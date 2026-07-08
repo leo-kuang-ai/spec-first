@@ -188,6 +188,29 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(configureHostPs1)).toContain("$DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder' -and $DetectedHost -ne 'cursor'");
   });
 
+  test('install-mcp PowerShell external commands use bounded process timeout', () => {
+    const source = read(installMcpPs1);
+
+    expect(source).toContain('function Invoke-CapturedProcess');
+    expect(source).toContain('[int]$TimeoutSeconds = $script:StageTimeoutSeconds');
+    expect(source).toContain('$process.WaitForExit($TimeoutSeconds * 1000)');
+    expect(source).toContain('$process.Kill($true)');
+    expect(source).toContain('$exitCode = 124');
+    expect(source).toContain('timed out after ${TimeoutSeconds}s');
+    expect(source).toContain('function Invoke-ToolProcess');
+    expect(source).toContain("($Command -eq 'npm' -or $Command -eq 'npx')");
+    expect(source).toContain("Invoke-ToolProcess -Command ([string]$installStep.command) -Arguments $installArgs");
+    expect(source).toContain("Invoke-CapturedProcess -FileName $psExe -Arguments $configureArgs");
+    expect(source).toContain("Invoke-CapturedProcess -FileName $psExe -Arguments $repairArgs");
+    expect(source).toContain("Invoke-ToolProcess -Command ([string]$bootstrapStep.command) -Arguments $bootstrapArgs -WorkingDirectory $ResolvedRepoRoot");
+    expect(source).toContain("Invoke-ToolProcess -Command 'codegraph' -Arguments @('sync') -WorkingDirectory $ResolvedRepoRoot");
+    expect(source).toContain("Invoke-ToolProcess -Command 'codegraph' -Arguments @('index', '-f') -WorkingDirectory $ResolvedRepoRoot");
+    expect(source).not.toContain('Invoke-Captured { & $verifyCommand @verifyArgs }');
+    expect(source).not.toContain("Invoke-Captured { & (Join-Path $ScriptDir 'configure-host.ps1')");
+    expect(source).not.toContain('Invoke-Captured { & codegraph sync');
+    expect(source).not.toContain('Invoke-Captured { & codegraph index -f');
+  });
+
   test('qoder host config writes local json by default and user json only with opt-in when PowerShell is available', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-qoder-'));
     try {
@@ -653,7 +676,7 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).not.toContain('graphify .');
     expect(read(installMcpPs1)).toContain('codegraph sync');
     expect(read(installMcpPs1)).toContain('Test-CodeGraphStatusRequestsFullReindex');
-    expect(read(installMcpPs1)).toContain('& codegraph index -f');
+    expect(read(installMcpPs1)).toContain("Invoke-ToolProcess -Command 'codegraph' -Arguments @('index', '-f') -WorkingDirectory $ResolvedRepoRoot");
     expect(read(installMcpPs1)).toContain("Where-Object { $_.status -ne 'ready' }");
     for (const section of [
       'Execution result',

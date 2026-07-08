@@ -221,8 +221,10 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).toContain('Example config outdated (.spec-first/config.local.example.yaml)');
     expect(text).toContain('bootstrap-project-config.sh\\" --repo \\"$repo_root\\" --refresh-example');
     expect(text).toContain('Stage 1: Diagnose');
-    expect(text).toContain('Required MCP/runtime: run spec-mcp-setup --verify-only');
-    expect(text).toContain('Optional providers: explicit setup only');
+    expect(text).toContain('Required MCP/runtime: baseline_ready=');
+    expect(text).toContain('Generated runtime manifest:');
+    expect(text).toContain('readiness fact(s); explicit setup only');
+    expect(text).toContain('Host configured dependencies:');
     expect(text).toContain('spec-mcp-setup --project-config');
     expect(text).toContain('spec-mcp-setup --only graphify');
   });

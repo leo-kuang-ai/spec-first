@@ -149,10 +149,10 @@ For bare `spec-mcp-setup`, do this inside the skill:
 
 1. Resolve the project target. In a parent workspace, stop before repo-local writes unless the user selected a child repo or intentionally chose all supported child repos.
 2. Run the lightweight health/readiness check and render a compact Stage 1 diagnostic:
-   - required MCP/runtime facts: point to `spec-mcp-setup --verify-only` when confirmed facts need refresh;
+   - required MCP/runtime facts: read existing `.spec-first/config/tool-facts.json` and `.spec-first/config/runtime-capabilities.json` snapshots when present, surface `baseline_ready`, generated runtime manifest status, configured dependency facts, and point to `spec-mcp-setup --verify-only` when confirmed facts are missing or need refresh;
    - helper readiness: `agent-browser`, `ast-grep`, and required global helper skills;
    - project-local config: `.spec-first/config.local.example.yaml`, optional `.spec-first/config.local.yaml`, `.gitignore` coverage, and legacy project config signals;
-   - optional providers: CodeGraph/Graphify detected or missing as advisory readiness, with explicit setup commands only.
+   - optional providers: CodeGraph/Graphify readiness facts from existing setup-owned facts when present, otherwise `unknown/not-refreshed` advisory status with explicit setup commands only.
 3. Summarize next actions instead of running provider setup:
    - `spec-mcp-setup --project-config` for project-local config repair;
    - `spec-first init --<host> -y` when generated runtime manifest is stale or missing;

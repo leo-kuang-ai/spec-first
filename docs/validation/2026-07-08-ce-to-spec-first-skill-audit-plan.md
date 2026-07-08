@@ -192,13 +192,13 @@ done
 3. `ce-doc-review` -> `spec-doc-review`
 4. `ce-code-review` -> `spec-code-review`
 5. `ce-work` -> `spec-work`
-6. `lfg` -> `spec-lfg`
-7. `ce-debug` -> `spec-debug`
-8. `ce-compound` -> `spec-compound`
-9. `ce-compound-refresh` -> `spec-compound-refresh`
-10. `ce-sweep` -> `spec-sweep`
-11. `ce-setup` -> `spec-mcp-setup`
-12. 其余低风险直接映射：`ce-commit`、`ce-commit-push-pr`、`ce-dogfood`、`ce-explain`、`ce-ideate`、`ce-optimize`、`ce-polish`、`ce-pov`、`ce-product-pulse`、`ce-promote`、`ce-proof`、`ce-resolve-pr-feedback`、`ce-riffrec-feedback-analysis`、`ce-simplify-code`、`ce-strategy`、`ce-test-browser`、`ce-test-xcode`、`ce-worktree`。
+6. `ce-debug` -> `spec-debug`
+7. `ce-compound` -> `spec-compound`
+8. `ce-compound-refresh` -> `spec-compound-refresh`
+9. `ce-sweep` -> `spec-sweep`
+10. `ce-setup` -> `spec-mcp-setup`
+11. 其余低风险直接映射：`ce-commit`、`ce-commit-push-pr`、`ce-dogfood`、`ce-explain`、`ce-ideate`、`ce-optimize`、`ce-polish`、`ce-pov`、`ce-product-pulse`、`ce-promote`、`ce-proof`、`ce-resolve-pr-feedback`、`ce-riffrec-feedback-analysis`、`ce-simplify-code`、`ce-strategy`、`ce-test-browser`、`ce-test-xcode`、`ce-worktree`。
+12. `lfg` -> `spec-lfg`，作为 full-pipeline 汇总审查最后执行。
 
 ## 待确认的首轮发现
 
@@ -233,6 +233,34 @@ done
 
 - 这是从 `ce-setup` 到 `spec-mcp-setup` 的近似映射，不是直接 parity target。
 - 审查应记录哪些 CE setup 职责被有意识排除，因为 spec-first setup 聚焦 multi-host runtime readiness。
+
+#### `ce-setup` 产物到 `spec-mcp-setup` 产物映射
+
+下表把 CE setup 已有产物逐项映射到 spec-first 原生 setup 产物。迁移判断以 spec-first 的 source/runtime 边界为准：本地项目配置、host MCP 配置、provider readiness、helper tool readiness 和 generated runtime freshness 都应成为 setup 可输出、可复查、可被后续 skill 消费的事实；但不保留 `.compound-engineering` 命名，也不把 legacy config 当作 active local config。
+
+| CE 产物 / 行为 | CE source | spec-first 对应产物 / 行为 | 覆盖状态 | spec-first 迁移说明 / 注意事项 | 下游消费者 / 验证面 |
+|---|---|---|---|---|---|
+| 三阶段 setup：诊断、修复 repo-local 问题、汇总 | `ce-setup/SKILL.md`、`scripts/check-health` | `spec-mcp-setup` 默认三阶段：Stage 1 轻量诊断、Stage 2 授权修复、Stage 3 汇总 next actions | 已覆盖并扩展 | 默认路径应保持轻量诊断；涉及 host 写入、project-local config 创建、provider 初始化时必须显式授权或显式参数触发 | `skills/spec-mcp-setup/SKILL.md`、`check-health` / `.ps1` human 输出、setup plan / focused tests |
+| Optional capability diagnostic 表 | `scripts/check-health` | `helper_tools` / `items[]` 诊断，human/JSON 输出 helper readiness | 已覆盖并扩展 | CE 只做工具存在性提示；spec-first 还需要输出 `status`、`result`、`next_action` 和 degraded reason，供后续 workflow 判断是否可用 | `tool-facts.json`、`runtime-capabilities.json`、`browser-helper-tool-contracts.test.js` |
+| `agent-browser` optional check | `scripts/check-health` | browser helper readiness：检测 CLI、runtime marker、global skill / host 可用性，缺失时给安装命令 | 已覆盖 | 不应自动安装；仅 CLI 存在但 runtime marker / skill 不完整时不能标为 ready。默认 setup 只给 next action，显式 helper install 才写入 | `spec-dogfood`、`spec-polish`、`spec-test-browser`、`spec-code-review` 浏览器证据路径 |
+| `gh`、`jq`、`ast-grep`、`ffmpeg` optional checks | `scripts/check-health` | helper registry 与 baseline readiness 分层；`ast-grep`、`ffmpeg` 等作为 helper/provider capability facts 输出 | 已覆盖并扩展 | 保留 CE 的“诊断而非批量安装”姿态；同时区分 required baseline、optional helper、provider-specific dependency，避免所有缺失都变阻断 | `spec-sweep`、`spec-riffrec-feedback-analysis`、`spec-rule-miner`、review/debug workflows |
+| `.compound-engineering/config.local.example.yaml` | `references/config-template.yaml` | `.spec-first/config.local.example.yaml` | 已覆盖 | 只迁移语义能力，不迁移文件名；example 是 project-local bootstrap 产物，可由 setup 刷新 | `verify-tools.*` project-local config status、config template contract tests |
+| 可选 `.compound-engineering/config.local.yaml` | `ce-setup/SKILL.md` | 可选 `.spec-first/config.local.yaml` | 已覆盖 | 仍是本地私有配置，不是 team-shared truth；setup 可创建或提示创建，但不应把它当作 source-of-truth | `spec-sweep`、`spec-product-pulse`、`spec-promote` 等读取 local config 的 workflow |
+| `.compound-engineering/*.local.yaml` gitignore 规则 | `scripts/check-health` | `.spec-first/*.local.yaml` gitignore 规则 | 已覆盖 | 保留“local config 不入库”的确定性保护；只写 spec-first namespace | gitignore policy / project-local config tests |
+| `compound-engineering.local.md` legacy cleanup | `scripts/check-health` | legacy markdown signal / manual cleanup next action | 部分覆盖，按 spec-first 降级 | 不作为 active setup 产物；只作为历史残留信号提示人工确认，避免 setup 自动删除用户文档 | `check-health` legacy signal、文档审查记录 |
+| `.compound-engineering/config.local.yaml` 未被 gitignore 的风险提示 | `scripts/check-health` | legacy local config signal；active 保护转为 `.spec-first/*.local.yaml` | 部分覆盖，按 spec-first 降级 | 旧路径不迁移为 active config；如存在，仅提示用户确认是否仍需保留。active 防泄漏只针对 `.spec-first` local config | `check-health` / `.ps1` legacy signal、gitignore policy |
+| CE config template keys | `references/config-template.yaml` | `skills/spec-mcp-setup/references/config-template.yaml` active local config keys | 已覆盖并重映射 | 迁移为 spec-first 当前消费者需要的 key；已裁决 retired 的 key 不作为 persisted setup preference，但后续 skill 仍使用的能力必须在 spec-first config 中有对应表达 | config template contract tests、后续 workflow local config reads |
+| work delegation keys | `references/config-template.yaml` | spec-first 下游 consumer-gated delegation config surface | 已覆盖 | 不是全局 active setup 偏好；只有下游 workflow 明确消费时才读取，避免 setup 阶段制造隐藏流程控制 | `spec-work`、`spec-plan`、review workflows 的 consumer-side gate |
+| plan skip scoping confirm | `references/config-template.yaml` | retired，不作为 persisted setup preference | 已裁决不覆盖 | 该行为不应在 setup 中持久化为默认跳过确认；需要由具体 planning workflow 基于当次上下文判断 | `spec-plan` 入口语义与 scoping confirmation 行为 |
+| setup summary | `scripts/check-health` | grouped status block：baseline、helpers、project-local config、provider readiness、generated runtime、next actions | 已覆盖并扩展 | 汇总必须清楚区分 blocking、degraded、optional、advisory；不能用 “All clear” 掩盖 optional degraded | `check-health` / `.ps1` human 输出 contract |
+| 不批量安装 optional tools，只输出 install command / URL | `ce-setup/SKILL.md`、`scripts/check-health` | 默认 setup 不自动安装 optional helper；`agent-browser`、provider setup 和 refresh 需要显式 opt-in | 已覆盖 | 保留 CE 的授权边界；spec-first 额外禁止裸 setup 触发 CodeGraph / Graphify first-generation | `install-helpers.*`、`setup-plan-renderer.cjs`、provider next action tests |
+| 无 MCP/runtime facts 文件 | 无 | `.spec-first/config/tool-facts.json`、`.spec-first/config/runtime-capabilities.json` | spec-first 新增 | 这是 spec-first 相比 CE 的核心新增产物：把诊断结果落成 machine-readable facts，供后续 workflow 读取，而不是依赖本轮口头判断 | `write-setup-facts` / `check-health --json`、runtime capability contract tests |
+| 无 generated runtime freshness 检查 | 无 | `generated_runtime_manifest.status` | spec-first 新增 | 用于确认 `.claude/`、`.codex/`、`.agents/skills/` 等 generated runtime 是否 stale / missing；发现漂移时提示 `spec-first init`，不手改 mirror | `spec-first doctor`、`verify-tools.*`、runtime manifest tests |
+| 无 provider readiness 事实 | 无 | `provider_readiness[]`，含 CodeGraph / Graphify 等 provider 的 status、artifact、refresh next action | spec-first 新增 | Provider 输出是 advisory navigation evidence；setup 只产 readiness facts，重要结论仍需 source/test/log 确认 | `spec-plan`、`spec-work`、`spec-code-review`、Graphify / CodeGraph consumption docs |
+| 无 host configured dependency scan | 无 | `configured_dependencies[]` | spec-first 新增 | 检查 host MCP / runtime 配置中声明的依赖是否存在、是否可执行、是否需要 repair，供 multi-host setup 汇总 | Claude、Codex、Kiro、Qoder、Cursor host setup / repair scripts |
+| 无 scenario fingerprint | 无 | `.spec-first/workspace/scenario-fingerprint-setup.json`（适用时） | spec-first 新增 | 用于 workspace / scenario 级 setup 事实复用；不替代具体 host/runtime/provider readiness | workspace setup summary、后续 setup drift 判断 |
+| 单 Bash health check | `scripts/check-health` | Bash + PowerShell parity scripts：`check-health`、`check-health.ps1`、`verify-tools.sh`、`verify-tools.ps1`、`install-mcp.*` | 已覆盖并扩展 | 需要维持 macOS/Linux/Windows 行为等价；外部命令执行、超时、路径 quoting、JSON/human 输出都应有跨平台测试 | `mcp-setup-powershell-contracts.test.js`、shell syntax check、PowerShell parse check |
+| plugin version display | `scripts/check-health` | spec-first version / runtime facts 可选展示，不作为核心产物 | 部分覆盖 | 版本可辅助诊断，但 setup 的可靠产物应是 readiness facts 与 next actions；不要把版本展示当作安装成功证据 | `spec-first --version`、`tool-facts.json` advisory facts |
 
 ## 推荐报告产物
 

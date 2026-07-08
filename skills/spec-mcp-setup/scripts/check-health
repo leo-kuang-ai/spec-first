@@ -97,6 +97,91 @@ agent_browser_ready() {
   global_skill_installed agent-browser || return 1
 }
 
+read_setup_snapshot_json() {
+  local repo_root="${1:-}"
+  node - "$repo_root" <<'NODE'
+const fs = require('node:fs');
+const path = require('node:path');
+const repoRoot = process.argv[2] || '';
+const unknown = (reasonCode, extra = {}) => ({ status: 'unknown', reason_code: reasonCode, ...extra });
+function readJson(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (error) {
+    return { __error: error && error.code ? error.code : 'unreadable' };
+  }
+}
+if (!repoRoot) {
+  console.log(JSON.stringify({
+    schema_version: 'spec-mcp-setup-diagnostic-snapshot.v1',
+    setup_facts_status: 'skip',
+    setup_facts_reason_code: 'not-inside-git-repo',
+    generated_runtime_manifest: unknown('not-inside-git-repo'),
+    baseline_ready: null,
+    host_runtime_ready: null,
+    provider_readiness: [],
+    configured_dependencies: [],
+  }));
+  process.exit(0);
+}
+const factsPath = path.join(repoRoot, '.spec-first', 'config', 'tool-facts.json');
+const runtimePath = path.join(repoRoot, '.spec-first', 'config', 'runtime-capabilities.json');
+const factsExists = fs.existsSync(factsPath);
+const runtimeExists = fs.existsSync(runtimePath);
+const facts = factsExists ? readJson(factsPath) : null;
+const runtime = runtimeExists ? readJson(runtimePath) : null;
+const runtimeSummary = runtime && !runtime.__error && runtime.setup_summary && typeof runtime.setup_summary === 'object'
+  ? runtime.setup_summary
+  : {};
+const generatedRuntimeManifest = runtimeSummary.generated_runtime_manifest && typeof runtimeSummary.generated_runtime_manifest === 'object'
+  ? runtimeSummary.generated_runtime_manifest
+  : unknown(runtimeExists ? 'generated-runtime-manifest-not-reported' : 'runtime-capabilities-missing', { next_action: 'spec-mcp-setup --verify-only' });
+console.log(JSON.stringify({
+  schema_version: 'spec-mcp-setup-diagnostic-snapshot.v1',
+  setup_facts_status: factsExists ? (facts && facts.__error ? 'error' : 'ready') : 'missing',
+  setup_facts_reason_code: factsExists ? (facts && facts.__error ? 'setup-facts-unreadable' : 'setup-facts-present') : 'setup-facts-missing',
+  setup_facts_path: factsPath,
+  runtime_capabilities_status: runtimeExists ? (runtime && runtime.__error ? 'error' : 'ready') : 'missing',
+  runtime_capabilities_reason_code: runtimeExists ? (runtime && runtime.__error ? 'runtime-capabilities-unreadable' : 'runtime-capabilities-present') : 'runtime-capabilities-missing',
+  runtime_capabilities_path: runtimePath,
+  generated_at: facts && !facts.__error ? facts.generated_at || null : null,
+  generated_runtime_manifest: generatedRuntimeManifest,
+  baseline_ready: Object.prototype.hasOwnProperty.call(runtimeSummary, 'baseline_ready') ? runtimeSummary.baseline_ready : null,
+  host_runtime_ready: Object.prototype.hasOwnProperty.call(runtimeSummary, 'host_runtime_ready') ? runtimeSummary.host_runtime_ready : null,
+  provider_readiness: facts && !facts.__error && Array.isArray(facts.provider_readiness) ? facts.provider_readiness : [],
+  configured_dependencies: facts && !facts.__error && Array.isArray(facts.configured_dependencies) ? facts.configured_dependencies : [],
+}));
+NODE
+}
+
+snapshot_field() {
+  local path_expr="$1"
+  SETUP_SNAPSHOT_JSON="$SETUP_SNAPSHOT_JSON" node - "$path_expr" <<'NODE'
+const snapshot = JSON.parse(process.env.SETUP_SNAPSHOT_JSON || '{}');
+const pathExpr = process.argv[2] || '';
+const value = pathExpr.split('.').filter(Boolean).reduce((current, key) => {
+  if (current && Object.prototype.hasOwnProperty.call(current, key)) return current[key];
+  return '';
+}, snapshot);
+if (value === null || value === undefined) process.stdout.write('');
+else if (typeof value === 'object') process.stdout.write(JSON.stringify(value));
+else process.stdout.write(String(value));
+NODE
+}
+
+snapshot_count() {
+  local path_expr="$1"
+  SETUP_SNAPSHOT_JSON="$SETUP_SNAPSHOT_JSON" node - "$path_expr" <<'NODE'
+const snapshot = JSON.parse(process.env.SETUP_SNAPSHOT_JSON || '{}');
+const pathExpr = process.argv[2] || '';
+const value = pathExpr.split('.').filter(Boolean).reduce((current, key) => {
+  if (current && Object.prototype.hasOwnProperty.call(current, key)) return current[key];
+  return [];
+}, snapshot);
+process.stdout.write(String(Array.isArray(value) ? value.length : 0));
+NODE
+}
+
 os="$(detect_os)"
 has_brew="$(command -v brew >/dev/null 2>&1 && echo "yes" || echo "no")"
 in_repo="$(git rev-parse --is-inside-work-tree >/dev/null 2>&1 && echo "yes" || echo "no")"
@@ -212,6 +297,15 @@ if [ "$in_repo" = "yes" ]; then
   fi
 fi
 
+SETUP_SNAPSHOT_JSON="$(read_setup_snapshot_json "${repo_root:-}")"
+capability_ok=0
+for result in "${results[@]}"; do
+  IFS='|' read -r _name _baseline_blocking status _install_cmd _url <<<"$result"
+  if [ "$status" = "ok" ]; then
+    capability_ok=$((capability_ok + 1))
+  fi
+done
+
 if [ "$json_output" = "yes" ]; then
   printf '{\n'
   printf '  "schema_version": "spec-mcp-setup-preflight.v2",\n'
@@ -296,6 +390,10 @@ if [ "$json_output" = "yes" ]; then
   printf '  "legacy": {"compound_engineering_markdown_status":"%s","compound_engineering_config_status":"%s"}\n' \
     "$(json_escape "$legacy_markdown")" \
     "$(json_escape "$legacy_ce_config")"
+  printf '  ,"runtime": %s,\n' "$SETUP_SNAPSHOT_JSON"
+  printf '  "generated_runtime_manifest": %s,\n' "$(snapshot_field generated_runtime_manifest)"
+  printf '  "provider_readiness": %s,\n' "$(snapshot_field provider_readiness)"
+  printf '  "configured_dependencies": %s\n' "$(snapshot_field configured_dependencies)"
   printf '}\n'
   exit 0
 fi
@@ -306,8 +404,14 @@ if [ -n "$plugin_version" ]; then
 fi
 
 section "Stage 1: Diagnose"
-detail "Required MCP/runtime: run spec-mcp-setup --verify-only to refresh confirmed host/runtime facts"
-detail "Helper tools: ${cli_ok}/${cli_total} CLI tools ready; ${skill_ok}/${skill_total} global skills ready"
+baseline_ready="$(snapshot_field baseline_ready)"
+manifest_status="$(snapshot_field generated_runtime_manifest.status)"
+manifest_reason="$(snapshot_field generated_runtime_manifest.reason_code)"
+provider_count="$(snapshot_count provider_readiness)"
+configured_dependency_count="$(snapshot_count configured_dependencies)"
+detail "Required MCP/runtime: baseline_ready=${baseline_ready:-unknown}; run spec-mcp-setup --verify-only to refresh confirmed host/runtime facts"
+detail "Generated runtime manifest: ${manifest_status:-unknown}${manifest_reason:+ ($manifest_reason)}"
+detail "Helper tools: ${capability_ok}/${cli_total} CLI capabilities ready; ${skill_ok}/${skill_total} global skills ready"
 if [ "$in_repo" = "yes" ]; then
   project_config_summary="ready"
   case "$example_cfg" in
@@ -317,13 +421,14 @@ if [ "$in_repo" = "yes" ]; then
     project_config_summary="action recommended"
   fi
   detail "Project local config: $project_config_summary"
-  detail "Optional providers: explicit setup only (spec-mcp-setup --only codegraph|graphify)"
+  detail "Optional providers: ${provider_count} readiness fact(s); explicit setup only (spec-mcp-setup --only codegraph|graphify)"
+  detail "Host configured dependencies: ${configured_dependency_count} fact(s)"
 else
   detail "Project local config: not inside a git repository"
   detail "Optional providers: choose a target repo before provider setup"
 fi
 
-section "Tool install status  ${cli_ok}/${cli_total}"
+section "Tool install status  ${capability_ok}/${cli_total}"
 printf "  %-15s %-9s %-10s\n" "Tool" "Required" "Status"
 printf "  %-15s %-9s %-10s\n" "----" "--------" "------"
 
@@ -418,10 +523,12 @@ if [ "$in_repo" = "yes" ]; then
 fi
 
 echo ""
-if [ "$issues" -eq 0 ]; then
-  echo " ✅  All clear  ${cli_ok}/${cli_total} tools  ${skill_ok}/${skill_total} skills"
+if [ "$issues" -eq 0 ] && [ "$capability_ok" -eq "$cli_total" ]; then
+  echo " ✅  All clear  ${capability_ok}/${cli_total} tool capabilities  ${skill_ok}/${skill_total} skills"
+elif [ "$issues" -eq 0 ]; then
+  echo " ✅  No blocking issues  ${capability_ok}/${cli_total} tool capabilities  ${skill_ok}/${skill_total} skills"
 else
-  echo " ⚠️   ${issues} issue(s) found  ${cli_ok}/${cli_total} tools  ${skill_ok}/${skill_total} skills"
+  echo " ⚠️   ${issues} issue(s) found  ${capability_ok}/${cli_total} tool capabilities  ${skill_ok}/${skill_total} skills"
 fi
 
 echo " Next:"

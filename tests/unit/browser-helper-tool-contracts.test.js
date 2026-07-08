@@ -158,9 +158,14 @@ describe('browser helper tool contracts', () => {
     expect(checkHealth).toContain('Skill install status');
     expect(checkHealth).toContain('Required');
     expect(checkHealth).toContain('Status');
-    expect(checkHealth).toContain('Optional providers: explicit setup only');
+    expect(checkHealth).toContain('baseline_ready=');
+    expect(checkHealth).toContain('Generated runtime manifest:');
+    expect(checkHealth).toContain('readiness fact(s); explicit setup only');
+    expect(checkHealth).toContain('Host configured dependencies:');
     expect(checkHealth).toContain('spec-mcp-setup --verify-only');
     expect(checkHealth).toContain('agent-browser-cli-ready|skipped) echo "skipped"');
+    expect(checkHealth).toContain('No blocking issues');
+    expect(checkHealth).toContain('CLI capabilities ready');
     expect(checkHealth).toContain('.installation.commands[$os]');
     expect(checkHealth).toContain('helper_registry_read_node install_command agent-browser "$os"');
     expect(checkHealth).toContain('elif [ "$name" = "agent-browser" ]; then');
@@ -190,6 +195,12 @@ describe('browser helper tool contracts', () => {
 
     const payload = JSON.parse(result.stdout);
     expect(payload.schema_version).toBe('spec-mcp-setup-preflight.v2');
+    expect(payload.runtime).toMatchObject({
+      schema_version: 'spec-mcp-setup-diagnostic-snapshot.v1',
+    });
+    expect(payload.generated_runtime_manifest).toHaveProperty('status');
+    expect(Array.isArray(payload.provider_readiness)).toBe(true);
+    expect(Array.isArray(payload.configured_dependencies)).toBe(true);
     const agentBrowser = payload.tools.find((tool) => tool.id === 'agent-browser');
     expect(agentBrowser).toMatchObject({
       required: true,
@@ -236,8 +247,10 @@ describe('browser helper tool contracts', () => {
     expect(result.status).toBe(0);
 
     expect(result.stdout).toContain('Stage 1: Diagnose');
-    expect(result.stdout).toContain('Required MCP/runtime: run spec-mcp-setup --verify-only');
-    expect(result.stdout).toContain('Optional providers: explicit setup only');
+    expect(result.stdout).toContain('Required MCP/runtime: baseline_ready=');
+    expect(result.stdout).toContain('Generated runtime manifest:');
+    expect(result.stdout).toContain('CLI capabilities ready');
+    expect(result.stdout).toContain('readiness fact(s); explicit setup only');
     expect(result.stdout).toContain('Next:');
     expect(result.stdout).toContain('spec-mcp-setup --only graphify');
     expect(result.stdout).not.toContain('graphify extract');

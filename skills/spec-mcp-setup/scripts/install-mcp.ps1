@@ -597,6 +597,94 @@ function Set-ProcessArgumentsCompat {
   $ProcessInfo.Arguments = Join-WindowsProcessArguments -Arguments $Arguments
 }
 
+function Get-CurrentPowerShellExecutable {
+  try {
+    $current = Get-Process -Id $PID -ErrorAction Stop
+    if (-not [string]::IsNullOrWhiteSpace([string]$current.Path)) { return [string]$current.Path }
+  } catch {}
+  $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
+  if ($null -ne $pwsh -and -not [string]::IsNullOrWhiteSpace([string]$pwsh.Source)) { return [string]$pwsh.Source }
+  $powershell = Get-Command powershell -ErrorAction SilentlyContinue
+  if ($null -ne $powershell -and -not [string]::IsNullOrWhiteSpace([string]$powershell.Source)) { return [string]$powershell.Source }
+  return 'pwsh'
+}
+
+function Invoke-CapturedProcess {
+  param(
+    [string]$FileName,
+    [object[]]$Arguments = @(),
+    [string]$WorkingDirectory = '',
+    [int]$TimeoutSeconds = $script:StageTimeoutSeconds,
+    [int]$Limit = 1000
+  )
+
+  $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = $FileName
+  Set-ProcessArgumentsCompat -ProcessInfo $processInfo -Arguments @($Arguments)
+  if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+    $processInfo.WorkingDirectory = $WorkingDirectory
+  }
+  $processInfo.RedirectStandardOutput = $true
+  $processInfo.RedirectStandardError = $true
+  $processInfo.UseShellExecute = $false
+
+  $process = [System.Diagnostics.Process]::new()
+  $process.StartInfo = $processInfo
+  $stdout = ''
+  $stderr = ''
+  $exitCode = 1
+  try {
+    [void]$process.Start()
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
+    $timedOut = -not $process.WaitForExit($TimeoutSeconds * 1000)
+    if ($timedOut) {
+      try {
+        $process.Kill($true)
+      } catch {
+        try { $process.Kill() } catch {}
+      }
+      $process.WaitForExit()
+      $exitCode = 124
+    } else {
+      $exitCode = [int]$process.ExitCode
+    }
+    $stdoutTask.Wait()
+    $stderrTask.Wait()
+    $stdout = [string]$stdoutTask.Result
+    $stderr = [string]$stderrTask.Result
+    if ($timedOut) {
+      $stderr = (($stderr, "timed out after ${TimeoutSeconds}s") | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }) -join "`n"
+    }
+  } catch {
+    $stderr = [string]$_.Exception.Message
+    $exitCode = 127
+  } finally {
+    $process.Dispose()
+  }
+
+  $summary = Redact-Diagnostic (((@($stderr, $stdout) -join ' ') -replace '\s+', ' ').Trim())
+  if ($summary.Length -gt $Limit) { $summary = $summary.Substring(0, $Limit) }
+  [pscustomobject]@{
+    ok = ($exitCode -eq 0)
+    exit_code = $exitCode
+    stdout = $stdout
+    diagnostic_summary = $summary
+  }
+}
+
+function Invoke-ToolProcess {
+  param(
+    [string]$Command,
+    [object[]]$Arguments = @(),
+    [string]$WorkingDirectory = ''
+  )
+  if ($Platform -eq 'windows' -and ($Command -eq 'npm' -or $Command -eq 'npx')) {
+    return Invoke-CapturedProcess -FileName $(if (-not [string]::IsNullOrWhiteSpace($env:ComSpec)) { $env:ComSpec } else { 'cmd.exe' }) -Arguments (@('/d', '/c', $Command) + @($Arguments)) -WorkingDirectory $WorkingDirectory
+  }
+  Invoke-CapturedProcess -FileName $Command -Arguments @($Arguments) -WorkingDirectory $WorkingDirectory
+}
+
 function Invoke-Warmup {
   param([object]$Tool)
   $platformKey = if ($Platform -eq 'windows') { 'windows' } else { 'unix' }
@@ -739,18 +827,12 @@ foreach ($tool in @($ToolsJson.tools)) {
     $expectedVersion = [string]$tool.version
     $verifyBefore = $null
     if (-not [string]::IsNullOrWhiteSpace($verifyCommand)) {
-      $verifyBefore = Invoke-Captured { & $verifyCommand @verifyArgs }
+      $verifyBefore = Invoke-ToolProcess -Command $verifyCommand -Arguments $verifyArgs
     }
     if ($null -ne $verifyBefore -and $verifyBefore.ok -and (Test-VersionOutputMatchesExpected -Expected $expectedVersion -Output "$($verifyBefore.stdout) $($verifyBefore.diagnostic_summary)")) {
       $lastAction = 'global-install-cache-hit'
     } else {
-      $installRun = Invoke-Captured {
-        if ($Platform -eq 'windows' -and $installStep.command -eq 'npm') {
-          & cmd.exe /d /c $installStep.command @installArgs
-        } else {
-          & $installStep.command @installArgs
-        }
-      }
+      $installRun = Invoke-ToolProcess -Command ([string]$installStep.command) -Arguments $installArgs
       if (-not $installRun.ok) {
         $status = 'action-required'
         $lastAction = 'failed'
@@ -759,7 +841,7 @@ foreach ($tool in @($ToolsJson.tools)) {
         $exitCode = $installRun.exit_code
         $diagnosticSummary = $installRun.diagnostic_summary
       } elseif (-not [string]::IsNullOrWhiteSpace($verifyCommand)) {
-        $verifyAfter = Invoke-Captured { & $verifyCommand @verifyArgs }
+        $verifyAfter = Invoke-ToolProcess -Command $verifyCommand -Arguments $verifyArgs
         if (-not $verifyAfter.ok) {
           $status = 'action-required'
           $lastAction = 'failed'
@@ -785,9 +867,10 @@ foreach ($tool in @($ToolsJson.tools)) {
   $hostConfigRequired = if ($null -ne $tool.PSObject.Properties['host_config_required']) { [bool]$tool.host_config_required } else { $true }
 
   if ($status -eq 'ready' -and $hostConfigRequired) {
-    $configureParams = @{ Tool = $tool.id }
-    if ($UserScope) { $configureParams.UserScope = $true }
-    $configureRun = Invoke-Captured { & (Join-Path $ScriptDir 'configure-host.ps1') @configureParams }
+    $psExe = Get-CurrentPowerShellExecutable
+    $configureArgs = @('-NoProfile', '-File', (Join-Path $ScriptDir 'configure-host.ps1'), '-Tool', $tool.id)
+    if ($UserScope) { $configureArgs += '-UserScope' }
+    $configureRun = Invoke-CapturedProcess -FileName $psExe -Arguments $configureArgs
     if ($configureRun.ok) {
       $configureResult = $configureRun.stdout | ConvertFrom-Json
       $configuredPath = $configureResult.configured_path
@@ -796,7 +879,9 @@ foreach ($tool in @($ToolsJson.tools)) {
     } else {
       $exitCode = $configureRun.exit_code
       $diagnosticSummary = $configureRun.diagnostic_summary
-      $repairRun = Invoke-Captured { & (Join-Path $ScriptDir 'repair-install.ps1') @configureParams }
+      $repairArgs = @('-NoProfile', '-File', (Join-Path $ScriptDir 'repair-install.ps1'), '-Tool', $tool.id)
+      if ($UserScope) { $repairArgs += '-UserScope' }
+      $repairRun = Invoke-CapturedProcess -FileName $psExe -Arguments $repairArgs
       if ($repairRun.ok) {
         $repairResult = $repairRun.stdout | ConvertFrom-Json
         $lastAction = 'repaired'
@@ -828,18 +913,7 @@ foreach ($tool in @($ToolsJson.tools)) {
     $platformKey = if ($Platform -eq 'windows') { 'windows' } else { 'unix' }
     $bootstrapStep = $tool.project_bootstrap.$platformKey
     $bootstrapArgs = @(Expand-ToolArgs -Tool $tool -Args $bootstrapStep.args)
-    $bootstrapRun = Invoke-Captured {
-      Push-Location $ResolvedRepoRoot
-      try {
-        if ($Platform -eq 'windows' -and $bootstrapStep.command -eq 'npx') {
-          & cmd.exe /d /c $bootstrapStep.command @bootstrapArgs
-        } else {
-          & $bootstrapStep.command @bootstrapArgs
-        }
-      } finally {
-        Pop-Location
-      }
-    }
+    $bootstrapRun = Invoke-ToolProcess -Command ([string]$bootstrapStep.command) -Arguments $bootstrapArgs -WorkingDirectory $ResolvedRepoRoot
     if ($bootstrapRun.ok) {
       $lastAction = 'project-bootstrapped'
     } else {
@@ -857,34 +931,13 @@ foreach ($tool in @($ToolsJson.tools)) {
   if ($status -eq 'ready' -and $null -ne $tool.PSObject.Properties['project_bootstrap'] -and $null -ne $tool.project_bootstrap.PSObject.Properties['status_probe']) {
     $probeStep = $tool.project_bootstrap.status_probe
     $probeArgs = @(Expand-ToolArgs -Tool $tool -Args @($probeStep.args))
-    $probeRun = Invoke-Captured {
-      Push-Location $ResolvedRepoRoot
-      try {
-        & $probeStep.command @probeArgs
-      } finally {
-        Pop-Location
-      }
-    }
+    $probeRun = Invoke-ToolProcess -Command ([string]$probeStep.command) -Arguments $probeArgs -WorkingDirectory $ResolvedRepoRoot
     if ($probeRun.ok) {
       $probeOutput = "$($probeRun.stdout) $($probeRun.diagnostic_summary)"
       if ($tool.id -eq 'codegraph' -and (($probeOutput -match 'Pending Changes') -or (Test-CodeGraphStatusRequestsFullReindex -Output $probeOutput))) {
-        $syncRun = Invoke-Captured {
-          Push-Location $ResolvedRepoRoot
-          try {
-            & codegraph sync
-          } finally {
-            Pop-Location
-          }
-        }
+        $syncRun = Invoke-ToolProcess -Command 'codegraph' -Arguments @('sync') -WorkingDirectory $ResolvedRepoRoot
         if ($syncRun.ok) {
-          $probeAfterSync = Invoke-Captured {
-            Push-Location $ResolvedRepoRoot
-            try {
-              & $probeStep.command @probeArgs
-            } finally {
-              Pop-Location
-            }
-          }
+          $probeAfterSync = Invoke-ToolProcess -Command ([string]$probeStep.command) -Arguments $probeArgs -WorkingDirectory $ResolvedRepoRoot
           if ($probeAfterSync.ok) {
             $probeAfterOutput = "$($probeAfterSync.stdout) $($probeAfterSync.diagnostic_summary)"
             if ($probeAfterOutput -match 'Pending Changes') {
@@ -894,23 +947,9 @@ foreach ($tool in @($ToolsJson.tools)) {
               $nextAction = 'Run codegraph sync from the project root and inspect pending changes.'
               $diagnosticSummary = $probeAfterSync.diagnostic_summary
             } elseif (Test-CodeGraphStatusRequestsFullReindex -Output $probeAfterOutput) {
-              $fullReindexRun = Invoke-Captured {
-                Push-Location $ResolvedRepoRoot
-                try {
-                  & codegraph index -f
-                } finally {
-                  Pop-Location
-                }
-              }
+              $fullReindexRun = Invoke-ToolProcess -Command 'codegraph' -Arguments @('index', '-f') -WorkingDirectory $ResolvedRepoRoot
               if ($fullReindexRun.ok) {
-                $probeAfterFullReindex = Invoke-Captured {
-                  Push-Location $ResolvedRepoRoot
-                  try {
-                    & $probeStep.command @probeArgs
-                  } finally {
-                    Pop-Location
-                  }
-                }
+                $probeAfterFullReindex = Invoke-ToolProcess -Command ([string]$probeStep.command) -Arguments $probeArgs -WorkingDirectory $ResolvedRepoRoot
                 if ($probeAfterFullReindex.ok) {
                   $probeAfterFullOutput = "$($probeAfterFullReindex.stdout) $($probeAfterFullReindex.diagnostic_summary)"
                   if (Test-CodeGraphStatusRequestsFullReindex -Output $probeAfterFullOutput) {

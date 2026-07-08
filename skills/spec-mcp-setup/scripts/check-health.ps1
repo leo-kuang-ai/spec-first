@@ -108,6 +108,80 @@ function Test-AgentBrowserReady {
   return (Test-GlobalSkillInstalled -SkillName 'agent-browser')
 }
 
+function Get-SetupSnapshot {
+  param([string]$RepoRoot)
+
+  if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+    return [ordered]@{
+      schema_version = 'spec-mcp-setup-diagnostic-snapshot.v1'
+      setup_facts_status = 'skip'
+      setup_facts_reason_code = 'not-inside-git-repo'
+      generated_runtime_manifest = [ordered]@{ status = 'unknown'; reason_code = 'not-inside-git-repo' }
+      baseline_ready = $null
+      host_runtime_ready = $null
+      provider_readiness = @()
+      configured_dependencies = @()
+    }
+  }
+
+  $factsPath = Join-Path $RepoRoot '.spec-first/config/tool-facts.json'
+  $runtimePath = Join-Path $RepoRoot '.spec-first/config/runtime-capabilities.json'
+  $facts = $null
+  $runtime = $null
+  $factsStatus = 'missing'
+  $factsReason = 'setup-facts-missing'
+  $runtimeStatus = 'missing'
+  $runtimeReason = 'runtime-capabilities-missing'
+
+  if (Test-Path -LiteralPath $factsPath -PathType Leaf) {
+    try {
+      $facts = Get-Content -Raw -LiteralPath $factsPath | ConvertFrom-Json -ErrorAction Stop
+      $factsStatus = 'ready'
+      $factsReason = 'setup-facts-present'
+    } catch {
+      $factsStatus = 'error'
+      $factsReason = 'setup-facts-unreadable'
+    }
+  }
+  if (Test-Path -LiteralPath $runtimePath -PathType Leaf) {
+    try {
+      $runtime = Get-Content -Raw -LiteralPath $runtimePath | ConvertFrom-Json -ErrorAction Stop
+      $runtimeStatus = 'ready'
+      $runtimeReason = 'runtime-capabilities-present'
+    } catch {
+      $runtimeStatus = 'error'
+      $runtimeReason = 'runtime-capabilities-unreadable'
+    }
+  }
+
+  $runtimeSummary = if ($null -ne $runtime -and $runtime.PSObject.Properties.Name -contains 'setup_summary') { $runtime.setup_summary } else { $null }
+  $manifest = if ($null -ne $runtimeSummary -and $runtimeSummary.PSObject.Properties.Name -contains 'generated_runtime_manifest') {
+    $runtimeSummary.generated_runtime_manifest
+  } else {
+    [ordered]@{
+      status = 'unknown'
+      reason_code = if ($runtimeStatus -eq 'missing') { 'runtime-capabilities-missing' } else { 'generated-runtime-manifest-not-reported' }
+      next_action = 'spec-mcp-setup --verify-only'
+    }
+  }
+
+  [ordered]@{
+    schema_version = 'spec-mcp-setup-diagnostic-snapshot.v1'
+    setup_facts_status = $factsStatus
+    setup_facts_reason_code = $factsReason
+    setup_facts_path = $factsPath
+    runtime_capabilities_status = $runtimeStatus
+    runtime_capabilities_reason_code = $runtimeReason
+    runtime_capabilities_path = $runtimePath
+    generated_at = if ($null -ne $facts -and $facts.PSObject.Properties.Name -contains 'generated_at') { $facts.generated_at } else { $null }
+    generated_runtime_manifest = $manifest
+    baseline_ready = if ($null -ne $runtimeSummary -and $runtimeSummary.PSObject.Properties.Name -contains 'baseline_ready') { $runtimeSummary.baseline_ready } else { $null }
+    host_runtime_ready = if ($null -ne $runtimeSummary -and $runtimeSummary.PSObject.Properties.Name -contains 'host_runtime_ready') { $runtimeSummary.host_runtime_ready } else { $null }
+    provider_readiness = if ($null -ne $facts -and $facts.PSObject.Properties.Name -contains 'provider_readiness') { @($facts.provider_readiness) } else { @() }
+    configured_dependencies = if ($null -ne $facts -and $facts.PSObject.Properties.Name -contains 'configured_dependencies') { @($facts.configured_dependencies) } else { @() }
+  }
+}
+
 function New-HealthItem {
   param(
     [object]$Helper,
@@ -243,13 +317,18 @@ $payload = [ordered]@{
     compound_engineering_config_status = $legacyConfig
   }
 }
+$setupSnapshot = Get-SetupSnapshot -RepoRoot $(if ($insideGitRepo) { $repoRoot } else { '' })
+$payload.runtime = $setupSnapshot
+$payload.generated_runtime_manifest = $setupSnapshot.generated_runtime_manifest
+$payload.provider_readiness = @($setupSnapshot.provider_readiness)
+$payload.configured_dependencies = @($setupSnapshot.configured_dependencies)
 
 if ($Json) {
   $payload | ConvertTo-Json -Depth 8
   exit 0
 }
 
-$readyTools = @($tools | Where-Object { $_.dependency_status -eq 'ready' }).Count
+$readyTools = @($tools | Where-Object { $_.result -eq 'ready' }).Count
 $readySkills = @($skills | Where-Object { $_.dependency_status -eq 'ready' }).Count
 
 if (-not [string]::IsNullOrWhiteSpace($Version)) {
@@ -258,8 +337,12 @@ if (-not [string]::IsNullOrWhiteSpace($Version)) {
 
 Write-Host ''
 Write-Host 'Stage 1: Diagnose'
-Write-Host '    Required MCP/runtime: run spec-mcp-setup --verify-only to refresh confirmed host/runtime facts'
-Write-Host "    Helper tools: $readyTools/$($tools.Count) CLI tools ready; $readySkills/$($skills.Count) global skills ready"
+$baselineReady = if ($null -eq $setupSnapshot.baseline_ready) { 'unknown' } else { ([string]$setupSnapshot.baseline_ready).ToLowerInvariant() }
+$manifestStatus = if ($setupSnapshot.generated_runtime_manifest.PSObject.Properties.Name -contains 'status') { [string]$setupSnapshot.generated_runtime_manifest.status } else { 'unknown' }
+$manifestReason = if ($setupSnapshot.generated_runtime_manifest.PSObject.Properties.Name -contains 'reason_code') { [string]$setupSnapshot.generated_runtime_manifest.reason_code } else { '' }
+Write-Host "    Required MCP/runtime: baseline_ready=$baselineReady; run spec-mcp-setup --verify-only to refresh confirmed host/runtime facts"
+Write-Host "    Generated runtime manifest: $manifestStatus$(if ([string]::IsNullOrWhiteSpace($manifestReason)) { '' } else { " ($manifestReason)" })"
+Write-Host "    Helper tools: $readyTools/$($tools.Count) CLI capabilities ready; $readySkills/$($skills.Count) global skills ready"
 if ($insideGitRepo) {
   $projectConfigSummary = 'ready'
   if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated') {
@@ -269,7 +352,8 @@ if ($insideGitRepo) {
     $projectConfigSummary = 'action recommended'
   }
   Write-Host "    Project local config: $projectConfigSummary"
-  Write-Host '    Optional providers: explicit setup only (spec-mcp-setup --only codegraph|graphify)'
+  Write-Host "    Optional providers: $(@($setupSnapshot.provider_readiness).Count) readiness fact(s); explicit setup only (spec-mcp-setup --only codegraph|graphify)"
+  Write-Host "    Host configured dependencies: $(@($setupSnapshot.configured_dependencies).Count) fact(s)"
 } else {
   Write-Host '    Project local config: not inside a git repository'
   Write-Host '    Optional providers: choose a target repo before provider setup'
