@@ -5,11 +5,11 @@
 
 ## 结论
 
-本轮复审覆盖 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md` 中已标记“已完成 / 已审查”的 20 个 CE -> spec-first skill pair，并排除 `ce-setup -> spec-mcp-setup`。
+本轮复审覆盖 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md` 中已标记“已完成 / 已审查”的 21 个 CE -> spec-first skill pair，并排除 `ce-setup -> spec-mcp-setup`。
 
 总体结论：
 
-- 明确 CE parity / 仅必要投影：`spec-compound`、`spec-explain`、`spec-lfg`、`spec-pov`、`spec-riffrec-feedback-analysis`、`spec-simplify-code`、`spec-strategy`、`spec-sweep`、`spec-test-xcode`。
+- 明确 CE parity / 仅必要投影：`spec-compound`、`spec-compound-refresh`、`spec-explain`、`spec-lfg`、`spec-pov`、`spec-riffrec-feedback-analysis`、`spec-simplify-code`、`spec-strategy`、`spec-sweep`、`spec-test-xcode`。
 - CE parity 加可保留增强：`spec-commit`、`spec-dogfood`、`spec-polish`、`spec-resolve-pr-feedback`、`spec-test-browser`、`spec-worktree`。
 - 明显不是最小投影，但增强可保留，需 owner 显式记录 divergence：`spec-commit-push-pr`、`spec-optimize`。
 - 存在 CE 行为缺失或主流程替换，需优先修复或 owner 决策：`spec-product-pulse`、`spec-promote`、`spec-proof`。
@@ -64,6 +64,21 @@
 - 必要投影：入口、scratch `/tmp/spec-first/spec-compound`、repo profile cache `/tmp/spec-first/repo-profile`、下游 `spec-compound-refresh` / `spec-simplify-code`、`SKILL_DIR` 路径锚点。
 - CE 行为保留：one-learning-per-run、headless mode、scratch artifact pattern、session-history enrichment、`CONCEPTS.md` create/seed、grounding validation、doc claims/frontmatter validators、local prompt assets、success output。
 - 结论：对齐 CE-first 投影口径。
+
+### `ce-compound-refresh` -> `spec-compound-refresh`
+
+状态：CE parity / 仅必要投影。
+
+已打开文件：
+- CE/spec 均打开：`SKILL.md`、`assets/resolution-template.md`、`references/concepts-vocabulary.md`、`references/per-action-flows.md`、`references/schema.yaml`、`references/yaml-schema.md`、`scripts/validate-frontmatter.py`
+- CE/spec 补齐后均有：`scripts/validate-doc-claims.py`
+
+判断：
+- 必要投影：入口和 downstream handoff 从 `ce-compound` 改为 `spec-compound`，CE `mode:headless` 的 no-interaction 安全动作语义投影为当前 `mode:autofix` 命名，validator 调用通过 loaded `SKILL_DIR` 而不是项目相对 `skills/` 路径。
+- CE 行为保留：Keep/Update/Consolidate/Replace/Delete 五类 refresh lifecycle、learning-first then pattern refresh、Update vs Replace 边界、Consolidate canonical doc 处理、Delete inbound-link check、ambiguous stale-mark、frontmatter parser-safety validator 和 doc claims validator。
+- CE 文件覆盖后删除 CE 中不存在的 spec-only `evals/examples.json`、structured recall 字段、legacy_unstructured_advisory / advisory scoped vocabulary / context-ADR report-only 口径；`spec-compound` 自身仍单独保留 structured promotion contract。
+- 修复：补回缺失的 `validate-doc-claims.py`，并让 Replace flow 在 parser-safety 后继续校验 cited paths、commit SHAs、relative links 和 drafting scaffold。
+- 结论：当前版本已恢复 CE refresh 的 grounding validator、CONCEPTS bootstrap / accretion / seeding 和 refresh lifecycle 能力；剩余差异为 spec-first 名称、模式命名、validator 路径锚点和最小 public workflow summary。
 
 ### `ce-dogfood` -> `spec-dogfood`
 

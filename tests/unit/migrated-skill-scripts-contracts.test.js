@@ -26,9 +26,11 @@ const EXPECTED_MIGRATED_SCRIPTS = {
     'scripts/session-history/extract-errors.py',
     'scripts/session-history/extract-metadata.py',
     'scripts/session-history/extract-skeleton.py',
+    'scripts/validate-doc-claims.py',
     'scripts/validate-frontmatter.py',
   ],
   'spec-compound-refresh': [
+    'scripts/validate-doc-claims.py',
     'scripts/validate-frontmatter.py',
   ],
   'spec-debug': [

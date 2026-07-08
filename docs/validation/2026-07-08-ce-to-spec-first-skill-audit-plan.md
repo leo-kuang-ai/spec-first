@@ -37,7 +37,7 @@ CE 是迁移能力的语义基准：
 | `ce-commit` | `spec-commit` | 生成并执行受控提交，维护 commit message 与验证摘要 | 直接映射，低复杂度 | 已完成 | 已审查 |
 | `ce-commit-push-pr` | `spec-commit-push-pr` | 提交、推送并创建或更新 PR 的交付 helper | 直接映射，低复杂度 | 已完成 | 已审查 |
 | `ce-compound` | `spec-compound` | 将已验证的问题解决经验沉淀为可复用知识 | 直接映射，knowledge/source evidence 关键 | 已完成 | 已审查 |
-| `ce-compound-refresh` | `spec-compound-refresh` | 刷新、合并或淘汰过期的 durable knowledge | 直接映射，learning lifecycle 关键 |  |  |
+| `ce-compound-refresh` | `spec-compound-refresh` | 刷新、合并或淘汰过期的 durable knowledge | 直接映射，learning lifecycle 关键 | 已完成 | 已审查 |
 | `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
 | `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
 | `ce-dogfood` | `spec-dogfood` | 对当前分支执行 hands-off 浏览器用户流 QA | 直接映射，browser QA artifact contract 关键 | 已完成 | 已审查 |
@@ -401,6 +401,79 @@ done
 
 - 本轮改动触及 skill prose、reference、Python validator、validation docs 和 changelog；执行 Python 语法检查、validator smoke、focused CE residual scan、`git diff --check`、`npm run lint:skill-entrypoints` 和 changelog 格式测试。
 - 未执行 fresh-source eval：本轮为 source-level migration repair，且 Codex 当前请求未显式授权 subagent/persona dispatch；语义充分性来自逐文件 source read、CE 对照和 focused deterministic checks。
+
+### `ce-compound-refresh` -> `spec-compound-refresh`
+
+#### Verdict
+
+- status: repaired
+- risk: high
+- decision: 按用户最新裁决，`spec-compound-refresh` 先以 CE `ce-compound-refresh` source 文件为真相源完整覆盖，再做最小 spec-first 必需归一化：入口名、下游 workflow 名、`mode:headless` -> `mode:autofix` 命名、loaded skill directory validator anchor，以及 public workflow 的轻量 Contract Summary。CE 的 docs/solutions refresh lifecycle、CONCEPTS bootstrap / accretion / seeding、replace/delete 安全门、frontmatter validator 与 mechanical claims validator 均恢复；不保留 CE 中不存在的 spec-only eval fixture、structured recall 字段或 advisory/context/ADR report-only 增强。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/assets/resolution-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/references/concepts-vocabulary.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/references/per-action-flows.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/references/schema.yaml`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/references/yaml-schema.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/scripts/validate-frontmatter.py`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound-refresh/scripts/validate-doc-claims.py`
+- spec-first: `skills/spec-compound-refresh/SKILL.md`
+- spec-first: `skills/spec-compound-refresh/assets/resolution-template.md`
+- spec-first: `skills/spec-compound-refresh/references/concepts-vocabulary.md`
+- spec-first: `skills/spec-compound-refresh/references/per-action-flows.md`
+- spec-first: `skills/spec-compound-refresh/references/schema.yaml`
+- spec-first: `skills/spec-compound-refresh/references/yaml-schema.md`
+- spec-first: `skills/spec-compound-refresh/scripts/validate-frontmatter.py`
+- spec-first: `skills/spec-compound-refresh/scripts/validate-doc-claims.py`
+
+#### Preserved Capabilities
+
+- 保留 `docs/solutions/` maintenance model：Keep、Update、Consolidate、Replace、Delete 五类 outcome，且 evidence 是判断输入而不是机械打分。
+- 保留 refresh order：先审 learning docs，再审依赖它们的 pattern docs；pattern stale 判断必须回到底层 learning evidence。
+- 保留 broad/focused/batch scope 处理：宽范围先 triage / cluster / spot-check，不把用户一开始就推入全量维护队列。
+- 保留 Update vs Replace 边界：路径、模块名、链接等 cosmetic drift 可原地更新；解决方案本身变化、旧 guidance 误导或架构变更时必须 Replace，不在原文里重写 solution。
+- 保留 Consolidate 逻辑：确认 canonical doc、提取 unique content、更新 cross-references、删除 subsumed doc，不创建 `_archived/`；合并后对 canonical doc 运行 mechanical claims check，避免 merged citations 或 cross-references 悬空。
+- 保留 Delete 安全门：实现或问题域消失时删除，但删除前必须做 inbound-link check；late-discovered substantive citation 会触发 reclassify。
+- 保留 replacement validator：`validate-frontmatter.py` 负责 parser-safety，`validate-doc-claims.py` 负责 cited paths、commit SHAs、relative links 和 dangling drafting scaffold。
+- 保留 headless/autofix conservative behavior：不问问题，安全动作可写入，歧义 Replace/Delete stale-mark，写失败进入 Recommended report。
+
+#### Intentional Spec-First Divergences
+
+- `mode:headless` 投影为当前 `mode:autofix`，与本仓库 programmatic/no-interaction 命名一致；行为仍保留 CE 的无交互安全动作和 stale-mark 策略。
+- `ce-compound` handoff 投影为 `spec-compound`；缺候选 docs 时提示运行 `spec-compound`。
+- CE 的 `${CLAUDE_SKILL_DIR}` validator guard 投影为“已读取的 `spec-compound-refresh` skill directory”上的 `SKILL_DIR` 调用，避免安装到用户目录或非 Claude host 后误依赖项目根 `skills/` 路径。
+- 保留本仓 public workflow 最小 `Workflow Contract Summary`，但不改变 CE 主流程、阶段或产物语义。
+- 删除 CE 中不存在的 spec-only `evals/examples.json`，避免形成额外维护面；同步删除旧 structured recall / advisory vocabulary / context-ADR report-only 测试口径。
+
+#### Legacy CE Residuals
+
+- 修复前 `spec-compound-refresh` 缺 CE 的 `scripts/validate-doc-claims.py`，且 Replace flow 只跑 parser-safety validator，丢失 cited path / SHA / relative-link / scaffold grounding check；已补回。
+- 修复前 `per-action-flows.md` 示例仍以 `python3 scripts/validate-frontmatter.py` project-relative 形式表达；已改为通过 loaded `SKILL_DIR` 调 bundled scripts，避免安装到用户目录后误依赖项目根 `skills/`。
+- `skills/spec-compound-refresh/scripts/__pycache__/validate-frontmatter.cpython-312.pyc` 曾作为本地编译产物出现；当前未被 git 跟踪，已从工作树移除，不作为 source 迁移面。
+
+#### Recommended Changes
+
+- [done] 用 CE `ce-compound-refresh` source 文件覆盖 `skills/spec-compound-refresh` 对应文件，再做最小 spec-first 投影。
+- [done] 新增 `skills/spec-compound-refresh/scripts/validate-doc-claims.py`，与 CE validator 对齐。
+- [done] Replace flow 在 frontmatter parser-safety 后运行 mechanical claims check，flags 作为 LLM adjudication input，不把脚本变成语义裁决者。
+- [done] Consolidate flow 严格保留 CE 的 post-merge mechanical claims check on canonical doc。
+- [done] 删除 CE 中不存在的 `evals/examples.json`、structured recall 字段和相关 contract tests；`spec-compound` 仍单独保留自身 structured promotion schema。
+- [done] 更新 migrated script contract，锁定脚本存在和无 CE namespace 残留；Replace flow 调用锚点由本节逐文件审查与 focused source checks 覆盖。
+
+#### Downstream Consumers
+
+- `spec-compound`: 新 learning 写入后可推荐 narrow `spec-compound-refresh` scope，refresh 现在能用同类 mechanical claims validator 维护 successor docs。
+- `spec-plan` / `spec-work` / `spec-code-review`: 消费 `docs/solutions/` recall 时仍把它当 advisory，并按当前 source/test/log/docs 回源确认；`spec-compound-refresh` 不再额外要求 CE 未定义的 `source_refs` / `invalidation_condition` 字段。
+- `docs/solutions/`: replacement / consolidation 后的 durable knowledge 有 parser-safety 与 mechanical citation check，减少 stale path、dangling link 和 draft scaffold 污染。
+
+#### Verification Needed
+
+- 本轮改动触及 skill prose、reference、Python validator、tests、validation docs 和 changelog；执行 Python 语法检查、validator smoke、focused migrated-skill/changelog Jest、entrypoint lint、focused CE residual scan 和 `git diff --check`。
+- 注意：旧 `tests/unit/spec-compound-contracts.test.js` 与 `tests/unit/knowledge-harness-contracts.test.js` 中将 `spec-compound-refresh` 绑定到 structured recall / advisory vocabulary 增强的断言已改为 CE-first parity 口径；`spec-compound` 自身的 structured promotion contract 仍由独立断言覆盖。
+- 未执行 fresh-source eval：本轮为 CE 对照 source repair；语义充分性来自逐文件打开 CE/spec source、contract tests 和 deterministic validator smoke。
 
 ### `ce-riffrec-feedback-analysis` -> `spec-riffrec-feedback-analysis`
 

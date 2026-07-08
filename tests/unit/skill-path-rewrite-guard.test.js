@@ -92,13 +92,13 @@ describe('skill source path rewrite guard', () => {
         adapter: new ClaudeAdapter(),
         skillName: 'using-spec-first',
         runtimeSkillRoot: '.claude/skills/using-spec-first',
-        expected: '`skills/using-spec-first/SKILL.md` is the source-of-truth routing policy.',
+        expected: '`skills/using-spec-first/SKILL.md` 是 routing policy source of truth。',
       },
       {
         adapter: new CodexAdapter(),
         skillName: 'using-spec-first',
         runtimeSkillRoot: '.agents/skills/using-spec-first',
-        expected: '`skills/using-spec-first/SKILL.md` is the source-of-truth routing policy.',
+        expected: '`skills/using-spec-first/SKILL.md` 是 routing policy source of truth。',
       },
     ];
 

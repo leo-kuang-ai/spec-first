@@ -71,10 +71,9 @@ describe('CE-lineage dispatch boundary contracts', () => {
     expect(combined).not.toMatch(/Codex does not support agents/i);
     expect(combined).not.toContain('do not call `spawn_agent` merely because this skill mentions reviewer personas');
     expect(combined).not.toMatch(/Codex should inline reviewer personas/i);
-    expect(read('skills/using-spec-first/SKILL.md')).toContain('Workflow Dispatch Admission');
-    expect(read('skills/using-spec-first/SKILL.md')).toContain('It does not by itself override host-level subagent tool contracts.');
-    expect(read('skills/using-spec-first/SKILL.md')).toContain('current request explicitly asks for subagents, delegated work, parallel agents, persona reviewer dispatch');
-    expect(read('skills/using-spec-first/SKILL.md')).toContain('visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording');
+    expect(read('skills/using-spec-first/SKILL.md')).toContain('进入公开 workflow 只授权该 workflow 本身');
+    expect(read('skills/using-spec-first/SKILL.md')).toContain('明示 subagents/personas/delegated/parallel/reviewer dispatch');
+    expect(read('skills/using-spec-first/SKILL.md')).toContain('dispatch_authorization_missing');
   });
 
   test('dispatch-boundary durable learnings keep old admission model only as superseded provenance', () => {

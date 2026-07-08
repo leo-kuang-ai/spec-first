@@ -51,7 +51,7 @@ describe('public workflow contract summary', () => {
     const writeTasks = fs.readFileSync(path.join(ROOT, 'skills', 'spec-write-tasks', 'SKILL.md'), 'utf8');
     const work = fs.readFileSync(path.join(ROOT, 'skills', 'spec-work', 'SKILL.md'), 'utf8');
 
-    expect(usingSpecFirst).toContain('Core boundary: scripts and CLI commands enforce deterministic invariants when mechanically decidable and prepare deterministic facts; the LLM decides the workflow recommendation above that fact floor.');
+    expect(usingSpecFirst).toContain('scripts/tools 只准备确定性事实；LLM 在事实地板之上判断语义充分性和入口选择。');
     expect(plan).toContain('setup/runtime facts stay advisory');
     expect(plan).toContain('implementation-dependent questions are deferred to `spec-work`');
     expect(writeTasks).toContain('Task packs are derived execution indexes and never replace the source plan.');

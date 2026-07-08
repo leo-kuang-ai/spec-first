@@ -8,7 +8,7 @@ Choose the template matching the problem_type track (see `references/schema.yaml
 
 Use for: `build_error`, `test_failure`, `runtime_error`, `performance_issue`, `database_issue`, `security_issue`, `ui_bug`, `integration_issue`, `logic_error`
 
-<!-- YAML safety: array items (symptoms, applies_when, tags, related_components, rejected_alternatives, applicable_versions, source_refs) starting with ` [ * & ! | > % @ ? or containing ": " must be wrapped in double quotes. See references/yaml-schema.md > "YAML Safety Rules". -->
+<!-- YAML safety: array items (symptoms, applies_when, tags, related_components) starting with ` [ * & ! | > % @ ? or containing ": " must be wrapped in double quotes. See references/yaml-schema.md > "YAML Safety Rules". -->
 
 ```markdown
 ---
@@ -23,15 +23,6 @@ symptoms:
 root_cause: [schema enum]
 resolution_type: [schema enum]
 severity: [schema enum]
-domain: [Problem or workflow domain]
-pattern: [Reusable pattern or lesson name]
-rejected_alternatives:
-  - [Approach rejected and why]
-applicable_versions:
-  - [Version or runtime where this applies]
-invalidation_condition: [What would make this learning stale]
-source_refs:
-  - [repo-relative source, test, doc, or review path]
 tags: [keyword-one, keyword-two]
 ---
 
@@ -65,7 +56,7 @@ tags: [keyword-one, keyword-two]
 
 Use for: `best_practice`, `documentation_gap`, `workflow_issue`, `developer_experience`
 
-<!-- YAML safety: array items (symptoms, applies_when, tags, related_components, rejected_alternatives, applicable_versions, source_refs) starting with ` [ * & ! | > % @ ? or containing ": " must be wrapped in double quotes. See references/yaml-schema.md > "YAML Safety Rules". -->
+<!-- YAML safety: array items (symptoms, applies_when, tags, related_components) starting with ` [ * & ! | > % @ ? or containing ": " must be wrapped in double quotes. See references/yaml-schema.md > "YAML Safety Rules". -->
 
 ```markdown
 ---
@@ -78,15 +69,6 @@ component: [schema enum]
 severity: [schema enum]
 applies_when:
   - [Condition where this applies]
-domain: [Problem or workflow domain]
-pattern: [Reusable pattern or lesson name]
-rejected_alternatives:
-  - [Approach rejected and why]
-applicable_versions:
-  - [Version or runtime where this applies]
-invalidation_condition: [What would make this learning stale]
-source_refs:
-  - [repo-relative source, test, doc, or review path]
 tags: [keyword-one, keyword-two]
 ---
 

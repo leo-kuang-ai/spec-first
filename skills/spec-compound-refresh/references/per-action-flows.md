@@ -1,6 +1,6 @@
 # Per-Action Flows
 
-This reference is loaded during Phase 4 of `spec-compound-refresh` after candidate artifacts have already been classified. Use only the section for the chosen action. The main skill owns classification, safety gates, user interaction, and reporting; this file holds the action-specific execution details.
+Read this reference when executing Phase 4. Find the section matching the action classified in Phase 2 and confirmed in Phase 3 (Keep, Update, Consolidate, Replace, or Delete) and follow that flow.
 
 ## Keep Flow
 
@@ -40,6 +40,8 @@ The orchestrator handles consolidation directly (no subagent needed — the docs
 
 If a doc cluster has 3+ overlapping docs, process pairwise: consolidate the two most overlapping docs first, then evaluate whether the merged result should be consolidated with the next doc.
 
+After the merge, run the mechanical claims check on the canonical doc (step 4 of the Replace flow below) — merged content brings its citations with it, and consolidation is where cross-references most often dangle.
+
 **Structural edits beyond merge:** Consolidate also covers the reverse case. If one doc has grown unwieldy and covers multiple distinct problems that would benefit from separate retrieval, it is valid to recommend splitting it. Only do this when the sub-topics are genuinely independent and a maintainer might search for one without needing the other.
 
 ## Replace Flow
@@ -62,8 +64,23 @@ Do not let replacement subagents invent frontmatter fields, enum values, or sect
    - The target path and category (same category as the old learning unless the category itself changed)
    - The relevant contents of the three support files listed above
 2. The subagent writes the new learning using the support files as the source of truth: `references/schema.yaml` for frontmatter fields and enum values, `references/yaml-schema.md` for category mapping and YAML-safety rules for array items, and `assets/resolution-template.md` for section order. It should use dedicated file search and read tools if it needs additional context beyond what was passed.
-3. **Run `python3 scripts/validate-frontmatter.py <new-learning-path>`** from the `skills/spec-compound-refresh/` directory to catch parser-safety issues the prose rules can miss: malformed `---` delimiter lines, unquoted ` #` in scalar values, and unquoted `: ` in scalar values. Exit 0 means the doc is parser-safe; exit 1 means stderr names the field(s) to quote or fix. Re-write the doc and re-run until exit 0. Do not declare success while validation fails, and do not delete the old learning before validation passes. The script is pure Python 3 stdlib and does not enforce schema required fields or enum values. If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify the same scope the script covers — the frontmatter opens and closes with exact `---` lines, and no unquoted top-level scalar value contains ` #` (YAML drops it as a comment) or `: ` (parsers may read it as a nested mapping). Quote offending values. Keep the manual check to exactly these three; do not expand into schema, enum, or style edits. Do not delete the old learning until either the script passes or the manual check is complete.
-4. After the subagent completes and the new learning passes parser-safety validation, the orchestrator deletes the old learning file. The new learning's frontmatter may include `supersedes: [old learning filename]` for traceability, but this is optional — the git history and commit message provide the same information.
+3. **Validate parser-safety of the new learning's frontmatter** to catch silent-corruption issues the prose rules miss: malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), and unquoted `: ` in scalar values (silent mapping confusion). Resolve the bundled validator through the loaded skill directory, not a project-relative `skills/` path:
+
+   ```bash
+   SKILL_DIR="<absolute path of the directory containing the spec-compound-refresh SKILL.md you read>"
+   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" <new-learning-path>
+   ```
+
+   Exit 0 means parser-safe; exit 1 means stderr names the offending field(s) — quote the value(s), re-write the doc, and re-run until exit 0. Do not declare success while validation fails. The validator does not enforce schema rules and does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps). If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify the same scope the script covers — the frontmatter opens and closes with exact `---` lines, and no unquoted top-level scalar value contains ` #` (YAML drops it as a comment) or `: ` (parsers may read it as a nested mapping). Quote offending values. Keep the manual check to exactly these three; do not expand into schema, enum, or style edits. Do not delete the old learning until either the script passes or the manual check is complete.
+4. **Run the mechanical claims check on the successor doc.** The bundled `scripts/validate-doc-claims.py` flags cited repo paths missing from the tree, commit SHAs that do not resolve or are unreachable, relative doc links that do not resolve, and dangling drafting scaffold ("Learning 3", unresolved `{{...}}` tokens):
+
+   ```bash
+   SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
+   python3 "$SKILL_DIR/scripts/validate-doc-claims.py" <new-learning-path>
+   ```
+
+   Exit 1 flags are **adjudication input, not failures** — a successor doc describing removed code legitimately cites paths that no longer exist. Resolve each flag by fixing the citation, annotating it as historical, or confirming it intentional; always fix scaffold flags. If the script is not resolvable on this platform, scan the body for those same patterns manually and say so in the report.
+5. After the subagent completes, the orchestrator deletes the old learning file. The new learning's frontmatter may include `supersedes: [old learning filename]` for traceability, but this is optional — the git history and commit message provide the same information.
 
 **When evidence is insufficient:**
 

@@ -450,14 +450,17 @@ describe('init --dry-run', () => {
       expect(gitignore).not.toContain('.spec-first/standards/');
 
       const claudeInstruction = fs.readFileSync(path.join(projectRoot, 'CLAUDE.md'), 'utf8');
-      expect(claudeInstruction).toContain('不默认进入 `spec-brainstorm`');
-      expect(claudeInstruction).toContain('只读定位也应使用 bounded direct reads 并说明目标 repo 假设');
-      expect(claudeInstruction).toContain('最小入口锚点');
-      expect(claudeInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
+      expect(claudeInstruction).toContain('source pointer');
+      expect(claudeInstruction).not.toContain('L0 启动锚点');
+      expect(claudeInstruction).toContain('完整入口路由与边界在 `skills/using-spec-first/SKILL.md`');
       expect(claudeInstruction).not.toContain('入口映射(意图→入口)');
-      expect(claudeInstruction).toContain('target_repo');
-      expect(claudeInstruction).toContain('完整 map 查 SKILL');
-      expect(claudeInstruction).toContain('spec-optimize');
+      expect(claudeInstruction).not.toContain('不默认进入 `spec-brainstorm`');
+      expect(claudeInstruction).not.toContain('target_repo');
+      expect(claudeInstruction).not.toContain('source/runtime 边界');
+      expect(claudeInstruction).not.toContain('generated runtime mirror');
+      expect(claudeInstruction).not.toContain('完整 map 查 SKILL');
+      expect(claudeInstruction).not.toContain('spec-optimize');
+      expect(claudeInstruction).not.toContain('外部 issue/PR 输入');
       expect(claudeInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(claudeInstruction).not.toContain('group.status');
       expect(claudeInstruction).not.toContain('spec-standards` 无参数运行默认为每个 discovered child repo');
@@ -619,20 +622,23 @@ describe('init --dry-run', () => {
       expect(gitignore).toContain('.codex/');
       expect(gitignore).toContain('.agents/skills/');
       expect(gitignore).not.toContain('.agents/\n');
-      expect(codexInstruction).toContain('不默认进入 `spec-brainstorm`');
-      expect(codexInstruction).toContain('只读定位也应使用 bounded direct reads 并说明目标 repo 假设');
-      expect(codexInstruction).toContain('最小入口锚点');
-      expect(codexInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
+      expect(codexInstruction).toContain('source pointer');
+      expect(codexInstruction).not.toContain('L0 启动锚点');
+      expect(codexInstruction).toContain('完整入口路由与边界在 `skills/using-spec-first/SKILL.md`');
       expect(codexInstruction).not.toContain('入口映射(意图→入口)');
-      expect(codexInstruction).toContain('target_repo');
-      expect(codexInstruction).toContain('完整 map 查 SKILL');
-      expect(codexInstruction).toContain('spec-optimize');
+      expect(codexInstruction).not.toContain('不默认进入 `spec-brainstorm`');
+      expect(codexInstruction).not.toContain('target_repo');
+      expect(codexInstruction).not.toContain('source/runtime 边界');
+      expect(codexInstruction).not.toContain('generated runtime mirror');
+      expect(codexInstruction).not.toContain('完整 map 查 SKILL');
+      expect(codexInstruction).not.toContain('spec-optimize');
+      expect(codexInstruction).not.toContain('外部 issue/PR 输入');
       expect(codexInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(codexInstruction).not.toContain('group.status');
-      expect(codexInstruction).toContain('spec-first startup-reminder --codex');
-      expect(codexInstruction).toContain('只提示在终端运行 `spec-first update`');
-      expect(codexInstruction).toContain('失败/空输出不阻塞');
-      expect(codexInstruction).toContain('bounded subagents、leaf reviewers、worker agents 不运行');
+      expect(codexInstruction).not.toContain('spec-first startup-reminder --codex');
+      expect(codexInstruction).not.toContain('只提示终端运行 `spec-first update`');
+      expect(codexInstruction).not.toContain('失败/空输出不阻塞');
+      expect(codexInstruction).not.toContain('bounded subagents、leaf reviewers、worker agents 不运行');
       expect(codexInstruction).not.toContain('spec-standards` 无参数运行默认为每个 discovered child repo');
       expect(codexInstruction).not.toContain('<!-- spec-first:runtime-tools:start -->');
 
@@ -742,10 +748,15 @@ describe('init --dry-run', () => {
   test('generated bootstrap keeps thin workspace guidance equivalent across hosts', () => {
     const codexBlock = buildBootstrapBlock(getAdapter('codex'), 'zh');
     const claudeBlock = buildBootstrapBlock(getAdapter('claude'), 'zh');
-    const workspaceLine = '父级多仓 workspace：写入、修复、测试、review autofix 或 commit 前必须有明确 `target_repo` / per-child scope；只读定位也应使用 bounded direct reads 并说明目标 repo 假设';
 
-    expect(codexBlock).toContain(workspaceLine);
-    expect(claudeBlock).toContain(workspaceLine);
+    expect(codexBlock).toContain('source pointer');
+    expect(claudeBlock).toContain('source pointer');
+    expect(codexBlock).not.toContain('L0 启动锚点');
+    expect(claudeBlock).not.toContain('L0 启动锚点');
+    expect(codexBlock).not.toContain('target_repo');
+    expect(claudeBlock).not.toContain('target_repo');
+    expect(codexBlock).not.toContain('父级多仓 workspace');
+    expect(claudeBlock).not.toContain('父级多仓 workspace');
     for (const block of [codexBlock, claudeBlock]) {
       expect(block).not.toContain('not-evaluated-no-mcp-input');
       expect(block).not.toContain('group.status');
@@ -891,16 +902,20 @@ describe('init --dry-run', () => {
       expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(false);
       expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(false);
       const parentAgents = fs.readFileSync(path.join(workspaceRoot, 'AGENTS.md'), 'utf8');
-      expect(parentAgents).toContain('target_repo');
-      expect(parentAgents).toContain('父级多仓 workspace');
-      expect(parentAgents).toContain('per-child scope');
+      expect(parentAgents).toContain('source pointer');
+      expect(parentAgents).not.toContain('L0 启动锚点');
+      expect(parentAgents).not.toContain('target_repo');
+      expect(parentAgents).not.toContain('父级多仓 workspace');
+      expect(parentAgents).not.toContain('per-child scope');
       expect(fs.existsSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'))).toBe(false);
 
       expect(captureInit(workspaceRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']).exitCode).toBe(0);
       expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(true);
       expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(true);
       const childAgents = fs.readFileSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'), 'utf8');
-      expect(childAgents).toContain('target_repo');
+      expect(childAgents).toContain('source pointer');
+      expect(childAgents).not.toContain('L0 启动锚点');
+      expect(childAgents).not.toContain('target_repo');
       expect(fs.readFileSync(path.join(workspaceRoot, 'project-a', '.gitignore'), 'utf8')).toContain(buildSpecFirstGitignoreBlock());
       expect(fs.readFileSync(path.join(workspaceRoot, 'project-b', '.gitignore'), 'utf8')).toContain(buildSpecFirstGitignoreBlock());
 

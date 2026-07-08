@@ -156,42 +156,48 @@ describe('knowledge harness workflow consumers', () => {
 });
 
 describe('solution promotion schema contract', () => {
-  test('extends the canonical spec-compound schema with structured recall fields', () => {
+  test('keeps CE-first spec-compound schema without structured recall fields', () => {
     const schema = read('skills/spec-compound/references/schema.yaml');
     const reference = read('skills/spec-compound/references/yaml-schema.md');
 
     for (const field of [
       'domain:',
-      'pattern:',
       'rejected_alternatives:',
       'applicable_versions:',
       'invalidation_condition:',
       'source_refs:',
     ]) {
-      expect(schema).toContain(field);
-      expect(reference).toContain(field.replace(':', ''));
+      expect(schema).not.toContain(field);
+      expect(reference).not.toContain(field.replace(':', ''));
     }
+    expect(schema).not.toMatch(/^\s{2}pattern:/m);
+    expect(reference).not.toMatch(/`pattern`/);
 
-    expect(schema).toContain('new_promote_required_fields');
-    expect(schema).toContain('legacy_unstructured_advisory');
-    expect(schema).toContain('New promoted solution docs must include invalidation_condition and source_refs');
-    expect(schema).toContain('Existing docs missing the new structured recall fields remain legacy_unstructured_advisory');
-    expect(reference).toContain('new promote');
-    expect(reference).toContain('legacy_unstructured_advisory');
+    expect(schema).not.toContain('new_promote_required_fields');
+    expect(schema).not.toContain('legacy_unstructured_advisory');
+    expect(schema).toContain('architecture_pattern');
+    expect(schema).toContain('tooling_decision');
+    expect(reference).toContain('Knowledge Track Fields');
+    expect(reference).toContain('architecture_pattern');
   });
 
-  test('compound and refresh route new durable knowledge through schema and verified gate', () => {
-    const compound = read('skills/spec-compound/SKILL.md');
-    const refresh = read('skills/spec-compound-refresh/SKILL.md');
+  test('knowledge contract owns structured promotion gate while refresh reuses CE-aligned documentation contracts', () => {
+    const contract = read('docs/contracts/knowledge/knowledge-harness.md');
+    const refresh = [
+      read('skills/spec-compound-refresh/SKILL.md'),
+      read('skills/spec-compound-refresh/references/per-action-flows.md'),
+    ].join('\n');
 
-    for (const text of [compound, refresh]) {
-      expect(text).toContain('Structured Promotion Gate');
-      expect(text).toContain('invalidation_condition');
-      expect(text).toContain('source_refs');
-      expect(text).toContain('verified learning');
-      expect(text).toContain('legacy_unstructured_advisory');
-      expect(text).toContain('references/schema.yaml');
-    }
+    expect(contract).toContain('source_refs');
+    expect(contract).toContain('legacy_unstructured_advisory');
+    expect(contract).toContain('new promote required 字段');
+    expect(contract).toContain('`invalidation_condition` 和 `source_refs`');
+
+    expect(refresh).not.toContain('Structured Promotion Gate');
+    expect(refresh).not.toContain('legacy_unstructured_advisory');
+    expect(refresh).toContain('references/schema.yaml');
+    expect(refresh).toContain('validate frontmatter and cited claims');
+    expect(refresh).toContain('Replace');
     expect(fs.existsSync(path.join(REPO_ROOT, 'docs/contracts/knowledge/solution-promotion.schema.json'))).toBe(false);
   });
 });
