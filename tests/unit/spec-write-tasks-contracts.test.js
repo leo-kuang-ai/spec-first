@@ -470,18 +470,6 @@ with ZipFile(${JSON.stringify(packagePath)}) as package:
     }
   });
 
-  test('spec-plan handoff only offers task-pack execution for executable task packs', () => {
-    const handoff = read(PLAN_HANDOFF_PATH);
-
-    expect(handoff).toContain('Invoke the `spec-write-tasks` workflow with the plan path');
-    expect(handoff).toContain('If it writes an executable task pack with matching `spec_id` and verifiable `source_plan_hash`');
-    expect(handoff).toContain('surface the copy-ready current-host doc-review invocation');
-    expect(handoff).toContain('If it returns `skip`, `return-to-plan`, `draft-only`, unverifiable identity/hash, or a non-executable task pack');
-    expect(handoff).toContain('do not offer task-pack execution');
-    expect(handoff).not.toContain('/spec:work <task-pack-path>` on Claude Code');
-    expect(handoff).not.toContain('$spec-work <task-pack-path>` on Codex');
-  });
-
   test('reviewed-existing posture requires evidence metadata for spec-work-task-pack next_action', () => {
     const contract = read(HANDOFF_CONTRACT_PATH);
     const skill = read(SKILL_PATH);

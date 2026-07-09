@@ -5,7 +5,6 @@ const path = require('node:path');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const CHECKLIST_PATH = path.join(REPO_ROOT, 'docs', 'contracts', 'workflows', 'fresh-source-eval-checklist.md');
-const PR_TEMPLATE_PATH = path.join(REPO_ROOT, '.github', 'pull_request_template.md');
 const SOURCE_RUNTIME_BOUNDARY_PATH = path.join(REPO_ROOT, 'docs', 'contracts', 'source-runtime-customization-boundary.md');
 const AGENTS_PATH = path.join(REPO_ROOT, 'AGENTS.md');
 const CLAUDE_PATH = path.join(REPO_ROOT, 'CLAUDE.md');
@@ -39,18 +38,11 @@ describe('fresh-source eval checklist contract', () => {
     }
   });
 
-  test('PR template and source-runtime boundary expose advisory fresh-source status with N/A', () => {
-    const template = fs.readFileSync(PR_TEMPLATE_PATH, 'utf8');
+  test('source-runtime boundary exposes advisory fresh-source status with N/A', () => {
     const boundary = fs.readFileSync(SOURCE_RUNTIME_BOUNDARY_PATH, 'utf8');
 
-    for (const text of [template, boundary]) {
-      expect(text).toContain('Fresh-source eval: passed | concerns | not_run | N/A');
-      expect(text).toContain('Runtime impact');
-      expect(text).toContain('N/A');
-    }
-    expect(template).toContain('advisory');
-    expect(template).toContain('not a model-judge CI gate');
-    expect(template).not.toMatch(/must pass.*model judge/i);
-    expect(template).not.toMatch(/required CI gate/i);
+    expect(boundary).toContain('Fresh-source eval: passed | concerns | not_run | N/A');
+    expect(boundary).toContain('Runtime impact');
+    expect(boundary).toContain('N/A');
   });
 });

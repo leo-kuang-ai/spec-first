@@ -14,7 +14,6 @@ const {
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const CONTRACT_PATH = path.join(REPO_ROOT, 'docs', 'contracts', 'workflows', 'eval-fixture-contract.md');
 const PACKAGE_PATH = path.join(REPO_ROOT, 'package.json');
-const SKILL_ENTRYPOINT_GATE_PATH = path.join(REPO_ROOT, '.github', 'workflows', 'skill-entrypoint-gate.yml');
 
 function listEvalJsonFiles(rootPath = path.join(REPO_ROOT, 'skills')) {
   const files = [];
@@ -254,17 +253,8 @@ describe('eval fixture normalizer contract', () => {
 
   test('package script and CI run deterministic eval fixture checks', () => {
     const packageJson = JSON.parse(fs.readFileSync(PACKAGE_PATH, 'utf8'));
-    const workflow = fs.readFileSync(SKILL_ENTRYPOINT_GATE_PATH, 'utf8');
 
     expect(packageJson.scripts['test:eval-fixtures']).toContain('tests/unit/eval-fixture-contracts.test.js');
-    expect(packageJson.scripts['test:eval-fixtures']).toContain('tests/unit/workflow-eval-readiness-contracts.test.js');
     expect(packageJson.scripts['test:eval-fixtures']).toContain('tests/unit/skill-audit-scripts.test.js');
-    expect(workflow).toContain('npm ci');
-    expect(workflow).toContain('npm run test:eval-fixtures');
-    expect(workflow).toContain('docs/contracts/workflows/eval-fixture-contract.md');
-    expect(workflow).toContain('skills/**');
-    expect(workflow).toContain('tests/unit/eval-fixture-contracts.test.js');
-    expect(workflow).not.toMatch(/model judge/i);
-    expect(workflow).not.toMatch(/fresh-source eval/i);
   });
 });

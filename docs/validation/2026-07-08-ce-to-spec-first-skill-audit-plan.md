@@ -1178,7 +1178,12 @@ done
 - 已核对 CE/spec 文件数量与文件名集合：两侧均为 28 个文件，集合一致。
 - 已运行 CE/spec 目录 diff，确认差异集中在 `ce-*` -> `spec-*`、`ce-unified-plan/v1` -> `spec-unified-plan/v1`、`.compound-engineering` -> `.spec-first`、`/tmp/compound-engineering` -> `/tmp/spec-first`、Proof identity 和 learnings module search 的必要投影。
 - 已运行 focused residual scan，确认 `skills/spec-plan` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留。
-- 本轮验证命令见本次执行 closeout；未手改 generated runtime mirrors。
+- 已运行 `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-plan/scripts/repo-profile-cache.py`。
+- 已运行 `npm run lint:skill-entrypoints`。
+- 已运行 `npm run test:eval-fixtures`。
+- 已运行 `npx jest tests/unit/skill-path-rewrite-guard.test.js tests/unit/governance-contracts.test.js tests/unit/init-dry-run.test.js tests/unit/spec-plan-contracts.test.js tests/unit/runtime-plan-contracts.test.js tests/unit/eval-fixture-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/changelog-format.test.js --runInBand --silent`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md package.json skills/spec-plan tests/unit`。
+- 未手改 generated runtime mirrors；未运行 fresh-source eval，原因是本轮按用户要求采用 CE source 逐文件对照恢复和 spec-first 必要投影，并用 source reads、文件集合 diff、残留扫描与 deterministic contract tests 验证迁移。
 
 ## 推荐报告产物
 

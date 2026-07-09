@@ -1348,7 +1348,10 @@ describe('spec-prd workflow contracts', () => {
 
   test('routing knows prd-requirements planning boundary', () => {
     const usingSpecFirst = read(USING_SPEC_FIRST_PATH);
-    const specPlan = read(SPEC_PLAN_PATH);
+    const specPlan = [
+      read(SPEC_PLAN_PATH),
+      read('skills/spec-plan/references/plan-sections.md'),
+    ].join('\n');
 
     expectContainsAll(usingSpecFirst, [
       'brownfield PRD authoring, existing PRD refinement, or code-aware PRD validation',
