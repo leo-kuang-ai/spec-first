@@ -1,7 +1,7 @@
 #!/bin/bash
 # Human-in-the-loop reproduction loop.
 # Copy this file, edit the steps below, and run it.
-# The agent runs the script; the user follows prompts in their terminal.
+# 用户运行脚本；agent 随后读取 captured KEY=VALUE output。
 #
 # Usage:
 #   bash hitl-loop.template.sh

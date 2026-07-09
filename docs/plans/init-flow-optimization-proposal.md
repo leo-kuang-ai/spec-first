@@ -441,7 +441,7 @@ PlatformAdapter (base.js, 177L — 不变)
 └── PointerBasedAdapter (新, ~150L) — pointer sync/removal/inspect + auto-derive patterns
     ├── CursorAdapter (~120L) — .mdc frontmatter, nested scan
     ├── KiroAdapter (~80L) — steering 目录, agent tool list injection
-    └── QoderAdapter (~150L) — hasCommands + pointer, agent tool pinning
+    └── QoderAdapter (~220-260L) — hasCommands + pointer, agent tool pinning + Qoder CLI hook lifecycle
 ```
 
 PointerBasedAdapter 封装：
@@ -516,6 +516,8 @@ if (adapter.id === 'qoder') {
 }
 ```
 
+**清理契约**：`renderManagedQoderHooksRemoval()` 只能移除 spec-first managed hook matchers 和 managed hook script references；若 `.qoder/settings.json` 中存在用户自定义 hooks、非 managed matcher、其他 settings key，必须原样保留。只有当 removal 后文件不再包含任何用户配置或非 managed hooks 时，clean 才能删除 `.qoder/settings.json`。
+
 **doctor 联动**（doctor.js `buildHostSpecificChecks`）：
 ```javascript
 // 类比 Claude 的 hook inspection（doctor.js L963）
@@ -559,7 +561,7 @@ if (adapter.id === 'qoder') {
 
 #### 4.7.3 Qoder hooks JSON schema
 
-`spec-first init --qoder` 写入的是项目级 `.qoder/settings.json`，会被 Qoder CLI 与 IDE/JB plugin 共同读取。为避免 CLI-only `args` exec-form 泄漏到未验证的 IDE/JB surface，本轮使用保守的 shell command string；若后续确认所有目标 surface 都支持 exec-form，再单独评估 `{ command, args }` 迁移。
+`spec-first init --qoder` 写入的是项目级 `.qoder/settings.json`，会被 Qoder CLI 与 IDE/JB plugin 共同读取。为避免 CLI-only `args` exec-form 泄漏到未验证的 IDE/JB surface，本轮使用保守的 shell command string；若后续确认所有目标 surface 都支持 exec-form，再单独评估 `{ command, args }` 迁移。下面的 matcher 语法（尤其 `".*"` 与 `"Write|Edit|MultiEdit"`）是 Phase 0 待确认项，必须由本地 smoke 验证确认 Qoder CLI/IDE/JB 均接受；验证失败时应改为 Qoder 官方支持的 matcher 表达或降级为不安装对应 matcher。
 
 ```json
 {
@@ -625,7 +627,7 @@ Phase 5: 平台兼容性 ───────────────── 独
 | 6 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder CLI 平台清理 settings matchers 与 hook scripts |
 | 7 | 修改 doctor.js `buildHostSpecificChecks` | Qoder CLI hook settings + script inspection |
 | 8 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder CLI hook drift 检测；该函数在 Phase 2 将迁移至 `init-plan.js` |
-| 9 | 验证 `UserPromptSubmit` 行为 | 确认 session-start prompt injection 的触发时机与 stdin/stdout 协议；Phase 0 不安装 `spec-plan-guard` |
+| 9 | 验证 `UserPromptSubmit` 行为 | 确认 session-start prompt injection 的触发时机、matcher 语法与 stdin/stdout 协议；若不符合预期，则不安装 session-start matcher，doctor 报 degraded，并只保留已验证的 PreToolUse/Stop hooks；Phase 0 不安装 `spec-plan-guard` |
 | 10 | 新建 `tests/unit/qoder-settings.test.js` 与 hook file plan tests | 覆盖 upsert/removal/inspect、script write/remove、settings 引用的脚本均存在 |
 
 **验收标准**：
@@ -724,7 +726,7 @@ Phase 5: 平台兼容性 ───────────────── 独
 预估: 1 天
 ```
 
-**适用范围**：上述流程适用于 pointer-only 宿主（Cursor/Kiro 类型）。若新宿主支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），但仍不修改现有 adapter。
+**适用范围**：上述流程适用于 pointer-only 宿主（Cursor/Kiro 类型）。若新宿主支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），参考成本为额外 +1-2 天、+250-500L source/tests，取决于 settings schema、hook script 数量、doctor/clean/drift 闭环和跨 surface 兼容验证；但仍不修改现有 adapter。
 
 vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
