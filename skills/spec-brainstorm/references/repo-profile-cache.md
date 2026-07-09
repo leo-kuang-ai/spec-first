@@ -25,7 +25,7 @@ Never read from the cache — recompute every run:
 ## Cache location & key
 
 ```
-/tmp/compound-engineering/repo-profile/<root-sha>/<head-sha>.json
+/tmp/spec-first/repo-profile/<root-sha>/<head-sha>.json
 ```
 
 - `<root-sha>` = lexicographically-first `git rev-list --max-parents=0 HEAD` — the repo identity (stable, shared across worktrees and clones).

@@ -1,6 +1,6 @@
 # Synthesis Summary
 
-**Synthesis ≠ unified plan artifact.** The synthesis is NOT a preview, draft, or substitute for the requirements-only unified plan — it's the scope checkpoint that doc-write consumes as input. The Product Contract itself is written in Phase 3 from the confirmed synthesis. Both the synthesis and the Product Contract stay scope-only — implementation detail (file paths, code shapes, exact error wording) is downstream (ce-plan's job), not the Product Contract.
+**Synthesis ≠ unified plan artifact.** The synthesis is NOT a preview, draft, or substitute for the requirements-only unified plan — it's the scope checkpoint that doc-write consumes as input. The Product Contract itself is written in Phase 3 from the confirmed synthesis. Both the synthesis and the Product Contract stay scope-only — implementation detail (file paths, code shapes, exact error wording) is downstream (spec-plan's job), not the Product Contract.
 
 **Two-stage shape: internal draft, then chat-time scoping synthesis.** The synthesis is composed in two stages. Stage 1 is an internal three-bucket draft (Stated / Inferred / Out of scope) the agent uses to think comprehensively about scope. Stage 2 is the scoping synthesis presented to the user — shaped like what two product collaborators would confirm before writing a PRD, not like a comprehensive audit and not like a one-line preview. The user only sees stage 2. The internal draft still informs the doc body via the doc-shape routing below; it just doesn't reach the user verbatim. This split exists because the comprehensive audit shape produced too much detail for the user to actually weigh in on, even when the granularity rules were followed.
 
@@ -8,7 +8,7 @@
 
 This content is loaded when Phase 2.5 fires — after Phase 2 (approaches chosen) and before Phase 3 (write the requirements-only unified plan). The synthesis is the user's last opportunity to correct the agent's interpretation before the artifact lands. It serves two purposes: synthesis confirmation (the user agreed to many individual things in dialogue but never saw the whole) and a transition checkpoint ("about to write the Product Contract").
 
-Fires for **all tiers** including Lightweight. Skip Phase 2.5 entirely on the Phase 0.1b non-software (universal-brainstorming) route. The skill is interactive by design — brainstorming requires dialogue with a synchronous user. There is no non-interactive mode; if an automated workflow needs a Product Contract without dialogue, the right move is to write the unified plan artifact from context directly, not to invoke `ce-brainstorm`.
+Fires for **all tiers** including Lightweight. Skip Phase 2.5 entirely on the Phase 0.1b non-software (universal-brainstorming) route. The skill is interactive by design — brainstorming requires dialogue with a synchronous user. There is no non-interactive mode; if an automated workflow needs a Product Contract without dialogue, the right move is to write the unified plan artifact from context directly, not to invoke `spec-brainstorm`.
 
 ---
 
@@ -68,8 +68,8 @@ Each conditional section has its own keep test. Sections are render-conditional 
 - **Real scope fork** — another reasonable agent might choose a different scope on this dimension (who the primary actor is, whether case X is in/out, in scope vs deferred)
 - **Non-obvious scope inclusion** — a behavior the agent assumed is in scope that the user might want excluded
 - **Non-obvious scope exclusion** — an item the agent moved to deferred that the user might want in scope
-- **Cheap-now-expensive-later correction** — a scope bet that's cheap to fix now but expensive after the Product Contract lands and ce-plan consumes it
-- **Non-obvious consequence of multi-turn answers** — a downstream effect of combining user-stated answers that the user is unlikely to have tracked through dialogue. Surfaced forward-looking ("X means Y for the doc"), not retrospectively ("you said X"). This category is the multi-turn-dialogue reason call-outs exist at all in ce-brainstorm; do not filter these as "already implied by Stated"
+- **Cheap-now-expensive-later correction** — a scope bet that's cheap to fix now but expensive after the Product Contract lands and spec-plan consumes it
+- **Non-obvious consequence of multi-turn answers** — a downstream effect of combining user-stated answers that the user is unlikely to have tracked through dialogue. Surfaced forward-looking ("X means Y for the doc"), not retrospectively ("you said X"). This category is the multi-turn-dialogue reason call-outs exist at all in spec-brainstorm; do not filter these as "already implied by Stated"
 
 Cut anything that doesn't match a keep-test category, including:
 
@@ -118,7 +118,7 @@ The "What we're building" prose obeys the same discipline: 1–3 sentences descr
 
 Each anti-pattern below produces a bullet that fails its section's keep test, or a scoping synthesis that drifts back toward the comprehensive-audit failure mode.
 
-- **Naming implementation detail in any bullet**: file paths, module names, exact JSON keys, HTTP status codes, error message wording, SQL syntax. The synthesis is scope-only; implementation is ce-plan's job. These granularity rules apply to every bullet in every section.
+- **Naming implementation detail in any bullet**: file paths, module names, exact JSON keys, HTTP status codes, error message wording, SQL syntax. The synthesis is scope-only; implementation is spec-plan's job. These granularity rules apply to every bullet in every section.
 - **Re-stating a Q&A turn verbatim** ("you said you wanted X"): transcript, not scoping synthesis. Reframe forward-looking ("X means Y for the doc") or cut.
 - **Re-stating the Phase 2 approach the user already picked**: the approach was chosen before Phase 2.5 — its mention belongs in one sentence of "What we're building," not as a call-out.
 - **Padding a section to meet a bullet count**: render-conditional means empty is allowed. Omit the section entirely rather than fill it with weak items.
@@ -194,7 +194,7 @@ What got cut from the 12-item internal draft and why:
 
 - Stated items already covered by the "What we're building" prose dissolved silently
 - "Use existing rule entity" — mechanical, no real trade-off
-- "Use Postgres for persistence" — implementation detail (ce-plan's job), failed granularity rules
+- "Use Postgres for persistence" — implementation detail (spec-plan's job), failed granularity rules
 - One Out-of-scope item ("no rate limiting") — mechanical exclude, no reader would ask about it
 - Three Inferred items rolled into the Trade-offs section as the explicit choices behind them
 
@@ -242,10 +242,10 @@ Fall back to a numbered list in chat only when no blocking tool exists or the ca
 
 ## Self-redirect
 
-If the user response indicates they're in the wrong skill or want a different workflow (e.g., "this is too small, just /ce-work it" or "this needs more thought, let me brainstorm differently"):
+If the user response indicates they're in the wrong skill or want a different workflow (e.g., "this is too small, just spec-work it" or "this needs more thought, let me brainstorm differently"):
 
-- Stop ce-brainstorm
-- Suggest the alternative skill the user appears to want (e.g., `/ce-work`, `/ce-debug`)
+- Stop spec-brainstorm
+- Suggest the alternative skill the user appears to want (e.g., `spec-work`, `spec-debug`)
 - Offer to load it in-session
 - Do not push back or argue — the user's redirect signal is the deliberate choice
 

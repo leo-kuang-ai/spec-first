@@ -61,7 +61,7 @@ Then:
 
 - **Selected decisions** — walk through one per turn as informed single-select menus. Post-pass, menus over mapped options are the right form even where Rule 5 would normally prefer open-ended: the options no longer steer, they recall what was just taught.
 - **Unselected decisions and hazards** — record the recommended default (or the hazard's constraint) as an explicit assumption, the same way rigor-probe uncertainty is recorded: in the Product Contract on the software route, in the synthesis on the universal route.
-- **"I want to actually learn this one"** — offer a handoff to the `ce-explain` skill for that item (offer, don't auto-fire); the brainstorm resumes when they return or continues with the default meanwhile.
+- **"I want to actually learn this one"** — offer a handoff to the `spec-explain` skill for that item (offer, don't auto-fire); the brainstorm resumes when they return or continues with the default meanwhile.
 
 The pass never resolves decisions by itself and never replaces the dialogue. It runs once, converts blindspots into questions the user can answer, and the normal flow — rigor probes, approaches, synthesis — continues on informed ground.
 

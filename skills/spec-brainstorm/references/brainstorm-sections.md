@@ -1,16 +1,16 @@
 # Brainstorm Sections
 
 This reference describes what makes a great requirements-only unified plan
-artifact produced by `ce-brainstorm`.
+artifact produced by `spec-brainstorm`.
 It does NOT prescribe how the doc looks on the page — rendering is handled by
 the format-specific references (`markdown-rendering.md`, `html-rendering.md`).
 
 ## The outcome
 
 A great brainstorm produces the first version of the same plan artifact that
-`ce-plan` later enriches. It enables three audiences to act:
+`spec-plan` later enriches. It enables three audiences to act:
 
-- **The planning agent** (`ce-plan` or a human) produces an implementation
+- **The planning agent** (`spec-plan` or a human) produces an implementation
   plan without inventing user behavior, scope boundaries, or success
   criteria — the brainstorm answered those.
 - **The reviewer** sees the framing choices, distinguishes pinned from open,
@@ -22,13 +22,13 @@ Sections earn their place by serving one of these audiences. Omit padding.
 
 ## Unified plan skeleton contract
 
-New `ce-brainstorm` outputs live under `docs/plans/` and use the unified plan
+New `spec-brainstorm` outputs live under `docs/plans/` and use the unified plan
 artifact contract:
 
 - **Path:** `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>`.
-- **`artifact_contract: ce-unified-plan/v1`**.
+- **`artifact_contract: spec-unified-plan/v1`**.
 - **`artifact_readiness: requirements-only`**.
-- **`product_contract_source: ce-brainstorm`**.
+- **`product_contract_source: spec-brainstorm`**.
 - **`execution`** only when the brainstorm has enough signal to classify the
   eventual execution domain. For software features, use `execution: code`.
   For non-code deliverables, follow the universal-brainstorming route instead
@@ -45,7 +45,7 @@ is skill-emitted at handoff, not a doc section, and the contract carries no
 Reader Index — consumers wayfind by scanning headings. It also omits empty
 `Planning Contract`, `Implementation Units`, `Verification Contract`, and
 `Definition of Done` sections — empty placeholders make requirements-only docs
-look executable and waste downstream tokens. `ce-plan` adds those sections when
+look executable and waste downstream tokens. `spec-plan` adds those sections when
 it enriches the same file in place. The next step (planning) is conveyed by the
 Phase 4 handoff menu, not by a section in the doc.
 
@@ -60,7 +60,7 @@ Skip document creation when **both** hold:
 - The user only needs brief alignment — no exploration produced novel scope,
   framing, or decisions worth preserving in IDed shape.
 - Any durable decisions made during the dialogue can flow naturally to
-  downstream artifacts (`ce-plan`, the commit message, `docs/solutions/`)
+  downstream artifacts (`spec-plan`, the commit message, `docs/solutions/`)
   without a brainstorm doc as an intermediary.
 
 The trigger for creating a doc is when the dialogue surfaced enough
@@ -71,7 +71,7 @@ durable, IDed form — not just as conversational artifacts.
 **Stress test:** a brainstorm about a tiny bug fix where the user asks "fix
 this with a null check or with upstream validation?" and the agent confirms
 "upstream validation, here's why" doesn't need a brainstorm doc. The
-decision flows to `ce-plan` (or directly to commit message, or to
+decision flows to `spec-plan` (or directly to commit message, or to
 `docs/solutions/` if it's a pattern worth carrying) without a brainstorm
 artifact in the middle.
 
@@ -221,7 +221,7 @@ worse than omitting it.
 - **Success Criteria** — include when there are quality / metric / handoff
   signals that Requirements don't already carry: quantitative metrics ("p95
   latency under 200ms"), qualitative criteria ("the agent's output reads as
-  one voice"), process / handoff quality ("ce-doc-review can act on this
+  one voice"), process / handoff quality ("spec-doc-review can act on this
   without follow-ups"). Skip when Requirements ARE the success criteria
   (every R is "done when the R is true").
 
@@ -278,7 +278,7 @@ artifact.
 - **`title`** — the artifact's descriptive name with a ` - Plan` suffix
   (e.g., `Highlighter Tool - Plan`), matching the H1 (markdown) or document
   `<h1>` (HTML). It is a unified plan at every readiness state, so the title
-  stays stable when `ce-plan` enriches it. Do not put a conventional-commit
+  stays stable when `spec-plan` enriches it. Do not put a conventional-commit
   prefix (`feat:`/`fix:`) in the title — the `type` field carries that.
 - **`type`** — conventional-commit-prefix-aligned classification (`feat`,
   `fix`, `refactor`, `docs`, etc.).
@@ -286,13 +286,13 @@ artifact.
   Used in the filename (`docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>`).
 - **`topic`** — kebab-case slug identifying the brainstorm subject (e.g.,
   `surface-scope-earlier`, `demo-reel-local-save`). Used in the filename and
-  as the resume-detection key when `ce-brainstorm` scans for an existing
+  as the resume-detection key when `spec-brainstorm` scans for an existing
   artifact to continue.
-- **`artifact_contract`** — always `ce-unified-plan/v1` for new outputs.
+- **`artifact_contract`** — always `spec-unified-plan/v1` for new outputs.
 - **`artifact_readiness`** — always `requirements-only` for new
-  `ce-brainstorm` outputs. Do not use `active`, `in_progress`, `completed`,
+  `spec-brainstorm` outputs. Do not use `active`, `in_progress`, `completed`,
   or `done`.
-- **`product_contract_source`** — always `ce-brainstorm`.
+- **`product_contract_source`** — always `spec-brainstorm`.
 
 ### No status field
 
@@ -321,7 +321,7 @@ Same shape as plan rules.
   heading levels.
 - **Repo-relative paths.** Always. Never absolute paths.
 - **No process exhaust.** No "captured at Phase X" notes, no `## Next Steps`
-  pointing to ce-plan, no italic provenance lines. Engineering process
+  pointing to spec-plan, no italic provenance lines. Engineering process
   metadata belongs in commit messages and tool output, not the artifact.
 - **No implementation details by default.** Libraries, schemas, endpoints,
   file layouts, code structure stay out unless the brainstorm itself is

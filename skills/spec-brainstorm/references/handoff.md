@@ -9,7 +9,7 @@ unified plan is written.
 
 The Phase 4 menu's visible option count varies by state: no unified plan
 artifact hides the review and Proof options, `OUTPUT_FORMAT=html` also hides
-the review option (ce-doc-review is markdown-only today), unresolved `Resolve
+the review option (spec-doc-review is markdown-only today), unresolved `Resolve
 Before Planning` hides both `Create the implementation plan` and `Ship it
 autonomously with lfg`, and the lfg option is also hidden for non-software
 brainstorms (`execution` other than `code`). Count the visible options for the
@@ -52,16 +52,16 @@ What would you like to do next? (Pick a number or describe what you want.)
 
 Present only the options that apply. Renumber so visible options stay contiguous starting at 1.
 
-1. **Create the implementation plan** *(recommended)* - Hand off to `ce-plan` and sharpen the requirements into a complete, testable plan. Shown only when `Resolve Before Planning` is empty.
-2. **Ship it autonomously with `lfg`** - Hand the requirements to the full autonomous pipeline: `lfg` plans (`ce-plan`), implements, simplifies, runs independent code review and applies the fixes, opens a PR, and watches CI to green — hands-off, no check-ins. It plans first (unlike a raw `/goal` straight from requirements), so it's the safer autonomous path. Best when you trust the requirements and want it built and shipped without steering. **Opens a PR and pushes a branch.** Shown only for software brainstorms (`execution: code`) with `Resolve Before Planning` empty **and a unified plan artifact was created** — `lfg` hands `ce-plan` that artifact path in pipeline mode and cannot prompt, so with no artifact (e.g. a brief-alignment brainstorm that skipped doc creation per the "Decide whether a doc is warranted" rule) there is nothing to enrich; offer option 1 instead, which can plan interactively from the conversation. For a quicker plan-then-decide flow, or to run a `/goal` yourself, pick option 1 and choose at the `ce-plan` handoff.
-3. **Pressure-test the requirements** - Dispatch reviewer agents with `ce-doc-review` to find gaps, conflicts, weak premises, and scope issues in the requirements; auto-apply safe fixes; route the rest interactively. Shown only when a markdown unified plan exists **and `OUTPUT_FORMAT=md`** — ce-doc-review's walkthrough applies markdown-only mutations (`##`/`###` heading inserts, single-file markdown edits via apply-set) and would corrupt an HTML artifact, so HTML brainstorms skip this option until ce-doc-review gains HTML-aware mutation support. Under HTML mode, surface a one-line note above the menu: `Requirements review unavailable in output:html mode — ce-doc-review is markdown-only today. Switch to output:md if you want a review pass.`
+1. **Create the implementation plan** *(recommended)* - Hand off to `spec-plan` and sharpen the requirements into a complete, testable plan. Shown only when `Resolve Before Planning` is empty.
+2. **Ship it autonomously with `lfg`** - Hand the requirements to the full autonomous pipeline: `lfg` plans (`spec-plan`), implements, simplifies, runs independent code review and applies the fixes, opens a PR, and watches CI to green — hands-off, no check-ins. It plans first (unlike a raw `/goal` straight from requirements), so it's the safer autonomous path. Best when you trust the requirements and want it built and shipped without steering. **Opens a PR and pushes a branch.** Shown only for software brainstorms (`execution: code`) with `Resolve Before Planning` empty **and a unified plan artifact was created** — `lfg` hands `spec-plan` that artifact path in pipeline mode and cannot prompt, so with no artifact (e.g. a brief-alignment brainstorm that skipped doc creation per the "Decide whether a doc is warranted" rule) there is nothing to enrich; offer option 1 instead, which can plan interactively from the conversation. For a quicker plan-then-decide flow, or to run a `/goal` yourself, pick option 1 and choose at the `spec-plan` handoff.
+3. **Pressure-test the requirements** - Dispatch reviewer agents with `spec-doc-review` to find gaps, conflicts, weak premises, and scope issues in the requirements; auto-apply safe fixes; route the rest interactively. Shown only when a markdown unified plan exists **and `OUTPUT_FORMAT=md`** — spec-doc-review's walkthrough applies markdown-only mutations (`##`/`###` heading inserts, single-file markdown edits via apply-set) and would corrupt an HTML artifact, so HTML brainstorms skip this option until spec-doc-review gains HTML-aware mutation support. Under HTML mode, surface a one-line note above the menu: `Requirements review unavailable in output:html mode — spec-doc-review is markdown-only today. Switch to output:md if you want a review pass.`
 4. **Publish to Proof — shareable link** - Publish the markdown unified plan to Every's Proof editor and get a shareable link to read, comment on, or share with others. One-way: the local doc stays canonical. Shown only when a markdown unified plan exists. **Render only when `OUTPUT_FORMAT=md`** (Proof operates on markdown and cannot ingest HTML).
 4. **Open in browser** — open the HTML unified plan locally for review and sharing. Shown only when an HTML unified plan exists. **Render only when `OUTPUT_FORMAT=html`.** Replaces "Publish to Proof" at the same slot under exclusive output mode — the artifact is either markdown OR HTML, never both, so exactly one of the two labels applies per run.
 5. **More clarifying questions to sharpen the doc** - Keep refining scope, edge cases, constraints, and preferences through further dialogue. Always shown.
 
 There is no "done" / "pause" option — the blocking question already waits, and the user ends by dismissing it (Esc) or saying they're finished. The unified plan artifact is already saved.
 
-**Post-review nudge (subsequent rounds only):** If the user has already run `ce-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Pressure-test the requirements\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Create the implementation plan` and the lfg option, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing `Pressure-test the requirements` option. Suppress this nudge when `OUTPUT_FORMAT=html` — that option is hidden in that mode, so the nudge would point users at a missing action.
+**Post-review nudge (subsequent rounds only):** If the user has already run `spec-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Pressure-test the requirements\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Create the implementation plan` and the lfg option, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing `Pressure-test the requirements` option. Suppress this nudge when `OUTPUT_FORMAT=html` — that option is hidden in that mode, so the nudge would point users at a missing action.
 
 #### 4.2 Handle the Selected Option
 
@@ -69,18 +69,18 @@ Selections may be the literal option label (when the user types the label or a c
 
 **If user selects "Create the implementation plan":**
 
-Immediately load the `ce-plan` skill in the current session. Pass the unified
+Immediately load the `spec-plan` skill in the current session. Pass the unified
 plan artifact path when one exists; otherwise pass a concise summary of the
 finalized brainstorm decisions. When the Phase 1.1 grounding scout produced a
 dossier and the file still exists, also pass its path
-(`/tmp/compound-engineering/ce-brainstorm/<run-id>/grounding.md`) — it gives
+(`/tmp/spec-first/spec-brainstorm/<run-id>/grounding.md`) — it gives
 planning verified quotes with `file:line` pointers to start from instead of
 re-scanning the repo. Do not print the closing summary first.
 
 **If user selects "Pressure-test the requirements":**
 
-Load the `ce-doc-review` skill, passing the unified plan path as the argument.
-When ce-doc-review returns "Review complete", return to the Phase 4 options
+Load the `spec-doc-review` skill, passing the unified plan path as the argument.
+When spec-doc-review returns "Review complete", return to the Phase 4 options
 and re-render the menu (the requirements may have changed, so re-evaluate
 `Resolve Before Planning`, the lfg software gate, and residual findings). If
 residual P0/P1 findings remain unaddressed, include the post-review nudge
@@ -90,11 +90,11 @@ above the menu. Do not show the closing summary yet.
 
 Immediately invoke the `lfg` skill in the current session via the platform's
 skill-invocation primitive, passing the unified plan artifact path as its
-argument so `lfg`'s `ce-plan` step enriches *this* requirements-only artifact in
+argument so `lfg`'s `spec-plan` step enriches *this* requirements-only artifact in
 place rather than bootstrapping a new plan. `lfg` then owns the full pipeline
-autonomously — plan, implement (`ce-work` in `return-to-caller` mode), simplify,
+autonomously — plan, implement (`spec-work` in `return-to-caller` mode), simplify,
 independent code review and applied fixes, commit/push/open PR, and CI watch to
-green. Do not also start a `/goal` or load `ce-work` directly — `lfg`
+green. Do not also start a `/goal` or load `spec-work` directly — `lfg`
 orchestrates them. Unlike a goal tool, `lfg` is host-agnostic: it works wherever
 skills run (plus `git`/`gh` for the PR/CI tail, which it guards when absent).
 
@@ -108,13 +108,13 @@ Do not print the closing summary first.
 
 **If user selects "Publish to Proof — shareable link":**
 
-Load the `ce-proof` skill to publish the markdown unified plan. Pass:
+Load the `spec-proof` skill to publish the markdown unified plan. Pass:
 
 - **source file:** `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md`
 - **doc title:** `Plan: <topic title> (requirements-only)`
-- **identity:** `ai:compound-engineering` / `Compound Engineering`
+- **identity:** `ai:spec-first` / `Spec-First`
 
-ce-proof creates a shared Proof doc from the markdown plan file (Create and
+spec-proof creates a shared Proof doc from the markdown plan file (Create and
 Share workflow), binds the display name, and returns the share URL. Surface
 the URL to the user — they can open it to read, comment, or share with others
 — then return to the Phase 4 options and re-render the menu. This is a one-way
@@ -148,7 +148,7 @@ Key decisions:
 - [Decision 1]
 - [Decision 2]
 
-Recommended next step: `ce-plan <plan artifact path>`
+Recommended next step: `spec-plan <plan artifact path>`
 ```
 
 If the user pauses with `Resolve Before Planning` still populated, display:
@@ -162,5 +162,5 @@ Planning is blocked by:
 - [Blocking question 1]
 - [Blocking question 2]
 
-Resume with `ce-brainstorm` when ready to resolve these before planning.
+Resume with `spec-brainstorm` when ready to resolve these before planning.
 ```

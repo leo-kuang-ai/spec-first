@@ -1,5 +1,5 @@
 ---
-name: ce-brainstorm
+name: spec-brainstorm
 description: 'Explore vague or ambitious ideas into a right-sized requirements-only unified plan. Use when the user wants to brainstorm, think through scope, decide what to build, or needs collaborative product framing before planning. Also use when the user must scope work in territory they say they do not know ("I know nothing about X but need to...") or asks for a blindspot pass — mapping the decision surface before questions begin. Not for executing already-specified work — direct implementation, debugging, or code review where no product scope is left to decide. Not for a decisive verdict on whether to adopt or switch to a specific external technology, library, or platform — brainstorming scopes what to build, not whether to commit to an outside option.'
 argument-hint: "[feature idea or problem to explore] [output:html]"
 ---
@@ -8,9 +8,9 @@ argument-hint: "[feature idea or problem to explore] [output:html]"
 
 **Note: The current year is 2026.** Use this when dating requirements-only unified plans.
 
-Brainstorming helps answer **WHAT** to build through collaborative dialogue. It precedes `/ce-plan`, which enriches the same unified plan artifact with **HOW** to build it.
+Brainstorming helps answer **WHAT** to build through collaborative dialogue. It precedes `spec-plan`, which enriches the same unified plan artifact with **HOW** to build it.
 
-The durable output of this workflow is a **requirements-only unified plan**. In other workflows this might be called a lightweight PRD or feature brief. In compound engineering, keep the workflow name `brainstorm`, but write the first version of the plan artifact under `docs/plans/` with `artifact_readiness: requirements-only` so planning does not need to invent product behavior, scope boundaries, or success criteria.
+The durable output of this workflow is a **requirements-only unified plan**. In other workflows this might be called a lightweight PRD or feature brief. In spec-first, keep the workflow name `brainstorm`, but write the first version of the plan artifact under `docs/plans/` with `artifact_readiness: requirements-only` so planning does not need to invent product behavior, scope boundaries, or success criteria.
 
 This skill does not implement code. It explores, clarifies, and documents decisions for later planning or execution.
 
@@ -61,7 +61,7 @@ Determine `OUTPUT_FORMAT` before any other phase fires. Output mode is **exclusi
 **Read config.** The repo root is pre-resolved at skill load:
 !`git rev-parse --show-toplevel 2>/dev/null || true`
 
-If the line above is an absolute path, use it as `<repo-root>`. If it is empty or still shows a backtick command string (a non-Claude harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.compound-engineering/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
+If the line above is an absolute path, use it as `<repo-root>`. If it is empty or still shows a backtick command string (a non-Claude harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
 
 Resolution steps:
 
@@ -71,23 +71,23 @@ Resolution steps:
 2. **User-stated preference.** If this prompt holds no format request, honor an output-format preference (markdown vs HTML) the user established earlier — earlier in this session, in your memory, or written into their active instructions — that is already in your context (match `md`/`html` case-insensitively). A remembered preference is more current than the rarely-edited config, so it **overrides** the config in step 3. Do not open or search instruction files to find it — act only on a preference already present in your context; if none is, fall through to the config.
 3. **Config.** If steps 1-2 did not resolve and the config file read above has an **active (non-commented)** `brainstorm_output:` key whose value matches `md` or `html` (case-insensitive), use it. Missing, invalid, or commented values fall through silently. Critical: lines starting with `#` are YAML comments and must be ignored — the shipped config template includes commented examples like `# brainstorm_output: html` to document the option, and matching those as active settings would silently force HTML mode on every run without the user having opted in.
 4. **Default.** Otherwise `OUTPUT_FORMAT=md`.
-5. **Pipeline override.** When invoked from LFG or any `disable-model-invocation` context, force `OUTPUT_FORMAT=md` regardless of steps 1-4. Downstream consumers (`ce-plan`, `ce-work`) parse markdown reliably; HTML in pipeline runs is unnecessary friction.
+5. **Pipeline override.** When invoked from LFG or any `disable-model-invocation` context, force `OUTPUT_FORMAT=md` regardless of steps 1-4. Downstream consumers (`spec-plan`, `spec-work`) parse markdown reliably; HTML in pipeline runs is unnecessary friction.
 
 **Token-parsing convention:** only literal-prefix flag tokens (`output:`, `mode:`, `delegate:` where applicable) are consumed and stripped. Other `<word>:<word>` tokens — including conventional commit prefixes like `feat:`, `fix:`, `chore:` that may appear inside a feature description — pass through verbatim.
 
 **Resolve the format here; load the rendering reference at Phase 3, not now.** The format-rendering reference (`references/markdown-rendering.md` for `md`, `references/html-rendering.md` for `html`) is consumed only when the doc is composed — loading it during Phase 0 would carry 200+ lines through the entire dialogue. Phase 3 names the load. Section content is the same in either format; presentation differs.
 
-The `output:` preference does NOT auto-propagate to `ce-plan` on handoff — ce-plan re-resolves its own `plan_output` config independently. Because both skills now operate on the same unified artifact, an explicit conversion by `ce-plan` must report the old path and new canonical path; pipeline mode may force markdown by writing the canonical markdown plan path and leaving any HTML sibling untouched as non-canonical for automated discovery.
+The `output:` preference does NOT auto-propagate to `spec-plan` on handoff — spec-plan re-resolves its own `plan_output` config independently. Because both skills now operate on the same unified artifact, an explicit conversion by `spec-plan` must report the old path and new canonical path; pipeline mode may force markdown by writing the canonical markdown plan path and leaving any HTML sibling untouched as non-canonical for automated discovery.
 
 #### 0.1 Resume Existing Work When Appropriate
 
-If the user references an existing brainstorm topic or document, or there is an obvious recent matching unified plan in `docs/plans/` with `artifact_contract: ce-unified-plan/v1`, `artifact_readiness: requirements-only`, and `product_contract_source: ce-brainstorm`:
+If the user references an existing brainstorm topic or document, or there is an obvious recent matching unified plan in `docs/plans/` with `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: requirements-only`, and `product_contract_source: spec-brainstorm`:
 - Read the document
 - Confirm with the user before resuming: "Found an existing requirements-only plan for [topic]. Should I continue from this, or start fresh?"
 - If resuming, summarize the current state briefly, continue from its existing decisions and outstanding questions, and update the existing document instead of creating a duplicate
 - **Resume preserves the existing artifact's format, except pipeline mode.** Write back in whatever format the existing artifact uses — markdown if the existing file is `.md`, HTML if it is `.html`. Explicit `output:` arguments on this run override (e.g., resuming an `.html` doc with `output:md` switches the artifact to markdown). Pipeline mode (LFG, any `disable-model-invocation` context) always wins per Phase 0.0: even when resuming an existing `.html` brainstorm, pipeline runs force `OUTPUT_FORMAT=md` so downstream automation receives the markdown shape it expects. The resume rewrites the markdown file at the parallel path and the original `.html` is left in place untouched.
 
-Historical `docs/brainstorms/*-requirements.{md,html}` files remain legacy inputs for `ce-plan`, but new `ce-brainstorm` outputs do not write there.
+Historical `docs/brainstorms/*-requirements.{md,html}` files remain legacy inputs for `spec-plan`, but new `spec-brainstorm` outputs do not write there.
 
 #### 0.1b Classify Task Domain
 
@@ -103,15 +103,15 @@ Before proceeding to Phase 0.2, classify whether this is a software task. The ke
 
 **Verdict-shape carve-out — do not exit before the 0.1c gate.** A request weighing whether to **adopt / switch to / replace** a *named external technology, library, pattern, platform, or architecture* for this project is a **software** decision even when it only names the tool and asks the bare question ("should we adopt Biome here?"). Classify it as **Software** and continue so the 0.1c gate below can catch it — do **not** route it to *Neither* or *Non-software*, which would skip the gate and lose the exact verdict-shape prompts that gate is for.
 
-**If non-software brainstorming is detected:** Read `references/universal-brainstorming.md` now and follow it — it replaces Phases 0.2–4 entirely. Scope assessment, exploration moves, convergence, and the wrap-up menu for this route live there, not in this main body; improvising them produces an unstructured chat with no synthesis and no handoff. The non-software route does **not** write `artifact_contract: ce-unified-plan/v1` or `artifact_readiness: requirements-only`; those fields are reserved for software Product Contracts that can later become implementation-ready code plans. The **Core Principles and Interaction Rules above still apply unchanged** — including one-question-per-turn and the default to the platform's blocking question tool — and are the only part of this file that survives the route.
+**If non-software brainstorming is detected:** Read `references/universal-brainstorming.md` now and follow it — it replaces Phases 0.2–4 entirely. Scope assessment, exploration moves, convergence, and the wrap-up menu for this route live there, not in this main body; improvising them produces an unstructured chat with no synthesis and no handoff. The non-software route does **not** write `artifact_contract: spec-unified-plan/v1` or `artifact_readiness: requirements-only`; those fields are reserved for software Product Contracts that can later become implementation-ready code plans. The **Core Principles and Interaction Rules above still apply unchanged** — including one-question-per-turn and the default to the platform's blocking question tool — and are the only part of this file that survives the route.
 
-#### 0.1c Route a Verdict Question to ce-pov
+#### 0.1c Route a Verdict Question to spec-pov
 
-A brainstorm scopes **what to build** once a direction is chosen. Deciding **whether to adopt, switch to, or replace** a *specific named external candidate* (technology, library, pattern, platform, or architecture) judged against this project is a different job — a decisive, project-grounded verdict, which is `ce-pov`'s purpose.
+A brainstorm scopes **what to build** once a direction is chosen. Deciding **whether to adopt, switch to, or replace** a *specific named external candidate* (technology, library, pattern, platform, or architecture) judged against this project is a different job — a decisive, project-grounded verdict, which is `spec-pov`'s purpose.
 
 **The verdict shape — all three hold:** a **named external candidate** (one outside thing, or a bounded set the user already named like "X vs Y vs Z" — not an open field for *you* to enumerate); a **whether-to-commit intent** (adopt / switch to / migrate / replace / is-it-time-for / revisit — not "how should we design or scope Y"); judged **against this project** (fit, migration cost, worth it here), not a neutral explainer. Open-ended design or scoping where *you'd* invent the options stays here. The whether-to-commit trigger separates the two: "help me **pick** between X, Y, Z" is a verdict; "I'm **mulling** X, Y, Z" stays here.
 
-When the shape matches — at intake, or whenever later dialogue (Phases 1.3–2) clarifies a request into it — read `references/verdict-routing.md` and follow it: offer the `/ce-pov` handoff interactively (never silently switch), invoke `ce-pov` on accept, drop the offer and continue the normal workflow unchanged on decline. The reference owns the offer construction, field mapping, and what to pass to `ce-pov`.
+When the shape matches — at intake, or whenever later dialogue (Phases 1.3–2) clarifies a request into it — read `references/verdict-routing.md` and follow it: offer the `spec-pov` handoff interactively (never silently switch), invoke `spec-pov` on accept, drop the offer and continue the normal workflow unchanged on decline. The reference owns the offer construction, field mapping, and what to pass to `spec-pov`.
 
 #### 0.2 Assess Whether Brainstorming Is Needed
 
@@ -163,11 +163,11 @@ python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 
 On `HIT`, load the profile JSON and take the agnostic orientation from it — `conventions.strategy` for the STRATEGY summary, `vocabulary` for the CONCEPTS terms, and `conventions` (coding standards, testing, review process, instruction files) for workflow/product/scope constraints; do not re-read those files. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive the profile, write its JSON to a file, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations), and use the same fields. On `NO-CACHE`, derive the orientation inline and skip the `put`. The cache is an optimization, never a correctness dependency: if it is unavailable, or any cached field is absent/null, fall back to reading the source inline — the project's active instructions and conventions already in your context for workflow, product, or scope constraints (no need to open or name specific instruction files); `STRATEGY.md` if it exists — the product's target problem, approach, persona, and active tracks, which shape scope, success criteria, and which approaches are aligned vs out-of-scope; and `CONCEPTS.md` at repo root if it exists — the project's authoritative vocabulary. Use these names in dialogue, approaches, and the Product Contract; map user-offered synonyms back. If any of these add nothing, move on. This pass — including the cache resolution — stays in the main conversation; the dialogue needs this material in context to shape its questions.
 
-*Topic Scan (grounding scout)* — Create a scratch dir at `/tmp/compound-engineering/ce-brainstorm/<run-id>/` (short unique slug), then dispatch one extraction-tier sub-agent via the platform's subagent primitive where available (a Task/Agent-style dispatch on harnesses that expose one); otherwise run the work inline or serially. In harnesses that support background dispatch, proceed to Phase 1.2/1.3 **without waiting**: the scout runs during the user's think-time on the opening questions. Scout prompt:
+*Topic Scan (grounding scout)* — Create a scratch dir at `/tmp/spec-first/spec-brainstorm/<run-id>/` (short unique slug), then dispatch one extraction-tier sub-agent via the platform's subagent primitive where available (a Task/Agent-style dispatch on harnesses that expose one); otherwise run the work inline or serially. In harnesses that support background dispatch, proceed to Phase 1.2/1.3 **without waiting**: the scout runs during the user's think-time on the opening questions. Scout prompt:
 
 > Gather grounding for a requirements brainstorm about **{topic}** in this repo. Search first with the native file-search and content-search tools, then read targeted sections — budget ~20 reads, preferring ranges over whole files. Find: whether something similar already exists, the most relevant existing artifacts (brainstorms, plans, specs, feature docs), adjacent examples of similar behavior, and the current state of anything the topic would touch (tables, routes, config, dependencies). Write a **grounding dossier** to `{scratch-dir}/grounding.md`: at most 150 lines of verbatim quotes and short code snippets, each with a `file:line` pointer. Extraction only — quote what the repo says; do not interpret or propose. If the topic has little footprint, write less rather than padding. Return only a gist: 3-5 lines summarizing what the dossier holds, plus its absolute path.
 
-Carry only the gist in the dialogue. When the conversation needs specifics the gist can't answer — the user challenges a claim, an approach needs grounding — read the dossier on demand: it is a condensed, verified quote-sheet, always cheaper than re-scanning raw files. Downstream consumers (the Phase 2.6 verifier, the ce-plan handoff) receive the dossier path, not its contents. If the scout has not returned by the time Phase 2 needs it, wait for it then.
+Carry only the gist in the dialogue. When the conversation needs specifics the gist can't answer — the user challenges a claim, an approach needs grounding — read the dossier on demand: it is a condensed, verified quote-sheet, always cheaper than re-scanning raw files. Downstream consumers (the Phase 2.6 verifier, the spec-plan handoff) receive the dossier path, not its contents. If the scout has not returned by the time Phase 2 needs it, wait for it then.
 
 If the scan and scout surface nothing relevant, say so and continue. Two rules govern technical depth during the scan:
 
@@ -230,7 +230,7 @@ For each approach, provide:
 - Key risks or unknowns
 - When it's best suited
 
-**Approach granularity: mechanism / product shape, not architecture.** Approach descriptions name mechanism-level distinctions ("pause as a rule property" vs "pause as an event filter" vs "pause as a separate entity") and product-relevant trade-offs (plan-tier coupling, complexity surface, migration difficulty). They do NOT name implementation specifics — column names, table names, file paths, service classes, JSON shapes, exact method names. Those are ce-plan's job. Bringing architecture forward at brainstorm time forces the user to make architectural decisions on ce-brainstorm's intentionally-shallow research, and the synthesis at Phase 2.5 then has to filter out the leak.
+**Approach granularity: mechanism / product shape, not architecture.** Approach descriptions name mechanism-level distinctions ("pause as a rule property" vs "pause as an event filter" vs "pause as a separate entity") and product-relevant trade-offs (plan-tier coupling, complexity surface, migration difficulty). They do NOT name implementation specifics — column names, table names, file paths, service classes, JSON shapes, exact method names. Those are spec-plan's job. Bringing architecture forward at brainstorm time forces the user to make architectural decisions on spec-brainstorm's intentionally-shallow research, and the synthesis at Phase 2.5 then has to filter out the leak.
 
 After presenting all approaches, state your recommendation and explain why. Prefer simpler solutions when added complexity creates real carrying cost, but do not reject low-cost, high-value polish just because it is not strictly necessary.
 
@@ -261,7 +261,7 @@ Skip when Path A fires, when the doc will make no checkable claims, or on the no
 
 ### Phase 3: Capture the Requirements-Only Unified Plan
 
-Write or update a requirements-only unified plan only when the conversation produced durable decisions worth preserving — see `references/brainstorm-sections.md` "Decide whether a doc is warranted at all" for the criteria and the bug-fix stress test. Skip document creation when the user only needs brief alignment and the decisions can flow downstream (ce-plan, commit message, docs/solutions/) without a brainstorm artifact in the middle.
+Write or update a requirements-only unified plan only when the conversation produced durable decisions worth preserving — see `references/brainstorm-sections.md` "Decide whether a doc is warranted at all" for the criteria and the bug-fix stress test. Skip document creation when the user only needs brief alignment and the decisions can flow downstream (spec-plan, commit message, docs/solutions/) without a brainstorm artifact in the middle.
 
 When a doc is warranted, compose it using:
 
@@ -270,11 +270,11 @@ When a doc is warranted, compose it using:
 
 **Write tight.** A section being material is not license to pad it. Hold every kept section to the prose-economy discipline in `references/brainstorm-sections.md`: lead with the decision or outcome, one idea per sentence, a requirement is intent plus at most one qualifier, defer forks to Outstanding Questions rather than specifying both arms, resolve superseded text in place rather than stacking strata. Before declaring the doc written, run the named test there — could a reader find a contradiction in each section in one pass?
 
-Write to `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` — extension follows `OUTPUT_FORMAT`. Include `artifact_contract: ce-unified-plan/v1`, `artifact_readiness: requirements-only`, and `product_contract_source: ce-brainstorm`. Title is `<Name> - Plan` (matching the H1; no conventional-commit prefix). Keep the doc light and standalone-readable: a Goal Capsule (objective, product authority, open blockers) and the Product Contract. Do **not** emit a Goal Launch Block or Reader Index. See `references/brainstorm-sections.md` — which owns the artifact content rules, including repo-relative file paths inside the doc. When confirming in chat, report the written artifact with its absolute path so the reference is clickable.
+Write to `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` — extension follows `OUTPUT_FORMAT`. Include `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: requirements-only`, and `product_contract_source: spec-brainstorm`. Title is `<Name> - Plan` (matching the H1; no conventional-commit prefix). Keep the doc light and standalone-readable: a Goal Capsule (objective, product authority, open blockers) and the Product Contract. Do **not** emit a Goal Launch Block or Reader Index. See `references/brainstorm-sections.md` — which owns the artifact content rules, including repo-relative file paths inside the doc. When confirming in chat, report the written artifact with its absolute path so the reference is clickable.
 
 #### Vocabulary Capture — after the requirements-only unified plan (only if CONCEPTS.md already exists)
 
-**Skip this step entirely if `CONCEPTS.md` does not exist at repo root** — creation is owned by ce-compound and ce-compound-refresh.
+**Skip this step entirely if `CONCEPTS.md` does not exist at repo root** — creation is owned by spec-compound and spec-compound-refresh.
 
 Run this **after** the approaches, the scope synthesis, and the requirements-only unified plan — that is where the canonical term often gets chosen or corrected, so capturing during early dialogue (before this point) would miss the final resolved name. If it exists, scan the full dialogue and the Product Contract for **resolved** domain terms — terms where the conversation actively pinned down a precise local meaning, not terms merely mentioned in passing. **Resolved means the definition is settled, not still under discussion.** Provisional terms that may still revise stay in the conversation only.
 
@@ -286,4 +286,4 @@ Follow the format set by existing entries. Apply edits silently. (If Phase 3 ski
 
 ### Phase 4: Handoff
 
-Read `references/handoff.md` now — before presenting any options. The option set and its visibility conditions, the rendering-mode rule, the per-selection dispatch instructions (including what gets passed to `ce-plan`), and the closing summary formats all live there — none of them appear in this main body. An improvised menu silently breaks pipeline routing: options surface in states where they must be hidden, and downstream skills receive the wrong payload.
+Read `references/handoff.md` now — before presenting any options. The option set and its visibility conditions, the rendering-mode rule, the per-selection dispatch instructions (including what gets passed to `spec-plan`), and the closing summary formats all live there — none of them appear in this main body. An improvised menu silently breaks pipeline routing: options surface in states where they must be hidden, and downstream skills receive the wrong payload.

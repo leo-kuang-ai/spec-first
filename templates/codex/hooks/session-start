@@ -35,7 +35,7 @@ async function main() {
   const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
   const missingMessage = [
     '[spec-first] using-spec-first SessionStart injection',
-    'Managed language/governance workflow entry guidance is missing from `AGENTS.md`.',
+    'Managed language/governance block is missing from `AGENTS.md`.',
     'Run `spec-first init` in this project and choose Codex when prompted to restore the managed language/governance block.',
   ].join('\n');
 

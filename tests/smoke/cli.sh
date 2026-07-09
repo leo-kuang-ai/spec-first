@@ -16,7 +16,11 @@ const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
 process.stdout.write(String(buildFilteredAssetSet('claude').commands.length));
 NODE
 )"
-expected_agent_count="$(find "$REPO_ROOT/agents" -type f -name '*.md' | wc -l | tr -d ' ')"
+if [[ -d "$REPO_ROOT/agents" ]]; then
+  expected_agent_count="$(find "$REPO_ROOT/agents" -type f -name '*.md' | wc -l | tr -d ' ')"
+else
+  expected_agent_count="0"
+fi
 expected_workflow_skill_count="$(node - "$REPO_ROOT" <<'NODE'
 const repoRoot = process.argv[2];
 const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
@@ -252,9 +256,11 @@ grep -q 'allowed-tools: Bash(bash \*worktree-manager.sh\*)' "$TMP_DIR/.claude/sk
 grep -q '.claude/skills/spec-worktree/scripts/worktree-manager.sh' "$TMP_DIR/.claude/skills/spec-worktree/SKILL.md"
 test ! -e "$TMP_DIR/.claude/skills/spec-session-inventory"
 test ! -e "$TMP_DIR/.claude/skills/spec-session-extract"
-for agent in spec-repo-research-analyst.agent.md spec-spec-flow-analyzer.agent.md; do
-  test -f "$TMP_DIR/.claude/agents/$agent"
-done
+if [[ "$expected_agent_count" != "0" ]]; then
+  for agent in spec-repo-research-analyst.agent.md spec-spec-flow-analyzer.agent.md; do
+    test -f "$TMP_DIR/.claude/agents/$agent"
+  done
+fi
 node - "$TMP_DIR/.claude/spec-first/state.json" "$expected_command_count" "$expected_claude_skill_count" "$expected_workflow_skill_count" "$expected_agent_count" <<'NODE'
 const fs = require('node:fs');
 const [statePath, commandCount, skillCount, workflowSkillCount, agentCount] = process.argv.slice(2);
@@ -267,7 +273,7 @@ if (state.agents.length !== Number(agentCount)) throw new Error('agent count mis
 if (state.developer) throw new Error('state should no longer track developer profile');
 NODE
 grep -q '<!-- spec-first:lang:start -->' "$TMP_DIR/CLAUDE.md"
-grep -q '### Workflow 入口治理' "$TMP_DIR/CLAUDE.md"
+grep -q '### Workflow Entry Governance' "$TMP_DIR/CLAUDE.md"
 grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/CLAUDE.md"
 if grep -q '<!-- spec-first:bootstrap:start -->' "$TMP_DIR/CLAUDE.md"; then
   echo "legacy standalone bootstrap block should not be injected into CLAUDE.md" >&2
@@ -363,11 +369,13 @@ grep -q 'allowed-tools: Bash(bash \*worktree-manager.sh\*)' "$TMP_DIR/.agents/sk
 grep -q '.agents/skills/spec-worktree/scripts/worktree-manager.sh' "$TMP_DIR/.agents/skills/spec-worktree/SKILL.md"
 test ! -e "$TMP_DIR/.agents/skills/spec-session-inventory"
 test ! -e "$TMP_DIR/.agents/skills/spec-session-extract"
-for agent in spec-repo-research-analyst.agent.md; do
-  test -f "$TMP_DIR/.codex/agents/$agent"
-done
+if [[ "$expected_agent_count" != "0" ]]; then
+  for agent in spec-repo-research-analyst.agent.md; do
+    test -f "$TMP_DIR/.codex/agents/$agent"
+  done
+fi
 grep -q '<!-- spec-first:lang:start -->' "$TMP_DIR/AGENTS.md"
-grep -q '### Workflow 入口治理' "$TMP_DIR/AGENTS.md"
+grep -q '### Workflow Entry Governance' "$TMP_DIR/AGENTS.md"
 grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/AGENTS.md"
 if grep -q '<!-- spec-first:bootstrap:start -->' "$TMP_DIR/AGENTS.md"; then
   echo "legacy standalone bootstrap block should not be injected into AGENTS.md" >&2
@@ -481,10 +489,12 @@ test -f "$TMP_DIR/.kiro/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.kiro/skills/using-spec-first/SKILL.md"
 test -f "$TMP_DIR/.kiro/skills/spec-worktree/SKILL.md"
 grep -q '^name: spec-worktree$' "$TMP_DIR/.kiro/skills/spec-worktree/SKILL.md"
-for agent in spec-repo-research-analyst.agent.md; do
-  test -f "$TMP_DIR/.kiro/agents/$agent"
-  grep -q '^tools: \["read"\]$' "$TMP_DIR/.kiro/agents/$agent"
-done
+if [[ "$expected_agent_count" != "0" ]]; then
+  for agent in spec-repo-research-analyst.agent.md; do
+    test -f "$TMP_DIR/.kiro/agents/$agent"
+    grep -q '^tools: \["read"\]$' "$TMP_DIR/.kiro/agents/$agent"
+  done
+fi
 test -f "$TMP_DIR/.kiro/spec-first/state.json"
 test ! -e "$TMP_DIR/.kiro/commands/spec"
 test ! -e "$TMP_DIR/.kiro/hooks"
@@ -502,14 +512,17 @@ NODE
 kiro_doctor_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --kiro)"
 grep -q ".kiro/spec-first/state.json" <<<"$kiro_doctor_output"
 grep -q ".kiro/skills" <<<"$kiro_doctor_output"
-grep -q ".kiro/agents" <<<"$kiro_doctor_output"
+if [[ "$expected_agent_count" != "0" ]]; then
+  grep -q ".kiro/agents" <<<"$kiro_doctor_output"
+fi
 if grep -q ".kiro/commands/spec" <<<"$kiro_doctor_output"; then
   echo "Kiro doctor should not report .kiro/commands/spec as an installed surface" >&2
   exit 1
 fi
 kiro_doctor_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --kiro --json)"
-node - "$kiro_doctor_json" <<'NODE'
+node - "$kiro_doctor_json" "$expected_agent_count" <<'NODE'
 const payload = JSON.parse(process.argv[2]);
+const expectedAgentCount = Number(process.argv[3]);
 if (!['simulated', 'verified', 'not_verified'].includes(payload.workflow_runnability)) {
   throw new Error(`unexpected Kiro runnability ${payload.workflow_runnability}`);
 }
@@ -521,10 +534,12 @@ const skillCheck = payload.platform_checks.kiro.find((entry) =>
   entry.name === '.kiro/skills/spec-work/SKILL.md' && entry.message.includes('Kiro skill frontmatter is valid')
 );
 if (!skillCheck || skillCheck.level !== 'PASS') throw new Error('missing passing Kiro skill check');
-const agentCheck = payload.platform_checks.kiro.find((entry) =>
-  entry.name === '.kiro/agents/spec-repo-research-analyst.agent.md' && entry.message.includes('read-only default tools')
-);
-if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing Kiro agent check');
+if (expectedAgentCount > 0) {
+  const agentCheck = payload.platform_checks.kiro.find((entry) =>
+    entry.name === '.kiro/agents/spec-repo-research-analyst.agent.md' && entry.message.includes('read-only default tools')
+  );
+  if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing Kiro agent check');
+}
 NODE
 echo "✓ Kiro init generated Agent Skills, agents, state, and doctor facts"
 
@@ -547,9 +562,10 @@ test -f "$TMP_DIR/.qoder/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.qoder/skills/using-spec-first/SKILL.md"
 test -f "$TMP_DIR/.qoder/skills/spec-worktree/SKILL.md"
 grep -q '^name: spec-worktree$' "$TMP_DIR/.qoder/skills/spec-worktree/SKILL.md"
-for agent in spec-repo-research-analyst.agent.md; do
-  test -f "$TMP_DIR/.qoder/agents/$agent"
-  node - "$TMP_DIR/.qoder/agents/$agent" <<'NODE'
+if [[ "$expected_agent_count" != "0" ]]; then
+  for agent in spec-repo-research-analyst.agent.md; do
+    test -f "$TMP_DIR/.qoder/agents/$agent"
+    node - "$TMP_DIR/.qoder/agents/$agent" <<'NODE'
 const fs = require('node:fs');
 const agentPath = process.argv[2];
 const content = fs.readFileSync(agentPath, 'utf8');
@@ -564,7 +580,8 @@ if (/\b(Write|Edit|Bash|Agent)\b/.test(frontmatter)) {
   throw new Error(`Qoder agent should not default to write/shell/dispatch tools: ${agentPath}`);
 }
 NODE
-done
+  done
+fi
 test -f "$TMP_DIR/.qoder/spec-first/state.json"
 test ! -e "$TMP_DIR/.qoder/rules"
 test ! -e "$TMP_DIR/.qoder/hooks"
@@ -583,10 +600,13 @@ qoder_doctor_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doct
 grep -q ".qoder/spec-first/state.json" <<<"$qoder_doctor_output"
 grep -q ".qoder/commands/spec" <<<"$qoder_doctor_output"
 grep -q ".qoder/skills" <<<"$qoder_doctor_output"
-grep -q ".qoder/agents" <<<"$qoder_doctor_output"
+if [[ "$expected_agent_count" != "0" ]]; then
+  grep -q ".qoder/agents" <<<"$qoder_doctor_output"
+fi
 qoder_doctor_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --qoder --json)"
-node - "$qoder_doctor_json" <<'NODE'
+node - "$qoder_doctor_json" "$expected_agent_count" <<'NODE'
 const payload = JSON.parse(process.argv[2]);
+const expectedAgentCount = Number(process.argv[3]);
 if (!['simulated', 'verified', 'not_verified'].includes(payload.workflow_runnability)) {
   throw new Error(`unexpected Qoder runnability ${payload.workflow_runnability}`);
 }
@@ -602,10 +622,12 @@ const skillCheck = payload.platform_checks.qoder.find((entry) =>
   entry.name === '.qoder/skills/spec-work/SKILL.md' && entry.message.includes('Qoder skill frontmatter is valid')
 );
 if (!skillCheck || skillCheck.level !== 'PASS') throw new Error('missing passing Qoder skill check');
-const agentCheck = payload.platform_checks.qoder.find((entry) =>
-  entry.name === '.qoder/agents/spec-repo-research-analyst.agent.md' && entry.message.includes('read/search default tools')
-);
-if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing Qoder agent check');
+if (expectedAgentCount > 0) {
+  const agentCheck = payload.platform_checks.qoder.find((entry) =>
+    entry.name === '.qoder/agents/spec-repo-research-analyst.agent.md' && entry.message.includes('read/search default tools')
+  );
+  if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing Qoder agent check');
+}
 NODE
 if command -v qodercli >/dev/null 2>&1 || command -v qoder >/dev/null 2>&1; then
   qoder_loader_command="$(command -v qodercli 2>/dev/null || command -v qoder 2>/dev/null)"
@@ -661,7 +683,9 @@ printf '# Native Kiro spec\n' > "$TMP_DIR/.kiro/specs/native/spec.md"
 kiro_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --kiro --dry-run)"
 grep -q "Dry run: spec-first clean (kiro)" <<<"$kiro_clean_dry"
 grep -q ".kiro/skills/spec-work" <<<"$kiro_clean_dry"
-grep -q ".kiro/agents/spec-repo-research-analyst.agent.md" <<<"$kiro_clean_dry"
+if [[ "$expected_agent_count" != "0" ]]; then
+  grep -q ".kiro/agents/spec-repo-research-analyst.agent.md" <<<"$kiro_clean_dry"
+fi
 grep -q ".kiro/spec-first/state.json" <<<"$kiro_clean_dry"
 grep -q "No files were changed." <<<"$kiro_clean_dry"
 (cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --kiro >/dev/null)
@@ -681,7 +705,9 @@ qoder_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --
 grep -q "Dry run: spec-first clean (qoder)" <<<"$qoder_clean_dry"
 grep -q ".qoder/commands/spec-work.md" <<<"$qoder_clean_dry"
 grep -q ".qoder/skills/spec-work" <<<"$qoder_clean_dry"
-grep -q ".qoder/agents/spec-repo-research-analyst.agent.md" <<<"$qoder_clean_dry"
+if [[ "$expected_agent_count" != "0" ]]; then
+  grep -q ".qoder/agents/spec-repo-research-analyst.agent.md" <<<"$qoder_clean_dry"
+fi
 grep -q ".qoder/spec-first/state.json" <<<"$qoder_clean_dry"
 grep -q "No files were changed." <<<"$qoder_clean_dry"
 (cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --qoder >/dev/null)

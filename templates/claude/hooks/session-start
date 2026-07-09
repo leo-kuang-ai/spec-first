@@ -20,7 +20,7 @@ const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
 const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
 const missingMessage = [
   '[spec-first] using-spec-first SessionStart injection',
-  'Managed language/governance workflow entry guidance is missing from `CLAUDE.md`.',
+  'Managed language/governance block is missing from `CLAUDE.md`.',
   'Run `spec-first init` in this project and choose Claude Code when prompted to restore the managed language/governance block.',
 ].join('\n');
 

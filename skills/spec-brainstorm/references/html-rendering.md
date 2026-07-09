@@ -10,10 +10,10 @@ content rendered by different skills shares the same HTML principles.
 
 The HTML artifact is the *only* artifact the skill produces for that run —
 output mode is exclusive (markdown OR HTML, never both). Downstream
-consumers that read HTML today (`ce-work`, human readers) do so directly;
-the agent-consumability rules below make that work. `ce-doc-review` is
+consumers that read HTML today (`spec-work`, human readers) do so directly;
+the agent-consumability rules below make that work. `spec-doc-review` is
 *not* currently an HTML consumer — its mutation mechanics are markdown-only,
-so the ce-plan handoff gates the 5.3.8 doc-review pass to `OUTPUT_FORMAT=md`
+so the spec-plan handoff gates the 5.3.8 doc-review pass to `OUTPUT_FORMAT=md`
 runs and skips it for HTML.
 
 ## Hard invariants
@@ -49,7 +49,7 @@ These hold regardless of which skill produced the artifact.
   (the user prompt context, the upstream brainstorm doc when one
   exists, or just the composing skill name when there's no external
   source). Example shape:
-  `<footer class="composition-signal">Composed 2026-05-17T14:23Z by ce-plan from <code>docs/brainstorms/...-requirements.md</code></footer>`.
+  `<footer class="composition-signal">Composed 2026-05-17T14:23Z by spec-plan from <code>docs/brainstorms/...-requirements.md</code></footer>`.
   Under exclusive output mode this signal is the artifact's own
   provenance — there's no markdown sibling to reference. Omitting it
   leaves readers unable to tell how stale the rendering is.
@@ -105,7 +105,7 @@ these locations, first match wins:
 
 1. Worktree root (resolve via `git rev-parse --show-toplevel`).
 2. `docs/DESIGN.md`.
-3. `.compound-engineering/DESIGN.md`.
+3. `.spec-first/DESIGN.md`.
 
 Read once at compose time. Absent → fall through to the fallback default.
 
@@ -473,8 +473,8 @@ with a UI/layout shape can carry a wireframe, whether or not the brainstorm
 as a whole is "a visual product" — a backend-heavy brainstorm with one
 screen change still earns a wireframe for that requirement. It still applies
 to brainstorm **requirements** output — the requirements-only unified plan
-`ce-brainstorm` writes (now under `docs/plans/`), not an implementation-ready
-plan (`ce-plan`'s enriched output) — and only to UI-shaped requirements — a
+`spec-brainstorm` writes (now under `docs/plans/`), not an implementation-ready
+plan (`spec-plan`'s enriched output) — and only to UI-shaped requirements — a
 non-visual requirement (API design, data model, agent workflow,
 infrastructure) takes a conceptual diagram instead, not a
 wireframe.
@@ -543,10 +543,10 @@ fine when the content suggests them.
 
 ## Agent-consumability rules
 
-Downstream agents that read HTML today (`ce-work`, a skill re-reading its
+Downstream agents that read HTML today (`spec-work`, a skill re-reading its
 own prior artifact on a resume run, future consumers) reason over the HTML
 as text — the way they reason over markdown, not via DOM extraction or a
-script-style parse. `ce-doc-review` is not a current HTML consumer (see
+script-style parse. `spec-doc-review` is not a current HTML consumer (see
 opening note).
 
 These rules are why such a consumer can locate one item (a single

@@ -22,7 +22,7 @@ CE 是迁移能力的语义基准：
 ## 非目标
 
 - 不把 `.agents/skills/`、`.claude/`、`.codex/`、`.cursor/`、`.kiro/` 或 `.qoder/` 当作 source truth。
-- 当 spec-first 已有更强当前 contract 时，不机械恢复 `ce-*`、`.compound-engineering` 或 `ce-unified-plan/v1` 等 CE 术语。
+- CE 能力、阶段、产物和 helper 语义作为迁移基准；但不机械恢复 `ce-*`、`.compound-engineering` 或 `ce-unified-plan/v1` 等 CE 命名和路径。
 - 不把 `spec-prd`、`spec-write-tasks`、`using-spec-first` 等 spec-first-only workflow 拆分折回 CE 时代行为。
 - 审查报告阶段不做大范围 runtime regeneration。source 修复后如需 runtime refresh，应作为单独显式步骤处理。
 
@@ -54,7 +54,7 @@ CE 是迁移能力的语义基准：
 | `ce-test-xcode` | `spec-test-xcode` | XcodeBuildMCP 预检与 iOS / Xcode 验证辅助 | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
 | `ce-worktree` | `spec-worktree` | 内部 worktree helper，支持隔离并行工程任务 | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
 | `lfg` | `spec-lfg` | 从计划到绿色 PR 的完整 hands-off 工程流水线 | 直接映射，full pipeline 关键 | 已完成 | 已审查 |
-| `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
+| `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，unified-plan artifact contract 关键 | 已完成 | 已审查 |
 | `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 | 已完成 | 已审查 |
 | `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
 | `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
@@ -508,7 +508,7 @@ done
 #### Intentional Spec-First Divergences
 
 - CE 的 `compound-engineering-feedback-format.md` 映射为 `spec-first-feedback-format.md`，Next Steps 从 `/ce-brainstorm` 改为 `spec-brainstorm`。
-- Extensive handoff 从 `ce-brainstorm` 改为 `spec-brainstorm`，durable requirements document 路径以 `docs/brainstorms/` 为当前 spec-first brainstorm contract；`docs/brainstorms/riffrec-feedback/` 只作为 analyzer evidence/kickoff artifact exception，不等同于 durable brainstorm output。
+- Extensive handoff 从 `ce-brainstorm` 改为 `spec-brainstorm`；`docs/brainstorms/riffrec-feedback/` 只作为 analyzer evidence/kickoff artifact exception，不等同于本轮 CE-first 恢复后的 durable brainstorm output。当前 `spec-brainstorm` durable requirements-only unified plan 输出为 `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>`。
 - Analyzer help、generated requirements kickoff 和 human review checklist 已使用 spec-first 命名与 `spec-brainstorm` 消费者。
 
 #### Legacy CE Residuals
@@ -520,11 +520,11 @@ done
 #### Recommended Changes
 
 - [fix] 将 analyzer 结尾 `Brainstorm handoff` 输出从 `$spec-first:spec-brainstorm <requirements-kickoff>` 改为 `spec-brainstorm <requirements-kickoff>`。
-- [document_divergence] 在本审查表记录 Riffrec analyzer artifact 到 `spec-brainstorm` 的产物映射和 `docs/brainstorms/riffrec-feedback/` 的 exception 语义。
+- [document_divergence] 在本审查表记录 Riffrec analyzer artifact 到 `spec-brainstorm` 的产物映射和 `docs/brainstorms/riffrec-feedback/` 的 evidence/kickoff exception 语义；durable brainstorm output 以 `docs/plans/` unified plan 为准。
 
 #### Downstream Consumers
 
-- `spec-brainstorm`: 消费 `requirements-kickoff.md`、`source-materials.md`、`analysis.md` 和截图引用，先确认、纠正、重组需求，再产出 durable requirements document。
+- `spec-brainstorm`: 消费 `requirements-kickoff.md`、`source-materials.md`、`analysis.md` 和截图引用，先确认、纠正、重组需求，再产出 `docs/plans/` 下的 requirements-only unified plan。
 - `spec-plan` / `spec-work`: 只消费 brainstorm 确认后的 requirements artifact；Riffrec analyzer 产物是 evidence/kickoff 输入，不应跳过 brainstorm 确认直接进入实现。
 - `spec-debug`: quick path 可建议打开 `spec-debug`，但 quick bug report 本身不自动 handoff。
 
@@ -740,11 +740,10 @@ done
 
 ### `spec-brainstorm`
 
-- `spec-brainstorm` 与 CE 在结构上有意不同：当前是短 spine 加 references，而不是 CE 风格的长 `SKILL.md`。
-- CE 的 `docs/plans/` + `ce-unified-plan/v1` requirements-only unified plan contract 看起来已被有意识替换为 `docs/brainstorms/` 下的 canonical markdown requirements。
-- 需要确认每个下游 consumer 都接受 `docs/brainstorms/*-requirements.md`，尤其是 `spec-plan`、`spec-doc-review`、`spec-work`。
-- 需要确认 `references/visual-probes.md` 不再把 durable brainstorm output 描述为 `docs/plans/`；若仍有这种表述，应改为 `docs/brainstorms/`。
-- 如果目标 skill 使用 provider-agnostic dispatch/degraded fallback 替代 model-tier routing，那么 CE `model-tiers.md` 的移除很可能是有意识 divergence。
+- 已按用户裁决推翻早期 “短 spine + `docs/brainstorms/*-requirements.md` canonical contract” 判断。
+- 当前处理方式是清空 `skills/spec-brainstorm` 后完整拷贝 CE `ce-brainstorm` source 文件，再做最小 spec-first 投影。
+- Durable brainstorm output 恢复为 `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` requirements-only unified plan，metadata 使用 `artifact_contract: spec-unified-plan/v1`、`artifact_readiness: requirements-only`、`product_contract_source: spec-brainstorm`。
+- `docs/brainstorms/*-requirements.*` 仅作为 legacy input 保留，不再作为新 `spec-brainstorm` active output contract。
 
 ### `spec-plan`
 
