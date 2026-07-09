@@ -9,7 +9,7 @@
 1. **扩展性即将触及临界** — 当前 5 宿主已使 UNREWRITTEN_PATH_PATTERNS 达到 O(n²) 维护负债。Kiro 刚接入时已触发全部 4 个现有 adapter 的修改。社区已有 Windsurf、Augment 等新 IDE 采用 AGENTS.md 标准，第 6 个宿主接入需求可预见。
 2. **Qoder hooks 功能缺口** — spec-first 本身运行在 Qoder 环境中，但 Qoder CLI 的 shell-command hooks 仍未覆盖；其事件、matcher、stdout 与配置兼容性需按 Qoder CLI 协议单独验证，这意味着 spec-first 在自己的宿主上缺少 confirmed governance injection。
 3. **init.js 3055 行已成维护瓶颈** — 任何 init 逻辑的修改（如上述 Qoder hooks 添加）都需要导航 3000+ 行文件，增加回归风险。
-4. **对齐核心链路** — 重构使新宿主扩展从 3-5 天降至 1 天，直接提升 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge` 链路的覆盖面（更多宿主 = 更多用户可触达 workflow）。
+4. **对齐核心链路** — 重构使 pointer-only 新宿主的 adapter 接入从 3-5 天收敛到约 1 天；hooks-capable 宿主仍需额外 protocol/runtime lifecycle spike。更低的 pointer 接入成本直接提升 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge` 链路的覆盖面（更多宿主 = 更多用户可触达 workflow）。
 
 **核心判断对齐（AGENTS.md）：**
 > 这次改动是否让 AI coding 从一次性对话，进一步走向可治理、可验证、可复用、可沉淀的工程闭环？
@@ -44,7 +44,7 @@
 
 ### 1.4 Source/Runtime 边界声明
 
-本方案所有变更均为 **source 变更**（`src/cli/`、`templates/`）。不手改 generated runtime assets（`.claude/`、`.codex/`、`.qoder/` 等）。source 变更后通过 `spec-first init` 重新生成 runtime。
+本方案所有变更均为 **source 变更**（`src/cli/`、`templates/`、必要的 `docs/contracts/`、`.gitignore` / context-runtime path rules）。不手改 generated runtime assets（`.claude/`、`.codex/`、`.agents/skills/` 等）。Qoder 的 `.qoder/settings.json` 与 `.qoder/hooks/**` 当前是 Qoder/user-owned surface；Phase 0 若写入它们，必须先把边界修订为“user-owned 文件中的 spec-first managed slice”，并确保 clean 只处理 managed slice。
 
 ---
 
@@ -234,25 +234,26 @@ CLI Entry (bin/spec-first.js)
 
 | Claude 事件 | Qoder 事件 | stdin/stdout 协议 | 兼容性 |
 |------------|-----------|------------------|--------|
-| SessionStart | UserPromptSubmit | ⚠️ 不同触发时机 | 需适配 |
-| UserPromptExpansion | UserPromptSubmit | ⚠️ Qoder 无独立 expansion 事件；Phase 0 不迁移 spec-plan-guard | 不兼容 |
-| PreToolUse | PreToolUse | ✅ 相同 | 完全兼容 |
-| PostToolUse | PostToolUse | ✅ 相同 | 完全兼容 |
-| Stop | Stop | ✅ 相同 | 完全兼容 |
+| SessionStart | SessionStart（Qoder CLI only） | ⚠️ 事件存在，但 IDE/JB 当前未列出该事件 | 需按 Qoder CLI 协议投影 |
+| UserPromptExpansion | 无等价事件；UserPromptSubmit 只能做 prompt-content inspection | ⚠️ Qoder 无独立 expansion 事件；Phase 0 不迁移 spec-plan-guard | 不兼容 |
+| PreToolUse | PreToolUse | ⚠️ 事件存在，payload/tool name/output/env/path 需投影验证 | 可迁移语义，不直接移植 |
+| PostToolUse | PostToolUse | ⚠️ 事件存在，Phase 0 不需要 | 非本轮目标 |
+| Stop | Stop | ⚠️ 事件存在，但阻断协议需改为 Qoder `exit 2`/stderr | 可迁移语义，不直接移植 |
 
 **关键差异**：
-- Qoder 没有 `SessionStart` 事件，最近似的是 `UserPromptSubmit`（用户提交首次 prompt 时触发）
-- `UserPromptSubmit` 与 `UserPromptExpansion` 都在 prompt 到达模型前触发，但 Qoder 的是统一 prompt 事件，不能按 tool/command name matcher 等价迁移 Claude 的 command expansion guard
-- Qoder CLI hooks 配置写入 `.qoder/settings.json` 的 `hooks` key；schema 必须以 Qoder CLI 当前文档和本地 smoke 验证为准，不复用“与 Claude 完全一致”的未验证断言
+- Qoder CLI 当前文档列出 `SessionStart`，matcher 对应 `startup/resume/clear/compact/new` 等 session source；IDE/JB plugin 文档当前只列 `UserPromptSubmit/PreToolUse/PostToolUse/PostToolUseFailure/Stop`，未列 `SessionStart`。
+- `UserPromptSubmit` 与 `UserPromptExpansion` 都在 prompt 到达模型前触发，但 Qoder 的是统一 prompt 事件，不能按 tool/command name matcher 等价迁移 Claude 的 command expansion guard。
+- Qoder CLI hooks 配置写入 `.qoder/settings.json` 的 `hooks` key；该项目级文件会被 Qoder CLI 与 IDE/JB plugin 共同读取，因此 Phase 0 需要验证 shared settings 对 CLI-only event（如 `SessionStart`）的 loader 容忍度。该验证只证明“不破坏 IDE/JB 加载”，不等于声明 IDE/JB hooks support。
+- Qoder CLI 的 `Stop` 阻断路径是 `exit 2` + stderr 注入；Claude 现有 `decision: "block"` + `exit 0` 输出不能直接移植。
 
 **Qoder hooks 适配策略**：
 
 | Claude hook | Qoder 映射 | 可行性 | 优先级 |
 |------------|-----------|--------|--------|
-| session-start → SessionStart | UserPromptSubmit（首次触发） | ⚠️ 需验证触发时机与 stdin/stdout 协议 | 高 |
+| session-start → SessionStart | SessionStart（Qoder CLI native） | ⚠️ 需验证 shared `.qoder/settings.json` 对 IDE/JB loader 安全；失败则不写 session-start settings entry | 高 |
 | spec-plan-guard → UserPromptExpansion | 不迁移；未来若需要只能做 prompt-content inspection hook | ⛔ Phase 0 不安装 | 低 |
-| prd-prewrite-guard → PreToolUse | PreToolUse | ✅ 直接移植 | 高 |
-| prd-readiness-guard → Stop | Stop | ✅ 直接移植 | 高 |
+| prd-prewrite-guard → PreToolUse | PreToolUse | ⚠️ 投影 Claude 语义，改用 Qoder payload/env/path/output 协议 | 高 |
+| prd-readiness-guard → Stop | Stop | ⚠️ 投影 Claude 语义，阻断改为 `exit 2` + stderr，并检查 `stop_hook_active` 防循环 | 高 |
 
 ### 3.3 更新感知机制（已有，需小幅增强）
 
@@ -424,13 +425,13 @@ for (const platformId of ['cursor', 'kiro', 'qoder']) {
 ```
 
 **当前需显式处理的差异候选**：
-- `.qoder/settings.json` 与 `.qoder/settings.local.json` 是否都应被其他宿主视为 non-target runtime path；当前 Kiro hardcoded pattern 只覆盖 `.qoder/settings.local.json`。
+- `.qoder/settings.json` 与 `.qoder/settings.local.json` 是否都应被其他宿主视为 non-target runtime path；当前 Kiro hardcoded pattern 只覆盖 `.qoder/settings.local.json`。若纳入 `runtimePathRules`，其含义仅是“其他宿主内容改写时排除该 Qoder surface”，不改变 `.qoder/settings.json` 的 Qoder/user-owned ownership；spec-first 仍只能管理其中的 hook slice。
 - `.cursor/mcp.json` 是否应保持精确匹配；`prefix: '.cursor/mcp' + suffixPattern: '\\.json'` 会比当前 hardcoded pattern 更宽。
 
 **收益**：
-- 添加第 6 个 pointer-only 宿主：只在 registry 添加 `runtimePathRules`，0 行现有 adapter 代码修改
-- O(n²) → O(1) 每次 pointer-only 宿主扩展
-- 对支持 shell hooks 的新宿主，额外工作限于新增 hooks 模块和设置 `capabilities.shellHooks: true`，仍不修改其他 adapter
+- 添加第 6 个 pointer-only 宿主时，adapter runtime path rewrite 只需在 registry 添加 `runtimePathRules`，0 行现有 adapter 代码修改
+- adapter path-rewrite 维护从 O(n²) → O(1)；完整新宿主接入仍需注册、governance scope、gitignore/context/task-pack 等消费者检查
+- 对支持 shell hooks 的新宿主，额外工作限于新增 hooks 模块和 settings/doctor/clean/drift 闭环，仍不修改其他 adapter
 
 ### 4.4 PointerBasedAdapter 基类
 
@@ -450,7 +451,7 @@ PointerBasedAdapter 封装：
 - `inspectRuntimeFiles()` → 统一 `inspectHostNativePointer`，但子类必须保留现有 frontmatter、agent tool pinning、workflow skill name rewrite、runtime path rewrite 等 host-specific drift checks
 - `getUnrewrittenPathPatterns()` → 从 registry 自动派生
 
-**抽象边界**：PointerBasedAdapter 只封装 pointer lifecycle 和 cross-host runtime path exclusion，不吞并 Cursor/Kiro/Qoder 的 `transformSkillContent`、`transformAgentContent`、frontmatter validation、host pin injection 或 agent tools policy。Phase 3 的验收必须证明现有 warning/error 不减少，除非某项减少被单独记录为 intentional behavior change。
+**抽象边界**：PointerBasedAdapter 只封装 pointer lifecycle 和 cross-host runtime path exclusion，不吞并 Cursor/Kiro/Qoder 的 `transformSkillContent`、`transformAgentContent`、frontmatter validation、host pin injection、agent tools policy 或 Qoder hook lifecycle。LOC 下降是副产物，不是硬 gate；Phase 3 的验收必须证明现有 warning/error 不减少，除非某项减少被单独记录为 intentional behavior change。
 
 ### 4.5 init.js 模块拆分
 
@@ -485,7 +486,11 @@ src/cli/
 
 #### 4.7.0 Scope: Qoder CLI first
 
-Phase 0 只支持 Qoder CLI hooks。IDE/JB plugin hooks 不写入 confirmed runtime contract；若本地环境或官方文档证明其 settings schema、exec-form、事件和 stdout 协议与 CLI 完全兼容，可作为后续 Phase 0b 增强。
+Phase 0 只把 Qoder CLI hooks 行为纳入 confirmed runtime contract。由于项目级 `.qoder/settings.json` 会被 Qoder CLI 与 IDE/JB plugin 共同读取，本轮必须同时做 **cross-surface loader safety** 验证：确认 IDE/JB 对 CLI 需要的配置（尤其 `SessionStart` 事件、command shell form、无 matcher group）不会拒绝加载或破坏既有 IDE/JB hooks。该验证只证明 shared config 安全，不声明 IDE/JB hook 行为受 spec-first 支持；IDE/JB 行为支持仍是 follow-up compatibility spike。
+
+若 cross-surface loader safety 无法确认或验证失败，Phase 0 不写入 CLI-only `SessionStart` settings entry；只安装已验证且 IDE/JB 也支持的 `PreToolUse`/`Stop` managed entries，doctor 报告 `qoder_session_start_degraded`。若本地环境或官方文档后续证明 IDE/JB settings schema、事件和 stdout 协议与 CLI 完全兼容，可作为后续 Phase 0c 增强。
+
+**Managed slice boundary**：`.qoder/settings.json` 和 `.qoder/hooks/**` 当前是 Qoder/user-owned surface，不是完整 generated runtime mirror。Phase 0 必须先更新 source/runtime customization contract、gitignore/context-runtime path rules 和 clean/doctor wording，把 spec-first 写入范围限定为 managed hook groups + managed hook script files；禁止把整个 `.qoder/settings.json` 或整个 `.qoder/hooks/` 目录当成 spec-first-owned runtime。
 
 #### 4.7.1 实现方案
 
@@ -500,7 +505,7 @@ if (platform === 'qoder') {
     projectRoot,
     '.qoder/settings.json',
     rendered.contents,
-    'managed_qoder_hook_matchers',
+    'managed_qoder_hooks',
   ));
 }
 ```
@@ -510,13 +515,15 @@ if (platform === 'qoder') {
 // 类比 Claude 的 hook removal（clean.js L419-L435）
 if (adapter.id === 'qoder') {
   const rendered = renderManagedQoderHooksRemoval(projectRoot);
-  operations.push(rendered && rendered.existsAfter
-    ? buildRelativeOperation('update_file', '.qoder/settings.json', 'managed_qoder_hook_cleanup', { contents: rendered.contents })
-    : buildRelativeOperation('remove_file', '.qoder/settings.json', 'managed_qoder_hook_cleanup'));
+  if (rendered) {
+    operations.push(rendered.existsAfter
+      ? buildRelativeOperation('update_file', '.qoder/settings.json', 'managed_qoder_hook_cleanup', { contents: rendered.contents })
+      : buildRelativeOperation('remove_file', '.qoder/settings.json', 'managed_qoder_hook_cleanup'));
+  }
 }
 ```
 
-**清理契约**：`renderManagedQoderHooksRemoval()` 只能移除 spec-first managed hook matchers 和 managed hook script references；若 `.qoder/settings.json` 中存在用户自定义 hooks、非 managed matcher、其他 settings key，必须原样保留。只有当 removal 后文件不再包含任何用户配置或非 managed hooks 时，clean 才能删除 `.qoder/settings.json`。
+**清理契约**：`renderManagedQoderHooksRemoval()` 只能移除 spec-first managed hook groups 和 managed hook script references；若 `.qoder/settings.json` 不存在或不含 managed slice，必须返回 null/no-op，clean 不得删除文件。若 `.qoder/settings.json` 中存在用户自定义 hooks、非 managed group、其他 settings key，必须原样保留。只有当 removal 后文件不再包含任何用户配置或非 managed hooks 时，clean 才能删除 `.qoder/settings.json`。
 
 **doctor 联动**（doctor.js `buildHostSpecificChecks`）：
 ```javascript
@@ -529,7 +536,7 @@ if (adapter.id === 'qoder') {
       name: `.qoder/settings.json ${status.displayName}`,
       message: status.message,
       fix: status.status !== 'installed'
-        ? formatInitGuidance('qoder', `to restore the managed ${status.displayName} matcher`)
+        ? formatInitGuidance('qoder', `to restore the managed ${status.displayName} hook entry`)
         : undefined,
     })),
   ];
@@ -552,32 +559,34 @@ if (adapter.id === 'qoder') {
 
 | 文件 | 内容 | 行数估计 |
 |------|------|---------|
-| `src/cli/qoder-settings.js` | hook upsert/removal/inspect；`renderManagedQoderHooksRemoval` 返回 `{filePath, existsAfter, contents}`（与 claude-settings.js 一致） | ~200L |
-| `templates/qoder/hooks/session-start` | Node.js hook 脚本（类比 codex template） | ~170L |
-| `templates/qoder/hooks/prd-prewrite-guard` | Node.js hook 脚本；Qoder CLI `PreToolUse` 下复用/投影 Claude prewrite guard 语义 | ~150L |
-| `templates/qoder/hooks/prd-readiness-guard` | Node.js hook 脚本；Qoder CLI `Stop` 下复用/投影 Claude readiness guard 语义 | ~150L |
+| `src/cli/qoder-settings.js` | hook upsert/removal/inspect；`renderManagedQoderHooksRemoval` 返回 `{filePath, existsAfter, contents}` 或 null/no-op（与 claude-settings.js 的 non-destructive removal 契约一致） | ~220L |
+| `templates/qoder/hooks/session-start` | Node.js hook 脚本；读 `AGENTS.md`，使用 `QODER_PROJECT_DIR` / stdin `cwd` / `process.cwd()` 定位项目，输出 Qoder `SessionStart` 支持的 `additionalContext` | ~170L |
+| `templates/qoder/hooks/prd-prewrite-guard` | Node.js hook 脚本；Qoder CLI `PreToolUse` 下投影 Claude prewrite guard 语义，使用 Qoder payload/env/path/output 协议 | ~170L |
+| `templates/qoder/hooks/prd-readiness-guard` | Node.js hook 脚本；Qoder CLI `Stop` 下投影 Claude readiness guard 语义，阻断必须走 `exit 2` + stderr，并在 `stop_hook_active` 为 true 时放行防循环 | ~180L |
 
-**安装闭环要求**：`QoderAdapter.planRuntimeFilesSync()` 必须写入 `.qoder/hooks/*` managed hook scripts，并设置可执行 mode；`planRuntimeFilesRemoval()`/clean 必须移除这些 managed hook scripts；doctor 与 init drift detection 必须同时检查 settings matcher 和 hook script 文件是否存在、内容是否为 managed current version。只写 `.qoder/settings.json` 不算完成 Phase 0。
+**安装闭环要求**：`QoderAdapter.planRuntimeFilesSync()` 必须写入 `.qoder/hooks/*` managed hook scripts，并设置可执行 mode；`planRuntimeFilesRemoval()`/clean 必须移除这些 managed hook scripts；doctor 与 init drift detection 必须同时检查 settings managed hook entry 和 hook script 文件是否存在、内容是否为 managed current version。只写 `.qoder/settings.json` 不算完成 Phase 0。
 
 #### 4.7.3 Qoder hooks JSON schema
 
-`spec-first init --qoder` 写入的是项目级 `.qoder/settings.json`，会被 Qoder CLI 与 IDE/JB plugin 共同读取。为避免 CLI-only `args` exec-form 泄漏到未验证的 IDE/JB surface，本轮使用保守的 shell command string；若后续确认所有目标 surface 都支持 exec-form，再单独评估 `{ command, args }` 迁移。下面的 matcher 语法（尤其 `".*"` 与 `"Write|Edit|MultiEdit"`）是 Phase 0 待确认项，必须由本地 smoke 验证确认 Qoder CLI/IDE/JB 均接受；验证失败时应改为 Qoder 官方支持的 matcher 表达或降级为不安装对应 matcher。
+`spec-first init --qoder` 写入的是项目级 `.qoder/settings.json`，会被 Qoder CLI 与 IDE/JB plugin 共同读取。为避免 CLI-only `args` exec-form 泄漏到未验证的 IDE/JB surface，本轮使用保守的 shell command string；若后续确认所有目标 surface 都支持 exec-form，再单独评估 `{ command, args }` 迁移。`UserPromptSubmit` 与 `Stop` 这类无 matcher 事件必须省略 `matcher`；`SessionStart` 只有 Qoder CLI 文档当前列出，写入前必须验证 IDE/JB loader safety。`PreToolUse` 的 `"Write|Edit|MultiEdit"` matcher 必须由本地 smoke 验证 Qoder CLI 接受，并确认 IDE/JB 对 compatible tool names 的映射不会拒绝加载。
 
 ```json
 {
   "hooks": {
-    "UserPromptSubmit": [
-      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node .qoder/hooks/session-start" }] }
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "node .qoder/hooks/session-start" }] }
     ],
     "PreToolUse": [
       { "matcher": "Write|Edit|MultiEdit", "hooks": [{ "type": "command", "command": "node .qoder/hooks/prd-prewrite-guard" }] }
     ],
     "Stop": [
-      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node .qoder/hooks/prd-readiness-guard" }] }
+      { "hooks": [{ "type": "command", "command": "node .qoder/hooks/prd-readiness-guard" }] }
     ]
   }
 }
 ```
+
+**Degraded schema**：若 `SessionStart` shared-loader safety 未确认或失败，`.qoder/settings.json` 不写入 `SessionStart` group；可以仍安装 `.qoder/hooks/session-start` 脚本作为 managed file，但 doctor 必须把 settings entry 标为 degraded/missing-by-design，init dry-run 也不得把 session-start settings entry 当作必需 operation。
 
 ### 4.8 平台兼容性加固（按需）
 
@@ -594,7 +603,7 @@ if (adapter.id === 'qoder') {
 ### 5.1 Phase 依赖图
 
 ```text
-Phase 0: Qoder Hooks ──────────────── 独立，可立即执行
+Phase 0: Qoder Hooks ──────────────── 独立，先协议 spike 再安装闭环
                                         │
 Phase 1: Platform Registry ──────────── 独立基础设施
          │                              │
@@ -615,27 +624,37 @@ Phase 5: 平台兼容性 ───────────────── 独
 
 ### 5.2 各 Phase 详细计划
 
-#### Phase 0: Qoder Hooks 补齐（1-2 天）
+#### Phase 0: Qoder Hooks 补齐（3-5 天）
+
+Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runtime：
+
+| 片段 | 内容 | 出口 |
+|------|------|------|
+| Phase 0a: Qoder protocol spike | 验证 Qoder CLI `SessionStart/PreToolUse/Stop` 事件、matcher、stdin/stdout、`QODER_PROJECT_DIR`、`stop_hook_active`、shared `.qoder/settings.json` 对 IDE/JB loader safety | 产出 confirmed/degraded matrix；决定是否写入 `SessionStart` settings entry |
+| Phase 0b: Runtime lifecycle | 基于 0a confirmed matrix 实现 settings upsert/removal/inspect、hook scripts、adapter plan/clean/doctor/drift、focused tests | init/doctor/clean/drift 闭环通过；degraded 项显式报告 |
 
 | 步骤 | 内容 | 验收标准 |
 |------|------|---------|
-| 1 | 新建 `src/cli/qoder-settings.js` | exports: renderManagedQoderHooksUpsert, renderManagedQoderHooksRemoval, inspectManagedQoderHooks |
-| 2 | 新建 `templates/qoder/hooks/session-start` | Node.js script，读 AGENTS.md，注入 governance context；只按 Qoder CLI 协议确认 |
-| 3 | 新建 `templates/qoder/hooks/prd-prewrite-guard` 与 `prd-readiness-guard` | `.qoder/settings.json` 引用的每个 managed hook script 都必须实际安装 |
-| 4 | 修改 Qoder adapter `planRuntimeFilesSync/Removal/inspectRuntimeFiles` | 写入/清理/检查 `.qoder/hooks/*`，保持 pointer lifecycle 不变 |
-| 5 | 修改 init.js `buildInitMetadataPlan` | Qoder CLI 平台写入 `.qoder/settings.json` hooks；该函数在 Phase 2 将迁移至 `init-plan.js` |
-| 6 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder CLI 平台清理 settings matchers 与 hook scripts |
-| 7 | 修改 doctor.js `buildHostSpecificChecks` | Qoder CLI hook settings + script inspection |
-| 8 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder CLI hook drift 检测；该函数在 Phase 2 将迁移至 `init-plan.js` |
-| 9 | 验证 `UserPromptSubmit` 行为 | 确认 session-start prompt injection 的触发时机、matcher 语法与 stdin/stdout 协议；若不符合预期，则不安装 session-start matcher，doctor 报 degraded，并只保留已验证的 PreToolUse/Stop hooks；Phase 0 不安装 `spec-plan-guard` |
-| 10 | 新建 `tests/unit/qoder-settings.test.js` 与 hook file plan tests | 覆盖 upsert/removal/inspect、script write/remove、settings 引用的脚本均存在 |
+| 1 | 更新 source/runtime customization boundary、gitignore/context-runtime path rules | `.qoder/settings.json` 与 `.qoder/hooks/**` 被声明为 Qoder/user-owned surface 中的 spec-first managed slice；普通 context 排除和 clean 只处理 managed slice |
+| 2 | 验证 Qoder CLI `SessionStart` | 确认 `SessionStart` source matcher、plain text/JSON `additionalContext`、`QODER_PROJECT_DIR`、stdin `cwd` 行为；若 shared-loader safety 未确认，不写入 settings entry |
+| 3 | 验证 Qoder CLI `PreToolUse` 与 `Stop` | `PreToolUse` matcher 命中 `Write/Edit/MultiEdit` 或官方支持的等价 tool names；`Stop` 阻断必须用 `exit 2` + stderr，且 `stop_hook_active` 防循环 |
+| 4 | 验证 IDE/JB shared-loader safety | 使用项目级 `.qoder/settings.json` 验证 IDE/JB 对 CLI 所需 config 不拒绝加载；只记录 loader safety，不声明 IDE/JB hook behavior support |
+| 5 | 新建 `src/cli/qoder-settings.js` | exports: renderManagedQoderHooksUpsert, renderManagedQoderHooksRemoval, inspectManagedQoderHooks；inspect 能区分 installed/missing/degraded-by-design |
+| 6 | 新建 `templates/qoder/hooks/session-start` | Node.js script，读 `AGENTS.md`，按 Qoder `SessionStart` 协议注入 governance context；若 settings entry degraded，脚本可安装但不被引用 |
+| 7 | 新建 `templates/qoder/hooks/prd-prewrite-guard` 与 `prd-readiness-guard` | `.qoder/settings.json` 引用的每个 managed hook script 都必须实际安装；脚本使用 Qoder env/payload/output，不复用 Claude hardcoded path |
+| 8 | 修改 Qoder adapter `planRuntimeFilesSync/Removal/inspectRuntimeFiles` | 写入/清理/检查 `.qoder/hooks/*` managed scripts，保持 pointer lifecycle 不变 |
+| 9 | 修改 init.js `buildInitMetadataPlan` | Qoder 平台写入 confirmed `.qoder/settings.json` hooks；该函数在 Phase 2 将迁移至 `init-plan.js` |
+| 10 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder 平台清理 managed settings groups 与 managed hook scripts，保留用户 hooks/settings |
+| 11 | 修改 doctor.js `buildHostSpecificChecks` | Qoder hook settings + script inspection；degraded-by-design 使用 WARNING/INFO，不伪报 PASS |
+| 12 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder hook drift 检测；degraded-by-design 不触发 hard drift，但必须出现在 doctor |
+| 13 | 新建 `tests/unit/qoder-settings.test.js` 与 hook file plan tests | 覆盖 upsert/removal/inspect、script write/remove、settings 引用的脚本均存在、degraded schema 不要求 session-start settings entry |
 
 **验收标准**：
 - `spec-first init --qoder --dry-run` 输出包含 `.qoder/settings.json` hook 写入
-- `spec-first init --qoder --dry-run` 输出包含 `.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 写入
+- `spec-first init --qoder --dry-run` 输出包含 `.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 写入；`.qoder/hooks/session-start` 可写入，但只有 0a confirmed 时 `.qoder/settings.json` 才引用它
 - `spec-first doctor --qoder` 报告 hook 状态
 - `spec-first clean --qoder` 正确移除 hooks
-- 若 IDE/JB plugin hooks 未验证，文档和 doctor 文案不得声称支持 IDE/JB plugin hooks
+- 若 IDE/JB plugin hook behavior 未验证，文档和 doctor 文案不得声称支持 IDE/JB plugin hooks；若 shared-loader safety 未验证或失败，doctor 必须报告 Qoder CLI session-start degraded
 - `npm test` 全通过
 
 #### Phase 1: Platform Registry + 排除列表自动化（1-2 天）
@@ -677,10 +696,10 @@ Phase 5: 平台兼容性 ───────────────── 独
 | 1 | 新建 `pointer-based-adapter.js` | 封装 pointer sync/removal/inspect |
 | 2 | cursor.js 继承重构 | 从 675L 降至 ~120L |
 | 3 | kiro.js 继承重构 | 从 435L 降至 ~80L |
-| 4 | qoder.js 继承重构 | 从 553L 降至 ~150L |
+| 4 | qoder.js 继承重构 | 从 553L 降至 ~220-260L（保留 Qoder hook lifecycle） |
 
 **验收标准**：
-- 三个 adapter 总行数从 1663L 降至 ~350L
+- 三个 adapter 总行数预计降至 ~420-460L；LOC 仅作趋势指标，不作为硬 gate
 - `spec-first init --dry-run` 对三宿主输出不变
 - `spec-first doctor` 对三宿主诊断不变
 - Cursor/Kiro/Qoder 现有 host-specific warning/error 数量和语义不减少；任何减少必须列入 intentional delta
@@ -709,9 +728,9 @@ Phase 5: 平台兼容性 ───────────────── 独
 |--------|---------|
 | UNC 路径被 `isSafeManagedStatePath` 拒绝或正确归一化 | 新增 unit test |
 | WSL 互通通过显式 flag（如 `--wsl-profile`）启用，默认关闭 | CLI smoke test |
-| 错误消息语言与 profile lang 一致 | 回归测试 |
+| 显式 opt-in 路径的错误消息语言与 profile lang 一致；默认错误消息 golden 不变 | 回归测试 |
 
-**默认行为**：Phase 5 不修改默认 CLI 行为；所有加固项均为 opt-in。
+**默认行为**：Phase 5 不修改默认 CLI 行为；所有加固项均为 opt-in，错误消息语言一致性只覆盖 opt-in 路径。
 
 ### 5.3 新宿主接入理想流程（优化后）
 
@@ -722,11 +741,11 @@ Phase 5: 平台兼容性 ───────────────── 独
 4. 在 skills-governance.json 添加 scope       (~5L)
 5. 写测试                                    (~300L)
 
-总计: ~430L 新代码, 0 行现有代码修改
-预估: 1 天
+总计: ~430L 新增/修改，其中现有非 adapter 注册/governance 约 7L；0 行现有 adapter 代码修改
+预估: 1 天（pointer-only 且不触碰其他 runtime consumers）
 ```
 
-**适用范围**：上述流程适用于 pointer-only 宿主（Cursor/Kiro 类型）。若新宿主支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），参考成本为额外 +1-2 天、+250-500L source/tests，取决于 settings schema、hook script 数量、doctor/clean/drift 闭环和跨 surface 兼容验证；但仍不修改现有 adapter。
+**适用范围**：上述流程适用于 pointer-only 宿主（Cursor/Kiro 类型），且只承诺 adapter path-rewrite O(1)。完整新宿主接入仍需检查 gitignore/context-bundle/task-pack/target-repo/plugin 等 runtime-path consumers。若新宿主支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），参考成本为额外 +2-4 天、+300-600L source/tests，取决于 settings schema、hook script 数量、doctor/clean/drift 闭环和跨 surface 兼容验证；但仍不修改现有 adapter。
 
 vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
@@ -772,9 +791,11 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI h
 | init.js 拆分破坏 module.exports | 所有 test require 失效 | init.js 保持 re-export |
 | Adapter 声明式化遗漏 Codex 特殊逻辑 | Codex 功能回归 | Codex 不纳入 PointerBasedAdapter |
 | deriveUnrewrittenPatterns 遗漏 edge case | 路径误改写 | golden snapshot + 全量 test case |
-| Qoder UserPromptSubmit 时机与预期不符 | session-start hook 注入时机偏移 | 先部署 PreToolUse/Stop hooks（确定兼容），UserPromptSubmit 单独验证 |
-| Qoder CLI 与 IDE/JB hooks surface 被误认为完全一致 | 生成 IDE/JB 不识别的 `.qoder/settings.json` 或误报支持范围 | Phase 0 只声明 Qoder CLI confirmed；IDE/JB 进入 follow-up compatibility spike |
-| `.qoder/settings.json` 引用的 hook script 未实际安装 | hook matcher 存在但运行时报 ENOENT，doctor 误判健康 | Qoder adapter plan/clean/doctor/drift 同时覆盖 settings matcher 与 `.qoder/hooks/*` scripts |
+| Qoder CLI `SessionStart` 与 IDE/JB event set 不一致 | shared `.qoder/settings.json` 中的 CLI-only event 可能让 IDE/JB loader 拒绝配置，或 session-start 被错误降级 | Phase 0a 验证 shared-loader safety；失败则不写 `SessionStart` settings entry，doctor 报 `qoder_session_start_degraded` |
+| Qoder hook output 协议被当成 Claude 等价 | `Stop` guard 看似安装但不能阻断，PRD readiness closeout 失效 | Qoder hook templates 使用 Qoder `exit 2`/stderr、`hookSpecificOutput.hookEventName`、`QODER_PROJECT_DIR` 和 `stop_hook_active` 协议 |
+| Qoder CLI 与 IDE/JB hooks surface 被误认为完全一致 | 误报 IDE/JB support 或生成 IDE/JB 不识别的 `.qoder/settings.json` | Phase 0 只声明 Qoder CLI behavior confirmed；IDE/JB 只做 loader safety，不做 behavior support |
+| `.qoder/settings.json` 引用的 hook script 未实际安装 | hook matcher 存在但运行时报 ENOENT，doctor 误判健康 | Qoder adapter plan/clean/doctor/drift 同时覆盖 settings managed groups 与 `.qoder/hooks/*` managed scripts |
+| `.qoder/settings.json` / `.qoder/hooks/**` ownership 未声明清楚 | clean/drift 误删用户配置或把 Qoder/user-owned 文件当整目录 generated runtime | Phase 0 先更新 source/runtime customization boundary 和 context/gitignore rules，明确 managed slice-only contract |
 | Platform Registry 派生 patterns 比 legacy 更宽 | runtime path rewrite 误报或误改写非目标路径 | 双向等价 + representative negative fixtures；intentional delta 单独记录 |
 | PointerBasedAdapter 抽象吞掉 host-specific checks | doctor 回归漏报 frontmatter、agent tool pin、runtime path rewrite 问题 | Phase 3 验收比较 refactor 前后 Cursor/Kiro/Qoder warning/error 集合 |
 | Plugin 拆分破坏 skill-entrypoints lint | governance 校验失败 | `npm run lint:skill-entrypoints` 作为门禁 |
@@ -797,7 +818,7 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI h
 
 | Phase | Source 变更 | Runtime 影响 | 边界正确性 |
 |-------|-----------|-------------|-----------|
-| Phase 0 | src/cli/ + templates/qoder/ | `.qoder/settings.json` + `.qoder/hooks/` 新增（via init） | ✅ source 变更后 init 重生 runtime |
+| Phase 0 | src/cli/ + templates/qoder/ + docs/contracts/context/gitignore rules | `.qoder/settings.json` managed hook groups + `.qoder/hooks/*` managed scripts（via init） | ⚠️ Qoder/user-owned surface 中的 managed slice，必须先更新边界契约；不是整目录 generated runtime |
 | Phase 1 | src/cli/adapters/ | 无 runtime 变化 | ✅ 纯 source 重构 |
 | Phase 2 | src/cli/commands/ | 无 runtime 变化 | ✅ 纯 source 重构 |
 | Phase 3 | src/cli/adapters/ | 无 runtime 变化 | ✅ 纯 source 重构 |
@@ -823,10 +844,10 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI h
 
 | 优先级 | Phase | 收益 | 成本 | 依赖 |
 |--------|-------|------|------|------|
-| 1 | Qoder Hooks | 补齐自身宿主最大功能缺口，直接影响 dogfooding 与 Qoder 用户体验 | 1-2 天 | 无 |
-| 2 | Platform Registry | 消除 O(n²)，新宿主零修改 | 1-2 天 | 无 |
+| 1 | Qoder Hooks | 补齐自身宿主最大功能缺口，直接影响 dogfooding 与 Qoder 用户体验；先用 0a 协议 spike 防止固化错误 hook contract | 3-5 天 | 无 |
+| 2 | Platform Registry | 消除 adapter path-rewrite O(n²)，新宿主无需修改既有 adapter | 1-2 天 | 无 |
 | 3 | init.js 拆分 | 可维护性瓶颈解除 | 2-3 天 | 无 |
-| 4 | PointerBasedAdapter | 消除 1300+ 行重复 | 1-2 天 | Phase 1 |
+| 4 | PointerBasedAdapter | 收敛 pointer lifecycle 重复；LOC 下降为趋势指标，诊断等价优先 | 1-2 天 | Phase 1 |
 | 5 | Plugin 分层 | 降低 contributor 理解成本 | 1 天 | 无 |
 | 6 | 平台兼容性 | 企业场景覆盖 | 1-2 天 | 无 |
 

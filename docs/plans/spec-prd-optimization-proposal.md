@@ -777,49 +777,59 @@ pipeline_propagation_risk（追问优先级排序依据）:
 
 #### 深度优化方案
 
-**方案：不新增 readiness_outcome，而是丰富 `ready-for-planning` 的交接信息**
+**方案：不新增 readiness_outcome，而是拆清 tech-input 的 readiness 边界**
 
-核心洞察：问题不是缺少一个新状态，而是 `ready-for-planning` 的交接包（handoff）缺少对 spec-plan 的引导信息。
+核心洞察：问题不是缺少一个新状态，而是当前交接语义把两类不同风险混在一起：
+
+- `non_what_tech_recheck`：开发需要复核技术事实或 HOW 可行性，但不会改变 Requirements、AE、Scope、source-of-truth、fallback、analytics acceptance 等产品 WHAT。
+- `what_affecting_tech_decision`：技术可行性会反向改变产品方案、验收、范围、默认行为或 source-of-truth，这类 gap 仍是 PRD-owned WHAT gap。
+
+只有前者可以随 `ready-for-planning` 交接；后者必须保持 `write_mode=checkpoint-prd` 或 `readiness_outcome=ask-owner/revise-prd`，除非已有 owner-capped fallback 且明确说明 planning 不会 invent WHAT。
 
 **在 prd-readiness-lens.md 的 Outcomes 段落增加 Handoff Guidance Protocol**：
 
 ```text
 ### Handoff Guidance Protocol
 
-当 readiness_outcome = ready-for-planning 时，closeout 必须包含 handoff_guidance：
+当 readiness_outcome = ready-for-planning 且存在需要开发复核的非 WHAT 项时，closeout 必须包含 handoff_guidance：
 
 #### 交接包结构
 
-hardoff_guidance:
+handoff_guidance:
   settled_what:          # 开发可以直接依赖的产品决策
     - [R-xx: 一句话总结]
   
-  needs_tech_input:      # 需要开发输入才能最终确认的产品问题
+  non_what_tech_recheck: # 可随 ready-for-planning 交接的技术复核项
     - question: [技术可行性问题]
-      why_blocked: [为什么 PM 无法独自回答]
-      fallback_if_infeasible: [如果技术不可行的备选方案]
+      why_non_what: [为什么不会改变 Requirements / AE / Scope / source-of-truth]
+      fallback_if_infeasible: [不可行时的 HOW 调整或需要返回 PRD 的条件]
       affects: [R-xx / AE-xx]
-  
+
+  blocked_what_affecting_tech_decisions: # 不可随 ready 交接；必须 checkpoint / ask-owner / revise-prd
+    - question: [会改变产品方案或验收的问题]
+      why_blocks_ready: [会改变哪个 WHAT / acceptance / scope / authority]
+      next_owner_question: [下一步需要问 owner 或开发+owner 共同裁决的问题]
+
   planning_recheck:      # 开发需要重新确认的 source 层面事实
     - [Planning Recheck 中的 advisory 项]
-  
+
   dev_freedom_zone:      # 开发可以自主决定 HOW 的明确范围
     - [scope boundary 内的技术实现自由度]
 
 #### 触发条件
 
-当 PRD 中存在以下情况之一时，needs_tech_input 段不能为空：
+当 PRD 中存在以下情况之一时，必须先分类为 `non_what_tech_recheck` 或 `what_affecting_tech_decision`：
 - Outstanding Questions 中有标注 `resolution_requires: tech-input` 的条目
 - Planning Recheck 中有 `blocks planning? = conditional on tech feasibility` 的条目
 - Evidence And Assumptions 中有 `tag: assumption` 且 `note` 提及技术可行性的条目
 
 #### 与现有流程的关系
 
-- 这不是新的 readiness_outcome，而是 ready-for-planning 交接的信息丰富度要求
-- needs_tech_input 不阻断 ready-for-planning（产品 WHAT 已定，只是 HOW 影响 WHAT 细节）
-- 如果 needs_tech_input 中的问题回答为「不可行」，走 fallback_if_infeasible 路径
-  （本质是 plan 过程中的 PRD revision，不是 readiness 失败）
-- spec-plan 消费此交接包时，优先处理 needs_tech_input 再展开详细规划
+- 这不是新的 readiness_outcome，而是 ready 边界的分类纪律
+- `non_what_tech_recheck` 不阻断 ready-for-planning，因为产品 WHAT 已定，只是 HOW / source-refresh 需要复核
+- `what_affecting_tech_decision` 阻断 ready-for-planning；合法输出是 `checkpoint-prd`、`ask-owner` 或 `revise-prd`
+- 如果 `non_what_tech_recheck` 回答为「不可行」且会改变 WHAT，spec-plan 必须返回 spec-prd refine，而不是自行改写需求
+- spec-plan 消费此交接包时，优先处理 `non_what_tech_recheck`；看到 `blocked_what_affecting_tech_decisions` 时不得继续当作 ready PRD 消费
 ```
 
 **配套：在 Outstanding Questions 表增加可选列 `resolution_requires`**
@@ -827,12 +837,12 @@ hardoff_guidance:
 ```text
 resolution_requires 合法值：
 - owner-decision（默认）：需要 PM/产品 owner 决策
-- tech-input：需要开发/架构输入才能做产品决策
+- tech-input：需要开发/架构输入；必须进一步分类为 non-WHAT recheck 或 WHAT-affecting decision
 - source-recheck：需要重新读取 source 确认
 - external-input：需要外部方（设计/合规/法务）输入
 ```
 
-这个列是 optional 的，不进入 checker 强制检查，但当 `resolution_requires=tech-input` 的 OQ 存在时，closeout 的 `needs_tech_input` 段应反映它。
+这个列是 optional 的，不进入 checker 强制检查，但当 `resolution_requires=tech-input` 的 OQ 存在时，closeout 必须反映其分类结果。若分类为 WHAT-affecting，PRD 不得返回 `ready-for-planning`。
 
 ---
 
@@ -1439,7 +1449,7 @@ Source Resolution Pass（8.6）+ Per-Question Quality Layer（8.5）都增加了
 
 #### 降级策略
 
-当剩余 context 不足以完成全量 grill 时，按优先级降级：
+当剩余 context 不足以完成全量 grill 时，按优先级降级。Context 不足是恢复/交接问题，不是 readiness 豁免：
 
 ```
 保留（不可跳过）：
@@ -1452,16 +1462,24 @@ Source Resolution Pass（8.6）+ Per-Question Quality Layer（8.5）都增加了
   → P2 体验问题 → PRD-local Outstanding Questions，标记 deferred_context_budget
   → 低风险 gap → 压缩为 advisory note
 
+ready 边界（不可绕过）：
+  → 任何 deferred_context_budget 项只要可能改变 WHAT / acceptance / scope /
+    data authority / interface availability / fallback display / analytics，
+    必须设置 write_mode=checkpoint-prd、can_enter_spec-plan: no，
+    readiness_outcome=ask-owner 或 revise-prd，并写明 next_owner_question
+  → 只有已达到 legal stop point，或明确为 non-WHAT Planning Recheck / HOW source-refresh
+    的 P1/P2 项，才能随 ready-for-planning 交接
+
 显式声明：
   → Closeout Summary 中记录 "context_budget_limited: N questions deferred"
-  → 下游 spec-plan 看到 deferred 标记时知道这些 gap 未闭合
+  → 下游 spec-plan 看到 load-bearing deferred 标记时知道当前 PRD 非 ready，不得自行补 WHAT
 ```
 
 #### 与 7.2 Grill Priority Signal 的关系
 
 - 7.2 决定「问什么顺序」（P0→P1→P2 排序）
-- 8.10 决定「context 不够时保什么」（保留 P0，defer P1/P2）
-- 两者互补：7.2 确保高优先级问题先问，8.10 确保高优先级问题在被 defer 之前已被问
+- 8.10 决定「context 不够时如何 checkpoint / non-ready handoff」（保留 P0，defer P1/P2 但不放行 load-bearing WHAT gap）
+- 两者互补：7.2 确保高优先级问题先问，8.10 确保 context 不足不会把未闭合 WHAT 推给 spec-plan
 
 ### 8.11 Inbound Revision Signal Protocol
 
