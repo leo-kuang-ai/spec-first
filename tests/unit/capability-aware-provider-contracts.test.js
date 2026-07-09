@@ -9,7 +9,6 @@ const WORKFLOW_SKILLS = [
   'skills/spec-plan/SKILL.md',
   'skills/spec-debug/SKILL.md',
   'skills/spec-prd/SKILL.md',
-  'skills/spec-brainstorm/SKILL.md',
 ];
 
 function readRepo(relativePath) {

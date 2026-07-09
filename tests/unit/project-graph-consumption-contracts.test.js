@@ -9,7 +9,6 @@ const CONSUMER_SURFACES = [
   'skills/spec-plan/references/governance-boundaries.md',
   'skills/spec-debug/SKILL.md',
   'skills/spec-prd/SKILL.md',
-  'skills/spec-brainstorm/SKILL.md',
 ];
 
 function read(relativePath) {
@@ -80,13 +79,9 @@ describe('project graph consumption contract', () => {
     }
   });
 
-  test('brainstorm consumer keeps project graph optional and user-led', () => {
+  test('project graph use remains optional and user-led at the contract layer', () => {
     const contract = read('docs/contracts/project-graph-consumption.md');
-    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
 
-    expect(brainstorm).toContain('docs/contracts/project-graph-consumption.md');
-    expect(brainstorm).toContain('the WHAT must come from user dialogue and source confirmation, never the candidate');
-    expect(brainstorm).toContain('fall back to direct source reads');
     expect(contract).toContain('Do not require workflows to run project-graph before direct source reads');
     expect(contract).toContain('whether to issue a project-graph query is an LLM judgment');
   });

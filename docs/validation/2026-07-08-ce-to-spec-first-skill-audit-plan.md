@@ -1066,7 +1066,9 @@ done
 - 已核对 CE/spec 文件数量与文件名集合：两侧均为 7 个文件，集合一致；旧 `skills/spec-work/evals/examples.json` 已移除。
 - 已运行 CE/spec 目录 diff，确认差异集中在 `ce-*` -> `spec-*`、`ce-unified-plan/v1` -> `spec-unified-plan/v1`、`/tmp/compound-engineering/...` -> `/tmp/spec-first/...`、CE evidence-capture wording 的必要投影。
 - 已运行 focused residual scan，确认 `skills/spec-work` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留；唯一命中为合法的 `spec-first evidence-capture workflow`。
-- 待运行 focused Jest、entrypoint lint、`git diff --check` 和 changelog 格式检查。
+- 已运行 `npm run lint:skill-entrypoints`。
+- 已运行 `npx jest tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/anti-rationalization-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-plan-enterprise-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-bundle-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/changelog-format.test.js --runInBand`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-work tests/unit/anti-rationalization-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-plan-enterprise-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-bundle-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/prompt-examples-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-work-resource-lens-contract.test.js`。
 
 ### `ce-ideate` -> `spec-ideate`
 
