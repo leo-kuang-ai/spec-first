@@ -72,20 +72,6 @@ describe('knowledge harness workflow consumers', () => {
     expect(contract).not.toContain('omitted_context');
   });
 
-  test('debug treats solution recall as advisory until source-confirmed', () => {
-    const debug = read('skills/spec-debug/SKILL.md');
-
-    for (const text of [debug]) {
-      expect(text).toContain('Recall Trust Boundary');
-      expect(text).toContain('docs/solutions');
-      expect(text).toContain('advisory candidate');
-      expect(text).toContain('source_refs');
-      expect(text).toContain('source_reads_required');
-      expect(text).toContain('source/test/doc');
-      expect(text).toContain('不依赖模型自评');
-    }
-  });
-
   test('context bundle keeps source read requirements in referenced summaries', () => {
     const contract = read('docs/contracts/context-bundle.md');
 

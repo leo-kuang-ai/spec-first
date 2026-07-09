@@ -6,7 +6,6 @@ const path = require('node:path');
 const REPO_ROOT = path.join(__dirname, '..', '..');
 
 const WORKFLOW_SKILLS = [
-  'skills/spec-debug/SKILL.md',
   'skills/spec-prd/SKILL.md',
 ];
 

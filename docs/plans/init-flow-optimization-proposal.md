@@ -64,7 +64,7 @@ CLI Entry (bin/spec-first.js)
         plugin.js (1467L)        -- Governance-based asset filtering
         state.js (769L)          -- Operation plan model + safety
         developer.js (264L)      -- Global identity management
-        claude-settings.js (439L) -- Claude hook matcher management
+        claude-settings.js (521L) -- Claude hook matcher management
         atomic-write.js (85L)    -- Windows-aware atomic writes
       平台适配 (adapters/):
         claude.js (425L), codex.js (845L), cursor.js (675L),
@@ -621,6 +621,64 @@ Phase 5: 平台兼容性 ───────────────── 独
 - Phase 3 硬依赖 Phase 1
 - Phase 2/4/5 在代码依赖上可独立，但建议 Phase 0/1 稳定后再启动 Phase 2，避免在 `init.js` 上并行迁移同一逻辑
 - **Phase 0 与 Phase 2 的代码迁移约定**：Phase 0 在 `init.js` 中新增的 Qoder hook 调用，将在 Phase 2 拆分 `init.js` 时同步迁移到 `init-plan.js`，避免同一逻辑被修改两次
+
+#### 优化后完整安装执行流程图
+
+下图描述优化完成后的 `spec-first init` 安装/刷新路径。它只描述 CLI 可确定执行的 install lifecycle；Qoder CLI hooks 的 behavior support 由 Phase 0a confirmed/degraded matrix 驱动，IDE/JB 只进入 shared-loader safety gate，不作为本轮 hook behavior success 标准。
+
+```mermaid
+flowchart TD
+  A["用户运行 spec-first init<br/>选择 host flags / repo scope / dry-run / language"] --> B["parseInitArgs<br/>解析平台、仓库、dry-run、yes、profile 参数"]
+  B --> C["collectInitInput<br/>补齐 developer profile、语言、目标宿主"]
+  C --> D{"目标范围"}
+  D -->|单仓| E["normalizeProjectRoot<br/>锁定当前 target_repo"]
+  D -->|父级 workspace| F["discover workspace repos<br/>--repo 单仓或 --all-repos 显式 fan-out"]
+  F --> E
+
+  E --> G["source/runtime boundary gate<br/>source 读取 skills/templates/src/docs<br/>不把 generated runtime mirror 当 source"]
+  G --> H["load governance and asset facts<br/>plugin manifest + skills governance + filteredAssetSet"]
+  H --> I["for each selected host"]
+  I --> J["resolve adapter from registry<br/>claude / codex / cursor / kiro / qoder"]
+  J --> K["derive runtimePathRules<br/>生成 other-host path exclusion<br/>只作为 rewrite exclusion facts"]
+  K --> L["adapter.planRuntimeFilesSync<br/>生成 host-native runtime operations"]
+
+  L --> M{"host capability"}
+  M -->|Claude/Codex| N["独立 adapter lifecycle<br/>instruction blocks + shell hooks + host-specific checks"]
+  M -->|Cursor/Kiro pointer-only| O["PointerBasedAdapter lifecycle<br/>pointer sync/removal/inspect + host-specific transforms"]
+  M -->|Qoder hooks-capable| P["Qoder lifecycle<br/>pointer + skills/agents/commands + managed hook slice"]
+
+  P --> Q{"Phase 0a confirmed matrix"}
+  Q -->|SessionStart loader safe| R["写 .qoder/settings.json SessionStart managed entry<br/>写 .qoder/hooks/session-start"]
+  Q -->|loader unsafe or unknown| S["不写 SessionStart settings entry<br/>session-start script 可安装但 doctor 标 degraded"]
+  Q -->|PreToolUse/Stop confirmed| T["写 PreToolUse/Stop managed entries<br/>写 prd-prewrite/readiness hook scripts"]
+  Q -->|guard protocol unknown| U["不声明 healthy<br/>doctor 输出 degraded reason_code"]
+
+  N --> V["buildInitMetadataPlan<br/>语言治理 block、state metadata、host metadata"]
+  O --> V
+  R --> V
+  S --> V
+  T --> V
+  U --> V
+
+  V --> W["inspectCurrentRuntimeDrift<br/>对比当前 managed runtime 与计划"]
+  W --> X["buildProjectInitPlan<br/>合并 adapter ops + metadata ops + legacy cleanup ops"]
+  X --> Y{"dry-run 或需要 preview"}
+  Y -->|dry-run| Z["printInitPreview<br/>只输出 planned operations，不写文件"]
+  Y -->|apply| AA["mutation gate<br/>用户确认或 -y 后执行"]
+  AA --> AB["applyProjectInitPlan<br/>写入 managed files/slices，失败 rollback"]
+  AB --> AC["write state and summary<br/>记录 installed host、runtime impact、next steps"]
+  AC --> AD["post-install verification path<br/>spec-first doctor --host 检查 drift/degraded"]
+
+  AD --> AE{"后续 lifecycle"}
+  AE -->|重新安装| A
+  AE -->|清理| AF["spec-first clean --host<br/>只移除 managed runtime / managed slice<br/>保留用户自定义配置"]
+  AE -->|修复 drift| AG["按 doctor guidance rerun init<br/>不手改 generated runtime mirror"]
+```
+
+**图中边界**：
+- `parse/collect/discover/load/derive/inspect/plan/apply` 是 script-owned deterministic work，必须产生可审计 operation、path、reason_code 或 degraded status。
+- 选择宿主、解释 degraded 风险和决定是否推进 IDE/JB follow-up 是 LLM/owner judgment，不由 install 脚本伪装成 confirmed support。
+- `.qoder/settings.json` 与 `.qoder/hooks/**` 是 Qoder/user-owned surface 中的 spec-first managed slice；`clean` 与 drift 检查只能触碰 managed hook groups 和 managed hook scripts。
 
 ### 5.2 各 Phase 详细计划
 

@@ -95,7 +95,6 @@ describe('context governance runtime exclusion contract', () => {
 
   test('high-frequency ordinary workflows carry the runtime exclusion rule', () => {
     const workflowPaths = [
-      'skills/spec-debug/SKILL.md',
       'skills/spec-optimize/SKILL.md',
     ];
 

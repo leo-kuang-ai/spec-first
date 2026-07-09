@@ -15,7 +15,9 @@
 
 ## 审查范围
 
-本轮复核的已完成审查 skill：
+本轮复核的已完成审查 skill（2026-07-08 当时已完成路径 / 入口复核范围）：
+
+> 当前后续全量代码审查范围已扩展为 `skills/` 下全部 36 个 source skill。以 `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md` 为准;本节保留为 2026-07-08 路径复核的历史范围记录。
 
 - `spec-commit`
 - `spec-commit-push-pr`

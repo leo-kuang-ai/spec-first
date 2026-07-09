@@ -2,14 +2,15 @@
 
 ## 结论
 
-本审查对 [2026-07-08-ce-to-spec-first-skill-audit-plan.md](./2026-07-08-ce-to-spec-first-skill-audit-plan.md) 中已完成迁移审查的 27 个 skill(含 `spec-mcp-setup`)进行逐文件代码审查,重点覆盖迁移正确性、代码质量、安全性、跨 skill 依赖关系和上下文管理。
+本审查对当前 `skills/` 下全部 36 个 source skill 进行逐文件代码审查,其中 29 个为 CE 迁移相关 skill(含 `spec-mcp-setup`),7 个为 spec-first 原生 / 拆分 skill。审查重点覆盖迁移正确性、代码质量、安全性、跨 skill 依赖关系和上下文管理。
 
 审查不替代迁移审查报告的结论,而是在其基础上验证实际 source 代码是否与审查结论一致,并发现迁移审查未覆盖的问题。
 
 ## 目标
 
-- 对 27 个已完成迁移审查的 skill 逐文件审查 SKILL.md、全部 references、全部 scripts、schemas/assets。
+- 对当前 `skills/` 下全部 36 个 source skill 逐文件审查 SKILL.md、全部 references、全部 scripts、schemas/assets。
 - 验证 CE 承重能力是否在 source 中被正确保留。
+- 对 spec-first 原生 / 拆分 skill 不做 CE 等价要求,但仍审查其入口语义、source/runtime 边界、依赖关系、artifact contract、脚本安全和上下文管理。
 - 验证跨 skill 依赖关系(文件引用、artifact contract、handoff 路由、配置键)是否全部正确。
 - 验证上下文管理(常驻 vs 触发、脚本产出质量、handoff 上下文传递)是否符合 spec-first 架构原则。
 - 产出一份合并报告,记录按严重程度分类的发现和修复建议。
@@ -19,18 +20,19 @@
 - 不重复迁移审查报告已确认的结论;只关注 source 代码层面的验证和新发现。
 - 不修改 generated runtime mirrors(`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`)。
 - 不在审查阶段做 runtime regeneration;如需 runtime refresh,作为单独显式步骤。
-- 不对 spec-first-only skills(`spec-prd`、`spec-write-tasks`、`using-spec-first`、`spec-write-skill`、`spec-skill-audit`、`spec-app-consistency-audit`、`spec-rule-miner`)做 CE 等价审查,但可引用它们解释合理 divergence。
+- 不对 spec-first 原生 / 拆分 skills(`spec-prd`、`spec-write-tasks`、`using-spec-first`、`spec-write-skill`、`spec-skill-audit`、`spec-app-consistency-audit`、`spec-rule-miner`)做 CE 等价审查;这些 skill 仍纳入全量 source 审查,并可用于解释合理 divergence。
 
 ## 审查范围
 
 ### Skill 清单与批次
 
-| 批次 | Skills | 迁移审查状态 | 文件量预估 |
+| 批次 | Skills | 审查口径 | 文件量预估 |
 |---|---|---|---|
 | **Batch 1**(低差异快审) | spec-test-xcode, spec-polish, spec-explain, spec-pov, spec-dogfood, spec-strategy, spec-simplify-code, spec-commit | 全部 aligned | ~20 |
 | **Batch 2**(helper 与尾项) | spec-commit-push-pr, spec-optimize, spec-promote, spec-proof, spec-resolve-pr-feedback, spec-test-browser, spec-worktree | 5 aligned + 2 repaired | ~40 |
 | **Batch 3**(支撑链路) | spec-debug, spec-compound, spec-compound-refresh, spec-sweep, **spec-mcp-setup**, spec-riffrec-feedback-analysis, spec-product-pulse | 1 partial + 5 repaired/replaced + 1 near-parity | ~60 |
 | **Batch 4**(核心链路深审) | spec-brainstorm, spec-plan, spec-doc-review, spec-code-review, spec-work, spec-ideate, spec-lfg | 全部 replaced/repaired | ~80 |
+| **Batch 5**(spec-first 原生 / 拆分 skill 全量审查) | spec-prd, spec-write-tasks, using-spec-first, spec-write-skill, spec-skill-audit, spec-app-consistency-audit, spec-rule-miner | 不做 CE 等价;做 source 质量、依赖、上下文与治理边界审查 | ~60 |
 
 **特殊说明**:`spec-mcp-setup` 是从 `ce-setup` 的近似映射(near-parity),不是直接 parity target。审查需额外关注 divergence 是否合理、provider readiness 和 runtime freshness 检查是否完整。
 
@@ -401,11 +403,11 @@ Phase 1: 全局依赖图谱 + 共享资源清单 + 上下文预算基线
   ├── 各 SKILL.md 行数统计(上下文预算基线)
   └── 常驻 vs 触发内容边界标注
 
-Phase 2: 逐批次代码审查 (Batch 1 → 2 → 3 → 4)
+Phase 2: 逐批次代码审查 (Batch 1 → 2 → 3 → 4 → 5)
   ├── 维度 1-4: 迁移/质量/安全/一致性(基础)
   ├── 维度 5-15: 依赖/共享脚本/contract/mode/metadata(核心)
   └── 维度 16-22: 上下文预算/产出/handoff/排除/隔离/恢复(上下文管理)
-  注意:批次内可并行读取文件;批次间串行执行
+  注意:批次内可并行读取文件;批次间串行执行。Batch 5 不做 CE parity 判定,但必须完成全量 source 审查。
 
 Phase 3: 全局交叉验证
   ├── Plan artifact contract 链路端到端
@@ -450,6 +452,7 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
   ### Batch 2 ... (同上)
   ### Batch 3 ... (同上,含 spec-mcp-setup)
   ### Batch 4 ... (同上)
+  ### Batch 5 ... (同上,不含 CE 等价 verdict)
 
 ## 全局交叉验证
   - 悬空引用
@@ -518,7 +521,7 @@ npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
 
 当每个审查 skill 都具备以下内容时,本审查完成:
 
-- CE 与 spec-first 两侧 source files 均已读取(或迁移审查已确认且无变化的低风险项可引用结论)。
+- CE 迁移相关 skill 的 CE 与 spec-first 两侧 source files 均已读取(或迁移审查已确认且无变化的低风险项可引用结论);spec-first 原生 / 拆分 skill 的 spec-first source files 均已读取,并记录其无 CE parity 目标。
 - 23 个维度均已检查。
 - 有带 risk level 的 verdict(pass / issues_found / critical_issues)。
 - 发现按严重程度分类(critical / high / medium / low / info)。

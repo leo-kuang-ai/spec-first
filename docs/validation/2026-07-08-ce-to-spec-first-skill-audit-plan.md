@@ -329,9 +329,9 @@ done
 
 #### Verdict
 
-- status: repaired_aligned
+- status: replaced_from_ce_source
 - risk: high
-- decision: `spec-debug` 不是 CE `ce-debug` 的最小投影版；它在 CE root-cause debug loop 上叠加了 spec-first evidence/context governance、feedback-loop contract、performance regression 和 HITL 辅助能力。本轮按 `docs/plans/2026-07-09-002-feat-spec-debug-ce-full-parity-plan.md` 完成修复：保留 spec-first 增强，同时补回 CE 明确承重的 tracker/PR history、pre-fix scope、post-fix simplify/review/residual tail、residual durability 和 `Post-Fix Quality` 输出。
+- decision: 按用户 2026-07-09 裁决，`spec-debug` 完全以 CE `ce-debug` source 为准重建，保留 CE 英文正文与完整执行流，只做必要 spec-first 投影：`name: spec-debug`、下游入口从 `/ce-*` 改为 `spec-*`、repo-profile cache 从 `/tmp/compound-engineering/repo-profile` 改为 `/tmp/spec-first/repo-profile`。不保留上一版 spec-first-only evidence/context governance、feedback-loop contract、performance regression、HITL 辅助能力、Scenario Capability 或旧 focused contract tests 作为 active runtime contract。
 
 #### Source Files Read
 
@@ -348,102 +348,63 @@ done
 - spec-first: `skills/spec-debug/references/anti-patterns.md`
 - spec-first: `skills/spec-debug/references/defense-in-depth.md`
 - spec-first: `skills/spec-debug/references/investigation-techniques.md`
-- spec-first: `skills/spec-debug/references/perf-regression.md`
 - spec-first: `skills/spec-debug/references/repo-profile-cache.md`
-- spec-first: `skills/spec-debug/scripts/hitl-loop.template.sh`
 - spec-first: `skills/spec-debug/scripts/repo-profile-cache.py`
 
 #### Preserved CE Capabilities
 
-- 保留 CE 的核心 debug posture：先调查再修复、建立 causal chain、uncertain link 需要 prediction、一次只改一个 hypothesis、失败后回到 root-cause 判断。
-- 保留 CE 的 Phase 0 issue intake、Phase 1 reproduce / environment sanity / trace code path、Phase 2 assumption audit / smart escalation、Phase 3 workspace safety / test-first / defense-in-depth、Phase 4 structured summary 与 learning capture 判断。
-- 保留 CE 的 repo-profile cache 辅助读取 testing convention；`scripts/repo-profile-cache.py` 只做 deterministic get/put，不把语义判断放进脚本。
-- 保留 CE 的 `references/anti-patterns.md`、`references/defense-in-depth.md`、`references/agents/repo-profiler.md`；当前 CE/spec diff 显示这些文件无实质差异。
+- 完整保留 CE 的核心 debug posture：investigate before fixing、causal chain gate、uncertain link prediction、one change at a time、stuck 时诊断 why。
+- 完整保留 CE 的 Phase 0 issue intake 与 trivial-bug fast-path；fast-path 只节省调查仪式，不跳过用户的 Fix it now / Diagnosis only 选择。
+- 完整保留 CE 的 Phase 1 reproduce、environment sanity、trace code path、tracker/PR history institutional memory 查询。
+- 完整保留 CE 的 Phase 2 assumption audit、hypothesis grounding observation、prediction、causal-chain gate、smart escalation 和 read-only parallel investigation option。
+- 完整保留 CE 的 Phase 3 workspace/branch check、test-first fix、failed-fix invalidation、conditional defense-in-depth 和 post-mortem。
+- 完整保留 CE 的 Phase 4 Debug Summary、post-fix simplify/review/residual tail、skill-owned branch commit/PR default、pre-existing branch user choice 和 learning capture offer。
+- 完整保留 CE references 与 repo-profile cache helper；`repo-profile-cache.py` 继续只做 deterministic get/put，不承担语义判断。
 
-#### Worth Keeping From `spec-debug`
+#### Removed Spec-First-Only Additions
 
-- [keep] `Feedback Loop And Hypothesis Ledger`：把“先复现再判断 root cause”具体化为 red-capable / deterministic / fast / agent-runnable loop；无 loop 且无 captured evidence 时不得声明 confirmed root cause。它强化 verification gate，符合 evidence harness。
-- [keep] `Direct evidence` closeout：Debug Summary 中的 `claims_validated_by` / `claims_remaining_advisory` 能防止 freeform “tests passed” 或 “修好了”变成 fake completion。
-- [keep] Runtime/context exclusion：默认排除 generated mirrors、`.spec-first/audits/**`、`.spec-first/governance/**`，只在 setup/runtime drift/audit/governance bug 中读取 runtime evidence，符合 source/runtime gate。
-- [keep] Capability-class provider boundary：CodeGraph / Graphify 等 provider 只作 advisory navigation，不作为 root-cause proof；provider freshness、自报状态和 graph call path 必须回源确认。
-- [keep] `docs/solutions/` recall trust boundary：默认扫描 durable learning 作为 advisory diagnostic pointer，但必须通过当前 source/test/log/runtime evidence 回证，不依赖模型自评。
-- [keep] Trivial-bug fast-path negative boundary：多文件 causal chain、architecture regression、state race、permission/env failure、flaky behavior 不走 fast-path；比 CE 的 Phase 0 early fast-path 更不容易误报 root cause。
-- [keep] Performance regression branch：`references/perf-regression.md` 为 “why is this slow / performance regression” 提供 measure-first、statistical timing、perf bisect 方法，并清楚区分 `spec-debug` 的 regression diagnosis 与 `spec-optimize` 的 outcome optimization。
-- [fixed] HITL loop：把人工点击复现定义为 human-operated last resort，避免 agent 直接运行会阻塞的 `read` 脚本；`scripts/hitl-loop.template.sh` 注释已改为用户运行、agent 读取 captured `KEY=VALUE` output。
-- [keep] Correct-seam test judgment：写 regression test 前判断测试是否覆盖真实 call pattern；shallow seam 必须标为 blocking advisory，防止浅层测试制造虚假覆盖。
-- [keep] Failed fix evidence reset：fix attempt 失败后先记录被推翻的 prediction、contradicting observation 和 ruled-out assumption，再形成下一假设。
-
-#### Missing Or Drifted CE Capabilities
-
-- [done] CE 的 `1.4 Check the tracker and PR history for prior work` 已恢复为 `spec-debug` Phase 1.5，并在其前新增 `Cheap trivial pre-check` 作为成本控制；完整 `Trivial-bug fast-path check` 保持为 Phase 1.6 的 evidence gate。
-- [done] CE 的 pre-fix scope 已恢复到 Phase 3，记录 `pre_fix_head`、`pre_fix_status_clean`、`pre_existing_changed_files` 和 Phase 3 changed-or-created `fix_owned_files`，用于约束后续 simplify/review scope。
-- [done] CE 的 post-fix polish/review tail 已恢复为 spec-first 表达：使用 `spec-simplify-code`、`spec-code-review`、invocation matrix、一轮上限、blocked/degraded handoff、tail edits 后 re-verification，以及 `Post-Fix Quality` 输出。
-- [done] CE 的 residual durability 已恢复：PR 场景使用 `Known Residuals`，commit-only 或 stop 场景写 `docs/residual-review-findings/<branch-or-head-sha>.md`。
-- [fixed] HITL template 注释第 4 行已从 “agent runs the script” 改为 “user runs the script; agent reads captured output afterward”。
-- [cleanup-confirmed] `spec-debug/evals/examples.json` 已删除，`SKILL.md` 无 `Examples As Context` / `evals/examples.json` 引用。删除理由是旧 spec-only examples-as-context 无 active runtime consumer，且会形成第二套行为真相源；替代验证路径是 focused contract tests、parity mapping 和 fresh-source eval。
-
-#### Intentional Spec-First Divergences
-
-- `ce-debug`、`ce-brainstorm`、`ce-code-review`、`ce-simplify-code`、`ce-commit-push-pr`、`ce-compound` 等入口投影为当前 `spec-*` 或 current-host entrypoint 表达。
-- `/tmp/compound-engineering/repo-profile/...` 投影为 `/tmp/spec-first/repo-profile/...`。
-- `.compound-engineering` local/runtime path 不作为 active debug contract；source/runtime 和 runtime context exclusion 以 spec-first 当前 governance 为准。
-- `Workflow Contract Summary`、`Scenario Capability`、provider boundary 和 evidence closeout 是 spec-first 增强；它们不来自 CE，但与角色契约的 deterministic facts / LLM semantic judgment 分工一致。旧 `Examples As Context` 不再作为 `spec-debug` active contract，已在本段按 cleanup-confirmed 处理。
-
-#### Legacy CE Residuals
-
-- `skills/spec-debug` active source 中未发现 `/ce-*` invocation 作为当前入口残留；CE 下游名称已改为 `spec-*` 或 current-host entrypoint。
-- 本轮修复后，原行为残留（tracker/PR history、pre-fix scope、post-fix tail、residual durability、HITL 注释冲突）已处理；focused scan 仍需在 closeout 验证 active source 无 `/ce-*`、`ce-debug`、`/tmp/compound-engineering` 残留。
-
-#### Recommended Changes
-
-- [done] 将 CE `1.4 Check the tracker and PR history for prior work` 补回 `spec-debug`，并保留完整 trivial fast-path evidence gate。
-- [done] 恢复 CE post-fix simplify/review/residual handling tail，并投影为 `spec-simplify-code`、`spec-code-review`、`spec-commit-push-pr`、`spec-compound`。
-- [done] 修正 `scripts/hitl-loop.template.sh` 注释，保持与 SKILL.md 的 human-operated contract 一致。
-- [documented] 保留并解释 `Feedback Loop And Hypothesis Ledger`、`Direct evidence` closeout、provider/context boundary、perf regression、correct-seam test 和 `docs/solutions/` recall 这些 spec-first 增强；不按“CE 不存在”机械删除。
-- [done] 补 focused contract test：锁定 tracker/PR history presence、pre-fix scope、post-fix residual durable sink、HITL human-operated wording、spec-only eval cleanup 和 no `/ce-*` entrypoints。
+- 删除 active `spec-debug` 中上一版 `Workflow Contract Summary`、`Scenario Capability`、provider/project-graph boundary、runtime context exclusion、direct evidence closeout、feedback-loop ledger、performance regression 专项 reference 和 HITL loop template。
+- 删除旧 `tests/unit/spec-debug-contracts.test.js`，并从共享 provider/knowledge/context/scenario 测试中移除对 `spec-debug` 旧增强段落的强绑定。
+- 从 `tests/unit/migrated-skill-scripts-contracts.test.js` 移除 `spec-debug` 的旧迁移脚本限制；`repo-profile-cache-parity.test.js` 仍覆盖 cache protocol/path parity。
 
 #### Parity Mapping
 
 | CE source / section | spec-debug projection | status | reason | consumer | verification anchor |
 | --- | --- | --- | --- | --- | --- |
-| Core principles | Core Principles / root-cause investigation posture | kept-enhanced | 保留 CE 的 causal chain、single-variable hypothesis、failed-fix reset，并叠加 spec-first evidence gate。 | `spec-debug` users, `spec-compound` | `tests/unit/spec-debug-contracts.test.js` hypothesis / failed-fix assertions；fresh-source eval checklist |
-| Phase 0 issue intake | Phase 0 + advisory issue/tracker wording | kept-enhanced | issue/tracker/PR text 作为 advisory input，不替代 direct evidence。 | `spec-debug` users | source read + tracker advisory assertions |
-| Trivial fast-path | Phase 1.4 cheap pre-check + Phase 1.6 full fast-path evidence gate | kept-enhanced | cheap pre-check 只节省 tracker 成本；root cause 仍需完整 evidence gate 和 Fix/Diagnosis choice。 | `spec-debug` users | `Cheap trivial pre-check` / ordering assertions |
-| Reproduce / env sanity / trace | Phase 1 reproduce, environment sanity, trace code path | kept-enhanced | 保留 CE 调试主干，并继续要求 runtime/source/test/log direct evidence。 | `spec-debug` users | existing contract assertions + fresh-source eval |
-| Tracker and PR history | Phase 1.5 `Check the tracker and PR history for prior work` | restored | 恢复 open duplicate、unmerged fix、prior merged attempt、original PR/issue 查询；最多 3 个精确查询，primary source 优先。 | `spec-debug` users | tracker/PR history contract test |
-| Pre-fix scope | Phase 3 workspace check pre-fix scope block | restored | dirty branch 上用 `pre_fix_head`、pre-existing files 和 `fix_owned_files` 限制 tail scope。 | `spec-simplify-code`, `spec-code-review` | pre-fix scope contract test |
-| Post-fix polish/review tail | Phase 4 `Post-fix polish/review tail` | restored | 恢复 simplify/review、invocation matrix、一轮上限、blocked/degraded handoff 和 re-verification。 | `spec-debug`, `spec-code-review` | post-fix tail contract test |
-| Residual durability | `Known Residuals` / `docs/residual-review-findings/<branch-or-head-sha>.md` | restored | accepted residuals 不只留在 session；PR 或 docs sink 承载。 | `spec-commit-push-pr`, future reviewers | residual durability assertions |
-| `Post-Fix Quality` output | Phase 4 `## Post-Fix Quality` block | restored | closeout 明确 Scope/Simplify/Review/Residuals/Re-verification。 | PR handoff, user closeout | Post-Fix Quality field assertions |
-| Commit/PR handoff | skill-owned branch default commit/PR + spec-first entrypoints | kept-enhanced | 保留 CE shipping readiness，但使用 `spec-*` 和 current-host entrypoint。 | `spec-commit-push-pr`, PR users | no `/ce-*` entrypoint assertions |
-| Learning capture | Phase 4 learning capture via `spec-compound` | kept | 只在可复用 root-cause lesson 时沉淀 durable knowledge。 | `spec-compound` | source read + existing summary contract |
-| repo-profile-cache | `scripts/repo-profile-cache.py` + `/tmp/spec-first/repo-profile` | kept-enhanced | 脚本继续只做 deterministic cache get/put，不做语义判断；路径投影为 spec-first。 | testing convention lookup | Python compile + migrated script contracts |
-| HITL script | `scripts/hitl-loop.template.sh` user-operated wording | fixed | 修复 agent-run 注释与 SKILL human-operated contract 冲突。 | human reproduction loop | HITL template contract test + `bash -n` |
-| `evals/examples.json` | omitted active source | cleanup-confirmed | spec-only examples-as-context 无 active consumer，删除以避免第二真相源；不因 CE 缺失本身作为唯一理由。 | maintainers, reviewers | absence assertion + fresh-source eval |
+| Frontmatter | `name: spec-debug`; CE description and argument hint otherwise retained | projected | 只改 spec-first skill identity。 | runtime skill catalog | source read |
+| Core principles | Core Principles | kept_ce | 原文保留。 | `spec-debug` users | source read |
+| Phase 0 issue intake + trivial fast-path | Phase 0 | kept_ce | 原文保留，只有 downstream design route 投影为 `spec-brainstorm`。 | `spec-debug` users | source read |
+| Phase 1 reproduce/env/trace/tracker history | Phase 1 | kept_ce | 原文保留，repo-profile cache path 投影为 spec-first namespace。 | `spec-debug` users | source read + cache parity test |
+| Phase 2 root cause/smart escalation | Phase 2 | kept_ce | 原文保留，design escalation route 投影为 `spec-brainstorm`。 | `spec-debug` users | source read |
+| Phase 3 fix | Phase 3 | kept_ce | 原文保留。 | fix workflow | source read |
+| Phase 4 handoff/post-fix tail | Phase 4 | kept_ce_projected_routes | CE tail 完整保留；`/ce-simplify-code`、`/ce-code-review`、`/ce-commit-push-pr`、`/ce-commit`、`/ce-compound` 投影为 `spec-*`。 | `spec-simplify-code`, `spec-code-review`, `spec-commit-push-pr`, `spec-compound` | source read |
+| repo-profile-cache assets | `references/repo-profile-cache.md`, `references/agents/repo-profiler.md`, `scripts/repo-profile-cache.py` | kept_ce_projected_path | 文件集合与 CE 一致；cache root 改为 `/tmp/spec-first/repo-profile`。 | testing convention lookup | `repo-profile-cache-parity.test.js` |
 
 #### Downstream Consumers
 
 - `spec-code-review`: 应接收 debug fix 的准确 scope 和 residual findings；恢复 post-fix tail 后，review 不应扩大到 unrelated branch work。
 - `spec-commit-push-pr`: skill-owned branch 可作为默认 shipping path；accepted residual findings 应进入 PR body 或 durable residual file。
-- `spec-compound`: 只在 root cause 有可复用学习价值时触发；Debug Summary 的 `claims_validated_by` / `claims_remaining_advisory` 可作为 learning promotion 判断输入。
-- `spec-optimize`: performance regression 属 `spec-debug`，working-but-suboptimal optimization 属 `spec-optimize`；当前 `perf-regression.md` 的边界应被保留。
+- `spec-compound`: 只在 root cause 有可复用学习价值时触发；CE Debug Summary 与修复证据可作为 learning promotion 判断输入。
+- `spec-simplify-code`: 只在 CE post-fix tail 的 scope 规则允许时运行。
 
 #### Verification Needed
 
-- 本轮 source fix 触及 `skills/spec-debug/SKILL.md`、`scripts/hitl-loop.template.sh`、focused tests、validation docs 和 changelog；closeout 运行 `bash -n skills/spec-debug/scripts/hitl-loop.template.sh`、`PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-debug/scripts/repo-profile-cache.py`、`npx jest tests/unit/spec-debug-contracts.test.js --runInBand`、`npx jest tests/unit/migrated-skill-scripts-contracts.test.js --runInBand`、`npx jest tests/unit/changelog-format.test.js --runInBand`、focused CE residual scan 和 `git diff --check`。
-- 需要 fresh-source eval 复核当前磁盘 `skills/spec-debug/SKILL.md` 的语义充分性；不能依赖当前会话缓存的 skill 行为。
+- `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-debug/scripts/repo-profile-cache.py`
+- `npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand`
+- `npx jest tests/unit/changelog-format.test.js --runInBand`
+- focused source scan：确认 `skills/spec-debug` 无 `/ce-*`、`ce-debug`、`/tmp/compound-engineering`、`.compound-engineering` active residual。
+- `git diff --check`
+- fresh-source eval 可作为语义证据；如果未运行，必须记录 not-run reason，不能用当前会话缓存行为代替。
 
 #### Verification Status
 
-- passed: `npx jest tests/unit/spec-debug-contracts.test.js --runInBand`
-- passed: `npx jest tests/unit/migrated-skill-scripts-contracts.test.js --runInBand`
-- passed: `npx jest tests/unit/changelog-format.test.js --runInBand`
-- passed: `bash -n skills/spec-debug/scripts/hitl-loop.template.sh`
-- passed: `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-debug/scripts/repo-profile-cache.py`
-- passed: `npm run lint:skill-entrypoints`
+- passed: CE/spec file-set diff for `ce-debug` and `spec-debug`
 - passed: focused active-source residual scan for `/ce-*`, `ce-debug`, `/tmp/compound-engineering`, `.compound-engineering`, and `ce-unified-plan` under `skills/spec-debug`
-- passed: `git diff --check`
-- passed: fresh-source eval using current disk source; independent read-only reviewer reported no blocking findings and confirmed parity mapping, tracker/PR history, post-fix tail, spec-first boundaries, HITL user-operated wording, and no active CE runtime-contract residuals. Residual risk: focused tests are string contract guards, so runtime behavior still depends on host agent following the updated skill prose.
+- passed: `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-debug/scripts/repo-profile-cache.py`
+- passed: `npx jest tests/unit/repo-profile-cache-parity.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/scenario-capability-matrix-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
+- passed: `npm run lint:skill-entrypoints`
+- passed: `git diff --check -- CHANGELOG.md docs/contracts/workflows/spec-debug-input-output.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-debug tests/unit`
+- passed: fresh-source eval using current disk source; independent read-only reviewer reported no blocking findings, confirmed the 7-file CE/spec source file set matches, confirmed normalized diff is empty after allowed projections, and found no active old spec-first-only runtime contract residuals. Note: ignored `__pycache__` is non-source noise.
 
 ### `ce-compound` -> `spec-compound`
 

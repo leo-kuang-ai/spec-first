@@ -33,9 +33,6 @@ const EXPECTED_MIGRATED_SCRIPTS = {
     'scripts/validate-doc-claims.py',
     'scripts/validate-frontmatter.py',
   ],
-  'spec-debug': [
-    'scripts/repo-profile-cache.py',
-  ],
   'spec-explain': [
     'scripts/repo-profile-cache.py',
   ],
