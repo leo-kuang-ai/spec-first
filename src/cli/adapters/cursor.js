@@ -3,10 +3,17 @@ const os = require('node:os');
 const path = require('node:path');
 
 const PlatformAdapter = require('./base');
+const {
+  buildHostNativePointer,
+  inspectHostNativePointer,
+  planHostNativePointerRemoval,
+  planHostNativePointerSync,
+} = require('./host-native-pointer');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 const { readState } = require('../state');
 
+const CURSOR_RULE_POINTER_PATH = '.cursor/rules/spec-first.mdc';
 const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
   'name',
   'description',
@@ -162,6 +169,10 @@ class CursorAdapter extends PlatformAdapter {
     if (fs.existsSync(skillsRoot)) {
       checks.push(...inspectCursorSkillNames(projectRoot, skillsRoot));
     }
+    checks.push(inspectHostNativePointer(projectRoot, CURSOR_RULE_POINTER_PATH, {
+      hostId: this.id,
+      hostLabel: 'Cursor',
+    }));
     checks.push(...inspectCursorDuplicateSkillRoots(projectRoot, this));
 
     return checks.length > 0
@@ -172,9 +183,30 @@ class CursorAdapter extends PlatformAdapter {
         message: 'no Cursor-specific runtime drift detected',
       }];
   }
+
+  planRuntimeFilesSync(projectRoot) {
+    return planHostNativePointerSync(
+      projectRoot,
+      CURSOR_RULE_POINTER_PATH,
+      buildHostNativePointer({
+        hostLabel: 'Cursor',
+        initCommand: 'spec-first init --cursor',
+        frontmatter: [
+          '---',
+          'alwaysApply: true',
+          '---',
+        ].join('\n'),
+      }),
+    );
+  }
+
+  planRuntimeFilesRemoval(projectRoot) {
+    return planHostNativePointerRemoval(projectRoot, CURSOR_RULE_POINTER_PATH);
+  }
 }
 
 module.exports = CursorAdapter;
+module.exports.CURSOR_RULE_POINTER_PATH = CURSOR_RULE_POINTER_PATH;
 module.exports.normalizeCursorName = normalizeCursorName;
 module.exports.inspectCursorDuplicateSkillRoots = inspectCursorDuplicateSkillRoots;
 

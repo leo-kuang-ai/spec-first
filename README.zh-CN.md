@@ -85,6 +85,8 @@ spec-first init
 
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
 
+Cursor/Kiro/Qoder native pointer 文件：`init --cursor`、`init --kiro` 和 `init --qoder` 也会写入 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md`。这些文件只把宿主指回根目录 `AGENTS.md` 和 `skills/using-spec-first/SKILL.md`；它们是 generated runtime pointer，不是第二个 source of truth。如果同路径已有无 spec-first managed marker 的用户文件，init 和 clean 都不会覆盖或删除，doctor 会报告 warning。
+
 所有 init 选项（flags、脚本模式、多仓库）见 [完整快速开始指南](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
 
 **步骤 3 — 重启宿主**
@@ -195,7 +197,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 
 Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 skill-local prompt assets、`templates/`、`src/cli/`）经 `spec-first init` 重新生成为 host runtime assets——产出仓库内 workflow artifacts：`ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`。
 
-`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（已退役的旧 namespace）、`.qoder/skills/`、`.qoder/agents/` 和 `.qoder/spec-first/` 下的 generated runtime copies 是可丢弃镜像，可通过 `spec-first init` 重建。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/` 与 Qoder local `.qoder/settings.local.json` 是配置输出，不是 source；Cursor 与 Qoder clean 会保留用户维护的 MCP entry。Cursor native `.cursor/rules/**`、Kiro native `.kiro/specs/**` 和 Qoder native `.qoder/rules/**` 不是 spec-first source。
+`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（已退役的旧 namespace）、`.qoder/skills/`、`.qoder/agents/` 和 `.qoder/spec-first/` 下的 generated runtime copies 是可丢弃镜像，可通过 `spec-first init` 重建。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/`、Qoder local `.qoder/settings.local.json`，以及固定 host-native pointer 文件 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md` 都是生成输出，不是 source；Cursor 与 Qoder clean 会保留用户维护的 MCP entry。其他 Cursor native `.cursor/rules/**`、Kiro native `.kiro/specs/**` 和 Qoder native `.qoder/rules/**` 不是 spec-first source。
 
 详细参考：
 

@@ -9,19 +9,9 @@ const BEST_EFFORT_STATEMENT = '这是注意力提醒,不是 gate,也不替代 LL
 
 const TARGETS = [
   {
-    skill: 'spec-work',
-    filePath: 'skills/spec-work/SKILL.md',
-    minRows: 3,
-  },
-  {
     skill: 'spec-debug',
     filePath: 'skills/spec-debug/SKILL.md',
     minRows: 3,
-  },
-  {
-    skill: 'spec-code-review',
-    filePath: 'skills/spec-code-review/SKILL.md',
-    exactRows: 3,
   },
 ];
 

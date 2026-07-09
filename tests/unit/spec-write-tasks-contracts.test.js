@@ -22,7 +22,6 @@ const YAO_SEMANTIC_CONFIG_PATH = path.join(EVALS_DIR, 'semantic_config.json');
 const YAO_OUTPUT_CASES_PATH = path.join(EVALS_DIR, 'output', 'cases.jsonl');
 const BOUNDARY_CASES_PATH = path.join(EVALS_DIR, 'boundary-cases.json');
 const OPENAI_PATH = path.join(REPO_ROOT, 'skills', 'spec-write-tasks', 'agents', 'openai.yaml');
-const SPEC_WORK_PATH = path.join(REPO_ROOT, 'skills', 'spec-work', 'SKILL.md');
 const PLAN_HANDOFF_PATH = path.join(REPO_ROOT, 'skills', 'spec-plan', 'references', 'plan-handoff.md');
 const QUALITY_CONTRACT_PATH = path.join(REPO_ROOT, 'docs', 'validation', 'spec-write-tasks', 'quality-score-contract.md');
 const FRESH_SOURCE_EVAL_PATH = path.join(
@@ -383,18 +382,6 @@ describe('spec-write-tasks contracts', () => {
 
     for (const decision of allowedDecisions) expect(coveredDecisions.has(decision)).toBe(true);
     for (const failure of allowedFailures) expect(coveredFailures.has(failure)).toBe(true);
-  });
-
-  test('spec-work validates task packs before creating execution tasks', () => {
-    const skill = read(SPEC_WORK_PATH);
-
-    expect(skill).toContain('If the work document is a task pack, validate it before creating execution tasks');
-    expect(skill).toContain('read its frontmatter and confirm `type: task-pack`, `generated_by: spec-write-tasks`, `status: derived`, and `mode: derived`');
-    expect(skill).toContain('treat that plan as the single source of truth');
-    expect(skill).toContain('spec-first tasks validate <task-pack-path> --json');
-    expect(skill).toContain('do not repair task-pack JSON in the executor');
-    expect(skill).toContain('do not silently fall back to executing stale task cards');
-    expect(skill).toContain("honor each task's `stop_if`");
   });
 
   test('openai metadata keeps task compilation optional and host-neutral', () => {

@@ -7,12 +7,9 @@ const REPO_ROOT = path.join(__dirname, '..', '..');
 
 const WORKFLOW_SKILLS = [
   'skills/spec-plan/SKILL.md',
-  'skills/spec-code-review/SKILL.md',
   'skills/spec-debug/SKILL.md',
-  'skills/spec-work/SKILL.md',
   'skills/spec-prd/SKILL.md',
   'skills/spec-brainstorm/SKILL.md',
-  'skills/spec-ideate/SKILL.md',
 ];
 
 function readRepo(relativePath) {

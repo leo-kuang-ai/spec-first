@@ -150,9 +150,9 @@ describe('CE-lineage dispatch boundary contracts', () => {
     expect(resolveFeedback).toContain('serialize the affected units or stop for orchestration');
 
     expect(work).toContain('Parallel Safety Check');
-    expect(work).toContain('Codex `spawn_agent` / forked workspace');
-    expect(work).toContain('The orchestrator owns final integration, staging, commits, and project-level verification.');
-    expect(work).toContain('Shared-directory fallback constraints');
+    expect(work).toContain('Codex `spawn_agent` (a coding **worker** edits its forked workspace)');
+    expect(work).toContain('the orchestrator integrates');
+    expect(work).toContain('Shared-workspace constraints');
 
     expect(optimize).toContain('Dispatch And Backend Boundary');
     expect(optimize).toContain('Serial local/worktree execution remains the safe fallback');

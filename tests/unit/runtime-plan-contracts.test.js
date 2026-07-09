@@ -21,6 +21,96 @@ function makeTempDir() {
 }
 
 describe('runtime plan contracts', () => {
+  test('Cursor runtime sync writes a managed host-native pointer and preserves user-owned rule files', () => {
+    const projectRoot = makeTempDir();
+    const adapter = getAdapter('cursor');
+
+    try {
+      const syncPlan = adapter.planRuntimeFilesSync(projectRoot);
+      expect(syncPlan.operations).toHaveLength(1);
+      expect(syncPlan.operations[0]).toMatchObject({
+        kind: 'write_file',
+        path: '.cursor/rules/spec-first.mdc',
+        reason: 'managed_host_native_pointer',
+      });
+      expect(syncPlan.operations[0].contents).toContain('alwaysApply: true');
+      expect(syncPlan.operations[0].contents).toContain('`AGENTS.md`');
+      expect(syncPlan.operations[0].contents).toContain('`skills/using-spec-first/SKILL.md`');
+
+      const pointerPath = path.join(projectRoot, '.cursor', 'rules', 'spec-first.mdc');
+      fs.mkdirSync(path.dirname(pointerPath), { recursive: true });
+      fs.writeFileSync(pointerPath, '# user rule\n', 'utf8');
+      expect(adapter.planRuntimeFilesSync(projectRoot).operations).toEqual([]);
+      expect(adapter.planRuntimeFilesRemoval(projectRoot).operations).toEqual([]);
+      expect(adapter.inspectRuntimeFiles(projectRoot)).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          level: 'WARNING',
+          name: '.cursor/rules/spec-first.mdc',
+          message: expect.stringContaining('not spec-first managed'),
+        }),
+      ]));
+
+      fs.writeFileSync(pointerPath, syncPlan.operations[0].contents, 'utf8');
+      expect(adapter.planRuntimeFilesSync(projectRoot).operations[0]).toMatchObject({
+        kind: 'update_file',
+        path: '.cursor/rules/spec-first.mdc',
+      });
+      expect(adapter.planRuntimeFilesRemoval(projectRoot).operations).toEqual([
+        {
+          kind: 'remove_file',
+          path: '.cursor/rules/spec-first.mdc',
+          reason: 'managed_host_native_pointer',
+        },
+      ]);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('Kiro and Qoder runtime sync write managed host-native pointers', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      const kiroPlan = getAdapter('kiro').planRuntimeFilesSync(projectRoot);
+      expect(kiroPlan.operations).toHaveLength(1);
+      expect(kiroPlan.operations[0]).toMatchObject({
+        kind: 'write_file',
+        path: '.kiro/steering/spec-first.md',
+        reason: 'managed_host_native_pointer',
+      });
+      expect(kiroPlan.operations[0].contents).toContain('`AGENTS.md`');
+      expect(kiroPlan.operations[0].contents).toContain('`skills/using-spec-first/SKILL.md`');
+
+      const qoderPlan = getAdapter('qoder').planRuntimeFilesSync(projectRoot);
+      expect(qoderPlan.operations).toHaveLength(1);
+      expect(qoderPlan.operations[0]).toMatchObject({
+        kind: 'write_file',
+        path: '.qoder/rules/spec-first.md',
+        reason: 'managed_host_native_pointer',
+      });
+      expect(qoderPlan.operations[0].contents).toContain('`AGENTS.md`');
+      expect(qoderPlan.operations[0].contents).toContain('`skills/using-spec-first/SKILL.md`');
+
+      const qoderPointerPath = path.join(projectRoot, '.qoder', 'rules', 'spec-first.md');
+      fs.mkdirSync(path.dirname(qoderPointerPath), { recursive: true });
+      fs.writeFileSync(qoderPointerPath, qoderPlan.operations[0].contents, 'utf8');
+      expect(getAdapter('qoder').planRuntimeFilesRemoval(projectRoot).operations).toEqual([
+        {
+          kind: 'remove_dir',
+          path: '.qoder/commands/spec',
+          reason: 'retired_runtime_command_namespace',
+        },
+        {
+          kind: 'remove_file',
+          path: '.qoder/rules/spec-first.md',
+          reason: 'managed_host_native_pointer',
+        },
+      ]);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('Claude runtime sync plan writes managed hook scripts with executable mode', () => {
     const projectRoot = makeTempDir();
 

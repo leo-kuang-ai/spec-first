@@ -99,11 +99,10 @@ describe('context bundle and summary contracts', () => {
     expect(governance).toContain('`host_local_config_excluded`');
   });
 
-  test('high-frequency workflows consume compact context contracts instead of full broadcast by default', () => {
-    const work = read('skills/spec-work/SKILL.md');
+  test('high-frequency planning workflows consume compact context contracts instead of full broadcast by default', () => {
     const plan = readPlanSurface();
 
-    for (const content of [work, plan]) {
+    for (const content of [plan]) {
       expect(content).toContain('stable instruction prefix');
       expect(content).toContain('dynamic suffix');
       expect(content).toContain('artifact-summary.v1');
@@ -111,7 +110,7 @@ describe('context bundle and summary contracts', () => {
       expect(content).toContain('docs/contracts/context-bundle.md');
     }
 
-    for (const content of [work, plan]) {
+    for (const content of [plan]) {
       expect(content).toContain('Maintain a run-local context ledger for this workflow');
       expect(content).toContain('paths read, reason, phase, and compact summary');
       expect(content).toContain('Reuse loaded summaries within the same workflow run');

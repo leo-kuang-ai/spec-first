@@ -2,9 +2,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const PlatformAdapter = require('./base');
+const {
+  buildHostNativePointer,
+  inspectHostNativePointer,
+  planHostNativePointerRemoval,
+  planHostNativePointerSync,
+} = require('./host-native-pointer');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 
+const QODER_RULE_POINTER_PATH = '.qoder/rules/spec-first.md';
 const QODER_AGENT_BASE_TOOLS = ['Read', 'Grep', 'Glob'];
 const QODER_AGENT_WEB_TOOLS = ['WebFetch', 'WebSearch'];
 const QODER_UNREWRITTEN_PATH_PATTERNS = [
@@ -162,6 +169,10 @@ class QoderAdapter extends PlatformAdapter {
     if (fs.existsSync(agentsRoot)) {
       checks.push(...inspectQoderAgentFrontmatter(projectRoot, agentsRoot));
     }
+    checks.push(inspectHostNativePointer(projectRoot, QODER_RULE_POINTER_PATH, {
+      hostId: this.id,
+      hostLabel: 'Qoder',
+    }));
 
     return checks.length > 0
       ? checks
@@ -172,12 +183,23 @@ class QoderAdapter extends PlatformAdapter {
       }];
   }
 
-  planRuntimeFilesRemoval() {
+  planRuntimeFilesSync(projectRoot) {
+    return planHostNativePointerSync(
+      projectRoot,
+      QODER_RULE_POINTER_PATH,
+      buildHostNativePointer({
+        hostLabel: 'Qoder',
+        initCommand: 'spec-first init --qoder',
+      }),
+    );
+  }
+
+  planRuntimeFilesRemoval(projectRoot) {
     const operations = [{
       kind: 'remove_dir',
       path: '.qoder/commands/spec',
       reason: 'retired_runtime_command_namespace',
-    }];
+    }, ...planHostNativePointerRemoval(projectRoot, QODER_RULE_POINTER_PATH).operations];
 
     return {
       operations,
@@ -187,6 +209,7 @@ class QoderAdapter extends PlatformAdapter {
 }
 
 module.exports = QoderAdapter;
+module.exports.QODER_RULE_POINTER_PATH = QODER_RULE_POINTER_PATH;
 module.exports.QODER_AGENT_BASE_TOOLS = QODER_AGENT_BASE_TOOLS;
 module.exports.normalizeQoderName = normalizeQoderName;
 

@@ -270,6 +270,7 @@ describe('clean --dry-run', () => {
       expect(dryRun.stdout).toContain('Dry run: spec-first clean (kiro)');
       expect(dryRun.stdout).toContain('.kiro/skills/spec-work');
       expect(dryRun.stdout).toContain('.kiro/spec-first/state.json');
+      expect(dryRun.stdout).toContain('.kiro/steering/spec-first.md');
       expect(dryRun.stdout).toContain('AGENTS.md');
       expect(dryRun.stdout).not.toContain('.kiro/hooks/user-hook.json');
       expect(dryRun.stdout).not.toContain('.kiro/settings/mcp.json');
@@ -281,6 +282,7 @@ describe('clean --dry-run', () => {
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'steering', 'spec-first.md'))).toBe(false);
       expect(fs.existsSync(userSkillPath)).toBe(true);
       expect(fs.existsSync(userAgentPath)).toBe(true);
       expect(fs.existsSync(userHookPath)).toBe(true);
@@ -322,6 +324,7 @@ describe('clean --dry-run', () => {
       expect(dryRun.stdout).toContain('.qoder/commands/spec');
       expect(dryRun.stdout).toContain('.qoder/skills/spec-work');
       expect(dryRun.stdout).toContain('.qoder/spec-first/state.json');
+      expect(dryRun.stdout).toContain('.qoder/rules/spec-first.md');
       expect(dryRun.stdout).toContain('AGENTS.md');
       expect(dryRun.stdout).not.toContain('.qoder/rules/security.md');
       expect(dryRun.stdout).not.toContain('.qoder/settings.json');
@@ -336,6 +339,7 @@ describe('clean --dry-run', () => {
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'rules', 'spec-first.md'))).toBe(false);
       expect(fs.existsSync(userRulePath)).toBe(true);
       expect(fs.existsSync(userSettingsPath)).toBe(true);
       expect(fs.existsSync(localMcpConfigPath)).toBe(true);
@@ -374,6 +378,7 @@ describe('clean --dry-run', () => {
       expect(dryRun.stdout).toContain('Dry run: spec-first clean (cursor)');
       expect(dryRun.stdout).toContain('.cursor/skills/spec-work');
       expect(dryRun.stdout).toContain('.cursor/spec-first/state.json');
+      expect(dryRun.stdout).toContain('.cursor/rules/spec-first.mdc');
       expect(dryRun.stdout).toContain('AGENTS.md');
       expect(dryRun.stdout).not.toContain('.cursor/agents');
       expect(dryRun.stdout).not.toContain('.cursor/commands');
@@ -385,6 +390,7 @@ describe('clean --dry-run', () => {
       expect(cleanResult.stdout).toContain('Removed spec-first managed Cursor assets');
       expect(fs.existsSync(path.join(projectRoot, '.cursor', 'skills', 'spec-work'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.cursor', 'spec-first', 'state.json'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'rules', 'spec-first.mdc'))).toBe(false);
       expect(fs.existsSync(userSkillPath)).toBe(true);
       expect(fs.existsSync(userAgentRoot)).toBe(true);
       expect(fs.existsSync(userRulePath)).toBe(true);

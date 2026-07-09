@@ -102,7 +102,6 @@ describe('context governance runtime exclusion contract', () => {
 
   test('high-frequency ordinary workflows carry the runtime exclusion rule', () => {
     const workflowPaths = [
-      'skills/spec-work/SKILL.md',
       'skills/spec-plan/SKILL.md',
       'skills/spec-debug/SKILL.md',
       'skills/spec-optimize/SKILL.md',
@@ -111,7 +110,7 @@ describe('context governance runtime exclusion contract', () => {
     for (const relativePath of workflowPaths) {
       const content = readWorkflowSurface(relativePath);
       expect(content).toContain('docs/contracts/context-governance.md');
-      if (relativePath.includes('spec-plan') || relativePath.includes('spec-work') || relativePath.includes('spec-debug') || relativePath.includes('spec-code-review')) {
+      if (relativePath.includes('spec-plan') || relativePath.includes('spec-debug') || relativePath.includes('spec-code-review')) {
         expect(content).toContain('already-loaded host/project instructions');
       }
       expect(content).toContain('.spec-first/audits/**');

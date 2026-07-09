@@ -435,7 +435,10 @@ grep -q '^name: spec-worktree$' "$TMP_DIR/.cursor/skills/spec-worktree/SKILL.md"
 test -f "$TMP_DIR/.cursor/spec-first/state.json"
 test ! -e "$TMP_DIR/.cursor/commands"
 test ! -e "$TMP_DIR/.cursor/agents"
-test ! -e "$TMP_DIR/.cursor/rules"
+test -f "$TMP_DIR/.cursor/rules/spec-first.mdc"
+grep -q "alwaysApply: true" "$TMP_DIR/.cursor/rules/spec-first.mdc"
+grep -q 'AGENTS.md' "$TMP_DIR/.cursor/rules/spec-first.mdc"
+grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/.cursor/rules/spec-first.mdc"
 node - "$TMP_DIR/.cursor/spec-first/state.json" "$expected_cursor_skill_count" "$expected_workflow_skill_count" <<'NODE'
 const fs = require('node:fs');
 const [statePath, skillCount, workflowSkillCount] = process.argv.slice(2);
@@ -498,7 +501,9 @@ fi
 test -f "$TMP_DIR/.kiro/spec-first/state.json"
 test ! -e "$TMP_DIR/.kiro/commands/spec"
 test ! -e "$TMP_DIR/.kiro/hooks"
-test ! -e "$TMP_DIR/.kiro/steering"
+test -f "$TMP_DIR/.kiro/steering/spec-first.md"
+grep -q 'AGENTS.md' "$TMP_DIR/.kiro/steering/spec-first.md"
+grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/.kiro/steering/spec-first.md"
 node - "$TMP_DIR/.kiro/spec-first/state.json" "$expected_kiro_skill_count" "$expected_workflow_skill_count" "$expected_agent_count" <<'NODE'
 const fs = require('node:fs');
 const [statePath, skillCount, workflowSkillCount, agentCount] = process.argv.slice(2);
@@ -583,7 +588,9 @@ NODE
   done
 fi
 test -f "$TMP_DIR/.qoder/spec-first/state.json"
-test ! -e "$TMP_DIR/.qoder/rules"
+test -f "$TMP_DIR/.qoder/rules/spec-first.md"
+grep -q 'AGENTS.md' "$TMP_DIR/.qoder/rules/spec-first.md"
+grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/.qoder/rules/spec-first.md"
 test ! -e "$TMP_DIR/.qoder/hooks"
 node - "$TMP_DIR/.qoder/spec-first/state.json" "$expected_qoder_command_count" "$expected_qoder_skill_count" "$expected_qoder_workflow_skill_count" "$expected_agent_count" <<'NODE'
 const fs = require('node:fs');
@@ -655,13 +662,14 @@ cursor_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean -
 grep -q "Dry run: spec-first clean (cursor)" <<<"$cursor_clean_dry"
 grep -q ".cursor/skills/spec-work" <<<"$cursor_clean_dry"
 grep -q ".cursor/spec-first/state.json" <<<"$cursor_clean_dry"
+grep -q ".cursor/rules/spec-first.mdc" <<<"$cursor_clean_dry"
 grep -q "No files were changed." <<<"$cursor_clean_dry"
 if grep -q ".cursor/agents" <<<"$cursor_clean_dry"; then
   echo "Cursor clean dry-run should not remove user-owned .cursor/agents" >&2
   exit 1
 fi
-if grep -q ".cursor/rules" <<<"$cursor_clean_dry"; then
-  echo "Cursor clean dry-run should not remove user-owned .cursor/rules" >&2
+if grep -q ".cursor/rules/product.mdc" <<<"$cursor_clean_dry"; then
+  echo "Cursor clean dry-run should not remove user-owned .cursor/rules/product.mdc" >&2
   exit 1
 fi
 if grep -q ".cursor/mcp.json" <<<"$cursor_clean_dry"; then
@@ -671,6 +679,7 @@ fi
 (cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --cursor >/dev/null)
 test ! -d "$TMP_DIR/.cursor/skills"
 test ! -d "$TMP_DIR/.cursor/spec-first"
+test ! -f "$TMP_DIR/.cursor/rules/spec-first.mdc"
 test -d "$TMP_DIR/.cursor/agents"
 test -f "$TMP_DIR/.cursor/rules/product.mdc"
 test -f "$TMP_DIR/.cursor/mcp.json"
@@ -687,11 +696,13 @@ if [[ "$expected_agent_count" != "0" ]]; then
   grep -q ".kiro/agents/spec-repo-research-analyst.agent.md" <<<"$kiro_clean_dry"
 fi
 grep -q ".kiro/spec-first/state.json" <<<"$kiro_clean_dry"
+grep -q ".kiro/steering/spec-first.md" <<<"$kiro_clean_dry"
 grep -q "No files were changed." <<<"$kiro_clean_dry"
 (cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --kiro >/dev/null)
 test ! -d "$TMP_DIR/.kiro/skills"
 test ! -d "$TMP_DIR/.kiro/agents"
 test ! -d "$TMP_DIR/.kiro/spec-first"
+test ! -f "$TMP_DIR/.kiro/steering/spec-first.md"
 test -f "$TMP_DIR/.kiro/hooks/custom"
 test -f "$TMP_DIR/.kiro/settings/user.json"
 test -f "$TMP_DIR/.kiro/specs/native/spec.md"
@@ -709,12 +720,14 @@ if [[ "$expected_agent_count" != "0" ]]; then
   grep -q ".qoder/agents/spec-repo-research-analyst.agent.md" <<<"$qoder_clean_dry"
 fi
 grep -q ".qoder/spec-first/state.json" <<<"$qoder_clean_dry"
+grep -q ".qoder/rules/spec-first.md" <<<"$qoder_clean_dry"
 grep -q "No files were changed." <<<"$qoder_clean_dry"
 (cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --qoder >/dev/null)
 test ! -d "$TMP_DIR/.qoder/commands/spec"
 test ! -d "$TMP_DIR/.qoder/skills"
 test ! -d "$TMP_DIR/.qoder/agents"
 test ! -d "$TMP_DIR/.qoder/spec-first"
+test ! -f "$TMP_DIR/.qoder/rules/spec-first.md"
 test -f "$TMP_DIR/.qoder/rules/security.md"
 test -f "$TMP_DIR/.qoder/settings.json"
 test -f "$TMP_DIR/.qoder/hooks/custom.json"

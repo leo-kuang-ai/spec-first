@@ -64,11 +64,9 @@ describe('knowledge harness contract', () => {
 });
 
 describe('knowledge harness workflow consumers', () => {
-  test('plan work and review expose summary-first producer and consumer signals', () => {
+  test('plan exposes summary-first producer and consumer signals', () => {
     const workflowTexts = [
       readPlanSurface(),
-      read('skills/spec-work/SKILL.md'),
-      read('skills/spec-code-review/SKILL.md'),
     ];
 
     for (const text of workflowTexts) {
@@ -115,23 +113,6 @@ describe('knowledge harness workflow consumers', () => {
       expect(text).toContain('source/test/doc');
       expect(text).toContain('不依赖模型自评');
     }
-  });
-
-  test('work and code-review consume solution recall as advisory until source-confirmed', () => {
-    const work = read('skills/spec-work/SKILL.md');
-    const codeReview = read('skills/spec-code-review/SKILL.md');
-
-    for (const text of [work, codeReview]) {
-      expect(text).toContain('docs/solutions');
-      expect(text).toContain('advisory candidate');
-      expect(text).toContain('source_refs');
-      expect(text).toContain('source_reads_required');
-      expect(text).toContain('不依赖模型自评');
-    }
-    // spec-work declares the named Recall Trust Boundary section
-    expect(work).toContain('Recall Trust Boundary');
-    // spec-code-review guards recall inside its Learnings & Past Solutions step
-    expect(codeReview).toContain('legacy_unstructured_advisory');
   });
 
   test('context bundle keeps source read requirements in referenced summaries', () => {

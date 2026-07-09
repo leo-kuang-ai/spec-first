@@ -2,9 +2,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const PlatformAdapter = require('./base');
+const {
+  buildHostNativePointer,
+  inspectHostNativePointer,
+  planHostNativePointerRemoval,
+  planHostNativePointerSync,
+} = require('./host-native-pointer');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 
+const KIRO_STEERING_POINTER_PATH = '.kiro/steering/spec-first.md';
 const KIRO_AGENT_READ_TOOLS = ['read'];
 const KIRO_UNREWRITTEN_PATH_PATTERNS = [
   /\.claude\/commands\/spec\/[a-z-]+\.md/,
@@ -139,6 +146,10 @@ class KiroAdapter extends PlatformAdapter {
     if (fs.existsSync(agentsRoot)) {
       checks.push(...inspectKiroAgentFrontmatter(projectRoot, agentsRoot));
     }
+    checks.push(inspectHostNativePointer(projectRoot, KIRO_STEERING_POINTER_PATH, {
+      hostId: this.id,
+      hostLabel: 'Kiro',
+    }));
 
     return checks.length > 0
       ? checks
@@ -148,9 +159,25 @@ class KiroAdapter extends PlatformAdapter {
         message: 'no Kiro-specific runtime drift detected',
       }];
   }
+
+  planRuntimeFilesSync(projectRoot) {
+    return planHostNativePointerSync(
+      projectRoot,
+      KIRO_STEERING_POINTER_PATH,
+      buildHostNativePointer({
+        hostLabel: 'Kiro',
+        initCommand: 'spec-first init --kiro',
+      }),
+    );
+  }
+
+  planRuntimeFilesRemoval(projectRoot) {
+    return planHostNativePointerRemoval(projectRoot, KIRO_STEERING_POINTER_PATH);
+  }
 }
 
 module.exports = KiroAdapter;
+module.exports.KIRO_STEERING_POINTER_PATH = KIRO_STEERING_POINTER_PATH;
 module.exports.KIRO_AGENT_READ_TOOLS = KIRO_AGENT_READ_TOOLS;
 module.exports.normalizeKiroName = normalizeKiroName;
 

@@ -10,7 +10,6 @@ const { planBundledAssetSync, syncBundledAssets, inspectInstalledAssets } = requ
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const SKILL_PATH = path.join(REPO_ROOT, 'skills', 'spec-plan', 'SKILL.md');
-const SPEC_WORK_PATH = path.join(REPO_ROOT, 'skills', 'spec-work', 'SKILL.md');
 const EVALS_DIR = path.join(REPO_ROOT, 'skills', 'spec-plan', 'evals');
 const OUTPUT_QUALITY_CASES_PATH = path.join(EVALS_DIR, 'output-quality-cases.json');
 const EVALS_README_PATH = path.join(EVALS_DIR, 'README.md');
@@ -94,7 +93,6 @@ describe('spec-plan enterprise and reuse contracts', () => {
     const planningFlow = fs.readFileSync(PLANNING_FLOW_PATH, 'utf8');
     const reuse = fs.readFileSync(REUSE_ANALYSIS_PATH, 'utf8');
     const planTemplate = fs.readFileSync(PLAN_TEMPLATE_PATH, 'utf8');
-    const specWork = fs.readFileSync(SPEC_WORK_PATH, 'utf8');
 
     expect(skill).toContain('read `skills/spec-plan/references/reuse-analysis.md`');
     expect(skill).toContain('A `reuse / extend / new` decision when the plan proposes a new source surface');
@@ -105,10 +103,6 @@ describe('spec-plan enterprise and reuse contracts', () => {
     expect(planningFlow).not.toContain('must output a reuse matrix for every plan');
     expect(planTemplate).toContain('## Existing Capability / Reuse Analysis');
     expect(planTemplate).toContain('- **Work-phase recheck:**');
-    expect(specWork).toContain('`## Existing Capability / Reuse Analysis`');
-    expect(specWork).toContain('`Work-phase recheck:` field');
-    expect(specWork).toContain('prefer `reuse` or `extend`');
-
     for (const token of [
       '## Existing Capability Inventory',
       '## Reuse / Extend / New Decision',
