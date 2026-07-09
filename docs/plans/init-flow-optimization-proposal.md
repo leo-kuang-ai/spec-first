@@ -7,7 +7,7 @@
 **驱动信号：**
 
 1. **扩展性即将触及临界** — 当前 5 宿主已使 UNREWRITTEN_PATH_PATTERNS 达到 O(n²) 维护负债。Kiro 刚接入时已触发全部 4 个现有 adapter 的修改。社区已有 Windsurf、Augment 等新 IDE 采用 AGENTS.md 标准，第 6 个宿主接入需求可预见。
-2. **Qoder hooks 功能缺口** — spec-first 本身运行在 Qoder 环境中，但 Qoder 的 shell-command hooks（与 Claude 同协议）完全未覆盖，这意味着 spec-first 在自己的宿主上缺少 governance injection。
+2. **Qoder hooks 功能缺口** — spec-first 本身运行在 Qoder 环境中，但 Qoder CLI 的 shell-command hooks 仍未覆盖；其事件、matcher、stdout 与配置兼容性需按 Qoder CLI 协议单独验证，这意味着 spec-first 在自己的宿主上缺少 confirmed governance injection。
 3. **init.js 3055 行已成维护瓶颈** — 任何 init 逻辑的修改（如上述 Qoder hooks 添加）都需要导航 3000+ 行文件，增加回归风险。
 4. **对齐核心链路** — 重构使新宿主扩展从 3-5 天降至 1 天，直接提升 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge` 链路的覆盖面（更多宿主 = 更多用户可触达 workflow）。
 
@@ -23,7 +23,7 @@
 | 不做 | 原因 |
 |------|------|
 | 引入外部 adapter 插件系统 | 当前 5+1 宿主规模不需要插件发现机制 |
-| 改变 CLI 用户可见接口（flags、输出格式、退出码） | 纯内部重构，无 breaking change |
+| 改变 CLI flags、退出码或既有语义 | 允许新增 Qoder CLI hooks 相关 dry-run operation、doctor checks 和 clean cleanup；这是用户可见增强但不是 breaking change |
 | 重构 state.json schema | state 模型正确，保持稳定 |
 | 修改 skills-governance.json 格式 | governance 合约稳定，只扩展 scope |
 | 触碰 dual-host governance contract schema | 契约由独立 schema 管理 |
@@ -32,12 +32,12 @@
 
 ### 1.3 用户体验影响承诺
 
-每个 Phase 的行为不变量：
+除明确声明的新增能力外，每个 Phase 的行为不变量：
 
 | 不变量 | 验证方式 |
 |--------|----------|
-| `spec-first init --dry-run` 输出内容与改前一致 | golden snapshot 对比 |
-| `spec-first doctor` 报告相同诊断项和 level | 回归测试断言 |
+| `spec-first init --dry-run` 既有 operation 的 kind/path/reason 不变 | golden snapshot 对比；Phase 0 只允许新增 Qoder CLI hook operations |
+| `spec-first doctor` 既有诊断项和 level 不变 | 回归测试断言；Phase 0 只允许新增 Qoder CLI hook checks |
 | `spec-first clean` 能处理旧版本安装的产物 | legacy state 测试 |
 | 错误消息、退出码保持不变 | CLI smoke test |
 | state.json 格式向后兼容 | schema validation test |
@@ -200,7 +200,8 @@ CLI Entry (bin/spec-first.js)
 | Codex | ✅ 完全 | ✅ Shell hooks | ⚠️ SessionStart only | 缺 guard hooks |
 | Cursor | ✅ 完全 | ❌ 不支持 | ⛔ 正确跳过 | 无 |
 | Kiro | ✅ 基本 | ⚠️ Agent-prompt（非 shell） | ❌ 未覆盖 | 模型不兼容 |
-| Qoder | ✅ 完全 | ✅ Shell hooks（同 Claude） | ❌ **未覆盖** | **可修复** |
+| Qoder CLI | ✅ 完全 | ✅ Shell hooks（需按 Qoder CLI 文档确认配置形态） | ❌ **未覆盖** | **本轮可修复** |
+| Qoder IDE/JB plugin | ✅ 基本 | ⚠️ Hooks surface 存在但配置/exec-form/协议需单独验证 | ❌ **未覆盖** | follow-up，不纳入本轮 confirmed scope |
 
 ### 3.2 Hook 设计深度分析
 
@@ -222,27 +223,34 @@ CLI Entry (bin/spec-first.js)
 5. **Merge non-destructive** — Codex hooks.json 合并保留用户自定义
 6. **Global pollution detection** — Codex 检测 CODEX_HOME 级全局 hook 污染
 
-#### Qoder 事件模型兼容性分析
+#### Qoder 支持范围与事件模型兼容性分析
+
+**本轮支持范围**：Phase 0 只把 **Qoder CLI hooks** 纳入 confirmed scope。Qoder IDE/JB plugin hooks 作为 follow-up compatibility spike，不在本轮写入 confirmed runtime contract，也不把 IDE/JB 的 hooks 行为当作 `spec-first init --qoder` 成功标准。
+
+理由：
+- `spec-first init` 是 CLI 分发的 runtime projection，先覆盖 Qoder CLI 能最小闭环验证 init/doctor/clean/drift。
+- Qoder CLI hooks 与 IDE/JB plugin hooks 属于不同宿主 surface；二者共享项目级 `.qoder/settings.json` 等配置文件，但不能直接假设 exec-form `{ command, args }`、matcher 与 stdout 控制协议在所有 surface 上完全一致。
+- IDE/JB plugin 支持需要单独产出 confirmed evidence 后再从 degraded/follow-up 升级为 confirmed capability。
 
 | Claude 事件 | Qoder 事件 | stdin/stdout 协议 | 兼容性 |
 |------------|-----------|------------------|--------|
 | SessionStart | UserPromptSubmit | ⚠️ 不同触发时机 | 需适配 |
-| UserPromptExpansion | UserPromptSubmit | ⚠️ Qoder 无独立 expansion 事件 | 部分兼容 |
+| UserPromptExpansion | UserPromptSubmit | ⚠️ Qoder 无独立 expansion 事件；Phase 0 不迁移 spec-plan-guard | 不兼容 |
 | PreToolUse | PreToolUse | ✅ 相同 | 完全兼容 |
 | PostToolUse | PostToolUse | ✅ 相同 | 完全兼容 |
 | Stop | Stop | ✅ 相同 | 完全兼容 |
 
 **关键差异**：
 - Qoder 没有 `SessionStart` 事件，最近似的是 `UserPromptSubmit`（用户提交首次 prompt 时触发）
-- `UserPromptSubmit` 与 `UserPromptExpansion` 都在 prompt 到达模型前触发，但 Qoder 的是统一事件，无法按 command name 区分
-- Qoder hooks 配置写入 `.qoder/settings.json` 的 `hooks` key，JSON schema 与 Claude 的 `.claude/settings.json` **完全一致**
+- `UserPromptSubmit` 与 `UserPromptExpansion` 都在 prompt 到达模型前触发，但 Qoder 的是统一 prompt 事件，不能按 tool/command name matcher 等价迁移 Claude 的 command expansion guard
+- Qoder CLI hooks 配置写入 `.qoder/settings.json` 的 `hooks` key；schema 必须以 Qoder CLI 当前文档和本地 smoke 验证为准，不复用“与 Claude 完全一致”的未验证断言
 
 **Qoder hooks 适配策略**：
 
 | Claude hook | Qoder 映射 | 可行性 | 优先级 |
 |------------|-----------|--------|--------|
-| session-start → SessionStart | UserPromptSubmit（首次触发） | ⚠️ 需验证触发时机 | 高 |
-| spec-plan-guard → UserPromptExpansion | UserPromptSubmit + matcher 过滤 | ⚠️ 需验证 matcher 支持 | 中 |
+| session-start → SessionStart | UserPromptSubmit（首次触发） | ⚠️ 需验证触发时机与 stdin/stdout 协议 | 高 |
+| spec-plan-guard → UserPromptExpansion | 不迁移；未来若需要只能做 prompt-content inspection hook | ⛔ Phase 0 不安装 | 低 |
 | prd-prewrite-guard → PreToolUse | PreToolUse | ✅ 直接移植 | 高 |
 | prd-readiness-guard → Stop | Stop | ✅ 直接移植 | 高 |
 
@@ -395,7 +403,7 @@ function escapeForRegex(str) {
 
 **锚定策略**：生成的正则不添加 `^` 锚点，以保持与当前硬编码 `UNREWRITTEN_PATH_PATTERNS` 一致的行为。golden snapshot 负责验证匹配字符串集合不变。若未来需要改为锚定匹配，应作为独立的 breaking change 评估。
 
-**验证策略**：golden snapshot 测试确保自动派生结果覆盖当前硬编码 patterns：
+**验证策略**：golden snapshot 测试必须证明自动派生结果与当前硬编码 patterns **双向等价**，而不是只证明覆盖。若派生结果新增匹配范围，必须把该差异列为 intentional delta，并用独立 fixture 和 changelog 说明用户可见影响。
 
 ```javascript
 // tests/unit/platform-registry-patterns.test.js
@@ -403,13 +411,21 @@ for (const platformId of ['cursor', 'kiro', 'qoder']) {
   it(`derived patterns for ${platformId} match legacy hardcoded set`, () => {
     const derived = deriveUnrewrittenPatterns(platformId);
     const legacy = loadLegacyPatterns(platformId);
-    // 验证: 每个 legacy pattern 匹配的字符串，derived 也匹配
+    // 验证 1: 每个 legacy pattern 匹配的字符串，derived 也匹配
     for (const testCase of generateTestStringsFromLegacy(legacy)) {
       expect(derived.some(d => d.test(testCase))).toBe(true);
+    }
+    // 验证 2: derived 不匹配 legacy 未匹配的 representative negatives
+    for (const negative of generateRepresentativeNegatives(platformId)) {
+      expect(derived.some(d => d.test(negative))).toBe(false);
     }
   });
 }
 ```
+
+**当前需显式处理的差异候选**：
+- `.qoder/settings.json` 与 `.qoder/settings.local.json` 是否都应被其他宿主视为 non-target runtime path；当前 Kiro hardcoded pattern 只覆盖 `.qoder/settings.local.json`。
+- `.cursor/mcp.json` 是否应保持精确匹配；`prefix: '.cursor/mcp' + suffixPattern: '\\.json'` 会比当前 hardcoded pattern 更宽。
 
 **收益**：
 - 添加第 6 个 pointer-only 宿主：只在 registry 添加 `runtimePathRules`，0 行现有 adapter 代码修改
@@ -429,10 +445,12 @@ PlatformAdapter (base.js, 177L — 不变)
 ```
 
 PointerBasedAdapter 封装：
-- `planRuntimeFilesSync()` → 统一 `planHostNativePointerSync` + hook 条件写入
-- `planRuntimeFilesRemoval()` → 统一 `planHostNativePointerRemoval` + hook 条件清理
-- `inspectRuntimeFiles()` → 统一 `inspectHostNativePointer` + hook 条件检查
+- `planRuntimeFilesSync()` → 统一 `planHostNativePointerSync`，但子类可追加 hook 或 host-specific runtime file operations
+- `planRuntimeFilesRemoval()` → 统一 `planHostNativePointerRemoval`，但子类可追加 legacy command namespace、hook file、settings cleanup
+- `inspectRuntimeFiles()` → 统一 `inspectHostNativePointer`，但子类必须保留现有 frontmatter、agent tool pinning、workflow skill name rewrite、runtime path rewrite 等 host-specific drift checks
 - `getUnrewrittenPathPatterns()` → 从 registry 自动派生
+
+**抽象边界**：PointerBasedAdapter 只封装 pointer lifecycle 和 cross-host runtime path exclusion，不吞并 Cursor/Kiro/Qoder 的 `transformSkillContent`、`transformAgentContent`、frontmatter validation、host pin injection 或 agent tools policy。Phase 3 的验收必须证明现有 warning/error 不减少，除非某项减少被单独记录为 intentional behavior change。
 
 ### 4.5 init.js 模块拆分
 
@@ -464,6 +482,10 @@ src/cli/
 ```
 
 ### 4.7 Qoder Hooks 补齐
+
+#### 4.7.0 Scope: Qoder CLI first
+
+Phase 0 只支持 Qoder CLI hooks。IDE/JB plugin hooks 不写入 confirmed runtime contract；若本地环境或官方文档证明其 settings schema、exec-form、事件和 stdout 协议与 CLI 完全兼容，可作为后续 Phase 0b 增强。
 
 #### 4.7.1 实现方案
 
@@ -530,20 +552,26 @@ if (adapter.id === 'qoder') {
 |------|------|---------|
 | `src/cli/qoder-settings.js` | hook upsert/removal/inspect；`renderManagedQoderHooksRemoval` 返回 `{filePath, existsAfter, contents}`（与 claude-settings.js 一致） | ~200L |
 | `templates/qoder/hooks/session-start` | Node.js hook 脚本（类比 codex template） | ~170L |
+| `templates/qoder/hooks/prd-prewrite-guard` | Node.js hook 脚本；Qoder CLI `PreToolUse` 下复用/投影 Claude prewrite guard 语义 | ~150L |
+| `templates/qoder/hooks/prd-readiness-guard` | Node.js hook 脚本；Qoder CLI `Stop` 下复用/投影 Claude readiness guard 语义 | ~150L |
+
+**安装闭环要求**：`QoderAdapter.planRuntimeFilesSync()` 必须写入 `.qoder/hooks/*` managed hook scripts，并设置可执行 mode；`planRuntimeFilesRemoval()`/clean 必须移除这些 managed hook scripts；doctor 与 init drift detection 必须同时检查 settings matcher 和 hook script 文件是否存在、内容是否为 managed current version。只写 `.qoder/settings.json` 不算完成 Phase 0。
 
 #### 4.7.3 Qoder hooks JSON schema
+
+`spec-first init --qoder` 写入的是项目级 `.qoder/settings.json`，会被 Qoder CLI 与 IDE/JB plugin 共同读取。为避免 CLI-only `args` exec-form 泄漏到未验证的 IDE/JB surface，本轮使用保守的 shell command string；若后续确认所有目标 surface 都支持 exec-form，再单独评估 `{ command, args }` 迁移。
 
 ```json
 {
   "hooks": {
     "UserPromptSubmit": [
-      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node", "args": [".qoder/hooks/session-start"] }] }
+      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node .qoder/hooks/session-start" }] }
     ],
     "PreToolUse": [
-      { "matcher": "Write|Edit|MultiEdit", "hooks": [{ "type": "command", "command": "node", "args": [".qoder/hooks/prd-prewrite-guard"] }] }
+      { "matcher": "Write|Edit|MultiEdit", "hooks": [{ "type": "command", "command": "node .qoder/hooks/prd-prewrite-guard" }] }
     ],
     "Stop": [
-      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node", "args": [".qoder/hooks/prd-readiness-guard"] }] }
+      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node .qoder/hooks/prd-readiness-guard" }] }
     ]
   }
 }
@@ -570,7 +598,7 @@ Phase 1: Platform Registry ──────────── 独立基础设�
          │                              │
          ├── Phase 3: PointerBasedAdapter（依赖 Phase 1 的 deriveUnrewrittenPatterns）
          │
-Phase 2: init.js 拆分 ──────────────── 独立，与 Phase 1 无依赖
+Phase 2: init.js 拆分 ──────────────── 依赖 Phase 0/1 稳定后启动
                                         │
 Phase 4: Plugin 分层 ───────────────── 独立，与其他 Phase 无依赖
                                         │
@@ -580,7 +608,7 @@ Phase 5: 平台兼容性 ───────────────── 独
 **关键结论**：
 - Phase 0 和 Phase 1 可并行启动
 - Phase 3 硬依赖 Phase 1
-- Phase 2/4/5 真正独立
+- Phase 2/4/5 在代码依赖上可独立，但建议 Phase 0/1 稳定后再启动 Phase 2，避免在 `init.js` 上并行迁移同一逻辑
 - **Phase 0 与 Phase 2 的代码迁移约定**：Phase 0 在 `init.js` 中新增的 Qoder hook 调用，将在 Phase 2 拆分 `init.js` 时同步迁移到 `init-plan.js`，避免同一逻辑被修改两次
 
 ### 5.2 各 Phase 详细计划
@@ -590,18 +618,22 @@ Phase 5: 平台兼容性 ───────────────── 独
 | 步骤 | 内容 | 验收标准 |
 |------|------|---------|
 | 1 | 新建 `src/cli/qoder-settings.js` | exports: renderManagedQoderHooksUpsert, renderManagedQoderHooksRemoval, inspectManagedQoderHooks |
-| 2 | 新建 `templates/qoder/hooks/session-start` | Node.js script，读 AGENTS.md，注入 governance context |
-| 3 | 修改 init.js `buildInitMetadataPlan` | Qoder 平台写入 `.qoder/settings.json` hooks；该函数在 Phase 2 将迁移至 `init-plan.js` |
-| 4 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder 平台清理 hooks |
-| 5 | 修改 doctor.js `buildHostSpecificChecks` | Qoder hook inspection |
-| 6 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder hook drift 检测；该函数在 Phase 2 将迁移至 `init-plan.js` |
-| 7 | 验证 `UserPromptSubmit` matcher 行为 | 确认 Qoder 支持按 command name 过滤；若不支持，则 `spec-plan-guard` 暂不安装 |
-| 8 | 新建 `tests/unit/qoder-settings.test.js` | 覆盖 upsert/removal/inspect |
+| 2 | 新建 `templates/qoder/hooks/session-start` | Node.js script，读 AGENTS.md，注入 governance context；只按 Qoder CLI 协议确认 |
+| 3 | 新建 `templates/qoder/hooks/prd-prewrite-guard` 与 `prd-readiness-guard` | `.qoder/settings.json` 引用的每个 managed hook script 都必须实际安装 |
+| 4 | 修改 Qoder adapter `planRuntimeFilesSync/Removal/inspectRuntimeFiles` | 写入/清理/检查 `.qoder/hooks/*`，保持 pointer lifecycle 不变 |
+| 5 | 修改 init.js `buildInitMetadataPlan` | Qoder CLI 平台写入 `.qoder/settings.json` hooks；该函数在 Phase 2 将迁移至 `init-plan.js` |
+| 6 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder CLI 平台清理 settings matchers 与 hook scripts |
+| 7 | 修改 doctor.js `buildHostSpecificChecks` | Qoder CLI hook settings + script inspection |
+| 8 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder CLI hook drift 检测；该函数在 Phase 2 将迁移至 `init-plan.js` |
+| 9 | 验证 `UserPromptSubmit` 行为 | 确认 session-start prompt injection 的触发时机与 stdin/stdout 协议；Phase 0 不安装 `spec-plan-guard` |
+| 10 | 新建 `tests/unit/qoder-settings.test.js` 与 hook file plan tests | 覆盖 upsert/removal/inspect、script write/remove、settings 引用的脚本均存在 |
 
 **验收标准**：
 - `spec-first init --qoder --dry-run` 输出包含 `.qoder/settings.json` hook 写入
+- `spec-first init --qoder --dry-run` 输出包含 `.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 写入
 - `spec-first doctor --qoder` 报告 hook 状态
 - `spec-first clean --qoder` 正确移除 hooks
+- 若 IDE/JB plugin hooks 未验证，文档和 doctor 文案不得声称支持 IDE/JB plugin hooks
 - `npm test` 全通过
 
 #### Phase 1: Platform Registry + 排除列表自动化（1-2 天）
@@ -609,12 +641,12 @@ Phase 5: 平台兼容性 ───────────────── 独
 | 步骤 | 内容 | 验收标准 |
 |------|------|---------|
 | 1 | 新建 `src/cli/adapters/platform-registry.js` | 5 宿主完整声明 + `deriveUnrewrittenPatterns` |
-| 2 | 新建 golden snapshot 测试 | 派生结果覆盖当前硬编码 |
+| 2 | 新建 golden snapshot + negative fixture 测试 | 派生结果与当前硬编码双向等价；intentional delta 必须显式记录 |
 | 3 | 逐一替换 cursor/kiro/qoder 排除列表 | 改用 `deriveUnrewrittenPatterns(this.id)` |
 | 4 | 移除硬编码 patterns 常量 | 清理旧代码 |
 
 **验收标准**：
-- golden snapshot 测试证明覆盖不变
+- golden snapshot 测试证明覆盖不变，negative fixture 证明未新增误匹配
 - `spec-first init --dry-run` 输出对 cursor/kiro/qoder 无差异
 - `npm test` 全通过
 
@@ -649,6 +681,7 @@ Phase 5: 平台兼容性 ───────────────── 独
 - 三个 adapter 总行数从 1663L 降至 ~350L
 - `spec-first init --dry-run` 对三宿主输出不变
 - `spec-first doctor` 对三宿主诊断不变
+- Cursor/Kiro/Qoder 现有 host-specific warning/error 数量和语义不减少；任何减少必须列入 intentional delta
 
 #### Phase 4: Plugin 模块分层（1 天）
 
@@ -656,6 +689,7 @@ Phase 5: 平台兼容性 ───────────────── 独
 - plugin.js ≤200 行
 - `npm run lint:skill-entrypoints` 通过
 - governance 逻辑行为不变
+- focused tests 覆盖 `loadPluginManifest`、`buildFilteredAssetSet`、scope/delivery mode filtering、anchor validation、asset sync planning、`inspectInstalledAssets` 和 facade exports
 
 #### Phase 5: 平台兼容性（按需，1-2 天）
 
@@ -710,12 +744,12 @@ vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
 ### 6.2 Golden Snapshot 策略
 
-Phase 1/2/3 的核心验收基于输出不变。策略：
+Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI hook operations，但既有 operations 不得变化。策略：
 
 1. **重构前**：对 5 宿主运行 `spec-first init --dry-run --{host}`（`--claude`、`--codex`、`--cursor`、`--kiro`、`--qoder` 均为当前 CLI 已支持的 flags）并保存输出为 golden file
 2. **重构后**：运行相同命令，对比 golden file
 3. **允许的差异**：文件修改时间戳、绝对路径中的用户名
-4. **不允许的差异**：任何 operation 的 kind/path/reason 变化
+4. **不允许的差异**：既有 operation 的 kind/path/reason 变化；Phase 0 之外不得新增或删除 operation，除非列入 intentional delta
 
 ### 6.3 跨平台 CI
 
@@ -737,6 +771,10 @@ Phase 1/2/3 的核心验收基于输出不变。策略：
 | Adapter 声明式化遗漏 Codex 特殊逻辑 | Codex 功能回归 | Codex 不纳入 PointerBasedAdapter |
 | deriveUnrewrittenPatterns 遗漏 edge case | 路径误改写 | golden snapshot + 全量 test case |
 | Qoder UserPromptSubmit 时机与预期不符 | session-start hook 注入时机偏移 | 先部署 PreToolUse/Stop hooks（确定兼容），UserPromptSubmit 单独验证 |
+| Qoder CLI 与 IDE/JB hooks surface 被误认为完全一致 | 生成 IDE/JB 不识别的 `.qoder/settings.json` 或误报支持范围 | Phase 0 只声明 Qoder CLI confirmed；IDE/JB 进入 follow-up compatibility spike |
+| `.qoder/settings.json` 引用的 hook script 未实际安装 | hook matcher 存在但运行时报 ENOENT，doctor 误判健康 | Qoder adapter plan/clean/doctor/drift 同时覆盖 settings matcher 与 `.qoder/hooks/*` scripts |
+| Platform Registry 派生 patterns 比 legacy 更宽 | runtime path rewrite 误报或误改写非目标路径 | 双向等价 + representative negative fixtures；intentional delta 单独记录 |
+| PointerBasedAdapter 抽象吞掉 host-specific checks | doctor 回归漏报 frontmatter、agent tool pin、runtime path rewrite 问题 | Phase 3 验收比较 refactor 前后 Cursor/Kiro/Qoder warning/error 集合 |
 | Plugin 拆分破坏 skill-entrypoints lint | governance 校验失败 | `npm run lint:skill-entrypoints` 作为门禁 |
 
 ### 7.2 Dual-Host Governance 影响
@@ -749,7 +787,7 @@ Phase 1/2/3 的核心验收基于输出不变。策略：
 | init.js 拆分 | 不影响（governance 由 plugin.js 管理） | 否 |
 | PointerBasedAdapter | 不影响（delivery 由 plugin.js 决定） | 否 |
 | Plugin 分层 | ⚠️ 内部拆分需保持 `buildFilteredAssetSet` API 不变 | 否（接口不变） |
-| Qoder hooks | 不影响（hooks 独立于 skill delivery） | 否 |
+| Qoder CLI hooks | 不影响（hooks 独立于 skill delivery） | 否 |
 
 **结论**：所有 Phase 均不修改 governance schema 或 delivery 逻辑。`npm run lint:skill-entrypoints` 作为每个 Phase 的 gate check。
 

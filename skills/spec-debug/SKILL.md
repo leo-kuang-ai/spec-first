@@ -54,10 +54,6 @@ Overrides: high-risk
 - optional external-tool evidence unavailable -> `fallback-only`: use reproduction, logs, tests, and bounded source reads; do not claim causal links or blast radius that direct evidence did not confirm.
 - `non-git-build-workspace` coverage gaps -> `partial`: debug covered git roots normally, and inspect uncovered build modules directly before concluding they are unaffected.
 
-## Examples As Context
-
-When editing or reviewing this workflow prompt, or when running fresh-source eval for debug posture drift, read `skills/spec-debug/evals/examples.json` as examples-as-context. These examples are not a deterministic router, state machine, semantic readiness gate, or substitute for LLM judgment during ordinary debugging runs.
-
 ## Core Principles
 
 These principles govern every phase. They are repeated at decision points because they matter most when the pressure to skip them is highest.

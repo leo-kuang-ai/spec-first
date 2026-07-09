@@ -36,8 +36,18 @@ local_benchmark_refs:
 - `spec-debug` 已有 CE 的 reference/agent/script 基线，并做了正确 spec-first 投影：repo-profile cache 从 `/tmp/compound-engineering` 改为 `/tmp/spec-first`。
 - 当前差距主要在 `SKILL.md` 的流程合同：CE 的 tracker/PR history 检查、pre-fix scope、post-fix simplify/review/residual tail 和 `Post-Fix Quality` 输出，在当前 `spec-debug` 中缺失或被收窄。
 - 当前 `skills/spec-debug/scripts/hitl-loop.template.sh` 注释仍与 SKILL contract 冲突：SKILL.md 说 HITL 是用户运行脚本、agent 读取 captured output；脚本注释写成 agent runs script。
+- `skills/spec-debug/evals/examples.json` 是 spec-first-only examples-as-context，CE `ce-debug` 中不存在；当前 worktree 已删除该 fixture，且 `SKILL.md` 已无 `Examples As Context` / `evals/examples.json` 引用。本计划把它作为已发生 cleanup 的确认项处理：删除理由必须来自 stale / 无 active runtime consumer / 避免行为真相源漂移，而不是单纯“CE 中不存在”。
 
-最终目标：`spec-debug` 具备 CE `ce-debug` 的完整 root-cause debug + PR-ready shipping tail，同时保留 spec-first 的 direct evidence closeout、runtime/source 边界、provider 降级、docs/solutions recall、performance regression、HITL、correct-seam test 和 failed-fix evidence reset。
+最终目标：`spec-debug` 在真实 debug 场景中提升 root-cause 可信度、复杂修复交付安全性和 PR-ready handoff 质量。CE parity 是达成该目标的迁移手段，不是最高层产品 outcome；`spec-debug` 仍必须保留 spec-first 的 direct evidence closeout、runtime/source 边界、provider 降级、docs/solutions recall、performance regression、HITL、correct-seam test 和 failed-fix evidence reset。
+
+## Product Hypothesis
+
+本计划解决的用户可感知问题：
+
+- recurring / regression bug 可利用 prior PR、open duplicate、unmerged fix 和 prior failed attempt 作为 advisory context，减少重复踩同一坑。
+- dirty 或 pre-existing branch 上执行修复时，pre-fix scope 和 fix-owned files 能防止 simplify/review/cleanup 误改用户已有工作。
+- 复杂修复在 closeout 前能经过 right-sized simplify/review/residual handling，并输出 direct evidence 与 `Post-Fix Quality`，减少“本地绿但 PR 不可交付”的落差。
+- 普通小修仍走轻路径：trivial bug 不默认触发 tracker/history 或 full shipping tail，避免把 `spec-debug` 变成 release workflow。
 
 ## Goals / Non-Goals
 
@@ -50,6 +60,7 @@ local_benchmark_refs:
 5. **修复 HITL 脚本注释冲突**：注释改为用户运行脚本，agent 读取 `KEY=VALUE` output。
 6. **补 contract tests**：用 focused Jest 守护 CE 能力回归、spec-first boundary 保留、CE 命名残留禁入。
 7. **更新审查记录和 Changelog**：把 `ce-debug` -> `spec-debug` 的 restore 项从“待补回”推进为 plan-backed implementation target。
+8. **确认 spec-only `evals/examples.json` cleanup**：当前 worktree 已删除该 fixture 且 `SKILL.md` 无引用；实施时只确认无 active consumer / 无 stale 引用，并在验证与 Changelog 中如实记录替代评估路径。
 
 ### Non-Goals
 
@@ -70,9 +81,10 @@ local_benchmark_refs:
 - `skills/spec-debug/SKILL.md`
 - `skills/spec-debug/scripts/hitl-loop.template.sh`
 - `tests/unit/spec-debug-contracts.test.js`
-- `tests/unit/migrated-skill-scripts-contracts.test.js`（仅当把 HITL script 纳入 migrated script guard）
 - `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`
 - `CHANGELOG.md`
+
+本计划确认 `skills/spec-debug/evals/examples.json` 已删除，不再把它作为待执行 source mutation；若后续发现 active eval consumer，应恢复或另开 cleanup 决策，而不是把 CE 缺失当作删除充分理由。
 
 ### Generated Runtime
 
@@ -95,7 +107,7 @@ source 修改后如需要刷新 runtime，由后续单独运行 `spec-first init
 | Phase 0 issue intake | 已保留并增强 | 补一句 tracker/PR text 是 advisory |
 | Trivial fast-path | spec-first 更严 | 保留 spec-first 版本 |
 | Reproduce / env sanity / trace | 已保留并增强 | 不动 |
-| Tracker and PR history | 缺失 | 恢复为 Phase 1.4 |
+| Tracker and PR history | 缺失 | 先增加 cheap trivial pre-check，再恢复 bounded tracker/PR history；完整 Trivial fast-path 保持在 tracker 查询之后作为证据门 |
 | Assumption audit / hypotheses | 已保留并增强 | 不动 |
 | Blocking user choice | 已保留 | 保持 current host blocking question wording |
 | Workspace/branch check | 已保留 | 增加 CE pre-fix scope |
@@ -133,11 +145,15 @@ source 修改后如需要刷新 runtime，由后续单独运行 `spec-first init
 
 ### Phase 1: Investigate
 
-新增 `1.4 Check the tracker and PR history for prior work`，从 CE 恢复并做 spec-first 投影。
+为避免 trivial bug 先跑 tracker 查询，Phase 1 使用两层 fast-path：
+
+1. **1.4 Cheap trivial pre-check**：在 tracker 查询前做轻量判断，只识别单文件 typo、missing import、显式 null dereference、off-by-one 这类直接可见 bug。命中时跳过 tracker/PR history，继续进入完整 fast-path 证据门。
+2. **1.5 Check the tracker and PR history for prior work**：只对 cheap pre-check 未命中的非 trivial bug 执行 targeted 查询。
+3. **1.6 Trivial-bug fast-path check**：保留当前完整 fast-path 证据门，确认 root cause、proposed fix、tests 和 Fix / Diagnosis choice gate；cheap pre-check 不能替代 causal evidence。
 
 触发：
 
-- trivial fast-path 跳过。
+- cheap trivial pre-check 命中时跳过 tracker/PR history。
 - 非 trivial bug 默认执行 targeted 查询。
 - regression、reopened、recurring symptom、用户提到 prior failed attempts 时优先执行。
 
@@ -154,6 +170,13 @@ source 修改后如需要刷新 runtime，由后续单独运行 `spec-first init
 - affected file / module / area。
 - Phase 1.3 中 `git log -- <file>` 暴露的 fixing commit 对应 PR / issue。
 
+查询预算与边界：
+
+- 默认最多 3 个精确查询，优先使用 repo forge primary source（例如 GitHub remote 对应的 `gh`）。
+- `none found` 只表示 `searched_no_match`，不是 confirmed absence。
+- 外部搜索或 web fetch 只能作为 degraded fallback，必须记录 source freshness 和 auth/visibility limits。
+- 不因查询缺工具、缺 auth、无 match 而阻塞 direct evidence debug path。
+
 高价值结果：
 
 - open ticket or PR for same bug。
@@ -166,10 +189,13 @@ source 修改后如需要刷新 runtime，由后续单独运行 `spec-first init
 ```text
 source_tag: advisory
 tracker_or_forge: <github|jira|linear|unknown>
-query: <query string>
+searched_queries:
+  - <query string>
 result_link: <url or none>
 debug_relevance: <open duplicate|unmerged fix|prior failed attempt|original fixing context|none>
-limits: <auth missing|tool unavailable|partial thread|not searched>
+freshness: <fetched_at or unknown>
+auth_scope: <authenticated|public-only|unknown>
+limits: <auth missing|tool unavailable|partial thread|searched_no_match|not searched>
 ```
 
 缺工具或 auth 时不阻塞 debug：记录 `tracker_history_unavailable` 并继续 direct evidence path。
@@ -196,7 +222,7 @@ pre_fix_status_clean: <true|false>
 pre_existing_changed_files:
   - <path>
 fix_owned_files:
-  - <path added during Phase 3>
+  - <path changed or created during Phase 3>
 ```
 
 用途：
@@ -263,14 +289,14 @@ Test-first 合并 CE 和 spec-first：
    - 即使跳过，也保留 Phase 3 tests 和 self-review。
 
 3. **Simplify before review when useful**
-   - 使用 `spec-simplify-code`。
+   - 使用 `spec-simplify-code` 的当前 host 默认入口（交互式）。除非 caller 明确处于 pipeline/headless 上下文，否则不使用 `mode:agent`。
    - 触发条件：>=30 changed lines、多 implementation files、新 helper/abstraction、auth/authz、public contracts、persistence、concurrency、background jobs、external services。
    - skill-owned branch 或 clearly fix-only branch 可用 branch diff。
    - pre-existing branch 只 scope 到 fix-owned files。
    - fix-owned file 若有 pre-existing edits，跳过该文件并记录：`Simplify: skipped for overlapping pre-existing edits`。
 
 4. **Review the final fix scope**
-   - 使用 `spec-code-review` 或 current host lightweight review。
+   - 使用 `spec-code-review` 的当前 host 默认入口（交互式），或 current host lightweight review。除非 caller 明确处于 pipeline/headless 上下文，否则不使用 `mode:agent`。
    - 默认 review 只在 scope 明确为 fix-only 时运行：skill-owned branch，或 pre-fix tree clean 且可传 `base:<pre-fix-HEAD>`。
    - dirty branch 或 unrelated committed work 时，不运行默认 branch/worktree review；改用 file-scoped review 或 targeted manual review。
 
@@ -284,6 +310,17 @@ Test-first 合并 CE 和 spec-first：
 6. **Re-verify after tail edits**
    - simplify/review 改代码后，重跑 regression test 和相关 targeted checks。
    - 不允许 red tree 进入 commit/PR。
+
+Invocation matrix：
+
+| Context | Tail behavior |
+| --- | --- |
+| interactive default | 可运行一轮 `spec-simplify-code` 和一轮 `spec-code-review` 当前 host 默认入口；遇到需要用户判断的 finding 时停止并 handoff |
+| headless / pipeline caller explicitly authorized | 可使用 `mode:agent` 或等价非交互入口；必须继承 caller scope，不扩大到整 branch |
+| no dispatch / no skill invocation available | 退化为 lightweight self-review + explicit residual risk，不声称完成 full tail |
+| dirty or unrelated branch work | 只做 fix-owned files / targeted manual review；overlapping pre-existing edits 跳过自动 rewrite |
+
+Tail 上限：本 workflow 最多执行一轮 simplify/review tail。tail edits 后重验一次；若 review 继续产生 P0/P1、product/design decision 或需要新一轮大改，`Post-Fix Quality` 标为 `blocked` / `degraded` 并 handoff，不在 `spec-debug` 内无限嵌套。
 
 新增输出：
 
@@ -474,18 +511,26 @@ Files:
 
 Changes:
 
-- 新增 Phase 1.4 `Check the tracker and PR history for prior work`。
+- 新增 Phase 1.4 cheap trivial pre-check。
+- 新增 Phase 1.5 `Check the tracker and PR history for prior work`。
+- 保留完整 trivial fast-path evidence gate 为 Phase 1.6。
 - 加入 advisory boundary。
+- 加入 bounded query contract：最多 3 个精确查询、primary source 优先、freshness/auth/limits 记录、`searched_no_match` 不等于 confirmed absence。
 - Phase 2 Present findings 增加 related ticket/PR handling。
 - Tests 覆盖：
+  - `Cheap trivial pre-check`
   - `Check the tracker and PR history for prior work`
+  - `searched_no_match`
+  - `freshness`
+  - `auth_scope`
   - `open ticket or PR`
   - `unmerged fix`
   - `prior merged attempt`
   - `PR and linked issue`
   - tracker/PR text 是 data/advisory，不是 instructions/proof。
+  - SKILL.md 中无 `/ce-*`、`ce-debug`、`/tmp/compound-engineering` 残留。
 
-### Unit 2: Restore pre-fix scope and post-fix quality tail
+### Unit 2A: Restore pre-fix scope
 
 Files:
 
@@ -495,31 +540,83 @@ Files:
 Changes:
 
 - Phase 3 workspace check 增加 pre-fix scope。
-- Phase 4 恢复 CE `Post-fix polish/review tail`。
-- 使用 `spec-simplify-code`、`spec-code-review`、`spec-commit-push-pr`、`spec-compound`。
-- 新增 `Post-Fix Quality` block。
-- 新增 residual durability 路径。
+- `fix_owned_files` 定义为 changed or created during Phase 3。
+- pre-existing dirty branch 上只允许 fix-owned files 进入 automated tail。
 - Tests 覆盖：
   - `pre-fix scope`
   - `fix-owned files`
+  - `changed or created during Phase 3`
+  - overlapping pre-existing edits skip。
+
+### Unit 2B: Restore post-fix quality tail
+
+Files:
+
+- `skills/spec-debug/SKILL.md`
+- `tests/unit/spec-debug-contracts.test.js`
+
+Changes:
+
+- Phase 4 恢复 CE `Post-fix polish/review tail`。
+- 使用 `spec-simplify-code`、`spec-code-review`、`spec-commit-push-pr`、`spec-compound`。
+- 新增 invocation matrix：interactive、headless/pipeline、no-dispatch、dirty branch。
+- 限制最多一轮 simplify/review tail，tail edits 后重验一次；后续 P0/P1 或 product/design decision 转 blocked/degraded handoff。
+- 新增 `Post-Fix Quality` block。
+- Tests 覆盖：
   - `Post-fix polish/review tail`
-  - `Post-Fix Quality`
-  - `docs/residual-review-findings/<branch-or-head-sha>.md`
+  - `Invocation matrix`
+  - `blocked` / `degraded`
+  - `Post-Fix Quality` 区块及 `Scope`、`Simplify`、`Review`、`Residuals`、`Re-verification` 子字段
   - no `/ce-*` entrypoints。
+
+### Unit 2C: Restore residual durability
+
+Files:
+
+- `skills/spec-debug/SKILL.md`
+- `tests/unit/spec-debug-contracts.test.js`
+
+Changes:
+
+- 新增 residual durability 路径。
+- 若 PR body 承载 residuals，传给 `spec-commit-push-pr` 作为 `Known Residuals`。
+- 若 commit-only 或 stop，写入 `docs/residual-review-findings/<branch-or-head-sha>.md`。
+- Tests 覆盖：
+  - `docs/residual-review-findings/<branch-or-head-sha>.md`
+  - `Known Residuals`
+  - accepted lower-severity residuals durable sink。
 
 ### Unit 3: Fix HITL template wording
 
 Files:
 
 - `skills/spec-debug/scripts/hitl-loop.template.sh`
-- `tests/unit/migrated-skill-scripts-contracts.test.js`（可选）
+- `tests/unit/spec-debug-contracts.test.js`
 
 Changes:
 
 - 注释改为 user runs / agent reads captured output。
-- 可选把 HITL template 加入 migrated script guard，防止 CE 语义残留。
+- 在 `spec-debug-contracts.test.js` 中增加专属断言，验证注释措辞：
+  - `The user runs the script`
+  - `agent reads captured KEY=VALUE output afterward`
+- 不把 HITL template 加入 `migrated-skill-scripts-contracts.test.js`：该 guard 只覆盖 CE 迁移脚本，而 `hitl-loop.template.sh` 是 spec-first 原生模板。
 
-### Unit 4: Update migration audit and changelog
+### Unit 4: Confirm spec-only `evals/examples.json` cleanup
+
+Files:
+
+- `skills/spec-debug/SKILL.md`
+- `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`
+- `CHANGELOG.md`
+
+Changes:
+
+- 确认当前 worktree 已删除 `skills/spec-debug/evals/examples.json`。
+- 确认 `SKILL.md` 中无 `## Examples As Context` / `evals/examples.json` 引用。
+- 记录删除理由为 stale / 无 active runtime consumer / 避免行为真相源漂移；不能只写 CE `ce-debug` 中不存在。
+- 在 parity mapping 中标为 `cleanup-confirmed`，并写明替代验证路径：focused Jest + fresh-source eval + parity mapping。
+
+### Unit 5: Update migration audit and changelog
 
 Files:
 
@@ -530,9 +627,20 @@ Changes:
 
 - 将 `ce-debug` -> `spec-debug` 的 `[restore]` 项标记为计划覆盖或实施完成后已处理。
 - 记录保留 spec-first 增强与恢复 CE 承重能力。
+- 记录删除 `evals/examples.json` 及其原因。
 - Changelog 记录 source surfaces、用户可见行为、验证命令、未手改 generated runtime mirrors。
 
 ## Test Plan
+
+Parity verification artifact:
+
+实施 closeout 前必须生成或更新一个 lightweight parity mapping（可写入本 plan 的执行记录、审查记录或 PR 描述），逐项覆盖 `local_benchmark_refs` 中 CE `ce-debug` 的承重段落：
+
+| CE source / section | spec-debug projection | status | reason | consumer | verification anchor |
+| --- | --- | --- | --- | --- | --- |
+| `<CE section>` | `<spec-debug section or omitted>` | restored / kept-enhanced / intentionally omitted / cleanup-confirmed | `<why>` | `<workflow/user/test>` | `<Jest assertion / source line / fresh-source eval checklist item>` |
+
+Acceptance 不能只依赖关键词存在；每个 restored / kept-enhanced / intentionally omitted 项都必须有 reason 和 verification anchor。LLM/fresh-source eval 判断语义充分性，focused Jest 只守确定性锚点。
 
 Focused verification:
 
@@ -554,6 +662,7 @@ Prompt behavior validation:
 - 因为这是 skill prose 行为变更，应执行 fresh-source eval。
 - Eval 输入必须是当前磁盘上的 `skills/spec-debug/SKILL.md`，不能依赖当前会话已缓存 skill。
 - Checklist：
+  - parity mapping 是否覆盖 CE `ce-debug` 的承重段落，且每项都有 status / reason / verification anchor。
   - 是否完整补回 CE tracker/PR history。
   - 是否完整补回 CE post-fix tail。
   - 是否保留 spec-first evidence/context/provider boundaries。
@@ -568,34 +677,46 @@ Prompt behavior validation:
 | --- | --- |
 | Prompt 继续膨胀，普通 bug 执行负担变大 | trivial fast-path 跳过 tracker/tail；tail 有 skip-with-reason |
 | tracker/PR history 被误当 truth | 明确 advisory；root cause 必须 direct evidence 确认 |
+| tracker 查询变成开放式外部调查 | bounded query contract：最多 3 个精确查询、primary source 优先、freshness/auth/limits 记录 |
 | simplify/review 改写用户已有工作 | pre-fix scope + fix-owned files + dirty overlap skip |
+| post-fix tail 嵌套成无限 shipping workflow | invocation matrix + 最多一轮 tail + blocked/degraded handoff |
 | CE 命名残留 | focused negative tests |
 | residual artifact 污染 docs | 只在 accepted residuals 且无 PR body 承载时写 |
 | 新 tail 阻塞小修 | skip tail only with reason，mechanical fix 可跳过 |
+| 删除 eval fixture 削弱 Evaluation Harness | cleanup-confirmed 必须记录无 active consumer / stale rationale，并由 parity mapping + fresh-source eval 补评估证据 |
 | runtime mirror 漂移 | source-first；如需刷新，单独 `spec-first init` |
 
 ## Rollout Order
 
-1. 补 `tests/unit/spec-debug-contracts.test.js` 中 CE parity contract 断言，让测试先表达目标。
-2. 修改 `skills/spec-debug/SKILL.md`：
-   - Phase 1.4 tracker/PR history。
-   - Phase 3 pre-fix scope。
-   - Phase 4 post-fix tail + Post-Fix Quality。
-3. 修 `skills/spec-debug/scripts/hitl-loop.template.sh` 注释。
-4. 如纳入 script guard，更新 `tests/unit/migrated-skill-scripts-contracts.test.js`。
-5. 更新 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`。
-6. 更新 `CHANGELOG.md`。
-7. 运行 focused verification。
-8. 执行 fresh-source eval 或记录未执行原因。
-9. 不自动运行 `spec-first init`；由后续 runtime refresh 任务处理。
+1. 确认 `skills/spec-debug/evals/examples.json` 已删除、`SKILL.md` 无对应引用，并记录 cleanup rationale 与替代验证路径。
+2. 补 `tests/unit/spec-debug-contracts.test.js` 中 CE parity contract 断言，让测试先表达目标。
+3. 修改 `skills/spec-debug/SKILL.md`：
+   - 新增 Phase 1.4 cheap trivial pre-check。
+   - 新增 Phase 1.5 bounded tracker/PR history。
+   - 保留完整 trivial fast-path evidence gate 为 Phase 1.6。
+   - Phase 3 pre-fix scope 与 changed-or-created fix-owned files。
+   - Phase 4 post-fix tail invocation matrix + Post-Fix Quality。
+   - residual durability sink。
+4. 修 `skills/spec-debug/scripts/hitl-loop.template.sh` 注释。
+5. 在 `tests/unit/spec-debug-contracts.test.js` 中增加 HITL 注释专属断言（不加入 migrated-skill-scripts guard）。
+6. 确保 `docs/residual-review-findings/` 目录存在（首次写入前创建）。
+7. 生成或更新 parity mapping。
+8. 更新 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`。
+9. 更新 `CHANGELOG.md`。
+10. 运行 focused verification。
+11. 执行 fresh-source eval 或记录未执行原因。
+12. 不自动运行 `spec-first init`；由后续 runtime refresh 任务处理。
 
 ## Acceptance Criteria
 
-- `spec-debug` 覆盖 CE `ce-debug` 的全部承重流程能力。
+- parity mapping 覆盖 CE `ce-debug` 的全部承重流程能力，每项都有 status / reason / consumer / verification anchor。
+- `spec-debug` 的用户 outcome 明确：recurring/regression bug 有 prior-work advisory context，dirty branch tail 不误改用户 work，复杂修复 closeout 有 direct evidence 与 `Post-Fix Quality`。
 - `spec-debug` 保留现有 spec-first 增强，不回退为 CE-only。
 - `spec-debug` source 中无 `/ce-*`、`ce-debug`、`/tmp/compound-engineering` 残留。
+- `spec-debug` 无 spec-only `evals/examples.json` 第二真相源，且 cleanup rationale 与替代验证路径已记录。
 - HITL script 注释与 SKILL contract 一致。
 - Post-fix residuals 有 durable 落点。
-- simplify/review tail 有明确 scope 防护。
+- tracker/PR history 有 bounded query contract，不把 `searched_no_match` 当 confirmed absence。
+- simplify/review tail 有明确 scope 防护、invocation matrix、一轮上限和 blocked/degraded handoff。
 - focused Jest、changelog format、diff check 通过。
 - 未手改 generated runtime mirrors。
