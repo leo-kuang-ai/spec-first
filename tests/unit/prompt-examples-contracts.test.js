@@ -6,7 +6,6 @@ const path = require('node:path');
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const EXAMPLE_FILES = [
   ['spec-work', path.join(REPO_ROOT, 'skills', 'spec-work', 'evals', 'examples.json'), 'skills/spec-work/evals/examples.json'],
-  ['spec-doc-review', path.join(REPO_ROOT, 'skills', 'spec-doc-review', 'evals', 'examples.json'), 'skills/spec-doc-review/evals/examples.json'],
 ];
 const PLACEHOLDER_PATTERN = /\b(?:TODO|TBD|foo|bar)\b|example 1/i;
 

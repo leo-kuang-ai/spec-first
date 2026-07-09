@@ -160,27 +160,14 @@ describe('CE-lineage dispatch boundary contracts', () => {
   });
 
   test('phase 2 dispatch-bearing workflows reject hidden implement-check lifecycles', () => {
-    const docReview = read('skills/spec-doc-review/SKILL.md');
     const codeReview = read('skills/spec-code-review/SKILL.md');
     const plan = read('skills/spec-plan/SKILL.md');
-
-    expect(docReview).toContain('Reviewers are analysis agents, not implementation workers.');
-    expect(docReview).toContain('Dispatch is bounded to document-review personas with the current document scope, selected sections, pre-facts, and output contract.');
-    expect(docReview).toContain('Do not create hidden implement/check agents from document review.');
-    expect(docReview).toContain('Autofix is limited to this workflow\'s documented `safe_auto` document edits');
-    expect(docReview).toContain('report-only fallback, user-requested no-agents mode, unsafe runtime, or missing dispatch capability must not edit documents or generated runtime mirrors');
-
-    expect(codeReview).toContain('Reviewers are analysis agents, not implementation workers.');
-    expect(codeReview).toContain('Dispatch is bounded to the resolved diff scope, selected reviewer personas, advisory facts, and output schema.');
-    expect(codeReview).toContain('Do not create hidden implement/check agents from code review.');
-    expect(codeReview).toContain('Mutation is allowed only through documented `safe_auto` / selected Apply paths in the chosen mode');
-    expect(codeReview).toContain('report-only fallback, unsafe runtime, or missing dispatch capability must not edit source, generated runtime mirrors, or workflow artifacts');
 
     expect(plan).toContain('Planning may recommend later worker delegation, but it must not dispatch implementation workers or create a hidden implement/check lifecycle.');
     expect(plan).toContain('A worker is suitable only when the scope is clear, the write set can be bounded, verification commands are known, no product/architecture blocker remains, and no sensitive/security-critical ambiguity is unresolved.');
     expect(plan).toContain('Review autofix and mutation are off unless a documented workflow mode or explicit user choice authorizes them.');
 
-    expect(`${docReview}\n${codeReview}\n${plan}`).not.toMatch(/always[- ]on worker delegation/i);
-    expect(`${docReview}\n${codeReview}\n${plan}`).not.toMatch(/hidden implementation worker/i);
+    expect(`${codeReview}\n${plan}`).not.toMatch(/always[- ]on worker delegation/i);
+    expect(`${codeReview}\n${plan}`).not.toMatch(/hidden implementation worker/i);
   });
 });

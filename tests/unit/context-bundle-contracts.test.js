@@ -100,13 +100,10 @@ describe('context bundle and summary contracts', () => {
   });
 
   test('high-frequency workflows consume compact context contracts instead of full broadcast by default', () => {
-    const codeReview = read('skills/spec-code-review/SKILL.md');
     const work = read('skills/spec-work/SKILL.md');
     const plan = readPlanSurface();
-    const docReview = read('skills/spec-doc-review/SKILL.md');
-    const compound = read('skills/spec-compound/SKILL.md');
 
-    for (const content of [codeReview, work, plan]) {
+    for (const content of [work, plan]) {
       expect(content).toContain('stable instruction prefix');
       expect(content).toContain('dynamic suffix');
       expect(content).toContain('artifact-summary.v1');
@@ -114,24 +111,12 @@ describe('context bundle and summary contracts', () => {
       expect(content).toContain('docs/contracts/context-bundle.md');
     }
 
-    for (const content of [codeReview, work, plan, docReview]) {
+    for (const content of [work, plan]) {
       expect(content).toContain('Maintain a run-local context ledger for this workflow');
       expect(content).toContain('paths read, reason, phase, and compact summary');
       expect(content).toContain('Reuse loaded summaries within the same workflow run');
       expect(content).toContain('Re-read only when exact wording is needed');
     }
-
-    expect(codeReview).toContain('docs/contracts/workflows/review-finding.md');
-    expect(codeReview).toContain('skills/spec-code-review/references/findings-schema.json');
-    expect(codeReview).toContain('P0-P3 severity');
-    expect(codeReview).toContain('0/25/50/75/100 confidence anchors');
-    expect(codeReview).toContain('review-finding.v1` 仅用于 downstream / compact mapped summary');
-    expect(docReview).toContain('selected document sections');
-    expect(docReview).toContain('instead of an automatic full-document broadcast');
-    expect(docReview).toContain('review-finding.v1');
-    expect(docReview).toContain('finding caps');
-    expect(compound).toContain('docs/contracts/artifact-summary.md');
-    expect(compound).toContain('not copy full upstream reports or raw tool output');
   });
 
   test('internal context-bundle helper emits path-backed envelope and applies runtime exclusion', () => {

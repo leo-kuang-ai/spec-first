@@ -57,7 +57,7 @@ CE 是迁移能力的语义基准：
 | `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，unified-plan artifact contract 关键 | 已完成 | 已审查 |
 | `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 | 已完成 | 已审查 |
 | `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
-| `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
+| `ce-doc-review` | `spec-doc-review` | 审查需求、计划或 spec 文档，输出 persona findings 与交互式修复/延期路径 | 直接映射，doc review lifecycle 关键 | 已完成 | 已审查 |
 | `ce-ideate` | `spec-ideate` | 生成并评估项目上下文内的改进想法 | 直接映射，与 brainstorm 的边界关键 | 已完成 | 已审查 |
 | `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 |  |  |
 | `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 |  |  |
@@ -753,9 +753,10 @@ done
 
 ### `spec-doc-review`
 
-- 初始 inventory 中 stale-contract scan count 最高。
-- 需要确认 markdown mutation rules、persona dispatch、finding confidence 和 review report paths 都是 spec-first source contracts。
-- 任何剩余 `ce-doc-review` 引用都应只是兼容说明，而不是 active invocation guidance。
+- 已按用户裁决推翻早期 spec-only 增强口径，清空 `skills/spec-doc-review` 后完整拷贝 CE `ce-doc-review` source 文件，再做最小 spec-first 投影。
+- 当前文件面与 CE 一致，共 15 个文件；删除旧 spec-only `evals/examples.json` 和 `references/decision-primer.md`，不再作为 active runtime dependency。
+- 保留 CE 的 requirements/plan/unified-plan 分类、persona dispatch、anchored confidence gate、same-persona collapse、cross-persona promotion、premise dependency chains、`safe_auto` / `gated_auto` / `manual` routing、Open Questions append、headless envelope 和 terminal next-stage handoff。
+- 旧 spec-first task-pack review、dispatch authorization fallback、context-governance/summary-first bundle、Workflow Contract Summary、review-finding.v1 和 examples-as-context 不属于 CE 真相源；本轮从 active `spec-doc-review` 移除，后续如需恢复必须作为独立 spec-first enhancement 重新论证。
 
 ### `spec-work` 与 `spec-lfg`
 
@@ -796,6 +797,61 @@ done
 | plugin version display | `scripts/check-health` | spec-first version / runtime facts 可选展示，不作为核心产物 | 部分覆盖 | 版本可辅助诊断，但 setup 的可靠产物应是 readiness facts 与 next actions；不要把版本展示当作安装成功证据 | `spec-first --version`、`tool-facts.json` advisory facts |
 
 ## Batch 4 核心链路深审记录
+
+### `ce-doc-review` -> `spec-doc-review`
+
+#### Verdict
+
+- status: replaced
+- risk: high
+- decision: 按用户裁决，`spec-doc-review` 以 CE `ce-doc-review` source 为真相源重建，再做最小 spec-first 投影。保留 CE 的 requirements / plan / unified artifact 分类、multi-persona document review、anchored confidence gate、same-persona premise collapse、cross-persona promotion、premise dependency chain、`safe_auto` / `gated_auto` / `manual` routing、Open Questions append、interactive walk-through、bulk preview、headless envelope 和 terminal next-stage handoff。不保留上一版 spec-first 的 task-pack review、dispatch authorization fallback、context-governance / summary-first bundle、Workflow Contract Summary、`review-finding.v1` 映射、`decision-primer.md` 外置 reference 和 `evals/examples.json` 作为 active doc-review contract。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/bulk-preview.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/findings-schema.json`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/open-questions-defer.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/review-output-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/subagent-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/synthesis-and-presentation.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/walkthrough.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/references/personas/*.md`
+- spec-first: `skills/spec-doc-review/SKILL.md`
+- spec-first: `skills/spec-doc-review/references/*.md`
+- spec-first: `skills/spec-doc-review/references/personas/*.md`
+
+#### Preserved Capabilities
+
+- 保留 CE 的 `mode:headless` contract：`safe_auto` 静默应用，`gated_auto` / `manual` / FYI 结构化返回，Phase 5 直接以 `Review complete` 结束。
+- 保留 CE 的文档分类：`requirements`、`plan`、`unified-requirements`、`unified-plan`；新 unified artifact contract 投影为 `artifact_contract: spec-unified-plan/v1`。
+- 保留 CE 的 Product Contract / Planning Contract 分片：requirements-only unified plan 只审 Product Contract，implementation-ready unified plan 同时审 Product / Planning / Implementation / Verification / DoD。
+- 保留 CE 的 reviewer roster：coherence、feasibility 两个 always-on persona，加 product/design/security/scope/adversarial 条件 persona。
+- 保留 CE 的 dispatch model：generic subagents + skill-local prompt assets，不依赖 standalone agent type/name，model tiering 留在 orchestrator。
+- 保留 CE 的 findings schema：P0-P3、`error` / `omission`、`safe_auto` / `gated_auto` / `manual`、0/25/50/75/100 confidence anchors、evidence quote array。
+- 保留 CE 的 synthesis pipeline：schema validate、confidence gate、same-persona collapse、dedup、cross-persona agreement promotion、contradiction resolution、deterministic recommended-action tie-break、premise-dependency chains、auto-promotion、restatement suppression。
+- 保留 CE 的 interactive routing：four-option routing question、per-finding walk-through、bulk preview、Open Questions append failure path、no-fix Acknowledge sub-question、in-memory walk-through state。
+
+#### Intentional Spec-First Divergences
+
+- `ce-doc-review`、`ce-plan`、`ce-work`、`ce-code-review`、`ce-brainstorm` 等入口和消费者投影为 `spec-doc-review`、`spec-plan`、`spec-work`、`spec-code-review`、`spec-brainstorm`。
+- `artifact_contract: ce-unified-plan/v1` 投影为 `artifact_contract: spec-unified-plan/v1`。
+- `product_contract_source: ce-brainstorm|ce-plan-bootstrap` 投影为 `product_contract_source: spec-brainstorm|spec-plan-bootstrap`。
+- `compound-engineering review workflow` 投影为 `spec-first review workflow`；不保留 CE branding。
+
+#### Test Contract Cleanup
+
+- 删除旧 `skills/spec-doc-review/evals/examples.json` 和 `references/decision-primer.md`：CE `ce-doc-review` 中不存在这些文件，不能作为 active runtime dependency 限制 CE-first 主流程。
+- 重写 `tests/unit/spec-doc-review-contracts.test.js`：从旧 task-pack/context-governance/dispatch-auth/eval 合同收窄为 CE-first 文件面、unified artifact、persona dispatch、synthesis routing、Open Questions 和 CE 残留清理检查。
+- 收窄 `tests/unit/prompt-examples-contracts.test.js`：移除 `spec-doc-review/evals/examples.json` 要求。
+- 收窄 `tests/unit/context-governance-contracts.test.js`、`tests/unit/context-bundle-contracts.test.js`、`tests/unit/spec-dispatch-boundary-contracts.test.js`、`tests/unit/workflow-invocation-boundary.test.js` 中针对旧 spec-only doc-review 增强的断言。
+
+#### Verification Status
+
+- 已逐个打开 `skills/spec-doc-review` 下 15 个 source 文件审查：`SKILL.md`、7 个顶层 `references/*` 文件、7 个 `references/personas/*.md` 文件。
+- 已运行 CE/spec 目录 diff，确认差异集中在 `ce-*` -> `spec-*`、`ce-unified-plan/v1` -> `spec-unified-plan/v1`、`product_contract_source` 和 spec-first review workflow 命名投影。
+- 已运行 focused residual scan，确认 `skills/spec-doc-review` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留。
+- 待运行 focused Jest、entrypoint lint、`git diff --check` 和 changelog 格式检查。
 
 ### `ce-code-review` -> `spec-code-review`
 

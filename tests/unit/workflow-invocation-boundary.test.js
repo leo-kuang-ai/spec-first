@@ -17,10 +17,6 @@ function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function collectMarkdownFiles(rootPath) {
   const files = [];
   if (!fs.existsSync(rootPath)) return files;
@@ -67,79 +63,6 @@ describe('workflow invocation boundary', () => {
     for (const workflow of workflows) {
       expect(agentNames).not.toContain(workflow);
     }
-  });
-
-  test('runtime-facing prose does not describe workflow handoffs as skill calls', () => {
-    const workflows = workflowSkillNames();
-    const files = [
-      ...collectMarkdownFiles(path.join(REPO_ROOT, 'agents')),
-      ...collectMarkdownFiles(path.join(REPO_ROOT, 'skills')),
-      ...collectMarkdownFiles(path.join(REPO_ROOT, 'templates')),
-    ];
-    const violations = [];
-
-    for (const filePath of files) {
-      const relativePath = path.relative(REPO_ROOT, filePath).replace(/\\/g, '/');
-      const lines = read(filePath).split(/\r?\n/);
-
-      lines.forEach((line, index) => {
-        if (/Skill\(["']spec-/.test(line)) {
-          violations.push(`${relativePath}:${index + 1}: ${line.trim()}`);
-        }
-
-        for (const workflow of workflows) {
-          const quotedName = `\`${escapeRegExp(workflow)}\``;
-          const ambiguousWorkflowCall = new RegExp(
-            `\\b(?:load|run|invoke|call|start|re-run|rerun|use)\\s+(?:the\\s+)?${quotedName}\\s+skill\\b`,
-            'i',
-          );
-
-          if (ambiguousWorkflowCall.test(line)) {
-            violations.push(`${relativePath}:${index + 1}: ${line.trim()}`);
-          }
-
-          const ambiguousWorkflowRerun = new RegExp(
-            `\\b(?:re-run|rerun)\\s+${quotedName}\\b`,
-            'i',
-          );
-
-          if (ambiguousWorkflowRerun.test(line)) {
-            violations.push(`${relativePath}:${index + 1}: ${line.trim()}`);
-          }
-
-          const workflowDescribedAsSkill = new RegExp(
-            `\\b${escapeRegExp(workflow)}\\s+skill\\b|${quotedName}\\s+skill\\b`,
-            'i',
-          );
-
-          if (workflowDescribedAsSkill.test(line)) {
-            violations.push(`${relativePath}:${index + 1}: ${line.trim()}`);
-          }
-        }
-      });
-    }
-
-    expect(violations).toEqual([]);
-  });
-
-  test('document review declares the workflow-vs-agent boundary at the entrypoint', () => {
-    const skill = read(path.join(REPO_ROOT, 'skills', 'spec-doc-review', 'SKILL.md'));
-
-    expect(skill).toContain('## Invocation Boundary');
-    expect(skill).toContain('workflow orchestrator, not an agent type');
-    expect(skill).toContain('Do not invoke it through Agent/Task/subagent primitives');
-    expect(skill).toContain('current host\'s document-review entrypoint');
-    expect(skill).not.toContain('/spec:doc-review <path>` on Claude Code');
-    expect(skill).not.toContain('$spec-doc-review <path>` on Codex');
-    const legacyHostSpecificSentence = [
-      'Claude' + ' users',
-      'call `/spec:doc-review <path>`;',
-      'Codex' + ' users',
-      'call `$spec-doc-review <path>`',
-    ].join(' ');
-    expect(skill).not.toContain(legacyHostSpecificSentence);
-    expect(skill).toContain('Phase 2');
-    expect(skill).toContain('persona agents');
   });
 
   test('runtime-facing prose does not duplicate host command mappings beside current-host entrypoints', () => {

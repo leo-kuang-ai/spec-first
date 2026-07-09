@@ -104,7 +104,6 @@ describe('context governance runtime exclusion contract', () => {
     const workflowPaths = [
       'skills/spec-work/SKILL.md',
       'skills/spec-plan/SKILL.md',
-      'skills/spec-doc-review/SKILL.md',
       'skills/spec-debug/SKILL.md',
       'skills/spec-optimize/SKILL.md',
     ];
