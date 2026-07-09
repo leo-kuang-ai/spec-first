@@ -1,14 +1,15 @@
 #!/usr/bin/env node
-const { execFileSync, spawn } = require("node:child_process")
-const fs = require("node:fs")
-const http = require("node:http")
-const path = require("node:path")
+import { execFileSync, spawn } from "node:child_process"
+import fs from "node:fs"
+import http from "node:http"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 
-const scriptPath = __filename
+const scriptPath = fileURLToPath(import.meta.url)
 const DEFAULT_HOST = "127.0.0.1"
 const DEFAULT_URL_HOST = "localhost"
-const IDLE_TIMEOUT_MS = Number(process.env.SPEC_FIRST_VISUAL_PROBE_IDLE_TIMEOUT_MS) || 30 * 60 * 1000
-const LIFECYCLE_CHECK_MS = Number(process.env.SPEC_FIRST_VISUAL_PROBE_LIFECYCLE_CHECK_MS) || 60 * 1000
+const IDLE_TIMEOUT_MS = Number(process.env.CE_VISUAL_PROBE_IDLE_TIMEOUT_MS) || 30 * 60 * 1000
+const LIFECYCLE_CHECK_MS = Number(process.env.CE_VISUAL_PROBE_LIFECYCLE_CHECK_MS) || 60 * 1000
 
 function usage() {
   return [
@@ -195,7 +196,7 @@ function wrapFragment(options, content) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spec-First Brainstorm Visual Probe</title>
+  <title>CE Brainstorm Visual Probe</title>
   <style>
     body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f7f7f8; color: #1f2328; }
     header { padding: 10px 18px; border-bottom: 1px solid #d8dee4; background: #fff; color: #57606a; font-size: 13px; }
@@ -203,7 +204,7 @@ function wrapFragment(options, content) {
   </style>
 </head>
 <body>
-  <header>Spec-First Brainstorm Visual Probe - directional sketch, reply in chat</header>
+  <header>CE Brainstorm Visual Probe - directional sketch, reply in chat</header>
   <main>${content}</main>
   ${refreshScript(options)}
 </body>
@@ -414,4 +415,4 @@ async function main() {
   }
 }
 
-main()
+await main()

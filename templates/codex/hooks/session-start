@@ -3,7 +3,7 @@
 
 const FALLBACK_CONTEXT = [
   '[spec-first] using-spec-first SessionStart injection',
-  'Managed using-spec-first bootstrap could not be inspected from `AGENTS.md`.',
+  'Managed language/governance workflow entry guidance could not be inspected from `AGENTS.md`.',
   'Run `spec-first doctor --codex` in this project to inspect the managed SessionStart hook.',
 ].join('\n');
 
@@ -29,12 +29,14 @@ async function main() {
   const projectDir = process.env.CODEX_PROJECT_DIR || process.cwd();
   const instructionPath = path.join(projectDir, 'AGENTS.md');
   const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
-  const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
-  const BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
+  const LANG_START = '<!-- spec-first:lang:start -->';
+  const LANG_END = '<!-- spec-first:lang:end -->';
+  const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
+  const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
   const missingMessage = [
     '[spec-first] using-spec-first SessionStart injection',
-    'Managed using-spec-first bootstrap is missing from `AGENTS.md`.',
-    'Run `spec-first init` in this project and choose Codex when prompted to restore the managed bootstrap block.',
+    'Managed language/governance workflow entry guidance is missing from `AGENTS.md`.',
+    'Run `spec-first init` in this project and choose Codex when prompted to restore the managed language/governance block.',
   ].join('\n');
 
   let additionalContext = missingMessage;
@@ -42,25 +44,22 @@ async function main() {
   // or a TOCTOU delete degrades to a pointer instead of throwing and aborting the hook.
   const instructionBody = readInstructionBody(instructionPath);
   if (instructionBody !== null) {
-    const startIdx = instructionBody.indexOf(BOOTSTRAP_START);
-    const endIdx = instructionBody.indexOf(BOOTSTRAP_END);
+    const status = inspectWorkflowEntryGuidance(instructionBody);
 
-    if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-      // AGENTS.md already carries the managed bootstrap block; inject a short pointer.
+    if (status.installed) {
+      // AGENTS.md already carries the managed language/governance block; inject a short pointer.
       additionalContext = [
         '[spec-first] using-spec-first SessionStart injection',
-        "Workflow entry governance is active in this repo's AGENTS.md (using-spec-first managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+        "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
         'Full routing policy: skills/using-spec-first/SKILL.md.',
       ].join('\n');
+    } else {
+      additionalContext = [
+        '[spec-first] using-spec-first SessionStart injection',
+        status.message,
+        'Run `spec-first init` in this project and choose Codex when prompted to restore the managed language/governance block.',
+      ].join('\n');
     }
-  }
-
-  if (additionalContext === missingMessage && instructionBody !== null) {
-    additionalContext = [
-      '[spec-first] using-spec-first SessionStart injection',
-      'Managed using-spec-first bootstrap markers are missing or incomplete in `AGENTS.md`.',
-      'Run `spec-first init` in this project and choose Codex when prompted to restore the managed bootstrap block.',
-    ].join('\n');
   }
 
   const startupReminder = readStartupReminder(projectDir);
@@ -80,6 +79,48 @@ async function main() {
     } catch {
       return null;
     }
+  }
+
+  function inspectWorkflowEntryGuidance(body) {
+    const legacyStartIdx = body.indexOf(LEGACY_BOOTSTRAP_START);
+    const legacyEndIdx = body.indexOf(LEGACY_BOOTSTRAP_END);
+    if (legacyStartIdx !== -1 || legacyEndIdx !== -1) {
+      if (legacyStartIdx === -1 || legacyEndIdx === -1 || legacyEndIdx <= legacyStartIdx) {
+        return {
+          installed: false,
+          message: 'Legacy standalone bootstrap markers are incomplete in `AGENTS.md`.',
+        };
+      }
+      return {
+        installed: false,
+        message: 'Legacy standalone using-spec-first bootstrap should be merged into the `spec-first:lang` block in `AGENTS.md`.',
+      };
+    }
+
+    const langStartIdx = body.indexOf(LANG_START);
+    const langEndIdx = body.indexOf(LANG_END);
+    if (langStartIdx === -1 && langEndIdx === -1) {
+      return {
+        installed: false,
+        message: 'Managed language/governance block is missing from `AGENTS.md`.',
+      };
+    }
+    if (langStartIdx === -1 || langEndIdx === -1 || langEndIdx <= langStartIdx) {
+      return {
+        installed: false,
+        message: 'Managed language/governance markers are incomplete in `AGENTS.md`.',
+      };
+    }
+
+    const managedBlock = body.slice(langStartIdx, langEndIdx + LANG_END.length);
+    if (managedBlock.includes('`using-spec-first`') &&
+      managedBlock.includes('skills/using-spec-first/SKILL.md')) {
+      return { installed: true };
+    }
+    return {
+      installed: false,
+      message: 'Workflow entry guidance is missing from the `spec-first:lang` block in `AGENTS.md`.',
+    };
   }
 
   function readStartupReminder(cwd) {

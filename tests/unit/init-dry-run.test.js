@@ -8,6 +8,7 @@ const { execFileSync } = require('node:child_process');
 const { buildInitWritePlan, printInitDryRun } = require('../../src/cli/commands/init');
 const { getAdapter } = require('../../src/cli/adapters');
 const { buildBootstrapBlock } = require('../../src/cli/instruction-bootstrap');
+const { buildManagedBlock } = require('../../src/cli/lang-policy');
 const {
   SPEC_FIRST_GITIGNORE_START,
   buildSpecFirstGitignoreBlock,
@@ -599,10 +600,45 @@ describe('init --dry-run', () => {
       expect(claudeInstruction).toContain('# Existing Windows Notes');
       expect(claudeInstruction).toContain('User note with CRLF.');
       expect(claudeInstruction).toContain('<!-- spec-first:lang:start -->');
-      expect(claudeInstruction).toContain('<!-- spec-first:bootstrap:start -->');
+      expect(claudeInstruction).toContain('### Workflow 入口治理');
+      expect(claudeInstruction).toContain('完整入口路由与边界在 `skills/using-spec-first/SKILL.md`');
+      expect(claudeInstruction).not.toContain('<!-- spec-first:bootstrap:start -->');
       expect(claudeInstruction).not.toContain('<!-- spec-first:coding-guidelines:start -->');
       expect(countLiteral(claudeInstruction, '<!-- spec-first:lang:start -->')).toBe(1);
-      expect(countLiteral(claudeInstruction, '<!-- spec-first:bootstrap:start -->')).toBe(1);
+      expect(countLiteral(claudeInstruction, '<!-- spec-first:bootstrap:start -->')).toBe(0);
+    } finally {
+      initLogSpy.mockRestore();
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('init migrates legacy standalone bootstrap into the language/governance block', () => {
+    const projectRoot = makeTempDir();
+    const initLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      fs.writeFileSync(
+        path.join(projectRoot, 'AGENTS.md'),
+        [
+          '# Existing Codex Notes',
+          '',
+          buildManagedBlock('zh').replace('### Workflow 入口治理\n- 本 block 同时提供 `using-spec-first` source pointer；完整入口路由与边界在 `skills/using-spec-first/SKILL.md`。\n', ''),
+          '',
+          buildBootstrapBlock(getAdapter('codex'), 'zh'),
+          '',
+        ].join('\n'),
+        'utf8',
+      );
+
+      expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'codex' }))).toBe(0);
+      expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'codex' }))).toBe(0);
+
+      const codexInstruction = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
+      expect(codexInstruction).toContain('# Existing Codex Notes');
+      expect(countLiteral(codexInstruction, '<!-- spec-first:lang:start -->')).toBe(1);
+      expect(countLiteral(codexInstruction, '<!-- spec-first:bootstrap:start -->')).toBe(0);
+      expect(codexInstruction).toContain('### Workflow 入口治理');
+      expect(codexInstruction).toContain('完整入口路由与边界在 `skills/using-spec-first/SKILL.md`');
     } finally {
       initLogSpy.mockRestore();
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -734,7 +770,8 @@ describe('init --dry-run', () => {
       expect(codexInstruction).toContain('# Existing Codex Notes');
       expect(codexInstruction).toContain('User note from Windows editor.');
       expect(countLiteral(codexInstruction, '<!-- spec-first:lang:start -->')).toBe(1);
-      expect(countLiteral(codexInstruction, '<!-- spec-first:bootstrap:start -->')).toBe(1);
+      expect(codexInstruction).toContain('### Workflow 入口治理');
+      expect(countLiteral(codexInstruction, '<!-- spec-first:bootstrap:start -->')).toBe(0);
       expect(codexInstruction).not.toContain('<!-- spec-first:coding-guidelines:start -->');
       expect(fs.existsSync(path.join(projectRoot, '.codex', 'spec-first', 'state.json'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.codex', 'spec-first', '.developer'))).toBe(false);
@@ -745,14 +782,18 @@ describe('init --dry-run', () => {
     }
   });
 
-  test('generated bootstrap keeps thin workspace guidance equivalent across hosts', () => {
-    const codexBlock = buildBootstrapBlock(getAdapter('codex'), 'zh');
-    const claudeBlock = buildBootstrapBlock(getAdapter('claude'), 'zh');
+  test('merged language/governance block keeps thin workspace guidance', () => {
+    const codexBlock = buildManagedBlock('zh');
+    const claudeBlock = buildManagedBlock('zh');
 
     expect(codexBlock).toContain('source pointer');
     expect(claudeBlock).toContain('source pointer');
+    expect(codexBlock).toContain('### Workflow 入口治理');
+    expect(claudeBlock).toContain('### Workflow 入口治理');
     expect(codexBlock).not.toContain('L0 启动锚点');
     expect(claudeBlock).not.toContain('L0 启动锚点');
+    expect(codexBlock).not.toContain('<!-- spec-first:bootstrap:start -->');
+    expect(claudeBlock).not.toContain('<!-- spec-first:bootstrap:start -->');
     expect(codexBlock).not.toContain('target_repo');
     expect(claudeBlock).not.toContain('target_repo');
     expect(codexBlock).not.toContain('父级多仓 workspace');

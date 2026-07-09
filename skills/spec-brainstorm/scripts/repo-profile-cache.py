@@ -23,7 +23,7 @@ stamp, and writes it atomically to the computed cache path. Prints the path
 on success, `NO-CACHE` when the repo/cache is unavailable.
 
 Cache path:
-    /tmp/spec-first/repo-profile/<root-sha>/<head-sha>.json
+    /tmp/compound-engineering/repo-profile/<root-sha>/<head-sha>.json
   root-sha = lexicographically-first `git rev-list --max-parents=0 HEAD`
              (deterministic even for multi-root histories) — the repo identity,
              shared across worktrees and clones.
@@ -55,7 +55,7 @@ from datetime import datetime, timezone
 # entry written under an older (narrower) schema.
 PROFILE_SCHEMA_VERSION = "1"
 
-CACHE_ROOT = "/tmp/spec-first/repo-profile"
+CACHE_ROOT = "/tmp/compound-engineering/repo-profile"
 
 # --- Profile-input set (the schema-derived superset, per the plan's R3) -------
 # Any change to one of these — including a NEW untracked file — must invalidate

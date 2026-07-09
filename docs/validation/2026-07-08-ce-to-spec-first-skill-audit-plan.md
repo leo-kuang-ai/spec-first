@@ -55,7 +55,7 @@ CE 是迁移能力的语义基准：
 | `ce-worktree` | `spec-worktree` | 内部 worktree helper，支持隔离并行工程任务 | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
 | `lfg` | `spec-lfg` | 从计划到绿色 PR 的完整 hands-off 工程流水线 | 直接映射，full pipeline 关键 | 已完成 | 已审查 |
 | `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
-| `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 |  |  |
+| `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 | 已完成 | 已审查 |
 | `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
 | `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
 | `ce-ideate` | `spec-ideate` | 生成并评估项目上下文内的改进想法 | 直接映射，与 brainstorm 的边界关键 | 已完成 | 已审查 |
@@ -231,7 +231,7 @@ done
 1. `ce-brainstorm` -> `spec-brainstorm`
 2. `ce-plan` -> `spec-plan`
 3. `ce-doc-review` -> `spec-doc-review`
-4. `ce-code-review` -> `spec-code-review`
+4. `ce-code-review` -> `spec-code-review`（已完成）
 5. `ce-work` -> `spec-work`
 6. `ce-ideate` -> `spec-ideate`（已完成）
 7. `lfg` -> `spec-lfg`
@@ -797,6 +797,76 @@ done
 | plugin version display | `scripts/check-health` | spec-first version / runtime facts 可选展示，不作为核心产物 | 部分覆盖 | 版本可辅助诊断，但 setup 的可靠产物应是 readiness facts 与 next actions；不要把版本展示当作安装成功证据 | `spec-first --version`、`tool-facts.json` advisory facts |
 
 ## Batch 4 核心链路深审记录
+
+### `ce-code-review` -> `spec-code-review`
+
+#### Verdict
+
+- status: replaced
+- risk: high
+- decision: 按用户裁决，`spec-code-review` 以 CE `ce-code-review` source 为真相源重建，再做最小 spec-first 投影。保留 CE 的 `mode:agent` JSON 合同、interactive safe apply/commit、small-diff lite gate、multi-persona fanout、cross-model adversarial pass、repo-profile cache、plan completeness check、Stage 5 merge/dedup/validation/apply/synthesis 和 Actionable Findings summary。不保留上一版 spec-first 的 `Workflow Contract Summary`、graph-assisted review contract、`mode:autofix` / `mode:report-only` / `mode:headless` 主模式、bulk preview / tracker-defer / walkthrough references 与 `resolve-base.sh` 作为 active contract。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/action-class-rubric.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/agents/repo-profiler.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/cross-model-review.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/diff-scope.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/findings-schema.json`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/persona-catalog.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/personas/*.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/repo-profile-cache.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/review-output-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/subagent-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/validator-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/scripts/cross-model-adversarial-review.sh`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/scripts/repo-profile-cache.py`
+- spec-first: `skills/spec-code-review/SKILL.md`
+- spec-first: `skills/spec-code-review/references/action-class-rubric.md`
+- spec-first: `skills/spec-code-review/references/agents/repo-profiler.md`
+- spec-first: `skills/spec-code-review/references/*.md`
+- spec-first: `skills/spec-code-review/references/personas/*.md`
+- spec-first: `skills/spec-code-review/scripts/cross-model-adversarial-review.sh`
+- spec-first: `skills/spec-code-review/scripts/repo-profile-cache.py`
+
+#### Preserved Capabilities
+
+- 保留 CE 的入口参数：`mode:agent` 为 pipeline/report-only JSON，`mode:headless` 仅作为 deprecated alias；默认模式仍可应用 safe verified fixes，并在 clean pre-review tree 时 commit。
+- 保留 CE 的 scope 解析：PR/branch/base/current checkout、untracked exclusion、remote PR/branch read-only inspection、`plan:<path>` readiness 与 implementation-unit completeness。
+- 保留 CE 的 reviewer 结构：4 个 structured always-on persona、2 个 always-on local prompt assets、cross-cutting / stack-specific conditional persona、migration-specific `deployment-verification-agent`。
+- 保留 CE 的 Stage 3c small-diff lite gate：低风险小 diff 可收缩 roster，`depth:full` 可强制 full roster。
+- 保留 CE 的跨模型 adversarial pass：通过 `scripts/cross-model-adversarial-review.sh` 调用 peer Codex/Claude，非阻塞写入 `adversarial-<peer>.json`。
+- 保留 CE 的 repo-profile cache：`repo-profiler` 只产 question-agnostic profile，`repo-profile-cache.py` 只做 deterministic get/put，不把语义判断放进脚本。
+- 保留 CE 的 Stage 5 synthesis：schema normalization、dedup、confidence/action-class routing、independent validator、safe apply、Coverage 与 JSON/Markdown 双输出。
+
+#### Intentional Spec-First Divergences
+
+- `ce-code-review`、`ce-work`、`ce-brainstorm`、`ce-plan`、`ce-doc-review`、`ce-simplify-code`、`ce-compound`、`ce-commit` 等入口和消费者投影为 `spec-*`。
+- `/tmp/compound-engineering/ce-code-review` 投影为 `/tmp/spec-first/spec-code-review`。
+- `/tmp/compound-engineering/repo-profile` 投影为 `/tmp/spec-first/repo-profile`。
+- `.compound-engineering` 投影为 `.spec-first`。
+- `artifact_contract: ce-unified-plan/v1` 投影为 `artifact_contract: spec-unified-plan/v1`。
+- `CE local prompt assets` / `CE conditional local prompt assets` 等术语投影为 `spec-first local prompt assets`。
+- `learnings-researcher.md` 的 module search 从 `compound-engineering|skill-design` 投影为 `spec-first|skill-design`。
+
+#### Test Contract Cleanup
+
+- 删除 `skills/spec-code-review/evals/examples.json`：CE `ce-code-review` 中不存在该 eval，不能用上一版 spec-first-only examples-as-context 限制 CE-first 主流程。
+- 删除 `references/bulk-preview.md`、`references/tracker-defer.md`、`references/walkthrough.md`、`scripts/resolve-base.sh`：这些是旧 spec-first contract 的运行时依赖，CE 真相源未定义；迁移后不作为 active local asset。
+- 若后续 focused test 因上述旧文件或旧模式失败，应按用户裁决删除或收窄测试，不反向恢复 CE 中不存在的行为。
+
+#### Verification Status
+
+- 已逐个打开 `skills/spec-code-review` 下 29 个 source 文件审查：`SKILL.md`、9 个顶层 `references/*.md` / schema / template 文件、16 个 `references/personas/*.md`、`references/agents/repo-profiler.md` 和 2 个 scripts。
+- 已运行 CE/spec 目录 diff，确认差异集中在 `ce-*` -> `spec-*`、`.compound-engineering` -> `.spec-first`、`/tmp/compound-engineering/...` -> `/tmp/spec-first/...`、artifact contract 和 local prompt asset 术语的必要投影。
+- 已运行 focused residual scan，确认 `skills/spec-code-review` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留。
+- 已核对 CE/spec 文件数量与文件名集合：两侧均为 29 个文件，集合一致。
+- 已运行 `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-code-review/scripts/repo-profile-cache.py`。
+- 已运行 `bash -n skills/spec-code-review/scripts/cross-model-adversarial-review.sh`。
+- 已运行 `npm run lint:skill-entrypoints`。
+- 已运行 `npx jest tests/unit/repo-profile-cache-parity.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/changelog-format.test.js --runInBand`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-code-review`。
 
 ### `ce-ideate` -> `spec-ideate`
 

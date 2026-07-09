@@ -140,7 +140,7 @@ function removeManagedBootstrapBlock(existing) {
     return normalizeRemovalResult(stripKnownBootstrapBodies(stripStandaloneMarkerLines(existing)));
   }
 
-  return normalizeRemovalResult(existing);
+  return normalizeRemovalResult(stripKnownBootstrapBodies(existing, { legacyHeadingsOnly: true }));
 }
 
 function buildBootstrapBlock(adapterOrId, lang = 'zh') {

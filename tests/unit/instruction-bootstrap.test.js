@@ -360,24 +360,31 @@ describe('instruction bootstrap', () => {
     expect(updated).not.toContain('This repository enables spec-first workflow entry governance');
   });
 
-  test('inspects installed and drifted bootstrap blocks', () => {
+  test('inspects merged workflow guidance and legacy standalone bootstrap drift', () => {
     const projectRoot = makeTempDir();
     const adapter = getAdapter('claude');
 
     try {
-      writeInstructionBootstrap(projectRoot, adapter, 'zh');
+      fs.writeFileSync(path.join(projectRoot, adapter.instructionFile), buildManagedBlock('zh'), 'utf8');
       expect(inspectInstructionBootstrap(projectRoot, adapter)).toEqual({
         status: 'installed',
-        message: 'managed bootstrap block present',
+        message: 'workflow entry guidance present in the spec-first:lang block',
       });
 
       const filePath = path.join(projectRoot, adapter.instructionFile);
-      const drifted = fs.readFileSync(filePath, 'utf8').replace('source pointer', 'workflow 判定');
+      const drifted = fs.readFileSync(filePath, 'utf8')
+        .replace('skills/using-spec-first/SKILL.md', 'skills/legacy-router/SKILL.md');
       fs.writeFileSync(filePath, drifted, 'utf8');
 
       expect(inspectInstructionBootstrap(projectRoot, adapter)).toEqual({
         status: 'drifted',
-        message: 'managed bootstrap block drifted from the bundled template',
+        message: 'workflow entry guidance missing from the spec-first:lang block',
+      });
+
+      writeInstructionBootstrap(projectRoot, adapter, 'zh');
+      expect(inspectInstructionBootstrap(projectRoot, adapter)).toEqual({
+        status: 'drifted',
+        message: 'standalone bootstrap block should be merged into the spec-first:lang block',
       });
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -387,17 +394,21 @@ describe('instruction bootstrap', () => {
   test('checked-in host instruction bootstrap matches the current generator', () => {
     expect(inspectInstructionBootstrap(REPO_ROOT, getAdapter('claude'))).toEqual({
       status: 'installed',
-      message: 'managed bootstrap block present',
+      message: 'workflow entry guidance present in the spec-first:lang block',
     });
     expect(inspectInstructionBootstrap(REPO_ROOT, getAdapter('codex'))).toEqual({
       status: 'installed',
-      message: 'managed bootstrap block present',
+      message: 'workflow entry guidance present in the spec-first:lang block',
     });
 
-    expect(managedBootstrapBlock(fs.readFileSync(path.join(REPO_ROOT, 'CLAUDE.md'), 'utf8')))
-      .toBe(buildBootstrapBlock('claude', 'zh'));
-    expect(managedBootstrapBlock(fs.readFileSync(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8')))
-      .toBe(buildBootstrapBlock('codex', 'zh'));
+    for (const instructionFile of ['CLAUDE.md', 'AGENTS.md']) {
+      const content = fs.readFileSync(path.join(REPO_ROOT, instructionFile), 'utf8');
+      expect(content).toContain('<!-- spec-first:lang:start -->');
+      expect(content).toContain('### Workflow 入口治理');
+      expect(content).toContain('skills/using-spec-first/SKILL.md');
+      expect(content).not.toContain(BOOTSTRAP_START);
+      expect(content).not.toContain(BOOTSTRAP_END);
+    }
   });
 
   test('shared AGENTS hosts render the same bootstrap block', () => {

@@ -14,12 +14,14 @@ const path = require('node:path');
 const projectDir = resolveProjectDir();
 const instructionPath = path.join(projectDir, 'CLAUDE.md');
 const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
-const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
-const BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
+const LANG_START = '<!-- spec-first:lang:start -->';
+const LANG_END = '<!-- spec-first:lang:end -->';
+const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
+const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
 const missingMessage = [
   '[spec-first] using-spec-first SessionStart injection',
-  'Managed using-spec-first bootstrap is missing from `CLAUDE.md`.',
-  'Run `spec-first init` in this project and choose Claude Code when prompted to restore the managed bootstrap block.',
+  'Managed language/governance workflow entry guidance is missing from `CLAUDE.md`.',
+  'Run `spec-first init` in this project and choose Claude Code when prompted to restore the managed language/governance block.',
 ].join('\n');
 
 let additionalContext = missingMessage;
@@ -27,28 +29,25 @@ let additionalContext = missingMessage;
 // or a TOCTOU delete degrades to a pointer instead of throwing and aborting the hook.
 const instructionBody = readInstructionBody(instructionPath);
 if (instructionBody !== null) {
-  const startIdx = instructionBody.indexOf(BOOTSTRAP_START);
-  const endIdx = instructionBody.indexOf(BOOTSTRAP_END);
+  const status = inspectWorkflowEntryGuidance(instructionBody);
 
-  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-    // The managed bootstrap block already lives in CLAUDE.md, which Claude loads at
+  if (status.installed) {
+    // The managed language/governance block already lives in CLAUDE.md, which Claude loads at
     // session start, so re-injecting its full body here would duplicate it verbatim.
     // Emit a short pointer instead: keep the workflow-entry trigger and the parent
     // multi-repo target_repo boundary salient without paying the duplication cost.
     additionalContext = [
       '[spec-first] using-spec-first SessionStart injection',
-      "Workflow entry governance is active in this repo's CLAUDE.md (using-spec-first managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+      "Workflow entry governance is active in this repo's CLAUDE.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
       'Full routing policy: skills/using-spec-first/SKILL.md.',
     ].join('\n');
+  } else {
+    additionalContext = [
+      '[spec-first] using-spec-first SessionStart injection',
+      status.message,
+      'Run `spec-first init` in this project and choose Claude Code when prompted to restore the managed language/governance block.',
+    ].join('\n');
   }
-}
-
-if (additionalContext === missingMessage && instructionBody !== null) {
-  additionalContext = [
-    '[spec-first] using-spec-first SessionStart injection',
-    'Managed using-spec-first bootstrap markers are missing or incomplete in `CLAUDE.md`.',
-    'Run `spec-first init` in this project and choose Claude Code when prompted to restore the managed bootstrap block.',
-  ].join('\n');
 }
 
 const startupReminder = readStartupReminder(projectDir);
@@ -85,6 +84,48 @@ function readInstructionBody(filePath) {
   } catch {
     return null;
   }
+}
+
+function inspectWorkflowEntryGuidance(body) {
+  const legacyStartIdx = body.indexOf(LEGACY_BOOTSTRAP_START);
+  const legacyEndIdx = body.indexOf(LEGACY_BOOTSTRAP_END);
+  if (legacyStartIdx !== -1 || legacyEndIdx !== -1) {
+    if (legacyStartIdx === -1 || legacyEndIdx === -1 || legacyEndIdx <= legacyStartIdx) {
+      return {
+        installed: false,
+        message: 'Legacy standalone bootstrap markers are incomplete in `CLAUDE.md`.',
+      };
+    }
+    return {
+      installed: false,
+      message: 'Legacy standalone using-spec-first bootstrap should be merged into the `spec-first:lang` block in `CLAUDE.md`.',
+    };
+  }
+
+  const langStartIdx = body.indexOf(LANG_START);
+  const langEndIdx = body.indexOf(LANG_END);
+  if (langStartIdx === -1 && langEndIdx === -1) {
+    return {
+      installed: false,
+      message: 'Managed language/governance block is missing from `CLAUDE.md`.',
+    };
+  }
+  if (langStartIdx === -1 || langEndIdx === -1 || langEndIdx <= langStartIdx) {
+    return {
+      installed: false,
+      message: 'Managed language/governance markers are incomplete in `CLAUDE.md`.',
+    };
+  }
+
+  const managedBlock = body.slice(langStartIdx, langEndIdx + LANG_END.length);
+  if (managedBlock.includes('`using-spec-first`') &&
+    managedBlock.includes('skills/using-spec-first/SKILL.md')) {
+    return { installed: true };
+  }
+  return {
+    installed: false,
+    message: 'Workflow entry guidance is missing from the `spec-first:lang` block in `CLAUDE.md`.',
+  };
 }
 
 function readStartupReminder(cwd) {

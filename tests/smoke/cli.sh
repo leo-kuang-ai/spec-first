@@ -267,7 +267,12 @@ if (state.agents.length !== Number(agentCount)) throw new Error('agent count mis
 if (state.developer) throw new Error('state should no longer track developer profile');
 NODE
 grep -q '<!-- spec-first:lang:start -->' "$TMP_DIR/CLAUDE.md"
-grep -q '<!-- spec-first:bootstrap:start -->' "$TMP_DIR/CLAUDE.md"
+grep -q '### Workflow 入口治理' "$TMP_DIR/CLAUDE.md"
+grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/CLAUDE.md"
+if grep -q '<!-- spec-first:bootstrap:start -->' "$TMP_DIR/CLAUDE.md"; then
+  echo "legacy standalone bootstrap block should not be injected into CLAUDE.md" >&2
+  exit 1
+fi
 if grep -q '<!-- spec-first:coding-guidelines:start -->' "$TMP_DIR/CLAUDE.md"; then
   echo "retired coding-guidelines block should not be injected into CLAUDE.md" >&2
   exit 1
@@ -362,14 +367,20 @@ for agent in spec-repo-research-analyst.agent.md; do
   test -f "$TMP_DIR/.codex/agents/$agent"
 done
 grep -q '<!-- spec-first:lang:start -->' "$TMP_DIR/AGENTS.md"
-grep -q '<!-- spec-first:bootstrap:start -->' "$TMP_DIR/AGENTS.md"
+grep -q '### Workflow 入口治理' "$TMP_DIR/AGENTS.md"
+grep -q 'skills/using-spec-first/SKILL.md' "$TMP_DIR/AGENTS.md"
+if grep -q '<!-- spec-first:bootstrap:start -->' "$TMP_DIR/AGENTS.md"; then
+  echo "legacy standalone bootstrap block should not be injected into AGENTS.md" >&2
+  exit 1
+fi
 if grep -q '<!-- spec-first:coding-guidelines:start -->' "$TMP_DIR/AGENTS.md"; then
   echo "retired coding-guidelines block should not be injected into AGENTS.md" >&2
   exit 1
 fi
-grep -q 'spec-first startup-reminder --codex' "$TMP_DIR/AGENTS.md"
-grep -q 'must not block routing' "$TMP_DIR/AGENTS.md"
-grep -q 'bounded subagents, leaf reviewers, and worker agents' "$TMP_DIR/AGENTS.md"
+if grep -q 'spec-first startup-reminder --codex' "$TMP_DIR/AGENTS.md"; then
+  echo "Codex startup reminder prose should stay out of AGENTS.md managed language/governance block" >&2
+  exit 1
+fi
 test -f "$TMP_DIR/.codex/hooks/session-start"
 test -f "$TMP_DIR/.codex/hooks/session-start.cmd"
 test -f "$TMP_DIR/.codex/hooks.json"

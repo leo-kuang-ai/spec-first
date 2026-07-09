@@ -6,6 +6,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const { getAdapter } = require('../../src/cli/adapters');
+const { buildManagedBlock } = require('../../src/cli/lang-policy');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const TRUSTED_CLI_PATH = path.join(REPO_ROOT, 'bin', 'spec-first.js');
@@ -650,19 +651,14 @@ describe('Codex SessionStart hook runtime plan', () => {
 });
 
 describe('Codex SessionStart hook script', () => {
-  test('emits a short governance pointer without re-injecting the AGENTS bootstrap block', () => {
+  test('emits a short governance pointer without re-injecting the AGENTS language/governance block', () => {
     const projectRoot = makeTempDir();
 
     try {
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
         '# AGENTS.md',
         '',
-        '<!-- spec-first:bootstrap:start -->',
-        '## Workflow entry governance',
-        '',
-        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
-        '- Keep writes bounded to target_repo.',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('en'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedCodexHook(projectRoot, (content) => (
@@ -684,15 +680,15 @@ describe('Codex SessionStart hook script', () => {
       expect(ctx).toContain('target_repo');
       expect(ctx).toContain('skills/using-spec-first/SKILL.md');
       // AGENTS.md already carries the block; the hook must not duplicate its body.
-      expect(ctx).not.toContain('## Workflow entry governance');
-      expect(ctx).not.toContain('- Codex workflow entrypoints use same-name `spec-*` Skills.');
+      expect(ctx).not.toContain('### Workflow Entry Governance');
+      expect(ctx).not.toContain('Language rules are an absolute hard-execution requirement');
       expect(ctx).not.toContain('before editing');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
   });
 
-  test('degrades non-blockingly when the AGENTS bootstrap block is missing', () => {
+  test('degrades non-blockingly when the AGENTS language/governance block is missing', () => {
     const projectRoot = makeTempDir();
 
     try {
@@ -709,7 +705,7 @@ describe('Codex SessionStart hook script', () => {
       expect(result.stderr).toBe('');
       const payload = JSON.parse(result.stdout);
       expect(payload.hookSpecificOutput.hookEventName).toBe('SessionStart');
-      expect(payload.hookSpecificOutput.additionalContext).toContain('Managed using-spec-first bootstrap is missing from `AGENTS.md`.');
+      expect(payload.hookSpecificOutput.additionalContext).toContain('Managed language/governance block is missing from `AGENTS.md`.');
       expect(payload.hookSpecificOutput.additionalContext).toContain('spec-first init');
       expect(payload.hookSpecificOutput.additionalContext).toContain('choose Codex');
     } finally {
@@ -717,7 +713,7 @@ describe('Codex SessionStart hook script', () => {
     }
   });
 
-  test('degrades non-blockingly when AGENTS bootstrap markers are incomplete', () => {
+  test('degrades non-blockingly when AGENTS legacy bootstrap markers are incomplete', () => {
     const projectRoot = makeTempDir();
 
     try {
@@ -740,7 +736,7 @@ describe('Codex SessionStart hook script', () => {
       expect(result.stderr).toBe('');
       const payload = JSON.parse(result.stdout);
       expect(payload.hookSpecificOutput.hookEventName).toBe('SessionStart');
-      expect(payload.hookSpecificOutput.additionalContext).toContain('markers are missing or incomplete in `AGENTS.md`');
+      expect(payload.hookSpecificOutput.additionalContext).toContain('Legacy standalone bootstrap markers are incomplete in `AGENTS.md`');
       expect(payload.hookSpecificOutput.additionalContext).toContain('choose Codex');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -777,9 +773,7 @@ describe('Codex SessionStart hook script', () => {
 
     try {
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
-        '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('en'),
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedCodexHook(projectRoot, (content) => (
         replaceTrustedCliPath(content, path.join(projectRoot, 'missing-spec-first.js'))
@@ -808,9 +802,7 @@ describe('Codex SessionStart hook script', () => {
         type: 'module',
       }, null, 2), 'utf8');
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
-        '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('en'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedCodexHook(projectRoot, (content) => (
@@ -844,9 +836,7 @@ describe('Codex SessionStart hook script', () => {
         '}',
       ].join('\n'), 'utf8');
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
-        '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('en'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedCodexHook(projectRoot, (content) => (
@@ -936,9 +926,7 @@ describe('Codex SessionStart hook script', () => {
 
     try {
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
-        '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('en'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedCodexHook(projectRoot, (content) => (

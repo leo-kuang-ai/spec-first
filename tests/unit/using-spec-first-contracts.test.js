@@ -58,7 +58,8 @@ describe('using-spec-first contracts', () => {
       'dispatch_authorization_missing',
       'scripts/tools 只准备确定性事实；LLM 在事实地板之上判断语义充分性和入口选择',
       '`skills/using-spec-first/SKILL.md` 是 routing policy source of truth',
-      'managed bootstrap block 只是最小入口锚点',
+      '`spec-first:lang` managed block 同时承载最小入口锚点',
+      'docs/contracts/context-governance.md',
       'generated mirrors',
       'spec-first startup-reminder --codex',
       '## Scenario Fingerprints',
@@ -148,7 +149,7 @@ describe('using-spec-first contracts', () => {
       expect(runtime).toContain('公开 workflow 标识统一使用 `spec-*`');
       expect(runtime).toContain('dispatch_authorization_missing');
       expect(runtime).toContain('spec-first startup-reminder --codex');
-      expect(runtime).toContain('managed bootstrap block 只是最小入口锚点');
+      expect(runtime).toContain('`spec-first:lang` managed block 同时承载最小入口锚点');
       expect(runtime).not.toContain('using-superpowers');
       expect(runtime).not.toContain('spec-intake');
     }

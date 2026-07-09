@@ -1,8 +1,10 @@
 # Code Review Output Template
 
-Use this **exact format** when presenting synthesized review findings. Findings are grouped by severity, not by reviewer.
+This is the **canonical skeleton** for *which sections appear and in what order* — copy the section structure; the example below shows one good rendering, not the only permitted layout. Shape each finding for the reader's next action per *Presentation direction* in SKILL.md Stage 6 (what & where / why it matters / what response it needs / how sure; let the shape serve the finding type). Findings are grouped by severity, not by reviewer.
 
-**IMPORTANT:** Use pipe-delimited markdown tables (`| col | col |`). Do NOT use ASCII box-drawing characters. Escape every literal pipe inside a cell as `\|` before rendering; unescaped cell pipes break the table.
+**Hard constraints (non-negotiable; the rest is judgment):** ASCII-safe only — no box-drawing or per-item horizontal-rule separators (`────`), no Unicode arrows or middot; use `->`. Don't paste file contents or re-print the diff — cite `file:line`. Stable `#` numbering, reused wherever a finding reappears. The Verdict and Actionable list are present, last, and self-sufficient.
+
+**If you use a markdown table, escape literal pipe characters in cells.** Any `|` inside a finding title, issue description, code snippet, regex pattern, or delimited-string example (e.g. cache key examples like `userName + "\|" + groups`) must be written as `\|` so column boundaries are determined only by unescaped pipes. Unescaped pipes split the cell across columns and corrupt the row's `Reviewer` and `Confidence` values (and `Route` in the Actionable Findings table).
 
 ## Example
 
@@ -11,53 +13,64 @@ Use this **exact format** when presenting synthesized review findings. Findings 
 
 **Scope:** merge-base with the review base branch -> working tree (14 files, 342 lines)
 **Intent:** Add order export endpoint with CSV and JSON format support
-**Mode:** autofix
-**scope_boundary:** concern
-**authorized_scope_source:** inferred-plan
-**finding_type:** missing_verification
-**graph_assist:** used
-**graph_reason_code:** candidate_results
-**expansion_budget:** max_5_high_impact_symbols
+**Mode:** interactive
 
 **Reviewers:** correctness, testing, maintainability, security, api-contract
 - security -- new public endpoint accepts user-provided format parameter
 - api-contract -- new /api/orders/export route with response schema
 
+### Applied (safe, verified)
+
+| # | File | Fix | Reviewer |
+|---|------|-----|----------|
+| 6 | `export_helper_test.rb:40` | Added missing test for the empty-format branch | testing |
+| 7 | `orders_controller.rb:88` (+test) | Tightened export file perms `0644 -> 0600` (security-posture — verify in diff) | security |
+
+Validation: export tests 11 -> 13; suite 214 pass, lint clean.
+Committed: `fix(review): cover empty-format branch + tighten export perms` (working tree was clean before review).
+
+### Triage Groups
+
+| Group | Findings | Context | Preferred Resolution | Why |
+|-------|----------|---------|----------------------|-----|
+| Export result-set scaling | #2, #3 | Both stem from loading the full order set in one pass | Design the pagination contract first (#3), then stream with `find_each` behind it (#2) | One cursor/page decision resolves the memory bound and the API shape together |
+
 ### P0 -- Critical
 
-| # | File | Issue | Reviewer | Confidence-first | Route |
-|---|------|-------|----------|------------|-------|
-| 1 | `orders_controller.rb:42` | User-supplied ID in account lookup without ownership check | security | 100 | `gated_auto -> downstream-resolver` |
+| # | File | Issue | Reviewer | Confidence |
+|---|------|-------|----------|------------|
+| 1 | `orders_controller.rb:42` | User-supplied ID in lookup, no ownership check | security | 100 |
+
+- **#1** — `find(params[:id])` on the export path has no `where(account: current_account)` scope, so any authenticated user can export another account's orders. Scope the lookup to the current account.
 
 ### P1 -- High
 
-| # | File | Issue | Reviewer | Confidence-first | Route |
-|---|------|-------|----------|------------|-------|
-| 2 | `export_service.rb:87` | Loads all orders into memory -- unbounded for large accounts | performance | 100 | `safe_auto -> review-fixer` |
-| 3 | `export_service.rb:91` | No pagination -- response size grows linearly with order count | api-contract, performance | 75 | `manual -> downstream-resolver` |
+| # | File | Issue | Reviewer | Confidence |
+|---|------|-------|----------|------------|
+| 2 | `export_service.rb:87` | Loads all orders into memory -- unbounded | performance | 100 |
+| 3 | `export_service.rb:91` | No pagination contract | api-contract, performance | 75 |
+
+- **#2** — `Order.where(...).to_a` materializes the full result set; a large account OOMs the worker. Stream with `find_each` or paginate.
+- **#3** — the endpoint returns every row in one response; needs a cursor/page contract before GA. Design decision — see Actionable Findings.
 
 ### P2 -- Moderate
 
-| # | File | Issue | Reviewer | Confidence-first | Route |
-|---|------|-------|----------|------------|-------|
-| 4 | `export_service.rb:45` | Missing error handling for CSV serialization failure | correctness | 75 | `safe_auto -> review-fixer` |
+| # | File | Issue | Reviewer | Confidence |
+|---|------|-------|----------|------------|
+| 4 | `export_service.rb:45` | No error handling for CSV serialization failure | correctness | 75 |
 
 ### P3 -- Low
 
-| # | File | Issue | Reviewer | Confidence-first | Route |
-|---|------|-------|----------|------------|-------|
-| 5 | `export_helper.rb:12` | Format detection could use early return instead of nested conditional | maintainability | 75 | `advisory -> human` |
+| # | File | Issue | Reviewer | Confidence |
+|---|------|-------|----------|------------|
+| 5 | `export_helper.rb:12` | Format detection could use an early return | maintainability | 75 |
 
-### Applied Fixes
+### Actionable Findings
 
-- `safe_auto`: Added bounded export pagination guard and CSV serialization failure test coverage in this run
-
-### Residual Actionable Work
-
-| # | File | Issue | Route | Next Step |
-|---|------|-------|-------|-----------|
-| 1 | `orders_controller.rb:42` | Ownership check missing on export lookup | `gated_auto -> downstream-resolver` | Defer via tracker (requires explicit approval before behavior change) |
-| 3 | `export_service.rb:91` | Pagination contract needs a broader API decision | `manual -> downstream-resolver` | Defer via tracker with contract and client impact details |
+| # | File | Issue | Route | Notes |
+|---|------|-------|-------|-------|
+| 1 | `orders_controller.rb:42` | Ownership check missing on export lookup | `gated_auto -> downstream-resolver` | `suggested_fix` present — caller decides whether to apply |
+| 3 | `export_service.rb:91` | Pagination contract needs a broader API decision | `manual -> downstream-resolver` | Needs design input before implementation |
 
 ### Pre-existing Issues
 
@@ -69,17 +82,9 @@ Use this **exact format** when presenting synthesized review findings. Findings 
 
 - [Known Pattern] `docs/solutions/export-pagination.md` -- previous export pagination fix applies to this endpoint
 
-### Learning Capture Recommendation
-
-- Current review produced a reusable lesson about export pagination review heuristics; user may run the current host's compound entrypoint with brief context.
-
 ### Agent-Native Gaps
 
 - New export endpoint has no CLI/agent equivalent -- agent users cannot trigger exports
-
-### Schema Drift Check
-
-- Clean: schema.rb changes match the migrations in scope
 
 ### Deployment Notes
 
@@ -87,31 +92,10 @@ Use this **exact format** when presenting synthesized review findings. Findings 
 - Verify: `SELECT COUNT(*) FROM exports WHERE status IS NULL;` should stay at `0`
 - Rollback: keep the old export path available until the backfill has been validated
 
-### Rule Maturity Candidates
-
-| rule_id | evidence_ref | reason_code | human_review_kind | similar_existing_rule_ids |
-|---------|--------------|-------------|-------------------|---------------------------|
-| `summary-generated-output-staged` | `docs/validation/review.md#F2` | `generated-runtime-path` | `adjudication-review` | `[]` |
-
 ### Coverage
 
-- Direct evidence: <source refs/checks/logs used | limitations>
-- scope_boundary_evidence: plan R2/U1 covers `orders_controller.rb`; `export_helper.rb` is adjacent but not declared
-- provider_untrusted.summaries[]: code-graph returned `OrderExportService -> CsvWriter` and candidate `export_service_test.rb`; direct source confirmed the caller but no test covers concurrent export
-- expansion_budget: max_5_high_impact_symbols
-- changed_symbols: `OrdersController#export`, `OrderExportService#call`
-- changed_entrypoints: `GET /api/orders/export`
-- changed_contracts: CSV export response contract
-- symbol_mapping_status: mapped
-- impact_chain_candidates: `OrdersController#export -> OrderExportService#call`
-- blast_radius_candidates: export endpoint and CSV writer
-- caller_callee_paths: `OrdersController#export -> OrderExportService#call -> CsvWriter.write`
-- affected_test_candidates: `test/controllers/orders_controller_test.rb`, `test/services/order_export_service_test.rb`
-- tests_for_query_result: controller export tests found; no concurrent export assertion confirmed
-- missing_test_confirmation: no targeted test confirms concurrent export behavior
-- review_priority_candidates: `OrdersController#export` (public endpoint + auth risk), `OrderExportService#call` (memory risk + missing test)
-- test_gaps: No test for concurrent export requests
 - Suppressed: 2 findings below anchor 75 (1 at anchor 50, 1 at anchor 25)
+- Removable surface: ~40 lines / 1 file across findings #5 (signal only, not a target)
 - Residual risks: No rate limiting on export endpoint
 - Testing gaps: No test for concurrent export requests
 
@@ -143,44 +127,44 @@ File: bar.go:99
 Issue: Another problem
 ```
 
-This fails because: no pipe-delimited tables, no severity-grouped `###` headers, uses box-drawing horizontal rules, no numbered findings, no `## Code Review Results` title, and the verdict is not in a blockquote. Always use the table format from the example above.
+This fails because of the **box-drawing `────` separators between items**, no stable finding numbers, no severity-grouped `###` headers, no `## Code Review Results` title, and a verdict not set apart. The `────` rules and missing structure are the problem — `Field:`-prefixed lines are not themselves banned, but here they carry no stable numbers and bury depth. Prefer a terse table or a keyed list; put depth in a per-finding detail line (`- **#N** — …`), not in box-drawn blocks.
 
 ## Formatting Rules
 
-- **Pipe-delimited markdown tables** for findings -- never ASCII box-drawing characters or per-finding horizontal-rule separators between entries (the report-level `---` before the verdict is still required)
-- **Escape literal pipes inside table cells** -- replace cell text `|` with `\|` before rendering, including shell pipelines, TypeScript union types, markdown examples, and copied reviewer text.
+- **ASCII-safe only** -- never box-drawing characters or per-item horizontal-rule separators (`────`) between entries (the report-level `---` before the verdict is still required), no Unicode arrows or middot; use `->`. Tables are a good default but not mandatory -- let the shape serve the finding type (SKILL.md Stage 6); stay consistent within a section
+- **Escape literal `|` in table cells** -- any `|` inside a finding title, issue description, code snippet, regex pattern, or delimited-string example must be written as `\|`. Unescaped pipes are parsed as column separators and corrupt the row's `Reviewer` and `Confidence` columns (and `Route` in the Actionable Findings table). Applies especially to cache-key delimiter examples, regex alternations, and logical-OR operators quoted inside findings.
 - **Severity-grouped sections** -- `### P0 -- Critical`, `### P1 -- High`, `### P2 -- Moderate`, `### P3 -- Low`. Omit empty severity levels.
-- **Stable sequential finding numbers** -- assign finding numbers once after sorting, continue them across severity sections, and reuse those same numbers when findings are repeated in Residual Actionable Work. Do not restart at `1` for each severity or route bucket.
+- **Stable sequential finding numbers** -- assign finding numbers once after sorting, continue them across severity sections, and reuse those same numbers when findings are repeated in Actionable Findings. Do not restart at `1` for each severity or route bucket.
 - **Always include file:line location** for code review issues
 - **Reviewer column** shows which persona(s) flagged the issue. Multiple reviewers = cross-reviewer agreement.
-- **Confidence-first column** shows the finding's anchor as an integer (`50`, `75`, or `100`). Never render as a float.
-- **Route column** shows the synthesized handling decision as ``<autofix_class> -> <owner>``.
+- **Confidence column** shows the finding's anchor as an integer (`50`, `75`, or `100`). Never render as a float.
+- **No `Route` column in the per-severity tables** -- the synthesized route (``<autofix_class> -> <owner>``) appears only in the Actionable Findings table and the `mode:agent` JSON. The scannable severity tables are 5 columns: `# | File | Issue | Reviewer | Confidence`.
+- **Detail line (per finding, as needed)** -- keep the scannable line short (the symptom + `file:line`, not the mechanism); put the why-it-matters + fix/options in a per-finding detail line keyed by stable `#`: `- **#N** — <why it matters + what response it needs>`. Add it whenever the one-liner isn't self-sufficient -- usually P0/P1; P2/P3 are often terse-only. This keyed detail is the home for depth -- don't paste code or restate the diff, and match weight to weight.
 - **Header includes** scope, intent, and reviewer team with per-conditional justifications
-- **Mode line** -- include `interactive`, `autofix`, `report-only`, or `headless`
-- **Stable boundary fields** -- include `scope_boundary`, `authorized_scope_source`, and Coverage `scope_boundary_evidence`
-- **Stable finding type fields** -- include derived `finding_type` labels when scope-boundary or verification findings are present
-- **Stable graph fields** -- always include `graph_assist`, `graph_reason_code`, and `expansion_budget`; include Coverage `provider_untrusted.summaries[]` and candidate fields when graph/code-graph candidates shaped review focus, fallback happened, or limitations need to be explicit
-- **Applied Fixes section** -- include only when a fix phase ran in this review invocation
-- **Residual Actionable Work section** -- include only when unresolved actionable findings were handed off for later work
-- **Pre-existing section** -- separate table, no confidence-first column (these are informational)
-- **Learnings & Past Solutions section** -- results from spec-learnings-researcher, with links to docs/solutions/ files
-- **Learning Capture Recommendation section** -- include only when the current review produced a new reusable lesson; omit for mechanical, one-off, or formatting-only results
-- **Agent-Native Gaps section** -- results from spec-agent-native-reviewer. Omit if no gaps found.
-- **Deployment Notes section** -- key checklist items from spec-deployment-verification-agent. Omit if the agent did not run.
-- **Coverage section** -- direct evidence posture, suppressed count, residual risks, first-class `test_gaps`, failed reviewers, boundary fields, graph fallback/candidate fields, and limitations
-- **Rule Maturity Candidates section** -- optional; include only when confirmed findings or resource advisory meet the noise filter and have durable evidence refs
+- **Mode line** -- include `interactive` or `agent`
+- **Triage Groups section (when groups exist)** -- pipe table `| Group | Findings | Context | Preferred Resolution | Why |` rendered after Applied and before the severity tables. The `Findings` cell lists stable `#`s (e.g. `#2, #3`); every referenced `#` must appear in a severity table below. Groups are a triage lens over the findings -- they never replace the severity tables, merge findings, or renumber them. Omit when `grouping:off` is active or no groups survived Stage 5b/5c pruning.
+- **Applied section (default mode only)** -- when the review applied fixes (Stage 5c), list them first, before the severity tables, as `# | File | Fix | Reviewer` followed by a one-line validation outcome (e.g. "suite 214 pass, lint clean") and the **commit status** — committed as an isolated review-labeled fix commit (`fix(review): …`, or the repo's nearest convention when `review` isn't an allowed scope) when the working tree was clean before the review, or left uncommitted (for the user's commit) when it was already dirty. A fix spanning multiple files is **one row with one `#`** (e.g. `controller.rb:88 (+test)`) -- never duplicate the number across rows. Flag green-but-unverifiable edits (auth/contract/concurrency) inline in the `Fix` cell, e.g. `(security-posture — verify in diff)`. Applied findings keep their stable `#` and appear only here, not in the severity tables. Omit in `mode:agent` and when nothing was applied
+- **Actionable Findings section** -- include when the actionable queue is non-empty (findings for the caller to handle)
+- **Pre-existing section** -- separate table, no confidence column (these are informational)
+- **Learnings & Past Solutions section** -- results from the `learnings-researcher` local prompt asset, with links to docs/solutions/ files
+- **Agent-Native Gaps section** -- results from the `agent-native-reviewer` local prompt asset. Omit if no gaps found.
+- **Deployment Notes section** -- key checklist items from the `deployment-verification-agent` local prompt asset. Omit if the prompt did not run. Schema drift surfaces as `data-migration` findings — no separate section.
+- **Coverage section** -- suppressed count, removable surface (only when deletion-oriented maintainability findings exist; approximate net lines/files removable if applied -- a dead-weight signal, never a reduction target, omit otherwise), residual risks, testing gaps, failed reviewers
 - **Summary uses blockquotes** for verdict, reasoning, and fix order
 - **Horizontal rule** (`---`) separates findings from verdict
 - **`###` headers** for each section -- never plain text headers
 
-## Headless Mode Format
+## Agent mode (JSON)
 
-In `mode:headless`, replace the interactive pipe-delimited table report with a structured text envelope. The headless format is defined in the `### Headless output format` section of SKILL.md. Key differences from the interactive format:
+When `mode:agent` is active, **do not** emit the markdown table report above. Emit **one parseable JSON object** as the primary response and write the same payload to `review.json` under `/tmp/spec-first/spec-code-review/<run-id>/`.
 
-- **No pipe-delimited tables.** Findings use `[severity][autofix_class -> owner] File: <file:line> -- <title>` line format with indented Why/Evidence/Suggested fix lines.
-- **Findings grouped by autofix_class** (gated-auto, manual, advisory) instead of severity. Within each group, findings are sorted by severity.
-- **Verdict in header** (top of output) instead of bottom, so programmatic callers get it first.
-- **`Artifact:` line** in metadata header gives callers the path to the full run artifact.
-- **`[needs-verification]` marker** on findings where `requires_verification: true`.
-- **Evidence lines** included per finding.
-- **Completion signal:** "Review complete" as the final line.
+The contract is defined in SKILL.md under **`### JSON output format (`mode:agent` only)`**. Minimum fields: `status`, `verdict`, `scope`, `intent`, `reviewers`, `findings`, `actionable_findings`, `artifact_path`, `run_id`.
+
+Key differences from the interactive markdown format:
+
+- **No pipe-delimited tables** — findings are JSON arrays with merged fields (`#`, `title`, `severity`, `file`, `line`, `confidence`, `autofix_class`, `owner`, `suggested_fix`, `why_it_matters`, `evidence`, `reviewers`, etc.).
+- **`actionable_findings`** — subset for caller apply workflows (`gated_auto` / `manual` with `downstream-resolver`).
+- **`triage_groups`** — the markdown Triage Groups section serialized as `{title, findings: [<stable #s>], context, preferred_resolution, why}` objects, so callers can batch related fixes by theme. Groups span the full finding set — a triage lens, not an apply queue — so a caller must intersect each group's `findings` with `actionable_findings` before applying; the apply handoff stays `actionable_findings`. Empty when `grouping:off` or no groups.
+- **No `applied_fixes` and no Applied section** — `mode:agent` does not apply fixes; the caller does. Applied work surfaces only in default-mode markdown (Stage 5c/6). The handoff is `actionable_findings`.
+- **Failure/degraded paths** — `{"status":"failed","reason":"..."}` or `"status":"degraded"` with reason; never mix markdown tables into the JSON response.
+- **Stable `#`** — same numbering as Stage 5 synthesis, carried in JSON finding objects for downstream apply/residual tracking.

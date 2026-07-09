@@ -243,9 +243,3 @@ Rules:
 - Treat legacy `graphify-out/` as compatibility-only evidence; prefer `spec-mcp-setup --only graphify --refresh` to regenerate provider-native `.graphify/`.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
 - Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
-
-<!-- spec-first:bootstrap:start -->
-## Workflow 入口治理
-
-- 本 block 只提供 `using-spec-first` source pointer；完整入口路由与边界在 `skills/using-spec-first/SKILL.md`
-<!-- spec-first:bootstrap:end -->

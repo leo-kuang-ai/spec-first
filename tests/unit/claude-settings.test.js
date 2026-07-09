@@ -25,6 +25,7 @@ const {
   validateClaudeSettingsFile,
 } = require('../../src/cli/claude-settings');
 const { getAdapter } = require('../../src/cli/adapters');
+const { buildManagedBlock } = require('../../src/cli/lang-policy');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 
@@ -469,7 +470,7 @@ describe('claude settings', () => {
     }
   });
 
-  test('session-start hook emits a short governance pointer without re-injecting the bootstrap block', () => {
+  test('session-start hook emits a short governance pointer without re-injecting the language/governance block', () => {
     const projectRoot = makeTempDir();
     const instructionPath = path.join(projectRoot, 'CLAUDE.md');
 
@@ -477,14 +478,7 @@ describe('claude settings', () => {
       fs.writeFileSync(instructionPath, [
         '# CLAUDE.md',
         '',
-        '<!-- spec-first:bootstrap:start -->',
-        '## Workflow 入口治理',
-        '',
-        '- 本 block 是 using-spec-first 的核心决策集；完整路由策略在 `skills/using-spec-first/SKILL.md`',
-        '- substantial work 前先判断是否进入公开 spec-first workflow；轻量问答和窄事实查询可直接回答；已在 workflow 或 bounded subagent 中时不重新分流',
-        '- Workflow 入口统一使用同名 `spec-*`',
-        '- 不要把 `using-spec-first` 本身当作 command-backed workflow',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('zh'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedSessionStartHook(projectRoot);
@@ -508,8 +502,8 @@ describe('claude settings', () => {
       expect(ctx).toContain('target_repo');
       expect(ctx).toContain('skills/using-spec-first/SKILL.md');
       // CLAUDE.md already carries the block; the hook must not duplicate its body.
-      expect(ctx).not.toContain('## Workflow 入口治理');
-      expect(ctx).not.toContain('substantial work 前先判断是否进入公开 spec-first workflow');
+      expect(ctx).not.toContain('### Workflow 入口治理');
+      expect(ctx).not.toContain('语言规则为绝对硬执行要求');
       expect(ctx).not.toContain('before editing');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -531,11 +525,7 @@ describe('claude settings', () => {
       fs.writeFileSync(instructionPath, [
         '# CLAUDE.md',
         '',
-        '<!-- spec-first:bootstrap:start -->',
-        '## Workflow 入口治理',
-        '',
-        '- Workflow 入口统一使用同名 `spec-*`',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('zh'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedSessionStartHook(projectRoot, (content) => (
@@ -629,7 +619,7 @@ describe('claude settings', () => {
     }
   });
 
-  test('session-start hook degrades non-blockingly when the bootstrap block is missing', () => {
+  test('session-start hook degrades non-blockingly when the language/governance block is missing', () => {
     const projectRoot = makeTempDir();
 
     try {
@@ -646,7 +636,7 @@ describe('claude settings', () => {
       expect(result.status).toBe(0);
       const payload = JSON.parse(result.stdout);
       expect(payload.hookSpecificOutput.hookEventName).toBe('SessionStart');
-      expect(payload.hookSpecificOutput.additionalContext).toContain('Managed using-spec-first bootstrap is missing');
+      expect(payload.hookSpecificOutput.additionalContext).toContain('Managed language/governance block is missing');
       expect(payload.hookSpecificOutput.additionalContext).toContain('spec-first init');
       expect(payload.hookSpecificOutput.additionalContext).toContain('choose Claude Code');
     } finally {
@@ -690,9 +680,7 @@ describe('claude settings', () => {
 
     try {
       fs.writeFileSync(path.join(projectRoot, 'CLAUDE.md'), [
-        '<!-- spec-first:bootstrap:start -->',
-        '- Workflow entrypoints use the same `spec-*` names.',
-        '<!-- spec-first:bootstrap:end -->',
+        buildManagedBlock('en'),
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedSessionStartHook(projectRoot);

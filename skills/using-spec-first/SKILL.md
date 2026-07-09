@@ -74,6 +74,7 @@ description: 在 spec-first 仓库中执行实质性工作前使用，也用于�
 这些边界不是流程步骤，但所有入口判断都必须服从。
 
 - **Source/runtime**：source 是 `skills/using-spec-first/SKILL.md`、`skills/`、`templates/`、`src/cli/`、`docs/` 等；`.claude/`、`.codex/`、`.agents/skills/` 和其他 host runtime mirrors 是 generated runtime，不手改作为 source fix。
+- **Runtime context**：默认排除 `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated mirrors；完整策略在 `docs/contracts/context-governance.md`，入口判断不复制 denylist。
 - **Deterministic floor**：脚本和 CLI 负责文件发现、git 状态、schema/hash/readiness/drift 等确定性事实；LLM 负责语义路由判断。
 - **Evidence**：advisory facts 不是 confirmed truth；测试、日志、source read、diff、owner evidence 才能支撑完成声明。
 - **Dispatch**：进入公开 workflow 只授权该 workflow 本身；在 Codex 中，只有用户或上游 handoff 明示 subagents/personas/delegated/parallel/reviewer dispatch 时，才可调用 `spawn_agent`。否则按 workflow fallback 记录 `dispatch_authorization_missing`。
@@ -133,7 +134,7 @@ description: 在 spec-first 仓库中执行实质性工作前使用，也用于�
 ## Host And Runtime Notes
 
 - `skills/using-spec-first/SKILL.md` 是 routing policy source of truth。
-- `CLAUDE.md` / `AGENTS.md` 的 managed bootstrap block 只是最小入口锚点，不是第二套路由表。
+- `CLAUDE.md` / `AGENTS.md` 的 `spec-first:lang` managed block 同时承载最小入口锚点，不是第二套路由表。
 - Runtime copies under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, and `.qoder/` are generated mirrors. Repair stale or missing runtime guidance with `spec-first init` after choosing the target host; do not hand-edit generated mirrors as source.
 - Codex 顶层 orchestrator 进入公开 `spec-*` workflow 前，可以 best-effort 运行 `spec-first startup-reminder --codex`；失败、空输出或本地状态 malformed 不阻塞路由。bounded subagents、leaf reviewers、worker agents 不运行 startup reminder。
 

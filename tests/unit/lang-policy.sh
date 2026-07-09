@@ -142,6 +142,9 @@ assert_contains "zh block applies to generated docs and task prose" "生成文�
 assert_contains "zh block applies to commit and PR text" "commit message 和 PR 文案" "$zh_block"
 assert_not_contains "zh block omits open-ended scope phrase" "适用范围包括但不限于" "$zh_block"
 assert_not_contains "zh block omits developer profile path detail" "~/.spec-first/.developer" "$zh_block"
+assert_contains "zh project block includes workflow entry heading" "### Workflow 入口治理" "$zh_block"
+assert_contains "zh project block includes using-spec-first pointer" '完整入口路由与边界在 `skills/using-spec-first/SKILL.md`' "$zh_block"
+assert_not_contains "zh project block does not include standalone bootstrap marker" "<!-- spec-first:bootstrap:start -->" "$zh_block"
 
 echo "1.13 en block contains changelog governance rule"
 assert_contains "en block has changelog rule" "CHANGELOG" "$en_block"
@@ -167,6 +170,9 @@ assert_contains "en block applies to generated docs and task prose" "generated d
 assert_contains "en block applies to commit and PR text" "commit messages, and PR text" "$en_block"
 assert_not_contains "en block omits open-ended scope phrase" "without limitation" "$en_block"
 assert_not_contains "en block omits developer profile path detail" "~/.spec-first/.developer" "$en_block"
+assert_contains "en project block includes workflow entry heading" "### Workflow Entry Governance" "$en_block"
+assert_contains "en project block includes using-spec-first pointer" 'full entry routing map and boundaries live in `skills/using-spec-first/SKILL.md`' "$en_block"
+assert_not_contains "en project block does not include standalone bootstrap marker" "<!-- spec-first:bootstrap:start -->" "$en_block"
 
 echo "1.20 user-language blocks use separate markers"
 zh_user_block=$(node_run "process.stdout.write(buildUserLanguageBlock('zh'))")
@@ -177,6 +183,10 @@ assert_contains "en user block has start marker" "<!-- spec-first:user-language:
 assert_contains "en user block has end marker" "<!-- spec-first:user-language:end -->" "$en_user_block"
 assert_no_blank_lines "zh user block has no blank lines" "$zh_user_block"
 assert_no_blank_lines "en user block has no blank lines" "$en_user_block"
+assert_not_contains "zh user block excludes workflow entry governance" "Workflow 入口治理" "$zh_user_block"
+assert_not_contains "zh user block excludes using-spec-first pointer" "using-spec-first" "$zh_user_block"
+assert_not_contains "en user block excludes workflow entry governance" "Workflow Entry Governance" "$en_user_block"
+assert_not_contains "en user block excludes using-spec-first pointer" "using-spec-first" "$en_user_block"
 
 echo "1.21 user-language blocks exclude project governance"
 assert_not_contains "zh user block excludes changelog" "CHANGELOG" "$zh_user_block"
@@ -192,6 +202,8 @@ function normalize(block) {
     .replace(/^## .*$/gm, '')
     .replace(/^\\*\\*语言设置：\\*\\*.*$/gm, '')
     .replace(/^\\*\\*Language setting:\\*\\*.*$/gm, '')
+    .replace(/### Workflow 入口治理[\\s\\S]*?### Changelog/m, '### Changelog')
+    .replace(/### Workflow Entry Governance[\\s\\S]*?### Changelog/m, '### Changelog')
     .replace(/### Changelog[\\s\\S]*$/m, '')
     .trim();
 }
@@ -204,6 +216,8 @@ function normalize(block) {
     .replace(/^## .*$/gm, '')
     .replace(/^\\*\\*语言设置：\\*\\*.*$/gm, '')
     .replace(/^\\*\\*Language setting:\\*\\*.*$/gm, '')
+    .replace(/### Workflow 入口治理[\\s\\S]*?### Changelog/m, '### Changelog')
+    .replace(/### Workflow Entry Governance[\\s\\S]*?### Changelog/m, '### Changelog')
     .replace(/### Changelog[\\s\\S]*$/m, '')
     .trim();
 }

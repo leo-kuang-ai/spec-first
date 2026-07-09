@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { buildBootstrapBlock } = require('../../src/cli/instruction-bootstrap');
+const { buildManagedBlock } = require('../../src/cli/lang-policy');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const CONTRACT_PATH = path.join(REPO_ROOT, 'docs', 'contracts', 'context-governance.md');
@@ -75,52 +75,37 @@ describe('context governance runtime exclusion contract', () => {
     expect(contract).toContain('不把 `.gitignore` 当作 LLM context policy 的唯一来源');
   });
 
-  test('host bootstrap surfaces runtime exclusion to generated instruction files', () => {
-    for (const [host, lang] of [
-      ['codex', 'zh'],
-      ['cursor', 'zh'],
-      ['kiro', 'zh'],
-      ['claude', 'zh'],
-      ['qoder', 'zh'],
-      ['codex', 'en'],
-      ['cursor', 'en'],
-      ['kiro', 'en'],
-      ['claude', 'en'],
-      ['qoder', 'en'],
-    ]) {
-      const block = buildBootstrapBlock(host, lang);
-      expect(block).toContain('.spec-first/audits/**');
-      expect(block).toContain('.spec-first/governance/**');
-      expect(block).toContain('generated mirrors');
-      expect(block).toContain('docs/contracts/context-governance.md');
-      expect(block).toContain('host-native advisory');
+  test('merged host governance block stays pointer-only; runtime exclusions live in contracts and workflows', () => {
+    for (const lang of ['zh', 'en']) {
+      const block = buildManagedBlock(lang);
+      expect(block).toContain('using-spec-first');
+      expect(block).toContain('skills/using-spec-first/SKILL.md');
+      expect(block).not.toContain('<!-- spec-first:bootstrap:start -->');
+      expect(block).not.toContain('.spec-first/audits/**');
+      expect(block).not.toContain('.spec-first/governance/**');
       expect(block).not.toContain('.claude/**');
       expect(block).not.toContain('.codex/**');
       expect(block).not.toContain('.agents/skills/**');
       expect(block).not.toContain('.qoder/settings.local.json');
     }
 
-    // Checked-in instruction files surface the same runtime-exclusion invariants.
-    // Assert language-agnostic anchors (path globs + the spec-first:lang managed-block
-    // pointer) rather than en/zh prose, since the bootstrap block follows the repo host lang.
+    // Checked-in instruction files carry the merged entry pointer. Full runtime-exclusion
+    // invariants remain in docs/contracts/context-governance.md and workflow source.
     for (const file of ['AGENTS.md', 'CLAUDE.md']) {
       const content = read(file);
-      expect(content).toContain('`.spec-first/audits/**`');
-      expect(content).toContain('`.spec-first/governance/**`');
-      expect(content).toContain('`docs/contracts/context-governance.md`');
-      expect(content).toContain('`spec-first:lang` managed block');
+      expect(content).toContain('<!-- spec-first:lang:start -->');
+      expect(content).toContain('### Workflow 入口治理');
+      expect(content).toContain('skills/using-spec-first/SKILL.md');
+      expect(content).not.toContain('<!-- spec-first:bootstrap:start -->');
     }
   });
 
   test('high-frequency ordinary workflows carry the runtime exclusion rule', () => {
     const workflowPaths = [
-      'skills/using-spec-first/SKILL.md',
       'skills/spec-work/SKILL.md',
       'skills/spec-plan/SKILL.md',
-      'skills/spec-code-review/SKILL.md',
       'skills/spec-doc-review/SKILL.md',
       'skills/spec-debug/SKILL.md',
-      'skills/spec-compound/SKILL.md',
       'skills/spec-optimize/SKILL.md',
     ];
 
@@ -152,6 +137,13 @@ describe('context governance runtime exclusion contract', () => {
         expect(content).toContain('latest relevant window / summary-first rules in `docs/contracts/context-governance.md`');
       }
     }
+
+    const entryGovernor = readWorkflowSurface('skills/using-spec-first/SKILL.md');
+    expect(entryGovernor).toContain('generated mirrors');
+    expect(entryGovernor).toContain('skills/using-spec-first/SKILL.md');
+    expect(entryGovernor).toContain('docs/contracts/context-governance.md');
+    expect(entryGovernor).toContain('.spec-first/audits/**');
+    expect(entryGovernor).toContain('.spec-first/governance/**');
   });
 
   test('skill-audit documents its bounded audit-artifact exception', () => {
