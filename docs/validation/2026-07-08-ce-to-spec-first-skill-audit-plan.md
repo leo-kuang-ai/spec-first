@@ -408,7 +408,7 @@ done
 
 - status: repaired
 - risk: high
-- decision: 按用户最新裁决，`spec-compound-refresh` 先以 CE `ce-compound-refresh` source 文件为真相源完整覆盖，再做最小 spec-first 必需归一化：入口名、下游 workflow 名、`mode:headless` -> `mode:autofix` 命名、loaded skill directory validator anchor，以及 public workflow 的轻量 Contract Summary。CE 的 docs/solutions refresh lifecycle、CONCEPTS bootstrap / accretion / seeding、replace/delete 安全门、frontmatter validator 与 mechanical claims validator 均恢复；不保留 CE 中不存在的 spec-only eval fixture、structured recall 字段或 advisory/context/ADR report-only 增强。
+- decision: 按用户最新裁决，`spec-compound-refresh` 先以 CE `ce-compound-refresh` source 文件为真相源完整覆盖，再做最小 spec-first 必需归一化：入口名、下游 workflow 名、保留 CE `mode:headless` 命名、loaded skill directory validator anchor。CE 的 docs/solutions refresh lifecycle、CONCEPTS bootstrap / accretion / seeding、replace/delete 安全门、frontmatter validator 与 mechanical claims validator 均恢复；不保留 CE 中不存在的 spec-only eval fixture、structured recall 字段或 advisory/context/ADR report-only 增强。
 
 #### Source Files Read
 
@@ -438,14 +438,14 @@ done
 - 保留 Consolidate 逻辑：确认 canonical doc、提取 unique content、更新 cross-references、删除 subsumed doc，不创建 `_archived/`；合并后对 canonical doc 运行 mechanical claims check，避免 merged citations 或 cross-references 悬空。
 - 保留 Delete 安全门：实现或问题域消失时删除，但删除前必须做 inbound-link check；late-discovered substantive citation 会触发 reclassify。
 - 保留 replacement validator：`validate-frontmatter.py` 负责 parser-safety，`validate-doc-claims.py` 负责 cited paths、commit SHAs、relative links 和 dangling drafting scaffold。
-- 保留 headless/autofix conservative behavior：不问问题，安全动作可写入，歧义 Replace/Delete stale-mark，写失败进入 Recommended report。
+- 保留 headless conservative behavior：不问问题，安全动作可写入，歧义 Replace/Delete stale-mark，写失败进入 Recommended report。
 
 #### Intentional Spec-First Divergences
 
-- `mode:headless` 投影为当前 `mode:autofix`，与本仓库 programmatic/no-interaction 命名一致；行为仍保留 CE 的无交互安全动作和 stale-mark 策略。
+- `mode:headless` 按 CE 原命名保留；行为保留 CE 的无交互安全动作和 stale-mark 策略。
 - `ce-compound` handoff 投影为 `spec-compound`；缺候选 docs 时提示运行 `spec-compound`。
 - CE 的 `${CLAUDE_SKILL_DIR}` validator guard 投影为“已读取的 `spec-compound-refresh` skill directory”上的 `SKILL_DIR` 调用，避免安装到用户目录或非 Claude host 后误依赖项目根 `skills/` 路径。
-- 保留本仓 public workflow 最小 `Workflow Contract Summary`，但不改变 CE 主流程、阶段或产物语义。
+- 删除 CE 中不存在的 spec-only `Workflow Contract Summary`，避免形成额外包装层；保留 CE 主流程、阶段和产物语义。
 - 删除 CE 中不存在的 spec-only `evals/examples.json`，避免形成额外维护面；同步删除旧 structured recall / advisory vocabulary / context-ADR report-only 测试口径。
 
 #### Legacy CE Residuals

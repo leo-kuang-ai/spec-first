@@ -154,7 +154,7 @@ describe('spec-compound frontmatter trigger contract', () => {
     expect(frontmatter).toContain('stale, overlapping, superseded, or drifted learnings');
     expect(frontmatter).toContain('avoid general refactor, debugging, or code review unless docs/solutions is explicit');
     expect(frontmatter).toContain('argument-hint');
-    expect(frontmatter).toContain('mode:autofix');
+    expect(frontmatter).toContain('mode:headless');
   });
 });
 
@@ -215,8 +215,7 @@ describe('spec-compound host entrypoint contract', () => {
     const skill = fs.readFileSync(COMPOUND_REFRESH_SKILL_PATH, 'utf8');
     const reference = fs.readFileSync(COMPOUND_REFRESH_CONCEPTS_REFERENCE_PATH, 'utf8');
 
-    expect(skill).toContain('mode:autofix');
-    expect(skill).not.toContain('mode:headless');
+    expect(skill).toContain('mode:headless');
     expect(skill).toContain('references/concepts-vocabulary.md');
     expect(skill).toContain('## CONCEPTS.md bootstrap requests');
     expect(skill).toContain('**Vocabulary**');

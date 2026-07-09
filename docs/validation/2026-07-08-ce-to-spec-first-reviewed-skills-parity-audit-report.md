@@ -74,11 +74,11 @@
 - CE/spec 补齐后均有：`scripts/validate-doc-claims.py`
 
 判断：
-- 必要投影：入口和 downstream handoff 从 `ce-compound` 改为 `spec-compound`，CE `mode:headless` 的 no-interaction 安全动作语义投影为当前 `mode:autofix` 命名，validator 调用通过 loaded `SKILL_DIR` 而不是项目相对 `skills/` 路径。
+- 必要投影：入口和 downstream handoff 从 `ce-compound` 改为 `spec-compound`，保留 CE `mode:headless` no-interaction 安全动作语义和命名，validator 调用通过 loaded `SKILL_DIR` 而不是项目相对 `skills/` 路径。
 - CE 行为保留：Keep/Update/Consolidate/Replace/Delete 五类 refresh lifecycle、learning-first then pattern refresh、Update vs Replace 边界、Consolidate canonical doc 处理、Delete inbound-link check、ambiguous stale-mark、frontmatter parser-safety validator 和 doc claims validator。
 - CE 文件覆盖后删除 CE 中不存在的 spec-only `evals/examples.json`、structured recall 字段、legacy_unstructured_advisory / advisory scoped vocabulary / context-ADR report-only 口径；`spec-compound` 自身仍单独保留 structured promotion contract。
 - 修复：补回缺失的 `validate-doc-claims.py`，并让 Replace flow 在 parser-safety 后继续校验 cited paths、commit SHAs、relative links 和 drafting scaffold。
-- 结论：当前版本已恢复 CE refresh 的 grounding validator、CONCEPTS bootstrap / accretion / seeding 和 refresh lifecycle 能力；剩余差异为 spec-first 名称、模式命名、validator 路径锚点和最小 public workflow summary。
+- 结论：当前版本已恢复 CE refresh 的 grounding validator、CONCEPTS bootstrap / accretion / seeding 和 refresh lifecycle 能力；剩余差异为 spec-first 名称、下游 workflow 名和 validator 路径锚点，`mode:headless` 按 CE 原样保留，额外 public workflow summary 已删除。
 
 ### `ce-dogfood` -> `spec-dogfood`
 
