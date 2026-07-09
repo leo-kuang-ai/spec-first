@@ -52,25 +52,29 @@ plan_depth: deep
 
 **问题：** 当前判断"是否值得生成 task pack"仅依赖模糊描述（"plan is too large or dependent for direct execution"），缺少可操作的决策信号。
 
-**方案：** 引入基于 source plan 结构的量化复杂度信号矩阵：
+**方案：** 引入基于 source plan 结构的复杂度信号方向矩阵（信号强度分 strong/moderate/weak，具体阈值需按项目校准）：
 
 ```yaml
 compile_signals:
   strong_compile:  # 任何一个 strong signal 即倾向 compile
-    - implementation_units >= 5
-    - cross_module_dependencies >= 3  # 跨模块/目录的依赖
-    - shared_contract_surfaces >= 2   # 公共 API/schema/contract 变更
-    - risk_rated_units >= 2           # plan 中标记高风险的 unit
+    - implementation_units 数量多（参考：项目最近 10 个 plan 中 compile 决策的下限）
+    - 存在跨模块/目录的依赖链
+    - 存在多个共享 contract surface（公共 API/schema/contract 变更）
+    - 存在多个 plan 中标记为高风险的 unit
   moderate_compile:  # 需要 >= 2 个 moderate signal
-    - implementation_units >= 3 AND wave_worthy_parallelism exists
-    - test_scenarios_total >= 15
-    - files_total >= 10
+    - unit 数量中等 AND 存在 wave-worthy 并行机会
+    - test scenarios 总量大
+    - 涉及文件数多
     - plan_depth == "deep"
   skip_signals:  # 任何一个 skip signal 且无 strong_compile
-    - implementation_units <= 2 AND files_total <= 5
+    - unit 数量少 AND 涉及文件数少
     - plan_depth == "lightweight"
-    - single_module_bounded == true AND no_shared_contracts
+    - 单模块内部变更 AND 无共享 contract
 ```
+
+**校准原则：** 上述信号是方向性指引，不是硬编码阈值。团队应根据最近 5-10 个 plan 的实际 compile/skip 决策分布来校准具体数字。数字仅作为团队共识的记录，不应被自动化消费。
+
+**与 `task-governance-signals.v1` 的关系：** O1 信号矩阵读取 source plan 的结构化数据（U-IDs、files、dependencies），是 plan-intrinsic evidence。`task-governance-signals.v1` 是外部 governance helper，提供 cross-check advisory signal，可能因缺少 `--input` 或上下文不可读而 degraded。两者都是 advisory input，O1 更直接、更稳定；当 governance helper degraded 时，O1 信号矩阵仍然可用。不要把 governance helper 的 `candidate_level` 当作 compile/skip gate。
 
 **与 spec-plan 的衔接：** spec-plan 在 Phase 3 已产出 U-IDs、files、dependencies、test scenarios 等结构化数据。spec-write-tasks 应消费这些结构，而非重新从自然语言推导。可在 Task Quality Guide 中新增 "Plan Readiness Signals" 小节。
 
@@ -115,7 +119,7 @@ compile_signals:
 - 依赖链深度（从根到叶）理想 ≤ 3 层
 
 **对 AI executor 的特殊考量：**
-- AI executor 的 context window 有限（~128K tokens），task pack 应确保单任务启动时载入 plan sections + context_refs + target files 不超过理想 context 的 50%
+- AI executor 的可用 context window 有限且因模型/provider 而异，task pack 应确保单任务启动时载入 plan sections + context_refs + target files 不超过 executor 可用 context 的 50%
 - entry_hint 在 AI executor 场景下应更精确地指向文件和行范围，减少无效 context 载入
 
 **保持边界：** 这是 quality guide 的 advisory 指导，不进入 deterministic validator。
@@ -134,6 +138,7 @@ compile_signals:
 2. **Contract-first** — 定义被多个下游任务消费的 interface/schema/contract 的任务优先
 3. **Integration-first** — 跨模块集成点优先于模块内部实现
 4. **Irreversible-first** — 对公共 API、数据 schema 等难以回退的变更优先验证
+5. **Walking Skeleton / Thin Slice first** — Wave 1 优先包含一条最小端到端路径（从输入到输出的最薄完整切片），验证架构假设后再在后续 wave 中加宽各层
 
 **与 spec-plan 的衔接：** spec-plan Phase 3.5 已产出 Dependencies（U-ID 引用）和 Test scenarios。spec-write-tasks 应利用这些信息识别"哪些 U-ID 是被多个其他 U-ID 依赖的关键路径节点"。
 
@@ -183,7 +188,7 @@ compile_signals:
 **方案：** 在 advisory quality analyzer 中增加 DAG 分析：
 
 **Advisory 分析维度：**
-1. **环检测** — 识别循环依赖（应是 validator-level 错误）
+1. **环检测** — 识别循环依赖（属于结构性图约束，与 "dependencies point to existing tasks" 同类，是 deterministic lint 可检查的 structural invariant，不属于语义质量判断）
 2. **关键路径识别** — 标记 longest dependency chain，提醒若此路径上任何 task 延迟会影响整体
 3. **并行度评估** — 计算 `max_parallel_width = max(wave_task_count)`，若 DAG 宽度远小于任务数，提示可能存在不必要的串行约束
 4. **孤立任务检测** — 无依赖且不被依赖的任务应审视是否遗漏了关联
@@ -202,26 +207,19 @@ compile_signals:
 
 **问题：** 当多个任务需要传递中间产物（如 T001 定义的 schema 被 T003 实现的 API 消费）时，当前仅通过 `dependencies` 隐含传递关系，executor 可能不清楚具体交接物。
 
-**方案：** 在 quality fields 中新增 optional `produces` 和 `consumes` 字段：
+**方案：** 在 Task Quality Guide 的 "Dependency and Wave Rules" 小节补充 artifact handoff 的写作指导（prose best-practice），而非新增 schema fields：
 
-```yaml
-- T001
-  goal: 定义 task pack validation schema
-  files: [src/cli/task-pack-schema.json]
-  produces: ["task-pack-schema.json — JSON Schema for task pack validation"]
-  ...
+**写作指导（advisory，不新增字段）：**
+- 当 task A 的主要产出被 task B 显式依赖时，在 task A 的 `done_signal` 中命名该产出（如 "schema file exists and passes validation"），在 task B 的 `context_refs` 中引用该产出路径
+- 在 `goal` 或 `notes` 中用一句话说明该 task 产出的关键 artifact 是什么，以及哪些下游 task 会消费它
+- 对于复杂的多产物 task，可在 `notes` 中列出 produces/consumes 关系作为 executor 指引
 
-- T003
-  goal: 实现 task pack validator
-  dependencies: [T001]
-  consumes: ["T001:task-pack-schema.json"]
-  files: [src/cli/task-pack.js]
-  ...
-```
+**不引入 `produces` / `consumes` 新字段的原因：**
+- 字段增殖带来维护成本，且对 deterministic lint 无实质帮助（消费关系是语义判断）
+- 当前 `dependencies` + `done_signal` + `context_refs` 组合已足以表达交接关系
+- 如果 executor 需要理解 artifact 关系，通过 `goal` 和 `notes` 的自然语言已足够清晰
 
-**价值：** 使 task 间的数据流显式化，减少 executor 理解成本，也让 review 时更容易判断依赖是否合理。
-
-**保持边界：** `produces` / `consumes` 为纯 advisory quality field，validator 不检查其语义正确性，但可以检查 consumes 引用的 task_id 是否存在于 dependencies 中（结构一致性）。
+**保持边界：** 不新增 schema fields，写作指导作为 Task Quality Guide 的 advisory section。
 
 ---
 
@@ -247,43 +245,41 @@ compile_signals:
 
 **触发方式：** 不新增硬字段。spec-write-tasks 根据调用上下文（是否来自 spec-lfg 等自动化流程、是否有 `executor: ai` 提示）调整粒度倾向。默认粒度适配 AI executor（因为 spec-work 是主要下游消费者）。
 
+**当前限制：** 目前不存在运行时 executor type 检测协议。粒度差异仅作为 Task Quality Guide 的写作参考，由 LLM 在编译时根据调用链上下文（spec-lfg 自动化 vs 用户手动调用）自行推断。如果未来需要精确切换，应由调用方在 invocation context 中传入 `executor_hint` advisory field，而非 spec-write-tasks 自行猜测。
+
 ---
 
 ### O9. Pre-Compilation Readiness Assessment
 
 **问题：** 当前流程是直接从 source plan 编译 task pack，缺少结构化的"编译前准备度评估"，导致 return-to-plan 的发现可能偏晚。
 
-**方案：** 在 compile 分支的开始阶段增加一个轻量 readiness check，前置于实际编译：
+**方案：** 在 compile 分支的开始阶段增加一个轻量 readiness check，聚焦于 **task-compilation-specific structural readiness**（即 source plan 的结构是否足以支撑 task 拆分），而非重复 spec-plan 已保证的上游职责：
 
-**Readiness Checklist：**
+**与 spec-plan 的职责划分：**
+- spec-plan Phase 0.5 已负责 product blockers / unresolved scope
+- spec-plan Phase 0.7 / 5.1.5 已做 scoping synthesis confirmation
+- spec-plan Phase 5.3 已执行 confidence check and deepening
+- 因此 O9 **不检查** scope closure、TBD resolution、open question resolution（这些是 spec-plan 的 exit gate）
+
+**Task-Compilation Readiness Checklist：**
 
 ```markdown
 ## Plan Readiness for Task Compilation
 
-1. Identity
-   - [ ] spec_id present
-   - [ ] artifact_readiness == implementation-ready
+1. Compilability Structure（task pack 可编译的最低结构要求）
+   - [ ] 每个 U-ID 有明确的 files 列表（否则无法分配 task 文件边界）
+   - [ ] 每个 feature-bearing unit 有 test scenarios（否则无法生成 done_signal）
+   - [ ] Dependencies 在 U-ID 间已声明（否则无法规划 waves）
+   - [ ] 每个 unit 有 done criteria / Verification 字段
 
-2. Scope Closure
-   - [ ] 无 "Resolve Before Planning" 类 open question
-   - [ ] scope boundaries 明确且 deferred items 已分离
-   - [ ] 无"TBD"/"pending decision" 在 active units 中
-
-3. Structure Quality
-   - [ ] 每个 U-ID 有明确的 files 列表
-   - [ ] 每个 feature-bearing unit 有 test scenarios
-   - [ ] Dependencies 在 U-ID 间已声明
-
-4. Verification Surface
-   - [ ] 每个 unit 有 done criteria（Verification 字段）
-   - [ ] test file paths 已列出
-
-5. Boundary Safety
+2. Boundary Safety（已被 deterministic lint 部分覆盖，这里前置检查避免编译浪费）
    - [ ] 无 generated runtime mirror paths 在 files 中
    - [ ] 若 parent workspace，target_repo 已声明
 ```
 
-**失败处理：** 如果 checklist 有 critical 项失败（Identity 或 Scope Closure），立即走 `return-to-plan` 分支，无需尝试编译。如果是 quality 项失败（Structure Quality、Verification Surface），在 Orientation Evidence 中记录 limitation 并继续编译（因为 plan 可能就是不完美的）。
+**注意：** Identity（spec_id、source_plan_hash）已由 deterministic lint 强制。此 checklist 仅作为 LLM 在开始编译前的 advisory quick-scan，减少编译后才发现 return-to-plan 的浪费。
+
+**失败处理：** 如果 checklist 中 "Compilability Structure" 有多项缺失（>50% 的 units 无 files 或无 test scenarios），倾向走 `return-to-plan` 或 `draft-only`。单项缺失时在 Orientation Evidence 中记录 limitation 并继续编译。
 
 ---
 
@@ -370,9 +366,26 @@ task_compilation_hints:
 | P1 | O10 Post-Compilation 自检 | 中 — 提升输出质量 | 低 — 修改 SKILL.md workflow |
 | P1 | O11 跨切面策略 | 中 — 解决常见拆分困惑 | 低 — 修改 Task Quality Guide |
 | P2 | O5 Spike Tasks | 低频但有价值 | 低 — Schema + Guide 变更 |
-| P2 | O7 Artifact Handoff | 低频但有价值 | 低 — Schema quality field |
+| P2 | O7 Artifact Handoff | 低频但有价值 | 低 — Guide prose 变更 |
 | P2 | O8 自适应粒度 | 中期价值 | 中 — 需要 executor detection |
 | P3 | O12 Plan 衔接协议 | 长期价值 | 中 — 需跨 skill 协同 |
+
+---
+
+## 应用纪律
+
+并非所有 task compilation 都需要应用全部 12 项优化。根据 plan 复杂度和风险选择适当层次：
+
+| 层次 | 适用场景 | 应用的优化项 |
+| --- | --- | --- |
+| **Lightweight** | plan_depth == lightweight、单模块、无跨依赖 | 仅 O1 skip signal → 跳过编译 |
+| **Standard** | 多数常规 plan（plan_depth == standard/deep，3-8 units） | O1 + O2 + O4 + O9 + O10 |
+| **Deep** | 大型复杂 plan（>8 units、跨模块、有 spike 需求） | 全部 12 项 |
+
+**当不应该编译 task pack 时：**
+- plan 足够简单，直接交 spec-work 执行效率更高
+- plan 本身就是一个 single-task 层次（如纯文档改动、单文件 bugfix）
+- 编译 task pack 的维护成本超过其带来的编排价值
 
 ---
 
@@ -391,9 +404,7 @@ task_compilation_hints:
 
 ### Vertical Slicing 对标
 
-spec-write-tasks 已明确反对 horizontal slicing（Task Quality Guide "Horizontal slicing smell"），并推荐 vertical tracer bullets。这与业界共识一致。差距在于：
-- 缺少 Walking Skeleton 的显式支持（第一个 task 可以是最小端到端路径）
-- 缺少 Thin Slice 优先原则（先做最薄的完整切片验证架构，再加宽）
+spec-write-tasks 已明确反对 horizontal slicing（Task Quality Guide "Horizontal slicing smell"），并推荐 vertical tracer bullets。这与业界共识一致。Walking Skeleton / Thin Slice 原则已通过 O4 纳入 risk-first wave ordering 策略（Wave 1 优先包含最小端到端路径）。
 
 ### AI Agent Task Decomposition 对标
 
@@ -430,6 +441,27 @@ spec-write-tasks 已明确反对 horizontal slicing（Task Quality Guide "Horizo
 2. **Quality Guide 变更后的 fresh-source eval** — 使用当前 Task Quality Guide 和示例 plan 执行一次 task compilation，验证输出质量是否改善
 3. **Analyzer 扩展后的 fixture 验证** — 扩展 `tests/fixtures/spec-write-tasks/` 覆盖新增 advisory signals
 4. **Backward Compatibility** — 所有优化都是增量的，不改变现有 task pack 的 validity
+
+---
+
+## 落地映射
+
+各优化项对应的具体文件/小节修改点：
+
+| 优化项 | 目标文件 | 变更类型 |
+| --- | --- | --- |
+| O1 | `skills/spec-write-tasks/references/task-quality-guide.md` 新增 "Plan Readiness Signals" 小节 | Guide 新增 section |
+| O2 | `skills/spec-write-tasks/references/task-quality-guide.md` 新增 "INVEST Mapping" 小节 | Guide 新增 section |
+| O3 | `skills/spec-write-tasks/references/task-quality-guide.md` "Granularity Rules" 后追加 context budget 经验法则 | Guide 扩展 |
+| O4 | `skills/spec-write-tasks/references/task-quality-guide.md` "Dependency and Wave Rules" 后追加 wave planning checklist | Guide 扩展 |
+| O5 | `skills/spec-write-tasks/references/task-pack-schema.md` quality fields 新增 `task_type` enum + Guide spike 模式说明 | Schema + Guide |
+| O6 | `scripts/spec-write-tasks/analyze-task-pack-quality.js` 新增 DAG topology 分析 | Script 扩展 |
+| O7 | `skills/spec-write-tasks/references/task-quality-guide.md` "Dependency and Wave Rules" 追加 artifact handoff 写作指导 | Guide 扩展 |
+| O8 | `skills/spec-write-tasks/references/task-quality-guide.md` "Granularity Rules" 追加 executor-aware 指导 | Guide 扩展 |
+| O9 | `skills/spec-write-tasks/SKILL.md` compile 分支开头插入 readiness quick-scan 步骤 | SKILL workflow |
+| O10 | `skills/spec-write-tasks/SKILL.md` compile 分支末尾插入 self-review 步骤 | SKILL workflow |
+| O11 | `skills/spec-write-tasks/references/task-quality-guide.md` 新增 "Cross-Cutting Concerns" 小节 | Guide 新增 section |
+| O12 | `skills/spec-plan/SKILL.md` Phase 5.2 optional + `task-quality-guide.md` 交叉引用 | 跨 skill 协同 |
 
 ---
 

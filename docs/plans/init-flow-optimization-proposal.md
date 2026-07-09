@@ -285,6 +285,7 @@ const PLATFORM_REGISTRY = {
     commandRoot: '.claude/commands',
     hooksDir: '.claude/hooks',
     settingsFile: '.claude/settings.json',
+    capabilities: { shellHooks: true },
     // 用于自动派生排除列表的路径规则
     runtimePathRules: [
       { prefix: '.claude/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
@@ -304,6 +305,7 @@ const PLATFORM_REGISTRY = {
     commandRoot: '.codex/commands/spec',
     hooksDir: '.codex/hooks',
     hooksJsonFile: '.codex/hooks.json',
+    capabilities: { shellHooks: true },
     runtimePathRules: [
       { prefix: '.codex/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
       { prefix: '.codex/commands/spec-', suffixPattern: '\\*\\.md' },
@@ -318,6 +320,7 @@ const PLATFORM_REGISTRY = {
     skillsRoot: '.cursor/skills',
     agentsRoot: '.cursor/agents',
     pointerPath: '.cursor/rules/spec-first.mdc',
+    capabilities: { shellHooks: false },
     runtimePathRules: [
       { prefix: '.cursor/skills/' },
       { prefix: '.cursor/spec-first/' },
@@ -331,6 +334,7 @@ const PLATFORM_REGISTRY = {
     skillsRoot: '.kiro/skills',
     agentsRoot: '.kiro/agents',
     pointerPath: '.kiro/steering/spec-first.md',
+    capabilities: { shellHooks: false },
     runtimePathRules: [
       { prefix: '.kiro/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
       { prefix: '.kiro/commands/spec-', suffixPattern: '\\*\\.md' },
@@ -347,6 +351,9 @@ const PLATFORM_REGISTRY = {
     agentsRoot: '.qoder/agents',
     commandRoot: '.qoder/commands',
     pointerPath: '.qoder/rules/spec-first.md',
+    settingsFile: '.qoder/settings.json',
+    hooksDir: '.qoder/hooks',
+    capabilities: { shellHooks: true },
     runtimePathRules: [
       { prefix: '.qoder/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
       { prefix: '.qoder/commands/spec-', suffixPattern: '[a-z-]+\\.md' },
@@ -386,6 +393,8 @@ function escapeForRegex(str) {
 }
 ```
 
+**锚定策略**：生成的正则不添加 `^` 锚点，以保持与当前硬编码 `UNREWRITTEN_PATH_PATTERNS` 一致的行为。golden snapshot 负责验证匹配字符串集合不变。若未来需要改为锚定匹配，应作为独立的 breaking change 评估。
+
 **验证策略**：golden snapshot 测试确保自动派生结果覆盖当前硬编码 patterns：
 
 ```javascript
@@ -403,8 +412,9 @@ for (const platformId of ['cursor', 'kiro', 'qoder']) {
 ```
 
 **收益**：
-- 添加第 6 个宿主：只在 registry 添加 `runtimePathRules`，0 行现有代码修改
-- O(n²) → O(1) 每次扩展
+- 添加第 6 个 pointer-only 宿主：只在 registry 添加 `runtimePathRules`，0 行现有 adapter 代码修改
+- O(n²) → O(1) 每次 pointer-only 宿主扩展
+- 对支持 shell hooks 的新宿主，额外工作限于新增 hooks 模块和设置 `capabilities.shellHooks: true`，仍不修改其他 adapter
 
 ### 4.4 PointerBasedAdapter 基类
 
@@ -518,7 +528,7 @@ if (adapter.id === 'qoder') {
 
 | 文件 | 内容 | 行数估计 |
 |------|------|---------|
-| `src/cli/qoder-settings.js` | hook upsert/removal/inspect（类比 claude-settings.js） | ~200L |
+| `src/cli/qoder-settings.js` | hook upsert/removal/inspect；`renderManagedQoderHooksRemoval` 返回 `{filePath, existsAfter, contents}`（与 claude-settings.js 一致） | ~200L |
 | `templates/qoder/hooks/session-start` | Node.js hook 脚本（类比 codex template） | ~170L |
 
 #### 4.7.3 Qoder hooks JSON schema
@@ -571,6 +581,7 @@ Phase 5: 平台兼容性 ───────────────── 独
 - Phase 0 和 Phase 1 可并行启动
 - Phase 3 硬依赖 Phase 1
 - Phase 2/4/5 真正独立
+- **Phase 0 与 Phase 2 的代码迁移约定**：Phase 0 在 `init.js` 中新增的 Qoder hook 调用，将在 Phase 2 拆分 `init.js` 时同步迁移到 `init-plan.js`，避免同一逻辑被修改两次
 
 ### 5.2 各 Phase 详细计划
 
@@ -580,11 +591,12 @@ Phase 5: 平台兼容性 ───────────────── 独
 |------|------|---------|
 | 1 | 新建 `src/cli/qoder-settings.js` | exports: renderManagedQoderHooksUpsert, renderManagedQoderHooksRemoval, inspectManagedQoderHooks |
 | 2 | 新建 `templates/qoder/hooks/session-start` | Node.js script，读 AGENTS.md，注入 governance context |
-| 3 | 修改 init.js `buildInitMetadataPlan` | Qoder 平台写入 `.qoder/settings.json` hooks |
+| 3 | 修改 init.js `buildInitMetadataPlan` | Qoder 平台写入 `.qoder/settings.json` hooks；该函数在 Phase 2 将迁移至 `init-plan.js` |
 | 4 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder 平台清理 hooks |
 | 5 | 修改 doctor.js `buildHostSpecificChecks` | Qoder hook inspection |
-| 6 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder hook drift 检测 |
-| 7 | 新建 `tests/unit/qoder-settings.test.js` | 覆盖 upsert/removal/inspect |
+| 6 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder hook drift 检测；该函数在 Phase 2 将迁移至 `init-plan.js` |
+| 7 | 验证 `UserPromptSubmit` matcher 行为 | 确认 Qoder 支持按 command name 过滤；若不支持，则 `spec-plan-guard` 暂不安装 |
+| 8 | 新建 `tests/unit/qoder-settings.test.js` | 覆盖 upsert/removal/inspect |
 
 **验收标准**：
 - `spec-first init --qoder --dry-run` 输出包含 `.qoder/settings.json` hook 写入
@@ -647,7 +659,23 @@ Phase 5: 平台兼容性 ───────────────── 独
 
 #### Phase 5: 平台兼容性（按需，1-2 天）
 
-按实际用户反馈决定优先级。WSL 互通为 opt-in，需显式 flag。
+**触发条件**（满足任一即启动）：
+
+| 条件 | 来源 |
+|------|------|
+| 收到 Windows UNC 路径导致 init/clean 失败的 issue | 用户反馈 |
+| 收到 WSL 与 Windows 侧 profile 不一致的 issue | 用户反馈 |
+| 启动企业环境 POC，明确要求 Windows/WSL 支持 | 业务需求 |
+
+**验收标准**：
+
+| 加固项 | 验证方式 |
+|--------|---------|
+| UNC 路径被 `isSafeManagedStatePath` 拒绝或正确归一化 | 新增 unit test |
+| WSL 互通通过显式 flag（如 `--wsl-profile`）启用，默认关闭 | CLI smoke test |
+| 错误消息语言与 profile lang 一致 | 回归测试 |
+
+**默认行为**：Phase 5 不修改默认 CLI 行为；所有加固项均为 opt-in。
 
 ### 5.3 新宿主接入理想流程（优化后）
 
@@ -661,6 +689,8 @@ Phase 5: 平台兼容性 ───────────────── 独
 总计: ~430L 新代码, 0 行现有代码修改
 预估: 1 天
 ```
+
+**适用范围**：上述流程适用于 pointer-only 宿主（Cursor/Kiro 类型）。若新宿主支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），但仍不修改现有 adapter。
 
 vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
@@ -682,7 +712,7 @@ vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
 Phase 1/2/3 的核心验收基于输出不变。策略：
 
-1. **重构前**：对 5 宿主运行 `spec-first init --dry-run --{host}` 并保存输出为 golden file
+1. **重构前**：对 5 宿主运行 `spec-first init --dry-run --{host}`（`--claude`、`--codex`、`--cursor`、`--kiro`、`--qoder` 均为当前 CLI 已支持的 flags）并保存输出为 golden file
 2. **重构后**：运行相同命令，对比 golden file
 3. **允许的差异**：文件修改时间戳、绝对路径中的用户名
 4. **不允许的差异**：任何 operation 的 kind/path/reason 变化
@@ -753,12 +783,14 @@ Phase 1/2/3 的核心验收基于输出不变。策略：
 
 | 优先级 | Phase | 收益 | 成本 | 依赖 |
 |--------|-------|------|------|------|
-| 1 | Platform Registry | 消除 O(n²)，新宿主零修改 | 1-2 天 | 无 |
-| 2 | Qoder Hooks | 补齐自身宿主最大功能缺口 | 1-2 天 | 无 |
+| 1 | Qoder Hooks | 补齐自身宿主最大功能缺口，直接影响 dogfooding 与 Qoder 用户体验 | 1-2 天 | 无 |
+| 2 | Platform Registry | 消除 O(n²)，新宿主零修改 | 1-2 天 | 无 |
 | 3 | init.js 拆分 | 可维护性瓶颈解除 | 2-3 天 | 无 |
 | 4 | PointerBasedAdapter | 消除 1300+ 行重复 | 1-2 天 | Phase 1 |
 | 5 | Plugin 分层 | 降低 contributor 理解成本 | 1 天 | 无 |
 | 6 | 平台兼容性 | 企业场景覆盖 | 1-2 天 | 无 |
+
+**优先级说明**：Qoder Hooks 与 Platform Registry 成本相近且均可独立交付；Qoder Hooks 排在首位因为它同时解决 spec-first 自身的 dogfooding 缺口和当前最大用户可见功能缺口。实际执行时两者可并行启动。
 
 **总工期**：7-12 天，渐进执行，每个 Phase 独立交付验证。
 

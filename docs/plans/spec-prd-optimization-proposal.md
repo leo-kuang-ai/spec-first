@@ -983,15 +983,650 @@ prd_revision_signal:
 
 ---
 
-## 八、总结
+## 八、grill-with-docs 集成深度分析与执行流程节点优化
+
+### 8.1 grill-with-docs 上游模式解剖
+
+`grill-with-docs` 是一个 3 层组合模式，不是单一技能：
+
+| 层 | 来源 | 核心行为 |
+| --- | --- | --- |
+| grilling（追问原语） | `/productivity/grilling/SKILL.md` | 无情一问一答；附推荐答案；**代码能回答的先探索代码，决不问 owner**；决策权归 owner |
+| domain-modeling（领域建模） | `/engineering/domain-modeling/SKILL.md` | 5 项主动纪律：挑战术语表、锐化模糊语言、发明具体场景、与代码交叉验证、即时更新 CONTEXT.md |
+| 组合（grill-with-docs） | `/engineering/grill-with-docs/SKILL.md` | 用 domain-modeling 纪律驱动 grilling 会话——每个追问都是锐化领域模型的机会 |
+
+**关键发现**：从 `ask-matt/SKILL.md` 的 `idea → ship` 主流看，grill-with-docs 是**第 1 步**，其产出（CONTEXT.md + ADR）是跨会话的持久化知识。spec-prd 将「grill + spec 综合」压缩进一个 workflow，这是正确的，但需要确保上游模式的质量行为在执行流中**结构性可见**而非仅文本提及。
+
+### 8.2 当前集成 vs 上游模式：三个关键差距
+
+`grill-with-docs-integration.md`（313 行）已经捕获了上游行为契约。但 SKILL.md 的执行流并未将上游模式最有价值的三个质量行为**转化为结构性节点**：
+
+#### 差距 A：Source Exploration 缺乏显式关卡
+
+**上游强制行为**："If a fact can be found by exploring the codebase, look it up rather than asking me."
+
+**当前 spec-prd**：Phase 1 提到 "Evidence Gathering (source-first)"，但没有一个显式关卡声明："所有 source 可解的 gap 已穷尽探索，才开始第一个 owner 问题。"
+
+**后果**：LLM 可能在 source-resolvable gap 尚存时就开始追问 owner——浪费 owner 注意力，且 recommended_answer 缺少 source 证据支撑。
+
+#### 差距 B：Scenario Invention 未成为 grill 问题的结构性质量层
+
+**上游强制行为**（domain-modeling）："Discuss concrete scenarios — invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts."
+
+**当前 spec-prd**：在 Source-First Session Rules 中作为文本提到，但未定位为**每个 grill 问题的前置质量放大器**。
+
+**理想模式**：每个 grill 问题应是 scenario-backed 的：
+1. 先发明一个边界场景探测 gap
+2. 用场景锐化问题表述
+3. 附 source-backed recommended_answer + 场景证据
+4. 问 owner：这个场景下系统应该怎么做？
+
+**收益**：场景驱动的追问让 owner 回答更精确——"用户在 A 场景下点取消但订单已发货时应该怎样？"远优于"取消策略是什么？"
+
+#### 差距 C：5 项 domain-modeling 主动纪律是 side-loaded 而非 spine-integrated
+
+5 项主动行为（challenge glossary、sharpen language、scenarios、cross-reference code、update CONTEXT.md）存在于 reference 文档中，不在执行脊柱上。仅遵循 SKILL.md Phase 2 的 LLM 不会自然产出这些行为带来的质量提升。
+
+### 8.3 执行流程节点评估
+
+#### 当前执行脊柱（4 Phase，~8 个主要节点）
+
+```
+Phase 0: Classify → route-out OR create/refine/validate
+Phase 1: Sanitize → Evidence → Req Analysis Gate → Product Expert Lens → Pre-Write Closure → Decision Card
+Phase 2: Change Delta → Topology → Requirements Grill (loop) → Domain Grill
+Phase 3: output_shape → surface lens → Write PRD
+Phase 4: Readiness Lens → finalize/checker → outcome
+```
+
+#### 五个结构性问题
+
+| # | 问题 | 描述 | 影响 |
+| --- | --- | --- | --- |
+| 1 | **Phase 1 过载** | 6 个不同活动挤在一个 Phase：sanitize、evidence、analysis gate、expert lens、closure gate、decision card | LLM 丢失跟踪；"direct-write-after-read" 反模式部分源于 Phase 1 太密集 |
+| 2 | **Decision Card 在 Grill 之前** | Pre-Write Closure Gate + Decision Card 在 Phase 1，而 Grill 在 Phase 2。`write_mode=ask-owner-first` 意味着"去 grill"——Phase 1 的输出路由到 Phase 2 | 制造"先决策后信息"的认知混乱；card 在 grill 后还需更新 |
+| 3 | **Phase 2 命名误导** | 叫"Change Delta & Domain Language"但 80% 执行时间是 Requirements Grill 循环 | LLM 可能低估 grill 投入，高估 delta/topology |
+| 4 | **Source exploration 无关卡** | 代码探索和 owner 追问之间无显式检查点 | source 可解的 gap 可能变成 owner 问题 |
+| 5 | **Scenario invention 不可见** | 不是 grill 循环内的结构性步骤 | 问题缺乏边界测试质量 |
+
+### 8.4 执行流程节点重构方案
+
+**原则**：不增加 Phase 数量（认知负荷已经很高），而是**在现有 4 Phase 内重构**，使 grill-with-docs 质量行为结构性可见。
+
+#### 重构后的执行脊柱
+
+```
+Phase 0: Classify & Route（不变）
+
+Phase 1: Input Analysis & Source Exploration（重命名 + 精简）
+  ├→ Sanitization（不变）
+  ├→ Source-First Evidence Gathering（不变）
+  ├→ Requirement Analysis Gate map（不变）
+  └→ ★ Source Resolution Pass（新增显式节点）
+      "穷尽所有 source 可解的 gap 后才进入 Phase 2。
+       每个 gap 经代码探索 → 标记 source-resolved 或升级为 owner 问题。"
+
+Phase 2: Requirements Grill & Closure（重命名——反映真实主活动）
+  ├→ Product Expert Lens（从 Phase 1 移入——需要 source resolution 结果才能排序）
+  ├→ Requirements Grill（relentless, priority-ordered）
+  │   └→ ★ Per-question Quality Layer（新增结构性步骤）:
+  │       1. 发明边界场景（probe scenario invention）
+  │       2. 与代码/术语表交叉验证（cross-reference）
+  │       3. 附 recommended_answer + 场景证据追问 owner
+  │       4. 绑定 closure 到 write target
+  │       5. 术语结晶 → 即时更新 CONTEXT.md（if triggered）
+  ├→ Domain Language Closure（术语/ADR 集中收口）
+  ├→ Pre-Write Closure Gate + Decision Card（从 Phase 1 移入——grill 后决策而非 grill 前）
+  └→ Change Delta confirmation（轻量，从 Phase 2 开头移到结尾）
+
+Phase 3: Draft / Refine（不变）
+Phase 4: Readiness & Handoff（不变）
+```
+
+#### 关键调整说明
+
+| 调整 | 理由 | 效果 |
+| --- | --- | --- |
+| Product Expert Lens → Phase 2 | 需要 source resolution 结果才能准确排序 gap 优先级 | Gap 排序质量提升 |
+| Pre-Write Closure Gate → Phase 2 末尾 | write_mode 应在 grill 之后决策，而非 grill 之前 | 消除"先决策后信息"的矛盾 |
+| Source Resolution Pass 显式节点 | 强制"代码能答的先答"纪律 | 减少不必要的 owner 问题 |
+| Per-question Quality Layer | 使场景发明+交叉验证成为每个追问的固定动作 | 问题质量系统性提升 |
+| Phase 2 重命名 | 反映执行重心是 Grill 而非 Change Delta | LLM 正确分配注意力 |
+
+#### 重构后执行流程图
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                    Phase 0: Classify & Route                       │
+├────────────────────────────────────────────────────────────────────┤
+│  Input → Route out? → Classify intent → Input posture → Split?    │
+│  [emit: intent, input_posture, intake_mode]                       │
+└────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌────────────────────────────────────────────────────────────────────┐
+│              Phase 1: Input Analysis & Source Exploration           │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ┌──────────────────┐                                              │
+│  │ PRD Sanitization │ 分离 facts/goals/scope/指令                  │
+│  └────────┬─────────┘                                              │
+│           ▼                                                        │
+│  ┌──────────────────────────────────┐                              │
+│  │ Source-First Evidence Gathering  │                              │
+│  │ • user-stated • repo/docs/tests  │                              │
+│  │ • source-candidates • assumptions│                              │
+│  └────────┬─────────────────────────┘                              │
+│           ▼                                                        │
+│  ┌──────────────────────────────────┐                              │
+│  │ Requirement Analysis Gate (map)  │                              │
+│  │ → input_inventory               │                              │
+│  │ → open_decisions                 │                              │
+│  │ → risk_to_prd_write_target       │                              │
+│  └────────┬─────────────────────────┘                              │
+│           ▼                                                        │
+│  ╔══════════════════════════════════════╗                           │
+│  ║ ★ Source Resolution Pass (新增)    ║                           │
+│  ║ 对每个 open gap:                   ║                           │
+│  ║ • 代码/文档/测试/契约能否回答？     ║                           │
+│  ║ • 能 → 标记 source-resolved        ║                           │
+│  ║ • 不能 → 升级为 owner_question     ║                           │
+│  ║                                    ║                           │
+│  ║ EXIT GATE: 所有 source-answerable   ║                           │
+│  ║ gap 已穷尽，才进入 Phase 2          ║                           │
+│  ╚══════════════════════════════════════╝                           │
+└────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌────────────────────────────────────────────────────────────────────┐
+│           Phase 2: Requirements Grill & Closure                    │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ┌──────────────────────────────────┐                              │
+│  │ Product Expert Lens              │                              │
+│  │ (用 source resolution 结果排序)  │                              │
+│  │ → P0/P1/P2 gap priority queue    │                              │
+│  └────────┬─────────────────────────┘                              │
+│           ▼                                                        │
+│  ┌──────────────────────────────────────────────────────────┐      │
+│  │ Requirements Grill (relentless, priority-ordered)        │      │
+│  │                                                          │      │
+│  │  ┌──────────────────────────────────────────────────┐    │      │
+│  │  │ ★ Per-Question Quality Layer (新增)              │    │      │
+│  │  │                                                  │    │      │
+│  │  │  1. 发明边界场景                                 │    │      │
+│  │  │     "如果用户在 X 状态下执行 Y 会怎样？"          │    │      │
+│  │  │                                                  │    │      │
+│  │  │  2. 与代码/术语表交叉验证                        │    │      │
+│  │  │     检查场景是否与现有实现/术语矛盾              │    │      │
+│  │  │                                                  │    │      │
+│  │  │  3. 追问 owner                                   │    │      │
+│  │  │     + scenario evidence                          │    │      │
+│  │  │     + recommended_answer                         │    │      │
+│  │  │     + write_target binding                       │    │      │
+│  │  │                                                  │    │      │
+│  │  │  4. 术语结晶 → CONTEXT.md (if triggered)         │    │      │
+│  │  └──────────────────────────────────────────────────┘    │      │
+│  │                                                          │      │
+│  │  Owner answers → Legal stop point?                       │      │
+│  │  • leaf / source-resolved / owner-capped / how-pushdown  │      │
+│  │  NO → next branch (按 P0→P1→P2 顺序)                    │      │
+│  │  YES → branch closed                                    │      │
+│  └──────────────────────────────────────────────────────────┘      │
+│           ▼                                                        │
+│  ┌──────────────────────────────────┐                              │
+│  │ Domain Language Closure          │                              │
+│  │ 术语表/ADR 最终收口              │                              │
+│  └────────┬─────────────────────────┘                              │
+│           ▼                                                        │
+│  ┌──────────────────────────────────┐                              │
+│  │ Change Delta Confirmation        │                              │
+│  │ keep/extend/replace/remove       │                              │
+│  └────────┬─────────────────────────┘                              │
+│           ▼                                                        │
+│  ╔══════════════════════════════════╗                               │
+│  ║ Pre-Write Closure Gate          ║                               │
+│  ║ + Decision Card (grill 后决策)  ║                               │
+│  ║ • write_mode                    ║                               │
+│  ║ • highest_risk_gap              ║                               │
+│  ║ • why planning won't invent WHAT║                               │
+│  ╚══════════════════════════════════╝                               │
+└────────────────────────────────────────────────────────────────────┘
+                                │
+              ┌─────────────────┼───────────────────┐
+              ▼                 ▼                   ▼
+     ┌────────────────┐ ┌──────────────┐ ┌──────────────┐
+     │ask-owner-first │ │checkpoint-prd│ │  final-prd   │
+     │(return to grill)│ │(recovery)    │ │(all closed)  │
+     └────────────────┘ └──────────────┘ └──────┬───────┘
+                                                ▼
+┌────────────────────────────────────────────────────────────────────┐
+│              Phase 3: Draft / Refine / Split                       │
+├────────────────────────────────────────────────────────────────────┤
+│  output_shape → surface lens + overlay → Write PRD artifact       │
+└────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌────────────────────────────────────────────────────────────────────┐
+│              Phase 4: Readiness & Handoff                          │
+├────────────────────────────────────────────────────────────────────┤
+│  Readiness Lens → finalize/checker → outcome decision             │
+│  → ready-for-planning / revise-prd / ask-owner / route-out        │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### 8.5 Per-Question Quality Layer 详细设计
+
+这是本次集成分析最核心的产出——将 domain-modeling 的 5 项主动纪律转化为 grill 循环内的结构性步骤：
+
+```text
+## Per-Question Quality Layer
+
+每个 grill 问题在提出前，必须经过以下质量层：
+
+### Step 1: Scenario Invention（场景发明）
+
+为当前 gap 发明 1-2 个具体边界场景：
+- Happy path scenario: 正常流程下的预期行为
+- Edge case scenario: 探测边界/异常/并发/权限的极端情况
+
+格式: "如果 [actor] 在 [state/condition] 下执行 [action]，系统应该 [expected behavior]？"
+
+目的: 让 owner 回答具体场景而非抽象问题。
+"取消策略是什么？" → "用户在已发货状态下点击取消，应该阻止还是允许退货流程？"
+
+### Step 2: Cross-Reference（交叉验证）
+
+在提问前检查：
+- 场景是否与代码现有实现一致/矛盾？
+- 场景中的术语是否在 CONTEXT.md/glossary 中有定义？
+- 是否存在已有的 ADR 覆盖了这个决策点？
+
+如果发现矛盾 → 在问题中显式表达：
+"代码中 OrderService.cancel() 当前会检查 shipment status 并拒绝已发货订单的取消。
+  但你的需求描述提到'允许任何状态的订单取消'——哪个是正确的？"
+
+### Step 3: Ask Owner（追问 owner）
+
+问题格式要求：
+- 一次只问一个问题
+- 附 scenario evidence（"基于以下场景..."）
+- 附 recommended_answer（"我建议...因为代码中已实现 X"）
+- 附 write_target binding（"你的回答将写入 PRD 的 [section]"）
+- 附 priority signal（"[问题 3/8, P0 级别]"）
+
+### Step 4: Terminology Crystallization（术语结晶）
+
+如果 owner 回答中解决了一个术语歧义：
+- 即时更新 CONTEXT.md（if grill-with-docs-integration triggered）
+- 或记录到 PRD 的 Domain Notes / Decision Notes section
+
+### Quality Layer 约束
+
+- 这是 quality layer，不是 blocking gate——LLM 判断是否需要完整走完所有步骤
+- 简单 gap（如确认一个 flag 的默认值）可以跳过 scenario invention
+- 复杂 gap（architecture-level P0）必须完整走完全部步骤
+- 不引入 checker 检查——这是 LLM-owned semantic discipline
+```
+
+### 8.6 Source Resolution Pass 详细设计
+
+```text
+## Source Resolution Pass
+
+位置: Phase 1 末尾，作为 Phase 1 → Phase 2 的显式 EXIT GATE。
+
+### 执行逻辑
+
+对 Requirement Analysis Gate map 中的每个 open_decision / gap:
+
+1. 分类：source-answerable vs owner-required
+   - source-answerable: 代码、文档、测试、契约、配置、历史 PRD/plan 能回答
+   - owner-required: 涉及产品选择、业务优先级、scope 取舍、设计偏好
+
+2. 对 source-answerable gap 执行 source lookup:
+   - 代码探索 (bounded file read / rg / ast-grep)
+   - 文档/测试/契约检索
+   - 已有 PRD/plan/decision 检索
+   - 结果标记: source-resolved + evidence ref
+
+3. 输出 Source Resolution Summary:
+   - total_gaps: N
+   - source_resolved: M (list with evidence refs)
+   - escalated_to_owner: K (list with reason)
+   - source_exploration_not_feasible: J (list with reason)
+
+### EXIT GATE 条件
+
+当以下条件满足时进入 Phase 2:
+- 所有标记为 source-answerable 的 gap 已探索
+- 无法探索的已标注原因（文件不可达/工具不可用/scope 过广）
+- escalated_to_owner 列表已就绪供 Product Expert Lens 排序
+
+### 约束
+
+- 这是 LLM-owned discipline gate，不是脚本 gate
+- 不阻断无代码库的纯文本输入（此时 source_answerable = 0）
+- 不要求穷举整个代码库——bounded exploration 即可
+- 时间上不应超过 evidence gathering 本身的投入
+- 目的是确保 "先问代码再问人" 的纪律被显式执行
+```
+
+### 8.7 集成优化与流程节点重构总结
+
+| 优化维度 | 具体改动 | 影响范围 | 风险 |
+| --- | --- | --- | --- |
+| Source Resolution Pass | Phase 1 新增显式节点 | SKILL.md Phase 1 | 低——已有 source-first 文本，只是显式化 |
+| Per-Question Quality Layer | Phase 2 grill loop 新增结构步骤 | SKILL.md Phase 2 + grill-with-docs-integration.md | 中——需要 LLM 投入更多推理 |
+| Product Expert Lens 后移 | 从 Phase 1 移至 Phase 2 开头 | SKILL.md Phase 1/2 重排 | 中——改变现有控制流 |
+| Pre-Write Closure 后移 | 从 Phase 1 移至 Phase 2 末尾 | SKILL.md Phase 1/2 重排 | 中——Decision Card 时机变化 |
+| Phase 2 重命名 | "Requirements Grill & Closure" | SKILL.md 标题 | 低——纯认知改善 |
+| Change Delta 轻量化 | 从 Phase 2 开头移至末尾 | SKILL.md Phase 2 重排 | 低——不改变内容 |
+
+**与现有 7.2 Grill Priority Signal 的关系**：
+- 7.2 解决了「追问什么顺序」（P0→P1→P2 排序）
+- 8.5 解决了「每个追问怎么问」（scenario + cross-reference + recommended_answer）
+- 8.6 解决了「追问前做什么」（source 先行，穷尽代码能回答的）
+- 三者互补，共同构成「高质量 grill workflow」的完整设计
+
+**实施优先级**：
+- **立即可做**：8.6 Source Resolution Pass + 8.8 术语表命名对齐（仅修改 reference 文字）
+- **短期可做**：8.5 Per-Question Quality Layer（修改 SKILL.md Phase 2 + grill-with-docs-integration.md）
+- **需评审**：Product Expert Lens 和 Pre-Write Closure Gate 位置调整（改变现有控制流，需验证对 checker/finalize 的影响）
+
+### 8.8 术语表命名错位：CONTEXT.md vs CONCEPTS.md
+
+#### 问题本质
+
+spec-prd 的 grill-with-docs-integration.md 全文使用上游产物名 `CONTEXT.md`（25 处引用），但 spec-first 项目中真正的项目级术语表是 `CONCEPTS.md`，由 `spec-compound` 拥有创建权。
+
+实际后果：如果在一个 spec-first 项目中运行 spec-prd 的 triggered grill 模式，grill 过程中术语结晶后会创建 `CONTEXT.md`，但项目实际的术语表是 `CONCEPTS.md`——**两个文件并行存在，术语分散，下游 agent 无法找到统一词汇**。
+
+当前所有权分布：
+
+```
+spec-prd grill  → 写入 CONTEXT.md（上游名称）
+spec-compound   → 写入 CONCEPTS.md（spec-first 名称）
+spec-plan       → gap-fill CONCEPTS.md（仅已存在时）
+spec-brainstorm → gap-fill CONCEPTS.md（仅已存在时）
+```
+
+#### 深度优化方案：对齐命名
+
+**方案：将 grill-with-docs-integration.md 中的 `CONTEXT.md` 引用统一为 `CONCEPTS.md`**
+
+核心变更：
+1. `grill-with-docs-integration.md` 中所有 `CONTEXT.md` → `CONCEPTS.md`
+2. `grill-with-docs-integration.md` 中所有 `CONTEXT-MAP.md` → 保留但标注为 upstream-only（spec-first 项目不使用多 context 模式）
+3. `domain-language-and-decision-ledger.md` 中 `CONTEXT.md` 引用 → `CONCEPTS.md`
+4. `prd-readiness-lens.md` 中 `CONTEXT.md` 引用 → `CONCEPTS.md`
+5. `prd-output-template.md` 中 `CONTEXT.md` 引用 → `CONCEPTS.md`
+
+**所有权边界调整**：
+
+| 操作 | 当前 | 调整后 |
+|------|------|--------|
+| 创建 CONCEPTS.md | spec-prd 可创建（triggered mode） | spec-prd **不创建**，仅 gap-fill（与 spec-plan/brainstorm 一致） |
+| 更新 CONCEPTS.md | spec-prd 可更新（triggered mode） | spec-prd 可更新已有条目（triggered mode），但创建留给 spec-compound |
+| 术语决策记录 | PRD-local sections | 不变——仍然写入 PRD-local Glossary/Decision Notes |
+
+**保留上游 snapshot 不改**：`grill-with-docs-integration.md` 中的「Embedded Upstream Source Snapshot」段落保留 `CONTEXT.md` 原文（这是上游 source snapshot，不应修改），只在「Adapted spec-prd rules」部分使用 `CONCEPTS.md`。
+
+#### 约束
+
+- 不改变 spec-compound 的创建权——CONCEPTS.md 的首次创建仍由 spec-compound 或 spec-compound-refresh 拥有
+- spec-prd triggered grill 模式可以 **refine 已有 CONCEPTS.md 条目**（与 spec-plan/brainstorm 的 gap-fill 一致）
+- 如果 CONCEPTS.md 不存在，spec-prd 术语决策只写入 PRD-local sections，不创建文件
+- 上游 snapshot 保留原文，不修改
+
+### 8.9 Grill Session Recovery Protocol
+
+#### 问题本质
+
+Grill 会话本质是长流程——8-15 个追问 + 源码读取 + 场景发明。AI coding 会话常因 context 溢出、宿主重启、用户中断而中断。当前 spec-prd 没有显式设计恢复协议。
+
+spec-first 原则要求："session recovery must rely solely on durable artifacts — not transient dialogue state"。PRD artifact 自带 trace、blocking reason_codes、glossary——天然就是恢复点，但需要显式协议化。
+
+#### 恢复协议
+
+恢复时分 3 步检查：
+
+1. **读 PRD artifact**：定位最后一个写入的 section，确认 `write_mode` 和 `output_shape`
+2. **读 trace**：定位 blocking gaps 中 priority 最高的未闭合分支
+3. **续接 grill**：从该分支继续执行 Per-Question Quality Layer（8.5）
+
+恢复时的 Decision Card 必须标注 `session_recovered: true`，并声明：
+- 上次中断点（哪个 gap、哪个 Phase）
+- 已闭合 vs 未闭合 gap 清单
+- 下一步动作
+
+#### 恢复源唯一性
+
+| 恢复源 | 可用性 | 理由 |
+|--------|--------|------|
+| PRD artifact（含 trace + blocking gaps + glossary） | ✅ 唯一恢复源 | durable artifact，checked-in 或 session-local |
+| 对话历史 | ❌ 不可依赖 | transient state，可能不可用 |
+| 内存 / cache | ❌ 不可依赖 | 宿主可能重启 |
+| PRD-local Decision Notes | ✅ 辅助恢复源 | durable，但不如 trace 结构化 |
+
+#### 约束
+
+- 恢复后不重新执行 Phase 0（Classify）和 Phase 1 已完成部分——直接续接中断点
+- 如果中断发生在 Phase 1（source resolution），恢复后重新执行 Source Resolution Pass（因为代码可能已变化）
+- 如果中断发生在 Phase 2（grill），恢复后从最高优先级 blocking gap 续接
+- 恢复后的第一个动作必须展示 task list + 恢复摘要
+
+### 8.10 Context Budget Strategy
+
+#### 问题本质
+
+Source Resolution Pass（8.6）+ Per-Question Quality Layer（8.5）都增加了每个追问的推理成本。一个 10 问题的 grill 会话 + 源码读取 + 场景发明可能逼近 context window 上限。当前方案没有回答：**context 不够时怎么办？**
+
+#### Context 预算估算
+
+粗粒度估算（非精确计量）：
+
+| 消耗项 | 估算 token | 备注 |
+|---------|-----------|------|
+| SKILL.md resident context | ~8K | 常驻 |
+| Phase 1 source reads + analysis | ~15-30K | 取决于 codebase 规模 |
+| 每个 grill 问题（含 scenario + cross-ref + recommended_answer） | ~3-5K | 8.5 Per-Question Quality Layer 后 |
+| 每个源码读取（source resolution） | ~2-5K | 取决于文件大小 |
+| PRD draft write | ~5-10K | 取决于 output_shape |
+| Phase 4 checker + finalize | ~3-5K | 确定性脚本输出 |
+
+总计：10 问题 grill ≈ 60-100K token（不含 SKILL.md 常驻）。
+
+#### 降级策略
+
+当剩余 context 不足以完成全量 grill 时，按优先级降级：
+
+```
+保留（不可跳过）：
+  ✓ P0 架构问题（影响后续 plan/code 的 foundation）
+  ✓ Source Resolution Pass（代码能答的不消耗 owner 注意力）
+  ✓ Phase 4 checker + finalize（确定性验证不可省）
+
+降级（转为 deferred）：
+  → P1 行为问题 → PRD-local Outstanding Questions，标记 deferred_context_budget
+  → P2 体验问题 → PRD-local Outstanding Questions，标记 deferred_context_budget
+  → 低风险 gap → 压缩为 advisory note
+
+显式声明：
+  → Closeout Summary 中记录 "context_budget_limited: N questions deferred"
+  → 下游 spec-plan 看到 deferred 标记时知道这些 gap 未闭合
+```
+
+#### 与 7.2 Grill Priority Signal 的关系
+
+- 7.2 决定「问什么顺序」（P0→P1→P2 排序）
+- 8.10 决定「context 不够时保什么」（保留 P0，defer P1/P2）
+- 两者互补：7.2 确保高优先级问题先问，8.10 确保高优先级问题在被 defer 之前已被问
+
+### 8.11 Inbound Revision Signal Protocol
+
+#### 问题本质
+
+7.4 Revision Signal 是**出站**信号（PRD → 下游通知变更）。但 spec-first 核心链路是闭环：
+
+```
+Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
+    ↑                                                    |
+    +----------------------------------------------------+
+```
+
+当 spec-plan 在制定计划时发现 PRD 有歧义、或 spec-code-review 在审查时发现需求 gap——**当前没有反馈到 spec-prd 的通道**。链路是单向的（Spec → Plan），缺少 Plan → Spec 的反馈。
+
+#### Inbound Revision Request 格式
+
+定义 `prd_revision_request` artifact 格式（advisory，非 blocking）：
+
+```yaml
+# prd_revision_request
+source_skill: spec-plan | spec-code-review | spec-debug
+prd_path: docs/brainstorms/xxx-requirements.md
+gap_type: ambiguity | missing_scenario | contradiction | scope_creep | missing_constraint
+evidence:
+  - source: src/module/file.js:42
+    description: "PRD says X but code does Y"
+suggested_resolution: "advisory — clarify whether X or Y is intended"
+priority: P0 | P1 | P2
+```
+
+#### 处理流程
+
+spec-prd 收到 `prd_revision_request` 后：
+
+1. **验证 evidence**：Read 引用的 source:line，确认 gap 真实存在
+2. **局部 grill**：仅针对 revision request 的 gap 执行 Phase 2 grill（不重跑整个 PRD）
+3. **更新 PRD**：将 resolved gap 写入对应 section，更新 trace
+4. **出站通知**：通过 7.4 Revision Signal 通知下游 PRD 已更新
+5. **记录**：在 Decision Notes 中记录 revision request 来源 + 解决结果
+
+#### 与 7.4 出站信号的互补关系
+
+```
+出站 (7.4): PRD 变更 → 通知 spec-plan/spec-code-review
+入站 (8.11): spec-plan/spec-code-review 发现 gap → 请求 spec-prd 修订
+
+形成闭环: PRD → Plan → (发现 gap) → Revision Request → PRD 修订 → 通知 Plan
+```
+
+#### 约束
+
+- Inbound revision request 是 advisory，不 blocking——spec-plan 可以继续基于现有 PRD 制定计划
+- spec-prd 处理 revision request 时走 `refine` 路径，不走 `create` 路径
+- 如果 revision request 的 evidence 无法验证（source 已变化），标记为 `unverifiable` 并在 Closeout Summary 中声明
+- 不新增确定性脚本——revision request 的创建和处理都是 LLM 语义行为
+
+### 8.12 Optimization-to-Source Allocation Map
+
+#### 问题本质
+
+当前 SKILL.md 是 294 行。spec-first 架构原则要求 SKILL.md < 500 行。如果所有优化都内联到 SKILL.md，可能逼近限制。需要显式规划 SKILL.md vs references/ 的分配。
+
+#### 分配原则
+
+- **脊柱节点**（改变执行流结构的）→ SKILL.md（简短 trigger，3-5 行）+ reference（详细设计）
+- **行为约束**（改变 LLM 如何推理的）→ SKILL.md（1-2 行 trigger）+ reference（详细步骤）
+- **降级策略**（context budget、degraded mode）→ 新建 reference 文件
+- **协议定义**（revision signal、recovery protocol）→ 新建 reference 文件
+
+#### 具体分配
+
+| 优化项 | SKILL.md 增量 | 详细设计位置 | SKILL.md 预估行数 |
+|--------|--------------|-------------|-----------------|
+| Source Resolution Pass（8.6） | Phase 1 出口 trigger | grill-with-docs-integration.md | +5 行 |
+| Per-Question Quality Layer（8.5） | Phase 2 grill loop trigger | grill-with-docs-integration.md | +3 行 |
+| Grill Priority Signal（7.2） | Phase 2 grill 排序 trigger | 新建 references/grill-priority-signal.md | +2 行 |
+| Handoff Guidance（7.3） | Phase 4 closeout trigger | 新建 references/handoff-guidance.md | +2 行 |
+| Revision Signal（7.4） | Phase 4 closeout trigger | domain-language-and-decision-ledger.md | +2 行 |
+| Developer Quick-Start（7.1） | 不改 SKILL.md | prd-output-template.md | +0 行 |
+| 叙事优化（7.5） | 不改 SKILL.md | prd-output-template.md | +0 行 |
+| 术语表命名对齐（8.8） | 不改 SKILL.md | 4 个 reference 文件 | +0 行 |
+| Session Recovery（8.9） | Phase 0 trigger | 新建 references/session-recovery.md | +2 行 |
+| Context Budget（8.10） | Phase 2 trigger | 新建 references/context-budget-strategy.md | +2 行 |
+| Inbound Revision Signal（8.11） | Phase 4 trigger | domain-language-and-decision-ledger.md | +2 行 |
+| 流程节点重排（8.4） | Phase 1/2 重排 | SKILL.md 直接修改 | +0 行（重排，不新增） |
+
+**预估 SKILL.md 总量**：294 + 22 ≈ **316 行**（远低于 500 行限制）。
+
+#### 新增 reference 文件清单
+
+| 新文件 | 内容 | 加载触发 |
+|--------|------|----------|
+| references/grill-priority-signal.md | P0→P1→P2 排序规则 + pipeline propagation risk | Phase 2 grill 开始时 |
+| references/handoff-guidance.md | PM→开发交接 guidance + Developer Quick-Start | Phase 4 closeout 时 |
+| references/session-recovery.md | 恢复协议 3 步检查 + Decision Card 恢复格式 | 会话恢复时 |
+| references/context-budget-strategy.md | token 预算估算 + 降级策略 + defer 格式 | Phase 2 grill 过程中按需 |
+
+### 8.13 Verification Plan
+
+#### 问题本质
+
+AGENTS.md 明确要求：
+
+> "Don't rely on in-session typed-agent/skill invocations; use fresh-source eval."
+> "fresh-source eval 的可复用 checklist 见 docs/contracts/workflows/fresh-source-eval-checklist.md"
+
+方案提出了大量行为变更，但需要定义**如何验证这些变更确实改善了质量**。
+
+#### 验证策略
+
+**1. Fresh-Source Eval（必做）**
+
+将修改后的 SKILL.md + references 注入一个全新通用 subagent 的 prompt 中，评估 3 个场景：
+
+| 场景 | 验证什么 | 通过标准 |
+|------|----------|----------|
+| 有明确源码答案的 gap | 是否走了 Source Resolution Pass 而非直接问 owner | gap 标记为 source-resolved，无 owner 问题 |
+| 模糊需求 | 是否先发明场景再追问 | 追问前有 scenario_invented 标记 |
+| 长会话（模拟 context 不足） | 是否执行了 context budget 降级 | Closeout Summary 有 deferred_context_budget 标记 |
+
+如果宿主缺少 dispatch primitive 或 runtime 无法调用，显式声明未执行原因，不能声称通过。
+
+**2. Contract Test（必做）**
+
+- `check-prd-artifact.js` 的 38 个 reason_codes 覆盖不变（不新增 blocking code）
+- `finalize-prd-artifact.js` 的 ready receipt 格式不变
+- 现有 Jest contract tests 全部通过
+- 新增 2-3 个 contract test 验证新行为（如 source-resolved gap 不出现在 owner questions 中）
+
+**3. Eval Fixture（建议做）**
+
+- evals/examples.json 中新增 2-3 个 fixture：
+  1. brownfield 需求 + 有明确源码答案 → 验证 source resolution
+  2. 模糊需求 + 多个 P0/P1 gap → 验证 grill priority signal
+  3. 长需求 + context 限制 → 验证 context budget 降级
+
+**4. 回归验证**
+
+- 运行 `npm run test:unit` 确保现有测试不回归
+- 运行 `npm run lint:skill-entrypoints` 确保入狱治理不违规
+- 运行 `npm run typecheck` 确保脚本语法正确
+
+#### 验证矩阵
+
+| 变更类型 | Fresh-source eval | Contract test | Eval fixture | 回归测试 |
+|---------|-----------------|---------------|-------------|----------|
+| SKILL.md 行为变更 | ✅ | ✅ | ✅ | ✅ |
+| Reference 文件修改 | ✅ | — | — | — |
+| 确定性脚本修改 | — | ✅ | ✅ | ✅ |
+| 新建 reference 文件 | ✅ | — | — | — |
+
+---
+
+## 九、总结
 
 spec-prd 当前已是 production-grade 的 brownfield PRD 工作流，其「分析优先 + 证据驱动 + relentless grill + 确定性验证」的架构在业界同类工具中处于领先水平。
 
-本方案在保持原有架构优势的基础上，从五个结构性缺口出发，回答了核心问题：
+本方案从两个维度回答核心问题：
 
 > **这个流程能否高质量地将产品需求文档转化为开发可直接使用的 PRD？**
 
-答案：**能，但需要五项补强才能从「架构优秀」走向「用户体验优秀」：**
+### 维度一：交付质量与体验（第七章）
+
+五项补强让流程从「架构优秀」走向「用户体验优秀」：
 
 1. **开发可消费性** — Developer Quick-Start 让开发 2 分钟内建立工作图景
 2. **Grill 优先级排序** — 按 pipeline 传播风险排序追问顺序，关键问题最先闭合
@@ -999,9 +1634,27 @@ spec-prd 当前已是 production-grade 的 brownfield PRD 工作流，其「分�
 4. **反馈闭环** — PRD Revision Signal 让下游发现的问题能回溯
 5. **叙事优化** — 按开发消费顺序提供聚合视图
 
-所有优化均在 spec-first 核心约束内运作：不新增硬状态机、不增加 BLOCKING 检查、不突破 source/runtime 边界、不让脚本做语义判断。走「丰富信息 + advisory 建议」路线，而非「硬规则 + 强制中断」路线。
+### 维度二：执行流程质量与 grill-with-docs 集成（第八章）
 
-实施优先级：
-- **立即可做**：7.1（Developer Quick-Start）+ 7.5（叙事优化）— 仅修改 prd-output-template.md
-- **短期可做**：7.2（Grill Priority Signal）+ 7.3（Handoff Guidance）— 修改 2 个 reference 文件
-- **需评审**：7.4（Revision Signal）— 跨 workflow 约定，需与 spec-plan/work/review skill owner 協商
+九项节点优化让 grill 从「仅文本要求 relentless」走向「结构性保证高质量 grill」：
+
+1. **Source Resolution Pass** — 显式关卡确保「先问代码再问人」
+2. **Per-Question Quality Layer** — 场景发明+交叉验证让每个问题都是边界探测
+3. **流程节点重排** — Product Expert Lens 后移、Decision Card 后移、Phase 2 重命名
+4. **术语表命名对齐** — CONTEXT.md → CONCEPTS.md，消除术语分散风险
+5. **Session Recovery Protocol** — PRD artifact 为唯一恢复源，3 步检查续接中断点
+6. **Context Budget Strategy** — context 不足时保留 P0、defer P1/P2，显式声明未闭合
+7. **Inbound Revision Signal** — 下游 skill 可反馈 PRD gap，形成闭环
+8. **Source Allocation Map** — SKILL.md 增量 ≤22 行，详细设计在 references
+9. **Verification Plan** — fresh-source eval + contract test + eval fixture 三层验证
+
+### 综合实施优先级
+
+| 优先级 | 优化项 | 影响范围 |
+| --- | --- | --- |
+| 立即可做 | 7.1 Developer Quick-Start + 7.5 叙事优化 + 8.6 Source Resolution Pass + 8.8 术语表命名对齐 + 8.12 Source Allocation Map | prd-output-template.md + SKILL.md Phase 1 + 4 个 reference 文件 |
+| 短期可做 | 7.2 Grill Priority Signal + 7.3 Handoff Guidance + 8.5 Per-Question Quality Layer + 8.9 Session Recovery + 8.10 Context Budget | 5 个 reference 文件 + SKILL.md Phase 2 |
+| 需评审 | 7.4 Revision Signal + 8.4 流程节点重排 + 8.11 Inbound Revision Signal | 跨 workflow + 控制流重构 + 新增 artifact 格式 |
+| 验证（随实施） | 8.13 Verification Plan | fresh-source eval + contract test + eval fixture |
+
+所有优化均在 spec-first 核心约束内运作：不新增硬状态机、不增加 BLOCKING 检查、不突破 source/runtime 边界、不让脚本做语义判断。走「丰富信息 + advisory 建议」路线，而非「硬规则 + 强制中断」路线。
