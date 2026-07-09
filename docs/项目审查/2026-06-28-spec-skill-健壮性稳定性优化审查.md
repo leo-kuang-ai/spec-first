@@ -46,7 +46,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 **C. Bootstrap block 忠实性：生成器有守、仓库盘面无守**
 - 生成器侧守卫健全：`instruction-bootstrap.test.js` 限制行数 `<26/28`、`blockIds.size < skillIds.size`、`CURATED_CORE ⊆ block`、`sessions`/`release-notes` 显式缺席、双宿主前缀参数化无泄漏。
 - 仓库盘面缺口（高杠杆）：
-  1. `slack-research/skill-audit/app-consistency-audit/polish-beta` 四个被裁剪项**无缺席断言**——accretion 边界只守了一半，bootstrap 可静默纳入任一项仍过测。
+  1. `slack-research/skill-review/app-consistency-audit/polish-beta` 四个被裁剪项**无缺席断言**——accretion 边界只守了一半，bootstrap 可静默纳入任一项仍过测。
   2. `CURATED_CORE` 在测试中硬编码，未从 `skills-governance.json` 派生；SKILL 新增高频入口时无人提示 bootstrap 漏纳。
   3. **无 repo-state faithfulness 测试**：`inspectInstructionBootstrap` helper 已存在，但仅对 temp dir 执行，从未对仓库自身 `CLAUDE.md`/`AGENTS.md` 断言 `status==='installed'`——checked-in block 的静默 prose drift 不会被 CI 捕获。这是单点最高杠杆修复。
 - 两条 load-bearing 红旗被 bootstrap 内联丢弃且无测试守护：「task is vague → brainstorm/plan」与「run init/update now → route first」——前者恰是路由最该生效的 vague-WHAT 场景，后者对应 Hard Rule #10（no state-changing commands just because governor matched）。
@@ -58,7 +58,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 ### 优化点（按杠杆降序）
 1. **P0** 新增 repo-state faithfulness 测试：`inspectInstructionBootstrap(REPO_ROOT, claude/codex).status === 'installed'`，让 checked-in `CLAUDE.md`/`AGENTS.md` 与生成器输出 byte-faithful 对齐。helper 已就绪，仅缺断言。
-2. **P0** 显式缺席集扩为 `{sessions, slack-research, skill-audit, app-consistency-audit, polish-beta, release-notes}`，闭合 accretion 边界。
+2. **P0** 显式缺席集扩为 `{sessions, slack-research, skill-review, app-consistency-audit, polish-beta, release-notes}`，闭合 accretion 边界。
 3. **P1** `CURATED_CORE` 改由 `skills-governance.json` 派生（如 `bootstrap_anchor:true` 标记），消除硬编码漂移。
 4. **P1** 补回两条 load-bearing 内联红旗（vague→brainstorm/plan、run-init-now→route first），或加测试断言其 intentional deferral 至 `routing-red-flags.md`。
 5. **P1** 定义 "sensitive surfaces"（architecture/contract/governance/runtime-delivery/multi-file/auth/payments/data-mutation 等），写入 `scope-guards.md` 并加红旗词条。
@@ -73,7 +73,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ## Round 2：工作流链路节点 handoff
 
 ### 取证范围
-`docs/10-prompt/结构化项目角色契约.md`、`docs/workflow-skill-agent-map.md`、`skills/{using-spec-first,spec-brainstorm,spec-prd,spec-plan,spec-write-tasks,spec-work,spec-code-review,spec-doc-review,spec-debug,spec-compound,spec-compound-refresh}/SKILL.md`、`.spec-first/audits/skill-audit/2026-06-28-deep-research-loop10/*`。
+`docs/10-prompt/结构化项目角色契约.md`、`docs/workflow-skill-agent-map.md`、`skills/{using-spec-first,spec-brainstorm,spec-prd,spec-plan,spec-write-tasks,spec-work,spec-code-review,spec-doc-review,spec-debug,spec-compound,spec-compound-refresh}/SKILL.md`、`.spec-first/audits/skill-review/2026-06-28-deep-research-loop10/*`。
 
 ### 证据与发现
 
@@ -106,13 +106,13 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ## Round 3：脚本健壮性审查
 
 ### 取证范围
-`skills/spec-skill-audit/scripts/write-audit-artifacts.js`、`collect-skill-facts` 相关模块、`tests/unit/skill-audit-scripts.test.js`、本轮执行产物 `.spec-first/audits/skill-audit/2026-06-28-deep-research-loop10/`。
+`skills/retired-skill-review/scripts/write-audit-artifacts.js`、`collect-skill-facts` 相关模块、`tests/unit/skill-review-scripts.test.js`、本轮执行产物 `.spec-first/audits/skill-review/2026-06-28-deep-research-loop10/`。
 
 ### 证据与发现
 
 **A. 正面：脚本是事实采集器，不假装语义裁决**
 - `write-audit-artifacts.js` 在 `runSelfAudit` 中收集 structure/security/trigger/boundary/eval/promise/governance/runtime 报告，然后统一写出 JSON 与 Markdown。
-- `skill-audit-summary.md` 明确 “Scorecards are signals, not gates” 与 “LLM review decides semantic quality”。
+- `skill-review-summary.md` 明确 “Scorecards are signals, not gates” 与 “LLM review decides semantic quality”。
 - `promise-implementation-report.json`：documented options 6、implemented options 6、findings 0，说明 audit workflow 自身承诺与实现一致。
 
 **B. 关键弱点：误报反证还停留在 LLM 手工层**
@@ -123,7 +123,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - `security-risk-report.json` 仍把这些“禁止/边界说明”升级成 P0/P1 候选，说明 scanner 缺少 negation/fixture/allowlist 分类。
 
 **C. Markdown link checker 对模板占位符误报**
-- `skill-audit-report.json` 报 `spec-release-notes` 4 个 broken local link。
+- `skill-review-report.json` 报 `spec-release-notes` 4 个 broken local link。
 - 源码证据是 `skills/spec-release-notes/SKILL.md` 中的模板占位：`[Full release notes ->]({url})`、`[v2.65.0]({older_url})`。
 - 这些不是本地 Markdown 链接，应该被识别为 templated external URL placeholder。
 
@@ -142,7 +142,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ## Round 4：schema/contract/eval 纪律
 
 ### 取证范围
-`.spec-first/audits/skill-audit/2026-06-28-deep-research-loop10/eval-readiness-report.json`、`skills/*/evals/*`、`tests/unit/eval-fixture-contracts.test.js`、`tests/unit/workflow-eval-readiness-contracts.test.js`、`docs/contracts/workflows/eval-fixture-contract.md`。
+`.spec-first/audits/skill-review/2026-06-28-deep-research-loop10/eval-readiness-report.json`、`skills/*/evals/*`、`tests/unit/eval-fixture-contracts.test.js`、`tests/unit/workflow-eval-readiness-contracts.test.js`、`docs/contracts/workflows/eval-fixture-contract.md`。
 
 ### 证据与发现
 
@@ -157,7 +157,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - `spec-mcp-setup` 有 44 个 scripts，但 eval readiness missing；这类高副作用 setup workflow 缺语义/边界 eval 的风险高于普通 internal helper。
 
 **C. Contract Summary 纪律不均衡**
-- `skill-audit-report.json` 报 61 个 P1 missing-section 与 61 个 P2 missing-section，主要集中在 internal-only 或旧迁移 skill。
+- `skill-review-report.json` 报 61 个 P1 missing-section 与 61 个 P2 missing-section，主要集中在 internal-only 或旧迁移 skill。
 - 这些不是都应按 P1 处理；对 public workflow 和 state-changing standalone skill 应严格，对 lightweight internal helper 可接受。
 
 ### 风险
@@ -175,7 +175,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ## Round 5：source/runtime 边界
 
 ### 取证范围
-`docs/10-prompt/结构化项目角色契约.md`、`docs/contracts/context-governance.md`、`skills/spec-skill-audit/references/source-vs-runtime-contract.md`、`runtime-drift-report.json`、`skills/spec-mcp-setup/SKILL.md`。
+`docs/10-prompt/结构化项目角色契约.md`、`docs/contracts/context-governance.md`、`skills/retired-skill-review/references/source-vs-runtime-contract.md`、`runtime-drift-report.json`、`skills/spec-mcp-setup/SKILL.md`。
 
 ### 证据与发现
 
@@ -207,7 +207,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ## Round 6：skill prose 质量与引用加载
 
 ### 取证范围
-`wc -l skills/*/SKILL.md`、`skills/spec-skill-audit/references/skill-authoring-quality.md`、各 skill 的 `references/` / `evals/` / `scripts/` 分布。
+`wc -l skills/*/SKILL.md`、`skills/retired-skill-review/references/skill-authoring-quality.md`、各 skill 的 `references/` / `evals/` / `scripts/` 分布。
 
 ### 证据与发现
 
@@ -314,7 +314,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 **A. Boundary overlap 报告是候选信号，不是结论**
 - `boundary-overlap-matrix.json` 产生 168 个 candidate。
 - Top candidates 包括：
-  - `spec-skill-audit` vs `spec-write-skill`
+  - `retired-skill-review` vs `spec-write-skill`
   - `spec-debug` vs `spec-work`
   - `spec-code-review` vs `spec-doc-review`
   - `spec-brainstorm` vs `spec-prd`
@@ -324,7 +324,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 **B. 真正需要修的是用户入口和近邻触发消歧**
 - `spec-brainstorm` vs `spec-prd`：WHAT discovery / brownfield PRD authoring 的 tie-break 已在 `using-spec-first` 写明，但 eval 覆盖仍可加强。
 - `spec-debug` vs `spec-optimize`：性能回归“why slow” vs 指标优化“make faster”存在真实近邻，前序 spec-debug 文档已承认一条撞车场景。
-- `spec-skill-audit` vs `spec-write-skill`：audit 不应自动 rewrite source；write-skill 才负责创建/改写 skill。这一点在 `spec-skill-audit` 主面清晰，但 boundary candidate 可提示补 negative eval。
+- `retired-skill-review` vs `spec-write-skill`：audit 不应自动 rewrite source；write-skill 才负责创建/改写 skill。这一点在 `retired-skill-review` 主面清晰，但 boundary candidate 可提示补 negative eval。
 
 **C. Internal-only 暴露边界仍需统一**
 - `skills-governance.json` 将 `git-worktree` 标为 `internal_only`，但 skill 作为可用 skill 出现在 host skill 列表中；这不是必然错误，问题在于“internal-only”到底表示不作为 public workflow，还是不应被用户直接触发。
@@ -335,7 +335,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - “internal-only” 名称如果未定义清楚，会在 skill discovery 与 public workflow governance 之间制造误解。
 
 ### 优化点
-1. **P1** 为 boundary-overlap top 5 pair 各补 2 个 negative eval：`brainstorm/prd`、`debug/optimize`、`skill-audit/write-skill`、`prd/write-tasks`、`code-review/doc-review`。
+1. **P1** 为 boundary-overlap top 5 pair 各补 2 个 negative eval：`brainstorm/prd`、`debug/optimize`、`skill-review/write-skill`、`prd/write-tasks`、`code-review/doc-review`。
 2. **P1** 在 governance schema 中拆分 `entry_surface` 与 `host_discoverability`：internal helper 可被 host 发现但不作为 public workflow。
 3. **P2** `boundary-overlap-matrix` 输出按 pair 聚合，不要把全局 candidate 当 skill-level defect；并加入 `likely_shared_vocabulary_only` 分类。
 4. **P2** 修正 `routing-red-flags.md` 中 stale/反转 skill 名与 internal-only 解释。
@@ -400,14 +400,14 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
    - 验证：聚焦 `tests/unit/instruction-bootstrap.test.js`。
 3. **仍开放**：调整 security/runtime governance scanner，避免把“禁止手改 generated runtime”的说明报成 P0。
    - Evidence：`spec-compound:85`、`spec-mcp-setup:34`、`provider-tools.json:56` 均是反向说明；全仓实扫确认这三行恰为仓库仅有的 3 个 P0，三层 negation 对其全部失效（根因 `PROHIBITION_HINTS` 未收录 `does not`/`excludes`/`are not source`，详见附录 B P0-3）。
-   - Consumer：`spec-skill-audit` summary、release governance。
-   - 验证：扩展 `PROHIBITION_HINTS`/allowlist + 新增 false-positive fixture + `tests/unit/skill-audit-scripts.test.js`，并全仓实扫确认三行 P0 已降级。
+   - Consumer：`retired-skill-review` summary、release governance。
+   - 验证：扩展 `PROHIBITION_HINTS`/allowlist + 新增 false-positive fixture + `tests/unit/skill-review-scripts.test.js`，并全仓实扫确认三行 P0 已降级。
 
 #### P1：补高风险 workflow 的语义回归网
 4. 给 `spec-mcp-setup` 增加最小 eval seed。
    - 覆盖：provider opt-in、runtime mirror 不手改、Graphify provider output boundary、degraded readiness。
 5. 给缺 eval 的 public workflow 建第二波 eval：`spec-compound-refresh`、`spec-ideate`、`spec-optimize`、`spec-polish-beta`、`spec-release-notes`、`spec-sessions`、`spec-slack-research`。
-6. 为 top boundary pair 增 negative eval：`brainstorm/prd`、`debug/optimize`、`skill-audit/write-skill`、`prd/write-tasks`、`code-review/doc-review`。
+6. 为 top boundary pair 增 negative eval：`brainstorm/prd`、`debug/optimize`、`skill-review/write-skill`、`prd/write-tasks`、`code-review/doc-review`。
 7. 将 section lint 按 `entry_surface` 分层，避免 internal-only old skill 噪声淹没 public workflow 风险。
 
 #### P2：降低长期维护成本
@@ -427,7 +427,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 2. **Slice B：audit 脚本误报治理**
    - 修 security scanner negation/fixture 分类。
    - 修 templated URL placeholder link 误报。
-   - 加 `skill-audit-scripts` fixtures。
+   - 加 `skill-review-scripts` fixtures。
 
 3. **Slice C：高风险 eval seed**
    - 先补 `spec-mcp-setup`，再补 missing public workflow 第二波。
@@ -440,9 +440,9 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ### 本轮验证证据
 
 - 已读取角色契约：`docs/10-prompt/结构化项目角色契约.md`。
-- 已按 `spec-skill-audit` workflow 运行确定性采集：
-  - `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --runtime --run-id 2026-06-28-deep-research-loop10`
-  - 产物：`.spec-first/audits/skill-audit/2026-06-28-deep-research-loop10/`
+- 已按 `retired-skill-review` workflow 运行确定性采集：
+  - `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --runtime --run-id 2026-06-28-deep-research-loop10`
+  - 产物：`.spec-first/audits/skill-review/2026-06-28-deep-research-loop10/`
 - 已检查多会话：`spec-first session list --json`，active_count 0。
 - 已使用 Graphify 作为 advisory navigation：`graphify query "spec-first skills workflow handoff runtime governance eval readiness source runtime boundaries" --budget 2200`。
 - 已用 source/test evidence 复核关键结论：`skills-governance.json` 37 条记录、`runtime-drift-report.json` 2 条 drift、`eval-readiness-report.json` 15 ready / 22 missing、`security-risk-report.json` P0/P1 误报反证、`docs/workflow-skill-agent-map.md` `spec-update` stale。
@@ -542,7 +542,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 **根因（为何误报）**：subagent 在 `instruction-bootstrap.test.js:366-388` 看到 temp-dir 用例，未向下翻到 `:392-397` 的 REPO_ROOT 用例；且未读 `inspectInstructionBootstrap` 函数体确认 `installed` 即 byte-faithful。
 
 **真实可优化点（细分，仍成立）**——这些是 Round 1 subagent 的其他发现，与"byte-faithful"无关：
-1. 显式缺席集不完整：`instruction-bootstrap.test.js:512-513` 仅断言 `sessions`/`release-notes` 缺席，`slack-research/skill-audit/app-consistency-audit/polish-beta` 无缺席断言 → bootstrap 可静默纳入这 4 项仍过测。**P1**。
+1. 显式缺席集不完整：`instruction-bootstrap.test.js:512-513` 仅断言 `sessions`/`release-notes` 缺席，`slack-research/skill-review/app-consistency-audit/polish-beta` 无缺席断言 → bootstrap 可静默纳入这 4 项仍过测。**P1**。
 2. `CURATED_CORE` 在测试中硬编码，未从 `skills-governance.json` 派生 → SKILL 新增高频入口时无人提示 bootstrap 漏纳。**P1**。
 3. 两条 load-bearing 红旗被 bootstrap 内联丢弃且无守：「vague→brainstorm/plan」「run-init-now→route first」。**P1**。
 
@@ -550,7 +550,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - **Goals**：闭合 accretion 边界（4 项缺席断言）；让 `CURATED_CORE` 随治理 registry 自动派生；补回或显式 deferral 两条红旗。
 - **Non-goals**：不重写已 byte-faithful 的守卫主体（已正确）。
 - **方案**：
-  - 扩 `instruction-bootstrap.test.js` 显式缺席集为 `{sessions, slack-research, skill-audit, app-consistency-audit, polish-beta, release-notes}`。
+  - 扩 `instruction-bootstrap.test.js` 显式缺席集为 `{sessions, slack-research, skill-review, app-consistency-audit, polish-beta, release-notes}`。
   - 在 `skills-governance.json` 给高频入口加 `bootstrap_anchor: true`，测试从该字段派生 `CURATED_CORE`。
   - bootstrap 内联红旗补回两条，或在测试中断言其 intentional deferral 至 `references/routing-red-flags.md`。
 - **风险**：改 `skills-governance.json` schema 需同步 governance-drift 守卫；中。
@@ -563,10 +563,10 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 **真实状态：三层 negation 机制存在，但对这三行全部失效，三行 P0 仍为 live 误报（P0 保留）。**
 - 经全仓实扫 `scanInstructionSecurity` 复核，当前仓库**仅有 3 个 P0 finding，全部 `runtime_governance`，且正是 Round 3 点名的三行**：`spec-compound/SKILL.md:85`、`spec-mcp-setup/SKILL.md:34`、`spec-mcp-setup/provider-tools.json:56`——无任何 allowlist 豁免，三层 negation 全部返回 `actionable_pattern`（不降级）。
-- `skills/spec-skill-audit/scripts/lib/security-patterns.js:75-121` `classifyPatternContext`：`PROHIBITION_HINTS`（`do not/never/avoid/must not/will not/forbid` + 中文 `禁止/不要/不得/避免/不允许/只建议`）命中即降级 P3。**根因缺口**：三行用的是 `excludes`/`are not source`/`does not`，而 `does not` **不匹配** 正则 `/\bdo not\b/i`（`PROHIBITION_HINTS` 未收录 `excludes`/`are not source`/`does not`）。
+- `skills/retired-skill-review/scripts/lib/security-patterns.js:75-121` `classifyPatternContext`：`PROHIBITION_HINTS`（`do not/never/avoid/must not/will not/forbid` + 中文 `禁止/不要/不得/避免/不允许/只建议`）命中即降级 P3。**根因缺口**：三行用的是 `excludes`/`are not source`/`does not`，而 `does not` **不匹配** 正则 `/\bdo not\b/i`（`PROHIBITION_HINTS` 未收录 `excludes`/`are not source`/`does not`）。
 - `scan-instruction-security.js:69-83` `classifyFileContext`：`/references/`、`/evals/`、`/examples/` 路径强制 P3。**对这三行失效**：三文件均不在这三类路径下。
 - `scan-instruction-security.js:85-100` `classifySectionContext`：`when not/do not/not to use` 标题降级 P3（`hasExecutableExceptionCue` 保留原严重度）。**对这三行失效**：相关标题不含这些短语。
-- `tests/unit/skill-audit-scripts.test.js:636-909` 共 6 个相关测试，其中纯 suppression fixture 4 个（含 "hand-edit generated runtime mirrors" 行断言无 P0，断言在 `:708`）。**但这些 fixture 覆盖的是 PROHIBITION_HINTS 已命中的措辞**，未覆盖 `does not`/`excludes`/`are not source` 这类缺口措辞，故三行 P0 漏网。
+- `tests/unit/skill-review-scripts.test.js:636-909` 共 6 个相关测试，其中纯 suppression fixture 4 个（含 "hand-edit generated runtime mirrors" 行断言无 P0，断言在 `:708`）。**但这些 fixture 覆盖的是 PROHIBITION_HINTS 已命中的措辞**，未覆盖 `does not`/`excludes`/`are not source` 这类缺口措辞，故三行 P0 漏网。
 - **结论**：Round 3"scanner 缺少能 catch 这类的 negation/fixture/allowlist 分类""误报反证停留在 LLM 手工层"**结论正确**。附录 B 初稿的相反结论**错误**——它只验证"机制存在"未跑实扫，犯了自己批评的同类错误。
 
 **真实残留（成立，P2 非 P1）**：
@@ -580,7 +580,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
   2. 或为这三类 generated-runtime 边界文件建 allowlist（`isDetectorOwnSource` 扩展），显式豁免边界说明行。
   3. `markdown.js` `extractLocalLinks` 增 placeholder 跳过——链接目标匹配 `/^\{[a-z_]+\}$/` 或含 `{...}` template 段时，标记 `templated_placeholder: true` 并跳过 `exists` 判定；且应跳过代码块/反引号 span 内的链接。加 fixture：`[x]({url})` 不产 `broken_local_link`。
 - **风险**：补 `PROHIBITION_HINTS` 需避免把真实禁止性安全指令也降级——应以"边界/否定说明"语境（generated runtime / source-of-truth 段）收紧，而非泛匹配。中。
-- **落地**：`skills/spec-skill-audit/scripts/lib/security-patterns.js` + `skills/spec-skill-audit/scripts/lib/markdown.js` + `tests/unit/skill-audit-scripts.test.js`；验证 `npx jest tests/unit/skill-audit-scripts.test.js` + 全仓实扫确认三行 P0 已降级。
+- **落地**：`skills/retired-skill-review/scripts/lib/security-patterns.js` + `skills/retired-skill-review/scripts/lib/markdown.js` + `tests/unit/skill-review-scripts.test.js`；验证 `npx jest tests/unit/skill-review-scripts.test.js` + 全仓实扫确认三行 P0 已降级。
 - **结论**：P0-3 主体（runtime governance P0 误报）**未满足，保留 P0**；`{url}` placeholder 误报**P2**（非初稿所标 P1）。
 
 ### P0-4 handoff 确定性补强（Spec→Plan / Tasks→Work / Review→Knowledge）

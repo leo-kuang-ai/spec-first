@@ -32,7 +32,7 @@ This task pack is the executable Phase 2 handoff for the source plan. It covers 
 - U6 agent role and dispatch boundary tightening.
 - U7 domain language, ADR-like guidance, and decision ledger consumption.
 - U8 feedback-loop-first debug/work/task discipline and vertical slicing guidance.
-- U12 progressive disclosure for review, sessions/compound, and skill-audit follow-up surfaces.
+- U12 progressive disclosure for review, sessions/compound, and skill-review follow-up surfaces.
 - U11 closeout checklist.
 
 It does not implement Phase 3 release/source-runtime continuity guards, U10 public surface inventory, U3b retention/prune lifecycle, U12 checkpoint replay, or U1-full-batch-2.
@@ -55,7 +55,7 @@ It does not implement Phase 3 release/source-runtime continuity guards, U10 publ
 | U6 | R8, R9; dispatch is bounded, degraded/fallback aware, and worker suitability gated | T004 | agent support, dispatch, plan/doc/code-review contract tests, fresh-source eval |
 | U7 | R12; domain language and major decisions consume existing context first | T005 | brainstorm/debug/work/plan/doc-review/code-review/standards contract tests |
 | U8 | R10, R11; feedback loop and vertical slice discipline | T006 | debug/work/write-tasks/code-review contract tests |
-| U12 progressive | R18-R25; scale-aware review and progressive disclosure for follow-up workflows | T007 | doc-review/code-review/sessions/compound/skill-audit contract tests |
+| U12 progressive | R18-R25; scale-aware review and progressive disclosure for follow-up workflows | T007 | doc-review/code-review/sessions/compound/skill-review contract tests |
 | U11 | R17, R26; changelog, validation artifact, runtime impact, fresh-source eval | T008 | changelog format, diff check, phase validation doc |
 
 ## Task Graph
@@ -337,19 +337,19 @@ It does not implement Phase 3 release/source-runtime continuity guards, U10 publ
       "task_id": "T007",
       "source_unit": "U12-progressive-disclosure",
       "requirement_refs": ["R18", "R19", "R20", "R21", "R22", "R23", "R24", "R25"],
-      "goal": "Add Phase 2 progressive-disclosure guidance for review workflows, sessions/compound replay refs, and skill-audit posture checks.",
+      "goal": "Add Phase 2 progressive-disclosure guidance for review workflows, sessions/compound replay refs, and skill-review posture checks.",
       "dependencies": ["T006"],
       "files": [
         "skills/spec-doc-review/SKILL.md",
         "skills/spec-code-review/SKILL.md",
-        "skills/spec-skill-audit/SKILL.md",
+        "skills/retired-skill-review/SKILL.md",
         "skills/spec-sessions/SKILL.md",
         "skills/spec-compound/SKILL.md",
         "skills/spec-compound-refresh/SKILL.md",
         "tests/unit/spec-doc-review-contracts.test.js",
         "tests/unit/spec-code-review-contracts.test.js",
         "tests/unit/spec-sessions-contracts.test.js",
-        "tests/unit/spec-skill-audit-contracts.test.js",
+        "tests/unit/retired-skill-review-contracts.test.js",
         "CHANGELOG.md"
       ],
       "context_refs": [
@@ -358,12 +358,12 @@ It does not implement Phase 3 release/source-runtime continuity guards, U10 publ
         "src/cli/helpers/review-pre-facts.js",
         "skills/spec-doc-review/SKILL.md",
         "skills/spec-code-review/SKILL.md",
-        "skills/spec-skill-audit/SKILL.md"
+        "skills/retired-skill-review/SKILL.md"
       ],
       "entry_hint": "Keep this as guidance: scale-aware reviewer set, checkpoint/replay refs, and audit detection of overgrown entry prompts.",
       "parallelizable": false,
-      "test_focus": "Low-risk docs-only and high-risk workflow/contract/release changes have different reviewer posture; sessions/compound use distilled refs; skill-audit flags progressive disclosure drift.",
-      "done_signal": "Review/session/skill-audit contract tests pass without adding hard token budgets or a new facts pipeline.",
+      "test_focus": "Low-risk docs-only and high-risk workflow/contract/release changes have different reviewer posture; sessions/compound use distilled refs; skill-review flags progressive disclosure drift.",
+      "done_signal": "Review/session/skill-review contract tests pass without adding hard token budgets or a new facts pipeline.",
       "wave": 7,
       "review_gate": "required",
       "review_focus": "Check no hard token budget engine, replay index, or new reviewer facts pipeline was introduced.",
@@ -572,26 +572,26 @@ It does not implement Phase 3 release/source-runtime continuity guards, U10 publ
 
 - source_unit: U12-progressive-disclosure
 - requirement_refs: R18, R19, R20, R21, R22, R23, R24, R25
-- goal: Add Phase 2 progressive-disclosure guidance for review/session/compound/skill-audit surfaces.
+- goal: Add Phase 2 progressive-disclosure guidance for review/session/compound/skill-review surfaces.
 - dependencies: T006
 - files:
   - `skills/spec-doc-review/SKILL.md`
   - `skills/spec-code-review/SKILL.md`
-  - `skills/spec-skill-audit/SKILL.md`
+  - `skills/retired-skill-review/SKILL.md`
   - `skills/spec-sessions/SKILL.md`
   - `skills/spec-compound/SKILL.md`
   - `skills/spec-compound-refresh/SKILL.md`
   - `tests/unit/spec-doc-review-contracts.test.js`
   - `tests/unit/spec-code-review-contracts.test.js`
   - `tests/unit/spec-sessions-contracts.test.js`
-  - `tests/unit/spec-skill-audit-contracts.test.js`
+  - `tests/unit/retired-skill-review-contracts.test.js`
   - `CHANGELOG.md`
 - context_refs:
   - `docs/plans/2026-05-11-002-feat-spec-first-project-optimization-upgrade-plan.md#U12. Token economy guardrails 与 progressive disclosure`
   - `docs/contracts/workflows/review-pre-facts-extraction.md`
   - `src/cli/helpers/review-pre-facts.js`
-- test_focus: scale-aware review, distilled replay refs, skill-audit progressive disclosure checks.
-- done_signal: review/session/skill-audit contract tests pass.
+- test_focus: scale-aware review, distilled replay refs, skill-review progressive disclosure checks.
+- done_signal: review/session/skill-review contract tests pass.
 - stop_if: durable replay index or hard token budget automation is required.
 - review_gate: required
 - wave: 7
@@ -632,7 +632,7 @@ It does not implement Phase 3 release/source-runtime continuity guards, U10 publ
   - `./bin/spec-first.js tasks validate docs/tasks/2026-05-17-004-feat-spec-first-optimization-phase2-tasks.md --json`
 - Suggested targeted validation after implementation:
   - `npm run lint:skill-entrypoints`
-  - `npm run test:jest -- tests/unit/public-workflow-contract-summary.test.js tests/unit/lint-skill-entrypoints.test.js tests/unit/spec-standards-contracts.test.js tests/unit/spec-standards-validation.test.js tests/unit/spec-standards-consumers.test.js tests/unit/readme-language-split.test.js tests/unit/user-manual-contracts.test.js tests/unit/runtime-contract-boundary.test.js tests/unit/agent-support-contracts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/spec-brainstorm-contracts.test.js tests/unit/spec-debug-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-plan-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-standards-contracts.test.js tests/unit/spec-sessions-contracts.test.js tests/unit/spec-skill-audit-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
+  - `npm run test:jest -- tests/unit/public-workflow-contract-summary.test.js tests/unit/lint-skill-entrypoints.test.js tests/unit/spec-standards-contracts.test.js tests/unit/spec-standards-validation.test.js tests/unit/spec-standards-consumers.test.js tests/unit/readme-language-split.test.js tests/unit/user-manual-contracts.test.js tests/unit/runtime-contract-boundary.test.js tests/unit/agent-support-contracts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/spec-brainstorm-contracts.test.js tests/unit/spec-debug-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-plan-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-standards-contracts.test.js tests/unit/spec-sessions-contracts.test.js tests/unit/retired-skill-review-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
   - `npm run typecheck`
   - `git diff --check`
 - Run fresh-source eval for skill/agent prose changes or record a valid not-run reason.

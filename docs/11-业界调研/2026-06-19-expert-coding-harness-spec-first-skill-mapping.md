@@ -16,8 +16,8 @@
 | --- | --- | --- | --- |
 | P0（假设，落地前先验证痛点） | 强化 `spec-work` 的 task handoff 质量：完整任务文本、源文件路径、验收条件、验证命令必须传给 fresh worker / reviewer | `spec-work`、`spec-write-tasks` | ECH `subagent-driven-development` 与 `writing-plans` 的最高价值点。但 §6 证据显示 spec-write-tasks 已有 `context_refs`/`review_gate`/`review_focus`、spec-work 已有 handoff 纪律；**P0 优先级须先绑 spec-first 侧失败交接实例，否则边际收益仅是 prose 加固**（见 Deferred A5/§14） |
 | P0（条件门，非全仓硬序） | 强化 review 顺序：**当存在 derived task/plan spec 时**先规格符合性、再代码质量；spec-less debug/refactor 走风险优先 fallback；reviewer 不应只看 diff 美观 | `spec-code-review`、`spec-work` | ECH SDD 的 implementer -> spec reviewer -> code quality reviewer 顺序值得吸收，但其前提是“每个任务皆 spec-derived”，须写成条件门而非无条件序（见 Deferred F7） |
-| P0 | 评估 `spec-task-handoff-reviewer`（plan/task/work 交接就绪度，本轮唯一“新增 agent”候选，先验证痛点再落地）；`spec-agent-tool-security-reviewer` **不新增**，先作 `spec-agent-native-reviewer` + `spec-security-reviewer` 交叉 lens（A3 裁定） | `spec-plan`、`spec-write-tasks`、`spec-work`、`spec-code-review`、`spec-skill-audit` | A1/A2/A3 裁定后 agent 净增上限为 1（51 → 52）；安全能力以扩展威胁清单落到交叉 lens，重叠取舍见 §6.2 |
-| P1 | 把安全审计、前端审查、API 设计、AI Agent 安全做成 code-review / plan 的专项 rubric 或 persona，而不是新增默认 workflow | `spec-code-review`、`spec-plan`、`spec-skill-audit` | ECH 专项 skill 细，但多数是 checklist，不应扩大 public surface |
+| P0 | 评估 `spec-task-handoff-reviewer`（plan/task/work 交接就绪度，本轮唯一“新增 agent”候选，先验证痛点再落地）；`spec-agent-tool-security-reviewer` **不新增**，先作 `spec-agent-native-reviewer` + `spec-security-reviewer` 交叉 lens（A3 裁定） | `spec-plan`、`spec-write-tasks`、`spec-work`、`spec-code-review`、`retired-skill-review` | A1/A2/A3 裁定后 agent 净增上限为 1（51 → 52）；安全能力以扩展威胁清单落到交叉 lens，重叠取舍见 §6.2 |
+| P1 | 把安全审计、前端审查、API 设计、AI Agent 安全做成 code-review / plan 的专项 rubric 或 persona，而不是新增默认 workflow | `spec-code-review`、`spec-plan`、`retired-skill-review` | ECH 专项 skill 细，但多数是 checklist，不应扩大 public surface |
 | P1 | config-protection（exit 2 阻断）作为确定性-gate 吸收点：这是项目“Scripts prepare facts”哲学最认可的资产，**从 P2 重排为 P1**（host-binding 是实现细节，非否决理由） | `spec-mcp-setup`、未来 host hook governance | allowlist/override 须 source-controlled + 人类可写 + AI 不可写 + override 需人工 commit；host-specific 落地前先独立核验 hook 源码（见 §8/§11 Phase 5 与 Deferred A6） |
 | P1 | 借鉴 `source-reading-analyst` 的报告模板：源码事实、调用路径、Mermaid 图、风险和改造建议分栏 | `spec-plan`、`spec-debug`、`spec-repo-research-analyst` | 适合作为架构分析输出格式，不应替代 direct source evidence；落到扩 `spec-repo-research-analyst` 输出格式（A1 裁定，不新增 source-map agent） |
 | P1 | 借鉴 `debug-expert` 的 hypothesis ledger / minimal repro 语言 | `spec-debug` | 与现有 debug workflow 同向，可作为 prose 加固 |
@@ -108,11 +108,11 @@
 | `tdd-master` | Workflow / method | `<HARD-GATE>`；必须先看到因正确原因失败的测试；RED-GREEN-REFACTOR | `spec-work` | 部分覆盖 | 仅对明确 TDD slice 增加“先验证 RED”严格模式；不要求所有任务 TDD 化 | P1 |
 | `debug-expert` | Workflow | 统一契约；两个 `<HARD-GATE>`；要求最小复现、假设、实际验证 | `spec-debug` | 基本覆盖 | 补强 hypothesis ledger、minimal repro、verification-before-fixed 的措辞 | P1 |
 | `code-review-expert` | Review | 统一契约；SOLID、安全、性能、边界条件、删除代码检查 | `spec-code-review` | 基本覆盖 | 抽取 refactor/delete-code/SOLID checklist 作为 reviewer rubric，不改 schema | P1 |
-| `code-security-audit` | Review / security | 统一契约；五阶段审计；污点追踪、攻击链、10 维安全面 | `spec-code-review`、`spec-skill-audit` | 部分覆盖 | 做 security deep-dive optional mode 或专项 persona；敏感面触发，不默认全量跑 | P1 |
+| `code-security-audit` | Review / security | 统一契约；五阶段审计；污点追踪、攻击链、10 维安全面 | `spec-code-review`、`retired-skill-review` | 部分覆盖 | 做 security deep-dive optional mode 或专项 persona；敏感面触发，不默认全量跑 | P1 |
 | `source-reading-analyst` | Research / architecture | `<HARD-GATE>`；只读源码；报告含 Mermaid、调用关系、改造建议 | `spec-plan`、`spec-debug`、`agent-native-architecture` | 部分覆盖 | 借鉴报告模板和图表选型；重要结论仍需 source/test/log 回源确认 | P1 |
 | `architecture-advisor` | Architecture | 新系统 / 既有架构优化，输出 Mermaid 和路线图 | `spec-plan`、`agent-native-architecture`、`spec-code-review` | 部分覆盖 | 可吸收“现状图 -> 目标图 -> 分阶段路线图”格式 | P2 |
 | `improve-codebase-architecture` | Architecture | 深模块 / 浅模块识别，改善可测试性和 AI 可导航性 | `spec-plan`、`spec-code-review`、`spec-compound` | 部分覆盖 | 适合转成 architecture smell rubric 和 durable knowledge 候选 | P2 |
-| `skill-smith` | Meta-skill | skill 创建反模式、触发描述、结构建议 | `skill-creator`、`spec-skill-audit` | 基本覆盖 | 可对照补 trigger precision / anti-pattern 示例；不替代现有 skill governance | P2 |
+| `skill-smith` | Meta-skill | skill 创建反模式、触发描述、结构建议 | `skill-creator`、`retired-skill-review` | 基本覆盖 | 可对照补 trigger precision / anti-pattern 示例；不替代现有 skill governance | P2 |
 | `docs-lookup` | Tool-use method | Context7 resolve 后 query；避免 API 幻觉 | `openai-docs`、Context7 工具使用、`spec-mcp-setup` | 部分覆盖 | 保持“官方 docs / primary source 优先”，并标记 provider_untrusted/advisory | P1 |
 | `planning-with-files` | Long-task memory | `task_plan.md/findings.md/progress.md`；hooks 注入/回读/提醒 | `spec-work`、`spec-sessions`、run artifacts | 概念覆盖，形态冲突 | 借鉴“每 2 次探索写 ledger / 决策前回读目标”；不采用根三文件为 source truth | P2 |
 | `handoff` | Handoff | 结构化会话交接 | `spec-work` closeout、`spec-sessions` | 基本覆盖 | 可吸收“当前状态 / 已试过 / 剩余风险 / 下一步”字段作为 closeout 补充 | P2 |
@@ -121,7 +121,7 @@
 | `frontend-performance-optimization` | Domain optimize | Web Vitals、加载、运行时、bundle | `spec-optimize`、`test-browser`、`frontend-design` | 部分覆盖 | 用指标驱动而非 checklist 驱动；接入 browser/perf evidence 时再落地 | P1 |
 | `react-best-practices` | Domain checklist | React/Next 组件、Hooks、状态、性能 | `frontend-design`、`spec-code-review` | 部分覆盖 | 只作为 React checklist，不新增 workflow | P2 |
 | `api-design` | Domain checklist | REST/GraphQL、版本、错误处理，行数最多 | `spec-prd`、`spec-plan`、`spec-code-review` | 部分覆盖 | 抽取 API contract / error model / versioning rubric；不做独立默认 skill | P2 |
-| `ai-agent-security` | Domain security | prompt injection、tool abuse、权限越界 | `agent-native-architecture`、`spec-skill-audit`、`spec-code-review` | 部分覆盖 | 对 agent/tool/MCP 变更启用专项安全 checklist | P1 |
+| `ai-agent-security` | Domain security | prompt injection、tool abuse、权限越界 | `agent-native-architecture`、`retired-skill-review`、`spec-code-review` | 部分覆盖 | 对 agent/tool/MCP 变更启用专项安全 checklist | P1 |
 | `interview-knowledge-track` | Knowledge / interview | 面试知识拆分、主题检索、经历绑定 | 无核心对应；可旁路到 knowledge | 低相关 | 不纳入 spec-first coding workflow；若做知识产品再评估 | 不采纳 |
 | `llm-wiki-interview` | Knowledge / interview | Raw/Wiki/Index 面试知识库 | 无核心对应 | 低相关 | 不纳入当前 skill 节点 | 不采纳 |
 | `grill-me` | Interaction mode | 深度追问，每次一个问题 | `spec-brainstorm` 可吸收局部 | 轻量覆盖 | 作为提问风格可选，不做节点 | 不采纳 |
@@ -140,11 +140,11 @@
 | `tdd-master` | RED-GREEN-REFACTOR，必须实际看到 RED/GREEN 输出 | `spec-work` | 是，仅对明确 TDD / bug slice 启用 stricter RED 语言 | 不新增；测试判断由 work/debug + testing reviewer 承接 | 条件优化 workflow |
 | `debug-expert` | 最小复现、假设清单、修复前后验证门 | `spec-debug` | 是，补 hypothesis ledger / minimal repro 措辞 | 不新增；现有 debug 输出已含 root cause / verification | 优化 workflow |
 | `code-review-expert` | SOLID、安全、性能、边界条件、删除代码检查 | `spec-code-review` | 是，作为 reviewer rubric 素材 | 不新增；默认 core + conditional personas 已覆盖大部分面向 | 优化 review rubric |
-| `code-security-audit` | 五阶段审计、Source-to-Sink、攻击链、安全控制矩阵 references | `spec-code-review`、`spec-skill-audit` | 是，作为 optional deep-dive 入口/选择规则 | 优先完善 `spec-security-reviewer` / `spec-security-sentinel` rubric；多次需要完整深审后再新增 `spec-security-deep-dive-reviewer` | 完善现有 agent/rubric，保留新增候选 |
+| `code-security-audit` | 五阶段审计、Source-to-Sink、攻击链、安全控制矩阵 references | `spec-code-review`、`retired-skill-review` | 是，作为 optional deep-dive 入口/选择规则 | 优先完善 `spec-security-reviewer` / `spec-security-sentinel` rubric；多次需要完整深审后再新增 `spec-security-deep-dive-reviewer` | 完善现有 agent/rubric，保留新增候选 |
 | `source-reading-analyst` | 只读源码、入口/调用链/数据流、报告含图与改造建议 | `spec-plan`、`spec-debug`、`spec-repo-research-analyst` | 是，借鉴 evidence table / call path / diagram 选型 | A1 裁定：**不新增 `spec-source-map-analyst`**，扩 `spec-repo-research-analyst` 输出格式（其 scope 已覆盖 entry/call-path/data-flow/impact） | 扩既有 analyst，不新增 agent |
 | `architecture-advisor` | 现状图、目标图、技术方案和路线图 | `spec-plan`、`agent-native-architecture` | 是，补架构计划输出形态 | 不新增；`spec-architecture-strategist` 已是更合适的判断角色 | 优化 workflow |
 | `improve-codebase-architecture` | 浅模块/深模块、可测试性、AI 可导航性 | `spec-plan`、`spec-code-review`、`spec-compound` | 是，作为 architecture smell / durable learning 素材 | 不新增；maintainability/simplicity/architecture reviewer 可覆盖 | 优化 rubric |
-| `skill-smith` | skill 架构、触发描述、reference 组织反模式 | `spec-skill-audit`、`skill-creator` | 是，补 trigger precision / progressive disclosure 示例 | 不新增；当前 skill-audit 是合适入口 | 优化 skill-audit rubric |
+| `skill-smith` | skill 架构、触发描述、reference 组织反模式 | `retired-skill-review`、`skill-creator` | 是，补 trigger precision / progressive disclosure 示例 | 不新增；当前 skill-review 是合适入口 | 优化 skill-review rubric |
 | `docs-lookup` | Context7 resolve -> query，避免 API 幻觉和敏感信息外发 | `openai-docs`、Context7 使用纪律、`spec-mcp-setup` | 是，强化 provider advisory / primary-source 语言 | 不新增；工具使用规则由 workflow 和 host docs 承接 | 优化 workflow/tool-use guidance |
 | `planning-with-files` | `task_plan.md/findings.md/progress.md`、2-action rule、read-before-decide | `spec-work`、`spec-sessions`、run artifacts | 只吸收 ledger 纪律；拒绝根三文件 source truth | 不新增；session/history 能承接 resume，artifact 承接 closeout | 局部借鉴，形态不采纳 |
 | `handoff` | 会话交接摘要 | `spec-work` closeout、`spec-sessions` | 是，补 closeout 字段：当前状态、已试过、剩余风险、下一步 | 不新增；现有 session historian 足够 | 优化 workflow |
@@ -153,7 +153,7 @@
 | `frontend-performance-optimization` | Web Vitals、加载、运行时、bundle | `spec-optimize`、`test-browser`、`spec-code-review` | 是，强调指标驱动和 browser/perf evidence | 仅在有 Lighthouse/Web Vitals/bundle/browser trace 证据时评估 `spec-web-performance-reviewer`；`spec-performance-reviewer` 可先扩展触发 | 完善现有 agent/rubric，保留低优先级候选 |
 | `react-best-practices` | React/Next Hooks、组件、状态、性能 checklist | `frontend-design`、`spec-code-review` | 是，作为 React lens | 不新增；TypeScript/frontend/design reviewers 可承接 | 优化 rubric |
 | `api-design` | REST 资源、状态码、分页、错误、版本、rate limit | `spec-prd`、`spec-plan`、`spec-code-review` | 是，补 API contract / error model / versioning rubric | A2 裁定：**不新增 `spec-api-design-lens-reviewer`**，把 plan/PRD 阶段 API 设计审查作为 `spec-api-contract-reviewer` 的阶段边界扩展（避免双 API owner 无 tiebreaker） | 扩既有 reviewer，不新增 agent |
-| `ai-agent-security` | Prompt injection、tool abuse、权限越界、敏感信息保护 | `agent-native-architecture`、`spec-skill-audit`、`spec-code-review` | 是，补 agent/tool/MCP 安全 checklist | P0 候选 `spec-agent-tool-security-reviewer`；也可先扩 `spec-agent-native-reviewer` + security reviewer 交叉 lens | 完善现有 agent/rubric + 评估 conditional agent |
+| `ai-agent-security` | Prompt injection、tool abuse、权限越界、敏感信息保护 | `agent-native-architecture`、`retired-skill-review`、`spec-code-review` | 是，补 agent/tool/MCP 安全 checklist | P0 候选 `spec-agent-tool-security-reviewer`；也可先扩 `spec-agent-native-reviewer` + security reviewer 交叉 lens | 完善现有 agent/rubric + 评估 conditional agent |
 | `interview-knowledge-track` | 面试知识拆分、主题检索、经历绑定 | 无核心对应 | 否 | 不新增；偏个人知识产品，不服务当前工程闭环 | 不采纳 |
 | `llm-wiki-interview` | Raw/Wiki/Index 面试知识库 | 无核心对应 | 否 | 不新增；与 spec-first coding harness 弱相关 | 不采纳 |
 | `grill-me` | 每次一个问题的强追问交互模式 | `spec-brainstorm` 可局部吸收 | 只作为提问风格素材 | 不新增；不是稳定工程 artifact 节点 | 不采纳为节点 |
@@ -171,7 +171,7 @@
 | `spec-code-review` 已有 security/performance/api personas | `skills/spec-code-review/references/persona-catalog.md:31-40` | ECH 的 security/API/perf/frontend 能做 persona/rubric 增强，不应默认新 workflow |
 | `spec-code-review` reviewer 输出已有 JSON schema 与 confidence anchors | `skills/spec-code-review/references/subagent-template.md:20-55` | ECH checklist 若接入 review，必须转成 schema-compatible findings，而不是自由文本 |
 | `spec-debug` 已有 root cause、hypothesis ledger、repro feedback loop | `skills/spec-debug/SKILL.md:61-78`、`:126-130` | ECH `debug-expert` 只需做措辞强化或 eval 参照，不是缺失能力 |
-| `spec-skill-audit` 已覆盖 trigger precision、scope、runtime governance | `skills/spec-skill-audit/SKILL.md:2-3`、`:80-100` | ECH `skill-smith` 只适合作为对照样例 |
+| `retired-skill-review` 已覆盖 trigger precision、scope、runtime governance | `skills/retired-skill-review/SKILL.md:2-3`、`:80-100` | ECH `skill-smith` 只适合作为对照样例 |
 
 ### 6.1 Agent 节点承接盘点
 
@@ -185,7 +185,7 @@
 | 前端性能优化 | `spec-performance-reviewer`、`test-browser` skill、`spec-optimize` | 指标入口存在，但 Web Vitals/browser evidence 触发可更明确 | 放进 `spec-optimize` / browser evidence 路径，不做 checklist-only agent |
 | AI Agent 安全 | `spec-agent-native-reviewer`、`spec-security-reviewer`、`agent-native-architecture` | action parity/primitive tools 有 owner；prompt injection/tool abuse 交叉风险需补 rubric | 优先完善 agent-native + security 交叉 lens，不新增 `ai-agent-security` clone |
 | 源码阅读 / 架构走读 | `spec-repo-research-analyst`、`spec-architecture-strategist`、`spec-adversarial-document-reviewer` | owner 清晰；ECH 报告模板可改进输出质量 | 补 evidence table / call path / diagram guidance；不新增 source-reading agent |
-| Skill 设计质量 | `spec-skill-audit`、`skill-creator` | owner 清晰，且 spec-first 有 source/runtime governance 特化 | 吸收 ECH `skill-smith` 反模式示例；不新增 meta-skill |
+| Skill 设计质量 | `retired-skill-review`、`skill-creator` | owner 清晰，且 spec-first 有 source/runtime governance 特化 | 吸收 ECH `skill-smith` 反模式示例；不新增 meta-skill |
 
 ### 6.2 可封装为 spec-first agent 的候选能力
 
@@ -196,8 +196,8 @@
 | 优先级 | 候选 / 处置 | ECH 来源 | 供哪些 spec-first skill 节点使用 | 判断能力 | 推荐裁决（已裁定） |
 | --- | --- | --- | --- | --- | --- |
 | P0 | `spec-task-handoff-reviewer`（或 `spec-execution-readiness-reviewer`）——**唯一明确新增候选** | `writing-plans` + `subagent-driven-development` | `spec-plan`、`spec-write-tasks`、`spec-work`、`spec-doc-review` | 判断 plan/task/handoff 是否足够给 fresh worker 执行：路径、上下文、验收、验证命令、`stop_if`、`review_focus`、review order 是否明确 | 新增评估；这是跨 plan/tasks/work 的独立语义质量判断，不应只靠执行者自检。**先验证 spec-first 侧痛点**（见 §0 P0 锚定说明）再决定是否落地 |
-| P0 | `spec-agent-tool-security-reviewer` → **不新增，先作交叉 lens**（A3 裁定） | `ai-agent-security` | `spec-skill-audit`、`spec-code-review`、`agent-native-architecture`、`spec-plan` | 威胁面：prompt injection、tool abuse、MCP/tool 权限越界、secret 暴露、source/runtime mirror 边界、human-only auth/security exception，外加 **provider/MCP 输出当指令注入、planning/ledger 文件注入、供应链/vendored 依赖（`vendor/`）、runtime mirror 篡改、经外部 provider 调用的数据外发**；并以 **“check-secrets 无告警 ≠ 安全通过”** 为硬约束 | A3 裁定：与 `spec-agent-native-reviewer`（已 owns tool/MCP/system-prompt + human-only auth exception）边界重叠，**先作 `spec-agent-native-reviewer` + `spec-security-reviewer` 的交叉 lens**；scope 先按左列补齐再实施，重复出现且交叉 lens 无法承接时才评估独立 agent |
-| P1 | `spec-security-deep-dive-reviewer` → **先扩现有 deep mode** | `code-security-audit` | `spec-code-review`、`spec-skill-audit` | Source-to-Sink、攻击链、auth/public endpoint/secrets/tool execution deep audit；输出 exploit path、control gap、source refs | 先扩现有 `spec-security-reviewer` / `spec-security-sentinel` deep mode；当完整深审需求反复出现再新增 |
+| P0 | `spec-agent-tool-security-reviewer` → **不新增，先作交叉 lens**（A3 裁定） | `ai-agent-security` | `retired-skill-review`、`spec-code-review`、`agent-native-architecture`、`spec-plan` | 威胁面：prompt injection、tool abuse、MCP/tool 权限越界、secret 暴露、source/runtime mirror 边界、human-only auth/security exception，外加 **provider/MCP 输出当指令注入、planning/ledger 文件注入、供应链/vendored 依赖（`vendor/`）、runtime mirror 篡改、经外部 provider 调用的数据外发**；并以 **“check-secrets 无告警 ≠ 安全通过”** 为硬约束 | A3 裁定：与 `spec-agent-native-reviewer`（已 owns tool/MCP/system-prompt + human-only auth exception）边界重叠，**先作 `spec-agent-native-reviewer` + `spec-security-reviewer` 的交叉 lens**；scope 先按左列补齐再实施，重复出现且交叉 lens 无法承接时才评估独立 agent |
+| P1 | `spec-security-deep-dive-reviewer` → **先扩现有 deep mode** | `code-security-audit` | `spec-code-review`、`retired-skill-review` | Source-to-Sink、攻击链、auth/public endpoint/secrets/tool execution deep audit；输出 exploit path、control gap、source refs | 先扩现有 `spec-security-reviewer` / `spec-security-sentinel` deep mode；当完整深审需求反复出现再新增 |
 | P1 | ~~`spec-api-design-lens-reviewer`~~ → **删候选，扩 `spec-api-contract-reviewer`**（A2 裁定） | `api-design` | `spec-prd`、`spec-plan`、`spec-doc-review`、`spec-code-review` | 在 PRD/plan 阶段审 API resource model、error envelope、pagination、versioning、rate limit、compatibility | A2 裁定：与 `spec-api-contract-reviewer`（已接 route/schema/interface/versioning）重叠，**不新增 owner**；把 plan/PRD 阶段 API 设计审查作为 `spec-api-contract-reviewer` 的阶段边界扩展（contract-reviewer 兼管无代码 artifact 的设计 lens） |
 | P1 | ~~`spec-source-map-analyst`~~ → **删候选，扩 `spec-repo-research-analyst`**（A1 裁定） | `source-reading-analyst` | `spec-plan`、`spec-debug`、`spec-code-review` | bounded source map、entry points、call path、data flow、impact surface、risk refs | A1 裁定：`spec-repo-research-analyst` 的 `architecture`/`patterns` scope 已覆盖 entry points/call path/data flow/impact surface，**不新增 owner**；改为给它补 ECH 的 evidence-table / call-path / diagram 输出格式 |
 | P2 | `spec-frontend-quality-reviewer` → **暂不新增，先组合** | `frontend-code-review` + `react-best-practices` | `spec-code-review`、`frontend-design`、`spec-polish-beta` | 汇总 React/Next/Vue/TS component、state、hook、race、UX implementation、accessibility、security/perf selector 信号 | 暂不新增；先组合 `spec-kieran-typescript-reviewer`、`spec-julik-frontend-races-reviewer`、`spec-design-implementation-reviewer`、`spec-performance-reviewer`、`spec-security-reviewer` |
@@ -214,7 +214,7 @@
 | `brainstorming` / `prd-engineer` / `writing-plans` 主体 | 它们定义 WHAT/HOW artifact 生产流程；拆成 agent 会弱化 public workflow owner | 强化 `spec-brainstorm`、`spec-prd`、`spec-plan`、`spec-write-tasks`，只把 handoff readiness 单独评估为 candidate agent |
 | `planning-with-files` / `handoff` | 根三文件和会话交接是 artifact/session 形态，不是专业判断角色 | 借鉴 ledger / closeout 字段，交给 `spec-work`、`spec-sessions`、run artifacts |
 | `docs-lookup` | 是工具使用纪律和 primary-source 约束，不应让 agent 代替 deterministic provider readiness | 保持在 `openai-docs`、Context7 使用规则、`spec-mcp-setup` readiness / degraded mode |
-| `skill-smith` | spec-first 已有 `spec-skill-audit` 与 `skill-creator` owner；新增 meta-agent 会制造治理重叠 | 吸收 trigger precision、progressive disclosure、anti-pattern 示例 |
+| `skill-smith` | spec-first 已有 `retired-skill-review` 与 `skill-creator` owner；新增 meta-agent 会制造治理重叠 | 吸收 trigger precision、progressive disclosure、anti-pattern 示例 |
 | `grill-me` / `caveman` / 面试知识类 | 交互风格或个人知识产品，不服务当前 AI coding harness 主链路 | 不纳入核心；最多作为非默认写作风格参考 |
 
 ## 7. 按 spec-first 节点的补充建议
@@ -229,7 +229,7 @@
 | `spec-debug` | 根因定位和修复 | `debug-expert` 的 hypothesis ledger、minimal repro、fix 验证门 | 补强语言和 checklist；保持现有 direct evidence / regression test 纪律 | 不让模型编造 repro 或 verification |
 | `spec-code-review` | 代码审查 | review/security/frontend/API/agent-security 多类 checklist | 作为 persona selector 或 reviewer rubric；安全审计可 optional deep-dive | 不默认每次跑大型安全审计 |
 | `spec-doc-review` | 文档审查 | `source-reading-analyst` 报告结构 | 仅借鉴 evidence table / claims table 输出形态 | 不把 Mermaid 变成文档审查硬要求 |
-| `spec-skill-audit` | skill/agent 审计 | `skill-smith`、`ai-agent-security` | 补 trigger precision、tool permission、安全边界 rubric | 不让外部 skill style 覆盖 spec-first governance |
+| `retired-skill-review` | skill/agent 审计 | `skill-smith`、`ai-agent-security` | 补 trigger precision、tool permission、安全边界 rubric | 不让外部 skill style 覆盖 spec-first governance |
 | `spec-mcp-setup` | runtime readiness | `docs-lookup` / hooks readiness 思路 | 对 Context7/Graphify 等 provider 维持 readiness facts + degraded mode | 不把 provider 输出当 truth |
 | `spec-compound` | 知识沉淀 | `improve-codebase-architecture` 的模式沉淀、debug/review 经验 | 好的架构 smell / TDD / security lesson 可沉淀为 `best_practice` / `convention` | 不把 ECH checklist 全量塞入 solutions |
 | `spec-sessions` | 历史会话检索 | `handoff`、session-start/end hooks | 长任务 closeout 和 resume 可参考 handoff 字段 | 不采用 `~/.claude` session state 为 source truth |
@@ -286,7 +286,7 @@
 | `code-review-expert` | 165 | 统一契约 + hard gate | 中高 | review rubric |
 | `architecture-advisor` | 169 | 架构图和路线图 | 中 | plan / architecture lens |
 | `writing-plans` | 176 | 统一契约 | 高 | P0 吸收 task quality rubric |
-| `skill-smith` | 192 | skill 创建 | 中 | skill-audit nuance |
+| `skill-smith` | 192 | skill 创建 | 中 | skill-review nuance |
 | `tdd-master` | 204 | hard gate + RED/GREEN | 中高 | optional strict TDD |
 | `debug-expert` | 224 | 统一契约 + hard gates | 中高 | debug rubric |
 | `code-security-audit` | 227 | 统一契约 + references | 高 | optional security deep-dive |
@@ -304,7 +304,7 @@
 | --- | --- | --- | --- |
 | Phase 0 | 保留本报告为映射证据 | `docs/11-业界调研/` + `CHANGELOG.md` | `git diff --check`、文档关键段落回读 |
 | Phase 1a | 先验证 spec-first 侧痛点，再决定是否新增 `spec-task-handoff-reviewer`（本轮唯一“新增 agent”候选） | `agents/`、`skills/spec-plan`、`skills/spec-write-tasks`、`skills/spec-work`、相关 contract tests、`CHANGELOG.md` | **先收集 spec-first 侧失败交接/漏审实例或指标（无实例则标“假设，落地前先验证”，不得仅以“ECH 强调”为由排 P0）**；再做 gate ①②③④（含 `spec-doc-review`/`spec-code-review` selector wiring）+ gate ⑤⑥ + task-pack / plan fixture；确认不会变成新 public skill |
-| Phase 1b | `spec-agent-tool-security-reviewer` **不新增**：先作 `spec-agent-native-reviewer` + `spec-security-reviewer` 交叉 lens（A3 裁定） | `skills/spec-skill-audit`、`skills/spec-code-review`、`agents/spec-agent-native-reviewer`、`agents/spec-security-reviewer`、`agent-native-architecture` 相关 docs/tests、`CHANGELOG.md` | agent/tool/runtime 变更 fixture + 扩展威胁清单 checklist：prompt-injection、tool-abuse、security-boundary，**外加 provider/MCP-output-as-instruction、planning/ledger 文件注入、供应链/vendored deps、runtime-mirror 篡改、provider 调用数据外发**；硬约束 **“check-secrets 无告警 ≠ 安全通过”**；**ECH rubric/references 文本并入任何 reviewer prompt 前须经人工审查嵌入式指令注入**；走 gate ⑤⑥（扩既有 agent，非新增） |
+| Phase 1b | `spec-agent-tool-security-reviewer` **不新增**：先作 `spec-agent-native-reviewer` + `spec-security-reviewer` 交叉 lens（A3 裁定） | `skills/retired-skill-review`、`skills/spec-code-review`、`agents/spec-agent-native-reviewer`、`agents/spec-security-reviewer`、`agent-native-architecture` 相关 docs/tests、`CHANGELOG.md` | agent/tool/runtime 变更 fixture + 扩展威胁清单 checklist：prompt-injection、tool-abuse、security-boundary，**外加 provider/MCP-output-as-instruction、planning/ledger 文件注入、供应链/vendored deps、runtime-mirror 篡改、provider 调用数据外发**；硬约束 **“check-secrets 无告警 ≠ 安全通过”**；**ECH rubric/references 文本并入任何 reviewer prompt 前须经人工审查嵌入式指令注入**；走 gate ⑤⑥（扩既有 agent，非新增） |
 | Phase 2 | 安全深审 optional mode | 先扩 `spec-security-reviewer` / `spec-security-sentinel`；必要时再新增 `spec-security-deep-dive-reviewer` | security fixture + source-to-sink evidence review；扩既有走 gate ⑤⑥，新增才走 ①②③④ |
 | Phase 3 | API / source-map lens **扩既有 owner（A1/A2 裁定，不新增 agent）** | 扩 `spec-api-contract-reviewer`（接管 plan/PRD 阶段 API 设计 lens）；扩 `spec-repo-research-analyst`（补 evidence-table / call-path / diagram 输出格式） | PRD/plan/doc-review fixture + source refs / call-path evidence；走 gate ⑤⑥ |
 | Phase 4 | 前端 / Web perf agent 仅按证据触发 | 先组合现有 frontend/design/perf/security reviewers；有指标证据后再评估 `spec-web-performance-reviewer` | browser trace / Web Vitals / bundle evidence；禁止 checklist-only |
@@ -329,7 +329,7 @@
 | 深度分析 `/Users/kuang/xiaobu/Expert-Coding-Harness` | 本报告覆盖 README、25 个顶层 skill、17 个 hook 脚本、6 个 hook lib、24 个 Cursor rules、Claude/Cursor hook 配置、关键 references | 已满足 |
 | 做源码级分析 | 报告含外部源码路径与行号证据；区分 README 宣称、SKILL.md prose、hook 实现、rules frontmatter、脚本退出码 | 已满足（外部 SKILL.md/hook 行号未逐条复核；§8 planning hooks 的“未完成门禁”已在本轮修正为 exit 0 reminder-only） |
 | 逐个 ECH skill 审查并找 spec-first 对应功能 | §5 覆盖 25 个 skill；§5.1 对每个 skill 给出 workflow/agent 裁决；§10 保留行数和结构信号 | 已分析（裁决依赖的外部行号引用未独立复核） |
-| 补充到当前 spec-first skill 节点能力 | 映射到 `spec-work`、`spec-write-tasks`、`spec-code-review`、`spec-debug`、`spec-plan`、`spec-prd`、`spec-skill-audit`、`spec-mcp-setup` 等节点，并给出 P0/P1/P2 顺序 | 已满足 |
+| 补充到当前 spec-first skill 节点能力 | 映射到 `spec-work`、`spec-write-tasks`、`spec-code-review`、`spec-debug`、`spec-plan`、`spec-prd`、`retired-skill-review`、`spec-mcp-setup` 等节点，并给出 P0/P1/P2 顺序 | 已满足 |
 | 思考是优化 skill workflow 还是新增/完善 agent | §5.1 给出逐 skill 裁决；§6.1 给出现有 agent owner 盘点；§6.2 给出可封装为 conditional agent 的 P0/P1/P2 候选；§6.3 列出不应 agent 化的能力 | 已满足 |
 | 回答“哪些能力可以封装成 agent 给 spec-first skill 节点使用” | §6.2 给出 7 个候选；第二轮 doc-review 已按 A1/A2/A3 裁定收敛：唯一“新增 agent”候选为 `spec-task-handoff-reviewer`（且须先验证痛点），security/API/source-map 全转为扩既有 owner 或交叉 lens | 已满足且已裁决（裁决账本见 Deferred 区 second-review 状态说明；agent 净增上限为 1） |
 | 表格内容输出 | 报告主体以表格为主：能力库存、证据摘要、skill 映射、节点补充、hooks、rules、结构附录、落地顺序、反模式、完成度审计 | 已满足 |

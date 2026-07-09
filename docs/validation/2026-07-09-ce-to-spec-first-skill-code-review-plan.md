@@ -20,7 +20,7 @@
 - 不重复迁移审查报告已确认的结论;只关注 source 代码层面的验证和新发现。
 - 不修改 generated runtime mirrors(`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`)。
 - 不在审查阶段做 runtime regeneration;如需 runtime refresh,作为单独显式步骤。
-- 不对 spec-first 原生 / 拆分 skills(`spec-prd`、`spec-write-tasks`、`using-spec-first`、`spec-write-skill`、`spec-skill-audit`、`spec-app-consistency-audit`、`spec-rule-miner`)做 CE 等价审查;这些 skill 仍纳入全量 source 审查,并可用于解释合理 divergence。
+- 不对 spec-first 原生 / 拆分 skills(`spec-prd`、`spec-write-tasks`、`using-spec-first`、`spec-write-skill`、`retired-skill-review`、`spec-app-consistency-audit`、`spec-rule-miner`)做 CE 等价审查;这些 skill 仍纳入全量 source 审查,并可用于解释合理 divergence。
 
 ## 审查范围
 
@@ -32,7 +32,7 @@
 | **Batch 2**(helper 与尾项) | spec-commit-push-pr, spec-optimize, spec-promote, spec-proof, spec-resolve-pr-feedback, spec-test-browser, spec-worktree | 5 aligned + 2 repaired | ~40 |
 | **Batch 3**(支撑链路) | spec-debug, spec-compound, spec-compound-refresh, spec-sweep, **spec-mcp-setup**, spec-riffrec-feedback-analysis, spec-product-pulse | 1 partial + 5 repaired/replaced + 1 near-parity | ~60 |
 | **Batch 4**(核心链路深审) | spec-brainstorm, spec-plan, spec-doc-review, spec-code-review, spec-work, spec-ideate, spec-lfg | 全部 replaced/repaired | ~80 |
-| **Batch 5**(spec-first 原生 / 拆分 skill 全量审查) | spec-prd, spec-write-tasks, using-spec-first, spec-write-skill, spec-skill-audit, spec-app-consistency-audit, spec-rule-miner | 不做 CE 等价;做 source 质量、依赖、上下文与治理边界审查 | ~60 |
+| **Batch 5**(spec-first 原生 / 拆分 skill 全量审查) | spec-prd, spec-write-tasks, using-spec-first, spec-write-skill, retired-skill-review, spec-app-consistency-audit, spec-rule-miner | 不做 CE 等价;做 source 质量、依赖、上下文与治理边界审查 | ~60 |
 
 **特殊说明**:`spec-mcp-setup` 是从 `ce-setup` 的近似映射(near-parity),不是直接 parity target。审查需额外关注 divergence 是否合理、provider readiness 和 runtime freshness 检查是否完整。
 

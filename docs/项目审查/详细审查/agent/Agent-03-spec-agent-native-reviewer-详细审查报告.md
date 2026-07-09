@@ -69,7 +69,7 @@
 ### 3.4 风险提示
 
 - 过度治理会让入口变重；治理证据应放在 references/evals/reports，而不是堆进主 prompt。
-- 不应把 spec-skill-audit 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
+- 不应把 retired-skill-review 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
 
 ## 4. 视角 B：$skill-creator:skill-creator 审查结论
 

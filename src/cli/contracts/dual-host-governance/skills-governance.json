@@ -395,20 +395,6 @@
       }
     },
     {
-      "skill_name": "spec-skill-audit",
-      "entry_surface": "workflow_command",
-      "command_name": "skill-audit",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
       "skill_name": "spec-strategy",
       "entry_surface": "standalone_skill",
       "command_name": null,

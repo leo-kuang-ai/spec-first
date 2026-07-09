@@ -78,7 +78,7 @@ Near-neighbor routing:
 - PRD creation, refinement, or planning-readiness validation belongs to `spec-prd` unless the explicit job is PRD/Figma/source consistency.
 - Runtime validation, build, simulator, real-device, Maestro, Appium, or cloud-device execution belongs to the requested command or a later runtime workflow.
 - Post-implementation visual/UI polishing belongs to `spec-polish`.
-- Skill or agent quality review belongs to `spec-skill-audit`, not this App product audit workflow.
+- Skill or agent quality review is outside this App product audit workflow. Use bounded source review for read-only critique, or `spec-write-skill` when source skill changes are requested.
 
 ## Default Mode
 
@@ -278,7 +278,7 @@ Read these on demand; they are not required for routing:
 
 ## Workflow Handoff Boundary
 
-This workflow may recommend follow-ups to `spec-plan`, `spec-code-review`, `spec-skill-audit`, `spec-polish`, or `spec-compound`. It does not automatically run those workflows.
+This workflow may recommend follow-ups to `spec-plan`, `spec-code-review`, bounded source review, `spec-polish`, or `spec-compound`. It does not automatically run those workflows.
 
 In v0.1, follow-ups appear only in `app-consistency-audit.summary.md` and the headless envelope. A standalone `workflow-handoff-suggestions.json` artifact is deferred.
 

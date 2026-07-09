@@ -27,7 +27,7 @@ The local evidence store is `.spec-first/governance/rule-maturity.json`. It is g
 | `spec-first internal rule-maturity list --json` | deterministic reader | Reads local evidence and returns projection facts only. |
 | `spec-code-review` Stage 6 | developer-visible candidate prompt | May surface `Rule Maturity Candidates` with `rule_id`, durable `evidence_ref`, `reason_code`, `human_review_kind`, and `similar_existing_rule_ids`; it does not adjudicate or promote rules. |
 | `spec-plan` | planning-depth governance observation | May record a small shadow hit after the LLM confirms or overrides task-governance signals. |
-| `spec-skill-audit` | periodic governance health consumer | Writes `rule-maturity-observations.json` with empty/ok/degraded facts; this is not the ordinary developer human-review entrypoint. |
+| retired skill audit workflow | historical governance health consumer | Previously wrote `rule-maturity-observations.json`; no current source workflow produces this artifact after the audit workflow retirement. |
 
 `rule_id` should follow `lens-family + problem-class` kebab-case using one of the canonical lens-family prefixes: `preflight`, `exploration`, `planning`, `execution`, `verification`, `review`, or `summary`. This is an advisory naming convention, not a schema validator.
 
@@ -35,7 +35,7 @@ The local evidence store is `.spec-first/governance/rule-maturity.json`. It is g
 
 ## Phase 1 Gate Facts
 
-`buildRuleMaturityPhase1GateFacts()` is a pure helper for the phase 1 review checkpoint. It consumes two existing deterministic surfaces: `rule-maturity list --json` and `spec-skill-audit`'s `rule-maturity-observations.json`. It does not read or write the local governance store, does not adjudicate hits, and does not promote or demote stages.
+`buildRuleMaturityPhase1GateFacts()` is a pure helper for the phase 1 review checkpoint. It consumes `rule-maturity list --json`; older validation artifacts may also mention retired audit workflow `rule-maturity-observations.json`, but no current source workflow produces that file. It does not read or write the local governance store, does not adjudicate hits, and does not promote or demote stages.
 
 The helper mirrors the lightweight Markdown gate required by the v1.17 plan: `as_of`, `source_refs`, `status_class`, `rule_count`, `shadow_hit_count`, `candidate_density`, `workflow_distribution`, `consumer_status`, `store_status`, `owner_cadence_decision`, and `recommended_next_action`. `recommended_next_action` is constrained to `continue-phase1`, `repair-producer-consumer`, or `open-phase2-plan`.
 

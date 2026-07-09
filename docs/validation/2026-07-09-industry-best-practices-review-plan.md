@@ -21,7 +21,7 @@
 
 - 不重复迁移正确性审查(已由主审查方案覆盖)
 - 不对 spec-first 的架构设计做整体重写建议
-- 不替代 spec-skill-audit 的治理审查
+- 不替代 retired-skill-review 的治理审查
 
 ## 审查范围
 
@@ -227,7 +227,7 @@ spec-explain ↔ spec-pov          (学习材料 vs 项目判断)
 |---|---|---|---|
 | "我想改进这段代码" | spec-simplify-code / spec-debug / spec-optimize / spec-polish | high | 边界是否清晰? |
 | "我要做需求分析" | spec-brainstorm / spec-ideate / spec-prd / spec-strategy | high | 边界是否清晰? |
-| "我要审查我的工作" | spec-code-review / spec-doc-review / spec-skill-audit | medium | 边界是否清晰? |
+| "我要审查我的工作" | spec-code-review / spec-doc-review / retired-skill-review | medium | 边界是否清晰? |
 | "我要发布功能" | spec-commit / spec-commit-push-pr / spec-promote / spec-lfg | medium | 边界是否清晰? |
 | "我要理解一个概念" | spec-explain / spec-pov / using-spec-first | medium | 边界是否清晰? |
 
@@ -373,7 +373,7 @@ rg -n "not to use\|do not use\|instead of\|use.*for" skills/*/SKILL.md
 
 - **业界基线时效性**: AI coding 领域发展极快,本方案基于 2025-2026 年中的业界状态。审查时如发现新的重大变化,应更新基线。
 - **主观判断风险**: "aligned" vs "gap" 的判断有一定主观性,应基于具体证据(代码、artifact、测试)而非感觉。
-- **不替代 spec-skill-audit**: 本方案聚焦业界对标,不替代 spec-first 内部的 skill-audit 治理审查。
+- **不替代 retired-skill-review**: 本方案聚焦业界对标,不替代 spec-first 内部的 skill-review 治理审查。
 - **不要求全盘对标**: spec-first 有自己的设计哲学(light contract, deterministic floor + LLM judgment),不需要在所有维度都与业界工具对齐。差距分析应区分"应该改进"和"有意 divergence"。
 
 ## 完成标准

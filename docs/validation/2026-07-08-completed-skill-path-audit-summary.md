@@ -4,7 +4,7 @@
 
 ## 结论
 
-本轮围绕 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md` 中标记为“已完成 / 已审查”的 skill 做了路径与入口一致性复核。审查方式是逐个打开 `SKILL.md`、reference 文档、必要脚本头部和路径处理段阅读，不用脚本替代理解。
+本轮围绕 `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md` 中标记为“已完成 / 已审查”的 skill 做了路径与入口一致性复核。审查方式是逐个打开 `SKILL.md`、reference 文档、必要脚本头部和路径处理段阅读，不用脚本替代理解。
 
 整体结论：
 
@@ -87,7 +87,7 @@ Quick Usage 示例从 legacy `/spec-test-xcode` 改为当前统一入口 `spec-t
 
 ### 1. 先确定 authoritative 工作清单
 
-以 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md` 的“已完成 / 已审查”状态为本轮范围，不临时扩大到未完成 batch。
+以 `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md` 的“已完成 / 已审查”状态为本轮范围，不临时扩大到未完成 batch。
 
 ### 2. 对每个 skill 逐文件打开
 
@@ -248,7 +248,7 @@ docs-only 修复仍需要：
 - **原先偏差：** 误把早期 standalone migrated skill contract test 中的 `not.toMatch(/^argument-hint:/m)` 当作当前治理规则，忽略了 `src/cli/plugin.js` 已支持 `metadata['argument-hint']`，且多个 active `spec-*` skill 已在使用该字段。
 - **用户纠正：** CE 有的入口提示能力都要集成进来；已完成审查的 skill 要逐个检查，不能只补 `spec-compound`。
 - **最终执行口径：** `argument-hint` 是用户入口参数提示，不参与 workflow 语义判断，但属于 CE 可见能力。已完成审查的迁移 skill 中，CE 有 `argument-hint` 的应在 spec-first 中保留并做必要命名/路径归一；CE 没有的不要为了统一而新增。
-- **影响范围：** `skills/spec-compound/SKILL.md`、`skills/spec-explain/SKILL.md`、`skills/spec-pov/SKILL.md`、`skills/spec-simplify-code/SKILL.md`、`skills/spec-strategy/SKILL.md`、`skills/spec-product-pulse/SKILL.md`、`skills/spec-promote/SKILL.md`、`skills/spec-commit-push-pr/SKILL.md`、`tests/unit/spec-migrated-standalone-skills-contracts.test.js`、`docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`。
+- **影响范围：** `skills/spec-compound/SKILL.md`、`skills/spec-explain/SKILL.md`、`skills/spec-pov/SKILL.md`、`skills/spec-simplify-code/SKILL.md`、`skills/spec-strategy/SKILL.md`、`skills/spec-product-pulse/SKILL.md`、`skills/spec-promote/SKILL.md`、`skills/spec-commit-push-pr/SKILL.md`、`tests/unit/spec-migrated-standalone-skills-contracts.test.js`、`docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md`。
 
 ## 本轮验证
 

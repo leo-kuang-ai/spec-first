@@ -39,7 +39,7 @@
 | 4. eval fixture 贴近 canonical contract | 部分采纳 | 新增 routing-discipline canonical fixture；保留 legacy `examples.json` 与 `routing-cases.json`，避免丢失现有本地字段和测试语义。 |
 | 5. 补治理元数据 | 暂缓 | 未改 `skills-governance.json` schema；改用 `references/maintenance-and-fresh-source-eval.md` 记录 owner、review cadence、invalidation conditions。 |
 | 6. 调整 frontmatter `description` | 暂缓 | 未运行 route-confusion holdout 前不改 trigger description，避免无证据 drift。 |
-| 7. 新增 deterministic checks | 低成本采纳 | 未新增脚本；复用 `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js` 在 Jest 中校验新 canonical fixture。 |
+| 7. 新增 deterministic checks | 低成本采纳 | 未新增脚本；复用 `skills/retired-skill-review/scripts/eval-fixture-normalizer.js` 在 Jest 中校验新 canonical fixture。 |
 | 8. Review Studio | 暂缓 | 不引入 `reports/` 或 Review Studio surface；本轮用 focused Jest + source docs + changelog 作为证据。 |
 
 本轮逐项判断后的剩余未优化项:
@@ -280,7 +280,7 @@ with-skill = 给当前磁盘 `skills/using-spec-first/SKILL.md` + 必要 referen
 
 建议两种路径二选一:
 
-1. 保持现有文件，更新 `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js` 的解释文档或测试，确保 `routing-cases.json` 的 local fields 会被稳定归一。
+1. 保持现有文件，更新 `skills/retired-skill-review/scripts/eval-fixture-normalizer.js` 的解释文档或测试，确保 `routing-cases.json` 的 local fields 会被稳定归一。
 2. 新增 canonical 文件，如 `evals/workflow-routing-fixtures.json`，逐步迁移后再考虑是否保留 legacy 文件。
 
 不要做:
@@ -362,7 +362,7 @@ description: "Use in spec-first repos to decide whether a substantial request sh
 - 是否需要 human owner
 - route priority 在复杂对话中的最终判断
 
-如果新增脚本，建议放在现有 tests/helpers 或 `skills/spec-skill-audit/scripts/` 的 normalizer 体系中，而不是 `skills/using-spec-first/scripts/`。原因是 `using-spec-first` 自身不该执行脚本；它是入口治理 prose + eval source。
+如果新增脚本，建议放在现有 tests/helpers 或 `skills/retired-skill-review/scripts/` 的 normalizer 体系中，而不是 `skills/using-spec-first/scripts/`。原因是 `using-spec-first` 自身不该执行脚本；它是入口治理 prose + eval source。
 
 ### 8. Review Studio 只作为 release-facing 选项
 

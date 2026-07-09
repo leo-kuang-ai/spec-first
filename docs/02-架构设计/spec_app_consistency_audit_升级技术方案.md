@@ -340,7 +340,7 @@ spec-plan / spec-brainstorm:
 spec-code-review:
   主问题是 correctness / security / performance / API contract / test coverage。
 
-spec-skill-audit:
+retired-skill-review:
   发现 skill trigger、runtime governance 或 source/runtime drift。
 
 spec-polish-beta / runtime validation:

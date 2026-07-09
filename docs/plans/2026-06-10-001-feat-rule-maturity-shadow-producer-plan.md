@@ -25,7 +25,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 全局定位：spec-first 的产品三支柱是「0-1/1-100 需求交付、团队大规模协作、自我进化」。自我进化有两个轮子——知识轮（解决过的问题沉淀进 docs/solutions、下次自动检索，已闭环）和规则轮（踩过的坑固化为可升级、可退役的治理规则，当前断裂）。v1.17 补的就是规则轮，让「重复的问题不会重复犯错」从靠 LLM 记性变成靠治理机制。harness 工程化实践（`docs/01-需求分析/14.harness-engineering/`）给出三条直接输入：每条规则都是一次事故的墓志铭（规则的诞生源头是真实 hit，不是凭空设计）；验证反馈质量决定 agent 可靠性（arxiv 2605.29682：验证反馈 R²=0.94 vs token 预算 R²=0.33——规则的毕业形态应是确定性 gate）；构建是为了删除（每条晋升规则必须带退役路径，否则 harness 越积越厚反成负担）。同时按 OPT-D 裁决过滤掉 harness 文档中与 spec-first 哲学冲突的建议：不引入 dispatcher 状态机、不建 G0-G22 式 runtime 门禁墙、不做 runtime hook 拦截——spec-first 的 blocking 落点是 contract test 进 CI，这正是仓库既有实践（`governance-contracts.test.js` 的断言本质上就是毕业规则）的正式化。
 
-面向用户的产品定位需要压住治理复杂度：spec-first 是给研发人员高质量完成 AI coding 的工程 harness，不是为了治理而治理。规则轮的提示点应贴近日常研发判断发生的位置：`spec-code-review` 已经在判断 finding 是否真实、是否缺测试、是否违反项目约定，因此它适合在最终汇总时轻量输出 rule-maturity 候选；`spec-compound` 适合在 verified learning 写成后提示「这个 learning 是否值得成为规则候选」；`spec-skill-audit` 只承担周期性治理健康检查，不作为普通研发人员的人审主入口。
+面向用户的产品定位需要压住治理复杂度：spec-first 是给研发人员高质量完成 AI coding 的工程 harness，不是为了治理而治理。规则轮的提示点应贴近日常研发判断发生的位置：`spec-code-review` 已经在判断 finding 是否真实、是否缺测试、是否违反项目约定，因此它适合在最终汇总时轻量输出 rule-maturity 候选；`spec-compound` 适合在 verified learning 写成后提示「这个 learning 是否值得成为规则候选」；`retired-skill-review` 只承担周期性治理健康检查，不作为普通研发人员的人审主入口。
 
 ---
 
@@ -36,7 +36,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - R1. 存在唯一可追溯的 shadow-hits producer：`spec-first internal rule-maturity record`，每次调用向目标 rule 的 `shadow_hits` 追加一条 hit（`observed_at` / `workflow` / `evidence_ref` / `reason_code`），整条 rule record 写盘后符合 `rule-maturity.v1` schema。（术语约定：本计划中「rule record」指 schema 顶层对象，「hit」指 `shadow_hits` 数组中的一条观测，`record` 单指 CLI 子动作。）
 - R2. producer 侧 stage 不可达 reserved stages：phase 1 `record` 不提供 stage 参数、固定写 `shadow`；任何 stage 变更（含 `advisory`）均不经 `record` 发生，只能在未来 phase 2 candidate 重新计划后由 promotion 工具承担。
 - R3. 存在 deterministic 读取面：`spec-first internal rule-maturity list --json` 输出逐 rule 的 stage、shadow_hits 计数与 evidence refs 汇总。
-- R4. 至少一个真实 consumer 消费读取面：`spec-skill-audit` 将 rule-maturity 观测汇总纳入其确定性事实 artifact（同 `reviewer-guard-coverage-report.json` 模式），满足父方案 §9.0.1「无消费方 = 不交付」。定位明确为**周期治理健康检查**：暴露「有记录但长期无人裁决 / 消费链断裂 / 观测为空」等事实，不作为普通研发人员的人审主入口。
+- R4. 至少一个真实 consumer 消费读取面：`retired-skill-review` 将 rule-maturity 观测汇总纳入其确定性事实 artifact（同 `reviewer-guard-coverage-report.json` 模式），满足父方案 §9.0.1「无消费方 = 不交付」。定位明确为**周期治理健康检查**：暴露「有记录但长期无人裁决 / 消费链断裂 / 观测为空」等事实，不作为普通研发人员的人审主入口。
 - R5. 至少两个 workflow 的 SKILL prose 在 governance lens 命中时显式引导记录 shadow hit：`spec-plan`（task-governance-signals 之后）与 `spec-code-review`（resource-governance-lens advisory 之后）。其中 `spec-code-review` 另在 Stage 6 最终汇总输出 `Rule Maturity Candidates` 小节，基于已确认 findings / resource advisory 轻提示 `rule_id`、`evidence_ref`、`reason_code` 与 `human_review_kind`；不新增专用 agent，不自动 `adjudicate` / `promote`。职责定位明确：lens helper 保持只读、只返回 facts；SKILL prose 含调用 `rule-maturity record` 的程序性引导；是否记录由 LLM 按引导判断后显式调用。
 - R6. 落盘路径、gitignore 策略、context-governance 读取边界明确登记，evidence 文件不被当作普通 source context 扫描。
 - R7. 现有治理断言有意识翻转/保留：`governance-contracts.test.js` 中「internal.js 不含 rule-maturity subcommand」断言翻转为正向注册断言；「producers 不出现 reserved stage 字面量」断言保留并扩展覆盖新 producer 的写入路径。
@@ -56,7 +56,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 **Phase 4（governance ROI 与 resource hardening，deferred-pending-phase1-evidence 候选要求）：**
 
-- R15. governance ROI 为确定性聚合 facts：治理漏斗（observed→adjudicated→promoted→graduated）计数与时间窗对比 delta，零 LLM 调用、零虚构常数（不引入上游 GovernanceMetrics 的 15%/10% 节省估算与 ROI Score baseline）、无数据支撑的指标不出现在报告中；**漏斗必输出 decay 事实**：blocking 规则总数趋势（本期 vs 前期）与每条 blocking 规则的最近命中时间是必输出 deterministic facts，不是可选项——治理面只增不减是上游已被证实的结构性缺陷，ROI 报告必须让「规则在变多还是在被删除」可直接读出；消费者为 `rule-maturity report` / promotion 人审与 `spec-skill-audit` 周期健康 artifact。
+- R15. governance ROI 为确定性聚合 facts：治理漏斗（observed→adjudicated→promoted→graduated）计数与时间窗对比 delta，零 LLM 调用、零虚构常数（不引入上游 GovernanceMetrics 的 15%/10% 节省估算与 ROI Score baseline）、无数据支撑的指标不出现在报告中；**漏斗必输出 decay 事实**：blocking 规则总数趋势（本期 vs 前期）与每条 blocking 规则的最近命中时间是必输出 deterministic facts，不是可选项——治理面只增不减是上游已被证实的结构性缺陷，ROI 报告必须让「规则在变多还是在被删除」可直接读出；消费者为 `rule-maturity report` / promotion 人审与 `retired-skill-review` 周期健康 artifact。
 - R16. resource/output governance 按父方案 §4.8 全范围收口：补 screenshots/媒体产物 staged 检测、coverage/playwright-report 提交策略 advisory、raw log retention 与 redaction status 字段、policy 输出补 owners/modules；schema bump `resource-governance-lens.v2` 并带版本说明与 downstream consumer tests。
 - R17. resource lens 消费接通两个已核实空置点：spec-work PR handoff（git-commit-push-pr 上下文清单注入 lens advisory）与 spec-code-review project-standards reviewer（lens items 进入其输入）；spec-release-notes 不接入（只读检索型 workflow、无 staging 环节，决策记录在案）。
 
@@ -82,7 +82,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - **不做数值健康分 / ROI Score**：拒绝上游 GovernanceMetrics 的虚构常数（15%/10% 节省、50 分 baseline、5min/fix）；ROI 报告只含可验证计数与 delta（brooks-lint 否决先例同构）。
 - 不让 `task-governance-signals` / `resource-governance-lens` 两个只读 lens helper 带写盘副作用（phase 4 的 resource lens v2 扩展输出字段，仍保持只读）。
 - 不新增公开 workflow 入口、不新增 skill；第一版也不新增专用 rule-maturity agent，全部能力经 internal helper + 既有 workflow synthesis/prose 接入。只有当候选筛选需要跨 finding 去重、规则冲突分析或稳定 rule_id 归并时，才在后续评估条件触发的 handoff classifier agent。
-- 不接入 doctor rollup；doctor 只消费 setup facts，治理证据消费面是 `spec-code-review` Stage 6 候选提示、`rule-maturity report` 人审事实、`spec-skill-audit` 周期健康检查与 promotion 人审。
+- 不接入 doctor rollup；doctor 只消费 setup facts，治理证据消费面是 `spec-code-review` Stage 6 候选提示、`rule-maturity report` 人审事实、`retired-skill-review` 周期健康检查与 promotion 人审。
 - 不引入 dispatcher 状态机 / 薄主会话架构（harness 文档 P0-1 建议与 spec-first「不强状态机」哲学冲突，OPT-D 裁决覆盖）。
 
 ### Deferred to Follow-Up Work
@@ -101,9 +101,9 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 **Phase 1 完成判据：**
 
-- **§9.0.1 交付等级登记（与 v1.11/v1.12 先例同构）**：phase 1 满足三级 gate——contract test（U1/U6）+ direct deterministic consumer（U4 skill-audit 周期健康 artifact）+ named workflow 可观察行为变化（U3 `spec-code-review` Stage 6 `Rule Maturity Candidates`）。shadow 观测能力仍整体标 **advisory**：它只让候选与证据开始流动，不宣称已兑现 promotion/blocking 治理价值。
+- **§9.0.1 交付等级登记（与 v1.11/v1.12 先例同构）**：phase 1 满足三级 gate——contract test（U1/U6）+ direct deterministic consumer（U4 skill-review 周期健康 artifact）+ named workflow 可观察行为变化（U3 `spec-code-review` Stage 6 `Rule Maturity Candidates`）。shadow 观测能力仍整体标 **advisory**：它只让候选与证据开始流动，不宣称已兑现 promotion/blocking 治理价值。
 - `spec-first internal rule-maturity record|list` 可运行且通过 focused unit tests。
-- `spec-skill-audit` 的 audit artifact 中出现 rule-maturity 汇总事实（fixture 测试守住）。
+- `retired-skill-review` 的 audit artifact 中出现 rule-maturity 汇总事实（fixture 测试守住）。
 - `skills/spec-plan/SKILL.md` 与 `skills/spec-code-review/SKILL.md` 含显式记录引导；`spec-code-review` Stage 6 含 `Rule Maturity Candidates` 小节与不自动 `adjudicate/promote` 边界，对应 doc contract tests 通过。
 - `governance-contracts.test.js` 断言翻转后 `npm run test:unit` 通过。
 - `rule-maturity.md`、SCALE README v1.17 行、CHANGELOG 已同步。
@@ -128,7 +128,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 |---------|------------|
 | 整版计划应拆分，phase 2-4 不应与 phase 1 同等 active | 成立。当前 active scope 收敛为 U1-U6；U7-U14 标记为 `deferred-pending-phase1-evidence`，phase gate 通过后重开窄计划。 |
 | P1-A：reserved-stage 字面量扫描会误杀 `rule-maturity.js` | 当前代码事实下不成立。`governance-contracts.test.js` 的 producers 数组只扫描两个既有 lens helper；U6 明确不得把 `rule-maturity.js` 加入该数组，改用单独断言。 |
-| P1-B：U4 skill-audit 接线被“按实际结构定”掩盖 | 成立。U4 已钉死四件套：collect 函数、`runSelfAudit()` 返回、`writeAuditArtifacts()` 写 JSON、`rule-maturity.js` 导出纯读取/summary。 |
+| P1-B：U4 skill-review 接线被“按实际结构定”掩盖 | 成立。U4 已钉死四件套：collect 函数、`runSelfAudit()` 返回、`writeAuditArtifacts()` 写 JSON、`rule-maturity.js` 导出纯读取/summary。 |
 | P1-C：`observed_at` 与 `last_observed_at` projection 未定义 | 成立。U1 已定义 `observed_at = new Date().toISOString()`；`last_observed_at` 按 `Date.parse()` 最大值计算，非法时间 degraded。 |
 | U2 gitignore section 归属未指定 | 成立。U2 已指定加入 `SPEC_FIRST_GITIGNORE_SECTIONS` 第二段 `spec-first local setup and workflow runtime artifacts`。 |
 | U7 hit-ref 复合键碰撞 | 成立但属 deferred。U7 不再批准 `<observed_at>::<evidence_ref>` 为实现合同，phase 2 需重选 hit identity。 |
@@ -164,12 +164,12 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - 2026-06-12 修订时新增 source_reads_completed:
   - `skills/spec-code-review/SKILL.md` Stage 5/6 synthesis、resource advisory 与 reviewer routing 段（确认 rule-maturity 候选提示应落在最终汇总，不新增 reviewer finding）
   - `skills/spec-compound/SKILL.md` promote gate / verified learning / optional enhancement 段（确认 compound 适合作为 verified learning→rule candidate 的轻量接线，不是人审主入口）
-  - `skills/spec-skill-audit/SKILL.md` contract summary / outputs / governance 段（确认 skill-audit 是 source-quality auditor 与周期治理 artifact producer，不适合作为普通研发人员主触发点）
+  - `skills/retired-skill-review/SKILL.md` contract summary / outputs / governance 段（确认 skill-review 是 source-quality auditor 与周期治理 artifact producer，不适合作为普通研发人员主触发点）
   - `docs/10-prompt/结构化项目角色契约.md` §1–§7（确认 spec-first 定位为服务研发人员高质量 AI coding 的 harness，治理能力必须服务 workflow 证据闭环与用户研发增益）
-  - `skills/spec-skill-audit/scripts/write-audit-artifacts.js` / `collect-skill-facts.js`（确认 `runSelfAudit()` 返回固定 reports 对象，`writeAuditArtifacts()` 逐个 `writeJson()`，`collect-skill-facts.js` 当前仅导出 `collectSkillFacts` / `collectReviewerGuardCoverage` / `collectSingleSkill`）
+  - `skills/retired-skill-review/scripts/write-audit-artifacts.js` / `collect-skill-facts.js`（确认 `runSelfAudit()` 返回固定 reports 对象，`writeAuditArtifacts()` 逐个 `writeJson()`，`collect-skill-facts.js` 当前仅导出 `collectSkillFacts` / `collectReviewerGuardCoverage` / `collectSingleSkill`）
   - `src/cli/gitignore-policy.js`（确认 `.spec-first/governance/` 应加入第二个 section：`spec-first local setup and workflow runtime artifacts`，不能新增 section 破坏镜像断言口径）
   - `tests/unit/governance-contracts.test.js` L70-L78（确认字面量扫描 producers 数组只含 `task-governance-signals.js` / `resource-governance-lens.js`，不含未来 `rule-maturity.js`）
-- impact_on_plan: governance 测试的反向断言决定了 U6 必须与 U1 同切片落地；gitignore section 结构决定了 U2 必须追加到第二段而非新建段；skill-audit writer 固定对象结构决定了 U4 必须四件套接线；上游「无 demotion」缺陷与 resource 缺口只作为 deferred candidate 输入，不再支撑本轮 active scope
+- impact_on_plan: governance 测试的反向断言决定了 U6 必须与 U1 同切片落地；gitignore section 结构决定了 U2 必须追加到第二段而非新建段；skill-review writer 固定对象结构决定了 U4 必须四件套接线；上游「无 demotion」缺陷与 resource 缺口只作为 deferred candidate 输入，不再支撑本轮 active scope
 - key_findings: 见 Context & Research
 - limitations: 上游 RuleMaturity 阈值在本仓的适配性无先验数据，phase 2 必须基于 phase 1 真实观测密度重新校准；scale-engine 上游源码不在本仓，任何行号/默认值都只能作为 advisory 参考
 
@@ -182,7 +182,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - `src/cli/helpers/resource-governance-lens.js` — internal helper 的标准结构：`runCli(argv)` 返回 exit code、`parseArgs` 收集 errors、输出前 `validateAgainstSchema` 自校验、`writeJson` 统一输出。新 helper 完全照此模式。
 - `src/cli/commands/internal.js` — subcommand 注册点：require helper 的 `runCli` 并加一个 `if (subcommand === 'rule-maturity')` 分支。
 - `src/contracts/schema-validator.js` — 已有 `validateAgainstSchema`，record 写入前对整条 record 校验。
-- `skills/spec-skill-audit/scripts/write-audit-artifacts.js` — `reviewer-guard-coverage-report.json` 的确定性事实 artifact 先例，U4 消费面模仿该模式。
+- `skills/retired-skill-review/scripts/write-audit-artifacts.js` — `reviewer-guard-coverage-report.json` 的确定性事实 artifact 先例，U4 消费面模仿该模式。
 - `.spec-first/config/tool-facts.json` 的生产/消费链 — 「generated local facts + 单一 writer + doctor 消费」是 phase 1 producer→consumer 形态的最近参照。
 
 ### 上游参考实现实测（借思想、不引代码，OPT-D 口径）
@@ -246,7 +246,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
   │                                                      └────────┘       │
   │  Phase 4: report --funnel（observed→adjudicated→promoted→graduated    │
   │           漏斗计数 + 时间窗 delta，零虚构常数）→ report/promotion     │
-  │           人审 + skill-audit 周期健康检查消费                         │
+  │           人审 + skill-review 周期健康检查消费                         │
   └──────────────────────────────────────────────────────────────────────┘
 
   全程不变量：stage 变更只经人审署名命令；脚本只产 facts/blockers；
@@ -259,7 +259,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 ## Key Technical Decisions
 
 - **独立 `rule-maturity` 子命令作为唯一 writer，而非 lens helper 内嵌写盘**：保持 `task-governance-signals` / `resource-governance-lens` 纯只读合同不变；记录动作是 LLM 在 lens 命中后的显式判断（「Scripts prepare, LLM decides」——是否构成值得观测的 hit 是语义判断），单一 writer 满足可追溯性 learning。（用户已确认）
-- **研发人员可见触发点选 `spec-code-review` Stage 6，而非 `spec-skill-audit`**：spec-first 的定位是帮助研发人员高质量完成 AI coding；`spec-code-review` 本来就在判断 finding 是否真实、是否缺测试、是否违反项目约定，最适合在最终汇总中输出 `Rule Maturity Candidates` 作为轻提示。`spec-skill-audit` 仍是 deterministic consumer，但定位降为周期治理健康检查；doctor 扩边界的成本与收益不匹配。
+- **研发人员可见触发点选 `spec-code-review` Stage 6，而非 `retired-skill-review`**：spec-first 的定位是帮助研发人员高质量完成 AI coding；`spec-code-review` 本来就在判断 finding 是否真实、是否缺测试、是否违反项目约定，最适合在最终汇总中输出 `Rule Maturity Candidates` 作为轻提示。`retired-skill-review` 仍是 deterministic consumer，但定位降为周期治理健康检查；doctor 扩边界的成本与收益不匹配。
 - **第一版不新增专用 rule-maturity agent**：候选提示只基于 Stage 5/6 已合成的 findings、resource advisory 与 durable evidence ref，属于当前 orchestrator 的 synthesis/handoff 工作；新增 agent 会增加调度成本、误报解释成本和边界风险。只有当候选筛选需要跨 finding 去重、已有 rule 冲突/重叠分析或稳定 rule_id 归并时，再评估只读 handoff classifier agent。
 - **落盘路径 `.spec-first/governance/rule-maturity.json`，gitignored**：与 `.spec-first/config/*.json` 等 generated local facts 同策略。shadow 观测是本机 workflow 运行的离散记录，提交进 git 会产生持续 commit 噪声且诱发「为绿而改」；promotion review（phase 2）需要跨机共享时再设计导出面。需同步 `.gitignore` 与 `spec-first init` managed block。
 - **存储形态：单文件、按 `rule_id` upsert 的 rule record 数组**：每条 rule record 是完整 `rule-maturity.v1` 对象，`record` 子动作对已存在的 rule_id 追加 hit、对新 rule_id 创建 stage=shadow 的初始 rule record。逐 hit 明细是主真源；`list` 的计数是 projection，不替代明细。
@@ -276,10 +276,10 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 ### Resolved During Planning
 
 - producer 形态（独立子命令 vs lens 内嵌）：独立子命令，用户确认。
-- 人审主提示点（spec-code-review vs skill-audit vs compound）：`spec-code-review` Stage 6 作为研发人员可见提示入口；`spec-compound` 只在 verified learning 写成后提示规则候选；`spec-skill-audit` 只做周期治理健康检查。
+- 人审主提示点（spec-code-review vs skill-review vs compound）：`spec-code-review` Stage 6 作为研发人员可见提示入口；`spec-compound` 只在 verified learning 写成后提示规则候选；`retired-skill-review` 只做周期治理健康检查。
 - 是否新增专用 agent：第一版不新增；先用 `spec-code-review` Stage 6 synthesis 与 `spec-compound` 轻量 prose，后续再按真实误报/复杂度评估条件 agent。
 - 落盘是否 git 提交：gitignored local，理由见 Key Technical Decisions（A2 标注为假设，用户可在评审时推翻）。
-- skill-audit 健康检查接线：按当前脚本结构钉死为四件套，不再留给实现时即兴决定：`collect-skill-facts.js` 新增 `collectRuleMaturityObservations(repoRoot)`，`write-audit-artifacts.js` 的 `runSelfAudit()` 并入返回对象，`writeAuditArtifacts()` 写出 `rule-maturity-observations.json`，`rule-maturity.js` 导出纯读取/summary 函数供 CLI 与 audit 复用。
+- skill-review 健康检查接线：按当前脚本结构钉死为四件套，不再留给实现时即兴决定：`collect-skill-facts.js` 新增 `collectRuleMaturityObservations(repoRoot)`，`write-audit-artifacts.js` 的 `runSelfAudit()` 并入返回对象，`writeAuditArtifacts()` 写出 `rule-maturity-observations.json`，`rule-maturity.js` 导出纯读取/summary 函数供 CLI 与 audit 复用。
 - `list.last_observed_at` 投影：按 `Date.parse(hit.observed_at)` 最大值计算，非法时间导致 `status: degraded` / `reason_code: invalid-observed-at`，不得用字符串字典序近似。
 - Phase 1 gate 产物：使用 `docs/validation/rule-maturity-phase1-gate-<date>.md` prose 模板承载复查结论，不新增 JSON schema；脚本只提供 facts，人是否进入 phase 2 由维护者按模板判断。
 - Phase 1 rule_id 归一化：采用 `lens-family + problem-class` 的 kebab-case 命名（如 `review-missing-contract-test`、`summary-generated-output-staged`）；候选输出必须列 `similar_existing_rule_ids`，没有则为 `[]`，用于人工合并近似规则，不做脚本级唯一性推断。
@@ -352,7 +352,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 **Approach:**
 - `.gitignore` 与 init managed block 同步加 `.spec-first/governance/`，位置钉死在 `SPEC_FIRST_GITIGNORE_SECTIONS` 第二段 `spec-first local setup and workflow runtime artifacts`，紧邻 `.spec-first/audits/` / `.spec-first/workflows/` 等本地运行证据；不得为它新建 section（会破坏 gitignore-policy 镜像断言的结构口径）。
 - 注意 `SPEC_FIRST_GITIGNORE_SECTIONS` 会经 `spec-first init` 投影到所有下游用户仓库的 managed block——这是有意行为（用户本机治理观测证据同样不应入 git），属 user-visible 变更，CHANGELOG 标注。
-- `context-governance.md` 登记：该路径是 workflow 观测证据，不进普通 source context；消费方（skill-audit 周期健康、`rule-maturity report`、未来 promotion review）按需显式读取。
+- `context-governance.md` 登记：该路径是 workflow 观测证据，不进普通 source context；消费方（skill-review 周期健康、`rule-maturity report`、未来 promotion review）按需显式读取。
 
 **Test scenarios:**
 - Happy path: `buildSpecFirstGitignoreBlock()` 第二段 `spec-first local setup and workflow runtime artifacts` 输出含 `.spec-first/governance/`（contract test 断言）。
@@ -401,7 +401,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 ---
 
-### U4. spec-skill-audit 周期健康消费面 — phase 1
+### U4. retired-skill-review 周期健康消费面 — phase 1
 
 **Goal:** 兑现 producer→consumer gate：audit artifact 纳入 rule-maturity 汇总事实，并定位为周期治理健康检查而非研发人员人审主入口。
 
@@ -410,16 +410,16 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 **Dependencies:** U1
 
 **Files:**
-- Modify: `skills/spec-skill-audit/scripts/collect-skill-facts.js`（新增 `collectRuleMaturityObservations(repoRoot)` 并导出）
-- Modify: `skills/spec-skill-audit/scripts/write-audit-artifacts.js`（`runSelfAudit()` 并入 `ruleMaturityObservationsReport`，`writeAuditArtifacts()` 写 `rule-maturity-observations.json`）
+- Modify: `skills/retired-skill-review/scripts/collect-skill-facts.js`（新增 `collectRuleMaturityObservations(repoRoot)` 并导出）
+- Modify: `skills/retired-skill-review/scripts/write-audit-artifacts.js`（`runSelfAudit()` 并入 `ruleMaturityObservationsReport`，`writeAuditArtifacts()` 写 `rule-maturity-observations.json`）
 - Modify: `src/cli/helpers/rule-maturity.js`（导出纯读取/summary 函数供 CLI 与 audit 复用）
-- Modify: `skills/spec-skill-audit/SKILL.md`（Outputs 与 read-step 说明）
-- Test: `tests/unit/` 下 skill-audit artifact 既有测试文件（实现时定位）+ fixture
+- Modify: `skills/retired-skill-review/SKILL.md`（Outputs 与 read-step 说明）
+- Test: `tests/unit/` 下 skill-review artifact 既有测试文件（实现时定位）+ fixture
 
 **Approach:**
 - audit 采集时读取 rule-maturity 观测汇总，把逐 rule 计数和健康信号写入独立 artifact：`rule-maturity-observations.json`。健康信号包括：有 shadow hits 但长期无裁决、观测为空、裁决/晋升证据链缺口、consumer 断裂。读取方式固定为直读 evidence 文件（从 repoRoot 解析路径，汇总逻辑与 `list` 共享 `rule-maturity.js` 导出的纯函数），不 spawn CLI 子进程。
 - `rule-maturity-observations.json` 最小稳定字段钉死为：`schema_version: "rule-maturity-observations.v1"`、`generated_at`、`status`（`empty|ok|degraded`）、`reason_code`、`rule_count`、`shadow_hit_count`、`uncategorized_count`、`last_observed_at`、`workflow_distribution`、`rules[]`、`health_signals[]`。`rules[]` 每项至少含 `rule_id`、`stage`、`shadow_hit_count`、`last_observed_at`、`reason_codes`、`similar_existing_rule_ids`（实现期可为空数组）。这是 audit artifact contract，不改变 `rule-maturity.v1` schema。
-- 四件套必须同 PR 完成：`collect-skill-facts.js` 新增并导出 `collectRuleMaturityObservations(repoRoot)`；`write-audit-artifacts.js` 的 `runSelfAudit()` 调用该函数并把结果放入返回对象 `ruleMaturityObservationsReport`；`writeAuditArtifacts()` 增加 `writeJson(path.join(dirs.runDir, 'rule-maturity-observations.json'), reports.ruleMaturityObservationsReport)`；`skills/spec-skill-audit/SKILL.md` Outputs/read-step 明确读取该 artifact。漏任一环都视为 U4 未完成。
+- 四件套必须同 PR 完成：`collect-skill-facts.js` 新增并导出 `collectRuleMaturityObservations(repoRoot)`；`write-audit-artifacts.js` 的 `runSelfAudit()` 调用该函数并把结果放入返回对象 `ruleMaturityObservationsReport`；`writeAuditArtifacts()` 增加 `writeJson(path.join(dirs.runDir, 'rule-maturity-observations.json'), reports.ruleMaturityObservationsReport)`；`skills/retired-skill-review/SKILL.md` Outputs/read-step 明确读取该 artifact。漏任一环都视为 U4 未完成。
 - evidence 文件缺失/为空时输出 `status: empty` 事实，不报错——空集本身是 v1.17 promotion 未就绪的有效证据。
 - audit artifact 不产生 `adjudicate` / `promote` 建议的交互式入口；它只把维护者应关注的治理健康事实摆出来。研发人员可见的候选提示归 U3 的 `spec-code-review` Stage 6，晋升/退役事实入口归 U8 `report`。
 
@@ -435,7 +435,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - Error path: evidence 文件损坏 → artifact 记录 degraded 事实，audit 不失败。
 
 **Verification:**
-- focused skill-audit tests 通过。
+- focused skill-review tests 通过。
 
 ---
 
@@ -453,7 +453,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - Modify: `CHANGELOG.md`
 
 **Approach:**
-- `rule-maturity.md`：v1.14「schema/docs-only、无 producer」段更新为「v1.17 phase 1 起有唯一 producer `spec-first internal rule-maturity`，仅产 shadow/advisory；promotion/blocking 仍未实现」，登记存储路径与 consumer 分工（`spec-code-review` Stage 6 轻提示、`spec-skill-audit` 周期健康、未来 `report`/promotion 人审）。
+- `rule-maturity.md`：v1.14「schema/docs-only、无 producer」段更新为「v1.17 phase 1 起有唯一 producer `spec-first internal rule-maturity`，仅产 shadow/advisory；promotion/blocking 仍未实现」，登记存储路径与 consumer 分工（`spec-code-review` Stage 6 轻提示、`retired-skill-review` 周期健康、未来 `report`/promotion 人审）。
 - SCALE README：v1.17 行进展按真实状态更新（plan 落地→计划中；实现合入→进行中），并在范围列点明 phase 1 边界。
 - 注意 `tests/unit/scale-provider-doc-contracts.test.js:57` 断言父方案含「v1.14 schema/docs-only shadow 例外」字样——该历史表述保留（它描述 v1.14 决策），新增表述不得删除它；若措辞冲突，调整新增句而非历史句。
 
@@ -640,8 +640,8 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 **Files:**
 - Modify: `src/cli/helpers/rule-maturity.js`（`report --funnel` 或独立 `roi` 子动作，实现时按输出体量定）
-- Modify: `skills/spec-skill-audit/scripts/collect-skill-facts.js`（周期健康 audit artifact 纳入漏斗事实，扩展 U4 已有采集函数）
-- Test: `tests/unit/rule-maturity.test.js` + skill-audit fixture 测试
+- Modify: `skills/retired-skill-review/scripts/collect-skill-facts.js`（周期健康 audit artifact 纳入漏斗事实，扩展 U4 已有采集函数）
+- Test: `tests/unit/rule-maturity.test.js` + skill-review fixture 测试
 
 **Approach:**
 - 借上游 GovernanceMetrics 的两个可取形态：漏斗转化计数（proposed→validated→approved→enforced 映射为 observed→adjudicated→promoted→graduated）与时间窗对比 delta（本期 vs 前期，纯文件聚合）。adjudicated 级计数沿用 U8 钉死的 refs-计数口径（裁决次数近似，合同已登记），不在 ROI 层伪造逐 hit 精度。
@@ -655,7 +655,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - Happy path: fixture 含窗口外与格式不合数据 → 排除计数与原因正确回显，纳入计数不含被排除项。
 - Happy path: 同一 fixture + 同一显式 `--as-of` / 窗口参数多次运行 → 输出逐字节一致（确定性可复现），且 `generated_at`（如存在）等于派生时间而非 wall-clock。
 - Edge case: 时间窗内无数据 → 计数为 0，不出现估算或外推值。
-- Happy path: skill-audit health artifact 含漏斗事实（fixture 断言）。
+- Happy path: skill-review health artifact 含漏斗事实（fixture 断言）。
 
 **Verification:**
 - focused tests 通过；输出中不存在任何非复算来源的数字（code review 核对项）。
@@ -747,11 +747,11 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 ## System-Wide Impact
 
-- **Interaction graph:** phase 1 active 范围内，internal.js 新增 dispatch 分支；spec-plan / spec-code-review 的 lens 消费段新增一个可选后继动作；spec-code-review Stage 6 新增 `Rule Maturity Candidates` 轻提示；skill-audit artifact 写入面新增周期健康事实。无公开 CLI 入口变化。
+- **Interaction graph:** phase 1 active 范围内，internal.js 新增 dispatch 分支；spec-plan / spec-code-review 的 lens 消费段新增一个可选后继动作；spec-code-review Stage 6 新增 `Rule Maturity Candidates` 轻提示；skill-review artifact 写入面新增周期健康事实。无公开 CLI 入口变化。
 - **Error propagation:** record 失败（store 损坏、参数非法）以 exit 2 + 结构化 reason_code 返回，workflow prose 明确 degraded 继续；不让治理观测失败阻塞主 workflow。
 - **State lifecycle risks:** 单文件 upsert 存在并发写竞态（两个会话同时 record）——phase 1 接受该风险：观测是低频显式动作，丢失个别 hit 不影响 advisory 语义；不引入锁机制（避免过度设计），风险登记于下表。
 - **API surface parity:** Claude/Codex 双宿主：SKILL.md 变更经 `spec-first init` 投影；helper 是 Node 脚本不受会话缓存影响。
-- **Integration coverage:** phase 1 使用 `npm run test:unit` 覆盖 internal dispatch + skill-audit health artifact + code-review prose contract；record→list→audit 消费的端到端在 U4 fixture 测试中验证，code-review 候选提示由 U3/U6 doc contract 与 fresh-source eval 守住。
+- **Integration coverage:** phase 1 使用 `npm run test:unit` 覆盖 internal dispatch + skill-review health artifact + code-review prose contract；record→list→audit 消费的端到端在 U4 fixture 测试中验证，code-review 候选提示由 U3/U6 doc contract 与 fresh-source eval 守住。
 - **Unchanged invariants:** `task-governance-signals` 输出合同不变；`resource-governance-lens` 在 phase 1 不变；`rule-maturity.v1` schema 不 bump（promotion/adjudication 的 prose artifact + ref 仍只是 deferred candidate）；doctor 合同不变；`gate-lens-taxonomy.v1` 词表不变。
 - **Phase 2+ 增量影响（candidate only）:** adjudicate/promote/demote/merge/report、U8 `human_review[]`、U10 compound 轻提示、U13 PR handoff / standards reviewer lens 注入均需后续重新计划。当前 plan 不改变这些 workflow 的阻塞行为。
 
@@ -781,7 +781,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 
 ## Documentation / Operational Notes
 
-- CHANGELOG 按仓库格式逐 phase 合入时分别记录，标 `(user-visible)`（新增 CLI internal 子命令 + code-review `Rule Maturity Candidates` 提示 + skill-audit 周期健康事实面 + resource lens v2）。
+- CHANGELOG 按仓库格式逐 phase 合入时分别记录，标 `(user-visible)`（新增 CLI internal 子命令 + code-review `Rule Maturity Candidates` 提示 + skill-review 周期健康事实面 + resource lens v2）。
 - SKILL.md 变更后执行 `spec-first init` 刷新双宿主 runtime mirror；不手改 mirror。
 - phase 1 合入后真实运行 2 周再决定是否启动 phase 2 重新计划（phase gate），让 shadow_hits 积累出可供人审的样本；phase 4/U12/U13 如需提前做，必须另开独立计划，不再从本 plan 直接并行。
 - 团队推广注意：phase 2 `merge` 落地前，各成员本机证据互不可见——团队级 promotion 评审从 phase 2 起才有完整样本，phase 1 期间不要基于单机数据做晋升预判。

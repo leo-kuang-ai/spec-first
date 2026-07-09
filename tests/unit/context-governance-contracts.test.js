@@ -60,7 +60,6 @@ describe('context governance runtime exclusion contract', () => {
     expect(contract).toContain('Detailed design rationale belongs in requirements, plans, reviews, validation artifacts, or PR descriptions');
     expect(contract).toContain('Allowed Exceptions');
     expect(contract).toContain('`spec-mcp-setup` / `spec-first update` CLI');
-    expect(contract).toContain('`spec-skill-audit`');
     expect(contract).toContain('changelog author resolution');
     expect(contract).toContain('`~/.spec-first/.developer`');
     expect(contract).toContain('user-explicit path request');
@@ -133,15 +132,6 @@ describe('context governance runtime exclusion contract', () => {
     expect(entryGovernor).toContain('docs/contracts/context-governance.md');
     expect(entryGovernor).toContain('.spec-first/audits/**');
     expect(entryGovernor).toContain('.spec-first/governance/**');
-  });
-
-  test('skill-audit documents its bounded audit-artifact exception', () => {
-    const skillAudit = read('skills/spec-skill-audit/SKILL.md');
-
-    expect(skillAudit).toContain('explicit exception to the ordinary runtime context exclusion');
-    expect(skillAudit).toContain('.spec-first/audits/skill-audit/**');
-    expect(skillAudit).toContain('.spec-first/governance/rule-maturity.json');
-    expect(skillAudit).toContain('Other workflows should treat `.spec-first/audits/**` and `.spec-first/governance/**` as excluded runtime artifacts');
   });
 
   test('user-facing docs explain context exclusion separately from gitignore', () => {

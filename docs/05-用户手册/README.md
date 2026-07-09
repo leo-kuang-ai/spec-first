@@ -12,7 +12,7 @@
 
 - `spec-mcp-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
 - `spec-app-consistency-audit`：移动 App 的 PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查入口
-- `spec-skill-audit`：source skill 质量、治理投递、runtime drift 与安全信号审计入口
+- `retired-skill-review`：source skill 质量、治理投递、runtime drift 与安全信号审计入口
 - `spec-compound`：工作完成后的稳定知识捕获入口
 
 当前功能状态：
@@ -40,7 +40,7 @@
 
 - 一个前置的 `spec-ideate` 候选发散入口
 - 跨宿主统一的 `spec-*` workflow 入口
-- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、source skill 审计入口 `spec-skill-audit`，以及知识沉淀入口 `spec-compound`
+- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、source skill 审计入口 `retired-skill-review`，以及知识沉淀入口 `spec-compound`
 - 一条 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 的标准闭环
 - 项目级 `.claude/commands/spec-*.md`
 - 项目级 `.claude/skills`、`.claude/spec-first/workflows` 与 `.claude/agents`
@@ -67,7 +67,7 @@ mcp-setup
   -> write-tasks
   -> work / debug / optimize / polish
   -> code-review / app-consistency-audit
-  -> compound / compound-refresh / sessions / slack-research / skill-audit
+  -> compound / compound-refresh / sessions / slack-research / skill-review
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
 ```
 

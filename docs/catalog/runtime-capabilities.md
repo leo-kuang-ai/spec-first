@@ -18,15 +18,15 @@
 
 | 范围 | 当前值 |
 |---|---|
-| Bundled source skills | 36 |
+| Bundled source skills | 35 |
 | Bundled source agents | 0 |
 | Bundled agent support files | 0 |
-| Governance records by entry surface | internal_only: 7, standalone_skill: 11, workflow_command: 18 |
-| Claude runtime delivery | 18 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Qoder runtime delivery | 18 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Governance records by entry surface | internal_only: 7, standalone_skill: 11, workflow_command: 17 |
+| Claude runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | Beta workflow entries | none |
@@ -63,7 +63,6 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 | plan | spec-plan | spec-plan | no | Run the Spec-First planning workflow |
 | polish | spec-polish | spec-polish | no | Start the dev server and iterate on browser-visible polish |
 | prd | spec-prd | spec-prd | no | Run the Spec-First PRD requirements workflow |
-| skill-audit | spec-skill-audit | spec-skill-audit | no | Run the Spec-First skill audit workflow |
 | work | spec-work | spec-work | no | Run the Spec-First execution workflow |
 | write-skill | spec-write-skill | spec-write-skill | no | Write, revise, migrate, or remediate spec-first source skills |
 | write-tasks | spec-write-tasks | spec-write-tasks | no | Public workflow entrypoint (spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
@@ -84,7 +83,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 | spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving behavior. Use for tidy/refactor passes; use spec-debug for bugs. |
 | spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | Create or update STRATEGY.md. Use when starting a product, changing direction or roadmap, or when spec-ideate, spec-brainstorm, or spec-plan need upstream product grounding. |
 | spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | Sweep configured feedback sources (Slack, GitHub Issues; email experimental) for new items: acknowledge at source, analyze recordings, verify fixes merged to main, and emit a spec-lfg-ready plan. First run sets up sources; supports mode:headless for scheduled runs. |
-| using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | 在 spec-first 仓库中执行实质性工作前使用，也用于回答用户“下一步跑哪个 spec-first workflow/command”。根据当前意图选择一个公开 `spec-*` workflow、一个终端命令，或直接回答/正常执行；不要用于轻量事实问答、当前上下文解释、窄范围 where-used 查询、用户给定单文档整理，或目标文件和改法都明确的低风险小改。 |
+| using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | 在 spec-first 仓库中执行实质性工作前使用，也用于回答用户“下一步跑哪个 spec-first workflow/command”。根据当前意图选择一个公开 `spec-*` workflow、一个终端命令，或直接回答/正常执行。不要用于轻量事实问答、当前上下文解释、窄范围 where-used 查询、用户给定单文档整理，或目标文件和改法都明确的低风险小改。 |
 
 ## Internal Skill Governance
 

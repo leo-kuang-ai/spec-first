@@ -42,8 +42,8 @@
       "coverage_tags": ["trigger", "boundary"],
       "expected_outcome": "near-neighbor",
       "expected_result": "near-neighbor",
-      "expected_mode": "spec-skill-audit",
-      "boundary_note": "Audit-only requests should route to spec-skill-audit instead of write-skill source mutation.",
+      "expected_mode": "bounded_source_review",
+      "boundary_note": "Audit-only requests should stay read-only instead of triggering write-skill source mutation.",
       "reason_code": "audit-not-authoring"
     },
     {

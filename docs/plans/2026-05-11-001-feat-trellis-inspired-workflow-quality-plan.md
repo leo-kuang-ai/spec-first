@@ -69,7 +69,7 @@ implements_schemas: ['docs/contracts/workflows/spec-work-run-artifact.schema.jso
 |------|----------|------|
 | 默认产品面 | 对所有 public workflow 可见；轻量、可维护、不增加必经状态。 | contract summary、source/runtime boundary、task-pack source-plan 聚焦核对、final evidence summary、not-run/degraded reason、changelog discipline。 |
 | Advanced / opt-in | 只在 plan/task/review/debug 复杂度或用户意图触发时使用。 | task-pack compilation、fresh-source eval、deep plan/research、worker delegation suitability gate、domain language/decision ledger、feedback-loop-first debug、release/package guard 扩展。 |
-| Internal-only | 只服务维护、审计或 release；不作为普通用户入口暴露。 | catalog/governance drift scripts、runtime capability generation、provider readiness facts、skill-audit deterministic inventory checks、rejected/out-of-scope replay indexes。 |
+| Internal-only | 只服务维护、审计或 release；不作为普通用户入口暴露。 | catalog/governance drift scripts、runtime capability generation、provider readiness facts、skill-review deterministic inventory checks、rejected/out-of-scope replay indexes。 |
 
 `src/cli/contracts/dual-host-governance/skills-governance.json` 是 public/internal skill delivery 的 source of truth。最终覆盖口径是所有 `entry_surface: workflow_command` 的 public workflow 都必须具备最低 contract summary；第一轮实现可按高频链路分批，但 R1 只有在 governance contract 中的 public workflows 全部被覆盖或明确豁免后才算完成。
 
@@ -163,7 +163,7 @@ Clean-room handling:
 - `src/cli/adapters/claude.js` 与 `src/cli/adapters/codex.js`: dual-host runtime projection；任何 host-visible 变化都必须保持两端一致。
 - `scripts/generate-runtime-capability-catalog.js`、`scripts/release-publish.cjs`、`scripts/run-test-suite.cjs`: release/catalog/test runner surface，确定性 continuity guards 应落在这里。
 - `skills/spec-debug/SKILL.md`: root-cause-first debug workflow；适合落地 feedback-loop-first、hypothesis ledger 和 post-fix prevention handoff。
-- `skills/spec-skill-audit/SKILL.md`: skill governance 审计入口；适合落地 trigger precision、progressive disclosure、public-surface drift 和 script-owned deterministic work 检查。
+- `skills/retired-skill-review/SKILL.md`: skill governance 审计入口；适合落地 trigger precision、progressive disclosure、public-surface drift 和 script-owned deterministic work 检查。
 - `skills/spec-compound/SKILL.md`、`skills/spec-compound-refresh/SKILL.md`、`skills/spec-sessions/SKILL.md`: knowledge capture、refresh 与 replay 链路；适合吸收 provenance-backed learnings、rejected rationale 和 stale learning 检索。
 - 外部对标 Matt Pocock skills：README 强调 small composable skills；`CONTEXT.md` 展示领域语言；ADR 0001 区分 hard/soft dependency；`diagnose`、`tdd`、`grill-with-docs`、`to-issues`、`write-a-skill` 分别提供反馈环、纵向切片、领域语言、任务切分和 skill 编写治理参考。
 
@@ -599,7 +599,7 @@ Clean-room handling:
 - 内容重点：只读审计 CLAUDE.md、skills、MCP、agents、memory redundancy，输出 context health 和 move-to-subagent 建议。
 - 可参考点：spec-first 需要 context health reviewer，尤其是 skill/agent prose 扩张后的 context bloat 风险。
 - 不能照搬点：Claude-specific file loading 和 line thresholds 不可直接作为 spec-first rule。
-- spec-first 落点：`spec-skill-audit` 可增加 context footprint / progressive disclosure / description overhead checks。
+- spec-first 落点：`retired-skill-review` 可增加 context footprint / progressive disclosure / description overhead checks。
 - 采纳等级：P1。
 
 ##### pro-workflow agent: `cost-analyst`
@@ -607,7 +607,7 @@ Clean-room handling:
 - 内容重点：分析 token/cost drivers、cache、model selection 和 optimization。
 - 可参考点：可作为 context/cost advisory reviewer，不参与语义决策。
 - 不能照搬点：实际成本需要 host telemetry；没有 telemetry 时不能编造数字。
-- spec-first 落点：只作为 `spec-skill-audit` / `spec-mcp-setup` 的 optional checklist，不新增默认 agent。
+- spec-first 落点：只作为 `retired-skill-review` / `spec-mcp-setup` 的 optional checklist，不新增默认 agent。
 - 采纳等级：P2。
 
 ##### pro-workflow agent: `debugger`
@@ -673,7 +673,7 @@ Clean-room handling:
 | `agent-teams` / `batch-orchestration` / `parallel-worktrees` | P1 | parallel suitability、file ownership、worktree isolation | `spec-work-beta` 和 task-pack wave 分解 | `skills/spec-work-beta/SKILL.md`, `skills/spec-write-tasks/**` | 不默认 agent team / PR fan-out |
 | `smart-commit` / `sprint-status` / `thoroughness-scoring` | P1 | commit hygiene、status enum、risk-adjusted rigor | `spec-work` closeout / PR guidance / review rubric | `skills/spec-work/SKILL.md`, `skills/spec-code-review/SKILL.md` | 不强制每条回复 status，不鼓励过度工程 |
 | `wiki-builder` / `wiki-query` / `survey-generator` | P1 | provenance-backed durable knowledge | `docs/solutions`/research artifacts 的 source/derived/citation discipline | `skills/spec-compound/SKILL.md`, `skills/spec-plan/SKILL.md` | 不新增核心 SQLite/wiki runtime |
-| `context-optimizer` / `cost-tracker` / `cost-analyst` | P2 | context/cost advisory | 作为 skill-audit/mcp-setup checklist | `skills/spec-skill-audit/SKILL.md`, `skills/spec-mcp-setup/SKILL.md` | 不写时效性价格/模型事实 |
+| `context-optimizer` / `cost-tracker` / `cost-analyst` | P2 | context/cost advisory | 作为 skill-review/mcp-setup checklist | `skills/retired-skill-review/SKILL.md`, `skills/spec-mcp-setup/SKILL.md` | 不写时效性价格/模型事实 |
 | `file-watcher` / `safe-mode` | P2/P1 | reactive config drift、bounded write scope | doctor/release advisory + worker write-scope guard | `skills/spec-work-beta/SKILL.md`, `docs/contracts/source-runtime-customization-boundary.md` | 不引入 always-on hooks state |
 | `llm-council` / `llm-gate` / `wiki-research-loop` / `wiki-viewer` | P2/拒绝核心 | multi-review synthesis、semantic gates、auto research、auditable viewer | 只吸收边界原则：independent review、cap/kill-switch/privacy、snapshot reports | `skills/spec-doc-review/SKILL.md`, `skills/spec-code-review/SKILL.md` | 不让 LLM gate 成 blocking guard，不建 auto crawler |
 
@@ -770,9 +770,9 @@ Clean-room handling:
 ##### Matt skill: `write-a-skill`
 
 - 内容重点：skill description 是 agent 判断是否加载 skill 的唯一入口；`SKILL.md` 超过约 100 行应拆 references；deterministic 操作用 scripts。
-- 可参考点：与 spec-first `spec-skill-audit`、skill entrypoint lint、source/runtime governance 高度一致。
+- 可参考点：与 spec-first `retired-skill-review`、skill entrypoint lint、source/runtime governance 高度一致。
 - 不能照搬点：不直接采用其模板作为 spec-first 唯一 skill schema；spec-first public workflow skill 还需要 workflow contract summary、dual-host boundary 和 tests。
-- spec-first 落点：`spec-skill-audit` 增加 trigger precision、progressive disclosure、script-owned deterministic work、description/runtime catalog drift checks。
+- spec-first 落点：`retired-skill-review` 增加 trigger precision、progressive disclosure、script-owned deterministic work、description/runtime catalog drift checks。
 - 采纳等级：P0。
 
 ##### Matt skill: `grill-me`
@@ -855,7 +855,7 @@ Clean-room handling:
 | `tdd` / `to-issues` | P0 | vertical tracer bullets、public behavior tests、独立可验证 slice | 强化 `spec-work`、`spec-write-tasks`、`spec-plan` task slicing | `skills/spec-work/SKILL.md`, `skills/spec-write-tasks/references/task-quality-guide.md`, `tests/unit/spec-write-tasks-contracts.test.js` | 不把所有任务强制 TDD；不发布外部 issue |
 | `grill-with-docs` / `grill-me` | P0/P1 | domain language、ADR、one-question gate、recommended answer | 强化 `spec-brainstorm` / `spec-plan` decision ledger 和 fuzzy-term review | `skills/spec-brainstorm/SKILL.md`, `skills/spec-plan/SKILL.md`, `tests/unit/spec-brainstorm-contracts.test.js` | 不强制 `CONTEXT.md` / `docs/adr` 目录 |
 | `setup-matt-pocock-skills` | P0 | hard vs soft dependency setup boundary | `spec-mcp-setup` / `spec-standards` readiness severity 和 reason_code | `skills/spec-mcp-setup/SKILL.md`, `skills/spec-standards/SKILL.md`, `tests/unit/spec-standards-contracts.test.js` | 不自动改 host instruction 或 issue tracker config |
-| `write-a-skill` | P0 | trigger precision、progressive disclosure、scripts for deterministic ops | 强化 `spec-skill-audit` 和 runtime capability catalog guard | `skills/spec-skill-audit/SKILL.md`, `tests/unit/lint-skill-entrypoints.test.js`, `tests/unit/runtime-capability-catalog.test.js` | 不复制模板作为唯一 skill schema |
+| `write-a-skill` | P0 | trigger precision、progressive disclosure、scripts for deterministic ops | 强化 `retired-skill-review` 和 runtime capability catalog guard | `skills/retired-skill-review/SKILL.md`, `tests/unit/lint-skill-entrypoints.test.js`, `tests/unit/runtime-capability-catalog.test.js` | 不复制模板作为唯一 skill schema |
 | `zoom-out` / `improve-codebase-architecture` | P0/P1 | module map、deep modules、locality/leverage | `spec-plan`/`spec-standards` orientation artifact 与 architecture rubric | `skills/spec-plan/SKILL.md`, `skills/spec-standards/SKILL.md`, `skills/spec-code-review/SKILL.md` | 不替代 impact analysis、tests 或 confirmed ADR |
 | `prototype` | P1 | throwaway spike answers a question | `spec-plan` optional spike guidance；`spec-work` 删除或吸收 prototype | `skills/spec-plan/SKILL.md`, `skills/spec-work/SKILL.md` | 不把 prototype 变成 mandatory phase |
 | `triage` | P1 | durable agent brief、repro-before-grill、out-of-scope memory | task card / worker brief / bug summary / rejected-rationale capture | `skills/spec-write-tasks/**`, `skills/spec-debug/SKILL.md`, `skills/spec-compound/SKILL.md` | 不引入 issue label state machine |
@@ -1217,7 +1217,7 @@ flowchart LR
 - 修改: `skills/spec-polish-beta/SKILL.md`
 - 修改: `skills/spec-release-notes/SKILL.md`
 - 修改: `skills/spec-sessions/SKILL.md`
-- 修改: `skills/spec-skill-audit/SKILL.md`
+- 修改: `skills/retired-skill-review/SKILL.md`
 - 修改: `skills/spec-slack-research/SKILL.md`
 - 修改: `skills/spec-standards/SKILL.md`
 - 修改: `skills/spec-update/SKILL.md`
@@ -1673,21 +1673,21 @@ flowchart LR
 **依赖：** U5 的 release/catalog guard；U6 的 source/runtime boundary docs
 
 **文件：**
-- 修改: `skills/spec-skill-audit/SKILL.md`
+- 修改: `skills/retired-skill-review/SKILL.md`
 - 修改: `skills/spec-compound/SKILL.md`
 - 修改: `skills/spec-compound-refresh/SKILL.md`
 - 修改: `skills/spec-sessions/SKILL.md`
 - 修改: `skills/spec-plan/SKILL.md`
 - 修改: `skills/spec-work/SKILL.md`
 - 测试: `tests/unit/lint-skill-entrypoints.test.js`
-- 测试: `tests/unit/skill-audit-scripts.test.js`
+- 测试: `tests/unit/skill-review-scripts.test.js`
 - 测试: `tests/unit/spec-compound-contracts.test.js`
 - 测试: `tests/unit/spec-sessions-contracts.test.js`
 - 测试: `tests/unit/spec-plan-contracts.test.js`
 - 测试: `tests/unit/spec-work-contracts.test.js`
 
 **做法：**
-- `spec-skill-audit` 审查 skill description 是否足以触发、是否 progressive disclosure、是否把 deterministic 操作交给 scripts、是否公开面与 governance/catalog/README 一致。
+- `retired-skill-review` 审查 skill description 是否足以触发、是否 progressive disclosure、是否把 deterministic 操作交给 scripts、是否公开面与 governance/catalog/README 一致。
 - 消费 U5 的 catalog/release guard result，比对 source inventory、governance contract、README/README.zh-CN、runtime capability catalog 和 plugin metadata 的结果，解释哪些属于 blocking drift、advisory drift、docs-only no-impact；不在 U11 中重新实现 guard。
 - hard dependency 缺失时输出 setup/doctor pointer；soft dependency 缺失时只降低 quality/confidence，不阻塞 workflow。
 - `spec-compound` / `spec-compound-refresh` / `spec-sessions` 支持 rejected/out-of-scope rationale 的检索与 replay，但不引入 issue label lifecycle 或新状态机。
@@ -1696,7 +1696,7 @@ flowchart LR
 **执行姿态：** 先界定 machine-checkable surface，再补 LLM-owned review guidance；不要让脚本判断 skill 语义优劣。
 
 **测试场景：**
-- 正常路径：新增 public skill 时，`spec-skill-audit` 能消费 U5 guard result，并解释 governance contract、runtime catalog、README 公开面是否一致。
+- 正常路径：新增 public skill 时，`retired-skill-review` 能消费 U5 guard result，并解释 governance contract、runtime catalog、README 公开面是否一致。
 - 正常路径：`spec-plan` / `spec-work` 能引用 provenance-backed rejected/out-of-scope rationale，减少重复讨论。
 - 正常路径：缺 hard dependency 时输出明确 setup action；缺 soft context 时记录 degraded/advisory。
 - 边界情况：internal helper 不要求出现在 public README，但必须在 governance 中标明 internal-only。
@@ -1704,7 +1704,7 @@ flowchart LR
 
 **验证：**
 - `npm run lint:skill-entrypoints`
-- `npm run test:unit`，或 targeted 运行 skill-audit/compound/sessions/plan/work contract tests。
+- `npm run test:unit`，或 targeted 运行 skill-review/compound/sessions/plan/work contract tests。
 
 ---
 
@@ -1731,7 +1731,7 @@ flowchart LR
 | Agent dispatch 隐式化或成本过高 | 复用现有 agents，要求 explicit dispatch scopes、fallback behavior，并禁止 default implement/check lifecycle。 |
 | 领域语言/ADR 变成固定目录要求 | U9 明确只消费 confirmed/advisory docs，不强制 `CONTEXT.md`、`CONTEXT-MAP.md` 或 `docs/adr/`；缺失时只建议创建或降级。 |
 | Feedback-loop-first 被误解为所有任务都必须 TDD | U10 区分 behavior-bearing code、docs/config contracts 和 manual review cue；只要求适配风险的可验证反馈环。 |
-| Public surface guard 变成语义审批器 | U11 只让脚本验证 inventory/catalog/README/governance 一致性；skill 质量仍由 `spec-skill-audit` 的 LLM judgment 负责。 |
+| Public surface guard 变成语义审批器 | U11 只让脚本验证 inventory/catalog/README/governance 一致性；skill 质量仍由 `retired-skill-review` 的 LLM judgment 负责。 |
 | Dirty worktree 让 graph evidence 不完整 | 本规划 run 把 compiled graph facts 作为 degraded-fallback；实现时重新检查当前 source 和 tests。 |
 
 ---

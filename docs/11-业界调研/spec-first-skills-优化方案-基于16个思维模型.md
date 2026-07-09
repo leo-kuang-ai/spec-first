@@ -3,7 +3,7 @@
 - 分析时间：2026-07-02
 - 参考方法论：`docs/11-业界调研/16个思维模型方法论学习记录.md`
 - 覆盖 skills：37 个（全部 SKILL.md）
-- 核心工作流分析深度：spec-plan / spec-code-review / spec-work / spec-prd / spec-optimize / spec-compound / spec-debug / spec-skill-audit / spec-write-skill / spec-team-standards-governance / using-spec-first
+- 核心工作流分析深度：spec-plan / spec-code-review / spec-work / spec-prd / spec-optimize / spec-compound / spec-debug / retired-skill-review / spec-write-skill / spec-team-standards-governance / using-spec-first
 
 > **执行者阅读路径（重要）**：本文件是追加式修订的研究方案，不是一次性定稿。若你要据此实施，只需读：**§一（方法论映射）+ §G / §H / §I / §J（当前有效结论）+ §H.14 / §H.15（执行清单与口径）**。
 > **§二~§六与附录 A-F 属于初版分析，其中「零风险删除」「整体减少 31%」「P0 立即落地」等措辞已被 §G / §H 系统性修正，仅供追溯脉络，不得作为实施依据。**
@@ -157,12 +157,12 @@ High-value solutions (referenced 3+ times, check first):
 **核心洞察**：新工具、新能力会替代旧流程。spec-first 本身就是在「破坏」传统手写 prompt 习惯；skills 内部也需要定期审视哪些环节可以被更好的机制替代。
 
 **当前 skill 现状**：
-- `spec-skill-audit` 有质量审计维度，但缺少「这个 skill 是否已被宿主能力商品化」的判断
+- `retired-skill-review` 有质量审计维度，但缺少「这个 skill 是否已被宿主能力商品化」的判断
 - `spec-write-skill` 的资格判断（`do-not-create-skill`）已部分覆盖「是否值得做成 skill」，但缺少「当前 skill 是否该退役」的逆向视角
 
 **具体优化建议**：
 
-**[OPT-3.1] spec-skill-audit：商品化风险评估**
+**[OPT-3.1] retired-skill-review：商品化风险评估**
 
 在 skill 审计报告中增加一个维度：
 
@@ -457,7 +457,7 @@ finding_source_reviewer: spec-adversarial-reviewer
 finding_severity: P1
 ```
 
-积累足够样本后，`spec-skill-audit` 可以用这些数据回答「哪些 reviewer 在这个 codebase 历史上找到了最多高价值 finding」，从而优化未来的 reviewer 优先级。
+积累足够样本后，`retired-skill-review` 可以用这些数据回答「哪些 reviewer 在这个 codebase 历史上找到了最多高价值 finding」，从而优化未来的 reviewer 优先级。
 
 **[OPT-10.2] spec-plan：High-Leverage Risks 优先展示**
 
@@ -629,7 +629,7 @@ second_order_impact:
 **当前 skill 现状**：
 - `spec-compound` 生成的 solutions 只有技术内容，没有「这个方案在哪些场景下被成功应用」的背书信息
 - `spec-release-notes` 主要是功能列表，缺少「真实用户反馈」和「可量化的效率改善」的社会认同信号
-- `spec-skill-audit` 的报告有质量评分，但缺少「这个 skill 实际被用了多少次，平均执行效果如何」的使用数据背书
+- `retired-skill-review` 的报告有质量评分，但缺少「这个 skill 实际被用了多少次，平均执行效果如何」的使用数据背书
 
 **具体优化建议**：
 
@@ -898,7 +898,7 @@ knowledge_corpus_health:
 
 ---
 
-### 3.9 `spec-skill-audit` / `spec-write-skill`：skill 治理优化
+### 3.9 `retired-skill-review` / `spec-write-skill`：skill 治理优化
 
 **当前优势**：
 - 明确把 skill 当作 engineering protocol，而不只是 prompt
@@ -950,7 +950,7 @@ knowledge_corpus_health:
 | P1-2 | map_vs_territory_log | spec-work | closeout/prose | 执行校准价值高 |
 | P1-3 | baseline min_runs + stability_check | spec-optimize | 待 eval；schema 延后 | `spec-optimize` 未经 §G/§H 复核，需先证明单次样本误判是当前高频问题 |
 | P1-4 | hypothesis confidence tracking | spec-debug | prose/template | 强化科学调试 |
-| P1-5 | commoditization_risk | spec-skill-audit | prose/report format | 守住非 prompt collection 边界 |
+| P1-5 | commoditization_risk | retired-skill-review | prose/report format | 守住非 prompt collection 边界 |
 
 ### 4.4 P2：数据成熟后落地（需要跨 run 数据）
 

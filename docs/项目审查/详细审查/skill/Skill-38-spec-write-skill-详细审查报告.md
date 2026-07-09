@@ -12,7 +12,7 @@
 
 ## 2. 职责定位
 
-`spec-write-skill` 是创建、改写、迁移或按 audit findings 修复 spec-first source skill 的公开 workflow。它先判断请求是否值得做成 skill，再更新 `skills/<skill-name>/SKILL.md`、必要 references/evals/resources、governance JSON、tests、docs 和 `CHANGELOG.md`。它不是 `spec-skill-audit` 的替代品，只把明确目标转成 source patch。
+`spec-write-skill` 是创建、改写、迁移或按 audit findings 修复 spec-first source skill 的公开 workflow。它先判断请求是否值得做成 skill，再更新 `skills/<skill-name>/SKILL.md`、必要 references/evals/resources、governance JSON、tests、docs 和 `CHANGELOG.md`。它不是 `retired-skill-review` 的替代品，只把明确目标转成 source patch。
 
 ## 3. 适用与不适用场景
 
@@ -58,7 +58,7 @@ Workflow 11 步，顺序符合专家路径：
 
 | 上游 | 下游 |
 |---|---|
-| audit findings、用户 skill authoring 请求、相邻 skill source、governance records | `spec-work`、`spec-skill-audit`、runtime catalog、skill 维护者、最终用户 |
+| audit findings、用户 skill authoring 请求、相邻 skill source、governance records | `spec-work`、`retired-skill-review`、runtime catalog、skill 维护者、最终用户 |
 
 ## 8. 成熟度评分
 
@@ -69,7 +69,7 @@ Workflow 11 步，顺序符合专家路径：
 | 执行逻辑 | 18/20 | 资格判断→写 patch→验证闭环完整 |
 | 判断规则 | 14/15 | repeated use、near-neighbor、quality tier 清楚 |
 | 输出产物 | 14/15 | source patch/governance/tests/docs/CHANGELOG 明确 |
-| 上下游衔接 | 9/10 | 与 spec-work/spec-skill-audit/runtime catalog 关系清楚 |
+| 上下游衔接 | 9/10 | 与 spec-work/retired-skill-review/runtime catalog 关系清楚 |
 | 失败处理 | 4/5 | failure modes 有，但输出 envelope 可更结构化 |
 | 证据要求 | 4/5 | delivery gates 有，真实 forward-testing 样例可补 |
 | 文档化程度 | 5/5 | authoring/delivery/vocabulary references 完整 |
@@ -96,7 +96,7 @@ Workflow 11 步，顺序符合专家路径：
 1. 保持本报告纳入详细审查索引后的 current coverage 口径，后续新增/删除 skill 时同步刷新。
 2. 增加最小 headless/report output envelope，至少包含 `mode/tier/entry_surface/source_files_changed/tests_run/generated_runtime_status/residual_risks`。
 3. 为 `do-not-create-skill`、near-neighbor route、source patch 三种路径各补一个 trigger/output eval。
-4. 在 `spec-skill-audit` 输出到 `spec-write-skill` 的 handoff 中要求带 finding ID、source refs、target skill、recommended tier。
+4. 在 `retired-skill-review` 输出到 `spec-write-skill` 的 handoff 中要求带 finding ID、source refs、target skill、recommended tier。
 
 ## 12. 是否建议重构
 

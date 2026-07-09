@@ -69,7 +69,7 @@
 ### 3.4 风险提示
 
 - 过度治理会让入口变重；治理证据应放在 references/evals/reports，而不是堆进主 prompt。
-- 不应把 spec-skill-audit 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
+- 不应把 retired-skill-review 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
 
 ## 4. 视角 B：$skill-creator:skill-creator 审查结论
 
@@ -238,7 +238,7 @@ agent-native-architecture 应被放在 扩展链路，服务主链路或支撑�
 |---|---|---|---|---|
 | Source 引用回源 | `rg 'agent-native-architecture' skills agents src docs tests`，排除 generated mirrors | 明确消费者、调用路径和历史引用 | Skill owner | P2 |
 | 结构契约检查 | 检查 required headings / output schema / failure modes | 缺口补齐且入口不过度膨胀 | Maintainer | P2 |
-| Eval / fixture | 新增或规范 normalized eval，覆盖触发、near-neighbor、失败模式 | 至少覆盖原报告验证建议：补 near-neighbor eval，覆盖“普通实现请求应走 `spec-work`”“skill 质量审查应走 `spec-skill-audit`”“runtime mirror 不可手改”。 | Test owner | P2 |
+| Eval / fixture | 新增或规范 normalized eval，覆盖触发、near-neighbor、失败模式 | 至少覆盖原报告验证建议：补 near-neighbor eval，覆盖“普通实现请求应走 `spec-work`”“skill 质量审查应走 `retired-skill-review`”“runtime mirror 不可手改”。 | Test owner | P2 |
 | Fresh-source 复核 | 改 source 后用 fresh read-only reviewer 或等价方式复核 | 不依赖当前会话缓存行为 | Reviewer | P2 |
 | 外部事实校验 | 无外部事实时确认报告不包含 current/latest 断言 | 所有结论均可由本地 source/report 支撑 | Maintainer | P2 |
 

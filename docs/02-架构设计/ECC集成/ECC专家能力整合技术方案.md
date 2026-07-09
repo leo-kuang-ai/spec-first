@@ -262,7 +262,7 @@ Workflow Layer
   - spec-code-review
   - spec-app-consistency-audit
   - spec-compound
-  - spec-skill-audit
+  - retired-skill-review
 
 Expert Capability Layer
   - capability registry
@@ -832,7 +832,7 @@ Stage 2: Evidence Builder
 | `spec-code-review`           | correctness、testing、maintainability、simplicity、standards |
 | `spec-app-consistency-audit` | product、flow、design、app/mobile                           |
 | `spec-compound`              | knowledge、pattern、standards                              |
-| `spec-skill-audit`           | agent-native、coherence、simplicity、standards              |
+| `retired-skill-review`           | agent-native、coherence、simplicity、standards              |
 
 ### File-based
 
@@ -848,7 +848,7 @@ Stage 2: Evidence Builder
 | `i18n`, `locale`, `translations`                   | `i18n-expert`                                      |
 | `analytics`, `track`, `event`                      | `analytics-expert`                                 |
 | `CLAUDE.md`, `AGENTS.md`, `repo-profile.yaml`      | `project-standards-expert`                         |
-| `skills/**/SKILL.md`, `agents/**`                  | `agent-native-design-expert`, `skill-audit`        |
+| `skills/**/SKILL.md`, `agents/**`                  | `agent-native-design-expert`, `skill-review`        |
 
 ### Risk-based
 
@@ -1325,7 +1325,7 @@ Standard candidates
 
 ---
 
-## 12.10 `spec-skill-audit`
+## 12.10 `retired-skill-review`
 
 接入：
 
@@ -1698,7 +1698,7 @@ transform_notes
 | debug       |       4 |
 | code-review |       5 |
 | app audit   |       6 |
-| skill-audit |       5 |
+| skill-review |       5 |
 
 超过上限时：
 
@@ -1971,7 +1971,7 @@ iOS UI state issue
 multi-team PRD
 large refactor
 security-sensitive diff
-skill-audit on bad SKILL.md
+skill-review on bad SKILL.md
 default init no ECC
 --with-ecc core-engineering
 ```

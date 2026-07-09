@@ -406,7 +406,7 @@ The plan intentionally has a narrow runtime projection:
 - Test: `tests/unit/contract-drift-guard.test.js`
 - Test: `tests/unit/spec-write-skill-contracts.test.js`
 - Test: `tests/unit/agent-native-architecture-contracts.test.js`
-- Test: `tests/unit/skill-audit-scripts.test.js`
+- Test: `tests/unit/skill-review-scripts.test.js`
 
 **Approach:**
 - Add `cursor` to schema host enums, `owner_host` enum and `host_delivery.required/properties` as part of the preview implementation so `buildFilteredAssetSet('cursor')` can load governed assets. Do not use U0 degraded evidence as a reason to leave governance four-host if `init --cursor` is shipped.

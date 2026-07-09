@@ -19,7 +19,7 @@
 - 事实 1：原报告位置为 docs/项目审查/2026-06-20-全量-skill-agent-优化建议.md:45；深审 docs/项目审查/2026-06-20-全量-skill-agent-优化建议.md:177。
 - 事实 2：存在：`skills/spec-app-consistency-audit/SKILL.md`，383 行。
 - 事实 3：资源目录计数：references=3，scripts=22，evals=0，assets=0。
-- 事实 4：原报告建议为：将 3 个 references 在入口显式挂载，避免 unused-reference signal。补 eval fixture（PRD/Figma/source missing、headless failure envelope、secret-path redaction）。同时修 `spec-skill-audit` secret scanner，使“保护性 secret regex”不再算风险。
+- 事实 4：原报告建议为：将 3 个 references 在入口显式挂载，避免 unused-reference signal。补 eval fixture（PRD/Figma/source missing、headless failure envelope、secret-path redaction）。同时修 `retired-skill-review` secret scanner，使“保护性 secret regex”不再算风险。
 
 ### 2.2 推断
 
@@ -69,13 +69,13 @@
 ### 3.4 风险提示
 
 - 过度治理会让入口变重；治理证据应放在 references/evals/reports，而不是堆进主 prompt。
-- 不应把 spec-skill-audit 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
+- 不应把 retired-skill-review 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
 
 ## 4. 视角 B：$skill-creator:skill-creator 审查结论
 
 ### 4.1 核心判断
 
-从 skill-creator 视角看，spec-app-consistency-audit 需要稳定“触发描述、执行步骤、输出契约、失败回退、验证样例”这五件事。当前最大缺口是：将 3 个 references 在入口显式挂载，避免 unused-reference signal。补 eval fixture（PRD/Figma/source missing、headless failure envelope、secret-path redaction）。同时修 `spec-skill-audit` secret scanner，使“保护性 secret regex”不再算风险。
+从 skill-creator 视角看，spec-app-consistency-audit 需要稳定“触发描述、执行步骤、输出契约、失败回退、验证样例”这五件事。当前最大缺口是：将 3 个 references 在入口显式挂载，避免 unused-reference signal。补 eval fixture（PRD/Figma/source missing、headless failure envelope、secret-path redaction）。同时修 `retired-skill-review` secret scanner，使“保护性 secret regex”不再算风险。
 
 ### 4.2 主要问题
 

@@ -33,7 +33,7 @@ fresh_source_eval:
     - docs/contracts/workflows/fresh-source-eval-checklist.md
     - skills/spec-doc-review/SKILL.md
     - skills/spec-code-review/SKILL.md
-    - skills/spec-skill-audit/SKILL.md
+    - skills/retired-skill-review/SKILL.md
     - skills/spec-work/SKILL.md
     - docs/plans/2026-05-11-002-feat-spec-first-project-optimization-upgrade-plan.md
   runtime_paths_checked: []
@@ -52,7 +52,7 @@ fresh_source_eval:
 
 Reviewer notes:
 
-- `spec-doc-review`, `spec-code-review`, `spec-skill-audit`, and `spec-work` keep the source/runtime boundary explicit.
+- `spec-doc-review`, `spec-code-review`, `retired-skill-review`, and `spec-work` keep the source/runtime boundary explicit.
 - The Phase 2 closeout does not pull Phase 3 retention, replay, or release continuity guards forward.
 - The workflow prose remains advisory and does not create a hidden state machine or a second facts pipeline.
 

@@ -18,7 +18,7 @@
 - PRD 创建、改写或 planning-readiness validation，走 `spec-prd`。
 - lint / test / build / simulator / real-device / Maestro / Appium / cloud-device 执行。
 - 已实现页面的交互式 UI polish，走 `spec-polish`。
-- skill / agent 质量审查，走 `spec-skill-audit`。
+- skill / agent 质量审查，不属于本 App consistency audit；需要修改 source skill 时走 `spec-write-skill`，只审查时做 bounded source review。
 
 ## 快速入口
 

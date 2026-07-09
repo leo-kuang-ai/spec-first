@@ -13,7 +13,7 @@
 
 `spec-evolve` 是一个有潜力的自我演化决策入口，但是否新增为正式 source skill，必须由 Cycle 0 composition baseline 决定。
 
-如果现有 `skill-audit` + `doc-review` + `spec-plan` + `compound` 的组合已经能稳定完成系统级演进决策，则不新增 `spec-evolve`。
+如果现有 `skill-review` + `doc-review` + `spec-plan` + `compound` 的组合已经能稳定完成系统级演进决策，则不新增 `spec-evolve`。
 
 如果 Cycle 0 发现明确 named gaps，则进入 Cycle 1，新增 source-only `spec-evolve` MVP。
 
@@ -66,7 +66,7 @@ Goal
   -> spec-plan
   -> spec-write-tasks
   -> spec-work
-  -> code-review / skill-audit
+  -> code-review / skill-review
   -> compound
   -> Next Evolution
 ```
@@ -90,7 +90,7 @@ mcp-setup / graph-bootstrap
 -> write-tasks
 -> work / debug / optimize / polish
 -> code-review / app-consistency-audit
--> compound / compound-refresh / skill-audit
+-> compound / compound-refresh / skill-review
 ```
 
 这些节点已经能覆盖很多单点能力，但随着 skill、agent、artifact、runtime 产物变多，会出现系统级风险。
@@ -111,7 +111,7 @@ mcp-setup / graph-bootstrap
 | 经验不复利         | review 发现的问题没有进入下一轮 plan / evolve                               |
 | 业界最佳实践吸收随机    | 看到新工具、新范式就想集成，缺少 intake / decision / verification 机制            |
 
-这些不是单个 `skill-audit`、`doc-review`、`code-review` 能完整解决的问题。
+这些不是单个 `skill-review`、`doc-review`、`code-review` 能完整解决的问题。
 
 因此需要一个更高层的 meta skill：
 
@@ -178,7 +178,7 @@ plan handoff 入口
 
 ```text
 spec-evolve
-  -> 调用 / 参考 skill-audit 审 skill
+  -> 调用 / 参考 skill-review 审 skill
   -> 调用 / 参考 doc-review 审文档
   -> 调用 / 参考 code-review 审代码变更风险
   -> 调用 / 参考 compound 读取历史经验
@@ -194,7 +194,7 @@ spec-evolve
 
 | Skill              | 职责                | 与 `spec-evolve` 的关系                                        |
 | ------------------ | ----------------- | ---------------------------------------------------------- |
-| `skill-audit`      | 审查单个或一组 skill 的质量 | `spec-evolve` 读取其结果，判断是否形成系统演进 gap                         |
+| `skill-review`      | 审查单个或一组 skill 的质量 | `spec-evolve` 读取其结果，判断是否形成系统演进 gap                         |
 | `doc-review`       | 审查文档质量和一致性        | `spec-evolve` 判断文档问题是否需要进入 plan                            |
 | `spec-plan`        | 设计实现方案            | `spec-evolve` 只提供 advisory handoff，不输出 implementation plan |
 | `spec-write-tasks` | 把 plan 编译成任务      | 不直接接收 evolve，接收 plan 产物                                    |
@@ -445,7 +445,7 @@ Goal
   -> spec-plan
   -> spec-write-tasks
   -> spec-work
-  -> code-review / skill-audit
+  -> code-review / skill-review
   -> compound
   -> next-cycle-input
 ```
@@ -464,7 +464,7 @@ Goal
 | spec-plan            | 设计 implementation plan                                  |
 | write-tasks          | 拆成任务                                                    |
 | work                 | 小步执行                                                    |
-| review               | code-review / skill-audit 验证                            |
+| review               | code-review / skill-review 验证                            |
 | compound             | 沉淀经验                                                    |
 | next-cycle-input     | 下一轮 evolve 的输入                                          |
 
@@ -485,7 +485,7 @@ Goal
 ### 使用现有能力
 
 ```text
-skill-audit
+skill-review
 doc-review
 spec-plan reasoning
 code-review findings if available
@@ -528,8 +528,8 @@ read error:
 evidence_inputs:
   skill_audit_reports:
     discovery_path:
-      - docs/**/skill-audit*.md
-      - .spec-first/reports/skill-audit/**
+      - docs/**/skill-review*.md
+      - .spec-first/reports/skill-review/**
     required: false
     freshness_signal:
       - source_commit
@@ -572,7 +572,7 @@ docs/YYYY-MM-DD-spec-evolve-baseline/
 ## GAP-001: 缺少系统级演进裁判
 
 ### Evidence
-- skill-audit 能审单个 skill，但没有稳定输出跨 workflow 的 evolution decision。
+- skill-review 能审单个 skill，但没有稳定输出跨 workflow 的 evolution decision。
 - doc-review 能审文档，但不能判断某个演进建议是否应进入 plan。
 - spec-plan 能设计实现，但缺少前置“是否值得进入 plan”的裁判。
 
@@ -677,13 +677,13 @@ Accepted / Skipped / Deferred
 延后后什么时候重新评估。
 
 ### Plan Handoff Target
-spec-plan / skill-audit / doc-review / code-review / compound / none
+spec-plan / skill-review / doc-review / code-review / compound / none
 
 默认规则：
 
 ```text
 accepted implementation-oriented proposals -> spec-plan
-validation-oriented decisions -> code-review / skill-audit / doc-review
+validation-oriented decisions -> code-review / skill-review / doc-review
 learning-only decisions -> compound
 no follow-up needed -> none
 ```
@@ -820,7 +820,7 @@ spec-evolve
   -> spec-plan
   -> spec-write-tasks
   -> spec-work
-  -> code-review / skill-audit
+  -> code-review / skill-review
   -> compound
   -> next-cycle-input
 ```
@@ -1279,7 +1279,7 @@ Accepted / Skipped / Deferred
 这个决策会导致什么后果。
 
 ### Plan Handoff Target
-spec-plan / skill-audit / doc-review / code-review / compound / none
+spec-plan / skill-review / doc-review / code-review / compound / none
 
 ### Verification
 如何验证这个决策是正确的。
@@ -1344,7 +1344,7 @@ spec-plan / skill-audit / doc-review / code-review / compound / none
     "compound_feedback": "pending"
   },
   "residual_risk": [
-    "May still overlap with skill-audit if boundaries are not enforced."
+    "May still overlap with skill-review if boundaries are not enforced."
   ],
   "next_cycle_input": [
     "Validate whether source-only MVP is useful before adding scripts or command wiring."
@@ -1397,7 +1397,7 @@ Industry Best Practice
    小步改 source assets，不改 runtime generated copies。
 
 7. Verify
-   通过 skill-audit / code-review / docs consistency / eval 验证。
+   通过 skill-review / code-review / docs consistency / eval 验证。
 
 8. Compound
    沉淀为 pattern / anti-pattern / next-cycle input。
@@ -1459,9 +1459,9 @@ No best practice receives priority or integration target until linked to a curre
 | Progressive disclosure | model-context practice          | 上下文过载             | context routing             | 过度路由会增加认知负担      | medium           | watchlist |
 | Context engineering    | model-context practice          | 模型注意力被稀释          | context-bloat audit         | 缺少本项目 token 证据     | medium           | watchlist |
 | Report-first workflow  | project review / safety pattern | 自动修改容易失控          | evolve / docs-sync 先报告      | 对机械修复可能太重         | medium           | watchlist |
-| Skill evals            | agent workflow practice         | skill 好坏靠感觉        | skill-audit + eval          | eval 成本可能高于收益      | low              | watchlist |
+| Skill evals            | agent workflow practice         | skill 好坏靠感觉        | skill-review + eval          | eval 成本可能高于收益      | low              | watchlist |
 | Subagents              | review workflow practice        | 并行审查复杂任务          | macro audit / PR review     | 普通文档审查可能不需要      | medium           | watchlist |
-| Security review        | MCP/tool trust practice         | MCP/skill/tool 信任风险 | mcp-setup / skill-audit lens | 无 trust boundary 时不适用 | medium           | watchlist |
+| Security review        | MCP/tool trust practice         | MCP/skill/tool 信任风险 | mcp-setup / skill-review lens | 无 trust boundary 时不适用 | medium           | watchlist |
 | Release readiness      | release engineering practice    | 发布前一致性风险          | release-readiness report    | 普通 patch release 不应触发 | medium           | watchlist |
 | Evolution memory       | compound dogfood                | 经验不能复利            | compound next-cycle input   | 早期可先人工记录          | medium           | watchlist |
 
@@ -1524,7 +1524,7 @@ lens_mapping:
 
   skill-contract:
     preferred_existing_reviewers:
-      - skill-audit
+      - skill-review
       - coherence
 
   artifact-contract:
@@ -1909,7 +1909,7 @@ P0 完成条件：
 | 变成第二套专家体系         | 新增一堆 agent profiles          | reuse-first，inline lens first                    |
 | 脚本语义越权            | 脚本判断 drift / priority        | scripts-only signals                             |
 | P0 过重             | 一上来接命令、脚本、11 文件报告            | P0 source-only MVP                               |
-| 和 skill-audit 重复  | 都在审 skill                    | Cycle 0 composition baseline 先证明 gap             |
+| 和 skill-review 重复  | 都在审 skill                    | Cycle 0 composition baseline 先证明 gap             |
 | 和 spec-plan 冲突    | 输出 implementation plan       | 改成 plan handoff                                  |
 | runtime/source 混淆 | 手改 `.claude` 或 `.spec-first` | 明确 source/runtime boundary                       |
 | context 膨胀        | AGENTS.md 越写越长               | 只写短规则和触发规则                                       |
@@ -2084,7 +2084,7 @@ Treat checked-in source assets as source of truth.
 Run a report-only composition baseline before implementing spec-evolve.
 
 Use existing capabilities only:
-- skill-audit
+- skill-review
 - doc-review
 - spec-plan reasoning
 - code-review findings if available

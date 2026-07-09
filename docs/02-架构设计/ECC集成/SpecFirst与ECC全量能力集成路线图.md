@@ -616,7 +616,7 @@ Pilot：
 code-review pilot
 plan pilot
 doc-review pilot
-skill-audit pilot
+skill-review pilot
 ```
 
 验收：
@@ -801,7 +801,7 @@ provider manifest schema
 Phase 0: 冻结 V1 治理基线与 ECC source evidence
 Phase 1: 生成 spec-first agent inventory 与 ECC overlap matrix
 Phase 2: 建立 registry / router / finding / synthesis policy
-Phase 3: 跑 code-review / plan / doc-review / skill-audit quality pilots
+Phase 3: 跑 code-review / plan / doc-review / skill-review quality pilots
 Phase 4: 从 ECC skills 提取 rubric，增强现有 workflow / agents
 Phase 5: optional lens pack lifecycle
 Phase 6: tech stack / domain optional packs

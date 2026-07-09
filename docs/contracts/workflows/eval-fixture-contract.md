@@ -60,6 +60,6 @@ Use `historical` or `advisory` when a case intentionally cites plans, validation
 
 ## Consumers
 
-`skills/spec-skill-audit/scripts/eval-fixture-normalizer.js` is the single source-owned adapter for canonical and legacy fixtures. Production readiness scoring and Jest contract tests must import it rather than reimplementing fixture interpretation.
+The previous source-owned adapter lived under a retired audit workflow. After that workflow's retirement, no current source-owned normalizer is exposed; remaining eval fixture checks are local to their owning workflow tests.
 
 `coverage_tags` are declared structural coverage. They do not prove semantic quality. Fresh-source eval, human sampling, or LLM review owns the semantic question of whether a case is meaningful.

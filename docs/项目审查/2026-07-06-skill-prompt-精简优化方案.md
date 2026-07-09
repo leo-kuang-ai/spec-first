@@ -302,7 +302,7 @@ spec-first 的 progressive disclosure 机制（references/ + runtime 投射）�
 | `spec-debug` | 449 chars / 68 words | 同义触发词较多，误触发和 index tax 风险都高 |
 | `spec-optimize` | 549 chars / 69 words | 描述混入了执行说明，优先进入 index audit |
 | `spec-doc-review` | 533 chars / 69 words | 包含调度 fallback 说明，需判断哪些必须留在路由层 |
-| `spec-skill-audit` | 433 chars / 53 words | 主题广，容易与 write-skill / doc-review / code-review 重叠 |
+| `retired-skill-review` | 433 chars / 53 words | 主题广，容易与 write-skill / doc-review / code-review 重叠 |
 
 这说明现有问题不只是 `spec-code-review/SKILL.md` 正文过长。即使正文成功下沉，路由层仍可能继续付出常驻 token tax，并造成相邻 workflow 误触发。
 
@@ -312,11 +312,11 @@ spec-first 的 progressive disclosure 机制（references/ + runtime 投射）�
 |---|---|---|
 | Description is Router, not Manual | 采纳。description 只表达触发、排除、定位，不放执行步骤和长 fallback | 先在 audit rubric 和 route audit 中落地，不立即机械改全量 skill |
 | Trigger + Exclude | 采纳。核心 skill 必须能说明 should trigger / should not trigger | 目前不新增 `exclude_intents` frontmatter 字段，先保留在 description / When Not To Use / audit facts |
-| 30 words / 中文 50 字 | 作为 advisory budget | 不作为硬 gate。现有 `spec-skill-audit` 还会把过短描述判为 under-specified |
+| 30 words / 中文 50 字 | 作为 advisory budget | 不作为硬 gate。现有 `retired-skill-review` 还会把过短描述判为 under-specified |
 | Token Audit + Route Audit | 采纳为 P0 measurement | audit 输出 advisory facts，LLM 判断语义充分性 |
 | L0/L1/L2 分层索引 | 不作为 spec-first 自建能力 | 当前 `using-spec-first` route map 已是事实上的 L0；宿主拥有 skill discovery，不新增第二套 route truth source |
 | 语义路由 / Skill 联邦 | 明确 deferred / host-owned | 当前 38 个 skill 未到必须引入向量 registry 的规模，过早做会重建宿主能力 |
-| 新 Skill Index Contract | 暂不采纳为新正式 contract | 先扩展 `spec-skill-audit` authoring lens；只有 audit 数据证明重复问题后再评估 contract 化 |
+| 新 Skill Index Contract | 暂不采纳为新正式 contract | 先扩展 `retired-skill-review` authoring lens；只有 audit 数据证明重复问题后再评估 contract 化 |
 
 关键边界：`exclude_intents` 是好概念，但直接新增 frontmatter 字段会制造未被 generator、lint、host runtime 明确定义的元数据。当前项目已有测试明确强调部分 skill authoring 只期望 `name` / `description`，且现有脚本已经从 description、When To Use、When Not To Use 提取 trigger signals。更小的做法是先改善这些已有字段和评估脚本，而不是新增 schema。
 
@@ -328,7 +328,7 @@ spec-first 的 progressive disclosure 机制（references/ + runtime 投射）�
 |---|---|---|---|
 | U0A Skill Index Baseline | 建立核心 skill 路由层 before 数据 | 表格：description chars/words、负向边界、相邻 workflow 引用、top overlap terms | 直接脚本统计 + `extract-trigger-signals` 类 deterministic facts |
 | U0B Route Collision Fixtures | 建 20 条用户意图样例，覆盖应触发和不应触发 | eval fixtures 或 audit case docs | LLM/read-only eval 判断命中是否合理，脚本只提供样例和实际文本 |
-| U7+ Audit Lens 扩展 | 把正文瘦身经验和 index 治理经验沉淀到 `spec-skill-audit` | `skill-authoring-quality.md` 增加 route-index lens | contract test 断言 rubric 不变成 auto-rewriter |
+| U7+ Audit Lens 扩展 | 把正文瘦身经验和 index 治理经验沉淀到 `retired-skill-review` | `skill-authoring-quality.md` 增加 route-index lens | contract test 断言 rubric 不变成 auto-rewriter |
 | U8+ Outcome Bundle 扩展 | closeout 同时报告 body 与 index 收益 | line-count delta、context-room delta、description delta、route audit limitations | final closeout 不只报行数 |
 
 建议 U0A/U0B 可以先随 pilot 实现前执行一次，作为 baseline；但不应阻塞 `spec-work` 的 task-pack CLI downshift，因为后者已经有明确 source evidence 和低耦合实施路径。
@@ -346,7 +346,7 @@ Route audit 不需要一开始做复杂语义路由。先用覆盖相邻 workflo
 | “这个测试为什么失败，找根因并修” | `spec-debug` | `spec-code-review`, `spec-plan` |
 | “把刚解决的问题沉淀成 reusable learning” | `spec-compound` | `spec-work`, `spec-doc-review` |
 | “优化 prompt 质量，用指标迭代” | `spec-optimize` | `spec-plan`, `spec-work` |
-| “审计这个 skill 的触发边界和 progressive disclosure” | `spec-skill-audit` | `spec-write-skill`, `spec-doc-review` |
+| “审计这个 skill 的触发边界和 progressive disclosure” | `retired-skill-review` | `spec-write-skill`, `spec-doc-review` |
 
 目标不是证明模型永远不会误判，而是让每次 description 改动都有 before/after 对照：减少误触发不能以漏掉核心触发为代价。
 
@@ -448,7 +448,7 @@ L3 references      → spec-first 拥有：按需加载
 ### 11.6 本章给 plan 补的三件遗漏事项
 
 1. **L1 description 审计单元**：现有 plan 只做 L2 body。补一个单元审计并压缩超长 description（proof/git-commit-push-pr/spec-slack-research），**保留 exclude intent**，不砍 workflow 边界。
-2. **新增 skill 的系统级治理**（报告原则 #11）：扩展 `lint-skill-entrypoints` / `spec-skill-audit`，新增/改 skill 时检查 description 长度、是否有 exclude、是否与现有 skill 高重叠。这是"新增 skill 是体系变更，不是孤立文件"。
+2. **新增 skill 的系统级治理**（报告原则 #11）：扩展 `lint-skill-entrypoints` / `retired-skill-review`，新增/改 skill 时检查 description 长度、是否有 exclude、是否与现有 skill 高重叠。这是"新增 skill 是体系变更，不是孤立文件"。
 3. **route collision 测试集**：plan/work/review/doc-review/compound 边界相邻，误触发真实存在。建 eval fixture：20 条典型请求断言命中正确 workflow。这比 body 行数更能证明"精简没破坏路由"。
 
 **边界重申**：不建 L0 域索引引擎，不建语义向量 registry——宿主职责，重建即反模式。

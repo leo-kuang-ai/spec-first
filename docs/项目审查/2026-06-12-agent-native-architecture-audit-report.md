@@ -99,14 +99,14 @@ note: 本文是对 spec-first 当前仓库的 agent-native architecture audit �
 > **方法学结论先行：** 业界对"prompt/skill 定义的能力"的 eval 共识恰恰是**轻量**的——结构化 golden examples + 廉价断言（CI 每次跑）+ LLM/人工抽查（按节奏跑），**明确反对快照断言 prose 输出、反对追求 100% 覆盖、反对硬 gate**。**spec-first 的 eval 方法论方向是对的**（它不是"没做 eval"，而是做了正确的最小形态）；真实缺口是**覆盖广度 + 内部一致性**，而非方法。
 
 **事实（已核对源码，修正此前计数）：**
-- 18 个 public `workflow_command` 中**仅 4 个有 `evals/`**（22%）：`spec-work`、`spec-doc-review`、`spec-prd`、`spec-skill-audit`。另两个常被一起提的 `spec-write-tasks`（standalone skill）与 `using-spec-first`（meta skill）不是 public workflow_command。原报告"14/18 缺、6 个有"的口径已据此更正。
+- 18 个 public `workflow_command` 中**仅 4 个有 `evals/`**（22%）：`spec-work`、`spec-doc-review`、`spec-prd`、`retired-skill-review`。另两个常被一起提的 `spec-write-tasks`（standalone skill）与 `using-spec-first`（meta skill）不是 public workflow_command。原报告"14/18 缺、6 个有"的口径已据此更正。
 - 测试只做**结构校验**（`tests/unit/*eval*`、`*contracts*`：文件存在、`schema_version`、id 唯一、enum/coverage_tags 覆盖、`source_refs` 路径有效且非 mirror），**不跑模型**——语义判断交给 fresh-source-eval。这正是 "scripts 验结构、LLM 判语义" 边界，与业界 L1 层一致。
-- 评分器是**文件名匹配**（已核对 `skills/spec-skill-audit/scripts/write-audit-artifacts.js:261-264`：`/trigger/i`、`/boundary/i` 等 regex 命中文件名）。后果：`using-spec-first` 有内容充实的 `routing-cases.json`（带 `expected_outcome`/`dispatch_decision`/`fallback_reason`），却因文件名不含 `trigger`/`boundary` 被评 "partial"——**30% 这个分数被命名漂移人为压低**。
+- 评分器是**文件名匹配**（已核对 `skills/retired-skill-review/scripts/write-audit-artifacts.js:261-264`：`/trigger/i`、`/boundary/i` 等 regex 命中文件名）。后果：`using-spec-first` 有内容充实的 `routing-cases.json`（带 `expected_outcome`/`dispatch_decision`/`fallback_reason`），却因文件名不含 `trigger`/`boundary` 被评 "partial"——**30% 这个分数被命名漂移人为压低**。
 
-**为何降级而非 Critical：** `eval-readiness-rubric.md:12` 明确 eval 是 "recommended for high-traffic" 而非全量强制；`skill-agent-quality-governance.md:77` 显式豁免 optional/internal skill；`spec-skill-audit/SKILL.md` 亦定 "scorecards are signals, not gates"。"14 个全算 Critical" 是过度判定。
+**为何降级而非 Critical：** `eval-readiness-rubric.md:12` 明确 eval 是 "recommended for high-traffic" 而非全量强制；`skill-agent-quality-governance.md:77` 显式豁免 optional/internal skill；`retired-skill-review/SKILL.md` 亦定 "scorecards are signals, not gates"。"14 个全算 Critical" 是过度判定。
 
 **深挖出的两个真实缺陷（此前文档未点明）：**
-- **缺陷 A — fixture schema 发散：** 现有 5 套并存且字段名漂移——`spec-write-tasks`(enum-coverage 4 文件: `expected_decision`/`expected_failure`)、`prompt-examples/v1`(work/doc-review/using-spec-first 共用: `user_intent`/`expected_posture`/`negative_signal`)、`spec-prd-evals.v1`(40+ id 大集)、`agent-native...eval-examples.v1`(`coverage_tags`/`forbidden_signals`)、`skill-audit`(极简 singleton)。无统一公共契约。
+- **缺陷 A — fixture schema 发散：** 现有 5 套并存且字段名漂移——`spec-write-tasks`(enum-coverage 4 文件: `expected_decision`/`expected_failure`)、`prompt-examples/v1`(work/doc-review/using-spec-first 共用: `user_intent`/`expected_posture`/`negative_signal`)、`spec-prd-evals.v1`(40+ id 大集)、`agent-native...eval-examples.v1`(`coverage_tags`/`forbidden_signals`)、`skill-review`(极简 singleton)。无统一公共契约。
 - **缺陷 B — 评分器文件名匹配**（见上），污染 readiness 分数。
 
 **业界对标（一手来源，已抓取）：**
@@ -186,7 +186,7 @@ note: 本文是对 spec-first 当前仓库的 agent-native architecture audit �
 **验证:** Warning（XS，conf 0.95）；**比原报告更严重——是 3 处不是 1 处**
 
 - **深挖回源：** `spec-runtime-setup` 作为"未来入口"出现在 **3 个 source**：`templates/claude/commands/spec/mcp-setup.md:10`、`skills/spec-mcp-setup/SKILL.md:9`、及其 generated mirror。无 `runtime-setup.md` 命令文件、governance 无 `command_aliases` 实现；`using-spec-first/SKILL.md:230` 路由表只认 `spec-mcp-setup`。违反项目自有的 "不广告不存在的命令" 规则。alias 实现已在 `2026-06-08-004` 单独 tracked/deferred。
-- **修正后建议（XS）：** 把 2 个 source 的 prose 从"recommended future entrypoint"改为明确当前入口 + deferral 注记（指向 tracked plan）；generated mirror 由 `init` 重生，不手改。可选：加 skill-audit 断言扫描"广告未实现命令"的 prose 模式。
+- **修正后建议（XS）：** 把 2 个 source 的 prose 从"recommended future entrypoint"改为明确当前入口 + deferral 注记（指向 tracked plan）；generated mirror 由 `init` 重生，不手改。可选：加 skill-review 断言扫描"广告未实现命令"的 prose 模式。
 
 ### L3 · ~~update 是 check-only~~ → 修正：前提已 STALE，update 现在真执行升级；真实 drift 只剩 1 行 help text
 **验证:** Warning，但**原前提被推翻**（XS，conf 0.95）
@@ -301,7 +301,7 @@ Effort 口径：XS≈单文件几行；S≈一个聚焦改动+窄测试；M≈�
 - `docs/10-prompt/结构化项目角色契约.md`、`templates/claude/commands/spec/mcp-setup.md`
 - `skills/agent-native-architecture/evals/examples.json`、`tests/unit/agent-native-architecture-eval-readiness.test.js`
 - `docs/validation/2026-05-12-plan-lifecycle-cleanup.md`
-- W1 深挖（2026-06-13）：`skills/spec-skill-audit/scripts/write-audit-artifacts.js:261-264`、`skills/spec-skill-audit/references/eval-readiness-rubric.md`、`docs/contracts/workflows/skill-agent-quality-governance.md:77`、`docs/contracts/workflows/fresh-source-eval-checklist.md`、`src/cli/contracts/dual-host-governance/skills-governance.json`、5 套 evals/ fixture（spec-write-tasks / prompt-examples-v1 / spec-prd / agent-native / skill-audit）
+- W1 深挖（2026-06-13）：`skills/retired-skill-review/scripts/write-audit-artifacts.js:261-264`、`skills/retired-skill-review/references/eval-readiness-rubric.md`、`docs/contracts/workflows/skill-agent-quality-governance.md:77`、`docs/contracts/workflows/fresh-source-eval-checklist.md`、`src/cli/contracts/dual-host-governance/skills-governance.json`、5 套 evals/ fixture（spec-write-tasks / prompt-examples-v1 / spec-prd / agent-native / skill-review）
 - W1 业界来源（2026-06-13，一手抓取）：Anthropic「Creating custom skills」(support.claude.com)、「Writing effective tools for agents」(anthropic.com/engineering)、Hamel Husain「Your AI Product Needs Evals」(hamel.dev)、MT-Bench (arXiv:2306.05685)、Length-Controlled AlpacaEval (arXiv:2404.04475)、promptfoo / OpenAI Evals / Inspect(AISI) / Braintrust / DeepEval 文档；Anthropic 部分 docs 区域受限未能抓取，已标注
 - 深挖轮（2026-06-13）核对文件：`tests/unit/plan-status-taxonomy.test.js:9`（W2 enum 已存在）、`tests/integration/e2e.sh` + `scripts/run-test-suite.cjs:100`（L1 接线）、`src/cli/commands/update.js:36-39` + `src/cli/index.js:161`（L3 升级已落地/help 过期）、`src/cli/plugin.js`（L4 `.pyc` 遍历）、`skills/agent-native-architecture/references/runtime-production-guardrails.md`（W6 实为 11 维度）、`skills/spec-mcp-setup/scripts/check-health.ps1` + `lib-helper-registry.{sh,ps1}`（W5 两侧确认）、`src/cli/commands/clean.js:372-422`（W3 仅删 managed）、`templates/claude/commands/spec/mcp-setup.md:10` + `skills/spec-mcp-setup/SKILL.md:9`（L2 三处 alias）
 - 前序：`docs/项目审查/2026-06-10-全项目综合审查报告.md`、本文 2026-06-12 首轮

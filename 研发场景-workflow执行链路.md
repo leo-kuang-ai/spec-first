@@ -51,7 +51,7 @@ Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
 
 - 公开 workflow 用户入口统一为 `spec-*`;`using-spec-first` 和 `spec-write-tasks` 是 standalone skill,不是命令;`git-worktree` 是隐藏 helper。
 - 不属于研发执行流程(可排除):上下文检索类 `spec-sessions`、`spec-slack-research`、`spec-release-notes`;以及与研发流程无关的 `baoyu-*`、`lark-*`、图像/视频类 skill。
-- `spec-skill-audit`、`spec-app-consistency-audit` 和 `spec-write-skill` 现在是公开 workflow 入口,但属于治理/支撑链路,不是 Codebase → Spec → Plan → Tasks → Code → Review → Knowledge 主链路节点。
+- `retired-skill-review`、`spec-app-consistency-audit` 和 `spec-write-skill` 现在是公开 workflow 入口,但属于治理/支撑链路,不是 Codebase → Spec → Plan → Tasks → Code → Review → Knowledge 主链路节点。
 - 路由原则:意图优先于关键词,只选一个入口、给一个理由,不自动串联多个 workflow——除非某 workflow 显式 handoff。
 
 ## 流程图

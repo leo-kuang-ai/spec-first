@@ -111,7 +111,7 @@ doctor 的 verification-evidence 校验、session-store、spec-work-run-artifact
 
 **问题**:spec-session-historian 正文明确写"Never write any files. Return text findings only."(line 43),但 frontmatter 无 `tools` 字段 → 运行时继承宿主全部工具(含 Write/Edit/Bash)。prose 契约与实际工具授权矛盾:正文的只读承诺没有工具层兜底,一旦模型偏离 prose 就能写文件。spec-slack-researcher(纯检索摘要)同样无 tools 约束。对比:多数审查 agent 已显式钉住 `Read, Grep, Glob, Bash`,少数研究/实现 agent 另有 Web/MCP 或写入能力边界。
 
-**修复**:给 spec-session-historian 补明确 read-only tools。spec-slack-researcher 需要先确认当前 host agent frontmatter 是否能表达 Slack MCP read-only allowlist;若能表达,补 `Read, Grep, Glob, Bash` + Slack read-only MCP tools;若不能表达,必须在 orchestrator dispatch contract/linter 中建显式例外与降级说明,不能简单加 `Read, Grep, Glob, Bash` 导致 Slack 检索能力被静默剪掉。skill-audit linter 增加"reviewer/researcher 必须显式声明工具边界或登记例外"校验。
+**修复**:给 spec-session-historian 补明确 read-only tools。spec-slack-researcher 需要先确认当前 host agent frontmatter 是否能表达 Slack MCP read-only allowlist;若能表达,补 `Read, Grep, Glob, Bash` + Slack read-only MCP tools;若不能表达,必须在 orchestrator dispatch contract/linter 中建显式例外与降级说明,不能简单加 `Read, Grep, Glob, Bash` 导致 Slack 检索能力被静默剪掉。skill-review linter 增加"reviewer/researcher 必须显式声明工具边界或登记例外"校验。
 
 ---
 
@@ -141,7 +141,7 @@ skills 有三层治理(`filteredAssetSet` 分类 + `DELIVERED_INTERNAL_SKILLS` a
 
 `skills/using-spec-first/SKILL.md:211` | confidence 100 | 维度:入口治理
 
-19 个 command-backed workflow 中,`app-consistency-audit` 与 `skill-audit` 在 Route Map 和 Scenario Routing 里一次都没出现。governor 自我定位为 entry governor 理应覆盖全部公开入口,但 guide mode 永远不会推荐这两个。**修复**:Route Map 补两行意图→入口映射。
+19 个 command-backed workflow 中,`app-consistency-audit` 与 `skill-review` 在 Route Map 和 Scenario Routing 里一次都没出现。governor 自我定位为 entry governor 理应覆盖全部公开入口,但 guide mode 永远不会推荐这两个。**修复**:Route Map 补两行意图→入口映射。
 
 ### #9 git-commit-push-pr 分类自相矛盾
 

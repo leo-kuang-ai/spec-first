@@ -10,15 +10,15 @@
 
 - Source-of-truth：`skills/`、`agents/`、`src/cli/contracts/dual-host-governance/`、相关 tests/docs。
 - Generated runtime：`.claude/`、`.codex/`、`.agents/skills/` 未作为 source 修复目标。
-- Deterministic facts：运行 `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .`，产物位于 `.spec-first/audits/skill-audit/latest/`，只作为 advisory evidence。
-- 语义判断：按 `docs/10-prompt/结构化项目角色契约.md`、`skills/spec-skill-audit/SKILL.md`、`$yao-meta-skill` 的 `skill-engineering-method` / `resource-boundaries` / `governance` / `output-eval-method` 做人工判断。
+- Deterministic facts：运行 `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .`，产物位于 `.spec-first/audits/skill-review/latest/`，只作为 advisory evidence。
+- 语义判断：按 `docs/10-prompt/结构化项目角色契约.md`、`skills/retired-skill-review/SKILL.md`、`$yao-meta-skill` 的 `skill-engineering-method` / `resource-boundaries` / `governance` / `output-eval-method` 做人工判断。
 - 本轮覆盖：`36` 个 skill 目录、`51` 个 agent 文件。
 
 ## 全局优先级
 
 | 优先级 | 建议 | 适用范围 | 理由 |
 | --- | --- | --- | --- |
-| P0 | 不接受 deterministic audit 对 generated runtime 的 P0 误报作为阻塞结论，但要修 audit 规则的误报分类 | `spec-compound`、`spec-mcp-setup`、`spec-skill-audit` | 回源证据显示相关文本多为“不要手改 runtime mirror”或 setup/runtime regeneration 说明，不是默认把 generated runtime 当 source 修。脚本应区分 provider/runtime 写入、init regeneration 与 source patch。 |
+| P0 | 不接受 deterministic audit 对 generated runtime 的 P0 误报作为阻塞结论，但要修 audit 规则的误报分类 | `spec-compound`、`spec-mcp-setup`、`retired-skill-review` | 回源证据显示相关文本多为“不要手改 runtime mirror”或 setup/runtime regeneration 说明，不是默认把 generated runtime 当 source 修。脚本应区分 provider/runtime 写入、init regeneration 与 source patch。 |
 | P1 | 为内部/standalone skill 补轻量 contract 摘要 | 内部 skill、helper skill、外部服务 skill | 大量内部 skill 缺 `When To Use` / `When Not To Use` / `Inputs` / `Outputs` / `Failure Modes` 明确段落，容易误触发或让下游 handoff 不清。 |
 | P1 | 大 workflow 做 progressive disclosure | `spec-code-review`、`spec-plan`、`spec-optimize`、`spec-compound*`、`spec-work` | 多个 `SKILL.md` 超过 500 行，初载成本高；细节应迁到 `references/`，入口保留 trigger、边界、流程骨架、输出合同。 |
 | P1 | 统一 reviewer agent 输出和 persona catalog 归属 | code-review/doc-review/research/deep-dive agents | 29 个 reviewer agent 已具备 hunting/guard section，但仍存在通用专家、workflow persona、旧 CE 同步 agent 重叠。需要按消费者明确 always-on / conditional / deep-dive / deprecated。 |
@@ -42,7 +42,7 @@
 | `proof` | 生成或同步 Proof/HITL 证据链接，用于人工确认、身份归属和外部证明。 | 405 行，1 个 reference；含大量外部 API 细节。 | 将 endpoint、curl 示例、local bridge 细节迁到 references/scripts；入口保留 Proof/HITL 触发、identity attribution、baseToken mutation safety、输出 URL/本地同步合同。补 token/privacy/redaction failure modes。 | P1 |
 | `report-bug` | 把本地问题整理成可审阅的 bug report 或 GitHub issue 草稿。 | 160 行，无 references/scripts/evals。 | 补输入/输出/失败合同，明确 bug report 目标是 spec-first plugin，不泛化到任意 repo；GitHub issue 创建必须 preview-first 并保护环境信息。增加 “用户只想本地草稿，不要提交 issue” near-neighbor。 | P1 |
 | `resolve-pr-feedback` | 读取、判断、修复并回复 PR review feedback，必要时建议 resolve thread。 | 62 行，2 个 references，4 个 GitHub scripts，已有 tests。 | 入口过短但写权限高。补 contract summary、GitHub auth/permission failure、reply/resolve thread 的 verification gate，明确仅在 feedback valid 且修复已验证后才 resolve。 | P1 |
-| `spec-app-consistency-audit` | 跨 PRD、Figma、源码、路由、组件、i18n、analytics 审查移动 App 一致性。 | 383 行，21 个 scripts，references/schemas/rule-packs 完整；deterministic audit 把 secret regex 防护误报为 security signal。 | 将 3 个 references 在入口显式挂载，避免 unused-reference signal。补 eval fixture（PRD/Figma/source missing、headless failure envelope、secret-path redaction）。同时修 `spec-skill-audit` secret scanner，使“保护性 secret regex”不再算风险。 | P1 |
+| `spec-app-consistency-audit` | 跨 PRD、Figma、源码、路由、组件、i18n、analytics 审查移动 App 一致性。 | 383 行，21 个 scripts，references/schemas/rule-packs 完整；deterministic audit 把 secret regex 防护误报为 security signal。 | 将 3 个 references 在入口显式挂载，避免 unused-reference signal。补 eval fixture（PRD/Figma/source missing、headless failure envelope、secret-path redaction）。同时修 `retired-skill-review` secret scanner，使“保护性 secret regex”不再算风险。 | P1 |
 | `spec-brainstorm` | 在需求未定时协作澄清 WHAT，形成可继续进入 PRD/plan 的需求材料。 | 294 行，8 个 references；无 eval 目录。 | 补 normalized trigger/boundary eval，覆盖“idea generation -> spec-ideate”“clear plan request -> spec-plan”“single doc cleanup -> direct”。把 visual/html rendering 作为 conditional references，入口保留 requirements capture 与 handoff contract。 | P1 |
 | `spec-code-review` | 对代码 diff/PR 做证据驱动的结构化 review、persona 合并和 finding 输出。 | 1141 行，9 个 references，1 个 script，1 个 eval examples；最大初载面。 | 拆入口：mode detection、interactive/headless/autofix、severity/action routing、reviewer catalog、tracker defer 都可进一步下沉到 references。保留核心 contract、evidence boundary、dispatch authorization、stage outline。把 examples 转成 normalized eval cases，并用 persona-catalog 作为单一 reviewer source。 | P1 |
 | `spec-compound` | 把已验证的问题解决经验沉淀为 `docs/solutions/` durable knowledge。 | 630 行，assets/evals/references/scripts 较完整；audit P0 是 generated-runtime 排除文本误报。 | 不改 source/runtime 边界文本。建议修 audit scanner 的误报；本 skill 侧可把 promotion gate、YAML schema、session recall、knowledge taxonomy 下沉，入口保留 capture criteria、invalidations、frontmatter output。补 “不把未验证经验写入 docs/solutions” eval。 | P1 |
@@ -58,10 +58,10 @@
 | `spec-prd` | 面向既有系统编写、校准或验证 brownfield PRD 级需求。 | 165 行，4 references，1 script，1 eval examples；较紧凑。 | 保持当前轻量。补 brownfield PRD readiness eval：existing-system evidence、domain language drift、single-file PRD vs split topology、plan-ready / not-plan-ready 判定。 | P2 |
 | `spec-release-notes` | 查询或总结近期 spec-first release changes，并给出版本/来源引用。 | 220 行，1 script，已有 tests。 | 补 network/API unavailable fallback、CHANGELOG-only fallback、current date/version boundary、输出 citation format。增加 query-mode eval，覆盖 “what changed recently” 与 “what happened to skill X”。 | P2 |
 | `spec-sessions` | 检索和解释历史 coding-agent session，辅助恢复上下文和尝试记录。 | 256 行，4 scripts；无 eval。 | 补 privacy/redaction boundary，明确 session history 是 advisory recall，不是 confirmed truth。增加 eval：missing session dir、stale sessions、multi-host sessions、error extraction。 | P1 |
-| `spec-skill-audit` | 审计 skill source 的触发、边界、契约、eval、runtime governance 和安全风险。 | 259 行，10 references，12 scripts，4 eval files；本轮事实来源。 | 优先改进 false-positive taxonomy：runtime mention vs runtime patch、secret detection regex vs secret exfiltration、`sudo` command suggestion vs execution。增加 “输出到 docs/项目审查 的 report mode” 作为可选 future，不默认写 source。 | P1 |
+| `retired-skill-review` | 审计 skill source 的触发、边界、契约、eval、runtime governance 和安全风险。 | 259 行，10 references，12 scripts，4 eval files；本轮事实来源。 | 优先改进 false-positive taxonomy：runtime mention vs runtime patch、secret detection regex vs secret exfiltration、`sudo` command suggestion vs execution。增加 “输出到 docs/项目审查 的 report mode” 作为可选 future，不默认写 source。 | P1 |
 | `spec-slack-research` | 从 Slack 组织讨论中提炼决策、约束和讨论脉络。 | 81 行，无 scripts/evals；依赖 Slack MCP。 | 补 MCP unavailable fallback、workspace identity verification、privacy/audience boundary、raw-message redaction、output schema。增加 near-neighbor：用户要直接 `slack:find` 原始列表时不触发 synthesis skill。 | P1 |
 | `spec-work` | 执行已明确的实现任务，并守住 mutation、verification、handoff 和 changelog 纪律。 | 551 行，2 references，1 eval examples；执行主 workflow。 | 继续瘦入口，把 shipping workflow/tracker defer 细节转 references；保留 completion audit、mutation gate、verification/handoff contract。补 eval：clear task、unclear plan、dirty worktree、generated runtime boundary、completion audit failure。 | P1 |
-| `spec-write-tasks` | 把已定计划编译成可执行 task pack，并保留 derived artifact 边界。 | 431 行，agents/evals/references 完整；standalone skill。 | 结构较成熟。下一步统一 eval fixture 与 `spec-skill-audit` checker，确保 `boundary-cases` / `failure-cases` 被算入 readiness。补 derived artifact stale/invalidation cases，防止 task pack 变第二 source of truth。 | P2 |
+| `spec-write-tasks` | 把已定计划编译成可执行 task pack，并保留 derived artifact 边界。 | 431 行，agents/evals/references 完整；standalone skill。 | 结构较成熟。下一步统一 eval fixture 与 `retired-skill-review` checker，确保 `boundary-cases` / `failure-cases` 被算入 readiness。补 derived artifact stale/invalidation cases，防止 task pack 变第二 source of truth。 | P2 |
 | `test-browser` | 通过浏览器、截图和运行态检查验证本地 Web UI 或交互行为。 | 357 行，已有 tests，无 references/scripts；内部 browser test helper。 | 补 contract summary 和 output artifact contract（dev server URL、screenshots、failures、cleanup）。明确与当前 host browser tool / Playwright / agent-browser 的边界。增加 fixture：server already running、port occupied、route mapping unknown。 | P1 |
 | `test-xcode` | 通过 Xcode/XcodeBuildMCP 验证 iOS/macOS 项目的 build、scheme 和模拟器运行。 | 209 行，无 tests/evals；依赖 XcodeBuildMCP。 | 补 XcodeBuildMCP unavailable fallback、simulator cleanup、scheme discovery failure、输出 summary schema。增加 static smoke tests，至少覆盖 frontmatter、required headings、no direct unsafe device mutation。 | P1 |
 | `using-spec-first` | 作为 entry governor 判断当前请求应直接处理还是进入公开 `$spec-*` workflow。 | 348 行，2 eval files；entry governor。 | 保持为 standalone meta skill，不暴露为 command-backed workflow。建议继续把 scenario fingerprint 和 multi-session 细节压缩到 references，入口保留路由优先级、direct outcome、dispatch authorization 和 public route map。补 fresh-source routing cases 对 `$yao-meta-skill` 这类 standalone skill 的覆盖。 | P2 |
@@ -76,15 +76,15 @@
 - 事实信号：contract headings 完整，16 个 references，1 个 eval file、6 个 normalized cases；entry 约 4.6k tokens，仍携带较长原则与 quick start。
 - 主要风险：长篇理念材料留在入口会增加初载成本，也容易让 reviewer 把它当成“所有 agent 设计问题都先走这里”的强路由。
 - 优化动作：入口保留 taxonomy、routing table、source/runtime 边界和 handoff；把 `Why Now`、Core Principles 长例、Quick Start 继续下沉到 references。
-- 验证建议：补 near-neighbor eval，覆盖“普通实现请求应走 `spec-work`”“skill 质量审查应走 `spec-skill-audit`”“runtime mirror 不可手改”。
+- 验证建议：补 near-neighbor eval，覆盖“普通实现请求应走 `spec-work`”“skill 质量审查应走 `retired-skill-review`”“runtime mirror 不可手改”。
 
 ### `agent-native-audit`
 
-- 定位判断：它现在像 agent-native 体系的内部审查方法，但没有清楚说明与 `spec-skill-audit`、`agent-native-architecture` 的分工。
+- 定位判断：它现在像 agent-native 体系的内部审查方法，但没有清楚说明与 `retired-skill-review`、`agent-native-architecture` 的分工。
 - 事实信号：无 references/scripts/evals；deterministic audit 报缺 Purpose、When To Use、When Not To Use、Inputs、Outputs、Failure Modes。
-- 主要风险：如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-audit / architecture reference 重叠。
+- 主要风险：如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-review / architecture reference 重叠。
 - 优化动作：先裁决保留、合并还是退役；若保留，补轻量 contract summary，并明确只审 agent-native architecture choices，不审所有 skill/source 质量。
-- 验证建议：增加 routing eval：skill 治理审查落到 `spec-skill-audit`，agent-native app 架构审查才读取本 skill。
+- 验证建议：增加 routing eval：skill 治理审查落到 `retired-skill-review`，agent-native app 架构审查才读取本 skill。
 
 ### `changelog`
 
@@ -302,7 +302,7 @@
 - 优化动作：补 privacy/redaction boundary、freshness/confidence 字段、current-source verification handoff；输出 schema 区分 remembered、confirmed、unresolved。
 - 验证建议：补 missing session dir、stale sessions、multi-host sessions、private path redaction、error extraction eval。
 
-### `spec-skill-audit`
+### `retired-skill-review`
 
 - 定位判断：这是本轮事实来源，整体最成熟；下一步主要是降低 false-positive taxonomy。
 - 事实信号：10 个 references、20 个 scripts、4 个 eval files，4 个 normalized cases；contract headings 完整；score 86。
@@ -331,7 +331,7 @@
 - 定位判断：这是成熟的 standalone plan-to-task-pack compiler；应继续防止 task pack 变成第二 source of truth。
 - 事实信号：2 个 references、5 个 eval files，19 个 normalized cases；contract headings 完整；score 81。
 - 主要风险：derived artifact 如果缺 stale/invalidation 规则，会在 plan/PRD 更新后继续被执行。
-- 优化动作：统一 eval fixture 格式，让 `boundary-cases` / `failure-cases` 被 `spec-skill-audit` readiness checker 稳定识别；补 derived artifact invalidation 条款。
+- 优化动作：统一 eval fixture 格式，让 `boundary-cases` / `failure-cases` 被 `retired-skill-review` readiness checker 稳定识别；补 derived artifact invalidation 条款。
 - 验证建议：新增 plan changed after task-pack、missing acceptance source、over-specified task、handoff to doc-review 四类 eval。
 
 ### `test-browser`
@@ -356,7 +356,7 @@
 - 事实信号：2 个 eval files，16 个 normalized cases；入口约 8.2k tokens；score 57；deterministic checker 报缺 headings，但文内已有 Contract Summary。
 - 主要风险：scenario fingerprint、multi-session、route map、dispatch authorization 全在入口会让治理文档继续膨胀；过度路由风险始终高于能力不足风险。
 - 优化动作：保持 standalone meta skill；把 scenario/multi-session 细节压缩或迁 references；入口保留 direct outcomes、routing priority、dispatch authorization、public route map。
-- 验证建议：补 fresh-source routing cases，覆盖 `$yao-meta-skill` standalone、lightweight direct edit、explicit `$spec-skill-audit`、parent workspace target_repo。
+- 验证建议：补 fresh-source routing cases，覆盖 `$yao-meta-skill` standalone、lightweight direct edit、explicit `$retired-skill-review`、parent workspace target_repo。
 
 ## Agent 全局建议
 
@@ -426,15 +426,15 @@
 
 ## 建议落地顺序
 
-1. 先修 `spec-skill-audit` deterministic scanner 的误报分类：runtime mention、provider runtime writes、secret regex 防护、sudo suggestion 输出。
+1. 先修 `retired-skill-review` deterministic scanner 的误报分类：runtime mention、provider runtime writes、secret regex 防护、sudo suggestion 输出。
 2. 为内部/高权限 helper skill 补轻量 contract：`git-worktree`、`git-clean-gone-branches`、`resolve-pr-feedback`、`proof`、`gemini-imagegen`、`test-browser`、`test-xcode`。
 3. 对大 workflow 做 progressive disclosure：先从 `spec-code-review`、`spec-plan`、`spec-work` 三个最高频入口开始。
 4. 统一 reviewer persona catalog 与 output schema：先处理 code-review/doc-review 已在 catalog 的 29 个 reviewer，再清理非 catalog 旧 agent。
-5. 规范 eval fixture，让现有 `examples.json` 被 `spec-skill-audit` readiness checker 正确识别，再补缺口。
+5. 规范 eval fixture，让现有 `examples.json` 被 `retired-skill-review` readiness checker 正确识别，再补缺口。
 
 ## 本轮验证与限制
 
-- 已执行：`node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .`。
-- 已回源：`skills/` 清单、`agents/` 清单、`spec-skill-audit` summary/plan/guard/eval reports、`spec-compound` 与 `spec-mcp-setup` runtime-governance 误报片段。
+- 已执行：`node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .`。
+- 已回源：`skills/` 清单、`agents/` 清单、`retired-skill-review` summary/plan/guard/eval reports、`spec-compound` 与 `spec-mcp-setup` runtime-governance 误报片段。
 - 未执行 fresh-source subagent eval：本次目标是写优化建议文档，未授权 subagents/personas；建议后续对具体 source 修改再跑 fresh-source eval。
-- 未修改 generated runtime mirrors；`.spec-first/audits/skill-audit/**` 是 gitignored 执行产物，不作为本文件 source。
+- 未修改 generated runtime mirrors；`.spec-first/audits/skill-review/**` 是 gitignored 执行产物，不作为本文件 source。

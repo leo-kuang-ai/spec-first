@@ -294,7 +294,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 **Files:**
 - Modify: `src/cli/plugin.js`
-- Test: `tests/unit/skill-audit-scripts.test.js` or a focused plugin/runtime integrity test
+- Test: `tests/unit/skill-review-scripts.test.js` or a focused plugin/runtime integrity test
 - Modify: `CHANGELOG.md`
 
 **Approach:**
@@ -365,7 +365,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 **Approach:**
 - 在文档末尾追加“Dimension to workflow application index”。
-- 映射维度到 `spec-plan`、`spec-work`、`spec-code-review`、`spec-mcp-setup`、`spec-skill-audit` 等真实消费点。
+- 映射维度到 `spec-plan`、`spec-work`、`spec-code-review`、`spec-mcp-setup`、`retired-skill-review` 等真实消费点。
 - 明确 `External facts and social sources` 是否进入测试锚点；建议纳入索引断言，避免未来又被误数。
 
 **Patterns to follow:**

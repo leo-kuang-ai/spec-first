@@ -9,7 +9,7 @@ author: leokuang
 target_repo: "."
 related_docs:
   - docs/10-prompt/结构化项目角色契约.md
-  - docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md
+  - docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md
   - docs/plans/2026-06-27-002-feat-spec-debug-discipline-borrow-from-diagnosing-bugs-plan.md
   - skills/spec-debug/SKILL.md
   - tests/unit/spec-debug-contracts.test.js
@@ -81,7 +81,7 @@ local_benchmark_refs:
 - `skills/spec-debug/SKILL.md`
 - `skills/spec-debug/scripts/hitl-loop.template.sh`
 - `tests/unit/spec-debug-contracts.test.js`
-- `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`
+- `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md`
 - `CHANGELOG.md`
 
 本计划确认 `skills/spec-debug/evals/examples.json` 已删除，不再把它作为待执行 source mutation；若后续发现 active eval consumer，应恢复或另开 cleanup 决策，而不是把 CE 缺失当作删除充分理由。
@@ -606,7 +606,7 @@ Changes:
 Files:
 
 - `skills/spec-debug/SKILL.md`
-- `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`
+- `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md`
 - `CHANGELOG.md`
 
 Changes:
@@ -620,7 +620,7 @@ Changes:
 
 Files:
 
-- `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`
+- `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md`
 - `CHANGELOG.md`
 
 Changes:
@@ -701,7 +701,7 @@ Prompt behavior validation:
 5. 在 `tests/unit/spec-debug-contracts.test.js` 中增加 HITL 注释专属断言（不加入 migrated-skill-scripts guard）。
 6. 确保 `docs/residual-review-findings/` 目录存在（首次写入前创建）。
 7. 生成或更新 parity mapping。
-8. 更新 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`。
+8. 更新 `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md`。
 9. 更新 `CHANGELOG.md`。
 10. 运行 focused verification。
 11. 执行 fresh-source eval 或记录未执行原因。

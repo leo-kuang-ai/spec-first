@@ -477,7 +477,7 @@ Capability Entry:
   pack 中的单项能力，可以是 agent enhancement、rubric reference、optional lens、style profile 或 future optional agent。
 
 Extension Point:
-  能力可挂载的位置，例如 spec-code-review reviewer selection、spec-plan deepening、spec-doc-review persona、spec-skill-audit。
+  能力可挂载的位置，例如 spec-code-review reviewer selection、spec-plan deepening、spec-doc-review persona、retired-skill-review。
 
 Activation Policy:
   pack 是否默认禁用、项目显式启用、workflow 条件启用，或仅 manual deep review 启用。
@@ -496,7 +496,7 @@ register-preview:
   写入 docs 级 registry preview，包含 source、version、trust、stale policy。
 
 pilot:
-  在 code-review / plan / doc-review / skill-audit 小样本验证节点质量增益。
+  在 code-review / plan / doc-review / skill-review 小样本验证节点质量增益。
 
 enable:
   只有通过 gate 的 pack 才能被项目或 workflow 显式启用。
@@ -883,7 +883,7 @@ spec-pr-comment-resolver
 不映射 ECC
 不允许被 ECC prompt 覆盖
 接入 Governance Pack
-服务 skill-audit / update / mcp-setup / code-review / compound
+服务 skill-review / update / mcp-setup / code-review / compound
 ```
 
 ---
@@ -900,7 +900,7 @@ V1 将现有 agent 重组为 packs，而不是继续暴露零散专家。
 | Document Quality Pack | `spec-coherence-reviewer`, `spec-feasibility-reviewer`, `spec-adversarial-document-reviewer`, `spec-security-lens-reviewer` | `spec-doc-review`, `spec-plan` |
 | Engineering Quality Pack | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer`, `spec-reliability-reviewer`, `spec-code-simplicity-reviewer` | `spec-code-review`, `spec-debug` |
 | Architecture & Contract Pack | `spec-architecture-strategist`, `spec-api-contract-reviewer`, `spec-repo-research-analyst`, `spec-git-history-analyzer` | `spec-plan`, `spec-code-review` |
-| Governance Pack | `spec-project-standards-reviewer`, `spec-agent-native-reviewer`, `spec-cli-readiness-reviewer`, `spec-cli-agent-readiness-reviewer`, `spec-learnings-researcher` | `spec-skill-audit`, `spec-compound`, `spec-update`, `spec-code-review` |
+| Governance Pack | `spec-project-standards-reviewer`, `spec-agent-native-reviewer`, `spec-cli-readiness-reviewer`, `spec-cli-agent-readiness-reviewer`, `spec-learnings-researcher` | `retired-skill-review`, `spec-compound`, `spec-update`, `spec-code-review` |
 
 ### 11.2 P1 Conditional Packs
 
@@ -1291,7 +1291,7 @@ Skill-owned selection envelope：
 | `spec-debug` | 4 | correctness、history、reliability、domain |
 | `spec-code-review` | 5 | 增量候选最多 5 个，不覆盖现有 persona catalog |
 | `spec-app-consistency-audit` | 6 | 产品、流程、设计、App、API、analytics/i18n |
-| `spec-skill-audit` | 5 | prompt、workflow、runtime、security、simplicity |
+| `retired-skill-review` | 5 | prompt、workflow、runtime、security、simplicity |
 
 若当前 workflow source 已经定义更具体的 dispatch catalog，以 workflow source 为准；V1 上限只用于控制 ECC-derived 增量候选、context pack 和 pilot 观察指标。
 
@@ -1665,7 +1665,7 @@ spec-deployment-verification-agent
 5. deployment verification 负责发布检查任务
 ```
 
-### 17.6 `spec-skill-audit`
+### 17.6 `retired-skill-review`
 
 默认候选：
 
@@ -2088,7 +2088,7 @@ If this workflow already has a stricter schema, follow the stricter workflow-nat
 2. spec-plan
 3. spec-doc-review
 4. spec-write-tasks
-5. spec-skill-audit
+5. retired-skill-review
 6. spec-app-consistency-audit
 7. spec-compound
 ```
@@ -2099,7 +2099,7 @@ If this workflow already has a stricter schema, follow the stricter workflow-nat
 code-review 最容易验证专家合成价值
 plan 最能体现 graph/evidence
 doc-review 最能体现 scope/coherence
-skill-audit 用来防止系统继续膨胀
+skill-review 用来防止系统继续膨胀
 ```
 
 ### G6.5: Host Compatibility 与 Runtime Merge Policy Preview
@@ -2271,7 +2271,7 @@ low-risk typo 场景不得选择重专家
 | 43 | pilot 是否覆盖 code-review | 已覆盖 |
 | 44 | pilot 是否覆盖 plan | 已覆盖 |
 | 45 | pilot 是否覆盖 doc-review | 已覆盖 |
-| 46 | pilot 是否覆盖 skill-audit | 已覆盖 |
+| 46 | pilot 是否覆盖 skill-review | 已覆盖 |
 | 47 | roadmap 是否与 V1 交付混淆 | 改为 Document Version / G gates / R roadmap |
 | 48 | 最小落地顺序是否包含 rubric extraction | 已加入 G1.5 |
 | 49 | 专家能力是否支持插件化与插拔式集成 | 新增 capability provider / capability pack / activation lifecycle |
@@ -2357,7 +2357,7 @@ V1 完成时应满足：
 15. capability pack preview contract 完成，明确 pack-gated / opt-in / degrade / future doctor-clean-state
 16. node quality matrix 完成，并覆盖 brainstorm / plan / tasks / work / review / compound
 17. quality gates 完成，能阻断重复、无证据、越权、stale graph、schema 冲突、registry 漂移、插件整包污染和 context 膨胀
-18. pilot 场景完成，至少覆盖 code-review / plan / doc-review / skill-audit
+18. pilot 场景完成，至少覆盖 code-review / plan / doc-review / skill-review
 19. 不修改 generated runtime
 20. 不新增 ECC commands/hooks/agents
 ```

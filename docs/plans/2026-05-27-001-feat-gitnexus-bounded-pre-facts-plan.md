@@ -73,7 +73,7 @@ Harness 的核心判断是：把不稳定的 AI 推理放进可重复、可观�
 
 ### Non-Helper Lanes In Scope
 
-- `tool_map` session evidence：setup、skill-audit、app-consistency-audit 或 tool-surface 任务可显式调用；summary 进入 shared evidence envelope。
+- `tool_map` session evidence：setup、skill-review、app-consistency-audit 或 tool-surface 任务可显式调用；summary 进入 shared evidence envelope。
 - `route_map` / `api_impact` / `shape_check` session evidence：API/web/backend 任务可显式调用；route/handler/consumer/shape 摘要必须 redacted and source-confirmed。
 - `cypher` advanced session evidence：需要 schema-first read-only proof、bounded query/result 和 redacted summary。
 - repo/group resources 与 group-aware `query/context/impact`：多仓/monorepo/service orientation 使用；不能选择写入 repo 或扩大 plan/task scope。
@@ -449,7 +449,7 @@ flowchart TB
 - Modify: `skills/spec-code-review/SKILL.md`
 - Modify: `skills/spec-debug/SKILL.md`
 - Modify: `skills/spec-mcp-setup/SKILL.md` if `tool_map` guidance needs a setup consumer
-- Modify: `skills/spec-skill-audit/SKILL.md` if tool-surface evidence is consumed there
+- Modify: `skills/retired-skill-review/SKILL.md` if tool-surface evidence is consumed there
 - Modify: focused contract tests for changed skill/contract surfaces
 
 **Approach:**

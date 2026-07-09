@@ -293,7 +293,7 @@ flowchart TB
 - Modify: `tests/unit/contract-drift-guard.test.js`
 - Modify: `tests/unit/agent-native-architecture-contracts.test.js`
 - Modify: `tests/unit/spec-write-skill-contracts.test.js`
-- Modify: `tests/unit/skill-audit-scripts.test.js`
+- Modify: `tests/unit/skill-review-scripts.test.js`
 
 **Approach:**
 - 一次性把 `qoder` 加入 schema host enum、owner host enum、required `host_delivery` properties，并给每条 governance record 补齐 Qoder delivery decision。

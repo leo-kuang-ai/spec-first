@@ -186,7 +186,7 @@ P2 是可插拔能力，必须显式启用或由 pilot 证明价值后再进入�
 | Pack | ECC 能力吸收 | 默认策略 |
 | --- | --- | --- |
 | Build Resolver Pack | `build-error-resolver`, `go-build-resolver`, `rust-build-resolver`, `kotlin-build-resolver`, `java-build-resolver`, `dart-build-resolver`, `pytorch-build-resolver` | 默认 checklist/reference，未来按技术栈 opt-in |
-| Agent Ops / Eval Pack | `agent-eval`, `eval-harness`, `skill-comply`, `skill-stocktake`, `context-budget`, `agentic-engineering`, `autonomous-loops` | 服务 `spec-optimize` 与 `spec-skill-audit`，不进入普通 code-review |
+| Agent Ops / Eval Pack | `agent-eval`, `eval-harness`, `skill-comply`, `skill-stocktake`, `context-budget`, `agentic-engineering`, `autonomous-loops` | 服务 `spec-optimize` 与 `retired-skill-review`，不进入普通 code-review |
 | MCP / Tooling Pack | `mcp-server-patterns`, `agent-harness-construction`, `enterprise-agent-ops`, `cost-aware-llm-pipeline` | 服务 harness/runtime/governance 设计，不成为用户任务默认专家 |
 | Open Source Release Pack | `opensource-packager`, `opensource-forker`, `opensource-sanitizer`, open-source pipeline skills | 显式 opt-in，默认不碰 repo 发布面 |
 
@@ -379,8 +379,8 @@ spec-first 已有 public workflow 入口；
 | `/code-review`, `/review-pr`, `/quality-gate`, `/test-coverage` | 参考到 `spec-code-review` 的 reviewer routing、finding、coverage gate |
 | `/plan`, `/multi-plan`, `/feature-dev`, `/prp-plan`, `/prp-implement` | 参考到 `spec-brainstorm`, `spec-plan`, `spec-write-tasks`, `spec-work` |
 | `/build-fix`, `/go-build`, `/rust-build`, `/kotlin-build`, `/flutter-build`, `/gradle-build` | 参考到 `spec-debug` 和 `spec-work` 的 build failure handling |
-| `/harness-audit`, `/skill-health`, `/learn-eval` | 参考到 `spec-skill-audit` 与 `spec-optimize` |
-| `/update-docs`, `/update-codemaps`, `/learn` | 参考到 `spec-compound`、`spec-skill-audit` 与现有 docs/contracts/source 维护流程 |
+| `/harness-audit`, `/skill-health`, `/learn-eval` | 参考到 `retired-skill-review` 与 `spec-optimize` |
+| `/update-docs`, `/update-codemaps`, `/learn` | 参考到 `spec-compound`、`retired-skill-review` 与现有 docs/contracts/source 维护流程 |
 | `/hookify*`, `/jira`, `/pm2`, `/model-route`, `/setup-pm` | 不进入核心，未来最多作为 optional tooling provider 参考 |
 
 后续可生成 `ecc-command-idea-matrix`，但它只能用于 reference：

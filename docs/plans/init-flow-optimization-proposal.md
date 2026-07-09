@@ -6,7 +6,7 @@
 
 **驱动信号：**
 
-1. **扩展性即将触及临界** — 当前 5 宿主已使 UNREWRITTEN_PATH_PATTERNS 达到 O(n²) 维护负债。Kiro 刚接入时已触发全部 4 个现有 adapter 的修改。社区已有 Windsurf、Augment 等新 IDE 采用 AGENTS.md 标准，第 6 个宿主接入需求可预见。
+1. **扩展性维护负债（推测性驱动，待需求信号确认）** — 当前 5 宿主已使 UNREWRITTEN_PATH_PATTERNS 达到 O(n²) 维护负债。Kiro 刚接入时已触发全部 4 个现有 adapter 的修改。社区已有 Windsurf、Augment 等新 IDE 采用 AGENTS.md 标准，但**目前尚无 confirmed 的第 6 个宿主接入需求（无用户请求、无 roadmap 承诺、无 POC）**。O(n²) 是内部维护指标，用户不可见；因此本驱动信号属推测性，扩展性投资（Phase 1/3）应待真实接入需求或 POC 承诺出现后再启动（见 1.2 与 5.2 的证据触发约定）。
 2. **Qoder hooks 功能缺口** — spec-first 本身运行在 Qoder 环境中，但 Qoder CLI 的 shell-command hooks 仍未覆盖；其事件、matcher、stdout 与配置兼容性需按 Qoder CLI 协议单独验证，这意味着 spec-first 在自己的宿主上缺少 confirmed governance injection。
 3. **init.js 3055 行已成维护瓶颈** — 任何 init 逻辑的修改（如上述 Qoder hooks 添加）都需要导航 3000+ 行文件，增加回归风险。
 4. **对齐核心链路** — 重构使 pointer-only 新宿主的 adapter 接入从 3-5 天收敛到约 1 天；hooks-capable 宿主仍需额外 protocol/runtime lifecycle spike。更低的 pointer 接入成本直接提升 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge` 链路的覆盖面（更多宿主 = 更多用户可触达 workflow）。
@@ -14,7 +14,9 @@
 **核心判断对齐（AGENTS.md）：**
 > 这次改动是否让 AI coding 从一次性对话，进一步走向可治理、可验证、可复用、可沉淀的工程闭环？
 
-答：是。通过降低宿主扩展成本 + 补齐 Qoder governance hooks + 提升可维护性，使 spec-first harness 的价值更可被更多宿主的用户识别和使用。
+答：是（限定于工程质量层）。本方案通过降低宿主扩展成本 + 补齐 Qoder governance hooks + 提升可维护性，改善的是 harness 的**内部工程质量与可治理性**。
+
+**价值链诚实声明**：本方案不直接提升 harness 价值的**用户识别度与采纳率**——降低扩展成本、提升可维护性、增加宿主覆盖对最终用户与决策者不可见，不会自动转化为采纳。「价值可被识别/采纳」是断裂因果链下游，属本方案的显式非目标（见 1.2），需另立方案（价值演示、发现性、决策者可见证据）。此处不以采纳目标为纯内部工程改造背书。
 
 ### 1.2 非目标（Non-Goals）
 
@@ -29,6 +31,7 @@
 | 触碰 dual-host governance contract schema | 契约由独立 schema 管理 |
 | 替代宿主即将商品化的能力 | 不重建 session resume、MCP discovery 等 |
 | 自动更新用户 CLI 版本 | 保持 read-only 提醒策略 |
+| 提升 harness 价值的用户识别度 / 采纳率 | 本方案只解决内部工程质量（扩展成本、可维护性、governance 覆盖）；采纳/价值识别（演示、发现性、决策者可见证据）另立方案 |
 
 ### 1.3 用户体验影响承诺
 
@@ -232,6 +235,8 @@ CLI Entry (bin/spec-first.js)
 - Qoder CLI hooks 与 IDE/JB plugin hooks 属于不同宿主 surface；二者共享项目级 `.qoder/settings.json` 等配置文件，但不能直接假设 exec-form `{ command, args }`、matcher 与 stdout 控制协议在所有 surface 上完全一致。
 - IDE/JB plugin 支持需要单独产出 confirmed evidence 后再从 degraded/follow-up 升级为 confirmed capability。
 
+**价值锚点（对齐 AGENTS.md「不重建商品化 primitive」）**：hook 机制（事件、matcher、stdin/stdout 管道）本身是宿主正在商品化的底座，本方案的差异化价值不在重建这套 plumbing，而在其上注入的 **spec-first governance 内容**（PRD prewrite/readiness 约束、workflow entry governance）。因此 Phase 0 的价值必须钉在 governance injection 上；hook plumbing 只是达成它的必要管道，若某宿主未来原生提供等价 governance 注入点，应优先复用而非自建。
+
 | Claude 事件 | Qoder 事件 | stdin/stdout 协议 | 兼容性 |
 |------------|-----------|------------------|--------|
 | SessionStart | SessionStart（Qoder CLI only） | ⚠️ 事件存在，但 IDE/JB 当前未列出该事件 | 需按 Qoder CLI 协议投影 |
@@ -265,6 +270,8 @@ CLI Entry (bin/spec-first.js)
 
 **唯一增强建议**：增加 `--skip <version>` 精确跳过某版本提醒（0.5 天工作量）。
 
+**路线图归属**：本轮**不做** `--skip <version>`。它未纳入第五章任何 Phase、优先级表或 7-12 天总工期；作为独立小任务待有需求再单列，不在本方案的分阶段验收范围内。此处显式声明以免它在路线图中悬空。
+
 ---
 
 ## 四、优化方案
@@ -282,95 +289,143 @@ CLI Entry (bin/spec-first.js)
 
 ### 4.2 Platform Registry（消除 O(n²) 的关键）
 
+Platform Registry 不应是“把各 adapter 的正则搬到一个对象里”。最佳方案是把它定义为 **结构化 host surface declaration**：registry 只描述一个编程工具的 runtime surface、ownership、能力与 path rule；regex/glob 编译、锚定、legacy 兼容 delta 由 compiler 和 tests 负责。这样后续接入 Windsurf、Augment 或其他 AGENTS.md-native 编程工具时，新增工作集中在“声明该工具拥有哪些 surface”和“选择 pointer/hooks 能力模块”，而不是修改所有既有 adapter 的排除规则。
+
+设计原则：
+- **Declarative, not regex snippets**：配置作者声明 `file` / `dir` / `glob` / `managed-slice`，不直接写 `suffixPattern`。
+- **Ownership first**：每条 path rule 必须声明 `ownership`，区分 `generated-runtime`、`host-local`、`host-user-owned`、`managed-slice`。
+- **Anchored compiler**：默认对 repo-relative normalized path 做 anchored match；legacy 未锚定行为只能通过显式 `compatibilityDelta` 保留。
+- **Capability granularity**：hooks 能力不是一个 `shellHooks: true` 布尔值，而是按事件/阻断/loader safety 表达 confirmed/degraded 状态。
+- **Host-specific escape hatch**：Codex cross-root、Qoder managed slice、Claude settings merge 等特殊性保留在结构化字段里，不塞进通用 adapter 抽象。
+
+**新增编程工具接入合同**：
+1. 新增工具必须先声明 `runtimeRoot`、`surfaces`、`rewriteExclusions`、`capabilities`，每条 path rule 必须带 ownership。
+2. pointer-only 工具只能实现 pointer lifecycle + skill/agent text transform；不得新增 hooks/doctor/clean 行为的隐式假设。
+3. hooks-capable 工具必须先走 protocol spike，确认 settings schema、command execution form、event payload、blocking output 和 cross-surface loader safety 后，才能把 hook capability 标为 confirmed。
+4. 任何 host-user-owned 文件只能通过 `managed-slice` 声明；clean/doctor/drift 不得把整文件或整目录当 spec-first-owned generated runtime。
+5. 新工具接入验收的核心是“不修改既有 adapter 且 existing host output 不变”，不是 LOC 下降。
+
 ```javascript
-// src/cli/adapters/platform-registry.js (~120L)
+// src/cli/adapters/platform-registry.js (~180L)
 const PLATFORM_REGISTRY = {
   claude: {
     runtimeRoot: '.claude',
-    managedRoot: '.claude/spec-first',
-    skillsRoot: '.claude/skills',
-    workflowsRoot: '.claude/spec-first/workflows',
-    agentsRoot: '.claude/agents',
-    commandRoot: '.claude/commands',
-    hooksDir: '.claude/hooks',
-    settingsFile: '.claude/settings.json',
-    capabilities: { shellHooks: true },
-    // 用于自动派生排除列表的路径规则
-    runtimePathRules: [
-      { prefix: '.claude/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
-      { prefix: '.claude/commands/spec-', suffixPattern: '[a-z-]+\\.md' },
-      { prefix: '.claude/commands/spec-', suffixPattern: '\\*\\.md' },
-      { prefix: '.claude/spec-first/workflows/' },
-      { prefix: '.claude/skills/' },
-      { prefix: '.claude/agents/' },
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.claude/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.claude/skills/', ownership: 'generated-runtime' },
+      workflowsRoot: { kind: 'dir', path: '.claude/spec-first/workflows/', ownership: 'generated-runtime' },
+      agentsRoot: { kind: 'dir', path: '.claude/agents/', ownership: 'generated-runtime' },
+      commandRoot: { kind: 'dir', path: '.claude/commands/', ownership: 'generated-runtime' },
+      hooksDir: { kind: 'dir', path: '.claude/hooks/', ownership: 'generated-runtime' },
+      settingsFile: { kind: 'managed-slice', path: '.claude/settings.json', ownership: 'host-user-owned', managedKeys: ['hooks'] },
+    },
+    capabilities: {
+      hooks: {
+        shellCommand: 'confirmed',
+        sessionStart: 'confirmed',
+        preToolUse: 'confirmed',
+        stopBlocking: 'confirmed',
+      },
+    },
+    rewriteExclusions: [
+      { kind: 'glob', path: '.claude/commands/spec/*.md', ownership: 'generated-runtime' },
+      { kind: 'glob', path: '.claude/commands/spec-*.md', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.claude/spec-first/workflows/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.claude/skills/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.claude/agents/', ownership: 'generated-runtime' },
     ],
   },
   codex: {
     runtimeRoot: '.codex',
-    managedRoot: '.codex/spec-first',
-    skillsRoot: '.agents/skills',          // 跨 runtimeRoot
-    workflowsRoot: '.agents/skills',
-    agentsRoot: '.codex/agents',
-    commandRoot: '.codex/commands/spec',
-    hooksDir: '.codex/hooks',
-    hooksJsonFile: '.codex/hooks.json',
-    capabilities: { shellHooks: true },
-    runtimePathRules: [
-      { prefix: '.codex/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
-      { prefix: '.codex/commands/spec-', suffixPattern: '\\*\\.md' },
-      { prefix: '.codex/skills/' },
-      { prefix: '.codex/agents/' },
-      { prefix: '.agents/skills/' },
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.codex/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+      workflowsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+      agentsRoot: { kind: 'dir', path: '.codex/agents/', ownership: 'generated-runtime' },
+      commandRoot: { kind: 'dir', path: '.codex/commands/spec/', ownership: 'generated-runtime' },
+      hooksDir: { kind: 'dir', path: '.codex/hooks/', ownership: 'generated-runtime' },
+      hooksJsonFile: { kind: 'file', path: '.codex/hooks.json', ownership: 'generated-runtime' },
+    },
+    capabilities: {
+      hooks: {
+        shellCommand: 'confirmed',
+        sessionStart: 'confirmed',
+        preToolUse: 'not-supported-by-spec-first',
+        stopBlocking: 'not-supported-by-spec-first',
+      },
+    },
+    rewriteExclusions: [
+      { kind: 'glob', path: '.codex/commands/spec/*.md', ownership: 'generated-runtime' },
+      { kind: 'glob', path: '.codex/commands/spec-*.md', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.codex/skills/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.codex/agents/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
     ],
   },
   cursor: {
     runtimeRoot: '.cursor',
-    managedRoot: '.cursor/spec-first',
-    skillsRoot: '.cursor/skills',
-    agentsRoot: '.cursor/agents',
-    pointerPath: '.cursor/rules/spec-first.mdc',
-    capabilities: { shellHooks: false },
-    runtimePathRules: [
-      { prefix: '.cursor/skills/' },
-      { prefix: '.cursor/spec-first/' },
-      { prefix: '.cursor/mcp', suffixPattern: '\\.json' },
-      { prefix: '.cursor/agents/' },
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.cursor/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.cursor/skills/', ownership: 'generated-runtime' },
+      agentsRoot: { kind: 'dir', path: '.cursor/agents/', ownership: 'generated-runtime' },
+      pointerPath: { kind: 'managed-slice', path: '.cursor/rules/spec-first.mdc', ownership: 'host-user-owned' },
+      mcpConfig: { kind: 'file', path: '.cursor/mcp.json', ownership: 'host-local' },
+    },
+    capabilities: { hooks: { shellCommand: 'not-supported' } },
+    rewriteExclusions: [
+      { kind: 'dir', path: '.cursor/skills/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.cursor/spec-first/', ownership: 'generated-runtime' },
+      { kind: 'file', path: '.cursor/mcp.json', ownership: 'host-local' },
+      { kind: 'dir', path: '.cursor/agents/', ownership: 'generated-runtime' },
     ],
   },
   kiro: {
     runtimeRoot: '.kiro',
-    managedRoot: '.kiro/spec-first',
-    skillsRoot: '.kiro/skills',
-    agentsRoot: '.kiro/agents',
-    pointerPath: '.kiro/steering/spec-first.md',
-    capabilities: { shellHooks: false },
-    runtimePathRules: [
-      { prefix: '.kiro/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
-      { prefix: '.kiro/commands/spec-', suffixPattern: '\\*\\.md' },
-      { prefix: '.kiro/skills/' },
-      { prefix: '.kiro/agents/' },
-      { prefix: '.kiro/spec-first/' },
-      { prefix: '.kiro/settings/' },
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.kiro/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.kiro/skills/', ownership: 'generated-runtime' },
+      agentsRoot: { kind: 'dir', path: '.kiro/agents/', ownership: 'generated-runtime' },
+      pointerPath: { kind: 'managed-slice', path: '.kiro/steering/spec-first.md', ownership: 'host-user-owned' },
+      settingsDir: { kind: 'dir', path: '.kiro/settings/', ownership: 'host-local' },
+    },
+    capabilities: { hooks: { shellCommand: 'not-supported' } },
+    rewriteExclusions: [
+      { kind: 'glob', path: '.kiro/commands/spec/*.md', ownership: 'generated-runtime' },
+      { kind: 'glob', path: '.kiro/commands/spec-*.md', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.kiro/skills/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.kiro/agents/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.kiro/spec-first/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.kiro/settings/', ownership: 'host-local' },
     ],
   },
   qoder: {
     runtimeRoot: '.qoder',
-    managedRoot: '.qoder/spec-first',
-    skillsRoot: '.qoder/skills',
-    agentsRoot: '.qoder/agents',
-    commandRoot: '.qoder/commands',
-    pointerPath: '.qoder/rules/spec-first.md',
-    settingsFile: '.qoder/settings.json',
-    hooksDir: '.qoder/hooks',
-    capabilities: { shellHooks: true },
-    runtimePathRules: [
-      { prefix: '.qoder/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
-      { prefix: '.qoder/commands/spec-', suffixPattern: '[a-z-]+\\.md' },
-      { prefix: '.qoder/commands/spec-', suffixPattern: '\\*\\.md' },
-      { prefix: '.qoder/skills/' },
-      { prefix: '.qoder/agents/' },
-      { prefix: '.qoder/spec-first/' },
-      { prefix: '.qoder/settings', suffixPattern: '(?:\\.local)?\\.json' },
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.qoder/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.qoder/skills/', ownership: 'generated-runtime' },
+      agentsRoot: { kind: 'dir', path: '.qoder/agents/', ownership: 'generated-runtime' },
+      commandRoot: { kind: 'dir', path: '.qoder/commands/', ownership: 'generated-runtime' },
+      pointerPath: { kind: 'managed-slice', path: '.qoder/rules/spec-first.md', ownership: 'host-user-owned' },
+      settingsFile: { kind: 'managed-slice', path: '.qoder/settings.json', ownership: 'host-user-owned', managedKeys: ['hooks'] },
+      settingsLocalFile: { kind: 'file', path: '.qoder/settings.local.json', ownership: 'host-local' },
+      hooksDir: { kind: 'managed-slice-dir', path: '.qoder/hooks/', ownership: 'host-user-owned', managedFilesOnly: true },
+    },
+    capabilities: {
+      hooks: {
+        shellCommand: 'confirmed-after-phase-0a',
+        sessionStart: 'degraded-until-shared-loader-safe',
+        preToolUse: 'confirmed-after-phase-0a',
+        stopBlocking: 'confirmed-after-phase-0a',
+      },
+    },
+    rewriteExclusions: [
+      { kind: 'glob', path: '.qoder/commands/spec/*.md', ownership: 'generated-runtime' },
+      { kind: 'glob', path: '.qoder/commands/spec-*.md', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.qoder/skills/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.qoder/agents/', ownership: 'generated-runtime' },
+      { kind: 'dir', path: '.qoder/spec-first/', ownership: 'generated-runtime' },
+      { kind: 'file', path: '.qoder/settings.local.json', ownership: 'host-local' },
+      { kind: 'managed-slice', path: '.qoder/settings.json', ownership: 'host-user-owned', managedKeys: ['hooks'] },
     ],
   },
 };
@@ -378,33 +433,52 @@ const PLATFORM_REGISTRY = {
 
 ### 4.3 自动派生 UNREWRITTEN_PATH_PATTERNS（修正版）
 
-**关键改进**：当前 patterns 不是简单前缀，而是包含字符类（`[a-z-]+`）、可选组（`(?:\.local)?`）等复杂正则。因此 `runtimePathRules` 采用 `{ prefix, suffixPattern }` 格式：
+**关键改进**：当前 patterns 不是简单前缀，且 legacy set 彼此不一致。新方案不再让 registry 作者手写 regex 片段，而是用结构化 rule 编译为 anchored matcher。legacy 未锚定行为只作为 migration delta 处理。
 
 ```javascript
 /**
  * 为指定 platformId 生成排除其他所有宿主的路径模式。
- * 从 PLATFORM_REGISTRY.runtimePathRules 自动构建正则表达式。
+ * 从 PLATFORM_REGISTRY.rewriteExclusions 自动构建 anchored regex。
  */
 function deriveUnrewrittenPatterns(platformId) {
   const registry = require('./platform-registry');
   return Object.entries(registry.PLATFORM_REGISTRY)
     .filter(([id]) => id !== platformId)
-    .flatMap(([, config]) => config.runtimePathRules || [])
-    .map(rule => {
-      const escaped = escapeForRegex(rule.prefix);
-      const suffix = rule.suffixPattern || '';
-      return new RegExp(escaped + suffix);
-    });
+    .flatMap(([, config]) => config.rewriteExclusions || [])
+    .filter(rule => rule.ownership !== 'host-user-owned' || rule.kind === 'managed-slice')
+    .map(compilePathRule);
 }
 
-function escapeForRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function compilePathRule(rule) {
+  const normalized = normalizeRepoRelativePath(rule.path);
+  if (rule.kind === 'file' || rule.kind === 'managed-slice') {
+    return new RegExp(`^${escapeForRegex(normalized)}$`);
+  }
+  if (rule.kind === 'dir' || rule.kind === 'managed-slice-dir') {
+    return new RegExp(`^${escapeForRegex(normalized)}(?:.*)?$`);
+  }
+  if (rule.kind === 'glob') {
+    return new RegExp(`^${globToRegexSource(normalized)}$`);
+  }
+  throw new Error(`Unsupported platform registry path rule kind: ${rule.kind}`);
 }
 ```
 
-**锚定策略**：生成的正则不添加 `^` 锚点，以保持与当前硬编码 `UNREWRITTEN_PATH_PATTERNS` 一致的行为。golden snapshot 负责验证匹配字符串集合不变。若未来需要改为锚定匹配，应作为独立的 breaking change 评估。
+**锚定策略**：生成的 regex 默认添加 `^...$`，输入必须先转换为 repo-relative normalized path（统一 `/`，去掉 leading `./`）。这是目标态最佳实践。与当前未锚定 legacy pattern 的差异不应隐藏在 compiler 里，而应写入 `compatibilityDelta` / fixture / changelog。
 
-**验证策略**：golden snapshot 测试必须证明自动派生结果与当前硬编码 patterns **双向等价**，而不是只证明覆盖。若派生结果新增匹配范围，必须把该差异列为 intentional delta，并用独立 fixture 和 changelog 说明用户可见影响。
+**ownership 策略**：
+- `generated-runtime`：可由 init/clean/doctor 管理整文件或整目录。
+- `host-local`：可排除 rewrite，可由 doctor 读取 advisory facts；clean 默认不删除，除非已有明确 managed marker。
+- `host-user-owned`：不能视为 generated runtime；只能在显式 managed slice 下 upsert/remove。
+- `managed-slice` / `managed-slice-dir`：registry 只声明 slice 边界，具体 upsert/removal 必须由 host-specific module 保证 non-destructive merge。
+
+**验证策略**：**「双向等价」在现状下不可达**——已核实 cursor/kiro/codex/qoder 四个 legacy 排除列表彼此并不一致（例如 `kiro.js` 缺少 `.claude/commands/spec-[a-z-]+\.md` 与 `.cursor/agents/`，却独有一条 bare `/\.qoder\/commands\/spec\//`），单一 registry 派生结果对某些宿主必然同时「更宽」和「更窄」。因此 Phase 1 必须：
+1. **前置步骤**：对四个 legacy set 做两两 diff，产出一张**完整 delta 表**（每条注明 registry 取宽还是取窄、影响哪个宿主、用户可见影响、ownership 归类）。
+2. **验收标准改写**：从「与硬编码双向等价」改为「**等价 modulo 一张显式枚举的 delta 表**」——即除 delta 表列出的 intentional 差异外，匹配集合不变。每条 delta 用独立 fixture 与 changelog 说明。
+3. **compiler contract tests**：覆盖 `file`、`dir`、`glob`、`managed-slice`、路径归一化、锚定行为、unsupported kind 报错。
+4. **ownership contract tests**：证明 `host-user-owned` path 不会被误当 generated runtime clean，Qoder `.qoder/settings.json` 只能通过 managed hook slice 修改。
+
+golden snapshot + negative fixture 验证的是「等价 modulo delta 表」，而非无差别双向等价。
 
 ```javascript
 // tests/unit/platform-registry-patterns.test.js
@@ -424,14 +498,38 @@ for (const platformId of ['cursor', 'kiro', 'qoder']) {
 }
 ```
 
-**当前需显式处理的差异候选**：
-- `.qoder/settings.json` 与 `.qoder/settings.local.json` 是否都应被其他宿主视为 non-target runtime path；当前 Kiro hardcoded pattern 只覆盖 `.qoder/settings.local.json`。若纳入 `runtimePathRules`，其含义仅是“其他宿主内容改写时排除该 Qoder surface”，不改变 `.qoder/settings.json` 的 Qoder/user-owned ownership；spec-first 仍只能管理其中的 hook slice。
-- `.cursor/mcp.json` 是否应保持精确匹配；`prefix: '.cursor/mcp' + suffixPattern: '\\.json'` 会比当前 hardcoded pattern 更宽。
+**已知需显式处理的差异（非穷举——Phase 1 前置 diff 需补全）**：
+- `.qoder/settings.json` 与 `.qoder/settings.local.json` 是否都应被其他宿主视为 non-target runtime path；当前 Kiro hardcoded pattern 只覆盖 `.qoder/settings.local.json`。若纳入 `rewriteExclusions`，`.qoder/settings.json` 必须是 `managed-slice`，含义仅是“其他宿主内容改写时排除该 Qoder surface”，不改变 Qoder/user-owned ownership；spec-first 仍只能管理其中的 hook slice。
+- `.cursor/mcp.json` 应保持精确 `file` rule；不得用 `.cursor/mcp` + regex suffix 这类过宽表达。
+- **kiro legacy 缺 `.claude/commands/spec-[a-z-]+\.md`**（cursor/qoder 都有）：registry 派生会让 kiro 变**更宽**——需确认这是可接受的收敛。
+- **kiro legacy 缺 `.cursor/agents/`**（qoder 有）：registry 派生会让 kiro 变**更宽**。
+- **kiro legacy 独有 bare `/\.qoder\/commands\/spec\//`**：registry 只生成 `.qoder/commands/spec/[a-z-]+\.md` 等具体形态，派生会让 kiro 变**更窄**——需确认是否补一条等价 rule 或接受收窄。
+- 以上仅为已发现项；Phase 1 前置 diff 必须枚举 cursor/kiro/codex/qoder 的全部结构性差异，逐条落入 delta 表。
 
 **收益**：
-- 添加第 6 个 pointer-only 宿主时，adapter runtime path rewrite 只需在 registry 添加 `runtimePathRules`，0 行现有 adapter 代码修改
-- adapter path-rewrite 维护从 O(n²) → O(1)；完整新宿主接入仍需注册、governance scope、gitignore/context/task-pack 等消费者检查
+- 添加新的 pointer-only 编程工具时，adapter runtime path rewrite 只需在 registry 添加 `surfaces` / `rewriteExclusions`，0 行现有 adapter 代码修改
+- adapter path-rewrite 维护从 O(n²) → O(1)；完整新增工具接入仍需注册、governance scope、gitignore/context/task-pack 等消费者检查
 - 对支持 shell hooks 的新宿主，额外工作限于新增 hooks 模块和 settings/doctor/clean/drift 闭环，仍不修改其他 adapter
+
+**新增工具最小声明模板**：
+
+```javascript
+newTool: {
+  runtimeRoot: '.new-tool',
+  surfaces: {
+    pointerPath: { kind: 'managed-slice', path: '.new-tool/rules/spec-first.md', ownership: 'host-user-owned' },
+    skillsRoot: { kind: 'dir', path: '.new-tool/skills/', ownership: 'generated-runtime' },
+    agentsRoot: { kind: 'dir', path: '.new-tool/agents/', ownership: 'generated-runtime' },
+  },
+  capabilities: { hooks: { shellCommand: 'not-supported' } },
+  rewriteExclusions: [
+    { kind: 'dir', path: '.new-tool/skills/', ownership: 'generated-runtime' },
+    { kind: 'dir', path: '.new-tool/agents/', ownership: 'generated-runtime' },
+  ],
+}
+```
+
+该模板是 pointer-only 默认路径。若新工具支持 hooks，不在这个声明里直接假设可用，而是在 Phase 0 风格的 protocol spike 后补充 `settingsFile`、`hooksDir`、managed hook slice 和 confirmed/degraded capability。
 
 ### 4.4 PointerBasedAdapter 基类
 
@@ -452,6 +550,8 @@ PointerBasedAdapter 封装：
 - `getUnrewrittenPathPatterns()` → 从 registry 自动派生
 
 **抽象边界**：PointerBasedAdapter 只封装 pointer lifecycle 和 cross-host runtime path exclusion，不吞并 Cursor/Kiro/Qoder 的 `transformSkillContent`、`transformAgentContent`、frontmatter validation、host pin injection、agent tools policy 或 Qoder hook lifecycle。LOC 下降是副产物，不是硬 gate；Phase 3 的验收必须证明现有 warning/error 不减少，除非某项减少被单独记录为 intentional behavior change。
+
+**命名/契合度说明**：Qoder 既是 pointer-based 又是 hooks-capable，与 Cursor/Kiro 的纯 pointer 形态不完全同轴——基类名「PointerBased」只描述其**共享的 pointer lifecycle**，不代表 Qoder 的 hook lifecycle 被基类接管。若后续再出现第 2 个 hooks-capable 的 pointer 宿主，应重新评估是否抽出独立的 hook lifecycle mixin，而不是继续往本基类塞 hook 逻辑。另注：degraded 情形下 `templates/qoder/hooks/session-start` 脚本会被安装但不被 settings 引用，成为 managed-but-unreferenced 文件；doctor 须能识别该「degraded-by-design 死文件」状态，clean 也须能移除它，不得误判为 drift。
 
 ### 4.5 init.js 模块拆分
 
@@ -483,6 +583,8 @@ src/cli/
 ```
 
 ### 4.7 Qoder Hooks 补齐
+
+> **⚠️ 待验证假设声明（advisory, 非 confirmed contract）**：本节出现的 `.qoder/settings.json` schema、`QODER_PROJECT_DIR`、`additionalContext`、`exit 2` + stderr 阻断协议、`stop_hook_active` 防循环、`Write|Edit|MultiEdit` matcher 等协议细节，均为 **Phase 0a spike 待验证的假设**，正文示例仅表达预期形态。Phase 0a 的实测结果可推翻其中任意一项；在 0a 产出 confirmed/degraded matrix 前，不得将本节示例当作 confirmed runtime contract 直接固化实现。
 
 #### 4.7.0 Scope: Qoder CLI first
 
@@ -588,6 +690,8 @@ if (adapter.id === 'qoder') {
 
 **Degraded schema**：若 `SessionStart` shared-loader safety 未确认或失败，`.qoder/settings.json` 不写入 `SessionStart` group；可以仍安装 `.qoder/hooks/session-start` 脚本作为 managed file，但 doctor 必须把 settings entry 标为 degraded/missing-by-design，init dry-run 也不得把 session-start settings entry 当作必需 operation。
 
+**Windows 执行风险（必须在 Phase 0a 验证）**：`"command": "node .qoder/hooks/session-start"` 是相对路径 shell command string。`claude-settings.js` 当初专门从 shell-form 迁到 exec-form `{command, args}`，正是为规避 Windows 上宿主经 Git Bash/PowerShell 执行 + 相对路径解析导致的失败。此处选用 shell-string 仅为 IDE/JB loader safety，但引入两个未声明假设：(1) Qoder CLI 在 Windows 上如何执行该串（用什么 shell、`node` 的 PATH 解析）；(2) 相对 hook 路径基于哪个 cwd 解析（本 schema 隐含 cwd = 项目根）。若 Phase 0a 证明 Qoder 支持 exec-form 或绝对/占位路径，**优先采用以保住 Windows 安全性**；否则必须在本节显式记录 Windows shell 约束与 cwd 假设，不能只以 IDE/JB loader safety 作为选型理由。
+
 ### 4.8 平台兼容性加固（按需）
 
 | 加固项 | 实现位置 | 方案 |
@@ -607,7 +711,7 @@ Phase 0: Qoder Hooks ──────────────── 独立，�
                                         │
 Phase 1: Platform Registry ──────────── 独立基础设施
          │                              │
-         ├── Phase 3: PointerBasedAdapter（依赖 Phase 1 的 deriveUnrewrittenPatterns）
+         ├── Phase 3: PointerBasedAdapter（依赖 Phase 1 的 deriveUnrewrittenPatterns；其 Qoder 部分另依赖 Phase 0 的 hook lifecycle）
          │
 Phase 2: init.js 拆分 ──────────────── 依赖 Phase 0/1 稳定后启动
                                         │
@@ -618,9 +722,23 @@ Phase 5: 平台兼容性 ───────────────── 独
 
 **关键结论**：
 - Phase 0 和 Phase 1 可并行启动
-- Phase 3 硬依赖 Phase 1
+- Phase 3 硬依赖 Phase 1；**Phase 3 的 Qoder adapter 重构额外硬依赖 Phase 0**（step 4 要求「保留 Qoder hook lifecycle」，而该 lifecycle 只在 Phase 0 创建——若 Phase 3 先于 Phase 0 执行，将无 lifecycle 可保留，且两个 Phase 会在 qoder.js 上双改冲突，等同 init.js 的 Phase 0/2 迁移隐患）
 - Phase 2/4/5 在代码依赖上可独立，但建议 Phase 0/1 稳定后再启动 Phase 2，避免在 `init.js` 上并行迁移同一逻辑
 - **Phase 0 与 Phase 2 的代码迁移约定**：Phase 0 在 `init.js` 中新增的 Qoder hook 调用，将在 Phase 2 拆分 `init.js` 时同步迁移到 `init-plan.js`，避免同一逻辑被修改两次
+- **Phase 2 滑期 contingency（消除隐性时序依赖）**：Phase 2 只是优先级 3、非必做；不能让它成为 Phase 0 成果的隐藏前提。因此 Phase 0 应**直接把 Qoder hook 逻辑写成一个自包含函数/模块**（即未来 `init-plan.js` 将承载的形态，`init.js` 仅薄调用），使 Phase 2 迁移退化为「移动一个已隔离的函数」。若 Phase 2 长期不做，该逻辑仍以隔离形态留在 `init.js`，不额外恶化 3055 行瓶颈，也不阻塞 Phase 0 交付
+
+#### 最小交付基线（do-minimal baseline）
+
+方案自评当前架构为「优秀/良好」，且 Phase 1/2/3/4 均标注「无 runtime 变化 / 纯 source 重构」——合计约 4-8 天投入产出**零用户可见变化**。为避免把工程精力过度投向 contributor 便利而非用户价值，采用如下交付基线：
+
+| 批次 | 内容 | 触发条件 |
+|------|------|---------|
+| 第一批（现在做） | Phase 0（Qoder Hooks，唯一有 dogfooding 证据的真实缺口） | 无条件 |
+| 需求触发 | Phase 1 / Phase 3（Platform Registry + PointerBasedAdapter） | 出现明确的第 6 宿主接入需求或 POC 承诺 |
+| 证据触发 | Phase 2（init.js 拆分）/ Phase 4（Plugin 分层） | 出现具体维护痛点或回归事件（沿用 Phase 5 的证据触发模型），而非「文件大即瓶颈」的一般假设 |
+| 按需 | Phase 5（平台兼容性） | 见 5.2 Phase 5 触发条件 |
+
+如此第一批只交付有真实证据支撑的 Phase 0，其余 Phase 在收益兑现条件出现后再启动，避免为内部整洁投入不成比例的工期。
 
 #### 优化后完整安装执行流程图
 
@@ -639,7 +757,7 @@ flowchart TD
   G --> H["load governance and asset facts<br/>plugin manifest + skills governance + filteredAssetSet"]
   H --> I["for each selected host"]
   I --> J["resolve adapter from registry<br/>claude / codex / cursor / kiro / qoder"]
-  J --> K["derive runtimePathRules<br/>生成 other-host path exclusion<br/>只作为 rewrite exclusion facts"]
+  J --> K["derive rewriteExclusions<br/>由结构化 surface rule 编译 anchored matcher<br/>只作为 rewrite exclusion facts"]
   K --> L["adapter.planRuntimeFilesSync<br/>生成 host-native runtime operations"]
 
   L --> M{"host capability"}
@@ -688,7 +806,7 @@ Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runti
 
 | 片段 | 内容 | 出口 |
 |------|------|------|
-| Phase 0a: Qoder protocol spike | 验证 Qoder CLI `SessionStart/PreToolUse/Stop` 事件、matcher、stdin/stdout、`QODER_PROJECT_DIR`、`stop_hook_active`、shared `.qoder/settings.json` 对 IDE/JB loader safety | 产出 confirmed/degraded matrix；决定是否写入 `SessionStart` settings entry |
+| Phase 0a: Qoder protocol spike | 验证 Qoder CLI `SessionStart/PreToolUse/Stop` 事件、matcher、stdin/stdout、`QODER_PROJECT_DIR`、`stop_hook_active`、shared `.qoder/settings.json` 对 IDE/JB loader safety、**Windows 上 `command` 串的 shell/PATH 执行方式与相对 hook 路径的 cwd 解析（决定 shell-string vs exec-form/绝对路径选型）** | 产出 confirmed/degraded matrix；决定是否写入 `SessionStart` settings entry 及 hook command 形态 |
 | Phase 0b: Runtime lifecycle | 基于 0a confirmed matrix 实现 settings upsert/removal/inspect、hook scripts、adapter plan/clean/doctor/drift、focused tests | init/doctor/clean/drift 闭环通过；degraded 项显式报告 |
 
 | 步骤 | 内容 | 验收标准 |
@@ -712,6 +830,7 @@ Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runti
 - `spec-first init --qoder --dry-run` 输出包含 `.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 写入；`.qoder/hooks/session-start` 可写入，但只有 0a confirmed 时 `.qoder/settings.json` 才引用它
 - `spec-first doctor --qoder` 报告 hook 状态
 - `spec-first clean --qoder` 正确移除 hooks
+- **价值级验收（区分 confirmed 交付与空壳通过）**：至少一个 managed hook（session-start 或 guard）在**真实 Qoder CLI 会话**中被触发并成功注入 governance context / 执行预期约束。仅结构性检查（dry-run/doctor/clean）全过、但无任何 hook 在真实会话生效，**不算 Phase 0 成功交付**，必须显式标记为 degraded 交付并记录未兑现的 governance injection 及原因——避免「验收全绿但存在理由（补齐自身宿主 governance）未兑现」的空壳通过。
 - 若 IDE/JB plugin hook behavior 未验证，文档和 doctor 文案不得声称支持 IDE/JB plugin hooks；若 shared-loader safety 未验证或失败，doctor 必须报告 Qoder CLI session-start degraded
 - `npm test` 全通过
 
@@ -719,13 +838,17 @@ Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runti
 
 | 步骤 | 内容 | 验收标准 |
 |------|------|---------|
-| 1 | 新建 `src/cli/adapters/platform-registry.js` | 5 宿主完整声明 + `deriveUnrewrittenPatterns` |
-| 2 | 新建 golden snapshot + negative fixture 测试 | 派生结果与当前硬编码双向等价；intentional delta 必须显式记录 |
-| 3 | 逐一替换 cursor/kiro/qoder 排除列表 | 改用 `deriveUnrewrittenPatterns(this.id)` |
-| 4 | 移除硬编码 patterns 常量 | 清理旧代码 |
+| 1 | 对现有 adapter legacy exclusion sets 做完整 diff | 产出 delta 表：每条注明取宽/取窄、影响宿主、ownership、用户可见影响 |
+| 2 | 新建 `src/cli/adapters/platform-registry.js` | 5 宿主完整 surface declaration：`surfaces`、`rewriteExclusions`、`capabilities`、ownership |
+| 3 | 新建 path-rule compiler | 支持 `file`/`dir`/`glob`/`managed-slice`/`managed-slice-dir`，默认 anchored + repo-relative normalized path |
+| 4 | 新建 compiler / golden / negative / ownership fixture 测试 | 证明除显式 delta 外匹配集合不变；host-user-owned 不会被 clean 当 generated runtime |
+| 5 | 逐一替换 cursor/kiro/qoder 排除列表 | 改用 `deriveUnrewrittenPatterns(this.id)`，不改 host-specific transform/doctor 语义 |
+| 6 | 移除硬编码 patterns 常量 | 清理旧代码；新增编程工具接入只需新增 registry declaration + adapter 注册 |
 
 **验收标准**：
-- golden snapshot 测试证明覆盖不变，negative fixture 证明未新增误匹配
+- golden snapshot 测试证明覆盖不变 modulo delta 表，negative fixture 证明未新增未声明误匹配
+- path-rule compiler 对 unsupported kind、未声明 ownership、非 normalized path 报错
+- 新增一个 pointer-only fixture host，证明新增工具只需 registry declaration + adapter 注册，不修改既有 adapter exclusion code
 - `spec-first init --dry-run` 输出对 cursor/kiro/qoder 无差异
 - `npm test` 全通过
 
@@ -747,7 +870,7 @@ Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runti
 - 全量测试通过（unit + smoke + integration）
 - 所有 `require('../commands/init')` 调用点不变
 
-#### Phase 3: PointerBasedAdapter 基类（1-2 天，依赖 Phase 1）
+#### Phase 3: PointerBasedAdapter 基类（1-2 天，依赖 Phase 1；Qoder 部分另依赖 Phase 0）
 
 | 步骤 | 内容 | 验收标准 |
 |------|------|---------|
@@ -790,20 +913,34 @@ Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runti
 
 **默认行为**：Phase 5 不修改默认 CLI 行为；所有加固项均为 opt-in，错误消息语言一致性只覆盖 opt-in 路径。
 
-### 5.3 新宿主接入理想流程（优化后）
+### 5.3 新增编程工具接入理想流程（优化后）
 
 ```text
-1. 在 platform-registry.js 添加声明          (~20L)
-2. 新建 adapters/new-host.js 继承 PointerBasedAdapter  (~100L)
-3. 在 adapters/index.js 注册                 (+2L)
-4. 在 skills-governance.json 添加 scope       (~5L)
-5. 写测试                                    (~300L)
+1. 在 platform-registry.js 添加 surface declaration
+   - runtimeRoot
+   - surfaces + ownership
+   - rewriteExclusions
+   - capabilities
+2. 新建 adapters/new-tool.js 继承 PointerBasedAdapter
+3. 在 adapters/index.js 注册
+4. 在 skills-governance.json 添加 scope
+5. 写 focused tests
+   - registry schema / compiler fixtures
+   - init dry-run output
+   - doctor / clean ownership behavior
+   - existing hosts output unchanged
 
 总计: ~430L 新增/修改，其中现有非 adapter 注册/governance 约 7L；0 行现有 adapter 代码修改
 预估: 1 天（pointer-only 且不触碰其他 runtime consumers）
 ```
 
-**适用范围**：上述流程适用于 pointer-only 宿主（Cursor/Kiro 类型），且只承诺 adapter path-rewrite O(1)。完整新宿主接入仍需检查 gitignore/context-bundle/task-pack/target-repo/plugin 等 runtime-path consumers。若新宿主支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），参考成本为额外 +2-4 天、+300-600L source/tests，取决于 settings schema、hook script 数量、doctor/clean/drift 闭环和跨 surface 兼容验证；但仍不修改现有 adapter。
+**适用范围**：上述流程适用于 pointer-only 编程工具（Cursor/Kiro 类型），且只承诺 adapter path-rewrite O(1)。完整新增工具接入仍需检查 gitignore/context-bundle/task-pack/target-repo/plugin 等 runtime-path consumers。若新工具支持 shell hooks，则需额外增加 hooks 模块（类似 Qoder Hooks 的 Phase 0），参考成本为额外 +2-4 天、+300-600L source/tests，取决于 settings schema、hook script 数量、doctor/clean/drift 闭环和跨 surface 兼容验证；但仍不修改现有 adapter。
+
+**新增工具接入不变量**：
+- 不修改任何既有 adapter 的 rewrite exclusion 常量；若必须修改，说明 registry 抽象失败或发现了旧 host bug，需作为 intentional behavior change 记录。
+- 不把新工具的 host-user-owned 文件加入 generated runtime clean 范围；只能通过 managed-slice module 操作。
+- 不以 `capabilities.hooks.shellCommand` 代替协议验证；hooks-capable 工具必须有 confirmed/degraded matrix。
+- 不把 IDE plugin、CLI、JetBrains plugin 等同名不同 surface 默认视为同一 runtime contract；共享配置文件必须单独做 loader safety。
 
 vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
@@ -815,7 +952,7 @@ vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
 
 | 测试类型 | 覆盖范围 | 运行命令 |
 |---------|---------|---------|
-| Unit | platform-registry patterns, qoder-settings, init module exports | `npm run test:unit` |
+| Unit | platform-registry path-rule compiler / ownership contracts, qoder-settings, init module exports | `npm run test:unit` |
 | Smoke | CLI help, init dry-run, doctor JSON, clean dry-run | `npm run test:smoke` |
 | Integration | init→doctor→clean 全链路 per-host | `npm run test:integration` |
 | Golden snapshot | init --dry-run 输出 before/after 对比 | 新增测试脚本 |
@@ -854,7 +991,8 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI h
 | Qoder CLI 与 IDE/JB hooks surface 被误认为完全一致 | 误报 IDE/JB support 或生成 IDE/JB 不识别的 `.qoder/settings.json` | Phase 0 只声明 Qoder CLI behavior confirmed；IDE/JB 只做 loader safety，不做 behavior support |
 | `.qoder/settings.json` 引用的 hook script 未实际安装 | hook matcher 存在但运行时报 ENOENT，doctor 误判健康 | Qoder adapter plan/clean/doctor/drift 同时覆盖 settings managed groups 与 `.qoder/hooks/*` managed scripts |
 | `.qoder/settings.json` / `.qoder/hooks/**` ownership 未声明清楚 | clean/drift 误删用户配置或把 Qoder/user-owned 文件当整目录 generated runtime | Phase 0 先更新 source/runtime customization boundary 和 context/gitignore rules，明确 managed slice-only contract |
-| Platform Registry 派生 patterns 比 legacy 更宽 | runtime path rewrite 误报或误改写非目标路径 | 双向等价 + representative negative fixtures；intentional delta 单独记录 |
+| Platform Registry 派生 matchers 比 legacy 更宽 | runtime path rewrite 误报或误改写非目标路径 | anchored compiler + representative negative fixtures；intentional delta 单独记录 |
+| 新增编程工具声明遗漏 ownership | clean/doctor/drift 把 host-user-owned 文件误当 generated runtime | registry schema/contract test 要求每条 surface/rewriteExclusion 声明 ownership；host-user-owned 只能 managed-slice 修改 |
 | PointerBasedAdapter 抽象吞掉 host-specific checks | doctor 回归漏报 frontmatter、agent tool pin、runtime path rewrite 问题 | Phase 3 验收比较 refactor 前后 Cursor/Kiro/Qoder warning/error 集合 |
 | Plugin 拆分破坏 skill-entrypoints lint | governance 校验失败 | `npm run lint:skill-entrypoints` 作为门禁 |
 
@@ -864,7 +1002,7 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI h
 
 | 重构项 | 对 governance 影响 | 需修改 governance? |
 |--------|-------------------|-------------------|
-| Platform Registry | 不影响（声明路径，不涉及 delivery） | 否 |
+| Platform Registry | 不影响（声明 host surface / rewrite exclusions，不涉及 delivery） | 否 |
 | init.js 拆分 | 不影响（governance 由 plugin.js 管理） | 否 |
 | PointerBasedAdapter | 不影响（delivery 由 plugin.js 决定） | 否 |
 | Plugin 分层 | ⚠️ 内部拆分需保持 `buildFilteredAssetSet` API 不变 | 否（接口不变） |
@@ -898,14 +1036,16 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder CLI h
 | Hook 覆盖度 | **中等** — Claude 完整、Codex 部分、Qoder 缺失 |
 | 生命周期对称性 | **良好** — 少数缺口是设计权衡 |
 
-### 优化优先级排序（按 收益/成本 比）
+### 优化优先级排序（按战略重要性）
+
+> 注：本表按**战略重要性**排序，不是纯收益/成本比。Qoder Hooks 成本最高（3-5 天）且需协议 spike（可能只能降级交付），在纯收益/成本比维度上**低于** Platform Registry（1-2 天、确定）；它排首位是因为同时解决 spec-first 自身的 dogfooding 缺口与当前最大用户可见功能缺口这一战略权重。
 
 | 优先级 | Phase | 收益 | 成本 | 依赖 |
 |--------|-------|------|------|------|
 | 1 | Qoder Hooks | 补齐自身宿主最大功能缺口，直接影响 dogfooding 与 Qoder 用户体验；先用 0a 协议 spike 防止固化错误 hook contract | 3-5 天 | 无 |
 | 2 | Platform Registry | 消除 adapter path-rewrite O(n²)，新宿主无需修改既有 adapter | 1-2 天 | 无 |
 | 3 | init.js 拆分 | 可维护性瓶颈解除 | 2-3 天 | 无 |
-| 4 | PointerBasedAdapter | 收敛 pointer lifecycle 重复；LOC 下降为趋势指标，诊断等价优先 | 1-2 天 | Phase 1 |
+| 4 | PointerBasedAdapter | 收敛 pointer lifecycle 重复；LOC 下降为趋势指标，诊断等价优先 | 1-2 天 | Phase 1（Qoder 部分另依赖 Phase 0） |
 | 5 | Plugin 分层 | 降低 contributor 理解成本 | 1 天 | 无 |
 | 6 | 平台兼容性 | 企业场景覆盖 | 1-2 天 | 无 |
 

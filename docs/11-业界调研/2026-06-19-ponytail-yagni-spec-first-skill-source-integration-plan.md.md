@@ -32,7 +32,7 @@ spec-write-tasks
   -> 复用现有 context_refs / stop_if / review_focus，不新增 task 字段
 spec-compound
   -> 用现有 best_practice / convention + pattern + invalidation_condition 沉淀最小实现经验
-spec-skill-audit
+retired-skill-review
   -> 仅补 rubric nuance，防 skill 自身诱导 broad generation
 ```
 
@@ -43,7 +43,7 @@ spec-skill-audit
 | P0 | `spec-code-simplicity-reviewer` 接入 `spec-code-review` | 已有 agent 语义贴合，但当前输出 Markdown，需改成 JSON findings 并进入 conditional selector |
 | P0 | `spec-plan` + `spec-work` 最小实现边界 | 加轻量语义合同，不加机器 schema，不强制每个 plan 生成大段模板 |
 | P1 | `spec-write-tasks` / `spec-compound` / `spec-optimize` | 全部复用既有 contract，除非真实需求证明必须扩 schema |
-| P2 | `spec-skill-audit` 反膨胀审计 nuance | 只补 rubric，不新建脚本规则引擎 |
+| P2 | `retired-skill-review` 反膨胀审计 nuance | 只补 rubric，不新建脚本规则引擎 |
 
 关键取舍：
 
@@ -87,7 +87,7 @@ spec-skill-audit
 | task-pack fields | `src/cli/task-pack.js:13-38` | `REQUIRED_TASK_FIELDS` / `ALLOWED_TASK_FIELDS` 固定，不应随手新增 `minimality_refs` 等字段 |
 | task-pack parity | `skills/spec-write-tasks/references/task-pack-schema.md:164-166`，`tests/unit/spec-write-tasks-contracts.test.js:193-223` | 新字段必须同步 schema / validator / tests；本方案建议不新增 |
 | compound schema | `skills/spec-compound/references/schema.yaml:25-35`，`:48-68`，`:221-229` | `problem_type: knowledge` 无效；应使用 `best_practice` / `convention` + `pattern` + `invalidation_condition` |
-| skill-audit coverage | `skills/spec-skill-audit/SKILL.md:83-87`，`references/expert-audit-rubric.md:35-44` | 已覆盖 progressive disclosure，Ponytail 启发只需补 broad generation nuance |
+| skill-review coverage | `skills/retired-skill-review/SKILL.md:83-87`，`references/expert-audit-rubric.md:35-44` | 已覆盖 progressive disclosure，Ponytail 启发只需补 broad generation nuance |
 | thin CLI wrappers | `src/cli/skills.js:1-29`，`agents.js:1-19`，`spec-commands.js:1-12` | 不把 YAGNI 语义塞进 CLI wrapper |
 | plugin manifest | `src/cli/plugin.js:112-147`，`src/cli/contracts/dual-host-governance/skills-governance.json` | 新增 public skill 才需要 governance + command template；本方案不建议 P0 新增 public skill |
 
@@ -586,9 +586,9 @@ guardrails:
 
 ---
 
-## 11. P2：`spec-skill-audit` 只补反膨胀 nuance
+## 11. P2：`retired-skill-review` 只补反膨胀 nuance
 
-`spec-skill-audit` 已经检查：
+`retired-skill-review` 已经检查：
 
 - trigger precision；
 - scope boundaries；
@@ -608,15 +608,15 @@ Flag skills that encourage broad generation, speculative artifacts, unbounded im
 可改：
 
 ```text
-skills/spec-skill-audit/SKILL.md
-skills/spec-skill-audit/references/expert-audit-rubric.md
-tests/unit/skill-audit-scripts.test.js
+skills/retired-skill-review/SKILL.md
+skills/retired-skill-review/references/expert-audit-rubric.md
+tests/unit/skill-review-scripts.test.js
 ```
 
 不建议改：
 
 ```text
-skills/spec-skill-audit/scripts/write-audit-artifacts.js
+skills/retired-skill-review/scripts/write-audit-artifacts.js
 scripts/lint-skill-entrypoints.js
 scripts/lint-skill-entrypoints.config.json
 ```
@@ -790,13 +790,13 @@ npx jest tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-compound-
 - compound 使用合法 `problem_type` enum；
 - new promoted learning 带 `source_refs` 和 string `invalidation_condition`。
 
-### Phase 4：optimize / skill-audit 后续增强
+### Phase 4：optimize / skill-review 后续增强
 
 目标：只在真实需求出现时再扩。
 
 ```text
 spec-optimize：显式 metric-driven code reduction mode
-spec-skill-audit：rubric nuance，不新增脚本规则引擎
+retired-skill-review：rubric nuance，不新增脚本规则引擎
 ```
 
 ---
@@ -810,7 +810,7 @@ spec-skill-audit：rubric nuance，不新增脚本规则引擎
 | plan/work prompt 改造 | `npx jest tests/unit/spec-plan-contracts.test.js tests/unit/spec-work-contracts.test.js --runInBand` |
 | task-pack prose 承接 | `npx jest tests/unit/spec-write-tasks-contracts.test.js --runInBand` |
 | compound learning guidance | `npx jest tests/unit/spec-compound-contracts.test.js --runInBand` |
-| skill-audit nuance | `npx jest tests/unit/skill-audit-scripts.test.js --runInBand` |
+| skill-review nuance | `npx jest tests/unit/skill-review-scripts.test.js --runInBand` |
 | 全局 source sanity | `npm run lint`、`npm run typecheck` |
 | 发布前 | `npm test`、`npm run build` |
 

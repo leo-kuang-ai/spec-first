@@ -5,7 +5,7 @@
 
 ## 结论
 
-本轮复审覆盖 `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md` 中已标记“已完成 / 已审查”的 21 个 CE -> spec-first skill pair，并排除 `ce-setup -> spec-mcp-setup`。
+本轮复审覆盖 `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md` 中已标记“已完成 / 已审查”的 21 个 CE -> spec-first skill pair，并排除 `ce-setup -> spec-mcp-setup`。
 
 总体结论：
 

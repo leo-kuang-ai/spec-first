@@ -30,7 +30,7 @@ Graph readiness artifacts 当前是 2026-05-16 针对旧 clean worktree 生成�
 | U7 Domain language / ADR / decision ledger | Phase 2 让 plan/work/debug/review 先消费 repo-local domain artifacts、ADR-like docs 和 decision notes，缺失时只 advisory。 | passed |
 | U8 Feedback-loop-first / vertical slicing | Phase 2 为 debug/work/task guidance 增加最小反馈环、not-possible reason 和 vertical tracer bullet 要求。 | passed |
 | U9 Release/source-runtime continuity guards | Phase 3 新增 deterministic `scripts/check-release-continuity.cjs`，并接入 `release-governance`，覆盖 catalog freshness、summary coverage、package surface、website gate preservation 和 README boundary links。 | passed |
-| U10 Public surface / rejected-scope replay | Phase 3 让 skill-audit 消费 guard facts，让 plan/work/sessions/compound 消费 provenance-backed rejected/out-of-scope rationale 作为 advisory boundary evidence。 | passed |
+| U10 Public surface / rejected-scope replay | Phase 3 让 skill-review 消费 guard facts，让 plan/work/sessions/compound 消费 provenance-backed rejected/out-of-scope rationale 作为 advisory boundary evidence。 | passed |
 | U11 Closeout checklist | 每阶段均记录 validation artifact、CHANGELOG、runtime impact、fresh-source eval/not-run reason；本 artifact 为最终 closeout。 | passed |
 | U12 Token economy / progressive disclosure | Phase task packs、contract summary、deterministic inventory、minimal replay consumer、review dispatch sizing 与 durable checkpoint guidance 已落到 source 和 tests。 | passed |
 

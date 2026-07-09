@@ -11,7 +11,7 @@
 
 但从顶尖 prompt 工程标准看，当前最大风险不是“prompt 不够聪明”，而是 **contract、eval、safety 和输出可组合性不均匀**：
 
-- 高流量 public workflows 大多还没有最小 eval fixtures。21 个 `workflow_command` 中只有 `spec-graph-bootstrap` 为 ready，`spec-skill-audit` 为 partial，其余 19 个 missing。
+- 高流量 public workflows 大多还没有最小 eval fixtures。21 个 `workflow_command` 中只有 `spec-graph-bootstrap` 为 ready，`retired-skill-review` 为 partial，其余 19 个 missing。
 - 部分执行型 skill 存在高风险默认行为：`git-worktree` 默认复制 `.env*`，`spec-work-beta` 成功 batch commit 时会 stage 所有未跟踪文件。
 - reviewer 类 agents 的 JSON / severity / confidence 体系明显强于 researcher、strategist、writer、manual deep-dive 类 agents，后者缺少统一的证据、限制、输出形状要求。
 - `spec-work` / `spec-work-beta`、`spec-plan`、`spec-code-review` 等核心 skill 很强，但长文档密度过高，容易让宿主模型遗漏后置规则。需要通过 progressive disclosure、contract tests 和 shared reference 机制降低 drift。
@@ -32,8 +32,8 @@
 
 确定性事实：
 
-- 执行：`node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .`
-- 产物：`.spec-first/audits/skill-audit/latest/`
+- 执行：`node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .`
+- 产物：`.spec-first/audits/skill-review/latest/`
 - source skills：42
 - source agents：51
 - governance records：42
@@ -335,7 +335,7 @@ Anthropic 侧建议：
 证据：
 
 - `eval-readiness-report.json` 显示 42 个 skill 中 39 missing、2 ready、1 partial。
-- 21 个 `workflow_command` 中，只有 `spec-graph-bootstrap` ready，`spec-skill-audit` partial，其余 19 个 missing。
+- 21 个 `workflow_command` 中，只有 `spec-graph-bootstrap` ready，`retired-skill-review` partial，其余 19 个 missing。
 - missing 范围包括 `spec-brainstorm`、`spec-plan`、`spec-work`、`spec-code-review`、`spec-doc-review`、`spec-mcp-setup`、`spec-update` 等核心入口。
 
 反证检查：
@@ -556,7 +556,7 @@ Anthropic 侧建议：
 | spec-session-extract | internal_only | 66 | missing | 63 | 补 eval fixtures 和最小 I/O/failure contract |
 | spec-session-inventory | internal_only | 63 | missing | 67 | 补 eval fixtures 和最小 I/O/failure contract |
 | spec-sessions | workflow_command/sessions | 72 | missing | 32 | 补 eval fixtures 和最小 I/O/failure contract |
-| spec-skill-audit | workflow_command/skill-audit | 86 | partial | 209 | 保持，补 failure/expected eval |
+| retired-skill-review | workflow_command/skill-review | 86 | partial | 209 | 保持，补 failure/expected eval |
 | spec-slack-research | workflow_command/slack-research | 71 | missing | 42 | 补 eval fixtures 和最小 I/O/failure contract |
 | spec-standards | workflow_command/standards | 62 | missing | 416 | 补 eval fixtures 和最小 I/O/failure contract |
 | spec-update | workflow_command/update | 63 | missing | 253 | P2：runtime repair 需 eval |
@@ -676,7 +676,7 @@ Anthropic 侧建议：
 - `npm run typecheck`
 - 相关 shell/script unit tests
 - `npm run lint:skill-entrypoints`
-- `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .`
+- `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .`
 
 ### Phase B：建立最小 contract
 
@@ -688,7 +688,7 @@ Anthropic 侧建议：
 验证：
 
 - 新增 contract lint。
-- skill-audit summary 中 public workflow eval missing 数下降。
+- skill-review summary 中 public workflow eval missing 数下降。
 
 ### Phase C：治理 drift 和持续质量
 

@@ -4,7 +4,7 @@ authority: review-evidence
 status: active-artifact
 lifecycle: active-artifact
 review_date: 2026-07-01
-review_method: spec-skill-audit deterministic artifacts + Graphify advisory query + source direct reads + focused contract/test inspection
+review_method: retired-skill-review deterministic artifacts + Graphify advisory query + source direct reads + focused contract/test inspection
 relates_to:
   - docs/10-prompt/结构化项目角色契约.md
   - docs/contracts/ai-coding-harness.md
@@ -63,8 +63,8 @@ Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 确定性事实：
 
-- 已运行 `node .agents/skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --run-id core-link-skill-flow-audit-2026-07-01`
-- 产物目录：`.spec-first/audits/skill-audit/core-link-skill-flow-audit-2026-07-01/`
+- 已运行 `node .agents/skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --run-id core-link-skill-flow-audit-2026-07-01`
+- 产物目录：`.spec-first/audits/skill-review/core-link-skill-flow-audit-2026-07-01/`
 - 报告显示 37 个 skill 被扫描，核心链路 skill 的 eval readiness 均为 ready；deterministic score 只是 review signal，不是 gate。
 - 运行 `--runtime` 时 runtime drift 子检查因 trusted-checkout guard 拒绝，不能声明 runtime drift 检查通过。
 
@@ -74,7 +74,7 @@ Advisory 导航：
 
 LLM 语义判断：
 
-- P0/P1/P2 定级基于 source 证据、反证和角色契约，不直接采用 skill-audit JSON 的关键词扫描结论。
+- P0/P1/P2 定级基于 source 证据、反证和角色契约，不直接采用 skill-review JSON 的关键词扫描结论。
 
 ## 核心流程评估
 
@@ -195,7 +195,7 @@ Knowledge 不只是“写入新 learning”，还包括让旧 learning 与当前
 
 **证据**
 
-skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 ready，但 trigger discovery readiness 多为 partial，常见缺项是 frontmatter negative boundary 或显式 positive/negative trigger examples。原始核心样例：
+skill-review 确定性报告显示核心链路 skill 的 eval readiness 均为 ready，但 trigger discovery readiness 多为 partial，常见缺项是 frontmatter negative boundary 或显式 positive/negative trigger examples。原始核心样例：
 
 - `spec-plan`、`spec-work`、`spec-code-review`、`spec-doc-review`、`spec-compound` 的 frontmatter description 不足以单独呈现所有 near-neighbor 边界。
 - `spec-work` 的 description 是 “Execute work efficiently while maintaining quality and finishing features”，比 body contract 宽；body 在 `skills/spec-work/SKILL.md:13-39` 才给出真正的 when-to-use / when-not-to-use / failure modes。
@@ -270,7 +270,7 @@ skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 re
 
 已执行：
 
-- `node .agents/skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --run-id core-link-skill-flow-audit-2026-07-01`
+- `node .agents/skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --run-id core-link-skill-flow-audit-2026-07-01`
 - `graphify query "核心链路 skill spec-brainstorm spec-prd spec-plan spec-write-tasks spec-work spec-code-review spec-doc-review spec-compound spec-compound-refresh 的职责边界和 handoff 关系" --budget 2500`
 - source direct reads：本报告 frontmatter `relates_to` 中列出的核心 skill、合同与文档。
 - focused test/source inspection：`runtime-capability-catalog.test.js`、`spec-work-contracts.test.js`、`public-workflow-contract-summary.test.js`。

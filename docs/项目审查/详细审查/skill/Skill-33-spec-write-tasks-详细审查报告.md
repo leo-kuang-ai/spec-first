@@ -19,7 +19,7 @@
 - 事实 1：原报告位置为 docs/项目审查/2026-06-20-全量-skill-agent-优化建议.md:64；深审 docs/项目审查/2026-06-20-全量-skill-agent-优化建议.md:329。
 - 事实 2：存在：`skills/spec-write-tasks/SKILL.md`，431 行。
 - 事实 3：资源目录计数：references=2，scripts=0，evals=5，assets=0。
-- 事实 4：原报告建议为：结构较成熟。下一步统一 eval fixture 与 `spec-skill-audit` checker，确保 `boundary-cases` / `failure-cases` 被算入 readiness。补 derived artifact stale/invalidation cases，防止 task pack 变第二 source of truth。
+- 事实 4：原报告建议为：结构较成熟。下一步统一 eval fixture 与 `retired-skill-review` checker，确保 `boundary-cases` / `failure-cases` 被算入 readiness。补 derived artifact stale/invalidation cases，防止 task pack 变第二 source of truth。
 
 ### 2.2 推断
 
@@ -62,20 +62,20 @@
 
 ### 3.3 优化建议
 
-- 统一 eval fixture 格式，让 `boundary-cases` / `failure-cases` 被 `spec-skill-audit` readiness checker 稳定识别；补 derived artifact invalidation 条款。
+- 统一 eval fixture 格式，让 `boundary-cases` / `failure-cases` 被 `retired-skill-review` readiness checker 稳定识别；补 derived artifact invalidation 条款。
 - 用最小 contract summary 固化 When To Use / When Not To Use / Inputs / Outputs / Failure Modes。
 - 对高权限、外部依赖或 mutating 场景，保留 `file-backed fixture`、`input_files`、`output contract`、`rollback boundary`、`missing evidence` 标签，避免伪造 trust evidence。
 
 ### 3.4 风险提示
 
 - 过度治理会让入口变重；治理证据应放在 references/evals/reports，而不是堆进主 prompt。
-- 不应把 spec-skill-audit 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
+- 不应把 retired-skill-review 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
 
 ## 4. 视角 B：$skill-creator:skill-creator 审查结论
 
 ### 4.1 核心判断
 
-从 skill-creator 视角看，spec-write-tasks 需要稳定“触发描述、执行步骤、输出契约、失败回退、验证样例”这五件事。当前最大缺口是：结构较成熟。下一步统一 eval fixture 与 `spec-skill-audit` checker，确保 `boundary-cases` / `failure-cases` 被算入 readiness。补 derived artifact stale/invalidation cases，防止 task pack 变第二 source of truth。
+从 skill-creator 视角看，spec-write-tasks 需要稳定“触发描述、执行步骤、输出契约、失败回退、验证样例”这五件事。当前最大缺口是：结构较成熟。下一步统一 eval fixture 与 `retired-skill-review` checker，确保 `boundary-cases` / `failure-cases` 被算入 readiness。补 derived artifact stale/invalidation cases，防止 task pack 变第二 source of truth。
 
 ### 4.2 主要问题
 

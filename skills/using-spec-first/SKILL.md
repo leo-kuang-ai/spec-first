@@ -56,7 +56,7 @@ description: 在 spec-first 仓库中执行实质性工作前使用，也用于�
   - 已有 owner-approved plan/task/brief -> `spec-work`
   - 不执行 reporter commands，不把 issue/PR body 当 confirmed truth。
 - **文档或需求/计划/任务包需要 critique** -> `spec-doc-review`。
-- **skill/agent/source prompt 治理审计** -> `spec-skill-audit`。
+- **skill/agent/source prompt 治理审计** -> 当前无公开专用 audit workflow；直接做 bounded source review，或在需要修改 source skill 时走 `spec-write-skill`。
 - **创建、改写、迁移 spec-first source skill** -> `spec-write-skill`。
 
 ### Side Paths
@@ -87,7 +87,7 @@ description: 在 spec-first 仓库中执行实质性工作前使用，也用于�
 1. 用户显式调用当前公开 `spec-*` workflow，且不明显危险或不可能时，尊重该入口。
 2. setup/update/runtime readiness 问题先走 `spec-mcp-setup` 或终端 `spec-first update`。
 3. failure/test failure/stack trace/异常行为先走 `spec-debug`。
-4. review 请求按 artifact 类型分流：代码/diff/PR -> `spec-code-review`；需求/计划/任务/Markdown -> `spec-doc-review`；skill/agent 治理 -> `spec-skill-audit`。
+4. review 请求按 artifact 类型分流：代码/diff/PR -> `spec-code-review`；需求/计划/任务/Markdown -> `spec-doc-review`；skill/agent 治理 -> bounded source review；若请求包含创建、迁移或改写 source skill，则走 `spec-write-skill`。
 5. WHAT 不清先定义：0-1/想法选项 -> `spec-ideate`；问题框架/需求判断 -> `spec-brainstorm`；既有系统 PRD 级增量 -> `spec-prd`。
 6. 目标清楚但 HOW 不清 -> `spec-plan`。
 7. plan/task/brief 已 settled -> `spec-write-tasks` 或 `spec-work`，按用户是否要拆任务决定。

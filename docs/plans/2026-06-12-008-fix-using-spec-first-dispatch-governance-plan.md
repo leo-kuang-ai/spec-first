@@ -18,7 +18,7 @@ This plan resolves the governance drift found while auditing `skills/using-spec-
 ## Decision Brief
 
 - **Recommended approach:** Keep the current source/test direction: public workflow invocation authorizes the workflow, but Codex host-level `spawn_agent` still requires explicit subagent/delegation/parallel/persona wording or an already authorized parent context.
-- **Key decisions:** Treat `skills/using-spec-first/SKILL.md` and dispatch workflow tests as the semantic source; make `src/cli/instruction-bootstrap.js` a compressed projection; route skill/agent asset audits to `spec-skill-audit`; upgrade examples from context-only prose into machine-judgable routing fixtures.
+- **Key decisions:** Treat `skills/using-spec-first/SKILL.md` and dispatch workflow tests as the semantic source; make `src/cli/instruction-bootstrap.js` a compressed projection; route skill/agent asset audits to `retired-skill-review`; upgrade examples from context-only prose into machine-judgable routing fixtures.
 - **Validation focus:** Bootstrap/full-skill drift tests, doc-review/code-review dispatch contract tests, prompt example fixture tests, checked-in `AGENTS.md`/`CLAUDE.md` managed block parity, and fresh-source eval disclosure.
 - **Acknowledged product tradeoff:** Under the canonical contract, a Codex user running the obvious `spec-doc-review <path>` gets single-agent report-only review unless they also signal subagents/personas. This deliberately trades out-of-box review depth on the most common Codex path for host-boundary safety, because `spawn_agent` is an unprompted side-effect the user did not ask for. This posture is intentional; the mitigation is a *loud* fallback that tells the Codex user how to opt into multi-persona in one line, so the default still teaches the capability rather than silently degrading it. The implementation must test for that user-facing opt-in guidance, not just the machine reason code.
 - **Largest risks / boundaries:** The main risk is flipping dispatch semantics by accident. Historical docs that teach the old model where plain document-review workflow entry is enough for persona fan-out are superseded unless intentionally revived with a broader contract change. The strict contract is not merely "what tests happen to encode": it was a deliberate, dated reversal — commit `fc3d43c1` (2026-05-24, "闭合 must-fix 批次") introduced the stricter `spec-doc-review` wording *after* the 2026-05-05 learning, so the strict reading is the most recent adjudication, not an accident.
@@ -31,7 +31,7 @@ The audit of `skills/using-spec-first` surfaced four governance issues:
 
 - The full skill's `Workflow Dispatch Admission` section states that routing into a public workflow does not override host-level subagent tool contracts, and Codex should call `spawn_agent` only with explicit subagent/delegation/parallel/persona wording or an already authorized parent context.
 - `src/cli/instruction-bootstrap.js` and the checked-in Codex managed block still state that public `spec-*` invocation is sufficient for documented read-only reviewer/researcher phases and unconditional Codex reviewer fan-out.
-- `Spec-First Self-Work` routes review-only requests only to `spec-code-review` or `spec-doc-review`, even though skill/agent asset review should route to `spec-skill-audit`.
+- `Spec-First Self-Work` routes review-only requests only to `spec-code-review` or `spec-doc-review`, even though skill/agent asset review should route to `retired-skill-review`.
 - `skills/using-spec-first/evals/examples.json` contains useful examples, but current tests only validate examples-as-context shape; they do not mechanically catch route/dispatch drift.
 
 This is a workflow governance fix, not a review workflow redesign. The implementation should repair source-of-truth wording, generator projections, tests, eval fixtures, and durable docs so future agents cannot reintroduce the same ambiguity.
@@ -43,7 +43,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 - R1. Establish one current dispatch authorization contract for `using-spec-first`, bootstrap blocks, and dispatch-bearing review workflows.
 - R2. Remove bootstrap wording that implies direct public `spec-*` invocation alone authorizes Codex `spawn_agent`.
 - R3. Preserve the distinction between workflow admission and host-level dispatch authorization for the confirmed drift surfaces: `spec-doc-review`, `spec-code-review`, and the `using-spec-first` prose that mentions dispatch-bearing workflows such as `spec-plan`/`spec-ideate`. This plan should not claim broad cross-skill routing-eval coverage beyond the fixtures it actually adds.
-- R4. Route skill/agent asset audit requests to `spec-skill-audit`, not only to code/doc review.
+- R4. Route skill/agent asset audit requests to `retired-skill-review`, not only to code/doc review.
 - R5. Add machine-judgable routing/dispatch eval fixtures so tests can catch future drift, while keeping examples usable as context for prompt evaluation.
 - R6. Keep the source/runtime boundary intact: update source files and generator-managed checked-in blocks; do not hand-edit generated mirrors under `.claude/`, `.codex/`, or `.agents/skills/`.
 - R7. Update `CHANGELOG.md` and any stale durable learning or docs that would otherwise teach the old dispatch contract.
@@ -79,7 +79,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 ## Completion Criteria
 
 - `skills/using-spec-first/SKILL.md`, `src/cli/instruction-bootstrap.js`, `AGENTS.md`, and `CLAUDE.md` no longer conflict on Codex dispatch authorization.
-- `using-spec-first` self-work routing names `spec-skill-audit` for skill and agent asset audits.
+- `using-spec-first` self-work routing names `retired-skill-review` for skill and agent asset audits.
 - Focused tests fail on the old bootstrap dispatch wording and pass on the new contract.
 - Routing fixtures can express expected entrypoint, dispatch decision, and fallback reason for the Codex-surface dispatch cases this plan owns. `host` and `mode` stay deferred as schema fields, so Codex scope must be explicit in case ids, names, and boundary notes rather than implied by host-neutral metadata.
 - The no-authorization fallback path includes user-facing opt-in guidance for multi-persona/subagent review, not only `dispatch_authorization_missing`.
@@ -110,7 +110,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 - **source_reads_required:** implementation should reread every target file and its current diff immediately before editing, especially `CHANGELOG.md` and generator-managed host instruction slices, because the worktree may already contain unrelated or partially related modifications. For generator-rendered blocks, capture a pre-change diff baseline, run the generator path, then inspect the post-change diff before accepting it; unrelated neighboring refactor hunks must be preserved or the implementation stops for reconciliation.
 - **commands_or_tools_used:** `git status --short`, plan file discovery, Graphify query, targeted `sed` reads, targeted `rg`, planning-depth helper, and focused Jest suites from the preceding audit.
 - **impact_on_plan:** confirms this is a Deep plan because the change crosses skill prose, generator-managed host instruction blocks, dual-host dispatch semantics, eval fixtures, tests, docs, changelog, and possible runtime regeneration.
-- **key_findings:** full skill and review workflow tests support the stricter dispatch boundary; bootstrap generator and its tests still encode the older looser boundary; self-work prose omits skill-audit despite route map coverage; eval examples lack machine-judgable expected routing fields.
+- **key_findings:** full skill and review workflow tests support the stricter dispatch boundary; bootstrap generator and its tests still encode the older looser boundary; self-work prose omits skill-review despite route map coverage; eval examples lack machine-judgable expected routing fields.
 - **limitations:** this plan did not execute implementation tests after writing because planning is not implementation.
 
 ---
@@ -142,7 +142,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 - KTD1. **Canonical dispatch contract:** Public workflow entry authorizes the workflow. It does not automatically authorize host-level `spawn_agent` in Codex.
 - KTD2. **Bootstrap is a projection, not an override:** `src/cli/instruction-bootstrap.js` and checked-in managed blocks should summarize the full skill; they must not create a separate Codex dispatch policy.
 - KTD3. **Fallback is part of normal workflow behavior:** When dispatch authorization is absent, dispatch-bearing workflows should use documented report-only or inline fallback, record concrete reason codes such as `dispatch_authorization_missing`, and tell Codex users the shortest opt-in wording needed when they do want multi-persona/subagent review.
-- KTD4. **Skill/agent asset audits route to skill-audit:** Review-only self-work over skill or agent assets should route to `spec-skill-audit`, while diffs/PRs still route to code review and markdown plans/requirements still route to doc review.
+- KTD4. **Skill/agent asset audits route to skill-review:** Review-only self-work over skill or agent assets should route to `retired-skill-review`, while diffs/PRs still route to code review and markdown plans/requirements still route to doc review.
 - KTD5. **Examples become fixtures:** Keep examples readable for prompt context, but add enough structured fields for unit tests to assert expected entrypoints, dispatch decisions, and fallback reasons. `host` and `mode` are intentionally out of scope for this fixture slice; Codex scope for dispatch cases is carried by case id/name/boundary note, not by a new schema axis.
 - KTD6. **Stale learning must be neutralized in place:** Update the old dispatch-boundary learning with an explicit supersession section (citing commit `fc3d43c1` / 2026-05-24) and rewrite or retire any normative stale guidance outside that section. Do not rely on a separate replacement doc while leaving the old file readable as current advice.
 - KTD7. **Parent-context remains a prose exception until hardened:** This plan keeps the current "already authorized parent context" exception, but only as a visible-provenance rule: if the parent cannot point to explicit user dispatch wording or an equivalent documented handoff signal, fallback applies. Machine-readable parent/headless authorization is deferred.
@@ -176,14 +176,14 @@ flowchart TB
   BootstrapGenerator --> CheckedInBlocks[AGENTS.md and CLAUDE.md managed blocks]
   FullSkill --> RoutingFixtures[using-spec-first routing fixtures]
   RoutingFixtures --> FixtureTests[prompt examples / routing contract tests]
-  FullSkill --> SkillAuditRoute[Self-work skill-audit route]
+  FullSkill --> SkillAuditRoute[Self-work skill-review route]
   Contract --> DurableDocs[docs/solutions stale-learning refresh]
   FixtureTests --> FreshSourceEval[Fresh-source eval closeout]
 ```
 
-The implementation should land the semantic source first, then generator projections, then machine fixtures and docs. Tests should prove the old bootstrap sentence and missing skill-audit route cannot return silently.
+The implementation should land the semantic source first, then generator projections, then machine fixtures and docs. Tests should prove the old bootstrap sentence and missing skill-review route cannot return silently.
 
-> **Unit-weight note:** The confirmed drift is small and localized (bootstrap/`AGENTS.md` wording, self-work skill-audit omission, missing machine fields in examples). U1 and U7 are intentionally lightweight: **U1 is a verification precondition** (`using-spec-first` SKILL.md is already strict; the only possible edit is the residual doc-review contradiction), and **U7 is an inspect-only closeout** with no source edits. They are kept as separate units only to preserve the dependency arc and disclosure obligations (R8); an implementer may execute U1 as a check and fold U7's disclosure into U6's closeout without losing any of the three drift fixes.
+> **Unit-weight note:** The confirmed drift is small and localized (bootstrap/`AGENTS.md` wording, self-work skill-review omission, missing machine fields in examples). U1 and U7 are intentionally lightweight: **U1 is a verification precondition** (`using-spec-first` SKILL.md is already strict; the only possible edit is the residual doc-review contradiction), and **U7 is an inspect-only closeout** with no source edits. They are kept as separate units only to preserve the dependency arc and disclosure obligations (R8); an implementer may execute U1 as a check and fold U7's disclosure into U6's closeout without losing any of the three drift fixes.
 
 ---
 
@@ -281,7 +281,7 @@ flowchart TB
 
 ### U3. Correct spec-first self-work review routing
 
-**Goal:** Ensure skill/agent asset audit requests route to `spec-skill-audit` instead of being flattened into code/doc review.
+**Goal:** Ensure skill/agent asset audit requests route to `retired-skill-review` instead of being flattened into code/doc review.
 
 **Requirements:** R4
 
@@ -293,16 +293,16 @@ flowchart TB
 - Inspect: `tests/unit/instruction-bootstrap.test.js` (confirm the bootstrap curated core stays intentionally smaller than the full Route Map)
 
 **Approach:**
-- In `Spec-First Self-Work`, distinguish artifact type: code/diff/PR review -> code review; requirements/plan/markdown review -> doc review; skill/agent asset governance audit -> skill audit. The load-bearing sentence is `skills/using-spec-first/SKILL.md:94` ("Route review-only requests to `spec-code-review` or `spec-doc-review`"), which still omits skill-audit in the current working tree; the full Route Map already covers it at `:237` (`audit spec-first skill/agent assets … spec-skill-audit | spec-skill-audit`). The fix adds the skill-audit branch to the `:94` prose so the self-work paragraph matches the Route Map.
+- In `Spec-First Self-Work`, distinguish artifact type: code/diff/PR review -> code review; requirements/plan/markdown review -> doc review; skill/agent asset governance audit -> skill audit. The load-bearing sentence is `skills/using-spec-first/SKILL.md:94` ("Route review-only requests to `spec-code-review` or `spec-doc-review`"), which still omits skill-review in the current working tree; the full Route Map already covers it at `:237` (`audit spec-first skill/agent assets … retired-skill-review | retired-skill-review`). The fix adds the skill-review branch to the `:94` prose so the self-work paragraph matches the Route Map.
 - Keep "review plus concrete revisions" routed to work when the user asks for both review and edits.
-- Ensure the full Route Map continues to include skill-audit for both hosts. Do not add `skill-audit` to the bootstrap curated core in this unit; the bootstrap remains a minimal entry anchor that points readers to the complete map.
+- Ensure the full Route Map continues to include skill-review for both hosts. Do not add `skill-review` to the bootstrap curated core in this unit; the bootstrap remains a minimal entry anchor that points readers to the complete map.
 
 **Patterns to follow:**
 - Existing route map row for "audit spec-first skill/agent assets"
-- `spec-skill-audit` skill description and current entry mapping
+- `retired-skill-review` skill description and current entry mapping
 
 **Test scenarios:**
-- Happy path: "review this skill for trigger precision/governance" recommends `spec-skill-audit`.
+- Happy path: "review this skill for trigger precision/governance" recommends `retired-skill-review`.
 - Happy path: "review this PR/diff" recommends `spec-code-review`.
 - Happy path: "review this plan/requirements doc" recommends `spec-doc-review`.
 - Edge case: "review this skill and then apply fixes" routes to `spec-work` with a review posture, not pure audit.
@@ -328,7 +328,7 @@ flowchart TB
 **Approach (recalibrated — the fixture file already exists):**
 - **The "optional create" framing is stale.** `skills/using-spec-first/evals/routing-cases.json` already exists with top-level `schema_version: "using-spec-first-routing-cases/v1"` (note: the field is `schema_version`, asserted at `prompt-examples-contracts.test.js:80`), a `cases` array (currently 5 cases: `greeting-direct-answer`, `current-context-explanation-direct`, `narrow-where-used-bounded-read`, `current-document-summary-direct`, `explicit-spec-plan-honored`; only the last sets `expected_entrypoint: spec-plan`), bound `5..8` (`:83-84`), and per-case fields `expected_outcome`, `public_workflow_required`, `expected_entrypoint`, `graphify_required`, `artifact_expected`, `boundary_note`, `user_intent`. The backing test is `tests/unit/prompt-examples-contracts.test.js` ("using-spec-first routing cases pin lightweight direct outcomes without becoming a router"). U4 is therefore **extend the existing fixture**, not create one.
 - **Coverage gap to close:** the existing `cases` only exercise progressive-disclosure outcomes (`direct_answer`, `bounded_read`, one `public_workflow` for `spec-plan`). They do **not** carry the Codex dispatch dimension this plan owns. Extend the schema with the minimum dispatch fields: `dispatch_decision` (`dispatch` | `fallback` | `none`) and `fallback_reason` (e.g. `dispatch_authorization_missing`), added only on cases where Codex dispatch is in play. Keep them optional so the 5 existing cases still validate.
-- Add exactly the three dispatch-bearing cases that fit the existing `5..8` bound (5 current + 3 = 8, no bound change): a Codex `spec-doc-review` request with no explicit dispatch wording → `dispatch_decision: fallback`, `fallback_reason: dispatch_authorization_missing`; a skill/agent asset review → `expected_entrypoint: spec-skill-audit`; and a Codex `spec-plan` or `spec-ideate` request with explicit delegated/research/persona wording → `dispatch_decision: dispatch`. Do **not** raise the test bound; a fourth case belongs in the deferred authorization-hardening follow-up, not here.
+- Add exactly the three dispatch-bearing cases that fit the existing `5..8` bound (5 current + 3 = 8, no bound change): a Codex `spec-doc-review` request with no explicit dispatch wording → `dispatch_decision: fallback`, `fallback_reason: dispatch_authorization_missing`; a skill/agent asset review → `expected_entrypoint: retired-skill-review`; and a Codex `spec-plan` or `spec-ideate` request with explicit delegated/research/persona wording → `dispatch_decision: dispatch`. Do **not** raise the test bound; a fourth case belongs in the deferred authorization-hardening follow-up, not here.
 - Because `host` is intentionally out of schema scope, each dispatch-bearing fixture id/name/boundary note must carry the Codex surface explicitly (for example `codex-doc-review-no-subagents-fallback`). Tests must not read these dispatch cases as host-neutral behavior.
 - **Existing-test compatibility constraints (verified against the current test body):** (1) the strict `expect(['direct_answer','bounded_read']).toContain(entry.expected_outcome)` / `not.toBe('public_workflow')` assertion is scoped to a **hardcoded id allowlist** (`greeting-direct-answer`, `current-context-explanation-direct`, `narrow-where-used-bounded-read`, `current-document-summary-direct`) — so the three new dispatch cases must use *new ids* and will not trip it; do not reuse those four ids. (2) The generic per-case loop (`prompt-examples-contracts.test.js:113-121`) runs over **all** cases and requires `name`, `user_intent`, `boundary_note` to be present non-empty trimmed strings and to contain no placeholder token — each new dispatch case must populate all three. (3) The new dispatch cases that route to a workflow should set `expected_outcome: public_workflow` + `public_workflow_required: true` to stay consistent with the `explicit-spec-plan-honored` precedent (matched at `:105-110`), unless they model a no-dispatch fallback that still stays inside the entered workflow.
 - Scope guard: add only `dispatch_decision` and `fallback_reason` as optional fields. Do **not** add `host`, `mode`, `parent_context`, or `must_not` — those need new schema design and a new test surface, the "fixture overgrows into a second workflow contract" risk this plan guards against (Risks table). Parent-context and headless authorization are deferred (Scope Boundaries): they are not expressible in this schema and the originating user turn is structurally unknowable to a child reviewer. Codex scope is prose/fixture labeling for this plan, not a new contract field.
@@ -342,7 +342,7 @@ flowchart TB
 
 **Test scenarios:**
 - Happy path: a `routing-cases.json` case declares `spec-doc-review` with `dispatch_decision: fallback` and `fallback_reason: dispatch_authorization_missing` when no explicit dispatch wording exists.
-- Happy path: a case declares `expected_entrypoint: spec-skill-audit` for skill/agent asset review.
+- Happy path: a case declares `expected_entrypoint: retired-skill-review` for skill/agent asset review.
 - Happy path: the explicit-dispatch case covers a non-doc-review Codex workflow (`spec-plan` or `spec-ideate`) with explicit delegated/research/persona wording, satisfying R3 without adding a broad cross-skill fixture matrix.
 - Edge case: the existing direct/bounded-read cases keep `dispatch_decision` absent or `none` and still validate (optional-field invariant holds).
 - Edge case: dispatch-bearing fixture ids/names/boundary notes identify Codex scope, so a Claude reviewer cannot treat the fallback case as host-neutral behavior.
@@ -384,7 +384,7 @@ flowchart TB
 **Test scenarios:**
 - Happy path: full skill, Codex generator output, and checked-in Codex block mention missing dispatch authorization fallback plus user-facing opt-in guidance; Claude checked-in block remains covered by the separate negative/parity guard and does not need Codex-specific wording.
 - Error path: generator output says plain `spec-*` entry is enough for reviewer fan-out; bootstrap drift test fails.
-- Error path: full skill drops skill-audit from self-work review guidance; self-work route test fails.
+- Error path: full skill drops skill-review from self-work review guidance; self-work route test fails.
 - Integration: adapter-transformed runtime skill preserves the source dispatch boundary text without inventing a command-backed workflow.
 
 **Verification:**
@@ -488,7 +488,7 @@ flowchart TB
 ## Alternative Approaches Considered
 
 - **Adopt the older learning and loosen the contract again:** Rejected for this plan. It would contradict current full-skill, doc-review, and code-review tests and should be handled as a separate semantic redesign.
-- **Patch only the bootstrap generator:** Rejected. The self-work skill-audit omission, eval fixture weakness, and stale learning would still allow drift.
+- **Patch only the bootstrap generator:** Rejected. The self-work skill-review omission, eval fixture weakness, and stale learning would still allow drift.
 - **Add a large new routing schema:** Rejected for now. A small fixture extension or dedicated routing-cases file is enough to catch this class of regression.
 - **Skip durable docs because tests are enough:** Rejected. This repo uses `docs/solutions/` as a knowledge harness, and stale learnings are active future inputs.
 

@@ -41,7 +41,7 @@
 | 27 | Skill | `spec-prd` | `skill/Skill-27-spec-prd-详细审查报告.md` | 优化 | P2 |
 | 28 | Skill | `spec-release-notes` | `skill/Skill-28-spec-release-notes-详细审查报告.md` | 优化 | P2 |
 | 29 | Skill | `spec-sessions` | `skill/Skill-29-spec-sessions-详细审查报告.md` | 优化 | P1 |
-| 30 | Skill | `spec-skill-audit` | `skill/Skill-30-spec-skill-audit-详细审查报告.md` | 优化 | P1 |
+| 30 | Skill | `retired-skill-review` | `skill/Skill-30-retired-skill-review-详细审查报告.md` | 优化 | P1 |
 | 31 | Skill | `spec-slack-research` | `skill/Skill-31-spec-slack-research-详细审查报告.md` | 优化 | P1 |
 | 32 | Skill | `spec-work` | `skill/Skill-32-spec-work-详细审查报告.md` | 重构 | P1 |
 | 33 | Skill | `spec-write-tasks` | `skill/Skill-33-spec-write-tasks-详细审查报告.md` | 优化 | P2 |
@@ -108,7 +108,7 @@
 
 1. 先读 `00-审查清单.md`，确认覆盖范围和原报告位置。
 2. 再读 `99-全局终审报告.md`，理解全局问题分布和路线图。
-3. 按 P0/P1 优先读单项报告，尤其是 `spec-skill-audit`、高权限 helper、`spec-code-review`、`spec-plan`、`spec-work` 和 Agent lifecycle 相关对象。
+3. 按 P0/P1 优先读单项报告，尤其是 `retired-skill-review`、高权限 helper、`spec-code-review`、`spec-plan`、`spec-work` 和 Agent lifecycle 相关对象。
 4. 最后读 P2 对象，作为中期 progressive disclosure、eval fixture 和 catalog 清理依据。
 
 ## 5. 后续优化建议

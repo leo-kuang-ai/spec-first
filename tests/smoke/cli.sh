@@ -234,9 +234,11 @@ claude_output="$(run_programmatic_init "$TMP_DIR" claude kuang en)"
 grep -q "Generated ${expected_command_count} command file(s)" <<<"$claude_output"
 grep -q "Generated ${expected_claude_skill_count} skill directory(ies)" <<<"$claude_output"
 grep -q "Generated ${expected_agent_count} agent file(s)" <<<"$claude_output"
-for file in app-consistency-audit.md brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish.md prd.md skill-audit.md work.md write-skill.md write-tasks.md; do
+for file in app-consistency-audit.md brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish.md prd.md work.md write-skill.md write-tasks.md; do
   test -f "$TMP_DIR/.claude/commands/spec-$file"
 done
+retired_audit_command="spec-skill""-audit.md"
+test ! -e "$TMP_DIR/.claude/commands/$retired_audit_command"
 test ! -e "$TMP_DIR/.claude/commands/spec-standards.md"
 test -f "$TMP_DIR/.claude/spec-first/workflows/spec-mcp-setup/scripts/check-health"
 grep -q 'bash .claude/spec-first/workflows/spec-mcp-setup/scripts/check-health' "$TMP_DIR/.claude/commands/spec-mcp-setup.md"

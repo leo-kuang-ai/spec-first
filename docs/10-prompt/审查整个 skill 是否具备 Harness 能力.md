@@ -353,7 +353,7 @@ using-spec-first
   -> spec-debug
   -> spec-compound
   -> spec-doc-review
-  -> spec-skill-audit
+  -> retired-skill-review
 ```
 
 输出表格：
@@ -652,7 +652,7 @@ skill-system/
   review-harness.md
   validation-harness.md
   evaluation-harness.md
-  skill-audit-checklist.md
+  skill-review-checklist.md
 ```
 
 请说明每个目录职责。

@@ -33,7 +33,7 @@
 输出姿态：
 
 - `do-not-create-skill`：明确不应写 skill，并说明更小的 durable surface 或直接回答方式。
-- `near-neighbor`：推荐 `spec-skill-audit`、`spec-doc-review`、`spec-work` 等更合适入口。
+- `near-neighbor`：推荐 bounded source review、`spec-doc-review`、`spec-work` 等更合适入口。
 - `authoring-brief`：只有重复任务、目标输出和排除边界足够清晰时才进入写作。
 
 ## 2. Intent Dialogue

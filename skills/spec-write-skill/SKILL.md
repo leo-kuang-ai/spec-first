@@ -35,7 +35,7 @@ description: 公开 workflow：编写、改写、迁移或按 audit findings 修
 先资格判断和意图澄清，再定 mode/tier/entry surface，写 patch，更新治理/测试/docs，跑匹配风险的 gate。
 
 ### Downstream Consumers
-`spec-work`、`spec-skill-audit`、runtime catalog、skill 维护者和最终用户。
+`spec-work`、runtime catalog、skill 维护者和最终用户。
 
 ## Scenario Capability
 

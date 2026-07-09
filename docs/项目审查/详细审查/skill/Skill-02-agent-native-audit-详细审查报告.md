@@ -7,7 +7,7 @@
 | 对象类型 | Skill |
 | 对象名称 | agent-native-audit |
 | 来源报告 | 2026-06-20-全量-skill-agent-优化建议.md |
-| 原报告问题摘要 | 它现在像 agent-native 体系的内部审查方法，但没有清楚说明与 `spec-skill-audit`、`agent-native-architecture` 的分工。 |
+| 原报告问题摘要 | 它现在像 agent-native 体系的内部审查方法，但没有清楚说明与 `retired-skill-review`、`agent-native-architecture` 的分工。 |
 | 审查日期 | 2026-06-20 |
 | 审查结论等级 | 重构 |
 | 优先级 | P1 |
@@ -24,7 +24,7 @@
 ### 2.2 推断
 
 - 推断 1：该对象应进入“重构”处理路径。
-  - 推断依据：原报告定位/风险/优化动作与当前 source 结构信号一致；主要风险为“如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-audit / architecture reference 重叠。”。
+  - 推断依据：原报告定位/风险/优化动作与当前 source 结构信号一致；主要风险为“如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-review / architecture reference 重叠。”。
   - 可信度：高
 - 推断 2：当前最小收益来自补齐边界、输出契约和验证 fixture，而不是新增同类对象。
   - 推断依据：角色契约要求 Light contract + Explicit boundaries；原报告也把“重复能力、入口过重、缺 eval/contract”列为主问题。
@@ -56,7 +56,7 @@
 
 ### 3.2 主要问题
 
-- 如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-audit / architecture reference 重叠。
+- 如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-review / architecture reference 重叠。
 - Source 结构信号：contract headings 不完整，eval 文件数 0，references 0，scripts 0。
 - 若该对象被团队复用，应补 owner、review cadence、trigger/output eval 或至少明确 deferred reason；否则不宜伪装成 governed asset。
 
@@ -69,7 +69,7 @@
 ### 3.4 风险提示
 
 - 过度治理会让入口变重；治理证据应放在 references/evals/reports，而不是堆进主 prompt。
-- 不应把 spec-skill-audit 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
+- 不应把 retired-skill-review 或原报告的 deterministic/advisory 信号当成已确认缺陷；source 修改前仍需回源。
 
 ## 4. 视角 B：$skill-creator:skill-creator 审查结论
 
@@ -102,7 +102,7 @@ agent-native-audit 应被放在 扩展链路，服务主链路或支撑链路的
 
 ### 5.2 架构定位判断
 
-它现在像 agent-native 体系的内部审查方法，但没有清楚说明与 `spec-skill-audit`、`agent-native-architecture` 的分工。
+它现在像 agent-native 体系的内部审查方法，但没有清楚说明与 `retired-skill-review`、`agent-native-architecture` 的分工。
 
 ### 5.3 与 spec-first 主链路的关系
 
@@ -155,7 +155,7 @@ agent-native-audit 应被放在 扩展链路，服务主链路或支撑链路的
 
 ### 7.2 判断依据
 
-- 原报告的定位/风险/优化建议已经指向具体对象问题：如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-audit / architecture reference 重叠。
+- 原报告的定位/风险/优化建议已经指向具体对象问题：如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-review / architecture reference 重叠。
 - 当前 source 事实显示：资源目录计数：references=0，scripts=0，evals=0，assets=0。
 - 角色契约要求 source/runtime 分离、script facts 与 LLM judgment 分离；本对象后续修改必须遵守该边界。
 
@@ -238,14 +238,14 @@ agent-native-audit 应被放在 扩展链路，服务主链路或支撑链路的
 |---|---|---|---|---|
 | Source 引用回源 | `rg 'agent-native-audit' skills agents src docs tests`，排除 generated mirrors | 明确消费者、调用路径和历史引用 | Skill owner | P1 |
 | 结构契约检查 | 检查 required headings / output schema / failure modes | 缺口补齐且入口不过度膨胀 | Maintainer | P1 |
-| Eval / fixture | 新增或规范 normalized eval，覆盖触发、near-neighbor、失败模式 | 至少覆盖原报告验证建议：增加 routing eval：skill 治理审查落到 `spec-skill-audit`，agent-native app 架构审查才读取本 skill。 | Test owner | P1 |
+| Eval / fixture | 新增或规范 normalized eval，覆盖触发、near-neighbor、失败模式 | 至少覆盖原报告验证建议：增加 routing eval：skill 治理审查落到 `retired-skill-review`，agent-native app 架构审查才读取本 skill。 | Test owner | P1 |
 | Fresh-source 复核 | 改 source 后用 fresh read-only reviewer 或等价方式复核 | 不依赖当前会话缓存行为 | Reviewer | P2 |
 | 外部事实校验 | 无外部事实时确认报告不包含 current/latest 断言 | 所有结论均可由本地 source/report 支撑 | Maintainer | P2 |
 
 ## 11. 结论摘要
 
 - agent-native-audit 当前建议为 重构，优先级 P1。
-- 原报告核心风险：如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-audit / architecture reference 重叠。
+- 原报告核心风险：如果继续存在但不补边界，会成为第二套泛 audit 入口，和 skill-review / architecture reference 重叠。
 - 当前 source 事实：存在：`skills/agent-native-audit/SKILL.md`，291 行；资源目录计数：references=0，scripts=0，evals=0，assets=0。
 - 视角 A 强调复用边界、治理证据和资源分层。
 - 视角 B 强调触发描述、输出模板、失败处理和 eval。

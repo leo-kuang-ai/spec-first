@@ -7,7 +7,7 @@
 | Tier | 使用场景 | 默认交付物 | 最小验证 |
 | --- | --- | --- | --- |
 | `scaffold` | 探索性、个人、短期、低误触发风险 | `SKILL.md`，必要时 1 个 small reference | `npm run lint:skill-entrypoints`、`git diff --check`；目标 package 提供 `quick_validate.py` 时加跑 |
-| `production` | 团队复用、route confusion 真实存在、输出质量重要 | lean `SKILL.md`、必要 references、trigger/boundary eval | scaffold 验证 + 聚焦 Jest contract + `spec-skill-audit` target run |
+| `production` | 团队复用、route confusion 真实存在、输出质量重要 | lean `SKILL.md`、必要 references、trigger/boundary eval | scaffold 验证 + 聚焦 Jest contract + bounded source review |
 | `library` | 共享基础能力，或会影响其他 skill 写作/治理 | trigger positive/negative/near-neighbor eval、packaging readiness、维护说明 | production 验证 + package smoke 或 runtime sync test |
 | `governed` | 安全、合规、发布、事故、组织规范、高权限脚本 | owner、review cadence、rollback boundary、trust/security notes | library 验证 + owner/review evidence 或 proposal-only 限制 |
 

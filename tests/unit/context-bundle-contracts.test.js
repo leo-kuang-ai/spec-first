@@ -411,7 +411,7 @@ describe('context bundle and summary contracts', () => {
 
   test('internal context-bundle helper can explicitly include runtime context', () => {
     const bundle = buildContextBundle({
-      stage: 'skill-audit',
+      stage: 'runtime-audit',
       intent: 'runtime_drift_check',
       changedFiles: [],
       relatedPaths: ['.spec-first/workspace/scenario-fingerprint-setup.json', '.agents/skills/spec-work/SKILL.md'],

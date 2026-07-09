@@ -1,6 +1,6 @@
 # Skill Quality Vocabulary
 
-本 reference 是 `spec-write-skill` 与 `spec-skill-audit` 共享的 skill 质量词表，用于判断触发、信息层级、执行牵引和剪枝。`writing-great-skills` 只作为来源背景；不要复刻其原文、平台假设或 invocation 机制。
+本 reference 是 `spec-write-skill` 的 skill 质量词表，用于判断触发、信息层级、执行牵引和剪枝。`writing-great-skills` 只作为来源背景；不要复刻其原文、平台假设或 invocation 机制。
 
 ## Contents
 

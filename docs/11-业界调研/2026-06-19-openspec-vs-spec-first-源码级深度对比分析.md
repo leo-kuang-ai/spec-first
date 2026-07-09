@@ -257,7 +257,7 @@ export const claudeAdapter: ToolCommandAdapter = {
 | 计划 | spec-plan + write-tasks skill | spec-plan | docs/plans/ docs/tasks/ |
 | 执行 | spec-work spec-debug spec-optimize spec-polish-beta | spec-* | 代码 + .spec-first/workflows/spec-work/ |
 | 评审 | spec-code-review spec-app-consistency-audit | spec-* | review artifacts |
-| 沉淀 | spec-compound spec-compound-refresh spec-sessions spec-skill-audit | spec-* | docs/solutions/ |
+| 沉淀 | spec-compound spec-compound-refresh spec-sessions retired-skill-review | spec-* | docs/solutions/ |
 
 > **关键**：这些入口**不是刚性状态机**，脚本准备 deterministic facts，LLM 根据目标/证据/scope/风险决定下一步。
 
@@ -658,7 +658,7 @@ spec-first 的 compound learnings 已是某种 cold tier，但缺分层策略。
 | **Harness Engineering 三层概念** | CONCEPTS.md | OpenSpec 停留在 spec 层，无 context/harness 层抽象 |
 | **三种开发模式（多仓 workspace）** | 08-三种开发模式.md | OpenSpec 无多仓/monorepo 治理 |
 | **垂直 workflow（App Consistency Audit）** | spec-app-consistency-audit/ | OpenSpec 纯通用 |
-| **Skill Audit（source skill 治理）** | spec-skill-audit/ | OpenSpec 无 skill 自审机制 |
+| **Skill Audit（source skill 治理）** | retired-skill-review/ | OpenSpec 无 skill 自审机制 |
 | **Discoverability Check** | compound Phase 2.5 检查 AGENTS.md | OpenSpec 无此机制 |
 
 **关键提醒（源码级）**：spec-first 在借鉴 OpenSpec 的规范演进机制时，**必须把这些建在自己的 trust model 之上**——Delta 合并用脚本执行（移植 specs-apply.ts 逻辑）、冲突用 LLM 判断、合并结果走 honest-closeout.js 的降级机制。否则会背离自身"工程治理"核心定位，变成"第二个 OpenSpec"而非"更强的 spec-first"。

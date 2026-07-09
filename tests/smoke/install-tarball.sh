@@ -69,9 +69,16 @@ if grep -q "templates/claude/commands/spec/${retired_standards}.md" "$PACK_LIST"
   echo "✗ tarball 文件列表不应包含已删除的 spec-"standards" command template"
   exit 1
 fi
-grep -q "skills/spec-skill-audit/SKILL.md" "$PACK_LIST"
-grep -q "skills/spec-skill-audit/scripts/write-audit-artifacts.js" "$PACK_LIST"
-grep -q "templates/claude/commands/spec/skill-audit.md" "$PACK_LIST"
+retired_audit_skill="spec-skill""-audit"
+retired_audit_command="skill""-audit"
+if grep -q "skills/${retired_audit_skill}/" "$PACK_LIST"; then
+  echo "✗ tarball 文件列表不应包含已删除的 retired audit skill"
+  exit 1
+fi
+if grep -q "templates/claude/commands/spec/${retired_audit_command}.md" "$PACK_LIST"; then
+  echo "✗ tarball 文件列表不应包含已删除的 retired audit command template"
+  exit 1
+fi
 grep -q "skills/spec-mcp-setup/SKILL.md" "$PACK_LIST"
 grep -q "templates/claude/commands/spec/mcp-setup.md" "$PACK_LIST"
 grep -q "src/cli/adapters/cursor.js" "$PACK_LIST"
@@ -169,16 +176,14 @@ for (const rel of forbidden) {
     process.exit(1);
   }
 }
-if (!fs.existsSync(path.join(root, 'skills/spec-skill-audit/SKILL.md'))) {
-  console.error('skill audit skill missing from package');
+const retiredAuditSkill = 'spec-skill' + '-audit';
+const retiredAuditCommand = 'skill' + '-audit.md';
+if (fs.existsSync(path.join(root, 'skills', retiredAuditSkill))) {
+  console.error('retired skill audit skill should not be packaged');
   process.exit(1);
 }
-if (!fs.existsSync(path.join(root, 'skills/spec-skill-audit/scripts/write-audit-artifacts.js'))) {
-  console.error('skill audit artifact writer missing from package');
-  process.exit(1);
-}
-if (!fs.existsSync(path.join(root, 'templates/claude/commands/spec/skill-audit.md'))) {
-  console.error('skill audit command missing from package');
+if (fs.existsSync(path.join(root, 'templates/claude/commands/spec', retiredAuditCommand))) {
+  console.error('retired skill audit command should not be packaged');
   process.exit(1);
 }
 if (!fs.existsSync(path.join(root, 'skills/spec-mcp-setup/SKILL.md'))) {

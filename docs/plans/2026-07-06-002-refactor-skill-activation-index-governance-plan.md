@@ -47,7 +47,7 @@ referenced_reviews:
 ## 需求
 
 - R-IDX-1（原 R11）. Activation-L1 description 审计：测量所有 spec-first skill/agent 的 frontmatter description token 占用，识别把功能说明写进 description 的超长 offender；任何压缩都必须保留 trigger + exclude + 定位三段，不得为凑长度砍掉边界相邻 workflow 的 exclude intent。
-- R-IDX-2（原 R12）. 新增/修改 skill 的系统级治理：扩展 `lint-skill-entrypoints` 或 `spec-skill-audit`，检查 description 长度预算、是否声明 exclude intent、是否与现有 skill 高重叠；不新增独立 contract/schema。
+- R-IDX-2（原 R12）. 新增/修改 skill 的系统级治理：扩展 `lint-skill-entrypoints` 或 `retired-skill-review`，检查 description 长度预算、是否声明 exclude intent、是否与现有 skill 高重叠；不新增独立 contract/schema。
 - R-IDX-3（原 R13）. route collision 覆盖：为边界相邻 workflow（plan/work/code-review/doc-review/compound）建 eval fixture，用典型请求记录 expected / excluded workflow；脚本/Jest 只校验 fixture 结构、覆盖和可解析性，语义命中是否合理由 fresh-source/read-only eval 判断。不得自建宿主级 L0 域索引、语义向量 registry 或 skill 联邦（宿主 primitive，重建即反模式）。
 
 ---
@@ -55,7 +55,7 @@ referenced_reviews:
 ## 范围边界
 
 - 不新增新的 public workflow、skill 或 agent。
-- 不新增独立 schema/contract 概念；扩展现有 `lint-skill-entrypoints` / `spec-skill-audit`。
+- 不新增独立 schema/contract 概念；扩展现有 `lint-skill-entrypoints` / `retired-skill-review`。
 - 不改计划 001 拥有的 `spec-work` / `spec-code-review` body spine 与 references。
 - 不把 generated runtime mirrors 当 source 修复；runtime drift 只通过 `spec-first init` 修复。
 - 不让脚本裁决自然语言路由语义；脚本只输出结构/覆盖/可解析性等 deterministic facts。
@@ -129,7 +129,7 @@ flowchart TB
 **依赖：** U-IDX-1
 
 **文件：**
-- 修改：`scripts/lint-skill-entrypoints.js` 或 `skills/spec-skill-audit/references/skill-authoring-quality.md`（description 预算 + exclude 声明 + 重叠检查）
+- 修改：`scripts/lint-skill-entrypoints.js` 或 `skills/retired-skill-review/references/skill-authoring-quality.md`（description 预算 + exclude 声明 + 重叠检查）
 - 若需新增检查项，修改：`scripts/lint-skill-entrypoints.config.json`
 - 新增或修改（route collision fixtures，用独立前缀 `route-collision-*.json`）：`skills/spec-code-review/evals/route-collision-*.json`、`skills/spec-doc-review/evals/route-collision-*.json`、`skills/spec-plan/evals/route-collision-*.json`、`skills/spec-work/evals/route-collision-*.json`、`skills/spec-compound/evals/route-collision-*.json`
 - 修改：`tests/unit/`（fixture schema/coverage/parse 断言，不做语义裁决）
@@ -219,5 +219,5 @@ flowchart TB
 - 拆分来源：`docs/plans/2026-07-06-001-refactor-skill-prompt-slimming-plan.md`
 - 优化审查（§10-11 索引/路由治理）：`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md`
 - 角色契约：`docs/10-prompt/结构化项目角色契约.md`
-- skill audit rubric：`skills/spec-skill-audit/references/skill-authoring-quality.md`
+- skill audit rubric：`skills/retired-skill-review/references/skill-authoring-quality.md`
 - lint 入口治理：`scripts/lint-skill-entrypoints.js`、`scripts/lint-skill-entrypoints.config.json`

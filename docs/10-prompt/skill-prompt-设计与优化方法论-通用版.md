@@ -6,7 +6,7 @@
 > 任何用 Claude Code / Codex / 兼容宿主的 skill 体系都可直接套用。
 >
 > **与 spec-first 专属版的关系：** 本文是**通用内核**。spec-first 项目的适配层（`spec-first
-> init` runtime 投射、source/runtime mirror 纪律、`spec-*` 入口治理、与 `spec-skill-audit`
+> init` runtime 投射、source/runtime mirror 纪律、`spec-*` 入口治理、与 `retired-skill-review`
 > rubric / 角色契约对齐、task-pack CLI handoff 等）见 `skill-prompt-设计与优化方法论-v2.md`。
 > 落到你自己的项目时：**保留本文全部内核，把「项目适配层」（§8、§21）换成你项目的等价机制。**
 >

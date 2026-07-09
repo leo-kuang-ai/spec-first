@@ -94,10 +94,10 @@ CLI 重构（新增命令）+ 删除/迁移（删 skill + template + governance 
   - `tests/unit/context-governance-contracts.test.js`（L35：`toContain('\`spec-update\` / \`spec-mcp-setup\`')`）
 
   另有 **2 个非测试同步项**（不会变红，但删除后会 stale，需一并更新）：
-  - `skills/spec-skill-audit/references/spec-first-skill-boundary-map.md`（L11：列 `spec-update` 为 workflow 条目 → 移除或标注为 CLI 命令）
+  - `skills/retired-skill-review/references/spec-first-skill-boundary-map.md`（L11：列 `spec-update` 为 workflow 条目 → 移除或标注为 CLI 命令）
   - `docs/contracts/context-governance.md`（被 `context-governance-contracts.test.js:35` 断言的源文档 `\`spec-update\` / \`spec-mcp-setup\`` → 与测试同步改）
 
-  **排除项（核实后确认不受影响，不要误改）**：`tests/unit/skill-audit-scripts.test.js:427` 的 `spec-update` 是测试自构造的虚拟 fixture（`runtime-path-reference` skill 内容），与真实 skill 无关，删除后该测试不变红，**不在 R10 范围**。
+  **排除项（核实后确认不受影响，不要误改）**：`tests/unit/skill-review-scripts.test.js:427` 的 `spec-update` 是测试自构造的虚拟 fixture（`runtime-path-reference` skill 内容），与真实 skill 无关，删除后该测试不变红，**不在 R10 范围**。
 
 ### 可发现性（审查发现的 UX 缺口，必做）
 

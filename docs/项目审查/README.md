@@ -29,7 +29,7 @@
 | 2026-07-02 | [AI 专家与工程效能综合审查](2026-07-02-ai-expert-engineering-effectiveness-review.md) | 任务建模、上下文治理、执行控制、评测反馈、知识进化与工程效能综合评估 |
 | 2026-06-28 | [spec-skill-健壮性稳定性优化审查](2026-06-28-spec-skill-健壮性稳定性优化审查.md) | skill 体系健壮性/稳定性/确定性 gate 加固（已转 PRD） |
 | 2026-06-20 | [using-spec-first-skill-optimization-suggestions](2026-06-20-using-spec-first-skill-optimization-suggestions.md) | using-spec-first 入口路由优化建议 |
-| 2026-06-20 | [spec-skill-audit-skill-optimization-suggestions](2026-06-20-spec-skill-audit-skill-optimization-suggestions.md) | spec-skill-audit 优化建议 |
+| 2026-06-20 | [retired-skill-review-skill-optimization-suggestions](2026-06-20-retired-skill-review-skill-optimization-suggestions.md) | retired-skill-review 优化建议 |
 | 2026-06-20 | [spec-prd-skill-optimization-suggestions](2026-06-20-spec-prd-skill-optimization-suggestions.md) | spec-prd 优化建议 |
 | 2026-06-15 | [项目Review与优化方案](2026-06-15-项目Review与优化方案.md) | 项目 review 与优化方案 |
 | 2026-06-15 | [行业对标研究档案](2026-06-15-行业对标研究档案.md) | 行业对标研究 |

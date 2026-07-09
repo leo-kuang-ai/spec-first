@@ -67,7 +67,7 @@ spec-first-only skills 不做 CE 直接等价审查，但可用于解释合理 d
 - `spec-app-consistency-audit`
 - `spec-prd`
 - `spec-rule-miner`
-- `spec-skill-audit`
+- `retired-skill-review`
 - `spec-write-skill`
 - `spec-write-tasks`
 - `using-spec-first`
@@ -302,7 +302,7 @@ done
 #### Batch 1 多 agent 裁决
 
 - 本 batch 不默认开启多 agent。理由：这些 pair 是低差异快审，文件数少、artifact/path 映射可由确定性 diff 与 bounded source reads 直接确认；多 agent 会增加调度成本和 synthesis 噪音。
-- 提升条件：若某个 pair 出现高风险 artifact contract 漂移、下游 consumer 不明确、或需要语义评审多个可行迁移策略，再临时升级为 `spec-doc-review` / `spec-skill-audit` 的多人审查。
+- 提升条件：若某个 pair 出现高风险 artifact contract 漂移、下游 consumer 不明确、或需要语义评审多个可行迁移策略，再临时升级为 `spec-doc-review` / `retired-skill-review` 的多人审查。
 
 ## Batch 2 helper 与尾项快审记录
 
@@ -403,7 +403,7 @@ done
 - passed: `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-debug/scripts/repo-profile-cache.py`
 - passed: `npx jest tests/unit/repo-profile-cache-parity.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/scenario-capability-matrix-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
 - passed: `npm run lint:skill-entrypoints`
-- passed: `git diff --check -- CHANGELOG.md docs/contracts/workflows/spec-debug-input-output.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-debug tests/unit`
+- passed: `git diff --check -- CHANGELOG.md docs/contracts/workflows/spec-debug-input-output.md docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md skills/spec-debug tests/unit`
 - passed: fresh-source eval using current disk source; independent read-only reviewer reported no blocking findings, confirmed the 7-file CE/spec source file set matches, confirmed normalized diff is empty after allowed projections, and found no active old spec-first-only runtime contract residuals. Note: ignored `__pycache__` is non-source noise.
 
 ### `ce-compound` -> `spec-compound`
@@ -1002,7 +1002,7 @@ done
 - 已运行 `bash -n skills/spec-code-review/scripts/cross-model-adversarial-review.sh`。
 - 已运行 `npm run lint:skill-entrypoints`。
 - 已运行 `npx jest tests/unit/repo-profile-cache-parity.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/changelog-format.test.js --runInBand`。
-- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-code-review`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md skills/spec-code-review`。
 
 ### `ce-work` -> `spec-work`
 
@@ -1062,7 +1062,7 @@ done
 - 已运行 focused residual scan，确认 `skills/spec-work` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留；唯一命中为合法的 `spec-first evidence-capture workflow`。
 - 已运行 `npm run lint:skill-entrypoints`。
 - 已运行 `npx jest tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/anti-rationalization-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-plan-enterprise-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-bundle-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/changelog-format.test.js --runInBand`。
-- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-work tests/unit/anti-rationalization-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-plan-enterprise-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-bundle-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/prompt-examples-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-work-resource-lens-contract.test.js`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md skills/spec-work tests/unit/anti-rationalization-contracts.test.js tests/unit/capability-aware-provider-contracts.test.js tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-plan-enterprise-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/knowledge-harness-contracts.test.js tests/unit/context-bundle-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/prompt-examples-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-work-resource-lens-contract.test.js`。
 
 ### `ce-ideate` -> `spec-ideate`
 
@@ -1122,7 +1122,7 @@ done
 - 已运行 `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-ideate/scripts/repo-profile-cache.py`。
 - 已运行 `npm run lint:skill-entrypoints`。
 - 已运行 `npx jest tests/unit/project-graph-consumption-contracts.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/repo-profile-cache-parity.test.js tests/unit/changelog-format.test.js --runInBand`。
-- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-ideate tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-ideate-contracts.test.js tests/unit/public-workflow-contract-summary.test.js`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md skills/spec-ideate tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-ideate-contracts.test.js tests/unit/public-workflow-contract-summary.test.js`。
 
 ### `ce-plan` -> `spec-plan`
 
@@ -1176,7 +1176,7 @@ done
 - 已运行 `npm run lint:skill-entrypoints`。
 - 已运行 `npm run test:eval-fixtures`。
 - 已运行 `npx jest tests/unit/skill-path-rewrite-guard.test.js tests/unit/governance-contracts.test.js tests/unit/init-dry-run.test.js tests/unit/spec-plan-contracts.test.js tests/unit/runtime-plan-contracts.test.js tests/unit/eval-fixture-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/changelog-format.test.js --runInBand --silent`。
-- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md package.json skills/spec-plan tests/unit`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md package.json skills/spec-plan tests/unit`。
 - 未手改 generated runtime mirrors；未运行 fresh-source eval，原因是本轮按用户要求采用 CE source 逐文件对照恢复和 spec-first 必要投影，并用 source reads、文件集合 diff、残留扫描与 deterministic contract tests 验证迁移。
 
 ## 推荐报告产物
@@ -1184,7 +1184,7 @@ done
 逐 skill review 完成后产出一份合并审查报告：
 
 ```text
-docs/validation/YYYY-MM-DD-ce-to-spec-first-skill-audit-report.md
+docs/validation/YYYY-MM-DD-ce-to-spec-first-skill-review-report.md
 ```
 
 如果后续修复较大，按 workflow cluster 拆成聚焦 source changes：

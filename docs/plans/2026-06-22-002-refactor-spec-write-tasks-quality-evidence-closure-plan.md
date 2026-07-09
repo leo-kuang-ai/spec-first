@@ -19,7 +19,7 @@ plan_depth: deep
 
 - **Recommended approach:** 采用“证据层补强 + entrypoint 继续瘦身”的组合方案：脚本只产 deterministic facts / warnings / reports，LLM 和 reviewer 继续负责语义判断；`SKILL.md` 只保留触发、边界、分支和 reference map。
 - **Key decisions:** 「quality evidence closure」而非「机械 100」：deterministic scorer 把 input_contract / output_contract / workflow_explicitness / eval_readiness 硬封顶在 4，且 runtime_governance / cross_host_portability 在 `--target` 审计下恒为 null，因此 KTD6/A4 前提下确定性上限约 92；满分语义是让每个非满分维度都有可复查的 source evidence、runner evidence、recorded output adjudication 或明确的 not-scored governance reason，而不是让审计脚本替代语义评审；runtime 和 cross-host portability 通过 packager / generated adapter smoke 证明，不手改 generated runtime mirrors，未实测宿主只能记录为 residual gap。
-- **Validation focus:** 新增 repo-level runner 的单测与 execution report、至少一个 recorded actual task-pack output + adjudication、轻量 advisory analyzer、official `.skill` package smoke、可用宿主的 runtime sync smoke、task-pack fixture validation、U4 瘦身后的 fresh-source eval、`spec-skill-audit` 复跑与 changelog/plan hygiene。
+- **Validation focus:** 新增 repo-level runner 的单测与 execution report、至少一个 recorded actual task-pack output + adjudication、轻量 advisory analyzer、official `.skill` package smoke、可用宿主的 runtime sync smoke、task-pack fixture validation、U4 瘦身后的 fresh-source eval、`retired-skill-review` 复跑与 changelog/plan hygiene。
 - **Largest risks / boundaries:** 最危险的偏差是为了“100 分”游戏化审计，把语义任务质量变成硬脚本门禁；本计划明确禁止该方向，只允许 advisory facts 和 human/LLM adjudication。
 
 ---
@@ -30,7 +30,7 @@ plan_depth: deep
 
 最新审计信号显示它不是结构性失败，而是质量证据尚未闭环：
 
-- `spec-skill-audit` 当前得分 `90/A-`，无 P0/P1/P2。
+- `retired-skill-review` 当前得分 `90/A-`，无 P0/P1/P2。
 - `trigger_precision`、`boundary_discipline`、`security_posture`、`spec_first_alignment` 已是 5 分。
 - `input_contract`、`output_contract`、`workflow_explicitness` 仍是 4 分，因为 deterministic audit 只能看到 section exists，不能确认语义完整性。**scorer 对这三维度按 `hasSection ? 4 : 2` 评分，无任何代码路径给 5；语义证据只能由 reviewer 确认，不会提升审计数字。瘦身时必须保持 normalized heading `inputs` / `outputs` / `workflow`（或 `execution`）在场，否则会 4→2 倒退。**
 - `progressive_disclosure` 仍是 4 分，`SKILL.md` 已降到约 5997 estimated tokens，但还没达到更强的 entrypoint economy。
@@ -62,7 +62,7 @@ plan_depth: deep
 - A1. `spec-write-tasks` 仍定位为 standalone skill，不升级为 `$spec-*` public workflow。
 - A2. official `.skill` package 当前只默认排除 skill root `evals/`；本计划不假设 packager 会自动排除 skill-local `scripts/` 或 `reports/`。
 - A3. Maintainer-only runner/analyzer 和 generated reports 必须放在 skill root 外（如 `scripts/spec-write-tasks/` 与 `docs/validation/spec-write-tasks/**`），或显式新增并验证 packaging/runtime exclusion 机制；默认路径选择 repo-level maintainer assets，避免把它们投影到 packaged skill 或 generated mirrors。
-- A4. `spec-skill-audit` 的评分语义可能需要小幅读取新增 evidence，但本计划优先改善目标 skill evidence；除非审计器明显无法消费合理证据，否则不改审计器评分逻辑。
+- A4. `retired-skill-review` 的评分语义可能需要小幅读取新增 evidence，但本计划优先改善目标 skill evidence；除非审计器明显无法消费合理证据，否则不改审计器评分逻辑。
 
 ---
 
@@ -89,7 +89,7 @@ plan_depth: deep
 - runtime / cross-host smoke 能证明 packaged skill 只依赖 package-local runtime refs，repo-level maintainer scripts/reports 不被 packaged skill 或 generated mirror 当成 runtime dependency；可用宿主的 generated mirrors 可从 source 生成或同步。**（注：`runtime_governance` / `cross_host_portability` 在 `--target` 审计下仍为 null；此处 smoke 是测试/reviewer 证据，不改审计分；宿主 `not_checked_with_reason` 是 residual gap。）**
 - 高风险 task-pack review handoff fixture 覆盖 `dispatch_authorization: missing|authorized|not_required`，并证明 standalone skill trigger 不会 silent auto-dispatch。
 - U8 需包含 downstream task-pack consumer outcome check：用代表性 task pack 证明 handoff 对 `spec-work` / doc-review 消费者没有 execution-blocking ambiguity，不能只用 audit score、runner report 或 maintainer evidence 作为成功代理。
-- `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks` 复跑后无 invalid eval cases；**目标分数是该命令在 KTD6/A4 前提下的确定性上限≈92（由 U4 把 `progressive_disclosure` 提到 5 实现），而非 100。低于上限或仍有未归因维度时，按 R10 在 report 中逐一说明真实阻塞（audit-tool gap / semantic review pending / 实质缺口）。若需让 governance 维度参与评分，改用 repo-wide self-audit 是另一条评分路径（见 Open Questions）。**
+- `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks` 复跑后无 invalid eval cases；**目标分数是该命令在 KTD6/A4 前提下的确定性上限≈92（由 U4 把 `progressive_disclosure` 提到 5 实现），而非 100。低于上限或仍有未归因维度时，按 R10 在 report 中逐一说明真实阻塞（audit-tool gap / semantic review pending / 实质缺口）。若需让 governance 维度参与评分，改用 repo-wide self-audit 是另一条评分路径（见 Open Questions）。**
 
 ---
 
@@ -109,10 +109,10 @@ plan_depth: deep
   - `tests/unit/spec-write-tasks-contracts.test.js`
   - `tests/fixtures/spec-write-tasks/valid/source-plan.md`
   - `tests/fixtures/spec-write-tasks/valid/task-pack.md`
-  - `.spec-first/audits/skill-audit/latest/skill-audit-summary.md`
-  - `.spec-first/audits/skill-audit/latest/expert-scorecard.json`
-  - `.spec-first/audits/skill-audit/latest/eval-readiness-report.json`
-  - `.spec-first/audits/skill-audit/latest/trigger-routing-report.json`
+  - `.spec-first/audits/skill-review/latest/skill-review-summary.md`
+  - `.spec-first/audits/skill-review/latest/expert-scorecard.json`
+  - `.spec-first/audits/skill-review/latest/eval-readiness-report.json`
+  - `.spec-first/audits/skill-review/latest/trigger-routing-report.json`
 - planning_snapshot_revision: `61c29f10` (original source/evidence snapshot used when this plan was drafted)
 - current_review_revision: `f2b4553e` (2026-06-23 terminal review; read-only `runSelfAudit({ targetPath: 'skills/spec-write-tasks' })` still confirms `90/A-`, `estimated_tokens: 5997`, `eval_case_count: 25`, and the same 90→92 premise)
 - worktree_status: dirty before this plan and dirty during terminal review; unrelated or parallel changes exist outside this plan. Implementation must re-run `git status`, preserve user/concurrent changes, and patch only targeted sections rather than reverting broad worktree state.
@@ -135,7 +135,7 @@ plan_depth: deep
 - source_reads_required:
   - Re-read `src/cli/plugin.js`, `src/cli/adapters/*`, and package helper tests before writing runtime/cross-host smoke tests.
   - Re-read official packager invocation in `tests/unit/spec-write-tasks-contracts.test.js` before changing package expectations.
-  - Re-read `skills/spec-skill-audit/scripts/write-audit-artifacts.js` only if target skill evidence is strong but the audit tool cannot consume it honestly.
+  - Re-read `skills/retired-skill-review/scripts/write-audit-artifacts.js` only if target skill evidence is strong but the audit tool cannot consume it honestly.
 - commands_or_tools_used:
   - `node bin/spec-first.js internal task-governance-signals --source plan-declared --json`
   - `node bin/spec-first.js session list --json`
@@ -179,7 +179,7 @@ plan_depth: deep
 - KTD3. **Keep semantic quality analysis advisory and minimal.** `analyze-task-pack-quality.js` may emit warnings and scorecard fields for already-documented high-frequency quality smells, but `spec-first tasks validate` remains identity/freshness/structure focused. Do not build a broad release-gate analyzer for this standalone skill.
 - KTD4. **Use repo-level reports as maintainer evidence, not runtime dependency.** Generated scorecards and quality reports live outside the packaged skill root, under `docs/validation/spec-write-tasks/**`; runner/analyzer scripts live under `scripts/spec-write-tasks/`. Package/runtime tests must prove packaged skill files and generated mirrors do not require these repo-local maintainer assets.
 - KTD5. **Slim `SKILL.md` by moving stable detail, not by deleting contracts.** The entrypoint must still name use/not-use, core derived-artifact boundary, branch list, deterministic validation rule, final envelope requirement and reference map.
-- KTD6. **Do not change `spec-skill-audit` scoring until target evidence exists.** If the audit remains at 90 after evidence is present, then inspect audit consumption semantics; do not preemptively game scores.
+- KTD6. **Do not change `retired-skill-review` scoring until target evidence exists.** If the audit remains at 90 after evidence is present, then inspect audit consumption semantics; do not preemptively game scores.
 - KTD7. **Cross-host evidence belongs in tests/smoke, not generated mirror patches.** Use source sync/package APIs and temp directories to prove each host delivery surface that has an existing source adapter/generator path; unchecked hosts remain named residual gaps. Regenerate runtime only if a separate setup/update task requires it.
 - KTD8. **High-risk doc-review remains a single bounded edge.** `spec-write-tasks -> spec-doc-review` may be recommended, or invoked only when explicitly authorized for the just-written pack; it never becomes general workflow chaining.
 - KTD9. **Large-plan handling is follow-up scope until behavior evidence exists.** 对超大 plan 的 map-reduce discipline 方向保留为后续工作：需要先用代表性 large-plan fixture / recorded output 证明规模阈值、中间产物持久化和宽单元 fan-out 自检确实改善任务拆分。当前计划只在本计划和后续 Open Questions 中记录边界，不新增 analyzer 判定、不新增 runtime-required 文件、不把 fan-out 变成 validator 失败条件，也不把该行为作为 quality evidence closure 的完成条件。
@@ -198,7 +198,7 @@ plan_depth: deep
 
 - Exact estimated-token threshold implementation: choose a simple deterministic estimator consistent with the audit script, then document its approximation.
 - Exact report file names beyond the required output scorecard: finalize under `docs/validation/spec-write-tasks/**` after inspecting whether existing meta-skill report naming conventions are easiest to reuse.
-- Whether `spec-skill-audit` needs a small enhancement to consume target skill reports: decide only after U1-U5 evidence exists.
+- Whether `retired-skill-review` needs a small enhancement to consume target skill reports: decide only after U1-U5 evidence exists.
 - Whether large-plan handling deserves source changes: require a representative large-plan fixture or recorded output before adding analyzer behavior or treating thresholds as authoring discipline.
 
 ### From 2026-06-22 doc-review
@@ -222,7 +222,7 @@ flowchart TB
   D --> F[docs/validation/spec-write-tasks/output_quality_scorecard]
   E --> G[docs/validation/spec-write-tasks/task_pack_quality_analysis]
   B --> H[slim SKILL.md reference map]
-  F --> I[spec-skill-audit evidence]
+  F --> I[retired-skill-review evidence]
   G --> I
   H --> I
   A --> J[official skill package smoke]
@@ -268,7 +268,7 @@ The diagram separates runtime use from maintainer evidence. Users of the package
 - `skills/spec-write-tasks/references/execution-handoff-contract.md`
 - `skills/spec-write-tasks/evals/failure-cases.json`
 - `skills/spec-write-tasks/evals/expected-behavior-cases.json`
-- `.spec-first/audits/skill-audit/latest/expert-scorecard.json`
+- `.spec-first/audits/skill-review/latest/expert-scorecard.json`
 - `yao-meta-skill` output eval evidence boundary, adapted as lightweight standalone evidence rather than a full release gate
 
 **Test scenarios:**
@@ -320,7 +320,7 @@ The diagram separates runtime use from maintainer evidence. Users of the package
 - Error path: missing `input_files` path fails the runner with a clear reason and non-zero exit.
 - Boundary: a case with only prose `objective_assertions` remains reportable but cannot count as deterministic pass/fail evidence.
 - Boundary: a case with `missing_evidence` remains reportable but cannot count as provider-backed or human-adjudicated.
-- Contract: output JSON schema stays stable enough for `spec-skill-audit` or reviewer scripts to consume.
+- Contract: output JSON schema stays stable enough for `retired-skill-review` or reviewer scripts to consume.
 - Freshness: the scorecard names generated_at, command, source revision and rerun command; recorded actual outputs include hashes. Full stale-gate enforcement is out of scope for this standalone-skill pass.
 
 **Verification:**
@@ -533,7 +533,7 @@ The diagram separates runtime use from maintainer evidence. Users of the package
   - `node bin/spec-first.js tasks validate tests/fixtures/spec-write-tasks/high-risk-review/task-pack.md --repo . --json`
   - `node scripts/spec-write-tasks/run-output-evals.js`
   - `node scripts/spec-write-tasks/analyze-task-pack-quality.js tests/fixtures/spec-write-tasks/valid/task-pack.md`
-  - `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks`
+  - `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks`
   - official package smoke already wired in unit tests or run explicitly when local package script exists.
 - Add a downstream task-pack consumer outcome check: inspect at least one representative recorded/generated task pack and confirm the handoff has no execution-blocking ambiguity for `spec-work` / doc-review consumers; if this cannot be confirmed, closeout records it as residual rather than success.
 - Run fresh-source eval or equivalent read-only semantic review for the final `SKILL.md` and references after U4 slimming. Record `passed`, `concerns`, or `not_run` with reason; do not let unit tests substitute for this semantic check.
@@ -558,7 +558,7 @@ The diagram separates runtime use from maintainer evidence. Users of the package
 
 - **Skill runtime:** Packaged users should see a smaller, clearer entrypoint with the same behavior boundaries.
 - **Maintainer workflow:** Maintainers gain repeatable repo-level output eval and quality analysis scripts, plus validation scorecard reports for future regressions.
-- **Audit workflow:** `spec-skill-audit` receives stronger evidence and clearer limitations; any score gap below the ≈92 ceiling, or any remaining unattributed dimension, becomes more actionable.
+- **Audit workflow:** `retired-skill-review` receives stronger evidence and clearer limitations; any score gap below the ≈92 ceiling, or any remaining unattributed dimension, becomes more actionable.
 - **Task-pack validator:** No semantic validator expansion is planned; deterministic validation remains identity/freshness/structure focused.
 - **Documentation and reports:** New reports live under `docs/validation/spec-write-tasks/**` as maintainer evidence and must not become required runtime context.
 - **Generated runtime mirrors:** Out of scope as source edits; any runtime regeneration belongs to a separate `spec-first init` or setup/update action after source validation.
@@ -583,7 +583,7 @@ The diagram separates runtime use from maintainer evidence. Users of the package
 
 ## Alternative Approaches Considered
 
-- **Change `spec-skill-audit` scoring first:** Rejected for now. The target skill has real evidence gaps; changing the scorer before producing evidence would make the number less trustworthy.
+- **Change `retired-skill-review` scoring first:** Rejected for now. The target skill has real evidence gaps; changing the scorer before producing evidence would make the number less trustworthy.
 - **Add more eval cases only:** Rejected. Current coverage has 25 cases and no invalid cases; the missing piece is executable evidence and adjudication.
 - **Make task quality analyzer block invalid packs:** Rejected. That would violate the script/LLM boundary and turn semantic splitting quality into a hard-coded rule engine.
 - **Keep `SKILL.md` near 6000 tokens for self-containment:** Rejected. Runtime quality is better served by a small spine plus focused references because this skill is frequently loaded as an execution method.
@@ -617,9 +617,9 @@ The diagram separates runtime use from maintainer evidence. Users of the package
 - `skills/spec-write-tasks/evals/README.md`
 - `skills/spec-write-tasks/evals/output-quality-cases.json`
 - `tests/unit/spec-write-tasks-contracts.test.js`
-- `.spec-first/audits/skill-audit/latest/skill-audit-summary.md`
-- `.spec-first/audits/skill-audit/latest/expert-scorecard.json`
-- `.spec-first/audits/skill-audit/latest/eval-readiness-report.json`
+- `.spec-first/audits/skill-review/latest/skill-review-summary.md`
+- `.spec-first/audits/skill-review/latest/expert-scorecard.json`
+- `.spec-first/audits/skill-review/latest/eval-readiness-report.json`
 - `docs/10-prompt/结构化项目角色契约.md`
 
 ---
@@ -627,6 +627,6 @@ The diagram separates runtime use from maintainer evidence. Users of the package
 ## Completion Evidence
 
 - implementation scope: `spec-write-tasks` entrypoint 瘦身到 target audit 估算 2035 tokens；新增 repo-level output eval runner、advisory task-pack quality analyzer、recorded output adjudication、validation reports、fresh-source eval 记录、高风险 handoff fixture 与聚焦 unit tests。
-- verification: 聚焦 Jest 6 套件 39 tests 通过；两个代表性 task pack `tasks validate` 均 valid/deterministic_handoff true；runner/analyzer 均 ok；`spec-skill-audit --target skills/spec-write-tasks` 返回 92/A-、0 P0/P1/P2、27 eval cases 且 invalid_cases 为空；`npm run typecheck` 通过；`git diff --check` 通过。
+- verification: 聚焦 Jest 6 套件 39 tests 通过；两个代表性 task pack `tasks validate` 均 valid/deterministic_handoff true；runner/analyzer 均 ok；`retired-skill-review --target skills/spec-write-tasks` 返回 92/A-、0 P0/P1/P2、27 eval cases 且 invalid_cases 为空；`npm run typecheck` 通过；`git diff --check` 通过。
 - review status: 多 agent review findings 已修复；fresh-source eval 初始 P2 为记录文件缺失，已通过 `docs/validation/spec-write-tasks/fresh-source-eval-2026-06-23-quality-evidence-closure.md` 补齐并记录。
 - generated runtime status: 未手改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors。

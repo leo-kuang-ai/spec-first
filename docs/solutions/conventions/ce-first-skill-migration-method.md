@@ -121,5 +121,5 @@ That is a projection, not a behavior change.
 
 - `docs/solutions/architecture-patterns/upstream-ce-sync-upgrade-methodology-2026-04-26.md` — broader CE update synchronization protocol.
 - `docs/solutions/workflow-issues/modify-source-not-artifacts-2026-04-13.md` — source/runtime boundary for generated mirrors.
-- `docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md` — active migration audit ledger for CE skill mappings.
+- `docs/validation/2026-07-08-ce-to-spec-first-skill-review-plan.md` — active migration audit ledger for CE skill mappings.
 - `docs/validation/2026-07-08-completed-skill-path-audit-summary.md` — running record of user corrections during migration review.

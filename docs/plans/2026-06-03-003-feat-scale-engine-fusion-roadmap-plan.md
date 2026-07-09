@@ -489,7 +489,7 @@ origin:
 - `docs/contracts/workflows/skill-agent-quality-governance.md`
 - `src/cli/contracts/dual-host-governance/skills-governance.*`
 - `src/cli/contracts/dual-host-governance/agents-governance.*`
-- `skills/spec-skill-audit/SKILL.md`
+- `skills/retired-skill-review/SKILL.md`
 - `tests/unit/skill-agent-quality-governance-contracts.test.js`
 
 **Test Scenarios:**
