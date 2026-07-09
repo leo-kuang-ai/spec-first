@@ -46,9 +46,8 @@ const {
   buildUserLanguageSyncPlan,
 } = require('../user-language-sync');
 const {
-  applyManagedBootstrapBlock,
-  buildBootstrapBlock,
   inspectInstructionBootstrap,
+  removeManagedBootstrapBlock,
 } = require('../instruction-bootstrap');
 const { removeManagedRuntimeToolsBlock } = require('../runtime-tools-index');
 const {
@@ -2810,18 +2809,17 @@ function buildInitMetadataPlan({
   const instructionWithoutLegacyCodingGuidelines = removeManagedCodingGuidelinesBlock(
     instructionWithoutLegacyRuntimeTools,
   );
-  const instructionWithLang = applyManagedBlock(
+  const instructionWithoutLegacyBootstrap = removeManagedBootstrapBlock(
     instructionWithoutLegacyCodingGuidelines,
-    buildManagedBlock(developer.lang),
   );
-  const instructionWithBootstrap = applyManagedBootstrapBlock(
-    instructionWithLang,
-    buildBootstrapBlock(adapter, developer.lang),
+  const instructionWithLang = applyManagedBlock(
+    instructionWithoutLegacyBootstrap,
+    buildManagedBlock(developer.lang),
   );
   operations.push(buildPlanFileOperation(
     projectRoot,
     adapter.instructionFile,
-    instructionWithBootstrap,
+    instructionWithLang,
     'managed_instruction_file',
   ));
 

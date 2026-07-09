@@ -12,7 +12,6 @@ const CONSUMER_SURFACES = [
   'skills/spec-work/SKILL.md',
   'skills/spec-prd/SKILL.md',
   'skills/spec-brainstorm/SKILL.md',
-  'skills/spec-ideate/SKILL.md',
 ];
 
 function read(relativePath) {
@@ -83,17 +82,13 @@ describe('project graph consumption contract', () => {
     }
   });
 
-  test('brainstorm and ideate consumers keep project graph optional and user-led', () => {
+  test('brainstorm consumer keeps project graph optional and user-led', () => {
     const contract = read('docs/contracts/project-graph-consumption.md');
     const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-    const ideate = read('skills/spec-ideate/SKILL.md');
 
     expect(brainstorm).toContain('docs/contracts/project-graph-consumption.md');
     expect(brainstorm).toContain('the WHAT must come from user dialogue and source confirmation, never the candidate');
     expect(brainstorm).toContain('fall back to direct source reads');
-    expect(ideate).toContain('docs/contracts/project-graph-consumption.md');
-    expect(ideate).toContain('option evaluation and the chosen direction must be re-grounded in source, never the candidate');
-    expect(ideate).toContain('fall back to direct source reads');
     expect(contract).toContain('Do not require workflows to run project-graph before direct source reads');
     expect(contract).toContain('whether to issue a project-graph query is an LLM judgment');
   });

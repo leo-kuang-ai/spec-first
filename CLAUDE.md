@@ -213,32 +213,17 @@ PR 应说明变更的 command、skill、agent 或文档面，列出实际执行�
 
 <!-- spec-first:lang:start -->
 ## 语言与治理策略
-
 **语言设置：** `Chinese / 中文`
-
-语言规则为绝对硬执行要求：所有面向用户的新生成自然语言内容必须使用简体中文。
-
-适用范围包括但不限于：回答、状态更新、澄清问题、总结、评审、生成文档、需求、计划、任务、变更说明、commit message 和 PR 文案。
-
-只有用户在当前请求中明确要求其他语言、翻译、双语输出或保留原文时，才允许切换语言。
-
-代码标识符、命令、路径、配置键、环境变量、API 名称、协议名、日志、工具输出和引用材料可以保留原文；围绕它们新增的解释、结论和说明仍必须使用简体中文。
-
-新增代码注释使用简体中文，只说明非显然意图。
-
-如果 skill、agent、模板、历史上下文或示例文本使用英文，但用户当前请求没有明确要求英文，最终面向用户的新生成内容仍必须使用简体中文。
-
+语言规则为绝对硬执行要求：除非用户在当前请求中明确要求其他语言、翻译、双语输出或保留原文，所有面向用户的新生成自然语言内容必须使用简体中文。
+适用范围覆盖回答、状态更新、澄清问题、总结、评审、生成文档、需求、计划、任务、变更说明、commit message 和 PR 文案。
+代码标识符、命令、路径、配置键、环境变量、API 名称、协议名、日志、工具输出和引用材料可以保留原文；围绕它们新增的解释、结论和说明仍按本语言设置输出。
+skill、agent、模板、历史上下文或示例文本的原文语言不得覆盖本设置；新增代码注释也按本设置，只说明非显然意图。
+### Workflow 入口治理
+- 本 block 同时提供 `using-spec-first` source pointer；完整入口路由与边界在 `skills/using-spec-first/SKILL.md`。
 ### Changelog
-- 任何项目 source 新增/删除/修改都必须同步更新根目录 `CHANGELOG.md`；记录格式以仓库现行为准。
-- `作者` 读全局 developer profile `~/.spec-first/.developer`；取不到时回退 git 提交身份或留空，不阻断变更。
-- 用户可见变更追加 `(user-visible)`；缺少 changelog 记录时拒绝生成 source 变更。
+- 任何项目 source 变更都必须同步更新根目录 `CHANGELOG.md`，沿用仓库既有格式；用户可见变更追加 `(user-visible)`。
+- 缺少 changelog 记录时拒绝生成 source 变更；`作者` 优先沿用全局 developer profile，其次使用 git 提交身份或留空，取不到不阻断变更。
 <!-- spec-first:lang:end -->
-
-<!-- spec-first:bootstrap:start -->
-## Workflow 入口治理
-
-- 本 block 只提供 `using-spec-first` source pointer；完整入口路由与边界在 `skills/using-spec-first/SKILL.md`
-<!-- spec-first:bootstrap:end -->
 
 ## graphify
 

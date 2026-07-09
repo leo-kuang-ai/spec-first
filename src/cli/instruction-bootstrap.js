@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { writeFileAtomic } = require('./atomic-write');
+const { LANG_END, LANG_START } = require('./lang-policy');
 
 const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
 const BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
@@ -45,39 +46,52 @@ function inspectInstructionBootstrap(projectRoot, adapter) {
   }
 
   const existing = fs.readFileSync(filePath, 'utf8');
-  const startIdx = existing.indexOf(BOOTSTRAP_START);
-  const endIdx = existing.indexOf(BOOTSTRAP_END);
+  const legacyStartIdx = existing.indexOf(BOOTSTRAP_START);
+  const legacyEndIdx = existing.indexOf(BOOTSTRAP_END);
 
-  if (startIdx === -1 && endIdx === -1) {
+  if (legacyStartIdx !== -1 || legacyEndIdx !== -1) {
+    if (legacyStartIdx === -1 || legacyEndIdx === -1 || legacyEndIdx <= legacyStartIdx) {
+      return {
+        status: 'partial',
+        message: 'legacy bootstrap markers are incomplete',
+      };
+    }
+
+    return {
+      status: 'drifted',
+      message: 'standalone bootstrap block should be merged into the spec-first:lang block',
+    };
+  }
+
+  const langStartIdx = existing.indexOf(LANG_START);
+  const langEndIdx = existing.indexOf(LANG_END);
+
+  if (langStartIdx === -1 && langEndIdx === -1) {
     return {
       status: 'missing',
-      message: 'managed bootstrap block missing',
+      message: 'managed language/governance block missing',
     };
   }
 
-  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+  if (langStartIdx === -1 || langEndIdx === -1 || langEndIdx <= langStartIdx) {
     return {
       status: 'partial',
-      message: 'managed bootstrap markers are incomplete',
+      message: 'managed language/governance markers are incomplete',
     };
   }
 
-  const actual = existing.slice(startIdx, endIdx + BOOTSTRAP_END.length);
-  const expectedBlocks = [
-    buildBootstrapBlock(adapter, 'zh'),
-    buildBootstrapBlock(adapter, 'en'),
-  ];
-
-  if (expectedBlocks.includes(actual)) {
+  const actual = existing.slice(langStartIdx, langEndIdx + LANG_END.length);
+  if (actual.includes('`using-spec-first`') &&
+    actual.includes('skills/using-spec-first/SKILL.md')) {
     return {
       status: 'installed',
-      message: 'managed bootstrap block present',
+      message: 'workflow entry guidance present in the spec-first:lang block',
     };
   }
 
   return {
     status: 'drifted',
-    message: 'managed bootstrap block drifted from the bundled template',
+    message: 'workflow entry guidance missing from the spec-first:lang block',
   };
 }
 

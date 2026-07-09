@@ -930,16 +930,16 @@ function checkInstructionBootstrap(projectRoot, adapter) {
   if (status.status === 'installed') {
     return {
       level: 'PASS',
-      name: `${adapter.instructionFile} using-spec-first bootstrap`,
+      name: `${adapter.instructionFile} workflow entry guidance`,
       message: status.message,
     };
   }
 
   return {
     level: 'WARNING',
-    name: `${adapter.instructionFile} using-spec-first bootstrap`,
+    name: `${adapter.instructionFile} workflow entry guidance`,
     message: status.message,
-    fix: formatInitGuidance(adapter, 'in this project to restore the managed bootstrap block'),
+    fix: formatInitGuidance(adapter, 'in this project to restore the merged language/governance block'),
   };
 }
 

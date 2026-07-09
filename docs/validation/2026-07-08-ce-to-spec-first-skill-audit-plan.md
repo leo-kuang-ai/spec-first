@@ -32,19 +32,13 @@ CE 是迁移能力的语义基准：
 
 | CE skill | spec-first target | skill 功能说明 | 审查类型 | 处理状态 | 是否完成审查 |
 |---|---|---|---|---|---|
-| `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
-| `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 |  |  |
 | `ce-commit` | `spec-commit` | 生成并执行受控提交，维护 commit message 与验证摘要 | 直接映射，低复杂度 | 已完成 | 已审查 |
 | `ce-commit-push-pr` | `spec-commit-push-pr` | 提交、推送并创建或更新 PR 的交付 helper | 直接映射，低复杂度 | 已完成 | 已审查 |
 | `ce-compound` | `spec-compound` | 将已验证的问题解决经验沉淀为可复用知识 | 直接映射，knowledge/source evidence 关键 | 已完成 | 已审查 |
 | `ce-compound-refresh` | `spec-compound-refresh` | 刷新、合并或淘汰过期的 durable knowledge | 直接映射，learning lifecycle 关键 | 已完成 | 已审查 |
-| `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
-| `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
 | `ce-dogfood` | `spec-dogfood` | 对当前分支执行 hands-off 浏览器用户流 QA | 直接映射，browser QA artifact contract 关键 | 已完成 | 已审查 |
 | `ce-explain` | `spec-explain` | 将概念、diff 或近期工作整理成面向用户的解释材料 | 直接映射，低/中复杂度 | 已完成 | 已审查 |
-| `ce-ideate` | `spec-ideate` | 生成并评估项目上下文内的改进想法 | 直接映射，与 brainstorm 的边界关键 |  |  |
 | `ce-optimize` | `spec-optimize` | 围绕可测指标运行迭代优化循环 | 直接映射，metric/eval loop 关键 | 已完成 | 已审查 |
-| `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 |  |  |
 | `ce-polish` | `spec-polish` | 启动应用、浏览器检查并迭代 UI / UX polish | 直接映射，browser/dev-server 行为关键 | 已完成 | 已审查 |
 | `ce-pov` | `spec-pov` | 基于项目上下文对外部输入给出明确 verdict | 直接映射，verdict routing 关键 | 已完成 | 已审查 |
 | `ce-product-pulse` | `spec-product-pulse` | 从配置的信号源生成产品脉搏报告 | 直接映射，signal/config 行为关键 | 已完成 | 已审查 |
@@ -58,9 +52,15 @@ CE 是迁移能力的语义基准：
 | `ce-sweep` | `spec-sweep` | 扫描反馈源并生成 acknowledge / analysis / recommendation | 直接映射，feedback-source workflow 关键 | 已完成 | 已审查 |
 | `ce-test-browser` | `spec-test-browser` | 浏览器测试 helper，辅助页面交互验证 | 直接映射，browser helper 边界关键 | 已完成 | 已审查 |
 | `ce-test-xcode` | `spec-test-xcode` | XcodeBuildMCP 预检与 iOS / Xcode 验证辅助 | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
-| `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 |  |  |
 | `ce-worktree` | `spec-worktree` | 内部 worktree helper，支持隔离并行工程任务 | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
 | `lfg` | `spec-lfg` | 从计划到绿色 PR 的完整 hands-off 工程流水线 | 直接映射，full pipeline 关键 | 已完成 | 已审查 |
+| `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
+| `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 |  |  |
+| `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
+| `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
+| `ce-ideate` | `spec-ideate` | 生成并评估项目上下文内的改进想法 | 直接映射，与 brainstorm 的边界关键 | 已完成 | 已审查 |
+| `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 |  |  |
+| `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 |  |  |
 
 spec-first-only skills 不做 CE 直接等价审查，但可用于解释合理 divergence：
 
@@ -233,7 +233,7 @@ done
 3. `ce-doc-review` -> `spec-doc-review`
 4. `ce-code-review` -> `spec-code-review`
 5. `ce-work` -> `spec-work`
-6. `ce-ideate` -> `spec-ideate`
+6. `ce-ideate` -> `spec-ideate`（已完成）
 7. `lfg` -> `spec-lfg`
 
 ## Batch 1 快审记录
@@ -795,6 +795,68 @@ done
 | 无 scenario fingerprint | 无 | `.spec-first/workspace/scenario-fingerprint-setup.json`（适用时） | spec-first 新增 | 用于 workspace / scenario 级 setup 事实复用；不替代具体 host/runtime/provider readiness | workspace setup summary、后续 setup drift 判断 |
 | 单 Bash health check | `scripts/check-health` | Bash + PowerShell parity scripts：`check-health`、`check-health.ps1`、`verify-tools.sh`、`verify-tools.ps1`、`install-mcp.*` | 已覆盖并扩展 | 需要维持 macOS/Linux/Windows 行为等价；外部命令执行、超时、路径 quoting、JSON/human 输出都应有跨平台测试 | `mcp-setup-powershell-contracts.test.js`、shell syntax check、PowerShell parse check |
 | plugin version display | `scripts/check-health` | spec-first version / runtime facts 可选展示，不作为核心产物 | 部分覆盖 | 版本可辅助诊断，但 setup 的可靠产物应是 readiness facts 与 next actions；不要把版本展示当作安装成功证据 | `spec-first --version`、`tool-facts.json` advisory facts |
+
+## Batch 4 核心链路深审记录
+
+### `ce-ideate` -> `spec-ideate`
+
+#### Verdict
+
+- status: replaced
+- risk: high
+- decision: 按用户裁决，`spec-ideate` 清空后完整拷贝 CE `ce-ideate` source 文件，再做最小 spec-first 投影。保留 CE 的 `output:md` / HTML 默认输出、自动写 ideation artifact、`references/divergent-ideation.md`、`references/ideation-sections.md`、`references/html-rendering.md`、`references/markdown-rendering.md`、fresh-context basis verifier、axis decomposition / recovery、auto-write 后再菜单化 handoff 的主流程。不保留上一版 spec-first 的 opt-in persistence、Proof HITL sync-back、project-graph consumer boundary 和 Workflow Contract Summary 作为 `spec-ideate` active contract。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/agents/*.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/divergent-ideation.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/html-rendering.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/ideation-sections.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/markdown-rendering.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/post-ideation-workflow.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/repo-profile-cache.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/universal-ideation.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/references/web-research-cache.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/scripts/repo-profile-cache.py`
+- spec-first: `skills/spec-ideate/SKILL.md`
+- spec-first: `skills/spec-ideate/references/agents/*.md`
+- spec-first: `skills/spec-ideate/references/*.md`
+- spec-first: `skills/spec-ideate/scripts/repo-profile-cache.py`
+
+#### Preserved Capabilities
+
+- 保留 CE 的输出模式解析：`output:md`、plain-language markdown/HTML request、用户偏好、`.spec-first/config.local.yaml` 中 `ideate_output`、默认 HTML、pipeline 强制 markdown。
+- 保留 CE 的自动持久化：Phase 4 自动写 ideation artifact，repo / existing `docs/ideation/` 写入项目文档，否则写入 `/tmp/spec-first/spec-ideate/<run-id>/`。
+- 保留 CE 的 artifact section contract：metadata、Grounding Context、Topic Axes、Ranked Ideas、Rejection Summary，以及 markdown / HTML exclusive rendering references。
+- 保留 CE 的发散生成拆分：Phase 2 必读 `references/divergent-ideation.md`，其中包含 fleet tiering、dispatch payload、ambition charter、six frames、basis contract、axis recovery 和 raw-candidates checkpoint。
+- 保留 CE 的 adversarial filtering：fresh-context basis verifier 先审，orchestrator 再裁决；`go deep` 可加第二 critic。
+- 保留 CE 的 universal ideation：非软件 elsewhere topics 使用 domain-native facilitation，同时保留 axis decomposition、basis verifier 和自动写 artifact 的 wrap-up。
+- 保留 CE 的 next-step menu：Open / Publish to Proof、Brainstorm one idea、Discuss/refine、Done；brainstorm handoff 使用 focused seed，不传整份文件。
+
+#### Intentional Spec-First Divergences
+
+- `ce-ideate` / `ce-brainstorm` / `ce-plan` / `ce-work` / `ce-doc-review` / `ce-proof` 等入口和消费者投影为 `spec-*`。
+- `.compound-engineering/config.local.yaml` 投影为 `.spec-first/config.local.yaml`。
+- `/tmp/compound-engineering/ce-ideate` 和 `/tmp/compound-engineering/repo-profile` 投影为 `/tmp/spec-first/spec-ideate` 和 `/tmp/spec-first/repo-profile`。
+- Proof identity 投影为 `ai:spec-first` / `Spec-First`。
+- `learnings-researcher.md` 的 module search 从 `compound-engineering|skill-design` 投影为 `spec-first|skill-design`。
+
+#### Test Contract Cleanup
+
+- 删除 `tests/unit/spec-ideate-contracts.test.js`：该测试锁定上一版 spec-first-only opt-in persistence、Proof HITL sync-back、OS temp root、Dispatch Boundary、project-graph boundary 等行为，已与 CE-first 裁决冲突。
+- 删除 `tests/unit/public-workflow-contract-summary.test.js`：该测试要求所有 public workflow 都有 `Workflow Contract Summary`，但当前 CE-first 迁移明确不为 `spec-ideate` 及若干 CE-derived skill 强加 CE 中不存在的 summary 包装。
+- 收窄 `tests/unit/project-graph-consumption-contracts.test.js`：移除 `spec-ideate` 作为 project-graph consumer 的断言，避免把 spec-first-only provider boundary 恢复进 CE-first `spec-ideate`。
+
+#### Verification Status
+
+- 已逐个打开 `skills/spec-ideate` 下 15 个 source 文件审查：`SKILL.md`、9 个 `references/*.md`、5 个 `references/agents/*.md` 和 `scripts/repo-profile-cache.py`。
+- 已运行 CE/spec 目录 diff，确认差异集中在 `ce-*` -> `spec-*`、`.compound-engineering` -> `.spec-first`、`/tmp/compound-engineering/...` -> `/tmp/spec-first/...`、Proof identity 和 learnings module search 的必要投影。
+- 已运行 focused residual scan，确认 `skills/spec-ideate` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留。
+- 已运行 `PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/spec-ideate/scripts/repo-profile-cache.py`。
+- 已运行 `npm run lint:skill-entrypoints`。
+- 已运行 `npx jest tests/unit/project-graph-consumption-contracts.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/repo-profile-cache-parity.test.js tests/unit/changelog-format.test.js --runInBand`。
+- 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-ideate tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-ideate-contracts.test.js tests/unit/public-workflow-contract-summary.test.js`。
 
 ## 推荐报告产物
 

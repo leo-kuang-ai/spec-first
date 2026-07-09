@@ -58,6 +58,17 @@ assert_not_contains() {
   fi
 }
 
+assert_no_blank_lines() {
+  local desc="$1"
+  local haystack="$2"
+  if [[ "$haystack" != *$'\n\n'* ]]; then
+    pass=$((pass + 1))
+  else
+    echo "  ✗ $desc: output contains blank lines"
+    fail=$((fail + 1))
+  fi
+}
+
 # Node helper: run a JS snippet and capture stdout
 node_run() {
   node -e "
@@ -89,6 +100,7 @@ assert_contains "zh block has start marker" "<!-- spec-first:lang:start -->" "$z
 
 echo "1.2 zh block contains END marker"
 assert_contains "zh block has end marker" "<!-- spec-first:lang:end -->" "$zh_block"
+assert_no_blank_lines "zh project block has no blank lines" "$zh_block"
 
 echo "1.3 zh block contains Chinese language directive"
 assert_contains "zh block has Chinese directive" "中文" "$zh_block"
@@ -122,11 +134,14 @@ assert_not_contains "en block omits raw en code" '**Language setting:** `en`' "$
 echo "1.11 en block contains START and END markers"
 assert_contains "en block has start marker" "<!-- spec-first:lang:start -->" "$en_block"
 assert_contains "en block has end marker" "<!-- spec-first:lang:end -->" "$en_block"
+assert_no_blank_lines "en project block has no blank lines" "$en_block"
 
 echo "1.12 zh block has strict generated-content language scope"
 assert_contains "zh block has hard execution wording" "语言规则为绝对硬执行要求" "$zh_block"
 assert_contains "zh block applies to generated docs and task prose" "生成文档、需求、计划、任务" "$zh_block"
 assert_contains "zh block applies to commit and PR text" "commit message 和 PR 文案" "$zh_block"
+assert_not_contains "zh block omits open-ended scope phrase" "适用范围包括但不限于" "$zh_block"
+assert_not_contains "zh block omits developer profile path detail" "~/.spec-first/.developer" "$zh_block"
 
 echo "1.13 en block contains changelog governance rule"
 assert_contains "en block has changelog rule" "CHANGELOG" "$en_block"
@@ -150,6 +165,8 @@ echo "1.19 en block has strict generated-content language scope"
 assert_contains "en block has hard execution wording" "absolute hard-execution requirement" "$en_block"
 assert_contains "en block applies to generated docs and task prose" "generated documents, requirements, plans, tasks" "$en_block"
 assert_contains "en block applies to commit and PR text" "commit messages, and PR text" "$en_block"
+assert_not_contains "en block omits open-ended scope phrase" "without limitation" "$en_block"
+assert_not_contains "en block omits developer profile path detail" "~/.spec-first/.developer" "$en_block"
 
 echo "1.20 user-language blocks use separate markers"
 zh_user_block=$(node_run "process.stdout.write(buildUserLanguageBlock('zh'))")
@@ -158,6 +175,8 @@ assert_contains "zh user block has start marker" "<!-- spec-first:user-language:
 assert_contains "zh user block has end marker" "<!-- spec-first:user-language:end -->" "$zh_user_block"
 assert_contains "en user block has start marker" "<!-- spec-first:user-language:start -->" "$en_user_block"
 assert_contains "en user block has end marker" "<!-- spec-first:user-language:end -->" "$en_user_block"
+assert_no_blank_lines "zh user block has no blank lines" "$zh_user_block"
+assert_no_blank_lines "en user block has no blank lines" "$en_user_block"
 
 echo "1.21 user-language blocks exclude project governance"
 assert_not_contains "zh user block excludes changelog" "CHANGELOG" "$zh_user_block"
