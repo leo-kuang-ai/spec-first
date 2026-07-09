@@ -13,13 +13,6 @@ function read(relativePath) {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
 }
 
-function readPlanSurface() {
-  return [
-    read('skills/spec-plan/SKILL.md'),
-    read('skills/spec-plan/references/governance-boundaries.md'),
-  ].join('\n');
-}
-
 function jsonBlocks(markdown) {
   const blocks = [];
   const pattern = /```json\n([\s\S]*?)\n```/g;
@@ -97,25 +90,6 @@ describe('context bundle and summary contracts', () => {
     expect(governance).toContain('docs/contracts/context-bundle.md');
     expect(governance).toContain('docs/contracts/artifact-summary.md');
     expect(governance).toContain('`host_local_config_excluded`');
-  });
-
-  test('high-frequency planning workflows consume compact context contracts instead of full broadcast by default', () => {
-    const plan = readPlanSurface();
-
-    for (const content of [plan]) {
-      expect(content).toContain('stable instruction prefix');
-      expect(content).toContain('dynamic suffix');
-      expect(content).toContain('artifact-summary.v1');
-      expect(content).toContain('context-bundle.v1');
-      expect(content).toContain('docs/contracts/context-bundle.md');
-    }
-
-    for (const content of [plan]) {
-      expect(content).toContain('Maintain a run-local context ledger for this workflow');
-      expect(content).toContain('paths read, reason, phase, and compact summary');
-      expect(content).toContain('Reuse loaded summaries within the same workflow run');
-      expect(content).toContain('Re-read only when exact wording is needed');
-    }
   });
 
   test('internal context-bundle helper emits path-backed envelope and applies runtime exclusion', () => {

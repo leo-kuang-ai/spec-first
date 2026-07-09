@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: cli_runtime/commands
+title: commands
+scope:
+    - src/cli/commands/
+source_files: []
+depends_on: []
+related_to: []

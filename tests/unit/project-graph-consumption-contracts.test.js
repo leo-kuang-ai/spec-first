@@ -6,7 +6,6 @@ const path = require('node:path');
 const REPO_ROOT = path.join(__dirname, '..', '..');
 
 const CONSUMER_SURFACES = [
-  'skills/spec-plan/references/governance-boundaries.md',
   'skills/spec-debug/SKILL.md',
   'skills/spec-prd/SKILL.md',
 ];

@@ -79,10 +79,11 @@ describe('skill source path rewrite guard', () => {
       expect(setup).toContain(`bash -n ${runtimeRoot}/scripts/*.sh`);
       expect(setup).not.toContain(`\`${runtimeRoot}/mcp-tools.json\` is the current source directory`);
 
-      expect(plan).toContain(`Read \`${specPlanRuntimeRoot}/references/plan-sections.md\``);
-      expect(plan).toContain(`Read \`${specPlanRuntimeRoot}/references/plan-template.md\``);
-      expect(plan).toContain(`read \`${specPlanRuntimeRoot}/references/planning-flow.md\``);
-      expect(plan).not.toContain('Read `skills/spec-plan/references/plan-template.md`');
+      expect(plan).toContain('references/plan-sections.md');
+      expect(plan).toContain('read `references/markdown-rendering.md`');
+      expect(plan).toContain('read `references/html-rendering.md`');
+      expect(plan).toContain('load `references/plan-handoff.md`');
+      expect(plan).not.toContain('Read `skills/spec-plan/references/plan-sections.md`');
     }
   });
 

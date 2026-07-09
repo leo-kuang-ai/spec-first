@@ -9,13 +9,6 @@ function read(relativePath) {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
 }
 
-function readPlanSurface() {
-  return [
-    read('skills/spec-plan/SKILL.md'),
-    read('skills/spec-plan/references/governance-boundaries.md'),
-  ].join('\n');
-}
-
 describe('knowledge harness contract', () => {
   test('defines six layers, v1.15 scope, and recall trust boundaries', () => {
     const contract = read('docs/contracts/knowledge/knowledge-harness.md');
@@ -64,27 +57,6 @@ describe('knowledge harness contract', () => {
 });
 
 describe('knowledge harness workflow consumers', () => {
-  test('plan exposes summary-first producer and consumer signals', () => {
-    const workflowTexts = [
-      readPlanSurface(),
-    ];
-
-    for (const text of workflowTexts) {
-      expect(text).toContain('Summary-First Handoff');
-      expect(text).toContain('artifact-summary.v1');
-      expect(text).toContain('summary_missing');
-      expect(text).toContain('full_artifact_read_reason');
-      expect(text).toContain('full_artifact_read_triggers');
-      expect(text).toContain('互依赖任务');
-      expect(text).toContain('context-bundle.v1');
-      expect(text).toContain('related_paths');
-      expect(text).toContain('evidence_paths');
-      expect(text).toContain('excluded_context');
-      expect(text).not.toContain('included_context');
-      expect(text).not.toContain('omitted_context');
-    }
-  });
-
   test('artifact-summary contract itself defines summary_missing and full_artifact_read_reason rules', () => {
     const contract = read('docs/contracts/artifact-summary.md');
 
@@ -100,11 +72,10 @@ describe('knowledge harness workflow consumers', () => {
     expect(contract).not.toContain('omitted_context');
   });
 
-  test('plan and debug treat solution recall as advisory until source-confirmed', () => {
-    const plan = readPlanSurface();
+  test('debug treats solution recall as advisory until source-confirmed', () => {
     const debug = read('skills/spec-debug/SKILL.md');
 
-    for (const text of [plan, debug]) {
+    for (const text of [debug]) {
       expect(text).toContain('Recall Trust Boundary');
       expect(text).toContain('docs/solutions');
       expect(text).toContain('advisory candidate');

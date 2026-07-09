@@ -1,3 +1,6 @@
+---
+trigger: always_on
+---
 <!-- spec-first:host-native-pointer:start -->
 # spec-first
 This file is a spec-first managed host-native pointer.

@@ -38,7 +38,6 @@ const GOVERNANCE_PATH = path.join(
 const COMMAND_PATH = path.join(REPO_ROOT, 'templates', 'claude', 'commands', 'spec', 'prd.md');
 const USING_SPEC_FIRST_PATH = path.join(REPO_ROOT, 'skills', 'using-spec-first', 'SKILL.md');
 const SPEC_PLAN_PATH = path.join(REPO_ROOT, 'skills', 'spec-plan', 'SKILL.md');
-const SPEC_PLAN_PLANNING_FLOW_PATH = path.join(REPO_ROOT, 'skills', 'spec-plan', 'references', 'planning-flow.md');
 const HUMAN_TEMPLATE_INDEX_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', 'README.md');
 const HUMAN_TEMPLATE_CORE_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', '00-通用增量需求模板.md');
 const HUMAN_TEMPLATE_H5_PC_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', '40-H5-PC端需求模板.md');
@@ -1347,9 +1346,9 @@ describe('spec-prd workflow contracts', () => {
     expect(humanCore).not.toContain([['git', 'nexus'].join(''), 'pointer'].join('-'));
   });
 
-  test('routing and downstream plan intake know prd-requirements boundaries', () => {
+  test('routing knows prd-requirements planning boundary', () => {
     const usingSpecFirst = read(USING_SPEC_FIRST_PATH);
-    const specPlan = `${read(SPEC_PLAN_PATH)}\n${read(SPEC_PLAN_PLANNING_FLOW_PATH)}`;
+    const specPlan = read(SPEC_PLAN_PATH);
 
     expectContainsAll(usingSpecFirst, [
       'brownfield PRD authoring, existing PRD refinement, or code-aware PRD validation',
@@ -1360,39 +1359,13 @@ describe('spec-prd workflow contracts', () => {
       'spec-app-consistency-audit',
     ]);
     expectContainsAll(specPlan, [
-      '`artifact_kind: prd-requirements`',
-      'PRD-grade requirements origin',
-      'PRD-grade candidate',
-      '`origin_grade: prd`',
-      '`origin_verification_status: verified`',
-      'PRD_FINALIZER',
-      '.agents/skills/spec-prd/scripts/finalize-prd-artifact.js',
-      '.claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js',
-      'Exit code `2` is a verifier usage/runtime failure',
-      '`unverified-prd-origin`',
-      '`downstream_sync_unknown`',
-      'Do not use `--check-only` as a consumer pass signal',
-      'Inherit the existing `spec_id`',
-      'R/F/AE',
-      'Scope Boundaries',
-      'Evidence And Assumptions',
-      'trace self-check summary',
-      '`US-*` / `FEAT-*` / `NFR-*`',
-      '`## Feature Slices`',
-      'preserve feature IDs',
-      'requirement refs',
-      'acceptance refs',
-      'source/evidence pointers',
-      'PRD-origin trace, not a new planning-owned artifact class',
-      'missing slice acceptance',
-      'missing slice source',
-      'missing slice scope',
-      'do not copy the full `spec-prd` readiness lens or Feature Slice Pack',
-      'do not generate program slices or task packs during planning',
-      '`document_role: split-summary`',
-      '`document_role: child-prd`',
-      'child_id',
-      'parent_spec_id',
+      'plan from requirements',
+      'requirements-only unified plan',
+      'legacy requirements doc',
+      'artifact_readiness: requirements-only',
+      'product_contract_source: spec-brainstorm',
+      'legacy-requirements',
+      'spec-unified-plan/v1',
     ]);
   });
 

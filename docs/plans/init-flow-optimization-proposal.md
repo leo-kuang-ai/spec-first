@@ -1,0 +1,774 @@
+# spec-first init 优化技术方案
+
+## 一、战略论证
+
+### 1.1 为什么现在做
+
+**驱动信号：**
+
+1. **扩展性即将触及临界** — 当前 5 宿主已使 UNREWRITTEN_PATH_PATTERNS 达到 O(n²) 维护负债。Kiro 刚接入时已触发全部 4 个现有 adapter 的修改。社区已有 Windsurf、Augment 等新 IDE 采用 AGENTS.md 标准，第 6 个宿主接入需求可预见。
+2. **Qoder hooks 功能缺口** — spec-first 本身运行在 Qoder 环境中，但 Qoder 的 shell-command hooks（与 Claude 同协议）完全未覆盖，这意味着 spec-first 在自己的宿主上缺少 governance injection。
+3. **init.js 3055 行已成维护瓶颈** — 任何 init 逻辑的修改（如上述 Qoder hooks 添加）都需要导航 3000+ 行文件，增加回归风险。
+4. **对齐核心链路** — 重构使新宿主扩展从 3-5 天降至 1 天，直接提升 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge` 链路的覆盖面（更多宿主 = 更多用户可触达 workflow）。
+
+**核心判断对齐（AGENTS.md）：**
+> 这次改动是否让 AI coding 从一次性对话，进一步走向可治理、可验证、可复用、可沉淀的工程闭环？
+
+答：是。通过降低宿主扩展成本 + 补齐 Qoder governance hooks + 提升可维护性，使 spec-first harness 的价值更可被更多宿主的用户识别和使用。
+
+### 1.2 非目标（Non-Goals）
+
+本方案明确 **不做** 以下事项：
+
+| 不做 | 原因 |
+|------|------|
+| 引入外部 adapter 插件系统 | 当前 5+1 宿主规模不需要插件发现机制 |
+| 改变 CLI 用户可见接口（flags、输出格式、退出码） | 纯内部重构，无 breaking change |
+| 重构 state.json schema | state 模型正确，保持稳定 |
+| 修改 skills-governance.json 格式 | governance 合约稳定，只扩展 scope |
+| 触碰 dual-host governance contract schema | 契约由独立 schema 管理 |
+| 替代宿主即将商品化的能力 | 不重建 session resume、MCP discovery 等 |
+| 自动更新用户 CLI 版本 | 保持 read-only 提醒策略 |
+
+### 1.3 用户体验影响承诺
+
+每个 Phase 的行为不变量：
+
+| 不变量 | 验证方式 |
+|--------|----------|
+| `spec-first init --dry-run` 输出内容与改前一致 | golden snapshot 对比 |
+| `spec-first doctor` 报告相同诊断项和 level | 回归测试断言 |
+| `spec-first clean` 能处理旧版本安装的产物 | legacy state 测试 |
+| 错误消息、退出码保持不变 | CLI smoke test |
+| state.json 格式向后兼容 | schema validation test |
+
+### 1.4 Source/Runtime 边界声明
+
+本方案所有变更均为 **source 变更**（`src/cli/`、`templates/`）。不手改 generated runtime assets（`.claude/`、`.codex/`、`.qoder/` 等）。source 变更后通过 `spec-first init` 重新生成 runtime。
+
+---
+
+## 二、现状诊断
+
+### 2.1 架构概览
+
+```text
+CLI Entry (bin/spec-first.js)
+  → dispatch (src/cli/index.js, 225L)
+    → runInit (src/cli/commands/init.js, 3055L)
+      → parseInitArgs()          -- CLI 参数解析
+      → collectInitInput()       -- 交互式输入收集
+      → buildInitPlans()         -- per-platform plan 构建
+      → applyInitPlan()          -- plan 执行 + rollback
+      依赖:
+        plugin.js (1467L)        -- Governance-based asset filtering
+        state.js (769L)          -- Operation plan model + safety
+        developer.js (264L)      -- Global identity management
+        claude-settings.js (439L) -- Claude hook matcher management
+        atomic-write.js (85L)    -- Windows-aware atomic writes
+      平台适配 (adapters/):
+        claude.js (425L), codex.js (845L), cursor.js (675L),
+        kiro.js (435L), qoder.js (553L)
+        总计 ~2930 行
+```
+
+### 2.2 核心优势（应保留）
+
+| 能力 | 实现 | 评价 |
+|------|------|------|
+| Operation Plan 声明式模型 | state.js: plan→preview→apply | 优秀 |
+| Atomic Write + Windows EPERM Retry | atomic-write.js: tmp→rename + 10x retry | 优秀 |
+| Rollback Backup | init.js: destructive reset 前备份+恢复 | 良好 |
+| Adapter 抽象接口 | base.js PlatformAdapter | 良好 |
+| Runtime Drift Detection | inspectCurrentRuntimeDrift() | 良好 |
+| Path 安全校验 | state.js: symlink escape, Windows reserved, containment | 优秀 |
+| Governance 分层过滤 | plugin.js: dual_host/host_exclusive/delivery mode | 良好 |
+| Hook merge non-destructive | 保留用户自定义 hooks，只替换 managed entries | 优秀 |
+
+### 2.3 核心问题
+
+| 编号 | 问题 | 严重度 | 影响 |
+|------|------|--------|------|
+| P0 | init.js 3055L 混合 6+ 职责 | 高 | 任何修改需导航全文，回归风险大 |
+| P1 | Adapter O(n²) 排除列表 | 高 | 新宿主接入需修改所有现有 adapter |
+| P2 | Plugin.js 1467L 无分层 | 中 | 理解成本高，修改影响面大 |
+| P3 | Qoder hooks 完全缺失 | 中 | 功能缺口，spec-first 在自身宿主无 governance |
+| P4 | 平台兼容性缺口（UNC、WSL） | 低 | 企业环境特定场景 |
+| P5 | 多宿主串行执行 | 低 | 性能浪费但实际 ~2s |
+
+### 2.4 生命周期对称性
+
+```text
+┌──────────────────────────────────────────────────────────────────┐
+│                    spec-first CLI Lifecycle                       │
+├────────────┬──────────────┬─────────────┬────────────────────────┤
+│  init      │  update      │  clean      │  doctor                │
+│  (安装)    │  (更新)      │  (卸载)     │  (诊断)                │
+├────────────┼──────────────┼─────────────┼────────────────────────┤
+│ Plan-based │ 委托 init    │ Plan-based  │ Adapter-driven 检查     │
+│ dry-run ✓  │ dry-run ✗    │ dry-run ✓   │ JSON report ✓          │
+│ rollback ✓ │ npm 幂等     │ 不可逆      │ host-specific checks   │
+│ 多宿主 ✓   │ 自动检测     │ 单宿主限制  │ 自动检测已装宿主        │
+└────────────┴──────────────┴─────────────┴────────────────────────┘
+```
+
+安装核心流程：
+```text
+收集输入 → 加载manifest → governance过滤 → 构建plan → preview → apply → 写state
+```
+
+### 2.5 最佳实践对标
+
+| 原则 | 业界实践 | spec-first 现状 | 评价 |
+|------|---------|-----------------|------|
+| 幂等性 | init 多次结果一致 | drift detection + hard reset | 良好 |
+| Dry-run | 安装前预览 | `--dry-run` 全覆盖 | 优秀 |
+| 原子性 | 失败可回滚 | rollback backup | 良好 |
+| 声明式 | 描述目标而非步骤 | Operation Plan 模型 | 优秀 |
+| 状态追踪 | 知道管理了什么 | state.json per-host | 良好 |
+| 安全卸载 | 只删自己管理的 | state-driven removal | 优秀 |
+| 跨平台 | 单一实现跨 OS | 纯 Node.js | 优秀 |
+| O(1) 扩展 | 新插件不改已有 | ❌ O(n²) 排除列表 | **需改进** |
+
+---
+
+## 三、各宿主合规性分析
+
+### 3.1 产物目录 vs 官方最佳实践
+
+#### Claude Code（2025.07 确认）
+
+| 官方规范 | spec-first 使用 | 符合 |
+|---------|----------------|------|
+| `CLAUDE.md` — 项目指令 | ✅ instructionFile | 符合 |
+| `.claude/settings.json` — hooks/权限 | ✅ hooks 写入此处 | 符合 |
+| `.claude/skills/` — 可复用 prompt | ✅ skillsRoot | 完全符合 |
+| `.claude/commands/` — 单文件命令 | ✅ commandRoot（官方标注 skills 优先） | 符合 |
+| `.claude/agents/` — 子 agent | ✅ agentsRoot | 符合 |
+| `.claude/hooks/` — Hook 脚本 | ✅ 4 个 managed hook | 完全符合 |
+| `.claude/workflows/` — JS workflow | ❌ 用 `.claude/spec-first/workflows/`（SKILL.md 格式非 JS） | 合理偏离 |
+
+**结论：高度符合**。workflows 路径偏离是合理隔离（格式不同）。
+
+#### Codex
+
+| 官方规范 | spec-first 使用 | 符合 |
+|---------|----------------|------|
+| `AGENTS.md` — 项目指令 | ✅ instructionFile | 符合 |
+| `.codex/hooks/` + `hooks.json` | ✅ SessionStart hook | 符合 |
+| `.agents/skills/` — 共享 skills | ✅ skillsRoot（非 `.codex/skills`） | 完全符合 |
+| `.codex/agents/` | ✅ agentsRoot | 符合 |
+
+**结论：完全符合**。
+
+#### Cursor
+
+| 官方规范 | spec-first 使用 | 符合 |
+|---------|----------------|------|
+| `.cursor/rules/` — path-scoped 规则 | ✅ pointer 文件 | 符合 |
+| `.cursor/skills/` — SKILL.md + frontmatter | ✅ skillsRoot | 符合 |
+| Hooks | ❌ **Cursor 不支持 hooks** | ⛔ 正确跳过 |
+
+**结论：完全符合**。
+
+#### Kiro
+
+| 官方规范 | spec-first 使用 | 符合 |
+|---------|----------------|------|
+| `.kiro/steering/` — 核心 context | ✅ pointer 文件 | 符合 |
+| `.kiro/skills/` | ✅ skillsRoot | 符合 |
+| `.kiro/hooks/` — agent-prompt hooks | ❌ 未安装（模型不兼容） | ⚠️ 合理 |
+
+**结论：基本符合**。Kiro hooks 是 agent-prompt 模型（非 shell），适配成本高收益低。
+
+#### Qoder
+
+| 官方规范 | spec-first 使用 | 符合 |
+|---------|----------------|------|
+| `.qoder/rules/` | ✅ pointer 文件 | 符合 |
+| `.qoder/skills/` | ✅ skillsRoot | 符合 |
+| `.qoder/commands/` | ✅ commandRoot | 符合 |
+| `.qoder/settings.json` → hooks | ❌ **未安装** | ⚠️ **可行缺口** |
+
+**结论：产物目录符合，hooks 是可行增强项。**
+
+#### 总结对照
+
+| 宿主 | 目录合规 | Hooks 平台支持 | spec-first hooks 覆盖 | 差距 |
+|------|---------|--------------|---------------------|------|
+| Claude | ✅ 完全 | ✅ Shell hooks | ✅ 4 hooks（最完整） | 无 |
+| Codex | ✅ 完全 | ✅ Shell hooks | ⚠️ SessionStart only | 缺 guard hooks |
+| Cursor | ✅ 完全 | ❌ 不支持 | ⛔ 正确跳过 | 无 |
+| Kiro | ✅ 基本 | ⚠️ Agent-prompt（非 shell） | ❌ 未覆盖 | 模型不兼容 |
+| Qoder | ✅ 完全 | ✅ Shell hooks（同 Claude） | ❌ **未覆盖** | **可修复** |
+
+### 3.2 Hook 设计深度分析
+
+#### 当前 Hook 清单
+
+| Hook | 事件 | 宿主 | 功能 |
+|------|------|------|------|
+| session-start | SessionStart | Claude/Codex | workflow entry governance + version reminder |
+| spec-plan-guard | UserPromptExpansion | Claude | `/spec-plan` 命令展开时注入约束 |
+| prd-prewrite-guard | PreToolUse | Claude | Write/Edit 前检查 PRD 上下文 |
+| prd-readiness-guard | Stop | Claude | 任务结束时检查 PRD readiness |
+
+#### 设计优点
+
+1. **Cross-platform Node.js** — `#!/usr/bin/env node`，macOS/Linux/Windows 均可运行
+2. **Exec-form hooks** — Claude 使用 `{command: "node", args: [path]}` 避免 shell 差异
+3. **Degraded-mode safe** — try/catch 包裹 I/O，失败注入 fallback 而非 abort
+4. **幂等覆盖** — 每次 init 覆盖写入 + drift detection
+5. **Merge non-destructive** — Codex hooks.json 合并保留用户自定义
+6. **Global pollution detection** — Codex 检测 CODEX_HOME 级全局 hook 污染
+
+#### Qoder 事件模型兼容性分析
+
+| Claude 事件 | Qoder 事件 | stdin/stdout 协议 | 兼容性 |
+|------------|-----------|------------------|--------|
+| SessionStart | UserPromptSubmit | ⚠️ 不同触发时机 | 需适配 |
+| UserPromptExpansion | UserPromptSubmit | ⚠️ Qoder 无独立 expansion 事件 | 部分兼容 |
+| PreToolUse | PreToolUse | ✅ 相同 | 完全兼容 |
+| PostToolUse | PostToolUse | ✅ 相同 | 完全兼容 |
+| Stop | Stop | ✅ 相同 | 完全兼容 |
+
+**关键差异**：
+- Qoder 没有 `SessionStart` 事件，最近似的是 `UserPromptSubmit`（用户提交首次 prompt 时触发）
+- `UserPromptSubmit` 与 `UserPromptExpansion` 都在 prompt 到达模型前触发，但 Qoder 的是统一事件，无法按 command name 区分
+- Qoder hooks 配置写入 `.qoder/settings.json` 的 `hooks` key，JSON schema 与 Claude 的 `.claude/settings.json` **完全一致**
+
+**Qoder hooks 适配策略**：
+
+| Claude hook | Qoder 映射 | 可行性 | 优先级 |
+|------------|-----------|--------|--------|
+| session-start → SessionStart | UserPromptSubmit（首次触发） | ⚠️ 需验证触发时机 | 高 |
+| spec-plan-guard → UserPromptExpansion | UserPromptSubmit + matcher 过滤 | ⚠️ 需验证 matcher 支持 | 中 |
+| prd-prewrite-guard → PreToolUse | PreToolUse | ✅ 直接移植 | 高 |
+| prd-readiness-guard → Stop | Stop | ✅ 直接移植 | 高 |
+
+### 3.3 更新感知机制（已有，需小幅增强）
+
+当前已实现完整版本提醒体系（version-reminder.js, 790L）：
+- CLI 命令触发 + session hook 触发双通道
+- 24h 冷却 + per-version-pair 冷却
+- CI/非 TTY 自动跳过
+- 严格 read-only（只提示不安装）
+
+**唯一增强建议**：增加 `--skip <version>` 精确跳过某版本提醒（0.5 天工作量）。
+
+---
+
+## 四、优化方案
+
+### 4.1 设计哲学
+
+```text
+目标状态 = f(source_skills, governance_rules, platform_registry)
+当前状态 = read(state.json) + scan(disk)
+操作计划 = diff(目标状态, 当前状态)
+执行 = apply(操作计划) with rollback
+```
+
+优化不是重新设计，而是让实现与设计意图对齐：拆分职责、消除重复、数据驱动。
+
+### 4.2 Platform Registry（消除 O(n²) 的关键）
+
+```javascript
+// src/cli/adapters/platform-registry.js (~120L)
+const PLATFORM_REGISTRY = {
+  claude: {
+    runtimeRoot: '.claude',
+    managedRoot: '.claude/spec-first',
+    skillsRoot: '.claude/skills',
+    workflowsRoot: '.claude/spec-first/workflows',
+    agentsRoot: '.claude/agents',
+    commandRoot: '.claude/commands',
+    hooksDir: '.claude/hooks',
+    settingsFile: '.claude/settings.json',
+    // 用于自动派生排除列表的路径规则
+    runtimePathRules: [
+      { prefix: '.claude/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
+      { prefix: '.claude/commands/spec-', suffixPattern: '[a-z-]+\\.md' },
+      { prefix: '.claude/commands/spec-', suffixPattern: '\\*\\.md' },
+      { prefix: '.claude/spec-first/workflows/' },
+      { prefix: '.claude/skills/' },
+      { prefix: '.claude/agents/' },
+    ],
+  },
+  codex: {
+    runtimeRoot: '.codex',
+    managedRoot: '.codex/spec-first',
+    skillsRoot: '.agents/skills',          // 跨 runtimeRoot
+    workflowsRoot: '.agents/skills',
+    agentsRoot: '.codex/agents',
+    commandRoot: '.codex/commands/spec',
+    hooksDir: '.codex/hooks',
+    hooksJsonFile: '.codex/hooks.json',
+    runtimePathRules: [
+      { prefix: '.codex/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
+      { prefix: '.codex/commands/spec-', suffixPattern: '\\*\\.md' },
+      { prefix: '.codex/skills/' },
+      { prefix: '.codex/agents/' },
+      { prefix: '.agents/skills/' },
+    ],
+  },
+  cursor: {
+    runtimeRoot: '.cursor',
+    managedRoot: '.cursor/spec-first',
+    skillsRoot: '.cursor/skills',
+    agentsRoot: '.cursor/agents',
+    pointerPath: '.cursor/rules/spec-first.mdc',
+    runtimePathRules: [
+      { prefix: '.cursor/skills/' },
+      { prefix: '.cursor/spec-first/' },
+      { prefix: '.cursor/mcp', suffixPattern: '\\.json' },
+      { prefix: '.cursor/agents/' },
+    ],
+  },
+  kiro: {
+    runtimeRoot: '.kiro',
+    managedRoot: '.kiro/spec-first',
+    skillsRoot: '.kiro/skills',
+    agentsRoot: '.kiro/agents',
+    pointerPath: '.kiro/steering/spec-first.md',
+    runtimePathRules: [
+      { prefix: '.kiro/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
+      { prefix: '.kiro/commands/spec-', suffixPattern: '\\*\\.md' },
+      { prefix: '.kiro/skills/' },
+      { prefix: '.kiro/agents/' },
+      { prefix: '.kiro/spec-first/' },
+      { prefix: '.kiro/settings/' },
+    ],
+  },
+  qoder: {
+    runtimeRoot: '.qoder',
+    managedRoot: '.qoder/spec-first',
+    skillsRoot: '.qoder/skills',
+    agentsRoot: '.qoder/agents',
+    commandRoot: '.qoder/commands',
+    pointerPath: '.qoder/rules/spec-first.md',
+    runtimePathRules: [
+      { prefix: '.qoder/commands/spec', suffixPattern: '/[a-z-]+\\.md' },
+      { prefix: '.qoder/commands/spec-', suffixPattern: '[a-z-]+\\.md' },
+      { prefix: '.qoder/commands/spec-', suffixPattern: '\\*\\.md' },
+      { prefix: '.qoder/skills/' },
+      { prefix: '.qoder/agents/' },
+      { prefix: '.qoder/spec-first/' },
+      { prefix: '.qoder/settings', suffixPattern: '(?:\\.local)?\\.json' },
+    ],
+  },
+};
+```
+
+### 4.3 自动派生 UNREWRITTEN_PATH_PATTERNS（修正版）
+
+**关键改进**：当前 patterns 不是简单前缀，而是包含字符类（`[a-z-]+`）、可选组（`(?:\.local)?`）等复杂正则。因此 `runtimePathRules` 采用 `{ prefix, suffixPattern }` 格式：
+
+```javascript
+/**
+ * 为指定 platformId 生成排除其他所有宿主的路径模式。
+ * 从 PLATFORM_REGISTRY.runtimePathRules 自动构建正则表达式。
+ */
+function deriveUnrewrittenPatterns(platformId) {
+  const registry = require('./platform-registry');
+  return Object.entries(registry.PLATFORM_REGISTRY)
+    .filter(([id]) => id !== platformId)
+    .flatMap(([, config]) => config.runtimePathRules || [])
+    .map(rule => {
+      const escaped = escapeForRegex(rule.prefix);
+      const suffix = rule.suffixPattern || '';
+      return new RegExp(escaped + suffix);
+    });
+}
+
+function escapeForRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+```
+
+**验证策略**：golden snapshot 测试确保自动派生结果覆盖当前硬编码 patterns：
+
+```javascript
+// tests/unit/platform-registry-patterns.test.js
+for (const platformId of ['cursor', 'kiro', 'qoder']) {
+  it(`derived patterns for ${platformId} match legacy hardcoded set`, () => {
+    const derived = deriveUnrewrittenPatterns(platformId);
+    const legacy = loadLegacyPatterns(platformId);
+    // 验证: 每个 legacy pattern 匹配的字符串，derived 也匹配
+    for (const testCase of generateTestStringsFromLegacy(legacy)) {
+      expect(derived.some(d => d.test(testCase))).toBe(true);
+    }
+  });
+}
+```
+
+**收益**：
+- 添加第 6 个宿主：只在 registry 添加 `runtimePathRules`，0 行现有代码修改
+- O(n²) → O(1) 每次扩展
+
+### 4.4 PointerBasedAdapter 基类
+
+```text
+PlatformAdapter (base.js, 177L — 不变)
+├── ClaudeAdapter (独立, ~425L) — hooks×4, settings.json, CLAUDE.md, workflows 独立
+├── CodexAdapter (独立, ~845L) — .agents/ 跨域, hooks.json, legacy×4, pollution
+└── PointerBasedAdapter (新, ~150L) — pointer sync/removal/inspect + auto-derive patterns
+    ├── CursorAdapter (~120L) — .mdc frontmatter, nested scan
+    ├── KiroAdapter (~80L) — steering 目录, agent tool list injection
+    └── QoderAdapter (~150L) — hasCommands + pointer, agent tool pinning
+```
+
+PointerBasedAdapter 封装：
+- `planRuntimeFilesSync()` → 统一 `planHostNativePointerSync` + hook 条件写入
+- `planRuntimeFilesRemoval()` → 统一 `planHostNativePointerRemoval` + hook 条件清理
+- `inspectRuntimeFiles()` → 统一 `inspectHostNativePointer` + hook 条件检查
+- `getUnrewrittenPathPatterns()` → 从 registry 自动派生
+
+### 4.5 init.js 模块拆分
+
+```text
+src/cli/commands/
+  init.js              (~250L) 编排入口: parse→collect→build→preview→apply
+  init-args.js         (~120L) 参数解析: parseInitArgs, INIT_PLATFORM_CHOICES
+  init-input.js        (~200L) 交互收集: collectInitInput, prompts
+  init-plan.js         (~400L) Plan 构建: buildProjectInitPlan, drift, state
+  init-apply.js        (~200L) Plan 执行: applyProjectInitPlan, rollback
+  init-output.js       (~250L) 输出格式: preview, success, next-steps
+  init-workspace.js    (~250L) Multi-repo: discover, workspace plan, summary
+  init-developer.js    (~150L) Profile: global developer, legacy cleanup
+```
+
+拆分原则：
+1. 按职责拆分，保持 exports 兼容（init.js re-export）
+2. 无行为变更——纯代码组织
+3. 现有 `require('./init')` 继续工作
+
+### 4.6 Plugin 模块分层
+
+```text
+src/cli/
+  plugin.js            (~200L) 外部 API: loadPluginManifest, buildFilteredAssetSet (thin facade)
+  plugin-manifest.js   (~400L) Manifest 构建: governance JSON 解析, 资产发现
+  plugin-governance.js (~300L) Governance 过滤: scope, delivery, anchor 验证
+  plugin-sync.js       (~400L) Asset sync planning: planBundledAssetSync, inspectInstalledAssets
+```
+
+### 4.7 Qoder Hooks 补齐
+
+#### 4.7.1 实现方案
+
+基于代码分析，Qoder hooks 的添加涉及以下联动：
+
+**init 联动**（init.js `buildInitMetadataPlan`）：
+```javascript
+// 类比 Claude 的 hook upsert（init.js L2846-L2854）
+if (platform === 'qoder') {
+  const rendered = renderManagedQoderHooksUpsert(projectRoot);
+  operations.push(buildPlanFileOperation(
+    projectRoot,
+    '.qoder/settings.json',
+    rendered.contents,
+    'managed_qoder_hook_matchers',
+  ));
+}
+```
+
+**clean 联动**（clean.js `buildRuntimeCleanupPreview`）：
+```javascript
+// 类比 Claude 的 hook removal（clean.js L419-L435）
+if (adapter.id === 'qoder') {
+  const rendered = renderManagedQoderHooksRemoval(projectRoot);
+  operations.push(rendered && rendered.existsAfter
+    ? buildRelativeOperation('update_file', '.qoder/settings.json', 'managed_qoder_hook_cleanup', { contents: rendered.contents })
+    : buildRelativeOperation('remove_file', '.qoder/settings.json', 'managed_qoder_hook_cleanup'));
+}
+```
+
+**doctor 联动**（doctor.js `buildHostSpecificChecks`）：
+```javascript
+// 类比 Claude 的 hook inspection（doctor.js L963）
+if (adapter.id === 'qoder') {
+  return [
+    checkQoderLocalMcpConfig(projectRoot),
+    ...inspectManagedQoderHooks(projectRoot).map(status => ({
+      level: status.status === 'installed' ? 'PASS' : 'WARNING',
+      name: `.qoder/settings.json ${status.displayName}`,
+      message: status.message,
+      fix: status.status !== 'installed'
+        ? formatInitGuidance('qoder', `to restore the managed ${status.displayName} matcher`)
+        : undefined,
+    })),
+  ];
+}
+```
+
+**drift detection 联动**（init.js `inspectCurrentRuntimeDrift`）：
+```javascript
+// 类比 Claude 的 drift check（init.js L2441-L2450）
+if (adapter.id === 'qoder') {
+  for (const status of inspectManagedQoderHooks(projectRoot)) {
+    if (status.status !== 'installed') {
+      reasons.push(`qoder_settings_${status.eventName}_${status.status}`);
+    }
+  }
+}
+```
+
+#### 4.7.2 新增文件
+
+| 文件 | 内容 | 行数估计 |
+|------|------|---------|
+| `src/cli/qoder-settings.js` | hook upsert/removal/inspect（类比 claude-settings.js） | ~200L |
+| `templates/qoder/hooks/session-start` | Node.js hook 脚本（类比 codex template） | ~170L |
+
+#### 4.7.3 Qoder hooks JSON schema
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node", "args": [".qoder/hooks/session-start"] }] }
+    ],
+    "PreToolUse": [
+      { "matcher": "Write|Edit|MultiEdit", "hooks": [{ "type": "command", "command": "node", "args": [".qoder/hooks/prd-prewrite-guard"] }] }
+    ],
+    "Stop": [
+      { "matcher": ".*", "hooks": [{ "type": "command", "command": "node", "args": [".qoder/hooks/prd-readiness-guard"] }] }
+    ]
+  }
+}
+```
+
+### 4.8 平台兼容性加固（按需）
+
+| 加固项 | 实现位置 | 方案 |
+|--------|---------|------|
+| Windows UNC 路径 | state.js `isSafeManagedStatePath` | 增加 `value.startsWith('\\\\')` 检测 |
+| WSL Profile 互通 | developer.js `getGlobalDeveloperPath` | 检测 WSL + WSLENV → 读 Windows 侧 |
+| 错误语言一致性 | 全局 | 按 profile lang 统一错误消息语言 |
+
+---
+
+## 五、实施路线
+
+### 5.1 Phase 依赖图
+
+```text
+Phase 0: Qoder Hooks ──────────────── 独立，可立即执行
+                                        │
+Phase 1: Platform Registry ──────────── 独立基础设施
+         │                              │
+         ├── Phase 3: PointerBasedAdapter（依赖 Phase 1 的 deriveUnrewrittenPatterns）
+         │
+Phase 2: init.js 拆分 ──────────────── 独立，与 Phase 1 无依赖
+                                        │
+Phase 4: Plugin 分层 ───────────────── 独立，与其他 Phase 无依赖
+                                        │
+Phase 5: 平台兼容性 ───────────────── 独立，按需
+```
+
+**关键结论**：
+- Phase 0 和 Phase 1 可并行启动
+- Phase 3 硬依赖 Phase 1
+- Phase 2/4/5 真正独立
+
+### 5.2 各 Phase 详细计划
+
+#### Phase 0: Qoder Hooks 补齐（1-2 天）
+
+| 步骤 | 内容 | 验收标准 |
+|------|------|---------|
+| 1 | 新建 `src/cli/qoder-settings.js` | exports: renderManagedQoderHooksUpsert, renderManagedQoderHooksRemoval, inspectManagedQoderHooks |
+| 2 | 新建 `templates/qoder/hooks/session-start` | Node.js script，读 AGENTS.md，注入 governance context |
+| 3 | 修改 init.js `buildInitMetadataPlan` | Qoder 平台写入 `.qoder/settings.json` hooks |
+| 4 | 修改 clean.js `buildRuntimeCleanupPreview` | Qoder 平台清理 hooks |
+| 5 | 修改 doctor.js `buildHostSpecificChecks` | Qoder hook inspection |
+| 6 | 修改 init.js `inspectCurrentRuntimeDrift` | Qoder hook drift 检测 |
+| 7 | 新建 `tests/unit/qoder-settings.test.js` | 覆盖 upsert/removal/inspect |
+
+**验收标准**：
+- `spec-first init --qoder --dry-run` 输出包含 `.qoder/settings.json` hook 写入
+- `spec-first doctor --qoder` 报告 hook 状态
+- `spec-first clean --qoder` 正确移除 hooks
+- `npm test` 全通过
+
+#### Phase 1: Platform Registry + 排除列表自动化（1-2 天）
+
+| 步骤 | 内容 | 验收标准 |
+|------|------|---------|
+| 1 | 新建 `src/cli/adapters/platform-registry.js` | 5 宿主完整声明 + `deriveUnrewrittenPatterns` |
+| 2 | 新建 golden snapshot 测试 | 派生结果覆盖当前硬编码 |
+| 3 | 逐一替换 cursor/kiro/qoder 排除列表 | 改用 `deriveUnrewrittenPatterns(this.id)` |
+| 4 | 移除硬编码 patterns 常量 | 清理旧代码 |
+
+**验收标准**：
+- golden snapshot 测试证明覆盖不变
+- `spec-first init --dry-run` 输出对 cursor/kiro/qoder 无差异
+- `npm test` 全通过
+
+#### Phase 2: init.js 模块拆分（2-3 天）
+
+| 步骤 | 内容 | 验收标准 |
+|------|------|---------|
+| 1 | 提取 init-args.js | INIT_PLATFORM_CHOICES + parseInitArgs |
+| 2 | 提取 init-input.js | collectInitInput + prompts |
+| 3 | 提取 init-plan.js | buildProjectInitPlan + 辅助函数 |
+| 4 | 提取 init-apply.js | applyProjectInitPlan + rollback |
+| 5 | 提取 init-output.js | printInitPreview + success/next-steps |
+| 6 | 提取 init-workspace.js | workspace plan + summary |
+| 7 | 提取 init-developer.js | global developer + legacy |
+| 8 | init.js 瘦身为编排入口 + re-export | ~250 行 |
+
+**验收标准**：
+- init.js 主文件 ≤300 行
+- 全量测试通过（unit + smoke + integration）
+- 所有 `require('../commands/init')` 调用点不变
+
+#### Phase 3: PointerBasedAdapter 基类（1-2 天，依赖 Phase 1）
+
+| 步骤 | 内容 | 验收标准 |
+|------|------|---------|
+| 1 | 新建 `pointer-based-adapter.js` | 封装 pointer sync/removal/inspect |
+| 2 | cursor.js 继承重构 | 从 675L 降至 ~120L |
+| 3 | kiro.js 继承重构 | 从 435L 降至 ~80L |
+| 4 | qoder.js 继承重构 | 从 553L 降至 ~150L |
+
+**验收标准**：
+- 三个 adapter 总行数从 1663L 降至 ~350L
+- `spec-first init --dry-run` 对三宿主输出不变
+- `spec-first doctor` 对三宿主诊断不变
+
+#### Phase 4: Plugin 模块分层（1 天）
+
+**验收标准**：
+- plugin.js ≤200 行
+- `npm run lint:skill-entrypoints` 通过
+- governance 逻辑行为不变
+
+#### Phase 5: 平台兼容性（按需，1-2 天）
+
+按实际用户反馈决定优先级。WSL 互通为 opt-in，需显式 flag。
+
+### 5.3 新宿主接入理想流程（优化后）
+
+```text
+1. 在 platform-registry.js 添加声明          (~20L)
+2. 新建 adapters/new-host.js 继承 PointerBasedAdapter  (~100L)
+3. 在 adapters/index.js 注册                 (+2L)
+4. 在 skills-governance.json 添加 scope       (~5L)
+5. 写测试                                    (~300L)
+
+总计: ~430L 新代码, 0 行现有代码修改
+预估: 1 天
+```
+
+vs 当前: ~400L 新代码 + ~250L 修改现有 5 个 adapter = ~650L, 3-5 天
+
+---
+
+## 六、测试策略
+
+### 6.1 测试矩阵
+
+| 测试类型 | 覆盖范围 | 运行命令 |
+|---------|---------|---------|
+| Unit | platform-registry patterns, qoder-settings, init module exports | `npm run test:unit` |
+| Smoke | CLI help, init dry-run, doctor JSON, clean dry-run | `npm run test:smoke` |
+| Integration | init→doctor→clean 全链路 per-host | `npm run test:integration` |
+| Golden snapshot | init --dry-run 输出 before/after 对比 | 新增测试脚本 |
+| Typecheck | Node --check 语法检查 | `npm run typecheck` |
+
+### 6.2 Golden Snapshot 策略
+
+Phase 1/2/3 的核心验收基于输出不变。策略：
+
+1. **重构前**：对 5 宿主运行 `spec-first init --dry-run --{host}` 并保存输出为 golden file
+2. **重构后**：运行相同命令，对比 golden file
+3. **允许的差异**：文件修改时间戳、绝对路径中的用户名
+4. **不允许的差异**：任何 operation 的 kind/path/reason 变化
+
+### 6.3 跨平台 CI
+
+当前状态：macOS/Linux CI 覆盖。Windows 依赖 atomic-write.js 的 EPERM retry。
+
+建议（按需）：
+- GitHub Actions 增加 `windows-latest` matrix entry
+- 重点覆盖：path separator handling, hook mode permissions, UNC path detection
+
+---
+
+## 七、风险与约束
+
+### 7.1 技术风险
+
+| 风险 | 影响 | 缓解 |
+|------|------|------|
+| init.js 拆分破坏 module.exports | 所有 test require 失效 | init.js 保持 re-export |
+| Adapter 声明式化遗漏 Codex 特殊逻辑 | Codex 功能回归 | Codex 不纳入 PointerBasedAdapter |
+| deriveUnrewrittenPatterns 遗漏 edge case | 路径误改写 | golden snapshot + 全量 test case |
+| Qoder UserPromptSubmit 时机与预期不符 | session-start hook 注入时机偏移 | 先部署 PreToolUse/Stop hooks（确定兼容），UserPromptSubmit 单独验证 |
+| Plugin 拆分破坏 skill-entrypoints lint | governance 校验失败 | `npm run lint:skill-entrypoints` 作为门禁 |
+
+### 7.2 Dual-Host Governance 影响
+
+`skills-governance.json` 管理 per-platform skill delivery（command vs skill）。影响分析：
+
+| 重构项 | 对 governance 影响 | 需修改 governance? |
+|--------|-------------------|-------------------|
+| Platform Registry | 不影响（声明路径，不涉及 delivery） | 否 |
+| init.js 拆分 | 不影响（governance 由 plugin.js 管理） | 否 |
+| PointerBasedAdapter | 不影响（delivery 由 plugin.js 决定） | 否 |
+| Plugin 分层 | ⚠️ 内部拆分需保持 `buildFilteredAssetSet` API 不变 | 否（接口不变） |
+| Qoder hooks | 不影响（hooks 独立于 skill delivery） | 否 |
+
+**结论**：所有 Phase 均不修改 governance schema 或 delivery 逻辑。`npm run lint:skill-entrypoints` 作为每个 Phase 的 gate check。
+
+### 7.3 Source/Runtime 边界
+
+| Phase | Source 变更 | Runtime 影响 | 边界正确性 |
+|-------|-----------|-------------|-----------|
+| Phase 0 | src/cli/ + templates/qoder/ | `.qoder/settings.json` + `.qoder/hooks/` 新增（via init） | ✅ source 变更后 init 重生 runtime |
+| Phase 1 | src/cli/adapters/ | 无 runtime 变化 | ✅ 纯 source 重构 |
+| Phase 2 | src/cli/commands/ | 无 runtime 变化 | ✅ 纯 source 重构 |
+| Phase 3 | src/cli/adapters/ | 无 runtime 变化 | ✅ 纯 source 重构 |
+| Phase 4 | src/cli/ | 无 runtime 变化 | ✅ 纯 source 重构 |
+
+---
+
+## 八、总结
+
+### 核心判断
+
+| 维度 | 评价 |
+|------|------|
+| 架构设计 | **优秀** — Plan→Apply + Adapter + State 是业界高端实践 |
+| 多平台支持 | **良好** — 5 宿主覆盖主流，macOS/Linux/Windows 兼容 |
+| 多平台扩展 | **中等** — Adapter 模式正确但 O(n²) 是瓶颈 |
+| 实现复杂度 | **偏高** — 单文件过大、重复代码多、缺少数据驱动 |
+| 产物目录合规性 | **优秀** — 所有宿主均符合官方最佳实践 |
+| Hook 覆盖度 | **中等** — Claude 完整、Codex 部分、Qoder 缺失 |
+| 生命周期对称性 | **良好** — 少数缺口是设计权衡 |
+
+### 优化优先级排序（按 收益/成本 比）
+
+| 优先级 | Phase | 收益 | 成本 | 依赖 |
+|--------|-------|------|------|------|
+| 1 | Platform Registry | 消除 O(n²)，新宿主零修改 | 1-2 天 | 无 |
+| 2 | Qoder Hooks | 补齐自身宿主最大功能缺口 | 1-2 天 | 无 |
+| 3 | init.js 拆分 | 可维护性瓶颈解除 | 2-3 天 | 无 |
+| 4 | PointerBasedAdapter | 消除 1300+ 行重复 | 1-2 天 | Phase 1 |
+| 5 | Plugin 分层 | 降低 contributor 理解成本 | 1 天 | 无 |
+| 6 | 平台兼容性 | 企业场景覆盖 | 1-2 天 | 无 |
+
+**总工期**：7-12 天，渐进执行，每个 Phase 独立交付验证。
+
+### 与业界对标
+
+| 最佳实践 | spec-first 优化后 | 对标 |
+|----------|-----------------|------|
+| 声明式目标状态 | Operation Plan（已有） | Terraform |
+| 插件式 O(1) 扩展 | Platform Registry + auto-derive | Terraform provider protocol |
+| 状态追踪 | state.json（已有） | Terraform state |
+| Dry-run / Preview | --dry-run（已有） | Terraform plan |
+| 单一职责文件 | ~250L 入口 | SRP |
+| 配置即代码 | platform-registry.js | Nx workspace.json |

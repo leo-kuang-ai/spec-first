@@ -59,7 +59,7 @@ CE 是迁移能力的语义基准：
 | `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
 | `ce-doc-review` | `spec-doc-review` | 审查需求、计划或 spec 文档，输出 persona findings 与交互式修复/延期路径 | 直接映射，doc review lifecycle 关键 | 已完成 | 已审查 |
 | `ce-ideate` | `spec-ideate` | 生成并评估项目上下文内的改进想法 | 直接映射，与 brainstorm 的边界关键 | 已完成 | 已审查 |
-| `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 |  |  |
+| `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 | 已完成 | 已审查 |
 | `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 | 已完成 | 已审查 |
 
 spec-first-only skills 不做 CE 直接等价审查，但可用于解释合理 divergence：
@@ -1129,6 +1129,56 @@ done
 - 已运行 `npm run lint:skill-entrypoints`。
 - 已运行 `npx jest tests/unit/project-graph-consumption-contracts.test.js tests/unit/migrated-skill-scripts-contracts.test.js tests/unit/repo-profile-cache-parity.test.js tests/unit/changelog-format.test.js --runInBand`。
 - 已运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md skills/spec-ideate tests/unit/project-graph-consumption-contracts.test.js tests/unit/spec-ideate-contracts.test.js tests/unit/public-workflow-contract-summary.test.js`。
+
+### `ce-plan` -> `spec-plan`
+
+#### Verdict
+
+- status: replaced
+- risk: high
+- decision: 按用户裁决，`spec-plan` 以 CE `ce-plan` source 为真相源重建，再做最小 spec-first 投影。保留 CE 的 direct planning、requirements-only unified plan enrichment、approach-altitude、universal-planning、synthesis confirmation、repo-profile cache、skill-local planning prompt assets、confidence-check deepening、headless doc review、post-generation handoff、Proof 发布和 `/goal` handoff 语义。不恢复上一版 spec-first-only 的 enterprise/governance/reuse/planning-flow reference、eval fixtures、task-pack/provider/context-governance 等额外 plan contract。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-plan/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-plan/references/*.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-plan/references/agents/*.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-plan/scripts/repo-profile-cache.py`
+- spec-first: `skills/spec-plan/SKILL.md`
+- spec-first: `skills/spec-plan/references/*.md`
+- spec-first: `skills/spec-plan/references/agents/*.md`
+- spec-first: `skills/spec-plan/scripts/repo-profile-cache.py`
+
+#### Preserved Capabilities
+
+- 保留 CE 的 plan-only 主流程：Phase 0 intake、requirements-only artifact enrichment、legacy requirements input、planning bootstrap、bug/work route-out suggestion、scoping synthesis、research/deepening/write/review/handoff。
+- 保留 CE 的 unified plan artifact 结构：Goal Capsule、Product Contract、Planning Contract、Implementation Units、Verification Contract、Definition of Done、Open Questions、Appendix，以及 `artifact_readiness` gate。
+- 保留 CE 的非软件与 approach-altitude 分支：universal planning 可以只在 chat 中回答或保存非软件 plan；approach-plan 使用 `execution: knowledge-work` 并路由到 `spec-work` 的 non-code carve-out。
+- 保留 CE 的 local prompt asset 口径：research/deepening agents 从 `references/agents/*.md` 读取并注入 generic subagent，不依赖 generated top-level agent mirror。
+- 保留 CE 的 repo-profile cache helper 和 MISS/HIT 降级行为，只改 spec-first cache root。
+- 保留 CE 的 post-generation menu，包括 `spec-work`、`/goal`、`spec-doc-review` open items、issue creation、`spec-proof` 发布和 HTML browser open。
+
+#### Intentional Spec-First Divergences
+
+- `ce-plan` / `ce-brainstorm` / `ce-work` / `ce-doc-review` / `ce-debug` / `ce-optimize` / `ce-proof` 等入口和消费者投影为 `spec-*`。
+- `artifact_contract: ce-unified-plan/v1` 投影为 `artifact_contract: spec-unified-plan/v1`；`product_contract_source: ce-brainstorm|ce-plan-bootstrap` 投影为 `spec-brainstorm|spec-plan-bootstrap`。
+- `.compound-engineering/config.local.yaml` 投影为 `.spec-first/config.local.yaml`；repo-profile cache 从 `/tmp/compound-engineering/repo-profile` 投影为 `/tmp/spec-first/repo-profile`。
+- Proof identity 从 `ai:compound-engineering` / `Compound Engineering` 投影为 `ai:spec-first` / `Spec-First`，Proof 分支保留为 `spec-proof`。
+- `learnings-researcher.md` 的 module search 从 `compound-engineering|skill-design` 投影为 `spec-first|skill-design`。
+
+#### Test Contract Cleanup
+
+- 重写 `tests/unit/spec-plan-contracts.test.js` 为 CE-first migration contract：守护 CE/spec 文件集合一致、spec-first 投影名称/路径/artifact contract、核心 CE planning behavior、repo-profile cache 和 runtime projection 相对 reference path。
+- 更新 `tests/unit/runtime-plan-contracts.test.js` 的 Codex rendering 断言，从旧 `planning-flow.md` / top-level Codex agent mirror 口径改为 `deepening-workflow.md` 和 skill-local prompt asset 口径。
+- 删除或让旧 spec-only `spec-plan` tests 退出 active contract：上一版 `evals/`、`planning-flow.md`、`governance-boundaries.md`、`enterprise-plan-review.md`、`reuse-analysis.md` 等不在 CE `ce-plan` 文件集合内。
+
+#### Verification Status
+
+- 已逐个打开 `skills/spec-plan` 下 28 个 source 文件审查：`SKILL.md`、10 个 `references/*.md`、16 个 `references/agents/*.md` 和 `scripts/repo-profile-cache.py`。
+- 已核对 CE/spec 文件数量与文件名集合：两侧均为 28 个文件，集合一致。
+- 已运行 CE/spec 目录 diff，确认差异集中在 `ce-*` -> `spec-*`、`ce-unified-plan/v1` -> `spec-unified-plan/v1`、`.compound-engineering` -> `.spec-first`、`/tmp/compound-engineering` -> `/tmp/spec-first`、Proof identity 和 learnings module search 的必要投影。
+- 已运行 focused residual scan，确认 `skills/spec-plan` 没有 active CE 命名、`.compound-engineering` 或 `/tmp/compound-engineering` 残留。
+- 本轮验证命令见本次执行 closeout；未手改 generated runtime mirrors。
 
 ## 推荐报告产物
 

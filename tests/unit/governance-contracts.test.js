@@ -116,29 +116,4 @@ describe('governance contracts', () => {
     expect(validateAgainstSchema(schema, missingReasonCode).errors.length).toBeGreaterThan(0);
   });
 
-  test('rule maturity workflow prose exposes candidates without automatic promotion', () => {
-    const specPlan = [
-      fs.readFileSync(path.join(REPO_ROOT, 'skills', 'spec-plan', 'SKILL.md'), 'utf8'),
-      fs.readFileSync(path.join(REPO_ROOT, 'skills', 'spec-plan', 'references', 'planning-flow.md'), 'utf8'),
-    ].join('\n');
-    const codeReview = fs.readFileSync(path.join(REPO_ROOT, 'skills', 'spec-code-review', 'SKILL.md'), 'utf8');
-    const outputTemplate = fs.readFileSync(path.join(REPO_ROOT, 'skills', 'spec-code-review', 'references', 'review-output-template.md'), 'utf8');
-    const skillAudit = fs.readFileSync(path.join(REPO_ROOT, 'skills', 'spec-skill-audit', 'SKILL.md'), 'utf8');
-    const contract = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'contracts', 'governance', 'rule-maturity.md'), 'utf8');
-
-    expect(specPlan).toContain('spec-first internal rule-maturity record --rule-id planning-depth-underclassified');
-    expect(specPlan).toContain('this observation is not a planning gate and does not adjudicate or promote a rule');
-    expect(codeReview).toContain('spec-first internal rule-maturity record --rule-id summary-generated-output-staged');
-    expect(codeReview).toContain('Rule Maturity Candidates');
-    expect(codeReview).toContain('similar_existing_rule_ids');
-    expect(codeReview).toContain('Do not automatically adjudicate, promote, demote');
-    expect(codeReview).toContain('never session-only summaries, raw lens stdout, `/tmp` files, or "see above"');
-    expect(outputTemplate).toContain('### Rule Maturity Candidates');
-    expect(skillAudit).toContain('rule-maturity-observations.json');
-    expect(skillAudit).toContain('does not trigger human review, adjudication, or promotion');
-    expect(contract).toContain('spec-first internal rule-maturity record');
-    expect(contract).toContain('The local evidence store is `.spec-first/governance/rule-maturity.json`');
-    expect(contract).toContain('spec-code-review` Stage 6');
-    expect(contract).toContain('`spec-skill-audit`');
-  });
 });

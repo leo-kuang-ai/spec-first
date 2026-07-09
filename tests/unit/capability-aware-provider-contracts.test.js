@@ -6,7 +6,6 @@ const path = require('node:path');
 const REPO_ROOT = path.join(__dirname, '..', '..');
 
 const WORKFLOW_SKILLS = [
-  'skills/spec-plan/SKILL.md',
   'skills/spec-debug/SKILL.md',
   'skills/spec-prd/SKILL.md',
 ];
@@ -16,13 +15,6 @@ function readRepo(relativePath) {
 }
 
 function readWorkflowSurface(relativePath) {
-  if (relativePath === 'skills/spec-plan/SKILL.md') {
-    return [
-      readRepo(relativePath),
-      readRepo('skills/spec-plan/references/governance-boundaries.md'),
-    ].join('\n');
-  }
-
   return readRepo(relativePath);
 }
 

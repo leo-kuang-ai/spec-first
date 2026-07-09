@@ -6,14 +6,14 @@ const path = require('node:path');
 
 const { getAdapter } = require('../../src/cli/adapters');
 const SPEC_PLAN_PATH = path.join(__dirname, '..', '..', 'skills', 'spec-plan', 'SKILL.md');
-const SPEC_PLAN_PLANNING_FLOW_PATH = path.join(
+const SPEC_PLAN_DEEPENING_PATH = path.join(
   __dirname,
   '..',
   '..',
   'skills',
   'spec-plan',
   'references',
-  'planning-flow.md',
+  'deepening-workflow.md',
 );
 
 function makeTempDir() {
@@ -280,24 +280,20 @@ describe('runtime plan contracts', () => {
       skillName: 'spec-plan',
       isWorkflowSkill: true,
     });
-    const renderedPlanningFlow = adapter.transformSkillContent(fs.readFileSync(SPEC_PLAN_PLANNING_FLOW_PATH, 'utf8'), {
+    const renderedDeepening = adapter.transformSkillContent(fs.readFileSync(SPEC_PLAN_DEEPENING_PATH, 'utf8'), {
       skillName: 'spec-plan',
       isWorkflowSkill: true,
     });
-    const combined = `${renderedSkill}\n${renderedPlanningFlow}`;
+    const combined = `${renderedSkill}\n${renderedDeepening}`;
 
-    expect(renderedSkill).toContain('read `.agents/skills/spec-plan/references/planning-flow.md`');
-    expect(combined).toContain('dispatch authorization is present for this run');
-    expect(combined).toContain('a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
-    expect(combined).toContain('record `dispatch_authorization_missing`');
-    expect(combined).toContain('explicit fallback');
-    expect(combined).toContain('Plan generation must still complete when research dispatch is unavailable');
+    expect(renderedSkill).toContain('read `references/markdown-rendering.md`');
+    expect(renderedSkill).toContain('read `references/html-rendering.md`');
+    expect(combined).toContain('skill-local prompt assets under `references/agents/`');
+    expect(combined).toContain('seed a generic subagent with that prompt content');
     expect(combined).toContain('references/agents/repo-research-analyst.md');
     expect(combined).toContain('references/agents/learnings-researcher.md');
     expect(combined).not.toContain('`.codex/agents/spec-repo-research-analyst.agent.md`');
     expect(combined).not.toContain('`.codex/agents/spec-learnings-researcher.agent.md`');
-    expect(combined).not.toContain('including `spawn_agent` where provided');
-    expect(combined).not.toContain('Do not downgrade solely because the host is Codex.');
     expect(combined).not.toContain('Read `.codex/agents/spec-repo-research-analyst.agent.md` and apply that agent profile to');
     expect(combined).not.toContain('Read `.codex/agents/spec-learnings-researcher.agent.md` and apply that agent profile to');
   });

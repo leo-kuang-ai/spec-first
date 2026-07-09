@@ -1,0 +1,1 @@
+Pluggable host adapters that translate spec-first's canonical runtime layout into per-IDE/runtime conventions for Claude Code, Codex, Cursor, Kiro, and Qoder.

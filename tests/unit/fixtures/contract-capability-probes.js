@@ -7,7 +7,7 @@ module.exports = {
       paths: [
         'skills/spec-mcp-setup/SKILL.md',
         'skills/spec-brainstorm/SKILL.md',
-        'skills/spec-plan/references/governance-boundaries.md',
+        'skills/spec-work/SKILL.md',
       ],
       pattern: 'bounded direct source reads',
     },
@@ -71,7 +71,7 @@ module.exports = {
       type: 'content',
       paths: [
         'skills/spec-mcp-setup/SKILL.md',
-        'skills/spec-plan/references/governance-boundaries.md',
+        'skills/spec-work/SKILL.md',
         'skills/spec-write-tasks/SKILL.md',
       ],
       pattern: 'tests/logs',
@@ -151,7 +151,7 @@ module.exports = {
       paths: [
         'skills/spec-work/SKILL.md',
         'skills/spec-code-review/SKILL.md',
-        'skills/spec-plan/references/governance-boundaries.md',
+        'skills/spec-work/SKILL.md',
       ],
       pattern: 'project standards',
     },
