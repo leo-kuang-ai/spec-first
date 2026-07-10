@@ -1201,6 +1201,51 @@ Batch 2 已完成；下一项 `spec-debug`。
 
 下一项 `spec-doc-review`。
 
+#### spec-doc-review
+
+- Tier: A
+- 状态: done
+- Verdict: issues_found
+- 已读取 source 文件:
+  - `skills/spec-doc-review/SKILL.md`
+  - `skills/spec-doc-review/references/bulk-preview.md`
+  - `skills/spec-doc-review/references/findings-schema.json`
+  - `skills/spec-doc-review/references/open-questions-defer.md`
+  - `skills/spec-doc-review/references/review-output-template.md`
+  - `skills/spec-doc-review/references/subagent-template.md`
+  - `skills/spec-doc-review/references/synthesis-and-presentation.md`
+  - `skills/spec-doc-review/references/walkthrough.md`
+  - `skills/spec-doc-review/references/personas/` 下 7 个 persona prompt assets
+  - `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/` 下对应 CE 文件集合与 diff
+- CE parity: applicable。当前 `spec-doc-review` 保留 CE `ce-doc-review` 的核心 document review 能力，并完成主要 spec-first 投影:
+  - 文件集合与 CE baseline 一致，覆盖 `SKILL.md`、`references/*.md`、`references/findings-schema.json` 和 7 个 persona prompt assets。
+  - `ce-doc-review` / `ce-unified-plan/v1` / `ce-brainstorm` / `ce-plan-bootstrap` / `ce-plan` / `ce-work` / `ce-code-review` 已投影为 `spec-doc-review`、`spec-unified-plan/v1`、`spec-brainstorm`、`spec-plan-bootstrap`、`spec-plan`、`spec-work`、`spec-code-review`。
+  - generic subagents、bounded parallelism、skill-local `references/personas/<reviewer-name>.md` prompt asset 加载、dispatch-time model tiering 和不依赖 platform-level custom-agent registration 的边界保留，位于 `skills/spec-doc-review/SKILL.md:155-163`。
+  - subagent payload slots 和 unified artifact section slicing 保留，位于 `skills/spec-doc-review/SKILL.md:165-182`；unified artifacts 不默认把全文传给所有 reviewer。
+  - 单个 reviewer failed/timed out 不阻塞整体 review，位于 `skills/spec-doc-review/SKILL.md:221-223`。
+  - synthesis pipeline 保留 validate、anchor gate、dedup、same-persona collapse、cross-persona promotion、premise-dependency chain、`safe_auto` / `gated_auto` / `manual` / FYI routing、headless structured envelope 和 user-facing vocabulary，位于 `skills/spec-doc-review/references/synthesis-and-presentation.md:1-416`。
+  - interactive walkthrough 保留四选项 routing、per-finding walkthrough、best-judgment bulk path、no-fix guard、Open Questions defer 和 in-memory state，位于 `skills/spec-doc-review/references/walkthrough.md:1-284`。
+- 发现:
+  1. medium — `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/SKILL.md:40`、`/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-doc-review/SKILL.md:46-49` vs `skills/spec-doc-review/SKILL.md:40-44`: CE baseline 在读取文档路径失败或文件不在磁盘时有明确 missing-document gate，要求在任何 persona dispatch 前停止，并分别给 interactive/headless caller 输出缺失路径说明；当前 `spec-doc-review` 只写 “Read it, then proceed.”，且只处理 headless 未传路径，不处理传入路径不可读。影响是用户传入只存在于未 checkout branch 的文档路径时，workflow 可能继续 dispatch persona team，让多个 reviewer 无意义失败，headless caller 也拿不到 deterministic missing-path failure。建议修复方向: 恢复并投影 CE missing-document gate 到 `spec-doc-review` 文案，明确所有 resolved document paths 必须先由 Read 成功确认；补 focused contract test 锁定 unreadable path 不得 dispatch personas。
+- 依赖关系验证结果:
+  - `spec-plan` 通过 headless `spec-doc-review` review plan artifact，当前 `spec-doc-review` 支持 `mode:headless`，并对 `.html` unified artifacts 明确 report-only / markdown-only mutation skip，位于 `skills/spec-doc-review/SKILL.md:16-36`、`skills/spec-doc-review/SKILL.md:50-55`。
+  - `spec-unified-plan/v1` 的 `requirements-only` / `implementation-ready` 分类与 `spec-brainstorm`、`spec-plan` 当前 artifact contract 口径一致，位于 `skills/spec-doc-review/SKILL.md:50-55`。
+  - 对 `skills/spec-doc-review` 的 active CE residual 扫描无命中；`rg` 未发现 `ce-*`、`compound-engineering`、`.compound-engineering`、`ce-unified-plan` 或 `/tmp/compound-engineering` 残留。
+- 上下文管理验证结果:
+  - `SKILL.md` 共 243 行，低于方案建议的 500 行 advisory budget。
+  - 重内容下沉到 triggered references: `synthesis-and-presentation.md` 416 行、`walkthrough.md` 284 行、`bulk-preview.md` 128 行、`open-questions-defer.md` 155 行。
+  - Persona prompt assets 无 frontmatter/tools，按 skill-local `references/personas/<name>.md` 加载，符合当前 source/runtime 边界。
+- 安全 / residual 检查:
+  - `node -e "JSON.parse(require('fs').readFileSync('skills/spec-doc-review/references/findings-schema.json','utf8')); console.log('json ok')"` pass，输出 `json ok`。
+  - `npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand` degraded: 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于配置中的 `<rootDir>/tests/jest-setup.js` 不存在，未能执行到 `spec-doc-review` focused assertions。
+  - `git log --all --name-status -- tests/unit/spec-doc-review-contracts.test.js` 显示该 focused test 在 `98e50159 test(cleanup): 清理过期测试 fixtures、老旧契约测试与开发脚本` 中被删除；本报告不回退该删除，只按当前工作树记录验证能力缺口。
+- 未检查 / degraded checks:
+  - 未实际运行 `spec-doc-review` 交互、headless review、subagent dispatch、safe-auto document mutation 或 Open Questions defer。
+  - 当前缺少可执行 Jest 测试基础设施，无法用 focused test 证明 `spec-doc-review` contract；该全局测试覆盖缺口留到 Phase 3 统一复核。
+  - 未修复上述 finding；本 goal 默认记录审查发现，不直接修改 source skill。
+
+下一项 `spec-code-review`。
+
 ### Batch 5
 
 待审查。
@@ -1223,11 +1268,11 @@ Batch 2 已完成；下一项 `spec-debug`。
 |---|---:|
 | critical | 0 |
 | high | 2 |
-| medium | 15 |
+| medium | 16 |
 | low | 7 |
 | info | 0 |
 
-当前状态: 已确认 2 个 high、15 个 medium、7 个 low 问题；涉及 `spec-commit-push-pr` / `spec-lfg` pipeline 合同、`New concepts:` trailer 合同、`spec-optimize` schema validation 口径、`spec-resolve-pr-feedback` focused tests 与当前 source contract 漂移、`spec-test-browser` pipeline no-ask 语义和 internal helper frontmatter、`spec-worktree` existing-ref / PR isolation 合同缺失、`spec-debug` source skill 目录存在 ignored `__pycache__` 产物，`spec-compound` / `spec-compound-refresh` 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、ignored `__pycache__` 产物，`spec-compound-refresh` 的 legacy `plugin AGENTS.md` wording，`spec-sweep` first-run interview 写入清单漏列 `sweep_lease_ttl_minutes`，`spec-mcp-setup` 的 product-pulse config key 漏列、`ideate_output` active/reserved 分类漂移、Cursor provider readiness host fallback 和 untracked registry-loader source-like 文件，`spec-riffrec-feedback-analysis` 对 `spec-brainstorm` durable output 目录的 `docs/brainstorms/` vs `docs/plans/` 合同漂移，`spec-product-pulse` report-template top-N error count 与当前不可配置合同矛盾，`spec-brainstorm` 共享 repo-profile reference parity 与 Markdown 结构漂移问题，以及 `spec-plan` focused migration contract 对 CE `reasoning-elevation.md` 的 file-set 断言与当前 source divergence 不一致。
+当前状态: 已确认 2 个 high、16 个 medium、7 个 low 问题；涉及 `spec-commit-push-pr` / `spec-lfg` pipeline 合同、`New concepts:` trailer 合同、`spec-optimize` schema validation 口径、`spec-resolve-pr-feedback` focused tests 与当前 source contract 漂移、`spec-test-browser` pipeline no-ask 语义和 internal helper frontmatter、`spec-worktree` existing-ref / PR isolation 合同缺失、`spec-debug` source skill 目录存在 ignored `__pycache__` 产物，`spec-compound` / `spec-compound-refresh` 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、ignored `__pycache__` 产物，`spec-compound-refresh` 的 legacy `plugin AGENTS.md` wording，`spec-sweep` first-run interview 写入清单漏列 `sweep_lease_ttl_minutes`，`spec-mcp-setup` 的 product-pulse config key 漏列、`ideate_output` active/reserved 分类漂移、Cursor provider readiness host fallback 和 untracked registry-loader source-like 文件，`spec-riffrec-feedback-analysis` 对 `spec-brainstorm` durable output 目录的 `docs/brainstorms/` vs `docs/plans/` 合同漂移，`spec-product-pulse` report-template top-N error count 与当前不可配置合同矛盾，`spec-brainstorm` 共享 repo-profile reference parity 与 Markdown 结构漂移问题，`spec-plan` focused migration contract 对 CE `reasoning-elevation.md` 的 file-set 断言与当前 source divergence 不一致，以及 `spec-doc-review` 迁移时丢失 CE missing-document gate。
 
 ## 验证命令记录
 
@@ -1324,6 +1369,16 @@ Batch 2 已完成；下一项 `spec-debug`。
 | spec-plan repo-profile Python syntax | `PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/private/tmp/spec-first-pycache python3 -m py_compile skills/spec-plan/scripts/repo-profile-cache.py` | pass | 无输出 |
 | 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
 | Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | pass | 2 个测试通过 |
+
+### 增量验证（2026-07-10 14:40:26 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-doc-review schema JSON | `node -e "JSON.parse(require('fs').readFileSync('skills/spec-doc-review/references/findings-schema.json','utf8')); console.log('json ok')"` | pass | 输出 `json ok` |
+| spec-doc-review active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|task-pack\|dispatch_authorization_missing\|Workflow Contract Summary\|docs/contracts/context-governance.md\|review-finding.v1" skills/spec-doc-review` | pass | 无输出 |
+| spec-doc-review focused contract | `npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
 
 ### 增量验证（2026-07-10 12:46:31 CST）
 
