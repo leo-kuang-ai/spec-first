@@ -1,7 +1,7 @@
 # spec-prd Skill 重构优化方案
 
-**状态：** implementation-ready，验证优先、按失败样本激活
-**目标 surface：** `skills/spec-prd/` source、按激活单元新增的最小定向测试、五宿主 runtime projection
+**状态：** implementation-ready；M1 已确认，U1-U4 验证优先、按失败样本激活
+**目标 surface：** `skills/spec-prd/` source（含 npm 内置 PRD 模板资产）、按激活单元新增的最小定向测试、五宿主 runtime projection
 **历史分析：** 重构前的完整候选机制与五视角审查轨迹保留在 Git 历史 `5b8d8637^..5b8d8637`，不再作为当前实施合同
 **当前权威：** 本文档全篇；实施时仍以当前 `skills/spec-prd/**`、脚本与测试事实为最终依据
 
@@ -15,10 +15,13 @@
 2. 现有 grill 排序和 WHAT/HOW 边界可能需要更清晰的反例，但不应新增第二套枚举或 schema。
 3. 下游消费视图存在，但需要验证其是否足以让开发和 `spec-plan` 快速定位核心信息。
 4. 任何新 prose 都必须证明改善了真实行为，而不是只证明文字被写入。
+5. 当前 human-facing PRD 模板主要位于仓库 `docs/需求文档模版/标准模版/`，但该目录不随 npm 包分发；如果这些模板被定义为 `spec-prd` 产品内置能力，安装用户无法稳定获得，且会与 `prd-output-template.md` 的 embedded skeleton 形成 ownership 冲突。
 
 因此，本轮采用：
 
 > **subtraction-first + evidence-activated**：先对当前 source 做改前基线；只有失败样本证明现有合同不足时才激活对应实现单元和该单元所需的最小测试。
+
+模板分发边界不属于待验证假设，而是已确认的产品定位：spec-first 是 npm 分发的 workflow harness，产品正常运行依赖、供安装用户使用的 PRD 模板必须进入 `skills/spec-prd/**` 的可打包 source；消费方项目自己的术语、合规与行业规则仍属于 project-local overlay。本文以 **M1 模板资产迁移** 单独承载该确定性迁移，不混入 H1-H4 的 evidence-activated 行为优化。
 
 ## 二、目标用户与产品结果
 
@@ -53,6 +56,8 @@
 - 复用现有 Handoff Context Slice 改善开发与 `spec-plan` 的消费效率。
 - 形成改前/改后、可复查、可说明限制的验证证据。
 - 保持 Claude、Codex、Cursor、Kiro、Qoder 的 source/runtime 投射一致。
+- 让 npm 安装用户稳定获得 `spec-prd` 产品承诺的通用及 surface-specific PRD 模板，不依赖 spec-first 源码仓库的维护者 `docs/` 路径。
+- 建立“产品内置模板 + 可选内置行业 overlay + 用户项目本地 overlay”的单一 ownership 与按需组合机制。
 
 ### 3.2 Non-Goals
 
@@ -67,6 +72,10 @@
 - 不恢复已删除的历史 `spec-prd` 聚焦测试，也不把清理失效的 `test:eval-fixtures` npm script 纳入本重构方案；该命令若需维护，作为独立仓库测试脚本清理处理。
 - 不引入外部 Product Owner / 最终用户 / 技术负责人路由；当前执行对话的用户是唯一问题接收者。
 - 本轮默认不新增 reference 文件；只有出现不可由现有文件承载的独立责任和明确 consumer 时才重评。
+- 不让安装后的 workflow 读取 spec-first 源码仓库 `docs/需求文档模版/**` 作为 runtime 依赖。
+- 不把证券或其他行业 overlay 默认应用到所有 PRD；内置行业资产只能按明确行业信号懒加载，并继续作为 advisory input。
+- 不在用户项目中静默生成或覆盖本地 PRD 模板；用户项目 overlay 由消费方项目自行维护。
+- 不同时保留 embedded skeleton 与独立正文模板作为两套规范性 source。
 
 ## 四、当前 Source 事实与 Ownership
 
@@ -79,6 +88,9 @@
 | Grill 排序 | `product-expert-lens.md` + `domain-language-and-decision-ledger.md` | 已有 `downstream_confirmation_risk` 与 Load-Bearing Gap Triage | 保持一个排序接口，只补反例或边界 |
 | WHAT/HOW 交接 | SKILL Closure-disposition razor + readiness/output references | 已有 `implementation-only-how-pushdown`、`planning_would_invent_what`、Planning Recheck | 复用既有术语；WHAT-affecting gap 不得 pushdown |
 | 下游快速消费 | `handoff_context_slice` | 已能承载 confirmed WHAT、决策、recheck 与 blocker | 只增强现有 slice，不新增 Developer Quick-Start section |
+| npm 内置 PRD 模板 | `prd-output-template.md` embedded skeleton + `docs/需求文档模版/标准模版/00-70` human-facing mirror | `package.json#files` 打包整个 `skills/`，但不打包该普通 `docs/` 目录；`plugin-sync.js` 会递归投射 skill 支持文件 | 将产品内置模板迁入 `skills/spec-prd/assets/templates/`，并删除重复 embedded 正文 ownership |
+| 可选行业 overlay | `docs/需求文档模版/标准模版/90-证券行业需求关注点与参考附录.md` | 当前是维护者仓库示例，不是安装用户稳定可用的产品资产，也不是 confirmed 合规事实 | 作为可选内置能力迁入 `skills/spec-prd/assets/overlays/securities.md` 并仅按行业触发；消费方仍可叠加自己的项目本地 overlay |
+| 模板选择与组合 | `SKILL.md` + `prd-output-template.md` | 已有 surface lens 与 project-local overlay 语义，但没有独立 packaged template asset routing | `SKILL.md` 保留唯一选择语义；contract 只定义机器安全字段、组合规则和 lazy-load trigger |
 | Eval fixture | `evals/examples.json` + `run-evals.js` | 当前 111 个 case 的结构与 coverage contract 可通过 | 不是模型语义质量证明 |
 | 历史聚焦测试 | 已删除 tests / `package.json#test:eval-fixtures` | 旧测试不恢复；失效 npm script 不属于本方案前置条件 | 每个激活单元只添加证明自身行为的最小定向测试 |
 | Runtime projection | `getSupportedPlatforms()` | 当前平台为 Claude、Codex、Cursor、Kiro、Qoder | 所有行为变更按五宿主验证 |
@@ -90,9 +102,55 @@
 | Scripts / tests | 字段组合、结构、section identity、ref、hash、receipt、reason_code、runtime projection | 判断哪个需求更重要、产品 WHAT 是否充分、PRD 语义质量分数 |
 | LLM / reviewer | 风险排序、WHAT/HOW 边界、当前用户回答的应用、语义充分性、用户价值判断 | 编造测试结果、把 advisory 当 confirmed、绕过 finalize receipt |
 
+### 4.2 npm 产品定位与目标模板拓扑
+
+`spec-first` 源码仓库不是安装用户的业务项目。仓库 `docs/` 主要服务维护、设计说明、计划、验证和知识沉淀；只有明确进入 npm 发布清单并被 runtime generator 投射的资产，才能成为安装后 workflow 的稳定依赖。
+
+目标 topology：
+
+```text
+skills/spec-prd/
+├── SKILL.md
+├── references/
+│   └── prd-output-template.md       # 机器安全合同、组合规则、template routing
+└── assets/
+    ├── templates/
+    │   ├── 00-generic.md
+    │   ├── 10-app.md
+    │   ├── 20-admin.md
+    │   ├── 30-backend.md
+    │   ├── 40-h5-pc.md
+    │   ├── 50-cli-devtool.md
+    │   ├── 60-mixed.md
+    │   └── 70-large-requirement-index.md
+    └── overlays/
+        └── securities.md            # 可选内置行业 overlay，不默认加载
+```
+
+目标组合顺序：
+
+```text
+machine-safe output contract
+  + 00 generic template
+  + one primary surface template（mixed 时可增加必要 secondary lens）
+  + optional built-in industry overlay
+  + consumer-project local overlay
+  + confirmed source / 当前执行对话用户裁决
+```
+
+Ownership 规则：
+
+1. `references/prd-output-template.md` 负责 frontmatter、machine section identity、readiness、trace、finalize 以及模板组合合同，不再重复维护完整 human-facing 正文骨架。
+2. `assets/templates/` 是通用和 surface-specific 正文模板的唯一 product source。
+3. `assets/overlays/` 只放 spec-first 明确承诺内置支持的可选行业增强包；overlay 只能提出问题和触发 conditional section，不能成为 confirmed 业务或合规事实。
+4. 消费方项目自己的模板、术语、监管辖区和团队标准留在该项目，由 `spec-prd` 按需读取为 project-local overlay。
+5. `docs/需求文档模版/标准模版/` 在迁移完成后删除规范性副本，或只保留维护者说明与 skill source pointer，不再承担 runtime authoring contract。
+
 ## 五、假设、指标与激活条件
 
 每个候选改动必须先回答：当前合同是什么、失败样本是什么、现有合同为什么没有覆盖、最小改动是什么。无法回答则不实施。
+
+M1 不使用失败样本激活：用户已明确产品内置 PRD 模板应供 npm 安装用户使用，而当前发布清单不会分发 `docs/需求文档模版/**`。M1 的验证对象是 package/runtime 可达性、单一 source、lazy loading 和 overlay 隔离，不是“是否需要模板”这一产品决策。
 
 | 假设 | 改前失败样本 | 主要指标 | 激活条件 | 未激活时处置 |
 | --- | --- | --- | --- | --- |
@@ -110,6 +168,36 @@
 - 行为改善必须由同一 fixture 的改前/改后证据支撑，不能只以字符串存在断言完成。
 
 ## 六、实施单元
+
+### M1：npm 内置 PRD 模板资产迁移（已确认，必须实施）
+
+**原则**：产品运行依赖跟随 npm/skill 分发；用户项目知识留在消费方项目；同一模板规则只有一个规范性 source。
+
+**迁移范围**：
+
+1. 将 `00-通用`、`10-App`、`20-Admin`、`30-Backend`、`40-H5-PC`、`50-CLI-DevTool`、`60-Mixed`、`70-大需求总索引` 迁入 `skills/spec-prd/assets/templates/`，统一使用稳定的 ASCII 文件名，中文标题和内容保留在文件内。
+2. 将 `90-证券行业需求关注点与参考附录` 作为可选内置证券 overlay 迁入 `skills/spec-prd/assets/overlays/securities.md`；只有检测到证券/交易行业上下文或当前用户明确选择时才读取。
+3. 收敛 `prd-output-template.md`：保留 machine-safe output contract、section identity、readiness、trace、组合顺序和 trigger map；删除与新模板重复的 embedded human-facing skeleton。
+4. 在 `SKILL.md` 增加轻量 Template Trigger Map：默认读取通用模板，只读取一个 primary surface 模板；mixed surface 仅加载真实命中的 secondary lens；行业 overlay 与大需求索引按触发条件读取。
+5. 迁移完成后退役 `docs/需求文档模版/标准模版/` 的规范性副本；如保留 README，只说明历史来源、维护方式和 canonical skill path。
+6. 保持 machine-owned 字段由 finalize/checker 产生或确认，不能让 human-facing 模板预填 `ready-for-planning`、`readiness_verified_*` 等 receipt 字段。
+7. 将模板中的“产品 owner”统一解释为当前执行对话的用户；兼容字段可保留，但不得重新引入外部联系人路由。
+
+**禁止**：
+
+- 同时维护 embedded skeleton、skill template 和 docs mirror 三份正文。
+- 每次运行全量读取全部模板。
+- 因证券 overlay 被打包就默认断言监管规则适用。
+- 把根目录 `templates/` 当作 PRD 内容模板目录；该目录继续服务 host runtime generation。
+- 手改 `.claude/`、`.codex/`、`.agents/skills/` 等 generated runtime mirror 完成迁移。
+
+**M1 完成证据**：
+
+- `npm pack --dry-run` 包含所有预期 `skills/spec-prd/assets/**` 文件，不包含已退役的规范性 docs mirror。
+- `spec-first init` 的五宿主临时目录均投射模板及 overlay，且 doctor/integrity 检查不报告 skill support file drift。
+- 聚焦测试证明 `prd-output-template.md` 不再复制完整正文模板，并且 `SKILL.md` 能定位所有模板资产。
+- 行为 fixture 证明 App/Admin/Backend/CLI/Mixed 只加载相关模板，证券 overlay 在无行业信号时不进入上下文。
+- 现有 checker/finalize good fixture 继续通过，machine section 与 ready receipt 合同未被 human-facing 模板削弱。
 
 ### U1：Decision Card 确定性一致性（按 H1 激活）
 
@@ -180,12 +268,17 @@ Architecture、Behavior、Experience 只作为案例标签，不带固定优先�
 | Grill 排序语义 | 现有 Product Expert Lens / Domain Ledger 段 | `spec-prd` LLM | Requirements Grill | 新建风险 enum/reference |
 | WHAT/HOW 判定 | SKILL closure razor + readiness/output references | `spec-prd` | readiness、handoff、`spec-plan` 现有 PRD 消费 | 新字段或未承诺 consumer 的协议 |
 | 消费视图 | 现有 Handoff Context Slice | `spec-prd` closeout | 人类开发、测试、`spec-plan` | 第二 PRD section/topology |
+| 产品内置模板正文 | `skills/spec-prd/assets/templates/**` | `spec-prd` authoring | npm 安装用户、五宿主 runtime | 依赖维护者 docs 路径或复制 embedded skeleton |
+| 可选行业 overlay | `skills/spec-prd/assets/overlays/**` + 消费方项目本地 docs | `spec-prd` template routing | 命中行业上下文的 PRD authoring | 默认加载、当作 confirmed 行业事实 |
+| 模板机器合同与 routing | `prd-output-template.md` + `SKILL.md` | `spec-prd` | template assets、checker/finalize、runtime projection | 第二套选择表或完整正文副本 |
 | Runtime | source 经 `spec-first init` 生成 | CLI adapters | Claude/Codex/Cursor/Kiro/Qoder | 手改 runtime mirror |
 
 ### 7.2 实施顺序
 
 ```text
-当前 source 基线（H1/H2/H3/H4）
+当前 source/package/runtime 基线
+  -> M1 模板 ownership 迁移与定向验证
+  -> 行为基线（H1/H2/H3/H4）
   -> 逐项 Activation Decision
      -> 未复现：删除该候选实现
      -> 已复现：激活对应 U1/U2/U3/U4
@@ -208,6 +301,11 @@ Architecture、Behavior、Experience 只作为案例标签，不带固定优先�
 | false-ready 未下降 | WHAT-affecting tech gap 仍被放行 | 保持 checkpoint/revise；补 fresh-source fixture |
 | owner 负担上升 | 问题数、重复问题数显著增加 | 保持 load-bearing 边界和 source-first guardrail |
 | runtime drift | source 变化未投射某宿主 | 五宿主临时目录矩阵；不手改 mirror |
+| npm 用户拿不到模板 | 模板仍只存在于普通 `docs/` 路径 | M1 将产品模板迁入 skill assets，并用 pack/init 证据验证 |
+| 三套模板真相源 | embedded skeleton、skill assets、docs mirror 同时规范化 | M1 迁移时删除重复正文 ownership，docs 只留 pointer 或退役 |
+| 行业规则污染默认上下文 | 无证券信号也加载证券 checklist | overlay 独立目录、trigger fixture、无信号负向断言 |
+| 模板迁移破坏 ready 合同 | human template 预填 receipt 或缺 machine section | machine-safe contract 留在 reference；checker/finalize fixture 回归 |
+| 上下文膨胀 | 每次加载 00-90 全量模板 | Template Trigger Map + primary surface 默认单选 + 按需 overlay |
 
 ## 九、明确不纳入本轮的方向
 
@@ -246,6 +344,9 @@ Architecture、Behavior、Experience 只作为案例标签，不带固定优先�
 
 ### 10.2 确定性验证
 
+- M1：`npm run build` 或等价 `npm pack --dry-run`，核对 `skills/spec-prd/assets/templates/**` 与 `assets/overlays/**` 均进入发布包。
+- M1：增加模板资产可达性、唯一 source、lazy-load trigger、无行业信号不加载证券 overlay 的最小定向测试。
+- M1：增加五宿主 init/integrity 聚焦验证，确认 skill 支持文件被递归投射且无 runtime drift。
 - `node skills/spec-prd/scripts/run-evals.js --json`。
 - U1 激活时增加 Decision Card 冲突的 checker/finalize 定向测试。
 - U2/U3/U4 激活时，只增加对应 source contract、行为 fixture 或输出 shape 的最小测试。
@@ -269,11 +370,14 @@ spec-first init --claude --codex --cursor --kiro --qoder -y -u <name> --lang zh
 | Kiro | `.kiro/skills/spec-prd` 与 steering/runtime projection |
 | Qoder | `.qoder/skills/spec-prd`、prewrite/readiness hooks 与 lifecycle tests |
 
-只修改 `skills/spec-prd/**`、templates、CLI generator 或 tests 等 source-of-truth；`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 只通过 `spec-first init` 再生成。
+只修改 `skills/spec-prd/**`、必要的 CLI generator 或 tests 等 source-of-truth；根 `templates/` 继续属于 host runtime generation，不承载 PRD 正文模板；`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 只通过 `spec-first init` 再生成。
 
 ## 十一、Definition of Done
 
 - 已删除的历史聚焦测试未恢复，失效 `test:eval-fixtures` 脚本未被误纳入本方案范围。
+- npm 内置 PRD 模板已迁入 `skills/spec-prd/assets/templates/**`，可选证券 overlay 已进入独立按需资产；安装用户不再依赖维护者 `docs/需求文档模版/**`。
+- `prd-output-template.md`、template assets 与 docs mirror 不存在重复规范性正文；每层 source、producer、consumer 和 conflict rule 明确。
+- 五宿主 runtime projection 和 npm pack 均证明模板资产可达；未命中行业信号时不会加载证券 overlay。
 - 每个实际实现的 U1/U2/U3/U4 都有改前失败证据、激活决策、最小定向测试、改后结果和限制说明。
 - 未复现的候选项已从实施范围删除，而不是以“顺手补 prose”落地。
 - 没有新增第二套状态表、风险 enum、tech-input schema、progress artifact 或 PRD topology。

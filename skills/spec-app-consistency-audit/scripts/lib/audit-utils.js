@@ -6,15 +6,23 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const TEXT_FILE_PATTERN = /\.(kt|kts|java|swift|m|mm|xml|json|ya?ml|gradle|properties|txt|md|strings)$/i;
-const SKIPPED_DIRS = new Set([
+const APP_AUDIT_METADATA_HOSTS = Object.freeze(['unknown', 'claude', 'codex', 'cursor', 'kiro', 'qoder']);
+const GENERATED_OR_CONTROL_ROOTS = Object.freeze([
   '.agents',
   '.claude',
   '.codex',
+  '.cursor',
   '.git',
+  '.kiro',
+  '.qoder',
+  '.spec-first',
+]);
+const GENERATED_OR_CONTROL_ROOT_SET = new Set(GENERATED_OR_CONTROL_ROOTS);
+const SKIPPED_DIRS = new Set([
+  ...GENERATED_OR_CONTROL_ROOTS,
   '.gradle',
   '.idea',
   '.next',
-  '.spec-first',
   'DerivedData',
   'Pods',
   'build',
@@ -28,7 +36,6 @@ const ISSUE_SYNTHESIS_STATUSES = new Set(['not_run', 'llm_provided', 'fixture_pr
 const GIT_REF_PATTERN = /^[A-Za-z0-9._/@{}^~+-]+$/;
 const DEFAULT_MAX_SOURCE_HASH_BYTES = 1024 * 1024;
 const DEFAULT_MAX_SKIPPED_LARGE_FILES = 50;
-const CONTROL_SOURCE_INPUT_PATTERN = /^(?:\.git(?:\/|$)|\.spec-first\/|\.claude\/|\.codex\/|\.agents\/)/;
 
 function makeArtifact(options) {
   return {
@@ -88,10 +95,16 @@ function sourceInputFromFiles(type, files, repoRoot, options = {}) {
 
 function sourceInputPath(repoRoot, filePath, type = 'input') {
   const visiblePath = publicPath(repoRoot, filePath, `${type}-outside-repo`);
-  if (typeof visiblePath === 'string' && CONTROL_SOURCE_INPUT_PATTERN.test(visiblePath)) {
+  if (isGeneratedOrControlPath(visiblePath)) {
     return redactedSourceInputPath(type, visiblePath);
   }
   return visiblePath;
+}
+
+function isGeneratedOrControlPath(value) {
+  const normalized = toPosix(value).replace(/^\.\/+/, '');
+  if (!normalized || normalized === '.') return false;
+  return GENERATED_OR_CONTROL_ROOT_SET.has(normalized.split('/')[0]);
 }
 
 function redactedSourceInputPath(type, pathValue) {
@@ -908,6 +921,10 @@ function resolveBoundedSourceRoot(options = {}) {
   if (!resolution.ok) {
     throw new Error(`source rejected: ${resolution.reason}`);
   }
+  const relativeSourceRoot = publicPath(repoRoot, resolution.realpath, 'source-outside-repo');
+  if (isGeneratedOrControlPath(relativeSourceRoot)) {
+    throw new Error(`source rejected: generated/control runtime path is not auditable product source (${relativeSourceRoot}).`);
+  }
   return {
     repoRoot,
     sourceRoot: resolution.realpath,
@@ -956,8 +973,10 @@ function toPosix(value) {
 }
 
 module.exports = {
+  APP_AUDIT_METADATA_HOSTS,
   DEFAULT_MAX_SOURCE_HASH_BYTES,
   DEFAULT_MAX_SKIPPED_LARGE_FILES,
+  GENERATED_OR_CONTROL_ROOTS,
   ISSUE_SYNTHESIS_STATUSES,
   assertCanWrite,
   buildFigmaReference,
@@ -1000,6 +1019,7 @@ module.exports = {
   unavailableSourceInput,
   unique,
   includedUntrackedSourceFiles,
+  isGeneratedOrControlPath,
   writeJsonOutput,
   writeTextOutput,
   resolveRunDir,

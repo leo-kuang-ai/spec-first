@@ -11,6 +11,11 @@ const UNKNOWN_RUNTIME_VERSION = 'unknown-runtime-version';
 const DEFAULT_VERSION_REMINDER_TIMEOUT_MS = 2000;
 const REMINDER_ATTEMPT_LOCK_STALE_MS = 5 * 60 * 1000;
 const VERSION_REMINDER_OPT_OUT_ENV = 'SPEC_FIRST_NO_UPDATE_NOTIFIER';
+const STARTUP_HOST_LABELS = Object.freeze({
+  claude: 'Claude Code',
+  codex: 'Codex',
+  qoder: 'Qoder',
+});
 
 // 默认网络超时；可经 SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS 覆盖(慢网调大、CI 调小)。
 // 350ms 曾导致在常见网络下查询 registry.npmjs.org(实测约 630ms)每次静默超时,提醒形同虚设。
@@ -175,7 +180,7 @@ async function buildStartupVersionReminder(options = {}) {
 }
 
 function formatStartupVersionReminder({ host, currentVersion, latestVersion }) {
-  const hostLabel = host === 'claude' ? 'Claude Code' : 'Codex';
+  const hostLabel = STARTUP_HOST_LABELS[host] || host;
   const statusLine = currentVersion
     ? `[spec-first] Update available for ${hostLabel} runtime: ${currentVersion} -> ${latestVersion}`
     : `[spec-first] ${hostLabel} runtime version is unknown; latest available spec-first is ${latestVersion}.`;
@@ -593,7 +598,7 @@ function buildStartupAttemptScope(host) {
 }
 
 function normalizeHost(host) {
-  return host === 'claude' || host === 'codex' ? host : '';
+  return Object.prototype.hasOwnProperty.call(STARTUP_HOST_LABELS, host) ? host : '';
 }
 
 async function defaultLookupLatestVersion(packageName, options = {}) {

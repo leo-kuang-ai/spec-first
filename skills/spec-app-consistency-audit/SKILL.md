@@ -127,6 +127,9 @@ Generated runtime assets are not source truth:
 - `.claude/`
 - `.codex/`
 - `.agents/skills/`
+- `.cursor/`
+- `.kiro/`
+- `.qoder/`
 
 Do not hand-edit generated runtime assets. Runtime refresh belongs to the host-specific `spec-first init` invocation.
 

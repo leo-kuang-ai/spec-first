@@ -20,10 +20,14 @@ const QODER_POINTER_FRONTMATTER = [
   '---',
 ].join('\n');
 const QODER_HOOK_TEMPLATE_ROOT = path.join(__dirname, '..', '..', '..', 'templates', 'qoder', 'hooks');
+const SESSION_START_CLI_PLACEHOLDER = '__SPEC_FIRST_CLI_PATH__';
+const TRUSTED_SPEC_FIRST_CLI_PATH = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
 const MANAGED_QODER_HOOK_FILES = MANAGED_HOOK_DEFINITIONS.map((definition) => ({
   relativePath: definition.hookPath,
-  templatePath: path.join(QODER_HOOK_TEMPLATE_ROOT, definition.templateName),
   displayName: definition.displayName,
+  render: definition.templateName === 'session-start'
+    ? renderSessionStartHookTemplate
+    : () => fs.readFileSync(path.join(QODER_HOOK_TEMPLATE_ROOT, definition.templateName), 'utf8'),
 }));
 const QODER_AGENT_BASE_TOOLS = ['Read', 'Grep', 'Glob'];
 const QODER_AGENT_WEB_TOOLS = ['WebFetch', 'WebSearch'];
@@ -426,10 +430,18 @@ function buildManagedQoderHookWriteOperations(projectRoot) {
       kind: fs.existsSync(targetPath) ? 'update_file' : 'write_file',
       path: hook.relativePath.replace(/\\/g, '/'),
       reason: 'managed_runtime_hook',
-      contents: fs.readFileSync(hook.templatePath, 'utf8'),
+      contents: hook.render(),
       mode: 0o755,
     };
   });
+}
+
+function renderSessionStartHookTemplate() {
+  const template = fs.readFileSync(path.join(QODER_HOOK_TEMPLATE_ROOT, 'session-start'), 'utf8');
+  return template.replace(
+    JSON.stringify(SESSION_START_CLI_PLACEHOLDER),
+    () => JSON.stringify(TRUSTED_SPEC_FIRST_CLI_PATH),
+  );
 }
 
 function buildRenderedQoderSettingsOperations(projectRoot, rendered, reason) {
@@ -469,7 +481,7 @@ function inspectManagedQoderHookFiles(projectRoot) {
       };
     }
 
-    const expected = fs.readFileSync(hook.templatePath, 'utf8');
+    const expected = hook.render();
     if (actual !== expected) {
       return {
         level: 'WARNING',

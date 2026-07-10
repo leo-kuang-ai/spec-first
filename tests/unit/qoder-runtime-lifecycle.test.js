@@ -137,6 +137,18 @@ describe('Qoder runtime lifecycle', () => {
 
     const pointer = plan.operations.find((operation) => operation.path === '.qoder/rules/spec-first.md');
     expect(pointer.contents).toMatch(/^---\ntrigger: always_on\n---\n/);
+    const sessionStart = plan.operations.find((operation) => operation.path === '.qoder/hooks/session-start');
+    expect(sessionStart.contents).toContain("'startup-reminder', '--qoder'");
+    expect(sessionStart.contents).toContain(JSON.stringify(path.join(
+      __dirname,
+      '..',
+      '..',
+      'bin',
+      'spec-first.js',
+    )));
+    expect(sessionStart.contents).not.toContain(
+      'const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";',
+    );
     for (const hookPath of [
       '.qoder/hooks/session-start',
       '.qoder/hooks/prd-prewrite-guard',
@@ -147,6 +159,52 @@ describe('Qoder runtime lifecycle', () => {
         mode: 0o755,
       });
     }
+  });
+
+  test('generated Qoder session-start appends trusted startup reminder output', () => {
+    const projectRoot = tempProject();
+    const adapter = new QoderAdapter();
+    const plan = adapter.planRuntimeFilesSync(projectRoot);
+    const sessionStart = plan.operations.find((operation) => operation.path === '.qoder/hooks/session-start');
+    const bundledCliPath = path.join(__dirname, '..', '..', 'bin', 'spec-first.js');
+    const fakeCliPath = path.join(projectRoot, 'test-bin', 'spec-first.js');
+    const hookPath = path.join(projectRoot, '.qoder', 'hooks', 'session-start');
+
+    writeText(fakeCliPath, [
+      "'use strict';",
+      "process.stdout.write('[spec-first] Update available for Qoder runtime: 1.0.0 -> 1.1.0\\n');",
+      '',
+    ].join('\n'));
+    writeText(
+      hookPath,
+      sessionStart.contents.replace(
+        JSON.stringify(bundledCliPath),
+        () => JSON.stringify(fakeCliPath),
+      ),
+    );
+    writeText(path.join(projectRoot, 'AGENTS.md'), [
+      '<!-- spec-first:lang:start -->',
+      '`using-spec-first`',
+      'skills/using-spec-first/SKILL.md',
+      '<!-- spec-first:lang:end -->',
+      '',
+    ].join('\n'));
+
+    const result = spawnSync(process.execPath, [hookPath], {
+      cwd: projectRoot,
+      input: JSON.stringify({ cwd: projectRoot }),
+      encoding: 'utf8',
+      env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
+    });
+
+    expect(result.status).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.hookSpecificOutput).toMatchObject({
+      hookEventName: 'SessionStart',
+    });
+    expect(output.hookSpecificOutput.additionalContext).toContain(
+      '[spec-first] Update available for Qoder runtime: 1.0.0 -> 1.1.0',
+    );
   });
 
   test('removes stale managed settings entries while preserving user hooks', () => {

@@ -114,7 +114,7 @@ function parseStartupReminderArgs(args) {
   };
 
   const setHost = (host) => {
-    if (host !== 'claude' && host !== 'codex') {
+    if (host !== 'claude' && host !== 'codex' && host !== 'qoder') {
       parsed.error = `invalid host "${host}"`;
       return;
     }
@@ -137,6 +137,10 @@ function parseStartupReminderArgs(args) {
       setHost('codex');
       continue;
     }
+    if (arg === '--qoder') {
+      setHost('qoder');
+      continue;
+    }
     if (arg === '--reset') {
       parsed.reset = true;
       continue;
@@ -149,7 +153,7 @@ function parseStartupReminderArgs(args) {
   }
 
   if (!parsed.error && !parsed.host) {
-    parsed.error = 'missing host selector (--claude or --codex)';
+    parsed.error = 'missing host selector (--claude, --codex, or --qoder)';
   }
 
   return parsed;

@@ -4,7 +4,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { ISSUE_SYNTHESIS_STATUSES } = require('./lib/audit-utils');
+const {
+  APP_AUDIT_METADATA_HOSTS,
+  ISSUE_SYNTHESIS_STATUSES,
+  isGeneratedOrControlPath,
+} = require('./lib/audit-utils');
 
 const ARTIFACT_CONTRACT_STATUSES = new Set(['candidate', 'confirmed', 'rejected', 'degraded']);
 const DATA_SENSITIVITY_VALUES = new Set(['public', 'internal', 'confidential', 'restricted']);
@@ -13,14 +17,13 @@ const ISSUE_SEVERITIES = new Set(['blocker', 'high', 'medium', 'low', 'info']);
 const ISSUE_CONTRACT_STATUSES = new Set(['candidate', 'confirmed', 'rejected']);
 const VALIDATION_STATUSES = new Set(['not_required', 'validated', 'validator_rejected', 'validator_unavailable']);
 const SENSITIVE_TEXT_PATTERN = /(https?:\/\/|Authorization\s*[:=]|Bearer\s+|Cookie\s*[:=]|(?:api[_-]?key|access[_-]?token|refresh[_-]?token|client[_-]?secret|token|secret|password|passwd|session(?:id)?|jwt)\s*[:=])/i;
-const METADATA_HOSTS = new Set(['unknown', 'claude', 'codex']);
+const METADATA_HOSTS = new Set(APP_AUDIT_METADATA_HOSTS);
 const DIFF_SCOPE_KINDS = new Set(['git_diff', 'working_tree', 'source_snapshot']);
 const METADATA_STATUSES = new Set(['started', 'complete', 'degraded', 'failed']);
 const TRACEABLE_EVIDENCE_FIELDS = ['file', 'path', 'artifact_id', 'node_id', 'route', 'event', 'key'];
 const PUBLIC_PLACEHOLDER_PATTERN = /^<[A-Za-z0-9._:-]+>$/;
 const FIGMA_REFERENCE_PATH_PATTERN = /^figma-(?:ref|node|file):[a-f0-9]{12}$/;
 const SECRET_PATH_PATTERN = /(?:^|\/)(?:\.env(?:\.|$)|\.npmrc$|\.pypirc$|\.netrc$|\.git-credentials$|.*(?:token|secret|credentials|password|apikey|api_key).*|.*\.(?:pem|key|p12|pfx|keystore|kdbx|mobileprovision|cer)$)/i;
-const GENERATED_OR_CONTROL_PATH_PATTERN = /^(?:\.git(?:\/|$)|\.spec-first\/|\.claude\/|\.codex\/|\.agents\/)/;
 
 function validateArtifact(artifact, options = {}) {
   const errors = [];
@@ -122,7 +125,7 @@ function isSafeSourceInputPath(value) {
   ) {
     return false;
   }
-  if (GENERATED_OR_CONTROL_PATH_PATTERN.test(sourcePath)) return false;
+  if (isGeneratedOrControlPath(sourcePath)) return false;
   if (SECRET_PATH_PATTERN.test(sourcePath)) return false;
   return true;
 }
@@ -525,7 +528,7 @@ function validateKnownContractArtifact(artifact, errors) {
         requireString(artifact, field, errors);
       }
       if (typeof artifact.host === 'string' && !METADATA_HOSTS.has(artifact.host)) {
-        errors.push(error('host', 'invalid_metadata_host', 'metadata host must be unknown, claude, or codex.'));
+        errors.push(error('host', 'invalid_metadata_host', `metadata host must be one of: ${APP_AUDIT_METADATA_HOSTS.join(', ')}.`));
       }
       if (typeof artifact.status === 'string' && !METADATA_STATUSES.has(artifact.status)) {
         errors.push(error('status', 'invalid_metadata_status', 'metadata status is invalid.'));

@@ -78,6 +78,14 @@ Checked-in source files that govern behavior, docs, tests, runtime generation, o
 
 Host-specific projected assets under `.claude/`, `.codex/`, or `.agents/skills/`. Repair them through source changes plus `spec-first init`; do not patch them as source fixes.
 
+### Product-Bundled Runtime Asset
+
+An asset distributed as part of the spec-first product because installed workflow behavior depends on it across supported hosts. Maintainer-only documentation cannot substitute for this distribution responsibility.
+
+### Project-Local Overlay
+
+A consumer project's templates, standards, glossary, compliance guidance, or industry rules layered onto a generic workflow as advisory input. It remains outside the product default and requires project evidence or confirmation before becoming a product fact.
+
 ### Direct Evidence
 
 Current source reads, diffs, tests, logs, schema checks, or user-provided artifacts that directly support a claim.

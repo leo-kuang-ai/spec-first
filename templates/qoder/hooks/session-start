@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 'use strict';
 
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
+const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
 const LANG_START = '<!-- spec-first:lang:start -->';
 const LANG_END = '<!-- spec-first:lang:end -->';
 
@@ -29,6 +31,15 @@ if (instructionBody !== null) {
       status.message,
       'Run `spec-first init --qoder` in this project after Qoder hook protocol support is confirmed.',
     ].join('\n');
+}
+
+const startupReminder = readStartupReminder(projectDir);
+if (startupReminder) {
+  additionalContext = [
+    additionalContext,
+    '',
+    startupReminder,
+  ].join('\n');
 }
 
 process.stdout.write(JSON.stringify({
@@ -104,5 +115,45 @@ function parseJsonObject(raw) {
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};
+  }
+}
+
+function readStartupReminder(cwd) {
+  try {
+    if (!isTrustedSpecFirstCliPath(SPEC_FIRST_CLI_PATH)) {
+      return '';
+    }
+
+    const result = spawnSync(process.execPath, [SPEC_FIRST_CLI_PATH, 'startup-reminder', '--qoder'], {
+      cwd,
+      encoding: 'utf8',
+      timeout: 1200,
+    });
+
+    if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {
+      return '';
+    }
+
+    return result.stdout.trim();
+  } catch {
+    return '';
+  }
+}
+
+function isTrustedSpecFirstCliPath(cliPath) {
+  if (
+    typeof cliPath !== 'string'
+    || cliPath.length === 0
+    || cliPath === '__SPEC_FIRST_CLI_PATH__'
+    || !path.isAbsolute(cliPath)
+    || path.basename(cliPath) !== 'spec-first.js'
+  ) {
+    return false;
+  }
+
+  try {
+    return fs.statSync(cliPath).isFile();
+  } catch {
+    return false;
   }
 }
