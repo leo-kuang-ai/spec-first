@@ -26,21 +26,24 @@ Edit checked-in source assets when changing spec-first behavior:
 
 Do not hand-edit these paths as source fixes:
 
-- `.claude/`
-- `.codex/`
-- `.agents/skills/`
-- `.cursor/skills/`
+- spec-first generated `.claude/commands/spec*`, `.claude/skills/spec-*`, `.claude/skills/using-spec-first`, `.claude/spec-first/`, `.claude/agents/spec-*`, and fixed spec-first hooks
+- spec-first generated `.codex/commands/spec*`, `.codex/skills/spec-*`, `.codex/skills/using-spec-first`, `.codex/spec-first/`, `.codex/agents/spec-*`, and fixed spec-first hooks
+- `.agents/skills/spec-*/` and `.agents/skills/using-spec-first/`
+- `.cursor/skills/spec-*/` and `.cursor/skills/using-spec-first/`
 - `.cursor/spec-first/`
+- `.cursor/rules/spec-first.mdc` (generated host-native pointer)
 - `.cursor/mcp.json` (host-local MCP config output; not source truth, and not removed by `spec-first clean --cursor`)
-- `.kiro/skills/`
-- `.kiro/agents/`
+- `.kiro/skills/spec-*/` and `.kiro/skills/using-spec-first/`
+- `.kiro/agents/spec-*`
 - `.kiro/spec-first/`
+- `.kiro/steering/spec-first.md` (generated host-native pointer)
 - spec-first managed `.kiro/settings/`
 - `.qoder/commands/spec-*.md`
 - `.qoder/commands/spec/` (retired legacy namespace)
-- `.qoder/skills/`
-- `.qoder/agents/`
+- `.qoder/skills/spec-*/` and `.qoder/skills/using-spec-first/`
+- `.qoder/agents/spec-*`
 - `.qoder/spec-first/`
+- `.qoder/rules/spec-first.md` (generated host-native pointer)
 - spec-first managed `.qoder/hooks/session-start`
 - spec-first managed `.qoder/hooks/prd-prewrite-guard`
 - spec-first managed `.qoder/hooks/prd-readiness-guard`
@@ -54,6 +57,8 @@ spec-first init
 
 Choose the target host when prompted. Run it once per host when Claude Code, Codex, Cursor, Kiro, or Qoder runtime mirrors need to be refreshed.
 Choose Cursor explicitly when refreshing Cursor generated-runtime preview assets; Cursor loader discovery/invocation remains degraded until local loader evidence is recorded.
+
+In target repositories, the host roots themselves remain mixed-ownership surfaces. Team-authored skills, agents, rules, and portable project configuration outside the namespaced paths above may be committed when the team chooses to share them; `init` must not blanket-ignore or automatically untrack those user-owned assets. Those files still do not become source for spec-first package behavior, and the spec-first source repository continues to treat its generated runtime mirrors as non-source.
 
 Use `spec-first doctor --claude|--codex|--cursor|--kiro|--qoder` to inspect runtime drift. A drift report is evidence that source and runtime may need reconciliation; it is not permission to patch the mirror directly. `doctor --cursor` reports generated-runtime preview posture and does not prove Cursor can discover or invoke the generated skills.
 

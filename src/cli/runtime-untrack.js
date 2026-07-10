@@ -1,7 +1,7 @@
 'use strict';
 
 const { spawnSync } = require('node:child_process');
-const { getSpecFirstGitignorePatterns } = require('./gitignore-policy');
+const { getSpecFirstRuntimeUntrackPatterns } = require('./gitignore-policy');
 
 const SUCCESS_REASON = 'untracked-runtime';
 const NONE_TRACKED_REASON = 'none-tracked';
@@ -12,7 +12,7 @@ function planRuntimeUntrack({ projectRoot, runGit = defaultRunGit } = {}) {
     return emptyPlan(repoCheck.reason_code, repoCheck.diagnostic);
   }
 
-  const result = runGit(['ls-files', '-z', '--', ...getSpecFirstGitignorePatterns()], {
+  const result = runGit(['ls-files', '-z', '--', ...getSpecFirstRuntimeUntrackPatterns()], {
     projectRoot,
     literalPathspecs: false,
   });

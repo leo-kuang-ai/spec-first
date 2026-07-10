@@ -9,32 +9,55 @@ const SPEC_FIRST_GITIGNORE_SECTIONS = [
     patterns: [
       '.claude/commands/spec/',
       '.claude/commands/spec-*.md',
-      '.claude/skills/',
+      '.claude/skills/spec-*/',
+      '.claude/skills/using-spec-first/',
+      '.claude/skills/graphify/',
       '.claude/spec-first/',
-      '.claude/agents/',
+      '.claude/agents/spec-*',
       '.claude/hooks/session-start',
       '.claude/hooks/spec-plan-guard',
       '.claude/hooks/prd-prewrite-guard',
       '.claude/hooks/prd-readiness-guard',
       '.claude/tasks/',
       '.claude/worktrees/',
-      '.codex/',
-      '.agents/skills/',
-      '.cursor/skills/',
+      '.codex/commands/spec/',
+      '.codex/commands/spec-*.md',
+      '.codex/skills/spec-*/',
+      '.codex/skills/using-spec-first/',
+      '.codex/skills/graphify/',
+      '.codex/spec-first/',
+      '.codex/agents/spec-*',
+      '.codex/hooks/session-start',
+      '.codex/hooks/session-start.cmd',
+      '.codex/hooks.json',
+      '.agents/skills/spec-*/',
+      '.agents/skills/using-spec-first/',
+      '.agents/skills/graphify/',
+      '.cursor/skills/spec-*/',
+      '.cursor/skills/using-spec-first/',
       '.cursor/spec-first/',
       '.cursor/mcp.json',
-      '.kiro/skills/',
-      '.kiro/agents/',
+      '.cursor/rules/spec-first.mdc',
+      '.kiro/commands/spec/',
+      '.kiro/commands/spec-*.md',
+      '.kiro/skills/spec-*/',
+      '.kiro/skills/using-spec-first/',
+      '.kiro/skills/graphify/',
+      '.kiro/agents/spec-*',
       '.kiro/spec-first/',
       '.kiro/settings/',
+      '.kiro/steering/spec-first.md',
       '.qoder/commands/spec/',
       '.qoder/commands/spec-*.md',
-      '.qoder/skills/',
-      '.qoder/agents/',
+      '.qoder/skills/spec-*/',
+      '.qoder/skills/using-spec-first/',
+      '.qoder/skills/graphify/',
+      '.qoder/agents/spec-*',
       '.qoder/spec-first/',
       '.qoder/hooks/session-start',
       '.qoder/hooks/prd-prewrite-guard',
       '.qoder/hooks/prd-readiness-guard',
+      '.qoder/rules/spec-first.md',
       '.qoder/settings.local.json',
       '.context/spec-first/',
     ],
@@ -63,7 +86,20 @@ const SPEC_FIRST_GITIGNORE_SECTIONS = [
   },
 ];
 
-const SPEC_FIRST_GITIGNORE_PATTERN_METADATA = {};
+const SPEC_FIRST_GITIGNORE_PATTERN_METADATA = {
+  '.codex/hooks.json': { runtimeUntrack: false, shareability: 'team-policy' },
+  '.cursor/mcp.json': { runtimeUntrack: false, shareability: 'team-policy' },
+  '.cursor/rules/spec-first.mdc': { runtimeUntrack: false, shareability: 'generated-pointer' },
+  '.kiro/settings/': { runtimeUntrack: false, shareability: 'team-policy' },
+  '.kiro/steering/spec-first.md': { runtimeUntrack: false, shareability: 'generated-pointer' },
+  '.qoder/hooks/session-start': { runtimeUntrack: false, shareability: 'managed-slice' },
+  '.qoder/hooks/prd-prewrite-guard': { runtimeUntrack: false, shareability: 'managed-slice' },
+  '.qoder/hooks/prd-readiness-guard': { runtimeUntrack: false, shareability: 'managed-slice' },
+  '.qoder/rules/spec-first.md': { runtimeUntrack: false, shareability: 'generated-pointer' },
+  '.qoder/settings.local.json': { runtimeUntrack: false, shareability: 'team-policy' },
+  '.graphify/': { runtimeUntrack: false, shareability: 'team-policy' },
+  'graphify-out/': { runtimeUntrack: false, shareability: 'team-policy' },
+};
 
 function getSpecFirstGitignorePatterns() {
   return SPEC_FIRST_GITIGNORE_SECTIONS.flatMap((section) => section.patterns);
@@ -71,6 +107,19 @@ function getSpecFirstGitignorePatterns() {
 
 function getSpecFirstGitignorePatternMetadata() {
   return { ...SPEC_FIRST_GITIGNORE_PATTERN_METADATA };
+}
+
+function getSpecFirstRuntimeUntrackPatterns() {
+  return getSpecFirstGitignorePatterns()
+    .filter((pattern) => SPEC_FIRST_GITIGNORE_PATTERN_METADATA[pattern]?.runtimeUntrack !== false)
+    .map(toRuntimeUntrackPathspec);
+}
+
+function toRuntimeUntrackPathspec(pattern) {
+  if (pattern.includes('*') && pattern.endsWith('/')) {
+    return `${pattern}**`;
+  }
+  return pattern;
 }
 
 function buildSpecFirstGitignoreBlock() {
@@ -91,17 +140,28 @@ function applySpecFirstGitignoreBlock(existingContent) {
   }
 
   const block = buildSpecFirstGitignoreBlock();
-  const startIdx = existingContent.indexOf(SPEC_FIRST_GITIGNORE_START);
-  const endIdx = existingContent.indexOf(SPEC_FIRST_GITIGNORE_END);
-  const hasValidBlock = startIdx !== -1 && endIdx !== -1 && endIdx > startIdx;
+  const startMarkers = findLineMarkers(existingContent, SPEC_FIRST_GITIGNORE_START);
+  const endMarkers = findLineMarkers(existingContent, SPEC_FIRST_GITIGNORE_END);
+  const hasNoBlock = !existingContent.includes(SPEC_FIRST_GITIGNORE_START)
+    && !existingContent.includes(SPEC_FIRST_GITIGNORE_END);
+  const hasValidBlock = startMarkers.length === 1
+    && endMarkers.length === 1
+    && endMarkers[0].index > startMarkers[0].index;
   let updated;
   let status;
 
   if (hasValidBlock) {
+    const startIdx = startMarkers[0].index;
+    const endIdx = endMarkers[0].index;
+    const endLength = endMarkers[0].length;
     const before = existingContent.slice(0, startIdx);
-    const after = existingContent.slice(endIdx + SPEC_FIRST_GITIGNORE_END.length);
+    const after = existingContent.slice(endIdx + endLength);
     updated = `${before}${block}${after}`;
     status = updated === existingContent ? 'already-current' : 'updated';
+  } else if (!hasNoBlock) {
+    throw new Error(
+      'Invalid spec-first .gitignore managed block: expected no markers or exactly one ordered start/end pair. Repair duplicate or unmatched markers before rerunning init.',
+    );
   } else if (existingContent.length === 0) {
     updated = `${block}\n`;
     status = 'added';
@@ -122,6 +182,12 @@ function applySpecFirstGitignoreBlock(existingContent) {
   };
 }
 
+function findLineMarkers(content, marker) {
+  const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return [...content.matchAll(new RegExp(`^${escapedMarker}\\r?$`, 'gm'))]
+    .map((match) => ({ index: match.index, length: match[0].length }));
+}
+
 function ensureFinalNewline(content) {
   return content.endsWith('\n') ? content : `${content}\n`;
 }
@@ -133,4 +199,5 @@ module.exports = {
   buildSpecFirstGitignoreBlock,
   getSpecFirstGitignorePatternMetadata,
   getSpecFirstGitignorePatterns,
+  getSpecFirstRuntimeUntrackPatterns,
 };

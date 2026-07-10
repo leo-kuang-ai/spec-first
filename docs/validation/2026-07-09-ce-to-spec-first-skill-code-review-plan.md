@@ -2,7 +2,7 @@
 
 ## 结论
 
-本审查对当前 `skills/` 下全部 35 个 source skill 按风险分级审查(自动化扫描全覆盖,高风险 skill 逐文件深审),其中 29 个为 CE 迁移相关 skill(含 `spec-mcp-setup`),6 个为 spec-first 原生 / 拆分 skill。审查重点覆盖迁移正确性、代码质量、安全性、跨 skill 依赖关系和上下文管理。
+本审查对固定 spec-first source snapshot 中的 35 个 source skill 按“迁移差异 × 用户/链路影响”双轴风险分级审查(自动化扫描全覆盖,高风险 skill 逐文件深审),其中 29 个为 CE 迁移相关 skill(含 `spec-mcp-setup`),6 个为 spec-first 原生 / 拆分 skill。CE parity 只读取固定 commit snapshot。审查重点覆盖迁移正确性、代码质量、安全性、跨 skill 依赖关系、上下文管理和长任务证据可恢复性。
 
 审查不替代迁移审查报告的结论,而是在其基础上验证实际 source 代码是否与审查结论一致,并发现迁移审查未覆盖的问题。
 
@@ -13,7 +13,7 @@
 - 对 spec-first 原生 / 拆分 skill 不做 CE 等价要求,但仍审查其入口语义、source/runtime 边界、依赖关系、artifact contract、脚本安全和上下文管理。
 - 验证跨 skill 依赖关系(文件引用、artifact contract、handoff 路由、配置键)是否全部正确。
 - 验证上下文管理(常驻 vs 触发、脚本产出质量、handoff 上下文传递)是否符合 spec-first 架构原则。
-- 产出一份合并报告,记录按严重程度分类的发现和修复建议。
+- 产出一份可重建来源快照、可恢复维度 checkpoint、可区分 review completion 与 release readiness 的合并报告,记录按严重程度分类的发现和修复建议。
 
 ## 非目标
 
@@ -24,9 +24,13 @@
 
 ## CE 基线(parity source of truth)
 
-- **权威 CE source**:`~/xiaobu/compound-engineering-plugin`,commit `fc0395b8`(v3.19.0);该工作副本含 `ce-setup` 与全部 `ce-*` skill,是逐文件 parity 比对的唯一基准。
+- **权威 CE source**:`~/xiaobu/compound-engineering-plugin` 中的 commit object `fc0395b8`(v3.19.0);该 commit 含 `ce-setup` 与全部 `ce-*` skill,是逐文件 parity 比对的唯一基准。当前工作副本、其 HEAD 与 dirty 内容均不是权威输入。
 - 已安装的 marketplace 副本(v3.14.3)与 plugin cache 均较旧,**不作为**比对基准,以避免 False parity / False drift。
-- **Phase 1 前置**:任何 parity 维度(维度 1、14b)运行前,先执行 `git -C ~/xiaobu/compound-engineering-plugin rev-parse HEAD` 记录基线 commit 并写入合并报告「全局依赖图谱」头部;若工作副本已偏离 `fc0395b8`,先说明漂移再继续。
+- **Phase 1 固定快照 gate**:任何 parity 维度(维度 1、14b)运行前必须:
+  1. 执行 `git -C ~/xiaobu/compound-engineering-plugin cat-file -e 'fc0395b8^{commit}'`,确认目标 commit object 存在。
+  2. 使用 `git show fc0395b8:<path>` 读取 CE 文件,或创建指向该 commit 的 detached 临时 worktree;禁止从当前 CE 工作树直接读取 parity 文件。
+  3. 在合并报告元数据中记录完整 commit SHA、读取方式(`git_show` / `detached_worktree`)、临时快照路径(如适用)和验证时间。
+  4. 若 commit object 不存在或固定快照无法建立,将 parity 维度标记为 `blocked_baseline_unavailable` 并停止这些维度;不得通过“说明漂移后继续”降级为当前工作副本比较。
 
 ## 审查范围
 
@@ -45,6 +49,15 @@
 ### 审查深度分级(risk-based scoping)
 
 本审查不对全部 35 个 skill 一律满深度手审,而是按迁移风险分级投放注意力;批次「审查口径」标签据此成为分级依据(不再仅描述性)。基线是 `2026-07-08-ce-to-spec-first-reviewed-skills-parity-audit-report.md`——本审查验证其结论的 delta 与未覆盖项,而非从零重推。
+
+审查深度采用**双轴升级**而不是只看迁移差异:
+
+1. **迁移差异轴**:aligned / partial / repaired / replaced / near-parity / native。
+2. **用户与链路影响轴**:公开入口、核心 workflow 链路、治理承重、artifact producer/consumer 中心性、跨宿主影响。
+
+任一 skill 在用户与链路影响轴为 high 时,即使属于 native / Tier C,也必须升级为该 skill 全部相关维度的深审;“无 CE 基线”只表示不做 CE parity,不表示降低当前产品行为、上下文或治理审查强度。Phase 1 必须在进度表中记录两轴值和最终 Tier,并说明任何升级理由。
+
+复用 2026-07-08 报告前必须执行 **provenance gate**:记录该报告对应的 CE commit、spec-first commit/tree、dirty 状态和已审文件清单。若旧报告缺少任一项且无法从直接证据重建,相关 verdict 仅作 advisory,不得用于降低审查深度;对应 skill 自动升级为 Tier A 或重新建立逐文件 delta 基线。
 
 - **全覆盖自动化扫描(所有 skill,不分层)**:CE residual grep、上下文排除扫描、`npm run lint:skill-entrypoints`、相关 CI 契约测试(见「验证命令」)。这些确定性扫描先于分级手审运行,任何 skill 不豁免。
 - **Tier A — replaced/repaired + near-parity**(Batch 3 的 partial/repaired 项、Batch 4 全部、`spec-mcp-setup`):对权威 CE 基线做全部适用维度的逐文件深审(含 CE parity 与维度 14b)。迁移风险集中于此。
@@ -122,12 +135,13 @@
 
 ```
 spec-brainstorm → spec-plan → spec-write-tasks → spec-work → spec-code-review → spec-compound
-                                                        ↓
-                                              spec-simplify-code
-                                                        ↓
-                                              spec-commit-push-pr
-                                                        ↓
-                                                   spec-lfg (full pipeline)
+
+spec-lfg (full-pipeline orchestrator)
+  ├── spec-work mode:return-to-caller
+  ├── spec-simplify-code
+  ├── spec-code-review mode:agent
+  ├── spec-test-browser mode:pipeline
+  └── spec-commit-push-pr mode:pipeline
 ```
 
 横向依赖:
@@ -300,7 +314,7 @@ spec-plan / spec-work / spec-code-review / spec-debug (消费)
 1. **路径迁移正确性**:CE 路径 → spec-first 路径的映射是否完整,无遗漏
 2. **路径可达性**:下游 skill 引用的产物路径,在 spec-mcp-setup 运行后确实存在
 3. **产物字段完整性**:每个产物的字段是否覆盖下游 skill 需要读取的所有字段
-4. **产物数量对等**:CE setup 产出的产物类型数量 ≤ spec-mcp-setup 产出的产物类型数量(含合理新增)
+4. **产物数量对等**:CE 中仍需保留的产物类型数量 ≤ spec-mcp-setup 产出的对应产物类型数量(含合理新增);已按规则 5 确认 retired 且无消费者的产物不计入
 5. **retired 产物处理**:CE 中存在但 spec-first 中 retired 的产物,确认没有下游 skill 仍在读取
 6. **新增产物的消费验证**:spec-first 新增的产物(tool-facts.json 等)是否确实被下游 skill 消费,而非产出后无人使用
 7. **产物格式一致性**:同一产物在 SKILL.md 中声明的格式与脚本实际输出的格式是否一致
@@ -414,6 +428,8 @@ AGENTS.md 明确了上下文排除范围。验证每个 skill 是否遵守:
 
 ```
 Phase 1: 全局依赖图谱 + 共享资源清单 + 上下文预算基线
+  ├── 固定 CE commit snapshot + 记录读取方式
+  ├── 固定 spec-first source manifest(HEAD / dirty digest / file hashes)
   ├── Skill 间引用关系 + artifact 产出/消费映射
   ├── 共享脚本清单(跨 skill 同名脚本对比)
   ├── 配置键定义/消费映射
@@ -442,21 +458,30 @@ Phase 4: 输出合并报告
 
 本审查预期跨越多个会话上下文,不得把单个 skill 的审查结论只保存在对话中。执行时采用**增量落盘 + 可恢复续跑**:
 
-1. Phase 1 先创建合并报告骨架,至少包含 CE 基线 commit、审查范围、分级规则、全局依赖图谱占位、逐 Batch / Skill 章节、审查进度表、严重程度定义和验证命令占位。
-2. 每完成一个 skill 审查,立即更新合并报告中对应 skill 小节和顶部进度表;不得等全部 skill 审完后再集中回填。
-3. 每个 skill 小节至少记录:Tier、status、verdict、已读取 source 文件、适用/不适用的 CE parity 结论、发现列表(文件:行号、严重程度、描述、修复建议)、依赖/artifact/config/context 结论、未检查项及原因。
-4. 对尚未完成的全局交叉验证,单个 skill 审查时可先记录局部 evidence / candidate finding,但必须标注为 `pending_global_cross_check`;Phase 3 再统一确认或降级。
-5. 当上下文接近上限或需要压缩/换会话时,先把当前 skill 的中间结论落盘为 `status: in_progress` 或 `status: done`,并写明 freshness、source refs、limitations 和 next skill;下一轮只从方案 + 合并报告进度表 + 最近小节恢复,不得依赖上一轮对话记忆。
-6. 续跑开始时先读取合并报告的进度表、最近一个已审 skill 小节和下一个待审 skill 的 source,再继续追加;如发现报告与源码当前状态不一致,先标注 freshness drift,再回源确认。
+1. Phase 1 先创建合并报告骨架,至少包含 CE 固定快照信息、spec-first `HEAD`、`worktree_status_digest`、source inventory、`source_manifest_hash`、审查范围、双轴分级、全局依赖图谱占位、逐 Batch / Skill 章节、审查进度表、严重程度定义和验证命令占位。source manifest 至少覆盖本轮纳入审查的 `skills/**` 文件路径、Git blob id(已跟踪文件)或 SHA-256(未跟踪文件)。
+2. 每完成一个 skill 审查,立即更新合并报告中对应 skill 小节和顶部进度表;不得等全部 skill 审完后再集中回填。并行 agent 只能只读分析并返回结构化 findings,合并报告由 orchestrator 单写者串行更新,避免 lost update。
+3. 每个 skill 小节至少记录:迁移差异轴、用户/链路影响轴、最终 Tier、status、verdict、已读取 source 文件及其 hash、适用/不适用的 CE parity 结论、发现列表(文件:行号、严重程度、描述、修复建议)、依赖/artifact/config/context 结论、未检查项及原因。
+4. Tier A 和升级深审的 skill 必须维护维度级 checkpoint,每个适用维度记录 `pending / in_progress / done / degraded`、最近 source hash、evidence refs、未完成命令和 next atomic action;只有全部适用维度结束后,skill 才能标记为 `done`。
+5. 对尚未完成的全局交叉验证,单个 skill 审查时可先记录局部 evidence / candidate finding,但必须标注为 `pending_global_cross_check`;Phase 3 再统一确认或降级。
+6. 当上下文接近上限或需要压缩/换会话时,先把当前 skill 的中间结论落盘为 `status: in_progress`,并写明 freshness、source refs、limitations、维度 checkpoint 和 next atomic action;存在未完成维度时不得提前写 `done`。下一轮只从方案 + 合并报告进度表 + 最近小节恢复,不得依赖上一轮对话记忆。
+7. 续跑开始时先重算全局 source manifest 和当前/下一个 skill 的文件 hash。hash 变化的已完成 skill 必须恢复为 `in_progress`;其全局结论恢复为 `pending_global_cross_check`,回源复核后才能重新完成。仅记录“freshness drift”但保留旧 `done` 不算有效恢复。
 
 这条纪律是 handoff gate 的具体落点:审查结论必须成为可恢复 artifact,而不是 transcript 声明。
 
 ### Goal 启动 Prompt
 
-在新会话中启动本审查时,使用以下中文 prompt。该 prompt 的目标不是让 agent 只给计划,而是要求它创建/使用 `goal` 持续完成全量审查,并把每个 skill 的结论增量写入合并报告。
+在新会话中启动本审查时,先探测宿主是否提供 goal primitive:
+
+- 可由 agent 调用 `create_goal` / 等价 primitive:创建或恢复 goal。
+- 仅提供用户级 `/goal`:输出下方 prompt 供用户显式启动,不得声称 agent 已创建 goal。
+- 无 goal primitive:按同一执行纪律直接运行,以合并报告作为唯一跨会话状态源。
+
+goal 只是执行便利,不是状态 source of truth。新会话不得假设旧 active goal 自动存在;始终先读取合并报告并重建执行状态。
+
+使用以下中文 prompt。该 prompt 的目标不是让 agent 只给计划,而是要求它在宿主能力允许时创建/使用 `goal` 持续完成全量审查,并把每个 skill 的结论增量写入合并报告。
 
 ```text
-请创建并使用一个 active goal 完成 CE 到 Spec-First Skill 迁移代码审查全量工作。
+请先探测当前宿主的 goal capability。可由 agent 创建 goal 时,创建并使用 active goal 完成 CE 到 Spec-First Skill 迁移代码审查;否则按相同纪律直接执行,并以合并报告为恢复 source of truth。
 
 目标:
 - 按 `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md` 审查当前 `skills/` 下全部 35 个 source skill。
@@ -474,27 +499,28 @@ Phase 4: 输出合并报告
 - 不手改 generated runtime mirrors: `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`。
 - 默认只记录审查发现,不修 source skill 问题;除非用户明确要求修复。
 - 每审完一个 skill,立即更新合并报告的顶部进度表和该 skill 小节,不要等全部审完后集中回填。
-- 每个 skill 小节至少记录 Tier、status、verdict、已读取 source 文件、CE parity 结论或不适用原因、发现列表(文件:行号、严重程度、描述、修复建议)、依赖/artifact/config/context 结论、未检查项及原因。
+- 并行 reviewer 只读返回 findings;合并报告由当前 orchestrator 单写者串行更新。
+- 每个 skill 小节至少记录双轴风险、最终 Tier、status、verdict、已读取 source 文件及 hash、CE parity 结论或不适用原因、维度 checkpoint、发现列表(文件:行号、严重程度、描述、修复建议)、依赖/artifact/config/context 结论、未检查项及原因。
 - 对尚未完成的跨 skill/global 结论,先标注 `pending_global_cross_check`;Phase 3 再统一确认或降级。
 - 如果上下文接近上限或需要压缩,先把当前 skill 的中间结论写入报告,标注 freshness、source refs、limitations 和 next skill;下一轮从方案和报告恢复,不要依赖 transcript。
-- 每次更新报告后同步更新 `CHANGELOG.md`,并运行最窄验证:
-  - `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md`
-  - `npx jest tests/unit/changelog-format.test.js --runInBand`
+- 逐 skill 进度只更新合并报告;`CHANGELOG.md` 在整个审查中维护一条 rolling entry,仅在阶段收口或最终结论变化时更新该条目,避免将内部流水拆成大量用户可见记录。
+- 每次报告更新运行 `git diff --check -- docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md`;阶段收口或 Changelog 更新时再运行 `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` 和 `npx jest tests/unit/changelog-format.test.js --runInBand`。
 
 完成条件:
 - Phase 1-4 全部完成。
 - 35 个 source skill 均有 `done` 状态和明确 verdict。
 - 全局依赖、artifact contract、config key、共享脚本、上下文排除和测试覆盖缺口均已交叉验证。
-- 合并报告与 `CHANGELOG.md` 已更新,验证命令结果已记录。
+- 合并报告与 rolling `CHANGELOG.md` 条目已更新,required verification 均 exit 0 并记录 command / exit_code / timestamp;`No tests found`、缺失命令或 degraded 验证不得作为 confirmed close。
+- 报告关闭检查确认 roster 完整、无 `pending_global_cross_check`、source manifest 新鲜、所有适用维度结束。若仓库尚无机器关闭验证器,执行同一 checklist 并将 `verification_gate: degraded` 和原因写入报告;此时报告只能标记 `complete_degraded`,goal 仅表示审查执行结束,不得据此声明迁移已 confirmed 或 release readiness 为 `pass`。
 - 满足以上条件后才把 goal 标记为 complete;否则保持 active goal 并继续下一个 skill。
 ```
 
 续跑时使用以下短 prompt:
 
 ```text
-继续 active goal: CE 到 Spec-First Skill 迁移代码审查。
-请先读取方案和合并报告,从报告进度表识别下一个待审 skill,继续审查并把本轮结论追加到合并报告和 `CHANGELOG.md`。
-不要依赖上一轮 transcript;如果发现报告 freshness 与当前 source 不一致,先回源确认并记录 drift。
+继续 CE 到 Spec-First Skill 迁移代码审查。若当前会话存在匹配的 active goal 则继续;否则根据合并报告重建 goal 或按无 goal 降级路径直接执行。
+请先读取方案和合并报告,重算 source manifest,从报告进度表识别下一个待审 skill,继续审查并把本轮结论追加到合并报告。只维护既有 rolling `CHANGELOG.md` 条目。
+不要依赖上一轮 transcript;如果 source hash 漂移,将受影响 skill 恢复为 `in_progress` 并重新验证。
 ```
 
 ## 审查输出
@@ -510,9 +536,22 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
 ```markdown
 # CE 到 Spec-First Skill 迁移代码审查报告
 
+## 元数据
+  - schema_version
+  - producer
+  - report_status: in_progress / complete / complete_degraded
+  - release_readiness: pass / conditional_pass / ship_blocked
+  - verification_gate: confirmed / degraded
+  - authority_level: confirmed / mixed / degraded
+  - CE baseline commit + snapshot method
+  - spec_first_head
+  - worktree_status_digest
+  - source_manifest_hash
+  - freshness / limitations / consumers
+
 ## 审查进度
-  | Skill | Tier | Status | Verdict | Last updated | Notes |
-  |---|---|---|---|---|---|
+  | Skill | Migration risk | User/chain impact | Tier | Status | Verdict | Source hash | Last updated | Notes |
+  |---|---|---|---|---|---|---|---|---|
 
 ## 全局依赖图谱
   - Skill 间引用关系图
@@ -525,11 +564,13 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
 
   ### Batch 1
     #### spec-test-xcode
+    - Migration risk / User-chain impact
     - Tier: A / B / C
     - Status: pending / in_progress / done
     - Verdict: pass / issues_found / critical_issues
-    - Source files read
+    - Source files read + blob/hash
     - CE parity: applicable / not_applicable + conclusion
+    - Dimension checkpoints: pending / in_progress / done / degraded
     - 发现列表(文件:行号, 严重程度, 描述, 修复建议)
     - 依赖关系验证结果
     - 上下文管理验证结果
@@ -553,6 +594,7 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
   - 各批次 pass rate
   - 依赖问题汇总
   - 上下文管理问题汇总
+  - Report completion 与 release readiness 决议
 ```
 
 ### 发现严重程度定义
@@ -572,8 +614,10 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
 ```bash
 # 语法检查
 npm run typecheck
-bash -n skills/*/scripts/*.sh
-PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/*/scripts/*.py
+find skills -path '*/scripts/*.sh' -type f -print0 | xargs -0 -n1 bash -n
+find skills -path '*/scripts/*.py' -type f -print0 | xargs -0 env PYTHONPYCACHEPREFIX=/tmp/spec-first-pycache/ce-skill-review python3 -m py_compile
+! find skills -type d -name __pycache__ -print -quit | grep -q .
+! find skills -type f -name '*.pyc' -print -quit | grep -q .
 
 # 入口治理
 npm run lint:skill-entrypoints
@@ -586,9 +630,14 @@ rg -n "\.claude/|\.codex/|\.agents/skills/|\.cursor/skills/|\.kiro/skills/|\.qod
 
 # 相关 focused contract tests
 npx jest tests/unit/changelog-format.test.js --runInBand
-npx jest tests/unit/migrated-skill-scripts-contracts.test.js --runInBand
+npx jest tests/unit/ce-upstream-skill-sync-contracts.test.js --runInBand
 npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
+npx jest tests/unit/mcp-setup-contracts.test.js tests/unit/mcp-setup-powershell-contracts.test.js --runInBand
 ```
+
+运行前先用 `test -f <suite>` 或当前 test inventory 确认 required suite 存在;缺失 suite 是 verification failure,不得把 Jest 的 `No tests found` 记录为可接受降级。上述命令是当前基线,后续测试重命名时必须同步更新方案和消费者。
+
+Phase 4 还必须运行机器可判定的报告关闭检查,校验 roster、维度 checkpoint、`pending_global_cross_check`、source manifest freshness 和 required verification exit code。若当前仓库尚未提供该 validator,必须显式执行并记录同一 checklist,报告只能标记 `complete_degraded`,release readiness 不得为 `pass`;新增 durable validator 应作为独立审计基础设施任务处理,不得用 LLM 自述伪装成硬 gate。
 
 ## 风险与反模式
 
@@ -617,6 +666,11 @@ npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
 - 测试覆盖缺口已分析。
 - 合并报告已输出。
 - 每个已完成 skill 的结论已增量写入合并报告,顶部进度表与逐 skill 小节一致;如发生上下文压缩/续跑,报告中保留 freshness、source refs、limitations 和 next skill。
+- 固定 CE snapshot 可重建;spec-first source manifest 在 close 时仍新鲜,发生漂移的 skill 已重新审查。
+- 所有 Tier A / 升级深审 skill 的适用维度 checkpoint 均已结束,不存在 `pending_global_cross_check`。
+- required verification 均有 command、exit code、timestamp 且 exit 0;`No tests found`、缺失 suite 或 degraded 结果不满足 confirmed completion。
+- 报告分别声明 `report_status` 与 `release_readiness`:审查工作可以在 findings 已完整记录时完成,但存在 critical/high 未关闭问题时必须标记 `ship_blocked` 或 `conditional_pass`,不得把“review complete”表达为“migration trusted”。
+- critical/high finding 必须指向后续修复 artifact、责任边界和复验条件;修复本身仍属于独立显式任务,不在本审查中静默执行。
 
 ## 复审决议(2026-07-10 spec-doc-review)
 
@@ -633,3 +687,14 @@ npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
 - **[P1] 上下文维度**:维度 16-22 对无 CE 基线的 Tier C 原生 skill 仅按需,不作强制满深度。
 - **[P2] 维度计数**:14b 认定为第 12 个核心维度,核心「11 项」→「12 项」,总数保持 23,Phase 2 表述改为「维度 5-15(含 14b)」。
 - **[P2] 维度重叠**:维度 15↔3、13↔6、22↔16 合并执行(见「审查深度分级」末),编号与总数不变。
+
+## 二次优化决议(2026-07-10 spec-doc-review)
+
+- CE parity 输入从“指定 commit 的工作副本”收紧为 commit object 固定快照;当前 CE HEAD/dirty 内容不再具有基线权威。
+- 审查分级从单一迁移风险升级为“迁移差异 × 用户/链路影响”双轴;高影响 native skill 可升级深审。
+- 旧 parity 报告增加 provenance gate;缺 commit/tree/dirty/file inventory 时只作 advisory,不得据此降级审查。
+- 长任务报告增加 spec-first source manifest、逐文件 hash、维度 checkpoint、单写者纪律和漂移失效规则。
+- goal 续跑改为 capability-aware;跨会话状态以合并报告为 source of truth,不假设 active goal 自动继承。
+- report completion 与 release readiness 拆分;critical/high finding 必须连接后续修复 artifact 和复验条件。
+- 修正 `spec-lfg` 编排方向、retired 产物计数、递归脚本语法命令、Python pycache 隔离和当前 focused test 名称。
+- Changelog 改为整个审查维护一条 rolling entry,逐 skill 流水只写合并报告。
