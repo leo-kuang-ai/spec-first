@@ -267,7 +267,6 @@ npm run test:unit
 npm run test:smoke
 npm run test:integration
 npm run test:ai-dev:gate
-npm run test:ai-dev:benchmarks
 npm run test:release
 npm run test:release:website
 npm run build

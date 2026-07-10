@@ -1306,6 +1306,10 @@ const REMEDIATION_BY_REASON_CODE = {
     expected_shape: 'Readiness Self-Check includes decision_card_highest_risk_gap, decision_card_next_action, and decision_card_why_no_invention before a ready/final claim.',
     remediation_hint: 'Add the missing Decision Card fields, or keep write_mode as checkpoint-prd with can_enter_spec_plan: no until the highest-risk gap is explicit.',
   },
+  decision_card_path_mismatch: {
+    expected_shape: 'decision_card_next_action 与已声明的 write_mode 路径完全一致。',
+    remediation_hint: '选择唯一写入路径，并在 closeout 前对齐 write_mode 与 decision_card_next_action。',
+  },
   open_oq_without_owner_closure: {
     expected_shape: 'Each non-blocking open OQ has a legal closure_disposition with checkable source evidence or a matching Owner Decision Trace row.',
     remediation_hint: 'Add a matching Owner Decision Trace row for the OQ id/question, add a checkable source reference for source-resolved closure, or keep the PRD as checkpoint-prd.',
@@ -1423,6 +1427,15 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   if ((structure.claimsReady || structure.writeModeIsFinalPrd)
     && !structure.decisionCardPresent) {
     findings.push({ reason_code: 'decision_card_undeclared' });
+  }
+  if (structure.writeModeDeclaredValid
+    && structure.decisionCardNextAction
+    && structure.writeModeValue !== structure.decisionCardNextAction) {
+    findings.push({
+      reason_code: 'decision_card_path_mismatch',
+      write_mode: structure.writeModeValue,
+      decision_card_next_action: structure.decisionCardNextAction,
+    });
   }
   // design source findings
   if (structure.designSourceRefsPresent && !structure.designSourceInventoryDeclared) {

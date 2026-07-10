@@ -295,7 +295,7 @@ why_not:
 
 `preflight_sweep_closure` is the compatibility field for Requirement Analysis Gate closure. It must summarize whether the run-local map from materials to requirement understanding, uncertainty/contradiction points, product/design/technical grill decisions, and PRD write targets is closed, degraded, blocked, or missing. Do not add a second persistent analysis schema to the PRD.
 
-`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). Required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` is exempt (still grilling, the card may be incomplete).
+`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). `decision_card_next_action` 必须与其完全一致；两个有效声明互相冲突时，checker 报告 `decision_card_path_mismatch`。The three `decision_card_*` fields are required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` 在仍处于 grill 时只豁免完整性，不豁免显式路径矛盾。
 
 The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 
@@ -444,9 +444,13 @@ Supporting evidence refs should be indexed when the PRD has more than a few sour
 
 The handoff context slice is a compact downstream reading map:
 
+对于 long、mixed 或 high-risk PRD，加入最多三个 load-bearing Requirement / Acceptance Example 引用，以及 planning 必须保留的 behaviors。这些内容只是现有 PRD 的阅读指针，不复制完整 requirements，也不包含 implementation instructions。
+
 ```text
 handoff_context_slice:
 - confirmed WHAT:
+- top requirement / acceptance refs:
+- must-preserve behaviors:
 - owner decisions:
 - accepted assumptions:
 - source refs to re-read:

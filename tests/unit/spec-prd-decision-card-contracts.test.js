@@ -83,6 +83,57 @@ function reasonCodes(report) {
 }
 
 describe('spec-prd Decision Card deterministic consistency', () => {
+  test('blocks final-prd when can_enter_spec_plan remains no', () => {
+    const receipt = buildFinalizeReceipt(
+      'docs/brainstorms/decision-card-requirements.md',
+      prd({ writeMode: 'final-prd', nextAction: 'final-prd', canEnterSpecPlan: 'no' }),
+      [],
+      { checkOnly: true },
+    );
+
+    expect(receipt.blocking_reason_codes).toContain('finalize_required');
+    expect(receipt.should_block_closeout).toBe(true);
+  });
+
+  test('blocks final-prd when clarification evidence was skipped', () => {
+    const text = prd({
+      writeMode: 'final-prd',
+      nextAction: 'final-prd',
+      canEnterSpecPlan: 'yes',
+      clarificationEvidence: 'skipped',
+    });
+    const report = buildReport('docs/brainstorms/decision-card-requirements.md', text);
+    const receipt = buildFinalizeReceipt(
+      'docs/brainstorms/decision-card-requirements.md',
+      text,
+      [],
+      { checkOnly: true },
+    );
+
+    expect(reasonCodes(report)).toContain('clarification_trace_absent');
+    expect(receipt.blocking_reason_codes).toContain('clarification_trace_absent');
+    expect(receipt.should_block_closeout).toBe(true);
+  });
+
+  test('blocks checkpoint-prd when it claims can_enter_spec_plan=yes', () => {
+    const text = prd({
+      writeMode: 'checkpoint-prd',
+      nextAction: 'checkpoint-prd',
+      canEnterSpecPlan: 'yes',
+    });
+    const report = buildReport('docs/brainstorms/decision-card-requirements.md', text);
+    const receipt = buildFinalizeReceipt(
+      'docs/brainstorms/decision-card-requirements.md',
+      text,
+      [],
+      { checkOnly: true },
+    );
+
+    expect(reasonCodes(report)).toContain('checkpoint_claims_ready');
+    expect(receipt.blocking_reason_codes).toContain('checkpoint_claims_ready');
+    expect(receipt.should_block_closeout).toBe(true);
+  });
+
   test.each([
     ['final-prd', 'checkpoint-prd', 'yes'],
     ['checkpoint-prd', 'final-prd', 'no'],

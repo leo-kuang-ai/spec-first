@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 
 const QoderAdapter = require('../../src/cli/adapters/qoder');
 const { buildHostNativePointer } = require('../../src/cli/adapters/host-native-pointer');
@@ -139,6 +139,8 @@ describe('Qoder runtime lifecycle', () => {
     expect(pointer.contents).toMatch(/^---\ntrigger: always_on\n---\n/);
     const sessionStart = plan.operations.find((operation) => operation.path === '.qoder/hooks/session-start');
     expect(sessionStart.contents).toContain("'startup-reminder', '--qoder'");
+    expect(sessionStart.contents).toContain('const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;');
+    expect(sessionStart.contents).toContain('const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;');
     expect(sessionStart.contents).toContain(JSON.stringify(path.join(
       __dirname,
       '..',
@@ -161,7 +163,7 @@ describe('Qoder runtime lifecycle', () => {
     }
   });
 
-  test('generated Qoder session-start appends trusted startup reminder output', () => {
+  test('generated Qoder session-start lets the child finish within the bounded lookup budget', () => {
     const projectRoot = tempProject();
     const adapter = new QoderAdapter();
     const plan = adapter.planRuntimeFilesSync(projectRoot);
@@ -172,7 +174,9 @@ describe('Qoder runtime lifecycle', () => {
 
     writeText(fakeCliPath, [
       "'use strict';",
-      "process.stdout.write('[spec-first] Update available for Qoder runtime: 1.0.0 -> 1.1.0\\n');",
+      'setTimeout(() => {',
+      "  process.stdout.write(`[spec-first] Update available for Qoder runtime: 1.0.0 -> 1.1.0; lookup_timeout=${process.env.SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS}\\n`);",
+      '}, 1300);',
       '',
     ].join('\n'));
     writeText(
@@ -192,12 +196,11 @@ describe('Qoder runtime lifecycle', () => {
 
     const result = spawnSync(process.execPath, [hookPath], {
       cwd: projectRoot,
-      input: JSON.stringify({ cwd: projectRoot, padding: 'x'.repeat(1024 * 1024) }),
+      input: JSON.stringify({ cwd: projectRoot }),
       encoding: 'utf8',
       env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
     });
 
-    expect(result.error).toBeUndefined();
     expect(result.status).toBe(0);
     const output = JSON.parse(result.stdout);
     expect(output.hookSpecificOutput).toMatchObject({
@@ -206,6 +209,47 @@ describe('Qoder runtime lifecycle', () => {
     expect(output.hookSpecificOutput.additionalContext).toContain(
       '[spec-first] Update available for Qoder runtime: 1.0.0 -> 1.1.0',
     );
+    expect(output.hookSpecificOutput.additionalContext).toContain('lookup_timeout=2000');
+  });
+
+  test('Qoder session-start drains stdin even when QODER_PROJECT_DIR is already set', async () => {
+    const projectRoot = tempProject();
+    const hookPath = path.join(__dirname, '..', '..', 'templates', 'qoder', 'hooks', 'session-start');
+    writeText(path.join(projectRoot, 'AGENTS.md'), [
+      '<!-- spec-first:lang:start -->',
+      '`using-spec-first`',
+      'skills/using-spec-first/SKILL.md',
+      '<!-- spec-first:lang:end -->',
+      '',
+    ].join('\n'));
+
+    const child = spawn(process.execPath, [hookPath], {
+      cwd: projectRoot,
+      env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    let stdinError = null;
+    let stdout = '';
+    child.stdin.on('error', (error) => {
+      stdinError = error;
+    });
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk;
+    });
+    child.stdin.end(JSON.stringify({
+      cwd: projectRoot,
+      padding: 'x'.repeat(1024 * 1024),
+    }));
+
+    const exitCode = await new Promise((resolve, reject) => {
+      child.once('error', reject);
+      child.once('close', resolve);
+    });
+
+    expect(stdinError).toBeNull();
+    expect(exitCode).toBe(0);
+    expect(JSON.parse(stdout).hookSpecificOutput.hookEventName).toBe('SessionStart');
   });
 
   test('removes stale managed settings entries while preserving user hooks', () => {

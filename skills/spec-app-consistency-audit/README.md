@@ -65,11 +65,8 @@ Runner 只产出确定性事实和 envelope：不调用 LLM、不生成语义 ve
 
 ```bash
 npm run test:eval-fixtures
-npx jest --runTestsByPath \
-  tests/unit/spec-app-consistency-audit-entry.test.js \
-  tests/unit/spec-app-consistency-audit-prompts.test.js \
-  tests/unit/spec-app-consistency-audit-cli-e2e.test.js \
-  --runInBand
+npx jest tests/unit/spec-app-consistency-audit-host-boundaries.test.js --runInBand
+npm run typecheck
 ```
 
 `scripts/` 负责 deterministic facts；LLM / experts 负责 issue validity、severity、impact、recommendation 和 downstream handoff 判断。

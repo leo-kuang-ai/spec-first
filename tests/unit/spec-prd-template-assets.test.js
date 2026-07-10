@@ -3,9 +3,13 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 const plugin = require('../../src/cli/plugin');
+
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
+const CLI_PATH = path.join(REPO_ROOT, 'bin', 'spec-first.js');
 
 const TEMPLATE_ASSETS = [
   'assets/templates/00-generic.md',
@@ -62,9 +66,9 @@ describe('spec-prd product-bundled template assets', () => {
     for (const relativePath of TEMPLATE_ASSETS) {
       expect(skill).toContain(relativePath);
     }
-    expect(skill).toContain('Load `assets/templates/00-generic.md` for every PRD artifact');
-    expect(skill).toContain('Do not load `assets/overlays/securities.md` without a securities/trading signal');
-    expect(skill).toContain('All human questions go to the current conversation user');
+    expect(skill).toContain('每个会产出 PRD artifact 的 run 都读取 `assets/templates/00-generic.md`');
+    expect(skill).toContain('无行业信号时不得加载');
+    expect(skill).toContain('所有人类问题都询问当前执行对话的用户');
   });
 
   test('projects every template asset into all supported host runtimes', () => {
@@ -81,6 +85,49 @@ describe('spec-prd product-bundled template assets', () => {
       for (const relativePath of TEMPLATE_ASSETS) {
         const expectedPath = path.join(runtimeRoot, 'spec-prd', relativePath).replace(/\\/g, '/');
         expect(operationPaths).toContain(expectedPath);
+      }
+    }
+  });
+
+  test('installs every template asset through one five-host init', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-prd-five-host-init-'));
+    const home = path.join(projectRoot, 'home');
+    fs.mkdirSync(home, { recursive: true });
+    const result = spawnSync(process.execPath, [
+      CLI_PATH,
+      'init',
+      '--claude',
+      '--codex',
+      '--cursor',
+      '--kiro',
+      '--qoder',
+      '-y',
+      '-u',
+      'spec-prd-template-test',
+      '--lang',
+      'zh',
+      '--no-sync-user-language',
+    ], {
+      cwd: projectRoot,
+      env: { ...process.env, HOME: home },
+      encoding: 'utf8',
+      timeout: 60000,
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('初始化完成');
+    expect(result.stderr).toContain('Cursor support is generated-runtime preview');
+
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
+      for (const relativePath of TEMPLATE_ASSETS) {
+        expect(fs.existsSync(path.join(
+          projectRoot,
+          runtimeRoot,
+          'spec-prd',
+          relativePath,
+        ))).toBe(true);
       }
     }
   });

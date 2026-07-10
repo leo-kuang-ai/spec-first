@@ -57,11 +57,8 @@ and `issue_synthesis_status_required_with_input` (refusing to silently default
 its own headless failure envelope (e.g. `build-run-metadata`, `build-impact-facts`) is
 propagated verbatim, preserving the upstream `Reason code:`.
 
-Pipeline order. The subprocess sequence below mirrors the
-`tests/unit/spec-app-consistency-audit-cli-e2e.test.js` recipe; the in-process steps
-`12` and `14` are runner-only wrappers and do not appear in the e2e test (the test
-hand-rolls a slim `latest-summary.json` and never promotes `metadata.json` from
-`started`):
+Pipeline order. The subprocess sequence below is the source contract for the runner;
+the in-process steps `12` and `14` are runner-only wrappers:
 
 1. `build-run-metadata.js` → `metadata.json` (`status: started`)
 2. `preflight.js` → `preflight.json`

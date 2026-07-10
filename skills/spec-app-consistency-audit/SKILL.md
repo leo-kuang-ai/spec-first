@@ -116,7 +116,7 @@ Do not write new artifacts to the legacy flat `.spec-first/app-audit/` path. Leg
 
 `scripts/run-audit.js` is the deterministic entrypoint for the static artifact chain. It is a subprocess orchestrator only — it never invents issues, never calls an LLM, and never fetches remote Figma/PRD assets. The runner accepts `mode:headless` only and requires `base:<git-ref>`; missing base returns `scope_headless_missing_base`.
 
-The full 16-step subprocess pipeline, runner-owned fail-fast reason codes, the auto-stub path for unstaged issues, and the failure-envelope behavior are documented in [Headless Runner And Artifact Lifecycle](references/headless-runner.md). The deterministic recipe is mirrored by `tests/unit/spec-app-consistency-audit-cli-e2e.test.js`.
+The full 16-step subprocess pipeline, runner-owned fail-fast reason codes, the auto-stub path for unstaged issues, and the failure-envelope behavior are documented in [Headless Runner And Artifact Lifecycle](references/headless-runner.md). Current focused tests cover source/runtime host boundaries; runner scripts remain directly syntax-checked and exercised through the repository test suites.
 
 ## Source And Runtime Boundaries
 

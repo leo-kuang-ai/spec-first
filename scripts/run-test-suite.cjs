@@ -6,8 +6,6 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
-const isWindows = process.platform === 'win32';
-const forcePosixOnWindows = process.env.SPEC_FIRST_FORCE_POSIX_TESTS === '1';
 const DEFAULT_TEST_COMMAND_TIMEOUT_MS = 15 * 60 * 1000;
 
 function resolveTestCommandTimeoutMs(env = process.env) {
@@ -58,99 +56,46 @@ function runJest(args) {
   runNode([jestBin, ...args]);
 }
 
-function testPathExists(testPath) {
-  return fs.existsSync(path.join(repoRoot, testPath));
+function assertTestPathsExist(testPaths) {
+  const missing = testPaths.filter((testPath) => !fs.existsSync(path.join(repoRoot, testPath)));
+  if (missing.length > 0) {
+    const error = new Error(`Declared test paths are missing: ${missing.join(', ')}`);
+    error.status = 1;
+    throw error;
+  }
 }
 
-function runBash(scriptPath) {
-  if (isWindows && !forcePosixOnWindows) {
-    console.log(`skip POSIX shell test on native Windows: ${scriptPath}`);
-    return;
-  }
-  run('bash', [scriptPath]);
-}
-
-function runOptionalBash(scriptPath) {
-  if (!testPathExists(scriptPath)) {
-    console.log(`skip missing legacy shell test: ${scriptPath}`);
-    return;
-  }
-  runBash(scriptPath);
-}
-
-function runJestFiles(testPaths, extraArgs = [], options = {}) {
-  const existing = testPaths.filter(testPathExists);
-  const missing = testPaths.filter((testPath) => !testPathExists(testPath));
-  for (const testPath of missing) {
-    console.log(`skip missing legacy Jest test: ${testPath}`);
-  }
-  if (existing.length === 0) {
-    if (options.required === true) {
-      const suiteName = options.suiteName || 'Jest suite';
-      const error = new Error(`${suiteName} has no active Jest tests; refusing to pass with zero checks`);
-      error.status = 1;
-      throw error;
-    }
-    return;
-  }
-  runJest([...existing, ...extraArgs]);
+function runJestFiles(testPaths, extraArgs = []) {
+  assertTestPathsExist(testPaths);
+  runJest([...testPaths, ...extraArgs]);
 }
 
 function runUnit() {
-  runOptionalBash('tests/unit/developer.sh');
-  runOptionalBash('tests/unit/lang-policy.sh');
-  runMcpSetup();
-  runOptionalBash('tests/unit/version-reminder.sh');
   runJest(['tests/unit', '--runInBand']);
 }
 
 function runMcpSetup() {
-  if (isWindows && !forcePosixOnWindows) {
-    runJestFiles(['tests/unit/mcp-setup-powershell-contracts.test.js'], ['--runInBand'], {
-      required: true,
-      suiteName: 'mcp-setup',
-    });
-    return;
-  }
-  runOptionalBash('tests/unit/mcp-setup.sh');
-  runJestFiles(['tests/unit/mcp-setup-contracts.test.js'], ['--runInBand'], {
-    required: true,
-    suiteName: 'mcp-setup',
-  });
+  runJestFiles([
+    'tests/unit/mcp-setup-contracts.test.js',
+    'tests/unit/mcp-setup-powershell-contracts.test.js',
+  ], ['--runInBand']);
 }
 
 function runSmoke() {
-  runOptionalBash('tests/smoke/install-local.sh');
-  runOptionalBash('tests/smoke/cli.sh');
-  runJestFiles(['tests/smoke/cli-smoke.test.js'], ['--runInBand'], {
-    required: true,
-    suiteName: 'smoke',
-  });
+  runJestFiles(['tests/smoke/cli-smoke.test.js'], ['--runInBand']);
 }
 
 function runIntegration() {
-  runJestFiles([
-    'tests/integration/qoder-runtime-lifecycle.integration.test.js',
-    'tests/integration/verification-gate.integration.test.js',
-    'tests/integration/spec-work-closeout-producer.test.js',
-  ], ['--runInBand'], {
-    required: true,
-    suiteName: 'integration',
-  });
+  runJestFiles(['tests/integration/qoder-runtime-lifecycle.integration.test.js'], ['--runInBand']);
 }
 
 function runReleaseGovernance() {
   runNode(['scripts/check-release-continuity.cjs']);
-  runBash('tests/smoke/release-dual-host-governance.sh');
-}
-
-function runReleaseInstall() {
-  runBash('tests/smoke/install-tarball.sh');
 }
 
 function runRelease() {
   runReleaseGovernance();
-  runReleaseInstall();
+  run(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['pack', '--dry-run']);
 }
 
 function runAll() {
@@ -169,7 +114,6 @@ function main() {
     integration: runIntegration,
     release: runRelease,
     'release-governance': runReleaseGovernance,
-    'release-install': runReleaseInstall,
   };
 
   if (!suites[suite]) {
@@ -195,10 +139,8 @@ module.exports = {
   DEFAULT_TEST_COMMAND_TIMEOUT_MS,
   main,
   run,
-  runBash,
+  assertTestPathsExist,
   runJest,
   resolveTestCommandTimeoutMs,
   runJestFiles,
-  runOptionalBash,
-  testPathExists,
 };

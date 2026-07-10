@@ -18,13 +18,13 @@ Review cadence: per release, or whenever trigger, requirements artifact, readine
 
 `skills/spec-prd/scripts/check-prd-artifact.js` and `check-glossary-drift.js` report deterministic script-owned facts (structure, trace gaps, placeholder lines, avoid-term drift). `skills/spec-prd/scripts/run-evals.js` reports deterministic fixture-contract facts (case metadata, coverage buckets, required `must_not` constraints, and reason codes). They never decide `ready-for-planning` or semantic output quality; those judgments stay LLM-owned.
 
-Focused Jest tests (`tests/unit/spec-prd-contracts.test.js`) check the source package contract, the compressed source topology (`SKILL.md` + 9 references + 4 scripts plus the `scripts/lib/reason-codes.js` readiness reason-code taxonomy module shared by `check-prd-artifact.js` and `finalize-prd-artifact.js`), first-120-lines entrypoint anchors, reference reachability, eval fixture structure, capability-bucket coverage, high-value sentinel cases, deterministic scripts against good/bad fixtures, fresh-source eval artifact records, and the human template mirror's evidence-tag enum. These are file-backed fixture checks, not provider-backed model execution.
+`tests/unit/spec-prd-*.test.js` 下的聚焦 Jest 测试覆盖当前 source package 合同：产品内置模板资产与五宿主投射、Decision Card 确定性一致性，以及 `spec-prd` 到 `spec-plan` 的 handoff 边界。当前 source topology 包含 `SKILL.md`、references、scripts、由 checker/finalize 共享的 `scripts/lib/reason-codes.js` 分类法，以及 `assets/templates/` 和 `assets/overlays/` 下的产品内置资产；文件数量只是实现事实，不再冻结为产品合同。这些是 file-backed fixture checks，不是 provider-backed 模型执行或语义输出质量证明。
 
 Dispatched fresh-source eval records live in `docs/validation/spec-prd/`. Several behaviors are honestly recorded `not_run` with explicit reasons; dispatched reviewer passes carry `status:passed` or `passed-with-concerns`. The domain-grill behavior has a dispatched pass; Sanitization, Feature Slices, and topology-heavy behaviors were validated by a dispatched fresh-source pass on 2026-06-21 (`passed-with-concerns`, one minor non-blocking generated-runtime-boundary hardening note). The remaining `not_run` records name the specific behaviors still awaiting a dispatched semantic pass — see those records for current status.
 
 ## Governed-Package Evidence Labels
 
-- `file-backed fixture`: current evidence includes `evals/examples.json`, the three deterministic scripts, and focused Jest contract tests.
+- `file-backed fixture`：当前证据包括 `evals/examples.json`、确定性脚本、产品内置模板资产和聚焦 Jest contract tests。
 - `input_files`: increment request or existing PRD path, optional notes/screenshots/transcripts/PDF extraction, repo source/docs/tests read during current-state analysis, and product-owner decisions.
 - `output contract`: a PRD-grade requirements artifact under `docs/brainstorms/` with `artifact_kind: prd-requirements`, plus a closeout summary, or a compact bypass/handoff/route-out.
 - `rollback boundary`: source-only changes here; generated runtime mirrors refresh through `spec-first init`.

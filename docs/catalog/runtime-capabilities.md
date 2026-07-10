@@ -140,20 +140,19 @@ These contracts are docs-side visibility records for workflow artifacts. `produc
 
 ## Quality Gate Evidence
 
-AI dev benchmark fixtures are advisory evidence for workflow input and artifact-shape drift. The checked-in suite currently has four repo-like fixtures (`docs-only`, `cli-bugfix`, `api-contract`, `multi-module-refactor`) and one recorded semantic-review evidence file for `api-contract`. They validate deterministic fixture contracts and evidence visibility, not LLM semantic quality or real `spec-work` output quality.
+The AI development gate runs a focused set of current workflow/runtime contract tests. The checked-in test inventory is fail-fast: an active test path must exist instead of being silently skipped.
 
 | Command | Artifact | Gate behavior | Boundary |
 |---|---|---|---|
-| `npm run test:ai-dev:benchmarks` | `.spec-first/workflows/quality-gates/ai-dev-benchmark-fixtures/benchmark-fixtures-result.json` | Fails on invalid fixture manifest/schema/path data, including missing declared semantic-review evidence files. | Deterministic fixture and evidence-shape validation only; does not run agents or workflows, and does not perform semantic scoring. |
-| `npm run test:ai-dev:gate` | `.spec-first/workflows/quality-gates/ai-dev-quality-gate/ai-dev-quality-gate-result.json` | Includes benchmark fixture results as `advisory`; gate-level `passed` and blocking `failures` are computed from non-advisory checks. | Advisory benchmark failures remain visible in `advisory_failures[]`; they are not release hard gates in v1. |
+| `npm run test:ai-dev:gate` | `.spec-first/workflows/quality-gates/ai-dev-quality-gate/ai-dev-quality-gate-result.json` | Runs the declared focused workflow/runtime contract suite and fails when a suite fails or an active path is missing. | Deterministic contract evidence only; it does not run LLM workflows or judge semantic output quality. |
 
 ## Release Package Evidence
 
-Release package evidence is deterministic package/install proof for maintainers and release reviewers. It records package contents and installed-CLI dry-run behavior; it does not decide whether a release should ship.
+Release package evidence is deterministic package-content proof for maintainers and release reviewers. It does not claim an isolated installation smoke or decide whether a release should ship.
 
 | Command | Artifacts | Evidence | Boundary |
 |---|---|---|---|
-| `npm run test:release:install` | `tests/smoke/install-tarball.sh` output | Local npm tarball packaging/install smoke: packs the current package, installs it into an isolated prefix, verifies the global `spec-first` shim, and checks required packaged assets. | Local deterministic smoke only; no CI matrix, no Windows/macOS/Linux matrix evidence, no generated release evidence artifacts, no Cursor loader/user journey support proof. |
+| `npm run build` | `npm pack --dry-run` output | Verifies the current package can be packed and exposes the files npm would publish. | Package-content evidence only; no isolated install, global shim, cross-platform matrix, or user-journey proof. |
 
 ## Readiness Meaning
 

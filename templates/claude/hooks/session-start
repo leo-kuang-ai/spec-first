@@ -14,6 +14,8 @@ const path = require('node:path');
 const projectDir = resolveProjectDir();
 const instructionPath = path.join(projectDir, 'CLAUDE.md');
 const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
+const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;
+const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
 const LANG_START = '<!-- spec-first:lang:start -->';
 const LANG_END = '<!-- spec-first:lang:end -->';
 const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
@@ -137,11 +139,12 @@ function readStartupReminder(cwd) {
     const result = spawnSync(process.execPath, [SPEC_FIRST_CLI_PATH, 'startup-reminder', '--claude'], {
       cwd,
       encoding: 'utf8',
-      // Deliberate session-start latency cap. The child records its cooldown only after a
-      // successful display, so on a dead/slow network it re-spawns every session — a larger
-      // timeout would block every offline session-start by that much. The reminder is a
-      // best-effort cosmetic notice and still completes on a healthy network (~600ms).
-      timeout: 1200,
+      env: {
+        ...process.env,
+        SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS: String(STARTUP_REMINDER_LOOKUP_TIMEOUT_MS),
+      },
+      // 子进程网络超时必须小于 hook 总预算，避免外层先终止而 attempt cooldown 已经落盘。
+      timeout: STARTUP_REMINDER_PROCESS_TIMEOUT_MS,
     });
 
     if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {

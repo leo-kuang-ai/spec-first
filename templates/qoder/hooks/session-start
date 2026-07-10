@@ -6,49 +6,51 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
+const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;
+const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
 const LANG_START = '<!-- spec-first:lang:start -->';
 const LANG_END = '<!-- spec-first:lang:end -->';
-
-const input = parseJsonObject(readStdin());
-const projectDir = resolveProjectDir(input);
-const instructionPath = path.join(projectDir, 'AGENTS.md');
-let additionalContext = [
+const MISSING_CONTEXT = [
   '[spec-first] using-spec-first SessionStart injection',
   'Managed language/governance block is missing from `AGENTS.md`.',
   'Run `spec-first init --qoder` in this project after Qoder hook protocol support is confirmed.',
 ].join('\n');
 
-const instructionBody = readInstructionBody(instructionPath);
-if (instructionBody !== null) {
-  const status = inspectWorkflowEntryGuidance(instructionBody);
-  additionalContext = status.installed
-    ? [
-      '[spec-first] using-spec-first SessionStart injection',
-      "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
-      'Full routing policy: skills/using-spec-first/SKILL.md.',
-    ].join('\n')
-    : [
-      '[spec-first] using-spec-first SessionStart injection',
-      status.message,
-      'Run `spec-first init --qoder` in this project after Qoder hook protocol support is confirmed.',
+main().catch(() => writeHookOutput(MISSING_CONTEXT));
+
+async function main() {
+  const input = parseJsonObject(await readStdin());
+  const projectDir = resolveProjectDir(input);
+  const instructionPath = path.join(projectDir, 'AGENTS.md');
+  let additionalContext = MISSING_CONTEXT;
+
+  const instructionBody = readInstructionBody(instructionPath);
+  if (instructionBody !== null) {
+    const status = inspectWorkflowEntryGuidance(instructionBody);
+    additionalContext = status.installed
+      ? [
+        '[spec-first] using-spec-first SessionStart injection',
+        "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+        'Full routing policy: skills/using-spec-first/SKILL.md.',
+      ].join('\n')
+      : [
+        '[spec-first] using-spec-first SessionStart injection',
+        status.message,
+        'Run `spec-first init --qoder` in this project after Qoder hook protocol support is confirmed.',
+      ].join('\n');
+  }
+
+  const startupReminder = readStartupReminder(projectDir);
+  if (startupReminder) {
+    additionalContext = [
+      additionalContext,
+      '',
+      startupReminder,
     ].join('\n');
-}
+  }
 
-const startupReminder = readStartupReminder(projectDir);
-if (startupReminder) {
-  additionalContext = [
-    additionalContext,
-    '',
-    startupReminder,
-  ].join('\n');
+  writeHookOutput(additionalContext);
 }
-
-process.stdout.write(JSON.stringify({
-  hookSpecificOutput: {
-    hookEventName: 'SessionStart',
-    additionalContext,
-  },
-}));
 
 function resolveProjectDir(input) {
   const fromEnv = process.env.QODER_PROJECT_DIR;
@@ -100,13 +102,19 @@ function inspectWorkflowEntryGuidance(body) {
 
 function readStdin() {
   if (process.stdin.isTTY) {
-    return '';
+    return Promise.resolve('');
   }
-  try {
-    return fs.readFileSync(0, 'utf8');
-  } catch {
-    return '';
-  }
+
+  return new Promise((resolve) => {
+    let body = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => {
+      body += chunk;
+    });
+    process.stdin.once('end', () => resolve(body));
+    process.stdin.once('error', () => resolve(''));
+    process.stdin.resume();
+  });
 }
 
 function parseJsonObject(raw) {
@@ -127,7 +135,12 @@ function readStartupReminder(cwd) {
     const result = spawnSync(process.execPath, [SPEC_FIRST_CLI_PATH, 'startup-reminder', '--qoder'], {
       cwd,
       encoding: 'utf8',
-      timeout: 1200,
+      env: {
+        ...process.env,
+        SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS: String(STARTUP_REMINDER_LOOKUP_TIMEOUT_MS),
+      },
+      // 子进程网络超时必须小于 hook 总预算，避免外层先终止而 attempt cooldown 已经落盘。
+      timeout: STARTUP_REMINDER_PROCESS_TIMEOUT_MS,
     });
 
     if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {
@@ -156,4 +169,13 @@ function isTrustedSpecFirstCliPath(cliPath) {
   } catch {
     return false;
   }
+}
+
+function writeHookOutput(additionalContext) {
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'SessionStart',
+      additionalContext,
+    },
+  }));
 }
