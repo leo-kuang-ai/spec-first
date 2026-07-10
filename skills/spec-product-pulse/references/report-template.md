@@ -63,7 +63,6 @@ _Source windows: analytics [{{start}} -> {{end}}], tracing [{{start}} -> {{end}}
 - **No system performance tool configured:** omit the entire `## System performance` section. The report stays Headlines / Usage / Followups.
 - **Quality scoring not opted in:** omit the quality sample line.
 - **Single-source setup (analytics only):** omit the tracing and payments source windows from the footer.
-- **Error count customized at setup** (e.g., top 3 instead of top 5): follow the configured count. Do not pad or trim beyond what the query returned.
 
 ## Post-write checklist
 
@@ -73,7 +72,7 @@ Before saving and surfacing to chat:
 - [ ] Headlines exist and lead with the most notable item.
 - [ ] No hardcoded thresholds ("high error rate", "low conversion").
 - [ ] No PII. Scan error signatures and followups for user emails, IDs, or message snippets.
-- [ ] Top 5 errors (or the configured count), not top 10. Trim if the query returned more.
+- [ ] Top 5 errors, not top 10. Trim if the query returned more.
 - [ ] Strategy metrics carried forward from config are rendered in Usage, or marked `no data`.
 - [ ] Followups are specific - each one should be actionable as a sentence.
 - [ ] Filename and in-file timestamp use the same wall-clock time.

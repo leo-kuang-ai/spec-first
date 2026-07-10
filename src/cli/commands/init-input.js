@@ -9,6 +9,7 @@ const {
   readDeveloperFile,
   readGitUserName,
 } = require('../developer');
+const { getAdapter } = require('../adapters');
 const { getInitMessages } = require('../init-i18n');
 const {
   INIT_PLATFORM_CHOICES,

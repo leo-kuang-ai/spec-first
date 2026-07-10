@@ -285,7 +285,12 @@ function normalizeRepoRelativePath(value) {
   if (normalized.startsWith('/') || /^[A-Za-z]:\//.test(normalized)) {
     throw new Error('Platform registry path rule must be repo-relative');
   }
-  if (normalized.includes('/../') || normalized === '..' || normalized.startsWith('../')) {
+  if (
+    normalized.includes('/../')
+    || normalized.endsWith('/..')
+    || normalized === '..'
+    || normalized.startsWith('../')
+  ) {
     throw new Error('Platform registry path rule must not traverse outside the repo');
   }
   if (normalized.includes('//') || normalized.includes('/./') || normalized.endsWith('/.')) {

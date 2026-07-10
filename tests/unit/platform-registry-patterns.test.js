@@ -180,6 +180,8 @@ describe('platform registry path-rule compiler', () => {
       .toThrow('Unsupported platform registry surface ownership');
     expect(() => compilePathRule({ kind: 'file', path: '/absolute', ownership: 'generated-runtime' }))
       .toThrow('Platform registry path rule must be repo-relative');
+    expect(() => compilePathRule({ kind: 'file', path: '.x/..', ownership: 'generated-runtime' }))
+      .toThrow('Platform registry path rule must not traverse outside the repo');
     expect(() => compilePathRule({ kind: 'file', path: '.x//nested', ownership: 'generated-runtime' }))
       .toThrow('Platform registry path rule must be normalized');
   });

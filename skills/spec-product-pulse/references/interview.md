@@ -170,22 +170,22 @@ Capture the final list in the config. A minimum of one source is acceptable.
 
 ## 7. System Performance
 
-**Opening framing:** "The system performance portion of the pulse is pretty standard - most teams want the same thing: top errors with context, and latency percentiles. Unless you have strong opinions, I'll set up the recommended default."
+**Opening framing:** "The system performance portion uses a fixed report shape in this version: top 5 errors with context and p50/p95/p99 latency. You can include that section or omit it."
 
-**Recommended default (confirm or override):**
+**Fixed report shape (not configurable in this version):**
 
 - **Top errors:** top 5 error signatures from the tracing tool, by count, descending. Each entry includes the signature and a one-line explanation of what it likely means.
 - **Latency:** p50, p95, p99 over the window, compared to the prior equal-length window.
 - **Tracing tool:** {{capture tool name if not already named in section 6}}
 
-Ask one confirmation question: "Keep the recommended setup, or customize?"
+Ask one confirmation question: "Include the standard system performance section with top 5 errors and p50/p95/p99 latency, or omit it?"
 
-- **Keep** -> capture defaults.
-- **Customize** -> ask what they want to change. Common adjustments: "top 3 instead of 5", "skip latency", "add a specific error signature to always surface". Accept and record.
+- **Include** -> capture the tracing tool already named in section 6. If none was named, ask which tracing/error tool they use; `none` is allowed.
+- **Omit** -> capture the tracing tool as `none`; the report omits the entire System performance section.
 
-If no tracing tool was named in section 6, ask: "What tool do you use for application tracing and errors? (e.g., Datadog, Sentry, Honeycomb, New Relic.) Skip if you don't have one - I'll omit the system performance section from the report." Skipping is fine - the pulse will just report usage and followups in that case.
+Do not offer top-N or percentile customization. Those settings are not persisted in config; adding such an option here would create a value the report cannot reliably consume on later runs.
 
-**Capture:** tool name (or "none"), top-error count (default 5), latency opt (default on).
+**Capture:** tracing tool name or `none` only. Top-error count remains 5 and latency remains p50/p95/p99 by contract.
 
 ---
 

@@ -1,8 +1,8 @@
 # spec-prd Skill 重构优化方案
 
-**状态：** implementation-ready，验证优先、按失败样本激活  
-**目标 surface：** `skills/spec-prd/` source、聚焦测试、五宿主 runtime projection  
-**历史分析：** 重构前的完整候选机制与五视角审查轨迹保留在 Git 历史 `5b8d8637^..5b8d8637`，不再作为当前实施合同  
+**状态：** implementation-ready，验证优先、按失败样本激活
+**目标 surface：** `skills/spec-prd/` source、按激活单元新增的最小定向测试、五宿主 runtime projection
+**历史分析：** 重构前的完整候选机制与五视角审查轨迹保留在 Git 历史 `5b8d8637^..5b8d8637`，不再作为当前实施合同
 **当前权威：** 本文档全篇；实施时仍以当前 `skills/spec-prd/**`、脚本与测试事实为最终依据
 
 ## 一、结论
@@ -11,33 +11,34 @@
 
 当前问题不是“缺少更多机制”，而是：
 
-1. 聚焦验证入口失效，无法可靠证明新改动没有破坏现有合同。
-2. 某些确定性跨字段矛盾仍需用失败 fixture 验证 checker 是否覆盖。
-3. 现有 grill 排序和 WHAT/HOW 边界可能需要更清晰的反例，但不应新增第二套枚举或 schema。
-4. 下游消费视图存在，但需要验证其是否足以让开发和 `spec-plan` 快速定位核心信息。
-5. 任何新 prose 都必须证明改善了真实行为，而不是只证明文字被写入。
+1. 某些确定性跨字段矛盾仍需用失败 fixture 验证 checker 是否覆盖。
+2. 现有 grill 排序和 WHAT/HOW 边界可能需要更清晰的反例，但不应新增第二套枚举或 schema。
+3. 下游消费视图存在，但需要验证其是否足以让开发和 `spec-plan` 快速定位核心信息。
+4. 任何新 prose 都必须证明改善了真实行为，而不是只证明文字被写入。
 
 因此，本轮采用：
 
-> **subtraction-first + evidence-activated**：先恢复验证地板，再对当前 source 做改前基线；只有失败样本证明现有合同不足时才激活对应实现单元。
+> **subtraction-first + evidence-activated**：先对当前 source 做改前基线；只有失败样本证明现有合同不足时才激活对应实现单元和该单元所需的最小测试。
 
 ## 二、目标用户与产品结果
 
-### 2.1 决策职责
+### 2.1 单一问答权威
 
-本方案按职责分层，不假设所有使用者都是传统 PM：
+所有需要人类补充、确认、裁决、接受假设或 hard-cap 的问题，只询问**当前执行对话的用户**。`spec-prd` 不做外部 Product Owner 识别、联系人路由或最终用户访谈。
 
-| 角色 | 主要职责 | 不应承担 |
+| 参与方 | 主要职责 | 边界 |
 | --- | --- | --- |
-| Decision Owner | 决定产品 WHAT、范围、默认行为、验收与风险接受 | 在证据不足时替代架构师选择实现 HOW |
-| Technical Evidence Provider | 提供源码事实、接口可用性、技术可行性与约束 | 单方面改写 Requirements、AE 或 Scope |
-| Downstream Consumer | `spec-plan`、开发、测试消费已确定 WHAT 与可复核 HOW | 在 planning 中自行发明产品决策 |
-| Workflow Maintainer | 维护 skill、checker、runtime projection 与验证证据 | 用更多 prompt 机制替代缺失的实测证据 |
+| 当前执行对话的用户 | 回答产品 WHAT、范围、默认行为、验收、风险接受和无法从 source 确认的事实；可以确认、否定、选择假设、hard-cap、defer 或回答“不知道” | 是唯一人类问答入口；回答“不知道”时保留 checkpoint/OQ，不再路由给第二个人 |
+| Agent / tools | 优先读取 source、docs、tests、contracts 和已有证据；只把剩余 gap 问当前用户 | 不把 source 可解问题转给用户，不伪造用户回答 |
+| Downstream Consumer | `spec-plan`、开发、测试消费已确定 WHAT 与可复核 HOW | 不在 planning 中自行发明产品决策 |
+| Workflow Maintainer | 维护 skill、checker、runtime projection 与验证证据 | 不用更多 prompt 机制替代缺失的实测证据 |
+
+为兼容当前 source，`ask-owner`、`owner_question`、`Owner Decision Trace`、`owner-capped` 等既有字段继续保留，但其中的 `owner` 统一映射为“当前执行对话的用户”，不是独立外部角色。当前用户的明确回答可关闭对应 gap；若回答与 confirmed source 冲突，agent 先展示冲突，再由当前用户选择产品口径或要求继续核实。
 
 ### 2.2 Primary outcome
 
-- Decision Owner 以尽可能低的重复交互成本关闭 load-bearing WHAT gap。
-- source 可以回答的问题不再询问 owner。
+- 当前执行对话的用户以尽可能低的重复交互成本关闭 load-bearing WHAT gap。
+- source 可以回答的问题不再询问当前执行对话的用户。
 - 纯 HOW 选型不被错误升级为产品决策。
 - 下游能快速识别 confirmed WHAT、核心 R/AE、must-preserve behavior、阻塞项和 Planning Recheck。
 - `ready-for-planning` 不携带仍需 planning 发明的产品 WHAT。
@@ -47,7 +48,7 @@
 ### 3.1 Goals
 
 - 降低矛盾 Decision Card 或虚假 ready 状态逸出。
-- 让最高传播风险的 PRD-owned WHAT gap 优先被 source-resolve 或询问 owner。
+- 让最高传播风险的 PRD-owned WHAT gap 优先被 source-resolve 或询问当前执行对话的用户。
 - 保持 relentless 只作用于 load-bearing WHAT branch。
 - 复用现有 Handoff Context Slice 改善开发与 `spec-plan` 的消费效率。
 - 形成改前/改后、可复查、可说明限制的验证证据。
@@ -63,6 +64,8 @@
 - 不单方实现 `PRD Revision Signal`；跨 workflow 反馈需独立提案和下游 consumer buy-in。
 - 不引入未经实测的 token/context 阈值、System State Cache 或 Acceptance Pattern Library。
 - 不因为旧测试曾锁定 9 个 references 就把文件数量当产品合同。
+- 不恢复已删除的历史 `spec-prd` 聚焦测试，也不把清理失效的 `test:eval-fixtures` npm script 纳入本重构方案；该命令若需维护，作为独立仓库测试脚本清理处理。
+- 不引入外部 Product Owner / 最终用户 / 技术负责人路由；当前执行对话的用户是唯一问题接收者。
 - 本轮默认不新增 reference 文件；只有出现不可由现有文件承载的独立责任和明确 consumer 时才重评。
 
 ## 四、当前 Source 事实与 Ownership
@@ -77,7 +80,7 @@
 | WHAT/HOW 交接 | SKILL Closure-disposition razor + readiness/output references | 已有 `implementation-only-how-pushdown`、`planning_would_invent_what`、Planning Recheck | 复用既有术语；WHAT-affecting gap 不得 pushdown |
 | 下游快速消费 | `handoff_context_slice` | 已能承载 confirmed WHAT、决策、recheck 与 blocker | 只增强现有 slice，不新增 Developer Quick-Start section |
 | Eval fixture | `evals/examples.json` + `run-evals.js` | 当前 111 个 case 的结构与 coverage contract 可通过 | 不是模型语义质量证明 |
-| 聚焦测试入口 | `package.json#test:eval-fixtures` | 当前引用已删除的测试文件，命令失败 | U0 必须先恢复可维护的 focused suite |
+| 历史聚焦测试 | 已删除 tests / `package.json#test:eval-fixtures` | 旧测试不恢复；失效 npm script 不属于本方案前置条件 | 每个激活单元只添加证明自身行为的最小定向测试 |
 | Runtime projection | `getSupportedPlatforms()` | 当前平台为 Claude、Codex、Cursor、Kiro、Qoder | 所有行为变更按五宿主验证 |
 
 ### 4.1 Scripts 与 LLM 边界
@@ -85,7 +88,7 @@
 | 归属 | 负责 | 禁止 |
 | --- | --- | --- |
 | Scripts / tests | 字段组合、结构、section identity、ref、hash、receipt、reason_code、runtime projection | 判断哪个需求更重要、产品 WHAT 是否充分、PRD 语义质量分数 |
-| LLM / reviewer | 风险排序、WHAT/HOW 边界、owner authority、语义充分性、用户价值判断 | 编造测试结果、把 advisory 当 confirmed、绕过 finalize receipt |
+| LLM / reviewer | 风险排序、WHAT/HOW 边界、当前用户回答的应用、语义充分性、用户价值判断 | 编造测试结果、把 advisory 当 confirmed、绕过 finalize receipt |
 
 ## 五、假设、指标与激活条件
 
@@ -100,30 +103,13 @@
 
 共同 guardrails：
 
-- owner 问题总量不得因“排序优化”无界增加。
+- 向当前用户提出的问题总量不得因“排序优化”无界增加。
 - 重复问题数不得高于改前基线。
-- source 可回答的问题不得继续转成 owner 问题。
+- source 可回答的问题不得继续转成当前用户问题。
 - 改动不得增加第二套 enum、artifact、progress ledger 或 runtime source。
 - 行为改善必须由同一 fixture 的改前/改后证据支撑，不能只以字符串存在断言完成。
 
 ## 六、实施单元
-
-### U0：恢复验证地板（无条件执行）
-
-**目标**：恢复 `spec-prd` 当前 source 的可验证 contract 入口，解除“等待已删除测试恢复”的伪前置条件。
-
-**修改面**：
-
-- 新建一个规模受控的 `spec-prd` focused contract suite；不机械恢复已删除的 3,854 行旧测试。
-- 修复 `package.json` 的 `test:eval-fixtures`，只引用当前存在且受维护的测试。
-- 覆盖 source/reference reachability、reason-code 分类、checker/finalize good/bad fixtures、eval fixture contract、关键 source/runtime projection。
-- 对固定 reference 数量只做有意图的 compactness 检查，不把精确文件数当不可演化的架构真相。
-
-**完成条件**：
-
-- `npm run test:eval-fixtures` 可执行并通过。
-- `node skills/spec-prd/scripts/run-evals.js --json` 继续返回 fixture contract passed。
-- focused suite 能在缺 reference、reason-code 漂移、checker/finalize 关键回归时失败。
 
 ### U1：Decision Card 确定性一致性（按 H1 激活）
 
@@ -199,18 +185,17 @@ Architecture、Behavior、Experience 只作为案例标签，不带固定优先�
 ### 7.2 实施顺序
 
 ```text
-U0 恢复验证地板
-  -> 当前 source 基线（H1/H2/H3/H4）
+当前 source 基线（H1/H2/H3/H4）
   -> 逐项 Activation Decision
      -> 未复现：删除该候选实现
      -> 已复现：激活对应 U1/U2/U3/U4
-  -> 同 fixture 改后重跑
-  -> focused tests + fresh-source eval
+  -> 为激活单元新增最小定向测试
+  -> 同 fixture 改后重跑 + fresh-source eval
   -> 五宿主 source/runtime projection
   -> closeout evidence
 ```
 
-实施单元彼此独立，不得因为 U1 激活就默认 U2/U3/U4 也需要实施。若 U2 与 U3 同时激活，先完成 U3 的 WHAT/HOW 边界，再调整 U2 排序，避免把纯 HOW 错误列为最高优先级 owner 问题。
+实施单元彼此独立，不得因为 U1 激活就默认 U2/U3/U4 也需要实施。若 U2 与 U3 同时激活，先完成 U3 的 WHAT/HOW 边界，再调整 U2 排序，避免把纯 HOW 错误列为最高优先级当前用户问题。
 
 ## 八、风险与失败模式
 
@@ -219,7 +204,7 @@ U0 恢复验证地板
 | 重复合同继续增加 | 出现第二套风险 enum、tech-input 字段或 Decision Card 表 | subtraction review；删除同义机制，保留唯一权威 |
 | 测试只证明字符串存在 | contract test 通过但行为 fixture 不改善 | 强制改前/改后同场景比较 |
 | 脚本越权判断语义 | checker 开始判断哪个 gap 更重要或是否充分 | 脚本只报告组合、结构、ref、receipt 等事实 |
-| Decision Owner 被迫裁决 HOW | owner question 出现存储/协议选择且不改变 WHAT | 先走 U3 判定，HOW pushdown |
+| 当前用户被迫裁决 HOW | 面向当前用户的问题要求选择存储/协议且不会改变 WHAT | 先走 U3 判定，HOW pushdown |
 | false-ready 未下降 | WHAT-affecting tech gap 仍被放行 | 保持 checkpoint/revise；补 fresh-source fixture |
 | owner 负担上升 | 问题数、重复问题数显著增加 | 保持 load-bearing 边界和 source-first guardrail |
 | runtime drift | source 变化未投射某宿主 | 五宿主临时目录矩阵；不手改 mirror |
@@ -253,20 +238,20 @@ U0 恢复验证地板
 | Fixture | 预期 |
 | --- | --- |
 | Decision Card 冲突 | checker 稳定报告确定性冲突，finalize 不产生 ready receipt |
-| 高影响行为 gap + 低影响架构 HOW | 先 source-resolve / 询问高影响 WHAT gap，纯 HOW 不询问 owner |
+| 高影响行为 gap + 低影响架构 HOW | 先 source-resolve / 询问当前用户高影响 WHAT gap，纯 HOW 不询问当前用户 |
 | WHAT-affecting tech feasibility | 不得 ready；进入 source-read / ask-owner / checkpoint / revise |
 | non-WHAT tech recheck | 可进入 Planning Recheck，不误阻断 ready |
-| source 可解 + owner gap 并存 | source 可解项不问 owner，owner 问题绑定 write target |
+| source 可解 + 当前用户 gap 并存 | source 可解项不问当前用户，当前用户问题绑定 write target |
 | 长/高风险 PRD handoff | slice 可定位核心 R/AE、preserved behavior、blocker 与 recheck，不复制完整 PRD |
 
 ### 10.2 确定性验证
 
-- `npm run test:eval-fixtures`。
 - `node skills/spec-prd/scripts/run-evals.js --json`。
-- 新 focused suite 的 checker/finalize good/bad fixture 测试。
+- U1 激活时增加 Decision Card 冲突的 checker/finalize 定向测试。
+- U2/U3/U4 激活时，只增加对应 source contract、行为 fixture 或输出 shape 的最小测试。
 - `npm run lint:skill-entrypoints`。
 - `npm run typecheck`。
-- 影响面需要时运行 `npm run test:unit`；不得在 focused gate 未恢复时用不相关绿灯替代。
+- 影响面需要时运行 `npm run test:unit`；不得用不相关绿灯替代激活单元的定向证据。
 
 ### 10.3 五宿主 Source/Runtime Matrix
 
@@ -288,8 +273,8 @@ spec-first init --claude --codex --cursor --kiro --qoder -y -u <name> --lang zh
 
 ## 十一、Definition of Done
 
-- U0 已恢复且 `test:eval-fixtures` 不再引用不存在的测试。
-- 每个实际实现的 U1/U2/U3/U4 都有改前失败证据、激活决策、改后结果和限制说明。
+- 已删除的历史聚焦测试未恢复，失效 `test:eval-fixtures` 脚本未被误纳入本方案范围。
+- 每个实际实现的 U1/U2/U3/U4 都有改前失败证据、激活决策、最小定向测试、改后结果和限制说明。
 - 未复现的候选项已从实施范围删除，而不是以“顺手补 prose”落地。
 - 没有新增第二套状态表、风险 enum、tech-input schema、progress artifact 或 PRD topology。
 - 确定性事实与 LLM 语义判断的 ownership 清晰，checker 不越权做产品质量评分。
