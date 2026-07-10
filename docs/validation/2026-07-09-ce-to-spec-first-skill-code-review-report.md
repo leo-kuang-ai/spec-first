@@ -6,10 +6,10 @@
 - 产出方: Codex goal execution
 - 方案来源: `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md`
 - 已加载角色契约: `docs/10-prompt/结构化项目角色契约.md`
-- 最近更新: 2026-07-10 14:27:54 CST
+- 最近更新: 2026-07-10 14:40:26 CST
 - 新鲜度: 以该时间点的当前工作树为准；已有的无关 dirty 文件未被本报告修改。
-- 局限: Phase 1 确定性扫描已完成；Phase 2 逐 skill 语义审查已完成 Batch 1 全部 8 个 skill、Batch 2 全部 7 个 skill、Batch 3 全部 7 个 skill，并完成 Batch 4 的 `spec-brainstorm` 与 `spec-plan`。
-- 下一步: 审查 Batch 4 / `spec-doc-review`。
+- 局限: Phase 1 确定性扫描已完成；Phase 2 逐 skill 语义审查已完成 Batch 1 全部 8 个 skill、Batch 2 全部 7 个 skill、Batch 3 全部 7 个 skill，并完成 Batch 4 的 `spec-brainstorm`、`spec-plan` 与 `spec-doc-review`。当前 HEAD 为 `98e50159`，仓库 `tests/` 目录已被清理删除，本轮 Jest focused / changelog-format 验证因此失败在测试基础设施缺失。
+- 下一步: 审查 Batch 4 / `spec-code-review`。
 
 ## 审查进度
 
@@ -39,7 +39,7 @@
 | spec-product-pulse | B | done | issues_found | 2026-07-10 14:09:18 CST | Product pulse CE 投影基本保留；report-template top-N error count 与当前不可配置合同矛盾 |
 | spec-brainstorm | A | done | issues_found | 2026-07-10 14:16:39 CST | 核心 Product Contract / handoff 保留；共享 repo-profile parity 与 Markdown 结构发现问题 |
 | spec-plan | A | done | issues_found | 2026-07-10 14:27:54 CST | 核心 plan artifact / handoff contract 保留；focused migration contract 的 CE file-set 断言与当前 source divergence 漂移 |
-| spec-doc-review | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
+| spec-doc-review | A | done | issues_found | 2026-07-10 14:40:26 CST | 核心 persona review / synthesis / walkthrough contract 基本保留；CE missing-document gate 丢失 |
 | spec-code-review | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
 | spec-work | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
 | spec-ideate | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
