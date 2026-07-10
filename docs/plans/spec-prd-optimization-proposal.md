@@ -23,7 +23,7 @@
 | 维度 | 评价 |
 | --- | --- |
 | 关注点分离 | 脚本只报 facts（reason_codes、trace gaps、placeholder），LLM 做语义判断——边界清晰 |
-| 单一真相源 | reason-codes.js 集中管理 38 个 blocking code 分类，checker 和 finalize 共消费 |
+| 单一真相源 | reason-codes.js 集中管理 31 个 blocking code 分类，checker 和 finalize 共消费 |
 | 可扩展性 | Reference Trigger Map 按需加载，避免每次全量 prompt；output_shape / surface_lens / topology 三轴正交 |
 | 测试覆盖 | Jest contract tests + evals fixture + fresh-source eval + deterministic scripts 分层验证 |
 | 宿主适配 | Claude prewrite guard + Codex degraded discipline + --verify-receipt 三路处理 |
@@ -274,7 +274,7 @@ phase_exit_card:
 
 | Tier | 触发条件 | 输出形态 | 用户价值 |
 | --- | --- | --- | --- |
-| T0 快速诊断 | 首轮分析完成（Phase 1 Decision Card） | 需求理解摘要 + 风险图谱 + 下一步建议 | 让 PM 立刻知道「AI 理解了什么」 |
+| T0 快速诊断 | 首轮 source/分析完成（不绑定 Decision Card 位置） | 需求理解摘要 + 风险图谱 + 下一步建议 | 让 PM 立刻知道「AI 理解了什么」 |
 | T1 结构化 checkpoint | grill 进行中，3+ 个 OQ 已解决 | 带进度标记的 draft PRD（OQ 闭合率） | 让 PM 看到累积进度 |
 | T2 ready-for-review | 所有 load-bearing branch closed | 完整 PRD + readiness receipt | 正式交付 |
 
@@ -355,7 +355,7 @@ handoff_summary_views:
 
 ### 3.1 确定性检查器扩展
 
-**问题**：check-prd-artifact.js 当前检测 38 种 blocking reason，但缺少以下高价值确定性检查：
+**问题**：check-prd-artifact.js 当前检测 31 种 blocking reason（以 reason-codes.js 的 `BLOCKING_REASON_CODES` 为准；checker 另会 emit 若干 advisory code，不计入 blocking），但缺少以下高价值确定性检查：
 
 1. **需求唯一性检查**：检测 Requirements 表中语义高度重叠的行（基于关键词重叠率）
 2. **Acceptance-Requirement 双向追溯完整性**：当前只检查 R → AE 方向，缺少 AE 反向校验（是否有 AE 没有对应 R）
@@ -404,6 +404,8 @@ const EXTENDED_CHECKS = [
 
 ### 3.3 Grill 深度自适应机制
 
+> **修正说明（doc-review）**：本节已被 §7.2 修正取代——§7.2 确立「grill 深度恒定、relentless by default、不引入 soft-cap/skip，只做优先级排序」。以下「深度自适应削减」方向不再采用；保留本节仅作演进记录，实施时以 §7.2 为准。
+
 **问题**：当前 grill 只有「relentless by default」一种模式，缺乏基于输入特征的自适应深度控制。导致：
 - 简单 extend 类需求也被深度 grill，浪费 owner 时间
 - 复杂 replace/migrate 类需求的 grill 深度可能不够
@@ -445,22 +447,12 @@ L1 - Domain Glossary（已有）
   → docs/contracts/domain-glossary.md
   → 跨 PRD 术语统一
 
-L2 - System State Cache（建议新增）
-  → 按 module/surface 组织的 confirmed current-state claims
-  → 减少重复 source-reading
-  → invalidation: 当 source 文件变更时标记 stale
-
-L3 - Acceptance Pattern Library（建议新增）
-  → 按 surface lens 组织的通用验收模式（权限、空状态、异常、loading）
-  → 减少每次从零构建 AE
-  → 使用方式: 作为 recommended default 模板，不是 confirmed truth
-
 L4 - Industry Overlay Knowledge（已有雏形）
   → 行业关注点附录（证券行业需求关注点与参考附录）
   → 建议扩展为可配置的 overlay pack
 ```
 
-2. **L2 实现路径**：利用 PRD 的 `Evidence And Assumptions` section 中 `confirmed-source` 条目，在 finalize 成功后自动提取到 project-level cache（可选 opt-in），下一个同 surface 的 PRD 可检索复用。
+> **doc-review 移除 L2/L3**：System State Cache（L2）与 Acceptance Pattern Library（L3）已从本方案删除——L2 是带失效逻辑的跨运行持久化缓存，直接违反本文档 Non-Goal #5「不引入 persistent progress schema」，且 L2/L3 均无当前可指名消费者。若未来出现真实跨 PRD 复用需求，另立独立 opt-in 提案，并说明如何从 aspirational 变 confirmed。
 
 ### 3.5 输入预处理管道标准化
 
@@ -536,7 +528,7 @@ input_preprocessor:
 | P0 | 3.2 Decision Card 合法状态组合 | 内部一致性 | 低（reference 补充） | 减少矛盾状态输出 |
 | P0 | 2.2 T0 快速诊断输出 | 用户体验 | 中（SKILL.md + template） | 首轮交互即见价值 |
 | P1 | 2.3 Quality Radar 可视化 | PM 满意度 | 中（template 扩展） | 质量诊断可读性提升 |
-| P1 | 3.3 Grill 优先级排序 | 执行效率 | 中（reference 修改） | 关键问题优先闭合，下游质量提升 |
+| P1 | 7.2 Grill Priority Signal（问题优先级排序） | 执行效率 | 中（reference 修改） | 关键问题优先闭合，下游质量提升 |
 | P1 | 3.1 确定性检查器扩展 | 质量下限 | 中（脚本开发） | 新增 5 项 advisory 检查 |
 | P2 | 2.4 Handoff Summary Views | 协作效率 | 低（template 扩展） | 多角色消费 PRD 更高效 |
 | P2 | 3.4 跨 PRD 知识复用 | 长期效率 | 高（需新 artifact） | 减少重复 source-reading |
@@ -560,6 +552,10 @@ input_preprocessor:
 ---
 
 ## 六、实施路径建议
+
+### Phase 0：基线测量（前置，doc-review 新增）
+
+在推进任何结构性增补前，先在若干真实 spec-prd 运行样本上量化三个 observed failure mode（direct-write-after-read、checkpoint-as-escape、closure-disposition self-asserted）的实测发生率与根因，并确立「direct-write-after-read 失败率」等收益指标的基线。只对数据支持的失败模式推进对应的结构性增补，其余降级为「待数据决定」的观察项。此步用于在铺开全量目录（§四 / §九）前先证伪/收敛，避免在假设需求上过早锁定维护面。
 
 ### Phase 1：快速见效（1-2 天）
 
@@ -593,7 +589,7 @@ input_preprocessor:
 
 当前 Readiness Lens 的 6 个 Base Gate 维度是：Clarity、Evidence provenance、Traceability、Testability、Boundary integrity、Planning-invention readiness。这些维度确保 PRD 对 **spec-plan**（规划流程）是充分的，但没有确保对 **开发人员**（最终消费者）是高效可消费的。
 
-一份通过全部 38 项 blocking 检查的 PRD，开发拿到后仍可能面临：
+一份通过全部 31 项 blocking 检查的 PRD，开发拿到后仍可能面临：
 - 不知道从哪里开始看（缺乏优先级引导的阅读路径）
 - Change Delta 用产品语言描述，无法映射到代码变更范围
 - Acceptance Examples 用业务场景语言，缺乏转化为测试 assertion 的技术前提
@@ -1221,7 +1217,7 @@ Phase 4: Readiness & Handoff（不变）
 │              Phase 4: Readiness & Handoff                          │
 ├────────────────────────────────────────────────────────────────────┤
 │  Readiness Lens → finalize/checker → outcome decision             │
-│  → ready-for-planning / revise-prd / ask-owner / route-out        │
+│  → ready-for-planning / revise-prd / ask-owner / doc-review / route-out │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1485,7 +1481,7 @@ ready 边界（不可绕过）：
 
 #### 问题本质
 
-7.4 Revision Signal 是**出站**信号（PRD → 下游通知变更）。但 spec-first 核心链路是闭环：
+7.4 Revision Signal 已经是**下游→PRD 的入站**信号（下游 workflow 发现 gap → 触发 spec-prd refine）。spec-first 核心链路本应是闭环：
 
 ```
 Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
@@ -1493,7 +1489,7 @@ Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
     +----------------------------------------------------+
 ```
 
-当 spec-plan 在制定计划时发现 PRD 有歧义、或 spec-code-review 在审查时发现需求 gap——**当前没有反馈到 spec-prd 的通道**。链路是单向的（Spec → Plan），缺少 Plan → Spec 的反馈。
+§7.4 已定义「下游发现 gap → 反馈 spec-prd」这一入站信号（`prd_revision_signal`）。本节（8.11）不新增反向通道，只补充其 artifact 格式细化（`prd_revision_request`）与 spec-prd 侧的处理流程；二者是同一入站方向，实施时应合并为一套协议而非两套。
 
 #### Inbound Revision Request 格式
 
@@ -1518,16 +1514,16 @@ spec-prd 收到 `prd_revision_request` 后：
 1. **验证 evidence**：Read 引用的 source:line，确认 gap 真实存在
 2. **局部 grill**：仅针对 revision request 的 gap 执行 Phase 2 grill（不重跑整个 PRD）
 3. **更新 PRD**：将 resolved gap 写入对应 section，更新 trace
-4. **出站通知**：通过 7.4 Revision Signal 通知下游 PRD 已更新
+4. **通知下游**：在 Closeout Summary 标注 PRD 已按 revision request 更新，供下游 spec-plan 重新消费（§7.4 是入站信号，本身不含出站通知能力，勿引用为出站）
 5. **记录**：在 Decision Notes 中记录 revision request 来源 + 解决结果
 
-#### 与 7.4 出站信号的互补关系
+#### 与 7.4 的关系（同一入站方向）
 
 ```
-出站 (7.4): PRD 变更 → 通知 spec-plan/spec-code-review
-入站 (8.11): spec-plan/spec-code-review 发现 gap → 请求 spec-prd 修订
+7.4  : 下游(spec-plan/work/review)发现 gap → 发出 prd_revision_signal → 触发 spec-prd refine
+8.11 : 同一入站方向的 artifact 格式细化(prd_revision_request)+ spec-prd 侧处理流程
 
-形成闭环: PRD → Plan → (发现 gap) → Revision Request → PRD 修订 → 通知 Plan
+结论: 7.4 与 8.11 是同一「下游→PRD」入站机制,不是「出站/入站」两套;实施时应合并为单一协议。
 ```
 
 #### 约束
@@ -1567,7 +1563,7 @@ spec-prd 收到 `prd_revision_request` 后：
 | Inbound Revision Signal（8.11） | Phase 4 trigger | domain-language-and-decision-ledger.md | +2 行 |
 | 流程节点重排（8.4） | Phase 1/2 重排 | SKILL.md 直接修改 | +0 行（重排，不新增） |
 
-**预估 SKILL.md 总量**：294 + 22 ≈ **316 行**（远低于 500 行限制）。
+**预估 SKILL.md 总量**：294 + 20 = **314 行**（远低于 500 行限制）。
 
 #### 新增 reference 文件清单
 
@@ -1605,7 +1601,7 @@ AGENTS.md 明确要求：
 
 **2. Contract Test（必做）**
 
-- `check-prd-artifact.js` 的 38 个 reason_codes 覆盖不变（不新增 blocking code）
+- `check-prd-artifact.js` 的 31 个 blocking reason_codes 覆盖不变（不新增 blocking code）
 - `finalize-prd-artifact.js` 的 ready receipt 格式不变
 - 现有 Jest contract tests 全部通过
 - 新增 2-3 个 contract test 验证新行为（如 source-resolved gap 不出现在 owner questions 中）
@@ -1676,3 +1672,21 @@ spec-prd 当前已是 production-grade 的 brownfield PRD 工作流，其「分�
 | 验证（随实施） | 8.13 Verification Plan | fresh-source eval + contract test + eval fixture |
 
 所有优化均在 spec-first 核心约束内运作：不新增硬状态机、不增加 BLOCKING 检查、不突破 source/runtime 边界、不让脚本做语义判断。走「丰富信息 + advisory 建议」路线，而非「硬规则 + 强制中断」路线。
+
+---
+
+## Deferred / Open Questions
+
+### From 2026-07-10 spec-doc-review (best-judgment)
+
+本轮 5-persona spec-doc-review（coherence / feasibility / product-lens / scope-guardian / adversarial）后，以下判断/范围类发现经作者裁决为 **Defer**（同轮另有 6 项已直接改文档：§3.3 标注被 §7.2 取代、§四表行改指 §7.2、§3.4 删除 L2/L3、§六新增 Phase 0 基线测量、§2.2 T0 触发解耦、§8.11 出/入站矛盾修正；1 项 Skip：§7.1/7.3/7.5「开发是否 PRD 消费者」）：
+
+1. **[P0] 认知过载：解药与病因同源（§2.1 / §8.12 / §九）** — 方案以 +17 机制 / +4 reference 治疗自列的「认知负荷过高」。开放问题：是否先落地 §六 Phase 0 基线测量，再据数据收敛到有证据的 P0 子集，而非一次性铺开？「SKILL.md 仅 +22 行」不能作为整体轻量的证明（复杂度被推入 references / 跨协议）。(product-lens + adversarial, conf 100)
+2. **[P1] Revision Signal 跨-workflow 范围外溢（§7.4 / §8.11 / §五）** — 7.4+8.11 需 spec-plan/work/review 三方共同实现，无生产者/消费者，逼近「不创建中心化流程引擎」非目标。决策：将该跨-workflow 协议整体拆为独立 opt-in 提案，待至少一个下游承诺消费再设计；spec-prd 本方案只保留自身可独立落地项。(scope-guardian + product-lens + adversarial, conf 100)
+3. **[P1] 「80% PRD 需多轮异步交互」无来源载重前提（§2.2）** — 该 80% 支撑 T0 / Session Recovery / Context Budget，且与 §7.2「同会话边际成本近零」矛盾。决策：需真实会话分布数据佐证；在此之前相关跨会话机制降级为 aspirational 并写明激活条件。(product-lens + adversarial, conf 100)
+4. **[P2] 多项「新」机制重复既有能力（§7.2 / §8.5 / §3.5）** — Grill 排序 ↔ downstream_confirmation_risk / Load-Bearing Gap Triage；Per-Question 层 ↔ Deep Requirements Grill；输入预处理 ↔ 既有多模态 / design-source / large-input / resume。决策：若确有增量，并入既有 reference 复用既有词汇，不新建平行机制 / 文件。(scope-guardian, conf 75)
+5. **[P2] Handoff Views / resolution_requires 无消费者（§2.4 / §7.3）** — 三受众 handoff_summary_views + optional 列是无当前消费者的 config / extensibility，与既有 Handoff Context Slice 重叠。决策：去掉三受众视图与 optional 列；§7.3 的 non_what vs what-affecting 边界纪律并入既有 Handoff Context Slice / Planning Recheck。(scope-guardian, conf 75)
+6. **[P2] §8.4 脊柱重排高逆转成本（§8.4 / §8.7）** — 跨 Phase 移动 Product Expert Lens / Decision Card，文档自认需评审、需验证 checker/finalize 影响，支撑仅为主观「Phase 1 过载」判断。决策：保持 §8.4 为需评审；重排前先补 `decision_card_undeclared` / `preflight_sweep_closure` 聚焦 contract test 验证 checker/finalize 影响。(adversarial + feasibility, conf 75)
+7. **[P2] Context Budget 阈值基于未测估算（§8.10）** — 降级阈值建立在自认「粗粒度估算」的 60–100K token 上，可能过早触发误 defer 或永不触发。决策：阈值待实测 token 消耗校准；校准前把降级策略标为 advisory。(adversarial, conf 75)
+8. **[P2] 新 reference 文件归属矛盾（§7.2 / §7.3 / §7.6 ↔ §8.12）** — 7.2/7.3/7.6 说写入现有文件，§8.12 说新建独立文件并据此计「4 个新文件」。决策：与本节 #4 一并定 inline vs new-file 方向后全文对齐（倾向内联以合 Light contract），同步修正新文件计数与 SKILL.md 加载 trigger。(coherence, conf 75)
+9. **[P2] CONTEXT.md→CONCEPTS.md 改名不可机械执行（§8.8）** — 「所有引用」与「保留上游 snapshot」相互矛盾，「25 处」实测 29 且多在 Embedded Upstream Source Snapshot 段，且无「Adapted spec-prd rules」段可定位边界。决策：按源码实际段边界精确重写——Snapshot 段及描述上游 artifact 的段保留原文，仅改 spec-prd 自有适配规则里的项目术语表引用；「25 处」改为按边界分列的两个计数（保留 N / 改写 M）。(feasibility, conf 75)

@@ -2,13 +2,13 @@
 
 ## 结论
 
-本审查对当前 `skills/` 下全部 36 个 source skill 进行逐文件代码审查,其中 29 个为 CE 迁移相关 skill(含 `spec-mcp-setup`),7 个为 spec-first 原生 / 拆分 skill。审查重点覆盖迁移正确性、代码质量、安全性、跨 skill 依赖关系和上下文管理。
+本审查对当前 `skills/` 下全部 35 个 source skill 按风险分级审查(自动化扫描全覆盖,高风险 skill 逐文件深审),其中 29 个为 CE 迁移相关 skill(含 `spec-mcp-setup`),6 个为 spec-first 原生 / 拆分 skill。审查重点覆盖迁移正确性、代码质量、安全性、跨 skill 依赖关系和上下文管理。
 
 审查不替代迁移审查报告的结论,而是在其基础上验证实际 source 代码是否与审查结论一致,并发现迁移审查未覆盖的问题。
 
 ## 目标
 
-- 对当前 `skills/` 下全部 36 个 source skill 逐文件审查 SKILL.md、全部 references、全部 scripts、schemas/assets。
+- 对当前 `skills/` 下全部 35 个 source skill 按「审查深度分级」审查 SKILL.md、references、scripts、schemas/assets:自动化扫描全覆盖,Tier A 逐文件深审,Tier B/C 扫描 + 抽查 / source 质量审查。
 - 验证 CE 承重能力是否在 source 中被正确保留。
 - 对 spec-first 原生 / 拆分 skill 不做 CE 等价要求,但仍审查其入口语义、source/runtime 边界、依赖关系、artifact contract、脚本安全和上下文管理。
 - 验证跨 skill 依赖关系(文件引用、artifact contract、handoff 路由、配置键)是否全部正确。
@@ -20,7 +20,13 @@
 - 不重复迁移审查报告已确认的结论;只关注 source 代码层面的验证和新发现。
 - 不修改 generated runtime mirrors(`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`)。
 - 不在审查阶段做 runtime regeneration;如需 runtime refresh,作为单独显式步骤。
-- 不对 spec-first 原生 / 拆分 skills(`spec-prd`、`spec-write-tasks`、`using-spec-first`、`spec-write-skill`、`retired-skill-review`、`spec-app-consistency-audit`、`spec-rule-miner`)做 CE 等价审查;这些 skill 仍纳入全量 source 审查,并可用于解释合理 divergence。
+- 不对 spec-first 原生 / 拆分 skills(`spec-prd`、`spec-write-tasks`、`using-spec-first`、`spec-write-skill`、`spec-app-consistency-audit`、`spec-rule-miner`)做 CE 等价审查;这些 skill 仍纳入全量 source 审查,并可用于解释合理 divergence。
+
+## CE 基线(parity source of truth)
+
+- **权威 CE source**:`~/xiaobu/compound-engineering-plugin`,commit `fc0395b8`(v3.19.0);该工作副本含 `ce-setup` 与全部 `ce-*` skill,是逐文件 parity 比对的唯一基准。
+- 已安装的 marketplace 副本(v3.14.3)与 plugin cache 均较旧,**不作为**比对基准,以避免 False parity / False drift。
+- **Phase 1 前置**:任何 parity 维度(维度 1、14b)运行前,先执行 `git -C ~/xiaobu/compound-engineering-plugin rev-parse HEAD` 记录基线 commit 并写入合并报告「全局依赖图谱」头部;若工作副本已偏离 `fc0395b8`,先说明漂移再继续。
 
 ## 审查范围
 
@@ -32,9 +38,20 @@
 | **Batch 2**(helper 与尾项) | spec-commit-push-pr, spec-optimize, spec-promote, spec-proof, spec-resolve-pr-feedback, spec-test-browser, spec-worktree | 5 aligned + 2 repaired | ~40 |
 | **Batch 3**(支撑链路) | spec-debug, spec-compound, spec-compound-refresh, spec-sweep, **spec-mcp-setup**, spec-riffrec-feedback-analysis, spec-product-pulse | 1 partial + 5 repaired/replaced + 1 near-parity | ~60 |
 | **Batch 4**(核心链路深审) | spec-brainstorm, spec-plan, spec-doc-review, spec-code-review, spec-work, spec-ideate, spec-lfg | 全部 replaced/repaired | ~80 |
-| **Batch 5**(spec-first 原生 / 拆分 skill 全量审查) | spec-prd, spec-write-tasks, using-spec-first, spec-write-skill, retired-skill-review, spec-app-consistency-audit, spec-rule-miner | 不做 CE 等价;做 source 质量、依赖、上下文与治理边界审查 | ~60 |
+| **Batch 5**(spec-first 原生 / 拆分 skill 全量审查) | spec-prd, spec-write-tasks, using-spec-first, spec-write-skill, spec-app-consistency-audit, spec-rule-miner | 不做 CE 等价;做 source 质量、依赖、上下文与治理边界审查 | ~60 |
 
 **特殊说明**:`spec-mcp-setup` 是从 `ce-setup` 的近似映射(near-parity),不是直接 parity target。审查需额外关注 divergence 是否合理、provider readiness 和 runtime freshness 检查是否完整。
+
+### 审查深度分级(risk-based scoping)
+
+本审查不对全部 35 个 skill 一律满深度手审,而是按迁移风险分级投放注意力;批次「审查口径」标签据此成为分级依据(不再仅描述性)。基线是 `2026-07-08-ce-to-spec-first-reviewed-skills-parity-audit-report.md`——本审查验证其结论的 delta 与未覆盖项,而非从零重推。
+
+- **全覆盖自动化扫描(所有 skill,不分层)**:CE residual grep、上下文排除扫描、`npm run lint:skill-entrypoints`、相关 CI 契约测试(见「验证命令」)。这些确定性扫描先于分级手审运行,任何 skill 不豁免。
+- **Tier A — replaced/repaired + near-parity**(Batch 3 的 partial/repaired 项、Batch 4 全部、`spec-mcp-setup`):对权威 CE 基线做全部适用维度的逐文件深审(含 CE parity 与维度 14b)。迁移风险集中于此。
+- **Tier B — aligned 低差异**(Batch 1、Batch 2 的 aligned 项):自动化扫描 + 迁移正确性核心(维度 1、3)+ 残差抽查;仅当扫描或抽查暴露异常时升级为深审。不默认跑全部 23 维。
+- **Tier C — 原生 / 拆分,无 CE 基线**(Batch 5):做 source 质量、依赖、artifact contract、脚本安全与治理边界审查;**不做 CE parity**;上下文维度 16-22 仅按需(该组审查通用架构质量而非迁移正确性,对无 CE 基线的原生 skill 不作强制满深度)。
+
+**维度合并执行(避免同一产物重复审查)**:维度 15(安全深度)作为维度 3 的深度清单合并执行,不单列重复;维度 13 的共享 persona/agent 一致性与维度 6 的共享脚本一致性合并为一次共享资产核对;维度 22「常驻」行的 SKILL.md 精简度判断并入维度 16。维度编号与总数保持不变,仅执行时不双跑。
 
 ## 审查维度(23 项)
 
@@ -45,7 +62,7 @@
 | 检查项 | 验证方式 |
 |---|---|
 | CE 承重能力是否完整保留 | 逐文件对比 CE source 与 spec-first source |
-| CE residual 扫描 | `rg -n "ce-\|/ce-\|compound-engineering\|\\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering"` |
+| CE residual 扫描 | `rg -n "\bce-\|compound-engineering\|\\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering"`(用 `\bce-` 词边界,避免 `source-of` 等误匹配) |
 | 路径/命名投影是否正确 | `/tmp/compound-engineering/` → `/tmp/spec-first/`、`.compound-engineering` → `.spec-first`、`ce-*` → `spec-*` |
 | spec-first divergence 是否合理 | 每处 divergence 必须有明确理由 |
 
@@ -77,7 +94,7 @@
 | Artifact contract 路径是否一致 | 产出方 vs 消费方路径匹配 |
 | 下游消费者输入是否正确 | 检查每个 skill 声明的 downstream consumers |
 
-### 核心维度(11 项)
+### 核心维度(12 项)
 
 #### 维度 5:跨 Skill 依赖关系
 
@@ -124,9 +141,9 @@ spec-brainstorm → spec-plan → spec-write-tasks → spec-work → spec-code-r
 
 | 共享脚本 | 出现的 skill | 审查重点 |
 |---|---|---|
-| `scripts/repo-profile-cache.py` | spec-debug, spec-code-review, spec-ideate, spec-compound, spec-compound-refresh | 5 处副本是否一致?divergence 是否有理由? |
+| `scripts/repo-profile-cache.py` | spec-brainstorm, spec-code-review, spec-compound, spec-debug, spec-explain, spec-ideate, spec-optimize, spec-plan, spec-pov | 9 处副本是否一致?divergence 是否有理由?(spec-compound-refresh 无此脚本) |
 | `scripts/analyze_riffrec_zip.py` | spec-sweep, spec-riffrec-feedback-analysis | 两处是否一致? |
-| `references/agents/repo-profiler.md` | spec-debug, spec-code-review, spec-ideate | persona 定义是否一致? |
+| `references/agents/repo-profiler.md` | spec-brainstorm, spec-code-review, spec-compound, spec-debug, spec-explain, spec-ideate, spec-optimize, spec-plan, spec-pov | 9 处副本 persona 定义是否一致? |
 | `scripts/validate-frontmatter.py` | spec-compound, spec-compound-refresh | 验证逻辑是否一致? |
 | `scripts/validate-doc-claims.py` | spec-compound, spec-compound-refresh | 同上 |
 
@@ -405,9 +422,9 @@ Phase 1: 全局依赖图谱 + 共享资源清单 + 上下文预算基线
 
 Phase 2: 逐批次代码审查 (Batch 1 → 2 → 3 → 4 → 5)
   ├── 维度 1-4: 迁移/质量/安全/一致性(基础)
-  ├── 维度 5-15: 依赖/共享脚本/contract/mode/metadata(核心)
+  ├── 维度 5-15(含 14b): 依赖/共享脚本/contract/mode/metadata(核心)
   └── 维度 16-22: 上下文预算/产出/handoff/排除/隔离/恢复(上下文管理)
-  注意:批次内可并行读取文件;批次间串行执行。Batch 5 不做 CE parity 判定,但必须完成全量 source 审查。
+  注意:批次内可并行读取文件;批次间串行执行;各 batch 按「审查深度分级」投放维度深度。Batch 5(Tier C)不做 CE parity 判定,但完成全量 source 质量/依赖/治理审查。
 
 Phase 3: 全局交叉验证
   ├── Plan artifact contract 链路端到端
@@ -494,7 +511,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/*/scripts/*.py
 npm run lint:skill-entrypoints
 
 # CE residual 全量扫描
-rg -n "ce-|/ce-|compound-engineering|\.compound-engineering|ce-unified-plan|/tmp/compound-engineering" skills/
+rg -n "\bce-|compound-engineering|\.compound-engineering|ce-unified-plan|/tmp/compound-engineering" skills/
 
 # 上下文排除扫描
 rg -n "\.claude/|\.codex/|\.agents/skills/|\.cursor/skills/|\.kiro/skills/|\.qoder/skills/" skills/ --glob '*.md'
@@ -522,7 +539,7 @@ npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
 当每个审查 skill 都具备以下内容时,本审查完成:
 
 - CE 迁移相关 skill 的 CE 与 spec-first 两侧 source files 均已读取(或迁移审查已确认且无变化的低风险项可引用结论);spec-first 原生 / 拆分 skill 的 spec-first source files 均已读取,并记录其无 CE parity 目标。
-- 23 个维度均已检查。
+- 各 skill 按「审查深度分级」完成对应维度:Tier A 完成全部适用维度(共 23 项,含 14b)深审;Tier B 完成自动化扫描 + 维度 1、3 + 残差抽查;Tier C 完成 source 质量/依赖/治理维度(上下文维度 16-22 按需),不做 CE parity。全覆盖自动化扫描对所有 skill 已运行。
 - 有带 risk level 的 verdict(pass / issues_found / critical_issues)。
 - 发现按严重程度分类(critical / high / medium / low / info)。
 - 每个发现包含具体文件和行号。
@@ -531,3 +548,19 @@ npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
 - 上下文管理问题已记录。
 - 测试覆盖缺口已分析。
 - 合并报告已输出。
+
+## 复审决议(2026-07-10 spec-doc-review)
+
+本轮 `spec-doc-review` 发现已全部处置,记录如下。
+
+**已直接修正(经源码核实):**
+- skill 总数 36→35,native 7→6,移除已退役的 `retired-skill-review`(结论 / 目标 / 非目标 / Batch 5)。
+- CE residual grep 改用 `\bce-` 词边界(实测 698→7 行,消除 `source-of` 等误匹配)。
+- 维度 6/13 共享脚本副本清单更正为实际 9 处(`repo-profile-cache.py`、`repo-profiler.md`),剔除无该脚本的 `spec-compound-refresh`。
+
+**判断类发现的决议:**
+- **[P0] CE 基线**:固定 `~/xiaobu/compound-engineering-plugin` @ `fc0395b8`(v3.19.0)为唯一 parity 基准(见「CE 基线」小节)。
+- **[P1] 审查规模**:改为风险分级(见「审查深度分级」)——自动化扫描全覆盖 + Tier A 深审 + Tier B/C 扫描抽查;批次标签成为分级依据;复用 2026-07-08 parity 审查报告的结论,仅验证 delta 与未覆盖项。据此 bespoke 全量矩阵不再与 `spec-code-review` 冗余满投,batch 标签产生实际优先级作用。
+- **[P1] 上下文维度**:维度 16-22 对无 CE 基线的 Tier C 原生 skill 仅按需,不作强制满深度。
+- **[P2] 维度计数**:14b 认定为第 12 个核心维度,核心「11 项」→「12 项」,总数保持 23,Phase 2 表述改为「维度 5-15(含 14b)」。
+- **[P2] 维度重叠**:维度 15↔3、13↔6、22↔16 合并执行(见「审查深度分级」末),编号与总数不变。

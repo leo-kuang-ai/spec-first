@@ -63,7 +63,7 @@ Same pipeline for default and `mode:agent`:
 | **Default** | Markdown report (pipe-delimited finding tables) + Actionable Findings summary |
 | **`mode:agent`** | One JSON object (see ### JSON output format below) + the same `/tmp/.../spec-code-review/<run-id>/` artifacts |
 
-`mode:agent` is **report-only**: it skips the Stage 5c apply (the caller applies) and serializes findings as JSON instead of markdown. It does not change reviewer selection, merge logic, or scope rules — the JSON is the deterministic contract for programmatic and cross-harness callers (Codex, Gemini, etc.). The default markdown is the human view; keep it ASCII-safe (pipe tables, `->` not middot `·`, no box-drawing) so it degrades gracefully across terminals.
+`mode:agent` is **report-only**: it skips the Stage 5c apply (the caller applies) and serializes findings as JSON instead of markdown. It does not change reviewer selection, merge logic, or scope rules — the JSON is the deterministic contract for programmatic and cross-harness callers (Codex and other harnesses). The default markdown is the human view; keep it ASCII-safe (pipe tables, `->` not middot `·`, no box-drawing) so it degrades gracefully across terminals.
 
 ## Quick Review Short-Circuit
 

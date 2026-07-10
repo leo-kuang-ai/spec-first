@@ -8,7 +8,7 @@
 
 1. **扩展性维护负债（推测性驱动，待需求信号确认）** — 当前 5 宿主已使 UNREWRITTEN_PATH_PATTERNS 达到 O(n²) 维护负债。Kiro 刚接入时已触发全部 4 个现有 adapter 的修改。社区已有 Windsurf、Augment 等新 IDE 采用 AGENTS.md 标准，但**目前尚无 confirmed 的第 6 个宿主接入需求（无用户请求、无 roadmap 承诺、无 POC）**。O(n²) 是内部维护指标，用户不可见；因此本驱动信号属推测性，扩展性投资（Phase 1/3）应待真实接入需求或 POC 承诺出现后再启动（见 1.2 与 5.2 的证据触发约定）。
 2. **Qoder hooks 功能缺口** — spec-first 本身运行在 Qoder 环境中，但 Qoder CLI 的 shell-command hooks 仍未覆盖；其事件、matcher、stdout 与配置兼容性需按 Qoder CLI 协议单独验证，这意味着 spec-first 在自己的宿主上缺少 confirmed governance injection。
-3. **init.js 3055 行已成维护瓶颈** — 任何 init 逻辑的修改（如上述 Qoder hooks 添加）都需要导航 3000+ 行文件，增加回归风险。
+3. **init.js 3055 行是疑似维护瓶颈（需证据触发）** — 文件体量会增加导航和回归理解成本，且 Qoder hooks 改动会触达 init lifecycle；但当前尚无 confirmed 的维护回归或 owner 反馈证明「大文件」本身已阻塞交付。因此 Phase 2 仍按 §5.1 的 evidence-triggered 规则启动，不以文件行数单独背书。
 4. **对齐核心链路** — 重构使 pointer-only 新宿主的 adapter 接入从 3-5 天收敛到约 1 天；hooks-capable 宿主仍需额外 protocol/runtime lifecycle spike。更低的 pointer 接入成本直接提升 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge` 链路的覆盖面（更多宿主 = 更多用户可触达 workflow）。
 
 **核心判断对齐（AGENTS.md）：**
@@ -92,7 +92,7 @@ CLI Entry (bin/spec-first.js)
 
 | 编号 | 问题 | 严重度 | 影响 |
 |------|------|--------|------|
-| P0 | init.js 3055L 混合 6+ 职责 | 高 | 任何修改需导航全文，回归风险大 |
+| P0 | init.js 3055L 混合 6+ 职责（疑似维护瓶颈） | 中 | 导航和理解成本偏高；需具体维护痛点或回归证据触发拆分 |
 | P1 | Adapter O(n²) 排除列表 | 高 | 新宿主接入需修改所有现有 adapter |
 | P2 | Plugin.js 1467L 无分层 | 中 | 理解成本高，修改影响面大 |
 | P3 | Qoder hooks 完全缺失 | 中 | 功能缺口，spec-first 在自身宿主无 governance |
@@ -321,12 +321,12 @@ Platform Registry 不应是“把各 adapter 的正则搬到一个对象里”�
 - **Single source of truth（surfaces 派生 exclusions）**：rewrite 排除集**不单独手维护**。一个宿主要排除的 = 其他宿主参与 rewrite/drift exclusion 的 surfaces 并集，由 `surfaces` 派生。surface 可带 `rewriteScope`（收窄，如 command 只排除 `spec-*`）、`rewriteExclude: true`（把 host-local surface 显式纳入排除）或 `rewriteExclude: false`（opt out）。这样避免 `surfaces` 与第二份手写排除表各自漂移——那正是本 registry 要消灭的 O(n²) 重复的缩小版。
 - **Ownership first**：每条 surface 必须声明 `ownership`，区分 `generated-runtime`、`host-local`、`host-user-owned`、`managed-slice`。
 - **Anchored compiler**：默认对 repo-relative normalized path 做 anchored match；legacy 未锚定行为只能通过显式 `compatibilityDelta` 保留。
-- **Capability granularity（结构化，非魔法字符串）**：hooks 能力不是布尔值，也不是 `'confirmed-after-phase-0a'` 这类把状态+门禁+原因塞进一个字符串的写法（consumer 只能字符串匹配、易拼错、无统一词汇表）。每个 capability 用结构化字段：`{ status, gate?, reason? }`，其中 `status ∈ { 'confirmed' | 'planned' | 'degraded' | 'not-supported' }`；`gate` 记录解锁该 capability 的前置（如 `'phase-0a'`）；`reason` 用于 `not-supported` 区分 `'platform'`（平台不支持）与 `'spec-first-scope'`（平台支持但本轮不做）。
-- **Pointer format declaration**：`pointerPath.format` 只声明 host-native pointer 文件格式，不驱动 skill/agent transform。字段必须来自官方文档或本地 smoke，至少包含 `markdown`、frontmatter/loading mode 和 source evidence；adapter snapshot test 必须覆盖实际输出。
+- **Capability granularity（结构化，非魔法字符串）**：hooks 能力不是布尔值，也不是 `'confirmed-after-phase-0a'` 这类把状态+门禁+原因塞进一个字符串的写法（consumer 只能字符串匹配、易拼错、无统一词汇表）。shipped `platform-registry.js` 只保留运行时消费者字段：`{ status, reasonCode? }`，其中 `status ∈ { 'confirmed' | 'degraded' | 'not-supported' }`。`reasonCode` 只能使用稳定、可测试、被 consumer 读取的协议/平台原因（如 `protocol-unconfirmed`、`platform-unsupported`），不得写入 `phase-0a`、owner 决策、路线图排期或文档溯源；这些信息放在 phase plan、validation artifact 或 test fixture。
+- **Pointer format declaration**：`pointerPath.format` 只声明 host-native pointer 文件格式，不驱动 skill/agent transform。shipped registry 字段限于 `markdown`、frontmatter/loading mode 等实现需要读取的格式事实；官方文档链接、本地 smoke 证据和日期放在 adapter snapshot test fixture 或相邻 validation docs，不进入持久 runtime source。
 - **Host-specific escape hatch**：Codex cross-root、Qoder managed slice、Claude settings merge 等特殊性保留在结构化字段里，不塞进通用 adapter 抽象。
 
 **新增编程工具接入合同**：
-1. 新增工具必须先声明 `runtimeRoot`、`surfaces`、`capabilities`，每个 surface 必须带 `ownership`（必要时带 `rewriteScope` / `rewriteExclude`）。若有 host-native pointer，还必须声明 `pointerPath.format` 和官方/本地验证证据。rewrite 排除集从 surfaces 派生，不单独声明。
+1. 新增工具必须先声明 `runtimeRoot`、`surfaces`、`capabilities`，每个 surface 必须带 `ownership`（必要时带 `rewriteScope` / `rewriteExclude`）。若有 host-native pointer，还必须声明 `pointerPath.format`；官方/本地验证证据放入 snapshot test fixture 或 validation docs。rewrite 排除集从 surfaces 派生，不单独声明。
 2. pointer-only 工具只能实现 pointer lifecycle + skill/agent text transform；不得新增 hooks/doctor/clean 行为的隐式假设。
 3. hooks-capable 工具必须先走 protocol spike，确认 settings schema、command execution form、event payload、blocking output 和 cross-surface loader safety 后，才能把 hook capability 标为 confirmed。
 4. 任何 host-user-owned 文件只能通过 `managed-slice` 声明；clean/doctor/drift 不得把整文件或整目录当 spec-first-owned generated runtime。
@@ -370,8 +370,8 @@ const PLATFORM_REGISTRY = {
       hooks: {
         shellCommand: { status: 'confirmed' },
         sessionStart: { status: 'confirmed' },
-        preToolUse: { status: 'not-supported', reason: 'spec-first-scope' },
-        stopBlocking: { status: 'not-supported', reason: 'spec-first-scope' },
+        preToolUse: { status: 'not-supported', reasonCode: 'spec-first-scope' },
+        stopBlocking: { status: 'not-supported', reasonCode: 'spec-first-scope' },
       },
     },
   },
@@ -388,12 +388,11 @@ const PLATFORM_REGISTRY = {
         format: {
           markdown: 'mdc',
           frontmatter: { alwaysApply: true },
-          evidence: 'cursor-docs-rules-project-rules',
         },
       },
       mcpConfig: { kind: 'file', path: '.cursor/mcp.json', ownership: 'host-local', rewriteExclude: true },
     },
-    capabilities: { hooks: { shellCommand: { status: 'not-supported', reason: 'platform' } } },
+    capabilities: { hooks: { shellCommand: { status: 'not-supported', reasonCode: 'platform-unsupported' } } },
   },
   kiro: {
     runtimeRoot: '.kiro',
@@ -409,12 +408,11 @@ const PLATFORM_REGISTRY = {
           markdown: 'md',
           frontmatter: null,
           loading: 'steering-default-always-included',
-          evidence: 'kiro-docs-steering',
         },
       },
       settingsDir: { kind: 'dir', path: '.kiro/settings/', ownership: 'host-local', rewriteExclude: true },
     },
-    capabilities: { hooks: { shellCommand: { status: 'not-supported', reason: 'platform' } } },
+    capabilities: { hooks: { shellCommand: { status: 'not-supported', reasonCode: 'platform-unsupported' } } },
   },
   qoder: {
     runtimeRoot: '.qoder',
@@ -430,7 +428,6 @@ const PLATFORM_REGISTRY = {
         format: {
           markdown: 'md',
           frontmatter: { trigger: 'always_on' },
-          evidence: 'qoder-cli-memory-rule-activation-modes',
         },
       },
       settingsFile: {
@@ -445,10 +442,10 @@ const PLATFORM_REGISTRY = {
     },
     capabilities: {
       hooks: {
-        shellCommand: { status: 'planned', gate: 'phase-0a' },
-        sessionStart: { status: 'degraded', gate: 'shared-loader-safety', reason: 'IDE/JB loader safety unconfirmed' },
-        preToolUse: { status: 'planned', gate: 'phase-0a' },
-        stopBlocking: { status: 'planned', gate: 'phase-0a' },
+        shellCommand: { status: 'degraded', reasonCode: 'protocol-unconfirmed' },
+        sessionStart: { status: 'degraded', reasonCode: 'shared-loader-safety-unconfirmed' },
+        preToolUse: { status: 'degraded', reasonCode: 'protocol-unconfirmed' },
+        stopBlocking: { status: 'degraded', reasonCode: 'protocol-unconfirmed' },
       },
     },
   },
@@ -601,7 +598,7 @@ newTool: {
     skillsRoot: { kind: 'dir', path: '.new-tool/skills/', ownership: 'generated-runtime' },
     agentsRoot: { kind: 'dir', path: '.new-tool/agents/', ownership: 'generated-runtime' },
   },
-  capabilities: { hooks: { shellCommand: { status: 'not-supported', reason: 'platform' } } },
+  capabilities: { hooks: { shellCommand: { status: 'not-supported', reasonCode: 'platform-unsupported' } } },
 }
 ```
 
@@ -866,7 +863,7 @@ flowchart TD
 
 ### 5.2 各 Phase 详细计划
 
-#### Phase 0: Qoder Hooks 补齐（3-5 天）
+#### Phase 0: Qoder Hooks 补齐（0a 0.5-1 天；0b 3-5 天）
 
 Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runtime：
 
@@ -874,6 +871,20 @@ Phase 0 拆成两个交付片段，避免在协议未确认前固化错误 runti
 |------|------|------|
 | Phase 0a: Qoder protocol spike | 验证 Qoder CLI `SessionStart/PreToolUse/Stop` 事件、matcher、stdin/stdout、`QODER_PROJECT_DIR`、`stop_hook_active`、shared `.qoder/settings.json` 对 IDE/JB loader safety、**Windows 上 command 形态的 shell/PATH/cwd 与 managed hook path 解析** | 产出 `docs/validation/qoder-hooks-protocol-matrix.md`（或等价 dated artifact）：记录 Qoder CLI/IDE/JB 版本、命令、输入 payload、stdout/stderr/exit code、触发结果、degraded reason；决定每个 event group 是否可写 settings entry |
 | Phase 0b: Runtime lifecycle | 只基于 0a confirmed/degraded matrix 实现 settings upsert/removal/inspect、hook scripts、adapter plan/clean/doctor/drift、focused tests | init/doctor/clean/drift 闭环通过；每个 confirmed hook 有真实 Qoder CLI 触发证据；degraded 项显式报告且不触发 hard drift |
+
+**Phase 0a matrix artifact contract**：`docs/validation/qoder-hooks-protocol-matrix.md` 不是自由格式笔记，而是 Phase 0b 的输入 artifact。文件必须带最小 metadata，并逐 event group 标注 authority，避免把 advisory smoke 结果当 confirmed runtime contract。
+
+```yaml
+schema_version: qoder-hooks-protocol-matrix/v1
+producer: spec-first Phase 0a Qoder protocol spike
+freshness: "<absolute timestamp + Qoder CLI/IDE/JB versions>"
+artifact_type: validation-matrix
+authority_level: mixed-by-row
+reason_code: qoder_hooks_protocol_matrix
+consumer: Phase 0b Qoder Runtime Lifecycle
+```
+
+每个 matrix row 至少包含：`eventGroup`、`surface`(`cli|ide|jb`)、`version`、`settingsShape`、`commandShape`、`matcher`、`triggerCommand`、`stdinSampleRedacted`、`stdoutShape`、`stderrShape`、`exitCode`、`observedResult`、`authorityLevel`(`confirmed|advisory|degraded|blocked`)、`reasonCode`、`limitations`、`sourceRefsOrLogPath`。Phase 0b 只能把 `authorityLevel: confirmed` 的 row 转成 settings managed entry；`degraded|blocked` row 只能转成 doctor/degraded reason，不能支撑 success 口径。
 
 | 步骤 | 内容 | 验收标准 |
 |------|------|---------|
@@ -1111,13 +1122,13 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder point
 
 ### 优化优先级排序（按战略重要性）
 
-> 注：本表按**战略重要性**排序，不是纯收益/成本比。Qoder Hooks 成本最高（3-5 天）且需协议 spike（可能只能降级交付），在纯收益/成本比维度上**低于** Platform Registry（1-2 天、确定）；它排首位是因为同时解决 spec-first 自身的 dogfooding 缺口与当前最大用户可见功能缺口这一战略权重。
+> 注：本表按**战略重要性**排序，不是纯收益/成本比。Qoder Hooks 总成本最高（0a 约 0.5-1 天，0b 约 3-5 天）且需协议 spike（可能只能降级交付），在纯收益/成本比维度上**低于** Platform Registry（1-2 天、确定）；它排首位是因为同时解决 spec-first 自身的 dogfooding 缺口与当前最大用户可见功能缺口这一战略权重。
 
 | 优先级 | Phase | 收益 | 成本 | 当前状态 |
 |--------|-------|------|------|------|
 | 1 | Qoder Hooks Phase 0a + Qoder pointer frontmatter | 补齐协议证据与已知 Qoder rules pointer 格式缺口；先用 0a 防止固化错误 hook contract | 0.5-1 天 + 后续 0b 3-5 天 | 当前可启动；0b 依赖 0a matrix |
 | 2 | Platform Registry | 消除 adapter exclusion/drift O(n²)，新宿主无需修改既有 adapter exclusion 常量 | 1-2 天 | blocked-until-trigger：第 6 宿主/POC 或新增宿主 spike 证明收益 |
-| 3 | init.js 拆分 | 可维护性瓶颈解除 | 2-3 天 | evidence-triggered：需具体维护痛点/回归 |
+| 3 | init.js 拆分 | 收敛疑似维护风险；需用具体痛点证明收益 | 2-3 天 | evidence-triggered：需具体维护痛点/回归 |
 | 4 | PointerBasedAdapter | 收敛 pointer lifecycle 重复；LOC 下降为趋势指标，诊断等价优先 | 1-2 天 | 依赖 Phase 1；Qoder 部分另依赖 Phase 0 |
 | 5 | Plugin 分层 | 降低 contributor 理解成本 | 1 天 | evidence-triggered |
 | 6 | 平台兼容性 | 企业场景覆盖 | 1-2 天 | issue/POC-triggered |
@@ -1149,5 +1160,3 @@ Phase 1/2/3 的核心验收基于输出不变；Phase 0 允许新增 Qoder point
 2. **[P1] 机会成本：内部治理 vs 价值识别**(§1.1 / §5.1)：文档仍承认采纳/价值识别是另一个断裂因果链下游缺口。**待决**：是否另立 owner/时间线处理价值演示、发现性或决策者可见证据；本方案不把该目标并入当前 Phase 0。
 3. **[P2] anchored matcher 是否作为 Phase 1 默认实现**(§4.3)：anchored matcher + 两步 consumer 能收窄 legacy 误判，但也会扩大 Phase 1 范围。**待决**：第 6 宿主触发 Phase 1 时，是否先走保留 legacy 子串语义的 compiler（最小变更），把 anchored + two-step consumer 作为独立 follow-up；若继续采用 anchored，必须接受 delta 表和 drift consumer contract 变更。
 4. **[P2] Phase 0a 测试环境可用性**(§5.2)：真实 Qoder CLI 会话触发证据是 Phase 0 success 的必要条件。**待决**：Phase 0a 开始时先确认本机或 CI 是否具备可运行 Qoder CLI hook 的测试环境；若不存在，Phase 0b 标记 blocked/degraded，不能对不可测验收门继续实现。
-5. **[P2] init.js 瓶颈前提的认知状态不一致**(§1.1#3 / §2.3 vs §5.1)：§1.1 驱动信号#3 与 §2.3 P0 把 init.js「已成维护瓶颈」当 confirmed 事实陈述，而 §5.1 do-minimal 把「文件大即瓶颈」视为需证据触发的一般假设。**待决**：统一该前提的认知状态——建议把 §1.1#3/§2.3 措辞下调为「疑似维护瓶颈（尚无 confirmed 回归/痛点证据）」以与 do-minimal 触发条件一致（与 #2 do-minimal 权威性一并处理）。
-6. **[P2] Platform Registry 内嵌无消费者的排期/溯源注解**(§4.2 / §4.3)：shipped runtime source（platform-registry.js）唯一消费者 `deriveUnrewrittenPatterns` 只读 `surfaces`，但 schema 仍要求 `capabilities.gate:'phase-0a'`、`reason`、`format.evidence` 等无代码消费者字段——把项目排期词汇（会随 0a 落地变 stale）耦合进持久数据结构。**待决**：是否从 shipped registry 移除排期/溯源字符串（移到 test fixture 或相邻 docs），只保留有代码消费者的字段（status、format.markdown、frontmatter），phase gating 记录在 phase plan 而非 runtime source。
