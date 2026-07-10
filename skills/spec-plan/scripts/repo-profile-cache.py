@@ -174,6 +174,53 @@ def is_profile_input(path: str) -> bool:
     return False
 
 
+# Named C escapes git emits for control bytes in quoted paths (quote.c).
+_C_ESCAPES = {
+    "a": 0x07, "b": 0x08, "t": 0x09, "n": 0x0A, "v": 0x0B,
+    "f": 0x0C, "r": 0x0D, '"': 0x22, "\\": 0x5C,
+}
+
+
+def git_unquote(token: str) -> str:
+    """Decode git's C-style path quoting (core.quotepath, on by default).
+
+    When a path has special bytes, git wraps it in double quotes and escapes
+    them: named escapes (\\t, \\n, \\", \\\\, ...) and \\NNN octal for each
+    control/non-ASCII byte (which together form UTF-8 sequences). Stripping
+    the quotes alone leaves the \\NNN text in the path, so a quoted profile
+    input (e.g. a manifest under a non-ASCII directory) would fail
+    is_profile_input's basename/prefix match and NOT invalidate the cache —
+    an under-invalidation, the one cardinal-rule break this input set must
+    never allow. Rebuild the raw bytes and decode UTF-8 so the real path is
+    matched. Unquoted tokens are returned unchanged.
+    """
+    if not (len(token) >= 2 and token[0] == '"' and token[-1] == '"'):
+        return token
+    body = token[1:-1]
+    out = bytearray()
+    i, n = 0, len(body)
+    while i < n:
+        ch = body[i]
+        if ch == "\\" and i + 1 < n:
+            nxt = body[i + 1]
+            if nxt in _C_ESCAPES:
+                out.append(_C_ESCAPES[nxt])
+                i += 2
+                continue
+            if "0" <= nxt <= "7":
+                j = i + 1
+                digits = ""
+                while j < n and len(digits) < 3 and "0" <= body[j] <= "7":
+                    digits += body[j]
+                    j += 1
+                out.append(int(digits, 8) & 0xFF)
+                i = j
+                continue
+        out.extend(ch.encode("utf-8"))
+        i += 1
+    return out.decode("utf-8", errors="replace")
+
+
 def git(*args: str) -> "str | None":
     """Run a git command; return stripped stdout, or None on any failure."""
     try:
@@ -221,11 +268,9 @@ def changed_paths() -> "list[str] | None":
     if result.returncode != 0:
         return None
     def clean(token: str) -> str:
-        token = token.strip()
-        # git quotes paths containing special characters.
-        if len(token) >= 2 and token[0] == '"' and token[-1] == '"':
-            token = token[1:-1]
-        return token
+        # git quotes paths with special bytes; decode the C-escapes back to the
+        # real path so a quoted profile input still matches is_profile_input.
+        return git_unquote(token.strip())
 
     paths: list[str] = []
     for line in result.stdout.split("\n"):

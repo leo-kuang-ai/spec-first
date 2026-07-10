@@ -156,7 +156,7 @@ Generated runtime assets 包括：
 根据任务大小调整审查和验证强度：
 
 - 小任务：文案修正、注释、单文件局部修复、docs-only 变更。默认直接执行，保持审查范围窄，不引入新架构，并保留 CHANGELOG、最窄验证和 source/runtime 边界纪律。
-- 中型任务：skill/agent/CLI 行为调整、文档结构调整、小幅 schema 扩展、runtime generation 调整、测试补充。检查 source/runtime 边界、双宿主影响、CHANGELOG/docs 需求、workflow 影响和测试覆盖。
+- 中型任务：skill/agent/CLI 行为调整、文档结构调整、小幅 schema 扩展、runtime generation 调整、测试补充。检查 source/runtime 边界、多宿主影响（当前 Claude、Codex、Cursor、Kiro、Qoder，以 `getSupportedPlatforms()` 为准）、CHANGELOG/docs 需求、workflow 影响和测试覆盖。
 - 大型任务：新增 skill 或 agent 体系、CLI 重构、provider/readiness 协议变更、source-of-truth 变更、runtime generation 变更、核心 workflow 变更、删除/迁移。必须明确 goals/non-goals、artifact contracts、failure modes、migration strategy、test plan、downstream consumer checks，并审查是否过度设计。
 
 遵循 80/20 原则：用最小 durable mechanism 解决高频、高价值、真实研发问题。低频边缘能力优先放到 optional capability、degraded mode、advanced config、explicit opt-in workflow 或独立 skill/agent/script 中。
@@ -189,7 +189,7 @@ Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启
 - tests
 - generated runtime expectations
 
-任何项目 source 变更都必须按仓库格式和当前 host developer profile 更新 `CHANGELOG.md`。用户可见行为变化还应更新 README 或 docs。Schema/contract 变化需要版本说明和 downstream consumer tests。Runtime generation 变化需要同时考虑 Claude 与 Codex 宿主。
+任何项目 source 变更都必须按仓库格式和当前 host developer profile 更新 `CHANGELOG.md`。用户可见行为变化还应更新 README 或 docs。Schema/contract 变化需要版本说明和 downstream consumer tests。Runtime generation 变化需要同时考虑所有受支持宿主（当前 Claude、Codex、Cursor、Kiro、Qoder，以 `getSupportedPlatforms()` 为准）。
 
 ## 输出标准
 

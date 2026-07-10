@@ -22,7 +22,7 @@ Probe environment variables in this order and stop at the first positive match. 
 
 ## Codex and other platforms
 
-Codex (Claude Agent SDK, Antigravity CLI (`agy`), etc.) do not yet expose an embedded-browser handoff. For these platforms, polish falls through to the terminal branch (print the URL). When a convention emerges, add a new row to the detection table above.
+Codex (Claude Agent SDK, etc.) do not yet expose an embedded-browser handoff. For these platforms, polish falls through to the terminal branch (print the URL). When a convention emerges, add a new row to the detection table above.
 
 ## Detection failure is never fatal
 
