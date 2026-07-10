@@ -115,7 +115,7 @@ Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture:
 - `work_delegate_*`, exposed for downstream execution workflows that support delegated work;
 - `plan_skip_scoping_confirm`, exposed for downstream planning workflows that support persisted scoping-confirmation preference.
 
-Document rendering keys (`plan_output`, `brainstorm_output`, `ideate_output`) are reserved future hints unless an implemented consumer and focused tests exist. Setup only exposes local config keys and keeps them protected; it must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
+Document rendering keys `plan_output` and `brainstorm_output` are reserved future hints until implemented consumers and focused tests exist. `ideate_output` is active: `spec-ideate` reads an uncommented `md` or `html` value, while setup only exposes and protects the key and never invokes the workflow. Setup must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
 
 If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a project guidance index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
 

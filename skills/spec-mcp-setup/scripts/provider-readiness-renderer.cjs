@@ -208,9 +208,9 @@ function envFlag(name) {
   return ['1', 'true', 'yes', 'ready'].includes(String(process.env[name] || '').toLowerCase());
 }
 
-function currentProviderHost() {
-  const value = String(process.env.SPEC_FIRST_PROVIDER_HOST || '').toLowerCase();
-  if (value === 'claude' || value === 'codex' || value === 'kiro' || value === 'qoder') return value;
+function currentProviderHost(env = process.env) {
+  const value = String(env.SPEC_FIRST_PROVIDER_HOST || '').toLowerCase();
+  if (value === 'claude' || value === 'codex' || value === 'cursor' || value === 'kiro' || value === 'qoder') return value;
   return 'codex';
 }
 
@@ -276,6 +276,11 @@ function projectSkillCandidates(repoDir, providerId, host = currentProviderHost(
   if (host === 'qoder') {
     return [
       path.join(repoDir, '.qoder', 'skills', providerId, 'SKILL.md'),
+    ];
+  }
+  if (host === 'cursor') {
+    return [
+      path.join(repoDir, '.cursor', 'skills', providerId, 'SKILL.md'),
     ];
   }
   return [
@@ -699,4 +704,11 @@ function main() {
   process.stdout.write(`${JSON.stringify(uniqueByProvider(entries), null, 2)}\n`);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  currentProviderHost,
+  projectSkillCandidates,
+};

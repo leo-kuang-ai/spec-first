@@ -1415,7 +1415,7 @@ function Install-GraphifyCli {
 
 function Get-GraphifyProjectPlatform {
   $hostValue = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_HOST')
-  if (@('claude', 'codex', 'kiro', 'qoder') -contains $hostValue) { return $hostValue }
+  if (@('claude', 'codex', 'cursor', 'kiro', 'qoder') -contains $hostValue) { return $hostValue }
   return 'codex'
 }
 

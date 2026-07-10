@@ -77,6 +77,7 @@ function runUnit() {
 function runMcpSetup() {
   runJestFiles([
     'tests/unit/mcp-setup-contracts.test.js',
+    'tests/unit/mcp-setup-config-consumers.test.js',
     'tests/unit/mcp-setup-powershell-contracts.test.js',
   ], ['--runInBand']);
 }

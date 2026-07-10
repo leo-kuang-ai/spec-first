@@ -1218,7 +1218,7 @@ graphify_cli_version_matches_pin() {
 
 graphify_project_platform() {
   case "${SPEC_FIRST_PROVIDER_HOST:-}" in
-    claude|codex|kiro|qoder) printf '%s' "$SPEC_FIRST_PROVIDER_HOST" ;;
+    claude|codex|cursor|kiro|qoder) printf '%s' "$SPEC_FIRST_PROVIDER_HOST" ;;
     *) printf 'codex' ;;
   esac
 }
