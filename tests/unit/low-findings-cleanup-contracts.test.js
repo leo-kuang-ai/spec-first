@@ -43,4 +43,13 @@ describe('low-severity skill cleanup contracts', () => {
     expect(gitignore).toMatch(/^__pycache__\/$/m);
     expect(gitignore).toMatch(/^\*\.pyc$/m);
   });
+
+  test('compound refresh points YAML safety guidance at root AGENTS.md', () => {
+    const compound = read('skills/spec-compound/references/yaml-schema.md');
+    const refresh = read('skills/spec-compound-refresh/references/yaml-schema.md');
+
+    expect(refresh).toContain('see root\n`AGENTS.md` under "YAML Frontmatter"');
+    expect(refresh).not.toContain('see plugin\n`AGENTS.md`');
+    expect(refresh).toBe(compound);
+  });
 });
