@@ -119,11 +119,12 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 8. [研发场景与降级路径](./20-研发场景与降级路径.md)
 9. [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 10. [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
-11. [常见问题](./04-常见问题.md)
-12. [最佳实践](./05-最佳实践.md)
-13. [三种开发模式](./08-三种开发模式.md)
-14. [本地源码安装](./06-本地源码安装.md)
-15. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
+11. [spec-prd 当前执行逻辑与流程图](./23-spec-prd当前执行逻辑.md)
+12. [常见问题](./04-常见问题.md)
+13. [最佳实践](./05-最佳实践.md)
+14. [三种开发模式](./08-三种开发模式.md)
+15. [本地源码安装](./06-本地源码安装.md)
+16. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
 
 ## 建议阅读路径
 
@@ -133,6 +134,7 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 - 如果你要判断单仓、多模块或多仓 workspace 怎么使用，先看 [三种开发模式](./08-三种开发模式.md)
 - 如果你要判断 OpenSpec 和 spec-first 在不同项目阶段怎么取舍，先看 [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 - 如果产品或 owner 已经给出 PRD、需求材料、会议纪要、设计说明或系统增量说明，你要在进入研发 planning 前澄清 WHAT/WHY、owner 决策和计划准入条件，先看 [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
+- 如果你要快速理解当前 `spec-prd` 从输入、模板选择、grill、Decision Card 到 checker/finalize 和 handoff 的实际执行逻辑，看 [spec-prd 当前执行逻辑与流程图](./23-spec-prd当前执行逻辑.md)
 - 如果你要确认真实执行过程，看 [完整示例](./03-完整示例.md)
 - 如果你要判断某个文档或 runtime 目录该不该手改、该不该提交，先看 [产物目录](./10-产物目录.md)
 - 如果你要判断当前仓库属于哪类研发场景、dirty / multi-repo / non-git build target 该如何降级，先看 [研发场景与降级路径](./20-研发场景与降级路径.md)

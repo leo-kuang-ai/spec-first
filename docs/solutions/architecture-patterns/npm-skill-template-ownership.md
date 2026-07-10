@@ -70,7 +70,7 @@ spec-first 源码仓库中的 `docs/` 主要服务产品维护、设计说明、
 
 ### 4. 迁移模板必须同时重构真相源
 
-把模板文件复制进 skill 但继续保留另一份 embedded skeleton，会制造双真相源。当前 `prd-output-template.md` 明确声明自己拥有 output shape、section skeleton 和 packaged runtime template；因此新增独立模板资产层不是普通文件搬迁，而是一次 contract ownership 重构：
+把模板文件复制进 skill 但继续保留另一份 embedded skeleton，会制造双真相源。迁移前的 `prd-output-template.md` 同时承载 machine contract、正文骨架和 routing；当前 ownership 已收敛为 `SKILL.md` 独占 Template Trigger Map、template assets 独占 human-facing 正文、`prd-output-template.md` 只保留 machine-safe contract 与组合顺序。因此新增独立模板资产层不是普通文件搬迁，而是一次 contract ownership 重构：
 
 1. 决定 reference 层只拥有机器安全合同和组合规则，还是继续拥有完整正文骨架；
 2. 如果正文模板迁入独立模板资产层，同步删除 reference 中重复的 embedded skeleton；

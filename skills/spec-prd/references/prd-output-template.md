@@ -2,7 +2,7 @@
 
 Load this reference before drafting or materially rewriting a PRD artifact.
 
-This file owns the machine-safe output contract, section identity, composition rules, and template routing semantics. Human-facing body templates live under `../assets/templates/`; optional built-in industry overlays live under `../assets/overlays/`. Do not duplicate their body content here.
+This file owns the machine-safe output contract, section identity, and composition order. `SKILL.md` `Template Trigger Map` is the single source of truth for template and overlay selection. Human-facing body templates live under `../assets/templates/`; optional built-in industry overlays live under `../assets/overlays/`. Do not duplicate their body content or routing map here.
 
 ## Contents
 
@@ -12,7 +12,7 @@ This file owns the machine-safe output contract, section identity, composition r
 - [Clarification Checklist Display Protocol](#clarification-checklist-display-protocol)
 - [Engineering Clarification Coverage Pack](#engineering-clarification-coverage-pack)
 - [Conditional Sections](#conditional-sections)
-- [Surface Lenses](#surface-lenses)
+- [Surface Lens Semantics](#surface-lens-semantics)
 - [Product Expert Lens Write-In](#product-expert-lens-write-in)
 - [Template Composition And Machine Sections](#template-composition-and-machine-sections)
 - [PRD Quality Diagnosis And Optimization](#prd-quality-diagnosis-and-optimization)
@@ -74,17 +74,7 @@ Keep every core section machine-locatable with either the canonical heading (`##
 
 Show the selected `clarification_view` and its checklist before or during authoring when it helps the owner see what is being clarified. The checklist is a human-facing display surface: it names likely questions, surfaces omissions, and routes unresolved items into existing PRD sections. It is not a script-owned quality score, not a required heading set, and not a `BLOCKING_REASON_CODES` source.
 
-Use these views to select the packaged template asset; do not load every surface template:
-
-| clarification_view | Packaged asset | Use when | Display focus |
-| --- | --- | --- | --- |
-| `Generic` | `../assets/templates/00-generic.md` | Every PRD artifact | target user, change delta, requirements, acceptance, scope, evidence, OQ closure |
-| `App` | `../assets/templates/10-app.md` | Native/mobile client behavior changes | entry, navigation, state, copy, loading/empty/error, permissions, rollout, accessibility, i18n |
-| `H5/PC` | `../assets/templates/40-h5-pc.md` | Web or desktop-browser surface changes | routes, forms, browser back/refresh, responsive viewports, login/session state, sharing/SEO when relevant |
-| `Admin` | `../assets/templates/20-admin.md` | Internal operations, review, or management surfaces | menu placement, roles, list/search/filter/export, forms, audit, bulk action, maker-checker when relevant |
-| `Backend/Java` | `../assets/templates/30-backend.md` | Service/platform behavior visible to products or downstream consumers | state semantics, idempotency, compatibility, error outcomes, observability expectations, operational readiness |
-| `CLI/DevTool` | `../assets/templates/50-cli-devtool.md` | Developer or agent-facing command/workflow changes | command entry, args/config, preview-first, logs, cross-platform behavior, failure recovery, upgrade/runtime projection |
-| `Mixed` | `../assets/templates/60-mixed.md` | Real cross-surface or producer/consumer changes | source-of-truth, cross-surface consistency, contract expectations, async sync, degradation, end-to-end acceptance |
+Resolve the selected view and packaged asset only through `SKILL.md` `Template Trigger Map`; do not recreate the view-to-asset mapping here and do not load every surface template. The selected asset owns its display focus and detailed questions.
 
 ## Engineering Clarification Coverage Pack
 
@@ -168,11 +158,9 @@ Use `## Planning Recheck` only when it prevents advisory evidence from being con
 
 `Planning Recheck` must not be used as a parking lot for PRD-owned owner questions. A PRD-owned owner question must not be marked non-blocking Planning Recheck when it can change user behavior, scope, acceptance, data authority, interface availability, fallback display, analytics acceptance, or source-of-truth. Only HOW/integration/source-refresh checks that do not require planning to invent WHAT may be non-blocking.
 
-## Surface Lenses
+## Surface Lens Semantics
 
-Load `../assets/templates/00-generic.md`, then select one primary surface asset. Add a secondary surface asset only for real mixed-surface changes. Use `../assets/templates/70-large-requirement-index.md` only after the current conversation user confirms split boundaries.
-
-The selected asset owns the detailed surface questions. This contract only owns selection, composition, machine safety, and the rule that irrelevant templates stay unloaded.
+Follow the canonical selection in `SKILL.md` `Template Trigger Map`. The selected asset owns the detailed surface questions; this contract owns only composition order, machine safety, and the rule that irrelevant templates stay unloaded.
 
 These are surface lenses, not role taxonomies. They ask PRD questions; they do not prescribe implementation units.
 
@@ -189,14 +177,9 @@ When a project has local templates, standards, glossary, compliance docs, or ind
 
 Missing local overlay docs are a graceful absence, not an error and not permission to invent industry rules. Do not treat template industry facts as confirmed project rules; local templates raise questions until source or owner confirmation resolves them.
 
-## Industry Overlay Triggers
+## Industry Overlay Semantics
 
-When the increment's industry context is clear from input, project source, or the current conversation user, layer an industry overlay on top of the surface template. The overlay only raises questions and triggers conditional sections; it never asserts an industry rule as confirmed truth.
-
-| Industry context | Overlay source | Behavior |
-| --- | --- | --- |
-| Securities / trading | `../assets/overlays/securities.md` | Load only on a securities/trading signal; treat every rule as advisory until project source or current-user confirmation |
-| Other industries | consumer-project local overlay | Read only the relevant local source; missing local docs is a graceful absence, never permission to invent rules |
+When the canonical `SKILL.md` trigger map selects an industry overlay, layer it on top of the surface template. The overlay only raises questions and triggers conditional sections; it never asserts an industry rule as confirmed truth. Consumer-project local overlays remain project-owned and are read only when relevant.
 
 If no industry context is detectable, do not load any industry overlay.
 
@@ -221,9 +204,9 @@ For structured or already-decided inputs, synthesize settled WHAT into standard 
 Compose the durable PRD in this order:
 
 1. Apply the Default Frontmatter and output-shape rules from this contract.
-2. Load `../assets/templates/00-generic.md` for the human-facing core body.
-3. Load one primary surface asset from the Template Trigger Map; add secondary assets only for real mixed-surface changes.
-4. Load `../assets/overlays/securities.md` only when a securities/trading signal exists, then layer any consumer-project local overlay.
+2. Use `SKILL.md` `Template Trigger Map` to load the baseline human-facing body and one primary surface asset.
+3. Add secondary surface assets only for real mixed-surface changes.
+4. Add only the built-in and consumer-project overlays selected by the canonical trigger map and current project context.
 5. Append the machine-safe sections below. Human-facing templates must not prefill `status: ready-for-planning`, `readiness_verified_*`, or a ready receipt.
 
 ```markdown

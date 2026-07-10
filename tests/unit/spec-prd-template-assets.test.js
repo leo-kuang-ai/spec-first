@@ -24,6 +24,18 @@ const TEMPLATE_ASSETS = [
   'assets/overlays/securities.md',
 ];
 
+const TEMPLATE_REQUIRED_ANCHORS = {
+  'assets/templates/00-generic.md': ['## Requirements [core]', '## Acceptance Examples [core]'],
+  'assets/templates/10-app.md': ['## App 属性确认', '## 页面与组件状态'],
+  'assets/templates/20-admin.md': ['## Admin 属性确认', '## 权限矩阵'],
+  'assets/templates/30-backend.md': ['## Backend 属性确认', '## 状态语义'],
+  'assets/templates/40-h5-pc.md': ['## Web 属性确认', '## 页面状态'],
+  'assets/templates/50-cli-devtool.md': ['## Tool 属性确认', '## Preview / Mutation Boundary'],
+  'assets/templates/60-mixed.md': ['## Mixed 属性确认', '## Source-Of-Truth Resolution'],
+  'assets/templates/70-large-requirement-index.md': ['## 子 PRD 清单', '## 整体验收'],
+  'assets/overlays/securities.md': ['## 一、行业横切关注点必查清单', '## 七、监管与标准参考（写 PRD 时只作线索）'],
+};
+
 const RETIRED_DOC_TEMPLATES = [
   '00-通用增量需求模板.md',
   '10-App客户端需求模板.md',
@@ -43,7 +55,14 @@ function read(filePath) {
 describe('spec-prd product-bundled template assets', () => {
   test('keeps one packaged template source and retires normative docs mirrors', () => {
     for (const relativePath of TEMPLATE_ASSETS) {
-      expect(fs.existsSync(path.join('skills/spec-prd', relativePath))).toBe(true);
+      const assetPath = path.join('skills/spec-prd', relativePath);
+      expect(fs.existsSync(assetPath)).toBe(true);
+
+      const content = read(assetPath);
+      for (const anchor of TEMPLATE_REQUIRED_ANCHORS[relativePath]) {
+        expect(content).toContain(anchor);
+      }
+      expect(content).not.toMatch(/^\s*(?:[-*]\s*)?(?:status:\s*ready-for-planning|readiness_verified_[^:]+:|readiness_(?:prd|inputs)_hash:)/m);
     }
 
     for (const filename of RETIRED_DOC_TEMPLATES) {
@@ -62,6 +81,7 @@ describe('spec-prd product-bundled template assets', () => {
 
   test('routes templates lazily from the skill entry contract', () => {
     const skill = read('skills/spec-prd/SKILL.md');
+    const outputContract = read('skills/spec-prd/references/prd-output-template.md');
 
     expect(skill).toContain('## Template Trigger Map');
     for (const relativePath of TEMPLATE_ASSETS) {
@@ -70,6 +90,12 @@ describe('spec-prd product-bundled template assets', () => {
     expect(skill).toContain('每个会产出 PRD artifact 的 run 都读取 `assets/templates/00-generic.md`');
     expect(skill).toContain('无行业信号时不得加载');
     expect(skill).toContain('所有人类问题都询问当前执行对话的用户');
+    expect(skill).not.toContain('template composition/routing');
+
+    expect(outputContract).toContain('`SKILL.md` `Template Trigger Map`');
+    expect(outputContract).not.toContain('| clarification_view | Packaged asset |');
+    expect(outputContract).not.toContain('| Industry context | Overlay source |');
+    expect(outputContract).not.toContain('template routing semantics');
   });
 
   test('projects every template asset into all supported host runtimes', () => {
@@ -132,6 +158,21 @@ describe('spec-prd product-bundled template assets', () => {
           ))).toBe(true);
         }
       }
+
+      const integrityPlatform = SUPPORTED_PLATFORMS.includes('codex') ? 'codex' : SUPPORTED_PLATFORMS[0];
+      const integrityAdapter = getAdapter(integrityPlatform);
+      const integrityRuntimeRoot = integrityAdapter.workflowsRoot || integrityAdapter.skillsRoot;
+      fs.rmSync(path.join(
+        projectRoot,
+        integrityRuntimeRoot,
+        'spec-prd',
+        'assets/templates/00-generic.md',
+      ));
+
+      const specPrdDrift = plugin.inspectInstalledAssets(projectRoot, integrityAdapter).skills.drifted
+        .find((entry) => entry.skillName === 'spec-prd');
+      expect(specPrdDrift).toBeDefined();
+      expect(specPrdDrift.issues).toContain('missing_file:assets/templates/00-generic.md');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }

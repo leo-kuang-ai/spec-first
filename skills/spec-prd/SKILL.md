@@ -122,7 +122,7 @@ Load references only when their trigger is present:
 - `references/product-expert-lens.md` - default authoring hot path: downstream-confirmation risk ranking, Product Expert Lens interface, structured-input synthesis, design-source/large-input pointers, and escalation boundary.
 - `references/design-source-evidence.md` - trigger-only for front-end/UI inputs with design links, screenshots, exported design context, or interaction-state material; design facts stay advisory until source/owner reconciliation.
 - `references/large-input-checkpoint.md` - trigger-only for oversized, multi-source, long-chain, or resume-risk PRDs; reduced candidates feed Product Expert Lens and PRD sections act as checkpoints.
-- `references/prd-output-template.md` - machine-safe output contract、section identity、Product Expert Lens write-in、PRD quality diagnosis、P0/P1 quality packs、template composition/routing 与 project-local overlay 边界；不再承载重复的 human-facing 正文骨架。
+- `references/prd-output-template.md` - machine-safe output contract、section identity、Product Expert Lens write-in、PRD quality diagnosis、P0/P1 quality packs、template composition order 与 project-local overlay 边界；不再承载 template routing map 或重复的 human-facing 正文骨架。
 - `references/prd-readiness-lens.md` - final PRD quality, Pre-PRD Clarification closure, triggered P0/P1 pack closure, readiness, handoff, or doc-review decision.
 - `references/evaluation-governance.md` - maturity posture, owner, review cadence, eval status, and promotion boundary; load for governance or lifecycle questions, not during normal PRD authoring.
 

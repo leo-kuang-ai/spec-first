@@ -764,11 +764,14 @@ function hasValidDeclaration(text, fieldPattern, values) {
 }
 
 function extractDeclarationValue(text, fieldPattern, values) {
+  return extractDeclarationValues(text, fieldPattern, values)[0] || null;
+}
+
+function extractDeclarationValues(text, fieldPattern, values) {
   const body = stripFencedCode(text);
   const valuePattern = values.map((value) => value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
-  const regex = new RegExp(`^\\s*(?:[-*]\\s*)?${fieldPattern}\\s*:\\s*(${valuePattern})\\s*$`, 'im');
-  const match = body.match(regex);
-  return match ? match[1].trim() : null;
+  const regex = new RegExp(`^\\s*(?:[-*]\\s*)?${fieldPattern}\\s*:\\s*(${valuePattern})\\s*$`, 'gim');
+  return [...body.matchAll(regex)].map((match) => match[1].trim());
 }
 
 function hasConcreteFieldBlock(text, fieldPattern) {
@@ -1060,9 +1063,10 @@ function parseStructure(target, text) {
   const planningRecheckPresent = sectionPresent(lines, headings, 'Planning Recheck');
   const outstandingQuestionCount = countSectionRows(lines, headings, 'Outstanding Questions');
   const planningRecheckCount = countSectionRows(lines, headings, 'Planning Recheck');
-  const writeModeValue = extractDeclarationValue(text, 'write_mode', [
+  const writeModeValues = extractDeclarationValues(text, 'write_mode', [
     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
   ]);
+  const writeModeValue = writeModeValues[0] || null;
   const writeModeDeclaredValid = Boolean(writeModeValue);
   const clarificationEvidenceValue = extractDeclarationValue(text, 'clarification_evidence', [
     'asked-owner', 'source-proven-no-ask', 'headless-degraded-logged', 'skipped',
@@ -1080,9 +1084,15 @@ function parseStructure(target, text) {
   // highest_risk_gap / next_action / why_no_invention。把 Phase 1 中间产物从"对话语义"
   // 外化为"artifact 可验证事实",防模型压缩 Phase 1 直接到 Write(R12 天花板内可推一步)。
   const decisionCardHighestRiskGap = hasConcreteFieldBlock(text, 'decision_card_highest_risk_gap');
-  const decisionCardNextAction = extractDeclarationValue(text, 'decision_card_next_action', [
+  const decisionCardNextActions = extractDeclarationValues(text, 'decision_card_next_action', [
     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out',
   ]);
+  const decisionCardNextAction = decisionCardNextActions[0] || null;
+  const decisionCardPathMismatch = new Set(writeModeValues).size > 1
+    || new Set(decisionCardNextActions).size > 1
+    || (writeModeDeclaredValid
+      && Boolean(decisionCardNextAction)
+      && writeModeValue !== decisionCardNextAction);
   const decisionCardWhyNoInvention = hasConcreteFieldBlock(text, 'decision_card_why_no_invention');
   const decisionCardPresent = decisionCardHighestRiskGap
     && Boolean(decisionCardNextAction)
@@ -1150,11 +1160,12 @@ function parseStructure(target, text) {
     missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
     evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
     outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
-    writeModeValue, writeModeDeclaredValid, clarificationEvidenceValue,
+    writeModeValue, writeModeValues, writeModeDeclaredValid, clarificationEvidenceValue,
     clarificationEvidenceDeclaredValid, clarificationEvidenceSubstantive,
     canEnterSpecPlanValue, canEnterSpecPlanDeclaredValid,
     preflightSweepClosureValue, preflightSweepClosureDeclaredValid,
-    decisionCardHighestRiskGap, decisionCardNextAction, decisionCardWhyNoInvention, decisionCardPresent,
+    decisionCardHighestRiskGap, decisionCardNextAction, decisionCardNextActions,
+    decisionCardWhyNoInvention, decisionCardPresent, decisionCardPathMismatch,
     designSourceRefsPresent, designSourceInventoryDeclared, designSourceCoverageDeclared,
     designSourcesReadPresent, designSourcesUnreadPresent,
     needsReadinessDeclarations, prdShaped, writeModeIsFinalPrd, writeModeIsCheckpoint,
@@ -1428,13 +1439,13 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
     && !structure.decisionCardPresent) {
     findings.push({ reason_code: 'decision_card_undeclared' });
   }
-  if (structure.writeModeDeclaredValid
-    && structure.decisionCardNextAction
-    && structure.writeModeValue !== structure.decisionCardNextAction) {
+  if (structure.decisionCardPathMismatch) {
     findings.push({
       reason_code: 'decision_card_path_mismatch',
       write_mode: structure.writeModeValue,
+      write_mode_values: [...new Set(structure.writeModeValues)],
       decision_card_next_action: structure.decisionCardNextAction,
+      decision_card_next_action_values: [...new Set(structure.decisionCardNextActions)],
     });
   }
   // design source findings

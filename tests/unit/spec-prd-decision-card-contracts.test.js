@@ -169,6 +169,37 @@ describe('spec-prd Decision Card deterministic consistency', () => {
     expect(reasonCodes(report)).not.toContain('decision_card_path_mismatch');
   });
 
+  test.each([
+    ['write_mode', 'write_mode: final-prd', 'write_mode: final-prd\nwrite_mode: checkpoint-prd'],
+    ['write_mode', 'write_mode: final-prd', 'write_mode: checkpoint-prd\nwrite_mode: final-prd'],
+    [
+      'decision_card_next_action',
+      'decision_card_next_action: final-prd',
+      'decision_card_next_action: final-prd\ndecision_card_next_action: checkpoint-prd',
+    ],
+    [
+      'decision_card_next_action',
+      'decision_card_next_action: final-prd',
+      'decision_card_next_action: checkpoint-prd\ndecision_card_next_action: final-prd',
+    ],
+  ])('blocks conflicting duplicate %s declarations regardless of order', (_field, original, replacement) => {
+    const text = prd({
+      writeMode: 'final-prd',
+      nextAction: 'final-prd',
+      canEnterSpecPlan: 'yes',
+    }).replace(original, replacement);
+    const receipt = buildFinalizeReceipt(
+      'docs/brainstorms/decision-card-requirements.md',
+      text,
+      [],
+      { checkOnly: true },
+    );
+
+    expect(receipt.checker.reason_codes).toContain('decision_card_path_mismatch');
+    expect(receipt.blocking_reason_codes).toContain('decision_card_path_mismatch');
+    expect(receipt.should_block_closeout).toBe(true);
+  });
+
   test('classifies the mismatch as a blocking deterministic reason code', () => {
     expect(BLOCKING_REASON_CODES.has('decision_card_path_mismatch')).toBe(true);
   });
