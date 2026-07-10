@@ -244,6 +244,75 @@ describe('platform registry runtime path consumer', () => {
     ]);
   });
 
+  test('extracts a sixth host from the supplied registry before anchored matching', () => {
+    const fixtureRegistry = {
+      ...PLATFORM_REGISTRY,
+      windsurf: {
+        runtimeRoot: '.windsurf',
+        surfaces: {
+          settingsFile: {
+            kind: 'file',
+            path: '.windsurf/settings.json',
+            ownership: 'host-local',
+            rewriteExclude: true,
+          },
+        },
+        capabilities: {},
+      },
+    };
+    const candidates = extractCandidateRuntimePaths(
+      'see `$HOME/.windsurf/settings.json`',
+      fixtureRegistry,
+    );
+    const patterns = deriveUnrewrittenPatterns('claude', fixtureRegistry);
+
+    expect(candidates).toEqual(['.windsurf/settings.json']);
+    expect(candidates.some((candidatePath) => (
+      patterns.some((pattern) => pattern.test(candidatePath))
+    ))).toBe(true);
+  });
+
+  test('strips Markdown fragments and numeric locations before anchored matching', () => {
+    const fileRule = compilePathRule({
+      kind: 'file',
+      path: '.cursor/mcp.json',
+      ownership: 'host-local',
+    });
+    const sliceRule = compilePathRule({
+      kind: 'managed-slice',
+      path: '.qoder/settings.json',
+      ownership: 'host-user-owned',
+    });
+    const globRule = compilePathRule({
+      kind: 'glob',
+      path: '.qoder/commands/spec-*.md',
+      ownership: 'generated-runtime',
+    });
+    const candidates = extractCandidateRuntimePaths([
+      '.cursor/mcp.json#configuration',
+      '.cursor/mcp.json.bak#configuration',
+      '.qoder/settings.json:12:4',
+      '.qoder/settings.local.json:12:4',
+      '.qoder/commands/spec-work.md:8',
+      '.qoder/commands/spec/nested.md:8',
+    ].join(' '));
+
+    expect(candidates).toEqual([
+      '.cursor/mcp.json',
+      '.cursor/mcp.json.bak',
+      '.qoder/settings.json',
+      '.qoder/settings.local.json',
+      '.qoder/commands/spec-work.md',
+      '.qoder/commands/spec/nested.md',
+    ]);
+    expect(fileRule.test(candidates[0])).toBe(true);
+    expect(fileRule.test(candidates[1])).toBe(false);
+    expect(sliceRule.test(candidates[2])).toBe(true);
+    expect(sliceRule.test(candidates[3])).toBe(false);
+    expect(globRule.test(candidates[4])).toBe(true);
+    expect(globRule.test(candidates[5])).toBe(false);
+  });
+
   test('flags non-Cursor runtime paths while preserving same-prefix hook negatives', () => {
     expect(contentHasOtherRuntimePathReferences('cursor', 'see `.claude/commands/spec/work.md`')).toBe(true);
     expect(contentHasOtherRuntimePathReferences('cursor', 'see `.qoder/settings.json`')).toBe(true);

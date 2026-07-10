@@ -224,20 +224,29 @@ function shouldIncludeSurfaceInRewriteExclusions(surface) {
     || surface.kind === 'managed-slice-dir';
 }
 
-function contentHasOtherRuntimePathReferences(platformId, content) {
-  return findUnrewrittenRuntimePathReferences(platformId, content).length > 0;
+function contentHasOtherRuntimePathReferences(platformId, content, registry = PLATFORM_REGISTRY) {
+  return findUnrewrittenRuntimePathReferences(platformId, content, registry).length > 0;
 }
 
-function findUnrewrittenRuntimePathReferences(platformId, content) {
-  const patterns = deriveUnrewrittenPatterns(platformId);
-  return extractCandidateRuntimePaths(content)
+function findUnrewrittenRuntimePathReferences(platformId, content, registry = PLATFORM_REGISTRY) {
+  const patterns = deriveUnrewrittenPatterns(platformId, registry);
+  return extractCandidateRuntimePaths(content, registry)
     .filter((candidatePath) => patterns.some((pattern) => pattern.test(candidatePath)));
 }
 
-function extractCandidateRuntimePaths(content) {
+function extractCandidateRuntimePaths(content, registry = PLATFORM_REGISTRY) {
   const candidates = [];
   const seen = new Set();
-  const runtimePathPattern = /(?:^|[\s`"'([{<])((?:\$HOME\/|~\/)?\.(?:claude|codex|cursor|kiro|qoder|agents)\/[^\s`"'<>]*)/g;
+  const runtimePathPrefixes = deriveRuntimePathPrefixes(registry);
+  if (runtimePathPrefixes.length === 0) {
+    return candidates;
+  }
+  const runtimePathPattern = new RegExp(
+    `(?:^|[\\s\`"'([{<])((?:\\$HOME\\/|~\\/)?(?:${runtimePathPrefixes
+      .map(escapeForRegex)
+      .join('|')})\\/[^\\s\`"'<>]*)`,
+    'g',
+  );
   let match;
   while ((match = runtimePathPattern.exec(String(content || ''))) !== null) {
     const normalized = normalizeCandidatePath(match[1]);
@@ -248,6 +257,28 @@ function extractCandidateRuntimePaths(content) {
     candidates.push(normalized);
   }
   return candidates;
+}
+
+function deriveRuntimePathPrefixes(registry) {
+  const prefixes = new Set();
+
+  for (const config of Object.values(registry || {})) {
+    const declaredPaths = [
+      config.runtimeRoot,
+      ...Object.values(config.surfaces || {}).flatMap((surface) => [surface.path, surface.rewriteScope]),
+    ];
+    for (const declaredPath of declaredPaths) {
+      const normalized = String(declaredPath || '')
+        .replace(/\\/g, '/')
+        .replace(/^\.\//, '');
+      const prefixMatch = normalized.match(/^(\.[A-Za-z0-9_-]+)(?:\/|$)/);
+      if (prefixMatch) {
+        prefixes.add(prefixMatch[1]);
+      }
+    }
+  }
+
+  return [...prefixes].sort((left, right) => right.length - left.length);
 }
 
 function compilePathRule(rule) {
@@ -304,8 +335,10 @@ function normalizeCandidatePath(value) {
     .replace(/\\/g, '/')
     .replace(/^\$HOME\//, '')
     .replace(/^~\//, '')
-    .replace(/[),.;:!?]+$/g, '')
-    .replace(/\]+$/g, '')
+    .replace(/[),.;!?\]]+$/g, '')
+    .replace(/#.*$/g, '')
+    .replace(/:\d+(?::\d+)?$/g, '')
+    .replace(/[),.;:!?\]]+$/g, '')
     .replace(/^\.\//, '.');
 }
 
