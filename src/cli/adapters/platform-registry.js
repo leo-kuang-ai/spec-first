@@ -142,39 +142,56 @@ const PLATFORM_REGISTRY = {
   },
 };
 
+function widenDelta(platform, fixture, candidatePath, reasonCode, ownership = 'generated-runtime') {
+  return {
+    platform,
+    fixture,
+    candidatePath,
+    direction: 'widen',
+    reasonCode,
+    ownership,
+  };
+}
+
 const EXCLUSION_COMPATIBILITY_DELTAS = [
-  {
-    platform: 'kiro',
-    fixture: 'kiro-derived-claude-flat-cmd',
-    direction: 'widen',
-    reasonCode: 'legacy-kiro-omitted-claude-flat-command',
-    ownership: 'generated-runtime',
-  },
-  {
-    platform: 'kiro',
-    fixture: 'kiro-derived-cursor-agents',
-    direction: 'widen',
-    reasonCode: 'legacy-kiro-omitted-cursor-agents',
-    ownership: 'generated-runtime',
-  },
-  {
-    platform: 'kiro',
-    fixture: 'kiro-qoder-settings-json',
-    direction: 'widen',
-    reasonCode: 'legacy-kiro-only-covered-qoder-settings-local',
-    ownership: 'host-user-owned',
-  },
-  {
-    platform: 'all',
-    fixture: 'qoder-managed-hooks-exact',
-    direction: 'widen',
-    reasonCode: 'phase-0-added-managed-qoder-hook-scripts',
-    ownership: 'host-user-owned',
-  },
+  widenDelta('cursor', 'cursor-claude-managed-root', '.claude/spec-first/state.json', 'registry-declares-complete-managed-root'),
+  widenDelta('cursor', 'cursor-claude-hooks', '.claude/hooks/session-start', 'registry-declares-generated-hook-surface'),
+  widenDelta('cursor', 'cursor-codex-managed-root', '.codex/spec-first/state.json', 'registry-declares-complete-managed-root'),
+  widenDelta('cursor', 'cursor-codex-flat-command', '.codex/commands/spec-work.md', 'registry-normalizes-flat-command-surface'),
+  widenDelta('cursor', 'cursor-codex-hooks', '.codex/hooks/session-start', 'registry-declares-generated-hook-surface'),
+  widenDelta('cursor', 'cursor-codex-hooks-json', '.codex/hooks.json', 'registry-declares-generated-hook-surface'),
+  widenDelta('cursor', 'cursor-kiro-flat-command', '.kiro/commands/spec-work.md', 'registry-preserves-legacy-command-surface'),
+  widenDelta('cursor', 'cursor-qoder-session-hook', '.qoder/hooks/session-start', 'phase-0-added-managed-qoder-hook-scripts', 'host-user-owned'),
+  widenDelta('cursor', 'cursor-qoder-prewrite-hook', '.qoder/hooks/prd-prewrite-guard', 'phase-0-added-managed-qoder-hook-scripts', 'host-user-owned'),
+  widenDelta('cursor', 'cursor-qoder-readiness-hook', '.qoder/hooks/prd-readiness-guard', 'phase-0-added-managed-qoder-hook-scripts', 'host-user-owned'),
+  widenDelta('kiro', 'kiro-claude-managed-root', '.claude/spec-first/state.json', 'registry-declares-complete-managed-root'),
+  widenDelta('kiro', 'kiro-claude-flat-command', '.claude/commands/spec-work.md', 'legacy-kiro-omitted-claude-flat-command'),
+  widenDelta('kiro', 'kiro-claude-hooks', '.claude/hooks/session-start', 'registry-declares-generated-hook-surface'),
+  widenDelta('kiro', 'kiro-codex-managed-root', '.codex/spec-first/state.json', 'registry-declares-complete-managed-root'),
+  widenDelta('kiro', 'kiro-codex-flat-command', '.codex/commands/spec-work.md', 'registry-normalizes-flat-command-surface'),
+  widenDelta('kiro', 'kiro-codex-hooks', '.codex/hooks/session-start', 'registry-declares-generated-hook-surface'),
+  widenDelta('kiro', 'kiro-codex-hooks-json', '.codex/hooks.json', 'registry-declares-generated-hook-surface'),
+  widenDelta('kiro', 'kiro-cursor-agents', '.cursor/agents/reviewer.md', 'legacy-kiro-omitted-cursor-agents'),
+  widenDelta('kiro', 'kiro-qoder-settings-json', '.qoder/settings.json', 'legacy-kiro-only-covered-qoder-settings-local', 'host-user-owned'),
+  widenDelta('kiro', 'kiro-qoder-session-hook', '.qoder/hooks/session-start', 'phase-0-added-managed-qoder-hook-scripts', 'host-user-owned'),
+  widenDelta('kiro', 'kiro-qoder-prewrite-hook', '.qoder/hooks/prd-prewrite-guard', 'phase-0-added-managed-qoder-hook-scripts', 'host-user-owned'),
+  widenDelta('kiro', 'kiro-qoder-readiness-hook', '.qoder/hooks/prd-readiness-guard', 'phase-0-added-managed-qoder-hook-scripts', 'host-user-owned'),
+  widenDelta('qoder', 'qoder-claude-managed-root', '.claude/spec-first/state.json', 'registry-declares-complete-managed-root'),
+  widenDelta('qoder', 'qoder-claude-hooks', '.claude/hooks/session-start', 'registry-declares-generated-hook-surface'),
+  widenDelta('qoder', 'qoder-codex-managed-root', '.codex/spec-first/state.json', 'registry-declares-complete-managed-root'),
+  widenDelta('qoder', 'qoder-codex-flat-command', '.codex/commands/spec-work.md', 'registry-normalizes-flat-command-surface'),
+  widenDelta('qoder', 'qoder-codex-hooks', '.codex/hooks/session-start', 'registry-declares-generated-hook-surface'),
+  widenDelta('qoder', 'qoder-codex-hooks-json', '.codex/hooks.json', 'registry-declares-generated-hook-surface'),
+  widenDelta('qoder', 'qoder-kiro-flat-command', '.kiro/commands/spec-work.md', 'registry-preserves-legacy-command-surface'),
 ];
 
 const EXCLUSION_OWNERSHIPS = new Set([
   'generated-runtime',
+]);
+const SURFACE_OWNERSHIPS = new Set([
+  'generated-runtime',
+  'host-local',
+  'host-user-owned',
 ]);
 
 function deriveUnrewrittenPatterns(platformId, registry = PLATFORM_REGISTRY) {
@@ -186,7 +203,13 @@ function deriveUnrewrittenPatterns(platformId, registry = PLATFORM_REGISTRY) {
     .filter(([id]) => id !== platformId)
     .flatMap(([, config]) => Object.values(config.surfaces || {}))
     .filter(shouldIncludeSurfaceInRewriteExclusions)
-    .map(compilePathRule);
+    .map((surface) => surface.rewriteScope
+      ? compilePathRule({
+        kind: 'glob',
+        path: surface.rewriteScope,
+        ownership: surface.ownership,
+      })
+      : compilePathRule(surface));
 }
 
 function shouldIncludeSurfaceInRewriteExclusions(surface) {
@@ -234,6 +257,9 @@ function compilePathRule(rule) {
   if (!rule.ownership) {
     throw new Error('Platform registry path rule must declare ownership');
   }
+  if (!SURFACE_OWNERSHIPS.has(rule.ownership)) {
+    throw new Error(`Unsupported platform registry surface ownership: ${rule.ownership}`);
+  }
 
   const normalized = normalizeRepoRelativePath(rule.path);
   if (rule.kind === 'file' || rule.kind === 'managed-slice') {
@@ -261,6 +287,9 @@ function normalizeRepoRelativePath(value) {
   }
   if (normalized.includes('/../') || normalized === '..' || normalized.startsWith('../')) {
     throw new Error('Platform registry path rule must not traverse outside the repo');
+  }
+  if (normalized.includes('//') || normalized.includes('/./') || normalized.endsWith('/.')) {
+    throw new Error('Platform registry path rule must be normalized');
   }
   return normalized;
 }

@@ -51,7 +51,7 @@ Do not end the workflow after extraction in normal use. The intended sequence is
 3. Inspect or refine `problem-analysis.md` when the evidence needs human-visible interpretation.
 4. Load the `spec-brainstorm` skill with `requirements-kickoff.md`.
 5. Ask the user to confirm, correct, or regroup the captured requirements.
-6. Let `spec-brainstorm` produce the durable requirements document under `docs/brainstorms/`.
+6. Let `spec-brainstorm` produce the durable requirements-only unified plan under `docs/plans/`.
 
 Only stop after step 1 or 2 when the user asks specifically for raw artifacts, transcript, screenshots, or analysis without brainstorming.
 

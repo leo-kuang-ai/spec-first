@@ -1,0 +1,105 @@
+'use strict';
+
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+const { getAdapter } = require('../../src/cli/adapters');
+const plugin = require('../../src/cli/plugin');
+const { applyOperationPlan } = require('../../src/cli/state');
+
+function tempProject() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-plugin-modules-'));
+}
+
+describe('plugin module facade and governance', () => {
+  test('preserves the plugin facade exports', () => {
+    expect(Object.keys(plugin).sort()).toEqual([
+      'buildFilteredAssetSet',
+      'getBundledPath',
+      'getSkillsGovernancePath',
+      'inspectInstalledAssets',
+      'listBundledAgentNames',
+      'listBundledAgentSupportFiles',
+      'listBundledAgents',
+      'listBundledCommands',
+      'listBundledSkills',
+      'loadPluginManifest',
+      'loadSkillsGovernance',
+      'planBundledAssetSync',
+      'readBundledCommandTemplate',
+      'syncAgents',
+      'syncBundledAssets',
+      'syncCommands',
+      'syncSkills',
+      'validateSkillsGovernance',
+    ]);
+  });
+
+  test('loads manifest and filters delivery mode for command and skill hosts', () => {
+    const manifest = plugin.loadPluginManifest();
+    const governance = plugin.loadSkillsGovernance();
+    expect(manifest.commands).toEqual(expect.any(Array));
+    expect(manifest.commands.length).toBeGreaterThan(0);
+    expect(governance.skills.length).toBe(plugin.listBundledSkills().length);
+    expect(() => plugin.validateSkillsGovernance({
+      schemaVersion: governance.schemaVersion,
+      skills: governance.skills,
+    })).not.toThrow();
+
+    const claude = plugin.buildFilteredAssetSet('claude');
+    const cursor = plugin.buildFilteredAssetSet('cursor');
+    expect(claude.commands.map((command) => command.name)).toContain('work');
+    expect(claude.workflowSkills).toContain('spec-work');
+    expect(cursor.commands).toEqual([]);
+    expect(cursor.workflowSkills).toContain('spec-work');
+    expect(cursor.internalSkills).toContain('spec-worktree');
+    expect(cursor.agents).toEqual([]);
+    expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
+  });
+
+  test('plans, applies, inspects, and anchor-validates bundled assets', () => {
+    const projectRoot = tempProject();
+    const adapter = getAdapter('cursor');
+    const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+
+    expect(plan.operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'ensure_dir', path: '.cursor/skills' }),
+      expect.objectContaining({ kind: 'write_file', path: '.cursor/skills/spec-work/SKILL.md' }),
+    ]));
+    expect(syncedAssets.workflowSkills).toContain('spec-code-review');
+    applyOperationPlan(projectRoot, plan);
+
+    const healthy = plugin.inspectInstalledAssets(projectRoot, adapter);
+    expect(healthy.commands.missing).toEqual([]);
+    expect(healthy.skills.missing).toEqual([]);
+    expect(healthy.skills.drifted).toEqual([]);
+
+    const reviewSkillPath = path.join(
+      projectRoot,
+      '.cursor',
+      'skills',
+      'spec-code-review',
+      'SKILL.md',
+    );
+    fs.writeFileSync(
+      reviewSkillPath,
+      fs.readFileSync(reviewSkillPath, 'utf8').replace(
+        'Plan discovery (requirements verification)',
+        'Plan requirements check',
+      ),
+      'utf8',
+    );
+
+    const drifted = plugin.inspectInstalledAssets(projectRoot, adapter);
+    expect(drifted.skills.drifted).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        skillName: 'spec-code-review',
+        issues: expect.arrayContaining([
+          'missing_anchor:Plan discovery (requirements verification)',
+          'content_mismatch',
+        ]),
+      }),
+    ]));
+  });
+});
