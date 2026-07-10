@@ -9,7 +9,6 @@ const {
   readDeveloperFile,
   readGitUserName,
 } = require('../developer');
-const { getAdapter } = require('../adapters');
 const { getInitMessages } = require('../init-i18n');
 const {
   INIT_PLATFORM_CHOICES,
@@ -215,15 +214,6 @@ async function maybeConfirmGlobalProfileOverwrite({ parsed, promptApi, name, lan
     messages.globalProfileOverwrite(display, name, lang),
     { default: false },
   );
-}
-
-function buildInitPlans(input) {
-  return input.platforms.map((platform) => buildInitPlan({
-    ...input,
-    platformCount: input.platforms.length,
-    platform,
-    adapter: getAdapter(platform),
-  }));
 }
 
 function resolveUserLanguageSyncProjectRoot(input = {}) {

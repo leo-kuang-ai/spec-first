@@ -1849,6 +1849,7 @@ Phase 2 逐 skill 语义审查完成。下一步进入 Phase 3 全局交叉验�
 | 2026-07-10 19:01:37 CST | medium — `spec-plan` file-set contract 未裁定 CE `reasoning-elevation.md` divergence | resolved_intentional_divergence | 复核 CE `ee2fee4c` 后明确不迁移 Claude/Fable 专属 elevation：其具体模型名、宿主环境探测、用户目录 marker 和 config 自动 subagent dispatch 与 spec-first 的跨宿主 contract、显式 dispatch 授权及 source/provider 边界冲突；`tests/unit/ce-upstream-skill-sync-contracts.test.js` 锁定无 Fable source/config，并保留现有 host-neutral model tiering |
 | 2026-07-10 19:01:37 CST | medium — `spec-doc-review` 缺失 missing-document gate | fixed | `skills/spec-doc-review/SKILL.md` 在 persona dispatch 前确认所有 resolved paths 可读，并为 interactive/headless 分别输出缺失路径；`tests/unit/ce-upstream-skill-sync-contracts.test.js` 覆盖 |
 | 2026-07-10 19:01:37 CST | medium — `spec-code-review` deployment checklist 可验证性约束退化 | fixed | `skills/spec-code-review/references/personas/deployment-verification-agent.md` 与 `skills/spec-plan/references/agents/deployment-verification-agent.md` 均要求每项 checklist 命名成功 command 或 observable signal；`tests/unit/ce-upstream-skill-sync-contracts.test.js` 覆盖 |
+| 2026-07-10 19:10:07 CST | medium — `spec-compound` / `spec-compound-refresh` Knowledge Track template 漏列 4 个 schema category | fixed | 两份 `assets/resolution-template.md` 补齐 `architecture_pattern`、`design_pattern`、`tooling_decision`、`convention`；`tests/unit/compound-template-category-contracts.test.js` 从各自 canonical `schema.yaml` 提取 Knowledge problem types 并锁定 template 完全一致；已同步 CE 对应 assets |
 
 ## 验证命令记录
 

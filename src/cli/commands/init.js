@@ -44,7 +44,6 @@ const {
   collectInitErrors,
   printInitDiagnostics,
 } = require('./init-diagnostics');
-const { buildProjectInitResult } = require('./init-result');
 const {
   printHelp,
   printInitApplySuccess,
@@ -240,47 +239,6 @@ function applyInitPlan(projectRoot, plan) {
   return applyProjectInitPlan(projectRoot || plan.projectRoot, plan);
 }
 
-function runInitForProject({
-  parsed,
-  platform,
-  adapter,
-  projectRoot,
-  gitRootTopology = 'single-repo',
-}) {
-  const plan = buildInitPlan({
-    projectRoot,
-    platform,
-    adapter,
-    name: parsed.name,
-    lang: parsed.lang,
-    gitRootTopology,
-    dryRun: parsed.dryRun,
-  });
-
-  printInitDiagnostics(plan);
-  if (Array.isArray(plan.errors) && plan.errors.length > 0) {
-    for (const error of plan.errors) {
-      console.error(error.message || String(error));
-    }
-    return buildProjectInitResult(1, plan.untrackDiagnostic);
-  }
-
-  if (parsed.dryRun) {
-    printInitDryRun({
-      platform,
-      plan: plan.operationPlan,
-      untrackDiagnostic: plan.untrackDiagnostic,
-      legacyStateDetected: plan.legacyStateDetected,
-      destructiveResetReason: plan.destructiveResetReason,
-    });
-    return buildProjectInitResult(0, plan.untrackDiagnostic);
-  }
-
-  const result = applyInitPlan(projectRoot, plan);
-  printInitApplySuccess(plan, result, { showDiagnostics: false });
-  return result;
-}
-
 module.exports = {
   applyInitPlan,
   buildInitPlan,
@@ -292,5 +250,4 @@ module.exports = {
   printInitPreview,
   printWorkspaceInitApplySuccess,
   runInit,
-  runInitForProject,
 };

@@ -1,8 +1,12 @@
-# spec-prd Skill 优化方案
+# spec-prd Skill 重构优化方案（验证优先执行版）
 
 ## 审查概要
 
-本文档从顶尖产品经理视角和架构师视角对 `skills/spec-prd/` 进行全面审查，输出优化方案。审查范围覆盖 SKILL.md（294 行）、9 个 reference 文档（共约 1,968 行）、4 个确定性脚本（含 lib，共约 2,461 行）、evals/examples.json（2,694 行），以及需求文档模版体系。
+本文档从专业产品经理和系统架构师视角对 `skills/spec-prd/` 进行全面审查，并将候选优化收敛为验证优先的重构计划。当前 source 基线为：`SKILL.md` 293 行、9 个 reference 文档共 1,960 行、5 个脚本文件（含 `scripts/lib/reason-codes.js`）共 2,590 行、`evals/examples.json` 2,693 行。
+
+> **实施权威声明（2026-07-10）**：第十至十二章是本方案唯一可执行合同。第一至九章保留为历史分析、候选机制与审查轨迹，其中的“立即可做”“Phase 1/2/3”“必做”“新增文件”等措辞均不得直接转化为实现任务。若前文与第十至十二章冲突，以后者为准；实施时仍以当前 `skills/spec-prd/**` source、脚本和测试事实为最终依据。
+
+本轮重构遵循：先恢复确定性验证地板，再对当前 source 运行改前基线；只有失败样本证明现有合同不足时才激活对应实现单元。目标不是继续增加 prompt 机制，而是减少重复真相源、提高执行稳定性、改善 owner 与下游消费者的真实研发体验。
 
 ---
 
@@ -30,7 +34,9 @@
 
 ---
 
-## 附：spec-prd 执行流程图
+## 附：历史抽象流程图（非当前实施时序）
+
+> 当前 source 校正：Phase 1 已包含 `Pre-PRD Clarification Loop`，并在 Pre-Write Closure Gate / Decision Card 之前执行；Phase 2 主要承载后续 Domain Grill。下图保留为本轮审查的历史输入，不得据此实施 §8.4 的控制流重排。
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -554,7 +560,7 @@ input_preprocessor:
 
 ---
 
-## 六、实施路径建议
+## 六、历史实施路径建议（已由第十章取代）
 
 ### Phase 0：基线测量（前置，doc-review 新增）
 
@@ -1594,7 +1600,7 @@ spec-prd 收到 `prd_revision_request` 后：
 | references/session-recovery.md | 恢复协议 3 步检查 + Decision Card 恢复格式 | 会话恢复时 |
 | references/context-budget-strategy.md | token 预算估算 + 降级策略 + defer 格式 | Phase 2 grill 过程中按需 |
 
-### 8.13 Verification Plan
+### 8.13 历史 Verification Plan（已由第十二章取代）
 
 #### 问题本质
 
@@ -1650,7 +1656,7 @@ AGENTS.md 明确要求：
 
 ---
 
-## 九、总结
+## 九、历史分析总结（非实施依据）
 
 spec-prd 当前已是 production-grade 的 brownfield PRD 工作流，其「分析优先 + 证据驱动 + relentless grill + 确定性验证」的架构在业界同类工具中处于领先水平。
 
