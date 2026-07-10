@@ -2584,19 +2584,20 @@
       ]
     },
     {
-      "id": "codex-degraded-receipt-gate",
+      "id": "codex-degraded-producer-finalize",
       "intent": "validate",
       "case_type": "boundary",
       "quality_buckets": [
         "validate",
         "workflow-runtime-quality"
       ],
-      "input_shape": "Codex run prepares a PRD origin for spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs current-source finalize/verify commands when possible, and treats producer finalize plus spec-plan --verify-receipt as mandatory handoff discipline rather than hook-enforced protection.",
+      "input_shape": "Codex run prepares a PRD that the user may later pass to spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs the current-source producer finalize command before claiming ready, and leaves downstream plan entry to the user instead of requiring an automatic consumer receipt gate.",
       "expected": [
         "Codex degraded enforcement must be explicit, not implied equal protection with Claude",
-        "--verify-receipt is the consumer-only read check for spec-plan origin verification",
-        "--check-only remains producer closeout preview and must not be used as a consumer pass signal",
-        "degraded verification such as missing inputs is not a verified origin"
+        "producer finalize remains mandatory before spec-prd claims the artifact is ready",
+        "spec-plan continues to treat docs/brainstorms/*-requirements.md as user-selected legacy requirements input",
+        "--verify-receipt remains an optional read-only diagnostic rather than a mandatory spec-plan gate",
+        "--check-only remains producer closeout preview and must not be represented as a finalized producer receipt"
       ],
       "coverage_tags": [
         "workflow-runtime-quality",
