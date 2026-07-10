@@ -63,7 +63,7 @@ function planHostNativePointerRemoval(projectRoot, relativePath) {
   return plan([buildRelativeOperation('remove_file', relativePath, 'managed_host_native_pointer')]);
 }
 
-function inspectHostNativePointer(projectRoot, relativePath, { hostId, hostLabel }) {
+function inspectHostNativePointer(projectRoot, relativePath, { hostId, hostLabel, expectedPrefix = '' }) {
   const absolutePath = path.join(projectRoot, relativePath);
   if (!fs.existsSync(absolutePath)) {
     return {
@@ -81,6 +81,16 @@ function inspectHostNativePointer(projectRoot, relativePath, { hostId, hostLabel
       name: relativePath,
       message: `${hostLabel} host-native rule file exists but is not spec-first managed; init will not overwrite user-owned content`,
       fix: `Move custom guidance to another file or add the spec-first managed pointer markers before rerunning \`spec-first init --${hostId}\`.`,
+    };
+  }
+
+  const normalizedExpectedPrefix = normalizeFrontmatter(expectedPrefix);
+  if (normalizedExpectedPrefix && !existing.startsWith(normalizedExpectedPrefix)) {
+    return {
+      level: 'WARNING',
+      name: relativePath,
+      message: `${hostLabel} host-native spec-first pointer drifted from expected metadata`,
+      fix: formatInitGuidance(hostId, `in this project to refresh ${relativePath}`),
     };
   }
 

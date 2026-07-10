@@ -36,6 +36,15 @@ if (!/^docs\/brainstorms\/.+-requirements\.md$/.test(relativeTarget)) {
 }
 
 const candidateText = collectCandidateText(toolName, toolInput, absoluteTarget);
+if (isFirstWritePrdWithoutWriteMode(toolName, toolInput, absoluteTarget, candidateText)) {
+  block([
+    '[spec-first] PRD prewrite guard blocked Qoder file mutation.',
+    `Target: ${relativeTarget}`,
+    '',
+    'A new PRD artifact must declare a durable-write path in `write_mode` before the first durable Write.',
+    'Use `write_mode: checkpoint-prd` with `can_enter_spec_plan: no` for recoverable drafts, or return to `spec-prd` before claiming ready/final state.',
+  ].join('\n'));
+}
 if (!hasReadyOrReceiptMutationSignal(candidateText)) {
   process.exit(0);
 }
@@ -88,6 +97,40 @@ function hasReadyOrReceiptMutationSignal(text) {
   if (/^\s*(?:-\s*)?write_mode:\s*final-prd\s*$/im.test(text)) return true;
   if (/^\s*(?:-\s*)?can_enter_spec_plan:\s*yes\s*$/im.test(text)) return true;
   return false;
+}
+
+function isFirstWritePrdWithoutWriteMode(currentToolName, currentToolInput, absolutePath, candidateText) {
+  if (currentToolName !== 'Write' || fs.existsSync(absolutePath)) {
+    return false;
+  }
+  const writeContent = typeof currentToolInput.content === 'string'
+    ? currentToolInput.content
+    : candidateText;
+  return isPrdRequirementsArtifact(writeContent)
+    && frontmatterFieldValue(writeContent, 'write_mode') === '';
+}
+
+function isPrdRequirementsArtifact(text) {
+  return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(text);
+}
+
+function frontmatterFieldValue(text, fieldName) {
+  const lines = String(text || '').split(/\r?\n/);
+  if (lines[0] !== '---') {
+    return '';
+  }
+  const fmEnd = lines.findIndex((line, index) => index > 0 && line === '---');
+  if (fmEnd === -1) {
+    return '';
+  }
+  const pattern = new RegExp(`^\\s*${fieldName}:\\s*(.*)$`, 'i');
+  for (let i = 1; i < fmEnd; i += 1) {
+    const match = lines[i].match(pattern);
+    if (match) {
+      return match[1].trim();
+    }
+  }
+  return '';
 }
 
 function isWithinRoot(candidatePath, rootPath) {

@@ -33,4 +33,12 @@ describe('run-test-suite legacy cleanup compatibility', () => {
       'skip missing legacy Jest test: tests/integration/verification-gate.integration.test.js',
     );
   });
+
+  test('fails required Jest suites when every target is missing', () => {
+    expect(() => runJestFiles(['tests/integration/retired.integration.test.js'], ['--runInBand'], {
+      required: true,
+      suiteName: 'integration',
+    })).toThrow('integration has no active Jest tests; refusing to pass with zero checks');
+    expect(logSpy).toHaveBeenCalledWith('skip missing legacy Jest test: tests/integration/retired.integration.test.js');
+  });
 });

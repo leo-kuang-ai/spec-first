@@ -100,13 +100,31 @@ Source-of-truth 路径包括：
 - `CHANGELOG.md`
 - `package.json`
 
-其中 `CLAUDE.md` 与 `AGENTS.md` 是 checked-in host 入口文档；其中的 spec-first managed blocks 是受生成规则管理的 source slice，不等同于 `.claude/`、`.codex/`、`.agents/skills/` runtime mirror。
+其中 `CLAUDE.md` 与 `AGENTS.md` 是 checked-in host 入口文档；其中的 spec-first managed blocks 是受生成规则管理的 source slice，不等同于 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` runtime mirror 或 managed slice。
 
-Generated runtime assets 包括：
+Generated runtime / host-local runtime surfaces 包括：
 
 - `.claude/`
 - `.codex/`
 - `.agents/skills/`
+- `.cursor/skills/`
+- `.cursor/spec-first/`
+- `.cursor/rules/spec-first.mdc`
+- `.cursor/mcp.json`
+- `.kiro/skills/`
+- `.kiro/agents/`
+- `.kiro/spec-first/`
+- `.kiro/settings/`
+- `.kiro/steering/spec-first.md`
+- `.qoder/commands/spec-*.md`
+- `.qoder/commands/spec/`
+- `.qoder/skills/`
+- `.qoder/agents/`
+- `.qoder/spec-first/`
+- `.qoder/hooks/` 中的 spec-first managed hook scripts
+- `.qoder/rules/spec-first.md`
+- `.qoder/settings.local.json`
+- `.qoder/settings.json` 中的 spec-first managed hook entries
 
 优先修改 source，不手改 generated runtime assets 来强制修复。source 变更后需要修复 runtime drift 时，使用 `spec-first init`。source 与 runtime 不一致时，先确认 source-of-truth，再检查 generator，最后修 source 或生成逻辑。
 
@@ -124,7 +142,7 @@ Generated runtime assets 包括：
 - `vendor/`：vendored parser dependencies
 - `tests/unit/`、`tests/smoke/`、`tests/integration/`：分层测试（integration 由 Jest 集成测试承载，无独立 `tests/e2e/` 目录）
 
-不要把 `.claude/`、`.codex/`、`.agents/skills/` 当作 source。
+不要把 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 下的 generated runtime mirror 或 managed slice 当作 source。
 
 ## 常用命令
 

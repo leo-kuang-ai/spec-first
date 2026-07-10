@@ -6,6 +6,8 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const QoderAdapter = require('../../src/cli/adapters/qoder');
+const { buildHostNativePointer } = require('../../src/cli/adapters/host-native-pointer');
+const { buildContextBundle } = require('../../src/cli/helpers/context-bundle');
 const { validateRepoRelativeField } = require('../../src/cli/helpers/target-repo');
 const { applyOperationPlan } = require('../../src/cli/state');
 const { computeSourcePlanHash, validateTaskPack } = require('../../src/cli/task-pack');
@@ -257,12 +259,60 @@ describe('Qoder runtime lifecycle', () => {
     applyOperationPlan(projectRoot, { operations: plan.operations });
 
     const checks = adapter.inspectRuntimeFiles(projectRoot);
+    expect(checks.find((check) => check.name === '.qoder/rules/spec-first.md')).toMatchObject({
+      level: 'PASS',
+    });
     expect(checks.filter((check) => check.name.startsWith('.qoder/hooks/')).map((check) => check.level))
       .toEqual(['PASS', 'PASS', 'PASS']);
     expect(checks.filter((check) => check.name.startsWith('.qoder/settings.json '))).toHaveLength(3);
     expect(checks.filter((check) => check.name.startsWith('.qoder/settings.json ')).every((check) =>
       check.level === 'WARNING' && check.degradedByDesign === true && check.drift === false
     )).toBe(true);
+  });
+
+  test('reports managed Qoder pointer missing always-on frontmatter as runtime drift', () => {
+    const projectRoot = tempProject();
+    const adapter = new QoderAdapter();
+    writeText(
+      path.join(projectRoot, '.qoder', 'rules', 'spec-first.md'),
+      buildHostNativePointer({
+        hostLabel: 'Qoder',
+        initCommand: 'spec-first init --qoder',
+      }),
+    );
+
+    const pointerCheck = adapter.inspectRuntimeFiles(projectRoot)
+      .find((check) => check.name === '.qoder/rules/spec-first.md');
+
+    expect(pointerCheck).toMatchObject({
+      level: 'WARNING',
+      message: 'Qoder host-native spec-first pointer drifted from expected metadata',
+    });
+  });
+
+  test('Qoder removal lifecycle plans and removes managed hook files without settings writes', () => {
+    const projectRoot = tempProject();
+    const adapter = new QoderAdapter();
+    applyOperationPlan(projectRoot, { operations: adapter.planRuntimeFilesSync(projectRoot).operations });
+
+    const removal = adapter.planRuntimeFilesRemoval(projectRoot);
+    expect(removal.operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'remove_file', path: '.qoder/hooks/session-start' }),
+      expect.objectContaining({ kind: 'remove_file', path: '.qoder/hooks/prd-prewrite-guard' }),
+      expect.objectContaining({ kind: 'remove_file', path: '.qoder/hooks/prd-readiness-guard' }),
+    ]));
+    expect(removal.operations.map((operation) => operation.path)).not.toContain('.qoder/settings.json');
+
+    adapter.removeRuntimeFiles(projectRoot);
+
+    for (const hookPath of [
+      '.qoder/hooks/session-start',
+      '.qoder/hooks/prd-prewrite-guard',
+      '.qoder/hooks/prd-readiness-guard',
+    ]) {
+      expect(fs.existsSync(path.join(projectRoot, hookPath))).toBe(false);
+    }
+    expect(fs.existsSync(path.join(projectRoot, '.qoder', 'hooks'))).toBe(false);
   });
 
   test('Qoder prewrite hook blocks ready PRD mutation without leaking absolute paths', () => {
@@ -327,6 +377,68 @@ describe('Qoder runtime lifecycle', () => {
     expect(result.stderr).not.toContain(projectRoot);
   });
 
+  test('Qoder prewrite hook blocks first PRD writes without write_mode', () => {
+    const projectRoot = tempProject();
+    const target = path.join(projectRoot, 'docs', 'brainstorms', 'sample-requirements.md');
+    const hookPath = path.join(__dirname, '..', '..', 'templates', 'qoder', 'hooks', 'prd-prewrite-guard');
+    const result = spawnSync(process.execPath, [hookPath], {
+      cwd: projectRoot,
+      input: JSON.stringify({
+        tool_name: 'Write',
+        cwd: projectRoot,
+        tool_input: {
+          file_path: target,
+          content: [
+            '---',
+            'artifact_kind: prd-requirements',
+            'status: draft',
+            '---',
+            '# Draft PRD',
+            '',
+          ].join('\n'),
+        },
+      }),
+      encoding: 'utf8',
+      env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
+    });
+
+    expect(result.status).toBe(2);
+    expect(result.stderr).toContain('write_mode');
+    expect(result.stderr).toContain('docs/brainstorms/sample-requirements.md');
+    expect(result.stderr).not.toContain(projectRoot);
+  });
+
+  test('Qoder prewrite hook allows first checkpoint PRD draft writes', () => {
+    const projectRoot = tempProject();
+    const target = path.join(projectRoot, 'docs', 'brainstorms', 'sample-requirements.md');
+    const hookPath = path.join(__dirname, '..', '..', 'templates', 'qoder', 'hooks', 'prd-prewrite-guard');
+    const result = spawnSync(process.execPath, [hookPath], {
+      cwd: projectRoot,
+      input: JSON.stringify({
+        tool_name: 'Write',
+        cwd: projectRoot,
+        tool_input: {
+          file_path: target,
+          content: [
+            '---',
+            'artifact_kind: prd-requirements',
+            'status: draft',
+            'write_mode: checkpoint-prd',
+            'can_enter_spec_plan: no',
+            '---',
+            '# Draft PRD',
+            '',
+          ].join('\n'),
+        },
+      }),
+      encoding: 'utf8',
+      env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe('');
+  });
+
   test('Qoder readiness hook bypasses recursive stop hook execution', () => {
     const projectRoot = tempProject();
 
@@ -378,6 +490,30 @@ describe('Qoder runtime lifecycle', () => {
     expect(result.stderr).not.toContain(projectRoot);
   });
 
+  test('Qoder readiness hook ignores machine receipt examples outside frontmatter', () => {
+    const projectRoot = tempProject();
+    initGitProject(projectRoot);
+    writeText(path.join(projectRoot, 'docs', 'brainstorms', 'sample-requirements.md'), [
+      '---',
+      'artifact_kind: prd-requirements',
+      'status: draft',
+      'write_mode: checkpoint-prd',
+      'can_enter_spec_plan: no',
+      '---',
+      '# Draft PRD',
+      '',
+      '```yaml',
+      'readiness_prd_hash: example-only',
+      '```',
+      '',
+    ].join('\n'));
+
+    const result = runReadinessHook(projectRoot);
+
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe('');
+  });
+
   test('Qoder readiness hook allows changed ready PRDs when finalize check succeeds', () => {
     const projectRoot = tempProject();
     initGitProject(projectRoot);
@@ -420,6 +556,25 @@ describe('Qoder runtime lifecycle', () => {
 
     expect(result.status).toBe(2);
     expect(result.stderr).toContain('docs/brainstorms/new-requirements.md');
+    expect(result.stderr).not.toContain('docs/brainstorms/old-requirements.md');
+  });
+
+  test('Qoder readiness hook blocks copied ready PRD destination paths', () => {
+    const projectRoot = tempProject();
+    initGitProject(projectRoot);
+    writeReadyPrd(projectRoot, 'docs/brainstorms/old-requirements.md');
+    runGit(projectRoot, ['add', 'docs/brainstorms/old-requirements.md']);
+    runGit(projectRoot, ['commit', '-m', 'test: add old prd']);
+    fs.copyFileSync(
+      path.join(projectRoot, 'docs', 'brainstorms', 'old-requirements.md'),
+      path.join(projectRoot, 'docs', 'brainstorms', 'copy-requirements.md'),
+    );
+    runGit(projectRoot, ['add', 'docs/brainstorms/copy-requirements.md']);
+
+    const result = runReadinessHook(projectRoot);
+
+    expect(result.status).toBe(2);
+    expect(result.stderr).toContain('docs/brainstorms/copy-requirements.md');
     expect(result.stderr).not.toContain('docs/brainstorms/old-requirements.md');
   });
 
@@ -572,5 +727,36 @@ describe('Qoder runtime lifecycle', () => {
     const result = validateTaskPack(taskPackPath, { repoRoot: projectRoot });
     expect(result.errors.map((error) => error.code)).not.toContain('task-pack-task-file-generated-runtime');
     expect(result.task_pack_validity).toBe('valid');
+  });
+
+  test('context bundle excludes exact managed Qoder hooks without excluding same-prefix user paths', () => {
+    const projectRoot = tempProject();
+    writeText(path.join(projectRoot, '.qoder', 'hooks', 'session-start'), 'managed hook\n');
+    writeText(path.join(projectRoot, '.qoder', 'hooks', 'session-start-backup'), 'user note\n');
+
+    const bundle = buildContextBundle({
+      stage: 'work',
+      intent: 'qoder hook boundary',
+      changedFiles: ['.qoder/hooks/session-start', '.qoder/hooks/session-start-backup'],
+      relatedPaths: [],
+      artifactSummaries: [],
+      evidencePaths: [],
+      fullReadTriggers: [],
+      maxFiles: 20,
+      maxTokens: 60000,
+      allowRuntimeContext: false,
+    }, { cwd: projectRoot, repoRoot: projectRoot });
+
+    expect(bundle.excluded_context).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        path: '.qoder/hooks/session-start',
+        reason_code: 'managed_runtime_hook_excluded',
+      }),
+    ]));
+    expect(bundle.related_paths).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        path: '.qoder/hooks/session-start-backup',
+      }),
+    ]));
   });
 });

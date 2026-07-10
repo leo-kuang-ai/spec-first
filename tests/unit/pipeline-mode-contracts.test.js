@@ -16,6 +16,30 @@ describe('pipeline mode contracts', () => {
     expect(skill).toMatch(/\*\*`mode:pipeline` modifier:\*\*[\s\S]*existing-PR rewrite question defaults to \*\*not rewriting\*\*/);
   });
 
+  test('spec-commit-push-pr produces the New concepts trailer consumed by spec-lfg', () => {
+    const skill = read('skills/spec-commit-push-pr/SKILL.md');
+    const writingReference = read('skills/spec-commit-push-pr/references/pr-description-writing.md');
+    const lfg = read('skills/spec-lfg/SKILL.md');
+
+    expect(lfg).toContain('If it prints a `New concepts:` trailer after the PR URL');
+    expect(lfg).toContain('run spec-explain <name> to go deeper');
+    expect(skill).toContain('pr_teaching_section:');
+    expect(skill).toContain('<repo-root>/.spec-first/config.local.yaml');
+    expect(skill).toContain('pr_teaching_archive:');
+    expect(skill).toContain('A per-run `archive:on|off` token overrides the archive key');
+    expect(skill).toContain('docs/explainers/YYYY-MM-DD-<concept-slug>.md');
+    expect(skill).toContain('New concepts: <name>[, <name>]');
+    expect(skill).toContain('Run spec-explain <name> to go deeper.');
+    expect(writingReference).toContain('## Step B2: Judge new concepts');
+    expect(writingReference).toContain('## New concepts');
+    expect(writingReference).toContain('Check each candidate against the base ref, never the working tree');
+    expect(writingReference).toContain('Description-only and description-update runs never write repo files.');
+    expect(writingReference).toMatch(/New concepts section[\s\S]*Evidence block[\s\S]*Spec-First badge/);
+    expect(skill).not.toContain('/ce-explain');
+    expect(skill).not.toContain('.compound-engineering/config.local.yaml');
+    expect(writingReference).not.toContain('Compound Engineering badge');
+  });
+
   test('spec-test-browser keeps pipeline mode unattended through human verification and failures', () => {
     const skill = read('skills/spec-test-browser/SKILL.md');
     const pipelineReference = read('skills/spec-test-browser/references/pipeline-orchestration.md');

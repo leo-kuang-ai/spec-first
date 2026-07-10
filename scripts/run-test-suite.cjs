@@ -78,13 +78,19 @@ function runOptionalBash(scriptPath) {
   runBash(scriptPath);
 }
 
-function runJestFiles(testPaths, extraArgs = []) {
+function runJestFiles(testPaths, extraArgs = [], options = {}) {
   const existing = testPaths.filter(testPathExists);
   const missing = testPaths.filter((testPath) => !testPathExists(testPath));
   for (const testPath of missing) {
     console.log(`skip missing legacy Jest test: ${testPath}`);
   }
   if (existing.length === 0) {
+    if (options.required === true) {
+      const suiteName = options.suiteName || 'Jest suite';
+      const error = new Error(`${suiteName} has no active Jest tests; refusing to pass with zero checks`);
+      error.status = 1;
+      throw error;
+    }
     return;
   }
   runJest([...existing, ...extraArgs]);
@@ -100,22 +106,37 @@ function runUnit() {
 
 function runMcpSetup() {
   if (isWindows && !forcePosixOnWindows) {
-    runJestFiles(['tests/unit/mcp-setup-powershell-contracts.test.js'], ['--runInBand']);
+    runJestFiles(['tests/unit/mcp-setup-powershell-contracts.test.js'], ['--runInBand'], {
+      required: true,
+      suiteName: 'mcp-setup',
+    });
     return;
   }
   runOptionalBash('tests/unit/mcp-setup.sh');
+  runJestFiles(['tests/unit/mcp-setup-contracts.test.js'], ['--runInBand'], {
+    required: true,
+    suiteName: 'mcp-setup',
+  });
 }
 
 function runSmoke() {
   runOptionalBash('tests/smoke/install-local.sh');
   runOptionalBash('tests/smoke/cli.sh');
+  runJestFiles(['tests/smoke/cli-smoke.test.js'], ['--runInBand'], {
+    required: true,
+    suiteName: 'smoke',
+  });
 }
 
 function runIntegration() {
   runJestFiles([
+    'tests/integration/qoder-runtime-lifecycle.integration.test.js',
     'tests/integration/verification-gate.integration.test.js',
     'tests/integration/spec-work-closeout-producer.test.js',
-  ], ['--runInBand']);
+  ], ['--runInBand'], {
+    required: true,
+    suiteName: 'integration',
+  });
 }
 
 function runReleaseGovernance() {

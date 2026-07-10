@@ -190,6 +190,7 @@ class QoderAdapter extends PlatformAdapter {
     checks.push(inspectHostNativePointer(projectRoot, QODER_RULE_POINTER_PATH, {
       hostId: this.id,
       hostLabel: 'Qoder',
+      expectedPrefix: QODER_POINTER_FRONTMATTER,
     }));
     checks.push(...inspectManagedQoderHookFiles(projectRoot));
     checks.push(...inspectManagedQoderHooks(projectRoot).map(qoderHookStatusToRuntimeCheck));

@@ -86,6 +86,16 @@
 
 # plan_skip_scoping_confirm: true
 
+# --- PR concept teaching ---
+# Active consumer: spec-commit-push-pr reads these keys when composing a PR
+# description. The teaching section defaults on; uncomment and set false to
+# disable it locally. Archival defaults off; when true, full workflow PR
+# creation/update may also write docs/explainers/ entries before applying the
+# PR body. Per-run archive:on|off overrides the archival key only.
+
+# pr_teaching_section: true
+# pr_teaching_archive: false
+
 # --- Project workflow conventions ---
 # Do not store team-shared tracker policy, label vocabulary, external PR
 # request-surface policy, issue acceptance rules, or rejected-scope decisions in

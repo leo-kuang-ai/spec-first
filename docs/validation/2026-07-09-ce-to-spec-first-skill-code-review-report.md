@@ -1843,7 +1843,7 @@ Phase 2 逐 skill 语义审查完成。下一步进入 Phase 3 全局交叉验�
 | 2026-07-10 17:14:54 CST | medium — `spec-resolve-pr-feedback` focused contract test 仍断言旧 helper path / runtime mirror path | fixed | 当前 source 已使用 `$SKILL_DIR/scripts/<helper>`；新增 `tests/unit/spec-resolve-pr-feedback-contracts.test.js` 锁定 loaded skill directory helper path，不再要求 `.claude/skills` / `.agents/skills` |
 | 2026-07-10 17:21:15 CST | medium — `spec-resolve-pr-feedback` resolver prompt 测试仍读取退役 `agents/spec-pr-comment-resolver.agent.md` | fixed | `tests/unit/spec-resolve-pr-feedback-contracts.test.js` 增加 skill-local resolver prompt 覆盖，锁定 `skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md` 及关键 contract，并确认不恢复退役 repo-level agent path |
 | 2026-07-10 17:32:23 CST | medium — `spec-resolve-pr-feedback` 与 CE 对比后仍缺少 resolver `blocked` 消费、reply 前 thread ID verification、大批量 central judgment 分组和脚本 repo autodetect 友好降级 | fixed | `skills/spec-resolve-pr-feedback/references/full-mode.md` 恢复 CE 行为合同并保留 spec-first skill-local path；`get-pr-comments` / `get-thread-for-comment` 恢复 `set -e` 下的 `|| true` 友好错误路径；`tests/unit/spec-resolve-pr-feedback-contracts.test.js` 覆盖 |
-| 2026-07-10 17:16:00 CST | medium — `New concepts:` trailer 消费合同悬空 | deferred | 用户要求最后处理；当前判断是若按 CE 对齐需恢复完整 concept teaching / archive / trailer 生产链路，不能只补消费端字样 |
+| 2026-07-10 18:02:41 CST | medium — `New concepts:` trailer 消费合同悬空 | fixed | `skills/spec-commit-push-pr/SKILL.md` 恢复 Spec-First 版 concept teaching gate、`pr_teaching_archive` / `archive:on|off`、`docs/explainers/` archival hook 和 `New concepts:` trailer；`references/pr-description-writing.md` 恢复 `Step B2` 与 `## New concepts` body 组装；`tests/unit/pipeline-mode-contracts.test.js` 覆盖 producer/consumer 对齐 |
 
 ## 验证命令记录
 

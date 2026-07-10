@@ -132,6 +132,50 @@ Do not label test output as "Demo" or "Screenshots". Place any preserved evidenc
 
 ---
 
+## Step B2: Judge new concepts
+
+Decide whether the change introduces a concept: a pattern, technique, library, or domain idea that a reader of this repo would plausibly not know. Skip this step entirely when the skill's concept teaching gate is off.
+
+**Gather candidates from the diff first.** Read the Pre-A diff for concept-shaped novelty: a dependency put to first real use, a technique the diff visibly introduces, or a domain idea the code now encodes. Most PRs surface no candidate; stop there and compose no section. Absence is the common case, and this path costs zero extra tool calls.
+
+**Check each candidate against the base ref, never the working tree.** The working tree contains this PR's own code, so grepping it finds the concept you just added and wrongly concludes it is already established. Check the base instead, using the base resolved in Pre-A:
+
+```bash
+git grep -il -e "<term>" "<base-remote>/<base>" | head -5
+```
+
+Run one call per candidate. Candidates cap at two, so the cost stays bounded. Empty output means the concept is absent from the base.
+
+A candidate is teachable only when it is both new to this codebase in this PR and transferable beyond it. Never teach routine use of an already-established repo pattern, ordinary refactors, renames, dependency bumps, or project-internal plumbing with no transferable idea. When in doubt, omit; a missing section costs little, while a patronizing one trains readers to skip the feature.
+
+In the `gh` fallback path (fork PR, no local base refs), judge from diff context alone and lean conservative: compose the section only when the concept is unmistakably new.
+
+- Bad: teaching "dependency injection" because a PR added one constructor argument in a codebase full of DI.
+- Good: teaching infinite scroll on the PR that replaces pagination with it for the first time.
+
+**Compose the section** under the heading `## New concepts` for at most 2 concepts. When more qualify, teach the most load-bearing concepts and name the rest in one sentence. Per concept, write roughly 10-25 lines covering:
+
+1. **What it is**: the concept in plain words, no jargon dependency.
+2. **Why here**: why it was chosen over the obvious alternative this PR could have used.
+3. **One example from this PR**: how the shipped behavior exercises the concept.
+4. **When not to use it**: one sentence on the boundary.
+
+Format by material:
+
+| Material | Show |
+|----------|------|
+| Architecture, relationships, boundaries | Fenced `mermaid` block (`flowchart TB`) |
+| Code behavior, a diff's mechanics | Fenced code block with a one-line why comment above |
+| A comparison or trade-off | Pipe-delimited table, prose verdict underneath |
+
+Lead with the point, then the mechanism, then the caveat. Dense is good; long is not. Never hand-draw box-drawing or ASCII diagrams. The section is additive to Step D's sizing: a small PR that introduces a heavy concept still gets the section, and the section never counts against the base description's size rows.
+
+**Rewrite preservation:** when rewriting an existing PR body, preserve an existing `## New concepts` section and any explainer-doc link verbatim, same as `## Demo`, unless the user's focus asks to refresh the concepts. Description-only and description-update runs never write repo files.
+
+**Archival hook:** when `spec-commit-push-pr` confirms the apply and `pr_teaching_archive` is on in full workflow, the teaching content is also written to `docs/explainers/` and linked from the section. The commit-and-push transition and doc frontmatter live in `SKILL.md` Step 7.
+
+---
+
 ## Step C: Frame the narrative
 
 Articulate the PR's narrative frame:
@@ -259,8 +303,9 @@ Assemble the body in this order:
 1. **Opening** -- the narrative frame from Step C, at the depth chosen in Step D. Under a heading (e.g., `## Summary`) if the description uses any `##` headings elsewhere; a bare paragraph otherwise.
 2. **Body sections** -- only the sections that earn their keep for this change: what changed and why, design decisions, tables for data, visual aids when complexity warrants. Skip empty sections entirely.
 3. **Test plan** -- only when non-obvious per the writing principles. Omit otherwise.
-4. **Evidence block** -- only the preserved or freshly captured block from Step B, if one exists. Do not fabricate or placeholder.
-5. **Spec-First badge** -- append a badge footer separated by a `---` rule. Skip if regenerating an existing body that already contains the badge.
+4. **New concepts section** -- only when Step B2 produced one or preserved one from the existing PR body.
+5. **Evidence block** -- only the preserved or freshly captured block from Step B, if one exists. Do not fabricate or placeholder.
+6. **Spec-First badge** -- append a badge footer separated by a `---` rule. Skip if regenerating an existing body that already contains the badge.
 
 **Badge:**
 

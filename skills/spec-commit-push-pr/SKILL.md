@@ -186,7 +186,12 @@ Otherwise, run the full decision: if the branch diff changes observable behavior
 
 When evidence is not possible (docs-only, markdown-only, changelog-only, release metadata, CI/config-only, test-only, or pure internal refactors), skip without asking.
 
-**Compose the title and body.** Continue with Steps A through H from the already-loaded reference (commit classification, evidence handling, narrative framing, sizing, writing voice and principles, visual communication, title format, body assembly, the Spec-First badge, and the compression pass). For an existing PR, the current body was already read in Pre-A.
+**Concept teaching gate (before composition).** Use the repo root from context; if it is empty or shows a literal command string, resolve it at runtime with `git rev-parse --show-toplevel`. Read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. Only an active, non-commented `pr_teaching_section:` key counts; lines starting with `#` are comments, and the shipped template documents optional keys as commented examples. The gate is off only when the active value is exactly `false`; a missing file, missing key, or any other value means the default is on. The same read resolves `pr_teaching_archive:`: on only when the active value is exactly `true`, otherwise off. A per-run `archive:on|off` token overrides the archive key for this invocation.
+
+- Gate **on** -- judge concept novelty and compose the section per Step B2 of the reference. The gate is single: when it is off, skip judgment, the section, Step 8 trailer and offer, and archival entirely.
+- Gate **off** -- compose the description without any concept handling.
+
+**Compose the title and body.** Continue with Steps A through H from the already-loaded reference (commit classification, evidence handling, concept judgment when the gate is on, narrative framing, sizing, writing voice and principles, visual communication, title format, body assembly, the Spec-First badge, and the compression pass). For an existing PR, the current body was already read in Pre-A.
 
 ### Step 7: Create or update the PR
 
@@ -199,6 +204,15 @@ BODY_FILE=$(mktemp "${TMPDIR:-/tmp}/spec-pr-body.XXXXXX")
 ```
 
 Use the platform's file-write tool to write the composed body markdown to `$BODY_FILE` verbatim. Do not embed the body in a shell heredoc, stdin pipe, command substitution, or inline shell string; arbitrary PR body text can contain delimiter-like or shell-sensitive content.
+
+**Explainer archival.** This runs only in full workflow, with `pr_teaching_archive` on, a composed `## New concepts` section, and a body that will be applied by this run. A declined existing-PR rewrite, or a pipeline-defaulted no rewrite, skips archival entirely so no unlinked doc commit is left behind. All paths resolve from the repo root, never the CWD. With two taught concepts, write one file per concept and stage both in the single commit. Execute these transitions immediately before the `gh` create/edit call:
+
+1. `git check-ignore -q docs/explainers/YYYY-MM-DD-<concept-slug>.md` from the repo root. The check works on not-yet-created paths. If the path is ignored, print a one-line warning and skip archival entirely, writing nothing and never using `git add -f`.
+2. Write the file, creating `docs/explainers/` if needed, with YAML frontmatter `title`, `date`, `input_shape: concept`, `subject`, and the teaching content. If the file already exists from a prior run, overwrite it.
+3. `git add` those file(s) only, commit with `docs(explainer): teach <concept>[, <concept>]`, and push. If the commit reports nothing to commit, the doc is already committed from a prior run; keep the link and continue.
+4. Splice a head-branch blob URL per doc into the `## New concepts` section, then rewrite `$BODY_FILE` with the final composed body before applying.
+
+If the doc write, commit, or push fails, warn and continue to PR creation or edit without the link. Never strand the flow between commit and PR.
 
 #### New PR (no existing PR from Step 3)
 
@@ -234,3 +248,5 @@ The new commits are already on the PR from Step 5. Report the PR URL, then ask w
 ### Step 8: Report
 
 Output the PR URL.
+
+If a body applied by this run contains a `## New concepts` section, print one line after the PR URL in every mode: `New concepts: <name>[, <name>]`. In interactive full-workflow runs, follow it with one line per taught concept: `Run spec-explain <name> to go deeper.` Do not print the trailer when this run applied no body, including a rewrite that was declined or pipeline-defaulted to no, or when no PR exists.

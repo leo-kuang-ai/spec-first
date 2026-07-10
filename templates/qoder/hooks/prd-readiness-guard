@@ -151,10 +151,20 @@ function isReadyClaimPrdArtifact(absolutePath) {
     return false;
   }
   return frontmatterFieldValue(content, 'status').toLowerCase() === 'ready-for-planning'
-    || /^\s*readiness_(?:verified_by|verified_at|checker_schema|prd_hash|inputs_hash)\s*:/im.test(content)
+    || hasFrontmatterMachineReceipt(content)
     || /^\s*(?:-\s*)?write_mode:\s*final-prd\s*$/im.test(content)
     || /^\s*(?:-\s*)?can_enter_spec_plan:\s*yes\s*$/im.test(content)
     || /^\s*(?:-\s*)?readiness_outcome:\s*ready-for-planning\s*$/im.test(content);
+}
+
+function hasFrontmatterMachineReceipt(text) {
+  return [
+    'readiness_verified_by',
+    'readiness_verified_at',
+    'readiness_checker_schema',
+    'readiness_prd_hash',
+    'readiness_inputs_hash',
+  ].some((fieldName) => frontmatterFieldValue(text, fieldName) !== '');
 }
 
 function frontmatterFieldValue(text, fieldName) {
