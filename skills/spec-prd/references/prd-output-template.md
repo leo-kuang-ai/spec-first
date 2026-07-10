@@ -2,7 +2,7 @@
 
 Load this reference before drafting or materially rewriting a PRD artifact.
 
-This file owns the output shape, section skeleton, surface lenses, and embedded standard template cues. Do not create a second packaged template tree for the same rules.
+This file owns the machine-safe output contract, section identity, composition rules, and template routing semantics. Human-facing body templates live under `../assets/templates/`; optional built-in industry overlays live under `../assets/overlays/`. Do not duplicate their body content here.
 
 ## Contents
 
@@ -14,7 +14,7 @@ This file owns the output shape, section skeleton, surface lenses, and embedded 
 - [Conditional Sections](#conditional-sections)
 - [Surface Lenses](#surface-lenses)
 - [Product Expert Lens Write-In](#product-expert-lens-write-in)
-- [Embedded Standard Skeleton](#embedded-standard-skeleton)
+- [Template Composition And Machine Sections](#template-composition-and-machine-sections)
 - [PRD Quality Diagnosis And Optimization](#prd-quality-diagnosis-and-optimization)
 - [P0 PRD Quality Packs](#p0-prd-quality-packs)
 - [Feature Slices](#feature-slices)
@@ -74,17 +74,17 @@ Keep every core section machine-locatable with either the canonical heading (`##
 
 Show the selected `clarification_view` and its checklist before or during authoring when it helps the owner see what is being clarified. The checklist is a human-facing display surface: it names likely questions, surfaces omissions, and routes unresolved items into existing PRD sections. It is not a script-owned quality score, not a required heading set, and not a `BLOCKING_REASON_CODES` source.
 
-Use these views without creating a second template tree:
+Use these views to select the packaged template asset; do not load every surface template:
 
-| clarification_view | Use when | Display focus |
-| --- | --- | --- |
-| `Generic` | Surface is unknown or narrow enough for the core skeleton | target user, change delta, requirements, acceptance, scope, evidence, OQ closure |
-| `App` | Native/mobile client behavior changes | entry, navigation, state, copy, loading/empty/error, permissions, rollout, accessibility, i18n |
-| `H5/PC` | Web or desktop-browser surface changes | routes, forms, browser back/refresh, responsive viewports, login/session state, sharing/SEO when relevant |
-| `Admin` | Internal operations, review, or management surfaces | menu placement, roles, list/search/filter/export, forms, audit, bulk action, maker-checker when relevant |
-| `Backend/Java` | Service/platform behavior visible to products or downstream consumers | state semantics, idempotency, compatibility, error outcomes, observability expectations, operational readiness |
-| `CLI/DevTool` | Developer or agent-facing command/workflow changes | command entry, args/config, preview-first, logs, cross-platform behavior, failure recovery, upgrade/runtime projection |
-| `Mixed` | Cross-surface or producer/consumer changes | source-of-truth, cross-surface consistency, contract expectations, async sync, degradation, end-to-end acceptance |
+| clarification_view | Packaged asset | Use when | Display focus |
+| --- | --- | --- | --- |
+| `Generic` | `../assets/templates/00-generic.md` | Every PRD artifact | target user, change delta, requirements, acceptance, scope, evidence, OQ closure |
+| `App` | `../assets/templates/10-app.md` | Native/mobile client behavior changes | entry, navigation, state, copy, loading/empty/error, permissions, rollout, accessibility, i18n |
+| `H5/PC` | `../assets/templates/40-h5-pc.md` | Web or desktop-browser surface changes | routes, forms, browser back/refresh, responsive viewports, login/session state, sharing/SEO when relevant |
+| `Admin` | `../assets/templates/20-admin.md` | Internal operations, review, or management surfaces | menu placement, roles, list/search/filter/export, forms, audit, bulk action, maker-checker when relevant |
+| `Backend/Java` | `../assets/templates/30-backend.md` | Service/platform behavior visible to products or downstream consumers | state semantics, idempotency, compatibility, error outcomes, observability expectations, operational readiness |
+| `CLI/DevTool` | `../assets/templates/50-cli-devtool.md` | Developer or agent-facing command/workflow changes | command entry, args/config, preview-first, logs, cross-platform behavior, failure recovery, upgrade/runtime projection |
+| `Mixed` | `../assets/templates/60-mixed.md` | Real cross-surface or producer/consumer changes | source-of-truth, cross-surface consistency, contract expectations, async sync, degradation, end-to-end acceptance |
 
 ## Engineering Clarification Coverage Pack
 
@@ -170,16 +170,9 @@ Use `## Planning Recheck` only when it prevents advisory evidence from being con
 
 ## Surface Lenses
 
-Select one primary lens, then add secondary lenses only for real mixed-surface changes.
+Load `../assets/templates/00-generic.md`, then select one primary surface asset. Add a secondary surface asset only for real mixed-surface changes. Use `../assets/templates/70-large-requirement-index.md` only after the current conversation user confirms split boundaries.
 
-| Surface | Add these product questions |
-| --- | --- |
-| App | entry point, navigation, state, copy, loading/empty/error, permissions, release/gray rollout, accessibility, i18n, risk or confirmation steps |
-| H5/PC | routes, form behavior, browser back/refresh, responsive viewports, login/session state, sharing/SEO if relevant |
-| Admin | menu placement, roles/permissions, list/search/filter/export, form validation, review flow, audit trail, bulk action, four-eyes/maker-checker when relevant |
-| Backend/Java | product-level state semantics, idempotency expectations, compatibility, transaction-visible outcomes, error semantics, observability expectations, operational readiness |
-| CLI/DevTool | command entry, arguments/config, dry-run or preview-first behavior, logs, cross-platform behavior, failure recovery, upgrade/migration path, workflow/skill/runtime quality signals when the change affects agent-facing tools |
-| Mixed | source-of-truth, cross-surface consistency, contract expectation, async sync, degradation, end-to-end acceptance, ownership boundary |
+The selected asset owns the detailed surface questions. This contract only owns selection, composition, machine safety, and the rule that irrelevant templates stay unloaded.
 
 These are surface lenses, not role taxonomies. They ask PRD questions; they do not prescribe implementation units.
 
@@ -192,22 +185,20 @@ When a project has local templates, standards, glossary, compliance docs, or ind
 1. Read only the relevant section.
 2. Treat it as a project-local overlay.
 3. Record which overlay was applied.
-4. Ask for confirmation when the overlay suggests legal, compliance, money movement, privacy, or safety implications.
+4. Ask the current conversation user for confirmation when the overlay suggests legal, compliance, money movement, privacy, or safety implications.
 
 Missing local overlay docs are a graceful absence, not an error and not permission to invent industry rules. Do not treat template industry facts as confirmed project rules; local templates raise questions until source or owner confirmation resolves them.
 
 ## Industry Overlay Triggers
 
-When the increment's industry context is clear from input or project docs, layer an industry overlay on top of the surface lens. The overlay only raises questions and triggers conditional sections; it never asserts an industry rule as confirmed truth.
+When the increment's industry context is clear from input, project source, or the current conversation user, layer an industry overlay on top of the surface template. The overlay only raises questions and triggers conditional sections; it never asserts an industry rule as confirmed truth.
 
-| Industry context | Raise these questions |
-| --- | --- |
-| Securities / trading | order/position state semantics, trading-window and market rules, risk control, clearing/settlement, audit trail, regulatory disclosure |
-| Credit / lending | approval flow and limits, risk/anti-fraud gates, interest/fee rules, repayment and overdue states, compliance and data-retention boundaries |
-| Admin / mid-back-office | data scope isolation, review and maker-checker flow, bulk action, export, audit log |
-| Backend / platform service | state semantics, idempotency, compatibility/versioning, transaction-visible outcomes, observability and operational readiness |
+| Industry context | Overlay source | Behavior |
+| --- | --- | --- |
+| Securities / trading | `../assets/overlays/securities.md` | Load only on a securities/trading signal; treat every rule as advisory until project source or current-user confirmation |
+| Other industries | consumer-project local overlay | Read only the relevant local source; missing local docs is a graceful absence, never permission to invent rules |
 
-If no industry context is detectable, skip this section and use the generic surface lens only.
+If no industry context is detectable, do not load any industry overlay.
 
 ## Product Expert Lens Write-In
 
@@ -225,48 +216,17 @@ Use `accepted-assumption` only when owner accepted it or source evidence proves 
 
 For structured or already-decided inputs, synthesize settled WHAT into standard PRD sections and demote implementation/testing/API/schema/task details to HOW unless they change scope, acceptance, or source-of-truth. Do not introduce a named conversion field map, adapter, issue tracker, or second output artifact.
 
-## Embedded Standard Skeleton
+## Template Composition And Machine Sections
 
-Use this skeleton as the packaged runtime template. It replaces the former separate template tree.
+Compose the durable PRD in this order:
+
+1. Apply the Default Frontmatter and output-shape rules from this contract.
+2. Load `../assets/templates/00-generic.md` for the human-facing core body.
+3. Load one primary surface asset from the Template Trigger Map; add secondary assets only for real mixed-surface changes.
+4. Load `../assets/overlays/securities.md` only when a securities/trading signal exists, then layer any consumer-project local overlay.
+5. Append the machine-safe sections below. Human-facing templates must not prefill `status: ready-for-planning`, `readiness_verified_*`, or a ready receipt.
 
 ```markdown
-## Summary
-
-<One paragraph: actor, increment, intended outcome, and current system anchor.>
-
-## Change Delta
-
-| item | current | target | delta | evidence |
-| --- | --- | --- | --- | --- |
-
-## Requirements
-
-| id | priority | requirement | rationale/source |
-| --- | --- | --- | --- |
-| R-01 | P0 | <observable product behavior> | <evidence tag/path> |
-
-## Acceptance Examples
-
-AE-01（对应 R-01）
-Given <current or initial state>
-When <actor action or system event>
-Then <observable outcome>
-
-AE-02（对应 R-01，异常）
-Given <exception or boundary state>
-When <actor action or system event>
-Then <observable outcome or explicit non-goal>
-
-## Scope Boundaries
-
-### In Scope
-
-### Out Of Scope
-
-## Evidence And Assumptions
-
-| claim | tag | source / owner | note |
-| --- | --- | --- | --- |
 
 ## Outstanding Questions
 
@@ -339,7 +299,7 @@ why_not:
 
 The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 
-Use the surface lens and project-local overlay to add only the conditional sections the increment needs.
+Use the selected packaged template asset and project-local overlay to add only the conditional sections the increment needs.
 
 ## Authoring Discipline
 
@@ -368,7 +328,7 @@ rewrite_strategy:
 
 Give optimization suggestions as `original -> recommendation -> reason -> write target`. Prioritize suggestions that reduce planning invention: missing current-state evidence, unclear delta, untestable wording, missing priority, missing acceptance, industry/compliance uncertainty, source/user contradiction, or scope creep.
 
-Then produce the final rewritten PRD using the standard skeleton and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
+Then produce the final rewritten PRD using the packaged generic template, the selected surface asset, and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
 
 `not-run` is a run-local decision-card state only; do not emit it in the diagnosis block because an emitted refine/validate diagnosis has run by definition. Do not create numeric PRD scorecards, 0-100 quality ratings, or industry hard-threshold rubrics.
 

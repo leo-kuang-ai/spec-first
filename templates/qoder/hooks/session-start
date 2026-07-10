@@ -9,7 +9,8 @@ const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
 const LANG_START = '<!-- spec-first:lang:start -->';
 const LANG_END = '<!-- spec-first:lang:end -->';
 
-const projectDir = resolveProjectDir();
+const input = parseJsonObject(readStdin());
+const projectDir = resolveProjectDir(input);
 const instructionPath = path.join(projectDir, 'AGENTS.md');
 let additionalContext = [
   '[spec-first] using-spec-first SessionStart injection',
@@ -49,13 +50,12 @@ process.stdout.write(JSON.stringify({
   },
 }));
 
-function resolveProjectDir() {
+function resolveProjectDir(input) {
   const fromEnv = process.env.QODER_PROJECT_DIR;
   if (typeof fromEnv === 'string' && fromEnv.trim()) {
     return fromEnv;
   }
 
-  const input = parseJsonObject(readStdin());
   if (typeof input.cwd === 'string' && input.cwd.trim()) {
     return input.cwd;
   }

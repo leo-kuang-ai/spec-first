@@ -122,9 +122,35 @@ Load references only when their trigger is present:
 - `references/product-expert-lens.md` - default authoring hot path: downstream-confirmation risk ranking, Product Expert Lens interface, structured-input synthesis, design-source/large-input pointers, and escalation boundary.
 - `references/design-source-evidence.md` - trigger-only for front-end/UI inputs with design links, screenshots, exported design context, or interaction-state material; design facts stay advisory until source/owner reconciliation.
 - `references/large-input-checkpoint.md` - trigger-only for oversized, multi-source, long-chain, or resume-risk PRDs; reduced candidates feed Product Expert Lens and PRD sections act as checkpoints.
-- `references/prd-output-template.md` - drafting, output shape, Product Expert Lens write-in, PRD quality diagnosis, Pre-PRD Clarification write-target mapping, P0/P1 quality packs, section selection, surface lenses, embedded standard template skeleton, and project-local overlays.
+- `references/prd-output-template.md` - machine-safe output contract、section identity、Product Expert Lens write-in、PRD quality diagnosis、P0/P1 quality packs、template composition/routing 与 project-local overlay 边界；不再承载重复的 human-facing 正文骨架。
 - `references/prd-readiness-lens.md` - final PRD quality, Pre-PRD Clarification closure, triggered P0/P1 pack closure, readiness, handoff, or doc-review decision.
 - `references/evaluation-governance.md` - maturity posture, owner, review cadence, eval status, and promotion boundary; load for governance or lifecycle questions, not during normal PRD authoring.
+
+## Template Trigger Map
+
+模板是 npm 产品内置运行资产，按需组合，不能每次全量读取：
+
+1. 每个会产出 PRD artifact 的 run 都读取 `assets/templates/00-generic.md`。
+2. 根据 `target_surface` 只读取一个 primary surface 模板；只有真实 Mixed 需求才增加必要的 secondary surface 模板。
+3. 只有当前执行对话用户确认拆分边界后，才读取 `assets/templates/70-large-requirement-index.md`。
+4. 只有输入、项目 source 或当前执行对话用户明确证券/交易信号时，才读取 `assets/overlays/securities.md`；无行业信号时不得加载。
+5. 用户项目自己的模板、术语和行业规则按 project-local overlay 读取相关片段，不复制到 product-bundled assets。
+
+| target_surface / trigger | 读取资产 |
+| --- | --- |
+| every PRD artifact | `assets/templates/00-generic.md` |
+| App | `assets/templates/10-app.md` |
+| Admin | `assets/templates/20-admin.md` |
+| Backend / Java | `assets/templates/30-backend.md` |
+| H5 / PC | `assets/templates/40-h5-pc.md` |
+| CLI / DevTool / workflow / runtime | `assets/templates/50-cli-devtool.md` |
+| real cross-surface or producer/consumer change | `assets/templates/60-mixed.md` |
+| owner-confirmed oversized split | `assets/templates/70-large-requirement-index.md` |
+| securities / trading signal | `assets/overlays/securities.md` |
+
+`references/prd-output-template.md` 先提供 frontmatter、machine-owned section、readiness、trace 与 finalize 合同，再组合上述正文资产。Human-facing 模板不得预填 `status: ready-for-planning`、`readiness_verified_*` 或 ready receipt。
+
+所有人类问题都询问当前执行对话的用户。兼容字段中的 `owner`、会签材料或专业意见只表示证据/责任语义，不允许路由第二个人类联系人。
 
 ## Input
 
@@ -267,7 +293,7 @@ The Requirements Grill / Domain Grill Gate is PRD-local in normal mode: ask one 
 
 ### Phase 3: Draft, Refine, Or Split
 
-Choose `output_shape` before drafting, then use `prd-output-template.md` for the core skeleton, surface lens, project-local overlay, and split topology. Include conditional sections only when they reduce planning invention; do not copy run-local scratch into the PRD by default.
+Choose `output_shape` before drafting, apply the machine-safe contract from `prd-output-template.md`, then compose `assets/templates/00-generic.md`, one primary surface template, and only the triggered built-in/project-local overlays. Include conditional sections only when they reduce planning invention; do not copy run-local scratch into the PRD by default.
 
 When refining or validating an existing PRD, produce optimization suggestions in the compact form `original -> recommendation -> reason -> write target` before the final rewrite or blocking question. The final durable artifact is the rewritten PRD-grade document under `docs/brainstorms/`, not a standalone critique report.
 

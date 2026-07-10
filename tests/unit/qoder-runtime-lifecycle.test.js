@@ -192,11 +192,12 @@ describe('Qoder runtime lifecycle', () => {
 
     const result = spawnSync(process.execPath, [hookPath], {
       cwd: projectRoot,
-      input: JSON.stringify({ cwd: projectRoot }),
+      input: JSON.stringify({ cwd: projectRoot, padding: 'x'.repeat(1024 * 1024) }),
       encoding: 'utf8',
       env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
     });
 
+    expect(result.error).toBeUndefined();
     expect(result.status).toBe(0);
     const output = JSON.parse(result.stdout);
     expect(output.hookSpecificOutput).toMatchObject({
