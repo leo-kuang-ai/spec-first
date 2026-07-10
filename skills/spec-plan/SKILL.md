@@ -6,7 +6,7 @@ argument-hint: "[optional: feature description, requirements doc path, plan path
 
 # Create Technical Plan
 
-**Note: The current year is 2026.** Use this when dating plans and searching for recent documentation.
+Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 `spec-brainstorm` defines **WHAT** to build by creating a requirements-only unified plan. `spec-plan` enriches that same artifact with **HOW** to build it. `spec-work` executes implementation-ready plans. A prior brainstorm is useful context but never required — `spec-plan` works from any input: a requirements-only unified plan, a legacy requirements doc, a bug report, a feature idea, or a rough description.
 

@@ -6,7 +6,7 @@ argument-hint: "[optional: section to revisit, e.g. 'metrics' or 'approach']"
 
 # Product Strategy
 
-**Note: The current year is 2026.** Use this when dating the strategy document.
+Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 `spec-strategy` produces and maintains `STRATEGY.md` - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`spec-ideate`, `spec-brainstorm`, `spec-plan`) read it as grounding when it exists.
 

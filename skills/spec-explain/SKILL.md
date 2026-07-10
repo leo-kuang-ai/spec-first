@@ -10,7 +10,7 @@ Teach the user one thing well: a concept, a change, an idea, or a window of thei
 
 Use the user's current request from the conversation as the explainer input.
 
-**Note: The current year is 2026.** Use this when weighting external sources and dating artifacts.
+Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 ## Who the explainer is for
 

@@ -6,7 +6,7 @@ argument-hint: "[feature idea or problem to explore] [output:html]"
 
 # Brainstorm a Feature or Improvement
 
-**Note: The current year is 2026.** Use this when dating requirements-only unified plans.
+Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 Brainstorming helps answer **WHAT** to build through collaborative dialogue. It precedes `spec-plan`, which enriches the same unified plan artifact with **HOW** to build it.
 

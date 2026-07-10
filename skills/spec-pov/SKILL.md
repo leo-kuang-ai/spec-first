@@ -10,7 +10,7 @@ Return a decisive, **graded verdict** on something from the outside world — ju
 
 Use the user's current request from the conversation as the POV input.
 
-**Note: The current year is 2026.** Use this when weighting source recency and dating any captured record.
+Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 ## The one rule that is the whole moat
 

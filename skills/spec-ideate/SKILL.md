@@ -7,7 +7,7 @@ argument-hint: "[feature, focus area, or constraint] [output:md]"
 
 # Generate Improvement Ideas
 
-**Note: The current year is 2026.** Use this when dating ideation documents and checking recent ideation artifacts.
+Note: Use the current date from the active host context. Use this when weighting external sources and dating artifacts.
 
 `spec-ideate` precedes `spec-brainstorm`.
 
