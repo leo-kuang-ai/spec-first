@@ -1,9 +1,13 @@
 # spec-prd Skill 目标与整体重构审查
 
-**日期：** 2026-07-11  
-**状态：** source-grounded architecture review；建议整体重构，尚未修改 `skills/spec-prd/**`  
-**审查对象：** `skills/spec-prd/`、PRD 模板、checker/finalizer、Claude/Qoder hooks、现有 tests/evals、`spec-plan` handoff  
-**目标读者：** spec-first maintainer、产品负责人、workflow / contract 设计者  
+**日期：** 2026-07-11
+
+**状态：** source-grounded architecture review；建议整体重构，尚未修改 `skills/spec-prd/**`
+
+**审查对象：** `skills/spec-prd/`、PRD 模板、checker/finalizer、Claude/Qoder hooks、现有 tests/evals、`spec-plan` handoff
+
+**目标读者：** spec-first maintainer、产品负责人、workflow / contract 设计者
+
 **性质：** validation / architecture decision input；不是 PRD artifact，不是实施计划，不是 runtime contract
 
 ## 1. 结论先行
@@ -433,6 +437,77 @@ LLM 或独立 reviewer 判断：
 
 只有 semantic review 和 deterministic floor 都通过，才允许 handoff。`spec-plan` 对新式 `artifact_kind: prd-requirements` 复验 receipt/freshness；legacy requirements 保持兼容，并在无法复验时响亮记录 degraded override。
 
+### 6.4 Figma 读取能力复用决策
+
+结论：**不能把 [`skills/spec-work/references/agents/figma-design-sync.md`](../../../skills/spec-work/references/agents/figma-design-sync.md) 整体复用到 `spec-prd`，但应复用并抽取其中的 Design Capture 能力。**
+
+当前 `spec-work` 在 UI/Figma 实现阶段会读取该 prompt，并 dispatch generic subagent 执行设计同步：
+
+- 通过 Figma MCP 访问指定 Figma URL 和 node/component；
+- 抽取颜色、字体、间距、布局、阴影、边框等设计规格；
+- 获取设计截图；
+- 再用 browser 截取当前实现，执行视觉差异分析、修改代码并迭代验证。
+
+其中前半段“读取设计源”是跨 workflow 可复用能力，后半段“实现对比与修复”是 `spec-work` 专属能力。
+
+| 能力 | `spec-prd` 是否复用 | 原因 |
+| --- | --- | --- |
+| 解析 Figma URL、file/node/component 定位信息 | 是 | 建立 design source identity 和读取范围 |
+| 使用当前 host 可用的 Figma provider 获取节点上下文 | 是 | 获得直接设计证据；workflow contract 不绑定具体 provider 内部 API |
+| 获取设计截图或 provider 返回的视觉预览 | 是 | 用于理解页面结构、状态和用户可见交互 |
+| 抽取页面、组件、文本、布局、交互和状态 | 是，但只消费 PRD-relevant WHAT | 支撑 Requirements、Acceptance、Design Coverage 和 gap analysis |
+| 记录无法访问、权限失败、partial read 和 missing node | 是 | 形成 loud degraded evidence，不伪造已读取 |
+| 启动本地页面并截图当前实现 | 否 | 属于实现或一致性审计，不是 PRD authoring |
+| 像素级 Figma-vs-code comparison | 否 | 属于 `spec-work` 或 `spec-app-consistency-audit` |
+| 直接修改 CSS/Tailwind/component code | 否 | 违反 `spec-prd` 的 no implementation 边界 |
+| `w-full`、ERB wrapper、Tailwind spacing 等项目特定规则 | 否 | 不是通用 Figma 读取合同，且可能污染其它技术栈 |
+| “Yes, I did it.” 等实现完成口令 | 否 | 不是 evidence，也不能证明设计读取或 PRD 质量 |
+
+建议把能力拆成两层：
+
+```mermaid
+flowchart LR
+    A[Figma URL / File / Node] --> B[Read-only Design Source Reader]
+    B --> C[Normalized Design Evidence]
+    C --> D[spec-prd<br/>提取 Product WHAT / States / Gaps]
+    C --> E[spec-work<br/>实现截图 / Visual Diff / Code Fix]
+    C --> F[spec-app-consistency-audit<br/>PRD / Figma / Code Consistency]
+```
+
+Read-only reader 的最小输出合同建议为：
+
+```yaml
+design_source_read_result:
+  source_ref:
+  file_or_node_id:
+  read_status: read | partial | unread
+  source_version_or_updated_at:
+  design_role: current-reference | target-proposal | approved-target | illustrative | unknown
+  approval_status:
+  authority_scope:
+  screens_and_components:
+  interaction_and_states:
+  extracted_product_what:
+  visual_specs:
+  missing_or_unread_states:
+  evidence_refs:
+  limitations:
+```
+
+消费边界：
+
+- `spec-prd` 主要消费 `screens_and_components`、`interaction_and_states`、`extracted_product_what`、缺失状态和 authority；视觉数值只有在它们构成产品 acceptance 或品牌硬约束时才进入 PRD。
+- `spec-work` 消费完整 visual specs，并在实现存在后执行 browser capture、diff、code fix 和 repeat verification。
+- `spec-app-consistency-audit` 可以继续消费 materialized Figma context 和 normalized contract 做跨源一致性审计；`spec-prd` 不复用其 run artifact topology。
+
+Source ownership 建议：
+
+1. 不让 `spec-prd` 直接调用现有 full-sync prompt，因为其中包含代码 mutation 权限和 implementation-only 规则。
+2. 在实施计划中把通用 Design Capture 抽成一个 provider-neutral、read-only 的内部 prompt/contract；`spec-prd`、`spec-work` 和 consistency audit 通过各自 adapter 消费。
+3. 如果当前架构尚无合适的 cross-skill prompt owner，第一阶段可在 `spec-prd` 写一个最小 read-only adapter，并用 contract test 锁定与 `spec-work` Design Capture 的共同字段；不要为了复用立即新增公开 workflow 或第二 artifact。
+4. 可参考 `spec-app-consistency-audit` 已有的 `has_figma_reference` / `has_figma_materialized_context` 分离、redaction 和 `extract-figma-contract.js` 规范化方式，但复用其事实/库之前必须先解除 app-audit path 和 artifact schema 耦合。
+5. Figma provider、MCP tool 名称和内部调用参数是 capability 实现细节，不进入 `spec-prd` durable workflow contract；contract 只要求读取结果、证据引用和 degraded reason。
+
 ## 7. Source Authority 模型
 
 Authority 必须按问题类型判断，不能设置一个全局“某来源永远最高”的排序。
@@ -520,10 +595,10 @@ Ready 的语义定义：
 
 | 字段 | 值 | 只表达 |
 | --- | --- | --- |
-| `artifact_mode` | `checkpoint | final` | 是否为可继续恢复的 PRD，或候选最终 PRD |
-| `decision_state` | `open | closed | blocked` | 单个决定当前是否闭合 |
-| `closure_disposition` | `source-resolved | user-answered | user-capped | accepted-assumption | out-of-release | implementation-how` | 为什么该决定可以关闭、延期或下推 |
-| `workflow_outcome` | `ask-user | revise-prd | ready-for-planning | route-out` | 整个 workflow 的下一步 |
+| `artifact_mode` | `checkpoint` / `final` | 是否为可继续恢复的 PRD，或候选最终 PRD |
+| `decision_state` | `open` / `closed` / `blocked` | 单个决定当前是否闭合 |
+| `closure_disposition` | `source-resolved` / `user-answered` / `user-capped` / `accepted-assumption` / `out-of-release` / `implementation-how` | 为什么该决定可以关闭、延期或下推 |
+| `workflow_outcome` | `ask-user` / `revise-prd` / `ready-for-planning` / `route-out` | 整个 workflow 的下一步 |
 
 约束：
 
@@ -590,6 +665,8 @@ skills/spec-prd/
 - checker 只守 deterministic floor；
 - 不增加 workflow engine、持久进度 schema 或第二 PRD artifact。
 
+Figma prompt 资产需要额外满足：Design Source Reader 是 read-only；Implementation Sync 只由 `spec-work` 消费。二者不能继续混在一个可被 `spec-prd` 直接复用的 prompt 中。
+
 ## 12. 保留 / 合并 / 删除 / 重写
 
 | 动作 | 当前能力 | 目标 |
@@ -634,6 +711,7 @@ skills/spec-prd/
 
 - 引入 run-local Source Authority Ledger；
 - 定义 meeting/code/Figma/domain authority adapter；
+- 从 `spec-work` 的 `figma-design-sync.md` 抽取 read-only Design Capture 合同；不复用实现截图、视觉 diff 或代码修改部分；
 - 修复 source input、binary hash、design enum 和 freshness 语义；
 - 不新增 durable artifact。
 
@@ -800,5 +878,9 @@ skills/spec-prd/
 - [`templates/claude/hooks/prd-prewrite-guard`](../../../templates/claude/hooks/prd-prewrite-guard)
 - [`templates/claude/hooks/prd-readiness-guard`](../../../templates/claude/hooks/prd-readiness-guard)
 - [`skills/spec-plan/SKILL.md`](../../../skills/spec-plan/SKILL.md)
+- [`skills/spec-work/SKILL.md`](../../../skills/spec-work/SKILL.md)
+- [`skills/spec-work/references/agents/figma-design-sync.md`](../../../skills/spec-work/references/agents/figma-design-sync.md)
+- [`skills/spec-app-consistency-audit/SKILL.md`](../../../skills/spec-app-consistency-audit/SKILL.md)
+- [`skills/spec-app-consistency-audit/scripts/extract-figma-contract.js`](../../../skills/spec-app-consistency-audit/scripts/extract-figma-contract.js)
 - [`docs/10-prompt/结构化项目角色契约.md`](../../10-prompt/结构化项目角色契约.md)
 - [`docs/plans/spec-prd-optimization-proposal.md`](../../plans/spec-prd-optimization-proposal.md)

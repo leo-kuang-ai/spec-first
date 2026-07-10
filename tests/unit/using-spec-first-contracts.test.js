@@ -5,11 +5,17 @@ const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const skillPath = path.join(repoRoot, 'skills/using-spec-first/SKILL.md');
+const referencePath = path.join(
+  repoRoot,
+  'skills/using-spec-first/references/conditional-routing-boundaries.md',
+);
 const governancePath = path.join(
   repoRoot,
   'src/cli/contracts/dual-host-governance/skills-governance.json',
 );
 const skill = fs.readFileSync(skillPath, 'utf8');
+const reference = fs.readFileSync(referencePath, 'utf8');
+const packageText = `${skill}\n${reference}`;
 const governance = JSON.parse(fs.readFileSync(governancePath, 'utf8'));
 const records = Array.isArray(governance) ? governance : governance.skills;
 
@@ -18,7 +24,7 @@ describe('using-spec-first entry-governor contracts', () => {
     const routeMapHeadings = skill.match(/^## (?:Flow Map|Route Map|Routing Rules)$/gm) || [];
 
     expect(routeMapHeadings).toEqual(['## Flow Map']);
-    expect(skill.split('\n').length).toBeLessThanOrEqual(140);
+    expect(skill.split('\n').length).toBeLessThanOrEqual(100);
     expect(skill).toContain('selects one next entrypoint and yields control');
     expect(skill).toContain('not a rigid state machine');
   });
@@ -34,7 +40,7 @@ describe('using-spec-first entry-governor contracts', () => {
     }
 
     for (const record of internalRecords) {
-      expect(skill).not.toContain(`\`${record.skill_name}\``);
+      expect(packageText).not.toContain(`\`${record.skill_name}\``);
     }
   });
 
@@ -46,17 +52,34 @@ describe('using-spec-first entry-governor contracts', () => {
     );
     expect(skill).toContain("Use the repository's configured user language");
     expect(skill).toContain('If a standalone skill is user-invoked only');
-    expect(skill).toContain('Enter it only after the user explicitly asks to continue');
+    expect(skill).toContain('Enter the recommendation only after the user asks to continue');
     expect(skill).toContain('spec-first doctor --<host>');
     expect(skill).toContain('spec-first update');
   });
 
   test('preserves source/runtime, evidence, dispatch, and parent-repo boundaries', () => {
-    expect(skill).toContain('generated runtime, not source fixes');
-    expect(skill).toContain('Advisory facts cannot support “complete” or “passed” claims');
-    expect(skill).toContain('dispatch_authorization_missing');
-    expect(skill).toContain('target_repo');
-    expect(skill).toContain('merely because routing matched');
+    expect(skill).toContain('Modify source-of-truth surfaces, never generated host runtime');
+    expect(reference).toContain('generated runtime, not source fixes');
+    expect(reference).toContain('Advisory facts cannot support “complete” or “passed” claims');
+    expect(reference).toContain('dispatch_authorization_missing');
+    expect(reference).toContain('target_repo');
+    expect(reference).toContain('A routing match alone never authorizes');
+  });
+
+  test('loads conditional governance through one explicit context pointer', () => {
+    expect(skill).toContain(
+      '[Conditional Routing Boundaries](references/conditional-routing-boundaries.md)',
+    );
+    expect(skill).toContain(
+      'Before runtime maintenance, scenario-fingerprint interpretation, Codex dispatch',
+    );
+    expect(skill).toContain('parent multi-repo write/test/autofix/commit');
+    expect(reference.split('\n').length).toBeLessThanOrEqual(60);
+    expect(reference).toContain('## Runtime Maintenance');
+    expect(reference).toContain('## Scenario Fingerprints');
+    expect(reference).toContain('## Codex Dispatch And Startup Reminder');
+    expect(reference).toContain('## Parent Multi-Repo Scope');
+    expect(reference).toContain('## Ordinary Context Exclusions');
   });
 
   test('does not restore legacy host-specific workflow spellings', () => {
