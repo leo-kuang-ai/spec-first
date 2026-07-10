@@ -261,6 +261,8 @@ phase_exit_card:
 
 3. **增加 anti-pattern 前置检测点**：在 Phase 0 → Phase 1 的过渡处增加一个显式的「Phase 1 entry gate」声明，强制 LLM 在首次 durable write 前确认 Decision Card 存在。
 
+> **修正说明（doc-review，已对 source 核对）**：本条（及 Phase Checkpoint Protocol）与现状高度重叠——`SKILL.md` 已有 `Failure-Mode Blacklist`（direct-write-after-read / checkpoint-as-escape 的 observable trigger + recovery）、`Canonical` 段两个 anti-pattern 定义、`Execution Compass` 两个 🔴 gate（"First durable PRD Write" 要求 Analysis Gate map + Product Expert Lens + Decision Card + Pre-Write Closure Gate；"Phase 4 closeout"），以及 Claude 的 `prd-prewrite-guard`。`decision_card_undeclared` 也已是 checker 会报的 finding。故本条应重定位为"**验证/强化现有 gate 的有效性**"（正好对接 §六 Phase 0 基线测量），而非列为新增 P0。
+
 ### 2.2 缺乏渐进式价值交付的节奏感
 
 **问题**：当前 skill 假设一次完整执行直到 readiness，但实际用户场景中：
@@ -444,7 +446,8 @@ const EXTENDED_CHECKS = [
 ## 知识复用层次
 
 L1 - Domain Glossary（已有）
-  → docs/contracts/domain-glossary.md
+  → 权威术语表为 repo 根 CONCEPTS.md（全仓多数 skill 的既定权威；见 §8.8 修正）
+  → spec-prd 当前实际引用 docs/contracts/domain-glossary.md，二者关系待 §8.8 统一
   → 跨 PRD 术语统一
 
 L4 - Industry Overlay Knowledge（已有雏形）
@@ -524,7 +527,7 @@ input_preprocessor:
 
 | 优先级 | 优化项 | 影响面 | 实施复杂度 | 预期收益 |
 | --- | --- | --- | --- | --- |
-| P0 | 2.1 Phase Checkpoint Protocol | 执行精度 | 低（SKILL.md 修改） | 减少 direct-write-after-read 失败率 50%+ |
+| P0→复核 | 2.1 Phase Checkpoint Protocol（与现状高度重叠，见 §2.1 修正） | 执行精度 | 低（SKILL.md 修改） | 现状已有 Failure-Mode Blacklist / 🔴 gate / prd-prewrite-guard；应先验证现有 gate 有效性再定增量 |
 | P0 | 3.2 Decision Card 合法状态组合 | 内部一致性 | 低（reference 补充） | 减少矛盾状态输出 |
 | P0 | 2.2 T0 快速诊断输出 | 用户体验 | 中（SKILL.md + template） | 首轮交互即见价值 |
 | P1 | 2.3 Quality Radar 可视化 | PM 满意度 | 中（template 扩展） | 质量诊断可读性提升 |
@@ -862,6 +865,8 @@ PRD → Plan → Tasks → Code → Review → Knowledge
 
 **方案：定义 `PRD Revision Signal` 协议，供下游 workflow 消费**
 
+> **修正说明（doc-review，治理红线）**：本协议是**跨 skill contract**——它依赖 spec-plan / spec-work / spec-code-review 主动产出并消费该 signal，但方案把它当作 spec-prd 本地增补处理。若下游三个 skill 的 SKILL.md 不同步改动，此协议即为 AGENTS.md 所述"机制就位但无兑现路径的 aspirational 能力"（无可指名消费者）。实施前必须二选一：(a) 拿到下游 buy-in 并同步修改它们的 source；(b) 显式标注为 aspirational 并写明从 aspirational 变 confirmed 的激活条件。§8.11 已与本节合并为同一入站方向，同此约束。
+
 这不是一个新的 artifact 或中心化流程，而是一个轻量约定，让下游 workflow 在发现 PRD gap 时有标准化的信号格式：
 
 ```text
@@ -1017,9 +1022,11 @@ prd_revision_signal:
 
 #### 差距 B：Scenario Invention 未成为 grill 问题的结构性质量层
 
+> **修正说明（doc-review，已对 source 核对）**：本差距被高估。`grill-with-docs-integration.md` 第 175 行已有相当结构化的 scenario invention 纪律——枚举了 happy path / permission-role edge / state transition / exception-failure / negative acceptance / cross-context handoff 六类场景，绑定到 `Canonical: Four Legal Stop Points`，并要求每个场景"要么暴露 gap 要么确认命名 write target，否则视为 ceremony 跳过"。因此 §8.5 Per-Question Quality Layer 的场景部分**部分是重新包装已有行为**。真正成立的是差距 C（该纪律在 reference 而非 SKILL.md spine 上，spine-visibility 不足）。§8.5 应重定位为"把已有 scenario 纪律上移到 spine 显式化"，而非"新增质量层"。
+
 **上游强制行为**（domain-modeling）："Discuss concrete scenarios — invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts."
 
-**当前 spec-prd**：在 Source-First Session Rules 中作为文本提到，但未定位为**每个 grill 问题的前置质量放大器**。
+**当前 spec-prd**：`grill-with-docs-integration.md` 已有结构化的 scenario 纪律（见上方修正说明），但它位于 reference，未在 SKILL.md 执行脊柱上显式化为**每个 grill 问题的前置质量放大器**。
 
 **理想模式**：每个 grill 问题应是 scenario-backed 的：
 1. 先发明一个边界场景探测 gap
@@ -1047,15 +1054,19 @@ Phase 4: Readiness Lens → finalize/checker → outcome
 
 #### 五个结构性问题
 
+> **修正说明（doc-review，已对 source 核对）**：问题 #2 的现状描述有误。核对 `SKILL.md` Phase 1 正文，Phase 1 内部**已包含 `Pre-PRD Clarification Loop`（一问一答 grill）**；Decision Card 与 Pre-Write Closure Gate 明写在 "Before the first durable PRD Write"，即**在 Phase 1 的 grill 之后**。grill 实际发生在 Phase 1（Pre-PRD Clarification）与 Phase 2（Domain Grill）**两处**。当前 spine（`...Requirements Grill -> Pre-Write Closure Decision -> PRD Write`）本就是"grill 先于决策"，不存在"先决策后信息"。因此问题 #2 不成立，§8.4 对应的"把 Decision Card 移到 grill 之后"很大程度**已是现状**。真正成立的是 #1（Phase 1 过载）、#3（Phase 2 命名）、#4、#5(部分，见 §8.2 修正)。
+
 | # | 问题 | 描述 | 影响 |
 | --- | --- | --- | --- |
-| 1 | **Phase 1 过载** | 6 个不同活动挤在一个 Phase：sanitize、evidence、analysis gate、expert lens、closure gate、decision card | LLM 丢失跟踪；"direct-write-after-read" 反模式部分源于 Phase 1 太密集 |
-| 2 | **Decision Card 在 Grill 之前** | Pre-Write Closure Gate + Decision Card 在 Phase 1，而 Grill 在 Phase 2。`write_mode=ask-owner-first` 意味着"去 grill"——Phase 1 的输出路由到 Phase 2 | 制造"先决策后信息"的认知混乱；card 在 grill 后还需更新 |
-| 3 | **Phase 2 命名误导** | 叫"Change Delta & Domain Language"但 80% 执行时间是 Requirements Grill 循环 | LLM 可能低估 grill 投入，高估 delta/topology |
+| 1 | **Phase 1 过载** | 多个活动挤在一个 Phase：sanitize、evidence、Pre-PRD 澄清 grill、analysis gate、expert lens、decision card、closure gate | LLM 丢失跟踪；"direct-write-after-read" 反模式部分源于 Phase 1 太密集 |
+| 2 | ~~**Decision Card 在 Grill 之前**~~（已证伪，见上方修正说明） | 现状 Decision Card / Pre-Write Closure 已在 Phase 1 grill 之后；grill 横跨 Phase 1/2 | 问题不成立 |
+| 3 | **Phase 2 命名误导** | 叫"Change Delta & Domain Language"但含第二处 Requirements Grill 循环 | LLM 可能低估 grill 投入，高估 delta/topology |
 | 4 | **Source exploration 无关卡** | 代码探索和 owner 追问之间无显式检查点 | source 可解的 gap 可能变成 owner 问题 |
-| 5 | **Scenario invention 不可见** | 不是 grill 循环内的结构性步骤 | 问题缺乏边界测试质量 |
+| 5 | **Scenario invention spine-不可见** | 已有场景纪律在 reference 而非 SKILL.md spine 上（见 §8.2 修正） | 仅遵循 SKILL.md 的 LLM 不会自然产出 |
 
 ### 8.4 执行流程节点重构方案
+
+> **修正说明（doc-review，已对 source 核对）**：下方"Pre-Write Closure / Decision Card 后移至 grill 之后"与"Product Expert Lens 后移"两项，很大程度**已是现状**（见 §8.3 问题 #2 修正）——当前 Phase 1 已在 grill 之后才做 Decision Card / Pre-Write Closure。因此本节应收敛为"**澄清 Phase 编号与逻辑 spine 的对应关系 + 缓解 Phase 1 过载 + Phase 2 更名 + 新增 Source Resolution Pass**"，而**不是改变控制流时序**。改变时序的净收益接近零，却要承担对 checker/finalize 的回归验证成本，性价比低。保留下文原图仅作意图参考。
 
 **原则**：不增加 Phase 数量（认知负荷已经很高），而是**在现有 4 Phase 内重构**，使 grill-with-docs 质量行为结构性可见。
 
@@ -1223,7 +1234,9 @@ Phase 4: Readiness & Handoff（不变）
 
 ### 8.5 Per-Question Quality Layer 详细设计
 
-这是本次集成分析最核心的产出——将 domain-modeling 的 5 项主动纪律转化为 grill 循环内的结构性步骤：
+> **修正说明（doc-review）**：Step 1 场景发明与 Step 2 交叉验证的实质纪律**已存在于** `grill-with-docs-integration.md`（见 §8.2 差距 B 修正）。本节的真实增量是"**把已有纪律从 reference 上移到 SKILL.md spine 显式化**"，而非"从无到有新增质量层"。实施时应引用现有六类场景枚举与 legal-stop-point 绑定，避免造出第二套近义纪律。
+
+这是本次集成分析的核心产出——把 domain-modeling 的 5 项主动纪律（其中场景发明/交叉验证已在 reference 存在）在 grill 循环内**结构性显式化**为步骤：
 
 ```text
 ## Per-Question Quality Layer
@@ -1342,9 +1355,16 @@ Phase 4: Readiness & Handoff（不变）
 
 ### 8.8 术语表命名错位：CONTEXT.md vs CONCEPTS.md
 
+> **修正说明（doc-review，已对 source 核对）**：本节原立论"项目真正的术语表是 `CONCEPTS.md`"不完整，且与 §3.4 L1 自相矛盾。核对 `skills/spec-prd/` 后，实际是**三个文件并存**：
+> - `CONCEPTS.md`（repo 根）— 被 spec-plan / spec-brainstorm / spec-code-review / spec-explain / spec-pov 视为权威词汇表；
+> - `docs/contracts/domain-glossary.md` — **spec-prd 当前真正引用的就是它**（`SKILL.md` Phase 2 明写 "read `docs/contracts/domain-glossary.md` when it exists"，`check-glossary-drift.js` 消费它）；
+> - `CONTEXT.md` — 仅出现在 grill-with-docs 的上游 snapshot。
+>
+> 因此本节的改名建议须先解决两件事：(a) 与 §3.4 L1 统一"权威术语表叫什么"的口径（本方案裁定为 `CONCEPTS.md`）；(b) 显式说明 `domain-glossary.md` 与 `CONCEPTS.md` 的关系（合并 / 别名 / 迁移），而非只做 `CONTEXT.md → CONCEPTS.md` 的字面替换——否则会制造第三条术语路径。下文原方案保留，实施时以本修正为准。
+
 #### 问题本质
 
-spec-prd 的 grill-with-docs-integration.md 全文使用上游产物名 `CONTEXT.md`（25 处引用），但 spec-first 项目中真正的项目级术语表是 `CONCEPTS.md`，由 `spec-compound` 拥有创建权。
+spec-prd 的 grill-with-docs-integration.md 全文使用上游产物名 `CONTEXT.md`（约 25 处引用）。spec-first 全仓多数 skill 以 repo 根 `CONCEPTS.md` 为权威术语表（由 `spec-compound` 拥有创建权），而 spec-prd 自身当前实际引用的是 `docs/contracts/domain-glossary.md`。三者并存导致术语分散，下游 agent 无法找到统一词汇。
 
 实际后果：如果在一个 spec-first 项目中运行 spec-prd 的 triggered grill 模式，grill 过程中术语结晶后会创建 `CONTEXT.md`，但项目实际的术语表是 `CONCEPTS.md`——**两个文件并行存在，术语分散，下游 agent 无法找到统一词汇**。
 

@@ -6,7 +6,7 @@ relates_to:
   - docs/项目审查/2026-07-06-真实状态与提升优先级.md
   - docs/10-prompt/结构化项目角色契约.md
   - scripts/lint-skill-entrypoints.config.json
-  - /Users/kuang/xiaobu/spec-first-doc/claw/2026-07-04/AI-Skill-Token优化-spec-first借鉴/2026-07-04-ai-skill-token-optimization-spec-first-integration-report.md
+  - external archive: spec-first-doc/claw/2026-07-04/AI-Skill-Token优化-spec-first借鉴/2026-07-04-ai-skill-token-optimization-spec-first-integration-report.md
 limitations: |
   基于当前 worktree 的 skill 源文件、lint 配置、contract 测试直接取证。
   行数/字数为实测。未运行真实宿主内 workflow 验证精简后的语义行为，语义等价性判断为待验证。

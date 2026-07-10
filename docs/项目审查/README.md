@@ -18,6 +18,8 @@
 
 | 日期 | 审查文档 | 主题 |
 | --- | --- | --- |
+| 2026-07-06 | [真实状态与提升优先级](2026-07-06-真实状态与提升优先级.md) | 当前真实状态、提升优先级和 adoption/value evidence 缺口 |
+| 2026-07-06 | [Skill Prompt 精简优化方案](2026-07-06-skill-prompt-精简优化方案.md) | skill prompt token 成本、activation index 与 active body 分层优化 |
 | 2026-07-05 | [系统性项目审查与优化方案](2026-07-05-系统性项目审查与优化方案.md) | 按系统性项目审查方法裁决历史 finding，输出项目事实、行业对标、短板、roadmap 与 P0/P1 origin trace plan |
 | 2026-07-05 | [Windows PowerShell 修复计划](2026-07-05-windows-powershell-fix-plan.md) | Windows PowerShell 兼容性专项审查的修复计划与优先级 |
 | 2026-07-05 | [Windows PowerShell 兼容性审查](2026-07-05-windows-powershell-compat-review.md) | Windows 安装、shim、doctor、init、workflow helper 与 CI 覆盖的兼容性审查 |

@@ -1,7 +1,7 @@
 ---
 title: "feat: spec-write-tasks 任务拆分质量优化方案"
 type: feat
-status: draft
+status: active
 date: 2026-07-09
 spec_id: 2026-07-09-001-spec-write-tasks-optimization
 plan_depth: deep

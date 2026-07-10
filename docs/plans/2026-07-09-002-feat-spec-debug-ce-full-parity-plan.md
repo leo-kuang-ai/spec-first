@@ -2,7 +2,7 @@
 spec_id: spec-debug-ce-full-parity
 title: "feat: spec-debug 集成 ce-debug 全能力并保留 spec-first 证据治理"
 type: feat
-status: proposed
+status: active
 date: 2026-07-09
 plan_depth: detailed
 author: leokuang

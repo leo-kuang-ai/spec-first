@@ -24,7 +24,7 @@ industry: securities
 
 - 本目录是 **human-facing 标准模板库**，给产品 owner、研发、测试、评审者直接使用。
 - `skills/spec-prd/references/prd-output-template.md` 是 `spec-prd` 的 **runtime authoring contract**，其中包含 core section、surface lens、project-local overlay 叠加机制和 embedded runtime skeleton，不依赖本 `docs/` 路径。
-- **分层 drift 范围**：通用骨架（core section + surface lens + overlay 叠加机制）由 `prd-output-template.md` 内置、随 workflow assets 分发，drift test 只锁定 embedded runtime skeleton 与本目录通用部分一致；证券行业 C1-C12 checklist 是本仓库项目本地 overlay 示例，不随通用 runtime 默认分发，也不是合规/法务事实源。下游项目可提供自己的本地 overlay。
+- **分层 drift 范围**：通用骨架（core section + surface lens + overlay 叠加机制）由 `prd-output-template.md` 内置、随 workflow assets 分发，drift test 只锁定 embedded runtime skeleton 与本目录通用部分一致；证券行业 C1-C19 checklist 是本仓库项目本地 overlay 示例，不随通用 runtime 默认分发，也不是合规/法务事实源。下游项目可提供自己的本地 overlay。
 - 本目录新增或调整通用 core section、surface lens 后，应同步评估并更新 `skills/spec-prd/references/prd-output-template.md`；新增或调整证券 checklist 时，只需评估项目本地 overlay 与 docs mirror，不要求 runtime 内置。
 - 本目录里的 checklist 是澄清展示与评审提示，不是 checker 语义校验源。脚本只检查确定性结构与 machine-owned safety section；普通 core-section 缺口最多给 `template_structure_hint`，内容质量由 `$spec-prd` readiness / `$spec-doc-review` 语义判断。
 
@@ -79,7 +79,7 @@ industry: securities
 所有模板遵循 `spec-prd` 的两层模板规则：
 
 - **[core] 始终必填**：PRD 元数据（surface 模板叫「属性确认」）、Summary、Change Delta、Requirements（含优先级分级）、Acceptance Examples、Scope Boundaries（含 Non-Goals）、Evidence And Assumptions、行业横切关注点自检。这是下游 `spec-plan` 消费的最小骨架，缺任一项 plan 就得发明 WHAT。需求优先级（P0/P1/P2 或 MoSCoW + 可降级/是否阻塞上线）是 core 的一部分——专业 PRD 必须回答"排期被砍时先砸哪些"。
-- **[conditional] 按需展开**：Problem Frame、Current System Snapshot、Goals / Success Metrics、Glossary、领域模型 / 核心实体、Actors、Use Cases、Interaction、Exception、Data / Compliance Boundaries、Dependencies / Constraints / Risks、Release Checklist、Outstanding Questions 等。小增量可折叠或省略；**省略项若有未决点，必须落入 Outstanding Questions，不得静默丢弃**。Success Metrics 有可信证据才写目标值，无证据写可观察口径或进入 Assumptions。领域模型仅在需求涉及多个相互关联业务对象时展开；Dependencies / Constraints / Risks 命中外部依赖或高风险时必填。
+- **[conditional] 按需展开**：Problem Frame、Current System Snapshot、Goals / Success Metrics、Glossary、领域模型 / 核心实体、Actors、Use Cases、Interaction、Exception、Data / Compliance Boundaries、非功能需求(NFR)、数据留存期限、需求追溯矩阵、合规/风控会签(Sign-off)、Dependencies / Constraints / Risks、Release Checklist、Outstanding Questions 等。小增量可折叠或省略；**省略项若有未决点，必须落入 Outstanding Questions，不得静默丢弃**。Success Metrics 有可信证据才写目标值，无证据写可观察口径或进入 Assumptions。领域模型仅在需求涉及多个相互关联业务对象时展开；Dependencies / Constraints / Risks 命中外部依赖或高风险时必填。
 - 对应 surface 命中时，conditional 升为必填。例如 App 命中交易/行情时必须写交互与展示规则；Backend 命中订单/资金时必须写状态语义、幂等、对账和异常。
 
 ## 五、WHAT not HOW 边界（必读）
@@ -135,7 +135,7 @@ PRD 里每条 current-state claim 应带 evidence tag（`confirmed-source` / `us
 **完整性**
 - [ ] 每条 core 需求都有优先级、验收样例、证据 tag
 - [ ] Change Delta 分清 keep/extend/replace/remove/unknown，历史逻辑写了差异不是"沿用一致"
-- [ ] 命中的行业关注点(C1-C12)都标了"适用/不涉及"，无留空
+- [ ] 命中的行业关注点(C1-C19)都标了"适用/不涉及"，无留空
 - [ ] 触及资金/交易/权限/数据/审计时，边界与合规点已显式标注或入 Outstanding Questions
 
 **质量**

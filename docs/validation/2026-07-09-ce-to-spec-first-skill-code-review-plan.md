@@ -438,6 +438,65 @@ Phase 3: 全局交叉验证
 Phase 4: 输出合并报告
 ```
 
+### 长任务执行与上下文续跑纪律
+
+本审查预期跨越多个会话上下文,不得把单个 skill 的审查结论只保存在对话中。执行时采用**增量落盘 + 可恢复续跑**:
+
+1. Phase 1 先创建合并报告骨架,至少包含 CE 基线 commit、审查范围、分级规则、全局依赖图谱占位、逐 Batch / Skill 章节、审查进度表、严重程度定义和验证命令占位。
+2. 每完成一个 skill 审查,立即更新合并报告中对应 skill 小节和顶部进度表;不得等全部 skill 审完后再集中回填。
+3. 每个 skill 小节至少记录:Tier、status、verdict、已读取 source 文件、适用/不适用的 CE parity 结论、发现列表(文件:行号、严重程度、描述、修复建议)、依赖/artifact/config/context 结论、未检查项及原因。
+4. 对尚未完成的全局交叉验证,单个 skill 审查时可先记录局部 evidence / candidate finding,但必须标注为 `pending_global_cross_check`;Phase 3 再统一确认或降级。
+5. 当上下文接近上限或需要压缩/换会话时,先把当前 skill 的中间结论落盘为 `status: in_progress` 或 `status: done`,并写明 freshness、source refs、limitations 和 next skill;下一轮只从方案 + 合并报告进度表 + 最近小节恢复,不得依赖上一轮对话记忆。
+6. 续跑开始时先读取合并报告的进度表、最近一个已审 skill 小节和下一个待审 skill 的 source,再继续追加;如发现报告与源码当前状态不一致,先标注 freshness drift,再回源确认。
+
+这条纪律是 handoff gate 的具体落点:审查结论必须成为可恢复 artifact,而不是 transcript 声明。
+
+### Goal 启动 Prompt
+
+在新会话中启动本审查时,使用以下中文 prompt。该 prompt 的目标不是让 agent 只给计划,而是要求它创建/使用 `goal` 持续完成全量审查,并把每个 skill 的结论增量写入合并报告。
+
+```text
+请创建并使用一个 active goal 完成 CE 到 Spec-First Skill 迁移代码审查全量工作。
+
+目标:
+- 按 `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md` 审查当前 `skills/` 下全部 35 个 source skill。
+- 最终维护并完成合并报告: `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md`。
+- 报告内容必须使用简体中文;路径、命令、字段值、verdict/status 等技术标识可以保留英文。
+
+开始前必须读取:
+1. `skills/using-spec-first/SKILL.md`
+2. `docs/10-prompt/结构化项目角色契约.md`
+3. `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md`
+4. `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md`(如果已存在)
+
+执行纪律:
+- 这是 skill/source prompt 治理审计,按 `using-spec-first` 的 bounded source review 执行;不要启动公开 `spec-*` workflow。
+- 不手改 generated runtime mirrors: `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`。
+- 默认只记录审查发现,不修 source skill 问题;除非用户明确要求修复。
+- 每审完一个 skill,立即更新合并报告的顶部进度表和该 skill 小节,不要等全部审完后集中回填。
+- 每个 skill 小节至少记录 Tier、status、verdict、已读取 source 文件、CE parity 结论或不适用原因、发现列表(文件:行号、严重程度、描述、修复建议)、依赖/artifact/config/context 结论、未检查项及原因。
+- 对尚未完成的跨 skill/global 结论,先标注 `pending_global_cross_check`;Phase 3 再统一确认或降级。
+- 如果上下文接近上限或需要压缩,先把当前 skill 的中间结论写入报告,标注 freshness、source refs、limitations 和 next skill;下一轮从方案和报告恢复,不要依赖 transcript。
+- 每次更新报告后同步更新 `CHANGELOG.md`,并运行最窄验证:
+  - `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md`
+  - `npx jest tests/unit/changelog-format.test.js --runInBand`
+
+完成条件:
+- Phase 1-4 全部完成。
+- 35 个 source skill 均有 `done` 状态和明确 verdict。
+- 全局依赖、artifact contract、config key、共享脚本、上下文排除和测试覆盖缺口均已交叉验证。
+- 合并报告与 `CHANGELOG.md` 已更新,验证命令结果已记录。
+- 满足以上条件后才把 goal 标记为 complete;否则保持 active goal 并继续下一个 skill。
+```
+
+续跑时使用以下短 prompt:
+
+```text
+继续 active goal: CE 到 Spec-First Skill 迁移代码审查。
+请先读取方案和合并报告,从报告进度表识别下一个待审 skill,继续审查并把本轮结论追加到合并报告和 `CHANGELOG.md`。
+不要依赖上一轮 transcript;如果发现报告 freshness 与当前 source 不一致,先回源确认并记录 drift。
+```
+
 ## 审查输出
 
 最终产出一份合并报告:
@@ -451,6 +510,10 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
 ```markdown
 # CE 到 Spec-First Skill 迁移代码审查报告
 
+## 审查进度
+  | Skill | Tier | Status | Verdict | Last updated | Notes |
+  |---|---|---|---|---|---|
+
 ## 全局依赖图谱
   - Skill 间引用关系图
   - Artifact 产出/消费映射表
@@ -462,10 +525,15 @@ docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md
 
   ### Batch 1
     #### spec-test-xcode
+    - Tier: A / B / C
+    - Status: pending / in_progress / done
     - Verdict: pass / issues_found / critical_issues
+    - Source files read
+    - CE parity: applicable / not_applicable + conclusion
     - 发现列表(文件:行号, 严重程度, 描述, 修复建议)
     - 依赖关系验证结果
     - 上下文管理验证结果
+    - Not checked / degraded checks + reason
   ### Batch 2 ... (同上)
   ### Batch 3 ... (同上,含 spec-mcp-setup)
   ### Batch 4 ... (同上)
@@ -548,6 +616,7 @@ npx jest tests/unit/repo-profile-cache-parity.test.js --runInBand
 - 上下文管理问题已记录。
 - 测试覆盖缺口已分析。
 - 合并报告已输出。
+- 每个已完成 skill 的结论已增量写入合并报告,顶部进度表与逐 skill 小节一致;如发生上下文压缩/续跑,报告中保留 freshness、source refs、limitations 和 next skill。
 
 ## 复审决议(2026-07-10 spec-doc-review)
 

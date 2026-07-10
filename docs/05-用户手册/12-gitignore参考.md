@@ -50,6 +50,9 @@
 .qoder/skills/
 .qoder/agents/
 .qoder/spec-first/
+.qoder/hooks/session-start
+.qoder/hooks/prd-prewrite-guard
+.qoder/hooks/prd-readiness-guard
 .qoder/settings.local.json
 .context/spec-first/
 
@@ -131,6 +134,9 @@ graphify-out/
     skills/                         # Qoder project skill runtime mirror，忽略
     agents/                         # Qoder subagent runtime mirror，忽略
     spec-first/                     # spec-first state/profile，忽略
+    hooks/session-start             # spec-first managed hook script，忽略
+    hooks/prd-prewrite-guard        # spec-first managed hook script，忽略
+    hooks/prd-readiness-guard       # spec-first managed hook script，忽略
     settings.local.json             # Qoder local MCP config，忽略；clean 保留整文件
     rules/                          # Qoder-native rules，是否提交按团队策略
 
@@ -182,7 +188,7 @@ graphify-out/
 | --- | --- |
 | `.claude/settings.json` | Claude Code 项目配置；`init --claude` 会写入 spec-first 受管 hook matchers。团队希望共享 Claude hooks、permissions 或 MCP 配置时可提交；仅个人使用的配置应放到 `.claude/settings.local.json` 并在 managed block 外自行忽略。 |
 | `.cursor/rules/**`、`.cursor/agents/**`、未知 `.cursor/**` | Cursor-native 团队规则、用户 agent 或宿主文件；是否提交按 Cursor/团队策略决定，spec-first P0 只管理 `.cursor/skills/**`、`.cursor/spec-first/**` 和 `.cursor/mcp.json`。 |
-| `.qoder/rules/**`、`.qoder/settings.json`、`.qoder/hooks/**` | Qoder-native 团队规则、用户级配置或 hooks；是否提交按 Qoder/团队策略决定，spec-first 不把它们作为 P0 generated runtime。 |
+| `.qoder/rules/**`、`.qoder/settings.json`、未知 `.qoder/hooks/**` | Qoder-native 团队规则、用户级配置或 hooks；是否提交按 Qoder/团队策略决定。`.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 三个 spec-first managed hook scripts 除外。 |
 | `.graphify/cache/`、`.graphify/graph.html`、`.graphify/.graphify_labels.json` | Graphify provider runtime/cache 输出，默认随整个 `.graphify/` 忽略。 |
 | `graphify-out/**` | 旧版 Graphify artifact，默认继续忽略；需要更新图谱时用 `spec-mcp-setup --only graphify --refresh` 生成 `.graphify/`。 |
 
