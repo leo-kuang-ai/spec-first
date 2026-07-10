@@ -117,11 +117,13 @@ When sizing the description, mentally subtract fix-up commits: a branch with 12 
 
 Decide whether to include an evidence section in the body.
 
-**Evidence is possible** when the diff changes observable behavior demonstrable from the workspace: UI, CLI output, API behavior with runnable code, generated artifacts, or workflow output.
+**Evidence is useful** when the diff changes behavior or makes a material claim a reviewer cannot establish from the diff alone: UI, CLI output, API behavior with runnable code, generated artifacts, workflow output, ranking or scoring logic, deployment/config behavior, migrations, performance, or compatibility.
 
-**Evidence is not possible** for:
-- Docs-only, markdown-only, changelog-only, release metadata, CI/config-only, test-only, or pure internal refactors
+**Evidence is normally unnecessary** for:
+- Inert documentation, changelog-only edits, release metadata, test-only changes, or pure internal refactors with no material reviewer claim
 - Behavior requiring unavailable credentials, paid/cloud services, bot tokens, deploy-only infrastructure, or hardware not provided
+
+Classify files by runtime purpose, not extension. Markdown or YAML may be inert prose, but it may also be runtime agent instructions, configuration, generated product content, policy code, or deployment behavior. Do not auto-skip evidence merely because a change is labeled docs-only or uses a prose-oriented extension.
 
 **Decision logic:**
 
@@ -188,9 +190,17 @@ This frame becomes the opening. For small+simple PRs, the "after" sentence alone
 
 ---
 
-## Step D: Size the change
+## Step D: Size by reviewer decision cost
 
-Assess size (files, diff volume) and complexity (design decisions, trade-offs, cross-cutting concerns) to select description depth:
+Size the description by how much a reviewer cannot establish from the diff alone, not by changed-line count, file extension, or visual surface. A small ranking-logic or deployment edit may carry more uncertainty than a large mechanical rename.
+
+Before sizing, name the change's **material claims**: what became possible, what was fixed, what risk changed, and which design decision the reviewer must assess. Note which claims the diff alone cannot establish. Surface those claims and the evidence or residual uncertainty that changes confidence; leave reconstructable mechanics implicit.
+
+Decision cost sets what to surface, not permission to write more. Reviewer uncertainty may move a change at most one row in the table below. A small high-uncertainty diff earns a sharper lead and a concise validation caveat, not a multi-section essay. Prefer the shortest description that still lets a reviewer decide.
+
+Evidence can include benchmarks, API captures, migration or rollback exercises, logs, compatibility matrices, security analysis, evals, manual probes, and rollout results. Include a result only when it changes confidence in a material claim. Keep demonstrated results distinct from assumptions and mixed or negative outcomes.
+
+Subtract fix-up commits when sizing. Large PRs need more selectivity, not more content.
 
 | Change profile | Description approach |
 |---|---|
@@ -200,7 +210,7 @@ Assess size (files, diff volume) and complexity (design decisions, trade-offs, c
 | Large or architecturally significant | Narrative frame + up to 3-5 design-decision callouts + 1-2 sentence test summary + key docs links. Target ~100 lines, cap ~150. For PRs with many mechanisms, use a Summary-level table to list them; do NOT create an H3 subsection per mechanism. Reviewers scrutinize decisions, not inventories — the diff and spec files carry the detail. If you find yourself writing 10+ subsections, consolidate to a table. |
 | Performance improvement | Include before/after measurements if available. Markdown table works well. |
 
-When in doubt, shorter is better. Match description weight to change weight. Large PRs need MORE selectivity, not MORE content.
+The table is calibration, not a diff-size formula. When in doubt, choose the shortest row that still carries the decision-relevant context, evidence, and residual uncertainty.
 
 ---
 
@@ -329,7 +339,13 @@ Assemble the body in this order:
 
 ## Step H: Compression pass
 
-Before applying, re-read the composed body and apply these cuts:
+Before applying, audit the body against the material claims from Step D:
+
+- Is every claim the diff cannot establish present, and is any claim the diff does show restated needlessly?
+- Is decision-changing evidence stated as a result rather than collapsed into an unexplained "tests passed"?
+- Are demonstrated results, assumptions, and mixed or negative outcomes clearly distinguished?
+
+Then apply these cuts:
 
 - If any body section restates content already in the `## Summary`, remove it. The Summary plus the diff should carry the reader.
 - If "Testing" or "Test plan" has more than 2 paragraphs, compress to bullets.
@@ -337,6 +353,7 @@ Before applying, re-read the composed body and apply these cuts:
 - If a "Review" or process-oriented section lists how to review, remove it. Move any truly non-obvious review hints inline with the relevant change.
 - If the body has 5+ H3 subsections that each describe one mechanism, consolidate them into a single table row per mechanism under one header. Reserve prose H3 callouts for 2-3 genuine design decisions.
 - If the body exceeds the sizing-table target by more than 30%, compress the longest non-Summary section by half.
+- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove required badge/footer content or a required `## New concepts` section solely to shorten the narrative.
 
 **Value-lead check.** Re-read the first sentence of the Summary. If it describes what was moved around, renamed, or added ("This PR introduces three-tier autofix..."), rewrite to lead with what's now possible or what was broken and is now fixed ("Document reviews previously produced 14+ findings requiring user judgment; this PR cuts that to 4-6.").
 

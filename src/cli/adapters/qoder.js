@@ -1,13 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PlatformAdapter = require('./base');
-const {
-  buildHostNativePointer,
-  inspectHostNativePointer,
-  planHostNativePointerRemoval,
-  planHostNativePointerSync,
-} = require('./host-native-pointer');
+const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const {
   MANAGED_HOOK_DEFINITIONS,
@@ -17,6 +11,7 @@ const {
   renderManagedQoderHooksRemoval,
 } = require('../qoder-settings');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const { contentHasOtherRuntimePathReferences } = require('./platform-registry');
 
 const QODER_RULE_POINTER_PATH = '.qoder/rules/spec-first.md';
 const QODER_POINTER_FRONTMATTER = [
@@ -32,31 +27,8 @@ const MANAGED_QODER_HOOK_FILES = MANAGED_HOOK_DEFINITIONS.map((definition) => ({
 }));
 const QODER_AGENT_BASE_TOOLS = ['Read', 'Grep', 'Glob'];
 const QODER_AGENT_WEB_TOOLS = ['WebFetch', 'WebSearch'];
-const QODER_UNREWRITTEN_PATH_PATTERNS = [
-  /\.claude\/commands\/spec\/[a-z-]+\.md/,
-  /\.claude\/commands\/spec-[a-z-]+\.md/,
-  /\.claude\/commands\/spec-\*\.md/,
-  /\.claude\/spec-first\/workflows\//,
-  /\.claude\/skills\//,
-  /\.claude\/agents\//,
-  /\.codex\/commands\/spec\/[a-z-]+\.md/,
-  /\.codex\/commands\/spec-\*\.md/,
-  /\.codex\/skills\//,
-  /\.codex\/agents\//,
-  /\.agents\/skills\//,
-  /\.cursor\/skills\//,
-  /\.cursor\/spec-first\//,
-  /\.cursor\/mcp\.json/,
-  /\.cursor\/agents\//,
-  /\.kiro\/commands\/spec\/[a-z-]+\.md/,
-  /\.kiro\/commands\/spec-\*\.md/,
-  /\.kiro\/skills\//,
-  /\.kiro\/agents\//,
-  /\.kiro\/spec-first\//,
-  /\.kiro\/settings\//,
-];
 
-class QoderAdapter extends PlatformAdapter {
+class QoderAdapter extends PointerBasedAdapter {
   get id() {
     return 'qoder';
   }
@@ -95,6 +67,18 @@ class QoderAdapter extends PlatformAdapter {
 
   get instructionFile() {
     return 'AGENTS.md';
+  }
+
+  get pointerPath() {
+    return QODER_RULE_POINTER_PATH;
+  }
+
+  get pointerHostLabel() {
+    return 'Qoder';
+  }
+
+  get pointerFrontmatter() {
+    return QODER_POINTER_FRONTMATTER;
   }
 
   renderCommandContent(command, templateContent, context = {}) {
@@ -187,11 +171,7 @@ class QoderAdapter extends PlatformAdapter {
     if (fs.existsSync(agentsRoot)) {
       checks.push(...inspectQoderAgentFrontmatter(projectRoot, agentsRoot));
     }
-    checks.push(inspectHostNativePointer(projectRoot, QODER_RULE_POINTER_PATH, {
-      hostId: this.id,
-      hostLabel: 'Qoder',
-      expectedPrefix: QODER_POINTER_FRONTMATTER,
-    }));
+    checks.push(this.inspectPointerRuntime(projectRoot));
     checks.push(...inspectManagedQoderHookFiles(projectRoot));
     checks.push(...inspectManagedQoderHooks(projectRoot).map(qoderHookStatusToRuntimeCheck));
 
@@ -205,15 +185,7 @@ class QoderAdapter extends PlatformAdapter {
   }
 
   planRuntimeFilesSync(projectRoot) {
-    const pointerPlan = planHostNativePointerSync(
-      projectRoot,
-      QODER_RULE_POINTER_PATH,
-      buildHostNativePointer({
-        hostLabel: 'Qoder',
-        initCommand: 'spec-first init --qoder',
-        frontmatter: QODER_POINTER_FRONTMATTER,
-      }),
-    );
+    const pointerPlan = this.planPointerRuntimeFilesSync(projectRoot);
     const operations = [
       ...pointerPlan.operations,
       ...buildManagedQoderHookWriteOperations(projectRoot),
@@ -236,7 +208,7 @@ class QoderAdapter extends PlatformAdapter {
       path: '.qoder/commands/spec',
       reason: 'retired_runtime_command_namespace',
     },
-    ...planHostNativePointerRemoval(projectRoot, QODER_RULE_POINTER_PATH).operations,
+    ...this.planPointerRuntimeFilesRemoval(projectRoot).operations,
     ...MANAGED_QODER_HOOK_FILES.map((hook) => ({
       kind: 'remove_file',
       path: hook.relativePath.replace(/\\/g, '/'),
@@ -611,7 +583,7 @@ function inspectQoderCommandFiles(projectRoot, commandRoot) {
       if (!fields.name) issues.push('missing name');
       if (!fields.description) issues.push('missing description');
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
-      if (QODER_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(content))) {
+      if (contentHasOtherRuntimePathReferences('qoder', content)) {
         issues.push('contains non-Qoder runtime path references');
       }
       return issues.length === 0
@@ -642,7 +614,7 @@ function inspectQoderSkillNames(projectRoot, skillsRoot) {
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
       if (!fields.description) issues.push('missing description');
-      if (QODER_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(content))) {
+      if (contentHasOtherRuntimePathReferences('qoder', content)) {
         issues.push('contains non-Qoder runtime path references');
       }
       return issues.length === 0

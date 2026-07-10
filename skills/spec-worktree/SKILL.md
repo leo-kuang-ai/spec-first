@@ -7,12 +7,12 @@ allowed-tools: Bash(bash *worktree-manager.sh*)
 
 # Worktree Isolation
 
-Detect whether the current checkout is already isolated, then create a worktree under `.worktrees/<branch>` only when creation is still needed. The bundled script adds branch-specific setup that `git worktree add` alone does not handle:
+Detect whether the current checkout is already isolated, then create or attach a worktree under `.worktrees/<slug>` only when isolation is still needed. The bundled script adds branch-specific setup that `git worktree add` alone does not handle:
 
 - Does not copy `.env*` files by default; `--copy-env` is an explicit opt-in for workflows that need local env files
 - Trusts `mise`/`direnv` configs, with branch-aware safety rules so review branches do not auto-grant trust to untrusted `.envrc` content
 - Adds `.worktrees` to `.gitignore` if not already ignored
-- Does not modify the main repo checkout — `from-branch` is fetched, not checked out
+- Does not modify the main repo checkout — `from-branch` and PR heads are fetched, not checked out
 
 ## Step 0: Detect existing isolation
 
@@ -43,7 +43,16 @@ The script computes this by comparing resolved absolute `--absolute-git-dir` and
 
 `detect --json` requires `node` on `PATH` to serialize the facts. When `node` is missing the command still prints a parseable `state=unknown`/`reason_code=output-contract-failed` object and exits non-zero, so a consumer always gets a structured reason_code rather than empty output.
 
-## Creating a worktree
+## Choose the mode
+
+There are two modes. The caller must choose one before invoking the script:
+
+- **New work:** create a fresh branch from a base branch. Use this when the task has no existing ref to test or modify.
+- **Isolate an existing ref:** attach a worktree to a PR head, existing branch, tag, or commit. Use this for PR review, dogfood, or any workflow that needs to test a target ref without switching the primary checkout.
+
+A branch can be checked out in only one worktree at a time. In existing-ref mode, if the target branch is already checked out anywhere, the script reports `already_checked_out branch=<name> path=<path>` and exits 0 without creating a second checkout. The caller must act on that verdict: work at the reported path, ask the user, or stop. Never force a duplicate branch checkout.
+
+## Creating a new-work worktree
 
 Invoke the bundled script through a `bash -c` wrapper whose command text includes `exec bash ...worktree-manager.sh`. On Claude Code, `${CLAUDE_SKILL_DIR}` resolves to the skill's own runtime directory across marketplace-cached installs and local plugin development. In source or non-Claude runtime contexts, use the repo-root fallback path so generated Codex assets can rewrite it to the installed skill directory. This shape intentionally matches the narrow `allowed-tools` pattern.
 
@@ -67,9 +76,34 @@ After creation, switch to the worktree with `cd .worktrees/<branch-name>`.
 
 The `create` command consumes the same detection function before creating `.worktrees/<branch>` or running `git worktree add`. It refuses `linked-worktree`, `unknown`, `not-git-repo`, `git-query-failed`, and `output-contract-failed` states so this helper cannot create nested or invisible worktrees by bypassing Step 0.
 
+## Isolating an existing ref
+
+Invoke `isolate` when the caller names a target ref that already exists:
+
+```bash
+bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/scripts/worktree-manager.sh" "$@"; fi; exec bash "$(git rev-parse --show-toplevel)"/"skills/spec-worktree/scripts/worktree-manager.sh" "$@"' _ isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]
+```
+
+Examples:
+
+```bash
+bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/scripts/worktree-manager.sh" "$@"; fi; exec bash "$(git rev-parse --show-toplevel)"/"skills/spec-worktree/scripts/worktree-manager.sh" "$@"' _ isolate feature/login
+bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/scripts/worktree-manager.sh" "$@"; fi; exec bash "$(git rev-parse --show-toplevel)"/"skills/spec-worktree/scripts/worktree-manager.sh" "$@"' _ isolate pr:123
+bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/scripts/worktree-manager.sh" "$@"; fi; exec bash "$(git rev-parse --show-toplevel)"/"skills/spec-worktree/scripts/worktree-manager.sh" "$@"' _ isolate '#123' pr-123
+```
+
+Behavior:
+
+- Existing local branch: `git worktree add .worktrees/<slug> <branch>`.
+- Remote-only `origin/<branch>`: create a local branch in the new worktree from `origin/<branch>`.
+- PR shorthand `pr:<number>` or `#<number>`: fetch `pull/<number>/head` into local branch `pr-<number>`, then attach the worktree to that branch so fix commits are not orphaned on `FETCH_HEAD`.
+- Tag or commit: create a detached worktree at that commit.
+- Already in a linked worktree: check the target out in place unless it is already the current branch; do not create a nested worktree.
+- Target branch already checked out elsewhere: report `already_checked_out branch=<name> path=<path>` and do not create a second checkout.
+
 ## Env File Opt-In
 
-Use `--copy-env` only when the workflow explicitly needs local environment files in the new worktree. The opt-in path copies `.env*` files except `.env.example`, `.env.template`, and `.env.sample`, prints only file names, backs up pre-existing destination files, and appends `.env-copy.log` with timestamp, source path, destination path, byte size, and an 8-character content fingerprint. The log does not include file contents and is added to the worktree git exclude file.
+Use `--copy-env` only when the workflow explicitly needs local environment files in the new worktree. The opt-in path works for both `create` and `isolate`: it copies `.env*` files except `.env.example`, `.env.template`, and `.env.sample`, prints only file names, backs up pre-existing destination files, and appends `.env-copy.log` with timestamp, source path, destination path, byte size, and an 8-character content fingerprint. The log does not include file contents and is added to the worktree git exclude file.
 
 Even when env files were copied intentionally, downstream staging must still treat them as denied by default. A batch may stage an env file only when the task/implementation unit declares the exact env path in `expected_side_effects` and explicitly states that changing that env file is intended.
 
@@ -102,11 +136,13 @@ Create a worktree when:
 - Running multiple features in parallel without branch-switching overhead
 - Keeping the default branch free of in-progress state
 
-Do not create a worktree for single-task work that can happen on a branch in the main checkout, and never create one when Step 0 reports `state=linked-worktree`.
+Do not create a new-work worktree for single-task work that can happen on a branch in the main checkout, and never create a nested worktree when Step 0 reports `state=linked-worktree`. For existing-ref isolation, use `isolate` so branch uniqueness and already-checked-out verdicts remain deterministic.
 
 ## Integration
 
-`spec-work` and `spec-code-review` offer this skill as an option. When the user selects "worktree" in those flows, run Step 0 first. If isolation already exists, proceed in place. Otherwise invoke `create` through the same `${CLAUDE_SKILL_DIR}` branch plus source/runtime fallback shown above, using a meaningful branch name derived from the work description (e.g., `feat/crowd-sniff`, `fix/email-validation`). Avoid auto-generated names like `worktree-jolly-beaming-raven` that obscure the work.
+`spec-work` and `spec-code-review` offer this skill as an option for new work. When the user selects "worktree" in those flows, run Step 0 first. If isolation already exists, proceed in place. Otherwise invoke `create` through the same `${CLAUDE_SKILL_DIR}` branch plus source/runtime fallback shown above, using a meaningful branch name derived from the work description (e.g., `feat/crowd-sniff`, `fix/email-validation`). Avoid auto-generated names like `worktree-jolly-beaming-raven` that obscure the work.
+
+`spec-dogfood` uses existing-ref mode for PR or non-current branch targets. It should invoke `isolate pr:<number>` for PR targets and `isolate <branch>` for branch targets, then act on either `Worktree ready: <path>` or `already_checked_out branch=<name> path=<path>`. It must not switch the primary checkout when isolation succeeds or reports an existing checkout path.
 
 ## Troubleshooting
 

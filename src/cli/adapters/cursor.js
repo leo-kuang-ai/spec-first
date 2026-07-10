@@ -2,16 +2,11 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const PlatformAdapter = require('./base');
-const {
-  buildHostNativePointer,
-  inspectHostNativePointer,
-  planHostNativePointerRemoval,
-  planHostNativePointerSync,
-} = require('./host-native-pointer');
+const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 const { readState } = require('../state');
+const { contentHasOtherRuntimePathReferences } = require('./platform-registry');
 
 const CURSOR_RULE_POINTER_PATH = '.cursor/rules/spec-first.mdc';
 const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
@@ -21,32 +16,6 @@ const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
   'disable-model-invocation',
   'metadata',
 ]);
-const CURSOR_UNREWRITTEN_PATH_PATTERNS = [
-  /\.claude\/commands\/spec\/[a-z-]+\.md/,
-  /\.claude\/commands\/spec-[a-z-]+\.md/,
-  /\.claude\/commands\/spec-\*\.md/,
-  /\.claude\/spec-first\/workflows\//,
-  /\.claude\/skills\//,
-  /\.claude\/agents\//,
-  /\.codex\/commands\/spec\/[a-z-]+\.md/,
-  /\.codex\/commands\/spec-\*\.md/,
-  /\.codex\/skills\//,
-  /\.codex\/agents\//,
-  /\.agents\/skills\//,
-  /\.kiro\/commands\/spec\/[a-z-]+\.md/,
-  /\.kiro\/commands\/spec-\*\.md/,
-  /\.kiro\/skills\//,
-  /\.kiro\/agents\//,
-  /\.kiro\/spec-first\//,
-  /\.kiro\/settings\//,
-  /\.qoder\/commands\/spec\/[a-z-]+\.md/,
-  /\.qoder\/commands\/spec-[a-z-]+\.md/,
-  /\.qoder\/commands\/spec-\*\.md/,
-  /\.qoder\/skills\//,
-  /\.qoder\/agents\//,
-  /\.qoder\/spec-first\//,
-  /\.qoder\/settings(?:\.local)?\.json/,
-];
 const CURSOR_NESTED_SCAN_SKIP_DIRS = new Set([
   '.git',
   '.spec-first',
@@ -62,7 +31,7 @@ const CURSOR_NESTED_SCAN_MAX_DEPTH = 4;
 const CURSOR_NESTED_SCAN_MAX_DIRECTORIES = 400;
 const CURSOR_NESTED_SCAN_MAX_MS = 500;
 
-class CursorAdapter extends PlatformAdapter {
+class CursorAdapter extends PointerBasedAdapter {
   get id() {
     return 'cursor';
   }
@@ -105,6 +74,22 @@ class CursorAdapter extends PlatformAdapter {
 
   get instructionFile() {
     return 'AGENTS.md';
+  }
+
+  get pointerPath() {
+    return CURSOR_RULE_POINTER_PATH;
+  }
+
+  get pointerHostLabel() {
+    return 'Cursor';
+  }
+
+  get pointerFrontmatter() {
+    return [
+      '---',
+      'alwaysApply: true',
+      '---',
+    ].join('\n');
   }
 
   transformSkillContent(content, context = {}) {
@@ -169,10 +154,7 @@ class CursorAdapter extends PlatformAdapter {
     if (fs.existsSync(skillsRoot)) {
       checks.push(...inspectCursorSkillNames(projectRoot, skillsRoot));
     }
-    checks.push(inspectHostNativePointer(projectRoot, CURSOR_RULE_POINTER_PATH, {
-      hostId: this.id,
-      hostLabel: 'Cursor',
-    }));
+    checks.push(this.inspectPointerRuntime(projectRoot));
     checks.push(...inspectCursorDuplicateSkillRoots(projectRoot, this));
 
     return checks.length > 0
@@ -184,25 +166,6 @@ class CursorAdapter extends PlatformAdapter {
       }];
   }
 
-  planRuntimeFilesSync(projectRoot) {
-    return planHostNativePointerSync(
-      projectRoot,
-      CURSOR_RULE_POINTER_PATH,
-      buildHostNativePointer({
-        hostLabel: 'Cursor',
-        initCommand: 'spec-first init --cursor',
-        frontmatter: [
-          '---',
-          'alwaysApply: true',
-          '---',
-        ].join('\n'),
-      }),
-    );
-  }
-
-  planRuntimeFilesRemoval(projectRoot) {
-    return planHostNativePointerRemoval(projectRoot, CURSOR_RULE_POINTER_PATH);
-  }
 }
 
 module.exports = CursorAdapter;
@@ -433,7 +396,7 @@ function inspectCursorSkillNames(projectRoot, skillsRoot) {
       if (skillDir === 'spec-mcp-setup' && !content.includes('MCP_SETUP_HOST=cursor')) {
         issues.push('missing Cursor MCP_SETUP_HOST pin');
       }
-      if (CURSOR_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(content))) {
+      if (contentHasOtherRuntimePathReferences('cursor', content)) {
         issues.push('contains non-Cursor runtime path references');
       }
       return issues.length === 0

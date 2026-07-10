@@ -1,0 +1,62 @@
+'use strict';
+
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+
+const repoRoot = path.resolve(__dirname, '..', '..');
+const scriptPath = path.join(repoRoot, 'skills/spec-worktree/scripts/worktree-manager.sh');
+
+function run(command, args, options = {}) {
+  return execFileSync(command, args, {
+    cwd: options.cwd,
+    env: { ...process.env, ...(options.env || {}) },
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+}
+
+function initRepo() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-worktree-'));
+  run('git', ['init', '-b', 'main'], { cwd: dir });
+  run('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  run('git', ['config', 'user.name', 'Spec Test'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'README.md'), '# Test\n');
+  run('git', ['add', 'README.md'], { cwd: dir });
+  run('git', ['commit', '-m', 'init'], { cwd: dir });
+  run('git', ['branch', 'feature/login'], { cwd: dir });
+  return dir;
+}
+
+describe('spec-worktree existing-ref isolation contracts', () => {
+  test('source documents existing-ref isolation for spec-dogfood', () => {
+    const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-worktree/SKILL.md'), 'utf8');
+    const dogfood = fs.readFileSync(path.join(repoRoot, 'skills/spec-dogfood/SKILL.md'), 'utf8');
+
+    expect(skill).toContain('isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]');
+    expect(skill).toContain('already_checked_out branch=<name> path=<path>');
+    expect(skill).toContain('spec-dogfood` uses existing-ref mode');
+    expect(dogfood).toContain('isolate pr:<number>');
+    expect(dogfood).toContain('isolate <branch>');
+    expect(dogfood).toContain('already_checked_out branch=<name> path=<path>');
+    expect(dogfood).toContain('never switch the primary checkout');
+  });
+
+  test('isolate attaches an existing branch and reports already-checked-out on repeat', () => {
+    const dir = initRepo();
+
+    const first = run('bash', [scriptPath, 'isolate', 'feature/login'], { cwd: dir });
+    const realDir = fs.realpathSync(dir);
+    const worktreePath = path.join(realDir, '.worktrees', 'feature-login');
+
+    expect(first).toContain(`Worktree ready: ${worktreePath}`);
+    expect(fs.existsSync(worktreePath)).toBe(true);
+    expect(run('git', ['branch', '--show-current'], { cwd: worktreePath }).trim()).toBe('feature/login');
+    expect(run('git', ['branch', '--show-current'], { cwd: dir }).trim()).toBe('main');
+
+    const second = run('bash', [scriptPath, 'isolate', 'feature/login'], { cwd: dir });
+    expect(second).toContain('already_checked_out branch=feature/login path=');
+    expect(second).toContain(worktreePath);
+  });
+});

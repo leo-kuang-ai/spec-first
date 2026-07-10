@@ -72,9 +72,9 @@ A plan is ready when an implementer can start confidently without needing the pl
 Determine `OUTPUT_FORMAT` before any other phase fires. Output mode is **exclusive** — the plan is written as either markdown (`.md`) OR HTML (`.html`), never both. Precedence: in-prompt request > user-stated preference > config > default (`md`), with a hard pipeline-mode override.
 
 **Read config.** The repo root is pre-resolved at skill load:
-!`git rev-parse --show-toplevel 2>/dev/null || true`
+!`git rev-parse --show-toplevel`
 
-If the line above is an absolute path, use it as `<repo-root>`. If it is empty or still shows a backtick command string (a non-Claude harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
+If the line above is an absolute path, use it as `<repo-root>`. If it is empty, shows an error, or still shows a backtick command string (a harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
 
 Resolution steps:
 
@@ -772,10 +772,10 @@ After document review and final checks, print a one-line summary of the headless
 
 **Options.** Option 5's label matches the artifact's format. Under exclusive output mode, exactly one of "Publish to Proof" or "Open in browser" applies per run — `OUTPUT_FORMAT=md` shows Proof; `OUTPUT_FORMAT=html` shows browser. Proof operates on markdown and cannot ingest HTML; the browser option opens the local `.html` file. Render the option matching the format produced this run.
 
-1. **Start `/spec-work`** - Best for shorter work, or when you want to review and possibly steer as it goes (runs via `spec-work`, in this session). Implementation-ready code plans only.
-2. **Run it as a `/goal`** - Run this plan as an autonomous goal to its Definition of Done — fewer check-ins; good for longer or unattended runs. The alternative to option 1, not an add-on — pick one. Implementation-ready code plans only, and only where the host has goal capability (Codex `create_goal` in the available tool list, or a user-typed `/goal` in Claude Code). Where it can start directly, it does; otherwise it hands over a copy-paste prompt.
+1. **Start `/spec-work`** - Build and ship the plan in this session; `spec-work` selects the appropriate implementation engine and owns simplification, review, verification, and closeout. Implementation-ready code plans only.
+2. **Run it as a `/goal`** - Choose this only when you prefer to bypass `spec-work` and drive the plan directly through the harness's autonomous goal mode. The alternative to option 1, not an add-on — pick one. Implementation-ready code plans only, and only where the host has goal capability (Codex `create_goal` in the available tool list, or a user-typed `/goal` in Claude Code). Where it can start directly, it does; otherwise it hands over a copy-paste prompt.
 
-**Recommended marker (dynamic):** Goal mode is the recommended default when the host supports it — mark option 2 *(recommended)* and leave option 1 unmarked; on hosts without goal capability (option 2 omitted), mark option 1 *(recommended)* instead. Exactly one option carries it.
+**Recommended marker:** `spec-work` (option 1) always carries *(recommended)* and option 2 stays unmarked. `spec-work` owns engine selection and can choose goal or dynamic-workflow execution when plan shape and host capability warrant it, so recommending it does not foreclose autonomous execution. Exactly one option carries the marker.
 3. **Decide on the review's open items** - Confirm or skip the suggested edits, and settle the judgment calls the auto-pass left for you. (Safe, mechanical fixes were already applied; you can also defer items into Open Questions.)
 4. **Create Issue** - Create a tracked issue from this plan in your configured issue tracker (e.g., GitHub Issues, Linear, Jira)
 5. **Publish to Proof — shareable link** - Publish the plan to Every's Proof editor and get a shareable link to read, comment on, or share with others. One-way: the local plan file stays canonical. **Render only when `OUTPUT_FORMAT=md`.**

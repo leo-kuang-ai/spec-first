@@ -1,42 +1,15 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PlatformAdapter = require('./base');
-const {
-  buildHostNativePointer,
-  inspectHostNativePointer,
-  planHostNativePointerRemoval,
-  planHostNativePointerSync,
-} = require('./host-native-pointer');
+const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const { contentHasOtherRuntimePathReferences } = require('./platform-registry');
 
 const KIRO_STEERING_POINTER_PATH = '.kiro/steering/spec-first.md';
 const KIRO_AGENT_READ_TOOLS = ['read'];
-const KIRO_UNREWRITTEN_PATH_PATTERNS = [
-  /\.claude\/commands\/spec\/[a-z-]+\.md/,
-  /\.claude\/commands\/spec-\*\.md/,
-  /\.claude\/spec-first\/workflows\//,
-  /\.claude\/skills\//,
-  /\.claude\/agents\//,
-  /\.codex\/commands\/spec\/[a-z-]+\.md/,
-  /\.codex\/commands\/spec-\*\.md/,
-  /\.codex\/skills\//,
-  /\.codex\/agents\//,
-  /\.agents\/skills\//,
-  /\.cursor\/skills\//,
-  /\.cursor\/spec-first\//,
-  /\.cursor\/mcp\.json/,
-  /\.qoder\/commands\/spec-[a-z-]+\.md/,
-  /\.qoder\/commands\/spec-\*\.md/,
-  /\.qoder\/commands\/spec\//,
-  /\.qoder\/skills\//,
-  /\.qoder\/agents\//,
-  /\.qoder\/spec-first\//,
-  /\.qoder\/settings\.local\.json/,
-];
 
-class KiroAdapter extends PlatformAdapter {
+class KiroAdapter extends PointerBasedAdapter {
   get id() {
     return 'kiro';
   }
@@ -75,6 +48,14 @@ class KiroAdapter extends PlatformAdapter {
 
   get instructionFile() {
     return 'AGENTS.md';
+  }
+
+  get pointerPath() {
+    return KIRO_STEERING_POINTER_PATH;
+  }
+
+  get pointerHostLabel() {
+    return 'Kiro';
   }
 
   transformSkillContent(content, context = {}) {
@@ -146,10 +127,7 @@ class KiroAdapter extends PlatformAdapter {
     if (fs.existsSync(agentsRoot)) {
       checks.push(...inspectKiroAgentFrontmatter(projectRoot, agentsRoot));
     }
-    checks.push(inspectHostNativePointer(projectRoot, KIRO_STEERING_POINTER_PATH, {
-      hostId: this.id,
-      hostLabel: 'Kiro',
-    }));
+    checks.push(this.inspectPointerRuntime(projectRoot));
 
     return checks.length > 0
       ? checks
@@ -160,20 +138,6 @@ class KiroAdapter extends PlatformAdapter {
       }];
   }
 
-  planRuntimeFilesSync(projectRoot) {
-    return planHostNativePointerSync(
-      projectRoot,
-      KIRO_STEERING_POINTER_PATH,
-      buildHostNativePointer({
-        hostLabel: 'Kiro',
-        initCommand: 'spec-first init --kiro',
-      }),
-    );
-  }
-
-  planRuntimeFilesRemoval(projectRoot) {
-    return planHostNativePointerRemoval(projectRoot, KIRO_STEERING_POINTER_PATH);
-  }
 }
 
 module.exports = KiroAdapter;
@@ -359,7 +323,7 @@ function inspectKiroSkillNames(projectRoot, skillsRoot) {
       const issues = [];
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
-      if (KIRO_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(fs.readFileSync(skillPath, 'utf8')))) {
+      if (contentHasOtherRuntimePathReferences('kiro', fs.readFileSync(skillPath, 'utf8'))) {
         issues.push('contains non-Kiro runtime path references');
       }
       return issues.length === 0

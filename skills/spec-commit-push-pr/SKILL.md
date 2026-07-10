@@ -39,10 +39,10 @@ Three flavors of intent. Pick one and follow the matching path; otherwise defaul
 !`git log --oneline -10`
 
 **Remote default branch:**
-!`git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo 'DEFAULT_BRANCH_UNRESOLVED'`
+!`git rev-parse --abbrev-ref origin/HEAD`
 
 **Existing PR check:**
-!`gh pr view --json url,title,state 2>/dev/null || echo 'NO_OPEN_PR'`
+!`gh pr view --json url,title,state`
 
 ### Context fallback
 
@@ -103,7 +103,7 @@ Report the PR URL.
 
 Use the context above. All data needed for this step and Step 3 is already available -- do not re-run those commands.
 
-The remote default branch value returns something like `origin/main`. Strip the `origin/` prefix. If it returned `DEFAULT_BRANCH_UNRESOLVED` or a bare `HEAD`, try:
+The remote default branch value returns something like `origin/main`. Strip the `origin/` prefix. If it returned `DEFAULT_BRANCH_UNRESOLVED`, an error, or a bare `HEAD`, try:
 
 ```bash
 gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
@@ -177,14 +177,14 @@ The working-tree diff from Step 1 only shows uncommitted changes at invocation t
 
 1. **User explicitly asked for evidence.** If the user's invocation requested it ("ship with a demo", "include a screenshot"), proceed directly to capture. If capture turns out to be not possible (no runnable surface, missing credentials, docs-only diff) or clearly not useful, note that briefly and proceed without evidence — do not force capture for its own sake.
 
-2. **Agent judgment on authored changes.** If you authored the commits in this session and know the change is clearly non-observable (internal plumbing, backend refactor without user-facing effect, type-level changes, etc.), skip the prompt without asking. The categorical skip list below is not exhaustive — trust judgment about the change you just wrote.
+2. **Agent judgment on authored changes.** If you authored the commits in this session and know the change produces no material claim a reviewer needs evidence for (internal plumbing, backend refactor without user-facing effect, type-level changes, inert documentation, pure refactors), skip the prompt without asking. Classify by runtime purpose, not extension: markdown or YAML that acts as runtime agent instructions, configuration, generated product content, policy code, or deployment behavior is not auto-skippable.
 
-Otherwise, run the full decision: if the branch diff changes observable behavior (UI, CLI output, API behavior with runnable code, generated artifacts, workflow output) and evidence is not otherwise blocked (unavailable credentials, paid services, deploy-only infrastructure, hardware), ask: "This PR has observable behavior. Capture evidence for the PR description?"
+Otherwise, run the full decision: if the branch diff changes behavior or makes a material claim a reviewer cannot establish from the diff alone (UI, CLI output, API behavior with runnable code, generated artifacts, workflow output, ranking/scoring logic, deployment/config behavior) and evidence is not otherwise blocked (unavailable credentials, paid services, deploy-only infrastructure, hardware), ask: "This PR has behavior or risk that would benefit from evidence. Include existing evidence in the PR description?"
 
 - **Use existing evidence** -- ask for the URL or markdown embed, then splice it in as a `## Demo` section.
 - **Skip** -- proceed with no evidence section.
 
-When evidence is not possible (docs-only, markdown-only, changelog-only, release metadata, CI/config-only, test-only, or pure internal refactors), skip without asking.
+When evidence would not change reviewer confidence (inert documentation, changelog-only edits, release metadata, test-only changes, or pure internal refactors), skip without asking.
 
 **Concept teaching gate (before composition).** Use the repo root from context; if it is empty or shows a literal command string, resolve it at runtime with `git rev-parse --show-toplevel`. Read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. Only an active, non-commented `pr_teaching_section:` key counts; lines starting with `#` are comments, and the shipped template documents optional keys as commented examples. The gate is off only when the active value is exactly `false`; a missing file, missing key, or any other value means the default is on. The same read resolves `pr_teaching_archive:`: on only when the active value is exactly `true`, otherwise off. A per-run `archive:on|off` token overrides the archive key for this invocation.
 

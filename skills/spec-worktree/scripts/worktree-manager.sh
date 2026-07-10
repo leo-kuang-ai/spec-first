@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# Create a new git worktree with optional environment files and dev-tool trust.
+# Create a new git worktree or attach an existing ref with optional environment
+# files and dev-tool trust.
 #
 # The distinctive work this script does (vs. raw `git worktree add`):
 #   1. Optionally copies .env* files from the main repo with --copy-env
@@ -218,12 +219,18 @@ usage() {
 Usage:
   worktree-manager.sh detect --json
   worktree-manager.sh create [--copy-env] <branch-name> [from-branch]
+  worktree-manager.sh isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]
 
 Creates .worktrees/<branch-name> with <branch-name> branched from
 [from-branch] (default: origin's default branch, or main).
 
 The main repo checkout is not modified; from-branch is fetched but
 not checked out.
+
+isolate attaches .worktrees/<slug> to an existing branch, tag, commit, or PR
+head. A branch can be checked out in only one worktree at a time; if the target
+branch is already checked out, the command reports already_checked_out and exits
+0 without creating a duplicate checkout.
 
 By default, .env* files are not copied. Pass --copy-env to opt in.
 
@@ -237,6 +244,37 @@ or submodule) -- always parse the state field to choose the next action, since
 exit 0 alone does not mean "safe to create". Non-zero (state=unknown) means
 detection failed; read reason_code. node is required to emit the JSON.
 EOF
+}
+
+slugify_ref() {
+  local value="${1:?Error: ref required}"
+  local slug
+  slug=$(printf '%s' "$value" | sed -E 's#[^A-Za-z0-9._-]+#-#g; s#^-+##; s#-+$##')
+  if [[ -z "$slug" ]]; then
+    slug="target"
+  fi
+  printf '%s\n' "$slug"
+}
+
+checked_out_path_for_branch() {
+  local branch_name="${1:?Error: branch name required}"
+  local branch_ref="refs/heads/$branch_name"
+  git worktree list --porcelain 2>/dev/null | awk -v ref="$branch_ref" '
+    /^worktree / { path = substr($0, 10) }
+    /^branch / {
+      if (substr($0, 8) == ref) {
+        print path
+        exit
+      }
+    }
+  '
+}
+
+report_already_checked_out() {
+  local branch_name="${1:?Error: branch name required}"
+  local checkout_path="${2:?Error: checkout path required}"
+  echo "already_checked_out branch=$branch_name path=$checkout_path"
+  echo "Use that checkout for this target; git will not allow one branch in two worktrees."
 }
 
 # Ensure .worktrees is ignored in the main repo. Runs `git check-ignore` from
@@ -558,12 +596,164 @@ create_worktree() {
   echo "Switch with: cd $worktree_path"
 }
 
+isolate_existing_ref() {
+  local copy_env="false"
+  if [[ "${1:-}" == "--copy-env" ]]; then
+    copy_env="true"
+    shift
+  fi
+
+  local target_ref="${1:-}"
+  local requested_slug="${2:-}"
+
+  if [[ -z "$target_ref" ]]; then
+    echo "Error: target ref required" >&2
+    usage >&2
+    exit 1
+  fi
+
+  if ! detect_worktree_facts; then
+    echo "Error: cannot isolate ref; detection failed reason_code=$DETECT_REASON_CODE" >&2
+    return 1
+  fi
+  case "$DETECT_STATE" in
+    ordinary-checkout|submodule|linked-worktree) ;;
+    *)
+      echo "Error: cannot isolate ref; unknown detection state=$DETECT_STATE reason_code=$DETECT_REASON_CODE" >&2
+      return 1
+      ;;
+  esac
+  init_worktree_paths_from_detect
+
+  local checkout_ref="$target_ref"
+  local branch_name=""
+  local worktree_slug="${requested_slug:-}"
+  local add_mode="ref"
+
+  case "$target_ref" in
+    pr:[0-9]*)
+      branch_name="pr-${target_ref#pr:}"
+      checkout_ref="$branch_name"
+      worktree_slug="${worktree_slug:-$branch_name}"
+      add_mode="branch"
+      ;;
+    \#[0-9]*)
+      branch_name="pr-${target_ref#\#}"
+      checkout_ref="$branch_name"
+      worktree_slug="${worktree_slug:-$branch_name}"
+      add_mode="branch"
+      ;;
+  esac
+
+  if [[ -n "$branch_name" ]]; then
+    local existing_checkout
+    existing_checkout=$(checked_out_path_for_branch "$branch_name")
+    if [[ -n "$existing_checkout" ]]; then
+      report_already_checked_out "$branch_name" "$existing_checkout"
+      return 0
+    fi
+    if ! git fetch origin "pull/${branch_name#pr-}/head:refs/heads/$branch_name" --quiet; then
+      echo "Error: could not fetch PR ${branch_name#pr-} from origin" >&2
+      return 1
+    fi
+  elif git show-ref --verify --quiet "refs/heads/$target_ref"; then
+    branch_name="$target_ref"
+    checkout_ref="$target_ref"
+    worktree_slug="${worktree_slug:-$(slugify_ref "$target_ref")}"
+    add_mode="branch"
+    local existing_checkout
+    existing_checkout=$(checked_out_path_for_branch "$branch_name")
+    if [[ -n "$existing_checkout" ]]; then
+      report_already_checked_out "$branch_name" "$existing_checkout"
+      return 0
+    fi
+  elif git rev-parse --verify "origin/$target_ref" >/dev/null 2>&1; then
+    branch_name="$target_ref"
+    checkout_ref="origin/$target_ref"
+    worktree_slug="${worktree_slug:-$(slugify_ref "$target_ref")}"
+    add_mode="remote-branch"
+    local existing_checkout
+    existing_checkout=$(checked_out_path_for_branch "$branch_name")
+    if [[ -n "$existing_checkout" ]]; then
+      report_already_checked_out "$branch_name" "$existing_checkout"
+      return 0
+    fi
+  elif git rev-parse --verify "$target_ref^{commit}" >/dev/null 2>&1; then
+    checkout_ref="$target_ref"
+    worktree_slug="${worktree_slug:-$(slugify_ref "$target_ref")}"
+    add_mode="detached"
+  else
+    echo "Error: target ref does not resolve: $target_ref" >&2
+    return 1
+  fi
+
+  if [[ "$DETECT_STATE" == "linked-worktree" ]]; then
+    if [[ -n "$branch_name" && "${DETECT_BRANCH:-}" == "$branch_name" ]]; then
+      echo "already_checked_out branch=$branch_name path=$DETECT_WORKTREE_ROOT"
+      return 0
+    fi
+    echo "Already in an isolated worktree; checking out $target_ref in place."
+    git checkout "$checkout_ref"
+    echo "Worktree ready: $DETECT_WORKTREE_ROOT"
+    return 0
+  fi
+
+  local worktree_path="$WORKTREE_DIR/$worktree_slug"
+  if [[ -d "$worktree_path" ]]; then
+    echo "Error: worktree already exists at $worktree_path" >&2
+    echo "Use 'cd $worktree_path' to switch, or 'git worktree remove' first." >&2
+    exit 1
+  fi
+
+  echo "Isolating $target_ref at $worktree_path"
+
+  mkdir -p "$WORKTREE_DIR"
+  ensure_gitignore
+
+  case "$add_mode" in
+    branch)
+      git worktree add "$worktree_path" "$checkout_ref"
+      ;;
+    remote-branch)
+      git worktree add -b "$branch_name" "$worktree_path" "$checkout_ref"
+      ;;
+    detached)
+      git worktree add --detach "$worktree_path" "$checkout_ref"
+      ;;
+    *)
+      git worktree add "$worktree_path" "$checkout_ref"
+      ;;
+  esac
+
+  echo "Environment files:"
+  if [[ "$copy_env" == "true" ]]; then
+    copy_env_files "$worktree_path"
+  else
+    echo "  Not copied by default. Re-run isolate with --copy-env to opt in."
+  fi
+
+  echo "Dev tool trust:"
+  local default_branch trust_ref
+  default_branch=$(get_default_branch)
+  trust_ref="origin/$default_branch"
+  if git rev-parse --verify "$trust_ref" &>/dev/null; then
+    trust_dev_tools "$worktree_path" "$trust_ref" "false"
+  else
+    echo "  Skipped: $trust_ref not available locally"
+  fi
+
+  echo ""
+  echo "Worktree ready: $worktree_path"
+  echo "Switch with: cd $worktree_path"
+}
+
 main() {
   local command="${1:-}"
   shift || true
   case "$command" in
     detect) detect_command "$@" ;;
     create) create_worktree "$@" ;;
+    isolate) isolate_existing_ref "$@" ;;
     ""|help|-h|--help) usage ;;
     *)
       echo "Error: unknown command '$command'" >&2
