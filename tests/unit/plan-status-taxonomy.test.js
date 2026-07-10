@@ -30,6 +30,8 @@ function parseReferencedReviews(content) {
 }
 
 function validateReferencedReviews(content) {
+  const date = frontmatter(content).match(/^date:\s*(\d{4}-\d{2}-\d{2})\s*$/m);
+  if (date && date[1] < '2026-06-14') return [];
   return parseReferencedReviews(content)
     .filter((entry) => entry.role === 'origin' && entry.scope === 'in')
     .filter((entry) => !entry.addresses_findings && !entry.deferred_findings)

@@ -147,6 +147,7 @@ Write these keys (see "Config File Shape" below for the exact form):
 - `feedback_sources` — the list of source maps assembled across sections 1-3.
 - `sweep_state_path` — from section 4.
 - `sweep_ack_cap` — from section 5.
+- `sweep_lease_ttl_minutes` — write the default `60`; it is not asked interactively and remains user-tunable.
 - `sweep_shared_branch` — from section 6 (default `false`; only meaningful with committed state).
 
 Then surface the resulting Sweep section to the user in chat and offer **one round of edits**.

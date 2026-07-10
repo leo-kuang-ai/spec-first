@@ -1,0 +1,79 @@
+name: Windows Compatibility
+
+on:
+  push:
+    paths:
+      - '.github/workflows/windows-compatibility.yml'
+      - 'bin/**'
+      - 'src/**'
+      - 'scripts/**'
+      - 'skills/**'
+      - 'templates/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - '.github/workflows/windows-compatibility.yml'
+      - 'bin/**'
+      - 'src/**'
+      - 'scripts/**'
+      - 'skills/**'
+      - 'templates/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: windows-latest / Node ${{ matrix.node }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Validate package contents
+        run: npm run build
+
+      - name: Pack and install globally
+        shell: pwsh
+        run: |
+          $packJson = npm pack --json | Out-String
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $pack = $packJson | ConvertFrom-Json
+          $tarball = (Resolve-Path $pack[0].filename).Path
+          $prefix = Join-Path $env:RUNNER_TEMP 'spec-first-windows-prefix'
+          npm install --global --prefix $prefix $tarball
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $prefix 'spec-first.cmd') --help
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Validate installed cmd shim
+        shell: cmd
+        run: '"%RUNNER_TEMP%\spec-first-windows-prefix\spec-first.cmd" --help'

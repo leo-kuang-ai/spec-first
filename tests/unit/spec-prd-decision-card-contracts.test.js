@@ -4,7 +4,12 @@ const { buildReport } = require('../../skills/spec-prd/scripts/check-prd-artifac
 const { buildFinalizeReceipt } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
 const { BLOCKING_REASON_CODES } = require('../../skills/spec-prd/scripts/lib/reason-codes');
 
-function prd({ writeMode, nextAction, canEnterSpecPlan, clarificationEvidence = 'asked-owner' }) {
+function prd({
+  writeMode,
+  nextAction,
+  canEnterSpecPlan,
+  clarificationEvidence = 'source-proven-no-ask',
+}) {
   return [
     '---',
     'spec_id: 2026-07-10-001-decision-card',
@@ -102,7 +107,6 @@ describe('spec-prd Decision Card deterministic consistency', () => {
       canEnterSpecPlan: 'yes',
       clarificationEvidence: 'skipped',
     });
-    const report = buildReport('docs/brainstorms/decision-card-requirements.md', text);
     const receipt = buildFinalizeReceipt(
       'docs/brainstorms/decision-card-requirements.md',
       text,
@@ -110,7 +114,7 @@ describe('spec-prd Decision Card deterministic consistency', () => {
       { checkOnly: true },
     );
 
-    expect(reasonCodes(report)).toContain('clarification_trace_absent');
+    expect(receipt.checker.reason_codes).toContain('clarification_trace_absent');
     expect(receipt.blocking_reason_codes).toContain('clarification_trace_absent');
     expect(receipt.should_block_closeout).toBe(true);
   });
@@ -121,7 +125,6 @@ describe('spec-prd Decision Card deterministic consistency', () => {
       nextAction: 'checkpoint-prd',
       canEnterSpecPlan: 'yes',
     });
-    const report = buildReport('docs/brainstorms/decision-card-requirements.md', text);
     const receipt = buildFinalizeReceipt(
       'docs/brainstorms/decision-card-requirements.md',
       text,
@@ -129,7 +132,7 @@ describe('spec-prd Decision Card deterministic consistency', () => {
       { checkOnly: true },
     );
 
-    expect(reasonCodes(report)).toContain('checkpoint_claims_ready');
+    expect(receipt.checker.reason_codes).toContain('checkpoint_claims_ready');
     expect(receipt.blocking_reason_codes).toContain('checkpoint_claims_ready');
     expect(receipt.should_block_closeout).toBe(true);
   });
@@ -140,7 +143,6 @@ describe('spec-prd Decision Card deterministic consistency', () => {
     ['ask-owner-first', 'checkpoint-prd', 'no'],
   ])('blocks write_mode=%s with next_action=%s', (writeMode, nextAction, canEnterSpecPlan) => {
     const text = prd({ writeMode, nextAction, canEnterSpecPlan });
-    const report = buildReport('docs/brainstorms/decision-card-requirements.md', text);
     const receipt = buildFinalizeReceipt(
       'docs/brainstorms/decision-card-requirements.md',
       text,
@@ -148,7 +150,7 @@ describe('spec-prd Decision Card deterministic consistency', () => {
       { checkOnly: true },
     );
 
-    expect(reasonCodes(report)).toContain('decision_card_path_mismatch');
+    expect(receipt.checker.reason_codes).toContain('decision_card_path_mismatch');
     expect(receipt.blocking_reason_codes).toContain('decision_card_path_mismatch');
     expect(receipt.should_block_closeout).toBe(true);
   });

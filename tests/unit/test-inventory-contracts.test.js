@@ -5,19 +5,30 @@ const path = require('node:path');
 const { WORKFLOW_RUNTIME_CONTRACT_TESTS } = require('../../scripts/run-ai-dev-quality-gate');
 
 const repoRoot = path.resolve(__dirname, '../..');
+const sourceExtensions = new Set(['.cjs', '.js', '.json', '.md', '.yaml']);
+
+function collectSourceFiles(relativePath, found = []) {
+  const absolutePath = path.join(repoRoot, relativePath);
+  const stat = fs.statSync(absolutePath);
+  if (stat.isDirectory()) {
+    for (const name of fs.readdirSync(absolutePath)) {
+      collectSourceFiles(path.join(relativePath, name), found);
+    }
+  } else if (sourceExtensions.has(path.extname(relativePath))) {
+    found.push(relativePath);
+  }
+  return found;
+}
+
 const currentSources = [
   'package.json',
   'README.md',
   'README.zh-CN.md',
-  'scripts/run-test-suite.cjs',
-  'scripts/run-ai-dev-quality-gate.js',
-  'skills/spec-app-consistency-audit/SKILL.md',
-  'skills/spec-app-consistency-audit/README.md',
-  'skills/spec-app-consistency-audit/references/headless-runner.md',
-  'skills/spec-prd/references/evaluation-governance.md',
-  'skills/spec-write-tasks/references/task-pack-schema.md',
-  'docs/contracts/context-bundle.md',
-  'src/cli/contracts/security/secret-deny-patterns.json',
+  ...collectSourceFiles('scripts'),
+  ...collectSourceFiles('src'),
+  ...collectSourceFiles('skills'),
+  ...collectSourceFiles('docs/contracts'),
+  ...collectSourceFiles('docs/catalog'),
 ];
 
 function exactTestPaths(content) {
@@ -26,6 +37,17 @@ function exactTestPaths(content) {
 }
 
 describe('active test inventory', () => {
+  test('package scripts and publish entries do not reference missing local files', () => {
+    const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+    const commandPaths = Object.values(packageJson.scripts || {}).flatMap((command) =>
+      [...command.matchAll(/(?:scripts|tests)\/[A-Za-z0-9._/-]+\.(?:cjs|js|sh)/g)].map((match) => match[0]));
+    expect(commandPaths.filter((file) => !fs.existsSync(path.join(repoRoot, file)))).toEqual([]);
+
+    const explicitPublishFiles = (packageJson.files || [])
+      .filter((entry) => !entry.startsWith('!') && /\.[A-Za-z0-9]+$/.test(entry));
+    expect(explicitPublishFiles.filter((file) => !fs.existsSync(path.join(repoRoot, file)))).toEqual([]);
+  });
+
   test('quality gate paths all exist', () => {
     expect(WORKFLOW_RUNTIME_CONTRACT_TESTS.length).toBeGreaterThan(0);
     expect(WORKFLOW_RUNTIME_CONTRACT_TESTS.filter((file) => !fs.existsSync(path.join(repoRoot, file))))

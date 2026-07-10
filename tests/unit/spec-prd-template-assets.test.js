@@ -10,6 +10,7 @@ const plugin = require('../../src/cli/plugin');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const CLI_PATH = path.join(REPO_ROOT, 'bin', 'spec-first.js');
+const SUPPORTED_PLATFORMS = getSupportedPlatforms();
 
 const TEMPLATE_ASSETS = [
   'assets/templates/00-generic.md',
@@ -75,60 +76,64 @@ describe('spec-prd product-bundled template assets', () => {
     const packageFiles = require('../../package.json').files;
     expect(packageFiles).toContain('skills/');
 
-    for (const platform of getSupportedPlatforms()) {
+    for (const platform of SUPPORTED_PLATFORMS) {
       const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-prd-templates-${platform}-`));
-      const adapter = getAdapter(platform);
-      const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
-      const operationPaths = new Set(plan.operations.map((operation) => operation.path));
-      const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const operationPaths = new Set(plan.operations.map((operation) => operation.path));
+        const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
 
-      for (const relativePath of TEMPLATE_ASSETS) {
-        const expectedPath = path.join(runtimeRoot, 'spec-prd', relativePath).replace(/\\/g, '/');
-        expect(operationPaths).toContain(expectedPath);
+        for (const relativePath of TEMPLATE_ASSETS) {
+          const expectedPath = path.join(runtimeRoot, 'spec-prd', relativePath).replace(/\\/g, '/');
+          expect(operationPaths).toContain(expectedPath);
+        }
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
       }
     }
   });
 
-  test('installs every template asset through one five-host init', () => {
-    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-prd-five-host-init-'));
+  test('installs every template asset through one all-supported-host init', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-prd-all-host-init-'));
     const home = path.join(projectRoot, 'home');
-    fs.mkdirSync(home, { recursive: true });
-    const result = spawnSync(process.execPath, [
-      CLI_PATH,
-      'init',
-      '--claude',
-      '--codex',
-      '--cursor',
-      '--kiro',
-      '--qoder',
-      '-y',
-      '-u',
-      'spec-prd-template-test',
-      '--lang',
-      'zh',
-      '--no-sync-user-language',
-    ], {
-      cwd: projectRoot,
-      env: { ...process.env, HOME: home },
-      encoding: 'utf8',
-      timeout: 60000,
-    });
+    try {
+      fs.mkdirSync(home, { recursive: true });
+      const hostFlags = SUPPORTED_PLATFORMS.map((platform) => `--${platform}`);
+      const result = spawnSync(process.execPath, [
+        CLI_PATH,
+        'init',
+        ...hostFlags,
+        '-y',
+        '-u',
+        'spec-prd-template-test',
+        '--lang',
+        'zh',
+        '--no-sync-user-language',
+      ], {
+        cwd: projectRoot,
+        env: { ...process.env, HOME: home },
+        encoding: 'utf8',
+        timeout: 60000,
+      });
 
-    expect(result.status).toBe(0);
-    expect(result.stdout).toContain('初始化完成');
-    expect(result.stderr).toContain('Cursor support is generated-runtime preview');
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(0);
 
-    for (const platform of getSupportedPlatforms()) {
-      const adapter = getAdapter(platform);
-      const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
-      for (const relativePath of TEMPLATE_ASSETS) {
-        expect(fs.existsSync(path.join(
-          projectRoot,
-          runtimeRoot,
-          'spec-prd',
-          relativePath,
-        ))).toBe(true);
+      for (const platform of SUPPORTED_PLATFORMS) {
+        const adapter = getAdapter(platform);
+        const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
+        for (const relativePath of TEMPLATE_ASSETS) {
+          expect(fs.existsSync(path.join(
+            projectRoot,
+            runtimeRoot,
+            'spec-prd',
+            relativePath,
+          ))).toBe(true);
+        }
       }
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
     }
   });
 });

@@ -139,7 +139,7 @@ Run this pack only for triggered conditional signals. It is not an all-section c
 - `regression guard` - for bugfix, brownfield, replace/remove, runtime/tooling, or compatibility-sensitive PRDs, unchanged behavior and negative acceptance are visible enough that planning will not accidentally widen scope. Old data, old clients, old commands, old routes, and old permissions are explicitly preserved, migrated, or out of scope.
 - `living lifecycle` - when updating an existing PRD or downstream-consumed requirements artifact, lifecycle fields such as baseline, supersedes, amendment, reopened, invalidated, last_validated, invalidation_condition, and downstream_sync_impact are clear. Use `downstream_sync_unknown` instead of claiming sync when affected plans/tasks cannot be verified.
 - `supporting evidence refs` - when sources are numerous or authority/freshness varies, `supporting_evidence_refs` or an equivalent index tells planning which refs are product-owned, owner-owned, source-confirmed, design-derived, external, stale, or degraded. This index is advisory unless independently verified by scripts/source reads.
-- `handoff context slice` - 当 PRD 较长、mixed 或 high risk 时，closeout 包含 confirmed WHAT、最多三个 load-bearing R/AE 对的 `top requirement / acceptance refs`、`must-preserve behaviors`、owner decisions、accepted assumptions、需要重读的 source refs、未解决 blockers、planning recheck items、degraded facts 与 downstream sync impact。Context slice 不得包含 implementation steps、task sequencing 或 file-level HOW。
+- `handoff context slice` - 当 PRD 较长、mixed 或 high risk 时，检查 closeout 是否按 `prd-output-template.md` 的 canonical Handoff Context Slice 提供足够的下游阅读指针；本 lens 不复制字段表，只判断该 slice 是否减少 planning invention 且没有泄漏 HOW。
 
 ### Metrics And Overlay Pack
 
