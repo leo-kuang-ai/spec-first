@@ -6,8 +6,8 @@
 
 核心原则：
 
-- `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（旧版命令命名空间）、`.qoder/skills/`、`.qoder/agents/` 和 `.qoder/spec-first/` 下的 spec-first runtime mirror 可重建，不作为项目 source truth。
-- `.cursor/mcp.json` 是 Cursor project MCP 配置落点；`.kiro/settings/` 是 Kiro workspace MCP 配置落点；`.qoder/settings.local.json` 是 Qoder local MCP 配置落点；三者不是 source，默认不提交。Cursor/Qoder clean 保留 local config 整文件，具体 MCP server entry 由 setup/uninstall 路径管理。
+- `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（旧版命令命名空间）、`.qoder/skills/`、`.qoder/agents/`、`.qoder/spec-first/` 和 spec-first managed `.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 下的 spec-first runtime mirror / hook output 可重建，不作为项目 source truth。
+- `.cursor/mcp.json` 是 Cursor project MCP 配置落点；`.kiro/settings/` 是 Kiro workspace MCP 配置落点；`.qoder/settings.local.json` 是 Qoder local MCP 配置落点；`.qoder/settings.json` 中 spec-first managed hook entries 是 managed slice 而非整文件 ownership。它们不是 source，默认不提交。Cursor/Qoder clean 保留 local config / user settings，具体 MCP server entry 或 managed hook entry 由 setup/init/clean 路径管理。
 - `.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 和 `.qoder/rules/**` 是宿主原生或用户维护 artifact，不属于 spec-first generated runtime mirror，只有被显式点名时才作为输入读取。
 - `.spec-first/config/` 和 `.spec-first/workspace/` 是本地 setup/control-plane facts，默认不提交。
 - `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated runtime mirrors 也不应作为普通 LLM 上下文扫描源；只有 setup/update/runtime-drift/audit/governance evidence 任务或用户明确点名路径时才按需读取。
@@ -204,7 +204,7 @@ graphify-out/
 | `.cursor/skills/`、`.cursor/spec-first/` | Cursor preview spec-first-managed runtime mirror 与 state，可由 `init --cursor` 重建 |
 | `.cursor/mcp.json` | Cursor project MCP config output，默认忽略且不是 source；`spec-first clean --cursor` 保留整文件，server entry 由 `spec-mcp-setup` setup/uninstall 管理 |
 | `.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.kiro/settings/` | Kiro spec-first-managed runtime mirror、state 与 MCP workspace config，可由 `init` / `spec-mcp-setup` 重建 |
-| `.qoder/commands/spec-*.md`、`.qoder/commands/spec/`、`.qoder/skills/`、`.qoder/agents/`、`.qoder/spec-first/` | Qoder spec-first-managed runtime mirror 与 state，可由 `init` 重建；`.qoder/commands/spec/` 是旧版命名空间清理目标 |
+| `.qoder/commands/spec-*.md`、`.qoder/commands/spec/`、`.qoder/skills/`、`.qoder/agents/`、`.qoder/spec-first/`、`.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` | Qoder spec-first-managed runtime mirror、hook scripts 与 state，可由 `init` 重建；`.qoder/commands/spec/` 是旧版命名空间清理目标 |
 | `.qoder/settings.local.json` | Qoder local MCP config output，默认忽略且不是 source；`spec-first clean --qoder` 保留整文件，server entry 由 `spec-mcp-setup` setup/uninstall 管理 |
 | `.spec-first/config.local.yaml`、`.spec-first/*.local.yaml` | 本地配置，可能包含个人路径或私有设置 |
 | `.spec-first/config/*.json` | `spec-mcp-setup` 生成的 setup-owned 本地投影，不是第二个版本源 |

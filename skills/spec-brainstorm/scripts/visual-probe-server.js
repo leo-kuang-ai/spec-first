@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { execFileSync, spawn } from "node:child_process"
-import fs from "node:fs"
-import http from "node:http"
-import path from "node:path"
-import { fileURLToPath } from "node:url"
+'use strict';
 
-const scriptPath = fileURLToPath(import.meta.url)
+const { execFileSync, spawn } = require("node:child_process")
+const fs = require("node:fs")
+const http = require("node:http")
+const path = require("node:path")
+
+const scriptPath = __filename
 const DEFAULT_HOST = "127.0.0.1"
 const DEFAULT_URL_HOST = "localhost"
 const IDLE_TIMEOUT_MS = Number(process.env.SPEC_FIRST_VISUAL_PROBE_IDLE_TIMEOUT_MS) || 30 * 60 * 1000
@@ -415,4 +416,6 @@ async function main() {
   }
 }
 
-await main()
+if (require.main === module) {
+  main()
+}

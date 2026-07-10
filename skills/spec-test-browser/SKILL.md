@@ -1,7 +1,7 @@
 ---
 name: spec-test-browser
 description: Run browser tests on pages affected by current PR or branch
-argument-hint: "[PR number, branch name, 'current', or --port PORT]"
+argument-hint: "[PR number, branch name, 'current', --port PORT, or mode:pipeline]"
 ---
 
 # Browser Test Skill
@@ -224,7 +224,7 @@ agent-browser screenshot --full page-name-full.png
 
 ### 8. Human Verification (When Required)
 
-Pause for human input when testing touches flows that require external interaction:
+Pause for human input when testing touches flows that require external interaction. **Pipeline mode:** do not pause; log each such flow as `Skip` with the reason and continue.
 
 | Flow Type | What to Ask |
 |-----------|-------------|
@@ -250,7 +250,7 @@ Did it work correctly?
 
 ### 9. Handle Failures
 
-When a test fails:
+When a test fails (**pipeline mode:** do not ask how to proceed; capture the error screenshot and repro steps, log the failure, and continue):
 
 1. **Document the failure:**
    - Screenshot the error state: `agent-browser screenshot error.png`

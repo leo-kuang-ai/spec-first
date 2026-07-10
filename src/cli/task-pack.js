@@ -3,6 +3,10 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  GENERATED_RUNTIME_PREFIXES,
+  GENERATED_RUNTIME_ROOTS,
+} = require('./helpers/target-repo');
 const { isSecretDeniedPath } = require('./helpers/secret-deny-patterns');
 
 const CANONICALIZATION_VERSION = 'source-plan-body-v1';
@@ -51,39 +55,8 @@ const ALLOWED_REVIEW_GATES = new Set(['optional', 'required']);
 const WINDOWS_RESERVED_NAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;
 const WINDOWS_ILLEGAL_SEGMENT_CHARS = /[<>:"|]/;
 const CONTROL_CHARS = /[\x00-\x1f]/;
-const GENERATED_RUNTIME_MIRROR_PREFIXES = [
-  '.claude/',
-  '.codex/',
-  '.agents/skills/',
-  '.cursor/skills/',
-  '.cursor/spec-first/',
-  '.kiro/skills/',
-  '.kiro/agents/',
-  '.kiro/spec-first/',
-  '.kiro/settings/',
-  '.qoder/commands/spec-',
-  '.qoder/commands/spec/',
-  '.qoder/skills/',
-  '.qoder/agents/',
-  '.qoder/spec-first/',
-];
-const GENERATED_RUNTIME_MIRROR_ROOTS = new Set([
-  '.claude',
-  '.codex',
-  '.agents/skills',
-  '.cursor/skills',
-  '.cursor/spec-first',
-  '.cursor/mcp.json',
-  '.kiro/skills',
-  '.kiro/agents',
-  '.kiro/spec-first',
-  '.kiro/settings',
-  '.qoder/commands/spec',
-  '.qoder/skills',
-  '.qoder/agents',
-  '.qoder/spec-first',
-  '.qoder/settings.local.json',
-]);
+const GENERATED_RUNTIME_MIRROR_PREFIXES = GENERATED_RUNTIME_PREFIXES;
+const GENERATED_RUNTIME_MIRROR_ROOTS = new Set(GENERATED_RUNTIME_ROOTS);
 
 function normalizeNewlines(text) {
   return String(text).replace(/\r\n?/g, '\n');

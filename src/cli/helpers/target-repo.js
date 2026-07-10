@@ -22,6 +22,9 @@ const GENERATED_RUNTIME_PREFIXES = Object.freeze([
   '.qoder/skills/',
   '.qoder/agents/',
   '.qoder/spec-first/',
+  '.qoder/hooks/session-start/',
+  '.qoder/hooks/prd-prewrite-guard/',
+  '.qoder/hooks/prd-readiness-guard/',
 ]);
 const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.claude',
@@ -38,6 +41,9 @@ const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.qoder/skills',
   '.qoder/agents',
   '.qoder/spec-first',
+  '.qoder/hooks/session-start',
+  '.qoder/hooks/prd-prewrite-guard',
+  '.qoder/hooks/prd-readiness-guard',
   '.qoder/settings.local.json',
 ]);
 
@@ -127,6 +133,7 @@ function validateRepoRelativeField(value, field, errors, options = {}) {
 
 module.exports = {
   GENERATED_RUNTIME_PREFIXES,
+  GENERATED_RUNTIME_ROOTS,
   resolveTargetRepoRoot,
   validateOutputContainment,
   validateRepoRelativeField,

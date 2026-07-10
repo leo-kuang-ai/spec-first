@@ -197,7 +197,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 
 Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 skill-local prompt assets、`templates/`、`src/cli/`）经 `spec-first init` 重新生成为 host runtime assets——产出仓库内 workflow artifacts：`ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`。
 
-`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（已退役的旧 namespace）、`.qoder/skills/`、`.qoder/agents/` 和 `.qoder/spec-first/` 下的 generated runtime copies 是可丢弃镜像，可通过 `spec-first init` 重建。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/`、Qoder local `.qoder/settings.local.json`，以及固定 host-native pointer 文件 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md` 都是生成输出，不是 source；Cursor 与 Qoder clean 会保留用户维护的 MCP entry。其他 Cursor native `.cursor/rules/**`、Kiro native `.kiro/specs/**` 和 Qoder native `.qoder/rules/**` 不是 spec-first source。
+`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（已退役的旧 namespace）、`.qoder/skills/`、`.qoder/agents/`、`.qoder/spec-first/`，以及 spec-first managed `.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 下的 generated runtime copies 是可丢弃镜像，可通过 `spec-first init` 重建。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/`、Qoder local `.qoder/settings.local.json`、Qoder `.qoder/settings.json` managed hook entries，以及固定 host-native pointer 文件 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md` 都是生成输出或 managed slice，不是 source；Cursor 与 Qoder clean 会保留用户维护的 MCP/settings entry。其他 Cursor native `.cursor/rules/**`、Kiro native `.kiro/specs/**` 和 Qoder native `.qoder/rules/**` 不是 spec-first source。
 
 详细参考：
 
@@ -211,7 +211,7 @@ Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 ski
 
 - **脚本负责什么：** 在出口和副作用处强制可机械判定的不变量，install、validate、generate、report machine facts。
 - **LLM 负责什么：** requirements framing、scope boundaries、tradeoffs、implementation judgment、review evidence。
-- **普通上下文排除什么：** `.spec-first/audits/**`、`.spec-first/governance/**` 以及 `.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、spec-first managed `.kiro/settings/**`、`.qoder/commands/spec-*.md`、已退役的 `.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**` 等 generated mirrors，以及 `.cursor/mcp.json`、`.qoder/settings.local.json` 这类 host-local config。
+- **普通上下文排除什么：** `.spec-first/audits/**`、`.spec-first/governance/**` 以及 `.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、spec-first managed `.kiro/settings/**`、`.qoder/commands/spec-*.md`、已退役的 `.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、spec-first managed `.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 等 generated mirrors，以及 `.cursor/mcp.json`、`.qoder/settings.local.json` 这类 host-local config。
 
 [→ 完整 Trust Model 与验证合同](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
 

@@ -1710,3 +1710,53 @@ spec-prd 当前已是 production-grade 的 brownfield PRD 工作流，其「分�
 7. **[P2] Context Budget 阈值基于未测估算（§8.10）** — 降级阈值建立在自认「粗粒度估算」的 60–100K token 上，可能过早触发误 defer 或永不触发。决策：阈值待实测 token 消耗校准；校准前把降级策略标为 advisory。(adversarial, conf 75)
 8. **[P2] 新 reference 文件归属矛盾（§7.2 / §7.3 / §7.6 ↔ §8.12）** — 7.2/7.3/7.6 说写入现有文件，§8.12 说新建独立文件并据此计「4 个新文件」。决策：与本节 #4 一并定 inline vs new-file 方向后全文对齐（倾向内联以合 Light contract），同步修正新文件计数与 SKILL.md 加载 trigger。(coherence, conf 75)
 9. **[P2] CONTEXT.md→CONCEPTS.md 改名不可机械执行（§8.8）** — 「所有引用」与「保留上游 snapshot」相互矛盾，「25 处」实测 29 且多在 Embedded Upstream Source Snapshot 段，且无「Adapted spec-prd rules」段可定位边界。决策：按源码实际段边界精确重写——Snapshot 段及描述上游 artifact 的段保留原文，仅改 spec-prd 自有适配规则里的项目术语表引用；「25 处」改为按边界分列的两个计数（保留 N / 改写 M）。(feasibility, conf 75)
+
+---
+
+## 十、精简集成提案（可执行落地清单，2026-07-10）
+
+> 结论先行：**本方案不整体集成进 `skills/spec-prd/`**。经与当前 `SKILL.md`（294 行）及 references 逐项核对，并受本仓治理约束限制，只集成下方「10.2 可落地子集」，其余按「10.3 不集成清单」处置。本节是把前九章收敛成的**可执行落地契约**，不改变前文分析，仅作为实施依据。
+
+### 10.1 集成目标与非目标
+
+**Goals**：把 3 项「确定性有价值 + 纯文档 + 折进现有 reference + 不改控制流时序 + 不跨 workflow」的增量并入 spec-prd，让 grill 排序、状态一致性、PM→开发交接边界更清晰。
+
+**Non-Goals（硬边界）**：
+- 不新建 reference 文件——会破坏 `spec-prd-contracts.test.js` 的拓扑锁（`references` 用 `toEqual([...9 个文件...])`、`sourceFiles` `toHaveLength(15)`）。§8.12 想新建 4 个文件的方向**否决**。
+- 不新增 `BLOCKING_REASON_CODES`——保持确定性下限轻量（对齐 Non-Goal #4）。
+- 不改 SKILL.md 控制流时序（§8.4）——doc-review 已证伪其前提，净收益≈0、回归成本高。
+- 不单方落地跨-workflow 协议（§7.4 / §8.11）——无下游消费者即 aspirational 空能力。
+- 不引入未测阈值机制（§8.10 context budget 阈值）。
+
+### 10.2 可落地子集
+
+| # | 条目 | 落点（现有文件 + 位置） | 加什么（要点） | 性质 | 验证 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | §3.2 Decision Card 合法状态组合 | `references/prd-output-template.md`，Readiness Self-Check 段之后 | 合法/矛盾组合参考表（如 `final-prd + can_enter_spec_plan=no`、`final-prd + clarification_evidence=skipped` 为矛盾） | advisory，不进 checker | contract test 加一条 `expectContainsAll` 断言该表存在；fresh-source eval：矛盾 card 能被自查发现 |
+| 2 | §7.2 Grill Priority Signal | `references/domain-language-and-decision-ledger.md`，Load-Bearing Gap Triage 段之后 | P0 架构 / P1 行为 / P2 体验的**追问排序**（按 pipeline 传播风险），复用既有 `downstream_confirmation_risk` 词汇，显式声明「只排序、不减深度、不 soft-cap、不进 BLOCKING」 | LLM-owned 排序纪律 | contract test 断言排序段存在 + `not.toContain` 削深度/ soft-cap 表述；fresh-source eval：多 gap 时先问架构级 |
+| 3 | §7.3 tech-input 交接边界 | `references/prd-readiness-lens.md`，Handoff/Outcomes 段 | `non_what_tech_recheck`（可随 ready 交接）vs `what_affecting_tech_decision`（必须 checkpoint/ask-owner/revise）的分类纪律；**去掉**三受众 `handoff_summary_views` 与 optional 列 | 分类纪律，不新增 readiness_outcome | contract test 断言分类纪律串；fresh-source eval：WHAT-affecting tech gap 不放行 ready-for-planning |
+| 4（待定，中风险） | §8.8 术语口径统一 | `grill-with-docs-integration.md` / `domain-language-and-decision-ledger.md` / `prd-readiness-lens.md` / `prd-output-template.md` | **先决策** `CONCEPTS.md`、`docs/contracts/domain-glossary.md`、`CONTEXT.md` 三者关系（合并/别名/迁移），再按段边界精确改写；上游 Embedded Snapshot 段保留原文，不机械 find-replace | 需求先定关系口径 | 落地前单独确认；改后 contract test + glossary-drift 脚本回归 |
+
+§7.1 / §7.5 Developer Quick-Start 列为**可选**：有价值但增加模板篇幅，且与既有 `handoff_context_slice` 部分重叠，非首批。
+
+### 10.3 不集成清单（理由可追溯到方案自身）
+
+| 条目 | 不集成理由 | 依据 |
+| --- | --- | --- |
+| §2.1 Phase Checkpoint Protocol / §8.4 脊柱重排 | 与现状 Failure-Mode Blacklist / 🔴 gate / Canonical stop points / prd-prewrite-guard 重复；重排净收益≈0、回归成本高 | §2.1、§8.3#2、§8.4 doc-review 修正 |
+| §7.4 / §8.11 PRD Revision Signal | 跨 workflow，需 spec-plan/work/review 同步改 source 才有消费者，否则 aspirational 空能力 | Deferred #2 |
+| §2.2 T0 / §8.9 Session Recovery / §8.10 Context Budget | 建立在「80% PRD 需多轮异步」无来源前提上，且与「同会话边际成本近零」矛盾；阈值未测 | Deferred #3 / #7 |
+| §2.4 Handoff Views / §7.3 optional 列 | 无当前消费者 | Deferred #5 |
+| §3.1 checker 扩展 / §3.6 eval 增强 | 需改脚本 + eval 基线，且当前工作树 contract test 不稳定，无法验证 | 本节 10.4 |
+| §3.5 输入预处理 / §8.5 场景发明「新增质量层」 | 与既有 multimodal/design-source/large-input 及 grill-with-docs 六类场景纪律重复 | Deferred #4、§8.2/§8.5 doc-review |
+| §8.12 新建 4 个 reference 文件 | 破坏 contract test `references` 拓扑锁 | 本节 10.1 Non-Goals |
+| §3.3 Grill 深度自适应 | 已被 §7.2 取代 | §3.3 doc-review |
+
+### 10.4 落地前置条件（gate the exits，缺一不落地）
+
+1. **测试可跑**：`tests/unit/spec-prd-contracts.test.js` 与 `tests/jest-setup.js` 在工作树内且 `npx jest tests/unit/spec-prd-contracts.test.js` 可执行（**当前工作树被并行任务 churn，该文件间歇性缺失，暂不满足**）。
+2. **每项落地闭环**：读现有 reference 现状 → 增量式添加（不动锁定串）→ 更新/新增对应 contract test 断言 → 跑 contract test → fresh-source eval（dispatch 可用则跑，否则显式记未执行原因）。
+3. **source→runtime**：source 改完跑 `spec-first init` 再生 `.claude`/`.codex`/`.agents/skills` 等 runtime mirror，验证无 source/runtime drift；不手改 mirror。
+4. **文档纪律**：CHANGELOG 追加 `(user-visible)`；SKILL.md 若有增量核对仍 < 500 行；评估是否需同步 `prd-output-template.md` embedded runtime skeleton（本子集为 reference 增量，通常无需动 skeleton）。
+
+> 实施顺序建议：等工作树稳定、contract test 可跑后，按 10.2 的 1→2→3 逐条落地并各自跑测试；§8.8（第 4 项）先定三文件关系再单独排期；跨-workflow 的 Revision Signal 另立 opt-in 提案。

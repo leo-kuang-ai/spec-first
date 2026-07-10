@@ -19,12 +19,17 @@ if [ -n "${3:-}" ]; then
     OWNER=$(echo "$3" | cut -d/ -f1)
     REPO=$(echo "$3" | cut -d/ -f2)
 else
-    OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null)
-    REPO=$(gh repo view --json name -q .name 2>/dev/null)
+    # `|| true` is load-bearing: under `set -e`, a failed command substitution
+    # in an assignment aborts the script immediately. Run outside a git repo,
+    # `gh repo view` exits 1, its stderr is swallowed by `2>/dev/null`, and the
+    # script would die here with rc=1 and no output -- making the friendly error
+    # below unreachable. Keep `|| true` so detection failure falls through to it.
+    OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null || true)
+    REPO=$(gh repo view --json name -q .name 2>/dev/null || true)
 fi
 
 if [ -z "$OWNER" ] || [ -z "$REPO" ]; then
-    echo "Error: Could not detect repository. Pass OWNER/REPO as third argument."
+    echo "Error: could not resolve owner/repo. Run get-thread-for-comment from inside the target git repository, or pass OWNER/REPO as the third argument (e.g., get-thread-for-comment $PR_NUMBER $COMMENT_NODE_ID OWNER/REPO)." >&2
     exit 1
 fi
 

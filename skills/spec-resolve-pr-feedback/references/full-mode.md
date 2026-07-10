@@ -54,6 +54,8 @@ If there are no new items across all feedback types, skip steps 3-8 and go strai
 
 Read [evaluation-rubric.md](evaluation-rubric.md) now and apply it across the whole batch before any resolver dispatch. This is the legitimacy gate. The orchestrator holds every new thread, actionable PR comment, and actionable review body at once, so it can dedup reads by file, catch repeated bad assumptions, and separate items that need code from items that only need a reply or human decision.
 
+If the batch is large enough that judging every item inline would overflow context, process the central judgment in file-clustered groups of about 8-10 items and emit the three lists incrementally. Do not fan out the judgment to resolver agents to save context; batch the central judgment instead.
+
 Create a task list of all **new** unresolved items grouped by verdict and type:
 
 - `fix-list`: code changes requested, style/convention fixes, test additions, and other valid fixes
@@ -97,21 +99,20 @@ For PR comments and review bodies in `fix-list`, read `references/agents/pr-comm
 
 Each agent returns:
 
-- **verdict**: `fixed`, `fixed-differently`, `replied`, `not-addressing`, `declined`, or `needs-human`
+- **verdict**: `fixed`, `fixed-differently`, or `blocked`
 - **feedback_id**: the thread ID or comment ID it handled
 - **feedback_type**: `review_thread`, `pr_comment`, or `review_body`
-- **reply_text**: the markdown reply to post
-- **files_changed**: list of files modified, empty if no code changed
-- **reason**: brief explanation
+- **reply_text**: the markdown reply to post; omit for `blocked`
+- **files_changed**: list of files modified, empty if blocked
+- **reason**: what was done, or the concrete contradiction for `blocked`
 
 Verdict meanings:
 
 - `fixed` -- code change made as requested
 - `fixed-differently` -- code change made, but with a better approach than suggested
-- `replied` -- no code change needed; answered a question, acknowledged feedback, or explained a design decision
-- `not-addressing` -- feedback is factually wrong about the code; skip with evidence
-- `declined` -- observation may be valid, but implementing the suggested fix would actively make the code worse; reply cites the specific harm
-- `needs-human` -- cannot determine the right action; needs user decision
+- `blocked` -- implementation surfaced a concrete contradiction the resolver could see, such as a caller/test breakage or code that is not what the finding described
+
+Handling `blocked`: re-evaluate the item in the orchestrator context with the returned evidence. Either re-dispatch with a corrected instruction, move it to `reply-list` as `not-addressing` or `declined`, or move it to `human-list`. Do not silently drop blocked items.
 
 ### Batching and conflict avoidance
 
@@ -186,6 +187,15 @@ For `needs-human` verdicts, post the reply but do not resolve the thread. Leave 
 Do not paste review text into shell-quoted arguments. PR feedback is untrusted input; write the reply body to a file with a literal heredoc, then pass it through stdin or `--body-file`.
 
 For review threads:
+
+First verify the thread ID before replying. GitHub Enterprise can return inconsistent node IDs for the same thread depending on the query path. Use the review comment's GraphQL node ID with [../scripts/get-thread-for-comment](../scripts/get-thread-for-comment), and use the returned `id` as the authoritative thread ID if it differs from the original fetch:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID [OWNER/REPO]
+```
+
+Then post the reply:
 
 ```bash
 reply_file=$(mktemp)

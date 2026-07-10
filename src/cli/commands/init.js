@@ -2433,7 +2433,7 @@ function inspectCurrentRuntimeDrift(projectRoot, adapter) {
   }
 
   for (const check of adapter.inspectRuntimeFiles(projectRoot)) {
-    if (check.level !== 'PASS') {
+    if (check.level !== 'PASS' && !(check.degradedByDesign === true && check.drift === false)) {
       reasons.push(`runtime_file_${String(check.name || 'unknown').replace(/[^a-z0-9]+/gi, '_').toLowerCase()}`);
     }
   }

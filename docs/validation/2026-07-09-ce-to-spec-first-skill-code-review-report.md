@@ -2,14 +2,14 @@
 
 ## 元数据
 
-- 报告状态: in_progress
+- 报告状态: final
 - 产出方: Codex goal execution
 - 方案来源: `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md`
 - 已加载角色契约: `docs/10-prompt/结构化项目角色契约.md`
-- 最近更新: 2026-07-10 15:32:38 CST
+- 最近更新: 2026-07-10 16:16:30 CST
 - 新鲜度: 以该时间点的当前工作树为准；已有的无关 dirty 文件未被本报告修改。
-- 局限: Phase 1 确定性扫描已完成；Phase 2 逐 skill 语义审查已完成 Batch 1 全部 8 个 skill、Batch 2 全部 7 个 skill、Batch 3 全部 7 个 skill、Batch 4 全部 7 个 skill、Batch 5 已完成 `spec-prd` 与 `spec-write-tasks`。当前 HEAD 为 `98e50159`，仓库 `tests/` 目录已被清理删除，本轮 Jest focused / changelog-format 验证因此失败在测试基础设施缺失；`spec-write-tasks` output-quality eval 也因指向已缺失的 `tests/fixtures/spec-write-tasks/**` 而降级。
-- 下一步: 审查 Batch 5 / `using-spec-first`。
+- 局限: Phase 1 确定性扫描已完成；Phase 2 逐 skill 语义审查已完成 Batch 1 全部 8 个 skill、Batch 2 全部 7 个 skill、Batch 3 全部 7 个 skill、Batch 4 全部 7 个 skill、Batch 5 全部 6 个 skill，共 35 个 source skill 均已记录 verdict。Phase 3 七项全局交叉验证已完成并写入本报告。当前 HEAD 为 `98e50159`，工作树只保留少量测试基础文件（如 `tests/jest-setup.js` 与 `tests/unit/qoder-runtime-lifecycle.test.js`），多数 focused tests 与 `tests/unit/changelog-format.test.js` 不存在，本轮 Jest focused / changelog-format 验证因此降级为 `No tests found`；`spec-write-tasks` output-quality eval 也因指向已缺失的 `tests/fixtures/spec-write-tasks/**` 而降级。
+- 下一步: 已完成；后续应进入独立修复任务处理本报告 findings。
 
 ## 审查进度
 
@@ -46,10 +46,10 @@
 | spec-lfg | A | done | pass | 2026-07-10 15:17:11 CST | CE hands-off pipeline 投影保留；引用既有 downstream pipeline 风险但未新增问题 |
 | spec-prd | C | done | issues_found | 2026-07-10 15:25:28 CST | 原生 PRD workflow；producer finalize/receipt contract 强，但 `spec-plan` 消费端 verify-receipt handoff 缺口已确认 |
 | spec-write-tasks | C | done | issues_found | 2026-07-10 15:32:38 CST | 原生 plan-to-task derived layer；runtime validator 健康，但 file-backed eval fixture 断裂 |
-| using-spec-first | C | pending | - | 2026-07-10 11:52:39 CST | Batch 5 原生/拆分 skill |
-| spec-write-skill | C | pending | - | 2026-07-10 11:52:39 CST | Batch 5 原生/拆分 skill |
-| spec-app-consistency-audit | C | pending | - | 2026-07-10 11:52:39 CST | Batch 5 原生/拆分 skill |
-| spec-rule-miner | C | pending | - | 2026-07-10 11:52:39 CST | Batch 5 原生/拆分 skill |
+| using-spec-first | C | done | pass | 2026-07-10 15:40:31 CST | 单文件 standalone entry governor；未发现 confirmed issue |
+| spec-write-skill | C | done | pass | 2026-07-10 15:47:31 CST | 公开 source skill authoring workflow；未发现 confirmed issue |
+| spec-app-consistency-audit | C | done | issues_found | 2026-07-10 15:57:42 CST | 原生 App 静态一致性审查 workflow；发现五宿主 generated/runtime 边界漂移 |
+| spec-rule-miner | C | done | pass | 2026-07-10 16:04:55 CST | standalone rule mining skill；未发现 confirmed issue |
 
 ## Phase 1 全局依赖图谱
 
@@ -97,7 +97,7 @@
 
 ### 共享脚本清单
 
-状态: pending_global_cross_check。
+状态: done。Phase 3 已确认 shared-file hashes 与 Riffrec analyzer divergence，详见「共享脚本 Divergence」。
 
 计划检查:
 - `scripts/repo-profile-cache.py` 的 9 个消费者副本。
@@ -108,7 +108,7 @@
 
 ### 配置键覆盖矩阵
 
-状态: pending_global_cross_check。
+状态: done。Phase 3 已确认 config key matrix，详见「Config Key 完整性」。
 
 待按方案验证的配置键:
 - `feedback_sources`
@@ -122,7 +122,7 @@
 
 ### Artifact / Handoff 路由图
 
-状态: pending_global_cross_check。
+状态: done。Phase 3 已确认主链路与 pipeline handoff，详见「Plan Artifact Contract 链路端到端」与「Pipeline 上下文传递完整性」。
 
 待验证主链路:
 
@@ -919,8 +919,8 @@ Batch 2 已完成；下一项 `spec-debug`。
   - Source connectors 均为 facts-only persona: Slack 只允许 configured reaction-add，GitHub 只允许 configured label-add，Email read-only / precondition-gated，分别位于 `skills/spec-sweep/references/sources/slack.md:57-61`、`skills/spec-sweep/references/sources/github-issues.md:55-59`、`skills/spec-sweep/references/sources/email.md:54-57`。
 - 发现:
   1. low — `skills/spec-sweep/references/interview.md:145-150` vs `skills/spec-sweep/SKILL.md:55`、`skills/spec-sweep/references/interview.md:180-190`、`skills/spec-mcp-setup/references/config-template.yaml:27-30`、`tests/unit/mcp-setup-config-template-contracts.test.js:129-135`: first-run interview 的 “Write these keys” 清单只列出 `feedback_sources`、`sweep_state_path`、`sweep_ack_cap`、`sweep_shared_branch`，漏列同一文件 config example 和 notes 都声明会写入的 `sweep_lease_ttl_minutes`。影响是按步骤实现 setup 的 agent 可能不把 lease TTL 写入 `.spec-first/config.local.yaml`，尽管运行时会按 `SKILL.md:55` fallback 到默认 `60`，因此不阻断 sweep。建议修复方向: 在 section 8 的写入清单加入 `sweep_lease_ttl_minutes`，并补 focused test 锁定 interview 写入清单与 config template 的 sweep keys 一致。
-- pending_global_cross_check:
-  - `skills/spec-sweep/scripts/analyze_riffrec_zip.py` 与 `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` 只有两处 durable output wording 差异: `spec-sweep` 写 `docs/plans/` / durable unified plan，`spec-riffrec-feedback-analysis` 写 `docs/brainstorms/` / durable requirements document。当前 `spec-sweep` 自身 handoff 依赖 `spec-brainstorm` 后续产出 unified plan，并由 `tests/unit/spec-sweep-lfg-migration-contracts.test.js:122-130` 覆盖；是否应统一共享 analyzer 文案留到 Phase 3 共享脚本 divergence 统一裁决。
+- Phase 3 结论:
+  - `skills/spec-sweep/scripts/analyze_riffrec_zip.py` 与 `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` 只有两处 durable output wording 差异: `spec-sweep` 写 `docs/plans/` / durable unified plan，`spec-riffrec-feedback-analysis` 写 `docs/brainstorms/` / durable requirements document。Phase 3 已确认该 shared-script divergence 与 `spec-riffrec-feedback-analysis` 既有 medium finding 同根因，不重复计数。
 - 依赖关系验证结果:
   - `spec-sweep` 读取的 config keys 与 `spec-mcp-setup` config template 基本对齐；`tests/unit/mcp-setup-config-template-contracts.test.js:126-150` 覆盖 `feedback_sources`、`sweep_state_path`、`sweep_ack_cap`、`sweep_lease_ttl_minutes`、`sweep_shared_branch` 在 template 中可发现。
   - `spec-sweep` 输出的 rolling plan frontmatter 是 `artifact_contract: spec-unified-plan/v1`、`artifact_readiness: requirements-only`、`product_contract_source: spec-sweep`，位于 `skills/spec-sweep/references/plan-template.md:9-17`。`spec-lfg docs/plans/feedback-sweep-plan.md` handoff 依赖 `spec-lfg` 先经 `spec-plan` enrich requirements-only plan，而不是直接把 requirements-only 当 implementation-ready 执行；该跨 workflow依赖留到 Phase 3 plan/lfg 链路端到端复核。
@@ -1029,8 +1029,8 @@ Batch 2 已完成；下一项 `spec-debug`。
   - CE identity 已投影为 spec-first: `ce-brainstorm` -> `spec-brainstorm`、`ce-debug` -> `spec-debug`、`compound-engineering-feedback-format.md` -> `spec-first-feedback-format.md`；CE residual scan 对该 skill 无命中。
 - 发现:
   1. medium — `skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md:54`、`skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py:61`、`skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py:1117` vs `skills/spec-brainstorm/SKILL.md:11-24`、`skills/spec-brainstorm/SKILL.md:96-102`、`skills/spec-brainstorm/SKILL.md:276-285`、`tests/unit/spec-brainstorm-contracts.test.js:47-62`: Riffrec extensive path 和 analyzer help/结尾输出仍声称 `spec-brainstorm` 会把 durable requirements document 写到 `docs/brainstorms/`，但当前 `spec-brainstorm` source 和 focused tests 明确新输出是 `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` 下的 `artifact_contract: spec-unified-plan/v1`、`artifact_readiness: requirements-only` unified plan；`docs/brainstorms/*-requirements.*` 仅是 legacy input。影响是 Riffrec handoff 可能误导用户和后续 agent 把 evidence/kickoff exception 当 durable brainstorm output，破坏 Phase 3 plan artifact contract 链路。建议修复方向: 将 Riffrec `extensive-analysis.md` 和 analyzer help/final print 改为 “`docs/brainstorms/riffrec-feedback/` 仅为 evidence/kickoff artifact exception；`spec-brainstorm` 的 durable requirements-only unified plan 写入 `docs/plans/`”，并补 focused test 锁定 `spec-riffrec-feedback-analysis` 与 `spec-brainstorm` output contract 一致。
-- pending_global_cross_check:
-  - `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` 与 `skills/spec-sweep/scripts/analyze_riffrec_zip.py` 只有 durable output wording 两处差异: Riffrec standalone 当前写 `docs/brainstorms/` / durable requirements document，Sweep 写 `docs/plans/` / durable unified plan。鉴于当前 `spec-brainstorm` contract 已确认 `docs/plans/`，该差异不只是 harmless wording；最终是否统一两个 analyzer 副本、是否共享实现，留到 Phase 3 共享脚本 divergence 统一裁决。
+- Phase 3 结论:
+  - `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` 与 `skills/spec-sweep/scripts/analyze_riffrec_zip.py` 只有 durable output wording 两处差异: Riffrec standalone 当前写 `docs/brainstorms/` / durable requirements document，Sweep 写 `docs/plans/` / durable unified plan。Phase 3 已确认这是 shared-script divergence，并由本小节 medium finding 覆盖，不重复计数。
 - 依赖关系验证结果:
   - `spec-brainstorm` handoff 目标存在，且 current source 明确 consumer 是 requirements-only unified plan；Riffrec analyzer 生成的 `requirements-kickoff.md` 是 upstream evidence/kickoff 输入，不应被当作 final Product Contract。
   - `spec-plan` 对 legacy `docs/brainstorms/*-requirements.{md,html}` 仍可读，但当前 Riffrec 的 `requirements-kickoff.md` 不匹配 legacy filename contract；因此正常路径必须先经过 `spec-brainstorm`，不能直接跳到 `spec-plan`。
@@ -1486,19 +1486,337 @@ Batch 2 已完成；下一项 `spec-debug`。
   - 未实际运行 `spec-prd` 交互式 PRD authoring/refinement、Claude `prd-prewrite-guard`、Stop hook、或 `spec-plan` 真实消费 PRD artifact；本轮只验证 current source contract、scripts/evals 和静态 cross-skill handoff。
   - 未运行 focused Jest suite；当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，本轮 changelog-format 验证会在测试基础设施缺失处 degraded。
 
-下一项 `spec-write-tasks`。
+#### spec-write-tasks
+
+- Tier: C
+- 状态: done
+- Verdict: issues_found
+- 已读取 source 文件:
+  - `skills/spec-write-tasks/SKILL.md`
+  - `skills/spec-write-tasks/references/execution-handoff-contract.md`
+  - `skills/spec-write-tasks/references/task-pack-schema.md`
+  - `skills/spec-write-tasks/references/task-quality-guide.md`
+  - `skills/spec-write-tasks/agents/openai.yaml`
+  - `skills/spec-write-tasks/evals/README.md`
+  - `skills/spec-write-tasks/evals/boundary-cases.json`
+  - `skills/spec-write-tasks/evals/expected-behavior-cases.json`
+  - `skills/spec-write-tasks/evals/failure-cases.json`
+  - `skills/spec-write-tasks/evals/output-quality-cases.json`
+  - `skills/spec-write-tasks/evals/semantic_config.json`
+  - `skills/spec-write-tasks/evals/trigger-cases.json`
+  - `skills/spec-write-tasks/evals/yao-trigger-cases.json`
+  - `skills/spec-write-tasks/evals/output/cases.jsonl`
+  - `scripts/spec-write-tasks/run-output-evals.js`
+  - `scripts/spec-write-tasks/analyze-task-pack-quality.js`
+  - `src/cli/task-pack.js`
+  - `src/cli/commands/tasks.js`
+- CE parity: not_applicable。`spec-write-tasks` 是 spec-first 原生 / 拆分 task-pack workflow，不做 CE 等价要求；本轮按 source 质量、task-pack artifact contract、CLI deterministic floor、下游 handoff、eval 证据和治理边界审查。
+- 正向结论:
+  - 主入口保持轻量，`SKILL.md` 137 行，低于方案建议的 500 行入口预算；细节下沉到 3 个 references。
+  - Source plan 单一真相源边界明确: task pack 是 optional derived execution index，不替代 `spec-plan`，不得改变 scope / acceptance / non-goals / repo ownership / product decisions，位于 `skills/spec-write-tasks/SKILL.md:56-65`。
+  - Final Decision Envelope 要求 `decision`、`reason_code`、`task_pack_validity`、`deterministic_handoff`、`semantic_posture`、`dispatch_authorization`、`validation`、`orientation` 和 `next_action`，位于 `skills/spec-write-tasks/SKILL.md:102-116` 与 `skills/spec-write-tasks/references/execution-handoff-contract.md:8-68`。
+  - Deterministic floor 明确由 `spec-first tasks validate <task-pack-path> --json` 和 `spec-first tasks hash <plan-path>` 提供，不能自报 `deterministic_handoff: true`，位于 `skills/spec-write-tasks/SKILL.md:108-114` 与 `skills/spec-write-tasks/references/execution-handoff-contract.md:50-68`。
+  - `src/cli/task-pack.js` 确认 validator 只检查 identity / freshness / structure / path safety / same-wave overlap / generated runtime mirror / secret-denied path 等确定性事实，不判断 task splitting semantic quality，位于 `src/cli/task-pack.js:405-552`、`src/cli/task-pack.js:578-924`。
+  - `src/cli/commands/tasks.js` 暴露 `hash` 和 `validate` 子命令，help 文案明确 “validate only checks identity, freshness, and structure. It does not judge task splitting quality or business scope.”，位于 `src/cli/commands/tasks.js:181-192`。
+  - High-risk task pack handoff 不默认自动 dispatch doc-review，必须有明确 bounded continuation authorization；否则返回 `next_action: review-task-pack` 与 `dispatch_authorization: missing`，位于 `skills/spec-write-tasks/references/execution-handoff-contract.md:70-85`。
+  - `evals/` 被标注为 maintainer-only validation fixtures，不是 runtime dependency，位于 `skills/spec-write-tasks/SKILL.md:118-122` 与 `skills/spec-write-tasks/evals/README.md:3-9`。
+- 发现:
+  1. medium — `skills/spec-write-tasks/evals/output-quality-cases.json:8-12`、`skills/spec-write-tasks/evals/output-quality-cases.json:21-28`、`skills/spec-write-tasks/evals/output-quality-cases.json:116-124`、`scripts/spec-write-tasks/run-output-evals.js:136-143` vs 当前工作树 `tests/`: output-quality eval 声明多个 file-backed assertions 依赖 `tests/fixtures/spec-write-tasks/valid/source-plan.md`、`tests/fixtures/spec-write-tasks/valid/task-pack.md`、`tests/fixtures/spec-write-tasks/small-plan/source-plan.md`、`tests/fixtures/spec-write-tasks/high-risk-review/source-plan.md` 和 `tests/fixtures/spec-write-tasks/high-risk-review/task-pack.md`，但当前 HEAD `98e50159` 已无 `tests/` 目录，`find tests -maxdepth 4 -type f` 为 0，`git ls-files tests/fixtures/spec-write-tasks tests/unit/spec-write-tasks-contracts.test.js tests/unit/task-pack-command.test.js` 也无输出。实测 `node scripts/spec-write-tasks/run-output-evals.js --output-dir /private/tmp/spec-write-tasks-eval --recorded-output-dir /private/tmp/spec-write-tasks-eval/recorded-output` 返回 exit 1，scorecard 显示 5 cases 中 `deterministic_assertions: 7/13`，`structural_errors: 6`，失败项均为 target file missing。影响是 `spec-write-tasks` 的 output-quality eval 证据面无法证明 valid task-pack handoff 和 high-risk review-gate fixture，削弱这个原生拆分 skill 的 Evaluation Harness；runtime `spec-first tasks validate` 仍可用，但 maintainer eval contract 与当前 source inventory 漂移。建议修复方向: 二选一收敛 source truth：恢复并跟踪 `tests/fixtures/spec-write-tasks/**` 与相关 focused tests；或将这些 file-backed fixtures 移入 `skills/spec-write-tasks/evals/fixtures/**` / `scripts/spec-write-tasks/fixtures/**` 并同步更新 `output-quality-cases.json`、runner 默认路径和 package/source coverage，避免 eval fixture 依赖已被删除的全局 `tests/` 目录。
+- 依赖关系验证结果:
+  - `spec-plan` -> `spec-write-tasks` -> `spec-work` 链路语义清晰：`spec-write-tasks` 只接收 settled local source plan 或 existing local task pack；`next_action: spec-work-task-pack` 只在 deterministic handoff true 且 semantic posture 合格时允许。
+  - `spec-doc-review` 是 high-risk task pack 的 bounded review handoff，不是默认自动链式执行。
+  - `src/cli/commands/tasks.js` 与 `src/cli/task-pack.js` 为 task-pack deterministic floor 的 source implementation；CLI help 和 schema 口径一致。
+- 上下文管理验证结果:
+  - `SKILL.md` 只保留 branch、gate 和 reference trigger；task schema、handoff envelope、quality guide 分散到 references。
+  - `context_refs` 被定义为 bounded reading pointers，不是 scope authority，位于 `skills/spec-write-tasks/SKILL.md:61` 与 `skills/spec-write-tasks/references/task-quality-guide.md:43-58`。
+- 安全 / residual 检查:
+  - Active CE residual scan 对 `skills/spec-write-tasks` 仅命中 `Workflow Contract Summary`，为允许命中。
+  - `git status --ignored --short -- skills/spec-write-tasks` 无输出，未发现 ignored artifact 污染该 source skill 目录。
+  - `node --check src/cli/task-pack.js`、`node --check src/cli/commands/tasks.js`、`node --check scripts/spec-write-tasks/run-output-evals.js`、`node --check scripts/spec-write-tasks/analyze-task-pack-quality.js` 均通过。
+  - `node bin/spec-first.js tasks --help` pass，输出 hash / validate 子命令和 validation scope boundary。
+  - `node bin/spec-first.js tasks hash docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md --json` pass，输出 `schema_version: task-plan-hash/v1` 与 `sha256:b27622eb53f1633ced29619d4c9087c7dea915e894a7d9a5f6d74b4e58489913`。
+  - `node bin/spec-first.js tasks validate /tmp/nonexistent-task-pack.md --json` 正确 exit 1 并输出 `schema_version: task-pack-validation/v1`、`deterministic_handoff: false`、`errors[0].code: task-pack-missing`。
+  - 安全 grep 对 `skills/spec-write-tasks`、`src/cli/task-pack.js`、`src/cli/commands/tasks.js` 无危险 shell mutation 命中；`secret` 命中是 `isSecretDeniedPath` 与文案中的 secret-denied path 防护。
+- 未检查 / degraded checks:
+  - 未生成真实 `docs/tasks/*.md` task pack，也未把 task pack 交给 `spec-work` 执行；本轮只验证 source contract、CLI validator、eval fixtures 和静态 handoff。
+  - 未运行 `tests/unit/spec-write-tasks-contracts.test.js` 或 `tests/unit/task-pack-command.test.js`；当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，此类 focused Jest 统一 degraded。
+
+#### using-spec-first
+
+- Tier: C
+- 状态: done
+- Verdict: pass
+- 已读取 source 文件:
+  - `skills/using-spec-first/SKILL.md`
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `src/cli/instruction-bootstrap.js`
+  - `templates/codex/hooks/session-start`
+  - `src/cli/contracts/dual-host-governance/skills-governance.json`
+- CE parity: not_applicable。`using-spec-first` 是 spec-first 原生 standalone entry governor，不做 CE 等价要求；本轮按入口路由、source/runtime 边界、runtime pointer、dispatch authorization 和 artifact non-production 审查。
+- 正向结论:
+  - 当前 source 只有 `SKILL.md` 一个文件，150 行；没有 references、scripts、assets 或 evals 作为 runtime 依赖，入口上下文成本低。
+  - Skill 明确声明它是 standalone entry governor，只做 admission/routing，不是 command-backed workflow，不生成 plan、task、review、debug、setup、intake、knowledge artifact，位于 `skills/using-spec-first/SKILL.md:10-23`。
+  - Main Flow 覆盖 `spec-ideate` / `spec-brainstorm` / `spec-prd` / `spec-plan` / `spec-write-tasks` / `spec-work` / `spec-code-review` / `spec-compound` / `spec-compound-refresh`，并明确不自动承诺 `plan -> work -> review` 连跑，位于 `skills/using-spec-first/SKILL.md:25-44`。
+  - On-Ramps 对 setup/update、debug、external issue/PR、doc review、skill/agent governance 和 source skill creation 分流清晰；skill/source prompt 治理审计明确走 bounded source review 或 source 修改时走 `spec-write-skill`，位于 `skills/using-spec-first/SKILL.md:46-60`。
+  - Underneath Boundaries 明确 source/runtime、context governance、deterministic floor、evidence、Codex dispatch authorization、parent workspace target_repo，位于 `skills/using-spec-first/SKILL.md:72-81`。
+  - User Next-Step Guide Mode 固定只推荐一个入口，并明确只给建议、不启动 workflow、不创建 artifact，位于 `skills/using-spec-first/SKILL.md:109-121`。
+  - Hard Rules 明确不把轻量请求强制 workflow 化、不把 `using-spec-first` 描述成 command-backed workflow、不运行 state-changing `init/clean/update`、不编造测试或 runtime refresh，位于 `skills/using-spec-first/SKILL.md:123-132`。
+  - `AGENTS.md` 与 `CLAUDE.md` 的 managed `spec-first:lang` block 均包含 `using-spec-first` 和 `skills/using-spec-first/SKILL.md` 指针；`src/cli/instruction-bootstrap.js:154-163` 构造的 bootstrap 文案同样只提供 source pointer。
+  - Codex SessionStart hook 只注入短指针，并把完整 policy 指到 `skills/using-spec-first/SKILL.md`，位于 `templates/codex/hooks/session-start:49-55`。
+  - Governance registry 把 `using-spec-first` 标为 `entry_surface: standalone_skill`、`command_name: null`，且 Claude/Codex/Cursor/Kiro/Qoder host delivery 均为 `skill`。
+- 发现: 无已确认问题。
+- 依赖关系验证结果:
+  - 入口提到的公开 `spec-*` workflow / skill 均存在于当前 `skills/` inventory。
+  - `spec-worktree` 只作为 internal helper 被禁止暴露为用户入口，符合当前 governance 边界。
+  - `spec-first update/init/clean/doctor` 被保留为 terminal CLI guidance，不被包装成公开 workflow。
+- 上下文管理验证结果:
+  - 单文件 150 行，显著低于方案建议的 500 行预算。
+  - 不加载历史 validation docs、evals 或 generated runtime mirror；Scenario Fingerprint 被标记为 advisory deterministic context，不是 gate / approval / source scope authority。
+- 安全 / residual 检查:
+  - Active CE residual scan 对 `skills/using-spec-first`、`AGENTS.md`、`CLAUDE.md`、`templates/codex/hooks/session-start`、`src/cli/instruction-bootstrap.js` 仅命中 `dispatch_authorization_missing`，这是当前 Codex dispatch boundary reason code，非 CE 残留。
+  - `git status --ignored --short -- skills/using-spec-first` 无输出，未发现 ignored artifact 污染 source skill 目录。
+  - `node --check src/cli/instruction-bootstrap.js && node --check templates/codex/hooks/session-start` pass。
+  - `AGENTS.md` / `CLAUDE.md` managed block pointer check pass: 两者均包含 `using-spec-first` 与 `skills/using-spec-first/SKILL.md`。
+- 未检查 / degraded checks:
+  - 未运行真实 host routing eval、runtime projection、`spec-first init` 或 SessionStart hook execution；本轮只验证 source pointers、hook syntax 和静态 routing contract。
+  - `npx jest tests/unit/using-spec-first-contracts.test.js --runInBand` degraded: 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite。
+
+#### spec-write-skill
+
+- Tier: C
+- 状态: done
+- Verdict: pass
+- 已读取 source 文件:
+  - `skills/spec-write-skill/SKILL.md`
+  - `skills/spec-write-skill/references/authoring-method.md`
+  - `skills/spec-write-skill/references/delivery-gates.md`
+  - `skills/spec-write-skill/references/skill-quality-vocabulary.md`
+  - `skills/spec-write-skill/evals/trigger-cases.json`
+  - `src/cli/contracts/dual-host-governance/skills-governance.json`
+  - `docs/catalog/runtime-capabilities.md`
+- CE parity: not_applicable。`spec-write-skill` 是 spec-first 原生 source skill authoring workflow，不做 CE 等价要求；本轮按入口语义、source/runtime 边界、治理记录、runtime catalog、trigger/boundary eval 证据和上下文分层审查。
+- 正向结论:
+  - Frontmatter description 明确为公开 workflow，正向触发限定在编写、改写、迁移或按 audit findings 修复 `skills/<name>/` source skill；负向边界排除一次性回答、解释/总结/翻译、只审计、文档导出、第三方安装、普通 `spec-*` workflow 执行和 generated runtime mirror 修补，位于 `skills/spec-write-skill/SKILL.md:1-4`。
+  - Contract Summary 把 When To Use / When Not To Use / Inputs / Outputs / Artifacts / Failure Modes / Workflow / Downstream Consumers 都放在入口文件，且 artifacts 明确 source-owned surfaces 与 generated mirrors 只由 `spec-first init` 投影，位于 `skills/spec-write-skill/SKILL.md:14-38`。
+  - Hard Boundaries 区分 source-of-truth、授权写入、script-owned deterministic facts、LLM-owned trigger/quality judgment、外部 skill local-fit 转换和不照搬完整 SkillOps 平台，位于 `skills/spec-write-skill/SKILL.md:45-51`。
+  - Workflow 先资格判断和意图澄清，再定 mode/tier/entry surface、读相邻 skill/治理记录/项目契约、设计 trigger 与信息层级、更新 source-owned consumers、按 tier 跑 gate、输出 closeout，位于 `skills/spec-write-skill/SKILL.md:57-69`。
+  - STOP Reference Trigger Map 对三份 reference 都写明读取条件和未读降级，不把 must-have 规则藏在弱 pointer 后面，位于 `skills/spec-write-skill/SKILL.md:71-77`。
+  - `authoring-method.md` 覆盖 qualification、intent dialogue、Evidence Matrix readiness、official skill-creator compatibility、external benchmark -> local fit、branch/pointer design、authoring discipline 和 anti-pattern families；其中 §1 明确 audit-only 不创建 skill，§2.2 要求不可逆改动只有 `implementation_permission: ready` 才执行，位于 `skills/spec-write-skill/references/authoring-method.md:16-78`。
+  - `delivery-gates.md` 采用 risk-based tier gate，不把更多 gate 当作默认更好；resource boundary、gate selection、packaging readiness、output eval、skill quality eval、forward testing 和 closeout 字段清楚，位于 `skills/spec-write-skill/references/delivery-gates.md:5-101`。
+  - `skill-quality-vocabulary.md` 把 invocation、description-as-trigger、information hierarchy、steering、completion criteria、pruning 和 closeout checklist 作为概念词表；其中 `workflow_command` / `standalone_skill` / `internal_only` 边界与当前治理记录一致，位于 `skills/spec-write-skill/references/skill-quality-vocabulary.md:20-146`。
+  - `evals/trigger-cases.json` 可解析，覆盖 should-trigger、near-neighbor、boundary、should-not-trigger、failure 和 expected 行为；包含 `audit-not-authoring`、`runtime-mirror-patch`、`weak-context-pointer`、`vague-completion-criterion`、`over-split-granularity`、`leading-word-no-op` 等反模式族。
+- 发现: 无已确认问题。
+- 依赖关系验证结果:
+  - Governance registry 把 `spec-write-skill` 标为 `entry_surface: workflow_command`、`command_name: write-skill`、`host_scope: dual_host`；host delivery 为 Claude/Qoder `command`，Codex/Cursor/Kiro `skill`，与 `SKILL.md` 的公开 workflow 入口一致。
+  - Runtime catalog `docs/catalog/runtime-capabilities.md` 将 `write-skill` 映射到 `spec-write-skill`，说明为 “Write, revise, migrate, or remediate spec-first source skills”，与当前 source description 匹配。
+  - `using-spec-first` 的 skill/source prompt 治理审计路由与 `spec-write-skill` 分工一致：只读审计走 bounded source review，需要创建/迁移/改写 source skill 时走 `spec-write-skill`。
+- 上下文管理验证结果:
+  - Source inventory 只有 5 个文件：`SKILL.md`、3 个 references、1 个 eval JSON；没有 scripts、assets、agents 或空目录。
+  - `SKILL.md` 77 行，显著低于方案建议的 500 行入口预算；reference 总计 392 行，eval 186 行，按触发条件渐进披露。
+  - `evals/` 当前作为 maintainer validation evidence，不是 runtime 必读依赖；runtime 必读内容均由 `SKILL.md` 指向。
+- 安全 / residual 检查:
+  - `node -e "JSON.parse(require('fs').readFileSync('skills/spec-write-skill/evals/trigger-cases.json','utf8')); console.log('json ok')"` pass。
+  - Active residual scan 对 `skills/spec-write-skill` 仅命中自身 source/runtime 负向边界、generated mirror closeout wording 和 eval 里的 `.agents/skills` negative case，均为允许命中；未发现 active CE namespace、legacy `/spec:` / `$spec-`、unsupported host wording 或 dangerous shell mutation。
+  - `git status --ignored --short -- skills/spec-write-skill` 无输出，未发现 ignored artifact 污染 source skill 目录。
+- 未检查 / degraded checks:
+  - 未实际运行 `spec-write-skill` 创建/改写 source skill，也未运行 `spec-first init`、runtime projection、fresh-source eval 或 package smoke；本轮只验证 current source contract、治理记录、runtime catalog 和静态 eval fixture。
+  - `tests/unit/spec-write-skill-contracts.test.js` 当前不在工作树中；当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，focused Jest 与 changelog-format 统一 degraded。
+
+#### spec-app-consistency-audit
+
+- Tier: C
+- 状态: done
+- Verdict: issues_found
+- 已读取 / 检查 source 文件:
+  - `skills/spec-app-consistency-audit/SKILL.md`
+  - `skills/spec-app-consistency-audit/README.md`
+  - `skills/spec-app-consistency-audit/references/headless-runner.md`
+  - `skills/spec-app-consistency-audit/references/mode-output-contract.md`
+  - `skills/spec-app-consistency-audit/references/evaluation-governance.md`
+  - `skills/spec-app-consistency-audit/references/pilot-validation.md`
+  - `skills/spec-app-consistency-audit/references/report-format.md`
+  - `skills/spec-app-consistency-audit/references/ecc-source-lock.json`
+  - `skills/spec-app-consistency-audit/evals/examples.json`
+  - `skills/spec-app-consistency-audit/evals/recorded-output-fixtures.json`
+  - `skills/spec-app-consistency-audit/scripts/lib/audit-utils.js`
+  - `skills/spec-app-consistency-audit/scripts/preflight.js`
+  - `skills/spec-app-consistency-audit/scripts/build-run-metadata.js`
+  - `skills/spec-app-consistency-audit/scripts/validate-artifacts.js`
+  - `skills/spec-app-consistency-audit/scripts/run-audit.js`
+  - `skills/spec-app-consistency-audit/scripts/select-rule-packs.js`
+  - all `skills/spec-app-consistency-audit/scripts/*.js` via `node --check`
+  - all `skills/spec-app-consistency-audit/schemas/*.json` via JSON parse
+  - all `skills/spec-app-consistency-audit/prompts/*.md` inventory / boundary scan
+  - all `skills/spec-app-consistency-audit/rule-packs/**` inventory
+  - `src/cli/contracts/dual-host-governance/skills-governance.json`
+  - `docs/catalog/runtime-capabilities.md`
+  - `docs/contracts/context-governance.md`
+- CE parity: not_applicable。`spec-app-consistency-audit` 是 spec-first 原生 App 静态一致性审查 workflow，不做 CE 等价要求；本轮按 source 质量、artifact contract、deterministic runner、prompt/rule-pack 边界、source/runtime 边界、治理记录和上下文管理审查。
+- 正向结论:
+  - Frontmatter 明确该 workflow 用于 mobile App PRD/Figma/local-source 静态一致性审查，覆盖 page routes、KMP/Clean Architecture、components、analytics、i18n、engineering quality 和 industry lenses；负向边界排除普通 code review、PRD authoring、build/test/runtime execution、UI polish 和 product-code edits，位于 `skills/spec-app-consistency-audit/SKILL.md:1-4`。
+  - Workflow Contract Summary 覆盖 when-to-use / not-to-use / inputs / outputs / artifacts / failure modes / workflow / downstream consumers，且 artifact 路径固定到 `.spec-first/app-audit/runs/<run-id>/`，位于 `skills/spec-app-consistency-audit/SKILL.md:11-37`。
+  - Mode Contract 诚实区分长期语义和当前实现：v1 deterministic orchestrator 只支持 `mode:headless`；`mode:report-only` 是 no-write 语义合同，当前 runner 报 unsupported 而不是写 artifact，位于 `skills/spec-app-consistency-audit/SKILL.md:91-99` 与 `skills/spec-app-consistency-audit/references/headless-runner.md:49-56`。
+  - Headless runner 明确是 subprocess orchestrator，不调用 LLM、不生成 issue、不远程抓 Figma/PRD；缺少 raw LLM issues 时强制 `issue_synthesis_status: not_run`，位于 `skills/spec-app-consistency-audit/SKILL.md:117-119` 与 `skills/spec-app-consistency-audit/references/headless-runner.md:26-41`。
+  - Figma materialization 边界清晰：headless/report-only 不远程 materialize Figma，只记录 `input_figma_reference_only`，位于 `skills/spec-app-consistency-audit/SKILL.md:174-178` 与 `skills/spec-app-consistency-audit/references/mode-output-contract.md:103-126`。
+  - Evidence Policy 与 Issue Protocol 明确 “No evidence, no issue”，rule packs 不能作为 confirmed issue 的唯一证据；confirmed findings 要求 `confidence >= 0.75`、`static_confirmed: true`、project-specific traceable evidence，且 app-audit 不发 `safe_auto`，位于 `skills/spec-app-consistency-audit/SKILL.md:205-217`。
+  - ECC-derived prompts 被锁为 skill-local read-only lens，不复制到 `agents/`，不获得 write/edit/repair/build/final-verdict 权限，位于 `skills/spec-app-consistency-audit/SKILL.md:141-149` 与 `skills/spec-app-consistency-audit/references/ecc-source-lock.json:1-22`。
+  - 16 个 expert prompt 文件均在首段声明只读边界和 “No evidence, no issue”；prompt assets 维持 skill-local，不作为 cross-workflow stable agents。
+  - `evals/examples.json` 10 个 cases 可解析；`evals/recorded-output-fixtures.json` 3 个 recorded fixtures 可解析，并被 `evaluation-governance.md` 标为 file-backed / non-provider-backed evidence。
+  - `run-audit.js --help` 输出与 `SKILL.md` 一致：v1 仅支持 `mode:headless`，需要 `base:<git-ref>`，并声明 runner 不生成 LLM verdict、不内联 issue synthesis、不远程拉取 Figma/PRD。
+- 发现:
+  1. medium — `skills/spec-app-consistency-audit/scripts/lib/audit-utils.js:9-31`、`skills/spec-app-consistency-audit/scripts/preflight.js:21-33`、`skills/spec-app-consistency-audit/scripts/validate-artifacts.js:16-23`、`skills/spec-app-consistency-audit/schemas/metadata.schema.json:38` vs `src/cli/contracts/dual-host-governance/skills-governance.json:76-87`、`docs/contracts/context-governance.md:30-48`: app-audit deterministic scripts 仍按旧 Claude/Codex/Agents 边界处理 generated/control paths 和 metadata host。`SKIPPED_DIRS` / `CONTROL_SOURCE_INPUT_PATTERN` / `GENERATED_OR_CONTROL_PATH_PATTERN` 未覆盖 `.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec-*.md`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json` 等当前 generated/runtime 或 host-local surfaces；`metadata.host` enum 也只允许 `unknown|claude|codex`。实测 `sourceInputPath(process.cwd(), '<repo>/.cursor/skills/foo/SKILL.md', 'source')` 返回 `.cursor/skills/foo/SKILL.md`，而 `.claude/foo.md` 会被 redacted；`validateArtifact` 用合法 `source_hash` 会拒绝 `.claude/foo.md` 但放过 `.cursor/skills/foo/SKILL.md`、`.kiro/skills/foo/SKILL.md`、`.qoder/skills/foo/SKILL.md` 和 `.qoder/commands/spec-plan.md`；`buildRunMetadata({ host: 'qoder', mode: 'headless', base: 'HEAD' })` 随后 `validateArtifact` 返回 `invalid_metadata_host`。影响是 Cursor/Kiro/Qoder 项目里 app-audit 可能扫描或暴露 generated runtime mirror / host-local config 作为普通 source evidence，或者生成在当前 supported host 上自相矛盾的 metadata artifact，削弱 source/runtime boundary 和跨宿主 runtime delivery。建议修复方向: 抽取共享 generated/control path denylist（优先复用 `docs/contracts/context-governance.md` / `src/cli/helpers/context-bundle.js` / `target-repo.js` 的当前五宿主列表），同步更新 `audit-utils.js`、`preflight.js`、`validate-artifacts.js`、`metadata.schema.json` 和 focused tests；metadata host enum 至少覆盖当前 `getSupportedPlatforms()` 的 Claude/Codex/Cursor/Kiro/Qoder，或明确改为 open enum + reason_code。
+- 依赖关系验证结果:
+  - Governance registry 把 `spec-app-consistency-audit` 标为 `entry_surface: workflow_command`、`command_name: app-consistency-audit`，host delivery 为 Claude/Qoder `command`，Codex/Cursor/Kiro `skill`。
+  - Runtime catalog 将 `app-consistency-audit` 映射到 `spec-app-consistency-audit`，说明为 “Run the Spec-First App consistency audit workflow”。
+  - `using-spec-first` 把 App PRD/Figma/source consistency audit 路由到 `spec-app-consistency-audit`；本 skill 又把普通 code review、PRD authoring、runtime validation、UI polish 和 skill quality review 路由到对应近邻，未发现入口 takeover。
+  - 下游 handoff 只作为建议写入 summary/envelope；`SKILL.md:285-288` 明确不会自动运行 `spec-plan`、`spec-code-review`、bounded source review、`spec-polish` 或 `spec-compound`。
+- 上下文管理验证结果:
+  - `SKILL.md` 290 行，低于方案建议的 500 行入口预算；headless runner、mode/output、evaluation governance、report format、pilot validation、ECC source lock 下沉到 references。
+  - 该 skill package 很大：包含 16 个 prompts、22 个 schemas、18 个 JS scripts、9 个 rule-pack/checklist 文件和 2 个 eval JSON；入口通过 `References` 段按需加载，避免全部常驻。
+  - Rule packs 只作为 rationale context，`select-rule-packs.js` 也把 `rule_pack_cannot_be_only_evidence` 与 `project_specific_evidence_required` 写入输出。
+- 安全 / residual 检查:
+  - `find skills/spec-app-consistency-audit/scripts -name '*.js' -type f -print0 | xargs -0 -n1 node --check` pass，所有 JS helper 语法通过。
+  - 所有 `schemas/*.json`、`evals/*.json` 和 `references/ecc-source-lock.json` JSON parse 通过。
+  - Active residual scan 未发现 CE namespace、legacy `/spec:` / `$spec-`、unsupported host wording 或 active dangerous shell mutation；generated runtime 命中主要是只读边界说明和本轮 finding 涉及的旧 denylist 常量。
+  - `git status --ignored --short -- skills/spec-app-consistency-audit` 无输出，未发现 ignored artifact 污染该 source skill 目录。
+  - `node skills/spec-app-consistency-audit/scripts/run-audit.js --help` pass。
+  - `node skills/spec-app-consistency-audit/scripts/run-audit.js mode:headless base:HEAD --source . --run-id codex-review-smoke --run-dir /private/tmp/spec-app-consistency-audit-smoke` 返回 `run_dir_outside_default_root` failed envelope；该失败符合 runner 约束 run-dir 必须位于 `.spec-first/app-audit/runs`，本轮未在仓库内生成 smoke artifacts。
+- 未检查 / degraded checks:
+  - 未实际运行完整 app-audit headless pipeline 写入 `.spec-first/app-audit/runs/<run-id>/`，避免本审查 goal 额外生成 runtime audit artifacts；本轮只运行 help、脚本语法、JSON parse、路径/metadata 最小复现和静态 source 审查。
+  - 未运行真实 Figma MCP materialization、LLM expert dispatch、Report Writer、pilot validation 或下游 `spec-code-review` handoff。
+  - `npx jest tests/unit/spec-app-consistency-audit-entry.test.js tests/unit/spec-app-consistency-audit-prompts.test.js tests/unit/spec-app-consistency-audit-cli-e2e.test.js --runInBand` degraded: 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到 suite。
+  - `npm run test:eval-fixtures -- --runInBand` degraded: 同样失败在 `<rootDir>/tests/jest-setup.js` 缺失。
+
+#### spec-rule-miner
+
+- Tier: C
+- 状态: done
+- Verdict: pass
+- 已读取 source 文件:
+  - `skills/spec-rule-miner/SKILL.md`
+  - `skills/spec-rule-miner/references/pattern-categories.md`
+  - `skills/spec-rule-miner/references/write-targets.md`
+  - `skills/spec-rule-miner/evals/trigger-cases.json`
+  - `src/cli/contracts/dual-host-governance/skills-governance.json`
+  - `docs/catalog/runtime-capabilities.md`
+- CE parity: not_applicable。`spec-rule-miner` 是 spec-first 原生 standalone skill，不做 CE 等价要求；本轮按 source 质量、规则写入目标、证据纪律、generated runtime 边界、治理记录、runtime catalog 和 eval trigger/boundary fixture 审查。
+- 正向结论:
+  - Frontmatter description 把正向触发限定为从现有代码证据挖掘项目编码约定、生成/刷新 `AGENTS.md` / `CLAUDE.md` pointer、Cursor 或 Qoder rule 文件；负向边界排除 confirmed team policy governance、普通 code review/debug/refactor、lint/format 配置、通用最佳实践、`.cursorrules` / `.kiro/steering` 等未支持目标和 generated runtime mirror edits，位于 `skills/spec-rule-miner/SKILL.md:1-4`。
+  - Purpose 明确它是 standalone skill，不是 `spec-*` public workflow；核心产物是 <=1000 words 的项目规则块，规则必须来自当前目标仓库证据，而不是语言默认、个人偏好或通用最佳实践，位于 `skills/spec-rule-miner/SKILL.md:8-13`。
+  - Hard Boundaries 要求只读业务源码、不修改测试/构建/linter/formatter；写入规则或 pointer 前必须 preview，普通聊天里用户暂未回复不能算 headless；headless 默认写入必须在 closeout 记录 `headless_default_write`、目标文件和限制，位于 `skills/spec-rule-miner/SKILL.md:31-38`。
+  - refresh 语义清晰：非首次执行必须重新取证、生成 candidate rules block，与 canonical marked block / pointer 对比；无实质变化不重写文件，输出 `refresh_noop`、采样范围和限制，位于 `skills/spec-rule-miner/SKILL.md:39-40` 和 `skills/spec-rule-miner/references/write-targets.md:40-46`。
+  - 证据纪律明确：每条规则默认至少 2 个文件支撑；不确定或 50/50 分裂模式不写入规则；formatter/linter 已强制的规则只记录为工具处理，不重复写入 AI 规则，位于 `skills/spec-rule-miner/SKILL.md:41-42`、`skills/spec-rule-miner/references/pattern-categories.md:5-18` 和 `skills/spec-rule-miner/references/pattern-categories.md:33-36`。
+  - Pattern Categories 覆盖函数体风格、命名、代码组织、import/依赖、错误处理、注释、测试、hidden associations 和 anti-patterns，并明确大仓/monorepo 抽样、生成代码、高冲突模式和历史例外的降级口径。
+  - `code-graph` / `project-graph` 只作为 `provider_untrusted` 候选导航，不能证明规则、频率、80% 一致性或包级适用范围；本 skill 不刷新图谱、不读完整 raw graph artifact，位于 `skills/spec-rule-miner/references/pattern-categories.md:20-29`。
+  - Write Targets 把 `docs/ai/project-rules.md` 定为默认 canonical full rules；`AGENTS.md` / `CLAUDE.md` 默认只写 pointer；`.cursor/rules/project-rules.mdc` 仅在明确 inline 场景写完整规则，`.qoder/rules/project-rules.md` 仅作为可选 pointer 目标，位于 `skills/spec-rule-miner/references/write-targets.md:5-38`。
+  - Generated runtime 禁止目标覆盖 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/skills/`、`.qoder/agents/`、`.qoder/spec-first/`；`.cursor/rules/**` 和 `.qoder/rules/**` 被明确区分为 host-native advisory input，不是 spec-first generated mirror，位于 `skills/spec-rule-miner/references/write-targets.md:54-56`。
+  - `evals/trigger-cases.json` 16 个 cases 可解析，覆盖正向触发、Cursor inline、team-standards/code-review/generic-best-practices 近邻负例、`.cursorrules` / `.kiro/steering` / Copilot 未支持目标、多包范围、generated runtime 禁区、headless 默认写入、legacy marker migration、frontmatter preservation、refresh no-op、大仓图谱候选边界和无可分析源码 failure。
+- 发现: 无已确认问题。
+- 依赖关系验证结果:
+  - Governance registry 把 `spec-rule-miner` 标为 `entry_surface: standalone_skill`、`command_name: null`，host delivery 为 Claude/Codex/Cursor/Kiro/Qoder 全部 `skill`。
+  - Runtime catalog 将其登记为五宿主 standalone skill，description 与 source frontmatter 的触发/负向边界一致。
+  - 近邻路由正确：confirmed team policy governance 已退役；代码质量评审交给 `spec-code-review`；实际实现/修复交给 `spec-work`；创建或修改 spec-first source skill 交给 `spec-write-skill`。
+- 上下文管理验证结果:
+  - `SKILL.md` 73 行，总包 4 个 source 文件 476 行；pattern taxonomy、write-target merge/marker/host-native 细节和 trigger cases 下沉到 references/evals，入口保持轻量。
+  - reference trigger 明确：抽取证据前读 `pattern-categories.md`，写入前读 `write-targets.md`；未把规则挖掘 taxonomy 全部常驻在入口。
+- 安全 / residual 检查:
+  - `node -e "JSON.parse(...trigger-cases.json...)"` pass，输出 16 个 cases。
+  - Active residual scan 未发现 CE namespace、legacy `/spec:` / `$spec-`、unsupported host ask tool wording 或 active old host residual；命中均为允许的 generated runtime 禁区说明、Cursor/Qoder supported rule targets、Kiro/Copilot/`.cursorrules` negative cases 和 `.agents/skills` generated mirror negative case。
+  - `git status --ignored --short -- skills/spec-rule-miner` 无输出，未发现 ignored artifact 污染该 source skill 目录。
+- 未检查 / degraded checks:
+  - 未在目标仓库真实运行 rule mining / preview / write 流程；本轮只审查 source contract、write target boundary、eval fixture 和治理记录。
+  - 未实际写入 `docs/ai/project-rules.md`、`AGENTS.md`、`CLAUDE.md`、`.cursor/rules/project-rules.mdc` 或 `.qoder/rules/project-rules.md`，避免本审查 goal 额外产生目标项目规则文件。
+  - `npx jest tests/unit/spec-rule-miner-contracts.test.js --runInBand` degraded: 当前工作树不存在 `tests/unit/spec-rule-miner-contracts.test.js`，Jest 返回 `No tests found`，未执行到 suite。
+
+Phase 2 逐 skill 语义审查完成。下一步进入 Phase 3 全局交叉验证。
 
 ## 全局交叉验证
 
 | 区域 | 状态 | 备注 |
 |---|---|---|
-| Plan artifact contract 链路端到端 | pending | Phase 3 |
-| Knowledge lifecycle schema 一致性 | pending | Phase 3 |
-| Config key 完整性 | pending | Phase 3 |
-| Pipeline 上下文传递完整性 | pending | Phase 3 |
-| 常驻上下文排除纪律 | pending | 上下文扫描已产出 advisory hits |
-| 测试覆盖缺口 | pending | Phase 3 |
-| 共享脚本 divergence | pending | Phase 3 |
+| Plan artifact contract 链路端到端 | done | 主链路字段匹配；PRD -> plan receipt 缺口已作为既有 medium finding 记录 |
+| Knowledge lifecycle schema 一致性 | done | schema / validator 副本一致；中文 locale 与 template category 问题为既有 findings |
+| Config key 完整性 | done | 确认 `pulse_schedule` 缺失和 rendering keys active/reserved 漂移；归入既有 setup/config drift + Phase 3 扩展说明 |
+| Pipeline 上下文传递完整性 | done | `spec-work` return envelope 与 LFG 消费字段匹配；`mode:pipeline` 下游阻塞风险和 trailer 悬空为既有 findings |
+| 常驻上下文排除纪律 | done | 大多数 generated-runtime 命中为边界说明或目标项目配置；app-audit 五宿主 denylist 缺口为既有 medium finding |
+| 测试覆盖缺口 | done | 新增 1 个 global medium finding：当前工作树绝大多数 focused contract tests 缺失 |
+| 共享脚本 divergence | done | `repo-profile-cache.py` / `repo-profiler.md` / validators 一致；Riffrec analyzer 两份仅 2 行 drift，已由既有 Riffrec finding 覆盖 |
+
+### Plan Artifact Contract 链路端到端
+
+- 结论: done，无新增 finding。
+- 确认链路:
+  - `spec-brainstorm` 写入 `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>`，并包含 `artifact_contract: spec-unified-plan/v1`、`artifact_readiness: requirements-only`、`product_contract_source: spec-brainstorm`，位于 `skills/spec-brainstorm/SKILL.md:273`。
+  - `spec-plan` 对 requirements-only unified plan 做 in-place enrichment，生成 `artifact_readiness: implementation-ready` 和 `execution: code` 的 unified plan，位于 `skills/spec-plan/SKILL.md:165-180`、`skills/spec-plan/SKILL.md:701-703`。
+  - `spec-work` 在输入 triage 中先读 metadata：`requirements-only` 停止并要求 `spec-plan` enrichment，`implementation-ready` + `execution: code` 才继续执行，位于 `skills/spec-work/SKILL.md:29-37`。
+  - `spec-lfg` 在 Step 1 gate 同样只接受 `artifact_contract: spec-unified-plan/v1` + `artifact_readiness: implementation-ready` + `execution: code`，拒绝 requirements-only、knowledge-work、approach-plan、answer-seeking 或无效 readiness，位于 `skills/spec-lfg/SKILL.md:16`。
+  - `spec-write-tasks` 的 task-pack contract 作为派生层存在：task pack 必须携带 `spec_id`、`source_plan`、`source_plan_hash`、`Task Pack Contract`，且 `deterministic_handoff` 必须来自 `spec-first tasks validate <task-pack-path> --json`，位于 `skills/spec-write-tasks/SKILL.md:36`、`skills/spec-write-tasks/SKILL.md:108-116`、`skills/spec-write-tasks/references/execution-handoff-contract.md:52-68`。
+- 已知相关问题:
+  - `spec-prd` producer finalize receipt 与 `spec-plan` consumer verify-receipt handoff 缺口已在 `spec-prd` 小节计为 medium；Phase 3 未重复计数。
+
+### Knowledge Lifecycle Schema 一致性
+
+- 结论: done，无新增 finding。
+- 确认事实:
+  - `skills/spec-compound/references/schema.yaml` 与 `skills/spec-compound-refresh/references/schema.yaml` SHA-256 均为 `9c47702cc3e505362a7dfc7d4b745016a52c0165871d284db96b251b32bbd379`。
+  - `validate-frontmatter.py` 两份 SHA-256 均为 `b7123723ebf6af52aa14ec32fd5c7f5a3c097547710dfedf7184ab08e5785cc6`。
+  - `validate-doc-claims.py` 两份 SHA-256 均为 `f33375649682d77cd4eb66eab6920210da8a0dde9005c54aa12e0c0b0adfdb79`。
+  - 两份 schema 均声明为 `docs/solutions/` frontmatter canonical contract，位于 `skills/spec-compound/references/schema.yaml:1-4` 与 `skills/spec-compound-refresh/references/schema.yaml:1-4`。
+  - `spec-plan` / `spec-code-review` 的 learnings researcher 都要求实时枚举 `docs/solutions/`，不依赖 repo-profile cache 的 stale 摘要，位于 `skills/spec-plan/references/agents/learnings-researcher.md:26-62` 与 `skills/spec-code-review/references/personas/learnings-researcher.md:26-62`。
+- 已知相关问题:
+  - 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、`plugin AGENTS.md` wording 和 ignored `__pycache__` 污染已分别在 `spec-compound` / `spec-compound-refresh` 小节计数；Phase 3 不重复计数。
+
+### Config Key 完整性
+
+- 结论: done，有既有 finding 扩展说明，无新增计数。
+- 确认矩阵:
+  - `feedback_sources`、`sweep_state_path`、`sweep_ack_cap`、`sweep_lease_ttl_minutes`、`sweep_shared_branch` 均在 setup template 中出现，`spec-sweep` 读取或写入这些 key，位于 `skills/spec-mcp-setup/references/config-template.yaml:19-30` 与 `skills/spec-sweep/SKILL.md:48-61`。
+  - `spec_promote_spiral_optout` 在 setup template 中出现，`spec-promote` 读取并写入该 key，位于 `skills/spec-mcp-setup/references/config-template.yaml:53-56` 与 `skills/spec-promote/references/spiral-cli.md:32-72`。
+  - `plan_skip_scoping_confirm` 在 setup template 中出现，`spec-plan` 读取该 active key，位于 `skills/spec-mcp-setup/references/config-template.yaml:87` 与 `skills/spec-plan/SKILL.md:100`。
+  - `verification_profile_path` 在 setup template 中出现，`src/verification/profile-loader.js` 读取该 key，位于 `skills/spec-mcp-setup/references/config-template.yaml:12` 与 `src/verification/profile-loader.js:77`。
+  - `pulse_*` key 大多在 setup template 与 product-pulse consumer 中对齐，但 `pulse_schedule` 仍只在 consumer / interview 出现，未出现在 template，位于 `skills/spec-product-pulse/SKILL.md:73`、`skills/spec-product-pulse/references/interview.md:216-250`；该缺口已在 `spec-mcp-setup` 小节计为 medium。
+  - Phase 3 扩展确认: `plan_output`、`brainstorm_output`、`ideate_output` 都已有 active consumer，分别位于 `skills/spec-plan/SKILL.md:85`、`skills/spec-brainstorm/SKILL.md:72`、`skills/spec-ideate/SKILL.md:81`；但 setup 仍把三者标为 reserved future hints，位于 `skills/spec-mcp-setup/SKILL.md:118` 与 `skills/spec-mcp-setup/references/config-template.yaml:65-67`。这扩大了既有 `ideate_output` active/reserved 分类漂移 finding 的影响面；因同属同一 setup config consumer-matrix drift，本轮不另增计数。
+  - `work_delegate_*` 在 setup template 中明确为 inert / future downstream support key，当前 active source 中没有 `spec-work` consumer；Phase 3 仅记录为 exposed-but-inert，不按缺 consumer 计为问题，位于 `skills/spec-mcp-setup/references/config-template.yaml:71-80`。
+
+### Pipeline 上下文传递完整性
+
+- 结论: done，无新增 finding。
+- 确认事实:
+  - LFG 调用 `spec-work mode:return-to-caller <plan>`，并要求 returned envelope 包含 `status: complete`、相同 plan path、changed files、attempted/completed U-IDs、verification results、blockers、`behavior_change`、`standalone_shipping_skipped: true` 和必要 `verification_evidence`，位于 `skills/spec-lfg/SKILL.md:18-22`。
+  - `spec-work` 解析 `mode:return-to-caller` 并定义 return envelope；`verification_evidence` 要按 unit/task 记录 behavior change、existing tests inspected、tests added/changed or unchanged、red failure/characterization、verification commands/results 和 exception reason，位于 `skills/spec-work/SKILL.md:23`、`skills/spec-work/SKILL.md:365-381`。
+  - LFG 调用 `spec-code-review mode:agent plan:<plan>`；`spec-code-review` 明确 `mode:agent` report-only、JSON output、不修改 checkout，位于 `skills/spec-lfg/SKILL.md:30-34`、`skills/spec-code-review/SKILL.md:25`、`skills/spec-code-review/SKILL.md:64-66`、`skills/spec-code-review/SKILL.md:706-750`。
+  - LFG 的 `mode:pipeline` 调用字符串存在于 `spec-test-browser` 与 `spec-commit-push-pr` 调用点，位于 `skills/spec-lfg/SKILL.md:68-72`。
+- 已知相关问题:
+  - `spec-test-browser` pipeline no-ask 语义缺口和 `spec-commit-push-pr` pipeline / `New concepts:` trailer 合同悬空已分别计为 high/medium；Phase 3 不重复计数。
+
+### 常驻上下文排除纪律
+
+- 结论: done，无新增 finding。
+- 确认事实:
+  - 当前 generated-runtime 路径扫描命中主要是 explicit boundary prose、目标项目 dev-server 配置、host skill discovery 或 eval negative cases。
+  - `using-spec-first` 与 `spec-mcp-setup` 明确 generated mirrors 不是 source，位于 `skills/using-spec-first/SKILL.md:76-77`、`skills/using-spec-first/SKILL.md:138`、`skills/spec-mcp-setup/SKILL.md:38`。
+  - `spec-polish` 的 `.claude/launch.json` 命中属于目标项目 dev-server 配置输入，不是 spec-first generated runtime source fix，位于 `skills/spec-polish/references/launch-json-schema.md:1-36`。
+  - `best-practices-researcher` 对 `.claude/skills/**`、`.codex/skills/**`、`.agents/skills/**` 的读取是查找可复用 skill guidance 的 curated context，不作为 spec-first source-of-truth 修改面，位于 `skills/spec-compound/references/agents/best-practices-researcher.md:17-19` 与 `skills/spec-plan/references/agents/best-practices-researcher.md:17-19`。
+- 已知相关问题:
+  - `spec-app-consistency-audit` deterministic scripts / metadata schema 未覆盖 Cursor/Kiro/Qoder generated/control paths，已在该 skill 小节计为 medium；Phase 3 不重复计数。
+
+### 测试覆盖缺口
+
+- 结论: done，新增 1 个 medium finding。
+- 发现:
+  1. medium — 当前工作树 `tests/` inventory vs Phase 1 / Phase 2 记录中的 focused contract suites：`find tests -maxdepth 3 -type f | sort` 仅输出 `tests/jest-setup.js` 和 `tests/unit/qoder-runtime-lifecycle.test.js`；`npx jest tests/unit/changelog-format.test.js --runInBand` 与 `npx jest tests/unit/spec-rule-miner-contracts.test.js --runInBand` 均返回 `No tests found`。但报告中已使用或方案要求的覆盖面包括 `changelog-format.test.js`、`migrated-skill-scripts-contracts.test.js`、`repo-profile-cache-parity.test.js`、`mcp-setup-config-template-contracts.test.js`、`spec-work-contracts.test.js`、`spec-plan-contracts.test.js`、`spec-code-review-contracts.test.js`、`spec-write-tasks-contracts.test.js`、`task-pack-command.test.js` 等多条 focused contract / parity / command tests。影响是 Phase 3 之后当前仓库无法用测试层证明大部分 skill migration contract、config key matrix、shared script parity、task-pack validator 和 changelog 格式；只能依赖 source reads、static scans 和历史已运行记录，验证出口显著降级。建议修复方向: 恢复当前仍作为 source contract 依赖的 focused tests，或把已退役测试的覆盖责任迁移到新的 contract/eval fixture 并更新方案、报告和 `package.json` test targets；至少恢复 `changelog-format.test.js` 或替代 changelog validator，避免每次 docs-only 变更都只能以 `No tests found` 降级收尾。
+
+### 共享脚本 Divergence
+
+- 结论: done，无新增计数。
+- 确认事实:
+  - 9 份 `scripts/repo-profile-cache.py` SHA-256 均为 `d91c63a1773de75d36c0a8f9f765cae91c1aaf92c7a8b5ae937d0580e130b9e5`。
+  - 9 份 `references/agents/repo-profiler.md` SHA-256 均为 `bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c`。
+  - `spec-compound` / `spec-compound-refresh` 的 `validate-frontmatter.py`、`validate-doc-claims.py` 副本哈希一致，见 Knowledge lifecycle 小节。
+  - `skills/spec-sweep/scripts/analyze_riffrec_zip.py` 与 `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` 仅 2 行文案 drift：前者说 durable `spec-brainstorm` output 在 `docs/plans/`，后者仍说 `docs/brainstorms/`，diff 位于脚本 help line 58-61 和 closeout line 1114-1117。
+- 已知相关问题:
+  - Riffrec analyzer durable output 目录漂移已在 `spec-riffrec-feedback-analysis` 小节计为 medium；Phase 3 只把它确认为 shared-script divergence，不重复计数。
 
 ## 汇总指标
 
@@ -1506,15 +1824,81 @@ Batch 2 已完成；下一项 `spec-debug`。
 |---|---:|
 | critical | 0 |
 | high | 2 |
-| medium | 18 |
+| medium | 21 |
 | low | 8 |
 | info | 0 |
 
-当前状态: 已确认 2 个 high、18 个 medium、8 个 low 问题；涉及 `spec-commit-push-pr` / `spec-lfg` pipeline 合同、`New concepts:` trailer 合同、`spec-optimize` schema validation 口径、`spec-resolve-pr-feedback` focused tests 与当前 source contract 漂移、`spec-test-browser` pipeline no-ask 语义和 internal helper frontmatter、`spec-worktree` existing-ref / PR isolation 合同缺失、`spec-debug` source skill 目录存在 ignored `__pycache__` 产物，`spec-compound` / `spec-compound-refresh` 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、ignored `__pycache__` 产物，`spec-compound-refresh` 的 legacy `plugin AGENTS.md` wording，`spec-sweep` first-run interview 写入清单漏列 `sweep_lease_ttl_minutes`，`spec-mcp-setup` 的 product-pulse config key 漏列、`ideate_output` active/reserved 分类漂移、Cursor provider readiness host fallback 和 untracked registry-loader source-like 文件，`spec-riffrec-feedback-analysis` 对 `spec-brainstorm` durable output 目录的 `docs/brainstorms/` vs `docs/plans/` 合同漂移，`spec-product-pulse` report-template top-N error count 与当前不可配置合同矛盾，`spec-brainstorm` 共享 repo-profile reference parity 与 Markdown 结构漂移问题，`spec-plan` focused migration contract 对 CE `reasoning-elevation.md` 的 file-set 断言与当前 source divergence 不一致，`spec-doc-review` 迁移时丢失 CE missing-document gate，`spec-code-review` deployment checklist 可验证性约束退化，`spec-ideate` source skill 目录存在 ignored `__pycache__` 产物，以及 `spec-prd` producer finalize receipt 与 `spec-plan` consumer verify-receipt handoff 缺口。`spec-lfg` 本轮未新增计数，但其端到端 pipeline 仍受已记录的下游 `mode:pipeline` 风险影响。
+当前状态: Phase 2 已覆盖全部 35 个 source skill，Phase 3 七项全局交叉验证已完成；已确认 2 个 high、21 个 medium、8 个 low 问题。新增的全局 medium 为当前工作树 focused contract / changelog tests 大面积缺失，导致测试覆盖出口降级。其余问题涉及 `spec-commit-push-pr` / `spec-lfg` pipeline 合同、`New concepts:` trailer 合同、`spec-optimize` schema validation 口径、`spec-resolve-pr-feedback` focused tests 与当前 source contract 漂移、`spec-test-browser` pipeline no-ask 语义和 internal helper frontmatter、`spec-worktree` existing-ref / PR isolation 合同缺失、`spec-debug` source skill 目录存在 ignored `__pycache__` 产物，`spec-compound` / `spec-compound-refresh` 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、ignored `__pycache__` 产物，`spec-compound-refresh` 的 legacy `plugin AGENTS.md` wording，`spec-sweep` first-run interview 写入清单漏列 `sweep_lease_ttl_minutes`，`spec-mcp-setup` 的 product-pulse config key 漏列、rendering keys active/reserved 分类漂移、Cursor provider readiness host fallback 和 untracked registry-loader source-like 文件，`spec-riffrec-feedback-analysis` 对 `spec-brainstorm` durable output 目录的 `docs/brainstorms/` vs `docs/plans/` 合同漂移，`spec-product-pulse` report-template top-N error count 与当前不可配置合同矛盾，`spec-brainstorm` 共享 repo-profile reference parity 与 Markdown 结构漂移问题，`spec-plan` focused migration contract 对 CE `reasoning-elevation.md` 的 file-set 断言与当前 source divergence 不一致，`spec-doc-review` 迁移时丢失 CE missing-document gate，`spec-code-review` deployment checklist 可验证性约束退化，`spec-ideate` source skill 目录存在 ignored `__pycache__` 产物，`spec-prd` producer finalize receipt 与 `spec-plan` consumer verify-receipt handoff 缺口，`spec-write-tasks` output-quality eval fixture 指向缺失 `tests/fixtures/spec-write-tasks/**` 导致 eval runner structural errors，以及 `spec-app-consistency-audit` deterministic scripts / metadata schema 仍按旧 Claude/Codex/Agents 边界处理 generated/control paths 与 host enum，未覆盖 Cursor/Kiro/Qoder runtime surfaces。`spec-lfg` 与 `spec-rule-miner` 本轮未新增计数；`spec-lfg` 端到端 pipeline 仍受已记录的下游 `mode:pipeline` 风险影响。
+
+## 后续修复跟踪
+
+本节记录报告 final 之后的 follow-up 修复状态；不回写原始审查计数，原始计数仍表示 2026-07-10 16:16:30 CST 审查快照。
+
+| 时间 | 原 finding | 状态 | 修复证据 |
+|---|---|---|---|
+| 2026-07-10 16:44:14 CST | high — `spec-commit-push-pr` 缺失 `mode:pipeline` 非交互语义 | fixed | `skills/spec-commit-push-pr/SKILL.md` 恢复 orchestrated caller pipeline modifier、blocking ask 抑制和 existing-PR rewrite 保守默认；`tests/unit/pipeline-mode-contracts.test.js` 覆盖 |
+| 2026-07-10 16:44:14 CST | high — `spec-test-browser` human verification / failure handling 在 pipeline 中仍可能阻塞 | fixed | `skills/spec-test-browser/SKILL.md` 与 `skills/spec-test-browser/references/pipeline-orchestration.md` 恢复 pipeline 不暂停、不询问、记录 skip/failure 后继续；`tests/unit/pipeline-mode-contracts.test.js` 覆盖 |
+| 2026-07-10 17:09:26 CST | medium — `spec-optimize` schema validation 从 CE `validation_rules` 全量校验退化为手写子集 | fixed | `skills/spec-optimize/SKILL.md` 恢复 `validation_rules` full source-of-truth 口径；`tests/unit/spec-optimize-contracts.test.js` 覆盖 |
+| 2026-07-10 17:37:53 CST | medium — `spec-optimize` 与 CE 对比后仍缺少 judge sub-agent bounded dispatch/backpressure、repo researcher 只返回 plan-changing findings、judge confidence 文案和 wrap-up mechanical-apply bar | fixed | `skills/spec-optimize/SKILL.md` 恢复 judge bounded dispatch 与 post-run code-review mechanical-apply bar，并以 `spec-code-review` / `spec-compound` 做 spec-first 投影；`references/agents/repo-research-analyst.md` 与 `references/judge-prompt-template.md` 恢复 CE 承重语义；`tests/unit/spec-optimize-contracts.test.js` 覆盖 |
+| 2026-07-10 17:14:54 CST | medium — `spec-resolve-pr-feedback` focused contract test 仍断言旧 helper path / runtime mirror path | fixed | 当前 source 已使用 `$SKILL_DIR/scripts/<helper>`；新增 `tests/unit/spec-resolve-pr-feedback-contracts.test.js` 锁定 loaded skill directory helper path，不再要求 `.claude/skills` / `.agents/skills` |
+| 2026-07-10 17:21:15 CST | medium — `spec-resolve-pr-feedback` resolver prompt 测试仍读取退役 `agents/spec-pr-comment-resolver.agent.md` | fixed | `tests/unit/spec-resolve-pr-feedback-contracts.test.js` 增加 skill-local resolver prompt 覆盖，锁定 `skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md` 及关键 contract，并确认不恢复退役 repo-level agent path |
+| 2026-07-10 17:32:23 CST | medium — `spec-resolve-pr-feedback` 与 CE 对比后仍缺少 resolver `blocked` 消费、reply 前 thread ID verification、大批量 central judgment 分组和脚本 repo autodetect 友好降级 | fixed | `skills/spec-resolve-pr-feedback/references/full-mode.md` 恢复 CE 行为合同并保留 spec-first skill-local path；`get-pr-comments` / `get-thread-for-comment` 恢复 `set -e` 下的 `|| true` 友好错误路径；`tests/unit/spec-resolve-pr-feedback-contracts.test.js` 覆盖 |
+| 2026-07-10 17:16:00 CST | medium — `New concepts:` trailer 消费合同悬空 | deferred | 用户要求最后处理；当前判断是若按 CE 对齐需恢复完整 concept teaching / archive / trailer 生产链路，不能只补消费端字样 |
 
 ## 验证命令记录
 
-已执行命令见 `Phase 1 全覆盖自动化扫描`。最终 closeout 会在 Phase 2 和 Phase 3 之后重跑必要验证，或明确说明未重跑/未覆盖的原因。
+已执行命令见 `Phase 1 全覆盖自动化扫描` 与以下增量验证。Phase 4 closeout 的最窄验证已记录在最新增量验证区块；因当前工作树缺少 `tests/unit/changelog-format.test.js`，changelog-format 验证降级为 `No tests found`。
+
+### 增量验证（2026-07-10 16:16:30 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| 审查进度表完成度 | `node - <<'NODE' ... NODE` | pass | 顶部审查进度表共 35 行；状态均为 `done`；verdict 均为 `pass`、`issues_found` 或 `critical_issues` |
+| `pending_global_cross_check` 残留扫描 | `node -e "const fs=require('fs'); const lines=fs.readFileSync('docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md','utf8').split(/\\n/).map((line,i)=>[i+1,line]).filter(([,line])=>line.includes('pending_global_cross_check')&&!line.includes('残留扫描')); console.log(JSON.stringify(lines)); if(lines.length) process.exit(1);"` | pass | 输出 `[]`；除本验证记录行外无残留 |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前工作树不存在 `tests/unit/changelog-format.test.js`，Jest 返回 `No tests found`；该缺口已计入 Phase 3 全局 medium finding |
+
+### 增量验证（2026-07-10 16:00:39 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-app-consistency-audit script syntax | `find skills/spec-app-consistency-audit/scripts -name '*.js' -type f -print0 \| xargs -0 -n1 node --check` | pass | 无输出 |
+
+### 增量验证（2026-07-10 16:04:55 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-rule-miner inventory / line count | `find skills/spec-rule-miner -type f \| sort && wc -l skills/spec-rule-miner/SKILL.md skills/spec-rule-miner/references/*.md skills/spec-rule-miner/evals/trigger-cases.json` | pass | 4 个 source files，总计 476 行 |
+| spec-rule-miner eval JSON parse | `node -e "const fs=require('fs'); const p='skills/spec-rule-miner/evals/trigger-cases.json'; const data=JSON.parse(fs.readFileSync(p,'utf8')); console.log('json ok', Array.isArray(data.cases)?data.cases.length:Object.keys(data).length);"` | pass | 输出 `json ok 16` |
+| spec-rule-miner active residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|Workflow Contract Summary\|dispatch_authorization_missing\|Gemini\|Antigravity\|\bPi\b\|agy\|ask_question\|ask_user\|generated runtime\|\.claude\|\.codex\|\.agents/skills\|\.cursor\|\.kiro\|\.qoder" skills/spec-rule-miner` | advisory_hits | 命中均为允许的 rule target / generated runtime 禁区说明和 eval negative cases |
+| spec-rule-miner ignored artifact check | `git status --ignored --short -- skills/spec-rule-miner` | pass | 无输出 |
+| spec-rule-miner governance registry entry | `node -e "const g=require('./src/cli/contracts/dual-host-governance/skills-governance.json'); ..."` | pass | `entry_surface: standalone_skill`、`command_name: null`、5 个 supported hosts delivery 均为 `skill` |
+| spec-rule-miner runtime catalog scan | `rg -n "spec-rule-miner\|rule-miner\|project-rules\|\.cursor/rules\|\.qoder/rules\|\.kiro/steering\|\.cursorrules" docs/catalog/runtime-capabilities.md src/cli/contracts/dual-host-governance/skills-governance.json tests/unit 2>/dev/null` | degraded | 命中 runtime catalog / governance 正常；命令因当前 `tests/unit` 缺失返回 exit 2 |
+| spec-rule-miner focused contract | `npx jest tests/unit/spec-rule-miner-contracts.test.js --runInBand` | degraded | 当前工作树不存在 `tests/unit/spec-rule-miner-contracts.test.js`，Jest 返回 `No tests found`，未执行到 suite |
+| spec-app-consistency-audit JSON parse | `node -e "const fs=require('fs'); for (const dir of ['skills/spec-app-consistency-audit/schemas','skills/spec-app-consistency-audit/evals','skills/spec-app-consistency-audit/references']) { ... } console.log('json ok')"` | pass | 所有 schemas/evals/reference JSON 可解析；输出 `json ok` |
+| spec-app-consistency-audit runner help | `node skills/spec-app-consistency-audit/scripts/run-audit.js --help` | pass | 输出 v1 headless-only usage 与 runner boundary |
+| spec-app-consistency-audit focused contracts | `npx jest tests/unit/spec-app-consistency-audit-entry.test.js tests/unit/spec-app-consistency-audit-prompts.test.js tests/unit/spec-app-consistency-audit-cli-e2e.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到 suite |
+| Eval fixture contracts | `npm run test:eval-fixtures -- --runInBand` | degraded | 同样失败在 `<rootDir>/tests/jest-setup.js` 缺失；未执行到 fixture suites |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前工作树不存在 `tests/unit/changelog-format.test.js`，Jest 返回 `No tests found` |
+
+### 增量验证（2026-07-10 16:08:03 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| 当前 tests inventory | `find tests -maxdepth 2 -type f \| sort \| sed -n '1,60p'` | degraded | 仅见 `tests/jest-setup.js` 与 `tests/unit/qoder-runtime-lifecycle.test.js`；本轮目标 focused tests 不存在 |
+| spec-rule-miner focused contract | `npx jest tests/unit/spec-rule-miner-contracts.test.js --runInBand` | degraded | `No tests found`，pattern `tests/unit/spec-rule-miner-contracts.test.js` 0 matches |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | `No tests found`，pattern `tests/unit/changelog-format.test.js` 0 matches |
+
+### 增量验证（2026-07-10 15:49:24 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-write-skill eval JSON parse | `node -e "JSON.parse(require('fs').readFileSync('skills/spec-write-skill/evals/trigger-cases.json','utf8')); console.log('json ok')"` | pass | 输出 `json ok` |
+| spec-write-skill focused contract | `npx jest tests/unit/spec-write-skill-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
 
 ### 增量验证（2026-07-10 12:22:24 CST）
 
@@ -1673,6 +2057,38 @@ Batch 2 已完成；下一项 `spec-debug`。
 | spec-prd eval fixture | `node skills/spec-prd/scripts/run-evals.js --json` | pass | `status: passed`，111 个 cases，`missing_required_buckets: []`，`invalid_cases: []` |
 | spec-prd active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|task-pack\|dispatch_authorization_missing\|Workflow Contract Summary" skills/spec-prd` | advisory_hits | 命中 `Workflow Contract Summary`、`dispatch_authorization_missing` reason code 和 eval negative `task-pack` case，均为允许命中 |
 | spec-prd ignored artifact check | `git status --ignored --short -- skills/spec-prd` | pass | 无输出 |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
+
+### 增量验证（2026-07-10 15:32:38 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-write-tasks source inventory | `find skills/spec-write-tasks -type f \| sort` | pass | 13 个 source files: `SKILL.md`、1 个 `agents/openai.yaml`、3 个 references、8 个 eval files |
+| spec-write-tasks JSON eval parse | `node -e "for (const f of [...]) JSON.parse(require('fs').readFileSync(f,'utf8'))"` | pass | 7 个 JSON eval/config 文件可解析；`evals/output/cases.jsonl` 为 JSONL 未纳入该命令 |
+| task-pack CLI syntax | `node --check src/cli/task-pack.js && node --check src/cli/commands/tasks.js` | pass | 无输出 |
+| spec-write-tasks maintainer scripts syntax | `node --check scripts/spec-write-tasks/run-output-evals.js && node --check scripts/spec-write-tasks/analyze-task-pack-quality.js` | pass | 无输出 |
+| task-pack CLI help | `node bin/spec-first.js tasks --help` | pass | 输出 `hash` / `validate` 子命令和 deterministic validation scope boundary |
+| task-pack hash smoke | `node bin/spec-first.js tasks hash docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md --json` | pass | 输出 `schema_version: task-plan-hash/v1` 和 `sha256:b27622eb53f1633ced29619d4c9087c7dea915e894a7d9a5f6d74b4e58489913` |
+| task-pack validate missing smoke | `node bin/spec-first.js tasks validate /tmp/nonexistent-task-pack.md --json` | pass_expected_failure | exit 1；输出 `schema_version: task-pack-validation/v1`、`deterministic_handoff: false`、`task-pack-missing` |
+| spec-write-tasks output-quality eval runner | `node scripts/spec-write-tasks/run-output-evals.js --output-dir /private/tmp/spec-write-tasks-eval --recorded-output-dir /private/tmp/spec-write-tasks-eval/recorded-output` | issues_found | exit 1；scorecard 显示 `deterministic_assertions: 7/13`、`structural_errors: 6`，失败项均为 `tests/fixtures/spec-write-tasks/**` target file missing |
+| spec-write-tasks active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|Workflow Contract Summary\|dispatch_authorization_missing" skills/spec-write-tasks` | advisory_hits | 仅命中 `Workflow Contract Summary`，为允许命中 |
+| spec-write-tasks ignored artifact check | `git status --ignored --short -- skills/spec-write-tasks` | pass | 无输出 |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
+
+### 增量验证（2026-07-10 15:40:31 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| using-spec-first inventory | `find skills/using-spec-first -type f \| sort` | pass | 仅 `skills/using-spec-first/SKILL.md` |
+| using-spec-first line count | `wc -l skills/using-spec-first/SKILL.md` | pass | 150 行 |
+| bootstrap/session-start syntax | `node --check src/cli/instruction-bootstrap.js && node --check templates/codex/hooks/session-start` | pass | 无输出 |
+| using-spec-first active residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|task-pack\|Workflow Contract Summary\|dispatch_authorization_missing\|Gemini\|Antigravity\|\bPi\b\|agy\|ask_question\|ask_user" skills/using-spec-first CLAUDE.md AGENTS.md templates/codex/hooks/session-start src/cli/instruction-bootstrap.js` | advisory_hits | 仅命中 `dispatch_authorization_missing`，为当前 Codex dispatch boundary reason code |
+| using-spec-first ignored artifact check | `git status --ignored --short -- skills/using-spec-first` | pass | 无输出 |
+| governance registry entry | `node -e "const g=require('./src/cli/contracts/dual-host-governance/skills-governance.json'); ..."` | pass | `entry_surface: standalone_skill`、`command_name: null`、5 个 supported hosts delivery 均为 `skill` |
+| managed block pointer check | `node -e "const fs=require('fs'); ..."` | pass | `AGENTS.md` / `CLAUDE.md` managed block 均包含 `using-spec-first` 与 `skills/using-spec-first/SKILL.md` |
+| using-spec-first focused contract | `npx jest tests/unit/using-spec-first-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
 | 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
 | Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
 

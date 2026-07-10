@@ -1,0 +1,121 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const projectDir = resolveProjectDir();
+const rawInput = readStdin();
+const input = parseJsonObject(rawInput);
+const toolName = String(input.tool_name || input.toolName || input.name || '');
+const toolInput = input.tool_input && typeof input.tool_input === 'object' && !Array.isArray(input.tool_input)
+  ? input.tool_input
+  : {};
+
+if (!['Write', 'Edit', 'MultiEdit'].includes(toolName)) {
+  process.exit(0);
+}
+
+const targetPath = typeof toolInput.file_path === 'string' ? toolInput.file_path : '';
+if (!targetPath) {
+  process.exit(0);
+}
+
+const cwd = typeof input.cwd === 'string' && input.cwd ? input.cwd : projectDir;
+const absoluteTarget = path.isAbsolute(targetPath)
+  ? path.resolve(targetPath)
+  : path.resolve(cwd, targetPath);
+const normalizedRoot = path.resolve(projectDir);
+if (!isWithinRoot(absoluteTarget, normalizedRoot)) {
+  process.exit(0);
+}
+
+const relativeTarget = path.relative(normalizedRoot, absoluteTarget).split(path.sep).join('/');
+if (!/^docs\/brainstorms\/.+-requirements\.md$/.test(relativeTarget)) {
+  process.exit(0);
+}
+
+const candidateText = collectCandidateText(toolName, toolInput, absoluteTarget);
+if (!hasReadyOrReceiptMutationSignal(candidateText)) {
+  process.exit(0);
+}
+
+block([
+  '[spec-first] PRD prewrite guard blocked Qoder file mutation.',
+  `Target: ${relativeTarget}`,
+  '',
+  'A PRD artifact must not be written or mutated into ready/final state through file mutation tools.',
+  '`status: ready-for-planning`, `readiness_*` receipt fields, `readiness_outcome: ready-for-planning`, `write_mode: final-prd`, and `can_enter_spec_plan: yes` are producer-owned readiness signals.',
+  'Return to `spec-prd`, complete the Requirements Grill/readiness path, then use the producer-local finalize command instead of patching receipt fields directly.',
+].join('\n'));
+
+function resolveProjectDir() {
+  const fromEnv = process.env.QODER_PROJECT_DIR;
+  if (typeof fromEnv === 'string' && fromEnv.trim()) {
+    return fromEnv;
+  }
+  return process.cwd();
+}
+
+function collectCandidateText(currentToolName, currentToolInput, absolutePath) {
+  const fragments = [];
+  if (currentToolName === 'Write' && typeof currentToolInput.content === 'string') {
+    fragments.push(currentToolInput.content);
+  }
+  if (currentToolName === 'Edit') {
+    if (typeof currentToolInput.new_string === 'string') fragments.push(currentToolInput.new_string);
+    if (typeof currentToolInput.old_string === 'string') fragments.push(currentToolInput.old_string);
+  }
+  if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
+    for (const edit of currentToolInput.edits) {
+      if (edit && typeof edit.new_string === 'string') fragments.push(edit.new_string);
+      if (edit && typeof edit.old_string === 'string') fragments.push(edit.old_string);
+    }
+  }
+  try {
+    fragments.push(fs.readFileSync(absolutePath, 'utf8'));
+  } catch {
+    // no-op
+  }
+  return fragments.join('\n');
+}
+
+function hasReadyOrReceiptMutationSignal(text) {
+  if (!text) return false;
+  if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
+  if (/^\s*readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)\s*:/im.test(text)) return true;
+  if (/^\s*(?:-\s*)?readiness_outcome:\s*ready-for-planning\s*$/im.test(text)) return true;
+  if (/^\s*(?:-\s*)?write_mode:\s*final-prd\s*$/im.test(text)) return true;
+  if (/^\s*(?:-\s*)?can_enter_spec_plan:\s*yes\s*$/im.test(text)) return true;
+  return false;
+}
+
+function isWithinRoot(candidatePath, rootPath) {
+  const relative = path.relative(rootPath, candidatePath);
+  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function block(message) {
+  process.stderr.write(`${message}\n`);
+  process.exit(2);
+}
+
+function readStdin() {
+  if (process.stdin.isTTY) {
+    return '';
+  }
+  try {
+    return fs.readFileSync(0, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function parseJsonObject(raw) {
+  try {
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}

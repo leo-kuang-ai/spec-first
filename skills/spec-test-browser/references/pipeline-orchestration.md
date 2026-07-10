@@ -1,6 +1,6 @@
 # Pipeline-Mode Server Orchestration
 
-Read and follow this file only when `spec-test-browser` is invoked with `mode:pipeline` by `spec-lfg` or another automated runner. It overrides three things in the main workflow: the headed/headless question, free-port selection, and dev-server startup. Pipeline mode runs unattended, so never block on a question.
+Read and follow this file only when `spec-test-browser` is invoked with `mode:pipeline` by `spec-lfg` or another automated runner. It overrides the headed/headless question, free-port selection, dev-server startup, human verification pauses, and failure-handling prompts. Pipeline mode runs unattended, so never block on a question.
 
 ## 1. No Headed/Headless Question
 

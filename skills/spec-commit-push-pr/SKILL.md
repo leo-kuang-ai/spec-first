@@ -18,6 +18,8 @@ Three flavors of intent. Pick one and follow the matching path; otherwise defaul
 - **Description update on existing PR.** If the user is asking to update, refresh, or rewrite an existing PR description (with no mention of committing or pushing), follow the Description Update workflow below. The user may also provide a focus (e.g., "update the PR description and add the benchmarking results"). Note any focus for DU-3.
 - **Full workflow.** Otherwise, follow the Full workflow below.
 
+**`mode:pipeline` modifier:** Set by orchestrated callers such as `spec-lfg`. Run the resolved mode non-interactively and suppress every blocking ask. The existing-PR rewrite question defaults to **not rewriting**; in description-update mode the preview ask is skipped and the rewrite applies directly because the update invocation is already the apply intent. Any other suppressed ask takes its conservative documented default: keep the current branch when possible, and stop/report instead of guessing when a base, PR, or branch state cannot be resolved.
+
 ## Context
 
 **On platforms other than Claude Code**, skip to the "Context fallback" section below and run the command there to gather context.

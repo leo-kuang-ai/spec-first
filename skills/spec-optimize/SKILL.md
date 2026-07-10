@@ -196,20 +196,7 @@ Check whether the input is:
 
 **If spec file provided:**
 1. Read the YAML spec file. The orchestrating agent parses YAML natively -- no shell script parsing.
-2. Validate against `references/optimize-spec-schema.yaml`:
-   - All required fields present
-   - `name` is lowercase kebab-case and safe to use in git refs / worktree paths
-   - `metric.primary.type` is `hard` or `judge`
-   - If type is `judge`, `metric.judge` section exists with `rubric` and `scoring`
-   - At least one degenerate gate defined
-   - `measurement.command` is non-empty
-   - `scope.mutable` and `scope.immutable` each have at least one entry
-   - `stopping.max_iterations`, `stopping.max_hours`, and `stopping.plateau_iterations` are present and finite
-   - `execution.mode` and `execution.max_concurrent` are present
-   - Gate check operators are valid (`>=`, `<=`, `>`, `<`, `==`, `!=`)
-   - `execution.max_concurrent` is at least 1
-   - `execution.max_concurrent` does not exceed 6 when backend is `worktree`
-   - High-throughput settings are called out for explicit user approval before baseline: `execution.max_concurrent > 4`, `stopping.max_iterations > 30`, or `stopping.max_hours > 4`
+2. Validate the spec against **every** rule in the `validation_rules` section of `references/optimize-spec-schema.yaml`. That section is the single source of truth for what a valid spec requires; do not rely on a remembered subset. Conditional rules such as exclusive-resource serial execution, singleton-rubric requirements, uncapped judge spend approval, high-throughput approval, and stopping criteria live there.
 3. If validation fails, report errors and ask the user to fix them
 
 **If description provided:**
@@ -594,7 +581,7 @@ For each completed experiment, **immediately**:
    - Apply stratified sampling per `metric.judge.stratification` config (using `sample_seed`)
    - Group samples into batches of `metric.judge.batch_size`
    - Fill the judge prompt template (`references/judge-prompt-template.md`) for each batch
-   - Dispatch `ceil(sample_size / batch_size)` parallel judge sub-agents
+   - Dispatch the `ceil(sample_size / batch_size)` judge sub-agents using the same bounded dispatch as Phase 3.2: queue them, dispatch to whatever concurrency the host accepts, and treat a capacity error as backpressure (retry the queued batch after a slot frees) rather than a scoring failure. These judge sub-agents are a separate budget from the experiment worktrees.
    - Each sub-agent returns structured JSON scores
    - Aggregate scores: compute the configured primary judge field from `metric.judge.scoring.primary` (which should match `metric.primary.name`) plus any `scoring.secondary` values
    - If `singleton_sample > 0`: also dispatch singleton evaluation sub-agents
@@ -741,8 +728,10 @@ The experiment log and strategy digest remain in local `.spec-first/workflows/sp
 
 Present post-completion options via the platform question tool:
 
-1. **Run code review** on the cumulative diff (baseline to final). Execute the current host's code-review entrypoint with `mode:autofix` on the optimization branch.
-2. **Capture learning** by executing the current host's compound entrypoint to document the winning strategy as an institutional learning.
+1. **Run code review** on the cumulative diff (baseline to final). Execute `spec-code-review` on the optimization branch, interactive or `mode:agent`. To land eligible fixes before the next option, apply the mechanical-apply bar below.
+
+   **Mechanical-apply bar:** apply any finding with a concrete `suggested_fix` that is a clear, reversible improvement; push back and keep the diff when the reviewer is wrong, noting why. Defer anything whose right fix needs a design or product decision, including architecture direction, contract shape, behavior change needing sign-off, and any finding with no concrete fix to act on. Confirm evidence still matches at `file:line` before editing. After applying, run tests, at least targeted tests for what changed and a broader suite for multi-file edits. Do not commit or push from this step; leave the diff on the optimization branch for the Create PR option.
+2. **Capture learning** by executing `spec-compound` to document the winning strategy as an institutional learning.
 3. **Create PR** from the optimization branch to the default branch.
 4. **Continue** with more experiments: re-enter Phase 3 with the current state. State re-read first.
 5. **Done** -- leave the optimization branch for manual review.

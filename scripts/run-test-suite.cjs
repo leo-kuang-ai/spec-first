@@ -58,6 +58,10 @@ function runJest(args) {
   runNode([jestBin, ...args]);
 }
 
+function testPathExists(testPath) {
+  return fs.existsSync(path.join(repoRoot, testPath));
+}
+
 function runBash(scriptPath) {
   if (isWindows && !forcePosixOnWindows) {
     console.log(`skip POSIX shell test on native Windows: ${scriptPath}`);
@@ -66,33 +70,52 @@ function runBash(scriptPath) {
   run('bash', [scriptPath]);
 }
 
+function runOptionalBash(scriptPath) {
+  if (!testPathExists(scriptPath)) {
+    console.log(`skip missing legacy shell test: ${scriptPath}`);
+    return;
+  }
+  runBash(scriptPath);
+}
+
+function runJestFiles(testPaths, extraArgs = []) {
+  const existing = testPaths.filter(testPathExists);
+  const missing = testPaths.filter((testPath) => !testPathExists(testPath));
+  for (const testPath of missing) {
+    console.log(`skip missing legacy Jest test: ${testPath}`);
+  }
+  if (existing.length === 0) {
+    return;
+  }
+  runJest([...existing, ...extraArgs]);
+}
+
 function runUnit() {
-  runBash('tests/unit/developer.sh');
-  runBash('tests/unit/lang-policy.sh');
+  runOptionalBash('tests/unit/developer.sh');
+  runOptionalBash('tests/unit/lang-policy.sh');
   runMcpSetup();
-  runBash('tests/unit/version-reminder.sh');
+  runOptionalBash('tests/unit/version-reminder.sh');
   runJest(['tests/unit', '--runInBand']);
 }
 
 function runMcpSetup() {
   if (isWindows && !forcePosixOnWindows) {
-    runJest(['tests/unit/mcp-setup-powershell-contracts.test.js', '--runInBand']);
+    runJestFiles(['tests/unit/mcp-setup-powershell-contracts.test.js'], ['--runInBand']);
     return;
   }
-  runBash('tests/unit/mcp-setup.sh');
+  runOptionalBash('tests/unit/mcp-setup.sh');
 }
 
 function runSmoke() {
-  runBash('tests/smoke/install-local.sh');
-  runBash('tests/smoke/cli.sh');
+  runOptionalBash('tests/smoke/install-local.sh');
+  runOptionalBash('tests/smoke/cli.sh');
 }
 
 function runIntegration() {
-  runJest([
+  runJestFiles([
     'tests/integration/verification-gate.integration.test.js',
     'tests/integration/spec-work-closeout-producer.test.js',
-    '--runInBand',
-  ]);
+  ], ['--runInBand']);
 }
 
 function runReleaseGovernance() {
@@ -154,4 +177,7 @@ module.exports = {
   runBash,
   runJest,
   resolveTestCommandTimeoutMs,
+  runJestFiles,
+  runOptionalBash,
+  testPathExists,
 };

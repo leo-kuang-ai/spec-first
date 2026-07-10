@@ -78,6 +78,9 @@ __pycache__/
 .qoder/skills/
 .qoder/agents/
 .qoder/spec-first/
+.qoder/hooks/session-start
+.qoder/hooks/prd-prewrite-guard
+.qoder/hooks/prd-readiness-guard
 .qoder/settings.local.json
 .context/spec-first/
 
