@@ -6,10 +6,10 @@
 - 产出方: Codex goal execution
 - 方案来源: `docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-plan.md`
 - 已加载角色契约: `docs/10-prompt/结构化项目角色契约.md`
-- 最近更新: 2026-07-10 14:40:26 CST
+- 最近更新: 2026-07-10 15:07:21 CST
 - 新鲜度: 以该时间点的当前工作树为准；已有的无关 dirty 文件未被本报告修改。
-- 局限: Phase 1 确定性扫描已完成；Phase 2 逐 skill 语义审查已完成 Batch 1 全部 8 个 skill、Batch 2 全部 7 个 skill、Batch 3 全部 7 个 skill，并完成 Batch 4 的 `spec-brainstorm`、`spec-plan` 与 `spec-doc-review`。当前 HEAD 为 `98e50159`，仓库 `tests/` 目录已被清理删除，本轮 Jest focused / changelog-format 验证因此失败在测试基础设施缺失。
-- 下一步: 审查 Batch 4 / `spec-code-review`。
+- 局限: Phase 1 确定性扫描已完成；Phase 2 逐 skill 语义审查已完成 Batch 1 全部 8 个 skill、Batch 2 全部 7 个 skill、Batch 3 全部 7 个 skill，并完成 Batch 4 的 `spec-brainstorm`、`spec-plan`、`spec-doc-review`、`spec-code-review`、`spec-work` 与 `spec-ideate`。当前 HEAD 为 `98e50159`，仓库 `tests/` 目录已被清理删除，本轮 Jest focused / changelog-format 验证因此失败在测试基础设施缺失。
+- 下一步: 审查 Batch 4 / `spec-lfg`。
 
 ## 审查进度
 
@@ -40,9 +40,9 @@
 | spec-brainstorm | A | done | issues_found | 2026-07-10 14:16:39 CST | 核心 Product Contract / handoff 保留；共享 repo-profile parity 与 Markdown 结构发现问题 |
 | spec-plan | A | done | issues_found | 2026-07-10 14:27:54 CST | 核心 plan artifact / handoff contract 保留；focused migration contract 的 CE file-set 断言与当前 source divergence 漂移 |
 | spec-doc-review | A | done | issues_found | 2026-07-10 14:40:26 CST | 核心 persona review / synthesis / walkthrough contract 基本保留；CE missing-document gate 丢失 |
-| spec-code-review | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
-| spec-work | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
-| spec-ideate | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
+| spec-code-review | A | done | issues_found | 2026-07-10 14:44:56 CST | 核心 code review / mode:agent / cross-model / validator contract 基本保留；deployment checklist 可验证性约束退化 |
+| spec-work | A | done | pass | 2026-07-10 15:03:14 CST | 核心 implementation / return-to-caller / shipping tail contract 保留；未发现迁移阻断问题 |
+| spec-ideate | A | done | issues_found | 2026-07-10 15:07:21 CST | CE ideation contract 基本保留；发现 ignored `__pycache__` 污染 source skill 目录 |
 | spec-lfg | A | pending | - | 2026-07-10 11:52:39 CST | Batch 4 |
 | spec-prd | C | pending | - | 2026-07-10 11:52:39 CST | Batch 5 原生/拆分 skill |
 | spec-write-tasks | C | pending | - | 2026-07-10 11:52:39 CST | Batch 5 原生/拆分 skill |
@@ -1246,6 +1246,146 @@ Batch 2 已完成；下一项 `spec-debug`。
 
 下一项 `spec-code-review`。
 
+#### spec-code-review
+
+- Tier: A
+- 状态: done
+- Verdict: issues_found
+- 已读取 source 文件:
+  - `skills/spec-code-review/SKILL.md`
+  - `skills/spec-code-review/references/action-class-rubric.md`
+  - `skills/spec-code-review/references/cross-model-review.md`
+  - `skills/spec-code-review/references/diff-scope.md`
+  - `skills/spec-code-review/references/findings-schema.json`
+  - `skills/spec-code-review/references/persona-catalog.md`
+  - `skills/spec-code-review/references/repo-profile-cache.md`
+  - `skills/spec-code-review/references/review-output-template.md`
+  - `skills/spec-code-review/references/subagent-template.md`
+  - `skills/spec-code-review/references/validator-template.md`
+  - `skills/spec-code-review/references/agents/repo-profiler.md`
+  - `skills/spec-code-review/references/personas/` 下全部 15 个 persona / local prompt assets
+  - `skills/spec-code-review/scripts/cross-model-adversarial-review.sh`
+  - `skills/spec-code-review/scripts/repo-profile-cache.py`
+  - `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/` 下对应 CE 文件集合与 diff
+- CE parity: applicable。当前 `spec-code-review` 保留 CE `ce-code-review` 的核心 code review 能力，并完成主要 spec-first 投影:
+  - 文件集合与 CE baseline 一致，覆盖 `SKILL.md`、references、persona prompt assets、repo-profiler agent asset 和 2 个 scripts。
+  - `ce-code-review`、CE local prompt assets、CE artifact path、`ce-work`、`ce-brainstorm` / `ce-plan`、`ce-unified-plan/v1` 和 `/tmp/compound-engineering` 已投影为 `spec-code-review`、spec-first local prompt assets、`spec-work`、`spec-brainstorm` / `spec-plan`、`spec-unified-plan/v1` 和 `/tmp/spec-first`。
+  - `mode:agent` JSON-only report contract、`mode:headless` alias、no blocking prompts、no checkout / no push、PR remote vs local-aligned scope split、remote review 不读 stale workspace 文件、requirements completeness、protected artifacts、small-diff fail-closed gate、bounded subagent dispatch、quote-the-line gate、validator pass、Stage 5c default-mode apply / `mode:agent` no-mutation handoff、run artifacts 与 `review.json` 均保留，位于 `skills/spec-code-review/SKILL.md:19-80`、`skills/spec-code-review/SKILL.md:130-169`、`skills/spec-code-review/SKILL.md:194-316`、`skills/spec-code-review/SKILL.md:423-552`、`skills/spec-code-review/SKILL.md:554-750`。
+  - Cross-model adversarial pass 保留 host self-id、peer CLI shell-out、read-only flags、timeout / process-group reap、schema-shaped JSON fold-in 和 non-blocking skip 语义，位于 `skills/spec-code-review/references/cross-model-review.md:1-63`、`skills/spec-code-review/scripts/cross-model-adversarial-review.sh:1-220`。
+  - Repo-profile cache 保留 shared `/tmp/spec-first/repo-profile` 路径，并包含当前 `git_unquote` 修复以避免 quoted-path under-invalidation，位于 `skills/spec-code-review/scripts/repo-profile-cache.py:55-174`、`skills/spec-code-review/scripts/repo-profile-cache.py:268-276`。
+- 发现:
+  1. medium — `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-code-review/references/personas/deployment-verification-agent.md:157` vs `skills/spec-code-review/references/personas/deployment-verification-agent.md:157`: CE baseline 要求 “Every checklist item must name the command or observable signal that proves the step succeeded.”，当前 spec-first prompt 退化为 “Be thorough. Be specific. Produce executable checklists, not vague recommendations.”。影响是高风险数据部署的 checklist 可能重新出现不可验证的泛化项，削弱 deployment notes 作为 review artifact 的 confirmed evidence / operational gate 价值。建议修复方向: 恢复 CE 的每项 checklist 必须带 command 或 observable signal 的硬约束，可保留当前泛化质量提醒作为补充；补 focused prompt contract 或 review-output test 锁定 deployment checklist 的可验证性要求。
+- 依赖关系验证结果:
+  - 下游 `spec-work` 可通过 `mode:agent` 消费 JSON `actionable_findings`，且 `mode:agent` 明确不 apply / 不输出 markdown 包裹，位于 `skills/spec-code-review/SKILL.md:706-750`。
+  - `spec-unified-plan/v1` 的 plan completeness 分类与 `spec-brainstorm` / `spec-plan` 当前 artifact readiness 口径一致，位于 `skills/spec-code-review/SKILL.md:144-169`。
+  - `docs/brainstorms/`、`docs/plans/`、`docs/solutions/` 被声明为 protected artifacts，避免 reviewer 把 pipeline artifacts 当 cleanup target，位于 `skills/spec-code-review/SKILL.md:134-142`。
+  - `learnings-researcher` 的 module pre-filter 从 CE `compound-engineering` 投影为 `spec-first`，位于 `skills/spec-code-review/references/personas/learnings-researcher.md:77-80`。
+- 上下文管理验证结果:
+  - `SKILL.md` 共 837 行，超过方案建议的 500 行 advisory budget；本轮不把行数本身计为 finding，因为该文件承载 scope detection、remote-safety、dispatch、synthesis、validator、apply 和 JSON handoff 等主执行合同。后续若要瘦身，应优先把非入口判断的长段落继续下沉到 references，并用 focused tests / fresh-source eval 锁住边界。
+  - References 全部按 stage 触发加载，且 `SKILL.md:822-837` 明确不要重新引入 `@` eager includes。
+  - Persona prompt assets 和 repo-profiler agent asset 均为 skill-local source，不依赖 generated runtime mirrors 或 platform-level custom-agent registration。
+- 安全 / residual 检查:
+  - Active CE residual scan 对 `skills/spec-code-review` 无命中。
+  - `bash -n skills/spec-code-review/scripts/cross-model-adversarial-review.sh` pass。
+  - `PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/private/tmp/spec-first-pycache python3 -m py_compile skills/spec-code-review/scripts/repo-profile-cache.py` pass。
+  - `node -e "JSON.parse(require('fs').readFileSync('skills/spec-code-review/references/findings-schema.json','utf8')); console.log('json ok')"` pass，输出 `json ok`。
+  - `npx jest tests/unit/spec-code-review-contracts.test.js --runInBand` degraded: 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未能执行到 `spec-code-review` focused assertions。
+- 未检查 / degraded checks:
+  - 未实际运行 `spec-code-review` review、PR remote fetch、cross-model peer CLI、subagent dispatch、validator wave、Stage 5c default apply 或 `mode:agent` JSON parse consumer。
+  - 当前缺少可执行 Jest 测试基础设施，无法用 focused test 证明 `spec-code-review` contract；该全局测试覆盖缺口留到 Phase 3 统一复核。
+  - 未修复上述 finding；本 goal 默认记录审查发现，不直接修改 source skill。
+
+下一项 `spec-work`。
+
+#### spec-work
+
+- Tier: A
+- 状态: done
+- Verdict: pass
+- 已读取 source 文件:
+  - `skills/spec-work/SKILL.md`
+  - `skills/spec-work/references/execution-engines.md`
+  - `skills/spec-work/references/non-code-execution.md`
+  - `skills/spec-work/references/review-findings-followup.md`
+  - `skills/spec-work/references/shipping-workflow.md`
+  - `skills/spec-work/references/tracker-defer.md`
+  - `skills/spec-work/references/agents/figma-design-sync.md`
+  - `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-work/` 下对应 CE 文件清单与 diff
+- CE parity: applicable。文件集合与 CE baseline 一致。当前 divergence 均为预期 spec-first 投影或已解释的 host scope 收敛:
+  - `artifact_contract` 从 `ce-unified-plan/v1` 投影为 `spec-unified-plan/v1`，requirements-only artifact 必须先交给 `spec-plan`，implementation-ready + `execution: code` 才继续执行，位于 `skills/spec-work/SKILL.md:29-37`。
+  - bare-prompt 大任务 handoff 从 `/ce-brainstorm` / `/ce-plan` 投影为 `spec-brainstorm` / `spec-plan`，位于 `skills/spec-work/SKILL.md:47-53`。
+  - plan 是 decision artifact，`spec-work` 不编辑 plan body，进度由 git/task tracker/envelope 承载，位于 `skills/spec-work/SKILL.md:61-73`。
+  - execution engine 文档保留 inline/subagent、goal-mode、dynamic-workflow 三类选择，并明确 engine 不拥有 shipping tail；Codex `create_goal` 只用于 standalone，不用于 return-to-caller，位于 `skills/spec-work/SKILL.md:142-144` 与 `skills/spec-work/references/execution-engines.md:1-19`、`skills/spec-work/references/execution-engines.md:39-48`、`skills/spec-work/references/execution-engines.md:72-85`。
+  - parallel safety、harness-owned isolation、bounded unit packet、worker verification evidence 和 orchestrator-owned commit / integration contract 保留，位于 `skills/spec-work/SKILL.md:154-195`。
+  - quality tail 投影为 `spec-simplify-code`、`spec-code-review`、`spec-commit-push-pr` / `spec-commit`，shipping workflow 中 `mode:agent` review-only + caller-owned apply/fix + Residual Work Gate 路径保留，位于 `skills/spec-work/SKILL.md:351-361`、`skills/spec-work/references/shipping-workflow.md:27-57` 和 `skills/spec-work/references/review-findings-followup.md:1-65`。
+  - Return-to-Caller Mode 保留 `status`、`changed_files`、`u_ids_*`、`verification_results`、`verification_evidence`、`behavior_change` 与 `standalone_shipping_skipped: true` envelope，并要求行为变更必须有 verification evidence 或 deliberate exception，位于 `skills/spec-work/SKILL.md:363-391`。
+- 发现: 未发现迁移阻断问题。
+- 依赖关系验证结果:
+  - `spec-lfg` 对 `spec-work mode:return-to-caller <plan-path>` 的调用要求与 `spec-work` envelope 字段匹配，位于 `skills/spec-lfg/SKILL.md:18-22` 与 `skills/spec-work/SKILL.md:371-384`。
+  - `spec-code-review` 的默认交互模式可 Stage 5c apply safe fixes，但 `spec-work` shipping path 通过 `mode:agent` 调用，并在 `review-findings-followup.md:5` 明确“在此上下文 review-only，caller owns apply/fix policy”。因此本轮不把 `spec-work/SKILL.md:357` 的简化表述单独计为 confirmed issue；该跨 skill mode 契约仍留到 Phase 3 pipeline/context 端到端复核。
+  - `tracker-defer.md` 的 residual filing reference 已投影到 `/tmp/spec-first/spec-code-review/<run-id>/` artifact path 和 `spec-code-review` caller 边界；未发现 active CE path residual。
+- 上下文管理验证结果:
+  - `SKILL.md` 共 432 行，低于方案建议的 500 行 advisory budget；reference 总量 1091 行，但按 Phase 0 knowledge-work、Phase 1 engine selection、Phase 3-4 shipping tail、review follow-up、tracker defer 和 Figma sync 触发加载。
+  - unified plan 大文档读取策略使用 heading map + active U-ID bounded read，不要求 worker 读取 whole plan，位于 `skills/spec-work/SKILL.md:61-62` 与 `skills/spec-work/SKILL.md:169-174`。
+  - return-to-caller 明确不发 copyable goal/workflow prompt，避免 caller-owned tail 被手动 paste 步骤 stranded，位于 `skills/spec-work/SKILL.md:386-391` 与 `skills/spec-work/references/execution-engines.md:43-48`。
+- 安全 / residual 检查:
+  - Active CE residual scan 对 `skills/spec-work` 无命中。
+  - `diff -ru /Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-work skills/spec-work` 只显示预期的 `ce-*` -> `spec-*`、`ce-unified-plan/v1` -> `spec-unified-plan/v1`、`/tmp/compound-engineering` -> `/tmp/spec-first`、badge / host question-tool list 收敛、以及删除 Pi / Antigravity 等非当前 supported host 示例。
+  - 该 skill 没有 `scripts/` 目录，因此无 Bash/Python 语法检查项。
+- 未检查 / degraded checks:
+  - 未实际运行 `spec-work`、`spec-lfg` pipeline、subagent dispatch、goal-mode、dynamic-workflow、`spec-code-review mode:agent` JSON consumer、Residual Work Gate 或 PR shipping tail；本轮只验证 source contract、CE parity 和跨 skill 静态引用。
+  - `npx jest tests/unit/spec-work-contracts.test.js --runInBand` degraded: 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite。
+  - 当前缺少可执行 Jest 测试基础设施，无法用 focused test 证明 `spec-work` contract；该全局测试覆盖缺口留到 Phase 3 统一复核。
+
+下一项 `spec-ideate`。
+
+#### spec-ideate
+
+- Tier: A
+- 状态: done
+- Verdict: issues_found
+- 已读取 source 文件:
+  - `skills/spec-ideate/SKILL.md`
+  - `skills/spec-ideate/references/divergent-ideation.md`
+  - `skills/spec-ideate/references/html-rendering.md`
+  - `skills/spec-ideate/references/ideation-sections.md`
+  - `skills/spec-ideate/references/markdown-rendering.md`
+  - `skills/spec-ideate/references/post-ideation-workflow.md`
+  - `skills/spec-ideate/references/repo-profile-cache.md`
+  - `skills/spec-ideate/references/universal-ideation.md`
+  - `skills/spec-ideate/references/web-research-cache.md`
+  - `skills/spec-ideate/references/agents/` 下全部 5 个 local prompt assets
+  - `skills/spec-ideate/scripts/repo-profile-cache.py`
+  - `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate/` 下对应 CE 文件清单与 diff
+- CE parity: applicable。除本小节记录的 ignored bytecode 产物外，文件集合与 CE baseline 一致。核心能力和 spec-first 投影保留:
+  - `ce-ideate` -> `spec-ideate`、`ce-brainstorm` -> `spec-brainstorm`、`ce-plan` -> `spec-plan`，且 ideation 明确不产出 requirements / plan / code，位于 `skills/spec-ideate/SKILL.md:12-18`。
+  - output mode exclusive contract、默认 HTML、active `ideate_output` config、pipeline 强制 markdown、`output:` token parsing 与不自动传播到 `spec-brainstorm` 保留，位于 `skills/spec-ideate/SKILL.md:64-89`。
+  - subject-identification gate、surprise-me、mode classification、elsewhere non-software routing 和 context-substance gate 保留，位于 `skills/spec-ideate/SKILL.md:115-203`。
+  - scratch path 已从 `/tmp/compound-engineering/ce-ideate/<run-id>` 投影为 `/tmp/spec-first/spec-ideate/<run-id>`，位于 `skills/spec-ideate/SKILL.md:253-260`、`skills/spec-ideate/references/web-research-cache.md:21-30` 和 `skills/spec-ideate/references/post-ideation-workflow.md:52-60`。
+  - Phase 2 divergent ideation 的 fleet、cache-friendly grounding payload、basis requirement、axis coverage recovery 和 raw candidate checkpoint 保留，位于 `skills/spec-ideate/references/divergent-ideation.md:5-32`、`skills/spec-ideate/references/divergent-ideation.md:55-89`。
+  - Phase 3 fresh-context verifier、automatic deliverable write、concise summary、Phase 5 next-step menu、Proof / `spec-brainstorm` handoff 和 no direct-to-implementation guard 保留，位于 `skills/spec-ideate/references/post-ideation-workflow.md:5-33`、`skills/spec-ideate/references/post-ideation-workflow.md:42-120`。
+  - artifact section contract 保持 ideation 是 human-facing discovery document、无 status lifecycle、ranked ideas 带 basis/rationale/downsides/confidence/complexity，位于 `skills/spec-ideate/references/ideation-sections.md:13-39`、`skills/spec-ideate/references/ideation-sections.md:53-74`。
+- 发现:
+  1. low — `skills/spec-ideate/scripts/__pycache__/repo-profile-cache.cpython-312.pyc`、`.gitignore:50`: `spec-ideate` source skill 目录中存在 Python bytecode 产物，`diff -ru /Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-ideate skills/spec-ideate` 显示 `Only in skills/spec-ideate/scripts: __pycache__`；`git status --ignored --short -- skills/spec-ideate/scripts/__pycache__/repo-profile-cache.cpython-312.pyc` 显示 `!! skills/spec-ideate/scripts/__pycache__/`，`git ls-files` 无输出，说明它被忽略且未被 git 跟踪。影响是 source inventory / 人工 parity 审查会看到 generated artifact，增加误判和打包卫生风险；当前不构成 tracked source regression。建议修复方向: 清理本地 `skills/spec-ideate/scripts/__pycache__/`，并在 Phase 3 全局 source hygiene 检查中统一确认所有 source skill 目录没有 ignored bytecode 产物。
+- 依赖关系验证结果:
+  - `spec-ideate` 只把一个幸存 idea 交给 `spec-brainstorm`，并构造 substance seed + provenance pointer，不直接交给 `spec-plan` 或 `spec-work`，位于 `skills/spec-ideate/references/post-ideation-workflow.md:110-120`。
+  - `spec-proof` 仅在 markdown 输出的 Publish to Proof 选项中触发，HTML 是本地 canonical artifact，位于 `skills/spec-ideate/references/post-ideation-workflow.md:100-108`。
+  - `repo-profile-cache.py` 与 `repo-profile-cache.md` 使用 `/tmp/spec-first/repo-profile`，并包含当前 `git_unquote` 修复，位于 `skills/spec-ideate/scripts/repo-profile-cache.py:25-58`、`skills/spec-ideate/scripts/repo-profile-cache.py:177-221` 和 `skills/spec-ideate/references/repo-profile-cache.md:25-63`。
+- 上下文管理验证结果:
+  - `SKILL.md` 共 414 行，低于方案建议的 500 行 advisory budget；总 source 3142 行，主要长文件为 HTML / Markdown rendering reference，且 `SKILL.md:87` 明确到 write time 才加载 `ideation-sections.md` 与对应 rendering reference。
+  - Phase 2 必须加载 `divergent-ideation.md`，Phase 2 完成后才加载 `post-ideation-workflow.md`，位于 `skills/spec-ideate/SKILL.md:410-414`；该分段避免把渲染和后处理细节提前塞进 grounding/ideation dispatch。
+  - evidence dossiers、web research cache 和 survivor/raw candidate checkpoints 都在 `<scratch-dir>` 下传递，不要求主会话读回大文件内容，位于 `skills/spec-ideate/SKILL.md:253-260`、`skills/spec-ideate/references/divergent-ideation.md:16-32`、`skills/spec-ideate/references/divergent-ideation.md:87-89` 和 `skills/spec-ideate/references/post-ideation-workflow.md:46-59`。
+- 安全 / residual 检查:
+  - Active CE residual scan 对 `skills/spec-ideate` 无命中。
+  - `PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/private/tmp/spec-first-pycache python3 -m py_compile skills/spec-ideate/scripts/repo-profile-cache.py` pass。
+  - `repo-profile-cache.py` 使用固定 argv `git` 调用且无 `shell=True`，cache 写入使用 `tempfile.mkstemp` + `os.replace` 原子替换，相关实现位于 `skills/spec-ideate/scripts/repo-profile-cache.py:224-234` 和 `skills/spec-ideate/scripts/repo-profile-cache.py:415-438`。
+- 未检查 / degraded checks:
+  - 未实际运行 `spec-ideate`、web research、issue intelligence、Slack research、subagent dispatch、HTML/Markdown rendering、Proof publish 或 `spec-brainstorm` handoff；本轮只验证 source contract、CE parity、静态依赖和脚本语法。
+  - `npx jest tests/unit/spec-ideate-contracts.test.js --runInBand` degraded: 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite。
+  - 未清理 ignored `__pycache__`；本 goal 默认记录审查发现，不直接修改 source skill。
+
+下一项 `spec-lfg`。
+
 ### Batch 5
 
 待审查。
@@ -1268,11 +1408,11 @@ Batch 2 已完成；下一项 `spec-debug`。
 |---|---:|
 | critical | 0 |
 | high | 2 |
-| medium | 16 |
-| low | 7 |
+| medium | 17 |
+| low | 8 |
 | info | 0 |
 
-当前状态: 已确认 2 个 high、16 个 medium、7 个 low 问题；涉及 `spec-commit-push-pr` / `spec-lfg` pipeline 合同、`New concepts:` trailer 合同、`spec-optimize` schema validation 口径、`spec-resolve-pr-feedback` focused tests 与当前 source contract 漂移、`spec-test-browser` pipeline no-ask 语义和 internal helper frontmatter、`spec-worktree` existing-ref / PR isolation 合同缺失、`spec-debug` source skill 目录存在 ignored `__pycache__` 产物，`spec-compound` / `spec-compound-refresh` 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、ignored `__pycache__` 产物，`spec-compound-refresh` 的 legacy `plugin AGENTS.md` wording，`spec-sweep` first-run interview 写入清单漏列 `sweep_lease_ttl_minutes`，`spec-mcp-setup` 的 product-pulse config key 漏列、`ideate_output` active/reserved 分类漂移、Cursor provider readiness host fallback 和 untracked registry-loader source-like 文件，`spec-riffrec-feedback-analysis` 对 `spec-brainstorm` durable output 目录的 `docs/brainstorms/` vs `docs/plans/` 合同漂移，`spec-product-pulse` report-template top-N error count 与当前不可配置合同矛盾，`spec-brainstorm` 共享 repo-profile reference parity 与 Markdown 结构漂移问题，`spec-plan` focused migration contract 对 CE `reasoning-elevation.md` 的 file-set 断言与当前 source divergence 不一致，以及 `spec-doc-review` 迁移时丢失 CE missing-document gate。
+当前状态: 已确认 2 个 high、17 个 medium、8 个 low 问题；涉及 `spec-commit-push-pr` / `spec-lfg` pipeline 合同、`New concepts:` trailer 合同、`spec-optimize` schema validation 口径、`spec-resolve-pr-feedback` focused tests 与当前 source contract 漂移、`spec-test-browser` pipeline no-ask 语义和 internal helper frontmatter、`spec-worktree` existing-ref / PR isolation 合同缺失、`spec-debug` source skill 目录存在 ignored `__pycache__` 产物，`spec-compound` / `spec-compound-refresh` 中文 frontmatter locale 失败、Knowledge Track template category 覆盖不全、ignored `__pycache__` 产物，`spec-compound-refresh` 的 legacy `plugin AGENTS.md` wording，`spec-sweep` first-run interview 写入清单漏列 `sweep_lease_ttl_minutes`，`spec-mcp-setup` 的 product-pulse config key 漏列、`ideate_output` active/reserved 分类漂移、Cursor provider readiness host fallback 和 untracked registry-loader source-like 文件，`spec-riffrec-feedback-analysis` 对 `spec-brainstorm` durable output 目录的 `docs/brainstorms/` vs `docs/plans/` 合同漂移，`spec-product-pulse` report-template top-N error count 与当前不可配置合同矛盾，`spec-brainstorm` 共享 repo-profile reference parity 与 Markdown 结构漂移问题，`spec-plan` focused migration contract 对 CE `reasoning-elevation.md` 的 file-set 断言与当前 source divergence 不一致，`spec-doc-review` 迁移时丢失 CE missing-document gate，`spec-code-review` deployment checklist 可验证性约束退化，以及 `spec-ideate` source skill 目录存在 ignored `__pycache__` 产物。
 
 ## 验证命令记录
 
@@ -1377,6 +1517,40 @@ Batch 2 已完成；下一项 `spec-debug`。
 | spec-doc-review schema JSON | `node -e "JSON.parse(require('fs').readFileSync('skills/spec-doc-review/references/findings-schema.json','utf8')); console.log('json ok')"` | pass | 输出 `json ok` |
 | spec-doc-review active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|task-pack\|dispatch_authorization_missing\|Workflow Contract Summary\|docs/contracts/context-governance.md\|review-finding.v1" skills/spec-doc-review` | pass | 无输出 |
 | spec-doc-review focused contract | `npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
+
+### 增量验证（2026-07-10 14:44:56 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-code-review active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|task-pack\|dispatch_authorization_missing\|Workflow Contract Summary\|review-finding.v1\|Gemini\|Antigravity\|\bPi\b\|agy\|ask_question\|ask_user" skills/spec-code-review` | pass | 无输出 |
+| spec-code-review cross-model Bash syntax | `bash -n skills/spec-code-review/scripts/cross-model-adversarial-review.sh` | pass | 无输出 |
+| spec-code-review repo-profile Python syntax | `PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/private/tmp/spec-first-pycache python3 -m py_compile skills/spec-code-review/scripts/repo-profile-cache.py` | pass | 无输出 |
+| spec-code-review schema JSON | `node -e "JSON.parse(require('fs').readFileSync('skills/spec-code-review/references/findings-schema.json','utf8')); console.log('json ok')"` | pass | 输出 `json ok` |
+| spec-code-review focused contract | `npx jest tests/unit/spec-code-review-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
+
+### 增量验证（2026-07-10 15:03:14 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-work active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|/ce-\|ce-work\|ce-code-review\|ce-plan\|ce-lfg\|ce-simplify-code\|ce-commit" skills/spec-work` | pass | 无输出 |
+| spec-work file set | `find skills/spec-work -type f \| sort` 和 `find /Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-work -type f \| sort` | pass | 文件集合一致；均为 `SKILL.md` + 6 个 reference 文件 |
+| spec-work line count | `wc -l skills/spec-work/SKILL.md skills/spec-work/references/*.md skills/spec-work/references/agents/*.md` | advisory | `SKILL.md` 432 行，skill 总计 1091 行 |
+| spec-work focused contract | `npx jest tests/unit/spec-work-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
+| 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
+| Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
+
+### 增量验证（2026-07-10 15:07:21 CST）
+
+| 检查 | 命令 | 结果 | 备注 |
+|---|---|---|---|
+| spec-ideate active CE residual scan | `rg -n "\bce-\|compound-engineering\|\.compound-engineering\|ce-unified-plan\|/tmp/compound-engineering\|/ce-\|ce-ideate\|ce-brainstorm\|ce-plan\|ce-proof\|ce-work\|ce-explain\|ce-code-review\|CLAUDE_SKILL_DIR\|/spec:\|\$spec-\|task-pack\|dispatch_authorization_missing\|Workflow Contract Summary\|review-finding.v1\|Gemini\|Antigravity\|\bPi\b\|agy\|ask_question\|ask_user" skills/spec-ideate` | pass | 无输出 |
+| spec-ideate ignored artifact check | `git status --ignored --short -- skills/spec-ideate/scripts/__pycache__/repo-profile-cache.cpython-312.pyc && git ls-files skills/spec-ideate/scripts/__pycache__/repo-profile-cache.cpython-312.pyc` | issues_found | 输出 `!! skills/spec-ideate/scripts/__pycache__/`，`git ls-files` 无输出；已记录为 low finding |
+| spec-ideate repo-profile Python syntax | `PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/private/tmp/spec-first-pycache python3 -m py_compile skills/spec-ideate/scripts/repo-profile-cache.py` | pass | 无输出 |
+| spec-ideate focused contract | `npx jest tests/unit/spec-ideate-contracts.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 先失败于 `<rootDir>/tests/jest-setup.js` 不存在，未执行到该 suite |
 | 报告 / Changelog whitespace | `git diff --check -- CHANGELOG.md docs/validation/2026-07-09-ce-to-spec-first-skill-code-review-report.md` | pass | 无输出 |
 | Changelog 格式 | `npx jest tests/unit/changelog-format.test.js --runInBand` | degraded | 当前 HEAD `98e50159` 已删除 `tests/` 目录，Jest 配置仍引用 `<rootDir>/tests/jest-setup.js`，命令失败在 setupFiles 缺失 |
 

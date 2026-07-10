@@ -24,7 +24,7 @@ industry: securities
 
 - 本目录是 **human-facing 标准模板库**，给产品 owner、研发、测试、评审者直接使用。
 - `skills/spec-prd/references/prd-output-template.md` 是 `spec-prd` 的 **runtime authoring contract**，其中包含 core section、surface lens、project-local overlay 叠加机制和 embedded runtime skeleton，不依赖本 `docs/` 路径。
-- **分层 drift 范围**：通用骨架（core section + surface lens + overlay 叠加机制）由 `prd-output-template.md` 内置、随 workflow assets 分发，drift test 只锁定 embedded runtime skeleton 与本目录通用部分一致；证券行业 C1-C19 checklist 是本仓库项目本地 overlay 示例，不随通用 runtime 默认分发，也不是合规/法务事实源。下游项目可提供自己的本地 overlay。
+- **分层 drift 范围**：通用骨架（core section + surface lens + overlay 叠加机制）由 `prd-output-template.md` 内置、随 workflow assets 分发，drift test 只锁定 embedded runtime skeleton 与本目录通用部分一致；证券行业 C1-C20 checklist 是本仓库项目本地 overlay 示例，不随通用 runtime 默认分发，也不是合规/法务事实源。下游项目可提供自己的本地 overlay。
 - 本目录新增或调整通用 core section、surface lens 后，应同步评估并更新 `skills/spec-prd/references/prd-output-template.md`；新增或调整证券 checklist 时，只需评估项目本地 overlay 与 docs mirror，不要求 runtime 内置。
 - 本目录里的 checklist 是澄清展示与评审提示，不是 checker 语义校验源。脚本只检查确定性结构与 machine-owned safety section；普通 core-section 缺口最多给 `template_structure_hint`，内容质量由 `$spec-prd` readiness / `$spec-doc-review` 语义判断。
 
@@ -50,6 +50,7 @@ industry: securities
 | `40-H5-PC端需求模板.md` | H5/PC 浏览器端增量需求 | H5/PC lens（路由/表单/响应式/浏览器行为/登录态/分享/SEO） |
 | `50-CLI-DevTool需求模板.md` | CLI、开发者工具、agent-facing workflow 需求 | CLI/DevTool lens（命令/参数/preview-first/输出契约/失败恢复/双宿主） |
 | `60-Mixed跨端需求模板.md` | 多端/跨系统/producer-consumer 需求 | Mixed lens（source-of-truth/跨端一致性/异步同步/降级/E2E 验收） |
+| `70-大需求总索引模板.md` | 大需求拆成多篇子文档时的**总索引**（只放导航与边界，不承载规则） | index（子文档清单/跨文档依赖/术语指针/整体验收与会签汇总） |
 | `90-证券行业需求关注点与参考附录.md` | 共享行业清单、枚举、术语、监管参考 | securities reference lens |
 
 选模板步骤：
@@ -109,7 +110,7 @@ PRD 里每条 current-state claim 应带 evidence tag（`confirmed-source` / `us
 4. 按用户角色拆：客户侧 / 运营端 / 风控端 / 合规端 / 主管端分开。
 5. 通用能力单独写：备注 / 附件 / 操作日志 / 权限 / 导出 / 风险揭示 / 双录不要散落。
 
-建议单篇 ≤ 800 行 / ≤ 20K tokens。超出继续拆子文档。多个文档属同一大需求时，建总索引文档（只放导航和边界，不承载具体规则）。跨文档引用写明文档名 + 章节名，不写「见上文」。
+建议单篇 ≤ 800 行 / ≤ 20K tokens。超出继续拆子文档。多个文档属同一大需求时，建总索引文档（只放导航和边界，不承载具体规则）——用 `70-大需求总索引模板.md`。跨文档引用写明文档名 + 章节名，不写「见上文」。
 
 ## 七、需求质量反模式清单（写之前自检）
 
@@ -135,7 +136,7 @@ PRD 里每条 current-state claim 应带 evidence tag（`confirmed-source` / `us
 **完整性**
 - [ ] 每条 core 需求都有优先级、验收样例、证据 tag
 - [ ] Change Delta 分清 keep/extend/replace/remove/unknown，历史逻辑写了差异不是"沿用一致"
-- [ ] 命中的行业关注点(C1-C19)都标了"适用/不涉及"，无留空
+- [ ] 命中的行业关注点(C1-C20)都标了"适用/不涉及"，无留空
 - [ ] 触及资金/交易/权限/数据/审计时，边界与合规点已显式标注或入 Outstanding Questions
 
 **质量**
