@@ -90,6 +90,6 @@ PRD 可以定义字段的产品含义和必需信息，但不定义具体字段�
 - 批处理重复运行、失败清单和补偿结果。
 - 产品级幂等和可观察最终状态。
 
-## Backend Outstanding Questions
+## Backend 待闭合问题候选
 
-会改变产品状态、错误结果、compatibility、source-of-truth、默认行为或 consumer 可见契约的问题仍属于 PRD；缓存、数据库、消息系统和代码拆分进入 `spec-plan`。
+这里只提示候选缺口，不生成第二套 OQ schema。会改变产品状态、错误结果、compatibility、source-of-truth、默认行为或 consumer 可见契约的问题移入 output contract 的 canonical `Outstanding Questions`；缓存、数据库、消息系统和代码拆分进入 `spec-plan`。

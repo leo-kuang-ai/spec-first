@@ -307,13 +307,13 @@ Then <系统拒绝并提示，且不产生未声明的状态、数据或审计�
 | 风控 | | | | | | |
 | 法务（如涉及） | | | | | | |
 
-## Outstanding Questions [conditional]
+## 待闭合问题候选 [conditional]
 
-> 只记当前无法决定、必须确认的问题。确认后回填正文对应章节；所有人类问题只询问当前执行对话的用户。
+> 这是 authoring prompt，不是 machine schema。先查 source，只把仍会改变 WHAT、验收或范围的缺口移入 `references/prd-output-template.md` 唯一 canonical `Outstanding Questions` section；所有人类问题只询问当前执行对话的用户。
 
-| 编号 | 问题 | 推荐答案 / 候选方案 | 决定路径 | 状态 |
-| --- | --- | --- | --- | --- |
-| OQ-01 | | | source / 当前执行对话用户 | 待确认 |
+| 候选缺口 | 先查 source | PRD write target | 推荐答案 / 待确认原因 |
+| --- | --- | --- | --- |
+| | | | |
 
 ---
 

@@ -68,7 +68,7 @@ Every PRD artifact includes the standard core sections unless it is a route-out/
 
 Compact PRDs may omit non-load-bearing conditional detail, but they still need enough evidence, acceptance, and scope boundary for planning. Bypass output writes no PRD artifact.
 
-Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Ordinary core-section gaps produce advisory `template_structure_hint` findings; final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must still be locatable or the checker blocks with `machine_section_identity_missing`.
+Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Draft/checkpoint core-section gaps remain advisory `template_structure_hint` findings. A final/ready claim fails closed with `core_section_missing`, `requirements_row_missing`, `acceptance_example_row_missing`, or `requirement_acceptance_trace_missing` when a core section is absent, Requirements/Acceptance Examples have no valid row, or an R item has no AE trace. Final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must also be locatable or the checker blocks with `machine_section_identity_missing`.
 
 ## Clarification Checklist Display Protocol
 
@@ -255,7 +255,7 @@ design_sources_unread:
 design_source_coverage: read | unread | partial | degraded | not-applicable
 design_degraded_owner_acceptance_ref: <Owner Decision Trace row, checkable owner ref, or none>
 
-Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`.
+Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. For create/refine, `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`. Validate only reports the recommended checkpoint/refine write target and never mutates these fields.
 
 ## Readiness Self-Check
 
@@ -280,7 +280,7 @@ why_not:
 
 `decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). `decision_card_next_action` 必须与其完全一致；两个有效声明互相冲突时，checker 报告 `decision_card_path_mismatch`。The three `decision_card_*` fields are required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` 在仍处于 grill 时只豁免完整性，不豁免显式路径矛盾。
 
-The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
+`write_mode: final-prd` plus `can_enter_spec_plan: yes` is LLM-owned final intent, not a receipt. Persist that pair only after semantic closure while frontmatter remains `status: draft`. The `status: ready-for-planning` and `readiness_verified_*` fields are producer-local machine receipt fields: never fill or invent them manually; `skills/spec-prd/scripts/finalize-prd-artifact.js` writes them atomically after `check-prd-artifact.js` reports no producer blocking reasons。缺少或 stale receipt 时，check-only 必须阻断 ready closeout claim，但不得仅因 draft 已合法持久化 final intent 就把该 intent 判为非法；write mode 可以生成第一份 receipt。If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 
 Use the selected packaged template asset and project-local overlay to add only the conditional sections the increment needs.
 
@@ -300,7 +300,7 @@ Resolve every source-answerable gap first (relentless, one question at a time ag
 
 ## PRD Quality Diagnosis And Optimization
 
-For refine or validate mode, diagnose before rewriting and keep the diagnosis concise:
+For validate mode, diagnose and return a report-only result:
 
 ```text
 quality_diagnosis: ready | minor-gaps | material-gaps | blockers
@@ -311,14 +311,16 @@ rewrite_strategy:
 
 Give optimization suggestions as `original -> recommendation -> reason -> write target`. Prioritize suggestions that reduce planning invention: missing current-state evidence, unclear delta, untestable wording, missing priority, missing acceptance, industry/compliance uncertainty, source/user contradiction, or scope creep.
 
-Then produce the final rewritten PRD using the packaged generic template, the selected surface asset, and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
+Run checker/finalizer only with `--check-only` or receipt verification. Report current bytes/receipt/readiness facts and semantic gaps; do not write a replacement artifact, a standalone report file, a receipt, screenshots, provider JSON, or runtime assets. If the user asks to validate and fix, show the proposed patch first and re-enter as `refine` only after explicit confirmation.
+
+For refine mode, diagnose before rewriting with the same compact block and suggestions. Then produce the final rewritten PRD using the packaged generic template, the selected surface asset, and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
 
 `not-run` is a run-local decision-card state only; do not emit it in the diagnosis block because an emitted refine/validate diagnosis has run by definition. Do not create numeric PRD scorecards, 0-100 quality ratings, or industry hard-threshold rubrics.
 
 Use two different diagnosis moments:
 
 - `Preliminary Diagnosis` happens after sanitization and source/current-state evidence. It decides input scale, system anchor, how to run Pre-PRD Clarification, whether large-input Map-Reduce is needed, which P0/P1 packs are triggered, and whether to route out.
-- `Final Readiness Diagnosis` happens after rewrite and closure. It decides whether unresolved gaps still force planning to invent WHAT. Preliminary labels such as `ready`, `minor-gaps`, `material-gaps`, or `blockers` are not final `ready-for-planning`.
+- `Final Readiness Diagnosis` happens after refine rewrite and closure, or after validate completes its read-only source/check-only pass. It decides whether unresolved gaps still force planning to invent WHAT. Preliminary labels such as `ready`, `minor-gaps`, `material-gaps`, or `blockers` are not final `ready-for-planning`.
 
 If Pre-PRD Clarification ran, feed its results into final PRD rewrite through section-level write targets. Do not leave a detached critique, interview transcript, chunk summary, Map row, Reduce output, or standalone grill report as the durable output.
 
@@ -545,7 +547,7 @@ Every PRD handoff should report:
 - producer receipt status
 - readiness_outcome
 
-When a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js` before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
+For create/refine when a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. Validate uses only `--check-only` or receipt verification and reports the current state without writing. The finalize/checker path seeds deterministic counts and trace facts before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
 
 The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, feature-to-R/AE trace gaps, finding count, blocking reason_codes, and producer receipt status. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, `readiness_outcome`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
 

@@ -42,6 +42,7 @@ logs/
 .spec-first/cache/
 .spec-first/tools/
 .spec-first/tmp-review/
+.spec-first/evals/
 
 # Published/package artifacts
 *.tgz

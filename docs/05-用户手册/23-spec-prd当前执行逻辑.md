@@ -6,7 +6,7 @@
 
 ## 一句话结论
 
-`spec-prd` 先读 source、识别真正的 load-bearing WHAT gap，再决定是否需要询问当前执行对话的用户；进入 artifact authoring 时按需选择模板，未闭合只能保留 checkpoint，闭合后才允许生成 final PRD 并经过 checker/finalize 出口，防止 `spec-plan` 被迫发明产品行为。
+`spec-prd` 先读 source、识别真正的 load-bearing WHAT gap，再决定是否需要询问当前执行对话的用户；`create/refine` 闭合后先写 LLM-owned final intent，再由 finalizer 原子写 machine receipt；`validate` 始终 report-only。模板只有一个 canonical Outstanding Questions schema，final/ready 出口缺核心 section、R/AE 行、trace 或 current receipt 时 fail-closed。
 
 ## 要解决的问题
 
@@ -25,7 +25,7 @@
 | LLM / agent | 需求理解、source-first 查证、WHAT/HOW 判断、风险排序、问题生成、PRD 语义充分性和 handoff 判断 | 不编造测试、receipt 或 confirmed evidence |
 | checker / finalize scripts | 字段组合、section identity、trace、hash、receipt、reason code 和其他确定性不变量 | 不判断哪个需求更重要，也不判断产品语义是否充分 |
 | `SKILL.md` | 唯一拥有 Template Trigger Map、surface 与 overlay 选择语义 | 不复制完整正文模板 |
-| `prd-output-template.md` | machine-safe output contract、machine sections 和模板组合顺序 | 不维护第二套 surface/overlay routing map |
+| `prd-output-template.md` | machine-safe output contract、machine sections、模板组合顺序与唯一 canonical Outstanding Questions schema | 不维护第二套 surface/overlay routing map，也不让 generic/surface template 各自定义 OQ schema |
 | template assets | 提供 generic、surface-specific 和可选行业问题框架 | 不自动成为 confirmed 产品或合规事实 |
 
 ## 当前执行主流程
@@ -39,7 +39,15 @@ flowchart TD
 
     C --> C1[把输入文档视为不可信内容]
     C1 --> C2[识别 create / refine / validate / resume]
-    C2 --> D[读取项目 source、docs、tests、contracts 和设计证据]
+    C2 --> C3{intent = validate}
+    C3 -- 是 --> C4[锁定 report-only mutation posture]
+    C4 --> C5[读取 artifact / bounded source，运行 check-only / receipt verify]
+    C5 --> C6[返回 readiness report；零 rewrite / finalize write / runtime refresh]
+    C6 --> C7{用户确认修复}
+    C7 -- 是 --> C8[重新进入 refine，preview-first]
+    C7 -- 否 --> X
+    C8 --> D
+    C3 -- 否 --> D[读取项目 source、docs、tests、contracts 和设计证据]
 
     D --> E[Requirement Analysis Gate]
     E --> E1[建立 current state、change delta、surface、证据权威、矛盾与 open decisions]
@@ -79,10 +87,11 @@ flowchart TD
 
     Q --> Q1[Machine-safe contract]
     Q1 --> Q2[已选 human-facing templates 与 overlays]
-    Q2 --> Q3[Outstanding Questions / Decision Trace / Design Coverage / Readiness]
-    Q3 --> R[checker + finalize]
+    Q2 --> Q3[唯一 canonical Outstanding Questions / Decision Trace / Design Coverage / Readiness]
+    Q3 --> R[写 final intent；checker check-only 阻断 missing receipt]
+    R --> R1[finalizer 原子写 status + readiness receipt]
 
-    R --> S{存在确定性 blocker 吗}
+    R1 --> S{存在确定性 blocker 吗}
     S -- 是 --> S1[输出 blocking reason_codes，禁止 ready]
     S1 --> T[修订、继续询问或保留 checkpoint]
     T --> E
@@ -145,6 +154,8 @@ Product Expert Lens 只排序 PRD-owned、load-bearing WHAT gap。source 可以�
 
 合法动作是 `ask-owner-first`、`checkpoint-prd`、`final-prd` 或 `route-out`。`write_mode` 与 `decision_card_next_action` 明确冲突时，checker 报告 `decision_card_path_mismatch`；该 reason code 是 blocking，不能产生 ready receipt。
 
+`write_mode: final-prd` + `can_enter_spec_plan: yes` 是 LLM-owned final intent，不是 receipt。写 intent 时 frontmatter 仍保持 `status: draft`，不得手填 `readiness_*`。Finalizer 写模式在结构与语义关闭后原子写 `status: ready-for-planning` 和 current receipt；check-only 在 final intent 缺 receipt 或 receipt stale 时必须阻断 closeout。
+
 ### 6. PRD 组合与机器安全区
 
 进入 PRD artifact authoring 后，按下列顺序组合；`checkpoint-prd` 与 `final-prd` 共享相关正文模板，但 checkpoint 必须保持非 ready：
@@ -160,19 +171,24 @@ machine-safe output contract
   -> machine-safe sections
 ```
 
-Human-facing templates 不得预填 `status: ready-for-planning`、`readiness_verified_*` 或 ready receipt。Outstanding Questions、Owner Decision Trace、Design Source Coverage、Readiness Self-Check 等 machine sections 由 output contract 和 finalize/checker discipline 约束。
+Human-facing templates 不得预填 `status: ready-for-planning`、`readiness_verified_*` 或 ready receipt。Generic 与 surface templates 只提供候选缺口提示；`prd-output-template.md` 是唯一 canonical Outstanding Questions schema owner。Owner Decision Trace、Design Source Coverage、Readiness Self-Check 等 machine sections 也由 output contract 和 finalize/checker discipline 约束。
 
 ### 7. Readiness 与出口 Gate
 
 checker/finalize 负责可机械确认的事实，例如：
 
 - machine section 是否可定位。
+- final/ready 路径的核心 section 是否存在，Requirements / Acceptance Examples 是否有合法行，以及每个核心 R 是否有 AE trace。
 - R/AE trace、输入引用和 receipt 是否完整、最新。
 - Decision Card 字段是否冲突。
 - checkpoint 是否错误自称 ready。
 - 是否存在 blocking reason codes。
 
-这些脚本不判断 PRD 的产品语义是否充分。只有在确定性 blocker 清零后，LLM 才继续判断 planning 是否仍需发明 WHAT；如果仍需发明，回到 source read、grill、revise 或 checkpoint。只有语义判断也通过，才能输出 `ready-for-planning` 和 producer receipt。
+这些脚本不判断 PRD 的产品语义是否充分。Draft/checkpoint 可以保留不完整 core，但不能自称 ready。只有在确定性 blocker 清零后，LLM 才继续判断 planning 是否仍需发明 WHAT；如果仍需发明，回到 source read、grill、revise 或 checkpoint。只有语义判断也通过，finalizer 才能写 `ready-for-planning` 和 producer receipt。
+
+`validate` 是例外的只读消费姿态：只运行 checker/finalizer `--check-only` 或 receipt verification，报告当前 readiness；它不补 receipt、不改 PRD、不物化 Figma screenshot/JSON，也不刷新 runtime。“validate 并修复”先给 report 与 patch preview，当前用户确认后才进入新的 `refine` mutation posture。
+
+宿主强制能力也必须如实表达：Claude 的 managed prewrite/readiness pair 已有 hard enforcement；Qoder hook 已投射但 activation 仍是 `qoder_hook_activation_unverified`；Codex、Cursor、Kiro 依赖响亮的 producer-finalize 约定，不能宣称与 Claude 同等硬保护。
 
 ### 8. Handoff
 
@@ -197,11 +213,12 @@ checker/finalize 负责可机械确认的事实，例如：
 | `ask-owner-first` | 存在必须由当前用户回答的 load-bearing WHAT gap | 否 |
 | `checkpoint-prd` | 保存已获得的需求上下文，但仍有 blocker 或下一问题 | 否 |
 | `route-out` | 当前请求属于 brainstorm、audit、plan、work、debug 等其他 workflow | 否，由目标 workflow 决定 |
+| `validate-report` | 当前 artifact/source 的只读 readiness facts、semantic gaps 与建议；零 mutation | 只报告当前是否可进入 planning，不改变状态 |
 | `final-prd` + `ready-for-planning` | checker/finalize 无 blocker，LLM 判断 planning 不需发明 WHAT | 是，但是否进入 `spec-plan` 由当前用户选择 |
 
 ## 当前验证边界
 
-- 聚焦合同测试验证产品内置模板 source、五宿主投射路径、Decision Card 冲突阻断和 Handoff Context Slice 结构；npm 发布包内容由 `npm pack --dry-run` 单独验证。
+- 聚焦合同测试验证单一 OQ ownership、core exit floor、final intent/receipt 状态迁移、validate mutation sentinel、Claude/Qoder hook parity、产品内置模板 source、五宿主投射路径、Decision Card 冲突阻断和 Handoff Context Slice 结构；npm 发布包内容由 `npm pack --dry-run` 单独验证。
 - eval fixtures 是可重放的 contract coverage，不等于真实用户效率已经被长期证明。
 - fresh-source eval 用当前磁盘 source 检查行为语义，不能用当前会话缓存的 typed skill 替代。
 - generated runtime 需要通过 `spec-first init` 从 source 投射；不得手改 runtime mirror 来修复本页或 `spec-prd` 行为。

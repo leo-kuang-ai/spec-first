@@ -38,3 +38,11 @@ Treat examples-as-context fixtures and focused contract tests as readiness evide
 Do not add a per-skill `manifest.json` unless spec-first adopts that as a source truth; lifecycle delivery currently lives in the dual-host governance contract. Do not create a new global governance index — co-located source-only governance notes like this file are the settled convention.
 
 A yao-style automated output-eval scorecard (10-20 live brownfield runs, with-skill vs baseline, model-executed, blind A/B review) is a settled out-of-scope decision, not an outstanding deliverable. Adversarial review of the yao-gate findings judged it over-engineering for this repo: no skill carries an `evals/output/` tree, hand-authored baselines would not be the provider-backed model evidence yao requires, and automated scoring of subjective PRD prose contradicts the role contract's "scripts enforce deterministic invariants; scripts prepare facts; LLM decides semantic adequacy above that floor" and "可信证据 > 自动化便利". Output quality here is verified by dispatched fresh-source eval + deterministic scripts + focused contract tests; that substitution is the recorded rationale in Eval Status above, which closes the only legitimate residue of that finding.
+
+## Contract Reset Gate A Boundary
+
+`contract-reset-protocol.md` 与 `contract-reset-cases.json` 是 U6 的 source-owned frozen protocol。三臂真实 outcome 只有在 hard-isolated fresh sessions、balanced order、deterministic blind/evidence producer、原 run sanitized retained evidence、independent replay、blind reviewer 与 owner materiality 裁决同时成立时，才能高于 L2 fixture/contract evidence。
+
+`run-evals.js --run-dir` 的 `status: passed` 只表示 run directory 的确定性合同可解析；`gate_a_status: inconclusive`、`invalid` 或 `awaiting-semantic-review` 保留各自含义。脚本永远不把结构通过升级为 Gate A semantic pass。
+
+Gate A 当前 attempt 的 source manifest、patch、isolation facts、custody status 与裁决报告保存在 `docs/validation/spec-prd/`。若 hard isolation 或 independent custody 不可用，合法结果是保留 Phase 1、停止 U7-U13，而不是把共享 workspace subagent 或 prompt 约定包装成 outcome evidence。

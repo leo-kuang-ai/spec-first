@@ -105,6 +105,10 @@ When the run cannot fetch remote design context because it is headless, report-o
 - if unread design-source inventory items affect page structure, state, interaction, acceptance, or scope, do not mark the PRD `ready-for-planning`
 - owner-accepted degradation is the only ready-for-planning release valve; record the owner decision and keep unread design residue visible
 
+## Validate report-only boundary
+
+When `intent=validate`, design evidence remains read-only. An already available, authorized provider may return scoped facts in memory, but do not persist or materialize screenshots, exports, or provider JSON, and do not create a local design artifact. When the provider or permission is unavailable, record the remote URL as a sanitized ref with degraded/unread consequence; do not fetch around the missing capability. Carry affected PRD write targets and readiness consequences into the validation report only. A later repair or design capture is a separately confirmed `refine` run.
+
 ## Route-Out Boundary
 
 `spec-prd` extracts PRD facts from design sources. It does not audit implementation consistency across PRD, Figma, and source. When the user asks for consistency, drift, visual implementation accuracy, or app-vs-design verification, route to `spec-app-consistency-audit`.

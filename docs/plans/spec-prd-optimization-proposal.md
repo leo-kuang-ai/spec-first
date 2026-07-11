@@ -1,9 +1,11 @@
 # spec-prd Skill 重构优化方案
 
-**状态：** implementation-ready；M1 已确认，U1-U4 验证优先、按失败样本激活
+**状态：** superseded（历史实施证据；不再作为当前 implementation contract）
 **目标 surface：** `skills/spec-prd/` source（含 npm 内置 PRD 模板资产）、按激活单元新增的最小定向测试、五宿主 runtime projection
 **历史分析：** 重构前的完整候选机制与五视角审查轨迹保留在 Git 历史 `5b8d8637^..5b8d8637`，不再作为当前实施合同
-**当前权威：** 本文档全篇；实施时仍以当前 `skills/spec-prd/**`、脚本与测试事实为最终依据
+**当前权威：** `docs/plans/2026-07-11-002-refactor-spec-prd-product-decision-synthesis-plan.md`；当前 source 与测试事实仍优先于历史描述
+
+> Supersession note（2026-07-11）：当前重构由上述 unified plan 接管。本文保留 M1 模板资产迁移、U1 Decision Card consistency 与 U4 Handoff Context Slice 的已完成历史，以及当时的 subtraction-first 取舍；未完成或待激活内容不得再被当作当前 runtime contract、rollout authority 或 Gate A outcome evidence。
 
 ## 一、结论
 

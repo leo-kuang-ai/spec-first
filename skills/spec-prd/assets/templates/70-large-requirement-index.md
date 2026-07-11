@@ -49,11 +49,13 @@
 
 整体验收只覆盖跨 child 结果；单模块验收留在对应子 PRD。
 
-## 大需求级 Outstanding Questions
+## 大需求级待闭合问题候选
 
-| OQ | 问题 | 影响 child | 推荐答案 | 决定路径 | blocks planning? |
-| --- | --- | --- | --- | --- | --- |
-| OQ-X01 | | | | source / 当前执行对话用户 | yes / no |
+> 这里只提示跨 child 候选缺口，不生成第二套 OQ schema；真正未闭合的问题统一移入 output contract 的 canonical `Outstanding Questions`。
+
+| 候选缺口 | 影响 child | 先查 source | 推荐答案 / 待确认原因 |
+| --- | --- | --- | --- |
+| | | | |
 
 ## Handoff
 

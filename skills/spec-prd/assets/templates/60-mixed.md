@@ -58,6 +58,6 @@
 - source-of-truth 冲突和负向验收。
 - 回退后不发生双写、错误覆盖或用户不可解释状态。
 
-## Mixed Outstanding Questions
+## Mixed 待闭合问题候选
 
-会改变 source-of-truth、surface 覆盖、允许差异、同步时效、fallback 或 E2E 验收的问题仍属于 PRD；协议、消息系统、数据库和部署编排进入 `spec-plan`。
+这里只提示候选缺口，不生成第二套 OQ schema。会改变 source-of-truth、surface 覆盖、允许差异、同步时效、fallback 或 E2E 验收的问题移入 output contract 的 canonical `Outstanding Questions`；协议、消息系统、数据库和部署编排进入 `spec-plan`。

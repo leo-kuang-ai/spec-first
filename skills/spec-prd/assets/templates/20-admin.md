@@ -89,6 +89,6 @@ PRD 只定义能力和数据范围，不写权限码、接口字段或鉴权实�
 - 批量操作部分成功与重试。
 - 导出脱敏、有效期、失败通知和审计。
 
-## Admin Outstanding Questions
+## Admin 待闭合问题候选
 
-只保留会改变角色、数据范围、状态、审核、导出、审计或验收的问题；实现层权限码、组件和接口设计进入 `spec-plan`。
+这里只提示候选缺口，不生成第二套 OQ schema。只把会改变角色、数据范围、状态、审核、导出、审计或验收的问题移入 output contract 的 canonical `Outstanding Questions`；实现层权限码、组件和接口设计进入 `spec-plan`。

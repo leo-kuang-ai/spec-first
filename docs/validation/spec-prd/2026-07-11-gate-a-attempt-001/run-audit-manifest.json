@@ -1,0 +1,25 @@
+{
+  "schema_version": "contract-reset-run-audit/v1",
+  "producer": "prepare-contract-reset-evidence.js",
+  "source_run_id": "2026-07-11-gate-a-attempt-001",
+  "deterministic_validation": {
+    "status": "passed",
+    "gate_a_status": "inconclusive",
+    "reason_codes": [
+      "holdout_commitment_unavailable",
+      "isolation_probe_execution_failed",
+      "model_outcomes_missing"
+    ]
+  },
+  "retained_files": {
+    "source-manifest.json": "sha256:7cc9df212e9a479ae8e871965b67fd95c065f8c2d08eaa253fce7a8126260e8d",
+    "control.patch": "sha256:61b37003b3caf3cc4b01878618ca3a0d4bd78cd79af305cb3407035890a947d7",
+    "candidate.patch": "sha256:722f07312513b88877115c42f26e388b721ae8a5b1fedd7617aeec846afcb89d",
+    "promotion-holdout-commitment.json": "sha256:620f48336883b27ed753b55f38f0a2e88879f5f7e9f53e597e990cad97819038",
+    "run-facts.json": "sha256:c3ef82416d5e51b35dcf10c899a5bd5fc8eadf69cf5986d9bc0ba61a00a5a8fd"
+  },
+  "limitations": [
+    "No semantic Gate A outcome is inferred from this deterministic export.",
+    "Absent model outputs remain absent rather than being replaced by replay or aggregate scores."
+  ]
+}

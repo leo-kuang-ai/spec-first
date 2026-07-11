@@ -78,6 +78,6 @@ Source-first：修 source/generator，再运行正式 init；不手改 generated
 - 中途失败无静默残留，恢复路径明确。
 - 五宿主 source/runtime projection 按实际支持范围验证。
 
-## CLI/DevTool Outstanding Questions
+## CLI/DevTool 待闭合问题候选
 
-会改变公开入口、默认行为、副作用、输出 contract、兼容或恢复的决定属于 PRD；模块拆分、依赖库和内部函数进入 `spec-plan`。
+这里只提示候选缺口，不生成第二套 OQ schema。会改变公开入口、默认行为、副作用、输出 contract、兼容或恢复的决定移入 output contract 的 canonical `Outstanding Questions`；模块拆分、依赖库和内部函数进入 `spec-plan`。

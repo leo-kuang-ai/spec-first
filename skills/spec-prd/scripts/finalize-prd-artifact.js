@@ -154,6 +154,23 @@ function upsertFrontmatterFields(text, fields) {
   ].join('\n');
 }
 
+function writeFileAtomic(targetPath, content) {
+  const crypto = require('node:crypto');
+  const directory = path.dirname(targetPath);
+  const basename = path.basename(targetPath);
+  const tempPath = path.join(
+    directory,
+    `.${basename}.${process.pid}.${crypto.randomBytes(6).toString('hex')}.tmp`,
+  );
+  const mode = fs.statSync(targetPath).mode;
+  try {
+    fs.writeFileSync(tempPath, content, { encoding: 'utf8', mode });
+    fs.renameSync(tempPath, targetPath);
+  } finally {
+    fs.rmSync(tempPath, { force: true });
+  }
+}
+
 function buildFinalizeReceipt(target, text, inputs, options = {}) {
   const initialReport = buildReport(target, text, {
     inputs,
@@ -162,17 +179,19 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
   });
   const facts = initialReport.facts;
   const readyStatusClaimPresent = frontmatterHasReadyStatus(text);
+  const readyIntentPresent = facts.write_mode === 'final-prd' && facts.can_enter_spec_plan === 'yes';
   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     !isReceiptOnly(reasonCode)
   ));
   // ready_receipt_absent 在写入模式不阻断 finalize(写入即补 receipt),但 check-only 预览时保留阻断
-  // (声称 ready 却没 receipt 是矛盾态,预览应警告)。这避免循环依赖:模型写 status: ready-for-planning
-  // 后跑 finalize 写入,旧逻辑因 ready_receipt_absent 进 blockingReasons → can_finalize=false → 永远写不了 receipt。
+  // (frontmatter ready 或 LLM-owned final intent 缺 receipt 都是不可 closeout 的中间态)。这避免循环依赖:
+  // LLM 先写 final intent,finalize 写模式再原子补 machine receipt。
   const receiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     reasonCode === 'ready_receipt_stale'
-    || (options.checkOnly === true && readyStatusClaimPresent && reasonCode === 'ready_receipt_absent')
+    || (options.checkOnly === true
+      && (readyStatusClaimPresent || readyIntentPresent)
+      && reasonCode === 'ready_receipt_absent')
   ));
-  const readyIntentPresent = facts.write_mode === 'final-prd' && facts.can_enter_spec_plan === 'yes';
   const missingReadyIntentReasons = readyIntentPresent ? [] : ['finalize_required'];
   const missingDesignInputScanReasons = readyIntentPresent
     && facts.design_source_refs_present === true
@@ -288,7 +307,7 @@ function finalizePrd(target, inputs, options = {}) {
     readiness_inputs_hash: receipt.checker.inputs_hash,
   });
 
-  fs.writeFileSync(targetPath, nextText.endsWith('\n') ? nextText : `${nextText}\n`, 'utf8');
+  writeFileAtomic(targetPath, nextText.endsWith('\n') ? nextText : `${nextText}\n`);
   return {
     ...receipt,
     status: 'finalized',

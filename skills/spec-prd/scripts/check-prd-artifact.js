@@ -582,6 +582,72 @@ function isEmptyish(value) {
     || /^<.*>$/.test(v);
 }
 
+function validRequirementIds(sectionText) {
+  const ids = new Set();
+  tableRows(sectionText).forEach((cells) => {
+    const id = String(cells[0] || '').trim().toUpperCase();
+    if (!/^R-\d{2,}$/.test(id)) return;
+    const hasSubstantiveCell = cells.slice(1).some((cell) => (
+      !isEmptyish(cell) && !/^P[0-3]$/i.test(cell)
+    ));
+    if (hasSubstantiveCell) ids.add(id);
+  });
+  return [...ids].sort();
+}
+
+function validAcceptanceExamples(sectionText) {
+  const ids = new Set();
+  const requirementIds = new Set();
+  tableRows(sectionText).forEach((cells) => {
+    const id = String(cells[0] || '').trim().toUpperCase();
+    const rowText = cells.slice(1).join(' ');
+    if (/^AE-\d{2,}$/.test(id) && /\bR-\d{2,}\b/i.test(rowText)) {
+      const substantive = rowText
+        .replace(/\b(?:AE|R)-\d{2,}\b/gi, '')
+        .replace(/\bP[0-3]\b/gi, '')
+        .trim();
+      if (!isEmptyish(substantive)) {
+        ids.add(id);
+        uniqueMatches(rowText, /\b(R-\d{2,})\b/gi).forEach((requirementId) => {
+          requirementIds.add(requirementId.toUpperCase());
+        });
+      }
+    }
+  });
+
+  const lines = splitLines(sectionText);
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = lines[index].match(/\b(AE-\d{2,})\b/i);
+    if (!match) continue;
+    let end = lines.length;
+    for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+      if (/\bAE-\d{2,}\b/i.test(lines[cursor])) {
+        end = cursor;
+        break;
+      }
+    }
+    const blockLines = lines.slice(index, end);
+    const block = blockLines.join('\n');
+    const givenIndex = blockLines.findIndex((line) => /^\s*Given\b/i.test(line));
+    const traceDeclaration = givenIndex === -1
+      ? ''
+      : blockLines.slice(0, givenIndex).join('\n');
+    if (/\bR-\d{2,}\b/i.test(traceDeclaration)
+      && /(?:^|\n)\s*Given\b/i.test(block)
+      && /(?:^|\n)\s*When\b/i.test(block)
+      && /(?:^|\n)\s*Then\b/i.test(block)) {
+      ids.add(match[1].toUpperCase());
+      uniqueMatches(traceDeclaration, /\b(R-\d{2,})\b/gi).forEach((requirementId) => {
+        requirementIds.add(requirementId.toUpperCase());
+      });
+    }
+  }
+  return {
+    ids: [...ids].sort(),
+    requirementIds: [...requirementIds].sort(),
+  };
+}
+
 // 一条 Owner Decision Trace 行是否有效:chosen_answer + write target + consequence 三非空。
 function isValidTraceRow(row) {
   return !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence);
@@ -1045,13 +1111,24 @@ function parseStructure(target, text) {
   const missingCoreSections = CORE_SECTIONS.filter((section) => (
     !sectionRange(lines, headings, section)
   ));
+  const requirementsSection = sectionRange(lines, headings, 'Requirements');
   const requirementIds = uniqueMatches(text, /\b(R-\d{2,})\b/g);
+  const validRequirementRowIds = requirementsSection
+    ? validRequirementIds(requirementsSection.text)
+    : [];
   const acceptanceIds = uniqueMatches(text, /\b(AE-\d{2,})\b/g);
   const nfrIds = uniqueMatches(text, /\b(NFR-\d{2,})\b/g);
   const acceptanceSection = sectionRange(lines, headings, 'Acceptance Examples');
-  const acceptanceText = acceptanceSection ? acceptanceSection.text : '';
+  const validAcceptanceCoverage = acceptanceSection
+    ? validAcceptanceExamples(acceptanceSection.text)
+    : { ids: [], requirementIds: [] };
+  const validAcceptanceExampleIdsInSection = validAcceptanceCoverage.ids;
+  const acceptanceRequirementIds = new Set(validAcceptanceCoverage.requirementIds);
+  const requirementsWithoutAcceptanceTrace = validRequirementRowIds.filter((id) => (
+    !acceptanceRequirementIds.has(id)
+  ));
   const uncoveredRequirements = requirementIds.filter((id) => (
-    !new RegExp(`\\b${id}\\b`).test(acceptanceText)
+    !acceptanceRequirementIds.has(id)
   ));
   const evidenceTagHits = EVIDENCE_TAGS.filter((tag) => text.includes(tag));
   const placeholderLines = lineNumbersFor(lines, /<[^>\n]+>|\bTODO\b|\bTBD\b|\bpending-tooling\b/i)
@@ -1157,7 +1234,9 @@ function parseStructure(target, text) {
     target, normalizedTarget, prdHash, lines, frontmatter, headings,
     unknownSectionIds, duplicateSectionIds, duplicateMachineSectionIds, orphanSectionIds,
     sectionIdTitleMismatches,
-    missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
+    missingCoreSections, requirementIds, validRequirementRowIds,
+    acceptanceIds, validAcceptanceExampleIdsInSection, requirementsWithoutAcceptanceTrace,
+    nfrIds, uncoveredRequirements,
     evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
     outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
     writeModeValue, writeModeValues, writeModeDeclaredValid, clarificationEvidenceValue,
@@ -1204,7 +1283,12 @@ function computeFacts(structure, inputPaths, options) {
     core_sections_present: CORE_SECTIONS.filter((s) => !structure.missingCoreSections.includes(s)),
     core_sections_missing: structure.missingCoreSections,
     requirement_ids: structure.requirementIds,
+    valid_requirement_row_ids: structure.validRequirementRowIds,
+    valid_requirement_row_count: structure.validRequirementRowIds.length,
     acceptance_ids: structure.acceptanceIds,
+    valid_acceptance_example_ids: structure.validAcceptanceExampleIdsInSection,
+    valid_acceptance_example_count: structure.validAcceptanceExampleIdsInSection.length,
+    requirements_without_acceptance_trace: structure.requirementsWithoutAcceptanceTrace,
     nfr_ids: structure.nfrIds,
     uncovered_requirements: structure.uncoveredRequirements,
     evidence_tags_present: structure.evidenceTagHits,
@@ -1284,6 +1368,24 @@ function computeFacts(structure, inputPaths, options) {
 function gateReadyClaims(facts, oqAnalysis) {
   if (!facts.ready_claim_present) return [];
   const findings = [];
+  facts.core_sections_missing.forEach((section) => {
+    findings.push({ reason_code: 'core_section_missing', section });
+  });
+  if (!facts.core_sections_missing.includes('Requirements')
+    && facts.valid_requirement_row_count === 0) {
+    findings.push({ reason_code: 'requirements_row_missing', section: 'Requirements' });
+  }
+  if (!facts.core_sections_missing.includes('Acceptance Examples')
+    && facts.valid_acceptance_example_count === 0) {
+    findings.push({ reason_code: 'acceptance_example_row_missing', section: 'Acceptance Examples' });
+  }
+  facts.requirements_without_acceptance_trace.forEach((requirement_id) => {
+    findings.push({
+      reason_code: 'requirement_acceptance_trace_missing',
+      section: 'Acceptance Examples',
+      requirement_id,
+    });
+  });
   if (facts.preflight_sweep_closure === 'blocked') {
     findings.push({ reason_code: 'preflight_sweep_closure_blocked' });
   }

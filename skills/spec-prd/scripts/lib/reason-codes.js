@@ -15,6 +15,10 @@
 const BLOCKING_REASON_CODES = new Set([
   // 基础结构 / 声明类
   'machine_section_identity_missing',
+  'core_section_missing',
+  'requirements_row_missing',
+  'acceptance_example_row_missing',
+  'requirement_acceptance_trace_missing',
   'forbidden_prds_path',
   'write_mode_undeclared',
   'clarification_evidence_undeclared',

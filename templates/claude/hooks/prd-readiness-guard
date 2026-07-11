@@ -20,7 +20,18 @@ const finalizeScript = path.join(
   'finalize-prd-artifact.js',
 );
 
-const prdPaths = changedPrdArtifacts(projectDir);
+const prdScan = changedPrdArtifacts(projectDir);
+if (prdScan.error) {
+  block([
+    '[spec-first] PRD readiness guard blocked closeout.',
+    'Could not inspect changed PRD artifacts under docs/brainstorms.',
+    `reason_codes: ${prdScan.error.reasonCode}`,
+    '',
+    'Next action: rerun from a valid git worktree or fix git status before closing out ready/final PRD work.',
+  ].join('\n'));
+}
+
+const prdPaths = prdScan.paths;
 if (prdPaths.length === 0) {
   process.exit(0);
 }
@@ -102,7 +113,14 @@ function changedPrdArtifacts(cwd) {
     timeout: 2000,
   });
   if (result.status !== 0 || typeof result.stdout !== 'string') {
-    return [];
+    return {
+      paths: [],
+      error: {
+        reasonCode: result.status === null || (result.signal && result.signal !== null)
+          ? 'git_status_timeout'
+          : 'git_status_unavailable',
+      },
+    };
   }
 
   const entries = result.stdout.split('\0').filter(Boolean);
@@ -110,17 +128,19 @@ function changedPrdArtifacts(cwd) {
   for (let i = 0; i < entries.length; i += 1) {
     const entry = entries[i];
     const status = entry.slice(0, 2);
-    let filePath = entry.slice(3);
+    const filePath = entry.slice(3);
     if (status.includes('R') || status.includes('C')) {
       i += 1;
-      filePath = entries[i] || filePath;
     }
     if (/^docs\/brainstorms\/.+-requirements\.md$/.test(filePath)
       && isReadyClaimPrdArtifact(path.join(cwd, filePath))) {
       paths.push(filePath);
     }
   }
-  return [...new Set(paths)].sort();
+  return {
+    paths: [...new Set(paths)].sort(),
+    error: null,
+  };
 }
 
 // docs/brainstorms/*-requirements.md 同时承载 spec-brainstorm 的需求 brief 与

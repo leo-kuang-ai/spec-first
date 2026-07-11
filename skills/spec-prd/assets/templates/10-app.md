@@ -83,6 +83,6 @@
 - 最低支持版本、旧客户端和灰度边界。
 - 命中设计证据时，read/unread/degraded 与 readiness consequence 已记录。
 
-## App Outstanding Questions
+## App 待闭合问题候选
 
-只保留会改变 App WHAT、验收、范围、权限、fallback、analytics 或发布行为的问题；纯组件实现和架构选择进入 `spec-plan`。
+这里只提示候选缺口，不生成第二套 OQ schema。只把会改变 App WHAT、验收、范围、权限、fallback、analytics 或发布行为的问题移入 output contract 的 canonical `Outstanding Questions`；纯组件实现和架构选择进入 `spec-plan`。

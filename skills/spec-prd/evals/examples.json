@@ -2585,13 +2585,13 @@
     },
     {
       "id": "codex-degraded-producer-finalize",
-      "intent": "validate",
+      "intent": "refine",
       "case_type": "boundary",
       "quality_buckets": [
-        "validate",
+        "refine",
         "workflow-runtime-quality"
       ],
-      "input_shape": "Codex run prepares a PRD that the user may later pass to spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs the producer-local finalize command from the loaded spec-prd skill root before claiming ready, and leaves downstream plan entry to the user instead of requiring an automatic consumer receipt gate.",
+      "input_shape": "Codex refine run prepares a PRD that the user may later pass to spec-plan. There is no confirmed managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records the degraded host posture, runs the producer-local finalize command from the loaded spec-prd skill root before claiming ready, and leaves downstream plan entry to the user instead of requiring an automatic consumer receipt gate.",
       "expected": [
         "Codex degraded enforcement must be explicit, not implied equal protection with Claude",
         "producer finalize remains mandatory before spec-prd claims the artifact is ready",
@@ -2676,6 +2676,81 @@
         "p1-pack",
         "readiness",
         "traceability"
+      ]
+    },
+    {
+      "id": "validate-report-only-existing-prd",
+      "intent": "validate",
+      "case_type": "positive",
+      "quality_buckets": [
+        "validate",
+        "readiness"
+      ],
+      "input_shape": "User asks for planning-readiness validation of an existing PRD and explicitly forbids file changes. The workflow reads bounded source, runs checker/finalizer only in check-only or receipt-verification mode, and returns source-grounded findings without rewriting or finalizing the artifact.",
+      "expected": [
+        "validate locks mutation_posture=report-only before evidence gathering",
+        "artifact bytes, mtime, frontmatter, and receipt remain unchanged",
+        "checker facts and semantic readiness judgment remain visibly separate",
+        "missing or stale receipt is reported rather than repaired"
+      ],
+      "must_not": [
+        "must not rewrite the PRD",
+        "must not invoke finalize in write mode",
+        "must not refresh generated runtime"
+      ],
+      "coverage_tags": [
+        "validate",
+        "readiness",
+        "mutation-boundary"
+      ]
+    },
+    {
+      "id": "validate-figma-degraded-no-materialization",
+      "intent": "validate",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "validate",
+        "design-evidence"
+      ],
+      "input_shape": "Existing PRD validation includes a remote Figma URL, but the current host has no authorized provider. The run records a sanitized ref, unread/degraded reason, affected PRD write targets, and readiness consequence in the report.",
+      "expected": [
+        "remote design input remains provider_untrusted or degraded evidence",
+        "load-bearing unread design state blocks a ready conclusion",
+        "the report names affected requirements or acceptance targets"
+      ],
+      "must_not": [
+        "must not persist or materialize screenshot, export, or provider JSON",
+        "must not create a design artifact",
+        "must not mutate the PRD"
+      ],
+      "coverage_tags": [
+        "validate",
+        "design-evidence",
+        "degraded"
+      ]
+    },
+    {
+      "id": "validate-and-fix-reenters-refine",
+      "intent": "validate",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "validate",
+        "preview-first"
+      ],
+      "input_shape": "User asks to validate and fix an existing PRD. The workflow first returns the report and a proposed patch preview, waits for explicit confirmation, then starts a separate refine posture before any write.",
+      "expected": [
+        "validate itself remains report-only",
+        "proposed edits are previewed before mutation",
+        "confirmed repair is reclassified as refine and follows normal finalize gates"
+      ],
+      "must_not": [
+        "must not treat validate and fix as implicit mutation authority",
+        "must not write before explicit confirmation"
+      ],
+      "coverage_tags": [
+        "validate",
+        "preview-first",
+        "mutation-boundary"
       ]
     }
   ],
