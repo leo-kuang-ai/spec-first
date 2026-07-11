@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SETTINGS_RELATIVE_PATH = '.qoder/settings.json';
-const QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE = 'qoder_hook_protocol_unconfirmed';
+const QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE = 'qoder_hook_activation_unverified';
 
 const MANAGED_HOOK_DEFINITIONS = [
   {
@@ -12,21 +12,21 @@ const MANAGED_HOOK_DEFINITIONS = [
     displayName: 'SessionStart',
     hookPath: '.qoder/hooks/session-start',
     templateName: 'session-start',
-    reasonCode: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+    reasonCode: QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
   },
   {
     eventName: 'PreToolUse',
     displayName: 'PreToolUse PRD prewrite guard',
     hookPath: '.qoder/hooks/prd-prewrite-guard',
     templateName: 'prd-prewrite-guard',
-    reasonCode: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+    reasonCode: QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
   },
   {
     eventName: 'Stop',
     displayName: 'Stop PRD readiness guard',
     hookPath: '.qoder/hooks/prd-readiness-guard',
     templateName: 'prd-readiness-guard',
-    reasonCode: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+    reasonCode: QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
   },
 ];
 const MANAGED_HOOK_PATHS = new Set(MANAGED_HOOK_DEFINITIONS.map((definition) => definition.hookPath));
@@ -83,7 +83,10 @@ function inspectManagedQoderHooks(projectRoot) {
     settings = readSettingsFile(filePath);
   } catch (error) {
     if (error && error.code === 'ENOENT') {
-      return MANAGED_HOOK_DEFINITIONS.map((definition) => degradedStatus(definition, 'settings file absent'));
+      return MANAGED_HOOK_DEFINITIONS.map((definition) => degradedStatus(
+        definition,
+        'settings file absent; the qodercli 1.0.41 evidence baseline confirms the settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified',
+      ));
     }
     return MANAGED_HOOK_DEFINITIONS.map((definition) => ({
       status: 'drifted',
@@ -104,12 +107,15 @@ function inspectManagedQoderHooks(projectRoot) {
         displayName: definition.displayName,
         drift: true,
         degradedByDesign: false,
-        reasonCode: 'qoder_unconfirmed_hook_entry_present',
-        message: `managed ${definition.displayName} settings entry is present, but Qoder hook protocol is not confirmed`,
+        reasonCode: 'qoder_unverified_hook_entry_present',
+        message: `managed ${definition.displayName} settings entry is present before authenticated Qoder CLI execution and shared IDE loader safety are verified`,
       };
     }
 
-    return degradedStatus(definition, 'settings entry intentionally omitted until Qoder CLI protocol is confirmed');
+    return degradedStatus(
+      definition,
+      'settings entry intentionally omitted until authenticated Qoder CLI execution and shared IDE loader safety are verified',
+    );
   });
 }
 
@@ -229,7 +235,7 @@ function isCommandHook(hook) {
 
 module.exports = {
   MANAGED_HOOK_DEFINITIONS,
-  QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+  QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
   SETTINGS_RELATIVE_PATH,
   inspectManagedQoderHooks,
   renderManagedQoderHooksCleanup,

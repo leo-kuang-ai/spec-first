@@ -524,7 +524,7 @@ function qoderHookStatusToRuntimeCheck(status) {
       message: status.message,
       drift: true,
       reasonCode: status.reasonCode,
-      fix: formatInitGuidance('qoder', 'to remove unconfirmed managed Qoder hook settings entries'),
+      fix: formatInitGuidance('qoder', 'to remove managed Qoder hook settings entries that were activated without verified execution evidence'),
     };
   }
 

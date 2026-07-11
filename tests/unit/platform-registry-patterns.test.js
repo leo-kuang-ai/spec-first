@@ -232,6 +232,15 @@ describe('platform registry path-rule compiler', () => {
 });
 
 describe('platform registry runtime path consumer', () => {
+  test('records confirmed Qoder command protocol separately from unverified hook activation', () => {
+    expect(PLATFORM_REGISTRY.qoder.capabilities.hooks).toEqual({
+      shellCommand: { status: 'confirmed' },
+      sessionStart: { status: 'degraded', reasonCode: 'activation-unverified' },
+      preToolUse: { status: 'degraded', reasonCode: 'activation-unverified' },
+      stopBlocking: { status: 'degraded', reasonCode: 'activation-unverified' },
+    });
+  });
+
   test('extracts normalized candidate runtime paths before anchored matching', () => {
     expect(extractCandidateRuntimePaths([
       '`$HOME/.kiro/settings/mcp.json`,',

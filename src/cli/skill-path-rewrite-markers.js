@@ -81,10 +81,6 @@ function shouldPreserveSourceSkillPathLine(line, skillName) {
     return false;
   }
 
-  if (/^\s*\|\s*Inputs\s*\|/.test(line)) {
-    return true;
-  }
-
   return SOURCE_TRUTH_MARKERS.some((marker) => marker.test(line));
 }
 

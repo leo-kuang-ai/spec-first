@@ -14,7 +14,7 @@ argument-hint: "[bare auto setup] [--check|--verify-only|--plan|--project-config
 | --- | --- |
 | When to use | Host runtime setup, MCP setup, helper-tool readiness, missing runtime assets, or project-local setup fact refresh. |
 | When not to use | Ordinary planning, implementation, review, debugging, or code impact questions that can proceed from direct source evidence. |
-| Inputs | Current host, repo target, `skills/spec-mcp-setup/mcp-tools.json`, helper installer facts, host config state, git/workspace target facts, and project instructions. |
+| Inputs | Current host, repo target, the loaded skill's colocated `mcp-tools.json`, helper installer facts, host config state, git/workspace target facts, and project instructions. |
 | Outputs | Readiness ledger v2, provider readiness v2 facts, generated runtime manifest freshness, setup scenario fingerprint, project-local config bootstrap status, optional project setup facts under `.spec-first/config/`, and a grouped status block. |
 | Artifacts | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, `.spec-first/config.local.example.yaml`, `.spec-first/config.local.yaml` when explicitly created, `.gitignore` local-config safety rule when explicitly ensured, and `.spec-first/workspace/scenario-fingerprint-setup.json` when applicable. |
 | Failure modes | Missing dependencies, host config write failure, ambiguous parent workspace target, symlink escape, invalid registry schema, helper install failure, or unsupported host. |
@@ -27,15 +27,11 @@ Core boundary: scripts prepare deterministic readiness facts; LLM workflows deci
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
 
-## Examples As Context
-
-When editing or reviewing this workflow prompt, or when running fresh-source eval for setup posture drift, read `skills/spec-mcp-setup/evals/examples.json` as examples-as-context. These examples are not a deterministic router, runtime-readiness gate, or substitute for LLM judgment during ordinary setup runs.
-
 ## Source Of Truth
 
-`skills/spec-mcp-setup/mcp-tools.json` is the current source directory for the machine registry of baseline MCP servers plus explicit opt-in MCP capability entries and centralized external dependency pins. Schema version is `7`. Current required baseline tools include `sequential-thinking` and `context7`; optional MCP entries must carry `opt_in.explicit_consent_required=true` and are admitted only through explicit `--only` selection. Bare Runtime Setup diagnoses optional provider readiness and prints next actions; it is not implicit consent for provider first generation. The directory name remains `spec-mcp-setup` during the entrypoint rename to avoid a broad source/runtime path migration in the same slice.
+The canonical package source-of-truth is `skills/spec-mcp-setup/mcp-tools.json`; generated hosts consume the colocated `mcp-tools.json` projection from the loaded skill directory. Schema version is `7`. Current required baseline tools include `sequential-thinking` and `context7`; optional MCP entries must carry `opt_in.explicit_consent_required=true` and are admitted only through explicit `--only` selection. Bare Runtime Setup diagnoses optional provider readiness and prints next actions; it is not implicit consent for provider first generation. The directory name remains `spec-mcp-setup` during the entrypoint rename to avoid a broad source/runtime path migration in the same slice.
 
-Generated runtime mirrors under `.claude/`, `.codex/`, `.cursor/skills/`, `.cursor/spec-first/`, `.kiro/`, `.qoder/`, and `.agents/skills/` are not source. `.cursor/mcp.json` is host-local config output, not source truth. If setup prose or scripts change, update source first and use `spec-first init` only for runtime regeneration.
+Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source. If setup prose or scripts change, update source first and use `spec-first init` only for runtime regeneration.
 
 ## Required Harness Runtime
 

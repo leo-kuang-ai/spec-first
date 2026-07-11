@@ -133,12 +133,6 @@ Generated runtime assets are not source truth:
 
 Do not hand-edit generated runtime assets. Runtime refresh belongs to the host-specific `spec-first init` invocation.
 
-## Evaluation And Governance Status
-
-This is a production, team-reused workflow command, not a governed-ready or public-claim-ready package. `skills/spec-app-consistency-audit/evals/examples.json` is examples-as-context, not a deterministic router; LLM judgment still owns route choice and issue validity.
-
-Governance labels, `file-backed fixture`, `input_files`, `output contract`, `rollback boundary`, and current `missing evidence` for `trust report` / `reports/output_quality_scorecard.md` are documented in [Evaluation And Governance Status](references/evaluation-governance.md).
-
 ## Expert Prompt Boundary
 
 App-audit experts and ECC-derived lenses are skill-local prompt assets:
@@ -270,9 +264,6 @@ skills/spec-app-consistency-audit/rule-packs/
 
 Read these on demand; they are not required for routing:
 
-- [`evals/examples.json`](evals/examples.json): examples-as-context for trigger/boundary/failure coverage; not a deterministic router and still subject to LLM judgment or fresh-source eval.
-- [`evals/recorded-output-fixtures.json`](evals/recorded-output-fixtures.json): minimal recorded fixtures for no-raw-issues, degraded-mode, and handoff output expectations; not provider-backed model evidence.
-- [Evaluation And Governance Status](references/evaluation-governance.md): owner/review cadence, eval status, governed-package evidence labels, and current missing evidence.
 - [Headless Runner And Artifact Lifecycle](references/headless-runner.md): full runner pipeline, fail-fast reason codes, and artifact-lifecycle/enum rules deferred from this entry.
 - [Mode, Output, And Issue Contract](references/mode-output-contract.md): detailed mode tokens, scope resolution, Figma materialization, output/writeback, and issue protocol fields.
 - [`references/report-format.md`](references/report-format.md): the report section structure that downstream Report-Writer steps emit.

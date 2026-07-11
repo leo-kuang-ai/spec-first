@@ -273,7 +273,7 @@ function checkInstalledSkills(adapter, assetInspection) {
     return {
       level: 'PASS',
       name: `${adapter.skillsRoot}`,
-      message: `found ${skillStatus.entries.length} skill directory(ies)`,
+      message: formatInstalledSkillInventory(adapter, skillStatus),
     };
   }
 
@@ -296,6 +296,18 @@ function checkInstalledSkills(adapter, assetInspection) {
     ].filter(Boolean).join('; '),
     fix: formatInitGuidance(adapter, 'in this project to resync bundled skills'),
   };
+}
+
+function formatInstalledSkillInventory(adapter, skillStatus) {
+  if (adapter.workflowsRoot === adapter.skillsRoot) {
+    return `found ${skillStatus.entries.length} skill directory(ies)`;
+  }
+
+  const standaloneCount = (skillStatus.standaloneEntries || []).length;
+  const internalCount = (skillStatus.internalEntries || []).length;
+  const workflowCount = (skillStatus.workflowEntries || []).length;
+  const skillsRootCount = standaloneCount + internalCount;
+  return `found ${skillsRootCount} standalone/internal skill directory(ies) in ${adapter.skillsRoot} and ${workflowCount} workflow mirror directory(ies) in ${adapter.workflowsRoot}`;
 }
 
 function checkInstalledAgents(adapter, assetInspection) {

@@ -133,10 +133,10 @@ const PLATFORM_REGISTRY = {
     },
     capabilities: {
       hooks: {
-        shellCommand: { status: 'degraded', reasonCode: 'protocol-unconfirmed' },
-        sessionStart: { status: 'degraded', reasonCode: 'shared-loader-safety-unconfirmed' },
-        preToolUse: { status: 'degraded', reasonCode: 'protocol-unconfirmed' },
-        stopBlocking: { status: 'degraded', reasonCode: 'protocol-unconfirmed' },
+        shellCommand: { status: 'confirmed' },
+        sessionStart: { status: 'degraded', reasonCode: 'activation-unverified' },
+        preToolUse: { status: 'degraded', reasonCode: 'activation-unverified' },
+        stopBlocking: { status: 'degraded', reasonCode: 'activation-unverified' },
       },
     },
   },

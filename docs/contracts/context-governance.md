@@ -42,9 +42,9 @@
 | `.qoder/skills/**` | `generated_runtime_mirror_excluded` | Qoder generated project skill runtime mirror |
 | `.qoder/agents/**` | `generated_runtime_mirror_excluded` | Qoder generated subagent runtime mirror |
 | `.qoder/spec-first/**` | `generated_runtime_mirror_excluded` | Qoder spec-first managed state/runtime facts |
-| `.qoder/hooks/session-start` | `managed_runtime_hook_excluded` | Qoder spec-first managed SessionStart hook script；settings entry may be degraded-by-design until protocol evidence exists |
-| `.qoder/hooks/prd-prewrite-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed PreToolUse PRD guard script；settings entry may be degraded-by-design until protocol evidence exists |
-| `.qoder/hooks/prd-readiness-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed Stop PRD readiness guard script；settings entry may be degraded-by-design until protocol evidence exists |
+| `.qoder/hooks/session-start` | `managed_runtime_hook_excluded` | Qoder spec-first managed SessionStart hook script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
+| `.qoder/hooks/prd-prewrite-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed PreToolUse PRD guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
+| `.qoder/hooks/prd-readiness-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed Stop PRD readiness guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
 | `.qoder/settings.local.json` | `host_local_config_excluded` | Qoder local MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --qoder` 保留整文件，server entry 由 setup/uninstall 路径管理 |
 
 `.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它；不得把 `.kiro/**` blanket 排除或 blanket 纳入 source context。

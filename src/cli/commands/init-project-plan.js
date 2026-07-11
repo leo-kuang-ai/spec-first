@@ -38,7 +38,7 @@ const {
 } = require('../instruction-bootstrap');
 const { removeManagedRuntimeToolsBlock } = require('../runtime-tools-index');
 const {
-  QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+  QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
 } = require('../qoder-settings');
 const {
   getClaudeSettingsPath,
@@ -101,8 +101,8 @@ function buildProjectInitPlan({
   if (platform === 'qoder') {
     diagnostics.push({
       level: 'warn',
-      code: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
-      message: `Warning [${QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE}]: Qoder hook scripts are generated, but hook settings entries are intentionally omitted until the Qoder hook protocol is confirmed. SessionStart and PRD guard hooks remain inactive.`,
+      code: QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
+      message: `Warning [${QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE}]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified. Hook scripts are generated while settings entries remain intentionally omitted, so SessionStart and PRD guard hooks stay inactive.`,
     });
   }
 

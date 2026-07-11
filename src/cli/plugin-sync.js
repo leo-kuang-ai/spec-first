@@ -393,8 +393,11 @@ function inspectSkills(projectRoot, filteredAssetSet, adapter) {
   const workflowNames = [...(filteredAssetSet && filteredAssetSet.workflowSkills ? filteredAssetSet.workflowSkills : [])];
   const standaloneNames = [...(filteredAssetSet && filteredAssetSet.skills ? filteredAssetSet.skills : [])];
   const internalNames = [...(filteredAssetSet && filteredAssetSet.internalSkills ? filteredAssetSet.internalSkills : [])];
+  const standaloneEntries = [...new Set(standaloneNames)].sort((a, b) => a.localeCompare(b));
+  const internalEntries = [...new Set(internalNames)].sort((a, b) => a.localeCompare(b));
+  const workflowEntries = [...new Set(workflowNames)].sort((a, b) => a.localeCompare(b));
   const workflowNameSet = new Set(workflowNames);
-  const skillNames = [...new Set([...standaloneNames, ...internalNames, ...workflowNames])].sort((a, b) =>
+  const skillNames = [...new Set([...standaloneEntries, ...internalEntries, ...workflowEntries])].sort((a, b) =>
     a.localeCompare(b),
   );
 
@@ -413,7 +416,17 @@ function inspectSkills(projectRoot, filteredAssetSet, adapter) {
       workflowRoot,
     }))
     .filter(Boolean);
-  return { targetRoot: standaloneRoot, entries: skillNames, missing, drifted };
+  return {
+    targetRoot: standaloneRoot,
+    standaloneRoot,
+    workflowRoot,
+    entries: skillNames,
+    standaloneEntries,
+    internalEntries,
+    workflowEntries,
+    missing,
+    drifted,
+  };
 }
 
 function inspectAgents(projectRoot, agentPaths = listBundledAgents(), adapter) {
@@ -479,7 +492,9 @@ function isTextFile(filePath) {
 
 function shouldIncludeBundledSkillPath(relativePath) {
   const normalizedPath = normalizePathForContent(relativePath);
-  return normalizedPath.split('/')[0] !== 'evals'
+  const pathSegments = normalizedPath.split('/');
+  return pathSegments[0] !== 'evals'
+    && !(pathSegments.length === 1 && pathSegments[0].toLowerCase() === 'readme.md')
     && !shouldIgnoreBundledSupportPath(normalizedPath);
 }
 
@@ -639,7 +654,22 @@ function renderRuntimeCommandContent(command, adapter) {
     skillContent,
     runtimeSkillRoot,
   });
-  return rewriteCommandSkillLocalResourcePaths(rendered, runtimeSkillRoot);
+  return rewriteCommandSkillLocalResourcePaths(
+    addCommandCompanionRootInstruction(rendered, runtimeSkillRoot),
+    runtimeSkillRoot,
+  );
+}
+
+function addCommandCompanionRootInstruction(content, runtimeSkillRoot) {
+  const instruction = `Command support root: \`${runtimeSkillRoot}\`. Treat it as the loaded skill directory whenever this inlined workflow refers to \`SKILL_DIR\` or the directory containing \`SKILL.md\`.`;
+  const frontmatterMatch = content.match(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n)?/);
+  if (!frontmatterMatch) {
+    return `${instruction}\n\n${content}`;
+  }
+
+  const frontmatter = frontmatterMatch[0].replace(/\r?\n?$/, '');
+  const body = content.slice(frontmatterMatch[0].length).replace(/^\r?\n/, '');
+  return `${frontmatter}\n\n${instruction}\n\n${body}`;
 }
 
 function inspectSkillIntegrity({

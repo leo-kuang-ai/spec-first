@@ -466,6 +466,7 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
   }
 
   const checks = [];
+  const managedDivergentGroups = [];
   for (const [skillName, entries] of bySkill.entries()) {
     if (entries.length < 2) continue;
     const allManaged = entries.every((entry) => entry.managed);
@@ -473,12 +474,31 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
     if (allManaged && identical) {
       continue;
     }
+    if (allManaged) {
+      managedDivergentGroups.push({ skillName, entries });
+      continue;
+    }
 
     checks.push({
       level: 'WARNING',
       name: `Cursor duplicate skill discovery: ${skillName}`,
-      message: `same-name skill found in Cursor-compatible roots: ${entries.map((entry) => entry.displayPath).join(', ')}; precedence is unverified and at least one root is unmanaged or divergent`,
-      fix: 'Remove or rename unmanaged duplicate skills, or rerun spec-first init for managed roots that should match current source.',
+      message: `same-name skill found in Cursor-compatible roots: ${entries.map((entry) => entry.displayPath).join(', ')}; Cursor precedence is unverified and at least one entry is outside its current spec-first-managed runtime root`,
+      fix: 'Remove or rename the unmanaged duplicate, or rerun spec-first init for the host that owns a stale compatibility path.',
+      drift: false,
+      reasonCode: 'cursor_external_skill_precedence_unverified',
+    });
+  }
+
+  if (managedDivergentGroups.length > 0) {
+    const rootCounts = countManagedProjectionRoots(managedDivergentGroups);
+    checks.push({
+      level: 'WARNING',
+      name: 'Cursor managed skill projection precedence',
+      message: `${managedDivergentGroups.length} same-name skill projection(s) are not byte-identical across Cursor-compatible managed roots: ${formatRootCounts(rootCounts)}; Cursor precedence is unverified and may select a non-Cursor host projection`,
+      fix: 'Keep the managed host runtimes intact and verify that Cursor prioritizes .cursor/skills; do not delete other host projections to silence this warning.',
+      drift: false,
+      degradedByDesign: true,
+      reasonCode: 'cursor_managed_projection_precedence_unverified',
     });
   }
 
@@ -488,6 +508,8 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
       name: 'Cursor nested skill root scan',
       message: `nested_roots_not_fully_enumerated (${duplicateRoots.limitWarnings.join(', ')})`,
       fix: 'Inspect nested workspace Cursor skill roots manually if duplicate discovery behavior matters for this project.',
+      drift: false,
+      reasonCode: 'cursor_nested_skill_roots_partial',
     });
   }
 
@@ -508,7 +530,7 @@ function collectCursorSkillRoots(projectRoot) {
   ];
   const nested = collectNestedCursorSkillRoots(projectRoot);
   return {
-    roots: [...roots, ...nested.roots],
+    roots: dedupeRoots([...roots, ...nested.roots]),
     limitWarnings: nested.limitWarnings,
   };
 }
@@ -605,18 +627,19 @@ function dedupeRoots(roots) {
 }
 
 function isManagedSkillRoot(projectRoot, root, skillName, cursorAdapter) {
+  if (root.scope !== 'project' && root.scope !== 'project_compat') {
+    return false;
+  }
+
   const rootPath = root.relativePath;
   if (rootPath === '.cursor/skills') {
-    return stateListsSkill(projectRoot, cursorAdapter, skillName);
+    return stateListsSkill(projectRoot, cursorAdapter, skillName, ['skills', 'workflowSkills']);
   }
   if (rootPath === '.agents/skills') {
-    return stateListsSkill(projectRoot, adapterForState('codex'), skillName);
+    return stateListsSkill(projectRoot, adapterForState('codex'), skillName, ['skills', 'workflowSkills']);
   }
   if (rootPath === '.claude/skills') {
-    return stateListsSkill(projectRoot, adapterForState('claude'), skillName);
-  }
-  if (rootPath === '.codex/skills') {
-    return stateListsSkill(projectRoot, adapterForState('codex'), skillName);
+    return stateListsSkill(projectRoot, adapterForState('claude'), skillName, ['skills']);
   }
   return false;
 }
@@ -632,14 +655,30 @@ function adapterForState(platform) {
   };
 }
 
-function stateListsSkill(projectRoot, adapter, skillName) {
+function stateListsSkill(projectRoot, adapter, skillName, fields) {
   try {
     const state = readState(projectRoot, adapter);
     if (!state) return false;
-    return state.skills.includes(skillName) || state.workflowSkills.includes(skillName);
+    return fields.some((field) => state[field].includes(skillName));
   } catch {
     return false;
   }
+}
+
+function countManagedProjectionRoots(groups) {
+  const counts = new Map();
+  for (const group of groups) {
+    for (const entry of group.entries) {
+      counts.set(entry.displayPath, (counts.get(entry.displayPath) || 0) + 1);
+    }
+  }
+  return [...counts.entries()].sort(([left], [right]) => left.localeCompare(right));
+}
+
+function formatRootCounts(rootCounts) {
+  return rootCounts
+    .map(([rootPath, count]) => `${rootPath} (${count})`)
+    .join(', ');
 }
 
 function normalizeContentForComparison(content) {

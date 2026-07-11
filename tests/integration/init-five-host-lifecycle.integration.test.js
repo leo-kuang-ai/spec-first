@@ -96,7 +96,8 @@ describe('five-host init lifecycle', () => {
       }
 
       if (platform === 'qoder') {
-        expect(firstInit.stderr).toContain('qoder_hook_protocol_unconfirmed');
+        expect(firstInit.stderr).toContain('qoder_hook_activation_unverified');
+        expect(firstInit.stderr).toContain('qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol');
         expect(firstInit.stderr).toContain('inactive');
       }
 
@@ -110,7 +111,7 @@ describe('five-host init lifecycle', () => {
       expect(report.checks.filter((check) => check.drift === true)).toEqual([]);
       if (platform === 'qoder') {
         const degradedHookChecks = report.checks.filter((check) =>
-          check.reasonCode === 'qoder_hook_protocol_unconfirmed'
+          check.reasonCode === 'qoder_hook_activation_unverified'
         );
         expect(degradedHookChecks).toHaveLength(3);
         expect(degradedHookChecks).toEqual(expect.arrayContaining([

@@ -9,6 +9,7 @@ const plugin = require('../../src/cli/plugin');
 const {
   findUnresolvedCommandSkillLocalResourcePaths,
   rewriteCommandSkillLocalResourcePaths,
+  rewriteSourceSkillRuntimePaths,
 } = require('../../src/cli/skill-path-rewrite-markers');
 
 const projectRoots = new Set();
@@ -38,6 +39,17 @@ function readRuntimeCommand(projectRoot, adapter, skillName) {
   );
 }
 
+function unresolvedPhysicalCommandResources(projectRoot, runtimeRoot, content) {
+  const pattern = new RegExp(
+    `${runtimeRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?:references|scripts|assets|prompts|schemas|rule-packs)/[^\`\\s)>,;]+`,
+    'g',
+  );
+  return (content.match(pattern) || [])
+    .map((candidate) => candidate.replace(/[.:]+$/, ''))
+    .filter((candidate) => !/[<*>]/.test(candidate))
+    .filter((candidate) => !fs.existsSync(path.join(projectRoot, candidate)));
+}
+
 describe('command companion resource paths', () => {
   test.each(['claude', 'qoder'])(
     '%s commands resolve inlined skill-local resources from the companion runtime skill',
@@ -48,6 +60,9 @@ describe('command companion resource paths', () => {
 
       const docReviewRoot = `${adapter.workflowsRoot}/spec-doc-review`;
       const docReview = readRuntimeCommand(projectRoot, adapter, 'spec-doc-review');
+      expect(docReview).toContain(
+        `Command support root: \`${docReviewRoot}\`. Treat it as the loaded skill directory whenever this inlined workflow refers to \`SKILL_DIR\` or the directory containing \`SKILL.md\`.`,
+      );
       expect(docReview).toContain(
         `read \`${docReviewRoot}/references/synthesis-and-presentation.md\``,
       );
@@ -85,6 +100,11 @@ describe('command companion resource paths', () => {
       for (const command of plugin.listBundledCommands()) {
         const content = readRuntimeCommand(projectRoot, adapter, command.skill);
         expect(findUnresolvedCommandSkillLocalResourcePaths(content)).toEqual([]);
+        expect(unresolvedPhysicalCommandResources(
+          projectRoot,
+          `${adapter.workflowsRoot}/${command.skill}`,
+          content,
+        )).toEqual([]);
       }
 
       expect(plugin.inspectInstalledAssets(projectRoot, adapter).commands.drifted).toEqual([]);
@@ -129,6 +149,24 @@ describe('command companion resource paths', () => {
     expect(rewritten.split('\r\n')).toHaveLength(lines.length);
     expect(rewriteCommandSkillLocalResourcePaths(rewritten, runtimeRoot)).toBe(rewritten);
     expect(findUnresolvedCommandSkillLocalResourcePaths(rewritten)).toEqual([]);
+  });
+
+  test('preserves explicit source-of-truth pointers but does not treat Inputs rows as source authority', () => {
+    const content = [
+      'The canonical source-of-truth is `skills/spec-prd/scripts/check-prd-artifact.js`.',
+      '| Inputs | `skills/spec-prd/scripts/check-prd-artifact.js` |',
+      'Run `skills/spec-prd/scripts/check-prd-artifact.js`.',
+    ].join('\n');
+
+    expect(rewriteSourceSkillRuntimePaths(
+      content,
+      'spec-prd',
+      '.qoder/skills/spec-prd',
+    )).toBe([
+      'The canonical source-of-truth is `skills/spec-prd/scripts/check-prd-artifact.js`.',
+      '| Inputs | `.qoder/skills/spec-prd/scripts/check-prd-artifact.js` |',
+      'Run `.qoder/skills/spec-prd/scripts/check-prd-artifact.js`.',
+    ].join('\n'));
   });
 
   test.each(['claude', 'qoder'])(

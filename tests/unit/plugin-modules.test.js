@@ -103,7 +103,7 @@ describe('plugin module facade and governance', () => {
     ]));
   });
 
-  test('excludes top-level evals from planned, copied, and inspected skill assets', () => {
+  test('excludes source-only evals and top-level maintainer READMEs from runtime assets', () => {
     const projectRoot = tempProject();
     const adapter = getAdapter('cursor');
     const staleRuntimeEval = path.join(
@@ -121,6 +121,9 @@ describe('plugin module facade and governance', () => {
       expect(operationPaths.some((operationPath) =>
         /\/skills\/[^/]+\/evals(?:\/|$)/.test(operationPath)
       )).toBe(false);
+      expect(operationPaths.some((operationPath) =>
+        /\/skills\/[^/]+\/README\.md$/.test(operationPath)
+      )).toBe(false);
       expect(operationPaths).toEqual(expect.arrayContaining([
         '.cursor/skills/spec-prd/references/prd-output-template.md',
         '.cursor/skills/spec-prd/scripts/check-prd-artifact.js',
@@ -132,6 +135,10 @@ describe('plugin module facade and governance', () => {
       expect(fs.existsSync(path.join(
         projectRoot,
         '.cursor/skills/spec-prd/evals',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-app-consistency-audit/README.md',
       ))).toBe(false);
       expect(fs.existsSync(path.join(
         projectRoot,
@@ -156,11 +163,6 @@ describe('plugin module facade and governance', () => {
 
   test('keeps maintainer-only eval assets out of every host runtime projection', () => {
     const targetSurfacePattern = /(?:spec-app-consistency-audit|spec-mcp-setup|spec-optimize|spec-prd)/;
-    const maintainerOnlyPathPatterns = [
-      /\/spec-prd\/scripts\/run-evals\.js$/,
-      /\/spec-prd\/references\/evaluation-governance\.md$/,
-      /\/spec-app-consistency-audit\/references\/evaluation-governance\.md$/,
-    ];
     const maintainerOnlyReferencePattern = /(?:evals\/(?:examples|recorded-output-fixtures)\.json|evals\/output\/|scripts\/run-evals\.js)/;
 
     for (const platform of getSupportedPlatforms()) {
@@ -168,20 +170,20 @@ describe('plugin module facade and governance', () => {
       try {
         const adapter = getAdapter(platform);
         const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const projectedEvalPaths = plan.operations
+          .map((operation) => operation.path)
+          .filter((operationPath) =>
+            /\/(?:skills|workflows)\/[^/]+\/evals(?:\/|$)/.test(operationPath)
+          );
         const targetOperations = plan.operations.filter((operation) =>
           targetSurfacePattern.test(operation.path)
         );
-        const projectedMaintainerFiles = targetOperations
-          .map((operation) => operation.path)
-          .filter((operationPath) => maintainerOnlyPathPatterns.some((pattern) =>
-            pattern.test(operationPath)
-          ));
         const leakedReferences = targetOperations
           .filter((operation) => typeof operation.contents === 'string')
           .filter((operation) => maintainerOnlyReferencePattern.test(operation.contents))
           .map((operation) => operation.path);
 
-        expect(projectedMaintainerFiles).toEqual([]);
+        expect(projectedEvalPaths).toEqual([]);
         expect(leakedReferences).toEqual([]);
 
         const prdSkillPath = path.posix.join(
@@ -193,10 +195,29 @@ describe('plugin module facade and governance', () => {
           operation.path === prdSkillPath
         );
         expect(prdSkill).toBeDefined();
+        expect(prdSkill.contents).toContain('SKILL_DIR="<absolute path of the directory containing the loaded spec-prd/SKILL.md>"');
         expect(prdSkill.contents).toContain('node "$SKILL_DIR/scripts/finalize-prd-artifact.js"');
         expect(prdSkill.contents).toContain('canonical source-of-truth path `skills/spec-prd/**`');
+        expect(prdSkill.contents).toContain('by editing a generated host runtime mirror');
         expect(prdSkill.contents).not.toContain('from the source checkout');
         expect(prdSkill.contents).not.toMatch(/`[^`]*(?:\.claude|\.agents|\.cursor|\.kiro|\.qoder)[^`]*` on (?:Codex|Claude)/);
+
+        const setupSkillPath = path.posix.join(
+          adapter.workflowsRoot,
+          'spec-mcp-setup',
+          'SKILL.md',
+        );
+        const setupSkill = targetOperations.find((operation) =>
+          operation.path === setupSkillPath
+        );
+        expect(setupSkill).toBeDefined();
+        expect(setupSkill.contents).toContain(
+          'The canonical package source-of-truth is `skills/spec-mcp-setup/mcp-tools.json`;',
+        );
+        expect(setupSkill.contents).toContain(
+          'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',
+        );
+        expect(setupSkill.contents).not.toContain('Generated runtime mirrors under');
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
       }

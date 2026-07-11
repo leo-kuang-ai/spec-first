@@ -288,7 +288,7 @@ describe('Qoder runtime lifecycle', () => {
     expect(next.hooks.Stop).toBeUndefined();
   });
 
-  test('reports missing settings entries as degraded by design, not drift', () => {
+  test('reports activation-unverified settings entries as degraded by design, not drift', () => {
     const projectRoot = tempProject();
     const statuses = inspectManagedQoderHooks(projectRoot);
 
@@ -298,7 +298,8 @@ describe('Qoder runtime lifecycle', () => {
         status: 'degraded-by-design',
         drift: false,
         degradedByDesign: true,
-        reasonCode: 'qoder_hook_protocol_unconfirmed',
+        reasonCode: 'qoder_hook_activation_unverified',
+        message: expect.stringContaining('qodercli 1.0.41 evidence baseline confirms the settings and command protocol'),
       });
     }
   });
@@ -684,7 +685,7 @@ describe('Qoder runtime lifecycle', () => {
     expect(degradedOnlyPlan.diagnostics).toEqual(expect.arrayContaining([
       expect.objectContaining({
         level: 'warn',
-        code: 'qoder_hook_protocol_unconfirmed',
+        code: 'qoder_hook_activation_unverified',
       }),
     ]));
     expect(degradedOnlyPlan.diagnostics.map((diagnostic) => diagnostic.code))

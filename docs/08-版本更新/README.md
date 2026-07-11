@@ -2141,7 +2141,7 @@ Codex 侧的 `spec-first init` 曾短暂生成 `spec-*` compatibility command fi
 
 ### 更新内容
 
-在执行 `doctor`、`init`、`clean`、`update` 等真实命令前，CLI 会先经过 package-level 24h gate；gate 允许时再异步向 npm registry 查询 `spec-first` 的最新版本，若当前版本落后则通过 stderr 输出一行更新提醒，并统一引导用户运行 `spec-first update`。`--help` 和 `--version` 不触发检查，避免打扰只需信息查询的场景。会话启动路径还会通过 `startup-reminder` 对 Claude/Codex/Qoder runtime 版本做只读提醒；Qoder settings entry 在协议未确认期间仍保持 degraded-by-design，只有宿主真实触发 managed `SessionStart` hook 时才会展示。
+在执行 `doctor`、`init`、`clean`、`update` 等真实命令前，CLI 会先经过 package-level 24h gate；gate 允许时再异步向 npm registry 查询 `spec-first` 的最新版本，若当前版本落后则通过 stderr 输出一行更新提醒，并统一引导用户运行 `spec-first update`。`--help` 和 `--version` 不触发检查，避免打扰只需信息查询的场景。会话启动路径还会通过 `startup-reminder` 对 Claude/Codex/Qoder runtime 版本做只读提醒；Qoder CLI 1.0.41 的 settings/command 协议已确认，但 settings entry 在 authenticated event execution 与 shared-loader safety 完成前仍保持 degraded-by-design，只有宿主真实触发 managed `SessionStart` hook 时才会展示。
 
 ### 主要能力
 
