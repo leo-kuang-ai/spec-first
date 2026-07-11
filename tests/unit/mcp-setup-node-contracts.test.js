@@ -336,7 +336,7 @@ describe('spec-mcp-setup unified Node contract', () => {
     }
   });
 
-  test('materializes and executes the baseline POSIX canonical owners', () => {
+  (process.platform === 'win32' ? test.skip : test)('materializes and executes the baseline POSIX canonical owners', () => {
     const { replay } = require('../fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs');
     const fixture = readFixture('legacy-parity/posix/runtime-contracts.json');
     const platformDifferences = readFixture('platform-differences.json');

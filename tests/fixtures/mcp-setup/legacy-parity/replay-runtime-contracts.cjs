@@ -570,7 +570,9 @@ function replay({ repoRoot, platform, source }) {
   const fixturePath = path.join(__dirname, platform, 'runtime-contracts.json');
   const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
   validateFixture(fixture, platform, source);
-  const workRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-legacy-replay-${platform}-`));
+  const workRoot = fs.realpathSync.native(
+    fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-legacy-replay-${platform}-`)),
+  );
   try {
     const materializedRoot = path.join(workRoot, 'baseline');
     const materializedFiles = materializeBaseline(repoRoot, source, materializedRoot);
