@@ -7,6 +7,23 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
 const DEFAULT_TEST_COMMAND_TIMEOUT_MS = 15 * 60 * 1000;
+const MCP_SETUP_TEST_PATHS = Object.freeze([
+  'tests/unit/host-runtime-projection-contracts.test.js',
+  'tests/unit/mcp-setup-config-consumers.test.js',
+  'tests/unit/mcp-setup-contracts.test.js',
+  'tests/unit/mcp-setup-entrypoint.test.js',
+  'tests/unit/mcp-setup-facts-renderer.test.js',
+  'tests/unit/mcp-setup-host-config.test.js',
+  'tests/unit/mcp-setup-mode-target.test.js',
+  'tests/unit/mcp-setup-node-contracts.test.js',
+  'tests/unit/mcp-setup-powershell-contracts.test.js',
+  'tests/unit/mcp-setup-preflight.test.js',
+  'tests/unit/mcp-setup-process-runner.test.js',
+  'tests/unit/mcp-setup-project-config.test.js',
+  'tests/unit/mcp-setup-providers.test.js',
+  'tests/unit/mcp-setup-registry.test.js',
+  'tests/unit/plugin-modules.test.js',
+]);
 
 function resolveTestCommandTimeoutMs(env = process.env) {
   const raw = env.SPEC_FIRST_TEST_COMMAND_TIMEOUT_MS;
@@ -30,7 +47,7 @@ function run(command, args, options = {}) {
 
   const rendered = [command, ...args].join(' ');
   if (result.error && result.error.code === 'ETIMEDOUT') {
-    const error = new Error(`${rendered} timed out after ${timeout}ms`);
+    const error = new Error(`${rendered} 在 ${timeout}ms 后超时`);
     error.status = 124;
     throw error;
   }
@@ -38,7 +55,7 @@ function run(command, args, options = {}) {
     throw result.error;
   }
   if (result.status !== 0) {
-    const error = new Error(`${rendered} failed with status ${result.status}`);
+    const error = new Error(`${rendered} 失败，状态为 ${result.status}`);
     error.status = result.status || 1;
     throw error;
   }
@@ -51,7 +68,7 @@ function runNode(args, options = {}) {
 function runJest(args) {
   const jestBin = path.join(repoRoot, 'node_modules', 'jest', 'bin', 'jest.js');
   if (!fs.existsSync(jestBin)) {
-    throw new Error('Jest is not installed. Run npm ci before running tests.');
+    throw new Error('未安装 Jest。请先运行 npm ci，再执行测试。');
   }
   runNode([jestBin, ...args]);
 }
@@ -59,7 +76,7 @@ function runJest(args) {
 function assertTestPathsExist(testPaths) {
   const missing = testPaths.filter((testPath) => !fs.existsSync(path.join(repoRoot, testPath)));
   if (missing.length > 0) {
-    const error = new Error(`Declared test paths are missing: ${missing.join(', ')}`);
+    const error = new Error(`声明的测试路径不存在：${missing.join(', ')}`);
     error.status = 1;
     throw error;
   }
@@ -75,11 +92,7 @@ function runUnit() {
 }
 
 function runMcpSetup() {
-  runJestFiles([
-    'tests/unit/mcp-setup-contracts.test.js',
-    'tests/unit/mcp-setup-config-consumers.test.js',
-    'tests/unit/mcp-setup-powershell-contracts.test.js',
-  ], ['--runInBand']);
+  runJestFiles(MCP_SETUP_TEST_PATHS, ['--runInBand']);
 }
 
 function runSmoke() {
@@ -121,8 +134,8 @@ function main() {
   };
 
   if (!suites[suite]) {
-    console.error(`Unknown test suite: ${suite}`);
-    console.error(`Available suites: ${Object.keys(suites).join(', ')}`);
+    console.error(`未知测试 suite：${suite}`);
+    console.error(`可用 suite：${Object.keys(suites).join(', ')}`);
     return 2;
   }
 
@@ -141,6 +154,7 @@ if (require.main === module) {
 
 module.exports = {
   DEFAULT_TEST_COMMAND_TIMEOUT_MS,
+  MCP_SETUP_TEST_PATHS,
   main,
   run,
   assertTestPathsExist,

@@ -1,0 +1,1820 @@
+{
+  "schema_version": "setup-registry.v8",
+  "summary_columns": [
+    "tool",
+    "type",
+    "required",
+    "dependency",
+    "host_config",
+    "project_bootstrap",
+    "result",
+    "next_action"
+  ],
+  "defaults": {
+    "tool": {},
+    "helper": {},
+    "provider": {}
+  },
+  "install_mirrors": {
+    "npm": {
+      "endpoint": "https://registry.npmmirror.com",
+      "environment": {
+        "NPM_CONFIG_REGISTRY": "https://registry.npmmirror.com",
+        "npm_config_registry": "https://registry.npmmirror.com"
+      }
+    }
+  },
+  "external_dependencies": [
+    {
+      "id": "codegraph",
+      "ecosystem": "npm",
+      "package": "@colbymchenry/codegraph",
+      "version": "1.2.0",
+      "command": "codegraph"
+    },
+    {
+      "id": "graphify",
+      "ecosystem": "npm",
+      "package": "@sentropic/graphify",
+      "version": "0.17.1",
+      "command": "graphify"
+    }
+  ],
+  "hosts": {
+    "claude": {
+      "id": "claude",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "managed",
+            "targets": {
+              "managed": {
+                "config_path": {
+                  "macos": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+                  "linux": "/etc/claude-code/managed-mcp.json",
+                  "wsl": "/etc/claude-code/managed-mcp.json",
+                  "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
+                },
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.claude.json",
+                "config_format": "json",
+                "precedence": 10,
+                "writable_check": "parent-or-file"
+              }
+            },
+            "fallback_order": [
+              "managed",
+              "user"
+            ],
+            "uninstall_targets": [
+              "managed",
+              "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    },
+    "codex": {
+      "id": "codex",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "user",
+            "targets": {
+              "user": {
+                "config_path": "$HOME/.codex/config.toml",
+                "config_format": "toml",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "system": {
+                "config_path": "/etc/codex/config.toml",
+                "config_format": "toml",
+                "precedence": 100,
+                "writable_check": "file-only"
+              }
+            },
+            "fallback_order": [
+              "user"
+            ],
+            "uninstall_targets": [
+              "user",
+              "system"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    },
+    "cursor": {
+      "id": "cursor",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "project",
+            "targets": {
+              "project": {
+                "config_path": ".cursor/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.cursor/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    },
+    "kiro": {
+      "id": "kiro",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "workspace",
+            "targets": {
+              "workspace": {
+                "config_path": ".kiro/settings/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.kiro/settings/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "workspace"
+            ],
+            "uninstall_targets": [
+              "workspace",
+              "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    },
+    "qoder": {
+      "id": "qoder",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "local",
+            "targets": {
+              "local": {
+                "config_path": ".qoder/settings.local.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.qoder/settings.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "local"
+            ],
+            "uninstall_targets": [
+              "local",
+              "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    }
+  },
+  "tools": [
+    {
+      "id": "sequential-thinking",
+      "name": "Sequential Thinking",
+      "summary_label": "Sequential Thinking",
+      "required": true,
+      "category": "mcp",
+      "host_config_required": true,
+      "description": "动态反思性问题解决，spec-first 全工作流通用依赖",
+      "dependencies": [
+        "node",
+        "npx"
+      ],
+      "detection": {
+        "kind": "host_config_exact",
+        "key": "sequential-thinking"
+      },
+      "installation": {
+        "kind": "warmup"
+      },
+      "project_bootstrap": {
+        "kind": "none",
+        "required": false
+      },
+      "host_overrides": {
+        "claude": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
+        },
+        "codex": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
+        },
+        "kiro": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
+        },
+        "qoder": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
+        },
+        "cursor": {
+          "host_config": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
+        }
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          }
+        },
+        "linux": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          }
+        },
+        "wsl": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          }
+        },
+        "windows": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "context7",
+      "name": "Context7",
+      "summary_label": "Context7",
+      "required": true,
+      "category": "mcp",
+      "host_config_required": true,
+      "description": "最新框架文档查询，spec-first 全工作流通用依赖",
+      "dependencies": [
+        "node",
+        "npx"
+      ],
+      "detection": {
+        "kind": "host_config_exact",
+        "key": "context7"
+      },
+      "installation": {
+        "kind": "warmup"
+      },
+      "project_bootstrap": {
+        "kind": "none",
+        "required": false
+      },
+      "host_overrides": {
+        "claude": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
+        },
+        "codex": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
+        },
+        "kiro": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
+        },
+        "qoder": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
+        },
+        "cursor": {
+          "host_config": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
+        }
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          }
+        },
+        "linux": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          }
+        },
+        "wsl": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          }
+        },
+        "windows": {
+          "installation": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "codegraph",
+      "name": "CodeGraph",
+      "summary_label": "CodeGraph",
+      "required": false,
+      "opt_in": {
+        "explicit_consent_required": true,
+        "consent_surface": "--only codegraph",
+        "state_model": "stateless-explicit-rerun"
+      },
+      "category": "mcp",
+      "host_config_required": true,
+      "description": "可选 code-graph 能力工具。setup 只在显式 opt-in 时帮装和配置；下游消费只把其输出当 advisory candidate。",
+      "dependency_ref": "codegraph",
+      "dependencies": [
+        "node",
+        "npm"
+      ],
+      "detection": {
+        "kind": "host_config_exact",
+        "key": "codegraph"
+      },
+      "provider_readiness": {
+        "provider": "codegraph",
+        "kind": "code-structure",
+        "profile": "optional",
+        "capabilities": [
+          "code-graph",
+          "impact-candidates",
+          "affected-tests-candidates"
+        ],
+        "native_interfaces": [
+          "mcp",
+          "cli"
+        ],
+        "first_generation": {
+          "owner": "runtime-setup",
+          "status": "not-run",
+          "scope": "project",
+          "requires_explicit_gate": true,
+          "requirement_workspace_path": null,
+          "artifact_root": ".codegraph"
+        },
+        "steady_state": {
+          "refresh_owner": "provider-native",
+          "refresh_mode": "watcher",
+          "hook_default": false,
+          "usage_owner": "downstream-skill"
+        },
+        "usage_note": "安装 package `{{package}}@{{version}}`，运行 `codegraph` CLI，并使用 CodeGraph MCP 工具获取 impact/call graph candidate。已确认的 setup 会在 status 报告 pending change 或建议 `codegraph index -f` 时先运行 `codegraph sync`；只有 full-rebuild advisory 仍存在时，才执行一次 bounded `codegraph index -f`。`codegraph serve --mcp` 负责 provider-native Auto-Sync freshness；结论需由 source/test/log/contract/user evidence 确认。",
+        "fallback_methods": [
+          "rg",
+          "ast-grep",
+          "direct-source-read"
+        ],
+        "fresh_self_report_maps_to": "unknown",
+        "stale_self_report_maps_to": "stale",
+        "lifecycle_display_only": [
+          "installed",
+          "configured",
+          "indexed",
+          "server_reachable",
+          "query_verified"
+        ]
+      },
+      "safety": {
+        "risk_flags": [
+          "global-npm-install",
+          "single-maintainer-bus-factor"
+        ],
+        "version_policy": {
+          "pin_status": "pinned"
+        },
+        "source": "npm",
+        "source_repo": "https://www.npmjs.com/package/@colbymchenry/codegraph",
+        "review_required": true
+      },
+      "installation": {
+        "kind": "global-npm",
+        "verify_command": {
+          "command": "codegraph",
+          "args": [
+            "--version"
+          ]
+        }
+      },
+      "project_bootstrap": {
+        "kind": "command",
+        "required": true,
+        "project_file": ".codegraph/codegraph.db",
+        "status_probe": {
+          "command": "codegraph",
+          "args": [
+            "status"
+          ]
+        }
+      },
+      "host_overrides": {
+        "claude": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
+        "codex": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
+        "kiro": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
+        "qoder": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
+        "cursor": {
+          "host_config": {
+            "type": "stdio",
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        }
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "linux": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "wsl": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "windows": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "helpers": [
+    {
+      "id": "agent-browser",
+      "kind": "browser-helper",
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [
+        "surface-ui"
+      ],
+      "required": true,
+      "baseline_blocking": false,
+      "required_for": [
+        "surface-ui"
+      ],
+      "recommended_for": [
+        "browser automation",
+        "frontend polish",
+        "e2e validation"
+      ],
+      "demand_signals": [
+        "surface-ui"
+      ],
+      "detection": {
+        "kind": "agent-browser",
+        "command": "agent-browser",
+        "skill_name": "agent-browser"
+      },
+      "safety": {
+        "risk_flags": [
+          "global-npm-install",
+          "browser-runtime-install",
+          "unpinned-latest"
+        ],
+        "source": "npm",
+        "source_repo": "https://github.com/vercel-labs/agent-browser",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": true,
+        "install_effect": "global CLI, browser runtime, global skill"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "manual-command",
+        "next_action": "运行 `spec-mcp-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "linux": {
+          "installation": {
+            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "wsl": {
+          "installation": {
+            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "windows": {
+          "installation": {
+            "command": "$env:CI='true'; npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error; if ($LASTEXITCODE -eq 0) { agent-browser install }; if ($LASTEXITCODE -eq 0) { npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y }"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        }
+      }
+    },
+    {
+      "id": "gh",
+      "kind": "cli",
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [],
+      "required": true,
+      "baseline_blocking": true,
+      "required_for": [
+        "github issue and pull request workflows"
+      ],
+      "recommended_for": [
+        "spec-code-review",
+        "spec-work"
+      ],
+      "demand_signals": [],
+      "detection": {
+        "kind": "command",
+        "command": "gh"
+      },
+      "safety": {
+        "risk_flags": [
+          "package-manager-install"
+        ],
+        "source": "package-manager",
+        "source_repo": "https://cli.github.com",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": false,
+        "install_effect": "system CLI"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "package-manager",
+        "next_action": "安装 gh"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "brew install gh",
+            "operations": [
+              {
+                "command": "brew",
+                "args": [
+                  "install",
+                  "gh"
+                ]
+              }
+            ]
+          },
+          "platform_required_tools": []
+        },
+        "linux": {
+          "installation": {
+            "command": "install gh from https://cli.github.com",
+            "operations": []
+          },
+          "platform_required_tools": []
+        },
+        "wsl": {
+          "installation": {
+            "command": "install gh from https://cli.github.com",
+            "operations": []
+          },
+          "platform_required_tools": []
+        },
+        "windows": {
+          "installation": {
+            "command": "winget install --id GitHub.cli -e",
+            "operations": [
+              {
+                "command": "winget",
+                "args": [
+                  "install",
+                  "--id",
+                  "GitHub.cli",
+                  "-e"
+                ]
+              }
+            ]
+          },
+          "platform_required_tools": []
+        }
+      }
+    },
+    {
+      "id": "vhs",
+      "kind": "cli",
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [],
+      "required": true,
+      "baseline_blocking": false,
+      "required_for": [],
+      "recommended_for": [
+        "terminal demos"
+      ],
+      "demand_signals": [],
+      "detection": {
+        "kind": "command",
+        "command": "vhs"
+      },
+      "safety": {
+        "risk_flags": [
+          "optional-helper",
+          "unpinned-latest"
+        ],
+        "source": "package-manager",
+        "source_repo": "https://github.com/charmbracelet/vhs",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": true,
+        "install_effect": "system CLI"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "package-manager",
+        "next_action": "安装 vhs"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "brew install vhs"
+          },
+          "platform_required_tools": []
+        },
+        "linux": {
+          "installation": {
+            "command": "go install github.com/charmbracelet/vhs@latest"
+          },
+          "platform_required_tools": []
+        },
+        "wsl": {
+          "installation": {
+            "command": "go install github.com/charmbracelet/vhs@latest"
+          },
+          "platform_required_tools": []
+        },
+        "windows": {
+          "installation": {
+            "command": "go install github.com/charmbracelet/vhs@latest"
+          },
+          "platform_required_tools": []
+        }
+      }
+    },
+    {
+      "id": "silicon",
+      "kind": "cli",
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [],
+      "required": true,
+      "baseline_blocking": false,
+      "required_for": [],
+      "recommended_for": [
+        "code screenshots"
+      ],
+      "demand_signals": [],
+      "detection": {
+        "kind": "command",
+        "command": "silicon"
+      },
+      "safety": {
+        "risk_flags": [
+          "optional-helper",
+          "global-cargo-install"
+        ],
+        "source": "package-manager",
+        "source_repo": "https://github.com/Aloxaf/silicon",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": true,
+        "install_effect": "system CLI"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "package-manager",
+        "next_action": "安装 silicon"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "brew install silicon"
+          },
+          "platform_required_tools": []
+        },
+        "linux": {
+          "installation": {
+            "command": "cargo install silicon --force"
+          },
+          "platform_required_tools": []
+        },
+        "wsl": {
+          "installation": {
+            "command": "cargo install silicon --force"
+          },
+          "platform_required_tools": []
+        },
+        "windows": {
+          "installation": {
+            "command": "cargo install silicon --force"
+          },
+          "platform_required_tools": []
+        }
+      }
+    },
+    {
+      "id": "ffmpeg",
+      "kind": "cli",
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [],
+      "required": true,
+      "baseline_blocking": false,
+      "required_for": [],
+      "recommended_for": [
+        "video composition"
+      ],
+      "demand_signals": [],
+      "detection": {
+        "kind": "command",
+        "command": "ffmpeg"
+      },
+      "safety": {
+        "risk_flags": [
+          "optional-helper",
+          "package-manager-install"
+        ],
+        "source": "package-manager",
+        "source_repo": "https://ffmpeg.org/download.html",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": false,
+        "install_effect": "system CLI"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "package-manager",
+        "next_action": "安装 ffmpeg"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "brew install ffmpeg"
+          },
+          "platform_required_tools": []
+        },
+        "linux": {
+          "installation": {
+            "command": "install ffmpeg with your package manager"
+          },
+          "platform_required_tools": []
+        },
+        "wsl": {
+          "installation": {
+            "command": "install ffmpeg with your package manager"
+          },
+          "platform_required_tools": []
+        },
+        "windows": {
+          "installation": {
+            "command": "winget install --id Gyan.FFmpeg -e"
+          },
+          "platform_required_tools": []
+        }
+      }
+    },
+    {
+      "id": "ast-grep",
+      "kind": "cli",
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [],
+      "required": true,
+      "baseline_blocking": false,
+      "required_for": [
+        "structural code search"
+      ],
+      "recommended_for": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "demand_signals": [],
+      "detection": {
+        "kind": "command",
+        "command": "ast-grep",
+        "fallback_command": "rg"
+      },
+      "safety": {
+        "risk_flags": [
+          "optional-helper",
+          "global-install"
+        ],
+        "source": "package-manager",
+        "source_repo": "https://ast-grep.github.io",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": true,
+        "install_effect": "system CLI"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "package-manager",
+        "next_action": "安装 ast-grep"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "brew install ast-grep"
+          },
+          "platform_required_tools": []
+        },
+        "linux": {
+          "installation": {
+            "command": "cargo install ast-grep --locked --force"
+          },
+          "platform_required_tools": []
+        },
+        "wsl": {
+          "installation": {
+            "command": "cargo install ast-grep --locked --force"
+          },
+          "platform_required_tools": []
+        },
+        "windows": {
+          "installation": {
+            "command": "npm install -g @ast-grep/cli@latest"
+          },
+          "platform_required_tools": []
+        }
+      }
+    },
+    {
+      "id": "ast-grep-skill",
+      "kind": "global-skill",
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [],
+      "required": true,
+      "baseline_blocking": true,
+      "required_for": [
+        "ast-grep usage guidance"
+      ],
+      "recommended_for": [
+        "structural search guidance"
+      ],
+      "demand_signals": [],
+      "detection": {
+        "kind": "global-skill",
+        "skill_name": "ast-grep"
+      },
+      "safety": {
+        "risk_flags": [
+          "global-skill-install",
+          "unpinned-npx"
+        ],
+        "source": "npx",
+        "source_repo": "https://ast-grep.github.io",
+        "version_policy": {
+          "pin_status": "latest"
+        },
+        "review_required": true,
+        "install_effect": "global skill"
+      },
+      "runner_kind": "cross-platform",
+      "installation": {
+        "strategy": "skills-cli",
+        "next_action": "安装全局 ast-grep skill"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "operations": [
+              {
+                "command": "npx",
+                "args": [
+                  "-y",
+                  "skills@latest",
+                  "add",
+                  "ast-grep/agent-skill",
+                  "-g",
+                  "-y"
+                ]
+              }
+            ]
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        },
+        "linux": {
+          "installation": {
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "operations": [
+              {
+                "command": "npx",
+                "args": [
+                  "-y",
+                  "skills@latest",
+                  "add",
+                  "ast-grep/agent-skill",
+                  "-g",
+                  "-y"
+                ]
+              }
+            ]
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        },
+        "wsl": {
+          "installation": {
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "operations": [
+              {
+                "command": "npx",
+                "args": [
+                  "-y",
+                  "skills@latest",
+                  "add",
+                  "ast-grep/agent-skill",
+                  "-g",
+                  "-y"
+                ]
+              }
+            ]
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        },
+        "windows": {
+          "installation": {
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "operations": [
+              {
+                "command": "npx",
+                "args": [
+                  "-y",
+                  "skills@latest",
+                  "add",
+                  "ast-grep/agent-skill",
+                  "-g",
+                  "-y"
+                ]
+              }
+            ]
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        }
+      }
+    }
+  ],
+  "providers": [
+    {
+      "id": "codegraph",
+      "name": "CodeGraph",
+      "kind": "code-structure",
+      "profile": "optional",
+      "capability_class": "code-structure",
+      "native_interfaces": [
+        "mcp",
+        "cli"
+      ],
+      "first_generation": {
+        "owner": "runtime-setup",
+        "status": "not-run",
+        "scope": "project",
+        "requires_explicit_gate": true,
+        "requirement_workspace_path": null,
+        "artifact_root": ".codegraph"
+      },
+      "steady_state": {
+        "refresh_owner": "provider-native",
+        "refresh_mode": "watcher",
+        "hook_default": false,
+        "usage_owner": "downstream-skill"
+      },
+      "usage_note": "安装 package `{{package}}@{{version}}`，运行 `codegraph` CLI，并使用 CodeGraph MCP 工具获取 impact/call graph candidate。已确认的 setup 会在 status 报告 pending change 或建议 `codegraph index -f` 时先运行 `codegraph sync`；只有 full-rebuild advisory 仍存在时，才执行一次 bounded `codegraph index -f`。`codegraph serve --mcp` 负责 provider-native Auto-Sync freshness；结论需由 source/test/log/contract/user evidence 确认。",
+      "dependency_ref": "codegraph",
+      "detection": {
+        "kind": "host_config_exact",
+        "key": "codegraph"
+      },
+      "installation": {
+        "kind": "global-npm",
+        "verify_command": {
+          "command": "codegraph",
+          "args": [
+            "--version"
+          ]
+        }
+      },
+      "project_bootstrap": {
+        "kind": "command",
+        "required": true,
+        "project_file": ".codegraph/codegraph.db",
+        "status_probe": {
+          "command": "codegraph",
+          "args": [
+            "status"
+          ]
+        }
+      },
+      "safety": {
+        "risk_flags": [
+          "global-npm-install",
+          "single-maintainer-bus-factor"
+        ],
+        "version_policy": {
+          "pin_status": "pinned"
+        },
+        "source": "npm",
+        "source_repo": "https://www.npmjs.com/package/@colbymchenry/codegraph",
+        "review_required": true
+      },
+      "readiness": {
+        "producer": "spec-mcp-setup",
+        "fresh_self_report_maps_to": "unknown",
+        "stale_self_report_maps_to": "stale",
+        "lifecycle_display_only": [
+          "installed",
+          "configured",
+          "indexed",
+          "server_reachable",
+          "query_verified"
+        ]
+      },
+      "fallback": {
+        "available": true,
+        "methods": [
+          "rg",
+          "ast-grep",
+          "direct-source-read"
+        ],
+        "reason_code": "codegraph-provider-unavailable"
+      },
+      "host_overrides": {
+        "claude": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "managed",
+            "targets": {
+              "managed": {
+                "config_path": {
+                  "macos": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+                  "linux": "/etc/claude-code/managed-mcp.json",
+                  "wsl": "/etc/claude-code/managed-mcp.json",
+                  "windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
+                },
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.claude.json",
+                "config_format": "json",
+                "precedence": 10,
+                "writable_check": "parent-or-file"
+              }
+            },
+            "fallback_order": [
+              "managed",
+              "user"
+            ],
+            "uninstall_targets": [
+              "managed",
+              "user"
+            ]
+          }
+        },
+        "codex": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "user",
+            "targets": {
+              "user": {
+                "config_path": "$HOME/.codex/config.toml",
+                "config_format": "toml",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "system": {
+                "config_path": "/etc/codex/config.toml",
+                "config_format": "toml",
+                "precedence": 100,
+                "writable_check": "file-only"
+              }
+            },
+            "fallback_order": [
+              "user"
+            ],
+            "uninstall_targets": [
+              "user",
+              "system"
+            ]
+          }
+        },
+        "kiro": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "workspace",
+            "targets": {
+              "workspace": {
+                "config_path": ".kiro/settings/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.kiro/settings/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "workspace"
+            ],
+            "uninstall_targets": [
+              "workspace",
+              "user"
+            ]
+          }
+        },
+        "qoder": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "local",
+            "targets": {
+              "local": {
+                "config_path": ".qoder/settings.local.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.qoder/settings.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "local"
+            ],
+            "uninstall_targets": [
+              "local",
+              "user"
+            ]
+          }
+        },
+        "cursor": {
+          "host_config": {
+            "type": "stdio",
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "project",
+            "targets": {
+              "project": {
+                "config_path": ".cursor/mcp.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              },
+              "user": {
+                "config_path": "$HOME/.cursor/mcp.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        }
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "linux": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "wsl": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "windows": {
+          "installation": {
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "graphify",
+      "name": "Graphify",
+      "kind": "project-graph",
+      "profile": "optional",
+      "capability_class": "project-graph",
+      "native_interfaces": [
+        "cli"
+      ],
+      "first_generation": {
+        "owner": "runtime-setup",
+        "status": "not-run",
+        "scope": "project",
+        "requires_explicit_gate": true,
+        "requirement_workspace_path": null,
+        "artifact_root": ".graphify"
+      },
+      "steady_state": {
+        "refresh_owner": "provider-native",
+        "refresh_mode": "skill-cli-hook-on-demand",
+        "hook_default": true,
+        "usage_owner": "downstream-skill"
+      },
+      "usage_note": "显式 Graphify setup（`spec-mcp-setup --only graphify`）会安装 Graphify CLI 与当前 host 的 project skill，并从原始 PATH 或 Provider 标准用户工具路径解析 `graphify`。若 project root 尚无 Graphify artifact，它先尝试 first-generation `graphify extract .`；semantic extract 无法运行时，回退到 code-only/incremental `graphify update .`，在 project root 生成 provider-native `.graphify/`。Bare Runtime Setup 只诊断 Graphify readiness 并输出 next action。若 `.graphify/graph.json` 或 `.graphify/GRAPH_REPORT.md` 已存在，显式 setup 会验证或修复 install state（project skill/instruction、query probe、hook status/install），并建议显式 incremental `--refresh`，不会默认重新生成。现有旧版 `graphify-out/` artifact 只作为 compatibility 与 refresh-needed evidence；运行 `spec-mcp-setup --only graphify --refresh` 可重新生成 provider-native `.graphify/`。显式 refresh 运行 `graphify update .`（code-only，不做 LLM semantic extraction）；仅当 Graphify 拒绝覆盖并建议 `--force` 时，才执行一次 bounded `graphify update . --force` 修复。需要且目标是 git repo 时，随后启用 provider-native `graphify hook install`。若解析到的 Graphify CLI 不在原始 PATH，setup 可在 Graphify 安装的 hook 文件中加入带 marker 的 project-local PATH repair block，再验证 hook status。下游只要求 CLI/project skill/hook；Graphify MCP/watch 在 Runtime Setup 外仍保持 opt-in。使用 `$graphify .`/`/graphify .` 或解析后的 Graphify CLI query/path/explain 获取 project-graph candidate，再由 source/test/log evidence 确认结论。",
+      "detection": {
+        "kind": "command",
+        "command": "graphify",
+        "version_args": [
+          "--version"
+        ],
+        "artifact_paths": [
+          ".graphify/graph.json",
+          ".graphify/GRAPH_REPORT.md",
+          "graphify-out/graph.json",
+          "graphify-out/GRAPH_REPORT.md"
+        ]
+      },
+      "safety": {
+        "risk_flags": [
+          "global-npm-install",
+          "package-migration:graphifyy->@sentropic/graphify",
+          "single-maintainer-bus-factor",
+          "project-runtime-skill-write",
+          "git-hook-write"
+        ],
+        "source": "npm",
+        "source_repo": "https://www.npmjs.com/package/@sentropic/graphify",
+        "version_policy": {
+          "pin_status": "pinned"
+        },
+        "review_required": true,
+        "install_effect": "Installs npm package `{{package}}@{{version}}`, resolves `graphify` from the user's original PATH or npm global bin, and verifies the resolved CLI. After npm install or upgrade, setup may back up and repoint a stale `graphify` symlink on the original PATH to the pinned executable; ordinary files, non-writable paths, and ambiguous cases stay report-only. Explicit Graphify setup verifies or installs the current-host project skill such as `graphify install --project --platform codex`, normalizes the provider-written `AGENTS.md`/`CLAUDE.md` `## graphify` instruction section to resolved CLI/manual-visibility/direct-source-fallback wording, and only generates provider-native project-root `.graphify/` when no existing current Graphify artifact is present. Bare Runtime Setup only diagnoses Graphify readiness and prints next actions. Existing `.graphify/graph.json`/`GRAPH_REPORT.md` triggers install-state verification plus query/hook probes and reports an explicit incremental refresh next action instead of regenerating by default. Legacy `graphify-out/graph.json`/`GRAPH_REPORT.md` is detected as compatibility-only refresh-needed evidence and does not replace the current `.graphify/` contract. Explicit refresh runs provider-native `graphify update .` (code-only, no LLM semantic extraction), with one bounded `graphify update . --force` repair only after Graphify emits overwrite refusal plus a force hint. Setup probes query/hook commands through the resolved CLI, installs project-level `graphify hook install` in git repos when needed, and may add a marked project-local PATH repair block to Graphify-installed hook files before `graphify hook status` when the resolved CLI is off the original PATH. Provider writes may include `.codex/skills/graphify/`, `.codex/hooks.json`, `AGENTS.md`, `.claude/skills/graphify/`, `CLAUDE.md`, `.graphify/`, legacy `graphify-out/`, and `.git/hooks/*`; setup reports them as provider-owned runtime/project output, does not edit shell profiles, does not vendor the Graphify skill, and does not auto-add, auto-commit, or promote provider output to spec-first source."
+      },
+      "readiness": {
+        "producer": "spec-mcp-setup",
+        "fresh_self_report_maps_to": "unknown",
+        "stale_self_report_maps_to": "stale"
+      },
+      "fallback": {
+        "available": true,
+        "methods": [
+          "docs",
+          "rg",
+          "direct-source-read"
+        ],
+        "reason_code": "project-graph-provider-unavailable"
+      },
+      "installation": {
+        "strategy": "npm-global",
+        "dependency_ref": "graphify",
+        "next_action": "运行当前 host setup workflow 诊断 Provider readiness，然后使用当前 host 的 subset entrypoint（Claude 与 Codex 均为 `spec-mcp-setup --only graphify`）执行显式 Provider install-init。{{package}} 的 version pin 为 {{version}}。"
+      },
+      "platform_overrides": {
+        "macos": {
+          "installation": {
+            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+          }
+        },
+        "linux": {
+          "installation": {
+            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+          }
+        },
+        "wsl": {
+          "installation": {
+            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+          }
+        },
+        "windows": {
+          "installation": {
+            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+          }
+        }
+      }
+    }
+  ],
+  "provider_readiness_defaults": {
+    "schema_version": "provider-readiness.v2",
+    "readiness_status_values": [
+      "fresh",
+      "stale",
+      "degraded",
+      "not-run",
+      "unknown"
+    ],
+    "fallback_methods": [
+      "rg",
+      "direct-source-read"
+    ]
+  },
+  "artifact_contracts": [
+    {
+      "id": "install-plan",
+      "schema_version": "setup-install-plan.v1",
+      "path": "stdout",
+      "producer": "mode-policy+renderer",
+      "consumers": [
+        "user",
+        "approval-surface"
+      ]
+    },
+    {
+      "id": "diagnostic-snapshot",
+      "schema_version": "spec-mcp-setup-diagnostic-snapshot.v1",
+      "path": "stdout",
+      "producer": "diagnostic-path",
+      "consumers": [
+        "user",
+        "ci"
+      ]
+    },
+    {
+      "id": "preflight",
+      "schema_version": "spec-mcp-setup-preflight.v2",
+      "path": "stdout",
+      "producer": "diagnostic-path",
+      "consumers": [
+        "user",
+        "ci"
+      ]
+    },
+    {
+      "id": "tool-facts",
+      "schema_version": "tool-facts.v2",
+      "path": ".spec-first/config/tool-facts.json",
+      "producer": "facts-reconciliation",
+      "consumers": [
+        "using-spec-first",
+        "spec-plan",
+        "spec-work",
+        "spec-debug",
+        "spec-code-review"
+      ]
+    },
+    {
+      "id": "runtime-capabilities",
+      "schema_version": "runtime-capabilities.v1",
+      "path": ".spec-first/config/runtime-capabilities.json",
+      "producer": "facts-reconciliation",
+      "consumers": [
+        "spec-plan",
+        "spec-work",
+        "spec-debug",
+        "spec-code-review"
+      ]
+    },
+    {
+      "id": "workspace-setup-summary",
+      "schema_version": "workspace-mcp-setup-summary.v1",
+      "path": ".spec-first/workspace/mcp-setup-summary.json",
+      "producer": "parent-batch-executor",
+      "consumers": [
+        "parent-workspace-consumer"
+      ]
+    },
+    {
+      "id": "workspace-verify-summary",
+      "schema_version": "workspace-mcp-verify-summary.v1",
+      "path": ".spec-first/workspace/mcp-verify-summary.json",
+      "producer": "verification-path",
+      "consumers": [
+        "parent-workspace-consumer"
+      ]
+    },
+    {
+      "id": "verify-child-result",
+      "schema_version": "mcp-verify-child-result.v1",
+      "path": "embedded:workspace-mcp-verify-summary.v1.children[]",
+      "producer": "verification-path",
+      "consumers": [
+        "workspace-mcp-verify-summary.v1"
+      ]
+    },
+    {
+      "id": "parent-artifact-quarantine",
+      "schema_version": "parent-artifact-quarantine.v1",
+      "path": ".spec-first/workspace/parent-artifact-quarantine.json",
+      "producer": "verification-path",
+      "consumers": [
+        "parent-workspace-consumer",
+        "spec-first-clean"
+      ]
+    },
+    {
+      "id": "project-config-bootstrap",
+      "schema_version": "project-config-bootstrap.v1",
+      "path": "stdout",
+      "producer": "project-config",
+      "consumers": [
+        "project-bootstrap",
+        "user"
+      ]
+    },
+    {
+      "id": "workspace-project-config-bootstrap-summary",
+      "schema_version": "workspace-project-config-bootstrap-summary.v1",
+      "path": ".spec-first/workspace/project-config-bootstrap-summary.json",
+      "producer": "project-config",
+      "consumers": [
+        "parent-workspace-consumer",
+        "user"
+      ]
+    },
+    {
+      "id": "project-local-config-status",
+      "schema_version": "project-local-config-status.v1",
+      "path": "embedded:project-config-result",
+      "producer": "project-config",
+      "consumers": [
+        "project-bootstrap",
+        "user"
+      ]
+    },
+    {
+      "id": "provider-readiness",
+      "schema_version": "provider-readiness.v2",
+      "path": "embedded:tool-facts.v2.provider_readiness[]",
+      "producer": "provider-verify+facts",
+      "consumers": [
+        "setup-consumers"
+      ]
+    }
+  ]
+}

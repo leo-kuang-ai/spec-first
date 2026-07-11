@@ -1,18 +1,34 @@
 'use strict';
 
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { getSupportedPlatforms } = require('../../src/cli/adapters');
-const { PLATFORM_REGISTRY } = require('../../src/cli/adapters/platform-registry');
 const {
-  currentProviderHost,
-  projectSkillCandidates,
-} = require('../../skills/spec-mcp-setup/scripts/provider-readiness-renderer.cjs');
+  maskAllowedCodexOtherHostPaths,
+} = require('../../src/cli/host-comparative-workflows');
+const {
+  normalizeSetupFacts,
+} = require('../../src/cli/helpers/setup-facts');
+const { WORKFLOW_RUNTIME_CONTRACT_TESTS } = require('../../scripts/run-ai-dev-quality-gate');
+const { collectSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+const {
+  getEffectiveEntry,
+  getEffectiveRegistry,
+  loadRegistry,
+} = require('../../skills/spec-mcp-setup/scripts/lib/registry.cjs');
+const providers = require('../../skills/spec-mcp-setup/scripts/providers/registry.cjs');
 
 const repoRoot = path.resolve(__dirname, '../..');
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+}
+
+function tempRepo(label) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-config-consumer-${label}-`));
+  fs.mkdirSync(path.join(root, '.git'), { recursive: true });
+  return root;
 }
 
 describe('spec-mcp-setup active config consumers', () => {
@@ -39,29 +55,100 @@ describe('spec-mcp-setup active config consumers', () => {
   });
 });
 
-describe('spec-mcp-setup provider host routing', () => {
-  test('accepts every supported platform without falling back to Codex', () => {
-    for (const platform of getSupportedPlatforms()) {
-      expect(currentProviderHost({ SPEC_FIRST_PROVIDER_HOST: platform })).toBe(platform);
+describe('spec-mcp-setup active Node consumers', () => {
+  test('loads helper metadata from setup-registry v8 without jq', () => {
+    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-mcp-setup') });
+    expect(registry.schema_version).toBe('setup-registry.v8');
+    expect(registry.helpers.map((entry) => entry.id)).not.toContain('jq');
+
+    const helpers = new Map(registry.helpers.map((entry) => [entry.id, entry]));
+    expect(helpers.get('gh')).toMatchObject({ id: 'gh', baseline_blocking: true });
+    for (const platform of ['macos', 'linux', 'windows']) {
+      expect(getEffectiveEntry(registry, {
+        kind: 'helper',
+        id: 'agent-browser',
+        host: 'codex',
+        platform,
+      }).installation.command).toEqual(expect.any(String));
     }
-    expect(currentProviderHost({ SPEC_FIRST_PROVIDER_HOST: 'unknown' })).toBe('codex');
   });
 
-  test('uses each platform registry skill root for project provider detection', () => {
-    for (const platform of getSupportedPlatforms()) {
-      const candidates = projectSkillCandidates('/repo', 'graphify', platform)
-        .map((candidate) => candidate.replaceAll('\\', '/'));
-      const skillsRoot = PLATFORM_REGISTRY[platform].surfaces.skillsRoot.path;
-      expect(candidates).toContain(`/repo/${skillsRoot}graphify/SKILL.md`);
+  test('keeps downstream tool-facts normalization stable when fed by the Node facts owner', () => {
+    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-mcp-setup') });
+    const toolResults = registry.tools.map((entry) => ({
+      id: entry.id,
+      status: entry.required ? 'ready' : 'skipped',
+      verified: true,
+      source: 'post-mutation-probe',
+    }));
+    const helperResults = registry.helpers.map((entry) => ({
+      id: entry.id,
+      status: 'ready',
+      verified: true,
+      source: 'post-mutation-probe',
+    }));
+    const bundle = collectSetupFacts({
+      repoRoot: '/repo',
+      host: 'codex',
+      platform: 'linux',
+      registry,
+      toolResults,
+      helperResults,
+      providerResults: [],
+      configuredDependencies: [],
+      now: new Date('2026-07-11T04:00:00.000Z'),
+    });
+
+    expect(normalizeSetupFacts(bundle.toolFacts, {
+      now: new Date('2026-07-11T04:00:01.000Z'),
+    })).toMatchObject({
+      status: 'ready',
+      reason_code: 'setup-facts-normalized',
+      schema_versions: { tool_facts: 'tool-facts.v2' },
+      host: 'codex',
+      platform: 'linux',
+      counts: { required_action: 0 },
+    });
+  });
+
+  test('queries effective registry data for every supported host', () => {
+    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-mcp-setup') });
+    for (const host of getSupportedPlatforms()) {
+      const effective = getEffectiveRegistry(registry, { host, platform: 'linux' });
+      expect(effective.host_definition.id).toBe(host);
+      expect(effective.tools.find((entry) => entry.id === 'context7').host_config.targets)
+        .toBeDefined();
     }
   });
 
-  test('keeps Bash and PowerShell Graphify platform allowlists aligned', () => {
-    const shell = read('skills/spec-mcp-setup/scripts/install-helpers.sh');
-    const powershell = read('skills/spec-mcp-setup/scripts/install-helpers.ps1');
-    const platforms = getSupportedPlatforms();
+  test('routes Graphify project-skill installation through the trusted provider map', () => {
+    expect(Object.keys(providers).sort()).toEqual(['codegraph', 'graphify']);
+    for (const host of getSupportedPlatforms()) {
+      const repoRoot = tempRepo(host);
+      const plan = providers.graphify.plan({ selected: true, repoRoot, host });
+      const installSkill = plan.actions.find((entry) => entry.kind === 'install-project-skill');
+      expect(installSkill).toMatchObject({
+        command: 'graphify',
+        args: ['install', '--project', '--platform', host],
+      });
+    }
+  });
 
-    expect(shell).toContain(`${platforms.join('|')}) printf '%s'`);
-    expect(powershell).toContain(`@('${platforms.join("', '")}') -contains $hostValue`);
+  test('masks only the unified Node entrypoint as comparative Claude runtime prose', () => {
+    const nodePath = '.claude/spec-first/workflows/spec-mcp-setup/scripts/setup.cjs';
+    expect(maskAllowedCodexOtherHostPaths(nodePath, 'spec-code-review')).toBe(
+      '[allowed spec-code-review other-host path]',
+    );
+  });
+
+  test('quality gate covers Node setup contracts without binding PowerShell assets', () => {
+    expect(WORKFLOW_RUNTIME_CONTRACT_TESTS.some((file) => /powershell/i.test(file))).toBe(false);
+    expect(WORKFLOW_RUNTIME_CONTRACT_TESTS).toEqual(expect.arrayContaining([
+      'tests/unit/mcp-setup-node-contracts.test.js',
+      'tests/unit/mcp-setup-entrypoint.test.js',
+      'tests/unit/mcp-setup-registry.test.js',
+      'tests/unit/mcp-setup-facts-renderer.test.js',
+      'tests/unit/mcp-setup-providers.test.js',
+    ]));
   });
 });

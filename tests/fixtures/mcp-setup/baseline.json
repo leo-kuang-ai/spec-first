@@ -1,0 +1,40 @@
+{
+  "schema_version": "mcp-setup-development-baseline.v1",
+  "baseline_commit": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+  "captured_at": "2026-07-11T12:02:23+08:00",
+  "environment": {
+    "os": "Darwin 25.5.0 arm64",
+    "node": "v22.22.3",
+    "worktree": "refactor/mcp-setup-node",
+    "source_checkout_limitation": "原始 checkout 包含无关的 owner edit，因此在修改 production source 前将实现移入独立 worktree。"
+  },
+  "posix_commands": [
+    {
+      "command": "npm run test:mcp-setup",
+      "status": "passed",
+      "evidence": "3 suites, 7 tests"
+    },
+    {
+      "command": "npm run test:unit",
+      "status": "passed",
+      "evidence": "51 suites, 261 tests"
+    },
+    {
+      "command": "npm run test:smoke",
+      "status": "passed",
+      "evidence": "1 suite, 5 tests"
+    },
+    {
+      "command": "npm run test:integration",
+      "status": "passed",
+      "evidence": "2 suites, 16 tests"
+    }
+  ],
+  "windows_baseline": {
+    "workflow_run_id": 29138759158,
+    "workflow_url": "https://github.com/sunrain520/spec-first/actions/runs/29138759158",
+    "status": "failed",
+    "limitation_owner": "tests/smoke/cli-smoke.test.js 中 packed tarball 的 child-process 行为",
+    "relation_to_mcp_setup": "Node 20 与 Node 22 上，无关 smoke failure 发生前，旧版 MCP setup unit contract 已通过。"
+  }
+}

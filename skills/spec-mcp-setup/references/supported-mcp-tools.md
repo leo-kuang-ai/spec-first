@@ -1,6 +1,6 @@
 # Supported MCP Tools
 
-This reference summarizes the current `spec-mcp-setup` registry. The machine source of truth is `skills/spec-mcp-setup/mcp-tools.json`.
+本文总结当前 `spec-mcp-setup` registry。Machine source of truth 是 `skills/spec-mcp-setup/setup-registry.json`，schema version 为 `setup-registry.v8`；generated host 从 loaded skill root 消费其共置 runtime projection。
 
 ## Current Required Tools
 
@@ -13,17 +13,22 @@ This reference summarizes the current `spec-mcp-setup` registry. The machine sou
 ## Setup Rules
 
 - Baseline entries may have `required=true`; optional MCP entries must carry `opt_in.explicit_consent_required=true`.
-- Current registry categories are `mcp` only. Required helper/provider tools live in `helper-tools.json` and `provider-tools.json`, not in `mcp-tools.json`.
+- 统一 registry 区分 `tools`、`helpers` 与 `providers`，同时集中管理 dependency pin、host target、platform override、install safety 与 artifact contract。
 - MCP tools must define deterministic install, host config, detection, summary, and uninstall metadata.
 - Package-backed setup paths normally request latest versions through `@latest`.
 - Warmup cache lives under `$HOME/.spec-first/cache/mcp-warmup/` unless `SPEC_FIRST_WARMUP_CACHE_DIR` overrides it.
-- `--verify-only` only reads facts and must not perform installs or host config writes.
+- `--verify-only` / `--refresh-facts` 会重新验证并刷新 setup-owned facts，但不执行安装或 host config 写入。
 - Supported host MCP config targets:
   - Claude Code: managed/user JSON `mcpServers`.
   - Codex: user/system TOML `mcp_servers` sections.
   - Kiro: workspace `.kiro/settings/mcp.json` by default; user `~/.kiro/settings/mcp.json` only with `--user-scope` or `KIRO_USER_SCOPE=1`.
   - Qoder: local `.qoder/settings.local.json` by default; user `~/.qoder/settings.json` only with `--user-scope` or `QODER_USER_SCOPE=1`.
-- Kiro and Qoder config writes use JSON `mcpServers`, preserve unrelated entries, reject invalid JSON instead of overwriting, and must write secret-like values only as env var references.
+  - Cursor：默认写 project `.cursor/mcp.json`；只有使用 `--user-scope` 才写 user `~/.cursor/mcp.json`。
+- Claude、Kiro、Qoder 与 Cursor config 使用 JSON `mcpServers`；Codex 使用 bounded TOML section editing。两者都保留无关 entry、拒绝有歧义或无效输入，并要求 secret-like value 保持为 environment reference。
+
+## Runtime 入口
+
+先解析 loaded skill directory，再使用公开 mode argument 调用 `node <loaded-skill-root>/scripts/setup.cjs`。项目 cwd 绝不能作为 support-file lookup root。`scripts/check-health` 只是 `--check` 的 Node compatibility shim；Windows 直接使用同一 `setup.cjs` 入口，不存在 platform-specific companion。
 
 ## Required Helper Tools
 

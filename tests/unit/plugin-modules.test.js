@@ -110,10 +110,21 @@ describe('plugin module facade and governance', () => {
       projectRoot,
       '.cursor/skills/spec-prd/evals/stale-runtime-fixture.json',
     );
+    const staleSetupRuntimeEval = path.join(
+      projectRoot,
+      '.cursor/skills/spec-mcp-setup/evals/stale-runtime-fixture.json',
+    );
+    const staleSetupRuntimeReadme = path.join(
+      projectRoot,
+      '.cursor/skills/spec-mcp-setup/README.md',
+    );
 
     try {
       fs.mkdirSync(path.dirname(staleRuntimeEval), { recursive: true });
       fs.writeFileSync(staleRuntimeEval, '{}\n');
+      fs.mkdirSync(path.dirname(staleSetupRuntimeEval), { recursive: true });
+      fs.writeFileSync(staleSetupRuntimeEval, '{}\n');
+      fs.writeFileSync(staleSetupRuntimeReadme, '# Maintainer notes\n');
 
       const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
       const operationPaths = plan.operations.map((operation) => operation.path);
@@ -128,6 +139,9 @@ describe('plugin module facade and governance', () => {
         '.cursor/skills/spec-prd/references/prd-output-template.md',
         '.cursor/skills/spec-prd/scripts/check-prd-artifact.js',
         '.cursor/skills/spec-prd/assets/templates/00-generic.md',
+        '.cursor/skills/spec-mcp-setup/setup-registry.json',
+        '.cursor/skills/spec-mcp-setup/setup-registry.schema.json',
+        '.cursor/skills/spec-mcp-setup/scripts/setup.cjs',
       ]));
 
       plugin.syncBundledAssets(projectRoot, adapter);
@@ -140,6 +154,26 @@ describe('plugin module facade and governance', () => {
         projectRoot,
         '.cursor/skills/spec-app-consistency-audit/README.md',
       ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-mcp-setup/evals',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-mcp-setup/README.md',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-mcp-setup/setup-registry.json',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-mcp-setup/setup-registry.schema.json',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-mcp-setup/scripts/setup.cjs',
+      ))).toBe(true);
       expect(fs.existsSync(path.join(
         projectRoot,
         '.cursor/skills/spec-prd/references/prd-output-template.md',
@@ -193,12 +227,35 @@ describe('plugin module facade and governance', () => {
       },
     ];
     const byteStableSupportFiles = [
-      'spec-mcp-setup/mcp-tools.json',
-      'spec-mcp-setup/helper-tools.json',
-      'spec-mcp-setup/provider-tools.json',
-      'spec-mcp-setup/scripts/detect-host.sh',
-      'spec-mcp-setup/scripts/install-helpers.sh',
-      'spec-mcp-setup/scripts/verify-tools.sh',
+      'spec-mcp-setup/setup-registry.json',
+      'spec-mcp-setup/setup-registry.schema.json',
+      'spec-mcp-setup/references/config-template.yaml',
+      'spec-mcp-setup/scripts/check-health',
+      'spec-mcp-setup/scripts/setup.cjs',
+      'spec-mcp-setup/scripts/lib/args.cjs',
+      'spec-mcp-setup/scripts/lib/configured-dependencies.cjs',
+      'spec-mcp-setup/scripts/lib/facts.cjs',
+      'spec-mcp-setup/scripts/lib/host-authority.cjs',
+      'spec-mcp-setup/scripts/lib/host-config.cjs',
+      'spec-mcp-setup/scripts/lib/human-output.cjs',
+      'spec-mcp-setup/scripts/lib/installation-executor.cjs',
+      'spec-mcp-setup/scripts/lib/mode-policy.cjs',
+      'spec-mcp-setup/scripts/lib/path-safety.cjs',
+      'spec-mcp-setup/scripts/lib/preflight.cjs',
+      'spec-mcp-setup/scripts/lib/process-runner.cjs',
+      'spec-mcp-setup/scripts/lib/project-config.cjs',
+      'spec-mcp-setup/scripts/lib/project-target.cjs',
+      'spec-mcp-setup/scripts/lib/registry.cjs',
+      'spec-mcp-setup/scripts/lib/renderer.cjs',
+      'spec-mcp-setup/scripts/lib/runtime-executor.cjs',
+      'spec-mcp-setup/scripts/lib/scenario-fingerprint.cjs',
+      'spec-mcp-setup/scripts/lib/toml-section-editor.cjs',
+      'spec-mcp-setup/scripts/lib/workspace-executor.cjs',
+      'spec-mcp-setup/scripts/lib/worktree-health.cjs',
+      'spec-mcp-setup/scripts/providers/codegraph.cjs',
+      'spec-mcp-setup/scripts/providers/common.cjs',
+      'spec-mcp-setup/scripts/providers/graphify.cjs',
+      'spec-mcp-setup/scripts/providers/registry.cjs',
     ];
 
     for (const platform of getSupportedPlatforms()) {
@@ -221,10 +278,12 @@ describe('plugin module facade and governance', () => {
           );
           const source = fs.readFileSync(
             path.join(__dirname, '..', '..', 'skills', relativePath),
-            'utf8',
           );
           expect(operation).toBeDefined();
-          expect(operation.contents).toBe(source);
+          const projected = Buffer.isBuffer(operation.contents)
+            ? operation.contents
+            : Buffer.from(operation.contents, 'utf8');
+          expect(projected).toEqual(source);
         }
 
         const auditLock = plan.operations.find((candidate) =>
@@ -250,9 +309,8 @@ describe('plugin module facade and governance', () => {
           );
           const source = fs.readFileSync(
             path.join(__dirname, '..', '..', 'skills', relativePath),
-            'utf8',
           );
-          expect(fs.readFileSync(path.join(projectRoot, operation.path), 'utf8')).toBe(source);
+          expect(fs.readFileSync(path.join(projectRoot, operation.path))).toEqual(source);
         }
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -327,7 +385,7 @@ describe('plugin module facade and governance', () => {
         );
         expect(setupSkill).toBeDefined();
         expect(setupSkill.contents).toContain(
-          'The canonical package source-of-truth is `skills/spec-mcp-setup/mcp-tools.json`;',
+          'Canonical package source-of-truth 是 `skills/spec-mcp-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。',
         );
         expect(setupSkill.contents).toContain(
           'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',

@@ -68,6 +68,6 @@ describe('active test inventory', () => {
   test('runner contains no legacy missing-test skip path', () => {
     const runner = fs.readFileSync(path.join(repoRoot, 'scripts/run-test-suite.cjs'), 'utf8');
     expect(runner).not.toContain('skip missing legacy');
-    expect(runner).toContain('Declared test paths are missing');
+    expect(runner).toContain('声明的测试路径不存在');
   });
 });

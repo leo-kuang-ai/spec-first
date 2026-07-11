@@ -57,6 +57,17 @@ function runCommand(command, args, {
   });
 }
 
+function runNpmCommand(args, options) {
+  const npmExecPath = process.env.npm_execpath;
+  if (npmExecPath && fs.existsSync(npmExecPath)) {
+    return runCommand(process.execPath, [npmExecPath, ...args], options);
+  }
+  if (process.platform === 'win32') {
+    throw new Error('npm_execpath is required to run npm smoke commands on Windows');
+  }
+  return runCommand(npmCommand, args, options);
+}
+
 afterEach(() => {
   for (const projectRoot of sandboxRoots) {
     fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -160,7 +171,7 @@ describe('CLI smoke checks', () => {
     fs.mkdirSync(packRoot, { recursive: true });
     fs.mkdirSync(consumerRoot, { recursive: true });
 
-    const pack = runCommand(npmCommand, [
+    const pack = runNpmCommand([
       'pack',
       '--json',
       '--pack-destination',
@@ -171,12 +182,18 @@ describe('CLI smoke checks', () => {
       timeout: 120000,
       env: isolatedNpmEnv(sandbox.home),
     });
-    expect(pack.status).toBe(0);
+    if (pack.status !== 0) {
+      const errorMessage = pack.error ? pack.error.message : 'none';
+      throw new Error([
+        `npm pack failed (status=${pack.status}, signal=${pack.signal}, error=${errorMessage}):`,
+        pack.stderr || pack.stdout,
+      ].join('\n'));
+    }
     const [{ filename }] = JSON.parse(pack.stdout);
     const tarballPath = path.join(packRoot, filename);
     expect(fs.existsSync(tarballPath)).toBe(true);
 
-    const install = runCommand(npmCommand, [
+    const install = runNpmCommand([
       'install',
       '--ignore-scripts',
       '--no-audit',
@@ -251,12 +268,12 @@ describe('CLI smoke checks', () => {
         '.qoder/skills',
       ],
     };
-    const providerSource = fs.readFileSync(
-      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'provider-tools.json'),
+    const registrySource = fs.readFileSync(
+      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'setup-registry.json'),
       'utf8',
     );
-    const helperSource = fs.readFileSync(
-      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'scripts', 'install-helpers.sh'),
+    const setupSource = fs.readFileSync(
+      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'scripts', 'setup.cjs'),
       'utf8',
     );
 
@@ -278,10 +295,10 @@ describe('CLI smoke checks', () => {
       }
 
       const setupRoot = path.join(consumerRoot, runtimeRoot, 'spec-mcp-setup');
-      expect(fs.readFileSync(path.join(setupRoot, 'provider-tools.json'), 'utf8'))
-        .toBe(providerSource);
-      expect(fs.readFileSync(path.join(setupRoot, 'scripts', 'install-helpers.sh'), 'utf8'))
-        .toBe(helperSource);
+      expect(fs.readFileSync(path.join(setupRoot, 'setup-registry.json'), 'utf8'))
+        .toBe(registrySource);
+      expect(fs.readFileSync(path.join(setupRoot, 'scripts', 'setup.cjs'), 'utf8'))
+        .toBe(setupSource);
       expect(fs.existsSync(path.join(
         consumerRoot,
         runtimeRoot,
