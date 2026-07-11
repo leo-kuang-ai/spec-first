@@ -13,6 +13,13 @@ function readFixture(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, 'tests', 'fixtures', 'mcp-setup', relativePath), 'utf8'));
 }
 
+function confirmedMismatchesFor(platformDifferences, platform) {
+  return platformDifferences.decisions
+    .filter((entry) => Array.isArray(entry.confirmed_mismatches)
+      && (!Array.isArray(entry.platforms) || entry.platforms.includes(platform)))
+    .flatMap((entry) => entry.confirmed_mismatches);
+}
+
 function initializeGitRepo(root) {
   const result = spawnSync('git', ['init', '-q', root], { encoding: 'utf8' });
   if (result.status !== 0) throw new Error(result.stderr || result.stdout);
@@ -250,14 +257,20 @@ describe('spec-mcp-setup unified Node contract', () => {
     expect(fixture.schema_version).toBe('mcp-setup-legacy-parity.v2');
     expect(fixture.provenance).toMatchObject({
       source_sha: expect.stringMatching(/^[0-9a-f]{40}$/),
-      capture_status: platform === 'posix' ? 'partial' : 'degraded',
-      authority_level: platform === 'posix' ? 'confirmed-runtime' : 'advisory',
-      reason_code: platform === 'posix'
-        ? 'legacy-runtime-reason-unavailable'
-        : 'legacy-runtime-capture-not-replayed',
+      capture_status: 'partial',
+      authority_level: 'confirmed-runtime',
+      reason_code: 'legacy-runtime-reason-unavailable',
       capture_command: expect.stringContaining(`--platform ${platform}`),
       ci_validation_command: expect.stringContaining('mcp-setup-node-contracts.test.js'),
     });
+    if (platform === 'windows') {
+      expect(fixture.provenance).toMatchObject({
+        capture_run_id: 29153023637,
+        capture_run_url: 'https://github.com/sunrain520/spec-first/actions/runs/29153023637',
+        capture_matrix: ['node-20', 'node-22'],
+        normalized_capture_sha256: '7b4e2376b801792f2c5a8d05c7fcdd86eab0af95841fa163e6fcb578acb341aa',
+      });
+    }
     expect(fixture.provenance.limitations).not.toEqual([]);
     expect(fixture.provenance.source_files.length).toBeGreaterThan(0);
     for (const source of fixture.provenance.source_files) {
@@ -272,15 +285,11 @@ describe('spec-mcp-setup unified Node contract', () => {
       expect(contract.runtime_capture).toMatchObject({
         owner: expect.any(String),
       });
-      if (platform === 'posix') {
-        expect(['confirmed', 'degraded']).toContain(contract.runtime_capture.capture_status);
-        expect(Number.isInteger(contract.runtime_capture.raw_exit_code)).toBe(true);
-        expect(contract.runtime_capture).toHaveProperty('raw_reason_code');
-        expect(contract.runtime_capture).toHaveProperty('raw_artifact_schema');
-        expect(Array.isArray(contract.runtime_capture.raw_artifact_schemas)).toBe(true);
-      } else {
-        expect(contract.runtime_capture.capture_status).toBe('pending-windows-ci');
-      }
+      expect(['confirmed', 'degraded']).toContain(contract.runtime_capture.capture_status);
+      expect(Number.isInteger(contract.runtime_capture.raw_exit_code)).toBe(true);
+      expect(contract.runtime_capture).toHaveProperty('raw_reason_code');
+      expect(contract.runtime_capture).toHaveProperty('raw_artifact_schema');
+      expect(Array.isArray(contract.runtime_capture.raw_artifact_schemas)).toBe(true);
       const plan = buildActionPlan({ argv: contract.argv, knownIds: ['codegraph', 'graphify'] });
       expect(plan.blocked).toBe(false);
       expect(plan.mode).toBe(expectedMode);
@@ -312,15 +321,11 @@ describe('spec-mcp-setup unified Node contract', () => {
       expect(contract.runtime_capture).toMatchObject({
         owner: expect.any(String),
       });
-      if (platform === 'posix') {
-        expect(['confirmed', 'degraded']).toContain(contract.runtime_capture.capture_status);
-        expect(Number.isInteger(contract.runtime_capture.raw_exit_code)).toBe(true);
-        expect(contract.runtime_capture).toHaveProperty('raw_reason_code');
-        expect(contract.runtime_capture).toHaveProperty('raw_artifact_schema');
-        expect(Array.isArray(contract.runtime_capture.raw_artifact_schemas)).toBe(true);
-      } else {
-        expect(contract.runtime_capture.capture_status).toBe('pending-windows-ci');
-      }
+      expect(['confirmed', 'degraded']).toContain(contract.runtime_capture.capture_status);
+      expect(Number.isInteger(contract.runtime_capture.raw_exit_code)).toBe(true);
+      expect(contract.runtime_capture).toHaveProperty('raw_reason_code');
+      expect(contract.runtime_capture).toHaveProperty('raw_artifact_schema');
+      expect(Array.isArray(contract.runtime_capture.raw_artifact_schemas)).toBe(true);
       expect(buildActionPlan({ argv: contract.argv, knownIds: ['codegraph', 'graphify'] })).toMatchObject({
         blocked: true,
         reason_code: contract.reason_code,
@@ -379,7 +384,8 @@ describe('spec-mcp-setup unified Node contract', () => {
       raw_artifact_schema: 'workspace-mcp-setup-summary.v1',
     });
     const adjudications = platformDifferences.decisions
-      .filter((entry) => Array.isArray(entry.confirmed_mismatches));
+      .filter((entry) => Array.isArray(entry.confirmed_mismatches)
+        && (!Array.isArray(entry.platforms) || entry.platforms.includes('posix')));
     expect(adjudications).toEqual([
       expect.objectContaining({
         id: 'verify-readiness-exit-code',
@@ -400,8 +406,15 @@ describe('spec-mcp-setup unified Node contract', () => {
       }),
     ]);
     expect(result.contract_mismatches).toEqual(
-      adjudications.flatMap((entry) => entry.confirmed_mismatches),
+      confirmedMismatchesFor(platformDifferences, 'posix'),
     );
+    expect(platformDifferences.decisions).toContainEqual(expect.objectContaining({
+      id: 'windows-project-config-new-item-literalpath',
+      platforms: ['windows'],
+      classification: 'legacy-defect',
+      confirmed_mismatches: ['project-config:exit_code:1!=0'],
+      canonical_expected_result: expect.stringContaining('以 0 退出'),
+    }));
   }, 60000);
 
   test('executes Windows replay only on win32 CI', () => {
@@ -411,8 +424,7 @@ describe('spec-mcp-setup unified Node contract', () => {
     const result = replay({ repoRoot, platform: 'windows', source: fixture.provenance.source_sha });
 
     if (process.platform === 'win32') {
-      const adjudicatedMismatches = platformDifferences.decisions
-        .flatMap((entry) => entry.confirmed_mismatches || []);
+      const adjudicatedMismatches = confirmedMismatchesFor(platformDifferences, 'windows');
       expect(result).toMatchObject({
         authority_level: 'confirmed-runtime',
         runtime_replay: 'executed',
@@ -422,7 +434,7 @@ describe('spec-mcp-setup unified Node contract', () => {
       for (const mode of ['verify', 'only', 'graphify-refresh']) {
         expect(result.modes[mode].raw_stderr).not.toContain('Cannot find module');
       }
-      expect(result.contract_mismatches).toEqual(adjudicatedMismatches);
+      expect([...result.contract_mismatches].sort()).toEqual([...adjudicatedMismatches].sort());
     } else {
       expect(result).toMatchObject({
         capture_status: 'skipped',

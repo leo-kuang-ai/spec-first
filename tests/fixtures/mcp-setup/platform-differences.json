@@ -19,6 +19,20 @@
       "mcp_setup_unit_contracts_before_failure": "passed"
     }
   },
+  "legacy_runtime_capture": {
+    "windows": {
+      "workflow_run_id": 29153023637,
+      "workflow_url": "https://github.com/sunrain520/spec-first/actions/runs/29153023637",
+      "head_sha": "827ee115ab638871d003d59adc2f5355682e21cb",
+      "source_sha": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+      "node_matrix": [20, 22],
+      "source_files_materialized": 58,
+      "capture_status": "partial",
+      "authority_level": "confirmed-runtime",
+      "normalized_capture_sha256": "7b4e2376b801792f2c5a8d05c7fcdd86eab0af95841fa163e6fcb578acb341aa",
+      "normalization": "仅移除包含随机临时路径的 modes.*.raw_stderr；所有合同字段在 Node 20/22 间一致"
+    }
+  },
   "decisions": [
     {
       "id": "public-flag-spelling",
@@ -51,9 +65,20 @@
         "verify:exit_code:0!=1"
       ],
       "classification": "legacy-defect",
-      "legacy_difference": "POSIX 旧版 --verify-only 即使未确认必需依赖就绪，仍会在写入 facts 后以 0 退出。",
+      "legacy_difference": "Bash/PowerShell 旧版 --verify-only 即使未确认必需依赖就绪，仍会在写入 facts 后以 0 退出。",
       "canonical_expected_result": "Node 实现在允许写入 setup-owned facts 后，只要 baseline 或 host readiness 仍需处理，就必须以非零退出。",
       "rationale": "Verification gate 要求成功写入 artifact 不能被提升为 setup 成功；退出状态必须 fail closed。"
+    },
+    {
+      "id": "windows-project-config-new-item-literalpath",
+      "platforms": ["windows"],
+      "confirmed_mismatches": [
+        "project-config:exit_code:1!=0"
+      ],
+      "classification": "legacy-defect",
+      "legacy_difference": "PowerShell 旧版在 fresh repo 创建 .gitignore 时调用不存在的 New-Item -LiteralPath；写入 example config 后中断并以 1 退出。",
+      "canonical_expected_result": "Node 实现使用受 containment 约束的文件 API 创建或更新 .gitignore，完成 project-config artifact 后以 0 退出。",
+      "rationale": "显式 project-config 已授权 repo-local 写入；PowerShell 参数拼写错误不能成为 Windows 的必要平台语义，也不能阻止 replacement 完成同一合同。"
     },
     {
       "id": "refresh-requires-explicit-graphify-selection",
@@ -62,7 +87,7 @@
         "refresh-without-only-graphify:mutated-state"
       ],
       "classification": "legacy-defect",
-      "legacy_difference": "POSIX 旧版裸 --refresh 会成功退出并写入 host config，未要求 --only graphify 的显式选择。",
+      "legacy_difference": "Bash/PowerShell 旧版裸 --refresh 会成功退出并写入 host config，未要求 --only graphify 的显式选择。",
       "canonical_expected_result": "Node 实现拒绝裸 --refresh，以非零退出并保持零副作用；只有 --only graphify --refresh 可进入 Graphify mutation。",
       "rationale": "Provider opt-in 与 mutation gate 都要求显式选择；未授权 refresh 必须 fail closed。"
     }
