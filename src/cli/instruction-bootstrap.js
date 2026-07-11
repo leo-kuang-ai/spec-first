@@ -1,40 +1,22 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { writeFileAtomic } = require('./atomic-write');
-const { LANG_END, LANG_START } = require('./lang-policy');
+const {
+  buildManagedBlock,
+  inspectMarkerStructure,
+  LANG_END,
+  LANG_START,
+} = require('./lang-policy');
 
 const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
 const BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
+const LEGACY_BOOTSTRAP_BODIES = [
+  `## Workflow 入口治理
 
-function writeInstructionBootstrap(projectRoot, adapter, lang = 'zh') {
-  const filePath = path.join(projectRoot, adapter.instructionFile);
-  const block = buildBootstrapBlock(adapter, lang);
+- 本 block 只提供 \`using-spec-first\` source pointer；完整入口路由与边界在 \`skills/using-spec-first/SKILL.md\``,
+  `## Workflow Entry Governance
 
-  let existing = '';
-  if (fs.existsSync(filePath)) {
-    existing = fs.readFileSync(filePath, 'utf8');
-  }
-
-  const updated = applyManagedBootstrapBlock(existing, block);
-  writeAtomically(filePath, updated);
-  console.log(`🧭 Wrote using-spec-first bootstrap to ${adapter.instructionFile}`);
-}
-
-function removeInstructionBootstrap(projectRoot, adapter) {
-  const filePath = path.join(projectRoot, adapter.instructionFile);
-  if (!fs.existsSync(filePath)) {
-    return false;
-  }
-
-  const existing = fs.readFileSync(filePath, 'utf8');
-  const updated = removeManagedBootstrapBlock(existing);
-  if (updated === existing) {
-    return false;
-  }
-
-  writeAtomically(filePath, updated);
-  return true;
-}
+- This block is only a \`using-spec-first\` source pointer; the full entry routing map and boundaries live in \`skills/using-spec-first/SKILL.md\``,
+];
 
 function inspectInstructionBootstrap(projectRoot, adapter) {
   const filePath = path.join(projectRoot, adapter.instructionFile);
@@ -46,14 +28,13 @@ function inspectInstructionBootstrap(projectRoot, adapter) {
   }
 
   const existing = fs.readFileSync(filePath, 'utf8');
-  const legacyStartIdx = existing.indexOf(BOOTSTRAP_START);
-  const legacyEndIdx = existing.indexOf(BOOTSTRAP_END);
+  const legacyMarkers = inspectMarkerStructure(existing, BOOTSTRAP_START, BOOTSTRAP_END);
 
-  if (legacyStartIdx !== -1 || legacyEndIdx !== -1) {
-    if (legacyStartIdx === -1 || legacyEndIdx === -1 || legacyEndIdx <= legacyStartIdx) {
+  if (!legacyMarkers.absent) {
+    if (!legacyMarkers.valid) {
       return {
         status: 'partial',
-        message: 'legacy bootstrap markers are incomplete',
+        message: 'legacy bootstrap markers must form exactly one balanced pair',
       };
     }
 
@@ -63,67 +44,56 @@ function inspectInstructionBootstrap(projectRoot, adapter) {
     };
   }
 
-  const langStartIdx = existing.indexOf(LANG_START);
-  const langEndIdx = existing.indexOf(LANG_END);
+  const langMarkers = inspectMarkerStructure(existing, LANG_START, LANG_END);
 
-  if (langStartIdx === -1 && langEndIdx === -1) {
+  if (langMarkers.absent) {
     return {
       status: 'missing',
       message: 'managed language/governance block missing',
     };
   }
 
-  if (langStartIdx === -1 || langEndIdx === -1 || langEndIdx <= langStartIdx) {
+  if (!langMarkers.valid) {
     return {
       status: 'partial',
-      message: 'managed language/governance markers are incomplete',
+      message: 'managed language/governance markers must form exactly one balanced pair',
     };
   }
 
-  const actual = existing.slice(langStartIdx, langEndIdx + LANG_END.length);
-  if (actual.includes('`using-spec-first`') &&
-    actual.includes('skills/using-spec-first/SKILL.md')) {
+  const actual = existing.slice(langMarkers.startIdx, langMarkers.endIdx + LANG_END.length);
+  const comparableActual = actual.replace(/\r\n/g, '\n');
+  if (![buildManagedBlock('zh'), buildManagedBlock('en')].includes(comparableActual)) {
     return {
-      status: 'installed',
-      message: 'workflow entry guidance present in the spec-first:lang block',
+      status: 'drifted',
+      message: 'managed language/governance block drifted from expected content',
+    };
+  }
+
+  const runtimeSkillPath = path.posix.join(
+    adapter.skillsRoot,
+    'using-spec-first',
+    'SKILL.md',
+  );
+  const runtimeSkillAbsolutePath = path.join(projectRoot, runtimeSkillPath);
+  if (!isFile(runtimeSkillAbsolutePath)) {
+    return {
+      status: 'missing',
+      message: `${runtimeSkillPath} is missing`,
     };
   }
 
   return {
-    status: 'drifted',
-    message: 'workflow entry guidance missing from the spec-first:lang block',
+    status: 'installed',
+    message: 'workflow entry guidance and installed using-spec-first runtime are present',
   };
 }
 
-function applyManagedBootstrapBlock(existing, block) {
-  const startIdx = existing.indexOf(BOOTSTRAP_START);
-  const endIdx = existing.indexOf(BOOTSTRAP_END);
-
-  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-    const before = existing.slice(0, startIdx);
-    const after = existing.slice(endIdx + BOOTSTRAP_END.length);
-    return `${before}${block}${after}`;
+function isFile(filePath) {
+  try {
+    return fs.statSync(filePath).isFile();
+  } catch {
+    return false;
   }
-
-  // Strip spec-first's own prior content before appending, so a legacy managed section is
-  // not duplicated by the freshly appended block on re-init. How aggressively depends on
-  // the evidence that the file was spec-first-managed:
-  // - A dangling marker (corrupted) proves prior management, so the full heuristic is safe
-  //   (exact bodies + explicit legacy heading + generic governance heading with >=2 anchors).
-  // - With NO markers there is no such proof, so only remove unambiguous spec-first content
-  //   (exact known bodies and the explicit "(managed by spec-first)" heading). A generic
-  //   heading like "## Workflow Entry Governance" that merely shares anchor phrases is left
-  //   alone: a possible duplicate is recoverable, but deleting a user-authored section is not.
-  const corrupted = startIdx !== -1 || endIdx !== -1;
-  const cleaned = corrupted
-    ? stripKnownBootstrapBodies(stripStandaloneMarkerLines(existing))
-    : stripKnownBootstrapBodies(existing, { legacyHeadingsOnly: true });
-  if (cleaned.length === 0) {
-    return block;
-  }
-
-  const separator = cleaned.endsWith('\n') ? '\n' : '\n\n';
-  return `${cleaned}${separator}${block}\n`;
 }
 
 function removeManagedBootstrapBlock(existing) {
@@ -143,26 +113,6 @@ function removeManagedBootstrapBlock(existing) {
   return normalizeRemovalResult(stripKnownBootstrapBodies(existing, { legacyHeadingsOnly: true }));
 }
 
-function buildBootstrapBlock(adapterOrId, lang = 'zh') {
-  const hostId = typeof adapterOrId === 'string' ? adapterOrId : adapterOrId.id;
-  const body = lang === 'en'
-    ? buildEnBootstrapBody(hostId)
-    : buildZhBootstrapBody(hostId);
-  return `${BOOTSTRAP_START}\n${body}\n${BOOTSTRAP_END}`;
-}
-
-function buildZhBootstrapBody(hostId) {
-  return `## Workflow 入口治理
-
-- 本 block 只提供 \`using-spec-first\` source pointer；完整入口路由与边界在 \`skills/using-spec-first/SKILL.md\``;
-}
-
-function buildEnBootstrapBody(hostId) {
-  return `## Workflow Entry Governance
-
-- This block is only a \`using-spec-first\` source pointer; the full entry routing map and boundaries live in \`skills/using-spec-first/SKILL.md\``;
-}
-
 function stripStandaloneMarkerLines(content) {
   return content
     .split('\n')
@@ -175,7 +125,7 @@ function stripStandaloneMarkerLines(content) {
 
 function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {}) {
   let next = content;
-  for (const body of buildKnownBootstrapBodies()) {
+  for (const body of LEGACY_BOOTSTRAP_BODIES) {
     next = next
       .replace(`\n${body}\n`, '\n')
       .replace(`\n${body}`, '\n')
@@ -183,15 +133,6 @@ function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {})
       .replace(body, '');
   }
   return stripManagedBootstrapSections(next, { legacyHeadingsOnly });
-}
-
-function buildKnownBootstrapBodies() {
-  const bodies = [];
-  for (const hostId of ['claude', 'codex', 'cursor', 'kiro', 'qoder']) {
-    bodies.push(buildZhBootstrapBody(hostId));
-    bodies.push(buildEnBootstrapBody(hostId));
-  }
-  return [...new Set(bodies)];
 }
 
 function stripManagedBootstrapSections(content, { legacyHeadingsOnly = false } = {}) {
@@ -295,17 +236,7 @@ function normalizeRemovalResult(content) {
     .replace(/\n+$/, '\n');
 }
 
-function writeAtomically(filePath, contents) {
-  writeFileAtomic(filePath, contents);
-}
-
 module.exports = {
-  BOOTSTRAP_END,
-  BOOTSTRAP_START,
-  applyManagedBootstrapBlock,
-  buildBootstrapBlock,
   inspectInstructionBootstrap,
-  removeInstructionBootstrap,
   removeManagedBootstrapBlock,
-  writeInstructionBootstrap,
 };

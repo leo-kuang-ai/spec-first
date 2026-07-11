@@ -87,7 +87,10 @@ function runSmoke() {
 }
 
 function runIntegration() {
-  runJestFiles(['tests/integration/qoder-runtime-lifecycle.integration.test.js'], ['--runInBand']);
+  runJestFiles([
+    'tests/integration/qoder-runtime-lifecycle.integration.test.js',
+    'tests/integration/init-five-host-lifecycle.integration.test.js',
+  ], ['--runInBand']);
 }
 
 function runReleaseGovernance() {

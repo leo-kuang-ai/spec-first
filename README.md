@@ -81,11 +81,13 @@ Select your host (Claude Code, Codex, Cursor, Kiro, and/or Qoder), confirm your 
 
 Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, or `.qoder/`. Generated copies can be rebuilt any time with `spec-first init`.
 
+Init does not create or rewrite the target repository's `CHANGELOG.md`. Changelog policy remains owned by the repository's existing instructions and release process.
+
 If the host reports missing helper or MCP readiness facts, run the unified `spec-mcp-setup` entry in your current host before continuing.
 
 Cursor note: `spec-first init --cursor` generates the same `spec-*` workflow runtime under `.cursor/skills/**`, spec-first state under `.cursor/spec-first/**`, and project MCP setup targets `.cursor/mcp.json` by default. User-level `~/.cursor/mcp.json` requires `--user-scope` / `CURSOR_USER_SCOPE=1`. Current release evidence records `cursor_loader_validation_unavailable`, so do not treat Cursor as full host support or an `init -y` default.
 
-Cursor/Kiro/Qoder native pointer files: `init --cursor`, `init --kiro`, and `init --qoder` also write `.cursor/rules/spec-first.mdc`, `.kiro/steering/spec-first.md`, and `.qoder/rules/spec-first.md`. These files only point the host back to root `AGENTS.md` and `skills/using-spec-first/SKILL.md`; they are generated runtime pointers, not a second source of truth. If a same-path user-owned file already exists without the spec-first managed marker, init and clean leave it untouched and doctor reports a warning.
+Cursor/Kiro/Qoder native pointer files: `init --cursor`, `init --kiro`, and `init --qoder` also write `.cursor/rules/spec-first.mdc`, `.kiro/steering/spec-first.md`, and `.qoder/rules/spec-first.md`. These files only point the host back to root `AGENTS.md` and that host's installed `using-spec-first` runtime skill (`.cursor/skills/`, `.kiro/skills/`, or `.qoder/skills/`); they are generated runtime pointers, not a second source of truth. If a same-path user-owned file already exists without the spec-first managed marker, init and clean leave it untouched; init and doctor both report the collision as a warning.
 
 For all init options (flags, scripted mode, multi-repo), see the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md).
 

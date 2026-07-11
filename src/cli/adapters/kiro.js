@@ -4,7 +4,10 @@ const path = require('node:path');
 const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
-const { contentHasOtherRuntimePathReferences } = require('./platform-registry');
+const {
+  contentHasUnexpectedRuntimePathReferences,
+  rewritePreservingHostComparativeConfigPaths,
+} = require('./host-comparative-config-paths');
 
 const KIRO_STEERING_POINTER_PATH = '.kiro/steering/spec-first.md';
 const KIRO_AGENT_READ_TOOLS = ['read'];
@@ -60,7 +63,7 @@ class KiroAdapter extends PointerBasedAdapter {
 
   transformSkillContent(content, context = {}) {
     let transformed = rewriteSkillName(
-      rewriteSharedPaths(content),
+      rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths),
       kiroRuntimeSkillName(context),
     );
     if (isKiroRuntimeSetupSurface(context)) {
@@ -323,7 +326,11 @@ function inspectKiroSkillNames(projectRoot, skillsRoot) {
       const issues = [];
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
-      if (contentHasOtherRuntimePathReferences('kiro', fs.readFileSync(skillPath, 'utf8'))) {
+      if (contentHasUnexpectedRuntimePathReferences(
+        'kiro',
+        fs.readFileSync(skillPath, 'utf8'),
+        { skillName: skillDir },
+      )) {
         issues.push('contains non-Kiro runtime path references');
       }
       return issues.length === 0

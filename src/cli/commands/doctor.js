@@ -200,18 +200,16 @@ function checkPlatformCli(platform) {
   };
 }
 
-function checkGeneratedCommands(projectRoot, adapter) {
-  let commandStatus;
-  try {
-    commandStatus = inspectInstalledAssets(projectRoot, adapter).commands;
-  } catch (error) {
+function checkGeneratedCommands(adapter, assetInspection) {
+  if (assetInspection.error) {
     return {
       level: 'ERROR',
       name: `${adapter.commandRoot}`,
-      message: error instanceof Error ? error.message : String(error),
+      message: formatInspectionError(assetInspection.error),
       fix: 'Reinstall the spec-first package so bundled command templates are available.',
     };
   }
+  const commandStatus = assetInspection.inventory.commands;
 
   if (!fs.existsSync(commandStatus.targetRoot)) {
     return {
@@ -251,18 +249,16 @@ function checkGeneratedCommands(projectRoot, adapter) {
   };
 }
 
-function checkInstalledSkills(projectRoot, adapter) {
-  let skillStatus;
-  try {
-    skillStatus = inspectInstalledAssets(projectRoot, adapter).skills;
-  } catch (error) {
+function checkInstalledSkills(adapter, assetInspection) {
+  if (assetInspection.error) {
     return {
       level: 'ERROR',
       name: `${adapter.skillsRoot}`,
-      message: error instanceof Error ? error.message : String(error),
+      message: formatInspectionError(assetInspection.error),
       fix: 'Reinstall the spec-first package so bundled skills are available.',
     };
   }
+  const skillStatus = assetInspection.inventory.skills;
 
   if (!fs.existsSync(skillStatus.targetRoot)) {
     return {
@@ -302,16 +298,22 @@ function checkInstalledSkills(projectRoot, adapter) {
   };
 }
 
-function checkInstalledAgents(projectRoot, adapter) {
-  let agentStatus;
-  try {
-    agentStatus = inspectInstalledAssets(projectRoot, adapter).agents;
-  } catch (error) {
+function checkInstalledAgents(adapter, assetInspection) {
+  if (assetInspection.error) {
     return {
       level: 'ERROR',
       name: `${adapter.agentsRoot}`,
-      message: error instanceof Error ? error.message : String(error),
+      message: formatInspectionError(assetInspection.error),
       fix: 'Reinstall the spec-first package so bundled agents are available.',
+    };
+  }
+  const agentStatus = assetInspection.inventory.agents;
+
+  if (agentStatus.entries.length === 0) {
+    return {
+      level: 'PASS',
+      name: `${adapter.agentsRoot}`,
+      message: 'no bundled agents',
     };
   }
 
@@ -353,18 +355,16 @@ function checkInstalledAgents(projectRoot, adapter) {
   };
 }
 
-function checkInstalledAgentSupportFiles(projectRoot, adapter) {
-  let supportStatus;
-  try {
-    supportStatus = inspectInstalledAssets(projectRoot, adapter).agentSupportFiles;
-  } catch (error) {
+function checkInstalledAgentSupportFiles(adapter, assetInspection) {
+  if (assetInspection.error) {
     return {
       level: 'ERROR',
       name: `${adapter.agentsRoot} support assets`,
-      message: error instanceof Error ? error.message : String(error),
+      message: formatInspectionError(assetInspection.error),
       fix: 'Reinstall the spec-first package so bundled agent support assets are available.',
     };
   }
+  const supportStatus = assetInspection.inventory.agentSupportFiles;
 
   if (supportStatus.entries.length === 0) {
     return {
@@ -431,6 +431,24 @@ function checkPluginManifest() {
   }
 }
 
+function inspectRuntimeAssetInventory(projectRoot, adapter) {
+  try {
+    return {
+      inventory: inspectInstalledAssets(projectRoot, adapter),
+      error: null,
+    };
+  } catch (error) {
+    return {
+      inventory: null,
+      error,
+    };
+  }
+}
+
+function formatInspectionError(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function buildDoctorCommonChecks(projectRoot) {
   return [
     checkNodeVersion(),
@@ -448,9 +466,10 @@ function buildDoctorReport({ projectRoot, platforms }) {
 
   for (const platform of platforms) {
     const adapter = getAdapter(platform);
+    const assetInspection = inspectRuntimeAssetInventory(projectRoot, adapter);
     const platformCliCheck = checkPlatformCli(platform);
     const runtimeFileChecks = adapter.inspectRuntimeFiles(projectRoot);
-    const commandChecks = adapter.hasCommands ? [checkGeneratedCommands(projectRoot, adapter)] : [];
+    const commandChecks = adapter.hasCommands ? [checkGeneratedCommands(adapter, assetInspection)] : [];
     const hostSpecificChecks = buildHostSpecificChecks(projectRoot, adapter);
     const coreRuntimeChecks = [
       checkManagedState(projectRoot, adapter),
@@ -459,12 +478,12 @@ function buildDoctorReport({ projectRoot, platforms }) {
       ...commandChecks,
     ];
     const inventoryChecks = [
-      checkInstalledSkills(projectRoot, adapter),
+      checkInstalledSkills(adapter, assetInspection),
       ...(adapter.supportsAgents === false
         ? []
         : [
-          checkInstalledAgents(projectRoot, adapter),
-          checkInstalledAgentSupportFiles(projectRoot, adapter),
+          checkInstalledAgents(adapter, assetInspection),
+          checkInstalledAgentSupportFiles(adapter, assetInspection),
         ]),
     ];
     const runtimeChecks = [

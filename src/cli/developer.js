@@ -85,52 +85,6 @@ function resolveDeveloperIdentity(projectRoot, options = {}) {
   return developer;
 }
 
-function resolveChangelogAuthor(projectRoot, options = {}) {
-  const fallbackName = normalizeName(options.fallbackName);
-
-  const globalDeveloper = readDeveloperFile(getGlobalDeveloperPath());
-  if (globalDeveloper && globalDeveloper.name) {
-    return {
-      name: globalDeveloper.name,
-      source: 'global_developer',
-      host: 'global',
-      path: normalizePathForContract(GLOBAL_DEVELOPER_RELATIVE_PATH),
-    };
-  }
-
-  if (fallbackName) {
-    return {
-      name: fallbackName,
-      source: 'fallback_name',
-      host: '',
-      path: '',
-    };
-  }
-
-  const gitUserName = readGitUserName(projectRoot);
-  if (gitUserName) {
-    return {
-      name: gitUserName,
-      source: 'git_config',
-      host: 'git',
-      path: 'user.name',
-    };
-  }
-
-  return {
-    name: '',
-    source: 'unresolved',
-    host: '',
-    path: '',
-  };
-}
-
-function resolveChangelogAuthorName(projectRoot, fallbackName = '') {
-  return resolveChangelogAuthor(projectRoot, {
-    fallbackName,
-  }).name;
-}
-
 function writeGlobalDeveloperFile(developer) {
   const filePath = getGlobalDeveloperPath();
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -233,10 +187,6 @@ function normalizeText(value) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : '';
 }
 
-function normalizePathForContract(filePath) {
-  return filePath.replace(/\\/g, '/');
-}
-
 function readGitUserName(projectRoot) {
   const result = spawnSyncWithTimeout('git', ['config', 'user.name'], {
     cwd: projectRoot,
@@ -256,8 +206,6 @@ module.exports = {
   parseDeveloperContents,
   readDeveloperFile,
   readGitUserName,
-  resolveChangelogAuthor,
-  resolveChangelogAuthorName,
   resolveDeveloperIdentity,
   writeGlobalDeveloperFile,
 };

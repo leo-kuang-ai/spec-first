@@ -1,40 +1,8 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { writeFileAtomic } = require('./atomic-write');
-
 const LANG_START = '<!-- spec-first:lang:start -->';
 const LANG_END = '<!-- spec-first:lang:end -->';
+const WORKFLOW_ENTRY_ANCHOR = '<!-- spec-first:workflow-entry:using-spec-first -->';
 const USER_LANGUAGE_START = '<!-- spec-first:user-language:start -->';
 const USER_LANGUAGE_END = '<!-- spec-first:user-language:end -->';
-
-/**
- * Idempotently write the language and governance policy block into the repo-root
- * instruction file (CLAUDE.md for Claude, AGENTS.md for Codex).
- *
- * - File absent: create it with just the managed block.
- * - File exists, no markers: append the block at end.
- * - File exists, markers present: replace the block in place (preserves surrounding content).
- * - Corrupted state (START without END): treat as "no markers" and append.
- *
- * @param {string} projectRoot
- * @param {{ lang: string }} developer
- * @param {import('./adapters/base')} adapter
- */
-function writeLangPolicy(projectRoot, developer, adapter) {
-  const filePath = path.join(projectRoot, adapter.instructionFile);
-  const block = buildManagedBlock(developer.lang);
-
-  let existing = '';
-  if (fs.existsSync(filePath)) {
-    existing = fs.readFileSync(filePath, 'utf8');
-  }
-
-  const updated = applyManagedBlock(existing, block);
-
-  writeFileAtomic(filePath, updated);
-
-  console.log(`📋 Wrote language policy to ${adapter.instructionFile}`);
-}
 
 /**
  * Apply the managed block to existing file content, idempotently.
@@ -45,7 +13,41 @@ function writeLangPolicy(projectRoot, developer, adapter) {
  * @returns {string}        - Updated content.
  */
 function applyManagedBlock(existing, block) {
+  const markers = inspectMarkerStructure(existing, LANG_START, LANG_END);
+  if (!markers.absent && !markers.valid) {
+    throw new Error('managed language/governance markers must form exactly one balanced pair');
+  }
   return upsertMarkerBlock(existing, block, LANG_START, LANG_END);
+}
+
+function inspectMarkerStructure(contents, startMarker, endMarker) {
+  const startIndexes = findMarkerIndexes(contents, startMarker);
+  const endIndexes = findMarkerIndexes(contents, endMarker);
+  const absent = startIndexes.length === 0 && endIndexes.length === 0;
+  const valid = startIndexes.length === 1 &&
+    endIndexes.length === 1 &&
+    startIndexes[0] < endIndexes[0];
+
+  return {
+    absent,
+    valid,
+    startIdx: startIndexes.length === 1 ? startIndexes[0] : -1,
+    endIdx: endIndexes.length === 1 ? endIndexes[0] : -1,
+  };
+}
+
+function findMarkerIndexes(contents, marker) {
+  const indexes = [];
+  let searchFrom = 0;
+  while (searchFrom <= contents.length - marker.length) {
+    const index = contents.indexOf(marker, searchFrom);
+    if (index === -1) {
+      break;
+    }
+    indexes.push(index);
+    searchFrom = index + marker.length;
+  }
+  return indexes;
 }
 
 function upsertMarkerBlock(existing, block, startMarker, endMarker) {
@@ -116,10 +118,8 @@ function buildZhProjectPolicy() {
 **语言设置：** \`Chinese / 中文\`
 ${buildZhLanguageRules()}
 ### Workflow 入口治理
-- 本 block 同时提供 \`using-spec-first\` source pointer；完整入口路由与边界在 \`skills/using-spec-first/SKILL.md\`。
-### Changelog
-- 任何项目 source 变更都必须同步更新根目录 \`CHANGELOG.md\`，沿用仓库既有格式；用户可见变更追加 \`(user-visible)\`。
-- 缺少 changelog 记录时拒绝生成 source 变更；\`作者\` 优先沿用全局 developer profile，其次使用 git 提交身份或留空，取不到不阻断变更。`;
+${WORKFLOW_ENTRY_ANCHOR}
+- 在执行实质性工作前，加载当前宿主已安装的 \`using-spec-first\` skill；完整入口路由与边界由该 skill 提供。`;
 }
 
 function buildEnProjectPolicy() {
@@ -127,10 +127,8 @@ function buildEnProjectPolicy() {
 **Language setting:** \`English / 英文\`
 ${buildEnLanguageRules()}
 ### Workflow Entry Governance
-- This block also provides the \`using-spec-first\` source pointer; the full entry routing map and boundaries live in \`skills/using-spec-first/SKILL.md\`.
-### Changelog
-- Any project source change must update the repo-root \`CHANGELOG.md\`, following the repository's existing format; append \`(user-visible)\` for user-visible changes.
-- If the changelog entry is missing, refuse to generate the source change; \`author\` prefers the global developer profile, then the git commit identity or blank, and must not block the change.`;
+${WORKFLOW_ENTRY_ANCHOR}
+- Before substantial work, load the \`using-spec-first\` skill installed for the current host; that skill provides the full entry routing map and boundaries.`;
 }
 
 function buildZhUserLanguagePolicy() {
@@ -158,14 +156,15 @@ The source language of skills, agents, templates, historical context, or example
 }
 
 module.exports = {
-  writeLangPolicy,
   applyManagedBlock,
   buildManagedBlock,
   buildUserLanguageBlock,
   LANG_END,
   LANG_START,
+  inspectMarkerStructure,
   upsertMarkerBlock,
   removeMarkerBlock,
+  WORKFLOW_ENTRY_ANCHOR,
   USER_LANGUAGE_START,
   USER_LANGUAGE_END,
 };

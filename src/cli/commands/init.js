@@ -176,7 +176,7 @@ async function runInit(argv, promptOverrides = {}) {
     }
 
     const results = [];
-    for (const [index, plan] of plans.entries()) {
+    for (const plan of plans) {
       const result = applyInitPlan(plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot, plan);
       results.push(result);
       if (plan.mode === 'all-repos') {
@@ -185,7 +185,6 @@ async function runInit(argv, promptOverrides = {}) {
         printInitApplySuccess(plan, result, {
           showDiagnostics: false,
           showNextSteps: false,
-          suppressChangelogCreated: plans.length > 1 && index > 0,
         });
       }
     }

@@ -22,6 +22,7 @@ const {
   listBundledCommands,
   readBundledCommandTemplate,
   readBundledSkillSource,
+  shouldIgnoreBundledSupportPath,
 } = require('./plugin-manifest');
 const {
   buildFilteredAssetSet,
@@ -208,8 +209,8 @@ function syncSkills(projectRoot, adapter, filteredAssetSet = buildFilteredAssetS
       fs.rmSync(path.join(standaloneRoot, skillName), { recursive: true, force: true });
     }
 
-    copyDirectoryWithTransform(path.join(sourceRoot, skillName), targetDir, (content, fileContext) =>
-      transformSkillTextFile(adapter, transformContext, content, fileContext),
+    copyDirectoryWithTransform(path.join(sourceRoot, skillName), targetDir, (content) =>
+      adapter.transformSkillContent(content, transformContext),
     );
   }
 
@@ -261,8 +262,7 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
       sourceDir: path.join(sourceRoot, skillName),
       targetDir,
       reason: isWorkflowSkill ? 'managed_workflow_skill' : 'managed_skill',
-      transformText: (content, fileContext) =>
-        transformSkillTextFile(adapter, transformContext, content, fileContext),
+      transformText: (content) => adapter.transformSkillContent(content, transformContext),
     }));
   }
 
@@ -437,13 +437,12 @@ function copyDirectoryWithTransform(sourceDir, targetDir, transformText, relativ
   fs.mkdirSync(targetDir, { recursive: true });
 
   for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
-    if (shouldIgnoreBundledSupportPath(entry.name)) {
-      continue;
-    }
-
     const sourcePath = path.join(sourceDir, entry.name);
     const targetPath = path.join(targetDir, entry.name);
     const relativePath = normalizePathForContent(path.join(relativeRoot, entry.name));
+    if (!shouldIncludeBundledSkillPath(relativePath)) {
+      continue;
+    }
 
     if (entry.isDirectory()) {
       copyDirectoryWithTransform(sourcePath, targetPath, transformText, relativePath);
@@ -474,33 +473,10 @@ function isTextFile(filePath) {
   return TEXT_FILE_EXTENSIONS.has(path.extname(filePath));
 }
 
-function shouldIgnoreBundledSupportPath(relativePath) {
+function shouldIncludeBundledSkillPath(relativePath) {
   const normalizedPath = normalizePathForContent(relativePath);
-  const parts = normalizedPath.split('/');
-  const basename = parts[parts.length - 1] || '';
-  return (
-    parts.includes('__pycache__')
-    || basename === '.DS_Store'
-    || basename.endsWith('.pyc')
-    || basename.endsWith('.pyo')
-  );
-}
-
-function transformSkillTextFile(adapter, transformContext, content, fileContext = {}) {
-  if (isSkillEvalSupportPath(fileContext.relativePath)) {
-    return content;
-  }
-
-  return adapter.transformSkillContent(content, transformContext);
-}
-
-function isSkillEvalSupportPath(relativePath) {
-  if (typeof relativePath !== 'string' || relativePath.length === 0) {
-    return false;
-  }
-
-  const normalizedPath = normalizePathForContent(relativePath);
-  return normalizedPath.split('/')[0] === 'evals';
+  return normalizedPath.split('/')[0] !== 'evals'
+    && !shouldIgnoreBundledSupportPath(normalizedPath);
 }
 
 function emptyPlan() {
@@ -532,13 +508,12 @@ function planDirectoryWithTransform({
   ];
 
   for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
-    if (shouldIgnoreBundledSupportPath(entry.name)) {
-      continue;
-    }
-
     const sourcePath = path.join(sourceDir, entry.name);
     const nextTargetPath = path.join(targetDir, entry.name);
     const relativePath = normalizePathForContent(path.join(relativeRoot, entry.name));
+    if (!shouldIncludeBundledSkillPath(relativePath)) {
+      continue;
+    }
 
     if (entry.isDirectory()) {
       operations.push(...planDirectoryWithTransform({
@@ -681,8 +656,7 @@ function inspectSkillIntegrity({
     ...skillSupportFileIntegrityIssues({
       sourceDir,
       targetDir,
-      transformText: (content, fileContext) =>
-        transformSkillTextFile(adapter, transformContext, content, fileContext),
+      transformText: (content) => adapter.transformSkillContent(content, transformContext),
     }),
   ]);
 
@@ -728,7 +702,7 @@ function listDirectoryFiles(rootDir, relativeRoot = '') {
     .readdirSync(path.join(rootDir, relativeRoot), { withFileTypes: true })
     .flatMap((entry) => {
       const relativePath = path.join(relativeRoot, entry.name);
-      if (shouldIgnoreBundledSupportPath(relativePath)) {
+      if (!shouldIncludeBundledSkillPath(relativePath)) {
         return [];
       }
 

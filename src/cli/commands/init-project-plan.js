@@ -13,10 +13,7 @@ const {
   loadPluginManifest,
   planBundledAssetSync,
 } = require('../plugin');
-const {
-  resolveChangelogAuthor,
-  resolveDeveloperIdentity,
-} = require('../developer');
+const { resolveDeveloperIdentity } = require('../developer');
 const {
   buildFileWriteOperation,
   buildState,
@@ -34,13 +31,15 @@ const { planRuntimeUntrack } = require('../runtime-untrack');
 const { detectGlobalCodexHookPollution } = require('../adapters/codex');
 const { applyManagedBlock, buildManagedBlock } = require('../lang-policy');
 const { removeManagedCodingGuidelinesBlock } = require('../coding-guidelines');
-const { buildInitialChangelog, formatChangelogTimestamp } = require('../changelog');
 const { applySpecFirstGitignoreBlock } = require('../gitignore-policy');
 const {
   inspectInstructionBootstrap,
   removeManagedBootstrapBlock,
 } = require('../instruction-bootstrap');
 const { removeManagedRuntimeToolsBlock } = require('../runtime-tools-index');
+const {
+  QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+} = require('../qoder-settings');
 const {
   getClaudeSettingsPath,
   inspectManagedClaudeHooks,
@@ -99,6 +98,13 @@ function buildProjectInitPlan({
       message: 'Warning: Cursor support is generated-runtime preview. Local Cursor skill discovery/invocation is not verified on this machine, so generated skills may not load.',
     });
   }
+  if (platform === 'qoder') {
+    diagnostics.push({
+      level: 'warn',
+      code: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
+      message: `Warning [${QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE}]: Qoder hook scripts are generated, but hook settings entries are intentionally omitted until the Qoder hook protocol is confirmed. SessionStart and PRD guard hooks remain inactive.`,
+    });
+  }
 
   const commandDir = adapter.hasCommands ? path.join(normalizedRoot, adapter.commandRoot) : '';
   let previousState = null;
@@ -155,6 +161,9 @@ function buildProjectInitPlan({
   const commandSkillNames = new Set(manifest.commands.map((cmd) => cmd.skill));
   const assetSync = planBundledAssetSync(normalizedRoot, adapter, filteredAssetSet);
   const runtimeSyncPlan = adapter.planRuntimeFilesSync(normalizedRoot, { manifest, filteredAssetSet });
+  if (runtimeSyncPlan && Array.isArray(runtimeSyncPlan.diagnostics)) {
+    diagnostics.push(...runtimeSyncPlan.diagnostics);
+  }
   if (runtimeSyncPlan && runtimeSyncPlan.skippedHookWrite) {
     diagnostics.push({
       level: 'warn',
@@ -287,7 +296,6 @@ function buildProjectInitPlan({
     operationPlan,
     untrackDiagnostic: initWritePlan.untrackDiagnostic,
     syncedAssets: assetSync.syncedAssets,
-    changelogCreated: !fs.existsSync(path.join(normalizedRoot, 'CHANGELOG.md')),
     diagnostics,
     errors,
     summary: operationPlan.summary,
@@ -332,7 +340,6 @@ function buildErroredProjectInitPlan({
       agents: [],
       agentSupportFiles: [],
     },
-    changelogCreated: false,
     diagnostics,
     errors,
     summary: emptyPlan.summary,
@@ -366,7 +373,7 @@ function inspectCurrentRuntimeDrift(projectRoot, adapter) {
   }
 
   for (const check of adapter.inspectRuntimeFiles(projectRoot)) {
-    if (check.level !== 'PASS' && !(check.degradedByDesign === true && check.drift === false)) {
+    if (check.level !== 'PASS' && check.drift !== false) {
       reasons.push(`runtime_file_${String(check.name || 'unknown').replace(/[^a-z0-9]+/gi, '_').toLowerCase()}`);
     }
   }
@@ -550,19 +557,6 @@ function buildInitMetadataPlan({
     `${JSON.stringify(nextState, null, 2)}\n`,
     'managed_state_file',
   ));
-
-  const changelogPath = path.join(projectRoot, 'CHANGELOG.md');
-  if (!fs.existsSync(changelogPath)) {
-    const changelogAuthor = resolveChangelogAuthor(projectRoot, {
-      platform,
-    });
-    operations.push(buildPlanFileOperation(
-      projectRoot,
-      'CHANGELOG.md',
-      buildInitialChangelog(formatChangelogTimestamp(new Date()), changelogAuthor.name || developer.name, developer.version),
-      'bootstrap_changelog',
-    ));
-  }
 
   if (platform === 'claude') {
     const rendered = renderManagedClaudeHooksUpsert(projectRoot);

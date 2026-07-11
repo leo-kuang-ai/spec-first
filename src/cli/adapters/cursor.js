@@ -5,8 +5,12 @@ const path = require('node:path');
 const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const { listBundledCommands } = require('../plugin-manifest');
 const { readState } = require('../state');
-const { contentHasOtherRuntimePathReferences } = require('./platform-registry');
+const {
+  contentHasUnexpectedRuntimePathReferences,
+  rewritePreservingHostComparativeConfigPaths,
+} = require('./host-comparative-config-paths');
 
 const CURSOR_RULE_POINTER_PATH = '.cursor/rules/spec-first.mdc';
 const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
@@ -94,7 +98,7 @@ class CursorAdapter extends PointerBasedAdapter {
 
   transformSkillContent(content, context = {}) {
     let transformed = normalizeCursorSkillFrontmatter(
-      rewriteSharedPaths(content),
+      rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths),
       context,
     );
     if (isCursorRuntimeSetupSurface(context)) {
@@ -132,6 +136,9 @@ class CursorAdapter extends PointerBasedAdapter {
       level: 'WARNING',
       name: 'Cursor generated-runtime preview',
       message: 'Cursor skill discovery/invocation is not verified on this machine; generated skills may not load.',
+      drift: false,
+      degradedByDesign: true,
+      reasonCode: 'cursor_generated_runtime_loader_unverified',
       fix: 'Open Cursor runtime UI or run a current Cursor CLI/user journey to record loader evidence before promoting beyond generated-runtime preview.',
     });
 
@@ -396,7 +403,7 @@ function inspectCursorSkillNames(projectRoot, skillsRoot) {
       if (skillDir === 'spec-mcp-setup' && !content.includes('MCP_SETUP_HOST=cursor')) {
         issues.push('missing Cursor MCP_SETUP_HOST pin');
       }
-      if (contentHasOtherRuntimePathReferences('cursor', content)) {
+      if (contentHasUnexpectedRuntimePathReferences('cursor', content, { skillName: skillDir })) {
         issues.push('contains non-Cursor runtime path references');
       }
       return issues.length === 0
@@ -425,7 +432,17 @@ function listFrontmatterKeys(frontmatter) {
 }
 
 function isPublicWorkflowSkillName(skillName) {
-  return String(skillName || '').startsWith('spec-');
+  return governedWorkflowSkillNames().has(String(skillName || ''));
+}
+
+let governedWorkflowSkillNamesCache = null;
+function governedWorkflowSkillNames() {
+  if (governedWorkflowSkillNamesCache === null) {
+    governedWorkflowSkillNamesCache = new Set(
+      listBundledCommands().map((command) => command.skill),
+    );
+  }
+  return governedWorkflowSkillNamesCache;
 }
 
 function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {

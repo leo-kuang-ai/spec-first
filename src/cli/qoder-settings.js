@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SETTINGS_RELATIVE_PATH = '.qoder/settings.json';
+const QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE = 'qoder_hook_protocol_unconfirmed';
 
 const MANAGED_HOOK_DEFINITIONS = [
   {
@@ -11,21 +12,21 @@ const MANAGED_HOOK_DEFINITIONS = [
     displayName: 'SessionStart',
     hookPath: '.qoder/hooks/session-start',
     templateName: 'session-start',
-    reasonCode: 'qoder_hook_protocol_unconfirmed',
+    reasonCode: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
   },
   {
     eventName: 'PreToolUse',
     displayName: 'PreToolUse PRD prewrite guard',
     hookPath: '.qoder/hooks/prd-prewrite-guard',
     templateName: 'prd-prewrite-guard',
-    reasonCode: 'qoder_hook_protocol_unconfirmed',
+    reasonCode: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
   },
   {
     eventName: 'Stop',
     displayName: 'Stop PRD readiness guard',
     hookPath: '.qoder/hooks/prd-readiness-guard',
     templateName: 'prd-readiness-guard',
-    reasonCode: 'qoder_hook_protocol_unconfirmed',
+    reasonCode: QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
   },
 ];
 const MANAGED_HOOK_PATHS = new Set(MANAGED_HOOK_DEFINITIONS.map((definition) => definition.hookPath));
@@ -228,6 +229,7 @@ function isCommandHook(hook) {
 
 module.exports = {
   MANAGED_HOOK_DEFINITIONS,
+  QODER_HOOK_PROTOCOL_UNCONFIRMED_REASON_CODE,
   SETTINGS_RELATIVE_PATH,
   inspectManagedQoderHooks,
   renderManagedQoderHooksCleanup,

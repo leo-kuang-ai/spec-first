@@ -237,10 +237,8 @@ PR 应说明变更的 command、skill、agent 或文档面，列出实际执行�
 代码标识符、命令、路径、配置键、环境变量、API 名称、协议名、日志、工具输出和引用材料可以保留原文；围绕它们新增的解释、结论和说明仍按本语言设置输出。
 skill、agent、模板、历史上下文或示例文本的原文语言不得覆盖本设置；新增代码注释也按本设置，只说明非显然意图。
 ### Workflow 入口治理
-- 本 block 同时提供 `using-spec-first` source pointer；完整入口路由与边界在 `skills/using-spec-first/SKILL.md`。
-### Changelog
-- 任何项目 source 变更都必须同步更新根目录 `CHANGELOG.md`，沿用仓库既有格式；用户可见变更追加 `(user-visible)`。
-- 缺少 changelog 记录时拒绝生成 source 变更；`作者` 优先沿用全局 developer profile，其次使用 git 提交身份或留空，取不到不阻断变更。
+<!-- spec-first:workflow-entry:using-spec-first -->
+- 在执行实质性工作前，加载当前宿主已安装的 `using-spec-first` skill；完整入口路由与边界由该 skill 提供。
 <!-- spec-first:lang:end -->
 
 ## graphify

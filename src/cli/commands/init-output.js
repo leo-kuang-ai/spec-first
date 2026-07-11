@@ -164,10 +164,6 @@ function printInitApplySuccess(plan, result, options = {}) {
   const runtimeUntrack = result.runtime_untrack;
   printRuntimeUntrackApplySummary(runtimeUntrack, messages);
   printGlobalDeveloperWriteSummary(plan.globalDeveloperWrite, messages);
-  if (plan.changelogCreated && !options.suppressChangelogCreated) {
-    console.log(messages.applyBootstrappedChangelog);
-  }
-
   if (options.showDiagnostics !== false) {
     printInitDiagnostics(plan);
   }

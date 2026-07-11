@@ -16,8 +16,12 @@ function buildHostNativePointer({
   initCommand,
   frontmatter = '',
   rootInstruction = 'AGENTS.md',
-  workflowPolicy = 'skills/using-spec-first/SKILL.md',
+  workflowPolicy,
 }) {
+  if (typeof workflowPolicy !== 'string' || workflowPolicy.length === 0) {
+    throw new Error('workflowPolicy is required for a host-native pointer');
+  }
+
   return [
     normalizeFrontmatter(frontmatter),
     HOST_NATIVE_POINTER_START,
@@ -35,7 +39,10 @@ function buildHostNativePointer({
   ].filter((part) => part !== '').join('\n');
 }
 
-function planHostNativePointerSync(projectRoot, relativePath, contents) {
+function planHostNativePointerSync(projectRoot, relativePath, contents, {
+  hostId = '',
+  hostLabel = 'Host',
+} = {}) {
   const absolutePath = path.join(projectRoot, relativePath);
   if (!fs.existsSync(absolutePath)) {
     return plan([buildFileWriteOperation(projectRoot, absolutePath, contents, 'managed_host_native_pointer')]);
@@ -43,7 +50,11 @@ function planHostNativePointerSync(projectRoot, relativePath, contents) {
 
   const existing = fs.readFileSync(absolutePath, 'utf8');
   if (!isManagedHostNativePointer(existing)) {
-    return plan([]);
+    return plan([], [{
+      level: 'warn',
+      code: 'host_native_pointer_user_owned_collision',
+      message: `Warning [host_native_pointer_user_owned_collision]: ${hostLabel} host-native rule ${relativePath} exists but is not spec-first managed. Init left the user-owned file unchanged; move its guidance or add the managed markers before rerunning \`spec-first init --${hostId}\`.`,
+    }]);
   }
 
   return plan([buildFileWriteOperation(projectRoot, absolutePath, contents, 'managed_host_native_pointer')]);
@@ -63,7 +74,12 @@ function planHostNativePointerRemoval(projectRoot, relativePath) {
   return plan([buildRelativeOperation('remove_file', relativePath, 'managed_host_native_pointer')]);
 }
 
-function inspectHostNativePointer(projectRoot, relativePath, { hostId, hostLabel, expectedPrefix = '' }) {
+function inspectHostNativePointer(projectRoot, relativePath, {
+  hostId,
+  hostLabel,
+  expectedContent = '',
+  expectedPrefix = '',
+}) {
   const absolutePath = path.join(projectRoot, relativePath);
   if (!fs.existsSync(absolutePath)) {
     return {
@@ -80,6 +96,8 @@ function inspectHostNativePointer(projectRoot, relativePath, { hostId, hostLabel
       level: 'WARNING',
       name: relativePath,
       message: `${hostLabel} host-native rule file exists but is not spec-first managed; init will not overwrite user-owned content`,
+      drift: false,
+      reasonCode: 'host_native_pointer_user_owned_collision',
       fix: `Move custom guidance to another file or add the spec-first managed pointer markers before rerunning \`spec-first init --${hostId}\`.`,
     };
   }
@@ -90,6 +108,19 @@ function inspectHostNativePointer(projectRoot, relativePath, { hostId, hostLabel
       level: 'WARNING',
       name: relativePath,
       message: `${hostLabel} host-native spec-first pointer drifted from expected metadata`,
+      drift: true,
+      reasonCode: 'host_native_pointer_metadata_drift',
+      fix: formatInitGuidance(hostId, `in this project to refresh ${relativePath}`),
+    };
+  }
+
+  if (expectedContent && existing !== expectedContent) {
+    return {
+      level: 'WARNING',
+      name: relativePath,
+      message: `${hostLabel} host-native spec-first pointer drifted from expected content`,
+      drift: true,
+      reasonCode: 'host_native_pointer_content_drift',
       fix: formatInitGuidance(hostId, `in this project to refresh ${relativePath}`),
     };
   }
@@ -113,10 +144,11 @@ function normalizeFrontmatter(frontmatter) {
   return trimmed ? `${trimmed}\n` : '';
 }
 
-function plan(operations) {
+function plan(operations, diagnostics = []) {
   return {
     operations,
     summary: summarizeOperationPlan(operations),
+    diagnostics,
   };
 }
 

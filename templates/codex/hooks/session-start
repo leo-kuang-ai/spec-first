@@ -33,6 +33,7 @@ async function main() {
   const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
   const LANG_START = '<!-- spec-first:lang:start -->';
   const LANG_END = '<!-- spec-first:lang:end -->';
+  const WORKFLOW_ENTRY_ANCHOR = '<!-- spec-first:workflow-entry:using-spec-first -->';
   const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
   const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
   const missingMessage = [
@@ -53,7 +54,7 @@ async function main() {
       additionalContext = [
         '[spec-first] using-spec-first SessionStart injection',
         "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
-        'Full routing policy: skills/using-spec-first/SKILL.md.',
+        'Full routing policy: .agents/skills/using-spec-first/SKILL.md.',
       ].join('\n');
     } else {
       additionalContext = [
@@ -84,13 +85,12 @@ async function main() {
   }
 
   function inspectWorkflowEntryGuidance(body) {
-    const legacyStartIdx = body.indexOf(LEGACY_BOOTSTRAP_START);
-    const legacyEndIdx = body.indexOf(LEGACY_BOOTSTRAP_END);
-    if (legacyStartIdx !== -1 || legacyEndIdx !== -1) {
-      if (legacyStartIdx === -1 || legacyEndIdx === -1 || legacyEndIdx <= legacyStartIdx) {
+    const legacyMarkers = inspectMarkerStructure(body, LEGACY_BOOTSTRAP_START, LEGACY_BOOTSTRAP_END);
+    if (!legacyMarkers.absent) {
+      if (!legacyMarkers.valid) {
         return {
           installed: false,
-          message: 'Legacy standalone bootstrap markers are incomplete in `AGENTS.md`.',
+          message: 'Legacy standalone bootstrap markers must form exactly one balanced pair in `AGENTS.md`.',
         };
       }
       return {
@@ -99,30 +99,57 @@ async function main() {
       };
     }
 
-    const langStartIdx = body.indexOf(LANG_START);
-    const langEndIdx = body.indexOf(LANG_END);
-    if (langStartIdx === -1 && langEndIdx === -1) {
+    const langMarkers = inspectMarkerStructure(body, LANG_START, LANG_END);
+    if (langMarkers.absent) {
       return {
         installed: false,
         message: 'Managed language/governance block is missing from `AGENTS.md`.',
       };
     }
-    if (langStartIdx === -1 || langEndIdx === -1 || langEndIdx <= langStartIdx) {
+    if (!langMarkers.valid) {
       return {
         installed: false,
-        message: 'Managed language/governance markers are incomplete in `AGENTS.md`.',
+        message: 'Managed language/governance markers must form exactly one balanced pair in `AGENTS.md`.',
       };
     }
 
-    const managedBlock = body.slice(langStartIdx, langEndIdx + LANG_END.length);
-    if (managedBlock.includes('`using-spec-first`') &&
-      managedBlock.includes('skills/using-spec-first/SKILL.md')) {
+    const managedBlock = body.slice(langMarkers.startIdx, langMarkers.endIdx + LANG_END.length);
+    if (countOccurrences(managedBlock, WORKFLOW_ENTRY_ANCHOR) === 1) {
       return { installed: true };
     }
     return {
       installed: false,
       message: 'Workflow entry guidance is missing from the `spec-first:lang` block in `AGENTS.md`.',
     };
+  }
+
+  function inspectMarkerStructure(contents, startMarker, endMarker) {
+    const startIndexes = findMarkerIndexes(contents, startMarker);
+    const endIndexes = findMarkerIndexes(contents, endMarker);
+    return {
+      absent: startIndexes.length === 0 && endIndexes.length === 0,
+      valid: startIndexes.length === 1 && endIndexes.length === 1 && startIndexes[0] < endIndexes[0],
+      startIdx: startIndexes.length === 1 ? startIndexes[0] : -1,
+      endIdx: endIndexes.length === 1 ? endIndexes[0] : -1,
+    };
+  }
+
+  function findMarkerIndexes(contents, marker) {
+    const indexes = [];
+    let searchFrom = 0;
+    while (searchFrom <= contents.length - marker.length) {
+      const index = contents.indexOf(marker, searchFrom);
+      if (index === -1) {
+        break;
+      }
+      indexes.push(index);
+      searchFrom = index + marker.length;
+    }
+    return indexes;
+  }
+
+  function countOccurrences(contents, value) {
+    return findMarkerIndexes(contents, value).length;
   }
 
   function readStartupReminder(cwd) {

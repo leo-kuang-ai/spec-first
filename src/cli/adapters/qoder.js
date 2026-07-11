@@ -11,7 +11,10 @@ const {
   renderManagedQoderHooksRemoval,
 } = require('../qoder-settings');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
-const { contentHasOtherRuntimePathReferences } = require('./platform-registry');
+const {
+  contentHasUnexpectedRuntimePathReferences,
+  rewritePreservingHostComparativeConfigPaths,
+} = require('./host-comparative-config-paths');
 
 const QODER_RULE_POINTER_PATH = '.qoder/rules/spec-first.md';
 const QODER_POINTER_FRONTMATTER = [
@@ -111,7 +114,7 @@ class QoderAdapter extends PointerBasedAdapter {
 
   transformSkillContent(content, context = {}) {
     let transformed = rewriteSkillName(
-      rewriteSharedPaths(content),
+      rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths),
       qoderRuntimeSkillName(context),
     );
     if (isQoderRuntimeSetupSurface(context)) {
@@ -203,6 +206,7 @@ class QoderAdapter extends PointerBasedAdapter {
     return {
       operations,
       summary: summarizeOperations(operations),
+      diagnostics: pointerPlan.diagnostics || [],
     };
   }
 
@@ -595,7 +599,9 @@ function inspectQoderCommandFiles(projectRoot, commandRoot) {
       if (!fields.name) issues.push('missing name');
       if (!fields.description) issues.push('missing description');
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
-      if (contentHasOtherRuntimePathReferences('qoder', content)) {
+      if (contentHasUnexpectedRuntimePathReferences('qoder', content, {
+        skillName: path.basename(commandPath, '.md'),
+      })) {
         issues.push('contains non-Qoder runtime path references');
       }
       return issues.length === 0
@@ -626,7 +632,7 @@ function inspectQoderSkillNames(projectRoot, skillsRoot) {
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
       if (!fields.description) issues.push('missing description');
-      if (contentHasOtherRuntimePathReferences('qoder', content)) {
+      if (contentHasUnexpectedRuntimePathReferences('qoder', content, { skillName: skillDir })) {
         issues.push('contains non-Qoder runtime path references');
       }
       return issues.length === 0

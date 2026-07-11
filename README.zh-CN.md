@@ -81,11 +81,13 @@ spec-first init
 
 预期结果：init 列出 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/` 或 `.qoder/` 下的生成路径，并确认 setup 完成。生成的 runtime copies 随时可通过 `spec-first init` 重建。
 
+Init 不会创建或重写目标仓库的 `CHANGELOG.md`；Changelog 治理由目标仓库既有 instruction 与发布流程自行拥有。
+
 如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-mcp-setup`。
 
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
 
-Cursor/Kiro/Qoder native pointer 文件：`init --cursor`、`init --kiro` 和 `init --qoder` 也会写入 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md`。这些文件只把宿主指回根目录 `AGENTS.md` 和 `skills/using-spec-first/SKILL.md`；它们是 generated runtime pointer，不是第二个 source of truth。如果同路径已有无 spec-first managed marker 的用户文件，init 和 clean 都不会覆盖或删除，doctor 会报告 warning。
+Cursor/Kiro/Qoder native pointer 文件：`init --cursor`、`init --kiro` 和 `init --qoder` 也会写入 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md`。这些文件只把宿主指回根目录 `AGENTS.md` 和当前宿主已安装的 `using-spec-first` runtime skill（`.cursor/skills/`、`.kiro/skills/` 或 `.qoder/skills/`）；它们是 generated runtime pointer，不是第二个 source of truth。如果同路径已有无 spec-first managed marker 的用户文件，init 和 clean 都不会覆盖或删除；init 和 doctor 都会显式报告冲突 warning。
 
 所有 init 选项（flags、脚本模式、多仓库）见 [完整快速开始指南](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
 

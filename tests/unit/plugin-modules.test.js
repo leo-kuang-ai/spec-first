@@ -102,4 +102,55 @@ describe('plugin module facade and governance', () => {
       }),
     ]));
   });
+
+  test('excludes top-level evals from planned, copied, and inspected skill assets', () => {
+    const projectRoot = tempProject();
+    const adapter = getAdapter('cursor');
+    const staleRuntimeEval = path.join(
+      projectRoot,
+      '.cursor/skills/spec-prd/evals/stale-runtime-fixture.json',
+    );
+
+    try {
+      fs.mkdirSync(path.dirname(staleRuntimeEval), { recursive: true });
+      fs.writeFileSync(staleRuntimeEval, '{}\n');
+
+      const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+      const operationPaths = plan.operations.map((operation) => operation.path);
+
+      expect(operationPaths.some((operationPath) =>
+        /\/skills\/[^/]+\/evals(?:\/|$)/.test(operationPath)
+      )).toBe(false);
+      expect(operationPaths).toEqual(expect.arrayContaining([
+        '.cursor/skills/spec-prd/references/prd-output-template.md',
+        '.cursor/skills/spec-prd/scripts/check-prd-artifact.js',
+        '.cursor/skills/spec-prd/assets/templates/00-generic.md',
+      ]));
+
+      plugin.syncBundledAssets(projectRoot, adapter);
+
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-prd/evals',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-prd/references/prd-output-template.md',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-prd/scripts/check-prd-artifact.js',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-prd/assets/templates/00-generic.md',
+      ))).toBe(true);
+
+      const installed = plugin.inspectInstalledAssets(projectRoot, adapter);
+      expect(installed.skills.missing).toEqual([]);
+      expect(installed.skills.drifted).toEqual([]);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
 });

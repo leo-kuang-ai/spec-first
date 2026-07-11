@@ -7,6 +7,7 @@ const { spawn, spawnSync } = require('node:child_process');
 
 const QoderAdapter = require('../../src/cli/adapters/qoder');
 const { buildHostNativePointer } = require('../../src/cli/adapters/host-native-pointer');
+const { buildManagedBlock } = require('../../src/cli/lang-policy');
 const { buildContextBundle } = require('../../src/cli/helpers/context-bundle');
 const { validateRepoRelativeField } = require('../../src/cli/helpers/target-repo');
 const { applyOperationPlan } = require('../../src/cli/state');
@@ -80,13 +81,11 @@ function runReadinessHook(projectRoot, payload = {}) {
 
 function installMinimalQoderRuntime(projectRoot, adapter = new QoderAdapter()) {
   applyOperationPlan(projectRoot, { operations: adapter.planRuntimeFilesSync(projectRoot).operations });
-  writeText(path.join(projectRoot, adapter.instructionFile), [
-    '<!-- spec-first:lang:start -->',
-    '## Workflow 入口治理',
-    '- `using-spec-first` source pointer: `skills/using-spec-first/SKILL.md`',
-    '<!-- spec-first:lang:end -->',
-    '',
-  ].join('\n'));
+  writeText(path.join(projectRoot, adapter.instructionFile), `${buildManagedBlock('zh')}\n`);
+  writeText(
+    path.join(projectRoot, adapter.skillsRoot, 'using-spec-first', 'SKILL.md'),
+    '---\nname: using-spec-first\ndescription: Test entry governor.\n---\n',
+  );
   writeJson(path.join(projectRoot, adapter.stateFile), {
     manifestVersion: 'test',
     platform: 'qoder',
@@ -186,13 +185,7 @@ describe('Qoder runtime lifecycle', () => {
         () => JSON.stringify(fakeCliPath),
       ),
     );
-    writeText(path.join(projectRoot, 'AGENTS.md'), [
-      '<!-- spec-first:lang:start -->',
-      '`using-spec-first`',
-      'skills/using-spec-first/SKILL.md',
-      '<!-- spec-first:lang:end -->',
-      '',
-    ].join('\n'));
+    writeText(path.join(projectRoot, 'AGENTS.md'), `${buildManagedBlock('en')}\n`);
 
     const result = spawnSync(process.execPath, [hookPath], {
       cwd: projectRoot,
@@ -215,13 +208,7 @@ describe('Qoder runtime lifecycle', () => {
   test('Qoder session-start drains stdin even when QODER_PROJECT_DIR is already set', async () => {
     const projectRoot = tempProject();
     const hookPath = path.join(__dirname, '..', '..', 'templates', 'qoder', 'hooks', 'session-start');
-    writeText(path.join(projectRoot, 'AGENTS.md'), [
-      '<!-- spec-first:lang:start -->',
-      '`using-spec-first`',
-      'skills/using-spec-first/SKILL.md',
-      '<!-- spec-first:lang:end -->',
-      '',
-    ].join('\n'));
+    writeText(path.join(projectRoot, 'AGENTS.md'), `${buildManagedBlock('en')}\n`);
 
     const child = spawn(process.execPath, [hookPath], {
       cwd: projectRoot,
@@ -381,6 +368,7 @@ describe('Qoder runtime lifecycle', () => {
       buildHostNativePointer({
         hostLabel: 'Qoder',
         initCommand: 'spec-first init --qoder',
+        workflowPolicy: '.qoder/skills/using-spec-first/SKILL.md',
       }),
     );
 
@@ -693,6 +681,12 @@ describe('Qoder runtime lifecycle', () => {
       dryRun: true,
     }));
     expect(degradedOnlyPlan.destructiveResetReason).toBe('');
+    expect(degradedOnlyPlan.diagnostics).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        level: 'warn',
+        code: 'qoder_hook_protocol_unconfirmed',
+      }),
+    ]));
     expect(degradedOnlyPlan.diagnostics.map((diagnostic) => diagnostic.code))
       .not.toContain('current_runtime_drift');
 

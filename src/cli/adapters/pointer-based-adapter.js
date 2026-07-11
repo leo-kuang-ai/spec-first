@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require('node:path');
+
 const PlatformAdapter = require('./base');
 const {
   buildHostNativePointer,
@@ -34,6 +36,11 @@ class PointerBasedAdapter extends PlatformAdapter {
       hostLabel: this.pointerHostLabel,
       initCommand: this.pointerInitCommand,
       frontmatter: this.pointerFrontmatter,
+      workflowPolicy: path.posix.join(
+        this.skillsRoot,
+        'using-spec-first',
+        'SKILL.md',
+      ),
     });
   }
 
@@ -41,6 +48,7 @@ class PointerBasedAdapter extends PlatformAdapter {
     return inspectHostNativePointer(projectRoot, this.pointerPath, {
       hostId: this.id,
       hostLabel: this.pointerHostLabel,
+      expectedContent: this.buildPointerContent(),
       expectedPrefix: this.pointerExpectedPrefix,
     });
   }
@@ -50,6 +58,10 @@ class PointerBasedAdapter extends PlatformAdapter {
       projectRoot,
       this.pointerPath,
       this.buildPointerContent(),
+      {
+        hostId: this.id,
+        hostLabel: this.pointerHostLabel,
+      },
     );
   }
 
