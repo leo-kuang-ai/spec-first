@@ -334,7 +334,8 @@ function inspectManagedHookFile(projectRoot, hook) {
   }
 
   const mode = fs.statSync(targetPath).mode & 0o777;
-  if ((mode & 0o111) !== 0o111) {
+  // Windows 不提供 POSIX executable-bit 语义；正文一致即可证明 hook 可由 Node 调用。
+  if (process.platform !== 'win32' && (mode & 0o111) !== 0o111) {
     return {
       level: 'WARNING',
       name: hook.relativePath,

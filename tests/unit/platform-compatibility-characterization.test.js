@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
+const ClaudeAdapter = require('../../src/cli/adapters/claude');
 const { getGlobalDeveloperPath } = require('../../src/cli/developer');
 const {
   applyOperationPlan,
@@ -108,6 +109,32 @@ describe('Phase 5a platform compatibility characterization', () => {
       restoreEnv('WSL_DISTRO_NAME', previous.WSL_DISTRO_NAME);
       restoreEnv('WSLENV', previous.WSLENV);
       restoreEnv('SPEC_FIRST_WINDOWS_HOME', previous.SPEC_FIRST_WINDOWS_HOME);
+    }
+  });
+
+  test('Claude hook drift checks enforce executable bits only on POSIX platforms', () => {
+    const projectRoot = tempProject();
+    const adapter = new ClaudeAdapter();
+    applyOperationPlan(projectRoot, adapter.planRuntimeFilesSync(projectRoot));
+    const hookPath = path.join(projectRoot, '.claude', 'hooks', 'session-start');
+    fs.chmodSync(hookPath, 0o644);
+    const platformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform');
+
+    try {
+      Object.defineProperty(process, 'platform', { ...platformDescriptor, value: 'linux' });
+      expect(adapter.inspectRuntimeFiles(projectRoot).find((check) =>
+        check.name === '.claude/hooks/session-start'
+      )).toMatchObject({
+        level: 'WARNING',
+        message: expect.stringContaining('not executable'),
+      });
+
+      Object.defineProperty(process, 'platform', { ...platformDescriptor, value: 'win32' });
+      expect(adapter.inspectRuntimeFiles(projectRoot).find((check) =>
+        check.name === '.claude/hooks/session-start'
+      )).toMatchObject({ level: 'PASS' });
+    } finally {
+      Object.defineProperty(process, 'platform', platformDescriptor);
     }
   });
 });
