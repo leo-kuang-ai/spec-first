@@ -28,6 +28,10 @@ const {
   buildFilteredAssetSet,
   DELIVERED_INTERNAL_SKILLS,
 } = require('./plugin-governance');
+const {
+  findUnresolvedCommandSkillLocalResourcePaths,
+  rewriteCommandSkillLocalResourcePaths,
+} = require('./skill-path-rewrite-markers');
 
 const TEXT_FILE_EXTENSIONS = new Set([
   '.md',
@@ -588,7 +592,11 @@ function normalizePathForContent(filePath) {
 }
 
 function normalizedWorkflowSkillRuntimePath(adapter, skillName) {
-  return normalizePathForContent(path.posix.join(normalizePathForContent(adapter.workflowsRoot), skillName, 'SKILL.md'));
+  return path.posix.join(normalizedWorkflowSkillRuntimeRoot(adapter, skillName), 'SKILL.md');
+}
+
+function normalizedWorkflowSkillRuntimeRoot(adapter, skillName) {
+  return normalizePathForContent(path.posix.join(normalizePathForContent(adapter.workflowsRoot), skillName));
 }
 
 function buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir) {
@@ -624,11 +632,14 @@ function inspectCommandIntegrity(projectRoot, command, adapter) {
 function renderRuntimeCommandContent(command, adapter) {
   const templateContent = readBundledCommandTemplate(command.name);
   const skillContent = readBundledSkillSource(command.skill);
-  return adapter.renderCommandContent(command, templateContent, {
+  const runtimeSkillRoot = normalizedWorkflowSkillRuntimeRoot(adapter, command.skill);
+  const rendered = adapter.renderCommandContent(command, templateContent, {
     commandName: command.name,
     skillName: command.skill,
     skillContent,
+    runtimeSkillRoot,
   });
+  return rewriteCommandSkillLocalResourcePaths(rendered, runtimeSkillRoot);
 }
 
 function inspectSkillIntegrity({
@@ -758,6 +769,9 @@ function commandIntegrityIssues(actualContent, command, adapter) {
   if (actualContent.includes(workflowPath)) {
     issues.push('legacy_workflow_runtime_reference');
   }
+
+  issues.push(...findUnresolvedCommandSkillLocalResourcePaths(actualContent)
+    .map((resourceRoot) => `unresolved_command_skill_local_resource:${resourceRoot}`));
 
   if (adapter.id === 'claude') {
     const missingAnchors = (HIGH_VALUE_COMMAND_ANCHORS[command.skill] || [])

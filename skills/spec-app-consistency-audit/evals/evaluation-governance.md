@@ -1,8 +1,8 @@
 # Evaluation And Governance Status
 
-Deferred governance detail for `spec-app-consistency-audit`. The `SKILL.md`
-entry keeps only the route-critical status and points here when maintainers need the
-governance labels required by `$yao-meta-skill`.
+Source-only governance detail for `spec-app-consistency-audit`. This file is
+maintainer evidence under `evals/` and is intentionally excluded from generated
+runtime packages.
 
 ## Maturity
 

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { getAdapter } = require('../../src/cli/adapters');
+const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 const plugin = require('../../src/cli/plugin');
 const { applyOperationPlan } = require('../../src/cli/state');
 
@@ -151,6 +151,55 @@ describe('plugin module facade and governance', () => {
       expect(installed.skills.drifted).toEqual([]);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('keeps maintainer-only eval assets out of every host runtime projection', () => {
+    const targetSurfacePattern = /(?:spec-app-consistency-audit|spec-mcp-setup|spec-optimize|spec-prd)/;
+    const maintainerOnlyPathPatterns = [
+      /\/spec-prd\/scripts\/run-evals\.js$/,
+      /\/spec-prd\/references\/evaluation-governance\.md$/,
+      /\/spec-app-consistency-audit\/references\/evaluation-governance\.md$/,
+    ];
+    const maintainerOnlyReferencePattern = /(?:evals\/(?:examples|recorded-output-fixtures)\.json|evals\/output\/|scripts\/run-evals\.js)/;
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const targetOperations = plan.operations.filter((operation) =>
+          targetSurfacePattern.test(operation.path)
+        );
+        const projectedMaintainerFiles = targetOperations
+          .map((operation) => operation.path)
+          .filter((operationPath) => maintainerOnlyPathPatterns.some((pattern) =>
+            pattern.test(operationPath)
+          ));
+        const leakedReferences = targetOperations
+          .filter((operation) => typeof operation.contents === 'string')
+          .filter((operation) => maintainerOnlyReferencePattern.test(operation.contents))
+          .map((operation) => operation.path);
+
+        expect(projectedMaintainerFiles).toEqual([]);
+        expect(leakedReferences).toEqual([]);
+
+        const prdSkillPath = path.posix.join(
+          adapter.workflowsRoot,
+          'spec-prd',
+          'SKILL.md',
+        );
+        const prdSkill = targetOperations.find((operation) =>
+          operation.path === prdSkillPath
+        );
+        expect(prdSkill).toBeDefined();
+        expect(prdSkill.contents).toContain('node "$SKILL_DIR/scripts/finalize-prd-artifact.js"');
+        expect(prdSkill.contents).toContain('canonical source-of-truth path `skills/spec-prd/**`');
+        expect(prdSkill.contents).not.toContain('from the source checkout');
+        expect(prdSkill.contents).not.toMatch(/`[^`]*(?:\.claude|\.agents|\.cursor|\.kiro|\.qoder)[^`]*` on (?:Codex|Claude)/);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
     }
   });
 });

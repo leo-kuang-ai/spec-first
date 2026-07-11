@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DEFAULT_FIXTURE = path.join(__dirname, '..', 'evals', 'examples.json');
+const DEFAULT_FIXTURE = path.join(__dirname, 'examples.json');
 const SCHEMA_VERSION = 'spec-prd-eval-run.v1';
 const FIXTURE_SCHEMA_VERSION = 'spec-prd-evals.v1';
 const VALID_INTENTS = new Set(['create', 'refine', 'validate']);
