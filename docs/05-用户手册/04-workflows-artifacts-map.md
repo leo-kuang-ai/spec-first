@@ -9,7 +9,7 @@
 | 目录 | 写入阶段 | 触发方式 | 主要作用 | 主要产物 |
 | --- | --- | --- | --- | --- |
 | `.spec-first/config/` | `spec-mcp-setup` setup facts 阶段 | `spec-mcp-setup` | 记录 host baseline、required MCP/helper readiness、candidate tools/resources、fallback 能力和 artifact path contract；不是 query-ready direct evidence 或 live MCP proof | `runtime-capabilities.json` |
-| `.spec-first/workspace/` | parent workspace advisory 阶段 | 父 workspace 下的 `spec-mcp-setup`、read-only resolver 或 `spec-first clean --workspace-orphans` | 保存跨 child repo 候选、批量维护 summary、scenario fingerprint 和 parent orphan quarantine | `project-config-bootstrap-summary.json`、`mcp-setup-summary.json`、`mcp-verify-summary.json`、`scenario-fingerprint-setup.json`、`scenario-fingerprint.json`、`parent-artifact-quarantine.json` |
+| `.spec-first/workspace/` | parent workspace advisory 阶段 | 父 workspace 下的 `spec-mcp-setup` 或 `spec-first clean --workspace-orphans` | 保存 per-child setup/verify summary、setup-time scenario fingerprint 和 parent orphan quarantine | `project-config-bootstrap-summary.json`、`mcp-setup-summary.json`、`mcp-verify-summary.json`、`scenario-fingerprint-setup.json`、`parent-artifact-quarantine.json` |
 | `.spec-first/audits/skill-review/` | `retired-skill-review` source skill audit 阶段 | `retired-skill-review` 或直接运行 `write-audit-artifacts.js` | 保存 source skill inventory、scorecard、安全/治理/runtime drift 信号和改进计划 | `latest/skill-review-summary.md`、`latest/skill-improvement-plan.md`、`latest/*.json`、`latest/patch-preview/*` |
 | `.spec-first/app-audit/runs/<run-id>/` | `spec-app-consistency-audit` App 一致性审查阶段 | `spec-app-consistency-audit`；headless 自动化下亦可直接调用 `node skills/spec-app-consistency-audit/scripts/run-audit.js mode:headless base:<ref>` | 保存移动 App PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查证据；`issue_synthesis_status` 三态(`not_run` / `llm_provided` / `fixture_provided`)区分确定性 runner 产物与上游 LLM/fixture 注入的语义 issue；markdown 摘要由下游 Report Writer 产出，不由 runner 直接生成 | 由 runner 产出: `metadata.json`、`preflight.json`、`impact-facts.json`、`issues.json`、`audit-report.json`、`app-audit-context.json`、`merged-context.json`、`artifact-manifest.json`、`headless-envelope.txt`；由下游 Report Writer 产出: `app-consistency-audit.md`、`app-consistency-audit.summary.md` |
 | `.spec-first/workflows/verification/<slug>/` | verification evidence 阶段 | 上游 verification 流程写入，`doctor` 读取 | 作为验证证据投递目录 | `verification-evidence.json` |
@@ -69,7 +69,7 @@
 | 阶段 | Required Harness Runtime setup facts |
 | 触发 | `spec-mcp-setup` |
 | 目录形状 | `.spec-first/config/` |
-| 关键源码 | `skills/spec-mcp-setup/scripts/write-setup-facts.*`、`skills/spec-mcp-setup/scripts/verify-tools.*` |
+| 关键源码 | `skills/spec-mcp-setup/scripts/setup.cjs`、`skills/spec-mcp-setup/scripts/lib/facts.cjs`、`skills/spec-mcp-setup/scripts/lib/configured-dependencies.cjs` |
 | 事实边界 | setup-owned config facts；不是 mcp-setup 的结果真相源 |
 
 ### 写入内容
@@ -87,7 +87,7 @@
 | 阶段 | parent workspace advisory summaries |
 | 触发 | 父 workspace 下运行 `spec-mcp-setup` 或显式只读定位 |
 | 目录形状 | `.spec-first/workspace/` |
-| 关键源码 | `skills/spec-mcp-setup/scripts/*` |
+| 关键源码 | `skills/spec-mcp-setup/scripts/setup.cjs`、`skills/spec-mcp-setup/scripts/lib/project-config.cjs`、`skills/spec-mcp-setup/scripts/lib/facts.cjs` |
 | 事实边界 | advisory workspace facts；不是任何 child repo 的 canonical truth |
 
 ### 写入内容
@@ -95,10 +95,9 @@
 | 文件 | 角色 |
 | --- | --- |
 | `project-config-bootstrap-summary.json` | 父 workspace 下 project config bootstrap 的 per-child 汇总 |
-| `mcp-setup-summary.json` | 父 workspace 下 install-mcp 的 per-child 汇总 |
-| `mcp-verify-summary.json` | 父 workspace 下 verify-tools 的 per-child readiness 汇总；`parent_workspace_pollution_count` 记录本次 parent orphan quarantine 命中数 |
+| `mcp-setup-summary.json` | 父 workspace 下显式 provider setup 的 per-child 汇总 |
+| `mcp-verify-summary.json` | 父 workspace 下统一 Node verify path 的 per-child readiness 汇总；`parent_workspace_pollution_count` 记录本次 parent orphan quarantine 命中数 |
 | `scenario-fingerprint-setup.json` | `developer-scenario-fingerprint-setup.v1`，setup-time 场景事实；包含 topology、worktree、complexity dimensions、foreign residual indicators 和 advisory limitations |
-| `scenario-fingerprint.json` | `developer-scenario-fingerprint.v1`，合并 setup layer、dirty child count、build-target coverage 和 freshness signals |
 | `parent-artifact-quarantine.json` | `parent-artifact-quarantine.v1`，父 workspace 下 repo-local retired residue 的 advisory quarantine；`spec-first clean --workspace-orphans` 默认只预览，`--confirm` 才删除受支持的 quarantined parent orphan 路径 |
 
 `workspace/` 只帮助 LLM 或维护者看清候选和批量维护结果。它不能替代 child repo 内的 `.spec-first/config/`、当前源码、git diff、tests/logs、ast-grep 或 bounded direct source reads。

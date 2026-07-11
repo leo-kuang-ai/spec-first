@@ -1,0 +1,53 @@
+{
+  "schema_version": "mcp-setup-legacy-parity.v2",
+  "platform": "windows",
+  "provenance": {
+    "source_sha": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+    "capture_method": "baseline-source-anchored-normalized-contract",
+    "capture_status": "degraded",
+    "authority_level": "advisory",
+    "reason_code": "legacy-runtime-capture-not-replayed",
+    "limitations": ["当前 POSIX host 未执行旧版 PowerShell workflow；这里只验证 source digest 与 normalized contract。Windows capture owner 必须物化 baseline tree 并执行 scenario harness，才能提升为 confirmed。"],
+    "capture_command": "node tests/fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs --platform windows --source a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+    "ci_validation_command": "npx jest tests/unit/mcp-setup-node-contracts.test.js --runInBand",
+    "runtime_requirement": "Windows host 上需要 PowerShell 7；通过 windows-compatibility Node 20/22 matrix 执行",
+    "source_files": [
+      { "path": "skills/spec-mcp-setup/SKILL.md", "sha256": "33d4df4e7893670a4f26ac86fe40b162e8d4214554b41f4a2287daa074145164" },
+      { "path": "skills/spec-mcp-setup/scripts/check-health.ps1", "sha256": "58cd7ceb9e4f9880927092d15335485fee5d0a3eb179afea1d12ba34cb1aa848" },
+      { "path": "skills/spec-mcp-setup/scripts/verify-tools.ps1", "sha256": "7d5fdfd64a29ec05cfb241b4f4657cbc9db0cbb254626139f03a2b06f3ddfea3" },
+      { "path": "skills/spec-mcp-setup/scripts/setup-plan-renderer.cjs", "sha256": "6f366b0e17841d055e6eb363f80bd8db3f93f31eb1dffbcc66217732defd148a" },
+      { "path": "skills/spec-mcp-setup/scripts/bootstrap-project-config.ps1", "sha256": "c34852640ce61a9719f5bc9061ab27905314711420aa760d77371804b9cdb550" },
+      { "path": "skills/spec-mcp-setup/scripts/install-mcp.ps1", "sha256": "be513a9b16ec799106af14ed2a7ac2176cbf92d2ae94bb1b16e038c77d07366e" },
+      { "path": "skills/spec-mcp-setup/scripts/install-helpers.ps1", "sha256": "21e4c85ae1ed84caf828ec0c2aa84837d9decde1a31b3660bb7f5ea4e882c655" }
+    ]
+  },
+  "modes": {
+    "bare": { "argv": [], "mutation": false, "capabilities": [], "exit_code": 0, "reason_code": "diagnostic-ready", "artifact_schema": "spec-mcp-setup-preflight.v2", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "check-health.ps1", "reason_code": "windows-runtime-required" } },
+    "check": { "argv": ["--check"], "mutation": false, "capabilities": [], "exit_code": 0, "reason_code": "diagnostic-ready", "artifact_schema": "spec-mcp-setup-preflight.v2", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "check-health.ps1", "reason_code": "windows-runtime-required" } },
+    "verify": { "argv": ["--verify-only"], "mutation": true, "capabilities": ["write-setup-facts"], "exit_code": 1, "reason_code": "host-config-missing", "artifact_schema": "spec-mcp-setup-execution.v1", "side_effect_categories": ["setup-facts"], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "verify-tools.ps1", "reason_code": "windows-runtime-required" } },
+    "plan": { "argv": ["--plan"], "mutation": false, "capabilities": [], "exit_code": 0, "reason_code": "setup-install-plan-ready", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1 -> setup-plan-renderer.cjs", "reason_code": "windows-runtime-required" } },
+    "project-config": { "argv": ["--project-config"], "mutation": true, "capabilities": ["write-project-config"], "exit_code": 0, "reason_code": "project-config-ready", "artifact_schema": "project-config-bootstrap.v1", "side_effect_categories": ["project-config"], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "bootstrap-project-config.ps1", "reason_code": "windows-runtime-required" } },
+    "only": { "argv": ["--only", "graphify"], "mutation": true, "capabilities": ["install-tools", "write-host-config", "provider-mutation", "write-setup-facts"], "exit_code": 0, "reason_code": "setup-facts-written", "artifact_schema": "spec-mcp-setup-execution.v1", "side_effect_categories": ["host-config", "provider-mutation", "setup-facts"], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1 -> install-helpers.ps1 -> verify-tools.ps1", "reason_code": "windows-runtime-required" } },
+    "graphify-refresh": { "argv": ["--only", "graphify", "--refresh"], "mutation": true, "capabilities": ["install-tools", "write-host-config", "provider-refresh", "write-setup-facts"], "exit_code": 0, "reason_code": "setup-facts-written", "artifact_schema": "spec-mcp-setup-execution.v1", "side_effect_categories": ["host-config", "provider-mutation", "setup-facts"], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1 -> install-helpers.ps1 -Refresh -> verify-tools.ps1", "reason_code": "windows-runtime-required" } }
+  },
+  "invalid": [
+    { "id": "refresh-without-only-graphify", "argv": ["--refresh"], "exit_code": 2, "reason_code": "refresh-without-only-graphify", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1", "reason_code": "windows-runtime-required" } },
+    { "id": "unknown-optional-provider-selection", "argv": ["--only", "unknown"], "exit_code": 2, "reason_code": "unknown-optional-provider-selection", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1", "reason_code": "windows-runtime-required" } },
+    { "id": "repo-and-all-repos", "argv": ["--repo", "child", "--all-repos"], "exit_code": 2, "reason_code": "repo-and-all-repos", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1", "reason_code": "windows-runtime-required" } },
+    { "id": "repo-and-folder", "argv": ["--repo", "child", "--folder", "folder"], "exit_code": 2, "reason_code": "repo-and-folder", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1", "reason_code": "windows-runtime-required" } },
+    { "id": "folder-and-all-repos", "argv": ["--folder", "folder", "--all-repos"], "exit_code": 2, "reason_code": "folder-and-all-repos", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "pending-windows-ci", "owner": "install-mcp.ps1", "reason_code": "windows-runtime-required" } }
+  ],
+  "artifacts": {
+    "setup-install-plan.v1": ["schema_version", "mutation", "blocked", "reason_code", "planned_operations", "safety"],
+    "spec-mcp-setup-execution.v1": ["schema_version", "mode", "mutation", "target", "host", "tool_facts", "runtime_capabilities", "write_result"],
+    "spec-mcp-setup-diagnostic-snapshot.v1": ["schema_version", "setup_facts_status", "setup_facts_reason_code", "generated_runtime_manifest", "baseline_ready", "host_runtime_ready", "provider_readiness", "configured_dependencies"],
+    "spec-mcp-setup-preflight.v2": ["schema_version", "target", "host", "tools", "skills", "project", "runtime", "provider_readiness", "configured_dependencies"],
+    "tool-facts.v2": ["schema_version", "generated_at", "repo_root", "host", "platform", "tools", "helper_tools", "provider_readiness", "items", "configured_dependencies", "source"],
+    "runtime-capabilities.v1": ["schema_version", "generated_at", "repo_root", "host", "direct_evidence", "setup_summary"],
+    "workspace-mcp-setup-summary.v1": ["schema_version", "workflow_mode", "selection_source", "workspace_root", "parent_writes_repo_local_artifacts", "results", "counts", "overall_status", "reason_code"],
+    "workspace-mcp-verify-summary.v1": ["schema_version", "workflow_mode", "selection_source", "workspace_root", "parent_writes_repo_local_artifacts", "results", "counts", "overall_status", "reason_code"],
+    "project-config-bootstrap.v1": ["schema_version", "overall_status", "repo_root", "target_kind", "project", "legacy"],
+    "workspace-project-config-bootstrap-summary.v1": ["schema_version", "workflow_mode", "selection_source", "workspace_root", "parent_writes_repo_local_artifacts", "results", "counts", "overall_status", "reason_code"],
+    "project-local-config-status.v1": ["schema_version", "status", "repo_root", "example_config", "local_config", "local_config_gitignore", "legacy_markdown_config", "legacy_local_config"]
+  }
+}

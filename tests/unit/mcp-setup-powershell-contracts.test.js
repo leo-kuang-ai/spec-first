@@ -2,19 +2,30 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
-describe('spec-mcp-setup PowerShell runner contracts', () => {
-  test('keeps active PowerShell setup source scripts available for Windows mcp-setup checks', () => {
-    for (const relativePath of [
-      'skills/spec-mcp-setup/scripts/check-health.ps1',
-      'skills/spec-mcp-setup/scripts/verify-tools.ps1',
-      'skills/spec-mcp-setup/scripts/install-mcp.ps1',
-      'skills/spec-mcp-setup/scripts/install-helpers.ps1',
-      'skills/spec-mcp-setup/scripts/setup-plan-renderer.cjs',
-    ]) {
-      expect(fs.existsSync(path.join(repoRoot, relativePath))).toBe(true);
-    }
+describe('spec-mcp-setup cross-platform Node runner contracts', () => {
+  test.each([
+    ['primary entrypoint', 'setup.cjs'],
+    ['compatibility shim', 'check-health'],
+  ])('executes the %s with Node on Windows and POSIX', (_label, fileName) => {
+    const entrypoint = path.join(repoRoot, 'skills', 'spec-mcp-setup', 'scripts', fileName);
+    expect(fs.existsSync(entrypoint)).toBe(true);
+
+    const result = spawnSync(process.execPath, [entrypoint, '--help'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+    });
+
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain(
+      '用法：node <loaded-skill-root>/scripts/setup.cjs [options]',
+    );
+    expect(result.stderr).toBe('');
   });
 });

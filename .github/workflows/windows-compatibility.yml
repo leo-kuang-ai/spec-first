@@ -52,8 +52,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Capture legacy Windows replay
+        shell: pwsh
+        run: |
+          $artifact = Join-Path $env:RUNNER_TEMP 'mcp-setup-legacy-windows-node-${{ matrix.node }}.json'
+          $output = & node tests/fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs --platform windows --source a574194b13ee3e53e1d7cd36bbfc86ac058db0cc
+          $status = $LASTEXITCODE
+          $output | Set-Content -LiteralPath $artifact -Encoding utf8
+          $output
+          if ($status -ne 0) { exit $status }
+
+      - name: Upload legacy Windows replay
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-setup-legacy-windows-node-${{ matrix.node }}
+          path: ${{ runner.temp }}/mcp-setup-legacy-windows-node-${{ matrix.node }}.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Typecheck
         run: npm run typecheck
+
+      - name: MCP setup Node 契约
+        run: npm run test:mcp-setup
 
       - name: Test
         run: npm test

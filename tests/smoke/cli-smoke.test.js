@@ -251,12 +251,12 @@ describe('CLI smoke checks', () => {
         '.qoder/skills',
       ],
     };
-    const providerSource = fs.readFileSync(
-      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'provider-tools.json'),
+    const registrySource = fs.readFileSync(
+      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'setup-registry.json'),
       'utf8',
     );
-    const helperSource = fs.readFileSync(
-      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'scripts', 'install-helpers.sh'),
+    const setupSource = fs.readFileSync(
+      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'scripts', 'setup.cjs'),
       'utf8',
     );
 
@@ -278,10 +278,10 @@ describe('CLI smoke checks', () => {
       }
 
       const setupRoot = path.join(consumerRoot, runtimeRoot, 'spec-mcp-setup');
-      expect(fs.readFileSync(path.join(setupRoot, 'provider-tools.json'), 'utf8'))
-        .toBe(providerSource);
-      expect(fs.readFileSync(path.join(setupRoot, 'scripts', 'install-helpers.sh'), 'utf8'))
-        .toBe(helperSource);
+      expect(fs.readFileSync(path.join(setupRoot, 'setup-registry.json'), 'utf8'))
+        .toBe(registrySource);
+      expect(fs.readFileSync(path.join(setupRoot, 'scripts', 'setup.cjs'), 'utf8'))
+        .toBe(setupSource);
       expect(fs.existsSync(path.join(
         consumerRoot,
         runtimeRoot,

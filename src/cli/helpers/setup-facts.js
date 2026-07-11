@@ -14,19 +14,6 @@ function readJsonFile(filePath) {
   return JSON.parse(raw);
 }
 
-function loadHelperRegistry(repoRoot = path.join(__dirname, '..', '..', '..')) {
-  const registryPath = path.join(repoRoot, 'skills', 'spec-mcp-setup', 'helper-tools.json');
-  return {
-    path: registryPath,
-    registry: readJsonFile(registryPath),
-  };
-}
-
-function helperById(registry) {
-  const entries = Array.isArray(registry && registry.helpers) ? registry.helpers : [];
-  return new Map(entries.map((entry) => [entry.id, entry]));
-}
-
 function normalizeSetupFactsFile(factsPath, options = {}) {
   if (!factsPath) {
     return buildUnavailableProjection({
@@ -579,8 +566,6 @@ function toBoolean(value, fallback) {
 module.exports = {
   SETUP_FACTS_MAX_AGE_MS,
   computeDecisionInputHealth,
-  helperById,
-  loadHelperRegistry,
   normalizeSetupFacts,
   normalizeSetupFactsFile,
 };

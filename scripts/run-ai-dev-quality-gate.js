@@ -10,7 +10,12 @@ const GATE_ID = 'ai-dev-quality-gate';
 const QUALITY_FEEDBACK_FILE = 'quality-feedback-topics.json';
 const WORKFLOW_RUNTIME_CONTRACT_TESTS = [
   'tests/unit/changelog-format.test.js',
-  'tests/unit/mcp-setup-powershell-contracts.test.js',
+  'tests/unit/mcp-setup-config-consumers.test.js',
+  'tests/unit/mcp-setup-entrypoint.test.js',
+  'tests/unit/mcp-setup-facts-renderer.test.js',
+  'tests/unit/mcp-setup-node-contracts.test.js',
+  'tests/unit/mcp-setup-providers.test.js',
+  'tests/unit/mcp-setup-registry.test.js',
   'tests/unit/platform-registry-patterns.test.js',
   'tests/unit/plugin-modules.test.js',
   'tests/unit/pipeline-mode-contracts.test.js',

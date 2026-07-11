@@ -6,7 +6,7 @@ The quarantine surface does not include init-owned parent workspace bootstrap ar
 
 ## Producer
 
-- Producer: `spec-mcp-setup` verify phase (`verify-tools.sh` / `verify-tools.ps1`)
+- Producer：parent-workspace verify/setup 期间统一执行的 `spec-mcp-setup` Node 入口（`scripts/setup.cjs`）
 - Artifact path: `.spec-first/workspace/parent-artifact-quarantine.json`
 - Topology: `multi-repo-workspace`
 - Freshness: generated at verify time

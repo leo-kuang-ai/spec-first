@@ -14,7 +14,7 @@ const SETUP_SOURCE = fs.readFileSync(
   'utf8',
 );
 const SETUP_REGISTRY_SOURCE = fs.readFileSync(
-  path.join(REPO_ROOT, 'skills', 'spec-mcp-setup', 'mcp-tools.json'),
+  path.join(REPO_ROOT, 'skills', 'spec-mcp-setup', 'setup-registry.json'),
   'utf8',
 );
 
@@ -78,7 +78,7 @@ describe('host runtime projection contracts', () => {
       const transformed = adapter.transformSkillContent(SETUP_SOURCE, setupTransformContext());
 
       expect(transformed).toContain(
-        'Never manually choose `.kiro/settings/mcp.json`, `.qoder/settings.local.json`, `.cursor/mcp.json`, Codex TOML, or Claude managed/user config from prose alone.',
+        '绝不能仅依据 prose 手动选择 `.kiro/settings/mcp.json`、`.qoder/settings.local.json`、`.cursor/mcp.json`、Codex TOML 或 Claude managed/user config。',
       );
       expect(transformed).toContain(
         'write Kiro MCP config to workspace `.kiro/settings/mcp.json` by default, and to `~/.kiro/settings/mcp.json` only after explicit user-scope opt-in;',
@@ -98,11 +98,17 @@ describe('host runtime projection contracts', () => {
       const registry = JSON.parse(
         adapter.transformSkillContent(
           SETUP_REGISTRY_SOURCE,
-          setupTransformContext('mcp-tools.json'),
+          setupTransformContext('setup-registry.json'),
         ),
       );
-      const hostConfig = registry.tools[0].host_config;
+      const hostConfig = Object.fromEntries(
+        Object.entries(registry.hosts).map(([host, definition]) => [
+          host,
+          definition.defaults.tool.host_config,
+        ]),
+      );
 
+      expect(registry.schema_version).toBe('setup-registry.v8');
       expect(hostConfig.kiro.targets).toMatchObject({
         workspace: { config_path: '.kiro/settings/mcp.json' },
         user: { config_path: '$HOME/.kiro/settings/mcp.json' },
