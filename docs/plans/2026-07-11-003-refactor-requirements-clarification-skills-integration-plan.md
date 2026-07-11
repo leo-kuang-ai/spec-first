@@ -216,7 +216,7 @@ flowchart TB
 **Deferred until confirmed evidence**
 
 - standalone/public `spec-prototype`。
-- 真实 repo/application context、shell command、network、worktree 或 OCI/micro-sandbox prototype execution。
+- 真实 repo/application context、shell command、external network / arbitrary egress、worktree 或 OCI/micro-sandbox prototype execution；helper 自身的 same-origin `/version` refresh 仍在本轮范围内。
 - browser-to-agent event channel、click tracking 或自动 verdict ingestion。
 - persistent request registry、exactly-once consumption、crash-recovery ledger、retention anchor 和 cleanup receipt。
 - 新 `spec-prd` unified artifact topology、mandatory consumer receipt gate 或新的 Contract Reset Gate A attempt。

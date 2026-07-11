@@ -25,7 +25,6 @@ const { mergeStringArrays } = require('./init-project-plan');
 
 const MAX_PREVIEW_PATH_SAMPLES_PER_GROUP = 8;
 const MAX_PREVIEW_DETAIL_LINES = 100;
-const MAX_SUMMARY_PATH_SAMPLES = 12;
 
 const DESTRUCTIVE_OPERATION_ORDER = Object.freeze({
   remove_file: 0,
@@ -88,7 +87,7 @@ function printInitPreviews(plans, options = {}) {
       userLanguageSyncPlan,
       useColor,
     });
-    console.log(messages.previewNoFilesChanged);
+    console.log(messages.previewAwaitingConfirmation);
     return;
   }
 
@@ -132,12 +131,7 @@ function printInitSummaryPreview(groups, options = {}) {
       formatPreviewCount(summary.destructiveTotal, BrandColors.remove, useColor),
       summary.destructiveGroupCount,
     ));
-    for (const sample of summary.destructiveSamples) {
-      console.log(`  - ${colorize(sample.kind, previewOperationColor(sample.kind), useColor)}: ${sample.path} (${initPlatformLabel(sample.platform)})`);
-    }
-    if (summary.destructiveOmitted > 0) {
-      console.log(messages.previewSummaryDestructiveOmitted(summary.destructiveOmitted));
-    }
+    console.log(messages.previewSummaryDestructiveDetails);
   }
   for (const host of summary.hosts) {
     console.log(messages.previewHostSummary(
@@ -167,24 +161,6 @@ function buildInitSummaryPreview(groups) {
   }
 
   const destructiveGroups = normalizedGroups.filter((group) => group.destructiveTotal > 0);
-  const samples = [];
-  let sampleIndex = 0;
-  while (samples.length < MAX_SUMMARY_PATH_SAMPLES) {
-    let added = false;
-    for (const group of destructiveGroups) {
-      const row = group.destructive[sampleIndex];
-      if (!row || samples.length >= MAX_SUMMARY_PATH_SAMPLES) {
-        continue;
-      }
-      samples.push({ ...row, platform: group.platform });
-      added = true;
-    }
-    if (!added) {
-      break;
-    }
-    sampleIndex += 1;
-  }
-
   const destructiveTotal = destructiveGroups.reduce(
     (total, group) => total + group.destructiveTotal,
     0,
@@ -195,8 +171,6 @@ function buildInitSummaryPreview(groups) {
     targetCount: new Set(normalizedGroups.map((group) => group.targetRoot)).size,
     destructiveTotal,
     destructiveGroupCount: destructiveGroups.length,
-    destructiveSamples: samples,
-    destructiveOmitted: Math.max(0, destructiveTotal - samples.length),
     resetReasons: normalizedGroups.map((group) => group.resetReason),
   };
 }
@@ -1092,7 +1066,6 @@ function printRuntimeUntrackApplySummary(summary = buildRuntimeUntrackSummary(),
 module.exports = {
   MAX_PREVIEW_DETAIL_LINES,
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
-  MAX_SUMMARY_PATH_SAMPLES,
   hasAnyManagedState,
   hasInitDiagnostic,
   printGlobalDeveloperWriteSummary,

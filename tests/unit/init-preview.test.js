@@ -4,7 +4,6 @@ const { BrandColors } = require('../../src/cli/brand');
 const {
   MAX_PREVIEW_DETAIL_LINES,
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
-  MAX_SUMMARY_PATH_SAMPLES,
   printInitPreviews,
 } = require('../../src/cli/commands/init-output');
 const { printInitDiagnostics } = require('../../src/cli/commands/init-diagnostics');
@@ -73,7 +72,7 @@ afterEach(() => {
 });
 
 describe('bounded init mutation preview', () => {
-  test('renders a summary-first five-host preview with bounded destructive samples', () => {
+  test('renders a summary-first five-host preview without destructive path details', () => {
     const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
     const plans = platforms.map((platform, platformIndex) => {
       const operations = [
@@ -100,20 +99,18 @@ describe('bounded init mutation preview', () => {
       },
     });
     const lines = output.split('\n').filter(Boolean);
-    const destructiveRows = lines.filter((line) => line.startsWith('  - remove_dir:'));
-
-    expect(MAX_SUMMARY_PATH_SAMPLES).toBe(12);
     expect(lines.length).toBeLessThanOrEqual(40);
-    expect(destructiveRows).toHaveLength(12);
     const labels = ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder'];
     for (const [index, platform] of platforms.entries()) {
       expect(output).toContain(`${labels[index]}:`);
-      expect(output).toContain(`.${platform}/obsolete-01`);
+      expect(output).not.toContain(`.${platform}/obsolete-01`);
     }
-    expect(output).toContain('145 destructive path(s)');
-    expect(output).toContain('133 more destructive path(s)');
+    expect(output).toContain('145 risk path(s)');
     expect(output).toContain('spec-first init --dry-run');
-    expect(output.indexOf('145 destructive path(s)')).toBeLessThan(output.indexOf('Claude Code:'));
+    expect(output).toContain('Preview only; files change only after confirmation.');
+    expect(output.indexOf('145 risk path(s)')).toBeLessThan(output.indexOf('Claude Code:'));
+    expect(output).not.toContain('remove_dir:');
+    expect(output).not.toContain('No files were changed.');
     expect(output).not.toContain('generated-0001.md');
     expect(output).not.toContain('target_host_groups=');
   });
@@ -131,6 +128,7 @@ describe('bounded init mutation preview', () => {
     expect(output).toContain('current runtime drift detected');
     expect(output).toContain('Destructive preview:');
     expect(output.indexOf('Destructive preview:')).toBeLessThan(output.indexOf('Codex:'));
+    expect(output).not.toContain('.agents/skills/spec-plan');
   });
 
   test('deduplicates known host diagnostics and localizes them', () => {

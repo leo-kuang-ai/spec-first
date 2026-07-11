@@ -28,17 +28,16 @@ const MESSAGES = {
     ),
     previewSummaryCoverage: (targets, hosts) => `初始化预览: ${targets} 个目标 · ${hosts} 个宿主`,
     previewHostSummary: (label, destructive, critical, generated) => (
-      `  ${label}: 删除/清理 ${destructive} · 关键写入 ${critical} · 生成 ${generated}`
+      `  ${label}: 风险操作 ${destructive} · 关键写入 ${critical} · 生成 ${generated}`
     ),
-    previewSummaryDestructive: (count, groups) => `风险操作: ${count} 个 destructive path · ${groups} 个 target/host group`,
-    previewSummaryDestructiveOmitted: (count) => (
-      `  ... 另有 ${count} 个 destructive path；运行 spec-first init --dry-run 查看有界明细。`
-    ),
+    previewSummaryDestructive: (count, groups) => `风险操作: ${count} 个 path · ${groups} 个 target/host group（默认不展开路径）`,
+    previewSummaryDestructiveDetails: '  查看具体路径: spec-first init --dry-run',
     previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
       `全局 developer profile: ${action} · ${displayPath} · ${name} (${lang})`
     ),
     previewSummaryLanguageReady: '用户级语言同步: ready（无需修改）',
     previewSummaryLanguageChanges: (count) => `用户级语言同步: ${count} 项计划变更`,
+    previewAwaitingConfirmation: '以上为预览；确认后才会修改文件。',
     previewGlobalDeveloperHeader: '全局 developer profile 预览:',
     previewDestructivePaths: (count) => `删除 / prune / runtime-untrack paths (${count}):`,
     previewCriticalWritePaths: (count) => `关键写入 paths (${count}):`,
@@ -136,17 +135,16 @@ const MESSAGES = {
     ),
     previewSummaryCoverage: (targets, hosts) => `Init preview: ${targets} target(s) · ${hosts} host(s)`,
     previewHostSummary: (label, destructive, critical, generated) => (
-      `  ${label}: remove/prune ${destructive} · critical writes ${critical} · generated ${generated}`
+      `  ${label}: risk operations ${destructive} · critical writes ${critical} · generated ${generated}`
     ),
-    previewSummaryDestructive: (count, groups) => `${count} destructive path(s) across ${groups} target/host group(s):`,
-    previewSummaryDestructiveOmitted: (count) => (
-      `  ... ${count} more destructive path(s); run spec-first init --dry-run for bounded details.`
-    ),
+    previewSummaryDestructive: (count, groups) => `${count} risk path(s) across ${groups} target/host group(s) (paths hidden by default)`,
+    previewSummaryDestructiveDetails: '  Inspect paths: spec-first init --dry-run',
     previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
       `Global developer profile: ${action} · ${displayPath} · ${name} (${lang})`
     ),
     previewSummaryLanguageReady: 'User-level language sync: ready (no changes)',
     previewSummaryLanguageChanges: (count) => `User-level language sync: ${count} planned change(s)`,
+    previewAwaitingConfirmation: 'Preview only; files change only after confirmation.',
     previewGlobalDeveloperHeader: 'Global developer profile preview:',
     previewDestructivePaths: (count) => `Destructive / prune / runtime-untrack paths (${count}):`,
     previewCriticalWritePaths: (count) => `Critical write paths (${count}):`,
