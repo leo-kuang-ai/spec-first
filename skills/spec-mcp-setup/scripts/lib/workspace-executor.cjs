@@ -164,6 +164,13 @@ function summarizeChildExecution(child, { mode, selectedIds = [] } = {}, firstSe
       reason_code: child && child.reason_code ? child.reason_code : 'child-execution-failed',
     };
   }
+  const executionSummary = child.payload && child.payload.execution_summary;
+  if (executionSummary && executionSummary.overall_status !== 'ready') {
+    return {
+      overall_status: executionSummary.overall_status,
+      reason_code: executionSummary.reason_code || 'child-setup-partial',
+    };
+  }
   const providerFailure = firstSelectedProviderFailure(
     child.payload && child.payload.tool_facts
       ? child.payload.tool_facts.provider_readiness
@@ -278,7 +285,9 @@ function buildWorkspaceSetupSummary(context, results) {
       : (overallStatus === 'ready' ? null : 'all-repos-partial-or-action-required'),
     next_action: overallStatus === 'ready'
       ? '所有 child repo 均已完成 MCP setup。'
-      : '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup。',
+      : (counts.action_required > 0
+        ? '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup。'
+        : '当前 child repo 仅完成 selected subset；运行标准 spec-mcp-setup 并用 --verify-only 复核完整 readiness。'),
   };
 }
 

@@ -586,4 +586,81 @@ describe('spec-mcp-setup renderer', () => {
     expect(text).toContain('Generated runtime manifest：stale (manifest-version-drift)');
     expect(text).not.toContain('setup complete');
   });
+
+  test('human summary renders provider actions and never continues after action-required', () => {
+    const { renderHumanSummary } = require('../../skills/spec-mcp-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: {
+        items: [],
+        provider_readiness: [{
+          provider: 'graphify',
+          readiness_status: 'degraded',
+          reason_code: 'graphify-artifact-missing',
+          next_actions: ['运行 spec-mcp-setup --only graphify。'],
+        }],
+        configured_dependencies: [],
+      },
+      runtimeCapabilities: {
+        setup_summary: {
+          baseline_ready: true,
+          host_runtime_ready: true,
+          generated_runtime_manifest: { status: 'current' },
+        },
+      },
+    }, {
+      executionSummary: {
+        overall_status: 'action-required',
+        reason_code: 'graphify-artifact-missing',
+        scope: 'full',
+        selected_ids: ['codegraph', 'graphify'],
+        required_provider_ids: ['codegraph', 'graphify'],
+      },
+    });
+
+    expect(text).toContain('整体状态：action-required (graphify-artifact-missing)');
+    expect(text).toContain('运行 spec-mcp-setup --only graphify。');
+    expect(text).not.toContain('继续目标 spec-* workflow');
+  });
+
+  test('human summary suppresses stale install and maintenance actions for ready rows', () => {
+    const { renderHumanSummary } = require('../../skills/spec-mcp-setup/scripts/lib/renderer.cjs');
+    const text = renderHumanSummary({
+      toolFacts: {
+        items: [{
+          id: 'ffmpeg',
+          kind: 'cli',
+          result: 'ready',
+          reason_code: 'ready',
+          next_action: '安装 ffmpeg',
+        }],
+        provider_readiness: [{
+          provider: 'graphify',
+          readiness_status: 'fresh',
+          next_actions: ['运行 spec-mcp-setup --only graphify --refresh。'],
+        }],
+        configured_dependencies: [],
+      },
+      runtimeCapabilities: {
+        setup_summary: {
+          baseline_ready: true,
+          host_runtime_ready: true,
+          generated_runtime_manifest: { status: 'current' },
+        },
+      },
+    }, {
+      executionSummary: {
+        overall_status: 'ready',
+        reason_code: 'setup-ready',
+        scope: 'full',
+        selected_ids: ['codegraph', 'graphify'],
+        required_provider_ids: ['codegraph', 'graphify'],
+      },
+    });
+
+    expect(text).toContain('ffmpeg [cli]: ready (ready)');
+    expect(text).toContain('graphify: fresh (ready)');
+    expect(text).not.toContain('安装 ffmpeg');
+    expect(text).not.toContain('graphify --refresh');
+    expect(text).toContain('继续目标 spec-* workflow');
+  });
 });

@@ -8,6 +8,14 @@
 
 `spec-prd` 先读 source、识别真正的 load-bearing WHAT gap，再决定是否需要询问当前执行对话的用户；`create/refine` 闭合后先写 LLM-owned final intent，再由 finalizer 原子写 machine receipt；`validate` 始终 report-only。模板只有一个 canonical Outstanding Questions schema，final/ready 出口缺核心 section、R/AE 行、trace 或 current receipt 时 fail-closed。
 
+## Opt-in：Contract Reset Lite
+
+只有调用中显式包含 `analysis_profile=contract-reset-lite` 时才进入 Lite；普通的“精简 PRD”“少问一些”或“缩短流程”不会自动启用。默认执行逻辑保持不变。
+
+Lite 只改变 run-local 分析形状：用一个 Product Analysis Brief 同时承载 Requirement Analysis Gate、产品风险排序和 Push-Right owner checkpoint。Brief 覆盖 product frame、current/target/delta、source inventory、claim-specific authority、候选行为、priority authority、R/AE gap、design coverage、下一 source/decision 和 closure summary；只在 Brief 发现 domain、持续访谈、设计或 large-input trigger 时加载对应深层 reference。
+
+Lite 不改变 durable contract：仍写 `docs/brainstorms/*-requirements.md`，继续使用现有 Decision Card、唯一 OQ schema、checker/finalizer 和 producer receipt；`validate` 仍为零 mutation，`spec-plan --verify-receipt` 仍是可选诊断。它不会创建 Product Analysis artifact、unified-plan sibling、migration manifest、mandatory consumer gate 或 generated runtime patch。
+
 ## 要解决的问题
 
 - 产品材料与现有代码、文档、测试或历史合同不一致。

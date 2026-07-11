@@ -82,12 +82,17 @@ function compactProjectStatus(projectConfigStatus, insideGitRepo) {
   const localStatus = status.local_config && status.local_config.status;
   const gitignoreStatus = status.local_config_gitignore && status.local_config_gitignore.status;
   const exampleStatus = status.example_config && status.example_config.status;
+  const defaultsActive = localStatus === 'defaults-active';
   return {
     inside_git_repo: true,
-    local_config_status: localStatus === 'present' ? 'ok' : 'missing',
+    local_config_status: localStatus === 'present'
+      ? 'ok'
+      : (defaultsActive ? 'defaults-active' : 'missing'),
     local_config_gitignore_status: localStatus === 'present'
       ? (gitignoreStatus === 'ignored' ? 'ok' : 'missing')
-      : 'skip',
+      : (defaultsActive
+        ? (gitignoreStatus === 'ready-for-local-config' ? 'ok' : 'missing')
+        : 'skip'),
     example_config_status: exampleStatus === 'current' ? 'ok' : (exampleStatus || 'missing'),
   };
 }

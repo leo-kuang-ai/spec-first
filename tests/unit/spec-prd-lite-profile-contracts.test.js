@@ -1,6 +1,11 @@
 'use strict';
 
 const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
+const plugin = require('../../src/cli/plugin');
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
@@ -26,8 +31,8 @@ describe('spec-prd Contract Reset Lite profile', () => {
     expect(SKILL).toContain('the single Product Analysis Brief is the compatibility representation of this gate and Product Expert risk ranking');
     expect(LITE).toContain('`docs/brainstorms/*-requirements.md` with `artifact_kind: prd-requirements`');
     expect(LITE).toContain('Create no separate Product Analysis artifact');
-    expect(LITE).toContain('optional downstream `--verify-receipt` diagnostic');
-    expect(LITE).toContain('Validate uses the same Brief only as a report structure and remains zero mutation');
+    expect(LITE).toMatch(/optional downstream\s+`--verify-receipt` diagnostic/);
+    expect(LITE).toMatch(/Validate uses the same Brief only as a report structure and remains zero\s+mutation/);
     expect(LITE).not.toContain('artifact_readiness: requirements-only');
     expect(LITE).not.toContain('product_contract_source: spec-prd');
   });
@@ -36,7 +41,7 @@ describe('spec-prd Contract Reset Lite profile', () => {
     expect(LITE).toContain('`source_ref` and `source_type`');
     expect(LITE).toContain('authority scope');
     expect(LITE).toContain('The phrase "not in this release" alone is not closure');
-    expect(LITE).toContain('plus a reopen condition');
+    expect(LITE).toMatch(/plus\s+a reopen condition/);
     expect(LITE).toContain('an independent planner would not need to invent load-bearing WHAT');
   });
 
@@ -51,5 +56,24 @@ describe('spec-prd Contract Reset Lite profile', () => {
     expect(nearNeighbor.must_not).toContain('must not infer Contract Reset Lite from a generic request for concision');
     expect(validate).toBeDefined();
     expect(validate.must_not).toContain('must not write, rewrite, finalize in write mode, or materialize provider output');
+  });
+
+  test('projects the Lite reference from source into every supported host plan', () => {
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-prd-lite-${platform}-`));
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
+        const expectedPath = path.join(
+          runtimeRoot,
+          'spec-prd/references/product-analysis-lite.md',
+        ).replace(/\\/g, '/');
+
+        expect(plan.operations.some((operation) => operation.path === expectedPath)).toBe(true);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
   });
 });

@@ -142,4 +142,27 @@ describe('spec-mcp-setup preflight v2 projection', () => {
       legacy_local_config_status: 'retired',
     });
   });
+
+  test('reports a missing local override as defaults-active and keeps ignore readiness visible', () => {
+    const { buildPreflightProjection } = require('../../skills/spec-mcp-setup/scripts/lib/preflight.cjs');
+    const preflight = buildPreflightProjection({
+      registry: { helpers: [] },
+      helperResults: [],
+      projectConfigStatus: {
+        example_config: { status: 'current' },
+        local_config: { status: 'defaults-active' },
+        local_config_gitignore: { status: 'ready-for-local-config' },
+        legacy_markdown_config: { status: 'missing' },
+      },
+      insideGitRepo: true,
+      platform: 'linux',
+    });
+
+    expect(preflight.project).toEqual({
+      inside_git_repo: true,
+      local_config_status: 'defaults-active',
+      local_config_gitignore_status: 'ok',
+      example_config_status: 'ok',
+    });
+  });
 });

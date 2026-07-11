@@ -434,9 +434,18 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
       runtime_capabilities_path: path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'),
     });
     expect(result.payload).toMatchObject({
+      execution_summary: {
+        overall_status: 'action-required',
+        scope: 'full',
+        selected_ids: ['codegraph', 'graphify'],
+        required_provider_ids: ['codegraph', 'graphify'],
+      },
       write_result: { status: 'ready', complete: true },
       host_ledger_write_result: { status: 'ready', reason_code: 'host-readiness-ledger-written' },
     });
+    expect(result.human).toContain('整体状态：action-required');
+    expect(result.human).toContain('spec-mcp-setup --only');
+    expect(result.human).not.toContain('继续目标 spec-* workflow');
     expect(fs.existsSync(path.join(target, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json'))).toBe(true);
     expect(snapshotFiles(target, ['.spec-first/config', '.spec-first/workspace/scenario-fingerprint-setup.json']))
       .toEqual(repoBefore);
@@ -690,6 +699,16 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     });
 
     expect(result.exit_code).toBe(0);
+    expect(result.payload.execution_summary).toEqual({
+      overall_status: 'partial',
+      reason_code: 'subset-setup-complete',
+      scope: 'subset',
+      selected_ids: ['graphify'],
+      required_provider_ids: ['codegraph', 'graphify'],
+    });
+    expect(result.human).toContain('整体状态：partial (subset-setup-complete)');
+    expect(result.human).toContain('当前仅完成 selected subset');
+    expect(result.human).not.toContain('继续目标 spec-* workflow');
     const hostConfig = JSON.parse(fs.readFileSync(path.join(target, '.qoder', 'settings.local.json'), 'utf8'));
     expect(Object.keys(hostConfig.mcpServers).sort()).toEqual(['context7', 'sequential-thinking']);
     expect(fs.existsSync(path.join(target, '.graphify', 'graph.json'))).toBe(true);
@@ -1168,7 +1187,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
       reason_code: 'all-repos-partial-or-action-required',
       payload: {
         schema_version: 'workspace-mcp-setup-summary.v1',
-        counts: { total: 2, ready: 1, partial: 0, action_required: 1 },
+        counts: { total: 2, ready: 0, partial: 1, action_required: 1 },
         overall_status: 'partial',
         reason_code: 'all-repos-partial-or-action-required',
         next_action: '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup。',

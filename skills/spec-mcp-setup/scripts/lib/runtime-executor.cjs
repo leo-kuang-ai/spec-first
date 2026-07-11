@@ -213,6 +213,7 @@ function runVerificationOrMutation(context, repoRoot) {
   const effectiveWriteResult = hostLedgerFailure
     ? { ...writeResult, complete: false }
     : writeResult;
+  const executionSummary = buildExecutionSummary({ context, failedOutcome });
   return {
     exit_code: failedOutcome ? 1 : 0,
     mode: context.actionPlan.mode,
@@ -223,13 +224,41 @@ function runVerificationOrMutation(context, repoRoot) {
       mutation: true,
       target: context.target,
       host: context.host,
+      execution_summary: executionSummary,
       tool_facts: bundle.toolFacts,
       runtime_capabilities: bundle.runtimeCapabilities,
       write_result: effectiveWriteResult,
       host_ledger_write_result: hostLedgerWriteResult,
     },
-    human: renderHumanSummary(bundle),
+    human: renderHumanSummary(bundle, { executionSummary }),
     target: context.target,
+  };
+}
+
+function buildExecutionSummary({ context, failedOutcome } = {}) {
+  const selectedIds = context && context.actionPlan
+    ? [...(context.actionPlan.selected_ids || [])]
+    : [];
+  const requiredProviderIds = context && context.effectiveRegistry
+    ? (context.effectiveRegistry.providers || [])
+      .filter((entry) => entry.setup_required === true)
+      .map((entry) => entry.id)
+    : [];
+  const mode = context && context.actionPlan ? context.actionPlan.mode : 'unknown';
+  const coversRequiredProviders = requiredProviderIds.every((id) => selectedIds.includes(id));
+  const partialScope = ['only', 'graphify-refresh', 'host-config-repair'].includes(mode)
+    && !coversRequiredProviders;
+  const overallStatus = failedOutcome
+    ? 'action-required'
+    : (partialScope ? 'partial' : 'ready');
+  return {
+    overall_status: overallStatus,
+    reason_code: failedOutcome && failedOutcome.reason_code
+      ? failedOutcome.reason_code
+      : (partialScope ? 'subset-setup-complete' : 'setup-ready'),
+    scope: partialScope ? 'subset' : 'full',
+    selected_ids: selectedIds,
+    required_provider_ids: requiredProviderIds,
   };
 }
 

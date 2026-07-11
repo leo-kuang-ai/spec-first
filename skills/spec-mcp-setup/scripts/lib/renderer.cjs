@@ -193,11 +193,19 @@ function renderDiagnostic({ preflight, snapshot, target, host } = {}) {
   };
 }
 
-function renderHumanSummary({ toolFacts = {}, runtimeCapabilities = {} } = {}) {
+function renderHumanSummary(
+  { toolFacts = {}, runtimeCapabilities = {} } = {},
+  { executionSummary } = {},
+) {
   const summary = runtimeCapabilities.setup_summary || {};
   const manifest = summary.generated_runtime_manifest || {};
+  const execution = executionSummary || deriveExecutionSummary({ toolFacts, summary, manifest });
+  const selected = (execution.selected_ids || []).join(', ') || 'none';
+  const required = (execution.required_provider_ids || []).join(', ') || 'none';
   const lines = [
     '执行结果',
+    `- 整体状态：${execution.overall_status} (${execution.reason_code})`,
+    `- 执行范围：${execution.scope}；selected=${selected}；required=${required}`,
     `- 必需 MCP/helper 依赖：${summary.baseline_ready === true ? 'ready' : 'action-required'}`,
     `- Host runtime 配置：${summary.host_runtime_ready === true ? 'ready' : 'action-required'}`,
     `- Generated runtime manifest：${manifest.status || 'unknown'}${manifest.reason_code ? ` (${manifest.reason_code})` : ''}`,
@@ -205,7 +213,8 @@ function renderHumanSummary({ toolFacts = {}, runtimeCapabilities = {} } = {}) {
     'MCP server / Helper 工具',
   ];
   for (const item of toolFacts.items || []) {
-    lines.push(`- ${item.id} [${item.kind}]: ${item.result} (${item.reason_code})${item.next_action ? ` -> ${item.next_action}` : ''}`);
+    const nextAction = item.result !== 'ready' && item.next_action ? ` -> ${item.next_action}` : '';
+    lines.push(`- ${item.id} [${item.kind}]: ${item.result} (${item.reason_code})${nextAction}`);
     if (item.config_path && item.reason_code && item.reason_code.includes('host-config')) {
       lines.push(`  config: ${item.config_path}${item.config_key ? ` key=${item.config_key}` : ''}`);
     }
@@ -218,22 +227,57 @@ function renderHumanSummary({ toolFacts = {}, runtimeCapabilities = {} } = {}) {
   }
   lines.push('', 'Provider 工具');
   for (const provider of toolFacts.provider_readiness || []) {
-    lines.push(`- ${provider.provider || provider.id}: ${provider.readiness_status || 'unknown'} (${provider.reason_code || 'unknown'})`);
+    const status = provider.readiness_status || 'unknown';
+    const reasonCode = provider.reason_code || (status === 'fresh' ? 'ready' : 'unknown');
+    lines.push(`- ${provider.provider || provider.id}: ${status} (${reasonCode})`);
   }
   lines.push('', 'Host 已配置依赖');
   for (const dependency of toolFacts.configured_dependencies || []) {
     lines.push(`- ${dependency.id}: ${dependency.result} (${dependency.reason_code})`);
   }
   lines.push('', '后续步骤');
-  const actionable = (toolFacts.items || []).filter((item) => item.result !== 'ready' && item.next_action);
+  const nextActions = [];
   if (manifest.status === 'stale' || manifest.status === 'missing') {
-    lines.push('- 对所选 topology 运行 spec-first init，然后重新运行 spec-mcp-setup --verify-only。');
+    nextActions.push('对所选 topology 运行 spec-first init，然后重新运行 spec-mcp-setup --verify-only。');
   }
-  for (const item of actionable) lines.push(`- ${item.next_action}`);
-  if (actionable.length === 0 && !['stale', 'missing'].includes(manifest.status)) {
+  for (const item of toolFacts.items || []) {
+    if (item.result !== 'ready' && item.next_action) nextActions.push(item.next_action);
+  }
+  for (const provider of toolFacts.provider_readiness || []) {
+    if (provider.readiness_status === 'fresh') continue;
+    for (const action of provider.next_actions || []) {
+      if (action) nextActions.push(action);
+    }
+  }
+  if (execution.overall_status === 'partial') {
+    nextActions.push('当前仅完成 selected subset；运行标准 spec-mcp-setup 完成全部 required items，然后运行 spec-mcp-setup --verify-only 复核。');
+  } else if (execution.overall_status === 'action-required' && nextActions.length === 0) {
+    nextActions.push('修复上述 action-required 项后，重新运行 spec-mcp-setup --verify-only。');
+  }
+  for (const action of [...new Set(nextActions)]) lines.push(`- ${action}`);
+  if (execution.overall_status === 'ready') {
     lines.push('- 继续目标 spec-* workflow。');
   }
   return `${lines.join('\n')}\n`;
+}
+
+function deriveExecutionSummary({ toolFacts, summary, manifest }) {
+  const itemActionRequired = (toolFacts.items || []).some((item) => item.result === 'action-required');
+  const providerActionRequired = (toolFacts.provider_readiness || []).some((provider) => (
+    ['degraded', 'failed', 'blocked'].includes(provider.readiness_status)
+  ));
+  const actionRequired = summary.baseline_ready !== true
+    || summary.host_runtime_ready !== true
+    || ['stale', 'missing'].includes(manifest.status)
+    || itemActionRequired
+    || providerActionRequired;
+  return {
+    overall_status: actionRequired ? 'action-required' : 'ready',
+    reason_code: actionRequired ? 'setup-action-required' : 'setup-ready',
+    scope: 'full',
+    selected_ids: [],
+    required_provider_ids: [],
+  };
 }
 
 function renderJson(payload) {
