@@ -13,7 +13,10 @@ const {
   loadPluginManifest,
   planBundledAssetSync,
 } = require('../plugin');
-const { resolveDeveloperIdentity } = require('../developer');
+const {
+  resolveChangelogAuthor,
+  resolveDeveloperIdentity,
+} = require('../developer');
 const {
   buildFileWriteOperation,
   buildState,
@@ -31,6 +34,7 @@ const { planRuntimeUntrack } = require('../runtime-untrack');
 const { detectGlobalCodexHookPollution } = require('../adapters/codex');
 const { applyManagedBlock, buildManagedBlock } = require('../lang-policy');
 const { removeManagedCodingGuidelinesBlock } = require('../coding-guidelines');
+const { buildInitialChangelog, formatChangelogTimestamp } = require('../changelog');
 const { applySpecFirstGitignoreBlock } = require('../gitignore-policy');
 const {
   inspectInstructionBootstrap,
@@ -296,6 +300,7 @@ function buildProjectInitPlan({
     operationPlan,
     untrackDiagnostic: initWritePlan.untrackDiagnostic,
     syncedAssets: assetSync.syncedAssets,
+    changelogCreated: !fs.existsSync(path.join(normalizedRoot, 'CHANGELOG.md')),
     diagnostics,
     errors,
     summary: operationPlan.summary,
@@ -340,6 +345,7 @@ function buildErroredProjectInitPlan({
       agents: [],
       agentSupportFiles: [],
     },
+    changelogCreated: false,
     diagnostics,
     errors,
     summary: emptyPlan.summary,
@@ -557,6 +563,23 @@ function buildInitMetadataPlan({
     `${JSON.stringify(nextState, null, 2)}\n`,
     'managed_state_file',
   ));
+
+  const changelogPath = path.join(projectRoot, 'CHANGELOG.md');
+  if (!fs.existsSync(changelogPath)) {
+    const changelogAuthor = resolveChangelogAuthor(projectRoot, {
+      platform,
+    });
+    operations.push(buildPlanFileOperation(
+      projectRoot,
+      'CHANGELOG.md',
+      buildInitialChangelog(
+        formatChangelogTimestamp(new Date()),
+        changelogAuthor.name || developer.name,
+        developer.version,
+      ),
+      'bootstrap_changelog',
+    ));
+  }
 
   if (platform === 'claude') {
     const rendered = renderManagedClaudeHooksUpsert(projectRoot);

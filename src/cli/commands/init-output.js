@@ -23,6 +23,26 @@ const { printInitDiagnostics } = require('./init-diagnostics');
 const { buildRuntimeUntrackSummary } = require('./init-result');
 const { mergeStringArrays } = require('./init-project-plan');
 
+const MAX_PREVIEW_PATH_SAMPLES_PER_GROUP = 8;
+const MAX_PREVIEW_DETAIL_LINES = 100;
+
+const DESTRUCTIVE_OPERATION_ORDER = Object.freeze({
+  remove_file: 0,
+  remove_dir: 1,
+  prune_command: 2,
+  runtime_untrack: 3,
+});
+
+const CRITICAL_WRITE_REASON_ORDER = Object.freeze({
+  managed_instruction_file: 0,
+  managed_gitignore_policy: 1,
+  bootstrap_changelog: 2,
+  managed_state_file: 3,
+  managed_runtime_hook: 4,
+  managed_claude_hook_matchers: 4,
+  managed_host_native_pointer: 5,
+});
+
 function resolveInitBannerRoot(root) {
   return findGitRoot(root) || root;
 }
@@ -45,69 +65,339 @@ function hasAnyManagedState(root) {
 }
 
 function printInitPreview(plan, options = {}) {
-  const { lang = 'en', useColor = false } = options;
-  if (plan.mode === 'all-repos') {
-    console.log(`Workspace preview: spec-first init (${plan.platform})`);
-    console.log(`  workspace_root: ${plan.workspaceRoot}`);
-    console.log(`  selection_source: ${plan.selectionSource}`);
-    console.log(`  child_repos: ${plan.childPlans.length}`);
-    console.log('');
-    console.log('Parent runtime assets:');
-    printInitDryRun({
-      platform: plan.platform,
-      plan: plan.parentPlan.operationPlan,
-      untrackDiagnostic: plan.parentPlan.untrackDiagnostic,
-      legacyStateDetected: plan.parentPlan.legacyStateDetected,
-      destructiveResetReason: plan.parentPlan.destructiveResetReason,
-      showPathSamples: false,
-      lang,
-      useColor,
-    });
-    plan.childPlans.forEach((entry, index) => {
-      console.log('');
-      console.log(`Child ${index + 1}/${plan.childPlans.length}: ${entry.candidate.workspace_relative_path}`);
-      printInitDryRun({
-        platform: plan.platform,
-        plan: entry.plan.operationPlan,
-        untrackDiagnostic: entry.plan.untrackDiagnostic,
-        legacyStateDetected: entry.plan.legacyStateDetected,
-        destructiveResetReason: entry.plan.destructiveResetReason,
-        showPathSamples: false,
-        lang,
-        useColor,
-      });
-    });
-    return;
-  }
-
-  printInitDryRun({
-    platform: plan.platform,
-    plan: plan.operationPlan,
-    untrackDiagnostic: plan.untrackDiagnostic,
-    legacyStateDetected: plan.legacyStateDetected,
-    destructiveResetReason: plan.destructiveResetReason,
-    showPathSamples: false,
-    lang,
-    useColor,
-  });
+  printInitPreviews([plan], options);
 }
 
 function printInitPreviews(plans, options = {}) {
-  const { lang = 'en', useColor = false, userLanguageSyncPlan = null } = options;
+  const {
+    effectiveGlobalDeveloperWrite = null,
+    lang = 'en',
+    useColor = false,
+    userLanguageSyncPlan = null,
+  } = options;
   const messages = getInitMessages(lang);
-  if (plans.length === 1) {
-    printInitPreview(plans[0], { lang, useColor });
-    printUserLanguageSyncPreview(userLanguageSyncPlan, { lang });
-    return;
+  const normalizedPlans = Array.isArray(plans) ? plans.filter(Boolean) : [];
+  const groups = collectInitPreviewGroups(normalizedPlans);
+
+  printInitPreviewRunContext(normalizedPlans, messages);
+  console.log(messages.previewCoverage(
+    new Set(groups.map((group) => group.targetRoot)).size,
+    new Set(groups.map((group) => group.platform)).size,
+    groups.length,
+    MAX_PREVIEW_DETAIL_LINES,
+  ));
+  printGlobalDeveloperWritePreview(effectiveGlobalDeveloperWrite, messages);
+  printPreviewResetDisclosure(groups.map((group) => group.resetReason), messages);
+
+  const preview = buildBoundedMutationPreview(groups);
+  printBoundedMutationPreview(preview, messages, { useColor });
+  printUserLanguageSyncPreview(userLanguageSyncPlan, {
+    lang,
+    globalDeveloperPath: effectiveGlobalDeveloperWrite
+      ? (effectiveGlobalDeveloperWrite.resolvedPath || effectiveGlobalDeveloperWrite.globalPath)
+      : '',
+  });
+  console.log(messages.previewNoFilesChanged);
+}
+
+function printInitPreviewRunContext(plans, messages) {
+  if (plans.length > 1) {
+    console.log(messages.previewSelectedHosts(
+      plans.map((plan) => initPlatformLabel(plan.platform)).join(', '),
+    ));
   }
 
-  console.log(messages.previewSelectedHosts(plans.map((plan) => initPlatformLabel(plan.platform)).join(', ')));
-  plans.forEach((plan, index) => {
-    console.log('');
-    console.log(messages.previewHostRuntime(index + 1, plans.length, initPlatformLabel(plan.platform)));
-    printInitPreview(plan, { lang, useColor });
-  });
-  printUserLanguageSyncPreview(userLanguageSyncPlan, { lang });
+  for (const plan of plans) {
+    if (plan.mode !== 'all-repos') {
+      console.log(messages.previewDryRunHeader(plan.platform));
+      continue;
+    }
+    console.log(`Workspace preview: spec-first init (${plan.platform})`);
+    console.log(`  workspace_root: ${plan.workspaceRoot}`);
+    console.log(`  selection_source: ${plan.selectionSource}`);
+    console.log(`  child_repos: ${Array.isArray(plan.childPlans) ? plan.childPlans.length : 0}`);
+    console.log('Parent workspace bootstrap:');
+  }
+}
+
+function collectInitPreviewGroups(plans) {
+  const groups = [];
+  for (const plan of plans) {
+    if (plan.mode !== 'all-repos') {
+      groups.push(buildInitPreviewGroup({
+        platform: plan.platform,
+        targetKind: 'project',
+        targetLabel: plan.projectRoot,
+        targetRoot: plan.projectRoot,
+        projectPlan: plan,
+      }));
+      continue;
+    }
+
+    groups.push(buildInitPreviewGroup({
+      platform: plan.platform,
+      targetKind: 'parent',
+      targetLabel: 'parent-workspace',
+      targetRoot: plan.workspaceRoot,
+      projectPlan: plan.parentPlan,
+    }));
+    for (const entry of Array.isArray(plan.childPlans) ? plan.childPlans : []) {
+      const candidate = entry && entry.candidate ? entry.candidate : {};
+      const projectPlan = entry && entry.plan ? entry.plan : entry;
+      groups.push(buildInitPreviewGroup({
+        platform: plan.platform,
+        targetKind: 'child',
+        targetLabel: candidate.workspace_relative_path || projectPlan.projectRoot,
+        targetRoot: projectPlan.projectRoot || candidate.git_root,
+        projectPlan,
+      }));
+    }
+  }
+  return groups;
+}
+
+function buildInitPreviewGroup({ platform, targetKind, targetLabel, targetRoot, projectPlan }) {
+  const operationPlan = projectPlan && projectPlan.operationPlan
+    ? projectPlan.operationPlan
+    : { operations: [] };
+  const operations = Array.isArray(operationPlan.operations) ? operationPlan.operations : [];
+  const destructiveCandidates = operations
+    .filter((operation) => Object.prototype.hasOwnProperty.call(
+      DESTRUCTIVE_OPERATION_ORDER,
+      operation.kind,
+    ));
+  const targetRootExists = Boolean(targetRoot && fs.existsSync(targetRoot));
+  const destructive = destructiveCandidates
+    .filter((operation) => (
+      !targetRootExists || fs.existsSync(path.resolve(targetRoot, operation.path))
+    ))
+    .map((operation) => ({ kind: operation.kind, path: operation.path }))
+    .sort((left, right) => DESTRUCTIVE_OPERATION_ORDER[left.kind]
+      - DESTRUCTIVE_OPERATION_ORDER[right.kind]);
+  const runtimeUntrack = buildRuntimeUntrackSummary(
+    projectPlan && projectPlan.untrackDiagnostic,
+  );
+  destructive.push(...runtimeUntrack.sample_paths.map((samplePath) => ({
+    kind: 'runtime_untrack',
+    path: samplePath,
+  })));
+
+  const writeOperations = operations.filter((operation) => (
+    operation.kind === 'write_file' || operation.kind === 'update_file'
+  ));
+  const criticalWrites = writeOperations
+    .filter(isCriticalPreviewWrite)
+    .map((operation) => ({ kind: operation.kind, path: operation.path, reason: operation.reason }))
+    .sort((left, right) => criticalWriteOrder(left) - criticalWriteOrder(right));
+  const criticalKeys = new Set(criticalWrites.map(previewOperationKey));
+  const generatedSamples = [];
+  let generatedTotal = 0;
+  for (const operation of operations) {
+    const isWrite = operation.kind === 'write_file' || operation.kind === 'update_file';
+    if (
+      operation.kind !== 'ensure_dir'
+      && (!isWrite || criticalKeys.has(previewOperationKey(operation)))
+    ) {
+      continue;
+    }
+    generatedTotal += 1;
+    if (generatedSamples.length < MAX_PREVIEW_PATH_SAMPLES_PER_GROUP) {
+      generatedSamples.push({
+        kind: operation.kind,
+        path: operation.path,
+        reason: operation.reason,
+      });
+    }
+  }
+
+  return {
+    id: `${platform}|${targetKind}|${targetRoot}`,
+    platform,
+    targetKind,
+    targetLabel,
+    targetRoot,
+    destructive,
+    criticalWrites,
+    generatedSamples,
+    generatedTotal,
+    resetReason: resolvePreviewResetReason(projectPlan),
+    runtimeUntrackCount: runtimeUntrack.count,
+  };
+}
+
+function resolvePreviewResetReason(projectPlan = {}) {
+  if (projectPlan.legacyStateDetected) {
+    return 'legacy';
+  }
+  return projectPlan.destructiveResetReason === 'current_runtime_drift'
+    ? 'current_runtime_drift'
+    : null;
+}
+
+function printPreviewResetDisclosure(reasons, messages) {
+  const resetReasons = new Set((Array.isArray(reasons) ? reasons : [reasons]).filter(Boolean));
+  if (resetReasons.has('legacy')) {
+    console.log(messages.previewHardResetLegacy);
+  }
+  if (resetReasons.has('current_runtime_drift')) {
+    console.log(messages.previewHardResetDrift);
+  }
+  if (resetReasons.size > 0) {
+    console.log(messages.previewDestructiveReset);
+  }
+}
+
+function isCriticalPreviewWrite(operation) {
+  if (Object.prototype.hasOwnProperty.call(CRITICAL_WRITE_REASON_ORDER, operation.reason)) {
+    return true;
+  }
+  const operationPath = typeof operation.path === 'string' ? operation.path : '';
+  return operationPath === 'AGENTS.md'
+    || operationPath === 'CLAUDE.md'
+    || operationPath === '.gitignore'
+    || operationPath === 'CHANGELOG.md'
+    || operationPath.endsWith('/state.json')
+    || operationPath.includes('/hooks/')
+    || operationPath.endsWith('/hooks.json')
+    || /\/settings(?:\.local)?\.json$/.test(operationPath);
+}
+
+function criticalWriteOrder(operation) {
+  if (Object.prototype.hasOwnProperty.call(CRITICAL_WRITE_REASON_ORDER, operation.reason)) {
+    return CRITICAL_WRITE_REASON_ORDER[operation.reason];
+  }
+  return Object.keys(CRITICAL_WRITE_REASON_ORDER).length;
+}
+
+function previewOperationKey(operation) {
+  return `${operation.kind}|${operation.path}|${operation.reason || ''}`;
+}
+
+function buildBoundedMutationPreview(groups) {
+  const groupDetails = groups.map((group) => ({
+    ...group,
+    destructiveTotal: group.destructive.length
+      + Math.max(0, group.runtimeUntrackCount - group.destructive
+        .filter((operation) => operation.kind === 'runtime_untrack').length),
+  }));
+  const phaseDefinitions = [
+    { key: 'destructive', rows: (group) => group.destructive },
+    { key: 'critical', rows: (group) => group.criticalWrites },
+    { key: 'generated', rows: (group) => group.generatedSamples },
+  ];
+  const blocks = [];
+  const shownGroupIds = new Set();
+  const shownTargetRoots = new Set();
+  let remainingDetailLines = MAX_PREVIEW_DETAIL_LINES;
+  let displayedPathCount = 0;
+
+  for (const phase of phaseDefinitions) {
+    for (const group of groupDetails) {
+      const rows = phase.rows(group);
+      if (rows.length === 0 || remainingDetailLines < 2) {
+        continue;
+      }
+      const displayedRows = rows.slice(0, remainingDetailLines - 1);
+      blocks.push({
+        phase: phase.key,
+        group,
+        rows: displayedRows,
+        generatedOmitted: phase.key === 'generated'
+          ? group.generatedTotal - displayedRows.length
+          : 0,
+      });
+      remainingDetailLines -= displayedRows.length + 1;
+      displayedPathCount += displayedRows.length;
+      shownGroupIds.add(group.id);
+      shownTargetRoots.add(group.targetRoot);
+    }
+  }
+
+  const totalPathCount = groupDetails.reduce((total, group) => (
+    total + group.destructiveTotal + group.criticalWrites.length + group.generatedTotal
+  ), 0);
+  const detailBearingGroups = groupDetails.filter((group) => (
+    group.destructiveTotal + group.criticalWrites.length + group.generatedTotal > 0
+  ));
+  const omittedGroups = detailBearingGroups.filter((group) => !shownGroupIds.has(group.id));
+  const detailBearingTargetRoots = new Set(detailBearingGroups.map((group) => group.targetRoot));
+
+  return {
+    blocks,
+    phaseTotals: {
+      destructive: groupDetails.reduce((total, group) => total + group.destructiveTotal, 0),
+      critical: groupDetails.reduce((total, group) => total + group.criticalWrites.length, 0),
+      generated: groupDetails.reduce((total, group) => total + group.generatedTotal, 0),
+    },
+    omittedTargets: [...detailBearingTargetRoots]
+      .filter((targetRoot) => !shownTargetRoots.has(targetRoot)).length,
+    omittedTargetHostGroups: omittedGroups.length,
+    omittedPaths: totalPathCount - displayedPathCount,
+  };
+}
+
+function printBoundedMutationPreview(preview, messages, options = {}) {
+  const useColor = options.useColor === true;
+  const phases = [
+    ['destructive', messages.previewDestructivePaths(
+      formatPreviewCount(preview.phaseTotals.destructive, BrandColors.remove, useColor),
+    )],
+    ['critical', messages.previewCriticalWritePaths(
+      formatPreviewCount(preview.phaseTotals.critical, BrandColors.write, useColor),
+    )],
+    ['generated', messages.previewGeneratedPaths(
+      formatPreviewCount(preview.phaseTotals.generated, BrandColors.write, useColor),
+    )],
+  ];
+  for (const [phase, heading] of phases) {
+    if (preview.phaseTotals[phase] === 0) {
+      continue;
+    }
+    console.log(heading);
+    for (const block of preview.blocks.filter((entry) => entry.phase === phase)) {
+      console.log(messages.previewTargetDetail(
+        block.group.platform,
+        block.group.targetKind,
+        block.group.targetLabel,
+        block.group.targetRoot,
+        block.group.resetReason || 'none',
+      ));
+      for (const row of block.rows) {
+        console.log(`  - ${colorize(row.kind, previewOperationColor(row.kind), useColor)}: ${row.path}`);
+      }
+      if (block.generatedOmitted > 0) {
+        console.log(`  generated_paths_omitted: ${block.generatedOmitted}`);
+      }
+    }
+  }
+  console.log(messages.previewOmittedCoverage(
+    preview.omittedTargets,
+    preview.omittedTargetHostGroups,
+    preview.omittedPaths,
+  ));
+}
+
+function previewOperationColor(kind) {
+  if (kind === 'runtime_untrack') {
+    return BrandColors.untrack;
+  }
+  if (Object.prototype.hasOwnProperty.call(DESTRUCTIVE_OPERATION_ORDER, kind)) {
+    return BrandColors.remove;
+  }
+  return BrandColors.write;
+}
+
+function printGlobalDeveloperWritePreview(globalWrite, messages) {
+  if (!globalWrite || !globalWrite.developer) {
+    return;
+  }
+  const action = globalWrite.action || 'preserve';
+  console.log(messages.previewGlobalDeveloperHeader);
+  console.log(`  action: ${action}`);
+  console.log(`  path: ${globalWrite.resolvedPath || globalWrite.globalPath}`);
+  console.log(`  name: ${globalWrite.developer.name}`);
+  console.log(`  lang: ${globalWrite.developer.lang}`);
+  console.log(`  effect: ${action === 'preserve' ? 'no-op' : 'write'}`);
 }
 
 function printWorkspaceInitApplySuccess(plan, result) {
@@ -163,7 +453,10 @@ function printInitApplySuccess(plan, result, options = {}) {
   }
   const runtimeUntrack = result.runtime_untrack;
   printRuntimeUntrackApplySummary(runtimeUntrack, messages);
-  printGlobalDeveloperWriteSummary(plan.globalDeveloperWrite, messages);
+  if (plan.changelogCreated && !options.suppressChangelogCreated) {
+    console.log(messages.applyBootstrappedChangelog);
+  }
+
   if (options.showDiagnostics !== false) {
     printInitDiagnostics(plan);
   }
@@ -186,7 +479,7 @@ function printGlobalDeveloperWriteSummary(globalWrite, messages = getInitMessage
   } else {
     console.log(messages.applyDeveloperProfilePreserve);
   }
-  console.log(`  📍 path: ${globalWrite.globalPath}`);
+  console.log(`  📍 path: ${globalWrite.resolvedPath || globalWrite.globalPath}`);
   console.log(`  👤 name: ${globalWrite.developer.name}`);
   console.log(`  🈯 lang: ${globalWrite.developer.lang}`);
   if (globalWrite.developer.initializedAt) {
@@ -206,7 +499,9 @@ function printUserLanguageSyncPreview(plan, options = {}) {
   console.log(messages.previewUserLanguageSyncHeader);
   printUserLanguageSyncDetails(plan);
   if (plan.profileOperation) {
-    printUserLanguageProfileOperation(plan.profileOperation);
+    printUserLanguageProfileOperation(plan.profileOperation, {
+      globalDeveloperPath: options.globalDeveloperPath,
+    });
   }
   console.log(messages.previewUserLanguageSyncDryRun);
 }
@@ -241,9 +536,9 @@ function printUserLanguageSyncDetails(planOrResult) {
   }
 }
 
-function printUserLanguageProfileOperation(operation) {
+function printUserLanguageProfileOperation(operation, options = {}) {
   console.log(`  - profile: ${operation.action} (${operation.status})`);
-  console.log(`    path: ${operation.globalPath}`);
+  console.log(`    path: ${options.globalDeveloperPath || operation.globalPath}`);
   console.log(`    sync_user_language: ${operation.value}`);
   if (operation.reason) {
     console.log(`    reason_code: ${operation.reason}`);
@@ -329,10 +624,11 @@ function printHelp() {
     '  6. Confirm or cancel',
     '',
     'Workspace targeting:',
-    '  In a parent workspace with child Git repos, init defaults to the parent workspace only.',
-    '  spec-first init -y -u <name> --lang zh                 Initialize parent workspace runtime only.',
+    '  In a parent workspace with child Git repos, init defaults to bootstrapping the parent workspace root.',
+    '  The parent bootstrap includes its instruction file, .gitignore, a missing CHANGELOG.md, and selected host runtime/state.',
+    '  spec-first init -y -u <name> --lang zh                 Initialize the parent workspace bootstrap only.',
     '  spec-first init --repo <path> -y -u <name> --lang zh   Initialize one child repo from a parent workspace.',
-    '  spec-first init --all-repos -y -u <name> --lang zh     Advanced: initialize every child Git repo.',
+    '  spec-first init --all-repos -y -u <name> --lang zh     Initialize the parent workspace and every child Git repo.',
     '  Child repo truth stays in each child repo; use --repo or --all-repos only when those repos are independent agent roots.',
     '',
     'Non-interactive usage:',
@@ -367,13 +663,9 @@ function printInitDryRun({
 }) {
   const messages = getInitMessages(lang);
   console.log(messages.previewDryRunHeader(platform));
-  if (legacyStateDetected) {
-    console.log(messages.previewHardResetLegacy);
-    console.log(messages.previewDestructiveReset);
-  } else if (destructiveResetReason === 'current_runtime_drift') {
-    console.log(messages.previewHardResetDrift);
-    console.log(messages.previewDestructiveReset);
-  }
+  printPreviewResetDisclosure([
+    resolvePreviewResetReason({ legacyStateDetected, destructiveResetReason }),
+  ], messages);
 
   const pruneCount = plan.summary.prune_command || 0;
   const removeCount = (plan.summary.remove_file || 0) + (plan.summary.remove_dir || 0);
@@ -489,6 +781,8 @@ function printRuntimeUntrackApplySummary(summary = buildRuntimeUntrackSummary(),
 }
 
 module.exports = {
+  MAX_PREVIEW_DETAIL_LINES,
+  MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
   hasAnyManagedState,
   hasInitDiagnostic,
   printGlobalDeveloperWriteSummary,

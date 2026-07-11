@@ -13,10 +13,24 @@ const {
   validateContainedWorkspaceWritePath,
 } = require('./init-paths');
 const { SUPPORTED_HOST_IDS } = require('./init-args');
-const { collectPlanErrorMessages } = require('./init-diagnostics');
-const { applyProjectInitPlan } = require('./init-apply');
+const { collectInitErrors, collectPlanErrorMessages } = require('./init-diagnostics');
+const {
+  applyProjectInitPlan,
+  ensureGlobalDeveloperPrerequisite,
+} = require('./init-apply');
 const { buildProjectInitPlan } = require('./init-project-plan');
 const { buildRuntimeUntrackSummary, normalizeProjectInitResult } = require('./init-result');
+
+// 物理写入事实与 child authority 分开表达，不能由路径位置推断 canonical/setup/readiness truth。
+const PARENT_ARTIFACT_AUTHORITY = Object.freeze({
+  physical_scope: 'workspace-root-local',
+  instruction_scope: 'parent-session-governance',
+  host_runtime_scope: 'parent-workspace',
+  workspace_summary_authority: 'advisory',
+  child_repo_canonical: false,
+  child_repo_setup_truth: false,
+  child_repo_readiness_truth: false,
+});
 
 function discoverChildGitRepos(workspaceRoot, maxDepth = 3) {
   const normalizedWorkspaceRoot = canonicalizeExistingPath(workspaceRoot);
@@ -191,7 +205,23 @@ function buildWorkspaceInitPlan({
   };
 }
 
-function applyWorkspaceInitPlan(workspaceRoot, plan) {
+function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
+  if (collectInitErrors(plan).length > 0) {
+    return {
+      exit_code: 1,
+      workspace_summary: null,
+      workspace_summary_paths: [],
+      runtime_untrack: buildRuntimeUntrackSummary(),
+      globalDeveloperWriteResult: null,
+    };
+  }
+  const prerequisite = ensureGlobalDeveloperPrerequisite([plan], context);
+  const projectContext = {
+    ...context,
+    globalDeveloperWriteHandled: true,
+    effectiveGlobalDeveloperWrite: prerequisite.effectiveGlobalDeveloperWrite,
+    globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
+  };
   const normalizedWorkspaceRoot = canonicalizeExistingPath(workspaceRoot || plan.workspaceRoot);
   let parentRuntime = {
     exit_code: 0,
@@ -205,6 +235,7 @@ function applyWorkspaceInitPlan(workspaceRoot, plan) {
     const parentResult = normalizeProjectInitResult(applyProjectInitPlan(
       plan.parentPlan.projectRoot,
       plan.parentPlan,
+      projectContext,
     ));
     parentRuntime = {
       exit_code: parentResult.exit_code,
@@ -230,6 +261,7 @@ function applyWorkspaceInitPlan(workspaceRoot, plan) {
       const projectResult = normalizeProjectInitResult(applyProjectInitPlan(
         entry.plan.projectRoot,
         entry.plan,
+        projectContext,
       ));
       results.push({
         repo_label: candidate.repo_label,
@@ -268,7 +300,9 @@ function applyWorkspaceInitPlan(workspaceRoot, plan) {
       return {
         exit_code: 1,
         workspace_summary: summary,
-        runtime_untrack: buildRuntimeUntrackSummary(),
+        workspace_summary_paths: [],
+        runtime_untrack: parentRuntime.runtime_untrack,
+        globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
         error: `workspace init summary path is unsafe (${writeResult.reason_code})`,
       };
     }
@@ -282,6 +316,7 @@ function applyWorkspaceInitPlan(workspaceRoot, plan) {
     workspace_summary: summary,
     workspace_summary_paths: summary.workspace_summary_paths || [],
     runtime_untrack: parentRuntime.runtime_untrack,
+    globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
   };
 }
 
@@ -308,8 +343,9 @@ function buildWorkspaceInitSummary({
     workflow_mode: 'all-repos',
     selection_source: plan.selectionSource,
     workspace_root: workspaceRoot,
-    parent_writes_repo_local_artifacts: false,
+    parent_writes_repo_local_artifacts: true,
     parent_writes_host_runtime_assets: true,
+    parent_artifact_authority: buildParentArtifactAuthority(),
     parent_host_runtime: parentRuntime,
     dry_run: Boolean(plan.dryRun),
     platform: plan.platform,
@@ -335,7 +371,7 @@ function buildWorkspaceInitSummary({
     overall_status: overallStatus,
     reason_code: actionRequiredCount === 0 ? null : 'all-repos-partial-or-action-required',
     next_action: actionRequiredCount === 0
-      ? 'Parent host runtime and all child repos completed init.'
+      ? 'Parent workspace bootstrap and all child repos completed init.'
       : 'Inspect per-child reason_code and rerun init for action-required repos.',
   };
 }
@@ -480,8 +516,9 @@ function buildWorkspaceInitSummaryIndex({
     workflow_mode: 'all-repos',
     selection_source: currentSummary.selection_source,
     workspace_root: workspaceRoot,
-    parent_writes_repo_local_artifacts: false,
+    parent_writes_repo_local_artifacts: true,
     parent_writes_host_runtime_assets: true,
+    parent_artifact_authority: buildParentArtifactAuthority(),
     platforms: entries.reduce((memo, entry) => {
       memo[entry.platform] = entry;
       return memo;
@@ -505,19 +542,22 @@ function buildWorkspaceInitSummaryIndex({
         : 'action-required',
     reason_code: actionRequiredCount === 0 ? null : 'all-repos-partial-or-action-required',
     next_action: actionRequiredCount === 0
-      ? 'Parent host runtime and all child repos completed init for all selected platforms.'
+      ? 'Parent workspace bootstrap and all child repos completed init for all selected platforms.'
       : 'Inspect per-platform reason_code and rerun init for action-required platforms.',
   };
 }
 
 function readWorkspaceInitSummaryIndex(summaryPath, workspaceRoot) {
   if (!fs.existsSync(summaryPath)) {
-    return { platforms: {} };
+    return { platforms: {}, parent_artifact_authority: null };
   }
   try {
     const payload = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
     if (payload && payload.schema_version === 'workspace-init-summary-index.v1' && payload.platforms && typeof payload.platforms === 'object') {
-      return { platforms: payload.platforms };
+      return {
+        platforms: payload.platforms,
+        parent_artifact_authority: readParentArtifactAuthority(payload),
+      };
     }
     if (payload && payload.schema_version === 'workspace-init-summary.v1' && payload.platform) {
       return {
@@ -527,12 +567,24 @@ function readWorkspaceInitSummaryIndex(summaryPath, workspaceRoot) {
             toWorkspaceRelativePath(summaryPath, workspaceRoot),
           ),
         },
+        parent_artifact_authority: readParentArtifactAuthority(payload),
       };
     }
   } catch (_error) {
-    return { platforms: {} };
+    return { platforms: {}, parent_artifact_authority: null };
   }
-  return { platforms: {} };
+  return { platforms: {}, parent_artifact_authority: null };
+}
+
+function buildParentArtifactAuthority() {
+  return { ...PARENT_ARTIFACT_AUTHORITY };
+}
+
+function readParentArtifactAuthority(payload) {
+  const authority = payload && payload.parent_artifact_authority;
+  return authority && typeof authority === 'object' && !Array.isArray(authority)
+    ? { ...authority }
+    : null;
 }
 
 function buildWorkspaceInitPlatformEntry(summary, summaryRelativePath) {

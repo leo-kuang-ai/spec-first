@@ -23,6 +23,19 @@ const MESSAGES = {
     previewSelectedHosts: (labels) => `已选择宿主运行时: ${labels}`,
     previewHostRuntime: (index, total, label) => `宿主运行时 ${index}/${total}: ${label}`,
     previewDryRunHeader: (platform) => `预览: spec-first init (${platform})`,
+    previewCoverage: (targets, hosts, groups, budget) => (
+      `预览覆盖: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
+    ),
+    previewGlobalDeveloperHeader: '全局 developer profile 预览:',
+    previewDestructivePaths: (count) => `删除 / prune / runtime-untrack paths (${count}):`,
+    previewCriticalWritePaths: (count) => `关键写入 paths (${count}):`,
+    previewGeneratedPaths: (count) => `生成路径 (${count}):`,
+    previewTargetDetail: (platform, kind, label, root, resetReason) => (
+      `目标明细: host=${platform} kind=${kind} label=${label} root=${root} reset=${resetReason}`
+    ),
+    previewOmittedCoverage: (targets, targetHostGroups, paths) => (
+      `预览省略: targets=${targets} target_host_groups=${targetHostGroups} paths=${paths}`
+    ),
     previewHardResetLegacy: '将先执行 managed hard reset，再重新生成 runtime assets。',
     previewHardResetDrift: '将先执行 managed hard reset，再重新生成 runtime assets（检测到当前 runtime drift）。',
     previewDestructiveReset: '破坏性预览: 包含 managed runtime reset/removal/prune 操作。',
@@ -80,6 +93,19 @@ const MESSAGES = {
     previewSelectedHosts: (labels) => `Selected host runtimes: ${labels}`,
     previewHostRuntime: (index, total, label) => `Host runtime ${index}/${total}: ${label}`,
     previewDryRunHeader: (platform) => `Dry run: spec-first init (${platform})`,
+    previewCoverage: (targets, hosts, groups, budget) => (
+      `Preview coverage: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
+    ),
+    previewGlobalDeveloperHeader: 'Global developer profile preview:',
+    previewDestructivePaths: (count) => `Destructive / prune / runtime-untrack paths (${count}):`,
+    previewCriticalWritePaths: (count) => `Critical write paths (${count}):`,
+    previewGeneratedPaths: (count) => `Generated paths (${count}):`,
+    previewTargetDetail: (platform, kind, label, root, resetReason) => (
+      `Target detail: host=${platform} kind=${kind} label=${label} root=${root} reset=${resetReason}`
+    ),
+    previewOmittedCoverage: (targets, targetHostGroups, paths) => (
+      `Preview omitted: targets=${targets} target_host_groups=${targetHostGroups} paths=${paths}`
+    ),
     previewHardResetLegacy: 'Would perform a managed hard reset before regenerating runtime assets.',
     previewHardResetDrift: 'Would perform a managed hard reset before regenerating runtime assets (current runtime drift detected).',
     previewDestructiveReset: 'Destructive preview: managed runtime reset/removal/prune operations are included.',

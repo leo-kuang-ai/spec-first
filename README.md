@@ -77,11 +77,11 @@ Expected: `doctor` reports no blocking issues. If issues appear, follow the prin
 spec-first init
 ```
 
-Select your host (Claude Code, Codex, Cursor, Kiro, and/or Qoder), confirm your developer name and language, then confirm the writes. In a parent workspace with many child Git repos, `init` defaults to writing only the parent workspace runtime; use `--repo <child>` only when one child repo should be an independent agent root, and reserve `--all-repos` for explicit batch maintenance. Scripted `init -y` setup on fresh machines must pass `-u <name>` because there is no prompt to collect a developer name, for example `spec-first init --codex -y -u <name> --lang <zh|en>`. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro, `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder, or `spec-first init --cursor -y -u <name> --lang <zh|en>` for Cursor generated-runtime preview. Cursor is not part of the `init -y` default host set.
+Select your host (Claude Code, Codex, Cursor, Kiro, and/or Qoder), confirm your developer name and language, then confirm the writes. In a parent workspace with many child Git repos, `init` defaults to bootstrapping the parent root with its instruction file, `.gitignore`, a missing `CHANGELOG.md`, and the selected host runtime/state. Use `--repo <child>` to initialize only one child repo; use `--all-repos` to initialize the parent workspace and every discovered child repo. Child setup and readiness truth remains local to each child. Scripted `init -y` setup on fresh machines must pass `-u <name>` because there is no prompt to collect a developer name, for example `spec-first init --codex -y -u <name> --lang <zh|en>`. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro, `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder, or `spec-first init --cursor -y -u <name> --lang <zh|en>` for Cursor generated-runtime preview. Cursor is not part of the `init -y` default host set.
 
 Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, or `.qoder/`. Generated copies can be rebuilt any time with `spec-first init`.
 
-Init does not create or rewrite the target repository's `CHANGELOG.md`. Changelog policy remains owned by the repository's existing instructions and release process.
+Init creates `CHANGELOG.md` only when it is missing; an existing repository changelog remains byte-for-byte user-owned.
 
 If the host reports missing helper or MCP readiness facts, run the unified `spec-mcp-setup` entry in your current host before continuing.
 

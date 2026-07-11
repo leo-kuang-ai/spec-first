@@ -33,7 +33,11 @@ const {
   buildInitPlan,
   buildInitWritePlan,
 } = require('./init-plan');
-const { applyProjectInitPlan } = require('./init-apply');
+const {
+  applyGlobalDeveloperProfileWrite,
+  applyProjectInitPlan,
+} = require('./init-apply');
+const { resolveEffectiveGlobalDeveloperWrite } = require('./init-developer');
 const {
   applyWorkspaceInitPlan,
   discoverChildGitRepos,
@@ -49,6 +53,7 @@ const {
   printInitApplySuccess,
   printInitBrandBanner,
   printInitDryRun,
+  printGlobalDeveloperWriteSummary,
   printInitNextStepsForPlatforms,
   printInitPreview,
   printInitPreviews,
@@ -159,15 +164,22 @@ async function runInit(argv, promptOverrides = {}) {
       }
       return 1;
     }
+    const effectiveGlobalDeveloperWrite = resolveEffectiveGlobalDeveloperWrite(plans);
+    const previewOptions = {
+      lang: interactiveInput.lang,
+      useColor,
+      userLanguageSyncPlan,
+      effectiveGlobalDeveloperWrite,
+    };
 
     if (parsed.dryRun) {
-      printInitPreviews(plans, { lang: interactiveInput.lang, useColor, userLanguageSyncPlan });
+      printInitPreviews(plans, previewOptions);
       return 0;
     }
 
     if (!parsed.yes) {
       const activeMessages = getInitMessages(interactiveInput.lang);
-      printInitPreviews(plans, { lang: interactiveInput.lang, useColor, userLanguageSyncPlan });
+      printInitPreviews(plans, previewOptions);
       const confirmed = await promptApi.confirm(activeMessages.confirmApply, { default: true });
       if (!confirmed) {
         console.log(activeMessages.cancelled);
@@ -175,9 +187,25 @@ async function runInit(argv, promptOverrides = {}) {
       }
     }
 
+    const globalDeveloperWriteResult = applyGlobalDeveloperProfileWrite(
+      effectiveGlobalDeveloperWrite,
+    );
+    printGlobalDeveloperWriteSummary(
+      globalDeveloperWriteResult,
+      getInitMessages(interactiveInput.lang),
+    );
+    const applyContext = {
+      globalDeveloperWriteHandled: true,
+      effectiveGlobalDeveloperWrite,
+      globalDeveloperWriteResult,
+    };
     const results = [];
-    for (const plan of plans) {
-      const result = applyInitPlan(plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot, plan);
+    for (const [index, plan] of plans.entries()) {
+      const result = applyInitPlan(
+        plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot,
+        plan,
+        applyContext,
+      );
       results.push(result);
       if (plan.mode === 'all-repos') {
         printWorkspaceInitApplySuccess(plan, result);
@@ -185,6 +213,7 @@ async function runInit(argv, promptOverrides = {}) {
         printInitApplySuccess(plan, result, {
           showDiagnostics: false,
           showNextSteps: false,
+          suppressChangelogCreated: plans.length > 1 && index > 0,
         });
       }
     }
@@ -226,16 +255,16 @@ function buildInitPlans(input) {
   }));
 }
 
-function applyInitPlan(projectRoot, plan) {
+function applyInitPlan(projectRoot, plan, context = {}) {
   if (!plan || typeof plan !== 'object') {
     throw new Error('applyInitPlan requires an init plan object.');
   }
 
   if (plan.mode === 'all-repos') {
-    return applyWorkspaceInitPlan(projectRoot || plan.workspaceRoot, plan);
+    return applyWorkspaceInitPlan(projectRoot || plan.workspaceRoot, plan, context);
   }
 
-  return applyProjectInitPlan(projectRoot || plan.projectRoot, plan);
+  return applyProjectInitPlan(projectRoot || plan.projectRoot, plan, context);
 }
 
 module.exports = {

@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { buildInitialChangelog } = require('../../src/cli/changelog');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const entryPattern = /^- v(?:\d+\.\d+\.\d+|X\.Y\.Z) \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [^:]+: .+$/;
@@ -19,5 +20,12 @@ describe('CHANGELOG format', () => {
     expect(entries.length).toBeGreaterThan(0);
     expect(entryPattern.test(entries[0])).toBe(true);
     expect(entries.filter((line) => !entryPattern.test(line) && !legacyEntryPattern.test(line))).toEqual([]);
+  });
+
+  test('bootstrap output follows the same contract', () => {
+    const content = buildInitialChangelog('2026-07-10 21:00:00', 'maintainer', '1.2.3');
+    expect(changelogEntries(content)).toEqual([
+      '- v1.2.3 2026-07-10 21:00:00 maintainer: 使用 spec-first 初始化项目',
+    ]);
   });
 });

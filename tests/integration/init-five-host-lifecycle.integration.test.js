@@ -84,7 +84,11 @@ describe('five-host init lifecycle', () => {
         'SKILL.md',
       );
       expect(fs.existsSync(runtimeSkillPath)).toBe(true);
-      expect(fs.existsSync(path.join(sandbox.projectRoot, 'CHANGELOG.md'))).toBe(false);
+      const changelog = fs.readFileSync(
+        path.join(sandbox.projectRoot, 'CHANGELOG.md'),
+        'utf8',
+      );
+      expect(changelog).toContain('使用 spec-first 初始化项目');
 
       if (adapter.pointerPath) {
         const pointer = fs.readFileSync(

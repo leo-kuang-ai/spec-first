@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const {
   getGlobalDeveloperPath,
+  normalizeDeveloper,
   readDeveloperFile,
 } = require('../developer');
 const { summarizeOperationPlan } = require('../state');
@@ -14,6 +15,7 @@ const LEGACY_PROJECT_DEVELOPER_PATHS = [
   '.codex/spec-first/.developer',
 ];
 const GLOBAL_DEVELOPER_RELATIVE_DISPLAY = path.join('~', '.spec-first', '.developer');
+const GLOBAL_DEVELOPER_WRITE_ACTIONS = new Set(['create', 'overwrite', 'preserve']);
 
 function planLegacyDeveloperProfileCleanup(projectRoot) {
   const operations = [];
@@ -91,6 +93,115 @@ function resolveGlobalDeveloperWriteAction(developer, options = {}) {
   };
 }
 
+function resolveEffectiveGlobalDeveloperWrite(plans) {
+  const writes = flattenProjectInitPlans(plans)
+    .map((plan) => plan && plan.globalDeveloperWrite)
+    .filter(Boolean)
+    .map(canonicalizeGlobalDeveloperWrite);
+  if (writes.length === 0) {
+    return null;
+  }
+
+  const first = writes[0];
+  const comparableFields = [
+    'action',
+    'globalPath',
+    'name',
+    'lang',
+    'version',
+    'hosts',
+    'syncUserLanguage',
+  ];
+  if (first.action !== 'create') {
+    comparableFields.push('initializedAt');
+  }
+  const conflictFields = comparableFields.filter((field) => (
+    writes.some((write) => !sameCanonicalGlobalWriteField(first, write, field))
+  ));
+  if (conflictFields.length > 0) {
+    const error = new Error(
+      `Conflicting global developer write fields: ${conflictFields.join(', ')}`,
+    );
+    error.code = 'global_developer_write_conflict';
+    error.conflictFields = conflictFields;
+    throw error;
+  }
+
+  return {
+    action: first.action,
+    globalPath: first.globalPath,
+    resolvedPath: getGlobalDeveloperPath(),
+    sourcePlanCount: writes.length,
+    developer: {
+      ...first.developer,
+      initializedAt: first.developer.initializedAt,
+      hosts: [...first.developer.hosts],
+    },
+  };
+}
+
+function flattenProjectInitPlans(plans) {
+  const flattened = [];
+  const visit = (plan) => {
+    if (!plan || typeof plan !== 'object') return;
+    if (plan.mode === 'all-repos') {
+      visit(plan.parentPlan);
+      for (const entry of Array.isArray(plan.childPlans) ? plan.childPlans : []) {
+        visit(entry && entry.plan ? entry.plan : entry);
+      }
+      return;
+    }
+    flattened.push(plan);
+  };
+  for (const plan of Array.isArray(plans) ? plans : [plans]) {
+    visit(plan);
+  }
+  return flattened;
+}
+
+function canonicalizeGlobalDeveloperWrite(write) {
+  const action = normalizeText(write.action);
+  const globalPath = normalizeOperationPathLike(normalizeText(write.globalPath));
+  const developer = normalizeDeveloper(write.developer);
+  const invalidFields = [];
+  if (!GLOBAL_DEVELOPER_WRITE_ACTIONS.has(action)) {
+    invalidFields.push('action');
+  }
+  if (!globalPath) {
+    invalidFields.push('globalPath');
+  }
+  if (!developer) {
+    invalidFields.push('developer');
+  }
+  if (invalidFields.length > 0) {
+    const error = new Error(`Invalid global developer write fields: ${invalidFields.join(', ')}`);
+    error.code = 'global_developer_write_invalid';
+    error.invalidFields = invalidFields;
+    throw error;
+  }
+  return {
+    action,
+    globalPath,
+    developer,
+  };
+}
+
+function sameCanonicalGlobalWriteField(left, right, field) {
+  const leftValue = Object.prototype.hasOwnProperty.call(left, field)
+    ? left[field]
+    : left.developer[field];
+  const rightValue = Object.prototype.hasOwnProperty.call(right, field)
+    ? right[field]
+    : right.developer[field];
+  return Array.isArray(leftValue)
+    ? sameHosts(leftValue, rightValue)
+    : leftValue === rightValue;
+}
+
+function normalizeText(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 function preserveSyncUserLanguage(developer, existing) {
   if (
     existing &&
@@ -123,5 +234,6 @@ function normalizeOperationPathLike(value) {
 module.exports = {
   planLegacyDeveloperProfileCleanup,
   readLegacyProjectDeveloperFiles,
+  resolveEffectiveGlobalDeveloperWrite,
   resolveGlobalDeveloperWriteAction,
 };

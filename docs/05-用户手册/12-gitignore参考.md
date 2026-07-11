@@ -97,7 +97,7 @@ graphify-out/
 # spec-first:end
 ```
 
-普通单 repo / monorepo 中，`init` 保持当前行为，只维护当前执行目录对应的目标项目 `.gitignore`，通常应在项目根目录运行。在父 workspace 且检测到多个 child Git repos 时，`init` 默认只初始化父 workspace host runtime 和父级入口文档，不逐个写 child repo。需要把某个 child repo 作为独立 agent root 时，显式运行 `spec-first init --repo <child>`；只有明确做批量 child-root runtime 维护时才使用 `spec-first init --all-repos`。父目录不把 child repo 的 `.spec-first/config/*` 作为 parent-local truth。
+普通单 repo / monorepo 中，`init` 保持当前行为，只维护当前执行目录对应的目标项目 `.gitignore`，通常应在项目根目录运行。在父 workspace 且检测到多个 child Git repos 时，`init` 默认在父 workspace root 执行完整 bootstrap：写入 instruction、`.gitignore`、缺失时的 `CHANGELOG.md` 以及 selected host runtime/state，但不逐个写 child repo。需要把某个 child repo 作为独立 agent root 时，显式运行 `spec-first init --repo <child>`；只有明确做批量 child-root runtime 维护时才使用 `spec-first init --all-repos`。父目录不把 child repo 的 `.spec-first/config/*` 作为 parent-local truth。
 
 如果项目里已经有同类规则，`init` 仍会保留 spec-first managed block，保证后续版本可以幂等更新。它不会尝试判断所有语义等价的 glob，也不会删除 block 外的用户规则。若 marker 缺失、重复或顺序错误，`init` 会停止并要求先修复 `.gitignore`，不会猜测替换范围。
 

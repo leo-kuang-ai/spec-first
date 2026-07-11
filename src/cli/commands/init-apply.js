@@ -5,19 +5,25 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { writeGlobalDeveloperFile } = require('../developer');
+const {
+  getGlobalDeveloperPath,
+  writeGlobalDeveloperFile,
+} = require('../developer');
 const { applyOperationPlan } = require('../state');
+const { resolveEffectiveGlobalDeveloperWrite } = require('./init-developer');
 const { canonicalizeExistingPath } = require('./init-paths');
 const { buildRuntimeUntrackSummary } = require('./init-result');
 
-function applyProjectInitPlan(projectRoot, plan) {
-  const normalizedRoot = canonicalizeExistingPath(projectRoot || plan.projectRoot);
+function applyProjectInitPlan(projectRoot, plan, context = {}) {
   if (Array.isArray(plan.errors) && plan.errors.length > 0) {
     return {
       exit_code: 1,
       runtime_untrack: buildRuntimeUntrackSummary(plan.untrackDiagnostic),
+      globalDeveloperWriteResult: null,
     };
   }
+  const prerequisite = ensureGlobalDeveloperPrerequisite([plan], context);
+  const normalizedRoot = canonicalizeExistingPath(projectRoot || plan.projectRoot);
 
   let untrackApplyResult = null;
   if (plan.destructiveResetPlan) {
@@ -33,28 +39,102 @@ function applyProjectInitPlan(projectRoot, plan) {
     } catch (error) {
       restoreRuntimeRollbackBackup(normalizedRoot, destructiveBackup);
       removeRuntimeRollbackBackup(destructiveBackup);
-      throw error;
+      throw annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
     }
   } else {
-    applyOperationPlan(normalizedRoot, plan.preSyncPlan);
-    untrackApplyResult = applyOperationPlan(normalizedRoot, plan.writePlan);
+    try {
+      applyOperationPlan(normalizedRoot, plan.preSyncPlan);
+      untrackApplyResult = applyOperationPlan(normalizedRoot, plan.writePlan);
+    } catch (error) {
+      throw annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
+    }
   }
-
-  applyGlobalDeveloperProfileWrite(plan.globalDeveloperWrite);
 
   return {
     exit_code: 0,
     runtime_untrack: buildRuntimeUntrackSummary(plan.untrackDiagnostic, untrackApplyResult),
+    globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
   };
 }
 
-function applyGlobalDeveloperProfileWrite(globalWrite) {
+function ensureGlobalDeveloperPrerequisite(plans, context = {}) {
+  const hasEffectiveWrite = Object.prototype.hasOwnProperty.call(
+    context,
+    'effectiveGlobalDeveloperWrite',
+  );
+  const effectiveGlobalDeveloperWrite = hasEffectiveWrite
+    ? context.effectiveGlobalDeveloperWrite
+    : resolveEffectiveGlobalDeveloperWrite(plans);
+  if (context.globalDeveloperWriteHandled === true) {
+    if (
+      effectiveGlobalDeveloperWrite
+      && !Object.prototype.hasOwnProperty.call(context, 'globalDeveloperWriteResult')
+    ) {
+      throw new Error('Handled global developer prerequisite requires its run-level result.');
+    }
+    return {
+      effectiveGlobalDeveloperWrite,
+      globalDeveloperWriteResult: context.globalDeveloperWriteResult || null,
+    };
+  }
+  return {
+    effectiveGlobalDeveloperWrite,
+    globalDeveloperWriteResult: applyGlobalDeveloperProfileWrite(
+      effectiveGlobalDeveloperWrite,
+      context,
+    ),
+  };
+}
+
+function applyGlobalDeveloperProfileWrite(globalWrite, options = {}) {
   if (!globalWrite || !globalWrite.developer) {
-    return;
+    return null;
   }
+  const resolvedPath = globalWrite.resolvedPath
+    || (options.getGlobalDeveloperPath || getGlobalDeveloperPath)();
   if (globalWrite.action === 'create' || globalWrite.action === 'overwrite') {
-    writeGlobalDeveloperFile(globalWrite.developer);
+    try {
+      (options.writeGlobalDeveloperFile || writeGlobalDeveloperFile)(globalWrite.developer);
+    } catch (error) {
+      throw annotateGlobalDeveloperWriteError(error, resolvedPath);
+    }
   }
+  const applied = globalWrite.action === 'create' || globalWrite.action === 'overwrite';
+  return {
+    action: globalWrite.action,
+    status: applied ? 'applied' : 'no-op',
+    applied,
+    globalPath: globalWrite.globalPath,
+    resolvedPath,
+    developer: {
+      ...globalWrite.developer,
+      hosts: Array.isArray(globalWrite.developer.hosts)
+        ? [...globalWrite.developer.hosts]
+        : [],
+    },
+  };
+}
+
+function annotateGlobalDeveloperWriteError(error, resolvedPath) {
+  if (error && typeof error === 'object') {
+    error.globalDeveloperTargetPath = resolvedPath;
+    if (typeof error.message === 'string' && !error.message.includes(resolvedPath)) {
+      error.message = `${error.message}\nGlobal developer profile target: ${resolvedPath}`;
+    }
+    return error;
+  }
+  const normalized = new Error(
+    `${String(error)}\nGlobal developer profile target: ${resolvedPath}`,
+  );
+  normalized.globalDeveloperTargetPath = resolvedPath;
+  return normalized;
+}
+
+function annotateProjectMutationError(error, globalDeveloperWriteResult) {
+  if (error && (typeof error === 'object' || typeof error === 'function')) {
+    error.globalDeveloperWriteResult = globalDeveloperWriteResult || null;
+  }
+  return error;
 }
 
 function createRuntimeRollbackBackup({ projectRoot, plans = [] } = {}) {
@@ -161,6 +241,7 @@ module.exports = {
   applyGlobalDeveloperProfileWrite,
   applyProjectInitPlan,
   createRuntimeRollbackBackup,
+  ensureGlobalDeveloperPrerequisite,
   removeRuntimeRollbackBackup,
   restoreRuntimeRollbackBackup,
 };
