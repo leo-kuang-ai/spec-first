@@ -158,7 +158,7 @@ describe('init workspace contract', () => {
       dryRun: true,
     });
     expect(childOnlyPlan.mode).toBe('single-repo');
-    expect(childOnlyPlan.projectRoot).toBe(fs.realpathSync(childRoot));
+    expect(childOnlyPlan.projectRoot).toBe(fs.realpathSync.native(childRoot));
   });
 
   test('preserves existing parent and child changelogs', () => {

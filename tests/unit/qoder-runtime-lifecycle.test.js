@@ -118,6 +118,17 @@ function withEmptyAssetInventory(callback) {
   return output;
 }
 
+function buildDeterministicQoderInitPlan(buildInitPlan, projectRoot, adapter) {
+  return buildInitPlan({
+    projectRoot,
+    platform: 'qoder',
+    adapter,
+    name: 'Qoder Runtime Test',
+    lang: 'en',
+    dryRun: true,
+  });
+}
+
 describe('Qoder runtime lifecycle', () => {
   test('plans Qoder pointer frontmatter and inert managed hook scripts without settings entries', () => {
     const projectRoot = tempProject();
@@ -675,12 +686,9 @@ describe('Qoder runtime lifecycle', () => {
     const adapter = new QoderAdapter();
     installMinimalQoderRuntime(projectRoot, adapter);
 
-    const degradedOnlyPlan = withEmptyAssetInventory(({ buildInitPlan }) => buildInitPlan({
-      projectRoot,
-      platform: 'qoder',
-      adapter,
-      dryRun: true,
-    }));
+    const degradedOnlyPlan = withEmptyAssetInventory(({ buildInitPlan }) => (
+      buildDeterministicQoderInitPlan(buildInitPlan, projectRoot, adapter)
+    ));
     expect(degradedOnlyPlan.destructiveResetReason).toBe('');
     expect(degradedOnlyPlan.diagnostics).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -702,12 +710,9 @@ describe('Qoder runtime lifecycle', () => {
       },
     });
 
-    const staleSettingsPlan = withEmptyAssetInventory(({ buildInitPlan }) => buildInitPlan({
-      projectRoot,
-      platform: 'qoder',
-      adapter,
-      dryRun: true,
-    }));
+    const staleSettingsPlan = withEmptyAssetInventory(({ buildInitPlan }) => (
+      buildDeterministicQoderInitPlan(buildInitPlan, projectRoot, adapter)
+    ));
     expect(staleSettingsPlan.destructiveResetReason).toBe('current_runtime_drift');
     const driftDiagnostic = staleSettingsPlan.diagnostics.find((diagnostic) =>
       diagnostic.code === 'current_runtime_drift'
@@ -731,12 +736,9 @@ describe('Qoder runtime lifecycle', () => {
       },
     });
 
-    const plan = withEmptyAssetInventory(({ buildInitPlan }) => buildInitPlan({
-      projectRoot,
-      platform: 'qoder',
-      adapter,
-      dryRun: true,
-    }));
+    const plan = withEmptyAssetInventory(({ buildInitPlan }) => (
+      buildDeterministicQoderInitPlan(buildInitPlan, projectRoot, adapter)
+    ));
 
     expect(plan.destructiveResetReason).toBe('');
     expect(plan.diagnostics.map((diagnostic) => diagnostic.code))
@@ -749,12 +751,9 @@ describe('Qoder runtime lifecycle', () => {
     installMinimalQoderRuntime(projectRoot, adapter);
     writeText(path.join(projectRoot, '.qoder', 'settings.json'), '{ invalid json');
 
-    const plan = withEmptyAssetInventory(({ buildInitPlan }) => buildInitPlan({
-      projectRoot,
-      platform: 'qoder',
-      adapter,
-      dryRun: true,
-    }));
+    const plan = withEmptyAssetInventory(({ buildInitPlan }) => (
+      buildDeterministicQoderInitPlan(buildInitPlan, projectRoot, adapter)
+    ));
 
     expect(plan.destructiveResetReason).toBe('current_runtime_drift');
     const driftDiagnostic = plan.diagnostics.find((diagnostic) => diagnostic.code === 'current_runtime_drift');

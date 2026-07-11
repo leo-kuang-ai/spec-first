@@ -115,10 +115,14 @@ describe('spec-first gitignore policy', () => {
 
   test('keeps the repo block and user manual synchronized with the generated policy', () => {
     const block = buildSpecFirstGitignoreBlock();
-    const rootGitignore = fs.readFileSync(path.join(REPO_ROOT, '.gitignore'), 'utf8');
-    const manual = fs.readFileSync(
-      path.join(REPO_ROOT, 'docs', '05-用户手册', '12-gitignore参考.md'),
-      'utf8',
+    const rootGitignore = normalizeLineEndings(
+      fs.readFileSync(path.join(REPO_ROOT, '.gitignore'), 'utf8'),
+    );
+    const manual = normalizeLineEndings(
+      fs.readFileSync(
+        path.join(REPO_ROOT, 'docs', '05-用户手册', '12-gitignore参考.md'),
+        'utf8',
+      ),
     );
 
     expect(rootGitignore).toContain(`${block}\n`);
@@ -141,6 +145,10 @@ function writeFile(repoRoot, relativePath) {
   const absolutePath = path.join(repoRoot, relativePath);
   fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
   fs.writeFileSync(absolutePath, 'test\n', 'utf8');
+}
+
+function normalizeLineEndings(content) {
+  return content.replace(/\r\n?/g, '\n');
 }
 
 function isIgnored(repoRoot, relativePath) {

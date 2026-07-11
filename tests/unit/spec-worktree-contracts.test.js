@@ -8,6 +8,11 @@ const { execFileSync } = require('node:child_process');
 const repoRoot = path.resolve(__dirname, '..', '..');
 const scriptPath = path.join(repoRoot, 'skills/spec-worktree/scripts/worktree-manager.sh');
 
+function canonicalShellPath(targetPath) {
+  const realpath = fs.realpathSync.native || fs.realpathSync;
+  return realpath(targetPath).replace(/\\/g, '/');
+}
+
 function run(command, args, options = {}) {
   return execFileSync(command, args, {
     cwd: options.cwd,
@@ -47,8 +52,7 @@ describe('spec-worktree existing-ref isolation contracts', () => {
     const dir = initRepo();
 
     const first = run('bash', [scriptPath, 'isolate', 'feature/login'], { cwd: dir });
-    const realDir = fs.realpathSync(dir);
-    const worktreePath = path.join(realDir, '.worktrees', 'feature-login');
+    const worktreePath = path.posix.join(canonicalShellPath(dir), '.worktrees', 'feature-login');
 
     expect(first).toContain(`Worktree ready: ${worktreePath}`);
     expect(fs.existsSync(worktreePath)).toBe(true);
@@ -58,5 +62,27 @@ describe('spec-worktree existing-ref isolation contracts', () => {
     const second = run('bash', [scriptPath, 'isolate', 'feature/login'], { cwd: dir });
     expect(second).toContain('already_checked_out branch=feature/login path=');
     expect(second).toContain(worktreePath);
+  });
+
+  test('detect compares git directories through one canonical path resolver', () => {
+    const dir = initRepo();
+    const bashEnv = path.join(dir, 'bash-env');
+    fs.writeFileSync(bashEnv, [
+      'pwd() {',
+      '  local result',
+      '  result=$(builtin pwd "$@")',
+      '  printf \'%s/\\n\' "${result%/}"',
+      '}',
+      '',
+    ].join('\n'));
+
+    const facts = JSON.parse(run('bash', [scriptPath, 'detect', '--json'], {
+      cwd: dir,
+      env: { BASH_ENV: canonicalShellPath(bashEnv) },
+    }));
+
+    expect(facts.state).toBe('ordinary-checkout');
+    expect(facts.reason_code).toBe('same-git-dir');
+    expect(facts.git_dir).toBe(facts.common_dir);
   });
 });

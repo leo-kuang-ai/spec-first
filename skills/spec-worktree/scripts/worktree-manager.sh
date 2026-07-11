@@ -29,12 +29,12 @@ WORKTREE_DIR=""
 
 realpath_existing() {
   local target_path="${1:?Error: path required}"
-  node -e 'const fs = require("fs"); console.log(fs.realpathSync(process.argv[1]));' "$target_path"
+  node -e 'const fs = require("fs"); const realpath = fs.realpathSync.native || fs.realpathSync; console.log(realpath(process.argv[1]).replace(/\\/g, "/"));' "$target_path"
 }
 
 realpath_for_new_path() {
   local target_path="${1:?Error: path required}"
-  node -e 'const fs = require("fs"); const path = require("path"); const target = process.argv[1]; const dir = fs.realpathSync(path.dirname(target)); console.log(path.join(dir, path.basename(target)));' "$target_path"
+  node -e 'const fs = require("fs"); const path = require("path"); const target = process.argv[1]; const realpath = fs.realpathSync.native || fs.realpathSync; const resolved = path.join(realpath(path.dirname(target)), path.basename(target)); console.log(resolved.replace(/\\/g, "/"));' "$target_path"
 }
 
 path_within() {
@@ -149,7 +149,7 @@ detect_worktree_facts() {
     set_detect_facts "unknown" "git-query-failed" "$worktree_root" "" "$git_dir" "" ""
     return 1
   fi
-  if ! common_dir=$(cd "$common_raw" 2>/dev/null && pwd -P); then
+  if ! common_dir=$(realpath_existing "$common_raw" 2>/dev/null); then
     set_detect_facts "unknown" "output-contract-failed" "$worktree_root" "" "$git_dir" "$common_raw" ""
     return 1
   fi

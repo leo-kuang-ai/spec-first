@@ -11,6 +11,7 @@ const {
   listTextFilesWithMetadata,
   resolveBoundedSourceRoot,
   sourceInputPath,
+  toPosix,
 } = require('../../skills/spec-app-consistency-audit/scripts/lib/audit-utils');
 const { validateArtifact } = require('../../skills/spec-app-consistency-audit/scripts/validate-artifacts');
 
@@ -76,7 +77,7 @@ describe('spec-app-consistency-audit host boundaries', () => {
       }
 
       const scan = listTextFilesWithMetadata(repoRoot);
-      expect(scan.files.map((file) => path.relative(repoRoot, file))).toEqual(['src/App.kt']);
+      expect(scan.files.map((file) => toPosix(path.relative(repoRoot, file)))).toEqual(['src/App.kt']);
 
       for (const root of GENERATED_OR_CONTROL_ROOTS) {
         expect(sourceInputPath(repoRoot, path.join(repoRoot, root, 'managed.md'), 'source'))
