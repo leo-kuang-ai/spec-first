@@ -19,6 +19,13 @@ describe('spec-mcp-setup preflight v2 projection', () => {
       { id: 'silicon', status: 'missing', reason_code: 'missing_dependency' },
       { id: 'vhs', status: 'missing', reason_code: 'missing_dependency' },
     ];
+    const toolResults = [
+      { id: 'context7', status: 'ready', reason_code: 'ready' },
+      { id: 'sequential-thinking', status: 'missing', reason_code: 'missing_dependency', next_action: 'Install or repair: npx' },
+    ];
+    const hostConfigResults = new Map([
+      ['context7', { configured_status: 'ready', reason_code: 'ready', config_path: '/tmp/config' }],
+    ]);
     const projectConfigStatus = {
       example_config: { status: 'current' },
       local_config: { status: 'present' },
@@ -29,7 +36,9 @@ describe('spec-mcp-setup preflight v2 projection', () => {
 
     const preflight = buildPreflightProjection({
       registry,
+      toolResults,
       helperResults,
+      hostConfigResults,
       projectConfigStatus,
       insideGitRepo: true,
       platform: 'macos',
@@ -47,6 +56,18 @@ describe('spec-mcp-setup preflight v2 projection', () => {
       'context7',
       'sequential-thinking',
     ]));
+    expect(preflight.mcp_servers.find((entry) => entry.id === 'context7')).toMatchObject({
+      dependency_status: 'ready',
+      configured_status: 'ready',
+      result: 'ready',
+      config_path: '/tmp/config',
+    });
+    expect(preflight.mcp_servers.find((entry) => entry.id === 'sequential-thinking')).toMatchObject({
+      dependency_status: 'missing',
+      result: 'action-required',
+      reason_code: 'missing_dependency',
+      next_action: 'Install or repair: npx',
+    });
     expect(preflight.skills).toHaveLength(1);
     expect(preflight.skills[0]).toMatchObject({
       id: 'ast-grep-skill',

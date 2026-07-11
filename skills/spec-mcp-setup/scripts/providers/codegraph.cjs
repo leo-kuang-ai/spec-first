@@ -140,6 +140,9 @@ function verify(context = {}) {
   const nextActions = [];
   if (!installed) nextActions.push('显式运行 spec-mcp-setup --only codegraph，安装 pinned CodeGraph CLI。');
   if (installed && !hasArtifact) nextActions.push('依赖 code-graph candidate 前，先显式执行 CodeGraph first generation。');
+  if (installed && hasArtifact && !indexed) {
+    nextActions.push('运行 spec-mcp-setup --only codegraph，修复 CodeGraph index/query readiness。');
+  }
   if (installed && hasArtifact && !serverReachable) nextActions.push('将 server_reachable 视为 true 前，先运行 CodeGraph server/probe 验证。');
   if (indexed && !queryVerified) nextActions.push('运行 spec-mcp-setup --only codegraph，重新执行 bounded CodeGraph query probe。');
   appendConfigurationAction(nextActions, context);
@@ -294,8 +297,11 @@ function reconcileConfigured(readiness, hostResult = {}) {
     if (['fresh', 'unknown'].includes(readiness.readiness_status)) {
       readiness.readiness_status = 'degraded';
     }
+    const nextActions = (readiness.next_actions || []).filter((action) =>
+      ![CONFIG_UNKNOWN_ACTION, CONFIG_REPAIR_ACTION].includes(action)
+    );
     readiness.next_actions = [...new Set([
-      ...(readiness.next_actions || []),
+      ...nextActions,
       hostResult.next_action || CONFIG_REPAIR_ACTION,
     ])];
     return readiness;

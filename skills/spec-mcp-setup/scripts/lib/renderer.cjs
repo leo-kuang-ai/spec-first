@@ -182,6 +182,7 @@ function renderDiagnostic({ preflight, snapshot, target, host } = {}) {
     generated_at: new Date().toISOString(),
     target: target || null,
     host: host || null,
+    mcp_servers: preflight && Array.isArray(preflight.mcp_servers) ? preflight.mcp_servers : [],
     tools: preflight && Array.isArray(preflight.tools) ? preflight.tools : [],
     skills: preflight && Array.isArray(preflight.skills) ? preflight.skills : [],
     project: preflight && preflight.project ? preflight.project : {},

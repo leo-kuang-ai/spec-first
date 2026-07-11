@@ -42,7 +42,7 @@ function advisoryHostCandidates({ env = {}, runner } = {}) {
   return visible.length === 1 ? visible : [];
 }
 
-function diagnosticNextActions(payload = {}) {
+function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredProviderIds } = {}) {
   const actions = [];
   const project = payload.project || {};
   if (project.inside_git_repo && (
@@ -53,19 +53,40 @@ function diagnosticNextActions(payload = {}) {
   }
   const runtime = payload.runtime || {};
   const manifest = payload.generated_runtime_manifest || runtime.generated_runtime_manifest || {};
-  const runtimeReady = runtime.setup_facts_status === 'ready'
+  const baselineFailures = Array.isArray(liveBaselineFailures)
+    ? liveBaselineFailures
+    : [
+      ...(Array.isArray(payload.tools) ? payload.tools : []),
+      ...(Array.isArray(payload.skills) ? payload.skills : []),
+    ].filter((entry) => entry.baseline_blocking === true && entry.result !== 'ready');
+  for (const entry of baselineFailures) {
+    actions.push(entry.next_action
+      || `运行标准 spec-mcp-setup，修复 ${entry.id || '当前缺失的 required baseline'}。`);
+  }
+  const persistedRuntimeReady = runtime.setup_facts_status === 'ready'
     && runtime.runtime_capabilities_status === 'ready'
     && runtime.baseline_ready === true
     && runtime.host_runtime_ready === true;
-  if (!runtimeReady) {
+  if (!persistedRuntimeReady) {
     actions.push('运行标准 spec-mcp-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。');
   } else {
     const providers = Array.isArray(payload.provider_readiness)
       ? payload.provider_readiness
       : (Array.isArray(runtime.provider_readiness) ? runtime.provider_readiness : []);
     const providerStatus = new Map(providers.map((entry) => [entry.provider, entry.readiness_status]));
-    const providersReady = ['codegraph', 'graphify'].every((id) => providerStatus.get(id) === 'fresh');
-    if (!providersReady || manifest.status !== 'current') {
+    const requiredIds = Array.isArray(requiredProviderIds)
+      ? requiredProviderIds
+      : providers.map((entry) => entry.provider);
+    const providersReady = requiredIds.every((id) => providerStatus.get(id) === 'fresh');
+    if (!providersReady) {
+      const requiredSet = new Set(requiredIds);
+      const providerActions = providers
+        .filter((entry) => requiredSet.has(entry.provider) && entry.readiness_status !== 'fresh')
+        .flatMap((entry) => entry.next_actions || []);
+      if (providerActions.length > 0) actions.push(...providerActions);
+      else actions.push('运行当前 host 的 spec-mcp-setup --verify-only，确认 required Provider readiness。');
+    }
+    if (manifest.status !== 'current') {
       actions.push('运行当前 host 的 spec-mcp-setup --verify-only，确认 required Provider readiness。');
     }
   }
@@ -79,6 +100,9 @@ function diagnosticNextActions(payload = {}) {
 function renderDiagnosticHuman(payload, pluginVersion) {
   const lines = [];
   if (pluginVersion) lines.push(`Spec-First 版本 v${pluginVersion}`, '');
+  lines.push('MCP servers');
+  appendItems(lines, payload.mcp_servers);
+  lines.push('');
   lines.push('工具');
   appendItems(lines, payload.tools);
   lines.push('', '技能');

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Write Skill"
+  short_description: "Author or validate project-owned Agent Skills"
+  default_prompt: "Use the spec-write-skill workflow for an explicit project-owned Skill authoring, migration, remediation, or validate-only request. Resolve one target repo and canonical source first, keep external or unknown packages read-only, preview mutations, and report portable, target, project, semantic, and mutation readiness separately."
+
+policy:
+  allow_implicit_invocation: false

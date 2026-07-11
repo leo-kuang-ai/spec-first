@@ -7,6 +7,9 @@ const {
   buildActionPlan,
 } = require('./lib/mode-policy.cjs');
 const {
+  isBaselineBlocking,
+} = require('./lib/baseline-policy.cjs');
+const {
   resolveHostAuthority,
 } = require('./lib/host-authority.cjs');
 const {
@@ -54,7 +57,9 @@ const {
   warmupCacheHit,
 } = require('./lib/installation-executor.cjs');
 const {
+  configureOrInspectHost,
   providerContext,
+  reconcileProviderHostConfig,
   requireCapability,
   resolveBundledVersion,
   runVerificationOrMutation,
@@ -419,8 +424,21 @@ function previewSafety(context) {
 }
 
 function runDiagnostic(context, repoRoot) {
-  const probes = probeRegistry(context, repoRoot, { selectedIds: [] });
+  const requiredProviderIds = (context.effectiveRegistry.providers || [])
+    .filter((entry) => entry.setup_required === true)
+    .map((entry) => entry.id);
+  const probes = probeRegistry(context, repoRoot, { selectedIds: requiredProviderIds });
   const providerResults = verifyProviders(context, repoRoot, []);
+  let hostConfigResults = new Map();
+  if (context.authority.status === 'ready') {
+    hostConfigResults = configureOrInspectHost(context, repoRoot, {
+      applyMutation: false,
+      selectedIds: requiredProviderIds,
+      providerResults,
+      installResults: new Map(),
+    });
+    reconcileProviderHostConfig(providerResults, hostConfigResults);
+  }
   const snapshot = readSetupSnapshot({ repoRoot });
   const projectStatus = inspectProjectConfig({
     repoRoot,
@@ -429,7 +447,9 @@ function runDiagnostic(context, repoRoot) {
   const payload = renderDiagnostic({
     preflight: buildPreflightProjection({
       registry: context.effectiveRegistry,
+      toolResults: probes.toolResults,
       helperResults: probes.helperResults,
+      hostConfigResults,
       projectConfigStatus: projectStatus,
       insideGitRepo: context.target && context.target.repo_status === 'git-repo',
       platform: context.platform,
@@ -441,7 +461,10 @@ function runDiagnostic(context, repoRoot) {
     target: context.target,
     host: context.host ? { host: context.host, authority: context.authority.status } : context.authority,
   });
-  payload.next_actions = diagnosticNextActions(payload);
+  payload.next_actions = diagnosticNextActions(payload, {
+    liveBaselineFailures: collectDiagnosticBaselineFailures(context, probes, hostConfigResults),
+    requiredProviderIds,
+  });
   return {
     exit_code: 0,
     mode: context.actionPlan.mode,
@@ -450,6 +473,36 @@ function runDiagnostic(context, repoRoot) {
     human: renderDiagnosticHuman(payload, context.parsed.pluginVersion),
     target: context.target,
   };
+}
+
+function collectDiagnosticBaselineFailures(context, probes, hostConfigResults) {
+  const toolResults = new Map((probes.toolResults || []).map((entry) => [entry.id, entry]));
+  const helperResults = new Map((probes.helperResults || []).map((entry) => [entry.id, entry]));
+  const failures = [];
+  for (const entry of context.effectiveRegistry.tools || []) {
+    if (!isBaselineBlocking(entry)) continue;
+    const observed = toolResults.get(entry.id);
+    if (!observed || observed.status !== 'ready') {
+      failures.push(observed || { next_action: `运行标准 spec-mcp-setup，修复 ${entry.id}。` });
+      continue;
+    }
+    const hostResult = hostConfigResults.get(entry.id);
+    if (hostResult && hostResult.configured_status !== 'ready') {
+      failures.push({
+        ...hostResult,
+        id: entry.id,
+        next_action: hostResult.next_action || `运行标准 spec-mcp-setup，修复 ${entry.id} host config。`,
+      });
+    }
+  }
+  for (const entry of context.effectiveRegistry.helpers || []) {
+    if (!isBaselineBlocking(entry)) continue;
+    const observed = helperResults.get(entry.id);
+    if (!observed || observed.status !== 'ready') {
+      failures.push(observed || { next_action: `运行标准 spec-mcp-setup，修复 ${entry.id}。` });
+    }
+  }
+  return failures;
 }
 
 function renderProjectConfig(result) {

@@ -105,10 +105,10 @@ describe('command companion resource paths', () => {
 
       const writeSkillRoot = `${adapter.workflowsRoot}/spec-write-skill`;
       const writeSkill = readRuntimeCommand(projectRoot, adapter, 'spec-write-skill');
-      expect(writeSkill).toContain('条件细节下沉 `references/` 并写清 context pointer');
-      expect(writeSkill).not.toContain(
-        `条件细节下沉 \`${writeSkillRoot}/references/\` 并写清 context pointer`,
-      );
+      expect(writeSkill).toContain('Load profiles conditionally.');
+      expect(writeSkill).toContain(`${writeSkillRoot}/references/target-profiles.md`);
+      expect(writeSkill).toContain(`${writeSkillRoot}/references/project-profiles.md`);
+      expect(writeSkill).toContain('$SKILL_DIR/scripts/validate-skill.cjs');
 
       for (const skillName of ['spec-optimize', 'spec-polish']) {
         const commandContent = readRuntimeCommand(projectRoot, adapter, skillName);

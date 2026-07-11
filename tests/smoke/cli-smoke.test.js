@@ -316,13 +316,27 @@ describe('CLI smoke checks', () => {
         'spec-app-consistency-audit',
         'README.md',
       ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        consumerRoot,
+        runtimeRoot,
+        'spec-write-skill',
+        'agents',
+        'openai.yaml',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        consumerRoot,
+        runtimeRoot,
+        'spec-write-skill',
+        'scripts',
+        'validate-skill.cjs',
+      ))).toBe(true);
     }
 
     const writeSkillCommand = fs.readFileSync(
       path.join(consumerRoot, '.claude', 'commands', 'spec-write-skill.md'),
       'utf8',
     );
-    expect(writeSkillCommand).toContain('条件细节下沉 `references/` 并写清 context pointer');
+    expect(writeSkillCommand).toContain('Load profiles conditionally.');
     expect(writeSkillCommand).not.toContain(
       '`.claude/spec-first/workflows/spec-write-skill/references/`',
     );

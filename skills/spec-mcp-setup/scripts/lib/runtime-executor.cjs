@@ -3,6 +3,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {
+  isBaselineBlocking,
+} = require('./baseline-policy.cjs');
+const {
   scanConfiguredDependencies,
 } = require('./configured-dependencies.cjs');
 const {
@@ -328,11 +331,6 @@ function reduceExecutionOutcome({
     return failureOutcome('host-runtime-action-required');
   }
   return null;
-}
-
-function isBaselineBlocking(entry) {
-  if (entry.baseline_blocking !== undefined) return entry.baseline_blocking === true;
-  return entry.required !== false;
 }
 
 function probeFailureReason(observed) {
@@ -788,8 +786,10 @@ function resolveBundledVersion({ skillRoot, env, runner }) {
 
 module.exports = {
   computeGeneratedRuntimeManifestHealth,
+  configureOrInspectHost,
   firstSelectedProviderFailure,
   providerContext,
+  reconcileProviderHostConfig,
   requireCapability,
   resolveBundledVersion,
   runVerificationOrMutation,

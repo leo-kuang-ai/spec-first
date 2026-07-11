@@ -137,6 +137,56 @@ describe('CodeGraph provider', () => {
     expect(result.lifecycle.configured).toBe(configured === true);
   });
 
+  test('replaces the unknown configuration action with the confirmed repair action', () => {
+    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const readiness = {
+      readiness_status: 'unknown',
+      lifecycle: {
+        installed: true,
+        configured: false,
+        initialized: true,
+        indexed: true,
+        query_verified: true,
+      },
+      next_actions: ['通过当前 host 的 spec-mcp-setup --verify-only 确认 CodeGraph MCP 配置。'],
+    };
+
+    provider.reconcileConfigured(readiness, {
+      configured_status: 'action-required',
+      next_action: 'spec-mcp-setup --only codegraph --repair-host-config',
+    });
+
+    expect(readiness).toMatchObject({
+      readiness_status: 'degraded',
+      lifecycle: { configured: false },
+      next_actions: ['spec-mcp-setup --only codegraph --repair-host-config'],
+    });
+  });
+
+  test('reports an actionable setup command when an existing CodeGraph index is not ready', () => {
+    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-index-not-ready');
+    fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+    const runner = (_command, args) => {
+      if (args[0] === '--version') return success('codegraph 1.2.0');
+      if (args[0] === 'status') return success('pending changes; run codegraph sync');
+      return success();
+    };
+
+    const result = provider.verify({
+      repoRoot: target,
+      runner,
+      configured: true,
+      dependency: { version: '1.2.0' },
+    });
+
+    expect(result.readiness_status).toBe('degraded');
+    expect(result.next_actions).toContain(
+      '运行 spec-mcp-setup --only codegraph，修复 CodeGraph index/query readiness。',
+    );
+  });
+
   test('degrades when the real CodeGraph query probe fails after indexing', () => {
     const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-query-failure');

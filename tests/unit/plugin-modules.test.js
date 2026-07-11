@@ -139,6 +139,10 @@ describe('plugin module facade and governance', () => {
         '.cursor/skills/spec-prd/references/prd-output-template.md',
         '.cursor/skills/spec-prd/scripts/check-prd-artifact.js',
         '.cursor/skills/spec-prd/assets/templates/00-generic.md',
+        '.cursor/skills/spec-write-skill/agents/openai.yaml',
+        '.cursor/skills/spec-write-skill/references/project-profiles.md',
+        '.cursor/skills/spec-write-skill/references/target-profiles.md',
+        '.cursor/skills/spec-write-skill/scripts/validate-skill.cjs',
         '.cursor/skills/spec-mcp-setup/setup-registry.json',
         '.cursor/skills/spec-mcp-setup/setup-registry.schema.json',
         '.cursor/skills/spec-mcp-setup/scripts/setup.cjs',
@@ -181,6 +185,14 @@ describe('plugin module facade and governance', () => {
       expect(fs.existsSync(path.join(
         projectRoot,
         '.cursor/skills/spec-prd/scripts/check-prd-artifact.js',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-write-skill/agents/openai.yaml',
+      ))).toBe(true);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.cursor/skills/spec-write-skill/scripts/validate-skill.cjs',
       ))).toBe(true);
       expect(fs.existsSync(path.join(
         projectRoot,

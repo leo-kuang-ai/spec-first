@@ -39,7 +39,7 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 | `spec-compound` | spec-compound | 问题刚解决时，将解决方案沉淀到 docs/solutions/ | `performance-oracle`、`security-sentinel`、`data-integrity-guardian`、`pattern-recognition-specialist`、`best-practices-researcher`、`framework-docs-researcher`、`session-historian`、`repo-profiler` |
 | `spec-compound-refresh` | spec-compound-refresh | 审查并刷新 docs/solutions/ 下已漂移的 learning 与 pattern 文档，更新/合并/替换/删除，维持知识库新鲜度 | 无具名 prompt asset（可用匿名 subagent 做调查与 replacement 的上下文隔离） |
 | `spec-mcp-setup` | spec-mcp-setup | 安装、配置并验证 spec-first 工作流所需宿主运行时，建立就绪基线 | 无 |
-| `spec-write-skill` | spec-write-skill | 编写、改写、迁移或按 audit findings 修复 spec-first source skill | 无 |
+| `spec-write-skill` | spec-write-skill | 创建、修改、迁移、修复或只读验证 project-owned Agent Skill；spec-first 治理按 project profile 加载 | 无 |
 | `spec-app-consistency-audit` | spec-app-consistency-audit | 对移动 App 的 PRD、Figma、源码、路由、架构边界等做静态一致性审查 | 专家 prompts 位于 `skills/spec-app-consistency-audit/prompts/` |
 | `spec-polish` | spec-polish | 启动 dev server、在浏览器打开功能并协作迭代改进 | 无（`disable-model-invocation`，浏览器迭代，不自动触发） |
 

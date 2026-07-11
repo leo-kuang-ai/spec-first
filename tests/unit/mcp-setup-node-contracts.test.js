@@ -197,6 +197,7 @@ describe('spec-mcp-setup unified Node contract', () => {
   test('keeps the entrypoint thin and exposes explicit runtime owner modules', () => {
     const setupPath = path.join(skillRoot, 'scripts', 'setup.cjs');
     const owners = [
+      ['baseline-policy.cjs', ['isBaselineBlocking']],
       ['scenario-fingerprint.cjs', ['generateSetupScenarioFingerprint', 'scenarioFingerprintFailure']],
       ['human-output.cjs', ['advisoryHostCandidates', 'diagnosticNextActions', 'renderDiagnosticHuman']],
       ['workspace-executor.cjs', ['runWorkspaceBatch', 'buildWorkspaceSetupSummary', 'buildWorkspaceVerifySummary']],

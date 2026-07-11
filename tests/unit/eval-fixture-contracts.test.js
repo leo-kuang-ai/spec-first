@@ -57,4 +57,38 @@ describe('active eval fixture references', () => {
       'current-source producer finalize command',
     );
   });
+
+  test('spec-write-skill route fixtures declare structural evidence and executable expectations', () => {
+    const fixture = JSON.parse(fs.readFileSync(path.join(
+      repoRoot,
+      'skills/spec-write-skill/evals/trigger-cases.json',
+    ), 'utf8'));
+
+    expect(fixture.schema_version).toBe('spec-first.spec-write-skill-trigger-cases.v2');
+    expect(fixture.evidence_level).toBe('L1 structural');
+    expect(fixture.cases).toHaveLength(8);
+    expect(new Set(fixture.cases.map((entry) => entry.id)).size).toBe(fixture.cases.length);
+
+    for (const entry of fixture.cases) {
+      expect(typeof entry.expected_trigger).toBe('boolean');
+      expect(entry.prompt).toEqual(expect.any(String));
+      expect(entry.expected_effect).toEqual(expect.any(String));
+      expect(entry.expected_layer_result).toEqual(expect.any(String));
+      expect(entry.reason_code).toEqual(expect.any(String));
+      expect(entry.forbidden_signals).toEqual(expect.any(Array));
+      expect(entry.forbidden_signals.length).toBeGreaterThan(0);
+    }
+
+    expect(fixture.cases).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'malicious-external-package',
+        expected_effect: 'validate-only',
+        expected_layer_result: 'trust-preflight-blocked',
+      }),
+      expect.objectContaining({
+        id: 'portable-create-non-spec-first',
+        expected_layer_result: 'portable-core-only',
+      }),
+    ]));
+  });
 });

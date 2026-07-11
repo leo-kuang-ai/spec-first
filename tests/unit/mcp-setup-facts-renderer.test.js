@@ -712,4 +712,120 @@ describe('spec-mcp-setup renderer', () => {
     expect(actions).toContain('运行当前 host 的 spec-mcp-setup --verify-only，确认 required Provider readiness。');
     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
+
+  test('diagnostic next actions prefer current baseline probes over stale ready facts', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      tools: [{
+        id: 'ffmpeg',
+        baseline_blocking: true,
+        result: 'action-required',
+        next_action: 'brew install ffmpeg',
+      }],
+      skills: [],
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [
+        { provider: 'codegraph', readiness_status: 'fresh' },
+        { provider: 'graphify', readiness_status: 'fresh' },
+      ],
+    }, { requiredProviderIds: ['codegraph', 'graphify'] });
+
+    expect(actions).toContain('brew install ffmpeg');
+    expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
+  });
+
+  test('diagnostic next actions consume registry-derived required provider ids', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      tools: [],
+      skills: [],
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [
+        { provider: 'graphify', readiness_status: 'degraded' },
+        { provider: 'new-required', readiness_status: 'fresh' },
+      ],
+    }, { requiredProviderIds: ['new-required'] });
+
+    expect(actions).toEqual(['必需设置项已就绪，继续目标 spec-* workflow。']);
+  });
+
+  test('diagnostic next actions prefer a required provider repair over verify-only', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const repair = '运行 spec-mcp-setup --only codegraph，修复 CodeGraph index/query readiness。';
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      tools: [],
+      skills: [],
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [{
+        provider: 'codegraph',
+        readiness_status: 'degraded',
+        next_actions: [repair],
+      }],
+    }, { requiredProviderIds: ['codegraph'] });
+
+    expect(actions).toContain(repair);
+    expect(actions.some((action) => action.includes('--verify-only'))).toBe(false);
+  });
+
+  test('diagnostic next actions report baseline and provider repairs together', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [{
+        provider: 'codegraph',
+        readiness_status: 'degraded',
+        next_actions: ['repair codegraph'],
+      }],
+    }, {
+      liveBaselineFailures: [{ id: 'ffmpeg', next_action: 'install ffmpeg' }],
+      requiredProviderIds: ['codegraph'],
+    });
+
+    expect(actions).toEqual(expect.arrayContaining(['install ffmpeg', 'repair codegraph']));
+    expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
+  });
 });

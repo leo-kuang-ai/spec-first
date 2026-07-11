@@ -340,11 +340,93 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     expect(result.payload.next_actions).toEqual(expect.arrayContaining([
       expect.stringContaining('required baseline、CodeGraph 与 Graphify'),
     ]));
-    for (const heading of ['工具', '技能', '项目设置', '设置事实', 'Provider 状态', '后续操作']) {
+    for (const heading of ['MCP servers', '工具', '技能', '项目设置', '设置事实', 'Provider 状态', '后续操作']) {
       expect(result.human).toContain(heading);
     }
     expect(result.human).toContain('gh');
     expect(result.human).toContain('ast-grep-skill');
+  });
+
+  test('check reconciles CodeGraph readiness from an explicitly pinned read-only host config', () => {
+    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const target = tempRepo('check-codegraph-configured');
+    fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const configPath = path.join(homeDir, '.codex', 'config.toml');
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(configPath, [
+      '[mcp_servers.codegraph]',
+      'command = "codegraph"',
+      'args = ["serve", "--mcp"]',
+      '',
+    ].join('\n'));
+    const before = snapshot(target);
+    const homeBefore = snapshot(homeDir);
+    const runner = (command, args, options) => {
+      if (command === 'codegraph' && args[0] === '--version') {
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.2.0' };
+      }
+      if (command === 'codegraph' && args[0] === 'status') {
+        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+      }
+      return fakeRunner(command, args, options);
+    };
+
+    const result = runSetup({
+      argv: ['--check'],
+      cwd: target,
+      skillRoot,
+      runner,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+    });
+
+    expect(result.payload.provider_readiness.find((entry) => entry.provider === 'codegraph'))
+      .toMatchObject({
+        readiness_status: 'fresh',
+        lifecycle: { configured: true, query_verified: true },
+      });
+    expect(result.payload.mcp_servers.find((entry) => entry.id === 'codegraph')).toMatchObject({
+      dependency_status: 'ready',
+      configured_status: 'ready',
+      result: 'ready',
+    });
+    expect(snapshot(target)).toEqual(before);
+    expect(snapshot(homeDir)).toEqual(homeBefore);
+  });
+
+  test('check reports a current missing baseline MCP dependency instead of relying on saved facts', () => {
+    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const target = tempRepo('check-live-mcp-missing');
+    const runner = (command, args, options) => {
+      if (command === 'npx' && args.length === 1 && args[0] === '--version') {
+        return {
+          ...fakeRunner(command, args, options),
+          exit_code: 127,
+          stdout: '',
+          stderr: 'npx missing',
+        };
+      }
+      return fakeRunner(command, args, options);
+    };
+
+    const result = runSetup({
+      argv: ['--check'],
+      cwd: target,
+      skillRoot,
+      runner,
+      env: {},
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+    });
+
+    expect(result.payload.next_actions).toContain('Install or repair: npx');
+    expect(result.payload.mcp_servers.find((entry) => entry.id === 'context7')).toMatchObject({
+      dependency_status: 'missing',
+      result: 'action-required',
+      reason_code: 'missing_dependency',
+    });
+    expect(result.payload.next_actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
 
   test.each([

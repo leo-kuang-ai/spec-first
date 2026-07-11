@@ -1,5 +1,5 @@
 ---
-description: "Write, revise, migrate, or remediate spec-first source skills"
+description: "Author, migrate, remediate, or validate project-owned Agent Skills"
 argument-hint: "[target skill or authoring request]"
 ---
 

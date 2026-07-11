@@ -1,5 +1,9 @@
 'use strict';
 
+const {
+  isBaselineBlocking,
+} = require('./baseline-policy.cjs');
+
 function installCommand(entry, platform) {
   if (entry && entry.installation && typeof entry.installation.command === 'string') {
     return entry.installation.command;
@@ -69,6 +73,40 @@ function normalizeHelper(entry, probe, platform) {
   return normalized;
 }
 
+function normalizeMcp(entry, probe, hostResult) {
+  const dependencyReady = probe && probe.status === 'ready';
+  const configuredStatus = hostResult && hostResult.configured_status
+    ? hostResult.configured_status
+    : (entry.host_config_required === false ? 'not-applicable' : 'not-checked');
+  const configuredReady = ['ready', 'not-applicable', 'not-required', 'fallback-active']
+    .includes(configuredStatus);
+  const blocking = isBaselineBlocking(entry);
+  let result = 'ready';
+  if (!dependencyReady) result = blocking ? 'action-required' : 'degraded';
+  else if (!configuredReady) result = configuredStatus === 'not-checked' ? 'unknown' : 'action-required';
+  return {
+    id: entry.id,
+    kind: entry.category || 'mcp',
+    required: entry.required !== false,
+    setup_required: entry.setup_required === true,
+    baseline_blocking: blocking,
+    dependency_status: dependencyReady ? 'ready' : 'missing',
+    configured_status: configuredStatus,
+    result,
+    reason_code: !dependencyReady
+      ? ((probe && probe.reason_code) || 'probe-not-ready')
+      : ((hostResult && hostResult.reason_code) || (configuredReady ? 'ready' : 'host-config-not-verified')),
+    next_action: (hostResult && hostResult.next_action)
+      || (probe && probe.next_action)
+      || '',
+    config_path: hostResult && hostResult.config_path ? hostResult.config_path : null,
+    config_key: hostResult && hostResult.config_key ? hostResult.config_key : null,
+    conflict_fields: hostResult && Array.isArray(hostResult.conflict_fields)
+      ? hostResult.conflict_fields
+      : [],
+  };
+}
+
 function compactProjectStatus(projectConfigStatus, insideGitRepo) {
   if (!insideGitRepo) {
     return {
@@ -116,15 +154,22 @@ function compactLegacyStatus(projectConfigStatus, insideGitRepo, platform) {
 
 function buildPreflightProjection({
   registry,
+  toolResults = [],
   helperResults = [],
+  hostConfigResults = new Map(),
   projectConfigStatus,
   insideGitRepo = false,
   platform,
 } = {}) {
   const effectivePlatform = platform || (registry && registry.platform) || 'linux';
   const probes = new Map(helperResults.map((entry) => [entry.id, entry]));
+  const mcpProbes = new Map(toolResults.map((entry) => [entry.id, entry]));
   const helpers = registry && Array.isArray(registry.helpers) ? registry.helpers : [];
+  const tools = registry && Array.isArray(registry.tools) ? registry.tools : [];
   return {
+    mcp_servers: tools
+      .filter((entry) => (entry.category || 'mcp') === 'mcp')
+      .map((entry) => normalizeMcp(entry, mcpProbes.get(entry.id), hostConfigResults.get(entry.id))),
     tools: helpers
       .filter((entry) => entry.kind === 'cli' || entry.kind === 'browser-helper')
       .map((entry) => normalizeHelper(entry, probes.get(entry.id), effectivePlatform)),
