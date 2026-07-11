@@ -403,6 +403,46 @@ describe('host config resolution, inspection, and transaction', () => {
     });
   });
 
+  test('finds an effective lower-precedence config when the selected inspection target is missing', () => {
+    const repoRoot = tempDir('inspection-repo');
+    const homeDir = tempDir('inspection-home');
+    const entry = jsonEntry();
+    entry.host_config.targets.project.precedence = 100;
+    entry.host_config.targets.user = {
+      config_path: '$HOME/.cursor/mcp.json',
+      config_format: 'json',
+      precedence: 10,
+    };
+
+    const userPath = path.join(homeDir, '.cursor', 'mcp.json');
+    fs.mkdirSync(path.dirname(userPath), { recursive: true });
+    fs.writeFileSync(userPath, JSON.stringify({
+      mcpServers: {
+        context7: {
+          command: 'npx',
+          args: ['-y', '@upstash/context7-mcp@latest'],
+        },
+      },
+    }));
+
+    const target = resolveHostConfigTarget({
+      entry,
+      host: 'cursor',
+      authority: authority('cursor'),
+      repoRoot,
+      homeDir,
+      requireWritable: false,
+    });
+    expect(target).toMatchObject({ ok: true, scope: 'project' });
+    expect(inspectHostConfig({ entry, target })).toMatchObject({
+      ok: true,
+      configured: true,
+      reason_code: 'host-config-current',
+      effective_scope: 'user',
+      effective_path: userPath,
+    });
+  });
+
   test('treats user-scope as an explicit user target and still inspects unselected higher precedence config', () => {
     const repoRoot = tempDir('user-scope-repo');
     const homeDir = tempDir('user-scope-home');

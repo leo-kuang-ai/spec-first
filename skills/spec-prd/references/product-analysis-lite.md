@@ -16,8 +16,14 @@ Contract Reset candidate.
   schema, unified-plan sibling, migration manifest, consumer gate, or runtime
   projection.
 - Scripts continue to own structure, trace, path, hash, and receipt facts. The
-  LLM plus claim-specific authority own semantic sufficiency, target WHAT,
-  priority, risk acceptance, and sign-off.
+  LLM owns analysis, recommendation, and semantic-readiness judgment but never
+  confirms a product decision. The current user is the sole human product
+  confirmer for target WHAT, priority, risk acceptance, scope caps, and defer
+  decisions.
+- Specialist, regulatory, privacy, security, financial, and professional
+  materials are confirmation evidence, not additional human roles. An
+  independent planner or reviewer may evaluate Lite outcomes, but does not
+  confirm product decisions or join the user interaction path.
 
 ## Single Run-Local Product Analysis Brief
 
@@ -33,12 +39,12 @@ The Brief must contain:
 | `product_frame` | actor, problem, expected outcome, why now, success evidence, candidate release slice |
 | `current_target_delta` | confirmed current behavior, target behavior, and the observable delta |
 | `source_inventory` | each identified source with the fields defined below |
-| `authority_conflicts` | conflicting, superseded, unread, or insufficient-authority claims and affected PRD write targets |
+| `confirmation_conflicts` | conflicting, superseded, unread, or insufficient-basis claims and affected PRD write targets |
 | `candidate_behaviors` | states, errors, permissions, degraded behavior, compatibility, and observable scenarios that may become Requirements or Acceptance Examples |
-| `priority_authority` | who or what can confirm priority and risk acceptance; otherwise keep the priority candidate labeled |
+| `priority_confirmation` | evidence supporting the current user's priority/risk confirmation; otherwise keep the priority candidate labeled |
 | `acceptance_gaps` | load-bearing R/AE gaps and what planning would have to invent if they remain open |
 | `design_coverage` | `not-applicable`, covered refs, or unread/degraded items with their readiness consequence |
-| `next_source_or_decision` | the single highest-value source read or claim-specific authority decision to perform next |
+| `next_source_or_decision` | the single highest-value source read or current-user confirmation to perform next |
 | `closure_summary` | source-resolved, owner-answered/capped, evidence-backed assumption, implementation-only HOW pushdown, blocker, or route-out residue |
 
 The Brief is complete only when every load-bearing gap points to a PRD write
@@ -46,7 +52,7 @@ target and the next action is unambiguous. If this cannot be achieved, the
 legal result is `ask-owner-first`, `checkpoint-prd`, or `route-out`, not a
 smaller Brief that hides the gap.
 
-## Source Inventory And Authority
+## Source Inventory And Confirmation Basis
 
 For every identified PRD, meeting note, code/test/doc source, design ref,
 provider output, screenshot/OCR extraction, external research item, or owner
@@ -57,21 +63,25 @@ answer, record:
 - `evidence_tag` (`confirmed-source`, `user-stated`, `source-candidate`,
   `provider_untrusted`, `external-research`, or `assumption`);
 - freshness/version;
-- authority scope;
+- confirmation scope and basis;
 - sensitivity and sanitization limitation;
 - affected PRD write target and readiness consequence.
 
 `read_status` proves accessibility only. Code and tests confirm current
 behavior, not target scope or priority. Meeting material becomes a confirmed
-target decision only when its ratification state, authority scope, and
+target decision only when its ratification state, confirmation basis, and
 freshness are all supported. Model knowledge, external research, provider
-output, and design proposals remain candidate evidence until the appropriate
-source or authority confirms the claim.
+output, and design proposals remain candidate evidence until project source or
+the current user confirms the claim.
 
-The current user remains the question recipient, but their answer is confirmed
-only inside their demonstrated authority scope. Regulatory, privacy, security,
-financial, professional, priority, and risk-acceptance claims keep a named
-authority, evidence need, affected R/AE refs, sign-off timing, and fallback.
+The current user is the only human question recipient and the sole product
+confirmer. Regulatory, privacy, security, financial, and professional claims
+must still record evidence need, affected R/AE refs, confirmation timing, and
+fallback, but named specialists or historical sign-off roles remain evidence
+provenance rather than a second contact. When reliable formal source is
+missing, ask the current user whether to confirm explicitly, defer, scope-cap,
+or keep the item as `source-candidate`, assumption, or blocker with a reopen
+condition. Never have the LLM confirm it automatically.
 
 ## Release-Bounded Closure
 
@@ -88,8 +98,9 @@ Map an evidence-backed exclusion to the existing
 obtain an owner cap.
 
 Compact analysis is allowed for a single surface with no source conflict,
-high-risk sign-off, or load-bearing unread evidence. Compact means fewer rows,
-not skipping the Brief, semantic review, Decision Card, checker, or finalize.
+high-risk evidence/confirmation gap, or load-bearing unread evidence. Compact
+means fewer rows, not skipping the Brief, semantic review, Decision Card,
+checker, or finalize.
 
 Load deeper references only when the Brief exposes their trigger:
 
@@ -111,7 +122,7 @@ Write only useful results into the existing PRD contract:
 | --- | --- |
 | product frame | Summary |
 | current/target/delta | Current System Snapshot and Change Delta |
-| source inventory / authority conflicts | Evidence And Assumptions and Decision Notes |
+| source inventory / confirmation conflicts | Evidence And Assumptions and Decision Notes |
 | candidate behaviors / acceptance gaps | Requirements and Acceptance Examples |
 | scope proof / reopen condition | Scope Boundaries, Planning Recheck, or Outstanding Questions |
 | owner answer or cap | Owner Decision Trace and the specifically bound OQ |
@@ -132,11 +143,12 @@ Before `final-prd`, confirm:
   explicit;
 - current facts are separated from target decisions;
 - no source, model, design proposal, provider output, or user answer exceeds
-  its authority;
+  its evidence or confirmation scope;
 - each load-bearing Requirement has an observable Acceptance Example or trace;
 - critical state, error, permission, degraded, compatibility, fallback, and
   reopen behavior is closed or visibly blocking;
-- an independent planner would not need to invent load-bearing WHAT.
+- an independent planner would not need to invent load-bearing WHAT. This is
+  an evaluation check, not a second product-confirmation role.
 
 If any check fails, keep `write_mode=checkpoint-prd` or `ask-owner-first` and
 name the next source/decision. If they pass, use the normal legacy

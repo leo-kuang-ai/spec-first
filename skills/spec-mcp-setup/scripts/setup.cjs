@@ -322,7 +322,7 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
           homeDir: context.homeDir,
           env: context.env,
           userScope: context.actionPlan.args.userScope,
-          requireWritable: false,
+          requireWritable: true,
         });
         if (target.ok) inspection = inspectHostConfig({ entry, target });
       }
@@ -343,8 +343,10 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
         conflict_fields: inspection && inspection.conflict_fields ? inspection.conflict_fields : [],
         blocking_scope: inspection && inspection.blocking_scope ? inspection.blocking_scope : null,
         blocking_path: inspection && inspection.blocking_path ? inspection.blocking_path : null,
-        planned: blockedReason === null,
-        reason_code: repairAuthorized ? 'host-config-repair-authorized' : null,
+        planned: blockedReason === null && !(inspection && inspection.ok && inspection.configured),
+        reason_code: repairAuthorized
+          ? 'host-config-repair-authorized'
+          : (inspection && inspection.ok && inspection.configured ? inspection.reason_code : null),
         blocked_reason: blockedReason || (context.host ? null : 'host-undetermined-advisory'),
         next_action: blockedReason === 'host-config-conflict'
           ? hostConfigRepairCommand(context)

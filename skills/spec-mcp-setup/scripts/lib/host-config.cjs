@@ -417,15 +417,19 @@ function inspectHostConfig({ entry, target } = {}) {
   }
   const key = configKeyForEntry(entry) || target.key;
   const server = buildServerConfig(entry) || target.server;
-  const higherTargets = Object.values(target.resolved_targets || {})
-    .filter((candidate) => candidate.scope !== target.scope && candidate.precedence > target.precedence)
+  const orderedTargets = Object.values(target.resolved_targets || {})
     .sort((left, right) => right.precedence - left.precedence);
-  for (const candidate of higherTargets) {
+  let selectedInspection = null;
+  for (const candidate of orderedTargets) {
     const inspected = inspectOneTarget({ targetRecord: candidate, key, server });
+    if (candidate.scope === target.scope) selectedInspection = inspected;
+    const higherPrecedence = candidate.precedence > target.precedence;
     if (!inspected.ok) {
       return {
         ok: false,
-        reason_code: 'host-config-higher-precedence-unreadable',
+        reason_code: higherPrecedence
+          ? 'host-config-higher-precedence-unreadable'
+          : inspected.reason_code,
         blocking_scope: candidate.scope,
         blocking_path: candidate.config_path,
         cause_reason_code: inspected.reason_code,
@@ -436,7 +440,9 @@ function inspectHostConfig({ entry, target } = {}) {
         ok: true,
         configured: true,
         conflict: false,
-        reason_code: 'host-config-higher-precedence-current',
+        reason_code: higherPrecedence
+          ? 'host-config-higher-precedence-current'
+          : 'host-config-current',
         effective_scope: candidate.scope,
         effective_path: candidate.config_path,
       };
@@ -446,20 +452,25 @@ function inspectHostConfig({ entry, target } = {}) {
         ok: false,
         configured: false,
         conflict: true,
-        reason_code: 'host-config-higher-precedence-conflict',
+        reason_code: higherPrecedence
+          ? 'host-config-higher-precedence-conflict'
+          : 'host-config-conflict',
         blocking_scope: candidate.scope,
         blocking_path: candidate.config_path,
         conflict_fields: inspected.conflict_fields || [],
       };
     }
   }
-  const selected = {
-    scope: target.scope,
-    config_path: target.config_path,
-    config_format: target.config_format,
-    precedence: target.precedence,
-  };
-  const inspected = inspectOneTarget({ targetRecord: selected, key, server });
+  const inspected = selectedInspection || inspectOneTarget({
+    targetRecord: {
+      scope: target.scope,
+      config_path: target.config_path,
+      config_format: target.config_format,
+      precedence: target.precedence,
+    },
+    key,
+    server,
+  });
   return {
     ...inspected,
     effective_scope: target.scope,

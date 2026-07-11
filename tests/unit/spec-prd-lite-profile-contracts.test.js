@@ -37,9 +37,14 @@ describe('spec-prd Contract Reset Lite profile', () => {
     expect(LITE).not.toContain('product_contract_source: spec-prd');
   });
 
-  test('keeps source authority and release-bounded closure explicit', () => {
+  test('keeps a single human confirmer, evidence basis, and release-bounded closure explicit', () => {
     expect(LITE).toContain('`source_ref` and `source_type`');
-    expect(LITE).toContain('authority scope');
+    expect(SKILL).toContain('the current user is the sole human product confirmer');
+    expect(SKILL).toContain('当前执行对话的用户是唯一人类产品确认人');
+    expect(LITE).toContain('confirmation scope and basis');
+    expect(LITE).toContain('The current user is the only human question recipient and the sole product');
+    expect(LITE).toContain('named specialists or historical sign-off roles remain evidence');
+    expect(LITE).toContain('does not\n  confirm product decisions or join the user interaction path');
     expect(LITE).toContain('The phrase "not in this release" alone is not closure');
     expect(LITE).toMatch(/plus\s+a reopen condition/);
     expect(LITE).toContain('an independent planner would not need to invent load-bearing WHAT');
@@ -49,28 +54,57 @@ describe('spec-prd Contract Reset Lite profile', () => {
     const optIn = CASES.get('contract-reset-lite-explicit-opt-in');
     const nearNeighbor = CASES.get('contract-reset-lite-near-neighbor-default');
     const validate = CASES.get('contract-reset-lite-validate-report-only');
+    const specialist = CASES.get('contract-reset-lite-specialist-evidence-single-confirmer');
 
     expect(optIn).toBeDefined();
     expect(optIn.expected).toContain('one run-local Product Analysis Brief represents analysis gate, product risk ranking, and owner checkpoint');
+    expect(optIn.expected).toContain('all human product confirmation routes only to the current user while specialist material remains evidence');
+    expect(optIn.must_not).toContain('must not route a question or confirmation to a second human contact');
     expect(nearNeighbor).toBeDefined();
     expect(nearNeighbor.must_not).toContain('must not infer Contract Reset Lite from a generic request for concision');
     expect(validate).toBeDefined();
     expect(validate.must_not).toContain('must not write, rewrite, finalize in write mode, or materialize provider output');
+    expect(specialist).toBeDefined();
+    expect(specialist.expected).toContain('the only human confirmation route is the current user');
+    expect(specialist.must_not).toContain('must not route the question to a named specialist or other human contact');
   });
 
-  test('projects the Lite reference from source into every supported host plan', () => {
+  test('projects the single-confirmer Lite contract from source into every supported host plan', () => {
     for (const platform of getSupportedPlatforms()) {
       const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-prd-lite-${platform}-`));
       try {
         const adapter = getAdapter(platform);
         const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
         const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
-        const expectedPath = path.join(
+        const expectedLitePath = path.join(
           runtimeRoot,
           'spec-prd/references/product-analysis-lite.md',
         ).replace(/\\/g, '/');
+        const expectedSkillPath = path.join(
+          runtimeRoot,
+          'spec-prd/SKILL.md',
+        ).replace(/\\/g, '/');
+        const liteOperation = plan.operations.find(
+          (operation) => operation.path === expectedLitePath,
+        );
+        const skillOperation = plan.operations.find(
+          (operation) => operation.path === expectedSkillPath,
+        );
 
-        expect(plan.operations.some((operation) => operation.path === expectedPath)).toBe(true);
+        expect(liteOperation).toBeDefined();
+        expect(liteOperation.contents).toContain(
+          'The current user is the only human question recipient and the sole product',
+        );
+        expect(liteOperation.contents).toContain(
+          'named specialists or historical sign-off roles remain evidence',
+        );
+        expect(skillOperation).toBeDefined();
+        expect(skillOperation.contents).toContain(
+          '当前执行对话的用户是唯一人类产品确认人',
+        );
+        expect(skillOperation.contents).toContain(
+          '不允许路由第二个人类联系人',
+        );
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
       }

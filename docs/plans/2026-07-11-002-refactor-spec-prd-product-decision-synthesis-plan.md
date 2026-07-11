@@ -2,7 +2,7 @@
 title: spec-prd 产品决策合成与合同重置 - Plan
 type: refactor
 date: 2026-07-11
-deepened: 2026-07-11
+deepened: 2026-07-12
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
@@ -16,10 +16,12 @@ source_documents:
 
 > **2026-07-11 Scope Decision — Contract Reset Lite:** Phase 1 Exit Safety 保持当前默认；Gate A 的 `inconclusive` 不追溯升级。Owner 已授权一个新的、可逆的 opt-in 试验，只在显式 `analysis_profile=contract-reset-lite` 时用单一 run-local Product Analysis Brief 合并 Requirement Analysis Gate、产品风险排序与 owner checkpoint，并继续写 legacy `docs/brainstorms/*-requirements.md`、复用现有 Decision Card/checker/finalizer/producer receipt。U7-U13 自本裁决起退出 active implementation backlog，以下章节仅保留历史设计与 reversal context；不得据此切 unified artifact topology、启用 mandatory consumer receipt gate，或建设 sealed-holdout、migration manifest、cleanup receipt、staged promotion/runtime cutover。若 Lite 的真实任务证据满足本计划 Primary/Non-regression 方向，再另起 scope decision，而不是恢复本计划的连续 migration。
 
+> **2026-07-12 Confirmation Decision — Single Human Confirmer:** 当前执行对话的用户是唯一产品确认人。所有产品 WHAT、范围、优先级、验收、风险接受、defer 与 scope-cap 的人类确认都只进入当前对话；法规、隐私、安全、资金和专业材料只作为确认依据，不形成第二人类联系人。LLM/agent 只负责读取、分析、推荐、语义判断与记录，scripts 只确认结构、trace、path、hash、receipt 等确定性事实。依据不足时，由当前用户选择基于正式 source 确认、明确自行确认、defer/scope-cap，或保留 `source-candidate` / assumption / blocker 与 reopen condition。下文出现的 named specialist、claim authority、custodian、独立 planner/reviewer 和 sign-off role 均为已退出 active backlog 的 U7-U13 历史设计或 Lite 效果评估角色，不得解释为当前 workflow 的第二产品确认人。
+
 ## Goal Capsule
 
 - **Objective:** 将 `spec-prd` 从围绕多套 grill/readiness ceremony 演化的 PRD 格式化流程，重构为 brownfield 多源产品决策合成器：读取低质量 PRD、会议、代码、Figma 和专业领域证据，闭合当前 release slice 的 WHAT，并输出唯一、可追溯、可验收的 Product Contract。
-- **Authority:** `docs/10-prompt/结构化项目角色契约.md` > claim-specific authority（当前用户只确认其 scope 内的产品/优先级/风险决定，named specialist 确认相应专业或监管 claim）> confirmed current-state source/tests/runtime facts > 本计划引用的 validation/proposal > 外部 `skill-creator` 方法与领域建议。
+- **Authority:** `docs/10-prompt/结构化项目角色契约.md` > 当前用户作为唯一人类产品确认人的明确决定 > confirmed current-state source/tests/runtime facts 与专业/监管材料提供的确认依据 > 本计划引用的 validation/proposal > 外部 `skill-creator` 方法与领域建议。专业材料不创建第二确认角色。
 - **Execution profile:** 本计划已选择单一 Markdown requirements-only unified artifact 作为 target topology；Phase 1 Exit Safety 可立即实施，U6 必须停在 Gate A 等待 go/no-go，Gate A 与 Gate B 都不得改变默认 artifact topology 或启用默认 consumer receipt gate；通过后 Phase 2–5 必须作为连续 migration 完成，不能发布 mixed contract。
 - **Legal completion paths:** Phase 1 Exit 未通过时，保留 U1 confirmed baseline，回退或隔离未验证的 U2-U5 patch，并在进入 U6 前停止；Gate A 未通过时，以“Phase 1 已发布、candidate 未推广、未创建 U7-U13 migration/rollback closure、默认 runtime 不变”完成；Gate B 未通过时，丢弃未发布的 Contract Reset patch，保持 Phase 1 default behavior，仅在明确保留 candidate artifact 时保留 manifest-declared rollback forward reader；Promotion authorization 未通过时保持 Phase 1 且不创建 U13 staging，Staging validation 未通过时丢弃 staging；validation 通过后只发布精确 source tree，runtime projection 失败时执行 rollback，projection 通过后才标记 Promotion complete。
 - **Stop conditions:** U2-U5 修复完成后的 Phase 1 Exit 仍有任一 P0 未通过，或修复过程引入非预期 deterministic regression；三项 Non-regression 出现回归；Gate A 试图改写 KTD3 target topology 而未另起 scope decision；rollback bundle 不能以 Phase 1 default behavior 加 manifest-declared forward-reader closure 消费 candidate artifact；或实现工作区存在未解决的重叠用户改动时停止，不把 U1 的预期红探针误判为 stop，也不以补 prose 绕过。
@@ -49,16 +51,16 @@ source_documents:
 | 类型 | 成功信号 |
 | --- | --- |
 | Primary 1 | 独立 planner 读取 Product Contract 后仍需补问、猜测或新增的 load-bearing WHAT 数量相对 Phase 1-fixed control 下降。 |
-| Primary 2 | 重复问题、source 可解却询问用户的问题和无 authority 的确认轮次相对 control 下降。 |
+| Primary 2 | 重复问题、source 可解却询问用户的问题和缺少确认依据的确认轮次相对 control 下降。 |
 | Core product quality | 独立 blind product reviewer 对 actor/problem/outcome/why now/success evidence/right-size 的逐项判断不得出现新的 fail，candidate 相对 control 总体至少持平；不能用“更易实施”掩盖错误或过度收敛的产品决定。 |
 | Investment value | Gate A 前由 owner 冻结 case-specific minimum material effect 与 maximum complexity budget；原始计数改善 `1` 只有在对应 load-bearing 问题被明确消除并经 owner 认定为 material 时才可计入，不能自动授权 U7-U13。 |
-| Adoption | Promotion authorization 前由 PRD author/question recipient、相应 claim authority 与独立 planner 完成角色化 create/refine -> decision closure -> planning journey；不得出现新的 load-bearing workaround、authority bypass 或明显增加的决策负担。 |
+| Adoption | Lite 评估中由当前用户完成唯一人类确认，独立 planner 仅消费产物并评估 planning invention；不得出现新的 load-bearing workaround、第二确认入口或明显增加的决策负担。 |
 | Causal validity | 生成 Agent 看不到 oracle/grades/version mapping/holdout，arm/repeat 使用 fresh context 与平衡顺序，产品盲评包不泄漏版本 identity；任一污染使 paired group invalid。 |
 | Auditability | Gate report 可追溯到原 run 的 sanitized Product Contract/blind packet、最小 question/action event、grading notes 与内容 hash；raw provider log、完整 transcript 和敏感 payload 按 retention contract 删除。 |
 | Provider realization | Deterministic readiness 至少识别一个非空 Figma-capable host class并取得 owner-authorized 真实最小成功读取；每个对外宣称支持的 class 另有拒绝/降级证据，其他组合保持 loud degraded。 |
 | Non-regression 1 | 不新增 `source-candidate`、provider output、模型知识或未会签材料被提升为 confirmed requirement 的情况。 |
-| Non-regression 2 | 不反转、放宽、遗漏或伪造当前用户或专业 authority 的实际决定。 |
-| Non-regression 3 | actor/problem/outcome、current/target、关键状态/异常/权限/降级、priority authority 与 R -> AE 完整性不下降。 |
+| Non-regression 2 | 不反转、放宽、遗漏或伪造当前用户的实际决定；专业材料只作为证据，不冒充第二人类确认。 |
+| Non-regression 3 | actor/problem/outcome、current/target、关键状态/异常/权限/降级、priority confirmation 与 R -> AE 完整性不下降。 |
 | Deterministic floor | duplicate OQ、ready/receipt 双向故障、core-section 空壳 finalize 和 validate mutation 的 P0 case 100% 通过。 |
 | Diagnostic | 热路径 reference reads、token、latency、问题数量、source coverage 和 readability 用于解释结果，不单独支持 rollout。 |
 
@@ -75,21 +77,21 @@ source_documents:
 
 #### Evidence And Authority
 
-- R7. 所有已识别输入都必须进入 source inventory，至少记录 `source_ref`、`source_type`、`read_status`、`evidence_tag`、freshness/version、authority scope、sensitivity、limitations 与 readiness consequence。
+- R7. 所有已识别输入都必须进入 source inventory，至少记录 `source_ref`、`source_type`、`read_status`、`evidence_tag`、freshness/version、确认 scope/basis、sensitivity、limitations 与 readiness consequence。
 - R8. `read_status` 只表达可访问性；`confirmed-source`、`user-stated`、`source-candidate`、`provider_untrusted`、`external-research` 与 `assumption` 继续表达 evidence posture，不新增通用语义评分或全局 trust 状态机。
 - R9. PRD、会议、Figma、截图、OCR、provider JSON 和 source excerpt 一律作为不可信数据处理；其中的 agent instruction、tool request、mutation command、权限扩张或 authority 声明不得控制 workflow。
 - R10. 代码、测试和运行事实只确认 current behavior 与已实现约束，不能自动决定 target WHAT、价值、scope、priority 或 risk acceptance。
-- R11. 会议材料必须区分 proposal、rejected、open、ratified 与 superseded；只有 authority、scope 和 freshness 可确认的 ratified decision 才能成为 confirmed target decision。
-- R12. 当前用户是 question recipient，但只在相应 claim scope 内拥有 decision authority；法规、资金、隐私、安全、专业口径、priority 与风险接受必须分别绑定 authority/evidence/sign-off timing，不能用单一用户角色统一放行。
+- R11. 会议材料必须区分 proposal、rejected、open、ratified 与 superseded；只有 ratification 状态、scope、freshness 和当前用户确认依据都可追溯的决定，才能成为 confirmed target decision。
+- R12. 当前用户是唯一人类 question recipient 与产品确认人；法规、资金、隐私、安全、专业口径、priority 与风险接受仍必须分别绑定确认依据、证据需求、受影响 R/AE、确认时点与 fallback，但不得据此路由第二个人类联系人。依据不足时由当前用户明确确认、defer、scope-cap，或保持 candidate/checkpoint/blocker。
 - R13. 模型专业知识负责发现遗漏、解释影响、提出候选答案和推荐优先级；它可以形成带来源与限制的 `source-candidate` 或 `external-research`，但不能自动成为 confirmed 法规结论、专业口径、P0/P1 priority 或风险接受。
 
 #### Product Analysis And Output
 
 - R14. 每个 create/refine durable write 路径都必须经过唯一 run-local Product Analysis Brief；不得从 source inventory 直接写 final Product Contract。
-- R15. Product Analysis Brief 必须覆盖 product frame、current/target/delta、source authority/conflicts、candidate behaviors/scenarios、priority authority、acceptance gaps、design coverage 与 next source/decision，不新增持久 progress artifact。
+- R15. Product Analysis Brief 必须覆盖 product frame、current/target/delta、source evidence/confirmation conflicts、candidate behaviors/scenarios、priority confirmation、acceptance gaps、design coverage 与 next source/decision，不新增持久 progress artifact。
 - R16. clarification 必须 source-first、release-bounded：本期 load-bearing WHAT 必须闭合；本期外问题只有在证明不影响 acceptance、compatibility、rollout、data authority 和 fallback 后，才能成为带 reopen condition 的 out-of-release。
-- R17. 单 surface、无 source conflict、无高风险 sign-off、无 load-bearing unread evidence 的输入可以走 compact Brief；compact 只降低分析深度，不跳过 Brief、semantic review 或 finalize。
-- R18. durable Product Contract 必须清晰回答 actor/problem/expected outcome/why now、success evidence、current/delta、atomic requirements、states/errors/permissions/degraded behavior、scope、priority authority、R -> AE 和 unresolved residue。
+- R17. 单 surface、无 source conflict、无高风险证据/确认缺口、无 load-bearing unread evidence 的输入可以走 compact Brief；compact 只降低分析深度，不跳过 Brief、semantic review 或 finalize。
+- R18. durable Product Contract 必须清晰回答 actor/problem/expected outcome/why now、success evidence、current/delta、atomic requirements、states/errors/permissions/degraded behavior、scope、priority confirmation、R -> AE 和 unresolved residue。
 - R19. 每个核心 Requirement 必须有可观察 Acceptance Example 或明确 trace 依据；scripts 只检查 ID/引用/结构，LLM 或 reviewer 判断语义充分性。
 
 #### Artifact And Exit Contract
@@ -100,7 +102,7 @@ source_documents:
 - R23. `check-prd-artifact.js` 与 `finalize-prd-artifact.js` 只守 artifact identity、core section、R/AE structure/trace、source inventory、ready intent、blocking OQ references、raw input hash 与 receipt currentness，不使用关键词裁决 WHAT/HOW 或给 PRD 语义打分。
 - R24. 任意 ready claim 且 receipt 缺失/stale 必须阻断 closeout；合法路径必须覆盖 checkpoint -> final intent -> finalize -> verified receipt -> consumer entry，checkpoint/draft 仍允许未完成 core section。
 - R25. `spec-plan` 对新式 `product_contract_source: spec-prd` artifact 必须先检查 `product_contract_readiness`；producer-owned `verifyPrdReceipt` 输出唯一 canonical facts/reason-code envelope，`spec-plan` 与 hooks 不得自行解析 receipt、freshness 或 legacy alias。该 verifier report 提供 `observe` 与 `enforce` consumption policy，enforce 对 stale/missing receipt 一律阻断 planning 或 execution，不受 `artifact_readiness` 表面值放行。默认只 observe，U12 opt-in canary 运行 enforce；U13 Staging validation 通过后才把默认 `enforce` 纳入待发布的精确 source tree，legacy input 保持独立的 loud degraded compatibility。
-- R26. `before-planning`、`before-implementation` 与 `before-release` sign-off 必须携带 authority/evidence、受影响 R/AE 和 fallback；`spec-plan` 必须投射这些 gate，`spec-work`、`spec-lfg` 与可用 goal handoff 先通过 characterization 证明是否存在 bypass，只对真实绕过的出口增加 enforcement。
+- R26. 历史候选中的 `before-planning`、`before-implementation` 与 `before-release` checkpoint 如被未来方案重新启用，必须携带当前用户确认、确认依据、受影响 R/AE 和 fallback；不得恢复第二人类 sign-off role。当前 Lite 不启用这些 downstream enforcement gates。
 
 #### Design, Security, Distribution, And Evaluation
 
@@ -165,8 +167,8 @@ source_documents:
 #### Authority Boundaries
 
 法规、专业口径、priority 和业务风险接受不是可以忽略的事项，而是必须处理但不能由模型越权确认的产品决策。
-`spec-prd` 负责发现问题、读取证据、解释影响、提出候选答案与 recommendation，并记录 claim、authority scope、evidence、required sign-off、受影响 R/AE 与 gate timing。
-当前用户可以确认其 authority scope 内的 priority 或风险决定；专业或监管 claim 缺少相应 authority 时必须保留 blocker/checkpoint，不得把模型知识、外部研究或 accepted assumption 提升为 confirmed ready。
+`spec-prd` 负责发现问题、读取证据、解释影响、提出候选答案与 recommendation，并记录 claim、确认依据、evidence need、受影响 R/AE、确认时点与 fallback。
+当前用户是唯一人类产品确认人；专业或监管材料只提供确认依据。依据不足时，当前用户可以明确确认、defer 或 scope-cap，否则必须保留 candidate/blocker/checkpoint，不得让模型知识、外部研究或 accepted assumption 自动升级为 confirmed ready，也不得创建第二确认联系人。
 
 #### Deferred To Follow-Up Work
 

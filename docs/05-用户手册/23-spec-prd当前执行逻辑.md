@@ -12,7 +12,9 @@
 
 只有调用中显式包含 `analysis_profile=contract-reset-lite` 时才进入 Lite；普通的“精简 PRD”“少问一些”或“缩短流程”不会自动启用。默认执行逻辑保持不变。
 
-Lite 只改变 run-local 分析形状：用一个 Product Analysis Brief 同时承载 Requirement Analysis Gate、产品风险排序和 Push-Right owner checkpoint。Brief 覆盖 product frame、current/target/delta、source inventory、claim-specific authority、候选行为、priority authority、R/AE gap、design coverage、下一 source/decision 和 closure summary；只在 Brief 发现 domain、持续访谈、设计或 large-input trigger 时加载对应深层 reference。
+Lite 只改变 run-local 分析形状：用一个 Product Analysis Brief 同时承载 Requirement Analysis Gate、产品风险排序和 Push-Right owner checkpoint。Brief 覆盖 product frame、current/target/delta、source inventory、确认依据与冲突、候选行为、priority confirmation、R/AE gap、design coverage、下一 source/当前用户决定和 closure summary；只在 Brief 发现 domain、持续访谈、设计或 large-input trigger 时加载对应深层 reference。
+
+当前执行对话的用户是唯一人类产品确认人。法规、隐私、安全、资金和专业材料只作为确认依据，不会产生第二个人类联系人；独立 planner/reviewer 只用于评估 Lite 效果。依据不足时，当前用户可以明确确认、defer、scope-cap，或让 PRD 保持 `source-candidate` / assumption / blocker 与 reopen condition，LLM 不得代为确认。
 
 Lite 不改变 durable contract：仍写 `docs/brainstorms/*-requirements.md`，继续使用现有 Decision Card、唯一 OQ schema、checker/finalizer 和 producer receipt；`validate` 仍为零 mutation，`spec-plan --verify-receipt` 仍是可选诊断。它不会创建 Product Analysis artifact、unified-plan sibling、migration manifest、mandatory consumer gate 或 generated runtime patch。
 
@@ -29,8 +31,8 @@ Lite 不改变 durable contract：仍写 `docs/brainstorms/*-requirements.md`，
 
 | 责任方 | 负责 | 不负责 |
 | --- | --- | --- |
-| 当前执行对话的用户 | 回答无法由 source 关闭的产品 WHAT、范围、默认行为、验收与风险取舍；可以回答“不知道”、接受假设、hard-cap 或 defer | 不需要被 workflow 路由到第二个人类联系人 |
-| LLM / agent | 需求理解、source-first 查证、WHAT/HOW 判断、风险排序、问题生成、PRD 语义充分性和 handoff 判断 | 不编造测试、receipt 或 confirmed evidence |
+| 当前执行对话的用户 | 唯一确认产品决定；回答无法由 source 关闭的产品 WHAT、范围、默认行为、验收与风险取舍；可以基于正式 source 确认、明确自行确认、回答“不知道”、接受假设、hard-cap 或 defer | 不需要被 workflow 路由到第二个人类联系人 |
+| LLM / agent | 需求理解、source-first 查证、WHAT/HOW 判断、风险排序、问题生成、推荐、PRD 语义充分性和 handoff 判断 | 不确认产品决定，不编造测试、receipt 或 confirmed evidence |
 | checker / finalize scripts | 字段组合、section identity、trace、hash、receipt、reason code 和其他确定性不变量 | 不判断哪个需求更重要，也不判断产品语义是否充分 |
 | `SKILL.md` | 唯一拥有 Template Trigger Map、surface 与 overlay 选择语义 | 不复制完整正文模板 |
 | `prd-output-template.md` | machine-safe output contract、machine sections、模板组合顺序与唯一 canonical Outstanding Questions schema | 不维护第二套 surface/overlay routing map，也不让 generic/surface template 各自定义 OQ schema |
@@ -149,7 +151,7 @@ flowchart TD
 
 Product Expert Lens 只排序 PRD-owned、load-bearing WHAT gap。source 可以回答的项先查 source，不询问用户；不会改变产品行为、范围、验收或 source-of-truth 的纯 HOW，进入 Planning Recheck 或 implementation-only HOW pushdown。
 
-必须由人类回答时，一次只向当前执行对话的用户提出一个最高风险问题。兼容字段中的 `owner`、`ask-owner`、`Owner Decision Trace` 和 `owner-capped` 都映射到当前执行对话用户，不建立外部联系人识别或第二问答路由。用户回答“不知道”或暂不裁决时，保留 checkpoint / Outstanding Question，不伪造 closure。
+必须由人类回答时，一次只向当前执行对话的用户提出一个最高风险问题。兼容字段中的 `owner`、`ask-owner`、`Owner Decision Trace`、`owner-capped`、专业意见或会签材料都映射为当前用户的确认入口或其确认依据，不建立外部联系人识别或第二问答路由。用户回答“不知道”或暂不裁决时，保留 checkpoint / Outstanding Question，不伪造 closure。
 
 ### 5. Decision Card 与写入路径
 

@@ -2763,11 +2763,13 @@
       "input_shape": "A brownfield PRD authoring request explicitly includes analysis_profile=contract-reset-lite and provides a rough PRD, current source, and one ratified meeting decision.",
       "expected": [
         "one run-local Product Analysis Brief represents analysis gate, product risk ranking, and owner checkpoint",
-        "source inventory records read status, evidence posture, freshness, authority scope, limitation, and affected PRD write target",
+        "source inventory records read status, evidence posture, freshness, confirmation scope and basis, limitation, and affected PRD write target",
+        "all human product confirmation routes only to the current user while specialist material remains evidence",
         "the durable output remains docs/brainstorms/*-requirements.md and uses the existing Decision Card, checker, finalizer, and producer receipt"
       ],
       "must_not": [
         "must not create a second Product Analysis artifact or unified-plan sibling",
+        "must not route a question or confirmation to a second human contact",
         "must not enable a mandatory spec-plan receipt gate",
         "must not promote the historical Contract Reset candidate"
       ],
@@ -2811,7 +2813,7 @@
       "expected": [
         "the Lite Brief is a report structure only",
         "checker and receipt verification remain read-only facts",
-        "the report names the next source or claim-specific authority decision"
+        "the report names the next source or current-user confirmation"
       ],
       "must_not": [
         "must not write, rewrite, finalize in write mode, or materialize provider output",
@@ -2822,6 +2824,31 @@
         "contract-reset-lite",
         "validate",
         "mutation-boundary"
+      ]
+    },
+    {
+      "id": "contract-reset-lite-specialist-evidence-single-confirmer",
+      "intent": "refine",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "brownfield-refine"
+      ],
+      "input_shape": "A Lite PRD contains a privacy or regulatory claim backed only by an advisory specialist note, with no formal project source. The current user is the sole product confirmer.",
+      "expected": [
+        "the specialist note remains evidence or source-candidate rather than a second confirmation role",
+        "the only human confirmation route is the current user",
+        "the current user may explicitly confirm, defer, scope-cap, or keep a blocker with a reopen condition"
+      ],
+      "must_not": [
+        "must not route the question to a named specialist or other human contact",
+        "must not let the LLM automatically confirm the professional claim",
+        "must not mark final-prd while the current user leaves the load-bearing claim unresolved"
+      ],
+      "coverage_tags": [
+        "contract-reset-lite",
+        "single-human-confirmer",
+        "source-authority",
+        "closure-boundary"
       ]
     }
   ],
