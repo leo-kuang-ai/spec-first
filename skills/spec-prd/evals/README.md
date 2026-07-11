@@ -7,7 +7,7 @@ This directory is source-only maintainer evidence and is intentionally excluded 
 - `evaluation-governance.md` records maturity, evidence labels, review cadence, and promotion boundaries.
 - `contract-reset-protocol.md` 与 `contract-reset-cases.json` 冻结 Gate A 三臂、case role、material-effect、complexity、session/order、isolation、retention 和 no-go/inconclusive 合同。
 - `contract-reset-candidate.patch` 是 eval-only candidate；它只在隔离 materialized tree 中应用，不是默认 source/runtime patch。
-- `run-contract-reset-arm.js` 是 source materialization、fresh arm session 与 active hard-isolation probe 的唯一 owner；硬隔离不可证明时不调用模型。
+- `run-contract-reset-arm.js` 是 source materialization、fresh arm session 与 active hard-isolation probe 的唯一 owner；macOS probe 通过 `/usr/bin/sandbox-exec` 启动最小 `/usr/bin/perl` errno helper，只开放系统运行库、dyld shared-cache namespace、当前 arm namespace 与 probe output，五类读取必须取得真实 `EPERM`/`EACCES`；任一 primitive/helper/deny fact 不可证明时不调用模型。
 - `prepare-contract-reset-evidence.js` 确定性生成 arm-neutral blind packet、private retained evidence 与 hashes；它拒绝 symlink ancestor、非法 UTF-8、quoted credential、未绑定 arm/session/tree/model-visible provenance 和越界/重叠 raw cleanup target。Enclosing run audit 会按原 run-relative path 保留每个 completed session 的 retained manifest、sanitized Product Contract、blind packet、event log 与 grading notes，并逐文件标注 hash/artifact type。
 
 Run the deterministic fixture check from the repository source checkout:

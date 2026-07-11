@@ -13,9 +13,11 @@ const {
 const {
   assertNoSensitiveContent,
   computeTreeHash,
+  createRootContext,
   ensurePrivateDir,
   isWithinRoot,
   opaqueNamespaceId,
+  resolveConfinedPath,
   writePrivateFile,
 } = require('./lib/contract-reset-safety');
 const {
@@ -341,12 +343,34 @@ function prepareArmNamespace(options) {
 function detectIsolationPrimitive() {
   if (process.platform === 'darwin') {
     const command = '/usr/bin/sandbox-exec';
+    const probeCommand = '/usr/bin/perl';
     try {
       fs.accessSync(command, fs.constants.X_OK);
-      return { status: 'available', id: 'macos-sandbox-exec', command };
     } catch (_error) {
-      // Fall through to the explicit unavailable result.
+      return {
+        status: 'unavailable',
+        id: null,
+        command: null,
+        reason_code: 'hard_isolation_unavailable',
+      };
     }
+    try {
+      fs.accessSync(probeCommand, fs.constants.X_OK);
+    } catch (_error) {
+      return {
+        status: 'unavailable',
+        id: 'macos-sandbox-exec',
+        command,
+        probe_command: null,
+        reason_code: 'isolation_probe_helper_unavailable',
+      };
+    }
+    return {
+      status: 'available',
+      id: 'macos-sandbox-exec',
+      command,
+      probe_command: probeCommand,
+    };
   }
   return {
     status: 'unavailable',
@@ -361,14 +385,12 @@ function sandboxLiteral(value) {
 }
 
 function macSandboxProfile(namespaceRoot, outputDir) {
-  const executable = fs.realpathSync.native(process.execPath);
-  const executableDir = path.dirname(executable);
   const readRoots = [
     '/System/Library',
     '/usr/lib',
     '/usr/share',
-    '/private/var/db/dyld',
-    executableDir,
+    '/usr/bin',
+    '/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld',
     namespaceRoot,
   ];
   return [
@@ -379,8 +401,8 @@ function macSandboxProfile(namespaceRoot, outputDir) {
     '(allow sysctl-read)',
     '(allow mach-lookup)',
     '(allow file-read-metadata)',
+    '(allow file-read-data (literal "/") (literal "/System/Volumes/Preboot/Cryptexes/OS"))',
     `(allow file-read* ${readRoots.map((root) => `(subpath ${sandboxLiteral(root)})`).join(' ')})`,
-    `(allow file-read* (literal ${sandboxLiteral(executable)}))`,
     `(allow file-write* (subpath ${sandboxLiteral(outputDir)}))`,
     '(allow file-read* file-write* (literal "/dev/null"))',
   ].join('\n');
@@ -441,7 +463,7 @@ function runIsolationProbe(options) {
       ...base,
       artifact_type: 'degraded',
       status: 'inconclusive',
-      reason_code: 'hard_isolation_unavailable',
+      reason_code: primitive.reason_code || 'hard_isolation_unavailable',
     };
   }
   if (!ISOLATION_PRIMITIVE_SET.has(primitive.id)) {
@@ -453,38 +475,79 @@ function runIsolationProbe(options) {
     };
   }
 
-  const namespaceRoot = path.resolve(options.namespaceRoot);
-  const probeRoot = path.join(namespaceRoot, '.isolation-probe');
-  const outputDir = path.join(probeRoot, 'output');
+  const namespace = createRootContext(path.resolve(options.namespaceRoot), 'isolation namespace');
+  const namespaceRoot = namespace.real;
+  const probeRoot = resolveConfinedPath(
+    namespace,
+    '.isolation-probe',
+    'isolation probe root',
+    { mustExist: false },
+  );
+  const outputDir = resolveConfinedPath(
+    namespace,
+    '.isolation-probe/output',
+    'isolation probe output',
+    { mustExist: false },
+  );
   ensurePrivateDir(outputDir);
-  const resultPath = path.join(outputDir, 'result.json');
-  const probeScript = path.join(probeRoot, 'probe.js');
+  const canonicalProbeRoot = fs.realpathSync.native(probeRoot);
+  const canonicalOutputDir = fs.realpathSync.native(outputDir);
+  resolveConfinedPath(
+    namespace,
+    '.isolation-probe/output/result.json',
+    'isolation probe result',
+    { mustExist: false },
+  );
+  resolveConfinedPath(
+    namespace,
+    '.isolation-probe/probe.pl',
+    'isolation probe script',
+    { mustExist: false },
+  );
+  const resultPath = path.join(canonicalOutputDir, 'result.json');
+  const probeScript = path.join(canonicalProbeRoot, 'probe.pl');
   const targets = buildIsolationTargets(options);
   writePrivateFile(probeScript, [
-    "'use strict';",
-    "const fs = require('node:fs');",
-    'const targets = JSON.parse(process.argv[2]);',
-    'const resultPath = process.argv[3];',
-    'const probes = {};',
-    'for (const [name, target] of Object.entries(targets)) {',
-    '  try {',
-    '    fs.readFileSync(target);',
-    "    probes[name] = { denied: false, code: 'read-succeeded' };",
-    '  } catch (error) {',
-    "    const code = error && error.code ? error.code : 'unknown-error';",
-    "    probes[name] = { denied: code === 'EACCES' || code === 'EPERM', code };",
+    'use strict;',
+    'use warnings;',
+    `my @names = qw(${ISOLATION_PROBE_NAMES.join(' ')});`,
+    'my $result_path = pop @ARGV;',
+    'die "unexpected probe target count" unless @ARGV == @names;',
+    'my @rows = ();',
+    'for (my $index = 0; $index < @names; $index += 1) {',
+    '  my $target = $ARGV[$index];',
+    '  my ($denied, $code);',
+    '  if (open(my $handle, "<", $target)) {',
+    '    my $buffer;',
+    '    my $read = sysread($handle, $buffer, 1);',
+    '    if (defined $read) {',
+    '      $denied = "false";',
+    '      $code = "read-succeeded";',
+    '    } else {',
+    '      my $errno = 0 + $!;',
+    '      $denied = ($errno == 1 || $errno == 13) ? "true" : "false";',
+    '      $code = $errno == 1 ? "EPERM" : ($errno == 13 ? "EACCES" : "ERRNO_$errno");',
+    '    }',
+    '    close($handle);',
+    '  } else {',
+    '    my $errno = 0 + $!;',
+    '    $denied = ($errno == 1 || $errno == 13) ? "true" : "false";',
+    '    $code = $errno == 1 ? "EPERM" : ($errno == 13 ? "EACCES" : "ERRNO_$errno");',
     '  }',
+    '  push @rows, "\\\"$names[$index]\\\":{\\\"denied\\\":$denied,\\\"code\\\":\\\"$code\\\"}";',
     '}',
-    "fs.writeFileSync(resultPath, `${JSON.stringify(probes)}\\n`, 'utf8');",
+    'open(my $output, ">", $result_path) or die "cannot write probe result: $!";',
+    'print $output "{" . join(",", @rows) . "}\\n";',
+    'close($output);',
   ].join('\n'));
 
-  const profile = macSandboxProfile(namespaceRoot, outputDir);
+  const profile = macSandboxProfile(namespaceRoot, canonicalOutputDir);
   const result = spawnSync(primitive.command, [
     '-p',
     profile,
-    fs.realpathSync.native(process.execPath),
+    primitive.probe_command,
     probeScript,
-    JSON.stringify(targets),
+    ...ISOLATION_PROBE_NAMES.map((name) => targets[name]),
     resultPath,
   ], {
     cwd: namespaceRoot,

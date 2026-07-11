@@ -10,7 +10,9 @@
 
 Gate A 未取得合规 outcome evidence，不能通过。
 
-Source-owned runner 在 review follow-up 后重新冻结并重建 baseline、Phase 1-fixed control 与 eval-only candidate，生成 54 条 fresh-session/balanced-order schedule，并在 private run directory 中执行第一条 preflight。当前 macOS 可发现 `/usr/bin/sandbox-exec`，但 active probe process 仍以 `SIGABRT` 终止，未形成绝对路径、父目录、symlink、control plane 与 sibling arm read 的真实 deny facts。Runner 因此保持 `model_invoked: false`。
+Source-owned runner 在 review follow-up 后重新冻结并重建 baseline、Phase 1-fixed control 与 eval-only candidate，生成 54 条 fresh-session/balanced-order schedule，并在 private run directory 中执行第一条 preflight。`attempt-002` 当时的 macOS active probe process 以 `SIGABRT` 终止，未形成绝对路径、父目录、symlink、control plane 与 sibling arm read 的真实 deny facts。该 attempt 的 runner 因此保持 `model_invoked: false`；这些 retained facts 是不可追溯升级的历史证据。
+
+后续 source 修复已定位并解除本机 isolation blocker：旧 probe 在 sandbox 内启动 Homebrew Node，macOS 26 dyld 先因 `/` 与 Cryptex shared-cache 入口不可读而 abort；继续放开后还会要求 Homebrew Cellar dylib 与 OpenSSL 配置，扩大非必要读取面。当前 runner 改用系统 `/usr/bin/perl` 最小 errno helper，并仅补 dyld 所需系统 namespace；本机 fresh integration probe 的五类读取均返回真实 `EPERM`。这只确认当前 source 的 isolation deterministic floor，不属于 `attempt-002`，也不创建或授权新的 Gate A attempt。
 
 同一 attempt 也没有独立于实现者身份的 custody primitive；`promotion-holdout-commitment.json` 诚实记录 `commitment_status: unavailable`，未创建同用户可读的伪 sealed bundle。
 
@@ -78,7 +80,9 @@ structural_reason_codes=none
 | Model invocation | `false` | confirmed deterministic fact |
 | Holdout custody | independent boundary unavailable | confirmed limitation |
 
-Binary presence 不是 runtime enforcement readiness。因为 hard-isolation floor 未通过，runner 没有调用模型；这不是 arm fail，而是 Gate A infrastructure `inconclusive`。
+上表只描述 `attempt-002`。Binary presence 不是 runtime enforcement readiness；该 attempt 因 hard-isolation floor 未通过而没有调用模型，这不是 arm fail，而是 Gate A infrastructure `inconclusive`。
+
+当前 source 的独立 follow-up probe 为 `confirmed` / `passed`：absolute、parent traversal、external symlink、control plane 与 sibling arm 五项均得到 `EPERM`，且 `model_invoked: false`。该结果证明 isolation probe 修复，不证明模型 outcome、blind review、holdout commitment 或 Gate A 通过。
 
 ## Gate A 判定
 
@@ -90,7 +94,7 @@ Binary presence 不是 runtime enforcement readiness。因为 hard-isolation flo
 | Core product quality 持平且无新 fail | 未判定 | 无 blind packet/reviewer result。 |
 | Critical / Non-regression 零失败 | 未判定 | 无 outcome。 |
 | Complexity budget | candidate declaration 可审计；未形成 outcome verdict | 不能单独授权继续。 |
-| Isolation / identity contamination | 不通过 precondition | deny facts 缺失。 |
+| Isolation / identity contamination | attempt-002 不通过；当前 source 本机 probe 已修复 | 历史 attempt deny facts 缺失且不可追溯升级；当前 source 五项 deny facts 不替代新 attempt 证据。 |
 | Independent replay | deterministic materialization replay tests 通过；真实模型 case replay 未执行 | infrastructure proof 不能替代 outcome replay。 |
 | Promotion holdout commitment | 不可用 | 无独立 custody boundary。 |
 
@@ -116,15 +120,20 @@ Binary presence 不是 runtime enforcement readiness。因为 hard-isolation flo
 - `node skills/spec-prd/evals/run-evals.js --run-dir docs/validation/spec-prd/2026-07-11-gate-a-attempt-002 --require-run-audit --json`：deterministic run contract 与 enclosing audit manifest passed，Gate A inconclusive。
 - `node skills/spec-prd/evals/prepare-contract-reset-evidence.js --run-audit ... --cleanup`：7 个 typed durable audit files 生成，native namespace/control 临时内容已删除。
 
+以上命令与计数属于 `attempt-002` 及其 review follow-up。Isolation 修复后的新增验证记录：
+
+- `npx jest --runTestsByPath tests/integration/spec-prd-contract-reset-isolation.integration.test.js --runInBand`：1 suite / 5 tests passed；覆盖 command/helper unavailable、execution failure、output symlink confinement 与本机五项真实 deny facts，不能把 execution failure 或 namespace 外写入降级后放行。
+- final direct probe fixture：`artifact_type: confirmed`、`status: passed`、`reason_code: isolation_probe_passed`、`exit_code: 0`；absolute、parent traversal、symlink、control 与 sibling 五项均为 `{ denied: true, code: EPERM }`，且 `model_invoked: false`。
+
 ## Reopen Conditions
 
-只有同时取得以下新证据，才能建立新 attempt 并重开 Gate A：
+只有在新 attempt 中同时取得以下证据，才能重开 Gate A：
 
-1. source-owned launcher 可在同一 fresh generic-agent invocation 中使用真实 hard sandbox/namespace；五类 active probes 全部产生 deny facts；
+1. source-owned launcher 可在同一 fresh generic-agent invocation 中使用真实 hard sandbox/namespace；五类 active probes 全部产生 attempt-bound deny facts（当前 source 已通过本机前置验证，但尚未建立新 attempt）；
 2. 生成 Agent 不可访问 control plane、sibling arms、历史 session/output/cache；
 3. 独立 custodian 提交与实现者身份隔离的 sealed-holdout commitment；
 4. 每 arm/case ≥3 runs，原 run sanitized Product Contract/blind packet、event、grade 与 hashes 可持久审计；
 5. 另一名 operator 可按 protocol 重放至少一个真实 case；
 6. blind reviewer 与 owner 对 material effect、core product quality、critical/Non-regression 和 complexity 给出绑定 retained-evidence hashes 的裁决。
 
-在此之前，本计划按“Gate A 未通过/不合规”合法结束于 Phase 1 + U6 evidence，不实施 U7-U13。
+当前缺少第 3 项 independent holdout custody，因此不得建立新 attempt。Gate A 继续按“未通过/不合规”合法结束于 Phase 1 + U6 evidence，不实施 U7-U13。
