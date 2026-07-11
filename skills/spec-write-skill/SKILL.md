@@ -19,13 +19,11 @@ description: 公开 workflow：创建、修改、迁移或只读验证项目拥�
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
 
-## Effects
+## Operation Model
 
-- `create`：在授权 repo 创建 project-owned Skill。
-- `revise`：修改 canonical source 已确认的 Skill。
-- `migrate`：仅限同 repo trusted source；未知文件逐项 `preserve|translate|drop-with-reason|manual-decision`。
-- `audit-remediation`：只实现用户已接受 findings；audit-only 保持只读。
-- `validate-only`：检查 readiness；必须零写入、零执行目标 package 代码。
+- `base_operation=create|revise`：创建 project-owned Skill，或修改 canonical source 已确认的 Skill。
+- `effect=apply|validate-only`：apply 才允许在 preview 与授权后写 source；validate-only 必须零写入、零执行目标 package 代码。
+- `modifier=migrate|audit-remediation|none`：migrate 仅限同 repo trusted source；audit-remediation 只实现用户已接受 findings。Modifier 只改变输入分析和 disposition，不形成独立 workflow/effect；audit-only 保持 near-neighbor 只读审查。
 
 ## Hard Boundaries
 
@@ -38,10 +36,10 @@ Overrides: none
 
 ## Workflow
 
-1. **Qualify.** 读取 [Authoring Method](references/authoring-method.md) 的 Qualification，确定 recurring job、输出、near-neighbor、effect、target repo/root、source owner 和授权；不值得 authoring 时直接路由。
+1. **Qualify.** 读取 [Authoring Method](references/authoring-method.md) 的 Qualification，确定 recurring job、输出、near-neighbor、base operation、effect、modifier、target repo/root、source owner 和授权；不值得 authoring 时直接路由。
 2. **Resolve ownership.** 目标不唯一、跨 repo、generated-only 或 containment 未确认时保持 preview/readiness，禁止 mutation。
 3. **Inventory first.** 对现有/外部 package，从当前已加载 Skill root 运行 `node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json`。它 no-follow、零执行；`incomplete` 阻止完成声明。
-4. **Author portable core.** Create/revise/migrate 时读取 [Authoring Method](references/authoring-method.md) 的 Authoring Core：先写 trigger/branches，再分配主文件、条件 references、deterministic scripts、assets 和 maintainer-only evals，并删除 no-op。
+4. **Author portable core.** `base_operation=create|revise` 且 `effect=apply` 时读取 [Authoring Method](references/authoring-method.md) 的 Authoring Core：先写 trigger/branches，再分配主文件、条件 references、deterministic scripts、assets 和 maintainer-only evals，并删除 no-op。Migration/remediation modifier 只补充 preserve/translate/finding disposition。
 5. **Load profiles conditionally.** 有真实宿主差异时读 [Target Profiles](references/target-profiles.md)；有本地治理/catalog/generator 时读 [Project Profiles](references/project-profiles.md)。Portable-only 分支不读取或复制 profile 细节。
 6. **Preview and apply.** 列出 patch、preserved files、generated outputs 与不改 surfaces；授权和 containment 仍成立才写入。迁移默认保留未知 metadata/sidecar。
 7. **Validate by risk.** 读取 [Delivery Gates](references/delivery-gates.md)，运行 bundled validator 和项目最窄 tests。Target-provided validator 不运行；复杂 prose 补 fresh-source sample，fixture 不能替代。

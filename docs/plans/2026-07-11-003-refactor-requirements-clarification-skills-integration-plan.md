@@ -112,12 +112,12 @@ flowchart TB
 
 - R25. 视觉辅助只在 source 与文本对话无法充分表达、答案可能改变 R/AE/Scope、且当前用户明确选择 visual path 时触发；一次只回答一个具名问题，不提供隐含的 interactive/dynamic 升级选项。
 - R26. 复用 `skills/spec-brainstorm/references/visual-probes.md` 与现有 display helper，不新增 skill、server、registry、packet schema 或 browser-to-agent channel。
-- R27. artifact 只允许 deterministic allowlist tokenizer 验证过的静态 HTML/CSS fragment 和 synthetic/sanitized data。允许集合仅覆盖展示型语义/布局标签，以及 `class`、`id`、`role`、`aria-*`、受 CSP 约束的 inline style；artifact 不允许 button、input、select、textarea、anchor、`tabindex` 或其他交互/可聚焦节点。所有 URL-bearing attribute 与不在 allowlist 的 tag/attribute 都拒绝。禁止 agent-authored JavaScript、`<script>`、事件处理属性、`javascript:`、meta refresh、form、anchor、frame/object、download 和动态 import。helper-owned refresh script 与 artifact 内容分离，只能访问 same-origin `/version`；现有 helper 无条件移除 `/files` route。响应前先以 `stat` 拒绝超过 512 KiB 的 artifact，tokenizer 最多处理 20,000 个 token、单元素 32 个属性、64 层嵌套和 500 ms 校验预算，任一超限即 fail closed、停止 helper 并清理 run root。
-- R28. helper 只绑定 `127.0.0.1` 或 `::1`；非 loopback `--host` 必须 fail closed 并回退文本。`Host` 必须与实际绑定的 loopback 地址和端口精确匹配，IPv6 使用规范化方括号形式；存在 `Origin` 时必须与返回 URL 同源，无 `Origin` 只允许 `GET`/`HEAD` 顶层导航；authority 不一致的 absolute-form request 一律拒绝，且不发送 CORS 许可头。不提供 LAN/remote serving，也不把返回的 localhost URL 描述为远程可达。
+- R27. artifact 只允许 deterministic allowlist tokenizer 验证过的静态 HTML/CSS fragment 和 synthetic/sanitized data。`screen_dir` 只允许固定 `current.html` artifact slot；producer 先在同目录写私有临时文件，校验通过后原子替换 `current.html`，响应路径不得枚举或排序目录，发现任何额外目录项即 fail closed。允许集合仅覆盖展示型语义/布局标签，以及 `class`、`id`、`role`、`aria-*`、受 CSP 约束的 inline style；artifact 不允许 button、input、select、textarea、anchor、`tabindex` 或其他交互/可聚焦节点。所有 URL-bearing attribute 与不在 allowlist 的 tag/attribute 都拒绝。禁止 agent-authored JavaScript、`<script>`、事件处理属性、`javascript:`、meta refresh、form、anchor、frame/object、download 和动态 import。helper-owned refresh script 与 artifact 内容分离，只能访问 same-origin `/version`；现有 helper 无条件移除 `/files` route。响应前先以 `stat` 拒绝超过 512 KiB 的 artifact，tokenizer 最多处理 20,000 个 token、单元素 32 个属性、64 层嵌套和 500 ms 校验预算，任一超限即 fail closed、停止 helper 并清理 run root。
+- R28. helper 只绑定 `127.0.0.1` 或 `::1`；非 loopback `--host` 必须 fail closed 并回退文本。`Host` 必须与实际绑定的 loopback 地址和端口精确匹配，IPv6 使用规范化方括号形式；存在 `Origin` 时必须与返回 URL 同源。无 `Origin` 时，根页面只接受 `GET`/`HEAD` 且 `Sec-Fetch-Mode: navigate`、`Sec-Fetch-Dest: document` 的导航；`/version` 只接受 `GET`/`HEAD`、`Sec-Fetch-Site: same-origin`，且 mode/dest 与同源 fetch 一致的请求。iframe、image、script、跨站 subresource、Fetch Metadata 缺失或矛盾、authority 不一致的 absolute-form request 一律拒绝，且不发送 CORS 许可头。不提供 LAN/remote serving，也不把返回的 localhost URL 描述为远程可达。
 - R29. helper-owned `start` 不再接受调用方指定的任意 root，而是在 OS temp 下用不可预测的 `mkdtemp` 创建 run root，并返回 `root`、`screen_dir` 与 `state_dir`；producer 只向返回的 `screen_dir` 写 artifact，`status`/`stop` 只接受 helper 返回的 root。目录权限为 `0700`、文件权限为 `0600`；读取前校验 owner、realpath、symlink、regular-file 与允许的 artifact type。裁决、取消、idle、owner 退出和 error 后递归清理 run root，不建设通用 cleanup ledger。
 - R30. HTML、状态和拒绝响应使用经过测试的 restrictive CSP/sandbox、no-referrer、no-sniff、Permissions-Policy、`Cache-Control: no-store`、`Pragma: no-cache` 与 `Expires: 0`。CSP 只允许 helper-owned inline refresh、inline style、data image 和 same-origin `/version`；artifact validation 与 headers 是互补的 deterministic floor，不能只靠作者自觉或正则关键词扫描。
-- R31. 静态页面保留现有 waiting/ready 与自动 reload，新增用户可见的 refreshing、refresh-failed、artifact-rejected 和 helper-unavailable 状态。每个状态必须定义触发条件、可见说明、live-region 播报、恢复动作和返回 chat/blocker 的出口。artifact 本身不包含可聚焦控件；若 helper shell 提供重试等 helper-owned 控件，必须单独满足键盘操作、可见 focus、可访问名称和状态播报。页面同时满足语义结构、DOM 阅读顺序、非颜色唯一信号、reduced-motion 和窄视口基线。chat 中当前用户的 response 才构成人类产品确认。
-- R32. 没有 current-user response、浏览器能力、可安全构造的 synthetic artifact 或 helper deterministic floor 时，回退文本并保持 unresolved/inconclusive；不得声称已运行。动态问题若能安全重述为具名静态状态比较，可先展示静态并列或序列；只有实际状态切换对裁决不可替代、静态比较仍不足，或问题必须读取真实应用状态、执行 repo command、访问 external network 或修改真实工作树时，才回退文本并保留 blocker / future experiment candidate。
+- R31. 静态页面保留现有 waiting/ready 与自动 reload，新增用户可见的 refreshing、refresh-failed 和 artifact-rejected 状态，并按 Static Visual Decision Aid Contract 的状态转换表实现。artifact 本身不包含可聚焦控件；若 helper shell 提供重试等 helper-owned 控件，必须单独满足键盘操作、可见 focus、可访问名称和状态播报。页面同时满足语义结构、DOM 阅读顺序、非颜色唯一信号、reduced-motion 和窄视口基线。chat 中当前用户的 response 才构成人类产品确认。
+- R32. 没有 current-user response、浏览器能力、可安全构造的 synthetic artifact 或 helper deterministic floor 时，回退文本并保持 unresolved/inconclusive；不得声称已运行。`start`/bind/status 失败、browser capability 不可用或 URL 无法交付时，`helper-unavailable` 只作为 producer-owned chat fallback：输出具名原因，停止并清理可用的 run root，回退文本并保留 blocker，不伪造 helper-served 页面状态。动态问题若能安全重述为具名静态状态比较，可先展示静态并列或序列；只有实际状态切换对裁决不可替代、静态比较仍不足，或问题必须读取真实应用状态、执行 repo command、访问 external network 或修改真实工作树时，才回退文本并保留 blocker / future experiment candidate。
 
 **`spec-plan` 消费**
 
@@ -183,7 +183,7 @@ flowchart TB
 - AE7. **术语冲突。** 假设 `CONCEPTS.md` 与规范 glossary 定义冲突；producer 暴露冲突并在当前制品内消歧，不静默修改任一项目文件。
 - AE8. **Promotion 授权。** 假设术语已经在 PRD 内闭合；当前用户只确认术语含义、未批准项目级写入，或无法声明其对目标 path 的 mutation authority 时，`CONTEXT.md` 保持不变。即使用户批准，preview 缺少 provenance、适用范围、真实 consumer、复用理由或 invalidation condition 时也只保留 PRD-local，不提升为 durable knowledge。
 - AE9. **静态视觉。** 假设用户比较三个布局；使用现有 display-only visual probe，不创建可运行探针合同。
-- AE10. **动态问题降级。** 假设用户必须实际切换状态才能判断交互；本轮不生成 agent-authored JavaScript，而是展示具名状态的静态并列/序列视图，若仍不足则回退文本并保持 blocker。
+- AE10. **动态问题降级。** 假设动态问题可安全重述为具名状态比较；本轮不生成 agent-authored JavaScript，而是展示静态并列/序列视图。若静态比较仍不足或实际状态切换对裁决不可替代，则回退文本并保持 blocker。
 - AE11. **无浏览器能力。** 宿主无法稳定显示 localhost artifact 时，回退文本讨论并保持问题 unresolved，不声称 probe 已运行。
 - AE12. **展示边界。** 非 loopback host、artifact validation 失败、temp root/权限不满足，或问题必须由 visual artifact 读取真实 repo state、运行应用时，本计划 fail closed 到文本路径，不创建 worktree 或直接执行命令；producer 仍可在主 workflow 中读取 source 来回答 source fact。
 - AE13. **Legacy consumer control。** PRD 声明 checkpoint 或 `can_enter_spec_plan: no` 时，`spec-plan` 默认返回 `spec-prd`；只有当前用户逐项接受 assumption/decision 后才能继续。
@@ -194,14 +194,14 @@ flowchart TB
 
 ### Success Criteria
 
-- U0 在任何目标 source mutation 前冻结 case/source hashes、rubric、主指标与 countermetrics；0→1、独立 1→10 和 10→100 三条路径必须分别相对各自 baseline 有可举证的 load-bearing WHAT invention 减少，且额外 rounds/token/latency、错误 blocker、artifact size 等 countermetrics 不退化。
+- U0 在任何目标 source mutation 前冻结 case/source hashes、rubric、主指标与 countermetrics。对 0→1、独立 1→10 和 10→100 分别判断 baseline headroom：存在非零 load-bearing WHAT invention 的路径必须证明减少；baseline 为零或未发现该 failure signal 的路径改为 no-regression，并验证该路径本轮实际承载的 promotion、compatibility 或 handoff claim。所有路径的额外 rounds/token/latency、错误 blocker、artifact size 等 countermetrics 均不得退化。
 - representative cases 中，source 可回答却被询问给用户的事实数量为零或相对 baseline 减少，且 current-user answer fidelity 不下降、第二人类确认路由为零。
 - requirements-only Product Contract 在 `/tmp` dossier 不存在时仍保留承重 source refs、limitations 和下一问题。
 - project-level glossary/context/ADR 的未授权 mutation 为零；preview 与 approval 可回到具体 path 和 proposed content。
 - 场景 pass 的每个保留项都有 AE/OQ/assumption/non-goal 落点；没有为了覆盖维度而生成的空仪式。
 - 静态 visual helper 的 deterministic floor 全部通过：agent-authored JavaScript 为零、非 loopback fail closed、所有启动方式均不暴露 `/files`、私有 temp 权限与清理可验证、非法或超预算 artifact 在响应前被拒绝、无外部请求或仓库写入。静态视觉是否帮助用户决策只作 field observation，不以“关闭/改变 R/AE”冒充正确性证据。
 - 默认 workflow 不新增 mandatory reference load；只有相关 signal 触发场景、领域语言或决策探针细节。
-- U5、U3、U2、U6 分别运行 immediate-parent 与 final-arm leave-one-out 对照并记录 interaction；只有两类证据共同支持主指标改善，且额外 rounds/token/latency、错误 blocker、artifact size 等 countermetric 不退化时才保留。current-source tests、fresh-source evaluation、field outcome 和五宿主 source projection 分开记录，任何一层不能替代另一层。
+- U5、U3、U2、U6 按 applicability matrix 运行 immediate-parent 与 DAG-valid contrasts 并记录 interaction；U2 使用 leaf leave-one-out，U6 marginal 只在 producer dependencies 完整时测量。每个适用 arm-case cell 运行 3 次 matched repeat，必需 fresh sessions 不超过 72；只有满足 bundle retention 条件，且额外 rounds/token/latency、错误 blocker、artifact size 等 countermetric 不退化时才保留。current-source tests、fresh-source evaluation、field outcome 和五宿主 source projection 分开记录，任何一层不能替代另一层。
 
 ### Scope Boundaries
 
@@ -335,12 +335,24 @@ provenance_pointer
 
 1. producer 先写明一个问题、affected R/AE、文本/源码为何不足，以及用户应观察什么；visual path 需要当前用户显式选择，不存在 interactive/dynamic 隐式升级。
 2. bundled helper 的 `start` 不接受调用方指定的任意 root，而是在 OS temp 下以 `mkdtemp` 创建不可预测 run root，返回 `root`、`screen_dir` 与 `state_dir`。producer 只向返回的 `screen_dir` 写 artifact；`status`/`stop` 只接受 helper 返回的 root。目录为 `0700`，artifact/state/log 文件为 `0600`；helper 校验 owner、realpath 与权限，symlink、非 regular file、越界路径或权限漂移在读取前 fail closed。旧 `--root /tmp/spec-first/.../<run-id>` 调用方式被替换。
-3. artifact 只能使用 synthetic/sanitized data 与静态 HTML/CSS fragment。helper 内 deterministic allowlist tokenizer 只接受展示型语义/布局标签和 `class`、`id`、`role`、`aria-*`、inline style；artifact 禁止 button、input、select、textarea、anchor、`tabindex` 或其他交互/可聚焦节点。所有 URL-bearing attribute、未知 tag/attribute、`<script>`、事件处理属性、`javascript:`、meta refresh、form、anchor/navigation、frame/object 和 download 在响应前拒绝。tokenizer 必须识别 tag/attribute boundary、大小写和 entity normalization，不得以正则关键词扫描作为唯一验证，也不引入通用 parser dependency。响应前执行 512 KiB、20,000 token、单元素 32 属性、64 层嵌套和 500 ms 校验预算，任一超限即 fail closed、停止 helper 并清理 run root。
-4. helper 只绑定 `127.0.0.1` 或 `::1`，并按实际地址返回可达 URL；非 loopback 或 remote/LAN serving 请求 fail closed。`Host` 必须与实际 loopback 地址和端口精确匹配，IPv6 使用规范化方括号形式；有 `Origin` 时必须同源，无 `Origin` 只允许 `GET`/`HEAD` 顶层导航；拒绝 authority 不一致的 absolute-form request，不发送 CORS 许可头。现有 helper 无条件移除 `/files`，除展示页面路由外唯一 helper-owned 辅助运行期 endpoint 是 `/version`。
+3. artifact 只能使用 synthetic/sanitized data 与静态 HTML/CSS fragment。`screen_dir` 只允许固定 `current.html`；producer 在同目录写私有临时文件，校验通过后原子替换，响应路径不得扫描、排序或选择“最新”文件，额外目录项一律拒绝。helper 内 deterministic allowlist tokenizer 只接受展示型语义/布局标签和 `class`、`id`、`role`、`aria-*`、inline style；artifact 禁止 button、input、select、textarea、anchor、`tabindex` 或其他交互/可聚焦节点。所有 URL-bearing attribute、未知 tag/attribute、`<script>`、事件处理属性、`javascript:`、meta refresh、form、anchor/navigation、frame/object 和 download 在响应前拒绝。tokenizer 必须识别 tag/attribute boundary、大小写和 entity normalization，不得以正则关键词扫描作为唯一验证，也不引入通用 parser dependency。响应前执行 512 KiB、20,000 token、单元素 32 属性、64 层嵌套和 500 ms 校验预算，任一超限即 fail closed、停止 helper 并清理 run root。
+4. helper 只绑定 `127.0.0.1` 或 `::1`，并按实际地址返回可达 URL；非 loopback 或 remote/LAN serving 请求 fail closed。`Host` 必须与实际 loopback 地址和端口精确匹配，IPv6 使用规范化方括号形式；有 `Origin` 时必须同源。无 `Origin` 时，根页面只接受 `GET`/`HEAD`、`Sec-Fetch-Mode: navigate`、`Sec-Fetch-Dest: document`；`/version` 只接受 `GET`/`HEAD`、`Sec-Fetch-Site: same-origin` 且 mode/dest 与同源 fetch 一致的请求。iframe、image、script、跨站 subresource、Fetch Metadata 缺失或矛盾、absolute-form authority 不一致均 fail closed，不发送 CORS 许可头。现有 helper 无条件移除 `/files`，除展示页面路由外唯一 helper-owned 辅助运行期 endpoint 是 `/version`。
 5. helper 为每次 HTML 响应生成 nonce，只给 helper-owned refresh script 注入 nonce。CSP 至少为 `default-src 'none'; script-src 'nonce-<per-response>'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; sandbox allow-scripts allow-same-origin`。根页面、状态页、错误页、拒绝响应和 `/version` 同时设置 `Referrer-Policy: no-referrer`、`X-Content-Type-Options: nosniff`、restrictive `Permissions-Policy`、`Cache-Control: no-store`、`Pragma: no-cache` 与 `Expires: 0`。
-6. 页面保留现有 waiting/ready 与自动 reload，新增 refreshing、refresh-failed、artifact-rejected 和 helper-unavailable。每个状态定义触发条件、可见说明、live-region 播报、恢复动作与返回 chat/blocker 的出口。artifact 内容无可聚焦控件；如 helper shell 提供 retry 等 helper-owned 控件，只允许该 shell 控件，并验证键盘操作、focus-visible、可访问名称与状态播报。所有状态满足 landmark/heading、DOM 阅读顺序、非颜色唯一信号、reduced-motion 和窄视口要求；当前用户在 chat 中的 accepted/rejected/mixed 或自由文本才是唯一产品确认。
+6. 页面保留现有 waiting/ready 与自动 reload，新增 refreshing、refresh-failed 和 artifact-rejected，并按下表执行状态转换。例行 `/version` 轮询保持静默；发现版本变化后进入 refreshing，先以 no-store fetch 预取根页面，校验 2xx、HTML content type 和与 `/version` 一致的 helper-owned artifact version 标识。预取失败时保留旧 DOM 并进入 refresh-failed；预取成功后才调用 reload。合同不声称能观察 reload 调用后的浏览器导航失败，refresh-failed 只覆盖可观察的版本轮询或预取失败。artifact 内容无可聚焦控件；如 helper shell 提供 retry 等 helper-owned 控件，只允许该 shell 控件，并验证键盘操作、focus-visible、可访问名称与状态播报。所有页面状态满足 landmark/heading、DOM 阅读顺序、非颜色唯一信号、reduced-motion 和窄视口要求；当前用户在 chat 中的 accepted/rejected/mixed 或自由文本才是唯一产品确认。
 7. producer 将 observation、decision、limitation 和 invalidation 写回 Product Contract；裁决、取消、idle、owner 退出或 error 后 helper 停止并清理 run root。删除或保留临时 artifact 不改变需求事实。
 8. 动态问题若能安全重述为具名静态状态比较，可先展示静态并列或序列；只有实际状态切换对裁决不可替代、静态比较仍不足，或无 browser capability、无 current-user answer、任何 deterministic floor 不可用、问题需要真实应用执行时，才停止并回退文本。不足以裁决则保留 blocker，不声称 visual aid 已运行或已证明产品结论。
+
+**State transition table**
+
+| State | Trigger and retained content | Live-region / visible behavior | Recovery and exit |
+| --- | --- | --- | --- |
+| `waiting` | 尚无有效 `current.html`；首次 artifact 被拒绝时也回到此状态 | 展示等待或拒绝原因；首次进入时礼貌播报，不因轮询重复播报 | producer 原子写入有效 artifact 后进入 `ready`；用户可返回 chat 并保留 blocker |
+| `ready` | 展示最近一次通过校验的 `current.html` | 内容稳定可读；例行 `/version` 轮询静默 | 检测到版本变化后进入 `refreshing` 并预取根页面 |
+| `refreshing` | 继续保留最近一次有效 artifact，不清空页面 | 显示非颜色唯一的刷新提示；仅状态变化时播报一次 | 预取的 2xx/HTML/version 校验成功后调用 reload；预取或轮询失败进入 `refresh-failed` |
+| `refresh-failed` | 保留最近一次有效 artifact | 展示非阻断失败提示，避免高频轮询重复播报 | 后续轮询与预取成功后调用 reload；不声称观察 reload 调用后的导航失败；用户可返回 chat 继续裁决或保留 blocker |
+| `artifact-rejected` | 已有有效 artifact 时继续保留；首次生成失败时使用 `waiting` 页面表达拒绝 | helper-owned 状态页展示具名拒绝原因，使用 R30 安全头 | producer 修正并原子替换后进入 `ready`；否则停止、清理并回退 chat |
+
+`helper-unavailable` 不属于页面状态。`start`/bind/status/browser-capability 或 URL 交付失败时，由 producer 在 chat 输出具名原因、清理可用 run root、回退文本并保持 unresolved/blocker。
 
 ### Implementation Sequence
 
@@ -361,7 +373,7 @@ flowchart LR
   U6 --> U7
 ```
 
-U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强依赖，确保独立 1→10 路径不需要 ideation artifact。U1-U6 均不依赖 PRD Gate A、standalone prototype、sandbox backend 或新 consumer parser；U5 → U3 → U2 → U6 只作为可复现的累积 arm，U7 还需为每项执行 immediate-parent、final-arm leave-one-out 与 interaction 分析。U4 只验证现有静态 helper 的安全与无回归，不承担动态价值实验。
+U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强依赖，确保独立 1→10 路径不需要 ideation artifact。U1-U6 均不依赖 PRD Gate A、standalone prototype、sandbox backend 或新 consumer parser；U5 → U3 → U2 → U6 只作为可复现的累积 arm，U7 还需执行 applicability matrix、immediate-parent、DAG-valid contrasts、3 次 matched repeat 与 interaction 分析，并把必需 fresh sessions 控制在 72 以内。U4 只验证现有静态 helper 的安全与无回归，不承担动态价值实验。
 
 ---
 
@@ -379,12 +391,25 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
 - **Approach：**
   - 在修改 skill source 前记录 Appendix source hashes、case IDs、输入 source refs 与 current behavior。
   - 预注册约 6 个组合 representative cases，覆盖 0→1、独立 1→10、10→100、promotion mutation、暂停恢复和静态 visual degraded path；详细 deterministic edge cases留在 focused tests，不把 17 个场景都升级为独立 fresh-source session。
-  - 固定 rubric、judge/reviewer 条件、主指标、countermetrics、tie/inconclusive 规则与 case invalidation condition。对 U5/U3/U2/U6 同时预注册 immediate-parent 增量对照和 final-arm leave-one-out 对照，单列交互效应；retention 由两类证据共同裁决，不以固定累积顺序中的一次增量冒充独立增益。fresh-source reviewer 只形成 comparative semantic evidence，不替代真实 current-user outcome。
+  - 固定 rubric、judge/reviewer 条件、主指标、countermetrics、baseline headroom、tie/inconclusive 规则、差异门与 case invalidation condition。对 U5/U3/U2/U6 预注册 immediate-parent 增量对照；U2 使用单项 leave-one-out。对 U3、U5 分别构造 DAG-valid `dependency-closed-absent`、`upstream-only`、`full-group` 三个对照，其他前置单元固定；U6 的单项 leave-one-out 即 `full-group` 对 `upstream-only`，不再从 final arm 单独移除仍被 U6 依赖的上游成员。单列 interaction，不以固定累积顺序中的一次增量冒充独立增益。
+  - 每个 semantic arm 使用同模型同配置运行 3 次 matched fresh-session，平衡 baseline/candidate 呈现顺序，由 blind reviewer 按预注册 rubric 评分并报告分布；只有方向一致且超过预注册差异门时计 improvement，否则为 inconclusive。
+  - 默认 retention 需要 immediate-parent 与 DAG-valid contrasts 共同支持。具名 bundle 只有在 `full-group` 相对 `dependency-closed-absent` 超过差异门、`upstream-only` 与 `full-group` 两个有效边际对照均不使主指标或 countermetrics 退化，且至少一个边际或预注册 interaction term 超过差异门时才可一并保留；否则保持未证明并收窄或删除。
+  - 预注册去重后的 arm-case applicability matrix，只运行能观察目标 claim 的 case，并复用同 case、同 source state、同模型配置下已存在的 baseline/arm 结果。必需评估最多 72 个 fresh sessions；每个已纳入 cell 仍完成 3 次 matched repeat，不用提前停止截断 cell。达到差异门后停止新增探索性 follow-up；若必需矩阵仍超过上限，则缩减不适用 arm/case 或诚实记录 degraded/inconclusive，不扩张预算。
   - baseline 不把计划中称为 confirmed gap 的源码事实升级成已证实用户收益；只记录当前行为和可观察 failure signal。
+
+**Arm-case applicability matrix**
+
+| Unit / bundle | Applicable representative cases | Required contrasts |
+| --- | --- | --- |
+| U2 focused seed | 0→1 handoff | immediate-parent；U2 leaf leave-one-out |
+| U3 + U6 | 0→1 handoff、独立 1→10、暂停恢复 | U3 dependency-closed-absent / upstream-only / full-group；U6 marginal = full-group vs upstream-only |
+| U5 + U6 | Promotion mutation、10→100 no-regression | U5 dependency-closed-absent / upstream-only / full-group；U6 marginal = full-group vs upstream-only |
+| U6 planning-only | 10→100 与 direct planning no-regression | 仅在所有显式 producer dependencies 存在时运行 U6 leaf leave-one-out |
+| U4 static visual | Static visual/degraded | 不进入 semantic retention matrix；只运行 deterministic gates 与 no-regression |
 - **Test scenarios：**
   - baseline 在任一目标 skill 改动前生成，source hash 可回查。
   - case ID、source refs、rubric 与 countermetrics 缺失时评估不可开始。
-  - tie 或 inconclusive 不计 improvement；immediate-parent 与 leave-one-out 结论冲突时记录 interaction 并保持未证明，缺 current-user field evidence 时不声明决策质量提升。
+  - baseline 为零的路径只能证明 no-regression；tie、重复运行方向不一致或未超过差异门不计 improvement。DAG-valid contrasts 结论冲突时记录 interaction；只有满足 bundle retention 条件才能组合保留。applicability matrix 缺失、必需 session 超过 72 或缺 current-user field evidence 时，不声明决策质量提升。
 - **Verification：** baseline artifact review、source hash check 与 eval fixture contract；不运行尚未实现的 candidate source。
 
 ### U1. 定义轻量澄清合同与当前 PRD 基线
@@ -467,17 +492,17 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
 - **Approach：**
   - display-only 继续默认；只在当前用户明确选择 visual path 且一个具名问题适合静态比较时生成 synthetic HTML/CSS fragment。动态交互需求展示静态状态序列或回退文本，不生成 JavaScript。
   - `start` 替换旧的调用方 `--root` 方式，由 helper 执行 `mkdtemp` 并返回 `root`、`screen_dir`、`state_dir`；producer 只向返回的 `screen_dir` 写入，`status`/`stop` 使用返回的 root。读取前执行 owner/realpath/symlink/regular-file/type 校验，裁决、取消、idle、owner exit 和 error 后递归清理。
-  - helper 只允许 loopback；按 R28 的 Host/Origin/IPv6/absolute-form/CORS 矩阵校验请求。现有 helper 在所有启动方式下无条件移除 `/files` route。
-  - helper 内小型 deterministic allowlist tokenizer 在响应前拒绝 script/event/navigation/form/URL-bearing attribute 等 active content；helper refresh 使用 per-response nonce，不与 artifact 共享脚本权限。若 allowlist 不足以表达目标视觉，回退文本，不扩张 tokenizer 为通用 HTML sanitizer。
-  - 保留现有 waiting/ready 与自动 reload，新增 refreshing、refresh-failed、artifact-rejected、helper-unavailable 和 chat fallback；按状态表定义触发、可见说明、live-region、恢复与 blocker 出口。artifact 不允许交互/可聚焦节点；helper-owned shell 控件单独满足键盘/focus/name 要求。
+  - helper 只允许 loopback；按 R28 的 Host/Origin/IPv6/Fetch Metadata/absolute-form/CORS 矩阵区分根页面导航、同源 `/version` fetch 与跨站/iframe/subresource 请求。现有 helper 在所有启动方式下无条件移除 `/files` route。
+  - `screen_dir` 只允许固定 `current.html`，producer 通过同目录私有临时文件 + atomic rename 更新；响应路径不枚举或排序目录，发现额外目录项即拒绝。helper 内小型 deterministic allowlist tokenizer 在响应前拒绝 script/event/navigation/form/URL-bearing attribute 等 active content；helper refresh 使用 per-response nonce，不与 artifact 共享脚本权限。若 allowlist 不足以表达目标视觉，回退文本，不扩张 tokenizer 为通用 HTML sanitizer。
+  - 保留现有 waiting/ready 与自动 reload，新增 refreshing、refresh-failed、artifact-rejected；按状态转换表定义内容保留、触发、live-region、恢复与 blocker 出口。版本变化后先 no-store 预取并校验 2xx、HTML content type 和 artifact version 标识，成功才 reload；refresh-failed 只覆盖可观察的轮询/预取失败。`helper-unavailable` 只作 producer-owned chat fallback。artifact 不允许交互/可聚焦节点；helper-owned shell 控件单独满足键盘/focus/name 要求。
   - 对 artifact 执行 R27 的大小与复杂度预算；对所有 HTML、状态、拒绝和 `/version` 响应执行 R30 的安全头与禁止缓存合同。
 - **Test scenarios：**
   - static layout 继续 display-only，现有 refresh/lifecycle 行为不回归。
-  - `127.0.0.1` 与 `::1` 返回正确 URL；`0.0.0.0`、LAN address、Host/port 不匹配、非同源 Origin、非法 IPv6 authority、absolute-form authority 不一致均 fail closed，且不发送 CORS 许可头。
+  - `127.0.0.1` 与 `::1` 返回正确 URL；地址栏、chat 链接和刷新产生的根页面 navigation 通过，same-origin `/version` 轮询通过；`0.0.0.0`、LAN address、Host/port 不匹配、非同源 Origin、iframe/image/script/cross-site subresource、Fetch Metadata 缺失或矛盾、非法 IPv6 authority、absolute-form authority 不一致均 fail closed，且不发送 CORS 许可头。
   - `start` 返回 helper-owned `root`/`screen_dir`/`state_dir`，旧任意 `--root` 调用被拒绝；目录/文件权限、symlink/realpath/regular-file 拒绝和五类终止清理均有 deterministic tests。
-  - script/event handler/meta refresh/anchor/form/external URL、超 512 KiB、超 token/attribute/depth/time budget 的 artifact 在发送任何 HTML 前被拒绝；默认、foreground、IPv4 和 IPv6 启动路径的 `/files/*` 均返回 404。
+  - producer 只能原子替换固定 `current.html`；额外目录项或大量小文件不能触发目录枚举/排序，且必须 fail closed。script/event handler/meta refresh/anchor/form/external URL、超 512 KiB、超 token/attribute/depth/time budget 的 artifact 在发送任何 artifact-derived HTML 前被拒绝；只允许返回带 R30 安全头的 helper-owned `artifact-rejected` 状态页，随后按生命周期合同停止并清理。默认、foreground、IPv4 和 IPv6 启动路径的 `/files/*` 均返回 404。
   - 根页面、状态页、错误页、拒绝响应和 `/version` 带 nonce CSP `sandbox`、no-referrer、no-sniff、restrictive Permissions-Policy 与 no-store headers，只有 helper-owned `/version` refresh 可运行。
-  - waiting、ready、refreshing、refresh-failed、artifact-rejected、helper-unavailable 分别验证 landmark/heading、DOM 阅读顺序、live-region、非颜色唯一提示和恢复动作；reduced-motion 下无非必要动画，在 320 CSS px 窄视口保持选项标签/顺序且正文无非预期横向滚动。Jest/DOM 断言确认结构与状态合同，人工浏览器 characterization 确认 focus-visible、播报体验和窄视口可读性。
+  - waiting、ready、refreshing、refresh-failed、artifact-rejected 分别验证内容保留规则、landmark/heading、DOM 阅读顺序、live-region、非颜色唯一提示和恢复动作；例行轮询不重复播报。覆盖 `/version` failure、预取非 2xx、错误 content type、version mismatch 与成功预取后 reload；不伪造 reload 调用后的导航失败观测。`helper-unavailable` 通过 start/bind/status/browser-capability 失败的 chat fallback 测试验证。reduced-motion 下无非必要动画，在 320 CSS px 窄视口保持选项标签/顺序且正文无非预期横向滚动。Jest/DOM 断言确认结构与状态合同，人工浏览器 characterization 确认 focus-visible、播报体验和窄视口可读性。
   - 无 current-user answer、需要真实 app context、动态交互、browser 不可用或任一 floor 不可用时保持 blocker/text fallback。
 - **Verification：** helper characterization/HTTP/security/lifecycle tests、before/after workspace snapshot 与静态 visual no-regression；不创建 prototype lifecycle、动态语义或真实用户价值 gate。
 
@@ -554,7 +579,8 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - 新增 `docs/validation/requirements-clarification/2026-07-11-clarification-integration-current-source-evaluation.md`
   - 修改 `CHANGELOG.md`
 - **Approach：**
-  - 使用 U0 当前源码 baseline，U5 deterministic mutation boundary → U3 core clarification → U2 focused seed → U6 plan consumer 只定义一个可复现的累积 arm，不单独证明独立增益。每个单元同时运行 immediate-parent 增量对照与 final-arm leave-one-out 对照，单列 interaction；只有两类证据共同支持主指标改善且 countermetric 不退化时才保留，结论冲突时保持未证明并收窄或删除。
+  - 使用 U0 当前源码 baseline，U5 deterministic mutation boundary → U3 core clarification → U2 focused seed → U6 plan consumer 只定义一个可复现的累积 arm，不单独证明独立增益。按 U0 applicability matrix 运行 immediate-parent 与 DAG-valid dependency-closed-absent / upstream-only / full-group contrasts；U2 为 leaf leave-one-out，U6 marginal 只在其 producer dependencies 完整时测量。
+  - 每个纳入的 arm-case cell 执行 3 次同模型同配置 matched fresh-session，平衡 baseline/candidate 顺序，由 blind reviewer 报告分布；方向不一致或未超过 U0 差异门时记为 inconclusive。只有满足 U0 bundle retention 条件时允许组合保留，否则结论冲突的单元收窄或删除。复用同 source state 的 baseline/arm 结果，必需评估不超过 72 sessions，达到差异门后不新增探索性 follow-up。
   - 使用约 6 个预注册组合 core cases；focused tests 承担结构、边界和 edge-case 覆盖，不为每个断言启动独立 fresh-source session。
   - U4 只通过 deterministic helper gates 与 static visual no-regression；不把“用户改变/关闭 R/AE”作为 retention 或正确性指标。未来 dynamic capability 必须另立计划并先提供可信封闭 renderer/浏览器级网络隔离。
   - PRD 组只验证 no-regression 和 promotion mutation boundary；不创建 Gate A candidate。
@@ -562,8 +588,8 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - fresh-source evaluation 证明触发、降级与语义比较；若未来要声明决策质量提升，另做有 owner、截止日期、case/source hash、rubric、framing-bias/反转率指标且 `tie/inconclusive = no-retain` 的 current-user opt-in field pilot。
   - source tests 通过后用现有 plugin sync 投射 modified reference；不新增 governance entry。
 - **Test scenarios：**
-  - 0→1、独立 1→10、10→100 各自独立样本。
-  - 删除 U2 输入后直接 1→10 结果不回归；U5/U3/U2/U6 各有 immediate-parent 与 final-arm leave-one-out 结果，能够区分独立增益、组合交互和负收益。
+  - 0→1、独立 1→10、10→100 各自独立样本；U0 baseline 有非零 failure headroom 时要求 improvement，baseline 为零时要求 no-regression 和路径对应 claim 通过。
+  - 删除 U2 输入后直接 1→10 结果不回归；U2 有单项 leave-one-out，U3/U5 使用 DAG-valid 三臂对照，U6 marginal 只在依赖完整时测量。每个适用 arm-case cell 有 3 次 matched repeat、平衡顺序与分布结果；applicability matrix 去重且必需 fresh sessions 不超过 72，能够区分独立增益、bundle interaction、模型波动和负收益。
   - 无 subagent/browser host 的诚实 degraded behavior。
   - 五宿主都获得修改后的 existing skill resources；没有 `spec-prototype` 新入口。
   - static tests 通过但 semantic sample 失败时发布阻塞。
@@ -651,17 +677,17 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - current-user answer / confirmation laundering 与 second-human routing。
 - unauthorized project-level mutations。
 - 额外 rounds、tokens、latency 和 artifact size。
-- 每个 U5/U3/U2/U6 单元的 immediate-parent、final-arm leave-one-out、interaction 与 countermetric 变化；tie/inconclusive 或两类对照冲突记为未证明。
+- 每个 U5/U3/U2/U6 单元或 bundle 的 immediate-parent、DAG-valid contrasts、3 次 matched repeat 分布、interaction 与 countermetric 变化；同时记录 applicability matrix、结果复用和总 session 数。tie、方向不一致、未过差异门、超过 72-session 上限或不满足 bundle retention 条件记为未证明。
 - static visual 的触发准确性、fallback 诚实性和额外 rounds；不从 fresh-source reviewer 推导真实决策正确性。
 
 ### Release Gates
 
 - U0 必须在任何目标 source mutation 前完成；缺 baseline、case/source hash、rubric 或 countermetric 时不得声明 improvement。
-- U1-U3 可以独立落地，并且不依赖任何 browser helper 代码；U2 不得成为直接 1→10 的前置条件。
+- U1 可先独立落地；U2 与 U3 在 U1 完成后可彼此独立落地，且均不依赖 browser helper 代码；U2 不得成为直接 1→10 的前置条件。
 - U4 必须通过 loopback/private-temp/artifact-validation/resource-budget/nonce-CSP/no-store/lifecycle/accessibility characterization 与 static visual no-regression；不存在 dynamic semantics retention 分支。
 - U5 必须同时覆盖 brainstorm、plan、PRD default/Lite 和 validate no-mutation；当前 Lite reference 默认只测不改。
 - U6 不改变 direct bootstrap/resume/deepen、legacy PRD user-control 或 optional receipt policy。
-- U7 的每个 U5/U3/U2/U6 单元必须同时有 immediate-parent、final-arm leave-one-out 与 interaction 结果；无两类证据共同支持的增益、结论冲突或 countermetric 退化时，单元先删除/收窄再进入投射。只有 focused tests 与 current-source evaluation 无 P0/P1 时才能投射 runtime。
+- U7 的 U5/U3/U2/U6 必须有 applicability matrix、immediate-parent、DAG-valid contrasts、3 次 matched repeat 分布、interaction 与总 session 结果；baseline 有 headroom 时验证 improvement，无 headroom 时验证 no-regression。超过 72-session 上限、未满足 bundle retention 条件、重复方向不一致、结论冲突或 countermetric 退化时，单元先删除/收窄再进入投射。只有 focused tests 与 current-source evaluation 无 P0/P1 时才能投射 runtime。
 - 任何新增 P0/P1 semantic finding、unauthorized mutation、second-human routing 或 confirmation laundering 阻塞发布。
 
 ---
@@ -679,7 +705,7 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - 没有 standalone `spec-prototype`、request registry、worktree takeover、sandbox runner、cleanup ledger 或 prototype release gate。
 - `spec-plan` upstream discovery 只识别当前两类真实 durable origin，30-day 仅为提示；direct bootstrap/resume/deepen 保持，blocker 不被静默忽略，用户控制 assumption/decision 路径保持。
 - U0 baseline、focused tests、repository gates、逐单元 fresh-source evaluation、field outcome（如有）和五宿主 source projection 分别记录；任何一层不替代另一层。
-- U5/U3/U2/U6 均有 immediate-parent、final-arm leave-one-out 与 interaction 证据；无两类证据共同支持的增益或 countermetric 退化的 change 不因总体 core arm 变好而保留。
+- U5/U3/U2/U6 均有 applicability matrix、immediate-parent、DAG-valid contrasts、3 次 matched repeat 分布与 interaction 证据；必需 fresh sessions 不超过 72。只有满足 improvement/no-regression headroom 与 bundle retention 规则的 change 才可保留，不因总体 core arm 变好而保留无证据单元。
 - README、README.zh-CN、当前执行文档和 CHANGELOG 与最终实现一致。
 - generated runtime 未手改；需要刷新时只从 source 运行 `spec-first init`。
 - U0-U7 各自的 Requirements、Trace、Test scenarios 与 Verification 均有实际证据；不得用 U7 总体验证替代单 unit exit。
@@ -716,6 +742,8 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - adversarial-document-reviewer：要求 U0 baseline 与 U5→U3→U2→U6 消融，避免总体 core arm 掩盖无效或负收益机制。
 - 2026-07-12 best-judgment resolution：用户确认批量应用全部 13 项 actionable finding；文档层已删除 dynamic probe experiment 和 retention threshold，实施与验证证据仍待 `spec-work` 按 U0-U7 产生。
 - 2026-07-12 second multi-agent review：自动修复 2 项内部一致性问题；用户确认 best-judgment 批量应用 13 项修订，补齐 helper CLI、request matrix、resource/cache/state/accessibility、promotion authority 与双对照消融合同；3 项 U4 产品/架构根决策进入 Deferred / Open Questions。
+- 2026-07-12 round-2 re-review：自动修复 AE10、U1→U2/U3 release dependency 与 artifact rejection 的 3 项残余矛盾；用户确认 best-judgment 应用 7 项新修订，补 Fetch Metadata、可达状态转换、固定单 artifact slot、依赖闭合 leave-out、baseline headroom、coupled-unit retention 与 3 次 matched repeat 分布裁决。
+- 2026-07-12 round-3 re-review：product-lens 超时，其余六视角完成；用户确认 best-judgment 应用 refresh 预取、DAG-valid bundle contrasts 与 72-session applicability budget，artifact publish ownership 和 candidate rejection/terminal cleanup 两项协议分歧进入 Deferred / Open Questions。
 
 ### Research Limitations
 
@@ -739,3 +767,11 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - **U4 是否应脱离核心发布 tranche** — Implementation Sequence / U7 (P1, scope-guardian, confidence 75)
 
   U7 当前依赖 U0-U6，使可选 visual hardening 可能阻塞核心澄清、promotion 和 plan-consumer 改造。是否拆分核心与 visual-helper 的投射/文档 tranche，应随 U4 保留形态的根决策一并裁决。
+
+- **Artifact publish ownership 尚未裁决** — R27 / Static Visual Decision Aid Contract / U4 (P1, coherence、feasibility、security-lens、adversarial, confidence 100)
+
+  当前固定 `current.html` 槽与原子更新需要一个不会触发“额外目录项拒绝”的发布协议。仍需裁决是允许 helper-issued、不可服务的受控临时槽，还是增加独立 staging 目录与 helper-owned `publish` 操作；在裁决前，producer 直接写 `screen_dir` 与 helper 独占校验/提交的 ownership 不清晰。
+
+- **Candidate rejection 与终止清理语义尚未裁决** — R27 / State transition table / U4 (P1, coherence、design-lens、security-lens, confidence 100)
+
+  内容校验失败、资源预算超限和 run-root 完整性失败是否都应终止 helper 尚未闭合。可恢复的 `artifact-rejected → ready` 需要保留 last-known-good 与会话；不可恢复的 owner/realpath/symlink/权限/bind/internal error 则应停止并清理。资源超限属于哪一侧仍需明确裁决。

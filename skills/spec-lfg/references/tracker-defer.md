@@ -144,6 +144,6 @@ When uncertain, prefer "drop with explicit user-facing notice" over "pass throug
 
 ## Cross-platform notes
 
-The question-tool name varies by platform. In Interactive mode, use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex). In Claude Code the tool should already be loaded from the Interactive-mode pre-load step — if it isn't, call `ToolSearch` with query `select:AskUserQuestion` now. Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool — `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose it (e.g., Codex edit modes without `request_user_input`). A pending schema load is not a fallback trigger. Never silently skip the question.
+In Interactive mode, use a native blocking-question primitive when the active host exposes one and the current execution mode allows it. Confirmed examples are `AskUserQuestion` in Claude Code and `request_user_input` in Codex. In Claude Code, if the deferred tool schema is not loaded, call `ToolSearch` with query `select:AskUserQuestion` before falling back. When no usable native primitive is exposed, present numbered options in chat, end the current turn, and wait for the user's reply. Treat the run as headless only when it genuinely cannot receive another user turn. Never silently skip a required question or continue with an assumed answer.
 
-Non-interactive mode is platform-agnostic: it never prompts, so the platform's question tool is not relevant.
+Non-interactive mode is platform-agnostic: it never prompts. Return unresolved decisions to the caller through the documented structured result.

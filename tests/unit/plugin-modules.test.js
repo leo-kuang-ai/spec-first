@@ -147,6 +147,9 @@ describe('plugin module facade and governance', () => {
         '.cursor/skills/spec-mcp-setup/setup-registry.schema.json',
         '.cursor/skills/spec-mcp-setup/scripts/setup.cjs',
       ]));
+      expect(operationPaths).not.toContain(
+        '.cursor/skills/spec-write-skill/evals/export-trigger-evals.cjs',
+      );
 
       plugin.syncBundledAssets(projectRoot, adapter);
 

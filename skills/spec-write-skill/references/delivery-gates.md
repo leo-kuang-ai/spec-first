@@ -44,15 +44,15 @@ node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
 
 ## Eval Evidence
 
-证据层级按实际结果报告：
+按实际证据类型报告，不维护 maturity 等级：
 
-- `L0 none`：无 eval；
-- `L1 structural`：fixture/schema/contract test，只证明结构；
-- `L2 semantic sample`：fresh-source 单版本真实请求样例；
-- `L3 comparative`：with-skill 与 baseline/previous version 对照；
-- `L4 field`：代表性真实任务与用户结果。
+- `not_run`：没有执行对应评测，附原因；
+- `structural-only`：fixture/schema/contract test，只证明结构与期望被消费；
+- `fresh-semantic`：fresh-source 单版本真实请求样例；
+- `comparative`：与固定 baseline/previous version 的对照；
+- `field-outcome`：代表性真实任务与用户结果。
 
-Route fixture 至少覆盖 positive、negative/near-neighbor、只读边界和一个主要 failure mode。没有 model runner 时不能把 L1 写成触发率或行为改善。
+Route fixture 至少覆盖 positive、negative/near-neighbor、只读边界和一个主要 failure mode。没有 model runner 时不能把 structural-only 写成触发率或行为改善。
 
 ## Five-Axis Readiness
 

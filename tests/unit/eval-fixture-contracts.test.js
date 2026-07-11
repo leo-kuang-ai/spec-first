@@ -64,20 +64,46 @@ describe('active eval fixture references', () => {
       'skills/spec-write-skill/evals/trigger-cases.json',
     ), 'utf8'));
 
-    expect(fixture.schema_version).toBe('spec-first.spec-write-skill-trigger-cases.v2');
-    expect(fixture.evidence_level).toBe('L1 structural');
+    expect(fixture.schema_version).toBe('spec-first.spec-write-skill-trigger-cases.v3');
+    expect(fixture.evidence_scope).toBe('structural-only');
+    expect(fixture).not.toHaveProperty('evidence_level');
     expect(fixture.cases).toHaveLength(8);
+    expect(fixture.route_queries.length).toBeGreaterThanOrEqual(12);
+    expect(fixture.route_queries.length).toBeLessThanOrEqual(16);
     expect(new Set(fixture.cases.map((entry) => entry.id)).size).toBe(fixture.cases.length);
+    expect(new Set(fixture.route_queries.map((entry) => entry.id)).size)
+      .toBe(fixture.route_queries.length);
 
     for (const entry of fixture.cases) {
       expect(typeof entry.expected_trigger).toBe('boolean');
       expect(entry.prompt).toEqual(expect.any(String));
-      expect(entry.expected_effect).toEqual(expect.any(String));
+      expect(entry.expected_base_operation === null || ['create', 'revise'].includes(entry.expected_base_operation)).toBe(true);
+      expect(['apply', 'validate-only', 'not-entered']).toContain(entry.expected_effect);
+      expect(['migrate', 'audit-remediation', 'none']).toContain(entry.expected_modifier);
       expect(entry.expected_layer_result).toEqual(expect.any(String));
       expect(entry.reason_code).toEqual(expect.any(String));
       expect(entry.forbidden_signals).toEqual(expect.any(Array));
       expect(entry.forbidden_signals.length).toBeGreaterThan(0);
     }
+
+    for (const entry of fixture.route_queries) {
+      expect(entry.query).toEqual(expect.any(String));
+      expect(typeof entry.expected_trigger).toBe('boolean');
+      expect(entry.expected_route).toEqual(expect.any(String));
+      expect(entry.reason_code).toEqual(expect.any(String));
+      expect(entry.forbidden_signals).toEqual(expect.any(Array));
+    }
+
+    expect([...new Set(fixture.route_queries.map((entry) => entry.expected_route))]).toEqual(
+      expect.arrayContaining([
+        'spec-write-skill',
+        'bounded-source-review',
+        'direct-answer',
+        'skill-installer',
+        'runtime-maintenance',
+        'spec-debug',
+      ]),
+    );
 
     expect(fixture.cases).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -87,6 +113,8 @@ describe('active eval fixture references', () => {
       }),
       expect.objectContaining({
         id: 'portable-create-non-spec-first',
+        expected_base_operation: 'create',
+        expected_effect: 'apply',
         expected_layer_result: 'portable-core-only',
       }),
     ]));

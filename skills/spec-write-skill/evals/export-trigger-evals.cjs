@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const CASES_PATH = path.join(__dirname, '..', 'evals', 'trigger-cases.json');
+const CASES_PATH = path.join(__dirname, 'trigger-cases.json');
 
 function loadCases() {
   return JSON.parse(fs.readFileSync(CASES_PATH, 'utf8'));
@@ -16,11 +16,13 @@ function toSkillCreator(source) {
     evals: source.cases.map((entry, index) => ({
       id: index + 1,
       prompt: entry.prompt,
-      expected_output: `${entry.expected_trigger ? 'Route to' : 'Do not route to'} ${source.skill}; effect=${entry.expected_effect}; result=${entry.expected_layer_result}; avoid=${entry.forbidden_signals.join(', ')}`,
+      expected_output: `${entry.expected_trigger ? 'Route to' : 'Do not route to'} ${source.skill}; base_operation=${entry.expected_base_operation}; effect=${entry.expected_effect}; modifier=${entry.expected_modifier}; result=${entry.expected_layer_result}; avoid=${entry.forbidden_signals.join(', ')}`,
       files: [],
       assertions: [
         `Expected trigger is ${entry.expected_trigger}`,
+        `Expected base operation is ${entry.expected_base_operation}`,
         `Expected effect is ${entry.expected_effect}`,
+        `Expected modifier is ${entry.expected_modifier}`,
         ...entry.forbidden_signals.map((signal) => `Output does not ${signal}`),
       ],
     })),
@@ -29,10 +31,10 @@ function toSkillCreator(source) {
 
 function toYao(source) {
   const result = { should_trigger: [], should_not_trigger: [], near_neighbor: [] };
-  for (const entry of source.cases) {
-    const item = { text: entry.prompt, family: entry.reason_code };
+  for (const entry of source.route_queries) {
+    const item = { text: entry.query, family: entry.reason_code };
     if (entry.expected_trigger) result.should_trigger.push(item);
-    else if (entry.case_type === 'near-neighbor') result.near_neighbor.push(item);
+    else if (entry.route_type === 'near-neighbor') result.near_neighbor.push(item);
     else result.should_not_trigger.push(item);
   }
   return result;

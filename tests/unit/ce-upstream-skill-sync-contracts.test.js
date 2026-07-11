@@ -81,6 +81,18 @@ describe('CE upstream skill sync contracts', () => {
     expect(read('skills/spec-compound/references/agents/best-practices-researcher.md')).toContain('Return only guidance that changes implementation, sequencing, or validation');
   });
 
+  test('keeps compound mode selection and session-history probing non-blocking', () => {
+    const compound = read('skills/spec-compound/SKILL.md');
+
+    expect(compound).toContain('**Mode selection (Full vs Lightweight) — decide it, don\'t ask it.**');
+    expect(compound).toContain('**Session history — an automatic probe in Full mode, never a question.**');
+    expect(compound).toContain('**Escalation gate.**');
+    expect(compound).toContain('Ran Full mode.');
+    expect(compound).toContain('does not present a "What\'s next?" menu');
+    expect(compound).not.toContain('only if the user opted in to session history');
+    expect(compound).not.toContain('If the user chooses Full');
+  });
+
   test('keeps Claude Fable elevation as an intentional upstream divergence', () => {
     const plan = read('skills/spec-plan/SKILL.md');
     const brainstorm = read('skills/spec-brainstorm/SKILL.md');

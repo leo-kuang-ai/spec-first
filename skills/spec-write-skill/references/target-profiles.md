@@ -14,7 +14,17 @@ Portable validator 只能检查本 Skill 声明支持的 YAML subset。合法但
 
 ## Codex Profile
 
-Confirmed local source: project packages may provide `agents/openai.yaml` as Codex-facing metadata。`spec-write-skill` 自身使用：
+Evidence record:
+
+- target: Codex
+- source: `https://developers.openai.com/codex/skills`
+- local_source: `skills/spec-write-skill/agents/openai.yaml`
+- checked_at: 2026-07-12
+- verification: `npx jest --runTestsByPath tests/unit/spec-write-skill-contracts.test.js tests/unit/plugin-modules.test.js tests/smoke/cli-smoke.test.js --runInBand`
+- limitations: 当前只确认 project package 的 Codex-facing sidecar 和 implicit invocation policy，不把该字段外推为其他宿主标准或 execution sandbox。
+- invalidation_condition: Codex 官方 metadata schema、sidecar path、policy key 或 runtime projection 行为变化时重新核对并降级旧事实。
+
+Confirmed source 表明 project packages 可提供 `agents/openai.yaml` 作为 Codex-facing metadata。`spec-write-skill` 自身使用：
 
 ```yaml
 policy:

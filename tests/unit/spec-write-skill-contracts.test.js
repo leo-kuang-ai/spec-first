@@ -21,6 +21,20 @@ test('front controller exposes portable authoring and validate-only without unsa
   expect(skill).toContain('portable/target/project readiness');
 });
 
+test('operation model keeps migration and remediation as modifiers, not peer effects', () => {
+  const skill = read('skills/spec-write-skill/SKILL.md');
+  const deliveryGates = read('skills/spec-write-skill/references/delivery-gates.md');
+
+  expect(skill).toContain('`base_operation=create|revise`');
+  expect(skill).toContain('`effect=apply|validate-only`');
+  expect(skill).toContain('`modifier=migrate|audit-remediation|none`');
+  expect(skill).not.toContain('## Effects');
+  expect(skill).not.toMatch(/^- `migrate`：/m);
+  expect(skill).not.toMatch(/^- `audit-remediation`：/m);
+  expect(deliveryGates).toContain('`structural-only`');
+  expect(deliveryGates).not.toMatch(/`L[0-4]\b/);
+});
+
 test('profiles are conditional and legacy vocabulary owner is removed', () => {
   const skill = read('skills/spec-write-skill/SKILL.md');
   const authoring = read('skills/spec-write-skill/references/authoring-method.md');
@@ -40,11 +54,16 @@ test('profiles are conditional and legacy vocabulary owner is removed', () => {
 
 test('Codex metadata disables implicit invocation without claiming execution safety', () => {
   const metadata = read('skills/spec-write-skill/agents/openai.yaml');
+  const targetProfile = read('skills/spec-write-skill/references/target-profiles.md');
   expect(metadata).toContain('allow_implicit_invocation: false');
   expect(metadata).toContain('explicit project-owned Skill');
-  expect(read('skills/spec-write-skill/references/target-profiles.md')).toContain(
+  expect(targetProfile).toContain(
     '该字段只限制 invocation，不等于 execution safety',
   );
+  expect(targetProfile).toContain('https://developers.openai.com/codex/skills');
+  expect(targetProfile).toContain('checked_at: 2026-07-12');
+  expect(targetProfile).toContain('invalidation_condition:');
+  expect(targetProfile).toContain('verification:');
 });
 
 test('spec-first project profile keeps catalog and runtime generated from source', () => {

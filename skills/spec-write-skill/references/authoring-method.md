@@ -18,7 +18,9 @@
 - one-sentence recurring job；
 - real inputs 与 required outputs；
 - should-trigger 和 should-not-trigger/near-neighbor 各一个真实示例；
-- effect：`create|revise|migrate|audit-remediation|validate-only`；
+- base operation：`create|revise`；
+- effect：`apply|validate-only`；
+- modifier：`migrate|audit-remediation|none`；
 - target repo、Skill root、canonical source owner；
 - mutation authorization：`ready|preview-only|blocked`；
 - first verification target。
@@ -34,7 +36,7 @@
 3. 项目规则声明的 canonical Skill root；
 4. 都无法确认时保持 `preview-only`。
 
-`validate-only` 永远不升级为 apply。`audit-remediation` 只处理已接受 finding。`migrate` 只处理同 repo trusted source；第三方 package 和跨仓目标只允许 inventory/readiness。
+`validate-only` 永远不升级为 apply。`audit-remediation` modifier 只处理已接受 finding。`migrate` modifier 只处理同 repo trusted source；第三方 package 和跨仓目标只允许 inventory/readiness。Modifier 不改变 base operation 或 effect，也不创建第三套执行主干。
 
 对现有 package 先列 inventory，不先读完所有正文：文件、目录、symlink、special file、frontmatter fields、Markdown references、scripts 和 secret-like paths。Inventory 是 advisory facts；是否采用内容仍由 LLM 判断。
 

@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { TextDecoder } = require('node:util');
 
 const STANDARD_FIELDS = new Set([
   'name',
@@ -13,11 +14,33 @@ const STANDARD_FIELDS = new Set([
   'compatibility',
 ]);
 const STATUS_ORDER = { error: 0, warning: 1, not_checked: 2 };
-const MAX_DEPTH = 8;
-const MAX_FILES = 500;
-const MAX_BYTES = 2 * 1024 * 1024;
+const VALIDATION_LIMITS = Object.freeze({
+  maxDepth: 16,
+  maxFiles: 1000,
+  maxTextFileBytes: 1024 * 1024,
+  maxTextBytes: 10 * 1024 * 1024,
+});
 const SECRET_NAME = /(^|[._-])(env|secret|secrets|credential|credentials|token|tokens|private|key|keys)([._-]|$)/i;
 const TEXT_EXTENSIONS = new Set(['.md', '.txt', '.json', '.yaml', '.yml', '.js', '.cjs', '.mjs', '.py', '.sh']);
+const UNSAFE_PATH_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u;
+const UNSAFE_PATH_CHARACTERS_GLOBAL = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/gu;
+const SENSITIVE_CONTENT_PATTERNS = [
+  /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/,
+  /\bAuthorization\s*:\s*(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{12,}/i,
+  /\bBearer\s+[A-Za-z0-9._~+/=-]{20,}/i,
+  /\bsk-[A-Za-z0-9]{20,}\b/,
+  /\bgh[pousr]_[A-Za-z0-9]{20,}\b/,
+  /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/,
+  /\bAKIA[0-9A-Z]{16}\b/,
+  /\b(?:api[_-]?key|access[_-]?token|secret[_-]?key|client[_-]?secret|password)\b\s*[:=]\s*["']?[^\s"']{12,}/i,
+];
+
+class FrontmatterParseError extends Error {
+  constructor(kind, message) {
+    super(message);
+    this.kind = kind;
+  }
+}
 
 function parseArgs(argv) {
   const args = { skillDir: null, json: false, strictPortable: false, authorizedRoot: null };
@@ -37,26 +60,84 @@ function normalizeRelative(value) {
   return value.split(path.sep).join('/');
 }
 
+function escapeUntrustedText(value) {
+  return String(value).replace(UNSAFE_PATH_CHARACTERS_GLOBAL, (character) => {
+    const codePoint = character.codePointAt(0).toString(16).padStart(4, '0');
+    return `\\u${codePoint}`;
+  });
+}
+
+function invalidFrontmatter(message) {
+  return new FrontmatterParseError('invalid', message);
+}
+
+function unsupportedFrontmatter(message) {
+  return new FrontmatterParseError('unsupported', message);
+}
+
+function containsSensitiveContent(content) {
+  return SENSITIVE_CONTENT_PATTERNS.some((pattern) => pattern.test(content));
+}
+
+function isSecretLikePath(relativePath) {
+  return relativePath.split('/').some((segment) => SECRET_NAME.test(segment));
+}
+
 function isInside(candidate, root) {
   const relative = path.relative(root, candidate);
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
+function findSymlinkSegment(absolutePath) {
+  const parsed = path.parse(absolutePath);
+  const segments = path.relative(parsed.root, absolutePath).split(path.sep).filter(Boolean);
+  let current = parsed.root;
+  for (const segment of segments) {
+    current = path.join(current, segment);
+    try {
+      if (fs.lstatSync(current).isSymbolicLink()) return current;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function nearestExistingAncestor(absolutePath) {
+  let current = absolutePath;
+  while (true) {
+    try {
+      fs.lstatSync(current);
+      return current;
+    } catch {
+      const parent = path.dirname(current);
+      if (parent === current) return null;
+      current = parent;
+    }
+  }
+}
+
 function finding(reasonCode, check, status, relativePath, message) {
-  return { reason_code: reasonCode, check, status, path: relativePath, message };
+  return {
+    reason_code: reasonCode,
+    check,
+    status,
+    path: relativePath === null ? null : escapeUntrustedText(relativePath),
+    message: escapeUntrustedText(message),
+  };
 }
 
 function parseQuoted(value, lineNumber) {
   if (value.startsWith('"')) {
-    if (!value.endsWith('"')) throw new Error(`line ${lineNumber}: unterminated double-quoted scalar`);
+    if (!value.endsWith('"')) throw invalidFrontmatter(`line ${lineNumber}: unterminated double-quoted scalar`);
     try {
       return JSON.parse(value);
     } catch {
-      throw new Error(`line ${lineNumber}: unsupported double-quoted scalar`);
+      throw invalidFrontmatter(`line ${lineNumber}: invalid double-quoted scalar`);
     }
   }
   if (value.startsWith("'")) {
-    if (!value.endsWith("'")) throw new Error(`line ${lineNumber}: unterminated single-quoted scalar`);
+    if (!value.endsWith("'")) throw invalidFrontmatter(`line ${lineNumber}: unterminated single-quoted scalar`);
     return value.slice(1, -1).replace(/''/g, "'");
   }
   return value;
@@ -68,16 +149,16 @@ function parseFrontmatterSubset(frontmatter) {
   for (let index = 0; index < lines.length; index += 1) {
     const raw = lines[index];
     if (!raw.trim() || raw.trimStart().startsWith('#')) continue;
-    if (/^\s/.test(raw)) throw new Error(`line ${index + 1}: unexpected nested content`);
+    if (/^\s/.test(raw)) throw unsupportedFrontmatter(`line ${index + 1}: nested YAML is outside the supported subset`);
     const match = raw.match(/^([A-Za-z0-9_-]+):(?:\s*(.*))?$/);
-    if (!match) throw new Error(`line ${index + 1}: unsupported frontmatter syntax`);
+    if (!match) throw unsupportedFrontmatter(`line ${index + 1}: YAML form is outside the supported subset`);
     const key = match[1];
     let value = match[2] || '';
     if (Object.prototype.hasOwnProperty.call(fields, key)) {
-      throw new Error(`line ${index + 1}: duplicate frontmatter field ${key}`);
+      throw invalidFrontmatter(`line ${index + 1}: duplicate frontmatter field ${key}`);
     }
     if (/^(?:&|\*|!|\[|\{)/.test(value.trim())) {
-      throw new Error(`line ${index + 1}: YAML anchors, tags, aliases, and flow collections are unsupported`);
+      throw unsupportedFrontmatter(`line ${index + 1}: YAML anchors, tags, aliases, and flow collections are unsupported`);
     }
     if (key === 'metadata' && value.trim() === '') {
       const metadata = {};
@@ -85,10 +166,10 @@ function parseFrontmatterSubset(frontmatter) {
         index += 1;
         const nested = lines[index].match(/^\s{2,}([A-Za-z0-9_.-]+):\s*(.*)$/);
         if (!nested || /^(?:&|\*|!|\[|\{)/.test(nested[2].trim())) {
-          throw new Error(`line ${index + 1}: unsupported metadata syntax`);
+          throw unsupportedFrontmatter(`line ${index + 1}: metadata YAML is outside the supported subset`);
         }
         if (Object.prototype.hasOwnProperty.call(metadata, nested[1])) {
-          throw new Error(`line ${index + 1}: duplicate metadata field ${nested[1]}`);
+          throw invalidFrontmatter(`line ${index + 1}: duplicate metadata field ${nested[1]}`);
         }
         metadata[nested[1]] = parseQuoted(nested[2].trim(), index + 1);
       }
@@ -96,7 +177,7 @@ function parseFrontmatterSubset(frontmatter) {
       continue;
     }
     if (key === 'metadata') {
-      throw new Error(`line ${index + 1}: metadata must be a one-level string map`);
+      throw unsupportedFrontmatter(`line ${index + 1}: metadata must be a one-level string map`);
     }
     if (value === '|' || value === '>') {
       const folded = value === '>';
@@ -145,18 +226,54 @@ function validateSkill(options) {
   };
   let incomplete = false;
   let fileCount = 0;
-  let totalBytes = 0;
+  let totalTextBytes = 0;
+  let secretLikeCount = 0;
+  let inventoryHalted = false;
   let rootStat;
+  let authorizedReal = null;
+
+  const symlinkSegment = findSymlinkSegment(requestedRoot);
+  if (symlinkSegment) {
+    findings.push(finding('skill_root_symlink_segment', 'path-safety', 'error', '.', 'Skill root path must not traverse a symbolic-link segment.'));
+  }
+
+  if (options.authorizedRoot) {
+    const requestedAuthorizedRoot = path.resolve(options.authorizedRoot);
+    try {
+      authorizedReal = fs.realpathSync(requestedAuthorizedRoot);
+      if (!isInside(requestedRoot, requestedAuthorizedRoot)) {
+        findings.push(finding('skill_root_outside_authorized_root', 'path-safety', 'error', '.', 'Skill root is lexically outside the authorized root.'));
+      }
+      const nearest = nearestExistingAncestor(requestedRoot);
+      if (nearest) {
+        const nearestReal = fs.realpathSync(nearest);
+        if (!isInside(nearestReal, authorizedReal)) {
+          findings.push(finding('skill_root_outside_authorized_root', 'path-safety', 'error', '.', 'Nearest existing Skill ancestor resolves outside the authorized root.'));
+        }
+      }
+    } catch (error) {
+      incomplete = true;
+      findings.push(finding('authorized_root_unavailable', 'path-safety', 'not_checked', null, error.message));
+    }
+  }
 
   try {
     rootStat = fs.lstatSync(requestedRoot);
   } catch (error) {
+    incomplete = true;
+    findings.push(finding('skill_root_unreadable', 'input', 'not_checked', null, error.message));
+    findings.sort((a, b) => (
+      STATUS_ORDER[a.status] - STATUS_ORDER[b.status]
+      || a.reason_code.localeCompare(b.reason_code)
+      || String(a.path || '').localeCompare(String(b.path || ''))
+    ));
+    const result = findings.some((item) => item.status === 'error') ? 'fail' : 'incomplete';
     return {
       schema_version: 'spec-write-skill.validator/v1',
-      skill_root: requestedRoot,
-      result: 'incomplete',
+      skill_root: escapeUntrustedText(requestedRoot),
+      result,
       ok: false,
-      findings: [finding('skill_root_unreadable', 'input', 'not_checked', null, error.message)],
+      findings,
       inventory,
     };
   }
@@ -175,10 +292,9 @@ function validateSkill(options) {
     findings.push(finding('skill_root_realpath_unavailable', 'path-safety', 'not_checked', '.', error.message));
   }
 
-  if (options.authorizedRoot) {
+  if (authorizedReal) {
     try {
-      const authorized = fs.realpathSync(path.resolve(options.authorizedRoot));
-      if (!isInside(realRoot, authorized)) {
+      if (!isInside(realRoot, authorizedReal)) {
         findings.push(finding('skill_root_outside_authorized_root', 'path-safety', 'error', '.', 'Skill root is outside the authorized root.'));
       }
     } catch (error) {
@@ -188,9 +304,10 @@ function validateSkill(options) {
   }
 
   function walk(directory, depth) {
-    if (depth > MAX_DEPTH) {
+    if (inventoryHalted) return;
+    if (depth > VALIDATION_LIMITS.maxDepth) {
       incomplete = true;
-      findings.push(finding('inventory_depth_exceeded', 'inventory', 'not_checked', normalizeRelative(path.relative(realRoot, directory)) || '.', `Inventory depth exceeds ${MAX_DEPTH}.`));
+      findings.push(finding('inventory_depth_exceeded', 'inventory', 'not_checked', normalizeRelative(path.relative(realRoot, directory)) || '.', `Inventory depth exceeds ${VALIDATION_LIMITS.maxDepth}.`));
       return;
     }
     let entries;
@@ -204,6 +321,10 @@ function validateSkill(options) {
     for (const entry of entries) {
       const absolute = path.join(directory, entry.name);
       const relative = normalizeRelative(path.relative(realRoot, absolute));
+      if (UNSAFE_PATH_CHARACTERS.test(relative)) {
+        findings.push(finding('unsafe_path_characters', 'path-safety', 'error', relative, 'Package path contains control or bidirectional override characters.'));
+        continue;
+      }
       let stat;
       try {
         stat = fs.lstatSync(absolute);
@@ -218,8 +339,15 @@ function validateSkill(options) {
         continue;
       }
       if (stat.isDirectory()) {
+        if (isSecretLikePath(relative)) {
+          secretLikeCount += 1;
+          inventory.directories.push(`[redacted-secret-like-path-${secretLikeCount}]`);
+          findings.push(finding('secret_like_directory_not_read', 'privacy', 'warning', null, 'A secret-like directory was inventoried without reading or returning its path.'));
+          continue;
+        }
         inventory.directories.push(relative);
         walk(absolute, depth + 1);
+        if (inventoryHalted) return;
         continue;
       }
       if (!stat.isFile()) {
@@ -227,25 +355,47 @@ function validateSkill(options) {
         continue;
       }
       fileCount += 1;
-      totalBytes += stat.size;
-      inventory.files.push(relative);
-      if (relative.startsWith('scripts/')) inventory.scripts.push(relative);
-      if (fileCount > MAX_FILES || totalBytes > MAX_BYTES) {
+      if (fileCount > VALIDATION_LIMITS.maxFiles) {
         incomplete = true;
-        findings.push(finding('inventory_budget_exceeded', 'inventory', 'not_checked', relative, `Inventory exceeds ${MAX_FILES} files or ${MAX_BYTES} bytes.`));
+        inventoryHalted = true;
+        findings.push(finding('inventory_file_budget_exceeded', 'inventory', 'not_checked', relative, `Inventory exceeds ${VALIDATION_LIMITS.maxFiles} files.`));
         return;
       }
-      if (SECRET_NAME.test(entry.name)) {
-        findings.push(finding('secret_like_file_not_read', 'privacy', 'warning', relative, 'Secret-like file was inventoried without reading its contents.'));
+      if (isSecretLikePath(relative)) {
+        secretLikeCount += 1;
+        inventory.files.push(`[redacted-secret-like-path-${secretLikeCount}]`);
+        findings.push(finding('secret_like_file_not_read', 'privacy', 'warning', null, 'A secret-like file was inventoried without reading or returning its path.'));
         continue;
       }
+      inventory.files.push(relative);
+      if (relative.startsWith('scripts/')) inventory.scripts.push(relative);
       if (!TEXT_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) continue;
+      if (stat.size > VALIDATION_LIMITS.maxTextFileBytes) {
+        incomplete = true;
+        findings.push(finding('text_file_budget_exceeded', 'inventory', 'not_checked', relative, `Readable text exceeds ${VALIDATION_LIMITS.maxTextFileBytes} bytes.`));
+        continue;
+      }
+      if (totalTextBytes + stat.size > VALIDATION_LIMITS.maxTextBytes) {
+        incomplete = true;
+        inventoryHalted = true;
+        findings.push(finding('inventory_text_budget_exceeded', 'inventory', 'not_checked', relative, `Readable text exceeds ${VALIDATION_LIMITS.maxTextBytes} total bytes.`));
+        return;
+      }
       let content;
       try {
-        content = fs.readFileSync(absolute, 'utf8');
+        const bytes = fs.readFileSync(absolute);
+        content = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+        totalTextBytes += bytes.length;
       } catch (error) {
         incomplete = true;
-        findings.push(finding('text_file_unreadable', 'inventory', 'not_checked', relative, error.message));
+        const reasonCode = error && error.code === 'ERR_ENCODING_INVALID_ENCODED_DATA'
+          ? 'text_file_invalid_utf8'
+          : 'text_file_unreadable';
+        findings.push(finding(reasonCode, 'inventory', 'not_checked', relative, reasonCode === 'text_file_invalid_utf8' ? 'Text file is not valid UTF-8.' : error.message));
+        continue;
+      }
+      if (containsSensitiveContent(content)) {
+        findings.push(finding('sensitive_content_detected', 'privacy', 'error', relative, 'High-confidence sensitive content detected; value was not returned and file is excluded from semantic review.'));
         continue;
       }
       if (relative.endsWith('.md')) {
@@ -279,8 +429,12 @@ function validateSkill(options) {
         try {
           fields = parseFrontmatterSubset(frontmatter);
         } catch (error) {
-          incomplete = true;
-          findings.push(finding('frontmatter_subset_unsupported', 'frontmatter', 'not_checked', 'SKILL.md', error.message));
+          if (error instanceof FrontmatterParseError && error.kind === 'invalid') {
+            findings.push(finding('frontmatter_invalid', 'frontmatter', 'error', 'SKILL.md', error.message));
+          } else {
+            incomplete = true;
+            findings.push(finding('frontmatter_subset_unsupported', 'frontmatter', 'not_checked', 'SKILL.md', error.message));
+          }
           fields = null;
         }
         if (fields) {
@@ -327,7 +481,7 @@ function validateSkill(options) {
   const result = hasErrors ? 'fail' : incomplete ? 'incomplete' : 'pass';
   return {
     schema_version: 'spec-write-skill.validator/v1',
-    skill_root: realRoot,
+    skill_root: escapeUntrustedText(realRoot),
     result,
     ok: result === 'pass',
     findings,
@@ -336,9 +490,10 @@ function validateSkill(options) {
 }
 
 function renderHuman(report) {
-  const lines = [`Skill validation: ${report.result}`, `Root: ${report.skill_root}`];
+  const lines = [`Skill validation: ${escapeUntrustedText(report.result)}`, `Root: ${escapeUntrustedText(report.skill_root)}`];
   for (const item of report.findings) {
-    lines.push(`[${item.status}] ${item.reason_code}${item.path ? ` (${item.path})` : ''}: ${item.message}`);
+    const safePath = item.path ? ` (${escapeUntrustedText(item.path)})` : '';
+    lines.push(`[${escapeUntrustedText(item.status)}] ${escapeUntrustedText(item.reason_code)}${safePath}: ${escapeUntrustedText(item.message)}`);
   }
   if (report.findings.length === 0) lines.push('No mechanical findings.');
   return lines.join('\n');
@@ -359,4 +514,9 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { parseFrontmatterSubset, validateSkill };
+module.exports = {
+  VALIDATION_LIMITS,
+  parseFrontmatterSubset,
+  renderHuman,
+  validateSkill,
+};
