@@ -9,6 +9,7 @@ const BOOLEAN_OPTIONS = new Map([
   ['--refresh', 'refresh'],
   ['--all-repos', 'allRepos'],
   ['--user-scope', 'userScope'],
+  ['--repair-host-config', 'repairHostConfig'],
 ]);
 
 const VALUE_OPTIONS = new Map([
@@ -29,6 +30,7 @@ function parseArgs(argv = []) {
     refresh: false,
     allRepos: false,
     userScope: false,
+    repairHostConfig: false,
     only: [],
     repo: '',
     folder: '',

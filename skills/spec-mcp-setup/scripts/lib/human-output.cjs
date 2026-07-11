@@ -43,7 +43,7 @@ function advisoryHostCandidates({ env = {}, runner } = {}) {
 }
 
 function diagnosticNextActions(payload = {}) {
-  const actions = ['运行 spec-mcp-setup --verify-only，刷新已确认的设置事实。'];
+  const actions = ['运行标准 spec-mcp-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。'];
   const project = payload.project || {};
   if (project.inside_git_repo && (
     project.example_config_status !== 'ok'
@@ -79,7 +79,7 @@ function renderDiagnosticHuman(payload, pluginVersion) {
 
   lines.push('', 'Provider 状态');
   if (!Array.isArray(payload.provider_readiness) || payload.provider_readiness.length === 0) {
-    lines.push('- 暂无已确认的 Provider 就绪事实；可选 Provider 必须显式选择。');
+    lines.push('- 暂无已确认的 required Provider 就绪事实；运行标准 Runtime Setup 完成 CodeGraph/Graphify 准备。');
   } else {
     for (const provider of payload.provider_readiness) {
       lines.push(`- ${provider.provider || provider.id || 'unknown'}: ${provider.readiness_status || 'unknown'} (${provider.reason_code || 'not-reported'})`);

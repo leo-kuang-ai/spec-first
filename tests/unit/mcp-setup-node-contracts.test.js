@@ -163,6 +163,37 @@ function runWorkspaceCharacterization(argv, label) {
 }
 
 describe('spec-mcp-setup unified Node contract', () => {
+  test('uses helper-specific detection argv instead of assuming --version', () => {
+    const { probeHelper } = require('../../skills/spec-mcp-setup/scripts/lib/installation-executor.cjs');
+    const calls = [];
+    const result = probeHelper({
+      homeDir: os.homedir(),
+      runner: (command, args) => {
+        calls.push([command, ...args]);
+        return {
+          command,
+          argv: args,
+          args,
+          exit_code: args[0] === '-version' ? 0 : 1,
+          signal: null,
+          timed_out: false,
+          timeout: false,
+          stdout: 'ffmpeg version 8.1.2',
+          stderr: '',
+          error: null,
+        };
+      },
+    }, process.cwd(), {
+      id: 'ffmpeg',
+      kind: 'cli',
+      detection: { kind: 'command', command: 'ffmpeg', args: ['-version'] },
+      installation: { next_action: '安装 ffmpeg' },
+    });
+
+    expect(calls).toEqual([['ffmpeg', '-version']]);
+    expect(result).toMatchObject({ status: 'ready', reason_code: 'ready' });
+  });
+
   test('keeps the entrypoint thin and exposes explicit runtime owner modules', () => {
     const setupPath = path.join(skillRoot, 'scripts', 'setup.cjs');
     const owners = [

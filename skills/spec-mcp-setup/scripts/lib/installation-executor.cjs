@@ -72,7 +72,8 @@ function probeHelper(context, repoRoot, entry) {
   }
   const command = detection.command;
   if (!command) return helperProbe(entry, 'missing', 'helper-detection-invalid');
-  const result = execute(context, command, ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
+  const detectionArgs = Array.isArray(detection.args) ? detection.args.map(String) : ['--version'];
+  const result = execute(context, command, detectionArgs, { cwd: repoRoot, timeoutMs: 10000 });
   const commandReady = commandSucceeded(result);
   if (detection.kind === 'agent-browser') {
     const marker = path.join(context.homeDir, '.agent-browser', 'spec-first-install.json');
@@ -81,7 +82,10 @@ function probeHelper(context, repoRoot, entry) {
     return helperProbe(entry, 'skipped', commandReady ? 'agent-browser-manual-setup-incomplete' : 'agent-browser-not-installed');
   }
   if (!commandReady && detection.fallback_command) {
-    const fallback = execute(context, detection.fallback_command, ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
+    const fallbackArgs = Array.isArray(detection.fallback_args)
+      ? detection.fallback_args.map(String)
+      : ['--version'];
+    const fallback = execute(context, detection.fallback_command, fallbackArgs, { cwd: repoRoot, timeoutMs: 10000 });
     if (commandSucceeded(fallback)) return helperProbe(entry, 'degraded', 'helper-fallback-active');
   }
   return helperProbe(entry, commandReady ? 'ready' : 'missing', commandReady ? 'ready' : 'missing_dependency');
@@ -100,10 +104,11 @@ function helperProbe(entry, status, reasonCode) {
   };
 }
 
-function installBaselineTools(context, repoRoot) {
+function installBaselineTools(context, repoRoot, selectedIds = []) {
   const results = new Map();
   for (const entry of context.effectiveRegistry.tools || []) {
     if (entry.required === false) continue;
+    if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
     const installation = resolveInstallation(entry, context.platform);
     if (!installation || !installation.command) continue;
     const dependency = dependencyFor(context, entry.dependency_ref);

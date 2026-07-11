@@ -52,4 +52,26 @@ describe('spec-mcp-setup runner contracts', () => {
     );
     expect(reference).not.toContain('`--verify-only` only reads facts');
   });
+
+  test('标准 setup 默认包含 required providers，local override 缺失表示 defaults-active', () => {
+    const skill = fs.readFileSync(
+      path.join(repoRoot, 'skills', 'spec-mcp-setup', 'SKILL.md'),
+      'utf8',
+    );
+    const registry = JSON.parse(fs.readFileSync(
+      path.join(repoRoot, 'skills', 'spec-mcp-setup', 'setup-registry.json'),
+      'utf8',
+    ));
+
+    expect(skill).toContain('## Default Full Setup Flow');
+    expect(skill).toContain('--only codegraph,graphify');
+    expect(skill).toContain('defaults-active');
+    expect(registry.providers.filter((entry) => entry.setup_required).map((entry) => entry.id).sort())
+      .toEqual(['codegraph', 'graphify']);
+    expect(registry.tools.find((entry) => entry.id === 'codegraph')).toMatchObject({ setup_required: true });
+    expect(registry.helpers.find((entry) => entry.id === 'ffmpeg')).toMatchObject({
+      baseline_blocking: true,
+      detection: { args: ['-version'] },
+    });
+  });
 });

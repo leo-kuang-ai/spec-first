@@ -83,7 +83,7 @@ Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, `.
 
 Init creates `CHANGELOG.md` only when it is missing; an existing repository changelog remains byte-for-byte user-owned.
 
-If the host reports missing helper or MCP readiness facts, run the unified `spec-mcp-setup` entry in your current host before continuing.
+If the host reports missing helper or MCP readiness facts, run the unified `spec-mcp-setup` entry in your current host. Its standard flow prepares the required baseline plus CodeGraph and Graphify; `--only` is reserved for advanced subset repair, while `--verify-only` remains non-installing verification.
 
 Cursor note: `spec-first init --cursor` generates the same `spec-*` workflow runtime under `.cursor/skills/**`, spec-first state under `.cursor/spec-first/**`, and project MCP setup targets `.cursor/mcp.json` by default. User-level `~/.cursor/mcp.json` requires `--user-scope` / `CURSOR_USER_SCOPE=1`. Current release evidence records `cursor_loader_validation_unavailable`, so do not treat Cursor as full host support or an `init -y` default.
 

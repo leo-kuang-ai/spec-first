@@ -530,6 +530,11 @@ describe('host config resolution, inspection, and transaction', () => {
       ok: false,
       reason_code: 'host-config-conflict',
     });
+    expect(inspectHostConfig({ entry: jsonEntry(), target })).toMatchObject({
+      conflict: true,
+      reason_code: 'host-config-conflict',
+      conflict_fields: ['command'],
+    });
     expect(applyHostConfig({ entry: jsonEntry(), target, overwrite: true })).toMatchObject({
       ok: true,
       changed: true,
@@ -547,6 +552,35 @@ describe('host config resolution, inspection, and transaction', () => {
     });
     expect(JSON.stringify(applyHostConfig({ entry: secretEntry, target, overwrite: true })))
       .not.toContain('super-private-credential-42');
+  });
+
+  test('reports TOML conflict fields without exposing conflicting values', () => {
+    const repoRoot = tempDir('toml-conflict-repo');
+    const homeDir = tempDir('toml-conflict-home');
+    const entry = codexEntry();
+    const target = resolveHostConfigTarget({
+      entry,
+      host: 'codex',
+      authority: authority('codex', 'user'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(target.config_path), { recursive: true });
+    fs.writeFileSync(target.config_path, [
+      '[mcp_servers.context7]',
+      'command = "user-owned"',
+      'args = []',
+      'startup_timeout_sec = 10',
+      '',
+    ].join('\n'));
+
+    const inspected = inspectHostConfig({ entry, target });
+    expect(inspected).toMatchObject({
+      conflict: true,
+      reason_code: 'host-config-conflict',
+      conflict_fields: expect.arrayContaining(['command', 'args', 'startup_timeout_sec']),
+    });
+    expect(JSON.stringify(inspected)).not.toContain('user-owned');
   });
 
   test('retries a transient Windows replace and preserves verified read-only semantics', () => {

@@ -220,6 +220,109 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     }
   });
 
+  test('blocks plan before installation on host config conflict and previews explicit repair', () => {
+    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const target = tempRepo('plan-host-conflict');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const configPath = path.join(homeDir, '.codex', 'config.toml');
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(configPath, [
+      '[mcp_servers.context7]',
+      'command = "user-owned"',
+      'args = []',
+      '',
+    ].join('\n'));
+    const before = snapshot(homeDir);
+
+    const blocked = runSetup({
+      argv: ['--plan', '--only', 'graphify'],
+      cwd: target,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+    });
+    expect(blocked).toMatchObject({
+      exit_code: 2,
+      mode: 'plan',
+      reason_code: 'host-config-conflict',
+      payload: {
+        blocked: true,
+        next_action: 'spec-mcp-setup --only graphify --repair-host-config',
+      },
+    });
+    expect(blocked.payload.planned_operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        tool: 'context7',
+        planned: false,
+        blocked_reason: 'host-config-conflict',
+        conflict_fields: expect.arrayContaining(['command', 'args']),
+      }),
+    ]));
+    expect(snapshot(homeDir)).toEqual(before);
+
+    const repairPlan = runSetup({
+      argv: ['--plan', '--only', 'graphify', '--repair-host-config'],
+      cwd: target,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+    });
+    expect(repairPlan).toMatchObject({ exit_code: 0, mode: 'plan' });
+    expect(repairPlan.payload.planned_operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'repair-host-config',
+        tool: 'context7',
+        planned: true,
+        action_reason_code: 'host-config-repair-authorized',
+      }),
+    ]));
+    expect(snapshot(homeDir)).toEqual(before);
+  });
+
+  test('repairs only conflicting managed Codex MCP entries with explicit authorization', () => {
+    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const target = tempRepo('apply-host-conflict-repair');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    installGlobalSkill(homeDir, 'ast-grep');
+    const configPath = path.join(homeDir, '.codex', 'config.toml');
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(configPath, [
+      'model = "gpt-5"',
+      '',
+      '[mcp_servers.context7]',
+      'command = "user-owned"',
+      'args = []',
+      '',
+      '[mcp_servers.unrelated]',
+      'command = "keep-me"',
+      'args = ["--safe"]',
+      '',
+    ].join('\n'));
+
+    const result = runSetup({
+      argv: ['--repair-host-config'],
+      cwd: target,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+      bundledVersion: '1.13.2',
+    });
+    const updated = fs.readFileSync(configPath, 'utf8');
+
+    expect(result).toMatchObject({ exit_code: 0, mode: 'host-config-repair' });
+    expect(updated).toContain('model = "gpt-5"');
+    expect(updated).toContain('[mcp_servers.unrelated]');
+    expect(updated).toContain('command = "keep-me"');
+    expect(updated).toContain('[mcp_servers.context7]');
+    expect(updated).toContain('@upstash/context7-mcp@latest');
+    expect(updated).toContain('[mcp_servers.sequential-thinking]');
+    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@latest');
+    expect(updated).not.toContain('command = "user-owned"');
+  });
+
   test('default diagnostic output exposes actionable tools, skills, project, setup, providers, and public next actions', () => {
     const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
     const target = tempRepo('human-diagnostic');
@@ -235,7 +338,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     expect(result.exit_code).toBe(0);
     expect(result.payload.host).toMatchObject({ host: 'codex', authority: 'advisory' });
     expect(result.payload.next_actions).toEqual(expect.arrayContaining([
-      expect.stringContaining('spec-mcp-setup --verify-only'),
+      expect.stringContaining('required baseline、CodeGraph 与 Graphify'),
     ]));
     for (const heading of ['工具', '技能', '项目设置', '设置事实', 'Provider 状态', '后续操作']) {
       expect(result.human).toContain(heading);
@@ -1122,18 +1225,18 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
         parent_generated_runtime_manifest: { status: 'current' },
         counts: {
           total: 2,
-          ready: 1,
-          action_required: 1,
+          ready: 0,
+          action_required: 2,
           generated_runtime_manifest: { current: 1, stale: 1, missing: 0, unknown: 0 },
         },
-        overall_status: 'partial',
+        overall_status: 'action-required',
         reason_code: 'generated-runtime-manifest-refresh-required',
         next_action: '从 parent workspace 运行 spec-first init --qoder -y -u <name> 刷新 parent runtime，或对 stale child repo 运行 spec-first init --qoder --repo <child> -y -u <name>，然后重新 verify。',
       },
     });
     expect(result.payload.results.find((entry) => entry.repo_label === 'packages/second')).toMatchObject({
       overall_status: 'action-required',
-      reason_code: 'generated-runtime-manifest-refresh-required',
+      reason_code: 'host-config-entry-missing',
       result: {
         schema_version: 'mcp-verify-child-result.v1',
         generated_runtime_manifest: { status: 'stale' },

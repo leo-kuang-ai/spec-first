@@ -450,14 +450,10 @@
       "name": "CodeGraph",
       "summary_label": "CodeGraph",
       "required": false,
-      "opt_in": {
-        "explicit_consent_required": true,
-        "consent_surface": "--only codegraph",
-        "state_model": "stateless-explicit-rerun"
-      },
+      "setup_required": true,
       "category": "mcp",
       "host_config_required": true,
-      "description": "可选 code-graph 能力工具。setup 只在显式 opt-in 时帮装和配置；下游消费只把其输出当 advisory candidate。",
+      "description": "标准 Runtime Setup 必备的 code-graph 能力工具；下游消费仍只把其输出当 advisory candidate。",
       "dependency_ref": "codegraph",
       "dependencies": [
         "node",
@@ -470,7 +466,7 @@
       "provider_readiness": {
         "provider": "codegraph",
         "kind": "code-structure",
-        "profile": "optional",
+        "profile": "minimal",
         "capabilities": [
           "code-graph",
           "impact-candidates",
@@ -484,7 +480,7 @@
           "owner": "runtime-setup",
           "status": "not-run",
           "scope": "project",
-          "requires_explicit_gate": true,
+          "requires_explicit_gate": false,
           "requirement_workspace_path": null,
           "artifact_root": ".codegraph"
         },
@@ -987,7 +983,7 @@
       ],
       "surface_overlays": [],
       "required": true,
-      "baseline_blocking": false,
+      "baseline_blocking": true,
       "required_for": [],
       "recommended_for": [
         "video composition"
@@ -995,11 +991,14 @@
       "demand_signals": [],
       "detection": {
         "kind": "command",
-        "command": "ffmpeg"
+        "command": "ffmpeg",
+        "args": [
+          "-version"
+        ]
       },
       "safety": {
         "risk_flags": [
-          "optional-helper",
+          "required-helper",
           "package-manager-install"
         ],
         "source": "package-manager",
@@ -1018,7 +1017,18 @@
       "platform_overrides": {
         "macos": {
           "installation": {
-            "command": "brew install ffmpeg"
+            "strategy": "package-manager",
+            "next_action": "安装 ffmpeg",
+            "command": "brew install ffmpeg",
+            "operations": [
+              {
+                "command": "brew",
+                "args": [
+                  "install",
+                  "ffmpeg"
+                ]
+              }
+            ]
           },
           "platform_required_tools": []
         },
@@ -1036,7 +1046,20 @@
         },
         "windows": {
           "installation": {
-            "command": "winget install --id Gyan.FFmpeg -e"
+            "strategy": "package-manager",
+            "next_action": "安装 ffmpeg",
+            "command": "winget install --id Gyan.FFmpeg -e",
+            "operations": [
+              {
+                "command": "winget",
+                "args": [
+                  "install",
+                  "--id",
+                  "Gyan.FFmpeg",
+                  "-e"
+                ]
+              }
+            ]
           },
           "platform_required_tools": []
         }
@@ -1249,7 +1272,8 @@
       "id": "codegraph",
       "name": "CodeGraph",
       "kind": "code-structure",
-      "profile": "optional",
+      "profile": "minimal",
+      "setup_required": true,
       "capability_class": "code-structure",
       "native_interfaces": [
         "mcp",
@@ -1259,7 +1283,7 @@
         "owner": "runtime-setup",
         "status": "not-run",
         "scope": "project",
-        "requires_explicit_gate": true,
+        "requires_explicit_gate": false,
         "requirement_workspace_path": null,
         "artifact_root": ".codegraph"
       },
@@ -1578,7 +1602,8 @@
       "id": "graphify",
       "name": "Graphify",
       "kind": "project-graph",
-      "profile": "optional",
+      "profile": "minimal",
+      "setup_required": true,
       "capability_class": "project-graph",
       "native_interfaces": [
         "cli"
@@ -1587,7 +1612,7 @@
         "owner": "runtime-setup",
         "status": "not-run",
         "scope": "project",
-        "requires_explicit_gate": true,
+        "requires_explicit_gate": false,
         "requirement_workspace_path": null,
         "artifact_root": ".graphify"
       },
@@ -1597,7 +1622,7 @@
         "hook_default": true,
         "usage_owner": "downstream-skill"
       },
-      "usage_note": "显式 Graphify setup（`spec-mcp-setup --only graphify`）会安装 Graphify CLI 与当前 host 的 project skill，并从原始 PATH 或 Provider 标准用户工具路径解析 `graphify`。若 project root 尚无 Graphify artifact，它先尝试 first-generation `graphify extract .`；semantic extract 无法运行时，回退到 code-only/incremental `graphify update .`，在 project root 生成 provider-native `.graphify/`。Bare Runtime Setup 只诊断 Graphify readiness 并输出 next action。若 `.graphify/graph.json` 或 `.graphify/GRAPH_REPORT.md` 已存在，显式 setup 会验证或修复 install state（project skill/instruction、query probe、hook status/install），并建议显式 incremental `--refresh`，不会默认重新生成。现有旧版 `graphify-out/` artifact 只作为 compatibility 与 refresh-needed evidence；运行 `spec-mcp-setup --only graphify --refresh` 可重新生成 provider-native `.graphify/`。显式 refresh 运行 `graphify update .`（code-only，不做 LLM semantic extraction）；仅当 Graphify 拒绝覆盖并建议 `--force` 时，才执行一次 bounded `graphify update . --force` 修复。需要且目标是 git repo 时，随后启用 provider-native `graphify hook install`。若解析到的 Graphify CLI 不在原始 PATH，setup 可在 Graphify 安装的 hook 文件中加入带 marker 的 project-local PATH repair block，再验证 hook status。下游只要求 CLI/project skill/hook；Graphify MCP/watch 在 Runtime Setup 外仍保持 opt-in。使用 `$graphify .`/`/graphify .` 或解析后的 Graphify CLI query/path/explain 获取 project-graph candidate，再由 source/test/log evidence 确认结论。",
+      "usage_note": "标准 Runtime Setup（或高级子集 `spec-mcp-setup --only graphify`）会安装 Graphify CLI 与当前 host 的 project skill，并从原始 PATH 或 Provider 标准用户工具路径解析 `graphify`。若 project root 尚无 Graphify artifact，它先尝试 first-generation `graphify extract .`；semantic extract 无法运行时，回退到 code-only/incremental `graphify update .`，在 project root 生成 provider-native `.graphify/`。Bare Runtime Setup 默认完成 Graphify install-init 与 query/hook verification。若 `.graphify/graph.json` 或 `.graphify/GRAPH_REPORT.md` 已存在，显式 setup 会验证或修复 install state（project skill/instruction、query probe、hook status/install），并建议显式 incremental `--refresh`，不会默认重新生成。现有旧版 `graphify-out/` artifact 只作为 compatibility 与 refresh-needed evidence；运行 `spec-mcp-setup --only graphify --refresh` 可重新生成 provider-native `.graphify/`。显式 refresh 运行 `graphify update .`（code-only，不做 LLM semantic extraction）；仅当 Graphify 拒绝覆盖并建议 `--force` 时，才执行一次 bounded `graphify update . --force` 修复。需要且目标是 git repo 时，随后启用 provider-native `graphify hook install`。若解析到的 Graphify CLI 不在原始 PATH，setup 可在 Graphify 安装的 hook 文件中加入带 marker 的 project-local PATH repair block，再验证 hook status。下游只要求 CLI/project skill/hook；Graphify MCP/watch 在 Runtime Setup 外仍保持 opt-in。使用 `$graphify .`/`/graphify .` 或解析后的 Graphify CLI query/path/explain 获取 project-graph candidate，再由 source/test/log evidence 确认结论。",
       "detection": {
         "kind": "command",
         "command": "graphify",
@@ -1625,7 +1650,7 @@
           "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "Installs npm package `{{package}}@{{version}}`, resolves `graphify` from the user's original PATH or npm global bin, and verifies the resolved CLI. After npm install or upgrade, setup may back up and repoint a stale `graphify` symlink on the original PATH to the pinned executable; ordinary files, non-writable paths, and ambiguous cases stay report-only. Explicit Graphify setup verifies or installs the current-host project skill such as `graphify install --project --platform codex`, normalizes the provider-written `AGENTS.md`/`CLAUDE.md` `## graphify` instruction section to resolved CLI/manual-visibility/direct-source-fallback wording, and only generates provider-native project-root `.graphify/` when no existing current Graphify artifact is present. Bare Runtime Setup only diagnoses Graphify readiness and prints next actions. Existing `.graphify/graph.json`/`GRAPH_REPORT.md` triggers install-state verification plus query/hook probes and reports an explicit incremental refresh next action instead of regenerating by default. Legacy `graphify-out/graph.json`/`GRAPH_REPORT.md` is detected as compatibility-only refresh-needed evidence and does not replace the current `.graphify/` contract. Explicit refresh runs provider-native `graphify update .` (code-only, no LLM semantic extraction), with one bounded `graphify update . --force` repair only after Graphify emits overwrite refusal plus a force hint. Setup probes query/hook commands through the resolved CLI, installs project-level `graphify hook install` in git repos when needed, and may add a marked project-local PATH repair block to Graphify-installed hook files before `graphify hook status` when the resolved CLI is off the original PATH. Provider writes may include `.codex/skills/graphify/`, `.codex/hooks.json`, `AGENTS.md`, `.claude/skills/graphify/`, `CLAUDE.md`, `.graphify/`, legacy `graphify-out/`, and `.git/hooks/*`; setup reports them as provider-owned runtime/project output, does not edit shell profiles, does not vendor the Graphify skill, and does not auto-add, auto-commit, or promote provider output to spec-first source."
+        "install_effect": "Installs npm package `{{package}}@{{version}}`, resolves `graphify` from the user's original PATH or npm global bin, and verifies the resolved CLI. After npm install or upgrade, setup may back up and repoint a stale `graphify` symlink on the original PATH to the pinned executable; ordinary files, non-writable paths, and ambiguous cases stay report-only. Explicit Graphify setup verifies or installs the current-host project skill such as `graphify install --project --platform codex`, normalizes the provider-written `AGENTS.md`/`CLAUDE.md` `## graphify` instruction section to resolved CLI/manual-visibility/direct-source-fallback wording, and only generates provider-native project-root `.graphify/` when no existing current Graphify artifact is present. Bare Runtime Setup includes Graphify install-init and query/hook verification by default. Existing `.graphify/graph.json`/`GRAPH_REPORT.md` triggers install-state verification plus query/hook probes and reports an explicit incremental refresh next action instead of regenerating by default. Legacy `graphify-out/graph.json`/`GRAPH_REPORT.md` is detected as compatibility-only refresh-needed evidence and does not replace the current `.graphify/` contract. Explicit refresh runs provider-native `graphify update .` (code-only, no LLM semantic extraction), with one bounded `graphify update . --force` repair only after Graphify emits overwrite refusal plus a force hint. Setup probes query/hook commands through the resolved CLI, installs project-level `graphify hook install` in git repos when needed, and may add a marked project-local PATH repair block to Graphify-installed hook files before `graphify hook status` when the resolved CLI is off the original PATH. Provider writes may include `.codex/skills/graphify/`, `.codex/hooks.json`, `AGENTS.md`, `.claude/skills/graphify/`, `CLAUDE.md`, `.graphify/`, legacy `graphify-out/`, and `.git/hooks/*`; setup reports them as provider-owned runtime/project output, does not edit shell profiles, does not vendor the Graphify skill, and does not auto-add, auto-commit, or promote provider output to spec-first source."
       },
       "readiness": {
         "producer": "spec-mcp-setup",

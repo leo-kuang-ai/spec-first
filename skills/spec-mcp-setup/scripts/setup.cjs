@@ -18,7 +18,7 @@ const {
   getEffectiveRegistry,
   loadRegistry,
 } = require('./lib/registry.cjs');
-const { resolveHostConfigTarget } = require('./lib/host-config.cjs');
+const { inspectHostConfig, resolveHostConfigTarget } = require('./lib/host-config.cjs');
 const {
   applyProjectConfig,
   inspectProjectConfig,
@@ -125,7 +125,10 @@ function runSetup(input = {}) {
     return failedResult('registry-load-failed', error, 2);
   }
   const knownIds = registry.providers.map((entry) => entry.id);
-  const actionPlan = buildActionPlan({ argv: parsed.modeArgv, knownIds });
+  const defaultIds = registry.providers
+    .filter((entry) => entry.setup_required === true)
+    .map((entry) => entry.id);
+  const actionPlan = buildActionPlan({ argv: parsed.modeArgv, knownIds, defaultIds });
   if (actionPlan.blocked) {
     return {
       exit_code: 2,
@@ -157,7 +160,7 @@ function runSetup(input = {}) {
     };
   }
 
-  const mutationNeedsHost = ['verify', 'only', 'graphify-refresh'].includes(actionPlan.mode);
+  const mutationNeedsHost = ['verify', 'only', 'graphify-refresh', 'host-config-repair'].includes(actionPlan.mode);
   const runner = input.runner || runCommandSync;
   const candidates = advisoryHostCandidates({ env, runner });
   const authority = resolveHostAuthority({
@@ -262,20 +265,26 @@ function runPlan(context, repoRoot) {
   }
   const providerBlock = providerPlans.find((entry) => entry.blocked);
   const previewActions = buildInstallPreviewActions(context, repoRoot, providerPlans);
+  const hostConfigBlock = previewActions.find((entry) =>
+    entry.blocked_reason && entry.blocked_reason !== 'host-undetermined-advisory'
+  );
+  const blockedEntry = providerBlock || hostConfigBlock;
   const payload = renderInstallPlan({
     ...context.actionPlan,
-    blocked: Boolean(providerBlock),
-    reason_code: providerBlock ? providerBlock.reason_code : 'setup-install-plan-ready',
+    blocked: Boolean(blockedEntry),
+    reason_code: blockedEntry ? blockedEntry.reason_code || blockedEntry.blocked_reason : 'setup-install-plan-ready',
     target: context.target,
     host: context.host,
     actions: previewActions,
     safety: previewSafety(context),
     next_action: providerBlock
       ? '修复被阻止的 Provider 目标或路径，然后重新运行 plan。'
+      : hostConfigBlock
+        ? hostConfigBlock.next_action || '修复 Host 配置冲突，然后重新运行 plan。'
       : '审查计划中的 mutation，然后使用相同选择且不带 --plan 重新运行。',
   });
   return {
-    exit_code: providerBlock ? 2 : 0,
+    exit_code: blockedEntry ? 2 : 0,
     mode: 'plan',
     reason_code: payload.reason_code || 'install-plan-ready',
     payload,
@@ -287,6 +296,7 @@ function runPlan(context, repoRoot) {
 function buildInstallPreviewActions(context, repoRoot, providerPlans) {
   const actions = [];
   for (const entry of context.effectiveRegistry.tools || []) {
+    if (entry.setup_required === true && !context.actionPlan.selected_ids.includes(entry.id)) continue;
     if (entry.required === false && !context.actionPlan.selected_ids.includes(entry.id)) continue;
     const installation = resolveInstallation(entry, context.platform);
     if (installation && installation.command) {
@@ -302,6 +312,7 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
     }
     if (entry.host_config_required !== false) {
       let target = null;
+      let inspection = null;
       if (context.host) {
         target = resolveHostConfigTarget({
           entry,
@@ -313,15 +324,31 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
           userScope: context.actionPlan.args.userScope,
           requireWritable: false,
         });
+        if (target.ok) inspection = inspectHostConfig({ entry, target });
       }
+      const repairableConflict = inspection && inspection.reason_code === 'host-config-conflict';
+      const repairAuthorized = repairableConflict && context.actionPlan.args.repairHostConfig === true;
+      const blockedReason = target && !target.ok
+        ? target.reason_code
+        : (inspection && (!inspection.ok || inspection.conflict) && !repairAuthorized
+          ? inspection.reason_code
+          : null);
       actions.push({
-        kind: 'write-host-config',
+        kind: repairAuthorized ? 'repair-host-config' : 'write-host-config',
         tool: entry.id,
         host: context.host,
         scope: target && target.ok ? target.scope : null,
         target_path: target && target.ok ? target.config_path : null,
-        planned: true,
-        blocked_reason: target && !target.ok ? target.reason_code : (context.host ? null : 'host-undetermined-advisory'),
+        config_key: target && target.ok ? target.key : null,
+        conflict_fields: inspection && inspection.conflict_fields ? inspection.conflict_fields : [],
+        blocking_scope: inspection && inspection.blocking_scope ? inspection.blocking_scope : null,
+        blocking_path: inspection && inspection.blocking_path ? inspection.blocking_path : null,
+        planned: blockedReason === null,
+        reason_code: repairAuthorized ? 'host-config-repair-authorized' : null,
+        blocked_reason: blockedReason || (context.host ? null : 'host-undetermined-advisory'),
+        next_action: blockedReason === 'host-config-conflict'
+          ? hostConfigRepairCommand(context)
+          : null,
       });
     }
   }
@@ -360,6 +387,23 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
   }
   actions.push({ kind: 'write-setup-facts', planned: true });
   return actions;
+}
+
+function hostConfigRepairCommand(context) {
+  const args = ['spec-mcp-setup'];
+  if (context.actionPlan.selected_ids.length > 0) {
+    args.push('--only', context.actionPlan.selected_ids.join(','));
+  }
+  if (context.actionPlan.mode === 'graphify-refresh' || context.actionPlan.args.refresh) args.push('--refresh');
+  if (context.actionPlan.args.repo) args.push('--repo', context.actionPlan.args.repo);
+  if (context.actionPlan.args.folder) args.push('--folder', context.actionPlan.args.folder);
+  if (context.actionPlan.args.allRepos) args.push('--all-repos');
+  if (context.actionPlan.args.userScope) args.push('--user-scope');
+  if (context.actionPlan.args.requirementWorkspace) {
+    args.push('--requirement-workspace', context.actionPlan.args.requirementWorkspace);
+  }
+  args.push('--repair-host-config');
+  return args.join(' ');
 }
 
 function previewSafety(context) {
@@ -421,7 +465,7 @@ function helpResult() {
   const human = [
     '用法：node <loaded-skill-root>/scripts/setup.cjs [options]',
     '',
-    '模式：--check | --verify-only | --refresh-facts | --plan | --project-config | --only <ids>',
+    '模式：--check | --verify-only | --refresh-facts | --plan | --project-config | --only <ids> | --repair-host-config',
     'Graphify 刷新：--only graphify --refresh',
     '目标：--repo <path> | --folder <path> | --all-repos',
     '',

@@ -358,6 +358,14 @@ function serverMatches(actual, expected) {
   return JSON.stringify(normalizeServer(actual)) === JSON.stringify(normalizeServer(expected));
 }
 
+function serverDriftFields(actual, expected) {
+  const normalizedActual = normalizeServer(actual);
+  const normalizedExpected = normalizeServer(expected);
+  return CONFIG_FIELDS.filter((field) =>
+    JSON.stringify(normalizedActual[field]) !== JSON.stringify(normalizedExpected[field])
+  );
+}
+
 function inspectOneTarget({ targetRecord, key, server }) {
   if (!fs.existsSync(targetRecord.config_path)) {
     return { ok: true, configured: false, conflict: false, reason_code: 'host-config-missing' };
@@ -378,7 +386,13 @@ function inspectOneTarget({ targetRecord, key, server }) {
     if (!compared.ok) return { ...compared, configured: false, conflict: false };
     return compared.matches
       ? { ok: true, configured: true, conflict: false, reason_code: 'host-config-current' }
-      : { ok: true, configured: false, conflict: true, reason_code: 'host-config-conflict' };
+      : {
+        ok: true,
+        configured: false,
+        conflict: true,
+        reason_code: 'host-config-conflict',
+        conflict_fields: compared.drift_fields || [],
+      };
   }
   const parsed = parseJsonConfig(text);
   if (!parsed.ok) return { ...parsed, configured: false, conflict: false };
@@ -388,7 +402,13 @@ function inspectOneTarget({ targetRecord, key, server }) {
   }
   return serverMatches(actual, server)
     ? { ok: true, configured: true, conflict: false, reason_code: 'host-config-current' }
-    : { ok: true, configured: false, conflict: true, reason_code: 'host-config-conflict' };
+    : {
+      ok: true,
+      configured: false,
+      conflict: true,
+      reason_code: 'host-config-conflict',
+      conflict_fields: serverDriftFields(actual, server),
+    };
 }
 
 function inspectHostConfig({ entry, target } = {}) {
@@ -429,6 +449,7 @@ function inspectHostConfig({ entry, target } = {}) {
         reason_code: 'host-config-higher-precedence-conflict',
         blocking_scope: candidate.scope,
         blocking_path: candidate.config_path,
+        conflict_fields: inspected.conflict_fields || [],
       };
     }
   }

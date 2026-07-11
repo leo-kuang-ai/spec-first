@@ -8,11 +8,12 @@
 | --- | --- | --- | --- | --- |
 | Sequential Thinking | Yes | `mcp` | Yes | `npx -y @modelcontextprotocol/server-sequential-thinking@latest` |
 | Context7 | Yes | `mcp` | Yes | `npx -y @upstash/context7-mcp@latest` |
-| CodeGraph | No, explicit opt-in | `mcp` | Yes | `codegraph serve --mcp` |
+| CodeGraph | Yes, standard setup | `mcp` | Yes | `codegraph serve --mcp` |
+| Graphify | Yes, standard setup | `provider-cli` | Project skill/hook | `graphify` |
 
 ## Setup Rules
 
-- Baseline entries may have `required=true`; optional MCP entries must carry `opt_in.explicit_consent_required=true`.
+- Standard Runtime Setup includes CodeGraph and Graphify；`--only` narrows execution for advanced subset repair，不代表这些 Provider 在完整 setup 中可选。
 - 统一 registry 区分 `tools`、`helpers` 与 `providers`，同时集中管理 dependency pin、host target、platform override、install safety 与 artifact contract。
 - MCP tools must define deterministic install, host config, detection, summary, and uninstall metadata.
 - Package-backed setup paths normally request latest versions through `@latest`.
@@ -32,7 +33,7 @@
 
 ## Required Helper Tools
 
-`agent-browser` and ast-grep are required helper tools for workflows that need browser automation or structural search. Each helper is not an MCP server, has no host config write, and is reported under `"helper_tools"` in setup-owned facts.
+ffmpeg and ast-grep guidance are required setup helpers；ffmpeg is baseline-blocking，`agent-browser` remains report-only/non-blocking for workflows that need browser automation. Each helper is not an MCP server, has no host config write, and is reported under `"helper_tools"` in setup-owned facts.
 
 ## Project Setup Facts
 

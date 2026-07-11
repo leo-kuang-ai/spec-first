@@ -46,31 +46,32 @@ const {
 
 function runVerificationOrMutation(context, repoRoot) {
   const selectedIds = context.actionPlan.selected_ids;
-  const applyMutation = ['only', 'graphify-refresh'].includes(context.actionPlan.mode);
+  const applyInstallMutation = ['only', 'graphify-refresh'].includes(context.actionPlan.mode);
+  const applyHostConfigMutation = applyInstallMutation || context.actionPlan.mode === 'host-config-repair';
   let installResults = new Map();
   let helperInstallResults = new Map();
-  if (applyMutation) {
+  if (applyInstallMutation) {
     requireCapability(context, 'install-tools');
-    installResults = installBaselineTools(context, repoRoot);
+    installResults = installBaselineTools(context, repoRoot, selectedIds);
     helperInstallResults = installBaselineHelpers(context, repoRoot);
   }
   const baselineInstallFailed = [...installResults.values(), ...helperInstallResults.values()]
     .some((entry) => entry.status !== 'ready');
 
-  const providerDependencyResults = applyMutation && !baselineInstallFailed
+  const providerDependencyResults = applyInstallMutation && !baselineInstallFailed
     ? installSelectedProviderDependencies(context, repoRoot, selectedIds)
     : new Map();
-  let providerResults = applyMutation && baselineInstallFailed
+  let providerResults = applyInstallMutation && baselineInstallFailed
     ? blockedSelectedProviders(context, repoRoot, selectedIds, 'baseline-install-failed')
     : verifyProviders(context, repoRoot, selectedIds);
 
   const hostConfigResults = configureOrInspectHost(context, repoRoot, {
-    applyMutation,
+    applyMutation: applyHostConfigMutation,
     selectedIds,
     providerResults,
     installResults,
   });
-  if (applyMutation && !baselineInstallFailed) {
+  if (applyInstallMutation && !baselineInstallFailed) {
     const dependencyFailure = firstProviderDependencyFailure(providerDependencyResults, selectedIds);
     const hostFailure = firstHostConfigFailure(context, hostConfigResults, selectedIds);
     if (dependencyFailure || hostFailure) {
@@ -97,9 +98,9 @@ function runVerificationOrMutation(context, repoRoot) {
       const hostResult = hostConfigResults.get(result.id);
       if (hostResult) Object.assign(result, hostResult);
     }
-    if (applyMutation) result.source = 'post-mutation-probe';
+    if (applyHostConfigMutation) result.source = 'post-mutation-probe';
   }
-  if (applyMutation) {
+  if (applyInstallMutation) {
     for (const result of probes.helperResults) {
       const installResult = helperInstallResults.get(result.id);
       if (installResult && installResult.status !== 'ready') Object.assign(result, installResult);
@@ -113,6 +114,7 @@ function runVerificationOrMutation(context, repoRoot) {
     templatePath: path.join(context.skillRoot, 'references', 'config-template.yaml'),
   });
   const generatedRuntimeManifest = computeGeneratedRuntimeManifestHealth(context, repoRoot);
+  const ripgrepProbe = context.runner('rg', ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
   const factsNow = new Date();
   const baseFactInputs = {
     repoRoot,
@@ -124,9 +126,12 @@ function runVerificationOrMutation(context, repoRoot) {
     providerResults: providerResults.map((readiness) => ({
       readiness,
       verified: true,
-      source: applyMutation ? 'post-mutation-probe' : 'read-only-probe',
+      source: applyHostConfigMutation ? 'post-mutation-probe' : 'read-only-probe',
     })),
     generatedRuntimeManifest,
+    directEvidence: {
+      ripgrep: commandSucceeded(ripgrepProbe),
+    },
     projectConfigStatus: projectStatus,
     target: context.target,
     now: factsNow,
@@ -243,6 +248,7 @@ function reduceExecutionOutcome({
 
   for (const entry of context.effectiveRegistry.tools || []) {
     if (!isBaselineBlocking(entry)) continue;
+    if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
     const installResult = installResults.get(entry.id);
     if (installResult && installResult.status !== 'ready') {
       return failureOutcome(installResult.reason_code, 'tool-install-failed');
@@ -265,19 +271,20 @@ function reduceExecutionOutcome({
     }
   }
 
-  const selectedProviderFailure = firstSelectedProviderFailure(providerResults, selectedIds, {
-    requireConfigured: false,
-  });
-  if (selectedProviderFailure) return selectedProviderFailure;
-
   for (const entry of context.effectiveRegistry.tools || []) {
     if (entry.host_config_required === false) continue;
+    if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
     if (entry.required === false && !selectedIds.includes(entry.id)) continue;
     const hostResult = hostConfigResults.get(entry.id);
     if (hostResult && !hostConfigReady(hostResult.configured_status)) {
       return failureOutcome(hostResult.reason_code, 'host-config-action-required');
     }
   }
+
+  const selectedProviderFailure = firstSelectedProviderFailure(providerResults, selectedIds, {
+    requireConfigured: false,
+  });
+  if (selectedProviderFailure) return selectedProviderFailure;
 
   const selectedProviderConfigFailure = firstSelectedProviderFailure(providerResults, selectedIds, {
     configuredOnly: true,
@@ -383,6 +390,7 @@ function configureOrInspectHost(context, repoRoot, {
   const providerReadiness = new Map((providerResults || []).map((entry) => [entry.provider, entry]));
   for (const entry of context.effectiveRegistry.tools || []) {
     if (entry.host_config_required === false) continue;
+    if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
     if (entry.required === false && !selectedIds.includes(entry.id)) continue;
     const installResult = installResults && installResults.get(entry.id);
     if (applyMutation && installResult && installResult.status !== 'ready') {
@@ -422,8 +430,10 @@ function configureOrInspectHost(context, repoRoot, {
       continue;
     }
     let inspection = inspectHostConfig({ entry, target });
-    if (applyMutation && inspection.ok && !inspection.configured && !inspection.conflict) {
-      const applied = applyHostConfig({ entry, target });
+    const repairAuthorized = context.actionPlan.args.repairHostConfig === true
+      && inspection.reason_code === 'host-config-conflict';
+    if (applyMutation && inspection.ok && !inspection.configured && (!inspection.conflict || repairAuthorized)) {
+      const applied = applyHostConfig({ entry, target, overwrite: repairAuthorized });
       if (applied.ok) inspection = inspectHostConfig({ entry, target });
       else inspection = { ok: false, configured: false, reason_code: applied.reason_code };
     }
@@ -432,9 +442,36 @@ function configureOrInspectHost(context, repoRoot, {
         ? 'ready'
         : (inspection.reason_code === 'host-config-higher-precedence-conflict' ? 'precedence-blocked' : 'action-required'),
       reason_code: inspection.reason_code,
+      config_key: target.key,
+      config_path: inspection.effective_path || target.config_path,
+      effective_scope: inspection.effective_scope || target.scope,
+      blocking_scope: inspection.blocking_scope || null,
+      blocking_path: inspection.blocking_path || null,
+      conflict_fields: inspection.conflict_fields || [],
+      repair_authorized: repairAuthorized,
+      next_action: inspection.reason_code === 'host-config-conflict'
+        ? hostConfigRepairCommand(context)
+        : null,
     });
   }
   return results;
+}
+
+function hostConfigRepairCommand(context) {
+  const args = ['spec-mcp-setup'];
+  if (context.actionPlan.selected_ids.length > 0) {
+    args.push('--only', context.actionPlan.selected_ids.join(','));
+  }
+  if (context.actionPlan.mode === 'graphify-refresh' || context.actionPlan.args.refresh) args.push('--refresh');
+  if (context.actionPlan.args.repo) args.push('--repo', context.actionPlan.args.repo);
+  if (context.actionPlan.args.folder) args.push('--folder', context.actionPlan.args.folder);
+  if (context.actionPlan.args.allRepos) args.push('--all-repos');
+  if (context.actionPlan.args.userScope) args.push('--user-scope');
+  if (context.actionPlan.args.requirementWorkspace) {
+    args.push('--requirement-workspace', context.actionPlan.args.requirementWorkspace);
+  }
+  args.push('--repair-host-config');
+  return args.join(' ');
 }
 
 function installSelectedProviderDependencies(context, repoRoot, selectedIds) {

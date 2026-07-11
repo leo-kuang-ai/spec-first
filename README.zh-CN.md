@@ -83,7 +83,7 @@ spec-first init
 
 Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Changelog 保持逐字节不变并继续由仓库自行拥有。
 
-如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-mcp-setup`。
+如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-mcp-setup`。标准流程会准备必备 baseline、CodeGraph 与 Graphify；`--only` 仅用于高级子集修复，`--verify-only` 保持不安装的只读验证边界。
 
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
 

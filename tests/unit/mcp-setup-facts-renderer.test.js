@@ -203,6 +203,38 @@ describe('spec-mcp-setup facts reconciliation', () => {
     expect(bundle.runtimeCapabilities.setup_summary.baseline_ready).toBe(false);
   });
 
+  test('preserves actionable host conflict evidence and repair command', () => {
+    const { collectSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const bundle = collectSetupFacts({
+      repoRoot: '/repo',
+      host: 'codex',
+      registry: { tools: [registryFixture().tools[0]], helpers: [] },
+      toolResults: [{
+        id: 'context7',
+        status: 'ready',
+        verified: true,
+        source: 'post-mutation-probe',
+        configured_status: 'action-required',
+        reason_code: 'host-config-conflict',
+        config_key: 'context7',
+        config_path: '/home/user/.codex/config.toml',
+        conflict_fields: ['command', 'args'],
+        next_action: 'spec-mcp-setup --repair-host-config',
+      }],
+      helperResults: [],
+      providerResults: [],
+      configuredDependencies: [],
+      generatedRuntimeManifest: { status: 'current', reason_code: 'manifest-current' },
+    });
+
+    expect(bundle.toolFacts.items[0]).toMatchObject({
+      result: 'action-required',
+      reason_code: 'host-config-conflict',
+      conflict_fields: ['command', 'args'],
+      next_action: 'spec-mcp-setup --repair-host-config',
+    });
+  });
+
   test.each(canonicalHosts)('writes %s readiness ledger v2 under an isolated HOME', (host) => {
     const {
       collectSetupFacts,

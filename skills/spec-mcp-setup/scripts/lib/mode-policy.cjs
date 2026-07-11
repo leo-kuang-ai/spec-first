@@ -20,6 +20,10 @@ const ACTIONS_BY_MODE = Object.freeze({
     action('inspect-project-config', 'read-only', false),
     action('write-project-config', 'write-project-config', true),
   ],
+  'host-config-repair': [
+    action('repair-host-config', 'write-host-config', true),
+    action('write-setup-facts', 'write-setup-facts', true),
+  ],
   only: [
     action('install-tools', 'install-tools', true),
     action('write-host-config', 'write-host-config', true),
@@ -38,7 +42,7 @@ function action(id, capability, mutation) {
   return Object.freeze({ id, capability, mutation });
 }
 
-function buildActionPlan({ argv = [], knownIds = [] } = {}) {
+function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
   const args = parseArgs(argv);
   if (args.errors.length > 0) {
     return blockedPlan(args.errors[0].reason_code, args);
@@ -48,12 +52,17 @@ function buildActionPlan({ argv = [], knownIds = [] } = {}) {
   if (args.repo && args.allRepos) return blockedPlan('repo-and-all-repos', args);
   if (args.folder && args.allRepos) return blockedPlan('folder-and-all-repos', args);
 
+  if (args.repairHostConfig && (args.check || args.verifyOnly || args.refreshFacts || args.projectConfig)) {
+    return blockedPlan('repair-host-config-mode-conflict', args);
+  }
+
   const selectedModes = [
     args.check && 'check',
     (args.verifyOnly || args.refreshFacts) && 'verify',
     args.plan && 'plan',
     args.projectConfig && 'project-config',
     args.only.length > 0 && !args.plan && 'only',
+    args.repairHostConfig && args.only.length === 0 && !args.plan && 'host-config-repair',
   ].filter(Boolean);
   if (new Set(selectedModes).size > 1) {
     return blockedPlan('mode-conflict', args);
@@ -94,7 +103,12 @@ function buildActionPlan({ argv = [], knownIds = [] } = {}) {
     reason_code: 'action-plan-ready',
     actions,
     args,
-    selected_ids: [...args.only],
+    selection_source: args.only.length > 0
+      ? 'explicit-only'
+      : (['verify', 'plan'].includes(mode) ? 'default-required' : 'not-selected'),
+    selected_ids: args.only.length > 0
+      ? [...args.only]
+      : (['verify', 'plan'].includes(mode) ? [...defaultIds] : []),
   };
 }
 

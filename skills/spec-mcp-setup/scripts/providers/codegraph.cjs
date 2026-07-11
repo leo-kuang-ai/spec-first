@@ -17,7 +17,7 @@ const {
 const METADATA = {
   id: 'codegraph',
   kind: 'code-structure',
-  profile: 'optional',
+  profile: 'minimal',
   capability_class: 'code-graph',
   capabilities: ['code-graph', 'impact-candidates', 'affected-tests-candidates'],
   native_interfaces: ['mcp', 'cli'],
@@ -25,7 +25,7 @@ const METADATA = {
     owner: 'runtime-setup',
     status: 'not-run',
     scope: 'project',
-    requires_explicit_gate: true,
+    requires_explicit_gate: false,
     requirement_workspace_path: null,
     artifact_root: '.codegraph',
   },
@@ -86,6 +86,11 @@ function plan(context = {}) {
   actions.push(
     { kind: 'initialize-if-missing', command: 'codegraph', args: ['init'] },
     { kind: 'verify-status', command: 'codegraph', args: ['status'] },
+    {
+      kind: 'verify-query',
+      command: 'codegraph',
+      args: ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
+    },
   );
   return {
     schema_version: 'provider-action-plan.v1',
@@ -122,13 +127,19 @@ function verify(context = {}) {
     && succeeded(statusResult)
     && !statusNeedsSync(statusOutput)
     && !statusNeedsReindex(statusOutput));
-  const queryVerified = context.queryVerified === true;
+  const queryResult = indexed
+    ? run(context, 'codegraph', ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'], {
+      cwd: repoRoot,
+      timeoutMs: 10000,
+    })
+    : null;
+  const queryVerified = Boolean(queryResult && succeeded(queryResult));
   const serverReachable = context.serverReachable === true;
   const nextActions = [];
   if (!installed) nextActions.push('显式运行 spec-mcp-setup --only codegraph，安装 pinned CodeGraph CLI。');
   if (installed && !hasArtifact) nextActions.push('依赖 code-graph candidate 前，先显式执行 CodeGraph first generation。');
   if (installed && hasArtifact && !serverReachable) nextActions.push('将 server_reachable 视为 true 前，先运行 CodeGraph server/probe 验证。');
-  if (serverReachable && !queryVerified) nextActions.push('将 query_verified 视为 true 前，先运行 CodeGraph query probe。');
+  if (indexed && !queryVerified) nextActions.push('运行 spec-mcp-setup --only codegraph，重新执行 bounded CodeGraph query probe。');
   return providerResult(METADATA, {
     installed,
     configured: context.configured === true,
@@ -137,7 +148,7 @@ function verify(context = {}) {
     artifactExists: hasArtifact,
     serverReachable,
     queryVerified,
-    readinessStatus: !installed ? 'not-run' : (!hasArtifact || !indexed ? 'degraded' : (queryVerified ? 'fresh' : 'unknown')),
+    readinessStatus: !installed ? 'not-run' : (!hasArtifact || !indexed || !queryVerified ? 'degraded' : 'fresh'),
     repoAligned: 'unknown',
     firstGenerationStatus: hasArtifact ? 'completed' : 'not-run',
     artifactRefs: hasArtifact ? ['.codegraph/codegraph.db'] : [],
@@ -216,6 +227,15 @@ function apply(context = {}, actionPlan = plan(context)) {
   if (!versionReady(versionResult, actionPlan.dependency_version)) {
     return degraded(context, repoRoot, 'codegraph-post-mutation-version-probe-failed');
   }
+  const queryResult = run(
+    context,
+    'codegraph',
+    ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
+    { cwd: repoRoot, timeoutMs: 10000 },
+  );
+  if (!succeeded(queryResult)) {
+    return degraded(context, repoRoot, 'codegraph-query-probe-failed');
+  }
   return providerResult(METADATA, {
     installed: true,
     configured: context.configured === true,
@@ -223,14 +243,12 @@ function apply(context = {}, actionPlan = plan(context)) {
     indexed: true,
     artifactExists: true,
     serverReachable: context.serverReachable === true,
-    queryVerified: context.queryVerified === true,
-    readinessStatus: context.queryVerified === true ? 'fresh' : 'unknown',
+    queryVerified: true,
+    readinessStatus: 'fresh',
     repoAligned: 'unknown',
     firstGenerationStatus: 'completed',
     artifactRefs: ['.codegraph/codegraph.db'],
-    nextActions: context.queryVerified === true
-      ? []
-      : ['将 query_verified 视为 true 前，先运行 CodeGraph query probe。'],
+    nextActions: [],
   });
 }
 

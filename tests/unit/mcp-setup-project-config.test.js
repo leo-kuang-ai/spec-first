@@ -44,7 +44,7 @@ describe('spec-mcp-setup project config', () => {
       status: 'action-required',
       repo_root: target,
       example_config: { status: 'missing', next_action: expect.stringContaining('--refresh-example') },
-      local_config: { status: 'missing', next_action: expect.stringContaining('--create-local') },
+      local_config: { status: 'defaults-active', next_action: null },
       local_config_gitignore: { status: 'not-applicable', next_action: null },
       legacy_markdown_config: { status: 'missing', next_action: null },
       legacy_local_config: { path: '', status: 'retired', next_action: null },
@@ -125,7 +125,7 @@ describe('spec-mcp-setup project config', () => {
     expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
       status: 'action-required',
       example_config: { status: 'outdated', next_action: expect.stringContaining('--refresh-example') },
-      local_config: { status: 'missing', next_action: expect.stringContaining('--create-local') },
+      local_config: { status: 'defaults-active', next_action: null },
       local_config_gitignore: { status: 'ready-for-local-config', next_action: null },
       legacy_markdown_config: {
         status: 'present',

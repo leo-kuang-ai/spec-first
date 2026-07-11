@@ -14,6 +14,8 @@ source_documents:
 
 # spec-prd 产品决策合成与合同重置 - Plan
 
+> **2026-07-11 Scope Decision — Contract Reset Lite:** Phase 1 Exit Safety 保持当前默认；Gate A 的 `inconclusive` 不追溯升级。Owner 已授权一个新的、可逆的 opt-in 试验，只在显式 `analysis_profile=contract-reset-lite` 时用单一 run-local Product Analysis Brief 合并 Requirement Analysis Gate、产品风险排序与 owner checkpoint，并继续写 legacy `docs/brainstorms/*-requirements.md`、复用现有 Decision Card/checker/finalizer/producer receipt。U7-U13 自本裁决起退出 active implementation backlog，以下章节仅保留历史设计与 reversal context；不得据此切 unified artifact topology、启用 mandatory consumer receipt gate，或建设 sealed-holdout、migration manifest、cleanup receipt、staged promotion/runtime cutover。若 Lite 的真实任务证据满足本计划 Primary/Non-regression 方向，再另起 scope decision，而不是恢复本计划的连续 migration。
+
 ## Goal Capsule
 
 - **Objective:** 将 `spec-prd` 从围绕多套 grill/readiness ceremony 演化的 PRD 格式化流程，重构为 brownfield 多源产品决策合成器：读取低质量 PRD、会议、代码、Figma 和专业领域证据，闭合当前 release slice 的 WHAT，并输出唯一、可追溯、可验收的 Product Contract。

@@ -110,10 +110,8 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
     },
     local_config: {
       path: localPath,
-      status: localPresent ? 'present' : 'missing',
-      next_action: localPresent
-        ? null
-        : `可选：${projectConfigNextAction(root, '--create-local')}`,
+      status: localPresent ? 'present' : 'defaults-active',
+      next_action: null,
     },
     local_config_gitignore: {
       path: gitignorePath,

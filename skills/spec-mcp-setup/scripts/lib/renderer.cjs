@@ -74,7 +74,9 @@ function normalizeOptionalProviderSelection(plan, selectedIds, blocked) {
       }))
       : []);
   return {
-    selection_source: source.selection_source || (selectedIds.length > 0 ? 'explicit-only' : 'plan-diagnose'),
+    selection_source: source.selection_source
+      || plan.selection_source
+      || (selectedIds.length > 0 ? 'explicit-only' : 'plan-diagnose'),
     selected_ids: selectedIds,
     unknown_ids: unknownIds,
     requires_confirmation: source.requires_confirmation === true,
@@ -107,7 +109,9 @@ function normalizeProviderSelection(plan, selectedIds, safety, plannedOperations
       ...detail,
       provider: id,
       selected: isSelected,
-      selection_source: detail.selection_source || (isSelected ? 'explicit-only' : 'not-selected'),
+      selection_source: detail.selection_source
+        || plan.selection_source
+        || (isSelected ? 'explicit-only' : 'not-selected'),
       requires_confirmation: detail.requires_confirmation === true,
       ...installSafetyFields(safetyEntry),
       planned_operations: plannedOperations.filter((entry) => entry.provider === id),
@@ -202,6 +206,15 @@ function renderHumanSummary({ toolFacts = {}, runtimeCapabilities = {} } = {}) {
   ];
   for (const item of toolFacts.items || []) {
     lines.push(`- ${item.id} [${item.kind}]: ${item.result} (${item.reason_code})${item.next_action ? ` -> ${item.next_action}` : ''}`);
+    if (item.config_path && item.reason_code && item.reason_code.includes('host-config')) {
+      lines.push(`  config: ${item.config_path}${item.config_key ? ` key=${item.config_key}` : ''}`);
+    }
+    if (Array.isArray(item.conflict_fields) && item.conflict_fields.length > 0) {
+      lines.push(`  conflict_fields: ${item.conflict_fields.join(', ')}`);
+    }
+    if (item.blocking_path) {
+      lines.push(`  blocking: ${item.blocking_path}${item.blocking_scope ? ` scope=${item.blocking_scope}` : ''}`);
+    }
   }
   lines.push('', 'Provider 工具');
   for (const provider of toolFacts.provider_readiness || []) {

@@ -87,7 +87,9 @@ function collectSetupFacts(options = {}) {
     host: options.host || null,
     direct_evidence: {
       bounded_source_reads: true,
-      ripgrep: commandReady(items, 'rg'),
+      ripgrep: options.directEvidence && typeof options.directEvidence.ripgrep === 'boolean'
+        ? options.directEvidence.ripgrep
+        : commandReady(items, 'rg'),
       ast_grep: commandReady(items, 'ast-grep'),
       git_diff: true,
       tests_and_logs: true,
@@ -136,10 +138,10 @@ function normalizeItem(entry, observed = null, kind) {
     reasonCode = source.reason_code || 'optional-skipped';
   } else if (configuredStatus === 'action-required') {
     result = 'action-required';
-    reasonCode = 'host-config-action-required';
+    reasonCode = source.reason_code || 'host-config-action-required';
   } else if (configuredStatus === 'precedence-blocked') {
     result = 'action-required';
-    reasonCode = 'host-config-precedence-blocked';
+    reasonCode = source.reason_code || 'host-config-precedence-blocked';
   } else if (configuredStatus === 'registry-args-drift') {
     result = 'degraded';
     reasonCode = 'host-config-version-drift';
@@ -172,6 +174,7 @@ function normalizeItem(entry, observed = null, kind) {
     kind,
     profile: normalizeProfile(source.profile || entry.profile || firstProfile(entry.profiles)),
     required,
+    setup_required: entry.setup_required === true,
     baseline_blocking: baselineBlocking,
     dependency_status: installed ? 'ready' : (observedStatus === 'missing' ? 'missing' : 'unknown'),
     configured_status: configuredStatus,

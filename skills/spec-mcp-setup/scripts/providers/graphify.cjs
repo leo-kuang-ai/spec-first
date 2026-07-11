@@ -30,7 +30,7 @@ const GRAPHIFY_HOOK_MARKER = 'Installed by: graphify hook install';
 const METADATA = {
   id: 'graphify',
   kind: 'project-graph',
-  profile: 'optional',
+  profile: 'minimal',
   capability_class: 'project-graph',
   capabilities: ['project-graph'],
   native_interfaces: ['cli'],
@@ -38,7 +38,7 @@ const METADATA = {
     owner: 'runtime-setup',
     status: 'not-run',
     scope: 'project',
-    requires_explicit_gate: true,
+    requires_explicit_gate: false,
     requirement_workspace_path: null,
     artifact_root: '.graphify',
   },

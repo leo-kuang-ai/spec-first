@@ -32,11 +32,13 @@ describe('spec-mcp-setup GNU argument parsing', () => {
       'child',
       '--requirement-workspace=packages/api',
       '--user-scope',
+      '--repair-host-config',
     ])).toMatchObject({
       only: ['codegraph', 'graphify'],
       repo: 'child',
       requirementWorkspace: 'packages/api',
       userScope: true,
+      repairHostConfig: true,
       errors: [],
     });
   });
@@ -121,6 +123,44 @@ describe('spec-mcp-setup action policy', () => {
     });
   });
 
+  test('selects required providers by default for plan and verify while keeping bare Node mode diagnostic', () => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const input = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
+
+    expect(buildActionPlan({ ...input, argv: [] })).toMatchObject({
+      mode: 'bare',
+      selected_ids: [],
+    });
+    expect(buildActionPlan({ ...input, argv: ['--plan'] })).toMatchObject({
+      mode: 'plan',
+      selected_ids: ['codegraph', 'graphify'],
+    });
+    expect(buildActionPlan({ ...input, argv: ['--verify-only'] })).toMatchObject({
+      mode: 'verify',
+      selected_ids: ['codegraph', 'graphify'],
+    });
+  });
+
+  test('treats host config repair as an explicit mutation mode or an --only modifier', () => {
+    const { buildActionPlan } = require(modePolicyModule);
+
+    expect(buildActionPlan({ argv: ['--repair-host-config'] })).toMatchObject({
+      blocked: false,
+      mode: 'host-config-repair',
+      capabilities: ['write-host-config', 'write-setup-facts'],
+      args: { repairHostConfig: true },
+    });
+    expect(buildActionPlan({
+      argv: ['--only', 'codegraph', '--repair-host-config'],
+      knownIds: ['codegraph', 'graphify'],
+    })).toMatchObject({
+      blocked: false,
+      mode: 'only',
+      selected_ids: ['codegraph'],
+      args: { repairHostConfig: true },
+    });
+  });
+
   test.each([
     [['--check', '--plan'], 'mode-conflict'],
     [['--refresh'], 'refresh-without-only-graphify'],
@@ -133,6 +173,9 @@ describe('spec-mcp-setup action policy', () => {
     [['--verify-only', '--only', 'graphify', '--refresh'], 'mode-conflict'],
     [['--refresh-facts', '--only', 'graphify', '--refresh'], 'mode-conflict'],
     [['--only', 'graphify', '--check'], 'mode-conflict'],
+    [['--check', '--repair-host-config'], 'repair-host-config-mode-conflict'],
+    [['--verify-only', '--repair-host-config'], 'repair-host-config-mode-conflict'],
+    [['--project-config', '--repair-host-config'], 'repair-host-config-mode-conflict'],
   ])('fails closed for %j', (argv, reasonCode) => {
     const { buildActionPlan } = require(modePolicyModule);
 

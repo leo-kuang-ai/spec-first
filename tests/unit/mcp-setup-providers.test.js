@@ -98,10 +98,41 @@ describe('CodeGraph provider', () => {
 
     const result = provider.apply({ repoRoot: target, runner }, plan);
     expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
-    expect(result.readiness_status).toBe('unknown');
-    expect(result.lifecycle).toMatchObject({ installed: true, initialized: true, indexed: true });
+    expect(result.readiness_status).toBe('fresh');
+    expect(result.lifecycle).toMatchObject({
+      installed: true,
+      initialized: true,
+      indexed: true,
+      query_verified: true,
+    });
     expect(calls.filter((call) => call.join(' ') === 'codegraph sync')).toHaveLength(1);
     expect(calls.filter((call) => call.join(' ') === 'codegraph index -f')).toHaveLength(1);
+    expect(calls.filter((call) => call.join(' ') === 'codegraph query __spec_first_readiness_probe__ --limit 1 --json')).toHaveLength(1);
+  });
+
+  test('degrades when the real CodeGraph query probe fails after indexing', () => {
+    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-query-failure');
+    fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+    const runner = (_command, args) => {
+      if (args[0] === '--version') return success('codegraph 1.2.0');
+      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'query') return failure('query failed');
+      return success();
+    };
+    const context = {
+      selected: true,
+      repoRoot: target,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.2.0' },
+      runner,
+    };
+
+    const result = provider.apply(context, provider.plan(context));
+
+    expect(result.readiness_status).toBe('degraded');
+    expect(result.lifecycle.query_verified).toBe(false);
+    expect(result.limitations).toContain('failed: codegraph-query-probe-failed. CodeGraph setup 失败。');
   });
 
   test('blocks a symlinked artifact root before running any mutation command', () => {

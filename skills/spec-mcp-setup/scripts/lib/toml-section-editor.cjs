@@ -543,15 +543,24 @@ function compareMcpSection(text, key, expected) {
   const parsed = parseManagedAssignments(extracted.section, extracted.range.header_end);
   if (!parsed.ok) return parsed;
   const normalized = normalizeExpected(expected);
+  const driftFields = [];
   for (const [field, value] of Object.entries(normalized)) {
     if (!parsed.assignments.has(field) || !valuesEqual(parsed.assignments.get(field).value, value)) {
-      return { ok: true, matches: false, reason_code: 'toml-target-config-drift' };
+      driftFields.push(field);
     }
   }
   for (const field of MANAGED_FIELDS) {
     if (!Object.prototype.hasOwnProperty.call(normalized, field) && parsed.assignments.has(field)) {
-      return { ok: true, matches: false, reason_code: 'toml-target-config-drift' };
+      driftFields.push(field);
     }
+  }
+  if (driftFields.length > 0) {
+    return {
+      ok: true,
+      matches: false,
+      reason_code: 'toml-target-config-drift',
+      drift_fields: [...new Set(driftFields)],
+    };
   }
   return { ok: true, matches: true, reason_code: 'toml-target-config-match' };
 }

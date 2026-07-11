@@ -47,6 +47,7 @@
 # pulse_metric_sources: "retention_d7=posthog,nps=delighted"
 # pulse_pending_metrics: "metric_without_data"
 # pulse_excluded_metrics: "metric_outside_pulse"
+# pulse_schedule: manual  # daily | weekly | manual | ask-again-after-3-runs
 
 # --- Promotion helpers ---
 # Active consumer: spec-promote reads an uncommented top-level
@@ -56,15 +57,15 @@
 # spec_promote_spiral_optout: true
 
 # --- Document rendering ---
-# Current spec-first workflows write markdown canonical artifacts. These output
-# keys are reserved future hints only: keeping them commented means they are
-# inactive. If a future workflow adopts HTML, it must remain an optional sidecar
-# until spec-plan, spec-brainstorm, spec-work, spec-write-tasks, and
-# spec-doc-review all have focused HTML consumer tests.
+# Active consumer: spec-ideate reads an uncommented ideate_output value and
+# accepts md or html. Keeping the example commented preserves its default.
+# plan_output and brainstorm_output remain reserved future hints: if those
+# workflows adopt HTML, it must remain an optional sidecar until downstream
+# consumers have focused HTML contract tests.
 
 # plan_output: html       # reserved: md | html (default remains md)
 # brainstorm_output: html # reserved: md | html (default remains md)
-# ideate_output: html     # reserved: md | html (default remains md)
+# ideate_output: html     # active: md | html (spec-ideate default remains html)
 
 # --- Work delegation ---
 # Integrated local config surface for downstream execution workflows that
@@ -85,16 +86,6 @@
 # key to skip questions by itself.
 
 # plan_skip_scoping_confirm: true
-
-# --- PR concept teaching ---
-# Active consumer: spec-commit-push-pr reads these keys when composing a PR
-# description. The teaching section defaults on; uncomment and set false to
-# disable it locally. Archival defaults off; when true, full workflow PR
-# creation/update may also write docs/explainers/ entries before applying the
-# PR body. Per-run archive:on|off overrides the archival key only.
-
-# pr_teaching_section: true
-# pr_teaching_archive: false
 
 # --- Project workflow conventions ---
 # Do not store team-shared tracker policy, label vocabulary, external PR
