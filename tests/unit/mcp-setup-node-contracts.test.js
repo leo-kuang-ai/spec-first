@@ -350,7 +350,7 @@ describe('spec-mcp-setup unified Node contract', () => {
       capture_reason_code: 'legacy-runtime-reason-unavailable',
       fixture_capture_verified: true,
     });
-    expect(result.source_files_materialized).toBeGreaterThan(result.source_files_verified);
+    expect(result.source_files_materialized).toBeGreaterThan(52);
     expect(result.modes.plan.capture_status).toBe('confirmed');
     for (const mode of ['bare', 'check', 'verify', 'project-config', 'only', 'graphify-refresh']) {
       expect(result.modes[mode]).toMatchObject({
@@ -419,6 +419,9 @@ describe('spec-mcp-setup unified Node contract', () => {
         fixture_capture_verified: true,
       });
       expect(Object.values(result.modes).every((entry) => Number.isInteger(entry.raw_exit_code))).toBe(true);
+      for (const mode of ['verify', 'only', 'graphify-refresh']) {
+        expect(result.modes[mode].raw_stderr).not.toContain('Cannot find module');
+      }
       expect(result.contract_mismatches).toEqual(adjudicatedMismatches);
     } else {
       expect(result).toMatchObject({

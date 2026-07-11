@@ -8,6 +8,15 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const SKILL_PATH = 'skills/spec-mcp-setup';
+const BASELINE_MATERIALIZATION_PATHS = [
+  SKILL_PATH,
+  'src/cli/helpers/secret-deny-patterns.js',
+  'src/cli/helpers/setup-facts.js',
+  'src/cli/helpers/target-repo.js',
+  'src/contracts/schema-validator.js',
+  'src/verification/profile-loader.js',
+  'docs/contracts/verification/verification-profile.schema.json',
+];
 const COMMAND_NAMES = [
   'agent-browser', 'ast-grep', 'brew', 'cargo', 'codegraph', 'ffmpeg',
   'gh', 'graphify', 'npm', 'npx', 'rg', 'silicon', 'spec-first', 'sudo', 'vhs',
@@ -73,7 +82,9 @@ function validateFixture(fixture, platform, source) {
 }
 
 function materializeBaseline(repoRoot, source, destination) {
-  const listing = requireSuccess(run('git', ['ls-tree', '-r', '-z', source, '--', SKILL_PATH], {
+  const listing = requireSuccess(run('git', [
+    'ls-tree', '-r', '-z', source, '--', ...BASELINE_MATERIALIZATION_PATHS,
+  ], {
     cwd: repoRoot,
     encoding: null,
   }), 'git ls-tree').stdout;
