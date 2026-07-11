@@ -226,6 +226,7 @@ describe('spec-prd Contract Reset evidence producer', () => {
       body,
     ].join('\n');
     const fixture = createNativeRun(artifact);
+    const chmodSpy = jest.spyOn(fs, 'chmodSync');
     try {
       const result = prepareEvidence({
         runRoot: fixture.runRoot,
@@ -279,11 +280,21 @@ describe('spec-prd Contract Reset evidence producer', () => {
       });
       expect(fs.existsSync(path.join(fixture.rawRoot, 'provider.log'))).toBe(false);
       expect(fs.existsSync(path.join(fixture.rawRoot, 'transcript.txt'))).toBe(false);
-      expect(fs.statSync(fixture.outDir).mode & 0o777).toBe(0o700);
-      for (const name of fs.readdirSync(fixture.outDir)) {
-        expect(fs.statSync(path.join(fixture.outDir, name)).mode & 0o777).toBe(0o600);
+      const outputNames = fs.readdirSync(fixture.outDir);
+      expect(chmodSpy).toHaveBeenCalledWith(fixture.outDir, 0o700);
+      for (const name of outputNames) {
+        expect(chmodSpy.mock.calls.some(([target, mode]) => (
+          path.basename(target) === name && mode === 0o600
+        ))).toBe(true);
+      }
+      if (process.platform !== 'win32') {
+        expect(fs.statSync(fixture.outDir).mode & 0o777).toBe(0o700);
+        for (const name of outputNames) {
+          expect(fs.statSync(path.join(fixture.outDir, name)).mode & 0o777).toBe(0o600);
+        }
       }
     } finally {
+      chmodSpy.mockRestore();
       cleanupFixture(fixture);
     }
   });
