@@ -40,11 +40,17 @@ function readRuntimeCommand(projectRoot, adapter, skillName) {
 }
 
 function unresolvedPhysicalCommandResources(projectRoot, runtimeRoot, content) {
-  const pattern = new RegExp(
-    `${runtimeRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?:references|scripts|assets|prompts|schemas|rule-packs)/[^\`\\s)>,;]+`,
+  const rootedPattern = new RegExp(
+    `${runtimeRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?:references|scripts|assets|prompts|schemas|rule-packs)/[^\`\\s)>,;'\"]+`,
     'g',
   );
-  return (content.match(pattern) || [])
+  const skillDirPattern = /\$SKILL_DIR\/(?:references|scripts|assets|prompts|schemas|rule-packs)\/[^\`\s)>,;'\"]+/g;
+  const candidates = [
+    ...(content.match(rootedPattern) || []),
+    ...(content.match(skillDirPattern) || [])
+      .map((candidate) => candidate.replace('$SKILL_DIR', runtimeRoot)),
+  ];
+  return candidates
     .map((candidate) => candidate.replace(/[.:]+$/, ''))
     .filter((candidate) => !/[<*>]/.test(candidate))
     .filter((candidate) => !fs.existsSync(path.join(projectRoot, candidate)));
@@ -97,6 +103,21 @@ describe('command companion resource paths', () => {
         'run-audit.js',
       ))).toBe(true);
 
+      const writeSkillRoot = `${adapter.workflowsRoot}/spec-write-skill`;
+      const writeSkill = readRuntimeCommand(projectRoot, adapter, 'spec-write-skill');
+      expect(writeSkill).toContain('条件细节下沉 `references/` 并写清 context pointer');
+      expect(writeSkill).not.toContain(
+        `条件细节下沉 \`${writeSkillRoot}/references/\` 并写清 context pointer`,
+      );
+
+      for (const skillName of ['spec-optimize', 'spec-polish']) {
+        const commandContent = readRuntimeCommand(projectRoot, adapter, skillName);
+        expect(commandContent).toContain('bare `scripts/<name>` path will not resolve');
+        expect(commandContent).not.toContain(
+          `bare \`${adapter.workflowsRoot}/${skillName}/scripts/<name>\` path will not resolve`,
+        );
+      }
+
       for (const command of plugin.listBundledCommands()) {
         const content = readRuntimeCommand(projectRoot, adapter, command.skill);
         expect(findUnresolvedCommandSkillLocalResourcePaths(content)).toEqual([]);
@@ -122,6 +143,11 @@ describe('command companion resource paths', () => {
       'Keep `$SKILL_DIR/scripts/run.sh` and `../references/parent.md`.',
       'Keep `/opt/tool/references/absolute.md` and `https://example.test/references/web.md`.',
       'Keep `C:\\scripts/mixed.sh`, `@references/literal.md`, and `evals/examples.json`.',
+      'Read `references/personas/<reviewer>.md` after selecting a reviewer.',
+      'Support files are `references/`, `scripts/`, `assets/`, `prompts/`, `schemas/`, and `rule-packs/`.',
+      'Keep conceptual glob `references/**` unchanged.',
+      'A bare `scripts/<name>` path will not resolve.',
+      'End with bare references/',
     ];
     const input = lines.join('\r\n');
     const runtimeRoot = '.claude/spec-first/workflows/spec-doc-review';
@@ -146,9 +172,26 @@ describe('command companion resource paths', () => {
     expect(rewritten).toContain('`C:\\scripts/mixed.sh`');
     expect(rewritten).toContain('`@references/literal.md`');
     expect(rewritten).toContain('`evals/examples.json`');
+    expect(rewritten).toContain(
+      '`.claude/spec-first/workflows/spec-doc-review/references/personas/<reviewer>.md`',
+    );
+    expect(rewritten).toContain(
+      'Support files are `references/`, `scripts/`, `assets/`, `prompts/`, `schemas/`, and `rule-packs/`.',
+    );
+    expect(rewritten).toContain('Keep conceptual glob `references/**` unchanged.');
+    expect(rewritten).toContain('A bare `scripts/<name>` path will not resolve.');
+    expect(rewritten.endsWith('End with bare references/')).toBe(true);
     expect(rewritten.split('\r\n')).toHaveLength(lines.length);
     expect(rewriteCommandSkillLocalResourcePaths(rewritten, runtimeRoot)).toBe(rewritten);
     expect(findUnresolvedCommandSkillLocalResourcePaths(rewritten)).toEqual([]);
+    expect(unresolvedPhysicalCommandResources(
+      '/tmp/command-resource-probe',
+      runtimeRoot,
+      'Run "$SKILL_DIR/scripts/missing.sh".',
+    )).toEqual([`${runtimeRoot}/scripts/missing.sh`]);
+    expect(findUnresolvedCommandSkillLocalResourcePaths(
+      'Support files are `references/`, `scripts/`, and `assets/`.',
+    )).toEqual([]);
   });
 
   test('preserves explicit source-of-truth pointers but does not treat Inputs rows as source authority', () => {

@@ -22,6 +22,7 @@ const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
 ]);
 const CURSOR_NESTED_SCAN_SKIP_DIRS = new Set([
   '.git',
+  '.agents',
   '.spec-first',
   '.claude',
   '.codex',
@@ -31,8 +32,7 @@ const CURSOR_NESTED_SCAN_SKIP_DIRS = new Set([
   'node_modules',
   'vendor',
 ]);
-const CURSOR_NESTED_SCAN_MAX_DEPTH = 4;
-const CURSOR_NESTED_SCAN_MAX_DIRECTORIES = 400;
+const CURSOR_NESTED_SCAN_MAX_DIRECTORIES = 1000;
 const CURSOR_NESTED_SCAN_MAX_MS = 500;
 
 class CursorAdapter extends PointerBasedAdapter {
@@ -97,11 +97,14 @@ class CursorAdapter extends PointerBasedAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    let transformed = normalizeCursorSkillFrontmatter(
-      rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths),
-      context,
-    );
-    if (isCursorRuntimeSetupSurface(context)) {
+    const isEntrypoint = isSkillEntrypointContext(context);
+    let transformed = isEntrypoint
+      ? rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths)
+      : content;
+    if (isEntrypoint) {
+      transformed = normalizeCursorSkillFrontmatter(transformed, context);
+    }
+    if (isEntrypoint && isCursorRuntimeSetupSurface(context)) {
       transformed = addCursorSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
@@ -305,6 +308,11 @@ function normalizeCursorSkillFrontmatter(content, context = {}) {
 
 function isCursorRuntimeSetupSurface(context = {}) {
   return context.skillName === 'spec-mcp-setup';
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addCursorSetupHostPin(content) {
@@ -560,16 +568,17 @@ function collectNestedCursorSkillRoots(projectRoot) {
   let directoryCount = 0;
   let stopped = false;
 
-  function walk(currentPath, depth) {
-    if (stopped) return;
-    if (Date.now() - startedAt > CURSOR_NESTED_SCAN_MAX_MS) {
-      stopped = true;
-      limitWarnings.push('max-duration');
-      return;
+  function stopForDurationBudget() {
+    if (Date.now() - startedAt <= CURSOR_NESTED_SCAN_MAX_MS) {
+      return false;
     }
-    if (depth > CURSOR_NESTED_SCAN_MAX_DEPTH) {
-      return;
-    }
+    stopped = true;
+    limitWarnings.push('max-duration');
+    return true;
+  }
+
+  function walk(currentPath) {
+    if (stopped || stopForDurationBudget()) return;
     directoryCount += 1;
     if (directoryCount > CURSOR_NESTED_SCAN_MAX_DIRECTORIES) {
       stopped = true;
@@ -585,6 +594,7 @@ function collectNestedCursorSkillRoots(projectRoot) {
     }
 
     for (const entry of entries) {
+      if (stopped || stopForDurationBudget()) break;
       if (!entry.isDirectory()) continue;
       if (entry.isSymbolicLink()) continue;
       if (CURSOR_NESTED_SCAN_SKIP_DIRS.has(entry.name)) continue;
@@ -601,15 +611,12 @@ function collectNestedCursorSkillRoots(projectRoot) {
           });
         }
       }
-      if (depth === CURSOR_NESTED_SCAN_MAX_DEPTH) {
-        limitWarnings.push('max-depth');
-        continue;
-      }
-      walk(childPath, depth + 1);
+      walk(childPath);
+      if (stopped) break;
     }
   }
 
-  walk(projectRoot, 0);
+  walk(projectRoot);
   return {
     roots: dedupeRoots(roots),
     limitWarnings: [...new Set(limitWarnings)],

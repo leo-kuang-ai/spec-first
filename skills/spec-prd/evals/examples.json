@@ -2591,7 +2591,7 @@
         "validate",
         "workflow-runtime-quality"
       ],
-      "input_shape": "Codex run prepares a PRD that the user may later pass to spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs the current-source producer finalize command before claiming ready, and leaves downstream plan entry to the user instead of requiring an automatic consumer receipt gate.",
+      "input_shape": "Codex run prepares a PRD that the user may later pass to spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs the producer-local finalize command from the loaded spec-prd skill root before claiming ready, and leaves downstream plan entry to the user instead of requiring an automatic consumer receipt gate.",
       "expected": [
         "Codex degraded enforcement must be explicit, not implied equal protection with Claude",
         "producer finalize remains mandatory before spec-prd claims the artifact is ready",

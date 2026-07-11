@@ -213,8 +213,8 @@ function syncSkills(projectRoot, adapter, filteredAssetSet = buildFilteredAssetS
       fs.rmSync(path.join(standaloneRoot, skillName), { recursive: true, force: true });
     }
 
-    copyDirectoryWithTransform(path.join(sourceRoot, skillName), targetDir, (content) =>
-      adapter.transformSkillContent(content, transformContext),
+    copyDirectoryWithTransform(path.join(sourceRoot, skillName), targetDir, (content, fileContext) =>
+      adapter.transformSkillContent(content, { ...transformContext, ...fileContext }),
     );
   }
 
@@ -266,7 +266,10 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
       sourceDir: path.join(sourceRoot, skillName),
       targetDir,
       reason: isWorkflowSkill ? 'managed_workflow_skill' : 'managed_skill',
-      transformText: (content) => adapter.transformSkillContent(content, transformContext),
+      transformText: (content, fileContext) => adapter.transformSkillContent(
+        content,
+        { ...transformContext, ...fileContext },
+      ),
     }));
   }
 
@@ -688,7 +691,7 @@ function inspectSkillIntegrity({
   const transformContext = buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir);
   const expectedContent = adapter.transformSkillContent(
     fs.readFileSync(sourcePath, 'utf8'),
-    transformContext,
+    { ...transformContext, relativePath: 'SKILL.md' },
   );
   const actualContent = fs.readFileSync(targetPath, 'utf8');
   const issues = unique([
@@ -697,7 +700,10 @@ function inspectSkillIntegrity({
     ...skillSupportFileIntegrityIssues({
       sourceDir,
       targetDir,
-      transformText: (content) => adapter.transformSkillContent(content, transformContext),
+      transformText: (content, fileContext) => adapter.transformSkillContent(
+        content,
+        { ...transformContext, ...fileContext },
+      ),
     }),
   ]);
 

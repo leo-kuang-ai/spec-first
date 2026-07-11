@@ -14,7 +14,7 @@
 
 2. **两处研究建议须按 source 现状改写其落地形态**（注意：二者证据独立性不同，下文分别标注，不并列为等强"纠正"）：
    - **`config-protection` exit-2 hook 在 spec-first source 中不存在**（证据：全仓 grep 仅命中 `CHANGELOG.md` 与 ECH 研究文档自身——这是与作者无关的**机械事实**，证据独立性强）。需说明的是：ECH 原报告本就**已自标** config-protection 为外部、未独立复核、"不直接复制、须改写为 source-owned policy"的引用（ECH 第 246、339 行），并未声称它存在于 spec-first。所以这里不是"纠正 ECH 失实"，而是**确认并继承 ECH 自己的 host-binding caveat**：落到 spec-first 应表达为"复用既有 `secret-deny-patterns` + mutation gate"，而非移植一个不存在的 hook。
-   - **"PRD live semantic 自动化 scorecard"已被记录为 settled out-of-scope**（CHANGELOG v1.11.4 2026-06-21 15:20，source-of-truth 在 `skills/spec-prd/references/evaluation-governance.md` Promotion Boundary）。**证据强度须如实标注**：该决策的对抗评审结论写在治理文件内部，CHANGELOG 与本判断文档为同作者（leokuang）同批次（yao-gate）同日产物，无独立留存的对抗评审 artifact 可回溯——即它是**同批次单方治理决策**，不是经第三方独立对抗复核的终局结论。因此：6/20 STORM 的 P0「build PRD live semantic eval v1」的*自动化打分器*形态**本轮不照搬**（live/semantic 判断改走 dispatched fresh-source eval + 两脚本 + contract tests）；但若 6/20 该 P0 的提出者带来新证据，此 out-of-scope **可重开**，不应被武断终局化。
+   - **"PRD live semantic 自动化 scorecard"已被记录为 settled out-of-scope**（CHANGELOG v1.11.4 2026-06-21 15:20，source-of-truth 在 source-only `skills/spec-prd/evals/evaluation-governance.md` Promotion Boundary）。**证据强度须如实标注**：该决策的对抗评审结论写在治理文件内部，CHANGELOG 与本判断文档为同作者（leokuang）同批次（yao-gate）同日产物，无独立留存的对抗评审 artifact 可回溯——即它是**同批次单方治理决策**，不是经第三方独立对抗复核的终局结论。因此：6/20 STORM 的 P0「build PRD live semantic eval v1」的*自动化打分器*形态**本轮不照搬**（live/semantic 判断改走 dispatched fresh-source eval + 两脚本 + contract tests）；但若 6/20 该 P0 的提出者带来新证据，此 out-of-scope **可重开**，不应被武断终局化。
 
 3. **多处缺口已部分闭合**（相比 6/19–6/20 研究快照）：`spec-debug` 已默认直接扫 `docs/solutions/` frontmatter（`skills/spec-debug` 第 84 行）；`spec-plan` 已有 PRD handoff entropy check（`spec-plan/SKILL.md:177`）；`spec-brainstorm` 已完成入口边界收窄与 routing fixture（CHANGELOG 6/21 多条）。这些把对应建议从"新增"降级为"扩既有表面"。
 
@@ -82,7 +82,7 @@
 ### 当前 source 真相（已复核）
 - `skills/spec-prd/scripts/check-prd-artifact.js`（297 行）确实存在：检查 core sections、evidence tags、requirement/acceptance/nfr IDs、uncovered_requirements、feature_slice_trace_gap、placeholder_line_count。**确定性 checker 已就位**。
 - `docs/validation/spec-prd/output-eval-2026-06-20-checker-delta.md`：5 个 recorded_fixture，`model_executed: false`，`authority_level: advisory`。它自己声明"不证明 live LLM 调用会稳定产出 with-skill 变体"。
-- **自动 scorecard 已 settled out-of-scope（须区分证据强度）**：`skills/spec-prd/references/evaluation-governance.md` Promotion Boundary（source-of-truth）把**"自动化 output-eval scorecard（live brownfield / with-skill vs baseline / blind A/B）"记录为 over-engineering、settled out-of-scope**，CHANGELOG v1.11.4（2026-06-21 15:20）是该决策落地后的辅助记录。理由对齐角色契约「Scripts prepare, LLM decides」「可信证据 > 自动化便利」。输出质量改由 **dispatched fresh-source eval + 两个确定性脚本（check-prd-artifact / check-glossary-drift）+ contract tests** 验证。
+- **自动 scorecard 已 settled out-of-scope（须区分证据强度）**：source-only `skills/spec-prd/evals/evaluation-governance.md` Promotion Boundary（source-of-truth）把**"自动化 output-eval scorecard（live brownfield / with-skill vs baseline / blind A/B）"记录为 over-engineering、settled out-of-scope**，CHANGELOG v1.11.4（2026-06-21 15:20）是该决策落地后的辅助记录。理由对齐角色契约「Scripts prepare, LLM decides」「可信证据 > 自动化便利」。输出质量改由 **dispatched fresh-source eval + 两个确定性脚本（check-prd-artifact / check-glossary-drift）+ contract tests** 验证。
   - **证据强度限定（doc-review 修正）**：该 out-of-scope 结论与其落地批次（yao-gate）同作者同日，"经对抗验证否决"的评审结论写在被论证的 artifact 内部，**无独立留存的对抗评审产物可回溯**。因此本文档不把它当"终局不可重开"，而是：当前依据下不照搬自动 scorecard；若 6/20 P0 的提出者拿出新证据（如自评 eval 长期不足以支撑外部 claim），此 out-of-scope 可按 §11 修订纪律重开。
   - 因此 6/20 的 P0「build 自动化 PRD live semantic eval v1」**当前不照搬**。正确的兑现形态是：(a) 把 checker scorecard 做成 **report-friendly closeout**（不升级为语义 gate）；(b) 用 `docs/contracts/workflows/fresh-source-eval-checklist.md` 的 dispatched fresh-source eval 承载 live/semantic 判断，并把结论按 supersede 约定归档到 `docs/validation/spec-prd/`（已有先例：6/21 的 fresh-source-eval 归档）。
 - `skills/spec-plan/SKILL.md:177` 已有 PRD handoff entropy check（canonical term / source-of-truth / domain ownership / hard decision / missing slice acceptance·source·scope → route to PRD refine 或 emit inline PRD feedback candidate）。这条 6/20 列的"PRD miss feedback 只在 plan 边界"**已部分实现**。
@@ -96,7 +96,7 @@
 - **自动化 live scorecard（不做）**：当前依据下 settled out-of-scope（重开条件见上）。
 
 ### 最小落地顺序
-1. 扩 `spec-prd` PRD summary closeout 字段，复用 check-prd-artifact 已产的确定性事实（advisory）。主引用 `evaluation-governance.md` Promotion Boundary，CHANGELOG 为辅。
+1. 扩 `spec-prd` PRD summary closeout 字段，复用 check-prd-artifact 已产的确定性事实（advisory）。主引用 `skills/spec-prd/evals/evaluation-governance.md` Promotion Boundary，CHANGELOG 为辅。
 2. 按 `fresh-source-eval-checklist.md` 跑一轮 PRD live fresh-source eval，归档到 `docs/validation/spec-prd/`，并设退出判据（如"连续 N 轮无 concern"或"≥1 篇经非作者/blind 评审"才算效果已兑现）。
 3. README / docs 对外表达强调 evidence loop，不宣传"自动提效"。
 
@@ -107,7 +107,7 @@
 
 ## 3b. P0-B 与自指证据风险（doc-review 新增）
 
-P0-B/P0-D 的整条"证据闭环"目前都由**维护者自评、自跑、自归档**：`docs/validation/spec-prd/` 下 9 份 eval 全部单作者，最新一份是 `passed-with-concerns`；`evaluation-governance.md` 自承"not public-claim-ready...until blind output review and reviewer-scored output evidence exists"。replay corpus 同样由维护者自产。
+P0-B/P0-D 的整条"证据闭环"目前都由**维护者自评、自跑、自归档**：`docs/validation/spec-prd/` 下 9 份 eval 全部单作者，最新一份是 `passed-with-concerns`；`skills/spec-prd/evals/evaluation-governance.md` 自承"not public-claim-ready...until blind output review and reviewer-scored output evidence exists"。replay corpus 同样由维护者自产。
 
 风险：若 fresh-source eval 与 replay 长期停在 `passed-with-concerns` 且无 blind/外部评审介入，"证据闭环"会塌缩成"维护者自评维护者技能"——它能证明结构/行为不退化，但永远证明不了角色契约 §1 真正要的"外部可试、可评估、用户真实研发增益"。这与本文档否决自动 scorecard 的理由（自评不算 provider-backed 证据）前后一致地适用于 P0-B 自身。
 

@@ -161,15 +161,24 @@ describe('Qoder runtime lifecycle', () => {
     expect(sessionStart.contents).not.toContain(
       'const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";',
     );
+    expect(sessionStart.contents).toContain('qoder_hook_activation_unverified');
+    const readinessGuard = plan.operations.find((operation) =>
+      operation.path === '.qoder/hooks/prd-readiness-guard'
+    );
+    expect(readinessGuard.contents).toContain('qoder_hook_activation_unverified');
     for (const hookPath of [
       '.qoder/hooks/session-start',
       '.qoder/hooks/prd-prewrite-guard',
       '.qoder/hooks/prd-readiness-guard',
     ]) {
-      expect(plan.operations.find((operation) => operation.path === hookPath)).toMatchObject({
+      const hookOperation = plan.operations.find((operation) => operation.path === hookPath);
+      expect(hookOperation).toMatchObject({
         reason: 'managed_runtime_hook',
         mode: 0o755,
       });
+      expect(hookOperation.contents).not.toContain(
+        'after Qoder hook protocol support is confirmed',
+      );
     }
   });
 

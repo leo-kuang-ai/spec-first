@@ -96,8 +96,9 @@ class ClaudeAdapter extends PlatformAdapter {
   }
 
   transformSkillContent(content, context = {}) {
+    const isEntrypoint = isSkillEntrypointContext(context);
     let transformed = rewriteCanonicalAgentNamesForSkills(content);
-    if (isClaudeRuntimeSetupSurface(context)) {
+    if (isEntrypoint && isClaudeRuntimeSetupSurface(context)) {
       transformed = addClaudeSetupHostPin(transformed);
     }
 
@@ -241,6 +242,11 @@ function rewriteCanonicalAgentNamesForExecution(content) {
 
 function isClaudeRuntimeSetupSurface(context = {}) {
   return context.skillName === 'spec-mcp-setup' || context.commandName === 'mcp-setup';
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addClaudeSetupHostPin(content) {

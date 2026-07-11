@@ -161,9 +161,107 @@ describe('plugin module facade and governance', () => {
     }
   });
 
+  test('preserves support-file identity, metadata, and cross-host semantics across every host projection path', () => {
+    const supportCases = [
+      {
+        suffix: '/spec-strategy/references/strategy-template.md',
+        marker: 'name: {{product_name}}',
+      },
+      {
+        suffix: '/spec-optimize/references/example-hard-spec.yaml',
+        marker: 'name: improve-build-latency',
+      },
+      {
+        suffix: '/spec-optimize/references/example-judge-spec.yaml',
+        marker: 'name: improve-search-relevance',
+      },
+      {
+        suffix: '/spec-prd/references/grill-with-docs-integration.md',
+        marker: 'name: grill-with-docs',
+      },
+      {
+        suffix: '/spec-prd/assets/overlays/securities.md',
+        marker: 'doc_role: securities-domain-reference',
+      },
+      {
+        suffix: '/spec-compound/references/agents/best-practices-researcher.md',
+        marker: '`.claude/skills/**/SKILL.md`, `.codex/skills/**/SKILL.md`, and `.agents/skills/**/SKILL.md`',
+      },
+      {
+        suffix: '/using-spec-first/references/conditional-routing-boundaries.md',
+        marker: 'Managed assets under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, and `.qoder/`',
+      },
+    ];
+    const byteStableSupportFiles = [
+      'spec-mcp-setup/mcp-tools.json',
+      'spec-mcp-setup/helper-tools.json',
+      'spec-mcp-setup/provider-tools.json',
+      'spec-mcp-setup/scripts/detect-host.sh',
+      'spec-mcp-setup/scripts/install-helpers.sh',
+      'spec-mcp-setup/scripts/verify-tools.sh',
+    ];
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+
+        for (const supportCase of supportCases) {
+          const operation = plan.operations.find((candidate) =>
+            candidate.path.endsWith(supportCase.suffix)
+          );
+          expect(operation).toBeDefined();
+          expect(operation.contents).toContain(supportCase.marker);
+        }
+
+        for (const relativePath of byteStableSupportFiles) {
+          const operation = plan.operations.find((candidate) =>
+            candidate.path.endsWith(`/${relativePath}`)
+          );
+          const source = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'skills', relativePath),
+            'utf8',
+          );
+          expect(operation).toBeDefined();
+          expect(operation.contents).toBe(source);
+        }
+
+        const auditLock = plan.operations.find((candidate) =>
+          candidate.path.endsWith('/spec-app-consistency-audit/references/ecc-source-lock.json')
+        );
+        expect(auditLock.contents).toContain(
+          `\"target_root\": \"${adapter.workflowsRoot}/spec-app-consistency-audit/prompts\"`,
+        );
+
+        plugin.syncBundledAssets(projectRoot, adapter);
+
+        for (const supportCase of supportCases) {
+          const operation = plan.operations.find((candidate) =>
+            candidate.path.endsWith(supportCase.suffix)
+          );
+          expect(fs.readFileSync(path.join(projectRoot, operation.path), 'utf8'))
+            .toContain(supportCase.marker);
+        }
+
+        for (const relativePath of byteStableSupportFiles) {
+          const operation = plan.operations.find((candidate) =>
+            candidate.path.endsWith(`/${relativePath}`)
+          );
+          const source = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'skills', relativePath),
+            'utf8',
+          );
+          expect(fs.readFileSync(path.join(projectRoot, operation.path), 'utf8')).toBe(source);
+        }
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
   test('keeps maintainer-only eval assets out of every host runtime projection', () => {
-    const targetSurfacePattern = /(?:spec-app-consistency-audit|spec-mcp-setup|spec-optimize|spec-prd)/;
-    const maintainerOnlyReferencePattern = /(?:evals\/(?:examples|recorded-output-fixtures)\.json|evals\/output\/|scripts\/run-evals\.js)/;
+    const sourceOnlyEvalFilePattern = /\bevals\/(?:[A-Za-z0-9._-]+\/)*[A-Za-z0-9._-]+\.[A-Za-z0-9]+/g;
 
     for (const platform of getSupportedPlatforms()) {
       const projectRoot = tempProject();
@@ -175,13 +273,15 @@ describe('plugin module facade and governance', () => {
           .filter((operationPath) =>
             /\/(?:skills|workflows)\/[^/]+\/evals(?:\/|$)/.test(operationPath)
           );
-        const targetOperations = plan.operations.filter((operation) =>
-          targetSurfacePattern.test(operation.path)
-        );
-        const leakedReferences = targetOperations
+        const contentOperations = plan.operations
           .filter((operation) => typeof operation.contents === 'string')
-          .filter((operation) => maintainerOnlyReferencePattern.test(operation.contents))
-          .map((operation) => operation.path);
+          .filter((operation) => /\/(?:commands|skills|workflows)\//.test(operation.path));
+        const leakedReferences = contentOperations.flatMap((operation) =>
+          (operation.contents.match(sourceOnlyEvalFilePattern) || []).map((reference) => ({
+            path: operation.path,
+            reference,
+          }))
+        );
 
         expect(projectedEvalPaths).toEqual([]);
         expect(leakedReferences).toEqual([]);
@@ -191,7 +291,7 @@ describe('plugin module facade and governance', () => {
           'spec-prd',
           'SKILL.md',
         );
-        const prdSkill = targetOperations.find((operation) =>
+        const prdSkill = contentOperations.find((operation) =>
           operation.path === prdSkillPath
         );
         expect(prdSkill).toBeDefined();
@@ -200,14 +300,29 @@ describe('plugin module facade and governance', () => {
         expect(prdSkill.contents).toContain('canonical source-of-truth path `skills/spec-prd/**`');
         expect(prdSkill.contents).toContain('by editing a generated host runtime mirror');
         expect(prdSkill.contents).not.toContain('from the source checkout');
+        expect(prdSkill.contents).not.toContain('current-source finalize command');
         expect(prdSkill.contents).not.toMatch(/`[^`]*(?:\.claude|\.agents|\.cursor|\.kiro|\.qoder)[^`]*` on (?:Codex|Claude)/);
+
+        if (platform === 'qoder') {
+          const qoderPrdCommand = contentOperations.find((operation) =>
+            operation.path === '.qoder/commands/spec-prd.md'
+          );
+          for (const surface of [prdSkill, qoderPrdCommand]) {
+            expect(surface).toBeDefined();
+            expect(surface.contents).toContain('Qoder degraded enforcement boundary');
+            expect(surface.contents).toContain('qoder_hook_activation_unverified');
+            expect(surface.contents).toContain('all three managed hook scripts remain inactive');
+            expect(surface.contents).toContain('loaded `spec-prd` skill root');
+            expect(surface.contents).not.toContain('Codex degraded enforcement boundary');
+          }
+        }
 
         const setupSkillPath = path.posix.join(
           adapter.workflowsRoot,
           'spec-mcp-setup',
           'SKILL.md',
         );
-        const setupSkill = targetOperations.find((operation) =>
+        const setupSkill = contentOperations.find((operation) =>
           operation.path === setupSkillPath
         );
         expect(setupSkill).toBeDefined();

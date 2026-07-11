@@ -95,14 +95,15 @@ class CodexAdapter extends PlatformAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    const sharedPathContent = shouldPreserveHostComparativeRuntimeProse(context)
+    const isEntrypoint = isSkillEntrypointContext(context);
+    const sharedPathContent = !isEntrypoint || shouldPreserveHostComparativeRuntimeProse(context)
       ? content
       : rewriteSharedPaths(content);
-    let transformed = rewriteSkillName(
-      transformCodexContent(sharedPathContent),
-      codexRuntimeSkillName(context),
-    );
-    if (isCodexRuntimeSetupSurface(context)) {
+    let transformed = transformCodexContent(sharedPathContent);
+    if (isEntrypoint) {
+      transformed = rewriteSkillName(transformed, codexRuntimeSkillName(context));
+    }
+    if (isEntrypoint && isCodexRuntimeSetupSurface(context)) {
       transformed = addCodexSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
@@ -277,6 +278,11 @@ function shouldPreserveHostComparativeRuntimeProse(context = {}) {
 
 function isCodexRuntimeSetupSurface(context = {}) {
   return context.skillName === 'spec-mcp-setup';
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addCodexSetupHostPin(content) {

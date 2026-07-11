@@ -131,7 +131,7 @@
 
 ## 5. Anti-Pattern Families
 
-本表是 eval 覆盖族清单：资格/边界类（`one-off-vs-reusable`、`explain-not-package`、`document-export-vs-agent-skill`、`future-outline-vs-build`、`audit-not-authoring`、`runtime-mirror-patch`）语义见 §1 Qualification 与 `evals/trigger-cases.json` 的 `reason_code`；写作质量类（弱 pointer、模糊 completion criterion、over-split、no-op）语义框架见 [Skill Quality Vocabulary](skill-quality-vocabulary.md)。维护 eval 时优先覆盖这些失败族：
+本表是 eval 覆盖族清单：资格/边界类（`one-off-vs-reusable`、`explain-not-package`、`document-export-vs-agent-skill`、`future-outline-vs-build`、`audit-not-authoring`、`runtime-mirror-patch`）语义见 §1 Qualification；对应 `reason_code` 的 source-only eval 导航只供维护者验证，不是 runtime 依赖。写作质量类（弱 pointer、模糊 completion criterion、over-split、no-op）语义框架见 [Skill Quality Vocabulary](skill-quality-vocabulary.md)。维护 eval 时优先覆盖这些失败族：
 
 - `one-off-vs-reusable`：把一次性回答误做成 skill package。
 - `explain-not-package`：把解释/总结请求误当成 skill 创建。

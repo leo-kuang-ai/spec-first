@@ -14,7 +14,8 @@ const WORKFLOW_ENTRY_ANCHOR = '<!-- spec-first:workflow-entry:using-spec-first -
 const MISSING_CONTEXT = [
   '[spec-first] using-spec-first SessionStart injection',
   'Managed language/governance block is missing from `AGENTS.md`.',
-  'Run `spec-first init --qoder` in this project after Qoder hook protocol support is confirmed.',
+  'Run `spec-first init --qoder` in this project to refresh managed runtime assets.',
+  'Hook activation remains degraded (`qoder_hook_activation_unverified`) until authenticated event execution and shared IDE loader safety are verified.',
 ].join('\n');
 
 main().catch(() => writeHookOutput(MISSING_CONTEXT));
@@ -37,7 +38,8 @@ async function main() {
       : [
         '[spec-first] using-spec-first SessionStart injection',
         status.message,
-        'Run `spec-first init --qoder` in this project after Qoder hook protocol support is confirmed.',
+        'Run `spec-first init --qoder` in this project to refresh managed runtime assets.',
+        'Hook activation remains degraded (`qoder_hook_activation_unverified`) until authenticated event execution and shared IDE loader safety are verified.',
       ].join('\n');
   }
 

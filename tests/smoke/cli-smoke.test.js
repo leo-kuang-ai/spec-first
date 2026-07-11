@@ -7,11 +7,14 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const sandboxRoots = new Set();
 
 function tempSandbox(prefix) {
   const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   const home = path.join(projectRoot, 'home');
   fs.mkdirSync(home, { recursive: true });
+  sandboxRoots.add(projectRoot);
   return { projectRoot, home };
 }
 
@@ -29,6 +32,37 @@ function runSpecFirst(args, sandbox) {
     timeout: 30000,
   });
 }
+
+function runCommand(command, args, {
+  cwd,
+  home,
+  timeout = 30000,
+  env = {},
+}) {
+  const commandEnv = {
+    ...process.env,
+    HOME: home,
+    USERPROFILE: home,
+    HOMEDRIVE: path.parse(home).root,
+    HOMEPATH: home.slice(path.parse(home).root.length),
+    ...env,
+  };
+  delete commandEnv.NPM_CONFIG_ALLOW_SCRIPTS;
+  delete commandEnv.npm_config_allow_scripts;
+  return spawnSync(command, args, {
+    cwd,
+    env: commandEnv,
+    encoding: 'utf8',
+    timeout,
+  });
+}
+
+afterEach(() => {
+  for (const projectRoot of sandboxRoots) {
+    fs.rmSync(projectRoot, { recursive: true, force: true });
+  }
+  sandboxRoots.clear();
+});
 
 describe('CLI smoke checks', () => {
   test('prints top-level help', () => {
@@ -119,4 +153,180 @@ describe('CLI smoke checks', () => {
     expect(fs.existsSync(path.join(sandbox.projectRoot, '.gitignore'))).toBe(false);
     expect(fs.existsSync(path.join(sandbox.projectRoot, 'CHANGELOG.md'))).toBe(false);
   });
+  test('packed tarball initializes a coherent five-host runtime', () => {
+    const sandbox = tempSandbox('spec-first-smoke-package-');
+    const packRoot = path.join(sandbox.projectRoot, 'pack');
+    const consumerRoot = path.join(sandbox.projectRoot, 'consumer');
+    fs.mkdirSync(packRoot, { recursive: true });
+    fs.mkdirSync(consumerRoot, { recursive: true });
+
+    const pack = runCommand(npmCommand, [
+      'pack',
+      '--json',
+      '--pack-destination',
+      packRoot,
+    ], {
+      cwd: repoRoot,
+      home: sandbox.home,
+      timeout: 120000,
+      env: isolatedNpmEnv(sandbox.home),
+    });
+    expect(pack.status).toBe(0);
+    const [{ filename }] = JSON.parse(pack.stdout);
+    const tarballPath = path.join(packRoot, filename);
+    expect(fs.existsSync(tarballPath)).toBe(true);
+
+    const install = runCommand(npmCommand, [
+      'install',
+      '--ignore-scripts',
+      '--no-audit',
+      '--no-fund',
+      tarballPath,
+    ], {
+      cwd: consumerRoot,
+      home: sandbox.home,
+      timeout: 120000,
+      env: isolatedNpmEnv(sandbox.home),
+    });
+    if (install.status !== 0) {
+      throw new Error(`packed tarball install failed:\n${install.stderr || install.stdout}`);
+    }
+
+    const packagedRoot = path.join(consumerRoot, 'node_modules', 'spec-first');
+    const packagedCli = path.join(packagedRoot, 'bin', 'spec-first.js');
+    const init = runCommand(process.execPath, [
+      packagedCli,
+      'init',
+      '--claude',
+      '--codex',
+      '--cursor',
+      '--kiro',
+      '--qoder',
+      '-y',
+      '-u',
+      'package-smoke',
+      '--lang',
+      'en',
+      '--no-sync-user-language',
+    ], {
+      cwd: consumerRoot,
+      home: sandbox.home,
+      timeout: 120000,
+    });
+    expect(init.status).toBe(0);
+
+    const runtimeRoots = {
+      claude: '.claude/spec-first/workflows',
+      codex: '.agents/skills',
+      cursor: '.cursor/skills',
+      kiro: '.kiro/skills',
+      qoder: '.qoder/skills',
+    };
+    const requiredDoctorChecks = {
+      claude: [
+        '.claude/spec-first/state.json',
+        'CLAUDE.md workflow entry guidance',
+        '.claude/commands',
+        '.claude/skills',
+      ],
+      codex: [
+        '.codex/spec-first/state.json',
+        'AGENTS.md workflow entry guidance',
+        '.agents/skills',
+      ],
+      cursor: [
+        '.cursor/spec-first/state.json',
+        'AGENTS.md workflow entry guidance',
+        '.cursor/skills',
+      ],
+      kiro: [
+        '.kiro/spec-first/state.json',
+        'AGENTS.md workflow entry guidance',
+        '.kiro/skills',
+      ],
+      qoder: [
+        '.qoder/spec-first/state.json',
+        'AGENTS.md workflow entry guidance',
+        '.qoder/commands',
+        '.qoder/skills',
+      ],
+    };
+    const providerSource = fs.readFileSync(
+      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'provider-tools.json'),
+      'utf8',
+    );
+    const helperSource = fs.readFileSync(
+      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'scripts', 'install-helpers.sh'),
+      'utf8',
+    );
+
+    for (const [platform, runtimeRoot] of Object.entries(runtimeRoots)) {
+      const doctor = runCommand(process.execPath, [packagedCli, 'doctor', `--${platform}`, '--json'], {
+        cwd: consumerRoot,
+        home: sandbox.home,
+        timeout: 120000,
+      });
+      expect(doctor.status).toBe(0);
+      const doctorReport = JSON.parse(doctor.stdout);
+      expect(doctorReport.install_health).toBe('pass');
+      expect(doctorReport.checks.filter((check) => check.level === 'ERROR')).toEqual([]);
+      expect(doctorReport.checks.filter((check) => check.drift === true)).toEqual([]);
+      for (const checkName of requiredDoctorChecks[platform]) {
+        expect(doctorReport.checks.find((check) => check.name === checkName)).toMatchObject({
+          level: 'PASS',
+        });
+      }
+
+      const setupRoot = path.join(consumerRoot, runtimeRoot, 'spec-mcp-setup');
+      expect(fs.readFileSync(path.join(setupRoot, 'provider-tools.json'), 'utf8'))
+        .toBe(providerSource);
+      expect(fs.readFileSync(path.join(setupRoot, 'scripts', 'install-helpers.sh'), 'utf8'))
+        .toBe(helperSource);
+      expect(fs.existsSync(path.join(
+        consumerRoot,
+        runtimeRoot,
+        'spec-prd',
+        'evals',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        consumerRoot,
+        runtimeRoot,
+        'spec-app-consistency-audit',
+        'README.md',
+      ))).toBe(false);
+    }
+
+    const writeSkillCommand = fs.readFileSync(
+      path.join(consumerRoot, '.claude', 'commands', 'spec-write-skill.md'),
+      'utf8',
+    );
+    expect(writeSkillCommand).toContain('条件细节下沉 `references/` 并写清 context pointer');
+    expect(writeSkillCommand).not.toContain(
+      '`.claude/spec-first/workflows/spec-write-skill/references/`',
+    );
+
+    const crossHostReference = fs.readFileSync(path.join(
+      consumerRoot,
+      '.agents',
+      'skills',
+      'spec-compound',
+      'references',
+      'agents',
+      'best-practices-researcher.md',
+    ), 'utf8');
+    expect(crossHostReference).toContain(
+      '`.claude/skills/**/SKILL.md`, `.codex/skills/**/SKILL.md`, and `.agents/skills/**/SKILL.md`',
+    );
+  }, 120000);
 });
+
+function isolatedNpmEnv(home) {
+  const userConfig = path.join(home, '.npmrc');
+  const cache = path.join(home, '.npm-cache');
+  return {
+    NPM_CONFIG_USERCONFIG: userConfig,
+    npm_config_userconfig: userConfig,
+    NPM_CONFIG_CACHE: cache,
+    npm_config_cache: cache,
+  };
+}

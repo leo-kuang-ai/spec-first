@@ -113,12 +113,18 @@ class QoderAdapter extends PointerBasedAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    let transformed = rewriteSkillName(
-      rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths),
-      qoderRuntimeSkillName(context),
-    );
-    if (isQoderRuntimeSetupSurface(context)) {
+    const isEntrypoint = isSkillEntrypointContext(context);
+    let transformed = isEntrypoint
+      ? rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths)
+      : content;
+    if (isEntrypoint) {
+      transformed = rewriteSkillName(transformed, qoderRuntimeSkillName(context));
+    }
+    if (isEntrypoint && isQoderRuntimeSetupSurface(context)) {
       transformed = addQoderSetupHostPin(transformed);
+    }
+    if (isEntrypoint && isQoderPrdRuntimeSurface(context)) {
+      transformed = addQoderPrdDegradedEnforcement(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
       || (context.isWorkflowSkill ? `${this.workflowsRoot}/${context.skillName}` : '');
@@ -342,6 +348,11 @@ function isQoderRuntimeSetupSurface(context = {}) {
     || context.runtimeName === 'spec-mcp-setup';
 }
 
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
+}
+
 function addQoderSetupHostPin(content) {
   if (content.includes('## Qoder Host Pin')) {
     return content;
@@ -355,6 +366,23 @@ function addQoderSetupHostPin(content) {
     '## Workflow Modes',
     '',
   ].join('\n'));
+}
+
+function isQoderPrdRuntimeSurface(context = {}) {
+  return context.skillName === 'spec-prd'
+    || context.commandName === 'prd'
+    || context.runtimeName === 'spec-prd';
+}
+
+function addQoderPrdDegradedEnforcement(content) {
+  if (content.includes('Qoder degraded enforcement boundary:')) {
+    return content;
+  }
+
+  return content.replace(
+    /^Codex degraded enforcement boundary:.*$/m,
+    'Qoder degraded enforcement boundary: record `reason_code: qoder_hook_activation_unverified` in closeout when relevant. The qodercli 1.0.41 settings/exec protocol is confirmed, but authenticated event execution and shared IDE loader safety are not; `.qoder/settings.json` entries are therefore intentionally omitted and all three managed hook scripts remain inactive (SessionStart, PreToolUse, and Stop). Treat the Pre-Write Closure Gate and PRD closeout guard as loud conventions, not hard protection. Before `spec-prd` claims readiness, run the producer-local finalize command from the loaded `spec-prd` skill root. Do not imply equal protection with Claude or present generated scripts as activated hooks.',
+  );
 }
 
 function rewriteSkillName(content, skillName) {

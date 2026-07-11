@@ -26,7 +26,7 @@
 
 ## 当前事实
 
-截至 2026-07-10，`skills/spec-mcp-setup/` 包含：
+截至 2026-07-11，`skills/spec-mcp-setup/` 包含：
 
 | 类型 | 数量 |
 | --- | ---: |
@@ -34,9 +34,9 @@
 | PowerShell | 19 |
 | CommonJS | 5 |
 | JSON | 4 |
-| 其他 source / reference | 4 |
-| 总文件数 | 51 |
-| 近似总行数 | 19,521 |
+| 其他 source / reference | 5 |
+| 总文件数 | 52 |
+| 近似总行数 | 19,485 |
 
 三个现有 registry 共 1,211 行：`mcp-tools.json` 714 行、`helper-tools.json` 421 行、`provider-tools.json` 76 行。
 
@@ -65,7 +65,9 @@
 skills/spec-mcp-setup/
 ├── SKILL.md
 ├── setup-registry.json
+├── setup-registry.schema.json
 ├── evals/
+│   ├── README.md
 │   └── examples.json
 ├── references/
 │   ├── config-template.yaml
@@ -92,7 +94,9 @@ skills/spec-mcp-setup/
         └── graphify.cjs
 ```
 
-`check-health` 保留现有文件名，但改为带 Node shebang 的薄入口。Windows generated host surfaces 直接调用 `node scripts/setup.cjs --check`，不再依赖 `check-health.ps1`。
+`check-health` 保留现有文件名，但改为带 Node shebang 的薄入口。所有 generated host surfaces 都必须从 loaded skill root 解析共置的 `scripts/setup.cjs`；Windows 调用形态为 `node <loaded-skill-root>/scripts/setup.cjs --check`，不得假设项目 cwd 下存在 `scripts/setup.cjs`，也不再依赖 `check-health.ps1`。
+
+`setup-registry.json` 与其 schema 是 package source；五宿主 runtime 中的共置副本是 generated projection。`evals/` 和 skill 顶层 maintainer `README.md` 保持 source-only，不进入 runtime projection；`setup-registry.json`、`references/` 中运行必需资产及 `scripts/` 必须随 loaded skill 投影。
 
 旧入口的 replacement ownership 固定如下，U1 inventory 只负责验证完整性，不重新决定归属：
 
@@ -286,24 +290,30 @@ module.exports = {
 
 ## 实施单元
 
+### 开发入口 gate
+
+- 在独立 worktree 或无无关 source 改动的稳定分支上开始，记录 baseline commit、OS、Node 版本和执行时间。
+- 先运行 `npm run test:mcp-setup`、`npm run test:unit`、`npm run test:smoke`、`npm run test:integration`；任何既有失败必须记录为带 owner 的 baseline limitation，不得在重构完成声明中混同为本方案通过。
+- POSIX legacy characterization 在本地/Unix CI 采集；Windows legacy characterization 由 `.github/workflows/windows-compatibility.yml` 的 Node 20/22 matrix 采集。两端 fixture 未形成前不得进入 U3。
+
 ### U1：行为 characterization 与 active consumer inventory
 
 - **Goal**：在删除旧实现前，把公开行为、平台差异、确定性边界和全部 active consumers 固化为可执行证据。
-- **Files**：`tests/unit/mcp-setup*.test.js`、新增 `tests/unit/mcp-setup-node-contracts.test.js` 与 fixture helpers；全仓脚本/registry reference inventory。
+- **Files**：`tests/unit/mcp-setup*.test.js`、新增 `tests/unit/mcp-setup-node-contracts.test.js` 与 fixture helpers、`tests/fixtures/mcp-setup/active-consumers.json`、`tests/fixtures/mcp-setup/legacy-parity/posix/`、`tests/fixtures/mcp-setup/legacy-parity/windows/`、`tests/fixtures/mcp-setup/platform-differences.json`、`.github/workflows/windows-compatibility.yml`。
 - **Approach**：
   - 生成 `.sh`、`.ps1`、旧 `.cjs` helper、三个旧 registry 和 `jq` 引用清单；每项标记 `migrate`、`absorb` 或 `retire`，并指定 replacement owner；
-  - inventory 至少覆盖 `repair-install.*`、`uninstall-mcp.*`、`bootstrap-project-config.*`、`repair-worktree.*`、`src/cli/commands/repair-worktree.js`、`src/cli/helpers/setup-facts.js`、source templates、quality gates 和 test runners；
+  - inventory 至少覆盖 `repair-install.*`、`uninstall-mcp.*`、`bootstrap-project-config.*`、`repair-worktree.*`、`src/cli/commands/repair-worktree.js`、`src/cli/helpers/setup-facts.js`、source templates、quality gates、test runners、runtime projection tests 和 package asset tests；
   - 在 POSIX 与 Windows 分别运行旧实现的 mode、target、artifact、reason code、config、provider 和 failure scenarios，输出规范化 fixtures；
   - Bash/PowerShell 差异必须在 U3 前标记为 canonical public behavior、既有缺陷或必要平台特例，不能由 Node 实现临时选择；
   - characterization tests 不锁定旧脚本文件名或调用方式。
-- **Verification**：旧 POSIX/Windows 实现分别通过其 canonical fixtures；consumer inventory 无未分类 active reference；同一 fixtures 可直接用于 Node contract suite。
+- **Verification**：旧 POSIX/Windows 实现分别通过其 canonical fixtures；consumer inventory 无未分类 active reference；platform difference ledger 每项都有 canonical expected result；同一 fixtures 可直接用于 Node contract suite。
 
 ### U2：Registry v8
 
 - **Goal**：建立唯一 registry source 和 schema validator。
-- **Files**：新增 `setup-registry.json`、`scripts/lib/registry.cjs`、schema、canonical snapshot 和 registry differential tests。
+- **Files**：新增 `setup-registry.json`、`setup-registry.schema.json`、`scripts/lib/registry.cjs`、`tests/fixtures/mcp-setup/effective-registry/` 和 registry differential tests。
 - **Approach**：机械迁移现有 metadata，不改变 required/optional、host target、safety 或 provider 语义；实现本计划定义的 merge algebra。开发期间旧 registry 只供尚未切换的旧实现读取，Node 实现只读取 v8；不实现同时合并 v7/v8 的 compatibility loader。旧 registry 在 U8 原子切换时删除。
-- **Verification**：每个旧 entry 的字段 projection 通过；每个 host/platform 的 fully-expanded effective registry 与旧 loader 查询结果等价；duplicate/null/array/override failure fixtures 通过。
+- **Verification**：每个旧 entry 的字段 projection 通过；每个 host/platform 的 fully-expanded effective registry 与旧 loader 查询结果等价；duplicate/null/array/override failure fixtures 通过；五宿主 runtime projection 中 registry 共置路径与 source/runtime drift 检查通过。
 
 ### U3：Mode、host authority 与 project target
 
@@ -346,20 +356,20 @@ module.exports = {
 ### U8：Source consumer 切换与删除
 
 - **Goal**：将所有 source consumer 切换到 Node，并删除旧实现。
-- **Files**：`SKILL.md`、`references/supported-mcp-tools.md`、source templates、`check-health`、`src/cli/commands/repair-worktree.js`、`src/cli/helpers/setup-facts.js`、`scripts/run-test-suite.cjs`、`scripts/run-ai-dev-quality-gate.js`、`src/cli/contracts/quality-gates/branch-protection-policy.json` 和相关 tests；删除 19 个 `.sh`、19 个 `.ps1`、已分类为 retire/absorb 的旧 `.cjs` helper、三个旧 registry 和 `jq`-specific tests。
+- **Files**：`SKILL.md`、`references/supported-mcp-tools.md`、source templates、`check-health`、`src/cli/commands/repair-worktree.js`、`src/cli/helpers/setup-facts.js`、`scripts/run-test-suite.cjs`、`scripts/run-ai-dev-quality-gate.js`、`src/cli/contracts/quality-gates/branch-protection-policy.json`、`tests/unit/mcp-setup-contracts.test.js`、`tests/unit/mcp-setup-config-consumers.test.js`、`tests/unit/mcp-setup-powershell-contracts.test.js`、`tests/unit/host-runtime-projection-contracts.test.js`、`tests/unit/plugin-modules.test.js` 和相关 fixtures；删除 19 个 `.sh`、19 个 `.ps1`、已分类为 retire/absorb 的旧 `.cjs` helper、三个旧 registry 和 `jq`-specific tests。
 - **Approach**：按 U1 inventory 原子切换所有 active consumers；Windows/POSIX 都运行统一 Node contract suite；保留公开 workflow 语义，仅更新内部入口引用；不保留 v7 loader、脚本 fallback 或双轨执行路径。
-- **Verification**：删除完成后执行全仓 active-reference scan，确认不存在对旧脚本、旧 registry、PowerShell-only contract suite、失效 `tests/unit/mcp-setup.sh` 或 `jq` 的 active source 引用；inventory 中每项 replacement owner 可定位且测试通过。
+- **Verification**：删除完成后执行全仓 active-reference scan，确认不存在对旧脚本、旧 registry、PowerShell-only existence contract 或 `jq` 的 active source 引用；`test:mcp-setup` 不再只检查文件存在，而是实际执行统一 Node contract suite；inventory 中每项 replacement owner 可定位且测试通过。
 
 ### U9：文档、runtime projection 与发布说明
 
 - **Goal**：同步 source 文档和发布说明。
-- **Files**：`SKILL.md`、必要的 README / docs、source templates、`CHANGELOG.md`、Windows CI workflow 或明确的外部 CI owner contract。
-- **Approach**：明确“公开合同不变、内部入口更新”；source template 统一指向 Node 入口；不手改 generated runtime mirrors。Windows CI 必须记录执行位置、触发条件和可验证结果。
-- **Verification**：entrypoint lint、changelog contract、无条件 integration/runtime projection tests、source/runtime drift expectations 和 Windows Node contract suite 通过。
+- **Files**：`SKILL.md`、必要的 README / docs、source templates、`CHANGELOG.md`、`.github/workflows/windows-compatibility.yml`。
+- **Approach**：明确“公开合同不变、内部入口更新”；source template 使用 loaded skill root 调用 Node 入口；不手改 generated runtime mirrors。现有 Windows Node 20/22 matrix 增加显式 `npm run test:mcp-setup` 步骤，并继续运行全量 `npm test` 与 package build。
+- **Verification**：entrypoint lint、changelog contract、无条件 integration/runtime projection tests、package contents、source/runtime drift expectations 和 Windows Node contract suite 通过；GitHub Actions run URL/ID 作为 confirmed evidence 留在 PR/交付记录中。
 
 ## 实施顺序
 
-1. U1 固化 POSIX/Windows behavior fixtures，并完成 active consumer inventory 和差异裁决。
+1. 满足开发入口 gate；U1 固化 POSIX/Windows behavior fixtures，并完成 active consumer inventory 和差异裁决。
 2. U2 建立 v8 registry、merge contract 和 effective snapshot differential tests。
 3. U3 实现 action plan、mode policy、host authority 和 target resolution。
 4. U4 实现统一 runner、execution contract 与 host config transaction。
@@ -408,6 +418,8 @@ npm run test:unit
 npm run lint:skill-entrypoints
 npm run test:smoke
 npm run test:integration
+npm run test:ai-dev:gate
+npm run build
 ```
 
 这些命令必须在 U8 删除旧实现且 U9 更新 source templates 后的最终文件树上执行。Windows CI 通过 `scripts/run-test-suite.cjs` 执行与 POSIX 相同的 Node contract suite，并保留 CI run 作为 confirmed evidence；不得以当前机器缺少 Windows 环境为由声明跨平台重构完成。
@@ -416,7 +428,9 @@ npm run test:integration
 
 - `skills/spec-mcp-setup/scripts/` 不再包含 `.sh` 或 `.ps1` 实现。
 - `setup-registry.json` 是唯一 active registry source；三个旧 registry 已删除。
+- `setup-registry.schema.json` 与 loader 查询合同锁步；五宿主 runtime 只消费 generated registry projection，不把 runtime copy 当 source。
 - `spec-mcp-setup` source/test 不再要求 `jq`。
+- `evals/` 与 maintainer README 不进入 runtime projection；loaded skill 中 registry、运行必需 references 和 scripts 完整共置。
 - U1 inventory 中所有旧 script/registry consumers 都有 replacement owner 或明确 retire 记录；全仓 active-reference scan 无残留。
 - mode matrix、host authority、target selection、artifact schema、execution contract、config transaction、project config、worktree health 和 provider contracts 有确定性测试。
 - bare/check/plan 无写入；verify 只写 facts；project-config 只写 project-local surface。
@@ -426,6 +440,7 @@ npm run test:integration
 - `spec-first repair-worktree` 在删除旧脚本后仍保持 dry-run-only 行为与退出码合同。
 - primary facts / plan artifact schema 和 downstream consumer tests 通过。
 - POSIX 与 Windows 运行同一 Node contract suite；legacy platform differences 已裁决并固化。
+- `.github/workflows/windows-compatibility.yml` 的 Node 20/22 matrix 显式运行 `npm run test:mcp-setup`，并保留可引用的 confirmed CI evidence。
 - 最终树通过 Test Plan；通过证据来自删除旧实现之后的命令结果。
 - `SKILL.md` 和 `CHANGELOG.md` 已同步，generated runtime mirrors 未手改。
 - 代码量下降作为结果记录，不作为正确性 gate。
@@ -445,4 +460,6 @@ npm run test:integration
 | Project/provider/hook symlink 越界 | mutation-surface containment table + commit-time recheck + source-repo protection |
 | stale lock 或 Windows replace 行为不一致 | owner metadata + stale recovery + Windows CI transaction fixtures |
 | 删除后 consumer 或测试仍绑定旧结构 | U1 inventory + U8 active-reference gate + 删除后最终 suite |
+| source-only eval 或 maintainer 资产泄漏到 runtime | package asset filter + 五宿主 projection tests + build contents check |
+| runtime 从项目 cwd 误找 Node 入口 | loaded skill root resolution + 五宿主 generated entrypoint fixtures |
 | generated runtime 被误当 source 修改 | source-first review + runtime mirror diff check |

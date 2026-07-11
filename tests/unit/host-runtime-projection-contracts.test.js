@@ -57,10 +57,11 @@ function writeText(filePath, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
-function setupTransformContext() {
+function setupTransformContext(relativePath = 'SKILL.md') {
   return {
     skillName: 'spec-mcp-setup',
     isWorkflowSkill: true,
+    relativePath,
   };
 }
 
@@ -95,7 +96,10 @@ describe('host runtime projection contracts', () => {
     '$id preserves the machine registry host-to-config-path mapping',
     ({ adapter }) => {
       const registry = JSON.parse(
-        adapter.transformSkillContent(SETUP_REGISTRY_SOURCE, setupTransformContext()),
+        adapter.transformSkillContent(
+          SETUP_REGISTRY_SOURCE,
+          setupTransformContext('mcp-tools.json'),
+        ),
       );
       const hostConfig = registry.tools[0].host_config;
 

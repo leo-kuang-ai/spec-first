@@ -10,7 +10,7 @@ const SOURCE_TRUTH_MARKERS = [
 ];
 
 function commandSkillLocalResourcePathPattern() {
-  return /(^|[^A-Za-z0-9_./@\\-])(@?\.\/)?(references|scripts|assets|prompts|schemas|rule-packs)\//gm;
+  return /(^|[^A-Za-z0-9_./@\\-])(@?\.\/)?(references|scripts|assets|prompts|schemas|rule-packs)\/(?=[A-Za-z0-9_.@-])/gm;
 }
 
 function rewriteCommandSkillLocalResourcePaths(content, runtimeSkillRoot) {

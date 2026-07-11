@@ -194,6 +194,83 @@ describe('five-host init lifecycle', () => {
     120000,
   );
 
+  test('same-project five-host init stays coherent and removes stale maintainer-only assets', () => {
+    const sandbox = tempSandbox('all-hosts-coexistence');
+    const initArgs = [
+      'init',
+      ...getSupportedPlatforms().map((platform) => `--${platform}`),
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ];
+
+    const firstInit = runSpecFirst(initArgs, sandbox);
+    expect(firstInit.status).toBe(0);
+
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      const prdRoot = path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-prd',
+      );
+      const appAuditRoot = path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-app-consistency-audit',
+      );
+      fs.mkdirSync(path.join(prdRoot, 'evals'), { recursive: true });
+      fs.writeFileSync(path.join(prdRoot, 'evals', 'stale.json'), '{}\n');
+      fs.writeFileSync(path.join(appAuditRoot, 'README.md'), '# stale runtime maintainer README\n');
+    }
+
+    const secondInit = runSpecFirst(initArgs, sandbox);
+    expect(secondInit.status).toBe(0);
+
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-prd',
+        'evals',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-app-consistency-audit',
+        'README.md',
+      ))).toBe(false);
+
+      const doctor = runSpecFirst(['doctor', `--${platform}`, '--json'], sandbox);
+      expect(doctor.status).toBe(0);
+      const report = parseJsonOutput(doctor);
+      expect(report.checks.filter((check) => check.drift === true)).toEqual([]);
+
+      if (platform === 'claude') {
+        expect(report.checks.find((check) => check.name === '.claude/skills')).toMatchObject({
+          level: 'PASS',
+          message: 'found 12 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
+        });
+      }
+      if (platform === 'cursor') {
+        expect(report.checks.filter((check) =>
+          check.reasonCode === 'cursor_managed_projection_precedence_unverified'
+        )).toHaveLength(1);
+        expect(report.checks.filter((check) =>
+          check.reasonCode === 'cursor_external_skill_precedence_unverified'
+        )).toEqual([]);
+      }
+      if (platform === 'qoder') {
+        expect(report.checks.filter((check) =>
+          check.reasonCode === 'qoder_hook_activation_unverified'
+        )).toHaveLength(3);
+      }
+    }
+  }, 120000);
+
   test('doctor reports managed pointer body drift', () => {
     const platform = 'kiro';
     const sandbox = tempSandbox(`${platform}-pointer-drift`);

@@ -54,7 +54,7 @@
 
 当前源码现状：
 
-- `spec-prd` 已有 deterministic checker、examples-as-context 和 focused contract tests，但 `skills/spec-prd/references/evaluation-governance.md` 明确说这些不是 provider-backed model execution，也不能替代 blind output review / reviewer-scored evidence。
+- `spec-prd` 已有 deterministic checker、examples-as-context 和 focused contract tests，但 source-only `skills/spec-prd/evals/evaluation-governance.md` 明确说这些不是 provider-backed model execution，也不能替代 blind output review / reviewer-scored evidence。
 - `docs/contracts/workflows/eval-fixture-contract.md` 明确 `coverage_tags` 只是结构覆盖，不证明 semantic quality。
 - `docs/validation/spec-prd/` 有 fresh-source eval 和 not_run 记录，但这仍不是稳定的 live/replay PRD output quality proof。
 

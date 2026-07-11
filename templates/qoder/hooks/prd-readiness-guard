@@ -40,7 +40,8 @@ if (!fs.existsSync(finalizeScript)) {
   block([
     '[spec-first] PRD readiness guard blocked Qoder closeout.',
     'Changed PRD artifacts claim ready/final state, but the managed spec-prd finalize script is missing.',
-    'Run `spec-first init --qoder` to refresh Qoder runtime assets after hook protocol support is confirmed.',
+    'Run `spec-first init --qoder` to refresh managed Qoder runtime assets.',
+    'Hook activation remains degraded (`qoder_hook_activation_unverified`) until authenticated event execution and shared IDE loader safety are verified.',
     '',
     ...prdPaths.map((entry) => `- ${entry}`),
   ].join('\n'));

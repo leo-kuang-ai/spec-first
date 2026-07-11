@@ -62,11 +62,14 @@ class KiroAdapter extends PointerBasedAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    let transformed = rewriteSkillName(
-      rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths),
-      kiroRuntimeSkillName(context),
-    );
-    if (isKiroRuntimeSetupSurface(context)) {
+    const isEntrypoint = isSkillEntrypointContext(context);
+    let transformed = isEntrypoint
+      ? rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths)
+      : content;
+    if (isEntrypoint) {
+      transformed = rewriteSkillName(transformed, kiroRuntimeSkillName(context));
+    }
+    if (isEntrypoint && isKiroRuntimeSetupSurface(context)) {
       transformed = addKiroSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
@@ -241,6 +244,11 @@ function kiroRuntimeSkillName(context = {}) {
 
 function isKiroRuntimeSetupSurface(context = {}) {
   return context.skillName === 'spec-mcp-setup';
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addKiroSetupHostPin(content) {
