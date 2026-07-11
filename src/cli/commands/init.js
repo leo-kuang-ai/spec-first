@@ -50,14 +50,13 @@ const {
 } = require('./init-diagnostics');
 const {
   printHelp,
+  printInitApplySummaries,
   printInitApplySuccess,
   printInitBrandBanner,
   printInitDryRun,
-  printGlobalDeveloperWriteSummary,
   printInitNextStepsForPlatforms,
   printInitPreview,
   printInitPreviews,
-  printUserLanguageSyncApplySummary,
   printWorkspaceInitApplySuccess,
   resolveInitBannerRoot,
 } = require('./init-output');
@@ -154,9 +153,7 @@ async function runInit(argv, promptOverrides = {}) {
       lang: interactiveInput.lang,
       preference: interactiveInput.userLanguageSyncPreference,
     });
-    for (const plan of plans) {
-      printInitDiagnostics(plan);
-    }
+    printInitDiagnostics(plans, { lang: interactiveInput.lang });
     const errors = plans.flatMap((plan) => collectInitErrors(plan));
     if (errors.length > 0) {
       for (const error of errors) {
@@ -173,13 +170,13 @@ async function runInit(argv, promptOverrides = {}) {
     };
 
     if (parsed.dryRun) {
-      printInitPreviews(plans, previewOptions);
+      printInitPreviews(plans, { ...previewOptions, view: 'detailed' });
       return 0;
     }
 
     if (!parsed.yes) {
       const activeMessages = getInitMessages(interactiveInput.lang);
-      printInitPreviews(plans, previewOptions);
+      printInitPreviews(plans, { ...previewOptions, view: 'summary' });
       const confirmed = await promptApi.confirm(activeMessages.confirmApply, { default: true });
       if (!confirmed) {
         console.log(activeMessages.cancelled);
@@ -190,37 +187,28 @@ async function runInit(argv, promptOverrides = {}) {
     const globalDeveloperWriteResult = applyGlobalDeveloperProfileWrite(
       effectiveGlobalDeveloperWrite,
     );
-    printGlobalDeveloperWriteSummary(
-      globalDeveloperWriteResult,
-      getInitMessages(interactiveInput.lang),
-    );
     const applyContext = {
       globalDeveloperWriteHandled: true,
       effectiveGlobalDeveloperWrite,
       globalDeveloperWriteResult,
     };
     const results = [];
-    for (const [index, plan] of plans.entries()) {
+    for (const plan of plans) {
       const result = applyInitPlan(
         plan.mode === 'all-repos' ? plan.workspaceRoot : plan.projectRoot,
         plan,
         applyContext,
       );
       results.push(result);
-      if (plan.mode === 'all-repos') {
-        printWorkspaceInitApplySuccess(plan, result);
-      } else {
-        printInitApplySuccess(plan, result, {
-          showDiagnostics: false,
-          showNextSteps: false,
-          suppressChangelogCreated: plans.length > 1 && index > 0,
-        });
-      }
     }
 
     const userLanguageSyncResult = applyUserLanguageSyncPlan(userLanguageSyncPlan);
     const summaryUpdateFailures = persistWorkspaceUserLanguageSyncSummaries(plans, results, userLanguageSyncResult);
-    printUserLanguageSyncApplySummary(userLanguageSyncResult, { lang: interactiveInput.lang });
+    printInitApplySummaries(plans, results, {
+      lang: interactiveInput.lang,
+      globalDeveloperWriteResult,
+      userLanguageSyncResult,
+    });
     for (const failure of summaryUpdateFailures) {
       console.error(`Error: could not update workspace init summary with user-language sync result (${failure.reason_code}).`);
     }

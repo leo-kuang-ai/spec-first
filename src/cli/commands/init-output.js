@@ -25,6 +25,7 @@ const { mergeStringArrays } = require('./init-project-plan');
 
 const MAX_PREVIEW_PATH_SAMPLES_PER_GROUP = 8;
 const MAX_PREVIEW_DETAIL_LINES = 100;
+const MAX_SUMMARY_PATH_SAMPLES = 12;
 
 const DESTRUCTIVE_OPERATION_ORDER = Object.freeze({
   remove_file: 0,
@@ -78,6 +79,18 @@ function printInitPreviews(plans, options = {}) {
   const messages = getInitMessages(lang);
   const normalizedPlans = Array.isArray(plans) ? plans.filter(Boolean) : [];
   const groups = collectInitPreviewGroups(normalizedPlans);
+  const view = options.view || 'detailed';
+
+  if (view === 'summary') {
+    printInitSummaryPreview(groups, {
+      effectiveGlobalDeveloperWrite,
+      messages,
+      userLanguageSyncPlan,
+      useColor,
+    });
+    console.log(messages.previewNoFilesChanged);
+    return;
+  }
 
   printInitPreviewRunContext(normalizedPlans, messages);
   console.log(messages.previewCoverage(
@@ -98,6 +111,136 @@ function printInitPreviews(plans, options = {}) {
       : '',
   });
   console.log(messages.previewNoFilesChanged);
+}
+
+function printInitSummaryPreview(groups, options = {}) {
+  const {
+    effectiveGlobalDeveloperWrite = null,
+    messages = getInitMessages('en'),
+    userLanguageSyncPlan = null,
+    useColor = false,
+  } = options;
+  const summary = buildInitSummaryPreview(groups);
+  console.log(messages.previewSelectedHosts(
+    summary.platforms.map((platform) => initPlatformLabel(platform)).join(', '),
+  ));
+  console.log(messages.previewSummaryCoverage(summary.targetCount, summary.platforms.length));
+  printGlobalDeveloperWriteSummaryPreview(effectiveGlobalDeveloperWrite, messages);
+  printPreviewResetDisclosure(summary.resetReasons, messages);
+  if (summary.destructiveTotal > 0) {
+    console.log(messages.previewSummaryDestructive(
+      formatPreviewCount(summary.destructiveTotal, BrandColors.remove, useColor),
+      summary.destructiveGroupCount,
+    ));
+    for (const sample of summary.destructiveSamples) {
+      console.log(`  - ${colorize(sample.kind, previewOperationColor(sample.kind), useColor)}: ${sample.path} (${initPlatformLabel(sample.platform)})`);
+    }
+    if (summary.destructiveOmitted > 0) {
+      console.log(messages.previewSummaryDestructiveOmitted(summary.destructiveOmitted));
+    }
+  }
+  for (const host of summary.hosts) {
+    console.log(messages.previewHostSummary(
+      initPlatformLabel(host.platform),
+      formatPreviewCount(host.destructive, BrandColors.remove, useColor),
+      formatPreviewCount(host.critical, BrandColors.write, useColor),
+      formatPreviewCount(host.generated, BrandColors.write, useColor),
+    ));
+  }
+  printUserLanguageSyncSummaryPreview(userLanguageSyncPlan, messages);
+}
+
+function buildInitSummaryPreview(groups) {
+  const normalizedGroups = addDestructiveTotals(groups);
+  const hostMap = new Map();
+  for (const group of normalizedGroups) {
+    const current = hostMap.get(group.platform) || {
+      platform: group.platform,
+      destructive: 0,
+      critical: 0,
+      generated: 0,
+    };
+    current.destructive += group.destructiveTotal;
+    current.critical += group.criticalWrites.length;
+    current.generated += group.generatedTotal;
+    hostMap.set(group.platform, current);
+  }
+
+  const destructiveGroups = normalizedGroups.filter((group) => group.destructiveTotal > 0);
+  const samples = [];
+  let sampleIndex = 0;
+  while (samples.length < MAX_SUMMARY_PATH_SAMPLES) {
+    let added = false;
+    for (const group of destructiveGroups) {
+      const row = group.destructive[sampleIndex];
+      if (!row || samples.length >= MAX_SUMMARY_PATH_SAMPLES) {
+        continue;
+      }
+      samples.push({ ...row, platform: group.platform });
+      added = true;
+    }
+    if (!added) {
+      break;
+    }
+    sampleIndex += 1;
+  }
+
+  const destructiveTotal = destructiveGroups.reduce(
+    (total, group) => total + group.destructiveTotal,
+    0,
+  );
+  return {
+    platforms: [...hostMap.keys()],
+    hosts: [...hostMap.values()],
+    targetCount: new Set(normalizedGroups.map((group) => group.targetRoot)).size,
+    destructiveTotal,
+    destructiveGroupCount: destructiveGroups.length,
+    destructiveSamples: samples,
+    destructiveOmitted: Math.max(0, destructiveTotal - samples.length),
+    resetReasons: normalizedGroups.map((group) => group.resetReason),
+  };
+}
+
+function addDestructiveTotals(groups) {
+  return groups.map((group) => ({
+    ...group,
+    destructiveTotal: group.destructive.length
+      + Math.max(0, group.runtimeUntrackCount - group.destructive
+        .filter((operation) => operation.kind === 'runtime_untrack').length),
+  }));
+}
+
+function printGlobalDeveloperWriteSummaryPreview(globalWrite, messages) {
+  if (!globalWrite || !globalWrite.developer) {
+    return;
+  }
+  console.log(messages.previewSummaryGlobalDeveloper(
+    globalWrite.action || 'preserve',
+    globalWrite.resolvedPath || globalWrite.globalPath,
+    globalWrite.developer.name,
+    globalWrite.developer.lang,
+  ));
+}
+
+function printUserLanguageSyncSummaryPreview(plan, messages) {
+  if (!plan || plan.mode === 'skipped') {
+    return;
+  }
+  const operations = [
+    ...(Array.isArray(plan.operations) ? plan.operations : []),
+    ...(plan.profileOperation ? [plan.profileOperation] : []),
+  ];
+  const changes = operations.filter((operation) => (
+    !['noop', 'preserve'].includes(operation.action)
+  ));
+  if (changes.length === 0) {
+    console.log(messages.previewSummaryLanguageReady);
+    return;
+  }
+  console.log(messages.previewSummaryLanguageChanges(changes.length));
+  for (const operation of changes) {
+    console.log(`  - ${operation.host || 'profile'}: ${operation.action} · ${operation.displayPath || operation.globalPath || ''}`);
+  }
 }
 
 function printInitPreviewRunContext(plans, messages) {
@@ -274,12 +417,7 @@ function previewOperationKey(operation) {
 }
 
 function buildBoundedMutationPreview(groups) {
-  const groupDetails = groups.map((group) => ({
-    ...group,
-    destructiveTotal: group.destructive.length
-      + Math.max(0, group.runtimeUntrackCount - group.destructive
-        .filter((operation) => operation.kind === 'runtime_untrack').length),
-  }));
+  const groupDetails = addDestructiveTotals(groups);
   const phaseDefinitions = [
     { key: 'destructive', rows: (group) => group.destructive },
     { key: 'critical', rows: (group) => group.criticalWrites },
@@ -412,6 +550,177 @@ function printWorkspaceInitApplySuccess(plan, result) {
   }
 }
 
+function printInitApplySummaries(plans, results, options = {}) {
+  const normalizedPlans = Array.isArray(plans) ? plans.filter(Boolean) : [];
+  const normalizedResults = Array.isArray(results) ? results : [];
+  const messages = getInitMessages(options.lang || 'zh');
+  const readyCount = normalizedPlans.reduce((count, _plan, index) => (
+    normalizedResults[index] && normalizedResults[index].exit_code === 0 ? count + 1 : count
+  ), 0);
+  console.log(readyCount === normalizedPlans.length
+    ? messages.applyRunSummary(readyCount, normalizedPlans.length)
+    : messages.applyRunFailureSummary(readyCount, normalizedPlans.length));
+
+  let runtimeUntrackCount = 0;
+  const runtimeUntrackSamples = [];
+  for (const [index, plan] of normalizedPlans.entries()) {
+    const result = normalizedResults[index] || { exit_code: 1 };
+    const status = result.exit_code === 0 ? messages.applyStatusReady : messages.applyStatusFailed;
+    const details = buildInitApplyHostDetails(plan, result, messages);
+    console.log(messages.applyHostSummary(
+      initPlatformLabel(plan.platform),
+      status,
+      details.join(' · '),
+    ));
+    runtimeUntrackCount += Number(result.runtime_untrack && result.runtime_untrack.count) || 0;
+    for (const samplePath of result.runtime_untrack && Array.isArray(result.runtime_untrack.sample_paths)
+      ? result.runtime_untrack.sample_paths
+      : []) {
+      if (runtimeUntrackSamples.length >= 3) {
+        break;
+      }
+      if (runtimeUntrackSamples.includes(samplePath)) {
+        continue;
+      }
+      runtimeUntrackSamples.push(samplePath);
+    }
+  }
+
+  const hasGitignoreChange = normalizedPlans.some((plan) => (
+    plan.writePlan && Array.isArray(plan.writePlan.operations)
+      && plan.writePlan.operations.some((operation) => operation.reason === 'managed_gitignore_policy')
+  ));
+  if (hasGitignoreChange) {
+    console.log(messages.applyGitignoreCompact);
+  }
+  if (normalizedPlans.some((plan) => plan.changelogCreated)) {
+    console.log(messages.applyChangelogCompact);
+  }
+
+  const globalWrite = options.globalDeveloperWriteResult;
+  if (globalWrite && globalWrite.developer) {
+    console.log(messages.applyProfileCompact(
+      globalWrite.action || globalWrite.status || 'preserve',
+      globalWrite.resolvedPath || globalWrite.globalPath,
+      globalWrite.developer.name,
+      globalWrite.developer.lang,
+    ));
+  }
+  const languageSync = options.userLanguageSyncResult;
+  if (languageSync && languageSync.status !== 'skipped') {
+    console.log(messages.applyLanguageCompact(
+      languageSync.status,
+      languageSync.reason_code || 'none',
+    ));
+    for (const operation of Array.isArray(languageSync.operations) ? languageSync.operations : []) {
+      if (!operation.error) {
+        continue;
+      }
+      console.log(messages.applyLanguageIssue(
+        operation.host || 'unknown',
+        operation.displayPath || '',
+        operation.error,
+      ));
+    }
+    if (languageSync.profileOperation && languageSync.profileOperation.error) {
+      console.log(messages.applyLanguageIssue(
+        'profile',
+        languageSync.profileOperation.displayPath
+          || languageSync.profileOperation.globalPath
+          || '',
+        languageSync.profileOperation.error,
+      ));
+    }
+  }
+  if (runtimeUntrackCount > 0) {
+    console.log(messages.applyRuntimeUntrackCompact(runtimeUntrackCount));
+    for (const samplePath of runtimeUntrackSamples) {
+      console.log(messages.applyRuntimeUntrackSample(samplePath));
+    }
+  }
+}
+
+function buildInitApplyHostDetails(plan, result, messages) {
+  if (plan.mode === 'all-repos') {
+    const counts = result.workspace_summary && result.workspace_summary.counts
+      ? result.workspace_summary.counts
+      : {};
+    const details = [messages.applyWorkspaceCount(counts.ready || 0, counts.total || 0)];
+    if (result.exit_code !== 0) {
+      details.push(...collectWorkspaceApplyFailureDetails(result));
+    }
+    return details;
+  }
+
+  const adapter = getAdapter(plan.platform);
+  const synced = plan.syncedAssets || {
+    commands: [],
+    skills: [],
+    workflowSkills: [],
+    internalSkills: [],
+    agents: [],
+  };
+  const commands = Array.isArray(synced.commands) ? synced.commands : [];
+  const directSkills = Array.isArray(synced.skills) ? synced.skills : [];
+  const workflowSkills = Array.isArray(synced.workflowSkills) ? synced.workflowSkills : [];
+  const internalSkills = Array.isArray(synced.internalSkills) ? synced.internalSkills : [];
+  const agents = Array.isArray(synced.agents) ? synced.agents : [];
+  const agentSupportFiles = Array.isArray(synced.agentSupportFiles)
+    ? synced.agentSupportFiles
+    : [];
+  const details = [];
+  if (adapter.hasCommands && commands.length > 0) {
+    details.push(messages.applyCommandsCount(commands.length));
+  }
+  const skills = adapter.workflowsRoot === adapter.skillsRoot
+    ? mergeStringArrays(directSkills, workflowSkills, internalSkills)
+    : mergeStringArrays(directSkills, internalSkills);
+  if (skills.length > 0) {
+    details.push(messages.applySkillsCount(skills.length));
+  }
+  if (agents.length > 0) {
+    details.push(messages.applyAgentsCount(agents.length));
+  }
+  if (agentSupportFiles.length > 0) {
+    details.push(messages.applyAgentSupportCount(agentSupportFiles.length));
+  }
+  if (
+    result.exit_code === 0
+    && (
+    plan.platform === 'claude'
+    || (plan.platform === 'codex' && !hasInitDiagnostic(plan, 'codex_home_hook_write_skipped'))
+    )
+  ) {
+    details.push(messages.applyHookUpdated);
+  } else if (plan.platform === 'codex' && hasInitDiagnostic(plan, 'codex_home_hook_write_skipped')) {
+    details.push(messages.applyHookSkippedCompact);
+  }
+  if (result.exit_code !== 0 && result.error) {
+    details.push(String(result.error));
+  }
+  return details;
+}
+
+function collectWorkspaceApplyFailureDetails(result) {
+  const summary = result.workspace_summary || {};
+  const details = [];
+  if (result.error) {
+    details.push(String(result.error));
+  }
+  if (summary.reason_code) {
+    details.push(summary.reason_code);
+  }
+  const failedEntry = [summary.parent_host_runtime, ...(summary.results || [])]
+    .find((entry) => entry && entry.exit_code !== 0);
+  if (failedEntry && failedEntry.reason_code && failedEntry.reason_code !== summary.reason_code) {
+    details.push(failedEntry.reason_code);
+  }
+  if (failedEntry && failedEntry.diagnostic) {
+    details.push(String(failedEntry.diagnostic));
+  }
+  return [...new Set(details)];
+}
+
 function printInitApplySuccess(plan, result, options = {}) {
   const adapter = getAdapter(plan.platform);
   const messages = getInitMessages((plan.developer && plan.developer.lang) || 'zh');
@@ -458,7 +767,7 @@ function printInitApplySuccess(plan, result, options = {}) {
   }
 
   if (options.showDiagnostics !== false) {
-    printInitDiagnostics(plan);
+    printInitDiagnostics(plan, { lang: (plan.developer && plan.developer.lang) || 'zh' });
   }
 
   if (options.showNextSteps !== false) {
@@ -783,10 +1092,12 @@ function printRuntimeUntrackApplySummary(summary = buildRuntimeUntrackSummary(),
 module.exports = {
   MAX_PREVIEW_DETAIL_LINES,
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
+  MAX_SUMMARY_PATH_SAMPLES,
   hasAnyManagedState,
   hasInitDiagnostic,
   printGlobalDeveloperWriteSummary,
   printHelp,
+  printInitApplySummaries,
   printInitApplySuccess,
   printInitBrandBanner,
   printInitDryRun,

@@ -130,6 +130,9 @@ describe('five-host init lifecycle', () => {
       const secondInit = runSpecFirst([...initArgs, '--dry-run'], sandbox);
       expect(secondInit.status).toBe(0);
       const secondOutput = `${secondInit.stdout}\n${secondInit.stderr}`;
+      expect(secondInit.stdout).toContain('Preview coverage:');
+      expect(secondInit.stdout).toContain('Target detail:');
+      expect(secondInit.stdout).toContain('Preview omitted:');
       expect(secondOutput).not.toContain('current_runtime_drift');
       expect(secondOutput).not.toContain('managed hard reset before regenerating runtime assets (current runtime drift detected)');
     },

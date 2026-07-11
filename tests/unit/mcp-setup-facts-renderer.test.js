@@ -663,4 +663,53 @@ describe('spec-mcp-setup renderer', () => {
     expect(text).not.toContain('graphify --refresh');
     expect(text).toContain('继续目标 spec-* workflow');
   });
+
+  test('diagnostic next actions continue only when runtime and required providers are ready', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [
+        { provider: 'codegraph', readiness_status: 'fresh' },
+        { provider: 'graphify', readiness_status: 'fresh' },
+      ],
+    });
+
+    expect(actions).toEqual(['必需设置项已就绪，继续目标 spec-* workflow。']);
+  });
+
+  test('diagnostic next actions report repair without also suggesting continuation', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [
+        { provider: 'codegraph', readiness_status: 'unknown' },
+        { provider: 'graphify', readiness_status: 'fresh' },
+      ],
+    });
+
+    expect(actions).toContain('运行当前 host 的 spec-mcp-setup --verify-only，确认 required Provider readiness。');
+    expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
+  });
 });

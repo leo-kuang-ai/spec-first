@@ -1,11 +1,26 @@
 
 'use strict';
 
-function printInitDiagnostics(plan) {
+const { getInitMessages } = require('../init-i18n');
+
+function printInitDiagnostics(plan, options = {}) {
+  const messages = getInitMessages(options.lang || 'en');
   const diagnostics = collectInitDiagnostics(plan);
+  const seen = new Set();
   for (const diagnostic of diagnostics) {
-    const message = diagnostic && diagnostic.message ? diagnostic.message : String(diagnostic);
-    if (diagnostic.level === 'warn') {
+    const normalized = diagnostic && typeof diagnostic === 'object'
+      ? diagnostic
+      : { message: String(diagnostic) };
+    const knownMessage = knownDiagnosticMessage(normalized.code, messages);
+    const message = knownMessage || normalized.message || String(diagnostic);
+    const dedupeKey = knownMessage
+      ? `known:${normalized.code}`
+      : `raw:${normalized.code || ''}:${message}`;
+    if (seen.has(dedupeKey)) {
+      continue;
+    }
+    seen.add(dedupeKey);
+    if (normalized.level === 'warn') {
       console.warn(message);
     } else {
       console.log(message);
@@ -14,6 +29,9 @@ function printInitDiagnostics(plan) {
 }
 
 function collectInitDiagnostics(plan) {
+  if (Array.isArray(plan)) {
+    return plan.flatMap((entry) => collectInitDiagnostics(entry));
+  }
   if (!plan || typeof plan !== 'object') {
     return [];
   }
@@ -26,6 +44,16 @@ function collectInitDiagnostics(plan) {
     ];
   }
   return Array.isArray(plan.diagnostics) ? plan.diagnostics : [];
+}
+
+function knownDiagnosticMessage(code, messages) {
+  if (code === 'cursor_generated_runtime_preview') {
+    return messages.diagnosticCursorGeneratedRuntimePreview;
+  }
+  if (code === 'qoder_hook_activation_unverified') {
+    return messages.diagnosticQoderHookActivationUnverified;
+  }
+  return '';
 }
 
 function collectInitErrors(plan) {

@@ -43,7 +43,7 @@ function advisoryHostCandidates({ env = {}, runner } = {}) {
 }
 
 function diagnosticNextActions(payload = {}) {
-  const actions = ['运行标准 spec-mcp-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。'];
+  const actions = [];
   const project = payload.project || {};
   if (project.inside_git_repo && (
     project.example_config_status !== 'ok'
@@ -51,8 +51,29 @@ function diagnosticNextActions(payload = {}) {
   )) {
     actions.push('运行 spec-mcp-setup --project-config，预览并写入项目本地设置。');
   }
-  actions.push('必需设置项就绪后，继续目标 spec-* workflow。');
-  return actions;
+  const runtime = payload.runtime || {};
+  const manifest = payload.generated_runtime_manifest || runtime.generated_runtime_manifest || {};
+  const runtimeReady = runtime.setup_facts_status === 'ready'
+    && runtime.runtime_capabilities_status === 'ready'
+    && runtime.baseline_ready === true
+    && runtime.host_runtime_ready === true;
+  if (!runtimeReady) {
+    actions.push('运行标准 spec-mcp-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。');
+  } else {
+    const providers = Array.isArray(payload.provider_readiness)
+      ? payload.provider_readiness
+      : (Array.isArray(runtime.provider_readiness) ? runtime.provider_readiness : []);
+    const providerStatus = new Map(providers.map((entry) => [entry.provider, entry.readiness_status]));
+    const providersReady = ['codegraph', 'graphify'].every((id) => providerStatus.get(id) === 'fresh');
+    if (!providersReady || manifest.status !== 'current') {
+      actions.push('运行当前 host 的 spec-mcp-setup --verify-only，确认 required Provider readiness。');
+    }
+  }
+  if (['stale', 'missing'].includes(manifest.status) && manifest.next_action) {
+    actions.push(manifest.next_action);
+  }
+  if (actions.length === 0) actions.push('必需设置项已就绪，继续目标 spec-* workflow。');
+  return [...new Set(actions)];
 }
 
 function renderDiagnosticHuman(payload, pluginVersion) {

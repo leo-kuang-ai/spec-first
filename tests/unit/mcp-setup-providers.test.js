@@ -96,7 +96,7 @@ describe('CodeGraph provider', () => {
     });
     expect(plan).toMatchObject({ mutation: true, blocked: false, provider: 'codegraph' });
 
-    const result = provider.apply({ repoRoot: target, runner }, plan);
+    const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
     expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
     expect(result.readiness_status).toBe('fresh');
     expect(result.lifecycle).toMatchObject({
@@ -108,6 +108,33 @@ describe('CodeGraph provider', () => {
     expect(calls.filter((call) => call.join(' ') === 'codegraph sync')).toHaveLength(1);
     expect(calls.filter((call) => call.join(' ') === 'codegraph index -f')).toHaveLength(1);
     expect(calls.filter((call) => call.join(' ') === 'codegraph query __spec_first_readiness_probe__ --limit 1 --json')).toHaveLength(1);
+  });
+
+  test.each([
+    ['unknown', undefined, 'unknown'],
+    ['not configured', false, 'degraded'],
+    ['configured', true, 'fresh'],
+  ])('reports indexed CLI readiness as %s when host configuration is %s', (_label, configured, expected) => {
+    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo(`codegraph-config-${expected}`);
+    fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+    const runner = (_command, args) => {
+      if (args[0] === '--version') return success('codegraph 1.2.0');
+      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'query') return success('{}');
+      return success();
+    };
+
+    const result = provider.verify({
+      repoRoot: target,
+      runner,
+      configured,
+      dependency: { version: '1.2.0' },
+    });
+
+    expect(result.readiness_status).toBe(expected);
+    expect(result.lifecycle.configured).toBe(configured === true);
   });
 
   test('degrades when the real CodeGraph query probe fails after indexing', () => {

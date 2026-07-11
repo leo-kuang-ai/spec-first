@@ -130,7 +130,12 @@ describe('CLI smoke checks', () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
-    expect(result.stdout.match(/Wrote global developer profile:/g) || []).toHaveLength(1);
+    expect(result.stdout).toContain('Init complete: 2/2 hosts ready');
+    expect(result.stdout.match(/Global developer profile:/g) || []).toHaveLength(1);
+    expect(result.stdout.match(/Claude Code:/g) || []).toHaveLength(1);
+    expect(result.stdout.match(/Codex:/g) || []).toHaveLength(1);
+    expect(result.stdout).not.toContain('0 agents');
+    expect(result.stdout).not.toContain('No managed runtime paths require untracking');
     expect(fs.readFileSync(path.join(sandbox.home, '.spec-first', '.developer'), 'utf8'))
       .toContain('hosts=claude,codex\n');
     expect(fs.existsSync(path.join(sandbox.projectRoot, '.claude'))).toBe(true);

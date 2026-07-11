@@ -461,7 +461,10 @@ function configureOrInspectHost(context, repoRoot, {
     let inspection = inspectHostConfig({ entry, target });
     const repairAuthorized = context.actionPlan.args.repairHostConfig === true
       && inspection.reason_code === 'host-config-conflict';
-    if (applyMutation && inspection.ok && !inspection.configured && (!inspection.conflict || repairAuthorized)) {
+    if (applyMutation
+      && !inspection.configured
+      && (inspection.ok || repairAuthorized)
+      && (!inspection.conflict || repairAuthorized)) {
       const applied = applyHostConfig({ entry, target, overwrite: repairAuthorized });
       if (applied.ok) inspection = inspectHostConfig({ entry, target });
       else inspection = { ok: false, configured: false, reason_code: applied.reason_code };
@@ -608,7 +611,12 @@ function reconcileProviderHostConfig(providerResults, hostConfigResults) {
   for (const readiness of providerResults || []) {
     const hostResult = hostConfigResults.get(readiness.provider);
     if (!hostResult || !readiness.lifecycle) continue;
-    readiness.lifecycle.configured = hostResult.configured_status === 'ready';
+    const provider = providers[readiness.provider];
+    if (provider && typeof provider.reconcileConfigured === 'function') {
+      provider.reconcileConfigured(readiness, hostResult);
+    } else {
+      readiness.lifecycle.configured = hostResult.configured_status === 'ready';
+    }
   }
 }
 

@@ -4,8 +4,10 @@ const { BrandColors } = require('../../src/cli/brand');
 const {
   MAX_PREVIEW_DETAIL_LINES,
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
+  MAX_SUMMARY_PATH_SAMPLES,
   printInitPreviews,
 } = require('../../src/cli/commands/init-output');
+const { printInitDiagnostics } = require('../../src/cli/commands/init-diagnostics');
 
 function operationPlan(operations) {
   return {
@@ -71,6 +73,110 @@ afterEach(() => {
 });
 
 describe('bounded init mutation preview', () => {
+  test('renders a summary-first five-host preview with bounded destructive samples', () => {
+    const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
+    const plans = platforms.map((platform, platformIndex) => {
+      const operations = [
+        ...Array.from({ length: 29 }, (_, index) => ({
+          kind: 'remove_dir',
+          path: `.${platform}/obsolete-${String(index + 1).padStart(2, '0')}`,
+          reason: 'managed_runtime_cleanup',
+        })),
+        ...Array.from({ length: 503 + platformIndex }, (_, index) => ({
+          kind: 'write_file',
+          path: `.${platform}/generated-${String(index + 1).padStart(4, '0')}.md`,
+          reason: 'managed_skill',
+        })),
+      ];
+      return projectPlan(platform, '/workspace/app', operations);
+    });
+
+    const output = capturePreview(plans, {
+      view: 'summary',
+      effectiveGlobalDeveloperWrite: {
+        action: 'overwrite',
+        resolvedPath: '/home/tester/.spec-first/.developer',
+        developer: { name: 'Ada', lang: 'en' },
+      },
+    });
+    const lines = output.split('\n').filter(Boolean);
+    const destructiveRows = lines.filter((line) => line.startsWith('  - remove_dir:'));
+
+    expect(MAX_SUMMARY_PATH_SAMPLES).toBe(12);
+    expect(lines.length).toBeLessThanOrEqual(40);
+    expect(destructiveRows).toHaveLength(12);
+    const labels = ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder'];
+    for (const [index, platform] of platforms.entries()) {
+      expect(output).toContain(`${labels[index]}:`);
+      expect(output).toContain(`.${platform}/obsolete-01`);
+    }
+    expect(output).toContain('145 destructive path(s)');
+    expect(output).toContain('133 more destructive path(s)');
+    expect(output).toContain('spec-first init --dry-run');
+    expect(output.indexOf('145 destructive path(s)')).toBeLessThan(output.indexOf('Claude Code:'));
+    expect(output).not.toContain('generated-0001.md');
+    expect(output).not.toContain('target_host_groups=');
+  });
+
+  test('keeps managed reset disclosure prominent in the summary view', () => {
+    const plan = projectPlan('codex', '/workspace/app', [{
+      kind: 'remove_dir',
+      path: '.agents/skills/spec-plan',
+      reason: 'managed_runtime_cleanup',
+    }]);
+    plan.destructiveResetReason = 'current_runtime_drift';
+
+    const output = capturePreview([plan], { view: 'summary' });
+
+    expect(output).toContain('current runtime drift detected');
+    expect(output).toContain('Destructive preview:');
+    expect(output.indexOf('Destructive preview:')).toBeLessThan(output.indexOf('Codex:'));
+  });
+
+  test('deduplicates known host diagnostics and localizes them', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const plans = [
+      {
+        mode: 'single-repo',
+        diagnostics: [{
+          level: 'warn',
+          code: 'cursor_generated_runtime_preview',
+          message: 'raw cursor warning',
+        }],
+      },
+      {
+        mode: 'all-repos',
+        parentPlan: {
+          diagnostics: [{
+            level: 'warn',
+            code: 'cursor_generated_runtime_preview',
+            message: 'raw cursor warning',
+          }],
+        },
+        childPlans: [{
+          plan: {
+            diagnostics: [{
+              level: 'warn',
+              code: 'qoder_hook_activation_unverified',
+              message: 'raw qoder warning',
+            }],
+          },
+        }],
+      },
+    ];
+
+    printInitDiagnostics(plans, { lang: 'zh' });
+
+    const output = warnSpy.mock.calls.flat().join('\n');
+    expect(warnSpy).toHaveBeenCalledTimes(2);
+    expect(output).toContain('Cursor');
+    expect(output).toContain('本机尚未验证');
+    expect(output).toContain('Qoder');
+    expect(output).toContain('保持未启用');
+    expect(output).not.toContain('raw cursor warning');
+    expect(output).not.toContain('raw qoder warning');
+  });
+
   test('prints the canonical global profile once with its resolved path', () => {
     const plans = [
       projectPlan('claude', '/workspace/app', []),

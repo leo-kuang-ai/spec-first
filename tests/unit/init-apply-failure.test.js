@@ -333,4 +333,146 @@ describe('init run-level global developer prerequisite', () => {
     const output = logSpy.mock.calls.flat().join('\n');
     expect(output).not.toContain('全局 developer profile');
   });
+
+  test('prints one compact run-level receipt for a five-host apply', () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-output-'));
+    const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
+    const plans = platforms.map((platform) => ({
+      platform,
+      projectRoot,
+      commandDir: path.join(projectRoot, `.${platform}`, 'commands'),
+      developer: makeGlobalWrite().developer,
+      syncedAssets: {
+        commands: platform === 'claude' || platform === 'qoder'
+          ? [{ filename: 'spec-plan.md' }]
+          : [],
+        skills: ['spec-explain'],
+        workflowSkills: ['spec-plan'],
+        internalSkills: [],
+        agents: [],
+        agentSupportFiles: [],
+      },
+      writePlan: emptyOperationPlan(),
+      changelogCreated: false,
+      diagnostics: [],
+    }));
+    const results = platforms.map(() => ({
+      exit_code: 0,
+      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+    }));
+
+    initOutput.printInitApplySummaries(plans, results, {
+      lang: 'en',
+      globalDeveloperWriteResult: {
+        action: 'create',
+        status: 'applied',
+        resolvedPath: '/home/tester/.spec-first/.developer',
+        developer: { name: 'Ada', lang: 'en' },
+      },
+      userLanguageSyncResult: {
+        status: 'ready',
+        reason_code: 'none',
+        operations: [],
+      },
+    });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    const lines = output.split('\n').filter(Boolean);
+    expect(lines.length).toBeLessThanOrEqual(15);
+    expect(output).toContain('Init complete: 5/5 hosts ready');
+    for (const label of ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder']) {
+      expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(1);
+    }
+    expect(output.match(/Global developer profile:/g) || []).toHaveLength(1);
+    expect(output.match(/User-level language sync:/g) || []).toHaveLength(1);
+    expect(output).not.toContain('0 agent');
+    expect(output).not.toContain('No managed runtime paths require untracking');
+  });
+
+  test('does not label a partial apply as complete and keeps failure evidence', () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const plans = ['claude', 'codex'].map((platform) => ({
+      platform,
+      projectRoot: '/workspace/app',
+      commandDir: `/workspace/app/.${platform}/commands`,
+      developer: makeGlobalWrite().developer,
+      syncedAssets: {
+        commands: [],
+        skills: [],
+        workflowSkills: [],
+        internalSkills: [],
+        agents: [],
+      },
+      diagnostics: [],
+    }));
+
+    initOutput.printInitApplySummaries(plans, [
+      { exit_code: 0, runtime_untrack: { count: 0, reason_code: 'none-tracked' } },
+      {
+        exit_code: 1,
+        error: 'managed write failed (permission-denied)',
+        runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+      },
+    ], { lang: 'en' });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).toContain('Init result: 1/2 hosts ready');
+    expect(output).not.toContain('Init complete:');
+    expect(output).toContain('Codex: failed');
+    expect(output).toContain('managed write failed (permission-denied)');
+  });
+
+  test('keeps all-repos reason codes and diagnostics in the compact failure receipt', () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const plan = {
+      mode: 'all-repos',
+      platform: 'codex',
+      diagnostics: [],
+    };
+    const result = {
+      exit_code: 1,
+      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+      workspace_summary: {
+        counts: { ready: 1, total: 2 },
+        reason_code: 'all-repos-partial-or-action-required',
+        parent_host_runtime: { exit_code: 0, reason_code: null, diagnostic: '' },
+        results: [{
+          exit_code: 1,
+          reason_code: 'init-exception',
+          diagnostic: 'permission denied for child repo',
+        }],
+      },
+    };
+
+    initOutput.printInitApplySummaries([plan], [result], { lang: 'en' });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).toContain('Init result: 0/1 hosts ready');
+    expect(output).toContain('workspace 1/2 ready');
+    expect(output).toContain('all-repos-partial-or-action-required');
+    expect(output).toContain('init-exception');
+    expect(output).toContain('permission denied for child repo');
+  });
+
+  test('keeps user-language profile write errors in the compact receipt', () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    initOutput.printInitApplySummaries([], [], {
+      lang: 'en',
+      userLanguageSyncResult: {
+        status: 'action-required',
+        reason_code: 'user-language-profile-write-failed',
+        operations: [],
+        profileOperation: {
+          globalPath: '~/.spec-first/.developer',
+          error: 'permission denied',
+        },
+      },
+    });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).toContain('user-language-profile-write-failed');
+    expect(output).toContain('profile: ~/.spec-first/.developer · permission denied');
+  });
 });

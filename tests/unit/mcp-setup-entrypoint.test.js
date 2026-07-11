@@ -766,6 +766,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     expect(hostConfig.mcpServers.codegraph).toMatchObject({ command: 'codegraph', args: ['serve', '--mcp'] });
     expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'codegraph'))
       .toMatchObject({
+        readiness_status: 'fresh',
         lifecycle: { installed: true, configured: true, initialized: true, indexed: true },
       });
   });

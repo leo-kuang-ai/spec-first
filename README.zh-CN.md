@@ -77,9 +77,9 @@ spec-first doctor
 spec-first init
 ```
 
-选择宿主（Claude Code、Codex、Cursor、Kiro 和/或 Qoder）、确认开发者姓名与语言，然后确认写入。在包含大量 child Git repos 的父级 workspace 中，`init` 默认在父 root 执行 workspace bootstrap：写入 instruction、`.gitignore`、缺失时的 `CHANGELOG.md` 以及 selected host runtime/state。`--repo <child>` 只初始化指定 child repo；`--all-repos` 初始化父 workspace 和所有发现的 child repos。child 的 setup/readiness truth 仍只属于各 child。全新机器上的脚本化 `init -y` 必须传入 `-u <name>`，因为非交互模式不会再提示输入开发者姓名，例如 `spec-first init --codex -y -u <name> --lang <zh|en>`。脚本化 preview 初始化可使用 `spec-first init --kiro -y -u <name> --lang <zh|en>` 初始化 Kiro，使用 `spec-first init --qoder -y -u <name> --lang <zh|en>` 初始化 Qoder，或使用 `spec-first init --cursor -y -u <name> --lang <zh|en>` 初始化 Cursor generated-runtime preview。Cursor 不属于 `init -y` 默认宿主集合。
+选择宿主（Claude Code、Codex、Cursor、Kiro 和/或 Qoder）、确认开发者姓名与语言，然后确认写入。交互确认默认显示摘要：按宿主聚合生成规模，突出 destructive totals、少量代表路径、项目外写入和 degraded warnings；需要检查 target/host/root、关键写入和有界路径样本时，显式运行 `spec-first init --dry-run`。在包含大量 child Git repos 的父级 workspace 中，`init` 默认在父 root 执行 workspace bootstrap：写入 instruction、`.gitignore`、缺失时的 `CHANGELOG.md` 以及 selected host runtime/state。`--repo <child>` 只初始化指定 child repo；`--all-repos` 初始化父 workspace 和所有发现的 child repos。child 的 setup/readiness truth 仍只属于各 child。全新机器上的脚本化 `init -y` 必须传入 `-u <name>`，因为非交互模式不会再提示输入开发者姓名，例如 `spec-first init --codex -y -u <name> --lang <zh|en>`。脚本化 preview 初始化可使用 `spec-first init --kiro -y -u <name> --lang <zh|en>` 初始化 Kiro，使用 `spec-first init --qoder -y -u <name> --lang <zh|en>` 初始化 Qoder，或使用 `spec-first init --cursor -y -u <name> --lang <zh|en>` 初始化 Cursor generated-runtime preview。Cursor 不属于 `init -y` 默认宿主集合。
 
-预期结果：init 列出 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/` 或 `.qoder/` 下的生成路径，并确认 setup 完成。生成的 runtime copies 随时可通过 `spec-first init` 重建。
+预期结果：交互 init 先给出可确认的宿主级摘要，完成后用单一 run-level 回执报告各宿主结果；`--dry-run` 才展开 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/` 或 `.qoder/` 下的有界路径明细。生成的 runtime copies 随时可通过 `spec-first init` 重建。
 
 Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Changelog 保持逐字节不变并继续由仓库自行拥有。
 

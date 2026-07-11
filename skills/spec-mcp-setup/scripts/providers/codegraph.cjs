@@ -42,6 +42,8 @@ const METADATA = {
   },
   usage_note: '使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 负责 provider-native Auto-Sync freshness；结论需由 source/test/log/contract/user evidence 确认。',
 };
+const CONFIG_UNKNOWN_ACTION = '通过当前 host 的 spec-mcp-setup --verify-only 确认 CodeGraph MCP 配置。';
+const CONFIG_REPAIR_ACTION = '运行 spec-mcp-setup --only codegraph，配置 CodeGraph MCP entry。';
 
 function plan(context = {}) {
   const repoRoot = path.resolve(context.repoRoot || process.cwd());
@@ -140,6 +142,7 @@ function verify(context = {}) {
   if (installed && !hasArtifact) nextActions.push('依赖 code-graph candidate 前，先显式执行 CodeGraph first generation。');
   if (installed && hasArtifact && !serverReachable) nextActions.push('将 server_reachable 视为 true 前，先运行 CodeGraph server/probe 验证。');
   if (indexed && !queryVerified) nextActions.push('运行 spec-mcp-setup --only codegraph，重新执行 bounded CodeGraph query probe。');
+  appendConfigurationAction(nextActions, context);
   return providerResult(METADATA, {
     installed,
     configured: context.configured === true,
@@ -148,7 +151,12 @@ function verify(context = {}) {
     artifactExists: hasArtifact,
     serverReachable,
     queryVerified,
-    readinessStatus: !installed ? 'not-run' : (!hasArtifact || !indexed || !queryVerified ? 'degraded' : 'fresh'),
+    readinessStatus: codegraphReadinessStatus(context, {
+      installed,
+      initialized: hasArtifact,
+      indexed,
+      queryVerified,
+    }),
     repoAligned: 'unknown',
     firstGenerationStatus: hasArtifact ? 'completed' : 'not-run',
     artifactRefs: hasArtifact ? ['.codegraph/codegraph.db'] : [],
@@ -244,12 +252,66 @@ function apply(context = {}, actionPlan = plan(context)) {
     artifactExists: true,
     serverReachable: context.serverReachable === true,
     queryVerified: true,
-    readinessStatus: 'fresh',
+    readinessStatus: codegraphReadinessStatus(context, {
+      installed: true,
+      initialized: true,
+      indexed: true,
+      queryVerified: true,
+    }),
     repoAligned: 'unknown',
     firstGenerationStatus: 'completed',
     artifactRefs: ['.codegraph/codegraph.db'],
-    nextActions: [],
+    nextActions: configurationActions(context),
   });
+}
+
+function codegraphReadinessStatus(context, lifecycle) {
+  if (!lifecycle.installed) return 'not-run';
+  if (!lifecycle.initialized || !lifecycle.indexed || !lifecycle.queryVerified) return 'degraded';
+  if (typeof context.configured !== 'boolean') return 'unknown';
+  return context.configured ? 'fresh' : 'degraded';
+}
+
+function configurationActions(context) {
+  const actions = [];
+  appendConfigurationAction(actions, context);
+  return actions;
+}
+
+function appendConfigurationAction(actions, context) {
+  if (typeof context.configured !== 'boolean') {
+    actions.push(CONFIG_UNKNOWN_ACTION);
+  } else if (context.configured !== true) {
+    actions.push(CONFIG_REPAIR_ACTION);
+  }
+}
+
+function reconcileConfigured(readiness, hostResult = {}) {
+  if (!readiness || !readiness.lifecycle) return readiness;
+  const configured = hostResult.configured_status === 'ready';
+  readiness.lifecycle.configured = configured;
+  if (!configured) {
+    if (['fresh', 'unknown'].includes(readiness.readiness_status)) {
+      readiness.readiness_status = 'degraded';
+    }
+    readiness.next_actions = [...new Set([
+      ...(readiness.next_actions || []),
+      hostResult.next_action || CONFIG_REPAIR_ACTION,
+    ])];
+    return readiness;
+  }
+  const lifecycle = readiness.lifecycle;
+  if (readiness.readiness_status === 'unknown'
+    && lifecycle.installed
+    && lifecycle.initialized
+    && lifecycle.indexed
+    && lifecycle.query_verified) {
+    readiness.readiness_status = 'fresh';
+  }
+  readiness.next_actions = (readiness.next_actions || []).filter((action) =>
+    ![CONFIG_UNKNOWN_ACTION, CONFIG_REPAIR_ACTION].includes(action)
+  );
+  return readiness;
 }
 
 function refresh(context = {}, actionPlan = plan({ ...context, selected: true })) {
@@ -323,6 +385,7 @@ function statusNeedsReindex(output) {
 module.exports = {
   apply,
   plan,
+  reconcileConfigured,
   refresh,
   uninstall,
   verify,
