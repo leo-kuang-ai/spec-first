@@ -1,7 +1,9 @@
 ---
 title: 需求澄清能力轻量集成 - Plan
 type: refactor
+status: completed
 date: 2026-07-11
+completed_at: 2026-07-12
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
@@ -9,6 +11,8 @@ execution: code
 ---
 
 # 需求澄清能力轻量集成 - Plan
+
+> **完成说明（2026-07-12）：** 本计划 U0-U7 已全部完成，提交 `5dfbb668` 已落地 source、测试、验证证据、用户文档与五宿主 runtime projection。最终完成证据以 `docs/validation/requirements-clarification/2026-07-11-clarification-integration-current-source-evaluation.md` 和 `docs/validation/requirements-clarification/2026-07-12-unit-replay/` 为准；field outcome 仍为 `not_run`，不影响本计划实现完成状态，也不构成普遍用户效果声明。`artifact_readiness: implementation-ready` 描述计划制品完整度，实施进度由 `status: completed` 表达。
 
 ## Goal Capsule
 
