@@ -90,6 +90,7 @@ function inferProducer(filePath) {
   if (name === 'impact-facts.json') return 'build-impact-facts.js';
   if (name === 'app-audit-context.json') return 'build-audit-context.js';
   if (name === 'audit-report.json' || name === 'issues.json') return 'merge-contracts.js';
+  if (name === 'verification-plan.json') return 'verification-compiler+validate-verification-plan.js';
   return 'app-audit-workflow';
 }
 

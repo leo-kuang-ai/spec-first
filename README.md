@@ -157,10 +157,13 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 | Execute scoped work | `spec-work` | source changes + evidence |
 | Dogfood a branch in browser | `spec-dogfood` | `docs/dogfood-reports/` |
 | Review code | `spec-code-review` | structured findings |
+| Audit a changed mobile App journey across PRD/Figma/source (opt-in Trial) | `spec-app-consistency-audit mode:headless base:<ref>` | run-scoped assurance artifacts |
 | Review docs or plans | `spec-doc-review` | structured findings |
 | Capture reusable learning | `spec-compound` | `docs/solutions/` |
 
 Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
+
+App Assurance maturity note: `spec-app-consistency-audit` is an opt-in pre-runtime Trial for KMP/Android/iOS changed journeys. Its supported path requires an explicit `base:<ref>` and uses `prepare → host semantic pass → finalize`; it does not run builds/devices, fix product code, or automatically feed `spec-code-review`. U0 comparative evidence justified continued experimentation only, not a universal effectiveness claim.
 
 Requirements clarification stays inside its current producer. `spec-ideate` passes a focused evidence snapshot to `spec-brainstorm`; `spec-brainstorm` verifies source facts, asks the current user one product question at a time, and persists blockers/source limitations in the requirements-only Product Contract; `spec-prd` does the same for brownfield PRDs. Project glossary/context/ADR files are advisory inputs only during these workflows—cross-release knowledge is emitted as a qualified promotion candidate for a later explicit maintenance request. Visual or spatial decisions use tables, state sequences, ASCII wireframes, or read-only source screenshots; there is no bundled browser helper.
 

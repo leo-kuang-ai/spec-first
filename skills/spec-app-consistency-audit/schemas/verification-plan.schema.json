@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/schemas/spec-app-consistency-audit/verification-plan.schema.json",
+  "title": "Producer-local App verification plan",
+  "type": "object",
+  "required": ["schema_version", "artifact_id", "generated_at", "source_inputs", "consumers", "contract_status", "artifact_authority", "execution_authority", "data_sensitivity", "retention_class", "run_id", "prepare_fingerprint", "input_refs", "compiler_receipt", "capability_snapshot", "verification_compiler_status", "verification_execution_status", "coverage", "tasks", "limitations"],
+  "properties": {
+    "schema_version": { "const": "verification-plan.v1" },
+    "artifact_id": { "const": "verification-plan" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_inputs": { "type": "array", "minItems": 1 },
+    "consumers": { "type": "array", "minItems": 1 },
+    "contract_status": { "const": "candidate" },
+    "artifact_authority": { "const": "generated_advisory" },
+    "execution_authority": { "const": "not_run" },
+    "data_sensitivity": { "enum": ["public", "internal", "confidential"] },
+    "retention_class": { "const": "run_local" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "prepare_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "input_refs": { "type": "object" },
+    "compiler_receipt": { "type": "object" },
+    "capability_snapshot": { "type": "object" },
+    "verification_compiler_status": { "enum": ["generated", "degraded"] },
+    "verification_execution_status": { "const": "not_run" },
+    "coverage": { "type": "object" },
+    "tasks": { "type": "array", "items": { "$ref": "#/$defs/task" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "task": {
+      "type": "object",
+      "required": ["id", "claim_refs", "verification_kind", "execution_environment", "target_platform", "preconditions", "inputs", "actions", "oracle", "required_capabilities", "capability_evidence_refs", "permission", "data_sensitivity", "parallelizable", "cost_rank", "lower_cost_rejections", "sensitive_action_class", "human_checkpoint_ref", "status", "blocked_reason", "limitations"],
+      "properties": {
+        "id": { "type": "string", "minLength": 3 },
+        "claim_refs": { "type": "array", "minItems": 1 },
+        "verification_kind": { "enum": ["static_proof", "compiler_lint", "unit", "state_transition", "navigation_component", "visual_capture", "end_to_end", "human_judgment"] },
+        "execution_environment": { "enum": ["none", "host", "build", "simulator", "real_device", "human_only"] },
+        "target_platform": { "enum": ["shared", "android", "ios", "multi"] },
+        "preconditions": { "type": "array" },
+        "inputs": { "type": "array" },
+        "actions": { "type": "array", "minItems": 1 },
+        "oracle": { "type": "object" },
+        "required_capabilities": { "type": "array" },
+        "capability_evidence_refs": { "type": "array" },
+        "permission": { "enum": ["read_only", "build", "simulator_control", "device_control", "human_only"] },
+        "data_sensitivity": { "enum": ["public", "internal", "confidential"] },
+        "parallelizable": { "type": "boolean" },
+        "cost_rank": { "type": "integer", "minimum": 0 },
+        "lower_cost_rejections": { "type": "array" },
+        "sensitive_action_class": { "enum": ["none", "oauth_consent", "captcha", "credential_entry", "biometric_confirmation", "system_permission_confirmation", "payment_transaction_confirmation", "store_release", "production_mutation"] },
+        "human_checkpoint_ref": { "type": ["string", "null"] },
+        "status": { "enum": ["not_run", "blocked"] },
+        "blocked_reason": { "type": ["object", "null"] },
+        "limitations": { "type": "array" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

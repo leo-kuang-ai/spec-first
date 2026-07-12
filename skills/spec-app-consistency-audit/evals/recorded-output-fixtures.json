@@ -57,33 +57,20 @@
       ]
     },
     {
-      "id": "code-review-handoff-consumable",
-      "input": "from:code-review issue artifact with project-specific evidence is normalized for downstream review.",
-      "coverage_tags": ["expected"],
-      "input_summary": "from:code-review issue artifact with project-specific evidence is normalized for downstream review.",
-      "expected_outcome": "Issue normalization preserves enabled code_review_handoff fields with severity, owner, verification, run id, and source issue id.",
+      "id": "trial-has-no-default-code-review-consumer",
+      "input": "A completed Trial run produces App findings before any U8 owner authorization for Code Review integration.",
+      "coverage_tags": ["expected", "boundary", "trial"],
+      "input_summary": "App Assurance Trial completes without an authorized downstream Code Review consumer.",
+      "expected_outcome": "The public contract keeps findings in the App report and may recommend a separately authorized follow-up; it does not auto-discover or invoke Code Review.",
       "recorded_output": {
-        "issue_fields": {
-          "code_review_handoff": {
-            "enabled": true,
-            "severity": "P2",
-            "autofix_class": "manual",
-            "owner": "downstream-resolver",
-            "requires_verification": true,
-            "source_run_id": "20260502-recorded-output",
-            "source_issue_id": "APP-AUDIT-RECORDED-001"
-          }
-        },
-        "headless_envelope_contains": [
-          "Code-review handoff:",
-          "requires_verification=true"
-        ]
+        "consumer_posture": "none_by_default",
+        "integration_authority": "requires_u8_owner_verdict",
+        "headless_envelope_contains": ["Follow-up suggestions are advisory"]
       },
       "assertions": [
-        "handoff_enabled",
-        "handoff_severity_present",
-        "handoff_requires_verification_preserved",
-        "handoff_source_ids_consumable"
+        "no_default_code_review_consumer",
+        "no_automatic_cross_workflow_invocation",
+        "app_findings_remain_in_app_report"
       ]
     }
   ]

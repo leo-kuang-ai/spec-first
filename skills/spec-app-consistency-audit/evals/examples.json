@@ -5,7 +5,9 @@
   "source_refs": [
     "skills/spec-app-consistency-audit/SKILL.md",
     "skills/spec-app-consistency-audit/references/headless-runner.md",
-    "skills/spec-app-consistency-audit/references/mode-output-contract.md"
+    "skills/spec-app-consistency-audit/references/mode-output-contract.md",
+    "skills/spec-app-consistency-audit/references/app-behavior-model.md",
+    "skills/spec-app-consistency-audit/references/proof-and-counterexample-method.md"
   ],
   "source_ref_authority": "source",
   "cases": [
@@ -35,14 +37,19 @@
       ]
     },
     {
-      "id": "trigger-headless-code-review-caller",
-      "input": "Parent workflow calls mode:headless from:code-review base:main source:app prd:docs/prd.md figma-context:.spec-first/input/figma-context.json.",
-      "coverage_tags": ["trigger", "expected"],
+      "id": "expected-headless-trial-lifecycle",
+      "input": "Run the opt-in App Assurance Trial for a changed checkout journey with mode:headless base:main source:app and local materialized inputs.",
+      "coverage_tags": ["trigger", "expected", "trial"],
       "expected_outcome": [
-        "run headless with base:<ref>",
-        "ask no user questions",
-        "write run-scoped artifacts",
-        "return compact headless envelope"
+        "require base:<ref> and keep the same scope across prepare and finalize",
+        "run prepare then a host-owned semantic pass then finalize",
+        "keep semantic input ephemeral and normalized artifacts run-local",
+        "return compact headless envelope without running runtime validation"
+      ],
+      "forbidden_signals": [
+        "default code-review consumer",
+        "runner-owned model invocation",
+        "zero issues treated as pass when semantic adjudication did not run"
       ]
     },
     {
@@ -54,7 +61,8 @@
       "boundary_note": "Ordinary code-review intent is a near neighbor but lacks cross-source App consistency scope.",
       "forbidden_signals": [
         "app-audit runner dispatch",
-        "PRD/Figma/source consistency finding"
+        "PRD/Figma/source consistency finding",
+        "automatic App Assurance invocation from code review"
       ]
     },
     {

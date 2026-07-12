@@ -5,18 +5,20 @@
 
 ## 1. 结论
 
-`spec-app-consistency-audit` 应保留为独立 App 专项 workflow，不并入 `spec-code-review`。
+`spec-app-consistency-audit` 应保留为独立、opt-in 的 App Assurance Compiler Trial，不并入 `spec-code-review`。
+
+当前 maturity 不是默认生产路径。U0 只在相同授权样本、证据 allowance 与预算下证明 Behavior IR thin slice 相对 direct App lens 产生了足以继续实现的增量，并经独立盲审得到 `ir_go`。它没有证明普遍效果、field adoption，也没有授权 Code Review integration。
 
 正确形态：
 
 ```text
-Skill Orchestrator
-  -> deterministic scripts build Impact Facts
-  -> LLM Audit Planner selects a small expert set
-  -> selected experts review bounded evidence
-  -> Deterministic Evidence Gate applies structural caps
-  -> LLM Evidence Auditor checks semantic support
-  -> Report Writer emits summary, issues and handoff suggestions
+mode:headless + base:<ref>
+  -> prepare deterministic facts + fingerprint
+  -> host compiles changed-journey Behavior IR
+  -> proof obligations + bounded counterexamples
+  -> deterministic evidence gate + isolated fresh adjudication
+  -> verification plan (generated, not executed)
+  -> finalize freshness + journey report + cleanup
 ```
 
 核心边界：
@@ -24,9 +26,10 @@ Skill Orchestrator
 ```text
 Scripts prepare, LLM decides.
 Light contract, explicit boundaries.
-Static-first, no runtime validation by default.
+Pre-runtime only; no build/simulator/device execution.
 Run-scoped artifacts only.
 Missing PRD/Figma/plan/task-doc degrades capability, not the whole audit by default.
+Trial has no default Code Review consumer before U8 owner verdict.
 ```
 
 ## 2. Source Of Truth
@@ -63,7 +66,7 @@ docs/02-架构设计/移动端交互审查方案.md
 2. 用 Impact Facts 提升 LLM 输入质量，避免专家自由发挥。
 3. 通过 run-scoped artifacts 保留本轮证据链。
 4. 对缺失输入做精准降级，不制造 confirmed false positive。
-5. 与 spec-code-review 协作，但不污染通用 code review。
+5. 用 comparative/field evidence 决定 promote、continue Trial 或收缩，不用实现完成度替代产品证据。
 ```
 
 非目标：
@@ -73,16 +76,16 @@ docs/02-架构设计/移动端交互审查方案.md
 2. 不替代 spec-plan / spec-brainstorm 补写 PRD 或产品决策。
 3. 不自动运行 simulator / real device / browser。
 4. 不修改产品源码、generated runtime assets、repo-profile.yaml 或 durable docs。
-5. 不把行业 rule-pack、Figma URL、node id 或术语候选当 confirmed evidence。
+5. 不把行业 rule-pack、Figma URL、node id、IR confidence 或多 agent 共识当 confirmed evidence。
+6. U8 裁决前不创建默认 Code Review consumer，不自动调用其他 workflow。
 ```
 
 ## 4. Mode Contract
 
-支持 token：
+当前 Trial 支持的公共主路径：
 
 ```text
 mode:headless
-mode:report-only
 base:<ref>
 source:<repo-relative-path>
 prd:<repo-relative-path>
@@ -92,8 +95,19 @@ industry:<name>
 tech-plan:<repo-relative-path>
 task-doc:<repo-relative-path>
 depth:deep
-from:code-review
 ```
+
+`mode:default`、`mode:report-only` 与 `from:code-review` 保留为兼容/长期语义，不属于当前候选 hot path。当前 runner 只执行 `mode:headless`，且 `base:<ref>` 必填。
+
+三阶段生命周期：
+
+```text
+phase:prepare
+  -> host-owned semantic stage under <run-dir>/input/
+  -> phase:finalize
+```
+
+Finalize 重新验证 `prepare_fingerprint`，生成 normalized run-local artifacts，并清理 ephemeral input。`phase:abort` 执行相同的幂等清理。宿主 transcript 不在 run-dir cleanup 权限范围内。
 
 模式边界：
 
@@ -459,4 +473,4 @@ P2：
 
 最终判断：
 
-> `spec-app-consistency-audit` 不应成为每次全量跑的重型平台，也不应成为隐藏规则引擎。它应是 App 专项审查 orchestrator：脚本准备事实，LLM 组织最小专家小组，Evidence Gate 保证证据边界，报告以能力范围和降级状态对用户诚实。
+> `spec-app-consistency-audit` 不应成为每次全量跑的重型平台，也不应成为隐藏规则引擎。当前 Trial 应保持 changed-journey compiler：脚本准备/校验事实与引用，LLM 编译 IR、obligations、counterexamples 和 verification choices，fresh adjudication 守住语义证据边界，最终报告对 coverage、未执行验证和 maturity 保持诚实。

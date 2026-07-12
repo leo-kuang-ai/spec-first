@@ -84,12 +84,36 @@ function validateArtifact(artifact, options = {}) {
   if (artifact.artifact_id === 'counterexamples' || artifact.schema_version === 'app-counterexamples.v1') {
     validateCounterexamplesArtifact(artifact, errors);
   }
+  if (artifact.artifact_id === 'verification-plan' || artifact.schema_version === 'verification-plan.v1') {
+    validateVerificationPlanArtifact(artifact, errors);
+  }
   validateKnownContractArtifact(artifact, errors);
 
   return {
     valid: errors.length === 0,
     errors,
   };
+}
+
+function validateVerificationPlanArtifact(artifact, errors) {
+  requireSchemaVersion(artifact, 'verification-plan.v1', errors);
+  if (artifact.artifact_id !== 'verification-plan') errors.push(error('artifact_id', 'verification_artifact_id_invalid', 'artifact_id must be verification-plan.'));
+  if (artifact.artifact_authority !== 'generated_advisory' || artifact.execution_authority !== 'not_run'
+    || artifact.verification_execution_status !== 'not_run') {
+    errors.push(error('execution_authority', 'verification_execution_authority_invalid', 'Generated verification plans must remain not_run advisory artifacts.'));
+  }
+  requireObject(artifact, 'input_refs', errors);
+  requireObject(artifact, 'compiler_receipt', errors);
+  requireObject(artifact, 'capability_snapshot', errors);
+  requireObject(artifact, 'coverage', errors);
+  requireArray(artifact, 'tasks', errors);
+  for (const [index, task] of (artifact.tasks || []).entries()) {
+    const prefix = `tasks[${index}]`;
+    for (const field of ['id', 'verification_kind', 'execution_environment', 'target_platform', 'permission', 'data_sensitivity', 'sensitive_action_class', 'status']) requireString(task, field, errors, prefix);
+    for (const field of ['claim_refs', 'preconditions', 'inputs', 'actions', 'required_capabilities', 'capability_evidence_refs', 'lower_cost_rejections', 'limitations']) requireArray(task, field, errors, prefix);
+    requireObject(task, 'oracle', errors, prefix);
+    if (!['not_run', 'blocked'].includes(task.status)) errors.push(error(`${prefix}.status`, 'verification_execution_claim_rejected', 'Task status must remain not_run or blocked.'));
+  }
 }
 
 function validateProofObligationsArtifact(artifact, errors) {
@@ -588,14 +612,21 @@ function validateAuditReportArtifact(artifact, errors, options = {}) {
   if (!['not_run', 'complete', 'degraded', 'invalid_isolation', 'stale'].includes(artifact.semantic_adjudication_status)) {
     errors.push(error('semantic_adjudication_status', 'semantic_adjudication_status_invalid', 'audit report must expose a valid semantic adjudication status.'));
   }
-  if (artifact.verification_compiler_status !== 'not_run') {
-    errors.push(error('verification_compiler_status', 'verification_compiler_status_invalid', 'U4 report must keep verification compiler status not_run.'));
+  if (!['not_run', 'generated', 'degraded'].includes(artifact.verification_compiler_status)) {
+    errors.push(error('verification_compiler_status', 'verification_compiler_status_invalid', 'Report must expose a valid verification compiler status.'));
+  }
+  if (artifact.verification_execution_status !== 'not_run') {
+    errors.push(error('verification_execution_status', 'verification_execution_status_invalid', 'Report cannot claim verification execution.'));
   }
   for (const field of ['changed_journeys', 'unresolved_obligations', 'coverage_caps', 'report_limitations', 'verification_task_refs']) {
     if (!Array.isArray(artifact[field])) errors.push(error(field, 'array_required', `${field} must be an array.`));
   }
-  if (Array.isArray(artifact.verification_task_refs) && artifact.verification_task_refs.length > 0) {
-    errors.push(error('verification_task_refs', 'verification_task_refs_forbidden_before_u5', 'U4 report cannot contain verification task refs.'));
+  if (artifact.verification_compiler_status === 'not_run'
+    && Array.isArray(artifact.verification_task_refs) && artifact.verification_task_refs.length > 0) {
+    errors.push(error('verification_task_refs', 'verification_task_refs_without_plan', 'not_run compiler status cannot contain verification task refs.'));
+  }
+  if (artifact.verification_compiler_status !== 'not_run' && !artifact.verification_plan_ref) {
+    errors.push(error('verification_plan_ref', 'verification_plan_ref_required', 'Generated/degraded compiler status requires a current plan ref.'));
   }
   if (artifact.result_interpretation === 'no_findings_after_completed_adjudication'
     && (artifact.semantic_adjudication_status !== 'complete' || artifact.issues.length > 0)) {
@@ -1103,6 +1134,7 @@ module.exports = {
   validateAppBehaviorModelArtifact,
   validateCounterexamplesArtifact,
   validateProofObligationsArtifact,
+  validateVerificationPlanArtifact,
   validateAuditIssue,
   validateAuditReportArtifact,
   validatePreflightArtifact,

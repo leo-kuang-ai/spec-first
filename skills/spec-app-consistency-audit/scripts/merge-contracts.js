@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const {
   ISSUE_SYNTHESIS_STATUSES,
+  hashText,
   makeArtifact,
   parseCommonArgs,
   redactForArtifactText,
@@ -310,6 +311,7 @@ function firstReason(adjudication, fallback) {
 
 function buildAuditReport(options = {}) {
   const artifacts = options.artifactsData || (options.artifacts || []).map((filePath) => readArtifact(filePath));
+  const verificationPlan = options.verificationPlanData || artifacts.find((entry) => entry.artifact_id === 'verification-plan') || null;
   const pilotValidation = options.pilotValidation ? readArtifact(options.pilotValidation) : null;
   const inputIssueArtifacts = options.issueArtifactsData || (options.issues || []).map((filePath) => readArtifact(filePath));
   const gatedIssues = gateInputIssues(options);
@@ -332,7 +334,20 @@ function buildAuditReport(options = {}) {
     body: {
       issue_synthesis_status: resolveIssueSynthesisStatus(options, inputIssueArtifacts),
       semantic_adjudication_status: resolveSemanticAdjudicationStatus(inputIssueArtifacts),
-      verification_compiler_status: 'not_run',
+      verification_compiler_status: verificationPlan ? verificationPlan.verification_compiler_status : 'not_run',
+      verification_execution_status: 'not_run',
+      verification_plan_ref: verificationPlan ? {
+        artifact_id: 'verification-plan', schema_version: verificationPlan.schema_version,
+        run_id: verificationPlan.run_id, prepare_fingerprint: verificationPlan.prepare_fingerprint,
+        content_hash: hashText(JSON.stringify(verificationPlan)),
+      } : null,
+      verification_summary: verificationPlan ? {
+        task_count: verificationPlan.tasks.length,
+        blocked_count: verificationPlan.tasks.filter((entry) => entry.status === 'blocked').length,
+        human_checkpoint_count: verificationPlan.tasks.filter((entry) => entry.verification_kind === 'human_judgment').length,
+        platforms: unique(verificationPlan.tasks.map((entry) => entry.target_platform)),
+        limitations: verificationPlan.limitations || [],
+      } : { task_count: 0, blocked_count: 0, human_checkpoint_count: 0, platforms: [], limitations: [] },
       result_interpretation: resolveResultInterpretation(inputIssueArtifacts, resolveFinalFreshness(options, artifacts), acceptedIssues),
       summary: summarizeIssues(acceptedIssues, rejectedIssues),
       scope_and_degraded_modes: scopeAndDegradedModes,
@@ -342,7 +357,7 @@ function buildAuditReport(options = {}) {
       unresolved_obligations: collectUnresolvedObligations(artifacts),
       coverage_caps: collectCoverageCaps(artifacts),
       report_limitations: collectReportLimitations(artifacts),
-      verification_task_refs: [],
+      verification_task_refs: verificationPlan ? verificationPlan.tasks.map((entry) => entry.id) : [],
       section_coverage: buildCoverage(artifacts),
       regression_suggestions: buildRegressionSuggestions(acceptedIssues),
       writeback_preview: writebackPreview,

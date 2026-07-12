@@ -40,6 +40,11 @@ function renderHeadlessEnvelope(options = {}) {
     `Summary: ${safePathLine(metadata.summary_path || 'app-consistency-audit.summary.md', 240)}`,
     `Issues: ${safePathLine(metadata.issues_path || 'issues.json', 240)}`,
     `Issue synthesis status: ${safeLine(synthesisStatus, 60)}`,
+    `Verification compiler: ${safeLine(report.verification_compiler_status || 'not_run', 60)}`,
+    `Verification execution: ${safeLine(report.verification_execution_status || 'not_run', 60)}`,
+    `Verification tasks: ${Number(report.verification_summary && report.verification_summary.task_count) || 0}`,
+    `Blocked tasks: ${Number(report.verification_summary && report.verification_summary.blocked_count) || 0}`,
+    `Human checkpoints: ${Number(report.verification_summary && report.verification_summary.human_checkpoint_count) || 0}`,
     `Verdict: ${buildVerdict(issues, rejected, degradedModes, synthesisStatus)}`,
     `Verdict scope: ${safeLine(metadata.audit_verdict_scope || 'source_only_app_static_audit', 160)}`,
   ];

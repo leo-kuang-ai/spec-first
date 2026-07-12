@@ -18,14 +18,14 @@ List unresolved obligations, missing evidence and the minimum verification hint 
 
 ## Verification status
 
-Before U5:
+Without a current verification plan:
 
 ```text
 verification_compiler_status: not_run
 verification_task_refs: []
 ```
 
-Regression suggestions remain advisory and must not be described as compiled verification work.
+With a valid U5 plan, show compiler `generated|degraded`, execution `not_run`, task/blocked/human-checkpoint counts and the current plan ref. Regression suggestions remain advisory and must not be described as compiled verification work.
 
 ## Empty-result wording
 

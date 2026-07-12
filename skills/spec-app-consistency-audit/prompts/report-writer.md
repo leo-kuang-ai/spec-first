@@ -18,4 +18,4 @@ Omit non-applicable domain sections instead of printing a fixed expert checklist
 
 `issues:[]` means no findings only when semantic adjudication is complete, critical obligations were processed, isolation is valid and final freshness is current. Otherwise use `semantic_not_run` or `coverage_limited` wording.
 
-Before U5, always emit `verification_compiler_status:not_run` and an empty `verification_task_refs`; regression suggestions remain advisory and are not compiled verification tasks. Do not read stale `latest-summary.json`. Preserve source provenance, redaction and the limitation that host transcripts are outside run-directory cleanup authority.
+Without a current valid verification plan, emit `verification_compiler_status:not_run`, `verification_execution_status:not_run` and empty task refs. With a valid U5 plan, emit compiler status, execution `not_run`, task/blocked/human-checkpoint counts and current plan ref. Never describe generated tasks as executed, passed, failed or verified. Regression suggestions remain advisory and are not compiled verification tasks. Do not read stale `latest-summary.json`.

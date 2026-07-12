@@ -156,10 +156,13 @@ docs/
 | 将计划拆成可执行任务 | `spec-write-tasks` | `docs/tasks/` |
 | 执行有范围的工作 | `spec-work` | 源码变更 + 证据 |
 | 代码审查 | `spec-code-review` | 结构化 findings |
+| 跨 PRD/Figma/source 审查移动 App changed journey（opt-in Trial） | `spec-app-consistency-audit mode:headless base:<ref>` | run-scoped assurance artifacts |
 | 文档/计划审查 | `spec-doc-review` | 结构化 findings |
 | 沉淀可复用经验 | `spec-compound` | `docs/solutions/` |
 
 支撑入口（按需触发）：`spec-mcp-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
+
+App Assurance maturity 说明：`spec-app-consistency-audit` 当前是面向 KMP/Android/iOS changed journey 的 opt-in pre-runtime Trial。可执行路径必须显式提供 `base:<ref>`，并按 `prepare → 宿主语义阶段 → finalize` 运行；它不执行 build/设备验证、不修改产品代码，也不会自动把结果送入 `spec-code-review`。U0 comparative evidence 只支持继续实验，不支持普遍有效性声明。
 
 需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。
 

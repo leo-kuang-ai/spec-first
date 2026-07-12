@@ -341,7 +341,7 @@ function finalizePreparedRun(context) {
 }
 
 function existingSemanticArtifactFlags(artifacts) {
-  return [artifacts.behaviorModel, artifacts.proofObligations, artifacts.counterexamples]
+  return [artifacts.behaviorModel, artifacts.proofObligations, artifacts.counterexamples, artifacts.verificationPlan]
     .filter((filePath) => filePath && fs.existsSync(filePath))
     .flatMap((filePath) => ['--artifacts', filePath]);
 }
@@ -470,6 +470,7 @@ function main(argv) {
       behaviorModel: path.join(absoluteRunDir, 'app-behavior-model.json'),
       proofObligations: path.join(absoluteRunDir, 'proof-obligations.json'),
       counterexamples: path.join(absoluteRunDir, 'counterexamples.json'),
+      verificationPlan: path.join(absoluteRunDir, 'verification-plan.json'),
       issues: path.join(absoluteRunDir, 'issues.json'),
       report: path.join(absoluteRunDir, 'audit-report.json'),
       context: path.join(absoluteRunDir, 'app-audit-context.json'),
