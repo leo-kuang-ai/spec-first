@@ -162,21 +162,24 @@ Otherwise, read `references/universal-planning.md` and follow that workflow inst
 
 Before asking planning questions, resolve the upstream product source in this order:
 
+Discovery recognizes exactly two durable origin shapes: a `spec-brainstorm` requirements-only unified plan (`product_contract_source: spec-brainstorm`) and a legacy `docs/brainstorms/*-requirements.{md,html}` document. A current `spec-prd` artifact is consumed as the legacy shape when its existing artifact/readiness/Handoff fields are present. Do not add a future `product_contract_source: spec-prd` unified origin without a separately approved producer-migration plan. Explicit implementation-ready resume/deepen and direct bootstrap remain independent fast paths.
+
 1. **Explicit path from the user.** If it points to a unified plan with `artifact_contract: spec-unified-plan/v1` and `artifact_readiness: requirements-only`, this run enriches that same file in place. If it is already `artifact_readiness: implementation-ready`, treat it as a resume/deepening target. If it is a legacy `docs/brainstorms/*-requirements.{md,html}` file, use it as a legacy origin and write a new unified plan in `docs/plans/`.
 2. **Recent requirements-only unified plans.** Search `docs/plans/*.{md,html}` for visible/frontmatter metadata containing `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: requirements-only`, and `product_contract_source: spec-brainstorm`. **Skip a superseded sibling:** if a requirements-only candidate has a same-basename file in the other format (`<basename>.md` / `<basename>.html`) that is already `implementation-ready`, a format conversion superseded it — the implementation-ready sibling is canonical; do not re-enrich the stale requirements-only copy.
 3. **Legacy requirements docs.** Search `docs/brainstorms/` for files matching `*-requirements.md` or `*-requirements.html`. These remain readable historical inputs; do not migrate or rewrite them.
 
 **Relevance criteria:** A Product Contract source is relevant if:
 - The topic semantically matches the feature description
-- It was created within the last 30 days (use judgment to override if the document is clearly still relevant or clearly stale)
 - It appears to cover the same user problem or scope
+
+Creation within the last 30 days only raises a candidate's discovery and ordering priority. Age is never required for relevance or freshness: an older source that still matches the topic and user problem remains eligible, while a recent source is not automatically relevant or current. Before relying on an origin, inspect its durable source refs, snapshots/versions, limitations, and invalidation conditions. Re-read changed source refs and record the resulting limitation; absence of a recent timestamp does not invalidate a still-current source, and recency does not confirm truth.
 
 If multiple source documents match, ask which one to use using the platform's blocking question tool when available (see Interaction Method). Otherwise, present numbered options in chat and wait for the user's reply before proceeding.
 
 #### 0.3 Use the Product Contract as Primary Input
 
 If a relevant requirements-only unified plan exists:
-1. Read metadata, Goal Capsule, Product Contract, Open Questions, and Sources (scan headings to locate them; don't read long appendices unless referenced).
+1. Read metadata, Goal Capsule, Product Contract, Resolve Before Planning / Open Questions, Sources, source refs, snapshots/versions, limitations, and invalidation conditions (scan headings to locate them; don't read long appendices unless referenced).
 2. Announce that `spec-plan` will enrich that same file to `artifact_readiness: implementation-ready`.
 3. Preserve the existing Product Contract text and stable R/A/F/AE IDs unless planning discovers a direct conflict. Conflicts become explicit assumptions or questions; do not silently rewrite product scope.
    - Because enrichment edits the same file that holds the user's product decisions, record a one-line **Product Contract preservation** note in the enriched plan: either "Product Contract unchanged" or "changed: \<R-IDs\> — \<why\>". This keeps the WHAT/HOW review boundary visible to reviewers (`spec-doc-review`, PR review) when there is no separate brainstorm file to diff against. For a *substantive* product-scope change (not a clarification), pause and confirm with the user before writing implementation units.
@@ -198,6 +201,7 @@ If a relevant legacy requirements document exists:
 4. Use the source document as the primary input to planning and research
 5. Reference important carried-forward decisions in the plan with `(see origin: <source-path>)`
 6. Do not silently omit source content — if the origin document discussed it, the plan must address it even if briefly. Before finalizing, scan each section of the origin document to verify nothing was dropped.
+7. Inspect current PRD compatibility fields when present, including `checkpoint-prd`, `can_enter_spec_plan: no`, readiness/write status, and Handoff Context Slice. Producer receipt remains an optional read-only diagnostic, never a consumer hard gate.
 
 If no relevant Product Contract source exists, planning may proceed from the user's request directly and will create a complete unified plan with `product_contract_source: spec-plan-bootstrap`.
 
@@ -217,6 +221,8 @@ The planning bootstrap should establish:
 - Blocking questions or assumptions
 
 Keep this bootstrap brief. It exists to preserve direct-entry convenience, not to replace a full brainstorm.
+
+For every load-bearing WHAT used by direct bootstrap, preserve its authority explicitly. A behavior, scope boundary, success criterion, compatibility choice, priority, or risk decision not directly stated by the current user or confirmed by current source must be recorded as a **planning-time assumption**, never presented as producer-confirmed fact. If that unconfirmed WHAT would materially change behavior, scope, or success criteria, return it to the current user as a product decision or keep it as a named blocker; bounded bootstrap is not permission to decide it silently.
 
 If the bootstrap uncovers major unresolved product questions:
 - Recommend `spec-brainstorm` again
@@ -246,12 +252,17 @@ If the origin document contains `Resolve Before Planning` or similar blocking qu
 - Reclassify it into planning-owned work **only if** it is actually a technical, architectural, or research question
 - Keep it as a blocker if it would change product behavior, scope, or success criteria
 
+Treat `checkpoint-prd`, `can_enter_spec_plan: no`, and any load-bearing PRD Outstanding Question as the same user-control signal. Do not silently ignore, downgrade, or convert one merely because the document is old or otherwise readable.
+
 If true product blockers remain:
 - Surface them clearly
-- Ask the user, using the platform's blocking question tool when available (see Interaction Method), whether to:
-  1. Resume `spec-brainstorm` to resolve them
-  2. Convert them into explicit assumptions or decisions and continue
+- For an upstream-sourced run, return to the upstream producer by default (`spec-brainstorm` for a brainstorm Product Contract, `spec-prd` for a legacy PRD checkpoint). For direct bootstrap, direct bootstrap returns to the current user because no producer artifact owns the gap.
+- Ask the current user, using the platform's blocking question tool when available (see Interaction Method), whether to:
+  1. Return to the owning producer to resolve them
+  2. Convert each blocker into an explicit assumption or decision and continue
 - Do not continue planning while true blockers remain unresolved
+
+When the current user chooses option 2, record the original blocker, the explicit assumption/decision, consequence, and accepted risk in the plan. This preserves user control without laundering the blocker into producer-confirmed WHAT.
 
 #### 0.6 Assess Plan Depth
 
@@ -289,7 +300,7 @@ Prepare a concise planning context summary (a paragraph or two) to pass as input
 - If an origin document exists, summarize the problem frame, requirements, and key decisions from that document
 - Otherwise use the feature description directly
 - If `STRATEGY.md` exists, read it and include the relevant pieces (target problem, approach, active tracks) in the summary so downstream research and planning decisions are anchored to product strategy
-- If `CONCEPTS.md` exists at repo root, read it — its definitions are the canonical names for domain entities, named processes, and status concepts. Plan with those terms rather than synonyms.
+- If `CONCEPTS.md` exists at repo root, read it as an advisory calibration source for domain entities, named processes, and status concepts. Reuse a term when it fits the Product Contract; when it conflicts with current-user or origin meaning, surface the conflict and preserve the plan-local meaning instead of silently overriding it.
 
 **Resolve the project profile from the shared cache first.** The agnostic profile (stack, deps, conventions, structure) is identical at this commit, so reuse it instead of having `repo-research-analyst` re-derive `technology`/`architecture`/`conventions` every run. Set `SKILL_DIR` to this skill's directory and run the helper (protocol in `references/repo-profile-cache.md`):
 
@@ -713,7 +724,7 @@ Plan written to <absolute path to plan>
 
 **Pipeline mode:** If invoked from an automated workflow such as LFG or any `disable-model-invocation` context, skip interactive questions. Make the needed choices automatically and proceed to writing the plan. Pipeline mode forces `OUTPUT_FORMAT=md` at Phase 0.0.
 
-**CONCEPTS.md gap-fill (only if the file already exists):** If the plan body uses a domain term whose definition is missing from `CONCEPTS.md`, add the entry. **Domain entities, named processes, and status concepts with project-specific meaning only** — not file paths, class names, function signatures, or implementation decisions. `CONCEPTS.md` is a glossary, not a spec or catch-all. Follow the format set by existing entries. Apply silently. Skip entirely if `CONCEPTS.md` does not exist — creation is owned by spec-compound and spec-compound-refresh.
+**Project-level promotion candidates:** Never create or modify `CONCEPTS.md`, a project glossary, `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR files during planning. Treat existing project language as an advisory calibration source; expose conflicts and preserve the Product Contract/plan-local meaning required by the current release slice. When a resolved term or decision clearly has cross-release reuse value, record a **project-level promotion candidate** with target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and `not written by this workflow`. ADR candidates additionally require hard-to-reverse, surprising-without-context, and real-tradeoff conditions. Missing qualification keeps the result plan-local. A later explicit knowledge-maintenance or document-editing request owns mutation.
 
 #### 5.3 Confidence Check and Deepening
 

@@ -109,7 +109,7 @@ spec-brainstorm "describe your first task here"
 After the brainstorm completes, check your repo for a new file:
 
 ```text
-docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
+docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 ```
 
 That file is your first artifact. The work is now repo-local, inspectable, and ready to hand off to planning. From here, continue to the current host's plan entrypoint.
@@ -133,8 +133,8 @@ A typical workflow chain produces these repo-local artifacts:
 ```text
 docs/
   ideation/      ranked ideas and exploration notes
-  brainstorms/   requirements briefs and PRD-grade requirements
-  plans/         implementation plans ready for review and execution
+  brainstorms/   legacy PRD-grade requirements from spec-prd and older brainstorms
+  plans/         requirements-only Product Contracts and implementation-ready plans
   tasks/         derived task packs for structured handoff
   reviews/       document and code review findings
   solutions/     reusable learnings after solving problems
@@ -142,7 +142,7 @@ docs/
   workflows/     structured work closeout evidence (gitignored by default)
 ```
 
-Not every workflow writes every artifact. The first run writes one file under `docs/brainstorms/`. Deeper chains add plans, tasks, code changes, review findings, and learnings over time — all inspectable, all in your repository.
+Not every workflow writes every artifact. A new `spec-brainstorm` run writes a requirements-only unified plan under `docs/plans/`; `spec-prd` keeps its legacy PRD artifact under `docs/brainstorms/`. Deeper chains add tasks, code changes, review findings, and learnings over time — all inspectable, all in your repository.
 
 ## Workflow Entry Points
 
@@ -150,7 +150,7 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 
 | Task | Unified entry | Artifact |
 |---|---|---|
-| Requirements from a rough idea | `spec-brainstorm` | `docs/brainstorms/` |
+| Requirements from a rough idea | `spec-brainstorm` | `docs/plans/` (`requirements-only`) |
 | Requirements from an existing PRD | `spec-prd` | `docs/brainstorms/` |
 | Implementation plan | `spec-plan` | `docs/plans/` |
 | Split a plan into executable tasks | `spec-write-tasks` | `docs/tasks/` |
@@ -161,6 +161,8 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 | Capture reusable learning | `spec-compound` | `docs/solutions/` |
 
 Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
+
+Requirements clarification stays inside its current producer. `spec-ideate` passes a focused evidence snapshot to `spec-brainstorm`; `spec-brainstorm` verifies source facts, asks the current user one product question at a time, and persists blockers/source limitations in the requirements-only Product Contract; `spec-prd` does the same for brownfield PRDs. Project glossary/context/ADR files are advisory inputs only during these workflows—cross-release knowledge is emitted as a qualified promotion candidate for a later explicit maintenance request. Visual or spatial decisions use tables, state sequences, ASCII wireframes, or read-only source screenshots; there is no bundled browser helper.
 
 `spec-write-skill` is a general project-level Agent Skill workflow: it creates or revises a project-owned canonical package, or validates an existing/external package read-only. The portable core does not require spec-first; host metadata and project governance load only when applicable. Audit-only quality review stays a bounded review, third-party installation stays with the installer, and generated runtime mirrors are rebuilt from source rather than patched directly.
 

@@ -12,7 +12,7 @@ A single JSON object, versioned by `profile_schema_version`:
 - **Dependency surface** — manifest + lockfile paths, top-level dependencies, project license + dependency licenses.
 - **Topology** — monorepo/workspace map, deployment model, API styles, data stores, module layout.
 - **Conventions & instruction files** — paths + digests of the *root* `AGENTS.md`/`CLAUDE.md`/`GEMINI.md`/`ARCHITECTURE.md`/`README.md`/`CONTRIBUTING.md`/`STRATEGY.md`.
-- **Vocabulary** — `CONCEPTS.md` canonical terms.
+- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
 
 ## What is NOT cached (always re-globbed fresh)
 

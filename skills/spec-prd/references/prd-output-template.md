@@ -450,9 +450,7 @@ Do not put implementation steps, file lists, or task sequencing in the handoff c
 
 When existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, or `docs/adr/**` were read, record the PRD-relevant evidence source and contradiction/decision outcome. Stable terms persist in `Glossary`; hard decisions persist in `Decision Notes`, `Evidence And Assumptions`, or `Scope Boundaries` so the PRD remains sufficient for planning.
 
-In normal PRD mode, project-level context or ADR updates are preview-first promotion candidates only. They are not required PRD output, not readiness prerequisites, and not silently written by this workflow.
-
-When `grill-with-docs-integration.md` is triggered, resolved project-specific terms update `CONTEXT.md` inline and ADR-worthy decisions create ADRs inline. Record the changed context/ADR paths in `Closeout Summary`; do not make those files a replacement for PRD-local closure.
+In every PRD profile and trigger mode, project-level context/glossary/ADR promotion is candidate-only after PRD-local closure. A qualified candidate records target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and `not written by this workflow`. It is not a readiness prerequisite. `grill-with-docs-integration.md` does not change this mutation boundary.
 
 ## Feature Slices
 

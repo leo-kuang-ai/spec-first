@@ -1,0 +1,621 @@
+{
+  "schema": "requirements-clarification-unit-replay/v1",
+  "base": "89c732603b0d544bdd2aeb2fd520525c6301a574",
+  "started_at": "2026-07-12T08:00:22.588Z",
+  "units": [
+    {
+      "unit": "U2",
+      "patches": [
+        {
+          "path": "patches/U2.patch",
+          "sha256": "53b5c1096f2cd1bc9dd9c658a72eb444d1ef19f5e82b8202d69bb59d1d90c1bf"
+        }
+      ],
+      "paths": [
+        "skills/spec-ideate/references/post-ideation-workflow.md"
+      ],
+      "pre": [
+        {
+          "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+          "status": "present",
+          "sha256": "94d5771bd579c5c97d6937dcce6642e2e51a905a60605829880cc764beace126",
+          "bytes": 18978
+        }
+      ],
+      "post": [
+        {
+          "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+          "status": "present",
+          "sha256": "b4d9c94745c15961e0434a0296bda287d282b36c3fb59d010b2c9345ceefc3d0",
+          "bytes": 19985
+        }
+      ],
+      "evaluator_paths": [
+        "skills/spec-ideate/references/post-ideation-workflow.md"
+      ],
+      "before_bundle_sha256": "a55051fb43833dccaa7fc7c569159a31c5cb62ede4cb57390656f8ebd01bdfbd",
+      "after_bundle_sha256": "b73300456c050c2bcfce678da3e495e05055681fb59c1098e04c0387cb41b84d",
+      "applied_at": "2026-07-12T08:00:22.598Z"
+    },
+    {
+      "unit": "U3",
+      "patches": [
+        {
+          "path": "patches/U3.patch",
+          "sha256": "c7cce00c72e23bb4561c43a8c6f2fcbef70829b2f12248e65b1016c8ed4a7be6"
+        },
+        {
+          "operation": "deterministic placement normalization",
+          "sha256": "0ac16d2d5eb44112aa4a1b45b5ca13a23c9e44bc6506d14ea3364cfd0401a539",
+          "description": "Move the relevance-driven scenario-pass paragraph from immediately before the Phase 2.5 heading to immediately after that heading."
+        }
+      ],
+      "paths": [
+        "skills/spec-brainstorm/SKILL.md",
+        "skills/spec-brainstorm/references/brainstorm-sections.md",
+        "skills/spec-brainstorm/references/handoff.md",
+        "skills/spec-brainstorm/references/product-pressure-test.md"
+      ],
+      "pre": [
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "status": "present",
+          "sha256": "5f29ad557bde6d2c4171432068840c76d441e9887f3e3ad191c4cd0d1e1ad07c",
+          "bytes": 42017
+        },
+        {
+          "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+          "status": "present",
+          "sha256": "2f154c25a83a3ef18892e4b36653e552f7c7206f3f6b445822fcae813b0384ef",
+          "bytes": 18840
+        },
+        {
+          "path": "skills/spec-brainstorm/references/handoff.md",
+          "status": "present",
+          "sha256": "8aba61648c99402644d55d113d08926d2a5a5a4fb7f85967ca749d7ca829422e",
+          "bytes": 12536
+        },
+        {
+          "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+          "status": "present",
+          "sha256": "61cbfc9ea8bc1fce8b33331cf4808358d073f9f7cf851c51431d3e1a8cc660a1",
+          "bytes": 3619
+        }
+      ],
+      "post": [
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "status": "present",
+          "sha256": "20fd2f471186502f44079f23f3bcf439e34994408111e4091f3d614d62ed1c94",
+          "bytes": 42996
+        },
+        {
+          "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+          "status": "present",
+          "sha256": "ed6e674cdba0b9a085c5af5b46919924230b256048d198c05d7f84214ec7bfba",
+          "bytes": 19342
+        },
+        {
+          "path": "skills/spec-brainstorm/references/handoff.md",
+          "status": "present",
+          "sha256": "b399fcffd62033a4edd62e6817fc216f50c60f39ebe5740ec7ea769a0264ee1d",
+          "bytes": 12810
+        },
+        {
+          "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+          "status": "present",
+          "sha256": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84",
+          "bytes": 4405
+        }
+      ],
+      "evaluator_paths": [
+        "skills/spec-brainstorm/SKILL.md",
+        "skills/spec-brainstorm/references/product-pressure-test.md",
+        "skills/spec-brainstorm/references/brainstorm-sections.md",
+        "skills/spec-brainstorm/references/handoff.md"
+      ],
+      "before_bundle_sha256": "35e47209c29e8b64c625bc3f036631b1798c62409adb9ad0431cd31b04b2628d",
+      "after_bundle_sha256": "06ebc4d64b9902b6b2395d7f82679301bd0c6fdbe2860c842f8411bbbfaa9f6d",
+      "applied_at": "2026-07-12T08:00:22.608Z"
+    },
+    {
+      "unit": "U4",
+      "patches": [
+        {
+          "path": "patches/U4.patch",
+          "sha256": "c555ade79ca59c5c0beb4431e18204ab44b5ca2b6f2cfc60002bd0c8182b6412"
+        }
+      ],
+      "paths": [
+        "skills/spec-brainstorm/SKILL.md",
+        "skills/spec-brainstorm/references/visual-probes.md",
+        "skills/spec-brainstorm/scripts/visual-probe-server.js"
+      ],
+      "pre": [
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "status": "present",
+          "sha256": "20fd2f471186502f44079f23f3bcf439e34994408111e4091f3d614d62ed1c94",
+          "bytes": 42996
+        },
+        {
+          "path": "skills/spec-brainstorm/references/visual-probes.md",
+          "status": "present",
+          "sha256": "8ffc76d2f6786c10b16e2bb3ff6d34b7a6310ce009578f5d7d1c380ffb2d9b62",
+          "bytes": 8975
+        },
+        {
+          "path": "skills/spec-brainstorm/scripts/visual-probe-server.js",
+          "status": "present",
+          "sha256": "6bbc37398aa79b5aef597e24f55a5bba386564dbedeca10498f10fe3e96ad0e3",
+          "bytes": 12566
+        }
+      ],
+      "post": [
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "status": "present",
+          "sha256": "09225bb8f14094c7dae9b42ef924722010fa16e07b4f5afbb8e087b62a9359cb",
+          "bytes": 41517
+        },
+        {
+          "path": "skills/spec-brainstorm/references/visual-probes.md",
+          "status": "absent"
+        },
+        {
+          "path": "skills/spec-brainstorm/scripts/visual-probe-server.js",
+          "status": "absent"
+        }
+      ],
+      "evaluator_paths": [
+        "skills/spec-brainstorm/SKILL.md",
+        "skills/spec-brainstorm/references/visual-probes.md",
+        "skills/spec-brainstorm/scripts/visual-probe-server.js"
+      ],
+      "before_bundle_sha256": "13a386e9d107af8a675dad507b7755a530712c62c709ed8a3dac998ffd88272e",
+      "after_bundle_sha256": "e3a175ff4c3bb5af91214e5d8d7af9e44a691be49afddd60bfc886f7047b44b8",
+      "applied_at": "2026-07-12T08:00:22.618Z"
+    },
+    {
+      "unit": "U5",
+      "patches": [
+        {
+          "path": "patches/U5.patch",
+          "sha256": "b00c618bce685eeb11f01a47c4b2346e77328815aeb6604eb4e397330a291abf"
+        }
+      ],
+      "paths": [
+        "docs/contracts/domain-glossary.md",
+        "skills/spec-brainstorm/SKILL.md",
+        "skills/spec-brainstorm/references/agents/repo-profiler.md",
+        "skills/spec-brainstorm/references/repo-profile-cache.md",
+        "skills/spec-code-review/references/agents/repo-profiler.md",
+        "skills/spec-code-review/references/repo-profile-cache.md",
+        "skills/spec-compound/references/agents/repo-profiler.md",
+        "skills/spec-compound/references/repo-profile-cache.md",
+        "skills/spec-debug/references/agents/repo-profiler.md",
+        "skills/spec-debug/references/repo-profile-cache.md",
+        "skills/spec-explain/references/agents/repo-profiler.md",
+        "skills/spec-explain/references/repo-profile-cache.md",
+        "skills/spec-ideate/references/agents/repo-profiler.md",
+        "skills/spec-ideate/references/repo-profile-cache.md",
+        "skills/spec-optimize/references/agents/repo-profiler.md",
+        "skills/spec-optimize/references/repo-profile-cache.md",
+        "skills/spec-plan/SKILL.md",
+        "skills/spec-plan/references/agents/repo-profiler.md",
+        "skills/spec-plan/references/repo-profile-cache.md",
+        "skills/spec-pov/references/agents/repo-profiler.md",
+        "skills/spec-pov/references/repo-profile-cache.md",
+        "skills/spec-prd/SKILL.md",
+        "skills/spec-prd/evals/examples.json",
+        "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+        "skills/spec-prd/references/evidence-and-topology.md",
+        "skills/spec-prd/references/grill-with-docs-integration.md",
+        "skills/spec-prd/references/prd-output-template.md",
+        "skills/spec-prd/references/prd-readiness-lens.md"
+      ],
+      "pre": [
+        {
+          "path": "docs/contracts/domain-glossary.md",
+          "status": "present",
+          "sha256": "21b70843bc653a55bc33866316ee9aedad132f33941cdd643b8d33083550766b",
+          "bytes": 3582
+        },
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "status": "present",
+          "sha256": "09225bb8f14094c7dae9b42ef924722010fa16e07b4f5afbb8e087b62a9359cb",
+          "bytes": 41517
+        },
+        {
+          "path": "skills/spec-brainstorm/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-brainstorm/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-code-review/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-code-review/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-compound/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-compound/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-debug/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-debug/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-explain/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-explain/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-ideate/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-ideate/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-optimize/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-optimize/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-plan/SKILL.md",
+          "status": "present",
+          "sha256": "7afaf3266ddad266caab69ba6268d2f47026ecad248b3f7609c5603c19fb4286",
+          "bytes": 98948
+        },
+        {
+          "path": "skills/spec-plan/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-plan/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-pov/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+          "bytes": 3411
+        },
+        {
+          "path": "skills/spec-pov/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "191ad36c7987ab9a131cabdbdbff95d34f9da9915f6a6c3b4b5b87363dfcd7a2",
+          "bytes": 4947
+        },
+        {
+          "path": "skills/spec-prd/SKILL.md",
+          "status": "present",
+          "sha256": "74db75f381d99ad118b00dbfa88b3bc72a973793d64caa5153d8964ef7689bd4",
+          "bytes": 66042
+        },
+        {
+          "path": "skills/spec-prd/evals/examples.json",
+          "status": "present",
+          "sha256": "8537d53042d723ff96b72d5db5568e43faa251c44875595de0b79d470043ed47",
+          "bytes": 106022
+        },
+        {
+          "path": "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+          "status": "present",
+          "sha256": "717c77ea7ca332fa1eedbb1bb191f566b1c5642a8d8a1ca04b8f55794fae2880",
+          "bytes": 23870
+        },
+        {
+          "path": "skills/spec-prd/references/evidence-and-topology.md",
+          "status": "present",
+          "sha256": "3fd9101f2bc1ff0e6b4f9569f415b46ea58eeffaf8cfe92c95c4fe0f7f4fe39d",
+          "bytes": 14750
+        },
+        {
+          "path": "skills/spec-prd/references/grill-with-docs-integration.md",
+          "status": "present",
+          "sha256": "56a2a7df5f029d937850acd52bda3b7f40ce76c63f56fc00954f58c4e8eff00a",
+          "bytes": 17198
+        },
+        {
+          "path": "skills/spec-prd/references/prd-output-template.md",
+          "status": "present",
+          "sha256": "bf9eb9e2651c26359199a63121819b3bf7bf2c17bd09105f961db304d08b8918",
+          "bytes": 49404
+        },
+        {
+          "path": "skills/spec-prd/references/prd-readiness-lens.md",
+          "status": "present",
+          "sha256": "612650c32c285524aa38bb5d6f4e184380f1af7888614580aa3e8a624698baba",
+          "bytes": 33768
+        }
+      ],
+      "post": [
+        {
+          "path": "docs/contracts/domain-glossary.md",
+          "status": "present",
+          "sha256": "6c16fdd75f22f72014cf9b9cb1f843906b5a38ff645a888accdfffb3fb534d41",
+          "bytes": 3873
+        },
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "status": "present",
+          "sha256": "b4e60f280bdf1ac0bd3f5fb7d26cd91f5d83240229f900cdda1b6d4c68f9f70d",
+          "bytes": 41903
+        },
+        {
+          "path": "skills/spec-brainstorm/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-brainstorm/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-code-review/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-code-review/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-compound/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-compound/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-debug/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-debug/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-explain/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-explain/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-ideate/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-ideate/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-optimize/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-optimize/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-plan/SKILL.md",
+          "status": "present",
+          "sha256": "fc4d768884d9eba68d5e575ec031af2a080901590969713d4e3779dd67398130",
+          "bytes": 99396
+        },
+        {
+          "path": "skills/spec-plan/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-plan/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-pov/references/agents/repo-profiler.md",
+          "status": "present",
+          "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea",
+          "bytes": 3486
+        },
+        {
+          "path": "skills/spec-pov/references/repo-profile-cache.md",
+          "status": "present",
+          "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f",
+          "bytes": 5048
+        },
+        {
+          "path": "skills/spec-prd/SKILL.md",
+          "status": "present",
+          "sha256": "38f26a519741cab7f1538448cec6f703b608041b094533b302cf29149bb8f023",
+          "bytes": 65628
+        },
+        {
+          "path": "skills/spec-prd/evals/examples.json",
+          "status": "present",
+          "sha256": "ebc9039ee0a8a47287380370ed56c2466d8300e742b4e939b8ae84f397dc3733",
+          "bytes": 106435
+        },
+        {
+          "path": "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+          "status": "present",
+          "sha256": "f1ecde33b3bf5b37e3801e69f95284198506397d355c7dc343fce9acb26acfe3",
+          "bytes": 22890
+        },
+        {
+          "path": "skills/spec-prd/references/evidence-and-topology.md",
+          "status": "present",
+          "sha256": "e596b313e36f2ace3a635da75e5dd28a9993ff9e8220b1f8fb9227c56748f95b",
+          "bytes": 15142
+        },
+        {
+          "path": "skills/spec-prd/references/grill-with-docs-integration.md",
+          "status": "present",
+          "sha256": "aaa90931129db5db520d8836214a4bcc7146bd0b79710bb304906a6b97e7d14f",
+          "bytes": 12508
+        },
+        {
+          "path": "skills/spec-prd/references/prd-output-template.md",
+          "status": "present",
+          "sha256": "59a776888f79c76d7d8c0869773ece95a828918e310ece2a53dbd06bd4858c89",
+          "bytes": 49347
+        },
+        {
+          "path": "skills/spec-prd/references/prd-readiness-lens.md",
+          "status": "present",
+          "sha256": "fddbff2c86451191210d99f2690af85490be2fd1d4016789c7b284a67839ba35",
+          "bytes": 33608
+        }
+      ],
+      "evaluator_paths": [
+        "docs/contracts/domain-glossary.md",
+        "skills/spec-brainstorm/SKILL.md",
+        "skills/spec-brainstorm/references/repo-profile-cache.md",
+        "skills/spec-brainstorm/references/agents/repo-profiler.md",
+        "skills/spec-plan/SKILL.md",
+        "skills/spec-plan/references/repo-profile-cache.md",
+        "skills/spec-plan/references/agents/repo-profiler.md",
+        "skills/spec-prd/SKILL.md",
+        "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+        "skills/spec-prd/references/evidence-and-topology.md",
+        "skills/spec-prd/references/grill-with-docs-integration.md",
+        "skills/spec-prd/references/prd-output-template.md",
+        "skills/spec-prd/references/prd-readiness-lens.md",
+        "skills/spec-prd/evals/examples.json"
+      ],
+      "before_bundle_sha256": "77b435c3afb7f77964fb47df50221640de7e934931d1232ecb9ae8f82b59a6d0",
+      "after_bundle_sha256": "cefb5a844cb57533ce0557f85d2d1513f2c69ca02fbf386752280e4b2cf77a7e",
+      "applied_at": "2026-07-12T08:00:22.639Z"
+    },
+    {
+      "unit": "U6",
+      "patches": [
+        {
+          "path": "patches/U6.patch",
+          "sha256": "f282509de6a40c2c9ee17c5a7aec3e0a1856896e46605b71effb538a9d434e1f"
+        },
+        {
+          "operation": "U6 direct-bootstrap authority refinement",
+          "before_sha256": "15fc61ae908a392e8332912fd10ec8d7365de5174f1cd069381e3eb68c8add93",
+          "after_sha256": "c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f",
+          "description": "Every unconfirmed load-bearing WHAT becomes a planning-time assumption; behavior/scope/success-changing WHAT returns to current user or remains a named blocker."
+        }
+      ],
+      "paths": [
+        "skills/spec-plan/SKILL.md"
+      ],
+      "pre": [
+        {
+          "path": "skills/spec-plan/SKILL.md",
+          "status": "present",
+          "sha256": "fc4d768884d9eba68d5e575ec031af2a080901590969713d4e3779dd67398130",
+          "bytes": 99396
+        }
+      ],
+      "post": [
+        {
+          "path": "skills/spec-plan/SKILL.md",
+          "status": "present",
+          "sha256": "c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f",
+          "bytes": 102131
+        }
+      ],
+      "evaluator_paths": [
+        "skills/spec-plan/SKILL.md"
+      ],
+      "before_bundle_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc",
+      "after_bundle_sha256": "790067e563de72bf3cfa09166cefe7a29a43c19cbd49d0e10319cd3e29fcac14",
+      "applied_at": "2026-07-12T08:00:22.650Z",
+      "after_bundle_file": "U6-after-refined-bundle.json",
+      "refined_at": "2026-07-12T08:15:49.581Z"
+    }
+  ],
+  "finished_at": "2026-07-12T08:15:49.582Z"
+}

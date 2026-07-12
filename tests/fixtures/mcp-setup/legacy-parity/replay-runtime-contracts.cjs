@@ -150,7 +150,7 @@ if (name === 'graphify') {
   } else if (args[0] === 'hook' && args[1] === 'status') process.stdout.write('installed\\n');
   else process.stdout.write('{"ok":true}\\n');
 } else if (name === 'codegraph') {
-  if (args[0] === '--version') process.stdout.write('codegraph 1.2.0\\n');
+  if (args[0] === '--version') process.stdout.write('codegraph 1.4.1\\n');
   else process.stdout.write('ready\\n');
 } else if (name === 'npm') {
   if (args[0] === '--version') process.stdout.write('10.9.0\\n');

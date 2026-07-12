@@ -105,7 +105,7 @@ describe('spec-mcp-setup registry v8', () => {
         id: 'codegraph',
         ecosystem: 'npm',
         package: '@colbymchenry/codegraph',
-        version: '1.2.0',
+        version: '1.4.1',
         command: 'codegraph',
       },
       {

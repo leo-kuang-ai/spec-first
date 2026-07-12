@@ -1405,8 +1405,9 @@
       "expected": [
         "load grill-with-docs-integration.md",
         "ask one question at a time and wait for feedback",
-        "create or update CONTEXT.md lazily when the first project-specific term is resolved",
-        "fold resolved terms back into PRD Glossary or Decision Notes"
+        "fold resolved terms into PRD Glossary or Decision Notes",
+        "emit a qualified candidate-only CONTEXT.md promotion record with not-written status",
+        "leave project-level files unchanged"
       ],
       "coverage_tags": [
         "trigger",
@@ -1703,8 +1704,9 @@
       "expected": [
         "load grill-with-docs-integration.md",
         "persist resolution in PRD-local sections",
-        "update CONTEXT.md inline for resolved project-specific terms",
-        "create ADR only when hard to reverse, surprising without context, and a real tradeoff"
+        "close resolved project-specific terms in PRD-local sections",
+        "emit candidate-only promotion records without project mutation",
+        "emit an ADR candidate only when hard to reverse, surprising without context, and a real tradeoff"
       ],
       "coverage_tags": [
         "boundary",
@@ -1851,7 +1853,8 @@
         "perform source-first lookup",
         "sharpen fuzzy terms through concrete scenarios",
         "surface code contradictions with consequences",
-        "update CONTEXT.md inline when a project-specific term is resolved"
+        "close the project-specific term in PRD-local sections",
+        "leave CONTEXT.md unchanged and emit only a qualified promotion candidate"
       ],
       "coverage_tags": [
         "expected",
@@ -2210,10 +2213,12 @@
       ],
       "input_shape": "owner accepted repeated project-specific term with clear definition and avoid terms",
       "expected": [
-        "CONTEXT.md promotion candidate",
+        "candidate-only CONTEXT.md promotion record",
         "project-specific term",
         "owner accepted",
         "definition and avoid terms",
+        "provenance, real consumer, reuse rationale, invalidation condition, and not-written status",
+        "project-level files remain unchanged",
         "preview-first",
         "no silent write"
       ],
@@ -2232,9 +2237,10 @@
       ],
       "input_shape": "PRD contains a hard product tradeoff with long-lived consequences",
       "expected": [
-        "suggest ADR promotion only for hard-to-reverse, surprising tradeoffs",
+        "suggest candidate-only ADR promotion only for hard-to-reverse, surprising tradeoffs",
         "keep ADR candidates sparse with PRD source refs",
-        "routine decisions stay in Decision Notes"
+        "routine decisions stay in Decision Notes",
+        "ADR files remain unchanged"
       ],
       "coverage_tags": [
         "expected",

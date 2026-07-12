@@ -1,0 +1,132 @@
+{
+  "schema": "requirements-clarification-fresh-source-review/v1",
+  "reviewer": "E",
+  "unit": "U6",
+  "case": "C6",
+  "review_mode": "fresh-source-before-after",
+  "presentation_order": "after_then_before",
+  "normalization": "reported_as_before_then_after",
+  "scale": {
+    "0": "无失败",
+    "1": "轻微但可恢复",
+    "2": "承重失败",
+    "direction": "lower_is_better"
+  },
+  "rubric_source": "/Users/kuang/xiaobu/spec-first/docs/validation/requirements-clarification/2026-07-11-clarification-integration-baseline.md",
+  "plan_source": "/Users/kuang/xiaobu/spec-first/docs/plans/2026-07-11-003-refactor-requirements-clarification-skills-integration-plan.md",
+  "behavior_source_policy": "Behavior judgments used only replay-evidence/U6-after-refined-bundle.json and replay-evidence/U6-before-bundle.json. The main skill source was not read.",
+  "bundle_hashes": {
+    "before": {
+      "path": "replay-evidence/U6-before-bundle.json",
+      "file_sha256": "bc118a843589df8862331048a31296d8f85cc7fd8ff1d97d10c7817fa3b22b9f",
+      "declared_bundle_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc"
+    },
+    "after": {
+      "path": "replay-evidence/U6-after-refined-bundle.json",
+      "file_sha256": "2dca178aad077d70f83ba4fbd00d490bf835e1cd959346a32eedc572f426b7dd",
+      "declared_bundle_sha256": "790067e563de72bf3cfa09166cefe7a29a43c19cbd49d0e10319cd3e29fcac14"
+    }
+  },
+  "metrics": {
+    "M1": "planner 发明 load-bearing WHAT",
+    "M2": "向当前用户询问 source-answerable fact",
+    "M3": "重复或捆绑独立 current-user questions",
+    "M4": "applicable scenario omission，或保留场景没有 AE/OQ/assumption/non-goal 落点",
+    "M5": "current-user answer/confirmation laundering 或 second-human routing",
+    "M6": "unauthorized project-level glossary/context/ADR mutation",
+    "M7": "visual/text fallback 无法闭合、伪造 helper outcome，或未诚实保留 future evidence need"
+  },
+  "scores": {
+    "before": {
+      "M1": 2,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": 0,
+      "M6": 0,
+      "M7": 0,
+      "total": 2
+    },
+    "after": {
+      "M1": 0,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": 0,
+      "M6": 0,
+      "M7": 0,
+      "total": 0
+    },
+    "delta_after_minus_before": {
+      "M1": -2,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": 0,
+      "M6": 0,
+      "M7": 0,
+      "total": -2
+    }
+  },
+  "attack_results": {
+    "direct_bootstrap_assumption_authority": {
+      "result": "pass",
+      "evidence": "AFTER requires every load-bearing WHAT to retain explicit authority; unconfirmed behavior, scope, success, compatibility, priority, or risk is labeled planning-time assumption, and any such WHAT that materially changes behavior, scope, or success criteria must return to the current user or remain a named blocker. This closes BEFORE's silent planning-invention permission while preserving direct entry."
+    },
+    "current_user_fidelity": {
+      "result": "pass",
+      "evidence": "Only the current user may choose to return to the owning producer or explicitly convert each blocker into an assumption/decision. The recorded blocker, consequence, and accepted risk prevent laundering that choice into producer-confirmed WHAT; no specialist or second-human confirmation route is introduced."
+    },
+    "false_blockers": {
+      "result": "pass_with_residual_wording_risk",
+      "evidence": "AFTER first reviews and classifies each question, reclassifies technical/architectural/research questions into planning-owned work, and keeps only product-behavior/scope/success questions as blockers. Freshness inspection and changed-source rereads reduce stale-source false positives. Residual risk remains because the phrase 'any load-bearing PRD Outstanding Question' does not explicitly say to close an already-resolved question from newer confirmed evidence before presenting the blocker menu."
+    },
+    "resume_deepen_compatibility": {
+      "result": "pass",
+      "evidence": "AFTER explicitly states implementation-ready resume/deepen and direct bootstrap remain independent fast paths. Phase 0.1 routing and format preservation are unchanged by the U6 diff; requirements-only enrichment and legacy-origin discovery remain separate from implementation-ready resume/deepen."
+    }
+  },
+  "countermetrics": {
+    "extra_current_user_confirmation_rounds": "no_expected_increase_for_valid_blockers; possible_one_round_on_stale_but_still_marked_load_bearing_PRD_OQ",
+    "input_tokens": "not_measured; small_prose_increase",
+    "output_tokens": "not_measured; small_recording_increase_only_when_assumption_or_blocker_exists",
+    "wall_latency": "not_measured; small_upfront_cost_offset_by_lower_rework_risk",
+    "artifact_bytes": "not_measured; small_increase_for_authority_and_risk_trace",
+    "wrong_blockers": "no_demonstrated_regression; residual_stale_OQ_wording_risk"
+  },
+  "severity_findings": {
+    "P0": [],
+    "P1": [],
+    "P2": [
+      {
+        "id": "U6-E-P2-1",
+        "finding": "The refined source says any load-bearing PRD Outstanding Question is a user-control signal and forbids downgrading it merely because the document is old, but does not explicitly instruct the planner to close that question when newer confirmed source evidence has already resolved it. The surrounding review/freshness rules make a false blocker unlikely, yet a conservative reader could still surface one unnecessary confirmation round.",
+        "release_effect": "non_blocking; tighten in a future prose pass if repeated evaluation or field evidence shows stale-OQ false blockers"
+      }
+    ],
+    "P3": [
+      {
+        "id": "U6-E-P3-1",
+        "finding": "Token, latency, and artifact-size countermetrics were not instrumented; directions are qualitative fresh-source judgments.",
+        "release_effect": "none_for_this_semantic_gate"
+      }
+    ]
+  },
+  "gate": {
+    "headroom_present_before": true,
+    "main_metric_improvement_at_least_one": true,
+    "current_user_fidelity_non_regression": true,
+    "second_human_routing_non_regression": true,
+    "unauthorized_mutation_non_regression": true,
+    "wrong_blocker_non_regression": true,
+    "resume_deepen_compatibility": true,
+    "repeat_E": "pass",
+    "decision": "retain_candidate",
+    "rationale": "Total improves from 2 to 0. The refined contract removes silent load-bearing WHAT invention, preserves sole-current-user authority and direct bootstrap convenience, and leaves resume/deepen routing intact. No P0/P1 or scored regression was found; the stale-OQ wording risk is P2 and non-blocking."
+  },
+  "limitations": [
+    "This is an advisory semantic review of two frozen replay bundles, not runtime execution evidence.",
+    "Only U6 C6 was scored; no claims are made about other units or cases.",
+    "The balanced-order aggregate and 2-of-3 repeat gate must be determined from the full reviewer set."
+  ]
+}

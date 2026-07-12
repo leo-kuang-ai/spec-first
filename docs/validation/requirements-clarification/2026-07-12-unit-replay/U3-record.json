@@ -1,0 +1,81 @@
+{
+  "unit": "U3",
+  "patches": [
+    {
+      "path": "patches/U3.patch",
+      "sha256": "c7cce00c72e23bb4561c43a8c6f2fcbef70829b2f12248e65b1016c8ed4a7be6"
+    },
+    {
+      "operation": "deterministic placement normalization",
+      "sha256": "0ac16d2d5eb44112aa4a1b45b5ca13a23c9e44bc6506d14ea3364cfd0401a539",
+      "description": "Move the relevance-driven scenario-pass paragraph from immediately before the Phase 2.5 heading to immediately after that heading."
+    }
+  ],
+  "paths": [
+    "skills/spec-brainstorm/SKILL.md",
+    "skills/spec-brainstorm/references/brainstorm-sections.md",
+    "skills/spec-brainstorm/references/handoff.md",
+    "skills/spec-brainstorm/references/product-pressure-test.md"
+  ],
+  "pre": [
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "status": "present",
+      "sha256": "5f29ad557bde6d2c4171432068840c76d441e9887f3e3ad191c4cd0d1e1ad07c",
+      "bytes": 42017
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "status": "present",
+      "sha256": "2f154c25a83a3ef18892e4b36653e552f7c7206f3f6b445822fcae813b0384ef",
+      "bytes": 18840
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "status": "present",
+      "sha256": "8aba61648c99402644d55d113d08926d2a5a5a4fb7f85967ca749d7ca829422e",
+      "bytes": 12536
+    },
+    {
+      "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+      "status": "present",
+      "sha256": "61cbfc9ea8bc1fce8b33331cf4808358d073f9f7cf851c51431d3e1a8cc660a1",
+      "bytes": 3619
+    }
+  ],
+  "post": [
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "status": "present",
+      "sha256": "20fd2f471186502f44079f23f3bcf439e34994408111e4091f3d614d62ed1c94",
+      "bytes": 42996
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "status": "present",
+      "sha256": "ed6e674cdba0b9a085c5af5b46919924230b256048d198c05d7f84214ec7bfba",
+      "bytes": 19342
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "status": "present",
+      "sha256": "b399fcffd62033a4edd62e6817fc216f50c60f39ebe5740ec7ea769a0264ee1d",
+      "bytes": 12810
+    },
+    {
+      "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+      "status": "present",
+      "sha256": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84",
+      "bytes": 4405
+    }
+  ],
+  "evaluator_paths": [
+    "skills/spec-brainstorm/SKILL.md",
+    "skills/spec-brainstorm/references/product-pressure-test.md",
+    "skills/spec-brainstorm/references/brainstorm-sections.md",
+    "skills/spec-brainstorm/references/handoff.md"
+  ],
+  "before_bundle_sha256": "35e47209c29e8b64c625bc3f036631b1798c62409adb9ad0431cd31b04b2628d",
+  "after_bundle_sha256": "06ebc4d64b9902b6b2395d7f82679301bd0c6fdbe2860c842f8411bbbfaa9f6d",
+  "applied_at": "2026-07-12T08:00:22.608Z"
+}

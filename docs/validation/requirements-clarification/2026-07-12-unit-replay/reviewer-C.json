@@ -1,0 +1,301 @@
+{
+  "schema_version": "requirements-clarification-fresh-source-review/v1",
+  "reviewer": "C",
+  "authority": {
+    "rubric": "docs/validation/requirements-clarification/2026-07-11-clarification-integration-baseline.md",
+    "plan": "docs/plans/2026-07-11-003-refactor-requirements-clarification-skills-integration-plan.md",
+    "behavior_source": "replay bundle JSON only",
+    "comparison": "BEFORE_TO_AFTER",
+    "limitations": [
+      "No main-worktree skill source was read.",
+      "Scores are advisory semantic judgments over frozen bundle prose, not runtime or field-outcome evidence.",
+      "Token and latency countermetrics are qualitative because the replay bundles contain no measured execution telemetry."
+    ]
+  },
+  "bundle_hashes": {
+    "U2": {
+      "before": "a55051fb43833dccaa7fc7c569159a31c5cb62ede4cb57390656f8ebd01bdfbd",
+      "after": "b73300456c050c2bcfce678da3e495e05055681fb59c1098e04c0387cb41b84d"
+    },
+    "U3": {
+      "before": "35e47209c29e8b64c625bc3f036631b1798c62409adb9ad0431cd31b04b2628d",
+      "after": "06ebc4d64b9902b6b2395d7f82679301bd0c6fdbe2860c842f8411bbbfaa9f6d"
+    },
+    "U4": {
+      "before": "13a386e9d107af8a675dad507b7755a530712c62c709ed8a3dac998ffd88272e",
+      "after": "e3a175ff4c3bb5af91214e5d8d7af9e44a691be49afddd60bfc886f7047b44b8"
+    },
+    "U5": {
+      "before": "77b435c3afb7f77964fb47df50221640de7e934931d1232ecb9ae8f82b59a6d0",
+      "after": "cefb5a844cb57533ce0557f85d2d1513f2c69ca02fbf386752280e4b2cf77a7e"
+    },
+    "U6": {
+      "before": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc",
+      "after": "6a27769483f46eb79111a63bf6f4c2b88877da33b7a00e4a2f6e375f837ced0a"
+    }
+  },
+  "calibration": {
+    "status": "passed",
+    "known_better_m1_m7": [0, 0, 0, 0, 0, 0, 0],
+    "known_worse_m1_m7": [0, 2, 2, 0, 2, 2, 2],
+    "known_worse_total": 10,
+    "recognized_failures": [
+      "specialist-as-second-confirmer confirmation laundering",
+      "silent project-level glossary/context/ADR mutation",
+      "helper-start claim presented as user outcome"
+    ]
+  },
+  "scoring_scale": {
+    "M1": "planner invents load-bearing WHAT",
+    "M2": "asks current user for source-answerable fact",
+    "M3": "repeats or bundles independent current-user questions",
+    "M4": "applicable scenario omitted or retained scenario lacks durable landing",
+    "M5": "current-user answer/confirmation laundering or second-human routing",
+    "M6": "unauthorized project-level glossary/context/ADR mutation",
+    "M7": "visual/text fallback fails to close, fabricates helper outcome, or hides future evidence need",
+    "values": {
+      "0": "no failure",
+      "1": "minor but recoverable failure",
+      "2": "load-bearing failure"
+    },
+    "direction": "lower_is_better"
+  },
+  "case_scores": [
+    {
+      "unit": "U2",
+      "case": "C1",
+      "before_m1_m7": [[0, 1, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0]],
+      "after_m1_m7": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [3, 2, 2],
+      "after_totals": [0, 0, 0],
+      "delta_after_minus_before": [-3, -2, -2],
+      "same_direction_repeats": "3/3 improved",
+      "difference_gate": "passed",
+      "judgment": "The focused seed now carries snapshot/freshness, limitations, assumptions, and one adjacent rejected alternative without adding HOW or a helper path."
+    },
+    {
+      "unit": "U3",
+      "case": "C1",
+      "before_m1_m7": [[0, 1, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0]],
+      "after_m1_m7": [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0]],
+      "before_totals": [3, 2, 2],
+      "after_totals": [1, 1, 1],
+      "delta_after_minus_before": [-2, -1, -1],
+      "same_direction_repeats": "3/3 improved",
+      "difference_gate": "passed",
+      "judgment": "Brainstorm now re-checks source-sensitive gaps and durably lands source refs, snapshots, limitations, and invalidation conditions. A minor handoff omission remains when U2 is absent because the adjacent rejected alternative is producer-owned and not reconstructible from this bundle."
+    },
+    {
+      "unit": "U3",
+      "case": "C2",
+      "before_m1_m7": [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0]],
+      "after_m1_m7": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [1, 2, 2],
+      "after_totals": [0, 0, 0],
+      "delta_after_minus_before": [-1, -2, -2],
+      "same_direction_repeats": "3/3 improved",
+      "difference_gate": "passed",
+      "judgment": "The relevance-driven scenario pass covers applicable permission/state/failure/negative/handoff dimensions while requiring a durable AE/OQ/assumption/non-goal landing and rejecting Cartesian ceremony."
+    },
+    {
+      "unit": "U3",
+      "case": "C3",
+      "before_m1_m7": [[0, 0, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0], [0, 0, 0, 2, 0, 0, 0]],
+      "after_m1_m7": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [2, 2, 2],
+      "after_totals": [0, 0, 0],
+      "delta_after_minus_before": [-2, -2, -2],
+      "same_direction_repeats": "3/3 improved",
+      "difference_gate": "passed",
+      "judgment": "Pause/resume no longer depends on transcript or /tmp dossier and preserves the blocker plus next highest-impact current-user question and write target."
+    },
+    {
+      "unit": "U4",
+      "case": "C5",
+      "before_m1_m7": [[0, 0, 0, 0, 0, 0, 2], [0, 0, 0, 0, 0, 0, 2], [0, 0, 0, 0, 0, 0, 2]],
+      "after_m1_m7": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [2, 2, 2],
+      "after_totals": [0, 0, 0],
+      "delta_after_minus_before": [-2, -2, -2],
+      "same_direction_repeats": "3/3 improved",
+      "difference_gate": "passed_for_text_closure_and_surface_removal_only",
+      "judgment": "Conversation-native tables, state sequences, ASCII, and read-only screenshots can close sufficient visual questions; indispensable real interaction remains an explicit blocker/future evidence need. No helper outcome is claimed."
+    },
+    {
+      "unit": "U5",
+      "case": "C4",
+      "before_m1_m7": [[0, 0, 0, 0, 0, 2, 0], [0, 0, 0, 0, 0, 2, 0], [0, 0, 0, 0, 0, 2, 0]],
+      "after_m1_m7": [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [2, 2, 2],
+      "after_totals": [0, 0, 0],
+      "delta_after_minus_before": [-2, -2, -2],
+      "same_direction_repeats": "3/3 improved",
+      "difference_gate": "passed",
+      "judgment": "All covered producer and consumer surfaces close terminology locally and emit only fully qualified, not-written promotion candidates; incomplete candidates remain local."
+    },
+    {
+      "unit": "U5",
+      "case": "C6",
+      "before_m1_m7": [[2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 1, 0, 0], [2, 0, 0, 0, 0, 0, 0]],
+      "after_m1_m7": [[2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [2, 3, 2],
+      "after_totals": [2, 2, 2],
+      "delta_after_minus_before": [0, -1, 0],
+      "same_direction_repeats": "1/3 improved; 2/3 tied",
+      "difference_gate": "semantic_no_regression_passed_but_not_a_standalone_improvement_gate",
+      "judgment": "U5 removes the one observed second-human/confirmation-laundering failure and does not worsen C6, but intentionally leaves planning invention for dependent U6. The plan does not preregister C6 as a separate U5 unit-exit retention session."
+    },
+    {
+      "unit": "U6",
+      "case": "C6",
+      "before_m1_m7": [[2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0, 0]],
+      "after_m1_m7": [[2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0, 0]],
+      "before_totals": [2, 2, 2],
+      "after_totals": [2, 2, 2],
+      "delta_after_minus_before": [0, 0, 0],
+      "same_direction_repeats": "0/3 improved; 3/3 tied",
+      "difference_gate": "failed_inconclusive",
+      "judgment": "The AFTER bundle improves durable-origin recognition, freshness handling, checkpoint routing, and accepted-risk recording, but the direct-bootstrap branch that produced baseline M1 headroom is materially unchanged: it still allows the planner to judge that bounded bootstrap is sufficient without requiring each unconfirmed load-bearing WHAT to be exposed as an assumption or current-user decision."
+    }
+  ],
+  "unit_summary": {
+    "U2": {
+      "aggregate_before": 7,
+      "aggregate_after": 0,
+      "aggregate_delta": -7,
+      "decision": "retain"
+    },
+    "U3": {
+      "aggregate_before": 16,
+      "aggregate_after": 3,
+      "aggregate_delta": -13,
+      "decision": "retain",
+      "condition": "U3 remains independently useful; retaining U2 removes the residual C1 adjacent-alternative omission."
+    },
+    "U4": {
+      "aggregate_before": 6,
+      "aggregate_after": 0,
+      "aggregate_delta": -6,
+      "decision": "retain_surface_removal",
+      "claim_limit": "No product-value or decision-correctness claim."
+    },
+    "U5": {
+      "aggregate_before": 13,
+      "aggregate_after": 6,
+      "aggregate_delta": -7,
+      "decision": "retain",
+      "retention_basis": "C4 mutation-boundary improvement plus C6 semantic no-regression; remaining C6 M1 is the expected U5-to-U6 dependency."
+    },
+    "U6": {
+      "aggregate_before": 6,
+      "aggregate_after": 6,
+      "aggregate_delta": 0,
+      "decision": "do_not_retain_as_proven",
+      "required_action": "rollback or narrow U6, or revise direct-bootstrap semantics and rerun matched C6 evaluation"
+    }
+  },
+  "countermetrics": {
+    "U2": {
+      "extra_current_user_confirmation_rounds": "no increase",
+      "estimated_input_output_tokens": "small seed-size increase; likely offset by less re-derivation",
+      "wall_latency": "likely neutral or improved; not measured",
+      "artifact_bytes": "bundle source +1005 bytes; seed artifact grows modestly",
+      "wrong_blockers": "no increase observed"
+    },
+    "U3": {
+      "extra_current_user_confirmation_rounds": "no mandatory increase; one-question discipline preserved",
+      "estimated_input_output_tokens": "moderate instruction increase, but scenario relevance and durable resume reduce repeated questioning",
+      "wall_latency": "possible source re-check cost; likely lower resume cost; not measured",
+      "artifact_bytes": "durable Product Contract grows with only load-bearing refs/limitations/next question",
+      "wrong_blockers": "no increase observed; scenario dimensions without a durable effect are dropped"
+    },
+    "U4": {
+      "extra_current_user_confirmation_rounds": "decrease by removing mandatory text-vs-visual offer",
+      "estimated_input_output_tokens": "lower because helper contract/reference is removed",
+      "wall_latency": "lower because no helper startup or artifact roundtrip",
+      "artifact_bytes": "decrease; helper reference and server are removed",
+      "wrong_blockers": "no increase observed; indispensable interaction remains honestly blocked"
+    },
+    "U5": {
+      "extra_current_user_confirmation_rounds": "no increase; current conversation user remains sole confirmer",
+      "estimated_input_output_tokens": "small candidate-field overhead only when cross-release reuse is qualified",
+      "wall_latency": "no project-file write roundtrip; likely neutral or improved",
+      "artifact_bytes": "PRD/plan may gain a bounded candidate; project glossary/context/ADR bytes remain unchanged",
+      "wrong_blockers": "no increase observed; incomplete candidates remain local and do not block readiness"
+    },
+    "U6": {
+      "extra_current_user_confirmation_rounds": "no forced increase",
+      "estimated_input_output_tokens": "instruction source +2153 bytes and additional origin/source-ref checks",
+      "wall_latency": "likely slight increase for source freshness checks; not measured",
+      "artifact_bytes": "accepted-risk records add bounded plan text",
+      "wrong_blockers": "upstream checkpoint handling improves, but direct-bootstrap hidden-WHAT risk remains"
+    },
+    "gate_assessment": "No retained U2-U5 change shows a material countermetric regression. U6 adds cost without reducing its preregistered M1 failure, reinforcing the inconclusive decision."
+  },
+  "findings": {
+    "P0": [],
+    "P1": [
+      {
+        "id": "P1-U6-C6-DIFFERENCE-GATE",
+        "summary": "U6 does not pass its preregistered C6 improvement gate.",
+        "evidence": "All three U6 C6 repeat totals remain 2; the bundle changes origin discovery and blocker routing but leaves direct-bootstrap sufficiency judgment and assumption exposure materially unchanged.",
+        "impact": "The plan requires U6 to be removed or narrowed when C6 does not improve; retaining it as proven would violate the release gate."
+      }
+    ],
+    "P2": [
+      {
+        "id": "P2-U3-C1-PRODUCER-COMPLEMENT",
+        "summary": "U3 alone cannot reconstruct the adjacent rejected alternative required by C1.",
+        "evidence": "U3 durably handles source refs/snapshots/limitations, while the selected alternative is carried only by the U2 focused seed.",
+        "impact": "U3 still passes independently, but the full C1 zero-failure result depends on retaining U2."
+      },
+      {
+        "id": "P2-U5-C6-NON-ABLATION",
+        "summary": "U5 C6 is no-regression evidence, not an independent planning-invention improvement.",
+        "evidence": "Only one repeat improves by removing M5; M1 remains 2 in all repeats.",
+        "impact": "Do not use U5 C6 to claim U6's outcome or overall 10-to-100 planning improvement."
+      }
+    ],
+    "P3": [
+      {
+        "id": "P3-TELEMETRY-NOT-MEASURED",
+        "summary": "Token, wall-time, and runtime artifact-size countermetrics are qualitative.",
+        "evidence": "Bundles contain source bytes but no execution telemetry.",
+        "impact": "Claims should remain limited to semantic comparison and source-size direction."
+      }
+    ]
+  },
+  "cross_case": {
+    "current_user_fidelity": {
+      "status": "passes_for_U2_to_U5; unresolved_planning_exposure_in_U6",
+      "assessment": "Questioning stays with the current conversation user and one-question discipline is explicit. U6 still risks treating unexposed direct-bootstrap WHAT as sufficiently settled."
+    },
+    "second_human_routing": {
+      "status": "zero_after_U5",
+      "assessment": "Specialist, regulated, privacy, security, and similar material is evidence only; it is not a second product-confirmation route."
+    },
+    "planning_invention": {
+      "status": "not_closed",
+      "assessment": "U5 correctly establishes the dependency baseline, but U6 does not reduce C6 M1 because direct bootstrap can still silently decide product sufficiency."
+    },
+    "unauthorized_mutation": {
+      "status": "closed_by_U5",
+      "assessment": "Brainstorm, plan, and PRD surfaces use PRD/Product Contract local closure plus candidate-only handoff and keep project-level glossary/context/ADR unchanged."
+    },
+    "visual_honesty": {
+      "status": "passes_with_claim_limit",
+      "assessment": "U4 closes text-answerable questions, retains future evidence needs for indispensable interaction, and makes no helper or product-value claim."
+    },
+    "expected_U5_to_U6_dependency": {
+      "status": "explicitly_evaluated",
+      "assessment": "U6 BEFORE is the post-U5 bundle. U5 removes mutation/second-confirmer failures first; U6 is then judged solely on the remaining planning-invention headroom. That headroom does not improve, so U5 is retained and U6 is not proven."
+    }
+  },
+  "final_decision": {
+    "overall": "conditional_no_go",
+    "retain": ["U2", "U3", "U4 surface removal", "U5"],
+    "do_not_retain_as_proven": ["U6"],
+    "release_condition": "Remove or narrow U6, or change the direct-bootstrap contract so every unconfirmed load-bearing WHAT is surfaced as a current-user decision or explicit assumption, then rerun three matched C6 repeats and re-check countermetrics.",
+    "semantic_release_blockers": ["P1-U6-C6-DIFFERENCE-GATE"]
+  }
+}

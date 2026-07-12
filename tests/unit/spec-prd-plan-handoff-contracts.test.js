@@ -54,4 +54,14 @@ describe('spec-prd to spec-plan handoff contracts', () => {
     expect(target.expected).toContain('context slice 包含最多三个 load-bearing Requirement / Acceptance Example 引用和 must-preserve behaviors');
     expect(target.expected).toContain('context slice carries confirmed WHAT and residue, not task sequencing or file-level HOW');
   });
+
+  test('keeps legacy PRD checkpoints under current-user control', () => {
+    const plan = read('skills/spec-plan/SKILL.md');
+
+    expect(plan).toContain('checkpoint-prd');
+    expect(plan).toContain('can_enter_spec_plan: no');
+    expect(plan).toContain('return to the upstream producer by default');
+    expect(plan).toContain('accepted risk');
+    expect(plan).toContain('optional read-only diagnostic');
+  });
 });

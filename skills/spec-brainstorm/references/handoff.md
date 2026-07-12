@@ -22,6 +22,7 @@ Never silently skip the question.
 
 If `Resolve Before Planning` contains any items:
 - Ask the blocking questions now, one at a time, by default
+- Keep the next highest-impact question, its source attempt, and its Product Contract write target in the durable artifact. The artifact also retains source refs, snapshots, limitations, and invalidation conditions so resume does not depend on transcript or `/tmp` dossier.
 - If the user explicitly wants to proceed anyway, first convert each remaining item into an explicit decision, assumption, or `Deferred to Planning` question
 - If the user chooses to pause instead, present the handoff as paused or blocked rather than complete
 - Do not offer the `Create the implementation plan` or `Ship it autonomously with lfg` options while `Resolve Before Planning` remains non-empty

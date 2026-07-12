@@ -40,3 +40,9 @@ Favor moves that compound value, reduce future carrying cost, or make the produc
 These questions force an explicit product thesis and feed the Scope Boundaries subsections ("Deferred for later" and "Outside this product's identity") and Dependencies / Assumptions in the Product Contract.
 
 Phase 1.3 owns how these gaps fire as probes: each scope-appropriate gap found here becomes a separate open-ended probe (the "when present, ask..." line is the probe), surfaced progressively but all probed before Phase 2.
+
+## Relevance-driven behavior scenario pass
+
+For Standard and Deep behavioral work, run this pass before Phase 2.5 synthesis. Consider happy path, role/permission, state transition, failure/degraded behavior, negative acceptance, and cross-context handoff. Select a dimension only when it changes the current Product Contract.
+
+Every selected scenario must land in an existing durable destination: an Acceptance Example, Resolve Before Planning / Outstanding Question, explicit assumption, or Non-Goal. If it changes none of those, remove it as ceremony. Do not generate a Cartesian product, ask the user to walk every dimension, or keep empty coverage prose. Applicability and landing are semantic judgments owned by the agent; scripts may check structure but do not decide relevance.

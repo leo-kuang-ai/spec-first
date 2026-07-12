@@ -1,0 +1,508 @@
+diff --git a/docs/contracts/domain-glossary.md b/docs/contracts/domain-glossary.md
+index 14162908..b76b545d 100644
+--- a/docs/contracts/domain-glossary.md
++++ b/docs/contracts/domain-glossary.md
+@@ -3 +3 @@
+-本文件是 spec-first 项目级 **canonical 领域语言** 的 source-of-truth。它解决一个真实债务:`docs/brainstorms/` 下已有数十个 requirements/PRD,共享大量术语(readiness、reason_code、degraded-mode 等),但若每个 PRD 各自定义,领域语言会随时间漂移。本 glossary 让第 N 个 PRD 不必重新发明第 1 个 PRD 已确立的术语。
++本文件是 spec-first 项目级 **canonical 领域语言** 的 source-of-truth，但对单次需求 workflow 只作为 advisory calibration source。它解决跨 PRD 术语漂移；它 does not automatically override 当前 Product Contract / PRD-local meaning，也不因文件名、年龄或 canonical 标签静默赢得冲突。
+@@ -11 +11 @@
+-- 晋升是 **preview-first** 的:LLM 提议晋升,用户确认后 spec-prd 才写入本文件。绝不 silent write。
++- 需求 workflow 只输出 candidate-only promotion 记录，不写本文件。实际晋升由后续显式知识维护或文档编辑请求授权；当前产品确认不隐含项目级 mutation 权限。
+@@ -61,2 +61,3 @@
+-- `spec-prd`:primary provider(磨锐、晋升、冲突挑战)+ consumer(起草前读取对齐)。
+-- 未来 `spec-brainstorm` / `spec-plan` / `spec-doc-review` 可作为 consumer 读取对齐(尚未接入,见路线图)。
++- `spec-prd`:负责 PRD-local 术语磨锐与冲突挑战，作为 advisory consumer 读取本文件，并只生产 project-level promotion candidate；不拥有本文件的 mutation。
++- `spec-brainstorm` / `spec-plan` / `spec-doc-review`:可作为 advisory consumer 读取对齐；需求 workflow 需要跨 release 复用时同样只生产 candidate。
++- 实际项目 glossary mutation 由后续显式知识维护或文档编辑 workflow 在独立授权后拥有和执行。
+@@ -66 +67 @@
+-<!-- 由 spec-prd 在 preview-first 晋升后写入。初始为空;migration bootstrap 从存量 PRD 提取高频术语种入。 -->
++<!-- 由后续显式知识维护或文档编辑 workflow 在独立授权后写入。需求 workflow 只产生 candidate。 -->
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -164 +168 @@ python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
+-On `HIT`, load the profile JSON and take the agnostic orientation from it — `conventions.strategy` for the STRATEGY summary, `vocabulary` for the CONCEPTS terms, and `conventions` (coding standards, testing, review process, instruction files) for workflow/product/scope constraints; do not re-read those files. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive the profile, write its JSON to a file, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations), and use the same fields. On `NO-CACHE`, derive the orientation inline and skip the `put`. The cache is an optimization, never a correctness dependency: if it is unavailable, or any cached field is absent/null, fall back to reading the source inline — the project's active instructions and conventions already in your context for workflow, product, or scope constraints (no need to open or name specific instruction files); `STRATEGY.md` if it exists — the product's target problem, approach, persona, and active tracks, which shape scope, success criteria, and which approaches are aligned vs out-of-scope; and `CONCEPTS.md` at repo root if it exists — the project's authoritative vocabulary. Use these names in dialogue, approaches, and the Product Contract; map user-offered synonyms back. If any of these add nothing, move on. This pass — including the cache resolution — stays in the main conversation; the dialogue needs this material in context to shape its questions.
++On `HIT`, load the profile JSON and take the agnostic orientation from it — `conventions.strategy` for the STRATEGY summary, `vocabulary` for advisory CONCEPTS terms, and `conventions` (coding standards, testing, review process, instruction files) for workflow/product/scope constraints; do not re-read those files. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive the profile, write its JSON to a file, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations), and use the same fields. On `NO-CACHE`, derive the orientation inline and skip the `put`. The cache is an optimization, never a correctness dependency: if it is unavailable, or any cached field is absent/null, fall back to reading the source inline — the project's active instructions and conventions already in your context for workflow, product, or scope constraints (no need to open or name specific instruction files); `STRATEGY.md` if it exists; and `CONCEPTS.md` at repo root if it exists as an advisory calibration source. Reuse established language when it fits, but surface conflicts and preserve the Product Contract-local meaning instead of letting a filename or age silently decide. If any source adds nothing, move on. This pass stays in the main conversation so the dialogue can apply the calibration semantically.
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -281 +281 @@ Run this **after** the approaches, the scope synthesis, and the requirements-onl
+-For each resolved term: if missing, add it; if present but new precision surfaced, refine it; if already consistent, no action.
++#### Project-level promotion candidates — after Product Contract-local closure
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -283 +283 @@ For each resolved term: if missing, add it; if present but new precision surface
+-**Domain entities, named processes, and status concepts with project-specific meaning only.** Not file paths, class names, function signatures, or implementation decisions — `CONCEPTS.md` is a glossary, not a spec or catch-all.
++Never create or modify `CONCEPTS.md`, a project glossary, `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR files in this workflow. Existing project language is an advisory calibration source; if it conflicts with the current release slice, expose the conflict and close the required meaning inside the Product Contract.
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -285 +285 @@ For each resolved term: if missing, add it; if present but new precision surface
+-Follow the format set by existing entries. Apply edits silently. (If Phase 3 skipped the doc, still run this against the resolved dialogue.)
++Only when a resolved term or decision clearly has cross-release reuse value, append a **project-level promotion candidate** to the Product Contract or closeout. Include target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and the statement `not written by this workflow`. ADR candidates additionally require all three: hard to reverse, surprising without context, and a real tradeoff. If any qualification is missing, keep the result Product Contract-local. A later explicit knowledge-maintenance or document-editing request owns any mutation; do not auto-dispatch it.
+diff --git a/skills/spec-brainstorm/references/agents/repo-profiler.md b/skills/spec-brainstorm/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-brainstorm/references/agents/repo-profiler.md
++++ b/skills/spec-brainstorm/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-brainstorm/references/repo-profile-cache.md b/skills/spec-brainstorm/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-brainstorm/references/repo-profile-cache.md
++++ b/skills/spec-brainstorm/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-code-review/references/agents/repo-profiler.md b/skills/spec-code-review/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-code-review/references/agents/repo-profiler.md
++++ b/skills/spec-code-review/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-code-review/references/repo-profile-cache.md b/skills/spec-code-review/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-code-review/references/repo-profile-cache.md
++++ b/skills/spec-code-review/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-compound/references/agents/repo-profiler.md b/skills/spec-compound/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-compound/references/agents/repo-profiler.md
++++ b/skills/spec-compound/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-compound/references/repo-profile-cache.md b/skills/spec-compound/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-compound/references/repo-profile-cache.md
++++ b/skills/spec-compound/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-debug/references/agents/repo-profiler.md b/skills/spec-debug/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-debug/references/agents/repo-profiler.md
++++ b/skills/spec-debug/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-debug/references/repo-profile-cache.md b/skills/spec-debug/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-debug/references/repo-profile-cache.md
++++ b/skills/spec-debug/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-explain/references/agents/repo-profiler.md b/skills/spec-explain/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-explain/references/agents/repo-profiler.md
++++ b/skills/spec-explain/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-explain/references/repo-profile-cache.md b/skills/spec-explain/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-explain/references/repo-profile-cache.md
++++ b/skills/spec-explain/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-ideate/references/agents/repo-profiler.md b/skills/spec-ideate/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-ideate/references/agents/repo-profiler.md
++++ b/skills/spec-ideate/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-ideate/references/repo-profile-cache.md b/skills/spec-ideate/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-ideate/references/repo-profile-cache.md
++++ b/skills/spec-ideate/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-optimize/references/agents/repo-profiler.md b/skills/spec-optimize/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-optimize/references/agents/repo-profiler.md
++++ b/skills/spec-optimize/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-optimize/references/repo-profile-cache.md b/skills/spec-optimize/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-optimize/references/repo-profile-cache.md
++++ b/skills/spec-optimize/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -292 +301 @@ Prepare a concise planning context summary (a paragraph or two) to pass as input
+-- If `CONCEPTS.md` exists at repo root, read it — its definitions are the canonical names for domain entities, named processes, and status concepts. Plan with those terms rather than synonyms.
++- If `CONCEPTS.md` exists at repo root, read it as an advisory calibration source for domain entities, named processes, and status concepts. Reuse a term when it fits the Product Contract; when it conflicts with current-user or origin meaning, surface the conflict and preserve the plan-local meaning instead of silently overriding it.
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -716 +725 @@ Plan written to <absolute path to plan>
+-**CONCEPTS.md gap-fill (only if the file already exists):** If the plan body uses a domain term whose definition is missing from `CONCEPTS.md`, add the entry. **Domain entities, named processes, and status concepts with project-specific meaning only** — not file paths, class names, function signatures, or implementation decisions. `CONCEPTS.md` is a glossary, not a spec or catch-all. Follow the format set by existing entries. Apply silently. Skip entirely if `CONCEPTS.md` does not exist — creation is owned by spec-compound and spec-compound-refresh.
++**Project-level promotion candidates:** Never create or modify `CONCEPTS.md`, a project glossary, `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR files during planning. Treat existing project language as an advisory calibration source; expose conflicts and preserve the Product Contract/plan-local meaning required by the current release slice. When a resolved term or decision clearly has cross-release reuse value, record a **project-level promotion candidate** with target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and `not written by this workflow`. ADR candidates additionally require hard-to-reverse, surprising-without-context, and real-tradeoff conditions. Missing qualification keeps the result plan-local. A later explicit knowledge-maintenance or document-editing request owns mutation.
+diff --git a/skills/spec-plan/references/agents/repo-profiler.md b/skills/spec-plan/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-plan/references/agents/repo-profiler.md
++++ b/skills/spec-plan/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-plan/references/repo-profile-cache.md b/skills/spec-plan/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-plan/references/repo-profile-cache.md
++++ b/skills/spec-plan/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-pov/references/agents/repo-profiler.md b/skills/spec-pov/references/agents/repo-profiler.md
+index b3006b0b..b38c23ca 100644
+--- a/skills/spec-pov/references/agents/repo-profiler.md
++++ b/skills/spec-pov/references/agents/repo-profiler.md
+@@ -13 +13 @@ Produce the profile by inspecting:
+-- **Vocabulary** — from `CONCEPTS.md` if present, the canonical domain terms/processes/status concepts.
++- **Vocabulary** — from `CONCEPTS.md` if present, domain terms/processes/status concepts as advisory calibration; do not imply they automatically override workflow-local meaning.
+diff --git a/skills/spec-pov/references/repo-profile-cache.md b/skills/spec-pov/references/repo-profile-cache.md
+index d1603fcd..23e1b5af 100644
+--- a/skills/spec-pov/references/repo-profile-cache.md
++++ b/skills/spec-pov/references/repo-profile-cache.md
+@@ -15 +15 @@ A single JSON object, versioned by `profile_schema_version`:
+-- **Vocabulary** — `CONCEPTS.md` canonical terms.
++- **Vocabulary** — `CONCEPTS.md` terms as advisory calibration; consumers surface conflicts and keep workflow-local meaning until separately promoted.
+diff --git a/skills/spec-prd/SKILL.md b/skills/spec-prd/SKILL.md
+index a61eafe8..3aa897cb 100644
+--- a/skills/spec-prd/SKILL.md
++++ b/skills/spec-prd/SKILL.md
+@@ -88 +88 @@ Follows `docs/contracts/project-graph-consumption.md`: `capability-class` candid
+-6. **No second PRD artifact topology** - Keep the PRD chain: `docs/brainstorms/*-requirements.md` -> plan -> tasks -> work -> review -> knowledge. `grill-with-docs` context or ADR updates are supporting source docs when explicitly triggered, not replacement PRD artifacts.
++6. **No second PRD artifact topology** - Keep the PRD chain: `docs/brainstorms/*-requirements.md` -> plan -> tasks -> work -> review -> knowledge. `grill-with-docs` closes requirements in the PRD and may emit candidate-only project knowledge records; it never creates a replacement artifact or mutates project context/ADR files.
+@@ -124 +124 @@ Load references only when their trigger is present:
+-- `references/grill-with-docs-integration.md` - package-local source snapshot and adapted contract for original `grill-with-docs` behavior: sustained one-question-at-a-time interview, source-first lookup, glossary challenge, inline `CONTEXT.md` updates, lazy context topology, and sparse ADR creation. Load by default for PRD authoring/refinement from rough PRD, draft, `reference-claims`, `resume-prd`, `pure-text`, or multi-source material unless the request is wrong-stage, implementation-ready, or already fully source-resolved.
++- `references/grill-with-docs-integration.md` - package-local historical snapshot plus the adapted candidate-only contract: sustained one-question-at-a-time interview, source-first lookup, glossary challenge, PRD-local closure, and project-level promotion candidates without project mutation. Load by default for PRD authoring/refinement from rough PRD, draft, `reference-claims`, `resume-prd`, `pure-text`, or multi-source material unless the request is wrong-stage, implementation-ready, or already fully source-resolved.
+@@ -155 +155 @@ Load references only when their trigger is present:
+-当前执行对话的用户是唯一人类产品确认人，所有人类问题与产品决定确认都只进入这一个对话。兼容字段中的 `owner`、会签材料、专业意见、法规/隐私/安全/资金口径或历史角色名称只表示证据、责任或评估语义，不允许路由第二个人类联系人。LLM/agent 负责读取、分析、推荐和记录，不能替用户确认产品决定；scripts 只确认结构、trace、path、hash、receipt 等确定性事实。专业依据不足时，当前用户可以基于正式 source 确认、明确自行确认、defer、scope-cap，或保留 `source-candidate` / assumption / blocker 与 reopen condition；不得以“需要另一个角色”为由创建第二确认入口。
++当前执行对话的用户是唯一人类产品确认人；所有人类问题都询问当前执行对话的用户，所有产品决定确认都只进入这一个对话。兼容字段中的 `owner`、会签材料、专业意见、法规/隐私、安全、资金口径或历史角色名称只表示证据、责任或评估语义，不允许路由第二个人类联系人。LLM/agent 负责读取、分析、推荐和记录，不能替用户确认产品决定；scripts 只确认结构、trace、path、hash、receipt 等确定性事实。专业依据不足时，当前用户可以基于正式 source 确认、明确自行确认、defer、scope-cap，或保留 `source-candidate` / assumption / blocker 与 reopen condition；不得以“需要另一个角色”为由创建第二确认入口。
+@@ -302 +302 @@ When domain terminology, source/user contradiction, ownership, permission/state/
+-The Requirements Grill / Domain Grill Gate is PRD-local in normal mode: ask one owner question at a time, require a named gap and PRD write target, persist results into existing PRD sections, and do not create standalone context, ADR, or runtime artifacts unless `grill-with-docs-integration.md` is triggered for resolved context updates. For rough, draft, reference-claim, resume, or pure-text inputs, deep clarification through `grill-with-docs-integration.md` is the default path; compact output is only a source-resolved PRD shape, not a shortcut around clarification. Continue one-question-at-a-time relentlessly by default, update `CONTEXT.md` inline for resolved project terms when triggered, and create ADRs only when the three ADR conditions hold. A branch stops only at a legal stop point in `Canonical: Four Legal Stop Points`; "the next question would not change a PRD write target" reorders questions, it is not by itself a stop. Keep its focus distinct from Pre-PRD Clarification: Domain Grill handles terminology, source/user/glossary contradictions, source-of-truth, ownership, permissions, state/exception edges, and hard product boundaries; Pre-PRD Clarification handles rough PRD behavioral completeness, scenario coverage, acceptance, scope, and write-target closure. If one question touches both, classify by the consequence for the PRD.
++The Requirements Grill / Domain Grill Gate is always PRD-local: ask one owner question at a time, require a named gap and PRD write target, and persist results into existing PRD sections. Even when `grill-with-docs-integration.md` is triggered, this workflow never creates or modifies `CONTEXT.md`, `CONTEXT-MAP.md`, project glossary, or ADR files; cross-release knowledge is candidate-only after PRD-local closure. For rough, draft, reference-claim, resume, or pure-text inputs, deep clarification remains the default path. A branch stops only at a legal stop point in `Canonical: Four Legal Stop Points`. Domain Grill handles terminology, contradictions, ownership, permissions, state/exception edges, and hard product boundaries; Pre-PRD Clarification handles behavioral completeness, scenario coverage, acceptance, scope, and write-target closure.
+diff --git a/skills/spec-prd/evals/examples.json b/skills/spec-prd/evals/examples.json
+index 72197467..13fdee68 100644
+--- a/skills/spec-prd/evals/examples.json
++++ b/skills/spec-prd/evals/examples.json
+@@ -1408,2 +1408,3 @@
+-        "create or update CONTEXT.md lazily when the first project-specific term is resolved",
+-        "fold resolved terms back into PRD Glossary or Decision Notes"
++        "fold resolved terms into PRD Glossary or Decision Notes",
++        "emit a qualified candidate-only CONTEXT.md promotion record with not-written status",
++        "leave project-level files unchanged"
+@@ -1706,2 +1707,3 @@
+-        "update CONTEXT.md inline for resolved project-specific terms",
+-        "create ADR only when hard to reverse, surprising without context, and a real tradeoff"
++        "close resolved project-specific terms in PRD-local sections",
++        "emit candidate-only promotion records without project mutation",
++        "emit an ADR candidate only when hard to reverse, surprising without context, and a real tradeoff"
+@@ -1854 +1856,2 @@
+-        "update CONTEXT.md inline when a project-specific term is resolved"
++        "close the project-specific term in PRD-local sections",
++        "leave CONTEXT.md unchanged and emit only a qualified promotion candidate"
+@@ -2213 +2216 @@
+-        "CONTEXT.md promotion candidate",
++        "candidate-only CONTEXT.md promotion record",
+@@ -2216,0 +2220,2 @@
++        "provenance, real consumer, reuse rationale, invalidation condition, and not-written status",
++        "project-level files remain unchanged",
+@@ -2235 +2240 @@
+-        "suggest ADR promotion only for hard-to-reverse, surprising tradeoffs",
++        "suggest candidate-only ADR promotion only for hard-to-reverse, surprising tradeoffs",
+@@ -2237 +2242,2 @@
+-        "routine decisions stay in Decision Notes"
++        "routine decisions stay in Decision Notes",
++        "ADR files remain unchanged"
+diff --git a/skills/spec-prd/references/domain-language-and-decision-ledger.md b/skills/spec-prd/references/domain-language-and-decision-ledger.md
+index 328135aa..59d4c8ac 100644
+--- a/skills/spec-prd/references/domain-language-and-decision-ledger.md
++++ b/skills/spec-prd/references/domain-language-and-decision-ledger.md
+@@ -28 +28 @@ Before asking the owner about terminology or current behavior, inspect context t
+-Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory for ordinary PRD authoring. The project domain glossary is optional and opt-in: if `docs/contracts/domain-glossary.md` does not exist, record that as advisory context and continue with available evidence — do not create it for a single small increment. When `grill-with-docs` integration is triggered, `CONTEXT.md` and ADR files are created or updated lazily under `grill-with-docs-integration.md`.
++Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory for PRD authoring. Existing project language and decision records are advisory calibration sources. Missing topology does not block PRD-local closure, and this workflow never creates or updates project-level glossary/context/ADR files.
+@@ -44 +44 @@ Two discipline rules keep glossary entries useful and prevent them from decaying
+-Do not create a permanent glossary or ADR by default in normal PRD mode. Triggered `grill-with-docs` mode may update `CONTEXT.md` inline for resolved project terms and create ADRs when the three ADR conditions hold.
++Project-level promotion is candidate-only in every PRD profile and trigger mode. Close the current release meaning in the PRD first; do not mutate a permanent glossary, context file, or ADR.
+@@ -53 +53 @@ A term lives in a single PRD's `## Glossary` by default (session-local, draft la
+-Promotion is **preview-first**: propose the canonical entry to the owner, and write it to `docs/contracts/domain-glossary.md` only after confirmation. Never silent-write. Follow the field contract and entry format defined in that file. A single small increment never needs promotion — keep its terms in the PRD only.
++Promotion is **candidate-only**: never write the entry during this workflow, even after product confirmation. A candidate contains target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and an explicit `not written by this workflow` statement. A later explicit knowledge-maintenance or document-editing request decides whether to write it. A single small increment normally keeps its terms in the PRD only.
+@@ -107 +107 @@ write_target: Summary | Problem Frame | Current System Snapshot | Change Delta |
+-This format is for asking the owner, not a third persistent field set. Persist the result into existing PRD-local sections. If it lands in `Decision Notes`, map it back to the existing fields: `question`, `recommended_answer`, `source_tag`, `chosen_answer`, `consequence`, and `deferred_reason`. Fold `why_recommended`, `consequence_if_chosen`, and `consequence_if_not_chosen` into `consequence` prose when useful. If it lands in `Glossary`, `Evidence And Assumptions`, or `Outstanding Questions`, compress it into that section's existing fields and do not add new fields. Do not create `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` by default in normal PRD mode; use `grill-with-docs-integration.md` when inline context or ADR updates are requested or required.
++This format is for asking the owner, not a third persistent field set. Persist the result into existing PRD-local sections. If it lands in `Decision Notes`, map it back to the existing fields: `question`, `recommended_answer`, `source_tag`, `chosen_answer`, `consequence`, and `deferred_reason`. Fold supporting rationale into `consequence` prose when useful. Never create or edit `CONTEXT.md`, `CONTEXT-MAP.md`, project glossary, or `docs/adr/`; `grill-with-docs-integration.md` uses the same PRD-local + candidate-only boundary.
+@@ -189 +189 @@ Domain Grill and Pre-PRD Clarification share cadence and source-first discipline
+-Load `grill-with-docs-integration.md` when the user explicitly names `grill-with-docs`, asks for sustained grilling, asks to update `CONTEXT.md` / ADRs inline, or when a PRD authoring/refinement run has any owner-adjudicated requirement branch left after source-first evidence calibration. This includes multiple load-bearing owner decisions, source/user contradictions, terminology or ownership affecting PRD sections, decision-tree dependencies, or ordinary rough requirements that need one-question-at-a-time closure before the standard PRD can be written.
++Load `grill-with-docs-integration.md` when the user explicitly names `grill-with-docs`, asks for sustained grilling, supplies rough/multi-source requirements, or when a PRD authoring/refinement run has owner-adjudicated branches left after source-first evidence calibration. A request to update project context or ADRs is captured as a candidate and requires a separate explicit knowledge-maintenance/editing workflow for mutation.
+@@ -201,3 +201,3 @@ In this mode:
+-- update the relevant `CONTEXT.md` inline when a project-specific term is resolved
+-- create `CONTEXT.md` / `CONTEXT-MAP.md` lazily only when there is resolved content to write
+-- create ADRs only when the decision is hard to reverse, surprising without context, and a real tradeoff
++- close project-specific terminology in the PRD-local Glossary or Decision Notes
++- emit a qualified project-level promotion candidate only when it has durable reuse value
++- emit an ADR candidate only when the decision is hard to reverse, surprising without context, and a real tradeoff
+@@ -206 +206 @@ In this mode:
+-Do not treat this mode as an implementation plan or coaching transcript. Its durable outputs are the PRD plus any directly updated source context files named in closeout.
++Do not treat this mode as an implementation plan or coaching transcript. Its durable outputs are the PRD plus qualified candidate-only records named in closeout; project-level files remain unchanged.
+@@ -227 +227 @@ In normal PRD mode, suggest a future ADR-like artifact only when all three condi
+-Otherwise, keep the decision local to the PRD. In triggered `grill-with-docs` mode, create the ADR inline under `grill-with-docs-integration.md` when those same three conditions hold.
++Otherwise, keep the decision local to the PRD. When all three conditions hold, record an ADR candidate with the full qualification fields; never create it inline.
+@@ -231 +231 @@ Otherwise, keep the decision local to the PRD. In triggered `grill-with-docs` mo
+-Read existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, and `docs/adr/**` as optional evidence and topology for normal PRD authoring. During source-first evidence calibration, read existing topology only when it exists and is relevant to the PRD topic. If it does not exist in normal mode, record graceful no-topology fallback and continue with PRD-local closure. In triggered `grill-with-docs` mode, missing topology is not a blocker because context and ADR files are created lazily when the first resolved term or ADR-worthy decision exists.
++Read existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, and `docs/adr/**` only as optional advisory evidence. Read topology when it exists and is relevant; if it does not exist, continue with PRD-local closure. A filename, age, or canonical label does not automatically override the current PRD-local meaning.
+@@ -239 +239 @@ Context routing:
+-- no topology in triggered `grill-with-docs` mode: create only the specific `CONTEXT.md` or ADR path needed for resolved content, following `grill-with-docs-integration.md`
++- no topology in triggered `grill-with-docs` mode: continue PRD-local and, if qualified, record a target kind/path in the promotion candidate
+@@ -241 +241 @@ Context routing:
+-PRD-local persistence remains required. Stable term decisions land in `Glossary`, with avoid terms or explanatory prose when useful. Hard decisions and consequences land in `Decision Notes`, `Evidence And Assumptions`, or `Scope Boundaries`. In normal mode, project-level promotion is a preview-first candidate after PRD-local closure, not a substitute for closure. In triggered `grill-with-docs` mode, resolved terms and ADR-worthy decisions also update the relevant context or ADR file inline.
++PRD-local persistence remains required. Stable term decisions land in `Glossary`; hard decisions and consequences land in `Decision Notes`, `Evidence And Assumptions`, or `Scope Boundaries`. In every mode, project-level promotion is candidate-only after PRD-local closure and never substitutes for it.
+@@ -245 +245 @@ In normal mode, suggest a `CONTEXT.md` promotion candidate only when the term is
+-Never silently create or edit `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/**` during ordinary PRD output. In triggered `grill-with-docs` mode, the owner answer, accepted recommendation, or confirmed source evidence that resolves a term or ADR-worthy decision is the confirmation for that specific inline update. Missing normal-mode promotion does not block planning unless the underlying term or decision remains unresolved in the PRD.
++Never create or edit `CONTEXT.md`, `CONTEXT-MAP.md`, project glossary, or `docs/adr/**` during PRD output. Product confirmation closes PRD WHAT; it is not project-level mutation authorization. Missing promotion never blocks planning when the underlying term or decision is resolved in the PRD.
+diff --git a/skills/spec-prd/references/evidence-and-topology.md b/skills/spec-prd/references/evidence-and-topology.md
+index 9631366b..2bdd93a0 100644
+--- a/skills/spec-prd/references/evidence-and-topology.md
++++ b/skills/spec-prd/references/evidence-and-topology.md
+@@ -49,0 +50,2 @@ For Feature Slices, candidate modules and source refs are evidence pointers only
++Project glossary, `CONCEPTS.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, and ADR-like records are advisory calibration sources. They do not automatically override PRD-local meaning by filename, age, or canonical label. This workflow is candidate-only for cross-release promotion and never mutates those project-level files; product confirmation closes PRD WHAT, not repository knowledge governance.
++
+diff --git a/skills/spec-prd/references/grill-with-docs-integration.md b/skills/spec-prd/references/grill-with-docs-integration.md
+index 507de5be..621d749b 100644
+--- a/skills/spec-prd/references/grill-with-docs-integration.md
++++ b/skills/spec-prd/references/grill-with-docs-integration.md
+@@ -37,0 +38,2 @@ This section is the package-local source snapshot for the upstream benchmark. It
++The embedded upstream snapshot is historical input, not mutation authorization. Any quoted instruction to create or update glossary/context/ADR files is superseded by the adapted candidate-only contract below.
++
+@@ -50 +52 @@ name: grill-with-docs
+-description: A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.
++description: A relentless interview to sharpen a plan or design through source-first questions and concrete scenarios.
+@@ -77 +79 @@ name: domain-modeling
+-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
++description: Build and sharpen a project's domain model by clarifying terminology, boundaries, and decisions.
+@@ -82,33 +84 @@ description: Build and sharpen a project's domain model. Use when the user wants
+-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+-
+-## File structure
+-
+-Most repos have a single context:
+-
+-```
+-/
+-├── CONTEXT.md
+-├── docs/
+-│   └── adr/
+-│       ├── 0001-event-sourced-orders.md
+-│       └── 0002-postgres-for-write-model.md
+-└── src/
+-```
+-
+-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+-
+-```
+-/
+-├── CONTEXT-MAP.md
+-├── docs/
+-│   └── adr/                          ← system-wide decisions
+-├── src/
+-│   ├── ordering/
+-│   │   ├── CONTEXT.md
+-│   │   └── docs/adr/                 ← context-specific decisions
+-│   └── billing/
+-│       ├── CONTEXT.md
+-│       └── docs/adr/
+-```
+-
+-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
++Actively sharpen the domain model by challenging terms, inventing relevant edge-case scenarios, and making decisions explicit in the current requirements artifact.
+@@ -133,16 +102,0 @@ When the user states how something works, check whether the code agrees. If you
+-
+-### Update CONTEXT.md inline
+-
+-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+-
+-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+-
+-### Offer ADRs sparingly
+-
+-Only offer to create an ADR when all three are true:
+-
+-1. **Hard to reverse** — the cost of changing your mind later is meaningful
+-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
+-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
+-
+-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+@@ -181,27 +135 @@ Continue this loop relentlessly by default, walking down each branch. A branch s
+-Most repos have one context:
+-
+-```text
+-/
+-+-- CONTEXT.md
+-+-- docs/
+-|   +-- adr/
+-|       +-- 0001-event-sourced-orders.md
+-|       +-- 0002-postgres-for-write-model.md
+-+-- src/
+-```
+-
+-Repos with multiple contexts use a root `CONTEXT-MAP.md`:
+-
+-```text
+-/
+-+-- CONTEXT-MAP.md
+-+-- docs/
+-|   +-- adr/
+-+-- src/
+-    +-- ordering/
+-    |   +-- CONTEXT.md
+-    |   +-- docs/adr/
+-    +-- billing/
+-        +-- CONTEXT.md
+-        +-- docs/adr/
+-```
++Read existing `CONTEXT.md`, `CONTEXT-MAP.md`, project glossary, and ADR files only as advisory calibration sources when relevant. A filename, age, or canonical label does not automatically override the PRD-local meaning. Missing topology never blocks planning after the PRD closes the current release meaning.
+@@ -209,8 +137 @@ Repos with multiple contexts use a root `CONTEXT-MAP.md`:
+-Infer topology in this order:
+-
+-1. If `CONTEXT-MAP.md` exists, read it and route to the matching context.
+-2. If only a root `CONTEXT.md` exists, use the root context.
+-3. If neither exists, create a root `CONTEXT.md` lazily when the first project-specific term is resolved.
+-4. If multiple contexts exist but ownership is unclear, ask one context-routing question before writing.
+-
+-Create files lazily, only when there is something resolved to write. Do not create `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` as empty ceremony.
++Never create or update topology in this workflow. If cross-release reuse is qualified, the candidate records the target kind/path that a later explicit knowledge-maintenance or document-editing request may choose to use.
+@@ -220,3 +141 @@ Create files lazily, only when there is something resolved to write. Do not crea
+-`CONTEXT.md` is a glossary and nothing else. Do not use it as a spec, scratch pad, implementation decision log, planning artifact, or repository for HOW.
+-
+-When a term is resolved, update the relevant `CONTEXT.md` inline before continuing the interview. Do not batch resolved terms for the end.
++Close the current release terminology in the PRD-local `Glossary`, `Decision Notes`, or `Evidence And Assumptions`. A project-level context candidate is candidate-only and not written by this workflow.
+@@ -224 +143 @@ When a term is resolved, update the relevant `CONTEXT.md` inline before continui
+-Use this structure:
++When qualified, use this candidate shape:
+@@ -227,43 +146,8 @@ Use this structure:
+-# {Context Name}
+-
+-{One or two sentence description of what this context is and why it exists.}
+-
+-## Language
+-
+-**Order**:
+-{A one or two sentence description of the term}
+-_Avoid_: Purchase, transaction
+-
+-**Invoice**:
+-A request for payment sent to a customer after delivery.
+-_Avoid_: Bill, payment request
+-
+-**Customer**:
+-A person or organization that places orders.
+-_Avoid_: Client, buyer, account
+-```
+-
+-Rules:
+-
+-- Be opinionated: pick the best term and list confusing alternatives under `_Avoid_`.
+-- Keep definitions tight: one or two sentences max.
+-- Define what the term IS, not what it DOES.
+-- Include only project/domain-specific terms. General engineering concepts such as timeout, retry, error type, cache, or pagination do not belong unless they are uniquely defined business concepts in this context.
+-- Group terms under subheadings when natural clusters emerge; otherwise keep a flat `## Language` section.
+-
+-For multi-context repos, a root `CONTEXT-MAP.md` lists contexts and relationships:
+-
+-```md
+-# Context Map
+-
+-## Contexts
+-
+-- [Ordering](./src/ordering/CONTEXT.md) - receives and tracks customer orders
+-- [Billing](./src/billing/CONTEXT.md) - generates invoices and processes payments
+-- [Fulfillment](./src/fulfillment/CONTEXT.md) - manages warehouse picking and shipping
+-
+-## Relationships
+-
+-- **Ordering -> Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
+-- **Fulfillment -> Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
+-- **Ordering <-> Billing**: Shared types for `CustomerId` and `Money`
++target kind/path: <CONTEXT/glossary path candidate>
++proposed meaning: <definition or decision>
++provenance: <PRD/source refs>
++applicability scope: <where it applies>
++real consumer: <who will use it>
++reuse rationale: <why it belongs beyond this release>
++invalidation condition: <what makes it stale>
++write status: not written by this workflow
+@@ -272 +156 @@ For multi-context repos, a root `CONTEXT-MAP.md` lists contexts and relationship
+-Only create or update `CONTEXT-MAP.md` when multiple contexts are actually needed and their relationships are known enough to record. A single small PRD increment does not need a map.
++Keep definitions concise and domain-specific. Missing any qualification keeps the result PRD-local.
+@@ -276 +160 @@ Only create or update `CONTEXT-MAP.md` when multiple contexts are actually neede
+-Offer ADRs sparingly. Create or update an ADR only when all three conditions are true:
++Offer an ADR candidate only when all three conditions are true:
+@@ -282,19 +166 @@ Offer ADRs sparingly. Create or update an ADR only when all three conditions are
+-If any condition is missing, do not create an ADR. Keep the decision in PRD `Decision Notes`, `Evidence And Assumptions`, or `Scope Boundaries`.
+-
+-ADRs live in `docs/adr/` for system-wide decisions or the relevant context's `docs/adr/` for context-specific decisions. Create the directory lazily when the first ADR is needed. Scan existing ADRs for the highest number and increment it with `0001-slug.md`, `0002-slug.md`, and so on.
+-
+-Minimal template:
+-
+-```md
+-# {Short title of the decision}
+-
+-{One to three sentences: what's the context, what did we decide, and why.}
+-```
+-
+-Optional sections are allowed only when they add genuine value:
+-
+-- `Status` frontmatter: `proposed`, `accepted`, `deprecated`, or `superseded by ADR-NNNN`
+-- `Considered Options`
+-- `Consequences`
+-
+-Good ADR candidates include architectural shape, integration patterns between contexts, lock-in technology choices, ownership and scope boundaries, deliberate deviations from the obvious path, constraints not visible in code, and non-obvious rejected alternatives.
++If any condition is missing, keep the decision PRD-local. Even when all conditions hold, emit only the candidate shape above with an ADR target kind/path; never create or update the ADR in this workflow.
+@@ -304 +170 @@ Good ADR candidates include architectural shape, integration patterns between co
+-This mode adds durable context/decision updates, but it does not replace the PRD artifact:
++This mode adds durable PRD-local closure and candidate-only handoff; it does not replace the PRD artifact:
+@@ -308,4 +174,4 @@ This mode adds durable context/decision updates, but it does not replace the PRD
+-- When a term is resolved, update `CONTEXT.md` inline before moving to the next question.
+-- When an ADR-worthy decision is resolved, create the ADR inline before moving to the next branch.
+-- Treat an owner answer, accepted recommendation, or confirmed source evidence as the confirmation for that specific glossary/ADR write. Do not create unrelated context files without a resolved term or decision.
+-- Record updated `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR paths in the PRD closeout summary.
++- Keep project-level files unchanged before and after create, refine, and validate runs.
++- When a term or decision has qualified cross-release value, record the complete promotion candidate after PRD-local closure.
++- Product confirmation authorizes PRD WHAT; it does not authorize project-level glossary/context/ADR mutation.
++- Record candidate targets and `not written by this workflow` in the PRD closeout summary.
+diff --git a/skills/spec-prd/references/prd-output-template.md b/skills/spec-prd/references/prd-output-template.md
+index f809248a..ea72a571 100644
+--- a/skills/spec-prd/references/prd-output-template.md
++++ b/skills/spec-prd/references/prd-output-template.md
+@@ -453,3 +453 @@ When existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, or
+-In normal PRD mode, project-level context or ADR updates are preview-first promotion candidates only. They are not required PRD output, not readiness prerequisites, and not silently written by this workflow.
+-
+-When `grill-with-docs-integration.md` is triggered, resolved project-specific terms update `CONTEXT.md` inline and ADR-worthy decisions create ADRs inline. Record the changed context/ADR paths in `Closeout Summary`; do not make those files a replacement for PRD-local closure.
++In every PRD profile and trigger mode, project-level context/glossary/ADR promotion is candidate-only after PRD-local closure. A qualified candidate records target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and `not written by this workflow`. It is not a readiness prerequisite. `grill-with-docs-integration.md` does not change this mutation boundary.
+diff --git a/skills/spec-prd/references/prd-readiness-lens.md b/skills/spec-prd/references/prd-readiness-lens.md
+index 0d69bd51..e357cf51 100644
+--- a/skills/spec-prd/references/prd-readiness-lens.md
++++ b/skills/spec-prd/references/prd-readiness-lens.md
+@@ -124,2 +124,2 @@ Run this pack when terminology, domain boundary, source/user contradiction, owne
+-- `context/adr topology adapter boundary` - existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, and `docs/adr/**` may provide advisory evidence in normal mode; in triggered `grill-with-docs` mode, resolved terms or ADR-worthy decisions may update those files inline. PRD-local Glossary / Decision Notes / Evidence And Assumptions / Scope Boundaries remain the planning handoff source.
+-- `context/adr artifact mode boundary` - readiness must not require `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` in normal PRD mode, and missing topology does not block planning if PRD-local closure is complete. When `grill-with-docs` mode is triggered, readiness checks that resolved context/ADR updates are reflected in the PRD closeout and that ADR creation still satisfies hard-to-reverse, surprising-without-context, real-tradeoff conditions.
++- `context/adr topology adapter boundary` - existing `CONTEXT.md`, `CONTEXT-MAP.md`, project glossary, and `docs/adr/**` provide advisory evidence only. PRD-local Glossary / Decision Notes / Evidence And Assumptions / Scope Boundaries remain the planning handoff source; project-level files remain unchanged in default, Lite, triggered-grill, and validate runs.
++- `context/adr artifact mode boundary` - readiness never requires project-level topology when PRD-local closure is complete. Promotion is candidate-only; an ADR candidate still requires hard to reverse, surprising without context, and a real tradeoff, plus the common qualification fields. Missing promotion does not block planning.

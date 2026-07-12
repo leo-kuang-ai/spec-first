@@ -210,6 +210,26 @@ describe('plugin module facade and governance', () => {
     }
   });
 
+  test('does not project the retired brainstorm visual helper to any supported host', () => {
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const operationPaths = plan.operations.map((operation) => operation.path);
+
+        expect(operationPaths.some((operationPath) =>
+          operationPath.endsWith('/spec-brainstorm/references/visual-probes.md')
+        )).toBe(false);
+        expect(operationPaths.some((operationPath) =>
+          operationPath.endsWith('/spec-brainstorm/scripts/visual-probe-server.js')
+        )).toBe(false);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
   test('preserves support-file identity, metadata, and cross-host semantics across every host projection path', () => {
     const supportCases = [
       {
@@ -226,7 +246,11 @@ describe('plugin module facade and governance', () => {
       },
       {
         suffix: '/spec-prd/references/grill-with-docs-integration.md',
-        marker: 'name: grill-with-docs',
+        markers: [
+          'name: grill-with-docs',
+          'write status: not written by this workflow',
+          'Product confirmation authorizes PRD WHAT; it does not authorize project-level glossary/context/ADR mutation.',
+        ],
       },
       {
         suffix: '/spec-prd/assets/overlays/securities.md',
@@ -284,7 +308,10 @@ describe('plugin module facade and governance', () => {
             candidate.path.endsWith(supportCase.suffix)
           );
           expect(operation).toBeDefined();
-          expect(operation.contents).toContain(supportCase.marker);
+          const markers = supportCase.markers || [supportCase.marker];
+          for (const marker of markers) {
+            expect(operation.contents).toContain(marker);
+          }
         }
 
         for (const relativePath of byteStableSupportFiles) {
@@ -314,8 +341,14 @@ describe('plugin module facade and governance', () => {
           const operation = plan.operations.find((candidate) =>
             candidate.path.endsWith(supportCase.suffix)
           );
-          expect(fs.readFileSync(path.join(projectRoot, operation.path), 'utf8'))
-            .toContain(supportCase.marker);
+          const installedContents = fs.readFileSync(
+            path.join(projectRoot, operation.path),
+            'utf8',
+          );
+          const markers = supportCase.markers || [supportCase.marker];
+          for (const marker of markers) {
+            expect(installedContents).toContain(marker);
+          }
         }
 
         for (const relativePath of byteStableSupportFiles) {

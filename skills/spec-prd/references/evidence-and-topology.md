@@ -47,6 +47,8 @@ When the owner input is itself split across a ratified decision record (review c
 
 For Feature Slices, candidate modules and source refs are evidence pointers only. A code index hit, SPEC statement, or historical case must not infer a user goal, add a new acceptance criterion, or override an explicit PRD non-goal without owner confirmation.
 
+Project glossary, `CONCEPTS.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, and ADR-like records are advisory calibration sources. They do not automatically override PRD-local meaning by filename, age, or canonical label. This workflow is candidate-only for cross-release promotion and never mutates those project-level files; product confirmation closes PRD WHAT, not repository knowledge governance.
+
 ## Current-State Coverage
 
 Right-size the snapshot, but check these dimensions before deciding something is irrelevant:

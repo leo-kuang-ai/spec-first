@@ -1,0 +1,68 @@
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -24,0 +25 @@ This skill does not implement code. It explores, clarifies, and documents decisi
++7. **Keep product confirmation singular** - The current conversation user is the only human product confirmer. Ask one highest-impact independent product question at a time; specialist material is evidence, not a second confirmation route.
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -87,0 +89 @@ If the user references an existing brainstorm topic or document, or there is an
++- If the transcript or `/tmp` dossier is unavailable, recover from the durable artifact: re-read its source refs, snapshots, limitations, invalidation conditions, named blockers, and next highest-impact question. Re-check stale refs before relying on them; do not infer closure from missing scratch context.
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -152,0 +155,2 @@ Scan the repo before substantive brainstorming. Match depth to scope:
++Classify each load-bearing gap in run-local reasoning as a **source fact**, **current-user decision**, **open exploration**, or **planning-owned HOW**. This is not a persistent gap table. Before asking a source-sensitive question, name the gap, record the source attempt and direct refs, identify the Product Contract write target, and state what load-bearing WHAT planning would otherwise invent. For a pure product preference with no useful source, record `source_attempt: not-applicable` and the reason instead of performing ceremonial lookup.
++
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -245,0 +248,2 @@ If relevant, call out whether the choice is:
++Before synthesis for Standard or Deep behavioral work, complete the relevance-driven scenario pass in `references/product-pressure-test.md`. Keep only dimensions that materially change an Acceptance Example, Resolve Before Planning / Outstanding Question, explicit assumption, or Non-Goal.
++
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -275,5 +279 @@ Write to `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` — extension
+-#### Vocabulary Capture — after the requirements-only unified plan (only if CONCEPTS.md already exists)
+-
+-**Skip this step entirely if `CONCEPTS.md` does not exist at repo root** — creation is owned by spec-compound and spec-compound-refresh.
+-
+-Run this **after** the approaches, the scope synthesis, and the requirements-only unified plan — that is where the canonical term often gets chosen or corrected, so capturing during early dialogue (before this point) would miss the final resolved name. If it exists, scan the full dialogue and the Product Contract for **resolved** domain terms — terms where the conversation actively pinned down a precise local meaning, not terms merely mentioned in passing. **Resolved means the definition is settled, not still under discussion.** Provisional terms that may still revise stay in the conversation only.
++If the run pauses, becomes headless, or approaches a context reset after any durable decision, write or update this artifact before stopping. Preserve confirmed decisions and assumptions plus load-bearing source refs, source snapshot or observed version, limitations, invalidation conditions, named blockers, and the next highest-impact question with its Product Contract write target. Never fabricate current-user closure or add a progress status.
+diff --git a/skills/spec-brainstorm/references/brainstorm-sections.md b/skills/spec-brainstorm/references/brainstorm-sections.md
+index 7cdf221c..df381b3d 100644
+--- a/skills/spec-brainstorm/references/brainstorm-sections.md
++++ b/skills/spec-brainstorm/references/brainstorm-sections.md
+@@ -248,0 +249,9 @@ worse than omitting it.
++  For a load-bearing source fact, retain the repo-relative source ref, the
++  source snapshot or observed version, any limitation, and an invalidation
++  condition. A `/tmp` dossier may point the current run to quotes, but the
++  durable artifact must remain sufficient when that dossier disappears.
++
++  When pausing with a product blocker, `Resolve Before Planning` also names
++  the next highest-impact question, its source attempt, and its Product
++  Contract write target. Do not add a progress status.
++
+diff --git a/skills/spec-brainstorm/references/handoff.md b/skills/spec-brainstorm/references/handoff.md
+index 4763328c..b418b429 100644
+--- a/skills/spec-brainstorm/references/handoff.md
++++ b/skills/spec-brainstorm/references/handoff.md
+@@ -24,0 +25 @@ If `Resolve Before Planning` contains any items:
++- Keep the next highest-impact question, its source attempt, and its Product Contract write target in the durable artifact. The artifact also retains source refs, snapshots, limitations, and invalidation conditions so resume does not depend on transcript or `/tmp` dossier.
+diff --git a/skills/spec-brainstorm/references/product-pressure-test.md b/skills/spec-brainstorm/references/product-pressure-test.md
+index 05ad604e..d6d775a0 100644
+--- a/skills/spec-brainstorm/references/product-pressure-test.md
++++ b/skills/spec-brainstorm/references/product-pressure-test.md
+@@ -42,0 +43,6 @@ Phase 1.3 owns how these gaps fire as probes: each scope-appropriate gap found h
++
++## Relevance-driven behavior scenario pass
++
++For Standard and Deep behavioral work, run this pass before Phase 2.5 synthesis. Consider happy path, role/permission, state transition, failure/degraded behavior, negative acceptance, and cross-context handoff. Select a dimension only when it changes the current Product Contract.
++
++Every selected scenario must land in an existing durable destination: an Acceptance Example, Resolve Before Planning / Outstanding Question, explicit assumption, or Non-Goal. If it changes none of those, remove it as ceremony. Do not generate a Cartesian product, ask the user to walk every dimension, or keep empty coverage prose. Applicability and landing are semantic judgments owned by the agent; scripts may check structure but do not decide relevance.

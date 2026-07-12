@@ -1,0 +1,270 @@
+{
+  "schema": "requirements-clarification-unit-replay-aggregate/v1",
+  "base": "89c732603b0d544bdd2aeb2fd520525c6301a574",
+  "unit_order": [
+    "U2",
+    "U3",
+    "U4",
+    "U5",
+    "U6"
+  ],
+  "counted_reviewers": {
+    "U2_U5": [
+      "reviewer-A.json",
+      "reviewer-B.json",
+      "reviewer-G.json"
+    ],
+    "U6_refined": [
+      "reviewer-U6-D.json",
+      "reviewer-U6-E.json",
+      "reviewer-U6-F.json"
+    ]
+  },
+  "reviewer_files": {
+    "reviewer-A.json": {
+      "sha256": "7e8347e38f5387145b5d679fab2af8f376d0e863616e516f73b67f61fe3e6bd2",
+      "counted": true
+    },
+    "reviewer-B.json": {
+      "sha256": "e28a8a0ffa4e662575ec07817e60e04dde6beb66ed464d68e24ecc551d6443db",
+      "counted": true
+    },
+    "reviewer-G.json": {
+      "sha256": "8ee67ff746b9a6e03deeb9ab6c3f9952495994f7fa06b93199bb7cbda6b7fa9c",
+      "counted": true
+    },
+    "reviewer-U6-D.json": {
+      "sha256": "e38cb83a21afab112a0f82753b4c534872f5f8d32da6e6ef2b7ae784ab5aa931",
+      "counted": true
+    },
+    "reviewer-U6-E.json": {
+      "sha256": "8c2713d944cb5c434c8fa99e3eafb3ddc35b3538e8d3d3d04056f56c194d032e",
+      "counted": true
+    },
+    "reviewer-U6-F.json": {
+      "sha256": "3509eba4dc45bcedb594ec2af727951851b3b11957d25556fb9e5f46604a6a8d",
+      "counted": true
+    },
+    "reviewer-C.json": {
+      "sha256": "ff99ae7e287241ec2770da8ec774d48ca809e9d0e00c48f311c3f0e229727272",
+      "counted": false,
+      "rejection_reason": "Malformed repeat shape: one session emitted internal three-repeat arrays; retained for audit but excluded from matched-repeat aggregation."
+    }
+  },
+  "aggregated": {
+    "U2_C1": {
+      "repeats": [
+        {
+          "before": 3,
+          "after": 0,
+          "delta": -3
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 3,
+          "after": 0,
+          "delta": -3
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U3_C1": {
+      "repeats": [
+        {
+          "before": 3,
+          "after": 0,
+          "delta": -3
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 3,
+          "after": 0,
+          "delta": -3
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U3_C2": {
+      "repeats": [
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U3_C3": {
+      "repeats": [
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U4_C5": {
+      "repeats": [
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U5_C4": {
+      "repeats": [
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U5_C6": {
+      "repeats": [
+        {
+          "before": 5,
+          "after": 2,
+          "delta": -3
+        },
+        {
+          "before": 5,
+          "after": 2,
+          "delta": -3
+        },
+        {
+          "before": 5,
+          "after": 2,
+          "delta": -3
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction"
+    },
+    "U6_C6": {
+      "repeats": [
+        {
+          "before": 3,
+          "after": 0,
+          "delta": -3
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        },
+        {
+          "before": 2,
+          "after": 0,
+          "delta": -2
+        }
+      ],
+      "improved_repeats": 3,
+      "tied_repeats": 0,
+      "regressed_repeats": 0,
+      "gate": "pass_3_of_3_same_direction_after_refinement"
+    }
+  },
+  "calibration": "passed_all_counted_reviewers",
+  "final_equivalence": {
+    "checked": 34,
+    "mismatches": [],
+    "checked_at": "2026-07-12T08:25:02.334Z"
+  },
+  "session_accounting": {
+    "historical_baseline_and_reviews": 9,
+    "replay_initial_persisted": 3,
+    "u6_refinement_rechecks": 3,
+    "replacement_for_malformed": 1,
+    "total_fresh_sessions": 16,
+    "cap": 36
+  },
+  "verdict": {
+    "U2": "retained",
+    "U3": "retained",
+    "U4": "retained_surface_removal_only",
+    "U5": "retained_with_U6_dependency",
+    "U6": "retained_after_direct_bootstrap_refinement",
+    "P0": 0,
+    "P1": 0,
+    "field_outcome": "not_run"
+  },
+  "limitations": [
+    "Fresh-source scores judge source prose, not actual workflow transcripts or field outcomes.",
+    "Token and latency countermetrics remain qualitative; source/artifact bytes are measured where reviewers reported them.",
+    "U4 supports surface removal and conversation-native closure only, not improved visual decision correctness.",
+    "Reviewer C is preserved but excluded because its repeat structure was invalid."
+  ]
+}

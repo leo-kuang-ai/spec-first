@@ -1,0 +1,58 @@
+{
+  "unit": "U4",
+  "patches": [
+    {
+      "path": "patches/U4.patch",
+      "sha256": "c555ade79ca59c5c0beb4431e18204ab44b5ca2b6f2cfc60002bd0c8182b6412"
+    }
+  ],
+  "paths": [
+    "skills/spec-brainstorm/SKILL.md",
+    "skills/spec-brainstorm/references/visual-probes.md",
+    "skills/spec-brainstorm/scripts/visual-probe-server.js"
+  ],
+  "pre": [
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "status": "present",
+      "sha256": "20fd2f471186502f44079f23f3bcf439e34994408111e4091f3d614d62ed1c94",
+      "bytes": 42996
+    },
+    {
+      "path": "skills/spec-brainstorm/references/visual-probes.md",
+      "status": "present",
+      "sha256": "8ffc76d2f6786c10b16e2bb3ff6d34b7a6310ce009578f5d7d1c380ffb2d9b62",
+      "bytes": 8975
+    },
+    {
+      "path": "skills/spec-brainstorm/scripts/visual-probe-server.js",
+      "status": "present",
+      "sha256": "6bbc37398aa79b5aef597e24f55a5bba386564dbedeca10498f10fe3e96ad0e3",
+      "bytes": 12566
+    }
+  ],
+  "post": [
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "status": "present",
+      "sha256": "09225bb8f14094c7dae9b42ef924722010fa16e07b4f5afbb8e087b62a9359cb",
+      "bytes": 41517
+    },
+    {
+      "path": "skills/spec-brainstorm/references/visual-probes.md",
+      "status": "absent"
+    },
+    {
+      "path": "skills/spec-brainstorm/scripts/visual-probe-server.js",
+      "status": "absent"
+    }
+  ],
+  "evaluator_paths": [
+    "skills/spec-brainstorm/SKILL.md",
+    "skills/spec-brainstorm/references/visual-probes.md",
+    "skills/spec-brainstorm/scripts/visual-probe-server.js"
+  ],
+  "before_bundle_sha256": "13a386e9d107af8a675dad507b7755a530712c62c709ed8a3dac998ffd88272e",
+  "after_bundle_sha256": "e3a175ff4c3bb5af91214e5d8d7af9e44a691be49afddd60bfc886f7047b44b8",
+  "applied_at": "2026-07-12T08:00:22.618Z"
+}

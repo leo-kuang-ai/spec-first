@@ -365,7 +365,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     const homeBefore = snapshot(homeDir);
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.2.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.4.1' };
       }
       if (command === 'codegraph' && args[0] === 'status') {
         return { ...fakeRunner(command, args, options), stdout: 'index ready' };
@@ -823,7 +823,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     const target = tempRepo('codegraph-configured');
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.2.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.4.1' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });

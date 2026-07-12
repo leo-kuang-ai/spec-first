@@ -109,7 +109,7 @@ spec-brainstorm "描述你的第一个任务"
 brainstorm 完成后，在仓库里检查是否出现了新文件：
 
 ```text
-docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
+docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 ```
 
 这就是你的第一个 artifact。工作已经写进仓库，可检查，并可以移交给 plan 继续推进。
@@ -133,8 +133,8 @@ docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
 ```text
 docs/
   ideation/      ranked ideas 与探索记录
-  brainstorms/   requirements briefs 与 PRD 级需求
-  plans/         可评审、可执行的 implementation plans
+  brainstorms/   spec-prd 与历史 brainstorm 的 legacy PRD 级需求
+  plans/         requirements-only Product Contract 与可执行 implementation plan
   tasks/         结构化 handoff 用 derived task packs
   reviews/       文档与代码审查 findings
   solutions/     解决问题后沉淀的可复用经验
@@ -142,7 +142,7 @@ docs/
   workflows/     structured work closeout evidence（默认 gitignore）
 ```
 
-不是每个 workflow 都写入所有 artifact。第一次运行只在 `docs/brainstorms/` 下写一个文件。更深的链路随着时间积累 plans、tasks、代码变更、review findings 和 learnings——全部在仓库里，全部可检查。
+不是每个 workflow 都写入所有 artifact。新的 `spec-brainstorm` 在 `docs/plans/` 写 requirements-only unified plan；`spec-prd` 继续在 `docs/brainstorms/` 写 legacy PRD artifact。更深的链路会继续积累 tasks、代码变更、review findings 和 learnings——全部在仓库里，全部可检查。
 
 ## Workflow Entry Points
 
@@ -150,7 +150,7 @@ docs/
 
 | 任务 | 统一入口 | 产物 |
 |---|---|---|
-| 从粗略想法提炼需求 | `spec-brainstorm` | `docs/brainstorms/` |
+| 从粗略想法提炼需求 | `spec-brainstorm` | `docs/plans/`（`requirements-only`） |
 | 从已有 PRD 提炼需求 | `spec-prd` | `docs/brainstorms/` |
 | 制定实现计划 | `spec-plan` | `docs/plans/` |
 | 将计划拆成可执行任务 | `spec-write-tasks` | `docs/tasks/` |
@@ -160,6 +160,8 @@ docs/
 | 沉淀可复用经验 | `spec-compound` | `docs/solutions/` |
 
 支撑入口（按需触发）：`spec-mcp-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
+
+需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。
 
 `spec-write-skill` 是通用的项目级 Agent Skill workflow：可创建或修改项目拥有的 canonical package，也可只读验证现有或外部 package。Portable core 不要求项目使用 spec-first；宿主 metadata 与项目治理只在适用时加载。只审查质量仍走 bounded review，第三方安装仍交给 installer，generated runtime mirror 必须从 source 重建而不是直接修补。
 

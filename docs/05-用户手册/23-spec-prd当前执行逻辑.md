@@ -6,7 +6,7 @@
 
 ## 一句话结论
 
-`spec-prd` 先读 source、识别真正的 load-bearing WHAT gap，再决定是否需要询问当前执行对话的用户；`create/refine` 闭合后先写 LLM-owned final intent，再由 finalizer 原子写 machine receipt；`validate` 始终 report-only。模板只有一个 canonical Outstanding Questions schema，final/ready 出口缺核心 section、R/AE 行、trace 或 current receipt 时 fail-closed。
+`spec-prd` 先读 source、识别真正的 load-bearing WHAT gap，再决定是否需要询问当前执行对话的用户；`create/refine` 闭合后先写 LLM-owned final intent，再由 finalizer 原子写 machine receipt；`validate` 始终 report-only。术语和决定先在 PRD-local sections 闭合，项目 glossary、`CONTEXT.md`、`CONTEXT-MAP.md` 与 ADR 只作 advisory calibration；跨 release 候选只输出 candidate，不在当前 workflow 中写项目级文件。模板只有一个 canonical Outstanding Questions schema，final/ready 出口缺核心 section、R/AE 行、trace 或 current receipt 时 fail-closed。
 
 ## Opt-in：Contract Reset Lite
 
@@ -37,6 +37,8 @@ Lite 不改变 durable contract：仍写 `docs/brainstorms/*-requirements.md`，
 | `SKILL.md` | 唯一拥有 Template Trigger Map、surface 与 overlay 选择语义 | 不复制完整正文模板 |
 | `prd-output-template.md` | machine-safe output contract、machine sections、模板组合顺序与唯一 canonical Outstanding Questions schema | 不维护第二套 surface/overlay routing map，也不让 generic/surface template 各自定义 OQ schema |
 | template assets | 提供 generic、surface-specific 和可选行业问题框架 | 不自动成为 confirmed 产品或合规事实 |
+
+项目级 promotion candidate 必须在 PRD-local closure 之后生成，并至少包含 target kind/path、proposed meaning、provenance、适用范围、真实 consumer、复用理由、invalidation condition 与“当前未写入”声明。ADR candidate 还必须同时满足 hard-to-reverse、surprising without context、real tradeoff。当前用户对产品 WHAT 的确认不自动扩张为项目级知识 mutation 授权。
 
 ## 当前执行主流程
 

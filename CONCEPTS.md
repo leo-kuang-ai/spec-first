@@ -36,6 +36,10 @@ A deferred workflow reference loaded only when its trigger signal appears. It ke
 
 A script, hook, or verifier boundary that blocks an exit based on mechanically checkable facts such as schema fields, receipts, paths, hashes, or reason codes. It must not replace LLM semantic judgment above the fact floor.
 
+### App Assurance Compiler
+
+面向 App 的 pre-runtime assurance 架构：把产品、设计、源码、状态、导航、平台、analytics、i18n 与 accessibility 证据编译为带 provenance 的行为模型、proof obligations、counterexamples 和 verification tasks。它不替代编译器、测试、模拟器、真机、产品判断或 code review；AI 只在确定性事实地板之上做有界语义推理，未验证结论保持 advisory 或 runtime-required。
+
 ### Eval Regression
 
 A fixture, test, or fresh-source evaluation that proves a prompt or workflow refactor kept protected behavior intact. It is useful for guarding route boundaries, source/runtime rules, handoff discipline, and known failure modes during prompt compression.
@@ -109,6 +113,10 @@ Mechanical setup evidence about an optional provider's installation, artifact pr
 ### Project Graph
 
 An advisory provider output used for broad orientation, relationship navigation, or candidate discovery. Conclusion-tier claims from a project graph must be confirmed from source, tests, logs, contracts, or docs.
+
+### Code Graph
+
+An advisory provider output used for tactical code-structure location, such as call relationships, impact surfaces, ownership candidates, or affected-test hints. Its relationship claims require direct confirmation before entering conclusion-tier work.
 
 ### Managed Hook
 

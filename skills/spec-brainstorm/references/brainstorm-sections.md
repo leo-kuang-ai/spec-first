@@ -246,6 +246,15 @@ worse than omitting it.
   category is inclusive, not enumerated). Process exhaust (reading the
   user's prompt, glancing at obvious files) → omit.
 
+  For a load-bearing source fact, retain the repo-relative source ref, the
+  source snapshot or observed version, any limitation, and an invalidation
+  condition. A `/tmp` dossier may point the current run to quotes, but the
+  durable artifact must remain sufficient when that dossier disappears.
+
+  When pausing with a product blocker, `Resolve Before Planning` also names
+  the next highest-impact question, its source attempt, and its Product
+  Contract write target. Do not add a progress status.
+
 ## Agent agency
 
 The catalog is a floor, not a ceiling. When the brainstorm's content doesn't

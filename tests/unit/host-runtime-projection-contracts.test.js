@@ -73,6 +73,31 @@ function findSkillCheck(adapter, projectRoot, skillsRoot, skillName) {
 
 describe('host runtime projection contracts', () => {
   test.each(ADAPTER_CASES)(
+    '$id keeps retired brainstorm visual helper assets out of projection',
+    ({ adapter, skillsRoot }) => {
+      const projectRoot = tempProject('visual-retirement');
+      const brainstormSource = fs.readFileSync(
+        path.join(REPO_ROOT, 'skills', 'spec-brainstorm', 'SKILL.md'),
+        'utf8',
+      );
+      const transformed = adapter.transformSkillContent(brainstormSource, {
+        skillName: 'spec-brainstorm',
+        isWorkflowSkill: true,
+        relativePath: 'SKILL.md',
+      });
+
+      expect(transformed).not.toMatch(/visual-probe|visual-probes|text-vs-visual/i);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        skillsRoot,
+        'spec-brainstorm',
+        'references',
+        'visual-probes.md',
+      ))).toBe(false);
+    },
+  );
+
+  test.each(ADAPTER_CASES)(
     '$id preserves the public cross-host MCP config mapping in spec-mcp-setup',
     ({ adapter }) => {
       const transformed = adapter.transformSkillContent(SETUP_SOURCE, setupTransformContext());
