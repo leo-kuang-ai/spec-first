@@ -6,6 +6,7 @@ topic: multi-repo-workspace-graph-lifecycle-query
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-brainstorm
+product_contract_amendment: confirmed-during-spec-plan
 execution: code
 deepened: 2026-07-12
 ---
@@ -17,7 +18,7 @@ deepened: 2026-07-12
 - **Objective:** 让非 Git 父 workspace 能以明确项目边界建立、查询和刷新 CodeGraph 与 Graphify 的 child 图和 workspace serving graph，并从跨仓候选可靠回到对应项目源码。
 - **Product authority:** project registry 定义 workspace 收录范围；各项目源码、Git 状态和直接证据高于 Provider 图谱；workspace 图只拥有跨项目导航候选权威。
 - **Execution profile:** 首版以可信跨仓查询闭环为成功标准，复用 Provider-native 刷新能力，不新增 spec-first 常驻 watcher。
-- **Open blockers:** 无 planning 前产品阻断项；具体 CLI、artifact schema 与 Provider adapter 机制留给 planning。
+- **Stop condition:** 实施先通过 CodeGraph父子scope隔离、显式选库、刷新隔离和旧快照安全门槛；任一门槛失败即停止依赖单元并重新确认产品契约。
 
 ---
 
@@ -46,7 +47,7 @@ CodeGraph 与 Graphify 已能分别提供战术 code graph 和宏观 project gra
 - **不新增统一 watcher。** CodeGraph、Graphify 和 Git 继续拥有各自原生刷新触发；spec-first 只编排 scope、freshness、验证和修复建议。
 - **旧快照持续服务。** 刷新中的图继续以 advisory 旧快照提供未受影响范围的候选；命中 pending 范围时强制回源读取。
 - **Provider 独立降级。** CodeGraph 与 Graphify 按 project/workspace scope 分别报告状态；单 Provider 成功不能掩盖另一个 Provider 的失败。
-- **Parent 只拥有 workspace scope。** 父 workspace 可以拥有显式标记的 workspace-level Provider artifact，但不能获得 child Git、修改、finding 或验证权威。
+- **Parent 只拥有 workspace scope。** 父 workspace 可以拥有显式标记的 workspace-level Provider artifact，并可在独立授权下编排 child Provider artifact mutation，但不能获得 child Git、source mutation、finding 或验证权威。
 
 ```mermaid
 flowchart TB
@@ -117,7 +118,7 @@ flowchart TB
 - R22. 当前仓库契约中的 CodeGraph steady-state 应继续由 MCP connect catch-up、filesystem watcher/auto-sync 和 provider-owned manual repair承担；setup 不启动 watcher。
 - R23. Git项目 Graphify 应继续使用 `post-commit` 与 `post-checkout` hooks；非 Git项目和父 workspace Graphify 首版使用显式 refresh。
 - R24. Registry、Provider 版本、解析规则或项目边界变化必须使受影响 scope 要求完整重建，而不是仅运行普通增量刷新。
-- R25. 每个 scope 必须记录 current snapshot、pending projects/files、last verified refresh、freshness 和失败原因。
+- R25. 每个 scope 必须记录 current snapshot、可确定的 pending projects/files、last verified refresh、freshness 和失败原因；pending 明细不可确定时必须显式标记 `unknown`。
 - R26. 刷新期间必须继续服务上一份已验证快照；未命中 pending 范围的查询可继续使用旧图作为 advisory candidate。
 - R27. 显式刷新必须在隔离 staging 中生成并完成 artifact integrity 与 query probe 后原子 promote；失败必须恢复或保留旧 snapshot。
 - R28. 新增、删除、重命名和跨项目移动必须更新或清除旧节点与旧关系，不能仅追加新节点。
@@ -260,7 +261,7 @@ flowchart TB
 
 ## Planning Contract
 
-本节在不改变 Product Contract 的前提下定义实现方式。Registry 是用户确认的 workspace scope truth；Provider artifacts、setup facts 与 query candidates 均不得反向修改 registry 或提升其授权范围。
+本节定义 Product Contract 的实现方式。R35-R40 与 AE13-AE18 是规划范围合成时由用户确认的 Product Contract amendment，用于补齐 agent操作、freshness preflight、refresh-run 与五宿主语义parity；其余产品决策保持 brainstorm 契约。Registry 是用户确认的 workspace scope truth；Provider artifacts、setup facts 与 query candidates 均不得反向修改 registry 或提升其授权范围。
 
 ### Key Technical Decisions
 
@@ -456,6 +457,7 @@ flowchart LR
   U4 --> U5
   U5 --> U6
   U5 --> U7
+  U6 --> U7
   U6 --> U8
   U7 --> U8
 ```
@@ -469,7 +471,7 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U0. Prove Provider scope isolation and snapshot safety
 
 - **Goal:** 用可重复 fixture 和真实 Provider probe证明或否决 workspace serving graph 的关键假设，并产出明确 go/no-go receipt。
-- **Requirements:** R6-R9, R21-R29, R37-R38；AE3, AE8-AE11, AE14-AE15。
+- **Requirements:** R6-R9, R21-R29, R37-R38；F4-F5；AE3, AE8-AE11, AE14-AE15。
 - **Files:** `skills/spec-mcp-setup/scripts/providers/codegraph.cjs`, `skills/spec-mcp-setup/scripts/providers/graphify.cjs`, `tests/unit/mcp-setup-providers.test.js`, `docs/contracts/project-graph-consumption.md`, `docs/validation/` 下新增 workspace graph feasibility receipt。
 - **Approach:** 建立包含 parent non-Git workspace、nested Git/non-Git child、child artifacts与parent artifacts的真实 fixture；验证 CodeGraph `projectPath`/CLI path选库、MCP query、Auto-Sync/rebuild隔离、SQLite/WAL读写与backup/restore或alternate root；验证 Graphify ignore、显式 graph选择和journaled refresh。Receipt必须逐项记录命令、版本、artifact refs、exit code、query结果与限制。
 - **Test scenarios:**
@@ -484,8 +486,8 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U1. Add workspace registry schemas, discovery, and preview
 
 - **Goal:** 为 mixed Git/non-Git workspace建立稳定项目身份、候选发现和零Provider写入的preview。
-- **Requirements:** R1-R5, R30, R34-R36；AE1-AE2, AE13, AE16。
-- **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-project-discovery.cjs`, `skills/spec-mcp-setup/scripts/lib/workspace-project-registry.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-project-registry.schema.json`, `skills/spec-mcp-setup/scripts/contracts/workspace-project-registry-preview.schema.json`, `tests/unit/mcp-setup-workspace-registry.test.js`, 修改 `skills/spec-mcp-setup/scripts/lib/project-target.cjs` 仅复用公共containment primitives。
+- **Requirements:** R1-R5, R30, R34-R36；F1, F6；AE1-AE2, AE13, AE16。
+- **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-project-discovery.cjs`, `skills/spec-mcp-setup/scripts/lib/workspace-project-registry.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-project-registry.schema.json`, `skills/spec-mcp-setup/scripts/contracts/workspace-project-registry-preview.schema.json`, `tests/unit/mcp-setup-workspace-registry.test.js`, 修改 `skills/spec-mcp-setup/scripts/lib/project-target.cjs`, `tests/unit/mcp-setup-mode-target.test.js`，仅复用公共containment primitives。
 - **Approach:** 使用有限marker表、bounded depth、canonical realpath和默认exclusions生成候选；同root多marker合并，Git root优先，nested manifests不自动拆分；规范化排序后生成discovery fingerprint和drift diff。Preview writer使用atomic rename且不得创建Provider artifact/config。
 - **Test scenarios:**
   1. Parent下两个Git repo和一个manifest-only non-Git项目均成为候选。
@@ -499,8 +501,8 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U2. Confirm registry and compile conflict-safe Provider scope projections
 
 - **Goal:** 将用户确认的scope写成durable registry，并只把该scope投射给CodeGraph和Graphify。
-- **Requirements:** R2-R9, R24, R30-R34, R39；AE2-AE3, AE10-AE12, AE16。
-- **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-provider-scope.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-provider-scope-projection.schema.json`, `tests/unit/mcp-setup-workspace-scope-projection.test.js`; 修改 `skills/spec-mcp-setup/scripts/lib/mode-policy.cjs`, `skills/spec-mcp-setup/scripts/lib/path-safety.cjs`, `skills/spec-mcp-setup/scripts/setup.cjs`。
+- **Requirements:** R2-R9, R24, R30-R34, R39；F1, F6；AE2-AE3, AE10-AE12, AE16。
+- **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-provider-scope.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-provider-scope-projection.schema.json`, `tests/unit/mcp-setup-workspace-scope-projection.test.js`; 修改 `skills/spec-mcp-setup/scripts/lib/mode-policy.cjs`, `skills/spec-mcp-setup/scripts/lib/path-safety.cjs`, `skills/spec-mcp-setup/scripts/setup.cjs`, `tests/unit/mcp-setup-entrypoint.test.js`。
 - **Approach:** Confirmation绑定preview fingerprint并atomic写registry；scope compiler生成workspace-root Provider patterns和projection hash。`.graphifyignore`使用managed block；`codegraph.json`通过sidecar base hash做三方保留式merge。所有mutation先进入plan preview，headless缺授权返回`approval_required`。
 - **Test scenarios:**
   1. 过期preview、变更后的workspace root或不匹配confirmation fingerprint被拒绝。
@@ -514,7 +516,7 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U3. Introduce canonical workspace operation envelopes and generalized scope executor
 
 - **Goal:** 为用户、agent和workflow提供稳定的machine interface，并把现有Git-only batch executor泛化为project/workspace scopes。
-- **Requirements:** R12-R13, R15-R16, R30-R40；AE4, AE12-AE17。
+- **Requirements:** R12-R13, R15-R16, R30-R40；F1-F6；AE4, AE12-AE17。
 - **Files:** 新增 `skills/spec-mcp-setup/scripts/workspace-graph`, `skills/spec-mcp-setup/scripts/lib/workspace-graph-operations.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-graph-operation.schema.json`, `skills/spec-mcp-setup/scripts/contracts/workspace-graph-result.schema.json`; 修改 `skills/spec-mcp-setup/scripts/lib/workspace-executor.cjs`, `skills/spec-mcp-setup/scripts/lib/args.cjs`, `skills/spec-mcp-setup/scripts/lib/human-output.cjs`, `skills/spec-mcp-setup/scripts/setup.cjs`。
 - **Approach:** 建立discover/confirm/list-scopes/resolve-query/status/query/plan-refresh/refresh/refresh-status/recover操作dispatcher；JSON envelope为source contract，人类输出只渲染envelope。Executor item改为`project_id/project_kind/scope_id/scope_kind`，workspace-serving是独立scope，不伪装child。Read-only与mutation operations使用明确capability表。
 - **Test scenarios:**
@@ -529,7 +531,7 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U4. Implement child and workspace Provider adapters
 
 - **Goal:** 在统一scope contract下建立、验证和查询CodeGraph/Graphify child及workspace artifacts，同时保持Provider边界。
-- **Requirements:** R6-R14, R21-R24, R27-R29；AE3-AE4, AE8-AE11。
+- **Requirements:** R6-R14, R21-R24, R27-R29；F1, F4-F5；AE3-AE4, AE8-AE11。
 - **Files:** 修改 `skills/spec-mcp-setup/scripts/providers/codegraph.cjs`, `skills/spec-mcp-setup/scripts/providers/graphify.cjs`, `skills/spec-mcp-setup/scripts/providers/registry.cjs`, `skills/spec-mcp-setup/setup-registry.json`, `skills/spec-mcp-setup/setup-registry.schema.json`, `tests/unit/mcp-setup-providers.test.js`。
 - **Approach:** Provider adapter接收显式scope root、artifact ref和projection hash；CodeGraph按U0证明的选库/快照机制实现，Graphify显式传graph artifact并参数化现有journaled refresh。Status与query统一转为canonical envelope，但保留raw log/artifact ref和provider_untrusted标记。
 - **Test scenarios:**
@@ -544,7 +546,7 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U5. Add freshness ledger and bounded query preflight
 
 - **Goal:** 让每次查询在无统一watcher的前提下识别实际fresh、stale-for-scope、stale、partial或unknown。
-- **Requirements:** R13-R14, R20-R25, R29, R33, R37；AE4, AE8-AE9, AE14。
+- **Requirements:** R13-R14, R20-R25, R29, R33, R37；F2-F5；AE4, AE8-AE9, AE14。
 - **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-graph-freshness.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-graph-freshness-ledger.schema.json`, `tests/unit/mcp-setup-workspace-freshness.test.js`; 修改 `skills/spec-mcp-setup/scripts/lib/facts.cjs`, `src/cli/helpers/setup-facts.js`, `docs/contracts/provider-readiness.md`, `docs/contracts/project-graph-consumption.md`。
 - **Approach:** 首次verified refresh建立registry-scoped source fingerprint；Git child组合HEAD/ref、dirty path和受影响内容hash，non-Git组合stable source inventory/content hash，workspace聚合child、registry、projection、Provider/parser版本。比较超出budget时标记unknown；pending overlap按project/path粒度决定direct-read降级。
 - **Test scenarios:**
@@ -559,7 +561,7 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U6. Add durable refresh-run coordination, atomic promotion, and recovery
 
 - **Goal:** 使长时多scope刷新可审计、可部分成功、可跨会话恢复，并保留上一份已验证snapshot。
-- **Requirements:** R21-R29, R32-R33, R38-R39；AE8-AE11, AE15-AE16。
+- **Requirements:** R21-R29, R32-R33, R38-R39；F4-F6；AE8-AE11, AE15-AE16。
 - **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-refresh-run.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-refresh-run.schema.json`, `tests/unit/mcp-setup-workspace-refresh.test.js`; 修改 `skills/spec-mcp-setup/scripts/lib/workspace-executor.cjs`, `skills/spec-mcp-setup/scripts/providers/codegraph.cjs`, `skills/spec-mcp-setup/scripts/providers/graphify.cjs`。
 - **Approach:** Plan阶段冻结requested scopes和authorization fingerprint；run逐项journal `planned/running/verifying/promoted/recovering/restored/action-required`。每个scope/provider使用lock、bounded timeout、staging/probe/promote；崩溃后recover先验证journal和paths，再恢复旧snapshot或继续安全步骤。取消只停止后续调度，当前步骤完成/超时后进入恢复。
 - **Test scenarios:**
@@ -574,7 +576,7 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
 ### U7. Implement query scope resolution, Provider invocation, and provenance packets
 
 - **Goal:** 从workspace根稳定选择最小充分scope，并把所有图谱候选路由回正确child源码。
-- **Requirements:** R7-R10, R14-R20, R35-R37；AE5-AE8, AE13-AE14, AE18。
+- **Requirements:** R7-R10, R14-R20, R35-R37；F2-F3；AE5-AE8, AE13-AE14, AE18。
 - **Files:** 新增 `skills/spec-mcp-setup/scripts/lib/workspace-query-scope.cjs`, `skills/spec-mcp-setup/scripts/lib/workspace-query-packet.cjs`, `skills/spec-mcp-setup/scripts/contracts/workspace-query-packet.schema.json`, `tests/unit/mcp-setup-workspace-query-scope.test.js`; 修改 `docs/contracts/project-graph-consumption.md`。
 - **Approach:** Resolver只处理cwd、explicit path/project、registry membership、ledger和Provider capabilities；输出child/fan-out/workspace candidates。Adapter显式传CodeGraph `projectPath`或经U0确认的CLI seam，Graphify显式传scope graph。Result mapper执行longest-root match、exclusion和containment检查，记录chosen scope receipt、accepted/rejected candidates与direct-read要求。
 - **Test scenarios:**
@@ -584,13 +586,13 @@ U0 与 U1 可以并行，但 U0 未通过时只能交付 registry/read-only scop
   4. Workspace结果映射到两个child并分别回源；unmapped/excluded ref被拒绝。
   5. stale-for-scope overlap强制direct read；fresh且不overlap结果仍保持advisory。
 - **Verification:** 新query resolver suite；canonical packet schema与provider fixture probes；source-ref containment negative tests。
-- **Dependencies:** U5；workspace query还依赖U4，refresh-aware behavior依赖U6。
+- **Dependencies:** U4-U6。
 
 ### U8. Integrate consumers, five hosts, documentation, and mixed-workspace pilot
 
 - **Goal:** 让现有code-review consumer和五宿主真实消费统一图谱contract，并用真实workspace完成端到端验收。
-- **Requirements:** R10-R14, R19-R20, R31-R40；AE4-AE18；SC1-SC6。
-- **Files:** `docs/plans/2026-07-12-005-feat-spec-code-review-code-graph-advisory-integration-plan.md` 的后续实现引用面、`skills/spec-code-review/SKILL.md` 及其相关source-owned agent/reference assets、`skills/spec-mcp-setup/SKILL.md`, `skills/spec-mcp-setup/references/supported-mcp-tools.md`, `templates/`, `src/cli/`, `README.md`, `README.zh-CN.md`, `docs/contracts/project-graph-consumption.md`, 新增 `docs/validation/` pilot receipt，相关unit/smoke/integration tests。
+- **Requirements:** R10-R14, R19-R20, R31-R40；F1-F6；AE4-AE18；SC1-SC6。
+- **Files:** `docs/plans/2026-07-12-005-feat-spec-code-review-code-graph-advisory-integration-plan.md` 的后续实现引用面、`skills/spec-code-review/SKILL.md` 及其相关source-owned agent/reference assets、`skills/spec-mcp-setup/SKILL.md`, `skills/spec-mcp-setup/references/supported-mcp-tools.md`, `templates/claude/commands/spec/mcp-setup.md`, `src/cli/adapters/index.js`, `src/cli/adapters/platform-registry.js`, `src/cli/commands/doctor.js`, `README.md`, `README.zh-CN.md`, `docs/contracts/project-graph-consumption.md`, 新增 `docs/validation/` pilot receipt，`tests/unit/mcp-setup-entrypoint.test.js`, `tests/unit/mcp-setup-providers.test.js`, `tests/smoke/cli-smoke.test.js`, `tests/integration/init-five-host-lifecycle.integration.test.js`, `tests/integration/qoder-runtime-lifecycle.integration.test.js`。
 - **Approach:** Code review只消费query packet/readiness，不接管refresh；五宿主source projection共享canonical semantics并记录transport差异。运行`spec-first init`从source生成runtime mirrors；真实mixed workspace覆盖Git/non-Git child、registry exclusion、跨仓query、partial Provider、refresh interruption和source confirmation。Pilot同时记录时间、文件数、artifact size、query成功率和limitations。
 - **Test scenarios:**
   1. Code review从parent root选择正确child或workspace scope，finding仍绑定child source/Git evidence。

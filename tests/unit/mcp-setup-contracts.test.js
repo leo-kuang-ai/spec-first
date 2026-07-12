@@ -74,4 +74,17 @@ describe('spec-mcp-setup runner contracts', () => {
       detection: { args: ['-version'] },
     });
   });
+
+  test('裸完整 setup 自动修复 registry managed drift，子集修复仍需显式授权', () => {
+    const skill = fs.readFileSync(
+      path.join(repoRoot, 'skills', 'spec-mcp-setup', 'SKILL.md'),
+      'utf8',
+    );
+
+    expect(skill).toContain('Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`');
+    expect(skill).toContain('自动携带 `--repair-host-config` 重新 preview 并继续 apply');
+    expect(skill).toContain('Subset / Repair Flow');
+    expect(skill).toContain('Host conflict 仍需独立 `--repair-host-config` 授权');
+    expect(skill).not.toContain('只有用户明确要求自动修复时，才追加 `--repair-host-config`');
+  });
 });
