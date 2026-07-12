@@ -14,7 +14,8 @@
     "run_id",
     "run_dir",
     "artifact_count",
-    "artifacts"
+    "artifacts",
+    "cleanup_receipt"
   ],
   "properties": {
     "schema_version": { "const": "spec-app-consistency-audit-artifact-manifest.v1" },
@@ -26,6 +27,7 @@
     "run_id": { "type": "string", "minLength": 1 },
     "run_dir": { "type": "string", "minLength": 1 },
     "artifact_count": { "type": "number", "minimum": 0 },
+    "cleanup_receipt": { "type": ["object", "null"] },
     "artifacts": {
       "type": "array",
       "items": {

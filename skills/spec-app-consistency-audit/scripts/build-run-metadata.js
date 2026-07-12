@@ -17,6 +17,7 @@ const {
   publicPath,
   resolvePathAgainstRoot,
   resolveRepoRoot,
+  sourceInputFromFile,
   sourceInputFromFiles,
   writeJsonOutput,
 } = require('./lib/audit-utils');
@@ -53,18 +54,25 @@ function buildRunMetadata(options = {}) {
     skippedLargeFiles: source.skippedLargeFiles,
     skippedLargeFileCount: source.skippedLargeFileCount,
   });
+  const auxiliaryInputs = [];
+  if (options.prd) auxiliaryInputs.push(sourceInputFromFile('prd', resolvePathAgainstRoot(repoRoot, options.prd), repoRoot));
+  if (options.figmaContext) auxiliaryInputs.push(sourceInputFromFile('figma', resolvePathAgainstRoot(repoRoot, options.figmaContext), repoRoot));
   const worktreeFingerprint = hashText([
     headSha || 'no-head',
     options.base || '',
     diffHash,
     sourceInput.source_hash || sourceInput.source_hash_unavailable_reason || '',
   ].join('\n'));
+  const prepareFingerprint = hashText([
+    worktreeFingerprint,
+    ...auxiliaryInputs.map((input) => `${input.type}:${input.source_hash || input.source_hash_unavailable_reason || ''}`),
+  ].join('\n'));
 
   const metadata = {
     schema_version: 'spec-app-consistency-audit-metadata.v1',
     artifact_id: 'metadata',
     generated_at: generatedAt,
-    source_inputs: [sourceInput],
+    source_inputs: [sourceInput, ...auxiliaryInputs],
     consumers: ['parent-workflow', 'report-writer', 'artifact-consumers'],
     contract_status: 'candidate',
     data_sensitivity: 'internal',
@@ -80,6 +88,7 @@ function buildRunMetadata(options = {}) {
     worktree_state: gitText(repoRoot, ['status', '--porcelain']).trim() ? 'dirty' : 'clean',
     diff_hash: diffHash,
     worktree_fingerprint: worktreeFingerprint,
+    prepare_fingerprint: prepareFingerprint,
     untracked_policy: 'source_snapshot_includes_scanned_untracked',
     included_untracked_files: includedUntrackedFiles,
     generated_against: {
@@ -92,6 +101,7 @@ function buildRunMetadata(options = {}) {
     started_at: options.startedAt || generatedAt,
     status,
     status_reason_codes: [],
+    stage_receipts: [],
     contract_versions: {
       preflight: 'spec-app-consistency-audit-preflight.v1',
       impact_facts: 'spec-app-consistency-audit-impact-facts.v1',
@@ -153,6 +163,20 @@ function finalizeMetadata(options = {}) {
     }
     metadata.status_reason_codes = merged;
   }
+  if (Array.isArray(options.stageReceipts)) {
+    metadata.stage_receipts = options.stageReceipts;
+  }
+  fs.writeFileSync(options.metadataPath, `${JSON.stringify(metadata, null, 2)}\n`);
+  return metadata;
+}
+
+function appendStageReceipt(options = {}) {
+  const fs = require('node:fs');
+  const metadata = JSON.parse(fs.readFileSync(options.metadataPath, 'utf8'));
+  const receipts = Array.isArray(metadata.stage_receipts) ? metadata.stage_receipts : [];
+  const next = receipts.filter((entry) => entry.stage !== options.receipt.stage);
+  next.push(options.receipt);
+  metadata.stage_receipts = next;
   fs.writeFileSync(options.metadataPath, `${JSON.stringify(metadata, null, 2)}\n`);
   return metadata;
 }
@@ -187,4 +211,5 @@ module.exports = {
   buildLatestSummary,
   buildRunMetadata,
   finalizeMetadata,
+  appendStageReceipt,
 };

@@ -15,7 +15,13 @@ const {
 } = require('./lib/audit-utils');
 
 const { renderHeadlessFailureEnvelope } = require('./render-headless-envelope');
-const { buildLatestSummary, finalizeMetadata } = require('./build-run-metadata');
+const {
+  appendStageReceipt,
+  buildLatestSummary,
+  buildRunMetadata,
+  finalizeMetadata,
+} = require('./build-run-metadata');
+const { cleanupRunInputs } = require('./cleanup-run-inputs');
 
 const SCRIPTS_DIR = __dirname;
 
@@ -47,7 +53,7 @@ function runStep(label, args, cwd) {
 
 function helpText() {
   return [
-    'Usage: run-audit.js mode:headless base:<ref> [options]',
+    'Usage: run-audit.js [phase:prepare|phase:finalize|phase:abort] mode:headless base:<ref> [options]',
     '',
     'Required:',
     '  mode:headless                 v1 仅支持 headless mode (default/report-only 留待后续版本)',
@@ -95,12 +101,15 @@ function emitFailure(reasonCode, message, runId, output, upstreamEnvelope) {
 
 function parseRunnerArgs(argv) {
   const passthrough = [];
+  let phase = 'legacy';
   let rawIssues = null;
   let rawIssuesValueMissing = false;
   let help = false;
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
-    if (arg === '--help' || arg === '-h') {
+    if (/^phase:(prepare|finalize|abort)$/.test(arg)) {
+      phase = arg.slice('phase:'.length);
+    } else if (arg === '--help' || arg === '-h') {
       help = true;
     } else if (arg === '--raw-issues') {
       const next = argv[index + 1];
@@ -115,7 +124,50 @@ function parseRunnerArgs(argv) {
     }
   }
   const options = parseCommonArgs(passthrough);
-  return { options, rawIssues, rawIssuesValueMissing, help };
+  return { options, rawIssues, rawIssuesValueMissing, help, phase };
+}
+
+function stageReceipt(stage, artifactPath, inputHashes = [], options = {}) {
+  return {
+    stage,
+    producer_kind: 'deterministic_script',
+    input_hashes: inputHashes.filter(Boolean),
+    artifact_path: artifactPath,
+    status: options.status || 'complete',
+    reason_codes: options.reasonCodes || [],
+    limitations: options.limitations || [],
+    cleanup_state: options.cleanupState || 'not_applicable',
+    retention_state: options.retentionState || 'run_local',
+  };
+}
+
+function writeReceipt(runDir, name, receipt) {
+  const receiptDir = path.join(runDir, 'receipts');
+  fs.mkdirSync(receiptDir, { recursive: true });
+  fs.writeFileSync(path.join(receiptDir, `${name}.json`), `${JSON.stringify({
+    schema_version: 'spec-app-consistency-audit-stage-receipt.v1',
+    artifact_id: `${name}-receipt`,
+    generated_at: new Date().toISOString(),
+    source_inputs: [{ type: 'run_artifact', path: 'metadata.json', source_hash_unavailable_reason: 'recorded_in_receipt', freshness: 'current-run' }],
+    consumers: ['runner', 'artifact-consumers'],
+    contract_status: 'candidate',
+    data_sensitivity: 'internal',
+    ...receipt,
+  }, null, 2)}\n`);
+}
+
+function cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath }) {
+  const cleanup = cleanupRunInputs({ repoRoot, runDir: absoluteRunDir });
+  writeReceipt(absoluteRunDir, 'cleanup', cleanup);
+  if (metadataPath && fs.existsSync(metadataPath)) {
+    appendStageReceipt({ metadataPath, receipt: stageReceipt('cleanup', 'receipts/cleanup.json', [], {
+      reasonCodes: cleanup.reason_codes,
+      cleanupState: cleanup.cleanup_state,
+      retentionState: cleanup.retention_state,
+      limitations: cleanup.limitations,
+    }) });
+  }
+  return cleanup;
 }
 
 function isInsideOrSame(parentPath, childPath) {
@@ -213,12 +265,83 @@ function assertWritePathInsideBoundary({ boundaryRoot, parent, candidate, reason
   }
 }
 
+function validateSemanticBinding(stagedRawIssues, preparedMetadata) {
+  const input = JSON.parse(fs.readFileSync(stagedRawIssues, 'utf8'));
+  if (input.run_id !== preparedMetadata.run_id) {
+    throw boundaryError('semantic_run_id_mismatch', 'Staged semantic artifact run_id does not match prepared run.');
+  }
+  if (input.prepare_fingerprint !== preparedMetadata.prepare_fingerprint) {
+    throw boundaryError('semantic_prepare_fingerprint_mismatch', 'Staged semantic artifact does not match the prepared facts bundle.');
+  }
+  if (!input.producer_receipt || typeof input.producer_receipt.producer_kind !== 'string'
+    || input.producer_receipt.producer_kind.trim().length === 0) {
+    throw boundaryError('semantic_producer_receipt_required', 'Staged semantic artifact requires a producer receipt.');
+  }
+}
+
+function finalizePreparedRun(context) {
+  const {
+    options,
+    rawIssues,
+    repoRoot,
+    absoluteRunDir,
+    runId,
+    runIdToken,
+    artifacts,
+    sharedSourceFlags,
+    synthesisFlags,
+  } = context;
+  const stagedRawIssues = rawIssues
+    ? resolvePathAgainstRoot(repoRoot, rawIssues)
+    : path.join(absoluteRunDir, 'input', 'raw-issues.json');
+  let autoStubbed = false;
+  if (!fs.existsSync(stagedRawIssues)) {
+    if (options.issueSynthesisStatus === 'llm_provided' || options.issueSynthesisStatus === 'fixture_provided') {
+      throw boundaryError(
+        'issue_synthesis_status_without_input',
+        `--issue-synthesis-status ${options.issueSynthesisStatus} requires a staged raw-issues artifact.`,
+      );
+    }
+    fs.mkdirSync(path.dirname(stagedRawIssues), { recursive: true });
+    fs.writeFileSync(stagedRawIssues, `${JSON.stringify({ issues: [], rejected_issues: [] }, null, 2)}\n`);
+    autoStubbed = true;
+  }
+  if (!autoStubbed && (!options.issueSynthesisStatus || options.issueSynthesisStatus === 'not_run')) {
+    throw boundaryError(
+      'issue_synthesis_status_required_with_input',
+      'Staged raw-issues requires llm_provided or fixture_provided provenance.',
+    );
+  }
+  if (!autoStubbed) validateSemanticBinding(stagedRawIssues, context.preparedMetadata);
+  const effectiveSynthesisFlags = autoStubbed ? [] : synthesisFlags;
+  runStep('merge-contracts:issues', [
+    script('merge-contracts.js'),
+    '--issues-artifact',
+    '--issue', stagedRawIssues,
+    'from:code-review',
+    runIdToken,
+    ...effectiveSynthesisFlags,
+    '--output', artifacts.issues,
+  ], repoRoot);
+  runStep('merge-contracts:report', [
+    script('merge-contracts.js'),
+    ...sharedSourceFlags,
+    '--run-dir', absoluteRunDir,
+    runIdToken,
+    '--artifacts', artifacts.routes,
+    '--artifacts', artifacts.quality,
+    '--issue', artifacts.issues,
+    ...effectiveSynthesisFlags,
+    '--output', artifacts.report,
+  ], repoRoot);
+}
+
 function main(argv) {
   let runId = null;
   let envelopePath = null;
   let metadataPath = null;
   try {
-    const { options, rawIssues, rawIssuesValueMissing, help } = parseRunnerArgs(argv);
+    const { options, rawIssues, rawIssuesValueMissing, help, phase } = parseRunnerArgs(argv);
     if (help) {
       process.stdout.write(helpText());
       return;
@@ -316,7 +439,6 @@ function main(argv) {
 
     fs.mkdirSync(absoluteRunDir, { recursive: true });
     fs.mkdirSync(path.join(absoluteRunDir, 'contracts'), { recursive: true });
-    fs.mkdirSync(path.join(absoluteRunDir, 'input'), { recursive: true });
 
     const artifacts = {
       metadata: path.join(absoluteRunDir, 'metadata.json'),
@@ -343,6 +465,17 @@ function main(argv) {
       headlessEnvelope: envelopePath,
     };
 
+    if (phase === 'abort') {
+      if (!fs.existsSync(artifacts.metadata)) {
+        throw boundaryError('prepare_receipt_missing', 'phase:abort requires an existing prepared run.');
+      }
+      metadataPath = artifacts.metadata;
+      cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath });
+      finalizeMetadata({ metadataPath, status: 'failed', statusReasonCodes: ['run_aborted'] });
+      process.stdout.write(`App consistency audit aborted and ephemeral inputs cleaned (run-id: ${runId})\n`);
+      return;
+    }
+
     const sourceArg = options.source || repoRoot;
     const baseToken = `base:${options.base}`;
     const runIdToken = `run-id:${runId}`;
@@ -353,6 +486,57 @@ function main(argv) {
     const sharedSourceFlags = ['--source', sourceArg];
     const prdFlags = options.prd ? ['--prd', options.prd] : [];
     const figmaFlags = options.figmaContext ? ['--figma-context', options.figmaContext] : [];
+
+    if (phase === 'finalize') {
+      if (!fs.existsSync(artifacts.metadata) || !fs.existsSync(path.join(absoluteRunDir, 'receipts', 'prepare.json'))) {
+        throw boundaryError('prepare_receipt_missing', 'phase:finalize requires a facts-ready prepare receipt.');
+      }
+      metadataPath = artifacts.metadata;
+      try {
+        const preparedMetadata = JSON.parse(fs.readFileSync(artifacts.metadata, 'utf8'));
+        const currentMetadata = buildRunMetadata({ ...options, repoRoot, runId, runDir: absoluteRunDir, source: sourceArg });
+        if (currentMetadata.prepare_fingerprint !== preparedMetadata.prepare_fingerprint) {
+          throw boundaryError('source_fingerprint_stale', 'Source, PRD, Figma, or worktree changed after prepare; rerun phase:prepare.');
+        }
+        finalizePreparedRun({
+          options,
+          rawIssues,
+          repoRoot,
+          absoluteRunDir,
+          runId,
+          runIdToken,
+          artifacts,
+          sharedSourceFlags,
+          synthesisFlags,
+          preparedMetadata,
+        });
+        cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath });
+        const reportArtifact = JSON.parse(fs.readFileSync(artifacts.report, 'utf8'));
+        const degraded = Array.isArray(reportArtifact.scope_and_degraded_modes) ? reportArtifact.scope_and_degraded_modes : [];
+        const finalizeReceipt = stageReceipt('finalize', 'audit-report.json', [preparedMetadata.worktree_fingerprint], {
+          reasonCodes: reportArtifact.issue_synthesis_status === 'not_run' ? ['semantic_stage_not_run'] : [],
+          limitations: reportArtifact.issue_synthesis_status === 'not_run' ? ['No staged semantic artifact was available; zero issues is not a pass.'] : [],
+        });
+        writeReceipt(absoluteRunDir, 'finalize', finalizeReceipt);
+        appendStageReceipt({ metadataPath, receipt: finalizeReceipt });
+        finalizeMetadata({
+          metadataPath,
+          status: degraded.length > 0 ? 'degraded' : 'complete',
+          statusReasonCodes: degraded.map((entry) => entry && entry.code).filter(Boolean),
+          stageReceipts: JSON.parse(fs.readFileSync(metadataPath, 'utf8')).stage_receipts,
+        });
+        runStep('build-audit-context', [script('build-audit-context.js'), '--artifacts-dir', absoluteRunDir, '--output', artifacts.context], repoRoot);
+        const metadata = JSON.parse(fs.readFileSync(artifacts.metadata, 'utf8'));
+        fs.writeFileSync(artifacts.latestSummary, `${JSON.stringify(buildLatestSummary(metadata), null, 2)}\n`);
+        runStep('build-artifact-manifest', [script('build-artifact-manifest.js'), '--run-dir', absoluteRunDir, runIdToken, '--output', artifacts.manifest], repoRoot);
+        runStep('render-headless-envelope', [script('render-headless-envelope.js'), '--metadata', artifacts.metadata, '--report', artifacts.report, '--output', artifacts.headlessEnvelope], repoRoot);
+        process.stdout.write(`App consistency audit finalize complete (run-id: ${runId})\n`);
+        return;
+      } catch (error) {
+        cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath });
+        throw error;
+      }
+    }
 
     runStep('build-run-metadata', [
       script('build-run-metadata.js'),
@@ -487,12 +671,36 @@ function main(argv) {
       '--output', artifacts.merged,
     ], repoRoot);
 
+    if (phase === 'prepare') {
+      runStep('build-audit-context', [
+        script('build-audit-context.js'),
+        '--artifacts-dir', absoluteRunDir,
+        '--output', artifacts.context,
+      ], repoRoot);
+      const preparedMetadata = JSON.parse(fs.readFileSync(artifacts.metadata, 'utf8'));
+      const receipt = stageReceipt('prepare', 'app-audit-context.json', [
+        preparedMetadata.prepare_fingerprint,
+        preparedMetadata.diff_hash,
+      ], {
+        reasonCodes: ['facts_ready'],
+        limitations: ['Semantic artifact production is host-owned and has not run yet.'],
+      });
+      writeReceipt(absoluteRunDir, 'prepare', receipt);
+      appendStageReceipt({ metadataPath: artifacts.metadata, receipt });
+      fs.mkdirSync(path.join(absoluteRunDir, 'input'), { recursive: true });
+      process.stdout.write(`Facts ready (run-id: ${runId})\n`);
+      process.stdout.write(`Run dir: ${publicPath(repoRoot, absoluteRunDir, 'run-outside-repo')}\n`);
+      return;
+    }
+
     const stagedRawIssues = rawIssues
       ? resolvePathAgainstRoot(repoRoot, rawIssues)
       : path.join(absoluteRunDir, 'input', 'raw-issues.json');
     let autoStubbed = false;
     if (!fs.existsSync(stagedRawIssues)) {
       if (options.issueSynthesisStatus === 'llm_provided' || options.issueSynthesisStatus === 'fixture_provided') {
+        cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath: artifacts.metadata });
+        finalizeMetadata({ metadataPath: artifacts.metadata, status: 'failed', statusReasonCodes: ['issue_synthesis_status_without_input'] });
         emitFailure(
           'issue_synthesis_status_without_input',
           `--issue-synthesis-status ${options.issueSynthesisStatus} 需要 staged raw-issues 文件;runner 不会自动生成 LLM verdict。`,
@@ -506,6 +714,8 @@ function main(argv) {
       autoStubbed = true;
     }
     if (!autoStubbed && (!options.issueSynthesisStatus || options.issueSynthesisStatus === 'not_run')) {
+      cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath: artifacts.metadata });
+      finalizeMetadata({ metadataPath: artifacts.metadata, status: 'failed', statusReasonCodes: ['issue_synthesis_status_required_with_input'] });
       emitFailure(
         'issue_synthesis_status_required_with_input',
         'Staged raw-issues 文件存在时,必须显式提供 --issue-synthesis-status (llm_provided 或 fixture_provided);runner 不会替调用方判断 issue 来源。',
@@ -551,6 +761,8 @@ function main(argv) {
       status: finalStatus,
       statusReasonCodes: finalReasonCodes,
     });
+
+    cleanupAndRecord({ repoRoot, absoluteRunDir, metadataPath: artifacts.metadata });
 
     runStep('build-audit-context', [
       script('build-audit-context.js'),

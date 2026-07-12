@@ -46,6 +46,40 @@ missing/out-of-range values with `issue_synthesis_status_required` /
 It is a subprocess orchestrator only — it never invents issues, never calls an LLM, and
 never fetches remote Figma/PRD assets.
 
+### Two-phase lifecycle
+
+`phase:prepare` executes steps 1–9, then builds `app-audit-context.json` and
+`receipts/prepare.json`. It leaves metadata at `status: started`, creates the bounded
+`input/` staging directory, and emits `Facts ready`; it does not write `issues.json`,
+`audit-report.json`, a final envelope, or a completion verdict.
+
+After a host-owned semantic pass optionally stages `input/raw-issues.json`,
+`phase:finalize` compares the current source/worktree fingerprint with the prepare
+metadata. A mismatch fails closed as `source_fingerprint_stale`. An unchanged retry
+reuses the prepared facts. Finalize then executes issue/report assembly, cleanup,
+metadata finalization, final context/summary/manifest, and envelope rendering. Missing
+semantic input maps to the compatibility value `issue_synthesis_status:not_run`.
+
+A provided semantic artifact must bind to the prepared facts bundle:
+
+```json
+{
+  "run_id": "same-run-id",
+  "prepare_fingerprint": "sha256:from-metadata",
+  "producer_receipt": { "producer_kind": "host_llm" },
+  "issues": [],
+  "rejected_issues": []
+}
+```
+
+Finalize rejects run/fingerprint mismatch or a missing producer receipt. The prepare
+fingerprint covers code/worktree plus materialized PRD and Figma inputs.
+
+Both `phase:finalize` failure closeout and `phase:abort` run
+`cleanup-run-inputs.js`. Cleanup removes run-local `input/` content, is idempotent, and
+records `receipts/cleanup.json`; it cannot erase host-agent transcripts. The phase-less
+command remains the compatibility facade for existing callers.
+
 v1 commitment: the runner accepts `mode:headless` only. Passing `mode:default` or
 `mode:report-only` returns a `mode_unsupported` failed envelope. `mode:headless`
 requires `base:<git-ref>`; missing it returns `scope_headless_missing_base`.

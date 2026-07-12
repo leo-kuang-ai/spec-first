@@ -26,6 +26,8 @@ function buildArtifactManifest(options = {}) {
     .filter((filePath) => !new Set(['artifact-manifest.json', 'latest-summary.json']).has(path.basename(filePath)));
   const artifacts = files.map((filePath) => artifactEntry(runDir, filePath));
   const degradedReasonCodes = unique(artifacts.flatMap((entry) => entry.degraded_reason_codes || []));
+  const cleanupPath = path.join(runDir, 'receipts', 'cleanup.json');
+  const cleanupReceipt = fs.existsSync(cleanupPath) ? readJson(cleanupPath) : null;
 
   return {
     schema_version: 'spec-app-consistency-audit-artifact-manifest.v1',
@@ -47,6 +49,13 @@ function buildArtifactManifest(options = {}) {
     artifact_count: artifacts.length,
     artifacts,
     degraded_reason_codes: degradedReasonCodes,
+    cleanup_receipt: cleanupReceipt ? {
+      path: 'receipts/cleanup.json',
+      status: cleanupReceipt.status,
+      reason_codes: cleanupReceipt.reason_codes || [],
+      cleanup_state: cleanupReceipt.cleanup_state,
+      retention_state: cleanupReceipt.retention_state,
+    } : null,
   };
 }
 

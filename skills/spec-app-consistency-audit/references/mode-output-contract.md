@@ -91,6 +91,15 @@ must validate it against `metadata.json` before trusting any run artifact. The
 `issue_synthesis_status` enum (`not_run` / `llm_provided` / `fixture_provided`) are
 enforced by `validate-artifacts.js` and explained in `headless-runner.md`.
 
+Two-phase runs additionally write `receipts/prepare.json`,
+`receipts/finalize.json`, and `receipts/cleanup.json`. Receipts record producer kind,
+input hashes, artifact path, status, reason codes, limitations, and retention/cleanup
+state. They bound recovery and completion claims; they are not a workflow state
+machine. Raw excerpts, staged model inputs/outputs, and transient prompt context belong
+under `input/` with ephemeral retention and are removed on finalize or abort. Normalized
+redacted contracts remain run-local. Host transcript retention is outside this cleanup
+boundary.
+
 Do not write new artifacts to the legacy flat `.spec-first/app-audit/` path. Legacy
 flat paths may be read only for migration compatibility tests.
 

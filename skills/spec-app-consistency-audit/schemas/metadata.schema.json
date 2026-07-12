@@ -18,6 +18,7 @@
     "diff_hash",
     "diff_scope_kind",
     "worktree_fingerprint",
+    "prepare_fingerprint",
     "coverage_capabilities",
     "input_expectations",
     "audit_verdict_scope",
@@ -26,7 +27,8 @@
     "issues_path",
     "status",
     "status_reason_codes",
-    "started_at"
+    "started_at",
+    "stage_receipts"
   ],
   "properties": {
     "schema_version": { "const": "spec-app-consistency-audit-metadata.v1" },
@@ -40,6 +42,9 @@
     "status": { "enum": ["started", "complete", "degraded", "failed"] },
     "status_reason_codes": { "type": "array", "items": { "type": "string" } },
     "started_at": { "type": "string" },
+    "stage_receipts": { "type": "array", "items": { "type": "object" } },
+    "worktree_fingerprint": { "type": "string", "minLength": 1 },
+    "prepare_fingerprint": { "type": "string", "minLength": 1 },
     "diff_scope_kind": { "enum": ["git_diff", "working_tree", "source_snapshot"] },
     "coverage_capabilities": { "type": "object" },
     "input_expectations": { "type": "object" }
