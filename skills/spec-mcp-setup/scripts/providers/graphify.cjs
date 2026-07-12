@@ -93,7 +93,7 @@ function plan(context = {}) {
   if (isSpecFirstSourceRepo(repoRoot)) {
     nonActions.push('不得在 spec-first source repo 中 normalize 或重写 source-owned AGENTS.md/CLAUDE.md。');
   }
-  nonActions.push('不得自动运行 npm uninstall -g、删除 graphify-out/ 或改写原始 PATH command。');
+  nonActions.push('不得在Python Provider未完整verified前卸载npm incumbent；不得删除graphify-out/或改写非npm-owned PATH command。');
   const actions = [];
   const resolvedDependency = context.probeDependency === true
     ? resolveGraphifyCommand(context, repoRoot, context.dependency && context.dependency.version)
@@ -168,7 +168,7 @@ function plan(context = {}) {
     original_path_graphify_command: resolvedDependency.original_path_command || null,
     incumbent_state: resolvedDependency.collision_state || 'none',
     incumbent_cleanup_action: resolvedDependency.collision_state === 'npm-incumbent'
-      ? '确认其他项目不再依赖后，显式运行 npm uninstall -g @sentropic/graphify；否则保留并继续使用 verified absolute Python launcher。'
+      ? 'Python Provider完整verified后，setup默认移除已确认归属@sentropic/graphify的全局npm incumbent与旧launcher symlink。'
       : null,
     mutation: true,
     blocked: false,
@@ -488,6 +488,12 @@ function apply(context = {}, actionPlan = plan(context)) {
     ? pythonHostIntegrationConfigured(repoRoot, context.host, runtimeContext).ok
     : projectSkillConfigured(repoRoot, context.host));
   if (!mutationFailure && !configured) mutationFailure = 'graphify-project-skill-post-probe-failed';
+  let incumbentCleanup = { status: 'not-needed', reason_code: null };
+  if (!mutationFailure && pythonProvider && runtimeContext.graphifyCollisionState === 'npm-incumbent') {
+    incumbentCleanup = cleanupNpmGraphifyIncumbent(runtimeContext, repoRoot);
+    if (!incumbentCleanup.ok) mutationFailure = incumbentCleanup.reason_code;
+    else runtimeContext = { ...runtimeContext, graphifyCollisionState: 'none', graphifyOriginalPathCommand: null };
+  }
   const degraded = Boolean(mutationFailure) || !hasArtifact || !queryVerified || (gitState.is_git_repo && !hookVerified);
   const nextActions = [];
   if (mutationFailure) nextActions.push(`检查 ${mutationFailure} 的 Graphify diagnostic，并重新运行显式 setup。`);
@@ -511,7 +517,7 @@ function apply(context = {}, actionPlan = plan(context)) {
     artifactRefs,
     limitations: mutationFailure
       ? [providerLimitation('failed', mutationFailure, 'Graphify setup 失败。')]
-      : pythonProviderLimitations(runtimeContext, graphIntegrity),
+      : pythonProviderLimitations(runtimeContext, graphIntegrity, incumbentCleanup),
     nextActions,
     hookInstalled,
     hookVerified,
@@ -670,8 +676,11 @@ function resolvePythonGraphifyCommand(context, repoRoot, dependency) {
       if (isExecutableCommandFile(candidate, windows) && !candidates.includes(candidate)) candidates.push(candidate);
     }
   }
+  const managedEnvironment = resolveManagedToolEnvironment(context, repoRoot, manager.kind, dependency.package);
+  if (managedEnvironment && isExecutableCommandFile(managedEnvironment.launcher, windows)
+    && !candidates.includes(managedEnvironment.launcher)) candidates.push(managedEnvironment.launcher);
   let mismatch = false;
-  const managedInterpreter = resolveManagedToolInterpreter(context, repoRoot, manager.kind, dependency.package);
+  const managedInterpreter = managedEnvironment && managedEnvironment.interpreter;
   for (const candidate of candidates) {
     const identity = probePythonDistributionIdentity(
       context,
@@ -918,7 +927,7 @@ function hasSupportedCodeFile(workspace) {
   return visit(workspace);
 }
 
-function pythonProviderLimitations(runtimeContext, graphIntegrity) {
+function pythonProviderLimitations(runtimeContext, graphIntegrity, incumbentCleanup) {
   if (!runtimeContext || !runtimeContext.graphifyInstaller) return undefined;
   const limitations = [
     `verified Python Provider: installer=${runtimeContext.graphifyInstaller}, interpreter=${runtimeContext.graphifyInterpreter || 'unknown'}, launcher=${runtimeContext.graphifyCommand}.`,
@@ -932,6 +941,9 @@ function pythonProviderLimitations(runtimeContext, graphIntegrity) {
     limitations.push('degraded visibility: 原始 PATH 中存在其他 graphify command；setup 使用 verified absolute Python launcher。');
   }
   if (graphIntegrity && graphIntegrity.empty_corpus) limitations.push('degraded capability: workspace 没有 Provider 支持的代码文件，生成空 code graph。');
+  if (incumbentCleanup && incumbentCleanup.status === 'removed') {
+    limitations.push(`migration cleanup: 已移除 ${incumbentCleanup.package}@${incumbentCleanup.version} 与确认归属该package的旧launcher symlink。`);
+  }
   return limitations;
 }
 
@@ -1005,7 +1017,7 @@ function resolveToolBinDirectories(context, repoRoot, homeDir, command, args) {
   return [...new Set([reported, path.join(homeDir, '.local', 'bin')].filter(Boolean))];
 }
 
-function resolveManagedToolInterpreter(context, repoRoot, manager, packageName) {
+function resolveManagedToolEnvironment(context, repoRoot, manager, packageName) {
   const windows = context.platform === 'windows' || process.platform === 'win32';
   const query = manager === 'uv'
     ? ['uv', ['tool', 'dir']]
@@ -1022,10 +1034,17 @@ function resolveManagedToolInterpreter(context, repoRoot, manager, packageName) 
   const environmentRoot = manager === 'uv'
     ? pathApi.resolve(root, packageName)
     : pathApi.resolve(root, 'venvs', packageName);
-  const candidates = windows
+  const interpreterCandidates = windows
     ? [pathApi.join(environmentRoot, 'Scripts', 'python.exe'), pathApi.join(environmentRoot, 'python.exe')]
     : [pathApi.join(environmentRoot, 'bin', 'python')];
-  return candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0] || null;
+  const launcherCandidates = windows
+    ? [pathApi.join(environmentRoot, 'Scripts', 'graphify.exe'), pathApi.join(environmentRoot, 'Scripts', 'graphify.cmd')]
+    : [pathApi.join(environmentRoot, 'bin', 'graphify')];
+  return {
+    root: environmentRoot,
+    interpreter: interpreterCandidates.find((candidate) => fs.existsSync(candidate)) || interpreterCandidates[0] || null,
+    launcher: launcherCandidates.find((candidate) => fs.existsSync(candidate)) || launcherCandidates[0] || null,
+  };
 }
 
 function probePythonDistributionIdentity(context, repoRoot, launcher, dependency, fallbackInterpreter) {
@@ -1095,6 +1114,81 @@ function graphifyProcessEnv(context, additions = {}) {
   }
   env.GRAPHIFY_OUT = additions && additions.GRAPHIFY_OUT ? additions.GRAPHIFY_OUT : '.graphify';
   return env;
+}
+
+function cleanupNpmGraphifyIncumbent(context, repoRoot) {
+  const packageName = '@sentropic/graphify';
+  const list = run(context, 'npm', ['list', '-g', packageName, '--depth=0', '--json'], {
+    cwd: repoRoot,
+    timeoutMs: 30000,
+    env: graphifyProcessEnv(context),
+    inheritEnv: false,
+  });
+  if (!succeeded(list)) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-identity-unverified' };
+  let installedVersion;
+  try {
+    installedVersion = JSON.parse(text(list)).dependencies[packageName].version;
+  } catch (_error) {
+    return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-identity-unverified' };
+  }
+  if (!installedVersion) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-identity-unverified' };
+  const rootResult = run(context, 'npm', ['root', '-g'], {
+    cwd: repoRoot,
+    timeoutMs: 10000,
+    env: graphifyProcessEnv(context),
+    inheritEnv: false,
+  });
+  const npmRoot = succeeded(rootResult) ? firstAbsoluteLine(text(rootResult)) : null;
+  if (!npmRoot) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-root-unverified' };
+  const packageRoot = path.resolve(npmRoot, '@sentropic', 'graphify');
+  if (!fs.existsSync(packageRoot)) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-root-unverified' };
+  const packageRealpath = fs.realpathSync.native(packageRoot);
+  const originalCommand = context.graphifyOriginalPathCommand;
+  let originalRealpath;
+  try {
+    originalRealpath = originalCommand ? fs.realpathSync.native(originalCommand) : null;
+  } catch (_error) {
+    return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-launcher-unverified' };
+  }
+  if (!originalRealpath || !isPathWithin(originalRealpath, packageRealpath)) {
+    return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-launcher-unverified' };
+  }
+  const staleLinks = [];
+  const homeDir = path.resolve(context.homeDir || os.homedir());
+  for (const name of ['graphify', 'graphify.cmd', 'graphify.exe']) {
+    const candidate = path.join(homeDir, '.local', 'bin', name);
+    const item = lstatOrNull(candidate);
+    if (!item || !item.isSymbolicLink()) continue;
+    try {
+      const realpath = fs.realpathSync.native(candidate);
+      if (isPathWithin(realpath, packageRealpath)) staleLinks.push({ path: candidate, target: fs.readlinkSync(candidate) });
+    } catch (_error) {
+      return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-symlink-unverified' };
+    }
+  }
+  const removed = run(context, 'npm', ['uninstall', '-g', packageName], {
+    cwd: repoRoot,
+    timeoutMs: 120000,
+    env: graphifyProcessEnv(context),
+    inheritEnv: false,
+  });
+  if (!succeeded(removed)) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-uninstall-failed' };
+  for (const stale of staleLinks) {
+    const item = lstatOrNull(stale.path);
+    if (!item) continue;
+    if (!item.isSymbolicLink() || fs.readlinkSync(stale.path) !== stale.target) {
+      return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-symlink-changed' };
+    }
+    fs.rmSync(stale.path);
+  }
+  return {
+    ok: true,
+    status: 'removed',
+    reason_code: 'graphify-npm-incumbent-removed',
+    package: packageName,
+    version: installedVersion,
+    removed_symlinks: staleLinks.map((entry) => entry.path),
+  };
 }
 
 function providerOriginalPath(context) {
@@ -1229,7 +1323,7 @@ function graphifyPathVisibilityAction(runtimeContext, pathRepair) {
   if (pathRepair && pathRepair.status === 'repaired') return null;
   const command = runtimeContext.graphifyCommand;
   if (runtimeContext.graphifyCollisionState === 'npm-incumbent') {
-    return 'Python Graphify 已通过 absolute launcher 验证；确认其他项目不再依赖后，可显式运行 npm uninstall -g @sentropic/graphify，setup 不会自动卸载。';
+    return '重新运行Graphify mutation setup；Python Provider完整verified后会清理已确认归属npm incumbent的全局package与旧launcher symlink。';
   }
   if (!path.isAbsolute(command)) {
     return '让 pinned Graphify CLI 在原始 PATH 中可见，然后重新运行显式 setup。';
@@ -1932,6 +2026,7 @@ function unsafeReadiness(context, repoRoot, reasonCode) {
 
 module.exports = {
   apply,
+  cleanupNpmGraphifyIncumbent,
   graphifyProcessEnv,
   normalizePythonHostIntegration,
   normalizePythonGraphifyHooks,

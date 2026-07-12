@@ -12,9 +12,9 @@ execution: code
 
 ## Goal Capsule
 
-- **Objective:** 让 `spec-code-review` 默认以 `code-graph:auto` 在正确 scope、可信 readiness 和可回源证据边界内消费候选，由 LLM 判断当前 diff 是否值得查询，并提升跨文件影响面发现与 reviewer 覆盖，而不把外部图谱升级为 finding、测试覆盖或 merge authority。
+- **Objective:** 让 `spec-code-review` 在 Git 已确定直接改动范围后，默认使用可用且对齐的 `code-graph` 生成结构化影响链路与影响范围，补强 reviewer selection、persona 审查上下文和集体覆盖检查，而不把外部图谱升级为 finding、测试覆盖或 merge authority。
 - **Authority hierarchy:** `docs/10-prompt/结构化项目角色契约.md` 与 `docs/contracts/project-graph-consumption.md` 高于本计划；Stage 1 Git scope、source/test/log/contract evidence 高于 provider 输出；setup facts 只拥有 readiness 事实。
-- **Execution profile:** 首版默认 `code-graph:auto`，并提供 `on/off` 显式覆盖。先用当前 provider 的只读 native surface 运行不发布的 paired pilot，校准 LLM 自动触发判据、预算和降级边界并确定 capability-to-invocation contract；只有安全/可调用性 gate 得出 `go`，才交付 provider-neutral thin slice。效果证据不足不阻止 `auto` 首版，但必须限制完整 challenger/validator 投资，并保留 thin-out/retire 路径。
+- **Execution profile:** 不新增 `auto/on/off` 产品模式。对于本地、readiness 可信且 graph index 对齐的 review，Stage 2 后默认执行一次只读、minimal、bounded change-to-impact query；LLM 基于该 packet 决定是否继续 callers/flows/tests 等定向扩展。图谱不可用或 scope 不对齐时自动回退现有 source/diff review。先用 paired pilot 校准 packet、预算和降级边界，效果证据不足时只交付 minimal integration，不扩张 challenger/validator 投资。
 - **Stop conditions:** 若实现要求在 review 内安装、初始化、刷新 provider，允许图谱提高 finding confidence，或让远程 PR 消费当前 checkout 图谱，则停止对应实现并回到契约层修正。
 - **Tail ownership:** source skill、skill-local prompt/schema、contract tests 与 README 由本仓库维护；provider installation、index、watcher 与 host MCP config 继续由 `spec-mcp-setup` 和 provider-native lifecycle 拥有。
 
@@ -47,14 +47,14 @@ execution: code
 
 **候选上下文**
 
-- R5. `code-graph:auto` 时，orchestrator 应在确定性 gate 通过后，由 LLM 根据 Stage 1 diff signals、Stage 2 intent 与 reviewer selection 判断是否发起一次有预算上限的 impact-oriented query；`on` 强制尝试查询，`off` 完全禁用。LLM 只能判断语义适用性，不能猜测 readiness、scope 或 alignment 事实。
+- R5. 确定性 gate 通过后，orchestrator 必须复用 Stage 1 Git scope 和 Stage 2 intent 发起一次 minimal、bounded change-to-impact query；是否继续查询 callers、flows、tests、inheritance 或更深 impact 由 LLM 根据 minimal packet 的具体候选决定。LLM 不负责猜测 readiness、scope 或 alignment 事实。
 - R6. Run-scoped context packet 必须区分 provider readiness、reviewed-tree alignment、graph-index alignment、查询摘要、带稳定 candidate ID 的 source refs/关系候选、未映射/截断/歧义和 direct-source confirmation 状态。
 - R7. 图谱候选只能扩大下一步读取范围或影响 reviewer 注意力，不能排除 changed files、缩小 Git review scope、证明 affected tests 完整或生成 merge verdict。
 - R8. Provider 返回的带文件与行号的 verbatim source 可按图谱消费契约作为 bounded direct read 使用；推导出的 edge、risk、flow、ownership 和 affected-test 仍保持 advisory。
 
 **Reviewer 与 coverage**
 
-- R9. Stage 3 可把图谱候选作为增加 conditional reviewer 的语义输入，但不能仅凭 provider risk score 设置 severity、confidence 或删除 always-on reviewer。
+- R9. Stage 3 必须把 source-confirmable 的图谱影响候选作为增加 conditional reviewer 和阻止错误 lite-roster 的语义输入，但不能仅凭 provider risk score 设置 severity、confidence、删除 always-on reviewer，或因空/失败结果放宽 Stage 3c。
 - R10. Stage 4 应按 persona 裁剪 code-graph hints，避免把完整 provider response 广播给所有 reviewer。
 - R11. 新增的 `impact-coverage-challenger` 只能输出 coverage challenges、source refs 和建议补审 persona，不得输出 P0-P3、finding confidence、autofix 或 verdict。
 - R12. Challenger 仅在图谱可用、跨文件候选具体且现有 reviewer evidence 未覆盖关键候选时触发；每轮补审请求必须有上限。
@@ -65,14 +65,14 @@ execution: code
 
 - R15. Default 与 `mode:agent` 必须在 Coverage 中记录 code-graph 是否启用、readiness、query/fallback 状态、候选接受/拒绝数量、补审数量和 limitations。
 - R16. Run artifact 目录应保存 code-graph context packet 与 coverage challenge artifact；`mode:agent` 主 JSON 保持单对象、可解析且不增加第二套 finding schema。
-- R17. 首版默认 `code-graph:auto`，同时支持 `code-graph:on` 与 `code-graph:off`。Auto 只在 LLM 判断存在跨文件/共享接口/异步链路/继承/测试定位等高价值信号且确定性 gate 通过时查询；否则跳过并记录原因。Comparative/field evidence 用于调整 auto 判据、预算、challenger 投资与保留/退役决策，而不是作为默认 auto 的前置产品审批。
+- R17. Graph consumption 不新增 review-time mode 参数：本地 eligibility gate 通过即运行 minimal query；gate 不通过即响亮 fallback。Comparative/field evidence 用于调整 minimal packet、深查预算、challenger 投资与保留/退役决策，不得把一次查询是否执行交给未获得影响信息前的 LLM 预判。
 - R18. `code-review-graph` 首版只作为能力与评估参考；实现复用当前 setup 已管理的 provider-neutral `code-graph` capability，不新增第二个 required provider、数据库或 runtime truth source。
 
 ### Key Flows
 
-- F1. Local review with auto-selected code graph
-  - **Trigger:** 默认 `code-graph:auto` 下，Stage 1 确认 standalone、`base:` 或 `local-aligned`，确定性 gate 通过，且 LLM 根据 diff/intent 判断跨文件图谱导航有价值；`code-graph:on` 可强制尝试同一路径。
-  - **Steps:** 读取 setup facts → 选择 `code-graph` readiness entry → 发起 bounded query → 生成 context packet → 按 persona 注入 hints → 必要时运行 challenger → source-confirmed findings 进入现有 Stage 5/5b。
+- F1. Local review with graph-first impact context
+  - **Trigger:** Stage 1 确认 standalone、`base:` 或 `local-aligned`，且 readiness、invocation 与 graph-index alignment gate 通过。
+  - **Steps:** Stage 1 确定 Git changed files/lines → Stage 2 理解 intent → Stage 2d 默认发起一次 minimal change-to-impact query → 生成 context packet → LLM 必要时扩展 callers/flows/tests → Stage 3 用候选补 reviewer coverage → Stage 4 按 persona 注入 hints → 必要时运行 challenger → source-confirmed findings 进入现有 Stage 5/5b。
   - **Outcome:** 图谱扩展检查面，但 finding authority 与验证规则保持不变。
   - **Covers:** R1-R16
 
@@ -94,22 +94,21 @@ execution: code
   - **Outcome:** 漏审风险被挑战，但 challenger 不成为 finding producer。
   - **Covers:** R11-R14
 
-- F5. Auto mode skips a low-value graph query
-  - **Trigger:** 默认 `code-graph:auto`，确定性 gate 可通过，但 diff 为单文件、局部、关系清晰且无共享接口/异步/继承/跨模块/test-location 信号。
-  - **Steps:** LLM 记录简短 skip reason → 不运行 query/challenger → 继续现有 diff/source review。
-  - **Outcome:** 保留默认自动能力，同时避免参考项目已承认的小变更 graph metadata 开销。
-  - **Covers:** R5, R15, R17
+- F5. Minimal graph context is sufficient
+  - **Trigger:** Stage 2d minimal query 返回局部、低影响候选，没有具体跨文件 consumer、flow、inheritance 或 test-location 扩展价值。
+  - **Steps:** 保留 minimal packet → LLM 不发起深层 graph query/challenger → reviewer 继续检查 changed code 与必要 source context。
+  - **Outcome:** 每次 eligible review 都获得相同的低成本影响探针，同时避免无条件运行完整 blast-radius workflow。
+  - **Covers:** R5, R7, R15, R17
 
 ### Acceptance Examples
 
-- AE1. Given `code-graph:on`、fresh setup facts 和 local-aligned scope, when query 返回某公共函数的三个 callers, then API reviewer 收到这些 caller 的候选 refs，并在读取源码后才可形成 finding。
-- AE1a. Given 默认 `code-graph:auto`、fresh/aligned readiness 和跨模块公共 API 变更, when Stage 2 intent 与 diff signals 表明 blast radius 不透明, then LLM 选择 bounded graph query，并记录 auto trigger reason。
-- AE2. Given `code-graph:on` 但 scope 为 `pr-remote`, when review starts, then code-graph query 不运行，Coverage 记录 scope mismatch，review 继续完成。
+- AE1. Given fresh/aligned readiness 和 local-aligned scope, when minimal query 返回某公共函数的三个 callers, then API reviewer 收到这些 caller 的候选 refs，并在读取源码后才可形成 finding。
+- AE2. Given scope 为 `pr-remote`, when review starts, then当前 checkout 的 code-graph query 不运行，Coverage 记录 scope mismatch，review 继续完成。
 - AE3. Given provider 返回“未发现测试”, when testing reviewer 查到集成测试覆盖, then不得产生 missing-test finding，并把该 graph candidate 记录为 rejected。
 - AE4. Given challenger 指出一个未检查 consumer, when targeted source read 证明 consumer 使用兼容 adapter, then challenge 被清除且不进入 findings。
 - AE5. Given provider query timeout, when full reviewer roster 可正常运行, then verdict 仅基于现有 source evidence，Coverage 记录 degraded fallback。
 - AE6. Given two agents 都消费同一 graph edge 并提出相同问题, when Stage 5 deduplicates results, then该共享 provider 信号不触发 cross-reviewer confidence promotion。
-- AE7. Given 默认 `code-graph:auto` 和一个单文件局部纯函数修改, when diff 与 intent 没有跨文件风险信号, then query 不运行，Coverage 记录 `auto-skipped: low expected value`，普通 reviewer roster 继续。
+- AE7. Given eligible 的单文件局部纯函数修改, when minimal query 未返回具体跨文件影响候选, then不运行深层 graph query 或 challenger，普通 reviewer roster 继续；空结果不证明无影响，也不单独启用 lite roster。
 
 ### Success Criteria
 
@@ -124,11 +123,11 @@ execution: code
 
 - `spec-code-review` 的 provider-neutral code-graph consumption、persona hints、coverage challenger、validator hint 与 Coverage/run artifacts。
 - 复用 `provider-readiness.v2`、`project-graph-consumption.v1` 与现有 CodeGraph MCP readiness。
-- 默认 `auto` 与显式 `on/off` 参数、contract tests、README/README.zh-CN 和 runtime projection expectations。
+- 默认 graph-first minimal consumption、contract tests、README/README.zh-CN 和 runtime projection expectations。
 
 **Deferred to Follow-Up Work**
 
-- 根据真实 pilot/field 结果调整 `auto` 触发判据、预算和 challenger 范围；不再把“是否默认 auto”留作 follow-up。
+- 根据真实 pilot/field 结果调整 minimal packet、深查预算和 challenger 范围。
 - 若当前 CodeGraph native surface 无法满足实际评估，再单独评审是否增加 `code-review-graph` provider adapter；该决策必须比较现有 provider、额外安装成本、license、host coverage 和维护责任。
 - 远程 PR 的 snapshot graph、临时 worktree graph 或 provider-side ref selection。
 
@@ -158,7 +157,7 @@ execution: code
 - KTD6. **Distribute hints by persona.** Orchestrator 将相同 packet 裁剪为 reviewer-specific candidate refs，reviewer 仍收到完整 diff 并保留自主 source inspection 权限。
 - KTD7. **One challenger, zero finding authority.** `impact-coverage-challenger` 只找 review coverage 差集；不拆分 flow/community/risk agents，避免同源伪共识。
 - KTD8. **Targeted re-review reuses existing finding schema.** Challenger 的 challenge 经 source confirmation 后，由既有 persona 或 orchestrator 产出标准 finding；challenger artifact 永不进入 agreement count。
-- KTD9. **Auto by default, explicit overrides.** 新增 provider-neutral 的 `code-graph:auto | on | off`；默认 `auto`，多个不同 token 冲突时 fail before dispatch。`auto` 的 LLM 判据参考 code-review-graph 的 graph-first/minimal-context 模式，但只在跨文件价值信号存在时调用，并受确定性 gate、调用次数、输出 token 与 challenge 数上限约束。
+- KTD9. **Graph-first minimal, LLM-directed depth.** 不新增 graph mode 参数。Eligibility gate 通过后固定运行一次 minimal change-to-impact query；LLM 只决定是否深入具体 callers/flows/tests/inheritance 候选。调用次数、输出 token、impact depth 与 challenge 数均有上限。
 
 ### High-Level Technical Design
 

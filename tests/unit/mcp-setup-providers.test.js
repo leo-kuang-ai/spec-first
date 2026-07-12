@@ -734,6 +734,46 @@ describe('Graphify provider', () => {
     expect(fs.existsSync(path.join(target, 'src', 'keep.js'))).toBe(true);
   });
 
+  test('removes a verified npm incumbent and only its owned stale launcher symlink', () => {
+    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const target = tempRepo('graphify-npm-cleanup');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-cleanup-home-'));
+    const prefix = path.join(target, 'npm-prefix');
+    const npmRoot = path.join(prefix, 'lib', 'node_modules');
+    const packageRoot = path.join(npmRoot, '@sentropic', 'graphify');
+    const packageCli = path.join(packageRoot, 'dist', 'cli.js');
+    const npmLauncher = path.join(prefix, 'bin', 'graphify');
+    const staleLauncher = path.join(homeDir, '.local', 'bin', 'graphify');
+    fs.mkdirSync(path.dirname(packageCli), { recursive: true });
+    fs.mkdirSync(path.dirname(npmLauncher), { recursive: true });
+    fs.mkdirSync(path.dirname(staleLauncher), { recursive: true });
+    fs.writeFileSync(packageCli, '#!/usr/bin/env node\n');
+    fs.symlinkSync(packageCli, npmLauncher);
+    fs.symlinkSync(npmLauncher, staleLauncher);
+    const runner = (command, args) => {
+      if (command === 'npm' && args[0] === 'list') {
+        return success(JSON.stringify({ dependencies: { '@sentropic/graphify': { version: '0.17.1' } } }));
+      }
+      if (command === 'npm' && args.join(' ') === 'root -g') return success(npmRoot);
+      if (command === 'npm' && args[0] === 'uninstall') {
+        fs.rmSync(npmLauncher, { force: true });
+        fs.rmSync(packageRoot, { recursive: true, force: true });
+        return success('removed');
+      }
+      return failure('unexpected');
+    };
+
+    expect(provider.cleanupNpmGraphifyIncumbent({
+      repoRoot: target,
+      homeDir,
+      graphifyOriginalPathCommand: staleLauncher,
+      env: { HOME: homeDir, PATH: path.dirname(staleLauncher) },
+      runner,
+    }, target)).toMatchObject({ ok: true, status: 'removed', version: '0.17.1' });
+    expect(fs.existsSync(staleLauncher)).toBe(false);
+    expect(fs.existsSync(packageRoot)).toBe(false);
+  });
+
   test('does not report signal-terminated Graphify probes as ready', () => {
     const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-signal');
