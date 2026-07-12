@@ -1,5 +1,6 @@
 ---
 title: Init Summary-First Output - Plan
+status: completed
 type: refactor
 date: 2026-07-12
 artifact_contract: spec-unified-plan/v1

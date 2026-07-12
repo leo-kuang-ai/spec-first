@@ -1,4 +1,13 @@
+---
+title: spec-first init 优化技术方案
+type: refactor
+status: completed
+date: 2026-07-09
+---
+
 # spec-first init 优化技术方案
+
+> **完成说明（2026-07-12）：** 当前批准范围已完成：Qoder Phase 0 按实测证据以 degraded delivery 收口，Phase 1–4 的 platform registry、path-rule compiler、`PointerBasedAdapter`、init 模块拆分与 plugin 分层均已落地。Phase 5 及第六宿主相关扩展仍是条件触发的独立后续，不构成本计划未完成开发。
 
 ## 一、战略论证
 

@@ -1,13 +1,17 @@
 ---
 title: "feat: spec-write-tasks 任务拆分质量优化方案"
 type: feat
-status: active
+status: closed
 date: 2026-07-09
 spec_id: 2026-07-09-001-spec-write-tasks-optimization
 plan_depth: deep
 ---
 
 # spec-write-tasks 任务拆分质量优化方案
+
+> **关闭决定（2026-07-12）：** 本方案经当前源码、历史决策与外部方法证据复核后决定不按 O1–O12 开发。现有 `spec-write-tasks`、Task Quality Guide、task-pack validator、advisory analyzer 与 `spec-work` 消费链已经覆盖大部分目标；继续整包实施会重复建设并扩大可选 derived layer 的契约面。保留现有自然语言质量指导，只把依赖目标、wave、文件重叠、路径、引用与 hash 等机械事实交给 deterministic validation。
+>
+> **重开条件：** 至少积累约 20 个有代表性的真实 task-pack 样本，并出现可复现的错误 compile/skip、任务拆分失败或 artifact handoff 丢失，且现有指南无法修复。满足条件后应另起窄计划，只处理被证据确认的缺口；本历史方案不恢复为 active。
 
 ## Summary
 

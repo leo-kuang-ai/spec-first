@@ -1,4 +1,13 @@
+---
+title: spec-mcp-setup 纯 Node.js 直接重构方案
+type: refactor
+status: completed
+date: 2026-07-10
+---
+
 # spec-mcp-setup：纯 Node.js 直接重构方案
+
+> **完成说明（2026-07-12）：** U1–U9 已完成：Runtime Setup 已收敛为 CommonJS `setup.cjs`、`setup-registry.v8` 与共置 owner modules，旧 Bash/PowerShell 和三 registry 双轨已删除，五宿主 projection、Windows/POSIX fixture、active consumer、provider、配置与发布合同均已有验证覆盖。
 
 ## 结论
 

@@ -1,5 +1,6 @@
 ---
 title: "fix(init): 对齐 workspace contract、失败边界与 mutation preview"
+status: completed
 created_at: 2026-07-11
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready

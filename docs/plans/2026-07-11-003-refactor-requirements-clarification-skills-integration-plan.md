@@ -13,13 +13,13 @@ execution: code
 ## Goal Capsule
 
 - **目标：** 在不新增公共澄清工作流、不重建宿主执行运行时的前提下，减少从想法、需求探索和现有 PRD 进入规划时的承重 WHAT 丢失、重复提问、术语越权写入和规划侧需求发明。
-- **产品路径：** 保持三条成熟度路径：`0→1: spec-ideate → spec-brainstorm → spec-plan`、`1→10: spec-brainstorm → spec-plan`、`10→100: spec-prd → spec-plan`。其中 10→100 仅适用于已有 PRD，或已经明确 target surface、release slice 与核心行为的 brownfield increment；产品形态仍未收敛时继续进入 `spec-brainstorm`。
+- **产品路径：** 保持三条成熟度路径：`0→1: spec-ideate → spec-brainstorm → spec-plan`、`1→10: spec-brainstorm → spec-plan`、`10→100: spec-prd → spec-plan`。其中 10→100 只适用于已有 PRD 的 refine/validate，或仍需要 PRD-grade WHAT 固化与 planning-readiness 判断的 brownfield increment；若 target surface、release slice、核心行为与验收已经闭合，只剩 HOW 未定，则直接进入 `spec-plan`。
 - **当前 PRD 基线：** 当前 `spec-prd` 已具备默认 profile 与显式 opt-in 的 `analysis_profile=contract-reset-lite`。Lite 使用单一 Product Analysis Brief 合并分析门与风险排序，但保持 legacy PRD artifact、producer finalize、report-only validate 和 optional consumer diagnostic。当前执行对话用户是唯一人类产品确认人；专业、法规、隐私、安全、资金等材料只提供确认依据，不形成第二个人类确认入口。现有 Contract Reset Gate A 结论为 `inconclusive`，candidate 未推广，当前 reopen conditions 未满足。
-- **本轮 PRD 范围：** 不新增 PRD 澄清适配器、不重开 Gate A、不改变 artifact topology、不新增 mandatory consumer receipt gate；只允许将 `CONTEXT.md`、项目词汇表和 ADR 的项目级写入统一收敛为 preview-first、单独批准。
-- **视觉辅助边界：** 不新增公共或 standalone 的 `spec-prototype`。首版只在 `spec-brainstorm` 内收敛并加固现有 display-only visual probe，提供 opt-in、单问题、静态 HTML/CSS 决策辅助；禁止 agent-authored JavaScript。这里的 shell、真实仓库/生产数据与主工作区限制约束 visual artifact 及其展示路径，不禁止 producer 在主 workflow 中 source-first 读取项目 source；producer 只可为展示目的执行 bundled helper 的私有 run-root 创建、启动、状态读取和停止。
+- **本轮 PRD 范围：** 不新增 PRD 澄清适配器、不重开 Gate A、不改变 artifact topology、不新增 mandatory consumer receipt gate；`spec-brainstorm`、`spec-plan` 与 `spec-prd` 只允许在需求制品内闭合术语/决策并输出 project-level promotion candidate，不直接创建或修改 `CONCEPTS.md`、`CONTEXT.md`、`CONTEXT-MAP.md` 或 ADR。
+- **视觉辅助边界：** 不新增公共或 standalone 的 `spec-prototype`。当前 browser visual-probe 路径缺少 confirmed field value，且要达到可信安全/生命周期/可访问性地板需要重建一个小型浏览器运行时；本轮因此从 `spec-brainstorm` 移除 visual offer、helper invocation、reference 和 server script，视觉问题统一以文本、表格、ASCII 或明确 blocker 处理。未来只有在独立 field signal 证明文本不足且存在可维护的 helper-owned fixed-template renderer 时，才另立实验计划。
 - **停止条件：** 不创建第二套需求制品、运行状态机、跨进程安全账本、worktree 接管协议、通用沙箱后端、PRD 平行评估平台或来源检查器；没有 confirmed failure evidence 时不提前建设这些机制。
 - **后续责任：** 后续实施由 `spec-work` 按 U-ID 依赖顺序推进。本计划本身不授权实现、runtime regeneration、提交或发布。
-- **源码基线失效条件：** 实施开始前必须重新读取 Appendix 中的 source refs。若 `spec-prd` topology、单一当前用户确认模型、Gate A 结论、`spec-plan` consumer policy、`spec-brainstorm` visual-probe contract 或相关文件 hash 已变化，先更新本计划再实施。
+- **源码基线失效条件：** 实施开始前必须重新读取 Appendix 中的 source refs。若 `spec-prd` topology、单一当前用户确认模型、Gate A 结论、`spec-plan` consumer policy、`spec-brainstorm` visual-probe source 或相关文件 hash 已变化，先更新本计划再实施。
 
 ---
 
@@ -36,13 +36,11 @@ flowchart TB
   I[0→1 spec-ideate] -->|聚焦选择胶囊| B[spec-brainstorm]
   D[1→10 已有想法] --> B
   B -->|requirements-only unified plan| P[spec-plan]
-  R[10→100 已知 target surface 的 brownfield PRD] --> Q[spec-prd]
+  R[10→100 仍需 PRD-grade WHAT closure] --> Q[spec-prd]
   Q -->|legacy PRD + Handoff Context Slice| P
-  B -. 单个视觉比较问题且用户 opt-in .-> V[静态视觉决策辅助]
-  V -. 观察 + 用户裁决 + 局限 .-> B
 ```
 
-`spec-prd` 保持当前默认/Lite 双基线和现有 PRD→plan 用户控制语义。静态视觉决策辅助是 `spec-brainstorm` 的临时展示方法，不是第四条主路径、独立 skill、动态代码执行面或生产实现入口。
+`spec-prd` 保持当前默认/Lite 双基线和现有 PRD→plan 用户控制语义。视觉问题仍由 `spec-brainstorm` 负责澄清，但本轮只使用 conversation-native 表达，不启动 browser helper，也不把视觉旁路当成第四条主路径。
 
 ### 第一性原理重切
 
@@ -51,8 +49,8 @@ flowchart TB
 | 源码事实优先、一次一问、单一当前用户确认 | `spec-brainstorm` 与 `spec-prd` 已有较强能力；最新 PRD/Lite 已明确当前执行对话用户是唯一产品确认人，并整合 source inventory、confirmation basis 和 release-bounded closure | Adopt：复用并统一术语，不建立第二确认入口或共享执行器 |
 | `spec-ideate` 选择交接 | 当前 focused seed 只有描述、basis、rationale、downsides 和 provenance | Wrap：补快照、局限、假设和相邻淘汰信息 |
 | `spec-brainstorm` 场景与暂停恢复 | 已有 product pressure、blindspot、AE、Sources 和 Resolve Before Planning，但缺少稳定的“场景结果必须落点”与恢复最小信息 | Extend：在现有 Product Contract 内补齐，不增加状态机 |
-| 项目级术语写入 | `spec-brainstorm` / `spec-plan` 会静默补写 `CONCEPTS.md`；触发的 `spec-prd grill-with-docs` 会 inline 更新 `CONTEXT.md` / ADR | Fix：统一 preview-first、单独批准 |
-| 视觉决策辅助 | visual probe 已有 display-only helper，但当前缺少明确的 loopback、私有 temp root、静态 artifact validation、CSP/sandbox 与可访问性合同；任意 agent-authored JavaScript 无法仅靠 prose 和资源加载 CSP 证明 no-egress | Harden：保留静态 HTML/CSS 展示，删除动态 JavaScript 执行面，不建设 standalone、真实仓库上下文或跨宿主事务运行时 |
+| 项目级术语写入 | `spec-brainstorm` / `spec-plan` 会静默补写 `CONCEPTS.md`；触发的 `spec-prd grill-with-docs` 会 inline 更新 `CONTEXT.md` / ADR | Thin：三个需求 workflow 只输出带 provenance/consumer/invalidation 的 promotion candidate；项目级 mutation 留给后续显式知识维护请求 |
+| 视觉决策辅助 | visual probe 只有单文件 display helper，当前接受任意 root/host、暴露 `/files`，且没有 field outcome 证明其决策价值；安全加固会引入 tokenizer、HTTP request matrix、状态机、DOM 与可访问性维护面 | Retire：本轮删除 browser helper 路径，保留文本/表格/ASCII 与诚实 blocker；未来 fixed-template renderer 需单独实验和 field gate |
 | PRD Contract Reset / Gate A | Gate A 已 `inconclusive`；owner 已选择 opt-in Lite，完整 migration 与 mandatory consumer gate 退出 active backlog | Stop：不重开、不平行建设 |
 | `spec-plan` 来源解析 | 当前 upstream discovery 已识别 brainstorm requirements-only unified plan 与通用 legacy requirements doc；`spec-prd` 产物只是后者的一个子集，direct bootstrap/resume/deepen 仍独立存在 | Thin：澄清识别与 blocker 规则，不新增 inspector，也不缩窄直接规划入口 |
 
@@ -63,9 +61,9 @@ flowchart TB
 1. **交接信息密度不稳定。** `spec-ideate` 的选择 seed 未携带承重 evidence 的基准版本、局限、未验证假设和最相关的淘汰替代，`spec-brainstorm` 可能重复推导或误把旧依据当当前事实。
 2. **已具备的澄清结果没有统一落入 durable source。** `spec-brainstorm` 已有源码核实、一次一问和 AE，但暂停、上下文重置或临时 dossier 丢失后，下一执行者仍可能缺少准确的下一问题、承重源码引用和失效条件。
 3. **项目级知识写入越过 mutation boundary。** 当前 `spec-brainstorm` / `spec-plan` 可静默修改 `CONCEPTS.md`；`spec-prd` 的 triggered grill-with-docs 还会把术语决策直接解释为 inline `CONTEXT.md` / ADR 写入授权。这违反 preview-first 和“需求制品本地闭合优先”。
-4. **动态决策价值尚未验证，却被旧计划提前产品化。** 旧方案为一个可选原型旁路设计 standalone skill、多个安全账本、worktree 接管、强制沙箱、崩溃恢复、真实 Windows/POSIX 发布门禁和第二套 PRD Gate A。它在确认用户价值之前就承担了通用执行运行时的长期成本。当前 visual-probe helper 只是 display server；资源加载 CSP、`form-action` 和 CSP `sandbox` 不能把任意 agent-authored JavaScript 升级为可证明的 no-egress boundary，因此本轮删除动态 JavaScript，只保留可机械校验的静态展示面。
+4. **视觉决策价值尚未验证，却已形成运行时维护面。** 旧方案为一个可选原型旁路设计 standalone skill、多个安全账本、worktree 接管、强制沙箱、崩溃恢复、真实 Windows/POSIX 发布门禁和第二套 PRD Gate A；当前 source 虽只剩单文件 display helper，但要安全保留仍需 tokenizer、HTTP request matrix、私有 run handle、状态转换、DOM 和可访问性合同。没有 field signal 时继续加固会重复建设宿主运行时，因此本轮退役该路径而不是把它产品化。
 
-本轮解决前三类 confirmed gap，并为现有静态 visual helper 补最小安全与可用性地板；是否需要动态交互探针留待未来具备可信封闭 renderer 或浏览器级网络隔离后另立实验计划。
+本轮解决前三类 confirmed gap，并删除未证明价值且安全边界不完整的 visual helper 入口。未来视觉能力只有在文本路径出现可回源 failure signal、独立 field pilot 证明增益、且 helper-owned fixed-template renderer 能以小于现方案的维护成本提供可信边界时，才另立实验计划。
 
 ### Requirements
 
@@ -95,7 +93,7 @@ flowchart TB
 
 **`spec-brainstorm` 澄清与场景**
 
-- R16. `spec-brainstorm` 在 run-local reasoning 中按 source fact、current-user decision、open exploration、planning-owned HOW、visual-aid candidate 分类 load-bearing gap；该分类不持久化为状态机。
+- R16. `spec-brainstorm` 在 run-local reasoning 中按 source fact、current-user decision、open exploration、planning-owned HOW 分类 load-bearing gap；视觉/空间问题仍是 current-user decision 的表达形态，不增加持久状态类别。
 - R17. Standard/Deep 的行为型需求在 Phase 2.5 综合前运行相关性驱动的场景 pass，候选维度为 happy path、role/permission、state transition、failure/degraded、negative acceptance 和 cross-context handoff。
 - R18. 场景 pass 不生成维度笛卡尔积；每个被选中的场景必须落为 AE、Resolve Before Planning/OQ、明确 assumption 或 Non-Goal，否则视为 ceremony 并删除。
 - R19. producer 暂停或进入新会话前，只要已经形成 durable decision，就创建或更新 requirements-only unified plan；`Resolve Before Planning` 明确 blocker 与下一问题，不新增 progress status。
@@ -103,21 +101,21 @@ flowchart TB
 
 **项目级语言 promotion**
 
-- R21. `spec-brainstorm`、`spec-plan` 和 `spec-prd` 均不得静默创建或修改 `CONCEPTS.md`、`CONTEXT.md`、`CONTEXT-MAP.md`、项目 glossary 或 ADR。
-- R22. term/ADR 的产品确认与“是否提升到项目级 source”是同一当前用户给出的两个不同授权，不是两个不同角色。producer 先在 Product Contract / PRD 内闭合含义，再展示精确 preview；preview 必须包含 target path、proposed content、provenance、适用范围、真实 consumer、复用理由、invalidation condition、mutation scope、不写入的影响，以及当前用户对该项目级 path 拥有 mutation authority 的显式声明。只有资格判断通过、用户确认其权限并针对该 path 和内容单独批准后才 mutation；无法确认 authority 时保持 Product Contract / PRD-local，不路由第二个人类联系人。
-- R23. ADR 仍只在 hard-to-reverse、surprising without context、real tradeoff 三项同时成立时提出；即使条件成立，也只产生 preview，不自动写入。缺少 R22 任一 durable knowledge qualification 时，不得以用户批准替代资格判断，只保留 Product Contract / PRD-local 结论。
+- R21. `spec-brainstorm`、`spec-plan` 和 `spec-prd` 均不得创建或修改 `CONCEPTS.md`、`CONTEXT.md`、`CONTEXT-MAP.md`、项目 glossary 或 ADR；显式知识维护请求属于后续独立 workflow，不由当前 producer 自动触发。
+- R22. producer 先在 Product Contract / PRD 内闭合 term/decision；当同一知识明显跨当前 release slice 复用时，只输出 project-level promotion candidate，不在本 workflow 内 mutation。candidate 最小包含 target kind/path、proposed meaning、provenance、适用范围、真实 consumer、复用理由和 invalidation condition，并明确“当前未写入”与后续显式知识维护入口。
+- R23. ADR candidate 仍只在 hard-to-reverse、surprising without context、real tradeoff 三项同时成立时提出；即使条件成立，也只记录 candidate，不创建 ADR。缺少 R22 任一 durable knowledge qualification 时，不输出 candidate，只保留 Product Contract / PRD-local 结论。
 - R24. 缺少项目级 glossary/context topology 不阻塞 planning，只要当前需求制品内的术语和决策已经充分闭合。
 
-**静态视觉决策辅助**
+**视觉路径退役**
 
-- R25. 视觉辅助只在 source 与文本对话无法充分表达、答案可能改变 R/AE/Scope、且当前用户明确选择 visual path 时触发；一次只回答一个具名问题，不提供隐含的 interactive/dynamic 升级选项。
-- R26. 复用 `skills/spec-brainstorm/references/visual-probes.md` 与现有 display helper，不新增 skill、server、registry、packet schema 或 browser-to-agent channel。
-- R27. artifact 只允许 deterministic allowlist tokenizer 验证过的静态 HTML/CSS fragment 和 synthetic/sanitized data。`screen_dir` 只允许固定 `current.html` artifact slot；producer 先在同目录写私有临时文件，校验通过后原子替换 `current.html`，响应路径不得枚举或排序目录，发现任何额外目录项即 fail closed。允许集合仅覆盖展示型语义/布局标签，以及 `class`、`id`、`role`、`aria-*`、受 CSP 约束的 inline style；artifact 不允许 button、input、select、textarea、anchor、`tabindex` 或其他交互/可聚焦节点。所有 URL-bearing attribute 与不在 allowlist 的 tag/attribute 都拒绝。禁止 agent-authored JavaScript、`<script>`、事件处理属性、`javascript:`、meta refresh、form、anchor、frame/object、download 和动态 import。helper-owned refresh script 与 artifact 内容分离，只能访问 same-origin `/version`；现有 helper 无条件移除 `/files` route。响应前先以 `stat` 拒绝超过 512 KiB 的 artifact，tokenizer 最多处理 20,000 个 token、单元素 32 个属性、64 层嵌套和 500 ms 校验预算，任一超限即 fail closed、停止 helper 并清理 run root。
-- R28. helper 只绑定 `127.0.0.1` 或 `::1`；非 loopback `--host` 必须 fail closed 并回退文本。`Host` 必须与实际绑定的 loopback 地址和端口精确匹配，IPv6 使用规范化方括号形式；存在 `Origin` 时必须与返回 URL 同源。无 `Origin` 时，根页面只接受 `GET`/`HEAD` 且 `Sec-Fetch-Mode: navigate`、`Sec-Fetch-Dest: document` 的导航；`/version` 只接受 `GET`/`HEAD`、`Sec-Fetch-Site: same-origin`，且 mode/dest 与同源 fetch 一致的请求。iframe、image、script、跨站 subresource、Fetch Metadata 缺失或矛盾、authority 不一致的 absolute-form request 一律拒绝，且不发送 CORS 许可头。不提供 LAN/remote serving，也不把返回的 localhost URL 描述为远程可达。
-- R29. helper-owned `start` 不再接受调用方指定的任意 root，而是在 OS temp 下用不可预测的 `mkdtemp` 创建 run root，并返回 `root`、`screen_dir` 与 `state_dir`；producer 只向返回的 `screen_dir` 写 artifact，`status`/`stop` 只接受 helper 返回的 root。目录权限为 `0700`、文件权限为 `0600`；读取前校验 owner、realpath、symlink、regular-file 与允许的 artifact type。裁决、取消、idle、owner 退出和 error 后递归清理 run root，不建设通用 cleanup ledger。
-- R30. HTML、状态和拒绝响应使用经过测试的 restrictive CSP/sandbox、no-referrer、no-sniff、Permissions-Policy、`Cache-Control: no-store`、`Pragma: no-cache` 与 `Expires: 0`。CSP 只允许 helper-owned inline refresh、inline style、data image 和 same-origin `/version`；artifact validation 与 headers 是互补的 deterministic floor，不能只靠作者自觉或正则关键词扫描。
-- R31. 静态页面保留现有 waiting/ready 与自动 reload，新增用户可见的 refreshing、refresh-failed 和 artifact-rejected 状态，并按 Static Visual Decision Aid Contract 的状态转换表实现。artifact 本身不包含可聚焦控件；若 helper shell 提供重试等 helper-owned 控件，必须单独满足键盘操作、可见 focus、可访问名称和状态播报。页面同时满足语义结构、DOM 阅读顺序、非颜色唯一信号、reduced-motion 和窄视口基线。chat 中当前用户的 response 才构成人类产品确认。
-- R32. 没有 current-user response、浏览器能力、可安全构造的 synthetic artifact 或 helper deterministic floor 时，回退文本并保持 unresolved/inconclusive；不得声称已运行。`start`/bind/status 失败、browser capability 不可用或 URL 无法交付时，`helper-unavailable` 只作为 producer-owned chat fallback：输出具名原因，停止并清理可用的 run root，回退文本并保留 blocker，不伪造 helper-served 页面状态。动态问题若能安全重述为具名静态状态比较，可先展示静态并列或序列；只有实际状态切换对裁决不可替代、静态比较仍不足，或问题必须读取真实应用状态、执行 repo command、访问 external network 或修改真实工作树时，才回退文本并保留 blocker / future experiment candidate。
+- R25. `spec-brainstorm` 不再提供 text-vs-visual offer，不加载 `references/visual-probes.md`，不启动 bundled browser helper，也不生成 HTML/CSS/JavaScript artifact。
+- R26. 视觉或空间问题使用 conversation-native 表达：结构化文本、比较表、状态序列、ASCII wireframe 或 source screenshot 的只读讨论；这些表达仍遵守一次一问和 current-user confirmation，不形成第二个 artifact 或确认入口。
+- R27. 当 conversation-native 表达足以让当前用户裁决时，正常写回 affected R/AE/Scope 并关闭 blocker；只有用户无回复、表达仍不足或真实交互/应用状态不可替代时，才保持 unresolved，并记录需要何种未来 evidence。
+- R28. 删除 `skills/spec-brainstorm/references/visual-probes.md` 与 `skills/spec-brainstorm/scripts/visual-probe-server.js`；五宿主 projection 不再包含该 reference/script，source/runtime 中不得残留 visual-probe gate、helper invocation、`/version`、`/files` 或临时 visual root 合同。
+- R29. 本轮不以 tokenizer、sanitizer、CSP、loopback server、opaque run handle、DOM harness 或浏览器网络隔离替代删除；这些机制只有未来独立实验获得 field signal 后才能重新提案。
+- R30. 未来视觉能力的 reopen condition 至少包括：可回源的文本路径 failure signal、current-user opt-in field pilot、helper-owned fixed-template renderer、无 producer-authored HTML/CSS/JavaScript、明确的 accessibility 和 lifecycle owner，以及与维护成本匹配的 countermetric。
+- R31. 视觉需求本身仍可进入 Product Contract；producer 记录用户需要比较的状态/布局、文本表达限制和 reopen condition，但不得声称 probe 已运行或浏览器结果已观察。
+- R32. 删除 helper 是安全/维护面收缩，不作为“视觉决策质量提升”的证据；本轮只验证入口退役、文本路径可闭合和无残留 runtime surface。
 
 **`spec-plan` 消费**
 
@@ -126,22 +124,22 @@ flowchart TB
 - R35. 30 天只作候选发现提示，不证明 freshness。planning 根据持久 source refs、当前源码重读、limitations 和 invalidation condition 判断是否需要重新溯源。
 - R36. `Resolve Before Planning`、`checkpoint-prd`、`can_enter_spec_plan: no` 或 load-bearing OQ 不能被静默忽略。存在 upstream producer 时 `spec-plan` 默认返回 producer；direct bootstrap 无 producer 时回到当前用户。现有用户控制语义保留：当前用户可以逐项把真正的产品 blocker 转成显式 decision/assumption 后继续。
 - R37. producer receipt 验证保持 optional read-only diagnostic；本轮不把它升级为 consumer hard gate，也不新增 `inspect-requirements-origin.js` 或 `capture-prd-verifier-evidence.js`。
-- R38. `spec-plan` 不再静默补写 `CONCEPTS.md`；发现项目级候选词汇时使用 R21-R24 的 preview-first promotion。
+- R38. `spec-plan` 不再静默补写 `CONCEPTS.md`；发现项目级候选词汇时按 R21-R24 记录 promotion candidate，不直接写项目级文件。
 
 **交付与证据**
 
-- R39. source 改动只发生在 `skills/`、`docs/contracts/`、测试、validation、README 和 CHANGELOG；generated runtime 只在 source/test/eval 通过后用 `spec-first init` 投射。
-- R40. scripts/tests 只证明字段、路径、触发、loopback、temp 权限、artifact validation、CSP/sandbox response、禁止行为和投射事实；LLM/human fresh-source evaluation 判断问题质量、场景相关性、planning invention 与 current-user answer fidelity。
+- R39. source 改动只发生在 `skills/`、`docs/`、测试、validation、README 和 CHANGELOG；generated runtime 只在 source/test/eval 通过后用 `spec-first init` 投射。
+- R40. scripts/tests 只证明字段、路径、触发、禁止写入、visual helper 退役和投射事实；LLM/human fresh-source evaluation 判断问题质量、场景相关性、planning invention 与 current-user answer fidelity。
 - R41. 语义评估必须分别覆盖 0→1、独立 1→10 和 10→100；0→1 样本不得替代直接 1→10。
-- R42. 每个主效果指标同时记录 countermetric：额外 current-user confirmation rounds、token/latency、artifact size、无效 visual aid 数和错误 blocker 数；不能用更重 ceremony 换取表面完整。
+- R42. 每个主效果指标同时记录 countermetric：额外 current-user confirmation rounds、token/latency、artifact size 和错误 blocker 数；不能用更重 ceremony 换取表面完整。
 - R43. 用户可见行为变化同步 README/README.zh-CN、当前执行文档和 CHANGELOG；计划本身的更新只同步 CHANGELOG。
 
 ### Actors
 
-- A1. **当前执行对话用户 / 唯一产品确认人：** 基于 project source、专业材料或显式自我确认裁决需求、优先级、风险接受、defer/scope-cap；项目级 promotion 还需由该用户显式声明其对目标 path 的 mutation authority 并另行批准写入，无法声明时保持 PRD-local，不路由第二个人类联系人。
+- A1. **当前执行对话用户 / 唯一产品确认人：** 基于 project source、专业材料或显式自我确认裁决需求、优先级、风险接受、defer/scope-cap；项目级 promotion candidate 只作后续知识维护输入，不在当前需求 workflow 中触发 mutation 或第二个人类联系人。
 - A2. **`spec-ideate`：** 生成并筛选方向，提供聚焦选择胶囊。
-- A3. **`spec-brainstorm`：** 查证事实、逐问澄清、维护 requirements-only Product Contract，并协调可选静态视觉决策辅助。
-- A4. **`spec-prd`：** 处理已明确 target surface 的 brownfield PRD；保持当前 default/Lite 合同，只收敛项目级 promotion mutation。
+- A3. **`spec-brainstorm`：** 查证事实、逐问澄清、维护 requirements-only Product Contract，并用 conversation-native 表达处理视觉/空间问题。
+- A4. **`spec-prd`：** 处理已有 PRD 或仍需 PRD-grade WHAT closure 的 brownfield increment；保持当前 default/Lite 合同，只收敛项目级 promotion candidate 边界。
 - A5. **`spec-plan`：** 发现两类真实 upstream requirements origin，并保留 direct bootstrap/resume/deepen；按需重读源码、保留用户控制语义并设计 HOW。
 - A6. **维护者 / repository governance owner：** 负责 source、tests、fresh-source evaluation、五宿主投射和发布证据，并单独批准 Gate A/topology 等项目治理变更；不参与或替代产品确认。
 
@@ -154,12 +152,12 @@ flowchart TB
 
 - F2. **1→10：直接需求探索**
   - **Trigger：** 用户已有想法，但行为、范围、验收或术语尚未闭合。
-  - **Steps：** `spec-brainstorm` 先查 source，再逐问 current-user decision，运行相关性场景 pass，必要时提供 opt-in 静态视觉决策辅助。
+  - **Steps：** `spec-brainstorm` 先查 source，再逐问 current-user decision，运行相关性场景 pass；视觉/空间问题使用文本、表格、状态序列或 ASCII 表达。
   - **Outcome：** Product Contract 包含足以规划的 WHAT，或明确的 Resolve Before Planning blocker。
 
 - F3. **10→100：现有系统增量**
-  - **Trigger：** 已有 PRD，或 target surface、release slice 与核心行为均明确的 brownfield increment。
-  - **Steps：** `spec-prd` 使用当前 default 或显式 Lite profile 完成 source-first closure 和 producer finalize；本轮只把项目级 promotion 改为 preview-first。
+  - **Trigger：** 已有 PRD 需要 refine/validate，或 brownfield increment 仍需 PRD-grade WHAT 固化与 readiness 判断；若 WHAT/acceptance 已闭合且只剩 HOW，则直接进入 `spec-plan`。
+  - **Steps：** `spec-prd` 使用当前 default 或显式 Lite profile 完成 source-first closure 和 producer finalize；本轮把项目级写入收敛为 candidate-only。
   - **Outcome：** legacy PRD 与 Handoff Context Slice 继续作为 `spec-plan` 的当前输入；Gate A 和 topology 不变化。
 
 - F4. **暂停与恢复**
@@ -167,10 +165,10 @@ flowchart TB
   - **Steps：** producer 将已确认需求、source refs、假设、局限、blocker 和下一问题写入规范制品。
   - **Outcome：** 新会话从 Product Contract / PRD 恢复，不依赖 transcript 或 `/tmp` dossier。
 
-- F5. **静态视觉决策辅助**
-  - **Trigger：** 一个布局、信息层级或多状态静态比较问题无法由 source 或纯文本充分表达，且用户明确选择 visual path。
-  - **Steps：** producer 写明问题和判定标准，由 bundled helper 在私有 OS temp root 展示 allowlist-validated 静态 HTML/CSS artifact，用户观察后在 chat 给出 decision。
-  - **Outcome：** observation、current-user decision、limitations 与 affected R/AE 写回 Product Contract；临时 artifact 不成为 source of truth。
+- F5. **视觉/空间问题的文本澄清**
+  - **Trigger：** 布局、信息层级或多状态比较会改变 R/AE/Scope。
+  - **Steps：** producer 使用表格、状态序列、ASCII wireframe 或只读 source screenshot 讨论同一具名问题；不启动 browser helper。
+  - **Outcome：** 当前用户答案充分时写回 Product Contract 并关闭 blocker；仍不足时保留具名 blocker 与 future evidence need。
 
 ### Acceptance Examples
 
@@ -181,44 +179,44 @@ flowchart TB
 - AE5. **场景相关性。** 假设需求涉及多角色审批；permission、state、failure 和 handoff 场景进入 AE/OQ，不相关的离线规模场景被省略。
 - AE6. **暂停恢复。** 假设对话在综合前暂停；requirements-only artifact 记录准确的下一问题和 source refs，删除 `/tmp` dossier 后仍可恢复。
 - AE7. **术语冲突。** 假设 `CONCEPTS.md` 与规范 glossary 定义冲突；producer 暴露冲突并在当前制品内消歧，不静默修改任一项目文件。
-- AE8. **Promotion 授权。** 假设术语已经在 PRD 内闭合；当前用户只确认术语含义、未批准项目级写入，或无法声明其对目标 path 的 mutation authority 时，`CONTEXT.md` 保持不变。即使用户批准，preview 缺少 provenance、适用范围、真实 consumer、复用理由或 invalidation condition 时也只保留 PRD-local，不提升为 durable knowledge。
-- AE9. **静态视觉。** 假设用户比较三个布局；使用现有 display-only visual probe，不创建可运行探针合同。
-- AE10. **动态问题降级。** 假设动态问题可安全重述为具名状态比较；本轮不生成 agent-authored JavaScript，而是展示静态并列/序列视图。若静态比较仍不足或实际状态切换对裁决不可替代，则回退文本并保持 blocker。
-- AE11. **无浏览器能力。** 宿主无法稳定显示 localhost artifact 时，回退文本讨论并保持问题 unresolved，不声称 probe 已运行。
-- AE12. **展示边界。** 非 loopback host、artifact validation 失败、temp root/权限不满足，或问题必须由 visual artifact 读取真实 repo state、运行应用时，本计划 fail closed 到文本路径，不创建 worktree 或直接执行命令；producer 仍可在主 workflow 中读取 source 来回答 source fact。
+- AE8. **Promotion candidate。** 假设术语已经在 PRD 内闭合且具备跨 release 复用价值；workflow 记录 target/provenance/consumer/invalidation candidate，但 `CONTEXT.md`、项目 glossary 和 ADR hash 始终不变，后续 mutation 需要独立知识维护请求。
+- AE9. **布局比较。** 假设用户比较三个布局；producer 用编号表格或 ASCII wireframe 表达，用户答案充分时关闭对应 R/AE，不声称启动过 browser probe。
+- AE10. **动态问题。** 假设动态问题可安全重述为具名状态序列；使用文本状态转换比较。若真实交互不可替代，则保留 blocker 和 future evidence need，不生成 JavaScript 或 HTML。
+- AE11. **文本 fallback 可闭合。** 假设旧 visual path 不可用；producer 立即用 conversation-native 方式提出同一问题，当前用户给出充分答案时正常关闭 blocker，而不是因缺浏览器永久保持 unresolved。
+- AE12. **退役无残留。** source 与五宿主 projection 中不再出现 visual-probe gate、helper invocation、server script、`/version`、`/files` 或 visual temp root；producer 仍可在主 workflow 中 source-first 读取项目 source。
 - AE13. **Legacy consumer control。** PRD 声明 checkpoint 或 `can_enter_spec_plan: no` 时，`spec-plan` 默认返回 `spec-prd`；只有当前用户逐项接受 assumption/decision 后才能继续。
 - AE14. **PRD no-regression。** 未显式传入 `analysis_profile=contract-reset-lite` 时使用 default profile；传入时只改变 run-local analysis shape，不改变 topology、validate 或 consumer policy。
 - AE15. **Gate A stop。** 实施和评估均不创建新的 Gate A attempt、runner 或 candidate；当前 `inconclusive` 结论保持可追溯。
-- AE16. **无静默 glossary write。** `spec-brainstorm`、`spec-plan` 与 triggered `spec-prd` 在未取得 promotion approval 时，运行前后项目级 glossary/context/ADR 文件 hash 不变。
+- AE16. **无项目级写入。** `spec-brainstorm`、`spec-plan` 与 triggered `spec-prd` 运行前后项目级 glossary/context/ADR 文件 hash 始终不变；candidate-only 输出不构成 mutation authorization。
 - AE17. **专业依据不足。** 法规/隐私/安全/资金材料不足以支持确认时，workflow 只向当前用户提供“显式确认、defer、scope-cap、保留 source-candidate/assumption/blocker”选项；LLM 不替代确认，也不路由 named specialist。
 
 ### Success Criteria
 
-- U0 在任何目标 source mutation 前冻结 case/source hashes、rubric、主指标与 countermetrics。对 0→1、独立 1→10 和 10→100 分别判断 baseline headroom：存在非零 load-bearing WHAT invention 的路径必须证明减少；baseline 为零或未发现该 failure signal 的路径改为 no-regression，并验证该路径本轮实际承载的 promotion、compatibility 或 handoff claim。所有路径的额外 rounds/token/latency、错误 blocker、artifact size 等 countermetrics 均不得退化。
+- U0 在任何目标 source mutation 前冻结 case/source hashes、rubric、judge calibration、主指标与 countermetrics。U2/U3/U6 只有在至少一个适用 case 出现非零目标 failure signal 时才进入实现；所有适用 baseline 均为零则该 unit 记为 `unproven/deferred`，不能凭 no-regression 进入默认路径。U5 的 confirmed silent-write gap 与 U4 的现有 helper 退役属于 correctness/surface-removal claim，可按 deterministic evidence 实施，但仍必须验证无回归。
 - representative cases 中，source 可回答却被询问给用户的事实数量为零或相对 baseline 减少，且 current-user answer fidelity 不下降、第二人类确认路由为零。
 - requirements-only Product Contract 在 `/tmp` dossier 不存在时仍保留承重 source refs、limitations 和下一问题。
-- project-level glossary/context/ADR 的未授权 mutation 为零；preview 与 approval 可回到具体 path 和 proposed content。
+- `spec-brainstorm`、`spec-plan`、`spec-prd` 对 project-level glossary/context/ADR 的 mutation 为零；promotion candidate 可回到 target、proposed meaning、provenance、consumer 与 invalidation condition。
 - 场景 pass 的每个保留项都有 AE/OQ/assumption/non-goal 落点；没有为了覆盖维度而生成的空仪式。
-- 静态 visual helper 的 deterministic floor 全部通过：agent-authored JavaScript 为零、非 loopback fail closed、所有启动方式均不暴露 `/files`、私有 temp 权限与清理可验证、非法或超预算 artifact 在响应前被拒绝、无外部请求或仓库写入。静态视觉是否帮助用户决策只作 field observation，不以“关闭/改变 R/AE”冒充正确性证据。
-- 默认 workflow 不新增 mandatory reference load；只有相关 signal 触发场景、领域语言或决策探针细节。
-- U5、U3、U2、U6 按 applicability matrix 运行 immediate-parent 与 DAG-valid contrasts 并记录 interaction；U2 使用 leaf leave-one-out，U6 marginal 只在 producer dependencies 完整时测量。每个适用 arm-case cell 运行 3 次 matched repeat，必需 fresh sessions 不超过 72；只有满足 bundle retention 条件，且额外 rounds/token/latency、错误 blocker、artifact size 等 countermetric 不退化时才保留。current-source tests、fresh-source evaluation、field outcome 和五宿主 source projection 分开记录，任何一层不能替代另一层。
+- source 与五宿主 projection 中 visual-probe gate、reference、server script、`/version`、`/files` 和 visual temp root 引用为零；conversation-native 视觉问题在答案充分时可关闭 blocker，不因缺浏览器永久 unresolved。
+- 默认 workflow 不新增 mandatory reference load；只有相关 signal 触发场景或领域语言细节。
+- U2/U3/U5/U6 在各自 unit exit 立即运行预注册 before/after fresh-source paired cases，每个适用 case 3 次 matched repeat；U7 只做最终三路径 integrated no-regression。所有必需 fresh sessions 不超过 36；方向不一致、未超过差异门、judge calibration 失败或 countermetric 退化均记为未证明并删除/收窄对应 unit。current-source tests、fresh-source evaluation、field outcome 和五宿主 source projection 分开记录，任何一层不能替代另一层。
 
 ### Scope Boundaries
 
 **In scope**
 
 - `spec-ideate` focused seed 的 evidence snapshot 与 limitation。
-- `spec-brainstorm` 的轻量 gap 分类、场景落点、暂停恢复与 opt-in 静态视觉决策辅助。
-- `spec-brainstorm`、`spec-plan`、`spec-prd` 项目级语言/ADR promotion 的 preview-first 边界。
+- `spec-brainstorm` 的轻量 gap 分类、场景落点、暂停恢复，以及 visual helper 退役后的 conversation-native 视觉问题处理。
+- `spec-brainstorm`、`spec-plan`、`spec-prd` 项目级语言/ADR promotion 的 candidate-only 边界。
 - `spec-plan` 对现有两类 upstream requirements origin 的轻量发现规则、freshness 提示和用户控制语义；direct bootstrap/resume/deepen 不变。
-- 聚焦 contract tests、fresh-source paired evaluation、五宿主投射和用户文档。
+- 聚焦 contract tests、unit-exit before/after fresh-source paired evaluation、最终 integrated no-regression、五宿主投射和用户文档；不创建 arm runner、评估 worktree 或通用实验平台。
 
 **Deferred until confirmed evidence**
 
 - standalone/public `spec-prototype`。
-- agent-authored JavaScript、真实 repo/application context、由 visual artifact 发起的 shell command、external network / arbitrary egress、worktree 或 OCI/micro-sandbox prototype execution；helper 自身的 same-origin `/version` refresh 仍在本轮范围内。
-- browser-to-agent event channel、click tracking 或自动 verdict ingestion。
-- persistent request registry、exactly-once consumption、crash-recovery ledger、retention anchor 和通用 cleanup receipt；本轮仍实现当前 run root 的最小私有化与清理。
+- 任何 browser visual helper、agent-authored HTML/CSS/JavaScript、真实 repo/application context、由 visual artifact 发起的 shell command、external network / arbitrary egress、visual worktree 或 OCI/micro-sandbox execution。
+- helper-owned fixed-template renderer、browser-to-agent event channel、click tracking 或自动 verdict ingestion；只有满足 R30 reopen conditions 才可另立实验计划。
+- persistent request registry、exactly-once consumption、crash-recovery ledger、retention anchor 和通用 cleanup receipt。
 - 新 `spec-prd` unified artifact topology、mandatory consumer receipt gate 或新的 Contract Reset Gate A attempt。
 - `inspect-requirements-origin.js`、producer verifier snapshot executor 或通用 requirements schema。
 
@@ -226,7 +224,7 @@ flowchart TB
 
 - 用共享公共澄清 workflow 替换 `spec-brainstorm` / `spec-prd`。
 - 持久化完整 interview transcript、run-local gap map 或每个可逆微决策。
-- 把 browser probe artifact 当成 PRD、production code、测试覆盖或架构批准。
+- 用新的 browser runtime 替换被退役的 visual helper，或把 conversation-native visual 表达当成 PRD 之外的 durable artifact。
 - 强制仓库必须存在 `CONCEPTS.md`、`CONTEXT.md`、`CONTEXT-MAP.md` 或 ADR。
 - 手改 generated runtime mirrors。
 
@@ -236,7 +234,7 @@ flowchart TB
 - 当前 Lite source 是 `skills/spec-prd/references/product-analysis-lite.md`；它是 opt-in evaluation branch，不授权 topology migration。
 - 当前 PRD/Lite confirmation model 的 source 是 `skills/spec-prd/SKILL.md` 与 `skills/spec-prd/references/product-analysis-lite.md`：当前执行对话用户是唯一人类产品确认人；specialist/regulated materials 只作依据，LLM 与 scripts 均不得替代产品确认。
 - 当前 `spec-plan` 受 `tests/unit/spec-prd-plan-handoff-contracts.test.js` 保护：通用 legacy requirements 保持可读；其中的 PRD handoff 保留用户控制，consumer receipt diagnostic optional。
-- 当前 visual probe server 只负责 display，接受任意 `--host`、固定返回 localhost URL、暴露 `/files`，且尚未设置本计划要求的私有 temp、artifact validation、CSP/sandbox/Permissions-Policy contract；chat response 仍是唯一人类产品确认。本计划只收紧并加固现有 helper，不扩展事件采集或 agent-authored JavaScript。
+- 当前 visual probe server 只负责 display，但接受任意 `--host`、调用方 `--root`、固定返回 localhost URL 并暴露 `/files`；当前 reference 还允许 disposable interaction demo。由于没有 field outcome 支持继续承担该运行时，本计划删除 gate/reference/script，而不是实现 parser/CSP/temp/lifecycle 补丁。
 - 本计划依据当前磁盘 source，而不是仅依据 HEAD transcript。实施前必须按 Goal Capsule 的失效条件重读 source。
 
 ---
@@ -249,25 +247,25 @@ flowchart TB
 | --- | --- | --- | --- |
 | `spec-ideate` focused seed | title、description、basis、rationale、downsides、provenance | snapshot、limitation、assumption、相邻淘汰替代 | 整份 ideation artifact handoff |
 | `spec-brainstorm` blindspot / pressure / AE | source-first、one-question、Product Contract | gap 分类、场景结果落点、暂停恢复 | 新 clarification engine |
-| `spec-brainstorm` visual probe | OS temp、display helper、chat feedback | allowlist-validated 静态 HTML/CSS、loopback/private-temp/security headers、可访问性与显式 opt-in | agent-authored JavaScript、standalone prototype runtime |
-| `spec-prd` default + Lite | source/confirmation basis、sole-current-user closure、Decision Card、receipt、Handoff Slice | 仅 project promotion preview-first | 第二确认入口、新 Gate A、topology、mandatory consumer gate |
+| `spec-brainstorm` visual probe | conversation 中的问题、判定标准与 chat confirmation | 删除 visual gate/reference/server；视觉问题回到表格、状态序列、ASCII 与 blocker | tokenizer/CSP/localhost runtime、agent-authored artifact、standalone prototype |
+| `spec-prd` default + Lite | source/confirmation basis、sole-current-user closure、Decision Card、receipt、Handoff Slice | project promotion candidate-only | inline project mutation、第二确认入口、新 Gate A、topology、mandatory consumer gate |
 | `spec-plan` Phase 0.2/0.5 | unified + legacy source discovery、用户 blocker 处置 | freshness 以 source refs 为主、禁止 silent glossary write | 新 origin inspector/runtime |
-| domain-modeling | glossary conflict、精确术语、克制 ADR | local closure first、promotion separately approved | 固定文件名自动 authority |
+| domain-modeling | glossary conflict、精确术语、克制 ADR | local closure first、candidate handoff to later knowledge maintenance | 固定文件名自动 authority、当前 workflow 内 mutation |
 
 ### Key Technical Decisions
 
 - KTD1. **澄清是 producer capability，不是新公共 workflow。**
 - KTD2. **当前 PRD 是已实现邻接能力，不是待复制目标。** default/Lite 双基线和 Gate A stop condition 优先于旧计划假设。
-- KTD3. **先修 confirmed gaps，动态执行留待具备可信隔离后另立实验。** seed、durable refs、promotion boundary、plan consumption 和静态 helper hardening 可分单元交付，但必须遵循 Implementation Sequence 与各 Unit 的显式依赖；这些单元均不依赖 Gate A、standalone prototype、sandbox backend 或新 consumer parser。
-- KTD4. **视觉辅助留在 `spec-brainstorm`。** 父会话拥有问题、当前用户 opt-in、展示和 Product Contract 写回；没有第二个协调者、确认人或 browser-to-agent channel。
-- KTD5. **v1 visual aid 是 static browser-contained presentation，不是 arbitrary code execution。** artifact 禁止 agent-authored JavaScript；helper 内小型 deterministic allowlist tokenizer、per-response nonce CSP、loopback-only serving、私有 temp 和 cleanup 共同构成 deterministic floor，任一层不可用即 fail closed。不引入通用 HTML sanitizer/parser dependency；若 allowlist 无法表达目标视觉，回退文本而不是扩张执行面。
-- KTD6. **真实上下文明确不支持。** 不用普通进程、temp directory 或 worktree 冒充强隔离。
-- KTD7. **durable source 仍是 Product Contract / PRD。** seed、dossier 和 browser artifact 都是临时输入。
+- KTD3. **先修 confirmed gaps，未证明价值的运行时直接收缩。** seed、durable refs、promotion boundary、plan consumption 和 visual helper retirement 可分单元交付；这些单元均不依赖 Gate A、standalone prototype、sandbox backend 或新 consumer parser。
+- KTD4. **视觉问题留在 `spec-brainstorm`，browser runtime 不保留。** 父会话拥有问题、conversation-native 表达、当前用户答案和 Product Contract 写回；没有 visual offer、第二协调者或 browser-to-agent channel。
+- KTD5. **删除优先于自研 renderer。** 当前没有 field signal 支撑 tokenizer、CSP、run handle、DOM 和状态机维护成本；本轮删除 reference/server，未来只接受 helper-owned fixed-template renderer 的独立实验提案。
+- KTD6. **真实上下文与 browser artifact 均不支持。** 不用普通进程、temp directory 或 worktree 冒充强隔离。
+- KTD7. **durable source 仍是 Product Contract / PRD。** seed、dossier、ASCII/表格表达和 promotion candidate 都只是输入或 handoff，不创建第二 durable artifact。
 - KTD8. **不新增 deterministic consumer parser。** 当前缺口由 prose contract 和聚焦测试可解决；等 repeated failure evidence 再 build。
-- KTD9. **项目级 promotion 是独立 mutation。** 同一当前用户确认 term decision，不等于批准写 glossary/context/ADR；这是两次 consent，不是两个角色。
+- KTD9. **项目级 promotion 不在需求 workflow 内 mutation。** term decision 只关闭当前 Product Contract / PRD；跨项目知识提升由后续显式知识维护请求单独授权。
 - KTD10. **场景按实质性推导。** selected dimension 必须改变 AE/OQ/assumption/non-goal，否则删除。
 - KTD11. **保留 `spec-plan` 用户控制语义。** producer blocker 不能被静默忽略，但当前用户可显式转成 assumption/decision。
-- KTD12. **证据强度匹配 claim。** contract test 证明结构、loopback/temp/artifact/response 地板；fresh-source paired eval 只判断问题质量和主 workflow 行为。视觉辅助是否改善决策属于 field outcome，不能用 reviewer 观察到“R/AE 被关闭”替代。
+- KTD12. **证据强度匹配 claim。** contract test 证明结构、禁止写入、visual surface removal 与 projection；unit-exit fresh-source paired eval 只判断问题质量和主 workflow 行为。删除 helper 不证明视觉决策质量提升。
 
 ### High-Level Design
 
@@ -284,18 +282,12 @@ flowchart TB
     L[legacy PRD + Handoff Context Slice]
   end
 
-  subgraph Optional
-    V[allowlist-validated static visual aid]
-  end
-
   subgraph Consumer
     P[spec-plan]
   end
 
   I -->|focused seed| B
   B --> U
-  B -. one visual comparison question .-> V
-  V -. observation + current-user decision .-> B
   R --> L
   U --> P
   L --> P
@@ -329,30 +321,15 @@ provenance_pointer
 | blocking WHAT | Resolve Before Planning / Outstanding Questions |
 | planning-owned HOW | Deferred to Planning |
 | local term | Product Contract prose / glossary subsection when material |
-| visual-aid observation | affected R/AE、Key Decision、limitations / invalidation |
+| visual/spatial comparison | affected R/AE、Key Decision、text limitation / future evidence need |
 
-### Static Visual Decision Aid Contract
+### Visual Capability Retirement Contract
 
-1. producer 先写明一个问题、affected R/AE、文本/源码为何不足，以及用户应观察什么；visual path 需要当前用户显式选择，不存在 interactive/dynamic 隐式升级。
-2. bundled helper 的 `start` 不接受调用方指定的任意 root，而是在 OS temp 下以 `mkdtemp` 创建不可预测 run root，返回 `root`、`screen_dir` 与 `state_dir`。producer 只向返回的 `screen_dir` 写 artifact；`status`/`stop` 只接受 helper 返回的 root。目录为 `0700`，artifact/state/log 文件为 `0600`；helper 校验 owner、realpath 与权限，symlink、非 regular file、越界路径或权限漂移在读取前 fail closed。旧 `--root /tmp/spec-first/.../<run-id>` 调用方式被替换。
-3. artifact 只能使用 synthetic/sanitized data 与静态 HTML/CSS fragment。`screen_dir` 只允许固定 `current.html`；producer 在同目录写私有临时文件，校验通过后原子替换，响应路径不得扫描、排序或选择“最新”文件，额外目录项一律拒绝。helper 内 deterministic allowlist tokenizer 只接受展示型语义/布局标签和 `class`、`id`、`role`、`aria-*`、inline style；artifact 禁止 button、input、select、textarea、anchor、`tabindex` 或其他交互/可聚焦节点。所有 URL-bearing attribute、未知 tag/attribute、`<script>`、事件处理属性、`javascript:`、meta refresh、form、anchor/navigation、frame/object 和 download 在响应前拒绝。tokenizer 必须识别 tag/attribute boundary、大小写和 entity normalization，不得以正则关键词扫描作为唯一验证，也不引入通用 parser dependency。响应前执行 512 KiB、20,000 token、单元素 32 属性、64 层嵌套和 500 ms 校验预算，任一超限即 fail closed、停止 helper 并清理 run root。
-4. helper 只绑定 `127.0.0.1` 或 `::1`，并按实际地址返回可达 URL；非 loopback 或 remote/LAN serving 请求 fail closed。`Host` 必须与实际 loopback 地址和端口精确匹配，IPv6 使用规范化方括号形式；有 `Origin` 时必须同源。无 `Origin` 时，根页面只接受 `GET`/`HEAD`、`Sec-Fetch-Mode: navigate`、`Sec-Fetch-Dest: document`；`/version` 只接受 `GET`/`HEAD`、`Sec-Fetch-Site: same-origin` 且 mode/dest 与同源 fetch 一致的请求。iframe、image、script、跨站 subresource、Fetch Metadata 缺失或矛盾、absolute-form authority 不一致均 fail closed，不发送 CORS 许可头。现有 helper 无条件移除 `/files`，除展示页面路由外唯一 helper-owned 辅助运行期 endpoint 是 `/version`。
-5. helper 为每次 HTML 响应生成 nonce，只给 helper-owned refresh script 注入 nonce。CSP 至少为 `default-src 'none'; script-src 'nonce-<per-response>'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; sandbox allow-scripts allow-same-origin`。根页面、状态页、错误页、拒绝响应和 `/version` 同时设置 `Referrer-Policy: no-referrer`、`X-Content-Type-Options: nosniff`、restrictive `Permissions-Policy`、`Cache-Control: no-store`、`Pragma: no-cache` 与 `Expires: 0`。
-6. 页面保留现有 waiting/ready 与自动 reload，新增 refreshing、refresh-failed 和 artifact-rejected，并按下表执行状态转换。例行 `/version` 轮询保持静默；发现版本变化后进入 refreshing，先以 no-store fetch 预取根页面，校验 2xx、HTML content type 和与 `/version` 一致的 helper-owned artifact version 标识。预取失败时保留旧 DOM 并进入 refresh-failed；预取成功后才调用 reload。合同不声称能观察 reload 调用后的浏览器导航失败，refresh-failed 只覆盖可观察的版本轮询或预取失败。artifact 内容无可聚焦控件；如 helper shell 提供 retry 等 helper-owned 控件，只允许该 shell 控件，并验证键盘操作、focus-visible、可访问名称与状态播报。所有页面状态满足 landmark/heading、DOM 阅读顺序、非颜色唯一信号、reduced-motion 和窄视口要求；当前用户在 chat 中的 accepted/rejected/mixed 或自由文本才是唯一产品确认。
-7. producer 将 observation、decision、limitation 和 invalidation 写回 Product Contract；裁决、取消、idle、owner 退出或 error 后 helper 停止并清理 run root。删除或保留临时 artifact 不改变需求事实。
-8. 动态问题若能安全重述为具名静态状态比较，可先展示静态并列或序列；只有实际状态切换对裁决不可替代、静态比较仍不足，或无 browser capability、无 current-user answer、任何 deterministic floor 不可用、问题需要真实应用执行时，才停止并回退文本。不足以裁决则保留 blocker，不声称 visual aid 已运行或已证明产品结论。
-
-**State transition table**
-
-| State | Trigger and retained content | Live-region / visible behavior | Recovery and exit |
-| --- | --- | --- | --- |
-| `waiting` | 尚无有效 `current.html`；首次 artifact 被拒绝时也回到此状态 | 展示等待或拒绝原因；首次进入时礼貌播报，不因轮询重复播报 | producer 原子写入有效 artifact 后进入 `ready`；用户可返回 chat 并保留 blocker |
-| `ready` | 展示最近一次通过校验的 `current.html` | 内容稳定可读；例行 `/version` 轮询静默 | 检测到版本变化后进入 `refreshing` 并预取根页面 |
-| `refreshing` | 继续保留最近一次有效 artifact，不清空页面 | 显示非颜色唯一的刷新提示；仅状态变化时播报一次 | 预取的 2xx/HTML/version 校验成功后调用 reload；预取或轮询失败进入 `refresh-failed` |
-| `refresh-failed` | 保留最近一次有效 artifact | 展示非阻断失败提示，避免高频轮询重复播报 | 后续轮询与预取成功后调用 reload；不声称观察 reload 调用后的导航失败；用户可返回 chat 继续裁决或保留 blocker |
-| `artifact-rejected` | 已有有效 artifact 时继续保留；首次生成失败时使用 `waiting` 页面表达拒绝 | helper-owned 状态页展示具名拒绝原因，使用 R30 安全头 | producer 修正并原子替换后进入 `ready`；否则停止、清理并回退 chat |
-
-`helper-unavailable` 不属于页面状态。`start`/bind/status/browser-capability 或 URL 交付失败时，由 producer 在 chat 输出具名原因、清理可用 run root、回退文本并保持 unresolved/blocker。
+1. 删除 `spec-brainstorm` 中 visual tripwire、text-vs-visual offer 和所有 `references/visual-probes.md` load/invocation；普通 blocking-question 规则重新成为唯一交互入口。
+2. 删除 `references/visual-probes.md` 与 `scripts/visual-probe-server.js` source，plugin projection 负责从五宿主 generated runtime 移除对应 mirror；不得手改 runtime。
+3. 视觉/空间问题只用 conversation-native 表达。当前用户回答充分时正常写回 R/AE/Scope 并关闭 blocker；仅在无回复或真实交互不可替代时保留 unresolved。
+4. contract tests 扫描 source、plugin projection 和用户文档，确认 visual gate、helper invocation、server path、`/version`、`/files`、visual temp root 与 disposable browser artifact 语义全部消失。
+5. 未来重开必须另立 experiment plan，并先满足 R30；不得在本计划实施中顺手加入 fixed-template renderer、HTML parser、CSP server 或 browser automation。
 
 ### Implementation Sequence
 
@@ -362,18 +339,18 @@ flowchart LR
   U1 --> U2[U2 ideate 选择胶囊]
   U1 --> U3[U3 brainstorm 核心澄清]
   U1 --> U5[U5 project promotion boundary]
-  U1 --> U4[U4 static visual helper hardening]
+  U1 --> U4[U4 retire visual helper]
   U3 --> U6[U6 plan 消费收敛]
   U5 --> U6
-  U0 --> U7[U7 消融评估、投射与文档]
-  U2 --> U7
-  U3 --> U7
+  U0 --> U7[U7 证据汇总、投射与文档]
+  U2 -. retained .-> U7
+  U3 -. retained .-> U7
   U4 --> U7
   U5 --> U7
-  U6 --> U7
+  U6 -. retained .-> U7
 ```
 
-U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强依赖，确保独立 1→10 路径不需要 ideation artifact。U1-U6 均不依赖 PRD Gate A、standalone prototype、sandbox backend 或新 consumer parser；U5 → U3 → U2 → U6 只作为可复现的累积 arm，U7 还需执行 applicability matrix、immediate-parent、DAG-valid contrasts、3 次 matched repeat 与 interaction 分析，并把必需 fresh sessions 控制在 72 以内。U4 只验证现有静态 helper 的安全与无回归，不承担动态价值实验。
+U0 在任何行为改动前冻结 current-source baseline、judge calibration 和 unit applicability。U2 与 U3 没有强依赖，确保独立 1→10 路径不需要 ideation artifact。U2/U3/U5/U6 在各自 unit exit 立即完成 before/after fresh-source paired evaluation，未证明的 unit 不进入后续累积 source；U7 只汇总证据并运行三路径 integrated no-regression。U4 是现有不安全/无证据运行时的 source removal，不承担视觉价值实验。
 
 ---
 
@@ -390,26 +367,29 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - 修改 `tests/unit/eval-fixture-contracts.test.js`
 - **Approach：**
   - 在修改 skill source 前记录 Appendix source hashes、case IDs、输入 source refs 与 current behavior。
-  - 预注册约 6 个组合 representative cases，覆盖 0→1、独立 1→10、10→100、promotion mutation、暂停恢复和静态 visual degraded path；详细 deterministic edge cases留在 focused tests，不把 17 个场景都升级为独立 fresh-source session。
-  - 固定 rubric、judge/reviewer 条件、主指标、countermetrics、baseline headroom、tie/inconclusive 规则、差异门与 case invalidation condition。对 U5/U3/U2/U6 预注册 immediate-parent 增量对照；U2 使用单项 leave-one-out。对 U3、U5 分别构造 DAG-valid `dependency-closed-absent`、`upstream-only`、`full-group` 三个对照，其他前置单元固定；U6 的单项 leave-one-out 即 `full-group` 对 `upstream-only`，不再从 final arm 单独移除仍被 U6 依赖的上游成员。单列 interaction，不以固定累积顺序中的一次增量冒充独立增益。
-  - 每个 semantic arm 使用同模型同配置运行 3 次 matched fresh-session，平衡 baseline/candidate 呈现顺序，由 blind reviewer 按预注册 rubric 评分并报告分布；只有方向一致且超过预注册差异门时计 improvement，否则为 inconclusive。
-  - 默认 retention 需要 immediate-parent 与 DAG-valid contrasts 共同支持。具名 bundle 只有在 `full-group` 相对 `dependency-closed-absent` 超过差异门、`upstream-only` 与 `full-group` 两个有效边际对照均不使主指标或 countermetrics 退化，且至少一个边际或预注册 interaction term 超过差异门时才可一并保留；否则保持未证明并收窄或删除。
-  - 预注册去重后的 arm-case applicability matrix，只运行能观察目标 claim 的 case，并复用同 case、同 source state、同模型配置下已存在的 baseline/arm 结果。必需评估最多 72 个 fresh sessions；每个已纳入 cell 仍完成 3 次 matched repeat，不用提前停止截断 cell。达到差异门后停止新增探索性 follow-up；若必需矩阵仍超过上限，则缩减不适用 arm/case 或诚实记录 degraded/inconclusive，不扩张预算。
+  - 预注册约 6 个 representative cases，覆盖 0→1、独立 1→10、暂停恢复、promotion candidate、visual retirement/text closure 和 10→100/direct planning；deterministic edge cases留在 focused tests。
+  - 固定 rubric、主指标、countermetrics、baseline headroom、tie/inconclusive 规则、差异门与 case invalidation condition。为 U2/U3/U5/U6 指定各自适用 case；每个 unit 只比较其实施前 source bundle 与实施后 source bundle，不构造 DAG arm 或未来 patch hash。
+  - 每个 unit 在首次修改自己的 source files 前冻结 pre-unit file list/hash 和 evaluator input；修改完成后冻结 post-unit file list/hash并立即评估。evaluation artifact 保存两侧 hash、source refs、实际注入内容的 bundle hash 与 limitations，不要求未来 worktree replay。
+  - 为每条成熟度路径至少预留一个由未参与方案编写的 reviewer 独立构造的 holdout case；用一组已知优/劣答案做 judge calibration。calibration 失败时该轮 semantic result 无效。
+  - 每个适用 before/after pair 使用同模型同配置运行 3 次 fresh session，平衡呈现顺序，由 blind reviewer 报告分布；只有方向一致且超过差异门时计 improvement，否则为 inconclusive。
+  - U2/U3/U6 的所有适用 baseline 都为零时，不实施该 unit；U5 与 U4 分别以 confirmed mutation gap 和 active-surface removal 为实施依据，不用 no-regression 冒充产品收益。
+  - 为 baseline 与 unit-exit/current-source evaluation 定义最小文档字段合同；`eval-fixture-contracts.test.js` 只检查 artifact path、source refs/hashes、case IDs、rubric、judge calibration、countermetrics、session total、fresh-source status 与 limitations，不裁决语义质量或实验结论。
   - baseline 不把计划中称为 confirmed gap 的源码事实升级成已证实用户收益；只记录当前行为和可观察 failure signal。
 
-**Arm-case applicability matrix**
+**Unit-exit applicability matrix**
 
-| Unit / bundle | Applicable representative cases | Required contrasts |
-| --- | --- | --- |
-| U2 focused seed | 0→1 handoff | immediate-parent；U2 leaf leave-one-out |
-| U3 + U6 | 0→1 handoff、独立 1→10、暂停恢复 | U3 dependency-closed-absent / upstream-only / full-group；U6 marginal = full-group vs upstream-only |
-| U5 + U6 | Promotion mutation、10→100 no-regression | U5 dependency-closed-absent / upstream-only / full-group；U6 marginal = full-group vs upstream-only |
-| U6 planning-only | 10→100 与 direct planning no-regression | 仅在所有显式 producer dependencies 存在时运行 U6 leaf leave-one-out |
-| U4 static visual | Static visual/degraded | 不进入 semantic retention matrix；只运行 deterministic gates 与 no-regression |
+| Unit | Case IDs | Exit evidence | Repeats | Max sessions |
+| --- | --- | --- | --- | --- |
+| U2 focused seed | C1 0→1 handoff | immediate before/after；需要非零 handoff failure headroom | 3 | 6 |
+| U3 brainstorm core | C1 0→1、C2 1→10、C3 pause/resume | immediate before/after；需要至少一个非零 clarification failure signal | 3 | 18 |
+| U5 promotion boundary | C4 candidate/no-mutation；C6 由 contract + U7 integrated 覆盖 | C4 deterministic hash + immediate before/after；C6 不新增 unit-exit session | 3 | 6 |
+| U6 plan consumer | C6 10→100/direct planning | dependencies 完整后的 immediate before/after；需要非零 planning-invention signal | 3 | 6 |
+| U4 visual retirement | C5 text closure/removal | deterministic source/projection removal；不运行产品价值 arm | 0 | 0 |
+| **Total cap** | **C1-C6；holdout 替换同路径一个预注册 case，不额外加 session** | **不新增 arm/worktree follow-up** | **3** | **36** |
 - **Test scenarios：**
   - baseline 在任一目标 skill 改动前生成，source hash 可回查。
-  - case ID、source refs、rubric 与 countermetrics 缺失时评估不可开始。
-  - baseline 为零的路径只能证明 no-regression；tie、重复运行方向不一致或未超过差异门不计 improvement。DAG-valid contrasts 结论冲突时记录 interaction；只有满足 bundle retention 条件才能组合保留。applicability matrix 缺失、必需 session 超过 72 或缺 current-user field evidence 时，不声明决策质量提升。
+  - case ID、source refs、rubric、judge calibration 与 countermetrics 缺失时评估不可开始。
+  - U2/U3/U6 所有适用 baseline 为零、tie、重复运行方向不一致或未超过差异门时，该 unit 不进入默认 source。必需 session 超过 36 时先删低适用性 case，不扩张评估平台。
 - **Verification：** baseline artifact review、source hash check 与 eval fixture contract；不运行尚未实现的 candidate source。
 
 ### U1. 定义轻量澄清合同与当前 PRD 基线
@@ -432,7 +412,7 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - 专业材料不足时由当前用户确认/defer/scope-cap，LLM 不代签、workflow 不联系第二人。
   - Product Contract/PRD 是 durable source，`/tmp` 不是。
   - Gate A current stop condition 可从准确 validation path 找到。
-  - project promotion 是单独 mutation。
+  - project promotion 在当前 workflow 中只生成 candidate，不产生 mutation。
 - **Verification：** 聚焦 contract test；直接检查 source refs 与当前文件 hash，不把 Graphify 或历史 transcript 当 confirmed truth。
 
 ### U2. 强化 `spec-ideate` focused seed
@@ -453,7 +433,7 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - HEAD 或 source changed 后 seed 标记 stale。
   - reasoned idea 无 direct evidence 时保留 unverified assumption。
   - rejection summary 很长时只携带与当前方向直接相关的一个替代。
-- **Verification：** contract test 加 fresh-source evaluator，检查 seed 有用但不演变为 PRD。
+- **Verification：** contract test；仅当 U0 的 C1 存在非零 handoff failure headroom 时实施，并在 unit exit 运行 3 次 before/after fresh-source paired evaluation，未过差异门则回退本 unit。
 
 ### U3. 收敛 `spec-brainstorm` 核心澄清、场景与暂停恢复
 
@@ -472,41 +452,36 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - 暂停时复用 requirements-only artifact 和 Resolve Before Planning。
   - Sources/Research 对承重 fact 增加 snapshot/limitation/invalidation 最小要求。
 - **Test scenarios：**
-  - source fact、current-user decision、HOW 和 future visual-aid candidate 正确分流，但没有 U4 时仍可完成 Product Contract。
+  - source fact、current-user decision 和 HOW 正确分流；视觉/空间问题作为表达形态处理，不新增 gap 状态。
   - 场景只保留会改变 AE/OQ/assumption/non-goal 的维度。
   - pause 后删除 dossier 仍可恢复。
   - 纯产品偏好无 source 可查时记录 not-applicable reason，不执行无效 source ceremony。
-- **Verification：** contract tests 与 fresh-source paired cases；无 browser host 或 U4 degraded 时本 unit 仍必须独立通过。
+- **Verification：** contract tests；仅当 U0 的 C1/C2/C3 至少一个存在非零 clarification failure signal 时实施，并在 unit exit 运行适用 case 的 3 次 before/after fresh-source paired evaluation。
 
-### U4. 加固现有 static visual helper
+### U4. 退役现有 visual helper
 
-- **Goal：** 在不新增 server/skill/runtime 或 agent-authored JavaScript 的前提下，为现有 display-only visual helper 补 loopback、私有 temp、静态 artifact validation、响应头、生命周期与可访问性地板。
+- **Goal：** 删除缺少 field value 且安全/生命周期边界不完整的 browser visual path，让视觉问题回到可闭合的 conversation-native 主路径。
 - **Requirements：** R25-R32
 - **Trace：** F5；AE9-AE12；KTD3-KTD6、KTD12
-- **Dependencies：** U0、U1；不依赖 U2/U3，且不阻塞无浏览器的核心澄清路径
+- **Dependencies：** U0、U1；不依赖 U2/U3
 - **Files：**
   - 修改 `skills/spec-brainstorm/SKILL.md`
-  - 修改 `skills/spec-brainstorm/references/visual-probes.md`
-  - 修改 `skills/spec-brainstorm/scripts/visual-probe-server.js`
-  - 新增 `tests/unit/spec-brainstorm-decision-probes.test.js`
+  - 删除 `skills/spec-brainstorm/references/visual-probes.md`
+  - 删除 `skills/spec-brainstorm/scripts/visual-probe-server.js`
+  - 新增 `tests/unit/spec-brainstorm-visual-retirement-contracts.test.js`
 - **Approach：**
-  - display-only 继续默认；只在当前用户明确选择 visual path 且一个具名问题适合静态比较时生成 synthetic HTML/CSS fragment。动态交互需求展示静态状态序列或回退文本，不生成 JavaScript。
-  - `start` 替换旧的调用方 `--root` 方式，由 helper 执行 `mkdtemp` 并返回 `root`、`screen_dir`、`state_dir`；producer 只向返回的 `screen_dir` 写入，`status`/`stop` 使用返回的 root。读取前执行 owner/realpath/symlink/regular-file/type 校验，裁决、取消、idle、owner exit 和 error 后递归清理。
-  - helper 只允许 loopback；按 R28 的 Host/Origin/IPv6/Fetch Metadata/absolute-form/CORS 矩阵区分根页面导航、同源 `/version` fetch 与跨站/iframe/subresource 请求。现有 helper 在所有启动方式下无条件移除 `/files` route。
-  - `screen_dir` 只允许固定 `current.html`，producer 通过同目录私有临时文件 + atomic rename 更新；响应路径不枚举或排序目录，发现额外目录项即拒绝。helper 内小型 deterministic allowlist tokenizer 在响应前拒绝 script/event/navigation/form/URL-bearing attribute 等 active content；helper refresh 使用 per-response nonce，不与 artifact 共享脚本权限。若 allowlist 不足以表达目标视觉，回退文本，不扩张 tokenizer 为通用 HTML sanitizer。
-  - 保留现有 waiting/ready 与自动 reload，新增 refreshing、refresh-failed、artifact-rejected；按状态转换表定义内容保留、触发、live-region、恢复与 blocker 出口。版本变化后先 no-store 预取并校验 2xx、HTML content type 和 artifact version 标识，成功才 reload；refresh-failed 只覆盖可观察的轮询/预取失败。`helper-unavailable` 只作 producer-owned chat fallback。artifact 不允许交互/可聚焦节点；helper-owned shell 控件单独满足键盘/focus/name 要求。
-  - 对 artifact 执行 R27 的大小与复杂度预算；对所有 HTML、状态、拒绝和 `/version` 响应执行 R30 的安全头与禁止缓存合同。
+  - 删除 Interaction Rule、Phase 0.3、Phase 1.3 与 approach-selection 中对 visual-probes 的 tripwire、offer、precedence 和 load 语义；恢复普通 blocking-question 路径。
+  - 删除 reference 与 server script，不保留 deprecated wrapper、stub endpoint 或兼容 alias。
+  - 在 `spec-brainstorm` 中明确视觉/空间问题使用表格、状态序列、ASCII 或只读 source screenshot；答案充分时正常关闭 blocker，不能因无 browser capability 永久 unresolved。
+  - future reopen 只记录为 Product Contract limitation/OQ，不生成 HTML/CSS/JavaScript、temp root、localhost URL 或 browser artifact。
 - **Test scenarios：**
-  - static layout 继续 display-only，现有 refresh/lifecycle 行为不回归。
-  - `127.0.0.1` 与 `::1` 返回正确 URL；地址栏、chat 链接和刷新产生的根页面 navigation 通过，same-origin `/version` 轮询通过；`0.0.0.0`、LAN address、Host/port 不匹配、非同源 Origin、iframe/image/script/cross-site subresource、Fetch Metadata 缺失或矛盾、非法 IPv6 authority、absolute-form authority 不一致均 fail closed，且不发送 CORS 许可头。
-  - `start` 返回 helper-owned `root`/`screen_dir`/`state_dir`，旧任意 `--root` 调用被拒绝；目录/文件权限、symlink/realpath/regular-file 拒绝和五类终止清理均有 deterministic tests。
-  - producer 只能原子替换固定 `current.html`；额外目录项或大量小文件不能触发目录枚举/排序，且必须 fail closed。script/event handler/meta refresh/anchor/form/external URL、超 512 KiB、超 token/attribute/depth/time budget 的 artifact 在发送任何 artifact-derived HTML 前被拒绝；只允许返回带 R30 安全头的 helper-owned `artifact-rejected` 状态页，随后按生命周期合同停止并清理。默认、foreground、IPv4 和 IPv6 启动路径的 `/files/*` 均返回 404。
-  - 根页面、状态页、错误页、拒绝响应和 `/version` 带 nonce CSP `sandbox`、no-referrer、no-sniff、restrictive Permissions-Policy 与 no-store headers，只有 helper-owned `/version` refresh 可运行。
-  - waiting、ready、refreshing、refresh-failed、artifact-rejected 分别验证内容保留规则、landmark/heading、DOM 阅读顺序、live-region、非颜色唯一提示和恢复动作；例行轮询不重复播报。覆盖 `/version` failure、预取非 2xx、错误 content type、version mismatch 与成功预取后 reload；不伪造 reload 调用后的导航失败观测。`helper-unavailable` 通过 start/bind/status/browser-capability 失败的 chat fallback 测试验证。reduced-motion 下无非必要动画，在 320 CSS px 窄视口保持选项标签/顺序且正文无非预期横向滚动。Jest/DOM 断言确认结构与状态合同，人工浏览器 characterization 确认 focus-visible、播报体验和窄视口可读性。
-  - 无 current-user answer、需要真实 app context、动态交互、browser 不可用或任一 floor 不可用时保持 blocker/text fallback。
-- **Verification：** helper characterization/HTTP/security/lifecycle tests、before/after workspace snapshot 与静态 visual no-regression；不创建 prototype lifecycle、动态语义或真实用户价值 gate。
+  - source 中 visual-probe reference 与 script 文件不存在，`SKILL.md` 无 load/invoke/offer 残留。
+  - 五宿主 dry-run projection 不再生成对应 runtime asset。
+  - 布局比较可用编号表格或 ASCII 询问，当前用户回答后关闭 affected R/AE。
+  - 真实交互不可替代或用户无回复时保持具名 blocker，不声称运行 probe。
+- **Verification：** source removal contract、plugin projection deletion expectation、before/after workspace snapshot 与 conversation-native fresh-source no-regression；不运行 browser/DOM/security characterization。
 
-### U5. 统一项目级语言与 ADR promotion mutation boundary
+### U5. 统一项目级语言与 ADR promotion candidate boundary
 
 - **Goal：** 消除 `CONCEPTS.md`、`CONTEXT.md` 和 ADR 的 silent/implicit write，同时保留需求制品本地闭合。
 - **Requirements：** R20-R24, R38
@@ -514,27 +489,38 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
 - **Files：**
   - 修改 `docs/contracts/domain-glossary.md`
   - 修改 `skills/spec-brainstorm/SKILL.md`
+  - 修改 `skills/spec-brainstorm/references/repo-profile-cache.md`
+  - 修改 `skills/spec-brainstorm/references/agents/repo-profiler.md`
   - 修改 `skills/spec-plan/SKILL.md`
+  - 修改 `skills/spec-plan/references/repo-profile-cache.md`
+  - 修改 `skills/spec-plan/references/agents/repo-profiler.md`
   - 修改 `skills/spec-prd/SKILL.md`
   - 修改 `skills/spec-prd/references/domain-language-and-decision-ledger.md`
+  - 修改 `skills/spec-prd/references/evidence-and-topology.md`
   - 修改 `skills/spec-prd/references/grill-with-docs-integration.md`
+  - 修改 `skills/spec-prd/references/prd-output-template.md`
+  - 修改 `skills/spec-prd/references/prd-readiness-lens.md`
+  - 修改 `skills/spec-prd/evals/examples.json`
   - 新增 `tests/unit/requirements-language-promotion-contracts.test.js`
   - 修改 `tests/unit/spec-prd-lite-profile-contracts.test.js`
+  - 修改 `tests/unit/eval-fixture-contracts.test.js`
 - **Approach：**
   - 删除 `spec-brainstorm` / `spec-plan` 的 `Apply silently` 行为。
-  - `spec-prd` 中当前用户对术语/决策的确认只关闭 PRD-local WHAT；项目级 file mutation 需要同一用户独立 preview + approval。
-  - preview 包含 target path、精确 proposed content、provenance、适用范围、真实 consumer、复用理由、invalidation condition、confirmation/mutation scope、不写入的影响，以及当前用户对目标 path 拥有项目级 mutation authority 的显式声明。无法声明 authority 时保持 PRD-local，不路由第二人。
-  - preview 字段齐全只满足 deterministic exit gate；内容是否值得 durable promotion 仍由 LLM/human 依据真实复用价值判断。任一资格缺失时保留 Product Contract/PRD-local，即使已取得写入批准也不 promotion。
+  - 将 `spec-brainstorm` 与 `spec-plan` 主 SKILL、repo-profile-cache reference 和 repo-profiler prompt 中的 authoritative/canonical 自动归一改为 advisory calibration；冲突时保留当前 Product Contract / PRD-local 含义并显式记录冲突。
+  - 将 `spec-prd` 的 `evidence-and-topology.md`、domain language、grill、output template、readiness lens 和 eval consumers 中“prefer canonical/inline update”语义统一改为 local closure + candidate-only。
+  - candidate 包含 target kind/path、proposed meaning、provenance、适用范围、真实 consumer、复用理由、invalidation condition 和“未写入”声明；内容是否值得 durable promotion 仍由 LLM/human 判断，但当前 workflow 无 mutation 分支。
+  - 后续若用户希望落地 candidate，单独进入明确的知识维护或文档编辑请求；本 workflow 不自动 dispatch，也不把产品确认扩张为项目级写授权。
   - validate 保持 report-only；不借 promotion 修改文件。
+  - 将 `prd-output-template.md`、`prd-readiness-lens.md` 与 `evals/examples.json` 中所有 triggered grill-with-docs inline `CONTEXT.md` / ADR 写入期望收敛为 PRD-local closure 与 candidate handoff。
   - 当前 `product-analysis-lite.md` 只作 single-confirmer/no-topology-drift 回归基线；除非实施时发现它直接声明项目级 mutation，否则不修改该刚更新的 reference。
 - **Test scenarios：**
-  - `CONCEPTS.md` 存在但 term 缺失，未批准时文件不变。
-  - triggered grill-with-docs 解决术语后只写 PRD，未单独批准时 `CONTEXT.md` 不变。
-  - ADR 三条件满足但未批准时只展示 preview。
-  - 用户批准写入但缺真实 consumer 或 invalidation condition 时不修改项目级文件。
-  - 当前用户确认术语和 proposed content，但无法声明其对目标 path 的 mutation authority 时不修改项目级文件，也不联系第二人代签。
+  - `CONCEPTS.md` 存在但 term 缺失，workflow 只输出 candidate，文件不变。
+  - `CONCEPTS.md` 与当前 Product Contract / PRD-local 术语冲突时，workflow 暴露冲突并保持 local 含义，不按 canonical/authoritative 文件名自动选胜者。
+  - triggered grill-with-docs 解决术语后只写 PRD 与 candidate，`CONTEXT.md` 不变。
+  - ADR 三条件满足时只输出 candidate；缺 consumer 或 invalidation condition 时只保留 PRD-local。
+  - `prd-output-template.md`、`prd-readiness-lens.md`、`evidence-and-topology.md` 和 `evals/examples.json` 不再出现 inline 项目级写入或 established-canonical 自动胜出期望；聚焦测试对所有实际 consumer 断言这一边界。
   - Lite profile 加载 domain reference 时不产生隐式写入。
-- **Verification：** 运行前后 path/hash snapshot；测试 default 与 Lite profile、create/refine/validate。
+- **Verification：** 运行前后 path/hash snapshot；测试 default 与 Lite profile、create/refine/validate；C4 unit-exit before/after semantic no-regression 与 candidate usefulness 评估。
 
 ### U6. 收窄 `spec-plan` 来源消费与 blocker 语义
 
@@ -552,7 +538,7 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - 读取 source refs、limitations、Resolve Before Planning、PRD write/readiness fields 与 Handoff Slice。
   - upstream-sourced run 默认把 true product blocker 路由回 producer；direct bootstrap 回当前用户。保留现有逐项转 explicit assumption/decision 的用户选择。
   - 不新增 `product_contract_source: spec-prd` unified branch、`inspect-requirements-origin.js` 或 verifier snapshot executor。
-  - 删除 silent `CONCEPTS.md` gap-fill，改用 U5 promotion。
+  - 删除 silent `CONCEPTS.md` gap-fill，改用 U5 candidate-only handoff。
 - **Test scenarios：**
   - brainstorm requirements-only artifact 原地 enrichment。
   - 通用 legacy requirements 仍可作为 origin；当其中存在当前 PRD fields/Handoff Slice 时，保持 user-selected entry 与 optional receipt diagnostic。
@@ -561,14 +547,14 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - checkpoint / `can_enter_spec_plan: no` 不被静默忽略。
   - 当前用户显式转换 blocker 后可以继续，记录 accepted risk。
   - source ref changed 时 planning 重新读取并记录 limitation。
-- **Verification：** 现有 handoff tests 加 focused behavior tests；不建立跨技能 runtime dependency。
+- **Verification：** 现有 handoff tests 加 focused behavior tests；仅当 U0 的 C6 存在非零 planning-invention signal 时实施语义改造，并在 dependencies 完整后运行 3 次 before/after fresh-source paired evaluation。
 
-### U7. 逐单元消融评估、五宿主投射与用户文档
+### U7. 汇总 unit-exit 证据、五宿主投射与用户文档
 
-- **Goal：** 相对 U0 baseline 逐单元证明核心改造减少下游发明和越权 mutation，拒绝用总体 core arm 掩盖无效机制，并把静态 helper 安全证明与产品效果声明分开。
+- **Goal：** 汇总各 unit 已完成的 before/after 证据，运行三路径 integrated no-regression，并完成 source delivery、visual surface removal 与用户文档投射。
 - **Requirements：** R39-R43
 - **Trace：** F1-F5；AE1-AE17；KTD12
-- **Dependencies：** U0-U6；U2 与 U3 作为独立能力分别评估
+- **Dependencies：** U0、U1、U4、U5；U2/U3/U6 仅在 U0 headroom gate 允许且 unit-exit evidence 支持保留时成为依赖
 - **Files：**
   - 修改 `tests/unit/eval-fixture-contracts.test.js`
   - 修改 `tests/unit/host-runtime-projection-contracts.test.js`
@@ -579,19 +565,18 @@ U0 在任何行为改动前冻结 current-source baseline。U2 与 U3 没有强�
   - 新增 `docs/validation/requirements-clarification/2026-07-11-clarification-integration-current-source-evaluation.md`
   - 修改 `CHANGELOG.md`
 - **Approach：**
-  - 使用 U0 当前源码 baseline，U5 deterministic mutation boundary → U3 core clarification → U2 focused seed → U6 plan consumer 只定义一个可复现的累积 arm，不单独证明独立增益。按 U0 applicability matrix 运行 immediate-parent 与 DAG-valid dependency-closed-absent / upstream-only / full-group contrasts；U2 为 leaf leave-one-out，U6 marginal 只在其 producer dependencies 完整时测量。
-  - 每个纳入的 arm-case cell 执行 3 次同模型同配置 matched fresh-session，平衡 baseline/candidate 顺序，由 blind reviewer 报告分布；方向不一致或未超过 U0 差异门时记为 inconclusive。只有满足 U0 bundle retention 条件时允许组合保留，否则结论冲突的单元收窄或删除。复用同 source state 的 baseline/arm 结果，必需评估不超过 72 sessions，达到差异门后不新增探索性 follow-up。
-  - 使用约 6 个预注册组合 core cases；focused tests 承担结构、边界和 edge-case 覆盖，不为每个断言启动独立 fresh-source session。
-  - U4 只通过 deterministic helper gates 与 static visual no-regression；不把“用户改变/关闭 R/AE”作为 retention 或正确性指标。未来 dynamic capability 必须另立计划并先提供可信封闭 renderer/浏览器级网络隔离。
-  - PRD 组只验证 no-regression 和 promotion mutation boundary；不创建 Gate A candidate。
-  - 记录 planner invention、source-answerable questions、current-user fidelity、second-human routing、scenario omission、unauthorized mutation、额外 rounds/token/latency、artifact size、错误 blocker 和 visual-aid fallback。
+  - 汇总 U2/U3/U5/U6 unit-exit evaluation 的 source hashes、case IDs、3 次 matched repeat 分布、judge calibration、countermetrics、保留/回退结论和 limitations；不得在 U7 首次补做缺失的 unit evidence。
+  - 对最终 source 运行 C1/C2/C6 的 integrated no-regression，确认 0→1、独立 1→10、10→100/direct planning 三条路径没有因组合交互退化；该结果不能挽救 unit-exit 未证明的 change。
+  - U4 通过 deterministic source/projection removal 和 C5 conversation-native closure case；不把删除 helper 或用户关闭 R/AE 当成视觉决策质量证据。
+  - PRD 组验证 default/Lite no-regression、single-confirmer、candidate-only/no-mutation 和 Gate A stop；不创建新 attempt/candidate。
+  - 记录 planner invention、source-answerable questions、current-user fidelity、second-human routing、scenario omission、project-level mutation、额外 rounds/token/latency、artifact size 和错误 blocker。
   - fresh-source evaluation 证明触发、降级与语义比较；若未来要声明决策质量提升，另做有 owner、截止日期、case/source hash、rubric、framing-bias/反转率指标且 `tie/inconclusive = no-retain` 的 current-user opt-in field pilot。
   - source tests 通过后用现有 plugin sync 投射 modified reference；不新增 governance entry。
 - **Test scenarios：**
-  - 0→1、独立 1→10、10→100 各自独立样本；U0 baseline 有非零 failure headroom 时要求 improvement，baseline 为零时要求 no-regression 和路径对应 claim 通过。
-  - 删除 U2 输入后直接 1→10 结果不回归；U2 有单项 leave-one-out，U3/U5 使用 DAG-valid 三臂对照，U6 marginal 只在依赖完整时测量。每个适用 arm-case cell 有 3 次 matched repeat、平衡顺序与分布结果；applicability matrix 去重且必需 fresh sessions 不超过 72，能够区分独立增益、bundle interaction、模型波动和负收益。
-  - 无 subagent/browser host 的诚实 degraded behavior。
-  - 五宿主都获得修改后的 existing skill resources；没有 `spec-prototype` 新入口。
+  - U2/U3/U6 只有在 unit-exit evidence 显示非零 headroom + improvement 时保留；全零或 inconclusive 的 unit 已从最终 source 回退。
+  - integrated cases 不回归，必需 fresh sessions 总数不超过 36，且没有临时 worktree/arm runner/patch manifest。
+  - 无 subagent host 时诚实记录 semantic eval `not_run` 并阻断对应语义 change 的保留；无 browser host 不再影响主路径。
+  - 五宿主获得修改后的 existing skill resources，同时不再包含 visual-probes reference/server；没有 `spec-prototype` 新入口。
   - static tests 通过但 semantic sample 失败时发布阻塞。
 - **Verification：** Verification Contract 中的 focused、repository、projection 与 fresh-source gates。
 
@@ -606,7 +591,7 @@ npx jest --runInBand \
   tests/unit/requirements-clarification-contracts.test.js \
   tests/unit/spec-ideate-clarification-handoff-contracts.test.js \
   tests/unit/spec-brainstorm-clarification-contracts.test.js \
-  tests/unit/spec-brainstorm-decision-probes.test.js \
+  tests/unit/spec-brainstorm-visual-retirement-contracts.test.js \
   tests/unit/requirements-language-promotion-contracts.test.js \
   tests/unit/spec-plan-contracts.test.js \
   tests/unit/spec-prd-lite-profile-contracts.test.js \
@@ -620,9 +605,10 @@ npx jest --runInBand \
 
 - focused seed 字段和 source limitation。
 - scenario pass 有具体落点且无全维度强制。
-- static visual helper 只允许 loopback/private temp，allowlist-tokenized artifact validation、resource budget 与 nonce CSP/sandbox/no-store deterministic floor 生效；agent-authored JavaScript、所有启动路径的 `/files`、external request、repo mutation 和伪运行声明均为零。
+- visual-probe gate/reference/server source 被删除，五宿主 projection 不再生成对应 asset；conversation-native 视觉问题在答案充分时可关闭 blocker。
+- requirements-clarification baseline、unit-exit/current-source evaluation artifact 的路径、source refs/hashes、case IDs、rubric、judge calibration、countermetrics、session total、fresh-source status 和 limitations 可由聚焦 fixture contract 确定性检查；测试不裁决语义质量或实验结论。
 - current user 是唯一人类产品确认入口；specialist material 只作 evidence，LLM/scripts 不替代确认。
-- glossary/context/ADR 未授权时 hash 不变。
+- `spec-brainstorm`、`spec-plan`、`spec-prd` 运行前后 glossary/context/ADR hash 不变，promotion 只输出 candidate。
 - default/Lite PRD profile、legacy topology、report-only validate、optional consumer diagnostic 不漂移。
 - `spec-plan` 保留 direct bootstrap/resume/deepen 与用户控制 blocker 语义，且不静默写 glossary。
 
@@ -664,8 +650,8 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 1. **0→1 handoff：** source-answerable current fact、current behavior/target conflict、stale ideation basis 和一个相邻 rejected alternative。
 2. **独立 1→10：** 无 ideation artifact，三个独立 current-user decision 逐次只问一个，并覆盖 permission/state/failure/negative/handoff 的相关场景落点。
 3. **暂停恢复：** 无 transcript、无 `/tmp` dossier，仍从 Product Contract 恢复 source refs、limitations、blocker 和下一问题。
-4. **Promotion mutation：** glossary authority conflict、未授权 promotion，以及批准但缺 provenance/consumer/invalidation qualification 时项目级文件保持不变。
-5. **Static visual/degraded：** display-only layout、动态问题降级为静态状态比较或文本、非 loopback/非法 artifact/browser 不可用/真实 repo context 均 fail closed；helper deterministic edge cases由 focused tests证明。
+4. **Promotion candidate：** glossary authority conflict、local closure、具备/缺少 provenance/consumer/invalidation 的 candidate，以及项目级文件始终不变。
+5. **Visual retirement/text closure：** 布局比较用表格/ASCII、动态问题用状态序列、答案充分时关闭 blocker、真实交互不可替代时保留 future evidence need；source/runtime 无 helper 残留。
 6. **10→100 与 planning no-regression：** default/Lite、specialist evidence single-confirmer、legacy PRD checkpoint 用户处置、Gate A stop、direct bootstrap 和 implementation-ready resume/deepen 均保持。
 
 主要指标：
@@ -677,17 +663,17 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - current-user answer / confirmation laundering 与 second-human routing。
 - unauthorized project-level mutations。
 - 额外 rounds、tokens、latency 和 artifact size。
-- 每个 U5/U3/U2/U6 单元或 bundle 的 immediate-parent、DAG-valid contrasts、3 次 matched repeat 分布、interaction 与 countermetric 变化；同时记录 applicability matrix、结果复用和总 session 数。tie、方向不一致、未过差异门、超过 72-session 上限或不满足 bundle retention 条件记为未证明。
-- static visual 的触发准确性、fallback 诚实性和额外 rounds；不从 fresh-source reviewer 推导真实决策正确性。
+- U2/U3/U5/U6 unit-exit before/after 的 3 次 matched repeat 分布、judge calibration、baseline headroom 与 countermetric 变化；tie、方向不一致、未过差异门、超过 36-session 上限或 calibration 失败记为未证明。
+- visual surface removal、conversation-native closure 和 future evidence honesty；不从 helper 删除推导真实决策正确性。
 
 ### Release Gates
 
 - U0 必须在任何目标 source mutation 前完成；缺 baseline、case/source hash、rubric 或 countermetric 时不得声明 improvement。
 - U1 可先独立落地；U2 与 U3 在 U1 完成后可彼此独立落地，且均不依赖 browser helper 代码；U2 不得成为直接 1→10 的前置条件。
-- U4 必须通过 loopback/private-temp/artifact-validation/resource-budget/nonce-CSP/no-store/lifecycle/accessibility characterization 与 static visual no-regression；不存在 dynamic semantics retention 分支。
-- U5 必须同时覆盖 brainstorm、plan、PRD default/Lite 和 validate no-mutation；当前 Lite reference 默认只测不改。
+- U4 必须删除 visual gate/reference/server，并通过 source/runtime projection removal 与 text-closure no-regression；不得以新 renderer 替代删除。
+- U5 必须同时覆盖 brainstorm、plan、repo-profile cache/prompts、PRD evidence/domain/grill/output/readiness/eval consumers、default/Lite 和 validate no-mutation；当前 Lite reference 默认只测不改。
 - U6 不改变 direct bootstrap/resume/deepen、legacy PRD user-control 或 optional receipt policy。
-- U7 的 U5/U3/U2/U6 必须有 applicability matrix、immediate-parent、DAG-valid contrasts、3 次 matched repeat 分布、interaction 与总 session 结果；baseline 有 headroom 时验证 improvement，无 headroom 时验证 no-regression。超过 72-session 上限、未满足 bundle retention 条件、重复方向不一致、结论冲突或 countermetric 退化时，单元先删除/收窄再进入投射。只有 focused tests 与 current-source evaluation 无 P0/P1 时才能投射 runtime。
+- U2/U3/U6 必须有非零 baseline headroom、unit-exit 3 次 before/after matched repeat 与 improvement；U5 必须有 deterministic no-mutation 和 semantic no-regression；U7 integrated pass 不能替代缺失的 unit evidence。超过 36-session 上限、calibration 失败、重复方向不一致或 countermetric 退化时，单元先删除/收窄再进入投射。只有 focused tests 与 current-source evaluation 无 P0/P1 时才能投射 runtime。
 - 任何新增 P0/P1 semantic finding、unauthorized mutation、second-human routing 或 confirmation laundering 阻塞发布。
 
 ---
@@ -700,16 +686,16 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - `spec-ideate` focused seed 携带 source snapshot、limitations、assumptions 和相关淘汰信息，但不变成 mini PRD。
 - `spec-brainstorm` 先查 source、逐问当前用户、运行相关性场景 pass，并在暂停时把 durable state 写入 requirements-only Product Contract。
 - 所有保留场景都有 AE/OQ/assumption/non-goal 落点。
-- `spec-brainstorm`、`spec-plan` 和 `spec-prd` 的 project-level glossary/context/ADR write 均为 preview-first、当前用户显式声明目标 path mutation authority、单独批准；无法确认 authority 时保持 PRD-local。
-- visual aid 只存在于 `spec-brainstorm` existing visual-probe surface，使用 allowlist-validated 静态 HTML/CSS、loopback/private temp、resource budget、nonce CSP/sandbox/no-store 和明确 lifecycle/accessibility contract；所有启动路径均无 `/files`，没有 agent-authored JavaScript、external request、repo write、真实数据或由 artifact 发起的 shell execution。
-- 没有 standalone `spec-prototype`、request registry、worktree takeover、sandbox runner、cleanup ledger 或 prototype release gate。
+- `spec-brainstorm`、`spec-plan` 和 `spec-prd` 不创建或修改 project-level glossary/context/ADR；跨 release 候选只输出带 provenance/consumer/invalidation 的 candidate。
+- `spec-brainstorm` 的 visual-probe gate、reference 和 server script 已从 source 与五宿主 projection 删除；视觉问题使用 conversation-native 表达，答案充分时可正常关闭 blocker。
+- 没有 standalone `spec-prototype`、browser helper replacement、request registry、worktree takeover、sandbox runner、cleanup ledger 或 prototype release gate。
 - `spec-plan` upstream discovery 只识别当前两类真实 durable origin，30-day 仅为提示；direct bootstrap/resume/deepen 保持，blocker 不被静默忽略，用户控制 assumption/decision 路径保持。
-- U0 baseline、focused tests、repository gates、逐单元 fresh-source evaluation、field outcome（如有）和五宿主 source projection 分别记录；任何一层不替代另一层。
-- U5/U3/U2/U6 均有 applicability matrix、immediate-parent、DAG-valid contrasts、3 次 matched repeat 分布与 interaction 证据；必需 fresh sessions 不超过 72。只有满足 improvement/no-regression headroom 与 bundle retention 规则的 change 才可保留，不因总体 core arm 变好而保留无证据单元。
+- U0 baseline、focused tests、repository gates、U2/U3/U5/U6 unit-exit fresh-source evaluation、U7 integrated no-regression、field outcome（如有）和五宿主 source projection 分别记录；任何一层不替代另一层。
+- U2/U3/U6 只有在非零 baseline headroom 与 3 次 matched before/after improvement 成立时保留；U5 有 deterministic no-mutation 与 semantic no-regression，必需 fresh sessions 不超过 36。U7 总体验证不能保留 unit-exit 未证明的 change。
 - README、README.zh-CN、当前执行文档和 CHANGELOG 与最终实现一致。
 - generated runtime 未手改；需要刷新时只从 source 运行 `spec-first init`。
 - U0-U7 各自的 Requirements、Trace、Test scenarios 与 Verification 均有实际证据；不得用 U7 总体验证替代单 unit exit。
-- `tests/unit/spec-brainstorm-decision-probes.test.js` 永久保留为 static helper characterization/no-regression suite；最终 diff 不包含 dynamic probe prose、cases、fixtures 或 abandoned experiment/code。
+- `tests/unit/spec-brainstorm-visual-retirement-contracts.test.js` 永久保护 gate/reference/server removal 与 conversation-native closure；最终 diff 不包含 visual-probe prose、runtime asset、cases、fixtures 或 abandoned helper code。
 
 ---
 
@@ -744,34 +730,12 @@ runtime projection 只验证 source delivery 和 path rewrite；不能证明问�
 - 2026-07-12 second multi-agent review：自动修复 2 项内部一致性问题；用户确认 best-judgment 批量应用 13 项修订，补齐 helper CLI、request matrix、resource/cache/state/accessibility、promotion authority 与双对照消融合同；3 项 U4 产品/架构根决策进入 Deferred / Open Questions。
 - 2026-07-12 round-2 re-review：自动修复 AE10、U1→U2/U3 release dependency 与 artifact rejection 的 3 项残余矛盾；用户确认 best-judgment 应用 7 项新修订，补 Fetch Metadata、可达状态转换、固定单 artifact slot、依赖闭合 leave-out、baseline headroom、coupled-unit retention 与 3 次 matched repeat 分布裁决。
 - 2026-07-12 round-3 re-review：product-lens 超时，其余六视角完成；用户确认 best-judgment 应用 refresh 预取、DAG-valid bundle contrasts 与 72-session applicability budget，artifact publish ownership 和 candidate rejection/terminal cleanup 两项协议分歧进入 Deferred / Open Questions。
+- 2026-07-12 latest-code review：Appendix hashes 与当前磁盘 source 一致；用户确认补齐 `CONCEPTS.md` 读取侧 advisory boundary、全部 PRD inline-write consumers、source-only arm manifest/可计数 matrix/fixture contract，以及 disposable visual sketch migration。security-lens 未发现新增计划级安全遗漏。
+- 2026-07-12 calibrated autonomous resolution：逐项复核最新 15 条 finding 与 10→100 routing FYI 后，收窄 PRD 入口谓词；接受 arm manifest 时序、零 headroom、U5 consumer 漏改、text fallback 和 visual runtime 维护成本等根因；删除 arm/worktree/57-72 session 评估平台，改为 unit-exit before/after + 36-session cap；U5 改为 candidate-only/no-mutation 并补齐 repo-profile 与 PRD evidence consumer；U4 选择退役 gate/reference/server，因而一并关闭 parser、inline style、run handle、publish ownership、reload/DOM/accessibility 等派生问题。原 Deferred / Open Questions 五项已由该根决策全部解决。
 
 ### Research Limitations
 
 - 本轮以当前仓库 source、tests、validation 和 git history 为事实依据；Graphify 仅作 advisory 导航，重要结论均回源确认。
 - 未重新运行 Contract Reset Gate A，也未把当前 `inconclusive` 追溯升级。
-- 未实施本计划、未运行计划中尚不存在的新 tests、未做 runtime projection；本次只更新 plan 与 CHANGELOG，并执行 Markdown/差异一致性检查。
-- 静态 visual aid 的真实用户价值仍缺 field outcome，因此本计划只承诺 deterministic safety/no-regression，不宣称提升决策正确性。未来动态能力必须另立计划并先满足可信隔离前提。
-
-## Deferred / Open Questions
-
-### From 2026-07-12 review
-
-- **静态视觉 helper 的保留形态尚未裁决** — Problem Frame / U4 (P1, product-lens、scope-guardian、adversarial, confidence 100)
-
-  团队会在尚无真实用户价值证据时，为可选视觉能力承担安全、生命周期和可访问性维护成本。后续需要基于可回源 field signal 裁决：当前禁用并保留文本回退，还是仅保留 helper-owned 固定模板形式；在裁决前不得把 helper hardening 当成产品价值证据。
-
-- **U4 renderer / parser 策略尚未裁决** — KTD5 / U4 (P1, security-lens、scope-guardian、adversarial, confidence 75)
-
-  若决定保留 U4，仍需在 helper-owned 固定模板、maintained parser allowlist 与自研 tokenizer 之间作出明确选择。当前计划的自研 tokenizer 同时承担安全边界和维护复杂度，缺少足以排除更小方案的比较证据。
-
-- **U4 是否应脱离核心发布 tranche** — Implementation Sequence / U7 (P1, scope-guardian, confidence 75)
-
-  U7 当前依赖 U0-U6，使可选 visual hardening 可能阻塞核心澄清、promotion 和 plan-consumer 改造。是否拆分核心与 visual-helper 的投射/文档 tranche，应随 U4 保留形态的根决策一并裁决。
-
-- **Artifact publish ownership 尚未裁决** — R27 / Static Visual Decision Aid Contract / U4 (P1, coherence、feasibility、security-lens、adversarial, confidence 100)
-
-  当前固定 `current.html` 槽与原子更新需要一个不会触发“额外目录项拒绝”的发布协议。仍需裁决是允许 helper-issued、不可服务的受控临时槽，还是增加独立 staging 目录与 helper-owned `publish` 操作；在裁决前，producer 直接写 `screen_dir` 与 helper 独占校验/提交的 ownership 不清晰。
-
-- **Candidate rejection 与终止清理语义尚未裁决** — R27 / State transition table / U4 (P1, coherence、design-lens、security-lens, confidence 100)
-
-  内容校验失败、资源预算超限和 run-root 完整性失败是否都应终止 helper 尚未闭合。可恢复的 `artifact-rejected → ready` 需要保留 last-known-good 与会话；不可恢复的 owner/realpath/symlink/权限/bind/internal error 则应停止并清理。资源超限属于哪一侧仍需明确裁决。
+- 未实施本计划、未运行计划中尚不存在的新 tests、未做 runtime projection；本次只更新 plan 与 CHANGELOG。已确认 Appendix 9 个 source hash 匹配，现有 `spec-plan`/PRD handoff/Lite 聚焦 Jest 3 suites、12 tests 通过，并完成 R/AE/U ID、Markdown fence、旧 active contract 残留和 `git diff --check` 检查。
+- visual helper 的真实用户价值仍缺 field outcome，因此本计划选择退役而非加固；未来视觉能力必须另立实验计划并满足 R30，不能从本次删除推导决策质量提升。

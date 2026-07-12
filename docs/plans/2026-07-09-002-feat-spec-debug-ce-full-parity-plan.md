@@ -2,7 +2,7 @@
 spec_id: spec-debug-ce-full-parity
 title: "feat: spec-debug 集成 ce-debug 全能力并保留 spec-first 证据治理"
 type: feat
-status: active
+status: completed
 date: 2026-07-09
 plan_depth: detailed
 author: leokuang
@@ -25,6 +25,8 @@ local_benchmark_refs:
 ---
 
 # feat: spec-debug 集成 ce-debug 全能力并保留 spec-first 证据治理
+
+> **完成说明（2026-07-12）：** 当前 `spec-debug` 已完成 CE debug Phase 0–4 能力投影、spec-first 命名与证据治理适配、旧增强资产清理、合同文档同步、聚焦测试、skill entrypoint lint 与 fresh-source eval。后续通用 debug 演进不再作为本计划未完成项。
 
 ## Summary
 
