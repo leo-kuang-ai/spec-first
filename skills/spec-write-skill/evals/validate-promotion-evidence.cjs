@@ -5,7 +5,9 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const SCHEMA_VERSION = 'spec-write-skill.promotion-evidence/v1';
+const SCHEMA_V1 = 'spec-write-skill.promotion-evidence/v1';
+const SCHEMA_V2 = 'spec-write-skill.promotion-evidence/v2';
+const SUPPORTED_SCHEMA_VERSIONS = new Set([SCHEMA_V1, SCHEMA_V2]);
 const REQUIRED_INPUT_ROLES = ['baseline_source', 'candidate_source', 'case_set', 'gate0', 'rubric'];
 const REQUIRED_ARM_IDS = ['candidate-ablation', 'candidate-full', 'native', 'old-full'];
 const VERDICTS = new Set(['pass', 'fail', 'not_run']);
@@ -143,14 +145,18 @@ function validateArmAssembly(arm, errors) {
   }
 }
 
-function readCaseSet(bundleRoot, inputs, errors) {
+function readCaseSet(bundleRoot, inputs, schemaVersion, errors) {
   const caseSet = Array.isArray(inputs) && inputs.find((input) => input && input.role === 'case_set');
   if (!caseSet || !isSafeRelativePath(caseSet.path)) return { behaviorIds: [], routeIds: [] };
   try {
     const parsed = JSON.parse(fs.readFileSync(path.resolve(bundleRoot, caseSet.path), 'utf8'));
     const behavior = Array.isArray(parsed.cases) ? parsed.cases : null;
     const routes = Array.isArray(parsed.route_queries) ? parsed.route_queries : null;
-    if (!behavior || behavior.length !== 8) errors.push('case_set must declare exactly 8 behavior cases');
+    if (!behavior || (schemaVersion === SCHEMA_V1 ? behavior.length !== 8 : behavior.length < 8)) {
+      errors.push(schemaVersion === SCHEMA_V1
+        ? 'v1 case_set must declare exactly 8 behavior cases'
+        : 'v2 case_set must declare at least 8 behavior cases');
+    }
     if (!routes || routes.length < 12 || routes.length > 16) errors.push('case_set must declare 12-16 route queries');
     const behaviorIds = behavior ? behavior.map((entry) => entry && entry.id) : [];
     const routeIds = routes ? routes.map((entry) => entry && entry.id) : [];
@@ -175,7 +181,7 @@ function sameIdSet(actual, expected) {
     && actual.every((id) => expected.includes(id));
 }
 
-function validateCoverage(coverage, expected, cases, routeRuns, errors) {
+function validateCoverage(coverage, expected, cases, routeRuns, requireFullCandidateCoverage, errors) {
   if (!coverage || typeof coverage !== 'object' || Array.isArray(coverage)) {
     errors.push('manifest.coverage is required');
     return { comparisonIds: [], regressionIds: [] };
@@ -196,6 +202,9 @@ function validateCoverage(coverage, expected, cases, routeRuns, errors) {
   const caseIds = new Set((Array.isArray(cases) ? cases : []).map((entry) => entry && entry.id));
   for (const id of expected.behaviorIds) {
     if (!caseIds.has(id)) errors.push(`manifest.cases must include behavior case ${id}`);
+    if (requireFullCandidateCoverage && repeatsFor(cases, id, 'candidate-full').size < 2) {
+      errors.push(`behavior case ${id} arm candidate-full must have at least two distinct promotion repeats`);
+    }
   }
   const routeIds = new Set((Array.isArray(routeRuns) ? routeRuns : []).map((entry) => entry && entry.id));
   for (const id of expected.routeIds) {
@@ -292,7 +301,7 @@ function readArtifactResult(bundleRoot, reference, label, requireRouteSignal, re
   }
 }
 
-function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, errors) {
+function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, countAllCandidateFull, errors) {
   const counts = new Map();
   const armRunCounts = new Map();
   const runKeys = new Set();
@@ -358,7 +367,7 @@ function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, e
       }
     }
     validateNonNegativeInteger(entry.duration_ms, `${label}.duration_ms`, errors);
-    if (entry.arm === 'candidate-full' && entry.promotion_case === true) {
+    if (entry.arm === 'candidate-full' && (countAllCandidateFull || entry.promotion_case === true)) {
       if (entry.machine_verdict === 'fail' || entry.reviewer_verdict === 'fail') hardFailures += 1;
       else if (entry.machine_verdict === 'not_run' || entry.reviewer_verdict === 'not_run') notRun += 1;
     }
@@ -581,17 +590,20 @@ function validatePromotionEvidence(bundlePath) {
   if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
     errors.push('manifest must be an object');
   } else {
-    if (manifest.schema_version !== SCHEMA_VERSION) errors.push(`manifest.schema_version must equal ${SCHEMA_VERSION}`);
+    if (!SUPPORTED_SCHEMA_VERSIONS.has(manifest.schema_version)) {
+      errors.push(`manifest.schema_version must equal ${SCHEMA_V1} or ${SCHEMA_V2}`);
+    }
+    const isV2 = manifest.schema_version === SCHEMA_V2;
     requireString(manifest, 'bundle_id', errors);
     requireString(manifest, 'host', errors);
     requireString(manifest, 'model', errors);
     validateInputs(bundleRoot, manifest.inputs, errors);
-    const expectedCoverage = readCaseSet(bundleRoot, manifest.inputs, errors);
+    const expectedCoverage = readCaseSet(bundleRoot, manifest.inputs, manifest.schema_version, errors);
     const armIds = validateArms(bundleRoot, manifest.arms, errors);
     validateSourceBindings(manifest.inputs, manifest.arms, errors);
-    const behavior = validateCases(bundleRoot, manifest.cases, armIds, manifest.host, manifest.model, errors);
+    const behavior = validateCases(bundleRoot, manifest.cases, armIds, manifest.host, manifest.model, isV2, errors);
     const routes = validateRouteRuns(bundleRoot, manifest.route_runs, manifest.host, manifest.model, errors);
-    const coverage = validateCoverage(manifest.coverage, expectedCoverage, manifest.cases, manifest.route_runs, errors);
+    const coverage = validateCoverage(manifest.coverage, expectedCoverage, manifest.cases, manifest.route_runs, isV2, errors);
     validateComparativeCoverage(manifest.cases, coverage, errors);
     validateCountermetrics(bundleRoot, manifest.countermetrics, manifest.cases, errors);
     const gate0BenefitVerdict = validateGate0Resolution(bundleRoot, manifest.gate0_resolution, errors);

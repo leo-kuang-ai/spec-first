@@ -6,7 +6,7 @@ It improves Evaluation/Knowledge Harness input by letting any tool join「审查
 
 It exists because a 2026-06-14 audit found a closure break (`META-closure-break`): the 2026-06-10 综合审查报告's 12 个 P1 had no plan pointing back at them via `origin`, so their逐条闭环状态 became unauditable. This contract makes the back-link explicit and minimally enforced.
 
-This is the contract surface for 角色契约 §4「响亮约定(loud convention)」: a deterministic check that the back-link is *declared*, never a hard gate that blocks merges or mandates coverage completeness.
+This is the contract surface for 角色契约「Gate the exits, not the thinking」: a deterministic check that the back-link is *declared*, never a hard gate that blocks merges or mandates coverage completeness.
 
 ## Field Responsibilities
 
@@ -32,7 +32,7 @@ The deterministic check is intentionally minimal — it catches只 silent 断链
 - **Not enforced(语义,归 LLM):** finding id 是否真实存在于报告中;finding 是否被正确裁决;报告所有 finding 是否都被某 plan 覆盖。这些是 LLM/orchestrator 语义判断,不脚本化。
 - **Legacy 放行:** 两类放行——(1) 完全没有 `referenced_reviews` 字段的 plan;(2) frontmatter `date` 早于约定确立日 `2026-06-14` 的历史 plan(法不溯及既往,不回溯改写历史 plan frontmatter)。本约定只对该日及之后、且显式引用审查报告的 plan 生效。
 
-为什么弱:角色契约 §4 把「knowledge promotion / handoff gate」列为留给 LLM 语义判断的轻合同,在缺 runtime 强制时降级为响亮约定。强制「必须声明 finding id」防住了 `META-closure-break` 那类静默断链;强制「覆盖完整性」会变成新增硬 gate,与 §4「不新增硬 gate」冲突,成本高且收益边际。
+为什么弱:角色契约把 handoff / knowledge promotion 定义为 exit gate,同时要求 deterministic floor 与 semantic judgment 分工。这里机械强制「必须声明 finding id」以防住 `META-closure-break` 那类静默断链;finding 是否被正确覆盖仍由 LLM 判断。把覆盖完整性脚本化会扩张 hard gate,成本高且收益边际。
 
 ## Artifact Metadata
 

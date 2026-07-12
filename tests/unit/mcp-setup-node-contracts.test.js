@@ -53,16 +53,37 @@ function parityRunner(calls) {
   return (command, args, options = {}) => {
     calls.push([command, ...args]);
     const cwd = options.cwd || process.cwd();
-    if (command === 'graphify' && args[0] === 'install' && args[1] === '--project') {
+    const graphifyCommand = path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify';
+    if (command === 'uv' && args[0] === 'tool' && args[1] === 'install') {
+      const home = options.env && options.env.HOME;
+      const binDir = path.join(home, '.local', 'bin');
+      const toolBin = path.join(home, '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin');
+      fs.mkdirSync(binDir, { recursive: true });
+      fs.mkdirSync(toolBin, { recursive: true });
+      fs.writeFileSync(path.join(toolBin, 'python'), '#!/bin/sh\n');
+      fs.writeFileSync(path.join(binDir, 'graphify'), `#!${path.join(toolBin, 'python')}\n`);
+      fs.chmodSync(path.join(toolBin, 'python'), 0o755);
+      fs.chmodSync(path.join(binDir, 'graphify'), 0o755);
+    }
+    if (graphifyCommand && args[0] === 'install' && args[1] === '--project') {
       const platform = args[3] || 'codex';
       const roots = { claude: '.claude', cursor: '.cursor', kiro: '.kiro', qoder: '.qoder' };
       const skillDir = path.join(cwd, roots[platform] || '.codex', 'skills', 'graphify');
       fs.mkdirSync(skillDir, { recursive: true });
       fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\n');
     }
-    if (command === 'graphify' && ['extract', 'update'].includes(args[0])) {
-      fs.mkdirSync(path.join(cwd, '.graphify'), { recursive: true });
-      fs.writeFileSync(path.join(cwd, '.graphify', 'graph.json'), '{}\n');
+    if (graphifyCommand && ['extract', 'update'].includes(args[0])) {
+      const artifact = path.resolve(cwd, (options.env && options.env.GRAPHIFY_OUT) || '.graphify');
+      fs.mkdirSync(artifact, { recursive: true });
+      fs.writeFileSync(path.join(artifact, 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
+    }
+    if (graphifyCommand && args[0] === 'hook' && args[1] === 'install') {
+      const interpreter = path.join(options.env.HOME, '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin', 'python');
+      const hooks = path.join(cwd, '.git', 'hooks');
+      fs.mkdirSync(hooks, { recursive: true });
+      for (const [name, markers] of Object.entries({ 'post-commit': ['# graphify-hook-start', '# graphify-hook-end'], 'post-checkout': ['# graphify-checkout-hook-start', '# graphify-checkout-hook-end'] })) {
+        fs.writeFileSync(path.join(hooks, name), ['#!/bin/sh', markers[0], `_PINNED='${interpreter}'`, "_out = os.environ.get('GRAPHIFY_OUT', 'graphify-out')", 'from graphify.watch import _rebuild_code', markers[1]].join('\n'));
+      }
     }
     return {
       command,
@@ -72,9 +93,15 @@ function parityRunner(calls) {
       signal: null,
       timed_out: false,
       timeout: false,
-      stdout: command === 'graphify' && args[0] === '--version'
-        ? 'graphify 0.17.1'
-        : (args[0] === 'status' ? 'ready' : 'ok'),
+      stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
+        ? (String(args[1]).includes('importlib.metadata')
+          ? JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12']] })
+          : '3.12.1')
+        : (graphifyCommand && args[0] === '--version'
+          ? 'graphify 0.9.12'
+          : (command === 'uv' && args.join(' ') === 'tool dir --bin'
+            ? path.join(options.env.HOME, '.local', 'bin')
+            : (args[0] === 'status' ? 'ready' : 'ok'))),
       stderr: '',
       error: null,
     };
@@ -95,7 +122,7 @@ function classifyEffects(repoBefore, repoAfter, homeBefore, homeAfter, calls) {
     effects.add('project-config');
   }
   if (paths.some((entry) => /^\.(?:claude|codex|cursor|kiro|qoder)\//.test(entry))) effects.add('host-config');
-  if (calls.some(([command, first, second]) => command === 'graphify'
+  if (calls.some(([command, first, second]) => path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify'
     && (['install', 'extract', 'update'].includes(first) || (first === 'hook' && second === 'install')))) {
     effects.add('provider-mutation');
   }
@@ -332,7 +359,9 @@ describe('spec-mcp-setup unified Node contract', () => {
       expect(observed.result.exit_code).toBe(contract.exit_code);
       expect(observed.result.reason_code).toBe(contract.reason_code);
       expect(observed.result.payload.schema_version).toBe(contract.artifact_schema);
-      expect(observed.effects).toEqual([...contract.side_effect_categories].sort());
+      const expectedEffects = [...contract.side_effect_categories];
+      if (['only', 'graphify-refresh'].includes(expectedMode)) expectedEffects.push('home');
+      expect(observed.effects).toEqual([...new Set(expectedEffects)].sort());
       expectFields(observed.result.payload, fixture.artifacts[contract.artifact_schema]);
       if (observed.result.payload.runtime) {
         expectFields(observed.result.payload.runtime, fixture.artifacts['spec-mcp-setup-diagnostic-snapshot.v1']);

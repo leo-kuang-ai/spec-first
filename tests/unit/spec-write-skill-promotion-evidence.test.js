@@ -21,7 +21,11 @@ function sha256(content) {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
-function createBundle() {
+function createBundle({
+  behaviorCount = 9,
+  routeCount = 12,
+  schemaVersion = 'spec-write-skill.promotion-evidence/v2',
+} = {}) {
   const root = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'spec-write-skill-promotion-'));
   tempRoots.push(root);
 
@@ -37,8 +41,8 @@ function createBundle() {
   const portableCore = artifact('inputs/portable-core.md');
   const candidateFull = artifact('inputs/candidate-full.md');
   const baselineFull = artifact('inputs/baseline-full.md');
-  const behaviorIds = Array.from({ length: 8 }, (_, index) => `behavior-${index + 1}`);
-  const routeIds = Array.from({ length: 12 }, (_, index) => `route-${index + 1}`);
+  const behaviorIds = Array.from({ length: behaviorCount }, (_, index) => `behavior-${index + 1}`);
+  const routeIds = Array.from({ length: routeCount }, (_, index) => `route-${index + 1}`);
   const inputs = [
     { role: 'candidate_source', ...candidateFull },
     { role: 'baseline_source', ...baselineFull },
@@ -118,7 +122,7 @@ function createBundle() {
   }));
   const defaultContext = artifact('inputs/default-context.md', 'default context');
   const manifest = {
-    schema_version: 'spec-write-skill.promotion-evidence/v1',
+    schema_version: schemaVersion,
     bundle_id: 'test-bundle',
     host: 'codex',
     model: 'test-model',
@@ -166,6 +170,36 @@ test('accepts a complete promotion evidence bundle', () => {
   expect(report.valid).toBe(true);
   expect(report.result).toBe('pass');
   expect(report.errors).toEqual([]);
+});
+
+test('preserves promotion coverage floors while allowing the canonical case set to grow', () => {
+  expect(validatePromotionEvidence(createBundle({
+    behaviorCount: 8,
+    routeCount: 12,
+    schemaVersion: 'spec-write-skill.promotion-evidence/v1',
+  }).root)).toMatchObject({ valid: true, result: 'pass' });
+  expect(validatePromotionEvidence(createBundle({ behaviorCount: 10, routeCount: 16 }).root))
+    .toMatchObject({ valid: true, result: 'pass' });
+
+  expect(validatePromotionEvidence(createBundle({ behaviorCount: 7 }).root).errors)
+    .toEqual(expect.arrayContaining(['v2 case_set must declare at least 8 behavior cases']));
+  expect(validatePromotionEvidence(createBundle({ routeCount: 11 }).root).errors)
+    .toEqual(expect.arrayContaining(['case_set must declare 12-16 route queries']));
+  expect(validatePromotionEvidence(createBundle({ routeCount: 17 }).root).errors)
+    .toEqual(expect.arrayContaining(['case_set must declare 12-16 route queries']));
+});
+
+test('keeps published v1 evidence semantics stable and requires v2 for expanded case sets', () => {
+  const historical = path.join(repoRoot, 'docs/validation/2026-07-12-spec-write-skill-promotion');
+  expect(validatePromotionEvidence(historical)).toMatchObject({ valid: true, result: 'pass' });
+
+  const expandedV1 = createBundle({
+    behaviorCount: 9,
+    schemaVersion: 'spec-write-skill.promotion-evidence/v1',
+  });
+  expect(validatePromotionEvidence(expandedV1.root).errors).toEqual(expect.arrayContaining([
+    'v1 case_set must declare exactly 8 behavior cases',
+  ]));
 });
 
 test('fails closed on missing manifest fields', () => {
@@ -326,6 +360,40 @@ test('requires each declared arm to contribute evidence runs', () => {
   expect(report.errors).toEqual(expect.arrayContaining([
     'manifest.cases must contain at least one run for arm candidate-full',
   ]));
+});
+
+test('requires candidate-full double-run coverage for every bound behavior case', () => {
+  const { root, manifest } = createBundle();
+  manifest.cases = manifest.cases.filter((entry) => !(
+    entry.id === 'behavior-9' && entry.arm === 'candidate-full'
+  ));
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(false);
+  expect(report.errors).toEqual(expect.arrayContaining([
+    'behavior case behavior-9 arm candidate-full must have at least two distinct promotion repeats',
+  ]));
+});
+
+test('counts failures from every candidate-full behavior case, not only comparison subsets', () => {
+  const { root, manifest } = createBundle();
+  const candidates = manifest.cases.filter((entry) => (
+    entry.arm === 'candidate-full' && entry.id === 'behavior-9'
+  ));
+  for (const entry of candidates) entry.promotion_case = false;
+  const [candidate] = candidates;
+  const content = '{"result":"fail","route_high_risk_misroute":false}\n';
+  fs.writeFileSync(path.join(root, candidate.machine_check.path), content);
+  candidate.machine_check.sha256 = sha256(content);
+  candidate.machine_verdict = 'fail';
+  manifest.gate_calculation.hard_failures = 1;
+  manifest.gate_calculation.result = 'fail';
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(true);
+  expect(report.result).toBe('fail');
 });
 
 test('requires the fixed old-full regression arm', () => {

@@ -91,6 +91,28 @@ describe('process-runner security and timeout isolation', () => {
     }
   });
 
+  test('supports a complete allowlisted environment without inheriting host credentials', async () => {
+    const previous = process.env.OPENAI_API_KEY;
+    process.env.OPENAI_API_KEY = 'runner-isolation-sentinel';
+    const env = {
+      PATH: process.env.PATH,
+      HOME: os.homedir(),
+      TMPDIR: os.tmpdir(),
+      GRAPHIFY_OUT: '.graphify',
+    };
+    const script = 'process.stdout.write(JSON.stringify({secret:process.env.OPENAI_API_KEY||null,path:!!process.env.PATH,home:!!process.env.HOME,tmp:!!process.env.TMPDIR,out:process.env.GRAPHIFY_OUT}))';
+    try {
+      for (const result of [
+        await runProcess({ command: process.execPath, args: ['-e', script], env, inheritEnv: false }),
+        runProcessSync({ command: process.execPath, args: ['-e', script], env, inheritEnv: false }),
+      ]) {
+        expect(JSON.parse(result.stdout)).toEqual({ secret: null, path: true, home: true, tmp: true, out: '.graphify' });
+      }
+    } finally {
+      restoreEnv('OPENAI_API_KEY', previous);
+    }
+  });
+
   const posixTest = process.platform === 'win32' ? test.skip : test;
 
   posixTest('runProcessSync force-kills and confirms a SIGTERM-resistant grandchild', async () => {

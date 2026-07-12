@@ -99,6 +99,22 @@ function createReadOnlyAuditRunner() {
 
 function fakeRunner(command, args, options = {}) {
   const cwd = options.cwd || process.cwd();
+  const graphifyCommand = path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify';
+  if (command === 'uv' && args[0] === 'tool' && args[1] === 'install') {
+    const home = options.env && options.env.HOME;
+    if (home) {
+      const binDir = path.join(home, '.local', 'bin');
+      const toolDir = path.join(home, '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin');
+      fs.mkdirSync(binDir, { recursive: true });
+      fs.mkdirSync(toolDir, { recursive: true });
+      const interpreter = path.join(toolDir, 'python');
+      const launcher = path.join(binDir, 'graphify');
+      fs.writeFileSync(interpreter, '#!/bin/sh\n');
+      fs.writeFileSync(launcher, `#!${interpreter}\n`);
+      fs.chmodSync(interpreter, 0o755);
+      fs.chmodSync(launcher, 0o755);
+    }
+  }
   if (command === 'npx' && args.includes('ast-grep/agent-skill')) {
     const home = options.env && options.env.HOME;
     if (home) {
@@ -107,7 +123,7 @@ function fakeRunner(command, args, options = {}) {
       fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# ast-grep\n');
     }
   }
-  if (command === 'graphify' && args[0] === 'install' && args[1] === '--project') {
+  if (graphifyCommand && args[0] === 'install' && args[1] === '--project') {
     const platform = args[3] || 'codex';
     const roots = {
       claude: '.claude/skills/graphify',
@@ -117,11 +133,36 @@ function fakeRunner(command, args, options = {}) {
     };
     const skillDir = path.join(cwd, roots[platform] || '.codex/skills/graphify');
     fs.mkdirSync(skillDir, { recursive: true });
-    fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\n');
+    fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\nUse graphify-out/graph.json\n');
+    const instruction = platform === 'claude' ? 'CLAUDE.md' : 'AGENTS.md';
+    fs.writeFileSync(path.join(cwd, instruction), '## graphify\nUse graphify-out/graph.json\n');
+    if (platform === 'codex') {
+      fs.mkdirSync(path.join(cwd, '.codex'), { recursive: true });
+      fs.writeFileSync(path.join(cwd, '.codex', 'hooks.json'), JSON.stringify({
+        hooks: { PreToolUse: [{ hooks: [{ type: 'command', command: '/wrong/graphify hook-check' }] }] },
+      }));
+    }
   }
-  if (command === 'graphify' && args[0] === 'extract') {
-    fs.mkdirSync(path.join(cwd, '.graphify'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.graphify', 'graph.json'), '{}\n');
+  if (graphifyCommand && args[0] === 'extract') {
+    const envOut = options.env && options.env.GRAPHIFY_OUT ? options.env.GRAPHIFY_OUT : '.graphify';
+    const artifactRoot = path.resolve(cwd, envOut);
+    fs.mkdirSync(artifactRoot, { recursive: true });
+    fs.writeFileSync(path.join(artifactRoot, 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
+  }
+  if (graphifyCommand && args[0] === 'hook' && args[1] === 'install') {
+    const interpreter = path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin', 'python');
+    const hooksRoot = path.join(cwd, '.git', 'hooks');
+    fs.mkdirSync(hooksRoot, { recursive: true });
+    for (const [name, markers] of Object.entries({
+      'post-commit': ['# graphify-hook-start', '# graphify-hook-end'],
+      'post-checkout': ['# graphify-checkout-hook-start', '# graphify-checkout-hook-end'],
+    })) {
+      fs.writeFileSync(path.join(hooksRoot, name), [
+        '#!/bin/sh', markers[0], '# Installed by: graphify hook install',
+        `_PINNED='${interpreter}'`, "_out = os.environ.get('GRAPHIFY_OUT', 'graphify-out')",
+        'from graphify.watch import _rebuild_code', markers[1], '',
+      ].join('\n'));
+    }
   }
   return {
     command,
@@ -131,9 +172,15 @@ function fakeRunner(command, args, options = {}) {
     signal: null,
     timed_out: false,
     timeout: false,
-    stdout: command === 'graphify' && args[0] === '--version'
-      ? 'graphify 0.17.1'
-      : (args[0] === 'status' ? 'ready' : 'ok'),
+    stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
+      ? (String(args[1]).includes('importlib.metadata')
+        ? JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12']] })
+        : '3.12.1')
+      : (graphifyCommand && args[0] === '--version'
+        ? 'graphify 0.9.12'
+        : (command === 'uv' && args.join(' ') === 'tool dir --bin'
+          ? path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'bin')
+          : (args[0] === 'status' ? 'ready' : 'ok'))),
     stderr: '',
     error: null,
   };
@@ -974,7 +1021,6 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     const target = tempRepo('mirror-success');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const calls = [];
-    let graphifyInstalled = false;
     const failed = (command, args, message) => ({
       command,
       argv: args,
@@ -995,15 +1041,8 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
       const context7Install = command === 'npx'
         && args.some((arg) => String(arg).includes('@upstash/context7-mcp'));
       const skillInstall = command === 'npx' && args.includes('ast-grep/agent-skill');
-      const graphifyInstall = command === 'npm'
-        && args[0] === 'install'
-        && args.some((arg) => String(arg).includes('@sentropic/graphify'));
-      if ((context7Install || skillInstall || graphifyInstall) && !mirror) {
+      if ((context7Install || skillInstall) && !mirror) {
         return failed(command, args, 'injected primary registry failure');
-      }
-      if (graphifyInstall && mirror) graphifyInstalled = true;
-      if (command === 'graphify' && args[0] === '--version' && !graphifyInstalled) {
-        return failed(command, args, 'graphify not installed');
       }
       return fakeRunner(command, args, options);
     };
@@ -1034,19 +1073,17 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     }
     expect(facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
       readiness_status: 'fresh',
-      install_source: 'mirror',
-      mirror_used: true,
+      install_source: 'official',
+      mirror_used: false,
       attempts: [
-        expect.objectContaining({ exit_code: 1 }),
-        expect.objectContaining({ exit_code: 0 }),
+        expect.objectContaining({ command: 'uv', exit_code: 0 }),
       ],
     });
     const retriedInstalls = calls.filter((call) => (
       (call.command === 'npx' && call.args.some((arg) => String(arg).includes('@upstash/context7-mcp')))
       || (call.command === 'npx' && call.args.includes('ast-grep/agent-skill'))
-      || (call.command === 'npm' && call.args.some((arg) => String(arg).includes('@sentropic/graphify')))
     ));
-    expect(retriedInstalls).toHaveLength(6);
+    expect(retriedInstalls).toHaveLength(4);
     for (let index = 0; index < retriedInstalls.length; index += 2) {
       expect(retriedInstalls[index].env).not.toHaveProperty('NPM_CONFIG_REGISTRY');
       expect(retriedInstalls[index].env).not.toHaveProperty('npm_config_registry');
@@ -1239,7 +1276,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     childRepo(workspace, 'packages/second');
     const runner = (command, args, options) => {
       if (options.cwd === first
-        && command === 'graphify'
+        && path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify'
         && ['extract', 'update'].includes(args[0])) {
         return {
           command,

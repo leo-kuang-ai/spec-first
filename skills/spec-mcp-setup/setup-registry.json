@@ -34,10 +34,27 @@
     },
     {
       "id": "graphify",
-      "ecosystem": "npm",
-      "package": "@sentropic/graphify",
-      "version": "0.17.1",
-      "command": "graphify"
+      "ecosystem": "pypi",
+      "package": "graphifyy",
+      "version": "0.9.12",
+      "command": "graphify",
+      "python": {
+        "requires": ">=3.10",
+        "allow_managed_download": false
+      },
+      "installers": {
+        "preference": [
+          "uv",
+          "pipx"
+        ],
+        "plain_pip_allowed": false
+      },
+      "distribution": {
+        "wheel_url": "https://files.pythonhosted.org/packages/76/0c/5c52d9e5b535d22c529417e219e23ad2c04532d4d9ca239abc21518f111a/graphifyy-0.9.12-py3-none-any.whl",
+        "sha256": "94f9d0d7ef68455a2055c7623fb9574c7a781afb1473d26c7936d1abfc14d62c",
+        "index_url": "https://pypi.org/simple"
+      },
+      "hook_normalization_contract": "graphify-python-hook-normalization.v1"
     }
   ],
   "hosts": {
@@ -1622,7 +1639,7 @@
         "hook_default": true,
         "usage_owner": "downstream-skill"
       },
-      "usage_note": "标准 Runtime Setup（或高级子集 `spec-mcp-setup --only graphify`）会安装 Graphify CLI 与当前 host 的 project skill，并从原始 PATH 或 Provider 标准用户工具路径解析 `graphify`。若 project root 尚无 Graphify artifact，它先尝试 first-generation `graphify extract .`；semantic extract 无法运行时，回退到 code-only/incremental `graphify update .`，在 project root 生成 provider-native `.graphify/`。Bare Runtime Setup 默认完成 Graphify install-init 与 query/hook verification。若 `.graphify/graph.json` 或 `.graphify/GRAPH_REPORT.md` 已存在，显式 setup 会验证或修复 install state（project skill/instruction、query probe、hook status/install），并建议显式 incremental `--refresh`，不会默认重新生成。现有旧版 `graphify-out/` artifact 只作为 compatibility 与 refresh-needed evidence；运行 `spec-mcp-setup --only graphify --refresh` 可重新生成 provider-native `.graphify/`。显式 refresh 运行 `graphify update .`（code-only，不做 LLM semantic extraction）；仅当 Graphify 拒绝覆盖并建议 `--force` 时，才执行一次 bounded `graphify update . --force` 修复。需要且目标是 git repo 时，随后启用 provider-native `graphify hook install`。若解析到的 Graphify CLI 不在原始 PATH，setup 可在 Graphify 安装的 hook 文件中加入带 marker 的 project-local PATH repair block，再验证 hook status。下游只要求 CLI/project skill/hook；Graphify MCP/watch 在 Runtime Setup 外仍保持 opt-in。使用 `$graphify .`/`/graphify .` 或解析后的 Graphify CLI query/path/explain 获取 project-graph candidate，再由 source/test/log evidence 确认结论。",
+      "usage_note": "标准 Runtime Setup（或高级子集 `spec-mcp-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.12` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 `graphify extract . --code-only` 并以 `GRAPHIFY_OUT=.graphify` 维护唯一current artifact。已有`.graphify/`时普通setup只读query；显式`--refresh`执行journaled staged clean rebuild、机械完整性/query验证、backup与promote，不原位update。Claude/Codex/Cursor/Kiro使用Provider-native project integration，Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和`.graphify`环境。PATH上的npm incumbent只形成shadowing limitation和显式cleanup建议，不自动卸载或重指向。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
       "detection": {
         "kind": "command",
         "command": "graphify",
@@ -1638,19 +1655,22 @@
       },
       "safety": {
         "risk_flags": [
-          "global-npm-install",
-          "package-migration:graphifyy->@sentropic/graphify",
+          "isolated-python-tool-install",
+          "python-interpreter-coupling",
+          "same-name-cli-collision",
+          "verified-direct-wheel",
+          "third-party-executable-host-config",
           "single-maintainer-bus-factor",
           "project-runtime-skill-write",
           "git-hook-write"
         ],
-        "source": "npm",
-        "source_repo": "https://www.npmjs.com/package/@sentropic/graphify",
+        "source": "pypi",
+        "source_repo": "https://pypi.org/project/graphifyy/0.9.12/",
         "version_policy": {
           "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "Installs npm package `{{package}}@{{version}}`, resolves `graphify` from the user's original PATH or npm global bin, and verifies the resolved CLI. After npm install or upgrade, setup may back up and repoint a stale `graphify` symlink on the original PATH to the pinned executable; ordinary files, non-writable paths, and ambiguous cases stay report-only. Explicit Graphify setup verifies or installs the current-host project skill such as `graphify install --project --platform codex`, normalizes the provider-written `AGENTS.md`/`CLAUDE.md` `## graphify` instruction section to resolved CLI/manual-visibility/direct-source-fallback wording, and only generates provider-native project-root `.graphify/` when no existing current Graphify artifact is present. Bare Runtime Setup includes Graphify install-init and query/hook verification by default. Existing `.graphify/graph.json`/`GRAPH_REPORT.md` triggers install-state verification plus query/hook probes and reports an explicit incremental refresh next action instead of regenerating by default. Legacy `graphify-out/graph.json`/`GRAPH_REPORT.md` is detected as compatibility-only refresh-needed evidence and does not replace the current `.graphify/` contract. Explicit refresh runs provider-native `graphify update .` (code-only, no LLM semantic extraction), with one bounded `graphify update . --force` repair only after Graphify emits overwrite refusal plus a force hint. Setup probes query/hook commands through the resolved CLI, installs project-level `graphify hook install` in git repos when needed, and may add a marked project-local PATH repair block to Graphify-installed hook files before `graphify hook status` when the resolved CLI is off the original PATH. Provider writes may include `.codex/skills/graphify/`, `.codex/hooks.json`, `AGENTS.md`, `.claude/skills/graphify/`, `CLAUDE.md`, `.graphify/`, legacy `graphify-out/`, and `.git/hooks/*`; setup reports them as provider-owned runtime/project output, does not edit shell profiles, does not vendor the Graphify skill, and does not auto-add, auto-commit, or promote provider output to spec-first source."
+        "install_effect": "Installs the release-reviewed `graphifyy@0.9.12` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version; same-name npm/unknown PATH commands remain report-only. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to `.graphify/` and the selected launcher. First generation is local AST `extract --code-only`; explicit refresh is journaled clean rebuild with backup/recovery. Git hook readiness requires both Provider marker blocks, verified interpreter, `.graphify` env and allowed rebuild command. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, never auto-uninstalls npm, and never promotes Graphify output beyond advisory evidence."
       },
       "readiness": {
         "producer": "spec-mcp-setup",
@@ -1667,29 +1687,29 @@
         "reason_code": "project-graph-provider-unavailable"
       },
       "installation": {
-        "strategy": "npm-global",
+        "strategy": "python-isolated-tool",
         "dependency_ref": "graphify",
-        "next_action": "运行当前 host setup workflow 诊断 Provider readiness，然后使用当前 host 的 subset entrypoint（Claude 与 Codex 均为 `spec-mcp-setup --only graphify`）执行显式 Provider install-init。{{package}} 的 version pin 为 {{version}}。"
+        "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-mcp-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`.graphify/` code-only生成、query与hook验证。"
       },
       "platform_overrides": {
         "macos": {
           "installation": {
-            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用journaled clean rebuild"
           }
         },
         "linux": {
           "installation": {
-            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用journaled clean rebuild"
           }
         },
         "wsl": {
           "installation": {
-            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用journaled clean rebuild"
           }
         },
         "windows": {
           "installation": {
-            "command_display": "npm install -g {{package}}@{{version}}；从 PATH 或 npm global bin 解析 graphify；验证/安装 Graphify project skill；已有 .graphify 时验证 install state 并建议 incremental --refresh；旧版 graphify-out 仅作为 compatibility-only refresh-needed evidence；否则运行 graphify extract .；显式 --refresh 运行 graphify update .（code-only，不使用 LLM）；只有 Provider 拒绝覆盖后才运行 graphify update . --force；最后验证/安装 graphify hook"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用journaled clean rebuild"
           }
         }
       }

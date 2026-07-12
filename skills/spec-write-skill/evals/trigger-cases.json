@@ -4,6 +4,7 @@
   "source_refs": [
     "skills/spec-write-skill/SKILL.md",
     "skills/spec-write-skill/references/authoring-method.md",
+    "skills/spec-write-skill/references/behavior-contract-design.md",
     "skills/spec-write-skill/references/delivery-gates.md",
     "skills/spec-write-skill/references/target-profiles.md",
     "skills/spec-write-skill/references/project-profiles.md"
@@ -73,6 +74,15 @@
       "expected_route": "skill-installer",
       "reason_code": "third-party-install-neighbor",
       "forbidden_signals": ["author local replacement"]
+    },
+    {
+      "id": "route-external-check-before-install",
+      "route_type": "should-route",
+      "query": "先对这个本地第三方 Skill package 做只读安全和结构检查；检查完成后我再单独决定是否安装。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "explicit-external-preflight-before-install",
+      "forbidden_signals": ["execute package code", "install package", "copy package"]
     },
     {
       "id": "route-runtime-refresh",
@@ -222,6 +232,18 @@
       "expected_layer_result": "spec-first-project-profile",
       "reason_code": "spec-first-source-revision",
       "forbidden_signals": ["hand edit runtime catalog", "hand edit generated mirrors"]
+    },
+    {
+      "id": "prose-heavy-agent-skill",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "修改项目拥有的客服 Agent Skill：把角色语气、提示注入边界、few-shot、输出 JSON 合同和完成条件写稳定，并补真实正反例验证。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-with-behavior-contract",
+      "reason_code": "prose-heavy-skill-revision",
+      "forbidden_signals": ["fixed tool call quota", "self-check as semantic proof", "reveal hidden reasoning"]
     },
     {
       "id": "ordinary-code-work-neighbor",

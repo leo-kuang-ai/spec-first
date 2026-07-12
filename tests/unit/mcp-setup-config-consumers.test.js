@@ -126,6 +126,11 @@ describe('spec-mcp-setup active Node consumers', () => {
     for (const host of getSupportedPlatforms()) {
       const repoRoot = tempRepo(host);
       const plan = providers.graphify.plan({ selected: true, repoRoot, host });
+      if (host === 'qoder') {
+        expect(plan.actions).toContainEqual(expect.objectContaining({ kind: 'install-qoder-adapter', command: null }));
+        expect(plan.actions.some((entry) => entry.kind === 'install-project-skill')).toBe(false);
+        continue;
+      }
       const installSkill = plan.actions.find((entry) => entry.kind === 'install-project-skill');
       expect(installSkill).toMatchObject({
         command: 'graphify',

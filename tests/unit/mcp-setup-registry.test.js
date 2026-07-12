@@ -110,10 +110,24 @@ describe('spec-mcp-setup registry v8', () => {
       },
       {
         id: 'graphify',
-        ecosystem: 'npm',
-        package: '@sentropic/graphify',
-        version: '0.17.1',
+        ecosystem: 'pypi',
+        package: 'graphifyy',
+        version: '0.9.12',
         command: 'graphify',
+        python: {
+          requires: '>=3.10',
+          allow_managed_download: false,
+        },
+        installers: {
+          preference: ['uv', 'pipx'],
+          plain_pip_allowed: false,
+        },
+        distribution: {
+          wheel_url: 'https://files.pythonhosted.org/packages/76/0c/5c52d9e5b535d22c529417e219e23ad2c04532d4d9ca239abc21518f111a/graphifyy-0.9.12-py3-none-any.whl',
+          sha256: '94f9d0d7ef68455a2055c7623fb9574c7a781afb1473d26c7936d1abfc14d62c',
+          index_url: 'https://pypi.org/simple',
+        },
+        hook_normalization_contract: 'graphify-python-hook-normalization.v1',
       },
     ]);
     expect(registry.summary_columns).toEqual([

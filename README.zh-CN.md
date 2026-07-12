@@ -85,6 +85,8 @@ Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Chan
 
 如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-mcp-setup`。标准流程会准备必备 baseline、CodeGraph 与 Graphify；`--only` 仅用于高级子集修复，`--verify-only` 保持不安装的只读验证边界。
 
+Graphify 当前固定为 PyPI `graphifyy@0.9.12`，需要预先存在 Python `>=3.10` 与 `uv`（优先）或 `pipx`。Setup 不自动安装 Python/tool manager，也不使用 plain pip；它会验证 direct wheel hash 与 package identity，通过 `extract --code-only` 在 `.graphify/` 生成本地 AST 图，并始终把 Graphify 输出视为 advisory navigation。已有 npm Graphify 命令只会作为 PATH collision 报告，不会被自动卸载。
+
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
 
 Cursor/Kiro/Qoder native pointer 文件：`init --cursor`、`init --kiro` 和 `init --qoder` 也会写入 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md`。这些文件只把宿主指回根目录 `AGENTS.md` 和当前宿主已安装的 `using-spec-first` runtime skill（`.cursor/skills/`、`.kiro/skills/` 或 `.qoder/skills/`）；它们是 generated runtime pointer，不是第二个 source of truth。如果同路径已有无 spec-first managed marker 的用户文件，init 和 clean 都不会覆盖或删除；init 和 doctor 都会显式报告冲突 warning。
@@ -163,7 +165,7 @@ docs/
 
 需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。
 
-`spec-write-skill` 是通用的项目级 Agent Skill workflow：可创建或修改项目拥有的 canonical package，也可只读验证现有或外部 package。Portable core 不要求项目使用 spec-first；宿主 metadata 与项目治理只在适用时加载。只审查质量仍走 bounded review，第三方安装仍交给 installer，generated runtime mirror 必须从 source 重建而不是直接修补。
+`spec-write-skill` 是通用的项目级 Agent Skill workflow：可创建或修改项目拥有的 canonical package，也可只读验证现有或外部 package。Portable core 不要求项目使用 spec-first；宿主 metadata 与项目治理只在适用时加载。依赖 prose 的 Agent Skill 会按需加载行为合同方法，补强判据、权威边界、正反例、停止条件与证据化自检。只审查质量仍走 bounded review，第三方安装仍交给 installer，generated runtime mirror 必须从 source 重建而不是直接修补。
 
 [→ 完整入口与路由规则](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 

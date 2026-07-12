@@ -197,7 +197,7 @@
     },
     "externalDependency": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "id",
         "ecosystem",
@@ -224,6 +224,119 @@
         "command": {
           "type": "string",
           "minLength": 1
+        },
+        "python": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/python"
+        },
+        "installers": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/installers"
+        },
+        "distribution": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/distribution"
+        },
+        "hook_normalization_contract": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/hook_normalization_contract"
+        },
+        "candidate": {
+          "$ref": "#/$defs/pythonToolCandidate"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "ecosystem": { "const": "pypi" } },
+            "required": ["ecosystem"]
+          },
+          "then": {
+            "required": ["python", "installers", "distribution", "hook_normalization_contract"]
+          }
+        }
+      ]
+    },
+    "pythonToolCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ecosystem",
+        "package",
+        "version",
+        "command",
+        "python",
+        "installers",
+        "distribution",
+        "hook_normalization_contract"
+      ],
+      "properties": {
+        "ecosystem": {
+          "const": "pypi"
+        },
+        "package": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requires", "allow_managed_download"],
+          "properties": {
+            "requires": {
+              "type": "string",
+              "pattern": "^>=3\\.10$"
+            },
+            "allow_managed_download": {
+              "const": false
+            }
+          }
+        },
+        "installers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["preference", "plain_pip_allowed"],
+          "properties": {
+            "preference": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "prefixItems": [
+                { "const": "uv" },
+                { "const": "pipx" }
+              ],
+              "items": false
+            },
+            "plain_pip_allowed": {
+              "const": false
+            }
+          }
+        },
+        "distribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wheel_url", "sha256", "index_url"],
+          "properties": {
+            "wheel_url": {
+              "type": "string",
+              "pattern": "^https://files\\.pythonhosted\\.org/.+\\.whl$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "index_url": {
+              "const": "https://pypi.org/simple"
+            }
+          }
+        },
+        "hook_normalization_contract": {
+          "type": "string",
+          "const": "graphify-python-hook-normalization.v1"
         }
       }
     },

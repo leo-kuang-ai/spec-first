@@ -234,7 +234,7 @@ function runProcess(options = {}) {
   const command = options.command;
   const args = Array.isArray(options.args) ? options.args.map((arg) => String(arg)) : [];
   const envOverlay = options.env && typeof options.env === 'object' ? { ...options.env } : {};
-  const effectiveEnv = { ...process.env, ...envOverlay };
+  const effectiveEnv = options.inheritEnv === false ? envOverlay : { ...process.env, ...envOverlay };
   const secrets = collectRedactionValues(effectiveEnv, [
     ...(options.redactValues || []),
     ...collectArgRedactionValues(args),
@@ -393,7 +393,8 @@ function runProcessSync(options = {}) {
     }
   }
   const envOverlay = options.env && typeof options.env === 'object' ? options.env : {};
-  const secrets = collectRedactionValues({ ...process.env, ...envOverlay }, [
+  const effectiveEnv = options.inheritEnv === false ? envOverlay : { ...process.env, ...envOverlay };
+  const secrets = collectRedactionValues(effectiveEnv, [
     ...(options.redactValues || []),
     ...collectArgRedactionValues(options.args),
   ]);

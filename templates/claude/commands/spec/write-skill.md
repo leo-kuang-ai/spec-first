@@ -1,5 +1,5 @@
 ---
-description: "Author, migrate, remediate, or validate project-owned Agent Skills"
+description: "Author project-owned Agent Skills or validate packages read-only"
 argument-hint: "[target skill or authoring request]"
 ---
 

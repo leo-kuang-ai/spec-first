@@ -4,7 +4,7 @@
 
 ## Base Mechanical Gate
 
-所有 package 先运行 bundled validator：
+所有 package 先运行 bundled validator。先从当前已加载 `SKILL.md` 解析 package root 的绝对路径并记作 `SKILL_DIR`；不要依赖宿主预设同名环境变量：
 
 ```bash
 node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
@@ -22,7 +22,8 @@ node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
 
 | Signal | Additional evidence |
 | --- | --- |
-| description / route 变化 | realistic positive、negative、near-neighbor fixtures；可用时 fresh-source semantic sample |
+| description / route 变化 | realistic positive、negative、near-neighbor fixtures；需要声明行为充分性时运行 fresh-source semantic sample，runner 不可用则记录 `not_run` 与原因 |
+| persona、few-shot、输出合同或 agent loop 变化 | good/bad/why 或等价边界样例；成功路径、近邻错误、主要 failure mode 的 fresh-source sample；完成/停止声明与直接证据对应 |
 | 新增或移动 reference | 每个 runtime reference 有明确 pointer；validator 引用检查通过 |
 | 新增 script/shell | syntax/unit test、输入/输出/权限/失败行为；确认不读取 secret、不越出授权 root |
 | 外部或未知 package | validate-only、no-follow inventory、零 package-code execution；无法确认 provenance 的 validator 不运行 |
@@ -52,7 +53,7 @@ node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
 - `comparative`：与固定 baseline/previous version 的对照；
 - `field-outcome`：代表性真实任务与用户结果。
 
-Route fixture 至少覆盖 positive、negative/near-neighbor、只读边界和一个主要 failure mode。没有 model runner 时不能把 structural-only 写成触发率或行为改善。
+Route fixture 至少覆盖 positive、negative/near-neighbor、只读边界和一个主要 failure mode。复杂 prose 的输出评测应检查真实 artifact/response 是否满足判据，不接受“我已遵守指令”、隐藏自检或 checklist 勾选作为通过依据。没有 model runner 时不能把 structural-only 写成触发率或行为改善。
 
 ## Five-Axis Readiness
 
@@ -78,7 +79,7 @@ Closeout 分别报告，不能合成模糊总分：
 
 ## Closeout Envelope
 
-- `effect` 和 target/source owner；
+- `base_operation`、`effect`、`modifier`、`layer_result` 和 target/source owner；
 - `changed_surfaces` 与明确未修改 surfaces；
 - `deterministic_checks`；
 - `eval_adequacy` 与实际 semantic/comparative evidence；

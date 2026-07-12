@@ -394,11 +394,15 @@ describe('active eval fixture references', () => {
       repoRoot,
       'skills/spec-write-skill/evals/trigger-cases.json',
     ), 'utf8'));
+    const runtimeSource = fs.readFileSync(path.join(
+      repoRoot,
+      'skills/spec-write-skill/SKILL.md',
+    ), 'utf8');
 
     expect(fixture.schema_version).toBe('spec-first.spec-write-skill-trigger-cases.v3');
     expect(fixture.evidence_scope).toBe('structural-only');
     expect(fixture).not.toHaveProperty('evidence_level');
-    expect(fixture.cases).toHaveLength(8);
+    expect(fixture.cases).toHaveLength(9);
     expect(fixture.route_queries.length).toBeGreaterThanOrEqual(12);
     expect(fixture.route_queries.length).toBeLessThanOrEqual(16);
     expect(new Set(fixture.cases.map((entry) => entry.id)).size).toBe(fixture.cases.length);
@@ -415,6 +419,7 @@ describe('active eval fixture references', () => {
       expect(entry.reason_code).toEqual(expect.any(String));
       expect(entry.forbidden_signals).toEqual(expect.any(Array));
       expect(entry.forbidden_signals.length).toBeGreaterThan(0);
+      expect(runtimeSource).toContain(entry.expected_layer_result);
     }
 
     for (const entry of fixture.route_queries) {
@@ -447,6 +452,23 @@ describe('active eval fixture references', () => {
         expected_base_operation: 'create',
         expected_effect: 'apply',
         expected_layer_result: 'portable-core-only',
+      }),
+      expect.objectContaining({
+        id: 'prose-heavy-agent-skill',
+        expected_effect: 'apply',
+        expected_layer_result: 'portable-core-with-behavior-contract',
+      }),
+    ]));
+    expect(fixture.route_queries).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'route-third-party-install',
+        expected_trigger: false,
+        expected_route: 'skill-installer',
+      }),
+      expect.objectContaining({
+        id: 'route-external-check-before-install',
+        expected_trigger: true,
+        expected_route: 'spec-write-skill',
       }),
     ]));
   });

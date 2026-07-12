@@ -528,6 +528,8 @@ function installSelectedProviderDependencies(context, repoRoot, selectedIds) {
       const result = executeInstallWithMirror(context, action.command, action.args, {
         cwd: repoRoot,
         timeoutMs: 120000,
+        env: action.env,
+        inheritEnv: action.inheritEnv,
       });
       actionResults.push(result);
       if (!commandSucceeded(result)) {

@@ -11,7 +11,7 @@
 - deterministic script/reference 能减少重复错误；
 - portability、治理或 source ownership 是承重边界。
 
-默认不创建或修改 Skill：一次性回答、解释/总结/翻译、普通文档导出、只讨论未来大纲、普通 code review/debug/plan/work、第三方安装或导入。例外是用户同时给出外部 package 并要求安装/导入：本 workflow 仍只进入 `base_operation=revise`、`effect=validate-only` 的 no-follow preflight，拒绝复制/安装/导入后，把后续安装交给独立入口重新授权；不可因最终请求属于 installer 而跳过安全 preflight。
+默认不创建或修改 Skill：一次性回答、解释/总结/翻译、普通文档导出、只讨论未来大纲、普通 code review/debug/plan/work、第三方安装或导入。纯安装/导入请求直接路由 installer，不进入本 workflow，也不强制附加 readiness 检查。只有用户明确同时要求独立的 readiness、安全或结构检查时，才先以 `base_operation=revise`、`effect=validate-only` 完成 no-follow 检查并停止；复制、安装或导入仍交给独立入口重新授权。
 
 Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operation=null`、`effect=not-entered`、`modifier=none`。后续入口可以建议普通 code work、bounded source review、installer 或 runtime maintenance，但不得把那些入口的预期动作记成本 workflow 的 `apply`/`validate-only`，也不得继续执行本 workflow 的 inventory、validator 或 mutation步骤。
 
@@ -27,7 +27,7 @@ Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operati
 - mutation authorization：`ready|preview-only|blocked`；
 - first verification target。
 
-缺少会改变 package 设计的信息时只问 2-3 个问题。不要用更多目录、profiles 或 fallback 掩盖未决意图。
+只询问答案会改变 package 设计、权限或不可逆结果的最少问题，并尽量合并为一轮。能从 source 发现或以低风险、可撤销假设推进时，记录假设并继续；不要用更多目录、profiles 或 fallback 掩盖真正未决的意图。
 
 ## Source And Effect Resolution
 
@@ -44,7 +44,7 @@ Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operati
 
 `validate-only` 永远不升级为 apply。对已存在 package 的 readiness 检查使用 `base_operation=revise`；`revise` 在此只表示输入是现有 package，不代表允许修改。`audit-remediation` modifier 只处理已接受 finding。`migrate` modifier 只处理同 repo trusted source；第三方 package 和跨仓目标只允许 inventory/readiness。Modifier 不改变 base operation 或 effect，也不创建第三套执行主干。
 
-对现有 package 先列 inventory，不先读完所有正文：文件、目录、symlink、special file、frontmatter fields、Markdown references、scripts 和 secret-like paths。Inventory 是 advisory facts；是否采用内容仍由 LLM 判断。
+对现有 package 先列 inventory，不把全部正文加载给 LLM：文件、目录、symlink、special file、frontmatter fields、Markdown references、scripts 和 secret-like paths。Bundled validator 会在本地预算内读取非 secret-like 文本字节，用于 UTF-8、敏感内容和引用检查，但不返回正文或敏感值；Inventory 仍是 advisory facts，是否采用内容由 LLM 判断。
 
 ## Portable Authoring Core
 
@@ -70,6 +70,12 @@ Frontmatter `description` 必须同时表达：
 - `evals/`：维护者 route/output regression，不是 runtime 必读内容。
 
 Context pointer 必须说明“什么条件下读取”和“读完支持什么判断”。如果正常路径每次都读取全部 references，说明分支或 owner 切分失败，应合并承重规则或重新按条件拆分。
+
+### Match Freedom To Failure Cost
+
+按任务脆弱度分配约束强度：开放式语义判断使用原则与判据；有首选路径但允许变化时使用步骤骨架或参数化模板；容易造成数据损坏、越权或格式破坏的动作交给窄脚本和 hard gate。不要用长 prompt 模拟本可确定性验证的 schema/path/hash，也不要用脚本替代产品、架构或语义判断。
+
+当 Skill 的主要机制是 prose、角色/persona、few-shot、输出格式或 agent loop 时，读取 `behavior-contract-design.md`。它只负责模型行为合同，不取代本文件的 package、source owner、resource placement 与 portability 规则。
 
 ### Completion Criteria And Pruning
 
@@ -106,6 +112,11 @@ Same-repo migration 对每个非 portable 文件给出 disposition：
 - `vague-completion-criterion`：步骤只有动作名，没有 done signal。
 - `fixture-as-behavior-proof`：结构样例通过却声称模型行为改善。
 - `leading-word-no-op`：口号不改变实际动作。
+- `adjective-persona`：用形容词堆人设，却没有可观察行为倾向。
+- `flat-must-wall`：把 hard gate、偏好和启发式都写成同强度命令。
+- `example-without-boundary`：只有理想正例，没有 near-neighbor/bad/why 校准。
+- `self-check-as-evidence`：把模型自检或“已遵守”当成 semantic/field proof。
+- `fixed-tool-quota`：用固定调用次数或“工具免费”假设替代成本、依赖与风险判断。
 
 ## Skill Creator Compatibility
 

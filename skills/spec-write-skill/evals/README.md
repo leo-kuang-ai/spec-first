@@ -14,18 +14,18 @@ Promotion 不是 fixture pass。执行者必须分别记录：
 
 1. retrospective native creator Gate 0；
 2. `route_queries` 的 fresh host route result；
-3. 8 个 behavior cases 的 fresh-source output；
+3. canonical case set 中全部 behavior cases 的 fresh-source output；
 4. fixed pre-candidate regression；
 5. matched native/candidate-ablation output review 与固定 `old-full` regression；
-6. 14 条 fresh host route result、默认加载 Markdown bytes、tokens、duration、redaction 与最终 gate calculation。
+6. canonical case set 中全部 fresh host route results、默认加载 Markdown bytes、tokens、duration、redaction 与最终 gate calculation。
 
-Bundle root 使用 `spec-write-skill.promotion-evidence/v1` 的 `manifest.json`。三组 assembly 固定为：
+新 promotion bundle root 使用 `spec-write-skill.promotion-evidence/v2` 的 `manifest.json`；validator 继续支持已发布的 v1 bundle，v1 固定 8 个 behavior cases 并保持原 gate 语义，不能用新规则反向改写历史证据。三组 assembly 固定为：
 
 - `native`：一份 `common_guardrails` + 一份 `native_creator`；
 - `candidate-ablation`：一份 `common_guardrails` + 一到多份 `portable_core` slice；
 - `candidate-full`：只加载一份完整 candidate source，不再次注入 common guardrails。
 
-每个 `promotion_case=true` 的 case/arm 至少使用两个不同 repeat 编号双跑，且每个 declared arm 至少有一次 run。固定 `old-full` arm 使用 `baseline_full` 单文件 assembly，承接 pre-candidate regression；它不替代 native/candidate-ablation 对照。Manifest 的 `coverage` 必须逐字枚举 `case_set` 的 8 个 behavior case 与 12–16 个 route query，并标出双跑的 comparison/regression cases。每次 behavior run 保存 prompt、output、machine check、blind reviewer 四个相对路径和 SHA-256；reviewer artifact 必须声明 `blind=true`、`independent=true`。每条 route run 保存 prompt、output、machine check。所有 run 记录 model、host、route high-risk misroute、redaction status、input/output/total tokens、duration 与 verdict；machine/reviewer artifact 内的 verdict 必须与 manifest 一致，route high-risk misroute 必须由 machine-check artifact 携带并与 case 声明一致。Reviewer 不接收 intended fix。
+在 v2 中，绑定 `case_set` 中的每个 behavior case 都必须由 `candidate-full` 至少使用两个不同 repeat 编号双跑，且每个 declared arm 至少有一次 run。固定 `old-full` arm 使用 `baseline_full` 单文件 assembly，承接 pre-candidate regression；它不替代 candidate-full 全覆盖或 native/candidate-ablation 对照。Manifest 的 `coverage` 必须逐字枚举绑定 `case_set` 中的全部 behavior cases 与 route queries，并标出双跑的 comparison/regression cases；v2 case set 可随 canonical fixture 增长，但必须保留至少 8 个 behavior cases 和 12–16 个 route queries 的确定性质量地板。每次 behavior run 保存 prompt、output、machine check、blind reviewer 四个相对路径和 SHA-256；reviewer artifact 必须声明 `blind=true`、`independent=true`。每条 route run 保存 prompt、output、machine check。所有 run 记录 model、host、route high-risk misroute、redaction status、input/output/total tokens、duration 与 verdict；machine/reviewer artifact 内的 verdict 必须与 manifest 一致，route high-risk misroute 必须由 machine-check artifact 携带并与 case 声明一致。Reviewer 不接收 intended fix。
 
 Manifest 还必须：引用 Gate 0 原始 evidence，并把“candidate 是否提供额外收益”的语义裁决明确为 `pass|fail|not_run`；测量实际 default context artifact 的 Markdown bytes（不得超过 20 KiB）；由 native/candidate-ablation 的 run tokens 推导 input token delta。delta 超过 20% 时需记录可见质量或安全收益理由。`not_run` 是结构有效但不可 promotion 的结果，不能进入 U4。
 
