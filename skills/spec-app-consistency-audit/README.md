@@ -2,7 +2,7 @@
 
 `spec-app-consistency-audit` 当前是 opt-in App Assurance Compiler Trial。它在 build、模拟器和真机前，把一个 changed feature 的关键 journey 从本地 PRD、已物化 Figma、源码和平台 ownership 事实编译为 Behavior IR、proof obligations、candidate counterexamples、evidence-adjudicated findings 与 verification plan。
 
-U0 在相同合成样本、证据 allowance 和预算下比较了 direct App lens 与 disposable IR thin slice，并经独立盲审得到 `ir_go`，因此允许继续实现 durable Trial。这个结论只证明“值得继续实验”，不证明默认路径成熟、普遍优于 Code Review 或已经产生 field outcome。
+U0 的合成样本比较得到 `ir_go`，允许实现 durable Trial。U8 随后因只有两个 synthetic fixtures、缺少独立 App 开发者采用证据和完整三臂盲审，正式选择 `continue_trial`。该结论只证明机制可继续受限试用，不证明默认路径成熟、普遍优于 Code Review 或已经产生 field outcome。
 
 ## 当前公共合同
 
@@ -14,7 +14,7 @@ U0 在相同合成样本、证据 allowance 和预算下比较了 direct App len
 - 无 semantic stage 时记录 `issue_synthesis_status:not_run`，空 issues 不是通过。
 - 无本地 materialized Figma 时 design alignment 为 `not_evaluable`。
 - 不执行 build/test/simulator/device，不修改产品代码。
-- Trial 没有默认 Code Review consumer；任何集成都等待 U8 owner verdict。
+- Trial 没有默认 Code Review consumer；U8 明确未授权 U6 集成。
 
 ## 快速入口
 
@@ -57,3 +57,7 @@ IR/counterexamples 是 generated/advisory；obligation 按 item 保留 authority
 - [`references/pilot-validation.md`](./references/pilot-validation.md)：U8 promotion evidence。
 
 `evals/` 是 maintainer-only source evidence，不属于普通 runtime hot path。Source 改动完成后由主线单独决定是否运行 `spec-first init`；不要手改 generated mirrors。
+
+## 下一次重评
+
+最迟于 2026-08-12，在具备 3–5 个真实/历史代表样本、两名独立盲审者、一名独立 App 开发者采用 receipt、完整成本 countermetrics，且无高影响误报或 permission violation 后重新裁决。门槛满足前不扩 prompt/schema、不发布效果声明、不接入默认 Code Review。

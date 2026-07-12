@@ -7,7 +7,7 @@
 
 `spec-app-consistency-audit` 应保留为独立、opt-in 的 App Assurance Compiler Trial，不并入 `spec-code-review`。
 
-当前 maturity 不是默认生产路径。U0 只在相同授权样本、证据 allowance 与预算下证明 Behavior IR thin slice 相对 direct App lens 产生了足以继续实现的增量，并经独立盲审得到 `ir_go`。它没有证明普遍效果、field adoption，也没有授权 Code Review integration。
+当前 maturity 不是默认生产路径。U0 只在相同授权样本、证据 allowance 与预算下证明 Behavior IR thin slice 相对 direct App lens 产生了足以继续实现的增量，并经独立盲审得到 `ir_go`。U8 因只有两个 synthetic fixtures、缺少完整三臂盲审和独立 App 开发者采用证据，选择 `continue_trial`，未授权 Code Review integration。下一次重评门槛和日期记录在 `docs/validation/2026-07-12-app-assurance-compiler-promotion/`。
 
 正确形态：
 
@@ -29,7 +29,7 @@ Light contract, explicit boundaries.
 Pre-runtime only; no build/simulator/device execution.
 Run-scoped artifacts only.
 Missing PRD/Figma/plan/task-doc degrades capability, not the whole audit by default.
-Trial has no default Code Review consumer before U8 owner verdict.
+Trial has no default Code Review consumer；U8 `continue_trial` verdict 未授权 U6 integration。
 ```
 
 ## 2. Source Of Truth

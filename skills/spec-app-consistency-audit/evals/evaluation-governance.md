@@ -6,10 +6,11 @@ runtime packages.
 
 ## Maturity
 
-Current posture: production, team-reused workflow command.
+当前 posture：opt-in `continue_trial`；机制 readiness 已具备，field effectiveness 未被证明。
 
-This package is not governed-ready and not public-claim-ready. Do not claim governed
-status until trust, output-quality, and reviewer-scored output evidence exists.
+该 package 尚不具备 public claim readiness。U8 因现有证据为 synthetic 且缺少
+独立开发者采用验证而记录 `continue_trial`。在 promotion bundle 中带日期的证据门槛
+满足前，不得声称已 promotion。
 
 Owner: Spec-First maintainers.
 

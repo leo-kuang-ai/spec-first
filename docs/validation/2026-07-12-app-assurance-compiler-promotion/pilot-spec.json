@@ -1,0 +1,69 @@
+{
+  "schema_version": "app-assurance-promotion-evidence.v1",
+  "verdict": "continue_trial",
+  "decision": {
+    "owner": "project-owner",
+    "decision_kind": "fail_closed_plan_closeout",
+    "owner_instruction_ref": "user:2026-07-12:按方案内容继续完成开发",
+    "rationale": "Promotion requirements R49-R51 are not met by two synthetic fixtures and deterministic mechanism tests. Continue the reversible Trial without default integration until field and adoption evidence exists.",
+    "integration_authorized": false
+  },
+  "inputs": {
+    "case_set": "case-set.json",
+    "rubric": "rubric.md"
+  },
+  "generation_controls": {
+    "known_defect_labels_withheld": true,
+    "implementation_rationale_withheld_from_reviewers": true
+  },
+  "samples": [
+    {
+      "sample_id": "synthetic-checkout-retry",
+      "provenance": "synthetic_fixture",
+      "source_hash": "sha256:9636b91636e2612bdc40e44b89b4464cc439d7e001b46496bd42cb026a1039b8",
+      "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"],
+      "arms": {
+        "current_code_review": { "source_hash": "sha256:9636b91636e2612bdc40e44b89b4464cc439d7e001b46496bd42cb026a1039b8", "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"], "repeat_count": 1, "output": "outputs/current-code-review.md", "metrics": { "incremental_confirmed_findings": 0, "pre_runtime_fixable_count": 0, "confirmed_precision": 0, "runtime_escape_count": 0, "critical_journey_coverage": 0, "verification_plan_executability": 0, "human_review_minutes": 0, "duration_ms": 0, "tokens": 0, "artifact_bytes": 0, "high_impact_false_positives": 0, "permission_violations": 0 } },
+        "current_app_audit": { "source_hash": "sha256:9636b91636e2612bdc40e44b89b4464cc439d7e001b46496bd42cb026a1039b8", "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"], "repeat_count": 1, "output": "outputs/current-app-audit.md", "metrics": { "incremental_confirmed_findings": 0, "pre_runtime_fixable_count": 0, "confirmed_precision": 0, "runtime_escape_count": 0, "critical_journey_coverage": 0, "verification_plan_executability": 0, "human_review_minutes": 0, "duration_ms": 0, "tokens": 0, "artifact_bytes": 0, "high_impact_false_positives": 0, "permission_violations": 0 } },
+        "candidate_compiler": { "source_hash": "sha256:9636b91636e2612bdc40e44b89b4464cc439d7e001b46496bd42cb026a1039b8", "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"], "repeat_count": 1, "output": "outputs/candidate-compiler.md", "metrics": { "incremental_confirmed_findings": 0, "pre_runtime_fixable_count": 0, "confirmed_precision": 0, "runtime_escape_count": 0, "critical_journey_coverage": 0, "verification_plan_executability": 0, "human_review_minutes": 0, "duration_ms": 0, "tokens": 0, "artifact_bytes": 0, "high_impact_false_positives": 0, "permission_violations": 0 } }
+      }
+    },
+    {
+      "sample_id": "synthetic-permission-resume",
+      "provenance": "synthetic_fixture",
+      "source_hash": "sha256:f086709fe309952be4e60bdb1c47f2ae2c4f6f8d0b28dccaf065b67533f3840f",
+      "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"],
+      "arms": {
+        "current_code_review": { "source_hash": "sha256:f086709fe309952be4e60bdb1c47f2ae2c4f6f8d0b28dccaf065b67533f3840f", "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"], "repeat_count": 1, "output": "outputs/current-code-review.md", "metrics": { "incremental_confirmed_findings": 0, "pre_runtime_fixable_count": 0, "confirmed_precision": 0, "runtime_escape_count": 0, "critical_journey_coverage": 0, "verification_plan_executability": 0, "human_review_minutes": 0, "duration_ms": 0, "tokens": 0, "artifact_bytes": 0, "high_impact_false_positives": 0, "permission_violations": 0 } },
+        "current_app_audit": { "source_hash": "sha256:f086709fe309952be4e60bdb1c47f2ae2c4f6f8d0b28dccaf065b67533f3840f", "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"], "repeat_count": 1, "output": "outputs/current-app-audit.md", "metrics": { "incremental_confirmed_findings": 0, "pre_runtime_fixable_count": 0, "confirmed_precision": 0, "runtime_escape_count": 0, "critical_journey_coverage": 0, "verification_plan_executability": 0, "human_review_minutes": 0, "duration_ms": 0, "tokens": 0, "artifact_bytes": 0, "high_impact_false_positives": 0, "permission_violations": 0 } },
+        "candidate_compiler": { "source_hash": "sha256:f086709fe309952be4e60bdb1c47f2ae2c4f6f8d0b28dccaf065b67533f3840f", "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"], "repeat_count": 1, "output": "outputs/candidate-compiler.md", "metrics": { "incremental_confirmed_findings": 0, "pre_runtime_fixable_count": 0, "confirmed_precision": 0, "runtime_escape_count": 0, "critical_journey_coverage": 0, "verification_plan_executability": 0, "human_review_minutes": 0, "duration_ms": 0, "tokens": 0, "artifact_bytes": 0, "high_impact_false_positives": 0, "permission_violations": 0 } }
+      }
+    }
+  ],
+  "blind_review": {
+    "identity_revealed_before_scoring": false,
+    "reviewers": [],
+    "status": "not_run",
+    "reason_code": "representative_field_samples_unavailable"
+  },
+  "independent_developer_adoption": {
+    "status": "not_run",
+    "reason_code": "independent_app_developer_evidence_unavailable"
+  },
+  "closeout": {
+    "action": "continue_trial",
+    "reevaluate_by": "2026-08-12",
+    "required_evidence": [
+      "3-5 representative historical or real App changes with materialized source",
+      "two independent blind reviewers on all three arms",
+      "one independent App developer public-entry adoption receipt",
+      "incremental confirmed and pre-runtime-fixable findings with acceptable cost countermetrics",
+      "no high-impact false positive or permission violation"
+    ]
+  },
+  "limitations": [
+    "This bundle closes the implementation experiment conservatively; it is not field-effectiveness evidence.",
+    "No U6 Code Review integration is authorized.",
+    "No public maturity or universal effectiveness claim is permitted."
+  ]
+}

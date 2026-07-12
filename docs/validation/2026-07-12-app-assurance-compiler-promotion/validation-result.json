@@ -1,0 +1,19 @@
+{
+  "schema_version": "app-assurance-promotion-validation.v1",
+  "valid": true,
+  "verdict": "continue_trial",
+  "promotion_eligible": false,
+  "integration_authorized": false,
+  "blockers": [
+    "representative_sample_count_not_met",
+    "field_sample_evidence_missing",
+    "independent_blind_review_missing",
+    "independent_developer_adoption_missing",
+    "incremental_confirmed_value_missing",
+    "pre_runtime_fixable_value_missing",
+    "verification_executability_missing",
+    "owner_cost_acceptance_missing",
+    "owner_acceptance_missing"
+  ],
+  "errors": []
+}

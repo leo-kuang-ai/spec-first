@@ -1,0 +1,22 @@
+{
+  "schema_version": "app-assurance-promotion-case-set.v1",
+  "samples": [
+    {
+      "sample_id": "synthetic-checkout-retry",
+      "source_hash": "sha256:9636b91636e2612bdc40e44b89b4464cc439d7e001b46496bd42cb026a1039b8",
+      "provenance": "synthetic_fixture",
+      "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"]
+    },
+    {
+      "sample_id": "synthetic-permission-resume",
+      "source_hash": "sha256:f086709fe309952be4e60bdb1c47f2ae2c4f6f8d0b28dccaf065b67533f3840f",
+      "provenance": "synthetic_fixture",
+      "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"]
+    }
+  ],
+  "limitations": [
+    "Only two synthetic fixtures are available.",
+    "There is no materialized App source or Figma evidence.",
+    "Known-defect labels are retained only for post-run scoring and were not supplied to generation arms."
+  ]
+}

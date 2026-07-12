@@ -6,7 +6,7 @@ argument-hint: "mode:headless base:<ref> [source:<path>] [prd:<path>] [figma-con
 
 # App Assurance Compiler — Opt-in Trial
 
-Use this public workflow to pre-compile one changed mobile App feature's critical journeys before build, simulator or real-device validation. This capability remains an evidence-gated Trial: U0 comparative evaluation produced an `ir_go` decision for continued implementation, but it does not prove universal effectiveness, default-path maturity or field adoption.
+Use this public workflow to pre-compile one changed mobile App feature's critical journeys before build, simulator or real-device validation. 当前能力保持 evidence-gated Trial。U8 选择 `continue_trial`：机制可受限使用，但两个 synthetic fixtures 不能证明普遍效果、默认路径成熟度或 field adoption。
 
 ## Route boundary
 
@@ -20,7 +20,7 @@ Do not use for:
 - interactive UI polish: use `spec-polish`;
 - product-code edits or automatic fixes.
 
-The Trial has no default `spec-code-review` consumer. It may recommend a separate follow-up, but must not auto-discover, invoke or mutate Code Review. Generic correctness, security, performance, API-contract and regression review remain outside the candidate hot path pending U8 verdict.
+The Trial has no default `spec-code-review` consumer. U8 未授权 U6 integration。它可以建议独立 follow-up，但不得自动发现、调用或修改 Code Review。通用 correctness、security、performance、API-contract 和 regression review 继续位于 candidate hot path 之外。
 
 ## Supported public path
 
@@ -29,6 +29,8 @@ The executable Trial path is local historical/headless audit with an explicit di
 ```text
 mode:headless base:<ref> source:<path>
 ```
+
+确定性 phase 入口是 `scripts/run-audit.js`；宿主通过该脚本执行 prepare/finalize/abort，不在 Node runner 内调用模型。
 
 `base:<ref>` is mandatory. `mode:default` and `mode:report-only` remain documented long-term semantics, not supported orchestration paths for this Trial. Headless asks no questions and does not fetch remote PRD/Figma data. A Figma URL/reference without local `figma-context` is not design evidence; design alignment becomes `not_evaluable`.
 
@@ -102,6 +104,10 @@ Load only what the current phase needs:
 - [Pilot Validation](references/pilot-validation.md): U8 promotion/continue/contract evidence requirements.
 
 Maintainer `evals/` and pilot artifacts are source-only evidence and must not be loaded into ordinary user runs or projected as runtime-required assets.
+
+## Trial 重评边界
+
+最迟于 2026-08-12，在收集 3–5 个代表性历史/真实 App 变更、两名独立盲审者、一份独立 App 开发者采用 receipt、对照成本指标，且无高影响误报或 permission violation 后重评。在此之前不得扩展 prompt/schema、发布效果声明或新增默认 Code Review consumer。
 
 ## Output and handoff
 
