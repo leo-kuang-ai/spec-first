@@ -78,12 +78,163 @@ function validateArtifact(artifact, options = {}) {
   if (artifact.artifact_id === 'app-behavior-model' || artifact.schema_version === 'app-behavior-model.v1') {
     validateAppBehaviorModelArtifact(artifact, errors);
   }
+  if (artifact.artifact_id === 'proof-obligations' || artifact.schema_version === 'app-proof-obligations.v1') {
+    validateProofObligationsArtifact(artifact, errors);
+  }
+  if (artifact.artifact_id === 'counterexamples' || artifact.schema_version === 'app-counterexamples.v1') {
+    validateCounterexamplesArtifact(artifact, errors);
+  }
   validateKnownContractArtifact(artifact, errors);
 
   return {
     valid: errors.length === 0,
     errors,
   };
+}
+
+function validateProofObligationsArtifact(artifact, errors) {
+  requireSchemaVersion(artifact, 'app-proof-obligations.v1', errors);
+  if (artifact.artifact_id !== 'proof-obligations') errors.push(error('artifact_id', 'proof_artifact_id_invalid', 'artifact_id must be proof-obligations.'));
+  if (artifact.artifact_authority !== 'mixed_per_item') errors.push(error('artifact_authority', 'proof_container_authority_invalid', 'Proof authority must remain per obligation.'));
+  if (artifact.retention_class !== 'run_local') errors.push(error('retention_class', 'proof_retention_invalid', 'Proof obligations must be run_local.'));
+  requireString(artifact, 'run_id', errors);
+  requireString(artifact, 'prepare_fingerprint', errors);
+  requireObject(artifact, 'behavior_model_ref', errors);
+  requireObject(artifact, 'semantic_input_receipt', errors);
+  requireObject(artifact, 'coverage', errors);
+  requireArray(artifact, 'obligations', errors);
+  requireArray(artifact, 'limitations', errors);
+  if (artifact.behavior_model_ref && !/^sha256:[a-f0-9]{64}$/.test(artifact.behavior_model_ref.content_hash || '')) {
+    errors.push(error('behavior_model_ref.content_hash', 'proof_behavior_model_hash_invalid', 'Proof obligations require a script-computed Behavior IR hash.'));
+  }
+  if (artifact.semantic_input_receipt) {
+    if (artifact.semantic_input_receipt.hash_authority !== 'script_computed') errors.push(error('semantic_input_receipt.hash_authority', 'proof_receipt_hash_authority_invalid', 'Input hashes must be script-computed.'));
+    if (!Array.isArray(artifact.semantic_input_receipt.input_hashes) || artifact.semantic_input_receipt.input_hashes.length === 0
+      || artifact.semantic_input_receipt.input_hashes.some((entry) => !/^sha256:[a-f0-9]{64}$/.test(entry))) {
+      errors.push(error('semantic_input_receipt.input_hashes', 'proof_receipt_hash_invalid', 'Input receipt requires SHA-256 hashes.'));
+    }
+  }
+  const ids = new Set();
+  for (const [index, obligation] of (artifact.obligations || []).entries()) {
+    const prefix = `obligations[${index}]`;
+    for (const field of ['id', 'category', 'statement', 'platform_scope', 'producer_kind', 'assessment_authority', 'assessment', 'freshness', 'conclusion_cap']) {
+      requireString(obligation, field, errors, prefix);
+    }
+    requireArray(obligation, 'model_refs', errors, prefix);
+    requireArray(obligation, 'required_evidence', errors, prefix);
+    requireArray(obligation, 'evidence_refs', errors, prefix);
+    requireArray(obligation, 'limitations', errors, prefix);
+    requireObject(obligation, 'minimum_verification', errors, prefix);
+    if (ids.has(obligation.id)) errors.push(error(`${prefix}.id`, 'proof_duplicate_id', `Duplicate obligation ID: ${obligation.id}.`));
+    ids.add(obligation.id);
+    if (obligation.assessment_authority === 'script_confirmed'
+      && (obligation.producer_kind !== 'script' || !['reference_integrity', 'evidence_integrity', 'freshness_integrity'].includes(obligation.category))) {
+      errors.push(error(`${prefix}.assessment_authority`, 'proof_authority_escalation', 'script_confirmed is limited to script-produced mechanical obligations.'));
+    }
+    if (obligation.assessment_authority === 'not_assessed' && obligation.assessment !== 'unresolved') {
+      errors.push(error(`${prefix}.assessment`, 'proof_unassessed_must_be_unresolved', 'Unassessed obligations must remain unresolved.'));
+    }
+    validateAbsenceClaim(obligation, prefix, errors);
+  }
+  if (artifact.coverage && artifact.coverage.budget) {
+    const budget = artifact.coverage.budget;
+    if (budget.emitted !== (artifact.obligations || []).length) errors.push(error('coverage.budget.emitted', 'proof_budget_count_mismatch', 'Budget emitted count must match obligations length.'));
+    if (budget.exhausted !== ((artifact.coverage.omitted_obligations || []).length > 0)) errors.push(error('coverage.budget.exhausted', 'proof_budget_exhaustion_mismatch', 'Budget exhausted must match omitted obligations.'));
+  }
+}
+
+function validateAbsenceClaim(obligation, prefix, errors) {
+  const absence = obligation.absence_claim;
+  if (absence === null || absence === undefined) return;
+  if (!absence || typeof absence !== 'object' || Array.isArray(absence)) {
+    errors.push(error(`${prefix}.absence_claim`, 'proof_absence_claim_invalid', 'absence_claim must be an object or null.'));
+    return;
+  }
+  requireArray(absence, 'expected_evidence_refs', errors, `${prefix}.absence_claim`);
+  requireObject(absence, 'negative_evidence_scope', errors, `${prefix}.absence_claim`);
+  requireString(absence, 'coverage_cap', errors, `${prefix}.absence_claim`);
+  requireArray(absence, 'reason_codes', errors, `${prefix}.absence_claim`);
+  const scope = absence.negative_evidence_scope || {};
+  for (const field of ['source_roots', 'file_patterns', 'symbols', 'tools', 'platform_sources']) {
+    if (!Array.isArray(scope[field]) || scope[field].length > 100) {
+      errors.push(error(`${prefix}.absence_claim.negative_evidence_scope.${field}`, 'proof_absence_scope_array_invalid', `${field} must be an array with at most 100 entries.`));
+      continue;
+    }
+    scope[field].forEach((entry, index) => {
+      const entryPath = `${prefix}.absence_claim.negative_evidence_scope.${field}[${index}]`;
+      validateArtifactText(entry, entryPath, errors, 240);
+      if (['source_roots', 'file_patterns'].includes(field)
+        && (path.isAbsolute(entry) || /^[A-Za-z]:[\\/]/.test(entry) || entry.split(/[\\/]/).includes('..') || SECRET_PATH_PATTERN.test(entry))) {
+        errors.push(error(entryPath, 'proof_absence_scope_path_unsafe', 'Absence search paths must be safe, repo-relative and non-secret.'));
+      }
+    });
+  }
+  const incomplete = (absence.expected_evidence_refs || []).length === 0
+    || !Array.isArray(scope.source_roots) || scope.source_roots.length === 0
+    || !Array.isArray(scope.file_patterns) || scope.file_patterns.length === 0
+    || !Array.isArray(scope.tools) || scope.tools.length === 0
+    || !Number.isInteger(scope.scanned_file_count) || scope.scanned_file_count <= 0
+    || !Number.isInteger(scope.max_file_count) || scope.max_file_count < scope.scanned_file_count
+    || !Array.isArray(scope.platform_sources) || scope.platform_sources.length === 0
+    || scope.truncated === true
+    || scope.generated_code_covered !== true
+    || scope.dynamic_routes_covered !== true
+    || scope.di_bindings_covered !== true
+    || scope.provider_status !== 'ready';
+  if (absence.coverage_cap === 'complete' && incomplete) {
+    errors.push(error(`${prefix}.absence_claim.coverage_cap`, 'proof_absence_complete_scope_invalid', 'Complete absence coverage requires positive expectation and all deterministic coverage dimensions.'));
+  }
+  if (incomplete && obligation.assessment !== 'unresolved') {
+    errors.push(error(`${prefix}.assessment`, 'proof_absence_incomplete_must_be_unresolved', 'Incomplete absence coverage must remain unresolved.'));
+  }
+}
+
+function validateCounterexamplesArtifact(artifact, errors) {
+  requireSchemaVersion(artifact, 'app-counterexamples.v1', errors);
+  if (artifact.artifact_id !== 'counterexamples') errors.push(error('artifact_id', 'counterexample_artifact_id_invalid', 'artifact_id must be counterexamples.'));
+  if (artifact.artifact_authority !== 'generated_advisory') errors.push(error('artifact_authority', 'counterexample_authority_invalid', 'Counterexamples must remain generated_advisory.'));
+  if (artifact.retention_class !== 'run_local') errors.push(error('retention_class', 'counterexample_retention_invalid', 'Counterexamples must be run_local.'));
+  requireObject(artifact, 'behavior_model_ref', errors);
+  requireObject(artifact, 'proof_obligations_ref', errors);
+  requireObject(artifact, 'search_receipt', errors);
+  requireObject(artifact, 'coverage', errors);
+  requireArray(artifact, 'counterexamples', errors);
+  requireArray(artifact, 'limitations', errors);
+  if (artifact.search_receipt && artifact.search_receipt.context_isolation !== 'generation_only') {
+    errors.push(error('search_receipt.context_isolation', 'counterexample_context_isolation_invalid', 'U3 search receipt must be generation_only.'));
+  }
+  if (artifact.search_receipt) {
+    if (artifact.search_receipt.hash_authority !== 'script_computed') errors.push(error('search_receipt.hash_authority', 'counterexample_receipt_hash_authority_invalid', 'Counterexample input hashes must be script-computed.'));
+    if (!Array.isArray(artifact.search_receipt.input_hashes) || artifact.search_receipt.input_hashes.length !== 3
+      || artifact.search_receipt.input_hashes.some((entry) => !/^sha256:[a-f0-9]{64}$/.test(entry))) {
+      errors.push(error('search_receipt.input_hashes', 'counterexample_receipt_hash_invalid', 'Counterexample receipt requires model, proof and raw SHA-256 hashes.'));
+    }
+  }
+  if (!artifact.proof_obligations_ref || !/^sha256:[a-f0-9]{64}$/.test(artifact.proof_obligations_ref.content_hash || '')) {
+    errors.push(error('proof_obligations_ref.content_hash', 'counterexample_proof_hash_invalid', 'Counterexamples require the current proof artifact hash.'));
+  }
+  const ids = new Set();
+  const keys = new Set();
+  for (const [index, candidate] of (artifact.counterexamples || []).entries()) {
+    const prefix = `counterexamples[${index}]`;
+    for (const field of ['id', 'obligation_ref', 'platform_scope', 'expected_invariant', 'hypothesized_break', 'status', 'conclusion_cap', 'dedupe_key']) {
+      requireString(candidate, field, errors, prefix);
+    }
+    for (const field of ['model_refs', 'preconditions', 'action_sequence', 'direct_evidence_refs', 'missing_evidence', 'limitations']) {
+      requireArray(candidate, field, errors, prefix);
+    }
+    requireObject(candidate, 'minimum_verification', errors, prefix);
+    if (candidate.status !== 'candidate') errors.push(error(`${prefix}.status`, 'counterexample_candidate_only', 'U3 counterexamples must remain candidate.'));
+    if (ids.has(candidate.id)) errors.push(error(`${prefix}.id`, 'counterexample_duplicate_id', `Duplicate counterexample ID: ${candidate.id}.`));
+    if (keys.has(candidate.dedupe_key)) errors.push(error(`${prefix}.dedupe_key`, 'counterexample_duplicate_key', 'Normalized counterexamples must have unique dedupe keys.'));
+    ids.add(candidate.id);
+    keys.add(candidate.dedupe_key);
+  }
+  if (artifact.coverage && artifact.coverage.budget) {
+    const budget = artifact.coverage.budget;
+    if (budget.emitted !== (artifact.counterexamples || []).length) errors.push(error('coverage.budget.emitted', 'counterexample_budget_count_mismatch', 'Budget emitted count must match candidate count.'));
+    if (budget.exhausted !== ((artifact.coverage.omitted_counterexamples || []).length > 0)) errors.push(error('coverage.budget.exhausted', 'counterexample_budget_exhaustion_mismatch', 'Budget exhausted must match omitted candidates.'));
+  }
 }
 
 function validateAppBehaviorModelArtifact(artifact, errors) {
@@ -920,6 +1071,8 @@ module.exports = {
   validateArtifact,
   validateArtifactFile,
   validateAppBehaviorModelArtifact,
+  validateCounterexamplesArtifact,
+  validateProofObligationsArtifact,
   validateAuditIssue,
   validateAuditReportArtifact,
   validatePreflightArtifact,

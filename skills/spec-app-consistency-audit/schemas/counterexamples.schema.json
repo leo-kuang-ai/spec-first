@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/schemas/spec-app-consistency-audit/counterexamples.schema.json",
+  "title": "Producer-local App counterexamples",
+  "type": "object",
+  "required": ["schema_version", "artifact_id", "generated_at", "source_inputs", "consumers", "contract_status", "artifact_authority", "data_sensitivity", "retention_class", "run_id", "prepare_fingerprint", "behavior_model_ref", "proof_obligations_ref", "search_receipt", "coverage", "counterexamples", "limitations"],
+  "properties": {
+    "schema_version": { "const": "app-counterexamples.v1" },
+    "artifact_id": { "const": "counterexamples" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_inputs": { "type": "array", "minItems": 1 },
+    "consumers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "contract_status": { "const": "candidate" },
+    "artifact_authority": { "const": "generated_advisory" },
+    "data_sensitivity": { "enum": ["public", "internal", "confidential"] },
+    "retention_class": { "const": "run_local" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "prepare_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "behavior_model_ref": { "type": "object" },
+    "proof_obligations_ref": { "type": "object" },
+    "search_receipt": {
+      "type": "object",
+      "required": ["producer_kind", "input_hashes", "hash_authority", "context_isolation", "status", "usage", "limitations"],
+      "properties": {
+        "producer_kind": { "type": "string", "minLength": 1 },
+        "input_hashes": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "hash_authority": { "const": "script_computed" },
+        "context_isolation": { "const": "generation_only" },
+        "status": { "const": "complete" },
+        "usage": {
+          "type": "object",
+          "required": ["authority", "token_count", "time_ms"],
+          "properties": {
+            "authority": { "enum": ["caller_receipt", "unverified"] },
+            "token_count": { "type": ["integer", "null"], "minimum": 0 },
+            "time_ms": { "type": ["integer", "null"], "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["searched_obligation_refs", "omitted_obligations", "omitted_counterexamples", "triggered_lenses", "budget"],
+      "properties": {
+        "searched_obligation_refs": { "type": "array", "items": { "type": "string" } },
+        "omitted_obligations": { "type": "array" },
+        "omitted_counterexamples": { "type": "array" },
+        "triggered_lenses": { "type": "array", "items": { "type": "string" } },
+        "budget": {
+          "type": "object",
+          "required": ["max_journeys", "max_counterexamples", "token_limit", "time_limit_ms", "observed_token_count", "observed_time_ms", "emitted", "exhausted"],
+          "properties": {
+            "max_journeys": { "type": "integer", "minimum": 1 },
+            "max_counterexamples": { "type": "integer", "minimum": 1 },
+            "token_limit": { "type": "integer", "minimum": 1000 },
+            "time_limit_ms": { "type": "integer", "minimum": 1000 },
+            "observed_token_count": { "type": ["integer", "null"], "minimum": 0 },
+            "observed_time_ms": { "type": ["integer", "null"], "minimum": 0 },
+            "emitted": { "type": "integer", "minimum": 0 },
+            "exhausted": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "counterexamples": { "type": "array", "items": { "$ref": "#/$defs/counterexample" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "counterexample": {
+      "type": "object",
+      "required": ["id", "obligation_ref", "model_refs", "platform_scope", "preconditions", "action_sequence", "expected_invariant", "hypothesized_break", "direct_evidence_refs", "missing_evidence", "minimum_verification", "status", "conclusion_cap", "dedupe_key", "limitations"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]{2,127}$" },
+        "obligation_ref": { "type": "string" },
+        "model_refs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "platform_scope": { "enum": ["shared", "android", "ios", "multi", "unknown"] },
+        "preconditions": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+        "action_sequence": { "type": "array", "minItems": 1, "items": { "type": "string", "maxLength": 500 } },
+        "expected_invariant": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "hypothesized_break": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "direct_evidence_refs": { "type": "array", "items": { "type": "string" } },
+        "missing_evidence": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+        "minimum_verification": { "type": "object" },
+        "status": { "const": "candidate" },
+        "conclusion_cap": { "enum": ["candidate", "advisory", "out_of_scope"] },
+        "dedupe_key": { "type": "string", "minLength": 1 },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

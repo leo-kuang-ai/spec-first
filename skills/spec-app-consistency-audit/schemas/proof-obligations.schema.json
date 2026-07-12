@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/schemas/spec-app-consistency-audit/proof-obligations.schema.json",
+  "title": "Producer-local App proof obligations",
+  "type": "object",
+  "required": ["schema_version", "artifact_id", "generated_at", "source_inputs", "consumers", "contract_status", "artifact_authority", "data_sensitivity", "retention_class", "run_id", "prepare_fingerprint", "behavior_model_ref", "semantic_input_receipt", "coverage", "obligations", "limitations"],
+  "properties": {
+    "schema_version": { "const": "app-proof-obligations.v1" },
+    "artifact_id": { "const": "proof-obligations" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_inputs": { "type": "array", "minItems": 1 },
+    "consumers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "contract_status": { "const": "candidate" },
+    "artifact_authority": { "const": "mixed_per_item" },
+    "data_sensitivity": { "enum": ["public", "internal", "confidential"] },
+    "retention_class": { "const": "run_local" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "prepare_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "behavior_model_ref": {
+      "type": "object",
+      "required": ["artifact_id", "schema_version", "run_id", "prepare_fingerprint"],
+      "properties": {
+        "artifact_id": { "const": "app-behavior-model" },
+        "schema_version": { "const": "app-behavior-model.v1" },
+        "run_id": { "type": "string" },
+        "prepare_fingerprint": { "type": "string" },
+        "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "semantic_input_receipt": {
+      "type": "object",
+      "required": ["hash_authority", "input_hashes", "producer_kind"],
+      "properties": {
+        "hash_authority": { "const": "script_computed" },
+        "input_hashes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } },
+        "producer_kind": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["included_journey_refs", "omitted_obligations", "budget", "triggered_lenses", "conclusion_caps"],
+      "properties": {
+        "included_journey_refs": { "type": "array", "items": { "type": "string" } },
+        "omitted_obligations": { "type": "array" },
+        "budget": {
+          "type": "object",
+          "required": ["max_obligations", "emitted", "exhausted"],
+          "properties": {
+            "max_obligations": { "type": "integer", "minimum": 1 },
+            "emitted": { "type": "integer", "minimum": 0 },
+            "exhausted": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "triggered_lenses": { "type": "array", "items": { "type": "string" } },
+        "conclusion_caps": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "obligations": { "type": "array", "items": { "$ref": "#/$defs/obligation" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "obligation": {
+      "type": "object",
+      "required": ["id", "category", "statement", "model_refs", "platform_scope", "producer_kind", "assessment_authority", "assessment", "required_evidence", "evidence_refs", "freshness", "limitations", "conclusion_cap", "minimum_verification"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]{2,127}$" },
+        "category": { "type": "string", "minLength": 1 },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "model_refs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "platform_scope": { "enum": ["shared", "android", "ios", "multi", "unknown"] },
+        "producer_kind": { "enum": ["script", "llm"] },
+        "assessment_authority": { "enum": ["script_confirmed", "llm_advisory", "not_assessed"] },
+        "assessment": { "enum": ["proven", "disproven", "unresolved", "not_evaluable"] },
+        "required_evidence": { "type": "array" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } },
+        "freshness": { "enum": ["current-run", "partial", "stale", "unavailable"] },
+        "limitations": { "type": "array", "items": { "type": "string" } },
+        "conclusion_cap": { "enum": ["confirmed", "candidate", "advisory", "out_of_scope"] },
+        "minimum_verification": { "$ref": "#/$defs/minimumVerification" },
+        "absence_claim": { "type": ["object", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "minimumVerification": {
+      "type": "object",
+      "required": ["kind", "environment_constraints", "rationale"],
+      "properties": {
+        "kind": { "enum": ["static_proof", "compiler_lint", "unit", "state_transition", "navigation_component", "visual_capture", "runtime_interaction", "human_judgment"] },
+        "environment_constraints": { "type": "array", "items": { "enum": ["none", "host", "build", "simulator", "real_device", "human"] } },
+        "rationale": { "type": "string", "maxLength": 500 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

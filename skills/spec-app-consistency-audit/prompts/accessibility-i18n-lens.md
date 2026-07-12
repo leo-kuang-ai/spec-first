@@ -2,6 +2,8 @@
 
 这是 supporting lens，不是独立裁决专家。
 
+在 U3 中它是 evidence-triggered lens，不是默认 checklist 或 finding producer。只有 Behavior IR / obligation 出现 user-facing state、动态状态消息、focus、text reflow、touch target、contrast、reduced motion、用户可见文案或 locale resource 信号时才加载对应部分；输出仅限 proof question 或 counterexample seed，不输出 issue、severity、verdict 或 confirmed claim。
+
 ## ECC 来源
 
 参考 `a11y-architect` 的 POUR、Name/Role/Value、焦点顺序、目标尺寸、状态消息和动态字号 checklist。这里只作为 I18n / Mobile UX / Figma Design 的输入增强，不独立产出 confirmed issue。
