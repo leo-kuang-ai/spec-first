@@ -1,0 +1,38 @@
+{
+  "schema_version": "spec-app-assurance-u0-validation.v1",
+  "status": "complete",
+  "artifact_authority": "generated_advisory",
+  "sample_contract": "skills/spec-app-consistency-audit/evals/pilot-cases.json",
+  "arms": {
+    "current_code_review": "contract_grounded_projection_no_diff_evidence",
+    "current_app_audit": "runner_characterized_semantic_not_run_and_contract_projection",
+    "variant_a": "generated_advisory_direct_lens",
+    "variant_b": "generated_advisory_disposable_ir"
+  },
+  "reviewer_independence": {
+    "required": 2,
+    "observed": 2,
+    "reason_code": "independent_blind_reviews_complete",
+    "receipts": ["reviewer-r1.md", "reviewer-r2.md"]
+  },
+  "variant_mapping_revealed_after_scoring": {
+    "variant_x": "disposable_ir",
+    "variant_y": "direct_lens"
+  },
+  "budget": {
+    "direct_tokens_estimate": 3200,
+    "ir_tokens_estimate": 4000,
+    "token_ratio": 1.25,
+    "direct_duration_minutes_estimate": 12,
+    "ir_duration_minutes_estimate": 8,
+    "human_review_cost_delta": "approximately_20_to_25_percent"
+  },
+  "terminal_verdict": "ir_go",
+  "unlocks_u1": true,
+  "limitations": [
+    "Synthetic fixtures 只提供 journey、platform 和 changed-surface metadata，不含 materialized App source；本结果只支持架构 Trial，不支持 public effectiveness claim。",
+    "Token、duration 与人工审查分钟为粗略估算，不是受控 telemetry。",
+    "Characterization 测试只证明当前 runner、evidence gate 和 extractor authority 行为。",
+    "验证任务可执行性在匿名摘要中未完整展示 capability/blocked fields；U5 必须以 schema 和 validator 补齐。"
+  ]
+}

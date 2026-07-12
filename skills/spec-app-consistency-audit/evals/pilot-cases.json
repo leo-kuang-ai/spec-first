@@ -1,0 +1,39 @@
+{
+  "schema_version": "spec-app-assurance-u0-pilot-cases.v1",
+  "window": {
+    "window_start": "2026-07-12",
+    "window_end": "2026-07-17",
+    "extension_count": 0,
+    "decision_owner": "project-owner"
+  },
+  "samples": [
+    {
+      "sample_id": "synthetic-checkout-retry",
+      "source_hash": "sha256:9636b91636e2612bdc40e44b89b4464cc439d7e001b46496bd42cb026a1039b8",
+      "provenance": "synthetic_fixture",
+      "known_defect_refs": ["KD-CHECKOUT-DUPLICATE-SUBMIT", "KD-CHECKOUT-ERROR-RECOVERY"],
+      "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"],
+      "redaction_posture": "public_synthetic_no_restricted_data",
+      "materialized_figma": false,
+      "fixture": {
+        "journey": "Checkout -> Submit -> Error -> Retry",
+        "platforms": ["android", "ios"],
+        "changed_surfaces": ["CheckoutViewModel", "CheckoutScreen"]
+      }
+    },
+    {
+      "sample_id": "synthetic-permission-resume",
+      "source_hash": "sha256:f086709fe309952be4e60bdb1c47f2ae2c4f6f8d0b28dccaf065b67533f3840f",
+      "provenance": "synthetic_fixture",
+      "known_defect_refs": ["KD-PERMISSION-SETTINGS-RETURN", "KD-PERMISSION-IOS-OWNERSHIP"],
+      "allowed_evidence": ["synthetic_prd", "synthetic_kmp_source", "synthetic_android_source", "synthetic_ios_source"],
+      "redaction_posture": "public_synthetic_no_restricted_data",
+      "materialized_figma": false,
+      "fixture": {
+        "journey": "Feature entry -> Permission denied -> Settings -> Resume",
+        "platforms": ["android", "ios"],
+        "changed_surfaces": ["PermissionCoordinator", "FeatureScreen"]
+      }
+    }
+  ]
+}

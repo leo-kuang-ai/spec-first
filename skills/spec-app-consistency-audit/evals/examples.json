@@ -10,6 +10,21 @@
   "source_ref_authority": "source",
   "cases": [
     {
+      "id": "u0-competing-thin-slices",
+      "input": "Compare the direct App lens and disposable IR thin slice on the same authorized samples before adding durable schemas.",
+      "coverage_tags": ["architecture-eval", "boundary"],
+      "expected_outcome": [
+        "use identical samples, evidence allowances, and budgets",
+        "keep IR output disposable until every ir_go gate passes",
+        "require at least two independent blind reviewers"
+      ],
+      "forbidden_signals": [
+        "durable app-behavior-model schema during U0",
+        "same-context self-review treated as blind evidence",
+        "design-only increment counted without materialized Figma"
+      ]
+    },
+    {
       "id": "trigger-cross-source-app-audit",
       "input": "Audit this mobile App feature for consistency across docs/prd.md, a local Figma context JSON, and the app source tree before simulator validation.",
       "coverage_tags": ["trigger"],

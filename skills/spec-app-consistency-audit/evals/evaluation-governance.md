@@ -52,3 +52,13 @@ human-owner acceptance for semantic quality claims.
 
 Do not add a per-skill `manifest.json` unless spec-first adopts that as a source
 truth; lifecycle delivery currently lives in the dual-host governance contract.
+
+## U0 Competing Thin-Slice Boundary
+
+`pilot-cases.json`、`pilot-rubric.md` 与 `u0-*` 文件只支持 U0 架构裁决。
+Direct 与 IR arm 必须使用同样本、同 evidence allowance 和同预算；IR 输出是
+`generated/advisory/disposable`，不得在 `ir_go` 前提升为 production schema。
+
+`ir_go` 需要至少两名独立盲审者。当前会话自评、schema 校验、测试通过或多次
+重复生成都不能替代 reviewer independence。缺少调度授权时记录
+`dispatch_authorization_missing` 并保持后续 durable implementation blocked。
