@@ -1,5 +1,7 @@
 # Changelog
 
+- v1.13.2 2026-07-12 22:10:00 Codex: feat(app-assurance): U2 新增 producer-local `app-behavior-model.v1`、Behavior Model Compiler prompt/reference、deterministic normalizer 和 artifact/context validator；core 仅覆盖 changed-feature 的 Feature/Journey/Surface/State/Event/Transition/Navigation/Platform Ownership，强制 run/prepare binding、journey topology、逐节点 evidence/freshness/limitations、same-name identity candidate、contradiction 与 missing-Figma cap。关闭 raw prompt retention、任意 run-dir/output、symlink、authority upgrade 和 dangling/cross-run ref 边界；未创建全 App graph，未修改 generated runtime。 (user-visible)
+
 - v1.13.2 2026-07-12 21:10:00 Codex: refactor(app-assurance): U1 将 App Audit runner 扩展为 deterministic `phase:prepare` / `phase:finalize` / `phase:abort` 生命周期，host 语义阶段位于 prepare 与 finalize 之间；新增 source freshness fail-closed、run-local ephemeral input cleanup、stage/cleanup receipts、metadata/manifest 投射和兼容 `issue_synthesis_status:not_run`，phase-less facade 保留既有调用语义并执行相同 cleanup。同步 source Skill 与 runner/output contracts，未修改 generated runtime。 (user-visible)
 
 - v1.13.2 2026-07-12 20:15:17 Codex: test(app-assurance): 完成 App Assurance Compiler U0：增加 runner、evidence gate 与 extractor authority 的聚焦 characterization tests，同样本/同预算比较 direct lens 与 disposable IR；两名独立盲审均轻微偏好 IR 的 journey closure/lifecycle 覆盖，IR token 为 direct 的 1.25×、人工审查成本约 +20%–25%，未越过门禁，terminal verdict 为 `ir_go`。证据位于 `docs/validation/2026-07-12-app-assurance-compiler-pilot-baseline/`；该结果只授权 Trial 实施，不支持 public effectiveness claim。未修改 generated runtime。 (user-visible)

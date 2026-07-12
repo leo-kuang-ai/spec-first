@@ -75,12 +75,232 @@ function validateArtifact(artifact, options = {}) {
   if (artifact.artifact_id === 'issues' || artifact.schema_version === 'spec-app-consistency-audit-issues.v1') {
     validateIssuesArtifact(artifact, errors, options);
   }
+  if (artifact.artifact_id === 'app-behavior-model' || artifact.schema_version === 'app-behavior-model.v1') {
+    validateAppBehaviorModelArtifact(artifact, errors);
+  }
   validateKnownContractArtifact(artifact, errors);
 
   return {
     valid: errors.length === 0,
     errors,
   };
+}
+
+function validateAppBehaviorModelArtifact(artifact, errors) {
+  requireSchemaVersion(artifact, 'app-behavior-model.v1', errors);
+  if (artifact.artifact_id !== 'app-behavior-model') {
+    errors.push(error('artifact_id', 'invalid_behavior_model_artifact_id', 'artifact_id must be app-behavior-model.'));
+  }
+  if (artifact.artifact_authority !== 'generated_advisory') {
+    errors.push(error('artifact_authority', 'behavior_model_authority_invalid', 'Behavior IR must remain generated_advisory.'));
+  }
+  if (artifact.retention_class !== 'run_local') {
+    errors.push(error('retention_class', 'behavior_model_retention_invalid', 'Normalized Behavior IR must use run_local retention.'));
+  }
+  requireString(artifact, 'run_id', errors);
+  if (typeof artifact.prepare_fingerprint !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(artifact.prepare_fingerprint)) {
+    errors.push(error('prepare_fingerprint', 'behavior_model_prepare_fingerprint_invalid', 'prepare_fingerprint must be a SHA-256 fingerprint.'));
+  }
+  requireObject(artifact, 'scope', errors);
+  requireArray(artifact, 'evidence_catalog', errors);
+  requireObject(artifact, 'entities', errors);
+  requireArray(artifact, 'identity_candidates', errors);
+  requireArray(artifact, 'contradictions', errors);
+  requireObject(artifact, 'extensions', errors);
+  requireObject(artifact, 'coverage', errors);
+  if (!artifact.entities || typeof artifact.entities !== 'object') return;
+
+  const collections = ['features', 'journeys', 'surfaces', 'states', 'events', 'transitions', 'navigations', 'platform_ownership'];
+  for (const collection of collections) requireArray(artifact.entities, collection, errors, 'entities');
+  const evidenceIds = new Set();
+  const evidenceById = new Map();
+  for (const [index, entry] of (artifact.evidence_catalog || []).entries()) {
+    const prefix = `evidence_catalog[${index}]`;
+    requireString(entry, 'id', errors, prefix);
+    requireString(entry, 'source_kind', errors, prefix);
+    requireString(entry, 'path', errors, prefix);
+    requireString(entry, 'freshness', errors, prefix);
+    requireString(entry, 'summary', errors, prefix);
+    if (typeof entry.path === 'string' && !isSafeSourceInputPath(entry.path)) {
+      errors.push(error(`${prefix}.path`, 'behavior_model_unsafe_path', 'Evidence path must be safe repo-relative provenance or a redacted placeholder.'));
+    }
+    if (evidenceIds.has(entry.id)) errors.push(error(`${prefix}.id`, 'behavior_model_duplicate_id', `Duplicate evidence ID: ${entry.id}.`));
+    evidenceIds.add(entry.id);
+    evidenceById.set(entry.id, entry);
+    validateArtifactText(entry.summary, `${prefix}.summary`, errors, 500);
+  }
+
+  const byCollection = {};
+  const allIds = new Set(evidenceIds);
+  for (const collection of collections) {
+    byCollection[collection] = new Set();
+    for (const [index, entry] of (artifact.entities[collection] || []).entries()) {
+      const prefix = `entities.${collection}[${index}]`;
+      validateBehaviorSemanticEntry(entry, prefix, evidenceIds, evidenceById, errors);
+      if (allIds.has(entry.id)) errors.push(error(`${prefix}.id`, 'behavior_model_duplicate_id', `Duplicate Behavior IR ID: ${entry.id}.`));
+      allIds.add(entry.id);
+      byCollection[collection].add(entry.id);
+    }
+  }
+  for (const [collection, values] of Object.entries({
+    identity_candidates: artifact.identity_candidates || [],
+    contradictions: artifact.contradictions || [],
+  })) {
+    values.forEach((entry, index) => {
+      const prefix = `${collection}[${index}]`;
+      validateBehaviorSemanticEntry(entry, prefix, evidenceIds, evidenceById, errors);
+      if (allIds.has(entry.id)) errors.push(error(`${prefix}.id`, 'behavior_model_duplicate_id', `Duplicate Behavior IR ID: ${entry.id}.`));
+      allIds.add(entry.id);
+      if (collection === 'identity_candidates' && entry.match_status === 'supported' && entry.semantic_status !== 'observed') {
+        errors.push(error(`${prefix}.match_status`, 'behavior_model_identity_support_requires_observation', 'Supported identity requires observed semantic evidence.'));
+      }
+      if (collection === 'identity_candidates' && entry.match_status === 'supported') {
+        const sourceKinds = new Set((entry.evidence_refs || []).map((ref) => evidenceById.get(ref)).filter(Boolean).map((evidence) => evidence.source_kind));
+        if (typeof entry.left_ref !== 'string' || typeof entry.right_ref !== 'string' || sourceKinds.size < 2) {
+          errors.push(error(`${prefix}.match_status`, 'behavior_model_identity_support_requires_cross_source_evidence', 'Supported identity requires both sides and at least two source kinds.'));
+        }
+      }
+    });
+  }
+
+  for (const [index, transition] of (artifact.entities.transitions || []).entries()) {
+    const prefix = `entities.transitions[${index}]`;
+    requireBehaviorRef(transition.journey_ref, byCollection.journeys, `${prefix}.journey_ref`, errors);
+    requireBehaviorRef(transition.source_state_ref, byCollection.states, `${prefix}.source_state_ref`, errors);
+    requireBehaviorRef(transition.target_state_ref, byCollection.states, `${prefix}.target_state_ref`, errors);
+    requireBehaviorRef(transition.event_ref, byCollection.events, `${prefix}.event_ref`, errors);
+    requireBehaviorRef(transition.surface_ref, byCollection.surfaces, `${prefix}.surface_ref`, errors);
+  }
+  for (const [index, navigation] of (artifact.entities.navigations || []).entries()) {
+    const prefix = `entities.navigations[${index}]`;
+    requireBehaviorRef(navigation.source_surface_ref, byCollection.surfaces, `${prefix}.source_surface_ref`, errors);
+    requireBehaviorRef(navigation.target_surface_ref, byCollection.surfaces, `${prefix}.target_surface_ref`, errors);
+    requireBehaviorRef(navigation.trigger_event_ref, byCollection.events, `${prefix}.trigger_event_ref`, errors);
+  }
+  for (const [index, ownership] of (artifact.entities.platform_ownership || []).entries()) {
+    const allowed = new Set([...byCollection.surfaces, ...byCollection.states, ...byCollection.events, ...byCollection.transitions]);
+    requireBehaviorRef(ownership.subject_ref, allowed, `entities.platform_ownership[${index}].subject_ref`, errors);
+  }
+  for (const [index, journey] of (artifact.entities.journeys || []).entries()) {
+    const prefix = `entities.journeys[${index}]`;
+    requireBehaviorRef(journey.feature_ref, byCollection.features, `${prefix}.feature_ref`, errors);
+    if (!journey.entry || typeof journey.entry !== 'object') {
+      errors.push(error(`${prefix}.entry`, 'behavior_model_incomplete_journey', 'Journey must include entry and preconditions.'));
+    } else {
+      requireBehaviorRef(journey.entry.surface_ref, byCollection.surfaces, `${prefix}.entry.surface_ref`, errors);
+      requireBehaviorRef(journey.entry.state_ref, byCollection.states, `${prefix}.entry.state_ref`, errors);
+      if (!Array.isArray(journey.entry.preconditions)) errors.push(error(`${prefix}.entry.preconditions`, 'behavior_model_incomplete_journey', 'Journey preconditions must be an array.'));
+    }
+    if (!Array.isArray(journey.ordered_step_refs) || journey.ordered_step_refs.length === 0) {
+      errors.push(error(`${prefix}.ordered_step_refs`, 'behavior_model_incomplete_journey', 'Journey must include ordered transition steps.'));
+    } else {
+      journey.ordered_step_refs.forEach((ref, refIndex) => requireBehaviorRef(ref, byCollection.transitions, `${prefix}.ordered_step_refs[${refIndex}]`, errors));
+      const journeyTransitions = (artifact.entities.transitions || []).filter((entry) => entry.journey_ref === journey.id);
+      const transitionById = new Map(journeyTransitions.map((entry) => [entry.id, entry]));
+      journey.ordered_step_refs.forEach((ref, refIndex) => {
+        if (!transitionById.has(ref)) {
+          errors.push(error(`${prefix}.ordered_step_refs[${refIndex}]`, 'behavior_model_cross_journey_transition', 'Ordered transition must belong to the current journey.'));
+        }
+      });
+      const steps = journey.ordered_step_refs.map((ref) => transitionById.get(ref)).filter(Boolean);
+      if (journey.entry && steps[0] && steps[0].source_state_ref !== journey.entry.state_ref) {
+        errors.push(error(`${prefix}.ordered_step_refs[0]`, 'behavior_model_transition_chain_invalid', 'First transition must start at the journey entry state.'));
+      }
+      if (journey.entry && steps[0] && steps[0].surface_ref !== journey.entry.surface_ref) {
+        errors.push(error(`${prefix}.ordered_step_refs[0]`, 'behavior_model_transition_chain_invalid', 'First transition must start on the journey entry surface.'));
+      }
+      for (let stepIndex = 1; stepIndex < steps.length; stepIndex += 1) {
+        if (steps[stepIndex - 1].target_state_ref !== steps[stepIndex].source_state_ref) {
+          errors.push(error(`${prefix}.ordered_step_refs[${stepIndex}]`, 'behavior_model_transition_chain_invalid', 'Ordered transitions must form a continuous state chain.'));
+        }
+      }
+      const reachableStates = new Set([journey.entry && journey.entry.state_ref].filter(Boolean));
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const transition of journeyTransitions) {
+          if (reachableStates.has(transition.source_state_ref) && !reachableStates.has(transition.target_state_ref)) {
+            reachableStates.add(transition.target_state_ref);
+            changed = true;
+          }
+        }
+      }
+      const exitStates = [journey.happy_exit, ...(journey.failure_or_cancel_exits || [])].filter(Boolean).map((entry) => entry.state_ref);
+      if (exitStates.some((stateRef) => !reachableStates.has(stateRef))) {
+        errors.push(error(`${prefix}.happy_exit`, 'behavior_model_exit_unreachable', 'Every journey exit must be reachable from ordered transitions.'));
+      }
+    }
+    validateBehaviorExit(journey.happy_exit, `${prefix}.happy_exit`, byCollection, errors, false);
+    if (!Array.isArray(journey.failure_or_cancel_exits) || journey.failure_or_cancel_exits.length === 0) {
+      errors.push(error(`${prefix}.failure_or_cancel_exits`, 'behavior_model_incomplete_journey', 'Journey must include at least one failure or cancel exit.'));
+    } else {
+      journey.failure_or_cancel_exits.forEach((entry, exitIndex) => validateBehaviorExit(entry, `${prefix}.failure_or_cancel_exits[${exitIndex}]`, byCollection, errors, true));
+    }
+  }
+
+  for (const [index, ref] of ((artifact.scope && artifact.scope.changed_feature_refs) || []).entries()) {
+    requireBehaviorRef(ref, byCollection.features, `scope.changed_feature_refs[${index}]`, errors);
+  }
+  for (const [index, ref] of ((artifact.scope && artifact.scope.selected_journey_refs) || []).entries()) {
+    requireBehaviorRef(ref, byCollection.journeys, `scope.selected_journey_refs[${index}]`, errors);
+  }
+
+  const figmaMissing = artifact.coverage && Array.isArray(artifact.coverage.omitted_sources)
+    && artifact.coverage.omitted_sources.includes('figma');
+  if (figmaMissing && artifact.coverage.design_alignment !== 'not_evaluable') {
+    errors.push(error('coverage.design_alignment', 'behavior_model_missing_figma_cap_required', 'Missing Figma requires design_alignment:not_evaluable.'));
+  }
+}
+
+function validateBehaviorSemanticEntry(entry, prefix, evidenceIds, evidenceById, errors) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+    errors.push(error(prefix, 'behavior_model_entry_not_object', 'Behavior IR entry must be an object.'));
+    return;
+  }
+  for (const field of ['id', 'label', 'platform_scope', 'semantic_status', 'freshness']) requireString(entry, field, errors, prefix);
+  if (typeof entry.confidence !== 'number' || entry.confidence < 0 || entry.confidence > 1) {
+    errors.push(error(`${prefix}.confidence`, 'behavior_model_confidence_invalid', 'confidence must be a number between 0 and 1.'));
+  }
+  if (!Array.isArray(entry.evidence_refs)) errors.push(error(`${prefix}.evidence_refs`, 'array_required', 'evidence_refs must be an array.'));
+  else entry.evidence_refs.forEach((ref, index) => requireBehaviorRef(ref, evidenceIds, `${prefix}.evidence_refs[${index}]`, errors));
+  if (!Array.isArray(entry.limitations)) errors.push(error(`${prefix}.limitations`, 'array_required', 'limitations must be an array.'));
+  if (['inferred', 'contradicted', 'unknown'].includes(entry.semantic_status)
+    && (!Array.isArray(entry.limitations) || entry.limitations.length === 0)) {
+    errors.push(error(`${prefix}.limitations`, 'behavior_model_limitations_required', `${entry.semantic_status} entries require limitations.`));
+  }
+  if (entry.semantic_status === 'observed' && (!Array.isArray(entry.evidence_refs) || entry.evidence_refs.length === 0)) {
+    errors.push(error(`${prefix}.evidence_refs`, 'behavior_model_observed_evidence_required', 'Observed entries require direct evidence refs.'));
+  }
+  if (entry.semantic_status === 'observed' && Array.isArray(entry.evidence_refs)) {
+    const currentEvidence = entry.evidence_refs.map((ref) => evidenceById.get(ref)).filter((evidence) => evidence
+      && evidence.freshness !== 'unavailable' && typeof evidence.source_hash === 'string');
+    if (currentEvidence.length === 0) {
+      errors.push(error(`${prefix}.evidence_refs`, 'behavior_model_observed_current_evidence_required', 'Observed entries require current traceable evidence with a source hash.'));
+    }
+    if (entry.freshness !== 'current-run') {
+      errors.push(error(`${prefix}.freshness`, 'behavior_model_observed_current_freshness_required', 'Observed entries must be current-run; partial/stale/unavailable entries remain inferred or unknown.'));
+    }
+  }
+}
+
+function validateBehaviorExit(exitValue, prefix, byCollection, errors, requireKind) {
+  if (!exitValue || typeof exitValue !== 'object' || Array.isArray(exitValue)) {
+    errors.push(error(prefix, 'behavior_model_incomplete_journey', 'Journey exit must be an object.'));
+    return;
+  }
+  if (requireKind && !['failure', 'cancel'].includes(exitValue.kind)) {
+    errors.push(error(`${prefix}.kind`, 'behavior_model_incomplete_journey', 'Non-happy exit kind must be failure or cancel.'));
+  }
+  requireBehaviorRef(exitValue.state_ref, byCollection.states, `${prefix}.state_ref`, errors);
+  if (exitValue.navigation_ref !== null && exitValue.navigation_ref !== undefined) {
+    requireBehaviorRef(exitValue.navigation_ref, byCollection.navigations, `${prefix}.navigation_ref`, errors);
+  }
+}
+
+function requireBehaviorRef(value, allowed, pathName, errors) {
+  if (typeof value !== 'string' || !allowed.has(value)) {
+    errors.push(error(pathName, 'behavior_model_dangling_ref', `Unknown Behavior IR reference: ${value || '<missing>'}.`));
+  }
 }
 
 function validateSourceInput(source, index, errors) {
@@ -699,6 +919,7 @@ if (require.main === module) {
 module.exports = {
   validateArtifact,
   validateArtifactFile,
+  validateAppBehaviorModelArtifact,
   validateAuditIssue,
   validateAuditReportArtifact,
   validatePreflightArtifact,

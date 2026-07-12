@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/schemas/spec-app-consistency-audit/app-behavior-model.schema.json",
+  "title": "Producer-local App Behavior Model",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "generated_at",
+    "source_inputs",
+    "consumers",
+    "contract_status",
+    "artifact_authority",
+    "data_sensitivity",
+    "retention_class",
+    "run_id",
+    "prepare_fingerprint",
+    "scope",
+    "evidence_catalog",
+    "entities",
+    "identity_candidates",
+    "contradictions",
+    "extensions",
+    "coverage"
+  ],
+  "properties": {
+    "schema_version": { "const": "app-behavior-model.v1" },
+    "artifact_id": { "const": "app-behavior-model" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_inputs": { "type": "array", "minItems": 1 },
+    "consumers": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "contract_status": { "const": "candidate" },
+    "artifact_authority": { "const": "generated_advisory" },
+    "data_sensitivity": { "enum": ["public", "internal", "confidential"] },
+    "retention_class": { "const": "run_local" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "prepare_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "scope": {
+      "type": "object",
+      "required": ["changed_feature_refs", "selected_journey_refs", "platform_scope", "selection_source", "selection_rationale", "omitted_journey_candidates"],
+      "properties": {
+        "changed_feature_refs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "selected_journey_refs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "platform_scope": { "type": "array", "minItems": 1, "items": { "enum": ["shared", "android", "ios", "unknown"] } },
+        "selection_source": { "enum": ["user_override", "semantic_selection"] },
+        "selection_rationale": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "omitted_journey_candidates": { "type": "array" }
+      },
+      "additionalProperties": false
+    },
+    "evidence_catalog": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidence" } },
+    "entities": {
+      "type": "object",
+      "required": ["features", "journeys", "surfaces", "states", "events", "transitions", "navigations", "platform_ownership"],
+      "properties": {
+        "features": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/semantic" } },
+        "journeys": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/journey" } },
+        "surfaces": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/semantic" } },
+        "states": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/semantic" } },
+        "events": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/semantic" } },
+        "transitions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/transition" } },
+        "navigations": { "type": "array", "items": { "$ref": "#/$defs/navigation" } },
+        "platform_ownership": { "type": "array", "items": { "$ref": "#/$defs/platformOwnership" } }
+      },
+      "additionalProperties": false
+    },
+    "identity_candidates": { "type": "array", "items": { "$ref": "#/$defs/semantic" } },
+    "contradictions": { "type": "array", "items": { "$ref": "#/$defs/semantic" } },
+    "extensions": { "type": "object" },
+    "coverage": {
+      "type": "object",
+      "required": ["included_sources", "omitted_sources", "platforms_evaluable", "platforms_not_evaluable", "design_alignment", "conclusion_caps", "limitations"],
+      "properties": {
+        "included_sources": { "type": "array", "items": { "type": "string" } },
+        "omitted_sources": { "type": "array", "items": { "type": "string" } },
+        "platforms_evaluable": { "type": "array", "items": { "type": "string" } },
+        "platforms_not_evaluable": { "type": "array", "items": { "type": "string" } },
+        "design_alignment": { "enum": ["evaluable", "partially_evaluable", "not_evaluable"] },
+        "conclusion_caps": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "semantic": {
+      "type": "object",
+      "required": ["id", "label", "platform_scope", "semantic_status", "evidence_refs", "freshness", "confidence", "limitations"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]{2,127}$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "platform_scope": { "enum": ["shared", "android", "ios", "multi", "unknown"] },
+        "semantic_status": { "enum": ["observed", "inferred", "contradicted", "unknown"] },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } },
+        "freshness": { "enum": ["current-run", "partial", "stale", "unavailable"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "journey": {
+      "allOf": [
+        { "$ref": "#/$defs/semantic" },
+        {
+          "type": "object",
+          "required": ["feature_ref", "entry", "ordered_step_refs", "happy_exit", "failure_or_cancel_exits"],
+          "properties": {
+            "feature_ref": { "type": "string" },
+            "entry": {
+              "type": "object",
+              "required": ["surface_ref", "state_ref", "preconditions"],
+              "properties": {
+                "surface_ref": { "type": "string" },
+                "state_ref": { "type": "string" },
+                "preconditions": { "type": "array", "items": { "type": "string" } }
+              }
+            },
+            "ordered_step_refs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "happy_exit": { "$ref": "#/$defs/exit" },
+            "failure_or_cancel_exits": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/exit" } }
+          }
+        }
+      ]
+    },
+    "exit": {
+      "type": "object",
+      "required": ["state_ref", "navigation_ref"],
+      "properties": {
+        "kind": { "enum": ["failure", "cancel"] },
+        "state_ref": { "type": "string" },
+        "navigation_ref": { "type": ["string", "null"] }
+      }
+    },
+    "transition": {
+      "allOf": [
+        { "$ref": "#/$defs/semantic" },
+        {
+          "type": "object",
+          "required": ["journey_ref", "source_state_ref", "event_ref", "target_state_ref", "surface_ref"],
+          "properties": {
+            "journey_ref": { "type": "string" },
+            "source_state_ref": { "type": "string" },
+            "event_ref": { "type": "string" },
+            "target_state_ref": { "type": "string" },
+            "surface_ref": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "navigation": {
+      "allOf": [
+        { "$ref": "#/$defs/semantic" },
+        {
+          "type": "object",
+          "required": ["source_surface_ref", "target_surface_ref", "trigger_event_ref", "navigation_kind"],
+          "properties": {
+            "source_surface_ref": { "type": "string" },
+            "target_surface_ref": { "type": "string" },
+            "trigger_event_ref": { "type": "string" },
+            "navigation_kind": { "enum": ["forward", "back", "external", "deep_link", "unknown"] }
+          }
+        }
+      ]
+    },
+    "platformOwnership": {
+      "allOf": [
+        { "$ref": "#/$defs/semantic" },
+        {
+          "type": "object",
+          "required": ["subject_ref", "ownership", "bindings"],
+          "properties": {
+            "subject_ref": { "type": "string" },
+            "ownership": { "enum": ["shared", "android", "ios", "split", "unknown"] },
+            "bindings": { "type": "array" }
+          }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "source_kind", "path", "freshness", "summary", "limitations"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]{2,127}$" },
+        "source_kind": { "enum": ["prd", "figma", "code", "diff", "contract", "user_override"] },
+        "path": { "type": "string", "minLength": 1 },
+        "source_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "source_hash_unavailable_reason": { "type": "string", "minLength": 1 },
+        "freshness": { "enum": ["current-worktree", "partial-worktree", "unavailable"] },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "oneOf": [
+        { "required": ["source_hash"] },
+        { "required": ["source_hash_unavailable_reason"] }
+      ],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

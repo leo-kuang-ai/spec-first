@@ -22,6 +22,7 @@ function buildAuditContext(options = {}) {
   const repoRoot = resolveRepoRoot(options);
   const artifactsDir = resolvePathAgainstRoot(repoRoot, options.artifactsDir || options.runDir);
   const outputPath = options.output ? resolvePathAgainstRoot(repoRoot, options.output) : null;
+  assertManagedContextPaths(repoRoot, artifactsDir, outputPath);
   const files = listJsonFiles(artifactsDir, {
     excludeDirs: new Set(['input', 'writeback-preview']),
     exclude: new Set([
@@ -57,9 +58,16 @@ function buildAuditContext(options = {}) {
       artifact_id: artifact.artifact_id || null,
       schema_version: artifact.schema_version || null,
       contract_status: artifact.contract_status || null,
+      artifact_authority: artifact.artifact_authority || null,
+      retention_class: artifact.retention_class || null,
+      run_id: artifact.run_id || null,
+      prepare_fingerprint: artifact.prepare_fingerprint || null,
       generated_at: artifact.generated_at || null,
       source_inputs: artifact.source_inputs || [],
       consumers: artifact.consumers || [],
+      coverage_caps: artifact.coverage && Array.isArray(artifact.coverage.conclusion_caps)
+        ? artifact.coverage.conclusion_caps
+        : [],
       file: toPosix(path.relative(artifactsDir, filePath)),
     });
   }
@@ -95,6 +103,35 @@ function buildAuditContext(options = {}) {
   };
 
   return context;
+}
+
+function isInside(parent, child) {
+  const relative = path.relative(parent, child);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function existingParent(filePath) {
+  let current = path.resolve(filePath);
+  while (!fs.existsSync(current)) current = path.dirname(current);
+  return fs.realpathSync(fs.statSync(current).isDirectory() ? current : path.dirname(current));
+}
+
+function assertManagedContextPaths(repoRoot, artifactsDir, outputPath) {
+  const realRepo = fs.realpathSync(repoRoot);
+  const managedRoot = path.join(realRepo, '.spec-first', 'app-audit', 'runs');
+  if (!fs.existsSync(managedRoot) || !fs.existsSync(artifactsDir) || fs.lstatSync(artifactsDir).isSymbolicLink()) {
+    throw new Error('audit_context_run_boundary_invalid: artifacts-dir must be an existing non-symlink managed run.');
+  }
+  const realManaged = fs.realpathSync(managedRoot);
+  const realArtifacts = fs.realpathSync(artifactsDir);
+  if (!isInside(realRepo, realManaged) || realManaged === realRepo || !isInside(realManaged, realArtifacts) || realArtifacts === realManaged) {
+    throw new Error('audit_context_run_boundary_escape: artifacts-dir resolves outside the managed run root.');
+  }
+  if (outputPath) {
+    if (fs.existsSync(outputPath) && fs.lstatSync(outputPath).isSymbolicLink()) throw new Error('audit_context_output_symlink_rejected: output must not be a symlink.');
+    const parent = existingParent(outputPath);
+    if (!isInside(realArtifacts, parent)) throw new Error('audit_context_output_outside_run_boundary: output must remain inside the run.');
+  }
 }
 
 function listJsonFiles(dirPath, options = {}) {
