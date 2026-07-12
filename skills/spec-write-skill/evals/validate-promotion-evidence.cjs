@@ -6,11 +6,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SCHEMA_VERSION = 'spec-write-skill.promotion-evidence/v1';
-const REQUIRED_INPUT_ROLES = ['baseline_source', 'candidate_source', 'case_set', 'rubric'];
-const REQUIRED_ARM_IDS = ['candidate-ablation', 'candidate-full', 'native'];
+const REQUIRED_INPUT_ROLES = ['baseline_source', 'candidate_source', 'case_set', 'gate0', 'rubric'];
+const REQUIRED_ARM_IDS = ['candidate-ablation', 'candidate-full', 'native', 'old-full'];
 const VERDICTS = new Set(['pass', 'fail', 'not_run']);
 const REDACTION_STATUSES = new Set(['passed', 'not_required']);
 const UNSAFE_PATH_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u;
+const MAX_DEFAULT_MARKDOWN_BYTES = 20 * 1024;
 
 function sha256File(filePath) {
   return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
@@ -135,6 +136,75 @@ function validateArmAssembly(arm, errors) {
       errors.push('arm candidate-full must load candidate_full exactly once without common guardrails');
     }
   }
+  if (arm.id === 'old-full') {
+    if (assembly.length !== 1 || roleCount(assembly, 'baseline_full') !== 1) {
+      errors.push('arm old-full must load baseline_full exactly once');
+    }
+  }
+}
+
+function readCaseSet(bundleRoot, inputs, errors) {
+  const caseSet = Array.isArray(inputs) && inputs.find((input) => input && input.role === 'case_set');
+  if (!caseSet || !isSafeRelativePath(caseSet.path)) return { behaviorIds: [], routeIds: [] };
+  try {
+    const parsed = JSON.parse(fs.readFileSync(path.resolve(bundleRoot, caseSet.path), 'utf8'));
+    const behavior = Array.isArray(parsed.cases) ? parsed.cases : null;
+    const routes = Array.isArray(parsed.route_queries) ? parsed.route_queries : null;
+    if (!behavior || behavior.length !== 8) errors.push('case_set must declare exactly 8 behavior cases');
+    if (!routes || routes.length < 12 || routes.length > 16) errors.push('case_set must declare 12-16 route queries');
+    const behaviorIds = behavior ? behavior.map((entry) => entry && entry.id) : [];
+    const routeIds = routes ? routes.map((entry) => entry && entry.id) : [];
+    if (behaviorIds.some((id) => typeof id !== 'string' || !id) || new Set(behaviorIds).size !== behaviorIds.length) {
+      errors.push('case_set behavior case ids must be unique non-empty strings');
+    }
+    if (routeIds.some((id) => typeof id !== 'string' || !id) || new Set(routeIds).size !== routeIds.length) {
+      errors.push('case_set route query ids must be unique non-empty strings');
+    }
+    return { behaviorIds, routeIds };
+  } catch {
+    errors.push('case_set artifact must be valid JSON with cases and route_queries');
+    return { behaviorIds: [], routeIds: [] };
+  }
+}
+
+function sameIdSet(actual, expected) {
+  return Array.isArray(actual)
+    && actual.length === expected.length
+    && actual.every((id) => typeof id === 'string')
+    && new Set(actual).size === actual.length
+    && actual.every((id) => expected.includes(id));
+}
+
+function validateCoverage(coverage, expected, cases, routeRuns, errors) {
+  if (!coverage || typeof coverage !== 'object' || Array.isArray(coverage)) {
+    errors.push('manifest.coverage is required');
+    return { comparisonIds: [], regressionIds: [] };
+  }
+  if (!sameIdSet(coverage.behavior_case_ids, expected.behaviorIds)) {
+    errors.push('coverage.behavior_case_ids must exactly match case_set behavior ids');
+  }
+  if (!sameIdSet(coverage.route_query_ids, expected.routeIds)) {
+    errors.push('coverage.route_query_ids must exactly match case_set route query ids');
+  }
+  for (const [field, label] of [['comparison_case_ids', 'comparison'], ['regression_case_ids', 'regression']]) {
+    if (!Array.isArray(coverage[field]) || coverage[field].length === 0
+      || coverage[field].some((id) => typeof id !== 'string' || !expected.behaviorIds.includes(id))
+      || new Set(coverage[field]).size !== coverage[field].length) {
+      errors.push(`coverage.${field} must be a non-empty unique subset of behavior cases`);
+    }
+  }
+  const caseIds = new Set((Array.isArray(cases) ? cases : []).map((entry) => entry && entry.id));
+  for (const id of expected.behaviorIds) {
+    if (!caseIds.has(id)) errors.push(`manifest.cases must include behavior case ${id}`);
+  }
+  const routeIds = new Set((Array.isArray(routeRuns) ? routeRuns : []).map((entry) => entry && entry.id));
+  for (const id of expected.routeIds) {
+    if (!routeIds.has(id)) errors.push(`manifest.route_runs must include route query ${id}`);
+  }
+  return {
+    comparisonIds: Array.isArray(coverage.comparison_case_ids) ? coverage.comparison_case_ids : [],
+    regressionIds: Array.isArray(coverage.regression_case_ids) ? coverage.regression_case_ids : [],
+  };
 }
 
 function validateArms(bundleRoot, arms, errors) {
@@ -169,11 +239,31 @@ function validateArms(bundleRoot, arms, errors) {
   return ids;
 }
 
+function validateSourceBindings(inputs, arms, errors) {
+  if (!Array.isArray(inputs) || !Array.isArray(arms)) return;
+  const candidateSource = inputs.find((input) => input && input.role === 'candidate_source');
+  const baselineSource = inputs.find((input) => input && input.role === 'baseline_source');
+  const candidateArm = arms.find((arm) => arm && arm.id === 'candidate-full');
+  const baselineArm = arms.find((arm) => arm && arm.id === 'old-full');
+  const candidateAssembly = candidateArm && Array.isArray(candidateArm.assembly)
+    ? candidateArm.assembly.find((item) => item && item.role === 'candidate_full')
+    : null;
+  const baselineAssembly = baselineArm && Array.isArray(baselineArm.assembly)
+    ? baselineArm.assembly.find((item) => item && item.role === 'baseline_full')
+    : null;
+  if (candidateSource && candidateAssembly && candidateSource.sha256 !== candidateAssembly.sha256) {
+    errors.push('candidate_source must have the same content hash as candidate-full candidate_full assembly');
+  }
+  if (baselineSource && baselineAssembly && baselineSource.sha256 !== baselineAssembly.sha256) {
+    errors.push('baseline_source must have the same content hash as old-full baseline_full assembly');
+  }
+}
+
 function validateNonNegativeInteger(value, label, errors) {
   if (!Number.isInteger(value) || value < 0) errors.push(`${label} must be a non-negative integer`);
 }
 
-function readArtifactResult(bundleRoot, reference, label, requireRouteSignal, errors) {
+function readArtifactResult(bundleRoot, reference, label, requireRouteSignal, requireBlindReview, errors) {
   if (!reference || !isSafeRelativePath(reference.path)) return null;
   const absolutePath = path.resolve(bundleRoot, reference.path);
   if (!isInside(absolutePath, bundleRoot) || hasSymlinkSegment(bundleRoot, reference.path)) return null;
@@ -186,6 +276,10 @@ function readArtifactResult(bundleRoot, reference, label, requireRouteSignal, er
     }
     if (requireRouteSignal && typeof parsed.route_high_risk_misroute !== 'boolean') {
       errors.push(`${label} must contain boolean route_high_risk_misroute`);
+      return null;
+    }
+    if (requireBlindReview && (parsed.blind !== true || parsed.independent !== true)) {
+      errors.push(`${label} must declare blind=true and independent=true`);
       return null;
     }
     return {
@@ -225,7 +319,7 @@ function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, e
     else if (entry.model !== manifestModel) errors.push(`${label}.model must match manifest.model`);
     if (typeof entry.route_high_risk_misroute !== 'boolean') {
       errors.push(`${label}.route_high_risk_misroute must be a boolean`);
-    } else if (entry.route_high_risk_misroute) {
+    } else if (entry.route_high_risk_misroute && entry.arm === 'candidate-full') {
       routeHighRiskMisroutes += 1;
     }
     if (typeof entry.id === 'string' && typeof entry.arm === 'string' && Number.isInteger(entry.repeat)) {
@@ -240,7 +334,7 @@ function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, e
     if (!VERDICTS.has(entry.machine_verdict)) errors.push(`${label}.machine_verdict is invalid`);
     if (!VERDICTS.has(entry.reviewer_verdict)) errors.push(`${label}.reviewer_verdict is invalid`);
     if (!REDACTION_STATUSES.has(entry.redaction_status)) errors.push(`${label}.redaction_status is invalid`);
-    const machineArtifactResult = readArtifactResult(bundleRoot, entry.machine_check, `${label}.machine_check`, true, errors);
+    const machineArtifactResult = readArtifactResult(bundleRoot, entry.machine_check, `${label}.machine_check`, true, false, errors);
     if (machineArtifactResult && machineArtifactResult.verdict !== entry.machine_verdict) {
       errors.push(`${label}.machine_verdict must match machine_check result`);
     }
@@ -248,7 +342,7 @@ function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, e
       && machineArtifactResult.routeHighRiskMisroute !== entry.route_high_risk_misroute) {
       errors.push(`${label}.route_high_risk_misroute must match machine_check result`);
     }
-    const reviewerArtifactResult = readArtifactResult(bundleRoot, entry.reviewer, `${label}.reviewer`, false, errors);
+    const reviewerArtifactResult = readArtifactResult(bundleRoot, entry.reviewer, `${label}.reviewer`, false, true, errors);
     if (reviewerArtifactResult && reviewerArtifactResult.verdict !== entry.reviewer_verdict) {
       errors.push(`${label}.reviewer_verdict must match reviewer result`);
     }
@@ -264,8 +358,10 @@ function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, e
       }
     }
     validateNonNegativeInteger(entry.duration_ms, `${label}.duration_ms`, errors);
-    if (entry.machine_verdict === 'fail' || entry.reviewer_verdict === 'fail') hardFailures += 1;
-    else if (entry.machine_verdict === 'not_run' || entry.reviewer_verdict === 'not_run') notRun += 1;
+    if (entry.arm === 'candidate-full' && entry.promotion_case === true) {
+      if (entry.machine_verdict === 'fail' || entry.reviewer_verdict === 'fail') hardFailures += 1;
+      else if (entry.machine_verdict === 'not_run' || entry.reviewer_verdict === 'not_run') notRun += 1;
+    }
     if (entry.promotion_case === true && typeof entry.id === 'string' && typeof entry.arm === 'string') {
       const key = `${entry.id}\u0000${entry.arm}`;
       if (!counts.has(key)) counts.set(key, new Set());
@@ -284,7 +380,159 @@ function validateCases(bundleRoot, cases, armIds, manifestHost, manifestModel, e
   return { hardFailures, notRun, routeHighRiskMisroutes };
 }
 
-function validateGateCalculation(gate, calculated, errors) {
+function validateRouteRuns(bundleRoot, routeRuns, manifestHost, manifestModel, errors) {
+  let hardFailures = 0;
+  let notRun = 0;
+  let routeHighRiskMisroutes = 0;
+  if (!Array.isArray(routeRuns) || routeRuns.length === 0) {
+    errors.push('manifest.route_runs must be a non-empty array');
+    return { hardFailures, notRun, routeHighRiskMisroutes };
+  }
+  const ids = new Set();
+  routeRuns.forEach((entry, index) => {
+    const label = `route_runs[${index}]`;
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      errors.push(`${label} must be an object`);
+      return;
+    }
+    if (typeof entry.id !== 'string' || !entry.id) errors.push(`${label}.id is required`);
+    else if (ids.has(entry.id)) errors.push(`${label}.id is duplicated`);
+    else ids.add(entry.id);
+    if (typeof entry.host !== 'string' || entry.host !== manifestHost) errors.push(`${label}.host must match manifest.host`);
+    if (typeof entry.model !== 'string' || entry.model !== manifestModel) errors.push(`${label}.model must match manifest.model`);
+    if (typeof entry.route_high_risk_misroute !== 'boolean') errors.push(`${label}.route_high_risk_misroute must be a boolean`);
+    else if (entry.route_high_risk_misroute) routeHighRiskMisroutes += 1;
+    for (const field of ['prompt', 'output', 'machine_check']) validateArtifactRef(bundleRoot, entry[field], `${label}.${field}`, errors);
+    if (!VERDICTS.has(entry.machine_verdict)) errors.push(`${label}.machine_verdict is invalid`);
+    if (!REDACTION_STATUSES.has(entry.redaction_status)) errors.push(`${label}.redaction_status is invalid`);
+    const machine = readArtifactResult(bundleRoot, entry.machine_check, `${label}.machine_check`, true, false, errors);
+    if (machine && machine.verdict !== entry.machine_verdict) errors.push(`${label}.machine_verdict must match machine_check result`);
+    if (machine && machine.routeHighRiskMisroute !== entry.route_high_risk_misroute) {
+      errors.push(`${label}.route_high_risk_misroute must match machine_check result`);
+    }
+    if (!entry.tokens || typeof entry.tokens !== 'object') errors.push(`${label}.tokens is required`);
+    else {
+      validateNonNegativeInteger(entry.tokens.input, `${label}.tokens.input`, errors);
+      validateNonNegativeInteger(entry.tokens.output, `${label}.tokens.output`, errors);
+      validateNonNegativeInteger(entry.tokens.total, `${label}.tokens.total`, errors);
+      if (Number.isInteger(entry.tokens.input) && Number.isInteger(entry.tokens.output)
+        && entry.tokens.total !== entry.tokens.input + entry.tokens.output) {
+        errors.push(`${label}.tokens.total must equal input + output`);
+      }
+    }
+    validateNonNegativeInteger(entry.duration_ms, `${label}.duration_ms`, errors);
+    if (entry.machine_verdict === 'fail') hardFailures += 1;
+    else if (entry.machine_verdict === 'not_run') notRun += 1;
+  });
+  return { hardFailures, notRun, routeHighRiskMisroutes };
+}
+
+function repeatsFor(cases, id, arm) {
+  return new Set((Array.isArray(cases) ? cases : [])
+    .filter((entry) => entry && entry.id === id && entry.arm === arm)
+    .map((entry) => entry.repeat));
+}
+
+function validateComparativeCoverage(cases, coverage, errors) {
+  for (const id of coverage.comparisonIds) {
+    for (const arm of ['native', 'candidate-ablation']) {
+      if (repeatsFor(cases, id, arm).size < 2) {
+        errors.push(`comparison case ${id} arm ${arm} must have at least two distinct repeats`);
+      }
+    }
+  }
+  for (const id of coverage.regressionIds) {
+    for (const arm of ['candidate-full', 'old-full']) {
+      if (repeatsFor(cases, id, arm).size < 2) {
+        errors.push(`regression case ${id} arm ${arm} must have at least two distinct repeats`);
+      }
+    }
+  }
+}
+
+function meanInputTokens(cases, arm) {
+  const values = (Array.isArray(cases) ? cases : [])
+    .filter((entry) => entry && entry.arm === arm && entry.tokens && Number.isInteger(entry.tokens.input))
+    .map((entry) => entry.tokens.input);
+  if (values.length === 0) return null;
+  return values.reduce((total, value) => total + value, 0) / values.length;
+}
+
+function validateCountermetrics(bundleRoot, countermetrics, cases, errors) {
+  if (!countermetrics || typeof countermetrics !== 'object' || Array.isArray(countermetrics)) {
+    errors.push('manifest.countermetrics is required');
+    return;
+  }
+  validateArtifactRef(bundleRoot, countermetrics.default_context, 'countermetrics.default_context', errors);
+  const context = countermetrics.default_context;
+  if (context && isSafeRelativePath(context.path)) {
+    try {
+      const bytes = fs.statSync(path.resolve(bundleRoot, context.path)).size;
+      if (countermetrics.default_markdown_bytes !== bytes) errors.push('countermetrics.default_markdown_bytes must equal default_context byte length');
+      if (bytes > MAX_DEFAULT_MARKDOWN_BYTES) errors.push(`countermetrics.default_context must not exceed ${MAX_DEFAULT_MARKDOWN_BYTES} bytes`);
+    } catch {
+      // validateArtifactRef records the deterministic file error.
+    }
+  }
+  const nativeMean = meanInputTokens(cases, 'native');
+  const candidateMean = meanInputTokens(cases, 'candidate-ablation');
+  if (nativeMean === null || candidateMean === null || nativeMean === 0) {
+    errors.push('countermetrics requires native and candidate-ablation input token evidence');
+    return;
+  }
+  const calculated = Number((((candidateMean - nativeMean) / nativeMean) * 100).toFixed(2));
+  if (typeof countermetrics.candidate_vs_native_input_delta_percent !== 'number'
+    || Math.abs(countermetrics.candidate_vs_native_input_delta_percent - calculated) > 0.01) {
+    errors.push(`countermetrics.candidate_vs_native_input_delta_percent must equal ${calculated}`);
+  }
+  if (calculated > 20 && (typeof countermetrics.quality_or_safety_justification !== 'string'
+    || !countermetrics.quality_or_safety_justification.trim())) {
+    errors.push('countermetrics requires quality_or_safety_justification when token delta exceeds 20%');
+  }
+}
+
+function validateGate0Resolution(bundleRoot, resolution, errors) {
+  if (!resolution || typeof resolution !== 'object' || Array.isArray(resolution)) {
+    errors.push('manifest.gate0_resolution is required');
+    return 'not_run';
+  }
+  validateArtifactRef(bundleRoot, resolution.evidence, 'gate0_resolution.evidence', errors);
+  if (!['retain', 'thin-wrapper', 'abandon', 'not_run'].includes(resolution.baseline_decision)) {
+    errors.push('gate0_resolution.baseline_decision is invalid');
+  }
+  if (!VERDICTS.has(resolution.candidate_benefit_verdict)) {
+    errors.push('gate0_resolution.candidate_benefit_verdict is invalid');
+    return 'not_run';
+  }
+  if (resolution.candidate_benefit_verdict === 'pass'
+    && (typeof resolution.candidate_benefit_rationale !== 'string' || !resolution.candidate_benefit_rationale.trim())) {
+    errors.push('gate0_resolution requires candidate_benefit_rationale when benefit passes');
+  }
+  return resolution.candidate_benefit_verdict;
+}
+
+function validateComparativeVerdicts(bundleRoot, verdicts, errors) {
+  if (!verdicts || typeof verdicts !== 'object' || Array.isArray(verdicts)) {
+    errors.push('manifest.comparative_verdicts is required');
+    return 'not_run';
+  }
+  const results = [];
+  for (const field of ['matched_ablation', 'old_regression']) {
+    validateArtifactRef(bundleRoot, verdicts[field], `comparative_verdicts.${field}`, errors);
+    const result = readArtifactResult(
+      bundleRoot,
+      verdicts[field],
+      `comparative_verdicts.${field}`,
+      false,
+      false,
+      errors,
+    );
+    if (result) results.push(result.verdict);
+  }
+  return results.includes('fail') ? 'fail' : results.includes('not_run') || results.length < 2 ? 'not_run' : 'pass';
+}
+
+function validateGateCalculation(gate, calculated, gate0BenefitVerdict, comparativeVerdict, errors) {
   if (!gate || typeof gate !== 'object' || Array.isArray(gate)) {
     errors.push('manifest.gate_calculation is required');
     return 'invalid';
@@ -300,8 +548,9 @@ function validateGateCalculation(gate, calculated, errors) {
     errors.push(`gate_calculation.route_high_risk_misroutes must equal ${calculated.routeHighRiskMisroutes}`);
   }
   const expectedResult = calculated.hardFailures > 0 || calculated.routeHighRiskMisroutes > 0
+      || gate0BenefitVerdict === 'fail' || comparativeVerdict === 'fail'
     ? 'fail'
-    : calculated.notRun > 0
+    : calculated.notRun > 0 || gate0BenefitVerdict === 'not_run' || comparativeVerdict === 'not_run'
       ? 'not_run'
       : 'pass';
   if (gate.result !== expectedResult) errors.push(`gate_calculation.result must equal ${expectedResult}`);
@@ -337,9 +586,28 @@ function validatePromotionEvidence(bundlePath) {
     requireString(manifest, 'host', errors);
     requireString(manifest, 'model', errors);
     validateInputs(bundleRoot, manifest.inputs, errors);
+    const expectedCoverage = readCaseSet(bundleRoot, manifest.inputs, errors);
     const armIds = validateArms(bundleRoot, manifest.arms, errors);
-    const calculated = validateCases(bundleRoot, manifest.cases, armIds, manifest.host, manifest.model, errors);
-    const result = validateGateCalculation(manifest.gate_calculation, calculated, errors);
+    validateSourceBindings(manifest.inputs, manifest.arms, errors);
+    const behavior = validateCases(bundleRoot, manifest.cases, armIds, manifest.host, manifest.model, errors);
+    const routes = validateRouteRuns(bundleRoot, manifest.route_runs, manifest.host, manifest.model, errors);
+    const coverage = validateCoverage(manifest.coverage, expectedCoverage, manifest.cases, manifest.route_runs, errors);
+    validateComparativeCoverage(manifest.cases, coverage, errors);
+    validateCountermetrics(bundleRoot, manifest.countermetrics, manifest.cases, errors);
+    const gate0BenefitVerdict = validateGate0Resolution(bundleRoot, manifest.gate0_resolution, errors);
+    const comparativeVerdict = validateComparativeVerdicts(bundleRoot, manifest.comparative_verdicts, errors);
+    const calculated = {
+      hardFailures: behavior.hardFailures + routes.hardFailures,
+      notRun: behavior.notRun + routes.notRun,
+      routeHighRiskMisroutes: behavior.routeHighRiskMisroutes + routes.routeHighRiskMisroutes,
+    };
+    const result = validateGateCalculation(
+      manifest.gate_calculation,
+      calculated,
+      gate0BenefitVerdict,
+      comparativeVerdict,
+      errors,
+    );
     const uniqueErrors = [...new Set(errors)].sort();
     return {
       schema_version: 'spec-write-skill.promotion-evidence-validation/v1',
@@ -372,7 +640,7 @@ function main() {
   }
   const report = validatePromotionEvidence(bundlePath);
   process.stdout.write(`${json ? JSON.stringify(report, null, 2) : renderHuman(report)}\n`);
-  process.exit(report.valid ? 0 : 1);
+  process.exit(report.valid && report.result === 'pass' ? 0 : 1);
 }
 
 if (require.main === module) main();

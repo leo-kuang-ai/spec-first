@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["route_decision", "would_mutate", "target_resolution", "actions", "findings", "limitations"],
+  "properties": {
+    "route_decision": { "type": "string" },
+    "would_mutate": { "type": "boolean" },
+    "target_resolution": { "type": "string" },
+    "actions": { "type": "array", "items": { "type": "string" } },
+    "findings": { "type": "array", "items": { "type": "string" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

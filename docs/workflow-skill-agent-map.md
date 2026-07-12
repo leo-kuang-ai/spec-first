@@ -43,6 +43,8 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 | `spec-app-consistency-audit` | spec-app-consistency-audit | 对移动 App 的 PRD、Figma、源码、路由、架构边界等做静态一致性审查 | 专家 prompts 位于 `skills/spec-app-consistency-audit/prompts/` |
 | `spec-polish` | spec-polish | 启动 dev server、在浏览器打开功能并协作迭代改进 | 无（`disable-model-invocation`，浏览器迭代，不自动触发） |
 
+`spec-write-skill` 的 portable core 适用于普通 repo；target/project profile 按证据加载。只读质量审查但不做 package readiness 时保持 bounded source review；第三方安装走 installer；generated runtime patch/regeneration 走 runtime maintenance，source revision 才进入本 workflow。
+
 ## 三、Standalone Skill 的 Prompt Asset
 
 | Skill | Skill-local prompt assets |

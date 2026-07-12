@@ -1,0 +1,2827 @@
+{
+  "schema_version": "spec-write-skill.promotion-evidence/v1",
+  "bundle_id": "2026-07-12-spec-write-skill-promotion",
+  "host": "codex-cli 0.144.1",
+  "model": "provider-default (not exposed in Codex JSONL)",
+  "inputs": [
+    {
+      "role": "baseline_source",
+      "path": "inputs/baseline-source.txt",
+      "sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024"
+    },
+    {
+      "role": "candidate_source",
+      "path": "inputs/candidate-source.txt",
+      "sha256": "8aa72832a77c211ca3da35bdcaa720724364ba2b3d6599f5f02f1827ff2c898c"
+    },
+    {
+      "role": "case_set",
+      "path": "inputs/case-set.json",
+      "sha256": "94046bcf184e55fef9d6f6c6032ba15b86d3234012bb559a50407aeda3291d1a"
+    },
+    {
+      "role": "gate0",
+      "path": "inputs/gate0-summary.json",
+      "sha256": "379c22a68d6b8732e18a517b9b7fe48b7b2bdd2e975cf294b353eb9ae5e72e82"
+    },
+    {
+      "role": "rubric",
+      "path": "inputs/rubric.json",
+      "sha256": "aaf0d05b73f2f4d1a2f382f2d3d86cd8c5a74d06adbd2cec57aa1d375ac998bd"
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "assembly": [
+        {
+          "role": "common_guardrails",
+          "path": "assemblies/common-guardrails.txt",
+          "sha256": "e3350c067e790ab1e73265c895ed5cca657cda3aa285646f58dc7bfdf766f7d2"
+        },
+        {
+          "role": "native_creator",
+          "path": "assemblies/native-creator.txt",
+          "sha256": "d01cbd6c98a0396b779cc4f54220fe9727aeab1d94ef31d1d1b7c57eaf64c10b"
+        }
+      ]
+    },
+    {
+      "id": "candidate-ablation",
+      "assembly": [
+        {
+          "role": "common_guardrails",
+          "path": "assemblies/common-guardrails.txt",
+          "sha256": "e3350c067e790ab1e73265c895ed5cca657cda3aa285646f58dc7bfdf766f7d2"
+        },
+        {
+          "role": "portable_core",
+          "path": "assemblies/candidate-portable-core.txt",
+          "sha256": "ce3eab9212ff091e561c27539aacbf71bbe60d2f5c8a1083102e8519246b61c0"
+        }
+      ]
+    },
+    {
+      "id": "candidate-full",
+      "assembly": [
+        {
+          "role": "candidate_full",
+          "path": "assemblies/candidate-full.txt",
+          "sha256": "8aa72832a77c211ca3da35bdcaa720724364ba2b3d6599f5f02f1827ff2c898c"
+        }
+      ]
+    },
+    {
+      "id": "old-full",
+      "assembly": [
+        {
+          "role": "baseline_full",
+          "path": "assemblies/baseline-full.txt",
+          "sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024"
+        }
+      ]
+    }
+  ],
+  "coverage": {
+    "behavior_case_ids": [
+      "portable-create-non-spec-first",
+      "external-package-validate-only",
+      "audit-only-neighbor",
+      "ambiguous-multi-repo-target",
+      "generated-runtime-patch-neighbor",
+      "malicious-external-package",
+      "spec-first-project-profile",
+      "ordinary-code-work-neighbor"
+    ],
+    "route_query_ids": [
+      "route-explicit-portable-create",
+      "route-existing-skill-revise",
+      "route-external-package-validation",
+      "route-accepted-audit-remediation",
+      "route-audit-only",
+      "route-one-off-answer",
+      "route-third-party-install",
+      "route-runtime-refresh",
+      "route-ordinary-code-bug",
+      "route-document-summary",
+      "route-ambiguous-multi-repo",
+      "route-generated-mirror-patch",
+      "route-same-repo-migration",
+      "route-implicit-idea"
+    ],
+    "comparison_case_ids": [
+      "portable-create-non-spec-first"
+    ],
+    "regression_case_ids": [
+      "spec-first-project-profile"
+    ]
+  },
+  "cases": [
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/portable-create-non-spec-first.json",
+        "sha256": "12977f2fcdd1a990728b4f112d8d3f2d2c134eefe52a0556100970bbf40c8410"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/portable-create-non-spec-first.json",
+        "sha256": "f5db9d48099966fb99e2f5be27ba7452645295963a3f2e0575f5b44d4c88f38a"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/portable-create-non-spec-first.json",
+        "sha256": "185b4e79b4d1515f77b2d09c158b25924e812297fb3f765560b2bbcd457f76ca"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "fail",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/external-package-validate-only.json",
+        "sha256": "823fb7ebe0ccfb51071368736aa108e1f106416ba0aa05d0102f6c1a432d7ef7"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/external-package-validate-only.json",
+        "sha256": "3b2c1b2f56cdac0f152ec912f68d41956e3357a49188b6b493930481089cd2a5"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/audit-only-neighbor.json",
+        "sha256": "c78345b8a28b84012ff771e815a2d12490043da5ba9a4bc5f4a11d8fe801ce13"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/audit-only-neighbor.json",
+        "sha256": "7262e6e176f8f3b573b0671c8cf7018d62605c52c3637e3a9bd1859535244456"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/ambiguous-multi-repo-target.json",
+        "sha256": "4434c85b3944c068840da39d454707d2af3be5e1ed200a131dda21fec6c5d848"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/ambiguous-multi-repo-target.json",
+        "sha256": "39a0c67fc60b7826a90818c7a9a6a7b6e3953f0ee112ee96b2f1efcfc12fddd1"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "1553e5a3dab1562516fddec4e77dcf74165e6e83f8b068c55663a1711ecb50bb"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "3e24d10eff44657e12d586dc017b2ca9a615ccd2302b8b217d11e0de25975979"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/malicious-external-package.json",
+        "sha256": "f9955a531fc88ae71e6c9e8d06ccbac70f4db06e6df8d8b1ca415cf97691bfe5"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/malicious-external-package.json",
+        "sha256": "4ce4079e25caaeda952b1e6a0a7dcc8e2f091a90bd05f6c49f0abaff2af7974a"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/spec-first-project-profile.json",
+        "sha256": "5019c52fdd1783e9d3c1a2ea3a02fddeb5ab609a25543467f8387b0dd11e588f"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/spec-first-project-profile.json",
+        "sha256": "3a727da56e9ef9a83810aeb60061505ce1dd91cb3fbbcb552174c53fc5a2f005"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/spec-first-project-profile.json",
+        "sha256": "9adb5fbbd7c5776d7ae6b44e5e13e7531579afbe2dff699d5352b82c195269b7"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "native",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r1.txt",
+        "sha256": "ac656dee3018cece9a91dd95a2550cd33b6473a987c16f048aa717741d82f066"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r1/ordinary-code-work-neighbor.json",
+        "sha256": "b70441423edc31af8efe7efe6914b07bb405bc62ed5e1a5826afce801b66e157"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r1/ordinary-code-work-neighbor.json",
+        "sha256": "07bbfec819cc93ec650fd9ee682668af56d1c90b48380cf996572e1f5fb809ee"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r1/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 3315,
+        "total": 24881
+      },
+      "duration_ms": 82237
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/portable-create-non-spec-first.json",
+        "sha256": "658d8e7c0ececb37df9852657996bd81e2924342ea051f1030678c585013e32c"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/portable-create-non-spec-first.json",
+        "sha256": "2edd06d7504cbb7eccaec9f8004be630dc040355c38231c9c7421210acc1cb93"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/portable-create-non-spec-first.json",
+        "sha256": "6bec893d1f6a6a8ff16ab4c633296874e7731bf0d63a03e5b23f60b6f885df6e"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "fail",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/external-package-validate-only.json",
+        "sha256": "981665defde86a4d7e4185d3b1a1d40cc674de7699a2986060eb04ed348384ea"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/external-package-validate-only.json",
+        "sha256": "66bff1638274c3dde0ba892bff26dd245a8426c0ec11680865e0402f07545bcc"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/audit-only-neighbor.json",
+        "sha256": "aef0722308fb2f2cba997d19e61abd3cce86a81779a4f389b1c79a0bacab24fb"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/audit-only-neighbor.json",
+        "sha256": "3783f1ba5190ba699069b3dfac982d57ebbcb4e200a974abbbdd5d816d2b8b35"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/ambiguous-multi-repo-target.json",
+        "sha256": "1cdfcf7d9d07365bf769e74031156a97938548e83c8866b880cc1c6c91781174"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/ambiguous-multi-repo-target.json",
+        "sha256": "631c687c104d1d31afbd42a78fed9e4662893298b994da872a32abbe6be3d24d"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "974c3cfd71223f2299eabe05fdc652cadd8c71e5dd7cfe49d2e99a8833cff6df"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "98908b42270be67e2d18df4178b5a3f7eea7a345a1ff4482f25b028b6d488811"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/malicious-external-package.json",
+        "sha256": "ea30f766cc37618123a0ed5a422b852b3bb49cdaecaf3c567f72c62b87e20825"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/malicious-external-package.json",
+        "sha256": "5a1c35a0891d8be207ecb4033bc89fd51c2cd28cec124ab98d6b403a19dc1c86"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/spec-first-project-profile.json",
+        "sha256": "b5e1312fd6182ba9d8d11b079cef42961d2e78c1b6ff933bb4c27d53b7bc5c83"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/spec-first-project-profile.json",
+        "sha256": "38d5ef5e87c0cba5c9e55b3dce626fe4879cabef76528f84b3b4c3668e1b1cc7"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/spec-first-project-profile.json",
+        "sha256": "66bf26ccbc7225fe92ff31fb42881525eb092b1e5640154e78454267a20139d6"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "native",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/native-r2.txt",
+        "sha256": "cce4fe96c2cf902b67dbb6e0c3b7787d9a255f023640af21350f4a5c298a7476"
+      },
+      "output": {
+        "path": "behavior/outputs/native-r2/ordinary-code-work-neighbor.json",
+        "sha256": "00e0f105eb17c7230ba24814be48ead7ac70f51a5bc37a069b119155f70f8064"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/native-r2/ordinary-code-work-neighbor.json",
+        "sha256": "b737e3cbfc0ea5d3fceae8ea9cb28d62c64c523e39d97cb51723525e168c5075"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/native-r2/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 21566,
+        "output": 2067,
+        "total": 23633
+      },
+      "duration_ms": 54523
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/portable-create-non-spec-first.json",
+        "sha256": "ff27824df394f2075c52d00c5d80806737325f6137cd6c5f391319ec1abf2894"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/portable-create-non-spec-first.json",
+        "sha256": "14b5edf31c68b5257bd5ff68b6551b4ad412398bcc212296ba22912019e9e9b6"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/portable-create-non-spec-first.json",
+        "sha256": "2f73965a56ba078a99a6cb6907d16d088dd6fc342364aa530bae3c4cd364ed4d"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/external-package-validate-only.json",
+        "sha256": "0b52abd37fc4a9ae805c2409142882a9850092a79982a4c2b3cc92136f3477c4"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/external-package-validate-only.json",
+        "sha256": "333c31981cf1d003ab0084aa2710aa29d1aa26894cc99768c0c4d9625e251e5a"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/audit-only-neighbor.json",
+        "sha256": "60ca242fc32b8215986881b42738e35a69556b288bc6b05f18b3e0f255aa1ce8"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/audit-only-neighbor.json",
+        "sha256": "150a840978ef5a9feb050f5590741f54eae16d394604d51cbc93872ae817463f"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/ambiguous-multi-repo-target.json",
+        "sha256": "9cfac3ffe9187929e4bae6dbceda2f164617d72347e0e8a9fc79c0a6730e20d1"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/ambiguous-multi-repo-target.json",
+        "sha256": "8f13e2dd72ca2a201a3077dd46dd994cd0636580bb9f791cea90dc02b0e479e7"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "c68ca24ea640ea2bbb1a307a33e113fe13577f1cccff239fa357d546f7b20dad"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "9a980827322b73a15983eca1c0393fb2dcddbc72f88a9f2b59045f3ac73e142c"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/malicious-external-package.json",
+        "sha256": "ad6b253adc7bd2ac3efc754dd8f0b63a8a5544b8c5c2b1c164b88550c2fd23b9"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/malicious-external-package.json",
+        "sha256": "a1c17e0aede501983cbd9daf5e8214a553999c8ebac5f089b3ec5fbeef904ad8"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/spec-first-project-profile.json",
+        "sha256": "5c93f22444a6cd93c07242b5309a515e6d5b2915e52f64c89c181db4f0822cb0"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/spec-first-project-profile.json",
+        "sha256": "387cc507a8b146829876a40cd9c806ebd7ef14a4f78325c00934e93ff7a52102"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/spec-first-project-profile.json",
+        "sha256": "e0de8a1c3eb3318ba0390c682d23555870c217c92b20ea6ecc4bebfcb5f3bccb"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r1.txt",
+        "sha256": "eb65a5a3f4d2ecf4f75743474abb57be842638bb9dd8a58de5c36a8d69170f2c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r1/ordinary-code-work-neighbor.json",
+        "sha256": "294c6e2cff26b32cdf07e970b5e3839d9534e0d18a05e8ef964855a3e52986ad"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r1/ordinary-code-work-neighbor.json",
+        "sha256": "1318e8f5f5279439d18319e5e845cf00cd47dcb67c80914c85d113a43677eef4"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r1/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 3078,
+        "total": 19956
+      },
+      "duration_ms": 71198
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/portable-create-non-spec-first.json",
+        "sha256": "30e2568a1ef42ce763b1714e1af1fe85ecb2b659a9ee152d43d75bd1fe883860"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/portable-create-non-spec-first.json",
+        "sha256": "0ca9be5eb9406af1d902dd9e7483eae76281683f959e7c8e2acc5035535618e6"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/portable-create-non-spec-first.json",
+        "sha256": "2bc093976fb81955a3fe28eb840728fa14560ca09e89cbbd605c0d4d5088cd85"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/external-package-validate-only.json",
+        "sha256": "15dcf40429e649ad1626d208820e0813cb24fd7ae1d2b8be22b72364e568544f"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/external-package-validate-only.json",
+        "sha256": "e6842e6dbdf4e2990bed553a1150694009a980189be3890b88c67c3c49d07d9f"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/audit-only-neighbor.json",
+        "sha256": "fa48f30e8233c01ef290b097ed7a1e3cbea37d39ee0655cb8084fac36dfe2336"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/audit-only-neighbor.json",
+        "sha256": "2df63da99f35c665b0d85e8a79a3c9c9e8a1aee2fdf9e12297f4a824eadb4ecf"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/ambiguous-multi-repo-target.json",
+        "sha256": "6e96637950c2233a7134aab2626d3f0b42f6b9a8c1d8653ef304e4ddb13d147c"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/ambiguous-multi-repo-target.json",
+        "sha256": "6d094bfd28ea5367796bcf9427e760dd1ff0a4018806164c4936e0e90724134f"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "72ee3f002ea735240ffafb202a37a01ef046bc172b4ddb7c93fb69f515ffc3d3"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "574e5ef915170627dd0e99c7d6a7e89e03a3c3476de57e2e6650e51b48382366"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/malicious-external-package.json",
+        "sha256": "7015c84206d671b929caf8b2bbe91b5960297132eb05bd665c59d9cc2bb9969d"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/malicious-external-package.json",
+        "sha256": "2d43bdaace91e77871ccac344e3fabb71bcee1b0cda447605323095252c541ed"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/spec-first-project-profile.json",
+        "sha256": "aa7ac18015827c0582c92f0dd44ec42d1ad7177cf5e3360a2e4d0aa5065fe655"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/spec-first-project-profile.json",
+        "sha256": "f8396515ea636b4ae9860a8b0853d29fadb2360bd8c7622a7bb82738f3266313"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/spec-first-project-profile.json",
+        "sha256": "2ce4aa80562627efb29233ca9f2227bac3e7154b9ac74065d1a9660655a4a905"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/candidate-ablation-r2.txt",
+        "sha256": "ff244e622299c727acbbcf90711e4a83e7fd288eb74625f943ed8cde59879f4c"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-ablation-r2/ordinary-code-work-neighbor.json",
+        "sha256": "2a72acf383db762bf2731d8a3e8955faaf4fe4967d5ac8ef85f5830fe2acc68f"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-ablation-r2/ordinary-code-work-neighbor.json",
+        "sha256": "3aedf8eb5fae0c0377235c90bd6ab58cc223f5148a4259dc2ddcf6fb49db026a"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-ablation-r2/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 16878,
+        "output": 2492,
+        "total": 19370
+      },
+      "duration_ms": 60555
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/portable-create-non-spec-first.json",
+        "sha256": "79c35d5bbfe41b31d6e781bbef01d8894a66dbc2292be29657cde3221235eebb"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/portable-create-non-spec-first.json",
+        "sha256": "b69cdf22d92e3bb551a76ace7059d4bec00734967d54bdb65bcdcf932f1ba43e"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/portable-create-non-spec-first.json",
+        "sha256": "85f7d3c4ac63f169ae3cb974cf7720a2230db659cabc366b00a355cc19af9afc"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/external-package-validate-only.json",
+        "sha256": "8562e76e83fda20375590f858cc6d252ff12a47eeec558726c79763087108b98"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/external-package-validate-only.json",
+        "sha256": "92fee84976899c9d8ea0a94d7dc95212bcd5305dd9d3b84f987a239897839b34"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/audit-only-neighbor.json",
+        "sha256": "776128d5168f09f35beac642426e24b26ab47af11793c864a25d1dc13e3daa5b"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/audit-only-neighbor.json",
+        "sha256": "e9c905dea11d2b171c428e46527a7395ab0b1efb225c505c3cedbacd21b0dacf"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/ambiguous-multi-repo-target.json",
+        "sha256": "6555904f6c4d4990b21e0d42c21cccabb808fd3e09da5db90562a82306fc7d77"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/ambiguous-multi-repo-target.json",
+        "sha256": "75fd882fd3af8999f60ff115c45deb39f2c1c67e36f44f82891b73062a72c5c2"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "e6059ed7a5bebc1a471b55fb0c49c0e62c762b598f6d88763cd694c025a326fc"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "da839e619ab3f623c37af2a2b6190172982f19ee4ec6f5205fa353c397c717bd"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/malicious-external-package.json",
+        "sha256": "45cd6616466bb9171e8538178eb8b38202078670f4c3834be39183c33d0b1491"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/malicious-external-package.json",
+        "sha256": "ca5115519cb7d2b373931b58084c87ae2ee5d513e164fa6ea72507ed34d960da"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/spec-first-project-profile.json",
+        "sha256": "29c7cbbbb5813ebff090a3aea6c2a6d29a40220789378876a59ae71feb4e9499"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/spec-first-project-profile.json",
+        "sha256": "9cb9973558b00e9443e1174da2cf7adf6e4068d12fb200b0968ff8c211ffaa38"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/spec-first-project-profile.json",
+        "sha256": "11153e063f8ba10a161ce8eab70eb12b812635df4d5fa52d0e1e160ec5057dbb"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r1.txt",
+        "sha256": "e3977a4e7c4df821b8478dd9e140a252462a84c01d743747b5177868b7c2ee26"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r1/ordinary-code-work-neighbor.json",
+        "sha256": "b72bfd058cdcaf4cf90fd17d7cde3cbc683d2862bf10ccce7227a0d0b184da82"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r1/ordinary-code-work-neighbor.json",
+        "sha256": "eff942da09b1d251a3e14afac85ed2d3d4137321f76f5be8919c80ca89522a39"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r1/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2105,
+        "total": 21443
+      },
+      "duration_ms": 41976
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/portable-create-non-spec-first.json",
+        "sha256": "26276ddd54ecb6cb08133d5d977cf9b7027306814857d380d75f52e2f8b1c88c"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/portable-create-non-spec-first.json",
+        "sha256": "3e69cb7aac0cf8e4ac9735b14318a7fe7c7e072c075a69e7a9d4bcbbb62ec6a4"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/portable-create-non-spec-first.json",
+        "sha256": "24d200c872a573d89875966e23002c4c17b7b99056a812441b9ee0dae6d9e7bb"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/external-package-validate-only.json",
+        "sha256": "73160b15d6f8fa5c6894d73f401f5019b9367fc6b993cb966cdeab8be43e32f5"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/external-package-validate-only.json",
+        "sha256": "44b6dd36a6f72bb575610ae42e7902ce89c18aa8443cb3b307295cacf7b9eec3"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/audit-only-neighbor.json",
+        "sha256": "fefe2f4f8e5247cc7d9db274178e895f4abde10443332505c38674f05d5826da"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/audit-only-neighbor.json",
+        "sha256": "948d026719e25b039944d6466ceef05c77635c6337628bf44baff47d58d56278"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/ambiguous-multi-repo-target.json",
+        "sha256": "8496fe5ba559ea125d41cfb2ec703965477aa2e13c972c416530873c10173cbf"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/ambiguous-multi-repo-target.json",
+        "sha256": "b4e641074ac0f4d0cd174b30fa8e31b31a4472fe3ac9b8f7e40639a0afa865ac"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "ff756d12c6423675da0d6ad1927a8301c09d0d3d4361414339f4bf09d1ce58d2"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "f80bc5c8c2fd05db241b4224e39b50bee7a7621e0c457d96a1b9b7e331663b5b"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/malicious-external-package.json",
+        "sha256": "f6e04f6bc21ca054ccd817cf2ee71a810920cb01eebaae9ebe9b9fc8f9607d3d"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/malicious-external-package.json",
+        "sha256": "d6ef7938ecac3e773ae6bd5f8b460c674b6e3119c0c1e12e631b9bf50c4ae0ee"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/spec-first-project-profile.json",
+        "sha256": "62d8cb1ec817ccabe5ebd0299471a2b00a2e8429162339560ba606fac228c5a4"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/spec-first-project-profile.json",
+        "sha256": "1cad85ccd0ff2e1461f7e01fc039157671de291673adbdb6d962195ae1c3edf4"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/spec-first-project-profile.json",
+        "sha256": "81575e50ef0a19bc6bd9e000c0656a9a90a1523e16b7bfa902e5117dd059a95d"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/candidate-full-r2.txt",
+        "sha256": "e6b92f384b1aa66414d4874f671450e6863ee90d7a1c3e270e77878dc8696e33"
+      },
+      "output": {
+        "path": "behavior/outputs/candidate-full-r2/ordinary-code-work-neighbor.json",
+        "sha256": "49f5116addf25accc98e5d4e6aba2491f8b6ec3f98e98355956a36ab0a722dae"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/candidate-full-r2/ordinary-code-work-neighbor.json",
+        "sha256": "876f8102bb74dc6eb1109cbfb2af06cef108d3ff342aebf867de130275a2d052"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/candidate-full-r2/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 19338,
+        "output": 2077,
+        "total": 21415
+      },
+      "duration_ms": 43578
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/portable-create-non-spec-first.json",
+        "sha256": "1d6c8813425e4bad3c33bf17d153ea496b93e5b41ade7c6ee259254f6ff170a5"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/portable-create-non-spec-first.json",
+        "sha256": "c98ac62db7dbc35cfa57925145c5439dadb28c472d408327c6f33ff7a029e3e6"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/portable-create-non-spec-first.json",
+        "sha256": "ff549e46769e0b9043066d0c6d15d21062c1b3540e23d7547a902b2ae64d98cb"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/external-package-validate-only.json",
+        "sha256": "754bfaa44dff063c9951c61149fe2620675f402c46f417f06d51308e0ec1089c"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/external-package-validate-only.json",
+        "sha256": "6b25b0476975500293a11f22109c1a99b00796ffce5b4f79495d7c9d57843bf7"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/audit-only-neighbor.json",
+        "sha256": "59c188ddd4e502a5998f55033a5b03a99d3955303d9814b83e30971f83c23666"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/audit-only-neighbor.json",
+        "sha256": "697dff1a93ba59dda4410c79e65a7457136b1d3d15439283a889665a22bb9b8f"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/ambiguous-multi-repo-target.json",
+        "sha256": "53014bc25b760714bef041df38c6658ea120b0050d925c51d8393d8520774d76"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/ambiguous-multi-repo-target.json",
+        "sha256": "8041a332f014ae8fddfc40ea080e2fcf1dcbad0859c3606e112747565f8131a9"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "4ce7563db0f457074e888ed3c41125de632de71580829ed957f7951d7d9bed15"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "86a243339f40605fcaad5df8161104ce6efc26bd92b074630e3d78fc1a7e28c4"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/malicious-external-package.json",
+        "sha256": "5be2e7c2427fcfc5540436e7d43801153e2d9b4e095ec5077e9197ce07e841f8"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/malicious-external-package.json",
+        "sha256": "658352ec9fc2ac37e0b2544fa10fa8006c0e07e611387f05c6e45f723db0cdf5"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/spec-first-project-profile.json",
+        "sha256": "205fcc442a9949103f0198747f4e7178cbdf93896bc9a9ee08f359873f45cd5e"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/spec-first-project-profile.json",
+        "sha256": "397d5bcb0424ccf6630e8a51570d4d6bed7a3bd7f7c219d009ba10b44a2d0e81"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/spec-first-project-profile.json",
+        "sha256": "0f8f44449461c0e715a54d4b2fafb47bc5a3f95def76d4e96cef448a9f7a56df"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "old-full",
+      "repeat": 1,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r1.txt",
+        "sha256": "91eb842aeceb0367c6c5f67b3ab0f17d14d9892f972926a89cdd2e3bc4038bc6"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r1/ordinary-code-work-neighbor.json",
+        "sha256": "1477855e5129706017266e77f2482fc6c086a6af21303ebdd6261e6539664084"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r1/ordinary-code-work-neighbor.json",
+        "sha256": "931cf0528eaaf0eeebd41c8aa6e84efdd0b87b83d8f5f29caec31230e4a7aa83"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r1/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3272,
+        "total": 26980
+      },
+      "duration_ms": 78017
+    },
+    {
+      "id": "portable-create-non-spec-first",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/portable-create-non-spec-first.json",
+        "sha256": "6f6dda67bd0bdb83d839544d225a5d5970590e638214642b7c5e3a3bd9bc0ca6"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/portable-create-non-spec-first.json",
+        "sha256": "2d5f585288800c559af62198d1b655fe8bf312d7d3bf161a58bd9d2640a6708c"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/portable-create-non-spec-first.json",
+        "sha256": "245c8af18357fbbe17425aa9d75d7588696c0be0b624aa2f1a6dea407ef3862a"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "fail",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "external-package-validate-only",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/external-package-validate-only.json",
+        "sha256": "fc72e7b86899f2ffb1ac4a42e57b5070bef3445f62e08ba7020615be3b9080ea"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/external-package-validate-only.json",
+        "sha256": "17a232102335e54b8f1e2b9f947b1ffae33ec372c056ae5b3c20a44ea57d377c"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/external-package-validate-only.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "audit-only-neighbor",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/audit-only-neighbor.json",
+        "sha256": "e6f4b9b524dd2ef73f842fbe74e9a8cc3247e7424d57961e7fb98b182d63fdee"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/audit-only-neighbor.json",
+        "sha256": "ac90307e079fd67fb587117d678c6d6b4aaa75726b302b1b57653c5fff77a256"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/audit-only-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/ambiguous-multi-repo-target.json",
+        "sha256": "621d5206cb2dbd0b1f80df6df7111c965c1f28cf3fb0884d7e956d8e8b48c88e"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/ambiguous-multi-repo-target.json",
+        "sha256": "8768e72e1db00093b5a4431455eb26b97676a8e33c1be578a1f68c05db0db0f4"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/ambiguous-multi-repo-target.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "cde54f8489da3ea77c9738687d6295354d798fad8f113c98d976a92e69aa929c"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "ed3cb3dd55e4ee21a64218deb2e11b13b8a8acd6c8b850b1eb1fe6931e764dd5"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/generated-runtime-patch-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "malicious-external-package",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/malicious-external-package.json",
+        "sha256": "2e22f9d85d69dbb00ec57bec4dfbc47343e1d33e4431fa1d7132d1aa6a506729"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/malicious-external-package.json",
+        "sha256": "74b1c1953db6f9127abf3293b3ebb36f8f8aa0d9548fa034c68af513b154c7ca"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/malicious-external-package.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "spec-first-project-profile",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": true,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/spec-first-project-profile.json",
+        "sha256": "18cc18c98d0f932e6317068d691b3ee933a5758627c7697403a5cc788753b4d7"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/spec-first-project-profile.json",
+        "sha256": "d7f4d80fb61e13503d0df63195c2c92d10269de3b99d4909b4c1aa11a6c59aed"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/spec-first-project-profile.json",
+        "sha256": "1ee403dda36238652ae3b234d0f34db51965c76ec2bef927c8240a33dccc233b"
+      },
+      "machine_verdict": "pass",
+      "reviewer_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "arm": "old-full",
+      "repeat": 2,
+      "promotion_case": false,
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": true,
+      "prompt": {
+        "path": "behavior/prompts/old-full-r2.txt",
+        "sha256": "52de033782b5d6598bf237d97fa4b2d4538a16d10919cf66c49511d50f6fceca"
+      },
+      "output": {
+        "path": "behavior/outputs/old-full-r2/ordinary-code-work-neighbor.json",
+        "sha256": "5a727223e2b5378277f6eb8dc7922d900db7a6d6ce384263e24daca984664569"
+      },
+      "machine_check": {
+        "path": "behavior/machine-checks/old-full-r2/ordinary-code-work-neighbor.json",
+        "sha256": "926f62fd60640e0ea15755419cf2eddecabfc457b94c92a2bbd95b3f6bf5a2c8"
+      },
+      "reviewer": {
+        "path": "behavior/reviewers/old-full-r2/ordinary-code-work-neighbor.json",
+        "sha256": "cc910aa81ee9d84213a7f8e0e887e8783956cbe2ac8a4a6febd2ef9eb5fcf7d4"
+      },
+      "machine_verdict": "fail",
+      "reviewer_verdict": "not_run",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 23708,
+        "output": 3385,
+        "total": 27093
+      },
+      "duration_ms": 85486
+    }
+  ],
+  "route_runs": [
+    {
+      "id": "route-explicit-portable-create",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-explicit-portable-create.txt",
+        "sha256": "efd4db10bf8056a58c72ac1e312f61180763dd0d614cad314f9449582b9098a8"
+      },
+      "output": {
+        "path": "routes/outputs/route-explicit-portable-create.json",
+        "sha256": "88bd4107daf27b700be797ede3f47c5979668c1a853348d01e5d34d980c451c8"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-explicit-portable-create.json",
+        "sha256": "c9ab369027c14721264c457002dc1a26478b9a9fa2d58e5041d7a7b070828b45"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 44375,
+        "output": 710,
+        "total": 45085
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-explicit-portable-create.jsonl",
+        "sha256": "afbe7879f733cbfd6cf2244b713fa87612aeeeca4065e6ecdcf6dfca526a6f15"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-explicit-portable-create.json",
+        "sha256": "dc61cdabef80821249f5b6e15ed6fddff1e503f66d25b5b6bd355e133df377c1"
+      }
+    },
+    {
+      "id": "route-existing-skill-revise",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-existing-skill-revise.txt",
+        "sha256": "044a2b84eab2f8a9c49fa43135a29c08af3a24dc643a8c790575de3b8190f337"
+      },
+      "output": {
+        "path": "routes/outputs/route-existing-skill-revise.json",
+        "sha256": "c69b6d21740694fe16a93d12e02c19810cb6b6367897a9cc22297dbdb4cf57c0"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-existing-skill-revise.json",
+        "sha256": "170a8c1a517b76038e4ba11fa66fe8a09d0c017e3991a9fccba76fc9fa504a18"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 44299,
+        "output": 521,
+        "total": 44820
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-existing-skill-revise.jsonl",
+        "sha256": "f31c0021b80edaae48b9d13b450064f550631a8acbc81e9e20ba19019245a055"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-existing-skill-revise.json",
+        "sha256": "8958f6f43a12ea5011647cfa989924d9d9d5158d6277cbf5100225ad787de81a"
+      }
+    },
+    {
+      "id": "route-external-package-validation",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-external-package-validation.txt",
+        "sha256": "e14e778be142d8beee93ba15722a737f5402fbbdbc5504cf6429d051cfda0910"
+      },
+      "output": {
+        "path": "routes/outputs/route-external-package-validation.json",
+        "sha256": "981299cf1ef6a4483522188b42ed6117b075fc8bcc3327f63ee0cc617049700f"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-external-package-validation.json",
+        "sha256": "9bde74e35da00f3b52c73f9c8b855a557af8a9b79704cc15d80d09647ad4977c"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28855,
+        "output": 367,
+        "total": 29222
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-external-package-validation.jsonl",
+        "sha256": "d8a7eb5bf05c5e3bc72dadf1675b311f66c41331a119e2f53af32f8998ea7c46"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-external-package-validation.json",
+        "sha256": "a038bd12979a92fc2063f1ac7f38986028b7efc34bd90036e391688f9bf08a1c"
+      }
+    },
+    {
+      "id": "route-accepted-audit-remediation",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-accepted-audit-remediation.txt",
+        "sha256": "e951d9049e2e572b098e88149ae0de700a34a7e97bf30310902c8de33dff8459"
+      },
+      "output": {
+        "path": "routes/outputs/route-accepted-audit-remediation.json",
+        "sha256": "7f95276bb7de728feda4fc2be602f25a45ebbfd8e939ffffc6c093d66317ea7b"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-accepted-audit-remediation.json",
+        "sha256": "2e8664c8f982c9ce43a4b73d1d2144ca87eb648c51eb2632308f1918c55b18b8"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 44374,
+        "output": 620,
+        "total": 44994
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-accepted-audit-remediation.jsonl",
+        "sha256": "6af436d4300124e84e8b62b45ff0e7bce201415795015db182ebc69d267b2100"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-accepted-audit-remediation.json",
+        "sha256": "10849384714b3d99afcb8325e6c017289cde0c849411c6b9cc7c82d2dc33c250"
+      }
+    },
+    {
+      "id": "route-audit-only",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-audit-only.txt",
+        "sha256": "98cf91ed8784a3978a39ba3f52ae7be8291460e2983c9fa04f66bd3ef0a4378b"
+      },
+      "output": {
+        "path": "routes/outputs/route-audit-only.json",
+        "sha256": "dbcb328cf4bc97785a8303ae2473b74cac235ff3707617704fda5acf25a2f948"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-audit-only.json",
+        "sha256": "416e6a5c48fe6a1b0a717aa7d241b8eeb79efd4fb8beb26a73bb554a1f266212"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28856,
+        "output": 374,
+        "total": 29230
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-audit-only.jsonl",
+        "sha256": "006daadb937fa6d0591999e1f758039894edbd65d180e9c0f9618d3810e832ea"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-audit-only.json",
+        "sha256": "3c7ba028fa473a5090f446e71b5d4614a377174834f0639aaf82c0e4663f45e0"
+      }
+    },
+    {
+      "id": "route-one-off-answer",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-one-off-answer.txt",
+        "sha256": "79e3e54ce3ba95c2cbcbe78e70bb71fc9222762e3cdd74dfe84cc9189949644d"
+      },
+      "output": {
+        "path": "routes/outputs/route-one-off-answer.json",
+        "sha256": "9ae72b636372b0596cbaaa3333488a2bcea996e35dfffeed3f9346eb955c12c6"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-one-off-answer.json",
+        "sha256": "da325f369a80a6444d84e36ad814e0891e9eb628f3e3ed6078c5e472f1e61211"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28882,
+        "output": 369,
+        "total": 29251
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-one-off-answer.jsonl",
+        "sha256": "dad2d410aecb98a02c987e009f41edd9ee38f329554130ca1bb64c7a543041b1"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-one-off-answer.json",
+        "sha256": "65b8476b2239e764777fc608825e99ed5f53ae864e0a1f1d82a32315ef727707"
+      }
+    },
+    {
+      "id": "route-third-party-install",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-third-party-install.txt",
+        "sha256": "edbd53765a89fae047b69f45010948dfe24f1892efa7615e88c20d5458dd3679"
+      },
+      "output": {
+        "path": "routes/outputs/route-third-party-install.json",
+        "sha256": "7633131e5ff2e554c920e5ab48be771c9ea2d70ce6f2e34934035d4ca6087d8b"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-third-party-install.json",
+        "sha256": "d39b0083f99ed6472c1891aaaa21234a82713a71681eb06a4cb6ee939630f386"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28838,
+        "output": 386,
+        "total": 29224
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-third-party-install.jsonl",
+        "sha256": "3b5c84d3e886e97b3615a93579f1afb5b9ad949e19b65f3689e82337d2b8ea6d"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-third-party-install.json",
+        "sha256": "1934db8e466a85458b54fb26814edef2923271e0fa0b7e94a0446aa6f40e9077"
+      }
+    },
+    {
+      "id": "route-runtime-refresh",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-runtime-refresh.txt",
+        "sha256": "4a8d52890e1a39fec52c1b476b5244c36962afd393bd4f44d0748e6578afbd7b"
+      },
+      "output": {
+        "path": "routes/outputs/route-runtime-refresh.json",
+        "sha256": "c012e4d0b893288cfd52d1ccfd474fae95e02e6b74afa51b7cbca0f86502ef52"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-runtime-refresh.json",
+        "sha256": "de9111895ee802803c21abfabc1606ab00e00ba6e209879c13728af23b8da328"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 44863,
+        "output": 589,
+        "total": 45452
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-runtime-refresh.jsonl",
+        "sha256": "04d430a15c4f9513b4705db5d7d929c199ce7c010729eb0c60196c09ed5989af"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-runtime-refresh.json",
+        "sha256": "57133f76ce7a88aab695430d4c30235077d8dc08bf9fdbd218251f225e6070e2"
+      }
+    },
+    {
+      "id": "route-ordinary-code-bug",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-ordinary-code-bug.txt",
+        "sha256": "d425942c8394c36c4e0e3f4a4de9603e118131276d1222e9793a3683bcf75f21"
+      },
+      "output": {
+        "path": "routes/outputs/route-ordinary-code-bug.json",
+        "sha256": "5e2e1faaa9b6bec895ba86422a3546ff8f406a938f1b3a5a552f33544ae0e4d5"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-ordinary-code-bug.json",
+        "sha256": "d992ec7e7d4c3c0901b86fa847de5693c93a8859e75019de668fc0deafcb122b"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28853,
+        "output": 457,
+        "total": 29310
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-ordinary-code-bug.jsonl",
+        "sha256": "ba6932535b4fb009fe144800c4ac78c073c6dcc6d8b21e505bb979ffa8e0b7fc"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-ordinary-code-bug.json",
+        "sha256": "91b58b3d004c5bb42e3c16aab42df9f61827f4d7ba636f20d0ffa4e2528ecc1f"
+      }
+    },
+    {
+      "id": "route-document-summary",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-document-summary.txt",
+        "sha256": "5fa1ed9aab6cefd301401e789300e22c9ad5862e00af6f1caef457f1989bf4bf"
+      },
+      "output": {
+        "path": "routes/outputs/route-document-summary.json",
+        "sha256": "ca7e558305b34266946b0f8d066f807e7fd29dae15b881b939d4cc2d6e516670"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-document-summary.json",
+        "sha256": "a1b346e60cd6b75cb20b25b47ba5cbc1f892302ffe7ae30f7e4b7cd9ea5829e0"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28923,
+        "output": 430,
+        "total": 29353
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-document-summary.jsonl",
+        "sha256": "99b215848a07ebd5dc3ec09b1b06f4e82bb08245e4577ef6f1b01c25d373d58a"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-document-summary.json",
+        "sha256": "6132fd266bd73bd78f28d796ab88baadab60ed71bd3c44b4296d050cfcfc855b"
+      }
+    },
+    {
+      "id": "route-ambiguous-multi-repo",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-ambiguous-multi-repo.txt",
+        "sha256": "69926a7eaaf69c6221ecc4cffac83f5f2c366fb27ea3f7ab6f5c2ba19edefeb0"
+      },
+      "output": {
+        "path": "routes/outputs/route-ambiguous-multi-repo.json",
+        "sha256": "91379f4f9e7c232a0eff9085c63a5cee329f138e593896b115052b947d972fdc"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-ambiguous-multi-repo.json",
+        "sha256": "d7c87a9826e384b51e78fd273b55946811fa42c5155d5a9d7bbb7bf64199b631"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28916,
+        "output": 528,
+        "total": 29444
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-ambiguous-multi-repo.jsonl",
+        "sha256": "2f8ad07d7c76663e6350ecb156ae86a206eac6296263d2fcee2d7f0a097a901d"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-ambiguous-multi-repo.json",
+        "sha256": "027ce44f99f973a8e109c13d212e509372856d62d4209565faa4df8417395c70"
+      }
+    },
+    {
+      "id": "route-generated-mirror-patch",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-generated-mirror-patch.txt",
+        "sha256": "285e3f8e2b0d003f2c342a2dfd32199b3147cc30584df014aead20f7313b2165"
+      },
+      "output": {
+        "path": "routes/outputs/route-generated-mirror-patch.json",
+        "sha256": "c95053d02a1cd4a519f3808a5b93cf8c3ec513416b875ff854fd0e39499b6c36"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-generated-mirror-patch.json",
+        "sha256": "9cfe5f8a8ff7e76ff96336719a99de7c7cc3cc8aa71579a781e5043d3f81d7c0"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 45003,
+        "output": 537,
+        "total": 45540
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-generated-mirror-patch.jsonl",
+        "sha256": "1ac797dbf1dd4d840e8cabbdc4a5d6d9bfa5edab6490e3e79d3ec506705afb43"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-generated-mirror-patch.json",
+        "sha256": "2b7d8992bb71a74ea6b14c796489506721e6c6b801f171c6328401da2d56981b"
+      }
+    },
+    {
+      "id": "route-same-repo-migration",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-same-repo-migration.txt",
+        "sha256": "8237708e6a8d77147ef5778daddecabc93912667b3ffd11498ca2d3c0206c200"
+      },
+      "output": {
+        "path": "routes/outputs/route-same-repo-migration.json",
+        "sha256": "11b8249c5a69a30b1d5dbc23c638224ac3cd0e9bc643894c69affd32e57157c2"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-same-repo-migration.json",
+        "sha256": "9bae2717a8e87c1014b6d20ed86903a4f8ee3753e0f56984ecb29cc2f23d95cc"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28869,
+        "output": 526,
+        "total": 29395
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-same-repo-migration.jsonl",
+        "sha256": "2fbf9d6f4410c19edc252a13c6fd41298e14f4739bdc3377124c0b86170cd004"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-same-repo-migration.json",
+        "sha256": "8385338c732a8201249a6be6f5aa39652a46709f258c08f8bb2712f80e98bf37"
+      }
+    },
+    {
+      "id": "route-implicit-idea",
+      "host": "codex-cli 0.144.1",
+      "model": "provider-default (not exposed in Codex JSONL)",
+      "route_high_risk_misroute": false,
+      "prompt": {
+        "path": "routes/prompts/route-implicit-idea.txt",
+        "sha256": "cf1372e733bae7fd151e891408607bc47682eb06ce2f1799cd78ce6d8a47f80b"
+      },
+      "output": {
+        "path": "routes/outputs/route-implicit-idea.json",
+        "sha256": "b07eb12ac9b618b82964115fa3dc1e431ee2a126fa47a92410c745242df387d7"
+      },
+      "machine_check": {
+        "path": "routes/machine-checks/route-implicit-idea.json",
+        "sha256": "5582088351c1aebc14297c04e3e4c52ae640cc7755b5945ed9d64d3baea45f74"
+      },
+      "machine_verdict": "pass",
+      "redaction_status": "passed",
+      "tokens": {
+        "input": 28847,
+        "output": 372,
+        "total": 29219
+      },
+      "duration_ms": 0,
+      "duration_status": "not_captured_by_source_run",
+      "raw_events": {
+        "path": "routes/raw-events/route-implicit-idea.jsonl",
+        "sha256": "14a9bb2160d59044777a48fd5a84da9a5e0edcf3e2c7bc7cd4938d8e479cd909"
+      },
+      "run_metadata": {
+        "path": "routes/meta/route-implicit-idea.json",
+        "sha256": "df6fb9dac32d34f7418b6046ac70d26f56b5f8eb5ce221eaa5b822acc07c989a"
+      }
+    }
+  ],
+  "countermetrics": {
+    "default_context": {
+      "path": "inputs/default-context.md",
+      "sha256": "263360a5a74af3b5bf9016092144723368097ce6e5bc45bcd359a56d45cbeebc"
+    },
+    "default_markdown_bytes": 13837,
+    "candidate_vs_native_input_delta_percent": -21.74,
+    "quality_or_safety_justification": "The candidate-ablation arm uses fewer input tokens than native in this run set; no >20% token-cost exception is needed."
+  },
+  "gate0_resolution": {
+    "evidence": {
+      "path": "inputs/gate0-summary.json",
+      "sha256": "379c22a68d6b8732e18a517b9b7fe48b7b2bdd2e975cf294b353eb9ae5e72e82"
+    },
+    "baseline_decision": "thin-wrapper",
+    "candidate_benefit_verdict": "pass",
+    "candidate_benefit_rationale": "Candidate-full demonstrates scoped portable-authoring benefit over native (2/2 at mean 9 versus 0/2 at 7.5), preserves fixed old-full quality on the spec-first control, and records 0/16 current machine hard misroutes while Gate 0 observed two native hard-boundary violations."
+  },
+  "comparative_verdicts": {
+    "matched_ablation": {
+      "path": "comparisons/matched-ablation.json",
+      "sha256": "b39d5dd1ea76f19bdae601160e25d7cc7b025eabca2ebfce3233d50b46e04453"
+    },
+    "old_regression": {
+      "path": "comparisons/old-regression.json",
+      "sha256": "a0e4131f3892b5577c2958423cfbecdcdb89aac757c7c387c5c7276ddae8ae77"
+    }
+  },
+  "gate_calculation": {
+    "hard_failures": 0,
+    "not_run": 0,
+    "route_high_risk_misroutes": 0,
+    "result": "pass"
+  },
+  "limitations": {
+    "path": "limitations.json",
+    "sha256": "e86bdb8cc6fe627c41bb50b6578e0e379322632697969df24476511b57c18518"
+  }
+}

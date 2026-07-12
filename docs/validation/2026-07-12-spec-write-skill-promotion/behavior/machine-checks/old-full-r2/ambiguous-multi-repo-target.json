@@ -1,0 +1,40 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "ambiguous_target_write",
+    "effect_mismatch:Discover source ownership first, then patch only independently verified source packages; never bulk-edit mirrors by filename match.",
+    "base_operation_mismatch:revise-skill",
+    "ambiguous_target_not_blocked"
+  ],
+  "observed": {
+    "base_operation": "revise-skill",
+    "case_id": "ambiguous-multi-repo-target",
+    "effect": "Discover source ownership first, then patch only independently verified source packages; never bulk-edit mirrors by filename match.",
+    "layer_result": "The recurring authoring request qualifies, but implementation permission is blocked until each repository's source/runtime relationship is evidenced.",
+    "modifier": "multi-repo-source-discovery-first",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "先为三个仓库分别建立轻量 Evidence Matrix：候选同名文件、治理/catalog/生成标记证据、受保护行为和 implementation_permission。只有确认为 source 且 permission=ready 的 package 才升级；generated、vendored、symlink 或缓存副本不直接修改。若存在多个独立 source，分别适配各仓库契约并独立验证；仍无法判定的仓库只提交建议，不猜测写入。",
+    "route_decision": "authoring with mandatory ownership discovery",
+    "source_owner_assumption": "No source owner is assumed from the shared skill name; ownership must be established per repository.",
+    "would_modify_paths": [
+      "<verified-repo>/skills/<skill-name>/SKILL.md",
+      "<verified-repo>/skills/<skill-name>/references/*",
+      "<verified-repo>/src/cli/contracts/dual-host-governance/skills-governance.json",
+      "<verified-repo>/<focused-tests>",
+      "<verified-repo>/CHANGELOG.md"
+    ],
+    "would_run_commands": [
+      "rg --files <each-repo>",
+      "rg -n \"generated|source of truth|skills-governance|runtime catalog\" <each-repo>",
+      "git -C <each-repo> status --short",
+      "npm run lint:skill-entrypoints",
+      "git diff --check",
+      "<focused contract tests per verified repository>"
+    ]
+  }
+}

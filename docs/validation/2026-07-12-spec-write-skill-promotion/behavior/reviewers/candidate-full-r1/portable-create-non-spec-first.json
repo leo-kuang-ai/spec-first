@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "portable-create-non-spec-first",
+  "arm": "candidate-full",
+  "repeat": 1,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 1,
+    "required_references": 2,
+    "no_contamination": 1
+  },
+  "total_score": 8,
+  "rationale": "完整覆盖可复用 Skill 的输入、输出和路由测试，并正确把 canonical root 视为候选路径。主要缺口是 would_modify_paths 包含 CHANGELOG.md，与正文承诺不创建此类非必要治理产物相冲突，且 apply 授权边界表述略混杂。",
+  "source_output": {
+    "path": "outputs/candidate-full-r1.json",
+    "sha256": "d7231d0956efd85b6d240dfbdffb6f4e40f99deb43e6239bb9c8db2c1d505a2b",
+    "hash_verified": true
+  },
+  "fixed_old_source": null,
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-portable-create-non-spec-first.txt",
+    "raw_jsonl": "review/scoped-v2/runs/portable-create-non-spec-first.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/portable-create-non-spec-first.stderr.txt",
+    "last_json": "review/scoped-v2/runs/portable-create-non-spec-first.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 16792,
+    "output_tokens": 1105,
+    "reasoning_output_tokens": 112,
+    "duration_ms": 24257,
+    "reviewer_last_json_sha256": "b97d22c889a3e18a48328eeef6e161503e5e6416373294a3985bfc4c1af4959e"
+  }
+}

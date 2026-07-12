@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "portable-create-non-spec-first",
+  "arm": "native",
+  "repeat": 2,
+  "blind": true,
+  "independent": true,
+  "result": "fail",
+  "verdict": "fail",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 0,
+    "required_references": 1,
+    "no_contamination": 2
+  },
+  "total_score": 7,
+  "rationale": "触发和近邻排除清晰，包内容保持精简且没有 spec-first 污染。然而它未经确认便把 skills/ 声明为 canonical repository-owned source，并给出直接初始化命令；在 source root 尚未确认时缺少必要的预览阻塞与 containment 授权边界。",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/native-r2.json",
+    "sha256": "4b1b96f1979f0a248a0c69e1ff593967cb129420244a7505c28c25d42e1dbc44",
+    "hash_verified": true
+  },
+  "fixed_old_source": null,
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-portable-create-non-spec-first.txt",
+    "raw_jsonl": "review/scoped-v2/runs/portable-create-non-spec-first.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/portable-create-non-spec-first.stderr.txt",
+    "last_json": "review/scoped-v2/runs/portable-create-non-spec-first.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 16792,
+    "output_tokens": 1105,
+    "reasoning_output_tokens": 112,
+    "duration_ms": 24257,
+    "reviewer_last_json_sha256": "b97d22c889a3e18a48328eeef6e161503e5e6416373294a3985bfc4c1af4959e"
+  }
+}

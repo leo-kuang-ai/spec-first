@@ -1,0 +1,1 @@
+{"invocation_mode":"implicit","effect":"apply","reason":"真实请求是修改项目维护的源 Agent Skill，并收紧触发描述、补充验证；入口治理将其路由到源 Skill 创建/修订与验证流程。当前仅做路由评估，未进入该流程，也未修改文件。","entrypoint":"using-spec-first","handoff_target":"spec-write-skill","loaded_skills":["using-spec-first"]}

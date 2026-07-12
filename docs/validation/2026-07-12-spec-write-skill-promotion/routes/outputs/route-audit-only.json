@@ -1,0 +1,1 @@
+{"reason":"该请求仅要求只读审查单个 SKILL.md 的质量并列出 findings，且明确排除修改文件和 package readiness。根据 using-spec-first 的路由规则，应进入 bounded source review，而不是 spec-write-skill。","entrypoint":"using-spec-first","handoff_target":"bounded source review","loaded_skills":["using-spec-first"],"invocation_mode":"none","effect":"not-entered"}

@@ -1,0 +1,30 @@
+{
+  "arm": "old-full",
+  "repeat": 1,
+  "case_id": "portable-create-non-spec-first",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "create-skill",
+    "case_id": "portable-create-non-spec-first",
+    "effect": "Propose a portable standalone source package without introducing spec-first-only governance or generated mirrors.",
+    "layer_result": "authoring-brief",
+    "modifier": "non-spec-first repository profile",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "可创建 `skills/api-change-compat-checklist/`，入口为 `standalone_skill`。先确认真实输入格式、必需清单栏目，以及“不负责生成 changelog/执行兼容性测试”等近邻边界；随后编写含正反触发条件、输入输出合同和完成标准的 `SKILL.md`，仅在确有长规则时增加被明确指向的 reference，并加入 positive、near-neighbor、missing-input eval。不要凭空加入 spec-first 的 governance、runtime catalog、CHANGELOG 或 mirror 生成流程；只采用该 Node.js 项目已有的 package/validation 约定。",
+    "route_decision": "Proceed with portable skill authoring after minimal package-shaping clarification.",
+    "source_owner_assumption": "The ordinary repository's checked-in `skills/` directory is the intended source owner; no generated runtime owner is assumed.",
+    "would_modify_paths": [
+      "skills/api-change-compat-checklist/SKILL.md",
+      "skills/api-change-compat-checklist/references/* (only if required)",
+      "skills/api-change-compat-checklist/evals/* (if supported by the repository)"
+    ],
+    "would_run_commands": [
+      "project-provided skill validator, if present",
+      "git diff --check"
+    ]
+  }
+}

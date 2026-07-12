@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "spec-first-project-profile",
+  "arm": "candidate-ablation",
+  "repeat": 2,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 2,
+    "required_references": 2,
+    "no_contamination": 2
+  },
+  "total_score": 10,
+  "rationale": "Covers source revision, governance, focused route/output tests, Changelog, generator-driven runtime regeneration, containment, failure stops, and avoidance of manual runtime edits. It states the source assumption explicitly and includes an ownership check, though execution would still need to confirm that assumption before mutation.",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/candidate-ablation-r2.json",
+    "sha256": "4b9e8f04ff0d90d88086cd28016efe70bebd028040cee993a2f3d98965e7b9cb",
+    "hash_verified": true
+  },
+  "fixed_old_source": null,
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-spec-first-project-profile.txt",
+    "raw_jsonl": "review/scoped-v2/runs/spec-first-project-profile.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/spec-first-project-profile.stderr.txt",
+    "last_json": "review/scoped-v2/runs/spec-first-project-profile.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 17242,
+    "output_tokens": 1004,
+    "reasoning_output_tokens": 111,
+    "duration_ms": 21884,
+    "reviewer_last_json_sha256": "5a3de33aadd77d76ecb7deaf9a9503a546388dbb8156925fa83adbdde352db93"
+  }
+}

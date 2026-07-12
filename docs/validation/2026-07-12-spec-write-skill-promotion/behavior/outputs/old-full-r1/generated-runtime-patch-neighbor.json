@@ -1,0 +1,22 @@
+{
+  "arm": "old-full",
+  "repeat": 1,
+  "case_id": "generated-runtime-patch-neighbor",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "patch-generated-runtime",
+    "case_id": "generated-runtime-patch-neighbor",
+    "effect": "Reject direct mirror mutation and redirect the change to its authoritative source plus regeneration workflow.",
+    "layer_result": "near-neighbor-runtime-mirror-protection",
+    "modifier": "generated mirror requested as immediate session override",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md"
+    ],
+    "response": "不直接修改 `.agents/skills/spec-prd/SKILL.md`，因为它是 generated runtime mirror，修改会被覆盖并制造双重真相源。应在明确授权后修改 `skills/spec-prd/SKILL.md` 及必要的 source-owned tests/governance，再运行项目规定的 source projection（通常为 `spec-first init`）更新 runtime。当前已加载会话未必热重载；重生后需新开或重新加载会话验证，不能承诺本会话立即采用新文本。",
+    "route_decision": "Decline mirror patch; route to source authoring and generated projection.",
+    "source_owner_assumption": "`skills/spec-prd/SKILL.md` is the presumed source owner; `.agents/skills/spec-prd/SKILL.md` is generated.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

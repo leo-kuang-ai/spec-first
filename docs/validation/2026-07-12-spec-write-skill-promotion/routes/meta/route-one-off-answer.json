@@ -1,0 +1,10 @@
+{
+  "id": "route-one-off-answer",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28882,
+    "cached_input_tokens": 0,
+    "output_tokens": 369,
+    "reasoning_output_tokens": 98
+  }
+}

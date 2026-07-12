@@ -1,0 +1,1 @@
+{"entrypoint":"using-spec-first","handoff_target":"spec-write-skill","loaded_skills":["using-spec-first"],"invocation_mode":"implicit","effect":"validate-only","reason":"真实请求涉及在多个仓库中辨认同名 Skill 的源码真源并生成变更预览，属于 source skill 的结构与就绪性核验，应由 using-spec-first 隐式转交 spec-write-skill；因用户要求先预览且不批量修改，本次仅进入 validate-only。"}

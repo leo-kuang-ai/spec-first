@@ -18,21 +18,31 @@ test('front controller exposes portable authoring and validate-only without unsa
   expect(skill).toContain('`validate-only`');
   expect(skill).toContain('不执行其 scripts、validator、hooks、binaries');
   expect(skill).toContain('不能因为目标目录里存在同名脚本就执行');
+  expect(skill).toContain('即使用户同时要求安装/导入，也先以 `base_operation=revise`、`effect=validate-only` 完成 preflight');
   expect(skill).toContain('portable/target/project readiness');
 });
 
 test('operation model keeps migration and remediation as modifiers, not peer effects', () => {
   const skill = read('skills/spec-write-skill/SKILL.md');
+  const authoring = read('skills/spec-write-skill/references/authoring-method.md');
   const deliveryGates = read('skills/spec-write-skill/references/delivery-gates.md');
 
   expect(skill).toContain('`base_operation=create|revise`');
   expect(skill).toContain('`effect=apply|validate-only`');
   expect(skill).toContain('`modifier=migrate|audit-remediation|none`');
+  expect(skill).toContain('`base_operation=null`、`effect=not-entered`、`modifier=none`');
+  expect(skill).toContain('`base_operation=revise` + `effect=validate-only`');
+  expect(skill).toContain('`layer_result=blocked-source-owner`');
   expect(skill).not.toContain('## Effects');
   expect(skill).not.toMatch(/^- `migrate`：/m);
   expect(skill).not.toMatch(/^- `audit-remediation`：/m);
   expect(deliveryGates).toContain('`structural-only`');
   expect(deliveryGates).not.toMatch(/`L[0-4]\b/);
+  expect(authoring).toContain('不得把那些入口的预期动作记成本 workflow 的 `apply`/`validate-only`');
+  expect(authoring).toContain('不可因最终请求属于 installer 而跳过安全 preflight');
+  expect(authoring).toContain('`not-entered` 只用于根本不是 authoring/readiness 的 near-neighbor');
+  expect(authoring).toContain('不要立即以 `blocked-source-owner` 结束');
+  expect(authoring).toContain('candidate only');
 });
 
 test('profiles are conditional and legacy vocabulary owner is removed', () => {

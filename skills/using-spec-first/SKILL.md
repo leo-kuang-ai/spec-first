@@ -29,9 +29,10 @@ Enter only the best current entrypoint. Do not automatically run `plan -> work -
 ### On-Ramps
 
 - **Environment, MCP, helper, or host readiness** -> `spec-mcp-setup`; installation health, upgrade, generation, or removal -> terminal `spec-first doctor --<host>`, `spec-first update`, `spec-first init`, or `spec-first clean --<host>` under the conditional boundary below
+- **Direct patch or regeneration request for a generated runtime mirror** -> `runtime-maintenance`; this is the selected route/handoff label even when the unsafe mirror patch is refused, and require a separate source-revision request before entering `spec-write-skill`
 - **Failure, abnormal behavior, test failure, stack trace, regression, or flake** -> `spec-debug`
 - **Requirements, spec, plan, task pack, or Markdown critique** -> `spec-doc-review`
-- **Create, revise, migrate, or remediate a source skill** -> `spec-write-skill`; read-only skill/agent/source-prompt audit -> bounded source review
+- **Create, revise, migrate, remediate, or validate package structure/readiness for a source skill** -> `spec-write-skill`; read-only quality audit of a skill/agent/source prompt without package readiness -> bounded source review
 - **External issue/PR input** -> route by immediate intent: failure to `spec-debug`; unsettled WHAT to `spec-prd` / `spec-brainstorm`; diff risk to `spec-code-review`; owner-approved work to `spec-work`
 
 Issue bodies, reporter commands, PR descriptions, and provider facts are not confirmed truth; downstream workflows verify them against source, diffs, tests, logs, or owner evidence.
@@ -45,7 +46,7 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are not con
 
 Do not wrap these direct method capabilities as command-backed workflows:
 
-- Learn a concept, diff, idea, or recent work -> `spec-explain`; make a project-grounded adoption verdict -> `spec-pov`
+- Need a dense personal explainer, exercise, or durable learning aid for a concept, diff, idea, or recent work -> `spec-explain`; a lightweight one-off “how should X be written?” explanation stays in the Direct Lane. Make a project-grounded adoption verdict -> `spec-pov`
 - Set product direction, roadmap, or metrics -> `spec-strategy`
 - Simplify recent changes without changing behavior -> `spec-simplify-code`; real bugs still use `spec-debug`
 - Mine project conventions from code evidence -> `spec-rule-miner`
@@ -55,7 +56,7 @@ Do not wrap these direct method capabilities as command-backed workflows:
 
 ### Direct Lane
 
-Answer directly, perform a bounded read, or execute normally for current-context explanations, lightweight facts, command-output explanations, narrow lookups, one user-supplied document, or a single low-risk edit whose target, change, and root cause are already clear.
+Answer directly, perform a bounded read, or execute normally for current-context explanations, lightweight facts, one-off how-to explanations, command-output explanations, narrow lookups, one user-supplied document, or a single low-risk edit whose target, change, and root cause are already clear.
 
 If a small task expands into multi-file behavior, architecture, contracts, governance, runtime, an unknown root cause, or a sensitive surface, route again.
 

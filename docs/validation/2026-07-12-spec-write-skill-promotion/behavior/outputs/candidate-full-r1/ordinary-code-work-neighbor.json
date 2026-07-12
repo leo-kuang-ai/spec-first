@@ -1,0 +1,13 @@
+{
+  "base_operation": null,
+  "effect": "not-entered",
+  "modifier": "none",
+  "source_owner_assumption": "src/cli/init.js 与对应 Jest 测试属于普通项目代码，不是 Agent Skill package。",
+  "case_id": "ordinary-code-work-neighbor",
+  "route_decision": "路由到普通代码修复与测试流程。",
+  "layer_result": "near-neighbor-code-work",
+  "response": "直接按普通代码工作处理：定位参数解析失败路径，最小化修复 src/cli/init.js，并补充覆盖该输入与预期行为的 Jest 回归测试；运行对应聚焦测试及必要 lint。无需 Skill inventory、validator、profiles、package readiness 或 runtime projection。",
+  "would_modify_paths": [],
+  "would_run_commands": [],
+  "required_references": []
+}

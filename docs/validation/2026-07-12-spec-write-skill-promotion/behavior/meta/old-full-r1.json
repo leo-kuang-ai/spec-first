@@ -1,0 +1,14 @@
+{
+  "id": "old-full-r1",
+  "arm": "old-full",
+  "repeat": 1,
+  "exit_code": 0,
+  "signal": null,
+  "duration_ms": 78017,
+  "usage": {
+    "input_tokens": 23708,
+    "cached_input_tokens": 0,
+    "output_tokens": 3272,
+    "reasoning_output_tokens": 864
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "route-document-summary",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28923,
+    "cached_input_tokens": 0,
+    "output_tokens": 430,
+    "reasoning_output_tokens": 117
+  }
+}

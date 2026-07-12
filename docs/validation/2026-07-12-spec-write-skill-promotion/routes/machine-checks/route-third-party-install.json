@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "expected_route": "skill-installer",
+  "actual_route": "skill-installer",
+  "reason_code": "third-party-install-neighbor"
+}

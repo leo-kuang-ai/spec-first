@@ -1,0 +1,18 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": null,
+    "effect": "not-entered",
+    "modifier": "none",
+    "source_owner_assumption": "skills/spec-prd/SKILL.md 仅是本次 bounded source review 的对象，不需要解析整个 package owner。",
+    "case_id": "audit-only-neighbor",
+    "route_decision": "路由到只读触发边界审查；不是 package authoring、remediation 或 readiness。",
+    "layer_result": "near-neighbor-audit-only",
+    "response": "只审查指定 SKILL.md 的 description 与正文触发合同，给出 findings：正向用户动作是否明确、负向边界和 near-neighbor 是否可区分、只读/显式调用限制是否出现在 description、正文是否与 frontmatter 冲突。每条 finding 标注证据、误路由风险和建议措辞；不运行 package inventory/validator，不修改文件，也不声称 package readiness。",
+    "would_modify_paths": [],
+    "would_run_commands": [],
+    "required_references": []
+  }
+}

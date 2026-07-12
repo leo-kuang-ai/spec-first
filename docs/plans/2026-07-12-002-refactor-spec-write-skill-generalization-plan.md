@@ -1,7 +1,9 @@
 ---
 title: Spec Write Skill Generalization - Plan
 type: refactor
+status: completed
 date: 2026-07-12
+completed_at: 2026-07-12
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
@@ -11,12 +13,14 @@ plan_depth: deep
 
 # Spec Write Skill Generalization - Plan
 
+> **Completion note（2026-07-12）：** 本计划已按 promoted completion 终态完成。Gate 0/C、U1-U4、文档收口和 Claude/Codex/Cursor/Kiro/Qoder 五宿主 runtime projection 均已完成；最终证据以 `docs/validation/2026-07-12-spec-write-skill-promotion/manifest.json`、当前 source/tests 与下方 Completion Evidence 为准。`artifact_readiness: implementation-ready` 描述文档可执行完整度，工作进度由 `status: completed` 表达。
+
 ## Goal Capsule
 
 - **Objective:** 将 `spec-write-skill` 从“只为 spec-first 仓库编写 `skills/<name>/`”重构为通用的项目级 Agent Skill authoring、validation 与 package-readiness workflow，以 Open Agent Skills 为 portable floor，并把宿主差异和 spec-first 治理降为按需 profile。
 - **Authority hierarchy:** 用户已确认的“平台中立核心 + 可选适配层”和通用工具定位 > `docs/10-prompt/结构化项目角色契约.md` > Open Agent Skills 官方规范与目标宿主官方文档 > 当前仓库 source/test 事实 > 外部 Skill 或 audit findings。
 - **Stop conditions:** 若实现需要新增通用 Skill IR、adapter registry、projection engine、安装器、registry/marketplace、遥测、持久 run database 或完整 Eval 平台，停止并重新评估；若无法唯一解析 canonical source，或外部内容的 license/权限边界无法建立，只允许只读验证或 preview，不得 mutation/package-ready closeout。
-- **Execution profile:** 当前 `1d5721df7f17bf0cf919a592a3fc8b8eac5f5247` 已形成一个未晋升 candidate，父提交 `cbcd9361366c6c6e48ea3501eb129d474fe5ee03` 是 pre-candidate baseline。由于 source mutation 已发生，原“mutation 前 Gate 0”不能追溯声称通过；下一步先运行 retrospective Gate 0 决定 retain/rework/abandon，再修复 U1-U2 确定性合同并完成 U3。Gate C 通过前，candidate 中已出现的 U4 surfaces 保持冻结，不得 merge 到 release/main、发布或运行 workspace `spec-first init`；通过后才由 U4 完成 promotion 与 runtime projection。
+- **Execution profile:** 历史 candidate `1d5721df7f17bf0cf919a592a3fc8b8eac5f5247` 与 pre-candidate baseline `cbcd9361366c6c6e48ea3501eb129d474fe5ee03` 已完成 retrospective Gate 0、U1-U3 remediation 和 Gate C comparative promotion。最终 Gate C 为 pass，U4 已完成 canonical source、用户文档、runtime catalog 与五宿主 projection；原先 Gate C 前的冻结边界已正常解除。
 - **Tail ownership:** `spec-work` 负责实现、fresh-source eval、代码审查、验证和 closeout。
 
 ---
@@ -39,9 +43,9 @@ Pre-candidate baseline `cbcd9361366c6c6e48ea3501eb129d474fe5ee03` 中，`skills/
 
 最后，该 baseline 的 scaffold 会直接落入 active `skills/`。整个目录进入 npm source package，并被 bundled discovery 当成 Skill；半成品、评测 workspace 或外部导入暂存目录可能污染治理与发布。通用化必须先解决 target/source authority 和 trust boundary，而不是继续叠加 mode、tier 或 adapter abstraction。
 
-### Current Candidate Baseline
+### Historical Candidate Baseline
 
-当前代码事实以 candidate commit `1d5721df7f17bf0cf919a592a3fc8b8eac5f5247` 为准；它不是 promotion evidence，也不得因为进入 git history 就视为 Gate C 已通过：
+下表记录计划制定时 candidate commit `1d5721df7f17bf0cf919a592a3fc8b8eac5f5247` 的初始缺口，保留为 provenance，不再描述当前实现状态。最终 closure 由 Completion Evidence 与 promotion bundle 证明：
 
 | Area | Current candidate fact | Required closure before promotion |
 | --- | --- | --- |
@@ -502,6 +506,21 @@ git diff --check -- \
 ```
 
 审查必须确认 `src/cli/adapters/**`、governance schema/record、generated mirrors 和无关用户改动未被纳入。
+
+---
+
+## Completion Evidence
+
+本计划于 2026-07-12 以 **Promoted completion** 终态完成。
+
+- **Gate 0 / benefit test：** 固定 native creator 的四个 retrospective case 全部完成，观察到 2 个 hard-boundary violation：读取 secret-like `.env` 与 spec-first project profile leakage。经修正 rubric 的独立 blind review，candidate portable create 为 2/2、均分 9，native 为 0/2、均分 7.5；candidate-ablation 为 2/2、均分 9.5。最终 `candidate_benefit=pass`，允许从初始 `thin-wrapper` 假设晋升为 retain/promote。
+- **Gate C：** Promotion bundle 位于 `docs/validation/2026-07-12-spec-write-skill-promotion/`，根 manifest 为 `spec-write-skill.promotion-evidence/v1`。它包含 4 arms、8 behavior cases × 4 arms × 2 repeats = 64 runs、14 个 fresh route runs、固定 old-full regression、raw prompt/output/machine/reviewer/meta 与 hash。最终 `hard_failures=0`、`not_run=0`、`route_high_risk_misroutes=0`、`result=pass`。
+- **Fail-closed evidence validator：** `validate-promotion-evidence.cjs` 已校验 path containment、symlink、hash、arm assembly、source/assembly identity、双跑、完整 coverage、blind/independent reviewer、countermetrics 与 gate calculation。CLI 只有 `valid && result=pass` 才 exit 0；结构有效但 `fail|not_run` 仍阻断 U4。最终独立 code review 发现的两个 P1 已修复，复核无新增 P0/P1。
+- **Context/countermetrics：** 默认必读 `SKILL.md + authoring-method.md` 为 13,837 bytes，低于 20 KiB ceiling；candidate-ablation input tokens 相对 native 为 `-21.74%`，无需 token-cost exception。Spec-first candidate 与固定 old-full 的 authoring quality 均为 2/2、均分 8，未回归。
+- **U1-U3 source closure：** Operation model 已收敛为 `base_operation=create|revise`、`effect=apply|validate-only`、`modifier=migrate|audit-remediation|none`；near-neighbor 使用 `base_operation=null/effect=not-entered`。External package preflight、single-repo candidate preview、multi-repo source-owner blocker、runtime-maintenance handoff、portable/target/project 分层与 dependency-free validator 均已落地并有 contract/eval evidence。
+- **U4 / projection：** README、README.zh-CN、workflow map、runtime catalog 与 CHANGELOG 已同步。执行 `node bin/spec-first.js init -y --claude --codex --cursor --kiro --qoder` 后 5/5 hosts ready；runtime 包含 validator、profiles 与 `agents/openai.yaml`，不包含 maintainer-only `evals/`。Claude/Codex doctor 均通过，临时 candidate worktree 与 route consumer 已删除。
+- **验证：** Promotion focused Jest 22/22；最终聚焦 suites 54/54；`npm run test:eval-fixtures` 64/64；smoke 5/5；integration 16/16；build 成功并包含 608 files；skill entrypoint lint、typecheck、strict portable validator、promotion validator、five-host physical checks 与 `git diff --check` 均通过。
+- **已知非本计划失败：** 完整 `npm test` 已执行，唯一失败为并行 `spec-prd-template-assets` 的旧文案断言漂移；该文件面不属于本计划，未为了制造全绿而修改。工作区中的 `docs/plans/2026-07-11-003-refactor-requirements-clarification-skills-integration-plan.md` 也是用户并行改动，不纳入本计划提交。
 
 ---
 

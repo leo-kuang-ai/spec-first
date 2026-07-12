@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "expected_route": "bounded-source-review",
+  "actual_route": "bounded-source-review",
+  "reason_code": "audit-only-neighbor"
+}

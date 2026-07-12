@@ -162,6 +162,8 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 
 Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
 
+`spec-write-skill` is a general project-level Agent Skill workflow: it creates or revises a project-owned canonical package, or validates an existing/external package read-only. The portable core does not require spec-first; host metadata and project governance load only when applicable. Audit-only quality review stays a bounded review, third-party installation stays with the installer, and generated runtime mirrors are rebuilt from source rather than patched directly.
+
 [→ Full entrypoint reference with routing rules](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 
 ## The Problem

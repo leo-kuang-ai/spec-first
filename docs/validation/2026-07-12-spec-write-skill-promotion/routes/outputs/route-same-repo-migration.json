@@ -1,0 +1,1 @@
+{"invocation_mode":"implicit","effect":"not-entered（若继续将进入 apply）","reason":"请求是迁移 project-owned Skill 的包结构并保留未知 sidecar，属于源 Skill 的迁移与 package readiness，using-spec-first 应交给 spec-write-skill；本次仅评估路由，未进入该工作流。","entrypoint":"using-spec-first","handoff_target":"spec-write-skill","loaded_skills":["using-spec-first"]}

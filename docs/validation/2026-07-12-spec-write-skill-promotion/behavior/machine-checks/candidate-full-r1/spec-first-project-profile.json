@@ -1,0 +1,34 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "revise",
+    "effect": "apply",
+    "modifier": "none",
+    "source_owner_assumption": "目标已明确为 spec-first 仓库中的 canonical source skills/spec-debug/；治理文件和 runtime producer 按项目 profile 管理。",
+    "case_id": "spec-first-project-profile",
+    "route_decision": "进入单仓 source-first revise；先预览 source/governance/tests/Changelog，再由 generator 和 init 重建派生物。",
+    "layer_result": "apply-after-preview",
+    "response": "修改 skills/spec-debug/ 的 canonical package，并同步 skills-governance.json、与变更影响匹配的聚焦测试和 CHANGELOG.md；如用户可见定位变化再更新 README/docs。不得手改 docs/catalog/runtime-capabilities.md 或 .claude/.codex/.agents/skills/.cursor/.kiro/.qoder。preview 确认授权与 realpath containment 后 apply，运行 bundled validator、聚焦 Jest、skill entrypoint lint、runtime catalog generator 和 git diff --check，再用项目批准的 spec-first init 重建 runtime；closeout 分开报告 source diff、生成状态、语义证据和五轴 readiness。",
+    "would_modify_paths": [
+      "skills/spec-debug/",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "tests/",
+      "CHANGELOG.md"
+    ],
+    "would_run_commands": [
+      "node \"$SKILL_DIR/scripts/validate-skill.cjs\" skills/spec-debug --json",
+      "npx jest --runTestsByPath <focused-tests> --runInBand",
+      "npm run lint:skill-entrypoints",
+      "npm run docs:runtime-catalog",
+      "spec-first init",
+      "git diff --check"
+    ],
+    "required_references": [
+      "references/authoring-method.md",
+      "references/project-profiles.md",
+      "references/delivery-gates.md"
+    ]
+  }
+}

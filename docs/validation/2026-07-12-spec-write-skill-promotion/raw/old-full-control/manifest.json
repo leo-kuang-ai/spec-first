@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.fixed-old-full-control/v1",
+  "old_commit": "cbcd9361366c6c6e48ea3501eb129d474fe5ee03",
+  "source_input": "inputs/old_full.txt",
+  "source_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "source_bytes": 31589,
+  "hash_verified": true,
+  "original_evidence_root": "/private/tmp/spec-write-skill-behavior-20260711T195445Z",
+  "copied_runs": [
+    {
+      "run_id": "old-full-r1",
+      "outputs": {
+        "path": "review/old-full-control/outputs/old-full-r1.json",
+        "sha256": "ace577e559de5c6918d4c6e78dea89ecd509f4615f47b7466776be022cc47cea"
+      },
+      "logs": {
+        "path": "review/old-full-control/logs/old-full-r1.jsonl",
+        "sha256": "f15e7734c884f11a28287b2f13fab01a5d0eabca672c5981f11486eef5d7d470"
+      },
+      "meta": {
+        "path": "review/old-full-control/meta/old-full-r1.json",
+        "sha256": "6ac23462c31287fc7ba469af31e660d039bb5c08158b6c7dc6b839c109c3deb1"
+      }
+    },
+    {
+      "run_id": "old-full-r2",
+      "outputs": {
+        "path": "review/old-full-control/outputs/old-full-r2.json",
+        "sha256": "0cf0011cd4972c22507c02084d76410ecaedb393538e95cc1c32de313cfcb066"
+      },
+      "logs": {
+        "path": "review/old-full-control/logs/old-full-r2.jsonl",
+        "sha256": "748002c0b22c826530fd80b42ad1cfd666b61456c1cdaf188265685b28c9bc52"
+      },
+      "meta": {
+        "path": "review/old-full-control/meta/old-full-r2.json",
+        "sha256": "58be29f78d4825675e16bd5afdbf9ef4d6cbe26faabdd6608e27a3d1dff2421b"
+      }
+    }
+  ]
+}

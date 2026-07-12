@@ -1,0 +1,1 @@
+./external-skill/references/outside-link.txt -> ../../outside/private.txt

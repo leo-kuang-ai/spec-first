@@ -1,0 +1,23 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_none"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "generated-runtime-patch-neighbor",
+    "effect": "none",
+    "layer_result": "Direct generated-runtime modification is rejected; canonical-source workflow is required.",
+    "modifier": "none",
+    "required_references": [
+      "Project mapping from canonical Skill source to `.agents/skills/spec-prd`",
+      "Project generator documentation"
+    ],
+    "response": "不直接修改 `.agents/skills/spec-prd/SKILL.md`：该路径是 runtime mirror，手改会被生成流程覆盖并制造双重真相源。需要先定位并授权 canonical `skills/spec-prd/` source；若项目为 spec-first，应修改 source、相应治理记录/聚焦测试/CHANGELOG，预览差异后运行项目生成器重建 runtime，再验证 source 与 mirror 一致。当前缺少 source 授权，因此不提出写入。",
+    "route_decision": "Generated-runtime patch is a near-neighbor and an unsafe mutation target.",
+    "source_owner_assumption": "`.agents/skills/spec-prd/` is generated runtime rather than canonical source; the actual owner is not established.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

@@ -57,6 +57,15 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(skill).toContain('spec-first update');
   });
 
+  test('distinguishes package readiness validation from an audit-only neighbor', () => {
+    expect(skill).toContain('validate package structure/readiness for a source skill** -> `spec-write-skill`');
+    expect(skill).toContain('without package readiness -> bounded source review');
+    expect(skill).toContain('Direct patch or regeneration request for a generated runtime mirror** -> `runtime-maintenance`');
+    expect(skill).toContain('this is the selected route/handoff label even when the unsafe mirror patch is refused');
+    expect(skill).toContain('require a separate source-revision request before entering `spec-write-skill`');
+    expect(skill).toContain('a lightweight one-off “how should X be written?” explanation stays in the Direct Lane');
+  });
+
   test('preserves source/runtime, evidence, dispatch, and parent-repo boundaries', () => {
     expect(skill).toContain('Modify source-of-truth surfaces, never generated host runtime');
     expect(reference).toContain('generated runtime, not source fixes');

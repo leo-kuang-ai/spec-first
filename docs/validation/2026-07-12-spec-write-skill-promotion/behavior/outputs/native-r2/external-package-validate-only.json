@@ -1,0 +1,16 @@
+{
+  "base_operation": "revise",
+  "case_id": "external-package-validate-only",
+  "effect": "validate-only",
+  "layer_result": "The external package may receive a structural, non-executing review only.",
+  "modifier": "none",
+  "required_references": [
+    "native/SKILL.md",
+    "native/references/openai_yaml.md"
+  ],
+  "response": "Perform a static package-structure review of `/tmp/vendor-skill`: verify the directory name, required `SKILL.md`, YAML frontmatter containing only `name` and `description`, concise trigger coverage, instruction completeness, optional `agents/openai.yaml`, and referenced resource paths. Preserve unknown files, do not follow symlinks or inspect secret-like targets, and do not execute validators, scripts, hooks, imports, copies, installations, or edits. Report findings with severity and remediation suggestions only.",
+  "route_decision": "authoring-validate-external",
+  "source_owner_assumption": "`/tmp/vendor-skill` is third-party or otherwise not an authorized canonical source owned by the current project.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

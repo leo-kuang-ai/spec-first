@@ -1,0 +1,23 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_none"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "generated-runtime-patch-neighbor",
+    "effect": "none",
+    "layer_result": "blocked generated-runtime patch",
+    "modifier": "none",
+    "required_references": [
+      "Canonical-source mapping for `.agents/skills/spec-prd`",
+      "The owning project's runtime generation procedure"
+    ],
+    "response": "Do not hand-edit `.agents/skills/spec-prd/SKILL.md`; it is identified as a runtime copy, and changing it would create drift or be overwritten. Locate the canonical source package and use its owning generator to refresh the runtime. Also do not claim that an on-disk patch can replace skill instructions already loaded into the current session; a new invocation or session may be required after regeneration.",
+    "route_decision": "near-neighbor-blocked",
+    "source_owner_assumption": "`.agents/skills/spec-prd` is generated runtime output rather than the canonical source.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

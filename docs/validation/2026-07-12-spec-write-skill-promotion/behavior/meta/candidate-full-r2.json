@@ -1,0 +1,14 @@
+{
+  "id": "candidate-full-r2",
+  "arm": "candidate-full",
+  "repeat": 2,
+  "exit_code": 0,
+  "signal": null,
+  "duration_ms": 43578,
+  "usage": {
+    "input_tokens": 19338,
+    "cached_input_tokens": 0,
+    "output_tokens": 2077,
+    "reasoning_output_tokens": 307
+  }
+}

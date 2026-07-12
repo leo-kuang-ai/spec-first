@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -9,6 +10,7 @@ const {
   validatePromotionEvidence,
 } = require('../../skills/spec-write-skill/evals/validate-promotion-evidence.cjs');
 
+const repoRoot = path.resolve(__dirname, '../..');
 const tempRoots = [];
 
 afterEach(() => {
@@ -34,10 +36,17 @@ function createBundle() {
   const nativeCreator = artifact('inputs/native-creator.md');
   const portableCore = artifact('inputs/portable-core.md');
   const candidateFull = artifact('inputs/candidate-full.md');
+  const baselineFull = artifact('inputs/baseline-full.md');
+  const behaviorIds = Array.from({ length: 8 }, (_, index) => `behavior-${index + 1}`);
+  const routeIds = Array.from({ length: 12 }, (_, index) => `route-${index + 1}`);
   const inputs = [
     { role: 'candidate_source', ...candidateFull },
-    { role: 'baseline_source', ...artifact('inputs/baseline.md') },
-    { role: 'case_set', ...artifact('inputs/cases.json', '{}\n') },
+    { role: 'baseline_source', ...baselineFull },
+    { role: 'case_set', ...artifact('inputs/cases.json', `${JSON.stringify({
+      cases: behaviorIds.map((id) => ({ id })),
+      route_queries: routeIds.map((id) => ({ id })),
+    })}\n`) },
+    { role: 'gate0', ...artifact('inputs/gate0.json', '{"decision":"thin-wrapper"}\n') },
     { role: 'rubric', ...artifact('inputs/rubric.md') },
   ];
   const arms = [
@@ -61,31 +70,53 @@ function createBundle() {
         { role: 'candidate_full', ...candidateFull },
       ],
     },
+    {
+      id: 'old-full',
+      assembly: [
+        { role: 'baseline_full', ...baselineFull },
+      ],
+    },
   ];
   const cases = [];
   for (const arm of arms) {
     for (const repeat of [1, 2]) {
-      const prefix = `runs/create-basic/${arm.id}/${repeat}`;
-      cases.push({
-        id: 'create-basic',
-        arm: arm.id,
-        repeat,
-        promotion_case: true,
-        host: 'codex',
-        model: 'test-model',
-        route_high_risk_misroute: false,
-        prompt: artifact(`${prefix}/prompt.txt`),
-        output: artifact(`${prefix}/output.txt`),
-        machine_check: artifact(`${prefix}/machine.json`, '{"result":"pass","route_high_risk_misroute":false}\n'),
-        reviewer: artifact(`${prefix}/reviewer.json`, '{"result":"pass"}\n'),
-        machine_verdict: 'pass',
-        reviewer_verdict: 'pass',
-        redaction_status: 'passed',
-        tokens: { input: 10, output: 5, total: 15 },
-        duration_ms: 25,
-      });
+      for (const id of behaviorIds) {
+        const prefix = `runs/${id}/${arm.id}/${repeat}`;
+        cases.push({
+          id,
+          arm: arm.id,
+          repeat,
+          promotion_case: true,
+          host: 'codex',
+          model: 'test-model',
+          route_high_risk_misroute: false,
+          prompt: artifact(`${prefix}/prompt.txt`),
+          output: artifact(`${prefix}/output.txt`),
+          machine_check: artifact(`${prefix}/machine.json`, '{"result":"pass","route_high_risk_misroute":false}\n'),
+          reviewer: artifact(`${prefix}/reviewer.json`, '{"result":"pass","blind":true,"independent":true}\n'),
+          machine_verdict: 'pass',
+          reviewer_verdict: 'pass',
+          redaction_status: 'passed',
+          tokens: { input: 10, output: 5, total: 15 },
+          duration_ms: 25,
+        });
+      }
     }
   }
+  const route_runs = routeIds.map((id) => ({
+    id,
+    host: 'codex',
+    model: 'test-model',
+    route_high_risk_misroute: false,
+    prompt: artifact(`routes/${id}/prompt.txt`),
+    output: artifact(`routes/${id}/output.json`),
+    machine_check: artifact(`routes/${id}/machine.json`, '{"result":"pass","route_high_risk_misroute":false}\n'),
+    machine_verdict: 'pass',
+    redaction_status: 'passed',
+    tokens: { input: 10, output: 5, total: 15 },
+    duration_ms: 25,
+  }));
+  const defaultContext = artifact('inputs/default-context.md', 'default context');
   const manifest = {
     schema_version: 'spec-write-skill.promotion-evidence/v1',
     bundle_id: 'test-bundle',
@@ -94,6 +125,29 @@ function createBundle() {
     inputs,
     arms,
     cases,
+    route_runs,
+    coverage: {
+      behavior_case_ids: behaviorIds,
+      route_query_ids: routeIds,
+      comparison_case_ids: ['behavior-1'],
+      regression_case_ids: ['behavior-2'],
+    },
+    countermetrics: {
+      default_context: defaultContext,
+      default_markdown_bytes: Buffer.byteLength('default context'),
+      candidate_vs_native_input_delta_percent: 0,
+      quality_or_safety_justification: '',
+    },
+    gate0_resolution: {
+      evidence: inputs.find((input) => input.role === 'gate0'),
+      baseline_decision: 'thin-wrapper',
+      candidate_benefit_verdict: 'pass',
+      candidate_benefit_rationale: 'Independent review confirms additional boundary value.',
+    },
+    comparative_verdicts: {
+      matched_ablation: artifact('comparative/matched-ablation.json', '{"result":"pass"}\n'),
+      old_regression: artifact('comparative/old-regression.json', '{"result":"pass"}\n'),
+    },
     gate_calculation: {
       hard_failures: 0,
       not_run: 0,
@@ -189,13 +243,14 @@ test('reports malformed arm items instead of throwing', () => {
 
 test('rejects a gate calculation that does not match case verdicts', () => {
   const { root, manifest } = createBundle();
-  manifest.cases[0].reviewer_verdict = 'fail';
+  const candidateIndex = manifest.cases.findIndex((entry) => entry.arm === 'candidate-full');
+  manifest.cases[candidateIndex].reviewer_verdict = 'fail';
   fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
 
   const report = validatePromotionEvidence(root);
   expect(report.valid).toBe(false);
   expect(report.errors).toEqual(expect.arrayContaining([
-    'cases[0].reviewer_verdict must match reviewer result',
+    `cases[${candidateIndex}].reviewer_verdict must match reviewer result`,
     'gate_calculation.hard_failures must equal 1',
     'gate_calculation.result must equal fail',
   ]));
@@ -203,14 +258,17 @@ test('rejects a gate calculation that does not match case verdicts', () => {
 
 test('rejects duplicate repeat numbers that fake the promotion double-run requirement', () => {
   const { root, manifest } = createBundle();
-  manifest.cases[1].repeat = 1;
+  const duplicateIndex = manifest.cases.findIndex((entry) =>
+    entry.id === 'behavior-1' && entry.arm === 'native' && entry.repeat === 2
+  );
+  manifest.cases[duplicateIndex].repeat = 1;
   fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
 
   const report = validatePromotionEvidence(root);
   expect(report.valid).toBe(false);
   expect(report.errors).toEqual(expect.arrayContaining([
-    'cases[1] duplicates case create-basic arm native repeat 1',
-    'promotion case create-basic arm native must have at least two distinct repeats',
+    `cases[${duplicateIndex}] duplicates case behavior-1 arm native repeat 1`,
+    'promotion case behavior-1 arm native must have at least two distinct repeats',
   ]));
 });
 
@@ -230,13 +288,14 @@ test('rejects declared verdicts that disagree with hashed run artifacts', () => 
 
 test('derives high-risk route misroutes from case evidence', () => {
   const { root, manifest } = createBundle();
-  manifest.cases[0].route_high_risk_misroute = true;
+  const candidateIndex = manifest.cases.findIndex((entry) => entry.arm === 'candidate-full');
+  manifest.cases[candidateIndex].route_high_risk_misroute = true;
   fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
 
   const report = validatePromotionEvidence(root);
   expect(report.valid).toBe(false);
   expect(report.errors).toEqual(expect.arrayContaining([
-    'cases[0].route_high_risk_misroute must match machine_check result',
+    `cases[${candidateIndex}].route_high_risk_misroute must match machine_check result`,
     'gate_calculation.route_high_risk_misroutes must equal 1',
     'gate_calculation.result must equal fail',
   ]));
@@ -267,4 +326,143 @@ test('requires each declared arm to contribute evidence runs', () => {
   expect(report.errors).toEqual(expect.arrayContaining([
     'manifest.cases must contain at least one run for arm candidate-full',
   ]));
+});
+
+test('requires the fixed old-full regression arm', () => {
+  const { root, manifest } = createBundle();
+  manifest.arms = manifest.arms.filter((arm) => arm.id !== 'old-full');
+  manifest.cases = manifest.cases.filter((entry) => entry.arm !== 'old-full');
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(false);
+  expect(report.errors).toEqual(expect.arrayContaining([
+    'manifest.arms must contain old-full',
+    'regression case behavior-2 arm old-full must have at least two distinct repeats',
+  ]));
+});
+
+test('requires blind independent reviewer artifacts', () => {
+  const { root, manifest } = createBundle();
+  const reviewer = manifest.cases[0].reviewer;
+  const content = '{"result":"pass"}\n';
+  fs.writeFileSync(path.join(root, reviewer.path), content);
+  reviewer.sha256 = sha256(content);
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(false);
+  expect(report.errors).toEqual(expect.arrayContaining([
+    'cases[0].reviewer must declare blind=true and independent=true',
+  ]));
+});
+
+test('requires full case-set coverage and a measured default context budget', () => {
+  const { root, manifest } = createBundle();
+  manifest.coverage.route_query_ids.pop();
+  manifest.countermetrics.default_markdown_bytes = 0;
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(false);
+  expect(report.errors).toEqual(expect.arrayContaining([
+    'coverage.route_query_ids must exactly match case_set route query ids',
+    'countermetrics.default_markdown_bytes must equal default_context byte length',
+  ]));
+});
+
+test('does not promote a Gate 0 benefit verdict that is not confirmed', () => {
+  const { root, manifest } = createBundle();
+  manifest.gate0_resolution.candidate_benefit_verdict = 'not_run';
+  manifest.gate_calculation.result = 'not_run';
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(true);
+  expect(report.result).toBe('not_run');
+});
+
+test('does not count expected baseline arm failures as candidate hard failures', () => {
+  const { root, manifest } = createBundle();
+  const native = manifest.cases.find((entry) => entry.arm === 'native');
+  const content = '{"result":"fail","route_high_risk_misroute":true}\n';
+  fs.writeFileSync(path.join(root, native.machine_check.path), content);
+  native.machine_check.sha256 = sha256(content);
+  native.machine_verdict = 'fail';
+  native.route_high_risk_misroute = true;
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(true);
+  expect(report.result).toBe('pass');
+});
+
+test('blocks promotion when a comparative verdict fails', () => {
+  const { root, manifest } = createBundle();
+  const comparison = manifest.comparative_verdicts.matched_ablation;
+  const content = '{"result":"fail"}\n';
+  fs.writeFileSync(path.join(root, comparison.path), content);
+  comparison.sha256 = sha256(content);
+  manifest.gate_calculation.result = 'fail';
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(true);
+  expect(report.result).toBe('fail');
+});
+
+test('binds the declared candidate source to the evaluated candidate-full assembly', () => {
+  const { root, manifest } = createBundle();
+  const alternateContent = 'different candidate source';
+  const alternatePath = path.join(root, 'inputs', 'alternate-candidate.md');
+  fs.writeFileSync(alternatePath, alternateContent);
+  manifest.arms.find((arm) => arm.id === 'candidate-full').assembly[0] = {
+    role: 'candidate_full',
+    path: 'inputs/alternate-candidate.md',
+    sha256: sha256(alternateContent),
+  };
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(false);
+  expect(report.errors).toEqual(expect.arrayContaining([
+    'candidate_source must have the same content hash as candidate-full candidate_full assembly',
+  ]));
+});
+
+test('binds the declared baseline source to the evaluated old-full assembly', () => {
+  const { root, manifest } = createBundle();
+  const alternateContent = 'different historical baseline';
+  const alternatePath = path.join(root, 'inputs', 'alternate-baseline.md');
+  fs.writeFileSync(alternatePath, alternateContent);
+  manifest.arms.find((arm) => arm.id === 'old-full').assembly[0] = {
+    role: 'baseline_full',
+    path: 'inputs/alternate-baseline.md',
+    sha256: sha256(alternateContent),
+  };
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const report = validatePromotionEvidence(root);
+  expect(report.valid).toBe(false);
+  expect(report.errors).toEqual(expect.arrayContaining([
+    'baseline_source must have the same content hash as old-full baseline_full assembly',
+  ]));
+});
+
+test('CLI exits non-zero for a structurally valid not-run gate', () => {
+  const { root, manifest } = createBundle();
+  manifest.gate0_resolution.candidate_benefit_verdict = 'not_run';
+  manifest.gate_calculation.result = 'not_run';
+  fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
+
+  const script = path.join(
+    repoRoot,
+    'skills/spec-write-skill/evals/validate-promotion-evidence.cjs',
+  );
+  const result = spawnSync(process.execPath, [script, root, '--json'], { encoding: 'utf8' });
+  const report = JSON.parse(result.stdout);
+
+  expect(result.status).toBe(1);
+  expect(report.valid).toBe(true);
+  expect(report.result).toBe('not_run');
 });

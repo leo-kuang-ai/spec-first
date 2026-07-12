@@ -1,0 +1,29 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "layer_result": "preview-only",
+    "response": "进入创建流程，但仓库未给出 canonical Skill root；先按项目规则和相邻 project-owned packages 定位 owner。若仍无唯一声明，预览候选 `skills/api-change-compat-checklist/`：`SKILL.md` 定义将 API 变更记录转为兼容性清单的输入、输出、正/负触发例和失败行为，必要时增加确定性解析脚本与 fixtures。确认路径后再写入并运行 bundled validator、脚本测试及最窄项目测试；不创建 spec-first governance、catalog、模板或 runtime projection。",
+    "would_modify_paths": [
+      "skills/api-change-compat-checklist/SKILL.md",
+      "skills/api-change-compat-checklist/references/compatibility-rules.md",
+      "skills/api-change-compat-checklist/evals/route-fixtures.json"
+    ],
+    "case_id": "portable-create-non-spec-first",
+    "route_decision": "entered-create-preview",
+    "base_operation": "create",
+    "modifier": "none",
+    "would_run_commands": [
+      "node \"$SKILL_DIR/scripts/validate-skill.cjs\" skills/api-change-compat-checklist --json",
+      "npm test -- --runInBand"
+    ],
+    "source_owner_assumption": "单一 Node.js 仓库已绑定；`skills/api-change-compat-checklist/` 仅为 candidate path，须由项目规则或用户确认后才能写入。",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/delivery-gates.md",
+      "references/project-profiles.md"
+    ],
+    "effect": "apply"
+  }
+}

@@ -1,0 +1,1 @@
+wrapper_exit=1 (zsh readonly variable after Codex completed)

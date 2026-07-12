@@ -1,0 +1,23 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_none"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "ordinary-code-work-neighbor",
+    "effect": "none",
+    "layer_result": "ordinary code implementation task",
+    "modifier": "none",
+    "required_references": [
+      "src/cli/init.js",
+      "Relevant Jest test files and CLI argument contract"
+    ],
+    "response": "Route this as ordinary code work, not Skill authoring. Diagnose the parser against the CLI's documented argument contract, make the smallest source fix, add a Jest regression covering the failing input and an adjacent valid case, and run the focused test suite. No Skill package, metadata, governance, or runtime-mirror work is warranted.",
+    "route_decision": "near-neighbor",
+    "source_owner_assumption": "The application repository owns the CLI source; no Agent Skill source owner is involved.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

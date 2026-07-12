@@ -1,0 +1,15 @@
+{
+  "base_operation": null,
+  "case_id": "audit-only-neighbor",
+  "effect": "none",
+  "layer_result": "near-neighbor trigger-boundary audit",
+  "modifier": "none",
+  "required_references": [
+    "skills/spec-prd/SKILL.md"
+  ],
+  "response": "Provide findings only. Evaluate the frontmatter description for intended positive triggers, false-positive contexts, false-negative phrasings, overlap with neighboring skills, and explicit exclusions. Treat trigger defects as frontmatter issues because body guidance is unavailable until after invocation. Rank findings by impact and suggest replacement wording where needed, without assessing package readiness or changing files.",
+  "route_decision": "near-neighbor",
+  "source_owner_assumption": "No source ownership assumption is needed for a read-only, single-file trigger audit.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

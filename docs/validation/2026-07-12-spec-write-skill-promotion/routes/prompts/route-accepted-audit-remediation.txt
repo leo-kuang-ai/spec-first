@@ -1,0 +1,3 @@
+只执行入口路由评估，不执行用户请求，不修改任何文件。根据当前宿主实际发现和加载的项目 AGENTS/Skill，判断下面真实用户请求的第一入口。entrypoint 填当前实际入口；若 using-spec-first 将其交给另一入口，handoff_target 填该入口；loaded_skills 只列本 turn 实际加载/读取的 Skill；invocation_mode 表示 spec-write-skill 是 explicit、implicit 或 none；effect 简述将进入 apply/validate-only/not-entered。
+
+按已经接受的 Skill audit findings 修复 canonical source。

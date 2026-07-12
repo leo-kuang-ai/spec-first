@@ -1,0 +1,21 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "revise",
+    "effect": "apply",
+    "modifier": "none",
+    "source_owner_assumption": "workspace 中存在三个仓库和多个同名候选，canonical source owner 无法唯一确定。",
+    "case_id": "ambiguous-multi-repo-target",
+    "route_decision": "保留批量升级的 revise/apply 请求分类，但一次 invocation 不能跨仓 mutation；必须先选择一个 repo 和 canonical source。",
+    "layer_result": "blocked-source-owner",
+    "response": "停止写入，不自行挑选或批量升级。下一步只做 source-resolution：分别列出三个候选的 repo、路径、项目规则、source/runtime 标记及 generator/governance 证据，然后要求用户选择唯一 mutation target。确认前不运行 validator、测试、generator 或修改命令；确认后为单个 repo 重新给出 preview。",
+    "would_modify_paths": [],
+    "would_run_commands": [],
+    "required_references": [
+      "references/authoring-method.md",
+      "references/project-profiles.md"
+    ]
+  }
+}

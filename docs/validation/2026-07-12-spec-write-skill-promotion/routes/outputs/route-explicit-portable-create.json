@@ -1,0 +1,1 @@
+{"invocation_mode":"explicit","effect":"not-entered：只完成入口路由评估，未进入 spec-write-skill，未修改文件","reason":"真实用户请求显式指定 spec-write-skill，且目标是创建源 Skill；using-spec-first 的路由规则将此类请求交给 spec-write-skill。当前环境只读，因此不执行创建。","entrypoint":"using-spec-first","handoff_target":"spec-write-skill","loaded_skills":["using-spec-first"]}

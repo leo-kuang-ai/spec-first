@@ -1,0 +1,1 @@
+{"handoff_target":"spec-write-skill","loaded_skills":["using-spec-first"],"invocation_mode":"implicit","effect":"apply","reason":"请求是依据已接受的 Skill audit findings 修复 canonical source，属于源 Skill 的修订与整改，应由 using-spec-first 路由至 spec-write-skill；本次仅评估路由，未进入该流程或修改文件。","entrypoint":"using-spec-first"}

@@ -161,6 +161,8 @@ docs/
 
 支撑入口（按需触发）：`spec-mcp-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
 
+`spec-write-skill` 是通用的项目级 Agent Skill workflow：可创建或修改项目拥有的 canonical package，也可只读验证现有或外部 package。Portable core 不要求项目使用 spec-first；宿主 metadata 与项目治理只在适用时加载。只审查质量仍走 bounded review，第三方安装仍交给 installer，generated runtime mirror 必须从 source 重建而不是直接修补。
+
 [→ 完整入口与路由规则](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 
 ## 你遇到的问题

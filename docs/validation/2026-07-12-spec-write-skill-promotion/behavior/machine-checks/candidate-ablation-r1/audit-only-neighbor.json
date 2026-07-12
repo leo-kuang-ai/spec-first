@@ -1,0 +1,22 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_none"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "audit-only-neighbor",
+    "effect": "none",
+    "layer_result": "Focused trigger-boundary findings; package readiness and remediation are out of scope.",
+    "modifier": "none",
+    "required_references": [
+      "skills/spec-prd/SKILL.md"
+    ],
+    "response": "仅审查 frontmatter `description` 与正文中的路由规则：列出 recurring job 是否明确、真实正向请求能否触发、负向边界和近邻任务能否排除、只读或显式调用限制是否只藏在正文，以及是否存在同义词堆叠或占位符。每条 finding 给出严重度、原文证据、误触发/漏触发样例和建议措辞；不扩展到 package readiness，也不修改文件。",
+    "route_decision": "Audit-only near-neighbor, not Skill authoring or package-readiness work.",
+    "source_owner_assumption": "No source ownership assumption is needed for a read-only finding report.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

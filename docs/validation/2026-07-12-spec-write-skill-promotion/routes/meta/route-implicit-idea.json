@@ -1,0 +1,10 @@
+{
+  "id": "route-implicit-idea",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28847,
+    "cached_input_tokens": 0,
+    "output_tokens": 372,
+    "reasoning_output_tokens": 90
+  }
+}

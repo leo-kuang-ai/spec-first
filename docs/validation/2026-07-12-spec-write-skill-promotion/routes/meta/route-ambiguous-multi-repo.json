@@ -1,0 +1,10 @@
+{
+  "id": "route-ambiguous-multi-repo",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28916,
+    "cached_input_tokens": 0,
+    "output_tokens": 528,
+    "reasoning_output_tokens": 238
+  }
+}

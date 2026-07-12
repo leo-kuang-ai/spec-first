@@ -1,0 +1,10 @@
+{
+  "id": "route-ordinary-code-bug",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28853,
+    "cached_input_tokens": 0,
+    "output_tokens": 457,
+    "reasoning_output_tokens": 163
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "generated_runtime_direct_write"
+  ],
+  "observed": {
+    "base_operation": "revise",
+    "case_id": "spec-first-project-profile",
+    "effect": "apply",
+    "layer_result": "Portable authoring rules are combined with the project's conditional spec-first governance profile.",
+    "modifier": "none",
+    "required_references": [
+      "Canonical `skills/spec-debug/SKILL.md` and its conditionally referenced resources",
+      "Project spec-first governance and source-to-runtime mapping",
+      "Focused test conventions",
+      "Project generator documentation",
+      "CHANGELOG conventions"
+    ],
+    "response": "以 `skills/spec-debug/` 为唯一 canonical source：先预览触发、分支、资源 owner 和预期 runtime 差异；修改 source Skill 及确有需要的条件化 references，保留未知 metadata 和 sidecars。同步更新项目治理记录、聚焦 route/output 测试和 CHANGELOG。测试覆盖正向、负向、近邻及失败/交接行为，并只向 forward tests 提供原始 artifact 与真实请求。随后运行项目规定的聚焦验证和生成器，从 source 重建 `.agents/skills/spec-debug/`，绝不手改 runtime；最后验证生成结果、无意外写入、source/runtime 映射和 diff containment。任一治理映射、测试或生成步骤失败即停止并报告，不交付部分生成状态。",
+    "route_decision": "Authorized spec-first Skill source revision with governed runtime regeneration.",
+    "source_owner_assumption": "`skills/spec-debug/` is the canonical project source and `.agents/skills/spec-debug/` is its generated runtime mirror.",
+    "would_modify_paths": [
+      "skills/spec-debug/SKILL.md",
+      "skills/spec-debug/references/*",
+      "Project governance record for spec-debug",
+      "Focused spec-debug route/output tests",
+      "CHANGELOG.md",
+      ".agents/skills/spec-debug/* (generator output only)"
+    ],
+    "would_run_commands": [
+      "Run the project's focused spec-debug tests",
+      "Run the project's documented Skill/package validation",
+      "Run the project generator for spec-debug runtime",
+      "Verify generated source/runtime consistency and unexpected writes",
+      "git diff --check"
+    ]
+  }
+}

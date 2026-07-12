@@ -1,0 +1,21 @@
+{
+  "execution_mode": "native-host-route-codex-cli",
+  "logical_id": "codex-system-skill-creator",
+  "resolved_path": "/Users/kuang/.codex/skills/.system/skill-creator",
+  "native_source_manifest_sha256": "473b9dd5ff3df1d352b499d83e00864290bd2874ac3f9243e33f09ab7e9e835c",
+  "native_skill_md_sha256": "da44c88f6b3845a8fa8c60792ec9a722110a55a9793c279757b48fefb11f819c",
+  "native_openai_yaml_sha256": "d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6",
+  "codex_version": "codex-cli 0.144.1",
+  "model": "gpt-5.6-sol",
+  "model_source": "/Users/kuang/.codex/config.toml",
+  "host": "Darwin arm64 25.5.0",
+  "os": "macOS 26.5.1 build 25F80",
+  "cli_flags": ["--ephemeral", "--sandbox", "read-only", "--ignore-rules", "--skip-git-repo-check", "--json", "--color", "never"],
+  "auth_handling": "Existing user config/auth was used unchanged. No auth files were copied, printed, or modified.",
+  "pre_candidate_commit": "cbcd9361366c6c6e48ea3501eb129d474fe5ee03",
+  "pre_candidate_skill_tree": "4ea4e9bf5c5a5812ef43ced6c35478ce0c125e88",
+  "pre_candidate_skill_md_blob": "d5e092ac43cef9c9b0c1265e30ab97438107670f",
+  "candidate_commit": "1d5721df7f17bf0cf919a592a3fc8b8eac5f5247",
+  "candidate_skill_tree": "d3b7ef8b3555476d31c4b9c685e3e2b2f63fdf1b",
+  "candidate_skill_md_blob": "be2910a05302c2b0ebe8f114370f66b0a17e4450"
+}

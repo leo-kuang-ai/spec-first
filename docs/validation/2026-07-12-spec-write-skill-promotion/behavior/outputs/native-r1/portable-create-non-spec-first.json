@@ -1,0 +1,24 @@
+{
+  "base_operation": "create",
+  "case_id": "portable-create-non-spec-first",
+  "effect": "apply",
+  "layer_result": "portable-skill package in a non-spec-first repository",
+  "modifier": "none",
+  "required_references": [
+    "references/openai_yaml.md",
+    "Representative API change-record inputs and expected compatibility checklists",
+    "The repository's existing skill layout and naming conventions, if any"
+  ],
+  "response": "Create a repo-local `api-change-compatibility-checklist` package under `skills/`. Its description should trigger when API change records must be converted into compatibility checks, while excluding API implementation, generic changelog writing, and unrelated one-off code review. Keep the core procedure in `SKILL.md`; add a reference containing compatibility categories and checklist output schema only if those details are substantial. Generate matching `agents/openai.yaml`, preview the complete package, validate it, and keep all changes inside this repository. Do not introduce spec-first governance files or runtime mirrors.",
+  "route_decision": "authoring",
+  "source_owner_assumption": "The current Node.js repository is the explicitly requested canonical owner, with its repository-local `skills/` directory as the source root.",
+  "would_modify_paths": [
+    "skills/api-change-compatibility-checklist/SKILL.md",
+    "skills/api-change-compatibility-checklist/agents/openai.yaml",
+    "skills/api-change-compatibility-checklist/references/compatibility-checklist.md"
+  ],
+  "would_run_commands": [
+    "scripts/init_skill.py api-change-compatibility-checklist --path skills --resources references --interface display_name=\"API Compatibility Checklist\" --interface short_description=\"Turn API changes into compatibility checks\" --interface default_prompt=\"Use $api-change-compatibility-checklist to turn these API changes into a compatibility checklist.\"",
+    "scripts/quick_validate.py skills/api-change-compatibility-checklist"
+  ]
+}

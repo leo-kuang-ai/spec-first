@@ -1,0 +1,1 @@
+{"effect":"not-entered","reason":"真实请求是从 GitHub 安装第三方 Skill，属于现成 Skill 的安装操作，而非创建、修改或校验源 Skill 包；入口治理因此应交给 skill-installer。按要求本次只完成路由评估，未进入安装流程，也未修改文件。","entrypoint":"using-spec-first","handoff_target":"skill-installer","loaded_skills":["using-spec-first"],"invocation_mode":"none"}
