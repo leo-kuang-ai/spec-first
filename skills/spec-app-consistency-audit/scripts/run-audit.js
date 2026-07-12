@@ -314,12 +314,14 @@ function finalizePreparedRun(context) {
   }
   if (!autoStubbed) validateSemanticBinding(stagedRawIssues, context.preparedMetadata);
   const effectiveSynthesisFlags = autoStubbed ? [] : synthesisFlags;
+  const semanticFlags = existingSemanticArtifactFlags(artifacts);
   runStep('merge-contracts:issues', [
     script('merge-contracts.js'),
     '--issues-artifact',
     '--issue', stagedRawIssues,
     'from:code-review',
     runIdToken,
+    ...semanticFlags,
     ...effectiveSynthesisFlags,
     '--output', artifacts.issues,
   ], repoRoot);
@@ -330,10 +332,18 @@ function finalizePreparedRun(context) {
     runIdToken,
     '--artifacts', artifacts.routes,
     '--artifacts', artifacts.quality,
+    '--artifacts', artifacts.metadata,
+    ...semanticFlags,
     '--issue', artifacts.issues,
     ...effectiveSynthesisFlags,
     '--output', artifacts.report,
   ], repoRoot);
+}
+
+function existingSemanticArtifactFlags(artifacts) {
+  return [artifacts.behaviorModel, artifacts.proofObligations, artifacts.counterexamples]
+    .filter((filePath) => filePath && fs.existsSync(filePath))
+    .flatMap((filePath) => ['--artifacts', filePath]);
 }
 
 function main(argv) {
@@ -457,6 +467,9 @@ function main(argv) {
       industry: path.join(absoluteRunDir, 'contracts', 'industry-profile.preview.json'),
       rules: path.join(absoluteRunDir, 'contracts', 'industry-rule-pack-selection.json'),
       merged: path.join(absoluteRunDir, 'merged-context.json'),
+      behaviorModel: path.join(absoluteRunDir, 'app-behavior-model.json'),
+      proofObligations: path.join(absoluteRunDir, 'proof-obligations.json'),
+      counterexamples: path.join(absoluteRunDir, 'counterexamples.json'),
       issues: path.join(absoluteRunDir, 'issues.json'),
       report: path.join(absoluteRunDir, 'audit-report.json'),
       context: path.join(absoluteRunDir, 'app-audit-context.json'),
@@ -725,6 +738,7 @@ function main(argv) {
       return;
     }
     const effectiveSynthesisFlags = autoStubbed ? [] : synthesisFlags;
+    const semanticFlags = existingSemanticArtifactFlags(artifacts);
 
     runStep('merge-contracts:issues', [
       script('merge-contracts.js'),
@@ -732,6 +746,7 @@ function main(argv) {
       '--issue', stagedRawIssues,
       'from:code-review',
       runIdToken,
+      ...semanticFlags,
       ...effectiveSynthesisFlags,
       '--output', artifacts.issues,
     ], repoRoot);
@@ -743,6 +758,8 @@ function main(argv) {
       runIdToken,
       '--artifacts', artifacts.routes,
       '--artifacts', artifacts.quality,
+      '--artifacts', artifacts.metadata,
+      ...semanticFlags,
       '--issue', artifacts.issues,
       ...effectiveSynthesisFlags,
       '--output', artifacts.report,

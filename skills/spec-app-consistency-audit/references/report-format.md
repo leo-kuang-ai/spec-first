@@ -1,42 +1,38 @@
-# App Consistency Audit Report Format
+# App Assurance Journey Report Format
 
-## 1. Scope & Degraded Modes
+## Scope, freshness and coverage caps
 
-说明输入、source freshness、不可审查范围和 degraded modes。no-evidence 不能写成通过。
+State current-run inputs, final freshness, unavailable sources, degraded modes and claim-specific caps. No evidence is not a pass. Missing Figma caps design alignment only; missing platform source caps parity only.
 
-## 2. Executive Summary
+## Changed journeys
 
-列出 blocker/high/medium/low 数量、证据门禁结果和 runtime verification 建议数量。
+For each selected journey show platform scope, coverage status, proof-obligation counts, accepted/rejected finding refs and limitations. Do not render empty fixed expert sections.
 
-## 3. Findings
+## Findings and challenge results
 
-每个问题必须包含 severity、category、expert、confidence、static_confirmed、contract_status、provenance、evidence、impact、recommendation、related_rule_packs、runtime_verification 和 data_sensitivity。
+Each finding retains severity, claim family/type, affected surface, confidence, project evidence, model/obligation/counterexample refs, conclusion cap, semantic adjudication, lifecycle, impact and recommendation. Rejected/downgraded candidates remain visible with reason codes.
 
-## 4. Domain Sections
+## Unresolved and not evaluable
 
-- 产品-设计-代码覆盖矩阵
-- 页面路由审查
-- KMP + Clean Architecture 审查
-- App 工程质量审查
-- 组件化 / 模块化 / 复用审查
-- 移动端交互审查
-- 埋点审查
-- 国际化审查
-- 行业专项审查
+List unresolved obligations, missing evidence and the minimum verification hint from U3. These hints are not executable tasks.
 
-## 5. Evidence Gate
+## Verification status
 
-列出 rejected issue 和原因。Rule Pack-only issue 必须降级或拒绝。
+Before U5:
 
-## 6. Regression Suggestions
+```text
+verification_compiler_status: not_run
+verification_task_refs: []
+```
 
-输出候选回归建议，不直接新增测试。
+Regression suggestions remain advisory and must not be described as compiled verification work.
 
-## 7. Writeback Preview
+## Empty-result wording
 
-只允许 preview 路径：
+- Completed isolated adjudication + critical obligations processed + current final freshness + no findings: `no_findings_after_completed_adjudication`.
+- Semantic stage absent: `semantic_not_run`.
+- Degraded, stale, incomplete or isolation-unverified: `coverage_limited`.
 
-- `.spec-first/app-audit/runs/<run-id>/writeback-preview/repo-profile.patch.yaml`
-- `.spec-first/app-audit/runs/<run-id>/writeback-preview/suggested-standards.md`
+## Privacy and retention
 
-禁止自动修改 durable repo-profile 或 standards。
+Use short redacted summaries and repo-relative locators. Never persist credentials, token-bearing URLs, absolute local paths or long raw excerpts. State that host transcripts are outside run-directory cleanup authority.

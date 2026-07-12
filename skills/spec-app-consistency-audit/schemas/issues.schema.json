@@ -27,6 +27,22 @@
     "rejected_issues": {
       "type": "array",
       "items": { "$ref": "issue.schema.json" }
+    },
+    "semantic_adjudication_status": { "enum": ["not_run", "complete", "degraded", "invalid_isolation", "stale"] },
+    "critical_obligations_processed": { "type": "boolean" },
+    "adjudication_receipt": {
+      "type": "object",
+      "required": ["producer_kind", "generation_context_id", "adjudication_context_id", "context_isolation_status", "input_hashes", "excluded_inputs", "limitations"],
+      "properties": {
+        "producer_kind": { "const": "fresh_host_llm_adjudicator" },
+        "generation_context_id": { "type": "string", "minLength": 1 },
+        "adjudication_context_id": { "type": "string", "minLength": 1 },
+        "context_isolation_status": { "enum": ["isolated", "unverified", "invalid"] },
+        "input_hashes": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "excluded_inputs": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": true

@@ -585,6 +585,22 @@ function validateAuditReportArtifact(artifact, errors, options = {}) {
   if (!Array.isArray(artifact.scope_and_degraded_modes)) {
     errors.push(error('scope_and_degraded_modes', 'scope_degraded_modes_required', 'audit report must expose scope_and_degraded_modes.'));
   }
+  if (!['not_run', 'complete', 'degraded', 'invalid_isolation', 'stale'].includes(artifact.semantic_adjudication_status)) {
+    errors.push(error('semantic_adjudication_status', 'semantic_adjudication_status_invalid', 'audit report must expose a valid semantic adjudication status.'));
+  }
+  if (artifact.verification_compiler_status !== 'not_run') {
+    errors.push(error('verification_compiler_status', 'verification_compiler_status_invalid', 'U4 report must keep verification compiler status not_run.'));
+  }
+  for (const field of ['changed_journeys', 'unresolved_obligations', 'coverage_caps', 'report_limitations', 'verification_task_refs']) {
+    if (!Array.isArray(artifact[field])) errors.push(error(field, 'array_required', `${field} must be an array.`));
+  }
+  if (Array.isArray(artifact.verification_task_refs) && artifact.verification_task_refs.length > 0) {
+    errors.push(error('verification_task_refs', 'verification_task_refs_forbidden_before_u5', 'U4 report cannot contain verification task refs.'));
+  }
+  if (artifact.result_interpretation === 'no_findings_after_completed_adjudication'
+    && (artifact.semantic_adjudication_status !== 'complete' || artifact.issues.length > 0)) {
+    errors.push(error('result_interpretation', 'zero_findings_claim_invalid', 'No-findings interpretation requires completed adjudication and an empty issue set.'));
+  }
 }
 
 function validateIssuesArtifact(artifact, errors, options = {}) {
@@ -595,6 +611,10 @@ function validateIssuesArtifact(artifact, errors, options = {}) {
     errors.push(error('artifact_id', 'invalid_issues_artifact_id', 'issues artifact_id must be issues.'));
   }
   validateIssueSynthesisStatus(artifact, 'issues', errors);
+  if (artifact.semantic_adjudication_status !== undefined
+    && !['not_run', 'complete', 'degraded', 'invalid_isolation', 'stale'].includes(artifact.semantic_adjudication_status)) {
+    errors.push(error('semantic_adjudication_status', 'semantic_adjudication_status_invalid', 'issues artifact semantic adjudication status is invalid.'));
+  }
   if (!Array.isArray(artifact.issues)) {
     errors.push(error('issues', 'issues_array_required', 'issues artifact must include issues array.'));
   } else {
@@ -666,6 +686,16 @@ function validateAuditIssue(issue, index, errors, options = {}) {
   }
   if (options.strictIssues) {
     validateStrictIssueFields(issue, prefix, errors, options);
+  }
+  if (issue.contract_status === 'confirmed') {
+    for (const field of ['model_refs', 'obligation_refs', 'counterexample_refs']) {
+      if (!Array.isArray(issue[field]) || issue[field].length === 0) {
+        errors.push(error(`${prefix}.${field}`, 'semantic_refs_required', `confirmed issue requires non-empty ${field}.`));
+      }
+    }
+    if (!issue.semantic_adjudication || issue.semantic_adjudication.status !== 'accepted') {
+      errors.push(error(`${prefix}.semantic_adjudication`, 'semantic_adjudication_required', 'confirmed issue requires accepted fresh adjudication.'));
+    }
   }
 }
 

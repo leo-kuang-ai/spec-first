@@ -73,6 +73,25 @@
     "related_rule_packs": { "type": "array" },
     "runtime_verification": { "type": "object" },
     "review_lifecycle": { "type": "array", "minItems": 1 }
+    ,"model_refs": { "type": "array", "items": { "type": "string" } }
+    ,"obligation_refs": { "type": "array", "items": { "type": "string" } }
+    ,"counterexample_refs": { "type": "array", "items": { "type": "string" } }
+    ,"conclusion_cap": { "enum": ["confirmed", "candidate", "not_evaluable", "out_of_scope"] }
+    ,"semantic_adjudication": {
+      "type": "object",
+      "required": ["status", "producer_kind", "assessment_authority", "challenge_summary", "challenged_fields", "reason_codes", "missing_evidence", "limitations"],
+      "properties": {
+        "status": { "enum": ["accepted", "downgraded", "rejected", "unresolved"] },
+        "producer_kind": { "const": "fresh_host_llm_adjudicator" },
+        "assessment_authority": { "const": "llm_advisory" },
+        "challenge_summary": { "type": "string", "maxLength": 500 },
+        "challenged_fields": { "type": "array", "items": { "enum": ["claim", "severity", "impact", "recommendation"] } },
+        "reason_codes": { "type": "array", "items": { "type": "string" } },
+        "missing_evidence": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
   },
   "allOf": [
     {
