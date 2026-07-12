@@ -30,10 +30,9 @@
 - 恶意journal不能把staged/backup指向`src/`等任意仓库目录；恢复后会重新规划，避免对已恢复current graph继续执行陈旧first-generation action。
 - verify-only会把缺host integration、supported corpus零节点图降级；Windows uv `.exe`与含空格launcher fixture确认tool-environment identity和安全command quoting。
 
-## 剩余发布验证
+## 当前迁移边界
 
-1. 完成五宿主projection/doctor与Qoder adapter release matrix。
-2. 完成显式rollback machine/runtime round trip自动化。
+Python `graphifyy` 是唯一受支持的Graphify runtime。失败恢复通过重装pinned Python wheel、恢复contained `.graphify.backup-*`并重新验证Python readiness完成。
 
 ## 限制
 

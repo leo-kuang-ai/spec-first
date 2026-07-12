@@ -123,6 +123,22 @@ describe('spec-mcp-setup action policy', () => {
     });
   });
 
+  test('allows an explicit graphify refresh to be previewed without mutation', () => {
+    const { buildActionPlan } = require(modePolicyModule);
+
+    expect(buildActionPlan({
+      argv: ['--plan', '--only', 'graphify', '--refresh'],
+      knownIds: ['codegraph', 'graphify'],
+    })).toMatchObject({
+      blocked: false,
+      mode: 'plan',
+      mutation: false,
+      capabilities: [],
+      selected_ids: ['graphify'],
+      args: { refresh: true },
+    });
+  });
+
   test('selects required providers by default for plan and verify while keeping bare Node mode diagnostic', () => {
     const { buildActionPlan } = require(modePolicyModule);
     const input = { knownIds: ['codegraph', 'graphify'], defaultIds: ['codegraph', 'graphify'] };
@@ -165,7 +181,6 @@ describe('spec-mcp-setup action policy', () => {
     [['--check', '--plan'], 'mode-conflict'],
     [['--refresh'], 'refresh-without-only-graphify'],
     [['--only', 'codegraph', '--refresh'], 'refresh-without-only-graphify'],
-    [['--plan', '--only', 'graphify', '--refresh'], 'refresh-without-only-graphify'],
     [['--check', '--refresh'], 'refresh-without-only-graphify'],
     [['--verify-only', '--refresh'], 'refresh-without-only-graphify'],
     [['--refresh-facts', '--refresh'], 'refresh-without-only-graphify'],

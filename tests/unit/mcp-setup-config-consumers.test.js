@@ -123,9 +123,24 @@ describe('spec-mcp-setup active Node consumers', () => {
 
   test('routes Graphify project-skill installation through the trusted provider map', () => {
     expect(Object.keys(providers).sort()).toEqual(['codegraph', 'graphify']);
+    const dependency = {
+      ecosystem: 'pypi',
+      package: 'graphifyy',
+      version: '0.9.12',
+      distribution: {
+        wheel_url: 'https://files.pythonhosted.org/packages/76/0c/5c52d9e5b535d22c529417e219e23ad2c04532d4d9ca239abc21518f111a/graphifyy-0.9.12-py3-none-any.whl',
+        sha256: '94f9d0d7ef68455a2055c7623fb9574c7a781afb1473d26c7936d1abfc14d62c',
+        index_url: 'https://pypi.org/simple',
+      },
+    };
+    const runner = (command) => command === 'python3'
+      ? { exit_code: 0, status: 0, stdout: '3.12.4', stderr: '', signal: null, error: null, timed_out: false }
+      : (command === 'uv'
+        ? { exit_code: 0, status: 0, stdout: 'uv 0.8.0', stderr: '', signal: null, error: null, timed_out: false }
+        : { exit_code: 1, status: 1, stdout: '', stderr: 'missing', signal: null, error: null, timed_out: false });
     for (const host of getSupportedPlatforms()) {
       const repoRoot = tempRepo(host);
-      const plan = providers.graphify.plan({ selected: true, repoRoot, host });
+      const plan = providers.graphify.plan({ selected: true, repoRoot, host, dependency, runner });
       if (host === 'qoder') {
         expect(plan.actions).toContainEqual(expect.objectContaining({ kind: 'install-qoder-adapter', command: null }));
         expect(plan.actions.some((entry) => entry.kind === 'install-project-skill')).toBe(false);

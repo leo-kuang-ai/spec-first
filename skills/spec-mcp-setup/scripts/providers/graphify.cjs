@@ -24,8 +24,6 @@ const {
 const ARTIFACTS = ['.graphify/graph.json', '.graphify/GRAPH_REPORT.md'];
 const LEGACY_ARTIFACTS = ['graphify-out/graph.json', 'graphify-out/GRAPH_REPORT.md'];
 const GRAPHIFY_HOOK_NAMES = ['post-commit', 'post-checkout'];
-const HOOK_PATH_BLOCK_START = '# spec-first graphify path repair start';
-const HOOK_PATH_BLOCK_END = '# spec-first graphify path repair end';
 const HOOK_ARTIFACT_BLOCK_START = '# spec-first graphify artifact env start';
 const HOOK_ARTIFACT_BLOCK_END = '# spec-first graphify artifact env end';
 const HOOK_CREDENTIAL_BLOCK_START = '# spec-first graphify credential isolation start';
@@ -77,6 +75,9 @@ function plan(context = {}) {
       non_actions: ['Bare/check/plan/verify 路径不会安装、生成、刷新或 hook Graphify。'],
     };
   }
+  if (!context.dependency || context.dependency.ecosystem !== 'pypi') {
+    return blockedPlan(repoRoot, 'graphify-python-provider-required');
+  }
   const resolved = resolveProviderPaths(context, repoRoot);
   if (!resolved.ok) return blockedPlan(repoRoot, resolved.reason_code);
   const workspace = resolved.workspace;
@@ -98,18 +99,10 @@ function plan(context = {}) {
   const resolvedDependency = context.probeDependency === true
     ? resolveGraphifyCommand(context, repoRoot, context.dependency && context.dependency.version)
     : { ok: false, reason_code: 'provider-dependency-not-probed' };
-  if (!resolvedDependency.ok && context.dependency && context.dependency.package && context.dependency.version) {
-    if (context.dependency.ecosystem === 'pypi') {
-      const installAction = buildPythonInstallAction(context, repoRoot, context.dependency);
-      if (!installAction.ok) return blockedPlan(repoRoot, installAction.reason_code);
-      actions.push(installAction.action);
-    } else {
-      actions.push({
-        kind: 'install-dependency',
-        command: 'npm',
-        args: ['install', '-g', `${context.dependency.package}@${context.dependency.version}`, '--no-audit', '--no-fund', '--loglevel=error'],
-      });
-    }
+  if (!resolvedDependency.ok && context.dependency.package && context.dependency.version) {
+    const installAction = buildPythonInstallAction(context, repoRoot, context.dependency);
+    if (!installAction.ok) return blockedPlan(repoRoot, installAction.reason_code);
+    actions.push(installAction.action);
   }
   if (!isSpecFirstSourceRepo(repoRoot) && context.host !== 'qoder') {
     actions.push({ kind: 'install-project-skill', command: 'graphify', args: ['install', '--project', '--platform', context.host || 'codex'] });
@@ -117,7 +110,7 @@ function plan(context = {}) {
     actions.push({ kind: 'install-qoder-adapter', command: null, args: [] });
   }
   const hasCurrent = currentArtifactRefs(repoRoot, resolved.artifact_root).length > 0;
-  const pythonProvider = context.dependency && context.dependency.ecosystem === 'pypi';
+  const pythonProvider = true;
   if (context.refresh && hasCurrent) {
     actions.push({
       kind: 'refresh',
@@ -196,6 +189,9 @@ function blockedPlan(repoRoot, reasonCode) {
 
 function verify(context = {}) {
   const repoRoot = path.resolve(context.repoRoot || process.cwd());
+  if (!context.dependency || context.dependency.ecosystem !== 'pypi') {
+    return unsafeReadiness(context, repoRoot, 'graphify-python-provider-required');
+  }
   const resolved = resolveProviderPaths({ ...context, requirementWorkspace: '' }, repoRoot);
   if (!resolved.ok) return unsafeReadiness(context, repoRoot, resolved.reason_code);
   try {
@@ -291,8 +287,8 @@ function apply(context = {}, actionPlan = plan(context)) {
   }
   let fallbackUsed = false;
   let mutationFailure = null;
-  const pythonProvider = Boolean(context.dependency && context.dependency.ecosystem === 'pypi');
-  let pathRepair = { status: 'not-evaluated', reason_code: null };
+  const pythonProvider = true;
+  const pathRepair = { status: 'report-only', reason_code: null };
   let runtimeContext = actionPlan.resolved_graphify_command
     ? {
       ...context,
@@ -310,9 +306,6 @@ function apply(context = {}, actionPlan = plan(context)) {
     : context;
 
   function adoptResolvedCommand(resolved) {
-    pathRepair = pythonProvider
-      ? { status: 'report-only', reason_code: resolved.collision_state === 'none' ? null : 'graphify-cli-shadowed-by-npm-incumbent' }
-      : repairGraphifyPathSymlinkIfSafe(context, resolved, actionPlan.dependency_version);
     runtimeContext = {
       ...context,
       graphifyCommand: resolved.command,
@@ -453,18 +446,26 @@ function apply(context = {}, actionPlan = plan(context)) {
     let hook = null;
     try {
       assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, '.graphify'), context.dependency && context.dependency.ecosystem);
-      if (!pythonProvider) repairGraphifyHookPathVisibility(repoRoot, runtimeContext);
       hook = runGraphify(runtimeContext, ['hook', 'status'], { cwd: repoRoot, timeoutMs: 30000 });
       const pythonHooksMissing = pythonProvider
         ? !pythonHookMarkersPresent(repoRoot)
         : false;
-      if ((!succeeded(hook) || pythonHooksMissing) && gitState.hook_mutation_allowed) {
+      const pythonHookProbe = pythonProvider && !pythonHooksMissing
+        ? verifyPythonGraphifyHooks(repoRoot, runtimeContext)
+        : { ok: false, reason_code: 'graphify-provider-hook-not-found' };
+      const pythonHooksNeedReinstall = pythonProvider
+        && pythonHookProbe.reason_code === 'graphify-hook-interpreter-stale';
+      if (pythonHooksNeedReinstall && gitState.hook_mutation_allowed) {
+        const uninstallHook = runGraphify(runtimeContext, ['hook', 'uninstall'], { cwd: repoRoot, timeoutMs: 60000 });
+        if (!succeeded(uninstallHook)) throw reasonError('graphify-hook-uninstall-failed', text(uninstallHook));
         const installHook = runGraphify(runtimeContext, ['hook', 'install'], { cwd: repoRoot, timeoutMs: 60000 });
         hookInstalled = succeeded(installHook);
-        if (hookInstalled) {
-          assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, '.graphify'), context.dependency && context.dependency.ecosystem);
-          if (!pythonProvider) repairGraphifyHookPathVisibility(repoRoot, runtimeContext);
-        }
+        if (!hookInstalled) throw reasonError('graphify-hook-install-failed', text(installHook));
+      } else if ((!succeeded(hook) || pythonHooksMissing) && gitState.hook_mutation_allowed) {
+        const installHook = runGraphify(runtimeContext, ['hook', 'install'], { cwd: repoRoot, timeoutMs: 60000 });
+        hookInstalled = succeeded(installHook);
+        if (!hookInstalled) throw reasonError('graphify-hook-install-failed', text(installHook));
+        assertGraphifyMutationSurfaces(repoRoot, context.host, actionPlan.artifact_root || path.join(repoRoot, '.graphify'), context.dependency && context.dependency.ecosystem);
       } else if (!succeeded(hook)) {
         hookSkippedReason = gitState.hook_skipped_reason;
       }
@@ -489,7 +490,8 @@ function apply(context = {}, actionPlan = plan(context)) {
     : projectSkillConfigured(repoRoot, context.host));
   if (!mutationFailure && !configured) mutationFailure = 'graphify-project-skill-post-probe-failed';
   let incumbentCleanup = { status: 'not-needed', reason_code: null };
-  if (!mutationFailure && pythonProvider && runtimeContext.graphifyCollisionState === 'npm-incumbent') {
+  if (!mutationFailure && pythonProvider && (!gitState.is_git_repo || hookVerified)
+    && runtimeContext.graphifyCollisionState === 'npm-incumbent') {
     incumbentCleanup = cleanupNpmGraphifyIncumbent(runtimeContext, repoRoot);
     if (!incumbentCleanup.ok) mutationFailure = incumbentCleanup.reason_code;
     else runtimeContext = { ...runtimeContext, graphifyCollisionState: 'none', graphifyOriginalPathCommand: null };
@@ -566,91 +568,8 @@ function runGraphify(context, args, options) {
   });
 }
 
-function resolveGraphifyCommand(context, repoRoot, versionPin) {
-  if (context.dependency && context.dependency.ecosystem === 'pypi') {
-    return resolvePythonGraphifyCommand(context, repoRoot, context.dependency);
-  }
-  const homeDir = path.resolve(context.homeDir || os.homedir());
-  const windows = context.platform === 'windows' || process.platform === 'win32';
-  const names = windows
-    ? ['graphify.cmd', 'graphify.exe', 'graphify']
-    : ['graphify'];
-  const originalPath = providerOriginalPath(context);
-  const originalPathCommand = originalPath
-    ? commandFromSearchPath('graphify', originalPath, windows, context.env)
-    : null;
-  const pathCandidate = originalPathCommand || 'graphify';
-  const pathProbe = run(context, pathCandidate, ['--version'], {
-    cwd: repoRoot,
-    timeoutMs: 10000,
-    env: originalPath ? { PATH: originalPath } : undefined,
-  });
-  let sawVersionMismatch = false;
-  let observedOriginalPathCommand = originalPathCommand;
-  if (succeeded(pathProbe)) {
-    observedOriginalPathCommand = observedOriginalPathCommand || pathCandidate;
-    if (versionOutputMatches(text(pathProbe), versionPin)) {
-      return {
-        ok: true,
-        command: pathCandidate,
-        version_result: pathProbe,
-        on_original_path: true,
-        original_path_command: observedOriginalPathCommand,
-      };
-    }
-    sawVersionMismatch = true;
-  }
-
-  const candidates = [];
-  for (const name of names) {
-    const candidate = path.join(homeDir, '.local', 'bin', name);
-    if (fs.existsSync(candidate)) candidates.push(candidate);
-  }
-
-  for (const candidate of candidates) {
-    if (candidate === pathCandidate) continue;
-    const result = run(context, candidate, ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
-    if (!succeeded(result)) continue;
-    if (versionOutputMatches(text(result), versionPin)) {
-      return {
-        ok: true,
-        command: candidate,
-        version_result: result,
-        on_original_path: false,
-        original_path_command: observedOriginalPathCommand,
-      };
-    }
-    sawVersionMismatch = true;
-  }
-
-  const prefixResult = run(context, 'npm', ['prefix', '-g'], { cwd: repoRoot, timeoutMs: 10000 });
-  if (succeeded(prefixResult)) {
-    const prefix = String(prefixResult.stdout || '').split(/\r?\n/).map((line) => line.trim()).find(Boolean);
-    if (prefix && (path.isAbsolute(prefix) || path.win32.isAbsolute(prefix))) {
-      for (const name of names) {
-        const candidate = process.platform === 'win32'
-          ? path.join(prefix, name)
-          : path.join(prefix, 'bin', name);
-        if (!fs.existsSync(candidate)) continue;
-        const result = run(context, candidate, ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
-        if (!succeeded(result)) continue;
-        if (versionOutputMatches(text(result), versionPin)) {
-          return {
-            ok: true,
-            command: candidate,
-            version_result: result,
-            on_original_path: false,
-            original_path_command: observedOriginalPathCommand,
-          };
-        }
-        sawVersionMismatch = true;
-      }
-    }
-  }
-  return {
-    ok: false,
-    reason_code: sawVersionMismatch ? 'graphify-version-pin-mismatch' : 'graphify-cli-not-found',
-  };
+function resolveGraphifyCommand(context, repoRoot) {
+  return resolvePythonGraphifyCommand(context, repoRoot, context.dependency);
 }
 
 function resolvePythonGraphifyCommand(context, repoRoot, dependency) {
@@ -1229,95 +1148,6 @@ function isExecutableCommandFile(candidate, windows) {
   }
 }
 
-function repairGraphifyPathSymlinkIfSafe(context, resolved, versionPin) {
-  if (!resolved || !resolved.ok || resolved.on_original_path) {
-    return { status: 'not-needed', reason_code: null };
-  }
-  if (repairDisabled(context)) {
-    return { status: 'report-only', reason_code: 'graphify-path-symlink-repair-disabled' };
-  }
-
-  const pathCommand = resolved.original_path_command;
-  const pinnedCommand = resolved.command;
-  if (!pathCommand || !path.isAbsolute(pathCommand) || !path.isAbsolute(pinnedCommand)) {
-    return { status: 'report-only', reason_code: 'graphify-path-command-ambiguous' };
-  }
-  if (path.resolve(pathCommand) === path.resolve(pinnedCommand)) {
-    return { status: 'not-needed', reason_code: null };
-  }
-
-  const pathItem = lstatOrNull(pathCommand);
-  if (!pathItem || !pathItem.isSymbolicLink()) {
-    return { status: 'report-only', reason_code: 'graphify-path-command-not-symlink' };
-  }
-  const windows = context.platform === 'windows' || process.platform === 'win32';
-  if (!isExecutableCommandFile(pinnedCommand, windows)) {
-    return { status: 'report-only', reason_code: 'graphify-pinned-command-not-executable' };
-  }
-  const pinnedProbe = run(context, pinnedCommand, ['--version'], { timeoutMs: 10000 });
-  if (!succeeded(pinnedProbe) || !versionOutputMatches(text(pinnedProbe), versionPin)) {
-    return { status: 'report-only', reason_code: 'graphify-pinned-command-not-confirmed' };
-  }
-
-  const parent = path.dirname(pathCommand);
-  try {
-    if (!fs.statSync(parent).isDirectory()) {
-      return { status: 'report-only', reason_code: 'graphify-path-parent-not-directory' };
-    }
-    fs.accessSync(parent, fs.constants.W_OK);
-  } catch (_error) {
-    return { status: 'report-only', reason_code: 'graphify-path-parent-not-writable' };
-  }
-
-  const parentRealPath = fs.realpathSync.native(parent);
-  const backupPath = nextGraphifyBackupPath(pathCommand);
-  try {
-    const currentItem = lstatOrNull(pathCommand);
-    if (!currentItem
-      || !currentItem.isSymbolicLink()
-      || currentItem.dev !== pathItem.dev
-      || currentItem.ino !== pathItem.ino
-      || fs.realpathSync.native(parent) !== parentRealPath
-      || lstatOrNull(backupPath)) {
-      return { status: 'report-only', reason_code: 'graphify-path-command-changed-before-repair' };
-    }
-    fs.renameSync(pathCommand, backupPath);
-    try {
-      if (windows) fs.symlinkSync(pinnedCommand, pathCommand, 'file');
-      else fs.symlinkSync(pinnedCommand, pathCommand);
-    } catch (error) {
-      if (!lstatOrNull(pathCommand) && lstatOrNull(backupPath)) {
-        fs.renameSync(backupPath, pathCommand);
-      }
-      throw error;
-    }
-    return {
-      status: 'repaired',
-      reason_code: 'graphify-path-symlink-repaired',
-      path_command: pathCommand,
-      pinned_command: pinnedCommand,
-      backup_path: backupPath,
-    };
-  } catch (_error) {
-    return { status: 'report-only', reason_code: 'graphify-path-symlink-repair-skipped' };
-  }
-}
-
-function repairDisabled(context) {
-  const env = context.env && typeof context.env === 'object' ? context.env : {};
-  return ['false', 'no', '0'].includes(String(env.SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK || '').toLowerCase());
-}
-
-function nextGraphifyBackupPath(pathCommand) {
-  let candidate = `${pathCommand}.old`;
-  let index = 1;
-  while (lstatOrNull(candidate)) {
-    candidate = `${pathCommand}.old.${index}`;
-    index += 1;
-  }
-  return candidate;
-}
-
 function graphifyPathVisibilityAction(runtimeContext, pathRepair) {
   if (!runtimeContext.graphifyCommand || runtimeContext.graphifyOnOriginalPath === true) return null;
   if (pathRepair && pathRepair.status === 'repaired') return null;
@@ -1877,79 +1707,6 @@ function renderHookWithManagedBlock(current, startMarker, endMarker, block, inse
   const lineEnd = current.indexOf('\n', markerEnd);
   const insertAt = lineEnd === -1 ? current.length : lineEnd + 1;
   return `${current.slice(0, insertAt)}${block}${current.slice(insertAt)}`;
-}
-
-function repairGraphifyHookPathVisibility(repoRoot, runtimeContext) {
-  if (runtimeContext.graphifyOnOriginalPath !== false) {
-    return { changed: false, reason_code: 'graphify-cli-visible-on-original-path' };
-  }
-  const graphifyCommand = runtimeContext.graphifyCommand;
-  if (!graphifyCommand || !path.isAbsolute(graphifyCommand)) {
-    return { changed: false, reason_code: 'graphify-hook-path-command-ambiguous' };
-  }
-  const graphifyBinDirectory = path.dirname(graphifyCommand);
-  try {
-    if (!fs.statSync(graphifyBinDirectory).isDirectory()) {
-      return { changed: false, reason_code: 'graphify-hook-path-directory-missing' };
-    }
-  } catch (_error) {
-    return { changed: false, reason_code: 'graphify-hook-path-directory-missing' };
-  }
-
-  const hooksRoot = path.join(repoRoot, '.git', 'hooks');
-  const hooksItem = lstatOrNull(hooksRoot);
-  if (!hooksItem) return { changed: false, reason_code: 'graphify-hooks-directory-missing' };
-  if (hooksItem.isSymbolicLink() || !hooksItem.isDirectory()) {
-    throw graphifySafetyError('graphify-hook-symlink-escape', `不安全的 Graphify hooks root：${hooksRoot}`);
-  }
-  assertContainedPath(repoRoot, hooksRoot, { reasonCode: 'graphify-hook-symlink-escape' });
-
-  const escapedDirectory = graphifyBinDirectory.replaceAll("'", "'\\''");
-  const repairBlock = [
-    HOOK_PATH_BLOCK_START,
-    `export PATH='${escapedDirectory}':"$PATH"`,
-    HOOK_PATH_BLOCK_END,
-    '',
-  ].join('\n');
-  let changed = false;
-  let providerHookFound = false;
-  for (const hookName of GRAPHIFY_HOOK_NAMES) {
-    const hookPath = path.join(hooksRoot, hookName);
-    const hookItem = assertGraphifyHookLeaf(repoRoot, hookPath);
-    if (!hookItem) continue;
-    if (!hookItem.isFile()) {
-      throw graphifySafetyError('graphify-hook-leaf-unsafe', `Graphify hook 不是普通文件：${hookPath}`);
-    }
-    const current = fs.readFileSync(hookPath, 'utf8');
-    if (!current.includes(GRAPHIFY_HOOK_MARKER)) continue;
-    providerHookFound = true;
-    const next = renderHookWithManagedPathBlock(current, repairBlock);
-    if (next === current) continue;
-    writeContainedText(repoRoot, hookPath, next, 'graphify-hook-symlink-escape');
-    assertGraphifyHookLeaf(repoRoot, hookPath);
-    changed = true;
-  }
-  return {
-    changed,
-    reason_code: changed
-      ? 'graphify-hook-path-repaired'
-      : (providerHookFound ? 'graphify-hook-path-current' : 'graphify-provider-hook-not-found'),
-  };
-}
-
-function renderHookWithManagedPathBlock(current, repairBlock) {
-  const startCount = current.split(HOOK_PATH_BLOCK_START).length - 1;
-  const endCount = current.split(HOOK_PATH_BLOCK_END).length - 1;
-  if (startCount !== endCount || startCount > 1) {
-    throw graphifySafetyError('graphify-hook-path-block-ambiguous', 'Graphify hook PATH managed block 存在歧义。');
-  }
-  if (startCount === 1) {
-    const pattern = new RegExp(`${escapeRegExp(HOOK_PATH_BLOCK_START)}[\\s\\S]*?${escapeRegExp(HOOK_PATH_BLOCK_END)}(?:\\r?\\n)?`);
-    return current.replace(pattern, repairBlock);
-  }
-  const shebang = /^#![^\r\n]*(?:\r?\n|$)/.exec(current);
-  const insertAt = shebang ? shebang[0].length : 0;
-  return `${current.slice(0, insertAt)}${repairBlock}${current.slice(insertAt)}`;
 }
 
 function assertGraphifyHookLeaf(repoRoot, hookPath) {

@@ -82,14 +82,13 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
     || args.check
     || args.verifyOnly
     || args.refreshFacts
-    || args.plan
     || args.projectConfig
   )) {
     return blockedPlan('refresh-without-only-graphify', args);
   }
 
   let mode = selectedModes[0] || 'bare';
-  if (args.refresh) mode = 'graphify-refresh';
+  if (args.refresh && !args.plan) mode = 'graphify-refresh';
   const actions = ACTIONS_BY_MODE[mode].map((entry) => ({ ...entry }));
   const capabilities = actions
     .filter((entry) => entry.mutation)

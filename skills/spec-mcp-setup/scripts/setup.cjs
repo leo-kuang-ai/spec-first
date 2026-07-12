@@ -265,7 +265,7 @@ function runPlan(context, repoRoot) {
     if (!module) continue;
     providerPlans.push(module.plan(providerContext(context, repoRoot, id, {
       selected: true,
-      refresh: false,
+      refresh: context.actionPlan.args.refresh === true,
     })));
   }
   const providerBlock = providerPlans.find((entry) => entry.blocked);

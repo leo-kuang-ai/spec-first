@@ -267,6 +267,34 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     }
   });
 
+  test('previews an explicit Graphify refresh without mutating the project', () => {
+    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const target = tempRepo('readonly-graphify-refresh-plan');
+    fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), '{"nodes":[{"id":"main"}],"edges":[]}\n');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const before = snapshot(target);
+    const homeBefore = snapshot(homeDir);
+    const audit = createReadOnlyAuditRunner();
+
+    const result = runSetup({
+      argv: ['--plan', '--only', 'graphify', '--refresh'],
+      cwd: target,
+      skillRoot,
+      runner: audit.runner,
+      env: {},
+      homeDir,
+    });
+
+    expect(audit.violations).toEqual([]);
+    expect(result).toMatchObject({ exit_code: 0, mode: 'plan' });
+    expect(result.payload.planned_operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'refresh', provider: 'graphify', clean_rebuild: true }),
+    ]));
+    expect(snapshot(target)).toEqual(before);
+    expect(snapshot(homeDir)).toEqual(homeBefore);
+  });
+
   test('blocks plan before installation on host config conflict and previews explicit repair', () => {
     const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
     const target = tempRepo('plan-host-conflict');
