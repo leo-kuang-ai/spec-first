@@ -1,9 +1,9 @@
 {
   "schema_version": "spec-first.workflow-eval-fixtures.v1",
-  "skill": "spec-mcp-setup",
-  "description": "Examples-as-context for spec-mcp-setup trigger and boundary coverage. They are not a deterministic router or runtime-readiness gate.",
+  "skill": "spec-runtime-setup",
+  "description": "Examples-as-context for spec-runtime-setup trigger and boundary coverage. They are not a deterministic router or runtime-readiness gate.",
   "source_refs": [
-    "skills/spec-mcp-setup/SKILL.md"
+    "skills/spec-runtime-setup/SKILL.md"
   ],
   "source_ref_authority": "source",
   "cases": [
@@ -23,7 +23,7 @@
       "id": "ordinary-code-edit-boundary",
       "input": "Fix a typo in a skill SKILL.md paragraph.",
       "coverage_tags": ["boundary", "scope-routing"],
-      "expected_outcome": "A clearly scoped low-risk source edit is not a setup task; do not route to mcp-setup or run state-changing setup commands.",
+      "expected_outcome": "A clearly scoped low-risk source edit is not a setup task; do not route to runtime-setup or run state-changing setup commands.",
       "boundary_note": "Setup owns runtime/provider readiness, not ordinary source edits.",
       "forbidden_signals": ["run-setup-for-source-edit", "spec-first-init-for-typo"]
     },

@@ -227,9 +227,9 @@
       }
     },
     {
-      "skill_name": "spec-mcp-setup",
+      "skill_name": "spec-runtime-setup",
       "entry_surface": "workflow_command",
-      "command_name": "mcp-setup",
+      "command_name": "runtime-setup",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {

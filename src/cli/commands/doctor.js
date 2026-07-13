@@ -478,13 +478,13 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
   let runStatus;
   try {
     runStatus = deps.runWorkspaceGraphStatus
-      || require('../../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
+      || require('../../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
   } catch (_error) {
     return {
       level: 'WARNING',
       name: 'workspace graph',
       message: 'workspace-graph status module unavailable',
-      fix: 'Ensure skills/spec-mcp-setup is present in this package install.',
+      fix: 'Ensure skills/spec-runtime-setup is present in this package install.',
       reasonCode: 'workspace-graph-status-unavailable',
     };
   }
@@ -497,7 +497,7 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
       level: 'WARNING',
       name: 'workspace graph',
       message: `workspace-graph status failed: ${error instanceof Error ? error.message : String(error)}`,
-      fix: 'Inspect the requirement workspace root, then retry or run `spec-mcp-setup --only codegraph,graphify --workspace-graph-status`.',
+      fix: 'Inspect the requirement workspace root, then retry or run `spec-runtime-setup --only codegraph,graphify --workspace-graph-status`.',
       reasonCode: 'workspace-graph-status-failed',
     };
   }
@@ -546,7 +546,7 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
       level: 'WARNING',
       name: 'workspace graph',
       message: `child repos need confirmation before build (${(status.pending_confirm || []).join(', ') || 'discovered'}).`,
-      fix: 'Pass `--repos a,b` or add `.spec-first/workspace.yaml`, then run `spec-mcp-setup --only codegraph,graphify --workspace-graph`.',
+      fix: 'Pass `--repos a,b` or add `.spec-first/workspace.yaml`, then run `spec-runtime-setup --only codegraph,graphify --workspace-graph`.',
       reasonCode: 'workspace-graph-needs-confirmation',
       advisory: true,
       workspace_graph: summarizeWorkspaceGraphForDoctor(status),
@@ -558,7 +558,7 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
       level: 'WARNING',
       name: 'workspace graph',
       message: `partial (${childReady}/${childTotal} child CodeGraph; merged=${merged}).${defaultPath}${defaultNote}. Empty/partial results have no negative authority.`,
-      fix: 'Re-run `spec-mcp-setup --only codegraph,graphify --workspace-graph` from this requirement folder; use `--workspace-graph-status` for details.',
+      fix: 'Re-run `spec-runtime-setup --only codegraph,graphify --workspace-graph` from this requirement folder; use `--workspace-graph-status` for details.',
       reasonCode: 'workspace-graph-partial',
       advisory: true,
       workspace_graph: summarizeWorkspaceGraphForDoctor(status),
@@ -570,7 +570,7 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
     level: 'WARNING',
     name: 'workspace graph',
     message: `no managed two-layer graph yet (${status.status}).${defaultPath}${defaultNote}`,
-    fix: 'From this non-Git multi-repo requirement folder run `spec-mcp-setup --only codegraph,graphify --workspace-graph [--repos a,b]`. Clean with `spec-first clean --workspace-graph`.',
+    fix: 'From this non-Git multi-repo requirement folder run `spec-runtime-setup --only codegraph,graphify --workspace-graph [--repos a,b]`. Clean with `spec-first clean --workspace-graph`.',
     reasonCode: 'workspace-graph-absent',
     advisory: true,
     workspace_graph: summarizeWorkspaceGraphForDoctor(status),
@@ -1143,7 +1143,7 @@ function checkCursorProjectMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing project MCP config',
-      fix: 'Run `spec-mcp-setup` when MCP setup is required.',
+      fix: 'Run `spec-runtime-setup` when MCP setup is required.',
     };
   }
 
@@ -1168,7 +1168,7 @@ function checkCursorProjectMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} project MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found project MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run `spec-mcp-setup` to configure required MCP servers.',
+    fix: serverCount > 0 ? undefined : 'Run `spec-runtime-setup` to configure required MCP servers.',
   };
 }
 
@@ -1180,7 +1180,7 @@ function checkQoderLocalMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing local MCP config',
-      fix: 'Run `spec-mcp-setup` when MCP setup is required.',
+      fix: 'Run `spec-runtime-setup` when MCP setup is required.',
     };
   }
 
@@ -1205,7 +1205,7 @@ function checkQoderLocalMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} local MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found local MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run `spec-mcp-setup` to configure required MCP servers.',
+    fix: serverCount > 0 ? undefined : 'Run `spec-runtime-setup` to configure required MCP servers.',
   };
 }
 
@@ -1256,11 +1256,11 @@ function printHelp() {
 	    '🔎 Boundaries:',
 	    '  doctor checks CLI install, managed runtime assets, host readiness, and workflow verification evidence.',
 	    '  When setup facts exist, doctor reads .spec-first/config/tool-facts.json for decision_input_health.',
-    '  MCP/helper setup is handled by the matching `spec-mcp-setup` workflow entrypoint.',
+    '  MCP/helper setup is handled by the matching `spec-runtime-setup` workflow entrypoint.',
 	    '  target name: spec-runtime-setup, pending host alias contract.',
 	    '  On a non-Git multi-repo requirement parent, doctor also reports advisory workspace-graph status',
 	    '  (per-child CodeGraph / workspace Graphify merge / default projectPath). Detail and mutation stay under',
-	    '  `spec-mcp-setup --workspace-graph*` and `spec-first clean --workspace-graph`.',
+	    '  `spec-runtime-setup --workspace-graph*` and `spec-first clean --workspace-graph`.',
 	    '',
 	    '🔗 Repository:',
 	    '  https://github.com/sunrain520/spec-first',

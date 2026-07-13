@@ -58,7 +58,7 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 | doc-review | spec-doc-review | spec-doc-review | no | Run the Spec-First document review workflow |
 | dogfood | spec-dogfood | spec-dogfood | no | Run autonomous diff-scoped browser dogfood QA for a branch or PR |
 | ideate | spec-ideate | spec-ideate | no | Run the Spec-First ideation workflow |
-| mcp-setup | spec-mcp-setup | spec-mcp-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
+| runtime-setup | spec-runtime-setup | spec-runtime-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
 | optimize | spec-optimize | spec-optimize | no | Run metric-driven iterative optimization loops |
 | plan | spec-plan | spec-plan | no | Run the Spec-First planning workflow |
 | polish | spec-polish | spec-polish | no | Start the dev server and iterate on browser-visible polish |
@@ -161,7 +161,7 @@ Runtime delivery describes what commands, skills, and agents were generated. It 
 | Layer | Entry | Canonical artifacts | Means | Does not mean |
 |---|---|---|---|---|
 | CLI/runtime health | `spec-first doctor` | doctor text/JSON report | Node/Git/package checks, generated host runtime assets, workflow surface, and stale verification evidence were inspected. | MCP/helper setup is complete or any external tool evidence is available. |
-| Harness setup | `spec-mcp-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |
+| Harness setup | `spec-runtime-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |
 
 ## Maintenance Contract
 
@@ -169,4 +169,4 @@ Runtime delivery describes what commands, skills, and agents were generated. It 
 - 不在本 catalog 中手写能力数量；能力数量必须由 generator 从 source/governance 推导。
 - Workflow runtime contracts 必须由 `docs/contracts/workflows/*.schema.json` 的 `x-spec-first-*` metadata 派生；不能在 catalog 手写 planned/producer/integrated 状态。
 - 新增、删除或改变 host delivery 时，同步更新 governance/source，运行 `npm run docs:runtime-catalog`，再运行 targeted governance tests。
-- 该 catalog 只描述 delivery surface，不判断某个 MCP/helper 当前是否 ready；setup readiness 由 `spec-mcp-setup` 产物表达。
+- 该 catalog 只描述 delivery surface，不判断某个 MCP/helper 当前是否 ready；setup readiness 由 `spec-runtime-setup` 产物表达。

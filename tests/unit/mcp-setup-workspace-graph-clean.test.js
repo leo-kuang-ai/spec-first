@@ -5,9 +5,9 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const { runWorkspaceGraphClean } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-clean.cjs');
-const { runWorkspaceGraphBuild } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-executor.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-provider-runners.cjs');
+const { runWorkspaceGraphClean } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs');
+const { runWorkspaceGraphBuild } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
+const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-clean-')));
@@ -81,7 +81,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const ws = mkWorkspace();
     const repo = initRepo(ws, 'api');
     // user rule in the same repo's info/exclude
-    const { resolveExcludePath } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-git-exclude.cjs');
+    const { resolveExcludePath } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
     const excludePath = resolveExcludePath(repo).absolute;
     fs.writeFileSync(excludePath, '# user\n*.tmp\n');
 
@@ -178,7 +178,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    const { resolveExcludePath, MANAGED_BLOCK_START } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-git-exclude.cjs');
+    const { resolveExcludePath, MANAGED_BLOCK_START } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
     const excludePath = resolveExcludePath(api).absolute;
     fs.writeFileSync(excludePath, `${MANAGED_BLOCK_START}\n.codegraph/\n`);
     const first = runWorkspaceGraphClean({ cwd: ws, repos: ['api'], allowDiscovery: false });

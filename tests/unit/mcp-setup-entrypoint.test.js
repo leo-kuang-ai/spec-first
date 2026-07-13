@@ -6,7 +6,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const skillRoot = path.join(repoRoot, 'skills', 'spec-mcp-setup');
+const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
 
 function tempRepo(label) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-entry-${label}-`));
@@ -215,13 +215,13 @@ function visibleHostRunner(visibleHost) {
   };
 }
 
-describe('spec-mcp-setup unified Node entrypoint', () => {
+describe('spec-runtime-setup unified Node entrypoint', () => {
   test.each([
     [[], 'bare'],
     [['--check'], 'check'],
     [['--plan', '--only', 'graphify'], 'plan'],
   ])('%j is read-only', (argv, expectedMode) => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo(`readonly-${expectedMode}`);
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const before = snapshot(target);
@@ -268,7 +268,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('previews an explicit Graphify refresh without mutating the project', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('readonly-graphify-refresh-plan');
     fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
     fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), '{"nodes":[{"id":"main"}],"edges":[]}\n');
@@ -296,7 +296,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('blocks plan before installation on host config conflict and previews explicit repair', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('plan-host-conflict');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const configPath = path.join(homeDir, '.codex', 'config.toml');
@@ -323,7 +323,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
       reason_code: 'host-config-conflict',
       payload: {
         blocked: true,
-        next_action: 'spec-mcp-setup --only graphify --repair-host-config',
+        next_action: 'spec-runtime-setup --only graphify --repair-host-config',
       },
     });
     expect(blocked.payload.planned_operations).toEqual(expect.arrayContaining([
@@ -357,7 +357,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('repairs only conflicting managed Codex MCP entries with explicit authorization', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('apply-host-conflict-repair');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     installGlobalSkill(homeDir, 'ast-grep');
@@ -399,7 +399,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('default diagnostic output exposes actionable tools, skills, project, setup, providers, and public next actions', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('human-diagnostic');
     const result = runSetup({
       argv: [],
@@ -423,7 +423,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('check reconciles CodeGraph readiness from an explicitly pinned read-only host config', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('check-codegraph-configured');
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -472,7 +472,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('check reports a current missing baseline MCP dependency instead of relying on saved facts', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('check-live-mcp-missing');
     const runner = (command, args, options) => {
       if (command === 'npx' && args.length === 1 && args[0] === '--version') {
@@ -508,7 +508,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
     [{ CODEX_THREAD_ID: 'thread-1' }, 'codex'],
     [{ CLAUDE_CODE_SESSION_ID: 'session-1' }, 'claude'],
   ])('uses runtime markers only as read-only advisory host evidence', (env, expectedHost) => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo(`advisory-marker-${expectedHost}`);
     const result = runSetup({ argv: ['--check'], cwd: target, skillRoot, runner: fakeRunner, env });
     expect(result).toMatchObject({ exit_code: 0, payload: { host: { host: expectedHost, authority: 'advisory' } } });
@@ -519,7 +519,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('uses a uniquely visible host CLI as advisory evidence for bare diagnostics', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('advisory-cli');
     const result = runSetup({ argv: [], cwd: target, skillRoot, runner: visibleHostRunner('claude'), env: {} });
     expect(result).toMatchObject({ exit_code: 0, payload: { host: { host: 'claude', authority: 'advisory' } } });
@@ -528,7 +528,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   test('stops advisory CLI probing once multiple visible hosts make the result ambiguous', () => {
     const {
       advisoryHostCandidates,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const commands = [];
     const runner = (command) => {
       commands.push(command);
@@ -544,8 +544,8 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('verify-only writes setup-owned facts and no host/provider/project config', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
-    const { buildActionPlan } = require('../../skills/spec-mcp-setup/scripts/lib/mode-policy.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
     const target = tempRepo('verify');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const repoBefore = snapshotFiles(target, ['.spec-first/config', '.spec-first/workspace/scenario-fingerprint-setup.json']);
@@ -601,7 +601,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
       host_ledger_write_result: { status: 'ready', reason_code: 'host-readiness-ledger-written' },
     });
     expect(result.human).toContain('整体状态：action-required');
-    expect(result.human).toContain('spec-mcp-setup --only');
+    expect(result.human).toContain('spec-runtime-setup --only');
     expect(result.human).not.toContain('继续目标 spec-* workflow');
     expect(fs.existsSync(path.join(target, '.spec-first', 'workspace', 'scenario-fingerprint-setup.json'))).toBe(true);
     expect(snapshotFiles(target, ['.spec-first/config', '.spec-first/workspace/scenario-fingerprint-setup.json']))
@@ -609,7 +609,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('fails completion with a structured outcome when the host readiness ledger cannot be written', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('host-ledger-failure');
     const result = runSetup({
       argv: ['--verify-only'],
@@ -639,7 +639,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('preserves a host inspection failure even when setup facts are written', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('host-failure');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     installGlobalSkill(homeDir, 'ast-grep');
@@ -665,7 +665,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('blocks selected providers before project mutation when host config verification fails', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('provider-host-gate');
     const calls = [];
     fs.mkdirSync(path.join(target, '.qoder'), { recursive: true });
@@ -694,7 +694,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('fails when facts cannot be committed after otherwise successful setup', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('facts-write-failure');
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-facts-outside-'));
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
@@ -720,7 +720,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('keeps scenario fingerprint containment failures advisory and records degraded status', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('scenario-fingerprint-failure');
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-scenario-outside-'));
     fs.mkdirSync(path.join(target, '.spec-first'), { recursive: true });
@@ -765,7 +765,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('keeps the primary outcome when the scenario status ledger rewrite fails', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('scenario-ledger-failure');
     let writes = 0;
     const factsWriter = (filePath, payload) => {
@@ -810,8 +810,8 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('project-config writes only project-local config surfaces without host authority', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
-    const { buildActionPlan } = require('../../skills/spec-mcp-setup/scripts/lib/mode-policy.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
     const target = tempRepo('project-config');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const repoBefore = snapshotFiles(target, ['.spec-first/config.local.example.yaml', '.gitignore']);
@@ -842,7 +842,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('explicit graphify setup applies baseline host config, provider mutation, and post-probe facts', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('graphify');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const result = runSetup({
@@ -894,7 +894,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('reconciles CodeGraph configured lifecycle from the post-write host config probe', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('codegraph-configured');
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
@@ -929,7 +929,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('repairs a missing baseline helper through structured argv operations before provider setup', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('helper-repair');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const calls = [];
@@ -968,7 +968,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('preserves the first baseline helper install failure after facts reconciliation', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('helper-failure');
     const calls = [];
     const runner = (command, args, options) => {
@@ -1002,7 +1002,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('reuses verified warmup cache entries on repeated explicit setup', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('warmup-cache');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const calls = [];
@@ -1045,7 +1045,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('uses the npm mirror only after primary install failures and persists install provenance', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('mirror-success');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const calls = [];
@@ -1128,7 +1128,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('preserves both failed npm attempts without promoting install success', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('mirror-both-failed');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     installGlobalSkill(homeDir, 'ast-grep');
@@ -1182,7 +1182,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('treats a signaled install as failed and retries it through the configured mirror', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('mirror-signal-retry');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     installGlobalSkill(homeDir, 'ast-grep');
@@ -1242,7 +1242,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('parent verification writes contained summaries and quarantines parent repo-local artifacts', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-'));
     const first = childRepo(workspace, 'apps/first');
     const second = childRepo(workspace, 'packages/second');
@@ -1298,7 +1298,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('parent setup consumes selected provider failures and preserves legacy partial summary fields', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-provider-'));
     const first = childRepo(workspace, 'apps/first');
     childRepo(workspace, 'packages/second');
@@ -1355,7 +1355,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('parent verification reports child manifest counts and manifest-specific next action', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-manifest-'));
     const first = childRepo(workspace, 'apps/first');
     const second = childRepo(workspace, 'packages/second');
@@ -1412,7 +1412,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('parent verification fails closed when the workspace summary directory is a symlink', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-symlink-'));
     childRepo(workspace, 'child');
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-summary-outside-'));
@@ -1437,7 +1437,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('continues later child repos and writes a partial summary after one child throws', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-partial-'));
     const first = childRepo(workspace, 'a');
     const second = childRepo(workspace, 'b');
@@ -1464,7 +1464,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('preserves child evidence and fails when the workspace summary cannot be committed', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-summary-failure-'));
     childRepo(workspace, 'apps/first');
     childRepo(workspace, 'packages/second');
@@ -1498,7 +1498,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('propagates blocked provider plans without running fallback verification as mutation success', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const previewTarget = tempRepo('blocked-provider-preview');
     const previewBefore = snapshot(previewTarget);
     const preview = runSetup({
@@ -1543,7 +1543,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('stops dependent host and provider mutations after a baseline install failure', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('baseline-install-failure');
     const calls = [];
     const runner = (command, args, options) => {
@@ -1589,7 +1589,7 @@ describe('spec-mcp-setup unified Node entrypoint', () => {
   });
 
   test('unknown provider and missing mutation host fail closed with zero writes', () => {
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const unknownTarget = tempRepo('unknown');
     const unknownBefore = snapshot(unknownTarget);
     expect(runSetup({

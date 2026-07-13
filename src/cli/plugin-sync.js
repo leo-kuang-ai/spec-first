@@ -22,6 +22,7 @@ const {
   listBundledCommands,
   readBundledCommandTemplate,
   readBundledSkillSource,
+  resolveBundledSkillSourceName,
   shouldIgnoreBundledSupportPath,
 } = require('./plugin-manifest');
 const {
@@ -202,6 +203,7 @@ function syncSkills(projectRoot, adapter, filteredAssetSet = buildFilteredAssetS
 
   for (const skillName of skillNames) {
     const isWorkflowSkill = workflowNameSet.has(skillName);
+    const sourceSkillName = resolveBundledSkillSourceName(skillName);
     const targetDir = isWorkflowSkill
       ? path.join(workflowRoot, skillName)
       : path.join(standaloneRoot, skillName);
@@ -213,9 +215,14 @@ function syncSkills(projectRoot, adapter, filteredAssetSet = buildFilteredAssetS
       fs.rmSync(path.join(standaloneRoot, skillName), { recursive: true, force: true });
     }
 
-    copyDirectoryWithTransform(path.join(sourceRoot, skillName), targetDir, (content, fileContext) =>
-      adapter.transformSkillContent(content, { ...transformContext, ...fileContext }),
-    );
+    copyDirectoryWithTransform(path.join(sourceRoot, sourceSkillName), targetDir, (content, fileContext) => {
+      const projected = projectSkillContentForRuntimeName(content, {
+        ...fileContext,
+        skillName,
+        sourceSkillName,
+      });
+      return adapter.transformSkillContent(projected, { ...transformContext, ...fileContext });
+    });
   }
 
   return { skills: standaloneNames, workflowSkills: workflowNames, internalSkills: internalNames };
@@ -242,6 +249,7 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
 
   for (const skillName of skillNames) {
     const isWorkflowSkill = workflowNameSet.has(skillName);
+    const sourceSkillName = resolveBundledSkillSourceName(skillName);
     const targetDir = isWorkflowSkill
       ? path.join(workflowRoot, skillName)
       : path.join(standaloneRoot, skillName);
@@ -263,13 +271,20 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
 
     operations.push(...planDirectoryWithTransform({
       projectRoot,
-      sourceDir: path.join(sourceRoot, skillName),
+      sourceDir: path.join(sourceRoot, sourceSkillName),
       targetDir,
       reason: isWorkflowSkill ? 'managed_workflow_skill' : 'managed_skill',
-      transformText: (content, fileContext) => adapter.transformSkillContent(
-        content,
-        { ...transformContext, ...fileContext },
-      ),
+      transformText: (content, fileContext) => {
+        const projected = projectSkillContentForRuntimeName(content, {
+          ...fileContext,
+          skillName,
+          sourceSkillName,
+        });
+        return adapter.transformSkillContent(
+          projected,
+          { ...transformContext, ...fileContext },
+        );
+      },
     }));
   }
 
@@ -617,6 +632,23 @@ function normalizedWorkflowSkillRuntimeRoot(adapter, skillName) {
   return normalizePathForContent(path.posix.join(normalizePathForContent(adapter.workflowsRoot), skillName));
 }
 
+
+function projectSkillContentForRuntimeName(content, context = {}) {
+  const skillName = context.skillName;
+  const sourceSkillName = context.sourceSkillName || resolveBundledSkillSourceName(skillName);
+  const relativePath = typeof context.relativePath === 'string'
+    ? context.relativePath.replace(/\\/g, '/')
+    : '';
+  const isEntrypoint = relativePath === '' || relativePath === 'SKILL.md';
+
+  if (!isEntrypoint || !skillName || skillName === sourceSkillName) {
+    return content;
+  }
+
+  // Legacy alias skill dirs keep the alias `name:` so host skill discovery matches the old entry.
+  return String(content || '').replace(/^name:\s*.+$/m, `name: ${skillName}`);
+}
+
 function buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir) {
   const context = {
     skillName,
@@ -648,8 +680,11 @@ function inspectCommandIntegrity(projectRoot, command, adapter) {
 }
 
 function renderRuntimeCommandContent(command, adapter) {
+  const sourceSkillName = command.sourceSkill || resolveBundledSkillSourceName(command.skill);
   const templateContent = readBundledCommandTemplate(command.name);
-  const skillContent = readBundledSkillSource(command.skill);
+  const skillContent = readBundledSkillSource(sourceSkillName);
+  // Companion skill root stays on the projected skill name (primary or alias) so host
+  // discovery of the command points at a co-located scripts tree.
   const runtimeSkillRoot = normalizedWorkflowSkillRuntimeRoot(adapter, command.skill);
   const rendered = adapter.renderCommandContent(command, templateContent, {
     commandName: command.name,
@@ -686,11 +721,16 @@ function inspectSkillIntegrity({
   const runtimeRoot = isWorkflowSkill ? workflowRoot : standaloneRoot;
   const targetDir = path.join(runtimeRoot, skillName);
   const targetPath = path.join(targetDir, 'SKILL.md');
-  const sourceDir = path.join(getBundledPath('skills'), skillName);
+  const sourceSkillName = resolveBundledSkillSourceName(skillName);
+  const sourceDir = path.join(getBundledPath('skills'), sourceSkillName);
   const sourcePath = path.join(sourceDir, 'SKILL.md');
   const transformContext = buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir);
-  const expectedContent = adapter.transformSkillContent(
+  const projectedSource = projectSkillContentForRuntimeName(
     fs.readFileSync(sourcePath, 'utf8'),
+    { skillName, sourceSkillName, relativePath: 'SKILL.md' },
+  );
+  const expectedContent = adapter.transformSkillContent(
+    projectedSource,
     { ...transformContext, relativePath: 'SKILL.md' },
   );
   const actualContent = fs.readFileSync(targetPath, 'utf8');
@@ -700,10 +740,17 @@ function inspectSkillIntegrity({
     ...skillSupportFileIntegrityIssues({
       sourceDir,
       targetDir,
-      transformText: (content, fileContext) => adapter.transformSkillContent(
-        content,
-        { ...transformContext, ...fileContext },
-      ),
+      transformText: (content, fileContext) => {
+        const projected = projectSkillContentForRuntimeName(content, {
+          ...fileContext,
+          skillName,
+          sourceSkillName,
+        });
+        return adapter.transformSkillContent(
+          projected,
+          { ...transformContext, ...fileContext },
+        );
+      },
     }),
   ]);
 

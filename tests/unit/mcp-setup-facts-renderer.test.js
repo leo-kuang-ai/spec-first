@@ -27,9 +27,9 @@ function registryFixture() {
   };
 }
 
-describe('spec-mcp-setup facts reconciliation', () => {
+describe('spec-runtime-setup facts reconciliation', () => {
   test('scans configured commands and reports undeclared dependencies or degraded scan visibility', () => {
-    const { scanConfiguredDependencies } = require('../../skills/spec-mcp-setup/scripts/lib/configured-dependencies.cjs');
+    const { scanConfiguredDependencies } = require('../../skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs');
     const target = tempRepo('configured-scan');
     fs.writeFileSync(path.join(target, 'package.json'), JSON.stringify({
       scripts: {
@@ -90,7 +90,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
   });
 
   test('resolves repeated configured commands once per scan', () => {
-    const { scanConfiguredDependencies } = require('../../skills/spec-mcp-setup/scripts/lib/configured-dependencies.cjs');
+    const { scanConfiguredDependencies } = require('../../skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs');
     const target = tempRepo('configured-scan-cache');
     const binDirectory = path.join(target, 'bin');
     fs.mkdirSync(binDirectory);
@@ -123,7 +123,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
   });
 
   test('only promotes confirmed post-probe results to ready', () => {
-    const { collectSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const { collectSetupFacts } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const bundle = collectSetupFacts({
       repoRoot: '/repo',
       host: 'codex',
@@ -176,7 +176,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
     expectedResult,
     expectedReason,
   ) => {
-    const { collectSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const { collectSetupFacts } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const bundle = collectSetupFacts({
       repoRoot: '/repo',
       host: 'codex',
@@ -204,7 +204,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
   });
 
   test('preserves actionable host conflict evidence and repair command', () => {
-    const { collectSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const { collectSetupFacts } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const bundle = collectSetupFacts({
       repoRoot: '/repo',
       host: 'codex',
@@ -219,7 +219,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
         config_key: 'context7',
         config_path: '/home/user/.codex/config.toml',
         conflict_fields: ['command', 'args'],
-        next_action: 'spec-mcp-setup --repair-host-config',
+        next_action: 'spec-runtime-setup --repair-host-config',
       }],
       helperResults: [],
       providerResults: [],
@@ -231,7 +231,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
       result: 'action-required',
       reason_code: 'host-config-conflict',
       conflict_fields: ['command', 'args'],
-      next_action: 'spec-mcp-setup --repair-host-config',
+      next_action: 'spec-runtime-setup --repair-host-config',
     });
   });
 
@@ -241,7 +241,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
       prepareHostReadinessLedger,
       writeHostReadinessLedger,
       writeSetupFacts,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const target = tempRepo(`host-ledger-${host}`);
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-home-${host}-`));
     const targetFacts = {
@@ -319,7 +319,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
     const {
       collectSetupFacts,
       prepareHostReadinessLedger,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const target = tempRepo('host-ledger-reconciliation');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-home-reconciliation-'));
     const bundle = collectSetupFacts({ repoRoot: target, host: 'codex', registry: { tools: [], helpers: [] } });
@@ -356,7 +356,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
       collectSetupFacts,
       readSetupSnapshot,
       writeSetupFacts,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const target = tempRepo('facts-write');
     const bundle = collectSetupFacts({
       repoRoot: target,
@@ -379,7 +379,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
     expect(fs.readdirSync(path.join(target, '.spec-first', 'config')).some((name) => name.endsWith('.tmp'))).toBe(false);
 
     expect(readSetupSnapshot({ repoRoot: target })).toMatchObject({
-      schema_version: 'spec-mcp-setup-diagnostic-snapshot.v1',
+      schema_version: 'spec-runtime-setup-diagnostic-snapshot.v1',
       setup_facts_status: 'ready',
       setup_facts_reason_code: 'setup-facts-present',
       runtime_capabilities_status: 'ready',
@@ -399,7 +399,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
     expectedRuntimeStatus,
     expectedRuntimeReason,
   ) => {
-    const { readSetupSnapshot } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const { readSetupSnapshot } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const target = tempRepo(`snapshot-${state}`);
     if (state !== 'missing') {
       const configDir = path.join(target, '.spec-first', 'config');
@@ -423,7 +423,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
   });
 
   test('does not claim completion when either artifact write fails', () => {
-    const { writeSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const { writeSetupFacts } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const target = tempRepo('facts-failure');
     const writer = jest.fn((filePath) => {
       if (filePath.endsWith('runtime-capabilities.json')) {
@@ -447,7 +447,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
   });
 
   test('builds the parent-workspace quarantine from repo-local artifact pollution', () => {
-    const { buildParentArtifactQuarantine } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+    const { buildParentArtifactQuarantine } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parent-quarantine-'));
     const foreignRepo = tempRepo('foreign-fingerprint');
     const configDir = path.join(workspace, '.spec-first', 'config');
@@ -475,7 +475,7 @@ describe('spec-mcp-setup facts reconciliation', () => {
       authority_level: 'advisory',
       freshness: 'generated',
       generated_at: '2026-07-11T05:00:00.000Z',
-      generated_by: 'spec-mcp-setup',
+      generated_by: 'spec-runtime-setup',
     });
     expect(quarantine.quarantined_paths).toEqual([
       expect.objectContaining({
@@ -494,9 +494,9 @@ describe('spec-mcp-setup facts reconciliation', () => {
   });
 });
 
-describe('spec-mcp-setup renderer', () => {
+describe('spec-runtime-setup renderer', () => {
   test('renders a mutation-free install preview with blocked reasons and safety facts', () => {
-    const { renderInstallPlan } = require('../../skills/spec-mcp-setup/scripts/lib/renderer.cjs');
+    const { renderInstallPlan } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
     const output = renderInstallPlan({
       mode: 'plan',
       blocked: false,
@@ -564,7 +564,7 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('human summary keeps dependency readiness separate from runtime freshness', () => {
-    const { renderHumanSummary } = require('../../skills/spec-mcp-setup/scripts/lib/renderer.cjs');
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
     const text = renderHumanSummary({
       toolFacts: {
         items: [
@@ -588,7 +588,7 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('human summary renders provider actions and never continues after action-required', () => {
-    const { renderHumanSummary } = require('../../skills/spec-mcp-setup/scripts/lib/renderer.cjs');
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
     const text = renderHumanSummary({
       toolFacts: {
         items: [],
@@ -596,7 +596,7 @@ describe('spec-mcp-setup renderer', () => {
           provider: 'graphify',
           readiness_status: 'degraded',
           reason_code: 'graphify-artifact-missing',
-          next_actions: ['运行 spec-mcp-setup --only graphify。'],
+          next_actions: ['运行 spec-runtime-setup --only graphify。'],
         }],
         configured_dependencies: [],
       },
@@ -618,12 +618,12 @@ describe('spec-mcp-setup renderer', () => {
     });
 
     expect(text).toContain('整体状态：action-required (graphify-artifact-missing)');
-    expect(text).toContain('运行 spec-mcp-setup --only graphify。');
+    expect(text).toContain('运行 spec-runtime-setup --only graphify。');
     expect(text).not.toContain('继续目标 spec-* workflow');
   });
 
   test('human summary suppresses stale install and maintenance actions for ready rows', () => {
-    const { renderHumanSummary } = require('../../skills/spec-mcp-setup/scripts/lib/renderer.cjs');
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
     const text = renderHumanSummary({
       toolFacts: {
         items: [{
@@ -636,7 +636,7 @@ describe('spec-mcp-setup renderer', () => {
         provider_readiness: [{
           provider: 'graphify',
           readiness_status: 'fresh',
-          next_actions: ['运行 spec-mcp-setup --only graphify --refresh。'],
+          next_actions: ['运行 spec-runtime-setup --only graphify --refresh。'],
         }],
         configured_dependencies: [],
       },
@@ -665,7 +665,7 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('diagnostic next actions continue only when runtime and required providers are ready', () => {
-    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({
       project: {
         inside_git_repo: true,
@@ -689,7 +689,7 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('diagnostic next actions report repair without also suggesting continuation', () => {
-    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({
       project: {
         inside_git_repo: true,
@@ -709,12 +709,12 @@ describe('spec-mcp-setup renderer', () => {
       ],
     });
 
-    expect(actions).toContain('运行当前 host 的 spec-mcp-setup --verify-only，确认 required Provider readiness。');
+    expect(actions).toContain('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
     expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
   });
 
   test('diagnostic next actions prefer current baseline probes over stale ready facts', () => {
-    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({
       project: {
         inside_git_repo: true,
@@ -746,7 +746,7 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('diagnostic next actions consume registry-derived required provider ids', () => {
-    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({
       project: {
         inside_git_repo: true,
@@ -772,8 +772,8 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('diagnostic next actions prefer a required provider repair over verify-only', () => {
-    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
-    const repair = '运行 spec-mcp-setup --only codegraph，修复 CodeGraph index/query readiness。';
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
+    const repair = '运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。';
     const actions = diagnosticNextActions({
       project: {
         inside_git_repo: true,
@@ -801,7 +801,7 @@ describe('spec-mcp-setup renderer', () => {
   });
 
   test('diagnostic next actions report baseline and provider repairs together', () => {
-    const { diagnosticNextActions } = require('../../skills/spec-mcp-setup/scripts/lib/human-output.cjs');
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({
       project: {
         inside_git_repo: true,

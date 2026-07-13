@@ -33,7 +33,7 @@ Check whether `agent-browser` is installed:
 command -v agent-browser >/dev/null 2>&1 && echo "Installed" || echo "NOT INSTALLED"
 ```
 
-If not installed, inform the user: "Browser automation helper unavailable. Run `spec-mcp-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-test-browser`. This does not block spec-first baseline." Then stop — this skill cannot function without agent-browser.
+If not installed, inform the user: "Browser automation helper unavailable. Run `spec-runtime-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-test-browser`. This does not block spec-first baseline." Then stop — this skill cannot function without agent-browser.
 
 After setup, use `agent-browser skills get core` when deeper upstream usage or troubleshooting guidance is needed.
 
@@ -47,7 +47,7 @@ Before starting, verify `agent-browser` is available:
 command -v agent-browser >/dev/null 2>&1 && echo "Ready" || echo "NOT INSTALLED"
 ```
 
-If not installed, inform the user: "Browser automation helper unavailable. Run `spec-mcp-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-test-browser`. This does not block spec-first baseline." Then stop.
+If not installed, inform the user: "Browser automation helper unavailable. Run `spec-runtime-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-test-browser`. This does not block spec-first baseline." Then stop.
 
 ### 2. Ask Browser Mode
 

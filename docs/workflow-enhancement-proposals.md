@@ -19,7 +19,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 一、Codebase 节点
 
-**对应命令**：`spec-mcp-setup`；runtime CLI 维护动作走 `spec-first update`
+**对应命令**：`spec-runtime-setup`；runtime CLI 维护动作走 `spec-first update`
 
 **当前能力**：环境就绪检查、runtime 资产同步。
 

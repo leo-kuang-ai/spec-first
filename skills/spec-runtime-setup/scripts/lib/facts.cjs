@@ -560,7 +560,7 @@ function readSetupSnapshot({ repoRoot } = {}) {
     ? runtime.value.setup_summary
     : {};
   return {
-    schema_version: 'spec-mcp-setup-diagnostic-snapshot.v1',
+    schema_version: 'spec-runtime-setup-diagnostic-snapshot.v1',
     setup_facts_status: facts.status,
     setup_facts_reason_code: facts.reason_code,
     setup_facts_path: factsPath,
@@ -573,7 +573,7 @@ function readSetupSnapshot({ repoRoot } = {}) {
       reason_code: runtime.status === 'missing'
         ? 'runtime-capabilities-missing'
         : 'generated-runtime-manifest-not-reported',
-      next_action: 'spec-mcp-setup --verify-only',
+      next_action: 'spec-runtime-setup --verify-only',
     },
     baseline_ready: Object.prototype.hasOwnProperty.call(setupSummary, 'baseline_ready')
       ? setupSummary.baseline_ready
@@ -612,7 +612,7 @@ function readJsonState(filePath, artifactKind) {
 
 function emptySnapshot(reasonCode) {
   return {
-    schema_version: 'spec-mcp-setup-diagnostic-snapshot.v1',
+    schema_version: 'spec-runtime-setup-diagnostic-snapshot.v1',
     setup_facts_status: 'skip',
     setup_facts_reason_code: reasonCode,
     generated_runtime_manifest: { status: 'unknown', reason_code: reasonCode },
@@ -654,7 +654,7 @@ function buildParentArtifactQuarantine({
     authority_level: 'advisory',
     freshness: 'generated',
     generated_at: now.toISOString(),
-    generated_by: 'spec-mcp-setup',
+    generated_by: 'spec-runtime-setup',
     consumers: [
       'spec-first clean --workspace-orphans',
       'LLM workflow 的 degraded-evidence 判断',

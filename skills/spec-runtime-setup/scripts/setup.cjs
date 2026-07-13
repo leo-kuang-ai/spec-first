@@ -281,7 +281,7 @@ function runWorkspaceGraphSetup(context) {
   const detail = result.reason_code ? ` (${result.reason_code})` : '';
   const pending = Array.isArray(result.pending_confirm) ? result.pending_confirm : [];
   const confirmation = result.status === 'needs-confirmation' && pending.length > 0
-    ? `\n  pending_confirm: ${pending.join(', ')}\n  confirm: spec-mcp-setup --only codegraph,graphify --workspace-graph --repos ${pending.join(',')}`
+    ? `\n  pending_confirm: ${pending.join(', ')}\n  confirm: spec-runtime-setup --only codegraph,graphify --workspace-graph --repos ${pending.join(',')}`
     : '';
   return {
     exit_code: exitCode,
@@ -555,7 +555,7 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
 }
 
 function hostConfigRepairCommand(context) {
-  const args = ['spec-mcp-setup'];
+  const args = ['spec-runtime-setup'];
   if (context.actionPlan.selected_ids.length > 0) {
     args.push('--only', context.actionPlan.selected_ids.join(','));
   }
@@ -641,7 +641,7 @@ function collectDiagnosticBaselineFailures(context, probes, hostConfigResults) {
     if (!isBaselineBlocking(entry)) continue;
     const observed = toolResults.get(entry.id);
     if (!observed || observed.status !== 'ready') {
-      failures.push(observed || { next_action: `运行标准 spec-mcp-setup，修复 ${entry.id}。` });
+      failures.push(observed || { next_action: `运行标准 spec-runtime-setup，修复 ${entry.id}。` });
       continue;
     }
     const hostResult = hostConfigResults.get(entry.id);
@@ -649,7 +649,7 @@ function collectDiagnosticBaselineFailures(context, probes, hostConfigResults) {
       failures.push({
         ...hostResult,
         id: entry.id,
-        next_action: hostResult.next_action || `运行标准 spec-mcp-setup，修复 ${entry.id} host config。`,
+        next_action: hostResult.next_action || `运行标准 spec-runtime-setup，修复 ${entry.id} host config。`,
       });
     }
   }
@@ -657,7 +657,7 @@ function collectDiagnosticBaselineFailures(context, probes, hostConfigResults) {
     if (!isBaselineBlocking(entry)) continue;
     const observed = helperResults.get(entry.id);
     if (!observed || observed.status !== 'ready') {
-      failures.push(observed || { next_action: `运行标准 spec-mcp-setup，修复 ${entry.id}。` });
+      failures.push(observed || { next_action: `运行标准 spec-runtime-setup，修复 ${entry.id}。` });
     }
   }
   return failures;
@@ -696,7 +696,7 @@ function failedResult(reasonCode, error, exitCode = 1, extra = {}) {
     mode: extra.mode || 'failed',
     reason_code: reasonCode,
     payload: {
-      schema_version: 'spec-mcp-setup-error.v1',
+      schema_version: 'spec-runtime-setup-error.v1',
       reason_code: reasonCode,
       diagnostic: String(error && error.message ? error.message : error).slice(0, 2000),
     },

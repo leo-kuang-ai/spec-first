@@ -555,7 +555,7 @@ function decisionInputNextAction(reasonCode, requestedPlatforms = []) {
 }
 
 function setupWorkflowCommandForPlatforms(requestedPlatforms = []) {
-  return 'spec-mcp-setup';
+  return 'spec-runtime-setup';
 }
 
 function toBoolean(value, fallback) {

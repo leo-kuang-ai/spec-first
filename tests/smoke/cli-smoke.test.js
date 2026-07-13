@@ -274,11 +274,11 @@ describe('CLI smoke checks', () => {
       ],
     };
     const registrySource = fs.readFileSync(
-      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'setup-registry.json'),
+      path.join(packagedRoot, 'skills', 'spec-runtime-setup', 'setup-registry.json'),
       'utf8',
     );
     const setupSource = fs.readFileSync(
-      path.join(packagedRoot, 'skills', 'spec-mcp-setup', 'scripts', 'setup.cjs'),
+      path.join(packagedRoot, 'skills', 'spec-runtime-setup', 'scripts', 'setup.cjs'),
       'utf8',
     );
 
@@ -299,7 +299,7 @@ describe('CLI smoke checks', () => {
         });
       }
 
-      const setupRoot = path.join(consumerRoot, runtimeRoot, 'spec-mcp-setup');
+      const setupRoot = path.join(consumerRoot, runtimeRoot, 'spec-runtime-setup');
       expect(fs.readFileSync(path.join(setupRoot, 'setup-registry.json'), 'utf8'))
         .toBe(registrySource);
       expect(fs.readFileSync(path.join(setupRoot, 'scripts', 'setup.cjs'), 'utf8'))

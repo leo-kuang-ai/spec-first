@@ -124,6 +124,28 @@
               "$ref": "#/$defs/hostDelivery"
             }
           }
+        },
+        "legacy_aliases": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "skill_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "command_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
         }
       }
     }

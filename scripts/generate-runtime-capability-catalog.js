@@ -300,7 +300,7 @@ function buildRuntimeCapabilityCatalog() {
     '| Layer | Entry | Canonical artifacts | Means | Does not mean |',
     '|---|---|---|---|---|',
     '| CLI/runtime health | `spec-first doctor` | doctor text/JSON report | Node/Git/package checks, generated host runtime assets, workflow surface, and stale verification evidence were inspected. | MCP/helper setup is complete or any external tool evidence is available. |',
-    '| Harness setup | `spec-mcp-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |',
+    '| Harness setup | `spec-runtime-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |',
     '',
     '## Maintenance Contract',
     '',
@@ -308,7 +308,7 @@ function buildRuntimeCapabilityCatalog() {
     '- 不在本 catalog 中手写能力数量；能力数量必须由 generator 从 source/governance 推导。',
     '- Workflow runtime contracts 必须由 `docs/contracts/workflows/*.schema.json` 的 `x-spec-first-*` metadata 派生；不能在 catalog 手写 planned/producer/integrated 状态。',
     '- 新增、删除或改变 host delivery 时，同步更新 governance/source，运行 `npm run docs:runtime-catalog`，再运行 targeted governance tests。',
-    '- 该 catalog 只描述 delivery surface，不判断某个 MCP/helper 当前是否 ready；setup readiness 由 `spec-mcp-setup` 产物表达。',
+    '- 该 catalog 只描述 delivery surface，不判断某个 MCP/helper 当前是否 ready；setup readiness 由 `spec-runtime-setup` 产物表达。',
   ];
 
   return `${lines.join('\n')}\n`;

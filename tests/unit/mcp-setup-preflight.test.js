@@ -3,12 +3,12 @@
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const skillRoot = path.join(repoRoot, 'skills', 'spec-mcp-setup');
+const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
 
-describe('spec-mcp-setup preflight v2 projection', () => {
+describe('spec-runtime-setup preflight v2 projection', () => {
   test('keeps CLI and browser helpers in tools, global skills in skills, and MCP entries out', () => {
-    const { loadRegistry } = require('../../skills/spec-mcp-setup/scripts/lib/registry.cjs');
-    const { buildPreflightProjection } = require('../../skills/spec-mcp-setup/scripts/lib/preflight.cjs');
+    const { loadRegistry } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
+    const { buildPreflightProjection } = require('../../skills/spec-runtime-setup/scripts/lib/preflight.cjs');
     const registry = loadRegistry({ skillRoot });
     const helperResults = [
       { id: 'agent-browser', status: 'skipped', reason_code: 'agent-browser-manual-setup-incomplete' },
@@ -111,7 +111,7 @@ describe('spec-mcp-setup preflight v2 projection', () => {
   });
 
   test('preserves outside-repo skip vocabulary on POSIX and Windows', () => {
-    const { buildPreflightProjection } = require('../../skills/spec-mcp-setup/scripts/lib/preflight.cjs');
+    const { buildPreflightProjection } = require('../../skills/spec-runtime-setup/scripts/lib/preflight.cjs');
     const base = {
       registry: { helpers: [] },
       helperResults: [],
@@ -138,7 +138,7 @@ describe('spec-mcp-setup preflight v2 projection', () => {
   });
 
   test('keeps legacy compact project statuses distinct from project-local-config v1 statuses', () => {
-    const { buildPreflightProjection } = require('../../skills/spec-mcp-setup/scripts/lib/preflight.cjs');
+    const { buildPreflightProjection } = require('../../skills/spec-runtime-setup/scripts/lib/preflight.cjs');
     const preflight = buildPreflightProjection({
       registry: { helpers: [] },
       helperResults: [],
@@ -165,7 +165,7 @@ describe('spec-mcp-setup preflight v2 projection', () => {
   });
 
   test('reports a missing local override as defaults-active and keeps ignore readiness visible', () => {
-    const { buildPreflightProjection } = require('../../skills/spec-mcp-setup/scripts/lib/preflight.cjs');
+    const { buildPreflightProjection } = require('../../skills/spec-runtime-setup/scripts/lib/preflight.cjs');
     const preflight = buildPreflightProjection({
       registry: { helpers: [] },
       helperResults: [],

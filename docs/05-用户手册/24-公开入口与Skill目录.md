@@ -42,7 +42,7 @@
 
 | 入口 | 一句话用途 | 何时用 / 不用 |
 | --- | --- | --- |
-| `spec-mcp-setup` | 安装、校验、刷新 required harness runtime 与 helper readiness facts | 首次 setup、MCP/helper 缺失、provider 配置变化；不是每次 plan/work 的硬前置 |
+| `spec-runtime-setup` | 安装、校验、刷新 required harness runtime 与 helper readiness facts | 首次 setup、MCP/helper 缺失、provider 配置变化；不是每次 plan/work 的硬前置 |
 | `spec-ideate` | 生成并评估 grounded 候选方向 | 还没选定方向；选定后转 brainstorm，不要在 ideate 里写 plan |
 | `spec-brainstorm` | 把模糊想法收敛成 requirements-only 统一计划输入 | 要定 WHAT；不要用来直接写代码或做技术选型 verdict |
 | `spec-prd` | 棕地 PRD / 需求材料的研发澄清与 plan 准入 | 已有产品材料要进入 planning；不要替代 brainstorm 的从零 framing |
@@ -113,7 +113,7 @@
 | `spec-first repair-worktree` | worktree pointer 修复指引 |
 | `spec-first tasks …` / `spec-first session …` | task pack 确定性校验；opt-in 多 actor 会话 advisory |
 
-环境健康优先 `doctor` / `init` / `update` / `clean`；MCP 与 helper readiness 用 `spec-mcp-setup`。
+环境健康优先 `doctor` / `init` / `update` / `clean`；MCP 与 helper readiness 用 `spec-runtime-setup`。
 
 ## 8. 与其他手册章节的关系
 

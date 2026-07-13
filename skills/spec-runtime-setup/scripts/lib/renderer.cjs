@@ -178,7 +178,7 @@ function installSafetyFields(source = {}) {
 
 function renderDiagnostic({ preflight, snapshot, target, host } = {}) {
   return {
-    schema_version: 'spec-mcp-setup-preflight.v2',
+    schema_version: 'spec-runtime-setup-preflight.v2',
     generated_at: new Date().toISOString(),
     target: target || null,
     host: host || null,
@@ -239,7 +239,7 @@ function renderHumanSummary(
   lines.push('', '后续步骤');
   const nextActions = [];
   if (manifest.status === 'stale' || manifest.status === 'missing') {
-    nextActions.push('对所选 topology 运行 spec-first init，然后重新运行 spec-mcp-setup --verify-only。');
+    nextActions.push('对所选 topology 运行 spec-first init，然后重新运行 spec-runtime-setup --verify-only。');
   }
   for (const item of toolFacts.items || []) {
     if (item.result !== 'ready' && item.next_action) nextActions.push(item.next_action);
@@ -251,9 +251,9 @@ function renderHumanSummary(
     }
   }
   if (execution.overall_status === 'partial') {
-    nextActions.push('当前仅完成 selected subset；运行标准 spec-mcp-setup 完成全部 required items，然后运行 spec-mcp-setup --verify-only 复核。');
+    nextActions.push('当前仅完成 selected subset；运行标准 spec-runtime-setup 完成全部 required items，然后运行 spec-runtime-setup --verify-only 复核。');
   } else if (execution.overall_status === 'action-required' && nextActions.length === 0) {
-    nextActions.push('修复上述 action-required 项后，重新运行 spec-mcp-setup --verify-only。');
+    nextActions.push('修复上述 action-required 项后，重新运行 spec-runtime-setup --verify-only。');
   }
   for (const action of [...new Set(nextActions)]) lines.push(`- ${action}`);
   if (execution.overall_status === 'ready') {

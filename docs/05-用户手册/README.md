@@ -6,12 +6,12 @@
 
 落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files、项目级 `.developer` 和受管状态。
 
-完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `spec-*` workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
+完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `spec-*` workflow。`spec-runtime-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
 
 当前推荐的事实准备、专项审查、治理与知识沉淀入口：
 
 - `using-spec-first`：入口路由治理（standalone；只选下一步，不写 artifact）
-- `spec-mcp-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
+- `spec-runtime-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
 - `spec-app-consistency-audit`：移动 App 的 PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查入口
 - `spec-write-skill`：创建 / 修改 / 迁移项目拥有的 Agent Skill package，或只读 readiness 校验
 - `spec-dogfood` / `spec-polish`：分支/PR 浏览器 QA 与 UI polish
@@ -63,7 +63,7 @@
 
 ```text
 using-spec-first（入口路由，可选）
-  -> mcp-setup（环境/MCP 需要时）
+  -> runtime-setup（环境/MCP 需要时）
   -> ideate / brainstorm / prd / doc-review
   -> plan
   -> write-tasks（可选）
@@ -103,7 +103,7 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 边界：
 
 - `figma-context:<path>` 是可抽取 evidence；`figma-ref:<id-or-url>` 只是 reference。
-- Figma MCP 是宿主可选能力，只在默认交互模式下用于 materialize 本地 JSON；它不是 `spec-mcp-setup` 的 required baseline。
+- Figma MCP 是宿主可选能力，只在默认交互模式下用于 materialize 本地 JSON；它不是 `spec-runtime-setup` 的 required baseline。
 - 缺 PRD、Figma 或直接源码证据时应降级披露能力范围，不把缺失输入直接当作整个审查失败。
 
 ![Spec-First 五阶段工作流](../assets/svg/spec-first-workflow.svg)

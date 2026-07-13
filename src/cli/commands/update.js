@@ -270,7 +270,7 @@ function printHelp() {
     'npm -g manages a separate copy.',
     '',
     'Per-requirement multi-repo graphs are not rebuilt by `update`. After upgrading, re-run',
-    '`spec-mcp-setup --only codegraph,graphify --workspace-graph` from the requirement folder',
+    '`spec-runtime-setup --only codegraph,graphify --workspace-graph` from the requirement folder',
     'to rebuild graphs, or `spec-first clean --workspace-graph` to remove managed graph assets.',
     '',
     '🔗 Repository:',

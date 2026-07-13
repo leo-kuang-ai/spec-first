@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://spec-first.dev/schemas/setup-registry.v8.json",
-  "title": "spec-mcp-setup registry v8",
+  "title": "spec-runtime-setup registry v8",
   "type": "object",
   "additionalProperties": false,
   "required": [

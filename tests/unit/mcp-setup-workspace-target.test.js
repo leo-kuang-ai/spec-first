@@ -8,7 +8,7 @@ const { spawnSync } = require('node:child_process');
 const {
   resolveWorkspaceTargets,
   MANIFEST_RELATIVE_PATH,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-target.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-target.cjs');
 
 function mkWorkspace(name = 'spec-first-ws-target-') {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), name)));

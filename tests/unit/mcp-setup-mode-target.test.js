@@ -5,10 +5,10 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const argsModule = '../../skills/spec-mcp-setup/scripts/lib/args.cjs';
-const modePolicyModule = '../../skills/spec-mcp-setup/scripts/lib/mode-policy.cjs';
-const hostAuthorityModule = '../../skills/spec-mcp-setup/scripts/lib/host-authority.cjs';
-const projectTargetModule = '../../skills/spec-mcp-setup/scripts/lib/project-target.cjs';
+const argsModule = '../../skills/spec-runtime-setup/scripts/lib/args.cjs';
+const modePolicyModule = '../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs';
+const hostAuthorityModule = '../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs';
+const projectTargetModule = '../../skills/spec-runtime-setup/scripts/lib/project-target.cjs';
 
 function createWorkspace() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mode-target-'));
@@ -22,7 +22,7 @@ function createRepo(root, relativePath = '.') {
   return repo;
 }
 
-describe('spec-mcp-setup GNU argument parsing', () => {
+describe('spec-runtime-setup GNU argument parsing', () => {
   test('normalizes documented flags and comma-separated selections', () => {
     const { parseArgs } = require(argsModule);
 
@@ -58,7 +58,7 @@ describe('spec-mcp-setup GNU argument parsing', () => {
   });
 });
 
-describe('spec-mcp-setup action policy', () => {
+describe('spec-runtime-setup action policy', () => {
   test('binds every action to an explicit capability', () => {
     const { buildActionPlan } = require(modePolicyModule);
     const plan = buildActionPlan({
@@ -231,7 +231,7 @@ describe('spec-mcp-setup action policy', () => {
   });
 });
 
-describe('spec-mcp-setup host authority', () => {
+describe('spec-runtime-setup host authority', () => {
   test('accepts only canonical MCP_SETUP_HOST pins for mutation', () => {
     const { resolveHostAuthority } = require(hostAuthorityModule);
 
@@ -271,7 +271,7 @@ describe('spec-mcp-setup host authority', () => {
   });
 });
 
-describe('spec-mcp-setup project target resolution', () => {
+describe('spec-runtime-setup project target resolution', () => {
   test('uses the current repo when cwd is a Git root', () => {
     const { resolveProjectTarget } = require(projectTargetModule);
     const repo = createRepo(createWorkspace());

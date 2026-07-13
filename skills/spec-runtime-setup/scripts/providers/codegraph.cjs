@@ -42,8 +42,8 @@ const METADATA = {
   },
   usage_note: '使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 负责 provider-native Auto-Sync freshness；结论需由 source/test/log/contract/user evidence 确认。',
 };
-const CONFIG_UNKNOWN_ACTION = '通过当前 host 的 spec-mcp-setup --verify-only 确认 CodeGraph MCP 配置。';
-const CONFIG_REPAIR_ACTION = '运行 spec-mcp-setup --only codegraph，配置 CodeGraph MCP entry。';
+const CONFIG_UNKNOWN_ACTION = '通过当前 host 的 spec-runtime-setup --verify-only 确认 CodeGraph MCP 配置。';
+const CONFIG_REPAIR_ACTION = '运行 spec-runtime-setup --only codegraph，配置 CodeGraph MCP entry。';
 
 function plan(context = {}) {
   const repoRoot = path.resolve(context.repoRoot || process.cwd());
@@ -138,13 +138,13 @@ function verify(context = {}) {
   const queryVerified = Boolean(queryResult && succeeded(queryResult));
   const serverReachable = context.serverReachable === true;
   const nextActions = [];
-  if (!installed) nextActions.push('显式运行 spec-mcp-setup --only codegraph，安装 pinned CodeGraph CLI。');
+  if (!installed) nextActions.push('显式运行 spec-runtime-setup --only codegraph，安装 pinned CodeGraph CLI。');
   if (installed && !hasArtifact) nextActions.push('依赖 code-graph candidate 前，先显式执行 CodeGraph first generation。');
   if (installed && hasArtifact && !indexed) {
-    nextActions.push('运行 spec-mcp-setup --only codegraph，修复 CodeGraph index/query readiness。');
+    nextActions.push('运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。');
   }
   if (installed && hasArtifact && !serverReachable) nextActions.push('将 server_reachable 视为 true 前，先运行 CodeGraph server/probe 验证。');
-  if (indexed && !queryVerified) nextActions.push('运行 spec-mcp-setup --only codegraph，重新执行 bounded CodeGraph query probe。');
+  if (indexed && !queryVerified) nextActions.push('运行 spec-runtime-setup --only codegraph，重新执行 bounded CodeGraph query probe。');
   appendConfigurationAction(nextActions, context);
   return providerResult(METADATA, {
     installed,

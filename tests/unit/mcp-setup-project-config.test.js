@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const templatePath = path.join(repoRoot, 'skills', 'spec-mcp-setup', 'references', 'config-template.yaml');
+const templatePath = path.join(repoRoot, 'skills', 'spec-runtime-setup', 'references', 'config-template.yaml');
 const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
 
 function tempRepo(label) {
@@ -30,13 +30,13 @@ function runRepairWorktreeCli(cwd, argv) {
   );
 }
 
-describe('spec-mcp-setup project config', () => {
+describe('spec-runtime-setup project config', () => {
   test('inspects, plans, applies, and re-applies project-local actions idempotently', () => {
     const {
       inspectProjectConfig,
       planProjectConfig,
       applyProjectConfig,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const target = tempRepo('project-config');
 
     expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
@@ -99,7 +99,7 @@ describe('spec-mcp-setup project config', () => {
   });
 
   test('preserves the not-applicable project-local-config-status v1 shape', () => {
-    const { inspectProjectConfig } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    const { inspectProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
 
     expect(inspectProjectConfig({ repoRoot: '', templatePath })).toEqual({
       schema_version: 'project-local-config-status.v1',
@@ -114,7 +114,7 @@ describe('spec-mcp-setup project config', () => {
   });
 
   test('reports current, outdated, ready-for-local-config, and legacy residue with v1 vocabulary', () => {
-    const { inspectProjectConfig } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    const { inspectProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const target = tempRepo('project-config-status');
     const specDir = path.join(target, '.spec-first');
     fs.mkdirSync(specDir, { recursive: true });
@@ -142,7 +142,7 @@ describe('spec-mcp-setup project config', () => {
   });
 
   test('fails closed when a managed ancestor or leaf is a symlink', () => {
-    const { planProjectConfig, applyProjectConfig } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    const { planProjectConfig, applyProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const target = tempRepo('project-config-symlink');
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-project-config-outside-'));
     fs.symlinkSync(outside, path.join(target, '.spec-first'));
@@ -155,7 +155,7 @@ describe('spec-mcp-setup project config', () => {
   });
 
   test('does not delete legacy markdown without an explicit action', () => {
-    const { planProjectConfig, applyProjectConfig } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    const { planProjectConfig, applyProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const target = tempRepo('project-config-legacy');
     const legacy = path.join(target, 'compound-engineering.local.md');
     fs.writeFileSync(legacy, 'legacy\n');
@@ -178,7 +178,7 @@ describe('spec-mcp-setup project config', () => {
     const {
       planProjectConfig,
       applyProjectConfigBatch,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-project-config-batch-'));
     const childA = path.join(workspace, 'a');
     const childB = path.join(workspace, 'b');
@@ -212,7 +212,7 @@ describe('spec-mcp-setup project config', () => {
     const {
       planProjectConfig,
       applyProjectConfigBatch,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-project-config-summary-failure-'));
     const childA = path.join(workspace, 'a');
     const childB = path.join(workspace, 'b');
@@ -253,7 +253,7 @@ describe('spec-first repair-worktree Node backend', () => {
   test('保留 legacy Git health reason code 与 ancestor 探测语义', () => {
     const {
       inspectGitHealth,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/worktree-health.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/worktree-health.cjs');
     const repo = tempRepo('worktree-health-legacy');
     const nested = path.join(repo, 'nested');
     fs.mkdirSync(nested, { recursive: true });
@@ -300,7 +300,7 @@ describe('spec-first repair-worktree Node backend', () => {
     const {
       buildRepairWorktreePreview,
       inspectGitHealth,
-    } = require('../../skills/spec-mcp-setup/scripts/lib/worktree-health.cjs');
+    } = require('../../skills/spec-runtime-setup/scripts/lib/worktree-health.cjs');
     const target = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-worktree-health-'));
     fs.writeFileSync(path.join(target, '.git'), 'gitdir: ../missing-admin/worktrees/demo\n');
 

@@ -12,7 +12,7 @@ function workspaceGraphRefreshPosture() {
     mode: 'explicit',
     native_hook_installed: false,
     reason_code: 'workspace-graph-native-hook-incompatible-with-out-of-tree-artifacts',
-    next_action: '运行 `spec-mcp-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>`。',
+    next_action: '运行 `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>`。',
     trust: 'confirmed-local-contract',
   };
 }

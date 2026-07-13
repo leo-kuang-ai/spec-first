@@ -31,7 +31,7 @@
 
 最小成功信号是具体可检查的：安装和 init 后，在宿主里运行一个 workflow，然后查看它写入仓库的 Markdown artifact，通常位于 `docs/brainstorms/` 或 `docs/plans/`。更深的治理内容可以稍后再读；第一次试用先确认工作是否变得可检查。
 
-<sub>模拟演示路径：安装 → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound；mcp-setup 是 helper 或 MCP readiness facts 缺失时运行的准备步骤，debug 作为测试失败或根因不明时的旁路循环，并在仓库中留下可检查的 Markdown artifacts。动画源文件：[spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)。</sub>
+<sub>模拟演示路径：安装 → init → runtime-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound；runtime-setup 是 helper 或 MCP readiness facts 缺失时运行的准备步骤，debug 作为测试失败或根因不明时的旁路循环，并在仓库中留下可检查的 Markdown artifacts。动画源文件：[spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)。</sub>
 
 ## 快速开始
 
@@ -83,11 +83,11 @@ spec-first init
 
 Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Changelog 保持逐字节不变并继续由仓库自行拥有。
 
-如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-mcp-setup`。标准流程会准备必备 baseline、CodeGraph 与 Graphify；`--only` 仅用于高级子集修复，`--verify-only` 保持不安装的只读验证边界。
+如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-runtime-setup`。标准流程会准备必备 baseline、CodeGraph 与 Graphify；`--only` 仅用于高级子集修复，`--verify-only` 保持不安装的只读验证边界。
 
 Graphify 当前固定为 PyPI `graphifyy@0.9.12`，需要预先存在 Python `>=3.10` 与 `uv`（优先）或 `pipx`。Setup 不自动安装 Python/tool manager，也不使用 plain pip；它会验证 direct wheel hash 与 package identity，通过 `extract --code-only` 在 `.graphify/` 生成本地 AST 图，并始终把 Graphify 输出视为 advisory navigation。显式Graphify mutation setup在Python cutover完整verified后，会默认卸载已确认的全局`@sentropic/graphify` incumbent，并且只删除被证明指向该npm package的旧launcher symlink；诊断、plan和verify-only仍保持只读。
 
-在**按需求组织的非 Git 多仓父目录**（一个需求文件夹里放多套独立 clone 的子 Git 仓）中，`spec-mcp-setup --only codegraph,graphify --workspace-graph --repos a,b` 会一次性为每个子仓建 CodeGraph 战术图、为整个 workspace 建 Graphify 跨仓合并图，并将可核验构建状态原子写入 `.graphify/workspace-graph-state.json`。`--workspace-graph-status` 只有在最近构建完整、repo/source snapshot 未变化且子图、合并图、路由块齐备时才报告 ready；仅存在旧 `merged-graph.json` 不再足够。自动发现只扫描直接子目录；重复 alias 或嵌套仓根会 fail closed，需先消除歧义。Graphify 0.9.x 原生 child hook 与 out-of-tree workspace 子图不兼容，因此当前采用显式刷新：child source 变化后重跑 `--workspace-graph --repos ...`。`--workspace-graph-clean` 或宿主 `spec-first clean --workspace-graph` 只清理显式确认、manifest 或 state receipt 记录的仓及 managed 资产；自动发现的新仓必须先确认。图输出仍是 advisory candidate，结论需回子仓源码确认。
+在**按需求组织的非 Git 多仓父目录**（一个需求文件夹里放多套独立 clone 的子 Git 仓）中，`spec-runtime-setup --only codegraph,graphify --workspace-graph --repos a,b` 会一次性为每个子仓建 CodeGraph 战术图、为整个 workspace 建 Graphify 跨仓合并图，并将可核验构建状态原子写入 `.graphify/workspace-graph-state.json`。`--workspace-graph-status` 只有在最近构建完整、repo/source snapshot 未变化且子图、合并图、路由块齐备时才报告 ready；仅存在旧 `merged-graph.json` 不再足够。自动发现只扫描直接子目录；重复 alias 或嵌套仓根会 fail closed，需先消除歧义。Graphify 0.9.x 原生 child hook 与 out-of-tree workspace 子图不兼容，因此当前采用显式刷新：child source 变化后重跑 `--workspace-graph --repos ...`。`--workspace-graph-clean` 或宿主 `spec-first clean --workspace-graph` 只清理显式确认、manifest 或 state receipt 记录的仓及 managed 资产；自动发现的新仓必须先确认。图输出仍是 advisory candidate，结论需回子仓源码确认。
 
 
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
@@ -164,7 +164,7 @@ docs/
 | 文档/计划审查 | `spec-doc-review` | 结构化 findings |
 | 沉淀可复用经验 | `spec-compound` | `docs/solutions/` |
 
-支撑入口（按需触发）：`spec-mcp-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
+支撑入口（按需触发）：`spec-runtime-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
 
 需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。
 
@@ -273,7 +273,7 @@ spec-first clean     # 移除 generated runtime
 
 ```bash
 npm run typecheck
-npm run test:mcp-setup
+npm run test:runtime-setup
 npm run test:unit
 npm run test:smoke
 npm run test:integration

@@ -6,12 +6,12 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
-describe('spec-mcp-setup cross-platform Node runner contracts', () => {
+describe('spec-runtime-setup cross-platform Node runner contracts', () => {
   test.each([
     ['primary entrypoint', 'setup.cjs'],
     ['compatibility shim', 'check-health'],
   ])('executes the %s with Node on Windows and POSIX', (_label, fileName) => {
-    const entrypoint = path.join(repoRoot, 'skills', 'spec-mcp-setup', 'scripts', fileName);
+    const entrypoint = path.join(repoRoot, 'skills', 'spec-runtime-setup', 'scripts', fileName);
     expect(fs.existsSync(entrypoint)).toBe(true);
 
     const result = spawnSync(process.execPath, [entrypoint, '--help'], {

@@ -222,7 +222,7 @@ function runVerificationOrMutation(context, repoRoot) {
     mode: context.actionPlan.mode,
     reason_code: failedOutcome ? failedOutcome.reason_code : writeResult.reason_code,
     payload: {
-      schema_version: 'spec-mcp-setup-execution.v1',
+      schema_version: 'spec-runtime-setup-execution.v1',
       mode: context.actionPlan.mode,
       mutation: true,
       target: context.target,
@@ -488,7 +488,7 @@ function configureOrInspectHost(context, repoRoot, {
 }
 
 function hostConfigRepairCommand(context) {
-  const args = ['spec-mcp-setup'];
+  const args = ['spec-runtime-setup'];
   if (context.actionPlan.selected_ids.length > 0) {
     args.push('--only', context.actionPlan.selected_ids.join(','));
   }

@@ -2,7 +2,7 @@
 
 // D6 — five-host `spec-first init` projection of the per-requirement workspace
 // graph surface. Runs in a clean sandbox (never against the dirty working tree).
-// Asserts each host mirror of `spec-mcp-setup` carries the new workspace-graph
+// Asserts each host mirror of `spec-runtime-setup` carries the new workspace-graph
 // modules + SKILL docs, and doctor reports no drift for that host.
 
 const fs = require('node:fs');
@@ -90,7 +90,7 @@ function runProjectedSetup(setupRoot, args, sandbox) {
 
 describe('D6 five-host workspace-graph projection', () => {
   test('spec-first init projects workspace-graph modules + docs on all five hosts; doctor no drift', () => {
-    const sourceSkill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-mcp-setup', 'SKILL.md'), 'utf8');
+    const sourceSkill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'), 'utf8');
     const sourceArgumentHint = sourceSkill.split('\n').find((line) => line.startsWith('argument-hint:')) || '';
     expect(sourceArgumentHint).toContain('--workspace-graph');
     expect(sourceArgumentHint).toContain('--json');
@@ -129,7 +129,7 @@ describe('D6 five-host workspace-graph projection', () => {
     for (const platform of platforms) {
       const adapter = getAdapter(platform);
       const runtimeRoot = SETUP_RUNTIME_ROOT[platform] || adapter.workflowsRoot || adapter.skillsRoot;
-      const setupRoot = path.join(sandbox.projectRoot, runtimeRoot, 'spec-mcp-setup');
+      const setupRoot = path.join(sandbox.projectRoot, runtimeRoot, 'spec-runtime-setup');
       expect(fs.existsSync(setupRoot)).toBe(true);
 
       const skillMd = fs.readFileSync(path.join(setupRoot, 'SKILL.md'), 'utf8');

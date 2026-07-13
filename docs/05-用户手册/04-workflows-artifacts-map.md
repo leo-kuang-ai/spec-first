@@ -8,8 +8,8 @@
 
 | 目录 | 写入阶段 | 触发方式 | 主要作用 | 主要产物 |
 | --- | --- | --- | --- | --- |
-| `.spec-first/config/` | `spec-mcp-setup` setup facts 阶段 | `spec-mcp-setup` | 记录 host baseline、required MCP/helper readiness、candidate tools/resources、fallback 能力和 artifact path contract；不是 query-ready direct evidence 或 live MCP proof | `runtime-capabilities.json` |
-| `.spec-first/workspace/` | parent workspace advisory 阶段 | 父 workspace 下的 `spec-mcp-setup` 或 `spec-first clean --workspace-orphans` | 保存 per-child setup/verify summary、setup-time scenario fingerprint 和 parent orphan quarantine | `project-config-bootstrap-summary.json`、`mcp-setup-summary.json`、`mcp-verify-summary.json`、`scenario-fingerprint-setup.json`、`parent-artifact-quarantine.json` |
+| `.spec-first/config/` | `spec-runtime-setup` setup facts 阶段 | `spec-runtime-setup` | 记录 host baseline、required MCP/helper readiness、candidate tools/resources、fallback 能力和 artifact path contract；不是 query-ready direct evidence 或 live MCP proof | `runtime-capabilities.json` |
+| `.spec-first/workspace/` | parent workspace advisory 阶段 | 父 workspace 下的 `spec-runtime-setup` 或 `spec-first clean --workspace-orphans` | 保存 per-child setup/verify summary、setup-time scenario fingerprint 和 parent orphan quarantine | `project-config-bootstrap-summary.json`、`runtime-setup-summary.json`、`mcp-verify-summary.json`、`scenario-fingerprint-setup.json`、`parent-artifact-quarantine.json` |
 | `.spec-first/app-audit/runs/<run-id>/` | `spec-app-consistency-audit` App 一致性审查阶段 | `spec-app-consistency-audit`；headless 自动化下亦可直接调用 `node skills/spec-app-consistency-audit/scripts/run-audit.js mode:headless base:<ref>` | 保存移动 App PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查证据；`issue_synthesis_status` 三态(`not_run` / `llm_provided` / `fixture_provided`)区分确定性 runner 产物与上游 LLM/fixture 注入的语义 issue；markdown 摘要由下游 Report Writer 产出，不由 runner 直接生成 | 由 runner 产出: `metadata.json`、`preflight.json`、`impact-facts.json`、`issues.json`、`audit-report.json`、`app-audit-context.json`、`merged-context.json`、`artifact-manifest.json`、`headless-envelope.txt`；由下游 Report Writer 产出: `app-consistency-audit.md`、`app-consistency-audit.summary.md` |
 | `.spec-first/workflows/verification/<slug>/` | verification evidence 阶段 | 上游 verification 流程写入，`doctor` 读取 | 作为验证证据投递目录 | `verification-evidence.json` |
 | `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/` | `spec-work` closeout evidence 阶段 | `spec-work` closeout durable evidence trigger 适用时，由 source-owned producer 写入 | 保存本次 work 的 compact run evidence、验证摘要、source refs 和可选 `direct_evidence_used` session-local direct source evidence evidence 摘要；`workflow_integrated=false` 仍表示完整 replay/retention lifecycle 未完成 | `run.json` |
@@ -44,7 +44,7 @@
 | `docs/brainstorms/` | 需求成型 brief 与研发侧 clarified requirements | `spec-plan`、doc review、后续维护者复核 scope、acceptance examples、Change Delta、owner 决策和 evidence posture |
 | `docs/plans/` / `docs/tasks/` | 计划与可执行任务交接 | `spec-work`、`write-tasks` public workflow、code/doc review；计划中的 evidence posture 说明 direct source reads、验证命令、限制和源码验证要求 |
 | `docs/solutions/` | 可复用工程知识 | 后续 brainstorm/plan/work/debug/review 复用经验 |
-| `config/` | setup-owned machine facts | mcp-setup 前置校验、host readiness 指针、required helper readiness、candidate `native_tools[]` / `native_resources[]`、fallback 能力判断 |
+| `config/` | setup-owned machine facts | runtime-setup 前置校验、host readiness 指针、required helper readiness、candidate `native_tools[]` / `native_resources[]`、fallback 能力判断 |
 | `workspace/` | parent workspace advisory summaries | 多仓父目录下展示 child repo 候选、scenario fingerprint、批量维护结果和 parent orphan quarantine；不作为 repo-local truth |
 | `app-audit/runs/` | App consistency audit execution artifacts | 评审者读取静态一致性报告、degraded modes、issues 和 runtime follow-up 建议 |
 | `verification/*` | 验证证据投递目录 | `doctor` 校验与汇总 |
@@ -56,7 +56,7 @@
 
 | 产物目录 | 主要读取方 | 读取发生阶段 | 读取目的 |
 | --- | --- | --- | --- |
-| `config/` | `spec-mcp-setup`、`doctor`、相关 workflow | mcp-setup preflight / host readiness selection | 校验 baseline、required helper readiness、artifact path contract 和 fallback 能力；不把 discovery facts 当 query-ready evidence |
+| `config/` | `spec-runtime-setup`、`doctor`、相关 workflow | runtime-setup preflight / host readiness selection | 校验 baseline、required helper readiness、artifact path contract 和 fallback 能力；不把 discovery facts 当 query-ready evidence |
 | `workspace/` | 父 workspace 下的 LLM workflow、维护者 | workspace 只读定位或批量维护后 | 查看 child repo 候选、per-child setup summary 和 next action；不替代 child repo source truth |
 | `app-audit/runs/<run-id>` | 评审者、`spec-code-review` headless 调用、后续 QA / runtime validation | App 一致性审查后 | 查看 PRD/Figma/source 一致性问题、证据链、降级范围和运行时验证建议 |
 | `verification/<slug>` | `src/cli/commands/doctor.js` | `doctor` 检查阶段 | 校验 verification evidence 是否存在、有效、足够新 |
@@ -68,10 +68,10 @@
 | 项目 | 内容 |
 | --- | --- |
 | 阶段 | Required Harness Runtime setup facts |
-| 触发 | `spec-mcp-setup` |
+| 触发 | `spec-runtime-setup` |
 | 目录形状 | `.spec-first/config/` |
-| 关键源码 | `skills/spec-mcp-setup/scripts/setup.cjs`、`skills/spec-mcp-setup/scripts/lib/facts.cjs`、`skills/spec-mcp-setup/scripts/lib/configured-dependencies.cjs` |
-| 事实边界 | setup-owned config facts；不是 mcp-setup 的结果真相源 |
+| 关键源码 | `skills/spec-runtime-setup/scripts/setup.cjs`、`skills/spec-runtime-setup/scripts/lib/facts.cjs`、`skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs` |
+| 事实边界 | setup-owned config facts；不是 runtime-setup 的结果真相源 |
 
 ### 写入内容
 
@@ -79,16 +79,16 @@
 | --- | --- |
 | `runtime-capabilities.json` | host ledger 指针、baseline 摘要、required helper readiness 和 fallback tool 能力 |
 
-`spec-mcp-setup` 写入 setup-owned facts，但不把自然语言 setup 输出当成后续 workflow 的源码证据真相源。
+`spec-runtime-setup` 写入 setup-owned facts，但不把自然语言 setup 输出当成后续 workflow 的源码证据真相源。
 
 ## Parent workspace advisory summaries
 
 | 项目 | 内容 |
 | --- | --- |
 | 阶段 | parent workspace advisory summaries |
-| 触发 | 父 workspace 下运行 `spec-mcp-setup` 或显式只读定位 |
+| 触发 | 父 workspace 下运行 `spec-runtime-setup` 或显式只读定位 |
 | 目录形状 | `.spec-first/workspace/` |
-| 关键源码 | `skills/spec-mcp-setup/scripts/setup.cjs`、`skills/spec-mcp-setup/scripts/lib/project-config.cjs`、`skills/spec-mcp-setup/scripts/lib/facts.cjs` |
+| 关键源码 | `skills/spec-runtime-setup/scripts/setup.cjs`、`skills/spec-runtime-setup/scripts/lib/project-config.cjs`、`skills/spec-runtime-setup/scripts/lib/facts.cjs` |
 | 事实边界 | advisory workspace facts；不是任何 child repo 的 canonical truth |
 
 ### 写入内容
@@ -96,7 +96,7 @@
 | 文件 | 角色 |
 | --- | --- |
 | `project-config-bootstrap-summary.json` | 父 workspace 下 project config bootstrap 的 per-child 汇总 |
-| `mcp-setup-summary.json` | 父 workspace 下显式 provider setup 的 per-child 汇总 |
+| `runtime-setup-summary.json` | 父 workspace 下显式 provider setup 的 per-child 汇总 |
 | `mcp-verify-summary.json` | 父 workspace 下统一 Node verify path 的 per-child readiness 汇总；`parent_workspace_pollution_count` 记录本次 parent orphan quarantine 命中数 |
 | `scenario-fingerprint-setup.json` | `developer-scenario-fingerprint-setup.v1`，setup-time 场景事实；包含 topology、worktree、complexity dimensions、foreign residual indicators 和 advisory limitations |
 | `parent-artifact-quarantine.json` | `parent-artifact-quarantine.v1`，父 workspace 下 repo-local retired residue 的 advisory quarantine；`spec-first clean --workspace-orphans` 默认只预览，`--confirm` 才删除受支持的 quarantined parent orphan 路径 |

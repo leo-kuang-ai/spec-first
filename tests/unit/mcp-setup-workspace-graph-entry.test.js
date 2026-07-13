@@ -5,11 +5,11 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const { parseArgs } = require('../../skills/spec-mcp-setup/scripts/lib/args.cjs');
-const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-provider-runners.cjs');
+const { parseArgs } = require('../../skills/spec-runtime-setup/scripts/lib/args.cjs');
+const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
-const skillRoot = path.resolve(__dirname, '../../skills/spec-mcp-setup');
+const skillRoot = path.resolve(__dirname, '../../skills/spec-runtime-setup');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-entry-')));

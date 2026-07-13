@@ -6,7 +6,7 @@ const {
 } = require('./platform-registry');
 
 const HOST_COMPARATIVE_CONFIG_SKILLS = new Set([
-  'spec-mcp-setup',
+  'spec-runtime-setup',
 ]);
 
 const HOST_COMPARATIVE_CONFIG_PATHS = [

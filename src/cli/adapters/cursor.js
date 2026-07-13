@@ -11,6 +11,7 @@ const {
   contentHasUnexpectedRuntimePathReferences,
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 
 const CURSOR_RULE_POINTER_PATH = '.cursor/rules/spec-first.mdc';
 const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
@@ -229,12 +230,12 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --cursor')
     .replace(/\$spec-\*/g, '`spec-*`')
     .replace(/\/spec:\*/g, '`spec-*`')
-    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`')
-    .replace(/\/spec:mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/\$spec-runtime-setup/g, '`spec-runtime-setup`')
+    .replace(/\/spec:runtime-setup/g, '`spec-runtime-setup`')
     .replace(/Kiro Agent\s+Skills/g, '`spec-*`')
-    .replace(/Kiro Agent\s+Skill `spec-mcp-setup`/g, '`spec-mcp-setup`')
+    .replace(/Kiro Agent\s+Skill `spec-runtime-setup`/g, '`spec-runtime-setup`')
     .replace(/Qoder project (?:commands|entrypoints)\s+or\s+Skills/g, '`spec-*`')
-    .replace(/Qoder `(?:\/spec:mcp-setup|spec-mcp-setup)` entrypoint/g, '`spec-mcp-setup`');
+    .replace(/Qoder `(?:\/spec:runtime-setup|spec-runtime-setup)` entrypoint/g, '`spec-runtime-setup`');
   return rewriteCursorRuntimeContextSections(rewriteUsingSpecFirstCursorSections(rewritten));
 }
 
@@ -307,7 +308,7 @@ function normalizeCursorSkillFrontmatter(content, context = {}) {
 }
 
 function isCursorRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
 }
 
 function isSkillEntrypointContext(context = {}) {
@@ -323,7 +324,7 @@ function addCursorSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Cursor Host Pin',
     '',
-    'When this generated Cursor `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=cursor` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    'When this generated Cursor `spec-runtime-setup` runtime surface invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=cursor` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
@@ -408,7 +409,7 @@ function inspectCursorSkillNames(projectRoot, skillsRoot) {
       if (isPublicWorkflowSkillName(skillDir) && fields['disable-model-invocation'] !== 'true') {
         issues.push('workflow skill must set disable-model-invocation: true');
       }
-      if (skillDir === 'spec-mcp-setup' && !content.includes('MCP_SETUP_HOST=cursor')) {
+      if ((skillDir === 'spec-runtime-setup') && !content.includes('MCP_SETUP_HOST=cursor')) {
         issues.push('missing Cursor MCP_SETUP_HOST pin');
       }
       if (contentHasUnexpectedRuntimePathReferences('cursor', content, { skillName: skillDir })) {

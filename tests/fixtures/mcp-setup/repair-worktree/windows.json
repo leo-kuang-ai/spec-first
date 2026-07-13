@@ -1,7 +1,7 @@
 {
   "schema_version": "repair-worktree-parity.v1",
   "platform": "windows",
-  "legacy_owner": "skills/spec-mcp-setup/scripts/repair-worktree.ps1",
+  "legacy_owner": "skills/spec-runtime-setup/scripts/repair-worktree.ps1",
   "contract": {
     "help": {
       "argv": ["--help"],

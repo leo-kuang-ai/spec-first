@@ -38,7 +38,7 @@ function probeTool(context, repoRoot, entry, selectedIds) {
       source: 'read-only-probe',
       reason_code: 'optional-capability-not-selected',
       configured_status: 'not-required',
-      next_action: `运行 spec-mcp-setup --only ${entry.id}，执行显式 setup。`,
+      next_action: `运行 spec-runtime-setup --only ${entry.id}，执行显式 setup。`,
     };
   }
   const dependencies = Array.isArray(entry.dependencies) ? entry.dependencies : [];

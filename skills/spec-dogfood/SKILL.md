@@ -50,7 +50,7 @@ This workflow drives the browser exclusively through the `agent-browser` CLI. Do
   command -v agent-browser >/dev/null 2>&1 && echo "Ready" || echo "NOT INSTALLED"
   ```
 
-If not installed, stop with this message: "Browser automation helper unavailable. Run `spec-mcp-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-dogfood`. This does not block spec-first baseline." This workflow cannot function without `agent-browser`.
+If not installed, stop with this message: "Browser automation helper unavailable. Run `spec-runtime-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-dogfood`. This does not block spec-first baseline." This workflow cannot function without `agent-browser`.
 
 ## Reusing Spec-First Skills
 

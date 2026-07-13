@@ -96,7 +96,7 @@ describe('CE upstream skill sync contracts', () => {
   test('keeps Claude Fable elevation as an intentional upstream divergence', () => {
     const plan = read('skills/spec-plan/SKILL.md');
     const brainstorm = read('skills/spec-brainstorm/SKILL.md');
-    const setup = read('skills/spec-mcp-setup/references/config-template.yaml');
+    const setup = read('skills/spec-runtime-setup/references/config-template.yaml');
 
     expect(fs.existsSync('skills/spec-plan/references/reasoning-elevation.md')).toBe(false);
     expect(fs.existsSync('skills/spec-brainstorm/references/reasoning-elevation.md')).toBe(false);

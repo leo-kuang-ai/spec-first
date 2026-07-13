@@ -34,21 +34,21 @@ function buildParentWorkspaceDiagnostic({
     child_provider_setup: {
       purpose: 'per-child CodeGraph/Graphify/MCP/host config',
       commands: [
-        'spec-mcp-setup --only codegraph,graphify --all-repos --repair-host-config',
-        'spec-mcp-setup --verify-only --all-repos',
+        'spec-runtime-setup --only codegraph,graphify --all-repos --repair-host-config',
+        'spec-runtime-setup --verify-only --all-repos',
       ],
     },
     workspace_two_layer_graph: {
       purpose: 'per-child CodeGraph + workspace Graphify merged graph + routing block',
       commands: [
         reposArg.length
-          ? `spec-mcp-setup --only codegraph,graphify --workspace-graph --repos ${reposArg.join(',')}`
+          ? `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos ${reposArg.join(',')}`
           : (candidateIds.length
-            ? `spec-mcp-setup --only codegraph,graphify --workspace-graph --repos ${candidateIds.join(',')}`
-            : 'spec-mcp-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>'),
+            ? `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos ${candidateIds.join(',')}`
+            : 'spec-runtime-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>'),
         reposArg.length || candidateIds.length
-          ? `spec-mcp-setup --workspace-graph-status --repos ${(reposArg.length ? reposArg : candidateIds).join(',')}`
-          : 'spec-mcp-setup --workspace-graph-status --repos <a,b,...>',
+          ? `spec-runtime-setup --workspace-graph-status --repos ${(reposArg.length ? reposArg : candidateIds).join(',')}`
+          : 'spec-runtime-setup --workspace-graph-status --repos <a,b,...>',
         'spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
       ],
       do_not: [

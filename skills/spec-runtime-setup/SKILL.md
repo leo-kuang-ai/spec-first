@@ -1,12 +1,12 @@
 ---
-name: spec-mcp-setup
+name: spec-runtime-setup
 description: Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows on Claude Code, Codex, Kiro, Qoder, or Cursor.
 argument-hint: "[bare auto setup] [--check|--verify-only|--plan|--project-config] [--only codegraph,graphify] [--workspace-graph|--workspace-graph-status|--workspace-graph-clean] [--repos <a,b>] [--json] [--repair-host-config] [--refresh] [--repo <path>] [--requirement-workspace <repo-relative-path>]"
 ---
 
 # Runtime Setup
 
-`spec-mcp-setup` is the current runnable entrypoint for the Runtime Setup workflow across supported hosts. The target user-facing alias remains `spec-runtime-setup` once the host alias contract is implemented; legacy host-specific setup spellings normalize to `spec-mcp-setup` and are not separate product surfaces. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and baseline helper tooling, diagnoses manual helpers such as `agent-browser`, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
+`spec-runtime-setup` is the canonical runnable entrypoint for the Runtime Setup workflow across supported hosts (Claude/Qoder command spelling `runtime-setup`). Host-specific setup spellings are not separate products. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and baseline helper tooling, diagnoses manual helpers such as `agent-browser`, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
 
 ## Contract Summary
 
@@ -29,7 +29,7 @@ Overrides: none
 
 ## Source Of Truth
 
-Canonical package source-of-truth 是 `skills/spec-mcp-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。Generated host 从已加载 skill 目录消费共置的 registry projection；该 projection 是 generated runtime，不是第二个 source。当前完整 Runtime Setup 必备项包括 `sequential-thinking`、`context7`、ffmpeg、CodeGraph 与 Graphify；CodeGraph/Graphify first generation 和真实 query probe 属于标准 setup completion，而不是长期可跳过的 optional tail。`--only codegraph` / `--only graphify` 仅用于高级子集修复，不改变完整 setup 的必备定义。
+Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。Generated host 从已加载 skill 目录消费共置的 registry projection；该 projection 是 generated runtime，不是第二个 source。当前完整 Runtime Setup 必备项包括 `sequential-thinking`、`context7`、ffmpeg、CodeGraph 与 Graphify；CodeGraph/Graphify first generation 和真实 query probe 属于标准 setup completion，而不是长期可跳过的 optional tail。`--only codegraph` / `--only graphify` 仅用于高级子集修复，不改变完整 setup 的必备定义。
 
 Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source. If setup prose or scripts change, update source first and use `spec-first init` only for runtime regeneration.
 
@@ -41,7 +41,7 @@ Generated host runtime mirrors and host-local MCP config files are projections o
 
 ## Loaded Skill 入口
 
-从当前已加载的 `spec-mcp-setup/SKILL.md` 所在目录解析 `SKILL_DIR`。每次 runtime 调用都必须使用该目录中的共置 Node 入口：
+从当前已加载的 `spec-runtime-setup/SKILL.md` 所在目录解析 `SKILL_DIR`。每次 runtime 调用都必须使用该目录中的共置 Node 入口：
 
 ```bash
 node "$SKILL_DIR/scripts/setup.cjs" <mode-and-target-arguments>
@@ -70,7 +70,7 @@ Local config bootstrap is a first-class Runtime Setup capability, but it remains
 
 ### Stage 1: Diagnose Target And Readiness
 
-Resolve the project target first. In a parent workspace, stop before repo-local writes unless the user selected a child repo or intentionally chose all supported child repos. Then inspect:
+Resolve the project target first. In a non-Git parent workspace, default to all discovered supported child repos; `--repo <child>` is the explicit narrowing control. Continue only when discovery yields a bounded child set, and keep every repo-local write within its child target. Then inspect:
 
 - host runtime identity and write authority;
 - required MCP/helper dependency readiness;
@@ -129,7 +129,7 @@ If setup later reports project convention facts, they must be deterministic exis
 
 ## Host Authority And Write Safety
 
-当前公开入口是 `spec-mcp-setup`；调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|qoder` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
+当前公开入口是 `spec-runtime-setup`；兼容入口仍接受 `spec-runtime-setup`；调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|qoder` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
 
 在写入任何 host config 或刷新 setup-owned facts 前，workflow 必须让 `setup.cjs` 从显式 entrypoint host pin 解析 host authority 与 effective registry target。旧 setup facts 只能作为 drift comparison evidence：若其与当前 entrypoint host 不一致，应报告 host-marker drift，并为当前 host 刷新 setup-owned facts，不得把旧 host 当作当前 host。绝不能仅依据 prose 手动选择 `.kiro/settings/mcp.json`、`.qoder/settings.local.json`、`.cursor/mcp.json`、Codex TOML 或 Claude managed/user config。
 
@@ -141,7 +141,7 @@ If setup later reports project convention facts, they must be deterministic exis
 - `--verify-only` / `--refresh-facts`: verify readiness and refresh setup-owned facts; do not install tools or edit host config.
 - `--plan`: render install/config operations and safety results; do not write setup facts, host config, or install tools.
 - `--project-config`：仅执行 project-local config bootstrap。按请求刷新 example，仅在显式 action 后创建 local override，按请求确保 `.spec-first/*.local.yaml` ignore coverage，并报告 legacy project config signal 而不迁移它们。该 mode 不安装 MCP server、不配置 host runtime，也不执行 helper/Provider first generation。
-- Bare invocation (`spec-mcp-setup` in the current host): default full setup workflow. Resolve target，运行默认 required-provider plan；无 blocker 时执行等价的 `--only codegraph,graphify` apply、验证 baseline/Provider/runtime/project status，并写 setup facts。Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`，不需要二次确认；它不授权绕过 higher-precedence、unsafe path、unreadable config、symlink/path escape 或 literal secret gate。
+- Bare invocation (`spec-runtime-setup` in the current host): default full setup workflow. Resolve target，运行默认 required-provider plan；无 blocker 时执行等价的 `--only codegraph,graphify` apply、验证 baseline/Provider/runtime/project status，并写 setup facts。Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`，不需要二次确认；它不授权绕过 higher-precedence、unsafe path、unreadable config、symlink/path escape 或 literal secret gate。
 - `--only <ids>`: advanced headless/subset repair path. `--only codegraph`, `--only graphify`, or `--only codegraph,graphify` narrows provider execution and does not require a confirmation prompt；子集结果必须标记为 partial scope，不能声称完整 setup ready。
 - `--repair-host-config`：显式授权 setup 仅替换 registry 管理且已确认冲突的 MCP 条目；保留同一 host config 中的其他用户字段和 server，并执行事务回滚与 post-write verification。Bare full setup 由 workflow 自动携带该 flag 处理 selected-target managed drift；显式 subset/repair 调用则必须由用户提供。可单独用于 baseline host config repair，也可与 `--only ...` 组合，在修复后继续 Provider install-init。没有该 flag 时，显式 `--plan` 必须在 package/provider mutation 前报告 `host-config-conflict` 并阻断；高优先级 target 冲突、不可读配置、symlink/path escape 和 literal secret 不能通过该 flag 绕过。
 - `--refresh`: Graphify explicit incremental refresh path. Use with `--only graphify` when `.graphify/` already exists, or when a legacy `graphify-out/` artifact should be regenerated into provider-native `.graphify/`, and the user wants setup to run provider-native `graphify update .` (code-only, no LLM) instead of only verifying/installing provider readiness. This is not full semantic extraction; missing artifacts still use first-generation `graphify extract .` with `graphify update .` fallback.
@@ -160,13 +160,13 @@ CodeGraph setup 使用受控 MCP/Provider route。被选中后，setup 安装 `s
 
 ## Default Full Setup Flow
 
-For bare `spec-mcp-setup`, do this inside the skill:
+For bare `spec-runtime-setup`, do this inside the skill:
 
-1. Resolve the project target. In a parent workspace, stop before repo-local writes unless the user selected a child repo or intentionally chose all supported child repos.
+1. Resolve the project target. In a non-Git parent workspace, default to all discovered supported child repos; use `--repo <child>` only to narrow the run. Every repo-local write remains contained in its child target.
 2. Run the read-only check。若 example config missing/outdated 或 local-config ignore rule missing，先运行 `--project-config --refresh-example --ensure-gitignore`；`.spec-first/config.local.yaml` 缺失保持 `defaults-active`，不创建空 override。
-3. Run `node "$SKILL_DIR/scripts/setup.cjs" --plan --repo <resolved-project-root>`。Plan 默认选择 registry 中 `setup_required=true` 的 CodeGraph/Graphify，并同时预览 baseline MCP/helper、host config、Provider artifact、hook 与 facts writes。
+3. Run `node "$SKILL_DIR/scripts/setup.cjs" --plan --repo <resolved-project-root>` for a single-repo target. For the default parent-workspace batch, preview every discovered child with its own `--repo <child>` target before the shared apply. Plan 默认选择 registry 中 `setup_required=true` 的 CodeGraph/Graphify，并同时预览 baseline MCP/helper、host config、Provider artifact、hook 与 facts writes。
 4. If the plan reports an unresolved target, higher-precedence conflict, unsafe path, unreadable config, or unsupported install path, stop with the exact blocker. If it reports a selected-target `host-config-conflict`, show config path/key/drift fields。Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`：自动携带 `--repair-host-config` 重新 preview 并继续 apply，不再请求用户二次确认。
-5. Plan 无 blocker 后运行等价 apply：`node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify --repo <resolved-project-root>`，并携带已授权的 repair/target/workspace flags。Bare workflow invocation 已授权标准 required setup，不再追加二次确认。
+5. Plan 无 blocker 后运行等价 apply：单仓使用 `node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify --repo <resolved-project-root>`；默认 parent-workspace batch 则从 parent 运行 `node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify`，由 resolver 对全部 discovered child 执行。两条路径都携带已授权的 repair/target/workspace flags。Bare workflow invocation 已授权标准 required setup，不再追加二次确认。
 6. Apply 必须完成 ffmpeg/baseline helper、CodeGraph init/index/query、Graphify graph/query/hook、host config、project status 和 facts verification。任一 required item 未 ready 时，完整 setup 返回 action-required；不得以 direct-source fallback 把 setup 本身报告为 complete。
 
 ## Subset / Repair Flow
@@ -175,17 +175,17 @@ Use `--only codegraph`, `--only graphify`, `--only codegraph,graphify`, or Graph
 
 1. 运行带相同 selection 的 plan，再执行 apply；`--only` 自身就是该子集 mutation 的授权。
 2. Host conflict 仍需独立 `--repair-host-config` 授权；higher-precedence、unsafe path、unreadable config 和 literal secret 永远 fail closed。
-3. 子集成功只证明所选 scope ready。最终完整 setup readiness 仍以 `spec-mcp-setup --verify-only` 对全部 required items 的结果为准。
+3. 子集成功只证明所选 scope ready。最终完整 setup readiness 仍以 `spec-runtime-setup --verify-only` 对全部 required items 的结果为准。
 
 ## Per-Requirement Workspace Graph (Multi-Repo)
 
 从一个**非 Git 的需求文件夹**(多仓父目录,内含多个独立 clone 的子 Git 仓)运行 setup 时,先分清两条路径:
 
-1. **子仓 provider/MCP setup**(各 child 的 CodeGraph/Graphify/host config):`--all-repos` 或 `--repo <child>`。
+1. **子仓 provider/MCP setup**(各 child 的 CodeGraph/Graphify/host config):父目录无 target 参数时默认 all-repos；`--repo <child>` 收窄到单仓，`--all-repos` 可用于显式表达同一批处理范围。
 2. **父目录双层图**(per-child CodeGraph + workspace Graphify merge):`--workspace-graph --repos a,b,...` 或 `.spec-first/workspace.yaml` manifest。  
    **不要**写 `--workspace-graph --all-repos`——`--all-repos` 只服务子仓 batch,不是 workspace-graph 的仓集确认。
 
-运行 `spec-mcp-setup --only codegraph,graphify --workspace-graph` 时,setup 会为该 workspace 建立两层代码图:
+运行 `spec-runtime-setup --only codegraph,graphify --workspace-graph` 时,setup 会为该 workspace 建立两层代码图:
 
 1. **每子仓战术图**:`codegraph init` 生成 `工程N/.codegraph/`;`.codegraph/` 写入该子仓 `.git/info/exclude`(经 `git rev-parse --git-path` 解析,正确处理 `.git`-as-file/worktree,并做 realpath+containment 校验)以保持子仓 `git status` 干净;CodeGraph MCP server 全局 install 一次,跨仓查询通过 `projectPath`。
 2. **workspace 跨仓宏观图**:Graphify `extract --code-only` 每子仓子图 + `merge-graphs` 合并图,全部 out-of-tree 写到 `需求文件夹/.graphify/`(子仓物理零侵入)。单/零子仓分别产出 single-source / not-applicable。构建结果原子写入 `.graphify/workspace-graph-state.json`;status 只有在最近构建 complete、repo 集合与 source snapshot 未变化、子图/合并图/路由块均存在时才报告 ready。
@@ -230,8 +230,8 @@ Machine contract:
 
 ## Workflow
 
-1. Identify the current host from the generated host-specific runtime surface invoking the unified `spec-mcp-setup` entrypoint. The target renamed entrypoint is `spec-runtime-setup` once the alias contract lands.
-2. If invoked from a parent workspace, select an explicit child repo or intentionally run setup for all supported child repos. Writes must stay within the selected target.
+1. Identify the current host from the generated host-specific runtime surface invoking the unified `spec-runtime-setup` entrypoint.
+2. If invoked from a non-Git parent workspace, resolve all discovered supported child repos by default; `--repo <child>` narrows the run. Writes must stay within each resolved child target.
 3. 运行共置 Node 入口，使其加载 `setup-registry.v8`、校验 schema，并展开 effective host/platform registry。
 4. 让 `setup.cjs` 按所选 mode 诊断或安装必需的 package-backed MCP tool；standard workflow 默认选择 registry required Provider，`--only` 只用于高级子集修复；host config 只能通过 registry target 写入，并记录结构化 execution facts。
 5. 让同一 Node 入口验证 baseline helper 与 required Provider。`agent-browser` 保持 diagnostic/manual-command only；ffmpeg、CodeGraph 与 Graphify 必须进入完整 setup completion。Provider first generation 与 project-local auto-refresh setup 只能通过静态 Provider module 与 bounded argv-array process runner 执行。若默认 project-root scope 中的 `graphify extract .` 失败，setup 可以先尝试 code-only `graphify update .`，再返回 failed readiness。若 Graphify 已安装但不在用户原始 `PATH` 中可见，报告 manual visibility action，不编辑 shell profile；对 Provider-owned git hook，setup 只能修复 project-local Graphify hook PATH block，使 hook verification 在不修改 global profile 的情况下成功。Bounded repair 后 Graphify hook install 仍失败时，报告带 `next_actions` 的 `readiness_status=degraded`，不得标记 hook refresh 已验证。
@@ -252,7 +252,7 @@ The final setup output should contain:
 - `Project local config`: example config, local override, gitignore safety rule, legacy markdown config signal, and retired legacy local config status. Human labels and machine fields should be de-branded; active setup facts must use `.spec-first` local config paths and neutral legacy field names.
 - `Project setup facts`: status for `tool-facts.json` and `runtime-capabilities.json`.
 - `Verification profile`: current verification profile visibility placeholder; full profile execution is v1.13 scope.
-- `Next steps`: either fix action-required rows, choose an explicit child repo, continue to the user-intent workflow, or suggest `spec-rule-miner` as a separate follow-up after CodeGraph/Graphify readiness is prepared. This suggestion is advisory; setup must not treat rule-miner output as setup readiness and must not call `spec-rule-miner` automatically.
+- `Next steps`: either fix action-required rows, narrow to an explicit child repo when a single-repo retry is needed, continue to the user-intent workflow, or suggest `spec-rule-miner` as a separate follow-up after CodeGraph/Graphify readiness is prepared. This suggestion is advisory; setup must not treat rule-miner output as setup readiness and must not call `spec-rule-miner` automatically.
 
 `tool-facts.json` records setup-owned tool and helper readiness:
 
@@ -330,7 +330,7 @@ Focused setup changes should run the narrowest relevant checks:
 ```bash
 node "$SKILL_DIR/scripts/setup.cjs" --check
 node "$SKILL_DIR/scripts/setup.cjs" --plan
-npm run test:mcp-setup
+npm run test:runtime-setup
 node --check "$SKILL_DIR/scripts/setup.cjs"
 ```
 

@@ -7,7 +7,7 @@ const {
   isRoutingInstructionCurrent,
   BLOCK_START,
   BLOCK_END,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-routing-instruction.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-routing-instruction.cjs');
 
 describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
   const repos = [{ repo_id: 'api' }, { repo_id: 'web' }];

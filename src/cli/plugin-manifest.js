@@ -37,7 +37,7 @@ function buildPluginManifestFromSources() {
   const governance = readJsonFile(GOVERNANCE_PATH, 'skills governance truth source');
   const commands = [...(governance.skills || [])]
     .filter((record) => record && record.entry_surface === 'workflow_command')
-    .map((record) => {
+    .flatMap((record) => {
       if (typeof record.command_name !== 'string' || record.command_name.length === 0) {
         throw new Error(`Governed workflow skill "${record.skill_name || '<unknown>'}" is missing command_name.`);
       }
@@ -45,18 +45,44 @@ function buildPluginManifestFromSources() {
         throw new Error(`Governed workflow command "${record.command_name}" is missing skill_name.`);
       }
 
-      const filename = `${record.command_name}.md`;
-      const templatePath = path.join(REPO_ROOT, SOURCE_DIRECTORIES.commands, filename);
+      const primaryFilename = `${record.command_name}.md`;
+      const templatePath = path.join(REPO_ROOT, SOURCE_DIRECTORIES.commands, primaryFilename);
       const skillSourcePath = path.join(REPO_ROOT, SOURCE_DIRECTORIES.skills, record.skill_name, 'SKILL.md');
       const metadata = readCommandTemplateMetadata(templatePath, record.command_name, skillSourcePath);
 
-      return {
+      const primary = {
         name: record.command_name,
-        filename,
+        filename: primaryFilename,
         description: metadata.description,
         argumentHint: metadata['argument-hint'] || '',
         skill: record.skill_name,
+        sourceSkill: record.skill_name,
+        isLegacyAlias: false,
       };
+
+      const legacyCommandNames = Array.isArray(record.legacy_aliases && record.legacy_aliases.command_names)
+        ? record.legacy_aliases.command_names
+        : [];
+      const legacySkillNames = Array.isArray(record.legacy_aliases && record.legacy_aliases.skill_names)
+        ? record.legacy_aliases.skill_names
+        : [];
+
+      const aliases = legacyCommandNames.map((commandName, index) => {
+        const aliasSkill = legacySkillNames[index] || legacySkillNames[0] || record.skill_name;
+        return {
+          name: commandName,
+          filename: `${commandName}.md`,
+          description: metadata.description,
+          argumentHint: metadata['argument-hint'] || '',
+          skill: aliasSkill,
+          sourceSkill: record.skill_name,
+          isLegacyAlias: true,
+          canonicalCommandName: record.command_name,
+          canonicalSkillName: record.skill_name,
+        };
+      });
+
+      return [primary, ...aliases];
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -199,6 +225,18 @@ function loadSkillsGovernance() {
           kiro: record.host_delivery.kiro,
           qoder: record.host_delivery.qoder,
         },
+        ...(record.legacy_aliases
+          ? {
+            legacy_aliases: {
+              skill_names: Array.isArray(record.legacy_aliases.skill_names)
+                ? [...record.legacy_aliases.skill_names]
+                : [],
+              command_names: Array.isArray(record.legacy_aliases.command_names)
+                ? [...record.legacy_aliases.command_names]
+                : [],
+            },
+          }
+          : {}),
       }))
       .sort((a, b) => a.skill_name.localeCompare(b.skill_name)),
   };
@@ -356,6 +394,40 @@ function validateSkillsGovernance(governance) {
       }
     }
 
+    if (record.legacy_aliases !== undefined) {
+      if (!record.legacy_aliases || typeof record.legacy_aliases !== 'object' || Array.isArray(record.legacy_aliases)) {
+        throw new Error(`${prefix} legacy_aliases must be an object when present.`);
+      }
+
+      const legacySkillNames = record.legacy_aliases.skill_names;
+      const legacyCommandNames = record.legacy_aliases.command_names;
+
+      if (legacySkillNames !== undefined) {
+        if (!Array.isArray(legacySkillNames) || legacySkillNames.some((name) => typeof name !== 'string' || name.length === 0)) {
+          throw new Error(`${prefix} legacy_aliases.skill_names must be an array of non-empty strings.`);
+        }
+        for (const aliasName of legacySkillNames) {
+          if (aliasName === record.skill_name || seen.has(aliasName) || bundledSkills.includes(aliasName)) {
+            throw new Error(`${prefix} legacy skill alias "${aliasName}" collides with a primary skill name.`);
+          }
+        }
+      }
+
+      if (legacyCommandNames !== undefined) {
+        if (!Array.isArray(legacyCommandNames) || legacyCommandNames.some((name) => typeof name !== 'string' || name.length === 0)) {
+          throw new Error(`${prefix} legacy_aliases.command_names must be an array of non-empty strings.`);
+        }
+        if (record.entry_surface !== 'workflow_command') {
+          throw new Error(`${prefix} can only declare command aliases for workflow_command skills.`);
+        }
+        for (const aliasName of legacyCommandNames) {
+          if (aliasName === record.command_name) {
+            throw new Error(`${prefix} legacy command alias "${aliasName}" collides with the primary command_name.`);
+          }
+        }
+      }
+    }
+
   }
 
   const missingSkills = bundledSkills.filter((skillName) => !seen.has(skillName));
@@ -490,23 +562,43 @@ function readBundledCommandTemplate(commandName) {
     throw new Error(`Unknown bundled command template: ${commandName}`);
   }
 
-  const templatePath = path.join(getBundledPath('commands'), command.filename);
+  // Alias commands reuse the canonical command template (or primary skill frontmatter).
+  const templateFilename = command.isLegacyAlias && command.canonicalCommandName
+    ? `${command.canonicalCommandName}.md`
+    : command.filename;
+  const templatePath = path.join(getBundledPath('commands'), templateFilename);
   if (fs.existsSync(templatePath)) {
     return fs.readFileSync(templatePath, 'utf8');
   }
 
-  // 无独立模板文件时，用 SKILL.md 内容（frontmatter 已在 buildPluginManifestFromSources 验证）
-  const skillPath = path.join(getBundledPath('skills'), command.skill, 'SKILL.md');
+  const sourceSkillName = command.sourceSkill || command.skill;
+  const skillPath = path.join(getBundledPath('skills'), sourceSkillName, 'SKILL.md');
   if (fs.existsSync(skillPath)) {
     return fs.readFileSync(skillPath, 'utf8');
   }
 
-  // 最后回退：生成最小 frontmatter
   return `---\ndescription: ${JSON.stringify(command.description)}\nargument-hint: ${JSON.stringify(command.argumentHint)}\n---\n`;
 }
 
+function resolveBundledSkillSourceName(skillName) {
+  const governance = JSON.parse(fs.readFileSync(GOVERNANCE_PATH, 'utf8'));
+  for (const record of governance.skills || []) {
+    if (record.skill_name === skillName) {
+      return skillName;
+    }
+    const aliases = record.legacy_aliases && Array.isArray(record.legacy_aliases.skill_names)
+      ? record.legacy_aliases.skill_names
+      : [];
+    if (aliases.includes(skillName)) {
+      return record.skill_name;
+    }
+  }
+  return skillName;
+}
+
 function readBundledSkillSource(skillName) {
-  return fs.readFileSync(path.join(getBundledPath('skills'), skillName, 'SKILL.md'), 'utf8');
+  const sourceSkillName = resolveBundledSkillSourceName(skillName);
+  return fs.readFileSync(path.join(getBundledPath('skills'), sourceSkillName, 'SKILL.md'), 'utf8');
 }
 
 function shouldIgnoreBundledSupportPath(relativePath) {
@@ -533,6 +625,7 @@ module.exports = {
   loadSkillsGovernance,
   readBundledCommandTemplate,
   readBundledSkillSource,
+  resolveBundledSkillSourceName,
   shouldIgnoreBundledSupportPath,
   validateSkillsGovernance,
 };

@@ -8,6 +8,7 @@ const {
   contentHasUnexpectedRuntimePathReferences,
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 
 const KIRO_STEERING_POINTER_PATH = '.kiro/steering/spec-first.md';
 const KIRO_AGENT_READ_TOOLS = ['read'];
@@ -186,7 +187,7 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --kiro')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --kiro')
     .replace(/\$spec-\*/g, '`spec-*`')
-    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`');
+    .replace(/\$spec-runtime-setup/g, '`spec-runtime-setup`');
   return rewriteKiroRuntimeContextSections(rewriteUsingSpecFirstKiroSections(rewritten));
 }
 
@@ -243,7 +244,7 @@ function kiroRuntimeSkillName(context = {}) {
 }
 
 function isKiroRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
 }
 
 function isSkillEntrypointContext(context = {}) {
@@ -259,7 +260,7 @@ function addKiroSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Kiro Host Pin',
     '',
-    'When this generated Kiro `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Cursor, Kiro, and Qoder CLIs can coexist on the same machine.',
+    'When this generated Kiro `spec-runtime-setup` runtime surface invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Cursor, Kiro, and Qoder CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',

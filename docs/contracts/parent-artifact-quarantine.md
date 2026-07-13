@@ -6,7 +6,7 @@ The quarantine surface does not include init-owned parent workspace bootstrap ar
 
 ## Producer
 
-- Producer：parent-workspace verify/setup 期间统一执行的 `spec-mcp-setup` Node 入口（`scripts/setup.cjs`）
+- Producer：parent-workspace verify/setup 期间统一执行的 `spec-runtime-setup` Node 入口（`scripts/setup.cjs`）
 - Artifact path: `.spec-first/workspace/parent-artifact-quarantine.json`
 - Topology: `multi-repo-workspace`
 - Freshness: generated at verify time
@@ -24,7 +24,7 @@ The producer may write an empty `quarantined_paths[]` list when a parent workspa
   "authority_level": "advisory",
   "freshness": "generated",
   "generated_at": "2026-05-28T00:00:00Z",
-  "generated_by": "spec-mcp-setup",
+  "generated_by": "spec-runtime-setup",
   "consumers": [
     "spec-first clean --workspace-orphans",
     "LLM workflow degraded-evidence judgment"
@@ -59,4 +59,4 @@ LLM workflows may use the artifact as degraded-evidence context when deciding wh
 
 ## Failure Mode
 
-If the artifact is missing, unreadable, or has an unknown `schema_version`, cleanup consumers should ask the user to rerun `spec-mcp-setup` from the parent workspace. Setup must warn-and-continue if quarantine writing fails, except when the shared workspace summary path itself is rejected as a symlink escape.
+If the artifact is missing, unreadable, or has an unknown `schema_version`, cleanup consumers should ask the user to rerun `spec-runtime-setup` from the parent workspace. Setup must warn-and-continue if quarantine writing fails, except when the shared workspace summary path itself is rejected as a symlink escape.

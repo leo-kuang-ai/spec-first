@@ -9,7 +9,7 @@ const {
   buildWorkspaceGraphs,
   GRAPHIFY_OUT_DIRNAME,
   MERGED_GRAPH_BASENAME,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-build.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-build-')));

@@ -10,11 +10,11 @@ const QoderAdapter = require('../../src/cli/adapters/qoder');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const SETUP_SOURCE = fs.readFileSync(
-  path.join(REPO_ROOT, 'skills', 'spec-mcp-setup', 'SKILL.md'),
+  path.join(REPO_ROOT, 'skills', 'spec-runtime-setup', 'SKILL.md'),
   'utf8',
 );
 const SETUP_REGISTRY_SOURCE = fs.readFileSync(
-  path.join(REPO_ROOT, 'skills', 'spec-mcp-setup', 'setup-registry.json'),
+  path.join(REPO_ROOT, 'skills', 'spec-runtime-setup', 'setup-registry.json'),
   'utf8',
 );
 
@@ -59,7 +59,7 @@ function writeText(filePath, content) {
 
 function setupTransformContext(relativePath = 'SKILL.md') {
   return {
-    skillName: 'spec-mcp-setup',
+    skillName: 'spec-runtime-setup',
     isWorkflowSkill: true,
     relativePath,
   };
@@ -98,7 +98,7 @@ describe('host runtime projection contracts', () => {
   );
 
   test.each(ADAPTER_CASES)(
-    '$id preserves the public cross-host MCP config mapping in spec-mcp-setup',
+    '$id preserves the public cross-host MCP config mapping in spec-runtime-setup',
     ({ adapter }) => {
       const transformed = adapter.transformSkillContent(SETUP_SOURCE, setupTransformContext());
 
@@ -170,10 +170,10 @@ describe('host runtime projection contracts', () => {
     '$id validator allows the setup comparative mapping but still reports other runtime residue',
     ({ adapter, hostLabel, id, skillsRoot }) => {
       const projectRoot = tempProject(`${id}-comparative-validator`);
-      const skillPath = path.join(projectRoot, skillsRoot, 'spec-mcp-setup', 'SKILL.md');
+      const skillPath = path.join(projectRoot, skillsRoot, 'spec-runtime-setup', 'SKILL.md');
       const comparativeContent = adapter.transformSkillContent([
         '---',
-        'name: spec-mcp-setup',
+        'name: spec-runtime-setup',
         'description: "Runtime setup"',
         '---',
         '',
@@ -188,11 +188,11 @@ describe('host runtime projection contracts', () => {
       ].join('\n'), setupTransformContext());
       writeText(skillPath, comparativeContent);
 
-      expect(findSkillCheck(adapter, projectRoot, skillsRoot, 'spec-mcp-setup'))
+      expect(findSkillCheck(adapter, projectRoot, skillsRoot, 'spec-runtime-setup'))
         .toMatchObject({ level: 'PASS' });
 
       writeText(skillPath, `${comparativeContent}\nUnexpected residue: \`.claude/skills/spec-work/SKILL.md\`.\n`);
-      expect(findSkillCheck(adapter, projectRoot, skillsRoot, 'spec-mcp-setup'))
+      expect(findSkillCheck(adapter, projectRoot, skillsRoot, 'spec-runtime-setup'))
         .toMatchObject({
           level: 'WARNING',
           message: expect.stringContaining(`contains non-${hostLabel} runtime path references`),
@@ -233,10 +233,10 @@ describe('host runtime projection contracts', () => {
   test('Qoder command validation applies the same narrow setup mapping exception', () => {
     const projectRoot = tempProject('qoder-command-comparative-validator');
     const adapter = new QoderAdapter();
-    const commandPath = path.join(projectRoot, '.qoder', 'commands', 'spec-mcp-setup.md');
+    const commandPath = path.join(projectRoot, '.qoder', 'commands', 'spec-runtime-setup.md');
     const comparativeContent = adapter.transformSkillContent([
       '---',
-      'name: spec-mcp-setup',
+      'name: spec-runtime-setup',
       'description: "Runtime setup"',
       '---',
       '',
@@ -248,17 +248,17 @@ describe('host runtime projection contracts', () => {
       '',
     ].join('\n'), {
       ...setupTransformContext(),
-      runtimeName: 'spec-mcp-setup',
+      runtimeName: 'spec-runtime-setup',
     });
     writeText(commandPath, comparativeContent);
 
     expect(adapter.inspectRuntimeFiles(projectRoot).find((check) =>
-      check.name === '.qoder/commands/spec-mcp-setup.md'
+      check.name === '.qoder/commands/spec-runtime-setup.md'
     )).toMatchObject({ level: 'PASS' });
 
     writeText(commandPath, `${comparativeContent}\nUnexpected residue: \`.claude/skills/spec-work/SKILL.md\`.\n`);
     expect(adapter.inspectRuntimeFiles(projectRoot).find((check) =>
-      check.name === '.qoder/commands/spec-mcp-setup.md'
+      check.name === '.qoder/commands/spec-runtime-setup.md'
     )).toMatchObject({
       level: 'WARNING',
       message: expect.stringContaining('contains non-Qoder runtime path references'),

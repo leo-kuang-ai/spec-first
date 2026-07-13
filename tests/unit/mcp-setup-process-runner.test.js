@@ -8,7 +8,7 @@ const {
   commandSucceeded,
   runProcess,
   runProcessSync,
-} = require('../../skills/spec-mcp-setup/scripts/lib/process-runner.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/process-runner.cjs');
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

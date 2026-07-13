@@ -7,7 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const SKILL_PATH = 'skills/spec-mcp-setup';
+const SKILL_PATH = 'skills/spec-runtime-setup';
 const BASELINE_MATERIALIZATION_PATHS = [
   SKILL_PATH,
   'src/cli/helpers/secret-deny-patterns.js',
@@ -81,9 +81,22 @@ function validateFixture(fixture, platform, source) {
   }
 }
 
+function historicalSourcePath(sourcePath) {
+  // Hard rename: fixtures expect skills/spec-runtime-setup/*, but pinned baseline
+  // commits still store the pre-rename skills/spec-mcp-setup/* tree.
+  if (sourcePath === SKILL_PATH || sourcePath.startsWith(`${SKILL_PATH}/`)) {
+    return sourcePath.replace(SKILL_PATH, 'skills/spec-mcp-setup');
+  }
+  return sourcePath;
+}
+
 function materializeBaseline(repoRoot, source, destination) {
+  const listingPaths = [...new Set([
+    ...BASELINE_MATERIALIZATION_PATHS,
+    ...BASELINE_MATERIALIZATION_PATHS.map((entry) => historicalSourcePath(entry)),
+  ])];
   const listing = requireSuccess(run('git', [
-    'ls-tree', '-r', '-z', source, '--', ...BASELINE_MATERIALIZATION_PATHS,
+    'ls-tree', '-r', '-z', source, '--', ...listingPaths,
   ], {
     cwd: repoRoot,
     encoding: null,
@@ -99,11 +112,16 @@ function materializeBaseline(repoRoot, source, destination) {
       cwd: repoRoot,
       encoding: null,
     }), `git show ${sourcePath}`).stdout;
-    const target = path.join(destination, sourcePath);
+    // Always materialize under the post-rename path expected by fixtures/runtime.
+    const destPath = sourcePath.startsWith('skills/spec-mcp-setup/')
+      || sourcePath === 'skills/spec-mcp-setup'
+      ? sourcePath.replace('skills/spec-mcp-setup', SKILL_PATH)
+      : sourcePath;
+    const target = path.join(destination, destPath);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, contents);
     fs.chmodSync(target, mode === '100755' ? 0o755 : 0o644);
-    files.push({ path: sourcePath, mode, sha256: sha256(contents) });
+    files.push({ path: destPath, mode, sha256: sha256(contents) });
   }
   return files;
 }
@@ -525,7 +543,9 @@ function assertRuntimeMatchesFixture(runtime, fixture) {
       if (observed[field] !== contract[field]) mismatches.push(`${mode}:${field}:${observed[field]}!=${contract[field]}`);
     }
     for (const field of ['reason_code', 'artifact_schema']) {
-      if (observed[field] !== null && observed[field] !== contract[field]) {
+      const left = field === 'artifact_schema' ? normalizeSchemaName(observed[field]) : observed[field];
+      const right = field === 'artifact_schema' ? normalizeSchemaName(contract[field]) : contract[field];
+      if (left !== null && left !== right) {
         mismatches.push(`${mode}:${field}:${observed[field]}!=${contract[field]}`);
       }
     }
@@ -544,6 +564,20 @@ function assertRuntimeMatchesFixture(runtime, fixture) {
   return mismatches;
 }
 
+function normalizeSchemaName(value) {
+  if (value === 'spec-mcp-setup-preflight.v2') return 'spec-runtime-setup-preflight.v2';
+  if (value === 'spec-mcp-setup-diagnostic-snapshot.v1') return 'spec-runtime-setup-diagnostic-snapshot.v1';
+  return value;
+}
+
+function normalizeCaptureField(field, value) {
+  if (field === 'raw_artifact_schema') return normalizeSchemaName(value);
+  if (field === 'raw_artifact_schemas' && Array.isArray(value)) {
+    return value.map((entry) => normalizeSchemaName(entry));
+  }
+  return value;
+}
+
 function assertRecordedCapture(runtime, fixture) {
   if (runtime.runtime_replay !== 'executed') return false;
   const mismatches = [];
@@ -553,7 +587,9 @@ function assertRecordedCapture(runtime, fixture) {
       'capture_status', 'capture_reason_code', 'raw_exit_code', 'raw_reason_code',
       'raw_artifact_schema', 'raw_artifact_schemas', 'side_effect_categories',
     ]) {
-      if (JSON.stringify(observed[field] ?? null) !== JSON.stringify(expected[field] ?? null)) {
+      const left = normalizeCaptureField(field, observed[field] ?? null);
+      const right = normalizeCaptureField(field, expected[field] ?? null);
+      if (JSON.stringify(left) !== JSON.stringify(right)) {
         mismatches.push(`${label}:${field}:${JSON.stringify(observed[field] ?? null)}!=${JSON.stringify(expected[field] ?? null)}`);
       }
     }

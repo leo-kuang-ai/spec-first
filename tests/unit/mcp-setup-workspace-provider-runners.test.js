@@ -4,7 +4,7 @@ const path = require('node:path');
 const {
   makeWorkspaceRunners,
   GRAPHIFY_OUT_ENV,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-provider-runners.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function recordingExec(behavior = () => ({ status: 0, stdout: '', stderr: '' })) {
   const calls = [];
@@ -71,7 +71,7 @@ describe('makeWorkspaceRunners — integrates with buildWorkspaceGraphs', () => 
     const fs = require('node:fs');
     const os = require('node:os');
     const { spawnSync } = require('node:child_process');
-    const { buildWorkspaceGraphs } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-build.cjs');
+    const { buildWorkspaceGraphs } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs');
 
     const ws = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-runner-int-')));
     const repos = ['api', 'web'].map((rel) => {

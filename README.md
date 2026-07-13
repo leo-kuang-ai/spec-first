@@ -31,7 +31,7 @@ The first thing to evaluate is not an agent count or a prompt library. It is whe
 
 The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
 
-<sub>Simulated demo path: install → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; mcp-setup is the readiness/setup step to run when helper or MCP facts are missing, debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
+<sub>Simulated demo path: install → init → runtime-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; runtime-setup is the readiness/setup step to run when helper or MCP facts are missing, debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
 
 ## Quickstart
 
@@ -83,11 +83,11 @@ Expected: interactive init first presents a host-level confirmation summary, the
 
 Init creates `CHANGELOG.md` only when it is missing; an existing repository changelog remains byte-for-byte user-owned.
 
-If the host reports missing helper or MCP readiness facts, run the unified `spec-mcp-setup` entry in your current host. Its standard flow prepares the required baseline plus CodeGraph and Graphify; `--only` is reserved for advanced subset repair, while `--verify-only` remains non-installing verification.
+If the host reports missing helper or MCP readiness facts, run the unified `spec-runtime-setup` entry in your current host. Its standard flow prepares the required baseline plus CodeGraph and Graphify; `--only` is reserved for advanced subset repair, while `--verify-only` remains non-installing verification.
 
 Graphify is pinned to PyPI `graphifyy@0.9.12` and requires an existing Python `>=3.10` plus `uv` (preferred) or `pipx`. Setup does not bootstrap Python/tool managers or use plain pip. It verifies the direct wheel hash and package identity, generates the local AST graph with `extract --code-only` under `.graphify/`, and treats Graphify output as advisory navigation only. During an explicit Graphify mutation setup, a verified Python cutover automatically removes a confirmed global `@sentropic/graphify` incumbent and only launcher symlinks proven to resolve into that npm package; diagnostic, plan, and verify-only modes remain read-only.
 
-在**按需求组织的非 Git 多仓父目录**中，`spec-mcp-setup --only codegraph,graphify --workspace-graph --repos a,b` 会一次性建立 per-child CodeGraph 战术图和 workspace Graphify 合并图，并将可核验构建状态写入 `.graphify/workspace-graph-state.json`。`--workspace-graph-status` 只有在最近构建完整、repo/source snapshot 未变化且子图、合并图、路由块齐备时才报告 ready；仅有旧 `merged-graph.json` 不再足够。自动发现只扫描直接子目录；重复 alias 或嵌套仓根会 fail closed，需先消除歧义。Graphify 0.9.x 原生 child hook 与 out-of-tree workspace 子图不兼容，因此当前采用显式刷新：child source 变化后重跑 `--workspace-graph --repos ...`。`--workspace-graph-clean` 或 `spec-first clean --workspace-graph` 只清理已确认/receipt 记录的仓和 managed 资产；自动发现的新仓必须先确认。
+在**按需求组织的非 Git 多仓父目录**中，`spec-runtime-setup --only codegraph,graphify --workspace-graph --repos a,b` 会一次性建立 per-child CodeGraph 战术图和 workspace Graphify 合并图，并将可核验构建状态写入 `.graphify/workspace-graph-state.json`。`--workspace-graph-status` 只有在最近构建完整、repo/source snapshot 未变化且子图、合并图、路由块齐备时才报告 ready；仅有旧 `merged-graph.json` 不再足够。自动发现只扫描直接子目录；重复 alias 或嵌套仓根会 fail closed，需先消除歧义。Graphify 0.9.x 原生 child hook 与 out-of-tree workspace 子图不兼容，因此当前采用显式刷新：child source 变化后重跑 `--workspace-graph --repos ...`。`--workspace-graph-clean` 或 `spec-first clean --workspace-graph` 只清理已确认/receipt 记录的仓和 managed 资产；自动发现的新仓必须先确认。
 
 
 Cursor note: `spec-first init --cursor` generates the same `spec-*` workflow runtime under `.cursor/skills/**`, spec-first state under `.cursor/spec-first/**`, and project MCP setup targets `.cursor/mcp.json` by default. User-level `~/.cursor/mcp.json` requires `--user-scope` / `CURSOR_USER_SCOPE=1`. Current release evidence records `cursor_loader_validation_unavailable`, so do not treat Cursor as full host support or an `init -y` default.
@@ -165,7 +165,7 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 | Review docs or plans | `spec-doc-review` | structured findings |
 | Capture reusable learning | `spec-compound` | `docs/solutions/` |
 
-Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
+Support entrypoints (on demand): `spec-runtime-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
 
 Requirements clarification stays inside its current producer. `spec-ideate` passes a focused evidence snapshot to `spec-brainstorm`; `spec-brainstorm` verifies source facts, asks the current user one product question at a time, and persists blockers/source limitations in the requirements-only Product Contract; `spec-prd` does the same for brownfield PRDs. Project glossary/context/ADR files are advisory inputs only during these workflows—cross-release knowledge is emitted as a qualified promotion candidate for a later explicit maintenance request. Visual or spatial decisions use tables, state sequences, ASCII wireframes, or read-only source screenshots; there is no bundled browser helper.
 
@@ -274,7 +274,7 @@ spec-first clean     # remove generated runtime
 
 ```bash
 npm run typecheck
-npm run test:mcp-setup
+npm run test:runtime-setup
 npm run test:unit
 npm run test:smoke
 npm run test:integration

@@ -112,11 +112,11 @@ describe('plugin module facade and governance', () => {
     );
     const staleSetupRuntimeEval = path.join(
       projectRoot,
-      '.cursor/skills/spec-mcp-setup/evals/stale-runtime-fixture.json',
+      '.cursor/skills/spec-runtime-setup/evals/stale-runtime-fixture.json',
     );
     const staleSetupRuntimeReadme = path.join(
       projectRoot,
-      '.cursor/skills/spec-mcp-setup/README.md',
+      '.cursor/skills/spec-runtime-setup/README.md',
     );
 
     try {
@@ -143,9 +143,9 @@ describe('plugin module facade and governance', () => {
         '.cursor/skills/spec-write-skill/references/project-profiles.md',
         '.cursor/skills/spec-write-skill/references/target-profiles.md',
         '.cursor/skills/spec-write-skill/scripts/validate-skill.cjs',
-        '.cursor/skills/spec-mcp-setup/setup-registry.json',
-        '.cursor/skills/spec-mcp-setup/setup-registry.schema.json',
-        '.cursor/skills/spec-mcp-setup/scripts/setup.cjs',
+        '.cursor/skills/spec-runtime-setup/setup-registry.json',
+        '.cursor/skills/spec-runtime-setup/setup-registry.schema.json',
+        '.cursor/skills/spec-runtime-setup/scripts/setup.cjs',
       ]));
       expect(operationPaths).not.toContain(
         '.cursor/skills/spec-write-skill/evals/export-trigger-evals.cjs',
@@ -163,23 +163,23 @@ describe('plugin module facade and governance', () => {
       ))).toBe(false);
       expect(fs.existsSync(path.join(
         projectRoot,
-        '.cursor/skills/spec-mcp-setup/evals',
+        '.cursor/skills/spec-runtime-setup/evals',
       ))).toBe(false);
       expect(fs.existsSync(path.join(
         projectRoot,
-        '.cursor/skills/spec-mcp-setup/README.md',
+        '.cursor/skills/spec-runtime-setup/README.md',
       ))).toBe(false);
       expect(fs.existsSync(path.join(
         projectRoot,
-        '.cursor/skills/spec-mcp-setup/setup-registry.json',
+        '.cursor/skills/spec-runtime-setup/setup-registry.json',
       ))).toBe(true);
       expect(fs.existsSync(path.join(
         projectRoot,
-        '.cursor/skills/spec-mcp-setup/setup-registry.schema.json',
+        '.cursor/skills/spec-runtime-setup/setup-registry.schema.json',
       ))).toBe(true);
       expect(fs.existsSync(path.join(
         projectRoot,
-        '.cursor/skills/spec-mcp-setup/scripts/setup.cjs',
+        '.cursor/skills/spec-runtime-setup/scripts/setup.cjs',
       ))).toBe(true);
       expect(fs.existsSync(path.join(
         projectRoot,
@@ -266,35 +266,35 @@ describe('plugin module facade and governance', () => {
       },
     ];
     const byteStableSupportFiles = [
-      'spec-mcp-setup/setup-registry.json',
-      'spec-mcp-setup/setup-registry.schema.json',
-      'spec-mcp-setup/references/config-template.yaml',
-      'spec-mcp-setup/scripts/check-health',
-      'spec-mcp-setup/scripts/setup.cjs',
-      'spec-mcp-setup/scripts/lib/args.cjs',
-      'spec-mcp-setup/scripts/lib/configured-dependencies.cjs',
-      'spec-mcp-setup/scripts/lib/facts.cjs',
-      'spec-mcp-setup/scripts/lib/host-authority.cjs',
-      'spec-mcp-setup/scripts/lib/host-config.cjs',
-      'spec-mcp-setup/scripts/lib/human-output.cjs',
-      'spec-mcp-setup/scripts/lib/installation-executor.cjs',
-      'spec-mcp-setup/scripts/lib/mode-policy.cjs',
-      'spec-mcp-setup/scripts/lib/path-safety.cjs',
-      'spec-mcp-setup/scripts/lib/preflight.cjs',
-      'spec-mcp-setup/scripts/lib/process-runner.cjs',
-      'spec-mcp-setup/scripts/lib/project-config.cjs',
-      'spec-mcp-setup/scripts/lib/project-target.cjs',
-      'spec-mcp-setup/scripts/lib/registry.cjs',
-      'spec-mcp-setup/scripts/lib/renderer.cjs',
-      'spec-mcp-setup/scripts/lib/runtime-executor.cjs',
-      'spec-mcp-setup/scripts/lib/scenario-fingerprint.cjs',
-      'spec-mcp-setup/scripts/lib/toml-section-editor.cjs',
-      'spec-mcp-setup/scripts/lib/workspace-executor.cjs',
-      'spec-mcp-setup/scripts/lib/worktree-health.cjs',
-      'spec-mcp-setup/scripts/providers/codegraph.cjs',
-      'spec-mcp-setup/scripts/providers/common.cjs',
-      'spec-mcp-setup/scripts/providers/graphify.cjs',
-      'spec-mcp-setup/scripts/providers/registry.cjs',
+      'spec-runtime-setup/setup-registry.json',
+      'spec-runtime-setup/setup-registry.schema.json',
+      'spec-runtime-setup/references/config-template.yaml',
+      'spec-runtime-setup/scripts/check-health',
+      'spec-runtime-setup/scripts/setup.cjs',
+      'spec-runtime-setup/scripts/lib/args.cjs',
+      'spec-runtime-setup/scripts/lib/configured-dependencies.cjs',
+      'spec-runtime-setup/scripts/lib/facts.cjs',
+      'spec-runtime-setup/scripts/lib/host-authority.cjs',
+      'spec-runtime-setup/scripts/lib/host-config.cjs',
+      'spec-runtime-setup/scripts/lib/human-output.cjs',
+      'spec-runtime-setup/scripts/lib/installation-executor.cjs',
+      'spec-runtime-setup/scripts/lib/mode-policy.cjs',
+      'spec-runtime-setup/scripts/lib/path-safety.cjs',
+      'spec-runtime-setup/scripts/lib/preflight.cjs',
+      'spec-runtime-setup/scripts/lib/process-runner.cjs',
+      'spec-runtime-setup/scripts/lib/project-config.cjs',
+      'spec-runtime-setup/scripts/lib/project-target.cjs',
+      'spec-runtime-setup/scripts/lib/registry.cjs',
+      'spec-runtime-setup/scripts/lib/renderer.cjs',
+      'spec-runtime-setup/scripts/lib/runtime-executor.cjs',
+      'spec-runtime-setup/scripts/lib/scenario-fingerprint.cjs',
+      'spec-runtime-setup/scripts/lib/toml-section-editor.cjs',
+      'spec-runtime-setup/scripts/lib/workspace-executor.cjs',
+      'spec-runtime-setup/scripts/lib/worktree-health.cjs',
+      'spec-runtime-setup/scripts/providers/codegraph.cjs',
+      'spec-runtime-setup/scripts/providers/common.cjs',
+      'spec-runtime-setup/scripts/providers/graphify.cjs',
+      'spec-runtime-setup/scripts/providers/registry.cjs',
     ];
 
     for (const platform of getSupportedPlatforms()) {
@@ -425,7 +425,7 @@ describe('plugin module facade and governance', () => {
 
         const setupSkillPath = path.posix.join(
           adapter.workflowsRoot,
-          'spec-mcp-setup',
+          'spec-runtime-setup',
           'SKILL.md',
         );
         const setupSkill = contentOperations.find((operation) =>
@@ -433,7 +433,7 @@ describe('plugin module facade and governance', () => {
         );
         expect(setupSkill).toBeDefined();
         expect(setupSkill.contents).toContain(
-          'Canonical package source-of-truth 是 `skills/spec-mcp-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。',
+          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。',
         );
         expect(setupSkill.contents).toContain(
           'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',

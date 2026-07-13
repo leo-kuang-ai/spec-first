@@ -21,6 +21,7 @@
     "build": "npm pack --dry-run",
     "release:publish": "node scripts/release-publish.cjs",
     "test:mcp-setup": "node scripts/run-test-suite.cjs mcp-setup",
+    "test:runtime-setup": "node scripts/run-test-suite.cjs mcp-setup",
     "test:eval-fixtures": "jest --runTestsByPath tests/unit/spec-prd-contracts.test.js tests/unit/spec-write-skill-contracts.test.js tests/unit/spec-write-skill-validator.test.js tests/unit/spec-write-skill-promotion-evidence.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/eval-fixture-contracts.test.js --runInBand",
     "test:unit": "node scripts/run-test-suite.cjs unit",
     "test:smoke": "node scripts/run-test-suite.cjs smoke",

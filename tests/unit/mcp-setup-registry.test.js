@@ -12,10 +12,10 @@ const {
   getEffectiveRegistry,
   loadRegistry,
   mergeLayers,
-} = require('../../skills/spec-mcp-setup/scripts/lib/registry.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const skillRoot = path.join(repoRoot, 'skills', 'spec-mcp-setup');
+const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
 const effectiveFixture = JSON.parse(fs.readFileSync(
   path.join(repoRoot, 'tests', 'fixtures', 'mcp-setup', 'effective-registry', 'legacy-effective-queries.json'),
   'utf8',
@@ -35,7 +35,7 @@ function withoutKeys(value, keys) {
 
 function withRegistryMutation(mutator) {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-registry-'));
-  const registry = readJson('skills/spec-mcp-setup/setup-registry.json');
+  const registry = readJson('skills/spec-runtime-setup/setup-registry.json');
   mutator(registry);
   fs.writeFileSync(
     path.join(tempRoot, 'setup-registry.json'),
@@ -68,7 +68,7 @@ function expectRegistryError(mutator, code) {
   }
 }
 
-describe('spec-mcp-setup registry v8', () => {
+describe('spec-runtime-setup registry v8', () => {
   test('detects WSL from the real Linux runtime signals', () => {
     expect(detectRuntimePlatform({
       platform: 'linux',
@@ -174,8 +174,8 @@ describe('spec-mcp-setup registry v8', () => {
       'provider-readiness.v2',
       'runtime-capabilities.v1',
       'setup-install-plan.v1',
-      'spec-mcp-setup-diagnostic-snapshot.v1',
-      'spec-mcp-setup-preflight.v2',
+      'spec-runtime-setup-diagnostic-snapshot.v1',
+      'spec-runtime-setup-preflight.v2',
       'tool-facts.v2',
       'workspace-mcp-setup-summary.v1',
       'workspace-mcp-verify-summary.v1',

@@ -213,7 +213,7 @@ function printVersion() {
 
     5. 在对话中使用当前宿主对应入口开始工作流
 
-       例如: spec-plan、spec-work、spec-code-review、spec-mcp-setup
+       例如: spec-plan、spec-work、spec-code-review、spec-runtime-setup
        注意: 这些是宿主 workflow 入口，不是 package CLI 子命令
        Cursor 需要显式运行 spec-first init --cursor，且当前 loader validation unavailable；它只代表 generated-runtime preview。
 

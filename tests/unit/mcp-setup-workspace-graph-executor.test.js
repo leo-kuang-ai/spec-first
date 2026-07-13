@@ -7,8 +7,8 @@ const { spawnSync } = require('node:child_process');
 
 const {
   runWorkspaceGraphBuild,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-executor.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-provider-runners.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
+const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wexec-')));
@@ -75,7 +75,7 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
     expect(result.build.state.state.operation_status).toBe('partial');
     expect(result.build.state.state.reason_code).toBe('workspace-repos-need-confirmation');
 
-    const status = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs')
+    const status = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs')
       .runWorkspaceGraphStatus({ cwd: ws, allowDiscovery: true });
     expect(status.status).toBe('partial');
     expect(status.reason_code).toBe('workspace-repos-need-confirmation');

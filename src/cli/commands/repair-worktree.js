@@ -2,7 +2,7 @@
 
 const {
   buildRepairWorktreePreview,
-} = require('../../../skills/spec-mcp-setup/scripts/lib/worktree-health.cjs');
+} = require('../../../skills/spec-runtime-setup/scripts/lib/worktree-health.cjs');
 
 function runRepairWorktree(argv) {
   const args = Array.isArray(argv) ? [...argv] : [];

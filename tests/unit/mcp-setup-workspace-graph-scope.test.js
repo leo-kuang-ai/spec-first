@@ -7,7 +7,7 @@ const path = require('node:path');
 const {
   resolveContainedProjectPath,
   classifyGraphFreshness,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-scope.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-scope.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-scope-')));

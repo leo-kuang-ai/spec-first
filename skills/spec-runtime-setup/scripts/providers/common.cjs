@@ -114,7 +114,7 @@ function isSpecFirstSourceRepo(repoRoot) {
   try {
     const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
     return packageJson.name === 'spec-first'
-      && fs.existsSync(path.join(repoRoot, 'skills', 'spec-mcp-setup'));
+      && fs.existsSync(path.join(repoRoot, 'skills', 'spec-runtime-setup'));
   } catch (_error) {
     return false;
   }

@@ -3,7 +3,7 @@
 const {
   workspaceGraphRefreshPosture,
   codegraphRefreshPosture,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-refresh.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-refresh.cjs');
 
 describe('workspaceGraphRefreshPosture — out-of-tree Graphify uses explicit refresh', () => {
   test('does not claim that a native child hook refreshes the merged workspace graph', () => {

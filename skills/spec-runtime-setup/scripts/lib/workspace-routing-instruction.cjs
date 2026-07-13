@@ -43,7 +43,7 @@ function renderRoutingInstruction({ workspaceRoot, repos = [], host = null, host
     '- **Cross-repo:** for questions spanning repos, use Graphify CLI against `.graphify/merged-graph.json` (`query` / `path` / `explain`). **Do not cat** `graph.json` or `merged-graph.json` into context (files may be tens or hundreds of MB).',
     '- **Fallback:** if launched from inside a child and `projectPath` is omitted, default to that enclosing child. If launched from the **parent root**, there is **no safe default** — pick an explicit child `projectPath` or use the merged Graphify graph for cross-repo questions. Never query the CodeGraph server root (no index).',
     '- **Isolation:** stay within this workspace; do not pass a `projectPath` pointing at another requirement folder.',
-    '- **Freshness gate:** run `spec-mcp-setup --workspace-graph-status` before graph use. Use graph candidates only when status is `ready`; on `partial`/`stale`, fall back to direct source reads and refresh with `spec-mcp-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>`.',
+    '- **Freshness gate:** run `spec-runtime-setup --workspace-graph-status` before graph use. Use graph candidates only when status is `ready`; on `partial`/`stale`, fall back to direct source reads and refresh with `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>`.',
     '',
     'Child repos in this workspace:',
     repoList,

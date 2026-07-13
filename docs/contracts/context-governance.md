@@ -105,7 +105,7 @@ New changelog entries should be compact breadcrumbs: one concise summary naming 
 
 | workflow / task | allowed scope |
 | --- | --- |
-| `spec-mcp-setup` / `spec-first update` CLI | runtime delivery、host setup、drift repair 所需的 host runtime paths |
+| `spec-runtime-setup` / `spec-first update` CLI | runtime delivery、host setup、drift repair 所需的 host runtime paths |
 | `spec-app-consistency-audit` | `.spec-first/app-audit/**` 的 run-scoped evidence |
 | changelog author resolution | 读取全局 developer profile：`~/.spec-first/.developer`，只用于 `CHANGELOG.md` 作者字段，不纳入 broad context bundle |
 | user-explicit path request | 只读取用户明确点名的文件或目录，并说明它是 runtime/generated/audit context |

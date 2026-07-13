@@ -15,6 +15,7 @@ const {
   contentHasUnexpectedRuntimePathReferences,
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 
 const QODER_RULE_POINTER_PATH = '.qoder/rules/spec-first.md';
 const QODER_POINTER_FRONTMATTER = [
@@ -295,9 +296,8 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --qoder')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --qoder')
     .replace(/\$spec-\*/g, '`spec-*`')
-    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/\$spec-runtime-setup/g, '`spec-runtime-setup`')
     .replace(/Kiro Agent\s+Skills/g, '`spec-*`')
-    .replace(/Kiro Agent\s+Skill `spec-mcp-setup`/g, '`spec-mcp-setup`');
 
   return rewriteQoderRuntimeContextSections(rewriteUsingSpecFirstQoderSections(rewritten));
 }
@@ -343,9 +343,7 @@ function rewriteQoderRuntimeContextSections(content) {
 }
 
 function isQoderRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup'
-    || context.commandName === 'mcp-setup'
-    || context.runtimeName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
 }
 
 function isSkillEntrypointContext(context = {}) {
@@ -361,7 +359,7 @@ function addQoderSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Qoder Host Pin',
     '',
-    'When this generated Qoder `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=qoder` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, and Qoder CLIs can coexist on the same machine.',
+    'When this generated Qoder `spec-runtime-setup` runtime surface invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=qoder` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, and Qoder CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',

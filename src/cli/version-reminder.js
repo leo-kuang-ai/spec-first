@@ -278,12 +278,12 @@ function managedRuntimeExists(projectRoot, adapter) {
 
   if (adapter.hasCommands) {
     candidates.push(
-      path.join(adapter.commandRoot, 'mcp-setup.md'),
+      path.join(adapter.commandRoot, 'runtime-setup.md'),
       path.join(adapter.skillsRoot, 'using-spec-first', 'SKILL.md'),
     );
   } else {
     candidates.push(
-      path.join(adapter.workflowsRoot, 'spec-mcp-setup', 'SKILL.md'),
+      path.join(adapter.workflowsRoot, 'spec-runtime-setup', 'SKILL.md'),
       path.join(adapter.skillsRoot, 'using-spec-first', 'SKILL.md'),
     );
   }

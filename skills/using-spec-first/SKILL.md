@@ -28,7 +28,7 @@ Enter only the best current entrypoint. Do not automatically run `plan -> work -
 
 ### On-Ramps
 
-- **Environment, MCP, helper, or host readiness** -> `spec-mcp-setup`; installation health, upgrade, generation, or removal -> terminal `spec-first doctor --<host>`, `spec-first update`, `spec-first init`, or `spec-first clean --<host>` under the conditional boundary below
+- **Environment, MCP, helper, or host readiness** -> `spec-runtime-setup`; installation health, upgrade, generation, or removal -> terminal `spec-first doctor --<host>`, `spec-first update`, `spec-first init`, or `spec-first clean --<host>` under the conditional boundary below
 - **Direct patch or regeneration request for a generated runtime mirror** -> `runtime-maintenance`; this is the selected route/handoff label even when the unsafe mirror patch is refused, and require a separate source-revision request before entering `spec-write-skill`
 - **Failure, abnormal behavior, test failure, stack trace, regression, or flake** -> `spec-debug`
 - **Requirements, spec, plan, task pack, or Markdown critique** -> `spec-doc-review`

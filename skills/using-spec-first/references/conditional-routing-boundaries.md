@@ -5,7 +5,7 @@ Read this file only when the selected route touches runtime maintenance, existin
 ## Runtime Maintenance
 
 - Source of truth lives in `skills/`, `templates/`, `src/cli/`, `docs/`, and other checked-in source surfaces. Managed assets under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, and `.qoder/` are generated runtime, not source fixes.
-- Use `spec-mcp-setup` for MCP/helper/host readiness. Use `spec-first doctor --<host>` to inspect installation health and `spec-first update` to upgrade spec-first or refresh installed guidance.
+- Use `spec-runtime-setup` for MCP/helper/host readiness. Use `spec-first doctor --<host>` to inspect installation health and `spec-first update` to upgrade spec-first or refresh installed guidance.
 - Use `spec-first init` only for an explicit initialization/regeneration request or confirmed runtime drift. Use `spec-first clean --<host>` only for explicit managed-runtime removal.
 - Preview state-changing maintenance when supported. A routing match alone never authorizes `init`, `clean`, `update`, or deletion.
 - `skills/using-spec-first/SKILL.md` is the routing-policy source of truth. Managed instruction blocks and host runtime copies are entry anchors or generated projections.
@@ -13,7 +13,7 @@ Read this file only when the selected route touches runtime maintenance, existin
 ## Scenario Fingerprints
 
 - Existing scenario fingerprints are advisory context, not gates, approvals, or source-scope authority. Never generate one merely to choose a route.
-- For foreign residuals, recommend preview-first inspection. When first-time setup facts are missing and the user asks about readiness, route to `spec-mcp-setup`.
+- For foreign residuals, recommend preview-first inspection. When first-time setup facts are missing and the user asks about readiness, route to `spec-runtime-setup`.
 - Dirty-source or git-alignment facts disclose blind spots; confirm important conclusions from current source, tests, logs, or owner evidence.
 
 ## Codex Dispatch And Startup Reminder

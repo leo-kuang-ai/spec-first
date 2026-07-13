@@ -85,9 +85,9 @@ function materializePythonGraphifyHooks(target, interpreter, userCommand = '') {
   }
 }
 
-describe('spec-mcp-setup provider registry', () => {
+describe('spec-runtime-setup provider registry', () => {
   test('uses a static trusted provider map', () => {
-    const providers = require('../../skills/spec-mcp-setup/scripts/providers/registry.cjs');
+    const providers = require('../../skills/spec-runtime-setup/scripts/providers/registry.cjs');
     expect(Object.keys(providers).sort()).toEqual(['codegraph', 'graphify']);
     for (const provider of Object.values(providers)) {
       expect(provider).toEqual(expect.objectContaining({
@@ -102,7 +102,7 @@ describe('spec-mcp-setup provider registry', () => {
 
 describe('CodeGraph provider', () => {
   test('requires explicit selection and performs bounded sync/reindex before confirmed readiness', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph');
     const calls = [];
     let statusCount = 0;
@@ -150,7 +150,7 @@ describe('CodeGraph provider', () => {
     ['not configured', false, 'degraded'],
     ['configured', true, 'fresh'],
   ])('reports indexed CLI readiness as %s when host configuration is %s', (_label, configured, expected) => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-config-${expected}`);
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -173,7 +173,7 @@ describe('CodeGraph provider', () => {
   });
 
   test('replaces the unknown configuration action with the confirmed repair action', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const readiness = {
       readiness_status: 'unknown',
       lifecycle: {
@@ -183,23 +183,23 @@ describe('CodeGraph provider', () => {
         indexed: true,
         query_verified: true,
       },
-      next_actions: ['通过当前 host 的 spec-mcp-setup --verify-only 确认 CodeGraph MCP 配置。'],
+      next_actions: ['通过当前 host 的 spec-runtime-setup --verify-only 确认 CodeGraph MCP 配置。'],
     };
 
     provider.reconcileConfigured(readiness, {
       configured_status: 'action-required',
-      next_action: 'spec-mcp-setup --only codegraph --repair-host-config',
+      next_action: 'spec-runtime-setup --only codegraph --repair-host-config',
     });
 
     expect(readiness).toMatchObject({
       readiness_status: 'degraded',
       lifecycle: { configured: false },
-      next_actions: ['spec-mcp-setup --only codegraph --repair-host-config'],
+      next_actions: ['spec-runtime-setup --only codegraph --repair-host-config'],
     });
   });
 
   test('reports an actionable setup command when an existing CodeGraph index is not ready', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-index-not-ready');
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -218,12 +218,12 @@ describe('CodeGraph provider', () => {
 
     expect(result.readiness_status).toBe('degraded');
     expect(result.next_actions).toContain(
-      '运行 spec-mcp-setup --only codegraph，修复 CodeGraph index/query readiness。',
+      '运行 spec-runtime-setup --only codegraph，修复 CodeGraph index/query readiness。',
     );
   });
 
   test('degrades when the real CodeGraph query probe fails after indexing', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-query-failure');
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -248,7 +248,7 @@ describe('CodeGraph provider', () => {
   });
 
   test('blocks a symlinked artifact root before running any mutation command', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-symlink');
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-codegraph-outside-'));
     fs.symlinkSync(outside, path.join(target, '.codegraph'), process.platform === 'win32' ? 'junction' : 'dir');
@@ -282,7 +282,7 @@ describe('CodeGraph provider', () => {
     ['pending changes remain after sync', 'pending changes; run codegraph sync', 'codegraph-sync-incomplete'],
     ['full rebuild remains after reindex', 'full rebuild recommended; run codegraph index -f', 'codegraph-post-mutation-probe-failed'],
   ])('degrades when %s', (_label, statusOutput, reasonCode) => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo(`codegraph-residual-${reasonCode}`);
     const runner = (command, args) => {
       if (args[0] === '--version') return success('codegraph 1.4.1');
@@ -306,7 +306,7 @@ describe('CodeGraph provider', () => {
   });
 
   test('does not report signal-terminated CodeGraph probes as ready', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/codegraph.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-signal');
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
@@ -327,7 +327,7 @@ describe('CodeGraph provider', () => {
 
 describe('Graphify provider', () => {
   test('resolves a pinned Python Graphify launcher through uv and excludes credentials', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-uv');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-home-'));
     const binDir = path.join(homeDir, '.local', 'bin');
@@ -377,7 +377,7 @@ describe('Graphify provider', () => {
   });
 
   test('uses pipx only when uv is unavailable and creates a hashed direct-wheel install plan', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-pipx');
     const dependency = {
       ecosystem: 'pypi',
@@ -418,7 +418,7 @@ describe('Graphify provider', () => {
   });
 
   test('uses the uv tool environment interpreter to verify a Windows exe launcher', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-windows-uv');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-windows-home-'));
     const binDir = path.join(homeDir, 'bin with spaces');
@@ -451,7 +451,7 @@ describe('Graphify provider', () => {
   });
 
   test('keeps verify degraded when Python host integration is missing or a supported corpus has zero nodes', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-verify-gates');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-verify-home-'));
     const binDir = path.join(homeDir, '.local', 'bin');
@@ -484,7 +484,7 @@ describe('Graphify provider', () => {
   });
 
   test('blocks Python Graphify setup when no isolated tool manager exists', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-no-manager');
     const dependency = {
       ecosystem: 'pypi',
@@ -507,7 +507,7 @@ describe('Graphify provider', () => {
   });
 
   test('normalizes only Python Provider marker blocks and verifies interpreter plus artifact contract', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-hooks');
     const launcher = path.join(target, 'tools with spaces', 'graphify');
     const interpreter = path.join(target, 'tools', 'graphifyy', 'bin', 'python');
@@ -543,7 +543,7 @@ describe('Graphify provider', () => {
 
   (process.platform === 'win32' ? test.skip : test)('executes only the normalized Provider marker and waits for a detached credential-isolated rebuild receipt', async () => {
     const { spawnSync } = require('node:child_process');
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-detached-hook');
     const launcher = path.join(target, 'tools with spaces', 'graphify');
     const interpreter = path.join(target, 'tools', 'python');
@@ -608,7 +608,7 @@ describe('Graphify provider', () => {
   });
 
   test('normalizes Python Codex host surfaces to the selected launcher and current artifact root', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-codex-host');
     const launcher = path.join(target, 'tools', 'graphify');
     fs.mkdirSync(path.join(target, '.codex', 'skills', 'graphify'), { recursive: true });
@@ -647,7 +647,7 @@ describe('Graphify provider', () => {
   });
 
   test('accepts graphifyy 0.9.12 Claude dual hook-guard entries and rewrites only the launcher', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-claude-hook-guard');
     const launcher = path.join(target, 'tools', 'graphify');
     fs.mkdirSync(path.join(target, '.claude', 'skills', 'graphify'), { recursive: true });
@@ -693,7 +693,7 @@ describe('Graphify provider', () => {
   });
 
   test('treats Cursor as rule-only and Qoder as a spec-first adapter', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const cursor = tempRepo('graphify-python-cursor-host');
     fs.mkdirSync(path.join(cursor, '.cursor', 'rules'), { recursive: true });
     fs.writeFileSync(path.join(cursor, '.cursor', 'rules', 'graphify.mdc'), 'Use graphify-out/graph.json\n');
@@ -711,7 +711,7 @@ describe('Graphify provider', () => {
   });
 
   test('fails Python hook readiness for duplicate markers or a stale interpreter', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-hook-invalid');
     const launcher = path.join(target, 'tools', 'graphify');
     const interpreter = path.join(target, 'tools', 'python');
@@ -739,7 +739,7 @@ describe('Graphify provider', () => {
   });
 
   test('recovers the current graph from a staged or backup journal before Provider mutation', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-recovery');
     const staged = path.join(target, '.graphify.staging-test');
     const backup = path.join(target, '.graphify.backup-test');
@@ -762,7 +762,7 @@ describe('Graphify provider', () => {
   });
 
   test('rejects a forged migration journal before deleting repository source', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-forged-journal');
     fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
     fs.mkdirSync(path.join(target, 'src'), { recursive: true });
@@ -781,7 +781,7 @@ describe('Graphify provider', () => {
   });
 
   test('removes a verified npm incumbent and only its owned stale launcher symlink', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-npm-cleanup');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-cleanup-home-'));
     const prefix = path.join(target, 'npm-prefix');
@@ -821,7 +821,7 @@ describe('Graphify provider', () => {
   });
 
   test('rejects npm Graphify as a Provider dependency instead of offering a rollback path', () => {
-    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-npm-provider-rejected');
     const dependency = { ecosystem: 'npm', package: '@sentropic/graphify', version: '0.17.1' };
     const runner = jest.fn();

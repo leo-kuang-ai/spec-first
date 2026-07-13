@@ -40,7 +40,7 @@ function quoteCommandArgument(value) {
 }
 
 function projectConfigNextAction(root, flag) {
-  return `spec-mcp-setup --project-config ${flag} --repo ${quoteCommandArgument(root)}`;
+  return `spec-runtime-setup --project-config ${flag} --repo ${quoteCommandArgument(root)}`;
 }
 
 function workspaceRelativePath(root, target) {

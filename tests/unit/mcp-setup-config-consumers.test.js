@@ -11,13 +11,13 @@ const {
   normalizeSetupFacts,
 } = require('../../src/cli/helpers/setup-facts');
 const { WORKFLOW_RUNTIME_CONTRACT_TESTS } = require('../../scripts/run-ai-dev-quality-gate');
-const { collectSetupFacts } = require('../../skills/spec-mcp-setup/scripts/lib/facts.cjs');
+const { collectSetupFacts } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
 const {
   getEffectiveEntry,
   getEffectiveRegistry,
   loadRegistry,
-} = require('../../skills/spec-mcp-setup/scripts/lib/registry.cjs');
-const providers = require('../../skills/spec-mcp-setup/scripts/providers/registry.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
+const providers = require('../../skills/spec-runtime-setup/scripts/providers/registry.cjs');
 
 const repoRoot = path.resolve(__dirname, '../..');
 
@@ -31,9 +31,9 @@ function tempRepo(label) {
   return root;
 }
 
-describe('spec-mcp-setup active config consumers', () => {
+describe('spec-runtime-setup active config consumers', () => {
   test('documents every active Product Pulse scheduling key', () => {
-    const template = read('skills/spec-mcp-setup/references/config-template.yaml');
+    const template = read('skills/spec-runtime-setup/references/config-template.yaml');
     const pulse = read('skills/spec-product-pulse/SKILL.md');
 
     expect(pulse).toContain('pulse_schedule');
@@ -42,8 +42,8 @@ describe('spec-mcp-setup active config consumers', () => {
   });
 
   test('classifies ideate_output as active while plan and brainstorm remain reserved', () => {
-    const setup = read('skills/spec-mcp-setup/SKILL.md');
-    const template = read('skills/spec-mcp-setup/references/config-template.yaml');
+    const setup = read('skills/spec-runtime-setup/SKILL.md');
+    const template = read('skills/spec-runtime-setup/references/config-template.yaml');
     const ideate = read('skills/spec-ideate/SKILL.md');
 
     expect(ideate).toContain('active (non-commented)** `ideate_output:`');
@@ -55,9 +55,9 @@ describe('spec-mcp-setup active config consumers', () => {
   });
 });
 
-describe('spec-mcp-setup active Node consumers', () => {
+describe('spec-runtime-setup active Node consumers', () => {
   test('loads helper metadata from setup-registry v8 without jq', () => {
-    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-mcp-setup') });
+    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
     expect(registry.schema_version).toBe('setup-registry.v8');
     expect(registry.helpers.map((entry) => entry.id)).not.toContain('jq');
 
@@ -74,7 +74,7 @@ describe('spec-mcp-setup active Node consumers', () => {
   });
 
   test('keeps downstream tool-facts normalization stable when fed by the Node facts owner', () => {
-    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-mcp-setup') });
+    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
     const toolResults = registry.tools.map((entry) => ({
       id: entry.id,
       status: entry.required ? 'ready' : 'skipped',
@@ -112,7 +112,7 @@ describe('spec-mcp-setup active Node consumers', () => {
   });
 
   test('queries effective registry data for every supported host', () => {
-    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-mcp-setup') });
+    const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
     for (const host of getSupportedPlatforms()) {
       const effective = getEffectiveRegistry(registry, { host, platform: 'linux' });
       expect(effective.host_definition.id).toBe(host);
@@ -155,7 +155,7 @@ describe('spec-mcp-setup active Node consumers', () => {
   });
 
   test('masks only the unified Node entrypoint as comparative Claude runtime prose', () => {
-    const nodePath = '.claude/spec-first/workflows/spec-mcp-setup/scripts/setup.cjs';
+    const nodePath = '.claude/spec-first/workflows/spec-runtime-setup/scripts/setup.cjs';
     expect(maskAllowedCodexOtherHostPaths(nodePath, 'spec-code-review')).toBe(
       '[allowed spec-code-review other-host path]',
     );

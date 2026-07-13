@@ -191,7 +191,7 @@ function parseCleanArgs(argv) {
   return parsed;
 }
 
-// Host-level counterpart of `spec-mcp-setup --workspace-graph-clean` (U6 / AE8).
+// Host-level counterpart of `spec-runtime-setup --workspace-graph-clean` (U6 / AE8).
 // Cleans managed per-requirement workspace graph assets only; does not touch host
 // runtime mirrors (those stay under clean --claude|--codex|...).
 function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
@@ -297,11 +297,11 @@ function printWorkspaceGraphCleanPreview(status) {
 }
 
 function requireWorkspaceGraphClean() {
-  return require('../../../skills/spec-mcp-setup/scripts/lib/workspace-graph-clean.cjs').runWorkspaceGraphClean;
+  return require('../../../skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs').runWorkspaceGraphClean;
 }
 
 function requireWorkspaceGraphStatus() {
-  return require('../../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
+  return require('../../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
 }
 
 function runWorkspaceOrphansClean(parsed) {
@@ -320,7 +320,7 @@ function runWorkspaceOrphansClean(parsed) {
   const quarantinePath = path.join(projectRoot, '.spec-first', 'workspace', 'parent-artifact-quarantine.json');
   if (!fs.existsSync(quarantinePath)) {
     console.error('No parent artifact quarantine found.');
-    console.error('Run `spec-mcp-setup` from the parent workspace to generate workspace orphan evidence first.');
+    console.error('Run `spec-runtime-setup` from the parent workspace to generate workspace orphan evidence first.');
     return 1;
   }
 
@@ -331,7 +331,7 @@ function runWorkspaceOrphansClean(parsed) {
     console.error(
       `Could not read parent artifact quarantine. ${error instanceof Error ? error.message : String(error)}`,
     );
-    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-runtime-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 
@@ -340,7 +340,7 @@ function runWorkspaceOrphansClean(parsed) {
     entries = validateWorkspaceOrphanQuarantine(payload);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
-    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-runtime-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 

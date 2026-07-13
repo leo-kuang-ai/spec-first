@@ -8,11 +8,11 @@ const { spawnSync } = require('node:child_process');
 const {
   buildParentWorkspaceDiagnostic,
   renderParentWorkspaceDiagnosticHuman,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-parent-diagnostic.cjs');
-const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
-const { parseArgs } = require('../../skills/spec-mcp-setup/scripts/lib/args.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs');
+const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+const { parseArgs } = require('../../skills/spec-runtime-setup/scripts/lib/args.cjs');
 
-const skillRoot = path.resolve(__dirname, '../../skills/spec-mcp-setup');
+const skillRoot = path.resolve(__dirname, '../../skills/spec-runtime-setup');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parent-diag-')));

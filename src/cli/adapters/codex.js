@@ -9,6 +9,7 @@ const {
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 const { listBundledAgentNames, listBundledSkills } = require('../plugin');
 const { isCodexHomeProjectRoot, effectiveCodexHome } = require('../helpers/global-config-dir');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 const SESSION_START_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'codex', 'hooks', 'session-start');
 const SESSION_START_CMD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'codex', 'hooks', 'session-start.cmd');
 const HOOKS_JSON_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'codex', 'hooks', 'hooks.json');
@@ -277,7 +278,7 @@ function shouldPreserveHostComparativeRuntimeProse(context = {}) {
 }
 
 function isCodexRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
 }
 
 function isSkillEntrypointContext(context = {}) {
@@ -293,7 +294,7 @@ function addCodexSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Codex Host Pin',
     '',
-    'When this generated Codex Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=codex` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    'When this generated Codex Skill invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=codex` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',

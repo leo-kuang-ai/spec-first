@@ -4,6 +4,7 @@ const path = require('node:path');
 const PlatformAdapter = require('./base');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 const SESSION_START_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'claude', 'hooks', 'session-start');
 const SESSION_START_RELATIVE_PATH = '.claude/hooks/session-start';
 const SPEC_PLAN_GUARD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'claude', 'hooks', 'spec-plan-guard');
@@ -241,7 +242,7 @@ function rewriteCanonicalAgentNamesForExecution(content) {
 }
 
 function isClaudeRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup' || context.commandName === 'mcp-setup';
+  return isRuntimeSetupSurface(context);
 }
 
 function isSkillEntrypointContext(context = {}) {
@@ -257,7 +258,7 @@ function addClaudeSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Claude Host Pin',
     '',
-    'When this generated Claude command or workflow Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=claude` in the script environment. Treat `spec-mcp-setup` and `spec-runtime-setup` command entry as authoritative Claude host evidence; do not infer Kiro, Qoder, or Codex from PATH, existing runtime directories, or stale setup facts.',
+    'When this generated Claude command or workflow Skill invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=claude` in the script environment. Treat `spec-runtime-setup` / `runtime-setup` command entry as authoritative Claude host evidence; do not infer Kiro, Qoder, or Codex from PATH, existing runtime directories, or stale setup facts.',
     '',
     '## Workflow Modes',
     '',

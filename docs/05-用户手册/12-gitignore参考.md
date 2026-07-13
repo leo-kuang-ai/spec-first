@@ -1,6 +1,6 @@
 # spec-first `.gitignore` 参考
 
-本文面向把 `spec-first` 安装到业务项目里的用户，说明在执行 `spec-first init` 和 `spec-mcp-setup` 后，哪些产物应该加入 `.gitignore`，哪些产物可以按团队协作需要提交。
+本文面向把 `spec-first` 安装到业务项目里的用户，说明在执行 `spec-first init` 和 `spec-runtime-setup` 后，哪些产物应该加入 `.gitignore`，哪些产物可以按团队协作需要提交。
 
 从 `v1.7.0` 起，`spec-first init` 会在当前目标项目的 `.gitignore` 中自动写入或更新一个 `# spec-first:start` / `# spec-first:end` managed block。交互式 init 会在确认前预览这次写入；取消时不会改变文件系统。团队仍然应该 review 并提交 `.gitignore`，让后续成员获得相同忽略规则。
 
@@ -15,7 +15,7 @@
 - `.codegraph/` 是 CodeGraph 项目级 SQLite 索引，默认不提交。
 - `.graphify/` 是 Graphify provider-native 项目图谱运行时目录，默认不提交；`spec-first init` 会忽略整个 `.graphify/` 目录。
 - `graphify-out/` 是旧版 Graphify artifact 目录，默认继续忽略，避免历史产物意外提交；当前 setup 会提示刷新为 `.graphify/`。
-- `spec-mcp-setup` 确认 provider pack 后还可能安装 Graphify provider runtime（`.codex/skills/graphify/` 或 `.claude/skills/graphify/`）和 `.git/hooks/post-commit` / `.git/hooks/post-checkout`。前者落在已忽略的 generated/runtime 目录；后者是 Git 本地 hook，不进入仓库提交面。
+- `spec-runtime-setup` 确认 provider pack 后还可能安装 Graphify provider runtime（`.codex/skills/graphify/` 或 `.claude/skills/graphify/`）和 `.git/hooks/post-commit` / `.git/hooks/post-checkout`。前者落在已忽略的 generated/runtime 目录；后者是 Git 本地 hook，不进入仓库提交面。
 - `AGENTS.md`、`CLAUDE.md`、`docs/`、项目源码、测试和 confirmed standards source 应按团队正常协作策略提交。
 
 ## init 默认写入的 `.gitignore` block
@@ -230,7 +230,7 @@ graphify-out/
 | `.qoder/rules/**`、`.qoder/settings.json`、未知 `.qoder/hooks/**` | Qoder-native 团队规则、用户级配置或 hooks；是否提交按 Qoder/团队策略决定。`.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 三个 spec-first managed hook scripts 除外。 |
 | `.cursor/mcp.json`、`.kiro/settings/`、`.qoder/settings.local.json` | 默认本地忽略；仅当配置使用可移植命令/环境变量引用、不含密钥且团队需要统一 provider 配置时，通过 block 后的 negation 规则选择性提交。 |
 | `.graphify/cache/`、`.graphify/graph.html`、`.graphify/.graphify_labels.json` | Graphify provider runtime/cache 输出，默认随整个 `.graphify/` 忽略。 |
-| `graphify-out/**` | 旧版 Graphify artifact，默认继续忽略；需要更新图谱时用 `spec-mcp-setup --only graphify --refresh` 生成 `.graphify/`。 |
+| `graphify-out/**` | 旧版 Graphify artifact，默认继续忽略；需要更新图谱时用 `spec-runtime-setup --only graphify --refresh` 生成 `.graphify/`。 |
 
 ## 默认不提交的内容
 
@@ -243,13 +243,13 @@ graphify-out/
 | `.codex/commands/spec*`、`.codex/spec-first/`、`.codex/skills/spec-*/`、`.codex/skills/using-spec-first/`、`.codex/agents/spec-*`、spec-first hooks | Codex spec-first runtime assets；`.codex/config.toml` 等非 spec-first 配置不再被整目录忽略 |
 | `.agents/skills/spec-*/`、`.agents/skills/using-spec-first/` | Codex skill runtime mirror；团队自定义 `.agents/skills/<team-skill>/` 可按策略提交 |
 | `.cursor/skills/spec-*/`、`.cursor/skills/using-spec-first/`、`.cursor/spec-first/`、`.cursor/rules/spec-first.mdc` | Cursor preview spec-first-managed runtime mirror、state 与 generated pointer，可由 `init --cursor` 重建 |
-| `.cursor/mcp.json` | Cursor project MCP config output，默认忽略且不是 source；`spec-first clean --cursor` 保留整文件，server entry 由 `spec-mcp-setup` setup/uninstall 管理 |
+| `.cursor/mcp.json` | Cursor project MCP config output，默认忽略且不是 source；`spec-first clean --cursor` 保留整文件，server entry 由 `spec-runtime-setup` setup/uninstall 管理 |
 | `.kiro/skills/spec-*/`、`.kiro/skills/using-spec-first/`、`.kiro/agents/spec-*`、`.kiro/spec-first/`、`.kiro/steering/spec-first.md` | Kiro spec-first-managed runtime mirror、state 与 generated pointer；团队自定义 skill/agent 不在此列 |
 | `.kiro/settings/` | Kiro MCP workspace config，默认本地忽略；需要团队共享时仅提交可移植且无密钥的配置 |
 | `.qoder/commands/spec-*.md`、`.qoder/commands/spec/`、`.qoder/skills/spec-*/`、`.qoder/skills/using-spec-first/`、`.qoder/agents/spec-*`、`.qoder/spec-first/`、`.qoder/rules/spec-first.md`、三个 spec-first hook | Qoder spec-first-managed runtime mirror、pointer、hook scripts 与 state，可由 `init` 重建 |
-| `.qoder/settings.local.json` | Qoder local MCP config output，默认忽略且不是 source；`spec-first clean --qoder` 保留整文件，server entry 由 `spec-mcp-setup` setup/uninstall 管理 |
+| `.qoder/settings.local.json` | Qoder local MCP config output，默认忽略且不是 source；`spec-first clean --qoder` 保留整文件，server entry 由 `spec-runtime-setup` setup/uninstall 管理 |
 | `.spec-first/config.local.yaml`、`.spec-first/*.local.yaml` | 本地配置，可能包含个人路径或私有设置 |
-| `.spec-first/config/*.json` | `spec-mcp-setup` 生成的 setup-owned 本地投影，不是第二个版本源 |
+| `.spec-first/config/*.json` | `spec-runtime-setup` 生成的 setup-owned 本地投影，不是第二个版本源 |
 | `.spec-first/workspace/` | 父级多仓 advisory summaries，不是 child repo canonical truth |
 | `.spec-first/audits/`、`.spec-first/app-audit/`、`.spec-first/workflows/` | workflow execution evidence，默认本地留存 |
 | `.spec-first/sessions/` | multi-actor 治理协议的 opt-in advisory 记录目录，由 `spec-first session register` 写入；不启用时为空 |

@@ -226,7 +226,7 @@ function hostEntrypointLabel(platform) {
 }
 
 function hostMcpSetupCommand(platform) {
-  return '`spec-mcp-setup`';
+  return '`spec-runtime-setup`';
 }
 
 module.exports = {

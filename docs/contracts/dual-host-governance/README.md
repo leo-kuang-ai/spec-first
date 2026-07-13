@@ -249,7 +249,7 @@ machine-readable 真源文件固定落位：
 2. KiroAdapter 不安装 `.kiro/commands/spec/*`，P0 只交付 `.kiro/skills`、`.kiro/agents`、`.kiro/spec-first` 和 Kiro MCP config 支撑面
 3. `init` 对所有 supported hosts 使用统一 `spec-*` 用户可见口径，并用 host delivery 说明承载方式
 4. `doctor` 不再把 `.codex/commands/spec/*` 或 `.kiro/commands/spec/*` 当成正式产品面检查项
-5. README、CLI banner、`spec-mcp-setup`、`setup` 全量收口到正确宿主入口
+5. README、CLI banner、`spec-runtime-setup`、`setup` 全量收口到正确宿主入口
 6. smoke 断言同步切换到新契约
 
 ## 6. Contributor Maintenance Rules

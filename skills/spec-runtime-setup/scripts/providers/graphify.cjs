@@ -238,9 +238,9 @@ function verify(context = {}) {
     ? pythonHostIntegrationConfigured(repoRoot, context.host, runtimeContext).ok
     : projectSkillConfigured(repoRoot, context.host));
   const nextActions = [];
-  if (!installed) nextActions.push('运行 spec-mcp-setup --only graphify，安装 pinned Provider。');
-  if (hasLegacy && !hasCurrent) nextActions.push('运行 spec-mcp-setup --only graphify --refresh，重新生成 provider-native .graphify/。');
-  if (hasCurrent) nextActions.push('运行 spec-mcp-setup --only graphify --refresh，执行显式 incremental refresh。');
+  if (!installed) nextActions.push('运行 spec-runtime-setup --only graphify，安装 pinned Provider。');
+  if (hasLegacy && !hasCurrent) nextActions.push('运行 spec-runtime-setup --only graphify --refresh，重新生成 provider-native .graphify/。');
+  if (hasCurrent) nextActions.push('运行 spec-runtime-setup --only graphify --refresh，执行显式 incremental refresh。');
   if (installed && hasCurrent && !queryVerified) nextActions.push('依赖 graph candidate 前，先运行真实的 Graphify query probe。');
   if (gitState.is_git_repo && !hookVerified) nextActions.push('检查 Graphify hook 状态，并重新运行显式 setup。');
   if (!configured) nextActions.push('重新运行显式 setup，修复 Graphify host integration。');
@@ -499,7 +499,7 @@ function apply(context = {}, actionPlan = plan(context)) {
   const degraded = Boolean(mutationFailure) || !hasArtifact || !queryVerified || (gitState.is_git_repo && !hookVerified);
   const nextActions = [];
   if (mutationFailure) nextActions.push(`检查 ${mutationFailure} 的 Graphify diagnostic，并重新运行显式 setup。`);
-  if (hasArtifact && !actionPlan.refresh) nextActions.push('运行 spec-mcp-setup --only graphify --refresh，执行显式 incremental refresh。');
+  if (hasArtifact && !actionPlan.refresh) nextActions.push('运行 spec-runtime-setup --only graphify --refresh，执行显式 incremental refresh。');
   if (hasArtifact && !queryVerified) nextActions.push('依赖 graph candidate 前，先运行真实的 Graphify query probe。');
   if (gitState.is_git_repo && !hookVerified) nextActions.push('检查 Graphify hook 状态，并重新运行显式 setup。');
   const pathVisibilityAction = graphifyPathVisibilityAction(runtimeContext, pathRepair);
@@ -538,7 +538,7 @@ function refresh(context = {}, actionPlan = plan({ ...context, selected: true, r
         'graphify-refresh-plan-required',
         'Graphify refresh 需要显式 refresh action plan。',
       )],
-      nextActions: ['使用 spec-mcp-setup --only graphify --refresh 重新运行。'],
+      nextActions: ['使用 spec-runtime-setup --only graphify --refresh 重新运行。'],
       hookStatus: 'unknown',
     });
   }
@@ -1344,12 +1344,12 @@ function renderGraphifyInstructionSection(host) {
     '规则：',
     '- 当 `.graphify/graph.json` 存在且 runtime 可见 Graphify CLI 时，将 Graphify 用作 architecture relationship、impact analysis 与宽范围 codebase navigation 的 exploration-tier 定向工具。用 `query` 做宽范围定向，用 `path "<A>" "<B>"` 查看关系，用 `explain "<concept>"` 聚焦概念。',
     '- 简单事实问答、当前上下文总结、用户提供的单文档工作或已限定范围的文件读取，默认不使用 Graphify；使用 `rg` 或 bounded source read。',
-    '- 如果 `.graphify/graph.json` 存在但 Graphify CLI 不可见，不得把 artifact 当作 runtime readiness。改用 bounded direct source read，并将 `spec-mcp-setup --only graphify` 作为修复路径。',
+    '- 如果 `.graphify/graph.json` 存在但 Graphify CLI 不可见，不得把 artifact 当作 runtime readiness。改用 bounded direct source read，并将 `spec-runtime-setup --only graphify` 作为修复路径。',
     '- Hook 或 incremental update 后 `.graphify/` 出现 dirty 文件属于预期现象，不能仅因此跳过 Graphify。',
     '- 如果 `.graphify/wiki/index.md` 存在，用它进行宽范围导航。只有 query/path/explain 未提供足够上下文时，才读取 `.graphify/GRAPH_REPORT.md`。',
-    '- 将旧版 `graphify-out/` 仅视为 compatibility evidence；优先运行 `spec-mcp-setup --only graphify --refresh`，重新生成 provider-native `.graphify/`。',
+    '- 将旧版 `graphify-out/` 仅视为 compatibility evidence；优先运行 `spec-runtime-setup --only graphify --refresh`，重新生成 provider-native `.graphify/`。',
     '- 将 Graphify/code-graph 输出视为 `provider_untrusted` advisory navigation；重要结论必须由 source、test、log、contract 或 owner evidence 确认。',
-    '- 普通 workflow 不会在代码变更后刷新 project graph。仅在显式 refresh 时运行 `spec-mcp-setup --only graphify --refresh`。',
+    '- 普通 workflow 不会在代码变更后刷新 project graph。仅在显式 refresh 时运行 `spec-runtime-setup --only graphify --refresh`。',
   );
   return lines.join('\n');
 }

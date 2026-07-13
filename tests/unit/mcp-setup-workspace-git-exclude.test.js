@@ -11,7 +11,7 @@ const {
   resolveExcludePath,
   MANAGED_BLOCK_START,
   MANAGED_BLOCK_END,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-git-exclude.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-exclude-')));

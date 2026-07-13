@@ -8,19 +8,19 @@ const {
   runProcess,
   runProcessSync,
   runProcessWithMirror,
-} = require('../../skills/spec-mcp-setup/scripts/lib/process-runner.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/process-runner.cjs');
 const {
   compareMcpSection,
   extractMcpSection,
   removeMcpSection,
   upsertMcpSection,
-} = require('../../skills/spec-mcp-setup/scripts/lib/toml-section-editor.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/toml-section-editor.cjs');
 const {
   acquireConfigLock,
   applyHostConfig,
   inspectHostConfig,
   resolveHostConfigTarget,
-} = require('../../skills/spec-mcp-setup/scripts/lib/host-config.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/host-config.cjs');
 
 function tempDir(label) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `spec-mcp-u4-${label}-`));

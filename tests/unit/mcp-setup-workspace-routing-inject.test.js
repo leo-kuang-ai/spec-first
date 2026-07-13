@@ -7,8 +7,8 @@ const path = require('node:path');
 const {
   injectRoutingInstruction,
   entryFilesForHosts,
-} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-routing-inject.cjs');
-const { BLOCK_START } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-routing-instruction.cjs');
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs');
+const { BLOCK_START } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-routing-instruction.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-inject-')));

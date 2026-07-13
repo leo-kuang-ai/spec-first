@@ -7,7 +7,14 @@ const crypto = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const skillRoot = path.join(repoRoot, 'skills', 'spec-mcp-setup');
+const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
+
+function historicalBaselinePath(sourcePath) {
+  return String(sourcePath || '').replace(
+    /^skills\/spec-runtime-setup(?=\/|$)/,
+    'skills/spec-mcp-setup',
+  );
+}
 
 function readFixture(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, 'tests', 'fixtures', 'mcp-setup', relativePath), 'utf8'));
@@ -133,7 +140,7 @@ function classifyEffects(repoBefore, repoAfter, homeBefore, homeAfter, calls) {
 }
 
 function runModeCharacterization(platform, contract) {
-  const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+  const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
   const target = tempRepo(`${platform}-${contract.artifact_schema}`);
   const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parity-home-'));
   const skillDir = path.join(homeDir, '.agents', 'skills', 'ast-grep');
@@ -169,7 +176,7 @@ function expectFields(value, fields) {
 }
 
 function runWorkspaceCharacterization(argv, label) {
-  const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+  const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-parity-workspace-${label}-`));
   const child = path.join(workspace, 'child');
   fs.mkdirSync(child, { recursive: true });
@@ -189,9 +196,9 @@ function runWorkspaceCharacterization(argv, label) {
   });
 }
 
-describe('spec-mcp-setup unified Node contract', () => {
+describe('spec-runtime-setup unified Node contract', () => {
   test('uses helper-specific detection argv instead of assuming --version', () => {
-    const { probeHelper } = require('../../skills/spec-mcp-setup/scripts/lib/installation-executor.cjs');
+    const { probeHelper } = require('../../skills/spec-runtime-setup/scripts/lib/installation-executor.cjs');
     const calls = [];
     const result = probeHelper({
       homeDir: os.homedir(),
@@ -242,7 +249,7 @@ describe('spec-mcp-setup unified Node contract', () => {
   });
 
   test('loads one schema v8 registry without jq', () => {
-    const { loadRegistry } = require('../../skills/spec-mcp-setup/scripts/lib/registry.cjs');
+    const { loadRegistry } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
     const registry = loadRegistry({ skillRoot });
 
     expect(registry.schema_version).toBe('setup-registry.v8');
@@ -284,7 +291,7 @@ describe('spec-mcp-setup unified Node contract', () => {
       expect(fs.existsSync(path.join(repoRoot, item.path))).toBe(false);
       const baseline = spawnSync(
         'git',
-        ['cat-file', '-e', `${inventory.baseline_commit}:${item.path}`],
+        ['cat-file', '-e', `${inventory.baseline_commit}:${historicalBaselinePath(item.path)}`],
         { cwd: repoRoot, encoding: 'utf8' },
       );
       expect(baseline.status).toBe(0);
@@ -302,7 +309,7 @@ describe('spec-mcp-setup unified Node contract', () => {
     for (const sourcePath of inventory.jq_reference_inventory.source_paths) {
       const baseline = spawnSync(
         'git',
-        ['show', `${inventory.baseline_commit}:${sourcePath}`],
+        ['show', `${inventory.baseline_commit}:${historicalBaselinePath(sourcePath)}`],
         { cwd: repoRoot, encoding: 'utf8' },
       );
       expect(baseline.status).toBe(0);
@@ -311,7 +318,7 @@ describe('spec-mcp-setup unified Node contract', () => {
   });
 
   test.each(['posix', 'windows'])('builds the same explicit mode policy for %s fixtures', (platform) => {
-    const { buildActionPlan } = require('../../skills/spec-mcp-setup/scripts/lib/mode-policy.cjs');
+    const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
     const fixture = readFixture(`legacy-parity/${platform}/runtime-contracts.json`);
     expect(fixture.schema_version).toBe('mcp-setup-legacy-parity.v2');
     expect(fixture.provenance).toMatchObject({
@@ -333,7 +340,7 @@ describe('spec-mcp-setup unified Node contract', () => {
     expect(fixture.provenance.limitations).not.toEqual([]);
     expect(fixture.provenance.source_files.length).toBeGreaterThan(0);
     for (const source of fixture.provenance.source_files) {
-      const replay = spawnSync('git', ['show', `${fixture.provenance.source_sha}:${source.path}`], {
+      const replay = spawnSync('git', ['show', `${fixture.provenance.source_sha}:${historicalBaselinePath(source.path)}`], {
         cwd: repoRoot,
         encoding: null,
       });
@@ -364,7 +371,7 @@ describe('spec-mcp-setup unified Node contract', () => {
       expect(observed.effects).toEqual([...new Set(expectedEffects)].sort());
       expectFields(observed.result.payload, fixture.artifacts[contract.artifact_schema]);
       if (observed.result.payload.runtime) {
-        expectFields(observed.result.payload.runtime, fixture.artifacts['spec-mcp-setup-diagnostic-snapshot.v1']);
+        expectFields(observed.result.payload.runtime, fixture.artifacts['spec-runtime-setup-diagnostic-snapshot.v1']);
       }
       if (observed.result.payload.tool_facts) {
         expectFields(observed.result.payload.tool_facts, fixture.artifacts['tool-facts.v2']);
@@ -374,8 +381,8 @@ describe('spec-mcp-setup unified Node contract', () => {
   });
 
   test.each(['posix', 'windows'])('fails closed for every invalid %s characterization case', (platform) => {
-    const { buildActionPlan } = require('../../skills/spec-mcp-setup/scripts/lib/mode-policy.cjs');
-    const { runSetup } = require('../../skills/spec-mcp-setup/scripts/setup.cjs');
+    const { buildActionPlan } = require('../../skills/spec-runtime-setup/scripts/lib/mode-policy.cjs');
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const fixture = readFixture(`legacy-parity/${platform}/runtime-contracts.json`);
 
     for (const contract of fixture.invalid) {
@@ -529,7 +536,7 @@ describe('spec-mcp-setup unified Node contract', () => {
       const result = runWorkspaceCharacterization(argv, label);
       samples[result.payload.schema_version] = result.payload;
     }
-    const { inspectProjectConfig } = require('../../skills/spec-mcp-setup/scripts/lib/project-config.cjs');
+    const { inspectProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const projectStatus = inspectProjectConfig({
       repoRoot: tempRepo('project-status'),
       templatePath: path.join(skillRoot, 'references', 'config-template.yaml'),
@@ -543,7 +550,7 @@ describe('spec-mcp-setup unified Node contract', () => {
   });
 
   test('treats host auto-detection as advisory and requires an explicit pin for mutation', () => {
-    const { resolveHostAuthority } = require('../../skills/spec-mcp-setup/scripts/lib/host-authority.cjs');
+    const { resolveHostAuthority } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
 
     expect(resolveHostAuthority({ env: {}, mutationRequested: false, candidates: ['codex'] })).toMatchObject({
       status: 'advisory',
@@ -562,7 +569,7 @@ describe('spec-mcp-setup unified Node contract', () => {
   });
 
   test('resolves a selected repo and blocks paths outside the invocation workspace', () => {
-    const { resolveProjectTarget } = require('../../skills/spec-mcp-setup/scripts/lib/project-target.cjs');
+    const { resolveProjectTarget } = require('../../skills/spec-runtime-setup/scripts/lib/project-target.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-target-'));
     const child = path.join(workspace, 'child');
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-outside-'));
