@@ -1,5 +1,10 @@
 # Changelog
 
+- v1.13.2 2026-07-13 23:20:00 Codex: docs(runtime-setup): 用户手册确认无 `spec-mcp-setup` 残留；同步外部官网 consumer（`spec-first-official-website`）入口/路由/facts/audit 至 `spec-runtime-setup` 与 `/guide/runtime-setup`；`npm run test:release:website` 通过。 (user-visible)
+- v1.13.2 2026-07-13 21:20:00 Codex: docs(plan): 新增 init、runtime setup 与 CodeGraph/Graphify workspace 引导协同优化的 implementation-ready 计划：保留 parent-only init 和三个 lifecycle owner，规划 child projection mutation preflight、真实 batch preview、host-once / child-phase batch apply、parent/member routing、四层 doctor 状态与 `spec-runtime-setup` canonical entrypoint 投射；明确 Provider / external MCP 证据边界、workspace graph opt-in 和不引入中心化流程引擎。未实施 runtime 或手改 generated mirror。 (user-visible)
+
+- v1.13.2 2026-07-13 21:34:36 Codex: docs(runtime-setup): 收口硬切断活跃文案——doctor 去掉 pending host alias contract 并统一 Boundaries 缩进、`docs/README.md` setup facts 入口改为 `spec-runtime-setup`、SKILL Host Authority 明确唯一公开入口且无兼容别名。未改行为逻辑；runtime mirror 仍由用户 `spec-first init` 刷新。
+
 - v1.13.2 2026-07-13 21:30:00 Codex: refactor(runtime-setup): 将 Runtime Setup 公共入口从 `spec-mcp-setup` 硬切断为 `spec-runtime-setup`（Claude/Qoder command 拼写 `runtime-setup`）；`skills/spec-runtime-setup/` 为唯一 source/runtime 名，不再生成 `spec-mcp-setup`/`mcp-setup` 兼容别名；CLI/adapters/consumer skill/README/用户手册/测试路径同步。内部 env 仍为 `MCP_SETUP_HOST`。需 `spec-first init` 重生成 host runtime。 (user-visible)
 
 

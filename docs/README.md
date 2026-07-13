@@ -61,7 +61,7 @@
 
 当前上下文与证据主线以这些 source 和 contract 为准：
 
-- setup facts：`spec-mcp-setup`、`.spec-first/config/runtime-capabilities.json`
+- setup facts：`spec-runtime-setup`、`.spec-first/config/runtime-capabilities.json`
 - direct evidence：bounded source reads、`rg`、ast-grep、git diff、tests/logs、用户提供证据
 - workflow source：`skills/spec-plan/SKILL.md`、`skills/spec-work/SKILL.md`、`skills/spec-code-review/SKILL.md`
 - 用户入口与产物边界：`docs/05-用户手册/04-workflows-artifacts-map.md`

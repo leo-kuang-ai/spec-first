@@ -129,7 +129,7 @@ If setup later reports project convention facts, they must be deterministic exis
 
 ## Host Authority And Write Safety
 
-当前公开入口是 `spec-runtime-setup`；兼容入口仍接受 `spec-runtime-setup`；调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|qoder` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
+当前唯一公开入口是 `spec-runtime-setup`（Claude/Qoder 命令拼写 `runtime-setup`）；不提供 `spec-mcp-setup` / `mcp-setup` 兼容别名。调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|qoder` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
 
 在写入任何 host config 或刷新 setup-owned facts 前，workflow 必须让 `setup.cjs` 从显式 entrypoint host pin 解析 host authority 与 effective registry target。旧 setup facts 只能作为 drift comparison evidence：若其与当前 entrypoint host 不一致，应报告 host-marker drift，并为当前 host 刷新 setup-owned facts，不得把旧 host 当作当前 host。绝不能仅依据 prose 手动选择 `.kiro/settings/mcp.json`、`.qoder/settings.local.json`、`.cursor/mcp.json`、Codex TOML 或 Claude managed/user config。
 
