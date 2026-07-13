@@ -58,6 +58,10 @@ const {
   runWorkspaceGraphStatus,
 } = require('./lib/workspace-graph-status.cjs');
 const {
+  buildParentWorkspaceDiagnostic,
+  renderParentWorkspaceDiagnosticHuman,
+} = require('./lib/workspace-parent-diagnostic.cjs');
+const {
   dependencyFor,
   interpolateArgs,
   probeHelper,
@@ -219,27 +223,24 @@ function runSetup(input = {}) {
   };
 
   try {
-    if (target.mode === 'workspace-all-repos' && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
-      // Clean/status are read/mutation counterparts under the same workspace-graph domain.
-      // Prefer clean/status over build when both flags appear (clean first, then status).
-      if (actionPlan.args.workspaceGraphClean) {
+    if (target.mode === 'workspace-all-repos') {
+      // Clean/status/build under the workspace-graph domain (mutation modes + bare/check status).
+      if (actionPlan.args.workspaceGraphClean && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
         return runWorkspaceGraphCleanSetup(context);
       }
       if (actionPlan.args.workspaceGraphStatus) {
         return runWorkspaceGraphStatusSetup(context);
       }
-      if (actionPlan.args.workspaceGraph) {
+      if (actionPlan.args.workspaceGraph && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
         return runWorkspaceGraphSetup(context);
       }
-      return runWorkspaceBatch(context, { runSingleTarget });
-    }
-    // Status is also allowed in bare/check modes for a non-Git workspace (read-only).
-    if (
-      target.mode === 'workspace-all-repos'
-      && actionPlan.args.workspaceGraphStatus
-      && ['bare', 'check'].includes(actionPlan.mode)
-    ) {
-      return runWorkspaceGraphStatusSetup(context);
+      if (!['bare', 'check', 'plan'].includes(actionPlan.mode)) {
+        return runWorkspaceBatch(context, { runSingleTarget });
+      }
+      // bare/check/plan on a requirement parent: dual-path diagnostic (not single-repo facts).
+      if (actionPlan.mode === 'bare' || actionPlan.mode === 'check') {
+        return runParentWorkspaceDiagnostic(context);
+      }
     }
     return runSingleTarget(context, target.target_root || cwd);
   } catch (error) {
@@ -248,6 +249,24 @@ function runSetup(input = {}) {
       target,
     });
   }
+}
+
+function runParentWorkspaceDiagnostic(context) {
+  const { actionPlan, cwd, target, host } = context;
+  const payload = buildParentWorkspaceDiagnostic({
+    cwd,
+    target,
+    host,
+    repos: actionPlan.args.repos || [],
+  });
+  return {
+    exit_code: 0,
+    mode: actionPlan.mode,
+    reason_code: payload.reason_code,
+    payload,
+    human: renderParentWorkspaceDiagnosticHuman(payload),
+    target,
+  };
 }
 
 function runWorkspaceGraphSetup(context) {
@@ -325,14 +344,21 @@ function renderWorkspaceGraphStatusHuman(result) {
     );
   }
   if (result.workspace) {
+    const sizeNote = result.workspace.merged_size_bytes != null
+      ? ` size=${result.workspace.merged_size_bytes}B`
+      : '';
     lines.push(
-      `  workspace graphify: ${result.workspace.merged_present ? 'merged' : (result.workspace.graphify_present ? 'partial' : 'absent')}`,
+      `  workspace graphify: ${result.workspace.merged_present ? 'merged' : (result.workspace.graphify_present ? 'partial' : 'absent')}${sizeNote}`,
     );
   }
   if (result.default_project_path) {
-    lines.push(`  default projectPath: ${result.default_project_path}`);
+    lines.push(
+      `  advisory projectPath hint: ${result.default_project_path}`
+        + ' (only when cwd is not inside a child; prefer enclosing child)',
+    );
   }
   lines.push(`  note: ${result.server_root_default_note || 'pass projectPath for CodeGraph queries'}`);
+  lines.push('  note: do not cat .graphify/graph.json or merged-graph.json; use Graphify CLI query/path/explain');
   return `${lines.join('\n')}\n`;
 }
 

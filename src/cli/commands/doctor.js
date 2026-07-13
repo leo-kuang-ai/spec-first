@@ -520,10 +520,13 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
     : '';
 
   if (status.status === 'ready') {
+    const size = status.workspace && status.workspace.merged_size_bytes != null
+      ? ` merged_size=${status.workspace.merged_size_bytes}B`
+      : '';
     return {
       level: 'PASS',
       name: 'workspace graph',
-      message: `ready (${childReady}/${childTotal} child CodeGraph; merged Graphify present).${defaultPath}${defaultNote}. Advisory only — confirm conclusions against child source.`,
+      message: `ready (${childReady}/${childTotal} child CodeGraph; merged Graphify present${size}).${defaultPath}${defaultNote}. Advisory only — confirm conclusions against child source. Do not cat merged-graph.json.`,
       reasonCode: 'workspace-graph-ready',
       advisory: true,
       workspace_graph: summarizeWorkspaceGraphForDoctor(status),
@@ -575,8 +578,12 @@ function summarizeWorkspaceGraphForDoctor(status) {
       ? status.repos.filter((repo) => repo.codegraph_present).length
       : 0,
     merged_present: Boolean(status.workspace && status.workspace.merged_present),
+    merged_size_bytes: status.workspace && status.workspace.merged_size_bytes != null
+      ? status.workspace.merged_size_bytes
+      : null,
     default_project_path: status.default_project_path || null,
     default_project_path_contained: Boolean(status.default_project_path_contained),
+    default_project_path_policy: status.default_project_path_policy || '',
     server_root_default_note: status.server_root_default_note || '',
   };
 }

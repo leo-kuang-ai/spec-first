@@ -30,6 +30,7 @@ const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/mcp-setup-workspace-graph-refresh.test.js',
   'tests/unit/mcp-setup-workspace-graph-scope.test.js',
   'tests/unit/mcp-setup-workspace-graph-status.test.js',
+  'tests/unit/mcp-setup-workspace-parent-diagnostic.test.js',
   'tests/unit/mcp-setup-workspace-provider-runners.test.js',
   'tests/unit/mcp-setup-workspace-routing-inject.test.js',
   'tests/unit/mcp-setup-workspace-routing-instruction.test.js',

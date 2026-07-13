@@ -5,6 +5,9 @@ date: 2026-07-12
 topic: multi-repo-workspace-graph-lifecycle-query
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
+status: superseded
+superseded_by: docs/plans/2026-07-13-001-feat-per-requirement-workspace-multi-repo-graph-plan.md
+superseded_reason: "Owner short-lived per-requirement workspaces; 2026-07-13-001 delivered the light two-layer path. This plan remains vision/reference for heavy registry/serving-graph lifecycle — not rewritten, not implemented as-is."
 product_contract_source: spec-brainstorm
 product_contract_amendment: confirmed-during-spec-plan
 execution: code
@@ -12,6 +15,10 @@ deepened: 2026-07-12
 ---
 
 # Multi-Repo Workspace Graph Lifecycle and Query - Plan
+
+> **Status: superseded (vision reference).** 短命 per-需求 workspace 场景由  
+> `docs/plans/2026-07-13-001-feat-per-requirement-workspace-multi-repo-graph-plan.md`  
+> （`status: completed`）以轻量双层图路径交付。本文保留 registry / serving-graph / freshness ledger 等重型 lifecycle 作为 vision，不就地改写、不按本文 as-is 实施。
 
 ## Goal Capsule
 

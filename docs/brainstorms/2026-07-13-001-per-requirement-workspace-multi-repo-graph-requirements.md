@@ -3,11 +3,15 @@ date: "2026-07-13"
 topic: per-requirement-workspace-multi-repo-graph
 spec_id: 2026-07-13-001-per-requirement-workspace-multi-repo-graph
 artifact_kind: scenario-clarification
-status: planning-ready
+status: implemented
 write_mode: draft
 can_enter_spec_plan: yes
+implementation_plan: docs/plans/2026-07-13-001-feat-per-requirement-workspace-multi-repo-graph-plan.md
+implementation_status: completed
 author: leokuang
 related:
+  - docs/plans/2026-07-13-001-feat-per-requirement-workspace-multi-repo-graph-plan.md
+  - docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md
   - docs/plans/2026-07-12-005-feat-spec-code-review-code-graph-advisory-integration-plan.md
   - docs/plans/2026-07-12-006-feat-multi-repo-workspace-graph-lifecycle-query-plan.md
   - skills/spec-mcp-setup/scripts/lib/project-target.cjs
@@ -17,7 +21,7 @@ related:
 
 # 按需求建 workspace 的多仓代码图谱 —— 背景 / 场景 / 需求梳理
 
-> 本文目的:在进入方案(plan)之前,把 owner 的真实使用场景、痛点和需求基线梳理清楚,作为后续独立 `spec-plan` 的输入。场景、范围与双图谱全量自动化可行性已经 owner 验证,当前已具备 planning readiness;manifest schema、宿主能力投射等实现细节由 plan 阶段确定。
+> 本文目的:在进入方案(plan)之前,把 owner 的真实使用场景、痛点和需求基线梳理清楚,作为后续独立 `spec-plan` 的输入。场景与范围已 owner 验证并进入 plan；**实现已完成**，见 `docs/plans/2026-07-13-001-feat-per-requirement-workspace-multi-repo-graph-plan.md`（`status: completed`）与 `docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md`。
 
 ---
 

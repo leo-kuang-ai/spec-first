@@ -34,7 +34,7 @@ function fakeExec(command, args) {
 }
 
 describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
-  test('after a complete build, status reports ready with contained projectPath defaults', () => {
+  test('after a complete build, status reports ready; parent cwd has no invented default projectPath', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     initRepo(ws, 'web');
@@ -53,13 +53,39 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     expect(status.repos.map((r) => r.repo_id).sort()).toEqual(['api', 'web']);
     expect(status.repos.every((r) => r.codegraph_present && r.project_path_contained)).toBe(true);
     expect(status.workspace.merged_present).toBe(true);
-    expect(status.default_project_path_contained).toBe(true);
-    expect(status.default_project_path).toBeTruthy();
+    expect(status.workspace.merged_size_bytes).toEqual(expect.any(Number));
+    // At parent root: no lexicographic "main" repo default.
+    expect(status.default_project_path_policy).toBe('none-at-parent-root');
+    expect(status.default_project_path).toBeNull();
     // Freshness carries no negative authority.
     expect(status.repos[0].freshness.negative_authority).toBe(false);
     expect(status.workspace.freshness.negative_authority).toBe(false);
     // Routing block should be present after build inject.
     expect(status.routing.entries.some((e) => e.has_routing_block)).toBe(true);
+  });
+
+  test('when cwd is inside a child, default projectPath is that enclosing child', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    initRepo(ws, 'web');
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api', 'web'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      injectRouting: false,
+    });
+    // Topology resolves from parent root; pathHintCwd simulates agent cwd inside a child.
+    const status = runWorkspaceGraphStatus({
+      cwd: ws,
+      pathHintCwd: api,
+      repos: ['api', 'web'],
+      allowDiscovery: false,
+    });
+    expect(status.status).toBe('ready');
+    expect(status.default_project_path_policy).toBe('cwd-enclosing-child');
+    expect(status.default_project_path).toBe(api);
+    expect(status.default_project_path_contained).toBe(true);
   });
 
   test('empty workspace reports absent without inventing graphs', () => {

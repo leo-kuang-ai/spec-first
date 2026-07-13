@@ -1,12 +1,15 @@
 ---
 title: "feat: Per-Requirement Multi-Repo Workspace Two-Layer Code Graph"
 type: feat
+status: completed
 date: 2026-07-13
+completed: 2026-07-13
 artifact_contract: spec-unified-plan/v1
-artifact_readiness: implementation-ready
+artifact_readiness: completed
 product_contract_source: legacy-requirements
 origin: docs/brainstorms/2026-07-13-001-per-requirement-workspace-multi-repo-graph-requirements.md
 execution: code
+validation_receipt: docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md
 ---
 
 # feat: Per-Requirement Multi-Repo Workspace Two-Layer Code Graph
@@ -317,6 +320,47 @@ flowchart LR
 - D8. README/README.zh-CN/SKILL/contracts/CHANGELOG 同步;E2E 回归回执落盘且关键 claim 可回源。
 - D9. 005/spec-work/spec-debug 等 consumer workflow 未被本 plan 改动;复用类能力保持 deferred。
 - D10. 实现期产生的废弃 schema/临时脚本/无 consumer 抽象已清理。
+
+---
+
+## Implementation Validation / Completion Evidence
+
+本计划已标记 `status: completed`（2026-07-13）。完成依据是当前 source 实现、聚焦/集成/smoke 测试、真实二进制 E2E 回执、干净沙箱五宿主 `spec-first init` 投射、以及 dogfood 暴露的 P0/P1 修复。**未手改 generated runtime mirrors**（D6 用干净沙箱 init 验证投射）。
+
+### 交付映射（U1–U7）
+
+| Unit | Source 落点 | 主要测试 / 证据 |
+|---|---|---|
+| U1 target/manifest/discovery | `skills/spec-mcp-setup/scripts/lib/workspace-target.cjs` + `workspace-manifest.schema.json` | `tests/unit/mcp-setup-workspace-target.test.js` |
+| U2 eager 双层图 | `workspace-graph-build.cjs` + `workspace-provider-runners.cjs` + `workspace-graph-executor.cjs` + `workspace-git-exclude.cjs`；CLI：`setup.cjs --workspace-graph` | graph-build / provider-runners / executor / entry |
+| U3 自动刷新 | `workspace-graph-refresh.cjs`（hook install containment + reconvergeMerge） | refresh unit + E2E 回执 D4 段（真实 Graphify hook/merge） |
+| U4 freshness/containment/doctor | `workspace-graph-scope.cjs` + `workspace-graph-status.cjs`；`--workspace-graph-status`；`doctor` common advisory 行 | graph-scope / graph-status / `doctor-workspace-graph` |
+| U5 路由注入 | `workspace-routing-instruction.cjs` + `workspace-routing-inject.cjs`（需求根 `CLAUDE.md`/`AGENTS.md` managed block；Kiro/Qoder 降级文案） | routing-instruction / routing-inject / executor |
+| U6 clean/update | `workspace-graph-clean.cjs`；`setup --workspace-graph-clean`；`spec-first clean --workspace-graph`；`update` help 明示不自动重建图 | graph-clean / cli-clean-workspace-graph / lifecycle integration |
+| U7 docs/投射/E2E | SKILL/README/README.zh-CN/CHANGELOG；`project-graph-consumption.md` per-requirement 节；`docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md`；五宿主 projection integration | five-host-projection integration；smoke five-host path |
+
+### 已执行验证（实现期）
+
+- `npm run test:mcp-setup` → 27 suites / 301 tests passed（含 workspace 全套）。
+- `npm run test:integration` → 含 `workspace-graph-lifecycle` + `workspace-graph-five-host-projection` 在内 4 suites / 18 tests passed。
+- `npm run test:smoke` → 5 tests passed。
+- 聚焦：`cli-clean-workspace-graph`、`doctor-workspace-graph`、Graphify dual `hook-guard` 合同、workspace-target。
+- 真实二进制 E2E 回执：`docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md`（CodeGraph 1.4.1 + Graphify 0.9.12 build；D4 hook→merge reconverge 2801→3705）。
+- D6：干净沙箱 `spec-first init --claude --codex --cursor --kiro --qoder -y`，每宿主 `spec-mcp-setup` mirror 含 workspace-graph 模块/flag/SKILL；`doctor --json` 无 drift/ERROR。
+- Dogfood 附带修复（同实现窗口）：Graphify 0.9.12 Claude `hook-guard`×2 契约、`js-yaml` 产品依赖、非 Git 父目录 PRD guard source 模板、SKILL 双路径文案。
+
+### 实现口径（与 plan Files 列表的有意偏差）
+
+- **路由 writer**：写需求根 `CLAUDE.md`/`AGENTS.md` managed block，而非改各 `src/cli/adapters/*` 的 init managed 资产；五宿主仍通过入口文件族覆盖。
+- **doctor**：宿主 `spec-first doctor` 增加 advisory workspace-graph 行；细节与 mutation 仍在 `--workspace-graph-status` / clean。
+- **update**：不自动重建图；help 指向再跑 `--workspace-graph` 或 `clean --workspace-graph`。
+- **daemon**：clean 报告清理动作，不强制 kill provider daemon。
+- **Deferred 保持**：跨 workspace 复用、机器级 global graph、Kiro/Qoder CodeGraph adapter、006 重型 lifecycle —— 仍 outside。
+
+### Residual（非 DoD 阻塞）
+
+- 本完成标记对应 **source 实现完成**；发布 commit/npm 发版与 KAZ 现场用新版本完整重跑属工程收尾，不改变本 plan 的 completed 判定。
+- 脏工作树未强跑全量 `spec-first init`（并发手册编辑风险）；D6 以干净沙箱 apply 为准。
 
 ---
 

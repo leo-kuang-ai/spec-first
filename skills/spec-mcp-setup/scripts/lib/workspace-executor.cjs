@@ -284,10 +284,15 @@ function buildWorkspaceSetupSummary(context, results) {
       ? 'workspace-no-git-candidates'
       : (overallStatus === 'ready' ? null : 'all-repos-partial-or-action-required'),
     next_action: overallStatus === 'ready'
-      ? '所有 child repo 均已完成 MCP setup。'
+      ? '所有 child repo 均已完成 MCP setup。若需父目录双层图，再跑：spec-mcp-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>（不要用 --workspace-graph --all-repos）。'
       : (counts.action_required > 0
         ? '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup。'
         : '当前 child repo 仅完成 selected subset；运行标准 spec-mcp-setup 并用 --verify-only 复核完整 readiness。'),
+    dual_path_hint: {
+      child_batch: 'spec-mcp-setup --only codegraph,graphify --all-repos',
+      workspace_graph: 'spec-mcp-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>',
+      ban: 'Do not combine --workspace-graph with --all-repos as the graph confirm path.',
+    },
   };
 }
 
@@ -369,8 +374,13 @@ function buildWorkspaceVerifySummary(context, results, computeGeneratedRuntimeMa
     next_action: manifestRefreshRequired
       ? `从 parent workspace 运行 ${parentRuntimeAction} 刷新 parent runtime，或对 stale child repo 运行 ${childRuntimeAction}，然后重新 verify。`
       : (overallStatus === 'ready'
-        ? '所有 child repo 均已验证必需 MCP/helper dependency readiness。'
+        ? '所有 child repo 均已验证必需 MCP/helper dependency readiness。父目录双层图请用 --workspace-graph --repos <清单> 构建/复核（勿用 --workspace-graph --all-repos）。'
         : '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup/verify。'),
+    dual_path_hint: {
+      child_batch_verify: 'spec-mcp-setup --verify-only --all-repos',
+      workspace_graph_status: 'spec-mcp-setup --workspace-graph-status --repos <a,b,...>',
+      ban: 'Do not combine --workspace-graph with --all-repos as the graph confirm path.',
+    },
   };
 }
 
