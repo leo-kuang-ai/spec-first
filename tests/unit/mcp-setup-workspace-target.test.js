@@ -186,4 +186,17 @@ describe('resolveWorkspaceTargets — topology guards', () => {
     expect(result.manifest_error).toBe('workspace-manifest-version-mismatch');
     expect(result.reason_code).toBe('workspace-manifest-version-mismatch');
   });
+
+  test.each([
+    ['missing required version', 'repos:\n  - path: api\n', 'workspace-manifest-schema-invalid'],
+    ['unknown top-level field', 'schema_version: workspace-manifest.v1\nowner: team\n', 'workspace-manifest-schema-invalid'],
+    ['unknown repo field', 'schema_version: workspace-manifest.v1\nrepos:\n  - path: api\n    branch: main\n', 'workspace-manifest-schema-invalid'],
+  ])('%s fails strict schema validation', (_name, manifest, reasonCode) => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    writeManifest(ws, manifest);
+    const result = resolveWorkspaceTargets({ cwd: ws, allowDiscovery: false });
+    expect(result.manifest_error).toBe(reasonCode);
+    expect(result.reason_code).toBe(reasonCode);
+  });
 });

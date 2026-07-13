@@ -22,12 +22,16 @@ const BLOCK_START = '<!-- spec-first:workspace-routing start -->';
 const BLOCK_END = '<!-- spec-first:workspace-routing end -->';
 const CODEGRAPH_DEGRADED_HOSTS = new Set(['kiro', 'qoder']);
 
-function renderRoutingInstruction({ workspaceRoot, repos = [], host = null } = {}) {
+function renderRoutingInstruction({ workspaceRoot, repos = [], host = null, hosts = [] } = {}) {
   const label = workspaceRoot ? path.basename(workspaceRoot) : 'workspace';
   const repoList = repos.length
     ? repos.map((r) => `  - \`${r.repo_id || r.workspace_relative_path}\``).join('\n')
     : '  - (none resolved yet — run workspace graph setup)';
-  const degraded = host && CODEGRAPH_DEGRADED_HOSTS.has(String(host).toLowerCase());
+  const selectedHosts = [...new Set([
+    ...(Array.isArray(hosts) ? hosts : []),
+    ...(host ? [host] : []),
+  ].map((entry) => String(entry).toLowerCase()))];
+  const degradedHosts = selectedHosts.filter((entry) => CODEGRAPH_DEGRADED_HOSTS.has(entry));
 
   const lines = [
     BLOCK_START,
@@ -43,10 +47,10 @@ function renderRoutingInstruction({ workspaceRoot, repos = [], host = null } = {
     'Child repos in this workspace:',
     repoList,
   ];
-  if (degraded) {
+  if (degradedHosts.length > 0) {
     lines.push(
       '',
-      `- **Note (${host}):** CodeGraph is running in honest-degraded mode on this host (provider install does not natively cover it); rely on Graphify + direct source reads for tactical questions.`,
+      `- **Note (${degradedHosts.join('/')}):** CodeGraph is running in honest-degraded mode on these hosts (provider install does not natively cover them); rely on Graphify + direct source reads for tactical questions.`,
     );
   }
   lines.push(BLOCK_END);

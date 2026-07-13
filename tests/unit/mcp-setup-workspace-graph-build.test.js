@@ -32,7 +32,12 @@ function makeRunners(ws, opts = {}) {
   return {
     calls,
     runners: {
-      codegraphInstallGlobal() { calls.install += 1; return { ok: true }; },
+      codegraphInstallGlobal() {
+        calls.install += 1;
+        return opts.failInstall
+          ? { ok: false, reason_code: 'codegraph-install-failed' }
+          : { ok: true };
+      },
       codegraphInit(repoRoot) {
         calls.codegraphInit.push(repoRoot);
         const id = path.basename(repoRoot);
@@ -52,6 +57,7 @@ function makeRunners(ws, opts = {}) {
       },
       graphifyMerge(inputs, outPath) {
         calls.merge.push({ inputs: inputs.slice(), outPath });
+        if (opts.failMerge) return { ok: false, reason_code: 'graphify-merge-failed' };
         fs.writeFileSync(outPath, JSON.stringify({ merged: inputs.length }));
         return { ok: true };
       },
@@ -141,5 +147,81 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
     expect(api.reason_code).toBe('codegraph-init-failed');
     // web still built, so batch is partial not failed
     expect(result.status).toBe('partial');
+  });
+
+  test('merge runner ok without writing merged-graph cannot be promoted to complete', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api'), initRepo(ws, 'web')];
+    const { runners } = makeRunners(ws);
+    runners.graphifyMerge = () => ({ ok: true });
+
+    const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos, runners });
+
+    expect(result.merge.status).toBe('failed');
+    expect(result.merge.reason_code).toBe('workspace-merged-graph-missing');
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-merge-failed');
+  });
+
+  test('merge failure cannot be promoted to complete when all child providers are ready', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api'), initRepo(ws, 'web')];
+    const { runners } = makeRunners(ws, { failMerge: true });
+
+    const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos, runners });
+
+    expect(result.merge.status).toBe('failed');
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-merge-failed');
+  });
+
+  test('exclude failure cannot be promoted to complete', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api')];
+    const { runners } = makeRunners(ws);
+
+    const result = buildWorkspaceGraphs({
+      workspaceRoot: ws,
+      repos,
+      runners,
+      excludeWriter: () => ({ ok: false, reason_code: 'exclude-write-failed' }),
+    });
+
+    expect(result.repos[0].exclude_status).toBe('failed');
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-exclude-failed');
+  });
+
+  test('global CodeGraph install failure cannot be promoted to complete', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api')];
+    const { runners } = makeRunners(ws, { failInstall: true });
+
+    const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos, runners });
+
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-codegraph-install-failed');
+  });
+
+  test('state receipt write failure cannot be promoted to complete', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api')];
+    const { runners } = makeRunners(ws);
+    let writes = 0;
+
+    const result = buildWorkspaceGraphs({
+      workspaceRoot: ws,
+      repos,
+      runners,
+      stateWriter: () => {
+        writes += 1;
+        return writes === 1
+          ? { ok: true }
+          : { ok: false, reason_code: 'workspace-state-write-failed' };
+      },
+    });
+
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-state-write-failed');
   });
 });

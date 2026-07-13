@@ -178,7 +178,7 @@ function runSetup(input = {}) {
     };
   }
 
-  const mutationNeedsHost = ['verify', 'only', 'graphify-refresh', 'host-config-repair'].includes(actionPlan.mode);
+  const mutationNeedsHost = ['verify', 'only', 'graphify-refresh', 'host-config-repair', 'workspace-graph-build'].includes(actionPlan.mode);
   const runner = input.runner || runCommandSync;
   const candidates = advisoryHostCandidates({ env, runner });
   const authority = resolveHostAuthority({
@@ -225,13 +225,13 @@ function runSetup(input = {}) {
   try {
     if (target.mode === 'workspace-all-repos') {
       // Clean/status/build under the workspace-graph domain (mutation modes + bare/check status).
-      if (actionPlan.args.workspaceGraphClean && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
+      if (actionPlan.args.workspaceGraphClean) {
         return runWorkspaceGraphCleanSetup(context);
       }
       if (actionPlan.args.workspaceGraphStatus) {
         return runWorkspaceGraphStatusSetup(context);
       }
-      if (actionPlan.args.workspaceGraph && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
+      if (actionPlan.args.workspaceGraph) {
         return runWorkspaceGraphSetup(context);
       }
       if (!['bare', 'check', 'plan'].includes(actionPlan.mode)) {
@@ -260,7 +260,7 @@ function runParentWorkspaceDiagnostic(context) {
     repos: actionPlan.args.repos || [],
   });
   return {
-    exit_code: 0,
+    exit_code: payload.overall_status === 'ready' ? 0 : 1,
     mode: actionPlan.mode,
     reason_code: payload.reason_code,
     payload,
@@ -276,18 +276,27 @@ function runWorkspaceGraphSetup(context) {
     repos: actionPlan.args.repos || [],
     // exec is injectable for tests; undefined falls back to spawnSync inside the executor.
     exec: context.workspaceExec,
-    hosts: context.host ? [context.host] : ['claude', 'codex'],
   });
-  const exitCode = result.status === 'failed' ? 1 : 0;
+  const exitCode = workspaceMutationExitCode(result.status);
   const detail = result.reason_code ? ` (${result.reason_code})` : '';
+  const pending = Array.isArray(result.pending_confirm) ? result.pending_confirm : [];
+  const confirmation = result.status === 'needs-confirmation' && pending.length > 0
+    ? `\n  pending_confirm: ${pending.join(', ')}\n  confirm: spec-mcp-setup --only codegraph,graphify --workspace-graph --repos ${pending.join(',')}`
+    : '';
   return {
     exit_code: exitCode,
     mode: actionPlan.mode,
     reason_code: result.reason_code || (result.status === 'complete' ? '' : result.status),
     payload: result,
-    human: `Workspace 双层图构建：${result.status}${detail}\n`,
+    human: `Workspace 双层图构建：${result.status}${detail}${confirmation}\n`,
     target,
   };
+}
+
+function workspaceMutationExitCode(status) {
+  if (status === 'complete' || status === 'skipped') return 0;
+  if (status === 'needs-confirmation') return 2;
+  return 1;
 }
 
 function runWorkspaceGraphCleanSetup(context) {
@@ -296,11 +305,8 @@ function runWorkspaceGraphCleanSetup(context) {
     cwd,
     repos: actionPlan.args.repos || [],
     exec: context.workspaceExec,
-    hosts: context.host
-      ? [context.host]
-      : ['claude', 'codex', 'cursor', 'kiro', 'qoder'],
   });
-  const exitCode = result.status === 'failed' ? 1 : 0;
+  const exitCode = workspaceMutationExitCode(result.status);
   const detail = result.reason_code ? ` (${result.reason_code})` : '';
   return {
     exit_code: exitCode,
@@ -334,12 +340,13 @@ function renderWorkspaceGraphStatusHuman(result) {
     return `Workspace 双层图状态：skipped (${result.reason_code || result.topology})\n`;
   }
   const lines = [
-    `Workspace 双层图状态：${result.status}`,
+    `Workspace 双层图状态：${result.status}${result.reason_code ? ` (${result.reason_code})` : ''}`,
     `  root: ${result.workspace_root}`,
   ];
   for (const repo of result.repos || []) {
     lines.push(
       `  child ${repo.repo_id}: codegraph=${repo.codegraph_present ? 'yes' : 'no'}`
+        + ` graphify_subgraph=${repo.graphify_subgraph_present ? 'yes' : 'no'}`
         + ` projectPath_contained=${repo.project_path_contained}`,
     );
   }
@@ -350,11 +357,21 @@ function renderWorkspaceGraphStatusHuman(result) {
     lines.push(
       `  workspace graphify: ${result.workspace.merged_present ? 'merged' : (result.workspace.graphify_present ? 'partial' : 'absent')}${sizeNote}`,
     );
+    lines.push(
+      `  state: ${result.workspace.state_status || 'unknown'}`
+        + ` freshness=${result.workspace.freshness && result.workspace.freshness.freshness
+          ? result.workspace.freshness.freshness
+          : 'unknown'}`
+        + ` refresh=${result.workspace.refresh_mode || 'unknown'}`,
+    );
+  }
+  if (Array.isArray(result.pending_confirm) && result.pending_confirm.length > 0) {
+    lines.push(`  pending_confirm: ${result.pending_confirm.join(', ')}`);
   }
   if (result.default_project_path) {
     lines.push(
       `  advisory projectPath hint: ${result.default_project_path}`
-        + ' (only when cwd is not inside a child; prefer enclosing child)',
+        + ' (cwd 位于 confirmed child 内时使用 enclosing child)',
     );
   }
   lines.push(`  note: ${result.server_root_default_note || 'pass projectPath for CodeGraph queries'}`);
@@ -663,6 +680,10 @@ function helpResult() {
     '模式：--check | --verify-only | --refresh-facts | --plan | --project-config | --only <ids> | --repair-host-config',
     'Graphify 刷新：--only graphify --refresh',
     '目标：--repo <path> | --folder <path> | --all-repos',
+    'Workspace 双层图构建：--only codegraph,graphify --workspace-graph [--repos <a,b>]',
+    'Workspace 双层图状态：--workspace-graph-status [--repos <a,b>]',
+    'Workspace 双层图清理：--workspace-graph-clean [--repos <a,b>]',
+    '约束：workspace-graph action 互斥，且不可与 --all-repos 组合；source 变化后显式重跑构建命令刷新。',
     '',
   ].join('\n');
   return { exit_code: 0, mode: 'help', reason_code: 'help', payload: { help: human }, human, target: null };

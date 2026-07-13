@@ -10,6 +10,7 @@ const {
   removeManagedExclude,
   resolveExcludePath,
   MANAGED_BLOCK_START,
+  MANAGED_BLOCK_END,
 } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-git-exclude.cjs');
 
 function mkWorkspace() {
@@ -109,5 +110,42 @@ describe('workspace-git-exclude — managed .git/info/exclude writer', () => {
     expect(resolved.ok).toBe(true);
     expect(path.isAbsolute(resolved.absolute)).toBe(true);
     expect(resolved.absolute.endsWith(path.join('info', 'exclude'))).toBe(true);
+  });
+
+  test('remove rejects an exclude symlink escaping the workspace', () => {
+    const ws = mkWorkspace();
+    const repo = initRepoWithCommit(ws, 'svc');
+    const excludePath = resolveExcludePath(repo).absolute;
+    const outside = path.join(mkWorkspace(), 'outside-exclude');
+    fs.writeFileSync(outside, `${MANAGED_BLOCK_START}\n.codegraph/\n${MANAGED_BLOCK_END}\n`);
+    fs.rmSync(excludePath, { force: true });
+    try {
+      fs.symlinkSync(outside, excludePath);
+    } catch (_error) {
+      return;
+    }
+    const result = removeManagedExclude(repo, ws);
+    expect(result).toEqual(expect.objectContaining({
+      ok: false,
+      reason_code: 'exclude-target-escapes-workspace',
+    }));
+    expect(fs.readFileSync(outside, 'utf8')).toContain(MANAGED_BLOCK_START);
+  });
+
+  test.each([
+    ['missing end', `${MANAGED_BLOCK_START}\n.codegraph/\n`],
+    ['duplicate start', `${MANAGED_BLOCK_START}\n${MANAGED_BLOCK_START}\n${MANAGED_BLOCK_END}\n`],
+    ['reversed markers', `${MANAGED_BLOCK_END}\n${MANAGED_BLOCK_START}\n`],
+  ])('malformed managed block (%s) fails closed and preserves user content', (_name, contents) => {
+    const ws = mkWorkspace();
+    const repo = initRepoWithCommit(ws, 'svc');
+    const excludePath = resolveExcludePath(repo).absolute;
+    fs.writeFileSync(excludePath, `# user\n${contents}`);
+    const remove = removeManagedExclude(repo, ws);
+    expect(remove).toEqual(expect.objectContaining({ ok: false, reason_code: 'exclude-managed-block-malformed' }));
+    expect(fs.readFileSync(excludePath, 'utf8')).toBe(`# user\n${contents}`);
+    const add = addManagedExclude(repo, ws);
+    expect(add).toEqual(expect.objectContaining({ ok: false, reason_code: 'exclude-managed-block-malformed' }));
+    expect(fs.readFileSync(excludePath, 'utf8')).toBe(`# user\n${contents}`);
   });
 });

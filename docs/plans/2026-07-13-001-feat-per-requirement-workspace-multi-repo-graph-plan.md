@@ -1,11 +1,10 @@
 ---
 title: "feat: Per-Requirement Multi-Repo Workspace Two-Layer Code Graph"
 type: feat
-status: completed
+status: active
 date: 2026-07-13
-completed: 2026-07-13
 artifact_contract: spec-unified-plan/v1
-artifact_readiness: completed
+artifact_readiness: implementation-ready
 product_contract_source: legacy-requirements
 origin: docs/brainstorms/2026-07-13-001-per-requirement-workspace-multi-repo-graph-requirements.md
 execution: code
@@ -16,7 +15,7 @@ validation_receipt: docs/validation/2026-07-13-per-requirement-workspace-graph-e
 
 ## Goal Capsule
 
-- **Objective:** 让开发者从一个**非 Git 的"需求文件夹"**(多仓父目录)一键为其中每个子 Git 仓建 CodeGraph 战术图、为整个 workspace 建一张 Graphify 跨仓宏观合并图,并保持两层图自动新鲜;从该目录进 codex/claude 时按 cwd best-effort 用对的图。
+- **Objective:** 让开发者从一个**非 Git 的"需求文件夹"**(多仓父目录)一键为其中每个子 Git 仓建 CodeGraph 战术图、为整个 workspace 建一张 Graphify 跨仓宏观合并图；CodeGraph freshness 由 provider watcher 负责，Graphify workspace 合并图当前通过显式重跑构建命令刷新；从该目录进 codex/claude 时按 cwd best-effort 用对的图。
 - **Authority:** origin 需求文档定义 WHAT(CR1-CR13);各子仓源码 / Git 状态 / 直接证据高于图谱候选;workspace 编排只拥有图 artifact 与路由权威,不获得子仓 source / finding / verification 权威。
 - **Execution profile:** owner 已实测端到端链路可用(origin §4.1),**本 plan 不设可行性 gate**,而是把已验证链路固化为可重复回归验收 + 补齐产品化 source、guardrail、多宿主投射与生命周期。
 - **Product Contract preservation:** 新建 plan,legacy origin 不改写;CR1-CR13 原义保留,plan 只加 HOW。
@@ -43,9 +42,9 @@ validation_receipt: docs/validation/2026-07-13-per-requirement-workspace-graph-e
 - CR5. Graphify 每子仓子图 + 需求根一张 `merge-graphs` 合并图,均 `--out`/`GRAPHIFY_OUT` 写到 `需求A/.graphify/`(子仓物理零侵入,不写机器级 global);建图 `extract --code-only`(纯 AST、零 LLM key),合并图 = 各子仓 AST 图 union,不含社区归纳/命名。
 - CR6. 两层图与产物严格 scope 在当前需求文件夹内;`projectPath` 解析须校验落在当前 workspace 根内(拒绝/告警他需求 projectPath);跨 workspace query 为非目标。
 
-**C. 自动刷新**
+**C. 刷新与诚实降级**
 - CR7. CodeGraph `serve --mcp` 默认 watcher,代码变更延迟 auto-sync。
-- CR8. Graphify 每子 Git 仓装 git hook,commit 后刷新子图;自动化编排在子图变化后重跑 `merge-graphs` 使合并图收敛;触发、完成信号、失败隔离、恢复写入实现合同与回归验收。
+- CR8. 目标合同是 Graphify 子图变化后自动重跑 `merge-graphs` 收敛；当前 Graphify 0.9.x 原生 hook 只重建 child 默认 output，无法可靠更新 out-of-tree 子图并在完成后触发 parent merge，因此本实现明确降级为显式重跑 `--workspace-graph --repos ...`，不安装 hook、不宣称自动 freshness。待 provider 提供 out-of-tree hook、完成回调或原子 parent merge 后重新评估自动化。
 - CR9. 非 Git 变更或无 hook 场景用 Graphify `watch` 或显式 refresh 兜底,并如实标注 freshness。
 
 **D. cwd-aware 路由**
@@ -54,7 +53,7 @@ validation_receipt: docs/validation/2026-07-13-per-requirement-workspace-graph-e
 
 **E. 诚实边界**
 - CR12. 图输出始终 advisory;partial/stale/unmapped 空结果无否定权,重要结论回源。
-- CR13. workspace/parent 只拥有编排与图 artifact 权威,不获得子仓 Git/source mutation/finding/verification 权威。**唯一授权例外**:向子仓 `.git/info/exclude` 写 `.codegraph/` 忽略行、及 `graphify hook install`——保 git 干净/刷新所需最小 Git-metadata 写入;写目标经 realpath + containment 校验(拒 symlink 逃逸,复用 `assertContainedPath`),`clean` 只幂等移除 spec-first 自写行/块。
+- CR13. workspace/parent 只拥有编排与图 artifact 权威,不获得子仓 Git/source mutation/finding/verification 权威。当前唯一授权子仓 Git-metadata 写入是向 `.git/info/exclude` 写 `.codegraph/` managed block；写目标经 realpath + containment 校验(拒 symlink 逃逸,复用 `assertContainedPath`),`clean` 只幂等移除 spec-first 自写 block。clean 可识别并调用 provider 命令清理旧版本遗留 hook，但当前 build 不安装 hook。
 
 ### Scope Boundaries
 
@@ -72,16 +71,16 @@ validation_receipt: docs/validation/2026-07-13-per-requirement-workspace-graph-e
 - AE2. Given manifest 缺一个仓、父目录里实际存在,when 自动发现,then 该仓作候选经轻确认后纳入;一个 symlink 指向 workspace 外的目录被拒绝/标记,不纳入。
 - AE3. Given 从需求根启动工具,cd 进 工程3,when 问 工程3 内符号,then 路由 best-effort 用 工程3 的 projectPath;漏传 projectPath 时兜底默认所在子仓。
 - AE4. Given 问"工程3 的 client 是否被 工程5 用",when 查合并图,then 得跨仓候选,回 工程5 源码确认后才形成结论。
-- AE5. Given 在 工程3 改文件,when CodeGraph watcher 生效,then 延迟 auto-sync;commit 后 Graphify 子图刷新且合并图重跑收敛。
+- AE5. Given 在 工程3 改文件,when CodeGraph watcher 生效,then 延迟 auto-sync；Graphify workspace 状态标为 stale/partial，用户显式重跑构建命令后子图与合并图收敛。
 - AE6. Given 传入指向他需求(需求B)的 projectPath,when 解析,then 拒绝/告警,不跨 workspace 读。
 - AE7. Given Kiro/Qoder 宿主,when init,then CodeGraph 走诚实降级(Graphify 仍覆盖),不因缺 adapter 而伪装 ready。
 - AE8. Given `spec-first clean`,when 执行,then 移除 workspace 图产物 + 幂等移除 spec-first 自写的 `.git/info/exclude` 行/hook 块,不碰用户内容,并清理 CodeGraph daemon。
 
 ### Success Criteria
 
-- SC1. 从需求根一条命令完成"清单/自动发现 → 双层图 eager 建立 → 全局 MCP + 子仓 hook 就位 → 五宿主路由注入",子仓物理仅 `.codegraph/` 且 git 干净。
+- SC1. 从需求根一条命令完成"清单/自动发现 → 双层图 eager 建立 → 全局 MCP → 五宿主路由注入",子仓物理仅 `.codegraph/` 且 git 干净；Graphify refresh mode 明确为 `explicit`。
 - SC2. 跨仓查询经合并图/projectPath 可达,结论回源;partial/stale/unmapped 无否定权。
-- SC3. 自动刷新在 owner-verified 拓扑上有可重复回归验收(记录版本/拓扑/命令/耗时/产物/结果/限制)。
+- SC3. 显式刷新在 owner-verified 拓扑上有可重复回归验收(记录版本/拓扑/命令/耗时/产物/结果/限制)，且不得把旧 hook 实验回执当作当前 runtime 合同。
 - SC4. per-需求 隔离与 containment 有执行点;无跨 workspace 串味、无 symlink 逃逸、`.git` 写入是唯一授权例外且可幂等清理。
 - SC5. 五宿主经 `spec-first init` 从 source 投射一致;Kiro/Qoder CodeGraph 诚实降级。
 
@@ -98,7 +97,7 @@ validation_receipt: docs/validation/2026-07-13-per-requirement-workspace-graph-e
 - **KTD5 — Manifest = 可选清单 + CLI + 自动发现。** workspace 根可选 `.spec-first/workspace.yaml`(workspace-relative repo 列表)+ CLI `--repos` 参数为主路径;自动发现补漏并轻确认。清单是否 checkin 由用户可选(便于复现需求环境);清单格式为新增 versioned schema,不扩塞现有 `provider-readiness.v2`。
 - **KTD6 — A2 路由 = spec-first adapter-owned managed 资产。** 复用宿主 adapter 的 `managedRoot`/managed-block 机制,由 spec-first 写一段 best-effort 路由指令(按 cwd 传 `projectPath`、跨仓用合并图、launch-from-child 兜底),不依赖 graphify/codegraph 原生 host 段。U5 先对源码核实精确 writer(§10.5)。
 - **KTD7 — 五宿主基线,Kiro/Qoder CodeGraph 诚实降级。** routing 注入覆盖五宿主(符合 `getSupportedPlatforms()` 不变量);CodeGraph 原生 install 不含 Kiro/Qoder,v1 不为无确认消费者建 spec-first CodeGraph adapter(defer/opt-in),按诚实降级表达,Graphify 仍覆盖。
-- **KTD8 — 不设 U0 可行性 gate;以回归固化替代。** owner 已实测 E2E(origin §4.1),plan 把 eager 建图、projectPath 路由、watcher、子图刷新→merge 收敛固化为可重复回归验收,记录版本/拓扑/命令/耗时/产物/结果/限制。
+- **KTD8 — eager 建图已验证，自动 merge refresh 诚实降级。** owner E2E 证明手工链路可运行，但不能证明 Graphify 0.9.x 原生 hook 能可靠驱动 out-of-tree child graph 与 parent merge。当前只把 eager 建图、projectPath 路由、CodeGraph watcher 与显式 Graphify 重建固化为 runtime 合同；自动 merge refresh 保持 deferred，重估条件见 CR8。
 
 ### High-Level Technical Design
 
@@ -110,13 +109,12 @@ flowchart TB
   B --> GF[Graphify per-child extract --code-only --out 需求A/.graphify/<repo>]
   GF --> MG[merge-graphs → 需求A/.graphify/merged-graph.json]
   B --> MCP[codegraph install 全局 MCP 一次]
-  B --> HK[graphify hook install per child]
   R --> INJ[五宿主 adapter 注入 best-effort 路由指令]
   CG --> RT[Runtime: cd 子仓 → projectPath 战术图]
   MG --> RT2[Runtime: 跨仓 → 合并图候选 → 回源确认]
-  subgraph Refresh[自动刷新]
+  subgraph Refresh[刷新]
     W[CodeGraph watcher auto-sync]
-    HK2[子仓 commit → hook 刷子图 → 重跑 merge-graphs 收敛]
+    EX[子仓 source 变化 → status 识别 stale → 显式重跑 build → merge 收敛]
   end
 ```
 
@@ -152,7 +150,7 @@ flowchart TB
 ```mermaid
 flowchart LR
   U1[U1 workspace 解析+manifest] --> U2[U2 双层图 eager 建立]
-  U2 --> U3[U3 自动刷新接线]
+  U2 --> U3[U3 显式刷新姿态]
   U2 --> U4[U4 freshness/containment/doctor]
   U3 --> U4
   U1 --> U5[U5 五宿主路由注入]
@@ -212,21 +210,21 @@ flowchart LR
   - `codegraph install` 全局仅执行一次,不逐仓装。
 - **Verification:** 从需求根一命令产出双层图与 per-repo 状态;子仓仅 `.codegraph/` 且 git 干净。
 
-### U3. Auto-refresh wiring (watcher + hook + merge convergence)
+### U3. Refresh posture (watcher + explicit Graphify rebuild)
 
-- **Goal:** 固化 owner-verified 自动刷新:CodeGraph watcher、Graphify 子仓 git hook、子图变化后重跑 merge-graphs 收敛,及非 git/无 hook 兜底。
+- **Goal:** 固化 CodeGraph watcher 与 Graphify 显式重建的真实 runtime posture；保留自动 merge refresh 的重新评估条件，不伪装 hook 已接线。
 - **Requirements:** CR7, CR8, CR9
 - **Dependencies:** U2
 - **Files:** `skills/spec-mcp-setup/scripts/providers/codegraph.cjs`、`skills/spec-mcp-setup/scripts/providers/graphify.cjs`、`skills/spec-mcp-setup/scripts/lib/workspace-executor.cjs`、`tests/unit/mcp-setup-workspace-refresh.test.js`
-- **Approach:** CodeGraph `serve --mcp` 默认 watcher(不由 setup 启 watcher,只消费/校验)。Graphify 每子 Git 仓 `hook install`——**与 U2 的 exclude 写入同规:hook 写目标(`.git/hooks/`)经 `git rev-parse --git-path` 解析后做 `assertContainedPath`,解析逃逸 workspace 即拒绝**(CR13 第二处授权写入的 containment)。定义子图变化 → 重跑 `merge-graphs` 的自动化编排触发与完成信号、失败隔离、恢复;记录到实现合同。非 git 变更/无 hook 用 `watch`/显式 refresh 兜底并如实标 freshness。owner-verified 拓扑作为回归基线在 U7 固化。
+- **Approach:** CodeGraph `serve --mcp` 默认 watcher(不由 setup 启 watcher,只消费/校验)。Graphify workspace build 写 `refresh_mode: explicit` state receipt，不安装原生 child hook；source snapshot 改变后 status 不得报告 ready，用户重跑 `spec-mcp-setup --only codegraph,graphify --workspace-graph --repos ...` 完成子图与 merge 收敛。自动化仅在 provider 提供可靠 completion callback/out-of-tree hook/atomic parent merge 时重新评估。
 - **Execution note:** 复用 owner 已实测链路;本单元把它编码为 source + 回归,不重新做 go/no-go。
 - **Test scenarios:**
-  - Covers AE5. 子仓文件改 → watcher 延迟 auto-sync(以 provider status/probe 证);commit → 子图刷新 → merge-graphs 重跑、合并图收敛。
-  - Graphify Git 子仓验证 hook 安装;hook 写目标经 `git rev-parse --git-path` 解析 + containment,解析逃逸 workspace → 拒绝安装。
-  - 非 git/无 hook 明确报 explicit/watch 兜底,freshness 标注诚实。
+  - Covers AE5. 子仓文件改 → CodeGraph watcher 延迟 auto-sync；workspace status 因 source snapshot 漂移降级，显式重跑后 merge-graphs 收敛。
+  - Graphify Git 子仓明确报告 `hook_status: not-installed` 与 `refresh_mode: explicit`。
+  - 显式 refresh 提示、失败隔离与 freshness 标注诚实。
   - merge 重跑失败 → 隔离该 scope、保留上一份合并图或进恢复,不静默 stale。
   - setup 不启动 watcher(watcher 属 provider-owned live fact)。
-- **Verification:** 刷新链路有明确触发/完成/失败/恢复语义与测试,freshness 不伪造。
+- **Verification:** 显式刷新链路有明确触发/完成/失败语义与测试，source 漂移不伪造 ready。
 
 ### U4. Freshness facts, containment enforcement, and doctor reporting
 
@@ -277,12 +275,12 @@ flowchart LR
 - **Requirements:** SC1-SC5;CR12-CR13(诚实表达)
 - **Dependencies:** U4, U5, U6
 - **Files:** `skills/spec-mcp-setup/SKILL.md`、`README.md`、`README.zh-CN.md`、`docs/contracts/project-graph-consumption.md`、新增 `docs/validation/` E2E 回归回执、`CHANGELOG.md`、`tests/integration/`(workspace 双层图/刷新/路由 smoke)、`tests/smoke/cli-smoke.test.js`、经 `spec-first init` 生成的五宿主 runtime mirror
-- **Approach:** SKILL/README 描述"从需求根一键双层图 + 自动刷新 + best-effort 路由 + per-需求 隔离/不复用/五宿主/code-only",诚实标注 Kiro/Qoder 降级与 advisory 边界。回归回执记录 Provider/宿主版本、workspace 拓扑、执行命令、耗时、产物大小、query 结果、刷新收敛结果、已知限制;回执落盘前不伪造未运行命令。`spec-first init` 从 source 生成五宿主 mirror,不手改。
+- **Approach:** SKILL/README 描述"从需求根一键双层图 + Graphify 显式刷新 + best-effort 路由 + per-需求 隔离/不复用/五宿主/code-only",诚实标注 Kiro/Qoder 降级、Graphify 0.9.x hook 限制与 advisory 边界。回归回执记录 Provider/宿主版本、workspace 拓扑、执行命令、耗时、产物大小、query 结果、刷新收敛结果、已知限制;回执落盘前不伪造未运行命令。`spec-first init` 从 source 生成五宿主 mirror,不手改。
 - **Execution note:** integration smoke 覆盖真实多仓 workspace(零/单/多子仓、manifest+自动发现、跨仓 query、partial、clean 回收)。
 - **Test scenarios:**
   - 五宿主 `spec-first init` 后 runtime 无 source drift;clean 仍只移除 spec-first-managed。
   - Covers AE4. 跨仓 query 经合并图得候选,回属主子仓源码确认后才形成结论(不由合并图直接定论)。
-  - 真实 mixed workspace 完成 first setup → 双层图 → single-child/cross-project query → 自动刷新收敛 → clean 全链路(含零/单/多子仓)。
+  - 真实 mixed workspace 完成 first setup → 双层图 → single-child/cross-project query → source 漂移识别 → 显式刷新收敛 → clean 全链路(含零/单/多子仓)。
   - README/SKILL 表达与实现一致,Kiro/Qoder 降级如实。
   - 回归回执关键 claim 可回源。
 - **Verification:** 文档/投射/回归回执齐备且可回源;五宿主 init 一致。
@@ -311,9 +309,9 @@ flowchart LR
 ## Definition of Done
 
 - D1. CR1-CR13 均由至少一个 U-ID 实现并有聚焦测试覆盖。
-- D2. 从非 Git 需求根一命令完成清单/自动发现 → 双层图 eager 建立 → 全局 MCP + 子仓 hook + 五宿主路由;子仓仅 `.codegraph/` 且 git 干净。
+- D2. 从非 Git 需求根一命令完成清单/自动发现 → 双层图 eager 建立 → 全局 MCP + 五宿主路由；子仓仅 `.codegraph/` 且 git 干净，Graphify refresh 明确为 explicit。
 - D3. Graphify 子图与合并图 out-of-tree 落 `需求A/.graphify/`,code-only;CodeGraph per-child + projectPath,不建父目录单体图。
-- D4. 自动刷新(watcher + hook + merge 收敛 + 兜底)有明确触发/完成/失败/恢复语义与回归;freshness 不伪造。
+- D4. CodeGraph watcher + Graphify 显式重建有明确触发/完成/失败语义与回归；自动 merge refresh 保持 degraded/deferred，freshness 不伪造。
 - D5. containment/隔离有执行点:projectPath 限当前 workspace、发现 symlink-contained、`.git` 写入唯一授权例外且经校验、clean 幂等只删自写。
 - D6. 五宿主经 `spec-first init` 从 source 投射一致、无手改 mirror;Kiro/Qoder CodeGraph 诚实降级不伪装 ready。
 - D7. 图输出全 advisory;partial/stale/unmapped 无否定权;重要跨仓结论回源。
@@ -325,7 +323,7 @@ flowchart LR
 
 ## Implementation Validation / Completion Evidence
 
-本计划已标记 `status: completed`（2026-07-13）。完成依据是当前 source 实现、聚焦/集成/smoke 测试、真实二进制 E2E 回执、干净沙箱五宿主 `spec-first init` 投射、以及 dogfood 暴露的 P0/P1 修复。**未手改 generated runtime mirrors**（D6 用干净沙箱 init 验证投射）。
+本计划恢复为 `status: active`：eager build、status、clean、路由与五宿主投射已有 source 实现，但 CR8 的 Graphify 自动 merge refresh 未兑现。当前 runtime 合同是 `refresh_mode: explicit`；历史真实二进制 hook→merge 回执仅证明实验链路，不作为当前自动化完成证据。**未手改 generated runtime mirrors**；五宿主投射继续以干净沙箱 `spec-first init` 验证。
 
 ### 交付映射（U1–U7）
 
@@ -333,13 +331,13 @@ flowchart LR
 |---|---|---|
 | U1 target/manifest/discovery | `skills/spec-mcp-setup/scripts/lib/workspace-target.cjs` + `workspace-manifest.schema.json` | `tests/unit/mcp-setup-workspace-target.test.js` |
 | U2 eager 双层图 | `workspace-graph-build.cjs` + `workspace-provider-runners.cjs` + `workspace-graph-executor.cjs` + `workspace-git-exclude.cjs`；CLI：`setup.cjs --workspace-graph` | graph-build / provider-runners / executor / entry |
-| U3 自动刷新 | `workspace-graph-refresh.cjs`（hook install containment + reconvergeMerge） | refresh unit + E2E 回执 D4 段（真实 Graphify hook/merge） |
+| U3 刷新姿态 | `workspace-graph-refresh.cjs`（explicit refresh posture）+ state/source snapshot | refresh/status unit + E2E 回执（仅作 provider 实验背景，不作自动化完成声明） |
 | U4 freshness/containment/doctor | `workspace-graph-scope.cjs` + `workspace-graph-status.cjs`；`--workspace-graph-status`；`doctor` common advisory 行 | graph-scope / graph-status / `doctor-workspace-graph` |
 | U5 路由注入 | `workspace-routing-instruction.cjs` + `workspace-routing-inject.cjs`（需求根 `CLAUDE.md`/`AGENTS.md` managed block；Kiro/Qoder 降级文案） | routing-instruction / routing-inject / executor |
 | U6 clean/update | `workspace-graph-clean.cjs`；`setup --workspace-graph-clean`；`spec-first clean --workspace-graph`；`update` help 明示不自动重建图 | graph-clean / cli-clean-workspace-graph / lifecycle integration |
 | U7 docs/投射/E2E | SKILL/README/README.zh-CN/CHANGELOG；`project-graph-consumption.md` per-requirement 节；`docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md`；五宿主 projection integration | five-host-projection integration；smoke five-host path |
 
-### 已执行验证（实现期）
+### 历史验证记录（需由本次修复后的最新测试结果取代）
 
 - `npm run test:mcp-setup` → 27 suites / 301 tests passed（含 workspace 全套）。
 - `npm run test:integration` → 含 `workspace-graph-lifecycle` + `workspace-graph-five-host-projection` 在内 4 suites / 18 tests passed。
@@ -347,7 +345,7 @@ flowchart LR
 - 聚焦：`cli-clean-workspace-graph`、`doctor-workspace-graph`、Graphify dual `hook-guard` 合同、workspace-target。
 - 真实二进制 E2E 回执：`docs/validation/2026-07-13-per-requirement-workspace-graph-e2e-receipt.md`（CodeGraph 1.4.1 + Graphify 0.9.12 build；D4 hook→merge reconverge 2801→3705）。
 - D6：干净沙箱 `spec-first init --claude --codex --cursor --kiro --qoder -y`，每宿主 `spec-mcp-setup` mirror 含 workspace-graph 模块/flag/SKILL；`doctor --json` 无 drift/ERROR。
-- Dogfood 附带修复（同实现窗口）：Graphify 0.9.12 Claude `hook-guard`×2 契约、`js-yaml` 产品依赖、非 Git 父目录 PRD guard source 模板、SKILL 双路径文案。
+- Dogfood 附带修复（同实现窗口）：Graphify 0.9.12 Claude `hook-guard`×2 契约、workspace manifest 零依赖严格 parser、非 Git 多仓父目录 PRD guard source 模板、SKILL 双路径文案。
 
 ### 实现口径（与 plan Files 列表的有意偏差）
 
@@ -359,7 +357,7 @@ flowchart LR
 
 ### Residual（非 DoD 阻塞）
 
-- 本完成标记对应 **source 实现完成**；发布 commit/npm 发版与 KAZ 现场用新版本完整重跑属工程收尾，不改变本 plan 的 completed 判定。
+- Graphify 自动 merge refresh 仍是明确未完成项；只有 provider 满足 CR8 重估条件并通过新的 runtime 回归后，计划才可重新标记 completed。
 - 脏工作树未强跑全量 `spec-first init`（并发手册编辑风险）；D6 以干净沙箱 apply 为准。
 
 ---

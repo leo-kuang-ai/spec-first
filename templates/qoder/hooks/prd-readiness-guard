@@ -115,7 +115,7 @@ function changedReadyPrdArtifacts(cwd) {
     // Treat as "no changed PRD artifacts" so ordinary non-PRD turns can close.
     // Real PRD work should run inside a child git repo where status failures still block.
     const stderr = String(result.stderr || (result.error && result.error.message) || '');
-    if (result.status === 128 || /not a git repository/i.test(stderr)) {
+    if (/not a git repository/i.test(stderr) && hasChildGitRepo(cwd)) {
       return { paths: [], error: null };
     }
     return {
@@ -146,6 +146,22 @@ function changedReadyPrdArtifacts(cwd) {
     paths: [...new Set(paths)].sort(),
     error: null,
   };
+}
+
+function hasChildGitRepo(cwd) {
+  try {
+    return fs.readdirSync(cwd, { withFileTypes: true }).some((entry) => {
+      if (!entry.isDirectory() || entry.isSymbolicLink()) return false;
+      try {
+        const marker = fs.lstatSync(path.join(cwd, entry.name, '.git'));
+        return marker.isDirectory() || marker.isFile();
+      } catch (_error) {
+        return false;
+      }
+    });
+  } catch (_error) {
+    return false;
+  }
 }
 
 function isReadyClaimPrdArtifact(absolutePath) {

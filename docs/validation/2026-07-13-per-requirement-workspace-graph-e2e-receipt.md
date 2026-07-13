@@ -46,7 +46,7 @@ Temp non-Git parent workspace with two independently `git init`-ed child repos, 
 - Graphify `extract --code-only` produces per-child subgraphs out-of-tree under the workspace `.graphify/`, and `merge-graphs` converges them into a real cross-repo merged graph — the two-layer model works with real output paths.
 - Per-repo failure isolation, out-of-tree placement, and merge zero/single/many semantics are covered by the unit suite (`tests/unit/mcp-setup-workspace-*.test.js`, 59 tests); this receipt adds the real-binary end-to-end confirmation those fakes stand in for.
 
-## D4 live refresh / merge reconvergence (real Graphify 0.9.12)
+## D4 Provider 可行性观测：手动 refresh / merge reconvergence（real Graphify 0.9.12）
 
 Date of observation: 2026-07-13. Temp non-Git parent with 2 `git init` children; `GRAPHIFY_OUT=.graphify`.
 
@@ -59,11 +59,12 @@ Date of observation: 2026-07-13. Temp non-Git parent with 2 `git init` children;
 | Re-run `merge-graphs` (U3 reconverge semantics) | rc 0; merged size **3705** bytes; content changed (`nodes`/`links` differ) |
 | `graphify hook uninstall` | rc 0 per child |
 
-**Confirms:** child subgraph change → workspace merge re-convergence is real with the installed Graphify binary; hook install/uninstall work on a real child git dir. CodeGraph watcher remains provider-native (not started by this receipt). Unit suite covers containment rejection when `core.hooksPath` escapes the workspace.
+**只确认 Provider 原子能力，不确认产品自动链路：** 手动重新 extract child subgraph 后，手动执行 merge 可以更新 workspace merged graph；Graphify hook install/uninstall 也能修改真实 child git dir。后续源码核验确认 Graphify 0.9.12 native hook 在提交时读取默认 `GRAPHIFY_OUT=graphify-out`，不会自动更新 spec-first 的 out-of-tree `<workspace>/.graphify/<repo>/.graphify/graph.json`，也不会触发 workspace merge。因此本段不得作为“commit 后自动收敛”的 completion evidence；当前产品 contract 已降级为显式重跑 `--workspace-graph --repos ...`。
 
 ## Limitations / not covered by this receipt
 
 - Global `codegraph install` (MCP host wiring) was skipped on the build pass to avoid host mutation; covered by provider-runner unit contract.
+- 本回执没有证明 native child hook 能刷新 out-of-tree workspace subgraph 或 merged graph；对应旧 claim 已被当前 source/status contract 作废。
 - Synthetic small repos; timing/size scale numbers are illustrative, not a performance baseline.
 - Surfaces unit/entry/integration-tested with injectable exec (and host CLI wiring) beyond this real-binary build+D4 pass:
   - U5 routing inject into workspace-root `CLAUDE.md`/`AGENTS.md`

@@ -12,6 +12,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { assertContainedPath } = require('./path-safety.cjs');
+const { CANONICAL_HOSTS } = require('./host-authority.cjs');
 const {
   renderRoutingInstruction,
   upsertRoutingBlock,
@@ -29,27 +30,38 @@ const HOST_ENTRY_FILE = Object.freeze({
 });
 
 function entryFilesForHosts(hosts) {
-  const files = new Set();
+  return entryTargetsForHosts(hosts).map((entry) => entry.entry_file);
+}
+
+function entryTargetsForHosts(hosts) {
+  const targets = new Map();
   for (const host of hosts) {
-    const file = HOST_ENTRY_FILE[String(host).toLowerCase()];
-    if (file) files.add(file);
+    const normalizedHost = String(host).toLowerCase();
+    const file = HOST_ENTRY_FILE[normalizedHost];
+    if (!file) continue;
+    if (!targets.has(file)) targets.set(file, []);
+    targets.get(file).push(normalizedHost);
   }
-  return [...files];
+  return [...targets.entries()].map(([entryFile, entryHosts]) => ({
+    entry_file: entryFile,
+    hosts: [...new Set(entryHosts)],
+  }));
 }
 
 function injectRoutingInstruction({
   workspaceRoot,
   repos = [],
-  hosts = ['claude', 'codex'],
+  hosts = [...CANONICAL_HOSTS],
   createIfAbsent = true,
 } = {}) {
-  const block = renderRoutingInstruction({ workspaceRoot, repos });
-  const targets = entryFilesForHosts(hosts);
+  const targets = entryTargetsForHosts(hosts);
   const results = [];
 
-  for (const relFile of targets) {
+  for (const target of targets) {
+    const relFile = target.entry_file;
+    const block = renderRoutingInstruction({ workspaceRoot, repos, hosts: target.hosts });
     const abs = path.join(workspaceRoot, relFile);
-    const entry = { entry_file: relFile, status: 'skipped', reason_code: '' };
+    const entry = { entry_file: relFile, hosts: target.hosts, status: 'skipped', reason_code: '' };
     try {
       assertContainedPath(workspaceRoot, abs, { reasonCode: 'routing-entry-escapes-workspace' });
     } catch (error) {
@@ -89,7 +101,7 @@ function injectRoutingInstruction({
 // Does not delete the entry file even if it becomes empty (the workspace may own it).
 function stripRoutingInstruction({
   workspaceRoot,
-  hosts = ['claude', 'codex', 'cursor', 'kiro', 'qoder'],
+  hosts = [...CANONICAL_HOSTS],
 } = {}) {
   const targets = entryFilesForHosts(hosts);
   const results = [];
@@ -133,5 +145,6 @@ module.exports = {
   injectRoutingInstruction,
   stripRoutingInstruction,
   entryFilesForHosts,
+  entryTargetsForHosts,
   HOST_ENTRY_FILE,
 };

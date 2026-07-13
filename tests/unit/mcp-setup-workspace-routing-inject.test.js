@@ -62,4 +62,20 @@ describe('injectRoutingInstruction — upsert routing block into workspace entry
     expect(result.entries[0].reason_code).toBe('entry-file-absent');
     expect(fs.existsSync(path.join(ws, 'CLAUDE.md'))).toBe(false);
   });
+
+  test('five-host injection renders the shared AGENTS block with Kiro/Qoder degradation', () => {
+    const ws = mkWorkspace();
+    const result = injectRoutingInstruction({
+      workspaceRoot: ws,
+      repos,
+      hosts: ['claude', 'codex', 'cursor', 'kiro', 'qoder'],
+    });
+
+    expect(result.entries.map((entry) => entry.entry_file).sort()).toEqual(['AGENTS.md', 'CLAUDE.md']);
+    const agents = fs.readFileSync(path.join(ws, 'AGENTS.md'), 'utf8');
+    const claude = fs.readFileSync(path.join(ws, 'CLAUDE.md'), 'utf8');
+    expect(agents).toContain('honest-degraded');
+    expect(agents).toContain('kiro/qoder');
+    expect(claude).not.toContain('honest-degraded');
+  });
 });

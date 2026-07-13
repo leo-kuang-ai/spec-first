@@ -29,6 +29,13 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
     expect(renderRoutingInstruction({ workspaceRoot: '/w', repos, host: 'qoder' })).toContain('honest-degraded');
     expect(renderRoutingInstruction({ workspaceRoot: '/w', repos, host: 'claude' })).not.toContain('honest-degraded');
     expect(renderRoutingInstruction({ workspaceRoot: '/w', repos, host: 'codex' })).not.toContain('honest-degraded');
+    const sharedAgents = renderRoutingInstruction({
+      workspaceRoot: '/w',
+      repos,
+      hosts: ['codex', 'cursor', 'kiro', 'qoder'],
+    });
+    expect(sharedAgents).toContain('honest-degraded');
+    expect(sharedAgents).toContain('kiro/qoder');
   });
 });
 

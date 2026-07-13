@@ -301,6 +301,19 @@ describe('spec-prd Claude and Qoder hook parity', () => {
     }
   });
 
+  test.each(Object.keys(HOSTS))('%s readiness hook allows a non-Git parent that contains a child Git repo', (host) => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-prd-${host}-workspace-parent-`));
+    try {
+      const child = path.join(projectRoot, 'api');
+      fs.mkdirSync(child, { recursive: true });
+      initGit(child);
+      const decision = readinessDecision(host, runReadiness(host, projectRoot));
+      expect(decision.blocked).toBe(false);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test.each(Object.keys(HOSTS))('%s readiness hook checks the destination of a renamed ready PRD', (host) => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-prd-${host}-rename-`));
     const oldPath = 'docs/brainstorms/old-requirements.md';

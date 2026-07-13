@@ -512,10 +512,18 @@ function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
     : 0;
   const childTotal = Array.isArray(status.repos) ? status.repos.length : 0;
   const merged = Boolean(status.workspace && status.workspace.merged_present);
+  const hasManagedWorkspaceState = Boolean(status.workspace && (
+    status.workspace.graphify_present
+    || status.workspace.merged_present
+    || (status.workspace.state_status && status.workspace.state_status !== 'missing')
+  ));
+  if (status.status === 'absent' && childTotal === 0 && !hasManagedWorkspaceState) {
+    return null;
+  }
   const defaultPath = status.default_project_path
     ? ` default projectPath=${status.default_project_path}`
     : ' default projectPath unavailable';
-  const defaultNote = status.default_project_path_contained === false
+  const defaultNote = status.default_project_path && status.default_project_path_contained === false
     ? ' (projectPath containment failed — advisory)'
     : '';
 
@@ -581,6 +589,11 @@ function summarizeWorkspaceGraphForDoctor(status) {
     merged_size_bytes: status.workspace && status.workspace.merged_size_bytes != null
       ? status.workspace.merged_size_bytes
       : null,
+    workspace_freshness: status.workspace && status.workspace.freshness
+      ? status.workspace.freshness.freshness
+      : 'unknown',
+    workspace_state_status: status.workspace ? status.workspace.state_status || 'unknown' : 'unknown',
+    refresh_mode: status.workspace ? status.workspace.refresh_mode || 'unknown' : 'unknown',
     default_project_path: status.default_project_path || null,
     default_project_path_contained: Boolean(status.default_project_path_contained),
     default_project_path_policy: status.default_project_path_policy || '',

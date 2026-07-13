@@ -17,6 +17,7 @@ const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
 const sandboxRoots = new Set();
 
 const WORKSPACE_LIB_MODULES = [
+  'workspace-manifest.cjs',
   'workspace-target.cjs',
   'workspace-git-exclude.cjs',
   'workspace-graph-build.cjs',
@@ -25,6 +26,8 @@ const WORKSPACE_LIB_MODULES = [
   'workspace-graph-refresh.cjs',
   'workspace-graph-scope.cjs',
   'workspace-graph-status.cjs',
+  'workspace-graph-state.cjs',
+  'workspace-exec.cjs',
   'workspace-provider-runners.cjs',
   'workspace-routing-inject.cjs',
   'workspace-routing-instruction.cjs',
@@ -73,6 +76,11 @@ function runSpecFirst(args, sandbox) {
 
 describe('D6 five-host workspace-graph projection', () => {
   test('spec-first init projects workspace-graph modules + docs on all five hosts; doctor no drift', () => {
+    const sourceSkill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-mcp-setup', 'SKILL.md'), 'utf8');
+    const sourceArgumentHint = sourceSkill.split('\n').find((line) => line.startsWith('argument-hint:')) || '';
+    expect(sourceArgumentHint).toContain('--workspace-graph');
+    expect(sourceArgumentHint).toContain('--json');
+
     const sandbox = tempSandbox();
     const platforms = getSupportedPlatforms();
     expect(platforms).toEqual(expect.arrayContaining(['claude', 'codex', 'cursor', 'kiro', 'qoder']));
@@ -92,6 +100,17 @@ describe('D6 five-host workspace-graph projection', () => {
       throw new Error(`five-host init failed:\nstdout:\n${init.stdout}\nstderr:\n${init.stderr}`);
     }
     expect(init.status).toBe(0);
+
+    const projectedRepo = path.join(sandbox.projectRoot, 'api');
+    fs.mkdirSync(path.join(sandbox.projectRoot, '.spec-first'), { recursive: true });
+    fs.mkdirSync(projectedRepo, { recursive: true });
+    expect(spawnSync('git', ['init', '-q', projectedRepo]).status).toBe(0);
+    fs.writeFileSync(path.join(sandbox.projectRoot, '.spec-first', 'workspace.yaml'), [
+      'schema_version: workspace-manifest.v1',
+      'repos:',
+      '  - path: api',
+      '',
+    ].join('\n'));
 
     for (const platform of platforms) {
       const adapter = getAdapter(platform);
@@ -121,6 +140,14 @@ describe('D6 five-host workspace-graph projection', () => {
         const modPath = path.join(setupRoot, 'scripts', 'lib', mod);
         expect(fs.existsSync(modPath)).toBe(true);
       }
+      const projectedTarget = require(path.join(setupRoot, 'scripts', 'lib', 'workspace-target.cjs'));
+      expect(projectedTarget.resolveWorkspaceTargets({
+        cwd: sandbox.projectRoot,
+        allowDiscovery: false,
+      })).toEqual(expect.objectContaining({
+        manifest_error: null,
+        repos: [expect.objectContaining({ repo_id: 'api', source: 'manifest' })],
+      }));
 
       // Routing instruction content carries Kiro/Qoder degradation note.
       const routing = fs.readFileSync(

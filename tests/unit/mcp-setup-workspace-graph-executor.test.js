@@ -63,6 +63,39 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
     expect(result.build).toBeNull();
   });
 
+  test('confirmed repos plus discovered candidates remain partial until confirmation', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    initRepo(ws, 'web');
+    const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: true, exec: fakeExec });
+    expect(result.build.status).toBe('complete');
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-repos-need-confirmation');
+    expect(result.pending_confirm).toEqual(['web']);
+  });
+
+  test('invalid manifest blocks a CLI-confirmed build before provider mutation', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    fs.mkdirSync(path.join(ws, '.spec-first'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.spec-first', 'workspace.yaml'), [
+      'schema_version: workspace-manifest.v1',
+      'owner: team',
+      '',
+    ].join('\n'));
+    let called = false;
+    const result = runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => { called = true; return { status: 0 }; },
+    });
+    expect(result.status).toBe('failed');
+    expect(result.reason_code).toBe('workspace-manifest-schema-invalid');
+    expect(result.build).toBeNull();
+    expect(called).toBe(false);
+  });
+
   test('CLI-declared repos build even when discovery is off', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'svc');
@@ -86,9 +119,10 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
     const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec, hosts: ['claude', 'codex'] });
     expect(result.status).toBe('complete');
     expect(result.routing).not.toBeNull();
-    // U3 hook install is wired (best-effort, non-fatal): a per-repo hooks result exists.
+    // Workspace out-of-tree 图使用显式刷新，不安装 native hook。
     expect(result.hooks).not.toBeNull();
-    expect(result.hooks.repos.map((r) => r.repo_id)).toEqual(['api']);
+    expect(result.hooks.status).toBe('not-installed');
+    expect(result.refresh.mode).toBe('explicit');
     const claude = fs.readFileSync(path.join(ws, 'CLAUDE.md'), 'utf8');
     const agents = fs.readFileSync(path.join(ws, 'AGENTS.md'), 'utf8');
     expect(claude).toContain('projectPath');

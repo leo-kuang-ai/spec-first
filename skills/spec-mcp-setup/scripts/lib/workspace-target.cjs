@@ -13,16 +13,9 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-// Runtime dependency declared in package.json. Fail with a stable reason_code if a
-// broken install omitted it (dogfood saw clean npm installs missing product yaml).
-let yaml;
-try {
-  yaml = require('js-yaml');
-} catch (_error) {
-  yaml = null;
-}
 const { resolveProjectTarget } = require('./project-target.cjs');
 const { assertContainedPath } = require('./path-safety.cjs');
+const { parseWorkspaceManifest } = require('./workspace-manifest.cjs');
 
 const MANIFEST_RELATIVE_PATH = '.spec-first/workspace.yaml';
 const MANIFEST_SCHEMA_VERSION = 'workspace-manifest.v1';
@@ -131,7 +124,7 @@ function resolveWorkspaceTargets({
   const hasTargets = reposOut.length > 0;
   const manifestError = manifest.malformed ? (manifest.reason_code || 'workspace-manifest-invalid') : null;
   let reasonCode = '';
-  if (manifestError && !hasTargets) {
+  if (manifestError) {
     reasonCode = manifestError;
   } else if (!hasTargets) {
     reasonCode = allowDiscovery ? 'workspace-no-review-targets' : 'workspace-no-declared-repos';
@@ -185,35 +178,17 @@ function loadManifest(workspaceRoot, manifestPath) {
   if (!fs.existsSync(resolvedPath)) {
     return { present: false, data: { repos: [], exclusions: [] } };
   }
-  if (!yaml || typeof yaml.load !== 'function') {
-    return {
-      present: true,
-      malformed: true,
-      reason_code: 'workspace-manifest-yaml-runtime-missing',
-      data: { repos: [], exclusions: [] },
-    };
+  const parsed = parseWorkspaceManifest(fs.readFileSync(resolvedPath, 'utf8'));
+  if (!parsed.ok) {
+    return { present: true, malformed: true, reason_code: parsed.reason_code, data: { repos: [], exclusions: [] } };
   }
-  let parsed;
-  try {
-    parsed = yaml.load(fs.readFileSync(resolvedPath, 'utf8'));
-  } catch (_error) {
-    return { present: true, malformed: true, reason_code: 'workspace-manifest-unparseable', data: { repos: [], exclusions: [] } };
-  }
-  if (!parsed || typeof parsed !== 'object') {
-    return { present: true, malformed: true, reason_code: 'workspace-manifest-empty', data: { repos: [], exclusions: [] } };
-  }
-  if (parsed.schema_version && parsed.schema_version !== MANIFEST_SCHEMA_VERSION) {
-    return { present: true, malformed: true, reason_code: 'workspace-manifest-version-mismatch', data: { repos: [], exclusions: [] } };
-  }
-  const repos = Array.isArray(parsed.repos)
-    ? parsed.repos
-      .filter((entry) => entry && typeof entry === 'object' && typeof entry.path === 'string')
-      .map((entry) => ({ path: entry.path, alias: typeof entry.alias === 'string' ? entry.alias : null }))
-    : [];
-  const exclusions = Array.isArray(parsed.exclusions)
-    ? parsed.exclusions.filter((entry) => typeof entry === 'string')
-    : [];
-  return { present: true, data: { repos, exclusions } };
+  return {
+    present: true,
+    data: {
+      repos: parsed.data.repos || [],
+      exclusions: parsed.data.exclusions || [],
+    },
+  };
 }
 
 function detectNestedPairs(repos) {
@@ -223,7 +198,7 @@ function detectNestedPairs(repos) {
       if (i === j) continue;
       const outer = repos[i].repo_id;
       const inner = repos[j].repo_id;
-      if (inner !== outer && (inner === `${outer}/${inner.slice(outer.length + 1)}` || inner.startsWith(`${outer}/`))) {
+      if (inner.startsWith(`${outer}/`)) {
         out.push({ reason_code: 'nested-repo-roots', outer, inner });
       }
     }

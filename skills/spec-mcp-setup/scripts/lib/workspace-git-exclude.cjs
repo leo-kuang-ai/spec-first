@@ -70,7 +70,9 @@ function addManagedExclude(repoRoot, workspaceRoot, patterns = DEFAULT_PATTERNS)
   }
 
   const existing = fs.existsSync(resolved.absolute) ? fs.readFileSync(resolved.absolute, 'utf8') : '';
-  const withoutBlock = stripManagedBlock(existing);
+  const stripped = stripManagedBlock(existing);
+  if (!stripped.ok) return { ok: false, reason_code: stripped.reason_code, target: resolved.absolute };
+  const withoutBlock = stripped.contents;
   const block = [MANAGED_BLOCK_START, ...patterns, MANAGED_BLOCK_END].join('\n');
   const base = withoutBlock.length && !withoutBlock.endsWith('\n') ? `${withoutBlock}\n` : withoutBlock;
   const next = `${base}${block}\n`;
@@ -91,29 +93,38 @@ function removeManagedExclude(repoRoot, workspaceRoot) {
   if (!fs.existsSync(resolved.absolute)) {
     return { ok: true, changed: false, target: resolved.absolute };
   }
+  try {
+    assertContainedPath(workspaceRoot, resolved.absolute, { reasonCode: 'exclude-target-escapes-workspace' });
+  } catch (error) {
+    return { ok: false, reason_code: error.reason_code || 'exclude-target-escapes-workspace', target: resolved.absolute };
+  }
   const existing = fs.readFileSync(resolved.absolute, 'utf8');
   const stripped = stripManagedBlock(existing);
-  if (stripped === existing) {
+  if (!stripped.ok) return { ok: false, reason_code: stripped.reason_code, target: resolved.absolute };
+  if (stripped.contents === existing) {
     return { ok: true, changed: false, target: resolved.absolute };
   }
-  fs.writeFileSync(resolved.absolute, stripped, 'utf8');
+  fs.writeFileSync(resolved.absolute, stripped.contents, 'utf8');
   return { ok: true, changed: true, target: resolved.absolute };
 }
 
 function stripManagedBlock(contents) {
-  if (!contents.includes(MANAGED_BLOCK_START)) return contents;
   const lines = contents.split('\n');
-  const out = [];
-  let inBlock = false;
-  for (const line of lines) {
-    if (line.trim() === MANAGED_BLOCK_START) { inBlock = true; continue; }
-    if (line.trim() === MANAGED_BLOCK_END) { inBlock = false; continue; }
-    if (!inBlock) out.push(line);
+  const starts = [];
+  const ends = [];
+  lines.forEach((line, index) => {
+    if (line.trim() === MANAGED_BLOCK_START) starts.push(index);
+    if (line.trim() === MANAGED_BLOCK_END) ends.push(index);
+  });
+  if (starts.length === 0 && ends.length === 0) return { ok: true, contents };
+  if (starts.length !== 1 || ends.length !== 1 || starts[0] >= ends[0]) {
+    return { ok: false, reason_code: 'exclude-managed-block-malformed', contents };
   }
+  const out = lines.filter((_line, index) => index < starts[0] || index > ends[0]);
   let result = out.join('\n');
   // Collapse a trailing blank left by block removal, preserve single trailing newline semantics.
   result = result.replace(/\n{3,}/g, '\n\n');
-  return result;
+  return { ok: true, contents: result };
 }
 
 module.exports = {

@@ -22,7 +22,12 @@ function initRepo(root, rel) {
   const repo = path.resolve(root, rel);
   fs.mkdirSync(repo, { recursive: true });
   spawnSync('git', ['-C', repo, 'init', '-q']);
+  spawnSync('git', ['-C', repo, 'config', 'user.email', 'test@example.com']);
+  spawnSync('git', ['-C', repo, 'config', 'user.name', 'Test']);
+  spawnSync('git', ['-C', repo, 'config', '--local', 'core.hooksPath', '.git/hooks']);
   fs.writeFileSync(path.join(repo, 'index.js'), 'module.exports = { main() { return 1; } };\n');
+  spawnSync('git', ['-C', repo, 'add', 'index.js']);
+  spawnSync('git', ['-C', repo, 'commit', '-q', '-m', 'init']);
   return repo;
 }
 function fakeExec(command, args) {

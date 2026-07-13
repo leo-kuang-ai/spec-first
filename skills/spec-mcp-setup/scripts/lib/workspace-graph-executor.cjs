@@ -11,27 +11,15 @@
 // the renderer/doctor (U4) and clean (U6) consume; never throws for a per-repo
 // provider failure — those are isolated in the build layer.
 
-const { spawnSync } = require('node:child_process');
 const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
 const { buildWorkspaceGraphs } = require('./workspace-graph-build.cjs');
 const { makeWorkspaceRunners } = require('./workspace-provider-runners.cjs');
 const { injectRoutingInstruction } = require('./workspace-routing-inject.cjs');
-const { installChildHooks } = require('./workspace-graph-refresh.cjs');
+const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
+const { workspaceGraphRefreshPosture } = require('./workspace-graph-refresh.cjs');
+const { CANONICAL_HOSTS } = require('./host-authority.cjs');
 
-function defaultExec(command, args, opts = {}) {
-  const result = spawnSync(command, args, {
-    cwd: opts.cwd,
-    env: { ...process.env, ...(opts.env || {}) },
-    encoding: 'utf8',
-    timeout: opts.timeoutMs || 300000,
-    windowsHide: true,
-  });
-  return {
-    status: typeof result.status === 'number' ? result.status : 1,
-    stdout: String(result.stdout || ''),
-    stderr: String(result.stderr || ''),
-  };
-}
+const defaultExec = defaultWorkspaceExec;
 
 function runWorkspaceGraphBuild({
   cwd = process.cwd(),
@@ -41,7 +29,7 @@ function runWorkspaceGraphBuild({
   exec = defaultExec,
   codegraphCommand = 'codegraph',
   graphifyCommand = 'graphify',
-  hosts = ['claude', 'codex'],
+  hosts = [...CANONICAL_HOSTS],
   injectRouting = true,
 } = {}) {
   const targets = resolveWorkspaceTargets({ cwd, repos, allowDiscovery, manifestPath });
@@ -54,6 +42,18 @@ function runWorkspaceGraphBuild({
       reason_code: targets.reason_code || 'workspace-not-eligible',
       workspace_root: targets.workspace_root,
       targets,
+      build: null,
+    };
+  }
+  if (targets.manifest_error) {
+    return {
+      schema_version: 'workspace-graph-executor.v1',
+      status: 'failed',
+      topology: targets.topology,
+      reason_code: targets.manifest_error,
+      workspace_root: targets.workspace_root,
+      targets,
+      pending_confirm: [],
       build: null,
     };
   }
@@ -91,26 +91,43 @@ function runWorkspaceGraphBuild({
     routing = injectRoutingInstruction({ workspaceRoot: targets.workspace_root, repos: confirmed, hosts });
   }
 
-  // U3/CR8: install per-child Graphify git hooks so a child commit refreshes its
-  // subgraph. Best-effort and non-fatal — a hook that can't be installed
-  // (e.g. core.hooksPath redirects outside the workspace) records a CR9 fallback
-  // and does not change the build status.
-  let hooks = null;
-  if (build.status === 'complete' || build.status === 'partial') {
-    hooks = installChildHooks({ workspaceRoot: targets.workspace_root, repos: confirmed, exec });
+  const refresh = workspaceGraphRefreshPosture();
+  const hooks = {
+    schema_version: 'workspace-graph-hooks.v1',
+    status: 'not-installed',
+    reason_code: refresh.reason_code,
+    repos: confirmed.map((repo) => ({
+      repo_id: repo.repo_id,
+      hook_status: 'not-installed',
+      reason_code: refresh.reason_code,
+      fallback: 'explicit-workspace-graph-refresh',
+    })),
+  };
+
+  let status = build.status;
+  let reasonCode = build.reason_code;
+  const routingFailed = routing && routing.entries.some((entry) => entry.status === 'failed');
+  if (status === 'complete' && routingFailed) {
+    status = 'partial';
+    reasonCode = 'workspace-routing-injection-failed';
+  }
+  if (status === 'complete' && pendingConfirm.length > 0) {
+    status = 'partial';
+    reasonCode = 'workspace-repos-need-confirmation';
   }
 
   return {
     schema_version: 'workspace-graph-executor.v1',
-    status: build.status, // complete | partial | failed
+    status,
     topology: targets.topology,
-    reason_code: build.reason_code,
+    reason_code: reasonCode,
     workspace_root: targets.workspace_root,
     targets,
     pending_confirm: pendingConfirm.map((r) => r.repo_id),
     build,
     routing,
     hooks,
+    refresh,
   };
 }
 

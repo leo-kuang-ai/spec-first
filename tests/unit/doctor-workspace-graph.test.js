@@ -30,15 +30,7 @@ describe('doctor workspace-graph common check', () => {
   test('skips when not a multi-repo requirement workspace', () => {
     const root = mkTmp('spec-first-doctor-wg-empty-');
     // empty non-git dir without child repos
-    const check = checkWorkspaceGraphStatus(root);
-    // resolveWorkspaceTargets may skip or needs-confirmation depending on discovery;
-    // non-requirement topologies return null.
-    if (check) {
-      expect(check.name).toBe('workspace graph');
-      expect(check.level).not.toBe('ERROR');
-    } else {
-      expect(check).toBeNull();
-    }
+    expect(checkWorkspaceGraphStatus(root)).toBeNull();
   });
 
   test('reports WARNING absent for requirement workspace without graphs', () => {

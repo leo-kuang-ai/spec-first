@@ -82,7 +82,8 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
       repos: ['api', 'web'],
       allowDiscovery: false,
     });
-    expect(status.status).toBe('ready');
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-routing-incomplete');
     expect(status.default_project_path_policy).toBe('cwd-enclosing-child');
     expect(status.default_project_path).toBe(api);
     expect(status.default_project_path_contained).toBe(true);
@@ -95,6 +96,49 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     expect(status.status).toBe('absent');
     expect(status.repos[0].codegraph_present).toBe(false);
     expect(status.workspace.merged_present).toBe(false);
+  });
+
+  test('a child source change after build makes the workspace graph stale instead of ready', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+    });
+    fs.writeFileSync(path.join(api, 'changed.js'), 'module.exports = 1;\n');
+
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-graph-stale');
+    expect(status.workspace.freshness.freshness).toBe('stale');
+  });
+
+  test('status without --repos reuses the repo set recorded by the last build', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+
+    const status = runWorkspaceGraphStatus({ cwd: ws, allowDiscovery: true });
+
+    expect(status.status).toBe('ready');
+    expect(status.repos.map((repo) => repo.repo_id)).toEqual(['api']);
+  });
+
+  test('a legacy merged file without a state receipt is not sufficient for ready', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    fs.mkdirSync(path.join(api, '.codegraph'), { recursive: true });
+    fs.mkdirSync(path.join(ws, '.graphify'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{}');
+
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-graph-state-missing');
+    expect(status.workspace.freshness.freshness).toBe('unknown');
   });
 
   test('git cwd is skipped', () => {

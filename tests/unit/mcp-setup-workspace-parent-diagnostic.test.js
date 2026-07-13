@@ -49,6 +49,8 @@ describe('parent workspace diagnostic (bare/check)', () => {
     expect(payload.schema_version).toBe('workspace-parent-diagnostic.v1');
     expect(payload.parent_repo_local_facts).toBe('not_applicable');
     expect(payload.parent_provider_readiness).toBe('not_applicable');
+    expect(payload.overall_status).toBe('action-required');
+    expect(payload.reason_code).toBe('workspace-graph-needs-confirmation');
     expect(payload.dual_paths.workspace_two_layer_graph.do_not.join(' ')).toContain('--workspace-graph --all-repos');
     expect(payload.next_actions.some((a) => a.includes('--workspace-graph --repos'))).toBe(true);
     expect(payload.next_actions.some((a) => a.includes('--all-repos'))).toBe(true);
@@ -69,7 +71,7 @@ describe('parent workspace diagnostic (bare/check)', () => {
       env: { MCP_SETUP_HOST: 'codex' },
       homeDir,
     });
-    expect(result.exit_code).toBe(0);
+    expect(result.exit_code).toBe(1);
     expect(result.payload.schema_version).toBe('workspace-parent-diagnostic.v1');
     expect(result.payload.parent_repo_local_facts).toBe('not_applicable');
     expect(result.human).toContain('not_applicable');

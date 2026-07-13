@@ -36,6 +36,15 @@ const ACTIONS_BY_MODE = Object.freeze({
     action('provider-refresh', 'provider-refresh', true),
     action('write-setup-facts', 'write-setup-facts', true),
   ],
+  'workspace-graph-build': [
+    action('build-workspace-graphs', 'provider-mutation', true),
+  ],
+  'workspace-graph-clean': [
+    action('clean-workspace-graphs', 'provider-mutation', true),
+  ],
+  'workspace-graph-status': [
+    action('inspect-workspace-graphs', 'read-only', false),
+  ],
 });
 
 function action(id, capability, mutation) {
@@ -52,16 +61,49 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
   if (args.repo && args.allRepos) return blockedPlan('repo-and-all-repos', args);
   if (args.folder && args.allRepos) return blockedPlan('folder-and-all-repos', args);
 
+  const workspaceActions = [
+    args.workspaceGraph && 'workspace-graph-build',
+    args.workspaceGraphClean && 'workspace-graph-clean',
+    args.workspaceGraphStatus && 'workspace-graph-status',
+  ].filter(Boolean);
+  if (workspaceActions.length > 1) return blockedPlan('workspace-graph-action-conflict', args);
+  if (args.repos.length > 0 && workspaceActions.length === 0) {
+    return blockedPlan('repos-requires-workspace-graph-action', args);
+  }
+  if (workspaceActions.length > 0 && args.allRepos) {
+    return blockedPlan('workspace-graph-all-repos-conflict', args);
+  }
+  if (workspaceActions.length > 0 && (args.repo || args.folder)) {
+    return blockedPlan('workspace-graph-target-conflict', args);
+  }
+  if (workspaceActions.length > 0 && (
+    args.check
+    || args.verifyOnly
+    || args.refreshFacts
+    || args.plan
+    || args.projectConfig
+    || args.repairHostConfig
+    || args.refresh
+    || args.requirementWorkspace
+  )) return blockedPlan('workspace-graph-mode-conflict', args);
+  if (workspaceActions.length > 0 && args.only.length > 0 && !hasWorkspaceProviders(args.only)) {
+    return blockedPlan('workspace-graph-provider-selection-invalid', args);
+  }
+  if (args.workspaceGraph && !hasWorkspaceProviders(args.only)) {
+    return blockedPlan('workspace-graph-requires-codegraph-graphify', args);
+  }
+
   if (args.repairHostConfig && (args.check || args.verifyOnly || args.refreshFacts || args.projectConfig)) {
     return blockedPlan('repair-host-config-mode-conflict', args);
   }
 
   const selectedModes = [
+    ...workspaceActions,
     args.check && 'check',
     (args.verifyOnly || args.refreshFacts) && 'verify',
     args.plan && 'plan',
     args.projectConfig && 'project-config',
-    args.only.length > 0 && !args.plan && 'only',
+    args.only.length > 0 && !args.plan && workspaceActions.length === 0 && 'only',
     args.repairHostConfig && args.only.length === 0 && !args.plan && 'host-config-repair',
   ].filter(Boolean);
   if (new Set(selectedModes).size > 1) {
@@ -109,6 +151,10 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
       ? [...args.only]
       : (['verify', 'plan'].includes(mode) ? [...defaultIds] : []),
   };
+}
+
+function hasWorkspaceProviders(ids) {
+  return ids.length === 2 && ids.includes('codegraph') && ids.includes('graphify');
 }
 
 function blockedPlan(reasonCode, args, extra = {}) {

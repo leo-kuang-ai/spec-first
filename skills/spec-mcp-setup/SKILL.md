@@ -1,7 +1,7 @@
 ---
 name: spec-mcp-setup
 description: Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows on Claude Code, Codex, Kiro, Qoder, or Cursor.
-argument-hint: "[bare auto setup] [--check|--verify-only|--plan|--project-config] [--only codegraph,graphify] [--repair-host-config] [--refresh] [--repo <path>] [--requirement-workspace <repo-relative-path>]"
+argument-hint: "[bare auto setup] [--check|--verify-only|--plan|--project-config] [--only codegraph,graphify] [--workspace-graph|--workspace-graph-status|--workspace-graph-clean] [--repos <a,b>] [--json] [--repair-host-config] [--refresh] [--repo <path>] [--requirement-workspace <repo-relative-path>]"
 ---
 
 # Runtime Setup
@@ -188,7 +188,9 @@ Use `--only codegraph`, `--only graphify`, `--only codegraph,graphify`, or Graph
 运行 `spec-mcp-setup --only codegraph,graphify --workspace-graph` 时,setup 会为该 workspace 建立两层代码图:
 
 1. **每子仓战术图**:`codegraph init` 生成 `工程N/.codegraph/`;`.codegraph/` 写入该子仓 `.git/info/exclude`(经 `git rev-parse --git-path` 解析,正确处理 `.git`-as-file/worktree,并做 realpath+containment 校验)以保持子仓 `git status` 干净;CodeGraph MCP server 全局 install 一次,跨仓查询通过 `projectPath`。
-2. **workspace 跨仓宏观图**:Graphify `extract --code-only` 每子仓子图 + `merge-graphs` 合并图,全部 out-of-tree 写到 `需求文件夹/.graphify/`(子仓物理零侵入)。单/零子仓分别产出 single-source / not-applicable。
+2. **workspace 跨仓宏观图**:Graphify `extract --code-only` 每子仓子图 + `merge-graphs` 合并图,全部 out-of-tree 写到 `需求文件夹/.graphify/`(子仓物理零侵入)。单/零子仓分别产出 single-source / not-applicable。构建结果原子写入 `.graphify/workspace-graph-state.json`;status 只有在最近构建 complete、repo 集合与 source snapshot 未变化、子图/合并图/路由块均存在时才报告 ready。
+
+Graphify 0.9.x 原生 child hook 只重建 child 默认 output,不能更新上述 out-of-tree 子图并重收敛 merged graph。因此当前 workspace 模式使用**显式刷新**:child source 变化后重新运行同一 `--workspace-graph --repos ...` 命令。不得把原生 hook install 表述成 workspace merged graph 的自动 freshness 保证。
 
 仓集来源:`--repos <a,b>` 清单(确认)、`需求文件夹/.spec-first/workspace.yaml` manifest(确认),或自动发现(仅作候选,需确认后才建)。
 
@@ -196,9 +198,19 @@ Use `--only codegraph`, `--only graphify`, `--only codegraph,graphify`, or Graph
 
 | Flag | 作用 |
 | --- | --- |
-| `--workspace-graph` | 一次性建双层图 + 注入路由块 + 安装子仓 Graphify hook |
-| `--workspace-graph-status` | 只读汇总各 child/workspace 图状态、default `projectPath` containment(advisory)、路由块是否已注入;不调用 provider 二进制 |
-| `--workspace-graph-clean` | 幂等清理:删子仓 `.codegraph/`、只移除 spec-first managed exclude 块、`graphify hook uninstall`、删 `需求/.graphify/`、剥离路由 managed block;不强制 kill CodeGraph daemon(回报清理动作)。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
+| `--workspace-graph` | 一次性建双层图 + 写 state receipt + 注入五宿主入口路由块;source 变化后显式重跑刷新 |
+| `--workspace-graph-status` | 只读汇总各 child/workspace 图状态、state/source freshness、default `projectPath` containment(advisory)、路由块是否已注入;不调用 provider 二进制 |
+| `--workspace-graph-clean` | 幂等清理:删子仓 `.codegraph/`、只移除 spec-first managed exclude 块、清理旧版本可能安装的 Graphify hook、删 `需求/.graphify/`、剥离路由 managed block;不强制 kill CodeGraph daemon(回报清理动作)。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
+
+Machine contract:
+
+| operation status | mutation exit code | 含义 |
+| --- | ---: | --- |
+| `complete` | 0 | 请求的 mutation 全部完成 |
+| `partial` / `failed` | 1 | 至少一个确定性步骤失败;读取 `reason_code` 与 per-repo 状态 |
+| `needs-confirmation` | 2 | 自动发现仅是候选;用 JSON 中的 `pending_confirm[]` 生成 `--repos` 重试命令 |
+
+`--json` 输出完整 envelope;自动化消费者必须同时读取 `status`、`reason_code`、`pending_confirm[]`、state/freshness 与 per-repo 字段,不能只检查文件存在或进程是否打印成功文本。显式 `--workspace-graph-status` 是只读诊断,即使对象 absent/partial 也可 exit 0,由 envelope 表达 readiness。
 
 **边界(per-需求 隔离)**:每个需求文件夹自成一体,不复用其它需求的图,不写机器级 global graph;`projectPath` 解析限定当前 workspace 根内;discovery 与所有 Git-metadata 写入均 symlink-contained;图输出是 advisory candidate,结论回子仓源码确认。删除需求文件夹即清空其图(无机器级残留)。
 

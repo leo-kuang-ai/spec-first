@@ -18,6 +18,8 @@ function initRepo(root, rel) {
   const repo = path.resolve(root, rel);
   fs.mkdirSync(repo, { recursive: true });
   spawnSync('git', ['-C', repo, 'init', '-q']);
+  // Isolate from developer-global core.hooksPath (e.g. ~/.githooks).
+  spawnSync('git', ['-C', repo, 'config', '--local', 'core.hooksPath', '.git/hooks']);
   return repo;
 }
 function fakeExec(command, args) {
@@ -64,6 +66,14 @@ describe('args — workspace-graph flags', () => {
 });
 
 describe('runSetup — workspace-graph dispatch', () => {
+  test('help documents workspace graph actions and conflicts', () => {
+    const result = runSetup({ argv: ['--help'] });
+    expect(result.human).toContain('--workspace-graph');
+    expect(result.human).toContain('--workspace-graph-status');
+    expect(result.human).toContain('--workspace-graph-clean');
+    expect(result.human).toContain('--repos <a,b>');
+    expect(result.human).toContain('不可与 --all-repos 组合');
+  });
   test('non-Git workspace + --workspace-graph builds the two-layer graph via injected exec', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
@@ -107,6 +117,43 @@ describe('runSetup — workspace-graph dispatch', () => {
     expect(result.payload && result.payload.schema_version).not.toBe('workspace-graph-executor.v1');
   });
 
+  test('workspace graph confirmation and partial outcomes use non-zero exit codes', () => {
+    const needsWs = mkWorkspace();
+    initRepo(needsWs, 'api');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-exit-home-'));
+    const needs = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph'],
+      cwd: needsWs,
+      skillRoot,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+      workspaceExec: fakeExec,
+    });
+    expect(needs.payload.status).toBe('needs-confirmation');
+    expect(needs.exit_code).toBe(2);
+    expect(needs.human).toContain('--repos api');
+
+    const partialWs = mkWorkspace();
+    initRepo(partialWs, 'api');
+    initRepo(partialWs, 'web');
+    const failWeb = (command, args, opts) => {
+      if (command === 'graphify' && args[0] === 'extract' && args[1].endsWith('web')) {
+        return { status: 1, stdout: '', stderr: 'fail' };
+      }
+      return fakeExec(command, args, opts);
+    };
+    const partial = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'api,web'],
+      cwd: partialWs,
+      skillRoot,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+      workspaceExec: failWeb,
+    });
+    expect(partial.payload.status).toBe('partial');
+    expect(partial.exit_code).toBe(1);
+  });
+
   test('build → status → clean → status via CLI flags (injected exec)', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
@@ -136,7 +183,7 @@ describe('runSetup — workspace-graph dispatch', () => {
     expect(statusReady.payload.schema_version).toBe('workspace-graph-status.v1');
     expect(statusReady.payload.status).toBe('ready');
     expect(statusReady.exit_code).toBe(0);
-    expect(statusReady.human).toContain('default projectPath');
+    expect(statusReady.human).toContain('no default index');
 
     const cleaned = runSetup({
       ...common,

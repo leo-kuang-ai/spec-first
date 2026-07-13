@@ -212,7 +212,7 @@ function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
   const projectRoot = deps.cwd || process.cwd();
   const runStatus = deps.runWorkspaceGraphStatus || requireWorkspaceGraphStatus();
   const runCleanGraph = deps.runWorkspaceGraphClean || requireWorkspaceGraphClean();
-  const exec = deps.workspaceExec; // injectable for tests; undefined → real spawnSync inside clean
+  const exec = deps.workspaceExec;
 
   if (parsed.dryRun) {
     const status = runStatus({
@@ -237,6 +237,16 @@ function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
     return 0;
   }
 
+  if (result.status === 'needs-confirmation') {
+    const pending = Array.isArray(result.pending_confirm) ? result.pending_confirm : [];
+    console.log(`Workspace graph clean: ${result.status}`);
+    console.log(`  pending_confirm: ${pending.join(', ') || 'discovered repos'}`);
+    if (pending.length > 0) {
+      console.log(`  confirm: spec-first clean --workspace-graph --repos ${pending.join(',')}`);
+    }
+    return 2;
+  }
+
   console.log(`Workspace graph clean: ${result.status}`);
   console.log(`  root: ${result.workspace_root}`);
   for (const repo of result.repos || []) {
@@ -255,7 +265,7 @@ function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
   if (result.codegraph_daemon_action) {
     console.log(`  daemon: ${result.codegraph_daemon_action}`);
   }
-  return result.status === 'failed' ? 1 : 0;
+  return result.status === 'complete' || result.status === 'skipped' ? 0 : 1;
 }
 
 function printWorkspaceGraphCleanPreview(status) {

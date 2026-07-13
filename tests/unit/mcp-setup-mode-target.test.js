@@ -191,6 +191,14 @@ describe('spec-mcp-setup action policy', () => {
     [['--check', '--repair-host-config'], 'repair-host-config-mode-conflict'],
     [['--verify-only', '--repair-host-config'], 'repair-host-config-mode-conflict'],
     [['--project-config', '--repair-host-config'], 'repair-host-config-mode-conflict'],
+    [['--workspace-graph', '--workspace-graph-status', '--only', 'codegraph,graphify'], 'workspace-graph-action-conflict'],
+    [['--workspace-graph-clean', '--workspace-graph-status'], 'workspace-graph-action-conflict'],
+    [['--repos', 'api'], 'repos-requires-workspace-graph-action'],
+    [['--workspace-graph', '--all-repos', '--only', 'codegraph,graphify'], 'workspace-graph-all-repos-conflict'],
+    [['--workspace-graph-status', '--repo', 'api'], 'workspace-graph-target-conflict'],
+    [['--workspace-graph-clean', '--check'], 'workspace-graph-mode-conflict'],
+    [['--workspace-graph'], 'workspace-graph-requires-codegraph-graphify'],
+    [['--workspace-graph', '--only', 'graphify'], 'workspace-graph-provider-selection-invalid'],
   ])('fails closed for %j', (argv, reasonCode) => {
     const { buildActionPlan } = require(modePolicyModule);
 
@@ -199,6 +207,26 @@ describe('spec-mcp-setup action policy', () => {
       mutation: false,
       reason_code: reasonCode,
       actions: [],
+    });
+  });
+
+  test('gives workspace build, status, and clean explicit action modes', () => {
+    const { buildActionPlan } = require(modePolicyModule);
+    const knownIds = ['codegraph', 'graphify'];
+    expect(buildActionPlan({ argv: ['--only', 'codegraph,graphify', '--workspace-graph'], knownIds })).toMatchObject({
+      blocked: false,
+      mode: 'workspace-graph-build',
+      mutation: true,
+    });
+    expect(buildActionPlan({ argv: ['--workspace-graph-status'], knownIds })).toMatchObject({
+      blocked: false,
+      mode: 'workspace-graph-status',
+      mutation: false,
+    });
+    expect(buildActionPlan({ argv: ['--workspace-graph-clean'], knownIds })).toMatchObject({
+      blocked: false,
+      mode: 'workspace-graph-clean',
+      mutation: true,
     });
   });
 });

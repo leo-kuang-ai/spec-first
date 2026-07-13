@@ -16,6 +16,7 @@ function initRepo(root, rel) {
   const repo = path.resolve(root, rel);
   fs.mkdirSync(repo, { recursive: true });
   spawnSync('git', ['-C', repo, 'init', '-q']);
+  spawnSync('git', ['-C', repo, 'config', '--local', 'core.hooksPath', '.git/hooks']);
   return repo;
 }
 function fakeExec(command, args) {
@@ -63,8 +64,9 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(fs.existsSync(path.join(ws, 'web', '.codegraph'))).toBe(false);
     expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(false);
     expect(clean.workspace_graphify_removed).toBe(true);
-    // graphify hook uninstall invoked per child, in the child cwd.
-    expect(uninstalls.filter((u) => u.args.join(' ') === 'hook uninstall').length).toBe(2);
+    // 当前 state 明确为 explicit refresh；该 build 未安装 hook，clean 不碰宿主 hook 配置。
+    expect(uninstalls.filter((u) => u.args.join(' ') === 'hook uninstall').length).toBe(0);
+    expect(clean.repos.every((repo) => repo.hook_status === 'not-installed')).toBe(true);
     // Managed routing block stripped.
     expect(clean.routing).not.toBeNull();
     expect(clean.routing.entries.some((e) => e.status === 'stripped')).toBe(true);
@@ -103,5 +105,90 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const clean = runWorkspaceGraphClean({ cwd: ws });
     expect(clean.status).toBe('skipped');
     expect(clean.topology).toBe('cwd-is-git-repo');
+  });
+
+  test('discovery-only clean requires confirmation and performs no child mutation', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    fs.mkdirSync(path.join(api, '.codegraph'), { recursive: true });
+    let execCalled = false;
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      allowDiscovery: true,
+      exec: () => { execCalled = true; return { status: 0 }; },
+    });
+
+    expect(clean.status).toBe('needs-confirmation');
+    expect(clean.pending_confirm).toEqual(['api']);
+    expect(execCalled).toBe(false);
+    expect(fs.existsSync(path.join(api, '.codegraph'))).toBe(true);
+  });
+
+  test('invalid manifest blocks clean before child mutation', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    fs.mkdirSync(path.join(api, '.codegraph'), { recursive: true });
+    fs.mkdirSync(path.join(ws, '.spec-first'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.spec-first', 'workspace.yaml'), 'schema_version: workspace-manifest.v1\nunknown: value\n');
+    const clean = runWorkspaceGraphClean({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(clean.status).toBe('failed');
+    expect(clean.reason_code).toBe('workspace-manifest-schema-invalid');
+    expect(fs.existsSync(path.join(api, '.codegraph'))).toBe(true);
+  });
+
+  test('clean without --repos reuses the last managed state repo set', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      allowDiscovery: true,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean.status).toBe('complete');
+    expect(clean.repos.map((repo) => repo.repo_id)).toEqual(['api']);
+    expect(fs.existsSync(path.join(ws, 'api', '.codegraph'))).toBe(false);
+  });
+
+  test('hook uninstall failure makes clean partial', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.rmSync(path.join(ws, '.graphify', 'workspace-graph-state.json'));
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => ({ status: 1 }),
+    });
+
+    expect(clean.status).toBe('partial');
+    expect(clean.reason_code).toBe('workspace-clean-partial');
+    expect(clean.repos[0].hook_status).toBe('failed');
+  });
+
+  test('hook uninstall is blocked when core.hooksPath escapes the workspace', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-clean-hooks-outside-'));
+    spawnSync('git', ['-C', api, 'config', '--local', 'core.hooksPath', outside]);
+    let execCalled = false;
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => { execCalled = true; return { status: 0 }; },
+    });
+
+    // Legacy/no-state cleanup cannot safely touch an escaping hooksPath.
+    expect(clean.status).toBe('partial');
+    expect(clean.repos[0].hook_status).toBe('blocked');
+    expect(clean.repos[0].reason_code).toBe('hook-target-escapes-workspace');
+    expect(execCalled).toBe(false);
   });
 });

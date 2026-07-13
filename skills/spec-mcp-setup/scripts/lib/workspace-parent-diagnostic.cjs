@@ -91,6 +91,8 @@ function buildParentWorkspaceDiagnostic({
     );
   }
 
+  const overallStatus = deriveParentOverallStatus(status);
+
   return {
     schema_version: 'workspace-parent-diagnostic.v1',
     topology: 'requirement-workspace',
@@ -105,9 +107,17 @@ function buildParentWorkspaceDiagnostic({
     dual_paths: dualPaths,
     workspace_graph: status,
     next_actions: nextActions,
-    overall_status: 'ready',
-    reason_code: 'requirement-workspace-parent-diagnostic',
+    overall_status: overallStatus,
+    reason_code: overallStatus === 'ready'
+      ? 'requirement-workspace-parent-diagnostic'
+      : `workspace-graph-${status && status.status ? status.status : 'status-unavailable'}`,
   };
+}
+
+function deriveParentOverallStatus(status) {
+  if (status && status.status === 'ready') return 'ready';
+  if (status && status.status === 'partial') return 'partial';
+  return 'action-required';
 }
 
 function renderParentWorkspaceDiagnosticHuman(payload) {
