@@ -111,6 +111,13 @@ function changedReadyPrdArtifacts(cwd) {
     timeout: 2000,
   });
   if (result.status !== 0 || typeof result.stdout !== 'string') {
+    // Non-Git parent workspaces (multi-repo requirement folders) have no git index.
+    // Treat as "no changed PRD artifacts" so ordinary non-PRD turns can close.
+    // Real PRD work should run inside a child git repo where status failures still block.
+    const stderr = String(result.stderr || (result.error && result.error.message) || '');
+    if (result.status === 128 || /not a git repository/i.test(stderr)) {
+      return { paths: [], error: null };
+    }
     return {
       paths: [],
       error: {

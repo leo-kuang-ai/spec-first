@@ -10,6 +10,9 @@ const BOOLEAN_OPTIONS = new Map([
   ['--all-repos', 'allRepos'],
   ['--user-scope', 'userScope'],
   ['--repair-host-config', 'repairHostConfig'],
+  ['--workspace-graph', 'workspaceGraph'],
+  ['--workspace-graph-clean', 'workspaceGraphClean'],
+  ['--workspace-graph-status', 'workspaceGraphStatus'],
 ]);
 
 const VALUE_OPTIONS = new Map([
@@ -17,6 +20,7 @@ const VALUE_OPTIONS = new Map([
   ['--repo', 'repo'],
   ['--folder', 'folder'],
   ['--requirement-workspace', 'requirementWorkspace'],
+  ['--repos', 'repos'],
 ]);
 
 function parseArgs(argv = []) {
@@ -31,7 +35,11 @@ function parseArgs(argv = []) {
     allRepos: false,
     userScope: false,
     repairHostConfig: false,
+    workspaceGraph: false,
+    workspaceGraphClean: false,
+    workspaceGraphStatus: false,
     only: [],
+    repos: [],
     repo: '',
     folder: '',
     requirementWorkspace: '',
@@ -74,14 +82,14 @@ function parseArgs(argv = []) {
       }
 
       const field = VALUE_OPTIONS.get(option);
-      if (field === 'only') {
+      if (field === 'only' || field === 'repos') {
         const selected = String(value).split(',').map((entry) => entry.trim()).filter(Boolean);
         if (selected.length === 0) {
           result.errors.push({ reason_code: 'missing-option-value', option });
           continue;
         }
-        result.only = uniqueStrings([
-          ...result.only,
+        result[field] = uniqueStrings([
+          ...result[field],
           ...selected,
         ]);
       } else {

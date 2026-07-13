@@ -22,6 +22,18 @@ const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/mcp-setup-project-config.test.js',
   'tests/unit/mcp-setup-providers.test.js',
   'tests/unit/mcp-setup-registry.test.js',
+  'tests/unit/mcp-setup-workspace-git-exclude.test.js',
+  'tests/unit/mcp-setup-workspace-graph-build.test.js',
+  'tests/unit/mcp-setup-workspace-graph-clean.test.js',
+  'tests/unit/mcp-setup-workspace-graph-entry.test.js',
+  'tests/unit/mcp-setup-workspace-graph-executor.test.js',
+  'tests/unit/mcp-setup-workspace-graph-refresh.test.js',
+  'tests/unit/mcp-setup-workspace-graph-scope.test.js',
+  'tests/unit/mcp-setup-workspace-graph-status.test.js',
+  'tests/unit/mcp-setup-workspace-provider-runners.test.js',
+  'tests/unit/mcp-setup-workspace-routing-inject.test.js',
+  'tests/unit/mcp-setup-workspace-routing-instruction.test.js',
+  'tests/unit/mcp-setup-workspace-target.test.js',
   'tests/unit/plugin-modules.test.js',
 ]);
 
@@ -103,6 +115,8 @@ function runIntegration() {
   runJestFiles([
     'tests/integration/qoder-runtime-lifecycle.integration.test.js',
     'tests/integration/init-five-host-lifecycle.integration.test.js',
+    'tests/integration/workspace-graph-lifecycle.integration.test.js',
+    'tests/integration/workspace-graph-five-host-projection.integration.test.js',
   ], ['--runInBand']);
 }
 

@@ -87,6 +87,21 @@ Do not add schema fields or graph-specific evidence enums.
 
 Project-graph is an advisory candidate provider. It does not unlock deterministic TIA, coverage, dependency graph, ownership, affected-test, or review-impact claims as confirmed facts. Those claims need direct evidence even when project-graph output looks plausible.
 
+## Per-Requirement Multi-Repo Workspace Graphs
+
+When the cwd is a **non-Git multi-repo requirement parent** (several independently cloned child Git repos under one requirement folder), setup may build a two-layer graph:
+
+- **code-graph (tactical):** per-child CodeGraph index under each child's `.codegraph/`, queried with `projectPath` set to that child.
+- **project-graph (macro):** one workspace Graphify merged graph at `<requirement>/.graphify/merged-graph.json` (out-of-tree, code-only).
+
+Consumption rules for this shape:
+
+1. **Same candidate-only contract.** Child CodeGraph hits and the merged Graphify graph are both `provider_untrusted` advisory orientation. Empty, partial, stale, or unmapped results have **no negative authority** — "no edge found" never means "no edge exists."
+2. **`projectPath` containment is advisory, not a hard MCP gate.** Spec-first may validate that a requested `projectPath` resolves inside the current requirement workspace (facts, doctor, routing text). The global CodeGraph MCP server is provider-owned; this containment check does **not** hard-block queries at the server. Cross-requirement `projectPath` should still be rejected or warned by consumers that implement the advisory check.
+3. **Default projectPath is not the server root.** The server root has no workspace index. Routing guidance and doctor status report a default first-child `projectPath` for CR10 diagnosability; agents must still pass `projectPath` explicitly when querying.
+4. **Per-requirement isolation.** Graphs are not reused across requirement folders. Deleting the requirement folder removes its managed graph assets (no machine-global residue from this feature). Cross-requirement conclusions still re-ground in the target child sources.
+5. **Setup / clean surfaces.** Build and status: `spec-mcp-setup --only codegraph,graphify --workspace-graph` / `--workspace-graph-status`. Clean: `spec-mcp-setup --workspace-graph-clean` or host `spec-first clean --workspace-graph`. Host `spec-first doctor` may surface an advisory workspace-graph row when the cwd is a requirement parent; detail and mutation stay under the setup/clean flags above.
+
 ## Validation Expectations
 
 - Contract tests should pin the candidate-only rule, the readiness-status mapping, the never-cat graph artifact rule, the fallback trigger set, the recording fields, and the relay-chain no skip-layer elevation rule.

@@ -1427,6 +1427,14 @@ function providerOwnedTextFiles(repoRoot, directory) {
   return files;
 }
 
+// Graphify host hooks (provider-native):
+// - legacy / Codex-shaped: `<launcher> hook-check` (exactly one was historical)
+// - graphifyy 0.9.12 Claude: `<launcher> hook-guard search` + `<launcher> hook-guard read`
+//   (two PreToolUse matchers). Spec-first rewrites only the launcher path and keeps
+//   the provider-owned verb/mode; it never collapses multi-entry 0.9.12 shapes to 1.
+const GRAPHIFY_HOST_HOOK_VERBS = new Set(['hook-check', 'hook-guard']);
+const GRAPHIFY_HOST_HOOK_GUARD_MODES = new Set(['search', 'read']);
+
 function normalizePythonHostHookConfig(repoRoot, target, launcher) {
   if (!fs.existsSync(target)) throw graphifySafetyError('graphify-host-hook-config-missing', `缺少 ${relativeRef(repoRoot, target)}。`);
   assertContainedPath(repoRoot, target, { reasonCode: 'graphify-project-surface-symlink-escape' });
@@ -1442,38 +1450,78 @@ function normalizePythonHostHookConfig(repoRoot, target, launcher) {
     if (value && typeof value === 'object') {
       return Object.fromEntries(Object.entries(value).map(([childKey, child]) => [childKey, visit(child, childKey)]));
     }
-    if (key !== 'command' || typeof value !== 'string' || !value.includes('hook-check')) return value;
-    const commandLauncher = parseHookCheckLauncher(value);
-    const basename = commandLauncher
-      ? (path.win32.isAbsolute(commandLauncher) && !path.isAbsolute(commandLauncher)
-        ? path.win32.basename(commandLauncher)
-        : path.basename(commandLauncher)).replace(/\.(?:exe|cmd)$/i, '')
-      : '';
-    if (!commandLauncher || basename !== 'graphify') {
+    if (key !== 'command' || typeof value !== 'string') return value;
+    if (!/\bhook-(?:check|guard)\b/.test(value)) return value;
+    const parsedCommand = parseGraphifyHostHookCommand(value);
+    if (!parsedCommand || !isGraphifyLauncherBasename(parsedCommand.launcher)) {
       throw graphifySafetyError('graphify-host-hook-command-unexpected', `拒绝修改 unexpected Graphify host hook command：${value}`);
     }
     matches += 1;
-    return renderHookCheckCommand(launcher);
+    return renderGraphifyHostHookCommand(launcher, parsedCommand.verb, parsedCommand.mode);
   };
   const normalized = { ...parsed, hooks: visit(parsed.hooks) };
-  if (matches !== 1) throw graphifySafetyError('graphify-host-hook-cardinality-invalid', 'Graphify host hook entry 必须恰好出现一次。');
+  if (matches < 1) {
+    throw graphifySafetyError(
+      'graphify-host-hook-cardinality-invalid',
+      'Graphify host hook entry 至少出现一次（hook-check 或 hook-guard）。',
+    );
+  }
   const next = `${JSON.stringify(normalized, null, 2)}\n`;
   if (next !== fs.readFileSync(target, 'utf8')) writeContainedText(repoRoot, target, next, 'graphify-project-surface-symlink-escape');
 }
 
 function renderHookCheckCommand(launcher) {
-  if (path.win32.isAbsolute(launcher) && !path.isAbsolute(launcher)) {
-    return `"${launcher.replaceAll('"', '\\"')}" hook-check`;
+  return renderGraphifyHostHookCommand(launcher, 'hook-check', null);
+}
+
+function renderGraphifyHostHookCommand(launcher, verb, mode) {
+  const quoted = quoteGraphifyLauncher(launcher);
+  if (verb === 'hook-guard') {
+    const guardMode = mode && GRAPHIFY_HOST_HOOK_GUARD_MODES.has(mode) ? mode : 'search';
+    return `${quoted} hook-guard ${guardMode}`;
   }
-  return `'${launcher.replaceAll("'", "'\\''")}' hook-check`;
+  return `${quoted} hook-check`;
+}
+
+function quoteGraphifyLauncher(launcher) {
+  if (path.win32.isAbsolute(launcher) && !path.isAbsolute(launcher)) {
+    return `"${String(launcher).replaceAll('"', '\\"')}"`;
+  }
+  return `'${String(launcher).replaceAll("'", "'\\''")}'`;
+}
+
+function isGraphifyLauncherBasename(commandLauncher) {
+  if (!commandLauncher) return false;
+  const basename = (path.win32.isAbsolute(commandLauncher) && !path.isAbsolute(commandLauncher)
+    ? path.win32.basename(commandLauncher)
+    : path.basename(commandLauncher)).replace(/\.(?:exe|cmd)$/i, '');
+  return basename === 'graphify';
+}
+
+// Returns { launcher, verb, mode } for graphify host-hook commands, else null.
+// Supports: `… hook-check` and `… hook-guard <search|read>` (graphifyy 0.9.12+).
+function parseGraphifyHostHookCommand(command) {
+  const match = String(command).match(
+    /^(?:'([^']*)'|"((?:[^"\\]|\\.)*)"|(\S+))\s+(hook-check|hook-guard)(?:\s+(\S+))?$/,
+  );
+  if (!match) return null;
+  const launcher = match[1] !== undefined
+    ? match[1]
+    : (match[2] !== undefined ? match[2].replace(/\\(["\\])/g, '$1') : match[3]);
+  const verb = match[4];
+  if (!GRAPHIFY_HOST_HOOK_VERBS.has(verb)) return null;
+  const mode = match[5] || null;
+  if (verb === 'hook-guard') {
+    if (!mode || !GRAPHIFY_HOST_HOOK_GUARD_MODES.has(mode)) return null;
+  } else if (mode) {
+    return null;
+  }
+  return { launcher, verb, mode };
 }
 
 function parseHookCheckLauncher(command) {
-  const match = String(command).match(/^(?:'([^']*)'|"((?:[^"\\]|\\.)*)"|(\S+))\s+hook-check$/);
-  if (!match) return null;
-  if (match[1] !== undefined) return match[1];
-  if (match[2] !== undefined) return match[2].replace(/\\(["\\])/g, '$1');
-  return match[3];
+  const parsed = parseGraphifyHostHookCommand(command);
+  return parsed ? parsed.launcher : null;
 }
 
 function pythonHostIntegrationConfigured(repoRoot, host, runtimeContext) {
@@ -1515,17 +1563,24 @@ function pythonHostIntegrationConfigured(repoRoot, host, runtimeContext) {
   }
   if (host === 'claude' || host === 'codex') {
     const configPath = path.join(repoRoot, host === 'claude' ? '.claude/settings.json' : '.codex/hooks.json');
-    const expected = runtimeContext.graphifyCommand ? renderHookCheckCommand(runtimeContext.graphifyCommand) : null;
-    let commands;
+    if (!runtimeContext.graphifyCommand
+      || !(path.isAbsolute(runtimeContext.graphifyCommand) || path.win32.isAbsolute(runtimeContext.graphifyCommand))) {
+      return { ok: false, reason_code: 'graphify-host-launcher-mismatch' };
+    }
+    let hooks;
     try {
-      commands = graphifyHostHookCommands(JSON.parse(fs.readFileSync(configPath, 'utf8')));
+      hooks = graphifyHostHookEntries(JSON.parse(fs.readFileSync(configPath, 'utf8')));
     } catch (_error) {
       return { ok: false, reason_code: 'graphify-host-hook-config-invalid' };
     }
-    if (!runtimeContext.graphifyCommand
-      || !(path.isAbsolute(runtimeContext.graphifyCommand) || path.win32.isAbsolute(runtimeContext.graphifyCommand))
-      || commands.length !== 1
-      || commands[0] !== expected) {
+    if (hooks.length < 1) {
+      return { ok: false, reason_code: 'graphify-host-launcher-mismatch' };
+    }
+    // Every graphify host-hook entry must use the verified launcher. Verb/mode stay
+    // provider-owned (hook-check vs hook-guard search|read).
+    const expectedLauncher = runtimeContext.graphifyCommand;
+    const allLaunchersMatch = hooks.every((entry) => entry.launcher === expectedLauncher);
+    if (!allLaunchersMatch) {
       return { ok: false, reason_code: 'graphify-host-launcher-mismatch' };
     }
   }
@@ -1533,18 +1588,29 @@ function pythonHostIntegrationConfigured(repoRoot, host, runtimeContext) {
 }
 
 function graphifyHostHookCommands(parsed) {
-  const commands = [];
+  return graphifyHostHookEntries(parsed).map((entry) => entry.command);
+}
+
+function graphifyHostHookEntries(parsed) {
+  const entries = [];
   const events = parsed && parsed.hooks && Array.isArray(parsed.hooks.PreToolUse)
     ? parsed.hooks.PreToolUse
     : [];
   for (const event of events) {
-    const entries = event && Array.isArray(event.hooks) ? event.hooks : [];
-    for (const entry of entries) {
-      if (entry && entry.type === 'command' && typeof entry.command === 'string'
-        && parseHookCheckLauncher(entry.command)) commands.push(entry.command);
+    const hooks = event && Array.isArray(event.hooks) ? event.hooks : [];
+    for (const entry of hooks) {
+      if (!(entry && entry.type === 'command' && typeof entry.command === 'string')) continue;
+      const parsedCommand = parseGraphifyHostHookCommand(entry.command);
+      if (!parsedCommand) continue;
+      entries.push({
+        command: entry.command,
+        launcher: parsedCommand.launcher,
+        verb: parsedCommand.verb,
+        mode: parsedCommand.mode,
+      });
     }
   }
-  return commands;
+  return entries;
 }
 
 function normalizePythonGraphifyHooks(repoRoot, runtimeContext) {

@@ -66,7 +66,7 @@ spec-first 已有的相关能力:
 
 - **workspace 根 = 需求文件夹,是一个非 Git 父目录**,内含多个 child Git repo —— 结构上正是 006 处理的 "non-Git parent workspace",但叠加了短命 + 重叠维度;owner 已决定 per-需求 隔离、当前版本不做跨 workspace 复用。
 - **图 artifact 按需求 workspace 隔离**:CodeGraph 产物位于各 clone 内的 `.codegraph/`;Graphify 子图与合并图统一 out-of-tree 写入需求根 `.graphify/`。因此 `需求A/工程3` 与 `需求B/工程3` 仍各自生成独立图谱,不做缓存 / 软链 / 内容寻址复用。
-- **会话默认 cwd = 需求文件夹根(多仓父目录)**,而不是某个具体工程——resolver 必须把"cwd 在 workspace 根、尚未指向具体工程"当作常见起始态,再按后续 `cd` 或显式 target 路由。
+- **会话默认 cwd = 需求文件夹根(多仓父目录)**,而不是某个具体工程——路由(注入指令 + `projectPath`,非自建 resolver;见 A2)须把"cwd 在 workspace 根、尚未指向具体工程"当作常见起始态,再按后续 `cd` 或显式 target 尽量路由。
 - 需求文件夹名可能是中文/非 ASCII(`需求A`)——路径处理需 unicode-safe。
 
 关键特征:
@@ -98,7 +98,7 @@ spec-first 已有的相关能力:
 
 - **per-需求 隔离**:每个需求文件夹自成一体,不与其它需求共享图或身份。
 - **当前版本不考虑复用**:各 workspace 独立生成;同一工程在 `需求A/`、`需求B/` 各建各的,不做缓存 / 软链 / 内容寻址复用。
-- 从需求文件夹根进工具后,**`cd` 进哪个子仓就自动用哪个子仓的战术图**;需要跨仓时用 workspace 宏观图。
+- 从需求文件夹根进工具后,按 cwd **尽量(best-effort)**路由到对应子仓的战术图(A2 靠注入指令引导 agent 传 `projectPath`,非确定性 resolver);需要跨仓时用 workspace 宏观图。
 
 **真实 gap(要解决的):** 今天 `spec-mcp-setup` 以**单一 project root** 为中心,没有一等的方式从一个**非 Git 多仓父目录**一键建立"每仓战术图 + workspace 跨仓宏观图"并让两者自动保持新鲜;开发者要么逐仓手动配置,要么把父目录误当单仓。
 
@@ -107,6 +107,8 @@ spec-first 已有的相关能力:
 ## 4. Provider 建图 / 刷新能力与端到端验证
 
 > 基于本机已安装 `codegraph`(homebrew)与 `graphify 0.9.12` 的真实 CLI 能力核对;确定性事实,不随后续取舍改变。
+
+> **claim 1 / claim 2** = owner 在澄清中提出、本节据实核对的两条机制表述:**claim 1** = Graphify git / 非 git 都能建,git 下 commit 刷新、非 git 下由子 git 工程 commit 触发 hook 刷新 workspace 图;**claim 2** = CodeGraph 无需 Git、任何代码改动后延迟自动刷新。
 
 ### 4.1 已确认的端到端基线
 
@@ -151,7 +153,7 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 
 - **per-需求 隔离 ⇒ 用 per-workspace `merge-graphs`,不用机器级 `--global`。** 每个需求文件夹的 workspace 跨仓图落在该文件夹内,互不干扰。
 - **不复用 ⇒ 删掉一整类复杂度。** 无需跨 workspace 稳定 repo identity、无需内容寻址缓存 / 软链、无"同工程不同 commit 并存"冲突处理。之前担心的"缓存图填进新 clone 是否安全"硬门槛**随之消失**。
-- **分工:CodeGraph 做每仓战术图,Graphify 做 workspace 宏观图。** 契合两者本性(CodeGraph 符号 / 影响面;Graphify 结构 / 社区 / 路径),避免重复造图。
+- **分工:CodeGraph 做每仓战术图,Graphify 做 workspace 宏观图。** 契合两者本性(CodeGraph 符号 / 影响面;Graphify 结构 / 社区 / 路径),避免重复造图。Graphify 合并图相对"CodeGraph 多查 projectPath"的差异化:它是**一张**跨全部子仓的结构 / 路径整图,能答"跨服务谁依赖 X、跨仓调用路径"这类需要单张全局图的问题;projectPath 是分别查 N 张子图、不组装成一张。
 - **产物放置(已确认:owner 选“git 干净即可”)**:
   - CodeGraph 走**官方推荐 per-child**:每子仓 `工程N/.codegraph/`(物理在子仓内)+ 把 `.codegraph/` 写入该子仓 `.git/info/exclude` 保持 git 干净;**MCP server 全局 install 一次**;跨仓查询靠传 `projectPath`,**不建 CodeGraph 父目录单体图**。
   - Graphify 走 **out-of-tree**:`--out`/`GRAPHIFY_OUT` 把子图与合并图都写到 `需求A/.graphify/` 下,**子仓物理零侵入**。
@@ -162,7 +164,7 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 - **A1 Graphify = code-only**:宏观图用 `extract --code-only`(纯 AST、零 LLM key、可离线),合并图 = 各子仓 AST 图 union;**不含社区归纳/命名**(semantic 层 defer)。
 - **A2 路由 = 注入宿主指令 + `projectPath`**:向宿主注入一段路由指令(按 cwd/子仓传 CodeGraph `projectPath`,跨仓用 Graphify 合并图),复用 CodeGraph 原生 projectPath,不自建 resolver。
 - **A3 消费者 = 仅交互式 agent**:v1 只保证"图建好 + MCP/指令就位,交互式 agent 自动用",**不改 005 及其它 spec-first workflow**(留作后续 consumer)。
-- **A4 宿主 = 全五宿主**(claude/codex/cursor/kiro/qoder,以 `getSupportedPlatforms()` 为准)。⚠️ **已知落差**:CodeGraph 原生 `install` 只覆盖 Claude/Cursor/Codex(+opencode/Hermes),**不含 Kiro/Qoder** → 这两个宿主的 CodeGraph 需 spec-first adapter 或诚实降级,由 plan KTD 决定;Graphify `install` 覆盖含 kiro。
+- **A4 宿主 = 全五宿主**(claude/codex/cursor/kiro/qoder,以 `getSupportedPlatforms()` 为准)。⚠️ **已知落差**:CodeGraph 原生 `install` 只覆盖 Claude/Cursor/Codex(+opencode/Hermes),**不含 Kiro/Qoder**;Graphify `install` 覆盖含 kiro。**owner 决策**:五宿主为基线(符合 `getSupportedPlatforms()` 不变量),routing 注入覆盖五宿主;但 **Kiro/Qoder 的 CodeGraph 默认走诚实降级**(Graphify 仍覆盖),**v1 不为无确认消费者建 spec-first CodeGraph adapter**,该 adapter 显式 defer / opt-in。
 
 ---
 
@@ -173,14 +175,14 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 **A. 低摩擦批量 init(清单 + 自动发现)**
 
 - CR1. "照清单批量 init":owner 给出需求文件夹内仓清单(命令参数或 manifest),一条命令为全部子仓备齐 MCP + 图,免逐仓。
-- CR2. "自动发现补齐":扫需求文件夹发现清单外的子 Git 仓作为候选,保留一层轻确认防误收(vendor / build / 无关目录)。
+- CR2. "自动发现补齐":扫需求文件夹发现清单外的子 Git 仓作为候选,保留一层轻确认防误收(vendor / build / 无关目录)。发现必须 **symlink-contained**:realpath 逃逸出 workspace 根的候选一律拒绝 / 标记,不随 symlink 收录仓外目录。
 - CR3. init 对两种来源给出一致的批量结果与 per-repo 状态(ready / partial / failed + 原因)。
 
 **B. workspace 双层图建立(per-需求 隔离)**
 
 - CR4. 每个子仓建 CodeGraph 战术图 `工程N/.codegraph/`;`.codegraph/` 加入该子仓 `.git/info/exclude` 保持 git 干净;MCP server **全局 install 一次**,跨仓查询通过传 `projectPath` 命中对应子图(**不建 CodeGraph 父目录单体图**)。
 - CR5. Graphify 每子仓子图 + 需求文件夹一张 `merge-graphs` 合并图,全部用 `--out`/`GRAPHIFY_OUT` 写到 `需求A/.graphify/` 下(**子仓物理零侵入**,不写机器级 global)。建图用 `extract --code-only`(纯 AST、零 LLM key);合并图 = 各子仓 AST 图 union,不含社区归纳/命名(A1)。
-- CR6. 两层图与产物严格 scope 在当前需求文件夹内,不跨需求共享或串味。
+- CR6. 两层图与产物严格 scope 在当前需求文件夹内,不跨需求共享或串味。执行点:`projectPath` 解析须校验落在当前 workspace 根内(拒绝 / 告警指向他需求的 projectPath);跨 workspace query 为非目标。
 
 **C. 自动刷新**
 
@@ -190,13 +192,13 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 
 **D. cwd-aware 查询路由**
 
-- CR10. 从需求文件夹根进工具后,按 cwd / 显式 path 自动解析到唯一子仓的战术图;跨仓问题用 workspace 宏观图。路由通过**向宿主注入指令 + CodeGraph `projectPath`** 实现,不自建 resolver(A2)。
+- CR10. 从需求文件夹根进工具后,按 cwd / 显式 path 路由到对应子仓的战术图;跨仓问题用 workspace 宏观图。路由通过**向宿主注入指令 + CodeGraph `projectPath`** 实现,不自建 resolver(A2);是 **best-effort 指令引导、非确定性**:从子仓内启动或漏传 `projectPath` 时,兜底默认用所在子仓的 projectPath,doctor 应能检查 server root 有可用默认。
 - CR11. 解析歧义(同名仓 / 嵌套 root)时询问 owner,不静默选仓。
 
 **E. 诚实边界(继承 005/006/角色契约)**
 
 - CR12. 图输出始终 advisory;partial / stale / unmapped 空结果无否定权,重要结论回源。
-- CR13. workspace / parent 只拥有编排与图 artifact 权威,不获得子仓 Git / source mutation / finding / verification 权威。
+- CR13. workspace / parent 只拥有编排与图 artifact 权威,不获得子仓 Git / source mutation / finding / verification 权威。**唯一授权例外**:向子仓 `.git/info/exclude` 写入 `.codegraph/` 忽略行、及 `graphify hook install`——保持 git 干净 / 刷新所需的最小 Git-metadata 写入;写目标须经 realpath + containment 校验(拒 symlink 逃逸,复用 `assertContainedPath`),`clean` 只幂等移除 spec-first 自写的行 / 块,不碰用户内容。此例外不构成对子仓 source / finding / verification 的权威。
 
 **当前版本明确不做(deferred):** 跨 workspace 图复用、内容寻址缓存、软链挂载、机器级 global graph。
 
@@ -296,5 +298,6 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
    - 确定 manifest schema、写入位置、是否 checkin 及其 freshness / drift 语义;
    - 明确批量 init、doctor、clean、失败隔离和恢复合同;
    - 明确五宿主 projection,以及 Kiro/Qoder 的 adapter / degraded 行为;
-   - 可选评估 `CODEGRAPH_DIR` out-of-tree,但不得阻塞已验证主路径。
+   - 可选评估 `CODEGRAPH_DIR` out-of-tree,但不得阻塞已验证主路径;
+   - 新 plan 定稿后给 006 打 `superseded-for-this-scenario` / vision-only 标记,避免两套生命周期心智模型并存。
 3. 复杂度已因 per-需求 隔离 + 不复用大幅下降,plan 规模应远小于 006。

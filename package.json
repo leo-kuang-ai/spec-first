@@ -100,6 +100,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "dependencies": {
+    "js-yaml": "^4.3.0"
+  },
   "devDependencies": {
     "jest": "^29.0.0"
   }

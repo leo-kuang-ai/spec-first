@@ -170,7 +170,7 @@ function printHelp(withErrorPrefix = false) {
     '  doctor                 Check environment, runtime asset manifest, and managed runtime assets',
     '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
     '  update                 Upgrade the spec-first CLI package and refresh runtime assets with `spec-first init`',
-    '  clean (--claude|--codex|--cursor|--kiro|--qoder) Remove spec-first managed assets from the current project',
+    '  clean (--claude|--codex|--cursor|--kiro|--qoder) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',
     '  repair-worktree        Preview broken worktree pointer repair guidance',
     '  tasks <subcommand>      Hash and validate derived task packs',
     '  session <subcommand>    Opt-in multi-actor session advisory (register|list|heartbeat|unregister)',

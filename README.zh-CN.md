@@ -87,6 +87,8 @@ Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Chan
 
 Graphify 当前固定为 PyPI `graphifyy@0.9.12`，需要预先存在 Python `>=3.10` 与 `uv`（优先）或 `pipx`。Setup 不自动安装 Python/tool manager，也不使用 plain pip；它会验证 direct wheel hash 与 package identity，通过 `extract --code-only` 在 `.graphify/` 生成本地 AST 图，并始终把 Graphify 输出视为 advisory navigation。显式Graphify mutation setup在Python cutover完整verified后，会默认卸载已确认的全局`@sentropic/graphify` incumbent，并且只删除被证明指向该npm package的旧launcher symlink；诊断、plan和verify-only仍保持只读。
 
+在**按需求组织的非 Git 多仓父目录**（一个需求文件夹里放多套独立 clone 的子 Git 仓）中，`spec-mcp-setup --only codegraph,graphify --workspace-graph` 会一次性为每个子仓建 CodeGraph 战术图（`.codegraph/` 经 `.git/info/exclude` 保持子仓 git 干净）、为整个 workspace 建一张 Graphify 跨仓合并图（out-of-tree 写入 `需求文件夹/.graphify/`，子仓零侵入），跨仓查询通过 `projectPath`。可用 `--workspace-graph-status` 只读汇总 child/workspace 图状态（default `projectPath` containment 为 advisory），用 `--workspace-graph-clean` 或宿主 `spec-first clean --workspace-graph` 幂等清理 managed 图产物、exclude 块、hook 与路由块。仓集来自 `--repos` 清单、`.spec-first/workspace.yaml` manifest 或经确认的自动发现。每个需求文件夹 per-需求 隔离、不复用其它需求的图，图输出仍是 advisory candidate、结论回子仓源码确认。
+
 
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
 

@@ -646,6 +646,52 @@ describe('Graphify provider', () => {
     });
   });
 
+  test('accepts graphifyy 0.9.12 Claude dual hook-guard entries and rewrites only the launcher', () => {
+    const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
+    const target = tempRepo('graphify-python-claude-hook-guard');
+    const launcher = path.join(target, 'tools', 'graphify');
+    fs.mkdirSync(path.join(target, '.claude', 'skills', 'graphify'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.claude', 'skills', 'graphify', 'SKILL.md'), 'Read .graphify/graph.json\n');
+    fs.writeFileSync(path.join(target, '.claude', 'CLAUDE.md'), 'Use .graphify/\n');
+    fs.writeFileSync(path.join(target, 'CLAUDE.md'), '## graphify\nUse .graphify/\n');
+    // Real graphifyy@0.9.12 shape observed in dogfood: two PreToolUse matchers, hook-guard search|read.
+    fs.writeFileSync(path.join(target, '.claude', 'settings.json'), JSON.stringify({
+      hooks: {
+        PreToolUse: [
+          {
+            matcher: 'Bash',
+            hooks: [{ type: 'command', command: '/wrong/bin/graphify hook-guard search' }],
+          },
+          {
+            matcher: 'Read|Glob',
+            hooks: [{ type: 'command', command: '/wrong/bin/graphify hook-guard read' }],
+          },
+        ],
+      },
+    }));
+
+    provider.normalizePythonHostIntegration(target, 'claude', { graphifyCommand: launcher });
+
+    const settings = JSON.parse(fs.readFileSync(path.join(target, '.claude', 'settings.json'), 'utf8'));
+    const commands = settings.hooks.PreToolUse.flatMap((event) => event.hooks.map((h) => h.command));
+    expect(commands).toEqual([
+      `'${launcher}' hook-guard search`,
+      `'${launcher}' hook-guard read`,
+    ]);
+    expect(provider.pythonHostIntegrationConfigured(target, 'claude', { graphifyCommand: launcher })).toMatchObject({
+      ok: true,
+      mode: 'provider-native',
+    });
+
+    // Stale launcher on only one of the two entries still fails.
+    settings.hooks.PreToolUse[1].hooks[0].command = `'/stale/graphify' hook-guard read`;
+    fs.writeFileSync(path.join(target, '.claude', 'settings.json'), JSON.stringify(settings));
+    expect(provider.pythonHostIntegrationConfigured(target, 'claude', { graphifyCommand: launcher })).toMatchObject({
+      ok: false,
+      reason_code: 'graphify-host-launcher-mismatch',
+    });
+  });
+
   test('treats Cursor as rule-only and Qoder as a spec-first adapter', () => {
     const provider = require('../../skills/spec-mcp-setup/scripts/providers/graphify.cjs');
     const cursor = tempRepo('graphify-python-cursor-host');

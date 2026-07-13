@@ -269,6 +269,10 @@ function printHelp() {
     'Claude Code plugin, upgrade it with `claude plugin update` inside Claude Code instead —',
     'npm -g manages a separate copy.',
     '',
+    'Per-requirement multi-repo graphs are not rebuilt by `update`. After upgrading, re-run',
+    '`spec-mcp-setup --only codegraph,graphify --workspace-graph` from the requirement folder',
+    'to rebuild graphs, or `spec-first clean --workspace-graph` to remove managed graph assets.',
+    '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
   ].join('\n'));

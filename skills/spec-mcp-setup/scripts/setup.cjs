@@ -49,6 +49,15 @@ const {
   runWorkspaceBatch,
 } = require('./lib/workspace-executor.cjs');
 const {
+  runWorkspaceGraphBuild,
+} = require('./lib/workspace-graph-executor.cjs');
+const {
+  runWorkspaceGraphClean,
+} = require('./lib/workspace-graph-clean.cjs');
+const {
+  runWorkspaceGraphStatus,
+} = require('./lib/workspace-graph-status.cjs');
+const {
   dependencyFor,
   interpolateArgs,
   probeHelper,
@@ -211,7 +220,26 @@ function runSetup(input = {}) {
 
   try {
     if (target.mode === 'workspace-all-repos' && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
+      // Clean/status are read/mutation counterparts under the same workspace-graph domain.
+      // Prefer clean/status over build when both flags appear (clean first, then status).
+      if (actionPlan.args.workspaceGraphClean) {
+        return runWorkspaceGraphCleanSetup(context);
+      }
+      if (actionPlan.args.workspaceGraphStatus) {
+        return runWorkspaceGraphStatusSetup(context);
+      }
+      if (actionPlan.args.workspaceGraph) {
+        return runWorkspaceGraphSetup(context);
+      }
       return runWorkspaceBatch(context, { runSingleTarget });
+    }
+    // Status is also allowed in bare/check modes for a non-Git workspace (read-only).
+    if (
+      target.mode === 'workspace-all-repos'
+      && actionPlan.args.workspaceGraphStatus
+      && ['bare', 'check'].includes(actionPlan.mode)
+    ) {
+      return runWorkspaceGraphStatusSetup(context);
     }
     return runSingleTarget(context, target.target_root || cwd);
   } catch (error) {
@@ -220,6 +248,92 @@ function runSetup(input = {}) {
       target,
     });
   }
+}
+
+function runWorkspaceGraphSetup(context) {
+  const { actionPlan, cwd, target } = context;
+  const result = runWorkspaceGraphBuild({
+    cwd,
+    repos: actionPlan.args.repos || [],
+    // exec is injectable for tests; undefined falls back to spawnSync inside the executor.
+    exec: context.workspaceExec,
+    hosts: context.host ? [context.host] : ['claude', 'codex'],
+  });
+  const exitCode = result.status === 'failed' ? 1 : 0;
+  const detail = result.reason_code ? ` (${result.reason_code})` : '';
+  return {
+    exit_code: exitCode,
+    mode: actionPlan.mode,
+    reason_code: result.reason_code || (result.status === 'complete' ? '' : result.status),
+    payload: result,
+    human: `Workspace 双层图构建：${result.status}${detail}\n`,
+    target,
+  };
+}
+
+function runWorkspaceGraphCleanSetup(context) {
+  const { actionPlan, cwd, target } = context;
+  const result = runWorkspaceGraphClean({
+    cwd,
+    repos: actionPlan.args.repos || [],
+    exec: context.workspaceExec,
+    hosts: context.host
+      ? [context.host]
+      : ['claude', 'codex', 'cursor', 'kiro', 'qoder'],
+  });
+  const exitCode = result.status === 'failed' ? 1 : 0;
+  const detail = result.reason_code ? ` (${result.reason_code})` : '';
+  return {
+    exit_code: exitCode,
+    mode: actionPlan.mode,
+    reason_code: result.reason_code || (result.status === 'complete' ? '' : result.status),
+    payload: result,
+    human: `Workspace 双层图清理：${result.status}${detail}\n`,
+    target,
+  };
+}
+
+function runWorkspaceGraphStatusSetup(context) {
+  const { actionPlan, cwd, target } = context;
+  const result = runWorkspaceGraphStatus({
+    cwd,
+    repos: actionPlan.args.repos || [],
+  });
+  // Status is diagnostic: absent/partial still exit 0 so doctor-style consumers can read the envelope.
+  return {
+    exit_code: 0,
+    mode: actionPlan.mode,
+    reason_code: result.reason_code || '',
+    payload: result,
+    human: renderWorkspaceGraphStatusHuman(result),
+    target,
+  };
+}
+
+function renderWorkspaceGraphStatusHuman(result) {
+  if (result.status === 'skipped') {
+    return `Workspace 双层图状态：skipped (${result.reason_code || result.topology})\n`;
+  }
+  const lines = [
+    `Workspace 双层图状态：${result.status}`,
+    `  root: ${result.workspace_root}`,
+  ];
+  for (const repo of result.repos || []) {
+    lines.push(
+      `  child ${repo.repo_id}: codegraph=${repo.codegraph_present ? 'yes' : 'no'}`
+        + ` projectPath_contained=${repo.project_path_contained}`,
+    );
+  }
+  if (result.workspace) {
+    lines.push(
+      `  workspace graphify: ${result.workspace.merged_present ? 'merged' : (result.workspace.graphify_present ? 'partial' : 'absent')}`,
+    );
+  }
+  if (result.default_project_path) {
+    lines.push(`  default projectPath: ${result.default_project_path}`);
+  }
+  lines.push(`  note: ${result.server_root_default_note || 'pass projectPath for CodeGraph queries'}`);
+  return `${lines.join('\n')}\n`;
 }
 
 function runSingleTarget(context, repoRoot) {

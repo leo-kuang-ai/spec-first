@@ -177,6 +177,33 @@ Use `--only codegraph`, `--only graphify`, `--only codegraph,graphify`, or Graph
 2. Host conflict 仍需独立 `--repair-host-config` 授权；higher-precedence、unsafe path、unreadable config 和 literal secret 永远 fail closed。
 3. 子集成功只证明所选 scope ready。最终完整 setup readiness 仍以 `spec-mcp-setup --verify-only` 对全部 required items 的结果为准。
 
+## Per-Requirement Workspace Graph (Multi-Repo)
+
+从一个**非 Git 的需求文件夹**(多仓父目录,内含多个独立 clone 的子 Git 仓)运行 setup 时,先分清两条路径:
+
+1. **子仓 provider/MCP setup**(各 child 的 CodeGraph/Graphify/host config):`--all-repos` 或 `--repo <child>`。
+2. **父目录双层图**(per-child CodeGraph + workspace Graphify merge):`--workspace-graph --repos a,b,...` 或 `.spec-first/workspace.yaml` manifest。  
+   **不要**写 `--workspace-graph --all-repos`——`--all-repos` 只服务子仓 batch,不是 workspace-graph 的仓集确认。
+
+运行 `spec-mcp-setup --only codegraph,graphify --workspace-graph` 时,setup 会为该 workspace 建立两层代码图:
+
+1. **每子仓战术图**:`codegraph init` 生成 `工程N/.codegraph/`;`.codegraph/` 写入该子仓 `.git/info/exclude`(经 `git rev-parse --git-path` 解析,正确处理 `.git`-as-file/worktree,并做 realpath+containment 校验)以保持子仓 `git status` 干净;CodeGraph MCP server 全局 install 一次,跨仓查询通过 `projectPath`。
+2. **workspace 跨仓宏观图**:Graphify `extract --code-only` 每子仓子图 + `merge-graphs` 合并图,全部 out-of-tree 写到 `需求文件夹/.graphify/`(子仓物理零侵入)。单/零子仓分别产出 single-source / not-applicable。
+
+仓集来源:`--repos <a,b>` 清单(确认)、`需求文件夹/.spec-first/workspace.yaml` manifest(确认),或自动发现(仅作候选,需确认后才建)。
+
+相关 flag(同一 workspace-graph 域):
+
+| Flag | 作用 |
+| --- | --- |
+| `--workspace-graph` | 一次性建双层图 + 注入路由块 + 安装子仓 Graphify hook |
+| `--workspace-graph-status` | 只读汇总各 child/workspace 图状态、default `projectPath` containment(advisory)、路由块是否已注入;不调用 provider 二进制 |
+| `--workspace-graph-clean` | 幂等清理:删子仓 `.codegraph/`、只移除 spec-first managed exclude 块、`graphify hook uninstall`、删 `需求/.graphify/`、剥离路由 managed block;不强制 kill CodeGraph daemon(回报清理动作)。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
+
+**边界(per-需求 隔离)**:每个需求文件夹自成一体,不复用其它需求的图,不写机器级 global graph;`projectPath` 解析限定当前 workspace 根内;discovery 与所有 Git-metadata 写入均 symlink-contained;图输出是 advisory candidate,结论回子仓源码确认。删除需求文件夹即清空其图(无机器级残留)。
+
+从当前 Git repo(非父 workspace)运行 `--workspace-graph*` 会被跳过(该能力面向非 Git 多仓父目录)。
+
 ## Workflow
 
 1. Identify the current host from the generated host-specific runtime surface invoking the unified `spec-mcp-setup` entrypoint. The target renamed entrypoint is `spec-runtime-setup` once the alias contract lands.

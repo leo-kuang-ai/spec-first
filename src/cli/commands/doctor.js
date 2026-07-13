@@ -467,7 +467,118 @@ function buildDoctorCommonChecks(projectRoot) {
     checkGit(),
     checkPluginManifest(),
     checkGlobalDeveloper(projectRoot),
+    checkWorkspaceGraphStatus(projectRoot),
   ].filter(Boolean);
+}
+
+// U4 / CR10 — advisory workspace-graph surface for non-Git multi-repo requirement
+// parents. Never ERROR: absent graphs are a setup next-action, not a host-runtime
+// failure. Single-repo / git cwd projects skip this check (return null).
+function checkWorkspaceGraphStatus(projectRoot, deps = {}) {
+  let runStatus;
+  try {
+    runStatus = deps.runWorkspaceGraphStatus
+      || require('../../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
+  } catch (_error) {
+    return {
+      level: 'WARNING',
+      name: 'workspace graph',
+      message: 'workspace-graph status module unavailable',
+      fix: 'Ensure skills/spec-mcp-setup is present in this package install.',
+      reasonCode: 'workspace-graph-status-unavailable',
+    };
+  }
+
+  let status;
+  try {
+    status = runStatus({ cwd: projectRoot, allowDiscovery: true });
+  } catch (error) {
+    return {
+      level: 'WARNING',
+      name: 'workspace graph',
+      message: `workspace-graph status failed: ${error instanceof Error ? error.message : String(error)}`,
+      fix: 'Inspect the requirement workspace root, then retry or run `spec-mcp-setup --only codegraph,graphify --workspace-graph-status`.',
+      reasonCode: 'workspace-graph-status-failed',
+    };
+  }
+
+  if (!status || status.status === 'skipped') {
+    // Not a requirement workspace — host doctor stays silent.
+    return null;
+  }
+
+  const childReady = Array.isArray(status.repos)
+    ? status.repos.filter((repo) => repo.codegraph_present).length
+    : 0;
+  const childTotal = Array.isArray(status.repos) ? status.repos.length : 0;
+  const merged = Boolean(status.workspace && status.workspace.merged_present);
+  const defaultPath = status.default_project_path
+    ? ` default projectPath=${status.default_project_path}`
+    : ' default projectPath unavailable';
+  const defaultNote = status.default_project_path_contained === false
+    ? ' (projectPath containment failed — advisory)'
+    : '';
+
+  if (status.status === 'ready') {
+    return {
+      level: 'PASS',
+      name: 'workspace graph',
+      message: `ready (${childReady}/${childTotal} child CodeGraph; merged Graphify present).${defaultPath}${defaultNote}. Advisory only — confirm conclusions against child source.`,
+      reasonCode: 'workspace-graph-ready',
+      advisory: true,
+      workspace_graph: summarizeWorkspaceGraphForDoctor(status),
+    };
+  }
+
+  if (status.status === 'needs-confirmation') {
+    return {
+      level: 'WARNING',
+      name: 'workspace graph',
+      message: `child repos need confirmation before build (${(status.pending_confirm || []).join(', ') || 'discovered'}).`,
+      fix: 'Pass `--repos a,b` or add `.spec-first/workspace.yaml`, then run `spec-mcp-setup --only codegraph,graphify --workspace-graph`.',
+      reasonCode: 'workspace-graph-needs-confirmation',
+      advisory: true,
+      workspace_graph: summarizeWorkspaceGraphForDoctor(status),
+    };
+  }
+
+  if (status.status === 'partial') {
+    return {
+      level: 'WARNING',
+      name: 'workspace graph',
+      message: `partial (${childReady}/${childTotal} child CodeGraph; merged=${merged}).${defaultPath}${defaultNote}. Empty/partial results have no negative authority.`,
+      fix: 'Re-run `spec-mcp-setup --only codegraph,graphify --workspace-graph` from this requirement folder; use `--workspace-graph-status` for details.',
+      reasonCode: 'workspace-graph-partial',
+      advisory: true,
+      workspace_graph: summarizeWorkspaceGraphForDoctor(status),
+    };
+  }
+
+  // absent or other non-ready statuses
+  return {
+    level: 'WARNING',
+    name: 'workspace graph',
+    message: `no managed two-layer graph yet (${status.status}).${defaultPath}${defaultNote}`,
+    fix: 'From this non-Git multi-repo requirement folder run `spec-mcp-setup --only codegraph,graphify --workspace-graph [--repos a,b]`. Clean with `spec-first clean --workspace-graph`.',
+    reasonCode: 'workspace-graph-absent',
+    advisory: true,
+    workspace_graph: summarizeWorkspaceGraphForDoctor(status),
+  };
+}
+
+function summarizeWorkspaceGraphForDoctor(status) {
+  return {
+    status: status.status,
+    workspace_root: status.workspace_root,
+    child_count: Array.isArray(status.repos) ? status.repos.length : 0,
+    children_with_codegraph: Array.isArray(status.repos)
+      ? status.repos.filter((repo) => repo.codegraph_present).length
+      : 0,
+    merged_present: Boolean(status.workspace && status.workspace.merged_present),
+    default_project_path: status.default_project_path || null,
+    default_project_path_contained: Boolean(status.default_project_path_contained),
+    server_root_default_note: status.server_root_default_note || '',
+  };
 }
 
 function buildDoctorReport({ projectRoot, platforms }) {
@@ -1127,6 +1238,9 @@ function printHelp() {
 	    '  When setup facts exist, doctor reads .spec-first/config/tool-facts.json for decision_input_health.',
     '  MCP/helper setup is handled by the matching `spec-mcp-setup` workflow entrypoint.',
 	    '  target name: spec-runtime-setup, pending host alias contract.',
+	    '  On a non-Git multi-repo requirement parent, doctor also reports advisory workspace-graph status',
+	    '  (per-child CodeGraph / workspace Graphify merge / default projectPath). Detail and mutation stay under',
+	    '  `spec-mcp-setup --workspace-graph*` and `spec-first clean --workspace-graph`.',
 	    '',
 	    '🔗 Repository:',
 	    '  https://github.com/sunrain520/spec-first',
@@ -1208,4 +1322,7 @@ function tryReadRawManagedState(projectRoot, adapter) {
 module.exports = {
   runDoctor,
   detectPlatforms,
+  checkWorkspaceGraphStatus,
+  buildDoctorCommonChecks,
+  buildDoctorReport,
 };

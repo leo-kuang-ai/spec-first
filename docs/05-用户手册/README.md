@@ -8,12 +8,15 @@
 
 完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `spec-*` workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
 
-当前推荐的事实准备、专项审查与知识沉淀入口：
+当前推荐的事实准备、专项审查、治理与知识沉淀入口：
 
+- `using-spec-first`：入口路由治理（standalone；只选下一步，不写 artifact）
 - `spec-mcp-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
 - `spec-app-consistency-audit`：移动 App 的 PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查入口
-- `retired-skill-review`：source skill 质量、治理投递、runtime drift 与安全信号审计入口
-- `spec-compound`：工作完成后的稳定知识捕获入口
+- `spec-write-skill`：创建 / 修改 / 迁移项目拥有的 Agent Skill package，或只读 readiness 校验
+- `spec-dogfood` / `spec-polish`：分支/PR 浏览器 QA 与 UI polish
+- `spec-compound` / `spec-compound-refresh`：工作完成后的稳定知识捕获与 learnings 刷新
+- 完整公开 / standalone / internal 清单见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)
 
 当前功能状态：
 
@@ -40,7 +43,7 @@
 
 - 一个前置的 `spec-ideate` 候选发散入口
 - 跨宿主统一的 `spec-*` workflow 入口
-- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、source skill 审计入口 `retired-skill-review`，以及知识沉淀入口 `spec-compound`
+- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、skill 包治理入口 `spec-write-skill`，以及知识沉淀入口 `spec-compound`（完整清单见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)）
 - 一条 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 的标准闭环
 - 项目级 `.claude/commands/spec-*.md`
 - 项目级 `.claude/skills`、`.claude/spec-first/workflows` 与 `.claude/agents`
@@ -59,19 +62,21 @@
 主链路可以从 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 理解，但当前用户手册覆盖的是更完整的工程闭环：
 
 ```text
-mcp-setup
-  -> ideate
-  -> brainstorm
-  -> doc-review
+using-spec-first（入口路由，可选）
+  -> mcp-setup（环境/MCP 需要时）
+  -> ideate / brainstorm / prd / doc-review
   -> plan
-  -> write-tasks
-  -> work / debug / optimize / polish
+  -> write-tasks（可选）
+  -> work / debug / optimize / polish / dogfood
   -> code-review / app-consistency-audit
-  -> compound / compound-refresh / sessions / slack-research / skill-review
+  -> compound / compound-refresh
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
+旁路（按意图直接进入，非主链路状态）：
+  write-skill | explain | pov | strategy | rule-miner | simplify-code
+  | product-pulse | sweep | riffrec-feedback-analysis | promote | lfg（仅显式）
 ```
 
-这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由入口治理推荐一个公开 workflow。`write-tasks` 是可选派生 workflow，入口是 `spec-write-tasks`；它不替代 source plan，也不是强制阶段。
+这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由 `using-spec-first` 推荐一个公开入口。`write-tasks` 是可选派生 workflow，入口是 `spec-write-tasks`；它不替代 source plan，也不是强制阶段。完整入口表见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)。skill 包治理入口为 `spec-write-skill`。
 
 当外部工具或 setup facts 缺失时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation；不要把缺失证据包装成成功证据，也不要把 setup 当成所有 workflow 的硬前置。
 
@@ -120,11 +125,12 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 9. [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 10. [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
 11. [spec-prd 当前执行逻辑与流程图](./23-spec-prd当前执行逻辑.md)
-12. [常见问题](./04-常见问题.md)
-13. [最佳实践](./05-最佳实践.md)
-14. [三种开发模式](./08-三种开发模式.md)
-15. [本地源码安装](./06-本地源码安装.md)
-16. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
+12. [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)
+13. [常见问题](./04-常见问题.md)
+14. [最佳实践](./05-最佳实践.md)
+15. [三种开发模式](./08-三种开发模式.md)
+16. [本地源码安装](./06-本地源码安装.md)
+17. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
 
 ## 建议阅读路径
 
@@ -135,6 +141,7 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 - 如果你要判断 OpenSpec 和 spec-first 在不同项目阶段怎么取舍，先看 [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 - 如果产品或 owner 已经给出 PRD、需求材料、会议纪要、设计说明或系统增量说明，你要在进入研发 planning 前澄清 WHAT/WHY、owner 决策和计划准入条件，先看 [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
 - 如果你要快速理解当前 `spec-prd` 从输入、模板选择、grill、Decision Card 到 checker/finalize 和 handoff 的实际执行逻辑，看 [spec-prd 当前执行逻辑与流程图](./23-spec-prd当前执行逻辑.md)
+- 如果你要查当前全部公开 workflow、standalone skill 与 internal helper 清单，看 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)
 - 如果你要确认真实执行过程，看 [完整示例](./03-完整示例.md)
 - 如果你要判断某个文档或 runtime 目录该不该手改、该不该提交，先看 [产物目录](./10-产物目录.md)
 - 如果你要判断当前仓库属于哪类研发场景、dirty / multi-repo / non-git build target 该如何降级，先看 [研发场景与降级路径](./20-研发场景与降级路径.md)
@@ -146,6 +153,6 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 
 ## 版本
 
-本手册对应当前 `spec-first` 代码与运行时资产布局。当前版本以 `spec-first -v` 与 `package.json` 的 `version` 字段为单一真相源（撰写时为 `v1.11.0`），手册不再单独维护版本号以避免漂移。
+本手册对应当前 `spec-first` 代码与运行时资产布局。当前版本以 `spec-first -v` 与 `package.json` 的 `version` 字段为单一真相源（撰写时为 `v1.13.2`），手册不再单独维护版本号以避免漂移。
 
 > 说明：遇到行为疑问时，优先以 source-of-truth 文件、CLI contract 和本手册当前章节为准。

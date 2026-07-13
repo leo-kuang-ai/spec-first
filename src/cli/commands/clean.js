@@ -22,7 +22,7 @@ const {
   validateClaudeSettingsFile,
 } = require('../claude-settings');
 
-function runClean(argv) {
+function runClean(argv, deps = {}) {
   const args = [...argv];
   const parsed = parseCleanArgs(args);
 
@@ -35,6 +35,10 @@ function runClean(argv) {
     return runWorkspaceOrphansClean(parsed);
   }
 
+  if (parsed.workspaceGraph) {
+    return runWorkspaceGraphCleanCommand(parsed, deps);
+  }
+
   if (parsed.confirm) {
     console.error('Error: --confirm is only valid with --workspace-orphans.');
     return 2;
@@ -44,6 +48,7 @@ function runClean(argv) {
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
     console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]');
+    console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
 
@@ -132,11 +137,14 @@ function parseCleanArgs(argv) {
     qoder: false,
     dryRun: false,
     workspaceOrphans: false,
+    workspaceGraph: false,
+    repos: [],
     confirm: false,
     unknown: [],
   };
 
-  for (const arg of argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
     if (arg === '-h' || arg === '--help') {
       parsed.help = true;
     } else if (arg === '--claude') {
@@ -153,14 +161,134 @@ function parseCleanArgs(argv) {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
       parsed.workspaceOrphans = true;
+    } else if (arg === '--workspace-graph') {
+      parsed.workspaceGraph = true;
     } else if (arg === '--confirm') {
       parsed.confirm = true;
+    } else if (arg === '--repos' || arg.startsWith('--repos=')) {
+      let value = null;
+      if (arg.startsWith('--repos=')) {
+        value = arg.slice('--repos='.length);
+      } else {
+        value = argv[index + 1];
+        if (value !== undefined && !String(value).startsWith('--')) {
+          index += 1;
+        } else {
+          value = null;
+        }
+      }
+      if (!value) {
+        parsed.unknown.push(arg);
+      } else {
+        const selected = String(value).split(',').map((entry) => entry.trim()).filter(Boolean);
+        parsed.repos.push(...selected);
+      }
     } else {
       parsed.unknown.push(arg);
     }
   }
 
   return parsed;
+}
+
+// Host-level counterpart of `spec-mcp-setup --workspace-graph-clean` (U6 / AE8).
+// Cleans managed per-requirement workspace graph assets only; does not touch host
+// runtime mirrors (those stay under clean --claude|--codex|...).
+function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
+  if (parsed.unknown.length > 0) {
+    console.error('Usage: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
+    return 2;
+  }
+  if (parsed.claude || parsed.codex || parsed.cursor || parsed.kiro || parsed.qoder) {
+    console.error('Error: --workspace-graph cannot be combined with host flags.');
+    console.error('Workspace graph cleanup is separate from host runtime asset cleanup.');
+    return 2;
+  }
+  if (parsed.confirm) {
+    console.error('Error: --confirm is only valid with --workspace-orphans.');
+    return 2;
+  }
+
+  const projectRoot = deps.cwd || process.cwd();
+  const runStatus = deps.runWorkspaceGraphStatus || requireWorkspaceGraphStatus();
+  const runCleanGraph = deps.runWorkspaceGraphClean || requireWorkspaceGraphClean();
+  const exec = deps.workspaceExec; // injectable for tests; undefined → real spawnSync inside clean
+
+  if (parsed.dryRun) {
+    const status = runStatus({
+      cwd: projectRoot,
+      repos: parsed.repos,
+      allowDiscovery: parsed.repos.length === 0,
+    });
+    printWorkspaceGraphCleanPreview(status);
+    return 0;
+  }
+
+  const result = runCleanGraph({
+    cwd: projectRoot,
+    repos: parsed.repos,
+    allowDiscovery: parsed.repos.length === 0,
+    exec,
+  });
+
+  if (result.status === 'skipped') {
+    console.log(`Workspace graph clean skipped (${result.reason_code || result.topology}).`);
+    console.log('This mode only applies to a non-Git multi-repo requirement parent folder.');
+    return 0;
+  }
+
+  console.log(`Workspace graph clean: ${result.status}`);
+  console.log(`  root: ${result.workspace_root}`);
+  for (const repo of result.repos || []) {
+    console.log(
+      `  child ${repo.repo_id}: codegraph_removed=${repo.codegraph_removed}`
+        + ` exclude_removed=${repo.exclude_removed}`
+        + ` hook=${repo.hook_uninstalled}`,
+    );
+  }
+  console.log(`  workspace .graphify removed: ${Boolean(result.workspace_graphify_removed)}`);
+  if (result.routing && Array.isArray(result.routing.entries)) {
+    for (const entry of result.routing.entries) {
+      console.log(`  routing ${entry.entry_file}: ${entry.status}`);
+    }
+  }
+  if (result.codegraph_daemon_action) {
+    console.log(`  daemon: ${result.codegraph_daemon_action}`);
+  }
+  return result.status === 'failed' ? 1 : 0;
+}
+
+function printWorkspaceGraphCleanPreview(status) {
+  console.log('Dry run: spec-first clean --workspace-graph');
+  if (status.status === 'skipped') {
+    console.log(`Would skip (${status.reason_code || status.topology}).`);
+    return;
+  }
+  console.log(`  root: ${status.workspace_root}`);
+  for (const repo of status.repos || []) {
+    if (repo.codegraph_present) {
+      console.log(`  would remove: ${path.join(repo.git_root, '.codegraph')}`);
+    }
+    console.log(`  would strip managed exclude block in: ${repo.repo_id}`);
+    console.log(`  would run: graphify hook uninstall (cwd=${repo.repo_id})`);
+  }
+  if (status.workspace && status.workspace.graphify_present) {
+    console.log(`  would remove: ${status.workspace.graphify_dir}`);
+  }
+  for (const entry of (status.routing && status.routing.entries) || []) {
+    if (entry.has_routing_block) {
+      console.log(`  would strip routing block from: ${entry.entry_file}`);
+    }
+  }
+  console.log('No files were changed.');
+}
+
+function requireWorkspaceGraphClean() {
+  return require('../../../skills/spec-mcp-setup/scripts/lib/workspace-graph-clean.cjs').runWorkspaceGraphClean;
+}
+
+function requireWorkspaceGraphStatus() {
+  return require('../../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
 }
 
 function runWorkspaceOrphansClean(parsed) {
@@ -372,8 +500,10 @@ function printHelp() {
     '📘 Usage:',
     '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
+    '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
     'Workspace orphan cleanup previews parent quarantine evidence by default; add --confirm to delete supported orphan paths.',
+    'Workspace graph cleanup removes managed per-requirement graph assets (child .codegraph/, exclude block, graphify hooks, workspace .graphify/, routing markers) without touching host runtime mirrors.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
@@ -478,4 +608,6 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
 
 module.exports = {
   runClean,
+  parseCleanArgs,
+  runWorkspaceGraphCleanCommand,
 };
