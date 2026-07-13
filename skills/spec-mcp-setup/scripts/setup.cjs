@@ -164,7 +164,7 @@ function runSetup(input = {}) {
     folder: actionPlan.args.folder,
     allRepos: actionPlan.args.allRepos,
   });
-  if (!target.state_write_allowed && !['bare', 'check', 'plan'].includes(actionPlan.mode)) {
+  if (!target.state_write_allowed && actionPlan.mutation) {
     return {
       exit_code: 2,
       mode: actionPlan.mode,
@@ -223,13 +223,13 @@ function runSetup(input = {}) {
   };
 
   try {
+    if (actionPlan.args.workspaceGraphStatus) {
+      return runWorkspaceGraphStatusSetup(context);
+    }
     if (target.mode === 'workspace-all-repos') {
       // Clean/status/build under the workspace-graph domain (mutation modes + bare/check status).
       if (actionPlan.args.workspaceGraphClean) {
         return runWorkspaceGraphCleanSetup(context);
-      }
-      if (actionPlan.args.workspaceGraphStatus) {
-        return runWorkspaceGraphStatusSetup(context);
       }
       if (actionPlan.args.workspaceGraph) {
         return runWorkspaceGraphSetup(context);
@@ -294,8 +294,8 @@ function runWorkspaceGraphSetup(context) {
 }
 
 function workspaceMutationExitCode(status) {
-  if (status === 'complete' || status === 'skipped') return 0;
-  if (status === 'needs-confirmation') return 2;
+  if (status === 'complete') return 0;
+  if (status === 'needs-confirmation' || status === 'skipped') return 2;
   return 1;
 }
 
@@ -326,7 +326,7 @@ function runWorkspaceGraphStatusSetup(context) {
   });
   // Status is diagnostic: absent/partial still exit 0 so doctor-style consumers can read the envelope.
   return {
-    exit_code: 0,
+    exit_code: result.status === 'invalid' ? 1 : 0,
     mode: actionPlan.mode,
     reason_code: result.reason_code || '',
     payload: result,
@@ -347,7 +347,8 @@ function renderWorkspaceGraphStatusHuman(result) {
     lines.push(
       `  child ${repo.repo_id}: codegraph=${repo.codegraph_present ? 'yes' : 'no'}`
         + ` graphify_subgraph=${repo.graphify_subgraph_present ? 'yes' : 'no'}`
-        + ` projectPath_contained=${repo.project_path_contained}`,
+        + ` projectPath_contained=${repo.project_path_contained}`
+        + `${repo.last_reason_code ? ` reason=${repo.last_reason_code}` : ''}`,
     );
   }
   if (result.workspace) {

@@ -72,6 +72,13 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
     expect(result.status).toBe('partial');
     expect(result.reason_code).toBe('workspace-repos-need-confirmation');
     expect(result.pending_confirm).toEqual(['web']);
+    expect(result.build.state.state.operation_status).toBe('partial');
+    expect(result.build.state.state.reason_code).toBe('workspace-repos-need-confirmation');
+
+    const status = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs')
+      .runWorkspaceGraphStatus({ cwd: ws, allowDiscovery: true });
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-repos-need-confirmation');
   });
 
   test('invalid manifest blocks a CLI-confirmed build before provider mutation', () => {
@@ -92,6 +99,27 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
     });
     expect(result.status).toBe('failed');
     expect(result.reason_code).toBe('workspace-manifest-schema-invalid');
+    expect(result.build).toBeNull();
+    expect(called).toBe(false);
+  });
+
+  test('nested manifest repos block build before provider mutation', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'platform');
+    initRepo(ws, 'platform/service');
+    fs.mkdirSync(path.join(ws, '.spec-first'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.spec-first', 'workspace.yaml'),
+      'schema_version: workspace-manifest.v1\nrepos:\n  - path: platform\n  - path: platform/service\n');
+    let called = false;
+
+    const result = runWorkspaceGraphBuild({
+      cwd: ws,
+      allowDiscovery: false,
+      exec: () => { called = true; return { status: 0 }; },
+    });
+
+    expect(result.status).toBe('failed');
+    expect(result.reason_code).toBe('workspace-targets-ambiguous');
     expect(result.build).toBeNull();
     expect(called).toBe(false);
   });

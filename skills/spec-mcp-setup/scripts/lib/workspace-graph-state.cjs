@@ -2,8 +2,11 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const crypto = require('node:crypto');
 const { assertContainedPath } = require('./path-safety.cjs');
+const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
+const { validateSchemaValue } = require('./registry.cjs');
+const stateSchema = require('../contracts/workspace-graph-state.schema.json');
 
 const STATE_BASENAME = 'workspace-graph-state.json';
 
@@ -20,19 +23,46 @@ function inspectRepoSnapshot(repo) {
       head_sha: null,
       head_state: 'unknown',
       worktree_clean: null,
+      worktree_fingerprint: null,
       observed: false,
     };
   }
 
   const head = runGit(gitRoot, ['rev-parse', 'HEAD']);
   const worktree = runGit(gitRoot, ['status', '--porcelain', '--untracked-files=all']);
+  const fingerprint = inspectWorktreeFingerprint(gitRoot, head.status === 0);
   return {
     repo_id: repoId || '',
     head_sha: head.status === 0 ? head.stdout.trim() : null,
     head_state: head.status === 0 ? 'commit' : 'unborn',
     worktree_clean: worktree.status === 0 ? worktree.stdout.trim() === '' : null,
-    observed: worktree.status === 0,
+    worktree_fingerprint: worktree.status === 0 && fingerprint.ok ? fingerprint.value : null,
+    observed: worktree.status === 0 && fingerprint.ok,
   };
+}
+
+function inspectWorktreeFingerprint(gitRoot, hasHead) {
+  const diffs = hasHead
+    ? [runGit(gitRoot, ['diff', '--binary', 'HEAD', '--'])]
+    : [runGit(gitRoot, ['diff', '--binary', '--cached']), runGit(gitRoot, ['diff', '--binary'])];
+  const untracked = runGit(gitRoot, ['ls-files', '--others', '--exclude-standard', '-z']);
+  if (diffs.some((result) => result.status !== 0) || untracked.status !== 0) return { ok: false, value: null };
+
+  const hash = crypto.createHash('sha256');
+  for (const diff of diffs) hash.update(diff.stdout);
+  for (const relativePath of untracked.stdout.split('\0').filter(Boolean).sort()) {
+    const absolute = path.resolve(gitRoot, relativePath);
+    hash.update(`untracked:${relativePath}\0`);
+    try {
+      const stat = fs.lstatSync(absolute);
+      if (stat.isSymbolicLink()) hash.update(`symlink:${fs.readlinkSync(absolute)}`);
+      else if (stat.isFile()) hash.update(fs.readFileSync(absolute));
+      else hash.update(`type:${stat.mode}`);
+    } catch (_error) {
+      return { ok: false, value: null };
+    }
+  }
+  return { ok: true, value: hash.digest('hex') };
 }
 
 function writeWorkspaceGraphState({
@@ -42,6 +72,7 @@ function writeWorkspaceGraphState({
   repos = [],
   merge = null,
   refreshMode = 'explicit',
+  expectedRepos = null,
 } = {}) {
   const graphifyDir = path.join(workspaceRoot, '.graphify');
   const target = workspaceGraphStatePath(workspaceRoot);
@@ -54,13 +85,19 @@ function writeWorkspaceGraphState({
     const repoRecords = repos.map((repo) => ({
       ...inspectRepoSnapshot(repo),
       subgraph_path: repo.subgraph_path ? relativePath(workspaceRoot, repo.subgraph_path) : null,
+      codegraph_status: repo.codegraph_status || 'unknown',
+      exclude_status: repo.exclude_status || 'unknown',
+      graphify_status: repo.graphify_status || 'unknown',
+      reason_code: repo.reason_code || '',
     }));
     const mergedArtifact = inspectMergedArtifact(workspaceRoot, merge && merge.merged_graph_path);
+    const sourceChanged = Array.isArray(expectedRepos)
+      && !repoSnapshotsMatch(expectedRepos, repoRecords);
     const payload = {
       schema_version: 'workspace-graph-state.v1',
       generated_at: new Date().toISOString(),
-      operation_status: operationStatus || 'unknown',
-      reason_code: reasonCode || '',
+      operation_status: sourceChanged ? 'partial' : (operationStatus || 'unknown'),
+      reason_code: sourceChanged ? 'workspace-source-changed-during-build' : (reasonCode || ''),
       refresh_mode: refreshMode,
       repos: repoRecords,
       merge: merge ? {
@@ -95,6 +132,19 @@ function writeWorkspaceGraphState({
   }
 }
 
+function repoSnapshotsMatch(expected, observed) {
+  const observedById = new Map(observed.map((repo) => [repo.repo_id, repo]));
+  return expected.length === observed.length && expected.every((repo) => {
+    const current = observedById.get(repo.repo_id);
+    return current
+      && repo.observed
+      && current.observed
+      && repo.head_state === current.head_state
+      && repo.head_sha === current.head_sha
+      && repo.worktree_fingerprint === current.worktree_fingerprint;
+  });
+}
+
 function replaceFile(source, target) {
   try {
     fs.renameSync(source, target);
@@ -113,9 +163,7 @@ function readWorkspaceGraphState(workspaceRoot) {
   try {
     assertContainedPath(workspaceRoot, target, { reasonCode: 'workspace-state-path-escapes-workspace' });
     const state = JSON.parse(fs.readFileSync(target, 'utf8'));
-    if (!state || state.schema_version !== 'workspace-graph-state.v1' || !Array.isArray(state.repos)) {
-      return { status: 'invalid', path: target, state: null, reason_code: 'workspace-graph-state-invalid' };
-    }
+    validateSchemaValue(state, stateSchema, stateSchema);
     return { status: 'ready', path: target, state, reason_code: '' };
   } catch (_error) {
     return { status: 'invalid', path: target, state: null, reason_code: 'workspace-graph-state-invalid' };
@@ -146,12 +194,7 @@ function relativePath(root, target) {
 }
 
 function runGit(cwd, args) {
-  const result = spawnSync('git', ['-C', cwd, ...args], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    timeout: 5000,
-    windowsHide: true,
-  });
+  const result = defaultWorkspaceExec('git', ['-C', cwd, ...args], { timeoutMs: 5000 });
   return {
     status: typeof result.status === 'number' ? result.status : 1,
     stdout: String(result.stdout || ''),

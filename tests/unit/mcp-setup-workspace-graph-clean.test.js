@@ -125,6 +125,43 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(fs.existsSync(path.join(api, '.codegraph'))).toBe(true);
   });
 
+  test('ambiguous nested manifest repos block clean before child mutation', () => {
+    const ws = mkWorkspace();
+    const platform = initRepo(ws, 'platform');
+    initRepo(ws, 'platform/service');
+    fs.mkdirSync(path.join(platform, '.codegraph'), { recursive: true });
+    fs.mkdirSync(path.join(ws, '.spec-first'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.spec-first', 'workspace.yaml'),
+      'schema_version: workspace-manifest.v1\nrepos:\n  - path: platform\n  - path: platform/service\n');
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      allowDiscovery: false,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean.status).toBe('failed');
+    expect(clean.reason_code).toBe('workspace-targets-ambiguous');
+    expect(fs.existsSync(path.join(platform, '.codegraph'))).toBe(true);
+  });
+
+  test('confirmed cleanup with an additional discovered repo remains partial', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    const web = initRepo(ws, 'web');
+    fs.mkdirSync(path.join(web, '.codegraph'), { recursive: true });
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: true,
+      exec: () => ({ status: 0 }),
+    });
+    expect(clean.status).toBe('partial');
+    expect(clean.reason_code).toBe('workspace-repos-need-confirmation');
+    expect(clean.pending_confirm).toEqual(['web']);
+    expect(fs.existsSync(path.join(web, '.codegraph'))).toBe(true);
+  });
+
   test('invalid manifest blocks clean before child mutation', () => {
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
@@ -135,6 +172,24 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(clean.status).toBe('failed');
     expect(clean.reason_code).toBe('workspace-manifest-schema-invalid');
     expect(fs.existsSync(path.join(api, '.codegraph'))).toBe(true);
+  });
+
+  test('partial child cleanup preserves the state receipt for a bare retry', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    const { resolveExcludePath, MANAGED_BLOCK_START } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-git-exclude.cjs');
+    const excludePath = resolveExcludePath(api).absolute;
+    fs.writeFileSync(excludePath, `${MANAGED_BLOCK_START}\n.codegraph/\n`);
+    const first = runWorkspaceGraphClean({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(first.status).toBe('partial');
+    expect(first.workspace_graphify_status).toBe('preserved');
+    expect(fs.existsSync(path.join(ws, '.graphify', 'workspace-graph-state.json'))).toBe(true);
+
+    fs.writeFileSync(excludePath, '# repaired\n');
+    const retry = runWorkspaceGraphClean({ cwd: ws, allowDiscovery: true, exec: () => ({ status: 0 }) });
+    expect(retry.repos.map((repo) => repo.repo_id)).toEqual(['api']);
+    expect(retry.status).toBe('complete');
   });
 
   test('clean without --repos reuses the last managed state repo set', () => {
@@ -169,6 +224,24 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(clean.status).toBe('partial');
     expect(clean.reason_code).toBe('workspace-clean-partial');
     expect(clean.repos[0].hook_status).toBe('failed');
+  });
+
+  test('explicit state still removes a contained legacy Graphify hook marker', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    const hooks = path.join(api, '.git', 'hooks');
+    fs.writeFileSync(path.join(hooks, 'post-commit'), '#!/bin/sh\n# Installed by: graphify hook install\n');
+    let calls = 0;
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => { calls += 1; return { status: 0 }; },
+    });
+    expect(clean.status).toBe('complete');
+    expect(clean.repos[0].hook_status).toBe('uninstalled');
+    expect(calls).toBe(1);
   });
 
   test('hook uninstall is blocked when core.hooksPath escapes the workspace', () => {

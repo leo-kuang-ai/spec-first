@@ -192,7 +192,19 @@ Use `--only codegraph`, `--only graphify`, `--only codegraph,graphify`, or Graph
 
 Graphify 0.9.x 原生 child hook 只重建 child 默认 output,不能更新上述 out-of-tree 子图并重收敛 merged graph。因此当前 workspace 模式使用**显式刷新**:child source 变化后重新运行同一 `--workspace-graph --repos ...` 命令。不得把原生 hook install 表述成 workspace merged graph 的自动 freshness 保证。
 
-仓集来源:`--repos <a,b>` 清单(确认)、`需求文件夹/.spec-first/workspace.yaml` manifest(确认),或自动发现(仅作候选,需确认后才建)。
+仓集来源:`--repos <a,b>` 清单(确认)、`需求文件夹/.spec-first/workspace.yaml` manifest(确认),或自动发现(仅作候选,需确认后才建)。自动发现只扫描需求根的直接子目录；重复 alias 或嵌套仓根会返回 `workspace-targets-ambiguous` 并阻止 build/clean，必须先由 owner 消除歧义。
+
+`workspace.yaml` 是为五宿主 projected runtime 保持零依赖的**严格 YAML 子集**，不是通用 YAML：支持顶层 `schema_version`、`repos`、`exclusions`，2 空格列表缩进、`repos` 下 4 空格的 `path`/可选 `alias`、普通或单/双引号字符串和行尾注释。禁止 tab、flow collection (`[]`/`{}`)、anchor/tag、block scalar、多行值及未声明字段；不符合时返回 `workspace-manifest-unparseable` 或 `workspace-manifest-schema-invalid`，不得猜测或静默忽略。可用格式：
+
+```yaml
+schema_version: workspace-manifest.v1
+repos:
+  - path: api # workspace-relative
+  - path: 'web client'
+    alias: web
+exclusions:
+  - vendor
+```
 
 相关 flag(同一 workspace-graph 域):
 
@@ -200,7 +212,7 @@ Graphify 0.9.x 原生 child hook 只重建 child 默认 output,不能更新上�
 | --- | --- |
 | `--workspace-graph` | 一次性建双层图 + 写 state receipt + 注入五宿主入口路由块;source 变化后显式重跑刷新 |
 | `--workspace-graph-status` | 只读汇总各 child/workspace 图状态、state/source freshness、default `projectPath` containment(advisory)、路由块是否已注入;不调用 provider 二进制 |
-| `--workspace-graph-clean` | 幂等清理:删子仓 `.codegraph/`、只移除 spec-first managed exclude 块、清理旧版本可能安装的 Graphify hook、删 `需求/.graphify/`、剥离路由 managed block;不强制 kill CodeGraph daemon(回报清理动作)。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
+| `--workspace-graph-clean` | 幂等清理:删子仓 `.codegraph/`、只移除 spec-first managed exclude 块、清理旧版本可能安装的 Graphify hook、删 `需求/.graphify/`、剥离路由 managed block;不强制 kill CodeGraph daemon。`codegraph daemon` 是 provider 的交互式选择器，因此 clean 只回报需由用户在 provider 中完成的动作，不伪造已停止。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
 
 Machine contract:
 

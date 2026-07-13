@@ -37,6 +37,37 @@ function fakeExec(command, args) {
   return { status: 0, stdout: '', stderr: '' };
 }
 
+function installProviderShims(binDir) {
+  fs.mkdirSync(binDir, { recursive: true });
+  const source = [
+    '#!/usr/bin/env node',
+    "'use strict';",
+    "const fs = require('node:fs');",
+    "const path = require('node:path');",
+    "const command = path.basename(process.argv[1]);",
+    'const args = process.argv.slice(2);',
+    "if (process.env.WORKSPACE_EXEC_LOG) fs.appendFileSync(process.env.WORKSPACE_EXEC_LOG, `${command} ${args.join(' ')}\\n`);",
+    "if (command === 'codegraph' && args[0] === 'init') {",
+    "  fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });",
+    "  fs.writeFileSync(path.join(args[1], '.codegraph', 'db'), 'x');",
+    '}',
+    "if (command === 'graphify' && args[0] === 'extract') {",
+    "  const out = args[args.indexOf('--out') + 1];",
+    "  fs.mkdirSync(path.join(out, '.graphify'), { recursive: true });",
+    "  fs.writeFileSync(path.join(out, '.graphify', 'graph.json'), '{}');",
+    '}',
+    "if (command === 'graphify' && args[0] === 'merge-graphs') {",
+    "  fs.writeFileSync(args[args.indexOf('--out') + 1], '{}');",
+    '}',
+    '',
+  ].join('\n');
+  for (const name of ['codegraph', 'graphify']) {
+    const target = path.join(binDir, name);
+    fs.writeFileSync(target, source);
+    fs.chmodSync(target, 0o755);
+  }
+}
+
 describe('args — workspace-graph flags', () => {
   test('parses --workspace-graph and comma-separated --repos', () => {
     expect(parseArgs(['--only=codegraph,graphify', '--workspace-graph', '--repos', 'api,web'])).toMatchObject({
@@ -74,6 +105,44 @@ describe('runSetup — workspace-graph dispatch', () => {
     expect(result.human).toContain('--repos <a,b>');
     expect(result.human).toContain('不可与 --all-repos 组合');
   });
+
+  test('status remains read-only and reports absent in an empty non-Git folder', () => {
+    const ws = mkWorkspace();
+    const result = runSetup({
+      argv: ['--workspace-graph-status'],
+      cwd: ws,
+      skillRoot,
+      env: {},
+    });
+    expect(result.exit_code).toBe(0);
+    expect(result.payload).toEqual(expect.objectContaining({
+      schema_version: 'workspace-graph-status.v1',
+      status: 'absent',
+    }));
+  });
+
+  test('workspace mutations skipped from a Git cwd return a non-zero usage result', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, '.');
+    const result = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'api'],
+      cwd: ws,
+      skillRoot,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-git-home-')),
+    });
+    expect(result.exit_code).not.toBe(0);
+  });
+
+  test('invalid manifest status returns non-zero while preserving the diagnostic envelope', () => {
+    const ws = mkWorkspace();
+    fs.mkdirSync(path.join(ws, '.spec-first'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.spec-first', 'workspace.yaml'), 'schema_version: workspace-manifest.v1\nunknown: value\n');
+    const result = runSetup({ argv: ['--workspace-graph-status'], cwd: ws, skillRoot, env: {} });
+    expect(result.exit_code).toBe(1);
+    expect(result.payload.status).toBe('invalid');
+    expect(result.payload.reason_code).toBe('workspace-manifest-schema-invalid');
+  });
   test('non-Git workspace + --workspace-graph builds the two-layer graph via injected exec', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
@@ -98,6 +167,49 @@ describe('runSetup — workspace-graph dispatch', () => {
     for (const rel of ['api', 'web']) {
       const st = spawnSync('git', ['-C', path.join(ws, rel), 'status', '--porcelain'], { encoding: 'utf8' }).stdout;
       expect(st.trim()).toBe('');
+    }
+  });
+
+  test('production default executor runs PATH provider commands for build and legacy clean', () => {
+    if (process.platform === 'win32') return;
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-shims-'));
+    const binDir = path.join(root, 'bin');
+    const logPath = path.join(root, 'calls.log');
+    installProviderShims(binDir);
+    const previousPath = process.env.PATH;
+    const previousLog = process.env.WORKSPACE_EXEC_LOG;
+    process.env.PATH = `${binDir}${path.delimiter}${previousPath || ''}`;
+    process.env.WORKSPACE_EXEC_LOG = logPath;
+    try {
+      const common = {
+        cwd: ws,
+        skillRoot,
+        env: { MCP_SETUP_HOST: 'codex' },
+        homeDir: path.join(root, 'home'),
+      };
+      const build = runSetup({
+        ...common,
+        argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'api'],
+      });
+      expect(build.payload.status).toBe('complete');
+      fs.rmSync(path.join(ws, '.graphify', 'workspace-graph-state.json'));
+      const clean = runSetup({
+        ...common,
+        argv: ['--workspace-graph-clean', '--repos', 'api'],
+      });
+      expect(clean.payload.status).toBe('complete');
+      const calls = fs.readFileSync(logPath, 'utf8');
+      expect(calls).toContain('codegraph init');
+      expect(calls).toContain('codegraph install');
+      expect(calls).toContain('graphify extract');
+      expect(calls).toContain('graphify merge-graphs');
+      expect(calls).toContain('graphify hook uninstall');
+    } finally {
+      process.env.PATH = previousPath;
+      if (previousLog === undefined) delete process.env.WORKSPACE_EXEC_LOG;
+      else process.env.WORKSPACE_EXEC_LOG = previousLog;
     }
   });
 

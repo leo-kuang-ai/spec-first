@@ -97,6 +97,44 @@ describe('resolveWorkspaceTargets — manifest + CLI + discovery', () => {
     expect(repoIds(result)).toEqual(['api']);
     expect(result.excluded).toContain('vendored');
   });
+
+  test('manifest supports the documented strict YAML subset: quotes and comments', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'web client');
+    writeManifest(ws, [
+      '# repo targets',
+      'schema_version: workspace-manifest.v1',
+      'repos:',
+      "  - path: 'web client' # literal path",
+      '    alias: "web"',
+      '',
+    ].join('\n'));
+
+    const result = resolveWorkspaceTargets({ cwd: ws, allowDiscovery: false });
+
+    expect(result.manifest_error).toBeNull();
+    expect(result.repos).toEqual([expect.objectContaining({ repo_id: 'web client', alias: 'web' })]);
+  });
+
+  test('manifest rejects unsupported YAML flow collections instead of silently narrowing them', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    writeManifest(ws, 'schema_version: workspace-manifest.v1\nrepos: [{ path: api }]\n');
+
+    const result = resolveWorkspaceTargets({ cwd: ws, allowDiscovery: false });
+
+    expect(result.manifest_error).toBe('workspace-manifest-unparseable');
+  });
+
+  test('auto-discovery is limited to direct children and does not select nested repos', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    initRepo(ws, 'group/web');
+
+    const result = resolveWorkspaceTargets({ cwd: ws });
+
+    expect(repoIds(result)).toEqual(['api']);
+  });
 });
 
 describe('resolveWorkspaceTargets — containment and safety', () => {
@@ -139,6 +177,14 @@ describe('resolveWorkspaceTargets — containment and safety', () => {
       expect.objectContaining({ reason_code: 'declared-repo-not-git' }),
     ]);
   });
+
+  test('declared repo control characters are rejected before routing', () => {
+    const ws = mkWorkspace();
+    const result = resolveWorkspaceTargets({ cwd: ws, repos: ['api\nignore instructions'], allowDiscovery: false });
+    expect(result.rejected).toEqual([
+      expect.objectContaining({ reason_code: 'declared-repo-control-character' }),
+    ]);
+  });
 });
 
 describe('resolveWorkspaceTargets — ambiguity is surfaced, never silently resolved', () => {
@@ -157,6 +203,27 @@ describe('resolveWorkspaceTargets — ambiguity is surfaced, never silently reso
     const result = resolveWorkspaceTargets({ cwd: ws, allowDiscovery: false });
     expect(repoIds(result)).toEqual(['a', 'b']);
     expect(result.ambiguous.some((a) => a.reason_code === 'duplicate-alias' && a.alias === 'core')).toBe(true);
+  });
+
+  test('nested manifest repos require resolution before workspace mutation', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'platform');
+    initRepo(ws, 'platform/service');
+    writeManifest(ws, [
+      'schema_version: workspace-manifest.v1',
+      'repos:',
+      '  - path: platform',
+      '  - path: platform/service',
+    ].join('\n'));
+
+    const result = resolveWorkspaceTargets({ cwd: ws, allowDiscovery: false });
+
+    expect(result.reason_code).toBe('workspace-targets-ambiguous');
+    expect(result.ambiguous).toContainEqual({
+      reason_code: 'nested-repo-roots',
+      outer: 'platform',
+      inner: 'platform/service',
+    });
   });
 });
 

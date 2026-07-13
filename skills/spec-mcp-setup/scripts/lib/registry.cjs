@@ -598,4 +598,5 @@ module.exports = {
   getEffectiveRegistry,
   loadRegistry,
   mergeLayers,
+  validateSchemaValue,
 };

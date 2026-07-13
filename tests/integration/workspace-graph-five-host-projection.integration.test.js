@@ -18,6 +18,7 @@ const sandboxRoots = new Set();
 
 const WORKSPACE_LIB_MODULES = [
   'workspace-manifest.cjs',
+  'workspace-graph-artifacts.cjs',
   'workspace-target.cjs',
   'workspace-git-exclude.cjs',
   'workspace-graph-build.cjs',
@@ -71,6 +72,19 @@ function runSpecFirst(args, sandbox) {
     },
     encoding: 'utf8',
     timeout: 180000,
+  });
+}
+
+function runProjectedSetup(setupRoot, args, sandbox) {
+  return spawnSync(process.execPath, [path.join(setupRoot, 'scripts', 'setup.cjs'), ...args], {
+    cwd: sandbox.projectRoot,
+    env: {
+      ...process.env,
+      HOME: sandbox.home,
+      USERPROFILE: sandbox.home,
+    },
+    encoding: 'utf8',
+    timeout: 30000,
   });
 }
 
@@ -140,6 +154,26 @@ describe('D6 five-host workspace-graph projection', () => {
         const modPath = path.join(setupRoot, 'scripts', 'lib', mod);
         expect(fs.existsSync(modPath)).toBe(true);
       }
+
+      const projectedHelp = runProjectedSetup(setupRoot, ['--help'], sandbox);
+      expect(projectedHelp.status).toBe(0);
+      expect(projectedHelp.stdout).toContain('--workspace-graph-status');
+
+      // Parse and execute the generated entrypoint itself, rather than merely
+      // requiring a projected helper module. Status is intentionally read-only
+      // and an unbuilt graph reports `absent` with a successful diagnostic exit.
+      const projectedStatus = runProjectedSetup(setupRoot, [
+        '--workspace-graph-status',
+        '--repos', 'api',
+        '--json',
+      ], sandbox);
+      expect(projectedStatus.status).toBe(0);
+      expect(JSON.parse(projectedStatus.stdout)).toEqual(expect.objectContaining({
+        schema_version: 'workspace-graph-status.v1',
+        status: 'absent',
+        reason_code: 'absent',
+      }));
+
       const projectedTarget = require(path.join(setupRoot, 'scripts', 'lib', 'workspace-target.cjs'));
       expect(projectedTarget.resolveWorkspaceTargets({
         cwd: sandbox.projectRoot,

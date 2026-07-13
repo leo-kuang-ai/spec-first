@@ -8,6 +8,10 @@ const { spawnSync } = require('node:child_process');
 const { runWorkspaceGraphStatus } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-status.cjs');
 const { runWorkspaceGraphBuild } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-executor.cjs');
 const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-provider-runners.cjs');
+const {
+  inspectRepoSnapshot,
+  writeWorkspaceGraphState,
+} = require('../../skills/spec-mcp-setup/scripts/lib/workspace-graph-state.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-status-')));
@@ -43,7 +47,6 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
       repos: ['api', 'web'],
       allowDiscovery: false,
       exec: fakeExec,
-      hosts: ['claude', 'codex'],
     });
     expect(build.status).toBe('complete');
 
@@ -89,6 +92,46 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     expect(status.default_project_path_contained).toBe(true);
   });
 
+  test('stale or truncated routing blocks cannot satisfy ready', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.writeFileSync(path.join(ws, 'AGENTS.md'), '<!-- spec-first:workspace-routing start -->\nstale\n');
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-routing-incomplete');
+    expect(status.routing.entries.find((entry) => entry.entry_file === 'AGENTS.md').routing_current).toBe(false);
+  });
+
+  test('empty child artifacts cannot satisfy ready', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.rmSync(path.join(api, '.codegraph'), { recursive: true, force: true });
+    fs.mkdirSync(path.join(api, '.codegraph'));
+    const state = JSON.parse(fs.readFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), 'utf8'));
+    fs.writeFileSync(path.join(ws, state.repos[0].subgraph_path), '');
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.status).toBe('partial');
+    expect(status.repos[0].codegraph_present).toBe(false);
+    expect(status.repos[0].graphify_subgraph_present).toBe(false);
+  });
+
+  test('malformed Graphify artifacts cannot satisfy ready', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    const state = JSON.parse(fs.readFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), 'utf8'));
+    fs.writeFileSync(path.join(ws, state.repos[0].subgraph_path), '{broken');
+    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{broken');
+
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+
+    expect(status.status).toBe('partial');
+    expect(status.repos[0].graphify_subgraph_present).toBe(false);
+    expect(status.workspace.merged_present).toBe(false);
+  });
+
   test('empty workspace reports absent without inventing graphs', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
@@ -116,6 +159,45 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     expect(status.workspace.freshness.freshness).toBe('stale');
   });
 
+  test('an explicit rebuild of unchanged dirty source converges to ready', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    fs.writeFileSync(path.join(api, 'changed.js'), 'module.exports = 1;\n');
+    const build = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    expect(build.status).toBe('complete');
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.status).toBe('ready');
+  });
+
+  test('changing dirty file content without changing porcelain paths makes status stale', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    const changed = path.join(api, 'changed.js');
+    fs.writeFileSync(changed, 'module.exports = 1;\n');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.writeFileSync(changed, 'module.exports = 2;\n');
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-graph-stale');
+  });
+
+  test('state writer downgrades a source change that races final receipt creation', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    const repo = { repo_id: 'api', git_root: api };
+    const expected = [inspectRepoSnapshot(repo)];
+    fs.writeFileSync(path.join(api, 'raced.js'), 'x');
+    const receipt = writeWorkspaceGraphState({
+      workspaceRoot: ws,
+      operationStatus: 'complete',
+      repos: [repo],
+      expectedRepos: expected,
+    });
+    expect(receipt.ok).toBe(true);
+    expect(receipt.state.operation_status).toBe('partial');
+    expect(receipt.state.reason_code).toBe('workspace-source-changed-during-build');
+  });
+
   test('status without --repos reuses the repo set recorded by the last build', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
@@ -139,6 +221,55 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     expect(status.status).toBe('partial');
     expect(status.reason_code).toBe('workspace-graph-state-missing');
     expect(status.workspace.freshness.freshness).toBe('unknown');
+  });
+
+  test('an incomplete state receipt cannot report ready', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    const statePath = path.join(ws, '.graphify', 'workspace-graph-state.json');
+    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    state.operation_status = 'partial';
+    state.reason_code = 'workspace-routing-injection-failed';
+    fs.writeFileSync(statePath, JSON.stringify(state));
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.status).toBe('partial');
+    expect(status.reason_code).toBe('workspace-routing-injection-failed');
+  });
+
+  test('changed merged artifact and missing subgraph invalidate the receipt', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{"changed":true}');
+    let status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.reason_code).toBe('workspace-merged-artifact-changed');
+
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    const state = JSON.parse(fs.readFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), 'utf8'));
+    fs.rmSync(path.join(ws, state.repos[0].subgraph_path));
+    status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.reason_code).toBe('workspace-subgraph-missing');
+  });
+
+  test('repo-set drift and invalid state JSON cannot report ready', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    initRepo(ws, 'web');
+    let status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false });
+    expect(status.reason_code).toBe('workspace-repo-set-changed');
+
+    fs.writeFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), '{bad json');
+    status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.reason_code).toBe('workspace-graph-state-invalid');
+
+    fs.writeFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), JSON.stringify({
+      schema_version: 'workspace-graph-state.v1',
+      repos: [],
+    }));
+    status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
+    expect(status.reason_code).toBe('workspace-graph-state-invalid');
   });
 
   test('git cwd is skipped', () => {

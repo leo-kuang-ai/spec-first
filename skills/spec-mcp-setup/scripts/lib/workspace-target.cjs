@@ -26,7 +26,8 @@ function resolveWorkspaceTargets({
   repos = [],
   allowDiscovery = true,
   manifestPath = null,
-  scanDepth = 3,
+  // `discoverChildRepos` starts at depth 0, so 0 means direct children only.
+  scanDepth = 0,
 } = {}) {
   const invocationCwd = path.resolve(cwd);
   const discovery = resolveProjectTarget({ cwd: invocationCwd, allRepos: true, scanDepth });
@@ -94,6 +95,10 @@ function resolveWorkspaceTargets({
     for (const candidate of discoveredCandidates) {
       const repoId = normalizeRelative(candidate.workspace_relative_path || candidate.repo_label || '');
       if (!repoId) continue;
+      if (/[\u0000-\u001F\u007F]/.test(repoId)) {
+        rejected.push({ path: repoId, source: 'discovered', reason_code: 'discovered-repo-control-character' });
+        continue;
+      }
       if (isExcluded(repoId, exclusions)) continue;
       if (repoById.has(repoId)) continue;
       repoById.set(repoId, {
@@ -126,6 +131,8 @@ function resolveWorkspaceTargets({
   let reasonCode = '';
   if (manifestError) {
     reasonCode = manifestError;
+  } else if (ambiguous.length > 0) {
+    reasonCode = 'workspace-targets-ambiguous';
   } else if (!hasTargets) {
     reasonCode = allowDiscovery ? 'workspace-no-review-targets' : 'workspace-no-declared-repos';
   }
@@ -141,7 +148,9 @@ function resolveWorkspaceTargets({
     rejected,
     excluded: Array.from(exclusions).sort(),
     reason_code: reasonCode,
-    next_action: hasTargets ? '' : '提供 --repos <child> 或在 .spec-first/workspace.yaml 声明仓,或从含子 Git 仓的父目录运行。',
+    next_action: ambiguous.length > 0
+      ? '消除重复 alias 或嵌套仓歧义后重试；不要静默选择其中一个仓。'
+      : (hasTargets ? '' : '提供 --repos <child> 或在 .spec-first/workspace.yaml 声明仓,或从含子 Git 仓的父目录运行。'),
   };
 }
 
@@ -149,6 +158,9 @@ function resolveDeclaredRepo(workspaceRoot, relPath) {
   const normalized = normalizeRelative(relPath);
   if (!normalized || normalized === '.') {
     return { ok: false, reason_code: 'declared-repo-empty-path' };
+  }
+  if (/[\u0000-\u001F\u007F]/.test(normalized)) {
+    return { ok: false, reason_code: 'declared-repo-control-character' };
   }
   const absolute = path.resolve(workspaceRoot, normalized);
   try {

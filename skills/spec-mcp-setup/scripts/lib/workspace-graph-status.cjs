@@ -18,12 +18,16 @@ const {
   resolveContainedProjectPath,
   classifyGraphFreshness,
 } = require('./workspace-graph-scope.cjs');
-const { BLOCK_START } = require('./workspace-routing-instruction.cjs');
+const {
+  BLOCK_START,
+  isRoutingInstructionCurrent,
+} = require('./workspace-routing-instruction.cjs');
 const {
   inspectRepoSnapshot,
   readWorkspaceGraphState,
   resolveStateRepoIds,
 } = require('./workspace-graph-state.cjs');
+const { directoryHasEntries, jsonFileHasContent } = require('./workspace-graph-artifacts.cjs');
 
 function runWorkspaceGraphStatus({
   cwd = process.cwd(),
@@ -69,6 +73,19 @@ function runWorkspaceGraphStatus({
       default_project_path: null,
     };
   }
+  if (targets.ambiguous.length > 0) {
+    return {
+      schema_version: 'workspace-graph-status.v1',
+      status: 'invalid',
+      topology: targets.topology,
+      reason_code: 'workspace-targets-ambiguous',
+      workspace_root: targets.workspace_root,
+      repos: [],
+      workspace: null,
+      routing: null,
+      default_project_path: null,
+    };
+  }
 
   const workspaceRoot = targets.workspace_root;
   const confirmed = targets.repos.filter((repo) => !repo.needs_confirm);
@@ -81,10 +98,10 @@ function runWorkspaceGraphStatus({
   );
   const repoFacts = confirmed.map((repo) => {
     const codegraphDir = path.join(repo.git_root, '.codegraph');
-    const codegraphPresent = fs.existsSync(codegraphDir);
+    const codegraphPresent = directoryHasEntries(codegraphDir);
     const stateRepo = stateRepos.get(repo.repo_id) || null;
     const subgraphPath = resolveStateArtifactPath(workspaceRoot, stateRepo && stateRepo.subgraph_path);
-    const subgraphPresent = Boolean(subgraphPath && fs.existsSync(subgraphPath));
+    const subgraphPresent = Boolean(subgraphPath && jsonFileHasContent(subgraphPath));
     const projectPathCheck = resolveContainedProjectPath(workspaceRoot, repo.git_root);
     const freshness = classifyGraphFreshness({
       scope_id: repo.repo_id,
@@ -102,6 +119,10 @@ function runWorkspaceGraphStatus({
       codegraph_present: codegraphPresent,
       graphify_subgraph_path: subgraphPath,
       graphify_subgraph_present: subgraphPresent,
+      last_codegraph_status: stateRepo ? stateRepo.codegraph_status : 'unknown',
+      last_exclude_status: stateRepo ? stateRepo.exclude_status : 'unknown',
+      last_graphify_status: stateRepo ? stateRepo.graphify_status : 'unknown',
+      last_reason_code: stateRepo ? stateRepo.reason_code : '',
       project_path: projectPathCheck.ok ? projectPathCheck.project_path : null,
       project_path_contained: projectPathCheck.ok,
       project_path_enforcement: 'advisory',
@@ -156,12 +177,12 @@ function runWorkspaceGraphStatus({
     defaultProjectPathContained = check.ok;
   }
 
-  const routing = inspectRoutingPresence(workspaceRoot);
+  const routing = inspectRoutingPresence(workspaceRoot, confirmed);
 
   const anyGraph = repoFacts.some((repo) => repo.codegraph_present || repo.graphify_subgraph_present) || mergedPresent;
   const allChildGraphs = repoFacts.length > 0 && repoFacts.every((r) => r.codegraph_present);
   const allSubgraphs = repoFacts.length > 0 && repoFacts.every((repo) => repo.graphify_subgraph_present);
-  const routingReady = routing.entries.length === 2 && routing.entries.every((entry) => entry.has_routing_block);
+  const routingReady = routing.entries.length === 2 && routing.entries.every((entry) => entry.routing_current);
   let status = 'absent';
   let reasonCode = 'absent';
   if (anyGraph && allChildGraphs && allSubgraphs && mergedPresent && stateEvaluation.ready && routingReady) {
@@ -174,9 +195,9 @@ function runWorkspaceGraphStatus({
       ? stateEvaluation.reason_code
       : (routingReady ? 'workspace-graph-partial' : 'workspace-routing-incomplete');
   }
-  if (pendingConfirm.length > 0 && confirmed.length === 0) {
-    status = 'needs-confirmation';
-    reasonCode = 'needs-confirmation';
+  if (pendingConfirm.length > 0) {
+    status = confirmed.length === 0 ? 'needs-confirmation' : 'partial';
+    reasonCode = 'workspace-repos-need-confirmation';
   }
 
   return {
@@ -277,12 +298,12 @@ function evaluateWorkspaceState({
         limitations: [`child-head-changed:${previous.repo_id}`],
       };
     }
-    if (previous.worktree_clean !== true || current.worktree_clean !== true) {
+    if (previous.worktree_fingerprint !== current.worktree_fingerprint) {
       return {
         ready: false,
         freshness: 'stale',
         reason_code: 'workspace-graph-stale',
-        limitations: [`child-worktree-not-clean:${previous.repo_id}`],
+        limitations: [`child-worktree-changed:${previous.repo_id}`],
       };
     }
   }
@@ -310,6 +331,9 @@ function mergedArtifactMatches(workspaceRoot, artifact, mergedPath, observed) {
 function inspectFileArtifact(filePath) {
   try {
     const stat = fs.statSync(filePath);
+    if (!stat.isFile() || !jsonFileHasContent(filePath)) {
+      return { present: false, size_bytes: null, mtime_ms: null };
+    }
     return { present: true, size_bytes: stat.size, mtime_ms: stat.mtimeMs };
   } catch (_error) {
     return { present: false, size_bytes: null, mtime_ms: null };
@@ -327,13 +351,17 @@ function resolveStateArtifactPath(workspaceRoot, relativePath) {
   }
 }
 
-function inspectRoutingPresence(workspaceRoot) {
-  const files = ['CLAUDE.md', 'AGENTS.md'];
+function inspectRoutingPresence(workspaceRoot, repos) {
+  const files = [
+    { entry_file: 'CLAUDE.md', hosts: ['claude'] },
+    { entry_file: 'AGENTS.md', hosts: ['codex', 'cursor', 'kiro', 'qoder'] },
+  ];
   const entries = [];
-  for (const rel of files) {
+  for (const target of files) {
+    const rel = target.entry_file;
     const abs = path.join(workspaceRoot, rel);
     if (!fs.existsSync(abs)) {
-      entries.push({ entry_file: rel, present: false, has_routing_block: false });
+      entries.push({ entry_file: rel, present: false, has_routing_block: false, routing_current: false });
       continue;
     }
     const body = fs.readFileSync(abs, 'utf8');
@@ -341,6 +369,7 @@ function inspectRoutingPresence(workspaceRoot) {
       entry_file: rel,
       present: true,
       has_routing_block: body.includes(BLOCK_START),
+      routing_current: isRoutingInstructionCurrent(body, { workspaceRoot, repos }),
     });
   }
   return { entries };

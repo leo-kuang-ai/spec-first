@@ -158,9 +158,124 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
     const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos, runners });
 
     expect(result.merge.status).toBe('failed');
-    expect(result.merge.reason_code).toBe('workspace-merged-graph-missing');
+    expect(result.merge.reason_code).toBe('workspace-merged-graph-invalid');
     expect(result.status).toBe('partial');
     expect(result.reason_code).toBe('workspace-merge-failed');
+  });
+
+  test('a zero-exit merge that writes an empty graph cannot produce a complete receipt', () => {
+    const ws = mkWorkspace();
+    const repos = [initRepo(ws, 'api'), initRepo(ws, 'web')];
+    const { runners } = makeRunners(ws);
+    runners.graphifyMerge = (_inputs, outPath) => {
+      fs.writeFileSync(outPath, '');
+      return { ok: true };
+    };
+
+    const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos, runners });
+
+    expect(result.status).toBe('partial');
+    expect(result.merge).toEqual(expect.objectContaining({
+      status: 'failed',
+      reason_code: 'workspace-merged-graph-invalid',
+    }));
+    expect(fs.existsSync(path.join(ws, '.graphify', MERGED_GRAPH_BASENAME))).toBe(false);
+  });
+
+  test('a malformed Graphify subgraph cannot satisfy a successful provider result', () => {
+    const ws = mkWorkspace();
+    const repo = initRepo(ws, 'api');
+    const result = buildWorkspaceGraphs({
+      workspaceRoot: ws,
+      repos: [repo],
+      runners: {
+        codegraphInstallGlobal: () => ({ ok: true }),
+        codegraphInit: () => {
+          fs.mkdirSync(path.join(repo.git_root, '.codegraph'), { recursive: true });
+          fs.writeFileSync(path.join(repo.git_root, '.codegraph', 'db'), 'x');
+          return { ok: true };
+        },
+        graphifyExtract: (_root, outDir) => {
+          const graphPath = path.join(outDir, '.graphify', 'graph.json');
+          fs.mkdirSync(path.dirname(graphPath), { recursive: true });
+          fs.writeFileSync(graphPath, '{broken');
+          return { ok: true, graphPath };
+        },
+        graphifyMerge: () => ({ ok: true }),
+      },
+    });
+    expect(result.status).toBe('partial');
+    expect(result.repos[0]).toEqual(expect.objectContaining({
+      graphify_status: 'failed',
+      reason_code: 'graphify-subgraph-invalid',
+    }));
+  });
+
+  test('zero-exit no-op providers cannot reuse stale graph artifacts', () => {
+    const ws = mkWorkspace();
+    const repo = initRepo(ws, 'api');
+    fs.mkdirSync(path.join(repo.git_root, '.codegraph'), { recursive: true });
+    fs.writeFileSync(path.join(repo.git_root, '.codegraph', 'old.db'), 'old');
+    const staleSubgraph = path.join(ws, '.graphify', 'api', '.graphify', 'graph.json');
+    fs.mkdirSync(path.dirname(staleSubgraph), { recursive: true });
+    fs.writeFileSync(staleSubgraph, '{"old":true}');
+    const result = buildWorkspaceGraphs({
+      workspaceRoot: ws,
+      repos: [repo],
+      runners: {
+        codegraphInstallGlobal: () => ({ ok: true }),
+        codegraphInit: () => ({ ok: true }),
+        graphifyExtract: () => ({ ok: true }),
+        graphifyMerge: () => ({ ok: true }),
+      },
+    });
+    expect(result.status).toBe('failed');
+    expect(result.repos[0].codegraph_status).toBe('failed');
+    expect(result.repos[0].graphify_status).toBe('failed');
+    expect(fs.readFileSync(path.join(repo.git_root, '.codegraph', 'old.db'), 'utf8')).toBe('old');
+    expect(fs.readFileSync(staleSubgraph, 'utf8')).toContain('old');
+  });
+
+  test('empty artifacts cannot satisfy a successful provider result', () => {
+    const ws = mkWorkspace();
+    const repo = initRepo(ws, 'api');
+    const result = buildWorkspaceGraphs({
+      workspaceRoot: ws,
+      repos: [repo],
+      runners: {
+        codegraphInstallGlobal: () => ({ ok: true }),
+        codegraphInit: () => {
+          fs.mkdirSync(path.join(repo.git_root, '.codegraph'), { recursive: true });
+          return { ok: true };
+        },
+        graphifyExtract: (_root, outDir) => {
+          const graphPath = path.join(outDir, '.graphify', 'graph.json');
+          fs.mkdirSync(path.dirname(graphPath), { recursive: true });
+          fs.writeFileSync(graphPath, '');
+          return { ok: true, graphPath };
+        },
+        graphifyMerge: () => ({ ok: true }),
+      },
+    });
+    expect(result.status).toBe('failed');
+    expect(result.repos[0].codegraph_status).toBe('failed');
+    expect(result.repos[0].graphify_status).toBe('failed');
+  });
+
+  test('source changed during build cannot produce a complete receipt', () => {
+    const ws = mkWorkspace();
+    const repo = initRepo(ws, 'api');
+    const { runners } = makeRunners(ws);
+    const originalExtract = runners.graphifyExtract;
+    runners.graphifyExtract = (...args) => {
+      const result = originalExtract(...args);
+      fs.writeFileSync(path.join(repo.git_root, 'changed-during-build.js'), 'x');
+      return result;
+    };
+    const result = buildWorkspaceGraphs({ workspaceRoot: ws, repos: [repo], runners });
+    expect(result.status).toBe('partial');
+    expect(result.reason_code).toBe('workspace-source-changed-during-build');
+    expect(result.state.state.operation_status).toBe('partial');
   });
 
   test('merge failure cannot be promoted to complete when all child providers are ready', () => {

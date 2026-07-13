@@ -18,6 +18,7 @@ const { injectRoutingInstruction } = require('./workspace-routing-inject.cjs');
 const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
 const { workspaceGraphRefreshPosture } = require('./workspace-graph-refresh.cjs');
 const { CANONICAL_HOSTS } = require('./host-authority.cjs');
+const { writeWorkspaceGraphState } = require('./workspace-graph-state.cjs');
 
 const defaultExec = defaultWorkspaceExec;
 
@@ -51,6 +52,18 @@ function runWorkspaceGraphBuild({
       status: 'failed',
       topology: targets.topology,
       reason_code: targets.manifest_error,
+      workspace_root: targets.workspace_root,
+      targets,
+      pending_confirm: [],
+      build: null,
+    };
+  }
+  if (targets.ambiguous.length > 0) {
+    return {
+      schema_version: 'workspace-graph-executor.v1',
+      status: 'failed',
+      topology: targets.topology,
+      reason_code: 'workspace-targets-ambiguous',
       workspace_root: targets.workspace_root,
       targets,
       pending_confirm: [],
@@ -114,6 +127,25 @@ function runWorkspaceGraphBuild({
   if (status === 'complete' && pendingConfirm.length > 0) {
     status = 'partial';
     reasonCode = 'workspace-repos-need-confirmation';
+  }
+
+  const finalState = writeWorkspaceGraphState({
+    workspaceRoot: targets.workspace_root,
+    operationStatus: status,
+    reasonCode,
+    repos: build.repos,
+    merge: build.merge,
+    refreshMode: refresh.mode,
+    expectedRepos: build.state && build.state.state ? build.state.state.repos : null,
+  });
+  build.state = finalState;
+  if (finalState.ok && finalState.state.operation_status !== status) {
+    status = finalState.state.operation_status;
+    reasonCode = finalState.state.reason_code;
+  }
+  if (!finalState.ok && status !== 'failed') {
+    status = 'partial';
+    reasonCode = finalState.reason_code || 'workspace-state-write-failed';
   }
 
   return {

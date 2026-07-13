@@ -70,20 +70,25 @@ function injectRoutingInstruction({
       results.push(entry);
       continue;
     }
-    const exists = fs.existsSync(abs);
-    if (!exists && !createIfAbsent) {
-      entry.status = 'skipped';
-      entry.reason_code = 'entry-file-absent';
-      results.push(entry);
-      continue;
-    }
-    const existing = exists ? fs.readFileSync(abs, 'utf8') : '';
-    const next = upsertRoutingBlock(existing, block);
-    if (next !== existing) {
-      fs.writeFileSync(abs, next, 'utf8');
-      entry.status = exists ? 'updated' : 'created';
-    } else {
-      entry.status = 'unchanged';
+    try {
+      const exists = fs.existsSync(abs);
+      if (!exists && !createIfAbsent) {
+        entry.status = 'skipped';
+        entry.reason_code = 'entry-file-absent';
+        results.push(entry);
+        continue;
+      }
+      const existing = exists ? fs.readFileSync(abs, 'utf8') : '';
+      const next = upsertRoutingBlock(existing, block);
+      if (next !== existing) {
+        fs.writeFileSync(abs, next, 'utf8');
+        entry.status = exists ? 'updated' : 'created';
+      } else {
+        entry.status = 'unchanged';
+      }
+    } catch (error) {
+      entry.status = 'failed';
+      entry.reason_code = error.reason_code || 'routing-entry-update-failed';
     }
     results.push(entry);
   }
@@ -122,13 +127,18 @@ function stripRoutingInstruction({
       results.push(entry);
       continue;
     }
-    const existing = fs.readFileSync(abs, 'utf8');
-    const next = stripRoutingBlock(existing);
-    if (next !== existing) {
-      fs.writeFileSync(abs, next, 'utf8');
-      entry.status = 'stripped';
-    } else {
-      entry.status = 'unchanged';
+    try {
+      const existing = fs.readFileSync(abs, 'utf8');
+      const next = stripRoutingBlock(existing);
+      if (next !== existing) {
+        fs.writeFileSync(abs, next, 'utf8');
+        entry.status = 'stripped';
+      } else {
+        entry.status = 'unchanged';
+      }
+    } catch (error) {
+      entry.status = 'failed';
+      entry.reason_code = error.reason_code || 'routing-entry-strip-failed';
     }
     results.push(entry);
   }

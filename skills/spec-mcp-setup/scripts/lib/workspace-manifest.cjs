@@ -4,6 +4,7 @@
 // workspace manifest contract self-contained and deliberately small: this is a
 // strict parser for the documented schema, not a general YAML implementation.
 const schema = require('../contracts/workspace-manifest.schema.json');
+const { validateSchemaValue } = require('./registry.cjs');
 
 function parseWorkspaceManifest(source) {
   const lines = String(source || '').replace(/^\uFEFF/, '').split(/\r?\n/);
@@ -113,39 +114,16 @@ function stripComment(value) {
 }
 
 function validateWorkspaceManifest(data) {
-  const contract = schema;
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return invalid('workspace-manifest-empty');
-  const allowed = new Set(Object.keys(contract.properties || {}));
-  for (const key of Object.keys(data)) {
-    if (!allowed.has(key)) return invalid('workspace-manifest-schema-invalid');
-  }
-  for (const key of contract.required || []) {
-    if (!Object.prototype.hasOwnProperty.call(data, key)) return invalid('workspace-manifest-schema-invalid');
-  }
-  if (data.schema_version !== contract.properties.schema_version.const) {
+  if (data && data.schema_version !== undefined
+    && data.schema_version !== schema.properties.schema_version.const) {
     return invalid('workspace-manifest-version-mismatch');
   }
-  if (data.repos !== undefined) {
-    if (!Array.isArray(data.repos)) return invalid('workspace-manifest-schema-invalid');
-    const repoSchema = contract.properties.repos.items;
-    const repoAllowed = new Set(Object.keys(repoSchema.properties || {}));
-    for (const repo of data.repos) {
-      if (!repo || typeof repo !== 'object' || Array.isArray(repo)) return invalid('workspace-manifest-schema-invalid');
-      if (!repoSchema.required.every((key) => Object.prototype.hasOwnProperty.call(repo, key))) {
-        return invalid('workspace-manifest-schema-invalid');
-      }
-      if (Object.keys(repo).some((key) => !repoAllowed.has(key))) return invalid('workspace-manifest-schema-invalid');
-      if (typeof repo.path !== 'string' || repo.path.length < 1) return invalid('workspace-manifest-schema-invalid');
-      if (repo.alias !== undefined && (typeof repo.alias !== 'string' || repo.alias.length < 1)) {
-        return invalid('workspace-manifest-schema-invalid');
-      }
-    }
+  try {
+    validateSchemaValue(data, schema, schema);
+    return { ok: true };
+  } catch (_error) {
+    return invalid('workspace-manifest-schema-invalid');
   }
-  if (data.exclusions !== undefined && (
-    !Array.isArray(data.exclusions)
-    || data.exclusions.some((entry) => typeof entry !== 'string' || entry.length < 1)
-  )) return invalid('workspace-manifest-schema-invalid');
-  return { ok: true };
 }
 
 function invalid(reasonCode) {

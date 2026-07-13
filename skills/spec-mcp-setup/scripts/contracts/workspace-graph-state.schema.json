@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workspace Graph State Receipt",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "operation_status", "reason_code", "refresh_mode", "repos", "merge", "merged_artifact"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "const": "workspace-graph-state.v1" },
+    "generated_at": { "type": "string", "minLength": 1 },
+    "operation_status": { "type": "string", "enum": ["building", "complete", "partial", "failed"] },
+    "reason_code": { "type": "string" },
+    "refresh_mode": { "type": "string", "enum": ["explicit"] },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repo_id", "head_sha", "head_state", "worktree_clean", "worktree_fingerprint", "observed", "subgraph_path", "codegraph_status", "exclude_status", "graphify_status", "reason_code"],
+        "additionalProperties": false,
+        "properties": {
+          "repo_id": { "type": "string", "minLength": 1 },
+          "head_sha": { "type": ["string", "null"] },
+          "head_state": { "type": "string", "enum": ["commit", "unborn", "unknown"] },
+          "worktree_clean": { "type": ["boolean", "null"] },
+          "worktree_fingerprint": { "type": ["string", "null"] },
+          "observed": { "type": "boolean" },
+          "subgraph_path": { "type": ["string", "null"] },
+          "codegraph_status": { "type": "string", "minLength": 1 },
+          "exclude_status": { "type": "string", "minLength": 1 },
+          "graphify_status": { "type": "string", "minLength": 1 },
+          "reason_code": { "type": "string" }
+        }
+      }
+    },
+    "merge": {
+      "type": ["object", "null"],
+      "required": ["status", "reason_code", "merged_graph_path"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "minLength": 1 },
+        "reason_code": { "type": "string" },
+        "merged_graph_path": { "type": ["string", "null"] }
+      }
+    },
+    "merged_artifact": {
+      "type": ["object", "null"],
+      "required": ["path", "size_bytes", "mtime_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "size_bytes": { "type": "number" },
+        "mtime_ms": { "type": "number" }
+      }
+    }
+  }
+}

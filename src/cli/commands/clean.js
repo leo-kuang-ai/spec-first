@@ -275,12 +275,15 @@ function printWorkspaceGraphCleanPreview(status) {
     return;
   }
   console.log(`  root: ${status.workspace_root}`);
+  const explicitRefresh = status.workspace && status.workspace.refresh_mode === 'explicit';
   for (const repo of status.repos || []) {
     if (repo.codegraph_present) {
       console.log(`  would remove: ${path.join(repo.git_root, '.codegraph')}`);
     }
     console.log(`  would strip managed exclude block in: ${repo.repo_id}`);
-    console.log(`  would run: graphify hook uninstall (cwd=${repo.repo_id})`);
+    if (!explicitRefresh) {
+      console.log(`  would run: graphify hook uninstall (cwd=${repo.repo_id})`);
+    }
   }
   if (status.workspace && status.workspace.graphify_present) {
     console.log(`  would remove: ${status.workspace.graphify_dir}`);

@@ -20,7 +20,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { assertContainedPath } = require('./path-safety.cjs');
 const { addManagedExclude } = require('./workspace-git-exclude.cjs');
-const { writeWorkspaceGraphState } = require('./workspace-graph-state.cjs');
+const { inspectRepoSnapshot, writeWorkspaceGraphState } = require('./workspace-graph-state.cjs');
+const { directoryHasEntries, jsonFileHasContent } = require('./workspace-graph-artifacts.cjs');
 
 const GRAPHIFY_OUT_DIRNAME = '.graphify';
 const MERGED_GRAPH_BASENAME = 'merged-graph.json';
@@ -35,6 +36,9 @@ function buildWorkspaceGraphs({
   const graphifyOut = path.join(workspaceRoot, GRAPHIFY_OUT_DIRNAME);
   assertContainedPath(workspaceRoot, graphifyOut, { reasonCode: 'graphify-out-escapes-workspace' });
   fs.mkdirSync(graphifyOut, { recursive: true });
+  const stagingRoot = path.join(graphifyOut, `.build-${process.pid}-${Date.now()}`);
+  assertContainedPath(workspaceRoot, stagingRoot, { reasonCode: 'graphify-staging-escapes-workspace' });
+  fs.mkdirSync(stagingRoot, { recursive: true });
   const initialState = safe(() => stateWriter({
     workspaceRoot,
     operationStatus: 'building',
@@ -63,7 +67,7 @@ function buildWorkspaceGraphs({
     };
 
     // 1. CodeGraph per-child init (isolated failure).
-    const cg = runProvider(runners.codegraphInit, repo.git_root);
+    const cg = runFreshCodegraph(runners.codegraphInit, repo.git_root, workspaceRoot);
     repoResult.codegraph_status = cg.ok ? 'ready' : 'failed';
     if (!cg.ok) repoResult.reason_code = cg.reason_code || 'codegraph-init-failed';
 
@@ -73,7 +77,9 @@ function buildWorkspaceGraphs({
     if (!excl.ok && !repoResult.reason_code) repoResult.reason_code = excl.reason_code || 'exclude-failed';
 
     // 3. Graphify per-child subgraph, out-of-tree.
-    const outDir = path.join(graphifyOut, sanitizeRepoDir(repo.repo_id));
+    const repoOutputName = sanitizeRepoDir(repo.repo_id);
+    const outDir = path.join(stagingRoot, repoOutputName);
+    const finalOutDir = path.join(graphifyOut, repoOutputName);
     let outSafe = true;
     try {
       assertContainedPath(workspaceRoot, outDir, { reasonCode: 'graphify-subgraph-escapes-workspace' });
@@ -89,10 +95,13 @@ function buildWorkspaceGraphs({
         const subgraphPath = gf.graphPath || path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
         try {
           assertContainedPath(workspaceRoot, subgraphPath, { reasonCode: 'graphify-subgraph-escapes-workspace' });
-          if (!fs.existsSync(subgraphPath)) throw new Error('graphify-subgraph-missing');
+          if (!jsonFileHasContent(subgraphPath)) throw reasonError('graphify-subgraph-invalid');
+          const promoted = promotePath(outDir, finalOutDir);
+          if (!promoted.ok) throw reasonError('graphify-subgraph-promote-failed');
+          const finalSubgraphPath = path.join(finalOutDir, path.relative(outDir, subgraphPath));
           repoResult.graphify_status = 'ready';
-          repoResult.subgraph_path = subgraphPath;
-          subgraphs.push(subgraphPath);
+          repoResult.subgraph_path = finalSubgraphPath;
+          subgraphs.push(finalSubgraphPath);
         } catch (error) {
           repoResult.graphify_status = 'failed';
           if (!repoResult.reason_code) {
@@ -111,24 +120,29 @@ function buildWorkspaceGraphs({
   // 4. Workspace merged graph. Zero → skip; single → from the lone subgraph; many → merge.
   // Runner ok alone is not enough: require the merged artifact to exist on disk.
   const mergedPath = path.join(graphifyOut, MERGED_GRAPH_BASENAME);
+  const stagedMergedPath = path.join(stagingRoot, MERGED_GRAPH_BASENAME);
   let merge;
   if (subgraphs.length === 0) {
     merge = { status: 'not-applicable', reason_code: 'no-eligible-subgraphs', merged_graph_path: null };
   } else if (subgraphs.length === 1) {
     merge = finalizeMergeResult(
-      runMerge(runners.graphifyMerge, subgraphs, mergedPath),
+      promoteMerge(runners.graphifyMerge, subgraphs, stagedMergedPath, mergedPath),
       mergedPath,
       { status: 'single-source', cross_repo_layer: false },
     );
   } else {
     merge = finalizeMergeResult(
-      runMerge(runners.graphifyMerge, subgraphs, mergedPath),
+      promoteMerge(runners.graphifyMerge, subgraphs, stagedMergedPath, mergedPath),
       mergedPath,
       { status: 'merged', cross_repo_layer: true },
     );
   }
 
   const outcome = deriveWorkspaceBuildOutcome({ repoResults, merge, globalInstall });
+  if (outcome.status === 'complete' && !sourceSnapshotsStable(initialState, repos)) {
+    outcome.status = 'partial';
+    outcome.reason_code = 'workspace-source-changed-during-build';
+  }
   const finalState = safe(() => stateWriter({
     workspaceRoot,
     operationStatus: outcome.status,
@@ -140,6 +154,7 @@ function buildWorkspaceGraphs({
     outcome.status = outcome.status === 'failed' ? 'failed' : 'partial';
     outcome.reason_code = finalState.reason_code || 'workspace-state-write-failed';
   }
+  safe(() => fs.rmSync(stagingRoot, { recursive: true, force: true }));
 
   return {
     schema_version: 'workspace-graph-build.v1',
@@ -153,6 +168,73 @@ function buildWorkspaceGraphs({
     status: outcome.status,
     reason_code: outcome.reason_code,
   };
+}
+
+function sourceSnapshotsStable(initialState, repos) {
+  if (!initialState.ok || !initialState.state || !Array.isArray(initialState.state.repos)) return false;
+  const initialById = new Map(initialState.state.repos.map((repo) => [repo.repo_id, repo]));
+  return repos.every((repo) => {
+    const before = initialById.get(repo.repo_id);
+    const after = inspectRepoSnapshot(repo);
+    return before
+      && before.observed
+      && after.observed
+      && before.head_state === after.head_state
+      && before.head_sha === after.head_sha
+      && before.worktree_fingerprint === after.worktree_fingerprint;
+  });
+}
+
+function runFreshCodegraph(fn, repoRoot, workspaceRoot) {
+  const target = path.join(repoRoot, '.codegraph');
+  const backup = `${target}.spec-first-previous-${process.pid}-${Date.now()}`;
+  try {
+    assertContainedPath(workspaceRoot, target, { reasonCode: 'codegraph-target-escapes-workspace' });
+    if (fs.existsSync(target)) fs.renameSync(target, backup);
+    const result = runProvider(fn, repoRoot);
+    if (!result.ok || !directoryHasEntries(target)) {
+      fs.rmSync(target, { recursive: true, force: true });
+      if (fs.existsSync(backup)) fs.renameSync(backup, target);
+      return result.ok ? { ok: false, reason_code: 'codegraph-artifact-missing' } : result;
+    }
+    fs.rmSync(backup, { recursive: true, force: true });
+    return result;
+  } catch (error) {
+    safe(() => fs.rmSync(target, { recursive: true, force: true }));
+    if (fs.existsSync(backup)) safe(() => fs.renameSync(backup, target));
+    return { ok: false, reason_code: error.reason_code || 'codegraph-refresh-failed' };
+  }
+}
+
+function promoteMerge(fn, inputs, stagedPath, finalPath) {
+  const result = runMerge(fn, inputs, stagedPath);
+  if (!result.ok) return result;
+  if (!jsonFileHasContent(stagedPath)) {
+    return { ok: false, reason_code: 'workspace-merged-graph-invalid' };
+  }
+  const promoted = promotePath(stagedPath, finalPath);
+  return promoted.ok ? { ok: true } : { ok: false, reason_code: 'workspace-merge-promote-failed' };
+}
+
+function promotePath(source, target) {
+  const backup = `${target}.spec-first-previous-${process.pid}-${Date.now()}`;
+  try {
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    if (fs.existsSync(target)) fs.renameSync(target, backup);
+    fs.renameSync(source, target);
+    fs.rmSync(backup, { recursive: true, force: true });
+    return { ok: true };
+  } catch (_error) {
+    safe(() => fs.rmSync(target, { recursive: true, force: true }));
+    if (fs.existsSync(backup)) safe(() => fs.renameSync(backup, target));
+    return { ok: false };
+  }
+}
+
+function reasonError(reasonCode) {
+  const error = new Error(reasonCode);
+  error.reason_code = reasonCode;
+  return error;
 }
 
 function deriveWorkspaceBuildOutcome({ repoResults, merge, globalInstall }) {
@@ -206,10 +288,10 @@ function finalizeMergeResult(result, mergedPath, successShape) {
       merged_graph_path: null,
     };
   }
-  if (!fs.existsSync(mergedPath)) {
+  if (!jsonFileHasContent(mergedPath)) {
     return {
       status: 'failed',
-      reason_code: 'workspace-merged-graph-missing',
+      reason_code: 'workspace-merged-graph-invalid',
       merged_graph_path: null,
     };
   }

@@ -101,6 +101,54 @@ describe('spec-first clean --workspace-graph', () => {
     expect(logs.join('\n')).toContain('codegraph_removed=true');
   });
 
+  test('dry-run omits legacy hook uninstall for an explicit-refresh state', () => {
+    const logs = [];
+    const originalLog = console.log;
+    console.log = (...args) => { logs.push(args.join(' ')); };
+    try {
+      expect(runClean(['--workspace-graph', '--dry-run'], {
+        cwd: mkWorkspace(),
+        runWorkspaceGraphStatus: () => ({
+          status: 'ready',
+          workspace_root: '/tmp/ws',
+          repos: [{ repo_id: 'api', git_root: '/tmp/ws/api', codegraph_present: true }],
+          workspace: { graphify_present: true, graphify_dir: '/tmp/ws/.graphify', refresh_mode: 'explicit' },
+          routing: { entries: [] },
+        }),
+      })).toBe(0);
+    } finally {
+      console.log = originalLog;
+    }
+    expect(logs.join('\n')).not.toContain('graphify hook uninstall');
+  });
+
+  test.each([
+    ['needs-confirmation', 2],
+    ['partial', 1],
+    ['failed', 1],
+    ['skipped', 0],
+  ])('maps workspace clean status %s to exit code %i', (cleanStatus, exitCode) => {
+    const originalLog = console.log;
+    console.log = () => {};
+    try {
+      expect(runClean(['--workspace-graph', '--repos', 'api'], {
+        cwd: mkWorkspace(),
+        runWorkspaceGraphClean: () => ({
+          status: cleanStatus,
+          topology: cleanStatus === 'skipped' ? 'cwd-is-git-repo' : 'requirement-workspace',
+          reason_code: cleanStatus === 'needs-confirmation' ? 'workspace-repos-need-confirmation' : '',
+          workspace_root: '/tmp/ws',
+          pending_confirm: cleanStatus === 'needs-confirmation' ? ['api'] : [],
+          repos: [],
+          workspace_graphify_removed: false,
+          routing: null,
+        }),
+      })).toBe(exitCode);
+    } finally {
+      console.log = originalLog;
+    }
+  });
+
   test('rejects combining --workspace-graph with a host flag', () => {
     const errors = [];
     const originalError = console.error;

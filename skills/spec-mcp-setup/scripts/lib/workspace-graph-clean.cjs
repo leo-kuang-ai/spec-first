@@ -5,9 +5,9 @@
 // Removes only spec-first-managed workspace graph state, idempotently and
 // containment-checked (CR13, D5):
 //   - per child: delete `.codegraph/` (contained), remove the managed
-//     `.git/info/exclude` block (self-only), uninstall the graphify git hook via
-//     graphify's own `hook uninstall` (the hook block is graphify-native, not
-//     spec-first-authored);
+//     `.git/info/exclude` block (self-only); current explicit-refresh builds do
+//     not install hooks, while legacy/no-state cleanup asks Graphify to uninstall
+//     any older native hook;
 //   - delete the workspace `.graphify/` artifact tree (contained);
 //   - surface a CodeGraph daemon-cleanup action (spec-first does not force-kill
 //     provider daemons; it reports the action).
@@ -17,7 +17,6 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 const { assertContainedPath } = require('./path-safety.cjs');
 const { removeManagedExclude, resolveGitPath } = require('./workspace-git-exclude.cjs');
 const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
@@ -66,6 +65,17 @@ function runWorkspaceGraphClean({
       routing: null,
     };
   }
+  if (targets.ambiguous.length > 0) {
+    return {
+      schema_version: 'workspace-graph-clean.v1',
+      status: 'failed',
+      topology: targets.topology,
+      reason_code: 'workspace-targets-ambiguous',
+      workspace_root: targets.workspace_root,
+      repos: [],
+      routing: null,
+    };
+  }
 
   const workspaceRoot = targets.workspace_root;
   const confirmed = targets.repos.filter((repo) => !repo.needs_confirm);
@@ -95,14 +105,14 @@ function runWorkspaceGraphClean({
       reason_code: '',
     };
 
-    // 1. Delete per-child .codegraph/ (contained).
+    // 1. 删除 contained 的 per-child .codegraph/。
     const codegraphDir = path.join(repo.git_root, '.codegraph');
     const codegraph = safeRemoveDir(workspaceRoot, codegraphDir);
     entry.codegraph_status = codegraph.status;
     entry.codegraph_removed = codegraph.removed;
     if (!codegraph.ok) entry.reason_code = codegraph.reason_code;
 
-    // 2. Remove managed exclude block (self-only, idempotent).
+    // 2. 幂等移除自身管理的 exclude block。
     const excl = safe(() => removeManagedExclude(repo.git_root, workspaceRoot));
     entry.exclude_status = excl && excl.ok ? (excl.changed ? 'removed' : 'absent') : 'failed';
     entry.exclude_removed = Boolean(excl && excl.ok && excl.changed);
@@ -110,12 +120,16 @@ function runWorkspaceGraphClean({
       entry.reason_code = excl && excl.reason_code ? excl.reason_code : 'exclude-remove-failed';
     }
 
-    // 3. Current explicit-refresh builds never install a hook. Without a
-    // current state receipt, preserve legacy cleanup for older installations.
+    // 3. 当前 explicit-refresh build 不安装 hook；但 contained git dir 中可能
+    // 仍有旧版本遗留 marker，此时继续调用 provider-native uninstall。
+    const hooks = resolveHooksPath(repo.git_root);
+    let shouldUninstallLegacyHook = !explicitRefreshState;
     if (explicitRefreshState) {
-      entry.hook_status = 'not-installed';
+      if (hooks.ok && isContained(workspaceRoot, hooks.absolute)) {
+        shouldUninstallLegacyHook = hasGraphifyManagedHook(hooks.absolute);
+      }
+      entry.hook_status = shouldUninstallLegacyHook ? 'skipped' : 'not-installed';
     } else {
-      const hooks = resolveHooksPath(repo.git_root);
       if (!hooks.ok) {
         entry.hook_status = 'failed';
         if (!entry.reason_code) entry.reason_code = hooks.reason_code;
@@ -127,28 +141,24 @@ function runWorkspaceGraphClean({
           if (!entry.reason_code) entry.reason_code = error.reason_code || 'hook-target-escapes-workspace';
         }
       }
-      if (entry.hook_status === 'skipped' && typeof exec === 'function') {
-        const result = safe(() => exec(graphifyCommand, ['hook', 'uninstall'], { cwd: repo.git_root }));
-        entry.hook_status = result && result.status === 0 ? 'uninstalled' : 'failed';
-        if (entry.hook_status === 'failed' && !entry.reason_code) entry.reason_code = 'graphify-hook-uninstall-failed';
-      }
+    }
+    if (entry.hook_status === 'skipped' && shouldUninstallLegacyHook && typeof exec === 'function') {
+      const result = safe(() => exec(graphifyCommand, ['hook', 'uninstall'], { cwd: repo.git_root }));
+      entry.hook_status = result && result.status === 0 ? 'uninstalled' : 'failed';
+      if (entry.hook_status === 'failed' && !entry.reason_code) entry.reason_code = 'graphify-hook-uninstall-failed';
     }
     entry.hook_uninstalled = entry.hook_status;
     repoResults.push(entry);
   }
 
-  // 4. Delete workspace .graphify/ tree (contained).
-  const graphifyOut = path.join(workspaceRoot, '.graphify');
-  const graphify = safeRemoveDir(workspaceRoot, graphifyOut);
-
-  // 5. Strip the managed routing block from workspace host entry docs (self-only).
+  // 4. 只剥离 workspace host 入口文档中的 managed routing block。
   let routing = null;
   if (stripRouting) {
     routing = safe(() => stripRoutingInstruction({ workspaceRoot, hosts }));
   }
 
-  // Legacy hook cleanup is part of the requested lifecycle. A containment block
-  // is not success: surface partial while leaving the external path untouched.
+  // Legacy hook 清理属于请求的生命周期；containment block 必须返回 partial，
+  // 同时保持外部路径不变。
   const repoFailed = repoResults.some((repo) => (
     repo.codegraph_status === 'failed'
     || repo.exclude_status === 'failed'
@@ -157,11 +167,19 @@ function runWorkspaceGraphClean({
   const routingFailed = stripRouting
     ? (!routing || routing.entries.some((entry) => entry.status === 'failed'))
     : false;
-  const failed = repoFailed || !graphify.ok || routingFailed;
+  const childOrRoutingFailed = repoFailed || routingFailed;
+
+  // 5. 只有 child/routing 已清理成功才删除 state/tree；否则保留 receipt 供裸重试。
+  const graphifyOut = path.join(workspaceRoot, '.graphify');
+  const graphify = childOrRoutingFailed
+    ? { ok: true, status: 'preserved', removed: false, reason_code: '' }
+    : safeRemoveDir(workspaceRoot, graphifyOut);
+  const failed = childOrRoutingFailed || !graphify.ok;
+  const needsConfirmation = pendingConfirm.length > 0;
 
   return {
     schema_version: 'workspace-graph-clean.v1',
-    status: failed ? 'partial' : 'complete',
+    status: failed || needsConfirmation ? 'partial' : 'complete',
     topology: targets.topology,
     workspace_root: workspaceRoot,
     repos: repoResults,
@@ -171,22 +189,42 @@ function runWorkspaceGraphClean({
     routing,
     // spec-first does not force-kill provider daemons; report the action for the user/host.
     codegraph_daemon_action: 'run `codegraph daemon` to stop any watcher bound to a removed workspace',
-    reason_code: failed ? 'workspace-clean-partial' : '',
+    reason_code: failed
+      ? 'workspace-clean-partial'
+      : (needsConfirmation ? 'workspace-repos-need-confirmation' : ''),
   };
 }
 
 function resolveHooksPath(repoRoot) {
-  const configured = spawnSync('git', ['-C', repoRoot, 'config', '--path', '--get', 'core.hooksPath'], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    timeout: 5000,
-    windowsHide: true,
-  });
+  const configured = defaultWorkspaceExec(
+    'git',
+    ['-C', repoRoot, 'config', '--path', '--get', 'core.hooksPath'],
+    { timeoutMs: 5000 },
+  );
   if (configured.status === 0 && String(configured.stdout || '').trim()) {
     const raw = String(configured.stdout).trim();
     return { ok: true, absolute: path.isAbsolute(raw) ? raw : path.resolve(repoRoot, raw) };
   }
   return resolveGitPath(repoRoot, 'hooks');
+}
+
+function isContained(workspaceRoot, target) {
+  try {
+    assertContainedPath(workspaceRoot, target, { reasonCode: 'hook-target-escapes-workspace' });
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function hasGraphifyManagedHook(hooksDir) {
+  return ['post-commit', 'post-checkout'].some((name) => {
+    try {
+      return fs.readFileSync(path.join(hooksDir, name), 'utf8').includes('Installed by: graphify hook install');
+    } catch (_error) {
+      return false;
+    }
+  });
 }
 
 function safeRemoveDir(workspaceRoot, dir) {

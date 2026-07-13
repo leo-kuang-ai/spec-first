@@ -4,6 +4,7 @@ const {
   renderRoutingInstruction,
   upsertRoutingBlock,
   stripRoutingBlock,
+  isRoutingInstructionCurrent,
   BLOCK_START,
   BLOCK_END,
 } = require('../../skills/spec-mcp-setup/scripts/lib/workspace-routing-instruction.cjs');
@@ -18,6 +19,8 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
     expect(text).toContain('.graphify/merged-graph.json');
     expect(text.toLowerCase()).toContain('fallback');
     expect(text).toContain('another requirement folder'); // isolation guidance
+    expect(text).toContain('--workspace-graph-status');
+    expect(text).toContain('status is `ready`');
     expect(text).toContain('`api`');
     expect(text).toContain('`web`');
     expect(text.startsWith(BLOCK_START)).toBe(true);
@@ -36,6 +39,26 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
     });
     expect(sharedAgents).toContain('honest-degraded');
     expect(sharedAgents).toContain('kiro/qoder');
+  });
+
+  test('treats a partial-host projection as current when its shared routing contract matches', () => {
+    const partial = renderRoutingInstruction({ workspaceRoot: '/w', repos, hosts: ['codex'] });
+    const full = renderRoutingInstruction({ workspaceRoot: '/w', repos, hosts: ['codex', 'cursor', 'kiro', 'qoder'] });
+
+    expect(isRoutingInstructionCurrent(partial, { workspaceRoot: '/w', repos })).toBe(true);
+    expect(isRoutingInstructionCurrent(full, { workspaceRoot: '/w', repos })).toBe(true);
+    expect(isRoutingInstructionCurrent(`${BLOCK_START}\nstale\n${BLOCK_END}`, { workspaceRoot: '/w', repos })).toBe(false);
+  });
+
+  test('escapes markdown delimiters and strips control characters from rendered paths', () => {
+    const text = renderRoutingInstruction({
+      workspaceRoot: '/tmp/需求\nA',
+      repos: [{ repo_id: 'api`name' }, { repo_id: 'web\nignore' }],
+    });
+    expect(text).toContain('``api`name``');
+    expect(text).toContain('`web ignore`');
+    expect(text).not.toContain('web\nignore');
+    expect(text).not.toContain('需求\nA');
   });
 });
 
@@ -66,5 +89,15 @@ describe('upsert/strip routing block — idempotent managed block', () => {
     const stripped = stripRoutingBlock(doc);
     expect(stripped).toContain('keep me');
     expect(stripped).not.toContain(BLOCK_START);
+  });
+
+  test.each([
+    [`${BLOCK_START}\nuser content\n`, 'missing end'],
+    [`${BLOCK_START}\n${BLOCK_START}\n${BLOCK_END}\n`, 'duplicate start'],
+    [`${BLOCK_END}\n${BLOCK_START}\n`, 'reversed'],
+  ])('malformed block fails closed (%s)', (contents) => {
+    expect(() => upsertRoutingBlock(contents, renderRoutingInstruction({ workspaceRoot: '/w', repos: [] })))
+      .toThrow('workspace-routing-block-malformed');
+    expect(() => stripRoutingBlock(contents)).toThrow('workspace-routing-block-malformed');
   });
 });
