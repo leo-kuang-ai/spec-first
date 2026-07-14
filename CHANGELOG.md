@@ -1,5 +1,7 @@
 # Changelog
 
+- v1.13.2 2026-07-14 10:20:29 Codex: docs(review): 新增 `spec-doc-review` / `spec-code-review` Token 消耗专项分析报告，基于当前 source 统计 prompt/persona/reference 体积并回源审查默认 roster、lite gate、逐 finding validator、diff/document 重复读取、Codex 上下文继承与模型分层退化；给出 run-level cost manifest、风险驱动 roster/validator、reviewer-specific slicing 和 lite/standard/full profile 的分阶段建议，并登记项目审查索引。未修改 skill、CLI、schema、tests、现有 token 优化计划或 generated runtime；未运行真实宿主计费与 paired quality benchmark。 (user-visible)
+
 - v1.13.2 2026-07-14 01:30:00 Codex: feat(runtime-setup): 非 Git 多仓父目录的 parent-only `init` 明确 child projection 为 pending 并给出最窄投射命令；`spec-runtime-setup` 在当前 host 的 child projection 缺失/过期时于 mutation 前阻断，`--plan --all-repos` 逐 child 零写入预览，user/managed host config 条件共享一次且 local/project/workspace config 仍逐 child 执行。补充子仓 CodeGraph / 跨仓 Graphify 静态引导与 doctor 四层 advisory readiness（projection、managed runtime、optional graph、unmanaged external MCP）；不新增 bootstrap 编排、marker lifecycle 或 runtime mirror 手改。 (user-visible)
 
 - v1.13.2 2026-07-14 Codex: docs(plan): 新增 `2026-07-14-001` spec-doc-review token 优化技术方案——核心链路文档审查 workflow 渐进式披露重构：子代理模板 spine (~80 行) + 惰性 reference、合成管道冷热分离（热路径 ~250 行 + 5 个冷路径 reference）、SKILL.md 入口脊柱瘦身 (~160 行)、contract test 补齐。复用 spec-plan 已验证的 spine + STOP 锚点模式，目标是单次审查 token 消耗从 ~22,500 降至 ~12,000-14,000。含完整的降智风险评估（硬约束保留、角色文件不动、冷路径最坏情况是 UX 略降而非 finding 错误）和 fresh-source eval 验证计划。未实施 runtime 或手改 generated mirror。 (user-visible)

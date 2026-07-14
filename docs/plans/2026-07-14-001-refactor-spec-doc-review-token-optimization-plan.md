@@ -1,18 +1,18 @@
 ---
-title: "refactor: spec-doc-review Token Consumption and Execution Speed Optimization"
+title: "refactor: spec-doc-review Token Consumption Optimization"
 type: refactor
 created_at: 2026-07-14
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
-execution: prompt
+execution: code
 ---
 
-# refactor: spec-doc-review Token Consumption and Execution Speed Optimization
+# refactor: spec-doc-review Token Consumption Optimization
 
 ## Goal Capsule
 
-- **Objective:** 将 `spec-doc-review` 每次审查的 token 消耗相对当前基线降低 40-55%（以 Wave 1a 实测指令体积与典型审查 token 为基线；当前 ~22,500 → 目标约 ~12,000 冷路径不触发 / ~14,000 冷路径部分触发为**待测假设**，验收以实测降幅为准），将子代理调度和合成管道的指令体积降低 40-55%，并通过 fresh-source eval 验证 finding 质量不出现约定阈值内的退化。
+- **Objective:** 将 `spec-doc-review` 每次审查的指令体积（注入上下文的 prompt 行数与估算 token）相对当前基线降低 40-55%（以 Wave 1a 实测为基线；当前 ~22,500 → 目标约 ~12,000 冷路径不触发 / ~14,000 冷路径部分触发为**待测假设**，验收以实测降幅为准），并通过 fresh-source eval 验证 finding 质量不出现约定阈值内的退化。Token 降低通常与执行加速正相关，但 wall-clock 耗时不在本计划度量范围内——标题与验收仅覆盖指令体积优化。
 - **Authority:** `spec-plan` 已验证的 "spine + STOP 锚点 + 惰性 reference + contract test 守护" 渐进式披露模式。本计划不发明新机制；热路径步骤语义与现网合成顺序对齐（含 always-on `3.5b`）。**语义边界：** 不改变 finding schema、角色独立性与交互遍历/批量预览流程；冷路径中 **presentation-only** 步骤（3.9、R29/R30）不改变 finding 集合，**outcome-affecting** 步骤（3.3b、3.5、3.5c）会改变呈现集合、推荐动作合并或决策级联，不得笼统写成「不改变行为语义」。
 - **Stop conditions:** 不合并或删除角色（独立角色是跨角色提升信号的前提）；不改变 finding schema；不新增 CLI 能力；不修改交互式遍历/批量预览流程；不在本轮收紧对抗性角色激活条件。
 
@@ -22,7 +22,7 @@ execution: prompt
 
 ### Summary
 
-`spec-doc-review` 是 spec-first 核心链路中的文档审查 workflow，通过 2-7 个独立角色子代理对需求文档和技术方案做多视角结构化审查。当前每次审查的 token 消耗过高（~22,500），执行速度慢（串行阶段 + 子代理全量指令注入），主要瓶颈在于：
+`spec-doc-review` 是 spec-first 核心链路中的文档审查 workflow，通过 2-7 个独立角色子代理对需求文档和技术方案做多视角结构化审查。当前每次审查的 token 消耗过高（~22,500），主要瓶颈在于：
 
 1. **子代理模板 183 行全量注入**每个子代理，其中 ~55% 是参考材料而非执行指令
 2. **合成管道 416 行全量加载**，其中 ~40% 是仅在特定条件触发时才需要的冷路径
@@ -57,7 +57,7 @@ Wave 1a/1b 关闭核心 token 消耗问题。Wave 2 关闭入口重量和结构�
 - **R1:** 子代理模板拆分为 spine（~80 行，始终注入）和惰性 reference（~100 行，子代理按需读取），spine 保留所有硬约束（schema enums、autofix_class 定义、置信度锚点速查表、误报目录），reference 承载置信度锚点行为详解、why_it_matters 强弱对比示例、suggested_fix 进阶规则。
 - **R2:** 合成管道拆分为热路径（~250 行，始终加载）和惰性 reference（~160 行，仅条件触发时读取）。热路径必须对齐现网 always-on 顺序：`3.1 → 3.2 → 3.3 → 3.4 → [STOP→3.5 若对立 recommended actions 未合并] → 3.5b（always-on，写 recommended_action） → [STOP→3.5c 若 post-3.5b 前提信号] → 3.6 → 3.7 → 3.8 → [STOP→3.9] → Phase 4 → [STOP→R29/R30 if round≥2]`。冷路径分两类：**outcome-affecting**（3.3b 同角色冗余折叠、3.5 矛盾解决、3.5c 前提-依赖链关联——改变呈现集合/推荐动作/决策级联）与 **presentation-only**（3.9 残余剔除、R29/R30 多轮抑制——主要影响报告噪音）。`3.3b` 仍为冷路径（`≥3` same-persona post-dedup）。walkthrough/bulk-preview 不重算 `recommended_action`（由 3.5b 写入）。
 - **R3:** SKILL.md 文档分类信号清单和角色激活矩阵移到惰性 reference，入口保留核心判断规则和激活决策速查表。
-- **R4:** 每个被拆分的文件必须有 contract test 守护 spine/reference 结构和 runtime 投射正确性，复用 `spec-plan-contracts.test.js` 的断言模式。
+- **R4:** 每个被拆分的文件必须有 contract test 守护 spine/reference 结构。**结构契约**（`tests/unit/spec-doc-review-contracts.test.js`，复用 `spec-plan-contracts.test.js` 的字符串包含断言模式）验证 source 文件含 STOP 锚点、硬约束标记与 reference 文件名。**集成测试**（`tests/integration/doc-review-five-host-projection.integration.test.js`，复用 `init-five-host-lifecycle.integration.test.js` 的 sandbox + `getSupportedPlatforms()` 遍历模式）验证 `spec-first init --<platform>` 后每个新增 reference 文件在所有 host runtime 路径的物理投射。两种测试互补，不互相替代。
 - **R5:** 精简后必须通过 fresh-source eval 验证 finding 质量不退化。方法、fixture、注入方式与评分责任见 Verification Contract：将磁盘上当前 skill/reference 源文件内容注入**全新通用 subagent**（或等价 fresh read-only reviewer；禁止依赖会话已缓存的 typed-agent），对同一 fixture 文档分别跑 before/after，对比 finding 数量、严重级别分布、置信度分布和 why_it_matters 质量。
 - **R6:** 7 个角色文件保持不变——角色文件承载审查方法论（分析协议、领域知识、抑制条件），是 finding 质量的核心保证，不在本轮优化范围内。
 - **R7:** 交互式遍历（walkthrough.md, 284 行）和批量预览（bulk-preview.md, 128 行）保持不变——交互模式的核心流程已按状态机方式组织，收缩空间有限。
@@ -68,7 +68,8 @@ Wave 1a/1b 关闭核心 token 消耗问题。Wave 2 关闭入口重量和结构�
   - Source 拆分与惰性加载：`skills/spec-doc-review/SKILL.md`、`skills/spec-doc-review/references/subagent-template.md`、`skills/spec-doc-review/references/synthesis-and-presentation.md`
   - **新增 inert references**（U1–U3 列出的全部 `references/*.md`）
   - **Contract tests 扩展**：`tests/unit/spec-doc-review-contracts.test.js`（及必要时对 `spec-plan-contracts.test.js` 模式的对齐）
-  - **多 host runtime 投射验证**：`spec-first init` 后断言 skill mirror / workflow references 在当前 `getSupportedPlatforms()` 覆盖的 host 路径就位（不仅 `.claude/spec-first/workflows/...`，还包括如 `.agents/skills/`、`.claude/skills/` 等 skill mirror，以 generator 实际输出为准）
+  - **集成测试新增**：`tests/integration/doc-review-five-host-projection.integration.test.js`（复用 `init-five-host-lifecycle.integration.test.js` 的 sandbox + `getSupportedPlatforms()` 遍历 + `spec-first init --<platform>` 模式）
+  - **多 host runtime 投射验证**：结构契约（source 字符串包含）+ 集成测试（物理文件存在），两者互补
   - Wave 1a 的 **token/指令体积基线测量** 与报告条目
 - **Out of scope:** 角色文件修改、finding schema 变更、交互式遍历/批量预览流程修改、新增 CLI 能力、对抗性角色激活条件收紧（本轮不做——对抗性角色在 plan-with-origin 上的决策压力测试是独特信号，收紧可能损失质量，留待数据积累后单独评估）。
 - **Deferred:** 决策引物增长控制（U5，Wave 3）——依赖多轮审查的实际使用数据来校准上限。
@@ -148,7 +149,7 @@ spine 保留了所有硬约束——这些是防止错误 finding 的机制（�
 |--------|------|---------|-------------------|
 | 3.3b 同角色冗余折叠 | outcome-affecting | `any persona has ≥3 findings in the post-dedup set` | "STOP. Before finalizing dedup, if any persona contributed 3 or more findings, read `references/synthesis-premise-collapse.md`."（在 3.3 完成、进入 3.4 前） |
 | 3.5 矛盾解决 | outcome-affecting | `after 3.3/3.4, the unmerged set still contains findings with opposing recommended actions from different personas`（对齐现网 3.3：对立 recommended actions **故意不合并**，留给 3.5） | "STOP. After cross-persona promotion (3.4), if any findings still carry opposing recommendations from different personas (not yet resolved), read `references/synthesis-contradictions.md` before 3.5b."（**不得**写成「merged finding 已带 opposing」——那会与 3.3 不合并策略矛盾） |
-| 3.5c 前提-依赖链 | outcome-affecting | `any P0 or P1 manual finding in the **post-3.5b** set has a framing-level section AND premise-challenge signal phrases in title or why_it_matters`（**不是** post-routing / post-3.7） | "STOP. After 3.5b and before 3.6, if any P0/P1 finding challenges a foundational premise (section is Problem Frame/Summary/Overview/Motivation/Goals AND signal: 'unsupported', 'unjustified', 'do-nothing baseline', 'is X the right approach'), read `references/synthesis-chain-linking.md`." |
+| 3.5c 前提-依赖链 | outcome-affecting | `any P0 or P1 manual finding in the **post-3.5b** set has a framing-level section AND premise-challenge signal in title or why_it_matters`（**不是** post-routing / post-3.7）。Signal 采用 **shape-match（子串/包含），非精确字符串**，覆盖以下形状及等价变体：`premise unsupported`、`justification missing`、`do-nothing baseline not evaluated`、`is X justified`、`unsupported by evidence`、`is the proposed solution the right approach`，**或** finding 显式质疑某个具名组件是否应该存在（"questions whether a named component should exist"）。匹配规则写入 `synthesis-chain-linking.md` 参考文件，STOP 锚点引用该文件为权威来源 | "STOP. After 3.5b and before 3.6, if any P0/P1 finding challenges a foundational premise (section is Problem Frame/Summary/Overview/Motivation/Goals AND title/why_it_matters contains a premise-challenge signal — see `references/synthesis-chain-linking.md` for the full shape-match rule and signal phrase list), read `references/synthesis-chain-linking.md`." |
 | 3.9 残余剔除 | presentation-only | `any persona output carries non-empty residual_risks or deferred_questions` | "STOP. Before final rendering, if any persona submitted residual risks or deferred questions, read `references/synthesis-restatement-suppression.md`." |
 | R29/R30 多轮 | presentation-only | `current round ≥ 2 (decision primer is non-empty)` | "STOP. Before Phase 4 presentation in round 2+, read `references/synthesis-multi-round.md`." |
 
@@ -182,6 +183,18 @@ spine 保留了所有硬约束——这些是防止错误 finding 的机制（�
 - 条件角色激活信号（~48 行 5 角色的详细触发矩阵）→ `references/persona-activation-matrix.md`，入口保留 ~10 行激活决策速查表
 - 子代理模型分层（~8 行嵌入 prose）→ ~3 行表格
 - 子代理调度逻辑、Phase 0-2 流程保持不变
+
+**加载契约（Phase 1 必读 / STOP / fallback）：**
+
+分类和角色激活是每次审查必经步骤。入口脊柱的核心规则和速查表覆盖常见情况；惰性 reference 仅在边缘情况触发——不总是读取，否则净 token 不降。
+
+- **文档分类（Phase 1）：** 编排器先用脊柱核心规则（"content shape over path, tie-breaker defaults to requirements" + unified artifact contract 检查）分类。若分类结果明确，不读 reference。STOP 锚点：**"If classification is genuinely ambiguous after applying the core rules above, read `references/document-classification-signals.md` before proceeding to persona selection."**
+- **角色激活（Phase 1）：** 编排器先用脊柱速查表判断条件角色是否激活。速查表覆盖典型触发信号（product-lens: 可质疑前提或战略权重；design-lens: UI/UX/前端/交互；security-lens: auth/API/PII；scope-guardian: 多优先级/>8 单元/stretch goals；adversarial: 高风险领域/新抽象/无上游验证）。若速查表不能裁决，STOP 锚点：**"If the quick-reference table does not resolve whether to activate a conditional persona for this document, read `references/persona-activation-matrix.md` before finalizing the reviewer list."**
+- **Fallback：** 若编排器跳过了两个 reference 但分类或角色选择在后续执行中被证明错误（如 feasibility-reviewer 报告大量 "this should have been classified as plan" 信号），不视为方案缺陷——这是 spine 覆盖率的验证数据，用于后续收紧核心规则或速查表。
+
+**Verification（分类/激活 fixture）：**
+- 选取 3 份文档（明确 requirements、明确 plan、ambiguous/mixed），仅凭脊柱核心规则 + 速查表做分类和角色激活
+- 通过标准：分类 100% 正确（与现网全信号清单结果一致）；角色激活不出现漏派（应激活未激活）或严重误派（激活了明确不应激活的角色）
 
 **Verification:**
 - Contract test 断言主文件含 STOP 锚点、reference 含对应内容
@@ -393,23 +406,42 @@ spine 保留了所有硬约束——这些是防止错误 finding 的机制（�
 
 ### Fresh-Source Eval
 
-**方法：** 将磁盘上当前 skill/reference **源文件内容**注入**全新通用 subagent**（或等价 fresh read-only reviewer）。禁止依赖本会话已缓存的 typed-agent / skill 定义。对比 before（优化前源）与 after（优化后源，默认 spine-only 负载策略）。
+**前置锁定（实施前完成，写入报告）：**
 
-**具名 fixture（实施时锁定路径；可替换为同类型仓库内文档但须记入报告）：**
-1. **requirements fixture：** 一份中等复杂度 requirements/PRD 类文档（建议从 `docs/` 既有需求中选，或使用本仓库近期 plan 的 product-contract 节选）
-2. **plan-with-origin fixture：** 一份带上游验证/来源的技术方案（`artifact_readiness: implementation-ready` + 明确 Authority/上游引用）
-3. **greenfield plan fixture：** 一份无强上游证据的技术方案
-4. **冷路径场景夹具（可合成 persona JSON 或选用必触发文档）：** ≥3 same-persona post-dedup；跨角色 opposing recommended actions；post-3.5b 前提挑战 P0/P1；residual 非空；round≥2 primer
+- **Before revision：** `git rev-parse HEAD` 在当前分支的最新 commit SHA，作为优化前源快照。Before 评测使用该 revision 的 `skills/spec-doc-review/**` 源文件。
+- **After source：** 当前工作树（含 U1-U3 修改）的 `skills/spec-doc-review/**` 源文件。
+- **Host / 模型：** 固定 Claude Code 作为评测宿主；记录实际使用的模型 ID（从会话元数据或 API 响应获取）。若评测期间模型版本变更，记入报告。
+- **重复运行：** 每个 fixture × before/after 至少运行 **3 次**，报告中同时报告中位数与 min/max 范围。单次运行不得作为通过/失败证据。
 
-**注入方式：**
-- 读取 `skills/spec-doc-review/**` 当前磁盘源（template + 角色文件 + 热路径 synthesis；after 侧按 STOP 规则允许再读 inert reference）
-- 注入到新 subagent system/user prompt；对同一 fixture 固定用户提示与文档正文
-- 记录：host、模型（若可知）、角色集合、是否触发冷路径、是否加载 detail reference
+**方法：** 将磁盘上当前 skill/reference **源文件内容**注入**全新通用 subagent**（或等价 fresh read-only reviewer）。禁止依赖本会话已缓存的 typed-agent / skill 定义。对比 before（优化前源，固定 revision）与 after（优化后源，默认 spine-only 负载策略）。
+
+**注入方式（固定模板）：**
+- 对于 persona 级 FSE（U1）：读取 `skills/spec-doc-review/references/subagent-template.md`（before: full 183 行；after: spine ~80 行）+ 固定角色文件 + fixture 文档正文，注入到新 subagent system/user prompt。固定 user prompt 文本（实施时写入报告）："Review the following document as {persona_name}. Return findings per the attached schema."
+- 对于合成级 FSE（U2）：运行完整 doc-review workflow（含子代理调度 + 合成管道），但固定角色集合与 fixture 文档，记录冷路径触发情况。
+- After 侧允许 subagent 按 STOP 规则读取 inert reference；记录是否实际读取。
+
+**具名 fixture（实施时锁定仓库内路径与文档 SHA；不得写"建议选择"）：**
+
+1. **requirements fixture：** `docs/项目审查/2026-07-06-真实状态与提升优先级.md`（中等复杂度需求/审查类文档，约 237 行）
+2. **plan-with-origin fixture：** `docs/plans/2026-07-13-002-feat-workspace-readiness-guidance-plan.md`（`artifact_readiness: implementation-ready` + `product_contract_source: spec-plan-bootstrap`，带上游引用）
+3. **greenfield plan fixture：** 本计划自身 `docs/plans/2026-07-14-001-refactor-spec-doc-review-token-optimization-plan.md`（`product_contract_source: spec-plan-bootstrap`，greenfield 语义）
+4. **冷路径场景夹具（合成级 FSE，至少覆盖）：**
+   - **3.3b 同角色冗余折叠：** 构造或选用已知会触发同一角色 ≥3 同前提 finding 的文档（如一篇结构松散、重复论述同一前提的 PRD）
+   - **3.5 矛盾解决：** 构造或选用已知会触发跨角色对立建议的文档（如一篇同时被 coherence 建议保留、scope-guardian 建议删除的段落）
+   - **3.5c 前提-依赖链：** fixture 2（plan-with-origin）— 其 Problem Frame 本身包含前提级主张，验证 post-3.5b 前提信号检测与级联
+   - **3.9 残余剔除 + R29/R30：** 运行 round 2 审查（同一 fixture 先跑 round 1 并记录 finding，再跑 round 2），验证残余剔除与多轮抑制
+
+  冷路径夹具不使用"合成 persona JSON"——合成 JSON 绕过子代理调度与文档读取，测试的是合成逻辑而非端到端行为。使用真实文档 + 完整 workflow 运行。
 
 **评分责任：**
-- **定量维度**（finding 数、P0/P1 比、置信度分布）：实施者用表格记录，可脚本辅助统计
-- **why_it_matters / 误报**：实施者或指定 reviewer **人工抽样**（每 fixture ≥5 条或全部若更少）；不得声称自动通过
-- **通过/失败裁定：** 实施者对照下表；任一条超阈值 → 失败并触发 U1 负载策略恢复或 U2 STOP 修复，不得「主观差不多就算过」
+- **定量维度**（finding 数、P0/P1 比、置信度分布）：实施者用表格记录 3 次运行的分布，报告中同时报告中位数与 min/max 范围
+- **why_it_matters / 误报**：实施者或指定 reviewer **人工抽样**（每 fixture × 每 run ≥5 条或全部若更少）；原始输出全文保存供审计
+- **通过/失败裁定：** 实施者对照下表；任一条在**中位数**上超阈值 → 失败并触发 U1 负载策略恢复或 U2 STOP 修复；"3 次中 2 次通过"不算通过——中位数超阈值即为失败
+
+**原始输出留存：**
+- Before/after 各 run 的子代理原始 JSON 输出保存到 `.spec-first/audits/fse-doc-review-optimization/{before,after}/run-{N}/{fixture-name}/`
+- 人工评分记录（why_it_matters 逐条判定 + 误报逐条判定）与评分人身份保存到同目录 `scoring.json`
+- DoD 验收时引用这些路径，不得以"实施者记忆中通过了"代替
 
 | 对比维度 | 退化判定标准 | 通过标准 |
 |---------|-------------|---------|
@@ -425,10 +457,42 @@ spine 保留了所有硬约束——这些是防止错误 finding 的机制（�
 ```bash
 # 结构契约（Wave 1a 最小 + 1b/2 全量）
 npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand
+```
 
-# Runtime 投射（多 host）
-spec-first init
-npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand  # 断言多路径 runtime reference 就位
+**结构契约覆盖范围：** 复用现有 `spec-doc-review-contracts.test.js` 的字符串包含断言模式（与 `spec-plan-contracts.test.js` 一致），扩展到：
+- U1 spine 含硬约束标记（schema enums、autofix_class 值、置信度速查表 5 锚点、FP catalog 关键条目词）、含可选 detail 指引行（非 always-read STOP）
+- U2 热路径含 `3.5b` always-on 文本、含 3.5 STOP 锚点文案且语义为 `unmerged` opposing（非 `merged`）、含 3.5c STOP 锚点且位置在 3.6 之前、含 `post-3.5b` 锚定文本
+- U3 主文件含分类与激活 STOP 锚点文案与对应 reference 文件名
+- 各惰性 reference 文件物理存在且含被移出段落的关键标识字符串
+
+### 多 Host Runtime 投射验证（集成测试）
+
+**不依赖裸 `spec-first init`（交互式，不保证覆盖五个 host）。** 使用项目已有的 `init-five-host-lifecycle.integration.test.js` 模式：`getSupportedPlatforms()` 遍历 + 临时 sandbox + `spec-first init --<platform>` 非交互式执行，断言每个新增 reference 文件在对应 host runtime 路径的物理存在。
+
+**新增或扩展集成测试文件** `tests/integration/doc-review-five-host-projection.integration.test.js`：
+
+```javascript
+// 模式复用 init-five-host-lifecycle.integration.test.js:
+// tempSandbox(platform) → runSpecFirst(['init', `--${platform}`], sandbox) → fs.existsSync(...)
+```
+
+**断言矩阵（每个 host 至少断言以下路径存在）：**
+
+| Host | 应存在的 reference 文件（示意；以 generator 实际输出路径为准） |
+|------|-----------------------------------------------------------|
+| Claude | `.claude/spec-first/workflows/spec-doc-review/references/subagent-confidence-rubric-detail.md` 等 U1-U3 全部惰性 reference |
+| Codex | `.codex/spec-first/workflows/spec-doc-review/references/...` |
+| Cursor | `.cursor/spec-first/workflows/spec-doc-review/references/...` 或 skill mirror（视 generator 策略） |
+| Kiro | `.kiro/spec-first/workflows/spec-doc-review/references/...` 或 skill mirror |
+| Qoder | `.qoder/spec-first/workflows/spec-doc-review/references/...` 或 skill mirror |
+
+此外断言 **skill mirror 路径**（如 `.claude/skills/spec-doc-review/references/`、`.agents/skills/spec-doc-review/references/`）中 reference 文件也投射正确——不仅 workflow references 路径。具体路径以 `getSupportedPlatforms()` + `getAdapter(platform)` 的 `pointerPath` / skill mirror 约定为准，不硬编码单一 host。
+
+**不与结构契约重复：** 结构契约测试 source 字符串包含（快速，无 CLI 依赖）；集成测试验证 runtime 物理投射（慢，依赖 `spec-first init`）。两者互补，结构契约在 `npm test` 中运行，集成测试在 `npm run test:integration` 中运行。
+
+```bash
+# 多 host 投射集成验证
+npx jest tests/integration/doc-review-five-host-projection.integration.test.js --runInBand
 ```
 
 ### 验证命令
@@ -447,11 +511,12 @@ npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand
 
 - [ ] **Wave 1a 基线测量：** 优化前/后指令体积（行数与估算 token）已记录；Objective 降幅用实测数字表述（~12k/~14k 仅作假设对照）
 - [ ] U1: 子代理模板 spine (~80 行) + 3 个惰性 reference 完成；**默认 spine-only** 负载策略落地；最小结构契约通过
-- [ ] U2: 合成热路径含 **always-on 3.5b**、3.5c-before-3.6、正确 STOP 表；5 个惰性 reference 完成；contract test 通过
-- [ ] U3: SKILL.md 降至 ~160 行，2 个惰性 reference 完成
-- [ ] U4: Contract test 覆盖 spine/reference 结构与 **多 host** runtime 投射
-- [ ] Fresh-source eval 通过——具名 fixture + 注入/评分责任完整；阈值内无退化；冷路径场景 STOP 验证通过（失败则已按策略恢复并重跑）
-- [ ] `spec-first init` 后相关 host 的 workflow references 与 skill mirror 中 reference 文件就位
+- [ ] U2: 合成热路径含 **always-on 3.5b**、3.5c-before-3.6、正确 STOP 表（含 3.5c shape-match 触发规则）；5 个惰性 reference 完成；contract test 通过
+- [ ] U3: SKILL.md 降至 ~160 行，2 个惰性 reference 完成；分类/激活 fixture 验证通过（3 份文档 × spine-only 分类和角色激活 100%/无漏派）
+- [ ] U4: 结构契约（`tests/unit/spec-doc-review-contracts.test.js`）覆盖 spine/reference 结构断言
+- [ ] U4: 集成测试（`tests/integration/doc-review-five-host-projection.integration.test.js`）覆盖 `getSupportedPlatforms()` 全部 host 的 runtime reference 物理投射 + skill mirror 路径
+- [ ] Fresh-source eval 通过——fixture 路径与 before revision 已锁定；每个 fixture × 3 runs × before/after；原始输出 + 评分记录留存 `.spec-first/audits/fse-doc-review-optimization/`；中位数超阈值已触发恢复策略
+- [ ] `spec-first init` 后全部 host 的 workflow references 与 skill mirror 中 reference 文件就位（集成测试验证）
 - [ ] CHANGELOG 更新
 
 ---
