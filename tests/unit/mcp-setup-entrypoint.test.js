@@ -11,6 +11,8 @@ const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
 function tempRepo(label) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-entry-${label}-`));
   initializeGitRepo(root);
+  writeRuntimeState(root, 'codex', '1.13.2');
+  writeRuntimeState(root, 'qoder', '1.13.2');
   return root;
 }
 
@@ -834,11 +836,194 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(target, '.spec-first', 'config.local.example.yaml'))).toBe(true);
     expect(fs.readFileSync(path.join(target, '.gitignore'), 'utf8')).toContain('.spec-first/*.local.yaml');
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
-    expect(fs.existsSync(path.join(target, '.qoder'))).toBe(false);
+    expect(fs.existsSync(path.join(target, '.qoder', 'settings.local.json'))).toBe(false);
     expect(fs.existsSync(path.join(target, '.graphify'))).toBe(false);
     expect(snapshotFiles(target, ['.spec-first/config.local.example.yaml', '.gitignore'])).toEqual(repoBefore);
     expect(snapshot(homeDir)).toEqual(homeBefore);
     expect(audit.violations).toEqual([]);
+  });
+
+  test('blocks selected child setup before host, provider, or facts mutation when this host projection is missing', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-workspace-'));
+    const child = childRepo(workspace, 'apps/child');
+    const calls = [];
+    const runner = (command, args, options) => {
+      calls.push([command, ...args]);
+      return fakeRunner(command, args, options);
+    };
+
+    const result = runSetup({
+      argv: ['--only', 'graphify', '--repo', 'apps/child'],
+      cwd: workspace,
+      skillRoot,
+      runner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      mode: 'only',
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        schema_version: 'workspace-runtime-projection-preflight.v1',
+        confirmed: true,
+        host: 'qoder',
+        overall_status: 'action-required',
+        results: [expect.objectContaining({
+          repo_root: child,
+          generated_runtime_manifest: expect.objectContaining({
+            status: 'missing',
+            reason_code: 'runtime-state-missing',
+          }),
+          next_action: expect.stringContaining('spec-first init --qoder --repo'),
+        })],
+      },
+    });
+    expect(calls.some(([command, action]) => command === 'graphify' && ['install', 'extract', 'update'].includes(action))).toBe(false);
+    expect(fs.existsSync(path.join(child, '.qoder', 'settings.local.json'))).toBe(false);
+    expect(fs.existsSync(path.join(child, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+  });
+
+  test('runtime projection preflight reads only the active host and permits a current selected child', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-current-'));
+    const child = childRepo(workspace, 'apps/child');
+    writeRuntimeState(child, 'qoder', '1.13.2');
+    writeRuntimeState(child, 'codex', '0.0.1');
+
+    const result = runSetup({
+      argv: ['--only', 'graphify', '--repo', 'apps/child'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result.exit_code).toBe(0);
+    expect(fs.existsSync(path.join(child, '.graphify', 'graph.json'))).toBe(true);
+  });
+
+  test('blocks stale projection but leaves check, plan, verify-only, and project-config outside the mutation gate', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-modes-'));
+    const staleChild = childRepo(workspace, 'apps/stale');
+    const missingChild = childRepo(workspace, 'apps/missing');
+    writeRuntimeState(staleChild, 'qoder', '1.12.0');
+    const baseInput = {
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    };
+
+    expect(runSetup({ ...baseInput, argv: ['--only', 'graphify', '--repo', 'apps/stale'] })).toMatchObject({
+      exit_code: 2,
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        results: [expect.objectContaining({
+          generated_runtime_manifest: expect.objectContaining({ status: 'stale' }),
+        })],
+      },
+    });
+    for (const argv of [
+      ['--check', '--repo', 'apps/missing'],
+      ['--plan', '--only', 'graphify', '--repo', 'apps/missing'],
+      ['--verify-only', '--repo', 'apps/missing'],
+      ['--project-config', '--repo', 'apps/missing'],
+    ]) {
+      const result = runSetup({ ...baseInput, argv });
+      expect(result.reason_code).not.toBe('generated-runtime-projection-preflight-blocked');
+    }
+    expect(fs.existsSync(path.join(missingChild, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
+    expect(fs.existsSync(path.join(missingChild, '.spec-first', 'config.local.example.yaml'))).toBe(true);
+  });
+
+  test('blocks unreadable current-host projection before provider, host, or facts mutation', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-unreadable-'));
+    const child = childRepo(workspace, 'apps/child');
+    writeRuntimeState(child, 'qoder', '1.13.2');
+    fs.writeFileSync(path.join(child, '.qoder', 'spec-first', 'state.json'), '{bad json\n');
+    const calls = [];
+
+    const result = runSetup({
+      argv: ['--only', 'graphify', '--repo', 'apps/child'],
+      cwd: workspace,
+      skillRoot,
+      runner(command, args, options) {
+        calls.push([command, ...args]);
+        return fakeRunner(command, args, options);
+      },
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        results: [expect.objectContaining({
+          blocked: true,
+          generated_runtime_manifest: expect.objectContaining({
+            status: 'unknown',
+            reason_code: 'runtime-state-unreadable',
+          }),
+          next_action: expect.stringContaining('spec-first init --qoder --repo'),
+        })],
+      },
+    });
+    expect(calls.some(([command, action]) => command === 'graphify' && ['install', 'extract', 'update'].includes(action))).toBe(false);
+    expect(fs.existsSync(path.join(child, '.qoder', 'settings.local.json'))).toBe(false);
+    expect(fs.existsSync(path.join(child, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+  });
+
+  test('blocks the all-repos mutation before any child provider or facts write when one child projection is missing', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-batch-'));
+    const currentChild = childRepo(workspace, 'apps/current');
+    const missingChild = childRepo(workspace, 'apps/missing');
+    writeRuntimeState(currentChild, 'qoder', '1.13.2');
+    const calls = [];
+    const result = runSetup({
+      argv: ['--only', 'graphify'],
+      cwd: workspace,
+      skillRoot,
+      runner(command, args, options) {
+        calls.push([command, ...args]);
+        return fakeRunner(command, args, options);
+      },
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        results: expect.arrayContaining([
+          expect.objectContaining({ repo_root: currentChild, blocked: false }),
+          expect.objectContaining({
+            repo_root: missingChild,
+            blocked: true,
+            next_action: expect.stringContaining('spec-first init --qoder --repo'),
+          }),
+        ]),
+      },
+    });
+    expect(calls.some(([command, action]) => command === 'graphify' && ['install', 'extract', 'update'].includes(action))).toBe(false);
+    for (const child of [currentChild, missingChild]) {
+      expect(fs.existsSync(path.join(child, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+      expect(fs.existsSync(path.join(child, '.qoder', 'settings.local.json'))).toBe(false);
+    }
   });
 
   test('explicit graphify setup applies baseline host config, provider mutation, and post-probe facts', () => {
@@ -1301,7 +1486,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-provider-'));
     const first = childRepo(workspace, 'apps/first');
-    childRepo(workspace, 'packages/second');
+    const second = childRepo(workspace, 'packages/second');
+    writeRuntimeState(first, 'qoder', '1.13.2');
+    writeRuntimeState(second, 'qoder', '1.13.2');
     const runner = (command, args, options) => {
       if (options.cwd === first
         && path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify'
@@ -1354,6 +1541,236 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(workspace, '.spec-first', 'workspace', 'parent-artifact-quarantine.json'))).toBe(false);
   });
 
+  test('parent --plan previews every selected child without writing workspace receipts, facts, host config, or provider artifacts', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-plan-'));
+    const first = childRepo(workspace, 'apps/first');
+    const second = childRepo(workspace, 'packages/second');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const before = snapshot(workspace);
+    const homeBefore = snapshot(homeDir);
+    const audit = createReadOnlyAuditRunner();
+
+    const result = runSetup({
+      argv: ['--plan', '--only', 'graphify', '--all-repos'],
+      cwd: workspace,
+      skillRoot,
+      runner: audit.runner,
+      env: {},
+      homeDir,
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 0,
+      mode: 'plan',
+      payload: {
+        schema_version: 'workspace-mcp-plan-summary.v1',
+        mutation: false,
+        workflow_mode: 'all-repos',
+        selection_source: 'explicit-all-repos',
+      },
+    });
+    expect(result.payload.results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        repo_label: 'apps/first',
+        workspace_relative_path: 'apps/first',
+        result: expect.objectContaining({ schema_version: 'setup-install-plan.v1' }),
+      }),
+      expect.objectContaining({
+        repo_label: 'packages/second',
+        workspace_relative_path: 'packages/second',
+        result: expect.objectContaining({ schema_version: 'setup-install-plan.v1' }),
+      }),
+    ]));
+    expect(audit.violations).toEqual([]);
+    expect(snapshot(workspace)).toEqual(before);
+    expect(snapshot(homeDir)).toEqual(homeBefore);
+    expect(fs.existsSync(path.join(first, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+    expect(fs.existsSync(path.join(second, '.graphify', 'graph.json'))).toBe(false);
+  });
+
+  test('parent --plan preserves child-specific blockers without falling through to a parent plan', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-plan-blocker-'));
+    const blockedChild = childRepo(workspace, 'apps/blocked');
+    const readyChild = childRepo(workspace, 'packages/ready');
+    const configPath = path.join(blockedChild, '.qoder', 'settings.local.json');
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(configPath, JSON.stringify({
+      mcpServers: { context7: { command: 'user-owned', args: [] } },
+    }, null, 2));
+    const before = snapshot(workspace);
+    const result = runSetup({
+      argv: ['--plan', '--only', 'graphify', '--all-repos'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      reason_code: 'workspace-install-plan-blocked',
+      payload: { schema_version: 'workspace-mcp-plan-summary.v1', blocked: true },
+    });
+    expect(result.payload.results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        repo_label: 'apps/blocked',
+        exit_code: 2,
+        reason_code: 'host-config-conflict',
+        result: expect.objectContaining({ target: expect.objectContaining({ target_root: blockedChild }) }),
+      }),
+      expect.objectContaining({
+        repo_label: 'packages/ready',
+        exit_code: 0,
+        result: expect.objectContaining({ target: expect.objectContaining({ target_root: readyChild }) }),
+      }),
+    ]));
+    expect(snapshot(workspace)).toEqual(before);
+    expect(fs.existsSync(path.join(workspace, '.spec-first', 'workspace', 'mcp-setup-summary.json'))).toBe(false);
+  });
+
+  test('runs a Codex user-scope host phase once before child mutations and records shared receipts', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const { applyHostConfig } = require('../../skills/spec-runtime-setup/scripts/lib/host-config.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-shared-host-'));
+    const first = childRepo(workspace, 'apps/first');
+    const second = childRepo(workspace, 'packages/second');
+    writeRuntimeState(first, 'codex', '1.13.2');
+    writeRuntimeState(second, 'codex', '1.13.2');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    installGlobalSkill(homeDir, 'ast-grep');
+    const calls = [];
+
+    const result = runSetup({
+      argv: ['--only', 'graphify', '--all-repos'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir,
+      bundledVersion: '1.13.2',
+      hostConfigApplier(options) {
+        calls.push(options.target.config_path);
+        return applyHostConfig(options);
+      },
+    });
+
+    expect(result.exit_code).toBe(1);
+    expect(calls).toHaveLength(2);
+    expect(new Set(calls)).toEqual(new Set([path.join(homeDir, '.codex', 'config.toml')]));
+    expect(result.payload.host_config_phases).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        phase: 'shared',
+        scope: 'user',
+        repo_root: workspace,
+        outcome: 'ready',
+        config_path: path.join(homeDir, '.codex', 'config.toml'),
+      }),
+    ]));
+    const sharedReceipts = result.payload.host_config_phases.filter((receipt) => receipt.phase === 'shared');
+    expect(sharedReceipts).toHaveLength(new Set(sharedReceipts.map((receipt) => receipt.tool)).size);
+    expect(result.payload.results.every((entry) => entry.host_config_receipt.every((receipt) => receipt.phase === 'shared'))).toBe(true);
+  });
+
+  test('does not enter child mutation when the shared host phase fails', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-shared-host-failure-'));
+    const first = childRepo(workspace, 'apps/first');
+    const second = childRepo(workspace, 'packages/second');
+    writeRuntimeState(first, 'codex', '1.13.2');
+    writeRuntimeState(second, 'codex', '1.13.2');
+    const providerCalls = [];
+
+    const result = runSetup({
+      argv: ['--only', 'graphify', '--all-repos'],
+      cwd: workspace,
+      skillRoot,
+      runner(command, args, options) {
+        if (path.basename(command) === 'graphify' && ['install', 'extract', 'update'].includes(args[0])) {
+          providerCalls.push({ command, args, options });
+        }
+        return fakeRunner(command, args, options);
+      },
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+      hostConfigApplier() {
+        return { ok: false, reason_code: 'shared-host-config-injected-failure' };
+      },
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 1,
+      reason_code: 'shared-host-config-injected-failure',
+      payload: {
+        overall_status: 'action-required',
+        shared_host_phase: expect.objectContaining({
+          status: 'failed',
+          reason_code: 'shared-host-config-injected-failure',
+          continue_children_on_shared_failure: false,
+        }),
+      },
+    });
+    expect(result.payload.results).toHaveLength(2);
+    expect(result.payload.results.every((entry) => entry.reason_code === 'shared-host-config-injected-failure')).toBe(true);
+    expect(providerCalls).toEqual([]);
+    expect(fs.existsSync(path.join(first, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+    expect(fs.existsSync(path.join(second, '.graphify', 'graph.json'))).toBe(false);
+    const summaryPath = path.join(workspace, '.spec-first', 'workspace', 'mcp-setup-summary.json');
+    expect(JSON.parse(fs.readFileSync(summaryPath, 'utf8'))).toMatchObject({
+      reason_code: 'shared-host-config-injected-failure',
+      shared_host_phase: expect.objectContaining({ status: 'failed' }),
+      host_config_phases: expect.arrayContaining([
+        expect.objectContaining({ phase: 'shared', outcome: 'action-required' }),
+      ]),
+    });
+  });
+
+  test('keeps Qoder local host config mutation in each child phase', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const { applyHostConfig } = require('../../skills/spec-runtime-setup/scripts/lib/host-config.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-local-host-'));
+    const first = childRepo(workspace, 'apps/first');
+    const second = childRepo(workspace, 'packages/second');
+    writeRuntimeState(first, 'qoder', '1.13.2');
+    writeRuntimeState(second, 'qoder', '1.13.2');
+    const calls = [];
+
+    const result = runSetup({
+      argv: ['--only', 'graphify', '--all-repos'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+      hostConfigApplier(options) {
+        calls.push(options.target.config_path);
+        return applyHostConfig(options);
+      },
+    });
+
+    expect(result.exit_code).toBe(1);
+    expect(calls).toHaveLength(4);
+    expect(new Set(calls)).toEqual(new Set([
+      path.join(first, '.qoder', 'settings.local.json'),
+      path.join(second, '.qoder', 'settings.local.json'),
+    ]));
+    expect(result.payload.shared_host_phase).toMatchObject({ status: 'skipped', reason_code: 'no-shared-host-config-target' });
+    expect(result.payload.results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        repo_label: 'apps/first',
+        host_config_receipt: expect.arrayContaining([expect.objectContaining({ phase: 'per_child', scope: 'local', repo_root: first })]),
+      }),
+      expect.objectContaining({
+        repo_label: 'packages/second',
+        host_config_receipt: expect.arrayContaining([expect.objectContaining({ phase: 'per_child', scope: 'local', repo_root: second })]),
+      }),
+    ]));
+  });
+
   test('parent verification reports child manifest counts and manifest-specific next action', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-manifest-'));
@@ -1368,6 +1785,8 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       homeDir,
       bundledVersion: '1.13.2',
     };
+    writeRuntimeState(first, 'qoder', '1.13.2');
+    writeRuntimeState(second, 'qoder', '1.13.2');
     expect(runSetup({ ...baseInput, cwd: first }).exit_code).toBe(0);
     expect(runSetup({ ...baseInput, cwd: second }).exit_code).toBe(0);
     writeRuntimeState(workspace, 'qoder', '1.13.2');

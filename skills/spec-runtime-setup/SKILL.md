@@ -185,6 +185,16 @@ Use `--only codegraph`, `--only graphify`, `--only codegraph,graphify`, or Graph
 2. **父目录双层图**(per-child CodeGraph + workspace Graphify merge):`--workspace-graph --repos a,b,...` 或 `.spec-first/workspace.yaml` manifest。  
    **不要**写 `--workspace-graph --all-repos`——`--all-repos` 只服务子仓 batch,不是 workspace-graph 的仓集确认。
 
+### 从子仓开始时的轻量引导
+
+这是一段静态引导，不会自动声明 workspace membership、CodeGraph 已安装，或 workspace graph 已构建：
+
+- 问题只涉及当前子仓时，如 Provider 可用，以当前子仓作为 `projectPath` 使用 CodeGraph；结果只是导航候选，重要结论仍由源码、测试、diff 或日志确认。
+- 问题跨多个子仓时，回到非 Git 的需求父工作区。仅当 workspace graph 状态和目标仓范围均已确认时才使用 Graphify；随后直接检查候选子仓。
+- 不要假设 workspace graph 存在或仍然 current，不要从该引导推断成员关系，也不要把任一 Provider 输出当作语义证明。
+
+本轮不向 child `AGENTS.md` / `CLAUDE.md` 注入独立受管 marker，也不提供对应的 clean 生命周期；父目录 routing block 仍由显式 workspace graph lifecycle 管理。
+
 运行 `spec-runtime-setup --only codegraph,graphify --workspace-graph` 时,setup 会为该 workspace 建立两层代码图:
 
 1. **每子仓战术图**:`codegraph init` 生成 `工程N/.codegraph/`;`.codegraph/` 写入该子仓 `.git/info/exclude`(经 `git rev-parse --git-path` 解析,正确处理 `.git`-as-file/worktree,并做 realpath+containment 校验)以保持子仓 `git status` 干净;CodeGraph MCP server 全局 install 一次,跨仓查询通过 `projectPath`。

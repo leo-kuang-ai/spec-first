@@ -38,6 +38,19 @@ function tempRepo(label) {
   return root;
 }
 
+function writeCurrentRuntimeState(repoRoot, host = 'qoder') {
+  const runtimeRoots = {
+    claude: '.claude',
+    codex: '.codex',
+    cursor: '.cursor',
+    kiro: '.kiro',
+    qoder: '.qoder',
+  };
+  const statePath = path.join(repoRoot, runtimeRoots[host], 'spec-first', 'state.json');
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, '{"manifestVersion":"1.13.2"}\n');
+}
+
 function fileSnapshot(root) {
   const result = new Map();
   function visit(directory) {
@@ -146,6 +159,9 @@ function runModeCharacterization(platform, contract) {
   const skillDir = path.join(homeDir, '.agents', 'skills', 'ast-grep');
   fs.mkdirSync(skillDir, { recursive: true });
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# ast-grep\n');
+  // 该套件刻画 legacy mode 的既有合同行为；current projection 由专属
+  // preflight 测试覆盖，避免把缺失 runtime state 误当作 legacy mode 语义变更。
+  writeCurrentRuntimeState(target);
   if (contract.argv.includes('--refresh')) {
     fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
     fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), '{}\n');
@@ -181,6 +197,7 @@ function runWorkspaceCharacterization(argv, label) {
   const child = path.join(workspace, 'child');
   fs.mkdirSync(child, { recursive: true });
   initializeGitRepo(child);
+  writeCurrentRuntimeState(child);
   const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-parity-home-'));
   const skillDir = path.join(homeDir, '.agents', 'skills', 'ast-grep');
   fs.mkdirSync(skillDir, { recursive: true });

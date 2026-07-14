@@ -16,6 +16,7 @@ const {
   hostDisplayName,
   hostEntrypointLabel,
   hostMcpSetupCommand,
+  formatInitHostFlagsForExample,
   initPlatformLabel,
 } = require('./init-args');
 const { findGitRoot } = require('./init-workspace');
@@ -611,6 +612,79 @@ function printInitApplySummaries(plans, results, options = {}) {
     for (const samplePath of runtimeUntrackSamples) {
       console.log(messages.applyRuntimeUntrackSample(samplePath));
     }
+  }
+
+  printInitTopologyHandoffs(normalizedPlans, normalizedResults, options.lang || 'zh');
+}
+
+function printInitTopologyHandoffs(plans, results, lang = 'zh') {
+  for (const [index, plan] of plans.entries()) {
+    const result = results[index] || {};
+    if (plan.mode === 'all-repos') {
+      printAllReposInitHandoff(plan, result, lang);
+      continue;
+    }
+    if (plan.gitRootTopology === 'multi-repo-workspace') {
+      printParentOnlyInitHandoff(plan, lang);
+    }
+  }
+}
+
+function printParentOnlyInitHandoff(plan, lang) {
+  const hostFlags = formatInitHostFlagsForExample([plan.platform]);
+  if (lang === 'en') {
+    console.log('Child repo projections: pending (not covered by this init).');
+    console.log(`  All children: spec-first init ${hostFlags} --all-repos -y`);
+    console.log(`  One child: spec-first init ${hostFlags} --repo <child-path> -y`);
+    return;
+  }
+
+  console.log('子仓 runtime projection：pending（本次 init 未覆盖）。');
+  console.log(`  所有子仓：spec-first init ${hostFlags} --all-repos -y`);
+  console.log(`  单个子仓：spec-first init ${hostFlags} --repo <child-path> -y`);
+}
+
+function printAllReposInitHandoff(plan, result, lang) {
+  const summary = result.workspace_summary || {};
+  const counts = summary.counts || {};
+  const children = Array.isArray(summary.results) ? summary.results : [];
+  const allChildrenReady = Number(counts.total) > 0
+    && Number(counts.ready) === Number(counts.total)
+    && summary.parent_host_runtime
+    && summary.parent_host_runtime.overall_status === 'ready'
+    && result.exit_code === 0;
+
+  if (allChildrenReady) {
+    if (lang === 'en') {
+      console.log(`Child repo projections are ready for ${initPlatformLabel(plan.platform)}. Next: run spec-runtime-setup.`);
+    } else {
+      console.log(`所有子仓 runtime projection 已为 ${initPlatformLabel(plan.platform)} 就绪。下一步：运行 spec-runtime-setup。`);
+    }
+    return;
+  }
+
+  const failedChild = children.find((child) => child && (
+    child.exit_code !== 0 || child.overall_status === 'action-required'
+  ));
+  const hostFlags = formatInitHostFlagsForExample([plan.platform]);
+  if (failedChild) {
+    const childPath = failedChild.workspace_relative_path || failedChild.repo_label || '<child-path>';
+    if (lang === 'en') {
+      console.log('Child repo projection is incomplete. Repair the affected child first:');
+      console.log(`  spec-first init ${hostFlags} --repo ${childPath} -y`);
+    } else {
+      console.log('子仓 runtime projection 未完成。请先修复受影响的子仓：');
+      console.log(`  spec-first init ${hostFlags} --repo ${childPath} -y`);
+    }
+    return;
+  }
+
+  if (lang === 'en') {
+    console.log('All-repos bootstrap is incomplete. Repair the workspace projection first:');
+    console.log(`  spec-first init ${hostFlags} --all-repos -y`);
+  } else {
+    console.log('all-repos bootstrap 未完成。请先修复 workspace projection：');
+    console.log(`  spec-first init ${hostFlags} --all-repos -y`);
   }
 }
 

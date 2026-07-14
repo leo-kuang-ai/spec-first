@@ -219,7 +219,14 @@ async function runInit(argv, promptOverrides = {}) {
       ? 1
       : 0;
 
-    if (exitCode === 0 && (plans.length > 1 || plans[0].mode !== 'all-repos')) {
+    const childProjectionPending = plans.some((plan) => (
+      plan.mode !== 'all-repos' && plan.gitRootTopology === 'multi-repo-workspace'
+    ));
+    if (
+      exitCode === 0
+      && !childProjectionPending
+      && (plans.length > 1 || plans[0].mode !== 'all-repos')
+    ) {
       console.log('');
       printInitNextStepsForPlatforms(interactiveInput.platforms, interactiveInput.lang);
     }

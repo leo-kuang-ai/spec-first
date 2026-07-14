@@ -85,6 +85,8 @@ Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Chan
 
 如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在当前宿主运行统一入口 `spec-runtime-setup`。标准流程会准备必备 baseline、CodeGraph 与 Graphify；`--only` 仅用于高级子集修复，`--verify-only` 保持不安装的只读验证边界。
 
+对于非 Git 多仓需求父目录，默认 `init` 仍只投射父目录，不会为子仓生成 runtime。执行 Runtime Setup mutation 前，先用 `spec-first init --all-repos` 完成当前宿主的子仓投射，或用 `spec-first init --repo <child>` 做最窄修复。若所选子仓的当前宿主 projection 缺失或过期，Runtime Setup 会阻断 Provider 与 host-config mutation；`--plan --all-repos` 则只逐仓预览、不写入。`spec-first doctor` 会分开呈现 projection、managed runtime facts、可选 workspace graph 和不受管的 external MCP，只有前两项可贡献 managed readiness。
+
 Graphify 当前固定为 PyPI `graphifyy@0.9.12`，需要预先存在 Python `>=3.10` 与 `uv`（优先）或 `pipx`。Setup 不自动安装 Python/tool manager，也不使用 plain pip；它会验证 direct wheel hash 与 package identity，通过 `extract --code-only` 在 `.graphify/` 生成本地 AST 图，并始终把 Graphify 输出视为 advisory navigation。显式Graphify mutation setup在Python cutover完整verified后，会默认卸载已确认的全局`@sentropic/graphify` incumbent，并且只删除被证明指向该npm package的旧launcher symlink；诊断、plan和verify-only仍保持只读。
 
 在**按需求组织的非 Git 多仓父目录**（一个需求文件夹里放多套独立 clone 的子 Git 仓）中，`spec-runtime-setup --only codegraph,graphify --workspace-graph --repos a,b` 会一次性为每个子仓建 CodeGraph 战术图、为整个 workspace 建 Graphify 跨仓合并图，并将可核验构建状态原子写入 `.graphify/workspace-graph-state.json`。`--workspace-graph-status` 只有在最近构建完整、repo/source snapshot 未变化且子图、合并图、路由块齐备时才报告 ready；仅存在旧 `merged-graph.json` 不再足够。自动发现只扫描直接子目录；重复 alias 或嵌套仓根会 fail closed，需先消除歧义。Graphify 0.9.x 原生 child hook 与 out-of-tree workspace 子图不兼容，因此当前采用显式刷新：child source 变化后重跑 `--workspace-graph --repos ...`。`--workspace-graph-clean` 或宿主 `spec-first clean --workspace-graph` 只清理显式确认、manifest 或 state receipt 记录的仓及 managed 资产；自动发现的新仓必须先确认。图输出仍是 advisory candidate，结论需回子仓源码确认。

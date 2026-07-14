@@ -73,6 +73,8 @@ function runVerificationOrMutation(context, repoRoot) {
     selectedIds,
     providerResults,
     installResults,
+    sharedHostConfigResults: context.sharedHostConfigResults,
+    hostConfigPhase: context.hostConfigPhase || 'per_child',
   });
   if (applyInstallMutation && !baselineInstallFailed) {
     const dependencyFailure = firstProviderDependencyFailure(providerDependencyResults, selectedIds);
@@ -232,6 +234,7 @@ function runVerificationOrMutation(context, repoRoot) {
       runtime_capabilities: bundle.runtimeCapabilities,
       write_result: effectiveWriteResult,
       host_ledger_write_result: hostLedgerWriteResult,
+      host_config_receipt: buildHostConfigReceipt(hostConfigResults),
     },
     human: renderHumanSummary(bundle, { executionSummary }),
     target: context.target,
@@ -411,6 +414,9 @@ function configureOrInspectHost(context, repoRoot, {
   selectedIds,
   providerResults,
   installResults,
+  sharedHostConfigResults = null,
+  scopeFilter = null,
+  hostConfigPhase = 'per_child',
 }) {
   if (applyMutation) requireCapability(context, 'write-host-config');
   const results = new Map();
@@ -456,6 +462,23 @@ function configureOrInspectHost(context, repoRoot, {
       });
       continue;
     }
+    const shared = sharedHostConfigResults && sharedHostConfigResults.get(entry.id);
+    if (shared && isSharedHostConfigScope(target.scope)) {
+      if (shared.config_path && shared.config_path !== target.config_path) {
+        results.set(entry.id, {
+          configured_status: 'action-required',
+          reason_code: 'shared-host-config-target-mismatch',
+          scope: target.scope,
+          config_path: target.config_path,
+          phase: hostConfigPhase,
+          repo_root: repoRoot,
+        });
+      } else {
+        results.set(entry.id, { ...shared });
+      }
+      continue;
+    }
+    if (typeof scopeFilter === 'function' && !scopeFilter(target.scope, target, entry)) continue;
     let inspection = inspectHostConfig({ entry, target });
     const repairAuthorized = context.actionPlan.args.repairHostConfig === true
       && inspection.reason_code === 'host-config-conflict';
@@ -463,7 +486,8 @@ function configureOrInspectHost(context, repoRoot, {
       && !inspection.configured
       && (inspection.ok || repairAuthorized)
       && (!inspection.conflict || repairAuthorized)) {
-      const applied = applyHostConfig({ entry, target, overwrite: repairAuthorized });
+      const applier = context.hostConfigApplier || applyHostConfig;
+      const applied = applier({ entry, target, overwrite: repairAuthorized });
       if (applied.ok) inspection = inspectHostConfig({ entry, target });
       else inspection = { ok: false, configured: false, reason_code: applied.reason_code };
     }
@@ -479,12 +503,31 @@ function configureOrInspectHost(context, repoRoot, {
       blocking_path: inspection.blocking_path || null,
       conflict_fields: inspection.conflict_fields || [],
       repair_authorized: repairAuthorized,
+      scope: target.scope,
+      phase: hostConfigPhase,
+      repo_root: repoRoot,
       next_action: inspection.reason_code === 'host-config-conflict'
         ? hostConfigRepairCommand(context)
         : null,
     });
   }
   return results;
+}
+
+function isSharedHostConfigScope(scope) {
+  return scope === 'user' || scope === 'managed';
+}
+
+function buildHostConfigReceipt(hostConfigResults) {
+  return [...(hostConfigResults || new Map()).entries()].map(([tool, result]) => ({
+    tool,
+    scope: result.scope || result.effective_scope || null,
+    config_path: result.config_path || null,
+    phase: result.phase || 'per_child',
+    repo_root: result.repo_root || null,
+    outcome: result.configured_status || 'unknown',
+    reason_code: result.reason_code || null,
+  }));
 }
 
 function hostConfigRepairCommand(context) {
@@ -787,9 +830,11 @@ function resolveBundledVersion({ skillRoot, env, runner }) {
 }
 
 module.exports = {
+  buildHostConfigReceipt,
   computeGeneratedRuntimeManifestHealth,
   configureOrInspectHost,
   firstSelectedProviderFailure,
+  isSharedHostConfigScope,
   providerContext,
   reconcileProviderHostConfig,
   requireCapability,

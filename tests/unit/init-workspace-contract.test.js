@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const CodexAdapter = require('../../src/cli/adapters/codex');
 const { buildInitPlan } = require('../../src/cli/commands/init-plan');
@@ -15,6 +16,7 @@ const {
 } = require('../../src/cli/commands/init-workspace');
 const {
   printHelp,
+  printInitApplySummaries,
   printInitPreview,
 } = require('../../src/cli/commands/init-output');
 
@@ -119,6 +121,24 @@ function readUserContract() {
   return USER_CONTRACT_PATHS.map((relativePath) => (
     `${relativePath}\n${fs.readFileSync(path.join(__dirname, '..', '..', relativePath), 'utf8')}`
   )).join('\n');
+}
+
+function runInitCli(workspaceRoot, args) {
+  const homeRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-home-'));
+  tempRoots.push(homeRoot);
+  return spawnSync(process.execPath, [
+    path.join(__dirname, '..', '..', 'bin', 'spec-first.js'),
+    'init',
+    ...args,
+  ], {
+    cwd: workspaceRoot,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      HOME: homeRoot,
+      NO_COLOR: '1',
+    },
+  });
 }
 
 afterEach(() => {
@@ -392,6 +412,8 @@ describe('init workspace contract', () => {
     expect(cliOutput).toContain('Initialize the parent workspace bootstrap only.');
     expect(cliOutput).not.toContain('Parent runtime assets:');
     expect(cliOutput).not.toContain('Initialize parent workspace runtime only.');
+    expect(cliOutput).not.toContain('spec-mcp-setup');
+    expect(cliOutput).not.toContain('mcp-setup');
 
     const userContract = readUserContract();
     for (const staleContract of [
@@ -408,5 +430,120 @@ describe('init workspace contract', () => {
     expect(userContract).toContain(
       '默认在父 workspace root 执行完整 bootstrap：写入 instruction、`.gitignore`、缺失时的 `CHANGELOG.md` 以及 selected host runtime/state',
     );
+  });
+
+  test('reports parent-only workspace child projections as pending with the narrow all-repos and repo handoffs', () => {
+    const { workspaceRoot } = createWorkspace();
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    printInitApplySummaries([{
+      mode: 'single-repo',
+      gitRootTopology: 'multi-repo-workspace',
+      platform: 'codex',
+      projectRoot: workspaceRoot,
+    }], [{
+      exit_code: 0,
+      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+    }], { lang: 'en' });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).toContain('Child repo projections: pending (not covered by this init).');
+    expect(output).toContain('spec-first init --codex --all-repos -y');
+    expect(output).toContain('spec-first init --codex --repo <child-path> -y');
+    expect(output).not.toContain('spec-mcp-setup');
+    expect(output).not.toContain('mcp-setup');
+  });
+
+  test('does not append the generic runtime setup recommendation after parent-only init', () => {
+    const { workspaceRoot } = createWorkspace();
+    const result = runInitCli(workspaceRoot, [
+      '--codex',
+      '-y',
+      '-u',
+      'Workspace Contract Test',
+      '--lang',
+      'en',
+    ]);
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Child repo projections: pending (not covered by this init).');
+    expect(result.stdout).toContain('spec-first init --codex --all-repos -y');
+    expect(result.stdout).not.toContain('For stronger readiness, run `spec-runtime-setup`');
+  });
+
+  test('does not add workspace child-projection handoffs to a regular Git repo', () => {
+    const { childRoot } = createWorkspace();
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    printInitApplySummaries([{
+      mode: 'single-repo',
+      gitRootTopology: 'single-repo',
+      platform: 'codex',
+      projectRoot: childRoot,
+    }], [{
+      exit_code: 0,
+      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+    }], { lang: 'en' });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).not.toContain('Child repo projections:');
+    expect(output).not.toContain('spec-first init --codex --all-repos -y');
+  });
+
+  test('recommends runtime setup only after all child projections are ready', () => {
+    const { workspaceRoot, childRoot } = createWorkspace();
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    printInitApplySummaries([{
+      mode: 'all-repos',
+      platform: 'codex',
+      workspaceRoot,
+    }], [{
+      exit_code: 0,
+      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+      workspace_summary: buildWorkspaceInitSummary({
+        workspaceRoot,
+        plan: buildCodexWorkspacePlan(workspaceRoot, childRoot),
+        parentRuntime: readyParentRuntime(),
+        results: [readyChildResult(childRoot)],
+      }),
+    }], { lang: 'en' });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).toContain('Child repo projections are ready for Codex. Next: run spec-runtime-setup.');
+    expect(output).not.toContain('spec-mcp-setup');
+    expect(output).not.toContain('mcp-setup');
+  });
+
+  test('recommends the narrow failed child repair before runtime setup for partial all-repos init', () => {
+    const { workspaceRoot, childRoot } = createWorkspace();
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    printInitApplySummaries([{
+      mode: 'all-repos',
+      platform: 'codex',
+      workspaceRoot,
+    }], [{
+      exit_code: 1,
+      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
+      workspace_summary: buildWorkspaceInitSummary({
+        workspaceRoot,
+        plan: buildCodexWorkspacePlan(workspaceRoot, childRoot),
+        parentRuntime: readyParentRuntime(),
+        results: [{
+          ...readyChildResult(childRoot),
+          exit_code: 1,
+          overall_status: 'action-required',
+          reason_code: 'init-failed',
+        }],
+      }),
+    }], { lang: 'en' });
+
+    const output = logSpy.mock.calls.flat().join('\n');
+    expect(output).toContain('Child repo projection is incomplete. Repair the affected child first:');
+    expect(output).toContain('spec-first init --codex --repo child-app -y');
+    expect(output).not.toContain('Next: run spec-runtime-setup.');
+    expect(output).not.toContain('spec-mcp-setup');
+    expect(output).not.toContain('mcp-setup');
   });
 });

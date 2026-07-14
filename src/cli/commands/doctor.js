@@ -461,14 +461,356 @@ function formatInspectionError(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
-function buildDoctorCommonChecks(projectRoot) {
-  return [
+function buildDoctorCommonChecks(projectRoot, options = {}) {
+  const checks = [
     checkNodeVersion(),
     checkGit(),
     checkPluginManifest(),
     checkGlobalDeveloper(projectRoot),
-    checkWorkspaceGraphStatus(projectRoot),
-  ].filter(Boolean);
+  ];
+  const workspaceReadiness = options.workspaceReadiness || buildWorkspaceReadinessView({
+    projectRoot,
+    platforms: options.platforms || [],
+    bundledManifestVersion: options.bundledManifestVersion,
+    runWorkspaceGraphStatus: options.runWorkspaceGraphStatus,
+    now: options.now,
+  });
+  if (workspaceReadiness) {
+    checks.push(...buildWorkspaceReadinessChecks(workspaceReadiness));
+  }
+  return checks.filter(Boolean);
+}
+
+// 非 Git 需求父目录有四个刻意分离的 readiness surface。它们是当前本地观察，
+// 不替代 workspace 级 receipt；外部 MCP startup 不属于 spec-first ownership，
+// 也绝不能贡献给 managed_ready。
+function buildWorkspaceReadinessView({
+  projectRoot,
+  platforms = [],
+  bundledManifestVersion,
+  runWorkspaceGraphStatus,
+  now = new Date(),
+} = {}) {
+  const targets = resolveDoctorWorkspaceTargets(projectRoot);
+  if (!targets || targets.topology !== 'requirement-workspace') return null;
+
+  const children = Array.isArray(targets.repos) ? targets.repos : [];
+  const hosts = [...new Set((platforms || []).filter(Boolean))];
+  const selection = {
+    source: 'current-workspace-target-discovery',
+    workspace_root: targets.workspace_root,
+    child_ids: children.map((child) => child.repo_id),
+    hosts,
+    confirmed: targets.manifest_error == null
+      && (!Array.isArray(targets.ambiguous) || targets.ambiguous.length === 0)
+      && children.length > 0
+      && children.every((child) => child.needs_confirm !== true)
+      && hosts.length > 0,
+  };
+  const selectionReason = workspaceSelectionReason(targets, hosts);
+  const observedAt = now instanceof Date ? now.toISOString() : new Date(now).toISOString();
+  const bundledVersion = bundledManifestVersion || bundledManifestVersionForDoctor();
+  const projection = inspectWorkspaceProjection({
+    children,
+    hosts,
+    bundledVersion,
+    selection,
+    selectionReason,
+    observedAt,
+  });
+  const managedRuntime = inspectWorkspaceManagedRuntime({
+    children,
+    hosts,
+    projection,
+    selection,
+    selectionReason,
+    observedAt,
+  });
+  const workspaceGraph = inspectWorkspaceGraphLayer({
+    projectRoot,
+    selection,
+    observedAt,
+    runWorkspaceGraphStatus,
+  });
+  const externalMcp = {
+    layer: 'external_mcp',
+    status: 'not_evaluated',
+    freshness: 'not_evaluated',
+    reason_code: 'external-mcp-unmanaged',
+    readiness_eligible: false,
+    selection,
+    evidence_paths: [],
+    observed_at: observedAt,
+    limitations: ['external-mcp-startup-is-unmanaged-and-not-evaluated'],
+  };
+  const managedLayers = [projection, managedRuntime];
+  return {
+    selection,
+    managed_ready: selection.confirmed && managedLayers.every((layer) => layer.status === 'ready'),
+    ready_denominator: ['projection', 'managed_runtime'],
+    excluded_from_ready_denominator: ['workspace_graph', 'external_mcp'],
+    layers: {
+      projection,
+      managed_runtime: managedRuntime,
+      workspace_graph: workspaceGraph,
+      external_mcp: externalMcp,
+    },
+  };
+}
+
+function resolveDoctorWorkspaceTargets(projectRoot) {
+  try {
+    const { resolveWorkspaceTargets } = require('../../../skills/spec-runtime-setup/scripts/lib/workspace-target.cjs');
+    return resolveWorkspaceTargets({ cwd: projectRoot, allowDiscovery: true });
+  } catch (_error) {
+    return null;
+  }
+}
+
+function bundledManifestVersionForDoctor() {
+  try {
+    return loadPluginManifest().version || null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function workspaceSelectionReason(targets, hosts) {
+  if (!hosts || hosts.length === 0) return 'doctor-host-selection-empty';
+  if (targets.manifest_error) return targets.manifest_error;
+  if (Array.isArray(targets.ambiguous) && targets.ambiguous.length > 0) return 'workspace-targets-ambiguous';
+  if (!Array.isArray(targets.repos) || targets.repos.length === 0) return targets.reason_code || 'workspace-no-review-targets';
+  if (targets.repos.some((child) => child.needs_confirm === true)) return 'workspace-repos-need-confirmation';
+  return null;
+}
+
+function inspectWorkspaceProjection({ children, hosts, bundledVersion, selection, selectionReason, observedAt }) {
+  if (selectionReason) return unavailableWorkspaceLayer('projection', selection, selectionReason, observedAt);
+  if (!bundledVersion) return unavailableWorkspaceLayer('projection', selection, 'bundled-manifest-version-unknown', observedAt);
+  const entries = [];
+  for (const child of children) {
+    for (const host of hosts) {
+      entries.push(inspectChildProjection(child, host, bundledVersion));
+    }
+  }
+  const incomplete = entries.filter((entry) => entry.status !== 'current');
+  const stale = incomplete.some((entry) => entry.status === 'stale');
+  const missing = incomplete.some((entry) => entry.status === 'missing');
+  const unknown = incomplete.some((entry) => entry.status === 'unknown');
+  return {
+    layer: 'projection',
+    status: incomplete.length === 0 ? 'ready' : (unknown ? 'unknown' : 'action_required'),
+    freshness: incomplete.length === 0 ? 'current' : (stale ? 'stale' : (missing ? 'missing' : 'unknown')),
+    reason_code: incomplete.length === 0 ? null : 'runtime-projection-incomplete',
+    readiness_eligible: true,
+    selection,
+    evidence_paths: entries.map((entry) => entry.state_path),
+    observed_at: observedAt,
+    entries,
+  };
+}
+
+function inspectChildProjection(child, host, bundledVersion) {
+  const adapter = getAdapter(host);
+  const statePath = path.join(child.git_root, adapter.stateFile);
+  const entry = {
+    child_id: child.repo_id,
+    host,
+    state_path: statePath,
+    bundled_manifest_version: bundledVersion,
+    recorded_manifest_version: null,
+    status: 'unknown',
+    reason_code: 'unknown-runtime-manifest-health',
+  };
+  const document = readDoctorJson(statePath);
+  if (document.status === 'missing') return { ...entry, status: 'missing', reason_code: 'runtime-state-missing' };
+  if (document.status !== 'ready') return { ...entry, reason_code: 'runtime-state-unreadable' };
+  const version = document.value && typeof document.value.manifestVersion === 'string'
+    ? document.value.manifestVersion
+    : '';
+  if (!version) return { ...entry, status: 'missing', reason_code: 'runtime-manifest-version-missing' };
+  if (version !== bundledVersion) {
+    return { ...entry, recorded_manifest_version: version, status: 'stale', reason_code: 'runtime-manifest-version-stale' };
+  }
+  return { ...entry, recorded_manifest_version: version, status: 'current', reason_code: null };
+}
+
+function inspectWorkspaceManagedRuntime({ children, hosts, projection, selection, selectionReason, observedAt }) {
+  if (selectionReason) return unavailableWorkspaceLayer('managed_runtime', selection, selectionReason, observedAt);
+  const projectionByScope = new Map((projection.entries || []).map((entry) => [`${entry.child_id}:${entry.host}`, entry]));
+  const entries = [];
+  for (const child of children) {
+    for (const host of hosts) {
+      entries.push(inspectChildManagedRuntime(child, host, projectionByScope.get(`${child.repo_id}:${host}`), selection));
+    }
+  }
+  const unknown = entries.find((entry) => entry.status === 'unknown');
+  const incomplete = entries.find((entry) => entry.status !== 'ready');
+  return {
+    layer: 'managed_runtime',
+    status: incomplete ? (unknown ? 'unknown' : 'action_required') : 'ready',
+    freshness: incomplete ? (unknown ? 'unknown' : 'stale') : 'current',
+    reason_code: incomplete ? incomplete.reason_code : null,
+    readiness_eligible: true,
+    selection,
+    evidence_paths: entries.flatMap((entry) => [entry.tool_facts_path, entry.runtime_capabilities_path]),
+    observed_at: observedAt,
+    entries,
+  };
+}
+
+function inspectChildManagedRuntime(child, host, projection, selection) {
+  const configDir = path.join(child.git_root, '.spec-first', 'config');
+  const toolFactsPath = path.join(configDir, 'tool-facts.json');
+  const runtimeCapabilitiesPath = path.join(configDir, 'runtime-capabilities.json');
+  const entry = {
+    child_id: child.repo_id,
+    host,
+    tool_facts_path: toolFactsPath,
+    runtime_capabilities_path: runtimeCapabilitiesPath,
+    status: 'unknown',
+    reason_code: 'setup-facts-unavailable',
+  };
+  const toolFacts = readDoctorJson(toolFactsPath);
+  if (toolFacts.status === 'missing') {
+    return { ...entry, reason_code: 'setup-facts-missing' };
+  }
+  const runtimeCapabilities = readDoctorJson(runtimeCapabilitiesPath);
+  if (runtimeCapabilities.status === 'missing') {
+    return { ...entry, reason_code: 'setup-facts-missing' };
+  }
+  if (toolFacts.status !== 'ready' || runtimeCapabilities.status !== 'ready') {
+    return { ...entry, reason_code: 'setup-facts-unreadable' };
+  }
+  const facts = toolFacts.value || {};
+  const runtime = runtimeCapabilities.value || {};
+  if (!samePath(facts.repo_root, child.git_root) || !samePath(runtime.repo_root, child.git_root)) {
+    return { ...entry, reason_code: 'setup-facts-scope-mismatch' };
+  }
+  if (facts.host !== host || runtime.host !== host) {
+    return { ...entry, reason_code: 'setup-facts-host-mismatch' };
+  }
+  if (!setupFactsMatchCurrentSelection(facts, selection)) {
+    return { ...entry, reason_code: 'setup-facts-selection-mismatch' };
+  }
+  if (!hasValidTimestamp(facts.generated_at) || !hasValidTimestamp(runtime.generated_at)) {
+    return { ...entry, reason_code: 'setup-facts-freshness-unknown' };
+  }
+  if (!projection || projection.status !== 'current') {
+    return { ...entry, status: 'action_required', reason_code: 'runtime-projection-incomplete' };
+  }
+  const summary = runtime.setup_summary && typeof runtime.setup_summary === 'object'
+    ? runtime.setup_summary
+    : {};
+  const manifest = summary.generated_runtime_manifest && typeof summary.generated_runtime_manifest === 'object'
+    ? summary.generated_runtime_manifest
+    : {};
+  if (manifest.status !== 'current') {
+    return { ...entry, status: 'action_required', reason_code: manifest.reason_code || 'setup-facts-runtime-manifest-not-current' };
+  }
+  if (summary.baseline_ready !== true || summary.host_runtime_ready !== true) {
+    return { ...entry, status: 'action_required', reason_code: 'managed-runtime-action-required' };
+  }
+  return { ...entry, status: 'ready', reason_code: null, generated_at: runtime.generated_at };
+}
+
+function setupFactsMatchCurrentSelection(facts, selection) {
+  const target = facts && facts.target;
+  if (!target || typeof target !== 'object') return true;
+  if (target.workspace_root && !samePath(target.workspace_root, selection.workspace_root)) return false;
+  // 直接 child receipt 不声明 workspace 全量 child set；只有 all-repos receipt
+  // 才有资格证明（或否定）该完整集合。
+  if (target.mode !== 'workspace-all-repos' || !Array.isArray(target.candidates)) return true;
+  const receiptIds = target.candidates
+    .map((candidate) => candidate && (candidate.workspace_relative_path || candidate.repo_label))
+    .filter(Boolean)
+    .sort();
+  const currentIds = selection.child_ids.slice().sort();
+  return receiptIds.length === currentIds.length
+    && receiptIds.every((id, index) => id === currentIds[index]);
+}
+
+function inspectWorkspaceGraphLayer({ projectRoot, selection, observedAt, runWorkspaceGraphStatus }) {
+  let status;
+  try {
+    const runStatus = runWorkspaceGraphStatus
+      || require('../../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
+    status = runStatus({ cwd: projectRoot, allowDiscovery: true });
+  } catch (_error) {
+    status = null;
+  }
+  if (!status) return unavailableWorkspaceLayer('workspace_graph', selection, 'workspace-graph-status-unavailable', observedAt, false);
+  const workspace = status.workspace || {};
+  const freshness = workspace.freshness && workspace.freshness.freshness
+    ? workspace.freshness.freshness
+    : (status.status === 'ready' ? 'current' : 'unknown');
+  return {
+    layer: 'workspace_graph',
+    status: status.status || 'unknown',
+    freshness,
+    reason_code: status.reason_code || null,
+    readiness_eligible: false,
+    selection,
+    evidence_paths: [workspace.state_path, workspace.merged_graph_path].filter(Boolean),
+    observed_at: observedAt,
+    advisory: true,
+  };
+}
+
+function unavailableWorkspaceLayer(layer, selection, reasonCode, observedAt, readinessEligible = true) {
+  return {
+    layer,
+    status: 'unknown',
+    freshness: 'unknown',
+    reason_code: reasonCode,
+    readiness_eligible: readinessEligible,
+    selection,
+    evidence_paths: [],
+    observed_at: observedAt,
+  };
+}
+
+function readDoctorJson(filePath) {
+  try {
+    return { status: 'ready', value: JSON.parse(fs.readFileSync(filePath, 'utf8')) };
+  } catch (error) {
+    if (error && error.code === 'ENOENT') return { status: 'missing', value: null };
+    return { status: 'unreadable', value: null };
+  }
+}
+
+function samePath(left, right) {
+  return typeof left === 'string' && path.resolve(left) === path.resolve(right);
+}
+
+function hasValidTimestamp(value) {
+  return typeof value === 'string' && Number.isFinite(Date.parse(value));
+}
+
+function buildWorkspaceReadinessChecks(view) {
+  return [
+    workspaceLayerCheck(view.layers.projection, 'workspace projection'),
+    workspaceLayerCheck(view.layers.managed_runtime, 'workspace managed runtime'),
+    workspaceLayerCheck(view.layers.workspace_graph, 'workspace graph'),
+    workspaceLayerCheck(view.layers.external_mcp, 'external MCP'),
+  ];
+}
+
+function workspaceLayerCheck(layer, name) {
+  const ready = layer.status === 'ready';
+  const unmanaged = layer.status === 'not_evaluated';
+  const level = ready || unmanaged ? 'PASS' : 'WARNING';
+  const message = unmanaged
+    ? 'unmanaged / not evaluated; does not contribute to managed readiness.'
+    : `${layer.status} (freshness=${layer.freshness || 'unknown'}; reason=${layer.reason_code || 'none'}).`;
+  return {
+    level,
+    name,
+    message,
+    reasonCode: layer.reason_code || null,
+    advisory: layer.readiness_eligible === false,
+    workspace_readiness_layer: layer,
+  };
 }
 
 // U4 / CR10 — advisory workspace-graph surface for non-Git multi-repo requirement
@@ -602,7 +944,8 @@ function summarizeWorkspaceGraphForDoctor(status) {
 }
 
 function buildDoctorReport({ projectRoot, platforms }) {
-  const commonChecks = buildDoctorCommonChecks(projectRoot);
+  const workspaceReadiness = buildWorkspaceReadinessView({ projectRoot, platforms });
+  const commonChecks = buildDoctorCommonChecks(projectRoot, { platforms, workspaceReadiness });
   const platformChecksByPlatform = {};
   const runtimeChecksByPlatform = {};
   const hostChecksByPlatform = {};
@@ -648,7 +991,9 @@ function buildDoctorReport({ projectRoot, platforms }) {
     ];
   }
 
-  const installHealth = summarizeChecks(commonChecks);
+  // Workspace readiness 是独立 advisory view。缺失 child projection 不能改写
+  // package/Node/Git installation health aggregate。
+  const installHealth = summarizeChecks(commonChecks.filter((check) => !check.workspace_readiness_layer));
   const runtimeAssetHealth = platforms.length === 0
     ? 'not_applicable'
     : summarizeChecks(Object.values(runtimeChecksByPlatform).flat());
@@ -681,6 +1026,7 @@ function buildDoctorReport({ projectRoot, platforms }) {
     decision_input_health_basis: decisionInput.basis,
     workflow_runnability: workflowRunnability.status,
     workflow_runnability_basis: workflowRunnability.basis,
+    workspace_readiness: workspaceReadiness,
     common_checks: commonChecks,
     platform_checks: platformChecksByPlatform,
     checks: allChecks,
@@ -707,6 +1053,7 @@ function printDoctorJson(report) {
     decision_input_health_basis: report.decision_input_health_basis,
     workflow_runnability: report.workflow_runnability,
     workflow_runnability_basis: report.workflow_runnability_basis,
+    workspace_readiness: report.workspace_readiness,
     checks: report.checks,
     common_checks: report.common_checks,
     platform_checks: report.platform_checks,
@@ -1258,9 +1605,10 @@ function printHelp() {
 	    '  When setup facts exist, doctor reads .spec-first/config/tool-facts.json for decision_input_health.',
 	    '  MCP/helper setup is handled by the matching `spec-runtime-setup` workflow entrypoint.',
 	    '  Canonical entry: `spec-runtime-setup` (Claude/Qoder command `runtime-setup`); no legacy alias.',
-	    '  On a non-Git multi-repo requirement parent, doctor also reports advisory workspace-graph status',
-	    '  (per-child CodeGraph / workspace Graphify merge / default projectPath). Detail and mutation stay under',
-	    '  `spec-runtime-setup --workspace-graph*` and `spec-first clean --workspace-graph`.',
+	    '  On a non-Git multi-repo requirement parent, doctor separately reports child runtime projection, managed',
+	    '  setup facts, optional workspace graph, and unmanaged external MCP. Only projection + managed facts can',
+	    '  contribute to managed readiness; graph remains advisory and external MCP is not evaluated. Detail and',
+	    '  mutation stay under `spec-runtime-setup --workspace-graph*` and `spec-first clean --workspace-graph`.',
 	    '',
 	    '🔗 Repository:',
 	    '  https://github.com/sunrain520/spec-first',
@@ -1343,6 +1691,7 @@ module.exports = {
   runDoctor,
   detectPlatforms,
   checkWorkspaceGraphStatus,
+  buildWorkspaceReadinessView,
   buildDoctorCommonChecks,
   buildDoctorReport,
 };

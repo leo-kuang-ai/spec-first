@@ -49,6 +49,11 @@ const {
   runWorkspaceBatch,
 } = require('./lib/workspace-executor.cjs');
 const {
+  buildWorkspaceRuntimePreflight,
+  requiresRuntimeProjectionPreflight,
+  selectedRuntimeProjectionTargets,
+} = require('./lib/workspace-runtime-preflight.cjs');
+const {
   runWorkspaceGraphBuild,
 } = require('./lib/workspace-graph-executor.cjs');
 const {
@@ -71,6 +76,7 @@ const {
 } = require('./lib/installation-executor.cjs');
 const {
   configureOrInspectHost,
+  computeGeneratedRuntimeManifestHealth,
   providerContext,
   reconcileProviderHostConfig,
   requireCapability,
@@ -226,6 +232,10 @@ function runSetup(input = {}) {
     if (actionPlan.args.workspaceGraphStatus) {
       return runWorkspaceGraphStatusSetup(context);
     }
+    const runtimePreflight = buildRuntimeProjectionPreflight(context);
+    if (runtimePreflight && runtimePreflight.overall_status === 'action-required') {
+      return blockedRuntimeProjectionResult(context, runtimePreflight);
+    }
     if (target.mode === 'workspace-all-repos') {
       // Clean/status/build under the workspace-graph domain (mutation modes + bare/check status).
       if (actionPlan.args.workspaceGraphClean) {
@@ -234,10 +244,10 @@ function runSetup(input = {}) {
       if (actionPlan.args.workspaceGraph) {
         return runWorkspaceGraphSetup(context);
       }
-      if (!['bare', 'check', 'plan'].includes(actionPlan.mode)) {
+      if (!['bare', 'check'].includes(actionPlan.mode)) {
         return runWorkspaceBatch(context, { runSingleTarget });
       }
-      // bare/check/plan on a requirement parent: dual-path diagnostic (not single-repo facts).
+      // bare/check on a requirement parent: dual-path diagnostic (not single-repo facts).
       if (actionPlan.mode === 'bare' || actionPlan.mode === 'check') {
         return runParentWorkspaceDiagnostic(context);
       }
@@ -249,6 +259,29 @@ function runSetup(input = {}) {
       target,
     });
   }
+}
+
+function buildRuntimeProjectionPreflight(context) {
+  if (!requiresRuntimeProjectionPreflight(context.actionPlan)) return null;
+  const targets = selectedRuntimeProjectionTargets(context.target);
+  if (targets.length === 0) return null;
+  return buildWorkspaceRuntimePreflight({
+    context,
+    targets,
+    computeHealth: computeGeneratedRuntimeManifestHealth,
+  });
+}
+
+function blockedRuntimeProjectionResult(context, payload) {
+  const nextAction = payload.next_action || '运行 spec-first init 刷新当前 host runtime projection，然后重试 setup。';
+  return {
+    exit_code: 2,
+    mode: context.actionPlan.mode,
+    reason_code: payload.reason_code,
+    payload,
+    human: `Runtime 设置被阻止：${payload.reason_code}\n下一步：${nextAction}\n`,
+    target: context.target,
+  };
 }
 
 function runParentWorkspaceDiagnostic(context) {

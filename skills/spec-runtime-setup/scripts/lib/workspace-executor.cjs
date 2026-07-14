@@ -16,17 +16,26 @@ const {
   planProjectConfig,
 } = require('./project-config.cjs');
 const {
+  resolveHostConfigTarget,
+} = require('./host-config.cjs');
+const {
   renderJson,
 } = require('./renderer.cjs');
 const {
+  buildHostConfigReceipt,
   computeGeneratedRuntimeManifestHealth,
+  configureOrInspectHost,
   firstSelectedProviderFailure,
+  isSharedHostConfigScope,
   requireCapability,
 } = require('./runtime-executor.cjs');
 
 function runWorkspaceBatch(context, dependencies = {}) {
   const { runSingleTarget } = dependencies;
   const candidates = context.target.candidates || [];
+  if (context.actionPlan.mode === 'plan') {
+    return runWorkspacePlan(context, { runSingleTarget });
+  }
   if (context.actionPlan.mode === 'project-config') {
     requireCapability(context, 'write-project-config');
     const explicitActions = context.parsed.refreshExample
@@ -70,6 +79,17 @@ function runWorkspaceBatch(context, dependencies = {}) {
     };
   }
 
+  const sharedHostPhase = runSharedHostPhase(context, candidates);
+  if (sharedHostPhase.status === 'failed') {
+    return sharedHostPhaseFailureResult(context, candidates, sharedHostPhase);
+  }
+  const batchContext = sharedHostPhase.status === 'ready'
+    ? {
+      ...context,
+      sharedHostConfigResults: sharedHostPhase.results,
+      hostConfigPhase: 'per_child',
+    }
+    : context;
   const results = candidates.map((candidate) => {
     try {
       const gitHealth = candidate.git_health || { status: 'unknown', reason_code: 'git-health-not-reported' };
@@ -79,22 +99,11 @@ function runWorkspaceBatch(context, dependencies = {}) {
           git_health: gitHealth,
         });
       }
-      const childTarget = {
-        ...context.target,
-        mode: 'git-repo',
-        target_kind: 'git-repo',
-        selection_source: context.target.selection_source,
-        state_write_allowed: true,
-        git_health: gitHealth,
-        target_root: candidate.git_root,
-        selected_repo_root: candidate.git_root,
-        repo_label: candidate.repo_label,
-        candidates: [],
-      };
-      const child = runSingleTarget({ ...context, target: childTarget }, candidate.git_root);
+      const childTarget = childTargetFor(batchContext, candidate, gitHealth);
+      const child = runSingleTarget({ ...batchContext, target: childTarget }, candidate.git_root);
       const childStatus = summarizeChildExecution(child, {
-        mode: context.actionPlan.mode,
-        selectedIds: context.actionPlan.selected_ids,
+        mode: batchContext.actionPlan.mode,
+        selectedIds: batchContext.actionPlan.selected_ids,
       }, firstSelectedProviderFailure);
       return {
         repo_label: candidate.repo_label,
@@ -102,9 +111,12 @@ function runWorkspaceBatch(context, dependencies = {}) {
         exit_code: child.exit_code,
         overall_status: childStatus.overall_status,
         reason_code: childStatus.reason_code,
-        result: context.actionPlan.mode === 'verify'
-          ? buildVerifyChildResult(child, candidate, context)
+        result: batchContext.actionPlan.mode === 'verify'
+          ? buildVerifyChildResult(child, candidate, batchContext)
           : child.payload,
+        host_config_receipt: child.payload && Array.isArray(child.payload.host_config_receipt)
+          ? child.payload.host_config_receipt
+          : [],
       };
     } catch (error) {
       return failedChildResult(
@@ -119,7 +131,7 @@ function runWorkspaceBatch(context, dependencies = {}) {
   });
   const payload = context.actionPlan.mode === 'verify'
     ? buildWorkspaceVerifySummary(context, results, computeGeneratedRuntimeManifestHealth)
-    : buildWorkspaceSetupSummary(context, results);
+    : buildWorkspaceSetupSummary(context, results, { sharedHostPhase });
   try {
     const summaryWriter = context.workspaceSummaryWriter || writeWorkspaceSummary;
     summaryWriter(context.target.workspace_root, payload);
@@ -154,6 +166,205 @@ function failedChildResult(candidate, reasonCode, result) {
     overall_status: 'action-required',
     reason_code: reasonCode,
     result,
+  };
+}
+
+function childTargetFor(context, candidate, gitHealth) {
+  return {
+    ...context.target,
+    mode: 'git-repo',
+    target_kind: 'git-repo',
+    selection_source: context.target.selection_source,
+    state_write_allowed: true,
+    git_health: gitHealth,
+    target_root: candidate.git_root,
+    selected_repo_root: candidate.git_root,
+    repo_label: candidate.repo_label,
+    candidates: [],
+  };
+}
+
+function runWorkspacePlan(context, { runSingleTarget }) {
+  const results = (context.target.candidates || []).map((candidate) => {
+    const gitHealth = candidate.git_health || { status: 'unknown', reason_code: 'git-health-not-reported' };
+    if (gitHealth.status !== 'ok') {
+      return failedChildResult(candidate, gitHealth.reason_code || 'child-git-health-action-required', {
+        schema_version: 'project-target.v2',
+        git_health: gitHealth,
+      });
+    }
+    try {
+      const child = runSingleTarget({
+        ...context,
+        target: childTargetFor(context, candidate, gitHealth),
+      }, candidate.git_root);
+      return {
+        repo_label: candidate.repo_label,
+        workspace_relative_path: portableWorkspacePath(candidate.workspace_relative_path),
+        exit_code: child.exit_code,
+        overall_status: child.exit_code === 0 ? 'ready' : 'action-required',
+        reason_code: child.reason_code || null,
+        result: child.payload,
+      };
+    } catch (error) {
+      return failedChildResult(candidate, error.reason_code || 'child-plan-execution-failed', {
+        schema_version: 'spec-runtime-setup-error.v1',
+        diagnostic: String(error && error.message ? error.message : error).slice(0, 2000),
+      });
+    }
+  });
+  const counts = countWorkspaceResults(results);
+  const blocked = results.some((entry) => entry.exit_code !== 0);
+  const payload = {
+    schema_version: 'workspace-mcp-plan-summary.v1',
+    generated_at: new Date().toISOString(),
+    mutation: false,
+    workflow_mode: 'all-repos',
+    selection_source: context.target.selection_source,
+    workspace_root: context.target.workspace_root,
+    parent_writes_repo_local_artifacts: false,
+    blocked,
+    reason_code: blocked ? 'workspace-install-plan-blocked' : 'workspace-install-plan-ready',
+    results,
+    counts,
+    next_action: blocked
+      ? '修复对应 child plan 的 reason_code，然后重新运行 --plan。'
+      : '审查各 child 的 mutation 计划，然后使用相同选择且不带 --plan 重新运行。',
+  };
+  return {
+    exit_code: blocked ? 2 : 0,
+    mode: 'plan',
+    reason_code: payload.reason_code,
+    payload,
+    human: renderJson(payload),
+    target: context.target,
+  };
+}
+
+function runSharedHostPhase(context, candidates) {
+  if (!isHostConfigMutationMode(context.actionPlan.mode)) {
+    return { status: 'skipped', reason_code: 'host-config-mutation-not-requested', receipts: [] };
+  }
+  const eligibility = sharedHostPhaseEligibility(context, candidates);
+  if (!eligibility.ok) {
+    return {
+      status: 'skipped',
+      reason_code: eligibility.reason_code,
+      receipts: [],
+    };
+  }
+  const results = configureOrInspectHost(context, context.target.workspace_root, {
+    applyMutation: true,
+    selectedIds: context.actionPlan.selected_ids,
+    providerResults: [],
+    installResults: new Map(),
+    scopeFilter: isSharedHostConfigScope,
+    hostConfigPhase: 'shared',
+  });
+  const receipts = buildHostConfigReceipt(results);
+  if (results.size === 0) {
+    return { status: 'skipped', reason_code: 'no-shared-host-config-target', receipts };
+  }
+  const failed = [...results.values()].find((result) => result.configured_status !== 'ready');
+  if (failed) {
+    return {
+      status: 'failed',
+      reason_code: failed.reason_code || 'shared-host-config-action-required',
+      results,
+      receipts,
+      continue_children_on_shared_failure: false,
+    };
+  }
+  return { status: 'ready', reason_code: null, results, receipts };
+}
+
+function sharedHostPhaseEligibility(context, candidates) {
+  const entries = (context.effectiveRegistry.tools || []).filter((entry) => {
+    if (entry.host_config_required === false) return false;
+    if (entry.setup_required === true && !context.actionPlan.selected_ids.includes(entry.id)) return false;
+    return !(entry.required === false && !context.actionPlan.selected_ids.includes(entry.id));
+  });
+  let hasSharedTarget = false;
+  for (const entry of entries) {
+    const parentTarget = resolveHostConfigTarget({
+      entry,
+      host: context.host,
+      authority: context.authority,
+      repoRoot: context.target.workspace_root,
+      homeDir: context.homeDir,
+      env: context.env,
+      userScope: context.actionPlan.args.userScope,
+      requireWritable: true,
+    });
+    if (!parentTarget.ok) {
+      return { ok: false, reason_code: 'shared-host-config-eligibility-unconfirmed' };
+    }
+    if (!isSharedHostConfigScope(parentTarget.scope)) continue;
+    hasSharedTarget = true;
+    for (const candidate of candidates) {
+      if (!candidate.git_health || candidate.git_health.status !== 'ok') continue;
+      const childTarget = resolveHostConfigTarget({
+        entry,
+        host: context.host,
+        authority: context.authority,
+        repoRoot: candidate.git_root,
+        homeDir: context.homeDir,
+        env: context.env,
+        userScope: context.actionPlan.args.userScope,
+        requireWritable: true,
+      });
+      if (!childTarget.ok
+        || childTarget.scope !== parentTarget.scope
+        || childTarget.config_path !== parentTarget.config_path
+        || childTarget.config_format !== parentTarget.config_format) {
+        return { ok: false, reason_code: 'shared-host-config-ownership-or-verification-unpreserved' };
+      }
+    }
+  }
+  return hasSharedTarget
+    ? { ok: true, reason_code: null }
+    : { ok: false, reason_code: 'no-shared-host-config-target' };
+}
+
+function isHostConfigMutationMode(mode) {
+  return ['only', 'graphify-refresh', 'host-config-repair'].includes(mode);
+}
+
+function sharedHostPhaseFailureResult(context, candidates, sharedHostPhase) {
+  const results = candidates.map((candidate) => failedChildResult(
+    candidate,
+    sharedHostPhase.reason_code,
+    {
+      schema_version: 'spec-runtime-setup-error.v1',
+      reason_code: sharedHostPhase.reason_code,
+      diagnostic: '共享 host config phase 失败；v1 不进入 child mutation。',
+    },
+  ));
+  const payload = buildWorkspaceSetupSummary(context, results, { sharedHostPhase });
+  payload.overall_status = 'action-required';
+  payload.reason_code = sharedHostPhase.reason_code;
+  try {
+    const summaryWriter = context.workspaceSummaryWriter || writeWorkspaceSummary;
+    summaryWriter(context.target.workspace_root, payload);
+  } catch (error) {
+    payload.summary_write_status = 'failed';
+    payload.summary_write_reason_code = error.reason_code || 'workspace-summary-write-failed';
+    return {
+      exit_code: 1,
+      mode: context.actionPlan.mode,
+      reason_code: payload.summary_write_reason_code,
+      payload,
+      human: renderJson(payload),
+      target: context.target,
+    };
+  }
+  return {
+    exit_code: 1,
+    mode: context.actionPlan.mode,
+    reason_code: sharedHostPhase.reason_code,
+    payload,
+    human: renderJson(payload),
+    target: context.target,
   };
 }
 
@@ -264,7 +475,7 @@ function buildVerifyChildResult(child, candidate, context) {
   };
 }
 
-function buildWorkspaceSetupSummary(context, results) {
+function buildWorkspaceSetupSummary(context, results, { sharedHostPhase = null } = {}) {
   const counts = countWorkspaceResults(results, { includePartial: true });
   let overallStatus = 'ready';
   if (counts.total === 0 || counts.action_required === counts.total) overallStatus = 'action-required';
@@ -277,6 +488,16 @@ function buildWorkspaceSetupSummary(context, results) {
     selection_source: context.target.selection_source,
     workspace_root: context.target.workspace_root,
     parent_writes_repo_local_artifacts: false,
+    shared_host_phase: sharedHostPhase ? {
+      status: sharedHostPhase.status,
+      reason_code: sharedHostPhase.reason_code || null,
+      continue_children_on_shared_failure: sharedHostPhase.continue_children_on_shared_failure === true,
+    } : null,
+    host_config_phases: [
+      ...((sharedHostPhase && sharedHostPhase.receipts) || []),
+      ...results.flatMap((entry) => (entry.host_config_receipt || [])
+        .filter((receipt) => receipt.phase === 'per_child')),
+    ],
     results,
     counts,
     overall_status: overallStatus,

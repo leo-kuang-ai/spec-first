@@ -22,6 +22,18 @@ const BLOCK_START = '<!-- spec-first:workspace-routing start -->';
 const BLOCK_END = '<!-- spec-first:workspace-routing end -->';
 const CODEGRAPH_DEGRADED_HOSTS = new Set(['kiro', 'qoder']);
 
+// 此片段保持为静态 source asset：可放入子仓文档，但不宣称 workspace graph、成员关系或
+// CodeGraph provider 已获确认。受管 child routing 生命周期不属于本模块的合同。
+function renderMemberGuidanceSnippet() {
+  return [
+    '### 子仓代码图引导',
+    '',
+    '- 问题只涉及当前子仓时，如 Provider 可用，以当前子仓作为 `projectPath` 使用 CodeGraph；其结果只是导航候选，重要结论仍需由源码、测试、diff 或日志确认。',
+    '- 问题跨多个子仓时，回到非 Git 的需求父工作区。仅当 workspace graph 状态和目标仓范围均已确认时才使用 Graphify；随后直接检查候选子仓。',
+    '- 不要假设 workspace graph 存在或仍然 current，不要从此片段推断成员关系，也不要把任一 Provider 输出当作语义证明。',
+  ].join('\n');
+}
+
 function renderRoutingInstruction({ workspaceRoot, repos = [], host = null, hosts = [] } = {}) {
   const label = escapeMarkdownText(workspaceRoot ? path.basename(workspaceRoot) : 'workspace');
   const repoList = repos.length
@@ -132,6 +144,7 @@ function escapeRegex(value) {
 
 module.exports = {
   renderRoutingInstruction,
+  renderMemberGuidanceSnippet,
   upsertRoutingBlock,
   stripRoutingBlock,
   BLOCK_START,

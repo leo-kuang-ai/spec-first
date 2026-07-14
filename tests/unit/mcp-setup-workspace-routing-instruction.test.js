@@ -1,7 +1,10 @@
 'use strict';
 
+const fs = require('node:fs');
+const path = require('node:path');
 const {
   renderRoutingInstruction,
+  renderMemberGuidanceSnippet,
   upsertRoutingBlock,
   stripRoutingBlock,
   isRoutingInstructionCurrent,
@@ -59,6 +62,35 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
     expect(text).toContain('`web ignore`');
     expect(text).not.toContain('web\nignore');
     expect(text).not.toContain('需求\nA');
+  });
+});
+
+describe('renderMemberGuidanceSnippet — child-repo static guidance', () => {
+  test('separates tactical CodeGraph from confirmed-scope Graphify without a workspace claim', () => {
+    const text = renderMemberGuidanceSnippet();
+
+    expect(text).toContain('CodeGraph');
+    expect(text).toContain('`projectPath`');
+    expect(text).toContain('Graphify');
+    expect(text).toContain('workspace graph 状态');
+    expect(text).toContain('源码、测试、diff 或日志');
+    expect(text).toContain('不要假设 workspace graph 存在或仍然 current');
+    expect(text).not.toContain('merged-graph.json');
+    expect(text).not.toContain('Child repos in this workspace');
+    expect(text).not.toContain('automatically injected');
+  });
+
+  test('publishes the same boundary in the source skill without introducing child marker lifecycle', () => {
+    const skill = fs.readFileSync(path.join(
+      __dirname,
+      '../../skills/spec-runtime-setup/SKILL.md',
+    ), 'utf8');
+
+    expect(skill).toContain('### 从子仓开始时的轻量引导');
+    expect(skill).toContain('`projectPath` 使用 CodeGraph');
+    expect(skill).toContain('workspace graph 状态和目标仓范围均已确认');
+    expect(skill).toContain('不向 child `AGENTS.md` / `CLAUDE.md` 注入独立受管 marker');
+    expect(skill).not.toContain('workspace-member-routing.cjs');
   });
 });
 
