@@ -4,8 +4,28 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
+const subagentTemplate = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/subagent-template.md'), 'utf8');
+const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/synthesis-and-presentation.md'), 'utf8');
+
+// Lazy references — must exist on disk
+const lazyRefs = [
+  'subagent-confidence-rubric-detail.md',
+  'subagent-why-it-matters-guide.md',
+  'subagent-suggested-fix-advanced.md',
+  'synthesis-premise-collapse.md',
+  'synthesis-contradictions.md',
+  'synthesis-chain-linking.md',
+  'synthesis-restatement-suppression.md',
+  'synthesis-multi-round.md',
+  'document-classification-signals.md',
+  'persona-activation-matrix.md',
+];
+
+const refsDir = path.resolve(__dirname, '../../skills/spec-doc-review/references');
 
 describe('spec-doc-review current contracts', () => {
+  // --- Existing assertions (preserved) ---
+
   test('asks for or discovers a document when none is supplied', () => {
     expect(skill).toContain('If no document is specified');
     expect(skill).toContain('Ask which document to review');
@@ -21,5 +41,179 @@ describe('spec-doc-review current contracts', () => {
   test('does not infer document kind from path alone', () => {
     expect(skill).toMatch(/content shape.*not its file path/);
     expect(skill).toMatch(/Path is a tie-breaker hint/);
+  });
+
+  // --- U1: Subagent template spine structure ---
+
+  test('U1: subagent template spine contains schema hard constraints', () => {
+    expect(subagentTemplate).toContain('"P0"');
+    expect(subagentTemplate).toContain('"P1"');
+    expect(subagentTemplate).toContain('"error"');
+    expect(subagentTemplate).toContain('"omission"');
+    expect(subagentTemplate).toContain('"safe_auto"');
+    expect(subagentTemplate).toContain('"gated_auto"');
+    expect(subagentTemplate).toContain('"manual"');
+    expect(subagentTemplate).toMatch(/evidence.*ARRAY/i);
+    expect(subagentTemplate).toMatch(/confidence.*exactly.*0.*25.*50.*75.*100/);
+  });
+
+  test('U1: subagent template spine contains confidence anchor quick-reference table', () => {
+    expect(subagentTemplate).toContain('| Anchor | Behavioral criterion | Route |');
+    expect(subagentTemplate).toContain('| `0`');
+    expect(subagentTemplate).toContain('| `25`');
+    expect(subagentTemplate).toContain('| `50`');
+    expect(subagentTemplate).toContain('| `75`');
+    expect(subagentTemplate).toContain('| `100`');
+  });
+
+  test('U1: subagent template spine contains autofix_class three-tier definitions', () => {
+    expect(subagentTemplate).toContain('`safe_auto`');
+    expect(subagentTemplate).toContain('`gated_auto`');
+    expect(subagentTemplate).toContain('`manual`');
+    expect(subagentTemplate).toMatch(/One clear correct fix/);
+    expect(subagentTemplate).toMatch(/Concrete fix exists but touches document meaning/);
+    expect(subagentTemplate).toMatch(/Requires user judgment/);
+  });
+
+  test('U1: subagent template spine contains false-positive catalog key entries', () => {
+    expect(subagentTemplate).toMatch(/pedantic style nitpick/i);
+    expect(subagentTemplate).toMatch(/Issues that belong to other personas/);
+    expect(subagentTemplate).toMatch(/Speculative future-work concerns/);
+    expect(subagentTemplate).toMatch(/Theoretical concerns without baseline/);
+    expect(subagentTemplate).toMatch(/visual-aid removal/i);
+  });
+
+  test('U1: subagent template spine contains optional detail guidance (not mandatory always-read)', () => {
+    expect(subagentTemplate).toContain('subagent-confidence-rubric-detail.md');
+    expect(subagentTemplate).toMatch(/If unsure about anchor selection/);
+    // Must NOT contain a mandatory "STOP. Before assigning confidence, read..."
+    expect(subagentTemplate).not.toMatch(/STOP.*Before.*confidence.*read/i);
+  });
+
+  // --- U2: Synthesis hot path structure ---
+
+  test('U2: synthesis hot path contains 3.5b always-on', () => {
+    expect(synthesis).toMatch(/3\.5b/);
+    expect(synthesis).toMatch(/Always-on/);
+    expect(synthesis).toMatch(/recommended_action/);
+  });
+
+  test('U2: synthesis hot path contains STOP anchors for cold paths', () => {
+    expect(synthesis).toContain('synthesis-premise-collapse.md');
+    expect(synthesis).toContain('synthesis-contradictions.md');
+    expect(synthesis).toContain('synthesis-chain-linking.md');
+    expect(synthesis).toContain('synthesis-restatement-suppression.md');
+    expect(synthesis).toContain('synthesis-multi-round.md');
+  });
+
+  test('U2: synthesis hot path 3.5 STOP anchor semantics is unmerged opposing (not merged opposing)', () => {
+    // Must reference "not yet resolved" or "intentionally kept separate" — not "merged finding already carries opposing"
+    expect(synthesis).toMatch(/not yet resolved|intentionally.*separate|kept separate/);
+    // The 3.5 STOP anchor text itself must not say "merged finding already carries opposing"
+    const stop35Match = synthesis.match(
+      /STOP\..*?(?:read\s+`references\/synthesis-contradictions\.md`)/is
+    );
+    expect(stop35Match).not.toBeNull();
+    expect(stop35Match[0]).not.toMatch(/merged finding.*already.*opposing/);
+  });
+
+  test('U2: synthesis hot path 3.5c STOP anchor is before 3.6', () => {
+    // 3.5c STOP must appear before 3.6 (Promote Auto-Eligible Findings)
+    const before36 = synthesis.indexOf('synthesis-chain-linking.md');
+    const promoteIndex = synthesis.indexOf('3.6 Promote Auto-Eligible');
+    expect(before36).toBeGreaterThan(0);
+    expect(promoteIndex).toBeGreaterThan(0);
+    expect(before36).toBeLessThan(promoteIndex);
+  });
+
+  test('U2: synthesis hot path 3.5c STOP anchor references post-3.5b (not post-routing)', () => {
+    expect(synthesis).toMatch(/3\.5b/);
+    // Must not claim cold-path trigger is "post-routing" or "post-3.7"
+    expect(synthesis).not.toMatch(/post-routing.*synthesis-chain-linking/);
+    expect(synthesis).not.toMatch(/after 3\.7.*synthesis-chain-linking/);
+  });
+
+  // --- U3: SKILL.md STOP anchors and lazy references ---
+
+  test('U3: SKILL.md contains classification STOP anchor', () => {
+    expect(skill).toContain('document-classification-signals.md');
+    expect(skill).toMatch(/classification is genuinely ambiguous/);
+  });
+
+  test('U3: SKILL.md contains persona activation STOP anchor', () => {
+    expect(skill).toContain('persona-activation-matrix.md');
+    expect(skill).toMatch(/quick-reference table does not resolve/);
+  });
+
+  test('U3: SKILL.md contains activation quick-reference table', () => {
+    expect(skill).toContain('| Persona | Activate when the document... |');
+    expect(skill).toContain('product-lens');
+    expect(skill).toContain('design-lens');
+    expect(skill).toContain('security-lens');
+    expect(skill).toContain('scope-guardian');
+    expect(skill).toContain('adversarial');
+  });
+
+  // --- Lazy reference existence ---
+
+  test('all lazy reference files exist on disk', () => {
+    for (const ref of lazyRefs) {
+      const refPath = path.join(refsDir, ref);
+      expect(fs.existsSync(refPath)).toBe(true);
+    }
+  });
+
+  // --- Lazy reference content markers ---
+
+  test('U1: confidence rubric detail reference contains full behavioral descriptions', () => {
+    const detail = fs.readFileSync(path.join(refsDir, 'subagent-confidence-rubric-detail.md'), 'utf8');
+    expect(detail).toContain('## Anchor Descriptions');
+    expect(detail).toContain('`0`');
+    expect(detail).toContain('`25`');
+    expect(detail).toContain('`50`');
+    expect(detail).toContain('`75`');
+    expect(detail).toContain('`100`');
+  });
+
+  test('U1: why-it-matters guide reference contains weak-vs-strong example', () => {
+    const guide = fs.readFileSync(path.join(refsDir, 'subagent-why-it-matters-guide.md'), 'utf8');
+    expect(guide).toMatch(/WEAK/i);
+    expect(guide).toMatch(/STRONG/i);
+    expect(guide).toContain('observable consequence');
+  });
+
+  test('U1: suggested-fix advanced reference contains strawman analysis', () => {
+    const advanced = fs.readFileSync(path.join(refsDir, 'subagent-suggested-fix-advanced.md'), 'utf8');
+    expect(advanced).toMatch(/strawman/i);
+    expect(advanced).toMatch(/single.*action|multi-facet|composite/i);
+  });
+
+  test('U2: chain-linking cold path contains shape-match signal rule and worked examples', () => {
+    const chain = fs.readFileSync(path.join(refsDir, 'synthesis-chain-linking.md'), 'utf8');
+    expect(chain).toMatch(/shape.*match|substring.*contains|shape.*not.*exact/i);
+    expect(chain).toContain('premise unsupported');
+    expect(chain).toContain('do-nothing baseline');
+    expect(chain).toMatch(/questions whether.*named component.*should exist/i);
+    expect(chain).toContain('Example A');
+    expect(chain).toContain('Example B');
+  });
+
+  test('U2: contradictions cold path references unmerged opposing actions from 3.3', () => {
+    const contradictions = fs.readFileSync(path.join(refsDir, 'synthesis-contradictions.md'), 'utf8');
+    expect(contradictions).toMatch(/intentionally kept separate|not merged/);
+  });
+
+  test('U3: document classification signals reference contains requirements and plan signals', () => {
+    const signals = fs.readFileSync(path.join(refsDir, 'document-classification-signals.md'), 'utf8');
+    expect(signals).toContain('`requirements` signals');
+    expect(signals).toContain('`plan` signals');
+    expect(signals).toMatch(/tie-breaker/i);
+  });
+
+  test('U3: persona activation matrix reference contains full adversarial activation rules', () => {
+    const matrix = fs.readFileSync(path.join(refsDir, 'persona-activation-matrix.md'), 'utf8');
+    expect(matrix).toContain('## adversarial');
+    expect(matrix).toContain('high-stakes domain');
+    expect(matrix).toContain('product_contract_source: spec-plan-bootstrap');
   });
 });
