@@ -83,7 +83,7 @@ Analyze the document content to determine which conditional personas to activate
 | scope-guardian | Has multiple priority tiers (P0/P1/P2), >8 requirements/units, stretch goals, or scope-goal misalignment signals |
 | adversarial | Touches high-stakes domains (auth/payments/data migrations/external integrations), proposes new abstractions/architectural patterns, is a greenfield plan with no validated upstream, OR has explicit alternatives sections. Do NOT activate on routine plans with validated upstream Product Contract |
 
-**STOP. If the quick-reference table does not resolve whether to activate a conditional persona for this document, read `references/persona-activation-matrix.md` before finalizing the reviewer list.** The plan's structural decisions (more units, more rationale) are not by themselves adversarial signal -- those are the plan doing its job.
+**STOP. If the quick-reference table does not resolve whether to activate a conditional persona for this document, read `references/persona-activation-matrix.md` before finalizing the reviewer list.**
 
 ## Phase 2: Announce and Dispatch Personas
 

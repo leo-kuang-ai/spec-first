@@ -1,5 +1,9 @@
 # Changelog
 
+- v1.13.2 2026-07-14 Codex: fix(doc-review): 移除 SKILL.md 中残留的旧 adversarial 激活规则文本——"The plan's structural decisions..." 句子应在 U3 提取 persona-activation-matrix.md 时一并移出。 (user-visible)
+
+- v1.13.2 2026-07-14 10:49:44 Codex: docs(review): 在 Review Token 消耗报告中补充适合 spec-first 的七层组合方法：Metadata Routing、Contract Spine、Risk-Based Activation、Just-in-Time References、Reviewer-Specific Context Slicing、Evidence/History Compaction、Cache-Friendly Layout 与 Paired Quality/Cost Evaluation；分别映射 `spec-doc-review`、`spec-code-review` 的执行链，给出 Wave 0–5 落地顺序和 decision-sufficiency-per-token 成功标准。未修改并行中的 skill/tests 实现或 generated runtime；仅更新审查报告与 Changelog。 (user-visible)
+
 - v1.13.2 2026-07-14 Codex: refactor(doc-review): 实施 `2026-07-14-001` spec-doc-review 渐进式披露重构——U1 子代理模板 spine (183→130行) + 3 个惰性 reference (subagent-confidence-rubric-detail/why-it-matters-guide/suggested-fix-advanced)、U2 合成管道冷热分离 (416→262行热路径 + 5 个冷路径 reference: premise-collapse/contradictions/chain-linking/restatement-suppression/multi-round，含 always-on 3.5b 与 3.5c-before-3.6)、U3 SKILL.md 入口脊柱瘦身 (248→207行 + 2 个惰性 reference: document-classification-signals/persona-activation-matrix，含分类/激活 STOP 锚点)、U4 contract test 扩展至 24 断言(spine 硬约束/STOP 语义/冷路径内容标记/惰性 reference 存在性) + 新增 5-host 集成测试。默认 spine-only 负载策略，detail 惰性加载；FSE 通过前不声称降幅达标。角色文件与 finding schema 不变。 (user-visible)
 
 - v1.13.2 2026-07-14 10:36:25 Codex: docs(review): 扩展 Review Token 消耗专项报告，补充 aggregate 成本方程、语义风险预算分配器、级联审查、run-scoped evidence ledger、validator 严重度分层与低风险批处理、输出预算、prompt caching 边界、独立性 claim 规则、可执行 profile 合同、Pareto 评测矩阵和伪优化清单；明确当前 doc-review prompt 分层计划先独立收口，code-review 的 context isolation、roster 与 validator 乘法成本另立窄方案。未修改正在进行的 skill/reference 实现、现有计划或 generated runtime；未运行真实计费/质量对照实验。 (user-visible)
