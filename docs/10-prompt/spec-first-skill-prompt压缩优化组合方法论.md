@@ -180,6 +180,20 @@ Output token、tool-result 大小、wall-clock 和人工决策时间应单独报
 该判断属于 LLM/human 的语义职责。脚本可准备 document bytes、changed files、risk facts 与 host readiness，
 不得按关键词自动裁决是否使用 multi-agent。
 
+每次判定至少留下一个轻量、可证伪的 decision record：
+
+```text
+current_failure_baseline
+single_agent_counterfactual
+expected_independent_gain
+falsification_condition
+reversal_cost
+invalidation_date
+```
+
+没有可回源 baseline 或可观察否证条件时，`ArchitectureFit` 默认不通过，采用 single-agent 或
+on-demand specialist。该记录是 LLM/human judgment 的证据载体，不是脚本自动评分 schema。
+
 ### 2.5 候选排序
 
 ```text
@@ -196,7 +210,10 @@ NetLeverage
 − expected_human_correction_cost
 ```
 
-这些公式只帮助人和 LLM 排序，不是脚本自动批准或拒绝候选的规则。
+这些公式只帮助人和 LLM 排序，不是脚本自动批准或拒绝候选的规则。`NetLeverage` 是概念分解，
+不是默认可直接计算的单一数值：token、工时、维护与纠正负担没有天然共同量纲。默认分别报告收益、成本、
+证据强度与时间窗，由 LLM/human 判断净收益；只有能够合理货币化时，才预注册统一单位、评估周期与
+不确定性区间，并做敏感性分析。
 
 ---
 
@@ -218,7 +235,7 @@ NetLeverage
 | LLMLingua 系列 | 预算化压缩动态材料 | **Conditional experiment** | contract/schema/否定/阈值/evidence anchor 永不进入有损路径 |
 | Soft prompt / latent compression | 学到的隐式前缀 | **Research only** | 非 project-owned、难审计、难跨宿主 |
 | KV-cache / sparse attention | 推理服务层优化 | **Out of scope** | 不写入 skill contract |
-| 大窗口替代 retrieval/slicing | 容量扩大但不消除 context rot | **Forbid as primary strategy** | 大窗口可作上限，不能替代治理 |
+| 大窗口替代 retrieval/slicing | 容量扩大但不消除 context rot | **Default no; local experiment only** | 默认不把容量当治理替代；目标 source/host/model 的 paired arm 同时通过质量、成本与 TCO 门时可采用 |
 
 ### 3.2 伪优化识别
 
@@ -230,7 +247,7 @@ NetLeverage
 | cache hit = 优化成功 | 是否计算 write、miss、churn 与 reuse？ | 可能净成本更高 | cache 净收益 |
 | 合并 persona 后声称独立 agreement | 是否共享父会话和证据路径？ | 伪造独立性 | claim-critical 才独立验证 |
 | 固定 roster 冒充风险预算 | 是否根据当前 evidence 增减？ | 低风险仍付满员税 | risk-selected + shadow calibration |
-| 大窗口替代 slicing | distractor 与长程依赖是否退化？ | context rot 仍在 | 索引、切片、回源和扩片 |
+| 大窗口替代 slicing | 是否在目标 source/host/model 上做过与 slicing 的 paired arm？ | context rot 仍可能存在，但短输入或低工具税任务也可能直接上下文更优 | 默认索引、切片、回源和扩片；允许本地质量/成本/TCO 证据推翻 |
 | 有损压 contract/schema/gate | 否定、exception、threshold 是否可能丢失？ | 治理失效 | protected segment manifest |
 | 每文件 × 每 pattern × 每 agent | 对 10k 文件是否爆炸？ | 工具税吞噬收益 | 批处理、脚本、有界 fan-out |
 | 只报告最佳单次 run | 是否报告波动和最坏分层？ | 把噪声当收益 | 重复 run、holdout、分位与 CI |
@@ -467,8 +484,10 @@ invalidation_condition
 - prompt 结构实验保持模型一致；model cascade 实验显式只改变模型/路由；
 - 数据分为 development、iterative validation 与 sealed promotion test；前两者用于实验循环，sealed test
   只在 winner 与阈值冻结后运行一次；
-- sealed test 一旦暴露即失去独立性，必须补充或轮换后才能再次用于 promotion；
+- sealed test 失败即淘汰当前 frozen winner，并把失败样本转入 development；只有形成新的 treatment、重新冻结阈值、完成新的 iterative validation 后，才可用独立来源的新 sealed set 发起下一次 promotion；
+- sealed test 通过后，该集合也因暴露而失去后续独立性；再次 promotion 必须补充或轮换独立来源的 sealed set；
 - 各 split 按风险、输入长度、host 或 workflow shape 分层；
+- `promotion_threshold` 同时预注册最小样本量或观测窗口、分层方式与不确定性判据；证据未达下限或区间仍覆盖无改善时保持 experiment；
 - 不可固定 temperature/seed 时运行多次，报告中位、分位、最坏分层和不确定性；
 - LLM judge 优先做 pairwise/pass-fail，并与人工标签校准；
 - 同时报 route/reference trigger、tool selection、agent handoff 与最终 outcome；
@@ -486,8 +505,9 @@ invalidation_condition
 
 ### 7.4 Profile shadow calibration
 
-优化现有 multi-agent 默认策略时，首先加入 `single-agent + on-demand specialist` 反事实 arm。只有直接证据已经
-证明任务需要独立证据路径时才可豁免，并记录证据、适用范围与失效条件。
+优化现有 multi-agent 默认策略时，首先加入 `single-agent + on-demand specialist` 反事实 arm。只有代表性任务上
+已有可复现的 single-agent 漏检或错误结果时才可豁免；证据必须包含样本、失败标签、复现条件、适用范围与
+预注册失效阈值。职责分离、独立性需要或 persona 多样性等叙述本身不得作为豁免证据。
 
 ArchitectureFit 通过后，候选 `lite` / `standard` promotion 前，再与 `full` 或等价完整覆盖做 shadow 对照：
 
@@ -497,7 +517,9 @@ ArchitectureFit 通过后，候选 `lite` / `standard` promotion 前，再与 `f
 - aggregate/output/tool-call/wall-clock；
 - 用户决策与纠正负担。
 
-`full` 只是校准 reference，不代表永久默认或绝对真相。若 full 本身质量不足，需要人工 gold 或 planted issue 补强。
+`full` 只是成本与覆盖校准 reference，不代表永久默认或质量 oracle。每次 profile promotion 至少包含一个与 roster
+无关的人工 gold 或 planted-issue 分层，并以该分层计算关键漏检率；若暂时无法建立独立真值，保持 experiment，
+不得用 full 与候选的一致性单独证明无退化。
 
 ### 7.5 Compression FSE 专项最小集
 
@@ -515,7 +537,11 @@ Deterministic link/schema/orphan PASS 不等于语义 FSE PASS。
 
 ### 7.6 实验执行 handoff
 
-本文负责定义领域输入；**会产生 project-owned source/config diff** 的实验循环交给 `spec-optimize`：
+本文负责定义领域输入；**会产生 project-owned source/config diff** 的实验循环交给 `spec-optimize`。
+下表是语义 handoff mapping，不代表当前 owner schema 已能持久化全部字段。进入自动实验前，必须先确认
+`spec-optimize` 的 source-owned spec/log contract 能保存 treatment、controlled variables、dataset split、
+promotion threshold、rollback 与 invalidation；若任一项只能留在会话记忆中，则不得声称实验可恢复或可审计，
+应先扩展既有 owner contract，或按下文 `manual_observation` 降级且禁止据此 promotion：
 
 | 本文产物 | `spec-optimize` 输入 | 状态 |
 | --- | --- | --- |
@@ -552,11 +578,13 @@ AND primary_objective_evidence = observed_and_improved
 AND P0/P1/关键 decision 未丢失
 AND human correction burden 未越线
 AND host degradation、rollback、invalidation 已记录
-AND NetLeverage > 0（已扣除可归属的 implementation、maintenance、human correction 与其他 GovernanceTCO）
+AND 有可回源证据支持净收益为正的 LLM/human judgment
+    （收益与 implementation、maintenance、human correction、其他 GovernanceTCO 分项报告）
 ```
 
 `observed_and_improved` 必须匹配预注册主目标：成本优化需要目标 host 的 observed runtime 改善；用户效率、
-纠正负担或 not-run 优化需要 observed field outcome。只有 proxy 或预测时保持 experiment，不晋级默认策略。
+纠正负担或 not-run 优化需要 observed field outcome。对应 `promotion_threshold` 必须满足 §7.3 的最小样本/
+观测窗口、分层和不确定性门；只有 proxy、预测或证据下限未满足时保持 experiment，不晋级默认策略。
 
 停止继续压缩或加派的条件：
 
@@ -619,11 +647,12 @@ LLMLingua、LongLLMLingua 或 abstractive compressor 默认不是第一步，但
 3. contract、schema、否定、threshold、exception、evidence anchor 已进入 protected manifest；
 4. 原始材料可回源，压缩输出标记 `lossy/advisory`；
 5. paired eval、rollback、数据授权与 retention 已定义；
-6. eval 植入未列入 protected manifest 的隐藏关键证据，并验证发现率不退化。
+6. eval 植入未列入 protected manifest 的隐藏关键证据，并把组件保真与 fallback 恢复分开测量。
 
 Lossy 输出只能作为辅助索引或候选生成。所有 claim-critical 结论必须检索可搜索的原始材料并回源；
-压缩率不是 promotion 指标。必须同时测量已知/隐藏关键事实 recall、distractor 选择、引用准确性、拒答/幻觉
-和纠正负担。
+压缩率不是 promotion 指标。paired eval 分为两个独立阶段：第一阶段禁止原文扩片，只测 compressor/index 对
+已知与 manifest 外隐藏关键证据的 recall、distractor 选择与引用准确性；第二阶段允许 expansion，测端到端恢复、
+拒答/幻觉与纠正负担。两个阶段分别满足预注册阈值后才可 promotion，不能用 fallback 找回证据来掩盖组件丢失。
 
 ---
 
@@ -730,18 +759,44 @@ Optional after the main bottleneck is controlled
 
 ## 11. 验收 Checklist
 
-### 所有方案必过
+### 通用边界（所有方案必过）
 
-- [ ] 问题有 baseline，不为行数或整洁度单独优化
+- [ ] 有可回源的问题或变更理由；不为行数或整洁度单独优化
 - [ ] 权威回到角色契约、canonical v2 与当前 source
-- [ ] ArchitectureFit 已判断；multi-agent 不是未经验证的默认
-- [ ] 明确 source、aggregate、billed、output、quality、field 与 TCO 的 claim 边界
 - [ ] hard contract、否定、exception、threshold、evidence anchor 未进入有损路径
 - [ ] scripts 只准备 deterministic facts；LLM/human 负责语义判断
 - [ ] 没有手改 generated runtime mirror
-- [ ] treatment、controls、development/validation/sealed test、rollback、invalidation 已写明
-- [ ] evidence vector 与最终 claim 匹配
+- [ ] evidence vector 与实际 claim 匹配；未执行项明确标记 not-run/degraded
 - [ ] 达到 decision sufficiency 或边际收益不足时停止
+
+### Tier A：机械修正 / 行为不变
+
+仅当改动不改变 trigger、schema、contract、threshold、gate、roster 或 model routing 时适用：
+
+- [ ] 改动仅为笔误、计数、术语标准化、明确不可达内容删除或等价结构整理
+- [ ] `structure_contract=passed`；Measurement 可记 `not_applicable` 及理由
+- [ ] 不声明 runtime、质量、field outcome 或默认策略收益
+
+### Tier B：行为变更 Pilot
+
+在通用边界之上额外满足：
+
+- [ ] 建立 baseline、关键 decision set 与 protected behavior
+- [ ] 明确 treatment、controls、paired cases、rollback 与 invalidation
+- [ ] 使用与 treatment 风险匹配的 before/after、iterative validation 或 sealed protocol
+- [ ] ArchitectureFit 仅在引入或优化 multi-agent 时判断，并留下可证伪 decision record
+- [ ] 明确 source、aggregate、billed、output、quality、field 与 TCO 的 claim 边界
+- [ ] 实验元数据能由既有 owner contract 持久化；否则降级为 `manual_observation` 且不得 promotion
+
+### Tier C：默认 Profile / Policy Promotion
+
+在 Tier B 之上额外满足：
+
+- [ ] 主目标有 observed improvement，且达到最小样本/窗口、分层与不确定性门
+- [ ] P0/P1/关键 decision 未丢失，人工纠正负担未越线
+- [ ] multi-agent/profile 变更有 single-agent 反事实与独立 gold/planted-issue 分层
+- [ ] rollback、host degradation、失效条件与重新评估触发已记录
+- [ ] 收益与各项 GovernanceTCO 分项可回源，LLM/human 判断净收益为正
 
 ### 选择 ProgressiveDisclosure 时
 
