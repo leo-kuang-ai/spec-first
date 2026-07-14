@@ -1,5 +1,13 @@
 # Changelog
 
+- v1.13.2 2026-07-14 Codex: feat(doc-review): 落地 `2026-07-14-002` roster 预算与 cost-shape——默认 `roster:standard`（always-on 2 + 至多 1 条件角色，优先级 security>adversarial>design>product>scope）、`roster:lite|full` 与 `depth:*` 别名；dispatch 前强制 advisory `cost-shape:` 行；子 agent 最小上下文继承意图 + `degraded_inherited`；unified 切片 anti-waste。扩展 contract 4 条（30 passed）。同步 001 基线附录 N=3 粗算与 002 plan 状态。未跑语义 FSE / 真实计费对照；未手改 generated runtime。 (user-visible)
+
+- v1.13.2 2026-07-14 11:25:49 Codex: fix(doc-review): 修复 progressive disclosure 独立复核发现的 orphaned lazy reference：在 subagent spine 为 `subagent-why-it-matters-guide.md` 增加仅当 finding 仍以文档结构开头、无法命名可观察后果时触发的条件读取指针，保持默认 spine-only；contract tests 新增该指针语义和全部 10 个 lazy reference 必须从 SKILL/leaf/synthesis execution spine 可达的通用地板，防止后续“文件存在但无 consumer”的静默降智。未改变 finding schema、persona roster、autofix/交互语义或 generated runtime。 (user-visible)
+
+- v1.13.2 2026-07-14 Codex: docs(review): 收口 `2026-07-14-001` 轨 1——回写 plan 为 `verification-pending`（U1–U4 结构 done；语义 FSE open）；新增签字基线 `docs/项目审查/2026-07-14-spec-doc-review-token-baseline.md` 与 `.spec-first/audits/doc-review-token-baseline-2026-07-14.json`（hot_instruction N=5 −48.4%，aggregate_no_doc −36.5%，chars/4 代理）；锁定对外措辞禁止无计费证据时声称端到端账单降幅；写入 deterministic FSE floor PASS 与语义 FSE 最小协议。未改 skill 运行时行为、未跑语义 FSE、未手改 generated runtime。 (user-visible)
+
+- v1.13.2 2026-07-14 11:12:56 Codex: docs(methodology): 新增并深度收敛 `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md`（891→637 行、33.8→29.2 KB）：将 Agent Skills progressive disclosure、context engineering、long-context position bias、routing/cascade、prompt caching、FrugalGPT 与 LLMLingua 研究边界组合为 ProgressiveDisclosure × TopologyBudget × DeterministicFloor × MeasurementPareto + optional HostAccelerators；补 expected-session/aggregate/billed 成本分层、内容 criticality、reference reachability、profile 数字实验边界、停止条件、restricted/cache retention、E0–E5 claim/evidence ladder、paired stochastic eval 和可复制提案模板。同步 docs/10-prompt 索引与 canonical v2 companion 指针；未修改 skill/runtime behavior 或 generated mirror，外部资料仅作 advisory。 (user-visible)
+
 - v1.13.2 2026-07-14 Codex: fix(doc-review): 移除 SKILL.md 中残留的旧 adversarial 激活规则文本——"The plan's structural decisions..." 句子应在 U3 提取 persona-activation-matrix.md 时一并移出。 (user-visible)
 
 - v1.13.2 2026-07-14 10:49:44 Codex: docs(review): 在 Review Token 消耗报告中补充适合 spec-first 的七层组合方法：Metadata Routing、Contract Spine、Risk-Based Activation、Just-in-Time References、Reviewer-Specific Context Slicing、Evidence/History Compaction、Cache-Friendly Layout 与 Paired Quality/Cost Evaluation；分别映射 `spec-doc-review`、`spec-code-review` 的执行链，给出 Wave 0–5 落地顺序和 decision-sufficiency-per-token 成功标准。未修改并行中的 skill/tests 实现或 generated runtime；仅更新审查报告与 Changelog。 (user-visible)

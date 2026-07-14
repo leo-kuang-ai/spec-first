@@ -1,7 +1,7 @@
 ---
 name: spec-doc-review
-description: Review requirements, plans, or specs with role-specific lenses. Use when the user wants to improve an existing planning document.
-argument-hint: "[mode:headless] [path/to/document.md]"
+description: Review requirements, plans, or specs with role-specific lenses. Use when the user wants to improve an existing planning document. Default roster is standard (≤3 reviewers); pass roster:full for the full conditional set.
+argument-hint: "[mode:headless] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
 # Document Review
@@ -15,7 +15,16 @@ Review requirements or plan documents through multi-persona analysis. Dispatches
 
 ## Phase 0: Detect Mode
 
-Check the skill arguments for `mode:headless`. Arguments may contain a document path, `mode:headless`, or both. Tokens starting with `mode:` are flags, not file paths — strip them from the arguments and use the remaining token (if any) as the document path for Phase 1.
+Check the skill arguments for flags and a document path. Tokens matching `mode:*`, `roster:*`, or `depth:*` are flags, not file paths — strip them from the arguments and use the remaining token (if any) as the document path for Phase 1.
+
+| Flag | Meaning |
+|------|---------|
+| `mode:headless` | Headless delivery (no interactive routing) |
+| `roster:lite` / `roster:standard` / `roster:full` | Reviewer budget profile (default **`standard`**) |
+| `depth:full` | Alias of `roster:full` (kept for callers used to depth wording) |
+| `depth:lite` | Alias of `roster:lite` |
+
+If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, profile = **`standard`**.
 
 If `mode:headless` is present, set **headless mode** for the rest of the workflow.
 
@@ -85,11 +94,46 @@ Analyze the document content to determine which conditional personas to activate
 
 **STOP. If the quick-reference table does not resolve whether to activate a conditional persona for this document, read `references/persona-activation-matrix.md` before finalizing the reviewer list.**
 
+### Apply Roster Budget (profile)
+
+The quick-reference table produces a **candidate set** of conditional personas. Apply the profile budget **before** Phase 2 dispatch. Never merge personas; only skip candidates that exceed budget.
+
+| Profile | Always-on | Conditional budget | Typical N |
+|---------|-----------|--------------------|-----------|
+| `lite` | coherence + feasibility | **0** conditional | 2 |
+| `standard` (default) | coherence + feasibility | **at most 1** conditional | ≤3 |
+| `full` | coherence + feasibility | all candidates that qualify | 2–7 |
+
+**Selecting the single conditional under `standard`:** if multiple candidates qualify, keep **exactly one** using this priority (first match wins):
+
+1. `security-lens` — auth/API/PII/payments/credentials/trust boundaries
+2. `adversarial` — high-stakes domain, new abstractions, greenfield without validated upstream, explicit alternatives
+3. `design-lens` — UI/UX/frontend/interaction
+4. `product-lens` — challengeable product/strategy claims
+5. `scope-guardian` — multi-priority / large unit count / stretch goals
+
+Record skipped candidates for the cost-shape line (`skipped_conditional=… reason=budget`). Under `lite`, skip **all** conditionals (`reason=lite`). Under `full`, keep the full candidate set (no budget skip).
+
+**Escape hatch:** user may name personas explicitly in the invocation (e.g. "also run adversarial") — honor explicit names even under `standard`/`lite`, and note `override=user` on cost-shape.
+
+### Emit cost-shape (advisory, required)
+
+**After** the final reviewer list is fixed and **before** any subagent dispatch, print exactly one advisory line (do not block on it):
+
+```text
+cost-shape: profile={lite|standard|full} N={count} personas=[{comma-separated short names}] skipped_conditional=[{name:reason},…] doc_bytes={utf8_bytes_or_unknown} slices={unified|full|mixed} isolation={min|degraded_inherited}
+```
+
+- `doc_bytes`: byte length of the on-disk document when known; else `unknown`.
+- `slices`: `unified` if every leaf gets a section slice; `full` if every leaf gets the full document; `mixed` otherwise.
+- `isolation`: set in Phase 2 Dispatch (below).
+This line is **advisory measurement**, not a hard gate.
+
 ## Phase 2: Announce and Dispatch Personas
 
 ### Announce the Review Team
 
-Tell the user which personas will review and why. For conditional personas, include the justification:
+Tell the user which personas will review and why. For conditional personas, include the justification. Include the `cost-shape:` line from Phase 1 in the same announcement block.
 
 ```
 Reviewing with:
@@ -105,16 +149,20 @@ Always include:
 - `coherence-reviewer`
 - `feasibility-reviewer`
 
-Add activated conditional personas:
+Add **budget-filtered** conditional personas only (from Apply Roster Budget), using these names when selected:
 - `product-lens-reviewer`
 - `design-lens-reviewer`
 - `security-lens-reviewer`
 - `scope-guardian-reviewer`
 - `adversarial-document-reviewer`
 
+Do **not** re-expand the list to "all conditionals that could match" after budget filtering unless `profile=full` or user override.
+
 ### Dispatch
 
 Dispatch generic subagents using **bounded parallelism** with the platform's subagent primitive (e.g., `Agent` in Claude Code, `spawn_agent` in Codex) where available; otherwise run the work inline or serially. Omit the `mode` parameter so the user's configured permission settings apply. Respect the current harness's active-subagent limit: queue selected reviewers, dispatch only as many as the harness accepts, and fill freed slots as reviewers complete. Treat active-agent/thread/concurrency-limit spawn errors as backpressure, not reviewer failure: leave the reviewer queued and retry after a slot frees. Record a reviewer as failed only after a successful dispatch times out/fails, or when dispatch fails for a non-capacity reason.
+
+**Context isolation (required intent):** Each reviewer prompt is self-contained (persona + schema + document slice + primer). Prefer **minimum parent-context inheritance** when the host supports it (e.g. Codex `fork_turns: "none"` / equivalent "no parent thread history"). Do **not** rely on the child inheriting the orchestrator's full skill text or chat history. If the host cannot isolate, set `isolation=degraded_inherited` on the cost-shape line and proceed — never claim isolation that did not happen.
 
 For each selected reviewer, read the matching skill-local prompt asset at `references/personas/<reviewer-name>.md` and pass its full content as `{persona_file}`. Do not dispatch standalone agents by type/name and do not rely on platform-level custom-agent registration.
 
@@ -139,11 +187,13 @@ Each subagent receives the prompt built from the subagent template included belo
 | `{decision_primer}` | Cumulative prior-round decisions in the current session, or an empty `<prior-decisions>` block on round 1. See "Decision primer" below. |
 
 For legacy requirements/plan documents, pass each subagent the **full
-document** — do not split into sections. For unified artifacts, do not pass the
+document** — do not split into sections (`slices=full`). For unified artifacts, do not pass the
 full artifact to every reviewer by default: unified plans can be large, so
-section slices (per the `{document_content}` slot above) are the default.
+section slices (per the `{document_content}` slot above) are the default (`slices=unified`).
 Escalate to a broader slice only when the reviewer needs cross-section
 traceability that the initial slice cannot assess.
+
+**Anti-waste rule:** The orchestrator may read the full document once for classification and roster selection. After slices are built, **do not** also inject the full document into every leaf "for safety" when a slice already covers that reviewer's contract. If a leaf must escalate to full text, mark `slices=mixed` or `full` on cost-shape.
 
 ### Decision primer
 

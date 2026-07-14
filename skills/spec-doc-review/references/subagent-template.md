@@ -56,6 +56,8 @@ If unsure about anchor selection, read `references/subagent-confidence-rubric-de
 - **Keep it tight.** Approximately 2-4 sentences.
 - **Anti-pattern:** "Section X says Y. Section Z says W. Reconcile." → **Instead:** "Implementers will disagree on which tier to apply because Section X lists four values while Section Z's routing only handles three. The document does not say which enumeration is authoritative."
 
+If your draft still leads with document structure, cannot name an observable consequence, or needs calibration beyond the compact anti-pattern above, read `references/subagent-why-it-matters-guide.md` before emitting. Do not load it when the spine rules already resolve the framing.
+
 **`autofix_class` — three tiers:**
 
 - `safe_auto`: One clear correct fix, applied silently. Eligible patterns: typo, wrong count, missing list entry derivable from elsewhere in the document, stale internal cross-reference, terminology drift, summary/detail mismatch (body authoritative over overview), prose-vs-prose contradiction where one passage is more detailed, missing step mechanically implied by other content, unstated threshold implied by surrounding context. Always include `suggested_fix`. (Factually incorrect behavior is `gated_auto`, not `safe_auto`.)

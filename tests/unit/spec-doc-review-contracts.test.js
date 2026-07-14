@@ -22,6 +22,7 @@ const lazyRefs = [
 ];
 
 const refsDir = path.resolve(__dirname, '../../skills/spec-doc-review/references');
+const executionSpines = `${skill}\n${subagentTemplate}\n${synthesis}`;
 
 describe('spec-doc-review current contracts', () => {
   // --- Existing assertions (preserved) ---
@@ -182,6 +183,12 @@ describe('spec-doc-review current contracts', () => {
     expect(guide).toContain('observable consequence');
   });
 
+  test('U1: why-it-matters guide is conditionally reachable from the subagent spine', () => {
+    expect(subagentTemplate).toContain('subagent-why-it-matters-guide.md');
+    expect(subagentTemplate).toMatch(/still leads with document structure|cannot name an observable consequence/);
+    expect(subagentTemplate).toMatch(/Do not load it when the spine rules already resolve/);
+  });
+
   test('U1: suggested-fix advanced reference contains strawman analysis', () => {
     const advanced = fs.readFileSync(path.join(refsDir, 'subagent-suggested-fix-advanced.md'), 'utf8');
     expect(advanced).toMatch(/strawman/i);
@@ -215,5 +222,37 @@ describe('spec-doc-review current contracts', () => {
     expect(matrix).toContain('## adversarial');
     expect(matrix).toContain('high-stakes domain');
     expect(matrix).toContain('product_contract_source: spec-plan-bootstrap');
+  });
+
+
+  // --- Roster budget + cost-shape (002) ---
+
+  test('002: SKILL.md defines roster profiles lite/standard/full', () => {
+    expect(skill).toMatch(/roster:lite/);
+    expect(skill).toMatch(/roster:standard/);
+    expect(skill).toMatch(/roster:full/);
+    expect(skill).toMatch(/Apply Roster Budget/);
+    expect(skill).toMatch(/at most 1/i);
+  });
+
+  test('002: SKILL.md requires cost-shape advisory line before dispatch', () => {
+    expect(skill).toContain('cost-shape:');
+    expect(skill).toMatch(/doc_bytes/);
+    expect(skill).toMatch(/isolation=\{min\|degraded_inherited\}|isolation=\{min\|degraded_inherited\}|degraded_inherited/);
+  });
+
+  test('002: SKILL.md states minimum context isolation intent', () => {
+    expect(skill).toMatch(/fork_turns|minimum parent-context inheritance|Context isolation/i);
+    expect(skill).toContain('degraded_inherited');
+  });
+
+  test('002: SKILL.md anti-waste rule for document slices', () => {
+    expect(skill).toMatch(/Anti-waste rule/);
+  });
+
+  test('all lazy references are reachable from an execution spine', () => {
+    for (const ref of lazyRefs) {
+      expect(executionSpines).toContain(ref);
+    }
   });
 });

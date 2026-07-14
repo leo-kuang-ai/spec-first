@@ -14,6 +14,11 @@
 > - **第三部分（§23–§26）· 决策模型透镜：** 用精选思维模型锐化设计与优化决策。
 > - **§27 端到端样板：** 把上面的方法走一遍长什么样（照做参考）。
 >
+> 多 agent review 的 fan-out、context isolation、validator budget、aggregate token 与质量/成本
+> Pareto，见专项 companion
+> [`spec-first-skill-prompt压缩优化组合方法论.md`](./spec-first-skill-prompt压缩优化组合方法论.md)；
+> 本文继续作为唯一 canonical，专项文档不重复定义通用 skill 设计合同。
+>
 > **阅读导引：** 新写 skill → 先读第二部分（§11 起）再回第一部分核对边界；精简既有 skill
 > → 读第一部分；想看「照着做一遍」→ 直接跳 §27；需要更锋利的决策直觉 → 查第三部分。
 >
