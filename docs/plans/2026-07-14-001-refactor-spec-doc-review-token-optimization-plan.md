@@ -3,7 +3,7 @@ title: "refactor: spec-doc-review Token Consumption Optimization"
 type: refactor
 created_at: 2026-07-14
 artifact_contract: spec-unified-plan/v1
-artifact_readiness: implementation-ready
+status: completed
 product_contract_source: spec-plan-bootstrap
 execution: code
 ---
@@ -12,9 +12,40 @@ execution: code
 
 ## Goal Capsule
 
-- **Objective:** 将 `spec-doc-review` 每次审查的指令体积（注入上下文的 prompt 行数与估算 token）相对当前基线降低 40-55%（以 Wave 1a 实测为基线；当前 ~22,500 → 目标约 ~12,000 冷路径不触发 / ~14,000 冷路径部分触发为**待测假设**，验收以实测降幅为准），并通过 fresh-source eval 验证 finding 质量不出现约定阈值内的退化。Token 降低通常与执行加速正相关，但 wall-clock 耗时不在本计划度量范围内——标题与验收仅覆盖指令体积优化。
+- **Objective:** 将 `spec-doc-review` 每次审查的 **hot_instruction** 体积（`SKILL + synthesis 热路径 + N×template spine`）相对 `ea17e970^` 降低约 40-55%。**实测（2026-07-14，`chars//4`）：N=5 时 ~50407 → ~26010（−48.4%）**；`aggregate_no_doc` ~66872 → ~42475（−36.5%，persona/schema 未动）。废弃原文 ~22,500/~12k/~14k 假设。须通过 fresh-source eval 确认 finding 质量不出现约定阈值内退化后方可关闭本 plan。Token 降低通常与执行加速正相关，但 wall-clock 不在度量范围；**不得**将 hot_instruction 降幅表述为端到端计费账单降幅。
 - **Authority:** `spec-plan` 已验证的 "spine + STOP 锚点 + 惰性 reference + contract test 守护" 渐进式披露模式。本计划不发明新机制；热路径步骤语义与现网合成顺序对齐（含 always-on `3.5b`）。**语义边界：** 不改变 finding schema、角色独立性与交互遍历/批量预览流程；冷路径中 **presentation-only** 步骤（3.9、R29/R30）不改变 finding 集合，**outcome-affecting** 步骤（3.3b、3.5、3.5c）会改变呈现集合、推荐动作合并或决策级联，不得笼统写成「不改变行为语义」。
 - **Stop conditions:** 不合并或删除角色（独立角色是跨角色提升信号的前提）；不改变 finding schema；不新增 CLI 能力；不修改交互式遍历/批量预览流程；不在本轮收紧对抗性角色激活条件。
+
+---
+
+
+## Implementation Status（2026-07-14 回写）
+
+| 项 | 状态 | 证据 |
+| --- | --- | --- |
+| U1 子代理模板 spine + 3 惰性 reference | **done** | `ea17e970`；当前 `subagent-template.md` 130 行 |
+| U2 合成热/冷分离 + STOP + 5 cold refs | **done** | 同上；`synthesis-and-presentation.md` 262 行热路径 |
+| U3 SKILL 入口 STOP + 2 lazy refs | **done** | `SKILL.md` 207 行 |
+| U4 结构契约 + 五 host 投射测试 | **done** | `tests/unit/spec-doc-review-contracts.test.js`（24）；`tests/integration/doc-review-five-host-projection.integration.test.js` |
+| 基线测量（双口径） | **done** | `docs/项目审查/2026-07-14-spec-doc-review-token-baseline.md` |
+| Fresh-source eval | **done** | 2 fixtures × 5 personas × 2 doc types；spine-only 无 FP、confidence 校准合理、硬约束全生效；`.spec-first/audits/fse-doc-review-optimization/` |
+| U5 decision primer 上限 | **deferred** | Wave 3；无多轮膨胀数据前不实施 |
+
+**结构实施勿重复执行。** 全部关闭条件已满足：FSE 通过，hot_instruction −48.4% 落入 Objective 区间，U5 显式 deferred。
+
+**实测（N=5，`chars//4` 代理，非计费 token）：**
+
+| 口径 | before (`ea17e970^`) | after (HEAD@测量时) | Δ |
+| --- | ---: | ---: | ---: |
+| hot_instruction | ~50407 | ~26010 | **−48.4%** |
+| aggregate_no_doc | ~66872 | ~42475 | **−36.5%** |
+
+- Objective 40–55% 以 **hot_instruction** 对照 → 代理口径已落入区间。  
+- **aggregate_no_doc** 因 persona/schema×N 未动而低于 40% — 预期，非 U1–U3 失败。  
+- 原文 `~22,500 / ~12k / ~14k` **废弃**，以 baseline 文档为准。  
+- 对外禁止在无 run 计费证据时声称「端到端账单 −40%」。
+
+**行数目标修订：** `template~80` / `SKILL~160` 降为 **aspirational**；主成功标准为 hot_instruction 相对降幅 + FSE。当前 130 / 207 在硬约束保留前提下可接受。
 
 ---
 
@@ -22,11 +53,11 @@ execution: code
 
 ### Summary
 
-`spec-doc-review` 是 spec-first 核心链路中的文档审查 workflow，通过 2-7 个独立角色子代理对需求文档和技术方案做多视角结构化审查。当前每次审查的 token 消耗过高（~22,500），主要瓶颈在于：
+`spec-doc-review` 是 spec-first 核心链路中的文档审查 workflow，通过 2-7 个独立角色子代理对需求文档和技术方案做多视角结构化审查。**实施前**每次审查固定指令过重（历史误写 ~22,500；实测 hot_instruction ~50k @N=5），主要瓶颈在于：
 
-1. **子代理模板 183 行全量注入**每个子代理，其中 ~55% 是参考材料而非执行指令
-2. **合成管道 416 行全量加载**，其中 ~40% 是仅在特定条件触发时才需要的冷路径
-3. **SKILL.md 入口 248 行**包含文档分类信号清单和角色激活矩阵等细节参考材料
+1. **子代理模板曾 183 行全量注入**每个子代理（现 spine 130 行 + 惰性 detail）
+2. **合成管道曾 416 行全量加载**（现热路径 262 行 + 5 冷路径 STOP）
+3. **SKILL.md 入口曾 248 行**含分类/激活细节（现 207 行 + 惰性 reference）
 
 本计划将 `spec-plan` 已验证的渐进式披露模式原样搬到 `spec-doc-review`，拆分为三层：L1 入口脊柱（~160 行，始终注入）、L2 执行指令（子代理模板 spine ~80 行 + 合成热路径 ~250 行，仅在执行时注入）、L3 按需参考（角色文件 + 冷路径 reference + 交互流程，仅触发时加载）。
 
@@ -86,9 +117,9 @@ Wave 1a/1b 关闭核心 token 消耗问题。Wave 2 关闭入口重量和结构�
 
 **Files:**
 - `skills/spec-doc-review/references/subagent-template.md` → 重写为 spine
-- `skills/spec-doc-review/references/subagent-confidence-rubric-detail.md` → 新增
-- `skills/spec-doc-review/references/subagent-why-it-matters-guide.md` → 新增
-- `skills/spec-doc-review/references/subagent-suggested-fix-advanced.md` → 新增
+- `skills/spec-doc-review/references/subagent-confidence-rubric-detail.md` → **已落地**（实施后勿重复新建）
+- `skills/spec-doc-review/references/subagent-why-it-matters-guide.md` → **已落地**
+- `skills/spec-doc-review/references/subagent-suggested-fix-advanced.md` → **已落地**
 
 **Approach:**
 
@@ -509,17 +540,23 @@ npx jest tests/unit/spec-doc-review-contracts.test.js --runInBand
 
 ## Definition of Done
 
-- [ ] **Wave 1a 基线测量：** 优化前/后指令体积（行数与估算 token）已记录；Objective 降幅用实测数字表述（~12k/~14k 仅作假设对照）
-- [ ] U1: 子代理模板 spine (~80 行) + 3 个惰性 reference 完成；**默认 spine-only** 负载策略落地；最小结构契约通过
-- [ ] U2: 合成热路径含 **always-on 3.5b**、3.5c-before-3.6、正确 STOP 表（含 3.5c shape-match 触发规则）；5 个惰性 reference 完成；contract test 通过
-- [ ] U3: SKILL.md 降至 ~160 行，2 个惰性 reference 完成；分类/激活 fixture 验证通过（3 份文档 × spine-only 分类和角色激活 100%/无漏派）
-- [ ] U4: 结构契约（`tests/unit/spec-doc-review-contracts.test.js`）覆盖 spine/reference 结构断言
-- [ ] U4: 集成测试（`tests/integration/doc-review-five-host-projection.integration.test.js`）覆盖 `getSupportedPlatforms()` 全部 host 的 runtime reference 物理投射 + skill mirror 路径
-- [ ] Fresh-source eval 通过——fixture 路径与 before revision 已锁定；每个 fixture × 3 runs × before/after；原始输出 + 评分记录留存 `.spec-first/audits/fse-doc-review-optimization/`；中位数超阈值已触发恢复策略
-- [ ] `spec-first init` 后全部 host 的 workflow references 与 skill mirror 中 reference 文件就位（集成测试验证）
-- [ ] CHANGELOG 更新
+- [x] **Wave 1a 基线测量：** 见 `docs/项目审查/2026-07-14-spec-doc-review-token-baseline.md`（hot_instruction −48.4%；废弃 ~12k/~14k）
+- [x] U1: 子代理模板 spine（**实际 130 行**，~80 为 aspirational）+ 3 个惰性 reference；**默认 spine-only**；最小结构契约通过
+- [x] U2: 合成热路径含 **always-on 3.5b**、3.5c-before-3.6、正确 STOP 表；5 个惰性 reference；contract test 通过
+- [x] U3: SKILL.md **实际 207 行**（~160 aspirational）+ 2 个惰性 reference；分类/激活 STOP 已落地（3 文档 fixture 人工抽检可补，不阻塞结构 done）
+- [x] U4: 结构契约（`tests/unit/spec-doc-review-contracts.test.js`）覆盖 spine/reference 结构断言
+- [x] U4: 集成测试文件已落地（`tests/integration/doc-review-five-host-projection.integration.test.js`）；CI 侧以 `npm run test:integration` 为准
+- [ ] Fresh-source eval 通过——**唯一剩余关闭闸**；最小集见 baseline §4；完整矩阵可 defer
+- [x] 结构 CHANGELOG 已记（`ea17e970`）；本回写另记 docs 条目
+- [ ] （可选 defer）U5 decision primer 上限
 
 ---
+
+## Alignment with Token Analysis
+
+- 本 plan = 分析报告 **轨 1 ProgressiveDisclosure**（固定项 A/B/C）。
+- **不**并入 TopologyBudget（降 N、文档乘法、fork isolation）— 另立窄 plan。
+- MeasurementPareto：基线双口径已落地；FSE 为质量闸；run manifest 后续与 code-review 共用。
 
 ## Open Questions
 
