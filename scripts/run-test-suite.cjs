@@ -119,6 +119,7 @@ function runIntegration() {
     'tests/integration/workspace-graph-lifecycle.integration.test.js',
     'tests/integration/workspace-graph-five-host-projection.integration.test.js',
     'tests/integration/spec-write-skill-authoring-preview.integration.test.js',
+    'tests/integration/plan-status-closeout.integration.test.js',
   ], ['--runInBand']);
 }
 

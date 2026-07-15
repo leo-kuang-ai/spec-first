@@ -50,6 +50,16 @@ describe('active test inventory', () => {
 
   test('quality gate paths all exist', () => {
     expect(WORKFLOW_RUNTIME_CONTRACT_TESTS.length).toBeGreaterThan(0);
+    for (const lifecycleTest of [
+      'tests/unit/plan-status-helper.test.js',
+      'tests/unit/plans-command.test.js',
+      'tests/unit/requirements-rendering-parity.test.js',
+      'tests/unit/spec-brainstorm-contracts.test.js',
+      'tests/unit/spec-lfg-contracts.test.js',
+      'tests/integration/plan-status-closeout.integration.test.js',
+    ]) {
+      expect(WORKFLOW_RUNTIME_CONTRACT_TESTS).toContain(lifecycleTest);
+    }
     expect(WORKFLOW_RUNTIME_CONTRACT_TESTS.filter((file) => !fs.existsSync(path.join(repoRoot, file))))
       .toEqual([]);
   });

@@ -10,7 +10,7 @@
     {
       "path": "skills/spec-brainstorm/SKILL.md",
       "status": "present",
-      "sha256": "b4e60f280bdf1ac0bd3f5fb7d26cd91f5d83240229f900cdda1b6d4c68f9f70d"
+      "sha256": "db7214ec68bcb6c4414264d5a615c2ae6ea2977a68d4a6d3ba9282c825a4bb79"
     },
     {
       "path": "skills/spec-brainstorm/references/agents/repo-profiler.md",
@@ -20,7 +20,7 @@
     {
       "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
       "status": "present",
-      "sha256": "ed6e674cdba0b9a085c5af5b46919924230b256048d198c05d7f84214ec7bfba"
+      "sha256": "9db1310fbfe61e0d3676feed8be10913b2e8cfe73357f544f0418676400b2105"
     },
     {
       "path": "skills/spec-brainstorm/references/handoff.md",
@@ -115,7 +115,7 @@
     {
       "path": "skills/spec-plan/SKILL.md",
       "status": "present",
-      "sha256": "c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f"
+      "sha256": "91c0538f80dc18f1aefa4f9cd6b81e38d4fd014cdef40f168e264ea49098329a"
     },
     {
       "path": "skills/spec-plan/references/agents/repo-profiler.md",

@@ -711,6 +711,7 @@ Write the unified plan artifact according to `references/plan-sections.md`.
 - If the source is a legacy requirements doc, create a new unified plan in `docs/plans/` and carry the legacy path in `origin:`.
 - If this is direct planning, create a complete unified plan in `docs/plans/` with `product_contract_source: spec-plan-bootstrap`.
 - Set `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: implementation-ready`, and `execution: code` for software implementation plans.
+- Only when `OUTPUT_FORMAT=md`, preserve one existing canonical `status` during enrichment and add `status: active` when it is missing. Preservation is compatibility, not a lifecycle reset: never turn `completed`, `partially-shipped`, or `superseded` back into `active`; duplicate, malformed, or non-canonical status metadata blocks enrichment for repair. This producer does not add a non-`active` execution intake gate. New Markdown software unified plans start at `status: active`; HTML output does not carry status.
 - Do not set `artifact_contract: spec-unified-plan/v1` on universal-planning outputs, answer-seeking outputs, or approach-plans unless they include the full software implementation contract.
 - Do not write a launch prompt into the doc. The launch prompt is generated at handoff (Phase 5.4 menu — `/goal` copy-paste on Claude Code, `create_goal` on Codex) from the plan's current content, so it never goes stale; it points to Goal Capsule, Verification Contract, Definition of Done, and U-IDs rather than duplicating them.
 

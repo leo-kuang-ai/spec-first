@@ -4,12 +4,33 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-plan/SKILL.md'), 'utf8');
+const sections = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-plan/references/plan-sections.md'),
+  'utf8',
+);
+const handoff = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-plan/references/plan-handoff.md'),
+  'utf8',
+);
 
 describe('spec-plan current contracts', () => {
   test('enriches requirements-only unified plans in place', () => {
     expect(skill).toContain('planning should enrich it in place');
     expect(skill).toContain('artifact_readiness: implementation-ready');
     expect(skill).toContain('execution: code');
+    expect(skill).toContain('preserve one existing canonical `status`');
+    expect(skill).toContain('add `status: active` when it is missing');
+    expect(skill).toContain('never turn `completed`, `partially-shipped`, or `superseded` back into `active`');
+    expect(skill).toContain('does not add a non-`active` execution intake gate');
+    expect(sections).toContain('Duplicate, malformed, or non-canonical status');
+  });
+
+  test('writes active only for Markdown software unified plans', () => {
+    expect(skill).toContain('only when `OUTPUT_FORMAT=md`');
+    expect(skill).toContain('status: active');
+    expect(sections).toContain('status is independent of `artifact_readiness`');
+    expect(sections).toContain('HTML plans do not carry `status`');
+    expect(sections).toMatch(/knowledge-work,\s+universal-planning, answer-seeking, and approach-plan outputs do not carry\s+`status`/);
   });
 
   test('consumes legacy brainstorm requirements without migration', () => {
@@ -22,6 +43,13 @@ describe('spec-plan current contracts', () => {
     expect(skill).toContain('Plans do not carry per-unit progress state');
     expect(skill).toContain('Start `/spec-work`');
     expect(skill).toContain('`spec-work` owns engine selection and the tail');
+  });
+
+  test('hands lifecycle completion to the execution tail without making the plan a task tracker', () => {
+    expect(handoff).toContain('active → completed');
+    expect(handoff).toContain('shipping-tail owner');
+    expect(handoff).toContain('before terminal goal completion');
+    expect(handoff).toContain('Return-to-Caller');
   });
 
   test('discovers only current durable requirement origins without narrowing direct entry', () => {

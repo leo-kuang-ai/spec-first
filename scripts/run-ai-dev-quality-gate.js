@@ -19,16 +19,22 @@ const WORKFLOW_RUNTIME_CONTRACT_TESTS = [
   'tests/unit/platform-registry-patterns.test.js',
   'tests/unit/plugin-modules.test.js',
   'tests/unit/pipeline-mode-contracts.test.js',
+  'tests/unit/plan-status-helper.test.js',
+  'tests/unit/plans-command.test.js',
   'tests/unit/plan-status-taxonomy.test.js',
+  'tests/unit/requirements-rendering-parity.test.js',
   'tests/unit/repo-profile-cache-parity.test.js',
   'tests/unit/secret-deny-patterns-contracts.test.js',
   'tests/unit/spec-plan-contracts.test.js',
+  'tests/unit/spec-brainstorm-contracts.test.js',
+  'tests/unit/spec-lfg-contracts.test.js',
   'tests/unit/task-pack-command.test.js',
   'tests/unit/spec-write-tasks-contracts.test.js',
   'tests/unit/spec-work-contracts.test.js',
   'tests/unit/spec-doc-review-contracts.test.js',
   'tests/unit/spec-code-review-contracts.test.js',
   'tests/unit/test-inventory-contracts.test.js',
+  'tests/integration/plan-status-closeout.integration.test.js',
 ];
 
 function ensureDir(dirPath) {

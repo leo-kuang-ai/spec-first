@@ -66,6 +66,20 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    - If the plan has a `Requirements` section (or legacy `Requirements Trace`), verify each requirement is satisfied by the completed work
    - If any `Deferred to Implementation` questions were noted, confirm they were resolved during execution
 
+5.1 **Plan Status Closeout**
+
+   This is the only shipping closeout that may mutate plan `status`. Run it only after Final Validation, required review, and Residual Work Gate obligations have closed. `completed` is an audit marker for scoped development work; it is not proof of tests, CI, merge, release, or field outcome. Leaf workers, reviewers, and fix subagents never perform this mutation.
+
+   Resolve lifecycle applicability before calling the helper:
+
+   - A lifecycle-managed candidate is a non-symlink regular direct `docs/plans/*.md` software plan with exactly one readable status: either `artifact_contract: spec-unified-plan/v1` plus `execution: code`, or a compatible legacy `type: feat | fix | refactor` plan whose execution is absent or `code`. Only `active` and `completed` candidates enter the mutation helper.
+   - Direct lifecycle-managed Markdown plan: update that plan.
+   - Validated task pack input: require exactly one `source_plan`; update it only when it resolves to the lifecycle-managed candidate above. The task pack stays `status: derived` or `draft`.
+   - Return-to-Caller: do not write. Return both `plan_status_completion_candidate` and `plan_status_completion_degraded_reason` so LFG/caller can apply the same decision after its own gates.
+   - HTML, historical missing/closed plans, read-compatible `partially-shipped`/`superseded` plans, and otherwise valid source plans outside the direct Markdown boundary: do not mutate. Report respectively `html-plan-lifecycle-degraded`, `legacy-plan-lifecycle-degraded`, `read-compatible-status-unmanaged`, or `source-plan-path-lifecycle-degraded`. These explicit degraded outcomes do not invalidate development completion already established by verification and review.
+
+   For an applicable candidate, invoke `spec-first internal plan-status complete --target-repo <root> --plan <repo-relative-source-plan> --json`. `active → completed` and `plan-status-already-completed` are successful closeouts. Duplicate, malformed, invalid, unsafe-path, read, or write failures on an applicable lifecycle-managed plan keep it unchanged and block the lifecycle closeout claim. Missing status on a unified lifecycle-managed Markdown plan is also a contract failure; legacy missing/closed status follows the explicit degraded branch above rather than forcing migration. The helper re-reads current disk content and uses the shared temp-file + rename writer: POSIX replacement is atomic, Windows replacement is best effort with retry, and neither path is a cross-process CAS. The shipping-tail single-writer rule remains a loud convention.
+
 6. **Prepare Operational Validation Plan** (REQUIRED)
    - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change.
    - Include concrete:

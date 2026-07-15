@@ -83,6 +83,8 @@ describe('CLI smoke checks', () => {
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('📘 Usage:');
     expect(result.stdout).toContain('spec-first <command> [options]');
+    expect(result.stdout).toContain('plans <subcommand>');
+    expect(result.stdout).toContain('plans audit');
   });
 
   test('previews Qoder init without writing project or user runtime files', () => {

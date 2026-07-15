@@ -4,7 +4,11 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const { computeSourcePlanHash } = require('../../src/cli/task-pack');
+const crypto = require('node:crypto');
+const {
+  computeSourcePlanHash,
+  parseFrontmatterScalars,
+} = require('../../src/cli/task-pack');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const cliPath = path.join(repoRoot, 'bin/spec-first.js');
@@ -57,6 +61,26 @@ describe('spec-first tasks command', () => {
     expect(payload.hash).toMatch(/^sha256:[a-f0-9]{64}$/);
   });
 
+  test('keeps source-plan-body-v1 hashing compatible after extracting frontmatter parsing', () => {
+    fs.writeFileSync(
+      planPath,
+      '---\r\nstatus: "active" # lifecycle\r\nspec_id: example\r\n---\r\n# Source Plan\r\n',
+      'utf8',
+    );
+    const result = computeSourcePlanHash(planPath);
+    const expected = crypto.createHash('sha256').update('# Source Plan\n', 'utf8').digest('hex');
+
+    expect(result).toEqual({
+      ok: true,
+      hash: `sha256:${expected}`,
+      canonicalization_version: 'source-plan-body-v1',
+      removed_frontmatter: true,
+      canonical_body_bytes: Buffer.byteLength('# Source Plan\n', 'utf8'),
+    });
+    expect(parseFrontmatterScalars('status: "derived" # lifecycle\nsource_plan: docs/plans/source.md\n'))
+      .toEqual({ status: 'derived', source_plan: 'docs/plans/source.md' });
+  });
+
   test('validates a current task pack and rejects stale hashes', () => {
     const hash = computeSourcePlanHash(planPath).hash;
     const taskPath = writeTaskPack(tempRoot, hash);
@@ -68,6 +92,30 @@ describe('spec-first tasks command', () => {
     const stale = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
     expect(stale.status).toBe(1);
     expect(JSON.parse(stale.stdout).reason_code).toBe('stale_hash');
+  });
+
+  test('rejects duplicate source_plan ownership metadata', () => {
+    const hash = computeSourcePlanHash(planPath).hash;
+    const taskPath = writeTaskPack(tempRoot, hash);
+    const content = fs.readFileSync(taskPath, 'utf8');
+    fs.writeFileSync(
+      taskPath,
+      content.replace(
+        'source_plan: docs/plans/source.md\n',
+        'source_plan: docs/plans/other.md\nsource_plan: docs/plans/source.md\n',
+      ),
+      'utf8',
+    );
+
+    const result = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(result.status).toBe(1);
+    expect(JSON.parse(result.stdout)).toEqual(expect.objectContaining({
+      deterministic_handoff: false,
+      reason_code: 'invalid_contract',
+      errors: expect.arrayContaining([
+        expect.objectContaining({ code: 'task-pack-source-plan-duplicate' }),
+      ]),
+    }));
   });
 
   test('rejects generated runtime task targets', () => {

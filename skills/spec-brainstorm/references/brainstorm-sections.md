@@ -33,6 +33,8 @@ artifact contract:
   eventual execution domain. For software features, use `execution: code`.
   For non-code deliverables, follow the universal-brainstorming route instead
   of pretending the artifact is executable code.
+- **`status: active`** for a Markdown software unified plan. HTML output and
+  the universal-brainstorming route do not carry lifecycle metadata.
 
 A requirements-only unified plan is kept **light and standalone-readable**. It
 includes:
@@ -303,12 +305,17 @@ artifact.
   or `done`.
 - **`product_contract_source`** — always `spec-brainstorm`.
 
-### No status field
+### Lifecycle status
 
-Unified plan artifacts have no `status` field and no `active → completed`
-lifecycle. `artifact_readiness` is document completeness, not execution
-progress. No CE artifact carries mutable progress state; whether work shipped
-is derived from git, not stored in the doc. Do not introduce one.
+For a Markdown software unified plan with `artifact_contract:
+spec-unified-plan/v1` and `execution: code`, write `status: active` on
+creation. Status is independent of readiness: `artifact_readiness` is document
+completeness, not lifecycle progress. Do not encode per-unit progress in the
+document or infer readiness from status.
+
+HTML output does not carry `status`, and the universal-brainstorming route does
+not carry `status`. These outputs remain outside the first lifecycle mutation
+contract.
 
 ### Field-name stability
 

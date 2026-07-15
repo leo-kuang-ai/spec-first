@@ -51,8 +51,9 @@ When the artifact is meant to be consumed by implementation agents, use:
 
 Do **not** use progress-like readiness values such as `active`,
 `in_progress`, `completed`, or `done`. Readiness answers "can the artifact be
-executed?", not "has execution happened?" Plans still carry no `status` field
-and no mutable execution lifecycle.
+executed?", not "has execution happened?" For Markdown software unified
+plans, status is independent of `artifact_readiness` and uses the separate
+plan lifecycle contract below.
 
 Do **not** use `artifact_readiness: approach-plan`. Approach-plans,
 answer-seeking outputs, and universal-planning outputs are outside this
@@ -341,10 +342,20 @@ plan.
   intent the eventual commit message should reflect.
 - **`date`** — creation date in ISO 8601 (`YYYY-MM-DD`), ASCII digits only.
 
-Plans carry **no `status` field** — a plan is a decision artifact, not a
-tracked work item. `spec-work` does not mutate the plan at ship time;
-whether a plan shipped is derived from git, not stored in the doc. Do not
-add a `status` field or an `active → completed` lifecycle.
+Markdown software unified plans carry a top-level **`status`** field,
+initialized to `active`. It is an audit marker for the whole plan, not a task
+tracker or evidence record; per-unit progress stays outside the plan body.
+Enrichment preserves one existing canonical status and adds `active` when a
+Markdown software unified plan has none. Preservation is compatibility, not a
+silent lifecycle reset: do not turn `completed`, `partially-shipped`, or
+`superseded` back into `active`. Duplicate, malformed, or non-canonical status
+metadata blocks enrichment for repair. Whether a non-`active` source later
+enters execution remains the existing consumer's decision; this producer does
+not add an intake gate.
+
+HTML plans do not carry `status`. Likewise, knowledge-work,
+universal-planning, answer-seeking, and approach-plan outputs do not carry
+`status`; their own artifact shapes remain authoritative.
 
 ### Optional but well-known
 

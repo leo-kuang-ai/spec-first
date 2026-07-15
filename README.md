@@ -268,7 +268,10 @@ spec-first doctor    # check health
 spec-first init      # generate runtime
 spec-first update    # upgrade CLI + refresh runtime
 spec-first clean     # remove generated runtime
+spec-first plans audit --status completed --json  # 只读盘点 Markdown code plan 的 lifecycle marker
 ```
+
+新的 Markdown software unified plan 以 `status: active` 创建；拥有完整 shipping tail 的 workflow 只有在 verification、required review 与 residual gate 收口后，才把 direct plan 或 task pack 的 `source_plan` 更新为 `completed`。`plans audit` 只扫描当前仓库 `docs/plans/*.md` 的直接普通文件，不写文件、不扫描 HTML。`completed` 只是 lifecycle marker，不是 tests、CI、merge、release 或 field outcome 证据。
 
 [→ Full CLI reference with all flags and options](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
 

@@ -215,10 +215,9 @@ brainstorm frontmatter). Common rules:
   and below.
 - Field names in lowercase snake_case (`created_at`, `topic`, not
   `CreatedAt`, `Topic`).
-- **No status / lifecycle field.** Artifacts are point-in-time records
-  (decision or discovery), not tracked work items. Do not introduce a
-  mutable `status` field or an `active → completed` lifecycle — whether
-  the work shipped is derived from git, not stored in the doc.
+- **Lifecycle fields are section-contract-owned.** The per-skill section
+  contract decides whether `status` is present. Do not invent or suppress
+  `status` in the renderer; point-in-time artifact contracts omit it.
 - Stable across artifact revisions — never rename or repurpose a field.
 
 ## Post-write audit

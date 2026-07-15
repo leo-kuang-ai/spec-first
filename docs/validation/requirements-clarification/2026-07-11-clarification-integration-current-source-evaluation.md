@@ -14,11 +14,11 @@
 | Source ref | After SHA-256 |
 | --- | --- |
 | `skills/spec-ideate/references/post-ideation-workflow.md` | `b4d9c94745c15961e0434a0296bda287d282b36c3fb59d010b2c9345ceefc3d0` |
-| `skills/spec-brainstorm/SKILL.md` | `b4e60f280bdf1ac0bd3f5fb7d26cd91f5d83240229f900cdda1b6d4c68f9f70d` |
+| `skills/spec-brainstorm/SKILL.md` | `db7214ec68bcb6c4414264d5a615c2ae6ea2977a68d4a6d3ba9282c825a4bb79` |
 | `skills/spec-brainstorm/references/product-pressure-test.md` | `2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84` |
-| `skills/spec-brainstorm/references/brainstorm-sections.md` | `ed6e674cdba0b9a085c5af5b46919924230b256048d198c05d7f84214ec7bfba` |
+| `skills/spec-brainstorm/references/brainstorm-sections.md` | `9db1310fbfe61e0d3676feed8be10913b2e8cfe73357f544f0418676400b2105` |
 | `skills/spec-brainstorm/references/handoff.md` | `b399fcffd62033a4edd62e6817fc216f50c60f39ebe5740ec7ea769a0264ee1d` |
-| `skills/spec-plan/SKILL.md` | `c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f` |
+| `skills/spec-plan/SKILL.md` | `91c0538f80dc18f1aefa4f9cd6b81e38d4fd014cdef40f168e264ea49098329a` |
 | `skills/spec-prd/SKILL.md` | `38f26a519741cab7f1538448cec6f703b608041b094533b302cf29149bb8f023` |
 | `skills/spec-prd/references/domain-language-and-decision-ledger.md` | `f1ecde33b3bf5b37e3801e69f95284198506397d355c7dc343fce9acb26acfe3` |
 | `skills/spec-prd/references/evidence-and-topology.md` | `e596b313e36f2ace3a635da75e5dd28a9993ff9e8220b1f8fb9227c56748f95b` |
@@ -28,11 +28,13 @@
 | `skills/spec-prd/evals/examples.json` | `ebc9039ee0a8a47287380370ed56c2466d8300e742b4e939b8ae84f397dc3733` |
 | `docs/contracts/domain-glossary.md` | `6c16fdd75f22f72014cf9b9cb1f843906b5a38ff645a888accdfffb3fb534d41` |
 
+2026-07-15 delta refresh: `spec-brainstorm` / `spec-plan` 增加了与 requirements clarification 正交的 Markdown plan lifecycle metadata 合同，因此上述三项 source hash 与 final-source manifest 已刷新。原 2026-07-12 unit replay 未重跑，也不再证明这三项文件与当时逐字节相同；本次只用独立 fresh-source lifecycle review 验证新增 producer/closeout 语义，原 replay 继续作为历史 clarification 证据，不冒充本次 lifecycle 评估。
+
 U4 removal facts: `skills/spec-brainstorm/references/visual-probes.md` and `skills/spec-brainstorm/scripts/visual-probe-server.js` are absent in the After tree; their Before hashes are retained in the baseline.
 
 ## Unit-exit sequence replay
 
-为修复最初未持久化完整 unit-exit provenance 的 P1，使用基准 commit `89c732603b0d544bdd2aeb2fd520525c6301a574` 构造隔离副本，按 `U2 → U3 → U4 → U5 → U6` 重新应用当前实现。每个 unit 均保存 pre/post 文件集合与 SHA-256、patch hash、实际 evaluator bundle 内容与 bundle hash、原始 reviewer JSON 和 countermetrics。Replay 最终 34 个目标 source 与当前工作树逐字一致，mismatch 为 0。
+为修复最初未持久化完整 unit-exit provenance 的 P1，使用基准 commit `89c732603b0d544bdd2aeb2fd520525c6301a574` 构造隔离副本，按 `U2 → U3 → U4 → U5 → U6` 重新应用当时实现。每个 unit 均保存 pre/post 文件集合与 SHA-256、patch hash、实际 evaluator bundle 内容与 bundle hash、原始 reviewer JSON 和 countermetrics。Replay 在 2026-07-12 capture 时与 34 个目标 source 逐字一致，mismatch 为 0；后续 source delta 见上方 refresh note。
 
 Durable evidence: `docs/validation/requirements-clarification/2026-07-12-unit-replay/`；聚合入口为 `aggregate.json`。U2-U5 使用三个真正独立 session A/B/G；单一 session 内错误生成内部三重复的 Reviewer C 被保留但不计数。U6 首轮 residual finding 促成 direct-bootstrap authority refinement：任何未由当前用户或 current source 确认的承重 WHAT 必须显式记录为 planning-time assumption；改变 behavior/scope/success criteria 的内容返回当前用户或保持 named blocker。随后 D/E/F 三次 matched recheck 均通过。
 

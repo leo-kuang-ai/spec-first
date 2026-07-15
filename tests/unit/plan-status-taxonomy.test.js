@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '../..');
+const PLAN_STATUSES = new Set(['active', 'partially-shipped', 'completed', 'superseded']);
 
 function frontmatter(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
@@ -41,7 +42,45 @@ function validateReferencedReviews(content) {
     }));
 }
 
+function validatePlanStatus(content) {
+  const metadata = frontmatter(content);
+  const match = metadata.match(/^status:\s*([^#\n]+?)(?:\s+#.*)?$/m);
+  if (!match) return { errors: [], advisories: ['missing legacy status'] };
+  const status = match[1].trim().replace(/^['"]|['"]$/g, '');
+  if (status === 'closed') return { errors: [], advisories: ['legacy closed status'] };
+  if (!PLAN_STATUSES.has(status)) {
+    return {
+      errors: [`status must be one of ${Array.from(PLAN_STATUSES).join(', ')}, got ${status}`],
+      advisories: [],
+    };
+  }
+  return { errors: [], advisories: [] };
+}
+
 describe('plan status and review-closure taxonomy', () => {
+  test('recognizes the canonical plan lifecycle taxonomy', () => {
+    for (const status of PLAN_STATUSES) {
+      expect(validatePlanStatus(`---\nstatus: ${status}\n---\n`)).toEqual({
+        errors: [],
+        advisories: [],
+      });
+    }
+    expect(validatePlanStatus('---\nstatus: done\n---\n').errors).toEqual([
+      'status must be one of active, partially-shipped, completed, superseded, got done',
+    ]);
+  });
+
+  test('keeps legacy missing and closed status advisory-only', () => {
+    expect(validatePlanStatus('---\ntitle: Legacy\n---\n')).toEqual({
+      errors: [],
+      advisories: ['missing legacy status'],
+    });
+    expect(validatePlanStatus('---\nstatus: closed\n---\n')).toEqual({
+      errors: [],
+      advisories: ['legacy closed status'],
+    });
+  });
+
   test('current plans do not use readiness fields as progress state', () => {
     const invalid = [];
     for (const name of fs.readdirSync(path.join(repoRoot, 'docs/plans'))) {

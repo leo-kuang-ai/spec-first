@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Coding Harness 架构演化构想</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f4ef;
+      --surface: #fffdf8;
+      --surface-2: #eceae2;
+      --text: #20231f;
+      --muted: #5d625b;
+      --border: #d6d4ca;
+      --accent: #0b6b62;
+      --accent-soft: #dceeea;
+      --accent-text: #07534d;
+      --blue-soft: #e0eaf6;
+      --blue-text: #244b73;
+      --warn-soft: #f4e8cc;
+      --warn-text: #6e4b0d;
+      --danger-soft: #f3dfdc;
+      --danger-text: #7a3028;
+      --shadow: 0 10px 30px rgba(43, 46, 39, .07);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151815;
+        --surface: #1e221e;
+        --surface-2: #292e29;
+        --text: #edf0ea;
+        --muted: #b7bdb4;
+        --border: #3b423b;
+        --accent: #63c8ba;
+        --accent-soft: #183c37;
+        --accent-text: #a6e7dc;
+        --blue-soft: #22374c;
+        --blue-text: #b5d4f2;
+        --warn-soft: #47381d;
+        --warn-text: #f3d38f;
+        --danger-soft: #492a28;
+        --danger-text: #f0b7b1;
+        --shadow: none;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.72;
+    }
+    main { width: min(940px, calc(100% - 32px)); margin: 0 auto; padding: 56px 0 72px; }
+    header, section, footer { margin-block: 0 44px; }
+    h1, h2, h3 { line-height: 1.2; letter-spacing: -.02em; }
+    h1 { margin: 8px 0 16px; font-size: clamp(2rem, 5vw, 3.6rem); max-width: 16ch; }
+    h2 { margin: 0 0 18px; font-size: 1.65rem; }
+    h3 { margin: 0; font-size: 1.28rem; }
+    p { max-width: 72ch; margin: .65rem 0; }
+    strong { color: inherit; }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .eyebrow { color: var(--accent); font-size: .76rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+    .lede { font-size: 1.12rem; color: var(--muted); max-width: 68ch; }
+    .meta, .stats, .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .meta { margin-top: 22px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: .82rem;
+      font-weight: 650;
+    }
+    .pill.accent { background: var(--accent-soft); color: var(--accent-text); border-color: transparent; }
+    .pill.blue { background: var(--blue-soft); color: var(--blue-text); border-color: transparent; }
+    .pill.warn { background: var(--warn-soft); color: var(--warn-text); border-color: transparent; }
+    .stats { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
+    .stat b { display: block; font-size: 1.55rem; line-height: 1; margin-bottom: 6px; }
+    .stat span { color: var(--muted); font-size: .82rem; }
+    .callout { background: var(--accent-soft); color: var(--accent-text); border: 1px solid transparent; border-radius: 16px; padding: 20px 22px; margin: 24px 0; }
+    .callout.warn { background: var(--warn-soft); color: var(--warn-text); }
+    .callout p { margin: 0; max-width: none; }
+    .axes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; list-style: none; padding: 0; }
+    .axes li { padding: 15px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .axes b { display: block; color: var(--accent); font-size: .8rem; letter-spacing: .06em; }
+    .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px; overflow-x: auto; box-shadow: var(--shadow); }
+    .diagram svg { display: block; width: 100%; min-width: 700px; height: auto; }
+    .diagram-note { color: var(--muted); font-size: .82rem; margin-top: 10px; }
+    .jump-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; list-style: none; padding: 0; margin: 0 0 22px; }
+    .jump-list a { display: block; padding: 10px 12px; background: var(--surface-2); border-radius: 10px; text-decoration: none; font-weight: 650; }
+    .idea { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin: 18px 0; box-shadow: var(--shadow); }
+    .idea-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+    .rank { flex: 0 0 auto; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 800; }
+    .idea dl { display: grid; grid-template-columns: 112px 1fr; gap: 10px 16px; margin: 18px 0 0; }
+    .idea dt { color: var(--muted); font-size: .78rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+    .idea dd { margin: 0; }
+    .idea ul { margin: .2rem 0; padding-left: 1.25rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: table; }
+    th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+    th { background: var(--surface-2); font-size: .8rem; letter-spacing: .04em; }
+    tr:last-child td { border-bottom: 0; }
+    .composition-signal { color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); padding-top: 18px; }
+    @media (max-width: 720px) {
+      main { width: min(100% - 22px, 940px); padding-top: 34px; }
+      .stats, .axes, .jump-list { grid-template-columns: 1fr; }
+      .idea { padding: 18px; }
+      .idea dl { grid-template-columns: 1fr; gap: 3px; }
+      .idea dd { margin-bottom: 10px; }
+      table { display: block; overflow-x: auto; white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Architecture Ideation · Repo-grounded</div>
+    <h1>AI Coding Harness 架构演化构想</h1>
+    <p class="lede">总架构师结论：spec-first 下一阶段的首要任务不是继续扩充 workflow，而是建立真实价值观测、证明跨宿主语义、削薄热路径；其余能力只保留窄实验资格。</p>
+    <div class="meta" aria-label="Document metadata">
+      <span class="pill">日期：<time datetime="2026-07-15">2026-07-15</time></span>
+      <span class="pill">主题：ai-coding-harness-architecture-evolution</span>
+      <span class="pill">模式：repo-grounded</span>
+      <span class="pill accent">焦点：harness、loop、可信闭环与架构削薄</span>
+    </div>
+    <div class="stats" aria-label="Ideation counts">
+      <div class="stat"><b>36</b><span>原始候选</span></div>
+      <div class="stat"><b>7</b><span>跨框架合成</span></div>
+      <div class="stat"><b>6</b><span>最终方向</span></div>
+      <div class="stat"><b>0</b><span>达到 Build 门槛</span></div>
+    </div>
+  </header>
+
+  <section id="grounding-context">
+    <div class="eyebrow">Grounding Context</div>
+    <h2>Codebase Context</h2>
+    <p>项目已经拥有较完整的 <code>Codebase → Spec → Plan → Tasks → Code → Review → Knowledge</code> artifact 链、确定性 contract、五宿主 source/runtime 投射与 evidence 基础。真正的结构性缺口不在“有没有机制”，而在四件事：真实采用和 field outcome 尚未测量；material claim 尚未稳定贯穿 evidence、verification 与 outcome；generated runtime 不等于真实 host invocation；知识失效边界仍主要依赖 prose 约定。</p>
+    <p>业界趋势进一步压缩了项目应拥有的边界：宿主正在吸收 agent loop、session、sandbox、parallelism、trace、resume 与异步任务。OpenAI 强调 repo 可读性、结构测试和运行反馈；Anthropic 强调可恢复 artifact、显式 done/verification、JIT context 与 session/harness/sandbox 解耦。由此推导，spec-first 的长期护城河不是通用 agent runtime，而是项目拥有的 intent、claim/evidence、跨宿主语义与可失效知识。</p>
+    <div class="callout">
+      <p><strong>第一性原理：</strong>如果一个机制不能缩短“正确意图形成可信结果”的时间，不能降低人工纠正/集成背压，也不能提高结果可证伪性，那么它即使增加了 agent、trace、artifact 或测试，也不构成架构进步。</p>
+    </div>
+    <p>外部依据：<a href="https://openai.com/index/harness-engineering/">OpenAI Harness Engineering</a>、<a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic Context Engineering</a>、<a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Long-running Agent Harnesses</a>、<a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Agent Evals</a>、<a href="https://modelcontextprotocol.io/seps/2663-tasks-extension">MCP Tasks Extension</a> 与 <a href="https://github.com/a2aproject/A2A/blob/main/docs/specification.md">A2A 1.0</a>。</p>
+  </section>
+
+  <section id="topic-axes">
+    <div class="eyebrow">Topic Axes</div>
+    <h2>四个审查轴</h2>
+    <ul class="axes">
+      <li><b>AXIS 1</b>Context 与 Harness 瘦身</li>
+      <li><b>AXIS 2</b>Evidence 与可信闭环</li>
+      <li><b>AXIS 3</b>Evaluation 与价值兑现</li>
+      <li><b>AXIS 4</b>Protocol、Knowledge 与跨宿主治理</li>
+    </ul>
+    <div class="diagram" role="img" aria-label="Recommended architecture posture: observe value, thin context, wrap host semantics, and experiment on evidence and knowledge gaps">
+      <svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#0b6b62"/></marker>
+        </defs>
+        <rect x="24" y="78" width="170" height="102" rx="14" fill="var(--blue-soft)" stroke="var(--border)"/>
+        <text x="109" y="112" text-anchor="middle" font-size="16" font-weight="700" fill="var(--blue-text)">先观测价值</text>
+        <text x="109" y="139" text-anchor="middle" font-size="13" fill="var(--blue-text)">TTC · 人工纠正</text>
+        <text x="109" y="161" text-anchor="middle" font-size="13" fill="var(--blue-text)">reopen · field outcome</text>
+        <line x1="194" y1="129" x2="238" y2="129" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="244" y="30" width="170" height="92" rx="14" fill="var(--accent-soft)" stroke="var(--border)"/>
+        <text x="329" y="65" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent-text)">直接 Thin</text>
+        <text x="329" y="91" text-anchor="middle" font-size="13" fill="var(--accent-text)">删重复 prose</text>
+        <text x="329" y="110" text-anchor="middle" font-size="13" fill="var(--accent-text)">做反事实 A/B</text>
+        <rect x="244" y="142" width="170" height="92" rx="14" fill="var(--accent-soft)" stroke="var(--border)"/>
+        <text x="329" y="177" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent-text)">最薄 Wrap</text>
+        <text x="329" y="203" text-anchor="middle" font-size="13" fill="var(--accent-text)">跨宿主语义 canary</text>
+        <text x="329" y="222" text-anchor="middle" font-size="13" fill="var(--accent-text)">显式 lossy/degraded</text>
+        <line x1="414" y1="76" x2="468" y2="76" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <line x1="414" y1="188" x2="468" y2="188" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="474" y="30" width="170" height="92" rx="14" fill="var(--warn-soft)" stroke="var(--border)"/>
+        <text x="559" y="65" text-anchor="middle" font-size="16" font-weight="700" fill="var(--warn-text)">窄 Experiment</text>
+        <text x="559" y="91" text-anchor="middle" font-size="13" fill="var(--warn-text)">claim join · real failures</text>
+        <text x="559" y="110" text-anchor="middle" font-size="13" fill="var(--warn-text)">knowledge predicate</text>
+        <rect x="474" y="142" width="170" height="92" rx="14" fill="var(--danger-soft)" stroke="var(--border)"/>
+        <text x="559" y="177" text-anchor="middle" font-size="16" font-weight="700" fill="var(--danger-text)">暂不 Build</text>
+        <text x="559" y="203" text-anchor="middle" font-size="13" fill="var(--danger-text)">不建状态机/遥测平台</text>
+        <text x="559" y="222" text-anchor="middle" font-size="13" fill="var(--danger-text)">不建通用 evidence graph</text>
+        <line x1="644" y1="129" x2="698" y2="129" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="704" y="78" width="132" height="102" rx="14" fill="var(--surface-2)" stroke="var(--border)"/>
+        <text x="770" y="112" text-anchor="middle" font-size="16" font-weight="700" fill="var(--text)">决策闭环</text>
+        <text x="770" y="139" text-anchor="middle" font-size="13" fill="var(--text)">Adopt / Wrap</text>
+        <text x="770" y="161" text-anchor="middle" font-size="13" fill="var(--text)">Thin / Retire</text>
+      </svg>
+      <div class="diagram-note">方向性示意：先获得价值信号，再决定删除、包装或实验；Build 是最后选项。</div>
+    </div>
+  </section>
+
+  <section id="ranked-ideas">
+    <div class="eyebrow">Ranked Ideas</div>
+    <h2>排序后的优化方向</h2>
+    <ul class="jump-list" aria-label="Ranked idea navigation">
+      <li><a href="#idea-1">1. Trusted Change Observatory</a></li>
+      <li><a href="#idea-2">2. Semantic Host Conformance Pack</a></li>
+      <li><a href="#idea-3">3. Counterfactual Harness Thinning</a></li>
+      <li><a href="#idea-4">4. Failure-to-Eval Flywheel</a></li>
+      <li><a href="#idea-5">5. Material Claim Join Pilot</a></li>
+      <li><a href="#idea-6">6. Knowledge Invalidation Canary</a></li>
+    </ul>
+
+    <article class="idea" id="idea-1">
+      <div class="idea-head"><span class="rank">1</span><div><h3>1. Trusted Change Observatory</h3><div class="pills"><span class="pill accent">Experiment</span><span class="pill">置信度 88%</span><span class="pill">复杂度 Low</span></div></div></div>
+      <p><strong>Description：</strong>选择 5–10 个明确 opt-in 的真实任务，人工记录 intent accepted、claim-scoped verification、owner trusted、人工修正、等待、reopen/rollback 与观察窗后的 field outcome。它不是 telemetry 平台，也不从 trace 静默推导价值；目标是第一次让 TTC 与 quality-adjusted throughput 进入架构决策。</p>
+      <dl>
+        <dt>Axis</dt><dd>Evaluation 与价值兑现</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> <code>README.md:196-206</code> 明确现有机制不是 measured adoption-outcome claims；评估 dossier 证实 TTC、人工负担、field outcome 没有持续观测。<strong>external:</strong> OpenAI/Anthropic 的 agent eval 实践要求 transcript 与 outcome 分离、多 trial、多 grader。</dd>
+        <dt>Rationale</dt><dd>没有真实价值基线，任何新增 contract 都无法证明比删除更好。这是后续 Adopt、Thin、Retire 的共同度量地板。</dd>
+        <dt>Downsides</dt><dd>需要 owner 授权、隐私/脱敏和人工裁决；小样本不能用于营销式普遍结论。若数据不改变任何决策，应停止收集。</dd>
+        <dt>Boundary</dt><dd>先用分析文档与现有 run artifact，不新增事件 schema；预先声明停止条件、数据保留期和不得作为 outcome 代理的字段。</dd>
+      </dl>
+    </article>
+
+    <article class="idea" id="idea-2">
+      <div class="idea-head"><span class="rank">2</span><div><h3>2. Semantic Host Conformance Pack</h3><div class="pills"><span class="pill blue">Wrap</span><span class="pill">置信度 84%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>选一个 material workflow 与两个可实际运行的宿主，用 3–5 个协议中立黑盒 canary 验证 entry discovery、invocation、source/runtime authority、mutation gate、handoff 与 degraded 表达。每次结果只声明特定 host/version/fixture 下的 supported、lossy、degraded 与 expiry，不把 generated files 当行为支持。</p>
+      <dl>
+        <dt>Axis</dt><dd>Protocol、Knowledge 与跨宿主治理</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> <code>getSupportedPlatforms()</code> 只证明 adapter 注册；<code>README.zh-CN.md:16-18,95-97</code> 明确 Cursor 尚未验证 discovery/invocation。<strong>external:</strong> MCP Tasks 仍实验，A2A 区分 task artifact 与 transport，支持 canonical semantics 与 adapter 解耦。</dd>
+        <dt>Rationale</dt><dd>它把“文件投射成功”与“宿主语义可依赖”分开，允许诚实地发布 lossy/degraded，同时避免追求 feature parity 或重建通用 orchestrator。</dd>
+        <dt>Downsides</dt><dd>全宿主 × 全版本矩阵会迅速变脆；canary 只能证明被测行为，不能推出宿主整体 fidelity。</dd>
+        <dt>Boundary</dt><dd>只维护会改变 mutation、verification、handoff 或 promotion claim 的 material canary；宿主提供等价 conformance fact 时删除 wrapper。</dd>
+      </dl>
+    </article>
+
+    <article class="idea" id="idea-3">
+      <div class="idea-head"><span class="rank">3</span><div><h3>3. Counterfactual Harness Thinning</h3><div class="pills"><span class="pill accent">Thin</span><span class="pill">置信度 82%</span><span class="pill">复杂度 Low</span></div></div></div>
+      <p><strong>Description：</strong>把大型 <code>SKILL.md</code>、重复治理 prose 与 rendering contract 当成需要证明存在价值的成本。选择一个热路径，删除一段重复上下文或抽取共享 source，再用代表性 fresh-source A/B 对比 decision quality、evidence coverage 与上下文体积；结果允许恢复，不建 Context MEL、Lease registry 或新预算 schema。</p>
+      <dl>
+        <dt>Axis</dt><dd>Context 与 Harness 瘦身</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> 当前 <code>spec-plan</code>、<code>spec-code-review</code> 入口超过 800 行，多套 HTML rendering contract 完整复制；仓库已有 Front Controller、Triggered References 与 fresh-source eval 方法。<strong>external:</strong> Anthropic context engineering 指向 JIT retrieval 与 compaction。</dd>
+        <dt>Rationale</dt><dd>这项收益最确定：减少固定 token 税、source drift 和多宿主投射成本，同时不创造新 runtime。真正的创新是让每段默认上下文接受可撤销的因果检验。</dd>
+        <dt>Downsides</dt><dd>当前尚未量化 token/wall-time 成本；一次 A/B 不能证明所有模型与任务分布。过度抽取共享 source 也可能损害 skill-local 可移植性。</dd>
+        <dt>Boundary</dt><dd>先删重复治理 prose 或一个 rendering copy；若 evidence/decision quality 下降立即恢复。它是一种持续删减方法，不是可发布的新产品能力。</dd>
+      </dl>
+    </article>
+
+    <article class="idea" id="idea-4">
+      <div class="idea-head"><span class="rank">4</span><div><h3>4. Failure-to-Eval Flywheel</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 75%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>把 owner-confirmed 的 reopen、人工大改、review escape、rollback 或 abandon 转为 3 个脱敏 task archetype，复用现有 eval/scorecard 做 baseline/candidate 多 trial 与盲 outcome grading。只有真实失败被后续回归实际消费，才继续扩充样本。</p>
+      <dl>
+        <dt>Axis</dt><dd>Evaluation 与价值兑现</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> 项目已有 deterministic fixtures、局部 fresh-source A/B 和 structured closeout，却缺真实返工样本与 field outcome。<strong>external:</strong> OpenAI、METR、SWE-rebench 强调任务分布、freshness、harness/model/version 与多次运行。</dd>
+        <dt>Rationale</dt><dd>真实失败是最稀缺的 eval 数据。每个被转化的失败都能让未来 harness 变更围绕用户真正付过的成本回归，而非围绕易写断言优化。</dd>
+        <dt>Downsides</dt><dd>当前还没有 confirmed 样本供给证据；脱敏、授权、grader 漂移与任务陈旧成本不可忽略。</dd>
+        <dt>Boundary</dt><dd>从 3 个案例开始，不自动采集 transcript，不建 benchmark 平台；样本不再影响设计决策时退役或重采样。</dd>
+      </dl>
+    </article>
+
+    <article class="idea" id="idea-5">
+      <div class="idea-head"><span class="rank">5</span><div><h3>5. Material Claim Join Pilot</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 72%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>不要建设统一 Trust BOM 或 evidence graph。先在 5–10 个 completion/review 样本中，用临时 sidecar 手工关联一个 material claim、现有 evidence refs、support/refute、scope 与 freshness，验证跨 artifact join 是否真的减少重复回读或漏证。</p>
+      <dl>
+        <dt>Axis</dt><dd>Evidence 与可信闭环</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> verification evidence 具有 <code>gate_ids</code>、status、artifact 与时间，却没有 material claim identity 或 support/refute 关系；<code>spec_id</code> 明确不是中央状态/进度键。<strong>reasoned:</strong> claim 是证据充分性判断的最小语义单位，但必须先证明共享 join key 有真实 consumer。</dd>
+        <dt>Rationale</dt><dd>它可能补上 evidence → verification → outcome 的关键连接，又通过 sidecar 实验避免一次性迁移所有 workflow schema。</dd>
+        <dt>Downsides</dt><dd>极易演化成第二套 evidence contract、状态图与字段治理；“引用存在”仍不能证明证据充分。</dd>
+        <dt>Boundary</dt><dd>只验证 join-key 需求；没有两个 workflow 反复消费同一关系，不进入 canonical schema。</dd>
+      </dl>
+    </article>
+
+    <article class="idea" id="idea-6">
+      <div class="idea-head"><span class="rank">6</span><div><h3>6. Knowledge Invalidation Canary</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 63%</span><span class="pill">复杂度 Low–Medium</span></div></div></div>
+      <p><strong>Description：</strong>从 3 条已经被真实 workflow 复用的高价值 learning 开始，为每条定义一个可机械观察的 file/version/contract predicate。命中时只输出 stale/advisory 诊断并要求回源，不自动删除、不扫描全库、不建设 mesh 或 memory 平台。</p>
+      <dl>
+        <dt>Axis</dt><dd>Protocol、Knowledge 与跨宿主治理</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> Knowledge Harness 已要求 <code>source_refs</code> 与 <code>invalidation_condition</code>，同时诚实说明它们仍是 prose/LLM-enforced。<strong>reasoned:</strong> 只有被实际复用且具有可观察失效信号的 knowledge，才值得从 loud convention 提升为最小 canary。</dd>
+        <dt>Rationale</dt><dd>项目长期应拥有的是可失效知识，而不是宿主 session memory。局部 canary 可以验证主动降级是否真的避免错误复用。</dd>
+        <dt>Downsides</dt><dd>尚无 stale knowledge 事故率和 consumer 复用量；predicate 容易漂移、误报或无人处理。</dd>
+        <dt>Boundary</dt><dd>未证明“命中后避免了 material rework”前，不扩为 mesh；无 consumer 的 learning 不进入实验。</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="rejection-summary">
+    <div class="eyebrow">Rejection Summary</div>
+    <h2>被合并或淘汰的方向</h2>
+    <div class="callout warn"><p><strong>对抗性结论：</strong>所有“统一图谱、全局状态、自动遥测、通用 conformance runtime、知识 mesh”都被降级或拒绝。当前没有一项达到 Build 门槛。</p></div>
+    <table>
+      <thead><tr><th>#</th><th>Idea</th><th>Reason Rejected</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Capability Survival Budget</td><td>与角色契约已有演化判断重复；独立 registry 会制造元治理。改为一次人工 portfolio review。</td></tr>
+        <tr><td>2</td><td>Consumer-issued readiness</td><td>可能形成第二套 readiness truth；并入 claim/handoff 局部实验。</td></tr>
+        <tr><td>3</td><td>Read-set receipt</td><td>只能证明读取发生，不能证明理解或 outcome；缺 confirmed failure 数据。</td></tr>
+        <tr><td>4</td><td>Claim LOPA</td><td>高风险验证方法有启发，但尚无稳定 common-cause 分类与 consumer；并入失败样本 eval。</td></tr>
+        <tr><td>5</td><td>Result escrow</td><td>边界正确，但单独状态会扩大 contract；由 Trusted Change Observatory 的 observation window 表达。</td></tr>
+        <tr><td>6</td><td>Execution-capability packet</td><td>ownership 张力真实，但应先删 host-specific prose；重复宿主缺口出现后再进入 conformance pack。</td></tr>
+        <tr><td>7</td><td>Default workflow zero</td><td>范围超过当前证据；可以局部 A/B Direct Lane-first，不能重构为 gate-card runtime。</td></tr>
+        <tr><td>8</td><td>Knowledge Mesh / Pharmacovigilance / Lease</td><td>命名与体系强于证据；收敛为 3 条已复用 knowledge 的 canary。</td></tr>
+        <tr><td>9</td><td>Run-scoped evidence snapshot</td><td>重复读取尚未量化，不能先建缓存与失效协议。</td></tr>
+        <tr><td>10</td><td>Unified Trust BOM</td><td>跨 artifact join gap 真实，但全量 schema 化会造成双重真相；降级为 sidecar pilot。</td></tr>
+        <tr><td>11</td><td>Full host capability lease</td><td>矩阵维护成本过高；只保留少数会改变 claim 的 material canary 与 expiry。</td></tr>
+        <tr><td>12</td><td>Automatic stale-knowledge deletion</td><td>脚本不能替代语义判断；命中只允许降级为 advisory 并要求回源。</td></tr>
+      </tbody>
+    </table>
+    <p>四个 topic axes 均有 survivor，没有刻意遗漏的覆盖轴。安全、授权、隐私、脱敏与保留期被视为所有真实任务实验的横切 gate，而不是新增第五套 workflow。</p>
+  </section>
+
+  <footer class="composition-signal">Composed 2026-07-15T12:59:13Z by spec-ideate from the user request and repository source at <code>/Users/kuang/xiaobu/spec-first</code>.</footer>
+</main>
+</body>
+</html>

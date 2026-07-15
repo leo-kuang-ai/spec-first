@@ -6,6 +6,7 @@ const { runClean } = require('./commands/clean');
 const { runDoctor } = require('./commands/doctor');
 const { runInit } = require('./commands/init');
 const { runInternal } = require('./commands/internal');
+const { runPlans } = require('./commands/plans');
 const { runRepairWorktree } = require('./commands/repair-worktree');
 const { runSession } = require('./commands/session');
 const { runTasks } = require('./commands/tasks');
@@ -59,6 +60,10 @@ async function runCli(argv) {
 
   if (cmd === 'tasks') {
     return Promise.resolve(runTasks(args.slice(1)));
+  }
+
+  if (cmd === 'plans') {
+    return Promise.resolve(runPlans(args.slice(1)));
   }
 
   if (cmd === 'repair-worktree') {
@@ -173,6 +178,7 @@ function printHelp(withErrorPrefix = false) {
     '  clean (--claude|--codex|--cursor|--kiro|--qoder) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',
     '  repair-worktree        Preview broken worktree pointer repair guidance',
     '  tasks <subcommand>      Hash and validate derived task packs',
+    '  plans <subcommand>      Read-only plan lifecycle audit (`plans audit`)',
     '  session <subcommand>    Opt-in multi-actor session advisory (register|list|heartbeat|unregister)',
     '',
     '🪝 Installed workflow entrypoints are provided by the host after `spec-first init`.',

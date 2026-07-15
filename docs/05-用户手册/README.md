@@ -26,6 +26,18 @@
 - `spec-first clean --claude / --codex / --kiro / --qoder`：已支持
 - `spec-first repair-worktree`：已支持；预览失效 worktree pointer 的修复指引（`--dry-run` 仅预览）
 - `spec-first tasks <subcommand>` / `spec-first session <subcommand>`：派生 task pack 的确定性校验入口，以及 opt-in 多 actor 会话 advisory
+- `spec-first plans audit [--status <active|partially-shipped|completed|superseded>] [--json]`：只读扫描当前仓库 `docs/plans/*.md` 的直接普通文件，盘点 unified code plan 和兼容的 legacy `feat|fix|refactor` plan；历史 missing/closed/invalid 是 advisory，不改变成功退出码。
+
+Plan lifecycle audit 的边界：
+
+- 新的 Markdown software unified plan 默认写 `status: active`；`artifact_readiness` 仍只表示文档能否执行。
+- Standalone `spec-work`、goal 或 LFG/caller 只有在各自完整 shipping tail 的 verification、required review 与 residual gate 收口后，才调用内部 helper 执行 `active → completed`。Direct plan 更新自身；task pack 只更新 `source_plan`，自身保持 derived/draft。
+- `partially-shipped` 与 `superseded` 首期仅做读取兼容，不提供自动 mutation、恢复协议或非 active intake gate。
+- JSON 固定输出 `schema_version: plan-status-audit/v1` 与 `plans[]`，每条只包含 `path/status/readiness/validity`。
+- `--status` 只接受 canonical taxonomy，并且只匹配 `validity: valid` 记录。
+- HTML plan 不参与首期 audit，这是显式 degraded boundary。
+- `completed` 只表示 plan 文件的 lifecycle marker；它不证明 tests、CI、merge、release 或 field outcome 已完成。
+- Internal helper 的 expected-old-status 与 temp-file + rename 不是跨进程 CAS；shipping-tail 单写者是未硬强制的 loud convention。
 
 `init` 支持在交互式引导中选择开发者姓名和语言；`-y` 会使用默认宿主集合和默认身份/语言，显式 `--claude` / `--codex` / `--kiro` / `--qoder` 会覆盖默认宿主集合。如果没有传用户名，它会优先回退到已选宿主的项目级 `.developer`，再回退到全局 `~/.spec-first/.developer` 和 `git config user.name`。
 

@@ -5,6 +5,7 @@ date: 2026-07-15
 spec_id: 2026-07-15-002-feat-plan-status-lifecycle-migration
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
+status: completed
 product_contract_source: spec-plan-bootstrap
 execution: code
 ---

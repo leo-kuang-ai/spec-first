@@ -8,6 +8,11 @@ const {
   GENERATED_RUNTIME_ROOTS,
 } = require('./helpers/target-repo');
 const { isSecretDeniedPath } = require('./helpers/secret-deny-patterns');
+const {
+  parseFrontmatterScalarOccurrences,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('./helpers/markdown-frontmatter');
 
 const CANONICALIZATION_VERSION = 'source-plan-body-v1';
 const TASK_PACK_SCHEMA_VERSION = 'task-pack/v1';
@@ -57,59 +62,6 @@ const WINDOWS_ILLEGAL_SEGMENT_CHARS = /[<>:"|]/;
 const CONTROL_CHARS = /[\x00-\x1f]/;
 const GENERATED_RUNTIME_MIRROR_PREFIXES = GENERATED_RUNTIME_PREFIXES;
 const GENERATED_RUNTIME_MIRROR_ROOTS = new Set(GENERATED_RUNTIME_ROOTS);
-
-function normalizeNewlines(text) {
-  return String(text).replace(/\r\n?/g, '\n');
-}
-
-function splitMarkdownFrontmatter(content) {
-  const normalized = normalizeNewlines(content);
-  const lines = normalized.split('\n');
-
-  if (lines[0] !== '---') {
-    return {
-      frontmatter: '',
-      body: normalized,
-      removedFrontmatter: false,
-      error: null,
-    };
-  }
-
-  const closingIndex = lines.findIndex((line, index) => index > 0 && line === '---');
-  if (closingIndex === -1) {
-    return {
-      frontmatter: '',
-      body: '',
-      removedFrontmatter: false,
-      error: {
-        code: 'frontmatter-invalid',
-        message: 'Frontmatter starts with --- but has no closing --- line.',
-      },
-    };
-  }
-
-  return {
-    frontmatter: lines.slice(1, closingIndex).join('\n'),
-    body: lines.slice(closingIndex + 1).join('\n'),
-    removedFrontmatter: true,
-    error: null,
-  };
-}
-
-function stripQuotes(value) {
-  const trimmed = String(value || '').trim();
-  return trimmed.replace(/^["']|["']$/g, '');
-}
-
-function parseFrontmatterScalars(frontmatter) {
-  const metadata = {};
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    metadata[match[1]] = stripQuotes(match[2]);
-  }
-  return metadata;
-}
 
 function readMarkdownFile(filePath, codePrefix) {
   if (!filePath || !fs.existsSync(filePath)) {
@@ -422,6 +374,8 @@ function validateTaskPack(taskPackPath, options = {}) {
   }
 
   const metadata = parseFrontmatterScalars(split.frontmatter);
+  const sourcePlanOccurrences = parseFrontmatterScalarOccurrences(split.frontmatter)
+    .filter((occurrence) => occurrence.key === 'source_plan');
   result.task_pack.metadata = metadata;
 
   const requiredMetadata = {
@@ -443,7 +397,10 @@ function validateTaskPack(taskPackPath, options = {}) {
     addFinding(errors, 'task-pack-missing-spec-id', 'Task pack is missing spec_id.');
   }
 
-  if (!metadata.source_plan) {
+  if (sourcePlanOccurrences.length > 1) {
+    validation.source_plan_path = 'invalid';
+    addFinding(errors, 'task-pack-source-plan-duplicate', 'Task pack source_plan must occur exactly once.');
+  } else if (!metadata.source_plan) {
     validation.source_plan_path = 'missing';
     addFinding(errors, 'task-pack-source-plan-missing', 'Task pack is missing source_plan.');
   } else if (!isConcreteRepoRelativeFile(metadata.source_plan)) {
