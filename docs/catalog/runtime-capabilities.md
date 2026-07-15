@@ -58,13 +58,13 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 | doc-review | spec-doc-review | spec-doc-review | no | Run the Spec-First document review workflow |
 | dogfood | spec-dogfood | spec-dogfood | no | Run autonomous diff-scoped browser dogfood QA for a branch or PR |
 | ideate | spec-ideate | spec-ideate | no | Run the Spec-First ideation workflow |
-| runtime-setup | spec-runtime-setup | spec-runtime-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
 | optimize | spec-optimize | spec-optimize | no | Run metric-driven iterative optimization loops |
 | plan | spec-plan | spec-plan | no | Run the Spec-First planning workflow |
 | polish | spec-polish | spec-polish | no | Start the dev server and iterate on browser-visible polish |
 | prd | spec-prd | spec-prd | no | Run the Spec-First PRD requirements workflow |
+| runtime-setup | spec-runtime-setup | spec-runtime-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
 | work | spec-work | spec-work | no | Run the Spec-First execution workflow |
-| write-skill | spec-write-skill | spec-write-skill | no | Author project-owned Agent Skills or validate packages read-only |
+| write-skill | spec-write-skill | spec-write-skill | no | Design and author project-owned Agent Skills, or validate packages read-only |
 | write-tasks | spec-write-tasks | spec-write-tasks | no | Public workflow entrypoint (spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
 
 ## Standalone Skills

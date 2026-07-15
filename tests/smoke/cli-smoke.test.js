@@ -336,7 +336,7 @@ describe('CLI smoke checks', () => {
       path.join(consumerRoot, '.claude', 'commands', 'spec-write-skill.md'),
       'utf8',
     );
-    expect(writeSkillCommand).toContain('Load profiles conditionally.');
+    expect(writeSkillCommand).toContain('Load evaluation and profiles conditionally.');
     expect(writeSkillCommand).not.toContain(
       '`.claude/spec-first/workflows/spec-write-skill/references/`',
     );

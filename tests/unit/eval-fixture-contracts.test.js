@@ -402,7 +402,7 @@ describe('active eval fixture references', () => {
     expect(fixture.schema_version).toBe('spec-first.spec-write-skill-trigger-cases.v3');
     expect(fixture.evidence_scope).toBe('structural-only');
     expect(fixture).not.toHaveProperty('evidence_level');
-    expect(fixture.cases).toHaveLength(9);
+    expect(fixture.cases).toHaveLength(15);
     expect(fixture.route_queries.length).toBeGreaterThanOrEqual(12);
     expect(fixture.route_queries.length).toBeLessThanOrEqual(16);
     expect(new Set(fixture.cases.map((entry) => entry.id)).size).toBe(fixture.cases.length);

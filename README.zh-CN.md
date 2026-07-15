@@ -170,7 +170,7 @@ docs/
 
 需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。
 
-`spec-write-skill` 是通用的项目级 Agent Skill workflow：可创建或修改项目拥有的 canonical package，也可只读验证现有或外部 package。Portable core 不要求项目使用 spec-first；宿主 metadata 与项目治理只在适用时加载。依赖 prose 的 Agent Skill 会按需加载行为合同方法，补强判据、权威边界、正反例、停止条件与证据化自检。只审查质量仍走 bounded review，第三方安装仍交给 installer，generated runtime mirror 必须从 source 重建而不是直接修补。
+`spec-write-skill` 是通用的项目级 Agent Skill authoring workbench：可创建或修改项目拥有的 canonical package，也可只读验证现有或外部 package。apply 会先形成 Design Brief、capability map、shape-aware eval 与 package topology preview；脚本只验证 source shape、preview 的 hash/scope/write-set binding 与 payload closure，语义充分性仍由人和 LLM 判断。Portable core 不要求项目使用 spec-first；宿主 metadata 与项目治理只在适用时加载。宿主没有原子 conditional patch 能力时必须停止 apply，不得声称 mutation gate 已关闭。只审查质量仍走 bounded review，第三方安装仍交给 installer，generated runtime mirror 必须从 source 重建而不是直接修补。
 
 [→ 完整入口与路由规则](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 

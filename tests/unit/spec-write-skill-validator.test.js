@@ -311,7 +311,7 @@ test('exports one canonical trigger fixture to skill-creator and Yao shapes', ()
   const creator = exportCases('skill-creator', source);
   const yao = exportCases('yao', source);
 
-  expect(source.cases).toHaveLength(9);
+  expect(source.cases).toHaveLength(15);
   expect(source.route_queries).toHaveLength(15);
   expect(creator.evals).toHaveLength(source.cases.length);
   expect(creator.evals.every((entry) => entry.prompt && entry.expected_output)).toBe(true);

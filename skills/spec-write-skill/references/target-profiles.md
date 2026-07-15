@@ -45,3 +45,14 @@ Claude、Cursor、Kiro、Qoder 或其他宿主只有在当前项目 source、官
 ## Profile Evidence
 
 新增 target rule 时记录：target、source URL/path、checked_at、影响字段/文件、验证命令、limitations、失效条件。过期或无法回源的事实降级为 advisory。
+
+## Target Payload Smoke
+
+只在 direct target evidence 已命中且临时 payload 已由宿主/target staging owner 准备后，调用 bundled `inspect-context.cjs` 的 target payload smoke：
+
+```bash
+node "$SKILL_DIR/scripts/inspect-context.cjs" --payload-smoke <temporary-payload-dir> \
+  --runtime-file-set <run-local-runtime-file-set.json> --json
+```
+
+它不创建、复制或执行 payload：run-local `runtime_file_set` 必须逐项声明 path、consumer 和 source-derived `expected_sha256`（`SKILL.md` reference、selected runtime script/asset、target sidecar 或 metadata），并与实际 payload 双向闭包。payload 缺声明 runtime reference、包含 `evals/`、`reports/`、repo-local docs 或 secret-like paths，或 metadata/runtime file drift 时 target readiness 为 `not-ready`；动态依赖无法静态声明时为 `degraded`。真实 invocation/init/publish 或 target-provided validator 仍需单独授权和 evidence，不能由 smoke 推断其他 host feature parity。

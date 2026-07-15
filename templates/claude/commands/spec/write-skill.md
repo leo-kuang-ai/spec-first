@@ -1,5 +1,5 @@
 ---
-description: "Author project-owned Agent Skills or validate packages read-only"
+description: "Design and author project-owned Agent Skills, or validate packages read-only"
 argument-hint: "[target skill or authoring request]"
 ---
 

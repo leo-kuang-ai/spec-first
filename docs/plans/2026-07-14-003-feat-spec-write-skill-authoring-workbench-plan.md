@@ -32,7 +32,7 @@ Eval 设计按目标 Skill 形状分流。Prompt 优化只准备 baseline、prot
 
 ### Problem Frame
 
-当前 `spec-write-skill` 已经覆盖 create/revise、validate-only、migration/remediation modifier、source owner、外部 package 信任边界、portable/target/project profile、行为合同、机械 validator 和自身 promotion evidence。聚焦的三个 unit suites 共 51 个测试已通过，说明现有治理地板稳定。
+当前 `spec-write-skill` 已经覆盖 create/revise、validate-only、migration/remediation modifier、source owner、外部 package 信任边界、portable/target/project profile、行为合同、机械 validator 和自身 promotion evidence。截至本计划编写时，未保留可回源的 suite/command/source snapshot/freshness，因此不以"51 个测试已通过"证明治理地板稳定；实施开始时按 V4/V5 在记录 commit SHA、命令、suite 列表、测试计数与时间戳后重新建立 baseline。
 
 但面向用户的 authoring 过程仍主要依赖 LLM 从规则直接跳到 source patch：
 
@@ -49,11 +49,11 @@ Eval 设计按目标 Skill 形状分流。Prompt 优化只准备 baseline、prot
 
 #### Authoring intent and shape
 
-- R1. Create/revise apply 分支必须在大量正文写入前形成 `Skill Design Brief`，至少覆盖 recurring job、真实输入、required outputs、consumer、positive trigger、negative/near-neighbor、source owner、authority、side effects、主要 failure mode、first verification target 与 invalidation condition。
+- R1. Create/revise apply 分支必须在大量正文写入前形成 `Skill Design Brief`，至少覆盖 recurring job、真实输入、required outputs、consumer、positive trigger、negative/near-neighbor、source owner、authority、side effects、主要 failure mode、first verification target 与 invalidation condition。**Tier A 例外：** 当改动限定于 typo、计数、metadata/术语修正、明确不可达内容删除或等价结构整理，且不改变 trigger、schema、contract、threshold、gate、roster 或 model routing 时，跳过 Design Brief、Desired Capability Map、shape/module selection 与 pre-patch semantic eval；仍必须完成 source owner 确认、用户授权、mutation preview/write-set binding 与最窄结构验证（见 U1 Test Scenarios 与 Definition of Done 的对应例外）。
 - R2. Brief 必须携带 `Desired Capability Map`，逐项记录 capability、owner、consumer、risk、hot-or-triggered、source carrier、runtime carrier、deterministic gate、semantic eval、protected behavior、TCO notes 与 `keep|extract|remove|add` disposition；它是 Markdown semantic envelope，不是持久 schema 或 checker 输入。
 - R3. Shape selection 由 LLM/human 基于 direct evidence 作出，候选集合至少能表达 entry governor、knowledge/reference、deterministic setup/validation、artifact-producing workflow、prose/agentic workflow、long-horizon loop 与 multi-agent/hybrid；候选名称是决策辅助，不得成为脚本 hard enum。
 - R4. 每次 shape decision 必须记录 supporting facts、selected modules、`not_applicable` modules、falsification/invalidation condition；multi-agent/hybrid 必须先通过 ArchitectureFit，否则回到 single-agent + on-demand specialist。
-- R5. Operation model 保持 `base_operation=create|revise`、`effect=apply|validate-only`、`modifier=migrate|audit-remediation|none`。不得为 guided、optimization、feedback 或 lifecycle 新增 public mode/modifier/layer result。
+- R5. Authoring operation model 保持 `base_operation=create|revise`、`effect=apply|validate-only`、`modifier=migrate|audit-remediation|none`。near-neighbor 继续沿用既有、workflow 外的 `base_operation=null/effect=not-entered` 路由结果；它不是新增的 authoring effect。不得为 guided、optimization、feedback 或 lifecycle 新增 public mode/modifier/layer result。
 
 #### Evaluation-first and package topology
 
@@ -72,19 +72,19 @@ Eval 设计按目标 Skill 形状分流。Prompt 优化只准备 baseline、prot
 
 #### Preview and mutation gate
 
-- R15. Create/revise apply 在 mutation 前必须形成 preview manifest，包含 canonical source root、authorized root、source snapshot/hash、would-change、preserve、generated、not-touch、existing collision、planned side effects 与 residual risks；Design Brief 语义正文不进入 manifest。
-- R16. 新增 preview validator，只机械检查 repo-relative paths、realpath containment、source/runtime 禁区、duplicate/collision、declared preserved files、precondition hash、snapshot freshness、authorization claim 枚举的结构合法性与空 mutation list；它不能独立证明本轮用户授权，也不决定设计合理性或 patch 内容质量。
-- R17. Apply 继续使用宿主原生 patch/write primitive 写 project-owned canonical source，不建设通用 scaffold writer。新增目录与文件只有在 preview 和授权均有效时创建。
-- R18. Apply 前脚本重新检查 containment、source snapshot、dirty overlap 与 target ownership；宿主 workflow 重新取得并记录本轮用户授权。任一机械事实变化、授权撤销或授权无法确认都使 preview 失效并停止；不得静默重算后继续写入。
+- R15. Create/revise apply 在 mutation 前必须形成 preview manifest，包含 canonical source root、authorized root、source snapshot/hash、would-change、preserve、generated、not-touch、existing collision、planned side effects 与 residual risks；`would-change` 的每项还必须声明 path、precondition hash（新文件为 `null`）与预期 after hash。`planned_side_effects` 与 `residual_risks` 均为必填 `string[]`（可为空），validator 只检查其存在和元素类型，不判断其语义充分性；Design Brief 语义正文不进入 manifest。
+- R16. 新增 preview validator，只机械检查 repo-relative paths、realpath containment、source/runtime 禁区、duplicate/collision、declared preserved files、precondition hash、snapshot freshness、authorization claim 枚举的结构合法性、`planned_side_effects`/`residual_risks` 的数组形状与空 mutation list。它还必须把 manifest 的 authorized root 与宿主从本轮用户确认中单独传入的 scope input 比对；它不能独立证明本轮用户授权，也不决定设计合理性或 patch 内容质量。
+- R17. Apply 继续使用宿主原生 patch/write primitive 写 project-owned canonical source，不建设通用 scaffold writer。宿主必须先从将要提交的 patch 计算实际 write set，并验证其 path 集、before/after hash 与已通过的 manifest 完全一致；写入本身必须使用能在写入时原子强制 expected-old-hash 或 expected-nonexistence、并拒绝 symlink/ancestor substitution 的 conditional patch primitive，而不是仅在写前 recheck 后依赖非原子写入；写后复核实际 changed paths/after hash。新增目录与文件只有在 preview、write-set binding 和授权均有效时创建。
+- R18. Apply 前脚本重新检查 containment、source snapshot、dirty overlap 与 target ownership；宿主 workflow 重新取得并记录本轮用户授权，并把用户确认的 authorized root/allowed path scope 作为 manifest 外的 scope input 传入验证。任一机械事实变化、授权撤销、scope 无法确认，或宿主不能在写前取得精确 write set 时都使 preview 失效并停止；不得静默重算后继续写入。若某宿主不具备 R17 所要求的原子 conditional patch primitive，mutation readiness 必须为 `not-ready` 并停止 apply，不得仅凭独立的最终 recheck 宣称已关闭 TOCTOU 或以 degraded loud convention 继续写入。
 - R19. Partial failure 报告已变更与未变更 paths、当前 diff、失败原因和 rollback preview；不得自动执行破坏性回滚，也不得声明完成。
 
 #### Target delivery, optimization and feedback
 
-- R20. Target metadata 与 packaging 只在 direct target evidence 命中时生成或更新。基础 payload smoke 在临时 payload 中检查分发文件、reference closure、metadata 与“不依赖 evals/reports/repo-local docs”，不执行目标 package 代码。
+- R20. Target metadata 与 packaging 只在 direct target evidence 命中时生成或更新。基础 payload smoke 在临时 payload 中检查分发文件、reference closure、metadata 与“不依赖 evals/reports/repo-local docs”，不执行目标 package 代码；smoke 必须先输出 run-local `runtime_file_set`，由 `SKILL.md` 引用、已选 runtime script/asset、target sidecar 与 target metadata 的显式 consumer 共同导出，并校验该集合与实际 payload 闭包。无法静态声明的动态依赖必须使 target readiness 为 `degraded|not-ready`，不得猜测打包。
 - R21. 未运行真实宿主 invocation、runtime projection 或 target-provided validator 时，portable readiness 可独立判断，但指定 target 轴必须 `degraded|not-ready` 并给出 reason；不得用 Codex sidecar推断其他宿主等价能力。
-- R22. Measurable optimization 是主要意图且尚未形成 authoring patch 时，`spec-write-skill` 以 near-neighbor `effect=not-entered` handoff `spec-optimize`；普通明确 revise 仍由本 workflow 完成 source authoring，不形成双 owner 或循环 handoff。
+- R22. Measurable optimization 是主要意图且尚未形成 authoring patch 时，`spec-write-skill` 以既有 near-neighbor 路由（`base_operation=null/effect=not-entered`，不进入 authoring effect contract）handoff `spec-optimize`；普通明确 revise 仍由本 workflow 完成 source authoring，不形成双 owner 或循环 handoff。
 - R23. Optimization handoff 至少携带 source snapshot、mutable/immutable scope、trigger evidence、baseline、protected behavior、treatment、controlled variables、metric、budget、stop condition、rollback、invalidation 与 owner-contract limitations。
-- R24. `spec-optimize` 当前不能持久表达 treatment arms、paired comparison 或 rollback/invalidation 时，只允许 `execution_mode=manual_observation` 或 deferred；该证据不可单独支持 default promotion，不新增旁路 experiment database/runner。
+- R24. `spec-optimize` 当前不能持久表达 treatment arms、paired comparison 或 rollback/invalidation 时，只允许 `execution_mode=manual_observation` 或 deferred；其中 `execution_mode=manual_observation` 仅是 `spec-write-skill` 的非持久化 handoff/closeout prose label，不得写入 `spec-optimize` YAML 的 `execution.mode`。该证据不可单独支持 default promotion，不新增旁路 experiment database/runner。
 - R25. Feedback、transcript、issue 或现场失败先作为 advisory input，绑定 source/host/model 后分类为 route、behavior、tool、target 或 project failure；只有完成最小化脱敏复现、确认期望行为并获得 eval-source mutation 授权后，才转为 regression case。
 - R26. 无法复现的反馈只保留 observation；post-write eval 或 payload smoke 失败时保留可审查 diff、阻断完成声明并提供修正或 rollback preview，不自动将失败经验晋级 durable knowledge。
 
@@ -97,7 +97,7 @@ Eval 设计按目标 Skill 形状分流。Prompt 优化只准备 baseline、prot
 
 ### Key Flows
 
-- F1. **Guided create/revise:** qualify → resolve owner/effect → Design Brief → desired capability map → shape/modules → pre-patch eval/baseline → package topology → context facts when material → preview manifest → deterministic preview validation → recheck snapshot/authorization → canonical source patch → structural tests → fresh-source eval；只有 direct target evidence 命中时运行 target payload smoke，否则直接以 target not-run/degraded reason closeout。
+- F1. **Guided create/revise:** qualify → resolve owner/effect → Design Brief → desired capability map → shape/modules → pre-patch eval/baseline → package topology → context facts when material → preview manifest → deterministic preview validation → recheck snapshot/authorization → canonical source patch → structural tests → fresh-source eval；只有 direct target evidence 命中时运行 target payload smoke，否则直接以 target not-run/degraded reason closeout。**Tier A behavior-preserving revise：** 满足 R1 Tier A 例外的改动跳过 Design Brief → fresh-source eval 之间的语义工作台步骤，直接走 qualify → resolve owner/effect → mutation preview → deterministic preview validation → recheck snapshot/authorization → canonical source patch → structural tests → closeout。
 - F2. **External validate-only:** qualify as `base_operation=revise/effect=validate-only` → no-follow inventory → bundled validator → target/project checks when evidence exists → readiness report → closeout；不生成 authoring brief、patch、eval source 或 installation action。
 - F3. **Near-neighbor and blocked owner:** audit-only/installer/runtime maintenance/primary measurable optimization 直接 route；source owner blocked 只给 candidate path/package outline，would-change 与 command list 为空，零 mutation。
 - F4. **Prompt optimization of an existing Skill:** verify project-owned source → establish trigger evidence/baseline/protected behavior/capability inventory → decide whether this is a direct revise or `spec-optimize` handoff → supported handoff or `manual_observation/not promotable` → no local experiment loop。
@@ -234,13 +234,13 @@ flowchart TB
 
 **Preview manifest validator**
 
-- Producer: LLM 在 OS temp 中生成 `spec-write-skill.authoring-preview/v1` JSON；`skills/spec-write-skill/scripts/validate-authoring-preview.cjs <manifest.json> --json` 只验证 mutation facts，并从同一结果渲染 human output。
-- Consumer: apply 前 mutation gate 与 closeout。
-- Required facts: schema version、target repo/root、canonical source root、authorized root、requested effect、authorization claim、would-change/preserve/generated/not-touch paths、collision disposition，以及 SHA-256 snapshot。Git snapshot 记录 HEAD 与声明 path sets 的 porcelain/hash；non-Git snapshot 记录声明 regular files 的 existence/hash 和新路径最近现存父目录 entries。
-- Snapshot scope: 只覆盖四组声明 paths、目标 `SKILL.md`、待创建路径的最近现存父目录与 ownership evidence；无关 dirty paths 不阻断，任何受覆盖 path 的 preview 后变化都使 manifest stale。
-- Result contract: `pass|fail|incomplete` 对应 exit 0/1/2，findings 使用稳定 reason code；输入 manifest 不持久化为 project source。
-- Failure: absolute/escaping/generated path、duplicate path、unresolved collision、snapshot drift、dirty overlap 或 source owner mismatch 阻断 apply。Authorization claim 只校验枚举结构；当前用户授权由宿主 workflow 重新确认，不能由脚本从 manifest 自证。
-- Non-goal: 不判断 Design Brief、Skill shape、prose、eval quality 或 target readiness。
+- Producer: LLM 在宿主创建的私有临时目录（mode `0700` 的 `mkdtemp` 结果）中以 mode `0600`、exclusive-create 方式生成 `spec-write-skill.authoring-preview/v1` JSON；宿主从本轮用户确认单独取得 scope input，并从候选 patch 生成 run-local write set。`skills/spec-write-skill/scripts/validate-authoring-preview.cjs <manifest.json> --authorized-root <confirmed-root> --allowed-paths <run-local-path-set.json> --write-set <run-local-write-set.json> --json` 只验证 mutation facts 与 write-set binding，并从同一结果渲染 human output；validator 以 no-follow 方式打开 manifest/scope/write-set 文件，拒绝 symlink 或 special-file 路径，并在读取前后核对文件身份与 hash 防止替换竞态。宿主 workflow 在 `finally` 中清理该临时目录；清理失败记入 closeout，不阻断已完成的 apply 结果判断。
+- Consumer: apply 前 mutation gate、宿主 patch primitive 的 pre/post write binding 与 closeout。
+- Required facts: schema version、target repo/root、canonical source root、authorized root、requested effect、authorization claim（仅允许 `ready|preview-only|blocked`；只有 `ready` 可继续进入 scope/write-set gate，且该字段不证明真实授权）、would-change（每项 path、before/after SHA-256）、preserve/generated/not-touch paths、collision disposition、`planned_side_effects:string[]`、`residual_risks:string[]`，以及 SHA-256 snapshot。Git snapshot 记录 HEAD 与声明 path sets 的 porcelain/hash；non-Git snapshot 记录声明 regular files 的 existence/hash 和新路径最近现存父目录 entries。scope input 与 write set 都是 run-local、非 project source artifacts。
+- Snapshot scope: 只覆盖四组声明 paths、目标 `SKILL.md`、待创建路径的最近现存父目录与 ownership evidence；无关 dirty paths 不阻断。Preview 生成时若 would-change/generated paths 与已存在的 dirty porcelain paths 存在交集（即 preview 开始前已经 dirty，而非 preview 后新增 dirty），必须为每个交集路径单独记录 current hash、planned disposition 与本轮显式 replace/preserve 授权；缺少任一项即阻断 apply，不得仅凭 hash freshness 隐式允许覆盖用户在途修改。任何受覆盖 path 在 preview 后的变化都使 manifest stale。
+- Result contract: `pass|fail|incomplete` 对应 exit 0/1/2，findings 使用稳定 reason code；只有 manifest、宿主 scope input 与候选 write set 完全匹配时才可 `pass`。输入 manifest、scope input 与 write set 均不持久化为 project source。
+- Failure: absolute/escaping/generated path、duplicate path、unresolved collision、snapshot drift、dirty overlap、source owner mismatch、scope mismatch、write-set path/hash mismatch 或缺少精确 write set 都阻断 apply。Authorization claim 只校验枚举结构；当前用户授权由宿主 workflow 重新确认，不能由脚本从 manifest 自证。没有宿主 pre-write binding 能力，或宿主不提供能在写入时原子强制 expected-old-hash/expected-nonexistence 的 conditional patch primitive 时，result 必须为 `incomplete`，mutation readiness 为 `not-ready` 并停止 apply，不得以 degraded loud convention 继续写入或声明 deterministic gate 已强制。
+- Non-goal: 不判断 Design Brief、Skill shape、prose、eval quality、`planned_side_effects`/`residual_risks` 的语义充分性或 target readiness。
 
 ### Assumptions
 
@@ -307,7 +307,8 @@ U1 authoring contract and shape decision
   - Multi-agent 请求在 ArchitectureFit 不充分时回到 single-agent，不创建固定 roster。
   - External validate-only、audit-only、installer、runtime maintenance、blocked-source-owner 不进入 workbench。
   - Contract test 确认 operation/effect/modifier/layer-result 枚举未扩张。
-- **Verification:** Source contract assertions 能定位新承重行为及其 reference trigger；existing route fixture 全部仍被消费。
+  - Tier A revise（如 typo、计数、术语标准化）跳过 Design Brief/capability map/shape/pre-patch eval，仍执行 owner 确认、preview/write-set binding 与结构验证；改动一旦涉及 trigger/schema/contract/threshold/gate/roster/model routing 即不适用该短路径，必须回到完整 F1。
+- **Verification:** Source contract assertions 能定位新承重行为及其 reference trigger；existing route fixture 全部仍被消费；Tier A 短路径有独立 fixture 证明未被误用于承重行为变更。
 - **Dependencies:** 无。
 
 ### U2. Read-only package context facts
@@ -338,19 +339,24 @@ U1 authoring contract and shape decision
 - **Files:**
   - Add: `skills/spec-write-skill/scripts/validate-authoring-preview.cjs`
   - Add: `tests/unit/spec-write-skill-authoring-preview.test.js`
+  - Add: `tests/integration/spec-write-skill-authoring-preview.integration.test.js`
+  - Modify: `scripts/run-test-suite.cjs`
   - Modify: `skills/spec-write-skill/references/authoring-workbench.md`
   - Modify: `skills/spec-write-skill/references/delivery-gates.md`
   - Modify: `tests/unit/spec-write-skill-contracts.test.js`
-- **Approach:** 定义 `spec-write-skill.authoring-preview/v1` producer-local JSON，只承载 mutation facts，并以 manifest file path 作为 CLI 输入。Validator 从同一 report 渲染 JSON/human 输出，机械验证 source root、authorized root、SHA-256 snapshot、dirty overlap、path sets、collision disposition、effect 与 authorization claim 的结构；宿主 workflow 另行重新确认真实用户授权，apply 仍由 host patch primitive 完成。
+- **Approach:** 定义 `spec-write-skill.authoring-preview/v1` producer-local JSON，只承载 mutation facts，并以 manifest file path、宿主 scope input 与候选 write set 作为 CLI 输入。Validator 从同一 report 渲染 JSON/human 输出，机械验证 source root、manifest/host scope 一致性、SHA-256 snapshot、dirty overlap、path sets、collision disposition、effect、authorization claim 的结构与候选 write set 的 before/after hash binding；宿主 workflow 另行重新确认真实用户授权，只有 pre-write binding pass 后才允许 host patch primitive 写入，且该写入必须使用能在写入时原子强制 expected-old-hash/expected-nonexistence、拒绝 symlink/ancestor substitution 的 conditional patch primitive，写后核对实际 changed paths/hash。若宿主不具备精确 pre-write binding 或不提供该原子 conditional patch primitive，mutation readiness 必须为 `not-ready` 并停止 apply，不得靠独立的最终 recheck 或 degraded loud convention 继续写入。
 - **Test Scenarios:**
   - Absolute path、parent escape、generated runtime path、symlinked ancestor、跨 repo target 被阻断。
   - would-change/preserve/generated/not-touch 重复或重叠被阻断。
   - Existing file collision 没有 disposition 时失败；unknown sidecar 默认 preserve/manual decision。
   - Preview 后 source hash 或 dirty overlap 变化时返回 stale-preview，零 mutation。
+  - Preview 生成前已存在于 would-change/generated paths 上的 dirty overlap，缺少逐路径 disposition 或显式 replace/preserve 授权时机械失败；提供完整 disposition 与授权后才可继续。
+  - Manifest 与宿主 scope input 不一致、候选 patch 的 path/before/after hash 不一致，或无法取得精确 write set 时返回 fail/incomplete，零 mutation；写后 receipt 与 manifest 不一致时阻断完成声明。
   - Invalid authorization claim enum 机械失败；真实授权撤销或无法确认时由宿主 workflow 停止，且不得把 manifest claim 报告为 confirmed authorization。
+  - `planned_side_effects` 与 `residual_risks` 缺失、非数组或含非 string 元素时机械失败；validator 不判断其文本内容。
   - Empty mutation request、validate-only 和 blocked-source-owner 不能伪装成 apply-ready。
   - JSON 与 human 输出来自同一 report，`pass|fail|incomplete`、exit 0/1/2 和 reason codes 保持一致。
-- **Verification:** Test fixture 对运行前后 workspace snapshot 作差，确认 validator 零写入；semantic Brief 字段不进入 machine contract。
+- **Verification:** Test fixture 对运行前后 workspace snapshot 作差，确认 validator 零写入；`tests/integration/spec-write-skill-authoring-preview.integration.test.js`（纳入 `scripts/run-test-suite.cjs` 的 `runIntegration()`）证明实际 write receipt 只能匹配已验证 write set，覆盖 pre-write binding、真实写入 receipt 与 partial-write failure；semantic Brief 字段不进入 machine contract。
 - **Dependencies:** U1。
 
 ### U4. Shape-aware eval and evidence mapping
@@ -358,6 +364,7 @@ U1 authoring contract and shape decision
 - **Goal:** 让被创建或修订的 Skill 在写 prose 前拥有与自身形状匹配的 baseline、protected behavior、negative cases 和 evidence adequacy。
 - **Requirements:** R6-R10、R25-R26、R30。
 - **Files:**
+  - Modify: `skills/spec-write-skill/SKILL.md`
   - Add: `skills/spec-write-skill/references/evaluation-design.md`
   - Modify: `skills/spec-write-skill/references/authoring-workbench.md`
   - Modify: `skills/spec-write-skill/references/delivery-gates.md`
@@ -365,7 +372,7 @@ U1 authoring contract and shape decision
   - Modify: `skills/spec-write-skill/evals/README.md`
   - Modify: `tests/unit/spec-write-skill-contracts.test.js`
   - Modify: `tests/unit/eval-fixture-contracts.test.js`
-- **Approach:** Evaluation reference 按 shape 提供 baseline、case family、machine assertion 与 semantic rubric 的选择判据。目标项目有 native eval owner 时复用；没有时只创建 target-local maintainer cases，不升级 `spec-write-skill` promotion validator 为通用平台。
+- **Approach:** Evaluation reference 按 shape 提供 baseline、case family、machine assertion 与 semantic rubric 的选择判据。目标项目有 native eval owner 时复用；没有时只创建 target-local maintainer cases，不升级 `spec-write-skill` promotion validator 为通用平台。`evaluation-design.md` 从 `SKILL.md` 直接一跳触发（不经由 `authoring-workbench.md` 间接链接），并配齐 STOP trigger 四件套：trigger_condition（进入 pre-patch eval 步骤前）、must_read（强指令）、fallback_if_unread（未读时不得声称已建立 baseline，须回退结构-only 结论）、eval_case（至少一个触发场景与一个不触发场景）。
 - **Test Scenarios:**
   - Entry governor 使用 with-skill vs bare-menu baseline，覆盖 collision、near-neighbor 与多 run 方差。
   - Artifact producer 检查真实 artifact contract；deterministic tool 检查 reason/failure；agentic loop 检查 authority、checkpoint、stop/recovery。
@@ -380,18 +387,20 @@ U1 authoring contract and shape decision
 - **Goal:** 为 prompt optimization、target metadata 和 package delivery提供诚实 handoff，不把 authoring workflow扩张成实验平台或跨宿主 adapter。
 - **Requirements:** R20-R26。
 - **Files:**
+  - Modify: `skills/spec-write-skill/SKILL.md`
   - Add: `skills/spec-write-skill/references/optimization-and-lifecycle.md`
   - Modify: `skills/spec-write-skill/references/target-profiles.md`
   - Modify: `skills/spec-write-skill/references/project-profiles.md`
   - Modify: `skills/spec-write-skill/references/delivery-gates.md`
   - Modify: `skills/spec-write-skill/evals/trigger-cases.json`
   - Modify: `tests/unit/spec-write-skill-contracts.test.js`
-- **Approach:** Optimization reference 只在 measurable optimization 或 field feedback 分支加载，复用最新 companion 的 supported/aspirational handoff 与 manual observation 口径。Target profile 明确临时 payload closure smoke、metadata freshness 和真实 invocation 的授权边界。
+- **Approach:** Optimization reference 只在 measurable optimization 或 field feedback 分支加载，复用最新 companion 的 supported/aspirational handoff 与 manual observation 口径；从 `SKILL.md` 直接一跳触发（不经由其他 reference 间接链接），并配齐 STOP trigger 四件套：trigger_condition（检测到 primary metric optimization 或 field feedback 信号时）、must_read（强指令）、fallback_if_unread（未读时按普通 revise 处理，不得声明已完成 optimization handoff 或 feedback-to-regression 判断）、eval_case（optimization/feedback 触发场景与普通 revise 不触发场景各一）。Target profile 明确临时 payload closure smoke、metadata freshness 和真实 invocation 的授权边界；smoke 先生成 run-local `runtime_file_set`，以 `SKILL.md` refs、已选 script/asset、sidecar 与 metadata 的显式 consumer 为 source，再检查该集合与 payload 的双向闭包。
 - **Test Scenarios:**
   - Primary metric optimization 在未 authoring 时 near-neighbor handoff `spec-optimize`，不写 source。
   - 普通 revise 保持单 owner；不出现 authoring→optimize→authoring 循环。
   - Unsupported treatment 输出 `execution_mode=manual_observation`、`not promotable` 与 limitations。
   - Payload 缺 runtime reference、依赖 evals/repo docs 或 metadata 漂移时 target not-ready。
+  - runtime file set 声明的 script/asset/sidecar 缺失时 target not-ready；无法声明的动态依赖保持 degraded，不能仅以目录 inventory 判 ready。
   - Codex confirmed delta 可用；其他 host 无 direct evidence 时 degraded，且不生成假 adapter。
   - Target package scripts 不执行；真实 invocation/init/publish 无授权时 not-run。
 - **Verification:** `spec-optimize` schema 未被修改；target/project/semantic/mutation readiness 仍分别报告。
@@ -412,14 +421,14 @@ U1 authoring contract and shape decision
   - Add execution evidence: `docs/validation/2026-07-14-spec-write-skill-authoring-workbench/`
   - Modify as needed: `tests/unit/plugin-modules.test.js`
   - Modify as needed: `tests/smoke/cli-smoke.test.js`
-- **Approach:** 先锁定 source/contract/tests，再运行 before/after representative authoring cases。只有 route/default-policy/hard-gate 发生额外变化时才升级到完整 promotion bundle；本计划默认使用纯 prose/structure 对应的 paired holdout + script tests，field outcome 保持 not-run。
+- **Approach:** 先锁定 source/contract/tests，再运行 before/after representative authoring cases。U3 新增 mutation hard gate，因此本计划必须运行现有完整 promotion protocol；paired holdout + script tests 是该 protocol 的补充证据，不是替代。field outcome 保持 not-run。
 - **Test Scenarios:**
   - 普通 repo create、deterministic tool、prose agent、long-horizon、multi-agent request、external validate-only、stale preview、optimization handoff、feedback-to-regression。
   - Before/after 复用同一 source snapshot、request、host/model；高歧义 case 重复运行并报告波动。
   - 宿主 source patch 在部分文件写入后失败时，closeout 精确报告 changed/unchanged paths、当前 diff、失败原因和 rollback preview，禁止自动破坏性回滚与完成声明。
   - Default source bytes、runtime-required resource closure、五宿主投影与 maintainer-only eval exclusion。
   - README/metadata/route fixtures 与 public workflow identity 一致。
-- **Verification:** Fresh-source evaluation 达到 L3 或明确 `not_run:<reason>`；source/runtime、mutation、verification、handoff 和 knowledge promotion 边界无回归。
+- **Verification:** 完整 promotion protocol 与 fresh-source evaluation 达到 L3，或明确 `not_run:<reason>`；缺少 host pre-write binding 或 full promotion evidence 时形成 degraded 未完成 closeout，并阻断 semantic readiness 与计划完成声明；source/runtime、mutation、verification、handoff 和 knowledge promotion 边界无回归。
 - **Dependencies:** U1-U5。
 
 ---
@@ -430,12 +439,12 @@ U1 authoring contract and shape decision
 | --- | --- | --- | --- |
 | V1 Mechanical package | 当前 `spec-write-skill` package | `node skills/spec-write-skill/scripts/validate-skill.cjs skills/spec-write-skill --strict-portable --json` | result=pass；无新增 secret/symlink/reference finding |
 | V2 Context facts | U2 | `node skills/spec-write-skill/scripts/inspect-context.cjs skills/spec-write-skill --json`；`npx jest --runTestsByPath tests/unit/spec-write-skill-context-inspector.test.js tests/unit/spec-write-skill-validator.test.js --runInBand` | facts 稳定、no-follow、zero-write；validator v1 non-regression |
-| V3 Preview gate | U3 | `npx jest --runTestsByPath tests/unit/spec-write-skill-authoring-preview.test.js --runInBand` | escape/collision/snapshot drift 全部 fail closed；JSON/human、reason code、exit 0/1/2 一致；workspace unchanged；授权只作结构 claim，真实授权由 workflow 重确认 |
+| V3 Preview gate | U3 | `npx jest --runTestsByPath tests/unit/spec-write-skill-authoring-preview.test.js tests/integration/spec-write-skill-authoring-preview.integration.test.js --runInBand` | escape/collision/snapshot drift、scope mismatch、write-set mismatch 与缺少 pre-write binding 全部 fail closed/incomplete；JSON/human、reason code、exit 0/1/2 一致；workspace unchanged；实际 write receipt 只能匹配已验证 write set；授权只作结构 claim，真实授权由 workflow 重确认 |
 | V4 Source contracts | U1/U4/U5 | `npx jest --runTestsByPath tests/unit/spec-write-skill-contracts.test.js tests/unit/eval-fixture-contracts.test.js --runInBand` | 新行为逐项有 assertion；旧 route/effect/layer-result 兼容 |
-| V5 Promotion evidence compatibility | Existing maintainer evidence | `npx jest --runTestsByPath tests/unit/spec-write-skill-promotion-evidence.test.js --runInBand`；验证已发布 v1/v2 bundle | 现有 bundle 语义和 validator exit contract 不回归 |
+| V5 Full promotion evidence | U3/U6 与 existing maintainer evidence | `npx jest --runTestsByPath tests/unit/spec-write-skill-promotion-evidence.test.js --runInBand`；按现有 full promotion protocol 复验已发布 v1 bundle、v2 validator/fixture contract 与本次新生成的 v2 bundle | 新 mutation gate 的 route/hard-boundary 行为有完整 promotion evidence；现有 bundle 语义和 validator exit contract 不回归 |
 | V6 Eval fixtures | Shape-aware cases | `npm run test:eval-fixtures` | structural fixtures 消费 expected outcomes；不宣称 semantic pass |
 | V7 Fresh-source behavior | U1/U4/U5/U6 | 按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 运行 before/after representative cases | eval adequacy=L3；`not_run:<reason>` 只能形成 degraded 未完成 closeout，并阻断 semantic readiness 与计划完成声明 |
-| V8 Target payload | U5/U6 | 临时 package payload closure + project-approved smoke；`npm run test:smoke`、`npm run test:integration` | runtime-required files complete；package code 未执行；未确认 host degraded |
+| V8 Target payload | U5/U6 | run-local runtime file set 与临时 package payload 的双向 closure + project-approved smoke；`npm run test:smoke`、`npm run test:integration` | runtime-required files complete；未声明动态依赖 degraded；package code 未执行；未确认 host degraded |
 | V9 Source/runtime projection | U6 | `npm run docs:runtime-catalog`；项目批准后从 source 运行五宿主 init/projection tests | catalog/generated runtime 来自 source；5-host expectations一致；无手改 mirror |
 | V10 Repository quality | 全部 | `npm run typecheck`、`npm run lint:skill-entrypoints`、`npm run build`、按影响面运行 `npm test`、`git diff --check` | 聚焦与扩大验证无归属于本计划的失败；not-run/known unrelated failure 诚实记录 |
 
@@ -446,21 +455,27 @@ U1 authoring contract and shape decision
 - Countermetrics: source bytes、aggregate input/output/tool results when observable、duration、human correction count；没有 observed runtime/field evidence时不作改善 claim。
 - Reviewer: fresh generic instance，blind to intended fix；复杂 case 至少两次 run，报告最坏分层而不是只报最佳结果。
 - Partial-write failure: fresh-source case 必须验证 changed/unchanged paths、当前 diff、失败原因、rollback preview、无自动破坏性回滚和无完成声明。
-- Promotion escalation: 若实施改变 description route、hard gate、public operation/layer result、target invocation policy 或 default policy，改用现有 full promotion protocol，而不是沿用简化评测。
+- Promotion escalation: 本计划的 U3 已改变 hard gate，必须使用现有 full promotion protocol，而不是沿用简化评测；后续若再改变 description route、public operation/layer result、target invocation policy 或 default policy，同样按完整 protocol 扩展证据。
 
 ---
 
 ## Definition of Done
 
 - R1-R30 均有对应 Implementation Unit、source owner 与验证证据，且不存在 launch-blocking open question。
-- Create/revise apply 形成 Design Brief、Desired Capability Map、shape/modules、pre-patch eval、package topology、validated preview 和 source patch；validate-only/near-neighbor/blocked-owner 分支保持短路。
+- Create/revise apply 形成 Design Brief、Desired Capability Map、shape/modules、pre-patch eval、package topology、validated preview 和 source patch；validate-only/near-neighbor/blocked-owner 分支保持短路；满足 R1 Tier A 例外的机械/行为不变修订跳过语义工作台步骤，仍保留 owner、授权、preview/write-set binding 与结构验证。
 - 不新增 public operation/effect/modifier/layer-result、通用 IR、scaffold writer、quality score、run database、adapter registry 或实验循环。
-- Context inspector 与 preview validator 为 dependency-free、zero-write、no-follow；secret、symlink、path escape、collision 和 snapshot drift 均 fail closed。Preview validator 只校验 authorization claim 结构，真实用户授权由宿主 workflow 重新确认，无法确认时停止。
-- `spec-write-skill.validator/v1` 与已发布 promotion evidence v1/v2 保持可复验；new context/preview contracts 各有独立 schema owner 和测试。
+- Context inspector 与 preview validator 为 dependency-free、zero-write、no-follow；secret、symlink、path escape、collision、snapshot drift、scope/write-set mismatch 与缺少 pre-write binding 均 fail closed/incomplete。Preview validator 只校验 authorization claim 结构，真实用户授权由宿主 workflow 重新确认，无法确认时停止；实际 patch 必须使用原子 conditional patch primitive 匹配已验证的 path/before/after hash，宿主无法提供该原语时 mutation readiness 为 `not-ready` 并停止，不得以 degraded loud convention 代替原子写入或声明完成。
+- `spec-write-skill.validator/v1`、已发布 promotion evidence v1 bundle、v2 validator/fixture contract 与本次新生成的 v2 bundle 保持可复验；new context/preview contracts 各有独立 schema owner 和测试。
 - Shape-aware eval 在 patch 前建立 baseline，在 patch 后运行 fresh-source before/after；新增承重行为没有“旧测试全绿但无新证据”的假完成。
 - Default authoring source context 保持既有结构预算或记录例外；没有把 source bytes 冒充 runtime/billed savings。
-- Target payload smoke 不执行 package code；其他 host 没有 direct evidence 时保持 degraded；runtime 只从 source generator 重建。
+- Target payload smoke 不执行 package code，且以 run-local runtime file set 与实际 payload 的双向 closure 证明声明依赖；动态依赖无法静态声明时保持 degraded。其他 host 没有 direct evidence 时保持 degraded；runtime 只从 source generator 重建。
 - `spec-optimize` unsupported treatment 明确 `execution_mode=manual_observation` 且 `not promotable`；feedback 只有经复现、脱敏、确认和授权后进入 regression。
 - README、README.zh-CN、workflow map、Claude/Codex metadata、runtime catalog、tests 和 CHANGELOG 与新定位一致。
 - Fresh-source status、five-axis readiness、field outcome、not-run reasons、generated runtime 状态和 residual risks 在 closeout 中分开报告。
 - 临时 eval/payload workspace 位于 `skills/` 之外，废弃尝试、缓存与中间文件不留在最终 diff。
+
+## Deferred / Open Questions
+
+### From 2026-07-15 review
+
+- **U5 / V8 Target payload staging owner 未确定。** U5、V8 与 Definition of Done 要求 target payload 的 staging、run-local runtime file set 双向 closure 与"零 package-code execution"可复验，但没有指定由谁承担该复制/校验逻辑：可选路径包括扩展 U2 的 context-facts inspector（增加 runtime closure 输出）、新增第三个窄 dependency-free validator（专职 staging + closure + no-execution 校验），或复用现有测试/generator harness（`npm run test:smoke`、`npm run test:integration`）编排。三者对 Product Contract "只新增两个窄脚本"的边界有不同影响，需要在实施前做架构取舍：新增第三个脚本会突破当前"两个窄脚本"的产品定位；扩展 inspector 会让 context-facts 承担 mutation-adjacent 的 staging 职责；复用现有 harness 则需要确认其 no-follow、secret-like 路径排除、禁止 child process/package manager/hooks/binary 等安全属性是否可控地插入。(feasibility, security-lens)

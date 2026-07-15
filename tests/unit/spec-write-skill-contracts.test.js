@@ -60,7 +60,7 @@ test('profiles are conditional and legacy vocabulary owner is removed', () => {
   const target = read('skills/spec-write-skill/references/target-profiles.md');
   const project = read('skills/spec-write-skill/references/project-profiles.md');
 
-  expect(skill).toContain('Load profiles conditionally');
+  expect(skill).toContain('Load evaluation and profiles conditionally');
   expect(authoring).toContain('Branch-First Information Hierarchy');
   expect(target).toContain('allow_implicit_invocation: false');
   expect(project).toContain('`npm run docs:runtime-catalog`');
@@ -121,6 +121,31 @@ test('spec-first project profile keeps catalog and runtime generated from source
   expect(delivery).toContain('不得手改 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`');
 });
 
+test('authoring workbench keeps semantic design, shape-aware evaluation, and mutation facts in their proper owners', () => {
+  const skill = read('skills/spec-write-skill/SKILL.md');
+  const workbench = read('skills/spec-write-skill/references/authoring-workbench.md');
+  const evaluation = read('skills/spec-write-skill/references/evaluation-design.md');
+  const optimization = read('skills/spec-write-skill/references/optimization-and-lifecycle.md');
+  const delivery = read('skills/spec-write-skill/references/delivery-gates.md');
+
+  expect(skill).toContain('[Authoring Workbench](references/authoring-workbench.md)');
+  expect(skill).toContain('[Shape-Aware Evaluation Design](references/evaluation-design.md)');
+  expect(skill).toContain('[Optimization And Feedback Handoff](references/optimization-and-lifecycle.md)');
+  expect(workbench).toContain('Skill Design Brief');
+  expect(workbench).toContain('Desired Capability Map');
+  expect(workbench).toContain('ArchitectureFit');
+  expect(workbench).toContain('Tier A Short Path');
+  expect(workbench).toContain('原子 conditional patch primitive');
+  expect(workbench).toContain('不要把 Brief 正文写入 machine contract');
+  expect(evaluation).toContain('trigger_condition');
+  expect(evaluation).toContain('fallback_if_unread');
+  expect(evaluation).toContain('protected_behavior → source carrier → contract assertion → semantic eval case');
+  expect(optimization).toContain('execution_mode=manual_observation');
+  expect(optimization).toContain('绝不写入 `spec-optimize` YAML `execution.mode`');
+  expect(delivery).toContain('Apply Preview Gate');
+  expect(skill).not.toContain('effect=guided');
+});
+
 test('public workflow governance identity remains stable', () => {
   const governance = JSON.parse(read(
     'src/cli/contracts/dual-host-governance/skills-governance.json',
@@ -140,6 +165,6 @@ test('public workflow governance identity remains stable', () => {
   });
 
   expect(read('docs/catalog/runtime-capabilities.md')).toContain(
-    '| write-skill | spec-write-skill | spec-write-skill | no | Author project-owned Agent Skills or validate packages read-only |',
+    '| write-skill | spec-write-skill | spec-write-skill | no | Design and author project-owned Agent Skills, or validate packages read-only |',
   );
 });

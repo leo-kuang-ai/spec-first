@@ -4,8 +4,11 @@
   "source_refs": [
     "skills/spec-write-skill/SKILL.md",
     "skills/spec-write-skill/references/authoring-method.md",
+    "skills/spec-write-skill/references/authoring-workbench.md",
     "skills/spec-write-skill/references/behavior-contract-design.md",
     "skills/spec-write-skill/references/delivery-gates.md",
+    "skills/spec-write-skill/references/evaluation-design.md",
+    "skills/spec-write-skill/references/optimization-and-lifecycle.md",
     "skills/spec-write-skill/references/target-profiles.md",
     "skills/spec-write-skill/references/project-profiles.md"
   ],
@@ -244,6 +247,78 @@
       "expected_layer_result": "portable-core-with-behavior-contract",
       "reason_code": "prose-heavy-skill-revision",
       "forbidden_signals": ["fixed tool call quota", "self-check as semantic proof", "reveal hidden reasoning"]
+    },
+    {
+      "id": "deterministic-tool-shape",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "为项目内固定 CLI 创建一个 Skill：脚本输出稳定 facts/reason code，Skill 只解释输入和失败边界。",
+      "expected_base_operation": "create",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-only",
+      "reason_code": "deterministic-tool-shape",
+      "forbidden_signals": ["load behavior contract", "script decides semantic adequacy"]
+    },
+    {
+      "id": "long-horizon-shape",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "修改项目拥有的长时任务 Skill，补 authority、checkpoint、stop、resume 和 recovery 的真实正反例。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-with-behavior-contract",
+      "reason_code": "long-horizon-shape",
+      "forbidden_signals": ["only structural fixture", "omit recovery case"]
+    },
+    {
+      "id": "multi-agent-architecture-fit-fallback",
+      "case_type": "boundary",
+      "expected_trigger": true,
+      "prompt": "用五个 agent 一起写这个上下文高度共享的 Skill，但没有独立证据方向。",
+      "expected_base_operation": "create",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-only",
+      "reason_code": "architecture-fit-single-agent-fallback",
+      "forbidden_signals": ["fixed five-agent roster", "claim architecture fit without evidence"]
+    },
+    {
+      "id": "tier-a-mechanical-revise",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "只修项目 Skill 的拼写和术语标准化；不改变触发、schema、contract、threshold、gate、roster 或 model routing。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-only",
+      "reason_code": "tier-a-behavior-preserving-revise",
+      "forbidden_signals": ["skip preview binding", "treat contract change as tier-a"]
+    },
+    {
+      "id": "primary-metric-optimization-handoff",
+      "case_type": "near-neighbor",
+      "expected_trigger": false,
+      "prompt": "不要先改 Skill；我要比较不同 prompt treatment 的 billed token 并决定默认策略。",
+      "expected_base_operation": null,
+      "expected_effect": "not-entered",
+      "expected_modifier": "none",
+      "expected_layer_result": "near-neighbor-route",
+      "reason_code": "primary-metric-optimization-handoff",
+      "forbidden_signals": ["create local experiment runner", "write spec-optimize execution.mode manual_observation"]
+    },
+    {
+      "id": "feedback-unreproduced-observation",
+      "case_type": "boundary",
+      "expected_trigger": true,
+      "prompt": "一段 transcript 说这个 Skill 越权外发数据；先根据它直接写 regression 并修改 source。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-only",
+      "reason_code": "feedback-reproduction-required",
+      "forbidden_signals": ["treat transcript as confirmed truth", "write regression without authorization"]
     },
     {
       "id": "ordinary-code-work-neighbor",

@@ -4,6 +4,20 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { TextDecoder } = require('node:util');
+const {
+  INSPECTION_LIMITS: VALIDATION_LIMITS,
+  TEXT_EXTENSIONS,
+  UNSAFE_PATH_CHARACTERS,
+  collectMarkdownReferences,
+  containsSensitiveContent,
+  escapeUntrustedText,
+  finding,
+  findSymlinkSegment,
+  isInside,
+  isSecretLikePath,
+  normalizeRelative,
+  readStableRegularFile,
+} = require('./lib/package-inspection.cjs');
 
 const STANDARD_FIELDS = new Set([
   'name',
@@ -14,26 +28,6 @@ const STANDARD_FIELDS = new Set([
   'compatibility',
 ]);
 const STATUS_ORDER = { error: 0, warning: 1, not_checked: 2 };
-const VALIDATION_LIMITS = Object.freeze({
-  maxDepth: 16,
-  maxFiles: 1000,
-  maxTextFileBytes: 1024 * 1024,
-  maxTextBytes: 10 * 1024 * 1024,
-});
-const SECRET_NAME = /(^|[._-])(env|secret|secrets|credential|credentials|token|tokens|private|key|keys)([._-]|$)/i;
-const TEXT_EXTENSIONS = new Set(['.md', '.txt', '.json', '.yaml', '.yml', '.js', '.cjs', '.mjs', '.py', '.sh']);
-const UNSAFE_PATH_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u;
-const UNSAFE_PATH_CHARACTERS_GLOBAL = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/gu;
-const SENSITIVE_CONTENT_PATTERNS = [
-  /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/,
-  /\bAuthorization\s*:\s*(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{12,}/i,
-  /\bBearer\s+[A-Za-z0-9._~+/=-]{20,}/i,
-  /\bsk-[A-Za-z0-9]{20,}\b/,
-  /\bgh[pousr]_[A-Za-z0-9]{20,}\b/,
-  /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/,
-  /\bAKIA[0-9A-Z]{16}\b/,
-  /\b(?:api[_-]?key|access[_-]?token|secret[_-]?key|client[_-]?secret|password)\b\s*[:=]\s*["']?[^\s"']{12,}/i,
-];
 
 class FrontmatterParseError extends Error {
   constructor(kind, message) {
@@ -56,16 +50,6 @@ function parseArgs(argv) {
   return args;
 }
 
-function normalizeRelative(value) {
-  return value.split(path.sep).join('/');
-}
-
-function escapeUntrustedText(value) {
-  return String(value).replace(UNSAFE_PATH_CHARACTERS_GLOBAL, (character) => {
-    const codePoint = character.codePointAt(0).toString(16).padStart(4, '0');
-    return `\\u${codePoint}`;
-  });
-}
 
 function invalidFrontmatter(message) {
   return new FrontmatterParseError('invalid', message);
@@ -75,33 +59,6 @@ function unsupportedFrontmatter(message) {
   return new FrontmatterParseError('unsupported', message);
 }
 
-function containsSensitiveContent(content) {
-  return SENSITIVE_CONTENT_PATTERNS.some((pattern) => pattern.test(content));
-}
-
-function isSecretLikePath(relativePath) {
-  return relativePath.split('/').some((segment) => SECRET_NAME.test(segment));
-}
-
-function isInside(candidate, root) {
-  const relative = path.relative(root, candidate);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
-function findSymlinkSegment(absolutePath) {
-  const parsed = path.parse(absolutePath);
-  const segments = path.relative(parsed.root, absolutePath).split(path.sep).filter(Boolean);
-  let current = parsed.root;
-  for (const segment of segments) {
-    current = path.join(current, segment);
-    try {
-      if (fs.lstatSync(current).isSymbolicLink()) return current;
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
 
 function nearestExistingAncestor(absolutePath) {
   let current = absolutePath;
@@ -117,15 +74,6 @@ function nearestExistingAncestor(absolutePath) {
   }
 }
 
-function finding(reasonCode, check, status, relativePath, message) {
-  return {
-    reason_code: reasonCode,
-    check,
-    status,
-    path: relativePath === null ? null : escapeUntrustedText(relativePath),
-    message: escapeUntrustedText(message),
-  };
-}
 
 function parseQuoted(value, lineNumber) {
   if (value.startsWith('"')) {
@@ -199,17 +147,6 @@ function extractFrontmatter(content) {
   const normalized = content.replace(/\r\n/g, '\n');
   const match = normalized.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
   return match ? match[1] : null;
-}
-
-function collectMarkdownReferences(content) {
-  const references = [];
-  const pattern = /\[[^\]]*\]\(([^)]+)\)/g;
-  for (const match of content.matchAll(pattern)) {
-    const raw = match[1].trim().replace(/^<|>$/g, '').split(/\s+["']/)[0];
-    if (!raw || /^(?:https?:|mailto:|#)/i.test(raw)) continue;
-    references.push(raw.split('#')[0]);
-  }
-  return references;
 }
 
 function validateSkill(options) {
@@ -383,7 +320,7 @@ function validateSkill(options) {
       }
       let content;
       try {
-        const bytes = fs.readFileSync(absolute);
+        const bytes = readStableRegularFile(absolute);
         content = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
         totalTextBytes += bytes.length;
       } catch (error) {
@@ -420,7 +357,7 @@ function validateSkill(options) {
     findings.push(finding('skill_md_missing', 'frontmatter', 'error', 'SKILL.md', 'SKILL.md is required.'));
   } else {
     try {
-      const content = fs.readFileSync(skillMdPath, 'utf8');
+      const content = new TextDecoder('utf-8', { fatal: true }).decode(readStableRegularFile(skillMdPath));
       const frontmatter = extractFrontmatter(content);
       if (frontmatter === null) {
         findings.push(finding('frontmatter_missing_or_unclosed', 'frontmatter', 'error', 'SKILL.md', 'SKILL.md requires closed YAML frontmatter.'));

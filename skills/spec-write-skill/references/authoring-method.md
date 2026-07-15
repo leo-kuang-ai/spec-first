@@ -27,6 +27,8 @@ Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operati
 - mutation authorization：`ready|preview-only|blocked`；
 - first verification target。
 
+当 revision 仅是 typo、计数、metadata/术语修正、明确不可达内容删除或等价结构整理，且不改变 trigger、schema、contract、threshold、gate、roster 或 model routing，可按 `authoring-workbench.md` 的 Tier A short path 处理；它仍要 owner、授权、preview/write-set binding 与最窄结构验证。不要把承重行为变化伪装成 Tier A。
+
 只询问答案会改变 package 设计、权限或不可逆结果的最少问题，并尽量合并为一轮。能从 source 发现或以低风险、可撤销假设推进时，记录假设并继续；不要用更多目录、profiles 或 fallback 掩盖真正未决的意图。
 
 ## Source And Effect Resolution
