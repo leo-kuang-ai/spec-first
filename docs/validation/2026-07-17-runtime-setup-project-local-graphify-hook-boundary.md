@@ -6,15 +6,15 @@
 
 ## 结论
 
-当前源码已证明以下产品边界：Graphify package、项目内 host integration、graph integrity 与真实 query probe 是核心 readiness；project-local Git hook 是可选自动刷新增强。有效 hooks root 位于项目外时，Runtime Setup 不执行 Graphify hook install/uninstall/status，不读取或修改外部 hook，完整 required setup 在核心条件通过时仍返回 ready，并报告 `hook_status=blocked`、`refresh_mode=manual-only`。有效 hooks root 位于项目内时，hook 子命令使用清洁的进程级 `core.hooksPath` pin，并在命令前后重新解析真实目标，两个 Provider hook 可安装、规范化和结构验证。
+当前源码已证明以下产品边界：Graphify package、项目内 host integration、graph integrity 与真实 query probe 是核心 readiness；project-local Git hook 是可选自动刷新增强。有效 hooks root 位于项目外时，Runtime Setup 不执行 Graphify hook install/uninstall/status，不读取或修改外部 hook，完整 required setup 在核心条件通过时仍返回 ready，并报告 `hook_status=blocked`、`refresh_mode=manual-only`。有效 hooks root 位于项目内时，hook 子命令使用清洁的进程级 `core.hooksPath` pin，并在命令前后重新解析真实目标，两个 Provider hook 可安装、规范化和结构验证。已有图的显式 refresh 使用官方 `graphify update` 原位更新，不再创建 spec-first 顶层 staging、backup 或 migration journal；旧 journal 仅保留兼容恢复。
 
 ## Script-confirmed Evidence
 
 ### 聚焦单元与入口验证
 
 - `npx jest tests/unit/mcp-setup-providers.test.js tests/unit/mcp-setup-facts-renderer.test.js tests/unit/mcp-setup-contracts.test.js --runInBand`
-  - 结果：3 suites，73 tests，全部通过。
-  - 覆盖：external 零 hook runner 调用、external Node filesystem probe spy 对 resolver/plan/apply 全路径为零、外部目录不变、contained custom hooks root、继承 `GIT_CONFIG_*` 清洗、命令级 pin、plan/apply drift、postflight drift、symlink escape、blocked schema、已有图普通 setup 不误报 fresh、unknown core-ready 强制 query probe、ready-with-optional-limitation renderer。
+  - 结果：3 suites，74 tests，全部通过。
+  - 覆盖：external 零 hook runner 调用、external Node filesystem probe spy 对 resolver/plan/apply 全路径为零、外部目录不变、contained custom hooks root、继承 `GIT_CONFIG_*` 清洗、命令级 pin、plan/apply drift、postflight drift、symlink escape、blocked schema、已有图普通 setup 不误报 fresh、显式 refresh 计划/执行 `graphify update` 且无 spec-first staging/backup、unknown core-ready 强制 query probe、ready-with-optional-limitation renderer。
 - `npx jest tests/unit/mcp-setup-entrypoint.test.js tests/unit/mcp-setup-node-contracts.test.js tests/unit/mcp-setup-contracts.test.js --runInBand`
   - 结果：3 suites，68 tests，全部通过。
   - 覆盖：完整 required setup 在 external hooksPath 下 exit 0、`overall_status=ready`、Graphify core facts 保持 fresh、human output 不泄露 external hook path。
@@ -33,7 +33,7 @@
 - `SPEC_FIRST_REAL_GRAPHIFY_DOGFOOD=1 npx jest tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js --runInBand`
   - 结果：1 suite，2 tests，全部通过；使用当前 PATH 中真实 `graphify 0.9.12`、`codegraph 1.4.1` 与 uv tool environment。
   - External 场景：临时 HOME 的 global `core.hooksPath` 指向 fixture project 外目录；完整 `--only codegraph,graphify` 在约 24–26 秒内 exit 0、`overall_status=ready`，Graphify 为 `fresh + blocked/manual-only`，external hook tree 的逐文件 SHA-256 snapshot 前后相同，stdout/stderr 不含 external absolute path。
-  - External 重复 setup：已有图时再次运行普通 `--only graphify` 只做完整性与真实 query probe，不生成或刷新图，因此保持 `overall_status=ready`，但 Graphify freshness 为 `unknown + blocked/manual-only`；external hook tree 仍逐字节不变。只有当轮成功执行 first generation 或 explicit refresh 才报告 `fresh`。
+  - External 重复 setup：已有图时再次运行普通 `--only graphify` 只做完整性与真实 query probe，不生成或刷新图，因此保持 `overall_status=ready`，但 Graphify freshness 为 `unknown + blocked/manual-only`；external hook tree 仍逐字节不变。随后修改 fixture source 并运行显式 `--only graphify --refresh`，真实 `graphify update` 使 graph hash 变化、`addedByManualRefresh` query 成功、fresh evidence 恢复，且项目根不存在 `.graphify.backup-*`、`.graphify.staging-*` 或 migration journal。
   - Contained 场景：仓库 local `core.hooksPath=.githooks`；`--only graphify` 在约 22–25 秒内完成，post-commit/post-checkout 均包含唯一 Provider marker、`GRAPHIFY_OUT=.graphify` managed block与 credential isolation block，facts 为 `hook_status=verified`、`refresh_mode=skill-cli-hook-on-demand`。
 
 ### 最终仓库验证
@@ -42,7 +42,7 @@
 - `npm run test:unit`：117 suites，1104 tests，全部通过。
 - `npm run test:smoke`：1 suite，5 tests，全部通过。
 - `npm run test:integration`：6 suites passed，1 suite expected skipped；21 tests passed，2 real-dogfood tests skipped by default。
-- `npm run test:mcp-setup`：28 suites，395 tests，全部通过。
+- `npm run test:mcp-setup`：28 suites，396 tests，全部通过。
 - `npm run lint:skill-entrypoints`：309 files scanned，passed。
 - `npx jest tests/unit/test-inventory-contracts.test.js --runInBand`：1 suite，4 tests，全部通过。
 - `npm run build`：`npm pack --dry-run` 通过；667 files，package 约 1.8 MB，包含 `skills/spec-runtime-setup/scripts/lib/git-path.cjs`。
@@ -57,6 +57,7 @@
 ### Graphify 官方行为与现场日志复核
 
 - PyPI package metadata 将 `graphifyy` 的官方 repository 指向 `https://github.com/safishamsi/graphify`。0.9.12 README 与 packaged `references/hooks.md` 推荐 `graphify hook install`，安装 `post-commit` / `post-checkout`：提交后异步执行 code-only AST rebuild，已有 hook 时追加 Provider marker；docs/images 变化仍需显式 update。
+- 0.9.12 CLI 将 `graphify update <path>`定义为“re-extract code files and update the graph”；实现与官方 hook 共用 `graphify.watch._rebuild_code`。显式 CLI 会阻塞等待 per-repo lock，使用临时 graph 后 replace current graph，保留未变文件、旧 semantic nodes/edges 与 community mapping，并在 shrink guard 拒绝时返回失败。因此 Runtime Setup 直接复用该 Provider owner，不再维护第二套目录级 clean-rebuild/rollback 协议。
 - 0.9.12 packaged `graphify/hooks.py` 与上游 0.9.17 source 都通过 `git rev-parse --git-path hooks` 解析有效 hooks root，CLI 没有 `--hooks-dir` 或 project-only hook 参数。因此全局 `core.hooksPath` 指向用户目录时，官方 installer 仍可能写入共享 hook root；spec-first 的 project containment 是必要授权边界，不应为追求“全绿”移除。
 - `/Users/kuang/xiaobu/email_week_reports/2026-07-17-013914-local-command-caveatcaveat-the-messages-below.txt` 显示执行 agent 把 core-ready `unknown` 误判为 query 需验证并自动运行 refresh。现场只读复核同时确认该仓有效 hooks root 为 `/Users/kuang/.githooks`，其中已存在 Graphify marker 与 `GRAPHIFY_OUT=.graphify` block。由此修正产品语义：普通 setup/verify 的 core-ready `unknown` 不自动 refresh；`manual-only` 只描述 spec-first verified project-local posture，external hook execution 必须标为 unverified，不能声称外部 hook 不存在或“无法安装”。
 

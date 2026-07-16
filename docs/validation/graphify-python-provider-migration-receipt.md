@@ -17,7 +17,7 @@
 - `graphify query common --graph .graphify/graph.json` 与 `graphify path run providerResult --graph .graphify/graph.json` 成功，并返回可回源到 fixture source 的节点与关系。
 - 同机 npm baseline首次setup为fresh，约1.47秒，但发生semantic extract失败后回退到incremental update；Python candidate end-to-end setup为fresh，显式journaled clean refresh约1.15秒。
 - Python Codex临时repo最终达到package/configured/artifact/query/hook全fresh；`.codex/hooks.json`绑定verified isolated launcher，post-commit/post-checkout均验证verified interpreter与`GRAPHIFY_OUT=.graphify`。
-- Clean refresh在contained staging生成并验证后保留`.graphify.backup-*`，current root完成promote且journal清除。
+- 本迁移回执执行时，clean refresh曾在contained staging生成并验证后保留`.graphify.backup-*`，current root完成promote且journal清除。该迁移期行为已被稳态产品合同取代：当前显式refresh使用Provider-native `graphify update`原位更新，spec-first不再创建新的顶层staging/backup。
 - `.cjs` fixture 未被 `0.9.12` classifier 识别，`.js` fixture可正常抽取。这是 candidate capability limitation，不能把任意 Node.js CommonJS repo 的覆盖率视为已确认。
 
 ## 已关闭的 cutover blockers
@@ -32,7 +32,7 @@
 
 ## 当前迁移边界
 
-Python `graphifyy` 是唯一受支持的Graphify runtime。失败恢复通过重装pinned Python wheel、恢复contained `.graphify.backup-*`并重新验证Python readiness完成。
+Python `graphifyy` 是唯一受支持的Graphify runtime。迁移期失败恢复曾通过重装pinned Python wheel、恢复contained `.graphify.backup-*`并重新验证Python readiness完成；当前稳态refresh不再建立spec-first rollback副本，旧migration journal仅作为兼容恢复输入保留。
 
 ## 限制
 

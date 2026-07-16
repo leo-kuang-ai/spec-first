@@ -52,7 +52,7 @@ function createFixture(label) {
 
 function realToolEnvironment(home) {
   const graphifyVersion = requireCommand('graphify').stdout.trim();
-  if (!graphifyVersion.includes('0.9.12')) throw new Error(`需要 graphify 0.9.12，实际为 ${graphifyVersion}`);
+  if (!graphifyVersion.includes('0.9.17')) throw new Error(`需要 graphify 0.9.17，实际为 ${graphifyVersion}`);
   requireCommand('codegraph');
   requireCommand('uv');
   const uvBin = run('uv', ['tool', 'dir', '--bin'], { timeout: 30000 });
@@ -190,6 +190,42 @@ function waitFor(predicate, timeoutMs = 60000, intervalMs = 250) {
     },
   });
   expect(snapshotTree(externalHooks)).toEqual(before);
+
+  const graphPath = path.join(fixture.project, '.graphify', 'graph.json');
+  const beforeRefreshHash = fileHash(graphPath);
+  fs.appendFileSync(
+    path.join(fixture.project, 'src', 'index.js'),
+    'module.exports.addedByManualRefresh = function addedByManualRefresh() { return 3; };\n',
+  );
+  const refreshed = runProjectedSetup(fixture, env, ['--only', 'graphify', '--refresh']);
+  if (refreshed.status !== 0) throw new Error(`external explicit refresh 失败：\n${refreshed.stdout}\n${refreshed.stderr}`);
+  const refreshedGraphify = refreshed.json.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify');
+  expect(refreshedGraphify).toMatchObject({
+    readiness_status: 'fresh',
+    lifecycle: {
+      configured: true,
+      initialized: true,
+      indexed: true,
+      artifact_exists: true,
+      query_verified: true,
+    },
+    steady_state: {
+      refresh_mode: 'manual-only',
+      hook_status: 'blocked',
+      hook_skipped_reason: 'graphify-hook-path-outside-project',
+    },
+  });
+  expect(fileHash(graphPath)).not.toBe(beforeRefreshHash);
+  expect(fs.readdirSync(fixture.project).filter((name) => name.startsWith('.graphify.backup-'))).toEqual([]);
+  expect(fs.readdirSync(fixture.project).filter((name) => name.startsWith('.graphify.staging-'))).toEqual([]);
+  expect(fs.existsSync(path.join(fixture.project, '.graphify-migration-journal.json'))).toBe(false);
+  expect(snapshotTree(externalHooks)).toEqual(before);
+  const query = run('graphify', ['query', 'addedByManualRefresh', '--graph', '.graphify/graph.json'], {
+    cwd: fixture.project,
+    env,
+    timeout: 30000,
+  });
+  if (query.status !== 0) throw new Error(query.stderr || query.stdout);
 }, 360000);
 
 (realDogfood ? test : test.skip)('真实 Graphify 在 contained hooksPath 下安装并验证 commit refresh hook', () => {

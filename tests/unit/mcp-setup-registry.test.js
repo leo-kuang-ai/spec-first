@@ -112,7 +112,7 @@ describe('spec-runtime-setup registry v8', () => {
         id: 'graphify',
         ecosystem: 'pypi',
         package: 'graphifyy',
-        version: '0.9.12',
+        version: '0.9.17',
         command: 'graphify',
         python: {
           requires: '>=3.10',
@@ -123,8 +123,8 @@ describe('spec-runtime-setup registry v8', () => {
           plain_pip_allowed: false,
         },
         distribution: {
-          wheel_url: 'https://files.pythonhosted.org/packages/76/0c/5c52d9e5b535d22c529417e219e23ad2c04532d4d9ca239abc21518f111a/graphifyy-0.9.12-py3-none-any.whl',
-          sha256: '94f9d0d7ef68455a2055c7623fb9574c7a781afb1473d26c7936d1abfc14d62c',
+          wheel_url: 'https://files.pythonhosted.org/packages/39/37/a28af8342d78d322511b6307fac2760ca7b9b3c859fa2dcfbaf7c4b5ddf9/graphifyy-0.9.17-py3-none-any.whl',
+          sha256: 'ef60768aaee7e315d2e2d7da89e971bc1f445f5c8d73ebe4fed550e40a1d687e',
           index_url: 'https://pypi.org/simple',
         },
         hook_normalization_contract: 'graphify-python-hook-normalization.v1',

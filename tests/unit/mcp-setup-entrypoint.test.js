@@ -180,10 +180,10 @@ function fakeRunner(command, args, options = {}) {
     timeout: false,
     stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
       ? (String(args[1]).includes('importlib.metadata')
-        ? JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12']] })
+        ? JSON.stringify({ version: '0.9.17', packages: [['graphifyy', '0.9.17']] })
         : '3.12.1')
       : (graphifyCommand && args[0] === '--version'
-        ? 'graphify 0.9.12'
+        ? 'graphify 0.9.17'
         : (command === 'uv' && args.join(' ') === 'tool dir --bin'
           ? path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'bin')
           : (args[0] === 'status' ? 'ready' : 'ok'))),
