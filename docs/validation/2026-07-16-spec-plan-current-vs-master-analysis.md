@@ -13,6 +13,17 @@
 
 因此，集成后的当前分支应理解为：**当前生命周期/格式/handoff 架构 + `master` 的可信规划质量地板**。静态 source、contract test 和 projection plan 能确认契约存在与分发路径；它们仍不等于真实模型输出质量、宿主 loader 生效或 field outcome。
 
+### Quality-closure 实施更新（2026-07-16）
+
+`docs/plans/2026-07-16-001-refactor-spec-plan-quality-closure-plan.md` 已继续实施：
+
+- 已新增 Markdown/HTML × requirements-only/implementation-ready 四个 source-only fixture 与 12 个 `spec-plan`/`spec-work`/goal consumer replay case。
+- HTML 已从 synthetic skipped envelope 升级为 `spec-doc-review` headless `report-only`：reviewer 零写入，唯一确定的修正由 `spec-plan` 最多两轮 full recompose + re-review 持有。
+- 已建立 dispatch/subagent/web/cache/HTML/reviewer degraded matrix，并补齐 `reuse / extend / compose / new` 四姿态案例；fresh-source 因 `dispatch_authorization_missing` 仍为 `not_run`。
+- `spec-work` source-level replay已覆盖 readiness、Markdown/HTML section map、progress-like invalid value、knowledge-work、sibling discovery 和 thin goal objective；同时最小补上 duplicate/missing/conflicting unified metadata fail-closed repair。
+- Prompt slimming gate 已建立 footprint/protected-behavior map，但因没有 fresh-source paired ablation 证据，安全选择保留当前 `spec-plan/SKILL.md`，没有为追求字节下降删除承重 prose。
+- 五宿主 source projection contract 已确认 runtime-required owners 可投影且 `evals/**` 继续排除；最终 runtime adoption 与 closeout evidence 见 `docs/validation/spec-plan/2026-07-16-quality-closure-eval.md`。
+
 ## 本次再次纠偏：ownership 恢复不等于 composition-first 思想完整恢复
 
 用户所说的“胶水编程、复用、扩展”等不是要求计划文档增加一张复用表，而是要求 `spec-plan` 的 prompt 在形成技术方案时采用更成熟的架构思维。第一轮集成主要恢复了“新增 durable source surface 前做 `reuse / extend / new` owner 判断”，但触发范围和决策空间仍然偏窄：
@@ -50,13 +61,13 @@
 | --- | --- | --- | --- |
 | 工作流定位 | 面向清晰软件 HOW、requirements/PRD handoff、现有 plan deepening；非软件 answer-seeking 默认不落盘。 | 面向所有多步骤工作；明确覆盖软件、non-software、answer-seeking 与 approach-plan。 | `spec-plan` 的入口覆盖面变宽，增加了任务分类和分流责任。 |
 | 上游输入 | 以 requirements document 为主，区分 PRD/brainstorm/legacy origin，并维护 `spec_id`、origin grade/receipt 等 trace。 | 以 Product Contract 为真相源；优先在同一 requirements-only unified artifact 上 enrichment，只承认 `spec-brainstorm` unified origin 与 legacy brainstorm 两种 durable origin；现有 `spec-prd` 按 legacy 兼容读取。 | 从“多个需求文档到新计划”的链路，改为“同一计划从 requirements-only 升格到 implementation-ready”；牺牲了 `spec_id` 作为显式跨工件链路标识。 |
-| 前置分流 | Phase 0 细节委托给 `planning-flow.md`；有 software/universal 路由、bug-shaped 的 `spec-debug` 建议和 ready-to-execute 的 `spec-work` 建议。 | 主干内联 Phase 0；新增 `output:`/`confirm:` 解析、approach-altitude、明确的 code vs answer-seeking 分类、Product Contract discovery 和 scoping synthesis。 | 当前行为更可见、更细化；同时主 `SKILL.md` 从 462 行增长到 821 行，入口认知负担提高。 |
-| 工件与格式 | Markdown 是唯一 canonical artifact；HTML 只能是从 Markdown 派生的 human-readable sidecar，且明确禁止 HTML-only。 | Markdown 与 HTML 变成互斥输出；以 prompt > memory > config > 默认的优先级选择，pipeline 强制 Markdown。HTML 以可见 metadata/anchor 支持下游直接读取。 | 计划可直接以 HTML 交付，但 HTML 目前被显式排除在 `spec-doc-review` mutation 之外，形成已声明的 review capability gap。 |
+| 前置分流 | Phase 0 细节委托给 `planning-flow.md`；有 software/universal 路由、bug-shaped 的 `spec-debug` 建议和 ready-to-execute 的 `spec-work` 建议。 | 主干内联 Phase 0；新增 `output:`/`confirm:` 解析、approach-altitude、明确的 code vs answer-seeking 分类、Product Contract discovery 和 scoping synthesis。 | 当前行为更可见、更细化；同时主 `SKILL.md` 从 462 行增长到 846 行，入口认知负担提高。 |
+| 工件与格式 | Markdown 是唯一 canonical artifact；HTML 只能是从 Markdown 派生的 human-readable sidecar，且明确禁止 HTML-only。 | Markdown 与 HTML 变成互斥输出；以 prompt > memory > config > 默认的优先级选择，pipeline 强制 Markdown。HTML 以可见 metadata/anchor 支持下游直接读取，并由 `spec-doc-review` report-only 审查。 | 计划可直接以 HTML 交付；reviewer 不写 HTML，producer recompose 持有确定性修正，避免把 Markdown mutator 套到 HTML。 |
 | 下游消费 contract | 以 `plan-template.md` 的 Markdown skeleton、`spec_id`、Direct Evidence 和 Markdown frontmatter 为主要契约。 | `plan-sections.md` 定义 `spec-unified-plan/v1`、`artifact_readiness`、`product_contract_source`、`execution`、固定 section registry、Verification Contract 和 Definition of Done；Markdown/HTML 只负责各自 rendering。 | 消费方可以先按 heading/anchor 进行 size-aware 读取，并按 `requirements-only`/`implementation-ready` 决定是否可执行；结构化 lifecycle 更清晰。 |
 | 范围确认与不确定性 | 有 solo/brainstorm scope summary，但由旧 planning-flow 和 synthesis reference 协同。 | 新增 `confirm:auto` / `confirm:ask` 与配置项；Standard/Deep 的 solo synthesis 需确认，Lightweight 且无 call-out 才可自动继续；把 inferred 内容路由为 Assumptions。 | 对 scope claim 的交互约束更明确，也为 headless/pipeline 保留了可追溯的假设出口。 |
 | 研究机制 | `planning-flow.md` 规定 local research、Direct Evidence Readiness、task-governance signals；research dispatch 需要明确 dispatch authorization，否则 inline fallback。 | 增加共享 repo profile cache、repo-profiler、agent-native triage、Slack opt-in、按 implementation-guidance/landscape/mixed 分类的外部研究；generic subagent 使用 skill-local prompt asset。 | 缓存可减少重复 repo orientation，agent-native 研究成为一等场景；但当前文字不再保留原有的 dispatch-authorization/inline-fallback 约束。 |
 | 高风险与新增 surface 治理 | `governance-boundaries.md`、`reuse-analysis.md`、`enterprise-plan-review.md` 作为条件 STOP reference；要求 Direct Evidence、reuse/extend/new 决策、enterprise appendices，并以 `task-governance-signals` 提供 advisory facts。 | 这些独立 reference 与硬 floor 都被移除；风险仍通过深度评分、`security-sentinel`、`data-integrity-guardian`、`deployment-verification-agent` 等 prompt assets 处理，并新增 agent action/context parity lens。 | 风险判断从显式 artifact contract 与 trigger matrix 转向 LLM 选择 specialist 的语义机制；当前 source 没有对旧字段/appendix/信号的等价替代承诺。 |
-| deepening 与 handoff | Confidence-first check 必做 doc review，菜单提供 Start work、task pack、Issue、Proof、Done；HTML sidecar 不改变 Markdown 的 handoff。 | Confidence check 增加“load-bearing external research 必入评分”；Markdown 默认 headless doc review，HTML 生成 synthetic skipped envelope；菜单按 readiness 和 host capability 动态提供 `spec-work`、`/goal`、interactive review、Issue、Proof 或 browser。 | handoff 的 consumer 归属更明确：`spec-work` 是推荐执行尾部 owner，goal 是替代路径；任务包编译不再作为默认菜单项。 |
+| deepening 与 handoff | Confidence-first check 必做 doc review，菜单提供 Start work、task pack、Issue、Proof、Done；HTML sidecar 不改变 Markdown 的 handoff。 | Confidence check 增加“load-bearing external research 必入评分”；Markdown 默认 headless `markdown-write` review，HTML 默认 headless `report-only` review；菜单按 readiness、review status 和 host capability 动态提供 `spec-work`、`/goal`、interactive Markdown review、Issue、Proof 或 browser。 | handoff 的 consumer 归属更明确：`spec-work` 是推荐执行尾部 owner，goal 是替代路径；HTML launch blocker 会降级 readiness 并抑制 execution handoff。 |
 
 ## 关键替换与删除（集成前基线）
 
@@ -86,9 +97,9 @@
 
 ### 4. 输出与 handoff 由静态菜单升级为状态驱动菜单
 
-当前 `plan-handoff.md` 先按输出格式处理 review：Markdown 必跑 `spec-doc-review mode:headless`，HTML 显式跳过并展示原因。然后根据 artifact readiness、`execution: code`、host 是否存在 `create_goal`、以及 residual findings 生成选项。`spec-work` 作为推荐项拥有 implementation engine、review、verification 和 closeout；`/goal` 是绕过该尾部的可选替代。
+当前 `plan-handoff.md` 对两种格式都运行 `spec-doc-review mode:headless`：Markdown 解析为 `markdown-write`，HTML 解析为 `report-only`。HTML review 保留同一 structural/semantic synthesis，但禁止 reviewer mutation；producer-fix candidate 只能由 `spec-plan` full recompose，最多两轮。然后根据 artifact readiness、review status、`execution: code`、host 是否存在 `create_goal`、以及 residual findings 生成选项。`spec-work` 作为推荐项拥有 implementation engine、review、verification 和 closeout；`/goal` 是绕过该尾部的可选替代。
 
-这比 master 的“Start work / task pack / Issue / Proof / Done”更精确地防止 requirements-only 或 knowledge-work artifact 被直接作为 code plan 执行。但 HTML 的 doc-review 空白、以及手动选择 `/goal` 后不经过 `spec-work` 尾部，都是当前 source 已明确需要依赖 host/goal owner 正确执行的边界。
+这比 master 的“Start work / task pack / Issue / Proof / Done”更精确地防止 requirements-only、invalid metadata 或 knowledge-work artifact 被直接作为 code plan 执行。HTML review 空白已关闭为 report-only；真实 host/goal loader 与 goal tail 仍需要独立宿主证据，不能由 source contract 代替。
 
 ## 质量与可验证性变化（集成前基线）
 
@@ -137,7 +148,7 @@
 
 | 层次 | `master` 的结构 | 当前分支集成前结构 | 本轮集成后的结构 | 判断 |
 | --- | --- | --- | --- | --- |
-| 入口热路径 | 462 行 spine；Purpose、Plan-Only、Workflow Summary、三个 mandatory references、Phase 0 委托 | 821 行 spine；unified lifecycle、格式选择、scope/bootstrap/research/deepening/handoff 大量内联 | 845 行 spine；只增加 planning-only、两个 triggered-reference 指针、dispatch fallback、`Inventory before invention` 和 final audit anchors | 保留当前可见 lifecycle，避免把旧 planning-flow 整体复活；composition 细节继续 reference-resident |
+| 入口热路径 | 462 行 spine；Purpose、Plan-Only、Workflow Summary、三个 mandatory references、Phase 0 委托 | 821 行 spine；unified lifecycle、格式选择、scope/bootstrap/research/deepening/handoff 大量内联 | 846 行 spine；只增加 planning-only、两个 triggered-reference 指针、dispatch fallback、`Inventory before invention` 和 final audit anchors | 保留当前可见 lifecycle，避免把旧 planning-flow 整体复活；composition 细节继续 reference-resident |
 | 输入 authority | requirements/PRD/brainstorm 多 origin，`spec_id` 与 receipt/trace metadata | Product Contract 是 authority；requirements-only unified plan 原地 enrichment；PRD legacy compatible | 不变；evidence reference 明确 user → Product Contract → current source → advisory docs/history/provider 的 authority order | 当前统一工件更适合减少 artifact entropy；无需恢复全局 `spec_id` |
 | 首屏内容 | Summary + material Decision Brief，回答 what/why/validation/risk | Goal Capsule 仅强调 objective/authority/stop/execution/tail | Goal Capsule 增 recommended approach、decision focus、verification focus、largest risk/boundary；format-independent section contract 负责内容，Markdown 共享 renderer 只保证 top-loaded，HTML 提供 compact panel | 将历史人类可读优势映射到当前稳定 section/anchor，不新增平行 Decision Brief，也不破坏三 skill Markdown renderer parity |
 | Planning Contract 内容 | KTD、Direct Evidence、reuse/enterprise/surface 附加结构 | KTD、HTD、assumptions、constraints、sequencing、research | 增 evidence limitations、architecture posture、composition/source ownership decision、conditional system-wide surface coverage 与 high-risk landing | 用 conditional subsection/KTD/unit 字段承接，不恢复固定大型模板 |
@@ -146,12 +157,12 @@
 | 高风险 | `enterprise-plan-review.md`，10 类 trigger、hard gates、可选 appendix、specialist mapping | 深度评分 + security/data/deployment/performance prompts，缺少统一最小问题集 | `high-risk-plan-lens.md` 覆盖 money、auth、privacy、scale、async、scheduled job、state machine、migration、data/ML、rollout | 恢复“计划必须回答什么”；不恢复“每份计划填 appendix” |
 | Multi-surface | 条件化 enrich `System-Wide Impact`，in/out/deferred derived list | `System-Wide Impact` 仍在，但枚举约束变弱 | 主 quality bar、section contract、deepening audit 三处一致恢复 client/service/contract/data/ops/test/agent-tool coverage | breadth 由 orchestrator/plan structure 守护，depth 仍由 specialist/LLM 判断 |
 | Research dispatch | 需要 capability + per-run authorization；否则 inline sequential | generic skill-local prompts，可并行，但授权边界不显式 | 主 research、Slack、external、flow analysis、deepening 均恢复授权门和 inline/serial fallback | 直接调用 workflow 不等于授权 subagent、persona、并行、web/Slack 外部访问 |
-| 输出格式 | Markdown canonical，HTML sidecar | Markdown/HTML exclusive；HTML 有 visible metadata/anchors，但 doc-review skip | 保持当前 exclusive format；两种 rendering 同步 Goal Capsule 首屏字段 | 不引入双 artifact drift；HTML read-only review gap 保留为后续能力 |
+| 输出格式 | Markdown canonical，HTML sidecar | Markdown/HTML exclusive；HTML 有 visible metadata/anchors | 保持当前 exclusive format；两种 rendering 同步 Goal Capsule 首屏字段；HTML 增 report-only review + producer recompose | 不引入双 artifact drift；reviewer 与 producer mutation ownership 分离 |
 | Handoff | 静态菜单含 work/task-pack/Issue/Proof/Done | readiness/capability 驱动，`spec-work` 推荐，goal 作为替代 tail | 不变 | 当前 ownership 更清楚，不应因回补质量 lens 而回滚 handoff |
-| Evals | 17 route cases + output-quality fixtures，历史上进入 runtime projection | eval package 删除；当前 plugin 明确 maintainer eval source-only | 恢复 14 个 route/boundary/failure cases 与 14 个 output-quality cases；仍 source-only | 新增 composition 的正反 case，但不照搬旧 runtime-copy 行为或把 fixture 当模型证据 |
+| Evals | 17 route cases + output-quality fixtures，历史上进入 runtime projection | eval package 删除；当前 plugin 明确 maintainer eval source-only | 扩展为 20 个 route/boundary/degraded cases、15 个 output-quality cases，以及 12 个 consumer replay cases；仍 source-only | 四姿态、HTML、degraded 与 consumer contract 均有机械回归地板，但不把 fixture 当模型证据 |
 | 宿主投影 | 历史重点验证 Claude/Codex | 当前支持 Claude、Codex、Cursor、Kiro、Qoder | 新 contract test 对五宿主验证两个新 references 和 nested agent asset 会投影，`evals/` 不投影 | 以 `getSupportedPlatforms()` 为准，避免只恢复双宿主假设 |
 
-## 当前分支应补充的能力：保留当前架构，不直接回滚 `master`
+## 能力补充建议与当前落实状态：保留当前架构，不直接回滚 `master`
 
 ### 判断原则
 
@@ -165,14 +176,14 @@
 
 ### 建议优先级
 
-| 优先级 | 建议补充的能力 | 应从 master 继承什么 | 在当前结构中的最小落点 | 预期收益 | 不应做什么 |
-| --- | --- | --- | --- | --- | --- |
-| P0 | Evidence / source-runtime 边界 | `governance-boundaries.md` 的 runtime mirror exclusion、provider advisory、source-first、summary-first intake | 新增一个按条件读取的轻量 `references/planning-evidence-boundaries.md`；在 Phase 0.2/1.1 对跨 repo、外部 provider、generated runtime 或 advisory graph 触发它；在 `Planning Contract` 增加仅在证据影响方案时出现的 `### Evidence & Limitations` | 避免 runtime mirror、陈旧 graph 或学习笔记被当作 plan truth；让 reviewer 知道结论的 source refs、freshness 与 limitation | 不恢复全量 context ledger 或强制每个轻量计划写 Direct Evidence 长表 |
-| P0 | 高风险决策 lens | `enterprise-plan-review.md` 的 trigger→必要决策：payment/permission/privacy/migration/async/rollout 的 invariant、idempotency、final failure、rollback、verification | 新增 `references/high-risk-plan-lens.md`，只在当前高风险信号命中时由 Phase 0.6 / 5.1 / 5.3 读取；要求把缺口落到 KTD、Risks、Verification、Open Questions 或明确 deferment | 使当前 generic risk score 重新获得可审查的“计划至少回答什么”，而非只依赖 specialist 是否被挑中 | 不恢复所有 enterprise appendix，更不能让 trigger 脚本自动判定语义合格或把每个高风险计划强制 Deep |
-| P1 | capability inventory、composition 与 ownership 决策 | `reuse-analysis.md` 的 existing capability / `reuse / extend / new`、历史方案的 specialist/owner 复用、当前 agent-native primitive composition 思想 | 在 `planning-evidence-boundaries.md` 内扩展为 `reuse / extend / compose / new`；触发 abstraction、adapter/wrapper、orchestrator、integration seam/pipeline 或 durable surface；由 synthesis/deepening/architecture/pattern prompts 共同承载 | 防止在已有 owner 上旁路新建第二事实源，也防止用无价值 wrapper/平行 pipeline 伪装复用；同时保护职责冲突时的 justified new boundary | 不要求普通 bug、文案、已有文件小改写 reuse matrix；不把 composition 变成绝对偏好，也不让脚本替 LLM 选择架构 |
-| P1 | 显式 dispatch 授权与 inline fallback | `planning-flow.md` 的 `dispatch_authorization_missing`、无 capability / 无授权时 inline sequential fallback | 恢复到 Phase 1.1、1.3、1.5 与 `deepening-workflow.md` 5.3.6：generic subagent 只能在用户或上游 handoff 已授权时启动；否则仍执行同一 research intent，但在当前 agent inline/serial 完成并记录降级 | 使 skill package 自身跨宿主可移植，不只依赖本仓库根级 AGENTS 来阻止未授权 dispatch | 不把“调用 `spec-plan`”解释成对子 agent、外部检索、并行的隐含授权；也不因无 subagent 而停止生成计划 |
-| P1 | 可回归的行为覆盖 | master 的 examples/output-quality 思路、enterprise/governance contract tests 的保护范围 | 不恢复 630 行静态样例原样；建立小的 route/contract fixture matrix，覆盖 unified enrich、legacy、PRD compatibility、answer-seeking、approach altitude、HTML review skip、cache miss、无 dispatch、高风险 lens、新 surface ownership | 防止 prompt 精简或 source 拆分再次静默删除关键分支；让调整有最小 regression floor | 不把静态文本断言说成 LLM 质量或 host loader 证明；需要另有 fresh-source/host scenario evidence |
-| P2 | HTML 审阅的诚实等价路径 | master 的“plan 变更后须复审”意图 | 不在 `spec-plan` 内手写 HTML mutation；先为 `spec-doc-review` 提供 read-only HTML structural/semantic review，或在未具备前保留当前显式 skip + limitation | 减少 HTML 作为一等输出却无法获得任何审阅的证据空洞 | 不把 Markdown mutator 套到 HTML，也不把 skip 伪装成 review passed |
+| 优先级 | 落实状态 | 建议补充的能力 | 应从 master 继承什么 | 在当前结构中的最小落点 | 预期收益 | 不应做什么 |
+| --- | --- | --- | --- | --- | --- | --- |
+| P0 | 已完成 | Evidence / source-runtime 边界 | `governance-boundaries.md` 的 runtime mirror exclusion、provider advisory、source-first、summary-first intake | `references/planning-evidence-boundaries.md` 已按条件承载跨 repo、外部 provider、generated runtime、advisory graph 与 `Evidence & Limitations` | 避免 runtime mirror、陈旧 graph 或学习笔记被当作 plan truth；让 reviewer 知道结论的 source refs、freshness 与 limitation | 不恢复全量 context ledger 或强制每个轻量计划写 Direct Evidence 长表 |
+| P0 | 已完成 | 高风险决策 lens | `enterprise-plan-review.md` 的 trigger→必要决策：payment/permission/privacy/migration/async/rollout 的 invariant、idempotency、final failure、rollback、verification | `references/high-risk-plan-lens.md` 只在高风险信号命中时读取，缺口必须落到 KTD、Risks、Verification、Open Questions 或明确 deferment | 使 generic risk score 重新获得可审查的“计划至少回答什么”，而非只依赖 specialist 是否被挑中 | 不恢复所有 enterprise appendix，更不能让 trigger 脚本自动判定语义合格或把每个高风险计划强制 Deep |
+| P1 | 已完成 | capability inventory、composition 与 ownership 决策 | `reuse-analysis.md` 的 existing capability / `reuse / extend / new`、历史方案的 specialist/owner 复用、当前 agent-native primitive composition 思想 | `planning-evidence-boundaries.md`、synthesis/deepening 与 architecture/pattern prompts 已共同承载 `reuse / extend / compose / new` | 防止在已有 owner 上旁路新建第二事实源，也防止用无价值 wrapper/平行 pipeline 伪装复用；同时保护职责冲突时的 justified new boundary | 不要求普通 bug、文案、已有文件小改写 reuse matrix；不把 composition 变成绝对偏好，也不让脚本替 LLM 选择架构 |
+| P1 | 已完成 | 显式 dispatch 授权与 inline fallback | `planning-flow.md` 的 `dispatch_authorization_missing`、无 capability / 无授权时 inline sequential fallback | `spec-plan` 与 `spec-doc-review` 均要求显式授权；无授权或无 callable primitive 时应用同一 prompt asset inline/serial，并记录 reason code 与 coverage limitation | 使 skill package 自身跨宿主可移植，不只依赖本仓库根级 AGENTS 来阻止未授权 dispatch | 不把调用 workflow 解释成对子 agent、外部检索、并行的隐含授权；也不因无 subagent 而停止生成计划或审查 |
+| P1 | 已完成（机械地板） | 可回归的行为覆盖 | master 的 examples/output-quality 思路、enterprise/governance contract tests 的保护范围 | 20 个 route/boundary/degraded cases、15 个 output-quality cases、12 个 consumer replay cases 与成对 Markdown/HTML fixture 已落地 | 防止 prompt 精简或 source 拆分再次静默删除关键分支；让调整有最小 regression floor | 不把静态文本断言说成 LLM 质量或 host loader 证明；fresh-source/host/field 仍单独标注 |
+| P2 | 已完成（source contract） | HTML 审阅的诚实等价路径 | master 的“plan 变更后须复审”意图 | `spec-doc-review` 对 HTML 使用 `report-only`，`spec-plan` 最多两轮 producer full recompose + re-review；未关闭 launch blocker 时生成有效 requirements-only shape 并抑制 handoff | 消除 HTML 一等输出却完全未审阅的证据空洞，同时保持 reviewer/producer ownership 清晰 | 不把 Markdown mutator 套到 HTML，也不把零写入误写成 clean 或 autofix |
 
 ### 三项 P0/P1 建议的具体 contract 形状
 
@@ -231,13 +242,13 @@ current source before writing and report any material deviation.
 | Proof 双向同步作为默认路径 | 会引入 local/proof stale 状态、pull、再审阅和冲突处理；当前 one-way publish 的 canonical boundary 更清楚。 | 保持 one-way publish；若未来要双向，另建具有原子同步、revision/review re-run 证据的独立 contract。 |
 | 原 master 大型 eval fixture 的原样复制 | 大量文本样例的存在不等于执行质量；原样回填会增加维护面却未必覆盖当前 unified/HTML/goal 分支。 | 新建小而明确的 route matrix + fresh-source scenario + host capability evidence，按风险升级。 |
 
-### 最小落地顺序与验证
+### 最小落地顺序与验证（当前已完成状态）
 
-1. **U1 — evidence boundary**：增加条件 reference 与 `Evidence & Limitations` 内容规则；对 generated runtime、provider-untrusted、cross-repo、普通 local 四个 fixture 做 source contract test。
-2. **U2 — high-risk lens**：增加五类风险的最小问题与落点规则；每类用一个 plan fixture 验证“有明确决定”和“信息不足时进入 Open Question”两条路径。
-3. **U3 — dispatch fallback**：恢复授权检查和 inline/serial fallback；在有/无 dispatch authorization、无 subagent capability 三个宿主条件下验证不会静默派发或停止计划。
-4. **U4 — capability/composition/ownership lens 与行为矩阵**：为“已有 owner 直接扩展”“两个 capability 通过薄胶水组合”“职责冲突时创建新 boundary”“普通已有-file 修改”分别建立 fixture；确认架构姿态是语义判断而非固定复用偏好，且普通小改不膨胀。
-5. **U5 — HTML review feasibility spike**：在 `spec-doc-review` 做只读 HTML scenario；若无法证明不会破坏 artifact，就维持明确 skip，而不是在 `spec-plan` 内伪造 review gate。
+1. **U1 — evidence boundary（已完成）**：条件 reference、`Evidence & Limitations` 与 source contract tests 已落地。
+2. **U2 — high-risk lens（已完成）**：高风险最小问题、语义落点和对应 fixture 已落地。
+3. **U3 — dispatch fallback（已完成 source contract）**：`spec-plan`/`spec-doc-review` 均区分 workflow admission 与 dispatch authorization，无授权或无 capability 时 inline/serial 降级并记录 reason code。
+4. **U4 — capability/composition/ownership lens 与行为矩阵（已完成 mechanical）**：reuse/extend/compose/new 四姿态及普通轻量修改保护已进入 fixture、specialist、consumer 与 projection contract。
+5. **U5 — HTML review feasibility（已完成 source contract）**：HTML 使用 report-only review；reviewer 零写入，producer bounded full recompose，未关闭 blocker 时 fail closed 到有效 requirements-only artifact。
 
 每个 U 的完成证据应区分：source contract/unit test（confirmed mechanical fact）、fresh-source review（advisory semantic judgment）、真实宿主 invocation（loader/behavior evidence）。在得到最后一类之前，README/Changelog 不应声称 host behavior 或 quality outcome 已被证明。
 
@@ -270,8 +281,9 @@ current source before writing and report any material deviation.
 | `skills/spec-plan/references/agents/architecture-strategist.md` | 修改 | composition-first decision ladder、thin-glue ownership、new-boundary escape hatch | 该 specialist 已拥有架构边界与 trade-off 判断；扩展现有 owner 比新增“胶水架构 agent”更合适 |
 | `skills/spec-plan/references/agents/pattern-recognition-specialist.md` | 修改 | reuse/extension candidates、composition seams、unnecessary wrapper/parallel pipeline、forced reuse | 该 specialist 已拥有 pattern、duplication 与 boundary guidance；直接增强其 planning output |
 | `skills/spec-plan/evals/README.md` | 新增 | fixture authority 与 proof limitation | 防止 maintainer fixtures 被误当 runtime/router/field evidence |
-| `skills/spec-plan/evals/examples.json` | 新增 | 14 个 trigger/boundary/failure cases | 覆盖 unified enrich、direct invocation、answer-seeking、approach altitude、deepening、legacy PRD、HTML、cache miss、work route、plan-only、runtime boundary、dispatch、高风险、ownership |
-| `skills/spec-plan/evals/output-quality-cases.json` | 新增后继续扩展 | 14 个 file-backed quality cases | 在首屏、evidence、高风险、ownership、multi-surface、lightweight 基础上，新增薄胶水组合、已有 owner 扩展、职责冲突时新 boundary 三个对立 case；每例保留 `missing_evidence` |
+| `skills/spec-plan/evals/examples.json` | 新增后继续扩展 | 20 个 trigger/boundary/degraded cases | 覆盖 unified enrich、direct invocation、answer-seeking、approach altitude、deepening、legacy PRD、HTML、cache、work route、plan-only、runtime boundary、dispatch/web/subagent/reviewer degraded、高风险、ownership |
+| `skills/spec-plan/evals/output-quality-cases.json` | 新增后继续扩展 | 15 个 file-backed quality cases | 在首屏、evidence、高风险、ownership、multi-surface、lightweight 基础上，完整覆盖 reuse、extend、compose、justified new 四姿态；每例保留 `missing_evidence` |
+| `skills/spec-plan/evals/consumer-replay-cases.json` | 新增 | 12 个 consumer replay cases + 四层 fresh-source protocol | 成对回放 Markdown/HTML × readiness 对 `spec-plan`、`spec-work`、goal 的 route、mutation、section map 与 thin objective contract |
 
 ### 新增 deterministic regression floor
 
@@ -300,7 +312,7 @@ current source before writing and report any material deviation.
 - repo profile cache 与 skill-local generic prompt assets；
 - agent-native action/context/tool/approval/shared-workspace planning lens；
 - composition-first 架构姿态：existing capability inventory、reuse/extend、thin-glue composition、justified new boundary；
-- dynamic handoff 与 HTML doc-review skip 的诚实 limitation。
+- dynamic handoff 与 HTML report-only review 的零写入、producer recompose 和 evidence limitation。
 
 ### 明确未集成的 `master` 机制
 
@@ -326,7 +338,7 @@ current source before writing and report any material deviation.
 - 旧 `2026-06-23` fresh-source pass 只证明当时 source，不被用来证明本轮新增文案。
 - 本轮 deterministic checks 能确认 source package、fixture shape 与 projection plan；未进行真实 Claude/Codex/Cursor/Kiro/Qoder session invocation，因此 host behavior/loader outcome 仍是未验证项。
 - 三个 composition quality case 是 source-owned expectation，不是模型执行记录；本轮只能确认 prompt/eval/test coverage，不能声称真实计划已稳定减少 wrapper 或平行 pipeline。
-- HTML 的 `spec-doc-review` read-only/semantic review 能力未在本轮实现，当前显式 skip 仍是诚实 degraded path。
+- HTML 的 `spec-doc-review` report-only source contract 已实现并有 mutation-entry guards、envelope 与 fixture hash 证据；真实 reviewer finding 质量、宿主 loader 与 field outcome 仍未验证。
 
 ### 已执行验证
 
@@ -334,22 +346,28 @@ current source before writing and report any material deviation.
 | --- | --- | --- |
 | `validate-authoring-preview.cjs` 初始 write-set + renderer repair + surface harmonization + composition-first follow-up | 四次 `pass`；四次 receipt 均允许 completion claim | canonical root、hash/snapshot、dirty overlap、exact path set 与 after hash 一致 |
 | `validate-skill.cjs skills/spec-plan --json` | `pass`；唯一 warning 为保留 target-owned `argument-hint` | package path/frontmatter/basic structure 合法 |
-| 聚焦 Jest：`spec-plan-contracts`、`spec-plan-quality-contracts`、`repo-profile-cache-parity`、`plugin-modules` | 4 suites / 26 tests passed | unified lifecycle 未回归，composition prompt anchors、新质量 contract、cache parity、五宿主 projection/source-only eval 边界成立 |
+| Quality-closure 聚焦 Jest：`spec-doc-review-contracts`、`spec-plan-quality-contracts`、`spec-plan-consumer-replay-contracts`、`repo-profile-cache-parity`、`spec-work-contracts`、`plugin-modules` | 6 suites / 74 tests passed | HTML/dispatch/mutation、composition、consumer replay、cache、spec-work intake 与五宿主 projection/source-only eval 边界成立 |
 | `npm run test:eval-fixtures -- --silent --no-cache` | 6 suites / 76 tests passed | repo 级 active fixture/source-ref/replay contract 仍一致 |
-| `npm run test:unit -- --runInBand --silent` | 102 suites / 931 tests passed | 最终工作树 unit regression floor 通过 |
-| `npm run lint:skill-entrypoints` | 303 files scanned，passed | public/internal skill entrypoint 治理未漂移 |
+| `npm run test:unit -- --runInBand --silent` | 103 suites / 952 tests passed | 最终工作树 unit regression floor 通过 |
+| `npm run lint:skill-entrypoints` | 305 files scanned，passed | public/internal skill entrypoint 治理未漂移 |
 | `npm run typecheck` | 179 files checked，passed | CLI/关键脚本语法地板通过 |
 | JSON parse + `git diff --check` + untracked file diff checks | passed | 新 fixture/manifest 可解析且 tracked/untracked 文本无 whitespace error |
 
 完整 unit suite 的第一次运行曾发现 `requirements-rendering-parity.test.js` 失败：plan-only Goal Capsule 字段被误放进三 skill 共享 Markdown renderer。该 finding 通过第二个 authoring preview 撤回，最终 renderer byte parity 与全量 unit suite 均通过。第一轮与本次 composition follow-up 的 eval-fixture 首跑都按预期发现 requirements-clarification current-source manifest 仍绑定写入前的 `spec-plan` hash；每次都只刷新当前 source hash，并明确历史 2026-07-12 unit replay 未重跑、hash refresh 不构成新的 replay 或模型行为 evidence。
 
-## 建议的后续核验顺序
+## 后续核验状态
 
-1. 为 Markdown 和 HTML 各构造 requirements-only → implementation-ready → handoff 的受控 fixture，确认 `spec-work`、`/goal` 和 `spec-doc-review` 的真实 consumer 行为与 source 宣称一致。
-2. 对高风险（权限、数据迁移、异步/rollout）以及 reuse/extend/compose/new 四类 architecture posture 建立 fresh-source 行为 eval，重点观察真实计划是否减少无价值 wrapper/平行 pipeline，同时仍能在职责冲突时选择新 boundary。
-3. 在无 subagent、无 web、cache miss/dirty profile、HTML 输出等 degraded 情景下做 fresh-source/host capability 验证，并记录哪些结论是 source contract、哪些是实际 host outcome。
+| 核验项 | 当前状态 | 证据边界 |
+| --- | --- | --- |
+| Markdown/HTML × 两种 readiness fixture 与 consumer replay | source-contract passed | 证明 metadata/section/route/oracle，不证明真实模型执行 |
+| HTML report-only review feasibility | source-contract passed | 证明 mutation policy、guard、envelope 和受控 fixture byte preservation |
+| degraded matrix 与四姿态 matrix | mechanical passed | 证明 case/oracle 在场，不证明 planner 稳定采用 |
+| `spec-work`/goal compatibility | source-level replay passed | `spec-work` 做过最小 metadata fail-closed 修复；真实 goal 未启动 |
+| Prompt slimming ablation | not_run | `dispatch_authorization_missing`；当前 source 保留，无删减晋升 |
+| 五宿主 projection | mechanical passed | 证明 projection operations 携带 runtime owners、排除 evals |
+| 五宿主 clean-session loader / field outcome | not_run | 仍需独立宿主或真实使用证据 |
 
-其中 evidence/high-risk/dispatch/ownership/composition/eval 的 source integration 已在本轮完成；真实 Markdown/HTML consumer replay、fresh-source behavior eval 与 HTML review feasibility 仍是后续验证范围。
+完整当前结果、hash、命令与 limitation 见 `docs/validation/spec-plan/2026-07-16-quality-closure-eval.md`。
 
 ## 证据索引
 
@@ -358,7 +376,7 @@ current source before writing and report any material deviation.
 - Integrated quality references：`skills/spec-plan/references/planning-evidence-boundaries.md`、`skills/spec-plan/references/high-risk-plan-lens.md`、`skills/spec-plan/references/deepening-workflow.md`、`skills/spec-plan/references/synthesis-summary.md`。
 - Composition specialist prompts：`skills/spec-plan/references/agents/architecture-strategist.md`、`skills/spec-plan/references/agents/pattern-recognition-specialist.md`；现存 primitive composition 原则：`skills/spec-plan/references/agents/agent-native-planning-strategist.md`。
 - Artifact contract：`skills/spec-plan/references/plan-sections.md`；format contract：`references/markdown-rendering.md`、`references/html-rendering.md`；handoff：`references/plan-handoff.md`。
-- Maintainer fixtures：`skills/spec-plan/evals/{README.md,examples.json,output-quality-cases.json}`；focused test：`tests/unit/spec-plan-quality-contracts.test.js`。
+- Maintainer fixtures：`skills/spec-plan/evals/{README.md,examples.json,output-quality-cases.json,consumer-replay-cases.json,fixtures/consumer-replay/**}`；focused tests：`tests/unit/spec-plan-quality-contracts.test.js`、`tests/unit/spec-plan-consumer-replay-contracts.test.js`。
 - Removed master contracts：`master:skills/spec-plan/references/{governance-boundaries,reuse-analysis,enterprise-plan-review,planning-flow,plan-template}.md` 以及 `master:skills/spec-plan/evals/**`。
 - Test-source comparison：`tests/unit/spec-plan-contracts.test.js`、`tests/unit/spec-plan-enterprise-contracts.test.js`、`tests/unit/spec-plan-governance-signals-contract.test.js`、`tests/unit/repo-profile-cache-parity.test.js`、`tests/unit/ce-upstream-skill-sync-contracts.test.js`。
 - Historical completed plans：`docs/plans/2026-06-11-001-refactor-spec-plan-decision-surface-coverage-plan.md`、`2026-06-11-003-refactor-spec-plan-plan-mode-hardening-plan.md`、`2026-06-11-004-refactor-spec-plan-skill-slimming-plan.md`、`2026-06-12-005-refactor-spec-plan-surface-coverage-lens-plan.md`、`2026-06-22-004-refactor-spec-plan-skill-quality-plan.md`、`2026-06-28-004-refactor-spec-plan-enterprise-architect-upgrade-plan.md`。

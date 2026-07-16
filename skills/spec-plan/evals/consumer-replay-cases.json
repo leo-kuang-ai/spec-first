@@ -11,6 +11,40 @@
     "skills/spec-work/references/execution-engines.md"
   ],
   "source_ref_authority": "source",
+  "fresh_source_protocol": {
+    "authorization_required": true,
+    "not_run_reason_code": "dispatch_authorization_missing",
+    "checklist": "docs/contracts/workflows/fresh-source-eval-checklist.md",
+    "source_injection": "Inject current canonical skill/reference source plus one fixture and its manifest oracle into a fresh read-only generic reviewer with minimal inherited context.",
+    "mandatory_case_ids": [
+      "markdown-requirements-only-spec-plan",
+      "markdown-requirements-only-spec-work",
+      "markdown-requirements-only-goal-handoff",
+      "markdown-implementation-ready-spec-plan",
+      "markdown-implementation-ready-spec-work",
+      "markdown-implementation-ready-goal-handoff",
+      "html-requirements-only-spec-plan",
+      "html-requirements-only-spec-work",
+      "html-requirements-only-goal-handoff",
+      "html-implementation-ready-spec-plan",
+      "html-implementation-ready-spec-work",
+      "html-implementation-ready-goal-handoff"
+    ],
+    "oracles": [
+      "artifact classification",
+      "consumer route",
+      "stable section selection",
+      "mutation policy",
+      "thin objective deletion test"
+    ],
+    "paired_rerun": "Repeat any disagreement once with the same source bundle and oracle; unresolved disagreement is concerns, not pass.",
+    "claim_levels": [
+      "mechanical source contract",
+      "fresh-source semantic judgment",
+      "host invocation/loader observation",
+      "field outcome"
+    ]
+  },
   "cases": [
     {
       "id": "markdown-requirements-only-spec-plan",

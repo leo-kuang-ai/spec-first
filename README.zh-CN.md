@@ -166,6 +166,8 @@ docs/
 | 文档/计划审查 | `spec-doc-review` | 结构化 findings |
 | 沉淀可复用经验 | `spec-compound` | `docs/solutions/` |
 
+`spec-plan` 在提出新 abstraction、adapter、orchestrator、integration seam 或 durable source 前先盘点已有能力，并在 `reuse / extend / compose / new` 中做语义取舍；`compose` 只允许薄胶水持有 contract translation、sequencing、failure/degradation routing 与 observability/evidence，不复制业务真相或平行持久状态。Markdown 和 HTML 都是 unified plan 的一等格式：Markdown review 可安全写入，HTML 由 `spec-doc-review` report-only 审查，确定性修正由 `spec-plan` 完整重组后复审。`spec-work` 会拒绝 requirements-only、progress-like readiness 以及重复、缺失或冲突的 unified metadata，并按稳定 heading/anchor 读取 implementation-ready artifact。以上 source/projection contract 不等于真实宿主 loader、模型质量或 field outcome 证据。
+
 支撑入口（按需触发）：`spec-runtime-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
 
 需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。

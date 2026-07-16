@@ -106,6 +106,8 @@ describe('spec-plan quality integration contracts', () => {
     expect(handoff).toMatch(/full recompose/i);
     expect(handoff).toMatch(/at most two.*recompose.*review/is);
     expect(handoff).toMatch(/artifact_readiness.*requirements-only/is);
+    expect(handoff).toMatch(/remove Planning Contract, Implementation Units, Verification Contract, and Definition of Done/is);
+    expect(handoff).toMatch(/Never flip readiness metadata while leaving implementation-ready sections in place/);
     expect(handoff).toMatch(/suppress.*spec-work.*goal/is);
     expect(handoff).not.toContain('skipped_reason = "output_format_html"');
     expect(handoff).not.toContain('HTML plans skip this phase entirely');
@@ -147,6 +149,7 @@ describe('spec-plan quality integration contracts', () => {
       'existing-capabilities-compose-through-thin-glue',
       'existing-owner-extends-instead-of-parallel-abstraction',
       'new-boundary-wins-when-reuse-mixes-concerns',
+      'existing-capability-reused-as-is',
       'multi-surface-plan-closes-coverage',
       'lightweight-change-stays-lean',
     ]) {
@@ -162,6 +165,49 @@ describe('spec-plan quality integration contracts', () => {
     for (const sourceRef of [...examples.source_refs, ...quality.source_refs]) {
       expect(sourceRef).toMatch(/^skills\/spec-plan\//);
       expect(sourceRef).not.toMatch(/^\.(?:claude|codex|agents|cursor|kiro|qoder)\//);
+    }
+  });
+
+  test('defines a complete degraded scenario contract and four architecture postures', () => {
+    const examples = readJson('evals/examples.json');
+    const quality = readJson('evals/output-quality-cases.json');
+    const degradedById = new Map(examples.cases
+      .filter((entry) => entry.degraded_contract)
+      .map((entry) => [entry.id, entry.degraded_contract]));
+
+    for (const id of [
+      'dispatch-authorization-missing-falls-back-inline',
+      'subagent-capability-missing-falls-back-inline',
+      'web-capability-missing-records-research-limit',
+      'repo-profile-cache-miss-has-inline-path',
+      'repo-profile-dirty-input-invalidates-hit',
+      'html-report-only-review-preserves-artifact',
+      'reviewer-partial-failure-preserves-coverage',
+      'mandatory-review-coverage-missing-is-incomplete',
+    ]) {
+      expect(degradedById.has(id)).toBe(true);
+      const contract = degradedById.get(id);
+      for (const field of [
+        'facts',
+        'authorization',
+        'expected_fallback',
+        'forbidden_behavior',
+        'reason_code',
+        'remaining_work',
+        'claim_ceiling',
+      ]) {
+        expect(contract[field]).toBeTruthy();
+      }
+    }
+
+    const postureIds = new Set(quality.cases.map((entry) => entry.id));
+    for (const id of [
+      'existing-capability-reused-as-is',
+      'existing-owner-extends-instead-of-parallel-abstraction',
+      'existing-capabilities-compose-through-thin-glue',
+      'new-boundary-wins-when-reuse-mixes-concerns',
+    ]) {
+      expect(postureIds.has(id)).toBe(true);
     }
   });
 

@@ -42,6 +42,7 @@ After reading and classifying the document, set exactly one run-local `mutation_
 
 - `markdown-write` — only when the document is confirmed Markdown by content shape and path and the platform can write it. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available.
 - `report-only` — mandatory for HTML content or a `.html` artifact. Run the same reviewer roster, schema validation, confidence gate, deduplication, severity routing, Coverage, and limitations reporting, but do not invoke any document mutation path.
+- `report-only` — also mandatory when the document is confirmed Markdown but the platform cannot write it. Record `mutation_reason: write-unavailable`; keep the full review and finding envelope, but do not imply that Markdown mutation was attempted.
 - If extension, declared format, and content shape conflict, or the format remains ambiguous, fail closed to `report-only` and record `mutation_reason: format-conflict-or-ambiguous` in the envelope. Never guess Markdown write eligibility from the path alone.
 
 For ordinary HTML use `mutation_reason: html-artifact`. A report-only request is valid in both headless and interactive delivery; interactive delivery still returns the structured report-only envelope and does not offer a mutation walkthrough.
@@ -102,7 +103,9 @@ Tell the user which personas will review and why (justify conditionals), includi
 
 ### Dispatch
 
-Dispatch generic subagents with **bounded parallelism** via the platform's subagent primitive (`Agent` in Claude Code, `spawn_agent` in Codex) where available, otherwise inline/serially. Omit the `mode` parameter so the user's permission settings apply. Respect the harness's active-subagent limit: queue selected reviewers, dispatch as many as accepted, fill freed slots as reviewers complete. Treat capacity-limit spawn errors as backpressure, not failure — leave the reviewer queued and retry after a slot frees; record failure only after a successful dispatch times out/fails or for a non-capacity reason.
+**Dispatch authorization gate.** A direct invocation of `spec-doc-review` authorizes this document-review workflow, not host-level subagent dispatch. Dispatch only when the user or an upstream handoff explicitly authorized subagents, personas, delegated review, or parallel-agent work for this run. When dispatch is unauthorized, record `dispatch_authorization_missing` in Coverage and Limitations, set `isolation=degraded_inherited`, and apply the same selected persona prompt assets inline or serially in the current agent. Do not claim independent persona coverage or context isolation. This dispatch fallback is orthogonal to `mutation_policy`: Markdown may still use `markdown-write`, while HTML and other report-only inputs remain non-mutating.
+
+When dispatch is authorized, dispatch generic subagents with **bounded parallelism** via the platform's subagent primitive (`Agent` in Claude Code, `spawn_agent` in Codex) where available. When the host exposes no callable primitive, record `subagent_capability_missing` and use the same inline/serial fallback. Omit the `mode` parameter so the user's permission settings apply. Respect the harness's active-subagent limit: queue selected reviewers, dispatch as many as accepted, fill freed slots as reviewers complete. Treat capacity-limit spawn errors as backpressure, not failure — leave the reviewer queued and retry after a slot frees; record failure only after a successful dispatch times out/fails or for a non-capacity reason.
 
 **Context isolation (required intent):** each reviewer prompt is self-contained (persona + schema + document slice + primer). Prefer **minimum parent-context inheritance** when the host supports it (e.g. Codex `fork_turns: "none"`). Do not rely on the child inheriting the orchestrator's full skill text or chat history — if the host cannot isolate, set `isolation=degraded_inherited` on the cost-shape line and proceed; never claim isolation that did not happen.
 
@@ -134,7 +137,7 @@ Each entry carries an `Evidence:` line because R29/R30 (`references/synthesis-an
 
 Accumulate across all rounds in the session. Skip, Defer, and Acknowledge all count as "rejected" for suppression purposes. Applied findings stay on the list so later rounds can verify fixes landed (R30). Cross-session persistence is out of scope — a new invocation starts fresh even if a prior session deferred findings into Open Questions.
 
-**Error handling:** if a subagent fails or times out, proceed with completed findings and note the failure in Coverage — do not block the review on one reviewer. **Dispatch limit:** even at maximum (7 agents), use bounded parallel dispatch; queue and launch the remainder as active reviewers complete.
+**Error handling:** if a subagent fails or times out, proceed with completed findings and note the failure in Coverage — do not block the review on one reviewer. If both always-on reviewers (`coherence` and `feasibility`) return no valid result, attempt one equivalent inline review using their already-selected prompt assets and document slices. If that equivalent inline review also does not complete, set `review_status: incomplete`, record `mandatory_review_coverage_missing`, and suppress any clean verdict or execution handoff. Never describe partial roster coverage as complete. **Dispatch limit:** even at maximum (7 agents), use bounded parallel dispatch; queue and launch the remainder as active reviewers complete.
 
 ## Phases 3-5: Synthesis, Presentation, and Next Action
 

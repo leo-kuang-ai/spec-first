@@ -10,6 +10,16 @@ const plugin = require('../../src/cli/plugin');
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const EVAL_ROOT = path.join(REPO_ROOT, 'skills/spec-plan/evals');
 const MANIFEST_PATH = path.join(EVAL_ROOT, 'consumer-replay-cases.json');
+const WORK_SKILL = fs.readFileSync(path.join(REPO_ROOT, 'skills/spec-work/SKILL.md'), 'utf8');
+const PLAN_SKILL = fs.readFileSync(path.join(REPO_ROOT, 'skills/spec-plan/SKILL.md'), 'utf8');
+const PLAN_HANDOFF = fs.readFileSync(
+  path.join(REPO_ROOT, 'skills/spec-plan/references/plan-handoff.md'),
+  'utf8',
+);
+const EXECUTION_ENGINES = fs.readFileSync(
+  path.join(REPO_ROOT, 'skills/spec-work/references/execution-engines.md'),
+  'utf8',
+);
 const REQUIRED_PRODUCT_IDS = ['A1', 'A2', 'R1', 'R2', 'R3', 'F1', 'F2', 'AE1', 'AE2'];
 const IMPLEMENTATION_SECTIONS = [
   'goal-capsule',
@@ -19,6 +29,17 @@ const IMPLEMENTATION_SECTIONS = [
   'verification-contract',
   'definition-of-done',
 ];
+const SECTION_ID_BY_TITLE = new Map([
+  ['Goal Capsule', 'goal-capsule'],
+  ['Product Contract', 'product-contract'],
+  ['Planning Contract', 'planning-contract'],
+  ['Implementation Units', 'implementation-units'],
+  ['Verification Contract', 'verification-contract'],
+  ['Definition of Done', 'definition-of-done'],
+]);
+const SECTION_TITLE_BY_ID = new Map(
+  [...SECTION_ID_BY_TITLE].map(([title, id]) => [id, title]),
+);
 
 function read(relativePath) {
   return fs.readFileSync(path.join(EVAL_ROOT, relativePath), 'utf8');
@@ -56,21 +77,27 @@ function productIds(contents) {
 }
 
 function markdownSections(contents) {
-  const headingToId = new Map([
-    ['Goal Capsule', 'goal-capsule'],
-    ['Product Contract', 'product-contract'],
-    ['Planning Contract', 'planning-contract'],
-    ['Implementation Units', 'implementation-units'],
-    ['Verification Contract', 'verification-contract'],
-    ['Definition of Done', 'definition-of-done'],
-  ]);
   return [...contents.matchAll(/^## (.+)$/gm)]
-    .map((match) => headingToId.get(match[1]))
+    .map((match) => SECTION_ID_BY_TITLE.get(match[1]))
     .filter(Boolean);
 }
 
 function htmlSections(contents) {
   return [...contents.matchAll(/<section id="([a-z-]+)"/g)].map((match) => match[1]);
+}
+
+function sectionContents(contents, format, sectionId) {
+  if (format === 'markdown') {
+    const title = SECTION_TITLE_BY_ID.get(sectionId);
+    const marker = `## ${title}\n`;
+    const start = contents.indexOf(marker);
+    if (start === -1) return '';
+    const remainder = contents.slice(start + marker.length);
+    const next = remainder.search(/^## /m);
+    return next === -1 ? remainder : remainder.slice(0, next);
+  }
+  const match = contents.match(new RegExp(`<section id="${sectionId}">([\\s\\S]*?)</section>`));
+  return match ? match[1] : '';
 }
 
 describe('spec-plan unified-plan consumer replay fixtures', () => {
@@ -119,8 +146,125 @@ describe('spec-plan unified-plan consumer replay fixtures', () => {
       ]));
       expect(entry.evidence_level).toBe('mechanical source contract');
       expect(entry.product_contract_ids.slice().sort()).toEqual(REQUIRED_PRODUCT_IDS.slice().sort());
-      expect(['markdown-write', 'report-only']).toContain(entry.mutation_policy);
-      expect(typeof entry.handoff_eligibility).toBe('boolean');
+      expect(entry.mutation_policy).toBe(
+        entry.format === 'markdown' ? 'markdown-write' : 'report-only',
+      );
+      expect(entry.handoff_eligibility).toBe(entry.readiness === 'implementation-ready');
+      expect(entry.expected_route).toBe({
+        'spec-plan': {
+          'requirements-only': 'enrich-in-place',
+          'implementation-ready': 'review-and-handoff',
+        },
+        'spec-work': {
+          'requirements-only': 'spec-plan-enrichment',
+          'implementation-ready': 'execute-section-map',
+        },
+        'goal-handoff': {
+          'requirements-only': 'not-eligible',
+          'implementation-ready': 'emit-thin-objective',
+        },
+      }[entry.consumer][entry.readiness]);
+    }
+  });
+
+  test('pre-registers an authorization-aware fresh-source replay protocol', () => {
+    expect(manifest.fresh_source_protocol).toMatchObject({
+      authorization_required: true,
+      not_run_reason_code: 'dispatch_authorization_missing',
+      checklist: 'docs/contracts/workflows/fresh-source-eval-checklist.md',
+    });
+    expect(manifest.fresh_source_protocol.claim_levels).toEqual([
+      'mechanical source contract',
+      'fresh-source semantic judgment',
+      'host invocation/loader observation',
+      'field outcome',
+    ]);
+    expect(manifest.fresh_source_protocol.mandatory_case_ids).toEqual(
+      manifest.cases.map((entry) => entry.id),
+    );
+    expect(manifest.fresh_source_protocol.oracles).toEqual(expect.arrayContaining([
+      'artifact classification',
+      'consumer route',
+      'stable section selection',
+      'mutation policy',
+      'thin objective deletion test',
+    ]));
+  });
+
+  test('replays fixture classification, readiness gates, and stable section selection', () => {
+    const routeAnchors = {
+      'enrich-in-place': [PLAN_SKILL, 'update that file in place'],
+      'review-and-handoff': [PLAN_HANDOFF, 'Document Review'],
+      'spec-plan-enrichment': [WORK_SKILL, 'Offer the exact `spec-plan <plan-path>` handoff'],
+      'execute-section-map': [WORK_SKILL, 'Build a section map'],
+      'not-eligible': [PLAN_HANDOFF, 'implementation-ready code plans'],
+      'emit-thin-objective': [PLAN_HANDOFF, 'Build a **thin** implementation objective'],
+    };
+
+    for (const entry of manifest.cases) {
+      const contents = read(entry.fixture);
+      const metadata = entry.format === 'markdown'
+        ? markdownMetadata(contents)
+        : htmlMetadata(contents);
+      const sections = entry.format === 'markdown'
+        ? markdownSections(contents)
+        : htmlSections(contents);
+
+      expect(metadata.artifact_readiness).toBe(entry.readiness);
+      expect(metadata.execution).toBe(entry.execution);
+      expect(sections).toEqual(expect.arrayContaining(entry.required_sections));
+      for (const forbidden of entry.forbidden_sections) {
+        expect(sections).not.toContain(forbidden);
+      }
+
+      const [source, anchor] = routeAnchors[entry.expected_route];
+      expect(source).toContain(anchor);
+    }
+
+    expect(WORK_SKILL).toContain('Progress-like values (`active`, `in_progress`, `completed`, `done`) are invalid readiness values');
+    expect(WORK_SKILL).toMatch(/execution: knowledge-work.*non-code carve-out/is);
+    expect(WORK_SKILL).toContain('Superseded sibling');
+  });
+
+  test('maps long Markdown and HTML plans before reading the material composition decision', () => {
+    for (const [fixture, format, minimumBytes] of [
+      ['fixtures/consumer-replay/implementation-ready.md', 'markdown', 3000],
+      ['fixtures/consumer-replay/implementation-ready.html', 'html', 5000],
+    ]) {
+      const contents = read(fixture);
+      expect(Buffer.byteLength(contents, 'utf8')).toBeGreaterThan(minimumBytes);
+      const planning = sectionContents(contents, format, 'planning-contract');
+      expect(planning).toContain('compose / thin-glue');
+      expect(planning).toContain('notification policy');
+      expect(planning).toContain('subscription state');
+    }
+
+    expect(WORK_SKILL).toMatch(/short plan.*read in full/is);
+    expect(WORK_SKILL).toMatch(/long implementation-ready plan.*Build a section map/is);
+    expect(WORK_SKILL).toMatch(/HTML.*anchor ids/is);
+    expect(WORK_SKILL).toMatch(/active U-ID.*referenced R\/F\/AE\/KTD/is);
+  });
+
+  test('keeps goal objectives thin and plan-agnostic by deletion test', () => {
+    const enginePrompt = EXECUTION_ENGINES.match(
+      /Copyable goal-mode prompt[\s\S]*?```text\n([\s\S]*?)\n```/,
+    );
+    expect(enginePrompt).not.toBeNull();
+    const objective = enginePrompt[1];
+    expect(objective).toContain('<plan-path>');
+    expect(objective).toContain('Goal Capsule');
+    expect(objective).toContain('Definition of Done');
+    expect(objective).toContain('Verification Contract');
+    expect(PLAN_HANDOFF).toContain('Deletion test');
+    for (const copiedDetail of [
+      'notification preference',
+      'compose / thin-glue',
+      'R1',
+      'U1',
+      'npx jest',
+      'fixtures/consumer-replay',
+    ]) {
+      expect(objective).not.toContain(copiedDetail);
     }
   });
 

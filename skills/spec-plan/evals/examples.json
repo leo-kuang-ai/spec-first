@@ -60,7 +60,16 @@
       "id": "repo-profile-cache-miss-has-inline-path",
       "input": "Plan a repository change when the shared repo profile cache is missing and delegation was not authorized.",
       "coverage_tags": ["failure", "cache-miss", "fallback"],
-      "expected_outcome": "Derive the bounded repository profile inline from current source, use the cache script only within its documented contract, and continue planning without dispatch or a cache dependency."
+      "expected_outcome": "Derive the bounded repository profile inline from current source, use the cache script only within its documented contract, and continue planning without dispatch or a cache dependency.",
+      "degraded_contract": {
+        "facts": "repo-profile-cache.py returned MISS and no authorized profiler dispatch is available",
+        "authorization": "delegation absent",
+        "expected_fallback": "derive the question-agnostic profile inline from current canonical source and continue",
+        "forbidden_behavior": "block planning, reuse an unproved stale profile, or fabricate a cache HIT",
+        "reason_code": "repo_profile_cache_miss",
+        "remaining_work": "complete question-specific grounding and the plan inline",
+        "claim_ceiling": "current-run inline grounding only; no isolated profiler claim"
+      }
     },
     {
       "id": "implementation-now-routes-to-work",
@@ -84,7 +93,106 @@
       "id": "dispatch-authorization-missing-falls-back-inline",
       "input": "Create a deep plan; no delegation or external research authorization was provided.",
       "coverage_tags": ["failure", "authorization", "fallback"],
-      "expected_outcome": "Do not spawn research agents or access external sources; apply relevant prompt assets inline, record dispatch_authorization_missing, and complete the plan."
+      "expected_outcome": "Do not spawn research agents or access external sources; apply relevant prompt assets inline, record dispatch_authorization_missing, and complete the plan.",
+      "degraded_contract": {
+        "facts": "the user authorized spec-plan but did not authorize helper dispatch or external research",
+        "authorization": "helper dispatch absent",
+        "expected_fallback": "apply selected prompt assets inline or serially and complete planning",
+        "forbidden_behavior": "spawn a helper, access external sources, or reuse an old fresh-source result",
+        "reason_code": "dispatch_authorization_missing",
+        "remaining_work": "complete all locally supportable planning and review intent",
+        "claim_ceiling": "mechanical and inline semantic judgment; no fresh-source isolation claim"
+      }
+    },
+    {
+      "id": "subagent-capability-missing-falls-back-inline",
+      "input": "Create a deep plan with helper authorization, but the host exposes no callable subagent primitive.",
+      "coverage_tags": ["failure", "capability", "fallback"],
+      "expected_outcome": "Run the selected specialist prompts inline or serially, preserve coverage accounting, and state that context isolation was unavailable.",
+      "degraded_contract": {
+        "facts": "helper authorization exists but the host exposes no callable subagent capability",
+        "authorization": "delegation present",
+        "expected_fallback": "apply specialist prompts inline or serially and record degraded inherited context",
+        "forbidden_behavior": "stop planning or claim isolated parallel review",
+        "reason_code": "subagent_capability_missing",
+        "remaining_work": "complete planning and mandatory inline review coverage",
+        "claim_ceiling": "inline semantic judgment without context-isolation evidence"
+      }
+    },
+    {
+      "id": "web-capability-missing-records-research-limit",
+      "input": "Plan a change when no web capability is available and one external compatibility fact may affect the recommendation.",
+      "coverage_tags": ["failure", "research", "fallback"],
+      "expected_outcome": "Use sufficient local source when available; otherwise record the missing external fact, its decision impact, and a blocking or deferred verification instead of inventing it.",
+      "degraded_contract": {
+        "facts": "no callable web capability is available",
+        "authorization": "external research may be authorized but cannot execute",
+        "expected_fallback": "continue from local evidence when sufficient or surface the load-bearing evidence gap",
+        "forbidden_behavior": "fabricate current external facts or silently omit their decision impact",
+        "reason_code": "web_capability_missing",
+        "remaining_work": "verify the external fact before any decision that depends on it becomes implementation-ready",
+        "claim_ceiling": "local-source judgment with an explicit external-evidence limitation"
+      }
+    },
+    {
+      "id": "repo-profile-dirty-input-invalidates-hit",
+      "input": "Plan at unchanged HEAD after package.json or root AGENTS.md changed locally while a cache entry exists.",
+      "coverage_tags": ["failure", "cache-dirty", "freshness"],
+      "expected_outcome": "Treat the cache as MISS, derive current facts, and never serve the old profile; a docs/plans-only change may retain a verified HIT.",
+      "degraded_contract": {
+        "facts": "a profile-input path is dirty at the current HEAD",
+        "authorization": "not applicable to deterministic cache freshness",
+        "expected_fallback": "invalidate the entry and re-derive current profile facts",
+        "forbidden_behavior": "serve the stale cached profile or treat advisory plan dirtiness as a profile input",
+        "reason_code": "profile_input_dirty",
+        "remaining_work": "complete current-source grounding before planning decisions",
+        "claim_ceiling": "deterministic cache MISS plus newly derived current facts"
+      }
+    },
+    {
+      "id": "html-report-only-review-preserves-artifact",
+      "input": "Review an implementation-ready HTML plan containing actionable findings.",
+      "coverage_tags": ["failure", "html", "report-only"],
+      "expected_outcome": "Run the structural and semantic review, keep fixes_applied at zero, return producer-fix candidates and preserve the HTML bytes.",
+      "degraded_contract": {
+        "facts": "the artifact is HTML and Markdown mutation mechanics are inapplicable",
+        "authorization": "review is authorized; reviewer mutation is not",
+        "expected_fallback": "return a report-only envelope and leave correction ownership with the producer",
+        "forbidden_behavior": "apply safe_auto, append Open Questions, or enter the Markdown walkthrough",
+        "reason_code": "html_report_only",
+        "remaining_work": "producer recompose only for uniquely determined fixes, then re-review",
+        "claim_ceiling": "review findings and byte preservation; no reviewer autofix claim"
+      }
+    },
+    {
+      "id": "reviewer-partial-failure-preserves-coverage",
+      "input": "Run document review when one selected reviewer fails after other reviewers return valid findings.",
+      "coverage_tags": ["failure", "reviewer", "partial"],
+      "expected_outcome": "Synthesize valid findings, mark the failed persona in Coverage, and avoid claiming the full roster completed.",
+      "degraded_contract": {
+        "facts": "at least one selected reviewer failed but valid reviewer coverage remains",
+        "authorization": "review dispatch may be authorized",
+        "expected_fallback": "complete synthesis from valid findings and report the missing persona",
+        "forbidden_behavior": "discard valid findings or claim complete roster coverage",
+        "reason_code": "reviewer_partial_failure",
+        "remaining_work": "surface the uncovered lens and any resulting claim limitation",
+        "claim_ceiling": "partial review coverage with explicit limitations"
+      }
+    },
+    {
+      "id": "mandatory-review-coverage-missing-is-incomplete",
+      "input": "Run document review when coherence and feasibility both fail and no equivalent inline review completes.",
+      "coverage_tags": ["failure", "reviewer", "incomplete"],
+      "expected_outcome": "Return review_status incomplete, keep findings/limitations visible, and suppress a clean verdict or execution handoff.",
+      "degraded_contract": {
+        "facts": "both always-on reviewers have zero valid results and inline fallback did not complete",
+        "authorization": "independent of authorization once mandatory coverage is absent",
+        "expected_fallback": "mark review incomplete and return coverage limitations",
+        "forbidden_behavior": "emit a clean verdict, claim mandatory review passed, or offer execution handoff",
+        "reason_code": "mandatory_review_coverage_missing",
+        "remaining_work": "obtain at least one valid mandatory reviewer or equivalent inline review",
+        "claim_ceiling": "incomplete review only"
+      }
     },
     {
       "id": "high-risk-async-plan-is-concrete",

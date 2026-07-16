@@ -451,4 +451,66 @@ describe('plugin module facade and governance', () => {
       }
     }
   });
+
+  test('projects spec-plan quality-closure runtime owners to every supported host', () => {
+    const runtimeOwners = {
+      'spec-plan': [
+        'SKILL.md',
+        'references/planning-evidence-boundaries.md',
+        'references/plan-sections.md',
+        'references/synthesis-summary.md',
+        'references/deepening-workflow.md',
+        'references/plan-handoff.md',
+        'references/agents/architecture-strategist.md',
+        'references/agents/pattern-recognition-specialist.md',
+      ],
+      'spec-doc-review': [
+        'SKILL.md',
+        'references/synthesis-and-presentation.md',
+        'references/walkthrough.md',
+        'references/bulk-preview.md',
+        'references/open-questions-defer.md',
+      ],
+      'spec-work': [
+        'SKILL.md',
+        'references/execution-engines.md',
+      ],
+    };
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const runtimeRoot = adapter.workflowsRoot || adapter.skillsRoot;
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const operations = new Map(plan.operations.map((operation) => [operation.path, operation]));
+
+        for (const [skillName, relativePaths] of Object.entries(runtimeOwners)) {
+          for (const relativePath of relativePaths) {
+            const projectedPath = path.posix.join(runtimeRoot, skillName, relativePath);
+            expect(operations.has(projectedPath)).toBe(true);
+          }
+        }
+
+        const planSkill = operations.get(path.posix.join(runtimeRoot, 'spec-plan/SKILL.md'));
+        const evidence = operations.get(path.posix.join(
+          runtimeRoot,
+          'spec-plan/references/planning-evidence-boundaries.md',
+        ));
+        const reviewSkill = operations.get(path.posix.join(runtimeRoot, 'spec-doc-review/SKILL.md'));
+        const workSkill = operations.get(path.posix.join(runtimeRoot, 'spec-work/SKILL.md'));
+        expect(planSkill.contents).toContain('Inventory before invention');
+        expect(planSkill.contents).toContain('reuse / extend / compose / new');
+        expect(evidence.contents).toContain('Thin glue may own only');
+        expect(reviewSkill.contents).toContain('mutation_policy');
+        expect(reviewSkill.contents).toContain('report-only');
+        expect(workSkill.contents).toContain('Duplicate critical metadata');
+        expect([...operations.keys()].some((operationPath) =>
+          operationPath.includes('/spec-plan/evals/')
+        )).toBe(false);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
 });

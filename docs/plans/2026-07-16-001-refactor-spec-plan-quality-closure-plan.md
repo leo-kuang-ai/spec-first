@@ -1,7 +1,7 @@
 ---
 title: "Spec Plan Quality Closure - Plan"
 type: refactor
-status: active
+status: completed
 date: 2026-07-16
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready

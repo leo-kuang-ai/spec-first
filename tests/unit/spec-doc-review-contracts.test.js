@@ -50,6 +50,16 @@ describe('spec-doc-review current contracts', () => {
     expect(skill).toMatch(/Headless.*delivery.*not.*mutation policy/is);
     expect(skill).toMatch(/HTML.*report-only/is);
     expect(skill).toMatch(/conflict.*fail closed.*report-only/is);
+    expect(skill).toMatch(/cannot write.*mutation_reason: write-unavailable/is);
+  });
+
+  test('requires explicit dispatch authorization and preserves the inline fallback', () => {
+    expect(skill).toMatch(/direct invocation.*authorizes.*workflow.*not host-level subagent dispatch/is);
+    expect(skill).toContain('dispatch_authorization_missing');
+    expect(skill).toContain('subagent_capability_missing');
+    expect(skill).toMatch(/selected persona prompt assets inline or serially/is);
+    expect(skill).toMatch(/orthogonal to `mutation_policy`/is);
+    expect(skill).toMatch(/Do not claim independent persona coverage or context isolation/);
   });
 
   test('report-only review blocks every Markdown mutation entrypoint', () => {
@@ -82,6 +92,13 @@ describe('spec-doc-review current contracts', () => {
     }
     expect(synthesis).toMatch(/report-only.*do not load.*walkthrough/is);
     expect(synthesis).toMatch(/report-only.*Open Questions/is);
+  });
+
+  test('mandatory reviewer loss fails closed instead of producing a clean verdict', () => {
+    expect(skill).toMatch(/both always-on reviewers.*equivalent inline review/is);
+    expect(skill).toContain('mandatory_review_coverage_missing');
+    expect(synthesis).toMatch(/review_status: incomplete/);
+    expect(synthesis).toMatch(/do not emit a clean verdict or execution-ready implication/);
   });
 
   test('does not infer document kind from path alone', () => {

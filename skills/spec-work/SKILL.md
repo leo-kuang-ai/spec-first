@@ -26,6 +26,8 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 **Plan document** (input is a file path to an existing plan or specification): read the plan's metadata first — YAML frontmatter for a markdown plan, or the visible header text for an HTML plan (both formats carry the same fields).
 
+For a declared unified artifact, validate critical metadata before classification. Duplicate critical metadata, missing `artifact_readiness` or `execution`, or a conflict between visible HTML metadata and content shape is invalid. Fail closed to a `spec-plan <plan-path>` repair handoff; do not normalize, merge, or guess the intended value. This validation applies only after the artifact declares `artifact_contract: spec-unified-plan/v1`; a truly legacy plan with no unified contract remains on the compatibility path below.
+
 - If it carries `artifact_contract: spec-unified-plan/v1`, classify `artifact_readiness` before reading the body.
   - `artifact_readiness: requirements-only` -> stop and tell the user this Product Contract needs `spec-plan` enrichment before implementation. Offer the exact `spec-plan <plan-path>` handoff.
   - `artifact_readiness: implementation-ready` plus `execution: code` -> continue to Phase 1 using the unified-plan reader strategy below.

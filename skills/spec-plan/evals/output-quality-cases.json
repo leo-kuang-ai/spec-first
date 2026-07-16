@@ -189,6 +189,28 @@
       "missing_evidence": ["model execution evidence", "human adjudication"]
     },
     {
+      "id": "existing-capability-reused-as-is",
+      "input": "Plan a new caller for an existing capability whose current contract, owner, failure behavior, and tests already satisfy the requested behavior without adaptation.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" },
+        { "path": "skills/spec-plan/references/agents/pattern-recognition-specialist.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan adds a wrapper, adapter, extension, or orchestration seam even though the existing capability already satisfies the contract."
+      ],
+      "with_skill_expectations": [
+        "The plan inventories the existing capability and chooses reuse as-is, pointing the caller at the current owner and contract.",
+        "No wrapper, new durable state, duplicated validation, or speculative extension is introduced."
+      ],
+      "objective_assertions": [
+        "Reuse is a distinct architecture posture rather than shorthand for extend or compose.",
+        "The plan stays lean and names no new owner when no ownership gap exists."
+      ],
+      "expected_outcome": "The plan reuses the complete existing capability directly and avoids architecture work that adds no decision value.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
       "id": "existing-capabilities-compose-through-thin-glue",
       "input": "Plan an integration where an existing parser already validates input and an existing publisher already owns delivery, but the new flow must translate results, sequence both capabilities, expose partial failure, and aggregate evidence.",
       "input_files": [

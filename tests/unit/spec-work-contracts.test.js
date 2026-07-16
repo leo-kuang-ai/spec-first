@@ -19,6 +19,14 @@ describe('spec-work current contracts', () => {
     expect(skill).toContain('execution: code');
   });
 
+  test('fails closed on duplicate, missing, or conflicting unified metadata', () => {
+    expect(skill).toMatch(/declared unified artifact.*duplicate.*critical metadata/is);
+    expect(skill).toMatch(/missing.*artifact_readiness.*execution/is);
+    expect(skill).toMatch(/conflict.*visible HTML metadata.*content shape/is);
+    expect(skill).toMatch(/fail closed.*spec-plan.*repair/is);
+    expect(skill).toMatch(/do not normalize.*guess/is);
+  });
+
   test('tracks execution outside the plan body', () => {
     expect(skill).toMatch(/do not (?:edit|mutate).*plan/i);
     expect(skill).toMatch(/progress.*git/i);
