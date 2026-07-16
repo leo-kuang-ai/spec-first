@@ -1,6 +1,6 @@
 # Scoping Synthesis
 
-**Scoping synthesis ≠ plan doc.** The scoping synthesis is the scope/decisions checkpoint that plan-write (Phase 5.2) consumes as input. It surfaces decisions the agent CAN make at synthesis time: scope-level (does this plan cover the full brainstorm or narrow to a subset?), posture (extend existing pattern vs. introduce new abstraction), test approach. It does NOT surface decisions plan-write produces: PR count, commit/branch sequencing, effort or time estimates, Implementation Unit lists, exact file paths, test command recipes. If the synthesis claims any of those, it has leaked plan-write thinking and must be re-cut to scope-decisions only. Even when the agent has formed plan-write opinions earlier in the session, the synthesis stays at scope altitude — the user is being asked to affirm scope, not to rubber-stamp implementation.
+**Scoping synthesis ≠ plan doc.** The scoping synthesis is the scope/decisions checkpoint that plan-write (Phase 5.2) consumes as input. It surfaces decisions the agent CAN make at synthesis time: scope-level (does this plan cover the full brainstorm or narrow to a subset?), architecture posture (reuse an existing capability, extend an existing pattern, compose existing capabilities through thin glue, or introduce a new abstraction), and test approach. It does NOT surface decisions plan-write produces: PR count, commit/branch sequencing, effort or time estimates, Implementation Unit lists, exact file paths, test command recipes. If the synthesis claims any of those, it has leaked plan-write thinking and must be re-cut to scope-decisions only. Even when the agent has formed plan-write opinions earlier in the session, the synthesis stays at scope altitude — the user is being asked to affirm scope, not to rubber-stamp implementation.
 
 **Two-stage shape: internal draft, then chat-time synthesis.** The synthesis is composed in two stages. Stage 1 is an internal three-bucket draft (Stated / Inferred / Out of scope) the agent uses to think comprehensively about scope. Stage 2 is the compressed chat-time output: a tier-shaped summary plus "Call outs" (zero or more, capped by plan depth — see the cap table under "How many call-outs are right?") — the specific forks where the user might redirect. The user only sees stage 2. The internal draft still informs the plan body via the doc-shape routing below; it just doesn't reach the user verbatim. This split exists because the comprehensive audit shape produced too much detail for the user to weigh in on, even when the granularity rules were followed.
 
@@ -9,7 +9,7 @@
 This content is loaded when a synthesis-summary phase fires in spec-plan. There are two variants — they share structure but differ in timing and content focus:
 
 - **Solo variant** (Phase 0.7): fires after Phase 0.4 bootstrap and Phase 0.6 depth classification, before Phase 1 research begins. Catches scope misinterpretation before sub-agent dispatch is spent. Full breadth — problem frame, intended behavior, success criteria, in/out scope.
-- **Brainstorm-sourced variant** (Phase 5.1.5): fires after Phase 1 research, before Phase 5.2 plan-write. Focuses on plan-time decisions (which files/modules to touch, which patterns extended vs. introduced new, test scope, refactor scope). Brainstorm-validated WHAT is assumed and not re-stated.
+- **Brainstorm-sourced variant** (Phase 5.1.5): fires after Phase 1 research, before Phase 5.2 plan-write. Focuses on plan-time decisions (which capabilities are reused, extended, composed through thin glue, or introduced as a new boundary; which files/modules are implicated; test scope; refactor scope). Brainstorm-validated WHAT is assumed and not re-stated.
 
 Both variants share the two-stage shape, the keep test for call-outs, soft-cut behavior, and the doc-shape routing. In non-interactive (headless) mode, both compose the internal draft and skip stage 2 — the user-facing compression is moot when there is no synchronous user. The internal draft dissolves into the plan body the same way, with Inferred bets routing to a `## Assumptions` section. See "Headless mode (shared)" below for the full routing.
 
@@ -176,7 +176,7 @@ Each call-out should be affirmable or rejectable by the user **without reading c
 
 **Allowed** (when these ARE the decisions being made):
 - File / module names — "skip filter in the matcher" when "where to put it" is the choice
-- Pattern names — "extends the existing event-skip pattern" when "extend vs. introduce" is the choice
+- Pattern names — "extends the existing event-skip pattern" or "composes the existing parser and publisher through a thin orchestration seam" when architecture posture is the choice
 - Column / table names — "user-TZ" or "destination-calendar TZ" when "which source" is the choice
 - Approach posture — "DB-side query with Google-side fallback" when "which strategy" is the choice
 
@@ -201,6 +201,8 @@ The line is drawn slightly differently per variant. **Solo (Phase 0.7)** stays a
 | Partial cleanup failure response: `{pause, cleanup: {eventsDeleted, eventsFailed, errors}}`; pause window persists regardless of cleanup outcome. | Partial cleanup failure: pause window persists; partial-failure response mirrors the existing rule-edit precedent |
 
 The test: a scanner reading a call-out should affirm or reject it without needing to read code. If they would have to look up a column name, method name, or call graph to evaluate the call-out, the granularity is wrong — that's plan-body content.
+
+When composition is the decision, keep the call-out at posture altitude: name the existing capabilities and why a thin seam is preferable to a parallel abstraction. Detailed translation rules, retry steps, and evidence fields belong in the Planning Contract, not the synthesis.
 
 ### Worked example: compression from internal draft to call-outs
 

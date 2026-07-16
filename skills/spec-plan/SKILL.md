@@ -1,6 +1,6 @@
 ---
 name: spec-plan
-description: "Create structured plans for multi-step work, including software and non-software tasks. Use when asked to plan, break down implementation, plan from requirements, or deepen an existing plan; prefer spec-brainstorm for exploratory framing."
+description: "Create or deepen evidence-grounded plans for multi-step software and non-software work, including plans derived from requirements and answer-seeking research plans. Use when the outcome is clear enough to plan but HOW is unsettled. Prefer spec-brainstorm for unresolved WHAT, spec-debug for active failures, spec-work for implementation or tests, spec-doc-review for independent document critique, and runtime-maintenance for generated runtime mirrors."
 argument-hint: "[optional: feature description, requirements doc path, plan path to deepen, or any task to plan] [output:html]"
 ---
 
@@ -13,6 +13,12 @@ Note: Use the current date from the active host context. Use this when weighting
 **When directly invoked, always plan.** Never classify a direct invocation as "not a planning task" and abandon the workflow. If the input is unclear, ask clarifying questions or use the planning bootstrap (Phase 0.4) to establish enough context — but always stay in the planning workflow.
 
 This workflow produces a durable implementation plan. It does **not** implement code, run tests, or learn from execution-time results. If the answer depends on changing code and seeing what happens, that belongs in `spec-work`, not here.
+
+## Planning-Only Safety Contract
+
+- **Before handoff selection, planning is the only authorized effect.** Research, ask planning questions, and write or revise the plan artifact; do not edit implementation code/config, run implementation tests/builds, start implementation workflows, or mutate generated runtime.
+- **Handoff stays blocking.** Writing a plan or finding an obvious implementation path does not authorize execution. Wait for the owning handoff question, then act only on the user's selected branch.
+- **Enforcement is honest.** These rules are workflow-level attention hardening unless the host exposes a real Plan Mode or equivalent write gate. Do not claim a hard write guarantee from prose alone.
 
 ## Mandatory Completion Contract
 
@@ -48,20 +54,28 @@ If the input is present but unclear or underspecified, do not abandon — ask on
 6. **Keep the plan portable** - The plan should work as a living document, review artifact, or issue body without embedding tool-specific executor instructions.
 7. **Carry execution direction lightly when it matters** - If the request, origin document, or repo context clearly implies test-first proof, characterization coverage, smoke-first verification, or another non-default execution direction, reflect that in the plan as a lightweight natural-language signal. Do not encode it as a finite enum or turn the plan into step-by-step execution choreography.
 8. **Honor user-named resources** - When the user names a specific resource — a CLI, MCP server, URL, file, doc link, or prior artifact — treat it as authoritative input, not a suggestion. Discover it if unknown (`command -v`, fetch, read) before assuming it's unavailable. Use it in place of generic alternatives. If it fails or doesn't exist, say so explicitly rather than silently substituting.
+9. **Inventory before invention** - Before proposing a new abstraction, durable source surface, adapter or wrapper, orchestrator, or integration pipeline, inspect existing capabilities, owners, and extension points. Prefer reuse, focused extension, or composition through thin glue; introduce a new boundary only when existing owners cannot absorb the change without mixing concerns, duplicating truth, or creating a misleading abstraction.
 
 ## Plan Quality Bar
 
 Every plan should contain:
 - A clear problem frame and scope boundary
+- A first-screen Goal Capsule that names the objective, recommended approach, decision focus, verification focus, and largest risk or boundary
 - Concrete requirements traceability back to the request or origin document
 - Repo-relative file paths for the work being proposed (never absolute paths — see Planning Rules)
 - Explicit test file paths for feature-bearing implementation units
 - Decisions with rationale, not just tasks
 - Existing patterns or code references to follow
+- Evidence provenance and limitations when source, provider, history, or cross-repo facts materially shape the plan
+- A `reuse / extend / compose / new` architecture posture when the plan proposes a new abstraction, durable source surface, adapter or orchestrator, or integration seam
+- Conditional coverage of every materially-considered client, service/backend, API/schema/event contract, data, operational/rollout, verification/test, and agent/tool surface on multi-surface work
+- Concrete invariant, failure, rollback, compatibility, and verification decisions when a high-risk lens applies
 - Enumerated test scenarios for each feature-bearing unit, specific enough that an implementer knows exactly what to test without inventing coverage themselves
 - Clear dependencies and sequencing
 
 A plan is ready when an implementer can start confidently without needing the plan to write the code for them.
+
+**STOP. Before Phase 0 source intake or Phase 1 research, read `references/planning-evidence-boundaries.md`.** It owns source/runtime exclusion, advisory evidence trust, cross-repo scope, evidence landing, summary-first intake, and the conditional `reuse / extend / compose / new` capability, composition, and ownership lens. Do not reconstruct those rules from memory.
 
 ## Workflow
 
@@ -272,6 +286,8 @@ Classify the work into one of these plan depths:
 - **Standard** - normal feature or bounded refactor with some technical decisions to document
 - **Deep** - cross-cutting, strategic, high-risk, or highly ambiguous implementation work
 
+When the request, Product Contract, or source evidence hits a high-risk domain, read `references/high-risk-plan-lens.md` before finalizing depth. Its trigger matrix is a semantic readiness lens, not a script-owned classifier: it may raise a plan toward Standard/Deep, require explicit decisions, or expose a blocking question, but the LLM still decides applicability and adequacy.
+
 If depth is unclear, ask one targeted question and then continue.
 
 #### 0.7 Solo-Mode Scoping Synthesis
@@ -292,6 +308,8 @@ Fires **only in solo invocation** — when Phase 0.2 found no upstream Product C
 
 All specialist research and deepening prompts used in this phase are skill-local prompt assets under `references/agents/`. When dispatching one, read the matching file and seed a generic subagent with that prompt content plus the task-specific context below. Do not dispatch standalone agents by type/name.
 
+**Dispatch authorization and fallback.** A public `spec-plan` invocation authorizes this workflow, not subagents, personas, parallel work, Slack search, web research, or external data access. Dispatch only when the host exposes the capability **and** the user or an upstream handoff explicitly authorized delegation/research dispatch for this run. Otherwise read the same prompt assets and apply them inline or serially in the current agent, record `dispatch_authorization_missing` or the actual capability failure, and continue planning. Lack of dispatch changes latency/context separation, not correctness or completion.
+
 Model tiering lives in this caller, not in prompt assets. Local prompt files have no frontmatter. Use the platform's mid-tier model for external/organizational research prompts such as `slack-researcher` and `web-researcher` when the current harness exposes a known override; otherwise omit the override and inherit. Use inherited model for high-judgment architecture, migration, and planning-deepening prompts unless the harness has an established cheaper capable tier.
 
 #### 1.1 Local Research (Always Runs)
@@ -309,9 +327,9 @@ SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read
 python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 ```
 
-On `HIT`, load the profile JSON as your agnostic grounding. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive it, write its JSON to a file, then `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations). On `NO-CACHE` — or if the call errors or returns nothing — derive it inline and skip the `put`; never block on the cache. Pass the resulting profile to `repo-research-analyst` below so it skips the agnostic scopes. The cached profile covers only *root* conventions — if the work targets a subdirectory with its own scoped instruction file (a nested `AGENTS.md`/`CLAUDE.md`), read that fresh; subdirectory-scoped instructions are deliberately excluded from the cache.
+On `HIT`, load the profile JSON as your agnostic grounding. On `MISS`, use `references/agents/repo-profiler.md` through an authorized generic subagent or the inline fallback above, write its JSON to a file, then `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations). On `NO-CACHE` — or if the call errors or returns nothing — derive it inline and skip the `put`; never block on the cache. Pass the resulting profile to `repo-research-analyst` below so it skips the agnostic scopes. The cached profile covers only *root* conventions — if the work targets a subdirectory with its own scoped instruction file (a nested `AGENTS.md`/`CLAUDE.md`), read that fresh; subdirectory-scoped instructions are deliberately excluded from the cache.
 
-Run these agents in parallel:
+When dispatch is authorized, run these agents in parallel. Under inline fallback, apply the same prompt scopes sequentially and keep only the strongest source-backed findings:
 
 - `references/agents/repo-research-analyst.md` — scope: **patterns** (the question-specific slice; the agnostic `technology`/`architecture`/`conventions` grounding comes from the cached profile passed in its context — the profile's `stack`/`topology`/`conventions` keys cover those analyst scopes). Pass the planning context summary and the cached profile.
 - `references/agents/learnings-researcher.md` — pass the planning context summary.
@@ -336,7 +354,8 @@ Collect:
 
 **Slack context** (opt-in) — never auto-dispatch. Route by condition:
 
-- **Tools available + user asked**: Dispatch a generic subagent with `references/agents/slack-researcher.md` and the planning context summary in parallel with other Phase 1.1 agents. If the origin document has a Slack context section, pass it verbatim so the researcher focuses on gaps. Include findings in consolidation.
+- **Tools available + user asked + external research/dispatch authorized**: Dispatch a generic subagent with `references/agents/slack-researcher.md` and the planning context summary in parallel with other Phase 1.1 agents, or apply that prompt inline when the current agent has the authorized Slack capability. If the origin document has a Slack context section, pass it verbatim so the researcher focuses on gaps. Include findings in consolidation.
+- **Tools available + user asked but external access or delegation is not authorized**: Do not search. Record the authorization gap and ask only if Slack context is load-bearing to the plan.
 - **Tools available + user didn't ask**: Note in output: "Slack tools detected. Ask me to search Slack for organizational context at any point, or include it in your next prompt."
 - **No tools + user asked**: Note in output: "Slack context was requested but no Slack tools are available. Install and authenticate the Slack plugin to enable organizational context search."
 
@@ -406,7 +425,7 @@ Announce the decision and the intent briefly before continuing. Examples:
 
 #### 1.3 External Research (Conditional)
 
-If Step 1.2 indicates external research is useful, dispatch by the **intent** classified in Stage 2, using the platform's subagent primitive (`Agent`/`Task` in Claude Code, `spawn_agent` in Codex) where available; otherwise run the work inline or serially. Read the selected prompt asset from `references/agents/` and seed a generic subagent with it. For `web-researcher.md`, pass a focus hint plus the planning context summary and do **not** pass codebase content — it operates externally.
+If Step 1.2 indicates external research is useful, execute it only within the authorization boundary above. When delegation is authorized, dispatch by the **intent** classified in Stage 2 using the host's subagent primitive; when external access is authorized but delegation is not, apply the selected prompt inline or serially. If external access itself is not authorized, record the gap and continue only when the missing research is non-blocking. Read the selected prompt asset from `references/agents/`; for `web-researcher.md`, pass a focus hint plus the planning context summary and do **not** pass codebase content.
 
 - **Implementation-guidance** — run in parallel:
   - `references/agents/best-practices-researcher.md` with the planning context summary.
@@ -446,7 +465,7 @@ This ensures flow analysis (Phase 1.5) runs and the confidence check (Phase 5.3)
 
 #### 1.5 Flow and Edge-Case Analysis (Conditional)
 
-For **Standard** or **Deep** plans, or when user flow completeness is still unclear, run:
+For **Standard** or **Deep** plans, or when user flow completeness is still unclear, run through authorized dispatch or apply inline:
 
 - `references/agents/spec-flow-analyzer.md` with the planning context summary and research findings.
 
@@ -648,13 +667,18 @@ Omit "include when material" sections that don't carry information for this spec
 Before finalizing, check:
 - The plan does not invent product behavior that should have been defined in `spec-brainstorm`
 - If there was no origin document, the bounded planning bootstrap established enough product clarity to plan responsibly
+- The Goal Capsule gives a human reviewer the recommended approach, key decision focus, verification focus, and largest risk or scope boundary in the first screen
 - Every major decision is grounded in the origin document or research
+- Any load-bearing provider, learning, historical, cross-repo, or dirty-worktree evidence lands with source refs, freshness, authority, limitations, and plan impact as required by `references/planning-evidence-boundaries.md`
+- Any proposed new abstraction, durable source surface, adapter or orchestrator, or integration seam carries a right-sized `reuse / extend / compose / new` architecture posture; a composition decision keeps glue thin and generated runtime mirrors are not treated as candidate owners
 - Each implementation unit is concrete, dependency-ordered, and implementation-ready
 - If test-first proof, characterization coverage, smoke-first verification, or another execution direction was explicit or strongly implied, the relevant units carry it forward with a lightweight natural-language `Execution note`
 - Each feature-bearing unit has test scenarios from every applicable category (happy path, edge cases, error paths, integration) — right-sized to the unit's complexity, not padded or skimped
 - Test scenarios name specific inputs, actions, and expected outcomes without becoming test code
 - Feature-bearing units with blank or missing test scenarios are flagged as incomplete — feature-bearing units must have actual test scenarios, not just an annotation. The `Test expectation: none -- [reason]` annotation is only valid for non-feature-bearing units (pure config, scaffolding, styling)
 - Deferred items are explicit and not hidden as fake certainty
+- Multi-surface work names every materially-considered client, service/backend, API/schema/event contract, data, operational/rollout, verification/test, and agent/tool surface as in-scope, out-of-scope with a reason, or deferred with an owner/trigger; irrelevant surfaces are omitted
+- When a high-risk trigger applies, the plan satisfies `references/high-risk-plan-lens.md` through concrete decisions or explicit Open Questions/deferments; a launch-blocking risk gap prevents `artifact_readiness: implementation-ready`
 - **High-Level Technical Design presence audit (load-bearing).** For each architecture trigger in Phase 3.4 that the plan content satisfies (3+ components with directed relationships, 3+ protocol steps, 3+ state machine states, lifecycle, 3+ decision points, 3+ data-flow stages, mode/flag combinations, DSL/API surface design, non-obvious single-component shape), verify a corresponding sketch/diagram is present in the High-Level Technical Design section. Count the firing triggers; count the sketches; the sketch count must be at least the count of distinct trigger categories that fired. Missing the section when a trigger fired, OR including the section but skipping a triggered sketch within it, is incomplete — return to Phase 3.4 and add the missing sketch. Token cost is not a valid reason to fail this check.
 - If a High-Level Technical Design section is included, it uses the right medium for the work, carries the non-prescriptive framing, and does not contain implementation code (no imports, exact signatures, or framework-specific syntax)
 - Per-unit technical design fields, if present, are concise and directional rather than copy-paste-ready

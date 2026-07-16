@@ -323,6 +323,11 @@ bundles, and the artifact's longevity doesn't warrant a build dependency.
 How section types commonly render in HTML. These are patterns, not
 contracts — the agent picks shapes that fit the content.
 
+- **Goal Capsule** — an always-visible orientation panel near the top with the
+  objective, recommended approach, decision and verification focus, largest
+  risk/boundary, authority, stop conditions, execution profile, and tail
+  ownership. Keep it compact; link to detailed KTD, risk, and verification
+  anchors rather than duplicating their prose.
 - **Summary / Problem Frame** — semantic `<section>` with prose
   paragraphs. Optionally precede with an eyebrow label (small-caps tag
   above the title) for editorial polish.

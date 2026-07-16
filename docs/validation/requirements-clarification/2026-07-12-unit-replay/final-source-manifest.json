@@ -115,7 +115,7 @@
     {
       "path": "skills/spec-plan/SKILL.md",
       "status": "present",
-      "sha256": "91c0538f80dc18f1aefa4f9cd6b81e38d4fd014cdef40f168e264ea49098329a"
+      "sha256": "b01be2c81ce90503b74078bf91e44924fed7b74bd00731b062cba07f866d03d3"
     },
     {
       "path": "skills/spec-plan/references/agents/repo-profiler.md",

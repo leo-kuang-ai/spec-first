@@ -71,7 +71,7 @@ skills grep or anchor-scan for these names before reading large bodies.
 
 | Logical section | Markdown heading | HTML id | Reader use |
 |---|---|---|---|
-| Goal Capsule | `## Goal Capsule` | `goal-capsule` | Objective, authority hierarchy, and stop conditions |
+| Goal Capsule | `## Goal Capsule` | `goal-capsule` | Objective, recommended approach, authority hierarchy, decision focus, verification focus, largest risk or boundary, and stop conditions |
 | Product Contract | `## Product Contract` | `product-contract` | Requirements, actors, flows, acceptance examples, product scope |
 | Product Requirements | `### Requirements` under Product Contract | `product-requirements` | Requirement extraction for review and implementation trace |
 | Planning Contract | `## Planning Contract` | `planning-contract` | KTDs, technical design, assumptions, sequencing |
@@ -166,9 +166,10 @@ message or `docs/solutions/` if they're worth carrying forward.
 When an implementation-ready software plan is warranted, these sections are
 present. They carry the contracts downstream consumers depend on.
 
-- **Goal Capsule** — objective, authority hierarchy, stop conditions, execution
-  profile, and tail ownership. This is the fastest way for an executor to
-  avoid drifting from the plan.
+- **Goal Capsule** — objective, recommended approach, authority hierarchy,
+  decision focus, verification focus, largest risk or scope boundary, stop
+  conditions, execution profile, and tail ownership. It is the first-screen
+  orientation for both human reviewers and executors.
 - **Product Contract** — product scope and behavior. Contains Summary, Problem
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,
@@ -176,7 +177,8 @@ present. They carry the contracts downstream consumers depend on.
   artifact in new brainstorm-to-plan flows.
 - **Planning Contract** — the implementation-facing decisions: Key Technical
   Decisions, high-level design, assumptions, implementation constraints,
-  sequencing, and research that shapes how the Product Contract will be built.
+  sequencing, architecture posture, composition/source-ownership decisions,
+  and evidence that shapes how the Product Contract will be built.
 - **Implementation Units** (with stable U-IDs) — discrete work packets sized so
   each is independently executable. Each unit names Goal, Requirements,
   Files, Approach, Test Scenarios, and Verification. `spec-work` and goal-mode
@@ -231,8 +233,13 @@ a section with placeholder prose is worse than omitting it.
 - **System-Wide Impact** — include when the change affects cross-cutting
   concerns (data lifecycles, auth boundaries, performance posture, cardinal
   rules, shared infrastructure, agent/tool parity, prompt context, shared
-  workspaces). Skip for changes localized to one component where the impact is
-  self-evident.
+  workspaces). For multi-surface work, enumerate only materially-considered
+  client, service/backend, API/schema/event contract, data,
+  operational/rollout, verification/test, and agent/tool surfaces; mark each
+  `in-scope`, `out-of-scope: <reason>`, or
+  `deferred: <owner/trigger>`. Omit irrelevant surfaces rather than filling
+  a closed matrix with `not-applicable`. Skip for changes localized to one
+  component where the impact is self-evident.
 
 - **Risks & Dependencies** — include when there are real risks worth flagging
   (external service changes, version pins under churn, behavioral assumptions
@@ -257,6 +264,22 @@ a section with placeholder prose is worse than omitting it.
   not enumerated). Process exhaust (reading the user's prompt, glancing at
   obvious entry points, restating prose) → omit. Surface inline next to the
   KTD or unit it justifies, or as a dedicated section — both shapes work.
+
+- **Evidence & Limitations** — include when provider output, historical
+  learnings, cross-repo reads, dirty-worktree state, or external research
+  materially shapes a decision. Record direct refs, provenance/freshness,
+  limitations, and plan impact. Omit when no such evidence is load-bearing.
+
+- **Existing Capability / Composition / Source Ownership** — include as a KTD
+  or unit field when a plan proposes a new abstraction, adapter or orchestrator,
+  integration seam, or durable source surface. Record the architecture posture
+  as `reuse / extend / compose / new`, the existing capabilities and owners
+  inspected, and the chosen source-of-truth or extension point. For
+  `compose / thin-glue`, state the narrow glue responsibility, participating
+  authorities, failure propagation, and observability/evidence boundary. For
+  `new`, state the rejected owner or composition shape and boundary reason.
+  Do not create a long matrix for ordinary changes, and do not turn this into a
+  mandatory artifact schema.
 
 ## Agent agency
 

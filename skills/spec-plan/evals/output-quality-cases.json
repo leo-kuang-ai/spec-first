@@ -1,0 +1,297 @@
+{
+  "schema_version": "spec-first.spec-plan-output-quality-cases.v1",
+  "skill": "spec-plan",
+  "source_refs": [
+    "skills/spec-plan/SKILL.md",
+    "skills/spec-plan/references/planning-evidence-boundaries.md",
+    "skills/spec-plan/references/high-risk-plan-lens.md",
+    "skills/spec-plan/references/plan-sections.md",
+    "skills/spec-plan/references/deepening-workflow.md",
+    "skills/spec-plan/references/agents/architecture-strategist.md",
+    "skills/spec-plan/references/agents/pattern-recognition-specialist.md"
+  ],
+  "source_ref_authority": "source",
+  "coverage_tags": ["expected", "output-quality"],
+  "cases": [
+    {
+      "id": "goal-capsule-supports-first-pass-decision",
+      "input": "Produce a Standard implementation plan for a cross-module change.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/plan-sections.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "A reviewer must scan dense units before understanding the recommended approach, verification focus, and largest risk."
+      ],
+      "with_skill_expectations": [
+        "The first-screen Goal Capsule states the objective, recommended approach, decision focus, verification focus, and largest risk or boundary without duplicating detailed sections."
+      ],
+      "objective_assertions": [
+        "Goal Capsule content points to lower sections and remains compact enough for first-pass review."
+      ],
+      "expected_outcome": "The unified artifact stays machine-consumable while improving human first-pass judgment.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "unsupported-plan-exposes-evidence-limitations",
+      "input": "Plan a source/runtime refactor using provider graph output and a dirty worktree.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "Advisory provider output or dirty source is presented as confirmed repository-wide truth.",
+        "Generated runtime mirrors become proposed source owners."
+      ],
+      "with_skill_expectations": [
+        "The plan records direct source refs, provenance/freshness, dirty-worktree or tool limitations, re-grounding, and the decisions affected.",
+        "Runtime mirrors remain generated evidence rather than source mutation targets."
+      ],
+      "objective_assertions": [
+        "Every load-bearing advisory input has a current source or explicit limitation.",
+        "No generated runtime path is assigned source authority."
+      ],
+      "expected_outcome": "The plan is evidence-grounded and visibly limited where evidence is incomplete.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["provider telemetry", "model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-mq-requires-idempotency-and-final-failure",
+      "input": "Plan a cross-service write that publishes an event and retries consumers.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan says retry without idempotency, ordering, dedupe, poison/final failure, compensation, or manual recovery."
+      ],
+      "with_skill_expectations": [
+        "The plan makes contract, idempotency/dedupe, retry, ordering, final failure, recovery, and verification explicit or blocks handoff."
+      ],
+      "objective_assertions": [
+        "Async retry has an explicit final-failure or manual-recovery decision."
+      ],
+      "expected_outcome": "High-risk async behavior is implementable and reviewable before handoff.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-money-write-protects-invariants",
+      "input": "Plan a refund and settlement adjustment that can update a ledger twice after retry.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan names transactions but leaves the financial invariant, idempotency boundary, audit trail, and compensation path implicit."
+      ],
+      "with_skill_expectations": [
+        "The plan states the invariant, idempotency boundary, audit evidence, failure handling, and rollback or compensation decision before implementation handoff."
+      ],
+      "objective_assertions": [
+        "An irreversible money write cannot be implementation-ready with an unstated invariant or duplicate-effect policy."
+      ],
+      "expected_outcome": "Financial behavior is bounded by reviewable invariants and recovery decisions.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-auth-privacy-names-enforcement-and-data-flow",
+      "input": "Plan a role change that exposes sensitive profile fields to web analytics and exports.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan names permissions and PII but omits actor rules, enforcement points, denial behavior, downstream data flow, masking, or retention."
+      ],
+      "with_skill_expectations": [
+        "The plan makes the actor, permission rule, enforcement point, denial behavior, audit/privacy boundary, data categories, transfer path, minimization or masking, retention, and owner-visible verification explicit."
+      ],
+      "objective_assertions": [
+        "Privacy review follows personal data through clients, analytics, exports, caches, telemetry, and third parties when present."
+      ],
+      "expected_outcome": "Authorization and privacy boundaries are implementable across the full data path.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-migration-has-compatibility-and-rollback",
+      "input": "Plan a schema migration, backfill, cache reindex, and irreversible data-shape cutover.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan sequences the happy path but omits the compatibility window, backup or rollback posture, backfill failure handling, and verification query."
+      ],
+      "with_skill_expectations": [
+        "The plan states migration order, compatibility window, backup/rollback, backfill posture, cache consistency boundary, and a concrete verification query or check."
+      ],
+      "objective_assertions": [
+        "An irreversible migration with no rollback or owner-visible verification remains below implementation-ready."
+      ],
+      "expected_outcome": "Data transition risk is explicit before code or production mutation begins.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-scheduled-job-handles-overlap-and-catchup",
+      "input": "Plan a recurring reconciliation job that may overlap, miss runs, or fail after retries.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan says cron and retry but leaves overlap prevention, missed-run catch-up, alerts, and terminal recovery unspecified."
+      ],
+      "with_skill_expectations": [
+        "The plan makes idempotency, overlap protection, schedule/catch-up behavior, monitoring/alerting, and final failure or manual recovery explicit."
+      ],
+      "objective_assertions": [
+        "A recurring job has an explicit overlap and missed-run policy."
+      ],
+      "expected_outcome": "Scheduled work has reviewable concurrency and recovery semantics.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-rollout-has-owner-visible-gates",
+      "input": "Plan a staged external integration rollout behind a feature flag.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan mentions a flag but omits rollout criteria, success/failure signals, rollback trigger, operational owner, or support impact."
+      ],
+      "with_skill_expectations": [
+        "The plan names the rollout gate, observable success/failure signal, owner, rollback trigger, and support/runbook impact."
+      ],
+      "objective_assertions": [
+        "A customer-visible rollout cannot close on a flag name alone."
+      ],
+      "expected_outcome": "Rollout and rollback decisions are operationally executable and reviewable.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "new-source-surface-has-owner-decision",
+      "input": "Plan a new skill reference, validator, schema, and runtime projection.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan creates a second source-of-truth without inspecting existing owners."
+      ],
+      "with_skill_expectations": [
+        "Each durable new surface has a right-sized reuse, extend, compose, or new decision, the existing owner inspected, and the chosen source-of-truth."
+      ],
+      "objective_assertions": [
+        "Generated runtime mirrors are never candidate source owners.",
+        "A new decision names the rejected owner and boundary reason."
+      ],
+      "expected_outcome": "The plan prefers existing ownership and makes any new durable boundary explicit.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "existing-capabilities-compose-through-thin-glue",
+      "input": "Plan an integration where an existing parser already validates input and an existing publisher already owns delivery, but the new flow must translate results, sequence both capabilities, expose partial failure, and aggregate evidence.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" },
+        { "path": "skills/spec-plan/references/agents/architecture-strategist.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan creates a second end-to-end workflow or a wrapper that copies parser and publisher rules.",
+        "The integration seam hides partial failure or becomes a new source of domain truth."
+      ],
+      "with_skill_expectations": [
+        "The plan inventories both existing capabilities and chooses compose / thin-glue instead of duplicating either owner.",
+        "The glue owns only translation, sequencing, failure/degradation routing, observability, and evidence aggregation; parser and publisher domain truth remain authoritative."
+      ],
+      "objective_assertions": [
+        "No parallel parser, publisher, or durable workflow state is introduced.",
+        "Failure propagation and participating-owner authority are explicit."
+      ],
+      "expected_outcome": "The plan composes existing primitives through a narrow, observable seam instead of building a second pipeline.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "existing-owner-extends-instead-of-parallel-abstraction",
+      "input": "Plan a focused capability addition where the current module already owns the contract, persistence boundary, and tests, but a new helper service is tempting.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" },
+        { "path": "skills/spec-plan/references/agents/pattern-recognition-specialist.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan introduces a parallel abstraction and splits one coherent owner across two truth sources."
+      ],
+      "with_skill_expectations": [
+        "The plan identifies the existing owner and extension point, chooses extend, and rejects the helper service because it adds no distinct boundary."
+      ],
+      "objective_assertions": [
+        "A wrapper with no translation, sequencing, safety, or observability value is rejected.",
+        "Existing contract and test ownership remain coherent."
+      ],
+      "expected_outcome": "The plan extends the established owner instead of creating an unnecessary parallel abstraction.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "new-boundary-wins-when-reuse-mixes-concerns",
+      "input": "Plan a new policy engine where the nearest existing orchestrator only sequences jobs and would need to own unrelated policy truth and durable state to absorb the feature.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" },
+        { "path": "skills/spec-plan/references/agents/architecture-strategist.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "A reuse-first slogan forces business policy and state into an orchestration owner with the wrong responsibility."
+      ],
+      "with_skill_expectations": [
+        "The plan rejects forced reuse and thin glue because both would make orchestration own policy truth.",
+        "The plan chooses new, names the rejected owner/composition shape, and defines the new boundary and source-of-truth."
+      ],
+      "objective_assertions": [
+        "Composition-first reasoning does not become an absolute ban on justified new boundaries.",
+        "The new owner has a distinct responsibility and does not duplicate an existing truth source."
+      ],
+      "expected_outcome": "The plan creates a justified new boundary when reuse or composition would mix concerns.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "multi-surface-plan-closes-coverage",
+      "input": "Plan a change spanning mobile, web, admin, backend, events, analytics, and agent tools.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/plan-sections.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "A materially affected client or contract surface is silently omitted."
+      ],
+      "with_skill_expectations": [
+        "Every materially-considered surface is in-scope, out-of-scope with a reason, or deferred with an owner/trigger; irrelevant surfaces are omitted."
+      ],
+      "objective_assertions": [
+        "The plan uses a conditional derived list rather than a closed exhaustive matrix or not-applicable rows."
+      ],
+      "expected_outcome": "Multi-surface breadth is explicit without bloating single-surface plans.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "lightweight-change-stays-lean",
+      "input": "Plan a localized copy correction in an already-owned file.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" },
+        { "path": "skills/spec-plan/references/planning-evidence-boundaries.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The planner emits enterprise, evidence, ownership, or surface-coverage sections that carry no information."
+      ],
+      "with_skill_expectations": [
+        "The plan remains Lightweight and omits high-risk, evidence, source-ownership, and multi-surface detail when their triggers do not apply."
+      ],
+      "objective_assertions": [
+        "No fixed enterprise appendix or reuse matrix appears for a localized already-owned change."
+      ],
+      "expected_outcome": "Quality lenses remain conditional and the artifact stays right-sized.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    }
+  ]
+}

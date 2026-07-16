@@ -18,7 +18,7 @@
 | `skills/spec-brainstorm/references/product-pressure-test.md` | `2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84` |
 | `skills/spec-brainstorm/references/brainstorm-sections.md` | `9db1310fbfe61e0d3676feed8be10913b2e8cfe73357f544f0418676400b2105` |
 | `skills/spec-brainstorm/references/handoff.md` | `b399fcffd62033a4edd62e6817fc216f50c60f39ebe5740ec7ea769a0264ee1d` |
-| `skills/spec-plan/SKILL.md` | `91c0538f80dc18f1aefa4f9cd6b81e38d4fd014cdef40f168e264ea49098329a` |
+| `skills/spec-plan/SKILL.md` | `b01be2c81ce90503b74078bf91e44924fed7b74bd00731b062cba07f866d03d3` |
 | `skills/spec-prd/SKILL.md` | `38f26a519741cab7f1538448cec6f703b608041b094533b302cf29149bb8f023` |
 | `skills/spec-prd/references/domain-language-and-decision-ledger.md` | `f1ecde33b3bf5b37e3801e69f95284198506397d355c7dc343fce9acb26acfe3` |
 | `skills/spec-prd/references/evidence-and-topology.md` | `e596b313e36f2ace3a635da75e5dd28a9993ff9e8220b1f8fb9227c56748f95b` |
@@ -29,6 +29,8 @@
 | `docs/contracts/domain-glossary.md` | `6c16fdd75f22f72014cf9b9cb1f843906b5a38ff645a888accdfffb3fb534d41` |
 
 2026-07-15 delta refresh: `spec-brainstorm` / `spec-plan` 增加了与 requirements clarification 正交的 Markdown plan lifecycle metadata 合同，因此上述三项 source hash 与 final-source manifest 已刷新。原 2026-07-12 unit replay 未重跑，也不再证明这三项文件与当时逐字节相同；本次只用独立 fresh-source lifecycle review 验证新增 producer/closeout 语义，原 replay 继续作为历史 clarification 证据，不冒充本次 lifecycle 评估。
+
+2026-07-16 delta refresh: `spec-plan` 增加了与 requirements clarification producer 语义正交的 planning-only、首屏决策、evidence/ownership、高风险、multi-surface、dispatch fallback，以及 `reuse / extend / compose / new` composition-first 架构姿态合同，因此 `skills/spec-plan/SKILL.md` 的 current-source hash 与 final-source manifest 再次刷新。原 2026-07-12 unit replay 未重跑，不证明本轮 source 与当时逐字节相同；本轮只通过 `spec-plan` 聚焦 source/fixture/projection tests 验证新增 planning contract，fresh-source helper eval 因 `dispatch_authorization_missing` 未执行。
 
 U4 removal facts: `skills/spec-brainstorm/references/visual-probes.md` and `skills/spec-brainstorm/scripts/visual-probe-server.js` are absent in the After tree; their Before hashes are retained in the baseline.
 

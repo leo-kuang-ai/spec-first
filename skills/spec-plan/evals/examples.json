@@ -1,0 +1,102 @@
+{
+  "schema_version": "spec-first.workflow-eval-fixtures.v1",
+  "skill": "spec-plan",
+  "description": "Maintainer examples for spec-plan trigger, near-neighbor, planning-only, evidence, risk, and dispatch-fallback behavior.",
+  "source_refs": [
+    "skills/spec-plan/SKILL.md",
+    "skills/spec-plan/references/planning-evidence-boundaries.md",
+    "skills/spec-plan/references/high-risk-plan-lens.md",
+    "skills/spec-plan/references/plan-sections.md",
+    "skills/spec-plan/references/plan-handoff.md",
+    "skills/spec-plan/references/approach-altitude.md",
+    "skills/spec-plan/references/universal-planning.md",
+    "skills/spec-plan/references/repo-profile-cache.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "unified-requirements-enrichment",
+      "input": "Create the implementation plan from a requirements-only unified plan.",
+      "coverage_tags": ["trigger", "planning", "unified-artifact"],
+      "expected_outcome": "Enrich the same Product Contract to implementation-ready while preserving its stable product IDs and recording the implementation-facing contract."
+    },
+    {
+      "id": "unclear-direct-invocation-stays-planning",
+      "input": "spec-plan improve onboarding",
+      "coverage_tags": ["trigger", "fallback", "planning"],
+      "expected_outcome": "Stay in planning, clarify or bootstrap the scope, and do not abandon the direct invocation."
+    },
+    {
+      "id": "repo-analysis-is-answer-seeking",
+      "input": "How does our local authorization approach compare with the alternative in this design note?",
+      "coverage_tags": ["boundary", "answer-seeking"],
+      "expected_outcome": "Read the named local sources, state a brief plan of attack, perform analysis only, and answer without creating an implementation plan by default."
+    },
+    {
+      "id": "approach-comparison-routes-to-altitude",
+      "input": "Compare three viable implementation approaches and recommend the right level before we commit to a detailed plan.",
+      "coverage_tags": ["trigger", "approach-altitude", "planning"],
+      "expected_outcome": "Use the approach-altitude branch to compare meaningful architecture or sequencing choices, recommend one, and stop at that branch's own handoff instead of forcing the full software-plan phases."
+    },
+    {
+      "id": "existing-plan-deepening-preserves-artifact",
+      "input": "Deepen docs/plans/2026-01-01-001-example-plan.md and close its confidence gaps.",
+      "coverage_tags": ["trigger", "deepening", "existing-artifact"],
+      "expected_outcome": "Treat the named plan as the artifact to deepen in place, preserve its valid contract and lifecycle metadata, and run the confidence/deepening path rather than creating a second plan."
+    },
+    {
+      "id": "legacy-prd-is-compatible-input",
+      "input": "Create the implementation plan from this existing spec-prd document.",
+      "coverage_tags": ["boundary", "legacy-origin", "planning"],
+      "expected_outcome": "Read the PRD as a legacy compatible requirements input, preserve its traceable requirement evidence, and create or enrich the current unified plan without inventing a future spec-prd unified origin."
+    },
+    {
+      "id": "html-output-remains-exclusive-and-honest",
+      "input": "Create this implementation plan with output:html.",
+      "coverage_tags": ["trigger", "html", "handoff"],
+      "expected_outcome": "Write one HTML plan with visible metadata and stable anchors, do not create a Markdown sidecar or status lifecycle field, and report the documented spec-doc-review skip instead of claiming review passed."
+    },
+    {
+      "id": "repo-profile-cache-miss-has-inline-path",
+      "input": "Plan a repository change when the shared repo profile cache is missing and delegation was not authorized.",
+      "coverage_tags": ["failure", "cache-miss", "fallback"],
+      "expected_outcome": "Derive the bounded repository profile inline from current source, use the cache script only within its documented contract, and continue planning without dispatch or a cache dependency."
+    },
+    {
+      "id": "implementation-now-routes-to-work",
+      "input": "Implement this finished plan and run its tests.",
+      "coverage_tags": ["boundary", "workflow-routing"],
+      "expected_outcome": "Route implementation and tests to spec-work instead of continuing in spec-plan."
+    },
+    {
+      "id": "planning-only-no-code-before-handoff",
+      "input": "Plan the change and immediately patch the obvious files.",
+      "coverage_tags": ["boundary", "planning-only"],
+      "expected_outcome": "Research and write only the plan artifact before a blocking handoff selection; do not edit implementation source or run implementation tests."
+    },
+    {
+      "id": "generated-runtime-is-not-source",
+      "input": "Fix the planning workflow by editing .agents/skills/spec-plan/SKILL.md.",
+      "coverage_tags": ["boundary", "source-runtime"],
+      "expected_outcome": "Treat the runtime mirror as generated evidence, plan the fix against skills/spec-plan source or its generator, and regenerate later through the project workflow."
+    },
+    {
+      "id": "dispatch-authorization-missing-falls-back-inline",
+      "input": "Create a deep plan; no delegation or external research authorization was provided.",
+      "coverage_tags": ["failure", "authorization", "fallback"],
+      "expected_outcome": "Do not spawn research agents or access external sources; apply relevant prompt assets inline, record dispatch_authorization_missing, and complete the plan."
+    },
+    {
+      "id": "high-risk-async-plan-is-concrete",
+      "input": "Plan a cross-service write with MQ retry and scheduled reconciliation.",
+      "coverage_tags": ["trigger", "high-risk", "planning"],
+      "expected_outcome": "Make contract, idempotency, retry, ordering, final-failure/manual-recovery, observability, and verification decisions explicit or keep a launch-blocking question open."
+    },
+    {
+      "id": "new-skill-surface-needs-owner-decision",
+      "input": "Plan a new skill, helper script, schema, and host runtime projection.",
+      "coverage_tags": ["trigger", "source-ownership", "planning"],
+      "expected_outcome": "Inspect existing project-owned owners and record right-sized reuse, extend, or new decisions without treating generated runtime as source."
+    }
+  ]
+}

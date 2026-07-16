@@ -2,6 +2,8 @@
 
 This file contains the confidence-check execution path (5.3.3-5.3.7). Load it only when the deepening gate at 5.3.2 determines that deepening is warranted.
 
+When the plan's risk profile hits `references/high-risk-plan-lens.md`, use that reference as the readiness checklist for the affected sections. It sharpens semantic questions; it does not replace the scoring model or let scripts decide adequacy.
+
 ## 5.3.3 Score Confidence Gaps
 
 Use a checklist-first, risk-weighted scoring pass.
@@ -35,6 +37,7 @@ If the plan already has a `deepened:` date:
 - Cited learnings or references do not materially shape the plan
 - High-risk work lacks appropriate external or internal grounding
 - Research is generic instead of tied to this repo or this plan
+- Provider, historical, external, dirty-worktree, or cross-repo evidence shapes the plan without provenance, freshness, limitations, re-grounding, or a named plan impact
 
 **Key Technical Decisions**
 - A decision is stated without rationale
@@ -42,6 +45,10 @@ If the plan already has a `deepened:` date:
 - The decision does not connect back to scope, requirements, or origin context
 - An obvious design fork exists but the plan never addresses why one path won
 - Agent/tool/workflow features lack an explicit decision about action parity, context parity, shared workspace, tool granularity, or approval posture
+- A new abstraction, adapter or orchestrator, integration seam, or durable source surface is proposed without a `reuse / extend / compose / new` architecture posture, existing-capability inventory, source-of-truth, or rejected-owner/composition reason
+- A `compose / thin-glue` decision does not bound glue ownership, participating authorities, failure propagation, degradation, or observability/evidence
+- A wrapper or parallel pipeline duplicates an existing capability without adding a real translation, sequencing, safety, or observability boundary
+- Reuse or extension is forced even though it mixes responsibilities or distorts the existing owner's contract
 
 **Open Questions**
 - Product blockers are hidden as assumptions
@@ -74,6 +81,7 @@ If the plan already has a `deepened:` date:
 
 **System-Wide Impact**
 - Affected interfaces, callbacks, middleware, entry points, or parity surfaces are missing
+- Multi-surface work omits a materially-considered client, service/backend, API/schema/event contract, data, operational/rollout, verification/test, or agent/tool surface instead of marking it in-scope, out-of-scope with a reason, or deferred with an owner/trigger
 - Failure propagation is underexplored
 - State lifecycle, caching, or data integrity risks are absent where relevant
 - Integration coverage is weak for cross-layer work
@@ -84,6 +92,7 @@ If the plan already has a `deepened:` date:
 - Rollout, monitoring, migration, or support implications are missing when warranted
 - External dependency assumptions are weak or unstated
 - Security, privacy, performance, or data risks are absent where they obviously apply
+- A high-risk trigger lacks the invariant, compatibility, idempotency, final-failure, rollback, owner-visible signal, or verification decision required by `high-risk-plan-lens.md`
 
 Use the plan's own `Context & Research` and `Sources & References` as evidence. If those sections cite a pattern, learning, or risk that never affects decisions, implementation units, or verification, treat that as a confidence gap.
 
@@ -114,6 +123,7 @@ The names below are skill-local prompt asset file stems under `references/agents
 
 **Key Technical Decisions**
 - `architecture-strategist` for design integrity, boundaries, and architectural tradeoffs
+- `pattern-recognition-specialist` for reuse/extension candidates, composition seams, duplication risk, and unnecessary wrappers or parallel abstractions
 - `agent-native-planning-strategist` when the decision involves agents, prompts, tools, MCP, workflow automation, action/context parity, shared workspace, approval gates, or agent execution lifecycle
 - Add `framework-docs-researcher` or `best-practices-researcher` when the decision needs external grounding beyond repo evidence
 
@@ -185,7 +195,7 @@ Refer to the echoed absolute path as `<scratch-dir>` throughout the rest of this
 
 ## 5.3.6 Run Targeted Research
 
-Launch the selected local prompt assets as generic subagents in parallel using the execution mode chosen above. If the current platform does not support parallel dispatch, run them sequentially instead. Omit the `mode` parameter when dispatching so the user's configured permission settings apply.
+Launch selected prompt assets as generic subagents only when the host supports dispatch and the user or an upstream handoff explicitly authorized delegation/research dispatch for this run. Otherwise read the same prompt assets and apply them sequentially in the current agent, recording `dispatch_authorization_missing` or the actual capability failure. Plan generation and deepening must still complete through this inline fallback. When dispatching, omit the `mode` parameter so the user's configured permission settings apply.
 
 Prefer local repo and institutional evidence first. Use external research only when the gap cannot be closed responsibly from repo context or already-cited sources.
 
