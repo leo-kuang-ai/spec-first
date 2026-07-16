@@ -597,6 +597,28 @@ describe('Graphify provider', () => {
     expect(fs.existsSync(path.join(fixture.target, '.graphify-migration-journal.json'))).toBe(false);
   });
 
+  test('keeps the project artifact root when refreshing a nested requirement workspace', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('nested-workspace-refresh');
+    fs.mkdirSync(path.join(fixture.target, 'packages', 'api'), { recursive: true });
+    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, '.graphify', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
+    );
+
+    const actionPlan = provider.plan({
+      ...fixture.context,
+      refresh: true,
+      requirementWorkspace: path.join('packages', 'api'),
+    });
+    expect(actionPlan.actions.find((action) => action.kind === 'refresh')).toMatchObject({
+      args: ['update', path.join('packages', 'api')],
+      graphify_out: path.join('..', '..', '.graphify'),
+    });
+    expect(actionPlan.artifact_root).toBe(path.join(fixture.target, '.graphify'));
+  });
+
   test('pins Graphify hook commands to a contained custom hooks root and verifies that root', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('contained-hooks');
