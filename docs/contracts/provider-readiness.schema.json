@@ -115,7 +115,7 @@
         "usage_owner": { "enum": ["downstream-skill", "provider-native", "user", "none", "unknown"] },
         "hook_installed": { "type": "boolean" },
         "hook_verified": { "type": "boolean" },
-        "hook_status": { "enum": ["verified", "installed", "failed", "skipped", "unknown"] },
+        "hook_status": { "enum": ["verified", "installed", "failed", "blocked", "skipped", "unknown"] },
         "hook_skipped_reason": { "type": ["string", "null"] }
       },
       "additionalProperties": false

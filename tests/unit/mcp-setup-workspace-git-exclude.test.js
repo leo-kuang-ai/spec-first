@@ -12,6 +12,7 @@ const {
   MANAGED_BLOCK_START,
   MANAGED_BLOCK_END,
 } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
+const { resolveGitPath } = require('../../skills/spec-runtime-setup/scripts/lib/git-path.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-exclude-')));
@@ -110,6 +111,35 @@ describe('workspace-git-exclude — managed .git/info/exclude writer', () => {
     expect(resolved.ok).toBe(true);
     expect(path.isAbsolute(resolved.absolute)).toBe(true);
     expect(resolved.absolute.endsWith(path.join('info', 'exclude'))).toBe(true);
+  });
+
+  test('shared Git path resolver follows effective hooksPath and distinguishes non-Git roots', () => {
+    const ws = mkWorkspace();
+    const repo = initRepoWithCommit(ws, 'svc');
+    git(repo, ['config', '--local', 'core.hooksPath', '.project-hooks']);
+    expect(resolveGitPath(repo, 'hooks')).toEqual({
+      ok: true,
+      absolute: path.join(repo, '.project-hooks'),
+    });
+
+    const nonGit = path.join(ws, 'plain');
+    fs.mkdirSync(nonGit);
+    expect(resolveGitPath(nonGit, 'hooks')).toEqual({
+      ok: false,
+      reason_code: 'not-a-git-repo',
+    });
+  });
+
+  test('shared Git path resolver exposes linked-worktree metadata outside the worktree root', () => {
+    const ws = mkWorkspace();
+    const main = initRepoWithCommit(ws, 'main');
+    const worktree = path.join(ws, 'wt-hooks');
+    git(main, ['worktree', 'add', '-q', worktree]);
+    const sharedHooks = path.join(main, '.git', 'hooks');
+    git(main, ['config', '--local', 'core.hooksPath', sharedHooks]);
+    const resolved = resolveGitPath(worktree, 'hooks');
+    expect(resolved).toEqual({ ok: true, absolute: sharedHooks });
+    expect(resolved.absolute.startsWith(worktree + path.sep)).toBe(false);
   });
 
   test('remove rejects an exclude symlink escaping the workspace', () => {

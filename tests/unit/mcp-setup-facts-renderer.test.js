@@ -664,6 +664,133 @@ describe('spec-runtime-setup renderer', () => {
     expect(text).toContain('继续目标 spec-* workflow');
   });
 
+  test('human summary keeps a blocked project hook visible without turning core readiness into failure', () => {
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    const ownerAction = '项目外 Git hook 策略未被修改；否则使用 spec-runtime-setup --only graphify --refresh 显式刷新。';
+    const text = renderHumanSummary({
+      toolFacts: {
+        items: [],
+        provider_readiness: [{
+          provider: 'graphify',
+          readiness_status: 'fresh',
+          lifecycle: {
+            installed: true,
+            configured: true,
+            initialized: true,
+            indexed: true,
+            artifact_exists: true,
+            query_verified: true,
+          },
+          steady_state: {
+            refresh_mode: 'manual-only',
+            hook_status: 'blocked',
+            hook_skipped_reason: 'graphify-hook-path-outside-project',
+          },
+          next_actions: [ownerAction],
+        }],
+        configured_dependencies: [],
+      },
+      runtimeCapabilities: {
+        setup_summary: {
+          baseline_ready: true,
+          host_runtime_ready: true,
+          generated_runtime_manifest: { status: 'current' },
+        },
+      },
+    }, {
+      executionSummary: {
+        overall_status: 'ready',
+        reason_code: 'setup-ready',
+        scope: 'full',
+        selected_ids: ['codegraph', 'graphify'],
+        required_provider_ids: ['codegraph', 'graphify'],
+      },
+    });
+
+    expect(text).toContain('整体状态：ready (setup-ready)');
+    expect(text).toContain('optional_auto_refresh: unavailable-by-project-boundary; refresh=manual-only; external_hook_execution=unverified; hook_fact=blocked (graphify-hook-path-outside-project)');
+    expect(text).toContain(ownerAction);
+    expect(text).toContain('继续目标 spec-* workflow');
+    expect(text).not.toContain('/Users/');
+  });
+
+  test('diagnostic accepts core-ready unknown freshness and treats an external hook action as optional', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
+    const ownerAction = '项目外 Git hook 策略未被修改；使用显式 --refresh。';
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [{
+        provider: 'graphify',
+        readiness_status: 'unknown',
+        lifecycle: {
+          installed: true,
+          configured: true,
+          initialized: true,
+          indexed: true,
+          artifact_exists: true,
+          query_verified: true,
+        },
+        steady_state: {
+          refresh_mode: 'manual-only',
+          hook_status: 'blocked',
+          hook_skipped_reason: 'graphify-hook-path-outside-project',
+        },
+        next_actions: [ownerAction],
+      }],
+    }, { requiredProviderIds: ['graphify'] });
+
+    expect(actions).toEqual([
+      ownerAction,
+      '必需设置项已就绪，继续目标 spec-* workflow。',
+    ]);
+    expect(actions.some((action) => action.includes('--verify-only'))).toBe(false);
+  });
+
+  test('diagnostic does not treat unknown freshness as core-ready when the query probe is unverified', () => {
+    const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
+    const actions = diagnosticNextActions({
+      project: {
+        inside_git_repo: true,
+        example_config_status: 'ok',
+        local_config_gitignore_status: 'ok',
+      },
+      runtime: {
+        setup_facts_status: 'ready',
+        runtime_capabilities_status: 'ready',
+        baseline_ready: true,
+        host_runtime_ready: true,
+      },
+      generated_runtime_manifest: { status: 'current' },
+      provider_readiness: [{
+        provider: 'graphify',
+        readiness_status: 'unknown',
+        lifecycle: {
+          installed: true,
+          configured: true,
+          initialized: true,
+          indexed: true,
+          artifact_exists: true,
+          query_verified: false,
+        },
+        next_actions: ['重新运行真实 Graphify query probe。'],
+      }],
+    }, { requiredProviderIds: ['graphify'] });
+
+    expect(actions).toEqual(['重新运行真实 Graphify query probe。']);
+    expect(actions.some((action) => action.includes('继续目标'))).toBe(false);
+  });
+
   test('diagnostic next actions continue only when runtime and required providers are ready', () => {
     const { diagnosticNextActions } = require('../../skills/spec-runtime-setup/scripts/lib/human-output.cjs');
     const actions = diagnosticNextActions({

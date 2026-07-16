@@ -19,32 +19,12 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { resolveGitPath } = require('./git-path.cjs');
 const { assertContainedPath, isPathWithin } = require('./path-safety.cjs');
 
 const MANAGED_BLOCK_START = '# spec-first codegraph exclude start';
 const MANAGED_BLOCK_END = '# spec-first codegraph exclude end';
 const DEFAULT_PATTERNS = ['.codegraph/'];
-
-// Generic `git rev-parse --git-path <gitRelative>` resolution. Correct for
-// `.git`-as-file worktrees/submodules where the real git dir is elsewhere.
-function resolveGitPath(repoRoot, gitRelative) {
-  const result = spawnSync('git', ['-C', repoRoot, 'rev-parse', '--git-path', gitRelative], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    timeout: 5000,
-    windowsHide: true,
-  });
-  if (result.status !== 0) {
-    return { ok: false, reason_code: 'git-path-resolution-failed' };
-  }
-  const raw = String(result.stdout || '').trim();
-  if (!raw) return { ok: false, reason_code: 'git-path-empty' };
-  // `git rev-parse --git-path` returns a path relative to the cwd it was run in
-  // (repoRoot) unless already absolute.
-  const absolute = path.isAbsolute(raw) ? raw : path.resolve(repoRoot, raw);
-  return { ok: true, absolute };
-}
 
 function resolveExcludePath(repoRoot) {
   return resolveGitPath(repoRoot, 'info/exclude');

@@ -15,7 +15,20 @@
 - `.codegraph/` 是 CodeGraph 项目级 SQLite 索引，默认不提交。
 - `.graphify/` 是 Graphify provider-native 项目图谱运行时目录，默认不提交；`spec-first init` 会忽略整个 `.graphify/` 目录。
 - `graphify-out/` 是旧版 Graphify artifact 目录，默认继续忽略，避免历史产物意外提交；当前 setup 会提示刷新为 `.graphify/`。
-- `spec-runtime-setup` 确认 provider pack 后还可能安装 Graphify provider runtime（`.codex/skills/graphify/` 或 `.claude/skills/graphify/`）和 `.git/hooks/post-commit` / `.git/hooks/post-checkout`。前者落在已忽略的 generated/runtime 目录；后者是 Git 本地 hook，不进入仓库提交面。
+- `spec-runtime-setup` 确认 provider pack 后还可能安装 Graphify provider runtime（`.codex/skills/graphify/` 或 `.claude/skills/graphify/`）和 project-local Git hook。Hook 目标由 `git rev-parse --git-path hooks` 解析，默认通常是 `.git/hooks/post-commit` / `.git/hooks/post-checkout`，也可以是仓库内自定义路径；只有目标位于当前项目内并通过 no-follow symlink containment 时才会写入。项目外 `core.hooksPath` 只产生 `manual-only` 可选增强状态，不会被读取、修改、复制或串联。该状态只表示 project-local hook 未由 spec-first 验证，不证明外部 hook 不存在或不会执行；应将 external hook execution 视为 unverified。
+
+如需在 `git commit` 后自动刷新 Graphify，可由仓库 owner 在确认不会绕过现有全局/组织 hooks 后显式启用项目内 hooks root：
+
+```bash
+git config --show-origin --get core.hooksPath
+mkdir -p .githooks
+git config --local core.hooksPath .githooks
+spec-runtime-setup --only graphify
+```
+
+仓库级 `core.hooksPath` 会覆盖全局值。若 `/Users/<user>/.githooks` 或组织配置承载 `commit-msg`、`pre-commit`、`pre-push` 等策略，不应直接切换；应继续使用 `manual-only`，或由 owner 建立受审计的项目 hook dispatcher。Runtime Setup 不自动复制、合并或链式执行这些脚本。
+
+Graphify 上游推荐用 `graphify hook install` 安装提交自动刷新，但该命令遵循 Git 的有效 `core.hooksPath`，没有独立的 project-only hooks 目标参数。若有效路径是用户级共享目录，直接运行会把 Graphify block 追加到共享 `post-commit` / `post-checkout`，从而可能影响所有继承该配置的仓库。因此 Runtime Setup 只在有效路径已位于当前项目内时调用官方 hook installer；项目外路径下若需确认历史 hook 是否仍会执行，由 owner 先运行 `git rev-parse --git-path hooks` 并手工审计对应 hook，setup 不把未读取的外部状态猜成“未安装”。
 - `AGENTS.md`、`CLAUDE.md`、`docs/`、项目源码、测试和 confirmed standards source 应按团队正常协作策略提交。
 
 ## init 默认写入的 `.gitignore` block
@@ -201,8 +214,8 @@ graphify-out/
 
   graphify-out/                     # 旧版 Graphify artifact，legacy 忽略
 
-  .git/hooks/post-commit            # Graphify provider-native refresh hook，本地 Git hook
-  .git/hooks/post-checkout          # Graphify provider-native refresh hook，本地 Git hook
+  .git/hooks/post-commit            # 默认有效 hooks root 下的 Graphify refresh hook；自定义项目内 hooksPath 时位置随 Git 配置变化
+  .git/hooks/post-checkout          # 默认有效 hooks root 下的 Graphify refresh hook；项目外 hooksPath 时 setup 不写入
 
 ```
 

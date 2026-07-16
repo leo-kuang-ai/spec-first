@@ -17,6 +17,7 @@ const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
 const sandboxRoots = new Set();
 
 const WORKSPACE_LIB_MODULES = [
+  'git-path.cjs',
   'workspace-manifest.cjs',
   'workspace-graph-artifacts.cjs',
   'workspace-target.cjs',

@@ -26,6 +26,8 @@ function childRepo(workspace, relativePath) {
 function initializeGitRepo(root) {
   const result = spawnSync('git', ['init', '-q', root], { encoding: 'utf8' });
   if (result.status !== 0) throw new Error(`git init failed: ${result.stderr || result.stdout}`);
+  const hooks = spawnSync('git', ['-C', root, 'config', '--local', 'core.hooksPath', '.git/hooks'], { encoding: 'utf8' });
+  if (hooks.status !== 0) throw new Error(`git config failed: ${hooks.stderr || hooks.stdout}`);
 }
 
 function installGlobalSkill(homeDir, skillName) {
@@ -153,7 +155,9 @@ function fakeRunner(command, args, options = {}) {
   }
   if (graphifyCommand && args[0] === 'hook' && args[1] === 'install') {
     const interpreter = path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin', 'python');
-    const hooksRoot = path.join(cwd, '.git', 'hooks');
+    const hooksRoot = options.env && options.env.GIT_CONFIG_VALUE_0
+      ? options.env.GIT_CONFIG_VALUE_0
+      : path.join(cwd, '.git', 'hooks');
     fs.mkdirSync(hooksRoot, { recursive: true });
     for (const [name, markers] of Object.entries({
       'post-commit': ['# graphify-hook-start', '# graphify-hook-end'],
@@ -291,7 +295,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(audit.violations).toEqual([]);
     expect(result).toMatchObject({ exit_code: 0, mode: 'plan' });
     expect(result.payload.planned_operations).toEqual(expect.arrayContaining([
-      expect.objectContaining({ kind: 'refresh', provider: 'graphify', clean_rebuild: true }),
+      expect.objectContaining({
+        kind: 'refresh',
+        provider: 'graphify',
+        args: ['update', '.'],
+        graphify_out: '.graphify',
+      }),
     ]));
     expect(snapshot(target)).toEqual(before);
     expect(snapshot(homeDir)).toEqual(homeBefore);
@@ -1076,6 +1085,81 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         configured_status: 'ready',
         result: 'ready',
       });
+  });
+
+  test('full required setup stays ready when the effective Graphify hooks root is external', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('graphify-external-hooks-full');
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-external-hooks-'));
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    fs.writeFileSync(path.join(outsideHooks, 'sentinel'), 'preserve\n');
+    const configured = spawnSync('git', ['-C', target, 'config', '--local', 'core.hooksPath', outsideHooks], { encoding: 'utf8' });
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+    const before = snapshot(outsideHooks);
+    const calls = [];
+    const runner = (command, args, options = {}) => {
+      calls.push({ command, args: [...args], env: { ...(options.env || {}) } });
+      if (command === 'codegraph' && args[0] === '--version') {
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.4.1' };
+      }
+      if (command === 'codegraph' && args[0] === 'init') {
+        fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+        fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+        return fakeRunner(command, args, options);
+      }
+      if (command === 'codegraph' && args[0] === 'status') {
+        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+      }
+      return fakeRunner(command, args, options);
+    };
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph,graphify'],
+      cwd: target,
+      skillRoot,
+      runner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir,
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 0,
+      reason_code: 'setup-facts-written',
+      payload: {
+        execution_summary: {
+          overall_status: 'ready',
+          reason_code: 'setup-ready',
+          scope: 'full',
+          selected_ids: ['codegraph', 'graphify'],
+          required_provider_ids: ['codegraph', 'graphify'],
+        },
+      },
+    });
+    expect(calls.filter((call) => path.basename(call.command) === 'graphify' && call.args[0] === 'hook')).toEqual([]);
+    expect(snapshot(outsideHooks)).toEqual(before);
+    expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: {
+        configured: true,
+        initialized: true,
+        indexed: true,
+        artifact_exists: true,
+        query_verified: true,
+      },
+      first_generation: { status: 'completed' },
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_installed: false,
+        hook_verified: false,
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
+      },
+    });
+    expect(result.human).toContain('整体状态：ready (setup-ready)');
+    expect(result.human).toContain('optional_auto_refresh: unavailable-by-project-boundary');
+    expect(result.human).toContain('继续目标 spec-* workflow');
+    expect(result.human).not.toContain(outsideHooks);
   });
 
   test('reconciles CodeGraph configured lifecycle from the post-write host config probe', () => {

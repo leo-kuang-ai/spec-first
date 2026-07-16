@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const { validateAgainstSchema } = require('../../src/contracts/schema-validator');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
@@ -12,6 +13,11 @@ function tempRepo(label) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-${label}-`));
   fs.mkdirSync(path.join(root, '.git'), { recursive: true });
   return root;
+}
+
+function initializeGitRepo(root) {
+  const result = spawnSync('git', ['init', '-q', root], { encoding: 'utf8' });
+  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
 }
 
 function success(stdout = '') {
@@ -50,8 +56,12 @@ function materializeGraphifyProjectSkill(target, args) {
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\n');
 }
 
-function materializePythonGraphifyHooks(target, interpreter, userCommand = '') {
-  const hooksRoot = path.join(target, '.git', 'hooks');
+function materializePythonGraphifyHooks(
+  target,
+  interpreter,
+  userCommand = '',
+  hooksRoot = path.join(target, '.git', 'hooks'),
+) {
   fs.mkdirSync(hooksRoot, { recursive: true });
   const bodies = {
     'post-commit': [
@@ -83,6 +93,94 @@ function materializePythonGraphifyHooks(target, interpreter, userCommand = '') {
     fs.writeFileSync(hookPath, lines.filter((line) => line !== '').join('\n') + '\n');
     fs.chmodSync(hookPath, 0o755);
   }
+}
+
+function createGraphifyApplyFixture(label) {
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-graphify-${label}-`));
+  const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-graphify-${label}-home-`));
+  initializeGitRepo(target);
+  const binDir = path.join(homeDir, '.local', 'bin');
+  const toolRoot = path.join(homeDir, '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin');
+  const launcher = path.join(binDir, 'graphify');
+  const interpreter = path.join(toolRoot, 'python');
+  fs.mkdirSync(binDir, { recursive: true });
+  fs.mkdirSync(toolRoot, { recursive: true });
+  fs.writeFileSync(launcher, `#!${interpreter}\n`);
+  fs.writeFileSync(interpreter, '#!/bin/sh\n');
+  fs.chmodSync(launcher, 0o755);
+  fs.chmodSync(interpreter, 0o755);
+  const hookCalls = [];
+  const graphifyCalls = [];
+  let onHookCommand = null;
+  const runner = (command, args, options = {}) => {
+    if (command === 'python3' && args[0] === '-c') return success('3.12.4');
+    if (command === 'uv' && args[0] === '--version') return success('uv 0.8.0');
+    if (command === 'uv' && args.join(' ') === 'tool dir --bin') return success(binDir);
+    if (command === 'uv' && args.join(' ') === 'tool dir') return success(path.dirname(toolRoot));
+    if (command === interpreter && args[0] === '-c') {
+      return success(JSON.stringify({ version: '0.9.12', packages: [['graphifyy', '0.9.12']] }));
+    }
+    if (command === launcher && args[0] === '--version') return success('graphify 0.9.12');
+    if (command === launcher) graphifyCalls.push({ args: [...args], env: { ...(options.env || {}) } });
+    if (command === launcher && args[0] === 'extract') {
+      fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
+      fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
+      return success('generated');
+    }
+    if (command === launcher && args[0] === 'update') {
+      fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
+      fs.writeFileSync(
+        path.join(target, '.graphify', 'graph.json'),
+        JSON.stringify({ nodes: [{ id: 'fixture-refreshed' }], links: [] }),
+      );
+      return success('updated');
+    }
+    if (command === launcher && args[0] === 'query') return success('query ok');
+    if (command === launcher && args[0] === 'hook') {
+      const call = { args: [...args], env: { ...(options.env || {}) } };
+      hookCalls.push(call);
+      const hooksRoot = call.env.GIT_CONFIG_VALUE_0 || path.join(target, '.git', 'hooks');
+      if (args[1] === 'install') materializePythonGraphifyHooks(target, interpreter, '', hooksRoot);
+      if (typeof onHookCommand === 'function') onHookCommand(call);
+      if (args[1] === 'status') {
+        const installed = ['post-commit', 'post-checkout'].every((name) => fs.existsSync(path.join(hooksRoot, name)));
+        return installed ? success('installed') : failure('missing');
+      }
+      return success('ok');
+    }
+    return failure(`unexpected ${command} ${args.join(' ')}`);
+  };
+  const dependency = { ecosystem: 'pypi', package: 'graphifyy', version: '0.9.12', command: 'graphify' };
+  const context = {
+    selected: true,
+    probeDependency: true,
+    repoRoot: target,
+    homeDir,
+    host: 'qoder',
+    dependency,
+    env: {
+      HOME: homeDir,
+      PATH: binDir,
+      GIT_CONFIG_COUNT: '2',
+      GIT_CONFIG_KEY_0: 'credential.helper',
+      GIT_CONFIG_VALUE_0: 'inherited-secret-helper',
+      GIT_CONFIG_KEY_1: 'core.hooksPath',
+      GIT_CONFIG_VALUE_1: '/inherited/outside/hooks',
+    },
+    runner,
+  };
+  return {
+    target,
+    homeDir,
+    launcher,
+    interpreter,
+    hookCalls,
+    graphifyCalls,
+    context,
+    setHookCommandCallback(callback) {
+      onHookCommand = callback;
+    },
+  };
 }
 
 describe('spec-runtime-setup provider registry', () => {
@@ -326,6 +424,306 @@ describe('CodeGraph provider', () => {
 });
 
 describe('Graphify provider', () => {
+  test('keeps an external effective hooks path read-only and preserves core readiness', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('external-hooks');
+    const { target, context, hookCalls } = fixture;
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-user-hooks-'));
+    fs.writeFileSync(path.join(outsideHooks, 'sentinel'), 'preserve\n');
+    const configured = spawnSync('git', ['-C', target, 'config', '--local', 'core.hooksPath', outsideHooks], { encoding: 'utf8' });
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+    const before = fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')]);
+
+    const outsideProbes = [];
+    const originalExistsSync = fs.existsSync;
+    const originalLstatSync = fs.lstatSync;
+    const originalReadFileSync = fs.readFileSync;
+    const existsSpy = jest.spyOn(fs, 'existsSync').mockImplementation((candidate) => {
+      if (String(candidate).startsWith(outsideHooks)) outsideProbes.push(['existsSync', candidate]);
+      return originalExistsSync(candidate);
+    });
+    const lstatSpy = jest.spyOn(fs, 'lstatSync').mockImplementation((candidate, options) => {
+      if (String(candidate).startsWith(outsideHooks)) outsideProbes.push(['lstatSync', candidate]);
+      return originalLstatSync(candidate, options);
+    });
+    const readSpy = jest.spyOn(fs, 'readFileSync').mockImplementation((candidate, options) => {
+      if (String(candidate).startsWith(outsideHooks)) outsideProbes.push(['readFileSync', candidate]);
+      return originalReadFileSync(candidate, options);
+    });
+    let actionPlan;
+    let result;
+    try {
+      expect(provider.resolveGraphifyHookTarget(target)).toEqual({
+        classification: 'external',
+        reason_code: 'graphify-hook-path-outside-project',
+      });
+
+      actionPlan = provider.plan(context);
+      expect(actionPlan).toMatchObject({
+        blocked: false,
+        hook_target: {
+          classification: 'external',
+          reason_code: 'graphify-hook-path-outside-project',
+        },
+      });
+      expect(JSON.stringify(actionPlan)).not.toContain(outsideHooks);
+
+      result = provider.apply(context, actionPlan);
+    } finally {
+      existsSpy.mockRestore();
+      lstatSpy.mockRestore();
+      readSpy.mockRestore();
+    }
+    expect(outsideProbes).toEqual([]);
+    expect(hookCalls).toEqual([]);
+    expect(fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')])).toEqual(before);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: {
+        configured: true,
+        initialized: true,
+        indexed: true,
+        artifact_exists: true,
+        query_verified: true,
+      },
+      first_generation: { status: 'completed' },
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_installed: false,
+        hook_verified: false,
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
+      },
+    });
+    expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
+
+    const verified = provider.verify(context);
+    expect(hookCalls).toEqual([]);
+    expect(verified).toMatchObject({
+      readiness_status: 'unknown',
+      lifecycle: { configured: true, artifact_exists: true, query_verified: true },
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
+      },
+    });
+    expect(verified.next_actions).toEqual([
+      expect.stringContaining('可选 project-local 自动刷新未启用'),
+    ]);
+    expect(verified.next_actions.join('\n')).toContain('现有 hook 是否会执行 Graphify 未经 setup 验证');
+    expect(verified.next_actions.join('\n')).not.toContain('执行显式 incremental refresh');
+  });
+
+  test('does not claim fresh when ordinary setup only probes an existing Graphify artifact', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('existing-artifact');
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-existing-user-hooks-'));
+    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, '.graphify', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
+    );
+    const configured = spawnSync(
+      'git',
+      ['-C', fixture.target, 'config', '--local', 'core.hooksPath', outsideHooks],
+      { encoding: 'utf8' },
+    );
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+
+    const actionPlan = provider.plan(fixture.context);
+    expect(actionPlan.actions.some((action) => ['first-generation', 'refresh'].includes(action.kind))).toBe(false);
+
+    const result = provider.apply(fixture.context, actionPlan);
+    expect(fixture.hookCalls).toEqual([]);
+    expect(result).toMatchObject({
+      readiness_status: 'unknown',
+      lifecycle: {
+        configured: true,
+        initialized: true,
+        indexed: true,
+        artifact_exists: true,
+        query_verified: true,
+      },
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
+      },
+    });
+  });
+
+  test('refreshes an existing Graphify graph in place without spec-first staging or backup artifacts', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('incremental-refresh');
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-refresh-user-hooks-'));
+    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, '.graphify', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
+    );
+    const configured = spawnSync(
+      'git',
+      ['-C', fixture.target, 'config', '--local', 'core.hooksPath', outsideHooks],
+      { encoding: 'utf8' },
+    );
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+
+    const refreshContext = { ...fixture.context, refresh: true };
+    const actionPlan = provider.plan(refreshContext);
+    expect(actionPlan.actions.find((action) => action.kind === 'refresh')).toMatchObject({
+      args: ['update', '.'],
+      graphify_out: '.graphify',
+    });
+    expect(actionPlan.actions.find((action) => action.kind === 'refresh')).not.toHaveProperty('clean_rebuild');
+
+    const result = provider.refresh(refreshContext, actionPlan);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: { artifact_exists: true, query_verified: true },
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
+      },
+    });
+    expect(fixture.graphifyCalls.filter((call) => call.args[0] === 'update')).toEqual([
+      expect.objectContaining({ args: ['update', '.'], env: expect.objectContaining({ GRAPHIFY_OUT: '.graphify' }) }),
+    ]);
+    expect(JSON.parse(fs.readFileSync(path.join(fixture.target, '.graphify', 'graph.json'), 'utf8')))
+      .toMatchObject({ nodes: [{ id: 'fixture-refreshed' }] });
+    expect(fs.readdirSync(fixture.target).filter((name) => name.startsWith('.graphify.backup-'))).toEqual([]);
+    expect(fs.readdirSync(fixture.target).filter((name) => name.startsWith('.graphify.staging-'))).toEqual([]);
+    expect(fs.existsSync(path.join(fixture.target, '.graphify-migration-journal.json'))).toBe(false);
+  });
+
+  test('pins Graphify hook commands to a contained custom hooks root and verifies that root', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('contained-hooks');
+    const customHooks = path.join(fixture.target, '.project-hooks');
+    const configured = spawnSync('git', ['-C', fixture.target, 'config', '--local', 'core.hooksPath', '.project-hooks'], { encoding: 'utf8' });
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+
+    const actionPlan = provider.plan(fixture.context);
+    expect(actionPlan).toMatchObject({
+      hook_target: {
+        classification: 'project-contained',
+        reason_code: null,
+        root_relative: '.project-hooks',
+        hook_names: ['post-commit', 'post-checkout'],
+      },
+      actions: expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'ensure-hook',
+          hook_root: '.project-hooks',
+          hook_names: ['post-commit', 'post-checkout'],
+        }),
+      ]),
+    });
+
+    const result = provider.apply(fixture.context, actionPlan);
+    expect(fixture.hookCalls.length).toBeGreaterThan(0);
+    for (const call of fixture.hookCalls) {
+      expect(call.env).toMatchObject({
+        GIT_CONFIG_COUNT: '1',
+        GIT_CONFIG_KEY_0: 'core.hooksPath',
+        GIT_CONFIG_VALUE_0: customHooks,
+      });
+      expect(call.env).not.toHaveProperty('GIT_CONFIG_KEY_1');
+      expect(call.env).not.toHaveProperty('GIT_CONFIG_VALUE_1');
+      expect(Object.values(call.env)).not.toContain('inherited-secret-helper');
+      expect(Object.values(call.env)).not.toContain('/inherited/outside/hooks');
+    }
+    expect(fs.existsSync(path.join(customHooks, 'post-commit'))).toBe(true);
+    expect(fs.existsSync(path.join(fixture.target, '.git', 'hooks', 'post-commit'))).toBe(false);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      steady_state: {
+        refresh_mode: 'skill-cli-hook-on-demand',
+        hook_installed: true,
+        hook_verified: true,
+        hook_status: 'verified',
+        hook_skipped_reason: null,
+      },
+    });
+    expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
+  });
+
+  test('re-resolves a stale plan before hook mutation and blocks a newly external target', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('plan-apply-drift');
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-plan-drift-outside-'));
+    spawnSync('git', ['-C', fixture.target, 'config', '--local', 'core.hooksPath', '.project-hooks']);
+    const actionPlan = provider.plan(fixture.context);
+    expect(actionPlan.hook_target.classification).toBe('project-contained');
+    spawnSync('git', ['-C', fixture.target, 'config', '--local', 'core.hooksPath', outsideHooks]);
+
+    const result = provider.apply(fixture.context, actionPlan);
+    expect(fixture.hookCalls).toEqual([]);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-path-outside-project',
+      },
+    });
+  });
+
+  test('stops normalization and verified claims when the effective target changes after a hook command', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('postflight-drift');
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-postflight-outside-'));
+    const customHooks = path.join(fixture.target, '.project-hooks');
+    spawnSync('git', ['-C', fixture.target, 'config', '--local', 'core.hooksPath', '.project-hooks']);
+    fixture.setHookCommandCallback((call) => {
+      if (call.args[1] === 'install') {
+        spawnSync('git', ['-C', fixture.target, 'config', '--local', 'core.hooksPath', outsideHooks]);
+      }
+    });
+
+    const result = provider.apply(fixture.context, provider.plan(fixture.context));
+    expect(fixture.hookCalls.map((call) => call.args.join(' '))).toEqual(['hook status', 'hook install']);
+    expect(fs.readFileSync(path.join(customHooks, 'post-commit'), 'utf8')).not.toContain('# spec-first graphify artifact env start');
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_verified: false,
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-target-changed',
+      },
+    });
+  });
+
+  test('blocks a contained hooks root that escapes through a symlink without reading the external target', () => {
+    if (process.platform === 'win32') return;
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('hook-symlink');
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-symlink-outside-'));
+    fs.writeFileSync(path.join(outsideHooks, 'sentinel'), 'preserve\n');
+    fs.symlinkSync(outsideHooks, path.join(fixture.target, '.project-hooks'));
+    spawnSync('git', ['-C', fixture.target, 'config', '--local', 'core.hooksPath', '.project-hooks']);
+
+    const actionPlan = provider.plan(fixture.context);
+    expect(actionPlan.hook_target).toEqual({
+      classification: 'unsafe',
+      reason_code: 'graphify-hook-symlink-escape',
+    });
+    expect(JSON.stringify(actionPlan)).not.toContain(outsideHooks);
+    const result = provider.apply(fixture.context, actionPlan);
+    expect(fixture.hookCalls).toEqual([]);
+    expect(fs.readFileSync(path.join(outsideHooks, 'sentinel'), 'utf8')).toBe('preserve\n');
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_status: 'blocked',
+        hook_skipped_reason: 'graphify-hook-symlink-escape',
+      },
+    });
+  });
+
   test('resolves a pinned Python Graphify launcher through uv and excludes credentials', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const target = tempRepo('graphify-python-uv');

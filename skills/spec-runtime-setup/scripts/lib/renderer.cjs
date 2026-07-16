@@ -231,6 +231,14 @@ function renderHumanSummary(
     const status = provider.readiness_status || 'unknown';
     const reasonCode = provider.reason_code || (status === 'fresh' ? 'ready' : 'unknown');
     lines.push(`- ${provider.provider || provider.id}: ${status} (${reasonCode})`);
+    const steadyState = provider.steady_state || {};
+    if (steadyState.hook_status) {
+      if (steadyState.hook_status === 'blocked') {
+        lines.push(`  optional_auto_refresh: unavailable-by-project-boundary; refresh=${steadyState.refresh_mode || 'manual-only'}; external_hook_execution=unverified; hook_fact=blocked${steadyState.hook_skipped_reason ? ` (${steadyState.hook_skipped_reason})` : ''}`);
+      } else {
+        lines.push(`  steady_state: refresh=${steadyState.refresh_mode || 'unknown'}; project_hook=${steadyState.hook_status}${steadyState.hook_skipped_reason ? ` (${steadyState.hook_skipped_reason})` : ''}`);
+      }
+    }
   }
   lines.push('', 'Host 已配置依赖');
   for (const dependency of toolFacts.configured_dependencies || []) {
@@ -245,7 +253,8 @@ function renderHumanSummary(
     if (item.result !== 'ready' && item.next_action) nextActions.push(item.next_action);
   }
   for (const provider of toolFacts.provider_readiness || []) {
-    if (provider.readiness_status === 'fresh') continue;
+    const hookBlocked = provider.steady_state && provider.steady_state.hook_status === 'blocked';
+    if (provider.readiness_status === 'fresh' && !hookBlocked) continue;
     for (const action of provider.next_actions || []) {
       if (action) nextActions.push(action);
     }

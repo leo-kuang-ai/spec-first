@@ -32,6 +32,20 @@
       "input": "A required provider tool cannot be installed in this environment; what does setup return?",
       "coverage_tags": ["failure", "degraded-mode"],
       "expected_outcome": "Report the missing dependency and a documented degraded path with reason; do not fabricate provider readiness."
+    },
+    {
+      "id": "graphify-core-ready-unknown-freshness",
+      "input": "Graphify package, artifact integrity, and real query probe are ready, but verify-only reports readiness_status=unknown. Finish runtime setup.",
+      "coverage_tags": ["provider-readiness", "freshness", "manual-only"],
+      "expected_outcome": "Treat core-ready unknown as successful setup with no current-run freshness claim; do not automatically run or recommend an immediate Graphify refresh unless source changed and the next graph consumer needs new currentness evidence.",
+      "forbidden_signals": ["unknown-means-query-failed", "automatic-refresh-after-verify"]
+    },
+    {
+      "id": "graphify-external-hooks-unverified",
+      "input": "The effective core.hooksPath points outside the repository and Graphify core setup is ready. Report the hook state.",
+      "coverage_tags": ["provider-readiness", "project-boundary", "git-hooks"],
+      "expected_outcome": "Report optional project-local auto-refresh as blocked/manual-only and external hook execution as unverified; do not inspect or mutate the external hook and do not claim it is absent, uninstalled, or unable to execute.",
+      "forbidden_signals": ["external-hook-not-installed", "external-hook-cannot-run", "mutate-global-hooks"]
     }
   ]
 }

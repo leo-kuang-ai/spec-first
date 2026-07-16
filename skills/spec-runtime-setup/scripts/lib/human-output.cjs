@@ -44,12 +44,14 @@ function advisoryHostCandidates({ env = {}, runner } = {}) {
 
 function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredProviderIds } = {}) {
   const actions = [];
+  let blocking = false;
   const project = payload.project || {};
   if (project.inside_git_repo && (
     project.example_config_status !== 'ok'
     || project.local_config_gitignore_status === 'missing'
   )) {
     actions.push('运行 spec-runtime-setup --project-config，预览并写入项目本地设置。');
+    blocking = true;
   }
   const runtime = payload.runtime || {};
   const manifest = payload.generated_runtime_manifest || runtime.generated_runtime_manifest || {};
@@ -62,6 +64,7 @@ function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredPro
   for (const entry of baselineFailures) {
     actions.push(entry.next_action
       || `运行标准 spec-runtime-setup，修复 ${entry.id || '当前缺失的 required baseline'}。`);
+    blocking = true;
   }
   const persistedRuntimeReady = runtime.setup_facts_status === 'ready'
     && runtime.runtime_capabilities_status === 'ready'
@@ -69,32 +72,51 @@ function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredPro
     && runtime.host_runtime_ready === true;
   if (!persistedRuntimeReady) {
     actions.push('运行标准 spec-runtime-setup，完成 required baseline、CodeGraph 与 Graphify setup；仅需只读复核时使用 --verify-only。');
+    blocking = true;
   } else {
     const providers = Array.isArray(payload.provider_readiness)
       ? payload.provider_readiness
       : (Array.isArray(runtime.provider_readiness) ? runtime.provider_readiness : []);
-    const providerStatus = new Map(providers.map((entry) => [entry.provider, entry.readiness_status]));
+    const providerById = new Map(providers.map((entry) => [entry.provider, entry]));
     const requiredIds = Array.isArray(requiredProviderIds)
       ? requiredProviderIds
       : providers.map((entry) => entry.provider);
-    const providersReady = requiredIds.every((id) => providerStatus.get(id) === 'fresh');
+    const providersReady = requiredIds.every((id) => providerReadyForDiagnostic(providerById.get(id)));
     if (!providersReady) {
       const requiredSet = new Set(requiredIds);
       const providerActions = providers
-        .filter((entry) => requiredSet.has(entry.provider) && entry.readiness_status !== 'fresh')
+        .filter((entry) => requiredSet.has(entry.provider) && !providerReadyForDiagnostic(entry))
         .flatMap((entry) => entry.next_actions || []);
       if (providerActions.length > 0) actions.push(...providerActions);
       else actions.push('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+      blocking = true;
+    } else {
+      const requiredSet = new Set(requiredIds);
+      actions.push(...providers
+        .filter((entry) => requiredSet.has(entry.provider)
+          && entry.steady_state
+          && entry.steady_state.hook_status === 'blocked')
+        .flatMap((entry) => entry.next_actions || []));
     }
     if (manifest.status !== 'current') {
       actions.push('运行当前 host 的 spec-runtime-setup --verify-only，确认 required Provider readiness。');
+      blocking = true;
     }
   }
   if (['stale', 'missing'].includes(manifest.status) && manifest.next_action) {
     actions.push(manifest.next_action);
+    blocking = true;
   }
-  if (actions.length === 0) actions.push('必需设置项已就绪，继续目标 spec-* workflow。');
+  if (!blocking) actions.push('必需设置项已就绪，继续目标 spec-* workflow。');
   return [...new Set(actions)];
+}
+
+function providerReadyForDiagnostic(provider) {
+  if (!provider || ['degraded', 'failed', 'blocked', 'not-run'].includes(provider.readiness_status)) return false;
+  if (provider.readiness_status === 'fresh') return true;
+  const lifecycle = provider.lifecycle || {};
+  return ['installed', 'configured', 'initialized', 'indexed', 'artifact_exists', 'query_verified']
+    .every((field) => lifecycle[field] === true);
 }
 
 function renderDiagnosticHuman(payload, pluginVersion) {

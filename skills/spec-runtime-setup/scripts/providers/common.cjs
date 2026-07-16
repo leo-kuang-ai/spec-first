@@ -94,7 +94,7 @@ function providerResult(metadata, options = {}) {
     },
     steady_state: {
       refresh_owner: steadyState.refresh_owner || 'unknown',
-      refresh_mode: steadyState.refresh_mode || 'unknown',
+      refresh_mode: options.refreshMode || steadyState.refresh_mode || 'unknown',
       hook_default: steadyState.hook_default === true,
       usage_owner: steadyState.usage_owner || 'unknown',
       hook_installed: Boolean(options.hookInstalled),

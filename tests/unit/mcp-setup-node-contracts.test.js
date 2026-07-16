@@ -30,6 +30,8 @@ function confirmedMismatchesFor(platformDifferences, platform) {
 function initializeGitRepo(root) {
   const result = spawnSync('git', ['init', '-q', root], { encoding: 'utf8' });
   if (result.status !== 0) throw new Error(result.stderr || result.stdout);
+  const hooks = spawnSync('git', ['-C', root, 'config', '--local', 'core.hooksPath', '.git/hooks'], { encoding: 'utf8' });
+  if (hooks.status !== 0) throw new Error(hooks.stderr || hooks.stdout);
 }
 
 function tempRepo(label) {
@@ -99,7 +101,9 @@ function parityRunner(calls) {
     }
     if (graphifyCommand && args[0] === 'hook' && args[1] === 'install') {
       const interpreter = path.join(options.env.HOME, '.local', 'share', 'uv', 'tools', 'graphifyy', 'bin', 'python');
-      const hooks = path.join(cwd, '.git', 'hooks');
+      const hooks = options.env && options.env.GIT_CONFIG_VALUE_0
+        ? options.env.GIT_CONFIG_VALUE_0
+        : path.join(cwd, '.git', 'hooks');
       fs.mkdirSync(hooks, { recursive: true });
       for (const [name, markers] of Object.entries({ 'post-commit': ['# graphify-hook-start', '# graphify-hook-end'], 'post-checkout': ['# graphify-checkout-hook-start', '# graphify-checkout-hook-end'] })) {
         fs.writeFileSync(path.join(hooks, name), ['#!/bin/sh', markers[0], `_PINNED='${interpreter}'`, "_out = os.environ.get('GRAPHIFY_OUT', 'graphify-out')", 'from graphify.watch import _rebuild_code', markers[1]].join('\n'));

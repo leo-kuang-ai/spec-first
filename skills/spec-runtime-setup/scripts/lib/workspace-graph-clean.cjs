@@ -18,7 +18,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { assertContainedPath } = require('./path-safety.cjs');
-const { removeManagedExclude, resolveGitPath } = require('./workspace-git-exclude.cjs');
+const { resolveGitPath } = require('./git-path.cjs');
+const { removeManagedExclude } = require('./workspace-git-exclude.cjs');
 const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
 const { stripRoutingInstruction } = require('./workspace-routing-inject.cjs');
 const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
@@ -196,15 +197,6 @@ function runWorkspaceGraphClean({
 }
 
 function resolveHooksPath(repoRoot) {
-  const configured = defaultWorkspaceExec(
-    'git',
-    ['-C', repoRoot, 'config', '--path', '--get', 'core.hooksPath'],
-    { timeoutMs: 5000 },
-  );
-  if (configured.status === 0 && String(configured.stdout || '').trim()) {
-    const raw = String(configured.stdout).trim();
-    return { ok: true, absolute: path.isAbsolute(raw) ? raw : path.resolve(repoRoot, raw) };
-  }
   return resolveGitPath(repoRoot, 'hooks');
 }
 

@@ -15,6 +15,7 @@ describe('spec-runtime-setup runner contracts', () => {
       'skills/spec-runtime-setup/scripts/lib/args.cjs',
       'skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs',
       'skills/spec-runtime-setup/scripts/lib/facts.cjs',
+      'skills/spec-runtime-setup/scripts/lib/git-path.cjs',
       'skills/spec-runtime-setup/scripts/lib/host-authority.cjs',
       'skills/spec-runtime-setup/scripts/lib/host-config.cjs',
       'skills/spec-runtime-setup/scripts/lib/human-output.cjs',
@@ -89,5 +90,44 @@ describe('spec-runtime-setup runner contracts', () => {
     expect(skill).toContain('Subset / Repair Flow');
     expect(skill).toContain('Host conflict 仍需独立 `--repair-host-config` 授权');
     expect(skill).not.toContain('只有用户明确要求自动修复时，才追加 `--repair-host-config`');
+  });
+
+  test('provider readiness v2 keeps project-local hook blocking separate from core readiness', () => {
+    const schema = JSON.parse(fs.readFileSync(
+      path.join(repoRoot, 'docs', 'contracts', 'provider-readiness.schema.json'),
+      'utf8',
+    ));
+    const contract = fs.readFileSync(
+      path.join(repoRoot, 'docs', 'contracts', 'provider-readiness.md'),
+      'utf8',
+    );
+
+    expect(schema.properties.steady_state.properties.hook_status.enum).toContain('blocked');
+    expect(schema.properties.steady_state.properties.refresh_mode.enum).toContain('manual-only');
+    expect(contract).toContain('`readiness_status` is the only provider readiness field that enters setup decision health');
+    expect(contract).toContain('hook blocked/failed/skipped 不得单独把这些成功事实改写为 Provider `degraded`');
+    expect(contract).toContain('不运行 hook install/uninstall/status、不读取外部 hook 内容、不修改 `core.hooksPath`');
+  });
+
+  test('Runtime Setup docs describe Graphify commit refresh as an explicit project-owner choice', () => {
+    const skill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'), 'utf8');
+    const readme = fs.readFileSync(path.join(repoRoot, 'README.zh-CN.md'), 'utf8');
+    const manual = fs.readFileSync(path.join(repoRoot, 'docs', '05-用户手册', '12-gitignore参考.md'), 'utf8');
+    const boundary = fs.readFileSync(path.join(repoRoot, 'docs', 'contracts', 'source-runtime-customization-boundary.md'), 'utf8');
+
+    for (const contents of [skill, readme, boundary]) {
+      expect(contents).toContain('git rev-parse --git-path hooks');
+      expect(contents).toContain('manual-only');
+    }
+    expect(skill).toContain('不运行 hook 命令、不读取外部 hook 内容、不修改 local/global `core.hooksPath`');
+    expect(skill).toContain('不得声称外部 hook 不存在、不会执行或“安装失败”');
+    expect(skill).toContain('不得仅因 unknown 自动追加或执行 `--refresh`');
+    expect(readme).toContain('完整 setup 仍为 ready');
+    expect(manual).toContain('git config --local core.hooksPath .githooks');
+    expect(manual).toContain('仓库级 `core.hooksPath` 会覆盖全局值');
+    expect(boundary).toContain('不得把它描述成外部 hook 不存在/安装失败');
+    expect(boundary).toContain('不得仅因 core-ready `unknown` 自动执行 `--refresh`');
+    expect(skill).not.toContain('Graphify graph/query/hook、host config');
+    expect(skill).not.toContain('Graphify hook install 仍失败时，报告带 `next_actions` 的 `readiness_status=degraded`');
   });
 });

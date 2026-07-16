@@ -118,6 +118,7 @@ function runIntegration() {
     'tests/integration/init-five-host-lifecycle.integration.test.js',
     'tests/integration/workspace-graph-lifecycle.integration.test.js',
     'tests/integration/workspace-graph-five-host-projection.integration.test.js',
+    'tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js',
     'tests/integration/spec-write-skill-authoring-preview.integration.test.js',
     'tests/integration/plan-status-closeout.integration.test.js',
   ], ['--runInBand']);

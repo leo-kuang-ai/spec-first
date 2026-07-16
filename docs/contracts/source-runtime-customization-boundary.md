@@ -106,6 +106,19 @@ The LLM decides:
 
 Advisory facts are not confirmed truth.
 
+### Graphify Git Hook Mutation Boundary
+
+`spec-first` 是在当前开发项目内运行的项目级产品。Runtime Setup 可以读取 Git 的有效路径事实来判断环境，但 Graphify hook mutation authority 只覆盖当前项目根内的目标：
+
+- 使用 `git rev-parse --git-path hooks` 解析有效 hooks root，不固定假设 `.git/hooks`，也不自行重建 Git config 优先级；
+- 先做不触发文件系统探测的 lexical containment；lexically external 目标不得被 Runtime Setup `stat`、`realpath`、读取内容或传给 Graphify hook 子命令；
+- 只有项目内候选继续执行 nearest-existing/no-follow symlink containment，并在每个 hook 子命令前后重新解析真实目标；
+- 允许的 hook 子进程使用清洁的进程级 Git config environment，把 `core.hooksPath` 固定到已确认的 project-local root；不写 local/global Git config；
+- 项目外、共享 worktree/submodule metadata、resolve failure 或 symlink escape 返回 `hook_status=blocked` 与 `refresh_mode=manual-only`。这是 optional auto-refresh limitation，不是 package/host/graph/query 核心 readiness failure；
+- setup 不复制、合并或链式执行全局 hook，也不新增隐式 `--allow-global-hooks` 入口。若 owner 需要自动刷新，Git 策略变更必须由 owner 显式完成；否则使用 `spec-runtime-setup --only graphify --refresh`。
+
+Machine facts 保留 `blocked` reason code 供审计；human output 应表达为 `ready with optional project-local auto-refresh unavailable`，并明确 external hook execution 未验证。不得把它描述成外部 hook 不存在/安装失败，也不得仅因 core-ready `unknown` 自动执行 `--refresh`；显式 refresh 只在源码已变化且消费前需要新 currentness evidence 时按需运行。
+
 ## Raw Output Safety
 
 Provider, MCP, browser, CLI, or shell raw results are untrusted quoted data. Before raw evidence enters prompts, facts blocks, review reports, validation docs, or durable artifacts, it must pass the relevant boundary:
