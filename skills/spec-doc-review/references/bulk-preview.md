@@ -4,6 +4,8 @@ This reference defines the compact plan preview that Interactive mode shows befo
 
 Interactive mode only.
 
+**Mutation-policy entry guard:** this preview is available only for `mutation_policy: markdown-write`. If the run is `report-only`, **STOP** and return to the structured report-only envelope; no Apply, Defer, Open Questions append, or document edit may be previewed.
+
 ---
 
 ## When the preview fires

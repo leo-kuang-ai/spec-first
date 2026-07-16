@@ -4,6 +4,8 @@ This reference defines the Defer action's in-doc append mechanic. When the user 
 
 Interactive mode only. Invoked by `references/walkthrough.md` (per-finding Defer option) and `references/bulk-preview.md` (routing option C Proceed).
 
+**Mutation-policy entry guard:** the append mechanic is Markdown-only and requires `mutation_policy: markdown-write`. If the run is `report-only`, **STOP** without reading for an append location and return the finding in the report-only envelope; never insert Markdown headings or bullets into HTML or an ambiguous format.
+
 ---
 
 ## Append flow

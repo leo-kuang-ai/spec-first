@@ -6,6 +6,9 @@ const path = require('node:path');
 const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/SKILL.md'), 'utf8');
 const subagentTemplate = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/subagent-template.md'), 'utf8');
 const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/synthesis-and-presentation.md'), 'utf8');
+const walkthrough = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/walkthrough.md'), 'utf8');
+const bulkPreview = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/bulk-preview.md'), 'utf8');
+const openQuestions = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/open-questions-defer.md'), 'utf8');
 
 // Lazy references — must exist on disk
 const lazyRefs = [
@@ -37,6 +40,48 @@ describe('spec-doc-review current contracts', () => {
     expect(skill).toContain('classify as `unified-requirements`');
     expect(skill).toContain('artifact_readiness: implementation-ready');
     expect(skill).toContain('classify as `unified-plan`');
+  });
+
+  test('separates delivery mode from the run-local mutation policy', () => {
+    expect(skill).toContain('delivery_mode');
+    expect(skill).toContain('mutation_policy');
+    expect(skill).toContain('markdown-write');
+    expect(skill).toContain('report-only');
+    expect(skill).toMatch(/Headless.*delivery.*not.*mutation policy/is);
+    expect(skill).toMatch(/HTML.*report-only/is);
+    expect(skill).toMatch(/conflict.*fail closed.*report-only/is);
+  });
+
+  test('report-only review blocks every Markdown mutation entrypoint', () => {
+    expect(synthesis).toMatch(/mutation_policy.*report-only/is);
+    expect(synthesis).toContain('fixes_applied: 0');
+    expect(synthesis).toContain('producer_fix_candidates');
+    expect(synthesis).toMatch(/do not.*edit.*document/is);
+    for (const reference of [walkthrough, bulkPreview, openQuestions]) {
+      expect(reference).toMatch(/mutation_policy.*markdown-write/is);
+      expect(reference).toMatch(/report-only.*STOP|STOP.*report-only/is);
+    }
+  });
+
+  test('report-only envelope preserves findings, coverage, and limitations without a walkthrough', () => {
+    for (const field of [
+      'delivery_mode:',
+      'mutation_policy:',
+      'mutation_reason:',
+      'review_status:',
+      'fixes_applied:',
+      'producer_fix_candidates:',
+      'proposed_fixes_count:',
+      'decisions_count:',
+      'fyi_count:',
+      'p0_p1_actionable_count:',
+      'Coverage:',
+      'Limitations:',
+    ]) {
+      expect(synthesis).toContain(field);
+    }
+    expect(synthesis).toMatch(/report-only.*do not load.*walkthrough/is);
+    expect(synthesis).toMatch(/report-only.*Open Questions/is);
   });
 
   test('does not infer document kind from path alone', () => {

@@ -27,6 +27,7 @@ describe('spec-plan quality integration contracts', () => {
   const highRisk = read('references/high-risk-plan-lens.md');
   const architecture = read('references/agents/architecture-strategist.md');
   const patterns = read('references/agents/pattern-recognition-specialist.md');
+  const handoff = read('references/plan-handoff.md');
 
   test('keeps planning-only and blocking handoff in the hot path', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
@@ -97,6 +98,19 @@ describe('spec-plan quality integration contracts', () => {
     expect(deepening).toContain('Plan generation and deepening must still complete through this inline fallback');
   });
 
+  test('reviews HTML plans report-only and keeps producer-owned recompose bounded', () => {
+    expect(skill).toMatch(/HTML.*report-only review/is);
+    expect(skill).not.toContain('skipped_reason: output_format_html');
+    expect(handoff).toContain('mutation_policy: report-only');
+    expect(handoff).toContain('producer-fix candidates');
+    expect(handoff).toMatch(/full recompose/i);
+    expect(handoff).toMatch(/at most two.*recompose.*review/is);
+    expect(handoff).toMatch(/artifact_readiness.*requirements-only/is);
+    expect(handoff).toMatch(/suppress.*spec-work.*goal/is);
+    expect(handoff).not.toContain('skipped_reason = "output_format_html"');
+    expect(handoff).not.toContain('HTML plans skip this phase entirely');
+  });
+
   test('keeps maintainer fixtures structural, source-owned, and coverage-balanced', () => {
     const examples = readJson('evals/examples.json');
     const quality = readJson('evals/output-quality-cases.json');
@@ -119,6 +133,9 @@ describe('spec-plan quality integration contracts', () => {
     ]) {
       expect(exampleIds.has(id)).toBe(true);
     }
+    expect(examples.cases.find((entry) =>
+      entry.id === 'html-output-remains-exclusive-and-honest'
+    ).expected_outcome).toMatch(/report-only.*zero reviewer mutation.*bounded producer recompose/i);
     for (const id of [
       'goal-capsule-supports-first-pass-decision',
       'unsupported-plan-exposes-evidence-limitations',

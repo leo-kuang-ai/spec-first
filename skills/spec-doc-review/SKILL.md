@@ -6,7 +6,7 @@ argument-hint: "[mode:headless] [roster:lite|standard|full] [path/to/document.md
 
 # Document Review
 
-Review requirements or plan documents through multi-persona analysis. Dispatches generic subagents seeded with skill-local reviewer prompt assets, auto-applies `safe_auto` fixes, and routes remaining findings through a four-option interaction (per-finding walk-through, auto-resolve with best judgment, Append-to-Open-Questions, Report-only) for user decision.
+Review requirements or plan documents through multi-persona analysis. Dispatches generic subagents seeded with skill-local reviewer prompt assets, applies `safe_auto` fixes only when the run-local mutation policy is `markdown-write`, and preserves the same structural/semantic review as report-only findings when mutation is unavailable or forbidden.
 
 ## Interactive mode rules
 - **Pre-load the platform question tool before any question fires.** In Claude Code, `AskUserQuestion` is deferred — call `ToolSearch` with `select:AskUserQuestion` once, eagerly, at the top of Interactive-mode work (before the routing question, walk-through, bulk-preview, and Phase 5 terminal question) rather than at the first question site. Other hosts don't need this preload.
@@ -23,7 +23,7 @@ Check the skill arguments for flags and a document path. Tokens matching `mode:*
 
 If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, profile = **`standard`**.
 
-**Headless mode** (set when `mode:headless` is present) changes delivery, not classification: `safe_auto` fixes still apply silently, but `gated_auto`/`manual`/FYI findings return as structured text for the caller — no blocking prompts, no interactive routing — and Phase 5 returns immediately with "Review complete". Invoke via `Skill("spec-doc-review", "mode:headless docs/plans/my-plan.md")`. Without `mode:headless`, the skill runs interactive mode per `references/walkthrough.md` and `references/bulk-preview.md`.
+Set run-local `delivery_mode` to `headless` when `mode:headless` is present, otherwise `interactive`. Headless changes delivery, not the mutation policy: under `markdown-write`, confidence-100 `safe_auto` fixes still apply silently and the remaining findings return as structured text; under `report-only`, no document write occurs in either delivery mode. Headless never uses blocking prompts or interactive routing and Phase 5 returns immediately with "Review complete". Invoke via `Skill("spec-doc-review", "mode:headless docs/plans/my-plan.md")`. Interactive references are eligible only after Phase 1 resolves `mutation_policy: markdown-write`.
 
 ## Phase 1: Get and Analyze Document
 
@@ -34,7 +34,17 @@ If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, p
 ### Classify Document Type
 Classify by reading its **content shape**, not its file path. Path is a tie-breaker hint, not the primary signal.
 
-First check the unified artifact contract: `artifact_contract: spec-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements` (review Product Contract only; absent Planning Contract/Units/Verification/DoD is expected). Same contract plus `artifact_readiness: implementation-ready` -> classify as `unified-plan` (review Product Contract and Planning Contract with different lenses, then Implementation Units/Verification/DoD for execution completeness). HTML unified artifacts (`.html`) are report-only — never apply markdown mutation paths to them; if mutation was requested, return report-only findings or the markdown-only message. Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
+First check the unified artifact contract: `artifact_contract: spec-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements` (review Product Contract only; absent Planning Contract/Units/Verification/DoD is expected). Same contract plus `artifact_readiness: implementation-ready` -> classify as `unified-plan` (review Product Contract and Planning Contract with different lenses, then Implementation Units/Verification/DoD for execution completeness). Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
+
+### Resolve Mutation Policy
+
+After reading and classifying the document, set exactly one run-local `mutation_policy`, independently from `delivery_mode`:
+
+- `markdown-write` — only when the document is confirmed Markdown by content shape and path and the platform can write it. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available.
+- `report-only` — mandatory for HTML content or a `.html` artifact. Run the same reviewer roster, schema validation, confidence gate, deduplication, severity routing, Coverage, and limitations reporting, but do not invoke any document mutation path.
+- If extension, declared format, and content shape conflict, or the format remains ambiguous, fail closed to `report-only` and record `mutation_reason: format-conflict-or-ambiguous` in the envelope. Never guess Markdown write eligibility from the path alone.
+
+For ordinary HTML use `mutation_reason: html-artifact`. A report-only request is valid in both headless and interactive delivery; interactive delivery still returns the structured report-only envelope and does not offer a mutation walkthrough.
 
 **Core classification rules (apply these first):**
 
@@ -128,9 +138,9 @@ Accumulate across all rounds in the session. Skip, Defer, and Acknowledge all co
 
 ## Phases 3-5: Synthesis, Presentation, and Next Action
 
-After all dispatched agents return, read `references/synthesis-and-presentation.md` for the synthesis pipeline (validate, anchor-based gate, dedup, cross-persona promotion, contradiction resolution, auto-promotion, three-tier routing with FYI subsection), `safe_auto` fix application, headless-envelope output, and the routing-question handoff.
+After all dispatched agents return, read `references/synthesis-and-presentation.md` for the synthesis pipeline (validate, anchor-based gate, dedup, cross-persona promotion, contradiction resolution, auto-promotion, three-tier routing with FYI subsection), mutation-policy enforcement, structured envelope output, and the routing-question handoff.
 
-For the four-option routing question and per-finding walk-through (interactive), read `references/walkthrough.md`. For the bulk-action preview used by best-judgment routing, Append-to-Open-Questions, and walk-through's "Auto-resolve with best judgment on the rest", read `references/bulk-preview.md`. Do not load either before agent dispatch completes.
+Only when `delivery_mode: interactive` **and** `mutation_policy: markdown-write`, read `references/walkthrough.md` for the four-option routing question and per-finding walk-through. For the bulk-action preview used by best-judgment routing, Append-to-Open-Questions, and walk-through's "Auto-resolve with best judgment on the rest", read `references/bulk-preview.md`. Do not load either before agent dispatch completes, and never load them for `report-only`.
 
 ---
 

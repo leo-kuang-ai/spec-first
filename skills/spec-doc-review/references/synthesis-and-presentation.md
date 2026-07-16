@@ -125,32 +125,49 @@ Sort findings for presentation: P0 → P1 → P2 → P3, then by finding type (e
 
 **User-facing vocabulary rule (applies to ALL user-visible output in Phase 4).** Internal enum values — `safe_auto`, `gated_auto`, `manual`, `FYI` — stay inside the schema and synthesis prose. Every word the user sees in Phase 4 output MUST use user-facing vocabulary: "fixes" (for `safe_auto`), "proposed fixes" (for `gated_auto`), "decisions" (for `manual` findings at anchor `75` or `100`), "FYI observations" (for any finding at anchor `50`).
 
-### Apply safe_auto fixes
+### Enforce Mutation Policy
 
-Apply only `safe_auto` findings **at confidence anchor `100`** to the document in a single pass. This matches the 3.7 routing table: anchor `100` + `safe_auto` silent-applies; anchor `75` + `safe_auto` was demoted to `gated_auto` in 3.7; anchor `50` + any `autofix_class` routes to FYI.
+Apply the run-local `mutation_policy` resolved in `SKILL.md` before any write-capable path:
 
-- Edit the document inline using the platform's edit tool
-- Track what was changed for the "Applied fixes" section in the rendered output
-- Do not ask for approval — these have one clear correct fix AND evidence directly confirms (anchor `100`)
-- Do NOT silent-apply any `safe_auto` finding at anchor `75` or `50`
+- **`markdown-write`:** apply only `safe_auto` findings at confidence anchor `100` to the document in a single pass. Edit inline with the platform's edit tool, track each change for the rendered summary, and never silent-apply anchor `75` or `50` findings.
+- **`report-only`:** do not edit the document, append Open Questions, enter the walkthrough, or invoke bulk Apply/Defer mechanics. Set `fixes_applied: 0`. Reclassify confidence-100 `safe_auto` findings as `producer_fix_candidates` in the envelope so an owning producer can decide whether to regenerate the artifact. Keep `gated_auto`, `manual`, FYI, residual, deferred, Coverage, and limitation surfaces intact.
 
-List every applied fix in the output summary so the user can see what changed. Use enough detail to convey the substance of each fix (section, what was changed, reviewer attribution).
+For `report-only`, the reviewer never turns an HTML finding into a Markdown-style patch and never gains producer authority. A caller such as `spec-plan` may consume a uniquely determined producer-fix candidate and perform a full artifact recompose under its own contract; this review run remains byte-preserving. Interactive delivery does not weaken this boundary: return the same report-only envelope and do not load `references/walkthrough.md`, `references/bulk-preview.md`, or `references/open-questions-defer.md`.
+
+Under `markdown-write`, list every applied fix in the output summary so the user can see what changed. Use enough detail to convey the substance of each fix (section, what was changed, reviewer attribution).
 
 ### Route Remaining Findings
 
-After safe_auto fixes apply, remaining findings split into buckets:
+After mutation-policy enforcement, remaining findings split into buckets:
 
-- `gated_auto` and `manual` findings at confidence anchor `75` or `100` → enter the routing question (see Unit 5 / `references/walkthrough.md`)
+- `gated_auto` and `manual` findings at confidence anchor `75` or `100` → enter the routing question only for `delivery_mode: interactive` plus `mutation_policy: markdown-write`
 - FYI-subsection findings → surface in the presentation only, no routing
 - Zero actionable findings remaining → skip the routing question; flow directly to Phase 5 terminal question
 
-**Headless mode:** Do not use interactive question tools. Output all findings as a structured text envelope the caller can parse. See the headless envelope format below.
+**Structured envelope:** Use this envelope whenever `delivery_mode: headless` or `mutation_policy: report-only`. Do not use interactive question tools on either path.
 
 ```
-Document review complete (headless mode).
+Document review complete.
+
+delivery_mode: headless|interactive
+mutation_policy: markdown-write|report-only
+mutation_reason: markdown-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable
+review_status: complete|incomplete
+fixes_applied: N
+producer_fix_candidates: N
+proposed_fixes_count: N
+decisions_count: N
+fyi_count: N
+p0_p1_actionable_count: N
 
 Applied N fixes:
 - <section>: <what was changed> (<reviewer>)
+
+Producer-fix candidates (report-only; caller-owned full recompose only):
+
+[P0] Section: <section> — <title> (<reviewer>, confidence <anchor>)
+  Why: <why_it_matters>
+  Suggested producer correction: <suggested_fix>
 
 Proposed fixes (concrete fix, requires user confirmation):
 
@@ -183,14 +200,20 @@ Dropped: N (anchors 0/25 suppressed)
 Chains: N root(s) with M dependents
 Restated: N (residual/deferred items suppressed as duplicates of actionable findings)
 
+Coverage:
+- <persona>: <finding counts or malformed/failed/partial status>
+
+Limitations:
+- <mutation, reviewer coverage, provider, or evidence limitation>
+
 Review complete
 ```
 
-Omit any section with zero items. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
+Omit any finding bucket with zero items, but keep every scalar envelope field so callers can parse zero counts. `fixes_applied` is always `0` under `report-only`; `producer_fix_candidates` is `0` under ordinary `markdown-write`. Set `review_status: incomplete` when both always-on reviewers produced no valid coverage and no equivalent inline review completed; do not emit a clean verdict or execution-ready implication on an incomplete review. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
 
 **Compact rendering for FYI observations, residual concerns, and deferred questions (high-count mode).** When the combined count of these three buckets is 5 or more, collapse each to a one-line count followed by a tight bullet list without per-item `Why` expansion.
 
-**Interactive mode:**
+**Interactive `markdown-write` mode:**
 
 Present findings using the review output template (read `references/review-output-template.md`). Within each severity level, separate findings by type:
 
@@ -217,9 +240,9 @@ These are pipeline artifacts and must not be flagged for removal.
 
 ## Phase 5: Next Action — Terminal Question
 
-**Headless mode:** Return "Review complete" immediately. Do not ask questions.
+**Headless mode or `mutation_policy: report-only`:** Return "Review complete" immediately after the structured envelope. Do not ask questions and do not enter any mutation-oriented next-action flow.
 
-**Interactive mode:** fire the terminal question using the platform's blocking question tool. In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors.
+**Interactive `markdown-write` mode:** fire the terminal question using the platform's blocking question tool. In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors.
 
 **Stem:** `Apply decisions and what next?`
 

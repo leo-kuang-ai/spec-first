@@ -2,6 +2,8 @@
 
 This reference defines Interactive mode's per-finding walk-through — the path the user enters by picking option A (`Review each finding one by one — accept the recommendation or choose another action`) from the routing question, plus the unified completion report that every terminal path (walk-through, best-judgment, Append-to-Open-Questions, zero findings) emits.
 
+**Mutation-policy entry guard:** load and execute this reference only when `mutation_policy: markdown-write`. If the run is `report-only`, **STOP** and return the structured report-only envelope from `synthesis-and-presentation.md`; do not offer Apply, Defer, Open Questions append, or best-judgment mutation options.
+
 Interactive mode only.
 
 ---

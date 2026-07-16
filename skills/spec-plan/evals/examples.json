@@ -54,7 +54,7 @@
       "id": "html-output-remains-exclusive-and-honest",
       "input": "Create this implementation plan with output:html.",
       "coverage_tags": ["trigger", "html", "handoff"],
-      "expected_outcome": "Write one HTML plan with visible metadata and stable anchors, do not create a Markdown sidecar or status lifecycle field, and report the documented spec-doc-review skip instead of claiming review passed."
+      "expected_outcome": "Write one HTML plan with visible metadata and stable anchors, do not create a Markdown sidecar or status lifecycle field, run spec-doc-review report-only with zero reviewer mutation, and use bounded producer recompose for uniquely determined fixes before handoff."
     },
     {
       "id": "repo-profile-cache-miss-has-inline-path",
