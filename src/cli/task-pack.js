@@ -169,6 +169,15 @@ function isInsidePath(parentPath, childPath) {
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
+function realpath(value) {
+  const resolver = fs.realpathSync.native || fs.realpathSync;
+  return resolver(value);
+}
+
+function realpathIfExists(value) {
+  return fs.existsSync(value) ? realpath(value) : path.resolve(value);
+}
+
 function isConcreteRepoRelativeFile(filePath) {
   if (typeof filePath !== 'string' || filePath.trim() === '') return false;
   if (filePath.includes('\\')) return false;
@@ -322,14 +331,16 @@ function deriveReasonCode(validity, errors) {
   // invalid: inspect first deterministic error code for a more specific reason
   const first = errors[0] && errors[0].code;
   if (first === 'task-pack-source-plan-file-missing' || first === 'task-pack-source-plan-missing') return 'source_plan_missing';
-  if (first === 'task-pack-missing-spec-id' || first === 'source-plan-missing-spec-id') return 'missing_spec_id';
   if (first && first.includes('contract')) return 'invalid_contract';
   return 'invalid_contract';
 }
 
 function validateTaskPack(taskPackPath, options = {}) {
-  const repoRoot = path.resolve(options.repoRoot || process.cwd());
-  const resolvedTaskPackPath = path.resolve(taskPackPath || '');
+  const repoRoot = realpathIfExists(path.resolve(options.repoRoot || process.cwd()));
+  const taskPackCandidate = path.isAbsolute(taskPackPath || '')
+    ? path.resolve(taskPackPath || '')
+    : path.resolve(repoRoot, taskPackPath || '');
+  const resolvedTaskPackPath = realpathIfExists(taskPackCandidate);
   const errors = [];
   const limitations = [];
   const validation = {
@@ -342,7 +353,9 @@ function validateTaskPack(taskPackPath, options = {}) {
 
   const result = {
     schema_version: 'task-pack-validation/v1',
+    identity_basis: 'source-plan-path+body-hash',
     task_pack_path: resolvedTaskPackPath,
+    artifact_root: repoRoot,
     repo_root: repoRoot,
     task_pack_validity: 'invalid',
     deterministic_handoff: false,
@@ -360,6 +373,19 @@ function validateTaskPack(taskPackPath, options = {}) {
     errors,
     limitations,
   };
+
+  if (!fs.existsSync(taskPackCandidate) && !isInsidePath(repoRoot, taskPackCandidate)) {
+    addFinding(errors, 'task-pack-file-outside-artifact-root', 'Task pack path must resolve inside artifact root.');
+    result.task_pack_validity = deriveValidity(errors, validation);
+    result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
+    return result;
+  }
+  if (fs.existsSync(taskPackCandidate) && !isInsidePath(repoRoot, resolvedTaskPackPath)) {
+    addFinding(errors, 'task-pack-file-symlink-escape', 'Task pack symlink must resolve inside artifact root.');
+    result.task_pack_validity = deriveValidity(errors, validation);
+    result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
+    return result;
+  }
 
   const taskPackRead = readMarkdownFile(resolvedTaskPackPath, 'task-pack');
   if (taskPackRead.error) {
@@ -392,11 +418,6 @@ function validateTaskPack(taskPackPath, options = {}) {
     }
   }
 
-  if (!metadata.spec_id) {
-    validation.spec_id = 'missing';
-    addFinding(errors, 'task-pack-missing-spec-id', 'Task pack is missing spec_id.');
-  }
-
   if (sourcePlanOccurrences.length > 1) {
     validation.source_plan_path = 'invalid';
     addFinding(errors, 'task-pack-source-plan-duplicate', 'Task pack source_plan must occur exactly once.');
@@ -417,7 +438,14 @@ function validateTaskPack(taskPackPath, options = {}) {
       validation.source_plan_path = 'missing';
       addFinding(errors, 'task-pack-source-plan-file-missing', 'source_plan file does not exist.');
     } else {
-      validation.source_plan_path = 'resolved';
+      const sourcePlanRealPath = realpath(sourcePlanPath);
+      if (!isInsidePath(repoRoot, sourcePlanRealPath)) {
+        validation.source_plan_path = 'invalid';
+        addFinding(errors, 'task-pack-source-plan-symlink-escape', 'source_plan symlink must resolve inside artifact root.');
+      } else {
+        result.source_plan.absolute_path = sourcePlanRealPath;
+        validation.source_plan_path = 'resolved';
+      }
     }
   }
 
@@ -441,14 +469,22 @@ function validateTaskPack(taskPackPath, options = {}) {
         addFinding(errors, 'source-plan-frontmatter-invalid', sourcePlanSplit.error.message);
       } else {
         const sourcePlanMetadata = parseFrontmatterScalars(sourcePlanSplit.frontmatter);
-        if (!sourcePlanMetadata.spec_id) {
-          validation.spec_id = metadata.spec_id ? 'missing' : validation.spec_id;
-          addFinding(errors, 'source-plan-missing-spec-id', 'Source plan is missing spec_id.');
-        } else if (metadata.spec_id && metadata.spec_id !== sourcePlanMetadata.spec_id) {
+        if (metadata.spec_id && sourcePlanMetadata.spec_id && metadata.spec_id !== sourcePlanMetadata.spec_id) {
           validation.spec_id = 'mismatch';
           addFinding(errors, 'task-pack-wrong-chain', 'Task pack spec_id does not match source plan spec_id.');
-        } else if (metadata.spec_id) {
+        } else if (metadata.spec_id && sourcePlanMetadata.spec_id) {
           validation.spec_id = 'matched';
+        } else {
+          validation.spec_id = 'missing';
+          addFinding(
+            limitations,
+            'task-pack-spec-id-trace-missing',
+            'spec_id compatibility trace is missing on the task pack, source plan, or both; source_plan path and hash remain the executable identity.',
+            {
+              task_pack_spec_id: metadata.spec_id ? 'present' : 'missing',
+              source_plan_spec_id: sourcePlanMetadata.spec_id ? 'present' : 'missing',
+            },
+          );
         }
 
         const hashResult = computeSourcePlanHash(result.source_plan.absolute_path);

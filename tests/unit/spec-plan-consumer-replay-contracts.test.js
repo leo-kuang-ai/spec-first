@@ -226,6 +226,16 @@ describe('spec-plan unified-plan consumer replay fixtures', () => {
     expect(WORK_SKILL).toContain('Superseded sibling');
   });
 
+  test('keeps unified plan identity independent from optional task-pack compatibility traces', () => {
+    const implementationReadyMarkdown = read('fixtures/consumer-replay/implementation-ready.md');
+    const metadata = markdownMetadata(implementationReadyMarkdown);
+
+    expect(metadata.artifact_contract).toBe('spec-unified-plan/v1');
+    expect(metadata.artifact_readiness).toBe('implementation-ready');
+    expect(metadata.spec_id).toBeUndefined();
+    expect(PLAN_SKILL).not.toMatch(/unified plan.{0,80}requires? `spec_id`/is);
+  });
+
   test('maps long Markdown and HTML plans before reading the material composition decision', () => {
     for (const [fixture, format, minimumBytes] of [
       ['fixtures/consumer-replay/implementation-ready.md', 'markdown', 3000],

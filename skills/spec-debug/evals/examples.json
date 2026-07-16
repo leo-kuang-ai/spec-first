@@ -1,0 +1,43 @@
+{
+  "schema_version": "spec-first.spec-debug.examples/v1",
+  "skill": "spec-debug",
+  "source_refs": [
+    "skills/spec-debug/SKILL.md",
+    "docs/contracts/verification/verification-run-summary.md",
+    "docs/contracts/workflows/honest-closeout.md",
+    "docs/contracts/workflows/anti-rationalization-pattern.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "root-cause-shortcut-rejected",
+      "input": "The first code read suggests an obvious root cause, but no reproducer or equivalent captured evidence exists.",
+      "expected": "Keep it as a working hypothesis, obtain a minimal reproduction or grounded prediction, and do not close the causal chain as confirmed.",
+      "forbidden": ["fix by intuition", "root-cause-confirmed without evidence"]
+    },
+    {
+      "id": "cannot-reproduce-bounded-hypothesis",
+      "input": "The bug cannot be reproduced because required production state is unavailable.",
+      "expected": "Document attempts and missing conditions, request the narrow evidence/setup needed, and limit the claim instead of fabricating a red loop.",
+      "forbidden": ["claim no bug", "invent runtime values"]
+    },
+    {
+      "id": "fix-reruns-structured-evidence",
+      "input": "A fix and later simplify pass changed the regression surface.",
+      "expected": "Rerun the original reproducer, regression test, and applicable broader checks on the final tree; record a spec-debug run summary and honest closeout.",
+      "forbidden": ["reuse pre-simplify green result", "freeform tests passed"]
+    },
+    {
+      "id": "diagnosis-only-no-fabrication",
+      "input": "The user chooses diagnosis only after the causal chain is explained.",
+      "expected": "Return the diagnosis with null post-fix run summary, honest_closeout_verdict not-run, and an explicit limitation; do not mutate, commit, or imply regression verification.",
+      "forbidden": ["invented degraded validator verdict", "post-fix passed claim", "spec-work run artifact"]
+    },
+    {
+      "id": "dispatch-authorization-missing-serial",
+      "input": "Parallel probe capability exists but the user did not authorize delegated probes.",
+      "expected": "Investigate ranked hypotheses serially and record dispatch_authorization_missing without claiming independent coverage.",
+      "forbidden": ["dispatch because tools exist"]
+    }
+  ]
+}

@@ -13,13 +13,13 @@ This is the **canonical skeleton** for *which sections appear and in what order*
 
 **Scope:** merge-base with the review base branch -> working tree (14 files, 342 lines)
 **Intent:** Add order export endpoint with CSV and JSON format support
-**Mode:** interactive
+**Mode:** interactive (`mutation_policy: apply-fixes`, `commit_authorization: authorized`)
 
 **Reviewers:** correctness, testing, maintainability, security, api-contract
 - security -- new public endpoint accepts user-provided format parameter
 - api-contract -- new /api/orders/export route with response schema
 
-### Applied (safe, verified)
+### Applied (explicitly authorized, verified)
 
 | # | File | Fix | Reviewer |
 |---|------|-----|----------|
@@ -27,7 +27,7 @@ This is the **canonical skeleton** for *which sections appear and in what order*
 | 7 | `orders_controller.rb:88` (+test) | Tightened export file perms `0644 -> 0600` (security-posture — verify in diff) | security |
 
 Validation: export tests 11 -> 13; suite 214 pass, lint clean.
-Committed: `fix(review): cover empty-format branch + tighten export perms` (working tree was clean before review).
+Committed: `fix(review): cover empty-format branch + tighten export perms` (`commit_authorization: authorized`; working tree was clean before review).
 
 ### Triage Groups
 
@@ -141,24 +141,25 @@ This fails because of the **box-drawing `────` separators between items*
 - **No `Route` column in the per-severity tables** -- the synthesized route (``<autofix_class> -> <owner>``) appears only in the Actionable Findings table and the `mode:agent` JSON. The scannable severity tables are 5 columns: `# | File | Issue | Reviewer | Confidence`.
 - **Detail line (per finding, as needed)** -- keep the scannable line short (the symptom + `file:line`, not the mechanism); put the why-it-matters + fix/options in a per-finding detail line keyed by stable `#`: `- **#N** — <why it matters + what response it needs>`. Add it whenever the one-liner isn't self-sufficient -- usually P0/P1; P2/P3 are often terse-only. This keyed detail is the home for depth -- don't paste code or restate the diff, and match weight to weight.
 - **Header includes** scope, intent, and reviewer team with per-conditional justifications
-- **Mode line** -- include `interactive` or `agent`
+- **Mode line** -- include `interactive` or `agent`, the resolved `mutation_policy`, and commit authorization/status when apply ran
 - **Triage Groups section (when groups exist)** -- pipe table `| Group | Findings | Context | Preferred Resolution | Why |` rendered after Applied and before the severity tables. The `Findings` cell lists stable `#`s (e.g. `#2, #3`); every referenced `#` must appear in a severity table below. Groups are a triage lens over the findings -- they never replace the severity tables, merge findings, or renumber them. Omit when `grouping:off` is active or no groups survived Stage 5b/5c pruning.
-- **Applied section (default mode only)** -- when the review applied fixes (Stage 5c), list them first, before the severity tables, as `# | File | Fix | Reviewer` followed by a one-line validation outcome (e.g. "suite 214 pass, lint clean") and the **commit status** — committed as an isolated review-labeled fix commit (`fix(review): …`, or the repo's nearest convention when `review` isn't an allowed scope) when the working tree was clean before the review, or left uncommitted (for the user's commit) when it was already dirty. A fix spanning multiple files is **one row with one `#`** (e.g. `controller.rb:88 (+test)`) -- never duplicate the number across rows. Flag green-but-unverifiable edits (auth/contract/concurrency) inline in the `Fix` cell, e.g. `(security-posture — verify in diff)`. Applied findings keep their stable `#` and appear only here, not in the severity tables. Omit in `mode:agent` and when nothing was applied
+- **Applied section (explicit apply only)** -- render only when default mode resolved `mutation_policy: apply-fixes` and Stage 5c actually applied fixes. List them first, before the severity tables, as `# | File | Fix | Reviewer`, followed by validation and the separate commit authorization/status. Without `commit_authorization`, say `verified, left uncommitted`; a clean tree alone never licenses a commit. A fix spanning multiple files is one row with one stable `#`. Flag green-but-unverifiable edits (auth/contract/concurrency) inline. Omit for ordinary report-only review, `mode:agent`, degraded inline fallback, and no applied fixes.
 - **Actionable Findings section** -- include when the actionable queue is non-empty (findings for the caller to handle)
 - **Pre-existing section** -- separate table, no confidence column (these are informational)
 - **Learnings & Past Solutions section** -- results from the `learnings-researcher` local prompt asset, with links to docs/solutions/ files
 - **Agent-Native Gaps section** -- results from the `agent-native-reviewer` local prompt asset. Omit if no gaps found.
 - **Deployment Notes section** -- key checklist items from the `deployment-verification-agent` local prompt asset. Omit if the prompt did not run. Schema drift surfaces as `data-migration` findings — no separate section.
 - **Coverage section** -- suppressed count, removable surface (only when deletion-oriented maintainability findings exist; approximate net lines/files removable if applied -- a dead-weight signal, never a reduction target, omit otherwise), residual risks, testing gaps, failed reviewers
+- **Structured verification evidence** -- include `verification_evidence` only for commands the review itself actually executed. Render `status`, repo-relative `run_summary_ref`, `closeout_verdict`, `reason_code`, check summaries, and `limitations`. Pure persona/validator findings use `status: not-produced` and `reason_code: no-targeted-command-executed`; they are not command evidence.
 - **Summary uses blockquotes** for verdict, reasoning, and fix order
 - **Horizontal rule** (`---`) separates findings from verdict
 - **`###` headers** for each section -- never plain text headers
 
 ## Agent mode (JSON)
 
-When `mode:agent` is active, **do not** emit the markdown table report above. Emit **one parseable JSON object** as the primary response and write the same payload to `review.json` under `/tmp/spec-first/spec-code-review/<run-id>/`.
+When `mode:agent` is active, **do not** emit the markdown table report above. Emit **one parseable JSON object** as the primary response and, when the concrete `REVIEW_ARTIFACT_DIR` is writable, write the same payload to `{review_artifact_dir}/review.json`. The JSON `artifact_path` is that exact absolute directory or `null`; consumers never reconstruct it from `run_id`.
 
-The contract is defined in SKILL.md under **`### JSON output format (`mode:agent` only)`**. Minimum fields: `status`, `verdict`, `scope`, `intent`, `reviewers`, `findings`, `actionable_findings`, `artifact_path`, `run_id`.
+The contract is defined in SKILL.md under **`### JSON output format (`mode:agent` only)`**. Minimum fields: `status`, `verdict`, `mutation_policy`, `commit_authorization`, `scope`, `intent`, `reviewers`, `findings`, `actionable_findings`, `coverage`, `artifact_path`, `artifact_write_status`, `run_id`.
 
 Key differences from the interactive markdown format:
 
@@ -168,3 +169,6 @@ Key differences from the interactive markdown format:
 - **No `applied_fixes` and no Applied section** — `mode:agent` does not apply fixes; the caller does. Applied work surfaces only in default-mode markdown (Stage 5c/6). The handoff is `actionable_findings`.
 - **Failure/degraded paths** — `{"status":"failed","reason":"..."}` or `"status":"degraded"` with reason; never mix markdown tables into the JSON response.
 - **Stable `#`** — same numbering as Stage 5 synthesis, carried in JSON finding objects for downstream apply/residual tracking.
+- **Task coverage** — when task context is active, `coverage.task_scope` carries digest, declared/delta/untracked files, per-file isolation, aggregate `task_diff_isolation`, `required_gate_eligible`, review focus, and limitations. Outside task mode it is `null`.
+- **Verification coverage** — `coverage.verification_evidence` is always present. Its shape is `{status, run_summary_ref, closeout_verdict, reason_code, checks, limitations}`. `run_summary_ref` is repo-relative and non-null only after `verification-run-summary record --workflow spec-code-review` captured a targeted command that actually ran; otherwise use the explicit not-produced/degraded reason.
+- **Portable artifacts** — resolve `REVIEW_ARTIFACT_DIR` once from an OS-native temp root or host-writable run-local temp. `$TMPDIR` and `%TEMP%` are platform inputs, not hard-coded contract paths. If writing fails, keep the in-band JSON complete and set `artifact_path: null` plus the limitation instead of re-running review.

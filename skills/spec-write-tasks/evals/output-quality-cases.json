@@ -15,7 +15,7 @@
       "input": "Compile a settled source plan into an executable task pack.",
       "input_files": [],
       "baseline_risks": [
-        "A generic task split omits spec_id/source_plan_hash and cannot be deterministically handed to spec-work.",
+        "A generic task split omits portable source_plan/source_plan_hash identity and cannot be deterministically handed to spec-work.",
         "Task cards restate the plan instead of providing bounded files, test_focus, done_signal, and stop_if."
       ],
       "with_skill_expectations": [
@@ -25,6 +25,7 @@
       "objective_assertions": [
         "Task pack frontmatter has type: task-pack, generated_by: spec-write-tasks, status: derived, and mode: derived.",
         "source_plan_hash uses sha256:<64-hex> and is validated by spec-first tasks validate --json.",
+        "The CLI reports identity_basis: source-plan-path+body-hash and treats missing spec_id only as an explicit compatibility-trace limitation.",
         "Every executable task has files, test_focus, done_signal, wave, stop_if, and a source anchor."
       ],
       "deterministic_assertions": [

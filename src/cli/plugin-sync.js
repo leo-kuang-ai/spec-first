@@ -62,12 +62,12 @@ const HIGH_VALUE_SKILL_ANCHORS = {
     'universal-planning.md',
   ],
   'spec-work': [
-    "Derive tasks from the plan's implementation units",
-    'Test Discovery',
-    'System-Wide Test Check',
+    'Reference Trigger Map',
+    'Task Pack Contract',
+    'references/feedback-and-tests.md',
+    'references/implementation-quality.md',
     'references/shipping-workflow.md',
     'Residual Work Gate',
-    'Phase 3-4: Quality Check and Finishing Work',
   ],
   'spec-code-review': [
     'Plan discovery (requirements verification)',
@@ -86,12 +86,12 @@ const HIGH_VALUE_COMMAND_ANCHORS = {
     'universal-planning.md',
   ],
   'spec-work': [
-    "Derive tasks from the plan's implementation units",
-    'Test Discovery',
-    'System-Wide Test Check',
+    'Reference Trigger Map',
+    'Task Pack Contract',
+    'references/feedback-and-tests.md',
+    'references/implementation-quality.md',
     'references/shipping-workflow.md',
     'Residual Work Gate',
-    'Phase 3-4: Quality Check and Finishing Work',
   ],
   'spec-code-review': [
     'Plan discovery (requirements verification)',

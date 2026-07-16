@@ -5,7 +5,16 @@ const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-write-tasks/SKILL.md'), 'utf8');
+const schema = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-write-tasks/references/task-pack-schema.md'),
+  'utf8',
+);
+const handoff = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-write-tasks/references/execution-handoff-contract.md'),
+  'utf8',
+);
 const casesPath = path.join(repoRoot, 'skills/spec-write-tasks/evals/output-quality-cases.json');
+const failureCasesPath = path.join(repoRoot, 'skills/spec-write-tasks/evals/failure-cases.json');
 
 describe('spec-write-tasks current contracts', () => {
   test('keeps the plan canonical and task packs derived', () => {
@@ -15,9 +24,22 @@ describe('spec-write-tasks current contracts', () => {
   });
 
   test('requires real CLI evidence before deterministic handoff claims', () => {
-    expect(skill).toContain('run `spec-first tasks validate <task-pack-path> --json`');
-    expect(skill).toContain('run `spec-first tasks hash <plan-path>`');
+    expect(skill).toContain('spec-first tasks validate <task-pack-path> --repo <artifact-root> --json');
+    expect(skill).toContain('spec-first tasks hash <plan-path> --repo <artifact-root> --json');
     expect(skill).toContain('before reporting `deterministic_handoff`');
+  });
+
+  test('uses portable source-plan identity and keeps spec_id as an optional compatibility trace', () => {
+    for (const source of [skill, schema, handoff]) {
+      expect(source).toContain('source-plan-path+body-hash');
+      expect(source).toContain('optional compatibility trace');
+      expect(source).not.toContain('missing_spec_id');
+    }
+
+    expect(schema).toContain('artifact-root-relative POSIX');
+    expect(handoff).toContain('artifact_root');
+    expect(handoff).toContain('repo_root');
+    expect(handoff).toContain('task-pack-spec-id-trace-missing');
   });
 
   test('high-risk review remains an authorized bounded handoff', () => {
@@ -32,5 +54,11 @@ describe('spec-write-tasks current contracts', () => {
     for (const sourceRef of fixture.source_refs) {
       expect(fs.existsSync(path.join(repoRoot, sourceRef))).toBe(true);
     }
+  });
+
+  test('failure fixtures no longer reject executable packs only because spec_id is absent', () => {
+    const fixture = JSON.parse(fs.readFileSync(failureCasesPath, 'utf8'));
+    expect(fixture.cases.map((entry) => entry.expected_failure)).not.toContain('missing_spec_id');
+    expect(fixture.cases.map((entry) => entry.id)).toContain('source-plan-path-escape');
   });
 });

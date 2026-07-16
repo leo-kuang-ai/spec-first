@@ -55,7 +55,7 @@ describe('plan status shipping closeout', () => {
     const taskPack = 'docs/tasks/source-tasks.md';
     fs.writeFileSync(
       path.join(root, sourcePlan),
-      '---\nspec_id: example\nstatus: active\n---\n# Source\n',
+      '---\nstatus: active\n---\n# Source\n',
       'utf8',
     );
     const sourcePlanHash = computeSourcePlanHash(path.join(root, sourcePlan)).hash;
@@ -80,7 +80,6 @@ describe('plan status shipping closeout', () => {
       'generated_by: spec-write-tasks',
       'status: derived',
       'mode: derived',
-      'spec_id: example',
       `source_plan: "${sourcePlan}" # lifecycle owner`,
       `source_plan_hash: ${sourcePlanHash}`,
       '---',
@@ -100,6 +99,7 @@ describe('plan status shipping closeout', () => {
     const validationPayload = JSON.parse(validation.stdout);
     expect(validationPayload.deterministic_handoff).toBe(true);
     expect(validationPayload.source_plan.path).toBe(sourcePlan);
+    expect(validationPayload.validation.spec_id).toBe('missing');
 
     const result = runPlanStatus(root, 'complete', validationPayload.source_plan.path);
 

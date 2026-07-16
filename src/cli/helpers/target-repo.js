@@ -13,10 +13,12 @@ const GENERATED_RUNTIME_PREFIXES = Object.freeze([
   '.agents/skills/',
   '.cursor/skills/',
   '.cursor/spec-first/',
+  '.cursor/rules/spec-first.mdc',
   '.kiro/skills/',
   '.kiro/agents/',
   '.kiro/spec-first/',
   '.kiro/settings/',
+  '.kiro/steering/spec-first.md',
   '.qoder/commands/spec-',
   '.qoder/commands/spec/',
   '.qoder/skills/',
@@ -25,6 +27,7 @@ const GENERATED_RUNTIME_PREFIXES = Object.freeze([
   '.qoder/hooks/session-start/',
   '.qoder/hooks/prd-prewrite-guard/',
   '.qoder/hooks/prd-readiness-guard/',
+  '.qoder/rules/spec-first.md',
 ]);
 const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.claude',
@@ -32,11 +35,13 @@ const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.agents/skills',
   '.cursor/skills',
   '.cursor/spec-first',
+  '.cursor/rules/spec-first.mdc',
   '.cursor/mcp.json',
   '.kiro/skills',
   '.kiro/agents',
   '.kiro/spec-first',
   '.kiro/settings',
+  '.kiro/steering/spec-first.md',
   '.qoder/commands/spec',
   '.qoder/skills',
   '.qoder/agents',
@@ -44,7 +49,9 @@ const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.qoder/hooks/session-start',
   '.qoder/hooks/prd-prewrite-guard',
   '.qoder/hooks/prd-readiness-guard',
+  '.qoder/rules/spec-first.md',
   '.qoder/settings.local.json',
+  '.qoder/settings.json',
 ]);
 
 function resolveTargetRepoRoot(targetRepo) {

@@ -12,7 +12,9 @@
 #              claude -> use Claude (when the host is Codex)
 #   <base-ref> the diff base (e.g. a merge-base SHA or branch); the peer reviews
 #              only `git diff <base-ref>` in the current repository
-#   <run-dir>  an existing dir; output is written to <run-dir>/adversarial-<peer>.json
+#   <run-dir>  the existing concrete REVIEW_ARTIFACT_DIR chosen by the caller;
+#              output is written to <run-dir>/adversarial-<peer>.json. This script
+#              never chooses or reconstructs the review artifact temp root.
 #
 # Self-locates its sibling reference files via BASH_SOURCE (NOT the CWD, which is
 # the user's project on every host), and derives the repo root from git. The agent
@@ -35,6 +37,7 @@ skip() { log "$*"; exit 0; }   # non-blocking: announce reason, exit clean, no o
 case "$PEER" in codex|claude) ;; *) skip "invalid peer '${PEER:-<empty>}' (want codex|claude); skipping cross-model pass" ;; esac
 [ -n "$BASE" ]                  || skip "no base ref given; skipping"
 [ -n "$RUN_DIR" ] && [ -d "$RUN_DIR" ] || skip "run-dir '${RUN_DIR:-<empty>}' is not a directory; skipping"
+RUN_DIR="$(cd "$RUN_DIR" 2>/dev/null && pwd -P)" || skip "cannot canonicalize run-dir; skipping"
 command -v "$PEER" >/dev/null 2>&1 || skip "$PEER CLI not installed; skipping"
 command -v jq      >/dev/null 2>&1 || skip "jq not installed; skipping"
 

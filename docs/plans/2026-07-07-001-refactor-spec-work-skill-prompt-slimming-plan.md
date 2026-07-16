@@ -1,8 +1,9 @@
 ---
 title: "refactor: 按设计与优化方法论精简 spec-work skill prompt"
 type: refactor
-status: active
+status: superseded
 date: 2026-07-07
+superseded_by: docs/plans/2026-07-16-003-refactor-spec-work-quality-capability-closure-plan.md
 spec_id: 2026-07-07-001-spec-work-skill-prompt-slimming
 origin: docs/10-prompt/skill-prompt-设计与优化方法论-v2.md
 origin_grade: methodology

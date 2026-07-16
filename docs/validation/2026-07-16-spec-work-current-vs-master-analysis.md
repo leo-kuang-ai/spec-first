@@ -1,8 +1,9 @@
 # `spec-work`：当前分支与 `master` 的深度对比、能力拆解与吸收建议
 
-> Artifact type: confirmed source diff + historical-plan evidence + semantic integration recommendations
+> Artifact type: confirmed source diff + historical-plan evidence + semantic integration recommendations + implementation closure addendum
 > Date: 2026-07-16
-> Comparison: `master` (`437bb9e4`) ↔ current `HEAD` (`6a0f060c`, branch `leo-2026-07-16-plan-update`)
+> Comparison baseline: `master` (`437bb9e4`) ↔ pre-implementation current `HEAD` (`6a0f060c`, branch `leo-2026-07-16-plan-update`)
+> Closure source: current worktree implementation of `docs/plans/2026-07-16-003-refactor-spec-work-quality-capability-closure-plan.md`; no commit/PR is claimed by this document.
 > Scope: `skills/spec-work/**` canonical source、直接相关 tests/contracts、`spec-plan`/`spec-write-tasks`/`spec-lfg` consumer contracts、历史已完成或 active 的 `spec-work` 技术方案；generated runtime mirrors 排除在写入范围外。
 
 ## 结论
@@ -24,6 +25,31 @@
 5. **P0/P1 — skill-local execution regression floor 大幅收缩。** `spec-work-contracts` 从 28 cases 收缩为 7，`task-pack-command` 从 48 收缩为 6，work-local eval 与 run-evidence/invariant/containment tests 被删除；当前确有新增的 unified readiness consumer replay 与 lifecycle helper/integration coverage，但它们不能替代 task-pack、scope、architecture、run-evidence 和 artifact-path 保护。
 
 `master` 的所有内容并非都应恢复。旧的 host-native review tier、`mode:autofix`、Markdown-only/full-read 假设、已退役 team-standards 路径、硬编码宿主能力和大段重复 prose 不应回迁。吸收应采用 **Adopt / Extend / Compose / New / Defer**，而不是文件级复制。
+
+## 2026-07-16 实施收口更新
+
+本报告以下主体保留“实施前对比”的证据口径；本节记录随后由 `2026-07-16-003` 执行的 current-source closure，防止把历史问题继续误读为当前断点。完整逐 unit 证据、命令、runtime adoption 与 limitation 见 `docs/validation/spec-work/2026-07-16-quality-capability-closure-eval.md`。
+
+| 原建议 | 当前吸收结果 | Source owner / 边界 |
+| --- | --- | --- |
+| A. Settled-scope Contract Spine | 已完成 | `spec-work/SKILL.md` 增 Workflow Contract Summary、Reference Trigger Map 与 P0 hard exits；没有恢复强状态机。 |
+| B. Validated task-pack executable intake | 已完成 | task identity/root/hash CLI + `work-intake-and-task-pack.md`；task pack保持derived，source plan拥有scope/lifecycle，semantic-fit仍由LLM判断。 |
+| C. Architecture / Composition Recheck | 已完成 | `implementation-quality.md` 持有current-source `reuse / extend / compose / new`、thin-glue owns/does-not-own、wrong-owner/future-only/new-boundary stop-back。 |
+| D. Scope / Target Repo / Source-Runtime | 已完成 | `execution-strategy.md` 与三个high-risk workflow锁定target repo、dirty overlap、canonical source、scope-changing discovery与mutation/commit/landing分离。 |
+| E. Feedback Loop And Vertical Slices | 已完成 | `feedback-and-tests.md` 持有smallest loop、vertical slice、proof/characterization、surface-specific verification与replacement evidence。 |
+| F. Minimality / Simplification | 已完成 | `remove-now` / `minimality-debt` / `protected` / `architecture-mismatch`四分类；不默认extract helper，不为LOC删除security/data/a11y/observability/required checks。 |
+| G. Structured Verification And Run Evidence | 已完成 | active shipping source持有`verification-run-summary`、`honest-closeout`和conditional `spec-work-run-artifact/v2`的实际调用序列，helper/producer integration tests确认确定性路径；debug/review仅消费共享summary/closeout，不取得work-artifact ownership。 |
+| H. Completion / Changelog / Artifact Path | 已完成 | Return-to-Caller与standalone handoff均返回summary ref、verdict、artifact reason和limitations；session-temp review detail需脱敏物化或降级为structured summary。 |
+| I. Direct Evidence / Context Economy | 已完成source分层 | Front Controller + 一层triggered references，actual-tree/source/test/log优先；provider graph仍是advisory navigation。Loader/context-room收益仅为contingent。 |
+| J. Contract / Eval / Invariant Floor | 已完成 | 恢复/新增task-pack、review scope、target containment、run evidence、implementation quality、anti-rationalization、front-controller与五宿主projection suites，并纳入AI gate。 |
+| K. Scenario Capability | 已完成 | `spec-work`、`spec-debug`、`spec-code-review`恢复high-risk overrides；缺optional evidence只限制claim，foreign residual可阻断相关mutation/claims。 |
+| L. Anti-Rationalization | 已完成 | 三workflow恢复轻量Red Flags；shared contract明确它们不是script gate、approval或状态机。 |
+
+已明确拒绝回迁：host-native Tier 1/Tier 2 review、`mode:autofix`、worker自动commit、skill-owned branch自动push/PR、硬编码宿主能力、把`spec_id`恢复为全局必填、第二套task/progress/evidence schema，以及把generated runtime mirror当source owner。
+
+Runtime adoption 已使用当前 checkout 的 `node bin/spec-first.js init --claude --codex --cursor --kiro --qoder` 完成，5/5 hosts generated runtime ready；Claude/Codex doctor为PASS，Cursor/Kiro/Qoder保留CLI/loader、duplicate discovery、hook activation与MCP config warnings。该结果只证明current source可重建managed runtime，不证明clean-session模型行为、reviewer independence或field outcome。Fresh-source eval仍为`not_run: dispatch_authorization_missing`。
+
+最终 current-worktree verification：计划focused gate 21 suites / 159 tests、unit 117 suites / 1090 tests、integration 6 suites / 21 tests、`npm test`中的smoke 1 suite / 5 tests、AI gate 39 suites / 393 tests、typecheck 179 files、skill entrypoint lint 309 files均通过；package build、structured closeout与plan lifecycle结果以companion validation report为准。收尾inline审查另外修复了CE upstream test仍绑定旧engine原句、debug diagnosis-only伪造`degraded` verdict、review inline fallback缺run-id/finding normalization，以及work shipping未消费dispatch-authorization degraded result四项合同缺口。
 
 ## 范围、方法与证据边界
 
@@ -56,7 +82,7 @@
 | CE-first migration review | 确认当前 package 与 CE `ce-work` 的文件/主流程 parity | 不证明被删除的 spec-first 能力已安全退役，也不证明真实 work/shipping 行为 |
 | focused Jest | 确认当前 7 个静态 contract assertions 通过 | 不能覆盖已删除行为，也不等于 fresh-source/field outcome |
 
-### 本轮已执行的只读检查
+### 原始分析阶段已执行的只读检查
 
 - `git status --short`、branch/SHA/merge-base 检查。
 - `git diff` / `git show master:` 对 `SKILL.md`、shipping、tracker、eval、tests 的逐段比较。
@@ -65,7 +91,9 @@
 - canonical `skills/spec-write-skill/scripts/validate-skill.cjs skills/spec-work --json`：结构结果 `pass`，仅有 `argument-hint` extension warning；该 validator 不证明 prompt 语义、reference branch 会被正确加载或 consumer 行为。
 - `npx jest tests/unit/spec-work-contracts.test.js --runInBand`：1 suite / 7 tests passed。
 
-### 未执行
+### 原始分析阶段未执行
+
+以下内容描述实施前的只读分析阶段；后续 closure 状态以本报告“实施收口更新”和 companion validation report为准。
 
 - 未运行把 `spec-work` 当真实执行者的 fresh-source semantic forward-test：`not_run: analysis-only-comparison`。本轮 delegated reviewer 只读审查源文件，没有执行或模拟完整 work/shipping 行为。
 - 未启动真实 Claude/Codex/Cursor/Kiro/Qoder clean session。

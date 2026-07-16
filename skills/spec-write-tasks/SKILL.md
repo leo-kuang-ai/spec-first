@@ -33,11 +33,11 @@ One of: executable derived task pack, validated existing task-pack handoff, `ski
 
 ### Artifacts
 
-Executable task packs live under `docs/tasks/` and must carry `spec_id`, `source_plan`, `source_plan_hash`, `generated_by: spec-write-tasks`, `mode: derived`, and a valid `Task Pack Contract` JSON block.
+Executable task packs live under `docs/tasks/` and must carry an artifact-root-relative POSIX `source_plan`, canonical `source_plan_hash`, `generated_by: spec-write-tasks`, `mode: derived`, and a valid `Task Pack Contract` JSON block. Executable identity is `source-plan-path+body-hash`; `spec_id` is an optional compatibility trace rather than a required identity field.
 
 ### Failure Modes
 
-Use machine-readable reason codes: `source_plan_missing`, `ambiguous_plan`, `missing_spec_id`, `wrong_chain`, `stale_hash`, `unverifiable_hash`, `invalid_contract`, `repo_scope_missing`, or `scope_gap`.
+Use machine-readable reason codes: `source_plan_missing`, `ambiguous_plan`, `wrong_chain`, `stale_hash`, `unverifiable_hash`, `invalid_contract`, `repo_scope_missing`, or `scope_gap`.
 
 ### Workflow
 
@@ -63,6 +63,7 @@ Overrides: none
 6. Source orientation is advisory and bounded: source plan sections, plan-declared files, nearby tests, and precise local contracts only when they improve task boundaries.
 7. Scripts validate identity, freshness, structure, hashes, concrete paths, and same-wave overlap. LLM/reviewers judge semantic task quality.
 8. Do not hand-edit `.claude/`, `.codex/`, or `.agents/skills/` as source fixes.
+9. `--repo <artifact-root>` selects the artifact/source resolution root only. It does not authorize or select the downstream mutation `target_repo`.
 
 ## Input Paths
 
@@ -105,9 +106,9 @@ Every run must end with the compact envelope from [Execution Handoff Contract](r
 
 Required posture:
 
-- include `decision`, `reason_code`, `source_plan`, `task_pack`, `task_pack_validity`, `deterministic_handoff`, `validity_scope`, `semantic_posture`, `dispatch_authorization`, `validation`, `orientation`, and `next_action`;
-- 🔴 GATE (verification): run `spec-first tasks validate <task-pack-path> --json` before reporting `deterministic_handoff` or validation fields;
-- run `spec-first tasks hash <plan-path>` when computing or comparing `source_plan_hash`;
+- include `decision`, `reason_code`, `identity_basis`, `artifact_root`, `source_plan`, `task_pack`, `task_pack_validity`, `deterministic_handoff`, `validity_scope`, `semantic_posture`, `dispatch_authorization`, `validation`, `orientation`, and `next_action`;
+- 🔴 GATE (verification): run `spec-first tasks validate <task-pack-path> --repo <artifact-root> --json` before reporting `deterministic_handoff` or validation fields;
+- run `spec-first tasks hash <plan-path> --repo <artifact-root> --json` when computing or comparing `source_plan_hash`, and copy its portable `source_plan` field rather than deriving identity from an absolute machine path;
 - 🔴 GATE (verification): never self-report `deterministic_handoff: true` without CLI JSON evidence;
 - 🔴 GATE (handoff): allow `next_action: spec-work-task-pack` only for valid deterministic handoff plus semantic posture `generated-this-run` or `reviewed-existing`;
 - 🔴 GATE (verification): for `semantic_posture: reviewed-existing`, the envelope must carry evidence metadata or a verifiable review-outcome reference; a bare `reviewed-existing` claim without current evidence is not eligible for `next_action: spec-work-task-pack`;

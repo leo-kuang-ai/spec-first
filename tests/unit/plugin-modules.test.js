@@ -473,7 +473,15 @@ describe('plugin module facade and governance', () => {
       ],
       'spec-work': [
         'SKILL.md',
+        'references/work-intake-and-task-pack.md',
+        'references/non-code-execution.md',
         'references/execution-engines.md',
+        'references/execution-strategy.md',
+        'references/feedback-and-tests.md',
+        'references/implementation-quality.md',
+        'references/shipping-workflow.md',
+        'references/review-findings-followup.md',
+        'references/tracker-defer.md',
       ],
     };
 
@@ -499,14 +507,27 @@ describe('plugin module facade and governance', () => {
         ));
         const reviewSkill = operations.get(path.posix.join(runtimeRoot, 'spec-doc-review/SKILL.md'));
         const workSkill = operations.get(path.posix.join(runtimeRoot, 'spec-work/SKILL.md'));
+        const workStrategy = operations.get(path.posix.join(
+          runtimeRoot,
+          'spec-work/references/execution-strategy.md',
+        ));
         expect(planSkill.contents).toContain('Inventory before invention');
         expect(planSkill.contents).toContain('reuse / extend / compose / new');
         expect(evidence.contents).toContain('Thin glue may own only');
         expect(reviewSkill.contents).toContain('mutation_policy');
         expect(reviewSkill.contents).toContain('report-only');
         expect(workSkill.contents).toContain('Duplicate critical metadata');
+        expect(workStrategy.contents).toContain('worker_dispatch_authorization');
+        expect(workStrategy.contents).toContain('landing_authorization');
         expect([...operations.keys()].some((operationPath) =>
           operationPath.includes('/spec-plan/evals/')
+        )).toBe(false);
+        expect([...operations.keys()].some((operationPath) =>
+          operationPath.includes('/spec-work/evals/')
+          || operationPath.includes('/spec-debug/evals/')
+          || operationPath.includes('/spec-code-review/evals/')
+          || operationPath.includes('/docs/validation/')
+          || operationPath.includes('/docs/plans/')
         )).toBe(false);
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });

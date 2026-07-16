@@ -1,0 +1,43 @@
+{
+  "schema_version": "spec-first.spec-code-review.examples/v1",
+  "skill": "spec-code-review",
+  "source_refs": [
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-code-review/references/review-output-template.md",
+    "docs/contracts/verification/verification-run-summary.md",
+    "docs/contracts/workflows/anti-rationalization-pattern.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "advisory-evidence-not-confirmed",
+      "input": "A provider graph candidate and one persona both suggest an impact path, but direct source/diff/test evidence does not confirm it.",
+      "expected": "Keep the candidate advisory/provider_untrusted, narrow Coverage, and do not promote the finding or impact claim to confirmed solely from agreement.",
+      "forbidden": ["advisory as confirmed", "full impact coverage"]
+    },
+    {
+      "id": "no-targeted-command-not-produced",
+      "input": "Reviewers inspect source and diff but the review executes no test/build command.",
+      "expected": "Return verification_evidence status not-produced with no-targeted-command-executed; findings remain review evidence, not command evidence.",
+      "forbidden": ["persona tests passed", "fake run summary"]
+    },
+    {
+      "id": "targeted-command-recorded",
+      "input": "The orchestrator actually runs one focused command to validate a mechanical finding.",
+      "expected": "Capture the real exit/log under spec-code-review, record the run summary and honest closeout, and expose the repo-relative ref in Coverage.",
+      "forbidden": ["spec-work run artifact ownership", "hide another failed check"]
+    },
+    {
+      "id": "residual-remains-structured",
+      "input": "A confirmed design-decision finding cannot be applied in report-only review.",
+      "expected": "Keep a numbered structured actionable finding, Coverage limitation, and downstream owner so the caller can route it durably.",
+      "forbidden": ["oral residual only", "silent drop"]
+    },
+    {
+      "id": "dispatch-missing-inline-degraded",
+      "input": "Reviewer dispatch is not authorized although persona files and a callable primitive exist.",
+      "expected": "Run a complete inline report-only pass, resolve a run id and optional artifact path, normalize findings as inline-fallback, return degraded and Not ready with dispatch_authorization_missing, and do not claim persona/validator/cross-model independence.",
+      "forbidden": ["Ready to merge", "implicit dispatch", "missing run_id in mode:agent"]
+    }
+  ]
+}

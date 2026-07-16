@@ -168,6 +168,10 @@ docs/
 
 `spec-plan` 在提出新 abstraction、adapter、orchestrator、integration seam 或 durable source 前先盘点已有能力，并在 `reuse / extend / compose / new` 中做语义取舍；`compose` 只允许薄胶水持有 contract translation、sequencing、failure/degradation routing 与 observability/evidence，不复制业务真相或平行持久状态。Markdown 和 HTML 都是 unified plan 的一等格式：Markdown review 可安全写入，HTML 由 `spec-doc-review` report-only 审查，确定性修正由 `spec-plan` 完整重组后复审。`spec-work` 会拒绝 requirements-only、progress-like readiness 以及重复、缺失或冲突的 unified metadata，并按稳定 heading/anchor 读取 implementation-ready artifact。以上 source/projection contract 不等于真实宿主 loader、模型质量或 field outcome 证据。
 
+对 validated task pack，`spec-work` 会固定 artifact-root-relative identity、task-pack digest、source-plan body hash，并重新检查 source plan readiness，再由 LLM 判断 Task Cards/Waves 与 scope/non-goals/KTD 的 semantic fit。Task pack 始终是 derived execution index，不成为 scope、progress 或 approval authority；`review_gate: required` 使用 bounded、report-only 的 task review，未关闭 P0/P1、design decision 或 scope attribution 问题前不会启动 dependent wave。实现阶段会基于 current source 重查 `reuse / extend / compose / new`：thin glue 只能协调 translation、sequencing、failure/partial-failure propagation、degradation 与 observability/evidence，不能复制 domain policy、validation truth 或 durable state；未授权的 public/schema/runtime/provider 边界返回 planning。
+
+本地 mutation、reviewer/worker dispatch、commit 与 outward landing 是四个独立授权面。`spec-code-review mode:agent` 始终 report-only；普通 review 默认也只报告，只有明确 review-and-fix 才能在本地 apply，commit 仍需独立授权。最终 work closeout 只记录真实执行的命令和 repo-relative redacted logs，通过 `verification-run-summary.v1` 与 `honest-closeout.v1` 校验结构化 claims，并只在 durable trigger 命中时写 `spec-work-run-artifact/v2`。`spec-debug`、`spec-code-review` 可以返回各自的 run-summary ref、verdict 与 limitation，但不拥有 spec-work run artifact。Prompt/source tests 与五宿主 projection 只证明合同存在，不证明 clean-session 模型行为或外部采用效果。
+
 支撑入口（按需触发）：`spec-runtime-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
 
 需求澄清由当前 producer 持有：`spec-ideate` 向 `spec-brainstorm` 传递聚焦 evidence snapshot；`spec-brainstorm` 先核实 source fact、每轮只向当前用户询问一个产品决定，并把 blocker、source limitation 与下一问题持久化到 requirements-only Product Contract；`spec-prd` 对 brownfield PRD 使用同一 sole-current-user 边界。项目 glossary/context/ADR 在这些 workflow 中只作 advisory 输入，跨 release 知识只输出带 provenance、consumer 与 invalidation condition 的 promotion candidate，后续显式维护请求才可写入。视觉/空间决定使用表格、状态序列、ASCII wireframe 或只读 source screenshot，不再启动 bundled browser helper。
@@ -197,9 +201,10 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 你今天就能检查的当前机制：
 
 - requirements 变成持久 brief，而不是会话里消失的 prompt。
-- plans 和 task packs 把模糊意图变成可评审、可执行的上下文。
+- plans 和 task packs 把模糊意图变成可评审、可执行的上下文；deterministic validation 只准备 identity/drift facts，LLM 仍判断 task semantic fit。
 - work closeout 可以指向结构化 verification evidence，而不是一句自由文本的"tests passed"。
-- task-pack handoff 会基于 source plan 结构推荐是否拆分，并对高风险 task pack 推荐文档审查，同时保持工程师在环确认。
+- required task-level review 保持 report-only，并在 scope attribution 或 blocking finding 未关闭时阻止 dependent wave。
+- work 在新增 durable surface 前重查 current owner/thin-glue 边界，并把本地 mutation 与 commit/landing authorization 分离。
 - work、review、debug、optimize 和 compound workflows 会沉淀证据与经验。
 - knowledge handoff 默认 summary-first，召回的 `docs/solutions/` learning 在回源确认前保持 advisory。
 - 一套 source assets 以统一 `spec-*` workflow 入口支持 Claude Code、Codex、Cursor、Kiro 和 Qoder，不需要手工维护生成副本。

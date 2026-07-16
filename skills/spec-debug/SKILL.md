@@ -10,12 +10,31 @@ Find root causes, then fix them. This skill investigates bugs systematically —
 
 <bug_description> #$ARGUMENTS </bug_description>
 
+## Scenario Capability
+
+Follows `docs/contracts/workflows/scenario-capability-matrix.md`.
+Overrides: high-risk
+
+- `foreign-residual-workspace` -> `blocked-action-required`: stop before fix mutation, root-cause-confirmed claims that depend on suspect local artifacts, commits, or PR-ready handoff until the named cleanup/init action runs or the user explicitly accepts degraded evidence.
+- optional external-tool evidence unavailable -> `fallback-only`: continue with bounded direct source, test, log, runtime-probe, and user-provided evidence; disclose the missing capability and do not extend root-cause or blast-radius claims beyond that evidence.
+- `non-git-build-workspace` coverage gaps -> `partial`: keep investigation/fixes inside the explicit `target_repo` or inspected build surface and directly inspect uncovered modules before claiming they are unaffected.
+
 ## Core Principles
 
 1. **Investigate before fixing.** Do not propose a fix until you can explain the full causal chain from trigger to symptom with no gaps. "Somehow X leads to Y" is a gap.
 2. **Predictions for uncertain links.** When the causal chain has uncertain or non-obvious links, form a prediction — something in a different code path or scenario that must also be true. If the prediction is wrong but a fix "works," you found a symptom, not the cause. When the chain is obvious (missing import, clear null reference), the chain explanation itself is sufficient.
 3. **One change at a time.** Test one hypothesis, change one thing. If you're changing multiple things to "see if it helps," stop — that is shotgun debugging.
 4. **When stuck, diagnose why — don't just try harder.**
+
+## Anti-Rationalization Red Flags
+
+| 红旗念头 | 停下来做什么 |
+| --- | --- |
+| 「我看出 bug 了，跳过复现」 | 先建立最小复现或取得等价捕获证据；没有 red-capable loop 时只能形成 working hypothesis，不能关闭 causal chain gate。 |
+| 「root cause 很明显」 | 用源码、日志、测试或 runtime value 补齐从 trigger 到 symptom 的 causal chain，不把直觉当 confirmed evidence。 |
+| 「修完了，手测一下就行」 | 复跑 original reproducer、regression 和适用 broader checks，记录 structured summary；不能只写 freeform “tests passed”。 |
+
+这是注意力提醒,不是 gate,也不替代 LLM 判断;最终是否停下、如何处理仍由你按当前证据决定。
 
 ## Execution Flow
 
@@ -34,6 +53,8 @@ Beyond the trivial-bug fast-path in Phase 0, no further phase skipping — compl
 ### Phase 0: Triage
 
 Parse the input and reach a clear problem statement.
+
+**Repository and source boundary:** Resolve the current Git root before repo-dependent investigation. In a parent workspace, bounded read-only orientation may compare likely child repos, but require a single `target_repo` or explicit per-fix repo scope before any behavior-bearing test, instrumentation write, or fix. Do not let cwd or broad discovery choose a sibling repo. Canonical checked-in source is the fix owner; generated runtime mirrors under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, or `.qoder/` are not source. If runtime drift is causal, repair source/generation first and regenerate only with explicit authorization.
 
 **If the input references an issue tracker**, fetch it:
 - GitHub (`#123`, `org/repo#123`, github.com URL): Parse the issue reference from `<bug_description>` and fetch with `gh issue view <number> --json title,body,comments,labels`. For URLs, pass the URL directly to `gh`.
@@ -199,7 +220,7 @@ If 2-3 hypotheses are exhausted without confirmation, diagnose why:
 | Works locally, fails in CI/prod | Environment problem | Focus on env differences, config, dependencies, timing |
 | Fix works but prediction was wrong | Symptom fix, not root cause | The real cause is still active — keep investigating |
 
-**Parallel investigation option:** When hypotheses are evidence-bottlenecked across clearly independent subsystems, dispatch read-only sub-agents in parallel, each with an explicit hypothesis and structured evidence-return format. No code edits by sub-agents, and skip this when hypotheses depend on each other's outcomes. If the platform does not support parallel sub-agent dispatch, run the same hypothesis probes sequentially in ranked-likelihood order instead — the parallelism is a latency optimization, not a correctness requirement.
+**Parallel investigation option:** When hypotheses are evidence-bottlenecked across clearly independent subsystems, first resolve `debug_probe_dispatch_authorization` from explicit current-user or upstream wording, then probe for a callable subagent primitive. Permission settings govern tool execution; they are not dispatch authorization. Only when authorization and capability are both present may read-only probes run in bounded parallel, each with an explicit hypothesis and structured evidence return. Missing authorization records `dispatch_authorization_missing`; missing capability records `subagent_capability_missing`; either case runs the same probes in ranked-likelihood sequential order inline. Unknown isolation is irrelevant for read-only probes but never licenses mutation. No code edits by probe agents, and skip parallelism when hypotheses depend on each other's outcomes.
 
 Present the diagnosis to the user before proceeding.
 
@@ -213,7 +234,8 @@ If the user chose "Diagnosis only" at the end of Phase 2, skip this phase and go
 
 **Workspace and branch check:** Before editing files:
 
-- Check for uncommitted changes (`git status`). If the user has unstaged work in files that need modification, confirm before editing — do not overwrite in-progress changes.
+- Confirm the selected single `target_repo` (or explicit per-fix repo scope), current `HEAD`, branch, and source owner. A `Fix it now` choice authorizes only the bounded local fix mutation described in the diagnosis; it does not authorize commit, push, PR creation, branch publication, runtime regeneration, or adjacent cleanup.
+- Check for uncommitted changes (`git status`). Record pre-existing dirty tracked/untracked paths and their overlap with fix-owned files. Unrelated dirty paths remain user-owned. A pre-existing dirty overlap requires an explicit owner decision or a bounded preservation strategy before editing — do not overwrite, stage, simplify, or revert those hunks.
 - If the current branch is the default branch, ask whether to create a feature branch first using the platform's blocking question tool (see Phase 2 for the per-platform names). To detect the default branch, compare against `main`, `master`, or the value of `git rev-parse --abbrev-ref origin/HEAD` with its `origin/` prefix stripped (the raw output is `origin/<name>`, so an unstripped comparison will never match the local branch name). Default to creating one; derive a name from the bug and run `git checkout -b <name>`. On any other branch, proceed.
 - Record the pre-fix scope before editing: current `HEAD`, whether `git status --short` is clean, and any pre-existing changed files. During Phase 3, keep a list of fix-owned files (the tests and implementation files changed for this bug). Phase 4 uses this to keep simplify/review from touching unrelated branch work.
 
@@ -225,6 +247,8 @@ If the user chose "Diagnosis only" at the end of Phase 2, skip this phase and go
 5. Verify the test passes.
 6. Run the broader test suite for regressions.
 7. Self-review the diff before declaring the root-cause fix done: read every changed line and check for style violations, missed edge cases, regressions in adjacent behavior, and missing test coverage for the fix. Do not run the broader polish/review/PR tail here; Phase 4 owns it after the debug summary so the user can see the root-cause result before shipping work begins.
+
+For every command in steps 3, 5, and 6, retain the real command, `ran`, exit code, status, required/missing tools, reason code, and a bounded secret-stripped log. These are provisional until the Phase 4 tail finishes: if simplify or review changes the fix, rerun affected checks and use only the final results for closeout. A planned command, a dry-run, or a worker's natural-language “passed” statement is not confirmed command evidence.
 
 **On a failed fix:** return to Phase 2 and *explicitly invalidate the current hypothesis* before forming a new one. State out loud what evidence ruled out the prior hypothesis, then form a new one with its own grounding observation and prediction. Do not retry variants of the same theory ("maybe it was the other branch", "let me also catch this case") — that is the rationalization spiral, not iteration.
 
@@ -239,21 +263,25 @@ Analyze how this was introduced and what allowed it to survive. Note any systemi
 
 ### Phase 4: Handoff
 
-**Structured summary** — always write this first:
+**Structured summary** — diagnosis-only runs write this immediately. When Phase 3 changed code, assemble the final version after the post-fix tail and structured verification closeout below, so the summary references the final tree rather than a pre-review green result:
 
 ```
 ## Debug Summary
 **Problem**: [What was broken]
 **Root Cause**: [Full causal chain, with file:line references]
+**Target Repo / Scenario**: [selected repo/surface and any bounded/degraded capability]
 **Recommended Tests**: [Tests to add/modify to prevent recurrence, with specific file and assertion guidance]
 **Fix**: [What was changed — or "diagnosis only" if Phase 3 was skipped]
 **Prevention**: [Test coverage added; defense-in-depth if applicable]
+**verification_run_summary_ref**: [repo-relative ref, or null with reason]
+**honest_closeout_verdict**: [verified/degraded/unsupported + overall_reason_code]
+**claim_limitations**: [not-run, missing evidence, bounded coverage, or none]
 **Confidence**: [High/Medium/Low]
 ```
 
-**If Phase 3 was skipped** (user chose "Diagnosis only" in Phase 2), stop after the summary — the user already told you they were taking it from here. Do not prompt.
+**If Phase 3 was skipped** (user chose "Diagnosis only" in Phase 2), do not fabricate post-fix command evidence or a validator verdict. Set `verification_run_summary_ref: null`, `honest_closeout_verdict: not-run`, and `claim_limitations: diagnosis-only-no-post-fix-verification`, then stop after the summary — the user already told you they were taking it from here. Do not prompt.
 
-**If Phase 3 ran**, the next move depends on whether the skill created the branch in Phase 3.
+**If Phase 3 ran**, complete the quality tail, then resolve commit and landing authorization. Branch ownership is scope evidence, not authority.
 
 #### Post-fix polish/review tail (before commit or PR)
 
@@ -265,11 +293,41 @@ Run this tail after Phase 3 ran and before the branch-based commit/PR handoff. T
 
 **Simplify before review when useful.** Invoke `spec-simplify-code` before code review when the current fix diff is non-mechanical and large enough to benefit (default: >=30 changed lines), touches multiple implementation files, introduces a new helper/abstraction, or affects shared/risky surfaces such as auth/authz, public contracts, persistence, concurrency, background jobs, or external services. Use the branch diff only when the branch is skill-owned or clearly contains only this fix. On a pre-existing branch, scope simplification to fix-owned files only when those files were clean before Phase 3. If a fix-owned file already had pre-existing user edits, skip `spec-simplify-code` for that file and record `Simplify: skipped for overlapping pre-existing edits`; file-level simplification could rewrite unrelated hunks the user did not authorize. Do not let simplification widen into unrelated user work.
 
-**Review the final fix scope.** After simplification (or after the skip decision), review every non-mechanical fix unless review tooling is unavailable. Run default `spec-code-review` only when its diff scope is known to be this fix: the branch was created by this skill, or the pre-fix tree was clean and you can pass `base:<pre-fix-HEAD>`. Do not run default `spec-code-review` on a pre-existing dirty branch or a branch with unrelated committed work; standalone review uses the branch/worktree diff and may apply fixes outside the bug scope. In that case, run the harness's lightweight review tool only if it accepts an explicit file scope; otherwise perform an explicit manual review of the fix-owned files and record `Code review: targeted manual due to unrelated branch work`. If `spec-code-review` is unavailable on an otherwise fix-only scope, fall back to the harness's lightweight review tool when available; otherwise do one explicit manual diff scan and state that dedicated review was unavailable.
+**Review the final fix scope.** After simplification (or after the skip decision), review every non-mechanical fix unless review tooling is unavailable. Use `spec-code-review mode:agent base:<pre-fix-HEAD>` only when the resolved diff is fix-only (the pre-fix tree was clean or an equivalent bounded scope exists); it remains report-only and this debug caller decides which eligible fixes to apply. On a dirty branch with unrelated committed work or overlapping pre-existing edits, do not let review/apply widen into those changes. Use a file-scoped native reviewer when available, otherwise perform an explicit targeted manual review of fix-owned files and record `Code review: targeted manual due to unrelated branch work`. If dedicated review dispatch is unauthorized/unavailable, accept its honest inline degraded result or do the targeted manual scan; never claim independent coverage that did not run.
 
 **Handle residual findings before shipping.** Inspect the review's Actionable Findings. Do not auto-open a PR with unresolved P0/P1 findings, or with findings whose fix needs a product/design decision. Ask the user whether to fix now, accept/defer durably, or stop. For lower-severity residuals the user accepts, preserve them before any outward handoff: if a PR will be opened, pass them as "Known Residuals" context to `spec-commit-push-pr`; if the user chooses commit-only or stop, create `docs/residual-review-findings/<branch-or-head-sha>.md` with the accepted findings and source review context, stage it with the fix when committing, and mention the file path in the final summary. Accepted residuals must not live only in the session.
 
 **Re-verify after tail edits.** If simplification or review changed code, rerun the bug's regression test and any targeted checks the tail identified. Never proceed to commit or PR with a red tree.
+
+#### Structured verification closeout
+
+After every fix-owned mutation has stopped, create one fresh safe `run-id` and use the repo-local `.spec-first/workflows/spec-debug/<workspace-slug>/<run-id>/` root. The final check set must distinguish the original reproducer, the regression test, and broader checks; include only commands that actually ran, plus honest `not-run` entries for a selected check that could not run. Write each executed command's bounded, secret-stripped output under `logs/` and keep every `log_path` repo-relative.
+
+- Dry-run or merely schedulable commands are `not-run` with `reason_code: schedulable`.
+- Missing tools are `not-run` with `reason_code: missing_dependency` and populated `missing_tools`.
+- A failed original reproducer after the fix or a failed regression/broader check remains `failed`; do not soften it into confidence prose.
+
+Record the final facts with the debug workflow scope:
+
+```bash
+spec-first internal verification-run-summary record \
+  --workflow spec-debug \
+  --input <verification-run-summary-input.json> \
+  --run-id <run-id> \
+  --target-repo <repo-root> \
+  --json
+```
+
+Then build structured validation claims from `verification-run-summary:<check-id>` refs, add only target-repo-contained regular-file refs for impact/review claims, and run:
+
+```bash
+spec-first internal honest-closeout validate \
+  --input <honest-closeout-claims.json> \
+  --target-repo <repo-root> \
+  --json
+```
+
+Carry the returned `run_summary_ref`, `overall`, `overall_reason_code`, and unsupported/degraded claim reasons into both Debug Summary and Post-Fix Quality. Required reproducer/regression evidence that is failed or not-run blocks a verified fix claim. This workflow owns diagnosis/fix evidence only: it does not create a spec-work durable run artifact; a later `spec-work` caller may consume the repo-relative debug summary ref without changing ownership.
 
 **Post-fix quality summary.** After the tail, append this block below the Debug Summary before the commit/PR decision:
 
@@ -280,25 +338,27 @@ Run this tail after Phase 3 ran and before the branch-based commit/PR handoff. T
 **Review**: [ran/skipped/manual + outcome]
 **Residuals**: [none / accepted Known Residuals for PR / accepted residuals written to docs/residual-review-findings/<branch-or-head-sha>.md / blocked pending user decision]
 **Re-verification**: [checks rerun after tail edits]
+**verification_run_summary_ref**: [repo-relative `spec-debug` summary ref]
+**honest_closeout_verdict**: [verified/degraded/unsupported + overall_reason_code]
+**claim_limitations**: [structured list or none]
+**Commit / Landing**: [authorization and actual uncommitted/committed/pushed/PR state]
 ```
 
-#### Skill-owned branch (created in Phase 3): default to commit-and-PR without prompting
+#### Commit and landing authorization
 
-1. **Check for contextual overrides first.** Look at the user's original prompt, loaded memories, and the project's active instructions already in your context for preferences that conflict with auto commit-and-PR — for example, "always review before pushing", "open PRs as drafts", or "don't open PRs from skills". A signal must be an explicit instruction or a clearly applicable rule, not a vague tonal cue. If any apply, honor them — switch to the pre-existing-branch menu below, or skip the PR step entirely, whichever matches the user's stated preference.
-2. **Briefly preview what will happen** — what will be committed, on what branch, and that a PR will be opened — then proceed without waiting for confirmation. The preview exists so the user can interrupt; it is not a blocking question. Format and length are your call; keep it scannable.
-3. **Run `spec-commit-push-pr`.** When the entry came from an issue tracker, include the appropriate auto-close syntax for that tracker in the location it requires — most trackers parse PR descriptions (e.g., `Fixes #N` for GitHub, `Closes ABC-123` for Linear), but some only parse commit messages (e.g., Jira Smart Commits) — so the diagnosis and fix flow back to the issue and it closes on merge. Surface the resulting PR URL.
+Resolve two independent facts from the current user request or a visible upstream handoff:
 
-#### Pre-existing branch (skill did not create it): ask the user
+- `commit_authorization: authorized` only when local commit creation was explicitly requested.
+- `landing_authorization: authorized` only when push, PR creation/update, or another outward handoff was explicitly requested.
 
-Use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex). In Claude Code, call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded — a pending schema load is not a reason to fall back. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors. Never end the phase without collecting a response.
+`Fix it now` does not authorize commit, push, or PR. A skill-created branch, clean tree, issue reference, or available landing tool also does not authorize those exits.
 
-Options:
+- Without commit authorization, return a verified uncommitted fix with the Debug Summary, Post-Fix Quality, changed files, checks, residuals, and a coherent commit candidate.
+- With commit authorization but without landing authorization, commit only fix-owned verified files; do not push and do not open a PR.
+- With landing authorization, run only the requested landing action after review/residual/re-verification gates close. When the entry came from an issue tracker, include the appropriate auto-close syntax only in the explicitly authorized commit/PR surface.
+- Never stage unrelated pre-existing dirty paths. If safe file ownership cannot be isolated, leave the fix uncommitted and report the blocker even when general commit authorization exists.
 
-1. **Open a PR with the reviewed fix (`spec-commit-push-pr`)** — default for most cases
-2. **Commit the fix (`spec-commit`)** — local commit only
-3. **Stop here** — user takes it from there
-
-#### After a PR is open (either path): consider offering learning capture
+#### After an explicitly authorized PR is open: consider offering learning capture
 
 Most bugs are localized mechanical fixes (typo, missed null check, missing import) where the only "lesson" is the bug itself. Compounding those clutters `docs/solutions/` without adding value. Decide which path applies:
 
@@ -306,4 +366,4 @@ Most bugs are localized mechanical fixes (typo, missed null check, missing impor
 - **Offer neutrally** when the lesson can be stated in one sentence — e.g., "X.foo() returns T | undefined when Y, not just T", or "the diagnostic path was non-obvious and worth recording." If you cannot articulate the lesson, skip rather than offer.
 - **Lean into the offer** when the pattern appears in 3+ locations OR the root cause reveals a wrong assumption about a shared dependency, framework, or convention that other code is likely to repeat.
 
-When offering, use the blocking question tool described above. If the user accepts, run `spec-compound`, then commit the resulting learning doc to the same branch and push so the open PR picks up the new commit.
+When offering, use the blocking question tool described above. If the user accepts, run `spec-compound`. Commit and push the resulting learning only when the same commit and landing authorization still covers that additional durable artifact; otherwise leave it as a verified local follow-up and say so.

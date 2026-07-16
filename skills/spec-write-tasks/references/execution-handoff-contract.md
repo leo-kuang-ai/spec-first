@@ -11,7 +11,10 @@ Every `spec-write-tasks` run must end with a compact decision envelope. The enve
 
 ```yaml
 decision: compile | skip | return-to-plan | draft-only | validate-only
-reason_code: source_plan_missing | ambiguous_plan | missing_spec_id | wrong_chain | stale_hash | unverifiable_hash | invalid_contract | repo_scope_missing | scope_gap | small_plan | task_pack_compiled | task_pack_validated | not_applicable
+reason_code: source_plan_missing | ambiguous_plan | wrong_chain | stale_hash | unverifiable_hash | invalid_contract | repo_scope_missing | scope_gap | small_plan | task_pack_compiled | task_pack_validated | not_applicable
+identity_basis: source-plan-path+body-hash
+artifact_root: <canonical artifact/source resolution root> | null
+repo_root: <compat alias equal to artifact_root> | null
 source_plan: docs/plans/... | null
 task_pack: docs/tasks/... | null
 task_pack_validity: valid | draft | stale | wrong-chain | invalid | unverifiable | not-applicable
@@ -57,7 +60,14 @@ Run:
 spec-first tasks validate <task-pack-path> --json
 ```
 
-Run `spec-first tasks hash <plan-path>` when computing or comparing the source plan hash.
+Run the commands against one explicit artifact/source resolution root:
+
+```bash
+spec-first tasks validate <task-pack-path> --repo <artifact-root> --json
+spec-first tasks hash <plan-path> --repo <artifact-root> --json
+```
+
+`--repo` is the artifact/source resolution root, not the mutation target repository. Copy `identity_basis`, `artifact_root`, the same-value compatibility alias `repo_root`, portable `source_plan`, and the `validation` fields from CLI JSON. Do not derive portable identity from absolute `plan_path` or treat `repo_root` as mutation authority.
 
 Copy `deterministic_handoff` and each `validation` field from the CLI JSON output. If the `tasks` subcommand is not runtime-visible or returns an unknown-subcommand error, treat the run as `unverifiable_hash`, set `deterministic_handoff: false`, and downgrade to `draft-only`; never self-report `deterministic_handoff: true` or `validation` matches without the CLI JSON in hand.
 
@@ -95,11 +105,11 @@ Do not imply the CLI validator proves the semantic adequacy of quality fields. T
 
 ## Drift And Hash
 
-`source_plan_hash` must be the canonical source plan body hash produced by `spec-first tasks hash <plan-path>`.
+`source_plan_hash` must be the canonical source plan body hash produced by `spec-first tasks hash <plan-path> --repo <artifact-root> --json`.
 
-`spec_id` is copied from the source plan and is not part of freshness. It links the task pack to the same spec chain; `source_plan_hash` proves the task pack is still derived from the current source plan body.
+Executable identity is `source-plan-path+body-hash`: the artifact-root-relative POSIX `source_plan` identifies the source artifact and `source_plan_hash` proves freshness of its canonical body.
 
-If the source plan has no `spec_id`, do not generate an executable task pack. Return to `spec-plan` to add the plan-local identity, or produce only a `draft` / `transient` output that is not valid `spec-work` input.
+`spec_id` is an optional compatibility trace, not part of freshness or executable identity. When both task pack and source plan carry it, values must match; mismatch is `wrong_chain`. When either side omits it, keep `validation.spec_id: missing`, add limitation `task-pack-spec-id-trace-missing`, and allow deterministic handoff when path, hash, and structure otherwise validate.
 
 Hash rules:
 
@@ -107,7 +117,7 @@ Hash rules:
 - Normalize `CRLF` / `CR` to `LF`.
 - If the first line is `---`, remove the complete frontmatter block; if closing frontmatter is missing, fail closed.
 - Hash the remaining Markdown body exactly as canonicalized; do not extract sections or collapse whitespace in MVP.
-- Frontmatter fields such as `status` and `spec_id` are not part of freshness; identity is checked separately.
+- Frontmatter fields such as `status` and `spec_id` are not part of freshness; path and canonical body hash own executable identity, while `spec_id` remains only a compatibility trace.
 
 A task pack that can be handed to `spec-work` must use a concrete canonical source plan body hash, for example `sha256:<64-hex>`.
 

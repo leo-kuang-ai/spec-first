@@ -37,8 +37,11 @@ describe('CE upstream skill sync contracts', () => {
     const plan = read('skills/spec-plan/SKILL.md');
     const handoff = read('skills/spec-plan/references/plan-handoff.md');
     const work = read('skills/spec-work/SKILL.md');
+    const engines = read('skills/spec-work/references/execution-engines.md');
 
-    expect(work).toContain('first pick the **engine** that runs implementation');
+    expect(work).toContain('[Execution engines](references/execution-engines.md)');
+    expect(engines).toContain('The engine is chosen once');
+    expect(engines).toContain('The engine decides *how* implementation runs; it never changes *who* owns the shipping tail');
     expect(plan).toContain('**Recommended marker:** `spec-work` (option 1) always carries *(recommended)*');
     expect(handoff).toContain('**Recommended marker:** `spec-work` (option 1) always carries *(recommended)*');
     expect(plan).not.toContain('**Recommended marker (dynamic):** Goal mode is the recommended default');

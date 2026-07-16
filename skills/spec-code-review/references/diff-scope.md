@@ -6,9 +6,10 @@ These rules apply to every reviewer. They define what is "your code to review" v
 
 Determine the diff to review using this priority order:
 
-1. **User-specified scope.** If the caller passed `BASE:`, `FILES:`, or `DIFF:` markers, use that scope exactly.
-2. **Working copy changes.** If there are unstaged or staged changes (`git diff HEAD` is non-empty), review those.
-3. **Unpushed commits vs base branch.** If the working copy is clean, review `git diff $(git merge-base HEAD <base>)..HEAD` where `<base>` is the default branch (main or master).
+1. **Task-scoped bundle.** When `<task-scope>` is present, use its labeled `FILES`/`DIFF`, exact/cumulative provenance, task-owned untracked additions, and limitations exactly. Do not widen to the full working tree, and do not call a `cumulative-file` patch isolated task work.
+2. **User-specified scope.** If the caller passed `BASE:`, `FILES:`, or `DIFF:` markers, use that scope exactly.
+3. **Working copy changes.** If there are unstaged or staged changes (`git diff HEAD` is non-empty), review those.
+4. **Unpushed commits vs base branch.** If the working copy is clean, review `git diff $(git merge-base HEAD <base>)..HEAD` where `<base>` is the default branch (main or master).
 
 The scope step in the SKILL.md handles discovery and passes you the resolved diff. You do not need to run git commands yourself unless PR scope mode requires it (below).
 

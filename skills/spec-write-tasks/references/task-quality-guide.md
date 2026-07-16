@@ -8,9 +8,13 @@ This guide defines quality expectations for task cards produced by `spec-write-t
 
 Accepted inputs are local source plan paths, existing local task-pack paths, or clear task-splitting requests that resolve to one local source plan. Rejected near-neighbors are implementation prompts, unresolved product or architecture scope, remote repositories, package names, marketplace skill names, and generic task-list requests that do not name a settled source plan.
 
-Executable task-pack input requires `type: task-pack`, `generated_by: spec-write-tasks`, `status: derived`, `mode: derived`, `spec_id`, a concrete repo-relative `source_plan`, a concrete `sha256:<64-hex>` source plan hash, and a valid `Task Pack Contract` JSON block. Existing task packs with missing identity, stale hash, wrong-chain `spec_id`, unverifiable hash tooling, generated runtime file ownership, or ambiguous workspace repo scope are not executable handoff.
+Executable task-pack input requires `type: task-pack`, `generated_by: spec-write-tasks`, `status: derived`, `mode: derived`, a concrete artifact-root-relative POSIX `source_plan`, a concrete `sha256:<64-hex>` source plan hash, and a valid `Task Pack Contract` JSON block. Executable identity is `source-plan-path+body-hash`; `spec_id` is an optional compatibility trace. Existing task packs with missing path/hash identity, stale hash, wrong-chain present-on-both-sides `spec_id`, unverifiable hash tooling, generated runtime file ownership, or ambiguous workspace repo scope are not executable handoff.
 
 Downstream consumers are `spec-work`, high-risk doc-review handoff, human reviewers, and later code-review/compound workflows. These consumers need source anchors, bounded context refs, task file ownership, and validation posture; they do not need maintainer eval fixtures or validation reports.
+
+### Downstream `spec-work` intake
+
+`spec-work` executes only the validated `Task Pack Contract` JSON and `execution_waves`; human-readable Task Cards are context compression, not a second executable source. The executor pins the current validation receipt, task-pack file digest, and source-plan hash, replays source-plan implementation readiness, then judges semantic-fit against scope/non-goals/KTD before creating tracker tasks. Keep task IDs, files, `stop_if`, review intent, and dependencies precise enough for that consumer; a validator-green but semantically incomplete pack must return to `spec-write-tasks` or `spec-plan` rather than forcing private re-splitting.
 
 ## Quality Bar
 
@@ -268,7 +272,7 @@ Bad stop signals:
     - skills/spec-write-tasks/references/task-pack-schema.md#Regeneration-Rules
   entry_hint: Compare Phase 1 input handling with task pack regeneration rules
   test_focus: Task pack path is validated before execution task creation
-  done_signal: `spec-work` documents spec_id/source_plan/source_plan_hash checks plus stale-pack and wrong-chain rejection
+  done_signal: `spec-work` documents source_plan/source_plan_hash identity, optional compatibility trace handling, and stale-pack/wrong-chain rejection
   parallelizable: false
   risk_note: Treating task pack as authoritative would break plan SoT
   review_gate: required

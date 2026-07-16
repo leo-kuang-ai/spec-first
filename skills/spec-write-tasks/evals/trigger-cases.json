@@ -4,7 +4,7 @@
     {
       "id": "explicit-split-plan",
       "input": "Please split docs/plans/2026-05-01-example-plan.md into tasks.",
-      "context": "The referenced plan exists, has spec_id, and has multiple implementation units.",
+      "context": "The referenced plan exists and has multiple implementation units; spec_id may be absent because executable identity uses source_plan path plus body hash.",
       "expected_decision": "compile",
       "expected_next_action": "Generate an executable task pack if the plan passes task-ready checks.",
       "coverage_tags": ["trigger"]

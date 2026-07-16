@@ -1,0 +1,11 @@
+{
+  "status": "written",
+  "schema_version": "spec-work-run-artifact/v2",
+  "producer": {
+    "producer_available": true,
+    "workflow_integrated": true,
+    "reason_code": "trigger-task-pack"
+  },
+  "plan_path": "docs/plans/2026-05-28-004-feat-spec-work-run-evidence-and-invariant-lens-plan.md",
+  "task_pack_path": "docs/tasks/2026-05-28-004-feat-spec-work-run-evidence-and-invariant-lens-tasks.md"
+}

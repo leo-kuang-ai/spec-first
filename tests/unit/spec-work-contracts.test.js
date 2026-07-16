@@ -19,6 +19,14 @@ describe('spec-work current contracts', () => {
     expect(skill).toContain('execution: code');
   });
 
+  test('accepts validated task packs while keeping the source plan authoritative', () => {
+    expect(skill).toContain('type: task-pack');
+    expect(skill).toContain('work-intake-and-task-pack.md');
+    expect(skill).toContain('Task Pack Contract');
+    expect(skill).toContain('source plan remains authoritative');
+    expect(skill).toContain('task pack stays `status: derived`');
+  });
+
   test('fails closed on duplicate, missing, or conflicting unified metadata', () => {
     expect(skill).toMatch(/declared unified artifact.*duplicate.*critical metadata/is);
     expect(skill).toMatch(/missing.*artifact_readiness.*execution/is);
@@ -37,7 +45,8 @@ describe('spec-work current contracts', () => {
     expect(skill).toContain('mode:agent');
     expect(skill).toContain('`spec-code-review` is review-only');
     expect(skill).toContain('**Apply fixes**');
-    expect(skill).toContain('The orchestrator merges diffs, runs tests, and commits');
+    expect(skill).toMatch(/orchestrator integrates and tests/i);
+    expect(skill).toContain('Commit only with `commit_authorization: authorized`');
   });
 
   test('allows status mutation only at shipping closeout and assigns the correct source owner', () => {
@@ -60,7 +69,7 @@ describe('spec-work current contracts', () => {
   test('requires scope, blockers, and verification to close before return-to-caller completion', () => {
     expect(skill).toContain('every in-scope unit/task is accounted for and completed');
     expect(skill).toContain('`blockers` is empty');
-    expect(skill).toContain('Failed, not-run, vague, or missing required verification cannot return complete');
+    expect(skill).toContain('Failed, degraded, not-run, vague, or missing required verification/review cannot return complete');
   });
 
   test('keeps goal terminal completion behind the same closeout owner', () => {

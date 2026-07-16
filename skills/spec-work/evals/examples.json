@@ -1,0 +1,136 @@
+{
+  "schema_version": "spec-first.spec-work.examples/v1",
+  "skill": "spec-work",
+  "source_refs": [
+    "skills/spec-work/SKILL.md",
+    "skills/spec-work/references/work-intake-and-task-pack.md",
+    "skills/spec-work/references/feedback-and-tests.md",
+    "skills/spec-work/references/implementation-quality.md",
+    "skills/spec-work/references/review-findings-followup.md",
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-write-tasks/references/task-pack-schema.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "valid-task-pack-intake",
+      "input": "mode:agent is not used; execute docs/tasks/example-tasks.md",
+      "expected": "Validate under an explicit artifact root, pin validation/digest/source hash, replay source-plan readiness, pass semantic-fit, then create tracker tasks from Task Pack Contract waves.",
+      "forbidden": ["infer tasks from human-readable cards", "treat validator as semantic approval"]
+    },
+    {
+      "id": "stale-task-pack-rejected",
+      "input": "Task-pack source_plan_hash no longer matches the source plan.",
+      "expected": "Stop before task creation with stale_hash and a copy-ready spec-write-tasks regeneration handoff.",
+      "forbidden": ["continue with cached tasks", "fall back to legacy plan parsing"]
+    },
+    {
+      "id": "metadata-only-source-plan-drift",
+      "input": "Body hash still matches, but source plan frontmatter changed to requirements-only or execution: knowledge-work.",
+      "expected": "Replay plan intake, return source-plan-intake-drift, and suppress code execution.",
+      "forbidden": ["trust body hash as readiness proof"]
+    },
+    {
+      "id": "required-review-p1-block",
+      "input": "A required Task Card completes focused verification and task-scoped review returns one P1 finding.",
+      "expected": "Block dependent waves, apply eligible caller-owned fix, rerun affected verification and one bounded follow-up review; stop if round two still blocks.",
+      "forbidden": ["start the dependent wave", "replace final full review"]
+    },
+    {
+      "id": "required-review-degraded-scope",
+      "input": "Task delta cannot be attributed and task_diff_isolation is degraded.",
+      "expected": "Return a required-review blocker with required_gate_eligible false.",
+      "forbidden": ["claim task-scoped clean"]
+    },
+    {
+      "id": "task-pack-drift-before-next-task",
+      "input": "The task-pack byte digest changes after the first task.",
+      "expected": "Stop before the next task and rerun full validation plus semantic-fit.",
+      "forbidden": ["patch the pinned receipt"]
+    },
+    {
+      "id": "stop-if-blocks-dependent-wave",
+      "input": "The active Task Card stop_if condition is observed.",
+      "expected": "Stop the task and dependent wave and return to plan/task regeneration.",
+      "forbidden": ["create replacement tasks", "weaken stop_if"]
+    },
+    {
+      "id": "direct-plan-does-not-trigger-task-pack-intake",
+      "input": "Execute a direct implementation-ready plan with moderate complexity.",
+      "expected": "Use the existing direct-plan section map; task-pack compilation remains an optional advisory only.",
+      "forbidden": ["auto-compile a task pack", "load task-pack intake for a trivial bare prompt"]
+    },
+    {
+      "id": "reuse-existing-capability",
+      "input": "The requested behavior is already fully provided by a current source-owned helper and its public contract.",
+      "expected": "Choose reuse, verify the existing contract satisfies the active scope, and do not add a wrapper or parallel implementation.",
+      "forbidden": ["new abstraction for symmetry", "duplicate existing capability"]
+    },
+    {
+      "id": "extend-canonical-owner",
+      "input": "A current owner already owns the boundary and needs one focused behavior supported by its existing extension point.",
+      "expected": "Choose extend at the canonical owner, preserve its source-of-truth, and verify downstream consumers.",
+      "forbidden": ["second owner", "unrelated convenience service"]
+    },
+    {
+      "id": "compose-thin-glue",
+      "input": "Two authoritative capabilities must be sequenced and their partial failures exposed to one caller.",
+      "expected": "Choose compose/thin-glue; bound translation, sequencing, failure/degradation routing, and evidence aggregation while leaving domain truth and durable state with participants.",
+      "forbidden": ["copy participant validation rules", "swallow partial failure", "parallel durable truth"]
+    },
+    {
+      "id": "justified-new-boundary",
+      "input": "Existing owners and composition seams would mix responsibilities and the implementation-ready plan explicitly authorizes a new source-owned contract.",
+      "expected": "Choose new with the rejected owner/composition evidence, clear source-of-truth, consumers, failure behavior, and verification.",
+      "forbidden": ["new because it feels cleaner", "runtime mirror as owner"]
+    },
+    {
+      "id": "future-only-wrapper-rejected",
+      "input": "A wrapper has no current consumer and adds no translation, sequencing, safety, or evidence boundary.",
+      "expected": "Do not create it; keep the current path or record a deferred idea without widening scope.",
+      "forbidden": ["future-proofing as authorization"]
+    },
+    {
+      "id": "wrong-owner-reuse-rejected",
+      "input": "A nearby helper looks reusable but belongs to a different domain and would need copied policy to fit.",
+      "expected": "Reject forced reuse, locate the correct owner or return to planning if a new boundary is required.",
+      "forbidden": ["reuse quota", "hide policy in glue"]
+    },
+    {
+      "id": "trivial-non-trigger",
+      "input": "Change one docs sentence without behavior, contract, source-owner, or durable-surface impact.",
+      "expected": "Use the narrow docs/diff check, stay quiet, and do not emit an architecture matrix or material-deviation note.",
+      "forbidden": ["load every architecture reference", "ceremony note"]
+    },
+    {
+      "id": "docs-only-feedback",
+      "input": "Update a schema-backed documentation table with no runtime behavior change.",
+      "expected": "Use schema/render/link or generated-catalog diff checks as the feedback loop and state the non-runtime claim ceiling.",
+      "forbidden": ["invent TDD", "claim host behavior"]
+    },
+    {
+      "id": "knowledge-work-code-references-not-triggered",
+      "input": "Execute a plan explicitly marked execution: knowledge-work.",
+      "expected": "Load only the non-code production route, read named sources, and produce the deliverable without branch/test/shipping references.",
+      "forbidden": ["code task loop", "shipping workflow", "implementation-quality matrix"]
+    },
+    {
+      "id": "shipping-not-triggered-mid-execution",
+      "input": "One implementation unit is complete but dependent units remain.",
+      "expected": "Continue the execution loop and focused verification; do not load shipping or claim lifecycle completion yet.",
+      "forbidden": ["plan-status complete", "final run artifact"]
+    },
+    {
+      "id": "tracker-defer-not-triggered-without-choice",
+      "input": "Review returned one residual finding, but no residual-gate decision selected tracker filing.",
+      "expected": "Keep the finding in the residual gate; do not load tracker-defer or perform external actions.",
+      "forbidden": ["auto-file ticket", "infer tracker authorization"]
+    },
+    {
+      "id": "non-default-engine-not-triggered-without-capability",
+      "input": "A large plan mentions parallelism, but no callable/authorized goal or workflow engine is available.",
+      "expected": "Use inline or separately authorized workers and record the capability/authorization limitation.",
+      "forbidden": ["copy-paste goal prompt", "host-name capability assumption"]
+    }
+  ]
+}

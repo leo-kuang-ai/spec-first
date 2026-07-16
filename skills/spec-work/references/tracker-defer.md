@@ -2,6 +2,24 @@
 
 This reference covers how residual actionable findings are filed in the project's tracker. Loaded by caller workflows (for example `spec-work` Residual Work Gate, or `lfg` residual handling) — not by `spec-code-review`, which stops after the report.
 
+## Owned
+
+- Detect an available project tracker/sink and file explicitly deferred residual findings.
+- Return structured filed/failed/no-sink outcomes for interactive and non-interactive callers.
+
+## Not Owned
+
+- Decide whether a finding is valid, whether the user accepted risk, or whether work may ship.
+- Let `spec-code-review` file tickets, infer external-action authorization, or drop residuals when no sink exists.
+
+## Trigger
+
+Load only after the Residual Work Gate/caller explicitly selects tracker deferral for structured findings.
+
+## Fallback
+
+Use the documented fallback chain; if every sink is unavailable, return `no_sink` structured findings to the caller. Do not block a headless caller with a prompt and do not treat no sink as permission to forget the residual.
+
 ---
 
 ## Execution Modes
@@ -94,12 +112,12 @@ Every Defer action creates a ticket with the following content, adapted to the t
 
 - **Title:** the merged finding's `title` (schema-capped at 10 words).
 - **Body:**
-  - Plain-English problem statement — reads the persona-produced `why_it_matters` from the contributing reviewer's artifact file at `/tmp/spec-first/spec-code-review/<run-id>/{reviewer}.json`, using the same `file + line_bucket(line, +/-3) + normalize(title)` matching agent mode uses (see SKILL.md Stage 6 detail enrichment). Falls back to the merged finding's `title`, `severity`, `file`, and `suggested_fix` (when present) when no artifact match is available — these fields are guaranteed in the merge-tier compact return.
+  - Plain-English problem statement — in the same run, may read persona-produced `why_it_matters` from `{artifact_path}/{reviewer}.json` when the returned `artifact_path` is non-null and readable, using the same `file + line_bucket(line, +/-3) + normalize(title)` matching agent mode uses. Falls back to the merged finding's structured finding summary (`title`, `severity`, `file`, `suggested_fix`, and in-band evidence when present) when no artifact match is available. Do not re-run review to enrich a ticket.
   - Suggested fix (when present in the finding's `suggested_fix`).
-  - Evidence (direct quotes from the reviewer's artifact).
+  - Evidence (direct quotes from the returned artifact when available, otherwise from in-band merged evidence; omit unavailable detail and state the limitation rather than inventing it).
   - Metadata block: `Severity: <level>`, `Confidence: <score>`, `Reviewer(s): <list>`, `Finding ID: <fingerprint>`.
 - **Labels** (when the tracker supports labels): severity tag (`P0`, `P1`, `P2`, `P3`) and, when the tracker convention supports it, a category label sourced from the reviewer name.
-- **Length cap:** when the composed body would exceed a tracker's body length limit, truncate with `... (continued in spec-code-review run artifact: /tmp/spec-first/spec-code-review/<run-id>/)` and include the finding_id in both the truncated body and the metadata block so the artifact is discoverable.
+- **Length cap:** when the composed body would exceed a tracker's body length limit, include the complete actionable core plus finding_id. Link a continuation only when spec-work has materialized sanitized repo-local review evidence; otherwise retain a compact structured finding summary in the ticket. A ticket must not link to a session-temp artifact_path because it can disappear or be machine-specific.
 
 The finding_id is a stable fingerprint composed as `normalize(file) + line_bucket(line, +/-3) + normalize(title)` — the same fingerprint used by the merge pipeline.
 
