@@ -1,6 +1,6 @@
 # Conditional Routing Boundaries
 
-Read this file only when the selected route touches runtime maintenance, existing scenario fingerprints, Codex dispatch, ordinary-context exclusions, or any write, test, autofix, or commit in a parent multi-repo workspace. Apply only the matching section.
+Read this file only when the selected route touches runtime maintenance, existing scenario fingerprints, Codex dispatch, handoff/context reset, knowledge promotion, ordinary-context exclusions, or any write, test, autofix, or commit in a parent multi-repo workspace. Apply only the matching section.
 
 ## Runtime Maintenance
 
@@ -8,7 +8,7 @@ Read this file only when the selected route touches runtime maintenance, existin
 - Use `spec-runtime-setup` for MCP/helper/host readiness. Use `spec-first doctor --<host>` to inspect installation health and `spec-first update` to upgrade spec-first or refresh installed guidance.
 - Use `spec-first init` only for an explicit initialization/regeneration request or confirmed runtime drift. Use `spec-first clean --<host>` only for explicit managed-runtime removal.
 - Preview state-changing maintenance when supported. A routing match alone never authorizes `init`, `clean`, `update`, or deletion.
-- `skills/using-spec-first/SKILL.md` is the routing-policy source of truth. Managed instruction blocks and host runtime copies are entry anchors or generated projections.
+- The `skills/using-spec-first/` source skill package is the routing-policy source of truth. Managed instruction blocks and host runtime copies are entry anchors or generated projections.
 
 ## Scenario Fingerprints
 
@@ -26,6 +26,11 @@ Read this file only when the selected route touches runtime maintenance, existin
 
 - Bounded read-only orientation may inspect likely child repos and state the target assumption.
 - Any write, test, autofix, or commit requires an explicit `target_repo` or per-child scope before mutation.
+
+## Handoff And Knowledge Promotion
+
+- Do not mark a context-reset or cross-workflow handoff complete without a summary, source refs, freshness, and limitations.
+- Promote knowledge as confirmed only when it is verified, reusable, scoped, and carries an invalidation condition; otherwise retain it as advisory.
 
 ## Ordinary Context Exclusions
 

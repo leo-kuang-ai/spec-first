@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skills Flow：七组情境路径</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d0f14;
+        --panel: #151922;
+        --panel-2: #101319;
+        --line: #2a303c;
+        --line-strong: #3b4556;
+        --text: #eef2f7;
+        --muted: #aab2c0;
+        --soft: #7f8898;
+        --blue: #8fb4ff;
+        --blue-bg: #17233c;
+        --amber: #ffd083;
+        --amber-bg: #31281a;
+        --green: #8ee0b7;
+        --green-bg: #17352a;
+        --red: #ff9f9f;
+        --red-bg: #371e22;
+        --violet: #c8a8ff;
+        --violet-bg: #2a2140;
+        --cyan: #91e4f2;
+        --cyan-bg: #142f37;
+        --radius: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(77, 103, 159, 0.16), transparent 32rem),
+          linear-gradient(180deg, #11141b 0%, var(--bg) 18rem);
+        color: var(--text);
+        font:
+          15px/1.62 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      main {
+        width: min(1180px, calc(100vw - 36px));
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 16px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(26px, 4vw, 42px);
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        margin: 0;
+        color: var(--muted);
+        max-width: 920px;
+      }
+
+      .source-note {
+        margin-top: 8px;
+        font-size: 13px;
+      }
+
+      .source-note a {
+        color: var(--blue);
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        background: rgba(13, 15, 20, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 14px;
+        margin: 18px 0 18px;
+      }
+
+      .search {
+        width: 100%;
+        height: 44px;
+        border: 1px solid var(--line-strong);
+        border-radius: 7px;
+        background: #090b10;
+        color: var(--text);
+        padding: 0 14px;
+        font: inherit;
+        outline: none;
+      }
+
+      .search:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(143, 180, 255, 0.14);
+      }
+
+      .quick {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .quick a {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 7px 8px;
+        text-align: center;
+        font-size: 13px;
+      }
+
+      .quick a:hover {
+        color: var(--text);
+        border-color: var(--line-strong);
+        background: #111722;
+      }
+
+      .flow {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+        margin: 18px 0;
+        overflow: hidden;
+      }
+
+      .flow[hidden] {
+        display: none;
+      }
+
+      .flow-head {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 20px 22px 12px;
+      }
+
+      .kicker {
+        color: var(--soft);
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(20px, 3vw, 28px);
+        line-height: 1.24;
+        letter-spacing: 0;
+      }
+
+      .summary {
+        margin: 9px 0 0;
+        color: var(--muted);
+      }
+
+      .badge {
+        flex: 0 0 auto;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        color: var(--muted);
+        padding: 5px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .diagram {
+        margin: 12px 22px 0;
+        background: #f8fafc;
+        color: #152033;
+        border-radius: 7px;
+        border: 1px solid #d7deea;
+        overflow-x: auto;
+      }
+
+      svg {
+        display: block;
+        min-width: 900px;
+        width: 100%;
+        height: auto;
+      }
+
+      .node rect {
+        stroke-width: 1.6;
+        rx: 5;
+      }
+
+      .node text {
+        font: 600 13px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        fill: #172033;
+      }
+
+      .user rect {
+        fill: #fff2d2;
+        stroke: #c58b2b;
+      }
+
+      .model rect {
+        fill: #e6efff;
+        stroke: #4b72ba;
+      }
+
+      .artifact rect {
+        fill: #f7f9fc;
+        stroke: #9aa8bc;
+        stroke-dasharray: 5 5;
+      }
+
+      .decision rect {
+        fill: #eaf8f2;
+        stroke: #4f9f78;
+      }
+
+      .warn rect {
+        fill: #ffe8e8;
+        stroke: #c76b6b;
+      }
+
+      .arrow {
+        stroke: #6a7488;
+        stroke-width: 1.6;
+        fill: none;
+        marker-end: url(#arrow);
+      }
+
+      .dash {
+        stroke-dasharray: 5 5;
+      }
+
+      .label {
+        font: 12px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        fill: #4d5768;
+      }
+
+      .body {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+        padding: 18px 22px 22px;
+      }
+
+      .box {
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: rgba(8, 10, 15, 0.48);
+        padding: 14px;
+      }
+
+      h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      code {
+        color: var(--cyan);
+        background: rgba(145, 228, 242, 0.09);
+        border: 1px solid rgba(145, 228, 242, 0.16);
+        border-radius: 5px;
+        padding: 1px 5px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .how {
+        color: var(--muted);
+      }
+
+      .how strong {
+        color: var(--text);
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .legend span {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 3px 9px;
+      }
+
+      .empty {
+        display: none;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 24px;
+        color: var(--muted);
+        background: var(--panel);
+      }
+
+      @media (max-width: 900px) {
+        main {
+          width: min(100vw - 24px, 1180px);
+          padding-top: 18px;
+        }
+
+        .quick {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .body {
+          grid-template-columns: 1fr;
+        }
+
+        .flow-head {
+          display: block;
+        }
+
+        .badge {
+          display: inline-block;
+          margin-top: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Skills Flow：七组情境路径</h1>
+        <p class="lede">
+          按“想实现的能力”找入口：每组是一条可执行路径，不只是一个命令。黄色是用户显式入口，蓝色是模型可自动调用、也可由用户显式调用的 skill，虚线框是产物或状态。
+        </p>
+        <p class="lede source-note">
+          这是交互式概览，不是独立规范；请以 <a href="./README.md">调研索引</a>、<a href="./engineering-workflow-map.md">Engineering 映射</a> 与对应 <code>SKILL.md</code> 为准。
+        </p>
+        <div class="legend">
+          <span>黄色：user-invoked</span>
+          <span>蓝色：model-invoked（用户也可调用）</span>
+          <span>虚线：artifact</span>
+          <span>绿色：判断/出口</span>
+        </div>
+      </header>
+
+      <section class="toolbar" aria-label="筛选">
+        <input
+          id="search"
+          class="search"
+          type="search"
+          placeholder="搜环名、skill、关键词...（如：bug、prototype、triage、架构、handoff）"
+        />
+        <nav class="quick" aria-label="快速跳转">
+          <a href="#main">主研发</a>
+          <a href="#inbound">外部入站</a>
+          <a href="#debug">Bug 诊断</a>
+          <a href="#wayfinder">巨大模糊</a>
+          <a href="#architecture">架构健康</a>
+          <a href="#assist">跨会话辅助</a>
+          <a href="#learning">生产力/学习</a>
+        </nav>
+      </section>
+
+      <p id="empty" class="empty">没有匹配的 flow。换一个 skill 名、产物名或任务关键词试试。</p>
+
+      <section
+        id="main"
+        class="flow"
+        data-search="主研发 idea ship grill-with-docs grilling domain-modeling to-spec to-tickets implement tdd code-review handoff prototype spec ticket commit"
+      >
+        <div class="flow-head">
+          <div>
+            <div class="kicker">① 主干</div>
+            <h2>主研发 Flow：idea → ship</h2>
+            <p class="summary">大多数产品/代码工作走这条：先把想法压实，再决定是否拆票，最后实现、测试、评审和提交。</p>
+          </div>
+          <div class="badge">入口：<code>/grill-with-docs</code></div>
+        </div>
+        <div class="diagram" role="img" aria-label="主研发 Flow 图">
+          <svg viewBox="0 0 1100 265" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                <path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" />
+              </marker>
+            </defs>
+            <g class="node user"><rect x="30" y="96" width="118" height="54" /><text x="89" y="118" text-anchor="middle">grill-with-docs</text><text x="89" y="137" text-anchor="middle">user</text></g>
+            <g class="node model"><rect x="198" y="96" width="118" height="54" /><text x="257" y="118" text-anchor="middle">grilling</text><text x="257" y="137" text-anchor="middle">model</text></g>
+            <g class="node model"><rect x="366" y="96" width="130" height="54" /><text x="431" y="118" text-anchor="middle">domain-modeling</text><text x="431" y="137" text-anchor="middle">model</text></g>
+            <g class="node user"><rect x="548" y="96" width="100" height="54" /><text x="598" y="118" text-anchor="middle">to-spec</text><text x="598" y="137" text-anchor="middle">user</text></g>
+            <g class="node user"><rect x="700" y="96" width="104" height="54" /><text x="752" y="118" text-anchor="middle">to-tickets</text><text x="752" y="137" text-anchor="middle">user</text></g>
+            <g class="node user"><rect x="856" y="96" width="104" height="54" /><text x="908" y="118" text-anchor="middle">implement</text><text x="908" y="137" text-anchor="middle">user</text></g>
+            <g class="node model"><rect x="856" y="184" width="104" height="54" /><text x="908" y="206" text-anchor="middle">tdd</text><text x="908" y="225" text-anchor="middle">model</text></g>
+            <g class="node model"><rect x="1002" y="96" width="78" height="54" /><text x="1041" y="118" text-anchor="middle">code-review</text><text x="1041" y="137" text-anchor="middle">model</text></g>
+            <path class="arrow" d="M148 123 H198" /><path class="arrow" d="M316 123 H366" /><path class="arrow" d="M496 123 H548" /><path class="arrow" d="M648 123 H700" /><path class="arrow" d="M804 123 H856" /><path class="arrow" d="M960 123 H1002" />
+            <path class="arrow dash" d="M496 96 C610 34 760 34 856 96" />
+            <path class="arrow dash" d="M908 150 V184" /><path class="arrow dash" d="M960 211 C1018 211 1018 156 1041 150" />
+            <text class="label" x="167" y="111">访谈</text><text class="label" x="332" y="111">术语/ADR</text><text class="label" x="510" y="111">写 spec</text><text class="label" x="662" y="111">拆票</text><text class="label" x="817" y="111">每票新会话</text><text class="label" x="645" y="28">小工作可直接实现</text><text class="label" x="876" y="175">驱动</text>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              <strong>有代码库的新需求</strong>从 <code>/grill-with-docs</code> 开始；它底层用
+              <code>/grilling</code> 一次一个问题打穿需求，并用 <code>/domain-modeling</code>
+              记录术语和 ADR。小且仍在当前上下文的工作可直接 <code>/implement</code>；需要跨会话或并行时，
+              <code>/to-spec</code> 再综合成 spec，接着用 <code>/to-tickets</code> 拆成 tracer-bullet tickets；每张票用 fresh session 跑
+              <code>/implement</code>，内部尽量用 <code>/tdd</code>，最后 <code>/code-review</code>。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li><code>grill-with-docs -> to-spec -> to-tickets</code> 尽量保持同一个未中断上下文。</li>
+              <li>短小工作不必为了走图而先写 spec/ticket；条件满足时可从共同理解直接进入 <code>implement</code>。</li>
+              <li>每个 <code>implement</code> 应从 ticket fresh start，避免把旧上下文带进实现。</li>
+              <li><code>to-spec</code> 写前要确认测试 seam；<code>to-tickets</code> 发布前要确认拆分和 blocking edges。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="inbound"
+        class="flow"
+        data-search="外部入站 raw issue pr triage grilling domain-modeling ready-for-agent implement needs-info wontfix out-of-scope"
+      >
+        <div class="flow-head">
+          <div>
+            <div class="kicker">② 入站</div>
+            <h2>外部入站 Flow：raw issue / PR → agent-ready</h2>
+            <p class="summary">处理别人提来的 bug、feature request 或 external PR：先分诊，不直接实现。</p>
+          </div>
+          <div class="badge">入口：<code>/triage</code></div>
+        </div>
+        <div class="diagram" role="img" aria-label="外部入站 Flow 图">
+          <svg viewBox="0 0 1100 230" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arrow2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" /></marker></defs>
+            <g class="node artifact"><rect x="35" y="85" width="130" height="58" /><text x="100" y="108" text-anchor="middle">raw issue</text><text x="100" y="128" text-anchor="middle">external PR</text></g>
+            <g class="node user"><rect x="230" y="85" width="110" height="58" /><text x="285" y="108" text-anchor="middle">triage</text><text x="285" y="128" text-anchor="middle">user</text></g>
+            <g class="node model"><rect x="405" y="35" width="116" height="54" /><text x="463" y="57" text-anchor="middle">grilling</text><text x="463" y="76" text-anchor="middle">model</text></g>
+            <g class="node model"><rect x="405" y="140" width="138" height="54" /><text x="474" y="162" text-anchor="middle">domain-modeling</text><text x="474" y="181" text-anchor="middle">model</text></g>
+            <g class="node decision"><rect x="610" y="85" width="148" height="58" /><text x="684" y="108" text-anchor="middle">ready-for-agent</text><text x="684" y="128" text-anchor="middle">brief</text></g>
+            <g class="node user"><rect x="825" y="85" width="110" height="58" /><text x="880" y="108" text-anchor="middle">implement</text><text x="880" y="128" text-anchor="middle">user</text></g>
+            <g class="node warn"><rect x="825" y="160" width="140" height="44" /><text x="895" y="187" text-anchor="middle">needs-info / wontfix</text></g>
+            <path class="arrow" marker-end="url(#arrow2)" d="M165 114 H230" /><path class="arrow" marker-end="url(#arrow2)" d="M340 114 H610" /><path class="arrow" marker-end="url(#arrow2)" d="M758 114 H825" />
+            <path class="arrow dash" marker-end="url(#arrow2)" d="M305 85 C330 46 370 45 405 62" /><path class="arrow dash" marker-end="url(#arrow2)" d="M310 143 C335 170 365 174 405 167" />
+            <path class="arrow dash" marker-end="url(#arrow2)" d="M742 143 C782 172 805 182 825 182" />
+            <text class="label" x="356" y="102">需要澄清时调用</text><text class="label" x="780" y="102">交给实现</text>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              <code>/triage</code> 读取 issue/PR、评论、标签和代码上下文，检查是否已实现或曾被拒绝；
+              必要时用 <code>/grilling</code> 和 <code>/domain-modeling</code> 把请求打磨成 agent-ready brief。
+              只有 ready-for-agent 的事项才交给 <code>/implement</code>。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li><code>/to-tickets</code> 生成的票已经 ready，不要再 triage。</li>
+              <li>triage 评论必须带 AI disclaimer。</li>
+              <li>只有 rejected enhancement 写入 <code>.out-of-scope/</code>；已实现的 wontfix 不写。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="debug" class="flow" data-search="bug debug diagnosing-bugs tdd code-review tight feedback loop regression test improve-codebase-architecture">
+        <div class="flow-head">
+          <div>
+            <div class="kicker">③ 修复</div>
+            <h2>Bug 诊断 Flow：broken → fixed</h2>
+            <p class="summary">先拿到能变红的 tight feedback loop，再复现、最小化、假设、插桩、修复和回归测试。</p>
+          </div>
+          <div class="badge">入口：<code>/diagnosing-bugs</code></div>
+        </div>
+        <div class="diagram" role="img" aria-label="Bug 诊断 Flow 图">
+          <svg viewBox="0 0 1100 230" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arrow3" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" /></marker></defs>
+            <g class="node artifact"><rect x="30" y="86" width="118" height="58" /><text x="89" y="109" text-anchor="middle">broken</text><text x="89" y="129" text-anchor="middle">symptom</text></g>
+            <g class="node model"><rect x="210" y="86" width="140" height="58" /><text x="280" y="109" text-anchor="middle">diagnosing-bugs</text><text x="280" y="129" text-anchor="middle">model</text></g>
+            <g class="node decision"><rect x="415" y="86" width="142" height="58" /><text x="486" y="109" text-anchor="middle">tight feedback</text><text x="486" y="129" text-anchor="middle">loop</text></g>
+            <g class="node model"><rect x="620" y="86" width="95" height="58" /><text x="668" y="109" text-anchor="middle">tdd</text><text x="668" y="129" text-anchor="middle">model</text></g>
+            <g class="node artifact"><rect x="775" y="86" width="120" height="58" /><text x="835" y="109" text-anchor="middle">fix +</text><text x="835" y="129" text-anchor="middle">regression</text></g>
+            <g class="node model"><rect x="955" y="86" width="105" height="58" /><text x="1008" y="109" text-anchor="middle">code-review</text><text x="1008" y="129" text-anchor="middle">model</text></g>
+            <g class="node user"><rect x="775" y="164" width="178" height="44" /><text x="864" y="191" text-anchor="middle">improve architecture</text></g>
+            <path class="arrow" marker-end="url(#arrow3)" d="M148 115 H210" /><path class="arrow" marker-end="url(#arrow3)" d="M350 115 H415" /><path class="arrow" marker-end="url(#arrow3)" d="M557 115 H620" /><path class="arrow" marker-end="url(#arrow3)" d="M715 115 H775" /><path class="arrow" marker-end="url(#arrow3)" d="M895 115 H955" />
+            <path class="arrow dash" marker-end="url(#arrow3)" d="M835 144 V164" />
+            <text class="label" x="369" y="102">先红</text><text class="label" x="728" y="102">修复</text><text class="label" x="776" y="158">没好 seam</text>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              用 <code>/diagnosing-bugs</code>，不要直接猜原因。先构造一个已经跑过、能抓住这个 bug 的命令；
+              再最小化 repro，列 3-5 个可证伪假设，单变量插桩，最后用正确 seam 写回归测试并修复。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li>没有 red-capable command，就不要进入假设阶段。</li>
+              <li>没有正确测试 seam，本身就是发现；修完后交给架构健康环。</li>
+              <li>所有 <code>[DEBUG-*]</code> 临时 instrumentation 最后必须清掉。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="wayfinder" class="flow" data-search="巨大模糊 foggy wayfinder map investigation tickets research prototype grilling domain-modeling to-spec implement">
+        <div class="flow-head">
+          <div>
+            <div class="kicker">④ 探路</div>
+            <h2>巨大模糊工作 Flow：foggy effort → clear route</h2>
+            <p class="summary">用于一个任务太大、太雾，一个 session 装不下：先做地图，不直接冲实现。</p>
+          </div>
+          <div class="badge">入口：<code>/wayfinder</code></div>
+        </div>
+        <div class="diagram" role="img" aria-label="Wayfinder Flow 图">
+          <svg viewBox="0 0 1100 250" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arrow4" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" /></marker></defs>
+            <g class="node artifact"><rect x="30" y="95" width="126" height="58" /><text x="93" y="118" text-anchor="middle">huge / foggy</text><text x="93" y="138" text-anchor="middle">effort</text></g>
+            <g class="node user"><rect x="220" y="95" width="112" height="58" /><text x="276" y="118" text-anchor="middle">wayfinder</text><text x="276" y="138" text-anchor="middle">user</text></g>
+            <g class="node artifact"><rect x="396" y="95" width="126" height="58" /><text x="459" y="118" text-anchor="middle">map issue</text><text x="459" y="138" text-anchor="middle">+ fog</text></g>
+            <g class="node decision"><rect x="586" y="95" width="142" height="58" /><text x="657" y="118" text-anchor="middle">frontier ticket</text><text x="657" y="138" text-anchor="middle">one/session</text></g>
+            <g class="node model"><rect x="785" y="38" width="104" height="48" /><text x="837" y="67" text-anchor="middle">research</text></g>
+            <g class="node model"><rect x="785" y="101" width="104" height="48" /><text x="837" y="130" text-anchor="middle">prototype</text></g>
+            <g class="node model"><rect x="785" y="164" width="104" height="48" /><text x="837" y="193" text-anchor="middle">grilling</text></g>
+            <g class="node decision"><rect x="953" y="95" width="110" height="58" /><text x="1008" y="118" text-anchor="middle">to-spec</text><text x="1008" y="138" text-anchor="middle">or implement</text></g>
+            <path class="arrow" marker-end="url(#arrow4)" d="M156 124 H220" /><path class="arrow" marker-end="url(#arrow4)" d="M332 124 H396" /><path class="arrow" marker-end="url(#arrow4)" d="M522 124 H586" />
+            <path class="arrow" marker-end="url(#arrow4)" d="M728 124 C752 74 760 62 785 62" /><path class="arrow" marker-end="url(#arrow4)" d="M728 124 H785" /><path class="arrow" marker-end="url(#arrow4)" d="M728 124 C752 176 760 188 785 188" />
+            <path class="arrow" marker-end="url(#arrow4)" d="M889 124 H953" />
+            <text class="label" x="352" y="111">建图</text><text class="label" x="539" y="111">消雾</text><text class="label" x="900" y="111">路线清楚</text>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              <code>/wayfinder</code> 先命名 destination，再创建 map issue 和 child investigation tickets。
+              每张票解决一个 decision：可能用 <code>/research</code> 查资料，用 <code>/prototype</code>
+              提高讨论保真度，或用 <code>/grilling</code> 继续问清楚。路清楚后才接回
+              <code>/to-spec</code> 或 <code>/implement</code>。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li>Wayfinder 默认是 planning，不是 deliverable production。</li>
+              <li>一次 session 只 resolve 一张 ticket。</li>
+              <li>map 是索引，决策详情住在 ticket 的 resolution comment。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="architecture" class="flow" data-search="架构健康 improve-codebase-architecture codebase-design deep module seam interface locality leverage grilling domain-modeling">
+        <div class="flow-head">
+          <div>
+            <div class="kicker">⑤ 治理</div>
+            <h2>架构健康 Flow：codebase health → deepening opportunity</h2>
+            <p class="summary">不是直接做功能，而是找浅模块、漏 seam、难测区域，把代码库变得更适合人和 agent 操作。</p>
+          </div>
+          <div class="badge">入口：<code>/improve-codebase-architecture</code></div>
+        </div>
+        <div class="diagram" role="img" aria-label="架构健康 Flow 图">
+          <svg viewBox="0 0 1100 230" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arrow5" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" /></marker></defs>
+            <g class="node artifact"><rect x="30" y="86" width="132" height="58" /><text x="96" y="109" text-anchor="middle">codebase</text><text x="96" y="129" text-anchor="middle">friction</text></g>
+            <g class="node user"><rect x="220" y="86" width="188" height="58" /><text x="314" y="109" text-anchor="middle">improve-codebase</text><text x="314" y="129" text-anchor="middle">-architecture</text></g>
+            <g class="node model"><rect x="465" y="28" width="126" height="52" /><text x="528" y="50" text-anchor="middle">codebase-design</text><text x="528" y="68" text-anchor="middle">model</text></g>
+            <g class="node artifact"><rect x="465" y="126" width="132" height="58" /><text x="531" y="149" text-anchor="middle">temp HTML</text><text x="531" y="169" text-anchor="middle">report</text></g>
+            <g class="node model"><rect x="660" y="126" width="104" height="58" /><text x="712" y="149" text-anchor="middle">grilling</text><text x="712" y="169" text-anchor="middle">model</text></g>
+            <g class="node model"><rect x="815" y="126" width="142" height="58" /><text x="886" y="149" text-anchor="middle">domain-modeling</text><text x="886" y="169" text-anchor="middle">model</text></g>
+            <g class="node decision"><rect x="1000" y="126" width="78" height="58" /><text x="1039" y="149" text-anchor="middle">spec /</text><text x="1039" y="169" text-anchor="middle">work</text></g>
+            <path class="arrow" marker-end="url(#arrow5)" d="M162 115 H220" /><path class="arrow dash" marker-end="url(#arrow5)" d="M408 102 C436 58 438 54 465 54" /><path class="arrow" marker-end="url(#arrow5)" d="M408 130 C430 150 440 155 465 155" /><path class="arrow" marker-end="url(#arrow5)" d="M597 155 H660" /><path class="arrow" marker-end="url(#arrow5)" d="M764 155 H815" /><path class="arrow" marker-end="url(#arrow5)" d="M957 155 H1000" />
+            <text class="label" x="430" y="91">词汇</text><text class="label" x="608" y="143">用户选候选</text>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              <code>/improve-codebase-architecture</code> 用 <code>/codebase-design</code>
+              的词汇扫描代码库，产出一个临时 HTML 报告。用户选一个 deepening opportunity 后，再进入
+              <code>/grilling</code> 和 <code>/domain-modeling</code>，最后变成 spec 或直接实现。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li>报告阶段不先设计接口，只展示候选。</li>
+              <li>判断依据是 locality、leverage、testability。</li>
+              <li>若用户用强理由拒绝候选，可记录 ADR，避免未来重复建议。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="assist" class="flow" data-search="跨会话辅助 research prototype handoff primary source cited markdown throwaway context window compact">
+        <div class="flow-head">
+          <div>
+            <div class="kicker">⑥ 辅助</div>
+            <h2>跨会话/辅助 Flow：research / prototype / handoff</h2>
+            <p class="summary">这些不是完整研发链，但经常嵌入其他链路：查资料、跑原型、跨上下文窗口交接。</p>
+          </div>
+          <div class="badge">入口：按问题选</div>
+        </div>
+        <div class="diagram" role="img" aria-label="跨会话辅助 Flow 图">
+          <svg viewBox="0 0 1100 250" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arrow6" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" /></marker></defs>
+            <g class="node artifact"><rect x="35" y="35" width="150" height="48" /><text x="110" y="64" text-anchor="middle">需要权威资料</text></g>
+            <g class="node model"><rect x="250" y="35" width="108" height="48" /><text x="304" y="64" text-anchor="middle">research</text></g>
+            <g class="node artifact"><rect x="425" y="35" width="150" height="48" /><text x="500" y="64" text-anchor="middle">cited markdown</text></g>
+            <g class="node artifact"><rect x="35" y="101" width="150" height="48" /><text x="110" y="130" text-anchor="middle">需要可运行答案</text></g>
+            <g class="node model"><rect x="250" y="101" width="108" height="48" /><text x="304" y="130" text-anchor="middle">prototype</text></g>
+            <g class="node artifact"><rect x="425" y="101" width="150" height="48" /><text x="500" y="130" text-anchor="middle">captured answer</text></g>
+            <g class="node artifact"><rect x="35" y="167" width="150" height="48" /><text x="110" y="196" text-anchor="middle">上下文快满</text></g>
+            <g class="node user"><rect x="250" y="167" width="108" height="48" /><text x="304" y="196" text-anchor="middle">handoff</text></g>
+            <g class="node artifact"><rect x="425" y="167" width="150" height="48" /><text x="500" y="196" text-anchor="middle">temp handoff.md</text></g>
+            <g class="node decision"><rect x="675" y="101" width="160" height="48" /><text x="755" y="130" text-anchor="middle">回主线或新会话</text></g>
+            <path class="arrow" marker-end="url(#arrow6)" d="M185 59 H250" /><path class="arrow" marker-end="url(#arrow6)" d="M358 59 H425" /><path class="arrow" marker-end="url(#arrow6)" d="M185 125 H250" /><path class="arrow" marker-end="url(#arrow6)" d="M358 125 H425" /><path class="arrow" marker-end="url(#arrow6)" d="M185 191 H250" /><path class="arrow" marker-end="url(#arrow6)" d="M358 191 H425" />
+            <path class="arrow" marker-end="url(#arrow6)" d="M575 59 C630 70 645 102 675 113" /><path class="arrow" marker-end="url(#arrow6)" d="M575 125 H675" /><path class="arrow" marker-end="url(#arrow6)" d="M575 191 C630 180 645 148 675 137" />
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              要读官方资料，用 <code>/research</code> 生成带引用的 Markdown；纸上想不清的逻辑/UI，
+              用 <code>/prototype</code> 写一次性可运行答案；上下文窗口快满或要分支探索，用
+              <code>/handoff</code> 写临时交接文档，再开 fresh session。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li><code>/research</code> 必须追到 primary sources。</li>
+              <li><code>/prototype</code> 的主分支只保留已验证决定；原型本身提交到 throwaway branch，并从 implementation issue 留下 context pointer。</li>
+              <li><code>/handoff</code> 引用已有 artifact，不复制 spec、ADR、issue、diff。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="learning" class="flow" data-search="生产力 学习 grill-me grilling teach writing-great-skills mission lessons resources learning-records skill authoring">
+        <div class="flow-head">
+          <div>
+            <div class="kicker">⑦ 非代码</div>
+            <h2>Productivity / Learning Flow</h2>
+            <p class="summary">不一定进入代码库：澄清想法、长期学习、维护 skill 写作质量。</p>
+          </div>
+          <div class="badge">入口：<code>/grill-me</code> / <code>/teach</code></div>
+        </div>
+        <div class="diagram" role="img" aria-label="生产力学习 Flow 图">
+          <svg viewBox="0 0 1100 250" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arrow7" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6a7488" /></marker></defs>
+            <g class="node user"><rect x="55" y="38" width="108" height="48" /><text x="109" y="67" text-anchor="middle">grill-me</text></g>
+            <g class="node model"><rect x="245" y="38" width="108" height="48" /><text x="299" y="67" text-anchor="middle">grilling</text></g>
+            <g class="node artifact"><rect x="435" y="38" width="160" height="48" /><text x="515" y="67" text-anchor="middle">settled plan</text></g>
+            <g class="node user"><rect x="55" y="105" width="108" height="48" /><text x="109" y="134" text-anchor="middle">teach</text></g>
+            <g class="node artifact"><rect x="245" y="105" width="172" height="48" /><text x="331" y="134" text-anchor="middle">learning workspace</text></g>
+            <g class="node artifact"><rect x="500" y="105" width="190" height="48" /><text x="595" y="134" text-anchor="middle">lessons + records</text></g>
+            <g class="node user"><rect x="55" y="172" width="150" height="48" /><text x="130" y="201" text-anchor="middle">writing-great-skills</text></g>
+            <g class="node artifact"><rect x="245" y="172" width="172" height="48" /><text x="331" y="201" text-anchor="middle">authoring guidance</text></g>
+            <path class="arrow" marker-end="url(#arrow7)" d="M163 62 H245" /><path class="arrow" marker-end="url(#arrow7)" d="M353 62 H435" />
+            <path class="arrow" marker-end="url(#arrow7)" d="M163 129 H245" /><path class="arrow" marker-end="url(#arrow7)" d="M417 129 H500" />
+            <path class="arrow" marker-end="url(#arrow7)" d="M205 196 H245" />
+          </svg>
+        </div>
+        <div class="body">
+          <div class="box">
+            <h3>怎么做这环</h3>
+            <p class="how">
+              没有代码库也想压实想法，用 <code>/grill-me</code>，它只调用 <code>/grilling</code>
+              并不写文件。想长期学习某个主题，用 <code>/teach</code>，当前目录会变成教学工作区。
+              要写或改 skill，用 <code>/writing-great-skills</code> 作为写作原则参考。
+            </p>
+          </div>
+          <div class="box">
+            <h3>注意</h3>
+            <ul>
+              <li><code>/grill-me</code> 是 stateless；需要 ADR/术语就用 <code>/grill-with-docs</code>。</li>
+              <li><code>/teach</code> 会维护 <code>MISSION.md</code>、<code>RESOURCES.md</code>、<code>lessons/*.html</code> 等文件。</li>
+              <li><code>/writing-great-skills</code> 不在研发链路里，是 skill 作者工具。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const input = document.querySelector("#search");
+      const flows = Array.from(document.querySelectorAll(".flow"));
+      const empty = document.querySelector("#empty");
+
+      input.addEventListener("input", () => {
+        const q = input.value.trim().toLowerCase();
+        let visible = 0;
+
+        for (const flow of flows) {
+          const haystack = `${flow.dataset.search} ${flow.textContent}`.toLowerCase();
+          const match = !q || haystack.includes(q);
+          flow.hidden = !match;
+          if (match) visible += 1;
+        }
+
+        empty.style.display = visible ? "none" : "block";
+      });
+    </script>
+  </body>
+</html>

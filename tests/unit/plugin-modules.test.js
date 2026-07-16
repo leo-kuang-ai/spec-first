@@ -264,6 +264,13 @@ describe('plugin module facade and governance', () => {
         suffix: '/using-spec-first/references/conditional-routing-boundaries.md',
         marker: 'Managed assets under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, and `.qoder/`',
       },
+      {
+        suffix: '/using-spec-first/references/public-route-map.md',
+        markers: [
+          '## Main Flow: Intent -> Governed Change',
+          '`runtime-maintenance`',
+        ],
+      },
     ];
     const byteStableSupportFiles = [
       'spec-runtime-setup/setup-registry.json',
