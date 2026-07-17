@@ -1,6 +1,10 @@
 # Authoring Method
 
-本 reference 只承接 portable authoring 方法。宿主差异见 `target-profiles.md`，项目治理与 source/runtime 见 `project-profiles.md`，验证见 `delivery-gates.md`。
+**trigger_condition：** core branch 已确定为 owner blocked、Tier A apply 或 full apply，需判断是否值得 authoring、解析 canonical source/effect，或设计 portable core。
+**purpose：** 只承接 portable authoring 的 qualification、source/effect resolution、resource placement 与迁移 disposition。
+**fallback_if_unread：** near-neighbor 只路由；无法确认 owner 时只给 candidate preview 并保持零 mutation；不得用本 reference 代替 delivery evidence。
+
+宿主差异见 `target-profiles.md`，项目治理与 source/runtime 见 `project-profiles.md`，验证见 `delivery-gates.md`。
 
 ## Qualification And Intent Contract
 
@@ -26,6 +30,8 @@ Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operati
 - target repo、Skill root、canonical source owner；
 - mutation authorization：`ready|preview-only|blocked`；
 - first verification target。
+
+`ready` 表示当前轮明确 create/revise，且已确认 target root 与预期 source surfaces 未超出请求范围；`preview-only` 表示用户只要求设计/preview，或 owner/scope 尚未解析；`blocked` 表示没有 mutation 授权。不要只因为生成了 preview 就再次询问；只有 exact write set 扩大范围、覆盖当前请求未明确包含的 dirty path，或新增 external/network/高风险副作用时才重新确认。
 
 当 revision 仅是 typo、计数、metadata/术语修正、明确不可达内容删除或等价结构整理，且不改变 trigger、schema、contract、threshold、gate、roster 或 model routing，可按 `authoring-workbench.md` 的 Tier A short path 处理；它仍要 owner、授权、preview/write-set binding 与最窄结构验证。不要把承重行为变化伪装成 Tier A。
 

@@ -78,6 +78,10 @@ test('passes only when manifest, host scope, snapshot and exact write set bind t
     mutation_readiness: 'ready',
     findings: [],
   });
+  expect(report.limitations).toEqual(expect.arrayContaining([
+    expect.stringContaining('re-confirm only if scope or side effects expand'),
+    expect.stringContaining('Design Record quality'),
+  ]));
   expect(fs.readFileSync(path.join(root, 'example-skill', 'SKILL.md'), 'utf8')).toBe(before);
 });
 

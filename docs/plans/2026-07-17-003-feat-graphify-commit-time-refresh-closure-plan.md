@@ -1,7 +1,7 @@
 ---
 title: "Graphify Commit-Time 自动刷新闭环（单 git + workspace 多 git）- Plan"
 type: feat
-status: active
+status: completed
 date: 2026-07-17
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready

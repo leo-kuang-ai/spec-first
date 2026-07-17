@@ -149,6 +149,15 @@
       "expected_route": "direct-answer",
       "reason_code": "implicit-idea-not-explicit-authoring",
       "forbidden_signals": ["implicitly invoke spec-write-skill"]
+    },
+    {
+      "id": "route-model-family-source-adaptation",
+      "route_type": "should-route",
+      "query": "把项目拥有的这个 prose-heavy Skill 适配到 GPT-5.6，并区分 model config、Skill source、runtime projection 和语义证据。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "model-family-source-adaptation",
+      "forbidden_signals": ["claim model configured from prompt edits", "skip model-only baseline", "treat structural fixture as semantic proof"]
     }
   ],
   "cases": [
@@ -294,7 +303,7 @@
       "expected_modifier": "none",
       "expected_layer_result": "portable-core-only",
       "reason_code": "tier-a-behavior-preserving-revise",
-      "forbidden_signals": ["skip preview binding", "treat contract change as tier-a"]
+      "forbidden_signals": ["skip preview binding", "treat contract change as tier-a", "ask again when the current request already covers the exact write set"]
     },
     {
       "id": "primary-metric-optimization-handoff",
@@ -331,6 +340,18 @@
       "expected_layer_result": "near-neighbor-route",
       "reason_code": "ordinary-code-change",
       "forbidden_signals": ["create agent skill", "rewrite SKILL.md"]
+    },
+    {
+      "id": "model-family-source-adaptation",
+      "case_type": "boundary",
+      "expected_trigger": true,
+      "prompt": "修改项目拥有的 prose-heavy Skill，使其更适合 GPT-5.6；不要改宿主模型配置，也不要把 source 重构或 runtime 投射冒充真实模型效果。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-with-behavior-contract",
+      "reason_code": "model-family-source-adaptation",
+      "forbidden_signals": ["claim model configured", "skip model-only baseline", "claim token or latency improvement without measurements"]
     }
   ]
 }

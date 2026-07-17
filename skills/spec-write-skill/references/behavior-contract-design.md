@@ -1,6 +1,8 @@
 # Behavior Contract Design
 
-本 reference 仅在 Skill 主要依赖自然语言改变模型行为时读取，例如 system/agent instructions、角色人格、few-shot、输出合同、安全边界或 agentic loop。纯工具封装、schema/reference 查询或确定性脚本型 Skill 不加载它。
+**trigger_condition：** full apply 的 Skill 主要依赖自然语言改变模型行为，例如 system/agent instructions、角色人格、few-shot、输出合同、安全边界或 agentic loop。
+**purpose：** 定义相对模型默认行为的可观察 delta、判据、authority、examples、checkpoint 和 stop conditions。
+**fallback_if_unread：** 纯工具封装、schema/reference 查询或确定性脚本型 Skill 不加载它；prose-heavy Skill 未读时不得把泛化 persona prose、fixture 或自检称为行为充分性。
 
 ## Start From The Delta
 

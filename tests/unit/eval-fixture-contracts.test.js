@@ -402,7 +402,11 @@ describe('active eval fixture references', () => {
     expect(fixture.schema_version).toBe('spec-first.spec-write-skill-trigger-cases.v3');
     expect(fixture.evidence_scope).toBe('structural-only');
     expect(fixture).not.toHaveProperty('evidence_level');
-    expect(fixture.cases).toHaveLength(15);
+    expect(runtimeSource).toContain('## Branch Contract');
+    expect(runtimeSource).toContain('## Exit Gates');
+    expect(runtimeSource).toContain('## Conditional Sources');
+    expect(runtimeSource).toContain('## Source Update and Closeout');
+    expect(fixture.cases).toHaveLength(16);
     expect(fixture.route_queries.length).toBeGreaterThanOrEqual(12);
     expect(fixture.route_queries.length).toBeLessThanOrEqual(16);
     expect(new Set(fixture.cases.map((entry) => entry.id)).size).toBe(fixture.cases.length);
@@ -458,6 +462,11 @@ describe('active eval fixture references', () => {
         expected_effect: 'apply',
         expected_layer_result: 'portable-core-with-behavior-contract',
       }),
+      expect.objectContaining({
+        id: 'model-family-source-adaptation',
+        expected_effect: 'apply',
+        expected_layer_result: 'portable-core-with-behavior-contract',
+      }),
     ]));
     expect(fixture.route_queries).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -467,6 +476,11 @@ describe('active eval fixture references', () => {
       }),
       expect.objectContaining({
         id: 'route-external-check-before-install',
+        expected_trigger: true,
+        expected_route: 'spec-write-skill',
+      }),
+      expect.objectContaining({
+        id: 'route-model-family-source-adaptation',
         expected_trigger: true,
         expected_route: 'spec-write-skill',
       }),

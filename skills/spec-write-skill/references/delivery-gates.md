@@ -1,6 +1,10 @@
 # Delivery Gates
 
-本 reference 只在 `validate-only`、写入前验证、package readiness 或 closeout 时读取。Gate 随实际风险增长，不按固定 maturity 标签堆叠文件。
+**trigger_condition：** `validate-only`、写入前验证、package readiness、closeout，或 package/source/target risk signal 命中时读取。
+**purpose：** 将 bundled validator、preview、风险匹配证据与五轴 readiness 连接到对应 claim。
+**fallback_if_unread：** 未完成本 reference 所需的检查时，只能报告 `not-run` / degraded；不得以 fixture、自检或 target-provided validator 伪造 readiness。
+
+Gate 随实际风险增长，不按固定 maturity 标签堆叠文件。
 
 ## Base Mechanical Gate
 
@@ -20,7 +24,7 @@ node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
 
 ## Apply Preview Gate
 
-create/revise apply 在写前生成 run-local preview manifest、host scope 与 exact candidate write set，并运行 `validate-authoring-preview.cjs`。它验证 hash/snapshot、path set、collision、source/runtime boundary 和 host binding；它不证明真实用户授权、Brief 质量或 patch 语义。宿主必须重新确认授权，并使用原子 expected-old-hash / expected-nonexistence conditional patch primitive；没有该能力时 mutation readiness 必须为 `not-ready`，不可 apply 或声明确定性 gate 已关闭。写后 receipt 必须逐 path 核对 after hash；partial failure 只报告当前 diff、changed/unchanged 和 rollback preview，不自动回滚。
+create/revise apply 在写前生成 run-local preview manifest、host scope 与 exact candidate write set，并运行 `validate-authoring-preview.cjs`。它验证 hash/snapshot、path set、collision、source/runtime boundary 和 host binding；它不证明真实用户授权、Design Record 质量或 patch 语义。宿主检查 exact write set 是否仍被当前轮明确 create/revise 请求覆盖，仅在 root/scope 扩大、未覆盖的 dirty overwrite 或新增 external/network/高风险副作用时重新确认。写入仍使用原子 expected-old-hash / expected-nonexistence conditional patch primitive；没有该能力时 mutation readiness 必须为 `not-ready`，不可 apply 或声明确定性 gate 已关闭。写后 receipt 必须逐 path 核对 after hash；partial failure 只报告当前 diff、changed/unchanged 和 rollback preview，不自动回滚。
 
 ## Risk-Triggered Checks
 

@@ -105,15 +105,16 @@ describe('command companion resource paths', () => {
 
       const writeSkillRoot = `${adapter.workflowsRoot}/spec-write-skill`;
       const writeSkill = readRuntimeCommand(projectRoot, adapter, 'spec-write-skill');
-      expect(writeSkill).toContain('Load evaluation and profiles conditionally.');
+      expect(writeSkill).toContain('## Conditional Sources');
       expect(writeSkill).toContain(`${writeSkillRoot}/references/authoring-workbench.md`);
       expect(writeSkill).toContain(`${writeSkillRoot}/references/evaluation-design.md`);
       expect(writeSkill).toContain(`${writeSkillRoot}/references/optimization-and-lifecycle.md`);
       expect(writeSkill).toContain(`${writeSkillRoot}/references/target-profiles.md`);
       expect(writeSkill).toContain(`${writeSkillRoot}/references/project-profiles.md`);
+      expect(writeSkill).toContain(`${writeSkillRoot}/references/delivery-gates.md`);
       expect(fs.existsSync(path.join(projectRoot, writeSkillRoot, 'scripts', 'inspect-context.cjs'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, writeSkillRoot, 'scripts', 'validate-authoring-preview.cjs'))).toBe(true);
-      expect(writeSkill).toContain('$SKILL_DIR/scripts/validate-skill.cjs');
+      expect(fs.existsSync(path.join(projectRoot, writeSkillRoot, 'scripts', 'validate-skill.cjs'))).toBe(true);
 
       for (const skillName of ['spec-optimize', 'spec-polish']) {
         const commandContent = readRuntimeCommand(projectRoot, adapter, skillName);

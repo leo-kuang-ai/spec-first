@@ -307,8 +307,8 @@ function validateAuthoringPreview({ manifest, authorizedRoot, scope, writeSet })
       } : null,
       findings,
       limitations: [
-        'authorization_claim is structural only; the host must re-confirm current user authorization before writing.',
-        'This validator does not judge Design Brief quality, patch semantics, or user authorization.',
+        'authorization_claim is structural only; the host must confirm the exact write set remains within current user authorization and re-confirm only if scope or side effects expand.',
+        'This validator does not judge Design Record quality, patch semantics, or user authorization.',
       ],
     };
   }
