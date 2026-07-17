@@ -143,18 +143,41 @@ describe('runWorkspaceGraphBuild — composed capability', () => {
 
   test('a complete build injects the routing block into workspace host entry docs', () => {
     const ws = mkWorkspace();
-    initRepo(ws, 'api');
+    const api = initRepo(ws, 'api');
+    // Pin the child's effective hooks root inside the child so classification is deterministic
+    // regardless of any ambient global core.hooksPath on the host running the suite.
+    spawnSync('git', ['-C', api, 'config', '--local', 'core.hooksPath', '.git/hooks']);
     const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec, hosts: ['claude', 'codex'] });
     expect(result.status).toBe('complete');
     expect(result.routing).not.toBeNull();
-    // Workspace out-of-tree 图使用显式刷新，不安装 native hook。
+    // Workspace merged-graph commit-time：spec-first 自有子仓 hook 触发异步 merged 重建。
     expect(result.hooks).not.toBeNull();
-    expect(result.hooks.status).toBe('not-installed');
-    expect(result.refresh.mode).toBe('explicit');
+    expect(result.hooks.status).toBe('installed');
+    expect(result.refresh.mode).toBe('commit-hook-spec-first-async');
+    const hook = fs.readFileSync(path.join(api, '.git', 'hooks', 'post-commit'), 'utf8');
+    expect(hook).toContain('spec-first-graphify-workspace-refresh start');
+    expect(hook).toContain('workspace-async-refresh.cjs');
+    expect(hook).toContain('--workspace-graph');
     const claude = fs.readFileSync(path.join(ws, 'CLAUDE.md'), 'utf8');
     const agents = fs.readFileSync(path.join(ws, 'AGENTS.md'), 'utf8');
     expect(claude).toContain('projectPath');
     expect(agents).toContain('merged-graph.json');
+  });
+
+  test('a workspace child whose effective hooks root is external is not written; merged degrades', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    const outsideHooks = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wexec-ext-hooks-')));
+    spawnSync('git', ['-C', api, 'config', '--local', 'core.hooksPath', outsideHooks]);
+    const before = fs.readdirSync(outsideHooks);
+    const result = runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    expect(result.status).toBe('complete');
+    expect(result.hooks.status).toBe('blocked');
+    expect(result.hooks.repos[0]).toMatchObject({ repo_id: 'api', hook_status: 'blocked' });
+    expect(result.refresh.mode).toBe('explicit');
+    // 绝不写外部 hooks root。
+    expect(fs.readdirSync(outsideHooks)).toEqual(before);
+    expect(JSON.stringify(result.hooks)).not.toContain(outsideHooks);
   });
 
   test('injectRouting=false leaves host docs untouched', () => {

@@ -27,6 +27,7 @@ const {
   readWorkspaceGraphState,
   resolveStateRepoIds,
 } = require('./workspace-graph-state.cjs');
+const { readAsyncRefreshStatus } = require('./workspace-async-refresh.cjs');
 const { directoryHasEntries, jsonFileHasContent } = require('./workspace-graph-artifacts.cjs');
 
 function runWorkspaceGraphStatus({
@@ -218,6 +219,9 @@ function runWorkspaceGraphStatus({
       state_path: stateResult.path,
       state_status: stateResult.status,
       refresh_mode: stateResult.status === 'ready' ? stateResult.state.refresh_mode : 'unknown',
+      // 消费侧只读事实（R10/U6）：commit 触发的 merged 重建异步执行，此处只报告其在途/失败/成功，
+      // 绝不在消费时触发重建。in-flight 表示图可能落后当前 HEAD；failed 表示后台重建失败需关注。
+      async_refresh: readAsyncRefreshStatus(workspaceRoot),
     },
     routing,
     // CR10: doctor-facing advisory projectPath when cwd is inside a child.

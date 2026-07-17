@@ -22,6 +22,8 @@ const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/mcp-setup-project-config.test.js',
   'tests/unit/mcp-setup-providers.test.js',
   'tests/unit/mcp-setup-registry.test.js',
+  'tests/unit/mcp-setup-workspace-async-refresh.test.js',
+  'tests/unit/mcp-setup-workspace-child-hook.test.js',
   'tests/unit/mcp-setup-workspace-git-exclude.test.js',
   'tests/unit/mcp-setup-workspace-graph-build.test.js',
   'tests/unit/mcp-setup-workspace-graph-clean.test.js',

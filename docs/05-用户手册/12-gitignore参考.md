@@ -15,7 +15,7 @@
 - `.codegraph/` 是 CodeGraph 项目级 SQLite 索引，默认不提交。
 - `.graphify/` 是 Graphify provider-native 项目图谱运行时目录，默认不提交；`spec-first init` 会忽略整个 `.graphify/` 目录。
 - `graphify-out/` 是旧版 Graphify artifact 目录，默认继续忽略，避免历史产物意外提交；当前 setup 会提示刷新为 `.graphify/`。
-- `spec-runtime-setup` 确认 provider pack 后还可能安装 Graphify provider runtime（`.codex/skills/graphify/` 或 `.claude/skills/graphify/`）和 project-local Git hook。Hook 目标由 `git rev-parse --git-path hooks` 解析，默认通常是 `.git/hooks/post-commit` / `.git/hooks/post-checkout`，也可以是仓库内自定义路径；只有目标位于当前项目内并通过 no-follow symlink containment 时才会写入。项目外 `core.hooksPath` 只产生 `manual-only` 可选增强状态，不会被读取、修改、复制或串联。该状态只表示 project-local hook 未由 spec-first 验证，不证明外部 hook 不存在或不会执行；应将 external hook execution 视为 unverified。
+- `spec-runtime-setup` 确认 provider pack 后还可能安装 Graphify provider runtime（`.codex/skills/graphify/` 或 `.claude/skills/graphify/`）和 project-local Git hook。Hook 目标由 `git rev-parse --git-path hooks` 解析，默认通常是 `.git/hooks/post-commit` / `.git/hooks/post-checkout`，也可以是仓库内自定义路径；只有目标位于当前项目内并通过 no-follow symlink containment 时才会写入。项目外 `core.hooksPath` 下，setup 只对 `post-commit`/`post-checkout` 做只读 marker 检测：命中报 `verified-external`（外部已存在 commit-time Graphify hook），缺失报 `blocked` + 一键安装提示；绝不 write/execute/status、修改、复制或串联外部 hook。`verified-external`/`manual-only` 都只表示 spec-first 只读可验证的 external posture，不证明外部 hook 一定不存在或不会执行；应将 external hook execution 视为 unverified。
 
 如需在 `git commit` 后自动刷新 Graphify，可由仓库 owner 在确认不会绕过现有全局/组织 hooks 后显式启用项目内 hooks root：
 

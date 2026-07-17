@@ -64,9 +64,10 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(fs.existsSync(path.join(ws, 'web', '.codegraph'))).toBe(false);
     expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(false);
     expect(clean.workspace_graphify_removed).toBe(true);
-    // 当前 state 明确为 explicit refresh；该 build 未安装 hook，clean 不碰宿主 hook 配置。
+    // build 安装了 spec-first 自有子仓 hook（children contained）；clean 对称移除 managed block，
+    // 绝不调用 graphify hook uninstall。
     expect(uninstalls.filter((u) => u.args.join(' ') === 'hook uninstall').length).toBe(0);
-    expect(clean.repos.every((repo) => repo.hook_status === 'not-installed')).toBe(true);
+    expect(clean.repos.every((repo) => repo.hook_status === 'uninstalled')).toBe(true);
     // Managed routing block stripped.
     expect(clean.routing).not.toBeNull();
     expect(clean.routing.entries.some((e) => e.status === 'stripped')).toBe(true);
@@ -229,7 +230,9 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
   test('explicit state still removes a contained legacy Graphify hook marker', () => {
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
-    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    // installHooks:false → build 保持 explicit refresh state（不装 spec-first 自有 hook），
+    // 从而走 legacy 分支：contained + graphify marker → provider-native uninstall。
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec, installHooks: false });
     const hooks = path.join(api, '.git', 'hooks');
     fs.writeFileSync(path.join(hooks, 'post-commit'), '#!/bin/sh\n# Installed by: graphify hook install\n');
     let calls = 0;

@@ -24,6 +24,7 @@ const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
 const { stripRoutingInstruction } = require('./workspace-routing-inject.cjs');
 const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
 const { readWorkspaceGraphState, resolveStateRepoIds } = require('./workspace-graph-state.cjs');
+const { removeWorkspaceChildHook } = require('./workspace-child-hook.cjs');
 const { CANONICAL_HOSTS } = require('./host-authority.cjs');
 
 function runWorkspaceGraphClean({
@@ -38,6 +39,8 @@ function runWorkspaceGraphClean({
   const stateResult = readWorkspaceGraphState(cwd);
   const explicitRefreshState = stateResult.status === 'ready'
     && stateResult.state.refresh_mode === 'explicit';
+  const specFirstHookState = stateResult.status === 'ready'
+    && stateResult.state.refresh_mode === 'commit-hook-spec-first-async';
   const effectiveRepos = repos.length > 0 ? repos : resolveStateRepoIds(stateResult);
   const targets = resolveWorkspaceTargets({
     cwd,
@@ -121,11 +124,30 @@ function runWorkspaceGraphClean({
       entry.reason_code = excl && excl.reason_code ? excl.reason_code : 'exclude-remove-failed';
     }
 
-    // 3. 当前 explicit-refresh build 不安装 hook；但 contained git dir 中可能
-    // 仍有旧版本遗留 marker，此时继续调用 provider-native uninstall。
+    // 3. Hook cleanup 按 state refresh_mode 分三态：
+    //    - commit-hook-spec-first-async：移除 spec-first 自有 managed block（contained only，绝不写外部）。
+    //    - explicit：当前 build 不装 hook；仅当 contained + 有 legacy graphify marker 才 provider-native uninstall。
+    //    - 其余（legacy/无 state）：向 Graphify 请求 uninstall 任何旧 native hook。
     const hooks = resolveHooksPath(repo.git_root);
-    let shouldUninstallLegacyHook = !explicitRefreshState;
-    if (explicitRefreshState) {
+    let shouldUninstallLegacyHook = !explicitRefreshState && !specFirstHookState;
+    if (specFirstHookState) {
+      if (!hooks.ok) {
+        entry.hook_status = 'failed';
+        if (!entry.reason_code) entry.reason_code = hooks.reason_code;
+      } else if (!isContained(workspaceRoot, hooks.absolute)) {
+        // 有效 hooks root 在项目外：绝不写；spec-first 自有 hook 不可能装在此，标 blocked。
+        entry.hook_status = 'blocked';
+        if (!entry.reason_code) entry.reason_code = 'hook-target-escapes-workspace';
+      } else {
+        const removal = safe(() => removeWorkspaceChildHook(repo.git_root, hooks.absolute));
+        if (removal && removal.ok) {
+          entry.hook_status = removal.changed ? 'uninstalled' : 'not-installed';
+        } else {
+          entry.hook_status = 'failed';
+          if (!entry.reason_code) entry.reason_code = (removal && removal.reason_code) || 'workspace-child-hook-remove-failed';
+        }
+      }
+    } else if (explicitRefreshState) {
       if (hooks.ok && isContained(workspaceRoot, hooks.absolute)) {
         shouldUninstallLegacyHook = hasGraphifyManagedHook(hooks.absolute);
       }

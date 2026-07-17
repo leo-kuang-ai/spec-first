@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const {
   assertContainedPath,
   ensureContainedDirectory,
@@ -250,6 +251,10 @@ function verify(context = {}) {
   if (!installed) nextActions.push('运行 spec-runtime-setup --only graphify，安装 pinned Provider。');
   if (hasLegacy && !hasCurrent) nextActions.push('运行 spec-runtime-setup --only graphify --refresh，重新生成 provider-native .graphify/。');
   if (installed && hasCurrent && !queryVerified) nextActions.push('依赖 graph candidate 前，先运行真实的 Graphify query probe。');
+  // KTD5a consume-side：仅当 spec-first 基线存在且 HEAD 已移动（图落后）时给 advisory；只读，不触发重建。
+  if (hasCurrent && readSingleRepoGraphFreshness(repoRoot, resolved.artifact_root).state === 'head-moved') {
+    nextActions.push('Graphify 图基线落后当前 HEAD：如需消费前的当轮 currentness，运行 spec-runtime-setup --only graphify --refresh；项目内/已验证的 commit-time hook 若在位会自动刷新。');
+  }
   nextActions.push(...graphifyHookNextActions(hookOutcome));
   if (!configured) nextActions.push('重新运行显式 setup，修复 Graphify host integration。');
   if (hasCurrent && !graphIntegrity.ok) nextActions.push(`修复 ${graphIntegrity.reason_code} 后重新生成 .graphify/。`);
@@ -441,6 +446,8 @@ function apply(context = {}, actionPlan = plan(context)) {
   const generatedThisRun = !mutationFailure && (actionPlan.actions || []).some(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
+  // KTD5a：spec-first 自己生成图时写单仓基线快照，供消费侧只读比对当前 HEAD。
+  if (generatedThisRun && hasArtifact) writeSingleRepoGraphBaseline(repoRoot, path.join(repoRoot, '.graphify'));
   const configured = isSpecFirstSourceRepo(repoRoot) || (pythonProvider
     ? pythonHostIntegrationConfigured(repoRoot, context.host, runtimeContext).ok
     : projectSkillConfigured(repoRoot, context.host));
@@ -543,6 +550,8 @@ function resolveGraphifyHookTarget(repoRoot) {
     return {
       classification: 'external',
       reason_code: 'graphify-hook-path-outside-project',
+      // 仅供 external 只读 marker 验证（R3/KTD2）；publicGraphifyHookTarget 不暴露此绝对路径。
+      absolute: resolved.absolute,
     };
   }
   try {
@@ -606,6 +615,53 @@ function defaultGraphifyHookOutcome(target) {
   };
 }
 
+function probeExternalGraphifyHookMarker(hooksRoot) {
+  // 只读验证（R3/KTD2）：仅读取有效 hooks root 下的 post-commit / post-checkout 两个文件，
+  // 只检测 Graphify managed marker 是否存在。绝不 execute、write、`graphify hook status`，
+  // 不读其他文件；非普通文件（symlink/目录）无法证明 project-owned，按未命中处理，避免 follow-out。
+  const detected = { post_commit: false, post_checkout: false };
+  for (const name of GRAPHIFY_HOOK_NAMES) {
+    const file = path.join(hooksRoot, name);
+    try {
+      const stat = fs.lstatSync(file);
+      if (!stat.isFile()) continue;
+      if (fs.readFileSync(file, 'utf8').includes(GRAPHIFY_HOOK_MARKER)) {
+        if (name === 'post-commit') detected.post_commit = true;
+        else if (name === 'post-checkout') detected.post_checkout = true;
+      }
+    } catch (_error) {
+      // 文件缺失或不可读 → 未命中；只读探测绝不抛到外部。
+    }
+  }
+  detected.any = detected.post_commit || detected.post_checkout;
+  return detected;
+}
+
+function externalGraphifyHookOutcome(target) {
+  const marker = target && target.absolute
+    ? probeExternalGraphifyHookMarker(target.absolute)
+    : { any: false };
+  if (marker.any) {
+    // 只读确认有效 hooks root（项目外）存在 Graphify commit hook。
+    // KTD3：verified-external ≠ project-owned verified；hook_installed/hook_verified 保持 false，
+    // external hook execution 由 Git 负责、未经 spec-first 结构验证。
+    return {
+      installed: false,
+      verified: false,
+      status: 'verified-external',
+      reason_code: 'graphify-hook-external-verified',
+      refresh_mode: 'commit-hook-external-verified',
+    };
+  }
+  return {
+    installed: false,
+    verified: false,
+    status: 'blocked',
+    reason_code: 'graphify-hook-path-outside-project',
+    refresh_mode: 'manual-only',
+  };
+}
+
 function graphifyHookTargetMatches(repoRoot, expectedRoot) {
   const current = resolveGraphifyHookTarget(repoRoot);
   return current.classification === 'project-contained'
@@ -652,6 +708,9 @@ function failedGraphifyHookOutcome(reasonCode, installed = false) {
 }
 
 function verifyGraphifyHookCapability(repoRoot, runtimeContext, target, installed, pythonProvider) {
+  // 项目外有效 hooks root：只读验证 commit hook 是否携带 Graphify marker（R3），
+  // 无论 provider 是否安装都可报告 verified-external / blocked；绝不 execute/write/status。
+  if (target.classification === 'external') return externalGraphifyHookOutcome(target);
   const outcome = defaultGraphifyHookOutcome(target);
   if (!installed || target.classification !== 'project-contained') return outcome;
   const hook = runProjectGraphifyHookCommand(runtimeContext, repoRoot, target.absolute, ['hook', 'status'], 30000);
@@ -672,6 +731,7 @@ function verifyGraphifyHookCapability(repoRoot, runtimeContext, target, installe
 }
 
 function applyGraphifyHookCapability(repoRoot, runtimeContext, target, pythonProvider) {
+  if (target.classification === 'external') return externalGraphifyHookOutcome(target);
   if (target.classification !== 'project-contained') return defaultGraphifyHookOutcome(target);
   const hooksRoot = target.absolute;
   let hookInstalled = false;
@@ -730,11 +790,56 @@ function applyGraphifyHookCapability(repoRoot, runtimeContext, target, pythonPro
     );
 }
 
+// 单仓 consume-side 新鲜度（R10/R11/KTD5a）：spec-first 只在自己生成图时写基线快照；
+// 消费侧只读比对当前 HEAD，产出 advisory 事实，绝不触发重建。external/native hook 刷新的图
+// 无基线时降级 no-baseline，沿用 verify() 既有 unknown 诚实信号。
+const SINGLE_REPO_GRAPH_BASELINE = 'spec-first-graph-baseline.json';
+
+function readGitHeadSha(repoRoot) {
+  const result = spawnSync('git', ['-C', path.resolve(repoRoot), 'rev-parse', 'HEAD'], {
+    encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000, windowsHide: true,
+  });
+  if (result.error || result.status !== 0) return null;
+  return String(result.stdout || '').trim() || null;
+}
+
+function writeSingleRepoGraphBaseline(repoRoot, artifactRoot) {
+  try {
+    const head = readGitHeadSha(repoRoot);
+    if (!head) return;
+    ensureContainedDirectory(repoRoot, artifactRoot, { reasonCode: 'graphify-baseline-symlink-escape' });
+    const target = assertContainedPath(repoRoot, path.join(artifactRoot, SINGLE_REPO_GRAPH_BASELINE), {
+      reasonCode: 'graphify-baseline-symlink-escape',
+    });
+    fs.writeFileSync(target, `${JSON.stringify({ schema_version: 'graphify-single-repo-baseline.v1', head_sha: head }, null, 2)}\n`, 'utf8');
+  } catch (_error) {
+    // 基线是 advisory；写失败绝不阻塞核心 setup。
+  }
+}
+
+function readSingleRepoGraphFreshness(repoRoot, artifactRoot) {
+  try {
+    const target = path.join(artifactRoot, SINGLE_REPO_GRAPH_BASELINE);
+    if (!fs.existsSync(target)) return { state: 'no-baseline' };
+    const baseline = JSON.parse(fs.readFileSync(target, 'utf8'));
+    const head = readGitHeadSha(repoRoot);
+    if (!head || !baseline || !baseline.head_sha) return { state: 'unknown' };
+    return { state: head === baseline.head_sha ? 'reflects-head' : 'head-moved' };
+  } catch (_error) {
+    return { state: 'unknown' };
+  }
+}
+
 function graphifyHookNextActions(outcome) {
   if (!outcome || outcome.verified) return [];
+  if (outcome.status === 'verified-external') {
+    return [
+      'commit-time 自动刷新已只读验证：有效 Git hooks root（项目外）存在 Graphify commit hook，其执行由 Git 负责、未经 spec-first 结构验证；核心图查询可正常使用，图内容仍需回源确认。',
+    ];
+  }
   if (outcome.status === 'blocked' && outcome.reason_code === 'graphify-hook-path-outside-project') {
     return [
-      '可选 project-local 自动刷新未启用：项目外 Git hook 策略未被读取或修改，其现有 hook 是否会执行 Graphify 未经 setup 验证；可继续正常使用核心图查询。只有源码已变化且消费前需要新的 currentness evidence 时，才按需运行 spec-runtime-setup --only graphify --refresh。只有仓库 owner 确认不会绕过现有 commit-msg/pre-commit/pre-push 等策略后，才可显式设置项目内 core.hooksPath 并重新运行 Graphify setup。',
+      '可选 commit-time 自动刷新未检测到：有效 Git hooks root（项目外）未见 Graphify commit hook，setup 不读取其余内容、也不写入外部 hook。若要启用，只有仓库 owner 确认不会绕过现有 commit-msg/pre-commit/pre-push 等策略后，可在项目内设置 core.hooksPath 并运行 spec-runtime-setup --only graphify（安装只写项目内路径），或自行在其全局 hook 中加入 graphify。核心图查询不受影响。',
     ];
   }
   if (outcome.status === 'blocked' && outcome.reason_code === 'graphify-hook-target-changed') {
@@ -1006,6 +1111,12 @@ function graphifyProviderLimitations(runtimeContext, graphIntegrity, incumbentCl
       'skipped',
       hookOutcome.reason_code,
       '当前项目没有可用的 project-local Git hook；Graphify 稳态刷新使用显式命令。',
+    ));
+  } else if (hookOutcome && hookOutcome.status === 'verified-external') {
+    limitations.push(providerLimitation(
+      'verified-external',
+      hookOutcome.reason_code || 'graphify-hook-external-verified',
+      'commit-time 自动刷新已只读验证：项目外 Git hooks root 存在 Graphify commit hook；其执行未经 spec-first 结构验证，图内容仍需回源确认。',
     ));
   } else if (hookOutcome && !hookOutcome.verified) {
     limitations.push(providerLimitation(

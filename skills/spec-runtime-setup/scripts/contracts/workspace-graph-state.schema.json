@@ -9,7 +9,7 @@
     "generated_at": { "type": "string", "minLength": 1 },
     "operation_status": { "type": "string", "enum": ["building", "complete", "partial", "failed"] },
     "reason_code": { "type": "string" },
-    "refresh_mode": { "type": "string", "enum": ["explicit"] },
+    "refresh_mode": { "type": "string", "enum": ["explicit", "commit-hook-spec-first-async"] },
     "repos": {
       "type": "array",
       "items": {

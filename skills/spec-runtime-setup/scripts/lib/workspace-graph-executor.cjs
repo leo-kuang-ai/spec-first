@@ -11,6 +11,7 @@
 // the renderer/doctor (U4) and clean (U6) consume; never throws for a per-repo
 // provider failure — those are isolated in the build layer.
 
+const path = require('node:path');
 const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
 const { buildWorkspaceGraphs } = require('./workspace-graph-build.cjs');
 const { makeWorkspaceRunners } = require('./workspace-provider-runners.cjs');
@@ -19,6 +20,7 @@ const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
 const { workspaceGraphRefreshPosture } = require('./workspace-graph-refresh.cjs');
 const { CANONICAL_HOSTS } = require('./host-authority.cjs');
 const { writeWorkspaceGraphState } = require('./workspace-graph-state.cjs');
+const { installWorkspaceChildHooks } = require('./workspace-child-hook.cjs');
 
 const defaultExec = defaultWorkspaceExec;
 
@@ -32,6 +34,7 @@ function runWorkspaceGraphBuild({
   graphifyCommand = 'graphify',
   hosts = [...CANONICAL_HOSTS],
   injectRouting = true,
+  installHooks = true,
 } = {}) {
   const targets = resolveWorkspaceTargets({ cwd, repos, allowDiscovery, manifestPath });
 
@@ -104,18 +107,18 @@ function runWorkspaceGraphBuild({
     routing = injectRoutingInstruction({ workspaceRoot: targets.workspace_root, repos: confirmed, hosts });
   }
 
-  const refresh = workspaceGraphRefreshPosture();
-  const hooks = {
-    schema_version: 'workspace-graph-hooks.v1',
-    status: 'not-installed',
-    reason_code: refresh.reason_code,
-    repos: confirmed.map((repo) => ({
-      repo_id: repo.repo_id,
-      hook_status: 'not-installed',
-      reason_code: refresh.reason_code,
-      fallback: 'explicit-workspace-graph-refresh',
-    })),
-  };
+  // spec-first 自有子仓 commit hook：仅当 build 产出可用图（complete/partial）时安装，
+  // 且只写有效 hooks root 在 child 内的子仓（external/unsafe 绝不写，merged 降级 advisory）。
+  const canInstallHooks = installHooks && (build.status === 'complete' || build.status === 'partial');
+  const hooks = installWorkspaceChildHooks({
+    workspaceRoot: targets.workspace_root,
+    repos: confirmed,
+    node: process.execPath,
+    asyncRefreshScript: path.join(__dirname, 'workspace-async-refresh.cjs'),
+    setupScript: path.resolve(__dirname, '..', 'setup.cjs'),
+    install: canInstallHooks,
+  });
+  const refresh = workspaceGraphRefreshPosture(hooks);
 
   let status = build.status;
   let reasonCode = build.reason_code;

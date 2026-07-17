@@ -235,6 +235,8 @@ function renderHumanSummary(
     if (steadyState.hook_status) {
       if (steadyState.hook_status === 'blocked') {
         lines.push(`  optional_auto_refresh: unavailable-by-project-boundary; refresh=${steadyState.refresh_mode || 'manual-only'}; external_hook_execution=unverified; hook_fact=blocked${steadyState.hook_skipped_reason ? ` (${steadyState.hook_skipped_reason})` : ''}`);
+      } else if (steadyState.hook_status === 'verified-external') {
+        lines.push(`  commit_time_refresh: external-hook-read-only-verified; refresh=${steadyState.refresh_mode || 'commit-hook-external-verified'}; external_hook_execution=unverified; project_owned=false; hook_fact=verified-external`);
       } else {
         lines.push(`  steady_state: refresh=${steadyState.refresh_mode || 'unknown'}; project_hook=${steadyState.hook_status}${steadyState.hook_skipped_reason ? ` (${steadyState.hook_skipped_reason})` : ''}`);
       }

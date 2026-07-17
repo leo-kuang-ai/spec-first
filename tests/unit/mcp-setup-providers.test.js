@@ -453,7 +453,7 @@ describe('Graphify provider', () => {
     let actionPlan;
     let result;
     try {
-      expect(provider.resolveGraphifyHookTarget(target)).toEqual({
+      expect(provider.resolveGraphifyHookTarget(target)).toMatchObject({
         classification: 'external',
         reason_code: 'graphify-hook-path-outside-project',
       });
@@ -474,7 +474,12 @@ describe('Graphify provider', () => {
       lstatSpy.mockRestore();
       readSpy.mockRestore();
     }
-    expect(outsideProbes).toEqual([]);
+    // R3 放宽：external 从「零 probe」变为「只读验证」——仅 lstat/read 两个 hook 文件，
+    // 绝不 write/execute，绝不触碰其余文件（如 sentinel）。此 fixture 无 marker → 仅 lstat（文件不存在即止）。
+    expect(outsideProbes.map(([op, candidate]) => [op, path.basename(String(candidate))])).toEqual([
+      ['lstatSync', 'post-commit'],
+      ['lstatSync', 'post-checkout'],
+    ]);
     expect(hookCalls).toEqual([]);
     expect(fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')])).toEqual(before);
     expect(result).toMatchObject({
@@ -509,10 +514,86 @@ describe('Graphify provider', () => {
       },
     });
     expect(verified.next_actions).toEqual([
-      expect.stringContaining('可选 project-local 自动刷新未启用'),
+      expect.stringContaining('可选 commit-time 自动刷新未检测到'),
     ]);
-    expect(verified.next_actions.join('\n')).toContain('现有 hook 是否会执行 Graphify 未经 setup 验证');
+    expect(verified.next_actions.join('\n')).toContain('也不写入外部 hook');
     expect(verified.next_actions.join('\n')).not.toContain('执行显式 incremental refresh');
+  });
+
+  test('read-only verifies an external commit hook carrying the Graphify marker as verified-external', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('external-hooks-verified');
+    const { target, context, hookCalls } = fixture;
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-verified-user-hooks-'));
+    fs.writeFileSync(
+      path.join(outsideHooks, 'post-commit'),
+      '#!/bin/sh\n# graphify-hook-start\n# Installed by: graphify hook install\ngraphify update .\n# graphify-hook-end\n',
+    );
+    fs.chmodSync(path.join(outsideHooks, 'post-commit'), 0o755);
+    const configured = spawnSync('git', ['-C', target, 'config', '--local', 'core.hooksPath', outsideHooks], { encoding: 'utf8' });
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+    const before = fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')]);
+
+    const writeSpy = jest.spyOn(fs, 'writeFileSync');
+    let result;
+    try {
+      const actionPlan = provider.plan(context);
+      result = provider.apply(context, actionPlan);
+    } finally {
+      writeSpy.mockRestore();
+    }
+    // 零写入外部 hooks root、零 hook 子命令、外部目录逐字节不变。
+    expect(writeSpy.mock.calls.filter(([candidate]) => String(candidate).startsWith(outsideHooks))).toEqual([]);
+    expect(hookCalls).toEqual([]);
+    expect(fs.readdirSync(outsideHooks).map((name) => [name, fs.readFileSync(path.join(outsideHooks, name), 'utf8')])).toEqual(before);
+    expect(result).toMatchObject({
+      steady_state: {
+        refresh_mode: 'commit-hook-external-verified',
+        hook_installed: false,
+        hook_verified: false,
+        hook_status: 'verified-external',
+        hook_skipped_reason: 'graphify-hook-external-verified',
+      },
+    });
+    expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
+    expect(JSON.stringify(result)).not.toContain(outsideHooks);
+
+    const verified = provider.verify(context);
+    expect(hookCalls).toEqual([]);
+    expect(verified.steady_state).toMatchObject({
+      refresh_mode: 'commit-hook-external-verified',
+      hook_status: 'verified-external',
+    });
+    expect(verified.next_actions.join('\n')).toContain('commit-time 自动刷新已只读验证');
+  });
+
+  test('writes a single-repo graph baseline on generation and surfaces a head-moved advisory (U6b)', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('single-repo-baseline');
+    const { target, context } = fixture;
+    const gitEnv = {
+      ...process.env,
+      GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@e', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@e',
+    };
+    const commit = (msg) => spawnSync('git', ['-C', target, 'commit', '--allow-empty', '--no-gpg-sign', '-m', msg], { env: gitEnv, encoding: 'utf8' });
+    commit('c1');
+
+    const result = provider.apply(context, provider.plan(context));
+    const baselinePath = path.join(target, '.graphify', 'spec-first-graph-baseline.json');
+    expect(fs.existsSync(baselinePath)).toBe(true);
+    expect(result.first_generation.status).toBe('completed');
+
+    // Same HEAD → no head-moved advisory (consume-side read-only, never triggers a rebuild).
+    const graphifyCallsBefore = fixture.graphifyCalls.length;
+    const v1 = provider.verify(context);
+    expect(v1.next_actions.join('\n')).not.toContain('图基线落后当前 HEAD');
+
+    // HEAD moves → head-moved advisory appears; still no rebuild command issued by verify.
+    commit('c2');
+    const v2 = provider.verify(context);
+    expect(v2.next_actions.join('\n')).toContain('图基线落后当前 HEAD');
+    expect(fixture.graphifyCalls.filter((c) => c.args[0] === 'update' || c.args[0] === 'extract').length)
+      .toBe(fixture.graphifyCalls.slice(0, graphifyCallsBefore).filter((c) => c.args[0] === 'update' || c.args[0] === 'extract').length);
   });
 
   test('does not claim fresh when ordinary setup only probes an existing Graphify artifact', () => {

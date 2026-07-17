@@ -37,6 +37,34 @@ function fakeExec(command, args) {
   return { status: 0, stdout: '', stderr: '' };
 }
 
+describe('runWorkspaceGraphStatus — async refresh consume-side honesty (U6)', () => {
+  const { runWorkspaceGraphStatus } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs');
+
+  test('surfaces a failed background merged rebuild without triggering one', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.writeFileSync(
+      path.join(ws, '.graphify', 'workspace-async-refresh-status.json'),
+      JSON.stringify({ schema_version: 'workspace-async-refresh-status.v1', ok: false, reason_code: 'workspace-async-refresh-nonzero-exit' }),
+    );
+    const rebuildExec = jest.fn(() => ({ status: 0 }));
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: rebuildExec });
+    expect(status.workspace.async_refresh).toMatchObject({ status: 'failed', reason_code: 'workspace-async-refresh-nonzero-exit' });
+    // 消费侧只读：绝不触发 merged 重建。
+    expect(rebuildExec.mock.calls.filter(([, args]) => Array.isArray(args) && args.includes('--workspace-graph'))).toEqual([]);
+  });
+
+  test('reports in-flight while the async lock is held', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.writeFileSync(path.join(ws, '.graphify', 'workspace-async-refresh.lock'), JSON.stringify({ pid: process.pid, started_at_ms: 0 }));
+    const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: () => ({ status: 0 }) });
+    expect(status.workspace.async_refresh.status).toBe('in-flight');
+  });
+});
+
 describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
   test('after a complete build, status reports ready; parent cwd has no invented default projectPath', () => {
     const ws = mkWorkspace();
