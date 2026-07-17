@@ -2,7 +2,7 @@
 
 日期：2026-07-17  
 计划：`docs/plans/2026-07-17-001-fix-runtime-setup-project-local-graphify-hook-boundary-plan.md`  
-验证范围：Runtime Setup Graphify plan/apply/verify、共享 Git path resolver、provider-readiness、human output、五宿主 projection、真实 Graphify 0.9.12 contained/external dogfood。
+验证范围：Runtime Setup Graphify plan/apply/verify、共享 Git path resolver、provider-readiness、human output、五宿主 projection、真实 Graphify 0.9.17 contained/external dogfood。
 
 ## 结论
 
@@ -13,7 +13,7 @@
 ### 聚焦单元与入口验证
 
 - `npx jest tests/unit/mcp-setup-providers.test.js tests/unit/mcp-setup-facts-renderer.test.js tests/unit/mcp-setup-contracts.test.js --runInBand`
-  - 结果：3 suites，74 tests，全部通过。
+  - 结果：3 suites，76 tests，全部通过。
   - 覆盖：external 零 hook runner 调用、external Node filesystem probe spy 对 resolver/plan/apply 全路径为零、外部目录不变、contained custom hooks root、继承 `GIT_CONFIG_*` 清洗、命令级 pin、plan/apply drift、postflight drift、symlink escape、blocked schema、已有图普通 setup 不误报 fresh、显式 refresh 计划/执行 `graphify update` 且无 spec-first staging/backup、unknown core-ready 强制 query probe、ready-with-optional-limitation renderer。
 - `npx jest tests/unit/mcp-setup-entrypoint.test.js tests/unit/mcp-setup-node-contracts.test.js tests/unit/mcp-setup-contracts.test.js --runInBand`
   - 结果：3 suites，68 tests，全部通过。
@@ -31,7 +31,7 @@
 ### 临时 HOME 真实 Provider dogfood
 
 - `SPEC_FIRST_REAL_GRAPHIFY_DOGFOOD=1 npx jest tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js --runInBand`
-  - 结果：1 suite，2 tests，全部通过；使用当前 PATH 中真实 `graphify 0.9.12`、`codegraph 1.4.1` 与 uv tool environment。
+  - 结果：1 suite，2 tests，全部通过；使用当前 PATH 中真实 `graphify 0.9.17`、`codegraph 1.4.1` 与 uv tool environment。
   - External 场景：临时 HOME 的 global `core.hooksPath` 指向 fixture project 外目录；完整 `--only codegraph,graphify` 在约 24–26 秒内 exit 0、`overall_status=ready`，Graphify 为 `fresh + blocked/manual-only`，external hook tree 的逐文件 SHA-256 snapshot 前后相同，stdout/stderr 不含 external absolute path。
   - External 重复 setup：已有图时再次运行普通 `--only graphify` 只做完整性与真实 query probe，不生成或刷新图，因此保持 `overall_status=ready`，但 Graphify freshness 为 `unknown + blocked/manual-only`；external hook tree 仍逐字节不变。随后修改 fixture source 并运行显式 `--only graphify --refresh`，真实 `graphify update` 使 graph hash 变化、`addedByManualRefresh` query 成功、fresh evidence 恢复，且项目根不存在 `.graphify.backup-*`、`.graphify.staging-*` 或 migration journal。
   - Contained 场景：仓库 local `core.hooksPath=.githooks`；`--only graphify` 在约 22–25 秒内完成，post-commit/post-checkout 均包含唯一 Provider marker、`GRAPHIFY_OUT=.graphify` managed block与 credential isolation block，facts 为 `hook_status=verified`、`refresh_mode=skill-cli-hook-on-demand`。
@@ -39,10 +39,10 @@
 ### 最终仓库验证
 
 - `npm run typecheck`：180 files checked，passed。
-- `npm run test:unit`：117 suites，1104 tests，全部通过。
+- `npm run test:unit`：117 suites，1107 tests，全部通过。
 - `npm run test:smoke`：1 suite，5 tests，全部通过。
 - `npm run test:integration`：6 suites passed，1 suite expected skipped；21 tests passed，2 real-dogfood tests skipped by default。
-- `npm run test:mcp-setup`：28 suites，396 tests，全部通过。
+- `npm run test:mcp-setup`：28 suites，398 tests，全部通过。
 - `npm run lint:skill-entrypoints`：309 files scanned，passed。
 - `npx jest tests/unit/test-inventory-contracts.test.js --runInBand`：1 suite，4 tests，全部通过。
 - `npm run build`：`npm pack --dry-run` 通过；667 files，package 约 1.8 MB，包含 `skills/spec-runtime-setup/scripts/lib/git-path.cjs`。
@@ -51,13 +51,13 @@
 ### Review 与语义验证状态
 
 - `spec-simplify-code`：以内联方式完成；复用现有 resolver owner，安全 gate、TOCTOU 复核、进程 pin 与 external lexical fast-path 均作为 protected surface 保留。
-- `spec-code-review`：`dispatch_authorization_missing`，未运行 persona、validator 或 cross-model reviewer；按 shipping fallback 对本轮 tracked diff 与可归属新文件执行完整内联 report-only 扫描。扫描期间修复 3 项：已有图普通 setup 误报 `fresh`、unknown readiness 漏检 `query_verified`、external filesystem-probe spy 未覆盖 plan/apply。修复后无剩余 actionable finding。
+- `spec-code-review`：`dispatch_authorization_missing`，未运行 persona、validator 或 cross-model reviewer；按 shipping fallback 对本轮 tracked diff 与可归属新文件执行完整内联 report-only 扫描。扫描期间修复 4 项：已有图普通 setup 误报 `fresh`、unknown readiness 漏检 `query_verified`、external filesystem-probe spy 未覆盖 plan/apply、refresh 在 shrink guard 拒绝后自动追加 `--force`。修复后无剩余 actionable finding。
 - `fresh_source_eval`：`not_run`，`not_run_reason=dispatch_authorization_missing`。因此只能声明 direct source review、contract tests、隔离五宿主 projection 与真实 Provider dogfood 已通过，不能声明独立 fresh-source semantic reviewer passed。
 
 ### Graphify 官方行为与现场日志复核
 
 - PyPI package metadata 将 `graphifyy` 的官方 repository 指向 `https://github.com/safishamsi/graphify`。0.9.12 README 与 packaged `references/hooks.md` 推荐 `graphify hook install`，安装 `post-commit` / `post-checkout`：提交后异步执行 code-only AST rebuild，已有 hook 时追加 Provider marker；docs/images 变化仍需显式 update。
-- 0.9.12 CLI 将 `graphify update <path>`定义为“re-extract code files and update the graph”；实现与官方 hook 共用 `graphify.watch._rebuild_code`。显式 CLI 会阻塞等待 per-repo lock，使用临时 graph 后 replace current graph，保留未变文件、旧 semantic nodes/edges 与 community mapping，并在 shrink guard 拒绝时返回失败。因此 Runtime Setup 直接复用该 Provider owner，不再维护第二套目录级 clean-rebuild/rollback 协议。
+- 0.9.17 CLI 将 `graphify update <path>`定义为“re-extract code files and update the graph”；实现与官方 hook 共用 `graphify.watch._rebuild_code`。显式 CLI 会阻塞等待 per-repo lock，使用临时 graph 后 replace current graph，保留未变文件、旧 semantic nodes/edges 与 community mapping，并在 shrink guard 拒绝时返回失败。Runtime Setup 不自动追加 `--force` 绕过该保护，直接复用 Provider owner，不再维护第二套目录级 clean-rebuild/rollback 协议。
 - 0.9.12 packaged `graphify/hooks.py` 与上游 0.9.17 source 都通过 `git rev-parse --git-path hooks` 解析有效 hooks root，CLI 没有 `--hooks-dir` 或 project-only hook 参数。因此全局 `core.hooksPath` 指向用户目录时，官方 installer 仍可能写入共享 hook root；spec-first 的 project containment 是必要授权边界，不应为追求“全绿”移除。
 - `/Users/kuang/xiaobu/email_week_reports/2026-07-17-013914-local-command-caveatcaveat-the-messages-below.txt` 显示执行 agent 把 core-ready `unknown` 误判为 query 需验证并自动运行 refresh。现场只读复核同时确认该仓有效 hooks root 为 `/Users/kuang/.githooks`，其中已存在 Graphify marker 与 `GRAPHIFY_OUT=.graphify` block。由此修正产品语义：普通 setup/verify 的 core-ready `unknown` 不自动 refresh；`manual-only` 只描述 spec-first verified project-local posture，external hook execution 必须标为 unverified，不能声称外部 hook 不存在或“无法安装”。
 

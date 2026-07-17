@@ -8,6 +8,7 @@
 
 最新审查及其衍生的 active recommendations 由下游 PRD / plan 承接，避免在历史报告里反复检索：
 
+- **Skill 关联关系系统审查**（最新）：审查见 [2026-07-17-skill-flow-system-audit/](2026-07-17-skill-flow-system-audit/README.md)；逐文件覆盖 35 个 governed Skill 的 275 个 `SKILL.md + references/**` source 文件、157 个 canonical cross-skill mention pair 和 76 个直接支撑文件，确认主链 ownership 基本成立，但 internal helper 五宿主可达性、generic dispatch/code-review mutation authority、task-pack review consumer、commit authorization、knowledge promotion 与 artifact/config consumer map 仍有 11 个 P1。后续只建议三个工作包：恢复 caller-target reachability、统一 dispatch/hard-exit authority、校准 canonical producer-consumer contract。
 - **Review Token 消耗专项分析**（最新）：审查见 [2026-07-14-spec-review-token-consumption-analysis.md](2026-07-14-spec-review-token-consumption-analysis.md)；确认 `spec-doc-review` 的文档/公共 contract 多 persona 复制，以及 `spec-code-review` 的默认 full roster、逐 finding validator、完整 diff 重复读取、Codex 上下文继承与模型分层退化，是当前高消耗的主要结构性来源。建议先建立 run-level cost manifest，再依次收紧 validator、按风险重构 roster、隔离子 agent 上下文并实施 reviewer-specific slicing；现有 `docs/plans/2026-07-14-001-refactor-spec-doc-review-token-optimization-plan.md` 仅覆盖 doc-review prompt 分层，code-review 仍需独立收敛。
 - **系统性项目审查与优化方案**（最新）：审查见 [2026-07-05-系统性项目审查与优化方案.md](2026-07-05-系统性项目审查与优化方案.md)；按 `docs/10-prompt/系统性项目审查方法.md` 重新裁决 06-15/07-02/07-03 历史 finding，确认 README/adoption-first 与五宿主 preview 已明显推进，但 P0 outcome evidence、P1 Windows workflow portability、P1 OSS governance、P1 enterprise adoption proof 与 P1 preview host honesty 仍需闭环或显式 deferred。已起三个 origin trace plan 承接或延期对应 finding：`docs/plans/2026-07-05-001-review-closure-outcome-ledger-plan.md`、`docs/plans/2026-07-05-002-windows-workflow-portability-plan.md`、`docs/plans/2026-07-05-003-oss-adoption-governance-plan.md`。
 - **项目整体严格审查（历史快照）**：审查见 [2026-07-02-项目整体严格审查报告.md](2026-07-02-项目整体严格审查报告.md)；该报告按当时 source inventory 建立覆盖。2026-07-07 完整退役 standards governance 后，其 skill/agent/standards inventory 不再代表当前状态；当前 active recommendations 以 2026-07-05 系统性项目审查和后续 plan 为准。
@@ -19,6 +20,7 @@
 
 | 日期 | 审查文档 | 主题 |
 | --- | --- | --- |
+| 2026-07-17 | [Skill 关联关系系统审查](2026-07-17-skill-flow-system-audit/README.md) | 35 个 governed Skill、275 个 source 文件、157 个 canonical mention pair 的 route/handoff/consumer/authority/failure/internal-helper 全量审查 |
 | 2026-07-14 | [Review Token 消耗专项分析](2026-07-14-spec-review-token-consumption-analysis.md) | `spec-doc-review` / `spec-code-review` 的 prompt、persona、上下文复制、validator 与 Codex dispatch 成本分析 |
 | 2026-07-06 | [真实状态与提升优先级](2026-07-06-真实状态与提升优先级.md) | 当前真实状态、提升优先级和 adoption/value evidence 缺口 |
 | 2026-07-06 | [Skill Prompt 精简优化方案](2026-07-06-skill-prompt-精简优化方案.md) | skill prompt token 成本、activation index 与 active body 分层优化 |

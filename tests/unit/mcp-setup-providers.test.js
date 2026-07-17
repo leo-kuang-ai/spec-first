@@ -597,6 +597,43 @@ describe('Graphify provider', () => {
     expect(fs.existsSync(path.join(fixture.target, '.graphify-migration-journal.json'))).toBe(false);
   });
 
+  test('preserves the Graphify shrink guard instead of retrying refresh with force', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('incremental-refresh-shrink-guard');
+    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, '.graphify', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
+    );
+    const baseRunner = fixture.context.runner;
+    const updateCalls = [];
+    const refreshContext = {
+      ...fixture.context,
+      refresh: true,
+      runner(command, args, options) {
+        if (command === fixture.launcher && args[0] === 'update') {
+          updateCalls.push({ args: [...args], env: { ...((options && options.env) || {}) } });
+          return failure('Refusing to overwrite. Pass --force to override.');
+        }
+        return baseRunner(command, args, options);
+      },
+    };
+    const actionPlan = provider.plan(refreshContext);
+
+    const result = provider.refresh(refreshContext, actionPlan);
+
+    expect(updateCalls).toEqual([
+      expect.objectContaining({
+        args: ['update', '.'],
+        env: expect.objectContaining({ GRAPHIFY_OUT: '.graphify' }),
+      }),
+    ]);
+    expect(result).toMatchObject({
+      readiness_status: 'degraded',
+      limitations: expect.arrayContaining([expect.stringContaining('graphify-refresh-failed')]),
+    });
+  });
+
   test('keeps the project artifact root when refreshing a nested requirement workspace', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('nested-workspace-refresh');
@@ -607,16 +644,28 @@ describe('Graphify provider', () => {
       JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
     );
 
-    const actionPlan = provider.plan({
+    const refreshContext = {
       ...fixture.context,
       refresh: true,
       requirementWorkspace: path.join('packages', 'api'),
-    });
+    };
+    const actionPlan = provider.plan(refreshContext);
     expect(actionPlan.actions.find((action) => action.kind === 'refresh')).toMatchObject({
       args: ['update', path.join('packages', 'api')],
       graphify_out: path.join('..', '..', '.graphify'),
     });
     expect(actionPlan.artifact_root).toBe(path.join(fixture.target, '.graphify'));
+
+    const result = provider.refresh(refreshContext, actionPlan);
+
+    expect(fixture.graphifyCalls.find((call) => call.args[0] === 'update')).toMatchObject({
+      args: ['update', path.join('packages', 'api')],
+      env: expect.objectContaining({ GRAPHIFY_OUT: path.join('..', '..', '.graphify') }),
+    });
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: { artifact_exists: true, query_verified: true },
+    });
   });
 
   test('pins Graphify hook commands to a contained custom hooks root and verifies that root', () => {

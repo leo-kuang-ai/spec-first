@@ -1,7 +1,7 @@
 ---
 title: "Runtime Setup Project-Local Graphify Hook Boundary - Plan"
 type: fix
-status: active
+status: completed
 date: 2026-07-17
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready

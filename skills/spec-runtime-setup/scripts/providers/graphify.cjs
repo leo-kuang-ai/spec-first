@@ -409,19 +409,7 @@ function apply(context = {}, actionPlan = plan(context)) {
         timeoutMs: 120000,
         env: { GRAPHIFY_OUT: action.graphify_out || actionPlan.artifact_root_relative || '.graphify' },
       });
-      if (!succeeded(refresh)) {
-        const diagnostic = text(refresh);
-        const incrementalUpdate = action.args[0] === 'update';
-        if (incrementalUpdate && /Refusing to overwrite/i.test(diagnostic) && /--force|force/i.test(diagnostic)) {
-          const force = runGraphify(runtimeContext, [...action.args, '--force'], {
-            cwd: repoRoot,
-            timeoutMs: 120000,
-          });
-          if (!succeeded(force)) mutationFailure = 'graphify-refresh-force-failed';
-        } else {
-          mutationFailure = 'graphify-refresh-failed';
-        }
-      }
+      if (!succeeded(refresh)) mutationFailure = 'graphify-refresh-failed';
     }
     if (mutationFailure) break;
   }
