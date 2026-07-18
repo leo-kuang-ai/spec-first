@@ -77,4 +77,21 @@ describe('spec-work current contracts', () => {
     expect(engines).toContain('active → completed');
     expect(engines).toContain('Return-to-Caller');
   });
+
+  test('shipping performs report-only plan review with before/after hash and P0/P1 disposition', () => {
+    expect(shipping).toContain('Source Plan Semantic Review (before Final Validation)');
+    expect(shipping).toContain('node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"');
+    expect(shipping).toMatch(/当前已加载的 `spec-work\/SKILL\.md` 所在目录解析 `SKILL_DIR`/);
+    expect(shipping).toMatch(/不得从 project cwd.*source checkout 路径定位 bundled helper/is);
+    expect(shipping).not.toContain('spec-first tasks hash <source-plan> --repo <artifact-root> --json');
+    expect(shipping).toContain('spec-doc-review mode:headless mutation:report-only output:json <source-plan>');
+    expect(shipping).toContain('doc-review-json-invalid');
+    expect(shipping).toContain('plan-changed-during-review');
+    expect(shipping).toMatch(/P0\/P1.*阻断 Final Validation/is);
+    expect(shipping).toContain('fixes_applied: 0');
+    expect(shipping).toMatch(/recompose.*source-plan\/task-pack intake/is);
+    expect(shipping).toMatch(/重新生成或验证 task pack.*semantic-fit/is);
+    expect(shipping).toMatch(/重跑受影响的实现验证与 code review/is);
+    expect(shipping).toMatch(/不得 patch hash.*签名\/DACL\/sealed pipeline/is);
+  });
 });

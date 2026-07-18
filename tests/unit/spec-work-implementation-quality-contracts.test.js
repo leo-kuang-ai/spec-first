@@ -46,6 +46,35 @@ describe('spec-work feedback and implementation quality contracts', () => {
     expect(feedback).toMatch(/LLM.*选择哪些 checks.*语义充分/is);
   });
 
+  test('feedback owner selects slices by contract and risk while keeping tests behavior-observable', () => {
+    expect(feedback).toContain('## Slice Selection');
+    expect(feedback).toMatch(/默认选择 vertical slice.*独立观察.*实现.*验证/is);
+    expect(feedback).toMatch(/多个 consumer 共享同一输入\/输出\/error contract.*最早可运行反馈.*contract-first.*立即回到.*vertical slice/is);
+    expect(feedback).toMatch(/最高损失.*最高不确定性.*最难回滚.*risk-first.*最小 proof\/characterization/is);
+    expect(feedback).toMatch(/rollback-friendly.*可撤销 seam.*orphan.*重复效果.*中间状态/is);
+    expect(feedback).toMatch(/语义判断.*不是文件类型或关键词分类/is);
+
+    expect(feedback).toContain('## Test Design Quality');
+    expect(feedback).toMatch(/DAMP.*名称.*setup.*断言.*表达行为和业务状态/is);
+    expect(feedback).toMatch(/state over interaction.*可观察.*只有 interaction itself is the contract.*调用次数或调用顺序/is);
+    expect(feedback).toContain('real implementation -> high-fidelity fake -> stub -> mock');
+    expect(feedback).toMatch(/No observed RED means no TDD-history claim.*run-local evidence.*production change 前.*RED\/TDD/is);
+    expect(feedback).toMatch(/跳过 serialization.*middleware.*callback.*permission.*retry.*error translation.*不能作为.*integration proof/is);
+  });
+
+  test('feedback-and-tests remains the deterministic owner for slice and test-design anchors', () => {
+    const referencesRoot = path.join(repoRoot, 'skills/spec-work/references');
+    const ownerFiles = fs.readdirSync(referencesRoot)
+      .filter((name) => name.endsWith('.md'))
+      .filter((name) => {
+        const content = fs.readFileSync(path.join(referencesRoot, name), 'utf8');
+        return content.includes('## Slice Selection') || content.includes('## Test Design Quality');
+      });
+
+    expect(ownerFiles).toEqual(['feedback-and-tests.md']);
+    expect(skill).toContain('references/feedback-and-tests.md');
+  });
+
   test('implementation owner rechecks all four postures against current source', () => {
     for (const posture of ['`reuse`', '`extend`', '`compose / thin-glue`', '`new`']) {
       expect(quality).toContain(posture);
@@ -88,7 +117,8 @@ describe('spec-work feedback and implementation quality contracts', () => {
   });
 
   test('source-only examples cover architecture, feedback, and cross-workflow anti-shortcuts', () => {
-    const workCases = new Set(readJson('skills/spec-work/evals/examples.json').cases.map((entry) => entry.id));
+    const workExamples = readJson('skills/spec-work/evals/examples.json').cases;
+    const workCases = new Set(workExamples.map((entry) => entry.id));
     const debugCases = new Set(readJson('skills/spec-debug/evals/examples.json').cases.map((entry) => entry.id));
     const reviewCases = new Set(readJson('skills/spec-code-review/evals/examples.json').cases.map((entry) => entry.id));
 
@@ -101,7 +131,50 @@ describe('spec-work feedback and implementation quality contracts', () => {
       'wrong-owner-reuse-rejected',
       'trivial-non-trigger',
       'docs-only-feedback',
+      'contract-first-shared-cli-contract',
+      'risk-first-high-loss-parser-change',
+      'docs-only-keeps-no-test-exception',
+      'green-only-does-not-prove-tdd-history',
+      'test-double-fidelity-does-not-prove-integration',
     ]) expect(workCases).toContain(id);
+
+    const byId = new Map(workExamples.map((entry) => [entry.id, entry]));
+    expect(byId.get('contract-first-shared-cli-contract')).toMatchObject({
+      input: expect.stringContaining('shared CLI envelope'),
+      expected: expect.stringMatching(/contract-first only.*input\/output\/error contract.*vertical slice/i),
+      forbidden: expect.arrayContaining([
+        expect.stringContaining('without a contract reason'),
+        'select contract-first by file type',
+      ]),
+    });
+    expect(byId.get('risk-first-high-loss-parser-change')).toMatchObject({
+      input: expect.stringMatching(/uncertain malformed-input behavior.*high-cost rollback/i),
+      expected: expect.stringMatching(/highest-loss uncertainty.*rollback-friendly.*observable parser outcomes/i),
+      forbidden: expect.arrayContaining([
+        'treat a green mock interaction as parser behavior proof',
+        'select risk-first by keyword',
+      ]),
+    });
+    expect(byId.get('docs-only-keeps-no-test-exception')).toMatchObject({
+      expected: expect.stringMatching(/no-test exception.*docs\/diff-shape.*source wording/i),
+      forbidden: expect.arrayContaining(['invent a failing runtime test', 'claim TDD history']),
+    });
+    expect(byId.get('green-only-does-not-prove-tdd-history')).toMatchObject({
+      input: expect.stringContaining('no run-local evidence'),
+      expected: expect.stringMatching(/do not claim TDD or RED history.*state\/behavior assertions.*interaction itself is the contract/i),
+      forbidden: expect.arrayContaining([
+        'infer RED from the final green diff',
+        'prefer interaction counts over observable state by default',
+      ]),
+    });
+    expect(byId.get('test-double-fidelity-does-not-prove-integration')).toMatchObject({
+      input: expect.stringMatching(/skips serialization.*middleware.*permissions.*retry.*error translation/i),
+      expected: expect.stringMatching(/Reject the integration claim.*real implementation.*high-fidelity fake.*real-object or integration check/i),
+      forbidden: expect.arrayContaining([
+        'call a seam-skipping mock integration evidence',
+        'choose mock before a usable real implementation or fake',
+      ]),
+    });
 
     expect(debugCases).toContain('root-cause-shortcut-rejected');
     expect(reviewCases).toContain('advisory-evidence-not-confirmed');

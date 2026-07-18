@@ -9,6 +9,10 @@ const synthesis = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc
 const walkthrough = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/walkthrough.md'), 'utf8');
 const bulkPreview = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/bulk-preview.md'), 'utf8');
 const openQuestions = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/open-questions-defer.md'), 'utf8');
+const reportOnlyCases = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-doc-review/evals/report-only-cases.json'),
+  'utf8',
+));
 
 // Lazy references — must exist on disk
 const lazyRefs = [
@@ -53,6 +57,23 @@ describe('spec-doc-review current contracts', () => {
     expect(skill).toMatch(/cannot write.*mutation_reason: write-unavailable/is);
   });
 
+  test('parses explicit report-only and JSON tokens without treating them as paths', () => {
+    expect(skill).toContain('[mutation:report-only] [output:json]');
+    expect(skill).toMatch(/mode:\*.*mutation:\*.*output:\*.*flags, not file paths/is);
+    expect(skill).toContain('Accept only `mutation:report-only` and `output:json`');
+    expect(skill).toMatch(/duplicate token.*multiple `mutation:\*`.*multiple `output:\*`.*fails closed/is);
+    expect(skill).toContain('Review failed: flag-conflict-or-unsupported');
+    expect(skill).toContain('requested_mutation');
+    expect(skill).toContain('output_mode');
+  });
+
+  test('caller-requested report-only overrides only ordinary writable Markdown', () => {
+    expect(skill).toContain('mutation_reason: caller-requested-report-only');
+    expect(skill).toMatch(/explicit caller policy overrides the ordinary Markdown default/is);
+    expect(skill).toMatch(/HTML remains `html-artifact`.*write-unavailable.*format-conflict-or-ambiguous/is);
+    expect(skill).toMatch(/Without the mutation token.*writable Markdown.*`markdown-write`/is);
+  });
+
   test('requires explicit dispatch authorization and preserves the inline fallback', () => {
     expect(skill).toMatch(/direct invocation.*authorizes.*workflow.*not host-level subagent dispatch/is);
     expect(skill).toContain('dispatch_authorization_missing');
@@ -92,6 +113,42 @@ describe('spec-doc-review current contracts', () => {
     }
     expect(synthesis).toMatch(/report-only.*do not load.*walkthrough/is);
     expect(synthesis).toMatch(/report-only.*Open Questions/is);
+  });
+
+  test('JSON output is the existing zero-write envelope in machine-readable form', () => {
+    expect(synthesis).toContain('### JSON Rendering');
+    expect(synthesis).toMatch(/output_mode.*json.*JSON object/is);
+    expect(skill).toMatch(/output_mode: json[\s\S]*do not print this line[\s\S]*final JSON object/is);
+    expect(skill).toMatch(/JSON mode's machine-readable single-object contract overrides the normal announcement requirement/i);
+    expect(synthesis).toMatch(/单对象合同覆盖[\s\S]*cost-shape[\s\S]*reviewer announcement[\s\S]*terminal_signal/is);
+    expect(synthesis).toContain('"mutation_reason": "markdown-artifact|caller-requested-report-only|html-artifact|format-conflict-or-ambiguous|write-unavailable"');
+    expect(synthesis).toContain('"fixes_applied": 0');
+    expect(synthesis).toContain('"applied_fixes": []');
+    expect(synthesis).toContain('"producer_fix_candidates": []');
+    expect(synthesis).toContain('"coverage": []');
+    expect(synthesis).toContain('"limitations": []');
+    expect(synthesis).toMatch(/coverage.*selected\/skipped personas.*cost shape.*isolation.*reviewer outcomes/is);
+    expect(synthesis).toMatch(/不得因 JSON 输出而获得 producer write authority/);
+    expect(synthesis).toMatch(/`markdown-write` \+ `output:json`.*实际 `N`.*对应明细/is);
+    expect(synthesis).toMatch(/`report-only`.*`0`.*`\[\]`/is);
+    expect(synthesis).toMatch(/output_mode: json[\s\S]*Return only the single JSON object/);
+    expect(synthesis).toMatch(/terminal signal exclusively in `terminal_signal: "Review complete"`/);
+    expect(synthesis).toMatch(/do not append an object-external `Review complete`/);
+    expect(synthesis).toMatch(/output_mode: text[\s\S]*return "Review complete" as the terminal signal/);
+  });
+
+  test('report-only evals contain two positive and two negative-owner cases', () => {
+    expect(reportOnlyCases.cases.filter((entry) => entry.kind === 'positive')).toHaveLength(2);
+    expect(reportOnlyCases.cases.filter((entry) => entry.kind === 'negative-owner')).toHaveLength(2);
+    expect(reportOnlyCases.cases.map((entry) => entry.id)).toEqual(expect.arrayContaining([
+      'markdown-caller-requests-json-report-only',
+      'shipping-caller-detects-plan-drift',
+      'default-markdown-still-writes-safe-auto',
+      'html-and-format-conflict-keep-existing-reasons',
+    ]));
+    const markdownJsonParity = reportOnlyCases.cases.find((entry) => entry.id === 'default-markdown-still-writes-safe-auto');
+    expect(markdownJsonParity.input).toContain('output:json');
+    expect(markdownJsonParity.expected).toContain('applied_fixes');
   });
 
   test('mandatory reviewer loss fails closed instead of producing a clean verdict', () => {

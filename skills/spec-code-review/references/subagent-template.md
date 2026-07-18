@@ -177,6 +177,7 @@ Reviewer name: {reviewer_name}
 REVIEW_ARTIFACT_DIR: {review_artifact_dir}
 Artifact path returned to caller: {artifact_path}
 Task scope (empty outside task mode): {task_scope_context}
+Live plan context (empty outside task mode): {live_plan_context}
 
 Intent: {intent_summary}
 
@@ -186,6 +187,8 @@ Diff:
 {diff}
 
 (For a large staged review, `{file_list}` and `{diff}` may be **file paths** rather than inline content. When a value above is a path, Read that file to get the full list/diff before reviewing — never treat the path string itself as the content to review.)
+
+When live plan context says `plan_context_mode: live-plan`, re-read the listed current file and only the named section titles before making a plan-aware claim. When it says `diff-only`, do not infer missing plan intent or claim plan-aware coverage. Never request plan body transport, hash comparison, byte offsets, anchor parsing, or a second context schema.
 </review-context>
 ```
 
@@ -202,3 +205,4 @@ Diff:
 | `{diff}` | Stage 1 output | The diff to review — inline hunks, or a staged file path to Read for a large review |
 | `{run_id}` | Stage 4 output | Unique review run identifier for the artifact directory |
 | `{reviewer_name}` | Stage 3 output | Persona or agent name used as the artifact filename stem |
+| `{live_plan_context}` | Task-scoped Stage 1/2 output | Current plan path, section-title hints, live-plan or diff-only status, and limitation; empty outside task mode |

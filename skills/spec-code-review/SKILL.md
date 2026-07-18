@@ -154,15 +154,16 @@ Routing rules:
 
 ## Reviewers
 
-13 reviewer personas in layered conditionals, plus spec-first local prompt assets. Quick roster with one-line triggers below; the persona catalog in `references/persona-catalog.md` (read it at Stage 3) has the full per-persona selection criteria and spawn gates. Each selected reviewer is a generic subagent seeded with a local prompt file from `references/personas/`; do not dispatch standalone agents by type/name.
+14 reviewer personas in layered conditionals, plus spec-first local prompt assets. Quick roster with one-line triggers below; the persona catalog in `references/persona-catalog.md` (read it at Stage 3) has the full per-persona selection criteria and spawn gates. Each selected reviewer is a generic subagent seeded with a local prompt file from `references/personas/`; do not dispatch standalone agents by type/name.
 
 **Always-on (full review):** local prompt assets `correctness-reviewer`, `testing-reviewer`, `maintainability-reviewer`, `project-standards-reviewer`, plus spec-first local prompt assets `agent-native-reviewer` and `learnings-researcher`. (Stage 3c may reduce this set to a lite roster for trivial, low-risk diffs.)
 
 **Cross-cutting conditional (per diff):**
 
-- `security-reviewer` — auth, public endpoints, user input, permissions
+- `security-reviewer` — auth、tenant/resource authorization、untrusted model/tool/web output、dangerous sinks、reachable dependency risk
 - `performance-reviewer` — DB queries, data transforms, caching, async
 - `api-contract-reviewer` — routes, serializers, type signatures, versioning
+- `frontend-quality-reviewer` — user-visible state, semantic/a11y, focus/contrast, responsive and presentation/data boundaries
 - `data-migration-reviewer` — migration files / schema dumps / backfills (see spawn gate in Stage 3)
 - `reliability-reviewer` — error handling, retries, timeouts, background jobs
 - `adversarial-reviewer` — >=50 changed code lines, or auth / payments / data mutations / external APIs, or a **silent-pass verification mechanism** (CI/CD gating logic, merge-blocking checks, build/deploy steps, coverage/lint gates, or test infrastructure/mocks that could mask production) regardless of size. When selected, a **cross-model adversarial pass** (Stage 4) additionally runs the same brief through a different model family via a peer CLI — additive, non-blocking
@@ -232,6 +233,7 @@ The caller-owned context file must be local, readable, inside the caller's autho
   "schema_version": "spec-code-review-task-context/v1",
   "task_pack_digest": "sha256:<64-hex>",
   "source_plan": "docs/plans/...",
+  "source_plan_section_titles": ["### U6. ...", "### Interface Contracts"],
   "work_run_base": "<same ref or resolved SHA passed via base:>",
   "pre_task_dirty_files": ["repo/relative/path"],
   "pre_task_untracked_files": ["repo/relative/path"],
@@ -264,6 +266,14 @@ Validate before reviewer dispatch:
 4. Read the Task Card's `files`, `expected_side_effects`, `review_gate`, and `review_focus`. The declared files plus narrowly bounded expected side effects are the allowed task surface. `review_focus` guides reviewers but never suppresses correctness findings.
 5. Require a pre-task file fact for every task delta path and both rename endpoints. Re-hash every current delta file and compare it with `current_content_sha256` (`absent` for deletion). Missing, drifting, or contradictory attribution returns `status: degraded`, reason `task-scope-unattributed`, and `required_gate_eligible: false`; a required review must not pass on an invented or concurrently changed task diff.
 
+### Task-Scoped Live Plan Context
+
+`source_plan_section_titles` is an optional producer label list of exact visible section headings relevant to the selected Task Card. It transports only the current plan path plus section titles: never plan body bytes, hashes, byte offsets, anchors, access-control claims, or a second context schema.
+
+When task context provides readable `source_plan` and one or more titles, reviewers re-read that same live file in the current checkout and use only the named sections as plan context. The producer does not attest that the plan is unchanged and the reviewer does not reconstruct a same-session hash check. Ordinary bounded heading lookup is enough; do not introduce an anchor parser.
+
+When the path is missing/unreadable, a title is absent, or section labels are absent, retain the attributed task diff review but set `plan_context_mode: diff-only` and record respectively `task-plan-unreadable`, `task-plan-section-unreadable`, or `task-plan-section-hints-missing`. Do not claim plan-aware coverage, do not invent omitted requirements, and do not fail the task solely because the additive plan context is unavailable.
+
 Build one review bundle with per-file provenance:
 
 - **`exact-file`**: `base_content_sha256` equals `pre_task_content_sha256`, including `absent == absent`. The file had no pre-task divergence from the work-run baseline, so its current base-to-working-tree patch is attributable to this task.
@@ -275,7 +285,7 @@ Build one review bundle with per-file provenance:
 
 Set per-file isolation and one aggregate `task_diff_isolation`: `exact-file` when every included file is exact, `cumulative-file` when every included file is cumulative, `mixed` when both are fully attributed, and `degraded` when any required fact or file attribution is missing. `cumulative-file`/`mixed` are honest bounded review scopes with limitations; only `degraded` or failed scope makes `required_gate_eligible: false` before findings are considered.
 
-For task mode, `BASE` remains the work-run baseline used for file diffs and reviewer context. It is not a pre-task snapshot. Set `FILES` to the attributed task bundle, `DIFF` to the labeled per-file patches/content, and `UNTRACKED` to two separate lists: excluded pre-existing untracked files and included task-owned untracked files. Pass the Task Card, observed/expected pack digest, source plan, declared files, delta files, file isolation map, aggregate isolation, review focus, and limitations to every reviewer and validator. Requirements completeness is limited to this Task Card's cited source refs; final branch/plan completeness remains the Phase 3 full review's job.
+For task mode, `BASE` remains the work-run baseline used for file diffs and reviewer context. It is not a pre-task snapshot. Set `FILES` to the attributed task bundle, `DIFF` to the labeled per-file patches/content, and `UNTRACKED` to two separate lists: excluded pre-existing untracked files and included task-owned untracked files. Pass the Task Card, observed/expected pack digest, source plan, `source_plan_section_titles`, `plan_context_mode`, declared files, delta files, file isolation map, aggregate isolation, review focus, and limitations to every reviewer and validator. Requirements completeness is limited to this Task Card's cited source refs; final branch/plan completeness remains the Phase 3 full review's job.
 
 **If `base:` argument is provided (fast path):**
 
@@ -476,7 +486,7 @@ Locate the plan document so Stage 6 can verify requirements completeness. Check 
 - Multiple/ambiguous PR body matches -> `plan_source: inferred` (lower confidence)
 - Auto-discover with single unambiguous match -> `plan_source: inferred` (lower confidence)
 
-If a plan is found, classify readiness before extraction (see "Plan Requirements Completeness" above): for a unified plan read the metadata/header first, and treat a requirements-only artifact as product intent only — it must not drive implementation-unit completeness findings. Then read its **Requirements** in this order — unified `Product Contract` -> `### Requirements`, then legacy top-level `## Requirements`, then legacy `## Requirements Trace` — and the R-IDs (R1, R2, etc.) listed there, plus **Implementation Units** (current numeric subsections such as `### U1.`, `### U2.`, or `### Unit 1:` under `## Implementation Units`; legacy bullet or checkbox unit entries under that section also count). For HTML unified plans the same section names and R-/U-IDs appear as visible headings/anchors — match on the section name, ignoring HTML wrapper tags. Store the extracted requirements list and `plan_source` for Stage 6. In task mode, retain only the selected Task Card's cited source refs for this review and set `completeness_scope: selected-task`; do not compare the bounded task delta with unrelated U-IDs. Do not block the review if no plan is found — requirements verification is additive, not required.
+If a plan is found, classify readiness before extraction (see "Plan Requirements Completeness" above): for a unified plan read the metadata/header first, and treat a requirements-only artifact as product intent only — it must not drive implementation-unit completeness findings. Then read its **Requirements** in this order — unified `Product Contract` -> `### Requirements`, then legacy top-level `## Requirements`, then legacy `## Requirements Trace` — and the R-IDs (R1, R2, etc.) listed there, plus **Implementation Units** (current numeric subsections such as `### U1.`, `### U2.`, or `### Unit 1:` under `## Implementation Units`; legacy bullet or checkbox unit entries under that section also count). For HTML unified plans the same section names and R-/U-IDs appear as visible headings/anchors — match on the section name, ignoring HTML wrapper tags. Store the extracted requirements list and `plan_source` for Stage 6. In task mode, retain only the selected Task Card's cited source refs for this review and set `completeness_scope: selected-task`; when `source_plan_section_titles` are present, use the Task-Scoped Live Plan Context branch above rather than injecting a plan body or asserting freshness. Do not compare the bounded task delta with unrelated U-IDs. Do not block the review if no plan is found — requirements verification is additive, not required.
 
 ### Stage 2c: Resolve the shared project profile (cache)
 
@@ -496,6 +506,10 @@ When a profile is in hand, include a short stack/conventions orientation slice f
 ### Stage 3: Select reviewers
 
 Read the diff and file list from Stage 1, and the `SIGNALS` / `EXEC_LINES` from Stage 1b. The 4 always-on personas and 2 spec-first always-on local prompt assets are automatic. Read `references/persona-catalog.md` from this skill's directory now — it carries the full per-persona selection criteria and spawn gates the one-line roster above only summarizes. For each cross-cutting and stack-specific conditional persona in that catalog, decide whether the diff warrants it. This is agent judgment, not keyword matching — a `SIGNALS` hit (`migrations`, `frontend`, `api`, `swift-ios`) is a *prompt* to consider the matching persona, not an instruction to spawn it; confirm the runtime concern is real in the diff before adding it, and add content-gated personas (`security`, `reliability`, `adversarial`) from the diff as before since those are not path-derivable.
+
+**Security selection boundary.** Select `security` when the diff introduces or changes an agent/model/tool/web-content trust boundary, tenant/resource authorization, credentials, or a reachable dangerous sink such as shell, path, SQL, server-side URL, template evaluation, or privileged tool action. A schema-only compatibility drift belongs to `api-contract`; an unreachable dependency advisory or generic hardening idea is not a security finding. Require a concrete attack path before escalating a security concern, and do not use file extension or dependency-name presence as a substitute for that judgment.
+
+**Frontend-quality selection boundary.** Select the internal `frontend-quality` persona when the diff changes a user-visible route, form, navigation, component public behavior, async loading/error/empty/permission/retry state, semantic HTML/ARIA, keyboard/focus, contrast, layout, responsive breakpoint, or motion behavior. This is a semantic activation judgment, not an extension test: CSS-only changes that affect contrast/focus/layout/responsive/motion activate it; backend-only, docs-only, type-only, fixture-only, and token-value-only changes that do not affect those visible semantics do not. It reviews current diff quality, not browser field behavior; timing/race findings remain `julik-frontend-races`, unsafe rendering remains `security`, test proof remains `testing`, and structural complexity remains `maintainability`.
 
 **File-type awareness for conditional selection:** Instruction-prose files (Markdown skill definitions, JSON schemas, config files) are product code but do not benefit from runtime-focused reviewers. The adversarial reviewer's techniques (race conditions, cascade failures, abuse cases) target executable code behavior. For diffs that only change instruction-prose files, skip adversarial unless the prose describes auth, payment, or data-mutation behavior, or the change is itself a silent-pass verification mechanism (next paragraph — a CI/CD workflow is a config file but still gets the adversarial lens). Count only executable code lines toward line-count thresholds.
 
@@ -636,7 +650,7 @@ For each selected reviewer, read the corresponding local prompt asset from `refe
 6. Run ID and reviewer name for the artifact file path
 7. **For `project-standards` only:** the standards file path list from Stage 3b, wrapped in a `<standards-paths>` block appended to the review context
 8. **For `data-migration` only:** the resolved review base ref from Stage 1 (`BASE:` marker), wrapped in `<review-base>` inside the review context so schema drift checks never assume `main`
-9. **For task mode:** the selected Task Card, `review_focus`, expected/observed task-pack digest, source plan, work-run base, declared and delta files, included task-owned/excluded pre-existing untracked files, per-file isolation, aggregate `task_diff_isolation`, `required_gate_eligible`, and limitations. Reviewers inspect only this bundle and must not reinterpret a cumulative file as an isolated task patch.
+9. **For task mode:** the selected Task Card, `review_focus`, expected/observed task-pack digest, source plan, `source_plan_section_titles`, `plan_context_mode`, work-run base, declared and delta files, included task-owned/excluded pre-existing untracked files, per-file isolation, aggregate `task_diff_isolation`, `required_gate_eligible`, and limitations. With `plan_context_mode: live-plan`, reviewers re-read only the named current sections; with `diff-only`, they do not claim plan-aware coverage. Reviewers inspect only this bundle and must not reinterpret a cumulative file as an isolated task patch.
 
 Persona sub-agents are **read-only** with respect to the project: they review and return structured JSON. They do not edit project files or propose refactors. The one permitted write is saving their full analysis under the exact caller-provided `REVIEW_ARTIFACT_DIR` when it is available.
 
@@ -919,7 +933,7 @@ Minimum shape:
 }
 ```
 
-When task context is active, `coverage.task_scope` is an object with `task_id`, `task_pack`, `expected_task_pack_digest`, `observed_task_pack_digest`, `source_plan`, `work_run_base`, `declared_files`, `task_delta_files`, `task_owned_untracked_files`, `pre_task_dirty_files`, `pre_task_untracked_files`, `pre_task_overlap`, `review_focus`, per-file isolation, aggregate `task_diff_isolation`, `required_gate_eligible`, and `limitations`. Outside task mode it remains `null`.
+When task context is active, `coverage.task_scope` is an object with `task_id`, `task_pack`, `expected_task_pack_digest`, `observed_task_pack_digest`, `source_plan`, `source_plan_section_titles`, `plan_context_mode`, `work_run_base`, `declared_files`, `task_delta_files`, `task_owned_untracked_files`, `pre_task_dirty_files`, `pre_task_untracked_files`, `pre_task_overlap`, `review_focus`, per-file isolation, aggregate `task_diff_isolation`, `required_gate_eligible`, and `limitations`. Outside task mode it remains `null`.
 
 `coverage.verification_evidence` is always present in `mode:agent`. It reports a repo-relative `run_summary_ref` and `closeout_verdict` only when Stage 5d recorded commands this review actually executed. Pure review judgment uses `status: not-produced` with `reason_code: no-targeted-command-executed`; never turn persona/validator coverage into a fake check.
 

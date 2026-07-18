@@ -1,6 +1,6 @@
 # Persona Catalog
 
-13 reviewer personas organized into always-on, cross-cutting conditional, and stack-specific conditional layers, plus spec-first local prompt assets. The orchestrator uses this catalog to select which reviewers to spawn for each review.
+14 reviewer personas organized into always-on, cross-cutting conditional, and stack-specific conditional layers, plus spec-first local prompt assets. The orchestrator uses this catalog to select which reviewers to spawn for each review.
 
 ## Always-on (4 structured personas + 2 local prompt assets)
 
@@ -22,17 +22,18 @@ Spawned on every review regardless of diff content.
 | `agent-native-reviewer` | Verify new features are agent-accessible |
 | `learnings-researcher` | Search docs/solutions/ for past issues related to this PR's modules and patterns |
 
-## Conditional (7 personas)
+## Conditional (8 personas)
 
 Spawned when the orchestrator identifies relevant patterns in the diff. The orchestrator reads the full diff and reasons about selection -- this is agent judgment, not keyword matching.
 
 | Persona | Agent | Select when diff touches... |
 |---------|-------|---------------------------|
-| `security` | `security-reviewer` | Auth middleware, public endpoints, user input handling, permission checks, secrets management |
+| `security` | `security-reviewer` | Auth/tenant/resource authorization, untrusted model/tool/web outputs crossing into a reachable dangerous sink, credential handling, privileged agent/tool actions; not schema-only drift or unreachable dependency advisories |
 | `performance` | `performance-reviewer` | Database queries, ORM calls, loop-heavy data transforms, caching layers, async/concurrent code |
 | `api-contract` | `api-contract-reviewer` | Route definitions, serializer/interface changes, event schemas, exported type signatures, API versioning |
+| `frontend-quality` | `frontend-quality-reviewer` | Internal-only diff review for user-visible forms/navigation/components, async state completeness, semantic HTML/ARIA, keyboard/focus, contrast, responsive/layout/motion; semantic activation, not file extension |
 | `data-migration` | `data-migration-reviewer` | Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, data transformations — **not** model/query-only changes without migration artifacts |
-| `reliability` | `reliability-reviewer` | Error handling, retry logic, circuit breakers, timeouts, background jobs, async handlers, health checks |
+| `reliability` | `reliability-reviewer` | I/O/async failure handling, retry/timeout, correlation propagation, telemetry emission, alert owner/action/runbook, health checks; not pure in-memory transforms |
 | `adversarial` | `adversarial-reviewer` | Diff has >=50 changed non-test, non-generated, non-lockfile lines, OR touches auth, payments, data mutations, external API integrations, or other high-risk domains, OR adds/modifies a **silent-pass verification mechanism** — a guard whose failure mode is going green while the real thing is red: CI/CD gating logic, merge-blocking checks, build/deploy steps, coverage/lint gates, or test infrastructure/mocks that could mask production. This trigger fires on the *mechanism* independent of line count and the auth/data heuristics. Scope guard: it does **not** fire on ordinary per-feature test assertions — a unit test asserting business logic is `testing`'s job — only on gating/CI/build/deploy/harness changes |
 | `previous-comments` | `previous-comments-reviewer` | **PR-only AND comment-gated.** Reviewing a PR that has existing review comments or review threads from prior review rounds. Skip entirely when no PR metadata was gathered in Stage 1, OR when Stage 1's `hasPriorComments` flag is false (no `reviews` and no `comments` on the PR). |
 

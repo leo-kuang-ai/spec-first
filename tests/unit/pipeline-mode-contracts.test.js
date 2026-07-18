@@ -40,14 +40,22 @@ describe('pipeline mode contracts', () => {
     expect(writingReference).not.toContain('Compound Engineering badge');
   });
 
-  test('spec-test-browser keeps pipeline mode unattended through human verification and failures', () => {
+  test('spec-test-browser keeps pipeline unattended and preserves caller-owned server boundaries', () => {
     const skill = read('skills/spec-test-browser/SKILL.md');
     const pipelineReference = read('skills/spec-test-browser/references/pipeline-orchestration.md');
 
-    expect(skill).toContain('argument-hint: "[PR number, branch name, \'current\', --port PORT, or mode:pipeline]"');
-    expect(pipelineReference).toContain('human verification pauses');
-    expect(pipelineReference).toContain('failure-handling prompts');
-    expect(skill).toMatch(/Human Verification \(When Required\)[\s\S]*\*\*Pipeline mode:\*\* do not pause; log each such flow as `Skip` with the reason and continue/);
-    expect(skill).toMatch(/Handle Failures[\s\S]*\*\*pipeline mode:\*\* do not ask how to proceed; capture the error screenshot and repro steps, log the failure, and continue/);
+    expect(skill).toContain('argument-hint: "[PR number, branch name, \'current\'] [mode:pipeline] [target-origin:<origin>]"');
+    expect(pipelineReference).toContain('不暂停等待');
+    expect(pipelineReference).toContain('failure-handling prompt');
+    expect(pipelineReference).toContain('caller-owned server');
+    expect(pipelineReference).toContain('target-origin-missing');
+    expect(pipelineReference).toContain('navigation/interaction subprocess 为 0');
+    expect(pipelineReference).toContain('browser-mutation-authorization-required');
+    expect(pipelineReference).not.toMatch(/Starting dev server|bin\/dev >|rails server -p|npm run dev >/);
+    expect(skill).not.toMatch(/Starting dev server|Auto-start in pipeline|bin\/dev >|rails server -p|npm run dev >/);
+    expect(skill).toContain('caller-owned server');
+    expect(skill).toContain('workflow-level loud convention');
+    expect(skill).not.toContain('browser_runtime_profile_path');
+    expect(skill).not.toContain('dev-server-run-context.cjs');
   });
 });

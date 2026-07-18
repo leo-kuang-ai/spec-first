@@ -1,17 +1,36 @@
 ---
 name: spec-lfg
-description: Run the full hands-off engineering pipeline from planning through a green PR.
-disable-model-invocation: true
-argument-hint: "[feature description]"
+description: Run the full hands-off engineering pipeline from planning through a green PR. Use only when the current user explicitly requests spec-lfg or selects an option that clearly states it will commit, push, open a PR, and watch CI.
+argument-hint: "[feature description or requirements-only plan path] [target-origin:<origin>]"
 ---
 
 CRITICAL: You MUST execute every step below IN ORDER. Do NOT skip any required step. Do NOT jump ahead to coding or implementation. The plan phase (step 1) MUST be completed and verified BEFORE any work begins. Violating this order produces bad output.
 
+进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断“适合 shipping”都不构成授权。
+
+本次明确的 `spec-lfg` 请求只额外授权此管线在第 4 步委派一次 `spec-code-review` 的只读独立审查；调用时必须把该授权及其来源作为可见上游上下文传递。它不授权任意 worker dispatch、实现 mutation、commit、push、PR、tracker 或其他外部副作用。若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
+
 When invoking any skill referenced below, resolve its name against the available-skills list the host platform provides and use that exact entry. Some platforms list skills under a plugin namespace (e.g., `spec-first:spec-plan`); others list the bare name. Invoking a short-form guess that isn't in the list will fail — always match a listed entry verbatim before calling the Skill/Task tool.
 
-1. Invoke the `spec-plan` skill with `$ARGUMENTS`.
+**Preserve and split the invocation payload.** Treat the arguments received from
+the caller as the authoritative input. Before step 1, remove at most one standalone
+`target-origin:<origin>` token and retain its value unchanged as the run-local
+`caller_target_origin`. Set `forwarded_arguments` to everything else: preserve
+every remaining argument in its original order, including an absolute
+requirements-only plan path. Do not paraphrase the path, prepend a label or menu
+number, replace it with a feature summary, or resolve it relative to the current
+working directory. The modifier is browser-routing input, not product intent: do
+not pass it to planning, normalize it, combine it with `--port`, derive a
+scheme/host/port from project files, redirects, browser state, or a guessed
+dev-server default. An empty, malformed, or repeated modifier records
+`target-origin-invalid`; it never becomes a usable origin.
 
-   GATE: STOP. If spec-plan reported the task is non-software and cannot be processed in pipeline mode, stop the pipeline and inform the user that LFG requires software tasks. Otherwise, verify that the `spec-plan` workflow produced a plan file in `docs/plans/`. If no plan file was created, invoke `spec-plan` again with `$ARGUMENTS`. Do NOT proceed to step 2 until a written plan exists. **Record the plan file path** — it will be passed to spec-work in step 2 and spec-code-review in step 4.
+1. Invoke the `spec-plan` skill with the exact `forwarded_arguments` payload. When
+   `spec-brainstorm` invoked LFG, this payload is the absolute requirements-only
+   unified plan path, so `spec-plan` recognizes it as an explicit Product Contract
+   source and enriches that same artifact in place.
+
+   GATE: STOP. If spec-plan reported the task is non-software and cannot be processed in pipeline mode, stop the pipeline and inform the user that LFG requires software tasks. Otherwise, verify that the `spec-plan` workflow produced a plan file in `docs/plans/`. If no plan file was created, invoke `spec-plan` again with the same `forwarded_arguments` payload. Do NOT proceed to step 2 until a written plan exists. **Record the plan file path** — it will be passed to spec-work in step 2 and spec-code-review in step 4.
 
    Read the plan metadata before continuing. If the plan has `artifact_contract: spec-unified-plan/v1`, proceed only when it has `artifact_readiness: implementation-ready` and `execution: code`. Stop the pipeline for `artifact_readiness: requirements-only`, any unrecognized readiness value, `execution: knowledge-work`, approach-plan outputs, answer-seeking/universal outputs, or invalid progress-like readiness values. LFG never launches `/goal` directly; when goal-mode or dynamic workflows are appropriate, `spec-work` owns that implementation engine choice and must return control to LFG afterward.
 
@@ -27,19 +46,75 @@ When invoking any skill referenced below, resolve its name against the available
 
    Do not commit in this step. `spec-simplify-code` leaves its changes in the working tree; step 4's review scopes the working tree (uncommitted changes included), and step 8's `spec-commit-push-pr` commits whatever remains. Committing here would sweep any still-uncommitted `spec-work` edits into a misleading `refactor` commit and could stall on a tree that never goes clean.
 
-4. Invoke the `spec-code-review` skill with `mode:agent plan:<plan-path-from-step-1>`.
+4. 以 `mode:agent plan:<plan-path-from-step-1>` 调用 `spec-code-review`，并传递以下可见上游上下文：
 
-   Pass the plan file path from step 1 so spec-code-review can verify requirements completeness. Read the **Actionable Findings** summary the skill emits.
+   ```yaml
+   review_dispatch_authorization: authorized
+   authorization_source: current-user-explicit-spec-lfg
+   authorization_scope: one delegated read-only independent code review
+   ```
+
+   传递步骤 1 的 plan path，使 spec-code-review 能核对 requirements completeness。`mode:agent` 返回单一 JSON object，而非 Markdown Actionable Findings summary。解析其中的 `status`、`actionable_findings`、`findings`、`artifact_path`、`run_id` 与 `coverage.dispatch_reason_code`。
+
+   GATE: 只有 `status: complete`、`coverage.dispatch_reason_code` 为 null，且实际 reviewer 不只是 `inline-fallback` 时才能继续。JSON 损坏或缺失，以及 `failed`、`degraded`、`skipped` 或其他不完整结果都表示独立审查不可用；保留其有界 findings，并在步骤 5、browser verification、lifecycle、commit、push、PR、tracker 或 CI 副作用前停止。
 
    `mode:agent` is report-only **by design** — it surfaces findings but never edits the tree; LFG applies the eligible ones in step 5. When narrating progress to the user, frame this as "review found X → applied X in step 5," not as "code review did not auto-fix." A report-only review followed by an LFG-applied fix is the intended contract, not a gap.
 
-**Shipping precondition (steps 5–9).** Run `git remote` once before the shipping steps. If it lists **no remote** (e.g. a sandbox/throwaway checkout that has `git init` but no `origin`), shipping is **local-only**: make every commit the steps below call for, but **skip every push, PR create/edit, and CI-watch action** — the pushes in steps 5 and 6, the push and PR creation in step 8, and step 9 in full. A missing remote is a terminal local-only state, not an error: never retry a push or hunt for a remote — make the local commits and proceed to step 10. Run steps 5–9 normally when a remote exists.
+5. **Apply review fixes locally** (REQUIRED after step 4)
 
-5. **Apply and persist review fixes** (REQUIRED after step 4, before residual handoff)
+   Load `references/review-followup.md` and execute its apply step. Apply eligible
+   mechanical findings and run their targeted verification, but leave verified
+   review fixes in the working tree. Do not stage, commit, push, file tracker
+   items, edit a PR, or perform any other durable or outward shipping side effect
+   before the browser/cleanup gate in step 6 closes.
 
-   Load `references/review-followup.md` and execute its apply step (mechanical apply + commit/push when changes exist). Do not proceed to the residual handoff, run browser tests, or output DONE while eligible review fixes remain only in the working tree uncommitted.
+6. **Decide browser applicability, then verify when applicable.** Decide
+   `browser_applicability: applicable | not_applicable` from the settled plan and
+   actual changed flow, not filename extension alone. A changed user-visible
+   route, form, navigation, client interaction/state, or an explicit
+   browser/runtime verification obligation is `applicable`; docs-only,
+   library/CLI, or backend-only work without a changed user-visible flow may be
+   `not_applicable`. Record the concrete reason either way. For `not_applicable`,
+   record an explicit `not_applicable` browser result and continue without invoking the browser skill or its wrapper.
 
-6. **Autonomous residual handoff** (only when step 4 reported one or more actionable `downstream-resolver` findings not applied in step 5; skip when it reported `Actionable findings: none.`)
+   For `applicable`, first validate any supplied `caller_target_origin`. An
+   invalid caller value is the diagnostic blocker `target-origin-invalid`; do
+   not fall back from malformed or repeated caller input. A missing caller value
+   returns `not_run / target-origin-missing` before browser invocation and blocks
+   the applicable flow. With a valid caller value, invoke `spec-test-browser`
+   with `mode:pipeline target-origin:<origin>`. Do not infer an origin from
+   redirects, page state, ambient listeners, free ports, framework defaults, or
+   other project files.
+
+   The caller owns the project server lifecycle. LFG forwards the exact origin
+   but does not read local runtime profiles, start or stop a project server, or
+   inspect project process state. Before the browser test plan is written,
+   determine whether its expected navigation or interaction has a durable or
+   external effect. A caller-provided origin is not mutation authorization: when
+   the current call lacks named authorization for that origin, flow, and effect,
+   record `not_run / browser-mutation-authorization-required`, do not write the
+   blocked step, and do not continue to lifecycle or landing actions.
+
+   Consume the browser result item by item: origin provenance, wrapper probe `status`/`reason_code`,
+   `capabilities.exact_origin_confirmed`, every route/step status, `action_process_calls`, browser cleanup `status`/`reason_code`,
+   private evidence refs, and limitations. A wrapper, pipeline, applicable
+   capability, browser cleanup, or result that is `not_supported`, `not_run`,
+   `failed`, missing, or indeterminate is a diagnostic blocker with its returned
+   reason code; do not let passed route/step results hide cleanup failure.
+
+   GATE: STOP. Before the shipping precondition, require browser verification
+   to have passed or be explicitly `not_applicable` with its recorded reason. A
+   failed, not-run, missing, or indeterminate result blocks lifecycle mutation
+   and every landing side effect for an applicable flow.
+
+**Shipping precondition (steps 7–9).** Only after step 6 closes, run `git remote`
+once. If it lists **no remote** (e.g. a sandbox/throwaway checkout that has
+`git init` but no `origin`), shipping is **local-only**: make the local commits
+called for below, but skip every push, PR create/edit, and CI-watch action in
+steps 7–9. A missing remote is a terminal local-only state, not an error: never
+retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists.
+
+7. **Autonomous residual handoff** (only when step 4 reported one or more actionable `downstream-resolver` findings not applied in step 5; skip when it reported `Actionable findings: none.`)
 
    Do not prompt the user. This step embraces the autopilot contract: residuals must become durable before DONE, but the agent never stops to ask.
 
@@ -65,15 +140,11 @@ When invoking any skill referenced below, resolve its name against the available
 
    Never block DONE on tracker filing failures once residuals have been durably recorded. A `no_sink` outcome is success only when the findings are present in the PR body or in the pushed fallback file.
 
-7. Invoke the `spec-test-browser` skill with `mode:pipeline`.
-
-   GATE: STOP. Before step 7.5, require browser/runtime verification to have passed or be explicitly not applicable with a reason. A failed, not-run, missing, or indeterminate result blocks lifecycle mutation and DONE.
-
 7.5. **Complete the source plan lifecycle marker.** The `spec-work` Return-to-Caller envelope never writes status; its candidate already resolves either the direct plan or a validated task pack's `source_plan`. After simplification, required review, residual handoff, and final verification have closed, use the validated lifecycle shape from step 2. When `plan_status_completion_candidate` is present, invoke `spec-first internal plan-status complete --target-repo <root> --plan <candidate> --json`; accept `active → completed` or the already-completed idempotent result, and block DONE on any other helper result. When the candidate is null with an allowed `plan_status_completion_degraded_reason`, skip mutation, preserve the verified development result, and surface that degraded boundary in DONE. This marker is not CI, merge, release, or field-outcome proof.
 
 8. Invoke the `spec-commit-push-pr` skill with `mode:pipeline`.
 
-   This commits any remaining changes, pushes the branch, and opens a pull request — non-interactively, per the mode token. If it prints a `New concepts:` trailer after the PR URL, record the concept name(s) for step 10. If step 6 already opened a PR (check with `gh pr view --json number,url,state 2>/dev/null`), skip PR creation but still commit and push any uncommitted changes. **Per the shipping precondition, when no remote is configured, do NOT invoke `spec-commit-push-pr` — its commit step pushes unconditionally (`git push -u origin HEAD`), so a literal invocation would still hit the impossible push. Instead commit any remaining changes locally yourself (`git add -A && git commit`) and skip the push and PR creation entirely.**
+   This commits any remaining pipeline-owned changes, pushes the branch, and opens a pull request — non-interactively, per the mode token. If it prints a `New concepts:` trailer after the PR URL, record the concept name(s) for step 10. If step 7 already opened or edited a PR (check with `gh pr view --json number,url,state 2>/dev/null`), skip PR creation but still commit and push any uncommitted pipeline-owned changes. **Per the shipping precondition, when no remote is configured, do NOT invoke `spec-commit-push-pr` — its commit step pushes unconditionally (`git push -u origin HEAD`), so a literal invocation would still hit the impossible push. Instead stage only pipeline-owned paths, commit the remaining changes locally, and skip push and PR creation entirely.**
 
 9. **CI watch and autofix loop** (only when an open PR exists for the current branch)
 

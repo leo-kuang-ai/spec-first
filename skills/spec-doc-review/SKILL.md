@@ -1,7 +1,7 @@
 ---
 name: spec-doc-review
 description: Review requirements, plans, or specs with role-specific lenses. Use when the user wants to improve an existing planning document. Default roster is standard (≤3 reviewers); pass roster:full for the full conditional set.
-argument-hint: "[mode:headless] [roster:lite|standard|full] [path/to/document.md]"
+argument-hint: "[mode:headless] [mutation:report-only] [output:json] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
 # Document Review
@@ -13,17 +13,23 @@ Review requirements or plan documents through multi-persona analysis. Dispatches
 - **The numbered-list fallback applies only when the harness genuinely lacks a blocking question tool** (`ToolSearch` no match, the call fails, or the mode doesn't expose it, e.g. Codex edit modes). A pending schema load is not a fallback trigger. In genuine-fallback cases present options as a numbered list and wait. Rendering a question as narrative text because the tool feels inconvenient, the model is mid-report, or the instruction was buried is a bug — a question that calls for a user decision must either fire the tool or fall back loudly, never slip past as prose.
 
 ## Phase 0: Detect Mode
-Check the skill arguments for flags and a document path. Tokens matching `mode:*`, `roster:*`, or `depth:*` are flags, not file paths — strip them and use the remaining token (if any) as the document path for Phase 1.
+Check the skill arguments for flags and a document path. Tokens matching `mode:*`, `mutation:*`, `output:*`, `roster:*`, or `depth:*` are flags, not file paths — strip every recognized flag before resolving the remaining document path for Phase 1.
 
 | Flag | Meaning |
 |------|---------|
 | `mode:headless` | Headless delivery (no interactive routing) |
+| `mutation:report-only` | Caller-requested zero-write review; valid for Markdown, HTML, and ambiguous/unwritable inputs |
+| `output:json` | Render the existing structured envelope as one JSON object |
 | `roster:lite` / `roster:standard` / `roster:full` | Reviewer budget profile (default **`standard`**) |
 | `depth:full` / `depth:lite` | Aliases of `roster:full` / `roster:lite` |
 
 If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, profile = **`standard`**.
 
-Set run-local `delivery_mode` to `headless` when `mode:headless` is present, otherwise `interactive`. Headless changes delivery, not the mutation policy: under `markdown-write`, confidence-100 `safe_auto` fixes still apply silently and the remaining findings return as structured text; under `report-only`, no document write occurs in either delivery mode. Headless never uses blocking prompts or interactive routing and Phase 5 returns immediately with "Review complete". Invoke via `Skill("spec-doc-review", "mode:headless docs/plans/my-plan.md")`. Interactive references are eligible only after Phase 1 resolves `mutation_policy: markdown-write`.
+`mutation:` and `output:` tokens are exact-token contracts. Accept only `mutation:report-only` and `output:json`. A duplicate token, multiple `mutation:*` tokens, multiple `output:*` tokens, or any unsupported `mutation:*` / `output:*` value fails closed before document read or reviewer dispatch. Return `Review failed: flag-conflict-or-unsupported` with the conflicting token names; do not guess precedence and do not treat those tokens as a path.
+
+Set run-local `requested_mutation` to `report-only` only when the exact token is present; otherwise `default`. Set `output_mode` to `json` only when `output:json` is present; otherwise `text`. Output mode changes rendering only — it does not grant mutation, dispatch, producer, commit, or lifecycle authority.
+
+Set run-local `delivery_mode` to `headless` when `mode:headless` is present, otherwise `interactive`. Headless changes delivery, not the mutation policy: under `markdown-write`, confidence-100 `safe_auto` fixes still apply silently and the remaining findings return as structured text; under `report-only`, no document write occurs in either delivery mode. `output_mode` is a third orthogonal choice. Headless never uses blocking prompts or interactive routing and Phase 5 returns immediately with "Review complete". Invoke via `Skill("spec-doc-review", "mode:headless docs/plans/my-plan.md")`. Interactive references are eligible only after Phase 1 resolves `mutation_policy: markdown-write`.
 
 ## Phase 1: Get and Analyze Document
 
@@ -40,12 +46,15 @@ First check the unified artifact contract: `artifact_contract: spec-unified-plan
 
 After reading and classifying the document, set exactly one run-local `mutation_policy`, independently from `delivery_mode`:
 
+- `report-only` — when `requested_mutation: report-only` and the document is confirmed writable Markdown. Record `mutation_reason: caller-requested-report-only`; this explicit caller policy overrides the ordinary Markdown default and must keep the file byte-preserving.
 - `markdown-write` — only when the document is confirmed Markdown by content shape and path and the platform can write it. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available.
 - `report-only` — mandatory for HTML content or a `.html` artifact. Run the same reviewer roster, schema validation, confidence gate, deduplication, severity routing, Coverage, and limitations reporting, but do not invoke any document mutation path.
 - `report-only` — also mandatory when the document is confirmed Markdown but the platform cannot write it. Record `mutation_reason: write-unavailable`; keep the full review and finding envelope, but do not imply that Markdown mutation was attempted.
 - If extension, declared format, and content shape conflict, or the format remains ambiguous, fail closed to `report-only` and record `mutation_reason: format-conflict-or-ambiguous` in the envelope. Never guess Markdown write eligibility from the path alone.
 
 For ordinary HTML use `mutation_reason: html-artifact`. A report-only request is valid in both headless and interactive delivery; interactive delivery still returns the structured report-only envelope and does not offer a mutation walkthrough.
+
+Existing mandatory reasons retain their diagnostic meaning: HTML remains `html-artifact`, write-unavailable Markdown remains `write-unavailable`, and format conflict/ambiguity remains `format-conflict-or-ambiguous` even when the caller also requested report-only. `caller-requested-report-only` applies to otherwise writable, unambiguous Markdown. Without the mutation token, ordinary writable Markdown still resolves to `markdown-write`; this feature must not globally downgrade the default path.
 
 **Core classification rules (apply these first):**
 
@@ -87,7 +96,7 @@ Record skipped candidates for the cost-shape line (`skipped_conditional=… reas
 
 ### Emit cost-shape (advisory, required)
 
-**After** the reviewer list is fixed and **before** any dispatch, print exactly one advisory line (do not block on it):
+**After** the reviewer list is fixed and **before** any dispatch, prepare exactly one advisory line (do not block on it). For ordinary text output, print it as shown below. When `output_mode: json`, do not print this line or any other user-visible prose outside the final JSON object; retain the same cost-shape facts inside the envelope's structured `coverage` metadata instead:
 
 ```text
 cost-shape: profile={lite|standard|full} N={count} personas=[{comma-separated short names}] skipped_conditional=[{name:reason},…] doc_bytes={utf8_bytes_or_unknown} slices={unified|full|mixed} isolation={min|degraded_inherited}
@@ -97,7 +106,7 @@ cost-shape: profile={lite|standard|full} N={count} personas=[{comma-separated sh
 
 ## Phase 2: Announce and Dispatch Personas
 
-Tell the user which personas will review and why (justify conditionals), including the `cost-shape:` line from Phase 1 in the same announcement block.
+For ordinary text output, tell the user which personas will review and why (justify conditionals), including the `cost-shape:` line from Phase 1 in the same announcement block. When `output_mode: json`, suppress this announcement and every other object-external status/terminal line; record selected/skipped personas, cost shape, isolation, and reviewer outcomes in the final JSON `coverage` and `limitations` fields. JSON mode's machine-readable single-object contract overrides the normal announcement requirement.
 
 **Build agent list.** Always include `coherence-reviewer` and `feasibility-reviewer`. Add **budget-filtered** conditional personas only (`product-lens-reviewer`, `design-lens-reviewer`, `security-lens-reviewer`, `scope-guardian-reviewer`, `adversarial-document-reviewer`) — do **not** re-expand to "all conditionals that could match" after budget filtering unless `profile=full` or user override.
 

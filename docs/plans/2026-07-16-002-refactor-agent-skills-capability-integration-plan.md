@@ -1,7 +1,7 @@
 ---
 title: "Agent Skills Capability Integration - Plan"
 type: refactor
-status: active
+status: completed
 date: 2026-07-16
 deepened: 2026-07-17
 simplified: 2026-07-17
@@ -15,10 +15,12 @@ origin: docs/14-agent-skills/README.md
 
 # Agent Skills Capability Integration - Plan
 
+> **Browser boundary supersession note (2026-07-18):** 本计划保持 `status: completed`；其中 R12、AE7、KTD18、U8 与 task T014 关于“interactive 模式确认后由 wrapper 启动 server”的分支，已由 `docs/plans/2026-07-18-002-refactor-spec-test-browser-caller-owned-server-boundary-plan.md` 替代。U8 的五宿主 internal delivery、browser wrapper safety floor、exact-origin capability gate 与 no-silent-pipeline-start 结果继续有效，其他已完成 unit 不受影响。
+
 > **2026-07-17 两轮简化修订说明。** 本版本经过两轮对抗性简化：第一轮替换了机制过重的原始草稿（1580
 > 行，SHA-256 `26503d2e43ac861caf48396cc1620b0383912a677de9a62a9762e0eb93e3baa0`），砍掉跨平台
 > DACL 私有存储、byte-exact 反重构证据链、五段 sealed evidence 生命周期等"防同 UID 恶意方"的安全
-> 剧场，把需要跨调用锁定 plan freshness 的场景降到"写入前后核对一次 plan hash"这一档。第二轮（本版本）
+> 剧场，把需要跨调用锁定 plan freshness 的场景降到"写入前后核对一次完整文件 hash"这一档。第二轮（本版本）
 > 进一步砍掉第一轮遗留的"证明流程确实被执行了"的流程剧场——中央 evidence manifest/case-index、独立
 > Phase 2 集成 unit、三层执行者术语、U6 同会话 hash-check——降到"git status + 直接读 live 文件 + owning
 > skill 自测"这一档；before/after hash 只保留在 U13 shipping caller 的跨调用复核中。
@@ -31,13 +33,13 @@ origin: docs/14-agent-skills/README.md
 | 维度 | 决策 |
 | --- | --- |
 | Objective | 以 Spec-First 的角色契约、source/runtime 治理和现有研发闭环为基准，把 Agent Skills 中已确认有增量价值的接口设计与演进、前端工程、测试设计、生产就绪与 reviewer 知识集成进现有 public workflow，不复制外部产品形态，不新增公共 Skill。 |
-| Recommended approach | 复用现有 `spec-plan`、`spec-work`、`spec-code-review`、`spec-test-browser`、`spec-doc-review`；新增 2 个 skill-local planning reference，扩展 2 个既有 planning owner、4 个既有 reviewer、新增 1 个 internal frontend reviewer，修复 browser 的五宿主 internal delivery 断链，并给 `spec-doc-review` 加一个显式 `mutation:report-only output:json` 调用方式。U6 task-scoped review 直接读取同一 checkout 的 live plan；只有 U13 shipping caller 需要跨调用锁定 plan freshness，调用前后比较目标文件 SHA-256，不一致就重跑。两者都不需要签名、DACL、sealed evidence 链或补偿事务。 |
-| Authority hierarchy | 当前用户目标与本方案 Product Contract > `docs/10-prompt/结构化项目角色契约.md` > 当前 project-owned source/contracts/tests > `docs/14-agent-skills/README.md` 与 `docs/solutions/**` advisory evidence > Agent Skills 固定快照。 |
+| Recommended approach | 复用现有 `spec-plan`、`spec-work`、`spec-code-review`、`spec-test-browser`、`spec-doc-review`；新增 2 个 skill-local planning reference，扩展 2 个既有 planning owner、4 个既有 reviewer、新增 1 个 internal frontend reviewer，修复 browser 的五宿主 internal delivery 断链，并给 `spec-doc-review` 加一个显式 `mutation:report-only output:json` 调用方式。U6 task-scoped review 直接读取同一 checkout 的 live plan；只有 U13 shipping caller 需要跨调用锁定 plan freshness，由 `skills/spec-work/scripts/source-plan-file-hash.cjs` 在调用前后计算并比较目标 plan 的完整文件字节 SHA-256，不一致就重跑。两者都不需要签名、DACL、sealed evidence 链或补偿事务。 |
+| Authority hierarchy | `docs/10-prompt/结构化项目角色契约.md` 的 durable boundaries > 当前用户目标与本方案 Product Contract 的 scope/value decisions > 当前 project-owned source/contracts/tests > `docs/14-agent-skills/README.md` 与 `docs/solutions/**` advisory evidence > Agent Skills 固定快照。 |
 | Decision focus | 条件能力由谁持有、何时触发、何时不触发；机制复杂度是否与 spec-first 自身声明的（非对抗性、单机、单用户）威胁模型成比例；如何避免公共入口、truth source 和 runtime generator 膨胀。 |
 | Verification focus | `docs/14-agent-skills/README.md` 的 24 项映射与本方案决策核对一致；每个受影响能力至少 2 个 positive / 2 个 negative-owner case；五宿主 recursive projection、`evals/**` source-only、public catalog 零增量；fresh-source 状态与 host/field 证据分层记录，不越级声称。 |
 | Largest risk or boundary | 工作树在规划与实施之间持续变化，静态 dirty 清单会失效——U1 必须在实施时动态重算。`spec-test-browser` 当前未被五宿主交付，且 pipeline 模式会直接后台启动待审分支的 dev server；U8 必须先堵住这个真实的执行面问题，再谈能力增强。 |
 | Stop conditions | 任一 slice 需要新公共 Skill 才能成立；canonical owner/negative boundary 不明确；fresh-source 未执行却声称通过；任一新机制的复杂度无法用"防的是哪个真实威胁"回答；既有硬门（browser 未强制层降级为 not_supported/not_run、五宿主 projection、findings schema）被绕过。 |
-| Execution profile | Deep，跨 workflow/source/test/runtime 的能力集成；U1-U13 由 `spec-work` 按依赖顺序执行，最终 review/verification/runtime adoption/plan closeout 由现有 shipping tail 持有。 |
+| Execution profile | Deep，跨 workflow/source/test/runtime 的能力集成；U1-U8、U10-U13 由 `spec-work` 按依赖顺序执行，最终 review/verification/runtime adoption/plan closeout 由现有 shipping tail 持有。 |
 
 ---
 
@@ -48,19 +50,19 @@ origin: docs/14-agent-skills/README.md
 本方案把外部 Agent Skills 中已验证有价值的工程知识，转化为 Spec-First 自有、可回源、可验证、跨宿主投射的条件能力。
 不新增 source Skill 或 public workflow，通过 skill-local reference、内部 reviewer、聚焦 fixture 与 contract test 补齐内容缺口；当前 35 个 source Skill 仅作为 U1 的实施基线，不作为永久常量。
 
-机制设计原则（本次修订新增）：**任何新增的确定性检查机制，其复杂度必须与它所防御的真实威胁成比例**。spec-first 是单开发者、本机 checkout 内运行的工具，唯一真正的不可信输入是浏览器页面内容；plan、prompt、评审产物都在同一个 uid 下，本就可被同一个 agent 直接读取。因此本方案按时间与 actor 边界分两档：U6 的同会话 task review 直接读取 live plan，不传正文或 hash；U13 的 shipping 语义复核可能跨调用并与人工编辑并发，由 caller 在调用前后对同一 plan 计算并比较一次 SHA-256。不引入跨平台 ACL/DACL attestation、byte-exact 反重构证据链、多阶段 sealed pipeline 或进程级 supervisor 协议——这些机制的防御目标是"同一本机用户下的恶意攻击者"，而这正是本方案（以及 spec-first 自身）明确声明不打算防御的对手。
+机制设计原则（本次修订新增）：**任何新增的确定性检查机制，其复杂度必须与它所防御的真实威胁成比例**。本地同一 checkout 下的 plan、prompt 与项目评审产物不按同 UID 恶意篡改建模；外部 model、tool、browser/web 内容仍默认不可信。因此本方案按时间与 actor 边界分两档：U6 的同会话 task review 直接读取 live plan，不传正文或 hash；U13 的 shipping 语义复核可能跨调用并与人工编辑并发，由 caller 在调用前后通过唯一 helper 对同一 plan 的完整文件字节计算并比较一次 SHA-256。不引入跨平台 ACL/DACL attestation、byte-exact 反重构证据链、多阶段 sealed pipeline 或进程级 supervisor 协议——这些机制的防御目标是"同一本机用户下的恶意攻击者"，而这正是本方案（以及 spec-first 自身）明确声明不打算防御的对手。
 
 ### Current Baseline
 
 截至 2026-07-17：
 
-- Origin report 的 Spec-First snapshot 为 `a2f37c6075d35d4f686371bca4fb20c31275e142`；capability-source baseline 为 `6a0f060cf6cf4b00149afd7682688d4b6d8ad56f`；plan-review HEAD 为 `f9213c15e9049c72f7e891e6980e0a154bb65cdd`。U1 仍须在实施时重新采样，不把任一历史 revision 当作 current truth。
+- Origin report 的 Spec-First snapshot 为 `a2f37c6075d35d4f686371bca4fb20c31275e142`；capability-source baseline 为 `6a0f060cf6cf4b00149afd7682688d4b6d8ad56f`；plan-review HEAD 为 `f9213c15e9049c72f7e891e6980e0a154bb65cdd`。Origin 中 2026-07-17 的 U1 核对只是历史 advisory snapshot；任何新的 `spec-work` run 都须在首次 source mutation 前重新采样，不把历史 revision 当作 current truth。
 - Agent Skills 固定快照为 `98967c45a42b88d6b8fb3a88b7ff6273920763d6`，tag `0.6.4`，24 个 Skill；`docs/14-agent-skills/README.md` 已完成全量映射：14 个强承载、10 个部分承载。
-- 决策：新增 0 个公共 Skill，直接引入 0 个外部 Skill，新增 2 个 skill-local reference，扩展 2 个既有 reference/lens，扩展 4 个 existing reviewer，新增 1 个内部条件 reviewer persona。
+- 决策：新增 0 个公共 Skill，直接引入 0 个外部 Skill，新增 2 个 skill-local planning reference，扩展 1 个既有 planning lens 与 1 个 `spec-work` reference，扩展 4 个 existing reviewer，新增 1 个内部条件 reviewer persona。
 - `skills/spec-plan/SKILL.md`、`high-risk-plan-lens.md`、`planning-evidence-boundaries.md`、`spec-plan/evals/**` 与 consumer replay 已进入 live HEAD，是本方案的 protected baseline。
 - `skills/spec-work/references/feedback-and-tests.md` 与 `spec-work/evals/examples.json` 已持有 smallest-loop、vertical-slice、proof/characterization、scenario-completeness、system-wide-check 与 replacement-evidence 合同；U5 只补 DAMP、state-over-interaction、test-double hierarchy、contract/risk-first 与 rollback-friendly slicing，不新建第二个 test-design owner。
 - `spec-doc-review` 当前对可写 Markdown 默认 `mutation_policy: markdown-write`，`mode:headless` 只改变交付方式不改变 mutation 策略；shipping tail 若要做只读语义评审，需要一个显式的 report-only 调用方式（U13）。
-- `src/cli/task-pack.js` 的 `computeSourcePlanHash()` 只对去 frontmatter 后的正文计算 hash；`src/cli/commands/tasks.js` 默认的 `task-plan-hash/v1` 足够支撑 U13 shipping caller 的 before/after freshness 检查。U6 的同会话 task review 直接读取 live plan，不消费该 hash，也不需要 byte-range 或 canonical anchor grammar。
+- `src/cli/task-pack.js` 的 `computeSourcePlanHash()` 只对去 frontmatter 后的正文计算 hash，因此 `task-plan-hash/v1` 只用于 task-pack 正文身份，不能证明 frontmatter 未变。U13 由新增的 `skills/spec-work/scripts/source-plan-file-hash.cjs` 持有完整文件字节 SHA-256；U6 的同会话 task review 直接读取 live plan，不消费任一 hash，也不需要 byte-range 或 canonical anchor grammar。
 - `src/cli/plugin-sync.js` 已支持递归 skill 投射并排除 `evals/**`；但 `src/cli/plugin-governance.js` 的 `DELIVERED_INTERNAL_SKILLS` 只含 `spec-worktree`，导致已声明 `internal_only` 的 `spec-test-browser` 在五宿主 projection 中为 0 条路径。U8 需要最小修复这一 delivery policy。
 - `skills/spec-test-browser/SKILL.md` 与 `references/pipeline-orchestration.md` 目前会在 pipeline 模式直接后台执行 `bin/dev`/Rails/`npm run dev`，读取待审分支代码；仓库没有任何可验证的 attestation/sandbox primitive 支撑"认证启动"。U8 必须移除这个未经证实的 happy path，诚实降级为 `not_supported`。
 - 当前宿主支持列表由 `src/cli/adapters/index.js` 的 `getSupportedPlatforms()` 返回：Claude、Codex、Cursor、Kiro、Qoder。
@@ -96,9 +98,9 @@ Spec-First 已经拥有比 Agent Skills 更完整的 intent/artifact/evidence/ha
 
 #### Scope 与基线
 
-- R1. 实施开始前核对 `docs/14-agent-skills/README.md`：确认其 24 个 Skill 的 ID/decision/U-ID 映射与本方案 Current Baseline 描述一致，不一致则直接更新该文件；不新建第二份 evidence manifest 去复制这份信息。
+- R1. 实施开始前核对 `docs/14-agent-skills/README.md`：确认其 24 个 Skill 的编号/decision/建议落点映射与本方案 Current Baseline 描述一致，不一致则直接更新该文件；U-ID 对应关系只由本计划的 Implementation Units 持有，不新建第二份 evidence manifest 去复制这些信息。
 - R2. 不新增公共 Skill、不 vendoring Agent Skills、不改 public catalog 语义；source Skill 目录数相对 U1 实施基线零增量（当前观察值 35）。
-- R3. U1 在第一次 source mutation 前，动态计算当前 dirty paths 与 U1-U13 写集的交集，逐文件确认 owner 与预期基线；无法协调的交集文件只阻塞受影响 unit，不覆盖他人改动。
+- R3. U1 在第一次 source mutation 前，动态计算当前 dirty paths 与 U1-U8、U10-U13 写集的交集，逐文件确认 owner 与预期基线；无法协调的交集文件只阻塞受影响 unit，不覆盖他人改动。
 
 #### 条件 reference 与 planning/work 能力
 
@@ -132,16 +134,16 @@ Spec-First 已经拥有比 Agent Skills 更完整的 intent/artifact/evidence/ha
 - R16. `spec-security-audit`、`spec-migration`、`spec-observability` 继续 Defer。
 - R17. 全部 source-bearing unit 完成聚焦验证后，由 orchestrator 在 shipping closeout 前一次性汇总更新 `CHANGELOG.md`；worker 不写该共享文件，Changelog 更新早于任何另行获授权的 commit。
 - R18. Fresh-source `passed`/`concerns`/`not_run` 是语义证据状态；`not_run` 带 reason，可关闭 source implementation 但不获得 semantic-passed claim；`concerns` 必须解决或由 maintainer 显式接受并记录理由。
-- R19. `spec-doc-review` 增加显式 `mutation:report-only` 与可选 `output:json` 调用方式，独立于 interactive/headless delivery，覆盖可写 Markdown：强制 `fixes_applied: 0`，跳过 walkthrough/bulk/open-questions mutation，confidence-100 的 `safe_auto` 候选转为 `producer_fix_candidates` 供 caller 自行决定。Caller 在 dispatch 前后各计算一次目标 plan 文件的 SHA-256；不一致时丢弃本次评审结果并重跑，不需要签名或 sealed artifact。
+- R19. `spec-doc-review` 增加显式 `mutation:report-only` 与可选 `output:json` 调用方式，独立于 interactive/headless delivery，覆盖可写 Markdown：强制 `fixes_applied: 0`，跳过 walkthrough/bulk/open-questions mutation，confidence-100 的 `safe_auto` 候选转为 `producer_fix_candidates` 供 caller 自行决定。Caller 在 dispatch 前后各调用一次 `skills/spec-work/scripts/source-plan-file-hash.cjs`，比较目标 plan 完整文件字节的 SHA-256；不一致时丢弃本次评审结果并重跑，不需要签名或 sealed artifact。
 
 ### Key Flows
 
-- F1. Evidence baseline：读取 origin report、`docs/14-agent-skills/README.md` 与当前 source，动态计算 U1-U13 写集与 dirty 交集，逐文件确认 owner 与基线；不新建 evidence manifest 或中央 case index。
+- F1. Evidence baseline：读取 origin report、`docs/14-agent-skills/README.md` 与当前 source，动态计算 U1-U8、U10-U13 写集与 dirty 交集，逐文件确认 owner 与基线；不新建 evidence manifest 或中央 case index。
 - F2. Planning lens：请求命中接口设计/演进、UI 或 high-risk 语义时，`spec-plan` 加载对应 reference 并把决策落入 Planning Contract。
 - F3. Work evidence：`spec-work` 读取 U-ID，按 `feedback-and-tests.md` 选择 slice 和证据策略，观察 RED 或 baseline，记录 run-local evidence。
 - F4. Review：producer 在 task context 中标注对应的 plan 路径与章节标题；reviewer 直接读取该 plan 文件对应章节作为 API 契约上下文（reviewer 与 producer 在同一次 `spec-work` 会话中对同一 checkout 工作，直接读 live 文件即可，不需要额外传递或核对 hash）。API/security/testing/reliability 按语义选择，findings 走既有 schema。
 - F5. Runtime projection：canonical `skills/**` 变更后，`plugin-sync` 递归投射到五宿主，`evals/**` 缺席。
-- F6. Plan 定稿后的语义复核：shipping caller 记录 plan hash → 调用 `spec-doc-review mode:headless mutation:report-only output:json` → 解析 JSON envelope → 重新计算 plan hash 确认未变 → 处置 P0/P1。
+- F6. Plan 定稿后的语义复核：shipping caller 调用 `source-plan-file-hash.cjs` 记录 plan 完整文件字节 SHA-256 → 调用 `spec-doc-review mode:headless mutation:report-only output:json` → 解析 JSON envelope → 用同一 helper 重新计算完整文件字节 SHA-256 确认未变 → 处置 P0/P1。若 plan owner 因 finding 重组计划，旧 task-pack identity、semantic-fit、task/code review 与相关验证立即失效；caller 必须回到 intake，重新生成或验证 task pack，并重跑受影响的实现验证与 code review 后才能再次进入语义复核和 Final Validation。
 
 ### Acceptance Examples
 
@@ -157,12 +159,12 @@ Spec-First 已经拥有比 Agent Skills 更完整的 intent/artifact/evidence/ha
 ### Success Criteria
 
 - `docs/14-agent-skills/README.md` 的 24 项映射、14/10 承载计数与本方案决策一致，或已按需更新。
-- 2 个新增、2 个扩展 planning reference/lens，4 个扩展 reviewer，1 个新增内部 reviewer 均有 canonical owner、trigger、negative boundary、consumer 与 focused test。
+- 2 个新增 planning reference、1 个扩展 planning lens、1 个扩展 `spec-work` reference，4 个扩展 reviewer，1 个新增内部 reviewer 均有 canonical owner、trigger、negative boundary、consumer 与 focused test。
 - 每个受影响能力（含 browser）至少 2 positive / 2 negative case，由 owning skill 的 `evals/` 持有。
 - source Skill 目录数、public catalog 相对 U1 基线零增量。
 - 五宿主 projection 包含 runtime-required assets、排除 `evals/**`，无手改 generated runtime。
 - `spec-doc-review` 具备 caller 可强制的 report-only/JSON 调用方式，且默认 Markdown/HTML 行为不变。
-- U6 task-scoped review 只读 live plan；U13 shipping caller 的跨调用 freshness 只依赖调用前后 hash 比较；两者都没有引入 DACL/sealed-evidence/supervisor-IPC 类基建。
+- U6 task-scoped review 只读 live plan；U13 shipping caller 的跨调用 freshness 只依赖唯一 full-file hash helper 的调用前后比较；两者都没有引入 DACL/sealed-evidence/supervisor-IPC 类基建。
 
 ### Scope Boundaries
 
@@ -182,7 +184,7 @@ Spec-First 已经拥有比 Agent Skills 更完整的 intent/artifact/evidence/ha
 - 真实五宿主 clean-session loader 观测与 field adoption 指标。
 - Authenticated browser server launcher/attestation：需要真实 host primitive 提供不可伪造的认证通道后才单独立项。
 - Screenshot 视觉模型摄入：需要独立方案处理数据授权与视觉敏感信息后才启用。
-- 三个未来 public Skill 候选（`spec-security-audit`/`spec-migration`/`spec-observability`）的 PRD：R16 门槛满足后启动。
+- 三个未来 public Skill 候选（`spec-security-audit`/`spec-migration`/`spec-observability`）的 PRD：Origin 第 8 节 Wave 3 量化采用门槛满足后启动；R16 只记录本轮继续 Defer 的决定。
 
 #### Outside this plan
 
@@ -212,14 +214,14 @@ Spec-First 已经拥有比 Agent Skills 更完整的 intent/artifact/evidence/ha
 - KTD10. scripts 只验证文件存在、hash 一致、findings schema、case coverage、五宿主 runtime path 与 public roster；lens applicability、设计充分性、finding validity 由 LLM/reviewer 判断。
 - KTD11. 每个能力按纵向 slice 交付：source、trigger、positive/negative case、contract test、fresh-source eval 状态、review 同一 U-ID 关闭。
 - KTD12. fresh-source `not_run` 是诚实降级；`concerns` 必须解决或有 maintainer 授权接受记录。
-- KTD13. runtime adoption 复用现有 `plugin-sync.js` 递归复制与 `plugin-governance.js` 的 delivery policy；U8 只最小扩展 `DELIVERED_INTERNAL_SKILLS`。
+- KTD13. runtime adoption 复用现有 `plugin-sync.js` 递归复制与 `plugin-governance.js` 的 delivery policy；U8 只最小扩展 `DELIVERED_INTERNAL_SKILLS`。五宿主 projection 通过只授予 `projection_confirmed`，不得自动升级为 `host_reachable`；只有逐宿主真实 loader/invocation observation 才能授予后者，未运行时记录 `not_run` 或 degraded limitation。
 - KTD14. `spec-test-browser` 只实现 `agent-browser` 本地默认 backend 这一条路径；引入第二种执行方式（其他 CLI/MCP/远程 backend）需要独立 readiness 证据才能新增，且到那时再决定合适的分层术语，不预先建三层分类法。
 - KTD15. `spec-prd`/`spec-debug`/`spec-compound` 本轮不因"求完整"而强行改动。
 - KTD16. `CHANGELOG.md` 是 orchestrator-owned 共享写入面：全部 source-bearing unit 完成聚焦验证后，在 shipping closeout 前一次性汇总追加；worker 不并发写。
 - KTD17. 行为 case 保持 skill-local，直接写进 owning skill 的 `evals/*.json`；不建中央 case index——它要索引的信息（case 是否存在、属于哪个 U-ID）已经由该 skill 自己的 focused test 断言，另建索引是重复记账，不是新增证据。
 - KTD18. Browser 安全分两层：wrapper 层的 capability probe、私有目录写入（本机当前用户 + 权限收紧）、test-plan 前后 hash 校验、默认拒绝的 action policy，属于 script-enforced 地板；"选哪些 route/step、locator 语义是否合理"属于 LLM/human 判断。当前五宿主没有 request-time exact-origin 或 sandbox primitive，因此 browser 的实际导航/交互一律 `not_supported`，pipeline 模式不自动起 server；interactive 模式下用户明确确认后可以启动一个 server 进程，关闭它是用户自己的职责，wrapper 不追踪进程或做代为清理。这个分层足以覆盖"防止 pipeline 静默执行待审分支代码"的真实风险，不需要跨平台 DACL attestation 或 supervisor handle 协议。
 - KTD19. interface lens 采用共享 contract core + greenfield/evolution 双分支；适用时在 Planning Contract 下生成可选 `### Interface Contracts` subsection。Evolution 必须指向 repo 内可读文件并绑定一个 repo-native parser 作为实施期验证；greenfield 只需声明目标 path/type/owner 与创建 U-ID。不新增跨格式 parser/validator 基础设施。
-- KTD20. `spec-doc-review` 的 report-only 调用方式与跨阶段一致性检查统一为"caller 在调用前后各算一次目标文件的 SHA-256，不一致就重跑"。不引入多阶段 sealed evidence 生命周期、authorization receipt、per-persona canonical leaf artifact 或 protected manifest；这些机制原本用于抵抗"同一 host/UID 下的恶意篡改"，而这正是 spec-first 自身声明不打算防御的威胁。语义评审的证据要求，一份 hash 加一份 JSON envelope 就足够。
+- KTD20. `spec-doc-review` 的 report-only 调用方式与跨阶段一致性检查统一为"caller 在调用前后各调用一次 `skills/spec-work/scripts/source-plan-file-hash.cjs`，比较目标 plan 的完整文件字节 SHA-256，不一致就重跑"。该 helper 是整文件 freshness 的唯一确定性 owner；`task-plan-hash/v1` 继续只承担去 frontmatter 后的 task-pack 正文身份，不复用为整文件 freshness 证明。不引入多阶段 sealed evidence 生命周期、authorization receipt、per-persona canonical leaf artifact 或 protected manifest；这些机制原本用于抵抗"同一 host/UID 下的恶意篡改"，而这正是 spec-first 自身声明不打算防御的威胁。语义评审的证据要求，一份完整文件 hash 加一份 JSON envelope 就足够。
 
 ### High-Level Technical Design
 
@@ -253,7 +255,8 @@ flowchart TB
 | `### Interface Contracts` block + canonical artifact | `interface-and-evolution-lens.md` + repo 内 API/schema owner | plan-time decision + project-owned source | implementer、API reviewer | consumers、artifact path/type、protocol、request/response、error model、compatibility、verification |
 | task-scoped review context | `spec-work` producer | plan path + 相关章节标题 | `spec-code-review` API/security owner | producer 标注 plan 路径与章节标题；reviewer 直接读取当前 live plan 文件对应内容 |
 | browser safe-run manifest | `spec-test-browser` safe wrapper | generated/degraded runtime fact | browser workflow | CLI 版本、capability probe 结果、private-dir 检查结果、test-plan hash、server 是否曾启动 |
-| `spec-doc-review-report/v1` JSON envelope | `spec-doc-review` JSON producer | semantic advisory evidence | shipping caller | delivery/mutation policy、findings、counts、coverage、limitations；plan freshness 由 shipping caller 在 envelope 外做 before/after hash 比较 |
+| source plan full-file hash | `skills/spec-work/scripts/source-plan-file-hash.cjs` | deterministic freshness fact | `spec-work` shipping caller | 从 artifact root 解析 repo-relative regular file，读取完整文件原始字节并输出 `sha256:<64-hex>`；拒绝绝对路径、repo escape、缺失或非普通文件 |
+| `spec-doc-review-report/v1` JSON envelope | `spec-doc-review` JSON producer | semantic advisory evidence | shipping caller | delivery/mutation policy、findings、counts、coverage、limitations；plan freshness 由 shipping caller 在 envelope 外做 before/after 完整文件字节 SHA-256 比较 |
 | `spec-work` shipping closeout envelope | existing `spec-work` shipping tail | confirmed/degraded execution closeout | completion response、plan lifecycle | 复用现有 `verification_run_summary_ref`、`honest_closeout_verdict`、limitations |
 
 ### Existing Capability / Composition / Source Ownership
@@ -286,7 +289,7 @@ flowchart TB
 - U1 是所有 unit 的 gate。
 - U2、U3、U4 语义上都只依赖 U1，但会触及同一 `spec-plan` surface，按 U2 → U3 → U4 串行调度。
 - U5 与 U2-U4 写集分离，可并行。
-- U6 依赖 U3；U10 依赖 U6；U11 依赖 U5；U12 依赖 U2。四者调度串行以共享 catalog/Changelog 表面。
+- U6 依赖 U3；U10 依赖 U6；U11 依赖 U5；U12 依赖 U2。四者调度串行以共享 `spec-code-review` source、persona catalog 与 `tests/unit/spec-code-review-contracts.test.js` 表面。
 - U7 依赖 U4、U10、U11、U12。
 - U8 只依赖 U1，可并行执行。
 - U13 只依赖 U1，可并行执行。
@@ -316,13 +319,13 @@ flowchart TB
 | U12 | 扩展 reliability reviewer | reliability persona、eval/test | U2 |
 | U7 | 新增 frontend-quality reviewer | frontend persona、catalog/eval/test | U4、U10、U11、U12 |
 | U8 | 修复 browser delivery 并完成 capability/safety | browser source/script/pipeline、plugin governance | U1 |
-| U13 | 增加 Markdown report-only 文档评审并接入 shipping caller | `spec-doc-review`、`shipping-workflow.md`、eval/test | U1 |
+| U13 | 增加 Markdown report-only 文档评审并接入 shipping caller | `spec-doc-review`、`source-plan-file-hash.cjs`、`shipping-workflow.md`、eval/test | U1 |
 
 U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail 的 final review 与 final checks；不设独立的 Phase 2 集成 unit（原 U9），理由见 Sequencing 一节。
 
 ### U1. 确认实施基线并核对当前工作树状态
 
-**Goal:** 在动手改任何 source 前，用一次 `git status` 确认工作树干净、用一次对 `docs/14-agent-skills/README.md` 的引用确认 24 项映射与本方案决策仍一致；不为此新建第二份可回放清单或并发写集协调机制。
+**Goal:** 在动手改任何 source 前，用一次 `git status` 确认当前工作树状态并识别 dirty paths 与本方案 write-set 的交集，再核对 `docs/14-agent-skills/README.md` 的 24 项映射与本方案决策；只阻塞无法协调的受影响 unit，不为此新建第二份可回放清单或并发写集协调机制。
 
 **Requirements:** R1、R2、R3、R17、R18
 
@@ -330,7 +333,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Files:**
 
-- Read/confirm: `docs/14-agent-skills/README.md`（核对 24 项映射、14/10 承载计数与本方案"2 new / 2 extended / 4 reviewer / 1 persona"决策仍一致）
+- Read/confirm；若映射或决策过时则 Modify: `docs/14-agent-skills/README.md`（核对 24 项映射、14/10 承载计数与本方案"2 new planning reference / 1 extended planning lens / 1 extended work reference / 4 reviewer / 1 persona"决策仍一致）
 - Read/confirm: `skills/spec-plan/SKILL.md`、`skills/spec-plan/references/high-risk-plan-lens.md`、`skills/spec-plan/references/planning-evidence-boundaries.md`、`skills/spec-plan/evals/examples.json`
 - Read/confirm: `skills/spec-work/SKILL.md`、`skills/spec-work/references/feedback-and-tests.md`、`skills/spec-work/evals/examples.json`
 - Read/confirm: `src/cli/plugin-governance.js`、`src/cli/contracts/dual-host-governance/skills-governance.json`
@@ -338,9 +341,9 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Approach:**
 
-- 开工前跑 `git status --short`；若工作树非空，逐文件确认是否与本方案 write-set 冲突，冲突文件先协调再动手，不需要为此新建 dirty/write-set collision-guard 子系统或 `baseline_changed` 状态机——单开发者串行执行 U1-U13 时，一次 `git status` 加人工判断就是这件事应有的成本。
+- 开工前跑 `git status --short`；若工作树非空，逐文件确认是否与本方案 write-set 冲突，冲突文件先协调再动手，不需要为此新建 dirty/write-set collision-guard 子系统或 `baseline_changed` 状态机——单开发者串行执行 U1-U8、U10-U13 时，一次 `git status` 加人工判断就是这件事应有的成本。
 - 逐项核对 `docs/14-agent-skills/README.md` 中的 24 项映射、14/10 承载计数是否仍与本方案 Current Baseline 描述一致；若已被其他方案合入或过时，直接更新该 README 的相关段落（这是它自己的 source，不需要另建一份 evidence-manifest.json 去"回放"同一信息）。
-- 确认 `task-plan-hash/v1`（现有 `computeSourcePlanHash()` + `tasks hash --json`）已经能满足 U13 shipping caller 的 before/after freshness 需求；同时确认 U6 只需在同一 checkout 传 plan path + section title 并直接读取 live plan，不传递 hash。不新增 stable-source-read、strict-JSON、Windows adapter 或 changed-tree-freeze 基础设施——这些机制原方案用于抵抗同 UID 恶意篡改，超出本方案实际威胁模型。
+- 确认 `task-plan-hash/v1`（现有 `computeSourcePlanHash()` + `tasks hash --json`）只用于 task-pack 正文身份；U13 由 `source-plan-file-hash.cjs` 另行比较 plan 完整文件字节 SHA-256。U6 只需在同一 checkout 传 plan path + section title 并直接读取 live plan，不传递 hash。不新增 stable-source-read、strict-JSON、Windows adapter 或 changed-tree-freeze 基础设施——这些机制原方案用于抵抗同 UID 恶意篡改，超出本方案实际威胁模型。
 - 每个能力的 positive/negative case 直接写进该能力 owning skill 的 `evals/*.json`（U2-U8、U10-U13 各自负责），不建中央 `case-index.json`；谁改了 source，谁的 focused test 就在同一 PR/commit 里断言对应 case 存在，不需要一个独立的中央索引文件去二次确认。
 - `CHANGELOG.md` 不进入任何 worker unit 写集；全部 source-bearing unit 完成聚焦验证后，由 orchestrator 在 shipping closeout 前一次性汇总追加（KTD16）。
 
@@ -351,7 +354,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Test scenarios:**
 
-- Happy path：`git status --short` 干净，`docs/14-agent-skills/README.md` 的 24 项映射与本方案决策一致，U2-U13 可直接开工。
+- Happy path：`git status --short` 的 dirty/write-set 交集为空或已逐文件协调，`docs/14-agent-skills/README.md` 的 24 项映射与本方案决策一致，U2-U8、U10-U13 可直接开工。
 - Failure path：工作树存在与本方案 write-set 冲突的未提交改动，先协调该文件的 owner 再继续，不覆盖他人改动。
 - Failure path：`docs/14-agent-skills/README.md` 的某项决策已被其他方案合入或过时，先更新该 README，再让引用它的下游 unit 继续。
 
@@ -391,8 +394,10 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Test scenarios:**
 
-- Happy path：staged 外部 rollout 含 feature flag、CI gate、dashboard、on-call owner，计划明确 fidelity、signal、rollback、runbook。
+- Positive：staged 外部 rollout 含 feature flag、CI gate、dashboard、on-call owner，计划明确 fidelity、signal、rollback、runbook。
+- Positive：CI 使用替代 artifact 且 observability 只写"add monitoring"时，要求 production/build fidelity、correlation、telemetry query proof、alert owner/action/runbook。
 - Negative owner：docs-only release note 保持 lightweight。
+- Negative owner：不影响 build、deploy、runtime、feature flag 或 release control 的低影响 config/comment 清理不触发 production ceremony。
 - Failure path：计划只写"add monitoring"，fixture 判定 required landing 未关闭。
 - Regression：现有 anchors 在 extension 后仍存在。
 
@@ -436,7 +441,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 - Covers AE1. Greenfield/existing breaking change 分别命中对应分支。
 - Negative owner：private rename、无 consumer 的 internal refactor 不加载 lens。
-- Failure path：evolution 场景缺 canonical artifact 时不能判为 implementation-ready，需 `parser_unavailable` + 实施期验证 U-ID。
+- Failure path：evolution 场景缺 canonical artifact 或 artifact 不可读时阻塞 `implementation-ready`；artifact 可读但没有 repo-native parser/test 时才记录 `parser_unavailable`，并绑定实施期验证 U-ID、owner 与 unblock condition。
 
 **Verification:**
 
@@ -473,9 +478,10 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Test scenarios:**
 
-- Happy path：新异步表单含 loading/error/empty/permission/retry、mobile layout、keyboard focus。
+- Positive：新异步表单含 loading/error/empty/permission/retry、mobile layout、keyboard focus。
+- Positive：纯 CSS 或 design token 修改降低 contrast、移除 focus indicator 或造成 mobile breakpoint overflow 时必须加载。
 - Negative owner：backend-only handler 不加载。
-- Edge case：纯 CSS 降低 contrast 或移除 focus indicator 时必须加载。
+- Negative owner：不影响 contrast、focus、layout、responsive、motion 或状态表达的 token-value-only 修改不加载。
 
 **Verification:**
 
@@ -515,6 +521,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 - Happy path：新增可观察 parser behavior，选 vertical slice，先加最小 failing test。
 - Happy path：共享 CLI 契约先稳定，选 contract-first。
 - Negative owner：docs-only 记录 no-test exception。
+- Negative owner：不改变可观察行为的 config-only 或 type-only 变更继续走 no-test exception，不触发测试设计 ceremony；由 `skills/spec-work/evals/examples.json` 与 focused test 断言。
 - Failure path：最终测试通过但没有 RED 证据，只能描述"tests added/updated"，不能声称 TDD。
 
 **Verification:**
@@ -634,6 +641,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 **Test scenarios:**
 
 - Positive：测试只断言 mock call count 不证明 state/behavior，返回 false-confidence finding。
+- Positive：integration fake 跳过 serialization、permission middleware 与 error translation，却声称覆盖真实跨层链路时返回 proof-sufficiency finding。
 - Negative owner：interaction 本身是公共契约且断言稳定时不报。
 - Negative owner：没有 execution evidence 时不从最终 diff 推断"未做 TDD"。
 
@@ -669,8 +677,10 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Test scenarios:**
 
-- Positive：跨服务调用缺 correlation propagation，返回具体 failure-path finding。
+- Positive：跨服务调用在 retry job payload/log 中丢失 correlation ID，返回具体 failure-path finding。
+- Positive：timeout 被吞成成功样式 fallback，metric 缺 failure correlation 且 alert 没有 owner/action/runbook 时返回 silent-failure finding。
 - Negative owner：pure in-memory transform 不报。
+- Negative owner：diff 只证明 telemetry emission、没有 dashboard query/alert delivery/on-call 运行证据时，不升级为 field-outcome finding。
 
 **Verification:**
 
@@ -718,7 +728,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 ### U8. 修复 browser internal delivery，并完成 capability、安全与 degraded contract
 
-**Goal:** 先让 `spec-test-browser` 真正到达五宿主 runtime，再以 capability probe、run-local test-plan hash 校验、私有目录写入检查、default-deny action policy 完成可执行的 browser 安全合同。当前五宿主缺少可验证的 sandbox/attestation primitive，因此 browser 的实际导航/交互一律 `not_supported`，pipeline 模式不自动起 server。
+**Goal:** 先让 `spec-test-browser` 进入五宿主 runtime projection，再以 capability probe、run-local test-plan hash 校验、私有目录写入检查、default-deny action policy 完成可执行的 browser 安全合同。Projection 只授予 `projection_confirmed`；逐宿主 loader/invocation 未观察时 `host_reachable` 保持 `not_run` 或 degraded。当前五宿主缺少可验证的 sandbox/attestation primitive，因此 browser 的实际导航/交互一律 `not_supported`，pipeline 模式不自动起 server。
 
 **Requirements:** R4、R6、R12、R13、R14、R17、R18
 
@@ -731,7 +741,8 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 - Create: `skills/spec-test-browser/evals/capability-cases.json`
 - Create: `tests/unit/spec-test-browser-contracts.test.js`
 - Modify: `src/cli/plugin-governance.js`
-- Modify: `tests/unit/plugin-modules.test.js`、`tests/unit/pipeline-mode-contracts.test.js`、`tests/unit/spec-lfg-contracts.test.js`
+- Modify: `tests/unit/plugin-modules.test.js`、`tests/unit/doctor-runtime-assets.test.js`、`tests/unit/pipeline-mode-contracts.test.js`、`tests/unit/spec-lfg-contracts.test.js`
+- Modify: `tests/integration/init-five-host-lifecycle.integration.test.js`
 
 **Approach:**
 
@@ -755,6 +766,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 **Test scenarios:**
 
 - Delivery happy path：五宿主 plan 均包含 internal-only `spec-test-browser` source/pipeline reference/script，`evals/**` 不投射。
+- Host-observation boundary：projection tests 通过但没有逐宿主 loader/invocation observation 时，`projection_confirmed` 为真而 `host_reachable` 保持 `not_run` 或 degraded。
 - Pipeline no-auto-start：pipeline 模式请求执行任何会加载待审分支代码的 server/build 命令时，无论 caller 声明什么，一律 `not_supported`。
 - Exact-origin fail-closed：capability 未确认时，wrapper 在启动任何 `agent-browser` navigation/interaction subprocess 前返回 `not_supported`，focused test 断言动作进程调用次数为 0。
 - Test-plan hash mismatch：`prepare` 之后 test-plan 文件被替换，`run` 在动作前用重新计算的 SHA-256 检测到不一致并中止。
@@ -766,6 +778,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 **Verification:**
 
 - 五宿主 delivery projection 通过；`spec-test-browser` 不进入 public catalog。
+- `host_reachable` 只在逐宿主真实 loader/invocation observation 存在时通过；未运行时记录 `not_run` 或 degraded limitation，不由 projection test 自动升级。
 - exact-origin 零动作调用、test-plan hash 校验、私有目录检查、pipeline no-auto-start 各有 focused test。
 - `npx jest --runTestsByPath tests/unit/spec-test-browser-contracts.test.js tests/unit/pipeline-mode-contracts.test.js tests/unit/spec-lfg-contracts.test.js tests/unit/plugin-modules.test.js --runInBand`
 
@@ -773,7 +786,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 ### U13. 为 spec-doc-review 增加显式 Markdown report-only 调用方式
 
-**Goal:** 让 `spec-doc-review` 支持一个显式的 `mutation:report-only output:json` 调用方式，供 shipping caller 在 plan 定稿后做只读语义复核；跨阶段一致性只依赖"调用前后比较一次 plan 文件 SHA-256"。
+**Goal:** 让 `spec-doc-review` 支持一个显式的 `mutation:report-only output:json` 调用方式，供 shipping caller 在 plan 定稿后做只读语义复核；跨阶段一致性只依赖唯一 helper 在调用前后比较一次 plan 完整文件字节 SHA-256。
 
 **Requirements:** R4、R13、R14、R17、R18、R19
 
@@ -783,8 +796,10 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 - Modify: `skills/spec-doc-review/SKILL.md`（Phase 0 增加 `mutation:report-only`/`output:json` flag 解析）
 - Modify: `skills/spec-doc-review/references/synthesis-and-presentation.md`（把 `caller-requested-report-only` 加入 `mutation_reason` 枚举）
-- Modify: `skills/spec-work/references/shipping-workflow.md`（shipping caller 前后 hash、JSON envelope 解析与 P0/P1 处置）
+- Create: `skills/spec-work/scripts/source-plan-file-hash.cjs`（完整文件原始字节 SHA-256 的唯一确定性 owner）
+- Modify: `skills/spec-work/references/shipping-workflow.md`（shipping caller 前后完整文件 hash、JSON envelope 解析、plan-recompose rewind 与 P0/P1 处置）
 - Create: `skills/spec-doc-review/evals/report-only-cases.json`
+- Create: `tests/unit/spec-work-source-plan-file-hash.test.js`
 - Modify: `tests/unit/spec-doc-review-contracts.test.js`、`tests/unit/spec-work-contracts.test.js`
 
 **Approach:**
@@ -793,10 +808,12 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 - Phase 1 policy resolution：显式传了 `mutation:report-only` 时，即使文档是可写 Markdown，也设置 `mutation_policy: report-only`、`mutation_reason: caller-requested-report-only`。未传该 flag 的普通调用保持现状（可写 Markdown 默认 `markdown-write`）。
 - 复用现有 report-only Phase 4 行为：`fixes_applied: 0`，confidence-100 的 `safe_auto` 转为 `producer_fix_candidates`，不进入 walkthrough/bulk/open-questions mutation。
 - `output:json` 返回现有结构化 envelope 的 JSON 版本：delivery/mutation policy、findings、counts、coverage、limitations。不新增 sealed input/authorization/synthesis-input/receipt 等额外 artifact schema——这些机制原方案用于防"同一 host/UID 下的恶意篡改"，超出实际威胁模型。
-- `skills/spec-work/references/shipping-workflow.md` 持有 caller 链：调用前用现有 `tasks hash --json` 记录目标 plan hash → 调用 `spec-doc-review mode:headless mutation:report-only output:json <plan>` → 校验 JSON envelope → 重新计算 plan hash；不一致时丢弃结果并重跑，一致时处置 P0/P1 后才进入 final checks。这是本方案对"证据不过期"这一诉求的唯一机制，不需要签名、DACL 或多阶段 sealed pipeline。
+- `skills/spec-work/scripts/source-plan-file-hash.cjs` 作为完整文件 freshness 的唯一确定性 owner：从 artifact root 接收一个 repo-relative source-plan path，拒绝绝对路径、repo escape、缺失或非普通文件，以 `Buffer` 读取包含 frontmatter 的完整原始字节并只输出 `sha256:<64-hex>`。它不解析 Markdown、不去 frontmatter、不做语义判断，也不生成持久 receipt。
+- `skills/spec-work/references/shipping-workflow.md` 持有 caller 链：调用前执行 `node skills/spec-work/scripts/source-plan-file-hash.cjs <source-plan>` → 调用 `spec-doc-review mode:headless mutation:report-only output:json <plan>` → 校验 JSON envelope → 用同一 helper 重新计算完整文件字节 SHA-256；不一致时丢弃结果并重跑，一致时处置 P0/P1 后才进入 final checks。`tasks hash --json` 继续只承担 task-pack 正文身份，不作为整文件 freshness 证明。
+- 若 P0/P1 处置触发 plan owner recompose，caller 必须回到 source-plan/task-pack intake：重新生成或验证 task pack、重跑 semantic-fit，并重跑受影响的实现验证与 code review；完成后才可再次执行 before/review/after 与 Final Validation。
 - 不改变 default Markdown write 行为或既有 HTML report-only 行为。
 
-**Execution note:** 先写会失败的 flag-parsing、policy-precedence、default-parity、shipping-caller hash-mismatch/disposition 测试，再改 `SKILL.md`、`synthesis-and-presentation.md` 与 `shipping-workflow.md`。
+**Execution note:** 先写会失败的 helper full-byte/path-safety、frontmatter-only mutation、flag-parsing、policy-precedence、default-parity、shipping-caller hash-mismatch/disposition 测试，再实现 helper 并修改 `SKILL.md`、`synthesis-and-presentation.md` 与 `shipping-workflow.md`。
 
 **Patterns to follow:**
 
@@ -805,16 +822,19 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 **Test scenarios:**
 
-- Positive：`mutation:report-only output:json mode:headless <markdown-plan>` 在可写 checkout 返回 report-only envelope、`fixes_applied: 0`，调用前后文件字节相同。
+- Positive：`mutation:report-only output:json mode:headless <markdown-plan>` 在可写 checkout 返回 report-only envelope、`fixes_applied: 0`，调用前后完整文件字节 SHA-256 相同。
+- Positive：helper 对同一普通文件的完整原始字节稳定输出同一个 `sha256:<64-hex>`，正文不变但 frontmatter 改动时 hash 必须变化。
 - Negative/parity：未传 mutation flag 的普通可写 Markdown 仍走 `markdown-write`，不被全局降级为只读。
 - Negative/parity：HTML 或 format-conflict 继续按既有 reason report-only。
-- Hash-check：caller 记录调用前 hash，评审过程中文件被改动，caller 重新计算的 hash 与之前不一致，丢弃本次结果并重跑（这是 caller 侧行为，由 U13 提供可验证的 before/after 一致性，不需要 helper 端的 sealed evidence 链）。
+- Negative owner：helper 收到绝对路径、repo escape、缺失路径或非普通文件时非零退出且不输出可误认成有效 hash 的值。
+- Hash-check：caller 记录调用前完整文件字节 SHA-256；评审期间只修改 frontmatter 或正文，caller 重新计算的 hash 都必须不一致，并丢弃本次结果重跑（这是 caller 侧行为，不需要 helper 端的 sealed evidence 链）。
+- Plan-recompose rewind：plan owner 因 finding 修改计划后，旧 task pack 与受影响 review/verification 不得继续支撑 Final Validation，caller 回到 intake 并重跑相应证据链。
 - Shipping integration：`shipping-workflow.md` 明确解析 report-only JSON、在 hash 一致后处置 P0/P1，hash mismatch 或 invalid envelope 时不得进入 final checks。
 
 **Verification:**
 
-- flag parsing、policy precedence、default parity、shipping caller hash/disposition 有 focused test。
-- `npx jest --runTestsByPath tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-work-contracts.test.js --runInBand`
+- helper 的完整原始字节、frontmatter-only mutation 与 path-safety 行为，以及 flag parsing、policy precedence、default parity、shipping caller hash/disposition 均有 focused test。
+- `npx jest --runTestsByPath tests/unit/spec-work-source-plan-file-hash.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-work-contracts.test.js --runInBand`
 
 ---
 
@@ -865,8 +885,9 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 | `spec-test-browser` 仍被 delivery policy 跳过 | Medium | High | U8 扩展 `DELIVERED_INTERNAL_SKILLS` 并逐宿主断言 |
 | pipeline 模式请求执行待审分支代码 | High | High | pipeline 模式不自动起 server；interactive 模式需用户明确确认展示的完整命令 |
 | browser test-plan 在运行期间被替换 | Medium | Medium | `run` 每次动作前重新计算并比较 test-plan SHA-256 |
-| `spec-doc-review` report-only 结果在评审过程中因 plan 并发改动而失效 | Medium | Medium | caller 调用前后各算一次 plan hash，不一致就丢弃重跑 |
-| 未来 public Skill 候选被主观高频推动 | Medium | Medium | R16 量化门槛（90 天 adoption、跨 repo、独立 artifact）；不满足继续 Defer |
+| `spec-doc-review` report-only 结果在评审过程中因 plan frontmatter 或正文并发改动而失效 | Medium | Medium | caller 调用前后各执行一次 `source-plan-file-hash.cjs`，hash 不一致就丢弃重跑 |
+| plan owner recompose 后沿用旧 task pack/review/verification | Medium | High | 任何计划修改都回到 intake，重新生成或验证 task pack、semantic-fit 与受影响证据 |
+| 未来 public Skill 候选被主观高频推动 | Medium | Medium | Origin 第 8 节 Wave 3 量化采用门槛（90 天 adoption、跨 repo、独立 artifact）；不满足继续 Defer |
 | 多 unit 并发修改 `CHANGELOG.md` | High | Medium | worker 不写 Changelog；orchestrator 在全部 unit 验证后一次性汇总 |
 
 ---
@@ -879,16 +900,16 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 | Work contract | U5 | `npx jest --runTestsByPath tests/unit/spec-work-implementation-quality-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-work-intake-contracts.test.js --runInBand` | proof/characterization parity、contract/risk-first、DAMP/state/test-double 通过 |
 | Review contract | U6、U7、U10-U12 | `npx jest --runTestsByPath tests/unit/spec-code-review-contracts.test.js tests/unit/spec-work-intake-contracts.test.js --runInBand` | 四个 reviewer 增强、新 persona、task context 降级路径通过 |
 | Browser contract | U8 | `npx jest --runTestsByPath tests/unit/spec-test-browser-contracts.test.js tests/unit/pipeline-mode-contracts.test.js tests/unit/spec-lfg-contracts.test.js tests/unit/plugin-modules.test.js --runInBand` | capability probe、test-plan hash 校验、pipeline no-auto-start、五宿主投射通过 |
-| Document-review report-only | U13 | `npx jest --runTestsByPath tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-work-contracts.test.js --runInBand` | flag parsing、policy precedence、default parity、shipping caller hash/disposition 通过 |
+| Document-review report-only | U13 | `npx jest --runTestsByPath tests/unit/spec-work-source-plan-file-hash.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-work-contracts.test.js --runInBand` | full-byte helper/path safety、flag parsing、policy precedence、default parity、完整文件 hash（含 frontmatter-only mutation）、plan-recompose rewind 与 shipping disposition 通过 |
 | Public entrypoints | shipping tail | `npx jest --runTestsByPath tests/unit/using-spec-first-contracts.test.js --runInBand` | public route/catalog 不新增 |
 | Plugin projection | shipping tail | `npx jest --runTestsByPath tests/unit/plugin-modules.test.js --runInBand` | 五宿主递归投射通过，排除 `evals/**` |
-| Skill governance | U2-U13 | `npm run lint:skill-entrypoints` | source Skill、entrypoints 治理合同通过 |
-| Syntax | U1-U13 | `npm run typecheck` | 无语法错误 |
+| Skill governance | U2-U8、U10-U13 | `npm run lint:skill-entrypoints` | source Skill、entrypoints 治理合同通过 |
+| Syntax | U1-U8、U10-U13 | `npm run typecheck` | 无语法错误 |
 | Focused unit suite | shipping tail | `npm run test:unit` | unit 层无回归 |
 | Five-host lifecycle | shipping tail | `npx jest --runTestsByPath tests/integration/init-five-host-lifecycle.integration.test.js --runInBand` | 五宿主 init/inspect/clean lifecycle 通过 |
 | Package content | shipping tail | `npm run build` | 新 source assets 进入发布包 |
 | Changelog | shipping closeout | `npx jest --runTestsByPath tests/unit/changelog-format.test.js --runInBand` | 全部 source-bearing unit 的实际变更与验证结果汇总为一条 orchestrator-owned 记录 |
-| Fresh-source semantic | U2-U13 | 按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 对 current disk source 运行 paired positive/negative review | `passed/concerns/not_run` 绑定 source hash；`not_run` 带 reason；仅 `passed` 授予 semantic-passed claim |
+| Fresh-source semantic | U2-U8、U10-U13 | 按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 对 current disk source 运行 paired positive/negative review | `passed/concerns/not_run` 绑定 source hash；`not_run` 带 reason；仅 `passed` 授予 semantic-passed claim |
 
 验证顺序：unit focused → skill lint/typecheck → 全部 unit 完成后进入现有 shipping tail（full unit → five-host integration → build → changelog → final review → 现有 final checks → 现有 plan-status 变更）；本方案不新增独立的跨能力集成 gate。
 
@@ -898,16 +919,16 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 
 ### Global
 
-- U1-U13 全部满足各自 Verification outcome。
-- 2 个新增、2 个扩展 planning reference/lens 存在并由主入口条件加载。
+- U1-U8、U10-U13 全部满足各自 Verification outcome。
+- 2 个新增 planning reference 与 1 个扩展 planning lens 存在并由 `spec-plan` 主入口条件加载；1 个扩展 `spec-work` reference 由 `spec-work` 持有。
 - 4 个 existing reviewer 完成 focused extension，frontend-quality internal persona 完成语义 gate。
 - `spec-code-review` 从 producer 标注的 plan 路径直接读取 Interface Contract 相关章节；路径不可读时退回 diff-only。
 - public Skill 新增数为 0、外部 Skill 直接引入数为 0、source Skill 目录相对 U1 基线零增量。
 - 每个受影响能力（含 browser）由 owning skill 持有至少 2 positive / 2 negative-owner case。
 - 五宿主 projection 包含 runtime-required source、排除 `evals/**`，无手改 generated runtime mirror。
-- `spec-test-browser` 在五宿主可达；pipeline 模式不自动起 server；browser 实际导航/交互在当前宿主能力下诚实降级为 `not_supported`。
-- `spec-doc-review` 具备 `mutation:report-only output:json` 调用方式；`spec-work` shipping caller 执行前后 hash、JSON envelope 与 P0/P1 处置；不改变 default Markdown/HTML 行为。
-- U6 task-scoped review 直接读取 live plan；U13 shipping caller 的跨调用 freshness 只依赖调用前后比较 plan SHA-256；没有引入签名、DACL、sealed-evidence 链或进程级 supervisor/IPC 协议。
+- `spec-test-browser` 的五宿主 projection 为 `projection_confirmed`；`host_reachable` 只由真实 loader/invocation observation 支撑，未运行时保持 `not_run` 或 degraded；pipeline 模式不自动起 server，browser 实际导航/交互在当前宿主能力下诚实降级为 `not_supported`。
+- `spec-doc-review` 具备 `mutation:report-only output:json` 调用方式；`skills/spec-work/scripts/source-plan-file-hash.cjs` 持有完整文件原始字节 SHA-256，`spec-work` shipping caller 在执行前后调用它并完成 JSON envelope 与 P0/P1 处置；plan recompose 后回到 task-pack intake 并重跑受影响 evidence；不改变 default Markdown/HTML 行为。
+- U6 task-scoped review 直接读取 live plan；U13 shipping caller 的跨调用 freshness 只依赖唯一 helper 的调用前后完整文件字节 SHA-256 比较；没有引入签名、DACL、sealed-evidence 链或进程级 supervisor/IPC 协议。
 - 全部 source-bearing unit 完成聚焦验证后，在 shipping closeout 前有一条 orchestrator-owned Changelog 汇总记录。
 - `spec-security-audit`、`spec-migration`、`spec-observability` 保持 Defer。
 
@@ -923,8 +944,8 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 - U11：testing reviewer 覆盖 DAMP/state/test-double，不推断 TDD 历史。
 - U12：reliability reviewer 覆盖 correlation/telemetry/alert actionability。
 - U7：frontend-quality 语义 gate 关闭，persona 保持 internal。
-- U8：browser internal delivery 可达；capability probe、test-plan hash 校验、pipeline no-auto-start 关闭。
-- U13：`mutation:report-only output:json` 与 shipping caller 前后 hash/JSON/P0-P1 处置关闭，default Markdown/HTML 行为不变。
+- U8：browser internal delivery projection 已确认；host loader/invocation observation 单独记录；capability probe、test-plan hash 校验、pipeline no-auto-start 关闭。
+- U13：`source-plan-file-hash.cjs` 的 full-byte/path-safety 合同、`mutation:report-only output:json` 与 shipping caller 前后完整文件 hash/JSON/P0-P1 处置、plan-recompose rewind 关闭，default Markdown/HTML 行为不变。
 - 全部 unit 完成后，cross-regression、五宿主 lifecycle、docs、Changelog 完整性由现有 shipping tail 的 final review/final checks 一并关闭，不设独立 unit。
 
 ---
@@ -947,7 +968,7 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 | --- | --- | --- | --- |
 | POSIX owner-only 回读 + Windows DACL/ACE exact allowset + `private-storage-windows.ps1` production adapter | 防"其他 principal"读/换 sealed 证据 | 过度：同 uid 下自建目录本就只有自己能读；多防的是被声明放弃的同 UID 恶意方 | U8/U13 只检查"目标目录是本机当前用户创建、权限收紧"，不能确认时降级为 `not_run` |
 | `spec-first-plan-disclosure-union/v1` 反重构门 + byte-exact CommonMark 子集解析器 | 防 task-scoped reviewer 拼回完整 plan 文本 | 过度/伪问题：reviewer 是本项目自己的 persona，plan 是 checked-in 文件，本就可直接读；不存在保密边界 | U6 只让 producer 标注 plan path + section title，reviewer 直接读取当前 live plan |
-| `prepare/authorize/bind-outputs/write/verify` 五段 sealed 生命周期 + 每跳 expected-hash + bounded stdin + 数值预算 | 防步骤间字节被换/注入 | 半过度：诚实内核（调用前后 hash 比较）值得留，多跳 sealed 链是防注入型同 UID 对手 | U13 只要求 caller 在调用前后各算一次 plan hash |
+| `prepare/authorize/bind-outputs/write/verify` 五段 sealed 生命周期 + 每跳 expected-hash + bounded stdin + 数值预算 | 防步骤间字节被换/注入 | 半过度：诚实内核（调用前后完整文件 hash 比较）值得留，多跳 sealed 链是防注入型同 UID 对手 | U13 只要求 caller 在调用前后各算一次 plan 完整文件 hash |
 | `authorize` 子命令（target/data 边界绑定、authority evidence、invalidation condition） | 门控 plan 外发给外部 model | 过度 ceremony：方案自认 helper 不判断授权者语义权威，单开发者场景开发者本人就是授权者 | 移除；`mutation:report-only` 由 caller 直接调用 |
 | SG4 verified transaction（pre/post honest-closeout 复验、conditional compensation、rollback-blocked） | 不误标 completed | 过度：一次 hash 比较 + 现有 plan-status 命令已足够覆盖误改/并发风险 | 移除；复用现有 shipping tail 的 plan-status 命令，不新增 verified transaction |
 | Windows 生产 adapter（`stable-source-read-windows.ps1`、`private-storage-windows.ps1`） | 跨平台真实私有存储 | 过早（YAGNI）：macOS dev/CI 无法真实验证，当前无真实 Windows 消费者 | 移除；Windows 上用 `icacls` 做最简权限收紧尝试，失败则 `not_run` |
@@ -968,13 +989,13 @@ U2-U8、U10-U13 全部完成后，直接进入现有 `spec-work` shipping tail �
 | U6/U10 的 task-scoped hash-check（producer 算 hash、reviewer 独立重算比较） | 防止 reviewer 使用过期的 plan 章节内容 | 半过度：producer 和 reviewer 在同一次 `spec-work` 会话、同一 checkout 内工作，是秒级到分钟级的时间窗口，不是跨会话/跨 actor 场景；传递并比较 hash 的机制成本高于它防的风险 | producer 只标注 plan 路径与章节标题，reviewer 直接读取当前 live 文件；天然不会用旧数据，无需额外校验 |
 | Interactive browser server 的 PID 记录 + best-effort 清理 | 会话结束尽量关掉用户启动的 server | 不必要的责任扩张：用户已看过完整命令并主动确认启动，理应自己管理该进程 | wrapper 不追踪 PID，不承担清理该进程的职责 |
 
-保留的机制：U13 中 shipping caller 的"调用前后比较 plan hash"仍然保留——这是跨会话（plan 编辑与语义复核可能相隔较长时间）、跨 actor（人 vs. reviewer）场景，与 U6/U10 的同会话场景性质不同，属于真实需要防范的风险。
+保留的机制：U13 中 shipping caller 的"调用前后比较 plan 完整文件 hash"仍然保留——这是跨会话（plan 编辑与语义复核可能相隔较长时间）、跨 actor（人 vs. reviewer）场景，与 U6/U10 的同会话场景性质不同，属于真实需要防范的风险。
 
 一个自我批评：上一轮"简化"只砍掉了签名/DACL/sealed-evidence 这类显式的"安全机制"，却没有意识到自己保留了同构的"流程证明机制"（evidence manifest、case-index、collision guard、独立集成 gate）——这是同一种过度设计倾向换了个领域的复现，提示这类审查需要至少两轮才能收敛到真正符合"机制复杂度与真实风险成比例"的版本；不排除仍有第三层可以再挖。
 
 ### Execution limitation
 
-本文是实施方案，未实现 U1-U13、未运行 `spec-first init`、未修改 skill/code/test/runtime source，也未产生 fresh-source 或 field outcome 结果。
+本文是决策与执行合同，不记录 per-unit 进度。Origin 中的 U1 核对和任何实现/验证结果都只是独立执行证据；新的 `spec-work` run 仍须重新采样 dirty/write-set，并按 fresh-source、host-loader 与 field-outcome 的证据层级分别声明结果。
 
 ---
 

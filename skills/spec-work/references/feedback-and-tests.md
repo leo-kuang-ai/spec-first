@@ -47,6 +47,15 @@
 
 Docs-only、config-only 和 generated-catalog 任务使用 docs/schema/help/render/diff-shape 回路；不要强制编造行为测试。
 
+## Slice Selection
+
+- 默认选择 vertical slice：每个可独立观察的行为同时关闭实现、验证与必要 handoff evidence。
+- 只有多个 consumer 共享同一输入/输出/error contract，且不先稳定该 contract 就无法得到最早可运行反馈时，才选择 contract-first；contract 稳定后立即回到 consumer 的 vertical slice。
+- 当最高损失、最高不确定性或最难回滚的假设会决定后续方向时，选择 risk-first，先用最小 proof/characterization 证伪它，不从低风险清理开始。
+- 保持 rollback-friendly：缩小同时变化的行为和状态面，保留可撤销 seam，并在进入下一 slice 前确认失败不会留下 orphan、重复效果或不可解释的中间状态。
+
+这三种选择是语义判断，不是文件类型或关键词分类。不要用 contract-first 建一个长期不落地的横向框架，也不要把 risk-first 解释为先做最复杂的实现。
+
 ## Proof / Characterization Strategy
 
 Test discovery 决定证据应该落在哪里：
@@ -62,6 +71,14 @@ Test discovery 决定证据应该落在哪里：
 Proof-first 时，测试和实现不能在同一步同时完成；必须观察到与目标 root/behavior 对应的失败。Characterization-first 时，baseline 是“当前行为被观察到”，不是“当前行为正确”。
 
 不要为证明纪律而复制测试。已有 test 是正确 owner 时，应 update/strengthen，而不是平行新增一份近似断言。
+
+## Test Design Quality
+
+- 测试应保持 DAMP（descriptive and meaningful phrases）：名称、setup 与断言直接表达行为和业务状态，允许为可读性保留少量重复，不用隐藏意图的过度 helper 压缩测试。
+- 默认验证 state over interaction：优先断言调用者可观察的返回值、状态转换、持久化结果、事件或错误。只有 interaction itself is the contract（例如协议必须调用一次、顺序本身可见、禁止某个 sink）时，才把调用次数或调用顺序作为主要 proof。
+- test double 选择顺序是 `real implementation -> high-fidelity fake -> stub -> mock`。越靠后越需要解释为什么更真实的 seam 不可用，以及该 double 仍能观察当前风险。
+- No observed RED means no TDD-history claim。最终 diff 里同时存在实现和绿测，只能证明测试当前通过；只有 run-local evidence 在 production change 前观察到与目标行为对应的失败，才能声称 RED/TDD 历史。
+- 一个 fake/mock 若跳过 serialization、middleware、callback、permission、retry 或 error translation，不能作为真实跨层链路的 integration proof；补最窄真实对象或 integration check。
 
 ## Test Discovery
 

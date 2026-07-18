@@ -132,12 +132,15 @@ At work intake, pin `work_run_base` to the current `HEAD` before plan-owned muta
 After task implementation and focused verification, compare current filesystem/git facts with the pre-task facts and build `spec-code-review-task-context/v1`:
 
 - `task_pack_digest`, `source_plan`, and `work_run_base`;
+- `source_plan_section_titles`: the selected Task Card's relevant live-plan headings, derived from its `source_unit` and current source-plan structure; this is a path-plus-title label only, never plan body, hash, byte range, or anchor grammar;
 - `pre_task_dirty_files`, `pre_task_untracked_files`, and `pre_task_file_facts`;
 - added/modified/deleted/renamed `task_delta_files` with current hashes;
 - `task_owned_untracked_files` only for files absent before the task and now present;
 - no path outside the Task Card's declared files/bounded side effects unless direct evidence shows it is necessary to complete already-authorized scope.
 
 If a new file/consumer changes acceptance, architecture, public contract, source ownership, provider boundary, or repo scope, stop and return to plan/task regeneration. Do not use “Create new tasks if scope expands” to legitimize it.
+
+For task-scoped review, the reviewer directly re-reads the current `source_plan` at those titles. If the path or a title is unavailable, preserve the attributed diff review with a `diff-only` plan-context limitation; do not pretend that plan-aware coverage ran and do not introduce same-session plan hash transport.
 
 ## 7. `stop_if` And Wave Control
 

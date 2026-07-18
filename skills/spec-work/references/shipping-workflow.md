@@ -87,6 +87,18 @@ If this reference cannot be read or a required quality/evidence gate cannot run,
 
    A session-temp review `artifact_path` is never the durable sink. When later shipping, resume, tracker, compound, or release work needs full review evidence, materialize sanitized repo-local review evidence in the current spec-work run artifact and reference that copy; if materialization fails, preserve the structured finding summary and an explicit copy-failure limitation. Never persist only the temp path.
 
+4.5 **Source Plan Semantic Review (before Final Validation)**
+
+   当本次执行有一个可读的 Markdown source plan 时，shipping caller 在进入 Final Validation 前运行一次只读语义复核。Task-pack input 使用其唯一 `source_plan`；HTML/legacy-unmanaged 或无 plan 输入记录 not-applicable reason，不发明替代 artifact。
+
+   1. 从当前已加载的 `spec-work/SKILL.md` 所在目录解析 `SKILL_DIR`，以 artifact root 为 cwd 调用 `node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"`，要求 stdout 恰好为 `sha256:<64-hex>`，保存 before hash。不得从 project cwd 的 `skills/spec-work/` source checkout 路径定位 bundled helper；五宿主 runtime projection 使用各自已加载的 Skill root。该 helper 读取包含 frontmatter 的完整文件原始字节；`tasks hash` 的去 frontmatter body hash 只用于 task-pack identity，不用于本 freshness gate。
+   2. 调用 `spec-doc-review mode:headless mutation:report-only output:json <source-plan>`。Reviewer 保持 zero-write；shipping caller 只解析 JSON，不把自然语言近似对象当 envelope。
+   3. 校验 envelope 至少满足：`output_mode: json`、`mutation_policy: report-only`、Markdown source plan 的 `mutation_reason: caller-requested-report-only`、`review_status: complete`、`fixes_applied: 0`，并且 counts、finding arrays、coverage、limitations、`terminal_signal: Review complete` 均存在且类型正确。无效时记录 `doc-review-json-invalid`，不得进入 Final Validation。
+   4. 立即用同一个 `SKILL_DIR` helper 重新计算 after hash。hash 与 before 不一致时，丢弃本次 review 结果并从新的 before hash 重跑一次；第二次仍漂移则记录 `plan-changed-during-review` blocker。不得 patch hash、比较 session 声明或引入签名/DACL/sealed pipeline。
+   5. Hash 一致后处置 P0/P1：caller 可以把唯一且明确的 `producer_fix_candidates` 交回 plan owner 做完整 artifact recompose。任何 recompose 都必须先回到 source-plan/task-pack intake，重新生成或验证 task pack、重跑 semantic-fit，并重跑受影响的实现验证与 code review；这些证据刷新后才可再次执行 before/review/after。其他 P0/P1 必须由当前 maintainer 明确解决、接受为 residual 或停止。任何未处置 P0/P1、`review_status: incomplete`、invalid envelope 或 hash mismatch 都阻断 Final Validation。
+
+   该 review 证明的是当前 hash 对应 plan 的 review envelope，不证明 finding 正确、实现完成或 field outcome。`spec-doc-review` 不直接修改 plan；before/after freshness 与 P0/P1 disposition 始终由 shipping caller 持有。
+
 5. **Final Validation**
    - All tasks marked completed
    - Testing addressed -- tests pass and new/changed behavior has corresponding test coverage (or an explicit justification for why tests are not needed)

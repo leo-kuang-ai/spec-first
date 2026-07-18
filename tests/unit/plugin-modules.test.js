@@ -54,6 +54,7 @@ describe('plugin module facade and governance', () => {
     expect(cursor.commands).toEqual([]);
     expect(cursor.workflowSkills).toContain('spec-work');
     expect(cursor.internalSkills).toContain('spec-worktree');
+    expect(cursor.internalSkills).toContain('spec-test-browser');
     expect(cursor.agents).toEqual([]);
     expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
   });
@@ -101,6 +102,37 @@ describe('plugin module facade and governance', () => {
         ]),
       }),
     ]));
+  });
+
+  test('delivers spec-test-browser as an internal-only recursive package on every host', () => {
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const operationPaths = plan.operations.map((operation) => operation.path);
+        const runtimeRoot = adapter.skillsRoot;
+
+        expect(syncedAssets.internalSkills).toContain('spec-test-browser');
+        expect(syncedAssets.skills).not.toContain('spec-test-browser');
+        expect(syncedAssets.workflowSkills).not.toContain('spec-test-browser');
+        expect(operationPaths).toEqual(expect.arrayContaining([
+          path.posix.join(runtimeRoot, 'spec-test-browser/SKILL.md'),
+          path.posix.join(runtimeRoot, 'spec-test-browser/references/pipeline-orchestration.md'),
+          path.posix.join(runtimeRoot, 'spec-test-browser/scripts/agent-browser-run-context.cjs'),
+        ]));
+        expect(operationPaths).not.toEqual(expect.arrayContaining([
+          path.posix.join(runtimeRoot, 'spec-test-browser/references/browser-runtime-profile.schema.json'),
+          path.posix.join(runtimeRoot, 'spec-test-browser/references/browser-runtime-profile.example.json'),
+          path.posix.join(runtimeRoot, 'spec-test-browser/scripts/dev-server-run-context.cjs'),
+        ]));
+        expect(operationPaths.some((operationPath) =>
+          operationPath.includes('/spec-test-browser/evals/')
+        )).toBe(false);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
   });
 
   test('excludes source-only evals and top-level maintainer READMEs from runtime assets', () => {
@@ -482,6 +514,7 @@ describe('plugin module facade and governance', () => {
         'references/shipping-workflow.md',
         'references/review-findings-followup.md',
         'references/tracker-defer.md',
+        'scripts/source-plan-file-hash.cjs',
       ],
     };
 
@@ -511,6 +544,10 @@ describe('plugin module facade and governance', () => {
           runtimeRoot,
           'spec-work/references/execution-strategy.md',
         ));
+        const shippingWorkflow = operations.get(path.posix.join(
+          runtimeRoot,
+          'spec-work/references/shipping-workflow.md',
+        ));
         expect(planSkill.contents).toContain('Inventory before invention');
         expect(planSkill.contents).toContain('reuse / extend / compose / new');
         expect(evidence.contents).toContain('Thin glue may own only');
@@ -519,6 +556,12 @@ describe('plugin module facade and governance', () => {
         expect(workSkill.contents).toContain('Duplicate critical metadata');
         expect(workStrategy.contents).toContain('worker_dispatch_authorization');
         expect(workStrategy.contents).toContain('landing_authorization');
+        expect(shippingWorkflow.contents).toContain(
+          'node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"',
+        );
+        expect(shippingWorkflow.contents).not.toContain(
+          'node skills/spec-work/scripts/source-plan-file-hash.cjs',
+        );
         expect([...operations.keys()].some((operationPath) =>
           operationPath.includes('/spec-plan/evals/')
         )).toBe(false);

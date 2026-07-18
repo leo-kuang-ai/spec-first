@@ -2,9 +2,9 @@
 title: "Agent Skills Capability Integration - Task Pack"
 type: "task-pack"
 status: "derived"
-date: "2026-07-17"
+date: "2026-07-18"
 source_plan: "docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md"
-source_plan_hash: "sha256:f42781f652b2d54111414fde68397bf27607c4693ac9aa8a41c2415eca2fb33b"
+source_plan_hash: "sha256:fbc0b15127a3ac850213f75a6313e5049cde473397826aaa7ab88b88b487ce2b"
 generated_by: "spec-write-tasks"
 mode: "derived"
 source_sections:
@@ -20,11 +20,13 @@ source_sections:
 
 # Task Pack: Agent Skills Capability Integration
 
+> **Historical browser task note (2026-07-18):** T014 中 interactive server 启动、不追踪 PID 与 caller 自行关闭的分支已被 `docs/plans/2026-07-18-002-refactor-spec-test-browser-caller-owned-server-boundary-plan.md` 替代。本 task pack 仍记录 07-16 已完成工作的历史拆分，但不得用于执行新的 caller-owned server boundary；该 follow-up 必须直接消费 07-18-002 的 R/U/Verification/DoD。
+
 ## Overview
 
-本任务包把 12 个 source implementation units 编译为 17 个可执行任务和 10 个 execution waves。计划跨越 planning、work、review、browser runtime delivery 与 document review，且包含共享 workflow prose、source/runtime 边界和 browser 安全面，因此派生任务包能显著降低单次执行的上下文与回滚风险。
+本任务包把 12 个 source implementation units 编译为 18 个可执行任务和 10 个 execution waves。计划跨越 planning、work、review、browser runtime delivery 与 document review，且包含共享 workflow prose、source/runtime 边界和 browser 安全面，因此派生任务包能显著降低单次执行的上下文与回滚风险。
 
-本任务包采用 plan 第二轮简化后的最终决策：U1 只做 `git status` 与 live README/source 核对；行为 case 留在 owning skill；U6/U10 通过 plan path + section title 直接读取 live plan，不做同会话 hash 传递；U8 不建独立 test-plan schema、不追踪 server PID；U13 由 `spec-doc-review` 提供 report-only JSON，并由 `spec-work` shipping workflow 持有前后 hash、envelope 解析与 P0/P1 处置。
+本任务包采用 plan 第二轮简化后的最终决策：U1 只做 `git status` 与 live README/source 核对；行为 case 留在 owning skill；U6/U10 通过 plan path + section title 直接读取 live plan，不做同会话 hash 传递；U8 不建独立 test-plan schema、不追踪 server PID；U13 先由唯一 helper 持有完整文件字节 SHA-256，再由 `spec-doc-review` 提供 report-only JSON，并由 `spec-work` shipping workflow 持有前后 hash、envelope 解析与 P0/P1 处置。
 
 高风险任务使用 `review_gate: required` 表示 review intent，不表示审批状态。现有 `spec-work` shipping tail 仍持有 final review、全量验证、五宿主 lifecycle、build 和 plan lifecycle mutation；这些步骤不被复制为新的 implementation unit。
 
@@ -45,14 +47,14 @@ source_sections:
 | U2 | R4, R7, R13-R14, R18; AE3 | T002 | planning capability contract + positive/negative eval cases |
 | U3 | R4-R5, R13-R14, R18; AE1 | T003 | interface lens trigger/landing/parser limitation contract |
 | U4 | R4, R6, R13-R14, R18; AE2 | T004 | frontend planning trigger/negative boundary contract |
-| U5 | R4, R8, R13-R14, R18; AE4 | T005 | work feedback/test-design contract tests |
+| U5 | R4, R8, R13-R14, R18; AE4 | T005 | work feedback/test-design contract tests；docs 与 config/type no-test negative-owner cases |
 | U6 | R4-R5, R9, R11, R13-R14, R18; AE5 | T006, T007 | live-plan task context degradation + API reviewer cases |
 | U10 | R4-R5, R9, R11, R13-R14, R18 | T008 | security owner/reachability/trust-boundary cases |
 | U11 | R4, R8-R9, R11, R13-R14, R18 | T009 | testing owner/DAMP/state/test-double cases |
 | U12 | R4, R7, R9, R11, R13-R14, R18 | T010 | reliability correlation/telemetry/actionability cases |
 | U7 | R4, R6, R10-R11, R13-R14, R18; AE6 | T011 | semantic activation and ownership-dedup cases |
 | U8 | R4, R6, R12-R15, R18; AE7 | T012-T015 | five-host internal delivery, wrapper, no-auto-start, LFG caller |
-| U13 | R4, R13-R14, R18-R19; AE8 | T016 | report-only flag/policy/JSON/default parity + before/after hash behavior |
+| U13 | R4, R13-R14, R18-R19; AE8 | T016, T018 | full-byte helper/path safety + report-only flag/policy/JSON/default parity + before/after hash behavior |
 | Cross-unit | R2, R17 | T001, T012, T017 | public/source Skill zero increment; serial Changelog closeout |
 | Deferred | R16 | no task | `spec-security-audit`、`spec-migration`、`spec-observability` 保持 Defer |
 
@@ -65,10 +67,11 @@ T003 -> T006 -> T007 -> T008
 T005 -> T009
 {T004, T008, T009, T010} -> T011
 {T012, T013} -> T014 -> T015
-{T002..T016 source tasks} -> T017
+T016 -> T018
+{T002..T016, T018 source tasks} -> T017
 ```
 
-`T002 -> T003 -> T004` 的波次串行来自共享 `spec-plan` source/eval/test surface，而不是新的产品依赖。`T006 -> T007 -> T008` 先建立 live-plan task context，再扩展 API/security owner。`T009`、`T010` 与 `T011` 因共享 code-review contract test/catalog surface 串行。`T012` 与 `T013` 可并行，随后由 `T014` 接入 workflow/pipeline，`T015` 最后接入 LFG caller。
+`T002 -> T003 -> T004` 的波次串行来自共享 `spec-plan` source/eval/test surface，而不是新的产品依赖。`T006 -> T007 -> T008` 先建立 live-plan task context，再扩展 API/security owner。`T009`、`T010` 与 `T011` 因共享 code-review contract test/catalog surface 串行。`T012` 与 `T013` 可并行，随后由 `T014` 接入 workflow/pipeline，`T015` 最后接入 LFG caller。`T016 -> T018` 先关闭完整文件 hash 的确定性地板，再接入 document-review 与 shipping caller。
 
 ## Execution Waves
 
@@ -76,8 +79,8 @@ T005 -> T009
 | --- | --- | --- |
 | 1 | T001 | 首次 source mutation 前完成 current baseline 与 dirty overlap 处置 |
 | 2 | T002, T005, T012, T013 | 文件集互不重叠，可并行形成四个纵向起点 |
-| 3 | T003, T014, T016 | T003 串行复用 spec-plan surface；T014 依赖 browser delivery + wrapper；T016 避开 T005 的 shared spec-work test surface |
-| 4 | T004, T006, T015 | 文件集互不重叠；T006 依赖 interface lens，T015 依赖 browser workflow contract |
+| 3 | T003, T014, T016 | T003 串行复用 spec-plan surface；T014 依赖 browser delivery + wrapper；T016 只持有独立 full-file hash helper/test surface |
+| 4 | T004, T006, T015, T018 | 文件集互不重叠；T006 依赖 interface lens，T015 依赖 browser workflow contract，T018 依赖 full-file hash helper |
 | 5 | T007 | API reviewer 消费 T006 task context |
 | 6 | T008 | Security reviewer 复用 T006/T007 owner split |
 | 7 | T009 | Testing reviewer 扩展，共享 code-review test surface |
@@ -94,7 +97,7 @@ T005 -> T009
     { "wave": 1, "tasks": ["T001"] },
     { "wave": 2, "tasks": ["T002", "T005", "T012", "T013"] },
     { "wave": 3, "tasks": ["T003", "T014", "T016"] },
-    { "wave": 4, "tasks": ["T004", "T006", "T015"] },
+    { "wave": 4, "tasks": ["T004", "T006", "T015", "T018"] },
     { "wave": 5, "tasks": ["T007"] },
     { "wave": 6, "tasks": ["T008"] },
     { "wave": 7, "tasks": ["T009"] },
@@ -116,8 +119,8 @@ T005 -> T009
         "src/cli/task-pack.js",
         "src/cli/commands/tasks.js"
       ],
-      "entry_hint": "先读取 git status 和 README 当前 24 项矩阵，再逐文件对照本任务包 T002-T016 的写集。",
-      "test_focus": "dirty overlap 处置、24 项/14-10 计数、2 new + 2 extend + 4 reviewer + 1 persona 决策与当前 live source 一致。",
+      "entry_hint": "先读取 git status 和 README 当前 24 项矩阵，再逐文件对照本任务包 T002-T016、T018 的写集。",
+      "test_focus": "dirty overlap 处置、24 项/14-10 计数、2 个新增 planning reference + 1 个扩展 planning lens + 1 个扩展 spec-work reference + 4 个 reviewer + 1 个 persona 决策与当前 live source 一致。",
       "done_signal": "U1 closeout 记录当前 git status 分类；README 映射与计划一致或已更新；未创建 evidence manifest、中央 case-index 或 collision-guard 子系统。",
       "parallelizable": false,
       "risk_note": "当前工作树已有并行用户改动；任何重叠文件必须保留现有内容并按文件协调。",
@@ -225,7 +228,7 @@ T005 -> T009
         "skills/spec-code-review/references/personas/testing-reviewer.md"
       ],
       "entry_hint": "保护现有 smallest-loop、vertical-slice、proof/characterization 语义后再补选择规则。",
-      "test_focus": "vertical/contract-first/risk-first 选择、DAMP、state outcome、double hierarchy、docs no-test exception 与无 RED 不声称 TDD。",
+      "test_focus": "vertical/contract-first/risk-first 选择、DAMP、state outcome、double hierarchy、docs 与 config/type no-test exception，以及无 RED 不声称 TDD。",
       "done_signal": "三个聚焦 suite 通过；2 positive/2 negative-owner cases 存在；feedback-and-tests.md 保持唯一 owner；fresh-source 状态有据可查。",
       "parallelizable": true,
       "risk_note": "不得新建第二个 test-design reference/eval owner，也不得从最终绿测伪造 TDD 历史。",
@@ -395,11 +398,13 @@ T005 -> T009
       "task_id": "T012",
       "source_unit": "U8",
       "requirement_refs": ["R2", "R4", "R12", "R15", "R18"],
-      "goal": "把 internal-only spec-test-browser 加入现有五宿主 delivery policy，并验证 runtime-required source 被递归投射且 evals 被排除。",
+      "goal": "把 internal-only spec-test-browser 加入现有五宿主 delivery policy，并同步 lifecycle/doctor consumer expectations，验证 runtime-required source 被递归投射且 evals 被排除。",
       "dependencies": ["T001"],
       "files": [
         "src/cli/plugin-governance.js",
-        "tests/unit/plugin-modules.test.js"
+        "tests/unit/plugin-modules.test.js",
+        "tests/unit/doctor-runtime-assets.test.js",
+        "tests/integration/init-five-host-lifecycle.integration.test.js"
       ],
       "context_refs": [
         "docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#U8-修复-browser-internal-delivery并完成-capability安全与-degraded-contract",
@@ -407,8 +412,8 @@ T005 -> T009
         "src/cli/plugin-sync.js"
       ],
       "entry_hint": "从 DELIVERED_INTERNAL_SKILLS 与 buildFilteredAssetSet 的 internal_only 分支开始。",
-      "test_focus": "Claude/Codex/Cursor/Kiro/Qoder 都投射 spec-test-browser package；evals 缺席；public catalog/source Skill count不增加。",
-      "done_signal": "plugin-modules focused tests 通过；五宿主 filtered asset plan 包含 spec-test-browser internal skill 且 public roster 无新增。",
+      "test_focus": "Claude/Codex/Cursor/Kiro/Qoder 都投射 spec-test-browser package；lifecycle/doctor expectations 接受新增 internal runtime skill；evals 缺席；public catalog/source Skill count不增加。",
+      "done_signal": "plugin-modules、doctor-runtime-assets 与 five-host lifecycle focused tests 通过；五宿主 filtered asset plan 包含 spec-test-browser internal skill 且 public roster 无新增。",
       "parallelizable": true,
       "risk_note": "只扩展 delivery policy，不能手改 runtime mirrors 或另建 generator。",
       "review_gate": "required",
@@ -495,8 +500,33 @@ T005 -> T009
       "task_id": "T016",
       "source_unit": "U13",
       "requirement_refs": ["R4", "R13", "R14", "R18", "R19", "AE8"],
-      "goal": "为 spec-doc-review 增加显式 mutation:report-only 与 output:json 调用方式，并保持默认 Markdown/HTML 行为与 caller 前后 hash 一致性边界。",
+      "goal": "建立 source plan 完整文件原始字节 SHA-256 的唯一确定性 helper，并关闭 frontmatter-only mutation 与路径安全回归。",
       "dependencies": ["T001"],
+      "files": [
+        "skills/spec-work/scripts/source-plan-file-hash.cjs",
+        "tests/unit/spec-work-source-plan-file-hash.test.js"
+      ],
+      "context_refs": [
+        "docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#U13-为-spec-doc-review-增加显式-markdown-report-only-调用方式",
+        "src/cli/task-pack.js",
+        "skills/spec-work/references/shipping-workflow.md"
+      ],
+      "entry_hint": "从 task-pack body hash 会去 frontmatter 的现状开始，为 shipping freshness 建立单一 full-byte helper。",
+      "test_focus": "Buffer 完整字节 hash、frontmatter-only mutation、稳定输出，以及绝对路径/repo escape/缺失/非普通文件 fail-closed。",
+      "done_signal": "helper 只输出 sha256:<64-hex>；完整字节与路径安全 focused tests 通过；frontmatter-only mutation 会改变 hash；未引入 Markdown 解析、持久 receipt 或公共 CLI。",
+      "parallelizable": true,
+      "risk_note": "helper 只拥有确定性完整字节事实，不得复用 task-plan-hash/v1 的去 frontmatter 语义或承担评审判断。",
+      "review_gate": "required",
+      "review_focus": "检查 full-byte owner 唯一性、repo-relative path safety 与 frontmatter-sensitive freshness。",
+      "stop_if": "实现需要新增公共 CLI、解析 Markdown 语义、生成持久 receipt，或扩大到签名/DACL/sealed pipeline。",
+      "wave": 3
+    },
+    {
+      "task_id": "T018",
+      "source_unit": "U13",
+      "requirement_refs": ["R4", "R13", "R14", "R18", "R19", "AE8"],
+      "goal": "为 spec-doc-review 增加显式 mutation:report-only 与 output:json，并让 shipping caller 使用 T016 helper 完成前后 hash、JSON envelope 与 P0/P1 处置。",
+      "dependencies": ["T016"],
       "files": [
         "skills/spec-doc-review/SKILL.md",
         "skills/spec-doc-review/references/synthesis-and-presentation.md",
@@ -510,21 +540,21 @@ T005 -> T009
         "skills/spec-doc-review/references/synthesis-and-presentation.md",
         "skills/spec-work/references/shipping-workflow.md"
       ],
-      "entry_hint": "先写 flag conflict、policy precedence、default parity、zero-write JSON envelope 与 hash mismatch caller cases。",
-      "test_focus": "token 剥离/冲突 fail-closed、caller-requested-report-only reason、fixes_applied=0、producer_fix_candidates、普通 Markdown/HTML parity、shipping caller JSON 解析/P0-P1 处置/before-after hash mismatch 阻断 final checks。",
-      "done_signal": "spec-doc-review 与 spec-work focused tests 通过；2 positive/2 negative-owner cases 存在；shipping workflow 持有前后 hash、JSON envelope 与 P0/P1 处置，hash mismatch/invalid envelope 不进入 final checks；fresh-source 状态按 passed/concerns/not_run 记录，not_run 带 reason，concerns 已解决或有 maintainer acceptance；未创建 sealed evidence/authorization/receipt schema。",
-      "parallelizable": true,
-      "risk_note": "delivery mode 与 mutation policy 必须正交；JSON output 不证明语义 finding 正确或 plan 未并发变化。",
+      "entry_hint": "从 T016 helper contract 与现有 Markdown-write/HTML-report-only parity 开始接入 caller 链。",
+      "test_focus": "flag conflict、policy precedence、zero-write JSON envelope、默认 Markdown/HTML parity、helper before/after mismatch、plan-recompose rewind 与 P0/P1 disposition。",
+      "done_signal": "spec-doc-review 与 spec-work focused tests 通过；2 positive/2 negative-owner cases 存在；shipping workflow 只通过 T016 helper 计算完整文件 hash，hash mismatch/invalid envelope/未处置 P0-P1 不进入 final checks；fresh-source 状态按 passed/concerns/not_run 记录；未创建 sealed evidence/authorization/receipt schema。",
+      "parallelizable": false,
+      "risk_note": "delivery mode 与 mutation policy 必须正交；JSON output 与 helper hash 不能越级证明 finding 正确或 field outcome。",
       "review_gate": "required",
-      "review_focus": "检查 zero-write、default parity、hash responsibility 与 safe_auto producer candidate 语义。",
-      "stop_if": "需要改变默认 Markdown write/HTML report-only 行为，或引入签名、DACL、sealed pipeline、多阶段 receipt。",
-      "wave": 3
+      "review_focus": "检查 zero-write、default parity、helper ownership、plan-recompose rewind 与 safe_auto producer candidate 语义。",
+      "stop_if": "需要改变默认 Markdown write/HTML report-only 行为，绕过 T016 helper，或引入签名、DACL、sealed pipeline、多阶段 receipt。",
+      "wave": 4
     },
     {
       "task_id": "T017",
       "requirement_refs": ["R2", "R17"],
       "goal": "在所有 source-bearing tasks 的聚焦验证完成后，串行更新 Changelog，准确记录各能力 slice、验证状态与未运行证据。",
-      "dependencies": ["T002", "T003", "T004", "T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014", "T015", "T016"],
+      "dependencies": ["T002", "T003", "T004", "T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014", "T015", "T016", "T018"],
       "files": ["CHANGELOG.md"],
       "context_refs": [
         "docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#Definition-of-Done",
@@ -565,8 +595,8 @@ T005 -> T009
   - `docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#Simplification-rationale-round-2本次修订2026-07-17`
   - `src/cli/task-pack.js`
   - `src/cli/commands/tasks.js`
-- **entry_hint:** 先读取 git status 和 README 当前 24 项矩阵，再逐文件对照本任务包 T002-T016 的写集。
-- **test_focus:** dirty overlap 处置、24 项/14-10 计数、2 new + 2 extend + 4 reviewer + 1 persona 决策与当前 live source 一致。
+- **entry_hint:** 先读取 git status 和 README 当前 24 项矩阵，再逐文件对照本任务包 T002-T016、T018 的写集。
+- **test_focus:** dirty overlap 处置、24 项/14-10 计数、2 个新增 planning reference + 1 个扩展 planning lens + 1 个扩展 spec-work reference + 4 个 reviewer + 1 个 persona 决策与当前 live source 一致。
 - **done_signal:** U1 closeout 记录当前 git status 分类；README 映射与计划一致或已更新；未创建 evidence manifest、中央 case-index 或 collision-guard 子系统。
 - **parallelizable:** false
 - **risk_note:** 当前工作树已有并行用户改动；任何重叠文件必须保留现有内容并按文件协调。
@@ -698,7 +728,7 @@ T005 -> T009
   - `docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#U5-扩展现有-spec-work-feedbacktest-design-owner`
   - `skills/spec-code-review/references/personas/testing-reviewer.md`
 - **entry_hint:** 保护现有 smallest-loop、vertical-slice、proof/characterization 语义后再补选择规则。
-- **test_focus:** vertical/contract-first/risk-first 选择、DAMP、state outcome、double hierarchy、docs no-test exception 与无 RED 不声称 TDD。
+- **test_focus:** vertical/contract-first/risk-first 选择、DAMP、state outcome、double hierarchy、docs 与 config/type no-test exception，以及无 RED 不声称 TDD。
 - **done_signal:** 三个聚焦 suite 通过；2 positive/2 negative-owner cases 存在；feedback-and-tests.md 保持唯一 owner；fresh-source 状态有据可查。
 - **parallelizable:** true
 - **risk_note:** 不得新建第二个 test-design reference/eval owner，也不得从最终绿测伪造 TDD 历史。
@@ -927,14 +957,16 @@ T005 -> T009
 - **files:**
   - `src/cli/plugin-governance.js`
   - `tests/unit/plugin-modules.test.js`
-- **goal:** 把 internal-only spec-test-browser 加入现有五宿主 delivery policy，并验证 runtime-required source 被递归投射且 evals 被排除。
+  - `tests/unit/doctor-runtime-assets.test.js`
+  - `tests/integration/init-five-host-lifecycle.integration.test.js`
+- **goal:** 把 internal-only spec-test-browser 加入现有五宿主 delivery policy，并同步 lifecycle/doctor consumer expectations，验证 runtime-required source 被递归投射且 evals 被排除。
 - **context_refs:**
   - `docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#U8-修复-browser-internal-delivery并完成-capability安全与-degraded-contract`
   - `src/cli/contracts/dual-host-governance/skills-governance.json`
   - `src/cli/plugin-sync.js`
 - **entry_hint:** 从 DELIVERED_INTERNAL_SKILLS 与 buildFilteredAssetSet 的 internal_only 分支开始。
-- **test_focus:** Claude/Codex/Cursor/Kiro/Qoder 都投射 spec-test-browser package；evals 缺席；public catalog/source Skill count不增加。
-- **done_signal:** plugin-modules focused tests 通过；五宿主 filtered asset plan 包含 spec-test-browser internal skill 且 public roster 无新增。
+- **test_focus:** Claude/Codex/Cursor/Kiro/Qoder 都投射 spec-test-browser package；lifecycle/doctor expectations 接受新增 internal runtime skill；evals 缺席；public catalog/source Skill count不增加。
+- **done_signal:** plugin-modules、doctor-runtime-assets 与 five-host lifecycle focused tests 通过；五宿主 filtered asset plan 包含 spec-test-browser internal skill 且 public roster 无新增。
 - **parallelizable:** true
 - **risk_note:** 只扩展 delivery policy，不能手改 runtime mirrors 或另建 generator。
 - **review_gate:** required
@@ -1036,7 +1068,7 @@ T005 -> T009
 - **stop_if:** 需要让 LFG 启动自有 browser executor、猜测 target origin 或绕过 spec-test-browser capability result。
 - **wave:** 4
 
-### T016 - Spec-doc-review report-only JSON（Wave 3）
+### T016 - Source plan full-file hash helper（Wave 3）
 
 - **task_id:** `T016`
 - **source_unit:** `U13`
@@ -1050,26 +1082,57 @@ T005 -> T009
 - **dependencies:**
   - `T001`
 - **files:**
+  - `skills/spec-work/scripts/source-plan-file-hash.cjs`
+  - `tests/unit/spec-work-source-plan-file-hash.test.js`
+- **goal:** 建立 source plan 完整文件原始字节 SHA-256 的唯一确定性 helper，并关闭 frontmatter-only mutation 与路径安全回归。
+- **context_refs:**
+  - `docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#U13-为-spec-doc-review-增加显式-markdown-report-only-调用方式`
+  - `src/cli/task-pack.js`
+  - `skills/spec-work/references/shipping-workflow.md`
+- **entry_hint:** 从 task-pack body hash 会去 frontmatter 的现状开始，为 shipping freshness 建立单一 full-byte helper。
+- **test_focus:** Buffer 完整字节 hash、frontmatter-only mutation、稳定输出，以及绝对路径/repo escape/缺失/非普通文件 fail-closed。
+- **done_signal:** helper 只输出 `sha256:<64-hex>`；完整字节与路径安全 focused tests 通过；frontmatter-only mutation 会改变 hash；未引入 Markdown 解析、持久 receipt 或公共 CLI。
+- **parallelizable:** true
+- **risk_note:** helper 只拥有确定性完整字节事实，不得复用 `task-plan-hash/v1` 的去 frontmatter 语义或承担评审判断。
+- **review_gate:** required
+- **review_focus:** 检查 full-byte owner 唯一性、repo-relative path safety 与 frontmatter-sensitive freshness。
+- **stop_if:** 实现需要新增公共 CLI、解析 Markdown 语义、生成持久 receipt，或扩大到签名/DACL/sealed pipeline。
+- **wave:** 3
+
+### T018 - Spec-doc-review report-only shipping integration（Wave 4）
+
+- **task_id:** `T018`
+- **source_unit:** `U13`
+- **requirement_refs:**
+  - `R4`
+  - `R13`
+  - `R14`
+  - `R18`
+  - `R19`
+  - `AE8`
+- **dependencies:**
+  - `T016`
+- **files:**
   - `skills/spec-doc-review/SKILL.md`
   - `skills/spec-doc-review/references/synthesis-and-presentation.md`
   - `skills/spec-work/references/shipping-workflow.md`
   - `skills/spec-doc-review/evals/report-only-cases.json`
   - `tests/unit/spec-doc-review-contracts.test.js`
   - `tests/unit/spec-work-contracts.test.js`
-- **goal:** 为 spec-doc-review 增加显式 mutation:report-only 与 output:json 调用方式，并保持默认 Markdown/HTML 行为与 caller 前后 hash 一致性边界。
+- **goal:** 为 spec-doc-review 增加显式 mutation:report-only 与 output:json，并让 shipping caller 使用 T016 helper 完成前后 hash、JSON envelope 与 P0/P1 处置。
 - **context_refs:**
   - `docs/plans/2026-07-16-002-refactor-agent-skills-capability-integration-plan.md#U13-为-spec-doc-review-增加显式-markdown-report-only-调用方式`
   - `skills/spec-doc-review/references/synthesis-and-presentation.md`
   - `skills/spec-work/references/shipping-workflow.md`
-- **entry_hint:** 先写 flag conflict、policy precedence、default parity、zero-write JSON envelope 与 hash mismatch caller cases。
-- **test_focus:** token 剥离/冲突 fail-closed、caller-requested-report-only reason、fixes_applied=0、producer_fix_candidates、普通 Markdown/HTML parity、shipping caller JSON 解析/P0-P1 处置/before-after hash mismatch 阻断 final checks。
-- **done_signal:** spec-doc-review 与 spec-work focused tests 通过；2 positive/2 negative-owner cases 存在；shipping workflow 持有前后 hash、JSON envelope 与 P0/P1 处置，hash mismatch/invalid envelope 不进入 final checks；fresh-source 状态按 passed/concerns/not_run 记录，not_run 带 reason，concerns 已解决或有 maintainer acceptance；未创建 sealed evidence/authorization/receipt schema。
-- **parallelizable:** true
-- **risk_note:** delivery mode 与 mutation policy 必须正交；JSON output 不证明语义 finding 正确或 plan 未并发变化。
+- **entry_hint:** 从 T016 helper contract 与现有 Markdown-write/HTML-report-only parity 开始接入 caller 链。
+- **test_focus:** flag conflict、policy precedence、zero-write JSON envelope、默认 Markdown/HTML parity、helper before/after mismatch、plan-recompose rewind 与 P0/P1 disposition。
+- **done_signal:** spec-doc-review 与 spec-work focused tests 通过；2 positive/2 negative-owner cases 存在；shipping workflow 只通过 T016 helper 计算完整文件 hash，hash mismatch/invalid envelope/未处置 P0-P1 不进入 final checks；fresh-source 状态按 passed/concerns/not_run 记录；未创建 sealed evidence/authorization/receipt schema。
+- **parallelizable:** false
+- **risk_note:** delivery mode 与 mutation policy 必须正交；JSON output 与 helper hash 不能越级证明 finding 正确或 field outcome。
 - **review_gate:** required
-- **review_focus:** 检查 zero-write、default parity、hash responsibility 与 safe_auto producer candidate 语义。
-- **stop_if:** 需要改变默认 Markdown write/HTML report-only 行为，或引入签名、DACL、sealed pipeline、多阶段 receipt。
-- **wave:** 3
+- **review_focus:** 检查 zero-write、default parity、helper ownership、plan-recompose rewind 与 safe_auto producer candidate 语义。
+- **stop_if:** 需要改变默认 Markdown write/HTML report-only 行为，绕过 T016 helper，或引入签名、DACL、sealed pipeline、多阶段 receipt。
+- **wave:** 4
 
 ### T017 - 串行 Changelog closeout（Wave 10）
 
@@ -1093,6 +1156,7 @@ T005 -> T009
   - `T014`
   - `T015`
   - `T016`
+  - `T018`
 - **files:**
   - `CHANGELOG.md`
 - **goal:** 在所有 source-bearing tasks 的聚焦验证完成后，串行更新 Changelog，准确记录各能力 slice、验证状态与未运行证据。
@@ -1111,14 +1175,14 @@ T005 -> T009
 
 ## Orientation Evidence
 
-- **provider:** mixed
+- **provider:** direct-repo-reads
 - **posture:** bounded
-- **evidence_refs:** source plan 全文；`src/cli/plugin-governance.js` 的 `DELIVERED_INTERNAL_SKILLS`/`buildFilteredAssetSet`；`src/cli/task-pack.js` 的 `computeSourcePlanHash`；计划声明的 skill/reference/test 文件存在性；现有 task-pack schema 与高风险 task-pack 示例。
-- **limitations:** CodeGraph 输出仅作 `provider_untrusted` 导航且对部分 prose 路径召回噪声较高；关键任务边界由当前 plan、直接文件存在性检查和 source symbol 回读确认。未运行 implementation tests、fresh-source eval、host loader 或 field outcome 验证。当前工作树非 clean，T001 必须在实施时重新分类 overlap。
+- **evidence_refs:** 最新 source plan 的 Goal Capsule、Requirements、Scope Boundaries、Planning Contract、Implementation Units、Verification Contract 与 Definition of Done；现有 task pack 的 Task Pack Contract/Task Cards；`src/cli/task-pack.js` 的 body-hash owner；`skills/spec-work/references/shipping-workflow.md` 当前 caller 链；task-pack schema 与 task-quality guide。
+- **limitations:** 本轮只为任务边界做定向 source/document reads，没有运行 implementation tests、fresh-source eval、host loader 或 field outcome 验证。当前工作树非 clean，T001 必须在实施时重新分类 dirty/write-set overlap；direct reads 不授予实现完成或 host adoption claim。
 
 ## Validation Notes
 
-- 本任务包绑定 `spec-first tasks hash ... --repo /Users/kuang/xiaobu/spec-first --json` 返回的 canonical body hash；frontmatter 不参与 freshness。
+- 本任务包绑定 `spec-first tasks hash ... --repo . --json` 返回的 canonical body hash；frontmatter 不参与 task-pack freshness。
 - `spec-first tasks validate` 只证明 source-plan path、body hash、Task Pack Contract 结构、依赖和同波文件不重叠，不证明任务切分或计划语义正确。
 - source plan 中已直接清理 evidence manifest、中央 case-index、U6 同会话 hash 传递和 server PID cleanup 等旧合同；本任务包只绑定当前 canonical body hash，不保留历史 hash 链，也不承担对 source plan 的 precedence 仲裁。
 - source plan 任意正文变更都会使本任务包 stale；不得手改 hash 绕过 regeneration。

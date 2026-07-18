@@ -32,6 +32,8 @@ describe('spec-work task-pack intake contracts', () => {
     expect(intake).toContain('validation_receipt');
     expect(intake).toContain('task_pack_digest');
     expect(intake).toContain('source_plan_hash');
+    expect(intake).toContain('source_plan_section_titles');
+    expect(intake).toContain('path-plus-title label only');
     expect(intake).toContain('semantic-fit');
     expect(intake).toContain('scope/non-goals/KTD');
   });
@@ -64,6 +66,8 @@ describe('spec-work task-pack intake contracts', () => {
     expect(intake).toContain('two review rounds total');
     expect(intake).toContain('affected verification');
     expect(intake).toContain('P2/P3');
+    expect(intake).toContain('diff-only');
+    expect(intake).toContain('same-session plan hash transport');
   });
 
   test('keeps task pack optional for direct implementation-ready plans', () => {

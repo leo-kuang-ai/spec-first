@@ -1,0 +1,82 @@
+{
+  "schema_version": "spec-first.spec-code-review.frontend-quality-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "frontend-quality-reviewer",
+  "source_refs": [
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-code-review/references/personas/frontend-quality-reviewer.md",
+    "skills/spec-code-review/references/persona-catalog.md"
+  ],
+  "cases": [
+    {
+      "id": "async-form-missing-error-focus-and-retry-state",
+      "kind": "positive",
+      "input": "新增用户可见 checkout form，submit 后只显示 spinner；失败时 error 不可见、焦点不移动，permission/retry state 也没有表达。",
+      "expected": "frontend-quality reviewer 报告状态完整性和 keyboard/focus finding，指出 loading/error/permission/retry 的可观察缺口。",
+      "forbidden": [
+        "只检查 happy path spinner",
+        "把问题交给纯视觉 polish"
+      ]
+    },
+    {
+      "id": "css-only-focus-contrast-and-breakpoint-regression",
+      "kind": "positive",
+      "input": "CSS-only diff 移除 focus outline、降低 button contrast，并在窄屏 breakpoint 隐藏 primary action。",
+      "expected": "frontend-quality reviewer 仍被语义激活，报告 focus、contrast 和 responsive regression。",
+      "forbidden": [
+        "因为只有 CSS 文件而跳过 reviewer",
+        "把可见 accessibility regression 当成 token-only 变更"
+      ]
+    },
+    {
+      "id": "backend-docs-type-fixture-and-safe-token-only-suppressed",
+      "kind": "negative-owner",
+      "input": "diff 只改 backend handler、文档、type、fixture 和一个不影响 contrast/focus/layout/responsive/motion/状态表达的 token value。",
+      "expected": "frontend-quality reviewer 不启用，保持 suppression。",
+      "forbidden": [
+        "仅按文件扩展名假定前端风险",
+        "为不可见 token value 创建 frontend finding"
+      ]
+    },
+    {
+      "id": "timing-race-owned-by-frontend-races",
+      "kind": "negative-owner",
+      "input": "UI diff 的唯一风险是两个 async response 的 stale ordering；当前状态、语义、focus、contrast 和 responsive 表达均未改变。",
+      "expected": "frontend-quality reviewer 保持 suppression，把 timing/race 交给 julik-frontend-races reviewer。",
+      "forbidden": [
+        "以 frontend-quality finding 重复报告 stale response race",
+        "声称 browser field verification 已通过"
+      ]
+    },
+    {
+      "id": "unsafe-rendering-owned-by-security",
+      "kind": "negative-owner",
+      "input": "UI diff 的唯一问题是把 untrusted HTML 直接写入危险 rendering sink；状态、focus、contrast 和 responsive 表达没有独立缺陷。",
+      "expected": "frontend-quality reviewer 保持 suppression，由 security reviewer 作为 canonical owner 报告 unsafe rendering finding。",
+      "forbidden": [
+        "以 frontend-quality finding 重复报告同一 unsafe rendering sink",
+        "把 XSS 风险降级为视觉或组件风格问题"
+      ]
+    },
+    {
+      "id": "test-sufficiency-owned-by-testing",
+      "kind": "negative-owner",
+      "input": "用户可见行为本身在 source 中完整，唯一缺口是测试只断言 mock 调用次数，无法证明错误状态和键盘路径。",
+      "expected": "frontend-quality reviewer 不重复报告 source behavior finding，由 testing reviewer 作为 canonical owner 报告 proof sufficiency gap。",
+      "forbidden": [
+        "把测试充分性重复写成 frontend-quality finding",
+        "声称缺测试等于已确认的 runtime UI failure"
+      ]
+    },
+    {
+      "id": "structural-complexity-owned-by-maintainability",
+      "kind": "negative-owner",
+      "input": "组件的可见状态、语义、focus、contrast 和 responsive 行为都完整，唯一问题是重复分支和过度嵌套导致结构复杂。",
+      "expected": "frontend-quality reviewer 保持 suppression，由 maintainability reviewer 作为 canonical owner 报告 structural complexity finding。",
+      "forbidden": [
+        "以 frontend-quality finding 重复报告纯结构复杂度",
+        "在没有可见行为缺陷时发明 accessibility finding"
+      ]
+    }
+  ]
+}

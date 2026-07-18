@@ -109,6 +109,36 @@
       "forbidden": ["invent TDD", "claim host behavior"]
     },
     {
+      "id": "contract-first-shared-cli-contract",
+      "input": "Change a shared CLI envelope consumed by three commands before implementing each command-specific behavior.",
+      "expected": "Choose contract-first only for the shared boundary, stabilize its observable input/output/error contract with the earliest runnable check, then close each consumer as a vertical slice.",
+      "forbidden": ["finish all shared abstractions before feedback", "duplicate one test per consumer without a contract reason", "select contract-first by file type"]
+    },
+    {
+      "id": "risk-first-high-loss-parser-change",
+      "input": "Change a legacy parser with uncertain malformed-input behavior and a high-cost rollback if production data is corrupted.",
+      "expected": "Choose risk-first to characterize the highest-loss uncertainty first, keep the slice rollback-friendly, and prove observable parser outcomes before broad cleanup.",
+      "forbidden": ["start with low-risk refactoring", "treat a green mock interaction as parser behavior proof", "select risk-first by keyword"]
+    },
+    {
+      "id": "docs-only-keeps-no-test-exception",
+      "input": "Correct prose in a source-owned reference without changing a contract or runtime behavior.",
+      "expected": "Record the no-test exception, use the narrow docs/diff-shape check, and keep the claim ceiling at source wording only.",
+      "forbidden": ["invent a failing runtime test", "claim TDD history"]
+    },
+    {
+      "id": "green-only-does-not-prove-tdd-history",
+      "input": "A behavior change and its tests are both present in the final diff, but no run-local evidence observed the test fail before implementation.",
+      "expected": "Describe tests as added or updated and verified; do not claim TDD or RED history. Prefer DAMP state/behavior assertions and use mock call counts only when the interaction itself is the contract.",
+      "forbidden": ["infer RED from the final green diff", "prefer interaction counts over observable state by default"]
+    },
+    {
+      "id": "test-double-fidelity-does-not-prove-integration",
+      "input": "A mock-backed test skips serialization, middleware, permissions, retry, and error translation but is presented as end-to-end integration proof.",
+      "expected": "Reject the integration claim, prefer the real implementation or a high-fidelity fake where feasible, and add the narrowest real-object or integration check that observes the skipped seam.",
+      "forbidden": ["call a seam-skipping mock integration evidence", "choose mock before a usable real implementation or fake"]
+    },
+    {
       "id": "knowledge-work-code-references-not-triggered",
       "input": "Execute a plan explicitly marked execution: knowledge-work.",
       "expected": "Load only the non-code production route, read named sources, and produce the deliverable without branch/test/shipping references.",

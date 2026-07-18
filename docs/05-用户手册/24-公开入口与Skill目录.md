@@ -77,7 +77,7 @@
 | `spec-sweep` | 扫配置的反馈源（如 Slack、GitHub Issues） |
 | `spec-riffrec-feedback-analysis` | 分析 Riffrec / 音视频反馈采集 |
 | `spec-promote` | 为已上线特性起草发布 / 推广文案 |
-| `spec-lfg` | **仅在用户明确要求时**跑从规划到绿 PR 的全自动管线 |
+| `spec-lfg` | **仅在用户明确要求时**跑从规划到绿 PR 的全自动管线；该明确选择只额外授权一次委派的独立只读代码审查，审查结果缺失、降级或无独立覆盖会阻断后续 shipping，且不扩展为任意 worker dispatch。browser applicable 时要求调用方提供 `target-origin:<origin>`，只消费 browser 结果与 browser cleanup；它不管理项目 server，缺 origin 或缺少持久/外部 UI effect 授权会阻断 shipping |
 
 ## 5. Internal helpers（`entry_surface: internal_only`）
 
@@ -90,7 +90,7 @@
 | `spec-commit-push-pr` | commit + push + 开 PR / 刷新 PR 描述 |
 | `spec-resolve-pr-feedback` | 处理 PR review 反馈 |
 | `spec-proof` | Proof editor 协作审阅环 |
-| `spec-test-browser` | 针对分支/PR 影响面的浏览器测试 |
+| `spec-test-browser` | 针对分支/PR 影响面的浏览器测试；持有 resolved loopback exact origin 的确定性校验、私有 browser run/cleanup 与 route/step 证据；项目 server 由调用方管理，origin 不授权持久/外部 UI effect |
 | `spec-test-xcode` | iOS 模拟器构建与测试 |
 
 ## 6. Agent 与 skill 的关系（用户需要知道的）

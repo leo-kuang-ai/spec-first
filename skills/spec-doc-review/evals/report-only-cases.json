@@ -1,0 +1,40 @@
+{
+  "schema_version": "spec-first.spec-doc-review.report-only-cases/v1",
+  "skill": "spec-doc-review",
+  "source_refs": [
+    "skills/spec-doc-review/SKILL.md",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md",
+    "skills/spec-work/references/shipping-workflow.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "markdown-caller-requests-json-report-only",
+      "kind": "positive",
+      "input": "spec-doc-review mode:headless mutation:report-only output:json docs/plans/example.md",
+      "expected": "Strip the flags from the path, keep delivery/output/mutation orthogonal, return one JSON object with caller-requested-report-only, fixes_applied zero, findings/counts/coverage/limitations, and leave the Markdown bytes unchanged.",
+      "forbidden": ["apply safe_auto directly", "enter walkthrough", "wrap JSON in Markdown"]
+    },
+    {
+      "id": "shipping-caller-detects-plan-drift",
+      "kind": "positive",
+      "input": "The source plan hash changes between the report-only review before and after receipts.",
+      "expected": "Discard the stale envelope and rerun from a new before hash; repeated drift blocks Final Validation with plan-changed-during-review.",
+      "forbidden": ["patch the receipt", "accept a stale P0/P1 disposition", "introduce a sealed evidence pipeline"]
+    },
+    {
+      "id": "default-markdown-still-writes-safe-auto",
+      "kind": "negative-owner",
+      "input": "Review a writable Markdown plan with output:json but without mutation:report-only.",
+      "expected": "Preserve markdown-write, apply eligible safe_auto fixes, and report the actual fixes_applied count plus applied_fixes details in the JSON envelope.",
+      "forbidden": ["globally default Markdown to report-only", "force fixes_applied to zero", "invent caller-requested-report-only"]
+    },
+    {
+      "id": "html-and-format-conflict-keep-existing-reasons",
+      "kind": "negative-owner",
+      "input": "Review HTML or a path/content format conflict with the new tokens available.",
+      "expected": "Keep html-artifact or format-conflict-or-ambiguous as the mutation reason and remain report-only; output:json changes only rendering.",
+      "forbidden": ["rewrite HTML as Markdown", "hide the format limitation behind caller-requested-report-only"]
+    }
+  ]
+}

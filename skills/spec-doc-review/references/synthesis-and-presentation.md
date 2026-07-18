@@ -151,7 +151,7 @@ Document review complete.
 
 delivery_mode: headless|interactive
 mutation_policy: markdown-write|report-only
-mutation_reason: markdown-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable
+mutation_reason: markdown-artifact|caller-requested-report-only|html-artifact|format-conflict-or-ambiguous|write-unavailable
 review_status: complete|incomplete
 fixes_applied: N
 producer_fix_candidates: N
@@ -211,6 +211,40 @@ Review complete
 
 Omit any finding bucket with zero items, but keep every scalar envelope field so callers can parse zero counts. `fixes_applied` is always `0` under `report-only`; `producer_fix_candidates` is `0` under ordinary `markdown-write`. Set `review_status: incomplete` when both always-on reviewers produced no valid coverage and no equivalent inline review completed; do not emit a clean verdict or execution-ready implication on an incomplete review. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
 
+### JSON Rendering
+
+当 `output_mode: json` 时，输出必须是一个可直接解析的 JSON object：不加 Markdown fence，不加对象前后的 prose，不把 enum、count 或 finding 压成一段自由文本。该单对象合同覆盖普通 text mode 的 cost-shape、reviewer announcement、进度公告和对象外 `Review complete` 终止文本；这些事实分别进入结构化 `coverage`、`limitations` 与 `terminal_signal`。复用上面的 envelope 语义，不创建新的 receipt、sealed input 或 authorization schema。
+
+```json
+{
+  "delivery_mode": "headless|interactive",
+  "output_mode": "json",
+  "mutation_policy": "markdown-write|report-only",
+  "mutation_reason": "markdown-artifact|caller-requested-report-only|html-artifact|format-conflict-or-ambiguous|write-unavailable",
+  "review_status": "complete|incomplete",
+  "fixes_applied": 0,
+  "applied_fixes": [],
+  "counts": {
+    "producer_fix_candidates": 0,
+    "proposed_fixes": 0,
+    "decisions": 0,
+    "fyi": 0,
+    "p0_p1_actionable": 0
+  },
+  "producer_fix_candidates": [],
+  "proposed_fixes": [],
+  "decisions": [],
+  "fyi_observations": [],
+  "residual_concerns": [],
+  "deferred_questions": [],
+  "coverage": [],
+  "limitations": [],
+  "terminal_signal": "Review complete"
+}
+```
+
+JSON 中每个 finding 保留 severity、section、title、reviewer、confidence、why_it_matters、suggested_fix 与 dependency/root 信息（存在时）。`fixes_applied` 始终是本次实际应用数量，`applied_fixes` 保存与 text envelope 相同的 section/change/reviewer 摘要：`report-only` 下必须分别为 `0` 与 `[]`，普通 `markdown-write` + `output:json` 则报告实际 `N` 与对应明细。`coverage` 同时保留 selected/skipped personas、cost shape、isolation 与 reviewer outcomes；confidence-100 `safe_auto` 在 `report-only` 下只进入 `producer_fix_candidates`；不得因 JSON 输出而获得 producer write authority。普通 `output_mode: text` 继续使用现有 Markdown/text envelope，默认行为不变。
+
 **Compact rendering for FYI observations, residual concerns, and deferred questions (high-count mode).** When the combined count of these three buckets is 5 or more, collapse each to a one-line count followed by a tight bullet list without per-item `Why` expansion.
 
 **Interactive `markdown-write` mode:**
@@ -240,7 +274,9 @@ These are pipeline artifacts and must not be flagged for removal.
 
 ## Phase 5: Next Action — Terminal Question
 
-**Headless mode or `mutation_policy: report-only`:** Return "Review complete" immediately after the structured envelope. Do not ask questions and do not enter any mutation-oriented next-action flow.
+**`output_mode: json`:** Return only the single JSON object defined in Phase 4. Put the terminal signal exclusively in `terminal_signal: "Review complete"`; do not append an object-external `Review complete`, progress line, question, numbered fallback, or any other prose. Do not enter the mutation-oriented next-action flow.
+
+**Headless mode or `mutation_policy: report-only` with `output_mode: text`:** Return "Review complete" immediately after the structured text envelope. Do not ask questions and do not enter any mutation-oriented next-action flow.
 
 **Interactive `markdown-write` mode:** fire the terminal question using the platform's blocking question tool. In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors.
 
@@ -274,7 +310,7 @@ The `<next stage>` substitution uses the document classification from Phase 1:
 
 After 2 refinement passes, recommend completion — diminishing returns are likely. But if the user wants to continue, allow it.
 
-Return "Review complete" as the terminal signal for callers.
+For `output_mode: text`, return "Review complete" as the terminal signal for callers. For `output_mode: json`, the `terminal_signal` field is the only terminal signal.
 
 ## What NOT to Do
 

@@ -25,12 +25,22 @@ Use the anchored confidence rubric in the subagent template. Persona-specific gu
 
 **Anchor 25 or below — suppress** — coverage is ambiguous and depends on test infrastructure you can't see.
 
+## Test proof and execution-evidence boundary
+
+- 测试应保持 DAMP：名称、setup 与断言直接表达被保护的业务状态和可观察结果。可读性需要的少量重复不是问题；隐藏输入、状态或 expected outcome 的过度 helper 才会降低 proof quality。
+- 默认优先 state/behavior outcome：返回值、状态转换、持久化结果、事件、错误或调用者可见的 UI/协议结果。只断言 mock call count、调用顺序或内部 helper interaction，不能单独证明行为正确。
+- interaction 本身确实是公开 contract 时例外成立，例如协议规定必须调用某个 sink、次数或顺序对外可见、或安全边界要求绝不调用某个 sink。此时断言 interaction 是适当 proof；不要把该例外误报成 implementation coupling。
+- test double 的优先顺序是 real implementation -> high-fidelity fake -> stub -> mock。若 fake/mock 跳过 serialization、middleware、callback、permission、retry 或 error translation，它不能单独证明真实跨层链路；报告缺失的 real/fidelity proof，而不是把 mock interaction 当 integration coverage。
+- review 只能判断当前 diff 可见的 test proof，不能从最终绿测或 production/test 同时出现的 diff 推断“没有做 TDD”。RED 或 characterization 历史只属于实施期 `spec-work` run-local evidence；没有该 evidence 时，最多说明当前测试的断言范围，不报告 TDD-history finding。
+
 ## What you don't flag
 
 - **Missing tests for trivial getters/setters** -- `getName()`, `setId()`, simple property accessors. These don't contain logic worth testing.
 - **Test style preferences** -- `describe/it` vs `test()`, AAA vs inline assertions, test file co-location vs `__tests__` directory. These are team conventions, not quality issues.
 - **Coverage percentage targets** -- don't flag "coverage is below 80%." Flag specific untested branches that matter, not aggregate metrics.
 - **Missing tests for unchanged code** -- if existing code has no tests but the diff didn't touch it, that's pre-existing tech debt, not a finding against this diff (unless the diff makes the untested code riskier).
+- **Interaction assertions when interaction is the contract** -- required sink call、可见 protocol order 或禁止调用的 safety boundary 有直接 source evidence 时，不把 call-count/order assertion 报为 brittle。
+- **Unobserved TDD history** -- 最终 diff 没有实施期 RED/characterization evidence 时，不推断开发者没有做 TDD；这不是 diff-review finding。
 
 ## Output format
 

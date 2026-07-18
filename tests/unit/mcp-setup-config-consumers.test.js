@@ -53,6 +53,16 @@ describe('spec-runtime-setup active config consumers', () => {
     expect(template).toContain('# plan_output: html       # reserved: md | html');
     expect(template).toContain('# brainstorm_output: html # reserved: md | html');
   });
+
+  test('does not expose retired browser runtime profile configuration', () => {
+    const setup = read('skills/spec-runtime-setup/SKILL.md');
+    const template = read('skills/spec-runtime-setup/references/config-template.yaml');
+
+    expect(setup).not.toContain('browser_runtime_profile_path');
+    expect(setup).not.toContain('browser runtime profile');
+    expect(template).not.toContain('browser_runtime_profile_path');
+    expect(template).not.toContain('Browser runtime autonomy');
+  });
 });
 
 describe('spec-runtime-setup active Node consumers', () => {

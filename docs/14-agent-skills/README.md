@@ -6,10 +6,10 @@
 >
 > **Spec-First HEAD 基线：** `a2f37c6075d35d4f686371bca4fb20c31275e142`，分支 `leo-2026-07-14-write-skill`，35 个 source Skill 目录
 >
-> **Spec-First working-tree 补充：** `skills/spec-plan/SKILL.md` 等文件有未提交修改，`skills/spec-plan/references/high-risk-plan-lens.md` 等文件尚未跟踪；这些内容只作为 `working-tree advisory`，不冒充上述 commit 已确认能力
+> **Origin working-tree 补充：** 分析当时 `skills/spec-plan/SKILL.md` 等文件有未提交修改，`skills/spec-plan/references/high-risk-plan-lens.md` 等文件尚未跟踪；这些内容在 origin snapshot 中只作为 `working-tree advisory`。2026-07-17 的 U1 current-source 复核见 3.1 节。
 >
 > **Agent Skills 快照：** `98967c45a42b88d6b8fb3a88b7ff6273920763d6`，tag `0.6.4`，24 个 Skill
-> **证据边界：** 两个仓库当前工作树均有未提交内容；`agent-skills` 还存在冲突中的根级文件。本文将 `HEAD confirmed` 与 `working-tree advisory` 分开，只有可在声明 revision 回放的 source 才算基线确认；未提交 source 只能说明正在演化的候选能力。静态源码结论不等于真实宿主 field outcome。
+> **证据边界：** origin snapshot 中两个仓库均有未提交内容；`agent-skills` 还存在冲突中的根级文件。历史证据继续区分 `HEAD confirmed` 与 `working-tree advisory`；当前实施判断以 U1 记录的 live source 为准。静态源码结论不等于真实宿主 field outcome。
 
 ## 结论先行
 
@@ -20,8 +20,8 @@
 - 24 个 Agent Skill 均能找到 `spec-first` 承载点，其中 14 个承载闭环较强、10 个承载分散或不完整；
 - 14/10 只描述 **入口与承载覆盖**，不代表领域内容或 evidence/verification 已达到同等成熟度；
 - 当前建议 **新增 0 个公共 Skill**；
-- 当前建议建设 **4 类条件能力**：新增 3 个 skill-local reference，扩展 1 个现有 high-risk lens；
-- 当前建议新增 **1 个内部条件 reviewer persona**：通用 frontend/accessibility reviewer；它不是用户入口；
+- 当前建议建设 **4 类条件能力**：新增 2 个 skill-local planning reference，扩展 high-risk 与 feedback/test-design 这 2 个既有 owner；
+- 当前建议扩展 **4 个既有 reviewer**，并新增 **1 个内部条件 reviewer persona**：通用 frontend/accessibility reviewer；它不是用户入口；
 - `spec-observability`、`spec-security-audit`、`spec-migration` 只作为有条件的未来候选，不进入当前 catalog；
 - 不直接安装或 vendoring `agent-skills` 的 Skill 文件，所有采纳内容都应按 `spec-first` 的 source-first、provider-neutral、light contract 和 eval 规则重新表达。
 
@@ -131,17 +131,18 @@ trigger rank-1: 86%（65/76）
 
 ### 3.1 可复现证据状态
 
+2026-07-17 的 U1 实施核对以 `959e95f02ba35dfc34f16a8cde9c97e5e9e78cac` 为 mutation 前基线：`git status --short` 为空，source Skill 目录数为 35，24 项映射仍为 14 个强对应、10 个部分覆盖。当前已确认的集成形态是：新增 2 个 skill-local planning reference，扩展 `high-risk-plan-lens.md` 与 `feedback-and-tests.md` 这 2 个既有 owner，扩展 4 个既有 reviewer，新增 1 个 internal frontend reviewer persona；不新增 public Skill，也不建立 evidence manifest 或中央 case index。
+
 本文使用以下 authority：
 
 | 证据组 | 状态 | 用途与限制 |
 | --- | --- | --- |
-| `docs/10-prompt/结构化项目角色契约.md`、`using-spec-first`、`spec-prd`、`spec-work`、`spec-debug`、`spec-code-review`、`spec-test-browser`、`spec-optimize`、`spec-simplify-code` | `HEAD confirmed` | 可在 Spec-First commit `a2f37c...` 回放，用于确认现有入口、合同和主要闭环 |
-| `skills/spec-plan/SKILL.md` 及其本轮未提交修改 | `mixed: HEAD + working-tree advisory` | HEAD 内容可确认；未提交的 high-risk、evidence、ownership 增强只作为候选演化证据 |
-| `skills/spec-plan/references/high-risk-plan-lens.md`、`planning-evidence-boundaries.md`、`skills/spec-plan/evals/` | `working-tree advisory` | 当前工作树可读，但不属于声明的 HEAD；不能据此声称已发布或已被干净 checkout 消费 |
+| `docs/10-prompt/结构化项目角色契约.md`、`using-spec-first`、`spec-prd`、`spec-work`、`spec-debug`、`spec-code-review`、`spec-test-browser`、`spec-optimize`、`spec-simplify-code` | `HEAD confirmed` | origin snapshot 可在 Spec-First commit `a2f37c...` 回放；实施判断以当前 HEAD source 为准 |
+| `skills/spec-plan/SKILL.md`、`high-risk-plan-lens.md`、`planning-evidence-boundaries.md`、`skills/spec-plan/evals/` | `HEAD confirmed at U1 baseline` | 已进入 mutation 前 HEAD；后续 unit 只从 current live source 继续扩展，不再按 working-tree advisory 处理 |
 | `skills/spec-code-review/references/personas/`、`skills/spec-debug/references/investigation-techniques.md` | `HEAD confirmed` | 用于确认 API、安全、测试、可靠性、迁移和诊断支点 |
 | Agent Skills 24 个 `SKILL.md` | `pinned external source` | 使用 commit `98967c...` 的固定链接；本地冲突中的根级 `AGENTS.md`、`.gitignore` 不作为能力证据 |
 
-本报告实际使用的 working-tree advisory hash：
+原始报告使用的 working-tree advisory hash 如下，仅保留为历史 provenance，不代表 U1 的当前 Git 状态：
 
 | Path | Git state | SHA-256 |
 | --- | --- | --- |
@@ -164,7 +165,7 @@ node /Users/kuang/xiaobu/agent-skills/scripts/validate-commands.js
 node /Users/kuang/xiaobu/agent-skills/scripts/run-evals.js
 ```
 
-后文没有特别标注时，“已有能力”表示 `HEAD confirmed`。依赖未提交 `spec-plan` source 的判断会明确标为 `working-tree advisory`；实施前必须以实际合入后的 HEAD 重新生成 evidence manifest。
+后文没有特别标注时，“已有能力”表示当前 source 可确认；历史段落中的 `working-tree advisory` 只描述 origin report 当时的证据状态。实施证据由各 owning skill 的聚焦测试、skill-local eval 与 fresh-source 状态持有，不另建 evidence manifest。
 
 ## 4. 24 个 Skill 全量映射与决策
 
@@ -198,11 +199,11 @@ node /Users/kuang/xiaobu/agent-skills/scripts/run-evals.js
 | 17 | [`doubt-driven-development`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/doubt-driven-development/SKILL.md) | adversarial review、doc review、fresh-source eval、confidence gate | 强 | 强 | 强 | CLAIM → EXTRACT → DOUBT → RECONCILE → STOP、最小 reviewer context | adversarial/fresh-source contract | `Adopt`，不新增 |
 | 18 | [`api-and-interface-design`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/api-and-interface-design/SKILL.md) | architecture strategist、API contract reviewer、PRD compatibility | 部分 | 部分 | 部分 | Hyrum、One-Version、contract-first、additive evolution、error semantics | PRD + plan lens + reviewer | `Adopt`，不新增 |
 | 19 | [`frontend-ui-engineering`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/frontend-ui-engineering/SKILL.md) | polish/test-browser/dogfood/app audit、frontend race reviewer | 部分 | 部分 | 部分 | composition、state hierarchy、tokens、WCAG、完整 UI states | plan/work reference + internal reviewer | `Adopt`，不新增 |
-| 20 | [`security-and-hardening`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/security-and-hardening/SKILL.md) | security sentinel、security reviewer；high-risk lens 为 working-tree advisory | 部分 | 部分 | 部分 | threat model、trust boundary、abuse case、LLM output untrusted、reachability | PRD/plan/work/review spine | `Adopt`；审计入口 `Defer` |
+| 20 | [`security-and-hardening`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/security-and-hardening/SKILL.md) | security sentinel、security reviewer、high-risk lens | 部分 | 部分 | 部分 | threat model、trust boundary、abuse case、LLM output untrusted、reachability | PRD/plan/work/review spine | `Adopt`；审计入口 `Defer` |
 | 21 | [`ci-cd-and-automation`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/ci-cd-and-automation/SKILL.md) | deployment verification、silent-pass review、shipping tail | 部分 | 部分 | 部分 | gate order/fidelity、preview、flag、staged rollout、rollback | high-risk lens + work/review | `Adopt`，不新增 |
 | 22 | [`deprecation-and-migration`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/deprecation-and-migration/SKILL.md) | data migration planner/reviewer、rollback、expand/contract | 部分 | 部分 | 部分 | replacement-first、consumer inventory、Strangler/Adapter、zero-use | PRD consumer/sunset + plan lens | `Adopt`；迁移入口 `Defer` |
 | 23 | [`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/documentation-and-adrs/SKILL.md) | plan decision notes、PRD decision ledger、`spec-compound`、release notes | 部分 | 部分 | 部分 | why/alternatives/consequences、ADR lifecycle、supersession | plan/compound decision record | `Adopt`，不新增 |
-| 24 | [`observability-and-instrumentation`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/observability-and-instrumentation/SKILL.md) | deployment verification、debug instrumentation、shipping metrics；high-risk lens 为 advisory | 部分 | 部分 | 部分 | on-call questions、signals、correlation、RED/USE、cardinality、alert validation | high-risk lens + work/debug/review/shipping | `Adopt`；独立入口 `Defer` |
+| 24 | [`observability-and-instrumentation`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/observability-and-instrumentation/SKILL.md) | deployment verification、debug instrumentation、shipping metrics、high-risk lens | 部分 | 部分 | 部分 | on-call questions、signals、correlation、RED/USE、cardinality、alert validation | high-risk lens + work/debug/review/shipping | `Adopt`；独立入口 `Defer` |
 
 汇总：
 
@@ -388,7 +389,7 @@ CLAIM → EXTRACT contract/evidence → DOUBT → RECONCILE → STOP
 
 真实缺口只是提问体验，不是新的 artifact。应 `Adopt` guess-attached question、intent restatement 和 explicit out-of-scope；不应 `Build` `spec-interview`。
 
-### 6.2 `test-driven-development`：补测试设计 reference，不新增 TDD 入口
+### 6.2 `test-driven-development`：扩展测试设计 owner，不新增 TDD 入口
 
 当前强项：
 
@@ -405,7 +406,7 @@ CLAIM → EXTRACT contract/evidence → DOUBT → RECONCILE → STOP
 建议：
 
 - 在 `spec-plan` Verification Contract 中增加按 claim 选择 test level；
-- 新增内部 `spec-work/references/test-design-and-slicing.md`；
+- 扩展现有 `spec-work/references/feedback-and-tests.md`，不新建第二个 test-design truth source；
 - 扩展 testing reviewer，识别 interaction-heavy mocks 和假绿色；
 - 明确没有观察到 RED 时不能声称完成 TDD 历史。
 
@@ -477,7 +478,7 @@ CLAIM → EXTRACT contract/evidence → DOUBT → RECONCILE → STOP
 现有证据：
 
 - `HEAD confirmed`：[`security-sentinel.md`](../../skills/spec-plan/references/agents/security-sentinel.md) 和 code-review security persona 已提供 planning/review 支点；
-- `working-tree advisory`：[`high-risk-plan-lens.md`](../../skills/spec-plan/references/high-risk-plan-lens.md) 草案已覆盖 auth、permission、privacy、sensitive data，但尚不能算 HEAD 已发布能力；
+- [`high-risk-plan-lens.md`](../../skills/spec-plan/references/high-risk-plan-lens.md) 已进入 U1 mutation 前 HEAD，覆盖 auth、permission、privacy、sensitive data；
 - [`security-reviewer.md`](../../skills/spec-code-review/references/personas/security-reviewer.md) 已检查 injection、authz、secret、deserialization、SSRF/path traversal；
 - repo governance 已有 secret 和 mutation 边界。
 
@@ -533,7 +534,7 @@ lint → typecheck → unit → build → integration → E2E
 
 - [`data-migration-reviewer.md`](../../skills/spec-plan/references/agents/data-migration-reviewer.md) 已覆盖 expand/contract、backfill、dual-write、deploy window、rollback 和 verification SQL；
 - code review 有同域 reviewer 和 deployment verification；
-- `working-tree advisory` high-risk lens 要求 compatibility/rollback window；HEAD 基线仍主要依赖 data-migration specialist 和 plan 通用兼容/回滚要求。
+- high-risk lens 要求 compatibility/rollback window，并与 data-migration specialist 和 plan 通用兼容/回滚要求共同构成当前支点。
 
 真实缺口：
 
@@ -577,7 +578,7 @@ lint → typecheck → unit → build → integration → E2E
 
 现有支点：
 
-- `working-tree advisory` high-risk plan lens 会要求 observable signal、monitoring/alerting、runbook；
+- high-risk plan lens 会要求 observable signal、monitoring/alerting、runbook；
 - deployment verification 会要求 metrics、logs、dashboard、alert threshold；
 - debug investigation reference 已覆盖 correlation ID、error tracker、APM 和 distributed trace；
 - shipping tail 会列出部署后 metrics/dashboard。
@@ -628,8 +629,8 @@ lint → typecheck → unit → build → integration → E2E
 | --- | --- | --- | --- | --- |
 | 接口与演进 | architecture strategist、API contract reviewer、PRD compatibility、data-migration reviewer | `new` reference | 现有 owner 分别负责架构研究、diff review、产品 WHAT 和数据迁移，没有一个承载一般接口设计、consumer migration 与 deprecation 的 planning contract；强行塞入 high-risk lens 会把普通 API 设计误当高风险 | `skills/spec-plan/references/interface-and-evolution-lens.md` |
 | 前端工程质量 | `spec-polish`、`spec-test-browser`、`spec-dogfood`、frontend race reviewer、Swift reviewer | `new` reference | 现有能力分别负责视觉迭代、runtime QA、用户旅程、竞态和 iOS，不拥有实施前的通用 Web component/state/a11y planning discipline | `skills/spec-plan/references/frontend-engineering-lens.md` |
-| 生产就绪 | high-risk plan lens 草案、deployment verification、reliability reviewer、shipping tail | `extend` high-risk lens | high-risk lens 已拥有 rollout、rollback、owner-visible signal、runbook 和 verification required landing；先补 on-call questions、telemetry、CI fidelity，避免第二套风险入口 | `skills/spec-plan/references/high-risk-plan-lens.md`，当前为 working-tree advisory |
-| 测试设计与切片 | `spec-work` feedback loop、`spec-debug` test-first、testing reviewer | `new` skill-local reference | review persona 只审查 diff，debug 只持有故障修复；执行期仍缺 DAMP、test-double hierarchy、TDD claim honesty 和 slicing taxonomy。直接继续增长主 `SKILL.md` 会削弱 progressive disclosure | `skills/spec-work/references/test-design-and-slicing.md` |
+| 生产就绪 | high-risk plan lens、deployment verification、reliability reviewer、shipping tail | `extend` high-risk lens | high-risk lens 已拥有 rollout、rollback、owner-visible signal、runbook 和 verification required landing；补 on-call questions、telemetry、CI fidelity，避免第二套风险入口 | `skills/spec-plan/references/high-risk-plan-lens.md` |
+| 测试设计与切片 | `spec-work` feedback loop、`spec-debug` test-first、testing reviewer | `extend` existing owner | `feedback-and-tests.md` 已拥有 smallest loop、vertical slice、proof/characterization 和 replacement evidence；在同一 owner 内补 DAMP、test-double hierarchy、TDD claim honesty 与 contract/risk-first slicing，避免第二个 test-design truth source | `skills/spec-work/references/feedback-and-tests.md` |
 | 通用 frontend reviewer | frontend race reviewer、Swift reviewer、maintainability/testing/security personas | `new` internal persona | race reviewer 只持有并发/时序，Swift reviewer 是平台专用；把 a11y、状态完整性和 responsive 分散到四个 reviewer 会重复且无明确 owner | `skills/spec-code-review/references/personas/frontend-quality-reviewer.md` |
 
 Rejected shapes：
@@ -673,7 +674,7 @@ Rejected shapes：
 | `spec-work` | slicing taxonomy、test-design discipline、instrumentation 与行为同验 |
 | `spec-debug` | stop-line、reduce、untrusted error output、correlation/tracing gap |
 | `spec-code-review` | 扩展 API/security/testing/reliability，新增内部 frontend-quality |
-| `spec-test-browser` | profile isolation、provider-neutral runtime、a11y/responsive/state recovery |
+| `spec-test-browser` | owner-private run isolation、provider-neutral runtime、a11y/responsive/state recovery |
 | shipping tail | feature flag lifecycle、CI fidelity、rollout threshold、telemetry proof |
 | `spec-compound` | ADR 引用、迁移经验、有效/无效 telemetry、可失效知识 |
 
@@ -694,18 +695,17 @@ Rejected shapes：
 
 ### Wave 0：冻结可复现基线
 
-- 生成本报告使用的 evidence manifest：path、HEAD/working-tree 状态、revision/hash、用于支持的判断；
-- 以 HEAD source 重新核对 24 项承载映射；working-tree advisory 不计入已发布能力；
-- 为 10 个部分承载项各准备至少 2 个 signature prompt、2 个 negative-owner prompt；
-- 收集 API 演进、UI/a11y、安全、CI、迁移、可观测性各至少 1 个真实或 file-backed case；
-- 记录 `using-spec-first` 当前只有结构/合同测试，behavioral route precision baseline 为 `not-established`，不得借用 Agent Skills 的 86%；
+- 在第一次 source mutation 前运行 `git status --short`，逐文件核对 dirty/write-set 交集；
+- 以当前 HEAD source 重新核对 24 项承载映射和 14/10 计数；
+- 记录 source Skill 目录数、public catalog 零增量基线和既有 canonical owner；
+- positive/negative-owner case 由各 owning skill 的 `evals/` 持有，不建立中央 case index；
 - 不改 public catalog。
 
 完成信号：
 
-- 14/10 可从 evidence manifest 回放；
+- 24 项表格仍为 14 个强对应、10 个部分覆盖，或 README 已按 current source 更新；
 - 每个建议都能指出 current owner、consumer 和 source state；
-- route baseline 的计算方法、case set 和结果文件已定义；
+- dirty overlap 已按当前工作树确认，不覆盖用户已有修改；
 - 没有仅因外部 Skill 存在就创建入口。
 
 ### Wave 1：按能力纵向落地 source + eval
@@ -713,7 +713,7 @@ Rejected shapes：
 每个 slice 必须同时包含 source、trigger、negative boundary、contract test、fresh-source eval 和 review；不能先合入 prose、下一 Wave 再补行为证据。
 
 1. **Production readiness slice**
-   - 先确认 working-tree high-risk lens 是否进入当前实施分支；
+   - 从已进入 HEAD 的 high-risk lens 当前 trigger/landing 开始；
    - `extend` high-risk lens 的 on-call questions、telemetry、CI fidelity、rollout proof；
    - 同步增加 high-risk output-quality fixture、轻量任务 negative fixture、focused contract test 和 fresh-source sample。
 2. **Interface/evolution slice**
@@ -721,7 +721,7 @@ Rejected shapes：
    - 同步覆盖 additive change、breaking change、consumer migration、internal-only API negative case；
    - 验证普通 API planning 不被误升级为 enterprise/high-risk ceremony。
 3. **Test-design/slicing slice**
-   - 新增 `spec-work` skill-local reference；
+   - 扩展现有 `skills/spec-work/references/feedback-and-tests.md`，不新建第二个 reference/eval owner；
    - 同步覆盖 TDD claim honesty、characterization fallback、interaction-heavy mock、docs-only no-TDD negative case；
    - 验证 source 与 feedback-loop contract 一起生效。
 4. **Frontend-engineering slice**
@@ -740,9 +740,9 @@ Reviewer 也按纵向 slice 落地：
 - security reviewer 的 Agent-native trust boundary/reachability + 无真实 exploit path 的 suppression case；
 - testing reviewer 的 DAMP/state-vs-interaction/TDD honesty + test-style preference suppression；
 - reliability reviewer 的 correlation/telemetry/actionable alert + pure-function negative case；
-- browser provider-neutral/profile-isolation/untrusted-page-data source + contract test + runtime/fresh-source evidence。
+- browser internal delivery、required-flag probe、private run context、test-plan hash、pipeline no-auto-start 与 exact-origin 缺失时的零 navigation/interaction source + contract test + runtime/fresh-source evidence。
 
-Wave 2 最后运行跨能力 regression：同一请求最多激活必要 lens，frontend/security/testing/reliability findings 不重复 ownership，dispatch 不可用时 inline fallback 不冒充独立 reviewer。
+跨能力 regression 由 frontend-quality unit 的 ownership/dedup 聚焦测试与现有 shipping tail 的 final review/final checks 关闭，不新增独立集成 phase。
 
 ### Wave 3：用量化采用数据决定是否 Build
 
@@ -901,8 +901,9 @@ GitHub Actions、Chrome DevTools、OpenTelemetry、Rails SQL 和具体云平台�
 ```text
 直接引入 Agent Skills 的公共 Skill：0
 新增 Spec-First 公共 Skill：0
-新增 skill-local reference：3 个
-扩展现有 high-risk lens：1 个
+新增 skill-local planning reference：2 个
+扩展既有 reference/lens：2 个
+扩展既有 reviewer：4 个
 新增内部条件 reviewer persona：1 个
 未来候选公共 Skill：3 个，全部 Defer
 ```
@@ -913,21 +914,20 @@ GitHub Actions、Chrome DevTools、OpenTelemetry、Rails SQL 和具体云平台�
 
 | 实施波次 | Source 位置 | 建议变更 |
 | --- | --- | --- |
-| Wave 0 | `docs/14-agent-skills/`、`docs/validation/` | evidence manifest、HEAD/advisory 分层、route behavior baseline |
-| Wave 1 | `skills/spec-plan/references/high-risk-plan-lens.md` | 先完成/adopt 当前 working-tree draft，再 `extend` production readiness；不创建第二个并列 truth source |
+| Wave 0 | `docs/14-agent-skills/README.md` | 当前 Git/owner/source Skill 基线、24 项映射与 14/10 计数；不创建 evidence manifest |
+| Wave 1 | `skills/spec-plan/references/high-risk-plan-lens.md` | `extend` production readiness；不创建第二个并列 truth source |
 | Wave 1 | `skills/spec-plan/references/interface-and-evolution-lens.md` | `new`：接口设计、consumer、compatibility、deprecation、migration planning contract |
 | Wave 1 | `skills/spec-plan/references/frontend-engineering-lens.md` | `new`：component/state/a11y/responsive planning discipline |
-| Wave 1 | `skills/spec-work/references/test-design-and-slicing.md` | `new`：TDD evidence、test doubles、vertical/risk-first slicing |
+| Wave 1 | `skills/spec-work/references/feedback-and-tests.md` | `extend`：contract/risk-first、rollback-friendly、DAMP、state-over-interaction、test-double hierarchy |
 | Wave 2 | `skills/spec-code-review/references/personas/api-contract-reviewer.md` | consumer、additive evolution、deprecation evidence |
 | Wave 2 | `skills/spec-code-review/references/personas/security-reviewer.md` | Agent-native trust boundary、dependency reachability |
 | Wave 2 | `skills/spec-code-review/references/personas/testing-reviewer.md` | DAMP、state vs interaction、TDD claim honesty |
 | Wave 2 | `skills/spec-code-review/references/personas/reliability-reviewer.md` | correlation propagation、telemetry、alert actionability |
 | Wave 2 | `skills/spec-code-review/references/personas/frontend-quality-reviewer.md` | `new` internal conditional reviewer |
 | Wave 2 | `skills/spec-code-review/references/persona-catalog.md` | frontend-quality 语义 gate、ownership 和负向边界 |
-| Wave 2 | `skills/spec-test-browser/SKILL.md` | provider-neutral、profile isolation、untrusted page data |
-| Wave 2 | `skills/spec-prd/` | consumer/sunset、abuse case、Not Doing 条件字段 |
-| Wave 2 | `skills/spec-debug/references/investigation-techniques.md` | stop-line/reduce 与 instrumentation gap |
-| Wave 2 | `skills/spec-compound/` | ADR supersession、有效/无效 signal 与迁移 learning |
+| Wave 2 | `skills/spec-test-browser/`、`src/cli/plugin-governance.js` | internal delivery、safe run-context wrapper、caller-owned exact origin、browser-only cleanup 与诚实 degraded contract |
+| Wave 2 | `skills/spec-lfg/SKILL.md` | caller-owned target-origin 解析、browser applicability/blocker 与独立 UI effect authorization |
+| Wave 2 | `skills/spec-doc-review/`、`skills/spec-work/references/shipping-workflow.md` | `mutation:report-only output:json` 与 caller-owned before/after hash、JSON/P0-P1 处置 |
 
 ## 附录 B：未来公共 Skill 的进入条件
 
@@ -941,7 +941,7 @@ GitHub Actions、Chrome DevTools、OpenTelemetry、Rails SQL 和具体云平台�
 
 ## 附录 C：24 项映射证据索引
 
-本索引用于回放矩阵中的“Spec-First 当前对应”。`HEAD confirmed` 可在声明 commit 回放；`mixed` 表示同时参考 HEAD 与明确标注的 working-tree advisory。
+本索引用于回放矩阵中的“Spec-First 当前对应”。origin evidence 可在声明 commit 回放；U1 已确认 high-risk、planning-evidence 与 spec-plan eval source 进入 mutation 前 HEAD。
 
 | # | Agent Skill | Spec-First source refs | Authority |
 | --- | --- | --- | --- |
@@ -964,10 +964,10 @@ GitHub Actions、Chrome DevTools、OpenTelemetry、Rails SQL 和具体云平台�
 | 17 | `doubt-driven-development` | `skills/spec-doc-review/SKILL.md`；`skills/spec-code-review/references/personas/adversarial-reviewer.md`；`docs/contracts/workflows/fresh-source-eval-checklist.md` | HEAD confirmed |
 | 18 | `api-and-interface-design` | `skills/spec-plan/references/agents/architecture-strategist.md@HEAD`；`skills/spec-code-review/references/personas/api-contract-reviewer.md`；`skills/spec-prd/SKILL.md` | HEAD confirmed |
 | 19 | `frontend-ui-engineering` | `skills/spec-polish/SKILL.md`；`skills/spec-test-browser/SKILL.md`；`skills/spec-dogfood/SKILL.md`；`skills/spec-app-consistency-audit/SKILL.md`；`skills/spec-code-review/references/personas/julik-frontend-races-reviewer.md` | HEAD confirmed |
-| 20 | `security-and-hardening` | `skills/spec-plan/references/agents/security-sentinel.md`；`skills/spec-code-review/references/personas/security-reviewer.md`；`skills/spec-plan/references/high-risk-plan-lens.md` | mixed；high-risk lens 为 working-tree advisory |
+| 20 | `security-and-hardening` | `skills/spec-plan/references/agents/security-sentinel.md`；`skills/spec-code-review/references/personas/security-reviewer.md`；`skills/spec-plan/references/high-risk-plan-lens.md` | HEAD confirmed at U1 baseline |
 | 21 | `ci-cd-and-automation` | `skills/spec-plan/references/agents/deployment-verification-agent.md`；`skills/spec-code-review/references/personas/adversarial-reviewer.md`；`skills/spec-code-review/references/personas/reliability-reviewer.md`；`skills/spec-work/references/shipping-workflow.md` | HEAD confirmed |
-| 22 | `deprecation-and-migration` | `skills/spec-plan/references/agents/data-migration-reviewer.md`；`skills/spec-code-review/references/personas/data-migration-reviewer.md`；`skills/spec-plan/references/high-risk-plan-lens.md` | mixed；high-risk lens 为 working-tree advisory |
+| 22 | `deprecation-and-migration` | `skills/spec-plan/references/agents/data-migration-reviewer.md`；`skills/spec-code-review/references/personas/data-migration-reviewer.md`；`skills/spec-plan/references/high-risk-plan-lens.md` | HEAD confirmed at U1 baseline |
 | 23 | `documentation-and-adrs` | `skills/spec-prd/references/domain-language-and-decision-ledger.md`；`skills/spec-compound/SKILL.md`；`CHANGELOG.md@HEAD` | HEAD confirmed |
-| 24 | `observability-and-instrumentation` | `skills/spec-plan/references/agents/deployment-verification-agent.md`；`skills/spec-debug/references/investigation-techniques.md`；`skills/spec-work/references/shipping-workflow.md`；`skills/spec-plan/references/high-risk-plan-lens.md` | mixed；high-risk lens 为 working-tree advisory |
+| 24 | `observability-and-instrumentation` | `skills/spec-plan/references/agents/deployment-verification-agent.md`；`skills/spec-debug/references/investigation-techniques.md`；`skills/spec-work/references/shipping-workflow.md`；`skills/spec-plan/references/high-risk-plan-lens.md` | HEAD confirmed at U1 baseline |
 
-实施前的 evidence manifest 应为每个 source ref 补充 content hash；本附录只给出当前可读路径和 authority，不把路径存在等同于语义已经满足。
+本附录只给出当前可读路径和 authority；路径存在不等于语义已经满足。实现证据由 owning skill 的聚焦测试、skill-local eval、fresh-source 状态和 shipping closeout 持有，不再复制到 evidence manifest。

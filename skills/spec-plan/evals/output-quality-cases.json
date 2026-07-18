@@ -5,6 +5,8 @@
     "skills/spec-plan/SKILL.md",
     "skills/spec-plan/references/planning-evidence-boundaries.md",
     "skills/spec-plan/references/high-risk-plan-lens.md",
+    "skills/spec-plan/references/interface-and-evolution-lens.md",
+    "skills/spec-plan/references/frontend-engineering-lens.md",
     "skills/spec-plan/references/plan-sections.md",
     "skills/spec-plan/references/deepening-workflow.md",
     "skills/spec-plan/references/agents/architecture-strategist.md",
@@ -165,6 +167,220 @@
         "A customer-visible rollout cannot close on a flag name alone."
       ],
       "expected_outcome": "Rollout and rollback decisions are operationally executable and reviewable.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-production-readiness-proves-observability-and-ci-fidelity",
+      "input": "Plan a staged production rollout whose CI job builds a substitute artifact and whose observability section only says add monitoring.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan does not show that the stand-in build/deploy context matches production or that emitted telemetry can be queried and acted on.",
+        "The feature flag has no safe default, cohort, rollback trigger, owner, or removal condition."
+      ],
+      "with_skill_expectations": [
+        "The plan starts from concrete on-call questions, then selects metrics, traces, and logs by purpose with correlation propagation and cardinality/privacy limits.",
+        "The CI/build/deploy stand-in names its fidelity to the production artifact, flags, environment, and execution path, and any gap receives separate production proof.",
+        "Telemetry proof covers emission plus a query, dashboard, or alert path; the alert names an owner, action, and runbook.",
+        "The feature flag names its safe default, cohort, success/failure signals, rollback trigger, owner, and removal condition."
+      ],
+      "objective_assertions": [
+        "A vague add-monitoring statement or green non-faithful CI job cannot close production readiness."
+      ],
+      "expected_outcome": "Operational readiness decisions are actionable, production-faithful, and supported by observable proof rather than stand-in optimism.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "highrisk-low-impact-config-keeps-production-ceremony-off",
+      "input": "Plan a comment-only cleanup in an already-owned development config file that does not affect build output, deployment, runtime behavior, or release controls.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/high-risk-plan-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The planner treats any config filename as a production trigger and emits a full rollout and observability appendix."
+      ],
+      "with_skill_expectations": [
+        "Production readiness is triggered by changed production behavior or operational risk, not by a docs/config filename alone.",
+        "The localized non-production change remains lightweight and omits CI fidelity, telemetry, feature-flag, rollout, alert, and runbook detail."
+      ],
+      "objective_assertions": [
+        "A docs-only or non-production config-only change does not activate production ceremony without a runtime, build, deploy, or release-control effect."
+      ],
+      "expected_outcome": "The negative-owner boundary prevents high-risk ceremony from leaking into lightweight changes.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "interface-greenfield-has-one-canonical-artifact",
+      "input": "Plan a new event contract shared by a producer and two consumers.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/interface-and-evolution-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan describes implementation classes but leaves consumers, errors, canonical artifact ownership, and executable contract verification implicit."
+      ],
+      "with_skill_expectations": [
+        "The greenfield branch starts from consumers and observable input/output/error semantics, then lands one Interface Contracts entry with target artifact path/type/owner, creation U-ID, and repo-native verification owner."
+      ],
+      "objective_assertions": [
+        "The plan does not duplicate the full schema or create a second canonical contract."
+      ],
+      "expected_outcome": "The new interface has one project-owned contract and an implementation-ready creation and verification path.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "interface-evolution-requires-replacement-and-zero-use",
+      "input": "Plan removal of an existing contract member with known consumers.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/interface-and-evolution-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan calls the removal cleanup without replacement, migration, compatibility window, rollback, or evidence that consumers stopped using it."
+      ],
+      "with_skill_expectations": [
+        "The evolution branch reads the canonical artifact, classifies the change, defines replacement-first migration, compatibility/deprecation posture, rollback, zero-use evidence, and removal condition."
+      ],
+      "objective_assertions": [
+        "A breaking removal cannot close on intuition that the interface is unused."
+      ],
+      "expected_outcome": "Interface evolution is consumer-visible, reversible, and evidence-backed.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "interface-private-refactor-does-not-trigger",
+      "input": "Plan a private helper refactor with no observable contract change.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/interface-and-evolution-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The planner treats any function or type edit as a durable interface and adds a compatibility appendix."
+      ],
+      "with_skill_expectations": [
+        "Private implementation changes stay lightweight when caller-observable contracts are unchanged."
+      ],
+      "objective_assertions": [
+        "No Interface Contracts subsection is required for a private refactor."
+      ],
+      "expected_outcome": "The negative boundary prevents interface ceremony from leaking into internal cleanup.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "interface-reviewer-does-not-become-design-owner",
+      "input": "Review implementation drift from an unchanged canonical contract.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/interface-and-evolution-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "A review finding silently redesigns the interface or creates a second contract artifact."
+      ],
+      "with_skill_expectations": [
+        "The API contract reviewer reports implementation drift; plan-time design returns to spec-plan only when a new product or architecture decision is required."
+      ],
+      "objective_assertions": [
+        "Review does not become the canonical interface design owner."
+      ],
+      "expected_outcome": "Planning and review ownership remain separate without losing drift coverage.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "frontend-async-form-has-state-and-accessibility-contract",
+      "input": "Plan an async mobile form whose draft only says add a submit button and make it responsive.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/frontend-engineering-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "Loading, empty/error/permission/retry states, duplicate action handling, focus/error announcement, and mobile reflow are left to implementation guesswork."
+      ],
+      "with_skill_expectations": [
+        "The plan records component reuse, an applicable async state matrix, keyboard/focus/semantic/error/contrast decisions, responsive constraints, and the browser or non-browser verification owner."
+      ],
+      "objective_assertions": [
+        "A generic responsive statement cannot close state and accessibility decisions for an async form."
+      ],
+      "expected_outcome": "The UI plan makes observable states and accessible responsive behavior implementation-ready.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "frontend-css-focus-contrast-breakpoint-is-not-cosmetic",
+      "input": "Plan a CSS-only change that removes focus visibility, reduces contrast, and causes overflow below a mobile breakpoint.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/frontend-engineering-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The plan classifies CSS as visual polish and skips accessibility and responsive verification."
+      ],
+      "with_skill_expectations": [
+        "The plan treats contrast, focus, and breakpoint/layout regression as user-visible contracts and assigns the corresponding verification owner."
+      ],
+      "objective_assertions": [
+        "File extension alone cannot suppress a behavior-visible frontend trigger."
+      ],
+      "expected_outcome": "Accessibility and responsive regressions receive planning coverage even when the diff is CSS-only.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "frontend-token-contrast-change-triggers",
+      "input": "Plan a design-token value change that lowers text contrast below the product accessibility contract.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/frontend-engineering-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The planner treats token-value-only as an unconditional negative boundary and skips the user-visible contrast regression."
+      ],
+      "with_skill_expectations": [
+        "The frontend lens activates because the token value changes contrast, then records the accessibility decision and verification owner."
+      ],
+      "objective_assertions": [
+        "Token representation cannot suppress a behavior-visible accessibility trigger."
+      ],
+      "expected_outcome": "Token maintenance remains lightweight only when it has no contrast, focus, layout, responsive, motion, or state-expression effect.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "frontend-backend-only-does-not-trigger",
+      "input": "Plan a backend-only handler refactor with unchanged UI routes and state contracts.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/frontend-engineering-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The planner adds a frontend appendix because the repository contains web components."
+      ],
+      "with_skill_expectations": [
+        "The frontend lens stays inactive because no user-visible component, state, accessibility, or responsive contract changes."
+      ],
+      "objective_assertions": [
+        "Backend-only work does not activate frontend ceremony."
+      ],
+      "expected_outcome": "The negative boundary keeps unrelated server work lightweight.",
+      "evidence_status": "file-backed fixture",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
+    },
+    {
+      "id": "frontend-token-only-does-not-trigger",
+      "input": "Plan a token value update with no contrast, focus, layout, responsive, motion, or state-expression effect.",
+      "input_files": [
+        { "path": "skills/spec-plan/references/frontend-engineering-lens.md", "evidence": "file-backed fixture" }
+      ],
+      "baseline_risks": [
+        "The planner treats every token change as a full frontend engineering change."
+      ],
+      "with_skill_expectations": [
+        "The plan remains lightweight unless source evidence shows a user-visible contract effect."
+      ],
+      "objective_assertions": [
+        "Token-only changes do not create a frontend verification claim by themselves."
+      ],
+      "expected_outcome": "The lens avoids broad trigger leakage into harmless token maintenance.",
       "evidence_status": "file-backed fixture",
       "missing_evidence": ["model execution evidence", "human adjudication"]
     },

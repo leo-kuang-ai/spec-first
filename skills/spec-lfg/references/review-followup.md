@@ -1,6 +1,8 @@
 # Review followup (LFG step 4–5)
 
-`spec-code-review` is review-only. LFG applies eligible fixes itself, then commits.
+`spec-code-review` is review-only. LFG applies eligible fixes itself; the apply
+step must leave verified review fixes in the working tree until the
+browser/cleanup gate closes.
 
 ## Step 4 — invoke review
 
@@ -8,11 +10,11 @@
 spec-code-review mode:agent plan:<plan-path-from-step-1>
 ```
 
-Read the **Actionable Findings** summary and artifact path. Do not pass `mode:autofix`.
+不要传递 `mode:autofix`。`mode:agent` 只输出一个 JSON object；只消费该对象，不读取 Markdown Actionable Findings summary。提取 `status`、`actionable_findings`、`findings`、`artifact_path`、`run_id`、`coverage.dispatch_reason_code` 与 `reviewers`。
 
-Capture parsed JSON (`status`, `actionable_findings`, `findings`, `artifact_path`, `run_id`) or the markdown Actionable Findings section. If `status` is `failed`, stop and surface `reason`.
+应用任何 finding 前，要求 `status: complete`、`coverage.dispatch_reason_code` 为 null，且 reviewer coverage 不只是 `inline-fallback`。JSON 损坏或缺失、status 为 `failed`、`degraded`、`skipped` 或其他不完整时，保留有界 findings 并停止；不得进入 apply、browser、lifecycle、commit、push、PR、tracker 或 CI 步骤。
 
-## Step 5 — apply and persist review fixes
+## Step 5 — apply review fixes locally
 
 ### What to apply
 
@@ -34,11 +36,14 @@ Do not treat `autofix_class` as permission to auto-apply.
 
 ### Execution
 
-1. Filter `actionable_findings` (or markdown Actionable Findings) with the bar above.
+1. 只按以上标准过滤 JSON `actionable_findings`。
 2. Apply eligible fixes in the working tree in severity order (`#` stable from the review).
 3. Run targeted tests when `requires_verification: true` on any applied finding.
-4. If `git status --short` shows changes, stage only review-driven files, commit `fix(review): apply review findings`, and push before step 6 **when a remote is configured** (per LFG's shipping precondition). To push: if an upstream exists, run `git push`. If no upstream exists but a remote is configured (common on a fresh feature branch), resolve a writable remote dynamically: prefer `origin` when present, otherwise use `git remote` and choose the first configured remote. Then run `git push --set-upstream <remote> HEAD`. If there is no remote at all, do not push — the local commit suffices. If no eligible fixes were applied, note explicitly and skip commit.
+4. Leave verified review fixes in the working tree for the later shipping step.
+   Do not stage, commit, push, file tracker items, or edit a PR before the
+   browser/cleanup gate closes. If no eligible fixes were applied, note that
+   explicitly.
 
-## Step 6 — residual handoff
+## Step 7 — residual handoff
 
 Residuals are actionable findings **not** applied in step 5 — not leftovers from in-skill autofix. Use the Actionable Findings summary / artifact from step 4.

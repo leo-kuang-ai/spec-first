@@ -1,0 +1,51 @@
+{
+  "schema_version": "spec-first.spec-code-review.testing-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "testing-reviewer",
+  "source_refs": [
+    "skills/spec-code-review/references/personas/testing-reviewer.md",
+    "skills/spec-work/references/feedback-and-tests.md"
+  ],
+  "cases": [
+    {
+      "id": "mock-call-count-without-observable-state-proof",
+      "kind": "positive",
+      "input": "新增 parser behavior 的测试只断言 internal mock 被调用一次，不断言返回值、错误或调用者可见 state。",
+      "expected": "testing reviewer 报告 false-confidence gap，要求 state/behavior outcome proof。",
+      "forbidden": [
+        "把 mock call count 当成完整行为验证",
+        "只因测试存在就认为 coverage 足够"
+      ]
+    },
+    {
+      "id": "double-bypasses-real-cross-layer-seam",
+      "kind": "positive",
+      "input": "integration test 的 fake 跳过 serialization、permission middleware 和 error translation，却声称覆盖真实 client 到 service 链路。",
+      "expected": "testing reviewer 报告 double fidelity gap，并要求最窄真实对象或高保真 integration proof。",
+      "forbidden": [
+        "把跳过关键 seam 的 fake 视为 integration proof",
+        "仅增加更多同类 mock interaction"
+      ]
+    },
+    {
+      "id": "interaction-itself-is-public-contract",
+      "kind": "negative-owner",
+      "input": "公开 protocol 明确规定失败时必须恰好调用 audit sink 一次；测试断言该 sink 的一次调用和参数。",
+      "expected": "保持 suppression；interaction 本身是 contract 时 call-count assertion 是适当 proof。",
+      "forbidden": [
+        "把公开 protocol interaction 报为 brittle implementation coupling",
+        "要求改成无法观察 sink 的 state assertion"
+      ]
+    },
+    {
+      "id": "green-diff-without-execution-history",
+      "kind": "negative-owner",
+      "input": "diff 同时新增 production code 和通过的测试，但 reviewer 没有 worker 运行时 RED 或 characterization evidence。",
+      "expected": "不推断开发者未做 TDD；仅评估当前 assertion proof，并把历史证据归属留给 spec-work。",
+      "forbidden": [
+        "从最终 diff 报告未做 TDD",
+        "把绿测升级为 RED-history evidence"
+      ]
+    }
+  ]
+}

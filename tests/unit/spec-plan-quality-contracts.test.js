@@ -25,6 +25,8 @@ describe('spec-plan quality integration contracts', () => {
   const deepening = read('references/deepening-workflow.md');
   const evidence = read('references/planning-evidence-boundaries.md');
   const highRisk = read('references/high-risk-plan-lens.md');
+  const interfaceEvolution = read('references/interface-and-evolution-lens.md');
+  const frontendEngineering = read('references/frontend-engineering-lens.md');
   const architecture = read('references/agents/architecture-strategist.md');
   const patterns = read('references/agents/pattern-recognition-specialist.md');
   const handoff = read('references/plan-handoff.md');
@@ -54,6 +56,9 @@ describe('spec-plan quality integration contracts', () => {
   test('restores evidence, source-runtime, composition/ownership, surface, and high-risk lenses conditionally', () => {
     expect(skill).toContain('references/planning-evidence-boundaries.md');
     expect(skill).toContain('references/high-risk-plan-lens.md');
+    expect(skill).toContain('references/interface-and-evolution-lens.md');
+    expect(skill).toContain('references/frontend-engineering-lens.md');
+    expect(skill).toContain('且不影响 contrast/focus/layout/responsive/motion/状态表达的 token-value-only');
     expect(evidence).toContain('advisory');
     expect(evidence).toContain('Generated runtime mirrors and host-local managed slices are not source-of-truth');
     expect(evidence).toContain('Evidence & Limitations');
@@ -61,8 +66,39 @@ describe('spec-plan quality integration contracts', () => {
     expect(evidence).toContain('Generated runtime mirrors are never candidate owners');
     expect(highRisk).toContain('Scheduled or recurring background job');
     expect(highRisk).toContain('overlap protection');
+    expect(highRisk).toContain('## Production Readiness Decisions');
+    expect(highRisk).toContain('on-call questions');
+    expect(highRisk).toContain('build context');
+    expect(highRisk).toContain('correlation');
+    expect(highRisk).toContain('cardinality');
+    expect(highRisk).toContain('telemetry proof');
+    expect(highRisk).toContain('removal condition');
+    expect(highRisk).toContain('docs-only');
     expect(highRisk).toContain('artifact_readiness');
     expect(highRisk).toContain('Do not add a fixed enterprise appendix');
+    expect(interfaceEvolution).toContain('## Shared Contract Core');
+    expect(interfaceEvolution).toContain('## Greenfield Branch');
+    expect(interfaceEvolution).toContain('## Evolution Branch');
+    expect(interfaceEvolution).toContain('### Interface Contracts');
+    expect(interfaceEvolution).toContain('canonical artifact');
+    expect(interfaceEvolution).toContain('replacement-first');
+    expect(interfaceEvolution).toContain('zero-use evidence');
+    expect(interfaceEvolution).toContain('parser_unavailable');
+    expect(interfaceEvolution).toContain('private helper');
+    expect(interfaceEvolution).toContain('api-contract-reviewer');
+    expect(frontendEngineering).toContain('## Required Planning Landing');
+    expect(frontendEngineering).toContain('State matrix');
+    expect(frontendEngineering).toContain('keyboard/focus');
+    expect(frontendEngineering).toContain('contrast');
+    expect(frontendEngineering).toContain('responsive');
+    expect(frontendEngineering).toContain('spec-polish');
+    expect(frontendEngineering).toContain('spec-test-browser');
+    expect(frontendEngineering).toContain('julik-frontend-races-reviewer');
+    expect(frontendEngineering).toContain('backend-only');
+    expect(frontendEngineering).toContain('token-value-only');
+    expect(readJson('evals/output-quality-cases.json').cases.map((entry) => entry.id)).toContain(
+      'frontend-token-contrast-change-triggers',
+    );
     expect(sections).toContain('in-scope');
     expect(sections).toContain('out-of-scope: <reason>');
     expect(sections).toContain('deferred: <owner/trigger>');
@@ -131,6 +167,16 @@ describe('spec-plan quality integration contracts', () => {
       'planning-only-no-code-before-handoff',
       'dispatch-authorization-missing-falls-back-inline',
       'high-risk-async-plan-is-concrete',
+      'production-readiness-staged-rollout-is-operational',
+      'production-readiness-docs-only-stays-lightweight',
+      'interface-greenfield-lands-canonical-contract',
+      'interface-evolution-is-replacement-first',
+      'interface-private-helper-stays-lightweight',
+      'interface-drift-review-stays-with-reviewer',
+      'frontend-async-form-plans-visible-states',
+      'frontend-css-focus-and-contrast-regression-triggers',
+      'frontend-backend-only-handler-stays-out',
+      'frontend-token-value-only-stays-out',
       'new-skill-surface-needs-owner-decision',
     ]) {
       expect(exampleIds.has(id)).toBe(true);
@@ -146,6 +192,16 @@ describe('spec-plan quality integration contracts', () => {
       'highrisk-migration-has-compatibility-and-rollback',
       'highrisk-scheduled-job-handles-overlap-and-catchup',
       'highrisk-rollout-has-owner-visible-gates',
+      'highrisk-production-readiness-proves-observability-and-ci-fidelity',
+      'highrisk-low-impact-config-keeps-production-ceremony-off',
+      'interface-greenfield-has-one-canonical-artifact',
+      'interface-evolution-requires-replacement-and-zero-use',
+      'interface-private-refactor-does-not-trigger',
+      'interface-reviewer-does-not-become-design-owner',
+      'frontend-async-form-has-state-and-accessibility-contract',
+      'frontend-css-focus-contrast-breakpoint-is-not-cosmetic',
+      'frontend-backend-only-does-not-trigger',
+      'frontend-token-only-does-not-trigger',
       'existing-capabilities-compose-through-thin-glue',
       'existing-owner-extends-instead-of-parallel-abstraction',
       'new-boundary-wins-when-reuse-mixes-concerns',
@@ -223,6 +279,8 @@ describe('spec-plan quality integration contracts', () => {
         for (const relativePath of [
           'references/planning-evidence-boundaries.md',
           'references/high-risk-plan-lens.md',
+          'references/interface-and-evolution-lens.md',
+          'references/frontend-engineering-lens.md',
           'references/agents/agent-native-planning-strategist.md',
         ]) {
           expect(operationPaths).toContain(path.posix.join(runtimeRoot, 'spec-plan', relativePath));

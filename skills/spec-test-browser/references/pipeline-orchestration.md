@@ -1,50 +1,20 @@
-# Pipeline-Mode Server Orchestration
+# Pipeline-Mode Browser Orchestration
 
-Read and follow this file only when `spec-test-browser` is invoked with `mode:pipeline` by `spec-lfg` or another automated runner. It overrides the headed/headless question, free-port selection, dev-server startup, human verification pauses, and failure-handling prompts. Pipeline mode runs unattended, so never block on a question.
+仅当 `spec-test-browser` 被 `spec-lfg` 或其他 automated caller 以 `mode:pipeline` 调用时读取。Pipeline 无人值守，但不代表拥有项目 mutation、project command 或 browser effect 授权。
 
-## 1. No Headed/Headless Question
+## Exact Origin And Caller-Owned Server
 
-Default to headless. Do not ask. Skip the browser-mode question entirely and never pass `--headed`.
+- Browser applicable 时必须提供一个 explicit exact loopback `target-origin:<origin>`。缺失时返回 `not_run` / `target-origin-missing`；非法值返回 `not_run` / `target-origin-invalid`。
+- 不读 runtime profile，不解析 package script、cwd 或 env，不做 reachability preflight、free-port scan、origin 改写或 server 启动。caller-owned server 在运行前后都保持 caller-owned，不被 wrapper 信号、关闭或清理。
+- 先调用 `node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe`。request-time exact-origin capability 未确认时返回 `not_supported` / `exact-origin-capability-unavailable`，navigation/interaction subprocess 为 0。
 
-## 2. Claim A Free Port And Start The Server
+## Effect Gate And Browser Execution
 
-Multiple agents may run on the same machine, so never assume the preferred port is free. Scan upward to the first free port, then start the server there in the background.
+- 不暂停等待 headed/headless、人工验证或 failure-handling prompt。OAuth、email、payment、SMS 等人工 flow 记录为 `Skip` 及 limitation。
+- 对删除、发布、发送、购买、权限变更或其他 durable/external effect，包括通过 `open` 或 keyboard action 可触发的 effect，返回 `not_run` / `browser-mutation-authorization-required`，不将该 step 写入 test plan。这是 workflow-level semantic gate，不声称 wrapper 能从 action 字符串确定业务 effect。
+- 仅通过唯一 wrapper 执行 prepare/run/cleanup。首个 `open` 是 availability evidence；任何 page-context action 不得位于它之前，其失败后不运行后续 action。
+- wrapper 或 browser cleanup 的 `not_supported`、`not_run`、`failed`、missing 或 indeterminate 均是该 applicable 流程的 blocker；不得让 passed route/step 覆盖 cleanup failure，也不得因此将流程改写为 `not_applicable`。
 
-Run the scan and startup as **one** command. Shell variables do not survive between separate tool calls, so the free-port scan and startup must share a single block. Set `PORT` on the first line to the preferred port from the main workflow; it defaults to `3000` only if no preferred port was found.
+## Claim Ceiling
 
-```bash
-PORT=3000   # replace 3000 with the preferred port from the main workflow
-
-find_free_port() {
-  local p=$1
-  while lsof -i ":$p" -sTCP:LISTEN -t >/dev/null 2>&1; do
-    p=$((p + 1))
-  done
-  echo "$p"
-}
-
-PORT=$(find_free_port "$PORT")
-echo "Using dev server port: $PORT"
-
-echo "Starting dev server on port ${PORT}..."
-if [ -f "bin/dev" ]; then
-  PORT=${PORT} bin/dev > /tmp/spec-test-browser-dev-server-${PORT}.log 2>&1 &
-elif [ -f "bin/rails" ]; then
-  bin/rails server -p ${PORT} > /tmp/spec-test-browser-dev-server-${PORT}.log 2>&1 &
-elif [ -f "package.json" ]; then
-  PORT=${PORT} npm run dev > /tmp/spec-test-browser-dev-server-${PORT}.log 2>&1 &
-fi
-
-for i in $(seq 1 30); do
-  lsof -i ":${PORT}" -sTCP:LISTEN -t >/dev/null 2>&1 && break
-  sleep 1
-done
-
-if ! lsof -i ":${PORT}" -sTCP:LISTEN -t >/dev/null 2>&1; then
-  echo "Server did not start in 30s. Last output:"
-  tail -20 /tmp/spec-test-browser-dev-server-${PORT}.log 2>/dev/null
-  exit 1
-fi
-```
-
-The scan may land on a different port than the preferred one, and `$PORT` does not survive into later tool calls. Note the literal port printed as `Using dev server port: N` and substitute that number into every subsequent `agent-browser` command. Do not rely on `${PORT}` carrying over into the main workflow snippets.
+输出 target-origin provenance、wrapper probe/capability、route/step 结果、`action_process_calls`、browser cleanup、private evidence refs 和 limitations。证据最高只支持在 caller-authorized exact origin 上的观察，不证明 server 对应当前 branch、由 spec-first 启动或被 spec-first 清理。

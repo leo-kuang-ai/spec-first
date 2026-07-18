@@ -6,6 +6,8 @@
     "skills/spec-plan/SKILL.md",
     "skills/spec-plan/references/planning-evidence-boundaries.md",
     "skills/spec-plan/references/high-risk-plan-lens.md",
+    "skills/spec-plan/references/interface-and-evolution-lens.md",
+    "skills/spec-plan/references/frontend-engineering-lens.md",
     "skills/spec-plan/references/plan-sections.md",
     "skills/spec-plan/references/plan-handoff.md",
     "skills/spec-plan/references/approach-altitude.md",
@@ -199,6 +201,66 @@
       "input": "Plan a cross-service write with MQ retry and scheduled reconciliation.",
       "coverage_tags": ["trigger", "high-risk", "planning"],
       "expected_outcome": "Make contract, idempotency, retry, ordering, final-failure/manual-recovery, observability, and verification decisions explicit or keep a launch-blocking question open."
+    },
+    {
+      "id": "production-readiness-staged-rollout-is-operational",
+      "input": "Plan a staged external integration behind a feature flag with a CI gate and on-call ownership.",
+      "coverage_tags": ["trigger", "production-readiness", "positive"],
+      "expected_outcome": "Start from the on-call questions, require a production-faithful build/deploy stand-in, choose purpose-bound metrics/traces/logs with correlation and cardinality/privacy limits, name telemetry proof and alert/runbook ownership, and define the flag default, cohort, rollback trigger, and removal condition."
+    },
+    {
+      "id": "production-readiness-docs-only-stays-lightweight",
+      "input": "Update a release-note typo without changing a build, deploy, runtime, feature flag, or operational contract.",
+      "coverage_tags": ["negative-owner", "production-readiness", "lightweight"],
+      "expected_outcome": "Keep the plan lightweight and do not add CI fidelity, telemetry, rollout, alert, runbook, or feature-flag ceremony when no production behavior changes."
+    },
+    {
+      "id": "interface-greenfield-lands-canonical-contract",
+      "input": "Plan a new shared CLI result envelope consumed by three commands and a plugin adapter.",
+      "coverage_tags": ["trigger", "interface", "greenfield", "positive"],
+      "expected_outcome": "Use the greenfield branch, name consumers and the observable input/output/error contract, land an Interface Contracts entry with target artifact path/type/owner and creation U-ID, and assign a repo-native contract check."
+    },
+    {
+      "id": "interface-evolution-is-replacement-first",
+      "input": "Plan removal of a deprecated response field that still has known downstream consumers.",
+      "coverage_tags": ["trigger", "interface", "evolution", "positive"],
+      "expected_outcome": "Read the canonical artifact, classify the change, define replacement and consumer migration before removal, preserve a compatibility window and rollback, and require zero-use evidence plus a removal condition."
+    },
+    {
+      "id": "interface-private-helper-stays-lightweight",
+      "input": "Rename and reorganize a private helper while preserving every observable caller contract.",
+      "coverage_tags": ["negative-owner", "interface", "private-refactor"],
+      "expected_outcome": "Keep the plan lightweight and do not add Interface Contracts, compatibility, deprecation, parser, or consumer-migration ceremony."
+    },
+    {
+      "id": "interface-drift-review-stays-with-reviewer",
+      "input": "During code review, an implementation response shape drifts from an unchanged canonical artifact and no new design decision is needed.",
+      "coverage_tags": ["negative-owner", "interface", "review-boundary"],
+      "expected_outcome": "Keep the drift finding with the API contract reviewer; do not turn the reviewer into the plan-time interface design owner or create a second contract source."
+    },
+    {
+      "id": "frontend-async-form-plans-visible-states",
+      "input": "Plan a mobile account form with asynchronous submit, loading, permission denial, error, retry, and keyboard focus behavior.",
+      "coverage_tags": ["trigger", "frontend", "state", "a11y", "responsive", "positive"],
+      "expected_outcome": "Use the frontend lens to define component ownership, an applicable state matrix, duplicate-submit/retry behavior, semantic labels/errors, keyboard/focus restoration, responsive constraints, and runtime verification owner."
+    },
+    {
+      "id": "frontend-css-focus-and-contrast-regression-triggers",
+      "input": "Change CSS that removes the visible focus indicator and lowers text contrast at a mobile breakpoint.",
+      "coverage_tags": ["trigger", "frontend", "a11y", "responsive", "positive"],
+      "expected_outcome": "Treat the behavior-visible CSS regression as a frontend trigger and plan focus, contrast, responsive verification, rather than dismissing it because no component file changed."
+    },
+    {
+      "id": "frontend-backend-only-handler-stays-out",
+      "input": "Refactor a backend-only request handler without changing any user-visible route, component, response contract, or UI state.",
+      "coverage_tags": ["negative-owner", "frontend", "backend-only"],
+      "expected_outcome": "Do not load frontend component/state/a11y/responsive ceremony solely because the codebase also has a web UI."
+    },
+    {
+      "id": "frontend-token-value-only-stays-out",
+      "input": "Update a design token value that does not affect contrast, focus, layout, responsive behavior, motion, or state expression.",
+      "coverage_tags": ["negative-owner", "frontend", "token-only"],
+      "expected_outcome": "Keep the plan lightweight and do not claim a frontend engineering trigger without a user-visible contract effect."
     },
     {
       "id": "new-skill-surface-needs-owner-decision",
