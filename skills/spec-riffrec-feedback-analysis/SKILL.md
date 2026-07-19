@@ -23,6 +23,17 @@ When the input is ambiguous (e.g., a zip arrived without context), inspect the r
 - Text/metadata artifacts (requirements kickoff material, analysis summaries, problem analyses, source manifests) may be committed when they are needed for traceability and contain no sensitive data.
 - Use repo-relative screenshot paths in any committed doc so later agents can open the evidence without absolute local paths.
 
+## Dispatch Authorization Boundary
+
+在把 recording evidence、transcript、screenshots 或 source-mapping context 交给任何 worker 前，记录：
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发；输入文件、分析规模、工具权限或本 Skill 被调用都不构成授权。缺授权时 inline 或 serial 执行并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时 inline 或 serial 执行并记录 `subagent_capability_missing`。任何派发还必须遵守 local-only/privacy 边界，只发送完成 bounded unit 所需的最小证据。Inline fallback 不得声称 independent analyst coverage。
+
 ## Analyzer entrypoint
 
 All non-setup paths share the same analyzer, which ships in this skill's `scripts/` directory. The Bash tool's working directory is the user's project, not the skill directory, so a bare `scripts/<name>` path will not resolve. Invoke it by the skill's own absolute path: set `SKILL_DIR` to the directory you loaded this `spec-riffrec-feedback-analysis` SKILL.md from, in the same command (shell state does not persist between Bash calls):

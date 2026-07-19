@@ -1,16 +1,16 @@
 # Post-Ideation Workflow
 
-Read this file after Phase 2 ideation agents return and the orchestrator has merged and deduped their outputs into a master candidate list. Do not load before Phase 2 completes.
+Read this file after Phase 2 ideation roles return and the orchestrator has merged and deduped their outputs into a master candidate list. Every dispatch instruction in this reference inherits the main Skill's Dispatch Authorization Boundary; inline/serial execution must keep the matching reason code and must not claim fresh-context or independent coverage. Do not load before Phase 2 completes.
 
 ## Phase 3: Adversarial Filtering
 
-Review every candidate idea critically. Critique runs in two layers — a fresh-context verifier first, then orchestrator arbitration. Fresh-context verification outperforms self-critique: the orchestrator synthesized some of these candidates itself and carries the full generation history, so it is anchored in ways a verifier that never saw the generation is not.
+Review every candidate idea critically. Critique has two roles — basis verification, then orchestrator arbitration. Only authorized, capable dispatch makes the first role a fresh-context verifier; inline fallback is an orchestrator self-check with the explicit coverage limitation from the main Skill.
 
-1. **Basis verification (one generation-tier sub-agent — see SKILL.md Model Tiers).** Dispatch a verifier whose payload is only the consolidated grounding summary (including the evidence gists and dossier file paths — it reads dossier files itself as needed) and the merged candidate list — none of the generation history. Prompt it to refute: for each candidate, check that the stated basis actually supports the claimed move, that `direct:` quotes exist where cited (spot-check by reading the file in repo mode), that `external:` prior art is real and relevantly analogous, that `reasoned:` arguments hold, and that the idea genuinely passes the meeting-test. It returns a per-candidate verdict (sound / weak / refuted) with a one-line reason. The verifier did not write the ideas, so its meeting-test judgment supersedes the generators' self-attestation. Under `go deep` (Phase 0.5), dispatch a second, ceiling-tier critic focused on novelty and feasibility with the same fresh-context payload.
+1. **Basis verification (generation-tier role — see SKILL.md Model Tiers).** When `worker_dispatch_authorization: authorized` and `worker_dispatch_capability: available`, dispatch a verifier whose payload is only the consolidated grounding summary (including evidence gists and dossier file paths) plus the merged candidate list, with none of the generation history. Otherwise run the same refutation rubric inline or serially, record `dispatch_authorization_missing` or `subagent_capability_missing`, and do not describe the result as independent or fresh-context. Check that each stated basis supports the move, that `direct:` quotes exist where cited, that `external:` prior art is real and relevantly analogous, that `reasoned:` arguments hold, and that the idea passes the meeting-test. A dispatched verifier returns sound/weak/refuted verdicts; only that fresh-context verdict may supersede generator self-attestation. Under `go deep`, a second ceiling-tier critic is eligible only through the same gate; inline fallback applies the second rubric serially without upgrading coverage.
 
 2. **Orchestrator arbitration.** The orchestrator makes the final cut, weighing verifier verdicts without being bound by them — overrule a verdict when evidence in context contradicts it, and say so in the rejection reason.
 
-If verifier dispatch fails (platform limits, errors), fall back to orchestrator-only filtering and note the degradation in the rejection summary.
+If an authorized verifier dispatch fails, fall back to orchestrator-only filtering, record the capability/failure reason, and note the degradation in the rejection summary.
 
 Do not generate replacement ideas in this phase unless explicitly refining.
 

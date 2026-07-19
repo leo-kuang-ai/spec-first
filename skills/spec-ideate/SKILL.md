@@ -43,6 +43,17 @@ If no argument is provided, proceed with open-ended ideation.
 2. **Generate many -> critique all -> explain survivors only** - The quality mechanism is explicit rejection with reasons, not optimistic ranking. Do not let extra process obscure this pattern.
 3. **Route action into brainstorming** - Ideation identifies promising directions; `spec-brainstorm` defines the selected one precisely enough for planning. Do not skip to planning from ideation output.
 
+## Dispatch Authorization Boundary
+
+在派发 grounding、research、evidence、ideation、basis-verification 或 recovery worker 前，记录：
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。Depth、mode、agent-count preview、用户请求外部/Slack/issue research、权限设置或 callable tool 都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时 inline 或 serial 执行相同 grounding/lens/rubric contracts 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Fallback 必须保留 topic-axis 与 six-frame category coverage，但不得声称 agent diversity、independent basis verification、fresh-context 或 multi-agent coverage。
+
 ## Model Tiers
 
 Sub-agent dispatch is tiered by task shape, never hardcoded to a model name:
@@ -51,7 +62,7 @@ Sub-agent dispatch is tiered by task shape, never hardcoded to a model name:
 - **Generation tier** — evidence-driven ideation frames and basis verification. Use the platform's mid-tier model when the current harness exposes a known override. If model names are unknown, omit the override and inherit rather than guessing.
 - **Ceiling tier** — ceiling ideation frames, cross-cutting synthesis, and final arbitration. Inherit the orchestrator's model by omitting the model parameter.
 
-**Degradation rule.** When the platform's subagent primitive does not support per-agent model selection, dispatch everything on the inherited model and keep the read budgets and dossier caps — cost control then comes from structure, not tiering.
+**Degradation rule.** When authorized dispatch exists but the platform cannot select per-agent models, dispatch everything on the inherited model and keep the read budgets and dossier caps. When dispatch is unauthorized or unavailable, run the same roles inline or serially with those budgets and the claim limitation above.
 
 Two overrides raise the whole ideation fleet to the ceiling tier: surprise-me mode (subject discovery is judgment-heavy and is the mode's whole value) and the `go deep` depth override (Phase 0.5).
 
@@ -228,15 +239,17 @@ Use reasonable interpretation rather than formal parsing.
 
 #### 0.6 Cost Transparency Notice
 
-Before dispatching Phase 1, surface the agent count and cost shape for the inferred mode in one short line so multi-agent cost is not invisible. Compute the count from the actual dispatch decision: 1 grounding-context agent (codebase scan in repo mode; user-context synthesis in elsewhere) + 1 learnings (skip in elsewhere-non-software) + 1 web researcher + evidence scouts (repo mode only, one per Phase 1.5 axis, max 5, extraction tier) + user-research distillers (one per user-supplied research artifact needing distillation, extraction tier, all modes) + the ideation fleet (5 agents default: 3 generation-tier + 2 ceiling-tier; 6 all-ceiling in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier (generation tier). When issue-tracker intent triggers (repo mode only): add 1 for the issue-intelligence agent. Add 1 if the user opted into Slack research. Subtract 1 if the user issued a web-research skip phrase or V15 reuse will fire. In **surprise-me mode**, note "(surprise-me mode: deeper exploration per agent)". Phase 2's axis-coverage check may dispatch up to 2 additional recovery sub-agents when generation leaves any topic axis empty (skipped in surprise-me mode); when not in surprise-me, append "(+up to 2 if axis-coverage requires recovery)" to the count line.
+Before Phase 1, surface the execution count and cost shape in one short line. When dispatch is authorized and capable, report the actual agent count using the calculation below. Otherwise report the number of role lenses that will run inline/serial and the applicable fallback reason; do not describe them as agents. Compute the count from the actual execution decision: 1 grounding-context role + 1 learnings role (skip in elsewhere-non-software) + 1 web researcher + evidence roles (repo mode only, one per Phase 1.5 axis, max 5) + user-research distillers + the ideation fleet (5 roles default; 6 in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier. Add issue intelligence and opt-in Slack roles when applicable; subtract web research when skipped/reused. Phase 2 may add up to 2 recovery roles when axis coverage requires it.
 
-Examples (defaults, no skips, no opt-ins):
+Authorized-dispatch examples (defaults, no skips, no opt-ins):
 
 - **Repo mode, specified subject:** "Will dispatch ~13 agents, most on cheap tiers: codebase scan + learnings + web research + up to 5 evidence scouts (cheap) + 5 ideation (3 mid-tier, 2 top-tier) + 1 basis verifier (mid-tier). Skip phrases: 'no external research', 'no slack'."
 - **Repo mode, surprise-me:** "Will dispatch ~10 agents (surprise-me mode: deeper exploration per agent): codebase scan + learnings + web research + 6 ideation (top-tier) + 1 basis verifier. Skip phrases: 'no external research', 'no slack'."
 - **Repo mode, issue-tracker intent:** "Will dispatch ~13 agents: codebase scan + learnings + web research + issue intelligence + up to 5 evidence scouts + 4 ideation + 1 basis verifier. Skip phrases: 'no external research', 'no slack'." Reflects the successful-theme path; if issue intelligence returns insufficient signal (see Phase 1), ideation falls back to the default 5-agent fleet.
 - **Elsewhere-software:** "Will dispatch ~9 agents: context synthesis + learnings + web research + 5 ideation + 1 basis verifier. Skip phrases: 'no external research'."
 - **Elsewhere-non-software:** "Will dispatch ~8 agents: context synthesis + web research + 5 ideation + 1 basis verifier. Skip phrases: 'no external research'."
+
+Inline fallback uses the same computed role count but says, for example: `Will run ~13 role lenses inline/serial (dispatch_authorization_missing); independent agent diversity and fresh-context verification are not available.`
 
 The line is informational; users do not need to acknowledge it.
 
@@ -262,7 +275,7 @@ echo "$SCRATCH_DIR"
 
 Use the echoed absolute path (`/tmp/spec-first/spec-ideate/<run-id>`) as `<scratch-dir>` for every subsequent checkpoint write and cache read in this run. The run directory is not deleted on completion — the V15 cache is session-scoped and reused across run-ids, the checkpoints follow the cross-invocation-reusable convention, and in the no-repo case the deliverable itself is written here (see `references/post-ideation-workflow.md` Phase 4 and §5.5).
 
-Run grounding agents in parallel in the **foreground** (do not background — results are needed before Phase 2):
+With authorized dispatch, run grounding agents in bounded parallel in the **foreground**. Otherwise execute the same grounding roles serially inline; results are still required before Phase 2.
 
 **Repo mode dispatch:**
 
@@ -273,7 +286,7 @@ SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read
 python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 ```
 
-On `HIT`, load the profile JSON — that is your agnostic project shape (stack, top-level layout, conventions); do not re-derive it in the scan. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive the profile, write its JSON output to a file under `<scratch-dir>`, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations). On `NO-CACHE`, derive the agnostic shape inline (the codebase scan below covers it) and skip the `put`. The cache is an optimization, never a hard dependency — on any failure or unreadable output, degrade to the full scan. With the profile in hand, the codebase scan runs **only the question-specific slice** on top of it.
+On `HIT`, load the profile JSON — that is your agnostic project shape (stack, top-level layout, conventions); do not re-derive it in the scan. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` only when the package-local boundary permits it; otherwise derive the profile inline and record the matching fallback reason. Persist usable JSON under `<scratch-dir>` with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` when available. On `NO-CACHE`, derive the agnostic shape inline and skip the `put`. The cache is an optimization, never a hard dependency.
 
 1. **Quick context scan** — dispatch a general-purpose subagent using the platform's cheapest capable model when the harness exposes a known override; otherwise inherit. Before dispatching, apply the routing test from "User-Supplied Research Artifacts" below to any root-level `*.md` file the focus hint names: research artifacts (evidence) take that subsection's distillation path, so list them on the prompt's research-artifacts line to keep the scan from duplicating them into `User-named references`. Dispatch with this prompt:
 

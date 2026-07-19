@@ -10,7 +10,7 @@
     {
       "path": "skills/spec-brainstorm/SKILL.md",
       "status": "present",
-      "sha256": "db7214ec68bcb6c4414264d5a615c2ae6ea2977a68d4a6d3ba9282c825a4bb79"
+      "sha256": "5e8365a53b3627290b1b59ce7e3d7361f2e0ddd6d83bed2924fc18f310f09b27"
     },
     {
       "path": "skills/spec-brainstorm/references/agents/repo-profiler.md",
@@ -95,7 +95,7 @@
     {
       "path": "skills/spec-ideate/references/post-ideation-workflow.md",
       "status": "present",
-      "sha256": "b4d9c94745c15961e0434a0296bda287d282b36c3fb59d010b2c9345ceefc3d0"
+      "sha256": "ad11642aac473155704ecd9e8e3c36c8dac690008865a425d17971f7067949b6"
     },
     {
       "path": "skills/spec-ideate/references/repo-profile-cache.md",

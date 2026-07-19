@@ -33,16 +33,16 @@ flowchart TD
 | # | Flow | Journey / Scenario | Status | Issue | Fix | Commit |
 |---|------|--------------------|--------|-------|-----|--------|
 | 1 |      |                    | Pass   | -     | -   | -      |
-| 2 |      |                    | Fixed  |       |     | abc123 |
+| 2 |      |                    | Fixed  |       |     | <commit-or-uncommitted> |
 | 3 |      |                    | Blocked (needs human verify) | | | |
 
-Status values: `Pending`, `Pass`, `Fixed`, `Skipped`, `Blocked (needs human verify)`, `Blocked (human decision)`. Start every scenario at `Pending` so this table doubles as the resume checkpoint.
+Status values: `Pending`, `Pass`, `Fixed`, `Skipped`, `Blocked (fix authorization)`, `Blocked (needs human verify)`, `Blocked (human decision)`. Start every scenario at `Pending` so this table doubles as the resume checkpoint. Use `uncommitted` when a verified fix exists but commit authorization is missing.
 
 ## What Was Fixed
 
 For each issue found and fixed:
 
-### <Short issue title> — `<commit>`
+### <Short issue title> — `<commit-or-uncommitted>`
 - **Symptom:** <what the user saw / what failed in the browser>
 - **Root cause:** <why it happened>
 - **Fix:** <what changed, repo-relative file paths>
@@ -52,7 +52,7 @@ For each issue found and fixed:
 
 <Experiential friction found while walking each flow as each persona. A scenario can `Pass` functionally and still carry paper cuts. Note the persona, severity, and whether it was fixed (sharp ones, via the Phase 5 loop) or deferred. "None" if clean.>
 
-- **<Persona>** — <paper cut> — <severity> — <fixed `<commit>` / deferred>
+- **<Persona>** — <paper cut> — <severity> — <fixed `<commit-or-uncommitted>` / deferred>
 
 ## Console Errors
 

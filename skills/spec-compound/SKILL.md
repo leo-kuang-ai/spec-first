@@ -6,11 +6,11 @@ argument-hint: "[optional: brief context] [mode:headless] "
 
 # spec-compound
 
-Coordinate multiple subagents working in parallel to document a recently solved problem.
+Document a recently solved problem through role-based research; use parallel subagents only when dispatch is explicitly authorized and callable, otherwise run the same roles inline or serially.
 
 ## Purpose
 
-Captures problem solutions while context is fresh, creating structured documentation in `docs/solutions/` with YAML frontmatter for searchability and future reference. Uses parallel subagents.
+Captures problem solutions while context is fresh, creating structured documentation in `docs/solutions/` with YAML frontmatter for searchability and future reference. Authorized dispatch can parallelize read-only research; correctness does not depend on it.
 
 **Why "compound"?** Each documented solution compounds your team's knowledge. The first time you solve a problem takes research. Document it, and the next occurrence takes minutes. Knowledge compounds.
 
@@ -66,6 +66,17 @@ These files are the durable contract for the workflow. Read them on-demand at th
 
 When spawning subagents, pass the relevant file contents into the task prompt so they have the contract without needing cross-skill paths.
 
+## Dispatch Authorization Boundary
+
+在派发 repo profiler、research role、session-history synthesizer、semantic validator 或 specialized reviewer 前，记录：
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。Full/headless mode、上下文预算、scratch directory、权限设置或 prompt asset 存在都不构成授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时依次 inline 或 serial 执行相同 role prompts 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Fallback 保留 Context Analyzer、Solution Extractor、Related Docs Finder 等角色合同，但不得声称 independent subagent、fresh-context 或 parallel coverage。无论哪种路径，只有 orchestrator 可以写 `docs/solutions/`、`CONCEPTS.md`、instruction files 或任何 tracked path。
+
 ## Execution Strategy
 
 `spec-compound` does not ask the user which mode to run or whether to search session history. Both are decisions the agent is better positioned to make: mode depends on context budget the agent can observe, and session-history value is unknowable a priori to *either* party (the payoff is an unrelated earlier session the current agent was never in), so it is resolved by a cheap probe rather than a question. The only interactive prompt in the whole workflow is the Discoverability Check consent, because that one edits a tracked instruction file.
@@ -76,7 +87,7 @@ When spawning subagents, pass the relevant file contents into the task prompt so
 - Choose **Lightweight** (single-pass, no subagents — see Lightweight Mode) ONLY under real context pressure: the session is near its context limit, or the fix is trivial enough that cross-referencing would add nothing. These are conditions the agent can observe and the user cannot, which is exactly why this is not a question.
 - State the chosen mode and a one-line reason as the first line of the completion output (e.g., "Ran Full mode." / "Ran Lightweight mode — session context was tight."). If Lightweight was the wrong call for the user's taste, re-running is a rare, cheap correction — cheaper than taxing every run with a prompt.
 
-**In headless mode**, skip mode selection entirely and run **Full Mode** with session history disabled (Phase 1 step 4 omitted). Proceed straight to research.
+**In headless mode**, skip mode selection entirely and run **Full Mode** with session history disabled (Phase 1 step 4 omitted). Headless does not elevate dispatch authority; when the package-local boundary is not satisfied, proceed through the serial inline Full fallback.
 
 **Session history — an automatic probe in Full mode, never a question.** The point of searching prior sessions is that an *unrelated* earlier session may hold related problem-solving; neither the agent nor the user can know that a priori, so asking is pointless. Instead, Full mode always runs the cheap discovery+metadata probe (Phase 1 step 4) — it runs in parallel with the research subagents, so it is near-free on wall-clock — and escalates to the expensive extraction+synthesis only when the probe surfaces genuinely relevant candidate sessions. Lightweight and headless modes skip session history entirely. There is no standalone `session-history` product surface; this support exists only inside the compounding workflow.
 
@@ -87,7 +98,7 @@ When spawning subagents, pass the relevant file contents into the task prompt so
 <critical_requirement>
 **The primary deliverable is ONE file - the final documentation.**
 
-Phase 1 subagents write their full structured output to a per-run scratch artifact under `/tmp/spec-first/spec-compound/<run-id>/` and return only a compact confirmation containing the artifact path. The orchestrator Reads those artifacts back in Phase 2 assembly. This is scratch space, identical in spirit to `spec-code-review`'s per-reviewer run artifacts; it does not make the scratch files additional deliverables. **Only the orchestrator writes product files** — the final solution doc and the maintenance side effects below. Subagents must not touch `docs/`, project instruction files, or any tracked path. Beyond the Phase 2 solution doc, the orchestrator's other writes are maintenance side effects — not additional deliverables, and creating one when absent is expected, not a violation of this rule:
+When dispatch is authorized, Phase 1 subagents write their full structured output to a per-run scratch artifact under `/tmp/spec-first/spec-compound/<run-id>/` and return only a compact confirmation containing the artifact path. In inline fallback, the orchestrator runs the same roles serially and writes the same scratch artifacts itself. Phase 2 reads those artifacts in either path. This scratch space does not make the files additional deliverables. **Only the orchestrator writes product files** — the final solution doc and the maintenance side effects below. Subagents must not touch `docs/`, project instruction files, or any tracked path. Beyond the Phase 2 solution doc, the orchestrator's other writes are maintenance side effects — not additional deliverables, and creating one when absent is expected, not a violation of this rule:
 - **`CONCEPTS.md`** — create or update in Phase 2.4 (Vocabulary Capture) when a qualifying domain term surfaces.
 - **A project instruction file** (AGENTS.md or CLAUDE.md) — a small edit when the Discoverability Check finds a gap.
 
@@ -119,7 +130,7 @@ If no relevant entries are found, proceed to Phase 1 without passing memory cont
 
 ### Phase 1: Research
 
-Launch research subagents. Each writes its full output to a per-run scratch artifact and returns only the artifact path to the orchestrator.
+Run the research roles. When the Dispatch Authorization Boundary is satisfied, launch research subagents and have each write its full output to a per-run scratch artifact. Otherwise execute Context Analyzer, Solution Extractor, and Related Docs Finder serially inline, writing their run-local scratch artifacts from the orchestrator so Phase 2 keeps the same input contract.
 
 **Run ID and run dir (before dispatching any subagent):** generate a unique run identifier and create the run directory. This scopes every Phase 1 artifact file to the same directory so the orchestrator can Read them back in Phase 2.
 
@@ -136,7 +147,7 @@ python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 ```
 
 - On `HIT`: load the profile JSON and use its `vocabulary` (CONCEPTS canonical terms) and `conventions` (root instruction/convention digests) as the agnostic orientation; do not re-derive them.
-- On `MISS`: dispatch a generic subagent seeded with `references/agents/repo-profiler.md` to derive the profile, write its JSON to a file, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations).
+- On `MISS`: dispatch a generic subagent seeded with `references/agents/repo-profiler.md` only when the package-local boundary permits it; otherwise derive the profile inline and record the matching fallback reason. Persist the resulting JSON with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` when a usable file exists (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations).
 - On `NO-CACHE` (no git repo or no writable cache): derive the orientation inline this run and skip `put`.
 
 The cache is an optimization, never a correctness dependency — if the helper errors or returns nothing usable, fall back to deriving the orientation inline and continue. Pass the resolved vocabulary/conventions into the Context Analyzer (for vocabulary and instruction-file convention grounding) so it does not re-derive them.
@@ -152,11 +163,11 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
 
 **Return the full output inline whenever the artifact write did not succeed.** This covers both cases where the orchestrator's Phase 2 inline fallback would otherwise have nothing to read: (a) `{run_id}` is empty or did not resolve (non-Claude-Code platforms where the pre-resolution failed), so there is no path to write to; and (b) `{run_id}` resolved but the write itself failed — tool permission denied, absolute-path writes unavailable, disk error, or the post-write existence check came back empty. In either case the subagent must return its complete structured output inline instead of a path, because the path would point at a file that does not exist. Return only the bare path when — and only when — the write is confirmed on disk. The artifact pattern is a reliability improvement, not a hard requirement; the orchestrator handles a missing artifact in Phase 2 by using the inline return.
 
-**Dispatch order:**
-- Launch `Context Analyzer`, `Solution Extractor`, and `Related Docs Finder` in parallel (background)
-- **Then** run the internal session-history discovery/extraction/synthesis flow (see step 4 below) in Full mode — skipped in lightweight and headless. Its cheap discovery+metadata probe always runs; it escalates to extraction+synthesis only on a relevance hit (see step 4's Escalation gate). This flow is synchronous from this orchestrator's main-context turn, but the already-dispatched background subagents continue running in parallel underneath, so the wall-clock benefit is preserved (`max(session-history, slowest background subagent)`, not their sum). Running session history before the parallel block would serialize it in front of the research subagents and regress wall-clock time.
+**Execution order:**
+- With authorized dispatch, launch `Context Analyzer`, `Solution Extractor`, and `Related Docs Finder` in bounded parallel. Without it, run the same roles serially inline and preserve their separate artifacts/results without presenting them as independent agents.
+- **Then** run the internal session-history discovery/extraction/synthesis flow (see step 4 below) in Full mode — skipped in lightweight and headless. Its cheap discovery+metadata probe always runs and escalates only on a relevance hit. With authorized background dispatch it overlaps the research roles; in inline fallback it runs after the three serial research roles so one orchestrator does not interleave several context-heavy jobs.
 
-<parallel_tasks>
+### Research roles
 
 #### 1. **Context Analyzer**
    - Extracts conversation history
@@ -225,8 +236,6 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
    **GitHub issue search:**
 
    Prefer the `gh` CLI for searching related issues: `gh issue list --search "<keywords>" --state all --limit 5`. If `gh` is not installed, fall back to the GitHub MCP tools (e.g., `unblocked` data_retrieval) if available. If neither is available, skip GitHub issue search and note it was skipped in the output.
-
-</parallel_tasks>
 
 #### 4. **Session History** (internal flow after launching the parallel block — automatic in Full mode)
    - **Skip entirely** in lightweight mode or headless mode. In Full mode it always runs as a two-stage probe: the cheap discovery+metadata pass (below) always executes, and the expensive extraction+synthesis executes only when the probe clears the relevance gate (see **Escalation gate** below).
@@ -300,11 +309,11 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
 
 <sequential_tasks>
 
-**WAIT for all Phase 1 inputs to complete before proceeding** — the three parallel subagents and, in Full mode, the internal session-history flow (which may have stopped at the probe with `no relevant prior sessions`). Session history is a Phase 1 input even though it runs in the orchestrator rather than as a public skill.
+**WAIT for all Phase 1 inputs to complete before proceeding** — the three research roles (parallel only under authorized dispatch) and, in Full mode, the internal session-history flow, which may stop at `no relevant prior sessions`. Session history is a Phase 1 input even though it runs in the orchestrator rather than as a public skill.
 
 The orchestrating agent (main conversation) performs these steps:
 
-1. **Collect Phase 1 results from the run artifacts.** For each Phase 1 subagent, `Read` its artifact file under `/tmp/spec-first/spec-compound/{run_id}/` (`context.json`, `solution.md`, `related.json`, and `session-history.md` when session history ran). The artifact holds the subagent's full output. **Fall back to the subagent's inline return only when its artifact file is absent or empty** (e.g., `{run_id}` did not resolve, or the subagent failed to write). The artifact is authoritative when present — this is what makes the workflow resilient to the issue #956 summary-collapse, where the inline return is only an executive summary.
+1. **Collect Phase 1 results from the run artifacts.** Read `context.json`, `solution.md`, `related.json`, and `session-history.md` when that flow ran. Under authorized dispatch, fall back to the subagent's inline return only when its artifact is absent or empty. Under inline fallback, the orchestrator owns both role execution and artifact writes. The artifact is authoritative when present.
 2. **Check the overlap assessment** from the Related Docs Finder before deciding what to write:
 
    | Overlap | Action |
@@ -383,7 +392,7 @@ The doc (and any `CONCEPTS.md` entries from Phase 2.4) is about to become perman
 
    Exit 0 means nothing flagged. Exit 1 means flags to **adjudicate, not auto-fix** — each flagged path, SHA, link, or scaffold pattern is fixed, annotated as historical, or confirmed intentional per the reference's adjudication table. A doc may legitimately cite a path deleted by the very fix it documents; a flag is a question, not a failure. If the script cannot be resolved on this platform, apply the reference's manual checklist and say so in the output — never silently skip.
 
-2. **Semantic grounding validator (Full and headless; lightweight skips it).** Dispatch one read-only generic subagent built from the prompt template in the reference, covering the written doc plus any `CONCEPTS.md` entries added or edited this run. It verifies code-behavior claims by quoting the defining source line, merge-state claims against remote truth (`gh` primary, git reachability fallback), and internal completeness of countable assertions. Apply its verdicts per the reference (fix contradicted claims from the quoted evidence; soften or drop unverifiable ones; mark offline merge-state checks as degraded), then re-run the mechanical check if the body changed.
+2. **Semantic grounding validator (Full and headless; lightweight skips it).** When the Dispatch Authorization Boundary is satisfied, dispatch one read-only generic subagent built from the prompt template in the reference, covering the written doc plus any `CONCEPTS.md` entries added or edited this run. Otherwise apply that validator prompt inline, record the matching fallback reason, and do not claim independent semantic validation. In either path, verify code-behavior claims by quoting the defining source line, merge-state claims against remote truth (`gh` primary, git reachability fallback), and internal completeness of countable assertions. Apply verdicts per the reference, then re-run the mechanical check if the body changed.
 
 ### Phase 2.5: Selective Refresh Check
 
@@ -482,17 +491,15 @@ After the learning is written and the refresh decision is made, check whether th
 
 **Skip Phase 3 entirely in headless mode** to bound token usage — the caller does not have a human-in-the-loop to act on reviewer findings, and downstream automations can run specialized reviewers themselves if they want that pass.
 
-<parallel_tasks>
+#### Optional review roles
 
-Based on problem type, optionally dispatch generic subagents seeded with local prompt assets from `references/agents/` to review the documentation. Do not dispatch standalone agents by type/name.
+Based on problem type, optionally apply local prompt assets from `references/agents/` to review the documentation. Dispatch generic subagents only when the package-local boundary permits it; otherwise run the selected reviews inline or serially and label them accordingly. Do not dispatch standalone agents by type/name.
 
 - **performance_issue** → `references/agents/performance-oracle.md`
 - **security_issue** → `references/agents/security-sentinel.md`
 - **database_issue** → `references/agents/data-integrity-guardian.md`
 - Any code-heavy issue → preserve code simplification as a **read-only documentation review**. Inspect the solution draft's code examples and explanatory claims inline, or dispatch a generic subagent seeded with a local prompt only to return suggestions. Do **not** invoke `spec-simplify-code` from this phase and do not mutate product code unless the user explicitly asks for a separate code-simplification pass. Do not use the deleted `code-simplicity-reviewer`.
   Example: review the solution draft's examples for speculative abstractions, redundant wrappers, dead branches, and just-in-case parameters. Apply edits only to the documentation/examples being written by `spec-compound`; leave any branch code changes untouched.
-
-</parallel_tasks>
 
 ---
 
@@ -648,7 +655,9 @@ Documentation skipped
 Ran Full mode.
 Auto memory: 2 relevant entries used as supplementary evidence
 
-Subagent Results:
+Execution: <dispatched | inline-serial (`dispatch_authorization_missing` | `subagent_capability_missing`)>
+
+Research Results:
   ✓ Context Analyzer: Identified performance_issue in brief_system, category: performance-issues/
   ✓ Solution Extractor: 3 code fixes, prevention strategies
   ✓ Related Docs Finder: 2 related issues
@@ -658,7 +667,7 @@ Grounding Validation:
   ✓ Mechanical check: 14 paths, 2 SHAs, 3 links checked — 1 flag annotated as historical
   ✓ Semantic validator: 9 claims verified, 1 merge-state claim softened to pending
 
-Specialized Agent Reviews (Auto-Triggered):
+Specialized Reviews (execution posture inherited from above):
   ✓ performance-oracle: Validated query optimization approach
   ✓ Code simplification review: Code examples are appropriately minimal
 

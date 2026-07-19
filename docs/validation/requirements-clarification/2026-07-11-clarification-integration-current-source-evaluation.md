@@ -13,8 +13,8 @@
 
 | Source ref | After SHA-256 |
 | --- | --- |
-| `skills/spec-ideate/references/post-ideation-workflow.md` | `b4d9c94745c15961e0434a0296bda287d282b36c3fb59d010b2c9345ceefc3d0` |
-| `skills/spec-brainstorm/SKILL.md` | `db7214ec68bcb6c4414264d5a615c2ae6ea2977a68d4a6d3ba9282c825a4bb79` |
+| `skills/spec-ideate/references/post-ideation-workflow.md` | `ad11642aac473155704ecd9e8e3c36c8dac690008865a425d17971f7067949b6` |
+| `skills/spec-brainstorm/SKILL.md` | `5e8365a53b3627290b1b59ce7e3d7361f2e0ddd6d83bed2924fc18f310f09b27` |
 | `skills/spec-brainstorm/references/product-pressure-test.md` | `2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84` |
 | `skills/spec-brainstorm/references/brainstorm-sections.md` | `9db1310fbfe61e0d3676feed8be10913b2e8cfe73357f544f0418676400b2105` |
 | `skills/spec-brainstorm/references/handoff.md` | `b399fcffd62033a4edd62e6817fc216f50c60f39ebe5740ec7ea769a0264ee1d` |
@@ -31,6 +31,8 @@
 2026-07-15 delta refresh: `spec-brainstorm` / `spec-plan` 增加了与 requirements clarification 正交的 Markdown plan lifecycle metadata 合同，因此上述三项 source hash 与 final-source manifest 已刷新。原 2026-07-12 unit replay 未重跑，也不再证明这三项文件与当时逐字节相同；本次只用独立 fresh-source lifecycle review 验证新增 producer/closeout 语义，原 replay 继续作为历史 clarification 证据，不冒充本次 lifecycle 评估。
 
 2026-07-16 delta refresh: `spec-plan` 增加了与 requirements clarification producer 语义正交的 planning-only、首屏决策、evidence/ownership、高风险、multi-surface、dispatch fallback，以及 `reuse / extend / compose / new` composition-first 架构姿态合同，因此 `skills/spec-plan/SKILL.md` 的 current-source hash 与 final-source manifest 再次刷新。原 2026-07-12 unit replay 未重跑，不证明本轮 source 与当时逐字节相同；本轮只通过 `spec-plan` 聚焦 source/fixture/projection tests 验证新增 planning contract，fresh-source helper eval 因 `dispatch_authorization_missing` 未执行。
+
+2026-07-19 delta refresh: `spec-brainstorm` 与 `spec-ideate` 的 post-ideation reference 增加了与 requirements clarification 产品语义正交的 package-local dispatch authorization/capability/fallback 边界，因此两项 current-source hash 与 final-source manifest 再次刷新。原 2026-07-12 unit replay 未重跑，不证明本轮 source 与当时逐字节相同；本轮只通过 mutation/dispatch authority、brainstorm/ideate 聚焦合同与完整 unit suite 验证新增授权边界，fresh-source/host-loader/field outcome 均为 `not_run`。
 
 U4 removal facts: `skills/spec-brainstorm/references/visual-probes.md` and `skills/spec-brainstorm/scripts/visual-probe-server.js` are absent in the After tree; their Before hashes are retained in the baseline.
 

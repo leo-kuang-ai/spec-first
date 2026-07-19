@@ -1,11 +1,18 @@
 ---
 name: spec-commit
-description: Create a git commit with a clear, value-communicating message. Use when the user says "commit", "commit this", "save my changes", "create a commit", or wants to commit staged or unstaged work. Produces well-structured commit messages that follow repo conventions when they exist, and defaults to conventional commit format otherwise.
+description: Internal commit helper for public workflows that already hold explicit commit authorization; creates scoped, value-communicating commits without owning push or PR landing.
+user-invocable: false
 ---
 
 # Git Commit
 
 Create a single, well-crafted git commit from the current working tree changes.
+
+## Invocation And Authorization Boundary
+
+This is an internal-only helper. A public workflow may delegate here only after the current user or a visible upstream handoff has established `commit_authorization: authorized` for the intended run-owned paths. `workflow invocation does not authorize commit`; tool permission, a dirty tree, a branch name, or successful verification are execution facts, not authority. When commit authorization is missing, stop before branch mutation, staging, or commit and return `commit_authorization_missing`.
+
+This helper owns commit composition and the authorized commit checkpoint only. It does not own push, PR creation/update, plan lifecycle, or unrelated dirty paths. If branch creation would be required, obtain explicit approval for that concrete branch mutation before creating it.
 
 ## Context
 

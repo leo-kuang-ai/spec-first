@@ -2,9 +2,11 @@
 
 Read this file at the start of Phase 2 — after Phase 1 grounding and any Phase 1.5 evidence scouts complete, and before building any ideation dispatch prompt. It defines the ideation fleet, the dispatch payload, the frames, the per-idea output contract, and the post-merge synthesis steps. Model tier names (extraction / generation / ceiling) are defined in SKILL.md Model Tiers.
 
+Every dispatch instruction in this reference is conditional on the main Skill's Dispatch Authorization Boundary. When authorization or capability is missing, execute the same frame prompts inline or serially, preserve all six frames and axis-coverage checks, and do not present the result as independent agent diversity or fresh-context verification.
+
 ## Fleet
 
-Dispatch parallel ideation sub-agents per the Model Tiers fleet. Omit the `mode` parameter so the user's configured permission settings apply. The default fleet is **5 agents covering all six frames**:
+With authorized, capable dispatch, run parallel ideation sub-agents per the Model Tiers fleet and omit the `mode` parameter so the user's configured permission settings apply. Otherwise run the default **5 role lenses covering all six frames** serially inline. Permission settings are execution conditions, not dispatch authorization.
 
 - **3 generation-tier agents**, one per evidence-driven frame (Pain and friction; Inversion, removal, or automation; Leverage and compounding). These frames live on evidence — the dossiers do the heavy lifting, so the mid-tier model performs well here.
 - **2 ceiling-tier agents** for the ceiling frames, where the strong model's reasoning is the product and must not be tiered down: one takes Cross-domain analogy; the other takes Assumption-breaking and reframing **plus** Constraint-flipping (cousins — both invert givens; one agent holds both as starting biases).

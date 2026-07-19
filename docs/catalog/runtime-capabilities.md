@@ -22,11 +22,11 @@
 | Bundled source agents | 0 |
 | Bundled agent support files | 0 |
 | Governance records by entry surface | internal_only: 7, standalone_skill: 11, workflow_command: 17 |
-| Claude runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Qoder runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Claude runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | Beta workflow entries | none |
@@ -74,7 +74,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 | Skill | Claude Delivery | Codex Delivery | Cursor Delivery | Kiro Delivery | Qoder Delivery | Description |
 |---|---|---|---|---|---|---|
 | spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | Turn a concept, a diff, an idea, or a window of your own recent work into a dense, visual explainer written for you personally — with an optional check-in (predict-then-reveal for diffs, corrected exercises) that makes the material stick. For learning, not repo docs or verdicts. |
-| spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | Run the full hands-off engineering pipeline from planning through a green PR. |
+| spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | Run the full hands-off engineering pipeline from planning through a green PR. Use only when the current user explicitly requests spec-lfg or selects an option that clearly states it will commit, push, open a PR, and watch CI. |
 | spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | Give a decisive, project-grounded verdict on an external input — judged against the current project, not in the abstract. Use to decide whether to adopt, switch to, or revisit a technology, library, pattern, platform, or architecture; to compare a candidate against what the project already uses; to judge whether an external change (a CVE, a deprecation, an ecosystem shift) actually affects this project; or for a mid-session second opinion. Always returns a project-specific verdict, so it is not for neutral explainers or generating options. |
 | spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | Generate time-windowed product pulse reports from configured signals. |
 | spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | Draft launch or promotion copy for a shipped feature. |
@@ -91,8 +91,8 @@ Most `internal_only` governance records are source governance entries and are no
 
 | Category | Skills |
 |---|---|
-| Delivered agent-facing internal skills | spec-worktree |
-| Governance-only internal records | spec-commit, spec-commit-push-pr, spec-proof, spec-resolve-pr-feedback, spec-test-browser, spec-test-xcode |
+| Delivered agent-facing internal skills | spec-commit, spec-commit-push-pr, spec-test-browser, spec-worktree |
+| Governance-only internal records | spec-proof, spec-resolve-pr-feedback, spec-test-xcode |
 
 ## Runtime Paths
 

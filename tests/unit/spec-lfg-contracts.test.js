@@ -113,6 +113,10 @@ describe('spec-lfg current contracts', () => {
         expect(operation.contents).toMatch(/^name: spec-lfg$/m);
         expect(operation.contents).not.toMatch(/^disable-model-invocation: true$/m);
         expect(operation.contents).toContain('Use only when the current user explicitly requests spec-lfg');
+        expect(operation.contents).toContain('commit_authorization: authorized');
+        expect(operation.contents).toContain('landing_authorization: authorized');
+        expect(operation.contents).toContain('authorization_source: current-user-explicit-spec-lfg');
+        expect(operation.contents).toContain('`mode:pipeline` only selects unattended execution and never grants authority');
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
       }

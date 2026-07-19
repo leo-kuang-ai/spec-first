@@ -22,6 +22,22 @@ describe('low-severity skill cleanup contracts', () => {
     });
   });
 
+  test.each(['spec-commit', 'spec-commit-push-pr'])(
+    '%s is delivered only as an internal helper',
+    (skillName) => {
+      const skill = read(`skills/${skillName}/SKILL.md`);
+      const governance = JSON.parse(read('src/cli/contracts/dual-host-governance/skills-governance.json'));
+      const record = governance.skills.find((entry) => entry.skill_name === skillName);
+
+      expect(skill).toMatch(/^user-invocable:\s*false$/m);
+      expect(skill).toMatch(/workflow invocation does not authorize/i);
+      expect(record).toMatchObject({
+        entry_surface: 'internal_only',
+        command_name: null,
+      });
+    },
+  );
+
   test('spec-sweep first-run write list includes every configured sweep key', () => {
     const interview = read('skills/spec-sweep/references/interview.md');
     const list = interview.match(/Write these keys[\s\S]*?Then surface the resulting Sweep section/);

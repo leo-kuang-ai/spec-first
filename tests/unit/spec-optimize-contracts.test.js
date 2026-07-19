@@ -29,9 +29,10 @@ describe('spec-optimize contracts', () => {
     const repoResearcher = read('skills/spec-optimize/references/agents/repo-research-analyst.md');
     const judgePrompt = read('skills/spec-optimize/references/judge-prompt-template.md');
 
-    expect(skill).toContain('judge sub-agents using the same bounded dispatch as Phase 3.2');
-    expect(skill).toContain('treat a capacity error as backpressure');
-    expect(skill).toContain('These judge sub-agents are a separate budget from the experiment worktrees.');
+    expect(skill).toContain('judge sub-agents using the same bounded scheduler as Phase 3.2');
+    expect(skill).toContain('Otherwise evaluate the same batches serially inline');
+    expect(skill).toContain('treat it as backpressure');
+    expect(skill).toContain('Judge work is a separate budget from experiment worktrees in either path.');
     expect(skill).toContain('**Mechanical-apply bar:** apply any finding with a concrete `suggested_fix`');
     expect(skill).toContain('Do not commit or push from this step');
     expect(skill).toContain('spec-code-review');

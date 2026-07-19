@@ -70,11 +70,11 @@ Process all three feedback types. Review threads are the primary type; PR commen
 
 ### Mutating resolver dispatch boundary
 
-Resolver dispatch is mutating-sensitive. Direct invocation of this workflow authorizes resolver dispatch by default when the host exposes a dispatch primitive, the user has not forbidden delegation, and the dispatch units pass the batching and file-overlap checks below.
+Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when both `worker_dispatch_authorization: authorized` and `worker_dispatch_capability: available` are recorded. Otherwise process `fix-list` units sequentially inline and preserve the matching reason code.
 
 Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, or resolve review threads directly unless a future host-specific isolation contract explicitly says otherwise.
 
-If dispatch is unavailable, explicitly disabled, or mutation would be unsafe, process dispatch units sequentially in the current agent. If file overlap or discovered collisions make parallel mutation unsafe, serialize the affected units or stop for orchestration instead of running shared-file fixes in parallel.
+If dispatch is unauthorized, unavailable, or mutation would be unsafe, process dispatch units sequentially in the current agent. If file overlap or discovered collisions make parallel mutation unsafe, serialize the affected units or stop for orchestration instead of running shared-file fixes in parallel.
 
 ### Dispatch inputs
 
@@ -82,7 +82,7 @@ Only `fix-list` items from new review threads, actionable PR comments, and actio
 
 ### Individual dispatch
 
-For review threads in `fix-list`, read `references/agents/pr-comment-resolver.md` and dispatch a generic subagent seeded with that local prompt for each approved fix.
+For review threads in `fix-list`, read `references/agents/pr-comment-resolver.md`. When the package-local boundary permits dispatch, seed one generic subagent with that prompt for each approved fix; otherwise apply the same prompt contract inline and serially.
 
 Each agent receives:
 
@@ -93,7 +93,7 @@ Each agent receives:
 - The feedback type: `review_thread`
 - The `isOutdated` flag from the thread node
 
-For PR comments and review bodies in `fix-list`, read `references/agents/pr-comment-resolver.md` and dispatch a generic subagent seeded with that local prompt for each approved fix. The agent receives the comment ID, body text, PR number, and feedback type: `pr_comment` or `review_body`. The agent must identify the relevant files from the comment text and the PR diff.
+For PR comments and review bodies in `fix-list`, use the same conditional path. A dispatched resolver receives the comment ID, body text, PR number, and feedback type: `pr_comment` or `review_body`; inline handling uses the same inputs. The resolver must identify the relevant files from the comment text and the PR diff.
 
 ### Agent return format
 
@@ -116,7 +116,7 @@ Handling `blocked`: re-evaluate the item in the orchestrator context with the re
 
 ### Batching and conflict avoidance
 
-If there are 1-4 dispatch units total, dispatch all in parallel. For 5 or more dispatch units, batch in groups of 4.
+When dispatch is authorized, capable, and isolated enough for concurrent mutation, 1-4 dispatch units may run in parallel; for 5 or more, batch in groups of 4. Otherwise run all units serially inline.
 
 No two dispatch units that touch the same file should run in parallel. Before dispatching, check for file overlaps across items. If two items reference the same file, serialize those units. Non-overlapping units can still run in parallel. Platforms without parallel dispatch should run units sequentially.
 

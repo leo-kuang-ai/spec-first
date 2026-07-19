@@ -35,6 +35,19 @@ Parse a `mode:headless` token from anywhere in the arguments, strip it, and trea
 
 **Fail safe.** If the harness exposes no usable blocking-question tool, behave as headless even when the token is absent — never block a run waiting on input that cannot arrive.
 
+## Dispatch Authorization And Sensitive-Data Boundary
+
+在派发 source extractor 或 media analyzer 前，记录：
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。`mode:headless`、scheduled run、已配置 source、standing ack approval、权限设置或 Agent tool 存在，都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时 inline 或 serial 执行并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时 inline 或 serial 执行并记录 `subagent_capability_missing`。
+
+对 `sensitive: true` source，普通派发授权仍不足以转交原始 body、quote、media 或完整 config；可见授权必须明确覆盖 delegated handling of sensitive content。否则在 orchestrator 内 inline 处理。即使允许派发，也只传完成 bounded unit 所需的最小、脱敏字段，绝不传 credential、token、cookie 或无关历史内容。Headless/scheduled 模式不得自行提升这项授权。Inline fallback 不得声称 independent extractor/analyzer coverage。
+
 ## Execution Flow
 
 ### Phase 0: Route by Config State
@@ -89,9 +102,9 @@ Then `validate --state <state>` (a lease-agnostic repair): note in the summary a
 
 #### 2b. Fetch each source
 
-For each entry in `feedback_sources`, dispatch a generic subagent at the **extraction tier** (`references/model-tiers.md`) seeded with:
+For each entry in `feedback_sources`, use a generic subagent at the **extraction tier** (`references/model-tiers.md`) only when the Dispatch Authorization And Sensitive-Data Boundary permits it; otherwise run the same source-persona mapping inline or serially and record the matching fallback reason. For an authorized dispatch, seed it with:
 - the matching persona file contents (`references/sources/<type>.md`),
-- the source's config entry verbatim,
+- the minimum redacted fields from the source's config entry needed for this fetch,
 - the current cursor from `cursor-get --state <state> --source <source-id>`.
 
 The persona returns mapped items (`id`, `origin`, `author_class`, `body`, `media`, identity-scoped `existing_ack`, `existing_closeout`) or one of its degrade/skip sentences. Personas report facts and never advance cursors.
@@ -119,7 +132,7 @@ A failed ack write -> upsert the item as `ack_deferred` and hold the cursor (do 
 
 For each new item carrying `media`:
 - Download attachments into scratch `/tmp/spec-first/spec-sweep/<run-id>/`; raw media is never committed. A download failure -> set the item `needs_download` and continue.
-- Dispatch one generic subagent per recording, in parallel, at the **generation tier**, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Fill the template's `{skill_dir}` slot with the same absolute spec-sweep skill directory you resolve for your own `SKILL_DIR` Bash calls (a fresh subagent does not inherit your shell state, so it cannot run the bundled analyzer without being told the path). Pass the absolute media PATHS, a scratch artifact path, and the item's `sensitive` flag; collect the compact 1-2 line summary each returns. A subagent failure -> set the item `needs_analysis`, retain the media, and continue.
+- When the package-local boundary permits the recording's sensitivity class, dispatch one generic subagent per recording, in bounded parallel, at the **generation tier**, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Otherwise analyze recordings inline or serially and record the matching fallback reason. Fill the template's `{skill_dir}` slot with the same absolute spec-sweep skill directory you resolve for your own `SKILL_DIR` Bash calls (a fresh subagent does not inherit your shell state, so it cannot run the bundled analyzer without being told the path). Pass only the required absolute media PATHS, a scratch artifact path, and the item's `sensitive` flag; collect the compact 1-2 line summary each returns. A dispatched subagent failure -> set the item `needs_analysis`, retain the media, and continue.
 - Track attempts on the item (a `media_attempts` count upserted on each try). After 3 failed attempts across runs (`needs_download`/`needs_analysis`), set the item `manual_stuck` and list it separately — out of the routine nag.
 
 #### 2f. Fix verification

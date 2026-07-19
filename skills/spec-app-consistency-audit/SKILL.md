@@ -145,6 +145,15 @@ Do not copy app-audit-specific experts or ECC-derived lenses into `agents/` duri
 
 ECC-derived content may be used only as read-only lens, checklist, or evidence pattern material. It must not bring write, edit, repair, build, cleanup, or final-verdict authority into this workflow.
 
+Before dispatching any selected expert, evidence auditor, or report-writer worker, record:
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。Planner 选择 expert、`mode:headless`、`depth:deep`、prompt asset 存在、权限设置或 callable tool 都不构成授权。缺授权时由 orchestrator inline 或 serial 应用 selected expert lenses，并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Inline fallback 可以产出同一 issue-candidate schema，但不得声称 independent expert、fresh-context 或 multi-agent coverage；报告应将其标为 orchestrator-applied lenses。
+
 ## Workflow
 
 v0.1a contract spine:

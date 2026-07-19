@@ -21,13 +21,13 @@ Do not use for initial requirements, implementation planning, non-browser backen
 A PR number, branch name, or current branch; project dev-server conventions; feature URL/route when known; user feedback from browser inspection.
 
 ### Outputs
-Running local dev server URL, browser handoff, scoped polish edits, verification notes, and a commit when the user says the polish loop is done.
+Running local dev server URL, browser handoff, authorized scoped polish edits, verification notes, and an explicit commit status.
 
 ### Artifacts
-Source edits in the user's project, dev-server log in temp space, optional browser screenshots/inspection notes, and the final commit if requested by the loop.
+Authorized source edits in the user's project, dev-server log in temp space, optional browser screenshots/inspection notes, and a final commit only when separately authorized.
 
 ### Failure Modes
-Wrong branch, main/master branch, missing dev-server command, unresolved port, server startup failure, browser helper unavailable, or user feedback requiring upstream product/design decisions.
+Wrong branch, main/master branch, missing branch-mutation authority, missing dev-server command, unresolved port, server startup failure, browser helper unavailable, or user feedback requiring upstream product/design decisions.
 
 ### Workflow
 Select the branch, start the dev server, resolve the browser handoff, iterate on user-reported polish issues, and stop when the user says the loop is complete.
@@ -35,11 +35,30 @@ Select the branch, start the dev server, resolve the browser handoff, iterate on
 ### Downstream Consumers
 The user reviewing the browser result, `spec-work` for deeper implementation follow-up, and release/review workflows that consume the final branch changes.
 
+## Mutation Authority Boundary
+
+Before checkout or the first source edit, derive four independent run-local facts from the current user request and any visible upstream handoff:
+
+```yaml
+branch_mutation_authorization: authorized | missing
+local_fix_authorization: authorized | missing
+commit_authorization: authorized | missing
+landing_authorization: authorized | missing
+```
+
+- A PR number or branch name selects review/polish scope; it does not authorize checkout. Set `branch_mutation_authorization: authorized` only when the current user or upstream owner explicitly requests the switch/worktree, or the user accepts the concrete checkout/isolation action after it is disclosed.
+- Set `local_fix_authorization: authorized` only when the current user explicitly requests polishing/fixes or the upstream handoff explicitly owns local apply. A route recommendation, branch target, or tool permission is not mutation authority.
+- Set `commit_authorization: authorized` only for an explicit commit request. `done` is a completion signal, not commit authorization.
+- Set `landing_authorization: authorized` only for an explicit push/PR request. Without landing authorization, do not push and do not open a PR.
+- These facts are non-transitive: local fixes do not imply checkout, commit, or landing; commit does not imply landing.
+
 ## Phase 0: Get on the right branch
 
-1. If a PR number or branch name was provided, check it out (probe for existing worktrees first).
-2. If blank, use the current branch.
-3. Verify the current branch is not main/master.
+1. If blank, use the current branch.
+2. If a PR number or branch name was provided, resolve it as scope and probe for existing worktrees without switching. When it is not the current checkout:
+   - with `branch_mutation_authorization: authorized`, use the explicitly approved existing-worktree/checkout action;
+   - otherwise stop before mutation with `branch_mutation_authorization_missing`, name the current and requested refs, and ask the user to switch themselves or authorize the exact action.
+3. Verify the selected checkout is not main/master.
 
 ## Phase 1: Start the dev server
 
@@ -109,11 +128,11 @@ Browse the feature and tell me what could be better.
 
 This is the core loop. The user browses the feature and tells you what to improve. You fix it. Repeat until they're happy.
 
-- When the user describes something to fix → make the change, the dev server hot-reloads
+- When the user describes something to fix, that explicit request may authorize that bounded fix. Re-resolve `local_fix_authorization` for the requested change; when authorized, make only that scoped change and let the dev server hot-reload. When missing, describe the proposed fix without editing and return `local_fix_authorization_missing`.
 - When the user asks to check something → use a browser-automation capability to screenshot or inspect the page; prefer `agent-browser` if it's installed. If it is missing, tell them: "Browser automation helper unavailable. Run `spec-runtime-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then continue. This does not block spec-first baseline." Continue the human browser loop when automated screenshots are unavailable.
-- When the user says they're done → commit the fixes and stop
+- When the user says they're done, stop the loop. If `commit_authorization: authorized`, commit only run-owned verified paths. Otherwise leave the changes uncommitted and return `commit_status: not-created` with reason `commit_authorization_missing`.
 
-No checklist. No envelope. Just conversation.
+Return a compact closeout with changed paths, verification notes, `commit_status`, `landing_status`, and limitations. This workflow never infers push or PR authority from completion.
 
 ## References
 

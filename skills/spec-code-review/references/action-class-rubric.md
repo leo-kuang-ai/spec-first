@@ -1,6 +1,6 @@
 # `autofix_class` rubric (personas)
 
-`autofix_class` describes the **intrinsic shape** of follow-up work — it is signal, **not an apply gate or permission**. In `mode:agent` the caller interprets findings and owns apply; in default (interactive) mode the review applies safe fixes itself by judgment (SKILL.md Stage 5c). Either way the class informs *what to do first* and *what to flag* — it does not mechanically decide what gets applied.
+`autofix_class` describes the **intrinsic shape** of follow-up work — it is classification signal, **not an apply gate or permission**. The orchestrator-owned run-local `mutation_policy` is authoritative: ordinary/default review is `report-only`, explicit `review-and-fix` may resolve to `apply-fixes`, and `mode:agent` always remains report-only with caller-owned apply. The class informs *what to do first* and *what to flag*; it never decides whether the current run may mutate.
 
 | `autofix_class` | Meaning |
 |-----------------|---------|

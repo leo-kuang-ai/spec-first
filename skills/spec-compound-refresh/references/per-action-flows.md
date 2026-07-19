@@ -46,24 +46,24 @@ After the merge, run the mechanical claims check on the canonical doc (step 4 of
 
 ## Replace Flow
 
-Process Replace candidates **one at a time, sequentially**. Each replacement is written by a subagent to protect the main context window.
+Process Replace candidates **one at a time, sequentially**. An authorized subagent may draft a replacement to protect the main context window; otherwise the orchestrator drafts it inline. The orchestrator is always the sole writer of the tracked successor.
 
-When a replacement is needed, read the documentation contract files and pass their contents into the replacement subagent's task prompt:
+When a replacement is needed, read the documentation contract files and use their contents in the replacement subagent's task prompt or the inline fallback:
 
 - `references/schema.yaml` — frontmatter fields and enum values
 - `references/yaml-schema.md` — category mapping
 - `assets/resolution-template.md` — section structure
 
-Do not let replacement subagents invent frontmatter fields, enum values, or section order from memory.
+Do not let replacement subagents or inline fallback invent frontmatter fields, enum values, or section order from memory.
 
 **When evidence is sufficient:**
 
-1. Spawn a single subagent to write the replacement learning. Pass it:
+1. When dispatch is authorized and capable, spawn a single subagent to draft the replacement learning; otherwise compose the same draft inline. Provide:
    - The old learning's full content
    - A summary of the investigation evidence (what changed, what the current code does, why the old guidance is misleading)
    - The target path and category (same category as the old learning unless the category itself changed)
    - The relevant contents of the three support files listed above
-2. The subagent writes the new learning using the support files as the source of truth: `references/schema.yaml` for frontmatter fields and enum values, `references/yaml-schema.md` for category mapping and YAML-safety rules for array items, and `assets/resolution-template.md` for section order. It should use dedicated file search and read tools if it needs additional context beyond what was passed.
+2. The subagent returns draft content or a run-local scratch reference; it must not write the tracked successor, stage, commit, or delete. Inline fallback produces the same draft. The orchestrator writes the new tracked learning using the support files as the source of truth: `references/schema.yaml` for frontmatter fields and enum values, `references/yaml-schema.md` for category mapping and YAML-safety rules for array items, and `assets/resolution-template.md` for section order.
 3. **Validate parser-safety of the new learning's frontmatter** to catch silent-corruption issues the prose rules miss: malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), and unquoted `: ` in scalar values (silent mapping confusion). Resolve the bundled validator through the loaded skill directory, not a project-relative `skills/` path:
 
    ```bash
@@ -80,7 +80,7 @@ Do not let replacement subagents invent frontmatter fields, enum values, or sect
    ```
 
    Exit 1 flags are **adjudication input, not failures** — a successor doc describing removed code legitimately cites paths that no longer exist. Resolve each flag by fixing the citation, annotating it as historical, or confirming it intentional; always fix scaffold flags. If the script is not resolvable on this platform, scan the body for those same patterns manually and say so in the report.
-5. After the subagent completes, the orchestrator deletes the old learning file. The new learning's frontmatter may include `supersedes: [old learning filename]` for traceability, but this is optional — the git history and commit message provide the same information.
+5. After the draft is integrated and validations complete, the orchestrator deletes the old learning file. The new learning's frontmatter may include `supersedes: [old learning filename]` for traceability, but this is optional — git history provides the same information when a later authorized commit is created.
 
 **When evidence is insufficient:**
 

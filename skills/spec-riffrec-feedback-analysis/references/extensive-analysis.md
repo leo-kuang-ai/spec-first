@@ -34,7 +34,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
    - **Inferences:** likely user intent, likely broken control, suspected missing state.
    - **Requirements:** product behavior needed to resolve the problem.
 
-7. When the current workspace contains the product source code, run a source-mapping pass before or during brainstorm. Use the transcript language, visible UI labels, screenshot paths, route names, and generated requirements to search the codebase for likely components, controllers, services, models, tests, and state stores. For larger sessions, split this mapping by product area and use sub-agents when available so independent areas can be inspected in parallel.
+7. When the current workspace contains the product source code, run a source-mapping pass before or during brainstorm. Use the transcript language, visible UI labels, screenshot paths, route names, and generated requirements to search the codebase for likely components, controllers, services, models, tests, and state stores. For larger sessions, split this mapping by product area. Dispatch sub-agents in parallel only when the main Skill's Dispatch Authorization Boundary is satisfied and the evidence packet respects its privacy minimum; otherwise inspect the areas inline or serially and record the matching fallback reason.
 
 8. Add source mapping to the brainstorm material as suspected implementation surfaces, not as proven root cause unless the code clearly proves it. Include confidence levels and short evidence notes explaining why each file or component is relevant.
 

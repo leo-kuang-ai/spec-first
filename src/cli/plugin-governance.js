@@ -12,6 +12,8 @@ const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
 const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
 const AGENTLESS_PLATFORM_IDS = new Set(['cursor']);
 const DELIVERED_INTERNAL_SKILLS = new Set([
+  'spec-commit',
+  'spec-commit-push-pr',
   'spec-test-browser',
   'spec-worktree',
 ]);

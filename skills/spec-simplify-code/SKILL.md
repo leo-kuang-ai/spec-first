@@ -16,9 +16,18 @@ Resolve the simplification scope in this order:
 
 If none of the above produces a non-empty scope, stop and ask the user what to simplify rather than guessing. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
-## Step 2: Launch 3 review agents in parallel
+## Step 2: Run 3 review lenses
 
-Dispatch three generic subagents — code-reuse, code-quality, and efficiency reviewers — via the platform's subagent primitive (`Agent`/`Task` in Claude Code, `spawn_agent` in Codex) where available; otherwise run the reviews inline or serially. For each reviewer, read its prompt asset from this skill's directory and pass the **full file content** as the subagent's prompt, together with the resolved scope (the full diff or file set) so it has complete context:
+在派发 reviewer 前记录：
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时，才可把三个 review lens 派发给 generic subagents。缺授权时 inline 或 serial 执行全部三个 lens 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时 inline 或 serial 执行并记录 `subagent_capability_missing`。Inline fallback 保留三个 rubric 的完整覆盖，但不得声称三个 independent reviewers 或 multi-agent coverage。
+
+When both authorization and capability are present, dispatch three generic subagents — code-reuse, code-quality, and efficiency reviewers — via the platform's subagent primitive (`Agent`/`Task` in Claude Code, `spawn_agent` in Codex). Otherwise run the reviews inline or serially. For each reviewer or inline lens, read its prompt asset from this skill's directory and use the **full file content** together with the resolved scope (the full diff or file set) so the review has complete context:
 
 - `references/personas/code-reuse-reviewer.md` — existing utilities, duplicated functionality, reimplemented stdlib/runtime primitives.
 - `references/personas/code-quality-reviewer.md` — redundant state, parameter sprawl, copy-paste, leaky abstractions, stringly-typed code, dead code, over-nesting, and the over-simplification balance guard.
@@ -26,15 +35,15 @@ Dispatch three generic subagents — code-reuse, code-quality, and efficiency re
 
 Do not paraphrase these rubrics from memory — read each file and pass it verbatim, or the reviewer loses the gating rules that keep the pass behavior-preserving.
 
-**Bounded dispatch.** Queue the three reviewers and launch only as many as the harness accepts at once; treat a concurrency/active-agent-limit error as backpressure (leave the reviewer queued and retry after a slot frees), not as reviewer failure.
+**Bounded dispatch.** When dispatch is authorized and available, queue the three reviewers and launch only as many as the harness accepts at once; treat a concurrency/active-agent-limit error as backpressure (leave the reviewer queued and retry after a slot frees), not as reviewer failure. Inline fallback runs the lenses serially when shared context or edit overlap makes concurrency unsafe.
 
 **Model selection.** Use the platform's balanced mid-tier model for these reviewers when the current harness exposes a known override. In Claude Code this is the Sonnet class. In Codex, apply this tier only when the active dispatch primitive exposes an explicit model or custom-agent selector; task wording alone does not select a different model. Otherwise omit the override and inherit the parent model -- a working pass on the parent model beats a broken dispatch.
 
-**Permission mode.** Omit the `mode` parameter on the dispatch call so the user's configured permission settings apply.
+**Permission mode.** For an authorized dispatch, omit the `mode` parameter so the user's configured permission settings apply. Permission settings are execution conditions, not dispatch authorization.
 
 ## Step 3: Fix issues
 
-Wait for all three agents to complete. Aggregate their findings and fix each issue directly. If a finding is a false positive or not worth addressing, note it and move on. Do not argue with the finding or raise questions to the user, just skip it.
+Complete all three review lenses, whether dispatched or inline. Aggregate their findings and fix each issue directly. If a finding is a false positive or not worth addressing, note it and move on. Do not argue with the finding or raise questions to the user, just skip it.
 
 Before applying each fix, confirm it preserves behavior: same output for every input, same error behavior, and same side effects and ordering. If a fix can't clear that test, skip it — automated checks in Step 4 don't cover every behavior.
 

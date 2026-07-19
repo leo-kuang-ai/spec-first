@@ -1,12 +1,19 @@
 ---
 name: spec-commit-push-pr
-description: Commit, push, and open a PR with an adaptive, value-first description. Use when the user says "commit and PR", "push and open a PR", "ship this", "create a PR", "open a pull request", "commit push PR", or wants to go from working changes to an open pull request in one step. Also use when the user says "update the PR description", "refresh the PR description", "freshen the PR", "rewrite the PR body", "write a PR description", "draft a PR description", or "describe this PR" — the skill will produce a description without committing or pushing if that is all the user wants. Produces PR descriptions that scale in depth with the complexity of the change, avoiding cookie-cutter templates.
+description: Internal landing helper for public workflows that already hold explicit commit and landing authorization; commits scoped changes, pushes, and creates or updates a PR with a value-first description.
+user-invocable: false
 argument-hint: "[PR ref] [mode:pipeline] [archive:on|off]"
 ---
 
 # Git Commit, Push, and PR
 
 Go from working changes to an open pull request, rewrite an existing PR description, or generate a description without touching git state.
+
+## Invocation And Authorization Boundary
+
+This is an internal-only helper. A public workflow may delegate the full commit/push/PR path only after the current user or a visible upstream handoff has established both `commit_authorization: authorized` and `landing_authorization: authorized`. `workflow invocation does not authorize commit, push, or PR creation`; `mode:pipeline`, tool permission, a feature branch, a green test suite, or an existing PR are execution facts, not authority. Missing commit authority stops before staging/commit with `commit_authorization_missing`; missing landing authority stops before push or PR mutation with `landing_authorization_missing`.
+
+Description-only generation remains non-mutating, but applying a description with `gh pr edit` is a landing mutation and still requires explicit landing authority. This helper never broadens the caller's run-owned file scope or absorbs unrelated dirty paths.
 
 **Asking the user:** When this skill says "ask the user", use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to presenting the question in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 

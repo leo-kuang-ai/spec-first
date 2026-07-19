@@ -8,7 +8,7 @@ CRITICAL: You MUST execute every step below IN ORDER. Do NOT skip any required s
 
 进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断“适合 shipping”都不构成授权。
 
-本次明确的 `spec-lfg` 请求只额外授权此管线在第 4 步委派一次 `spec-code-review` 的只读独立审查；调用时必须把该授权及其来源作为可见上游上下文传递。它不授权任意 worker dispatch、实现 mutation、commit、push、PR、tracker 或其他外部副作用。若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
+上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`review_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
 
 When invoking any skill referenced below, resolve its name against the available-skills list the host platform provides and use that exact entry. Some platforms list skills under a plugin namespace (e.g., `spec-first:spec-plan`); others list the bare name. Invoking a short-form guess that isn't in the list will fail — always match a listed entry verbatim before calling the Skill/Task tool.
 
@@ -142,7 +142,16 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
 
 7.5. **Complete the source plan lifecycle marker.** The `spec-work` Return-to-Caller envelope never writes status; its candidate already resolves either the direct plan or a validated task pack's `source_plan`. After simplification, required review, residual handoff, and final verification have closed, use the validated lifecycle shape from step 2. When `plan_status_completion_candidate` is present, invoke `spec-first internal plan-status complete --target-repo <root> --plan <candidate> --json`; accept `active → completed` or the already-completed idempotent result, and block DONE on any other helper result. When the candidate is null with an allowed `plan_status_completion_degraded_reason`, skip mutation, preserve the verified development result, and surface that degraded boundary in DONE. This marker is not CI, merge, release, or field-outcome proof.
 
-8. Invoke the `spec-commit-push-pr` skill with `mode:pipeline`.
+8. Invoke the `spec-commit-push-pr` skill with `mode:pipeline` and pass this visible upstream authority context:
+
+   ```yaml
+   commit_authorization: authorized
+   landing_authorization: authorized
+   authorization_source: current-user-explicit-spec-lfg
+   authorization_scope: pipeline-owned paths and the current branch PR
+   ```
+
+   These facts come from the entry admission above; `mode:pipeline` only selects unattended execution and never grants authority. If either authority fact is absent or cannot be traced to that explicit request, stop before invoking the helper with `commit_authorization_missing` or `landing_authorization_missing`.
 
    This commits any remaining pipeline-owned changes, pushes the branch, and opens a pull request — non-interactively, per the mode token. If it prints a `New concepts:` trailer after the PR URL, record the concept name(s) for step 10. If step 7 already opened or edited a PR (check with `gh pr view --json number,url,state 2>/dev/null`), skip PR creation but still commit and push any uncommitted pipeline-owned changes. **Per the shipping precondition, when no remote is configured, do NOT invoke `spec-commit-push-pr` — its commit step pushes unconditionally (`git push -u origin HEAD`), so a literal invocation would still hit the impossible push. Instead stage only pipeline-owned paths, commit the remaining changes locally, and skip push and PR creation entirely.**
 

@@ -110,9 +110,16 @@ Optimization may consume prior direct-read summaries, degraded reason counts, so
 
 ## Dispatch And Backend Boundary
 
-Optimization dispatch is an optional capability selected by the approved optimization spec and runtime readiness, not a correctness requirement. Serial local/worktree execution remains the safe fallback when Codex delegation, subagent dispatch, or parallel execution is unavailable or unsafe.
+Optimization dispatch is optional. Before any learnings researcher, repo analyst, experiment worker, Codex delegation, or parallel worker run, record:
 
-Parallel experiments require explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions.
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。Approved optimization spec、baseline approval、`execution.mode: parallel`、预算、权限设置或 runtime readiness 都不是派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时强制采用 serial inline/local execution 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时同样降级并记录 `subagent_capability_missing`。Fallback 可以继续使用串行 worktree，但不得声称 parallel experiment 或 independent worker coverage。
+
+Parallel experiments additionally require both dispatch facts above, explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions. Workers never stage, commit, merge, push, or mutate the authoritative experiment log.
 
 ---
 
@@ -277,7 +284,7 @@ Check whether the input is:
 
 ### 0.3 Search Prior Learnings
 
-Read `references/agents/learnings-researcher.md` and dispatch a generic subagent seeded with that local prompt to search for prior optimization work on similar topics. Do not dispatch a standalone agent by type/name. If relevant learnings exist, incorporate them into the approach.
+Read `references/agents/learnings-researcher.md`. Dispatch a generic subagent seeded with that local prompt only when the Dispatch And Backend Boundary permits it; otherwise search inline with the same bounded scope and record the matching fallback reason. Do not dispatch a standalone agent by type/name. If relevant learnings exist, incorporate them into the approach.
 
 ### 0.4 Run Identity Detection
 
@@ -444,7 +451,7 @@ Read the code within `scope.mutable` to understand:
 - Obvious improvement opportunities
 - Constraints and dependencies between components
 
-Optionally read `references/agents/repo-research-analyst.md` and dispatch a generic subagent seeded with that local prompt for deeper codebase analysis if the scope is large or unfamiliar. Do not dispatch a standalone agent by type/name. When you do, resolve the question-agnostic project profile from the shared cache first (set `SKILL_DIR` to this skill's directory; protocol in `references/repo-profile-cache.md`):
+Optionally read `references/agents/repo-research-analyst.md` for deeper codebase analysis if the scope is large or unfamiliar. Dispatch a generic subagent only when the Dispatch And Backend Boundary permits it; otherwise apply the same bounded analysis inline or serially. Do not dispatch a standalone agent by type/name. Before either path, resolve the question-agnostic project profile from the shared cache first (set `SKILL_DIR` to this skill's directory; protocol in `references/repo-profile-cache.md`):
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
@@ -511,11 +518,11 @@ Select hypotheses for this batch:
 If the backlog is empty and no new hypotheses can be generated, proceed to Phase 4 (wrap-up).
 If the backlog is non-empty but no runnable hypotheses remain because everything needs approval or is otherwise blocked, proceed to Phase 4 so the user can approve dependencies instead of spinning forever.
 
-### 3.2 Dispatch Experiments
+### 3.2 Execute Experiments
 
-For each hypothesis in the batch, dispatch according to `execution.mode`. In `serial` mode, run exactly one experiment to completion before selecting the next hypothesis. In `parallel` mode, dispatch the batch concurrently.
+For each hypothesis in the batch, use the effective run mode. If either dispatch fact is missing, override the worker mode to serial inline/local execution for this run, retain the spec's requested mode as an unmet capability note, and run exactly one experiment to completion before selecting the next hypothesis. Only when the package-local boundary permits dispatch may `execution.mode: parallel` dispatch a batch concurrently.
 
-**Bounded dispatch.** Do not assume the host will accept all concurrent subagents at once; the active-subagent cap varies by host and profile and is independent of `execution.max_concurrent` (which caps worktrees, a separate budget). Queue the selected experiments, dispatch only as many as the host accepts, and when a capacity or active-agent-limit error appears, treat it as backpressure — retry the queued experiment after a slot frees rather than marking it failed. Mark an experiment failed only when dispatch fails for a non-capacity reason or a successfully dispatched experiment errors/times out.
+**Bounded dispatch.** For authorized dispatch only, do not assume the host will accept all concurrent subagents at once; the active-subagent cap varies by host and profile and is independent of `execution.max_concurrent` (which caps worktrees, a separate budget). Queue the selected experiments, dispatch only as many as the host accepts, and when a capacity or active-agent-limit error appears, treat it as backpressure — retry the queued experiment after a slot frees rather than marking it failed. Mark an experiment failed only when dispatch fails for a non-capacity reason or a successfully dispatched experiment errors/times out.
 
 The Phase 3 blocks below each set `SKILL_DIR` inline as well (the loaded `spec-optimize` skill directory; see the Bundled scripts note in Phase 1) — shell state does not persist from Phase 1, so each block carries its own assignment.
 
@@ -533,7 +540,7 @@ The Phase 3 blocks below each set `SKILL_DIR` inline as well (the loaded `spec-o
    - Mutable and immutable scope
    - Constraints and approved dependencies
    - Rolling window of last 10 experiments (concise summaries)
-4. Dispatch a subagent with the filled prompt, working in the experiment worktree
+4. With authorized dispatch, dispatch a subagent with the filled prompt in the experiment worktree; otherwise execute the filled prompt inline in that worktree before moving to the next hypothesis
 
 **Codex backend:**
 1. Check environment guard -- do NOT delegate if already inside a Codex sandbox:
@@ -543,7 +550,7 @@ The Phase 3 blocks below each set `SKILL_DIR` inline as well (the loaded `spec-o
    ```
 2. Fill the experiment prompt template
 3. Write the filled prompt to a temp file
-4. Dispatch via Codex:
+4. Dispatch via Codex only when the package-local dispatch boundary is satisfied; otherwise use the serial local/worktree path:
    ```bash
    cat /tmp/optimize-exp-XXXXX.txt | codex exec --skip-git-repo-check - 2>&1
    ```
@@ -577,10 +584,10 @@ For each completed experiment, **immediately**:
    - Apply stratified sampling per `metric.judge.stratification` config (using `sample_seed`)
    - Group samples into batches of `metric.judge.batch_size`
    - Fill the judge prompt template (`references/judge-prompt-template.md`) for each batch
-   - Dispatch the `ceil(sample_size / batch_size)` judge sub-agents using the same bounded dispatch as Phase 3.2: queue them, dispatch to whatever concurrency the host accepts, and treat a capacity error as backpressure (retry the queued batch after a slot frees) rather than a scoring failure. These judge sub-agents are a separate budget from the experiment worktrees.
-   - Each sub-agent returns structured JSON scores
+   - When the package-local dispatch boundary is satisfied, dispatch the `ceil(sample_size / batch_size)` judge sub-agents using the same bounded scheduler as Phase 3.2. Otherwise evaluate the same batches serially inline, record the matching fallback reason, and do not claim independent judge coverage. Judge work is a separate budget from experiment worktrees in either path.
+   - Each dispatched sub-agent or inline judge batch returns structured JSON scores
    - Aggregate scores: compute the configured primary judge field from `metric.judge.scoring.primary` (which should match `metric.primary.name`) plus any `scoring.secondary` values
-   - If `singleton_sample > 0`: also dispatch singleton evaluation sub-agents
+   - If `singleton_sample > 0`: evaluate singleton batches through the same authorized-dispatch or serial-inline path
 
 6. **If gates pass AND primary type is `hard`**:
    - Use the metric value directly from the measurement output
@@ -664,7 +671,7 @@ If no stopping criterion is met, proceed to the next batch (step 3.1).
 
 ### 3.7 Cross-Cutting Concerns
 
-**Codex failure cascade**: Track consecutive Codex delegation failures. After 3 consecutive failures, auto-disable Codex for remaining experiments and fall back to subagent dispatch. Log the switch.
+**Codex failure cascade**: Track consecutive Codex delegation failures. After 3 consecutive failures, auto-disable Codex for remaining experiments. Fall back to subagent dispatch only when authorization and callable capability still permit it; otherwise continue through serial inline/local execution. Log the switch and reason code.
 
 **Error handling**: If an experiment's measurement command crashes, times out, or produces malformed output:
 - Log as outcome `error` or `timeout` with the error message

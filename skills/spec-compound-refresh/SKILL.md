@@ -183,7 +183,7 @@ Match investigation depth to the learning's specificity — a learning referenci
 The critical distinction is whether the drift is **cosmetic** (references moved but the solution is the same) or **substantive** (the solution itself changed):
 
 - **Update territory** — file paths moved, classes renamed, links broke, metadata drifted, but the core recommended approach is still how the code works. `spec-compound-refresh` fixes these directly.
-- **Replace territory** — the recommended solution conflicts with current code, the architectural approach changed, or the pattern is no longer the preferred way. This means a new learning needs to be written. A replacement subagent writes the successor following `spec-compound`'s document format (frontmatter, problem, root cause, solution, prevention), using the investigation evidence already gathered. The orchestrator does not rewrite learnings inline — it delegates to a subagent for context isolation.
+- **Replace territory** — the recommended solution conflicts with current code, the architectural approach changed, or the pattern is no longer the preferred way. This means a new learning needs to be written. An authorized replacement subagent may draft the successor following `spec-compound`'s document format, using the investigation evidence already gathered, but it never writes the tracked successor. Without authorized dispatch, the orchestrator composes the replacement inline or serially. In every path the orchestrator is the sole tracked-file writer.
 
 **The boundary:** if you find yourself rewriting the solution section or changing what the learning recommends, stop — that is Replace, not Update.
 
@@ -271,7 +271,16 @@ Contradictions between docs are more urgent than individual staleness — they a
 
 ## Subagent Strategy
 
-Use subagents for context isolation when investigating multiple artifacts — not just because the task sounds complex. Choose the lightest approach that fits:
+Before any investigation or replacement dispatch, record:
+
+```yaml
+worker_dispatch_authorization: authorized | missing
+worker_dispatch_capability: available | missing
+```
+
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发；headless mode、scope size、permission settings 或本 Skill 被调用都不是授权。缺授权时使用 main-thread/serial fallback 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Inline fallback 不得声称 independent investigation coverage。
+
+When dispatch is authorized and available, use subagents for context isolation when investigating multiple artifacts — not just because the task sounds complex. Otherwise choose the matching main-thread or serial approach with the same evidence contract:
 
 | Approach | When to use |
 |----------|-------------|
@@ -280,7 +289,7 @@ Use subagents for context isolation when investigating multiple artifacts — no
 | **Parallel subagents** | 3+ truly independent artifacts with low overlap |
 | **Batched subagents** | Broad sweeps — narrow scope first, then investigate in batches |
 
-**When spawning any subagent**, omit the `mode` parameter so the user's configured permission settings apply. Include this instruction in its task prompt:
+**When spawning an authorized subagent**, omit the `mode` parameter so the user's configured permission settings apply; those settings are execution conditions, not authorization. Include this instruction in its task prompt:
 
 > Use dedicated file search and read tools (Glob, Grep, Read) for all investigation. Do NOT use shell commands (ls, find, cat, grep, test, bash) for file operations. This avoids permission prompts and is more reliable.
 >
@@ -289,7 +298,7 @@ Use subagents for context isolation when investigating multiple artifacts — no
 There are two subagent roles:
 
 1. **Investigation subagents** — read-only. They must not edit files, create successors, or delete anything. Each returns: file path, evidence, recommended action, confidence, and open questions. These can run in parallel when artifacts are independent.
-2. **Replacement subagents** — write a single new learning to replace a stale one. These run **one at a time, sequentially** (each replacement subagent may need to read significant code, and running multiple in parallel risks context exhaustion). The orchestrator handles all deletions and metadata updates after each replacement completes.
+2. **Replacement subagents** — draft one candidate successor and return its content or a run-local scratch reference. They never write tracked files, stage, commit, or delete. These run **one at a time, sequentially**; the orchestrator validates the draft and performs the tracked successor write, deletion, and metadata updates.
 
 The orchestrator merges investigation results, detects contradictions, coordinates replacement subagents, and performs all deletions/metadata edits centrally. In interactive mode, it asks the user questions on ambiguous cases. In headless mode, it marks ambiguous cases as stale instead. If two artifacts overlap or discuss the same root issue, investigate them together rather than parallelizing.
 
@@ -491,7 +500,7 @@ For each candidate, execute the flow that matches its classification from Phase 
 - **Keep** — no file edit by default; summarize why the learning remains trustworthy.
 - **Update** — in-place edits when the solution is still substantively correct (path renames, link refreshes, module renames).
 - **Consolidate** — merge overlapping docs into a canonical doc, delete subsumed docs, update cross-references. The orchestrator handles consolidation directly.
-- **Replace** — write a successor learning via subagent (passing the documentation contract files), validate frontmatter and cited claims, then delete the old. When evidence is insufficient, mark stale instead.
+- **Replace** — obtain a successor draft through an authorized subagent or inline/serial fallback, then let the orchestrator write the tracked successor, validate frontmatter and cited claims, and delete the old. When evidence is insufficient, mark stale instead.
 - **Delete** — final inbound-link check, then remove. Reclassify if late-discovered substantive citations surface.
 
 Only one flow runs per candidate; the reference contains the per-action criteria, examples, and step-by-step instructions.

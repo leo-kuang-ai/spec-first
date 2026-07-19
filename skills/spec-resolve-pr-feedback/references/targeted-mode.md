@@ -30,7 +30,7 @@ The script paginates the top-level `reviewThreads` connection and returns the ma
 
 Read [evaluation-rubric.md](evaluation-rubric.md) and judge this thread before any resolver dispatch. Account for `isOutdated` and the location fields (`line`, `originalLine`, `startLine`, `originalStartLine`). The cross-item reasoning is mostly inert for a single thread, but the read-depth and divert logic still apply: do not fix on reviewer authority alone.
 
-Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. When the host exposes a dispatch primitive, the user has not forbidden delegation, and the single-thread unit is safe to isolate, read `references/agents/pr-comment-resolver.md` and dispatch one generic subagent seeded with that local prompt for the thread. If dispatch is unavailable, explicitly disabled, or unsafe, process the thread sequentially in the current agent.
+Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. First read `references/agents/pr-comment-resolver.md`. Dispatch one generic subagent seeded with it only when `worker_dispatch_authorization: authorized`, `worker_dispatch_capability: available`, and the single-thread unit is safe to isolate. Otherwise apply the same resolver prompt sequentially in the current agent and preserve the matching fallback reason code.
 
 Pass the same fields full mode does, including `isOutdated` and the location fields: `line`, `originalLine`, `startLine`, `originalStartLine`. Targeted threads can be outdated too and need the same relocation handling.
 

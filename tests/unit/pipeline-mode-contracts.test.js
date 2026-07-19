@@ -40,6 +40,21 @@ describe('pipeline mode contracts', () => {
     expect(writingReference).not.toContain('Compound Engineering badge');
   });
 
+  test('spec-lfg passes explicit commit and landing authority instead of treating mode:pipeline as permission', () => {
+    const helper = read('skills/spec-commit-push-pr/SKILL.md');
+    const lfg = read('skills/spec-lfg/SKILL.md');
+    const landingStep = lfg.match(/8\. Invoke the `spec-commit-push-pr`[\s\S]*?\n9\./);
+
+    expect(landingStep).not.toBeNull();
+    expect(landingStep[0]).toContain('commit_authorization: authorized');
+    expect(landingStep[0]).toContain('landing_authorization: authorized');
+    expect(landingStep[0]).toContain('authorization_source: current-user-explicit-spec-lfg');
+    expect(landingStep[0]).toContain('authorization_scope: pipeline-owned paths and the current branch PR');
+    expect(landingStep[0]).toContain('`mode:pipeline` only selects unattended execution and never grants authority');
+    expect(lfg).not.toContain('它不授权任意 worker dispatch、实现 mutation、commit、push、PR');
+    expect(helper).toContain('workflow invocation does not authorize commit, push, or PR creation');
+  });
+
   test('spec-test-browser keeps pipeline unattended and preserves caller-owned server boundaries', () => {
     const skill = read('skills/spec-test-browser/SKILL.md');
     const pipelineReference = read('skills/spec-test-browser/references/pipeline-orchestration.md');

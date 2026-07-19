@@ -55,6 +55,11 @@ describe('plugin module facade and governance', () => {
     expect(cursor.workflowSkills).toContain('spec-work');
     expect(cursor.internalSkills).toContain('spec-worktree');
     expect(cursor.internalSkills).toContain('spec-test-browser');
+    expect(cursor.internalSkills).toContain('spec-commit');
+    expect(cursor.internalSkills).toContain('spec-commit-push-pr');
+    for (const governanceOnly of ['spec-proof', 'spec-resolve-pr-feedback', 'spec-test-xcode']) {
+      expect(cursor.internalSkills).not.toContain(governanceOnly);
+    }
     expect(cursor.agents).toEqual([]);
     expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
   });
@@ -129,6 +134,56 @@ describe('plugin module facade and governance', () => {
         expect(operationPaths.some((operationPath) =>
           operationPath.includes('/spec-test-browser/evals/')
         )).toBe(false);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('delivers caller-required commit helpers as internal-only packages on every host', () => {
+    const helpers = [
+      {
+        name: 'spec-commit',
+        paths: ['SKILL.md'],
+      },
+      {
+        name: 'spec-commit-push-pr',
+        paths: [
+          'SKILL.md',
+          'references/branch-creation.md',
+          'references/pr-description-writing.md',
+        ],
+      },
+    ];
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+
+        for (const governanceOnly of ['spec-proof', 'spec-resolve-pr-feedback', 'spec-test-xcode']) {
+          expect(syncedAssets.internalSkills).not.toContain(governanceOnly);
+        }
+
+        for (const helper of helpers) {
+          expect(syncedAssets.internalSkills).toContain(helper.name);
+          expect(syncedAssets.skills).not.toContain(helper.name);
+          expect(syncedAssets.workflowSkills).not.toContain(helper.name);
+
+          for (const relativePath of helper.paths) {
+            const expectedPath = path.posix.join(adapter.skillsRoot, helper.name, relativePath);
+            const operation = plan.operations.find((entry) => entry.path === expectedPath);
+            expect(operation).toBeDefined();
+            if (relativePath === 'SKILL.md') {
+              expect(operation.contents).toMatch(new RegExp(`^name: ${helper.name}$`, 'm'));
+              expect(operation.contents).toMatch(/description:.*Internal/i);
+              if (platform !== 'cursor') {
+                expect(operation.contents).toMatch(/^user-invocable:\s*false$/m);
+              }
+            }
+          }
+        }
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
       }
