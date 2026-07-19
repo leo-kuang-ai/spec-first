@@ -3,9 +3,9 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 3e07fb20cd790eeabe10e409170f202ae195e78b
+current_head_at_calibration: 1c8a12a574a0768ea0d1334683e51cc9d709852f
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-source-repair
+working_tree_overlay: uncommitted-sf-03-sf-04-source-repair
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
@@ -43,7 +43,7 @@ actual_pairs: 165
 
 ## 3. 变更支撑文件所触及的既有 edge
 
-原刷新批次的 30 个 source file delta 触及 46 个 pair；后续 SF-01 overlay 重裁决 commit-helper caller edges，本轮 SF-02 overlay 重裁决 knowledge-promotion exit。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
+原刷新批次的 30 个 source file delta 触及 46 个 pair；后续 SF-01 修复重裁决 commit-helper caller edges，SF-02 修复重裁决 knowledge-promotion exit，本轮 SF-03/SF-04 overlay 分别重裁决 local rendering config consumer 与 high-risk task-pack review consumer。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
 
 | Baseline ID | Current edge | Current verdict | 说明 |
 | --- | --- | --- | --- |
@@ -70,7 +70,8 @@ actual_pairs: 165
 | brainstorm -> LFG -> plan/work | corrected canonical entry and preserved artifact path | brainstorm/plan/LFG each retain product/planning/shipping boundary | invalid/non-software/readiness stops | confirmed for SF-08 |
 | LFG -> browser helper | user-visible flow requires runtime verification only when applicable | caller owns origin/server; helper owns wrapper/session cleanup | missing/invalid origin or cleanup failure blocks; not_applicable has reason | confirmed for SF-09 |
 | work -> doc review -> work | semantic review prevents stale plan handoff | doc-review is byte-preserving report producer; work owns disposition/verification | hash drift/incomplete/P0/P1 stop final validation | confirmed |
-| task pack -> doc review | high-risk review intent is legitimate | target lacks task-pack classification/schema lens | no unique consumer/terminal result | drift, SF-04 |
+| task pack -> doc review | high-risk review intent is legitimate | `spec-doc-review` 唯一分类 task pack 并强制 report-only；validator owns deterministic floor，source plan owns scope/architecture，write-tasks owns regeneration | invalid/stale intake 不 dispatch personas；pack gap 回 `spec-write-tasks`，plan decision gap 回 `spec-plan`；只有完整 zero-write JSON envelope、source-plan 对齐及 passed+valid+deterministic outcome 同时成立才进入 `spec-work-task-pack` | confirmed at `source-contract-confirmed`, SF-04 closed；`Review complete`/`roster:full` 不提升 handoff/dispatch authority |
+| runtime setup -> local rendering config -> plan/brainstorm/ideate | setup 暴露并保护三个 active local preferences | 三个 workflow 分别拥有格式解析、默认值与 pipeline override；setup 不调用 workflow | 注释、缺失或无效值保持 consumer 默认，不能被 setup 提升为 runtime authority | confirmed at `source-contract-confirmed`, SF-03 closed；未验证真实 host/local config field run |
 | work/debug/review -> compound | durable knowledge can be reusable | new/materially rewritten learning 必须有 grounded `source_refs` 与 concrete `invalidation_condition`；validator 只强制机械形态，LLM/human 判断语义充分性 | Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 缺任一字段、空值、错误类型或重复字段时不得完成；legacy default mode 保持兼容 | confirmed at `source-contract-confirmed`, SF-02 closed；未验证真实 host field run |
 | public caller -> internal helper | helper reuse can be necessary；直接例为 LFG -> commit-push-pr、commit-authorized dogfood -> commit | 两个 load-bearing target 与 browser/worktree 共 4 个 internal package 已投射；其余 3 个 record 保持 governance-only | caller-target package 在五宿主 projection plan 与 sandbox init 可解析；真实 host loader/invocation 尚未验证 | confirmed at `projection_confirmed`, SF-01 closed；不把 spec-work 的条件式命名参考算作强制 caller edge |
 
@@ -91,4 +92,4 @@ actual_pairs: 165
 | actual current pairs | 165 |
 | duplicate canonical pairs | 0 |
 
-The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot; `current_head_at_calibration` does not contain the uncommitted SF-02 overlay. It does not prove host discovery or helper invocation, actual generic dispatch, real compound promotion behavior, browser navigation, CI/merge/release, or field outcome.
+The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot；`current_head_at_calibration` 已包含 SF-02，但不包含尚未提交的 SF-03/SF-04 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、真实 task-pack persona review、compound promotion、browser navigation、CI/merge/release 或 field outcome。

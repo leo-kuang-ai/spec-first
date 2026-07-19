@@ -3,9 +3,9 @@ title: Skill 关系图当前快照
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 3e07fb20cd790eeabe10e409170f202ae195e78b
+current_head_at_calibration: 1c8a12a574a0768ea0d1334683e51cc9d709852f
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-source-repair
+working_tree_overlay: uncommitted-sf-03-sf-04-source-repair
 governed_nodes: 35
 canonical_pairs: 165
 ---
@@ -71,10 +71,11 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 using-spec-first --select one--> public workflow / standalone / Direct Lane
 spec-brainstorm --requirements path--> spec-plan --implementation-ready--> spec-work
 spec-work --hash-bound report-only plan review--> spec-doc-review --envelope--> spec-work caller
+spec-write-tasks --high-risk derived task pack--> spec-doc-review --task_pack_outcome--> spec-work-task-pack / spec-write-tasks / spec-plan
 spec-work/spec-debug/spec-code-review --verified learning--> spec-compound --promotion gate--> docs/solutions/**
 spec-lfg --caller-owned exact origin--> spec-test-browser --structured result--> spec-lfg
 spec-lfg --authorized landing--> spec-commit-push-pr
 spec-dogfood --authorized checkpoint--> spec-commit
 ```
 
-每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate 与两个 load-bearing commit helper 的五宿主投射；working-tree SF-02 overlay 进一步要求新写入或 materially rewritten learning 经过 provenance/invalidation promotion gate。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。
+每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate、两个 load-bearing commit helper 的五宿主投射与 SF-02 provenance/invalidation promotion gate；working-tree SF-03/SF-04 overlay 进一步校准 Runtime Setup 的 local rendering consumer，以及 task-pack 的 derived/report-only review consumer、source-plan authority 和 terminal owner。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 278/165 与 manifest hash 仍绑定冻结 calibration inventory；SF-04 新增 source reference 未在本页重算关系分母。

@@ -41,17 +41,27 @@ describe('spec-runtime-setup active config consumers', () => {
     expect(template).toContain('daily | weekly | manual | ask-again-after-3-runs');
   });
 
-  test('classifies ideate_output as active while plan and brainstorm remain reserved', () => {
+  test('classifies every document rendering output key by its active workflow consumer', () => {
     const setup = read('skills/spec-runtime-setup/SKILL.md');
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
+    const plan = read('skills/spec-plan/SKILL.md');
+    const brainstorm = read('skills/spec-brainstorm/SKILL.md');
     const ideate = read('skills/spec-ideate/SKILL.md');
 
+    expect(plan).toContain('active (non-commented)** `plan_output:`');
+    expect(brainstorm).toContain('active (non-commented)** `brainstorm_output:`');
     expect(ideate).toContain('active (non-commented)** `ideate_output:`');
-    expect(setup).toContain('`ideate_output` is active');
-    expect(setup).toContain('`plan_output` and `brainstorm_output` are reserved future hints');
+    expect(setup).toContain('`plan_output`、`brainstorm_output` 和 `ideate_output`');
+    expect(setup).toContain('分别由 `spec-plan`、`spec-brainstorm` 和 `spec-ideate` 读取');
+    expect(setup).toContain('分别回退到 `spec-plan=md`、`spec-brainstorm=md`、`spec-ideate=html`');
+    expect(setup).toContain('Pipeline override 仍由各 consumer 自己决定');
+    expect(setup).toContain('不调用对应 workflow');
+    expect(setup).not.toContain('reserved future hints');
+    expect(template).toContain('# plan_output: html       # active: md | html');
+    expect(template).toContain('# brainstorm_output: html # active: md | html');
     expect(template).toContain('# ideate_output: html     # active: md | html');
-    expect(template).toContain('# plan_output: html       # reserved: md | html');
-    expect(template).toContain('# brainstorm_output: html # reserved: md | html');
+    expect(template).not.toMatch(/^(plan_output|brainstorm_output|ideate_output):/m);
+    expect(template).not.toContain('reserved: md | html');
   });
 
   test('does not expose retired browser runtime profile configuration', () => {

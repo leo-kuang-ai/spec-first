@@ -26,6 +26,7 @@ const lazyRefs = [
   'synthesis-multi-round.md',
   'document-classification-signals.md',
   'persona-activation-matrix.md',
+  'task-pack-review-lens.md',
 ];
 
 const refsDir = path.resolve(__dirname, '../../skills/spec-doc-review/references');
@@ -121,7 +122,7 @@ describe('spec-doc-review current contracts', () => {
     expect(skill).toMatch(/output_mode: json[\s\S]*do not print this line[\s\S]*final JSON object/is);
     expect(skill).toMatch(/JSON mode's machine-readable single-object contract overrides the normal announcement requirement/i);
     expect(synthesis).toMatch(/单对象合同覆盖[\s\S]*cost-shape[\s\S]*reviewer announcement[\s\S]*terminal_signal/is);
-    expect(synthesis).toContain('"mutation_reason": "markdown-artifact|caller-requested-report-only|html-artifact|format-conflict-or-ambiguous|write-unavailable"');
+    expect(synthesis).toContain('"mutation_reason": "markdown-artifact|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable"');
     expect(synthesis).toContain('"fixes_applied": 0');
     expect(synthesis).toContain('"applied_fixes": []');
     expect(synthesis).toContain('"producer_fix_candidates": []');

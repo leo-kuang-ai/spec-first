@@ -151,8 +151,9 @@ Document review complete.
 
 delivery_mode: headless|interactive
 mutation_policy: markdown-write|report-only
-mutation_reason: markdown-artifact|caller-requested-report-only|html-artifact|format-conflict-or-ambiguous|write-unavailable
+mutation_reason: markdown-artifact|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable
 review_status: complete|incomplete
+task_pack_outcome: not-applicable | {review_result, task_pack_validity, deterministic_handoff, source_plan, reason_code, next_action}
 fixes_applied: N
 producer_fix_candidates: N
 proposed_fixes_count: N
@@ -209,7 +210,7 @@ Limitations:
 Review complete
 ```
 
-Omit any finding bucket with zero items, but keep every scalar envelope field so callers can parse zero counts. `fixes_applied` is always `0` under `report-only`; `producer_fix_candidates` is `0` under ordinary `markdown-write`. Set `review_status: incomplete` when both always-on reviewers produced no valid coverage and no equivalent inline review completed; do not emit a clean verdict or execution-ready implication on an incomplete review. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
+Omit any finding bucket with zero items, but keep every scalar envelope field so callers can parse zero counts. `fixes_applied` is always `0` under `report-only`; `producer_fix_candidates` is `0` under ordinary `markdown-write`. Non-task-pack review renders `task_pack_outcome: not-applicable` in text and `task_pack_outcome: null` in JSON. Task-pack review follows `task-pack-review-lens.md`: invalid deterministic intake yields `incomplete` without persona dispatch；completed semantic review with unresolved P0/P1 or a task-pack/source-plan blocker yields `blocked`；only valid current intake plus complete coverage and no unresolved P0/P1 yields `passed`. Set `review_status: incomplete` when both always-on reviewers produced no valid coverage and no equivalent inline review completed; do not emit a clean verdict or execution-ready implication on an incomplete review. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
 
 ### JSON Rendering
 
@@ -220,8 +221,9 @@ Omit any finding bucket with zero items, but keep every scalar envelope field so
   "delivery_mode": "headless|interactive",
   "output_mode": "json",
   "mutation_policy": "markdown-write|report-only",
-  "mutation_reason": "markdown-artifact|caller-requested-report-only|html-artifact|format-conflict-or-ambiguous|write-unavailable",
+  "mutation_reason": "markdown-artifact|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable",
   "review_status": "complete|incomplete",
+  "task_pack_outcome": null,
   "fixes_applied": 0,
   "applied_fixes": [],
   "counts": {
@@ -240,6 +242,19 @@ Omit any finding bucket with zero items, but keep every scalar envelope field so
   "coverage": [],
   "limitations": [],
   "terminal_signal": "Review complete"
+}
+```
+
+`document_type: task-pack` 时，将 `task_pack_outcome: null` 替换为以下对象；这只是当前 review envelope 的一部分，不创建第二份 receipt、durable state 或 authorization schema：
+
+```json
+{
+  "task_pack_validity": "valid|stale|wrong-chain|invalid|unverifiable",
+  "deterministic_handoff": true,
+  "source_plan": "docs/plans/...|null",
+  "review_result": "passed|blocked|incomplete",
+  "reason_code": "task-pack-review-passed|task-pack-regeneration-required|source-plan-revision-required|<validation-reason-code>",
+  "next_action": "spec-work-task-pack|spec-write-tasks|spec-plan"
 }
 ```
 
@@ -305,6 +320,7 @@ The `<next stage>` substitution uses the document classification from Phase 1:
 - `requirements` → `spec-plan`
 - `unified-plan` → `spec-work`
 - `plan` → `spec-work`
+- `task-pack` → 不进入 interactive mutation question；按 `task_pack_outcome.next_action` 返回 `spec-work-task-pack`、`spec-write-tasks` 或 `spec-plan`
 
 ### Iteration limit
 

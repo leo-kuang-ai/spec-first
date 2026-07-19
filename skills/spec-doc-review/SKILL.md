@@ -1,12 +1,12 @@
 ---
 name: spec-doc-review
-description: Review requirements, plans, or specs with role-specific lenses. Use when the user wants to improve an existing planning document. Default roster is standard (≤3 reviewers); pass roster:full for the full conditional set.
+description: 使用角色化 lens 审查 requirements、plans、task packs 或 specs。适用于改进既有规划与执行文档；默认 standard roster（≤3 reviewers），完整条件 roster 使用 roster:full。
 argument-hint: "[mode:headless] [mutation:report-only] [output:json] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
 # Document Review
 
-Review requirements or plan documents through multi-persona analysis. Dispatches generic subagents seeded with skill-local reviewer prompt assets, applies `safe_auto` fixes only when the run-local mutation policy is `markdown-write`, and preserves the same structural/semantic review as report-only findings when mutation is unavailable or forbidden.
+Review requirements or plan documents through multi-persona analysis. Task packs are reviewed as derived, report-only execution inputs against their current source plan. Dispatches generic subagents seeded with skill-local reviewer prompt assets, applies `safe_auto` fixes only when the run-local mutation policy is `markdown-write`, and preserves the same structural/semantic review as report-only findings when mutation is unavailable or forbidden.
 
 ## Interactive mode rules
 - **Pre-load the platform question tool before any question fires.** In Claude Code, `AskUserQuestion` is deferred — call `ToolSearch` with `select:AskUserQuestion` once, eagerly, at the top of Interactive-mode work (before the routing question, walk-through, bulk-preview, and Phase 5 terminal question) rather than at the first question site. Other hosts don't need this preload.
@@ -40,12 +40,17 @@ Set run-local `delivery_mode` to `headless` when `mode:headless` is present, oth
 ### Classify Document Type
 Classify by reading its **content shape**, not its file path. Path is a tie-breaker hint, not the primary signal.
 
+首先检查 task-pack identity：frontmatter 含 `type: task-pack` 时，`type: task-pack` → classify as `task-pack`。`source_plan`、`source_plan_hash` 与 `Task Pack Contract` shape 用于后续 deterministic intake，不是 classification 前置条件；malformed pack 也不能降级解释成普通 plan。`task-pack` 分类优先于 unified requirements/plan 与通用 content-shape 分类。
+
 First check the unified artifact contract: `artifact_contract: spec-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements` (review Product Contract only; absent Planning Contract/Units/Verification/DoD is expected). Same contract plus `artifact_readiness: implementation-ready` -> classify as `unified-plan` (review Product Contract and Planning Contract with different lenses, then Implementation Units/Verification/DoD for execution completeness). Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
+
+**STOP. 当 classification 为 `task-pack` 时，立即读取 `references/task-pack-review-lens.md`，完成 deterministic intake、current source-plan read、task-pack-specific semantic lens 与 terminal-owner mapping；这些步骤必须在 persona selection/dispatch 前完成。**
 
 ### Resolve Mutation Policy
 
 After reading and classifying the document, set exactly one run-local `mutation_policy`, independently from `delivery_mode`:
 
+- `report-only` — `task-pack` 强制使用 `report-only`，并记录 `mutation_reason: task-pack-derived-artifact`。Task pack 由 `spec-write-tasks` 生成且 JSON contract / human-readable mirror 必须同源；reviewer 只能返回 producer fix candidates，不得直接 patch derived artifact。显式 `mutation:report-only` 不覆盖这个更具体的 mandatory reason。
 - `report-only` — when `requested_mutation: report-only` and the document is confirmed writable Markdown. Record `mutation_reason: caller-requested-report-only`; this explicit caller policy overrides the ordinary Markdown default and must keep the file byte-preserving.
 - `markdown-write` — only when the document is confirmed Markdown by content shape and path and the platform can write it. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available.
 - `report-only` — mandatory for HTML content or a `.html` artifact. Run the same reviewer roster, schema validation, confidence gate, deduplication, severity routing, Coverage, and limitations reporting, but do not invoke any document mutation path.
@@ -54,10 +59,11 @@ After reading and classifying the document, set exactly one run-local `mutation_
 
 For ordinary HTML use `mutation_reason: html-artifact`. A report-only request is valid in both headless and interactive delivery; interactive delivery still returns the structured report-only envelope and does not offer a mutation walkthrough.
 
-Existing mandatory reasons retain their diagnostic meaning: HTML remains `html-artifact`, write-unavailable Markdown remains `write-unavailable`, and format conflict/ambiguity remains `format-conflict-or-ambiguous` even when the caller also requested report-only. `caller-requested-report-only` applies to otherwise writable, unambiguous Markdown. Without the mutation token, ordinary writable Markdown still resolves to `markdown-write`; this feature must not globally downgrade the default path.
+Existing mandatory reasons retain their diagnostic meaning: task packs remain `task-pack-derived-artifact`, HTML remains `html-artifact`, write-unavailable Markdown remains `write-unavailable`, and format conflict/ambiguity remains `format-conflict-or-ambiguous` even when the caller also requested report-only. `caller-requested-report-only` applies to otherwise writable, unambiguous Markdown that is not a task pack. Without the mutation token, ordinary writable Markdown still resolves to `markdown-write`; this feature must not globally downgrade the default path.
 
 **Core classification rules (apply these first):**
 
+- **`task-pack`**: Frontmatter `type: task-pack`; derived metadata such as `generated_by: spec-write-tasks`、`mode: derived`、`source_plan`、`source_plan_hash`; headings `Task Pack Contract`、`Execution Waves`、`Task Cards`。Task-pack identity 优先，不因正文含 U-ID、files 或 verification 而归类成 `plan`。
 - **`requirements`**: Frontmatter fields like `actors:`, `flows:`, `acceptance_examples:`; headings like `Acceptance Examples`, `Actors`, `Key Flows`; IDs like `R1`, `A1`, `F1`, `AE1`; prose focused on user/business problem and scope. No implementation units, per-unit file lists, or test scenarios.
 - **`plan`**: Frontmatter fields like `type: feat|fix|refactor`, `origin:`, `product_contract_source:`; headings like `Implementation Units`, `Key Technical Decisions`, `Risks & Dependencies`; IDs like `U1`, `U2`; per-unit `Goal`, `Files`, `Approach`, `Test scenarios`, `Verification`; repo-relative paths.
 - **Tie-breaker:** Content shape is authoritative over path. Mixed/sparse signals → fall back to path: `docs/brainstorms/` → `requirements`, `docs/plans/` → `plan`. Neither applies → default to `requirements` (more conservative).
@@ -102,7 +108,7 @@ Record skipped candidates for the cost-shape line (`skipped_conditional=… reas
 cost-shape: profile={lite|standard|full} N={count} personas=[{comma-separated short names}] skipped_conditional=[{name:reason},…] doc_bytes={utf8_bytes_or_unknown} slices={unified|full|mixed} isolation={min|degraded_inherited}
 ```
 
-`doc_bytes` is the on-disk byte length when known, else `unknown`. `slices` is `unified` if every leaf gets a section slice, `full` if every leaf gets the full document, `mixed` otherwise. `isolation` is set in Phase 2 Dispatch below. This line is **advisory measurement**, not a hard gate.
+`doc_bytes` is the on-disk byte length when known, else `unknown`. `slices` is `unified` if every leaf gets a section slice, `full` if every leaf gets the full document, `mixed` otherwise. Task-pack review normally uses `mixed`: full task pack + focused current source-plan sections + compact deterministic receipt. `isolation` is set in Phase 2 Dispatch below. This line is **advisory measurement**, not a hard gate.
 
 ## Phase 2: Announce and Dispatch Personas
 
@@ -122,9 +128,9 @@ For each selected reviewer, read the matching skill-local prompt asset at `refer
 
 **Model tiering** (omit override if the platform has no known tier; inherit parent model otherwise): coherence gets the cheapest capable tier; design-lens/scope-guardian get the platform mid-tier; `security-lens-reviewer`, `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model (or a high-capability review tier if established).
 
-Each subagent's prompt fills these template variables: `{persona_file}` — full content of the selected persona asset; `{schema}` — the findings schema below; `{document_type}` — the Phase 1 classification; `{document_path}` — the document path; `{origin_path}` — upstream provenance (prefer `origin:` frontmatter, else `product_contract_source:<value>`, else `none`; product-lens/adversarial/scope-guardian read this slot rather than re-parsing frontmatter); `{document_content}` — metadata, Goal Capsule, and the reviewer-specific section slice (unified artifacts: product-lens/adversarial/scope get Product Contract, feasibility/coherence also get Planning Contract and active Implementation Units/Verification/DoD when implementation-ready; legacy documents get the full document); `{decision_primer}` — cumulative prior-round decisions, or an empty block on round 1.
+Each subagent's prompt fills these template variables: `{persona_file}` — full content of the selected persona asset; `{schema}` — the findings schema below; `{document_type}` — the Phase 1 classification; `{document_path}` — the document path; `{origin_path}` — upstream provenance (prefer `origin:` frontmatter, else `product_contract_source:<value>`, else `none`; product-lens/adversarial/scope-guardian read this slot rather than re-parsing frontmatter); `{document_content}` — metadata, Goal Capsule, and the reviewer-specific section slice (unified artifacts: product-lens/adversarial/scope get Product Contract, feasibility/coherence also get Planning Contract and active Implementation Units/Verification/DoD when implementation-ready; task packs get the full task pack plus `task-pack-review-lens.md`, compact deterministic receipt, and focused current source-plan sections; legacy documents get the full document); `{decision_primer}` — cumulative prior-round decisions, or an empty block on round 1.
 
-For legacy documents pass the **full document** (`slices=full`); for unified artifacts, default to section slices (`slices=unified`) and escalate to a broader slice only when a reviewer needs cross-section traceability the initial slice can't assess. **Anti-waste rule:** the orchestrator may read the full document once for classification and roster selection, but after slices are built do not also inject the full document into every leaf "for safety" — mark `slices=mixed` or `full` on cost-shape if a leaf must escalate.
+For legacy documents pass the **full document** (`slices=full`); for unified artifacts, default to section slices (`slices=unified`) and escalate to a broader slice only when a reviewer needs cross-section traceability the initial slice can't assess. For `task-pack`, set `slices=mixed` and wrap the four inputs separately as `<task-pack-review-lens>`、`<deterministic-intake>`、`<task-pack>` 与 `<source-plan>`，避免把 validator facts、derived tasks 与 canonical plan 混成同一 authority。**Anti-waste rule:** the orchestrator may read the full document once for classification and roster selection, but after slices are built do not also inject the full document into every leaf "for safety" — mark `slices=mixed` or `full` on cost-shape if a leaf must escalate.
 
 ### Decision primer
 
@@ -157,6 +163,10 @@ Only when `delivery_mode: interactive` **and** `mutation_policy: markdown-write`
 ---
 
 ## Included References
+
+### Task Pack Review Lens
+
+仅当 Phase 1 分类为 `task-pack` 时读取 [Task Pack Review Lens](references/task-pack-review-lens.md)。
 
 ### Subagent Template
 

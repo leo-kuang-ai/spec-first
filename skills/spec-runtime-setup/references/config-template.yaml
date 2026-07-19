@@ -57,15 +57,13 @@
 # spec_promote_spiral_optout: true
 
 # --- Document rendering ---
-# Active consumer: spec-ideate reads an uncommented ideate_output value and
-# accepts md or html. Keeping the example commented preserves its default.
-# plan_output and brainstorm_output remain reserved future hints: if those
-# workflows adopt HTML, it must remain an optional sidecar until downstream
-# consumers have focused HTML contract tests.
+# 以下三项分别由 spec-plan、spec-brainstorm 和 spec-ideate 读取；只接受未注释的
+# md 或 html。保持示例为注释状态，继续使用各 workflow 的默认值，Runtime Setup
+# 不会调用这些 workflow，也不会改变 consumer 自己的 pipeline override。
 
-# plan_output: html       # reserved: md | html (default remains md)
-# brainstorm_output: html # reserved: md | html (default remains md)
-# ideate_output: html     # active: md | html (spec-ideate default remains html)
+# plan_output: html       # active: md | html (spec-plan 默认 md)
+# brainstorm_output: html # active: md | html (spec-brainstorm 默认 md)
+# ideate_output: html     # active: md | html (spec-ideate 默认 html)
 
 # --- Work delegation ---
 # Integrated local config surface for downstream execution workflows that

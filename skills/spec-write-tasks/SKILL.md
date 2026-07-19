@@ -114,7 +114,7 @@ Required posture:
 - 🔴 GATE (verification): for `semantic_posture: reviewed-existing`, the envelope must carry evidence metadata or a verifiable review-outcome reference; a bare `reviewed-existing` claim without current evidence is not eligible for `next_action: spec-work-task-pack`;
 - 🔴 GATE (handoff): for `dispatch_authorization: authorized`, the envelope must carry a bounded continuation reference or doc-review outcome reference; absent that, report `dispatch_authorization: missing`.
 
-High-risk packs return `next_action: review-task-pack` with one reason and a copy-ready current-host doc-review invocation. Do not auto-dispatch review unless the explicit bounded continuation conditions in [Execution Handoff Contract](references/execution-handoff-contract.md) are met.
+High-risk packs return `next_action: review-task-pack` with one reason and the copy-ready current-host invocation `spec-doc-review mode:headless mutation:report-only output:json roster:full <task-pack-path>`。Consumer 必须把 derived task pack 保持 byte-preserving，并从 `task_pack_outcome` 读取 deterministic intake、semantic review 与 terminal owner；不要仅凭 `Review complete` 推导 `reviewed-existing`。`roster:full` 仍只保留实际 qualified personas，但不会让 high-risk review 因 standard budget 丢失同时成立的 security、scope 或 adversarial lens。Do not auto-dispatch review unless the explicit bounded continuation conditions in [Execution Handoff Contract](references/execution-handoff-contract.md) are met.
 
 ## Portability Boundary
 

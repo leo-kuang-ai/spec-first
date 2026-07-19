@@ -64,8 +64,9 @@ Document content:
 {document_content}
 </review-context>
 <context-slots-rules>
-- `Document type:` is the orchestrator's authoritative classification (`requirements`, `plan`, `unified-requirements`, or `unified-plan`) — trust it, don't re-classify by content shape. Where your persona adapts on `requirements` vs `plan`, apply the same branch to `unified-requirements`/`unified-plan` respectively.
+- `Document type:` is the orchestrator's authoritative classification (`requirements`, `plan`, `unified-requirements`, `unified-plan`, or `task-pack`) — trust it, don't re-classify by content shape. Where your persona adapts on `requirements` vs `plan`, apply the same branch to `unified-requirements`/`unified-plan` respectively.
 - For `unified-requirements`, review the Product Contract slice as product requirements — do not flag missing Planning Contract/Implementation Units/Verification Contract/Definition of Done. For `unified-plan`, treat Product Contract as the what-to-build authority and Planning Contract/Implementation Units/Verification Contract/Definition of Done as the how-to-build and completion contract.
+- For `task-pack`, apply the injected `<task-pack-review-lens>` before persona-specific judgment。`<deterministic-intake>` 只提供 identity/freshness/structure floor；`<task-pack>` 是 derived execution index，`<source-plan>` 是 scope/acceptance/architecture/non-goals/verification authority。不得把 validator success 当 semantic-fit，也不得建议 reviewer 直接 patch task pack。
 - `Origin:` carries upstream Product Contract provenance — a legacy `origin:` path, `product_contract_source:<value>`, or the literal token `none`. Treat `product_contract_source:spec-brainstorm`, `product_contract_source:legacy-requirements`, and legacy brainstorm `origin:` paths as validated upstream premise signals; treat `product_contract_source:spec-plan-bootstrap` and `none` as greenfield unless the document proves otherwise. Read this line directly — do not re-parse frontmatter yourself.
 </context-slots-rules>
 

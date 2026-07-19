@@ -121,9 +121,10 @@ Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture:
 - `pulse_*`, read and written by `spec-product-pulse`;
 - `spec_promote_spiral_optout`, read and written by `spec-promote`;
 - `work_delegate_*`, exposed for downstream execution workflows that support delegated work;
-- `plan_skip_scoping_confirm`, exposed for downstream planning workflows that support persisted scoping-confirmation preference.
+- `plan_skip_scoping_confirm`, exposed for downstream planning workflows that support persisted scoping-confirmation preference;
+- `plan_output`, `brainstorm_output` 和 `ideate_output`，分别由 `spec-plan`、`spec-brainstorm` 和 `spec-ideate` 读取。
 
-Document rendering keys `plan_output` and `brainstorm_output` are reserved future hints until implemented consumers and focused tests exist. `ideate_output` is active: `spec-ideate` reads an uncommented `md` or `html` value, while setup only exposes and protects the key and never invokes the workflow. Setup must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
+`plan_output`、`brainstorm_output` 和 `ideate_output` 都是 active local rendering preferences。对应 consumer 只读取未注释且有效的 `md` / `html` 值；缺失、无效或仍被注释的值分别回退到 `spec-plan=md`、`spec-brainstorm=md`、`spec-ideate=html`。Pipeline override 仍由各 consumer 自己决定。Runtime Setup 只暴露并保护这些 key，不调用对应 workflow，也不把本地 rendering preference 提升为 runtime authority。Setup must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
 
 If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a project guidance index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
 

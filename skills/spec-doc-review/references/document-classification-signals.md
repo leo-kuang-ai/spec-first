@@ -2,10 +2,18 @@
 
 This is a **lazy reference** for SKILL.md. Load when the core classification rules in the spine don't yield a clear classification. The spine classification rules are:
 
-1. First check for unified artifact contract (`artifact_contract: spec-unified-plan/v1`)
-2. Otherwise: content shape is authoritative, path is a tie-breaker hint
+1. First check task-pack identity (`type: task-pack`; malformed packs still keep this classification)
+2. Then check for unified artifact contract (`artifact_contract: spec-unified-plan/v1`)
+3. Otherwise: content shape is authoritative, path is a tie-breaker hint
 
 ---
+
+## `task-pack` signals（derived execution documents）
+
+- Frontmatter `type: task-pack`；通常同时包含 `generated_by: spec-write-tasks`、`status: derived`、`mode: derived`、`source_plan` 与 `source_plan_hash`
+- 正文包含 `Task Pack Contract` fenced JSON、`Execution Waves`、`Task Cards`、`Traceability Matrix` 或 `Regeneration Rules`
+- JSON tasks 使用 `task_id`、`dependencies`、`files`、`test_focus`、`done_signal`、`wave`、`stop_if` 等执行字段
+- 内容可能出现 U-ID、R-ID、repo-relative files 和 verification，但这些信号不能把 task pack 重新分类为 plan；task pack 始终是 source plan 的 derived index
 
 ## `requirements` signals (what-to-build documents)
 
