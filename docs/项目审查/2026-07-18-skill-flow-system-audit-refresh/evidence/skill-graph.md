@@ -3,7 +3,8 @@ title: Skill 关系图当前快照
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-working_tree_calibrated_at: 2026-07-19
+current_head_at_calibration: 3e07fb20cd790eeabe10e409170f202ae195e78b
+working_tree_calibrated_at: 2026-07-20
 working_tree_overlay: uncommitted-source-repair
 governed_nodes: 35
 canonical_pairs: 165
@@ -70,9 +71,10 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 using-spec-first --select one--> public workflow / standalone / Direct Lane
 spec-brainstorm --requirements path--> spec-plan --implementation-ready--> spec-work
 spec-work --hash-bound report-only plan review--> spec-doc-review --envelope--> spec-work caller
+spec-work/spec-debug/spec-code-review --verified learning--> spec-compound --promotion gate--> docs/solutions/**
 spec-lfg --caller-owned exact origin--> spec-test-browser --structured result--> spec-lfg
 spec-lfg --authorized landing--> spec-commit-push-pr
 spec-dogfood --authorized checkpoint--> spec-commit
 ```
 
-每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Working-tree overlay 已在各 owning package 增加独立 mutation/dispatch gate，并将两个 load-bearing commit helper 投射到五宿主，但 `source_head` 尚未包含这些未提交修复。
+每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate 与两个 load-bearing commit helper 的五宿主投射；working-tree SF-02 overlay 进一步要求新写入或 materially rewritten learning 经过 provenance/invalidation promotion gate。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。

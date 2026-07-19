@@ -35,14 +35,21 @@ The orchestrator handles consolidation directly (no subagent needed — the docs
 1. **Confirm the canonical doc** — the broader, more current, more accurate doc in the cluster.
 2. **Extract unique content** from the subsumed doc(s) — anything the canonical doc does not already cover. This might be specific edge cases, additional prevention rules, or alternative debugging approaches.
 3. **Merge unique content** into the canonical doc in a natural location. Do not just append — integrate it where it logically belongs. If the unique content is small (a bullet point, a sentence), inline it. If it is a substantial sub-topic, add it as a clearly labeled section.
-4. **Update cross-references** — if any other docs reference the subsumed doc, update those references to point to the canonical doc.
-5. **Delete the subsumed doc.** Do not archive it, do not add redirect metadata — just delete the file. Git history preserves it.
+4. **Run the promotion gate on the canonical doc** — preserve or add grounded non-empty `source_refs` and a concrete non-empty `invalidation_condition`, then run:
+
+   ```bash
+   SKILL_DIR="<absolute path of the directory containing the spec-compound-refresh SKILL.md you read>"
+   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <canonical-learning-path>
+   ```
+
+   Exit 1 blocks the consolidation exit until the canonical learning is repaired and the command passes. If the validator is unavailable, apply the four-item manual promotion checklist in Replace step 3 and state `validator unavailable: <reason>`; do not silently downgrade to the old parser-safety-only checklist. The orchestrator still judges provenance credibility and invalidation adequacy.
+5. **Run the mechanical claims check** on the canonical doc (step 4 of the Replace flow below) — merged content brings its citations with it, and consolidation is where cross-references most often dangle.
+6. **Update cross-references** — if any other docs reference the subsumed doc, update those references to point to the canonical doc.
+7. **Delete the subsumed doc only after steps 4-6 pass.** Do not archive it, do not add redirect metadata — just delete the file. Git history preserves it.
 
 If a doc cluster has 3+ overlapping docs, process pairwise: consolidate the two most overlapping docs first, then evaluate whether the merged result should be consolidated with the next doc.
 
-After the merge, run the mechanical claims check on the canonical doc (step 4 of the Replace flow below) — merged content brings its citations with it, and consolidation is where cross-references most often dangle.
-
-**Structural edits beyond merge:** Consolidate also covers the reverse case. If one doc has grown unwieldy and covers multiple distinct problems that would benefit from separate retrieval, it is valid to recommend splitting it. Only do this when the sub-topics are genuinely independent and a maintainer might search for one without needing the other.
+**Structural edits beyond merge:** Consolidate also covers the reverse case. If one doc has grown unwieldy and covers multiple distinct problems that would benefit from separate retrieval, it is valid to recommend splitting it. Only do this when the sub-topics are genuinely independent and a maintainer might search for one without needing the other. Every newly written split learning must use `references/schema.yaml` / `assets/resolution-template.md` and pass `--promotion`; validate all successors before deleting or truncating the original.
 
 ## Replace Flow
 
@@ -50,8 +57,8 @@ Process Replace candidates **one at a time, sequentially**. An authorized subage
 
 When a replacement is needed, read the documentation contract files and use their contents in the replacement subagent's task prompt or the inline fallback:
 
-- `references/schema.yaml` — frontmatter fields and enum values
-- `references/yaml-schema.md` — category mapping
+- `references/schema.yaml` — frontmatter fields, enum values, and promotion exit fields
+- `references/yaml-schema.md` — category mapping, YAML safety, and promotion semantics
 - `assets/resolution-template.md` — section structure
 
 Do not let replacement subagents or inline fallback invent frontmatter fields, enum values, or section order from memory.
@@ -63,15 +70,23 @@ Do not let replacement subagents or inline fallback invent frontmatter fields, e
    - A summary of the investigation evidence (what changed, what the current code does, why the old guidance is misleading)
    - The target path and category (same category as the old learning unless the category itself changed)
    - The relevant contents of the three support files listed above
-2. The subagent returns draft content or a run-local scratch reference; it must not write the tracked successor, stage, commit, or delete. Inline fallback produces the same draft. The orchestrator writes the new tracked learning using the support files as the source of truth: `references/schema.yaml` for frontmatter fields and enum values, `references/yaml-schema.md` for category mapping and YAML-safety rules for array items, and `assets/resolution-template.md` for section order.
-3. **Validate parser-safety of the new learning's frontmatter** to catch silent-corruption issues the prose rules miss: malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), and unquoted `: ` in scalar values (silent mapping confusion). Resolve the bundled validator through the loaded skill directory, not a project-relative `skills/` path:
+2. The subagent returns draft content or a run-local scratch reference; it must not write the tracked successor, stage, commit, or delete. Inline fallback produces the same draft. The orchestrator writes the new tracked learning using the support files as the source of truth: `references/schema.yaml` for frontmatter fields, enum values, and promotion exit fields; `references/yaml-schema.md` for category mapping, YAML-safety rules, and semantic guidance; and `assets/resolution-template.md` for section order. Every successor must carry grounded non-empty `source_refs` and a concrete non-empty `invalidation_condition`.
+3. **Validate parser-safety and the promotion exit contract of the successor frontmatter.** Promotion mode catches malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), unquoted `: ` in scalar values (silent mapping confusion), and mechanically requires non-empty top-level `source_refs` plus `invalidation_condition`. Resolve the bundled validator through the loaded skill directory, not a project-relative `skills/` path:
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the spec-compound-refresh SKILL.md you read>"
-   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" <new-learning-path>
+   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <new-learning-path>
    ```
 
-   Exit 0 means parser-safe; exit 1 means stderr names the offending field(s) — quote the value(s), re-write the doc, and re-run until exit 0. Do not declare success while validation fails. The validator does not enforce schema rules and does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps). If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify the same scope the script covers — the frontmatter opens and closes with exact `---` lines, and no unquoted top-level scalar value contains ` #` (YAML drops it as a comment) or `: ` (parsers may read it as a nested mapping). Quote offending values. Keep the manual check to exactly these three; do not expand into schema, enum, or style edits. Do not delete the old learning until either the script passes or the manual check is complete.
+   Exit 0 means the mechanical promotion gate passed; exit 1 means stderr names the offending field(s) — repair the frontmatter and re-run until exit 0. Do not declare success while validation fails. Default validator mode remains parser-safety-only for legacy compatibility; `--promotion` adds only the two promotion field shapes and does not judge reference credibility or invalidation adequacy. It does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps).
+
+   If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify exactly this mechanical scope before deleting the old learning:
+   - the frontmatter opens and closes with exact `---` lines;
+   - no unquoted top-level scalar value contains ` #` or `: `;
+   - `source_refs` appears exactly once as a top-level non-empty block or flow array whose items are non-empty strings; plain tokens that common YAML parsers type as null, boolean, number, sexagesimal, date, or timestamp do not count as strings and must be quoted;
+   - `invalidation_condition` appears exactly once as a top-level non-empty scalar or block string, with the same implicit-type quoting rule for plain scalar values.
+
+   The orchestrator still judges whether the references are trustworthy and whether the invalidation condition is semantically sufficient. Do not delete the old learning until either the script passes or the complete manual gate is satisfied.
 4. **Run the mechanical claims check on the successor doc.** The bundled `scripts/validate-doc-claims.py` flags cited repo paths missing from the tree, commit SHAs that do not resolve or are unreachable, relative doc links that do not resolve, and dangling drafting scaffold ("Learning 3", unresolved `{{...}}` tokens):
 
    ```bash

@@ -61,7 +61,7 @@ These files are the durable contract for the workflow. Read them on-demand at th
 - `references/grounding-validation.md` — grounding-validation protocol: flag adjudication rules and the semantic validator prompt (read in Phase 2.45)
 - `assets/resolution-template.md` — section structure for new docs (read when assembling)
 - `scripts/session-history/` — session discovery and extraction scripts copied into this skill so session-history support does not depend on the bundled session-history support
-- `scripts/validate-frontmatter.py` — frontmatter parser-safety validator (run in Phase 2 step 8 through the existence guard documented there; resolves via the loaded skill directory anchor `SKILL_DIR`, with a manual-checklist fallback elsewhere)
+- `scripts/validate-frontmatter.py` — frontmatter parser-safety validator plus the opt-in `--promotion` exit gate for provenance/invalidation (run in Phase 2 step 8 through the existence guard documented there; resolves via the loaded skill directory anchor `SKILL_DIR`, with a manual-checklist fallback elsewhere)
 - `scripts/validate-doc-claims.py` — mechanical claims validator: cited paths, commit SHAs, relative links, dangling drafting scaffold (run in Phase 2.45 via the `SKILL_DIR` anchor)
 
 When spawning subagents, pass the relevant file contents into the task prompt so they have the contract without needing cross-skill paths.
@@ -179,7 +179,7 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
    - Incorporates auto memory excerpts (if provided by the orchestrator) as supplementary evidence
    - Reads `references/yaml-schema.md` for category mapping into `docs/solutions/`
    - Suggests a filename using the pattern `[sanitized-problem-slug].md` — no date suffix, even if existing files in the target directory have one; the `date:` frontmatter field is the canonical creation date
-   - Writes to `context.json`: YAML frontmatter skeleton (must include `category:` field mapped from problem_type), category directory path, suggested filename, and which track applies. Returns only the artifact path.
+   - Writes to `context.json`: YAML frontmatter skeleton (must include `category:` plus the promotion exit fields `source_refs:` and `invalidation_condition:`), category directory path, suggested filename, and which track applies. Returns only the artifact path.
    - Does not invent enum values, categories, or frontmatter fields from memory; reads the schema and mapping files above
    - Does not force bug-track fields onto knowledge-track learnings or vice versa
 
@@ -324,7 +324,7 @@ The orchestrating agent (main conversation) performs these steps:
 
    The reason to update rather than create: two docs describing the same problem and solution will inevitably drift apart. The newer context is fresher and more trustworthy, so fold it into the existing doc rather than creating a second one that immediately needs consolidation.
 
-   When updating an existing doc, preserve its file path and frontmatter structure. Update the solution, code examples, prevention tips, and any stale references. Add a `last_updated: YYYY-MM-DD` field to the frontmatter. Do not change the title unless the problem framing has materially shifted.
+   When updating an existing doc, preserve its file path and existing frontmatter structure, but add `source_refs` and `invalidation_condition` when absent because this path materially rewrites the learning. Update the solution, code examples, prevention tips, and any stale references. Add a `last_updated: YYYY-MM-DD` field to the frontmatter. Do not change the title unless the problem framing has materially shifted.
 
 3. **Incorporate session history findings** (if available). When the internal session-history flow returned relevant prior-session context:
    - Fold investigation dead ends and failed approaches into the **What Didn't Work** section (bug track) or **Context** section (knowledge track)
@@ -332,26 +332,28 @@ The orchestrating agent (main conversation) performs these steps:
    - Tag session-sourced content with "(session history)" so its origin is clear to future readers
    - If findings are thin or "no relevant prior sessions," proceed without session context
 4. Assemble complete markdown file from the collected pieces, reading `assets/resolution-template.md` for the section structure of new docs
-5. Validate YAML frontmatter against `references/schema.yaml`, including the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules)
+5. Validate YAML frontmatter against `references/schema.yaml`, including non-empty `source_refs` and `invalidation_condition` promotion exit fields and the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules). The references must be grounded and the invalidation condition must be semantically specific; the script in step 8 checks only their mechanical shape.
 6. Create directory if needed: `mkdir -p docs/solutions/[category]/`
 7. Write the file: either the updated existing doc or the new `docs/solutions/[category]/[filename].md`
-8. **Validate parser-safety of the written frontmatter** to catch silent-corruption issues the prose rules miss: malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), and unquoted `: ` in scalar values (silent mapping confusion). The bundled validator ships **inside the skill bundle**; `SKILL_DIR` resolves to the skill directory, but the runtime Bash tool's CWD is the user's project, so a project-relative path (without the `$SKILL_DIR` prefix) would miss. Run it through an existence guard so platforms that cannot locate the script (harnesses where `$SKILL_DIR` is unset) fall back to a manual check instead of silently skipping the protection:
+8. **Validate parser-safety and the knowledge-promotion exit contract** after every new or materially rewritten learning. Promotion mode catches malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), unquoted `: ` in scalar values (silent mapping confusion), and mechanically requires a non-empty top-level `source_refs` array plus a non-empty top-level `invalidation_condition`. The bundled validator ships **inside the skill bundle**; `SKILL_DIR` resolves to the skill directory, but the runtime Bash tool's CWD is the user's project, so a project-relative path (without the `$SKILL_DIR` prefix) would miss. Run it through an existence guard so platforms that cannot locate the script (harnesses where `$SKILL_DIR` is unset) fall back to the same manual gate instead of silently skipping the protection:
 
    ```bash
    if [ -n "${SKILL_DIR:-}" ] && [ -f "$SKILL_DIR/scripts/validate-frontmatter.py" ]; then
-     python3 "$SKILL_DIR/scripts/validate-frontmatter.py" <output-path>
+     python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
    else
-     echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety checklist manually."
+     echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
    fi
    ```
 
-   - **If the script ran:** exit 0 means parser-safe; exit 1 means stderr names the offending field(s) — quote the value(s), re-write the doc, and re-run until exit 0. Do not declare success while validation fails.
-   - **If the script did not run** (else branch): apply the validator's checks by hand, matching its exact scope — checking more broadly risks edits the validator would not require. Fix any violation by quoting the whole value before continuing:
+   - **If the script ran:** exit 0 means the mechanical promotion gate passed; exit 1 means stderr names the offending field(s) — repair the frontmatter and re-run until exit 0. Do not declare success while validation fails.
+   - **If the script did not run** (else branch): apply the same parser-safety and promotion-shape checks by hand. Do not declare success until all four checks pass:
      1. The opening and closing frontmatter delimiters are each a line whose content is `---` (trailing whitespace is fine; `----` or `---extra` is not a valid delimiter).
      2. For each **top-level** mapping entry (`key: value`, no leading indentation) whose value is **not already quoted or structured** (does not start with `"`, `'`, `[`, `{`, `|`, or `>`): the value must contain no unquoted ` #` (space-then-hash — YAML treats it as a comment and silently truncates) and no unquoted `: ` (colon-then-space — strict YAML may read it as a nested mapping). Quote the whole value if either appears.
-     Nested values, array items, and already-quoted values are out of scope here (array-item quoting is handled by the schema/YAML-safety step above). Then state in the completion output that the bundled script validator was unavailable on this platform and the checks were applied manually.
+     3. `source_refs` appears exactly once as a top-level non-empty block or flow array, and every item is a non-empty string. Plain tokens that common YAML parsers type as null, boolean, number, sexagesimal, date, or timestamp do not count as strings; quote them.
+     4. `invalidation_condition` appears exactly once as a top-level non-empty scalar or block string, with the same implicit-type quoting rule for plain scalar values.
+     Nested parser-safety values, semantic source credibility, and semantic invalidation adequacy remain outside this mechanical fallback. Then state in the completion output that the bundled script validator was unavailable on this platform and the checks were applied manually.
 
-   The validator does not enforce schema rules and does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps).
+   Default validator mode remains parser-safety-only for legacy compatibility. `--promotion` adds only the two promotion exit shapes; it does not judge reference credibility, invalidation adequacy, other schema fields, or enum values. It also does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps).
 
 When creating a new doc, preserve the section order from `assets/resolution-template.md` unless the user explicitly asks for a different structure.
 
@@ -518,12 +520,20 @@ The orchestrator (main conversation) performs ALL of the following in one sequen
 1. **Extract from conversation**: Identify the problem and solution from conversation history. Also scan the "user's auto-memory" block injected into your system prompt, if present (Claude Code only) -- use any relevant notes as supplementary context alongside conversation history. Tag any memory-sourced content incorporated into the final doc with "(auto memory [claude])". Before asserting how code behaves (enum values, status semantics, limits, defaults), Read the defining line at the current tree — soften or attribute any claim you cannot verify. Cite PR numbers over bare commit SHAs, and phrase unmerged fixes as pending
 2. **Classify**: Read `references/schema.yaml` and `references/yaml-schema.md`, then determine track (bug vs knowledge), category, and filename
 3. **Write minimal doc**: Create `docs/solutions/[category]/[filename].md` using the appropriate track template from `assets/resolution-template.md`, with:
-   - YAML frontmatter with track-appropriate fields, applying the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules)
+   - YAML frontmatter with track-appropriate fields, a grounded non-empty `source_refs` array, and a concrete non-empty `invalidation_condition`, applying the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules)
    - Bug track: Problem, root cause, solution with key code snippets, one prevention tip
    - Knowledge track: Context, guidance with key examples, one applicability note
 4. **Vocabulary capture (update-only)**: if `CONCEPTS.md` exists at repo root, read `references/concepts-vocabulary.md`, then scan the new doc and the conversation for qualifying terms and add/refine entries silently (same criteria as Phase 2.4). Do **not** bootstrap or seed in lightweight mode — if `CONCEPTS.md` does not exist, defer creation to a Full run, which owns seeding. Record the outcome in the output (e.g., "Vocabulary: 1 entry refined" or "scanned, no qualifying terms"). If you refined `CONCEPTS.md` and a quick read of `AGENTS.md`/`CLAUDE.md` shows it isn't surfaced there, add the discoverability tip to the output below — lightweight **tips**, it does not edit instruction files (a Full run owns that edit).
-5. **Mechanical claims check**: run `scripts/validate-doc-claims.py` against the written doc exactly as in Phase 2.45 step 1 (same `SKILL_DIR` anchor, same adjudicate-not-auto-fix rule — read `references/grounding-validation.md` for the adjudication table when it flags anything). Lightweight skips only the semantic validator subagent, not this deterministic check.
-6. **Skip specialized agent reviews** (Phase 3) and the semantic grounding validator (Phase 2.45 step 2) to conserve context
+5. **Promotion gate**: run the same mechanical promotion validation as Phase 2 step 8. If the script is unavailable, apply that step's four-item manual checklist; do not silently skip or declare completion with either field absent:
+   ```bash
+   if [ -n "${SKILL_DIR:-}" ] && [ -f "$SKILL_DIR/scripts/validate-frontmatter.py" ]; then
+     python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
+   else
+     echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
+   fi
+   ```
+6. **Mechanical claims check**: run `scripts/validate-doc-claims.py` against the written doc exactly as in Phase 2.45 step 1 (same `SKILL_DIR` anchor, same adjudicate-not-auto-fix rule — read `references/grounding-validation.md` for the adjudication table when it flags anything). Lightweight skips only the semantic validator subagent, not this deterministic check.
+7. **Skip specialized agent reviews** (Phase 3) and the semantic grounding validator (Phase 2.45 step 2) to conserve context
 
 **Lightweight output:**
 ```

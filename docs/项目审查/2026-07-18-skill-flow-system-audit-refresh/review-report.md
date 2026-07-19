@@ -5,7 +5,8 @@ review_date: 2026-07-18
 origin_plan: docs/plans/2026-07-17-002-docs-system-project-audit-validation-approach-plan.md
 baseline_audit: docs/项目审查/2026-07-17-skill-flow-system-audit/review-report.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-working_tree_calibrated_at: 2026-07-19
+current_head_at_calibration: 3e07fb20cd790eeabe10e409170f202ae195e78b
+working_tree_calibrated_at: 2026-07-20
 working_tree_overlay: uncommitted-source-repair
 limitations:
   - 当前批次是基于 2026-07-17 全量 source audit 的增量刷新；未变 source 继承其逐行证据。
@@ -17,25 +18,26 @@ limitations:
 
 ## 1. 结论
 
-当前 working-tree source 没有 P0，仍有 5 个 P1。六项原 P1 已关闭：
+当前 working-tree source 没有 P0，仍有 4 个 P1。七项原 P1 已关闭：
 
 - **SF-01 已关闭：** `spec-commit` 与 `spec-commit-push-pr` 已作为 internal-only package 进入现有 delivery allowlist，五宿主 projection plan 与临时 sandbox `init` 均包含 caller 所需 package references；两 helper 的 invocation 不授予 commit/landing authority，LFG 由明确 entry admission 建立并传递可见 authority facts。
+- **SF-02 已关闭：** `spec-compound` 与 `spec-compound-refresh` 现在共享 `source_refs` / `invalidation_condition` promotion schema、模板、指南和字节一致 validator；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 都运行 `--promotion`，缺失、空值、错误类型或重复字段会确定性失败，默认 parser-safety 模式继续兼容 untouched legacy learning。
 - **SF-05 已关闭：** code-review 的 `autofix_class` 仅分类 follow-up，不再授予 apply 权限；run-local `mutation_policy` 是唯一 mutation authority。
 - **SF-07 已关闭：** dogfood/polish 已将 branch mutation、local fix、commit、landing 四类 authority 分离，scope 参数与 `done` 都不再隐式授权副作用。
 - **SF-08 已关闭：** `spec-brainstorm` 已以治理名 `spec-lfg` 作为 autonomous handoff，并要求以宿主 available-skills 中的精确名调用、透传绝对 artifact path。
 - **SF-09 已关闭：** `spec-lfg` 明确区分 `browser_applicability: applicable | not_applicable`；适用时由 caller 提供 exact loopback origin，非适用时保留 reason，失败/not-run/not-supported/cleanup 异常都阻断 shipping。
 - **SF-27 已关闭：** 12 个原缺口 package 已补齐 package-local dispatch authorization/capability/fallback，原 6 个合格 package 继续满足基线，聚焦矩阵覆盖 18/18。
 
-这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 收窄后的两个 load-bearing caller edge：`spec-lfg -> spec-commit-push-pr`、commit-authorized `spec-dogfood -> spec-commit`。`spec-work` 只在条件式 residual/landing 说明中引用这两个名称，Phase 4 的实际 contract 是“repo commit workflow / requested landing workflow”，不构成必须解析到 exact helper 的直接 caller edge。其余 3 个 internal-only record 继续保持 governance-only，不因本次修复被顺带交付。config、task-pack review、knowledge promotion、maintainability shared spine 与 artifact map 漂移仍会让错误 contract 进入正常用户路径。
+这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 收窄后的两个 load-bearing caller edge：`spec-lfg -> spec-commit-push-pr`、commit-authorized `spec-dogfood -> spec-commit`。`spec-work` 只在条件式 residual/landing 说明中引用这两个名称，Phase 4 的实际 contract 是“repo commit workflow / requested landing workflow”，不构成必须解析到 exact helper 的直接 caller edge。其余 3 个 internal-only record 继续保持 governance-only，不因本次修复被顺带交付。SF-02 以最小 promotion exit contract 关闭，未新增知识 registry、数据库或状态机；config、task-pack review、maintainability shared spine 与 artifact map 漂移仍会让错误 contract 进入正常用户路径。
 
-本次在既有校准基础上关闭 SF-01、SF-05、SF-07、SF-27，将 P1 从 9 降到 5。SF-01 的关闭只确认 source/projection contract 与临时 sandbox 五宿主 `init`，不升级为真实 host loader/invocation outcome；SF-06 继续只把公共 suppress 规则与明确的 1000 行阈值认定为已证实冲突；SF-10 继续由 current producer contract 反证用户地图。`source_head` 保持修复前 HEAD，以上关闭结论来自未提交 working-tree source 与实际执行的 focused contracts。
+此前校准已关闭 SF-01、SF-05、SF-07、SF-27，将 P1 从 9 降到 5；本轮关闭 SF-02，进一步降到 4。SF-01 的关闭只确认 source/projection contract 与临时 sandbox 五宿主 `init`，不升级为真实 host loader/invocation outcome；SF-02 的关闭只确认 promotion 字段形态、workflow gate、legacy 兼容和双 package parity，不把非空字段冒充可信 provenance 或充分 invalidation；SF-06 继续只把公共 suppress 规则与明确的 1000 行阈值认定为已证实冲突；SF-10 继续由 current producer contract 反证用户地图。`source_head` 保持原始冻结快照，SF-02 关闭结论来自 `current_head_at_calibration` 之上的未提交 working-tree source 与实际执行的 focused contracts。
 
 ### 1.1 逐项校准清单
 
 | Finding | 校准裁决 | 关键边界 |
 | --- | --- | --- |
 | SF-01 | **已关闭** | LFG/dogfood 的两个 load-bearing helper 已五宿主投射且保持 internal-only；spec-work 仍只是条件式命名参考 |
-| SF-02 | **成立** | knowledge prose gate 要求 `source_refs` / `invalidation_condition`，schema/template 未承载 |
+| SF-02 | **已关闭** | schema/template/guide/validator 同步；Full、Lightweight、Refresh Replace/Consolidate 共用 `--promotion`，legacy 默认模式不受影响 |
 | SF-03 | **成立** | plan/brainstorm consumer 实际读取 active output key，setup/template/test 仍标 reserved |
 | SF-04 | **成立** | write-tasks 要求高风险 task pack 进入 doc-review，target 无 task-pack intake/lens/terminal owner |
 | SF-05 | **已关闭** | `autofix_class` 仅分类；唯一 apply authority 是 run-local `mutation_policy` |
@@ -49,17 +51,6 @@ limitations:
 ## 2. 当前 P1 行动队列
 
 以下 finding 继承原编号；每项均保留 source refs、反证、可观察影响、closure 与 invalidation，便于后续 plan/work 直接消费。
-
-### SF-02 — Knowledge promotion 必填 provenance / invalidation 仍缺失
-
-- **edge/scope：** work/debug/review -> `spec-compound` -> `docs/solutions/**` -> later recall。
-- **claim 与证据：** `skills/spec-compound/references/schema.yaml` 与 resolution template 仍未把 `source_refs`、`invalidation_condition` 作为新 promotion 的 required gate；这与角色契约的 durable knowledge 要求不一致。
-- **counter-evidence：** `solved/verified`、grounding 与 refresh 路径仍在。
-- **user impact：** 后续 workflow 可能召回无法回源、无法失效的 learning。
-- **root cause / posture：** producer/schema 与 promotion exit 没有同一最小 contract；**Repair** existing schema/template/negative tests。
-- **closure：** 缺任一字段的新 promotion 不得完成；refresh replacement 复用同一 contract。
-- **invalidation：** owner 批准等价且可验证的 provenance/freshness contract。
-- **status：** OPEN；origin：本 plan。
 
 ### SF-03 — Runtime setup 仍将 active rendering consumers 标为 reserved
 
@@ -110,6 +101,7 @@ limitations:
 | Finding | 当前证据 | 反证检查 | 裁决 |
 | --- | --- | --- | --- |
 | SF-01 | `DELIVERED_INTERNAL_SKILLS` 包含 `spec-commit`、`spec-commit-push-pr`；projection plan 与临时 sandbox 五宿主 `init` 覆盖完整 package references；source frontmatter 维持 `user-invocable:false`，授权文本明确 invocation/tests/tool permission 不授予 commit/landing；LFG step 8 传递 entry-derived commit/landing facts并声明 `mode:pipeline` 不授权 | Cursor 会过滤不支持的 `user-invocable` 字段，因此 Cursor 只验证 internal description、governance/public-route 隐藏与 package 投射；未做真实 host loader/invocation | RESOLVED（source + focused contracts + sandbox init；claim ceiling=`projection_confirmed`） |
+| SF-02 | 两套 schema/template/YAML guide/validator 保持 byte parity；Knowledge Harness consumer 与当前 deterministic floor 对齐；`--promotion` 要求非空顶层 `source_refs` array 与 `invalidation_condition` string；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 均调用同一 gate，Consolidate 的 destructive delete 明确后置；focused tests 覆盖四类共享 source parity、完整正例、缺失、空值、转义空白、常见 YAML parser 隐式非字符串 scalar、错误类型、普通及 YAML-equivalent 重复键、flow/block array 与 legacy default mode | validator 不检查引用是否真实可信，也不判断失效条件是否语义充分；未执行 fresh-session host load 或真实 compound field run | RESOLVED（source + 43-test focused contract；claim ceiling=`source-contract-confirmed`） |
 | SF-05 | `action-class-rubric.md` 明确 classification is not permission，ordinary/default=`report-only`、explicit review-and-fix=`apply-fixes`、`mode:agent`=report-only；`mutation-authority-contracts` 通过 | `autofix_class` 仍保留优先级/风险信号，但没有任何 apply authority | RESOLVED（source + focused contract；未做 host behavior eval） |
 | SF-07 | dogfood/polish 均解析 branch/local-fix/commit/landing 四类 authority；branch/PR target 只选 scope，`done` 不授权 commit；无授权时保留 verified uncommitted changes | Dogfood 的 authorized checkpoint 仍委托 `spec-commit`，但该 target 已由 SF-01 投射；真实 checkout/host run 未执行 | RESOLVED（source + focused contract；未做真实 checkout/host run） |
 | SF-08 | `spec-brainstorm/references/handoff.md` 使用 `spec-lfg`，要求 exact available-skills resolution 与绝对 payload；`spec-brainstorm-clarification-contracts` 通过 | governance 的 canonical target 仍为 `spec-lfg`，无 `lfg` alias 依赖 | RESOLVED（source + focused contract；host menu invocation 未验证） |
@@ -125,12 +117,12 @@ limitations:
 
 ## 5. 最高杠杆两项
 
-1. **校准 producer/consumer contract（SF-02、SF-03、SF-04、SF-10）**：先恢复最小 required field、active config、task-pack intake、artifact-map consistency，不新增 registry、database 或 state machine。
+1. **校准 producer/consumer contract（SF-03、SF-04、SF-10）**：继续恢复 active config、task-pack intake、artifact-map consistency，不新增重复 key、registry、database 或 state machine。
 2. **修复 maintainability 机械阈值 precedence（SF-06）**：让 persona-defined 1000 行机械阈值优先于 generic style suppress，并以 planted cases 保留主观长文件意见的 suppress。
 
 ## 6. 不做什么
 
 - 不把 165 个 skill-name text pairs 当成 165 个 runtime invocation。
 - 不把本次 lint、typecheck 或 focused test 当成 host loader、browser field outcome、CI/merge/release 证据。
-- 不把 working-tree source/focused tests 冒充已提交 HEAD、fresh-source reviewer、host-loader 或 field outcome；SF-01 的关闭到 source/projection-contract 与 sandbox init 层，SF-05/SF-07/SF-27 的关闭到 source-contract 层。
+- 不把 working-tree source/focused tests 冒充已提交 HEAD、fresh-source reviewer、host-loader 或 field outcome；SF-01 的关闭到 source/projection-contract 与 sandbox init 层，SF-02/SF-05/SF-07/SF-27 的关闭到 source-contract 层。
 - 不修改 generated runtime mirror，也不从 Graphify/CodeGraph 的导航输出推导 confirmed relationship。

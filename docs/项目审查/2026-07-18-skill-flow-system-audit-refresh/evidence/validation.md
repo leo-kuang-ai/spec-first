@@ -3,7 +3,8 @@ title: Skill 关系审查当前快照验证记录
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-working_tree_calibrated_at: 2026-07-19
+current_head_at_calibration: 3e07fb20cd790eeabe10e409170f202ae195e78b
+working_tree_calibrated_at: 2026-07-20
 working_tree_overlay: uncommitted-source-repair
 ---
 
@@ -13,10 +14,11 @@ working_tree_overlay: uncommitted-source-repair
 
 | Fact | Result |
 | --- | --- |
-| Git HEAD | `0c1b358605c534db50321a5252e5e6d356dbcefb` |
+| Original audit source HEAD | `0c1b358605c534db50321a5252e5e6d356dbcefb` |
+| SF-02 calibration HEAD | `3e07fb20cd790eeabe10e409170f202ae195e78b` |
 | Branch | `leo-2026-07-16-plan-update` |
 | Dirty state before audit artifact write | clean |
-| Current authority-repair overlay | uncommitted working tree; `source_head` 不包含本轮修复 |
+| Current SF-02 repair overlay | uncommitted working tree; `current_head_at_calibration` 不包含本轮修复 |
 | Package version | `1.13.2` |
 | Baseline HEAD | `7cb9721f0a9e4f0e0dc265c7194ab80e678b3c64` |
 | Delta to baseline | 4 commits; 30 changed canonical Skill sources, including 3 new references |
@@ -51,7 +53,9 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | mutation/dispatch authority focused replay | pass, 14 suites / 77 tests | SF-05/SF-07/SF-27、18-package matrix、reference-level fallback 与关联合同 |
 | SF-01 final focused replay | pass, 9 suites / 65 tests | caller contract、LFG authority handoff、public-route hiding、helper authority、catalog/doctor inventory 与 five-host sandbox init |
 | SF-01 negative-delivery replay | pass, 2 suites / 25 tests | 两个 load-bearing helper delivered；其余 3 个 governance-only record 在 plan 与真实 sandbox init 中均未投射 |
-| `npm run test:unit` after authority/internal-delivery repair | pass, 123 suites / 1222 tests | complete unit regression; active replay manifest pins refreshed with explicit no-fresh-source note |
+| SF-02 promotion contract replay | pass, 2 suites / 43 tests | schema/template/guide/validator byte parity；Knowledge Harness consumer consistency；Full、Lightweight、Refresh Replace/Consolidate gate 与 destructive deletion ordering；完整正例、缺失/空值/转义空白/非字符串 scalar/错误类型/普通及 YAML-equivalent 重复键负例；binary/date/YAML 1.1 implicit-type false-pass 防护；legacy default compatibility 与 UTF-8 locale |
+| SF-02 inline adversarial diff scan | pass, no remaining actionable finding | 检查 promotion bypass、false-pass input、legacy regression、package parity、mechanical/semantic ownership 与 generated-runtime boundary；先发现并修复 Consolidate delete ordering、YAML-equivalent duplicate key 和 common-parser implicit scalar 三类缺口。`dispatch_authorization_missing`，independent persona、validator 与 cross-model review 均未运行 |
+| `npm run test:unit` after SF-02 adversarial repair | pass, 124 suites / 1263 tests | complete unit regression；包含 promotion gate 新增负例、现有 active replay manifest 与全仓 unit contracts |
 | `npm run test:smoke` | pass, 1 suite / 5 tests | CLI help、preview、global profile 与 packed five-host runtime |
 | `npm run test:integration` | pass, 6 suites / 21 tests；1 conditional suite / 2 tests skipped | five-host init、workspace graph、Qoder lifecycle 与 plan closeout integration |
 | `npm run test:eval-fixtures` | pass, 6 suites / 78 tests | current eval/replay fixture contracts |
@@ -71,6 +75,7 @@ No generic subagent dispatch was authorized. All rows are current-source inline 
 | autonomous brainstorm handoff | route `spec-lfg`; forbid bare `lfg` | exact skill resolution and absolute plan payload specified | current source + focused contracts |
 | LFG browser applicability | backend/docs can be `not_applicable`; UI requires explicit loopback origin | statuses/reasons and caller-owned server defined; effect gate blocks sensitive flow | current source + focused contracts |
 | work semantic plan review | byte-preserving JSON envelope; forbid plan mutation by reviewer | before/after hash, `mutation:report-only`, invalid/P0/P1 block rules specified | current source + focused contracts |
+| knowledge promotion | new/materially rewritten learning requires recoverable provenance and invalidation; forbid legacy bulk breakage or refresh successor/consolidation bypass | both packages share promotion fields and validator; Full/Lightweight/Replace/Consolidate material writes use `--promotion`; default mode remains parser-safety-only | working-tree source + focused contracts；SF-02 closed at `source-contract-confirmed` |
 | task-pack review | unique pack intake; forbid treating pack as generic plan | target still lacks task-pack type/lens | current source drift |
 | config consumer | active plan/brainstorm output config; forbid calling it reserved | consumer reads active key while setup/template/test call it reserved | current source drift |
 | internal helper delivery | direct caller edge must resolve or carry an equivalent fallback；forbid treating every name mention or mode token as invocation/landing authority | LFG commit-push-pr 与 commit-authorized dogfood commit target 已作为 internal-only package 五宿主投射；LFG 传递 entry-derived commit/landing facts并声明 `mode:pipeline` 不授权；spec-work 仍只有 conditional named references | working-tree source + focused projection contracts；SF-01 closed at `projection_confirmed` |
@@ -85,5 +90,6 @@ No generic subagent dispatch was authorized. All rows are current-source inline 
 - `spec-commit`、`spec-commit-push-pr`、`spec-test-browser` 与 `spec-worktree` 现在作为 internal assets 投射；这不证明真实 host loader/invocation，也不把 `spec-proof`、`spec-test-xcode`、`spec-resolve-pr-feedback` 从 governance-only 提升为 delivered。
 - CodeGraph was used only to orient source/test locations. Its output is provider-untrusted and does not support relation or completion claims.
 - No clean-session host loader/helper invocation test, fresh-source semantic dispatch, real `agent-browser` navigation, external provider call, CI/merge/release, or field outcome was run.
+- SF-02 tests prove field shape and workflow invocation only. They do not prove that a listed source is credible/reachable or that an invalidation condition is semantically sufficient; those remain LLM/human judgments.
 - Generated `.agents/skills/`, `.claude/`, `.codex/`, `.cursor/`, `.kiro/`, and `.qoder/` mirrors were not read as audit source and were not modified.
-- The original audit artifact remains a knowledge-work deliverable; the 2026-07-19 overlay is an authorized local source repair. It does not authorize plan lifecycle mutation, commit, push, or PR, and it remains uncommitted.
+- The original audit artifact remains a knowledge-work deliverable; the 2026-07-20 SF-02 overlay is an authorized local source repair. It does not authorize plan lifecycle mutation, commit, push, or PR, and it remains uncommitted.

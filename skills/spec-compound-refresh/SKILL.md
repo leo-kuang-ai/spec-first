@@ -183,7 +183,7 @@ Match investigation depth to the learning's specificity — a learning referenci
 The critical distinction is whether the drift is **cosmetic** (references moved but the solution is the same) or **substantive** (the solution itself changed):
 
 - **Update territory** — file paths moved, classes renamed, links broke, metadata drifted, but the core recommended approach is still how the code works. `spec-compound-refresh` fixes these directly.
-- **Replace territory** — the recommended solution conflicts with current code, the architectural approach changed, or the pattern is no longer the preferred way. This means a new learning needs to be written. An authorized replacement subagent may draft the successor following `spec-compound`'s document format, using the investigation evidence already gathered, but it never writes the tracked successor. Without authorized dispatch, the orchestrator composes the replacement inline or serially. In every path the orchestrator is the sole tracked-file writer.
+- **Replace territory** — the recommended solution conflicts with current code, the architectural approach changed, or the pattern is no longer the preferred way. This means a new learning needs to be written. An authorized replacement subagent may draft the successor following `spec-compound`'s document format, using the investigation evidence already gathered, but it never writes the tracked successor. Without authorized dispatch, the orchestrator composes the replacement inline or serially. In every path the orchestrator is the sole tracked-file writer, and the successor must pass the same `source_refs` / `invalidation_condition` promotion gate as a new `spec-compound` learning.
 
 **The boundary:** if you find yourself rewriting the solution section or changing what the learning recommends, stop — that is Replace, not Update.
 
@@ -499,8 +499,8 @@ For each candidate, execute the flow that matches its classification from Phase 
 
 - **Keep** — no file edit by default; summarize why the learning remains trustworthy.
 - **Update** — in-place edits when the solution is still substantively correct (path renames, link refreshes, module renames).
-- **Consolidate** — merge overlapping docs into a canonical doc, delete subsumed docs, update cross-references. The orchestrator handles consolidation directly.
-- **Replace** — obtain a successor draft through an authorized subagent or inline/serial fallback, then let the orchestrator write the tracked successor, validate frontmatter and cited claims, and delete the old. When evidence is insufficient, mark stale instead.
+- **Consolidate** — merge overlapping docs into a canonical doc, apply the same promotion exit to the materially rewritten canonical doc (and every new split successor), then update cross-references and delete subsumed docs. The orchestrator handles consolidation directly.
+- **Replace** — obtain a successor draft through an authorized subagent or inline/serial fallback, then let the orchestrator write the tracked successor, validate parser safety plus the `source_refs` / `invalidation_condition` promotion exit, validate cited claims, and only then delete the old. When evidence is insufficient, mark stale instead.
 - **Delete** — final inbound-link check, then remove. Reclassify if late-discovered substantive citations surface.
 
 Only one flow runs per candidate; the reference contains the per-action criteria, examples, and step-by-step instructions.

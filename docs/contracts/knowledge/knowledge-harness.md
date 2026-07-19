@@ -51,22 +51,22 @@ Context budget accounting 复用 `context-bundle.v1`：included 语义映射到 
 
 这条边界复用 `provider_untrusted` advisory 语义，不新建第二套 evidence enum。回源过程不依赖模型自评；LLM 可以判断要读哪些源、比较是否仍适用，但 confirmed 依据必须来自 source/test/doc、验证命令、review finding 或人工确认。
 
-现有缺少新结构化字段的 solution 是 `legacy_unstructured_advisory`：可以被 recall，但不能因存在于 durable store 就被视为 verified structured knowledge。最小回填 `domain`、`pattern`、`invalidation_condition` 和 `source_refs` 后，才可按新结构化 recall 规则消费。
+现有缺少 promotion exit 字段的 solution 是 `legacy_unstructured_advisory`：可以被 recall，但不能因存在于 durable store 就被视为 verified structured knowledge。只有在文档被 materially rewritten 或 replacement 时，才最小回填非空 `invalidation_condition` 和 `source_refs` 并重新通过 promotion gate；untouched legacy learning 不做批量迁移。
 
 ## Promotion Boundary
 
-新的 `docs/solutions/**` promote 必须走 `skills/spec-compound/references/schema.yaml`，并满足 new promote required 字段：`invalidation_condition` 和 `source_refs`。`source_refs` 是 recall 回源抓手，`invalidation_condition` 是失效边界；`domain`、`pattern`、`rejected_alternatives`、`applicable_versions` 用于提高 grep / summary-first recall 的质量。
+新的或 materially rewritten `docs/solutions/**` learning 必须走 `skills/spec-compound/references/schema.yaml` 的 `promotion_required_fields`：`source_refs` 是 recall 回源抓手，`invalidation_condition` 是失效边界。`spec-compound` Full、Lightweight 与 `spec-compound-refresh` Replace / Consolidate material rewrite 均消费同一合同。
 
 Promotion gate 的最小机制是 candidate -> review -> promote。只有 verified learning 进入 durable store；未验证的 session notes、raw tool output、raw diff hunks 或未确认 recall 不写入 `docs/solutions/**`。
 
-此 gate 是 prose / LLM-enforced 边界，不是 machine-validated 硬约束：`validate-frontmatter.py` 等确定性脚本只做 YAML parser-safety 检查，不校验 `new_promote_required_fields` 是否存在。`new_promote_required_fields`(`invalidation_condition` + `source_refs`)由 `spec-compound` / `spec-compound-refresh` 的 promote 路径在 review 时按 prose 规则执行；consumer 不应假设缺字段的新 promote 会被脚本自动拒绝。
+此 gate 分成确定性地板与语义判断两层：producer 必须运行 `validate-frontmatter.py --promotion <doc-path>`；脚本除 parser safety 外，只机械检查字段存在、顶层类型形态、非空与重复键，缺任一字段时拒绝 promotion。引用是否可信、是否足以回源，以及失效条件是否语义充分，仍由 LLM / human 判断。默认 validator 模式继续只做 parser safety，避免 untouched legacy learning 被迫批量迁移。
 
 ## Open Questions / Resolved
 
 - OQ-1 summary-first expand-on-trigger：使用语义触发而不是行数阈值。summary 缺少下游所需的 requirement/task/finding/evidence detail、reviewer 需要精确 prose/line reference、或互依赖任务需要具体实现细节时，consumer 展开 full artifact 并记录 `full_artifact_read_reason`。
 - OQ-2 file-first 转 hybrid 信号：v1.15 不实现 hybrid。当前规模远低于需要索引平台的量级；当 grep 召回精度持续下降、单关键词命中过多需多轮过滤，或语义近但用词不同的 recall miss 反复发生时，再评估 hybrid。不得声称 embeddings 已过时。
 - OQ-3 recall 回源操作化：recall 命中标 advisory candidate，consumer 使用 `source_refs` / `source_reads_required` 回源到权威 source/test/doc 或人工 reviewer，不依赖模型自评。
-- OQ-4 promotion gate 最小机制：结构化 frontmatter + verified gate。`invalidation_condition` 和 `source_refs` 对新 promote 必填(prose / LLM-enforced，非 machine-validated)；不引入额外可选 frontmatter 字段、签名、沙箱或第二套 validator。
+- OQ-4 promotion gate 最小机制：结构化 frontmatter + verified gate。`invalidation_condition` 和 `source_refs` 对新写入、material rewrite 与 replacement successor 必填；现有 validator 的 `--promotion` 模式负责机械负向 gate，LLM / human 负责 provenance 与 invalidation 的语义充分性。不引入额外可选 frontmatter 字段、签名、沙箱或第二套 validator。
 
 ## Package Delivery
 

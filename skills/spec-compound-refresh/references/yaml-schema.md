@@ -26,6 +26,15 @@ The `problem_type` determines which **track** applies. Each track has different 
 - **component**: One of `rails_model`, `rails_controller`, `rails_view`, `service_object`, `background_job`, `database`, `frontend_stimulus`, `hotwire_turbo`, `email_processing`, `brief_system`, `assistant`, `authentication`, `payments`, `development_workflow`, `testing_framework`, `documentation`, `tooling`
 - **severity**: One of `critical`, `high`, `medium`, `low`
 
+## Promotion Exit Fields
+
+Every **new or materially rewritten learning**, in either track, must include:
+
+- **source_refs**: A non-empty array of verifiable references that lets a later reader recover the evidence behind the learning. Prefer repo-relative source/test/doc paths, issue or PR identifiers, and other stable evidence references. Mechanical validation checks only that this is a non-empty array of non-empty strings; the author must judge whether the references are trustworthy and sufficient.
+- **invalidation_condition**: A non-empty scalar or block string naming the concrete condition that requires the learning to be re-checked, revised, or retired. Mechanical validation checks only that content exists; the author must judge semantic adequacy.
+
+Run `scripts/validate-frontmatter.py --promotion <doc-path>` after writing a new learning, materially rewriting an existing learning, or writing a replacement successor. Default validator mode remains parser-safety-only so untouched legacy docs are not forced through a bulk migration.
+
 ## Bug Track Fields
 
 Required:
@@ -35,7 +44,7 @@ Required:
 
 ## Knowledge Track Fields
 
-No additional required fields beyond the shared ones. All fields below are optional:
+No additional track-specific required fields beyond the shared fields and the promotion exit fields. All fields below are optional:
 
 - **applies_when**: Conditions or situations where this guidance applies
 - **symptoms**: Observable gaps or friction that prompted this guidance
@@ -57,6 +66,7 @@ Docs created before the track system may have `symptoms`/`root_cause`/`resolutio
 
 - Bug-track fields present on a knowledge-track doc are harmless. Do not strip them during refresh unless the doc is being rewritten for other reasons.
 - When creating **new** docs, follow the track rules above.
+- Untouched legacy docs do not need promotion exit fields. A new learning, material rewrite, or replacement successor does.
 
 ## Category Mapping
 
@@ -83,25 +93,33 @@ Docs created before the track system may have `symptoms`/`root_cause`/`resolutio
 1. Determine the track from `problem_type` using the Tracks table.
 2. All shared required fields must be present.
 3. Bug-track required fields (`symptoms`, `root_cause`, `resolution_type`) must be present on bug-track docs.
-4. Knowledge-track docs have no additional required fields beyond the shared ones.
-5. Bug-track fields on existing knowledge-track docs are harmless (see Backward Compatibility).
-6. Enum fields must match the allowed values exactly.
-7. Array fields must respect min/max item counts.
-8. `date` must match `YYYY-MM-DD`.
-9. `rails_version`, if present, must match `X.Y.Z` and only applies to bug-track docs.
+4. Knowledge-track docs have no additional track-specific required fields beyond the shared and promotion exit fields.
+5. New or materially rewritten learnings in either track must include non-empty `source_refs` and `invalidation_condition` promotion exit fields.
+6. Bug-track fields on existing knowledge-track docs are harmless (see Backward Compatibility).
+7. Enum fields must match the allowed values exactly.
+8. Array fields must respect min/max item counts.
+9. `date` must match `YYYY-MM-DD`.
+10. `rails_version`, if present, must match `X.Y.Z` and only applies to bug-track docs.
 
 ## YAML Safety Rules
 
 Strict YAML 1.2 parsers (`yq`, `js-yaml` strict, PyYAML) reject array items
 that start with a reserved indicator character as unquoted scalars. When
-writing items for any array-of-strings field (`symptoms`, `applies_when`,
-`tags`, `related_components`, or any future array field), wrap the value in
+writing items for any array-of-strings field (`source_refs`, `symptoms`,
+`applies_when`, `tags`, `related_components`, or any future array field), wrap the value in
 double quotes if it starts with any of:
 
 `` ` ``, `[`, `*`, `&`, `!`, `|`, `>`, `%`, `@`, `?`
 
 Also quote if the value contains the substring `": "` — that punctuation
 confuses flow-style parsers.
+
+Promotion exit strings must also be quoted when a common YAML parser could
+implicitly type the plain token as a non-string value. This includes nulls,
+booleans (`true`/`false` and the YAML 1.1 forms `yes`/`no`/`on`/`off`), numeric
+literals such as `0b1010` or `0x10`, sexagesimal values such as `1:20`, and
+date/timestamp values such as `2026-07-20`. Quoting preserves the required
+`array[string]` / `string` shape across `js-yaml` and PyYAML consumers.
 
 Example — before (breaks strict YAML):
 
