@@ -22,11 +22,11 @@
 | Bundled source agents | 0 |
 | Bundled agent support files | 0 |
 | Governance records by entry surface | internal_only: 7, standalone_skill: 11, workflow_command: 17 |
-| Claude runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Qoder runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Claude runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 17 workflow skills, 11 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 17 commands, 17 workflow skills, 11 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | Beta workflow entries | none |
@@ -91,8 +91,8 @@ Most `internal_only` governance records are source governance entries and are no
 
 | Category | Skills |
 |---|---|
-| Delivered agent-facing internal skills | spec-commit, spec-commit-push-pr, spec-test-browser, spec-worktree |
-| Governance-only internal records | spec-proof, spec-resolve-pr-feedback, spec-test-xcode |
+| Delivered agent-facing internal skills | spec-commit, spec-commit-push-pr, spec-proof, spec-test-browser, spec-worktree |
+| Governance-only internal records | spec-resolve-pr-feedback, spec-test-xcode |
 
 ## Runtime Paths
 

@@ -57,7 +57,9 @@
 2. `standalone_skill`
    - 该 skill 不在 manifest `commands` 中，按普通 skill 交付
 3. `internal_only`
-   - 该能力只用于内部编排、support files 或宿主内部消费，不作为用户直接入口
+   - 该能力不进入 `using-spec-first` 的公共 route/menu，只用于内部编排、support files 或宿主内部消费
+   - 是否允许用户显式点名调用由 package source 自己声明：严格内部 helper 使用 `user-invocable: false`；像 `spec-proof` 这类显式点名可用、但不作为公共 workflow route 的 helper，可以保持可调用
+   - 显式点名能力不把 `internal_only` 提升为 `standalone_skill`，也不授予该 helper 的 mutation、external-access、commit 或 landing authority
 
 ### 2.2 `host_scope`
 

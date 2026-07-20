@@ -14,6 +14,7 @@ const AGENTLESS_PLATFORM_IDS = new Set(['cursor']);
 const DELIVERED_INTERNAL_SKILLS = new Set([
   'spec-commit',
   'spec-commit-push-pr',
+  'spec-proof',
   'spec-test-browser',
   'spec-worktree',
 ]);

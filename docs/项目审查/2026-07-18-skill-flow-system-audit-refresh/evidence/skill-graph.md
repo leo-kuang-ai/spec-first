@@ -3,9 +3,9 @@ title: Skill 关系图当前快照
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: f640b19a05323f14ca4f89acfbcf999997f67fcb
+current_head_at_calibration: e395f10f92cb6e55875da74aa01927a66e53797b
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf-06-maintainability-precedence-repair
+working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-repair
 governed_nodes: 35
 canonical_pairs: 165
 ---
@@ -24,7 +24,7 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 
 ## 2. Internal delivery reality
 
-`src/cli/plugin-governance.js` 的 current allowlist 交付 `spec-commit`、`spec-commit-push-pr`、`spec-test-browser` 与 `spec-worktree`。这是 deterministic projection fact；其余 3 个 internal record 继续保持 governance-only，不因本次 SF-01 修复被顺带交付。
+`src/cli/plugin-governance.js` 的 current allowlist 交付 `spec-commit`、`spec-commit-push-pr`、`spec-proof`、`spec-test-browser` 与 `spec-worktree`。这是 deterministic projection fact；其余 2 个 internal record 继续保持 governance-only，不因本次 SF-01 修复被顺带交付。`internal_only` 表示不进入公共 route/menu；严格内部 helper 另以 `user-invocable:false` 禁止直接调用，`spec-proof` 保留 source 声明的显式点名入口。
 
 | Helper | 当前 projection | caller relationship posture |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 | `spec-commit-push-pr` | delivered | authorized LFG landing caller 可解析；LFG 传递 entry-derived authority facts，helper invocation/`mode:pipeline` 不授予 commit/landing authority |
 | `spec-test-browser` | delivered | `spec-lfg` browser pipeline 已有 structured applicability/origin/cleanup contract |
 | `spec-worktree` | delivered | `spec-dogfood` 的 existing-ref caller 可闭合 |
-| `spec-proof` | governance-only | 分享 path 可 local fallback，但 governed invocation 不可证实 |
+| `spec-proof` | delivered | plan/brainstorm/ideate/explain/pov 的 Proof handoff 可解析；只允许显式点名，不进入 public route |
 | `spec-resolve-pr-feedback` | governance-only | 无 current public caller；package-local dispatch gate 已闭合，delivery/caller posture 不因此改变 |
 | `spec-test-xcode` | governance-only | reverse-only caller 仍是 orphan candidate |
 
@@ -78,4 +78,4 @@ spec-lfg --authorized landing--> spec-commit-push-pr
 spec-dogfood --authorized checkpoint--> spec-commit
 ```
 
-每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate、两个 load-bearing commit helper 的五宿主投射，以及 SF-02 provenance/invalidation、SF-03 local rendering consumer、SF-04 task-pack derived/report-only consumer、source-plan authority、terminal owner 与 SF-10 artifact-map 修复；working-tree SF-06 overlay 只校准 `spec-code-review` 包内 shared template / maintainability persona precedence，并新增 capability fixture/test，不新增 Skill 节点或 pair。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 278/165 与 manifest hash 仍绑定冻结 calibration inventory；本轮不重算关系分母。
+每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate、两个 load-bearing commit helper 的首轮五宿主投射，以及 SF-02 provenance/invalidation、SF-03 local rendering consumer、SF-04 task-pack derived/report-only consumer、source-plan authority、terminal owner、SF-10 artifact-map 与 SF-06 maintainability precedence 修复；working-tree overlay 再补齐 `spec-proof` delivery、code-review pre-gate dispatch 与相应 governance/test/docs 校准，不新增 Skill 节点或 pair。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 278/165 与 manifest hash 仍绑定冻结 calibration inventory；本轮不重算关系分母。

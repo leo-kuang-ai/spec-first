@@ -114,13 +114,17 @@ describe('five-host init lifecycle', () => {
         'spec-test-browser',
         'evals',
       ))).toBe(false);
-      for (const [helperName, relativePaths] of [
-        ['spec-commit', ['SKILL.md']],
+      for (const [helperName, relativePaths, userInvocable, descriptionPattern] of [
+        ['spec-commit', ['SKILL.md'], false, /description:.*Internal/i],
         ['spec-commit-push-pr', [
           'SKILL.md',
           'references/branch-creation.md',
           'references/pr-description-writing.md',
-        ]],
+        ], false, /description:.*Internal/i],
+        ['spec-proof', [
+          'SKILL.md',
+          'references/hitl-review.md',
+        ], true, /remains an internal helper/i],
       ]) {
         for (const relativePath of relativePaths) {
           const helperPath = path.join(
@@ -132,14 +136,14 @@ describe('five-host init lifecycle', () => {
           expect(fs.existsSync(helperPath)).toBe(true);
           if (relativePath === 'SKILL.md') {
             const helperSource = fs.readFileSync(helperPath, 'utf8');
-            expect(helperSource).toMatch(/description:.*Internal/i);
-            if (platform !== 'cursor') {
+            expect(helperSource).toMatch(descriptionPattern);
+            if (userInvocable === false && platform !== 'cursor') {
               expect(helperSource).toMatch(/^user-invocable:\s*false$/m);
             }
           }
         }
       }
-      for (const governanceOnly of ['spec-proof', 'spec-resolve-pr-feedback', 'spec-test-xcode']) {
+      for (const governanceOnly of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
         expect(fs.existsSync(path.join(
           sandbox.projectRoot,
           adapter.skillsRoot,
@@ -317,7 +321,7 @@ describe('five-host init lifecycle', () => {
       if (platform === 'claude') {
         expect(report.checks.find((check) => check.name === '.claude/skills')).toMatchObject({
           level: 'PASS',
-          message: 'found 15 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
+          message: 'found 16 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
         });
       }
       if (platform === 'cursor') {

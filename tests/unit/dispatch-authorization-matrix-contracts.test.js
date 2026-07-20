@@ -129,6 +129,23 @@ describe('generic dispatch authorization matrix', () => {
     expect(new Set(names).size).toBe(18);
   });
 
+  test('code review keeps pre-roster trivial-PR classification inline and behind no hidden dispatch', () => {
+    const source = read('skills/spec-code-review/SKILL.md');
+    const trivialPrSection = source.match(/\*\*Trivial-PR judgment\*\*:[\s\S]*?(?=\n\nWhen any skip rule fires)/);
+    const dispatchGateIndex = source.indexOf('### Stage 1c: Dispatch gate and inline fallback');
+    const profileDispatchIndex = source.indexOf('On `MISS`, dispatch a generic subagent');
+
+    expect(trivialPrSection).not.toBeNull();
+    expect(trivialPrSection[0]).toContain('orchestrator inline');
+    expect(trivialPrSection[0]).toContain('does not dispatch');
+    expect(trivialPrSection[0]).not.toMatch(/spawn a .*sub-agent/i);
+    expect(dispatchGateIndex).toBeGreaterThanOrEqual(0);
+    expect(profileDispatchIndex).toBeGreaterThan(dispatchGateIndex);
+    expect(source.slice(dispatchGateIndex, profileDispatchIndex)).toContain(
+      'enforce the Phase 0 dispatch policy before profile derivation',
+    );
+  });
+
   test('mutating resolver no longer treats invocation or silence as dispatch authority', () => {
     const source = packages
       .find((entry) => entry.name === 'spec-resolve-pr-feedback')

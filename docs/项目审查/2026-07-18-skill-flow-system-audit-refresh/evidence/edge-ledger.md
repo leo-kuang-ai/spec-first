@@ -3,9 +3,9 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: f640b19a05323f14ca4f89acfbcf999997f67fcb
+current_head_at_calibration: e395f10f92cb6e55875da74aa01927a66e53797b
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf-06-maintainability-precedence-repair
+working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-repair
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
@@ -49,7 +49,7 @@ actual_pairs: 165
 | --- | --- | --- | --- |
 | M-008 | `spec-brainstorm -> spec-doc-review` | drift retained (P2) | handoff 仍称 HTML review unavailable，与 doc-review HTML report-only contract 冲突 |
 | M-010 | `spec-brainstorm -> spec-plan` | confirmed | requirements-only path remains the unique product-to-planning carrier |
-| M-012 | `spec-brainstorm -> spec-proof` | drift retained (P2) | runtime delivery/source-file precondition 未由本次变更解决 |
+| M-012 | `spec-brainstorm -> spec-proof` | **confirmed (SF-01 closed)** | target 完整 package 已五宿主投射；caller 传递现有 Markdown source path，真实 host invocation 尚未验证 |
 | M-013 | `spec-brainstorm -> spec-work` | drift retained (P2) | shared renderer 的 direct-work wording 未被本次变更移除 |
 | M-036 | `spec-dogfood -> spec-commit` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；caller 仍须先持有独立 commit authority |
 | M-057 | `spec-lfg -> spec-code-review` | drift retained (P2) | JSON-only report consumption 已修复，但 tracker-defer 仍把 interactive code review 视为 filing owner |
@@ -57,7 +57,7 @@ actual_pairs: 165
 | M-061 | `spec-lfg -> spec-simplify-code` | drift retained (P3) | source 仍泛称 simplify “runs the test suite”，实际 evidence scope 不能由该语句提升 |
 | M-062 | `spec-lfg -> spec-test-browser` | **confirmed (SF-09 closed)** | applicable/not_applicable、exact origin、effect authorization、cleanup/result blockers 已闭合 |
 | M-069 | `spec-plan -> spec-doc-review` | drift retained (P2) | `references/html-rendering.md` 仍称 doc-review non-HTML consumer |
-| M-072 | `spec-plan -> spec-proof` | drift retained (P2) | Proof runtime/source precondition 未解决 |
+| M-072 | `spec-plan -> spec-proof` | **confirmed (SF-01 closed)** | target 完整 package 已五宿主投射；caller 仅在 Markdown output 下传 plan path，真实 host invocation 尚未验证 |
 | M-112 | `spec-test-browser -> spec-lfg` | **confirmed (SF-09 closed)** | reverse caller now consumes structured pipeline contract，helper is delivered internal asset |
 | M-117 | `spec-work -> spec-commit` | INFO / conditional named path；不再作为 SF-01 carrier | residual-sink 说明称“no-PR `spec-commit` path”，但 Phase 4 只要求 separately authorized repo commit workflow；没有 exact-helper invocation 或缺失 target blocker |
 | M-118 | `spec-work -> spec-commit-push-pr` | INFO / conditional named landing reference；不再作为 SF-01 carrier | residual-sink 说明描述“when calling `spec-commit-push-pr`”，但 Phase 4 只要求 requested landing workflow；没有 mandatory exact-helper edge |
@@ -75,11 +75,11 @@ actual_pairs: 165
 | artifact map -> spec-work run artifact | 用户需要知道 closeout evidence 的真实生命周期与读取边界 | map 复述 schema/producer 的 conditional `workflow_integrated`、v2 `direct_evidence_used`、v1 `graph_evidence_used` read/prune compatibility；source-owned reader 仍是唯一确定性 read/prune owner | 不再把 false-only 写成 current contract，不把旧 graph-shaped fields 当 v2 字段，不把 spec-code-review 自动 discovery 当事实；显式 reader 仍需 target repo/workspace/run，artifact 不获得 source scope authority | confirmed at `source/docs-contract-confirmed`, SF-10 closed；未验证真实用户阅读/跨宿主渲染 |
 | runtime setup -> local rendering config -> plan/brainstorm/ideate | setup 暴露并保护三个 active local preferences | 三个 workflow 分别拥有格式解析、默认值与 pipeline override；setup 不调用 workflow | 注释、缺失或无效值保持 consumer 默认，不能被 setup 提升为 runtime authority | confirmed at `source-contract-confirmed`, SF-03 closed；未验证真实 host/local config field run |
 | work/debug/review -> compound | durable knowledge can be reusable | new/materially rewritten learning 必须有 grounded `source_refs` 与 concrete `invalidation_condition`；validator 只强制机械形态，LLM/human 判断语义充分性 | Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 缺任一字段、空值、错误类型或重复字段时不得完成；legacy default mode 保持兼容 | confirmed at `source-contract-confirmed`, SF-02 closed；未验证真实 host field run |
-| public caller -> internal helper | helper reuse can be necessary；直接例为 LFG -> commit-push-pr、commit-authorized dogfood -> commit | 两个 load-bearing target 与 browser/worktree 共 4 个 internal package 已投射；其余 3 个 record 保持 governance-only | caller-target package 在五宿主 projection plan 与 sandbox init 可解析；真实 host loader/invocation 尚未验证 | confirmed at `projection_confirmed`, SF-01 closed；不把 spec-work 的条件式命名参考算作强制 caller edge |
+| public caller -> internal helper | helper reuse can be necessary；直接例为 LFG -> commit-push-pr、commit-authorized dogfood -> commit、plan/brainstorm/ideate/explain/pov -> Proof | 三个 load-bearing target 与 browser/worktree 共 5 个 internal package 已投射；其余 2 个 record 保持 governance-only | 9 条 caller-target edge 在五宿主 projection plan 与 sandbox init 可解析；真实 host loader/invocation 尚未验证 | confirmed at `projection_confirmed`, SF-01 closed；不把 spec-work 的条件式命名参考算作强制 caller edge |
 
 ## 5. Dispatch authority matrix continuity
 
-当前 working-tree matrix 为 18 个 generic-dispatch package、18 个合格、0 个 package-local gap。原 6 个合格 precedent（`spec-code-review`、`spec-debug`、`spec-doc-review`、`spec-plan`、`spec-prd`、`spec-work`）继续保留 explicit authorization + missing-auth/capability fallback；原 12 个缺口 package 已逐包补齐 `worker_dispatch_authorization`、`worker_dispatch_capability`、`dispatch_authorization_missing` / `subagent_capability_missing` 与 inline/serial fallback。`spec-optimize` 的 judge/Codex cascade、`spec-sweep` 的 scheduled/sensitive input、`spec-resolve-pr-feedback` 的 mutating worker、`spec-compound-refresh` 的 tracked successor 等高风险路径均不能再从 workflow invocation、mode、approved spec、permission 或“用户未禁止”推导 dispatch/write authority。该结论由 18-package focused matrix 约束；本次审查自身仍因 `dispatch_authorization_missing` 使用 inline analysis，不声称 independent persona coverage。
+当前 working-tree matrix 为 18 个 generic-dispatch package、18 个合格、0 个 package-local gap。原 6 个合格 precedent（`spec-code-review`、`spec-debug`、`spec-doc-review`、`spec-plan`、`spec-prd`、`spec-work`）继续保留 explicit authorization + missing-auth/capability fallback；原 12 个缺口 package 已逐包补齐 `worker_dispatch_authorization`、`worker_dispatch_capability`、`dispatch_authorization_missing` / `subagent_capability_missing` 与 inline/serial fallback。对抗性首个-dispatch 顺序复核发现 `spec-code-review` 的 trivial-PR pre-check 曾位于 Stage 1c 前且直接要求 subagent；当前已改为 orchestrator inline conservative judgment，并以聚焦合同锁定 repo-profile dispatch 位于 gate 之后。`spec-optimize` 的 judge/Codex cascade、`spec-sweep` 的 scheduled/sensitive input、`spec-resolve-pr-feedback` 的 mutating worker、`spec-compound-refresh` 的 tracked successor 等高风险路径均不能再从 workflow invocation、mode、approved spec、permission 或“用户未禁止”推导 dispatch/write authority。该结论由 18-package focused matrix + current-source inline order audit 约束；本次审查自身仍因 `dispatch_authorization_missing` 使用 inline analysis，不声称 independent persona coverage。
 
 ## 6. Set checks
 
@@ -94,4 +94,4 @@ actual_pairs: 165
 | actual current pairs | 165 |
 | duplicate canonical pairs | 0 |
 
-The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot；`current_head_at_calibration` 已包含 SF-10，但不包含尚未提交的 SF-06 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session maintainability persona behavior、真实 task-pack persona review、用户文档阅读/跨宿主渲染、compound promotion、browser navigation、CI/merge/release 或 field outcome。
+The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot；`current_head_at_calibration` 已包含 SF-06，但不包含尚未提交的最终 SF-01/SF-27 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session maintainability persona behavior、真实 task-pack persona review、用户文档阅读/跨宿主渲染、compound promotion、browser navigation、CI/merge/release 或 field outcome。

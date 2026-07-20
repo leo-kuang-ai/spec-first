@@ -13,6 +13,10 @@ const boundaryPath = path.join(
   repoRoot,
   'skills/using-spec-first/references/conditional-routing-boundaries.md',
 );
+const governanceReadmePath = path.join(
+  repoRoot,
+  'docs/contracts/dual-host-governance/README.md',
+);
 const governancePath = path.join(
   repoRoot,
   'src/cli/contracts/dual-host-governance/skills-governance.json',
@@ -20,6 +24,7 @@ const governancePath = path.join(
 const skill = fs.readFileSync(skillPath, 'utf8');
 const routeMap = fs.readFileSync(routeMapPath, 'utf8');
 const boundary = fs.readFileSync(boundaryPath, 'utf8');
+const governanceReadme = fs.readFileSync(governanceReadmePath, 'utf8');
 const packageText = `${skill}\n${routeMap}\n${boundary}`;
 const governance = JSON.parse(fs.readFileSync(governancePath, 'utf8'));
 const records = Array.isArray(governance) ? governance : governance.skills;
@@ -125,6 +130,17 @@ describe('using-spec-first entry-governor contracts', () => {
       expect(packageText).not.toContain(record.skill_name);
     }
     expect(routeMap).not.toContain('`using-spec-first`');
+  });
+
+  test('separates public routing from explicit-name invocation for internal helpers', () => {
+    const proof = fs.readFileSync(path.join(repoRoot, 'skills/spec-proof/SKILL.md'), 'utf8');
+    const commit = fs.readFileSync(path.join(repoRoot, 'skills/spec-commit/SKILL.md'), 'utf8');
+
+    expect(governanceReadme).toContain('不进入 `using-spec-first` 的公共 route/menu');
+    expect(governanceReadme).toContain('由 package source 自己声明');
+    expect(proof).toContain('Direct user request');
+    expect(proof).not.toMatch(/^user-invocable:\s*false$/m);
+    expect(commit).toMatch(/^user-invocable:\s*false$/m);
   });
 
   test('does not restore legacy host-specific workflow spellings', () => {

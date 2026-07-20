@@ -57,7 +57,8 @@ describe('plugin module facade and governance', () => {
     expect(cursor.internalSkills).toContain('spec-test-browser');
     expect(cursor.internalSkills).toContain('spec-commit');
     expect(cursor.internalSkills).toContain('spec-commit-push-pr');
-    for (const governanceOnly of ['spec-proof', 'spec-resolve-pr-feedback', 'spec-test-xcode']) {
+    expect(cursor.internalSkills).toContain('spec-proof');
+    for (const governanceOnly of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
       expect(cursor.internalSkills).not.toContain(governanceOnly);
     }
     expect(cursor.agents).toEqual([]);
@@ -140,11 +141,13 @@ describe('plugin module facade and governance', () => {
     }
   });
 
-  test('delivers caller-required commit helpers as internal-only packages on every host', () => {
+  test('delivers caller-required internal helpers as recursive packages on every host', () => {
     const helpers = [
       {
         name: 'spec-commit',
         paths: ['SKILL.md'],
+        userInvocable: false,
+        descriptionPattern: /description:.*Internal/i,
       },
       {
         name: 'spec-commit-push-pr',
@@ -153,6 +156,17 @@ describe('plugin module facade and governance', () => {
           'references/branch-creation.md',
           'references/pr-description-writing.md',
         ],
+        userInvocable: false,
+        descriptionPattern: /description:.*Internal/i,
+      },
+      {
+        name: 'spec-proof',
+        paths: [
+          'SKILL.md',
+          'references/hitl-review.md',
+        ],
+        userInvocable: true,
+        descriptionPattern: /remains an internal helper/i,
       },
     ];
 
@@ -162,7 +176,7 @@ describe('plugin module facade and governance', () => {
         const adapter = getAdapter(platform);
         const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
 
-        for (const governanceOnly of ['spec-proof', 'spec-resolve-pr-feedback', 'spec-test-xcode']) {
+        for (const governanceOnly of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
           expect(syncedAssets.internalSkills).not.toContain(governanceOnly);
         }
 
@@ -177,12 +191,47 @@ describe('plugin module facade and governance', () => {
             expect(operation).toBeDefined();
             if (relativePath === 'SKILL.md') {
               expect(operation.contents).toMatch(new RegExp(`^name: ${helper.name}$`, 'm'));
-              expect(operation.contents).toMatch(/description:.*Internal/i);
-              if (platform !== 'cursor') {
+              expect(operation.contents).toMatch(helper.descriptionPattern);
+              if (helper.userInvocable === false && platform !== 'cursor') {
                 expect(operation.contents).toMatch(/^user-invocable:\s*false$/m);
+              } else if (helper.userInvocable === true) {
+                expect(operation.contents).not.toMatch(/^user-invocable:\s*false$/m);
+                expect(operation.contents).toContain('Direct user request');
               }
             }
           }
+        }
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('keeps load-bearing public-to-internal caller edges reachable on every host', () => {
+    const callerEdges = [
+      ['skills/spec-lfg/SKILL.md', 'spec-test-browser'],
+      ['skills/spec-lfg/SKILL.md', 'spec-commit-push-pr'],
+      ['skills/spec-dogfood/SKILL.md', 'spec-commit'],
+      ['skills/spec-dogfood/SKILL.md', 'spec-worktree'],
+      ['skills/spec-plan/references/plan-handoff.md', 'spec-proof'],
+      ['skills/spec-brainstorm/references/handoff.md', 'spec-proof'],
+      ['skills/spec-ideate/references/post-ideation-workflow.md', 'spec-proof'],
+      ['skills/spec-explain/references/destinations.md', 'spec-proof'],
+      ['skills/spec-pov/references/report.md', 'spec-proof'],
+    ];
+    const requiredTargets = new Set(callerEdges.map(([, target]) => target));
+
+    for (const [callerPath, target] of callerEdges) {
+      expect(fs.readFileSync(callerPath, 'utf8')).toContain(target);
+    }
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+        for (const target of requiredTargets) {
+          expect(syncedAssets.internalSkills).toContain(target);
         }
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
