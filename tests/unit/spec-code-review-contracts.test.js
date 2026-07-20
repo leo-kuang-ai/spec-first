@@ -13,6 +13,14 @@ const subagentTemplate = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/subagent-template.md'),
   'utf8',
 );
+const maintainabilityPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/maintainability-reviewer.md'),
+  'utf8',
+);
+const maintainabilityCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/maintainability-capability-cases.json'),
+  'utf8',
+));
 const outputTemplate = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/review-output-template.md'),
   'utf8',
@@ -107,6 +115,49 @@ describe('spec-code-review current contracts', () => {
     expect(skill).toContain('`foreign-residual-workspace` -> `blocked-action-required`');
     expect(skill).toContain('optional external-tool evidence unavailable -> `fallback-only`');
     expect(skill).toContain('`non-git-build-workspace` coverage gaps -> `partial`');
+  });
+
+  test('maintainability mechanical thresholds survive subjective long-file suppression', () => {
+    expect(maintainabilityPrompt).toContain('crossing **1000 lines** because of this diff');
+    expect(maintainabilityPrompt).toContain('file line count crosses 1k in the diff');
+    expect(maintainabilityPrompt).toContain('persona-defined mechanical threshold');
+    expect(subagentTemplate).toContain('persona-defined mechanical threshold');
+    expect(subagentTemplate).toContain('before/after line-count evidence');
+    expect(subagentTemplate).toContain('subjective “file getting long” concern');
+    expect(subagentTemplate).toContain('thin wrapper or duplicate canonical helper');
+    expect(subagentTemplate).toContain('Do not reclassify that proven persona-owned condition as advisory');
+    expect(subagentTemplate).toContain('Preserve the persona-assigned severity and confidence anchor');
+    expect(subagentTemplate).toContain('use the normal action-class rubric for its route');
+  });
+
+  test('maintainability planted cases preserve mechanical findings and suppress subjective opinions', () => {
+    expect(maintainabilityCapabilityCases.schema_version).toBe(
+      'spec-first.spec-code-review.maintainability-cases/v1',
+    );
+    expect(maintainabilityCapabilityCases.owner).toBe('maintainability-reviewer');
+    expect(maintainabilityCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/maintainability-reviewer.md',
+      'skills/spec-code-review/references/subagent-template.md',
+    ]));
+
+    const cases = new Map(maintainabilityCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const crossing = cases.get('diff-crosses-persona-owned-1000-line-threshold');
+    const thinWrapper = cases.get('new-thin-wrapper-with-no-added-behavior');
+    const duplicateHelper = cases.get('duplicate-helper-next-to-canonical-owner');
+    const subjectiveLongFile = cases.get('subjective-long-file-opinion-without-threshold-or-failure');
+
+    expect(crossing).toMatchObject({ kind: 'positive' });
+    expect(crossing.expected).toContain('P1 / anchor-100');
+    expect(crossing.forbidden).toContain('suppress it as a generic file getting long concern');
+    expect(thinWrapper).toMatchObject({ kind: 'positive' });
+    expect(thinWrapper.expected).toContain('concrete thin-wrapper finding');
+    expect(thinWrapper.forbidden).toContain('suppress it under the subjective long-file rule');
+    expect(duplicateHelper).toMatchObject({ kind: 'positive' });
+    expect(duplicateHelper.expected).toContain('duplicate-canonical-helper finding at anchor 100');
+    expect(duplicateHelper.forbidden).toContain('recommend a third abstraction or registry');
+    expect(subjectiveLongFile).toMatchObject({ kind: 'negative-owner' });
+    expect(subjectiveLongFile.expected).toContain('keep suppression');
+    expect(subjectiveLongFile.forbidden).toContain('route it to advisory merely because the file grew');
   });
 
   test('deployment verification requires executable evidence per item', () => {

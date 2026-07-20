@@ -6,23 +6,20 @@ status: review-evidence-current-source
 origin_report: docs/项目审查/2026-07-18-skill-flow-system-audit-refresh/review-report.md
 baseline_issue_list: docs/项目审查/2026-07-17-skill-flow-system-audit/optimization-issues.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 5fba757103a18103aa5943249ac095a6d82f0d3c
+current_head_at_calibration: f640b19a05323f14ca4f89acfbcf999997f67fcb
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf-10-doc-contract-repair
+working_tree_overlay: uncommitted-sf-06-maintainability-precedence-repair
 ---
 
 # Skill 关联关系当前需要优化的问题清单
 
-当前共 1 个需要优先优化的 P1；P0 为 0。SF-01、SF-02、SF-03、SF-04、SF-05、SF-07、SF-08、SF-09、SF-10、SF-27 已由 current source 与 focused contracts 关闭，不进入本清单。`source_head` 仍是原始冻结快照；`current_head_at_calibration` 已包含 SF-03/SF-04，SF-10 的关闭结论基于其上的尚未提交 source/docs overlay。
+当前 P0/P1 均为 0。SF-01、SF-02、SF-03、SF-04、SF-05、SF-06、SF-07、SF-08、SF-09、SF-10、SF-27 已由 current source 与 focused contracts 关闭，不进入优先优化队列。`source_head` 仍是原始冻结快照；`current_head_at_calibration` 已包含 SF-10，本轮 SF-06 关闭结论基于其上的尚未提交 source/test/docs overlay。
 
 本清单从同批次校准后的 [review-report.md](review-report.md) 提取，只用于后续 plan/work 消费，不表示问题已获得修复、commit、push、PR 或 lifecycle mutation 授权。
 
 ## P1：优先优化
 
-1. **SF-06 Maintainability 的 1000 行 finding 可能被公共规则压制**
-   - maintainability persona 将 diff 导致文件跨过 1000 行定义为机械 finding；shared template 又要求未被项目规则明确规定的 long-file concern 一律 suppress。
-   - 当前证据只确认 1000 行阈值冲突，不证明 thin wrapper、duplicate helper 等全部 structural finding 都会被压制。
-   - 优化方向：明确 persona-defined mechanical threshold 优先于 generic style suppress，并用 planted case 区分机械结构回归与主观可读性意见。
+无。低优先级 P2/P3 继续由同批次 [review-report.md](review-report.md) 与 07-17 baseline 跟踪。
 
 ## 已关闭，不进入优化队列
 
@@ -31,6 +28,7 @@ working_tree_overlay: uncommitted-sf-10-doc-contract-repair
 - **SF-03：** Runtime Setup、配置模板与 focused test 已按真实 consumer 统一 `plan_output`、`brainstorm_output`、`ideate_output` 的 active 状态；注释示例不激活配置，缺失/无效/注释值仍分别回退到 `md`、`md`、`html`，pipeline override 继续由 consumer 自己决定。关闭证据是 source + focused contracts，不包含真实 host/local config field run。
 - **SF-04：** `spec-doc-review` 现优先识别 `type: task-pack`，即使 deterministic contract 不完整也不降级为普通 plan；task pack 强制 `report-only` / `task-pack-derived-artifact`，真实 `tasks validate` receipt 只提供 identity/freshness/structure 地板，source plan 继续拥有 scope/acceptance/architecture/non-goals/verification。专属 lens 覆盖 dependency/wave、files/side effects、test/done、`stop_if`、`review_gate` 与 human/JSON parity；`task_pack_outcome` 将通过、pack gap、plan gap、deterministic failure 分别交给 `spec-work-task-pack`、`spec-write-tasks`、`spec-plan` 或 incomplete stop。关闭证据是 source + 正负 handoff focused contracts，不包含真实 host/persona field run。
 - **SF-10：** 用户 artifact map 现与 schema 的 `workflow_integrated` 条件、producer 的 durable-trigger reason、v2 `direct_evidence_used` 五字段、v1 `graph_evidence_used` read/prune 兼容和 source-owned reader 边界一致；文档不再把 `false` 写成唯一 current contract，也不再声称 workflow 会自动发现或隐式消费 run artifact。关闭证据是 map/schema/producer focused contract 与 RED/GREEN 文档一致性测试，不包含真实用户阅读或跨宿主渲染 field outcome。
+- **SF-06：** maintainability persona 的 1000 行 threshold 现明确为 persona-owned mechanical rule；shared false-positive catalog 只 suppress 无项目规则、无 persona exact mechanical/structural condition 的主观 “file getting long / hard to read”。共享模板先保留已被 diff 直接证明的 persona severity/confidence，再对其余 shape 执行 FP-over-advisory precedence，避免 1k P1/anchor-100 先绕过 suppress、又被 generic advisory 降成 anchor-50；四个 planted cases 分别锁定 1k crossing、thin wrapper、duplicate canonical helper 与 subjective long-file suppression。关闭证据是 source + focused contract/eval fixture，不包含真实 fresh-session persona dispatch。
 - **SF-05：** `autofix_class` 只保留 follow-up 分类语义，唯一 apply authority 是 run-local `mutation_policy`；普通 review=`report-only`，显式 review-and-fix 才可 `apply-fixes`，`mode:agent` 永远 report-only。
 - **SF-07：** Dogfood/Polish 已分别解析 `branch_mutation_authorization`、`local_fix_authorization`、`commit_authorization`、`landing_authorization`；branch/PR 参数只选 scope，`done` 不授权 commit，无 commit/landing authority 时保留 verified uncommitted changes 且不 push/建 PR。
 - **SF-08：** `spec-brainstorm` 已使用 exact `spec-lfg` 名称和绝对 artifact payload；未验证真实 host menu invocation。
@@ -39,4 +37,4 @@ working_tree_overlay: uncommitted-sf-10-doc-contract-repair
 
 ## 建议工作包
 
-1. **修复 maintainability 机械阈值 precedence：** SF-06。
+P1 队列已清空；下一批按 P2 优先处理 SF-11（HTML renderer/doc-review contract）、SF-12（Universal Proof 本地 Markdown 前置）与 SF-18（tracker-defer owner 漂移）。

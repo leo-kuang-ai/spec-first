@@ -3,9 +3,9 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 5fba757103a18103aa5943249ac095a6d82f0d3c
+current_head_at_calibration: f640b19a05323f14ca4f89acfbcf999997f67fcb
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf-10-doc-contract-repair
+working_tree_overlay: uncommitted-sf-06-maintainability-precedence-repair
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
@@ -43,7 +43,7 @@ actual_pairs: 165
 
 ## 3. 变更支撑文件所触及的既有 edge
 
-原刷新批次的 30 个 source file delta 触及 46 个 pair；后续 SF-01 修复重裁决 commit-helper caller edges，SF-02 修复重裁决 knowledge-promotion exit，SF-03/SF-04 overlay 分别重裁决 local rendering config consumer 与 high-risk task-pack review consumer，本轮 SF-10 overlay 重裁决 artifact-map 到 source-owned run-artifact producer/read-prune consumer 的文档边界。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
+原刷新批次的 30 个 source file delta 触及 46 个 pair；后续 SF-01 修复重裁决 commit-helper caller edges，SF-02 修复重裁决 knowledge-promotion exit，SF-03/SF-04 分别重裁决 local rendering config consumer 与 high-risk task-pack review consumer，SF-10 重裁决 artifact-map 到 source-owned run-artifact producer/read-prune consumer 的文档边界，本轮 SF-06 overlay 校准 `spec-code-review` 包内 orchestrator template -> maintainability persona precedence。SF-06 是 package-local prompt ownership，不新增 canonical cross-Skill pair。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
 
 | Baseline ID | Current edge | Current verdict | 说明 |
 | --- | --- | --- | --- |
@@ -71,6 +71,7 @@ actual_pairs: 165
 | LFG -> browser helper | user-visible flow requires runtime verification only when applicable | caller owns origin/server; helper owns wrapper/session cleanup | missing/invalid origin or cleanup failure blocks; not_applicable has reason | confirmed for SF-09 |
 | work -> doc review -> work | semantic review prevents stale plan handoff | doc-review is byte-preserving report producer; work owns disposition/verification | hash drift/incomplete/P0/P1 stop final validation | confirmed |
 | task pack -> doc review | high-risk review intent is legitimate | `spec-doc-review` 唯一分类 task pack 并强制 report-only；validator owns deterministic floor，source plan owns scope/architecture，write-tasks owns regeneration | invalid/stale intake 不 dispatch personas；pack gap 回 `spec-write-tasks`，plan decision gap 回 `spec-plan`；只有完整 zero-write JSON envelope、source-plan 对齐及 passed+valid+deterministic outcome 同时成立才进入 `spec-work-task-pack` | confirmed at `source-contract-confirmed`, SF-04 closed；`Review complete`/`roster:full` 不提升 handoff/dispatch authority |
+| code-review shared spine -> maintainability persona | maintainability owns concrete structural/mechanical findings；shared template owns cross-persona false-positive/advisory normalization | 1000-line crossing 在 before/after line-count + added-diff evidence 成立时保持 P1/anchor-100；thin wrapper/duplicate helper 保持 persona owner；无 threshold/failure mode 的 subjective long-file opinion 仍 suppress | shared template 先保留 proven persona severity/confidence，避免旧 suppress 或 generic advisory anchor-50 降级，再对剩余 shape 执行 FP-over-advisory precedence；四个 planted cases 防止 broad override | confirmed at `source-contract-confirmed`, SF-06 closed；未执行 fresh-session persona dispatch |
 | artifact map -> spec-work run artifact | 用户需要知道 closeout evidence 的真实生命周期与读取边界 | map 复述 schema/producer 的 conditional `workflow_integrated`、v2 `direct_evidence_used`、v1 `graph_evidence_used` read/prune compatibility；source-owned reader 仍是唯一确定性 read/prune owner | 不再把 false-only 写成 current contract，不把旧 graph-shaped fields 当 v2 字段，不把 spec-code-review 自动 discovery 当事实；显式 reader 仍需 target repo/workspace/run，artifact 不获得 source scope authority | confirmed at `source/docs-contract-confirmed`, SF-10 closed；未验证真实用户阅读/跨宿主渲染 |
 | runtime setup -> local rendering config -> plan/brainstorm/ideate | setup 暴露并保护三个 active local preferences | 三个 workflow 分别拥有格式解析、默认值与 pipeline override；setup 不调用 workflow | 注释、缺失或无效值保持 consumer 默认，不能被 setup 提升为 runtime authority | confirmed at `source-contract-confirmed`, SF-03 closed；未验证真实 host/local config field run |
 | work/debug/review -> compound | durable knowledge can be reusable | new/materially rewritten learning 必须有 grounded `source_refs` 与 concrete `invalidation_condition`；validator 只强制机械形态，LLM/human 判断语义充分性 | Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 缺任一字段、空值、错误类型或重复字段时不得完成；legacy default mode 保持兼容 | confirmed at `source-contract-confirmed`, SF-02 closed；未验证真实 host field run |
@@ -93,4 +94,4 @@ actual_pairs: 165
 | actual current pairs | 165 |
 | duplicate canonical pairs | 0 |
 
-The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot；`current_head_at_calibration` 已包含 SF-02/SF-03/SF-04，但不包含尚未提交的 SF-10 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、真实 task-pack persona review、用户文档阅读/跨宿主渲染、compound promotion、browser navigation、CI/merge/release 或 field outcome。
+The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot；`current_head_at_calibration` 已包含 SF-10，但不包含尚未提交的 SF-06 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session maintainability persona behavior、真实 task-pack persona review、用户文档阅读/跨宿主渲染、compound promotion、browser navigation、CI/merge/release 或 field outcome。

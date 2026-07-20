@@ -3,9 +3,9 @@ title: Skill 关系图当前快照
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 5fba757103a18103aa5943249ac095a6d82f0d3c
+current_head_at_calibration: f640b19a05323f14ca4f89acfbcf999997f67fcb
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf-10-doc-contract-repair
+working_tree_overlay: uncommitted-sf-06-maintainability-precedence-repair
 governed_nodes: 35
 canonical_pairs: 165
 ---
@@ -78,4 +78,4 @@ spec-lfg --authorized landing--> spec-commit-push-pr
 spec-dogfood --authorized checkpoint--> spec-commit
 ```
 
-每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate、两个 load-bearing commit helper 的五宿主投射，以及 SF-02 provenance/invalidation、SF-03 local rendering consumer、SF-04 task-pack derived/report-only consumer、source-plan authority 和 terminal owner 修复；working-tree SF-10 overlay 只校准用户 artifact map、审查 evidence 与既有合同测试，不新增 Skill 节点或 pair。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 278/165 与 manifest hash 仍绑定冻结 calibration inventory；SF-04 新增 source reference 未在本页重算关系分母。
+每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate、两个 load-bearing commit helper 的五宿主投射，以及 SF-02 provenance/invalidation、SF-03 local rendering consumer、SF-04 task-pack derived/report-only consumer、source-plan authority、terminal owner 与 SF-10 artifact-map 修复；working-tree SF-06 overlay 只校准 `spec-code-review` 包内 shared template / maintainability persona precedence，并新增 capability fixture/test，不新增 Skill 节点或 pair。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 278/165 与 manifest hash 仍绑定冻结 calibration inventory；本轮不重算关系分母。
