@@ -50,7 +50,7 @@
 | `workspace/` | parent workspace advisory summaries | 多仓父目录下展示 child repo 候选、scenario fingerprint、批量维护结果和 parent orphan quarantine；不作为 repo-local truth |
 | `app-audit/runs/` | App consistency audit execution artifacts | 评审者读取静态一致性报告、degraded modes、issues 和 runtime follow-up 建议 |
 | `verification/*` | 验证证据投递目录 | `doctor` 校验与汇总 |
-| `workflows/spec-work/*` | Work run evidence | 后续 `spec-code-review` 可通过 source-owned reader best-effort 读取 `direct_evidence_used`；缺失、not-readable 或 scope mismatch 时只在 Coverage 记录 unavailable/stale |
+| `workflows/spec-work/*` | Work run evidence | source-owned `spec-work-run-artifact read|prune`、显式 shipping/resume handoff 与维护者使用；缺失、not-readable 或 scope mismatch 时保留 unavailable/stale，不自动提升为 source authority |
 | `quality-gates/*` | 质量门机器结果 | gate 结果留痕与失败主题沉淀 |
 | `<os-temp>/spec-first/spec-code-review/*` | Code review 临时 handoff | 当前 run 的 reviewer/orchestrator 协调，不作为 repo-local durable artifact |
 
@@ -63,7 +63,7 @@
 | `app-audit/runs/<run-id>` | 评审者、`spec-code-review` headless 调用、后续 QA / runtime validation | App 一致性审查后 | 查看 PRD/Figma/source 一致性问题、证据链、降级范围和运行时验证建议 |
 | `verification/<slug>` | `src/cli/commands/doctor.js` | `doctor` 检查阶段 | 校验 verification evidence 是否存在、有效、足够新 |
 | `quality-gates/ai-dev-quality-gate` | `scripts/run-ai-dev-quality-gate.js`、`src/verification/quality-feedback.js` | AI gate 执行后 | 记录 gate 结果并提取失败主题 |
-| `workflows/spec-work/<workspace-slug>/<run-id>` | `spec-code-review`、shipping handoff、维护者 | work closeout 后 | 读取 compact work evidence、验证摘要和可选 `direct_evidence_used`；不得把 run artifact 当作 source scope authority |
+| `workflows/spec-work/<workspace-slug>/<run-id>` | source-owned reader、shipping handoff、维护者 | work closeout 后 | 在显式 target repo/workspace/run 选择下读取 compact work evidence、验证摘要和可选 `direct_evidence_used`；不得把 run artifact 当作 source scope authority |
 
 ## 1. config/
 
@@ -107,9 +107,11 @@
 
 ## Spec-work run evidence
 
-`spec-work` 的 run artifact 写入 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/run.json`。它是 closeout evidence，不是 plan/task 的 source authority；当前 contract 标记 `producer_available=true` 且 `workflow_integrated=false`，表示 producer 可写 schema-aligned payload，但完整 replay/retention lifecycle 仍是后续工作。
+`spec-work` 的 run artifact 写入 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/run.json`。它是 closeout evidence，不是 plan/task 的 source authority；producer 始终 `producer_available=true`。`workflow_integrated=true` 只在 `spec-work` closeout 因 durable trigger 调用 producer 时成立，触发原因包括 `trigger-task-pack`、`trigger-not-run-validation`、`trigger-deferred-follow-up` 和 `trigger-substantive-work`；如果一个已存在的 artifact 标记 `workflow_integrated=false`，它表示非 integrated/write-side 状态，不表示 active shipping 已调用 producer。无 durable trigger 时，shipping closeout 不调用 producer，也不写 `run.json`。同一 workspace/run-id 不可覆盖；source-owned `read|prune` consumer 支持当前 v2 与 legacy v1 artifact，retention status 仍明确标记为 `lifecycle-deferred`。
 
-`direct_evidence_used` 是 optional compact summary，用于把 `spec-work` 从 plan envelope 消费到的 direct source evidence evidence 传递给下游 `spec-code-review`。它只保存 `capabilities_used`、`evidence_grade`、`evidence_posture`、`freshness_state`、`repo_scope`、`graph_findings_applied`、`graph_findings_as_risk_only`、`source_reads_validated` 和 `redaction_status`，不保存 raw provider output、源码摘录或 credentialed URL。Capability-class advisory candidates 的查询与采纳/拒绝摘要落 `provider_untrusted.summaries[]`；经回源确认的内容再落 `direct_evidence_used`，未确认候选只能作为 limitation。`spec-code-review` 读取失败、artifact scope 不匹配或字段缺失时，应在 Coverage 的 `direct evidence:` 行记录 unavailable/stale 并继续 direct source reads。
+当前没有 workflow 自动发现或隐式消费 `spec-work` run artifact；需要使用时必须通过 source-owned reader 或显式 handoff 选择 target repo、workspace 和 run。Artifact 仍只是 advisory closeout evidence，不能替代 source plan、task pack、当前源码或验证摘要。
+
+`direct_evidence_used` 是 optional compact summary，可由 plan intake 或 work closeout 提供。v2 只保存 `source_refs`、`checks_or_logs`、`repo_scope`、`limitations` 和 `redaction_status`，不保存 raw provider output、源码摘录或 credentialed URL。Capability-class advisory candidates 的查询与采纳/拒绝摘要落 `provider_untrusted.summaries[]`；经回源确认的内容再落 `direct_evidence_used`，未确认候选只能作为 limitation。`graph_evidence_used` 仅保留 v1 read/prune 兼容，不是新的 v2 producer 字段。
 
 ## Code review temporary handoff
 

@@ -13,6 +13,12 @@ const SCHEMA_PATH = path.join(
   'workflows',
   'spec-work-run-artifact.schema.json'
 );
+const USER_ARTIFACT_MAP_PATH = path.join(
+  REPO_ROOT,
+  'docs',
+  '05-用户手册',
+  '04-workflows-artifacts-map.md'
+);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -256,6 +262,29 @@ describe('spec-work run artifact contract', () => {
     expect(validateAgainstSchema(schema, invalidLegacyArtifact).errors).toContain(
       'root.producer.reason_code: value "trigger-task-pack" not in enum'
     );
+  });
+
+  test('user artifact map matches the current integrated producer and v2 direct evidence contract', () => {
+    const schema = readJson(SCHEMA_PATH);
+    const map = fs.readFileSync(USER_ARTIFACT_MAP_PATH, 'utf8');
+    const runEvidenceSection = map.match(/## Spec-work run evidence([\s\S]*?)## Code review temporary handoff/);
+
+    expect(runEvidenceSection).not.toBeNull();
+    const section = runEvidenceSection[1];
+    expect(section).toContain('workflow_integrated=true');
+    expect(section).toContain('workflow_integrated=false');
+    expect(section).toContain('durable trigger');
+    expect(section).toContain('同一 workspace/run-id 不可覆盖');
+    for (const field of schema.properties.direct_evidence_used.required) {
+      expect(section).toContain(`\`${field}\``);
+    }
+    expect(section).toContain('`graph_evidence_used` 仅保留 v1 read/prune 兼容');
+    expect(map).toContain('当前没有 workflow 自动发现或隐式消费 `spec-work` run artifact');
+
+    expect(map).not.toContain('workflow_integrated=false`，表示 producer 可写 schema-aligned payload，但完整 replay/retention lifecycle 仍是后续工作');
+    expect(map).not.toContain('`capabilities_used`、`evidence_grade`、`evidence_posture`、`freshness_state`');
+    expect(map).not.toContain('后续 `spec-code-review` 可通过 source-owned reader best-effort 读取');
+    expect(map).not.toContain('传递给下游 `spec-code-review`');
   });
 
   test('schema caps persisted LLM prose fields to keep raw logs out of run evidence', () => {

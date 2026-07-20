@@ -5,34 +5,35 @@ review_date: 2026-07-18
 origin_plan: docs/plans/2026-07-17-002-docs-system-project-audit-validation-approach-plan.md
 baseline_audit: docs/项目审查/2026-07-17-skill-flow-system-audit/review-report.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 1c8a12a574a0768ea0d1334683e51cc9d709852f
+current_head_at_calibration: 5fba757103a18103aa5943249ac095a6d82f0d3c
 working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf-03-sf-04-source-repair
+working_tree_overlay: uncommitted-sf-10-doc-contract-repair
 limitations:
   - 当前批次是基于 2026-07-17 全量 source audit 的增量刷新；未变 source 继承其逐行证据。
   - 未授权 generic subagent dispatch；没有 fresh-source、host-loader 或 field-outcome claim。
-  - source_head 是冻结快照；current_head_at_calibration 已包含 mutation-authority、internal-helper delivery 与 SF-02，尚未提交的 SF-03/SF-04 overlay 不在当前 HEAD。
+  - source_head 是冻结快照；current_head_at_calibration 已包含 SF-03/SF-04，尚未提交的 SF-10 artifact-map source/docs overlay 不在当前 HEAD。
 ---
 
 # spec-first Skill 关联关系系统审查当前快照刷新报告
 
 ## 1. 结论
 
-当前 working-tree source 没有 P0，仍有 2 个 P1。九项原 P1 已关闭：
+当前 working-tree source 没有 P0，仍有 1 个 P1。十项原 P1 已关闭：
 
 - **SF-01 已关闭：** `spec-commit` 与 `spec-commit-push-pr` 已作为 internal-only package 进入现有 delivery allowlist，五宿主 projection plan 与临时 sandbox `init` 均包含 caller 所需 package references；两 helper 的 invocation 不授予 commit/landing authority，LFG 由明确 entry admission 建立并传递可见 authority facts。
 - **SF-02 已关闭：** `spec-compound` 与 `spec-compound-refresh` 现在共享 `source_refs` / `invalidation_condition` promotion schema、模板、指南和字节一致 validator；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 都运行 `--promotion`，缺失、空值、错误类型或重复字段会确定性失败，默认 parser-safety 模式继续兼容 untouched legacy learning。
 - **SF-03 已关闭：** Runtime Setup、config template 与 focused test 现按真实 consumer 将 `plan_output`、`brainstorm_output`、`ideate_output` 统一为 active local rendering preferences；注释示例不激活配置，默认值与 pipeline override 继续由三个 consumer 自治，setup 不调用这些 workflow。
 - **SF-04 已关闭：** `spec-doc-review` 现将 `type: task-pack` 优先分类为 derived/report-only 输入，先运行真实 `spec-first tasks validate ... --json` 建立 identity/freshness/structure 地板，再以 current source plan 为 scope/acceptance/architecture/non-goals/verification 权威审查 task quality；`task_pack_outcome` 明确区分 execution handoff、pack regeneration、plan revision 与 incomplete stop。
+- **SF-10 已关闭：** 用户 artifact map 现与 schema 的 `workflow_integrated` 条件、durable-trigger producer、v2 `direct_evidence_used` 字段、v1 `graph_evidence_used` read/prune 兼容和 source-owned reader 边界一致；文档不再把 `workflow_integrated=false` 写成唯一 current contract，也不再声称 workflow 自动发现或隐式消费 run artifact。
 - **SF-05 已关闭：** code-review 的 `autofix_class` 仅分类 follow-up，不再授予 apply 权限；run-local `mutation_policy` 是唯一 mutation authority。
 - **SF-07 已关闭：** dogfood/polish 已将 branch mutation、local fix、commit、landing 四类 authority 分离，scope 参数与 `done` 都不再隐式授权副作用。
 - **SF-08 已关闭：** `spec-brainstorm` 已以治理名 `spec-lfg` 作为 autonomous handoff，并要求以宿主 available-skills 中的精确名调用、透传绝对 artifact path。
 - **SF-09 已关闭：** `spec-lfg` 明确区分 `browser_applicability: applicable | not_applicable`；适用时由 caller 提供 exact loopback origin，非适用时保留 reason，失败/not-run/not-supported/cleanup 异常都阻断 shipping。
 - **SF-27 已关闭：** 12 个原缺口 package 已补齐 package-local dispatch authorization/capability/fallback，原 6 个合格 package 继续满足基线，聚焦矩阵覆盖 18/18。
 
-这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 收窄后的两个 load-bearing caller edge：`spec-lfg -> spec-commit-push-pr`、commit-authorized `spec-dogfood -> spec-commit`。`spec-work` 只在条件式 residual/landing 说明中引用这两个名称，Phase 4 的实际 contract 是“repo commit workflow / requested landing workflow”，不构成必须解析到 exact helper 的直接 caller edge。其余 3 个 internal-only record 继续保持 governance-only，不因本次修复被顺带交付。SF-02 以最小 promotion exit contract 关闭，未新增知识 registry、数据库或状态机；SF-03 只扩展现有 config consumer owner 和 focused test，不新增 key、parser、registry、schema 或状态机；SF-04 只扩展现有 doc-review owner、producer handoff 与 focused contracts，不新增 workflow、task-pack schema、approval state 或第二套 validator。maintainability shared spine 与 artifact map 漂移仍会让错误 contract 进入正常用户路径。
+这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 收窄后的两个 load-bearing caller edge：`spec-lfg -> spec-commit-push-pr`、commit-authorized `spec-dogfood -> spec-commit`。`spec-work` 只在条件式 residual/landing 说明中引用这两个名称，Phase 4 的实际 contract 是“repo commit workflow / requested landing workflow”，不构成必须解析到 exact helper 的直接 caller edge。其余 3 个 internal-only record 继续保持 governance-only，不因本次修复被顺带交付。SF-02 以最小 promotion exit contract 关闭，未新增知识 registry、数据库或状态机；SF-03 只扩展现有 config consumer owner 和 focused test，不新增 key、parser、registry、schema 或状态机；SF-04 只扩展现有 doc-review owner、producer handoff 与 focused contracts，不新增 workflow、task-pack schema、approval state 或第二套 validator；SF-10 只校准用户地图和既有 artifact contract test，不改 schema、producer、read/prune helper 或 workflow consumer。maintainability shared spine 仍是唯一未关闭 P1。
 
-此前校准已关闭 SF-01、SF-05、SF-07、SF-27，将 P1 从 9 降到 5；SF-02 进一步降到 4，SF-03 降到 3，本轮 SF-04 再降到 2。SF-01 的关闭只确认 source/projection contract 与临时 sandbox 五宿主 `init`，不升级为真实 host loader/invocation outcome；SF-02 的关闭只确认 promotion 字段形态、workflow gate、legacy 兼容和双 package parity，不把非空字段冒充可信 provenance 或充分 invalidation；SF-03 的关闭只确认 current source、配置模板与 focused contract 一致，不把它升级为真实 host/local config field outcome；SF-04 的关闭只确认 source-level classification/intake/lens/terminal-owner contract 与正负 fixture，不把 inline persona fallback 或静态 fixture 冒充真实 host dispatch/field outcome；SF-06 继续只把公共 suppress 规则与明确的 1000 行阈值认定为已证实冲突；SF-10 继续由 current producer contract 反证用户地图。`source_head` 保持原始冻结快照，SF-03/SF-04 关闭结论来自 `current_head_at_calibration` 之上的未提交 working-tree source 与实际执行的 focused contracts。
+此前校准已关闭 SF-01、SF-05、SF-07、SF-27，将 P1 从 9 降到 5；SF-02 进一步降到 4，SF-03 降到 3，SF-04 降到 2，本轮 SF-10 再降到 1。SF-01 的关闭只确认 source/projection contract 与临时 sandbox 五宿主 `init`，不升级为真实 host loader/invocation outcome；SF-02 的关闭只确认 promotion 字段形态、workflow gate、legacy 兼容和双 package parity，不把非空字段冒充可信 provenance 或充分 invalidation；SF-03 的关闭只确认 current source、配置模板与 focused contract 一致，不把它升级为真实 host/local config field outcome；SF-04 的关闭只确认 source-level classification/intake/lens/terminal-owner contract 与正负 fixture，不把 inline persona fallback 或静态 fixture 冒充真实 host dispatch/field outcome；SF-10 的关闭只确认用户地图、schema/producer/read-prune contract 与一致性测试对齐，不把文档一致性升级为真实用户阅读或跨宿主渲染 field outcome；SF-06 继续只把公共 suppress 规则与明确的 1000 行阈值认定为已证实冲突。`source_head` 保持原始冻结快照，SF-10 关闭结论来自 `current_head_at_calibration` 之上的未提交 working-tree docs/test source。
 
 ### 1.1 逐项校准清单
 
@@ -47,7 +48,7 @@ limitations:
 | SF-07 | **已关闭** | branch mutation、local fix、commit、landing 四类 authority 已分离；scope/`done` 不授权副作用 |
 | SF-08 | **关闭裁决正确** | exact `spec-lfg` 名称、absolute artifact payload 和五宿主 source projection 有 focused contract；未验证真实 host menu invocation |
 | SF-09 | **关闭裁决正确** | applicable/not_applicable、exact origin、effect/cleanup blocker 已闭合；未运行真实 browser field outcome |
-| SF-10 | **成立** | 用户 map 仍写 `workflow_integrated=false`，schema 与 durable-trigger producer contract 已为 true |
+| SF-10 | **已关闭** | 用户 map 已对齐 integrated true/false 条件、read/prune 生命周期、v2 direct evidence 字段和 v1 legacy graph compatibility；不再宣称自动 workflow consumer |
 | SF-27 | **已关闭** | 当前聚焦 continuity matrix 覆盖 18/18 qualified；缺授权/缺能力均有 inline/serial fallback |
 
 ## 2. 当前 P1 行动队列
@@ -65,17 +66,6 @@ limitations:
 - **invalidation：** maintainability persona 的范围被正式缩为项目显式规则。
 - **status：** OPEN；origin：本 plan。
 
-### SF-10 — 用户 artifact map 仍与 current producer contract 冲突
-
-- **edge/scope：** artifact documentation -> user/agent discovery -> downstream consumer。
-- **claim 与证据：** `docs/05-用户手册/04-workflows-artifacts-map.md:110` 仍写 `workflow_integrated=false`，而 `spec-work-run-artifact.schema.json:8-10` 与 `skills/spec-work/references/shipping-workflow.md:159` 已规定 durable trigger 时可以 integrated=true。
-- **counter-evidence：** map 的 direct-evidence boundary、current plan paths 与 advisory wording 大部分正确。
-- **user impact：** 用户可能把已接入的 producer 当作不可用，或错误理解 run artifact 生命周期。
-- **root cause / posture：** current docs 未随 source-owned producer/consumer 迁移；**Repair** the affected map + narrow consistency test。
-- **closure：** docs、schema、producer 与 consumer 对 integration flags/field set 没有相反说明。
-- **invalidation：** v2 run artifact 被正式替换并完成 consumer migration。
-- **status：** OPEN；origin：本 plan。
-
 ## 3. 已关闭 P1 与反证
 
 | Finding | 当前证据 | 反证检查 | 裁决 |
@@ -84,6 +74,7 @@ limitations:
 | SF-02 | 两套 schema/template/YAML guide/validator 保持 byte parity；Knowledge Harness consumer 与当前 deterministic floor 对齐；`--promotion` 要求非空顶层 `source_refs` array 与 `invalidation_condition` string；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 均调用同一 gate，Consolidate 的 destructive delete 明确后置；focused tests 覆盖四类共享 source parity、完整正例、缺失、空值、转义空白、常见 YAML parser 隐式非字符串 scalar、错误类型、普通及 YAML-equivalent 重复键、flow/block array 与 legacy default mode | validator 不检查引用是否真实可信，也不判断失效条件是否语义充分；未执行 fresh-session host load 或真实 compound field run | RESOLVED（source + 43-test focused contract；claim ceiling=`source-contract-confirmed`） |
 | SF-03 | `spec-plan`、`spec-brainstorm`、`spec-ideate` 已有 active non-commented key consumer；Runtime Setup 与 config template 现在统一列为 active local rendering preferences，focused test 同时锁定 consumer、setup 与注释模板 | 示例仍保持注释，缺失/无效/注释值分别回退 `md`/`md`/`html`；setup 不调用 workflow，未执行真实 host/local config field run | RESOLVED（source + focused contract；claim ceiling=`source-contract-confirmed`） |
 | SF-04 | `spec-doc-review` 优先识别 `type: task-pack`，malformed pack 不降级为普通 plan；task pack 强制 `report-only` / `task-pack-derived-artifact`；专属 lens 运行真实 validator receipt，并按 current source plan 审查 fidelity、dependency/wave、files/effects、verification、stop/review semantics 与 human/JSON parity；`spec-write-tasks` 的 copy-ready handoff 只在完整 zero-write JSON envelope、source-plan 对齐及 passed+valid+deterministic+正确 next action 同时成立时升级 `reviewed-existing` | validator 只证明 identity/freshness/structure，不返回 task-pack digest；`Review complete` 不是 execution handoff，`roster:full` 不授予 subagent dispatch；无授权时仍是 inline/serial、非 independent coverage，未执行真实 host/persona field run | RESOLVED（source + 53-test focused replay + 正负 handoff fixtures；claim ceiling=`source-contract-confirmed`） |
+| SF-10 | 用户地图已与 schema/producer/read-prune 对齐：`workflow_integrated=true` 只对应 durable trigger 调用，false 不再被写成唯一 contract；v2 direct evidence 只列 `source_refs`、`checks_or_logs`、`repo_scope`、`limitations`、`redaction_status`；v1 `graph_evidence_used` 仅兼容 read/prune；文档显式说明不存在自动 workflow discovery/implicit consumer | 窄一致性 test 直接加载 schema 与用户地图并拒绝旧 false-only、旧 graph-shaped field、自动 spec-code-review reader 说法；未执行真实用户阅读、跨宿主文档渲染或 field outcome | RESOLVED（source/docs contract + RED/GREEN focused test；claim ceiling=`source-contract-confirmed`） |
 | SF-05 | `action-class-rubric.md` 明确 classification is not permission，ordinary/default=`report-only`、explicit review-and-fix=`apply-fixes`、`mode:agent`=report-only；`mutation-authority-contracts` 通过 | `autofix_class` 仍保留优先级/风险信号，但没有任何 apply authority | RESOLVED（source + focused contract；未做 host behavior eval） |
 | SF-07 | dogfood/polish 均解析 branch/local-fix/commit/landing 四类 authority；branch/PR target 只选 scope，`done` 不授权 commit；无授权时保留 verified uncommitted changes | Dogfood 的 authorized checkpoint 仍委托 `spec-commit`，但该 target 已由 SF-01 投射；真实 checkout/host run 未执行 | RESOLVED（source + focused contract；未做真实 checkout/host run） |
 | SF-08 | `spec-brainstorm/references/handoff.md` 使用 `spec-lfg`，要求 exact available-skills resolution 与绝对 payload；`spec-brainstorm-clarification-contracts` 通过 | governance 的 canonical target 仍为 `spec-lfg`，无 `lfg` alias 依赖 | RESOLVED（source + focused contract；host menu invocation 未验证） |
@@ -99,12 +90,11 @@ limitations:
 
 ## 5. 最高杠杆两项
 
-1. **校准 producer/consumer contract（SF-10）**：恢复 artifact-map consistency，不新增重复 registry、database 或 state machine。
-2. **修复 maintainability 机械阈值 precedence（SF-06）**：让 persona-defined 1000 行机械阈值优先于 generic style suppress，并以 planted cases 保留主观长文件意见的 suppress。
+1. **修复 maintainability 机械阈值 precedence（SF-06）**：让 persona-defined 1000 行机械阈值优先于 generic style suppress，并以 planted cases 保留主观长文件意见的 suppress。
 
 ## 6. 不做什么
 
 - 不把 165 个 skill-name text pairs 当成 165 个 runtime invocation。
 - 不把本次 lint、typecheck 或 focused test 当成 host loader、browser field outcome、CI/merge/release 证据。
-- 不把 working-tree source/focused tests 冒充已提交 HEAD、fresh-source reviewer、host-loader 或 field outcome；SF-01 的关闭到 source/projection-contract 与 sandbox init 层，SF-02/SF-03/SF-04/SF-05/SF-07/SF-27 的关闭到 source-contract 层。
+- 不把 working-tree source/focused tests 冒充已提交 HEAD、fresh-source reviewer、host-loader 或 field outcome；SF-01 的关闭到 source/projection-contract 与 sandbox init 层，SF-02/SF-03/SF-04/SF-05/SF-07/SF-10/SF-27 的关闭到 source/docs-contract 层。
 - 不修改 generated runtime mirror，也不从 Graphify/CodeGraph 的导航输出推导 confirmed relationship。
