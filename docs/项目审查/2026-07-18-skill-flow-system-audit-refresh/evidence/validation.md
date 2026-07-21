@@ -3,9 +3,9 @@ title: Skill 关系审查当前快照验证记录
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
+current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
+working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 ---
 
 # Validation — current source refresh
@@ -15,10 +15,10 @@ working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 | Fact | Result |
 | --- | --- |
 | Original audit source HEAD | `0c1b358605c534db50321a5252e5e6d356dbcefb` |
-| Current calibration HEAD | `21fa24eaabe31335729cb43529f0e285fce90370` |
+| Current calibration HEAD | `247f86aeb2225641f93eb3d42f86a192e15a6d2e` |
 | Branch | `leo-2026-07-16-plan-update` |
-| Dirty state before SF-14-SF-23 repair | clean；SF-12/SF-18/SF-13 已进入 current HEAD |
-| Current final repair overlay | uncommitted working tree；`current_head_at_calibration` 不包含本轮最后 9 项 P2 source/test/docs 修复及对抗性补闭的 SF-11/M-013 consumer wording；另有用户并发新增的核心工作流详解文档与 Changelog 条目，不属于本轮 changed-set |
+| Dirty state before SF-24-SF-26 repair | clean；P0-P2 修复已进入 current HEAD |
+| Current final repair overlay | uncommitted working tree；`current_head_at_calibration` 不包含本轮 SF-24/SF-25/SF-26 source/test/docs 修复；未修改 generated runtime |
 | Package version | `1.13.2` |
 | Baseline HEAD | `7cb9721f0a9e4f0e0dc265c7194ab80e678b3c64` |
 | Frozen `source_head` delta to baseline | 4 commits; 30 changed canonical Skill sources, including 3 new references |
@@ -36,7 +36,7 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | canonical pair count | 165 |
 | pair manifest SHA-256 | `71c0a4c26d4b47690f4023a33174bf295be1df74787332e396d0b195e38ea30a` |
 | baseline/current pair set delta | +9 / -1 |
-| current P2 overlay pair delta | +2 / -3（bounded current-vs-HEAD token scan） |
+| committed P2 pair delta | +2 / -3（bounded current-vs-frozen-source token scan）；P3 overlay 不改变 pair 分母 |
 
 ## 3. Commands executed
 
@@ -91,6 +91,16 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | P2 final eval fixtures | pass, 6 suites / 78 tests | current eval/replay fixture contracts |
 | P2 final build | pass, 684 package files | `npm pack --dry-run` 最终 package surface |
 | P2 final diff check | pass | current source/docs/test working-tree whitespace floor |
+| SF-24-SF-26 P3 closure RED | expected fail, 2 suites；3 failed / 30 passed | 旧 source 分别保留 Deployment activation 扩张、validator required-context 冲突与 LFG full-suite 过度声明；失败保留于当前 P3 run root |
+| SF-24-SF-26 focused replay | pass, 2 suites / 33 tests | risky migration-artifact activation、worker no-self-invocation、optional validator context 与 Simplify verification ownership contracts |
+| P3 inline simplify/adversarial scan | pass, no remaining actionable finding | reuse/quality/efficiency 三镜无重构项；对抗性复核补强真实 `When to Use` section、validator 空字段 prompt body、LFG→Simplify 双 source contract，并修正本文件仍描述 P2 overlay 的快照漂移；`dispatch_authorization_missing`，不冒充 independent review |
+| P3 final skill-entrypoint lint | pass, 313 files | 最终 source package entrypoint 与 governance 静态地板 |
+| P3 final typecheck | pass, 184 files | 最终 CLI、scripts 与关键 JavaScript 语法地板 |
+| P3 final complete unit | pass, 126 suites / 1302 tests | SF-24/SF-25/SF-26 合同与全仓 unit regression |
+| P3 final smoke | pass, 1 suite / 5 tests | CLI help、preview、global profile 与 packed five-host runtime |
+| P3 final integration | pass, 6 suites / 21 tests；1 conditional suite / 2 tests skipped | five-host init、workspace graph、Qoder lifecycle 与 plan closeout integration |
+| P3 final eval fixtures | pass, 6 suites / 78 tests | current eval/replay fixture contracts |
+| P3 final build | pass, 684 package files | `npm pack --dry-run` 最终 package surface |
 | `npm run test:unit` after SF-06 adversarial repair | pass, 125 suites / 1274 tests | complete unit regression；包含 SF-03 config consumer、SF-04 task-pack consumer、SF-10 artifact-map、SF-06 suppress/advisory precedence、active replay manifest 与全仓 unit contracts |
 | `npm run test:unit` after final SF-01/SF-27 repair | pass, 125 suites / 1277 tests | complete unit regression；新增 Proof direct-name/internal-route separation 与 pre-gate dispatch guard |
 | `npm run test:unit` after SF-11 repair | pass, 125 suites / 1280 tests | complete unit regression；包含 HTML renderer/Brainstorm review contract 与更新后的 active requirements-clarification source pin |
@@ -115,6 +125,8 @@ SF-06 的 focused contract 先在旧 shared-template absolute suppression 口径
 SF-11 的两组新合同先在旧 renderer/handoff 上按预期 RED（2 suites；3 failed / 8 passed），随后三份 renderer、Brainstorm handoff 与既有 doc-review/Plan owner 对齐后转为 GREEN。第一次全量 unit 随即被 active requirements-clarification replay 的旧 handoff SHA pin 确定性阻断（1 failed / 1279 passed）；只刷新该唯一 source pin 后，focused eval replay 与完整 unit 分别转为 2 suites / 15 tests、125 suites / 1280 tests 全绿。该证据证明 current source 与 frozen replay freshness 对齐，不证明真实 host 菜单、persona dispatch 或 HTML field review outcome。
 
 最后 9 项 P2 初次 source 修复后，对抗性收口没有直接接受“9 tests green”作为充分证据。Current-source scan 发现 SF-11 仍在 shared HTML renderer 中把 requirements-only artifact 写成 `spec-work` 当前 consumer，edge ledger 自身也保留 `M-013 drift retained (P2)`；SF-14 closure test 又因读取不存在的 `## Consumers` heading 而在空字符串上 false green。随后聚焦复跑还以 1 failed / 84 passed 暴露 SF-23 projection test 错误要求 Cursor 保留其 adapter 明确不支持的 `allowed-tools` frontmatter。最终修复保持 renderer 单一 owner，以 artifact-kind condition 收窄 Work consumer；SF-14 test 先要求真实 `### Downstream Consumers` section 非空；SF-23 test 分离 source tool authority 与 host projection，Cursor 验证 lossy frontmatter 后仍保留 user entry、authority body 和 `disable-model-invocation`，其余四宿主保留 tool list。最终 10 suites / 89 tests 转绿。该证据证明 source/projection contract，不证明真实宿主工具可调用或 GitHub/Xcode field outcome。
+
+最后 3 项 P3 先以 2 suites / 3 failed / 30 passed 证明旧 contract 漂移，再以最小 owner 内修复转为 2 suites / 33 tests。对抗性复核没有只依赖新增字符串：Deployment test 必须读取非空的真实 `## When to Use This Agent` section 并同时证明双条件 gate、禁止 self-invocation 与宽触发负例；validator 在变量表和实际 prompt body 两处都声明空字段继续从 diff/cited code 验证；LFG test 同时读取 `spec-simplify-code` source，证明 full-project typecheck/lint、changed-path scoped tests、wide-impact broadening 和 runner-no-scope full-suite fallback 与 consumer 文案一致。该证据止于 current source、合同测试与完整回归，不证明真实 deployment checklist 质量、validator recall/precision、host-loader 或 field outcome。
 
 ## 4. Current-source semantic scenarios
 

@@ -147,11 +147,11 @@ Produce a complete Go/No-Go checklist that an engineer can literally execute:
 
 ## When to Use This Agent
 
-Invoke this agent when:
-- PR touches database migrations with data changes
-- PR modifies data processing logic
-- PR involves backfills or data transformations
-- Data Migration Expert flags critical findings
-- Any change that could silently corrupt/lose data
+本 prompt 只能由 `spec-code-review` orchestrator 调用，不能自行判断或扩大 activation。调用条件必须同时满足：
+
+- diff 包含 migration 或 schema artifact；以及
+- 该 artifact 涉及 risky migration：destructive DDL、backfill、NOT NULL without default、column rename/drop。
+
+Model-only、query-only、serializer/controller、普通 data-processing logic、migration test，或没有 migration/schema artifact 的抽象数据风险都不触发本 agent。Data Migration reviewer 的 finding 也只有在同一 orchestrator gate 已满足时才能作为 applicability context，不能单独授权调用。
 
 Every checklist item must name the command or observable signal that proves the step succeeded.

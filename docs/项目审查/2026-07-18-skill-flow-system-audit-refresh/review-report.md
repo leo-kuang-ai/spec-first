@@ -5,20 +5,20 @@ review_date: 2026-07-18
 origin_plan: docs/plans/2026-07-17-002-docs-system-project-audit-validation-approach-plan.md
 baseline_audit: docs/项目审查/2026-07-17-skill-flow-system-audit/review-report.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
+current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
+working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 limitations:
   - 当前批次是基于 2026-07-17 全量 source audit 的增量刷新；未变 source 继承其逐行证据。
   - 未授权 generic subagent dispatch；没有 fresh-source、host-loader 或 field-outcome claim。
-  - source_head 是冻结快照；current_head_at_calibration 已包含此前修复，本轮最后 9 项 P2 source/test/docs overlay 尚未提交。
+  - source_head 是冻结快照；current_head_at_calibration 已包含 P0-P2 修复，本轮最后 3 项 P3 source/test/docs overlay 尚未提交。
 ---
 
 # spec-first Skill 关联关系系统审查当前快照刷新报告
 
 ## 1. 结论
 
-当前 working-tree source 没有 P0/P1。十一项原 P1 已关闭：
+当前 working-tree source 的 P0/P1/P2/P3 均为 0。十一项原 P1 已关闭：
 
 - **SF-01 已关闭：** `spec-commit`、`spec-commit-push-pr` 与 `spec-proof` 已作为 internal-only package 进入现有 delivery allowlist，五宿主 projection plan 与临时 sandbox `init` 均包含 caller 所需完整 package references；9 条 load-bearing caller edge 均可解析。严格内部 commit helpers 保持 `user-invocable:false`，`spec-proof` 只允许 source 声明的显式点名调用且不进入公共 route/menu；helper invocation 不授予 mutation、commit 或 landing authority。
 - **SF-02 已关闭：** `spec-compound` 与 `spec-compound-refresh` 现在共享 `source_refs` / `invalidation_condition` promotion schema、模板、指南和字节一致 validator；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 都运行 `--promotion`，缺失、空值、错误类型或重复字段会确定性失败，默认 parser-safety 模式继续兼容 untouched legacy learning。
@@ -45,9 +45,9 @@ limitations:
 - **SF-22 已关闭（原 P2）：** Riffrec analysis 是 analyzer canonical owner，Sweep 是 byte-identical package-local projection，source 与五宿主 projection parity 均有合同。
 - **SF-23 已关闭（原 P2）：** `spec-resolve-pr-feedback` 与 `spec-test-xcode` 成为用户显式 standalone skill；PR feedback 的 local fix、commit、push、reply、thread resolve 分别准入，Xcode 删除虚假 Code Review auto-caller。
 
-这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 的 9 条 load-bearing caller edge。最后 9 项 P2 没有新增状态机或中心化 coordinator：虚假 consumer/reverse edge 被删除，已有 worker/cache/confidence/analyzer owner 在原 owner 内扩展；对抗性复核还将 SF-11 遗留的 requirements-only direct-work wording 收窄为 artifact-kind conditional。只有 SF-23 改变 public entry surface，并同时补齐 user-only route、五宿主 projection 与独立 exit authority。`spec-resolve-pr-feedback` / `spec-test-xcode` 不再属于 internal governance-only record；严格内部 commit helpers 与 Proof/Browser/Worktree 的既有边界不变。当前 P0/P1/P2 队列均已清空。
+这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 的 9 条 load-bearing caller edge。P2 没有新增状态机或中心化 coordinator：虚假 consumer/reverse edge 被删除，已有 worker/cache/confidence/analyzer owner 在原 owner 内扩展；对抗性复核还将 SF-11 遗留的 requirements-only direct-work wording 收窄为 artifact-kind conditional。最后 3 项 P3 同样只校准现有 owner：Deployment prompt 镜像 orchestrator gate，validator template 接受 optional detail context，LFG 如实描述 Simplify 的 scoped verification。当前 P0/P1/P2/P3 队列均已清空。
 
-此前校准依次清空 P1，并关闭原 P2 SF-11、SF-12、SF-18、SF-13；本轮关闭剩余 9 项 P2，并在最终对抗性复核中补闭 SF-11/M-013、SF-14 false-green test 与 SF-23 host-lossy projection 误测，没有重新打开 P0/P1。当前只剩 3 项 P3。新关闭证据分别止于 source contract、focused tests、source parity 与五宿主 projection/init integration；不把静态/沙箱验证升级为真实 GitHub/Xcode/Figma/host-loader/field outcome。`source_head` 保持原始冻结快照，当前最终校准来自 `current_head_at_calibration` 之上的未提交 working-tree overlay。
+此前校准已清空 P0-P2；当前 overlay 关闭 SF-24/SF-25/SF-26，且没有重新打开既有 finding。P3 的关闭证据止于 source contract、RED/GREEN focused tests 与完整回归，不把 prompt/contract 验证升级为真实 deployment、validator recall/precision、host-loader 或 field outcome。`source_head` 保持原始冻结快照，`current_head_at_calibration` 是已提交的 P2 基线，当前 P3 overlay 尚未提交。
 
 ### 1.1 逐项校准清单
 
@@ -76,11 +76,14 @@ limitations:
 | SF-21 | **已关闭（原 P2）** | anchor 50 suppress；直接证据提升到 75，否则不产出 |
 | SF-22 | **已关闭（原 P2）** | Riffrec canonical owner + Sweep byte-identical projection + source/five-host parity |
 | SF-23 | **已关闭（原 P2）** | 两个显式 user-only standalone skill 五宿主投射；PR feedback 五类 exit authority 分离；Cursor frontmatter lossy projection 按宿主语义验证 |
+| SF-24 | **已关闭（原 P3）** | Deployment worker 只镜像 risky migration-artifact gate，不能 self-invoke 或用普通 data-processing 风险扩张 activation |
+| SF-25 | **已关闭（原 P3）** | `why_it_matters` 是 available-when-present 的可选 validator context；缺失时继续从 diff/cited code 验证 |
+| SF-26 | **已关闭（原 P3）** | Simplify 默认 scoped tests + 全项目 typecheck/lint，必要时扩大；final verification 继续拥有完整 closeout truth |
 | SF-27 | **已关闭** | 当前聚焦 continuity matrix 覆盖 18/18 qualified；trivial-PR pre-gate 判断已 inline，缺授权/缺能力均有 inline/serial fallback |
 
 ## 2. 当前 P1 行动队列
 
-无。P3 继续按第 4 节与 07-17 baseline 跟踪。
+无。P0-P3 均已关闭。
 
 ## 3. 已关闭 P1 与反证
 
@@ -100,7 +103,7 @@ limitations:
 
 ## 4. P2/P3 与新增关系的增量裁决
 
-- 原 P2 已全部关闭；原 P3 SF-24/SF-25/SF-26 继续保留在 [07-17 report](../2026-07-17-skill-flow-system-audit/review-report.md)。
+- 原 P2 与原 P3 SF-24/SF-25/SF-26 均已关闭；07-17 report 继续作为原始 finding provenance，不代表 current backlog。
 - **SF-11 已关闭：** 三份 renderer 均承认 report-only `spec-doc-review` consumer；Brainstorm 不再隐藏 HTML requirements review；HTML review 明确为 byte-preserving、`fixes_applied: 0`，并阻断所有 Markdown mutation path；shared renderer 将 `spec-work` 限定为 implementation-ready software plan consumer，requirements-only Brainstorm/Ideate HTML 不形成 direct-work edge。RED/GREEN 合同同时覆盖 shared renderer、Brainstorm handoff、doc-review mutation owner 与 Plan 既有正确 handoff。
 - **SF-12 已关闭：** Universal Brainstorm/Plan 的 Proof-only 路径在 publish 前物化 existing local Markdown，并在 publish 失败时保留具体路径；Save+Proof 不再生成第二份可能漂移的内容。
 - **SF-18 已关闭：** Work/LFG tracker reference 当前 source 字节一致，Work 明确拥有规范合同；五宿主 projection plan 同时验证两份 runtime copy 仍相等，且正文不再让 `spec-code-review` filing 或将 session-temp path 写入 durable ticket。
@@ -110,13 +113,14 @@ limitations:
 - **SF-20/SF-21 已关闭：** Cache shared protocol 与 Code Review caller 同步；Maintainability producer 不再产生 synthesis 必然丢弃的 P1/anchor-50 finding。
 - **SF-22 已关闭：** analyzer owner/projection/parity 三层同源合同建立。
 - **SF-23 已关闭：** 两个 orphan helper 进入 user-only standalone route；PR feedback 先建立五类独立 exit authority，Xcode 不再声称 Code Review auto-caller；五宿主 projection test 按 Cursor 不支持 `allowed-tools` 的 host-lossy frontmatter 合同校准，而不是伪造字段 parity。
+- **SF-24 已关闭：** Deployment prompt 只允许 orchestrator 在 risky migration/schema artifact gate 成立时调用，并显式拒绝 self-invocation 与普通 data-processing 扩张。
+- **SF-25 已关闭：** Validator variable contract 与 Stage 5b 对齐；`why_it_matters` 缺失不再阻断 validator 依据 diff/cited code 独立复核。
+- **SF-26 已关闭：** LFG 将 Simplify verification 校准为 full-project typecheck/lint + default changed-path tests + risk-based broadening，最终 verification gate 保持权威。
 - 当前 overlay 的 `+2/-3` canonical pair 变化与 M-013 artifact-kind conditional 的完整理由见 [edge-ledger.md](evidence/edge-ledger.md)。文本 mention 或新增 route 不自动增加 workflow mutation/runtime authority。
 
 ## 5. 后续最高杠杆项
 
-1. **SF-25：** 统一 validator 对 `why_it_matters` 的 optional/required contract。
-2. **SF-24：** 收窄 Deployment prompt activation，使其与 orchestrator gate 一致。
-3. **SF-26：** 修正 LFG 对 Simplify 测试范围的表述，保留 final verification owner。
+无剩余 Skill-flow finding。Release-governance 的 public workflow summary coverage 缺口继续由独立 release continuity owner 处理，不在本审查中重编号或降级为 P3。
 
 ## 6. 不做什么
 

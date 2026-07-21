@@ -20,6 +20,8 @@ Line: {finding_line}
 Why it matters (the original reviewer's framing):
 {finding_why_it_matters}
 
+该字段可能为空；为空时直接依据 diff 与 cited code 验证，不得因缺少 reviewer framing 而拒绝或确认 finding。
+
 Suggested fix (if any):
 {finding_suggested_fix}
 
@@ -82,7 +84,7 @@ Rules:
 | `{finding_severity}` | Stage 5 merged finding | P0 / P1 / P2 / P3 |
 | `{finding_file}` | Stage 5 merged finding | Repo-relative file path |
 | `{finding_line}` | Stage 5 merged finding | Primary line number |
-| `{finding_why_it_matters}` | Per-agent artifact file (detail tier) | Loaded from disk for this validation; required for the validator to understand the finding |
+| `{finding_why_it_matters}` | Per-agent artifact file (detail tier) | 存在时从 detail-tier artifact 加载；该字段是可选上下文。缺失时 validator 继续依据 diff 与 cited code 验证，不得把字段缺失本身当作 finding 无效 |
 | `{finding_suggested_fix}` | Stage 5 merged finding (optional) | Pass empty string if not present |
 | `{finding_reviewer}` | Stage 5 merged finding | Original persona name (informational; helps validator interpret the framing) |
 | `{finding_confidence}` | Stage 5 merged finding | The persona's anchor (informational) |

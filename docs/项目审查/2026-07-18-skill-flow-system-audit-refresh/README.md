@@ -6,21 +6,21 @@ status: review-complete-current-source
 origin_plan: docs/plans/2026-07-17-002-docs-system-project-audit-validation-approach-plan.md
 baseline_audit: docs/项目审查/2026-07-17-skill-flow-system-audit/README.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
+current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
+working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 ---
 
 # spec-first Skill 关联关系系统审查当前快照刷新
 
-本批次按 origin plan 的 current-source、producer/consumer、focused-test 与 claim-ceiling 规则，对 2026-07-17 审查作增量刷新。它不改写旧批次：旧批次仍是其冻结 HEAD 的完整证据；本目录以 `source_head` 保存原始冻结快照。`current_head_at_calibration` 已包含此前 P0/P1 与 SF-11/SF-12/SF-13/SF-18 修复；当前 working-tree overlay 关闭 SF-14、SF-15、SF-16、SF-17、SF-19、SF-20、SF-21、SF-22、SF-23，并在对抗性复核中补闭 SF-11 遗留的 M-013 requirements-only HTML direct-work wording。不得把未提交 overlay 解读为当前 HEAD 已包含本轮最终校准。
+本批次按 origin plan 的 current-source、producer/consumer、focused-test 与 claim-ceiling 规则，对 2026-07-17 审查作增量刷新。它不改写旧批次：旧批次仍是其冻结 HEAD 的完整证据；本目录以 `source_head` 保存原始冻结快照。`current_head_at_calibration` 已包含 P0-P2 修复；当前 working-tree overlay 关闭 SF-24、SF-25、SF-26。不得把未提交 P3 overlay 解读为当前 HEAD 已包含本轮最终校准。
 
 ## 当前结论
 
 - **P0：0**
 - **仍未关闭的 P1：0**。
 - **已由当前 source + focused contracts 关闭的旧 P1：11**：SF-01（load-bearing internal helper delivery）、SF-02（knowledge promotion provenance/invalidation）、SF-03（active rendering config consumer）、SF-04（task-pack doc-review consumer）、SF-05（code-review mutation policy）、SF-06（maintainability mechanical-threshold precedence）、SF-07（dogfood/polish authority split）、SF-08（`lfg` 名称）、SF-09（browser N/A handshake）、SF-10（artifact map 与 producer contract）、SF-27（generic dispatch authorization）。
-- **总体判断：** P0/P1/P2 当前均为 0，剩余 3 项 P3。SF-11 的 shared HTML renderer 现按 artifact kind 声明 consumer：requirements-only brainstorm/ideation HTML 不直达 `spec-work`，只有 implementation-ready software plan 才可由 Work 消费；SF-14 删除 App audit/code-review 的虚假 active integration，仅保留明确休眠的兼容字段；SF-15 删除 Optimize 的纸面 Work consumer；SF-16/SF-19 对齐 worker artifact/return/authority；SF-17 只保留 Dogfood 真实 caller；SF-20/SF-21 对齐 cache fallback 与 confidence gate；SF-22 建立 Riffrec canonical owner、package-local byte parity 与五宿主投射检查；SF-23 将两个孤儿 helper 提升为显式用户 standalone skill，其中 PR feedback 的 local fix、commit、push、reply、thread resolve 五类出口分别准入。当前关闭证据止于 source、focused contracts 与 projection/init integration；没有 fresh-source independent reviewer、真实 XcodeBuildMCP/GitHub mutation、host-loader 或 field outcome。
+- **总体判断：** P0/P1/P2/P3 当前均为 0。最后 3 项 P3 已在现有 owner 内关闭：Deployment prompt 与 orchestrator risky-migration gate 对齐且不可 self-invoke；Validator 将 `why_it_matters` 视为可选 detail context；LFG 如实描述 Simplify 的 full-project typecheck/lint、默认 scoped tests 与按风险扩大范围。当前关闭证据止于 source、RED/GREEN contracts 与完整回归；没有 fresh-source independent reviewer、真实 deployment/validator outcome、host-loader 或 field outcome。
 - **逐项校准：** SF-01 已按 9 条 load-bearing caller edge（其中 5 条指向 `spec-proof`）在 projection-contract 层关闭；SF-02、SF-03、SF-04、SF-06、SF-10、SF-11、SF-12、SF-13 已在 source/docs-contract 层关闭，其中 SF-11 的 consumer test 同时拒绝 requirements-only direct-work false edge；SF-18 在 source-owner + five-host projection parity 层关闭；SF-05、SF-07、SF-27 已由 source 与聚焦合同关闭，其中 dispatch matrix 从 18/6/12 收口为 18/18 qualified，`spec-code-review` 的 trivial-PR 判断也已改为 dispatch gate 前的 orchestrator inline 判断。
 
 ## 覆盖与快照
@@ -42,8 +42,8 @@ working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 
 | 文件 | 用途 |
 | --- | --- |
-| [review-report.md](review-report.md) | 当前结论、P0/P1/P2 清零、P3 指针与逐项关闭证据边界 |
-| [optimization-issues.md](optimization-issues.md) | 当前 3 项 P3、P0/P1/P2 清空证明与已关闭 finding 摘要 |
+| [review-report.md](review-report.md) | 当前结论、P0-P3 清零与逐项关闭证据边界 |
+| [optimization-issues.md](optimization-issues.md) | 当前空队列证明与已关闭 finding 摘要 |
 | [evidence/skill-graph.md](evidence/skill-graph.md) | 35-node roster、entry surface、internal delivery 和关系增量 |
 | [evidence/edge-ledger.md](evidence/edge-ledger.md) | 与 07-17 全量 ledger 的联合账本、冻结关系集与当前 overlay `+2/-3` pair delta 裁决 |
 | [evidence/validation.md](evidence/validation.md) | 当前快照、命令、语义场景、反证、claim ceiling 与限制 |

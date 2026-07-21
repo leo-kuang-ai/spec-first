@@ -9,6 +9,10 @@ const deploymentPrompt = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/personas/deployment-verification-agent.md'),
   'utf8',
 );
+const validatorTemplate = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/validator-template.md'),
+  'utf8',
+);
 const subagentTemplate = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/subagent-template.md'),
   'utf8',
@@ -173,6 +177,32 @@ describe('spec-code-review current contracts', () => {
     expect(deploymentPrompt).toContain(
       'Every checklist item must name the command or observable signal that proves the step succeeded.',
     );
+  });
+
+  test('deployment verification activation mirrors the orchestrator risk gate and cannot self-invoke', () => {
+    const whenToUse = deploymentPrompt.match(/## When to Use This Agent([\s\S]*?)$/)?.[1] || '';
+
+    expect(skill).toContain('只有 orchestrator 能应用该 gate');
+    expect(whenToUse).not.toBe('');
+    expect(whenToUse).toContain('只能由 `spec-code-review` orchestrator 调用');
+    expect(whenToUse).toContain('必须同时满足');
+    expect(whenToUse).toContain('migration 或 schema artifact');
+    expect(whenToUse).toContain('destructive DDL');
+    expect(whenToUse).toContain('NOT NULL without default');
+    expect(whenToUse).toContain('column rename/drop');
+    expect(whenToUse).toContain('普通 data-processing logic');
+    expect(whenToUse).toContain('不能单独授权调用');
+    expect(whenToUse).not.toContain('PR modifies data processing logic');
+    expect(whenToUse).not.toContain('Any change that could silently corrupt/lose data');
+  });
+
+  test('validator treats why_it_matters as optional context exactly like Stage 5b', () => {
+    expect(skill).toContain('`why_it_matters` when available');
+    expect(validatorTemplate).toContain('该字段是可选上下文');
+    expect(validatorTemplate).toContain('缺失时 validator 继续依据 diff 与 cited code 验证');
+    expect(validatorTemplate).toContain('该字段可能为空；为空时直接依据 diff 与 cited code 验证');
+    expect(validatorTemplate).toContain('不得因缺少 reviewer framing 而拒绝或确认 finding');
+    expect(validatorTemplate).not.toContain('required for the validator to understand the finding');
   });
 
   test('prompt assets are skill-local', () => {

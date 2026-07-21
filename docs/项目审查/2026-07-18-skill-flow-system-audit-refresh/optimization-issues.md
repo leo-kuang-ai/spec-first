@@ -6,14 +6,14 @@ status: review-evidence-current-source
 origin_report: docs/项目审查/2026-07-18-skill-flow-system-audit-refresh/review-report.md
 baseline_issue_list: docs/项目审查/2026-07-17-skill-flow-system-audit/optimization-issues.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
+current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
+working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 ---
 
 # Skill 关联关系当前需要优化的问题清单
 
-当前 P0/P1/P2 均为 0。原 P0/P1/P2 finding 已由 current source 与 focused contracts 逐项关闭；SF-27 也已关闭。`source_head` 仍是原始冻结快照；`current_head_at_calibration` 已包含此前修复，当前 overlay 关闭最后 9 项 P2，并在对抗性复核中补闭 SF-11 遗留的 M-013 requirements-only direct-work wording、SF-14 空断言与 SF-23 host-lossy projection 误测。
+当前 P0/P1/P2/P3 均为 0。`current_head_at_calibration` 已包含此前 P0-P2 修复；当前 overlay 关闭最后 3 项 P3，并继续保留 SF-11/M-013、SF-14 false-green 与 SF-23 host-lossy projection 的既有对抗性修复。`source_head` 仍是原始冻结快照。
 
 本清单从同批次校准后的 [review-report.md](review-report.md) 提取，只用于后续 plan/work 消费，不表示问题已获得修复、commit、push、PR 或 lifecycle mutation 授权。
 
@@ -25,11 +25,9 @@ working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 
 无。
 
-## P3：文案与低风险合同修正（3 项）
+## P3：文案与低风险合同修正
 
-1. **SF-24 Deployment prompt activation 比 orchestrator gate 更宽。** 统一触发说明；worker 本身不可自调用。
-2. **SF-25 Validator 将 `why_it_matters` 写成必填，但 orchestrator 允许缺失。** 改为 `when available`，或统一 producer/validator contract。
-3. **SF-26 LFG 错称 Simplify 会跑完整测试。** 实际 simplify 先跑 affected scoped tests；应修正文案，最终 verification gate 继续拥有完整 closeout truth。
+无。
 
 ## 已关闭，不进入优化队列
 
@@ -57,7 +55,10 @@ working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 - **SF-21：** Maintainability anchor 50 一律 suppress；有直接客观证据时提升到 anchor 75，否则省略，禁止用 P0/P1 绕 confidence gate。关闭证据为 source + focused confidence contract；未执行 fresh-session persona eval。
 - **SF-22：** `spec-riffrec-feedback-analysis` 是 analyzer canonical owner，Sweep 保留 byte-identical package-local projection；source parity 与五宿主 projection contract 均锁定。关闭证据不包含真实媒体分析 field run。
 - **SF-23：** `spec-resolve-pr-feedback` 与 `spec-test-xcode` 作为显式用户 standalone skill 投射到五宿主；前者新增 local-fix/commit/push/reply/thread-resolve 五类独立 authority，后者删除虚假 Code Review auto-caller。Projection contract 按宿主语义验证：Cursor 按 allowlist 移除不支持的 `allowed-tools` frontmatter，但保留 user-only entry、authority body 与 `disable-model-invocation`，其余四宿主保留 source tool list；未执行真实 GitHub mutation、XcodeBuildMCP 或 host loader。
+- **SF-24：** Deployment prompt 的 activation 已与 orchestrator 的 risky migration-artifact gate 对齐；只有包含 migration/schema artifact 且涉及 destructive DDL、backfill、NOT NULL without default 或 column rename/drop 才可调用。Worker prompt 明确不能 self-invoke，普通 data-processing、model/query/serializer 或 migration-test change 不触发。
+- **SF-25：** Validator template 已将 `why_it_matters` 校准为 available-when-present 的可选 detail-tier context；缺失时仍依据 diff 与 cited code 独立验证，不再与 Stage 5b producer contract 冲突。
+- **SF-26：** LFG 不再把 Simplify 描述为无条件运行完整 test suite；当前合同明确全项目 typecheck/lint、默认 changed-path scoped tests、按影响面/runner 能力扩大范围，并保留 final verification gate 的完整 closeout authority。
 
 ## 建议工作包
 
-P0/P1/P2 队列已清空。下一批只剩 P3：先修 SF-25 的 validator producer/consumer 必填冲突，再修 SF-24 activation prose 与 SF-26 LFG verification 文案。
+P0/P1/P2/P3 审查队列已清空。既存 release-governance summary coverage 缺口属于独立 release continuity 债务，不重新归类为 Skill-flow finding。

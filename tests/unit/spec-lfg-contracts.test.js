@@ -8,6 +8,10 @@ const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 const plugin = require('../../src/cli/plugin');
 
 const skill = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-lfg/SKILL.md'), 'utf8');
+const simplifySkill = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-simplify-code/SKILL.md'),
+  'utf8',
+);
 const reviewFollowup = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-lfg/references/review-followup.md'),
   'utf8',
@@ -28,6 +32,18 @@ describe('spec-lfg current contracts', () => {
     expect(skill).toContain('all in-scope U-IDs/tasks accounted for and completed');
     expect(skill).toContain('an empty blocker list');
     expect(skill).toMatch(/failed, not-run, missing, or indeterminate result blocks lifecycle mutation/i);
+  });
+
+  test('describes Simplify verification scope without claiming an unconditional full test suite', () => {
+    expect(skill).toContain('全项目 typecheck/lint');
+    expect(skill).toContain('默认运行 changed-path scoped tests');
+    expect(skill).toContain('影响面明显扩大或 runner 无法缩小时才扩大测试范围');
+    expect(skill).toContain('最终 verification gate 仍拥有完整 closeout truth');
+    expect(skill).not.toContain('it preserves behavior and runs the test suite');
+    expect(simplifySkill).toContain('Run typecheck and lint over the full project');
+    expect(simplifySkill).toContain('Run tests scoped to the changed paths');
+    expect(simplifySkill).toContain('Broaden scope when the change has obvious wide reach');
+    expect(simplifySkill).toContain('If the test runner has no scoping mechanism, run the full suite');
   });
 
   test('uses the explicit LFG request as a scoped independent-review dispatch authorization', () => {

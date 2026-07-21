@@ -42,7 +42,7 @@ dev-server default. An empty, malformed, or repeated modifier records
 
 3. Invoke the `spec-simplify-code` skill on the branch diff.
 
-   This runs before review so the code-review in step 4 covers the simplified code. **Skip** this step when the change is docs-only (only markdown/docs paths changed) or trivial (roughly under 10 changed lines). Otherwise let `spec-simplify-code` resolve the branch-diff scope itself; it preserves behavior and runs the test suite.
+   This runs before review so the code-review in step 4 covers the simplified code. **Skip** this step when the change is docs-only (only markdown/docs paths changed) or trivial (roughly under 10 changed lines). Otherwise let `spec-simplify-code` resolve the branch-diff scope itself：它保持行为，运行全项目 typecheck/lint，并默认运行 changed-path scoped tests；影响面明显扩大或 runner 无法缩小时才扩大测试范围。该步骤只提供 behavior-preservation signal，最终 verification gate 仍拥有完整 closeout truth。
 
    Do not commit in this step. `spec-simplify-code` leaves its changes in the working tree; step 4's review scopes the working tree (uncommitted changes included), and step 8's `spec-commit-push-pr` commits whatever remains. Committing here would sweep any still-uncommitted `spec-work` edits into a misleading `refactor` commit and could stall on a tree that never goes clean.
 

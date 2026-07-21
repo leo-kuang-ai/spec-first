@@ -3,9 +3,9 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
+current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
+working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
@@ -50,7 +50,7 @@ overlay_pair_delta_removed: 3
 
 ## 3. 变更支撑文件所触及的既有 edge
 
-原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决此前 P0/P1/P2。当前 overlay 还以 bounded current-vs-HEAD skill-name token scan 记录 `+2/-3`：新增 `using-spec-first` 到两个 user-only standalone skill 的 public route，删除 Optimize/Work 与 Worktree/Work-Code Review 三条纸面/reverse pair。该 scan 只校准 overlay delta；顶部 165 仍是冻结 calibration manifest，不冒充本轮完整重算。
+原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决此前 P0/P1/P2。`current_head_at_calibration` 已包含 `+2/-3` 的 P2 pair delta；当前 P3 overlay 只校准 existing prompt/consumer wording，不新增或删除 canonical pair。顶部 165 仍是冻结 calibration manifest，不冒充本轮完整重算。
 
 | Baseline ID | Current edge | Current verdict | 说明 |
 | --- | --- | --- | --- |
@@ -62,7 +62,7 @@ overlay_pair_delta_removed: 3
 | M-036 | `spec-dogfood -> spec-commit` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；caller 仍须先持有独立 commit authority |
 | M-057 | `spec-lfg -> spec-code-review` | **confirmed (SF-18 closed)** | JSON-only report consumption 保持；tracker filing 由 caller-owned Work/LFG residual flow 处理，`spec-code-review` 只 report；LFG/Work tracker reference source 与五宿主投射均保持 parity |
 | M-058 | `spec-lfg -> spec-commit-push-pr` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；LFG 从明确 entry admission 派生并传递 commit/landing facts，`mode:pipeline` 不授权 |
-| M-061 | `spec-lfg -> spec-simplify-code` | drift retained (P3) | source 仍泛称 simplify “runs the test suite”，实际 evidence scope 不能由该语句提升 |
+| M-061 | `spec-lfg -> spec-simplify-code` | **confirmed（SF-26 closed）** | LFG 现如实声明 full-project typecheck/lint、默认 changed-path scoped tests 与 risk/runner-based broadening；final verification gate 仍持有完整 closeout truth |
 | M-062 | `spec-lfg -> spec-test-browser` | **confirmed (SF-09 closed)** | applicable/not_applicable、exact origin、effect authorization、cleanup/result blockers 已闭合 |
 | M-069 | `spec-plan -> spec-doc-review` | **confirmed (SF-11 closed)** | Plan HTML renderer 现声明 report-only consumer，锁定 `html-artifact` 与 zero-write boundary |
 | M-072 | `spec-plan -> spec-proof` | **confirmed (SF-01/SF-12 closed)** | target 完整 package 已五宿主投射；Universal Proof-only 先物化 source，Save+Proof 发布 exact saved Markdown，真实 host/API invocation 尚未验证 |
@@ -80,6 +80,7 @@ overlay_pair_delta_removed: 3
 | work -> doc review -> work | semantic review prevents stale plan handoff | doc-review is byte-preserving report producer; work owns disposition/verification | hash drift/incomplete/P0/P1 stop final validation | confirmed |
 | task pack -> doc review | high-risk review intent is legitimate | `spec-doc-review` 唯一分类 task pack 并强制 report-only；validator owns deterministic floor，source plan owns scope/architecture，write-tasks owns regeneration | invalid/stale intake 不 dispatch personas；pack gap 回 `spec-write-tasks`，plan decision gap 回 `spec-plan`；只有完整 zero-write JSON envelope、source-plan 对齐及 passed+valid+deterministic outcome 同时成立才进入 `spec-work-task-pack` | confirmed at `source-contract-confirmed`, SF-04 closed；`Review complete`/`roster:full` 不提升 handoff/dispatch authority |
 | code-review shared spine -> maintainability persona | maintainability owns concrete structural/mechanical findings；shared template owns cross-persona false-positive/advisory normalization | 1000-line crossing 在 before/after line-count + added-diff evidence 成立时保持 P1/anchor-100；thin wrapper/duplicate helper 保持 persona owner；无 threshold/failure mode 的 subjective long-file opinion 仍 suppress | shared template 先保留 proven persona severity/confidence，避免旧 suppress 或 generic advisory anchor-50 降级，再对剩余 shape 执行 FP-over-advisory precedence；四个 planted cases 防止 broad override | confirmed at `source-contract-confirmed`, SF-06 closed；未执行 fresh-session persona dispatch |
+| code-review orchestrator -> deployment/validator prompt | orchestrator owns conditional activation 与 available detail context；worker/template 不拥有 self-activation 或 producer-requiredness | Deployment 只在 risky migration/schema artifact gate 下调用；`why_it_matters` 存在时加载，缺失时 validator 继续依据 diff/cited code | 普通 data-processing、model/query/serializer/migration-test 不触发 deployment worker；optional detail 缺失不使 finding 自动失效 | confirmed at `source-contract-confirmed`, SF-24/SF-25 closed；未执行真实 deployment 或 validator precision/recall eval |
 | artifact map -> spec-work run artifact | 用户需要知道 closeout evidence 的真实生命周期与读取边界 | map 复述 schema/producer 的 conditional `workflow_integrated`、v2 `direct_evidence_used`、v1 `graph_evidence_used` read/prune compatibility；source-owned reader 仍是唯一确定性 read/prune owner | 不再把 false-only 写成 current contract，不把旧 graph-shaped fields 当 v2 字段，不把 spec-code-review 自动 discovery 当事实；显式 reader 仍需 target repo/workspace/run，artifact 不获得 source scope authority | confirmed at `source/docs-contract-confirmed`, SF-10 closed；未验证真实用户阅读/跨宿主渲染 |
 | runtime setup -> local rendering config -> plan/brainstorm/ideate | setup 暴露并保护三个 active local preferences | 三个 workflow 分别拥有格式解析、默认值与 pipeline override；setup 不调用 workflow | 注释、缺失或无效值保持 consumer 默认，不能被 setup 提升为 runtime authority | confirmed at `source-contract-confirmed`, SF-03 closed；未验证真实 host/local config field run |
 | work/debug/review -> compound | durable knowledge can be reusable | new/materially rewritten learning 必须有 grounded `source_refs` 与 concrete `invalidation_condition`；validator 只强制机械形态，LLM/human 判断语义充分性 | Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 缺任一字段、空值、错误类型或重复字段时不得完成；legacy default mode 保持兼容 | confirmed at `source-contract-confirmed`, SF-02 closed；未验证真实 host field run |

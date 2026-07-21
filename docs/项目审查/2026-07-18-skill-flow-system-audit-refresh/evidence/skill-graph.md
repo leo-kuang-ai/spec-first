@@ -3,9 +3,9 @@ title: Skill 关系图当前快照
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
+current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
+working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 governed_nodes: 35
 canonical_pairs: 165
 overlay_pair_delta: +2/-3
@@ -39,7 +39,7 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 
 ## 3. Canonical relationship delta
 
-基线是 07-17 的 157 pair ledger。下方 265 hits / 165 pairs 是冻结 calibration manifest；当前 P2 overlay 没有重写该历史 manifest。另用相同意图的 bounded current-vs-HEAD skill-name token scan 只校准 overlay delta：新增 2 条、删除 3 条；文本共现仍只是 declared candidate，语义角色与 authority 见 edge ledger。
+基线是 07-17 的 157 pair ledger。下方 265 hits / 165 pairs 是冻结 calibration manifest；`current_head_at_calibration` 已包含 P2 的 `+2/-3` pair delta。当前 P3 overlay 只校准 existing edge 的 activation/evidence wording，不改变 pair 分母；文本共现仍只是 declared candidate，语义角色与 authority 见 edge ledger。
 
 ```text
 157 baseline pairs
@@ -66,12 +66,13 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 
 `spec-test-browser -> spec-runtime-setup`（旧 M-113）已从 current source 删除。browser helper 现在返回 caller-consumable `not_supported` / reason code，不再把 setup repair 写成 declared handoff；这只改变关系分母，不证明 exact-origin capability 已就绪。
 
-### 当前 P2 overlay pair delta
+### 当前已提交 P2 pair delta 与 P3 overlay
 
 - 新增：`using-spec-first -> spec-resolve-pr-feedback`、`using-spec-first -> spec-test-xcode`，均为 user-explicit standalone route。
 - 删除：`spec-optimize -> spec-work`、`spec-worktree -> spec-code-review`、`spec-worktree -> spec-work`，分别移除纸面 consumer 与 reverse-only caller。
 - App audit 与 Xcode 对 Code Review 的文本 mention 只保留 near-neighbor/negative boundary 或 legacy compatibility，不构成 active invocation edge。
 - Shared HTML renderer 中的 `spec-work` 只在 artifact 已由 producer contract 确认为 implementation-ready software plan 时成立；requirements-only Brainstorm/Ideate HTML 不形成 `spec-brainstorm -> spec-work` direct edge。
+- P3 overlay 不增加/删除 pair：SF-24/SF-25 校准 Code Review 内部 activation/detail-context contract；SF-26 只修正既有 `spec-lfg -> spec-simplify-code` edge 的 verification 语义。
 
 ## 4. 关系形态
 
@@ -86,4 +87,4 @@ spec-lfg --authorized landing--> spec-commit-push-pr
 spec-dogfood --authorized checkpoint--> spec-commit
 ```
 
-每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含此前修复；working-tree overlay 关闭最后 9 项 P2，并将两个治理孤儿改为 user-only standalone skill。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 frozen manifest 的文件/pair/hash 不冒充 working-tree 全量重算；本轮只记录可复跑的 `+2/-3` overlay delta。
+每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 P0-P2 修复与 `+2/-3` pair delta；working-tree overlay 关闭最后 3 项 P3，但不改变 pair 分母。`source_head` 只保留原始冻结快照，顶部 frozen manifest 的文件/pair/hash 不冒充 working-tree 全量重算。
