@@ -3,9 +3,9 @@ title: Skill 关系审查当前快照验证记录
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: e395f10f92cb6e55875da74aa01927a66e53797b
-working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-repair
+current_head_at_calibration: 11b26b954a9b36483b97723b4c6917951c1813bc
+working_tree_calibrated_at: 2026-07-21
+working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
 ---
 
 # Validation — current source refresh
@@ -15,10 +15,10 @@ working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-
 | Fact | Result |
 | --- | --- |
 | Original audit source HEAD | `0c1b358605c534db50321a5252e5e6d356dbcefb` |
-| Current calibration HEAD | `e395f10f92cb6e55875da74aa01927a66e53797b` |
+| Current calibration HEAD | `11b26b954a9b36483b97723b4c6917951c1813bc` |
 | Branch | `leo-2026-07-16-plan-update` |
-| Dirty state before final SF-01/SF-27 repair | clean；SF-06 已进入 current HEAD |
-| Current final repair overlay | uncommitted working tree; `current_head_at_calibration` 不包含本轮 `spec-proof` delivery、code-review trivial-PR inline、governance wording、测试与审查 evidence 修复 |
+| Dirty state before SF-12/SF-18/SF-13 repair | clean；SF-11 已进入 current HEAD |
+| Current final repair overlay | uncommitted working tree; `current_head_at_calibration` 不包含本轮 Universal Proof materialization、tracker-defer parity、terminal handoff、测试与审查 evidence 修复 |
 | Package version | `1.13.2` |
 | Baseline HEAD | `7cb9721f0a9e4f0e0dc265c7194ab80e678b3c64` |
 | Frozen `source_head` delta to baseline | 4 commits; 30 changed canonical Skill sources, including 3 new references |
@@ -71,9 +71,15 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | SF-06 maintainability focused replay | pass, 1 suite / 22 tests | persona/shared-template false-positive + advisory precedence、1k crossing、thin wrapper、duplicate canonical helper 与 subjective long-file negative case |
 | SF-11 HTML consumer contract RED | expected fail, 2 suites；3 failed / 8 passed | 新合同先证明三份 renderer 仍否认 HTML doc-review consumer、Ideate 泄漏 plan-specific prose，且 Brainstorm 隐藏 HTML requirements review；失败未被改写为通过 |
 | SF-11 focused replay | pass, 6 suites / 65 tests | 三份 renderer、Brainstorm handoff、doc-review report-only mutation owner、Plan 既有 HTML handoff、Changelog 与 test inventory |
+| SF-12/SF-18/SF-13 contract RED | expected fail, 5 suites；5 failed / 26 passed | 旧 source 分别缺 Proof 前 Markdown materialization、tracker source/runtime parity 与正确 terminal/handoff 叙述；失败未被改写为通过 |
+| SF-12/SF-18/SF-13 focused replay | pass, 5 suites / 31 tests | Brainstorm/Plan Proof source path、Save+Proof same-file、Ideate→Brainstorm→explicit Plan boundary、Work/LFG source parity 与五宿主 projection parity |
+| SF-12/SF-18/SF-13 inline simplification | pass, no applied change | reuse/quality/efficiency 三镜逐项检查；跨包 tracker copy 是五宿主 root 差异下的必要 projection，Proof/Plan 步骤均为 load-bearing boundary，不为减少行数而删除 |
+| SF-12/SF-18/SF-13 inline adversarial scan | pass, no remaining actionable finding | 检查 materialization-before-publish、same-byte/same-file、failure retention、direct ideate→plan 禁止、Work canonical owner、source/runtime parity、temp/durable evidence 与 generated-runtime boundary；补强 `spec-proof` existing-file/title/default-identity consumer assertion |
+| post-adversarial focused replay | pass, 6 suites / 33 tests | 三项合同、五宿主 projection、Changelog format 与新增 Proof producer/consumer cross-contract |
 | `npm run test:unit` after SF-06 adversarial repair | pass, 125 suites / 1274 tests | complete unit regression；包含 SF-03 config consumer、SF-04 task-pack consumer、SF-10 artifact-map、SF-06 suppress/advisory precedence、active replay manifest 与全仓 unit contracts |
 | `npm run test:unit` after final SF-01/SF-27 repair | pass, 125 suites / 1277 tests | complete unit regression；新增 Proof direct-name/internal-route separation 与 pre-gate dispatch guard |
 | `npm run test:unit` after SF-11 repair | pass, 125 suites / 1280 tests | complete unit regression；包含 HTML renderer/Brainstorm review contract 与更新后的 active requirements-clarification source pin |
+| `npm run test:unit` after SF-12/SF-18/SF-13 repair | pass, 125 suites / 1284 tests | complete unit regression；新增 Universal Proof materialization、terminal/handoff 与 tracker source/five-host projection parity contracts |
 | `npm run test:smoke` | pass, 1 suite / 5 tests | CLI help、preview、global profile 与 packed five-host runtime |
 | `npm run test:integration` | pass, 6 suites / 21 tests；1 conditional suite / 2 tests skipped | five-host init、workspace graph、Qoder lifecycle 与 plan closeout integration |
 | `npm run test:eval-fixtures` | pass, 6 suites / 78 tests | current eval/replay fixture contracts |
@@ -109,6 +115,9 @@ No generic subagent dispatch was authorized. All rows are current-source inline 
 | code-review mutation policy | classification must not grant apply authority; ordinary review report-only; mode:agent caller-owned apply | `autofix_class` is classification-only and run-local `mutation_policy` is authoritative | working-tree source + focused contracts；SF-05 closed |
 | maintainability shared spine | persona-defined mechanical threshold must survive generic style suppression and advisory reroute；subjective opinion must remain suppressed | shared template preserves proven persona severity/confidence before FP/advisory normalization；planted cases keep 1k crossing/thin wrapper/duplicate helper and suppress ungrounded long-file opinion | working-tree source + focused RED/GREEN replay；SF-06 closed at `source-contract-confirmed` |
 | HTML requirements review | HTML must receive the same structural/semantic doc review while remaining zero-write；forbid hiding the option、Markdown mutation paths or plan-specific renderer prose | three renderers declare report-only `spec-doc-review` with `html-artifact` / `fixes_applied: 0`；Brainstorm exposes review in both formats and passes `mutation:report-only` for HTML；Ideate renderer has no `5.3.8` consumer leak | working-tree source + focused RED/GREEN replay；SF-11 closed at `source-contract-confirmed` |
+| Universal Proof publish | Proof must consume an existing local Markdown file；forbid chat-only/inline reconstruction and losing the source on publish failure | Brainstorm/Plan Proof-only branches materialize and verify run-local Markdown before `spec-proof`；Save+Proof publishes the exact saved file；failure retains the concrete path | working-tree source + focused RED/GREEN replay；SF-12 closed at `source-contract-confirmed` |
+| tracker-defer owner | one normative owner；forbid code-review filing、guessed temp paths and session-temp durable links | Work is named canonical owner；LFG copy is byte-identical for host packaging；source and five-host projection parity pass | working-tree source + focused parity/projection contracts；SF-18 closed at `projection-contract-confirmed` |
+| Universal Ideate terminal handoff | forbid direct ideate→plan or automatic implementation chain；allow user-explicit Plan only from Brainstorm wrap-up | Ideate hands only to Brainstorm；explicit Create a plan enters universal/knowledge-work Plan；Universal Plan does not offer Work | working-tree source + focused terminal/handoff contract；SF-13 closed at `source-contract-confirmed` |
 | dogfood/polish exit authority | branch scope, local fix, commit and landing must have separate explicit basis | four run-local facts defined; branch/PR selector and `done` do not authorize checkout/commit; uncommitted fallback preserved | working-tree source + focused contracts；SF-07 closed |
 | spec-work artifact map | user map must match current producer integration flag, evidence fields and reader boundary | map distinguishes integrated true/false, durable-trigger reasons, v1/v2 compatibility, v2 direct evidence fields and explicit source-owned reader; no implicit workflow consumer is claimed | working-tree source/docs contract + focused RED/GREEN replay；SF-10 closed at `source/docs-contract-confirmed` |
 | generic dispatch | explicit authorization required; forbid route/mode/permission/approved-spec-as-dispatch authorization | working-tree matrix is 18 dispatching / 18 qualified / 0 package-local gap；code-review trivial-PR pre-check is inline and profile dispatch remains after Stage 1c；this run itself used inline fallback | working-tree source + focused contracts + inline order audit；SF-27 closed，independent outcome not_run |
@@ -124,5 +133,8 @@ No generic subagent dispatch was authorized. All rows are current-source inline 
 - SF-10 contract test proves map/schema/producer/read-prune wording alignment and rejects the retired false-only, graph-shaped and implicit-consumer claims；它不证明真实用户阅读、跨宿主渲染或 workflow 自动消费。
 - SF-06 tests prove prompt precedence and planted-case shape only；它们不证明 fresh-session maintainability persona 的实际 finding recall、precision 或 host behavior。当前 `dispatch_authorization_missing`，因此只声明 inline adversarial coverage。
 - SF-11 tests prove renderer/handoff/doc-review source-contract consistency and replay freshness only；它们不证明 fresh-session host menu、独立 persona review、HTML browser rendering 或 field outcome。当前 `dispatch_authorization_missing`，因此只声明 inline diff/adversarial scan。
+- SF-12 tests prove local-file materialization and handoff wording only；它们不证明真实 Proof API publish、share URL 或跨宿主 temp filesystem outcome。
+- SF-18 tests prove source/runtime projection parity and authority wording only；它们不证明真实 tracker detection、ticket creation、PR-body/fallback-file durability 或跨会话 continuation。
+- SF-13 tests prove terminal/handoff source consistency only；它们不证明真实 host menu interaction或 universal plan field outcome。
 - Generated `.agents/skills/`, `.claude/`, `.codex/`, `.cursor/`, `.kiro/`, and `.qoder/` mirrors were not read as audit source and were not modified.
 - The original audit artifact remains a knowledge-work deliverable；2026-07-20 的 SF-03/SF-04/SF-10/SF-06、最终 SF-01/SF-27 与 SF-11 overlay 是用户要求继续优化后的本地 source/test/docs repair。它不授权 plan lifecycle mutation、commit、push 或 PR，且当前最终 overlay 仍未提交。

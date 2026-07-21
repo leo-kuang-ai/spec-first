@@ -3,9 +3,9 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: e395f10f92cb6e55875da74aa01927a66e53797b
-working_tree_calibrated_at: 2026-07-20
-working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-repair
+current_head_at_calibration: 11b26b954a9b36483b97723b4c6917951c1813bc
+working_tree_calibrated_at: 2026-07-21
+working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
@@ -43,21 +43,21 @@ actual_pairs: 165
 
 ## 3. 变更支撑文件所触及的既有 edge
 
-原刷新批次的 30 个 source file delta 触及 46 个 pair；后续 SF-01 修复重裁决 commit-helper caller edges，SF-02 修复重裁决 knowledge-promotion exit，SF-03/SF-04 分别重裁决 local rendering config consumer 与 high-risk task-pack review consumer，SF-10 重裁决 artifact-map 到 source-owned run-artifact producer/read-prune consumer 的文档边界，本轮 SF-06 overlay 校准 `spec-code-review` 包内 orchestrator template -> maintainability persona precedence。SF-06 是 package-local prompt ownership，不新增 canonical cross-Skill pair。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
+原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决 internal-helper delivery、knowledge promotion、rendering config、task-pack review、artifact map、maintainability precedence 与 HTML report-only consumer。本轮 SF-12/SF-18/SF-13 overlay 继续重裁决 Universal Proof local-file handoff、LFG/Work tracker-defer owner/parity 与 Ideate→Brainstorm→explicit Plan terminal boundary；不新增 canonical pair。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
 
 | Baseline ID | Current edge | Current verdict | 说明 |
 | --- | --- | --- | --- |
-| M-008 | `spec-brainstorm -> spec-doc-review` | drift retained (P2) | handoff 仍称 HTML review unavailable，与 doc-review HTML report-only contract 冲突 |
-| M-010 | `spec-brainstorm -> spec-plan` | confirmed | requirements-only path remains the unique product-to-planning carrier |
-| M-012 | `spec-brainstorm -> spec-proof` | **confirmed (SF-01 closed)** | target 完整 package 已五宿主投射；caller 传递现有 Markdown source path，真实 host invocation 尚未验证 |
+| M-008 | `spec-brainstorm -> spec-doc-review` | **confirmed (SF-11 closed)** | Markdown/HTML 均可进入审查；HTML 固定 report-only、byte-preserving 且 producer-owned mutation |
+| M-010 | `spec-brainstorm -> spec-plan` | **confirmed (SF-13 closed)** | software requirements-only artifact 仍是产品到实现规划的 carrier；universal route 只在用户 wrap-up 显式选择后进入 knowledge-work Plan |
+| M-012 | `spec-brainstorm -> spec-proof` | **confirmed (SF-01/SF-12 closed)** | target 完整 package 已五宿主投射；Universal Proof-only 先物化并验证现有 Markdown source path，真实 host/API invocation 尚未验证 |
 | M-013 | `spec-brainstorm -> spec-work` | drift retained (P2) | shared renderer 的 direct-work wording 未被本次变更移除 |
 | M-036 | `spec-dogfood -> spec-commit` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；caller 仍须先持有独立 commit authority |
-| M-057 | `spec-lfg -> spec-code-review` | drift retained (P2) | JSON-only report consumption 已修复，但 tracker-defer 仍把 interactive code review 视为 filing owner |
+| M-057 | `spec-lfg -> spec-code-review` | **confirmed (SF-18 closed)** | JSON-only report consumption 保持；tracker filing 由 caller-owned Work/LFG residual flow 处理，`spec-code-review` 只 report；LFG/Work tracker reference source 与五宿主投射均保持 parity |
 | M-058 | `spec-lfg -> spec-commit-push-pr` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；LFG 从明确 entry admission 派生并传递 commit/landing facts，`mode:pipeline` 不授权 |
 | M-061 | `spec-lfg -> spec-simplify-code` | drift retained (P3) | source 仍泛称 simplify “runs the test suite”，实际 evidence scope 不能由该语句提升 |
 | M-062 | `spec-lfg -> spec-test-browser` | **confirmed (SF-09 closed)** | applicable/not_applicable、exact origin、effect authorization、cleanup/result blockers 已闭合 |
-| M-069 | `spec-plan -> spec-doc-review` | drift retained (P2) | `references/html-rendering.md` 仍称 doc-review non-HTML consumer |
-| M-072 | `spec-plan -> spec-proof` | **confirmed (SF-01 closed)** | target 完整 package 已五宿主投射；caller 仅在 Markdown output 下传 plan path，真实 host invocation 尚未验证 |
+| M-069 | `spec-plan -> spec-doc-review` | **confirmed (SF-11 closed)** | Plan HTML renderer 现声明 report-only consumer，锁定 `html-artifact` 与 zero-write boundary |
+| M-072 | `spec-plan -> spec-proof` | **confirmed (SF-01/SF-12 closed)** | target 完整 package 已五宿主投射；Universal Proof-only 先物化 source，Save+Proof 发布 exact saved Markdown，真实 host/API invocation 尚未验证 |
 | M-112 | `spec-test-browser -> spec-lfg` | **confirmed (SF-09 closed)** | reverse caller now consumes structured pipeline contract，helper is delivered internal asset |
 | M-117 | `spec-work -> spec-commit` | INFO / conditional named path；不再作为 SF-01 carrier | residual-sink 说明称“no-PR `spec-commit` path”，但 Phase 4 只要求 separately authorized repo commit workflow；没有 exact-helper invocation 或缺失 target blocker |
 | M-118 | `spec-work -> spec-commit-push-pr` | INFO / conditional named landing reference；不再作为 SF-01 carrier | residual-sink 说明描述“when calling `spec-commit-push-pr`”，但 Phase 4 只要求 requested landing workflow；没有 mandatory exact-helper edge |

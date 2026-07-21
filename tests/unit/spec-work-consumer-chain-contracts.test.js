@@ -13,6 +13,8 @@ describe('spec-work review consumer chain contracts', () => {
   const followup = read('skills/spec-work/references/review-findings-followup.md');
   const shipping = read('skills/spec-work/references/shipping-workflow.md');
   const tracker = read('skills/spec-work/references/tracker-defer.md');
+  const lfgTracker = read('skills/spec-lfg/references/tracker-defer.md');
+  const lfgSkill = read('skills/spec-lfg/SKILL.md');
 
   test('run-local consumers reuse the returned artifact_path and never guess a temp path', () => {
     for (const source of [followup, shipping, tracker]) {
@@ -36,5 +38,13 @@ describe('spec-work review consumer chain contracts', () => {
     expect(followup).toContain('two review rounds total');
     expect(followup).toContain('affected verification');
     expect(followup).toContain('dependent wave');
+  });
+
+  test('keeps spec-work as the tracker-defer owner and projects one byte-identical LFG copy', () => {
+    expect(tracker).toContain("Canonical owner: the `spec-work` package's co-located `references/tracker-defer.md` source");
+    expect(tracker).toContain('package-local projection');
+    expect(lfgTracker).toBe(tracker);
+    expect(lfgSkill).toContain('Load `references/tracker-defer.md` in **non-interactive mode**');
+    expect(lfgTracker).not.toContain('/tmp/spec-first/spec-code-review');
   });
 });

@@ -12,6 +12,10 @@ const handoff = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-plan/references/plan-handoff.md'),
   'utf8',
 );
+const universal = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-plan/references/universal-planning.md'),
+  'utf8',
+);
 
 describe('spec-plan current contracts', () => {
   test('enriches requirements-only unified plans in place', () => {
@@ -92,5 +96,14 @@ describe('spec-plan current contracts', () => {
     expect(skill).toContain('never presented as producer-confirmed fact');
     expect(skill).toContain('return it to the current user as a product decision or keep it as a named blocker');
     expect(skill).toContain('bounded bootstrap is not permission to decide it silently');
+  });
+
+  test('materializes Proof-only universal plans and publishes the saved file for Save plus Proof', () => {
+    expect(universal).toContain('spec-first/spec-plan/<run-id>/');
+    expect(universal).toMatch(
+      /Publish to Proof[\s\S]*?write the complete plan[\s\S]*?existing local Markdown path[\s\S]*?load `spec-proof`/i,
+    );
+    expect(universal).toContain('publish that exact saved Markdown file');
+    expect(universal).toMatch(/Proof publish fails[\s\S]*?local Markdown path/i);
   });
 });

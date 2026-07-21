@@ -1,6 +1,26 @@
 # Tracker Detection and Defer Execution
 
-This reference covers how Defer actions file tickets in the project's tracker. It is loaded by `SKILL.md` when Interactive mode's routing question needs to decide whether to offer option C (File tickets), when the walk-through's Defer option executes, and when the bulk-preview of option C is shown. It is also loaded by autonomous callers (e.g., `spec-lfg`) that need to file residual actionable findings without user prompts — see Execution Modes below.
+Canonical owner: the `spec-work` package's co-located `references/tracker-defer.md` source. The `spec-lfg` package carries a byte-identical package-local projection because the current plugin has no cross-skill import mechanism across every host runtime root. Keep both copies identical; `tests/unit/spec-work-consumer-chain-contracts.test.js` and the five-host projection contract enforce parity.
+
+This reference covers how residual actionable findings are filed in the project's tracker. Loaded by caller workflows (for example `spec-work` Residual Work Gate, or `lfg` residual handling) — not by `spec-code-review`, which stops after the report.
+
+## Owned
+
+- Detect an available project tracker/sink and file explicitly deferred residual findings.
+- Return structured filed/failed/no-sink outcomes for interactive and non-interactive callers.
+
+## Not Owned
+
+- Decide whether a finding is valid, whether the user accepted risk, or whether work may ship.
+- Let `spec-code-review` file tickets, infer external-action authorization, or drop residuals when no sink exists.
+
+## Trigger
+
+Load only after the Residual Work Gate/caller explicitly selects tracker deferral for structured findings.
+
+## Fallback
+
+Use the documented fallback chain; if every sink is unavailable, return `no_sink` structured findings to the caller. Do not block a headless caller with a prompt and do not treat no sink as permission to forget the residual.
 
 ---
 
@@ -8,9 +28,9 @@ This reference covers how Defer actions file tickets in the project's tracker. I
 
 Tracker-defer has two execution modes. The caller selects one; the detection, fallback chain, and ticket composition are shared.
 
-### Interactive mode (default)
+### Interactive mode
 
-Used by `spec-code-review` Interactive mode's routing question, walk-through Defer actions, and bulk-preview option C. All user-facing prompts fire:
+Used by `spec-work` Residual Work Gate and similar caller flows when the user chooses to file tickets. All user-facing prompts fire:
 
 - First Defer of the session with a generic (non-named) label confirms the effective tracker choice.
 - Execution failures prompt with Retry / Fall back to next sink / Convert to Skip.
@@ -18,7 +38,7 @@ Used by `spec-code-review` Interactive mode's routing question, walk-through Def
 
 ### Non-interactive mode
 
-Used by autonomous callers like `spec-lfg` that must not prompt. All blocking questions are skipped; the fallback chain is executed silently in order. Behavior:
+Used by autonomous callers like `lfg` that must not prompt. All blocking questions are skipped; the fallback chain is executed silently in order. Behavior:
 
 - No confirmation on the first generic-label Defer; proceed directly.
 - On execution failure, automatically fall to the next tier without prompting. Record the failure.
@@ -94,12 +114,12 @@ Every Defer action creates a ticket with the following content, adapted to the t
 
 - **Title:** the merged finding's `title` (schema-capped at 10 words).
 - **Body:**
-  - Plain-English problem statement — reads the persona-produced `why_it_matters` from the contributing reviewer's artifact file at `/tmp/spec-first/spec-code-review/<run-id>/{reviewer}.json`, using the same `file + line_bucket(line, +/-3) + normalize(title)` matching agent mode uses (see SKILL.md Stage 6 detail enrichment). Falls back to the merged finding's `title`, `severity`, `file`, and `suggested_fix` (when present) when no artifact match is available — these fields are guaranteed in the merge-tier compact return.
+  - Plain-English problem statement — in the same run, may read persona-produced `why_it_matters` from `{artifact_path}/{reviewer}.json` when the returned `artifact_path` is non-null and readable, using the same `file + line_bucket(line, +/-3) + normalize(title)` matching agent mode uses. Falls back to the merged finding's structured finding summary (`title`, `severity`, `file`, `suggested_fix`, and in-band evidence when present) when no artifact match is available. Do not re-run review to enrich a ticket.
   - Suggested fix (when present in the finding's `suggested_fix`).
-  - Evidence (direct quotes from the reviewer's artifact).
+  - Evidence (direct quotes from the returned artifact when available, otherwise from in-band merged evidence; omit unavailable detail and state the limitation rather than inventing it).
   - Metadata block: `Severity: <level>`, `Confidence: <score>`, `Reviewer(s): <list>`, `Finding ID: <fingerprint>`.
 - **Labels** (when the tracker supports labels): severity tag (`P0`, `P1`, `P2`, `P3`) and, when the tracker convention supports it, a category label sourced from the reviewer name.
-- **Length cap:** when the composed body would exceed a tracker's body length limit, truncate with `... (continued in spec-code-review run artifact: /tmp/spec-first/spec-code-review/<run-id>/)` and include the finding_id in both the truncated body and the metadata block so the artifact is discoverable.
+- **Length cap:** when the composed body would exceed a tracker's body length limit, include the complete actionable core plus finding_id. Link a continuation only when spec-work has materialized sanitized repo-local review evidence; otherwise retain a compact structured finding summary in the ticket. A ticket must not link to a session-temp artifact_path because it can disappear or be machine-specific.
 
 The finding_id is a stable fingerprint composed as `normalize(file) + line_bucket(line, +/-3) + normalize(title)` — the same fingerprint used by the merge pipeline.
 
@@ -144,6 +164,6 @@ When uncertain, prefer "drop with explicit user-facing notice" over "pass throug
 
 ## Cross-platform notes
 
-In Interactive mode, use a native blocking-question primitive when the active host exposes one and the current execution mode allows it. Confirmed examples are `AskUserQuestion` in Claude Code and `request_user_input` in Codex. In Claude Code, if the deferred tool schema is not loaded, call `ToolSearch` with query `select:AskUserQuestion` before falling back. When no usable native primitive is exposed, present numbered options in chat, end the current turn, and wait for the user's reply. Treat the run as headless only when it genuinely cannot receive another user turn. Never silently skip a required question or continue with an assumed answer.
+The question-tool name varies by platform. In Interactive mode, use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex). In Claude Code the tool should already be loaded from the Interactive-mode pre-load step — if it isn't, call `ToolSearch` with query `select:AskUserQuestion` now. Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool — `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose it (e.g., Codex edit modes without `request_user_input`). A pending schema load is not a fallback trigger. Never silently skip the question.
 
-Non-interactive mode is platform-agnostic: it never prompts. Return unresolved decisions to the caller through the documented structured result.
+Non-interactive mode is platform-agnostic: it never prompts, so the platform's question tool is not relevant.

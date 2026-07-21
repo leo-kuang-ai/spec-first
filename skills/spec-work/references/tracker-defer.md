@@ -1,5 +1,7 @@
 # Tracker Detection and Defer Execution
 
+Canonical owner: the `spec-work` package's co-located `references/tracker-defer.md` source. The `spec-lfg` package carries a byte-identical package-local projection because the current plugin has no cross-skill import mechanism across every host runtime root. Keep both copies identical; `tests/unit/spec-work-consumer-chain-contracts.test.js` and the five-host projection contract enforce parity.
+
 This reference covers how residual actionable findings are filed in the project's tracker. Loaded by caller workflows (for example `spec-work` Residual Work Gate, or `lfg` residual handling) — not by `spec-code-review`, which stops after the report.
 
 ## Owned

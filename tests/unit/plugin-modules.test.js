@@ -643,7 +643,15 @@ describe('plugin module facade and governance', () => {
           'spec-plan/references/planning-evidence-boundaries.md',
         ));
         const reviewSkill = operations.get(path.posix.join(runtimeRoot, 'spec-doc-review/SKILL.md'));
+        const lfgTracker = operations.get(path.posix.join(
+          adapter.skillsRoot,
+          'spec-lfg/references/tracker-defer.md',
+        ));
         const workSkill = operations.get(path.posix.join(runtimeRoot, 'spec-work/SKILL.md'));
+        const workTracker = operations.get(path.posix.join(
+          runtimeRoot,
+          'spec-work/references/tracker-defer.md',
+        ));
         const workStrategy = operations.get(path.posix.join(
           runtimeRoot,
           'spec-work/references/execution-strategy.md',
@@ -657,6 +665,9 @@ describe('plugin module facade and governance', () => {
         expect(evidence.contents).toContain('Thin glue may own only');
         expect(reviewSkill.contents).toContain('mutation_policy');
         expect(reviewSkill.contents).toContain('report-only');
+        expect(lfgTracker).toBeDefined();
+        expect(workTracker).toBeDefined();
+        expect(lfgTracker.contents).toBe(workTracker.contents);
         expect(workSkill.contents).toContain('Duplicate critical metadata');
         expect(workStrategy.contents).toContain('worker_dispatch_authorization');
         expect(workStrategy.contents).toContain('landing_authorization');
