@@ -66,7 +66,7 @@ describe('spec-brainstorm clarification, scenarios, and resume contract', () => 
     expect(handoff).not.toContain('Requirements review unavailable in output:html mode');
     expect(handoff).not.toContain('Suppress this nudge when `OUTPUT_FORMAT=html`');
     expect(htmlRendering).toContain('report-only `spec-doc-review`');
-    expect(htmlRendering).toMatch(/does not grant document mutation authority/i);
+    expect(htmlRendering).toMatch(/does not grant\s+document mutation authority/i);
   });
 
   test('treats option 2 as explicit authorization and invokes exact spec-lfg', () => {

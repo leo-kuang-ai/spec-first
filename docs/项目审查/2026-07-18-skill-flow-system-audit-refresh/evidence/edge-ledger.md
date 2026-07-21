@@ -3,12 +3,14 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 11b26b954a9b36483b97723b4c6917951c1813bc
+current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
+working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
+overlay_pair_delta_added: 2
+overlay_pair_delta_removed: 3
 ---
 
 # Edge Ledger — 基线加增量的当前关系账本
@@ -40,17 +42,23 @@ actual_pairs: 165
 | R-008 | `spec-plan -> spec-test-browser`；verification owner boundary | plan records verification owner，origin/server remain caller-owned | unavailable browser limits claim，非 plan completion authority | BND；confirmed |
 | R-009 | `spec-work -> spec-doc-review`；shipping semantic plan check | source-plan path + before/after full-file hash; JSON report-only envelope | hash drift、invalid/incomplete envelope 或 unresolved P0/P1 block final validation | FWD; declared consumer + focused contracts；confirmed |
 | R-010 | removal of old M-113 `spec-test-browser -> spec-runtime-setup` | 无 setup route；browser returns structured unsupported reason to its caller | `not_supported` is caller-visible terminal, not readiness proof | removed from current source; no inferred replacement edge |
+| R-011 | `using-spec-first -> spec-resolve-pr-feedback`；用户明确要求处理 PR feedback | public route 只选择 user-only standalone skill；local-fix/commit/push/reply/thread-resolve 五类 authority 分离 | 任一 exit 缺 authority 时停在对应出口；不得借 workflow invocation 补造 | declared + governance/projection contracts；confirmed at source/projection level |
+| R-012 | `using-spec-first -> spec-test-xcode`；用户明确要求 iOS Simulator 验证 | public route 选择 user-only standalone skill；XcodeBuildMCP readiness 由 skill 检查 | MCP unavailable 时停止；不回退成 Code Review 静态 lens | declared + governance/projection contracts；confirmed at source/projection level |
+| R-013 | removal of `spec-optimize -> spec-work` | Optimize 不再列没有 artifact intake 的 Work consumer | 后续由真实 code-review/benchmark/release/human consumer 消费 | removed from current source；SF-15 closed |
+| R-014 | removal of `spec-worktree -> spec-code-review` | helper description/integration 不再反向声明 Code Review caller | future caller 必须先在 public owner 建 forward invocation/intake | removed from current source；SF-17 closed |
+| R-015 | removal of `spec-worktree -> spec-work` | helper description/integration 不再反向声明 Work caller | current confirmed caller 仅 Dogfood | removed from current source；SF-17 closed |
 
 ## 3. 变更支撑文件所触及的既有 edge
 
-原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决 internal-helper delivery、knowledge promotion、rendering config、task-pack review、artifact map、maintainability precedence 与 HTML report-only consumer。本轮 SF-12/SF-18/SF-13 overlay 继续重裁决 Universal Proof local-file handoff、LFG/Work tracker-defer owner/parity 与 Ideate→Brainstorm→explicit Plan terminal boundary；不新增 canonical pair。下表只列 role/status 发生改变、仍为 drift 或对 P1/P2 有实质影响的行；另有 9 条新增 pair 已在上一节逐条登记。未列出的既有 pair 维持 07-17 role/status，因为改动只增补同一 handoff 的 precision、reviewer lens、provider wording 或 test/evidence posture，未改变 route owner、artifact authority、failure/stop semantics。
+原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决此前 P0/P1/P2。当前 overlay 还以 bounded current-vs-HEAD skill-name token scan 记录 `+2/-3`：新增 `using-spec-first` 到两个 user-only standalone skill 的 public route，删除 Optimize/Work 与 Worktree/Work-Code Review 三条纸面/reverse pair。该 scan 只校准 overlay delta；顶部 165 仍是冻结 calibration manifest，不冒充本轮完整重算。
 
 | Baseline ID | Current edge | Current verdict | 说明 |
 | --- | --- | --- | --- |
 | M-008 | `spec-brainstorm -> spec-doc-review` | **confirmed (SF-11 closed)** | Markdown/HTML 均可进入审查；HTML 固定 report-only、byte-preserving 且 producer-owned mutation |
+| M-001 | `spec-app-consistency-audit -> spec-code-review` | **BND / legacy compatibility only（SF-14 closed）** | Ordinary code review 与 follow-up owner mention 保留；`from:code-review` / `code_review_handoff` 明确休眠，当前无 governed caller/intake/consumer |
 | M-010 | `spec-brainstorm -> spec-plan` | **confirmed (SF-13 closed)** | software requirements-only artifact 仍是产品到实现规划的 carrier；universal route 只在用户 wrap-up 显式选择后进入 knowledge-work Plan |
 | M-012 | `spec-brainstorm -> spec-proof` | **confirmed (SF-01/SF-12 closed)** | target 完整 package 已五宿主投射；Universal Proof-only 先物化并验证现有 Markdown source path，真实 host/API invocation 尚未验证 |
-| M-013 | `spec-brainstorm -> spec-work` | drift retained (P2) | shared renderer 的 direct-work wording 未被本次变更移除 |
+| M-013 | `spec-brainstorm -> spec-work` | **BND / artifact-kind conditional（SF-11 closed）** | shared renderer 明确 requirements-only brainstorm/ideation HTML 不由 Work 消费；只有 producer contract 已确认 implementation-ready software plan 时 `spec-work` 才是 HTML consumer，不建立 Brainstorm direct-work edge |
 | M-036 | `spec-dogfood -> spec-commit` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；caller 仍须先持有独立 commit authority |
 | M-057 | `spec-lfg -> spec-code-review` | **confirmed (SF-18 closed)** | JSON-only report consumption 保持；tracker filing 由 caller-owned Work/LFG residual flow 处理，`spec-code-review` 只 report；LFG/Work tracker reference source 与五宿主投射均保持 parity |
 | M-058 | `spec-lfg -> spec-commit-push-pr` | **confirmed (SF-01 closed)** | target 已作为 internal-only package 五宿主投射；LFG 从明确 entry admission 派生并传递 commit/landing facts，`mode:pipeline` 不授权 |
@@ -75,7 +83,7 @@ actual_pairs: 165
 | artifact map -> spec-work run artifact | 用户需要知道 closeout evidence 的真实生命周期与读取边界 | map 复述 schema/producer 的 conditional `workflow_integrated`、v2 `direct_evidence_used`、v1 `graph_evidence_used` read/prune compatibility；source-owned reader 仍是唯一确定性 read/prune owner | 不再把 false-only 写成 current contract，不把旧 graph-shaped fields 当 v2 字段，不把 spec-code-review 自动 discovery 当事实；显式 reader 仍需 target repo/workspace/run，artifact 不获得 source scope authority | confirmed at `source/docs-contract-confirmed`, SF-10 closed；未验证真实用户阅读/跨宿主渲染 |
 | runtime setup -> local rendering config -> plan/brainstorm/ideate | setup 暴露并保护三个 active local preferences | 三个 workflow 分别拥有格式解析、默认值与 pipeline override；setup 不调用 workflow | 注释、缺失或无效值保持 consumer 默认，不能被 setup 提升为 runtime authority | confirmed at `source-contract-confirmed`, SF-03 closed；未验证真实 host/local config field run |
 | work/debug/review -> compound | durable knowledge can be reusable | new/materially rewritten learning 必须有 grounded `source_refs` 与 concrete `invalidation_condition`；validator 只强制机械形态，LLM/human 判断语义充分性 | Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 缺任一字段、空值、错误类型或重复字段时不得完成；legacy default mode 保持兼容 | confirmed at `source-contract-confirmed`, SF-02 closed；未验证真实 host field run |
-| public caller -> internal helper | helper reuse can be necessary；直接例为 LFG -> commit-push-pr、commit-authorized dogfood -> commit、plan/brainstorm/ideate/explain/pov -> Proof | 三个 load-bearing target 与 browser/worktree 共 5 个 internal package 已投射；其余 2 个 record 保持 governance-only | 9 条 caller-target edge 在五宿主 projection plan 与 sandbox init 可解析；真实 host loader/invocation 尚未验证 | confirmed at `projection_confirmed`, SF-01 closed；不把 spec-work 的条件式命名参考算作强制 caller edge |
+| public caller -> internal/standalone helper | helper reuse can be necessary；internal 例为 LFG -> commit-push-pr、dogfood -> commit/worktree、五个 Proof handoff；user-only 例为 PR feedback 与 Xcode | 5 个 load-bearing internal package 保持投射；原 2 个 governance-only orphan 现按 explicit public route 作为 standalone skill 投射，PR feedback 同时补齐五类 exit authority | 五宿主 projection plan/init 可解析；Cursor 按宿主 allowlist 移除不支持的 `allowed-tools` frontmatter，但保留 user-only entry、authority body 与 `disable-model-invocation`，其他四宿主保留 source tool list；真实 host loader、GitHub/Xcode invocation 尚未验证 | confirmed at `projection_confirmed`；SF-01/SF-23 closed |
 
 ## 5. Dispatch authority matrix continuity
 
@@ -91,7 +99,8 @@ actual_pairs: 165
 | baseline identities retained | 156 |
 | removed identities | 1 |
 | new identities | 9 |
-| actual current pairs | 165 |
+| frozen calibration pairs | 165 |
+| current overlay pair delta | +2 / -3（bounded current-vs-HEAD token scan） |
 | duplicate canonical pairs | 0 |
 
-The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` is the original frozen snapshot；`current_head_at_calibration` 已包含 SF-06，但不包含尚未提交的最终 SF-01/SF-27 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session maintainability persona behavior、真实 task-pack persona review、用户文档阅读/跨宿主渲染、compound promotion、browser navigation、CI/merge/release 或 field outcome。
+The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` 是原始冻结快照；`current_head_at_calibration` 不包含当前未提交的最后 9 项 P2 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session persona behavior、真实 GitHub/Xcode/Figma/browser、CI/merge/release 或 field outcome。

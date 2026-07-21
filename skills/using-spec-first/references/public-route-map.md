@@ -38,6 +38,8 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are advisor
 - Simplify recent changes without changing behavior -> `spec-simplify-code`; real bugs still use `spec-debug`.
 - Mine project conventions from code evidence -> `spec-rule-miner`.
 - Product signals -> `spec-product-pulse`; feedback-source sweep -> `spec-sweep`; Riffrec/audio/video analysis -> `spec-riffrec-feedback-analysis`.
+- 用户明确要求处理 GitHub PR review feedback -> `spec-resolve-pr-feedback`；它只按当前请求中分别明确的本地修复、commit、push、回复与 thread resolve 授权执行副作用。
+- 用户明确要求在 iOS Simulator 上构建、运行或验证 App -> `spec-test-xcode`；它是用户主动入口，并要求当前宿主已连接 XcodeBuildMCP。
 - Shipped-feature promotion copy -> `spec-promote`.
 - Full hands-off path to a green PR, only when explicitly requested -> `spec-lfg`.
 

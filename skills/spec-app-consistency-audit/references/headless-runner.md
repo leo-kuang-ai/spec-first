@@ -71,8 +71,8 @@ the in-process steps `12` and `14` are runner-only wrappers:
 7. `build-industry-profile.js` → `industry-profile.preview.json`
 8. `select-rule-packs.js` → `industry-rule-pack-selection.json`
 9. `merge-contracts.js` (Form 1, all 12 contracts) → `merged-context.json`
-10. `merge-contracts.js` (Form 2, `--issues-artifact --issue <raw> from:code-review
-    run-id:<id>`) → `issues.json`
+10. `merge-contracts.js` (Form 2, `--issues-artifact --issue <raw> run-id:<id>`;
+    旧 envelope replay 可附加休眠兼容 marker `from:code-review`) → `issues.json`
 11. `merge-contracts.js` (Form 3, `--source --run-dir run-id:<id> --artifacts
     page-route,engineering-quality --issue issues.json`) → `audit-report.json`
 12. `finalizeMetadata` (in-process) — promote `metadata.json` from `started` to

@@ -42,4 +42,13 @@ describe('spec-optimize contracts', () => {
     expect(judgePrompt).toContain('High confidence (4-5) means you are very sure. Low confidence (1-2) means the item is borderline.');
     expect(judgePrompt).not.toContain('confidence-first');
   });
+
+  test('只列出拥有真实 optimization artifact intake 的 downstream consumer', () => {
+    const skill = read('skills/spec-optimize/SKILL.md');
+    const consumers = skill.match(/### Downstream Consumers\n\n([\s\S]*?)(?=\n### |\n## )/);
+
+    expect(consumers).not.toBeNull();
+    expect(consumers[1]).not.toContain('`spec-work`');
+    expect(consumers[1]).toContain('Code review');
+  });
 });

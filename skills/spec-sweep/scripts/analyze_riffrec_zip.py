@@ -5,6 +5,10 @@ Analyze a product feedback source.
 Supported sources: Riffrec zip, standalone video, standalone audio, and
 meeting notes text/markdown. The script extracts transcript, high-signal
 video frames when available, and spec-first-friendly markdown artifacts.
+
+Canonical owner：spec-riffrec-feedback-analysis。
+Package-local projection：spec-sweep 保留 byte-identical copy，因为 host runtime
+package 不能导入另一个 skill 的 private script path。
 """
 
 from __future__ import annotations

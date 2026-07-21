@@ -41,7 +41,9 @@ describe('spec-worktree existing-ref isolation contracts', () => {
 
     expect(skill).toContain('isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]');
     expect(skill).toContain('already_checked_out branch=<name> path=<path>');
-    expect(skill).toContain('spec-dogfood` uses existing-ref mode');
+    expect(skill).toContain('当前已确认的 caller 只有 `spec-dogfood`');
+    expect(skill).not.toContain('`spec-work` and `spec-code-review` offer this skill');
+    expect(skill).not.toMatch(/description:.*spec-work.*spec-code-review/i);
     expect(dogfood).toContain('isolate pr:<number>');
     expect(dogfood).toContain('isolate <branch>');
     expect(dogfood).toContain('already_checked_out branch=<name> path=<path>');

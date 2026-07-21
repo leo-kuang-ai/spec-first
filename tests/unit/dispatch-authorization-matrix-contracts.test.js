@@ -133,7 +133,7 @@ describe('generic dispatch authorization matrix', () => {
     const source = read('skills/spec-code-review/SKILL.md');
     const trivialPrSection = source.match(/\*\*Trivial-PR judgment\*\*:[\s\S]*?(?=\n\nWhen any skip rule fires)/);
     const dispatchGateIndex = source.indexOf('### Stage 1c: Dispatch gate and inline fallback');
-    const profileDispatchIndex = source.indexOf('On `MISS`, dispatch a generic subagent');
+    const profileDispatchIndex = source.indexOf('`MISS` 时派发 seeded with');
 
     expect(trivialPrSection).not.toBeNull();
     expect(trivialPrSection[0]).toContain('orchestrator inline');

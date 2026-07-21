@@ -30,10 +30,12 @@ The script paginates the top-level `reviewThreads` connection and returns the ma
 
 Read [evaluation-rubric.md](evaluation-rubric.md) and judge this thread before any resolver dispatch. Account for `isOutdated` and the location fields (`line`, `originalLine`, `startLine`, `originalStartLine`). The cross-item reasoning is mostly inert for a single thread, but the read-depth and divert logic still apply: do not fix on reviewer authority alone.
 
-Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. First read `references/agents/pr-comment-resolver.md`. Dispatch one generic subagent seeded with it only when `worker_dispatch_authorization: authorized`, `worker_dispatch_capability: available`, and the single-thread unit is safe to isolate. Otherwise apply the same resolver prompt sequentially in the current agent and preserve the matching fallback reason code.
+先应用 `SKILL.md` 的五项 Exit Authority Admission。没有 `local_fix_authorization` 时只做回源判断，不编辑；没有 `reply_authorization` 时不发布回复；没有 `thread_resolution_authorization` 时不 resolve。Commit 与 push 也分别要求自己的 authority，一项授权不得推导另一项。
+
+Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. First read `references/agents/pr-comment-resolver.md`. Dispatch one generic subagent seeded with it only when `local_fix_authorization: authorized`、`worker_dispatch_authorization: authorized`、`worker_dispatch_capability: available`，并且 single-thread unit 可安全隔离。已有本地修复授权但不能派发时，在当前 agent sequentially 应用同一 resolver prompt 并保留 fallback reason code；没有本地修复授权时保留待执行清单。
 
 Pass the same fields full mode does, including `isOutdated` and the location fields: `line`, `originalLine`, `startLine`, `originalStartLine`. Targeted threads can be outdated too and need the same relocation handling.
 
-For `replied`, `not-addressing`, or `declined`, compose the reply text from the rubric, skip validation/commit/push, then post the reply and resolve when appropriate. For `needs-human`, compose `decision_context`, post the natural reply text, leave the thread open, and present the decision to the user.
+For `replied`, `not-addressing`, or `declined`, compose the reply text from the rubric, skip validation/commit/push, then only post when `reply_authorization: authorized` and only resolve when `thread_resolution_authorization: authorized`. For `needs-human`, compose `decision_context`; post only with reply authority, always leave the thread open, and present the decision to the user.
 
-For fix verdicts, follow the same validate -> commit -> push -> reply -> resolve flow as Full Mode steps 5-7 in [full-mode.md](full-mode.md).
+For fix verdicts, follow the same separately authorized validate -> commit -> push -> reply -> resolve flow as Full Mode steps 5-7 in [full-mode.md](full-mode.md). A missing exit authority stops that exit and every downstream claim that depends on it.

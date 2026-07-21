@@ -3,11 +3,12 @@ title: Skill 关系图当前快照
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 11b26b954a9b36483b97723b4c6917951c1813bc
+current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
+working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 governed_nodes: 35
 canonical_pairs: 165
+overlay_pair_delta: +2/-3
 ---
 
 # Skill Graph — 当前 source snapshot
@@ -17,14 +18,14 @@ canonical_pairs: 165
 | Entry surface | 节点 | 数量 |
 | --- | --- | ---: |
 | workflow command | `spec-app-consistency-audit`, `spec-brainstorm`, `spec-code-review`, `spec-compound`, `spec-compound-refresh`, `spec-debug`, `spec-dogfood`, `spec-doc-review`, `spec-ideate`, `spec-runtime-setup`, `spec-optimize`, `spec-plan`, `spec-polish`, `spec-prd`, `spec-work`, `spec-write-skill`, `spec-write-tasks` | 17 |
-| standalone skill | `spec-explain`, `spec-lfg`, `spec-pov`, `spec-product-pulse`, `spec-promote`, `spec-riffrec-feedback-analysis`, `spec-rule-miner`, `spec-simplify-code`, `spec-sweep`, `spec-strategy`, `using-spec-first` | 11 |
-| internal only | `spec-commit`, `spec-commit-push-pr`, `spec-proof`, `spec-resolve-pr-feedback`, `spec-test-browser`, `spec-test-xcode`, `spec-worktree` | 7 |
+| standalone skill | `spec-explain`, `spec-lfg`, `spec-pov`, `spec-product-pulse`, `spec-promote`, `spec-resolve-pr-feedback`, `spec-riffrec-feedback-analysis`, `spec-rule-miner`, `spec-simplify-code`, `spec-sweep`, `spec-strategy`, `spec-test-xcode`, `using-spec-first` | 13 |
+| internal only | `spec-commit`, `spec-commit-push-pr`, `spec-proof`, `spec-test-browser`, `spec-worktree` | 5 |
 
 Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.json`；所有 package source 是 `skills/<skill>/SKILL.md + references/**`。Generated runtime 不进入本 inventory。
 
 ## 2. Internal delivery reality
 
-`src/cli/plugin-governance.js` 的 current allowlist 交付 `spec-commit`、`spec-commit-push-pr`、`spec-proof`、`spec-test-browser` 与 `spec-worktree`。这是 deterministic projection fact；其余 2 个 internal record 继续保持 governance-only，不因本次 SF-01 修复被顺带交付。`internal_only` 表示不进入公共 route/menu；严格内部 helper 另以 `user-invocable:false` 禁止直接调用，`spec-proof` 保留 source 声明的显式点名入口。
+`src/cli/plugin-governance.js` 的 current allowlist 继续交付 `spec-commit`、`spec-commit-push-pr`、`spec-proof`、`spec-test-browser` 与 `spec-worktree`。`spec-resolve-pr-feedback`、`spec-test-xcode` 不再是 internal record：它们由 governance 作为 `standalone_skill` 在五宿主投射，并且只接受用户显式入口。严格内部 helper 的边界保持不变。
 
 | Helper | 当前 projection | caller relationship posture |
 | --- | --- | --- |
@@ -33,12 +34,12 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 | `spec-test-browser` | delivered | `spec-lfg` browser pipeline 已有 structured applicability/origin/cleanup contract |
 | `spec-worktree` | delivered | `spec-dogfood` 的 existing-ref caller 可闭合 |
 | `spec-proof` | delivered | plan/brainstorm/ideate/explain/pov 的 Proof handoff 可解析；只允许显式点名，不进入 public route |
-| `spec-resolve-pr-feedback` | governance-only | 无 current public caller；package-local dispatch gate 已闭合，delivery/caller posture 不因此改变 |
-| `spec-test-xcode` | governance-only | reverse-only caller 仍是 orphan candidate |
+| `spec-resolve-pr-feedback` | standalone / delivered | `using-spec-first` 只在用户明确要求处理 PR feedback 时选择；local-fix/commit/push/reply/thread-resolve 分别授权 |
+| `spec-test-xcode` | standalone / delivered | 用户明确要求 iOS Simulator 验证时选择；当前没有 Code Review auto-caller |
 
 ## 3. Canonical relationship delta
 
-基线是 07-17 的 157 pair ledger。本次重新从 current source 以 skill-name token boundary 提取；结果为 265 file-target hits、165 unique pairs。文本共现仅是 declared candidate，关系角色和 authority 见 edge ledger。
+基线是 07-17 的 157 pair ledger。下方 265 hits / 165 pairs 是冻结 calibration manifest；当前 P2 overlay 没有重写该历史 manifest。另用相同意图的 bounded current-vs-HEAD skill-name token scan 只校准 overlay delta：新增 2 条、删除 3 条；文本共现仍只是 declared candidate，语义角色与 authority 见 edge ledger。
 
 ```text
 157 baseline pairs
@@ -65,6 +66,13 @@ Roster authority 是 `src/cli/contracts/dual-host-governance/skills-governance.j
 
 `spec-test-browser -> spec-runtime-setup`（旧 M-113）已从 current source 删除。browser helper 现在返回 caller-consumable `not_supported` / reason code，不再把 setup repair 写成 declared handoff；这只改变关系分母，不证明 exact-origin capability 已就绪。
 
+### 当前 P2 overlay pair delta
+
+- 新增：`using-spec-first -> spec-resolve-pr-feedback`、`using-spec-first -> spec-test-xcode`，均为 user-explicit standalone route。
+- 删除：`spec-optimize -> spec-work`、`spec-worktree -> spec-code-review`、`spec-worktree -> spec-work`，分别移除纸面 consumer 与 reverse-only caller。
+- App audit 与 Xcode 对 Code Review 的文本 mention 只保留 near-neighbor/negative boundary 或 legacy compatibility，不构成 active invocation edge。
+- Shared HTML renderer 中的 `spec-work` 只在 artifact 已由 producer contract 确认为 implementation-ready software plan 时成立；requirements-only Brainstorm/Ideate HTML 不形成 `spec-brainstorm -> spec-work` direct edge。
+
 ## 4. 关系形态
 
 ```text
@@ -78,4 +86,4 @@ spec-lfg --authorized landing--> spec-commit-push-pr
 spec-dogfood --authorized checkpoint--> spec-commit
 ```
 
-每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含 package-local mutation/dispatch gate、internal helper delivery、SF-02/SF-03/SF-04/SF-06/SF-10 与 SF-11 修复；working-tree overlay 继续校准 SF-12 Universal Proof local-file handoff、SF-18 Work-owned tracker parity 与 SF-13 Ideate→Brainstorm→explicit Plan terminal boundary，不新增 Skill 节点或 pair。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 278/165 与 manifest hash 仍绑定冻结 calibration inventory；本轮不重算关系分母。
+每条箭头都只表示所述 source-level handoff；它不授予 dispatch、mutation、commit、landing 或 knowledge promotion。Current HEAD 已包含此前修复；working-tree overlay 关闭最后 9 项 P2，并将两个治理孤儿改为 user-only standalone skill。`source_head` 只保留原始冻结快照，`current_head_at_calibration` 尚未包含本轮未提交修复。顶部 frozen manifest 的文件/pair/hash 不冒充 working-tree 全量重算；本轮只记录可复跑的 `+2/-3` overlay delta。

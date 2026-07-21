@@ -1,6 +1,6 @@
 ---
 name: spec-worktree
-description: Internal helper for public workflows that need an isolated git worktree for parallel feature work or PR review; use only when delegated by `spec-work`, `spec-code-review`, or another public workflow.
+description: Internal helper for caller-owned git worktree isolation. 当前受治理的 caller 是 spec-dogfood；未来 caller 必须先定义 forward invocation 与 intake contract。
 user-invocable: false
 allowed-tools: Bash(bash *worktree-manager.sh*)
 ---
@@ -140,9 +140,9 @@ Do not create a new-work worktree for single-task work that can happen on a bran
 
 ## Integration
 
-`spec-work` and `spec-code-review` offer this skill as an option for new work. When the user selects "worktree" in those flows, run Step 0 first. If isolation already exists, proceed in place. Otherwise invoke `create` through the same `${CLAUDE_SKILL_DIR}` branch plus source/runtime fallback shown above, using a meaningful branch name derived from the work description (e.g., `feat/crowd-sniff`, `fix/email-validation`). Avoid auto-generated names like `worktree-jolly-beaming-raven` that obscure the work.
+当前已确认的 caller 只有 `spec-dogfood`。它针对 PR 或非当前分支使用 existing-ref mode：PR target 调用 `isolate pr:<number>`，branch target 调用 `isolate <branch>`；随后消费 `Worktree ready: <path>` 或 `already_checked_out branch=<name> path=<path>`，不得切换 primary checkout。
 
-`spec-dogfood` uses existing-ref mode for PR or non-current branch targets. It should invoke `isolate pr:<number>` for PR targets and `isolate <branch>` for branch targets, then act on either `Worktree ready: <path>` or `already_checked_out branch=<name> path=<path>`. It must not switch the primary checkout when isolation succeeds or reports an existing checkout path.
+未来 caller 必须先在其 public owner source 中增加 forward invocation 与 intake contract。本 helper 的 reverse claim 不能单独建立 integration edge。
 
 ## Troubleshooting
 

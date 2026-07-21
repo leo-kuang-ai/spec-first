@@ -16,13 +16,12 @@ orchestrator today.
 
 Supported canonical tokens:
 
-- `mode:headless`: programmatic mode for parent workflows such as `spec-code-review`;
+- `mode:headless`：供显式 automation caller 使用的 programmatic mode；
   ask no user questions, write run-scoped artifacts, return a compact headless
   envelope, and finish with `App consistency audit complete`.
 - `mode:report-only`: read-only mode; ask no user questions and write no run artifacts,
   materialized inputs, preview files, metadata, manifest, or latest pointers.
-- `base:<sha-or-ref>`: deterministic diff base. `mode:headless` and
-  `from:code-review` should pass this whenever reviewing a diff.
+- `base:<sha-or-ref>`：deterministic diff base。`mode:headless` caller 审查 diff 时应传入。
 - `source:<repo-relative-path>`: App source root. Defaults to the current repository
   root.
 - `prd:<repo-relative-path>`: optional PRD/product input.
@@ -35,8 +34,8 @@ Supported canonical tokens:
   inputs; missing values degrade only when explicitly expected by the caller.
 - `depth:deep`: focused deepening flag, not a mode and not mutually exclusive with
   headless/report-only.
-- `from:code-review`: caller marker. Do not switch checkout; output summary-first
-  handoff fields.
+- `from:code-review`：只为旧 envelope 保留的休眠兼容 marker。当前没有受治理的
+  caller 或 consumer，因此不得把该 token 宣传为 active workflow edge。
 
 Conflict and failure rules:
 
@@ -196,7 +195,7 @@ Strict issue protocol:
 - `impact` and `recommendation` are arrays.
 - `claim_family` controls deterministic evidence requirements and conclusion caps.
 - `claim_type` describes the domain issue semantics.
-- `code_review_handoff` is required for issues surfaced to `spec-code-review`;
-  app-audit itself does not emit `safe_auto`.
+- `code_review_handoff` 只为旧 artifact 保留休眠兼容；它不建立 active
+  `spec-code-review` consumer。App-audit itself does not emit `safe_auto`.
 - `validation_status` starts as `not_required`; validation pass is deferred beyond
   v0.1a.

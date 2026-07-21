@@ -248,7 +248,7 @@ function buildIssuesArtifact(options = {}) {
     sourceInputs: sourceInputs.length > 0
       ? sourceInputs
       : [unavailableSourceInput('issues', 'issues', 'issue_inputs_missing')],
-    consumers: ['report-writer', 'spec-code-review'],
+    consumers: ['report-writer'],
     body: {
       issue_synthesis_status: resolveIssueSynthesisStatus(options, inputIssueArtifacts),
       issues: sortIssues(acceptedIssues),

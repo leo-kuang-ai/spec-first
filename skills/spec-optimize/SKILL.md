@@ -40,7 +40,7 @@ Validate the spec and budget, establish the baseline, run bounded experiments, m
 
 ### Downstream Consumers
 
-`spec-work`, code review, benchmark maintainers, release reviewers when performance/relevance changes matter, and humans inspecting experiment logs.
+Code review、benchmark maintainer、在性能/相关性变更时参与的 release reviewer，以及检查 experiment logs 的人工审查者。
 
 ## Scenario Capability
 

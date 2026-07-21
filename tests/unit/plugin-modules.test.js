@@ -58,9 +58,12 @@ describe('plugin module facade and governance', () => {
     expect(cursor.internalSkills).toContain('spec-commit');
     expect(cursor.internalSkills).toContain('spec-commit-push-pr');
     expect(cursor.internalSkills).toContain('spec-proof');
-    for (const governanceOnly of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
-      expect(cursor.internalSkills).not.toContain(governanceOnly);
-    }
+    expect(cursor.skills).toEqual(expect.arrayContaining([
+      'spec-resolve-pr-feedback',
+      'spec-test-xcode',
+    ]));
+    expect(cursor.internalSkills).not.toContain('spec-resolve-pr-feedback');
+    expect(cursor.internalSkills).not.toContain('spec-test-xcode');
     expect(cursor.agents).toEqual([]);
     expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
   });
@@ -176,10 +179,6 @@ describe('plugin module facade and governance', () => {
         const adapter = getAdapter(platform);
         const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
 
-        for (const governanceOnly of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
-          expect(syncedAssets.internalSkills).not.toContain(governanceOnly);
-        }
-
         for (const helper of helpers) {
           expect(syncedAssets.internalSkills).toContain(helper.name);
           expect(syncedAssets.skills).not.toContain(helper.name);
@@ -197,6 +196,72 @@ describe('plugin module facade and governance', () => {
               } else if (helper.userInvocable === true) {
                 expect(operation.contents).not.toMatch(/^user-invocable:\s*false$/m);
                 expect(operation.contents).toContain('Direct user request');
+              }
+            }
+          }
+        }
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('在每个宿主递归投射用户显式调用的 PR feedback 与 Xcode skill', () => {
+    const resolverSource = fs.readFileSync(
+      path.join(__dirname, '../../skills/spec-resolve-pr-feedback/SKILL.md'),
+      'utf8',
+    );
+    expect(resolverSource).toMatch(/^allowed-tools:$/m);
+    expect(resolverSource).toMatch(/^  - Edit$/m);
+    expect(resolverSource).toMatch(/^  - Agent$/m);
+
+    const standalonePackages = [
+      {
+        name: 'spec-resolve-pr-feedback',
+        paths: [
+          'SKILL.md',
+          'references/full-mode.md',
+          'references/targeted-mode.md',
+          'references/agents/pr-comment-resolver.md',
+          'scripts/get-pr-comments',
+          'scripts/reply-to-pr-thread',
+          'scripts/resolve-pr-thread',
+        ],
+      },
+      {
+        name: 'spec-test-xcode',
+        paths: ['SKILL.md'],
+      },
+    ];
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+
+        for (const standalonePackage of standalonePackages) {
+          expect(syncedAssets.skills).toContain(standalonePackage.name);
+          expect(syncedAssets.internalSkills).not.toContain(standalonePackage.name);
+          expect(syncedAssets.workflowSkills).not.toContain(standalonePackage.name);
+
+          for (const relativePath of standalonePackage.paths) {
+            const operation = plan.operations.find((entry) => entry.path === path.posix.join(
+              adapter.skillsRoot,
+              standalonePackage.name,
+              relativePath,
+            ));
+            expect(operation).toBeDefined();
+            if (standalonePackage.name === 'spec-resolve-pr-feedback' && relativePath === 'SKILL.md') {
+              expect(operation.contents).toMatch(/^disable-model-invocation:\s*true$/m);
+              expect(operation.contents).toContain('## Exit Authority Admission');
+              if (platform === 'cursor') {
+                expect(operation.contents).not.toMatch(/^allowed-tools:$/m);
+                expect(operation.contents).not.toMatch(/^  - Edit$/m);
+                expect(operation.contents).not.toMatch(/^  - Agent$/m);
+              } else {
+                expect(operation.contents).toMatch(/^  - Edit$/m);
+                expect(operation.contents).toMatch(/^  - Agent$/m);
               }
             }
           }
@@ -438,6 +503,8 @@ describe('plugin module facade and governance', () => {
       'spec-runtime-setup/scripts/providers/common.cjs',
       'spec-runtime-setup/scripts/providers/graphify.cjs',
       'spec-runtime-setup/scripts/providers/registry.cjs',
+      'spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py',
+      'spec-sweep/scripts/analyze_riffrec_zip.py',
     ];
 
     for (const platform of getSupportedPlatforms()) {

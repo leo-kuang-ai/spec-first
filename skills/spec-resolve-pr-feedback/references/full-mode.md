@@ -68,9 +68,11 @@ Create one task entry per new unresolved review thread, actionable PR comment, o
 
 Process all three feedback types. Review threads are the primary type; PR comments and review bodies are secondary but must not be ignored. Dispatch or sequential mutation applies only to items in `fix-list`; `reply-list` and `human-list` are carried to Step 7 without code mutation.
 
+先应用 `SKILL.md` 的 Exit Authority Admission。只有 `local_fix_authorization: authorized` 才能处理 `fix-list`；缺授权时保留完整清单和回源证据，跳过这些 fix item 的文件编辑、验证、commit、push，以及依赖远端 fix 的回复/resolve。无代码依赖的 `reply-list` / `human-list` 仍可按各自独立的 `reply_authorization` / `thread_resolution_authorization` 继续；不得用其中一项 authority 推导另一项。
+
 ### Mutating resolver dispatch boundary
 
-Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when both `worker_dispatch_authorization: authorized` and `worker_dispatch_capability: available` are recorded. Otherwise process `fix-list` units sequentially inline and preserve the matching reason code.
+Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when `local_fix_authorization: authorized`，并且 `worker_dispatch_authorization: authorized` 与 `worker_dispatch_capability: available` 都已记录。否则在已有本地修复授权时 sequential inline 处理 `fix-list` 并保留对应 reason code；没有本地修复授权时不得进入 mutation。
 
 Each resolver may edit only the files needed for its assigned feedback item and must return the actual `files_changed` list. The orchestrator owns final integration: combined validation, staging, commits, pushes, PR replies, and thread resolution. Resolver agents must not stage files, create commits, push, or resolve review threads directly unless a future host-specific isolation contract explicitly says otherwise.
 
@@ -126,6 +128,8 @@ Fixes can expand beyond the referenced file. Step 5 catches cross-agent test bre
 
 After all agents complete, aggregate `files_changed` across every returned summary. If it is empty, skip steps 5 and 6 and proceed to step 7.
 
+此处只验证本轮实际授权并应用的本地修复。只读 triage 或待授权 `fix-list` 不得被描述为已验证修复。
+
 Resolvers run only targeted tests on their own changes. This step runs the project's full validation once against the combined diff.
 
 1. Run the project's validation command.
@@ -136,6 +140,8 @@ Resolvers run only targeted tests on their own changes. This step runs the proje
 Record the validation outcome for the step 9 summary.
 
 ## 6. Commit and Push
+
+Commit 与 push 是两个独立出口：只有 `commit_authorization: authorized` 才执行 stage/commit；只有 commit 已成功且 `push_authorization: authorized` 才执行 push。缺任一授权时停止在对应出口，保留已验证本地状态并进入 Step 9；不得继续把 fixed thread 回复为远端已修复，更不得 resolve。
 
 Stage only files reported by resolvers and commit with a message referencing the PR:
 
@@ -154,7 +160,7 @@ git push
 
 ## 7. Reply and Resolve
 
-After the push succeeds, post replies and resolve where applicable.
+只有 `reply_authorization: authorized` 才发布回复；只有 `thread_resolution_authorization: authorized` 才 resolve review thread。对于 fixed/fixed-differently，必须先有成功 push，才能回复为已修复或 resolve。对于 `replied` / `not-addressing` / `declined`，可在无代码变更时按独立回复授权发布，但 resolve 仍需独立授权。`needs-human` 始终保持 open。
 
 All replies should quote the relevant part of the original feedback for continuity. Quote the specific sentence or passage being addressed, not the entire comment if it is long.
 
@@ -207,7 +213,7 @@ bash "$SKILL_DIR/scripts/reply-to-pr-thread" THREAD_ID < "$reply_file"
 rm -f "$reply_file"
 ```
 
-Then resolve:
+当且仅当 `thread_resolution_authorization: authorized` 时再 resolve：
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -229,7 +235,7 @@ Include enough quoted context in the reply so the reader can follow which commen
 
 ## 8. Verify
 
-Re-fetch feedback to confirm resolution:
+仅在本轮实际执行了回复或 resolve 后 re-fetch feedback；未获授权的外部动作记为 `not-run`，不能用只读抓取冒充远端状态变更：
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
@@ -248,6 +254,8 @@ PR comments and review bodies have no resolve mechanism, so they will still appe
 ## 9. Summary
 
 Present a concise summary of all work done. Group by verdict, one line per item describing what was done, not just where.
+
+摘要必须同时列出五项 exit authority、哪些动作实际执行、哪些因缺授权保持 `not-run`。只有真实执行并验证的远端动作才能计入 Resolved 数量。
 
 ```text
 Resolved N of M new items on PR #NUMBER:

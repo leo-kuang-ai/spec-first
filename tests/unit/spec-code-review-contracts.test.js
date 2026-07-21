@@ -130,6 +130,15 @@ describe('spec-code-review current contracts', () => {
     expect(subagentTemplate).toContain('use the normal action-class rubric for its route');
   });
 
+  test('repo profile fallback 与 maintainability confidence 对齐 shared synthesis contract', () => {
+    expect(skill).toMatch(/`NO-CACHE`[\s\S]*fresh derive profile/);
+    expect(skill).toMatch(/helper invocation 失败[\s\S]*fresh derive/);
+    expect(skill).toMatch(/`NO-CACHE`[\s\S]*跳过 `put`/);
+    expect(maintainabilityPrompt).toContain('Anchor 50 — suppress');
+    expect(maintainabilityPrompt).toContain('提升为 anchor 75');
+    expect(maintainabilityPrompt).not.toContain('suppress unless severity is P1');
+  });
+
   test('maintainability planted cases preserve mechanical findings and suppress subjective opinions', () => {
     expect(maintainabilityCapabilityCases.schema_version).toBe(
       'spec-first.spec-code-review.maintainability-cases/v1',

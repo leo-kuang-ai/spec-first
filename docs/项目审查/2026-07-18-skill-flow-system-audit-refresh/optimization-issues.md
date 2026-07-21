@@ -6,14 +6,14 @@ status: review-evidence-current-source
 origin_report: docs/项目审查/2026-07-18-skill-flow-system-audit-refresh/review-report.md
 baseline_issue_list: docs/项目审查/2026-07-17-skill-flow-system-audit/optimization-issues.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 11b26b954a9b36483b97723b4c6917951c1813bc
+current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
+working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 ---
 
 # Skill 关联关系当前需要优化的问题清单
 
-当前 P0/P1 均为 0。SF-01、SF-02、SF-03、SF-04、SF-05、SF-06、SF-07、SF-08、SF-09、SF-10、SF-11、SF-12、SF-13、SF-18、SF-27 已由 current source 与 focused contracts 关闭，不进入优先优化队列。`source_head` 仍是原始冻结快照；`current_head_at_calibration` 已包含此前 P0/P1 与 SF-11 修复，当前 overlay 关闭原 P2 SF-12、SF-18、SF-13。
+当前 P0/P1/P2 均为 0。原 P0/P1/P2 finding 已由 current source 与 focused contracts 逐项关闭；SF-27 也已关闭。`source_head` 仍是原始冻结快照；`current_head_at_calibration` 已包含此前修复，当前 overlay 关闭最后 9 项 P2，并在对抗性复核中补闭 SF-11 遗留的 M-013 requirements-only direct-work wording、SF-14 空断言与 SF-23 host-lossy projection 误测。
 
 本清单从同批次校准后的 [review-report.md](review-report.md) 提取，只用于后续 plan/work 消费，不表示问题已获得修复、commit、push、PR 或 lifecycle mutation 授权。
 
@@ -21,17 +21,9 @@ working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
 
 无。
 
-## P2：第二批优化（9 项）
+## P2：第二批优化
 
-1. **SF-14 App audit 声明 code-review 集成，但对端无 caller/intake。** 应正式接线 `from:code-review` / `code_review_handoff`，或删除不存在的 integration claim。
-2. **SF-15 Optimize 声称 `spec-work` 是 consumer，却没有真实 handoff。** 应删除纸面 consumer，或补最小 trigger/payload/intake contract。
-3. **SF-16 Compound session-historian 的写文件与返回合同冲突。** Caller 要求 scratch artifact + path，worker 却禁止写文件并只返文本；应统一为一种 authoritative return。
-4. **SF-17 Worktree helper 的 reverse caller 声明过期。** Helper 声称 `spec-work` / `spec-code-review` 会调用，真实 forward edge 只有 Dogfood；应删除过时 caller 或在 public owner 正式接线。
-5. **SF-19 Figma mutating worker 返回合同不完整。** 缺 `changed_paths`、verification evidence，以及 worker 禁止 stage/commit 的明确边界；应对齐通用 worker packet。
-6. **SF-20 Repo-profile cache 的 NO-CACHE fallback 说法不一致。** Shared protocol 要求 fresh derive，code-review consumer 却选择 no-profile；应明确 full protocol 是否允许 consumer-specific fallback。
-7. **SF-21 Maintainability persona 与 synthesis confidence gate 仍需独立复核。** Baseline 记录 persona 允许 P1/anchor-50 存活、synthesis 仅允许 P0/50；虽 SF-06 已修 threshold precedence，本项尚未被 current audit 单独校准为关闭。
-8. **SF-22 Sweep/Riffrec 复制同一 analyzer，无 canonical owner/parity test。** 应保留 package-local copy 并增加同源/parity contract，或建立唯一 owner。
-9. **SF-23 `spec-test-xcode` / `spec-resolve-pr-feedback` 缺真实 public caller。** 应退役孤儿 helper，或绑定真实 public owner；不能保留 reverse-only integration。
+无。
 
 ## P3：文案与低风险合同修正（3 项）
 
@@ -52,11 +44,20 @@ working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
 - **SF-08：** `spec-brainstorm` 已使用 exact `spec-lfg` 名称和绝对 artifact payload；未验证真实 host menu invocation。
 - **SF-09：** LFG/browser 已闭合 applicable/not_applicable、exact origin、effect 与 cleanup blocker；未运行真实 browser field outcome。
 - **SF-27：** 12 个原缺口 package 已补齐 package-local authorization/capability/fallback，原 6 个合格 package 继续满足基线；聚焦矩阵覆盖 18/18。对抗性复核发现 `spec-code-review` 仍在 Stage 1c 前为 trivial PR 派发轻量 subagent，现已改为 orchestrator inline conservative judgment，并锁定 profile dispatch 位于 gate 之后。敏感与 mutating worker 仍受各自数据/写入/commit/landing 边界约束。
-- **SF-11：** 三份 HTML renderer 已统一承认 report-only `spec-doc-review` consumer，并锁定 `mutation_policy: report-only`、`mutation_reason: html-artifact`、`fixes_applied: 0`；Brainstorm 对 Markdown/HTML 都展示 requirements review，HTML 显式传 `mutation:report-only` 且 byte-preserving；Ideate renderer 不再泄漏 plan-specific `5.3.8` prose。关闭证据为 source + RED/GREEN focused contracts，不包含真实 host 菜单、persona dispatch 或 field outcome。
+- **SF-11：** 三份 HTML renderer 已统一承认 report-only `spec-doc-review` consumer，并锁定 `mutation_policy: report-only`、`mutation_reason: html-artifact`、`fixes_applied: 0`；Brainstorm 对 Markdown/HTML 都展示 requirements review，HTML 显式传 `mutation:report-only` 且 byte-preserving；shared consumer prose 同时明确 requirements-only Brainstorm/Ideate HTML 不由 `spec-work` 消费，只有 implementation-ready software plan 才进入 Work，M-013 不再形成 direct edge。关闭证据为 source + RED/GREEN focused contracts，不包含真实 host 菜单、persona dispatch 或 field outcome。
 - **SF-12：** Universal Brainstorm 与 Universal Plan 的 Proof-only 分支现在都先在 OS 临时根下物化 run-local Markdown，确认文件存在且非空，再把具体 path/title/identity 交给 `spec-proof`；Save+Proof 发布用户刚保存的同一文件，不重建第二份内容；Proof 失败时保留并报告本地路径。关闭证据为 source + RED/GREEN focused contracts，不包含真实 Proof API publish outcome。
 - **SF-18：** `spec-work` 的共置 `references/tracker-defer.md` 已成为唯一规范 owner；由于五宿主 runtime root 不支持通用跨 Skill import，LFG 保留字节一致的 package-local projection，并由 source parity 与五宿主 projection contract 共同约束。两份合同均禁止 `spec-code-review` filing、禁止猜测 `/tmp/spec-first/spec-code-review/...`，durable ticket 只消费具体 `artifact_path`、in-band summary 或已物化的 repo-local evidence。关闭证据为 source parity + five-host projection plan，不包含真实 tracker filing。
 - **SF-13：** Universal Ideate 现在明确只把选中 idea 交给 `spec-brainstorm`，不直跳 planning；Brainstorm 不是自动 implementation chain，但用户可在其 wrap-up 显式选择 **Create a plan**，再进入 universal/knowledge-work `spec-plan`。Universal plan 默认不提供 `spec-work`，只有后续真实形成完整 software implementation plan 才进入软件执行链。关闭证据为 source + focused terminal/handoff contract，不包含真实 host menu outcome。
+- **SF-14：** App audit 不再把 `spec-code-review` 列为 downstream consumer，`from:code-review` / `code_review_handoff` 只保留为旧 artifact 的休眠兼容字段；Code Review source 无对应 caller/intake。Focused negative contract 先确认真实 `### Downstream Consumers` section 非空再断言无 Code Review，避免空 section false green；不包含 legacy artifact field removal 或真实跨 workflow run。
+- **SF-15：** Optimize 删除无 intake 的 `spec-work` consumer，只保留 code review、benchmark/release reviewer 与人工日志审查者。关闭证据为 source + consumer-block contract。
+- **SF-16：** Session historian 只允许写 caller 提供的 `/tmp/spec-first/spec-compound/{run_id}/session-history.md`，写成功只返 path，失败返完整 inline prose，且禁止 tracked/product writes。关闭证据为 caller/worker source contract；未执行真实 authorized dispatch。
+- **SF-17：** Worktree helper 只声明 Dogfood 当前 caller；未来 caller 必须先在 public owner 建立 forward invocation/intake。关闭证据为 source + caller contract。
+- **SF-19：** Figma mutating worker 返回 `changed_paths`、`verification_evidence`、不可从 diff 重建的视觉观察与 remaining blockers，并重复禁止 stage/commit/push/PR/lifecycle/generated-runtime-as-source。关闭证据为 source + worker-packet contract；未执行真实 Figma/browser field run。
+- **SF-20：** Code Review 对 `NO-CACHE` 与 helper failure 都 fresh derive profile、跳过 `put`，与 shared cache protocol 一致；dispatch gate 之前仍不派发 profiler。关闭证据为 source + focused dispatch-order/cache contract。
+- **SF-21：** Maintainability anchor 50 一律 suppress；有直接客观证据时提升到 anchor 75，否则省略，禁止用 P0/P1 绕 confidence gate。关闭证据为 source + focused confidence contract；未执行 fresh-session persona eval。
+- **SF-22：** `spec-riffrec-feedback-analysis` 是 analyzer canonical owner，Sweep 保留 byte-identical package-local projection；source parity 与五宿主 projection contract 均锁定。关闭证据不包含真实媒体分析 field run。
+- **SF-23：** `spec-resolve-pr-feedback` 与 `spec-test-xcode` 作为显式用户 standalone skill 投射到五宿主；前者新增 local-fix/commit/push/reply/thread-resolve 五类独立 authority，后者删除虚假 Code Review auto-caller。Projection contract 按宿主语义验证：Cursor 按 allowlist 移除不支持的 `allowed-tools` frontmatter，但保留 user-only entry、authority body 与 `disable-model-invocation`，其余四宿主保留 source tool list；未执行真实 GitHub mutation、XcodeBuildMCP 或 host loader。
 
 ## 建议工作包
 
-P1 队列已清空，SF-11、SF-12、SF-18、SF-13 已关闭；下一批按 P2 优先处理 SF-16（session-historian authoritative return 冲突）、SF-19（Figma mutating worker packet 不完整）与 SF-14（App audit/code-review integration claim 未闭合）。
+P0/P1/P2 队列已清空。下一批只剩 P3：先修 SF-25 的 validator producer/consumer 必填冲突，再修 SF-24 activation prose 与 SF-26 LFG verification 文案。

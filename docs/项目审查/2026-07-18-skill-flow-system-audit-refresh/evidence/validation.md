@@ -3,9 +3,9 @@ title: Skill 关系审查当前快照验证记录
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 11b26b954a9b36483b97723b4c6917951c1813bc
+current_head_at_calibration: 21fa24eaabe31335729cb43529f0e285fce90370
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
+working_tree_overlay: uncommitted-sf14-sf23-p2-contract-repair
 ---
 
 # Validation — current source refresh
@@ -15,27 +15,28 @@ working_tree_overlay: uncommitted-sf12-sf18-sf13-contract-repair
 | Fact | Result |
 | --- | --- |
 | Original audit source HEAD | `0c1b358605c534db50321a5252e5e6d356dbcefb` |
-| Current calibration HEAD | `11b26b954a9b36483b97723b4c6917951c1813bc` |
+| Current calibration HEAD | `21fa24eaabe31335729cb43529f0e285fce90370` |
 | Branch | `leo-2026-07-16-plan-update` |
-| Dirty state before SF-12/SF-18/SF-13 repair | clean；SF-11 已进入 current HEAD |
-| Current final repair overlay | uncommitted working tree; `current_head_at_calibration` 不包含本轮 Universal Proof materialization、tracker-defer parity、terminal handoff、测试与审查 evidence 修复 |
+| Dirty state before SF-14-SF-23 repair | clean；SF-12/SF-18/SF-13 已进入 current HEAD |
+| Current final repair overlay | uncommitted working tree；`current_head_at_calibration` 不包含本轮最后 9 项 P2 source/test/docs 修复及对抗性补闭的 SF-11/M-013 consumer wording；另有用户并发新增的核心工作流详解文档与 Changelog 条目，不属于本轮 changed-set |
 | Package version | `1.13.2` |
 | Baseline HEAD | `7cb9721f0a9e4f0e0dc265c7194ab80e678b3c64` |
 | Frozen `source_head` delta to baseline | 4 commits; 30 changed canonical Skill sources, including 3 new references |
 
 ## 2. Deterministic frozen-source inventory
 
-The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. A case-insensitive skill-name token boundary produced file-target supports; it does not classify semantic role by itself. 下表的 manifest/pair hash 绑定 `source_head` 冻结快照；`current_head_at_calibration` 的后续修复与 SF-03/SF-04/SF-10/SF-06、最终 SF-01/SF-27 overlay 只通过后续 focused/full tests 校准，本轮未重算整张关系图 manifest。SF-06 修改两个既有 canonical reference 并新增 `evals/` fixture；最终 overlay 只改变 delivery allowlist、code-review pre-gate prose、governance 说明及合同测试，不新增 Skill 节点或 canonical pair，因此不得把冻结的 278-file manifest 描述成当前 working-tree 重算结果。
+The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. A case-insensitive skill-name token boundary produced file-target supports; it does not classify semantic role by itself. 下表的 manifest/pair hash 绑定 `source_head` 冻结快照，不冒充 current working-tree 全量重算。本轮另做 bounded current-vs-HEAD token scan，只用于校准当前 overlay 的 pair delta：新增 2 条 user-only route，删除 1 条纸面 consumer 与 2 条 reverse-only caller；该 scan 与冻结生成器的文件选择细节不同，因此不替换历史 total/hash。
 
 | Command / fact | Result |
 | --- | --- |
-| current governed roster from `skills-governance.json` | 35 nodes: 17 workflow, 11 standalone, 7 internal |
+| current governed roster from `skills-governance.json` | 35 nodes: 17 workflow, 13 standalone, 5 internal |
 | canonical source count | 278 |
 | source manifest SHA-256 | `01c8b308afcc5907bc70e3e2983cae525098cb4db0d4e050dbf0144b79e5bc9f` |
 | file-target support hits | 265 |
 | canonical pair count | 165 |
 | pair manifest SHA-256 | `71c0a4c26d4b47690f4023a33174bf295be1df74787332e396d0b195e38ea30a` |
 | baseline/current pair set delta | +9 / -1 |
+| current P2 overlay pair delta | +2 / -3（bounded current-vs-HEAD token scan） |
 
 ## 3. Commands executed
 
@@ -76,6 +77,20 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | SF-12/SF-18/SF-13 inline simplification | pass, no applied change | reuse/quality/efficiency 三镜逐项检查；跨包 tracker copy 是五宿主 root 差异下的必要 projection，Proof/Plan 步骤均为 load-bearing boundary，不为减少行数而删除 |
 | SF-12/SF-18/SF-13 inline adversarial scan | pass, no remaining actionable finding | 检查 materialization-before-publish、same-byte/same-file、failure retention、direct ideate→plan 禁止、Work canonical owner、source/runtime parity、temp/durable evidence 与 generated-runtime boundary；补强 `spec-proof` existing-file/title/default-identity consumer assertion |
 | post-adversarial focused replay | pass, 6 suites / 33 tests | 三项合同、五宿主 projection、Changelog format 与新增 Proof producer/consumer cross-contract |
+| SF-14-SF-23 P2 closure RED | expected fail, 1 suite / 9 tests failed | 九项 current source 缺口分别由单一 closure contract 证伪；失败未被改写为通过 |
+| SF-14-SF-23 final focused replay | pass, 10 suites / 89 tests | App audit integration、Optimize consumer、Compound/Worktree/Figma worker、Code Review cache/confidence、Riffrec parity、PR feedback authority、M-013 artifact-kind consumer 与五宿主 projection owner contracts |
+| P2 language/anchor adversarial replay | expected fail, 10 suites；1 failed / 93 passed | 将新增 prose 校准为中文后，既有 dispatch-order test 仍依赖旧英文 profile-dispatch 锚点；随后把 test 精确改读当前 source marker，不弱化 gate |
+| P2 closeout adversarial RED/current-source scan | expected fail, 9 suites；1 failed / 84 passed；另发现 2 个 false-green source/test gap | SF-23 新 projection test 错误要求 Cursor 保留不支持的 `allowed-tools` 字段；直接 source/test scan 另发现 SF-14 读取不存在 heading 的空 section 断言，以及 SF-11/M-013 requirements-only direct-work wording漏网；三者均在 final focused replay 中转绿 |
+| P2 first complete unit adversarial RED | expected fail, 126 suites；2 failed / 124 passed；1297 / 1299 tests passed | Claude doctor inventory 仍锁旧计数 16，Brainstorm HTML authority 正则未允许 current source 的合法换行；失败保留于 `logs/unit-red.log`，随后修 source/test 而非弱化断言 |
+| P2 final skill-entrypoint lint | pass, 313 files | 最终 source package entrypoint、public/internal delivery 与五宿主投射静态治理地板 |
+| P2 final typecheck | pass, 184 files | 最终 CLI、scripts 与关键 JavaScript 语法地板 |
+| P2 post-closeout docs focused replay | pass, 11 suites / 91 tests | 最后 9 项 P2 contracts、M-013 renderer parity、五宿主 projection、dispatch authority 与最终 Changelog 格式 |
+| P2 final complete unit | pass, 126 suites / 1299 tests | 最后 9 项 P2、SF-11/M-013 遗留、doctor inventory、HTML authority、五宿主 projection 与全仓 unit contracts |
+| P2 final smoke | pass, 1 suite / 5 tests | CLI help、preview、global profile 与 packed five-host runtime |
+| P2 final integration | pass, 6 suites / 21 tests；1 conditional suite / 2 tests skipped | five-host init、workspace graph、Qoder lifecycle 与 plan closeout integration |
+| P2 final eval fixtures | pass, 6 suites / 78 tests | current eval/replay fixture contracts |
+| P2 final build | pass, 684 package files | `npm pack --dry-run` 最终 package surface |
+| P2 final diff check | pass | current source/docs/test working-tree whitespace floor |
 | `npm run test:unit` after SF-06 adversarial repair | pass, 125 suites / 1274 tests | complete unit regression；包含 SF-03 config consumer、SF-04 task-pack consumer、SF-10 artifact-map、SF-06 suppress/advisory precedence、active replay manifest 与全仓 unit contracts |
 | `npm run test:unit` after final SF-01/SF-27 repair | pass, 125 suites / 1277 tests | complete unit regression；新增 Proof direct-name/internal-route separation 与 pre-gate dispatch guard |
 | `npm run test:unit` after SF-11 repair | pass, 125 suites / 1280 tests | complete unit regression；包含 HTML renderer/Brainstorm review contract 与更新后的 active requirements-clarification source pin |
@@ -98,6 +113,8 @@ SF-10 的 artifact-map contract 先在旧 false-only / graph-shaped / implicit-c
 SF-06 的 focused contract 先在旧 shared-template absolute suppression 口径上按预期 RED；初版修复后，对抗性扫描又证明 generic advisory 仍可能把 proven 1k P1/anchor-100 降为 anchor-50，因此第二次按预期 RED（1 failed / 21 passed）。最终 shared template 先保留由 persona 定义且被 current diff 直接证明的 severity/confidence，再对其余 shapes 执行 FP-over-advisory precedence，focused replay 转为 GREEN（1 suite / 22 tests）。四个 planted cases 保证 1k crossing、thin wrapper、duplicate canonical helper 不被 subjective long-file rule 或 advisory reroute 误压制，同时无 threshold crossing、无 concrete failure mode 的 “getting long / hard to read” 仍被 suppress。该证据只证明 current prompt/fixture contract，不证明 fresh-session persona 一定稳定执行该语义。
 
 SF-11 的两组新合同先在旧 renderer/handoff 上按预期 RED（2 suites；3 failed / 8 passed），随后三份 renderer、Brainstorm handoff 与既有 doc-review/Plan owner 对齐后转为 GREEN。第一次全量 unit 随即被 active requirements-clarification replay 的旧 handoff SHA pin 确定性阻断（1 failed / 1279 passed）；只刷新该唯一 source pin 后，focused eval replay 与完整 unit 分别转为 2 suites / 15 tests、125 suites / 1280 tests 全绿。该证据证明 current source 与 frozen replay freshness 对齐，不证明真实 host 菜单、persona dispatch 或 HTML field review outcome。
+
+最后 9 项 P2 初次 source 修复后，对抗性收口没有直接接受“9 tests green”作为充分证据。Current-source scan 发现 SF-11 仍在 shared HTML renderer 中把 requirements-only artifact 写成 `spec-work` 当前 consumer，edge ledger 自身也保留 `M-013 drift retained (P2)`；SF-14 closure test 又因读取不存在的 `## Consumers` heading 而在空字符串上 false green。随后聚焦复跑还以 1 failed / 84 passed 暴露 SF-23 projection test 错误要求 Cursor 保留其 adapter 明确不支持的 `allowed-tools` frontmatter。最终修复保持 renderer 单一 owner，以 artifact-kind condition 收窄 Work consumer；SF-14 test 先要求真实 `### Downstream Consumers` section 非空；SF-23 test 分离 source tool authority 与 host projection，Cursor 验证 lossy frontmatter 后仍保留 user entry、authority body 和 `disable-model-invocation`，其余四宿主保留 tool list。最终 10 suites / 89 tests 转绿。该证据证明 source/projection contract，不证明真实宿主工具可调用或 GitHub/Xcode field outcome。
 
 ## 4. Current-source semantic scenarios
 
@@ -124,7 +141,7 @@ No generic subagent dispatch was authorized. All rows are current-source inline 
 
 ## 5. Counter-evidence and limitations
 
-- `spec-commit`、`spec-commit-push-pr`、`spec-proof`、`spec-test-browser` 与 `spec-worktree` 现在作为 internal assets 投射；这不证明真实 host loader/invocation，也不把 `spec-test-xcode`、`spec-resolve-pr-feedback` 从 governance-only 提升为 delivered。
+- `spec-commit`、`spec-commit-push-pr`、`spec-proof`、`spec-test-browser` 与 `spec-worktree` 作为 internal assets 投射；`spec-test-xcode`、`spec-resolve-pr-feedback` 现作为 user-only standalone skill 进入 projection/init plan。两者都没有真实 host loader/invocation outcome，后者也没有真实 GitHub mutation evidence。
 - CodeGraph was used only to orient source/test locations. Its output is provider-untrusted and does not support relation or completion claims.
 - No clean-session host loader/helper invocation test, fresh-source semantic dispatch, real `agent-browser` navigation, external provider call, CI/merge/release, or field outcome was run.
 - SF-02 tests prove field shape and workflow invocation only. They do not prove that a listed source is credible/reachable or that an invalidation condition is semantically sufficient; those remain LLM/human judgments.

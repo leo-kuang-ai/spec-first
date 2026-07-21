@@ -143,12 +143,26 @@ describe('five-host init lifecycle', () => {
           }
         }
       }
-      for (const governanceOnly of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
-        expect(fs.existsSync(path.join(
-          sandbox.projectRoot,
-          adapter.skillsRoot,
-          governanceOnly,
-        ))).toBe(false);
+      for (const [standaloneName, relativePaths] of [
+        ['spec-resolve-pr-feedback', [
+          'SKILL.md',
+          'references/full-mode.md',
+          'references/targeted-mode.md',
+          'references/agents/pr-comment-resolver.md',
+          'scripts/get-pr-comments',
+          'scripts/reply-to-pr-thread',
+          'scripts/resolve-pr-thread',
+        ]],
+        ['spec-test-xcode', ['SKILL.md']],
+      ]) {
+        for (const relativePath of relativePaths) {
+          expect(fs.existsSync(path.join(
+            sandbox.projectRoot,
+            adapter.skillsRoot,
+            standaloneName,
+            relativePath,
+          ))).toBe(true);
+        }
       }
       const changelog = fs.readFileSync(
         path.join(sandbox.projectRoot, 'CHANGELOG.md'),
@@ -321,7 +335,7 @@ describe('five-host init lifecycle', () => {
       if (platform === 'claude') {
         expect(report.checks.find((check) => check.name === '.claude/skills')).toMatchObject({
           level: 'PASS',
-          message: 'found 16 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
+          message: 'found 18 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
         });
       }
       if (platform === 'cursor') {

@@ -10,6 +10,7 @@ The dispatch prompt provides:
 
 - **`problem_topic`** — one sentence naming the concrete question or problem to synthesize against.
 - **`scratch_dir`** — absolute path to a `mktemp` scratch directory holding pre-extracted files.
+- **`output_path`** — caller 提供的 run-local scratch path；本 workflow 中必须是 `/tmp/spec-first/spec-compound/{run_id}/session-history.md`。
 - **`sessions`** — an array of objects (5 max), one per pre-extracted session, each with:
   - `path` — absolute path to a skeleton text file inside `scratch_dir`
   - `errors_path` *(optional)* — absolute path to an errors text file when the orchestrator extracted errors-mode for this session
@@ -34,7 +35,7 @@ These rules apply at all times during synthesis.
 - **Never include thinking or reasoning block content.** Claude Code thinking blocks are internal reasoning; Codex reasoning blocks are encrypted. Neither is actionable. The skeleton extractor already strips these — do not surface them if any survived.
 - **Never analyze the current session.** Its conversation history is already available to the caller; the orchestrator already excluded it from the dispatch payload.
 - **Never make claims about team dynamics or other people's work.** This is one person's session data.
-- **Never write any files.** Return text findings only.
+- **只写 caller 提供的 run-local scratch path。** 可以把完整 synthesis 写入 `/tmp/spec-first/spec-compound/{run_id}/session-history.md`；不得写 tracked/product files、其他 scratch path、项目指令或 durable knowledge artifact。
 - **Surface technical content, not personal content.** Sessions contain everything — credentials, frustration, half-formed opinions. Use judgment about what belongs in a technical summary and what doesn't.
 
 ## Time budget
@@ -59,6 +60,8 @@ Cite actual evidence from the extracted files, not vibe-summaries. When a findin
 
 If the dispatch prompt supplies an `output_schema`, follow it verbatim. Do not add extra sections. Do not prepend the default header below.
 
+Synthesis 完成后，将其写入 caller 提供的 run-local scratch path，确认文件存在且非空，再只返回 artifact path。若 path 缺失、写入失败或写后检查为空，必须 inline 返回完整 prose，避免 caller 丢失 authoritative result。
+
 Otherwise, lead with a brief one-line provenance header:
 
 ```
@@ -79,5 +82,6 @@ Omit any section with no findings. If no sessions yielded relevant content, retu
 ## Tool guidance
 
 - Use the platform's native file-read tool (e.g., `Read` in Claude Code) for each path the orchestrator supplied. Do not pipe `cat` through shell — native tools avoid permission prompts and are more reliable.
+- 使用平台 native file-write tool 写唯一的 `output_path`；若该能力不可用，按 fallback inline 返回完整 prose，不用 shell redirection 伪造成功写入。
 - Native content-search (e.g., `Grep`) is appropriate when you want to locate a specific keyword across the supplied scratch files (not across source session files).
-- **Do not invoke the `Skill` tool, the `Bash` tool to run extraction scripts, or any discovery primitive.** All discovery and extraction is the orchestrator's responsibility; this agent's contract is "read the paths you were given and synthesize."
+- **不要调用 `Skill` tool、用 `Bash` 运行 extraction scripts，或调用 discovery primitive。** Discovery/extraction 由 orchestrator 负责；本 agent 只读取指定 path、完成 synthesis，并保存唯一获授权的 scratch artifact。

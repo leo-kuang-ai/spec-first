@@ -47,8 +47,8 @@ spec-first： using-spec-first → brainstorm/prd → plan → [write-tasks] →
 | 入口与运行时 | `using-spec-first`、`spec-runtime-setup` | 选择一个合适入口；检查或配置支持工作流的运行时事实。 |
 | 意图与产品 | `spec-ideate`、`spec-brainstorm`、`spec-prd`、`spec-strategy`、`spec-pov` | 分别处理方向发散、需求探索、brownfield PRD、策略和对外部方案的项目化判断。 |
 | 计划与执行 | `spec-plan`、`spec-write-tasks`、`spec-work`、`spec-lfg` | 形成 plan、可选派生 task pack、执行明确工作；`spec-lfg` 仅在用户明确要求全自动 green-PR 路径时使用。browser applicable 时调用方提供 exact origin，browser cleanup、缺 origin 与缺少持久/外部 UI effect 授权会在 tracker、commit、push、PR、CI 副作用前阻断。 |
-| 质量与验证 | `spec-doc-review`、`spec-code-review`、`spec-debug`、`spec-test-browser`、`spec-test-xcode`、`spec-dogfood`、`spec-polish`、`spec-simplify-code`、`spec-optimize` | 分别处理文档/代码审查、bug、平台测试、分支 QA、协作式 UI 打磨、保行为简化和指标优化；`spec-test-browser` 在调用方已启动的 loopback exact origin 上执行有界 browser verification，聚合 route/step、私有证据与 browser cleanup，不管理项目 server。 |
-| 交付与协作 | `spec-commit`、`spec-commit-push-pr`、`spec-resolve-pr-feedback`、`spec-proof`、`spec-worktree` | commit/PR、处理 review thread、协作文档、内部隔离 worktree。`spec-worktree` 是 internal helper，不是公开路由菜单。 |
+| 质量与验证 | `spec-doc-review`、`spec-code-review`、`spec-debug`、`spec-test-browser`、`spec-test-xcode`、`spec-dogfood`、`spec-polish`、`spec-simplify-code`、`spec-optimize` | 分别处理文档/代码审查、bug、平台测试、分支 QA、协作式 UI 打磨、保行为简化和指标优化；`spec-test-xcode` 仅由用户显式调用并要求 XcodeBuildMCP，当前没有 Code Review auto-caller；`spec-test-browser` 仍由 caller 提供 loopback exact origin。 |
+| 交付与协作 | `spec-commit`、`spec-commit-push-pr`、`spec-resolve-pr-feedback`、`spec-proof`、`spec-worktree` | commit/PR、处理 review thread、协作文档、内部隔离 worktree。`spec-resolve-pr-feedback` 是 user-only standalone，local fix/commit/push/reply/resolve 分别授权；`spec-worktree` 是 internal helper，不是公开路由菜单。 |
 | 项目理解与知识 | `spec-compound`、`spec-compound-refresh`、`spec-explain`、`spec-rule-miner` | 沉淀/刷新知识、个人化解释、从代码证据提炼项目规则。 |
 | 专项与反馈 | `spec-app-consistency-audit`、`spec-product-pulse`、`spec-sweep`、`spec-riffrec-feedback-analysis`、`spec-promote` | App 跨源审计、产品信号/反馈、录音分析和已交付功能的对外文案。 |
 | 自身治理 | `spec-write-skill` | 创建、改造或只读审计 source skill package；不用于普通工程工作。 |

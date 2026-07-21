@@ -40,7 +40,7 @@ Resolve mode and scope, collect static product/design/source facts, apply archit
 
 ### Downstream Consumers
 
-`spec-code-review`, mobile QA planning, App implementation owners, report-writer steps, and human reviewers preparing runtime validation.
+移动 QA planning、App implementation owner、report-writer step，以及准备 runtime validation 的人工审查者。
 
 ## Scenario Capability
 
@@ -94,7 +94,7 @@ Keep these route-critical defaults in memory:
 
 - `mode:headless` asks no user questions, requires `base:<ref>`, writes run-scoped artifacts, returns a compact envelope, and fails with `scope_headless_missing_base` when diff scope is absent.
 - `mode:report-only` is a strict no-write semantic contract; the current runner reports it as unsupported instead of writing artifacts.
-- `source:<path>`, `prd:<path>`, `figma-context:<path>`, `figma-ref:<id-or-url>`, `industry:<name>`, `tech-plan:<path>`, `task-doc:<path>`, `depth:deep`, and `from:code-review` are canonical scope/lens/caller tokens.
+- `source:<path>`、`prd:<path>`、`figma-context:<path>`、`figma-ref:<id-or-url>`、`industry:<name>`、`tech-plan:<path>`、`task-doc:<path>` 与 `depth:deep` 是 canonical scope/lens token。`from:code-review` 只保留为旧 envelope 的休眠兼容字段；当前没有受治理的 caller 或 consumer，因此不得把这条反向关系描述为 active integration。
 - `figma-ref` is reference-only until a local `figma-context` JSON exists; headless/report-only must degrade it as `input_figma_reference_only` and must not fetch remote Figma data.
 - All modes are read-only with respect to product source, generated runtime assets, durable standards, and `.spec-first/specs/repo-profile.yaml`.
 
@@ -219,7 +219,7 @@ Rule packs can explain risk and rationale, but they cannot be the only evidence 
 
 Every issue must carry static/runtime flags, `contract_status`, numeric `confidence`, traceable `provenance`/`evidence`, `claim_family`, `claim_type`, `affected_surface`, `impact`, `recommendation`, `related_rule_packs`, `runtime_verification`, `validation_status`, `review_lifecycle`, and `data_sensitivity`.
 
-Weak evidence may be reported as risk, candidate, or follow-up. It must not be promoted to a confirmed issue. Confirmed findings require `confidence >= 0.75`, `static_confirmed: true`, project-specific traceable evidence, and any claim-family required evidence. `industry:<name>` is an explicit lens, not a confirmed industry profile. Issues surfaced to `spec-code-review` require `code_review_handoff`; app-audit itself does not emit `safe_auto`.
+Weak evidence may be reported as risk, candidate, or follow-up. It must not be promoted to a confirmed issue. Confirmed findings require `confidence >= 0.75`, `static_confirmed: true`, project-specific traceable evidence, and any claim-family required evidence. `industry:<name>` is an explicit lens, not a confirmed industry profile. `code_review_handoff` 只保留为旧 artifact 的休眠兼容字段；它不建立当前 `spec-code-review` caller 或 consumer。App-audit itself does not emit `safe_auto`.
 
 Detailed field rules are in [Mode, Output, And Issue Contract](references/mode-output-contract.md).
 

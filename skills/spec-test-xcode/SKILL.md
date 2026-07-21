@@ -203,6 +203,6 @@ spec-test-xcode MyApp-Debug
 spec-test-xcode current
 ```
 
-## Integration with spec-code-review
+## Invocation Boundary
 
-When reviewing PRs that touch iOS code, the `spec-code-review` workflow can spawn an agent to run this skill, build on the simulator, test key screens, and check for crashes.
+本 skill 仅由用户显式调用。当前没有 `spec-code-review` 或其他 public workflow 的自动 caller；代码审查中的 Swift 静态 lens 不等于 Simulator 构建与运行验证。

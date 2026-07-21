@@ -7,6 +7,17 @@ function read(filePath) {
 }
 
 describe('spec-riffrec-feedback-analysis artifact path contracts', () => {
+  test('拥有 analyzer canonical owner，Sweep 保持 byte-identical package-local projection', () => {
+    const owner = fs.readFileSync(
+      'skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py',
+    );
+    const projection = fs.readFileSync('skills/spec-sweep/scripts/analyze_riffrec_zip.py');
+
+    expect(projection).toEqual(owner);
+    expect(owner.toString('utf8')).toContain('Canonical owner：spec-riffrec-feedback-analysis');
+    expect(owner.toString('utf8')).toContain('Package-local projection：spec-sweep');
+  });
+
   test('keeps evidence artifacts separate from spec-brainstorm durable output', () => {
     const skill = read('skills/spec-riffrec-feedback-analysis/SKILL.md');
     const extensive = read('skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md');

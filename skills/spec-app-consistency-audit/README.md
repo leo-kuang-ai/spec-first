@@ -10,7 +10,7 @@
 
 - 审查 App PRD / Figma / local source 是否一致。
 - 在 runtime validation 前发现静态可证据化的产品、设计、架构、组件、埋点或 i18n 漂移。
-- 让 `spec-code-review`、移动 QA、实现 owner 或 Report-Writer 消费结构化 app-audit artifacts。
+- 让移动 QA、实现 owner、Report-Writer 或人工审查者消费结构化 app-audit artifacts。
 
 不使用这个 skill，当任务目标只是：
 

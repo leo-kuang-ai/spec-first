@@ -299,6 +299,7 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
    - the full content of `references/agents/session-historian.md`
    - `problem_topic`
    - `scratch_dir`
+   - `output_path: /tmp/spec-first/spec-compound/{run_id}/session-history.md`
    - a `sessions` array with extracted file paths and metadata
    - the output schema above
    - the filter rule above

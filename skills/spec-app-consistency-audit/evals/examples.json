@@ -20,14 +20,15 @@
       ]
     },
     {
-      "id": "trigger-headless-code-review-caller",
-      "input": "Parent workflow calls mode:headless from:code-review base:main source:app prd:docs/prd.md figma-context:.spec-first/input/figma-context.json.",
-      "coverage_tags": ["trigger", "expected"],
+      "id": "compatibility-headless-code-review-marker",
+      "input": "以 mode:headless from:code-review base:main source:app prd:docs/prd.md figma-context:.spec-first/input/figma-context.json 重放旧 envelope。",
+      "coverage_tags": ["compatibility", "expected"],
       "expected_outcome": [
         "run headless with base:<ref>",
         "ask no user questions",
         "write run-scoped artifacts",
-        "return compact headless envelope"
+        "return compact headless envelope",
+        "把 from:code-review 视为休眠兼容，而不是 active governed caller"
       ]
     },
     {

@@ -8,6 +8,32 @@ function read(filePath) {
 }
 
 describe('spec-resolve-pr-feedback contracts', () => {
+  test('逐项独立准入 mutating 与 external exit', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const targetedMode = read('skills/spec-resolve-pr-feedback/references/targeted-mode.md');
+
+    expect(entrypoint).toMatch(/^disable-model-invocation:\s*true$/m);
+    for (const tool of ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'Bash', 'Agent', 'AskUserQuestion']) {
+      expect(entrypoint).toMatch(new RegExp(`^  - ${tool}$`, 'm'));
+    }
+    for (const authority of [
+      'local_fix_authorization',
+      'commit_authorization',
+      'push_authorization',
+      'reply_authorization',
+      'thread_resolution_authorization',
+    ]) {
+      expect(entrypoint).toContain(authority);
+    }
+    expect(entrypoint).toContain('workflow invocation 不授权这些副作用');
+    expect(entrypoint).toContain('缺授权只阻断该出口及依赖它的 downstream 动作');
+    expect(fullMode).toMatch(/Commit 与 push 是两个独立出口/);
+    expect(fullMode).toMatch(/只有 `reply_authorization: authorized` 才发布回复/);
+    expect(fullMode).toMatch(/无代码依赖的 `reply-list` \/ `human-list` 仍可/);
+    expect(targetedMode).toMatch(/五项 Exit Authority Admission/);
+  });
+
   test('helper scripts resolve through the loaded skill directory, not runtime mirror paths', () => {
     const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
     const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');

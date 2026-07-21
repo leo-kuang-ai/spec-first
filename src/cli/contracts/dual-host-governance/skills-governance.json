@@ -60,16 +60,16 @@
     },
     {
       "skill_name": "spec-resolve-pr-feedback",
-      "entry_surface": "internal_only",
+      "entry_surface": "standalone_skill",
       "command_name": null,
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     },
     {
@@ -466,16 +466,16 @@
     },
     {
       "skill_name": "spec-test-xcode",
-      "entry_surface": "internal_only",
+      "entry_surface": "standalone_skill",
       "command_name": null,
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     },
     {

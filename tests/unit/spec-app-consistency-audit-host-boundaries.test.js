@@ -49,6 +49,20 @@ function metadataArtifact(host) {
 }
 
 describe('spec-app-consistency-audit host boundaries', () => {
+  test('没有受治理 caller 时不声明反向 code-review integration', () => {
+    const skill = fs.readFileSync('skills/spec-app-consistency-audit/SKILL.md', 'utf8');
+    const modeContract = fs.readFileSync(
+      'skills/spec-app-consistency-audit/references/mode-output-contract.md',
+      'utf8',
+    );
+    const reviewSkill = fs.readFileSync('skills/spec-code-review/SKILL.md', 'utf8');
+
+    expect(skill).toContain('休眠兼容字段');
+    expect(modeContract).toContain('当前没有受治理的');
+    expect(reviewSkill).not.toContain('from:code-review');
+    expect(reviewSkill).not.toContain('code_review_handoff');
+  });
+
   test('keeps metadata hosts aligned with every supported platform', () => {
     const schema = JSON.parse(fs.readFileSync(
       'skills/spec-app-consistency-audit/schemas/metadata.schema.json',

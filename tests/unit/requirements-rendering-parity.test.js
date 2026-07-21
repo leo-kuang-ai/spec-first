@@ -40,12 +40,16 @@ describe('shared HTML rendering consumer contract', () => {
   test('recognizes spec-doc-review as a report-only HTML consumer without mutation authority', () => {
     for (const renderer of Object.values(renderers)) {
       expect(renderer).toContain('report-only `spec-doc-review`');
+      expect(renderer).toContain('`spec-work` only for implementation-ready');
+      expect(renderer).toMatch(/it is not a consumer of\s+requirements-only brainstorm or ideation HTML/);
       expect(renderer).toContain('mutation_policy: report-only');
       expect(renderer).toContain('mutation_reason: html-artifact');
       expect(renderer).toContain('fixes_applied: 0');
-      expect(renderer).toMatch(/does not grant document mutation authority/i);
+      expect(renderer).toMatch(/does not grant\s+document mutation authority/i);
       expect(renderer).not.toContain('not a current HTML consumer');
       expect(renderer).not.toContain('*not* currently an HTML consumer');
+      expect(renderer).not.toContain('consumers that read HTML today (`spec-work`');
+      expect(renderer).not.toContain('Downstream agents that read HTML today (`spec-work`');
     }
   });
 

@@ -9,10 +9,13 @@ This reference describes *how* HTML specifically presents it. The same
 content rendered by different skills shares the same HTML principles.
 
 The HTML artifact is the *only* artifact the skill produces for that run —
-output mode is exclusive (markdown OR HTML, never both). Downstream
-consumers that read HTML today (`spec-work`, report-only `spec-doc-review`,
-and human readers) do so directly; the agent-consumability rules below make
-that work. HTML review does not grant document mutation authority:
+output mode is exclusive (markdown OR HTML, never both). Report-only
+`spec-doc-review` and human readers consume HTML directly. `spec-work` is a
+consumer only when the producer's section contract identifies the artifact as
+an implementation-ready software plan; it is not a consumer of
+requirements-only brainstorm or ideation HTML. The agent-consumability rules
+below make those artifact-kind-specific reads work. HTML review does not grant
+document mutation authority:
 `spec-doc-review` resolves `mutation_policy: report-only` with
 `mutation_reason: html-artifact`, keeps `fixes_applied: 0`, and returns
 findings or producer-fix candidates without invoking Markdown mutation paths.
@@ -549,9 +552,10 @@ fine when the content suggests them.
 
 ## Agent-consumability rules
 
-Downstream agents that read HTML today (`spec-work`, report-only
-`spec-doc-review`, a skill re-reading its own prior artifact on a resume run,
-and future consumers) reason over the HTML as text — the way they reason over
+Downstream agents that read HTML under the producer's artifact contract
+(report-only `spec-doc-review`; `spec-work` only for implementation-ready
+software plans; a skill re-reading its own prior artifact on a resume run; and
+future consumers) reason over the HTML as text — the way they reason over
 markdown, not via DOM extraction or a script-style parse.
 
 These rules are why such a consumer can locate one item (a single

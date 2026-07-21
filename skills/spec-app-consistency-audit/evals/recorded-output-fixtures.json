@@ -57,11 +57,11 @@
       ]
     },
     {
-      "id": "code-review-handoff-consumable",
-      "input": "from:code-review issue artifact with project-specific evidence is normalized for downstream review.",
-      "coverage_tags": ["expected"],
-      "input_summary": "from:code-review issue artifact with project-specific evidence is normalized for downstream review.",
-      "expected_outcome": "Issue normalization preserves enabled code_review_handoff fields with severity, owner, verification, run id, and source issue id.",
+      "id": "legacy-code-review-handoff-compatible",
+      "input": "对带 project-specific evidence 的旧 from:code-review issue artifact 做兼容重放与 normalize。",
+      "coverage_tags": ["compatibility"],
+      "input_summary": "旧 from:code-review artifact replay；不表示当前存在 governed caller 或 consumer。",
+      "expected_outcome": "Issue normalization 保留旧 code_review_handoff 字段，但不宣传 active workflow edge。",
       "recorded_output": {
         "issue_fields": {
           "code_review_handoff": {
