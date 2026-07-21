@@ -15,6 +15,7 @@ const brainstorm = read('skills/spec-brainstorm/SKILL.md');
 const pressure = read('skills/spec-brainstorm/references/product-pressure-test.md');
 const sections = read('skills/spec-brainstorm/references/brainstorm-sections.md');
 const handoff = read('skills/spec-brainstorm/references/handoff.md');
+const htmlRendering = read('skills/spec-brainstorm/references/html-rendering.md');
 const lfg = read('skills/spec-lfg/SKILL.md');
 
 describe('spec-brainstorm clarification, scenarios, and resume contract', () => {
@@ -55,6 +56,17 @@ describe('spec-brainstorm clarification, scenarios, and resume contract', () => 
     expect(brainstorm).toContain('current conversation user is the only human product confirmer');
     expect(brainstorm).toContain('one highest-impact independent product question at a time');
     expect(brainstorm).toContain('specialist material is evidence, not a second confirmation route');
+  });
+
+  test('offers requirements review for HTML without granting document mutation authority', () => {
+    expect(handoff).toContain('for both `OUTPUT_FORMAT=md` and `OUTPUT_FORMAT=html`');
+    expect(handoff).toContain('mutation:report-only');
+    expect(handoff).toContain('HTML review is byte-preserving');
+    expect(handoff).not.toContain('HTML brainstorms skip this option');
+    expect(handoff).not.toContain('Requirements review unavailable in output:html mode');
+    expect(handoff).not.toContain('Suppress this nudge when `OUTPUT_FORMAT=html`');
+    expect(htmlRendering).toContain('report-only `spec-doc-review`');
+    expect(htmlRendering).toMatch(/does not grant document mutation authority/i);
   });
 
   test('treats option 2 as explicit authorization and invokes exact spec-lfg', () => {

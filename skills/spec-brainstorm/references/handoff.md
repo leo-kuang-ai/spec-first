@@ -8,12 +8,12 @@ unified plan is written.
 #### 4.1 Present Next-Step Options
 
 The Phase 4 menu's visible option count varies by state: no unified plan
-artifact hides the review and Proof options, `OUTPUT_FORMAT=html` also hides
-the review option (spec-doc-review is markdown-only today), unresolved `Resolve
-Before Planning` hides both `Create the implementation plan` and `Ship it
-autonomously with spec-lfg`, and the spec-lfg option is also hidden for non-software
-brainstorms (`execution` other than `code`). Count the visible options for the
-current state and choose the rendering mode accordingly:
+artifact hides the review and Proof/browser options, `OUTPUT_FORMAT` selects
+the Proof or browser label and the document-review mutation policy, unresolved
+`Resolve Before Planning` hides both `Create the implementation plan` and
+`Ship it autonomously with spec-lfg`, and the spec-lfg option is also hidden
+for non-software brainstorms (`execution` other than `code`). Count the visible
+options for the current state and choose the rendering mode accordingly:
 
 - **Visible count fits the current platform's option cap:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex). Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options.
 - **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, Proof/browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
@@ -55,14 +55,14 @@ Present only the options that apply. Renumber so visible options stay contiguous
 
 1. **Create the implementation plan** *(recommended)* - Hand off to `spec-plan` and sharpen the requirements into a complete, testable plan. Shown only when `Resolve Before Planning` is empty.
 2. **Ship it autonomously with `spec-lfg`** - Hand the requirements to the full autonomous pipeline: `spec-lfg` plans (`spec-plan`), implements, simplifies, 委派一组独立、只读的 reviewer 执行代码审查并应用合格修复, opens a PR, and watches CI to green — hands-off, no pipeline check-ins. It plans first (unlike a raw `/goal` straight from requirements), so it's the safer autonomous path. Best when you trust the requirements and want it built and shipped without steering. **Opens a PR and pushes a branch. 此选择只授权上述委派的独立只读审查，不授权任意 worker dispatch。When browser verification applies, its caller or upstream runtime must provide a caller-owned target origin; selecting this option does not authorize a project server command.** The caller owns project-server startup and shutdown, and a missing origin blocks the applicable browser flow rather than triggering automatic startup. Shown only for software brainstorms (`execution: code`) with `Resolve Before Planning` empty **and a unified plan artifact was created** — `spec-lfg` hands `spec-plan` that artifact path in pipeline mode and cannot prompt, so with no artifact (e.g. a brief-alignment brainstorm that skipped doc creation per the "Decide whether a doc is warranted" rule) there is nothing to enrich; offer option 1 instead, which can plan interactively from the conversation. For a quicker plan-then-decide flow, or to run a `/goal` yourself, pick option 1 and choose at the `spec-plan` handoff.
-3. **Pressure-test the requirements** - Dispatch reviewer agents with `spec-doc-review` to find gaps, conflicts, weak premises, and scope issues in the requirements; auto-apply safe fixes; route the rest interactively. Shown only when a markdown unified plan exists **and `OUTPUT_FORMAT=md`** — spec-doc-review's walkthrough applies markdown-only mutations (`##`/`###` heading inserts, single-file markdown edits via apply-set) and would corrupt an HTML artifact, so HTML brainstorms skip this option until spec-doc-review gains HTML-aware mutation support. Under HTML mode, surface a one-line note above the menu: `Requirements review unavailable in output:html mode — spec-doc-review is markdown-only today. Switch to output:md if you want a review pass.`
+3. **Pressure-test the requirements** - Run `spec-doc-review` to find gaps, conflicts, weak premises, and scope issues in the requirements. Shown whenever a unified plan exists, for both `OUTPUT_FORMAT=md` and `OUTPUT_FORMAT=html`. Markdown keeps the ordinary `markdown-write` policy, so eligible safe fixes may apply and remaining actionable findings may enter the interactive walkthrough. HTML invokes `mutation:report-only`: the same structural and semantic review runs, but `fixes_applied: 0`, findings and producer-fix candidates are surfaced, and no Markdown edit, Open Questions append, walkthrough, or bulk mutation path is available. HTML review is byte-preserving and does not grant document mutation authority.
 4. **Publish to Proof — shareable link** - Publish the markdown unified plan to Every's Proof editor and get a shareable link to read, comment on, or share with others. One-way: the local doc stays canonical. Shown only when a markdown unified plan exists. **Render only when `OUTPUT_FORMAT=md`** (Proof operates on markdown and cannot ingest HTML).
 4. **Open in browser** — open the HTML unified plan locally for review and sharing. Shown only when an HTML unified plan exists. **Render only when `OUTPUT_FORMAT=html`.** Replaces "Publish to Proof" at the same slot under exclusive output mode — the artifact is either markdown OR HTML, never both, so exactly one of the two labels applies per run.
 5. **More clarifying questions to sharpen the doc** - Keep refining scope, edge cases, constraints, and preferences through further dialogue. Always shown.
 
 There is no "done" / "pause" option — the blocking question already waits, and the user ends by dismissing it (Esc) or saying they're finished. The unified plan artifact is already saved.
 
-**Post-review nudge (subsequent rounds only):** If the user has already run `spec-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Pressure-test the requirements\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Create the implementation plan` and the spec-lfg option, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing `Pressure-test the requirements` option. Suppress this nudge when `OUTPUT_FORMAT=html` — that option is hidden in that mode, so the nudge would point users at a missing action.
+**Post-review nudge (subsequent rounds only):** If the user has already run `spec-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Pressure-test the requirements\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Create the implementation plan` and the spec-lfg option, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing `Pressure-test the requirements` option in both output formats.
 
 #### 4.2 Handle the Selected Option
 
@@ -80,12 +80,17 @@ re-scanning the repo. Do not print the closing summary first.
 
 **If user selects "Pressure-test the requirements":**
 
-Load the `spec-doc-review` skill, passing the unified plan path as the argument.
-When spec-doc-review returns "Review complete", return to the Phase 4 options
-and re-render the menu (the requirements may have changed, so re-evaluate
-`Resolve Before Planning`, the spec-lfg software gate, and residual findings). If
-residual P0/P1 findings remain unaddressed, include the post-review nudge
-above the menu. Do not show the closing summary yet.
+Load the `spec-doc-review` skill. For `OUTPUT_FORMAT=md`, pass the unified plan
+path as the argument. For `OUTPUT_FORMAT=html`, pass
+`mutation:report-only <unified-plan-path>` so the zero-write boundary is explicit
+even though HTML classification also makes it mandatory. When spec-doc-review
+returns "Review complete", return to the Phase 4 options and re-render the menu.
+For Markdown, re-evaluate `Resolve Before Planning` because eligible fixes may
+have changed the requirements. For HTML, preserve the artifact bytes and surface
+the report-only findings or producer-fix candidates without implying they were
+applied. In both formats, re-evaluate the spec-lfg software gate and residual
+findings; if residual P0/P1 findings remain unaddressed, include the post-review
+nudge above the menu. Do not show the closing summary yet.
 
 **If user selects "Ship it autonomously with `spec-lfg`":**
 

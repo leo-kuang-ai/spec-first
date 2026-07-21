@@ -10,11 +10,12 @@ content rendered by different skills shares the same HTML principles.
 
 The HTML artifact is the *only* artifact the skill produces for that run —
 output mode is exclusive (markdown OR HTML, never both). Downstream
-consumers that read HTML today (`spec-work`, human readers) do so directly;
-the agent-consumability rules below make that work. `spec-doc-review` is
-*not* currently an HTML consumer — its mutation mechanics are markdown-only,
-so the spec-plan handoff gates the 5.3.8 doc-review pass to `OUTPUT_FORMAT=md`
-runs and skips it for HTML.
+consumers that read HTML today (`spec-work`, report-only `spec-doc-review`,
+and human readers) do so directly; the agent-consumability rules below make
+that work. HTML review does not grant document mutation authority:
+`spec-doc-review` resolves `mutation_policy: report-only` with
+`mutation_reason: html-artifact`, keeps `fixes_applied: 0`, and returns
+findings or producer-fix candidates without invoking Markdown mutation paths.
 
 ## Hard invariants
 
@@ -543,11 +544,10 @@ fine when the content suggests them.
 
 ## Agent-consumability rules
 
-Downstream agents that read HTML today (`spec-work`, a skill re-reading its
-own prior artifact on a resume run, future consumers) reason over the HTML
-as text — the way they reason over markdown, not via DOM extraction or a
-script-style parse. `spec-doc-review` is not a current HTML consumer (see
-opening note).
+Downstream agents that read HTML today (`spec-work`, report-only
+`spec-doc-review`, a skill re-reading its own prior artifact on a resume run,
+and future consumers) reason over the HTML as text — the way they reason over
+markdown, not via DOM extraction or a script-style parse.
 
 These rules are why such a consumer can locate one item (a single
 requirement, unit, idea, or other ID-bearing entry) and reason over it from

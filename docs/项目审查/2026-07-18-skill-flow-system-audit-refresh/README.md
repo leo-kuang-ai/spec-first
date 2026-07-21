@@ -32,7 +32,7 @@ working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-
 | 声明关系候选 | 265 个 file-target support hits 收敛为 165 个 canonical pair |
 | 关系增量 | 旧 157 条中移除 M-113 一条；新增 9 条，当前总数 165 |
 | 变更支撑面 | 30 个变更 source 文件触及 46 个既有/新增 pair；material route、authority、consumer 与 failure delta 已在 `edge-ledger.md` 裁决 |
-| Deterministic validation | 冻结快照验证保持有效；current source 另通过 mutation/dispatch authority 聚焦合同、SF-02 promotion gate、SF-03 config-consumer、SF-04 task-pack consumer、SF-10 artifact-map 与 SF-06 maintainability precedence RED/GREEN 合同，最终全量命令见 `evidence/validation.md` |
+| Deterministic validation | 冻结快照验证保持有效；current source 另通过 mutation/dispatch authority 聚焦合同、SF-02 promotion gate、SF-03 config-consumer、SF-04 task-pack consumer、SF-10 artifact-map、SF-06 maintainability precedence 与 SF-11 HTML report-only consumer RED/GREEN 合同，最终全量命令见 `evidence/validation.md` |
 
 冻结 manifest：
 
@@ -43,8 +43,8 @@ working_tree_overlay: uncommitted-sf01-proof-delivery-and-sf27-pregate-dispatch-
 
 | 文件 | 用途 |
 | --- | --- |
-| [review-report.md](review-report.md) | 当前结论、0 个存活 P1、11 个已关闭 P1、后续 P2/P3 指针 |
-| [optimization-issues.md](optimization-issues.md) | P1 队列清空证明与已关闭 finding 摘要 |
+| [review-report.md](review-report.md) | 当前结论、0 个存活 P1、11 个已关闭 P1、已关闭 SF-11 与后续 P2/P3 指针 |
+| [optimization-issues.md](optimization-issues.md) | 当前 12 项 P2、3 项 P3、P1 清空证明与已关闭 finding 摘要 |
 | [evidence/skill-graph.md](evidence/skill-graph.md) | 35-node roster、entry surface、internal delivery 和关系增量 |
 | [evidence/edge-ledger.md](evidence/edge-ledger.md) | 与 07-17 全量 ledger 的联合关系账本、9 新增/1 移除及受影响 edge 裁决 |
 | [evidence/validation.md](evidence/validation.md) | 当前快照、命令、语义场景、反证、claim ceiling 与限制 |
