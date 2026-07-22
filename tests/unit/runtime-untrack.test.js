@@ -11,6 +11,7 @@ describe('runtime untrack policy', () => {
     const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-untrack-'));
     const generatedPaths = [
       '.agents/skills/spec-plan/SKILL.md',
+      '.agents/skills/source-command-spec-plan/SKILL.md',
       '.claude/skills/using-spec-first/SKILL.md',
       '.codex/spec-first/state.json',
     ];

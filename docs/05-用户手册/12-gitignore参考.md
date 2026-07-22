@@ -7,6 +7,7 @@
 核心原则：
 
 - 各宿主目录中的 `spec-*`、`using-spec-first`、Graphify project skill、`spec-first/` state、`spec-*` command、明确的 spec-first hook 与 pointer 文件可重建，不作为项目 source truth；同目录下的团队自定义 skill、agent、rule 或宿主配置不因位于宿主目录就自动视为 runtime。
+- `.agents/skills/source-command-spec-*/` 是历史 Codex 投射曾使用的 spec-first 命令源兼容 runtime 命名；当前已退役，但仍作为可重建的清理命名空间保留在 policy 中。`init` 默认忽略并对已跟踪的该命名空间执行递归 untrack。
 - `.cursor/mcp.json` 是 Cursor project MCP 配置落点；`.kiro/settings/` 是 Kiro workspace MCP 配置落点；`.qoder/settings.local.json` 是 Qoder local MCP 配置落点；`.qoder/settings.json` 中 spec-first managed hook entries 是 managed slice 而非整文件 ownership。它们默认按本地配置忽略，但如果内容可移植、不含密钥且团队明确需要共享，可以在 managed block 后用 negation 规则重新纳入 Git；`init` 不会自动解除这些 team-policy 文件的已有跟踪状态。
 - `.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 和 `.qoder/rules/**` 是宿主原生或用户维护 artifact，不属于 spec-first generated runtime mirror。三个固定 pointer `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md`、`.qoder/rules/spec-first.md` 除外，它们由 `init` 生成并默认忽略。
 - `.spec-first/config/` 和 `.spec-first/workspace/` 是本地 setup/control-plane facts，默认不提交。

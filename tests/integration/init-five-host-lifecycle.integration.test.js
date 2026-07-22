@@ -357,6 +357,91 @@ describe('five-host init lifecycle', () => {
     }
   }, 120000);
 
+  test('five-host init ignores generated runtime while keeping project-owned host files visible', () => {
+    const sandbox = tempSandbox('all-hosts-gitignore');
+    const gitInit = spawnSync('git', ['init', '-q'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(gitInit.status).toBe(0);
+
+    const trackedLegacyRuntime = '.agents/skills/source-command-spec-legacy/SKILL.md';
+    const trackedLegacyRuntimePath = path.join(sandbox.projectRoot, trackedLegacyRuntime);
+    fs.mkdirSync(path.dirname(trackedLegacyRuntimePath), { recursive: true });
+    fs.writeFileSync(trackedLegacyRuntimePath, 'legacy generated runtime\n', 'utf8');
+    const gitAdd = spawnSync('git', ['add', '--', trackedLegacyRuntime], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(gitAdd.status).toBe(0);
+
+    const init = runSpecFirst([
+      'init',
+      ...getSupportedPlatforms().map((platform) => `--${platform}`),
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ], sandbox);
+    expect(init.status).toBe(0);
+
+    const trackedAfterInit = spawnSync('git', ['ls-files', '--', trackedLegacyRuntime], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(trackedAfterInit.status).toBe(0);
+    expect(trackedAfterInit.stdout).toBe('');
+
+    for (const relativePath of [
+      '.agents/skills/my-team-skill/SKILL.md',
+      '.codex/config.toml',
+      '.qoder/settings.json',
+    ]) {
+      const absolutePath = path.join(sandbox.projectRoot, relativePath);
+      fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+      fs.writeFileSync(absolutePath, 'team-owned\n', 'utf8');
+    }
+
+    const status = spawnSync('git', ['status', '--short', '--untracked-files=all'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(status.status).toBe(0);
+    const visibleUntrackedPaths = status.stdout
+      .trim()
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => line.slice(3))
+      .sort();
+
+    expect(visibleUntrackedPaths).toEqual([
+      '.agents/skills/my-team-skill/SKILL.md',
+      '.claude/settings.json',
+      '.codex/config.toml',
+      '.gitignore',
+      '.qoder/settings.json',
+      'AGENTS.md',
+      'CHANGELOG.md',
+      'CLAUDE.md',
+    ].sort());
+
+    for (const generatedPath of [
+      '.agents/skills/spec-plan/SKILL.md',
+      trackedLegacyRuntime,
+      '.claude/spec-first/state.json',
+      '.codex/spec-first/state.json',
+      '.cursor/spec-first/state.json',
+      '.kiro/spec-first/state.json',
+      '.qoder/spec-first/state.json',
+    ]) {
+      const ignored = spawnSync('git', ['check-ignore', '-q', '--', generatedPath], {
+        cwd: sandbox.projectRoot,
+      });
+      expect(ignored.status).toBe(0);
+    }
+  }, 120000);
+
   test('doctor reports managed pointer body drift', () => {
     const platform = 'kiro';
     const sandbox = tempSandbox(`${platform}-pointer-drift`);
