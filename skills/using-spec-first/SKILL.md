@@ -7,6 +7,14 @@ description: Standalone entry governor for spec-first. Use before substantial wo
 
 `using-spec-first` is a standalone entry governor, not a command-backed workflow. It selects one next entrypoint and yields control; it creates no workflow artifact. It is a semantic map, not a rigid state machine.
 
+## Workflow Contract Summary
+
+- **输入：** 当前用户意图、已有 workflow 状态、artifact 类型、失败/环境信号与项目级路由规则。
+- **输出：** 恰好一个 public `spec-*` workflow、standalone skill、terminal command 或 Direct Lane 入口；进入后立即把控制权交给该 owner。
+- **硬出口：** 入口选择不授权 mutation、verification claim、runtime maintenance、handoff、knowledge promotion、commit 或 landing；低置信且会改变 route 时最多询问一个问题。
+- **权威：** 用户意图与项目 source rules 决定 route；本 skill 只做语义路由，不创建 workflow state 或执行下游工作。
+- **消费者：** 当前用户、所有 public workflow、standalone skill 与 host runtime entrypoint。
+
 ## Fast Paths
 
 - Continue an active public workflow or bounded worker; do not restart routing.

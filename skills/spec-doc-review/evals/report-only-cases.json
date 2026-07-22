@@ -23,11 +23,11 @@
       "forbidden": ["patch the receipt", "accept a stale P0/P1 disposition", "introduce a sealed evidence pipeline"]
     },
     {
-      "id": "default-markdown-still-writes-safe-auto",
+      "id": "default-markdown-stays-report-only",
       "kind": "negative-owner",
-      "input": "Review a writable Markdown plan with output:json but without mutation:report-only.",
-      "expected": "Preserve markdown-write, apply eligible safe_auto fixes, and report the actual fixes_applied count plus applied_fixes details in the JSON envelope.",
-      "forbidden": ["globally default Markdown to report-only", "force fixes_applied to zero", "invent caller-requested-report-only"]
+      "input": "Review a writable Markdown plan with output:json but without mutation:apply-fixes.",
+      "expected": "Resolve default-review-report-only, keep fixes_applied zero and applied_fixes empty, and preserve all findings and producer-fix candidates in the JSON envelope.",
+      "forbidden": ["infer markdown-write from writability", "apply safe_auto directly", "invent caller-requested-apply-fixes"]
     },
     {
       "id": "html-and-format-conflict-keep-existing-reasons",

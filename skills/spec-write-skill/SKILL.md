@@ -12,7 +12,7 @@ description: 公开 workflow：创建、修改或迁移项目拥有的 Agent Ski
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
 
-## Result Contract
+## Workflow Contract Summary
 
 - **Input / output:** 用户目标、一个 target repo/Skill root、现有 package、项目规则、相邻 Skill、已接受 findings 和必要只读参考，产生 near-neighbor route、`validate-only` report、preview 后的单 repo source patch 或 source-resolution blocker；每个结果带验证状态与 residual risks。
 - `base_operation=create|revise` 只区分新建 package 与处理现有 package；`effect=apply|validate-only` 决定副作用，只有 `effect=apply` 才允许修改已确认的 canonical source，`effect=validate-only` 即使面对现有或外部 package 也保持零写入。`modifier=migrate|audit-remediation|none` 只补充输入分析，不形成新 workflow/effect。

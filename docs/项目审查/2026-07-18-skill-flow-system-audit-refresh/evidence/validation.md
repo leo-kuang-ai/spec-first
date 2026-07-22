@@ -3,9 +3,9 @@ title: Skill 关系审查当前快照验证记录
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
+current_head_at_calibration: 27baf79f7d3bb0873deb591218c76b9c11a91bbf
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
+working_tree_overlay: none
 ---
 
 # Validation — current source refresh
@@ -15,17 +15,17 @@ working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 | Fact | Result |
 | --- | --- |
 | Original audit source HEAD | `0c1b358605c534db50321a5252e5e6d356dbcefb` |
-| Current calibration HEAD | `247f86aeb2225641f93eb3d42f86a192e15a6d2e` |
+| Current calibration HEAD | `27baf79f7d3bb0873deb591218c76b9c11a91bbf` |
 | Branch | `leo-2026-07-16-plan-update` |
-| Dirty state before SF-24-SF-26 repair | clean；P0-P2 修复已进入 current HEAD |
-| Current final repair overlay | uncommitted working tree；`current_head_at_calibration` 不包含本轮 SF-24/SF-25/SF-26 source/test/docs 修复；未修改 generated runtime |
+| Dirty state before SF-24-SF-26 repair | clean；P0-P2 修复已进入当时 HEAD |
+| Current calibrated repair state | `current_head_at_calibration` 已提交 SF-24/SF-25/SF-26 source/test/docs 修复；校准时 working-tree overlay 为 none；未修改 generated runtime |
 | Package version | `1.13.2` |
 | Baseline HEAD | `7cb9721f0a9e4f0e0dc265c7194ab80e678b3c64` |
 | Frozen `source_head` delta to baseline | 4 commits; 30 changed canonical Skill sources, including 3 new references |
 
 ## 2. Deterministic frozen-source inventory
 
-The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. A case-insensitive skill-name token boundary produced file-target supports; it does not classify semantic role by itself. 下表的 manifest/pair hash 绑定 `source_head` 冻结快照，不冒充 current working-tree 全量重算。本轮另做 bounded current-vs-HEAD token scan，只用于校准当前 overlay 的 pair delta：新增 2 条 user-only route，删除 1 条纸面 consumer 与 2 条 reverse-only caller；该 scan 与冻结生成器的文件选择细节不同，因此不替换历史 total/hash。
+The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. A case-insensitive skill-name token boundary produced file-target supports; it does not classify semantic role by itself. 下表的 manifest/pair hash 绑定 `source_head` 冻结快照，不冒充后续 source 全量重算。另做的 bounded committed-vs-frozen-source token scan 只用于校准已提交 P2 pair delta：新增 2 条 user-only route，删除 1 条纸面 consumer 与 2 条 reverse-only caller；P3 修复没有新增或删除 pair。该 scan 与冻结生成器的文件选择细节不同，因此不替换历史 total/hash。
 
 | Command / fact | Result |
 | --- | --- |
@@ -36,7 +36,8 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | canonical pair count | 165 |
 | pair manifest SHA-256 | `71c0a4c26d4b47690f4023a33174bf295be1df74787332e396d0b195e38ea30a` |
 | baseline/current pair set delta | +9 / -1 |
-| committed P2 pair delta | +2 / -3（bounded current-vs-frozen-source token scan）；P3 overlay 不改变 pair 分母 |
+| committed P2 pair delta | +2 / -3（bounded committed-vs-frozen-source token scan） |
+| P3 pair delta | 0 / 0；只校准 existing edge wording |
 
 ## 3. Commands executed
 
@@ -50,7 +51,7 @@ The inventory read `skills/<governed skill>/SKILL.md` and `references/**` only. 
 | `tests/unit/plugin-modules.test.js` | pass | current filtered internal asset delivery contract |
 | post-calibration SF-08/SF-09 + changelog focused replay | pass, 4 suites / 47 tests | exact LFG handoff, browser contract, changelog format |
 | post-calibration five-host lifecycle replay | pass, 1 suite / 15 tests | five-host source projection and lifecycle consistency |
-| post-calibration `plugin-modules` replay | pass, 1 suite / 10 tests | delivered internal allowlist、recursive package projection 与 governance-only negative boundary |
+| post-calibration `plugin-modules` replay | pass, 1 suite / 10 tests | `skills-governance.json` 是 internal delivery 唯一真源，`plugin-governance.js` 直接消费且不维护第二份名单；同时覆盖 recursive package projection 与第二名单 negative boundary |
 | mutation/dispatch authority focused replay | pass, 14 suites / 77 tests | SF-05/SF-07/SF-27、18-package matrix、reference-level fallback 与关联合同 |
 | SF-01 final focused replay | pass, 9 suites / 65 tests | caller contract、LFG authority handoff、public-route hiding、helper authority、catalog/doctor inventory 与 five-host sandbox init |
 | SF-01 pre-final negative-delivery replay | pass, 2 suites / 25 tests | 当时只交付两个 load-bearing commit helper；该历史结果随后被最终 Proof caller 复核扩展，不再代表 current delivery count |
@@ -166,4 +167,4 @@ No generic subagent dispatch was authorized. All rows are current-source inline 
 - SF-18 tests prove source/runtime projection parity and authority wording only；它们不证明真实 tracker detection、ticket creation、PR-body/fallback-file durability 或跨会话 continuation。
 - SF-13 tests prove terminal/handoff source consistency only；它们不证明真实 host menu interaction或 universal plan field outcome。
 - Generated `.agents/skills/`, `.claude/`, `.codex/`, `.cursor/`, `.kiro/`, and `.qoder/` mirrors were not read as audit source and were not modified.
-- The original audit artifact remains a knowledge-work deliverable；2026-07-20 的 SF-03/SF-04/SF-10/SF-06、最终 SF-01/SF-27 与 SF-11 overlay 是用户要求继续优化后的本地 source/test/docs repair。它不授权 plan lifecycle mutation、commit、push 或 PR，且当前最终 overlay 仍未提交。
+- The original audit artifact remains a knowledge-work deliverable；2026-07-20 的 SF-03/SF-04/SF-10/SF-06、最终 SF-01/SF-27、SF-11 与 SF-24-SF-26 修复均已进入 `current_head_at_calibration`。这些历史修复记录不授权新的 plan lifecycle mutation、commit、push 或 PR。

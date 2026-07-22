@@ -39,6 +39,12 @@ const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/mcp-setup-workspace-target.test.js',
   'tests/unit/plugin-modules.test.js',
 ]);
+const INTEGRATION_TEST_PATHS = Object.freeze(
+  fs.readdirSync(path.join(repoRoot, 'tests', 'integration'), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.test.js'))
+    .map((entry) => `tests/integration/${entry.name}`)
+    .sort((left, right) => left.localeCompare(right)),
+);
 
 function resolveTestCommandTimeoutMs(env = process.env) {
   const raw = env.SPEC_FIRST_TEST_COMMAND_TIMEOUT_MS;
@@ -115,15 +121,7 @@ function runSmoke() {
 }
 
 function runIntegration() {
-  runJestFiles([
-    'tests/integration/qoder-runtime-lifecycle.integration.test.js',
-    'tests/integration/init-five-host-lifecycle.integration.test.js',
-    'tests/integration/workspace-graph-lifecycle.integration.test.js',
-    'tests/integration/workspace-graph-five-host-projection.integration.test.js',
-    'tests/integration/runtime-setup-graphify-hook-boundary.integration.test.js',
-    'tests/integration/spec-write-skill-authoring-preview.integration.test.js',
-    'tests/integration/plan-status-closeout.integration.test.js',
-  ], ['--runInBand']);
+  runJestFiles(INTEGRATION_TEST_PATHS, ['--runInBand']);
 }
 
 function runReleaseGovernance() {
@@ -174,6 +172,7 @@ if (require.main === module) {
 
 module.exports = {
   DEFAULT_TEST_COMMAND_TIMEOUT_MS,
+  INTEGRATION_TEST_PATHS,
   MCP_SETUP_TEST_PATHS,
   main,
   run,

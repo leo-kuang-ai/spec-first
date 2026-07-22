@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { runNpm } = require('./lib/npm-cli.cjs');
 const {
   DEFAULT_OUTPUT_PATH,
   buildRuntimeCapabilityCatalog,
@@ -163,7 +163,7 @@ function readPackageDryRunFiles() {
   const cacheRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-release-continuity-npm-cache-'));
   let result;
   try {
-    result = spawnSync('npm', ['pack', '--dry-run', '--json'], {
+    result = runNpm(['pack', '--dry-run', '--json'], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
       maxBuffer: 10 * 1024 * 1024,
@@ -172,6 +172,8 @@ function readPackageDryRunFiles() {
         npm_config_cache: cacheRoot,
       },
     });
+  } catch (error) {
+    return { ok: false, reason: error.message, files: new Set() };
   } finally {
     fs.rmSync(cacheRoot, { recursive: true, force: true });
   }

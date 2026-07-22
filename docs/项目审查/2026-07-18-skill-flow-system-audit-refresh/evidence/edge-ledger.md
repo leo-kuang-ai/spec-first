@@ -3,14 +3,16 @@ title: Skill 跨包关联边当前快照总账
 doc_role: audit-evidence
 review_date: 2026-07-18
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
+current_head_at_calibration: 27baf79f7d3bb0873deb591218c76b9c11a91bbf
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
+working_tree_overlay: none
 baseline_ledger: docs/项目审查/2026-07-17-skill-flow-system-audit/evidence/edge-ledger.md
 expected_pairs: 165
 actual_pairs: 165
-overlay_pair_delta_added: 2
-overlay_pair_delta_removed: 3
+committed_p2_pair_delta_added: 2
+committed_p2_pair_delta_removed: 3
+p3_pair_delta_added: 0
+p3_pair_delta_removed: 0
 ---
 
 # Edge Ledger — 基线加增量的当前关系账本
@@ -50,7 +52,7 @@ overlay_pair_delta_removed: 3
 
 ## 3. 变更支撑文件所触及的既有 edge
 
-原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决此前 P0/P1/P2。`current_head_at_calibration` 已包含 `+2/-3` 的 P2 pair delta；当前 P3 overlay 只校准 existing prompt/consumer wording，不新增或删除 canonical pair。顶部 165 仍是冻结 calibration manifest，不冒充本轮完整重算。
+原刷新批次的 30 个 source file delta 触及 46 个 pair；后续修复依次重裁决此前 P0/P1/P2。`current_head_at_calibration` 已包含 `+2/-3` 的 P2 pair delta；已提交 P3 修复只校准 existing prompt/consumer wording，pair delta 为 `0/0`。顶部 165 仍是冻结 calibration manifest，不冒充后续完整重算。
 
 | Baseline ID | Current edge | Current verdict | 说明 |
 | --- | --- | --- | --- |
@@ -101,7 +103,8 @@ overlay_pair_delta_removed: 3
 | removed identities | 1 |
 | new identities | 9 |
 | frozen calibration pairs | 165 |
-| current overlay pair delta | +2 / -3（bounded current-vs-HEAD token scan） |
+| committed P2 pair delta | +2 / -3（bounded committed-vs-frozen-source token scan） |
+| P3 pair delta | 0 / 0（existing edge wording only） |
 | duplicate canonical pairs | 0 |
 
-The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` 是原始冻结快照；`current_head_at_calibration` 不包含当前未提交的最后 9 项 P2 overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session persona behavior、真实 GitHub/Xcode/Figma/browser、CI/merge/release 或 field outcome。
+The ledger proves declared current-source relationships and named consumer/projection facts only. `source_head` 是原始冻结快照；`current_head_at_calibration` 已包含 P0-P3 修复，校准时没有 working-tree overlay。它不证明 host discovery/helper invocation、actual generic dispatch、fresh-session persona behavior、真实 GitHub/Xcode/Figma/browser、CI/merge/release 或 field outcome。

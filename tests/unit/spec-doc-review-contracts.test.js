@@ -58,21 +58,23 @@ describe('spec-doc-review current contracts', () => {
     expect(skill).toMatch(/cannot write.*mutation_reason: write-unavailable/is);
   });
 
-  test('parses explicit report-only and JSON tokens without treating them as paths', () => {
-    expect(skill).toContain('[mutation:report-only] [output:json]');
+  test('parses explicit mutation and JSON tokens without treating them as paths', () => {
+    expect(skill).toContain('[mutation:report-only|mutation:apply-fixes] [output:json]');
     expect(skill).toMatch(/mode:\*.*mutation:\*.*output:\*.*flags, not file paths/is);
-    expect(skill).toContain('Accept only `mutation:report-only` and `output:json`');
+    expect(skill).toContain('Accept only `mutation:report-only`, `mutation:apply-fixes`, and `output:json`');
     expect(skill).toMatch(/duplicate token.*multiple `mutation:\*`.*multiple `output:\*`.*fails closed/is);
     expect(skill).toContain('Review failed: flag-conflict-or-unsupported');
     expect(skill).toContain('requested_mutation');
     expect(skill).toContain('output_mode');
   });
 
-  test('caller-requested report-only overrides only ordinary writable Markdown', () => {
+  test('ordinary Markdown is report-only and write mode requires explicit apply authority', () => {
     expect(skill).toContain('mutation_reason: caller-requested-report-only');
-    expect(skill).toMatch(/explicit caller policy overrides the ordinary Markdown default/is);
+    expect(skill).toContain('mutation_reason: default-review-report-only');
+    expect(skill).toContain('mutation_reason: caller-requested-apply-fixes');
     expect(skill).toMatch(/HTML remains `html-artifact`.*write-unavailable.*format-conflict-or-ambiguous/is);
-    expect(skill).toMatch(/Without the mutation token.*writable Markdown.*`markdown-write`/is);
+    expect(skill).toMatch(/Without `mutation:apply-fixes`.*ordinary writable Markdown resolves to `report-only`/is);
+    expect(skill).toMatch(/delivery mode.*JSON output.*file writability.*cannot supply missing mutation authority/is);
   });
 
   test('requires explicit dispatch authorization and preserves the inline fallback', () => {
@@ -122,7 +124,7 @@ describe('spec-doc-review current contracts', () => {
     expect(skill).toMatch(/output_mode: json[\s\S]*do not print this line[\s\S]*final JSON object/is);
     expect(skill).toMatch(/JSON mode's machine-readable single-object contract overrides the normal announcement requirement/i);
     expect(synthesis).toMatch(/单对象合同覆盖[\s\S]*cost-shape[\s\S]*reviewer announcement[\s\S]*terminal_signal/is);
-    expect(synthesis).toContain('"mutation_reason": "markdown-artifact|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable"');
+    expect(synthesis).toContain('"mutation_reason": "caller-requested-apply-fixes|default-review-report-only|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable"');
     expect(synthesis).toContain('"fixes_applied": 0');
     expect(synthesis).toContain('"applied_fixes": []');
     expect(synthesis).toContain('"producer_fix_candidates": []');
@@ -144,12 +146,12 @@ describe('spec-doc-review current contracts', () => {
     expect(reportOnlyCases.cases.map((entry) => entry.id)).toEqual(expect.arrayContaining([
       'markdown-caller-requests-json-report-only',
       'shipping-caller-detects-plan-drift',
-      'default-markdown-still-writes-safe-auto',
+      'default-markdown-stays-report-only',
       'html-and-format-conflict-keep-existing-reasons',
     ]));
-    const markdownJsonParity = reportOnlyCases.cases.find((entry) => entry.id === 'default-markdown-still-writes-safe-auto');
+    const markdownJsonParity = reportOnlyCases.cases.find((entry) => entry.id === 'default-markdown-stays-report-only');
     expect(markdownJsonParity.input).toContain('output:json');
-    expect(markdownJsonParity.expected).toContain('applied_fixes');
+    expect(markdownJsonParity.expected).toContain('applied_fixes empty');
   });
 
   test('mandatory reviewer loss fails closed instead of producing a clean verdict', () => {

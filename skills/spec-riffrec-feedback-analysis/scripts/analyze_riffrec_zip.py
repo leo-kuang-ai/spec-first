@@ -20,10 +20,11 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import zipfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 
@@ -54,6 +55,11 @@ NOISY_NETWORK_PATTERNS = (
 VIDEO_EXTENSIONS = {".webm", ".mp4", ".mov", ".m4v", ".mkv", ".avi"}
 AUDIO_EXTENSIONS = {".webm", ".mp3", ".mp4", ".mpeg", ".mpga", ".m4a", ".wav", ".ogg", ".flac"}
 NOTES_EXTENSIONS = {".txt", ".md", ".markdown", ".text"}
+MAX_ZIP_MEMBERS = 512
+MAX_ZIP_MEMBER_BYTES = 1024 * 1024 * 1024
+MAX_ZIP_TOTAL_BYTES = 2 * 1024 * 1024 * 1024
+MAX_ZIP_COMPRESSION_RATIO = 200
+ZIP_COPY_CHUNK_BYTES = 1024 * 1024
 
 
 def parse_args() -> argparse.Namespace:
@@ -90,20 +96,73 @@ def read_json(path: Path, default: Any) -> Any:
 
 
 def safe_extract(zip_path: Path, dest: Path) -> None:
-    dest.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(zip_path) as archive:
-        dest_resolved = dest.resolve()
-        for member in archive.infolist():
-            member_path = dest / member.filename
-            resolved = member_path.resolve()
-            if not resolved.is_relative_to(dest_resolved):
-                raise RuntimeError(f"Unsafe zip member path: {member.filename}")
-            if member.is_dir():
-                resolved.mkdir(parents=True, exist_ok=True)
-            else:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=f".{dest.name}-extract-", dir=dest.parent))
+    try:
+        with zipfile.ZipFile(zip_path) as archive:
+            members = archive.infolist()
+            if len(members) > MAX_ZIP_MEMBERS:
+                raise RuntimeError(f"Zip member budget exceeded: {len(members)} > {MAX_ZIP_MEMBERS}")
+
+            declared_total = 0
+            normalized_names: set[str] = set()
+            for member in members:
+                normalized = PurePosixPath(member.filename.replace("\\", "/"))
+                if normalized.is_absolute() or not normalized.parts or ".." in normalized.parts:
+                    raise RuntimeError(f"Unsafe zip member path: {member.filename}")
+                normalized_name = normalized.as_posix().rstrip("/")
+                if not normalized_name or normalized_name in normalized_names:
+                    raise RuntimeError(f"Duplicate or empty zip member path: {member.filename}")
+                normalized_names.add(normalized_name)
+                if member.file_size > MAX_ZIP_MEMBER_BYTES:
+                    raise RuntimeError(
+                        f"Zip member size budget exceeded: {member.filename} ({member.file_size} bytes)"
+                    )
+                declared_total += member.file_size
+                if declared_total > MAX_ZIP_TOTAL_BYTES:
+                    raise RuntimeError(f"Zip total size budget exceeded: {declared_total} bytes")
+                if member.file_size > 0:
+                    ratio = member.file_size / max(member.compress_size, 1)
+                    if ratio > MAX_ZIP_COMPRESSION_RATIO:
+                        raise RuntimeError(
+                            f"Zip compression ratio budget exceeded: {member.filename} ({ratio:.1f})"
+                        )
+
+            streamed_total = 0
+            for member in members:
+                normalized = PurePosixPath(member.filename.replace("\\", "/"))
+                resolved = staging.joinpath(*normalized.parts)
+                if member.is_dir():
+                    resolved.mkdir(parents=True, exist_ok=True)
+                    continue
                 resolved.parent.mkdir(parents=True, exist_ok=True)
+                member_written = 0
                 with archive.open(member) as source, resolved.open("wb") as target:
-                    shutil.copyfileobj(source, target)
+                    while True:
+                        chunk = source.read(ZIP_COPY_CHUNK_BYTES)
+                        if not chunk:
+                            break
+                        member_written += len(chunk)
+                        streamed_total += len(chunk)
+                        if member_written > MAX_ZIP_MEMBER_BYTES:
+                            raise RuntimeError(f"Zip member stream budget exceeded: {member.filename}")
+                        if streamed_total > MAX_ZIP_TOTAL_BYTES:
+                            raise RuntimeError("Zip total stream budget exceeded")
+                        target.write(chunk)
+                if member_written != member.file_size:
+                    raise RuntimeError(
+                        f"Zip member size mismatch: {member.filename} ({member_written} != {member.file_size})"
+                    )
+
+        if dest.exists():
+            if dest.is_dir():
+                shutil.rmtree(dest)
+            else:
+                dest.unlink()
+        staging.replace(dest)
+    except Exception:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
 
 
 def default_output_dir(zip_path: Path) -> Path:
@@ -314,13 +373,18 @@ def transcribe_media(media_path: Path | None, model: str) -> dict[str, Any]:
         }
     if not shutil.which("curl"):
         return {"status": "skipped", "text": "", "reason": "curl is not installed"}
+    if "\r" in api_key or "\n" in api_key:
+        return {"status": "failed", "text": "", "reason": "OPENAI_API_KEY contains invalid line breaks"}
+
+    escaped_api_key = api_key.replace("\\", "\\\\").replace('"', '\\"')
+    curl_config = f'header = "Authorization: Bearer {escaped_api_key}"\n'
 
     command = [
         "curl",
+        "--config",
+        "-",
         "-sS",
         "https://api.openai.com/v1/audio/transcriptions",
-        "-H",
-        f"Authorization: Bearer {api_key}",
         "-F",
         f"file=@{media_path}",
         "-F",
@@ -329,7 +393,7 @@ def transcribe_media(media_path: Path | None, model: str) -> dict[str, Any]:
         "response_format=json",
     ]
     try:
-        result = subprocess.run(command, capture_output=True, text=True, timeout=180)
+        result = subprocess.run(command, input=curl_config, capture_output=True, text=True, timeout=180)
     except subprocess.TimeoutExpired:
         return {"status": "failed", "text": "", "reason": "transcription request timed out"}
 

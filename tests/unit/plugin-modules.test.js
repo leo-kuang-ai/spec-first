@@ -68,6 +68,24 @@ describe('plugin module facade and governance', () => {
     expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
   });
 
+  test('derives internal delivery only from skills governance', () => {
+    const governance = plugin.loadSkillsGovernance();
+    const source = fs.readFileSync(
+      path.join(__dirname, '../../src/cli/plugin-governance.js'),
+      'utf8',
+    );
+    expect(source).not.toContain('DELIVERED_INTERNAL_SKILLS');
+
+    for (const platform of getSupportedPlatforms()) {
+      const expected = governance.skills
+        .filter((record) => record.entry_surface === 'internal_only')
+        .filter((record) => record.host_delivery[platform] === 'internal')
+        .map((record) => record.skill_name)
+        .sort();
+      expect(plugin.buildFilteredAssetSet(platform).internalSkills).toEqual(expected);
+    }
+  });
+
   test('plans, applies, inspects, and anchor-validates bundled assets', () => {
     const projectRoot = tempProject();
     const adapter = getAdapter('cursor');
@@ -196,6 +214,9 @@ describe('plugin module facade and governance', () => {
               } else if (helper.userInvocable === true) {
                 expect(operation.contents).not.toMatch(/^user-invocable:\s*false$/m);
                 expect(operation.contents).toContain('Direct user request');
+              }
+              if (platform === 'cursor') {
+                expect(operation.contents).toMatch(/^disable-model-invocation:\s*true$/m);
               }
             }
           }

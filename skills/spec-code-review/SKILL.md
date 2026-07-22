@@ -8,6 +8,14 @@ argument-hint: "[mode:agent] [base:<ref>] [plan:<path>] [task-pack:<path> task:<
 
 Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage.
 
+## Workflow Contract Summary
+
+- **输入：** 当前分支、显式 base、远端 branch/PR，及可选 plan/task-pack 上下文。
+- **输出：** 默认 report-only 的结构化 findings、actionable queue、coverage、验证限制与 run artifact；`mode:agent` 返回 JSON。
+- **硬出口：** scope/base 不可解析、task context 漂移或越界、错误 checkout、必需独立覆盖不可用时不得给出完整 merge-ready 声明。
+- **权威：** source/diff/test/log 提供事实，reviewers 判断语义；review、local mutation、commit 与 landing 是四个独立授权面。
+- **消费者：** 人工 reviewer、`spec-work`、caller-owned shipping/LFG 流程与后续 residual gate。
+
 ## When to Use
 
 - Before creating a PR
@@ -526,7 +534,7 @@ Stack-specific personas are additive when runtime behavior warrants them. A Hotw
 
 **`data-migration` spawn gate.** Select `data-migration-reviewer` only when the diff includes at least one migration or schema artifact: `db/migrate/*`, `db/schema.rb`, `db/structure.sql`, Alembic/Flyway/Liquibase migration paths, or explicit backfill/data-transform scripts (rake tasks, one-off data migration classes). **Do not spawn** for model-only changes, query-only refactors, serializers/controllers that reference columns without a migration or schema dump in the diff, or migration tests alone.
 
-For `deployment-verification-agent`, use the same migration-artifact gate when the change is risky (destructive DDL, backfills, NOT NULL without default, column renames/drops)。只有 orchestrator 能应用该 gate；worker prompt 的适用范围说明不构成 self-invocation，也不能把普通 data-processing change 扩张成 activation signal。
+For `deployment-verification-agent`, use the same migration-artifact gate when the change is risky (destructive DDL, backfills, NOT NULL without default, column renames/drops)。只有 orchestrator 能应用该 gate；worker prompt 的适用范围说明不构成 self-invocation，也不能把普通 data-processing change 扩张成 activation signal。Only when both conditions pass, add `deployment-verification-agent` to `selected_local_prompt_assets`; otherwise do not add it. Record an applicability reason that names both the migration/schema artifact path and the concrete risky operation.
 
 Announce the team before spawning, as a user-facing summary: name the always-on reviewers plainly, and for each conditional reviewer give the one-line reason it was added (the real concern, not the keyword that matched). Do **not** put model-tier labels (`[session model]`/`[mid-tier]`) or scope-mode codenames in this announce — those are internal. Still *decide* each reviewer's tier here and keep it in your own working notes (Stage 4 applies it at dispatch as a correctness guarantee); just keep it out of this user-facing summary.
 
@@ -687,7 +695,7 @@ The artifact file **must** carry the full detail-tier fields (`why_it_matters`, 
 
 **spec-first always-on local prompt assets** (`agent-native-reviewer`, `learnings-researcher`) are dispatched as generic subagents through the same bounded parallel scheduler as the structured personas. Read their prompt files from `references/personas/`, then give them the same review context bundle the personas receive: entry mode, any PR metadata gathered in Stage 1, intent summary, review base branch name when known, `BASE:` marker, file list, diff, and `UNTRACKED:` scope notes. Do not invoke them with a generic "review this" prompt. Their output is unstructured and synthesized separately in Stage 6.
 
-**spec-first conditional local prompt assets** (`deployment-verification-agent` only) are dispatched as generic subagents through the same bounded parallel scheduler when the migration-artifact gate applies. Read the prompt file from `references/personas/`, then pass the same review context bundle plus the applicability reason (for example, which migration files triggered the prompt asset). Its output is unstructured and must be preserved for Stage 6 synthesis just like the spec-first always-on local prompt assets. Schema drift is handled by the `data-migration` persona as structured findings — not here.
+**spec-first conditional local prompt assets** (`deployment-verification-agent` only) are dispatched as generic subagents through the same bounded parallel scheduler only when Stage 3 already selected the asset after both the migration/schema-artifact gate and risky-change gate passed. A migration artifact alone, including a safe additive migration, does not authorize Stage 4 dispatch. Read the prompt file from `references/personas/`, then pass the same review context bundle plus the Stage 3 applicability reason naming at least one artifact path and the concrete risky operation (for example, a backfill or a NOT NULL change without a default). Its output is unstructured and must be preserved for Stage 6 synthesis just like the spec-first always-on local prompt assets. Schema drift is handled by the `data-migration` persona as structured findings — not here.
 
 #### Cross-model adversarial pass
 

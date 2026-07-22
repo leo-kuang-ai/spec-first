@@ -6,14 +6,14 @@ status: review-evidence-current-source
 origin_report: docs/项目审查/2026-07-18-skill-flow-system-audit-refresh/review-report.md
 baseline_issue_list: docs/项目审查/2026-07-17-skill-flow-system-audit/optimization-issues.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
+current_head_at_calibration: 27baf79f7d3bb0873deb591218c76b9c11a91bbf
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
+working_tree_overlay: none
 ---
 
 # Skill 关联关系当前需要优化的问题清单
 
-当前 P0/P1/P2/P3 均为 0。`current_head_at_calibration` 已包含此前 P0-P2 修复；当前 overlay 关闭最后 3 项 P3，并继续保留 SF-11/M-013、SF-14 false-green 与 SF-23 host-lossy projection 的既有对抗性修复。`source_head` 仍是原始冻结快照。
+当前 P0/P1/P2/P3 均为 0。`current_head_at_calibration` 已包含 P0-P3 修复，并继续保留 SF-11/M-013、SF-14 false-green 与 SF-23 host-lossy projection 的既有对抗性修复；校准时没有 working-tree overlay。已提交 P2 pair delta 为 `+2/-3`，P3 pair delta 为 `0/0`。`source_head` 仍是原始冻结快照。
 
 本清单从同批次校准后的 [review-report.md](review-report.md) 提取，只用于后续 plan/work 消费，不表示问题已获得修复、commit、push、PR 或 lifecycle mutation 授权。
 
@@ -31,7 +31,7 @@ working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
 
 ## 已关闭，不进入优化队列
 
-- **SF-01：** `spec-commit`、`spec-commit-push-pr` 与 `spec-proof` 已加入现有 internal delivery allowlist，并以完整 package references 投射到 Claude、Codex、Cursor、Kiro、Qoder；三者保持 `internal_only`、不进入 public route。前两者以 `user-invocable:false` 保持严格内部，`spec-proof` 只允许 source 明确声明的显式点名调用；任何 helper invocation、tool permission 或 green tests 都不授予额外 mutation/commit/landing authority。9 条 load-bearing caller edge 均有 target delivery，其中 5 条 Proof caller 覆盖 plan/brainstorm/ideate/explain/pov。关闭证据是 source + focused contracts + 临时 sandbox 五宿主 `init`，不包含真实 host loader/invocation outcome。
+- **SF-01：** `skills-governance.json` 是 internal delivery 的唯一真源；`spec-commit`、`spec-commit-push-pr` 与 `spec-proof` 由其中的 `entry_surface: internal_only` 与逐宿主 `host_delivery: internal` 投射到 Claude、Codex、Cursor、Kiro、Qoder，不存在第二份 helper 名单。三者不进入 public route；前两者以 `user-invocable:false` 保持严格内部，`spec-proof` 只允许 source 明确声明的显式点名调用。任何 helper invocation、tool permission 或 green tests 都不授予额外 mutation/commit/landing authority。9 条 load-bearing caller edge 均有 target delivery，其中 5 条 Proof caller 覆盖 plan/brainstorm/ideate/explain/pov。关闭证据是 source + focused contracts + 临时 sandbox 五宿主 `init`，不包含真实 host loader/invocation outcome。
 - **SF-02：** 两套 compound package 的 schema、模板、YAML 指南与 validator 保持字节一致；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 均调用 `--promotion`，且 Consolidate 的 destructive delete 后置到 promotion/claims/cross-reference checks 之后。缺少、空值、错误类型、常见 YAML parser 隐式非字符串值，或普通/YAML-equivalent 重复的 `source_refs` / `invalidation_condition` 会确定性失败，默认模式仍接受 untouched legacy learning。关闭证据只覆盖机械字段形态与 workflow contract，不替代引用可信度或失效语义判断。
 - **SF-03：** Runtime Setup、配置模板与 focused test 已按真实 consumer 统一 `plan_output`、`brainstorm_output`、`ideate_output` 的 active 状态；注释示例不激活配置，缺失/无效/注释值仍分别回退到 `md`、`md`、`html`，pipeline override 继续由 consumer 自己决定。关闭证据是 source + focused contracts，不包含真实 host/local config field run。
 - **SF-04：** `spec-doc-review` 现优先识别 `type: task-pack`，即使 deterministic contract 不完整也不降级为普通 plan；task pack 强制 `report-only` / `task-pack-derived-artifact`，真实 `tasks validate` receipt 只提供 identity/freshness/structure 地板，source plan 继续拥有 scope/acceptance/architecture/non-goals/verification。专属 lens 覆盖 dependency/wave、files/side effects、test/done、`stop_if`、`review_gate` 与 human/JSON parity；`task_pack_outcome` 将通过、pack gap、plan gap、deterministic failure 分别交给 `spec-work-task-pack`、`spec-write-tasks`、`spec-plan` 或 incomplete stop。关闭证据是 source + 正负 handoff focused contracts，不包含真实 host/persona field run。

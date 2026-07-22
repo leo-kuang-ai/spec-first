@@ -1,0 +1,37 @@
+name: Skill Entrypoint Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-skill-entrypoints:
+    name: lint-skill-entrypoints
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run skill entrypoint lint
+        run: npm run lint:skill-entrypoints
+
+      - name: Run eval fixture contracts
+        run: npm run test:eval-fixtures
+
+      - name: Run release governance
+        run: npm run test:release:governance

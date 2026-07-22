@@ -63,12 +63,21 @@ describe('spec-work structured shipping and shared verification contracts', () =
       'run_artifact_path',
       'run_artifact_reason_code',
       'claim_limitations',
+      'verified_worktree_fingerprint',
     ]) {
       expect(workSkill).toContain(field);
     }
     expect(shipping).toContain('overall');
     expect(shipping).toMatch(/degraded|unsupported/);
     expect(shipping).toMatch(/must not.*all tests passed|must not.*全部验证通过/is);
+  });
+
+  test('return-to-caller refreshes verification after caller-owned mutations', () => {
+    expect(workSkill).toContain('spec-work-working-tree-fingerprint/v1');
+    expect(workSkill).toContain('scripts/working-tree-fingerprint.cjs');
+    expect(workSkill).toMatch(/caller re-enters after caller-owned simplification\/review fixes/is);
+    expect(workSkill).toMatch(/rerun the complete applicable Verification Contract/is);
+    expect(workSkill).toMatch(/Never reuse the earlier run summary or fingerprint/is);
   });
 
   test('spec-debug records real reproducer and regression evidence without writing work artifacts', () => {

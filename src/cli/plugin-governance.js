@@ -11,13 +11,6 @@ const {
 const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
 const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
 const AGENTLESS_PLATFORM_IDS = new Set(['cursor']);
-const DELIVERED_INTERNAL_SKILLS = new Set([
-  'spec-commit',
-  'spec-commit-push-pr',
-  'spec-proof',
-  'spec-test-browser',
-  'spec-worktree',
-]);
 
 function buildFilteredAssetSet(platformOrAdapter) {
   const platform = resolvePlatformId(platformOrAdapter);
@@ -79,7 +72,6 @@ function buildFilteredAssetSet(platformOrAdapter) {
     if (
       record.entry_surface === 'internal_only'
       && delivery === 'internal'
-      && DELIVERED_INTERNAL_SKILLS.has(record.skill_name)
     ) {
       internalSkills.push(record.skill_name);
       continue;
@@ -135,7 +127,6 @@ function platformSupportsAgents(platformOrAdapter) {
 
 module.exports = {
   buildFilteredAssetSet,
-  DELIVERED_INTERNAL_SKILLS,
   platformSupportsAgents,
   resolvePlatformId,
 };

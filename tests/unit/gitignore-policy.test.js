@@ -22,6 +22,7 @@ describe('spec-first gitignore policy', () => {
 
     expect(patterns).toEqual(expect.arrayContaining([
       '.claude/skills/spec-*/',
+      '.agents/skills/source-command-spec-*/',
       '.agents/skills/using-spec-first/',
       '.cursor/rules/spec-first.mdc',
       '.kiro/steering/spec-first.md',
@@ -45,11 +46,13 @@ describe('spec-first gitignore policy', () => {
       execFileSync('git', ['init', '-q'], { cwd: repoRoot });
       fs.writeFileSync(path.join(repoRoot, '.gitignore'), `${buildSpecFirstGitignoreBlock()}\n`, 'utf8');
       writeFile(repoRoot, '.agents/skills/spec-plan/SKILL.md');
+      writeFile(repoRoot, '.agents/skills/source-command-spec-plan/SKILL.md');
       writeFile(repoRoot, '.agents/skills/my-team-skill/SKILL.md');
       writeFile(repoRoot, '.codex/spec-first/state.json');
       writeFile(repoRoot, '.codex/config.toml');
 
       expect(isIgnored(repoRoot, '.agents/skills/spec-plan/SKILL.md')).toBe(true);
+      expect(isIgnored(repoRoot, '.agents/skills/source-command-spec-plan/SKILL.md')).toBe(true);
       expect(isIgnored(repoRoot, '.agents/skills/my-team-skill/SKILL.md')).toBe(false);
       expect(isIgnored(repoRoot, '.codex/spec-first/state.json')).toBe(true);
       expect(isIgnored(repoRoot, '.codex/config.toml')).toBe(false);
@@ -108,6 +111,7 @@ describe('spec-first gitignore policy', () => {
     ]));
     expect(untrackPatterns).toEqual(expect.arrayContaining([
       '.agents/skills/spec-*/**',
+      '.agents/skills/source-command-spec-*/**',
       '.codex/spec-first/',
       '.spec-first/workflows/',
     ]));
@@ -127,6 +131,14 @@ describe('spec-first gitignore policy', () => {
 
     expect(rootGitignore).toContain(`${block}\n`);
     expect(manual).toContain(`\`\`\`gitignore\n${block}\n\`\`\``);
+  });
+
+  test('keeps source-checkout Claude settings local without hiding target-repo team policy', () => {
+    const rootGitignore = normalizeLineEndings(
+      fs.readFileSync(path.join(REPO_ROOT, '.gitignore'), 'utf8'),
+    );
+    expect(rootGitignore).toContain('/.claude/settings.json');
+    expect(getSpecFirstGitignorePatterns()).not.toContain('.claude/settings.json');
   });
 
   test('keeps bundled runtime names inside the reserved ignore namespace', () => {

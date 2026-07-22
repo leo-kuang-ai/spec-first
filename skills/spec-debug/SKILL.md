@@ -8,6 +8,14 @@ argument-hint: "[issue reference, error message, test path, or description of br
 
 Find root causes, then fix them. This skill investigates bugs systematically — tracing the full causal chain before proposing a fix — and optionally implements the fix with test-first discipline.
 
+## Workflow Contract Summary
+
+- **输入：** 可复现的失败、错误、回归、stack trace、issue 或明确异常行为。
+- **输出：** 证据闭合的 causal chain、最小修复、回归验证与结构化 handoff；若未授权修复则只返回诊断。
+- **硬出口：** 无法复现且缺 replacement evidence、因果链仍有未验证跳步、target repo/source owner/dirty overlap 未解决，或 required verification 失败时不得声明 root cause/fix complete。
+- **权威：** 运行时复现、source、test 与 log 提供事实；LLM 判断因果充分性；诊断、local mutation、commit 与 landing 分别授权。
+- **消费者：** 用户、`spec-work`、`spec-code-review`、issue/PR owner 与后续知识沉淀流程。
+
 <bug_description> #$ARGUMENTS </bug_description>
 
 ## Scenario Capability

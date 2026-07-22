@@ -1,0 +1,39 @@
+name: AI Dev Quality Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ai-dev-gate:
+    name: ai-dev-gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run AI dev quality gate
+        run: npm run test:ai-dev:gate
+
+      - name: Upload AI dev gate artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-dev-quality-gate
+          path: .spec-first/workflows/quality-gates/
+          if-no-files-found: ignore

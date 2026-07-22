@@ -40,6 +40,8 @@ dev-server default. An empty, malformed, or repeated modifier records
 
    If `behavior_change: true` but `verification_evidence` is missing or too vague to tell how behavior was protected, invoke `spec-work` one more time with the same `mode:return-to-caller <plan-path-from-step-1>` argument. Do not prompt the user and do not alter the plan path argument. The retry relies on spec-work's idempotency path to inspect the already-implemented work, fill the missing evidence, and return without reimplementing. If the second return still lacks coherent verification evidence, stop as blocked and report the missing fields instead of continuing to simplify/review/ship.
 
+   Record the accepted return's `verification_run_summary_ref` as `initial_verification_run_summary_ref` and require a complete `verified_worktree_fingerprint` object. These prove only the tree before caller-owned Simplify and review-fix mutations; they cannot satisfy step 6.5.
+
 3. Invoke the `spec-simplify-code` skill on the branch diff.
 
    This runs before review so the code-review in step 4 covers the simplified code. **Skip** this step when the change is docs-only (only markdown/docs paths changed) or trivial (roughly under 10 changed lines). Otherwise let `spec-simplify-code` resolve the branch-diff scope itself：它保持行为，运行全项目 typecheck/lint，并默认运行 changed-path scoped tests；影响面明显扩大或 runner 无法缩小时才扩大测试范围。该步骤只提供 behavior-preservation signal，最终 verification gate 仍拥有完整 closeout truth。
@@ -107,7 +109,40 @@ dev-server default. An empty, malformed, or repeated modifier records
    failed, not-run, missing, or indeterminate result blocks lifecycle mutation
    and every landing side effect for an applicable flow.
 
-**Shipping precondition (steps 7–9).** Only after step 6 closes, run `git remote`
+6.5. **Final working-tree verification** (REQUIRED after all code mutations)
+
+   After Simplify, review-fix application, targeted fix checks, and applicable
+   browser verification have finished, run the canonical
+   `skills/spec-work/scripts/working-tree-fingerprint.cjs` helper and store its
+   complete object as `pre_final_verification_fingerprint`.
+
+   Re-invoke `spec-work` with the exact same
+   `mode:return-to-caller <plan-path-from-step-1>` argument. This is an
+   idempotent final-verification pass: it must not reimplement the feature. It
+   re-reads the current tree, reruns the plan's complete applicable Verification
+   Contract, records a fresh `verification_run_summary_ref`, and returns a
+   `verified_worktree_fingerprint` captured after those commands.
+
+   GATE: require all of the following before residual, lifecycle, commit, push,
+   PR, or CI actions:
+
+   - `status: complete`, the same plan path, all in-scope units/tasks still
+     accounted for, empty blockers, and every required final verification check
+     passed or explicitly not applicable;
+   - a non-null `verification_run_summary_ref` that is different from
+     `initial_verification_run_summary_ref`; an earlier summary cannot prove the
+     post-fix tree;
+   - the returned `verified_worktree_fingerprint.fingerprint` exactly equals
+     `pre_final_verification_fingerprint.fingerprint`;
+   - a second helper invocation immediately after the return produces the same
+     fingerprint. Any mutation during verification, stale evidence reuse,
+     helper failure, missing field, or mismatch is `final-verification-stale`
+     and stops the pipeline.
+
+   This gate owns final local verification freshness. Targeted checks from
+   Simplify or review-fix application are additive and never replace it.
+
+**Shipping precondition (steps 7–9).** Only after step 6.5 closes, run `git remote`
 once. If it lists **no remote** (e.g. a sandbox/throwaway checkout that has
 `git init` but no `origin`), shipping is **local-only**: make the local commits
 called for below, but skip every push, PR create/edit, and CI-watch action in

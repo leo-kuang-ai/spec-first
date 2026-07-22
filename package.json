@@ -57,6 +57,7 @@
     "scripts/generate-runtime-capability-catalog.js",
     "scripts/lint-skill-entrypoints.config.json",
     "scripts/lint-skill-entrypoints.js",
+    "scripts/lib/npm-cli.cjs",
     "scripts/probe-claude-hook-payload.js",
     "scripts/release-publish.cjs",
     "scripts/run-ai-dev-quality-gate.js",

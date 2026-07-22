@@ -38,7 +38,7 @@ describe('workspace child hook — render and idempotency', () => {
     expect(block).toContain(HOOK_MARKER);
     expect(block).toContain('"/abs/node" "/abs/workspace-async-refresh.cjs" --trigger');
     expect(block).toContain('--workspace "/abs/ws"');
-    expect(block).toContain('"--repos","api,web"');
+    expect(block).toContain('\\"--repos\\",\\"api,web\\"');
     expect(block).toContain('|| true');
   });
 
@@ -52,6 +52,49 @@ describe('workspace child hook — render and idempotency', () => {
     expect(stripped).not.toContain(BLOCK_START);
     // Stripping again is a no-op.
     expect(stripManagedBlock(stripped)).toBe(stripped);
+  });
+
+  const posixRoundTripTest = process.platform === 'win32' ? test.skip : test;
+  posixRoundTripTest('round-trips quotes, newlines and shell metacharacters through /bin/sh', () => {
+    const parent = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wch-quote-')));
+    const specialRoot = path.join(parent, 'single\' double" dollar$ tick` slash\\ line\nnext');
+    fs.mkdirSync(specialRoot);
+    const asyncRefreshScript = path.join(specialRoot, 'capture args.cjs');
+    const capturePath = path.join(parent, 'captured.json');
+    fs.writeFileSync(asyncRefreshScript, [
+      "'use strict';",
+      "require('node:fs').writeFileSync(process.env.SPEC_FIRST_CAPTURE_PATH, JSON.stringify(process.argv.slice(2)));",
+      '',
+    ].join('\n'));
+
+    const workspaceRoot = path.join(specialRoot, 'workspace\nroot\' "$`\\');
+    const setupScript = path.join(specialRoot, 'setup\nscript\' "$`\\.cjs');
+    const repoIds = ['api\' "$`\\\nnode'];
+    const block = renderWorkspaceRefreshHookBlock({
+      node: process.execPath,
+      asyncRefreshScript,
+      setupScript,
+      workspaceRoot,
+      repoIds,
+    });
+    const result = spawnSync('/bin/sh', ['-c', block], {
+      env: { ...process.env, SPEC_FIRST_CAPTURE_PATH: capturePath },
+      encoding: 'utf8',
+    });
+
+    expect(result.status).toBe(0);
+    expect(fs.existsSync(capturePath)).toBe(true);
+    expect(JSON.parse(fs.readFileSync(capturePath, 'utf8'))).toEqual([
+      '--trigger',
+      '--workspace', workspaceRoot,
+      '--command', process.execPath,
+      '--args', JSON.stringify([
+        setupScript,
+        '--only', 'codegraph,graphify',
+        '--workspace-graph',
+        '--repos', repoIds.join(','),
+      ]),
+    ]);
   });
 });
 

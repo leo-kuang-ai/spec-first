@@ -63,36 +63,28 @@ describe('doc-review five-host reference projection', () => {
       const adapter = getAdapter(platform);
 
       // Run spec-first init for this platform
-      const initResult = runSpecFirst(['init', `--${platform}`], sandbox);
+      const initResult = runSpecFirst([
+        'init',
+        `--${platform}`,
+        '-y',
+        '-u',
+        'doc-review-projection',
+        '--lang',
+        'zh',
+        '--no-sync-user-language',
+      ], sandbox);
 
       // Init must succeed
       expect(initResult.status).toBe(0);
 
-      // Determine the doc-review references directory in the runtime
-      // Skill mirror paths (e.g., .claude/skills/spec-doc-review/references/)
-      const pointerPath = adapter.pointerPath;
       const projectRoot = sandbox.projectRoot;
 
-      // Collect all runtime paths where references could land
-      const candidateRefDirs = [];
-
-      // Workflow references path
-      const workflowRefsDir = path.join(projectRoot, pointerPath, 'spec-first', 'workflows', 'spec-doc-review', 'references');
-      if (fs.existsSync(workflowRefsDir)) {
-        candidateRefDirs.push(workflowRefsDir);
-      }
-
-      // Skill mirror path (for platforms that mirror skills)
-      const skillMirrorRefsDir = path.join(projectRoot, pointerPath, 'skills', 'spec-doc-review', 'references');
-      if (fs.existsSync(skillMirrorRefsDir)) {
-        candidateRefDirs.push(skillMirrorRefsDir);
-      }
-
-      // Also check .agents/skills/ path for platforms that use it
-      const agentsSkillRefsDir = path.join(projectRoot, '.agents', 'skills', 'spec-doc-review', 'references');
-      if (fs.existsSync(agentsSkillRefsDir)) {
-        candidateRefDirs.push(agentsSkillRefsDir);
-      }
+      const candidateRefDirs = [...new Set([
+        adapter.workflowsRoot,
+        adapter.skillsRoot,
+      ])]
+        .map((runtimeRoot) => path.join(projectRoot, runtimeRoot, 'spec-doc-review', 'references'))
+        .filter((runtimeRoot) => fs.existsSync(runtimeRoot));
 
       // At least one reference directory must exist
       expect(candidateRefDirs.length).toBeGreaterThan(0);

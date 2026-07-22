@@ -17,6 +17,14 @@ Note: Use the current date from the active host context. Use this when weighting
 
 This workflow produces a ranked ideation artifact — written to `docs/ideation/` when present, else a spec-first temp path (see Phase 4). It does **not** produce requirements, plans, or code.
 
+## Workflow Contract Summary
+
+- **输入：** 一个希望获得改进方向的主题、范围、约束或用户提供的 research artifact。
+- **输出：** 有证据基础、经过批判和排序的 ideation artifact，包含候选、拒绝理由、限制与推荐探索方向。
+- **硬出口：** 主题或目标 repo 无法确定、证据不足以支撑 basis、请求实际需要产品收敛/规划/实现时停止并路由 owning workflow。
+- **权威：** source 与研究证据约束 idea basis；LLM 负责生成、批判和排序；workflow 不产生 requirements、implementation、commit 或 landing 权限。
+- **消费者：** 用户、`spec-brainstorm`、产品/技术 owner 与后续 strategy 讨论。
+
 ## Interaction Method
 
 Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.

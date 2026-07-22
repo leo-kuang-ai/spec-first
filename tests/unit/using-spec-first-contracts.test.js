@@ -143,6 +143,14 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(commit).toMatch(/^user-invocable:\s*false$/m);
   });
 
+  test('supported-host governance includes Cursor in the accepted host contract', () => {
+    expect(governanceReadme).toContain(
+      'Accepted supported hosts 固定为 `claude`、`codex`、`cursor`、`kiro`、`qoder`',
+    );
+    expect(governanceReadme).toContain('目标平台：`claude | codex | cursor | kiro | qoder`');
+    expect(governanceReadme).toContain('host_delivery.cursor = skill');
+  });
+
   test('does not restore legacy host-specific workflow spellings', () => {
     expect(packageText).not.toMatch(/(?:\/spec:|\$spec-)/);
   });

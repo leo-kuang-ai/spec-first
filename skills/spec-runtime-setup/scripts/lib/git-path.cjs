@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
@@ -33,6 +34,20 @@ function resolveGitPath(repoRoot, gitRelative) {
   return { ok: true, absolute: path.normalize(absolute) };
 }
 
+function canonicalizeGitPath(candidatePath) {
+  const absolute = path.resolve(candidatePath);
+  let nearest = absolute;
+  while (!fs.existsSync(nearest)) {
+    const parent = path.dirname(nearest);
+    if (parent === nearest) break;
+    nearest = parent;
+  }
+  const realNearest = fs.realpathSync.native(nearest);
+  const suffix = path.relative(nearest, absolute);
+  return path.resolve(realNearest, suffix);
+}
+
 module.exports = {
+  canonicalizeGitPath,
   resolveGitPath,
 };

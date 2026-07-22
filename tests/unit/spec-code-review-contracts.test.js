@@ -81,6 +81,10 @@ const frontendQualityCapabilityCases = JSON.parse(fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/evals/frontend-quality-capability-cases.json'),
   'utf8',
 ));
+const deploymentVerificationActivationCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/deployment-verification-activation-cases.json'),
+  'utf8',
+));
 
 describe('spec-code-review current contracts', () => {
   test('mode:agent is JSON report-only and never applies fixes', () => {
@@ -181,8 +185,17 @@ describe('spec-code-review current contracts', () => {
 
   test('deployment verification activation mirrors the orchestrator risk gate and cannot self-invoke', () => {
     const whenToUse = deploymentPrompt.match(/## When to Use This Agent([\s\S]*?)$/)?.[1] || '';
+    const stage3 = skill.match(/### Stage 3: Select reviewers([\s\S]*?)### Stage 4:/)?.[1] || '';
+    const stage4 = skill.match(/### Stage 4:([\s\S]*?)### Stage 5:/)?.[1] || '';
 
     expect(skill).toContain('只有 orchestrator 能应用该 gate');
+    expect(stage3).toContain('Only when both conditions pass');
+    expect(stage3).toContain('selected_local_prompt_assets');
+    expect(stage3).toContain('artifact path and the concrete risky operation');
+    expect(stage4).toContain('only when Stage 3 already selected the asset');
+    expect(stage4).toContain('both the migration/schema-artifact gate and risky-change gate passed');
+    expect(stage4).toContain('safe additive migration');
+    expect(stage4).toContain('does not authorize Stage 4 dispatch');
     expect(whenToUse).not.toBe('');
     expect(whenToUse).toContain('只能由 `spec-code-review` orchestrator 调用');
     expect(whenToUse).toContain('必须同时满足');
@@ -194,6 +207,12 @@ describe('spec-code-review current contracts', () => {
     expect(whenToUse).toContain('不能单独授权调用');
     expect(whenToUse).not.toContain('PR modifies data processing logic');
     expect(whenToUse).not.toContain('Any change that could silently corrupt/lose data');
+
+    const cases = new Map(deploymentVerificationActivationCases.cases.map((entry) => [entry.id, entry]));
+    expect(cases.get('safe-additive-migration-does-not-dispatch')).toMatchObject({ kind: 'negative-owner' });
+    expect(cases.get('safe-additive-migration-does-not-dispatch').expected).toContain('不得把 deployment-verification-agent 加入 selected_local_prompt_assets');
+    expect(cases.get('risky-migration-dispatches-deployment-verification')).toMatchObject({ kind: 'positive' });
+    expect(cases.get('risky-migration-dispatches-deployment-verification').expected).toContain('artifact path 与 backfill/NOT NULL risky operation');
   });
 
   test('validator treats why_it_matters as optional context exactly like Stage 5b', () => {

@@ -140,6 +140,9 @@ describe('five-host init lifecycle', () => {
             if (userInvocable === false && platform !== 'cursor') {
               expect(helperSource).toMatch(/^user-invocable:\s*false$/m);
             }
+            if (platform === 'cursor') {
+              expect(helperSource).toMatch(/^disable-model-invocation:\s*true$/m);
+            }
           }
         }
       }

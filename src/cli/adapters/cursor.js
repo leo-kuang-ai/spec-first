@@ -297,7 +297,7 @@ function normalizeCursorSkillFrontmatter(content, context = {}) {
   if (pathsValue) {
     lines.push(`paths: ${pathsValue}`);
   }
-  if (context.isWorkflowSkill || fields['disable-model-invocation'] === 'true') {
+  if (context.isWorkflowSkill || context.isInternalSkill || fields['disable-model-invocation'] === 'true') {
     lines.push('disable-model-invocation: true');
   }
   if (fields.metadata) {

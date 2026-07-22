@@ -85,7 +85,7 @@ test('conditional sources name their trigger, purpose, and fallback', () => {
   ))).toBe(false);
   expect(skill).not.toContain('skill-quality-vocabulary.md');
   expect(skill).not.toContain('## Operation Model');
-  expect(skill).not.toContain('## Workflow');
+  expect(skill).not.toMatch(/^## Workflow$/m);
 });
 
 test('prose-heavy skills load a conditional behavior-contract method without replacing deterministic gates', () => {

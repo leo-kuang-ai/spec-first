@@ -1,12 +1,20 @@
 ---
 name: spec-doc-review
 description: 使用角色化 lens 审查 requirements、plans、task packs 或 specs。适用于改进既有规划与执行文档；默认 standard roster（≤3 reviewers），完整条件 roster 使用 roster:full。
-argument-hint: "[mode:headless] [mutation:report-only] [output:json] [roster:lite|standard|full] [path/to/document.md]"
+argument-hint: "[mode:headless] [mutation:report-only|mutation:apply-fixes] [output:json] [roster:lite|standard|full] [path/to/document.md]"
 ---
 
 # Document Review
 
 Review requirements or plan documents through multi-persona analysis. Task packs are reviewed as derived, report-only execution inputs against their current source plan. Dispatches generic subagents seeded with skill-local reviewer prompt assets, applies `safe_auto` fixes only when the run-local mutation policy is `markdown-write`, and preserves the same structural/semantic review as report-only findings when mutation is unavailable or forbidden.
+
+## Workflow Contract Summary
+
+- **输入：** requirements、统一计划、legacy plan、task pack 或其他可读 spec artifact，及可选 roster/output/mutation 参数。
+- **输出：** 默认 report-only 的结构化文档 findings、coverage、改进建议与可选 JSON envelope；只有显式 apply 授权才可修改 Markdown。
+- **硬出口：** 文档不可读、flag 冲突、task-pack/source-plan 漂移、format/source owner 不明确，或 mutation authority 缺失时不得写入文档。
+- **权威：** 原文和 source refs 提供事实，persona/LLM 判断语义充分性；producer 拥有 derived artifact 修复，review 不继承 commit/landing authority。
+- **消费者：** 文档 owner、`spec-brainstorm`、`spec-plan`、`spec-write-tasks`、`spec-work` 与人工 reviewer。
 
 ## Interactive mode rules
 - **Pre-load the platform question tool before any question fires.** In Claude Code, `AskUserQuestion` is deferred — call `ToolSearch` with `select:AskUserQuestion` once, eagerly, at the top of Interactive-mode work (before the routing question, walk-through, bulk-preview, and Phase 5 terminal question) rather than at the first question site. Other hosts don't need this preload.
@@ -19,17 +27,18 @@ Check the skill arguments for flags and a document path. Tokens matching `mode:*
 |------|---------|
 | `mode:headless` | Headless delivery (no interactive routing) |
 | `mutation:report-only` | Caller-requested zero-write review; valid for Markdown, HTML, and ambiguous/unwritable inputs |
+| `mutation:apply-fixes` | Explicitly authorizes bounded reviewer-owned Markdown fixes for this run; does not authorize commit or landing |
 | `output:json` | Render the existing structured envelope as one JSON object |
 | `roster:lite` / `roster:standard` / `roster:full` | Reviewer budget profile (default **`standard`**) |
 | `depth:full` / `depth:lite` | Aliases of `roster:full` / `roster:lite` |
 
 If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, profile = **`standard`**.
 
-`mutation:` and `output:` tokens are exact-token contracts. Accept only `mutation:report-only` and `output:json`. A duplicate token, multiple `mutation:*` tokens, multiple `output:*` tokens, or any unsupported `mutation:*` / `output:*` value fails closed before document read or reviewer dispatch. Return `Review failed: flag-conflict-or-unsupported` with the conflicting token names; do not guess precedence and do not treat those tokens as a path.
+`mutation:` and `output:` tokens are exact-token contracts. Accept only `mutation:report-only`, `mutation:apply-fixes`, and `output:json`. A duplicate token, multiple `mutation:*` tokens, multiple `output:*` tokens, or any unsupported `mutation:*` / `output:*` value fails closed before document read or reviewer dispatch. Return `Review failed: flag-conflict-or-unsupported` with the conflicting token names; do not guess precedence and do not treat those tokens as a path.
 
-Set run-local `requested_mutation` to `report-only` only when the exact token is present; otherwise `default`. Set `output_mode` to `json` only when `output:json` is present; otherwise `text`. Output mode changes rendering only — it does not grant mutation, dispatch, producer, commit, or lifecycle authority.
+Set run-local `requested_mutation` to `report-only` or `apply-fixes` only when the matching exact token is present; otherwise `default-report-only`. Set `output_mode` to `json` only when `output:json` is present; otherwise `text`. Output mode changes rendering only — it does not grant mutation, dispatch, producer, commit, or lifecycle authority.
 
-Set run-local `delivery_mode` to `headless` when `mode:headless` is present, otherwise `interactive`. Headless changes delivery, not the mutation policy: under `markdown-write`, confidence-100 `safe_auto` fixes still apply silently and the remaining findings return as structured text; under `report-only`, no document write occurs in either delivery mode. `output_mode` is a third orthogonal choice. Headless never uses blocking prompts or interactive routing and Phase 5 returns immediately with "Review complete". Invoke via `Skill("spec-doc-review", "mode:headless docs/plans/my-plan.md")`. Interactive references are eligible only after Phase 1 resolves `mutation_policy: markdown-write`.
+Set run-local `delivery_mode` to `headless` when `mode:headless` is present, otherwise `interactive`. Headless changes delivery, not mutation authority: it never upgrades `default-report-only` to a write policy. Only an explicit `requested_mutation: apply-fixes` may resolve to `markdown-write`; under `report-only`, no document write occurs in either delivery mode. `output_mode` is a third orthogonal choice. Headless never uses blocking prompts or interactive routing and Phase 5 returns immediately with "Review complete". Invoke a producer-owned write review via `Skill("spec-doc-review", "mode:headless mutation:apply-fixes docs/plans/my-plan.md")`; omit the mutation token for ordinary report-only review. Interactive references are eligible only after Phase 1 resolves `mutation_policy: markdown-write`.
 
 ## Phase 1: Get and Analyze Document
 
@@ -51,15 +60,16 @@ First check the unified artifact contract: `artifact_contract: spec-unified-plan
 After reading and classifying the document, set exactly one run-local `mutation_policy`, independently from `delivery_mode`:
 
 - `report-only` — `task-pack` 强制使用 `report-only`，并记录 `mutation_reason: task-pack-derived-artifact`。Task pack 由 `spec-write-tasks` 生成且 JSON contract / human-readable mirror 必须同源；reviewer 只能返回 producer fix candidates，不得直接 patch derived artifact。显式 `mutation:report-only` 不覆盖这个更具体的 mandatory reason。
-- `report-only` — when `requested_mutation: report-only` and the document is confirmed writable Markdown. Record `mutation_reason: caller-requested-report-only`; this explicit caller policy overrides the ordinary Markdown default and must keep the file byte-preserving.
-- `markdown-write` — only when the document is confirmed Markdown by content shape and path and the platform can write it. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available.
+- `markdown-write` — only when `requested_mutation: apply-fixes`, the document is confirmed writable Markdown, and no mandatory report-only reason applies. Record `mutation_reason: caller-requested-apply-fixes`. Markdown `safe_auto`, walkthrough Apply, bulk Apply, and Open Questions append paths remain available; commit and landing remain unauthorized.
+- `report-only` — when `requested_mutation: report-only` and the document is confirmed writable Markdown. Record `mutation_reason: caller-requested-report-only` and keep the file byte-preserving.
+- `report-only` — when `requested_mutation: default-report-only` and the document is confirmed writable Markdown. Record `mutation_reason: default-review-report-only`; ordinary review never acquires write authority from file format or host capability.
 - `report-only` — mandatory for HTML content or a `.html` artifact. Run the same reviewer roster, schema validation, confidence gate, deduplication, severity routing, Coverage, and limitations reporting, but do not invoke any document mutation path.
 - `report-only` — also mandatory when the document is confirmed Markdown but the platform cannot write it. Record `mutation_reason: write-unavailable`; keep the full review and finding envelope, but do not imply that Markdown mutation was attempted.
 - If extension, declared format, and content shape conflict, or the format remains ambiguous, fail closed to `report-only` and record `mutation_reason: format-conflict-or-ambiguous` in the envelope. Never guess Markdown write eligibility from the path alone.
 
 For ordinary HTML use `mutation_reason: html-artifact`. A report-only request is valid in both headless and interactive delivery; interactive delivery still returns the structured report-only envelope and does not offer a mutation walkthrough.
 
-Existing mandatory reasons retain their diagnostic meaning: task packs remain `task-pack-derived-artifact`, HTML remains `html-artifact`, write-unavailable Markdown remains `write-unavailable`, and format conflict/ambiguity remains `format-conflict-or-ambiguous` even when the caller also requested report-only. `caller-requested-report-only` applies to otherwise writable, unambiguous Markdown that is not a task pack. Without the mutation token, ordinary writable Markdown still resolves to `markdown-write`; this feature must not globally downgrade the default path.
+Existing mandatory reasons retain their diagnostic meaning: task packs remain `task-pack-derived-artifact`, HTML remains `html-artifact`, write-unavailable Markdown remains `write-unavailable`, and format conflict/ambiguity remains `format-conflict-or-ambiguous` even when the caller requested apply. `caller-requested-apply-fixes` applies only to otherwise writable, unambiguous Markdown that is not a task pack. Without `mutation:apply-fixes`, ordinary writable Markdown resolves to `report-only`; delivery mode, JSON output, file writability, or permission settings cannot supply missing mutation authority.
 
 **Core classification rules (apply these first):**
 
@@ -118,7 +128,7 @@ For ordinary text output, tell the user which personas will review and why (just
 
 ### Dispatch
 
-**Dispatch authorization gate.** A direct invocation of `spec-doc-review` authorizes this document-review workflow, not host-level subagent dispatch. Dispatch only when the user or an upstream handoff explicitly authorized subagents, personas, delegated review, or parallel-agent work for this run. When dispatch is unauthorized, record `dispatch_authorization_missing` in Coverage and Limitations, set `isolation=degraded_inherited`, and apply the same selected persona prompt assets inline or serially in the current agent. Do not claim independent persona coverage or context isolation. This dispatch fallback is orthogonal to `mutation_policy`: Markdown may still use `markdown-write`, while HTML and other report-only inputs remain non-mutating.
+**Dispatch authorization gate.** A direct invocation of `spec-doc-review` authorizes this document-review workflow, not host-level subagent dispatch. Dispatch only when the user or an upstream handoff explicitly authorized subagents, personas, delegated review, or parallel-agent work for this run. When dispatch is unauthorized, record `dispatch_authorization_missing` in Coverage and Limitations, set `isolation=degraded_inherited`, and apply the same selected persona prompt assets inline or serially in the current agent. Do not claim independent persona coverage or context isolation. This dispatch fallback is orthogonal to `mutation_policy`: only explicit `mutation:apply-fixes` can enable Markdown writes; HTML and all ordinary reviews remain non-mutating.
 
 When dispatch is authorized, dispatch generic subagents with **bounded parallelism** via the platform's subagent primitive (`Agent` in Claude Code, `spawn_agent` in Codex) where available. When the host exposes no callable primitive, record `subagent_capability_missing` and use the same inline/serial fallback. Omit the `mode` parameter so the user's permission settings apply. Respect the harness's active-subagent limit: queue selected reviewers, dispatch as many as accepted, fill freed slots as reviewers complete. Treat capacity-limit spawn errors as backpressure, not failure — leave the reviewer queued and retry after a slot frees; record failure only after a successful dispatch times out/fails or for a non-capacity reason.
 

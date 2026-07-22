@@ -12,7 +12,10 @@ const {
   MANAGED_BLOCK_START,
   MANAGED_BLOCK_END,
 } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
-const { resolveGitPath } = require('../../skills/spec-runtime-setup/scripts/lib/git-path.cjs');
+const {
+  canonicalizeGitPath,
+  resolveGitPath,
+} = require('../../skills/spec-runtime-setup/scripts/lib/git-path.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-exclude-')));
@@ -140,6 +143,22 @@ describe('workspace-git-exclude — managed .git/info/exclude writer', () => {
     const resolved = resolveGitPath(worktree, 'hooks');
     expect(resolved).toEqual({ ok: true, absolute: sharedHooks });
     expect(resolved.absolute.startsWith(worktree + path.sep)).toBe(false);
+  });
+
+  test('shared Git path resolver canonicalizes existing ancestors before containment checks', () => {
+    const ws = mkWorkspace();
+    const realRoot = path.join(ws, 'real-root');
+    const aliasRoot = path.join(ws, 'alias-root');
+    fs.mkdirSync(path.join(realRoot, 'nested'), { recursive: true });
+    try {
+      fs.symlinkSync(realRoot, aliasRoot, process.platform === 'win32' ? 'junction' : 'dir');
+    } catch (_error) {
+      return;
+    }
+
+    expect(canonicalizeGitPath(path.join(aliasRoot, 'nested', 'future.txt'))).toBe(
+      path.join(fs.realpathSync.native(realRoot), 'nested', 'future.txt'),
+    );
   });
 
   test('remove rejects an exclude symlink escaping the workspace', () => {

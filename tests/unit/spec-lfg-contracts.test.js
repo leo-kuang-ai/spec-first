@@ -87,16 +87,18 @@ describe('spec-lfg current contracts', () => {
   test('closes browser and cleanup gates before every durable or outward shipping side effect', () => {
     const reviewIndex = skill.indexOf('5. **Apply review fixes locally**');
     const browserIndex = skill.indexOf('6. **Decide browser applicability');
+    const finalVerificationIndex = skill.indexOf('6.5. **Final working-tree verification**');
     const shippingIndex = skill.indexOf('**Shipping precondition (steps 7–9).**');
     const residualIndex = skill.indexOf('7. **Autonomous residual handoff**');
     const lifecycleIndex = skill.indexOf('7.5. **Complete the source plan lifecycle marker.**');
     const commitIndex = skill.indexOf('8. Invoke the `spec-commit-push-pr` skill');
     const ciIndex = skill.indexOf('9. **CI watch and autofix loop**');
 
-    expect([reviewIndex, browserIndex, shippingIndex, residualIndex, lifecycleIndex, commitIndex, ciIndex])
+    expect([reviewIndex, browserIndex, finalVerificationIndex, shippingIndex, residualIndex, lifecycleIndex, commitIndex, ciIndex])
       .not.toContain(-1);
     expect(reviewIndex).toBeLessThan(browserIndex);
-    expect(browserIndex).toBeLessThan(shippingIndex);
+    expect(browserIndex).toBeLessThan(finalVerificationIndex);
+    expect(finalVerificationIndex).toBeLessThan(shippingIndex);
     expect(shippingIndex).toBeLessThan(residualIndex);
     expect(residualIndex).toBeLessThan(lifecycleIndex);
     expect(lifecycleIndex).toBeLessThan(commitIndex);
@@ -105,6 +107,17 @@ describe('spec-lfg current contracts', () => {
     expect(reviewFollowup).toContain('Do not stage, commit, push, file tracker items, or edit a PR');
     expect(reviewFollowup).not.toContain('git commit');
     expect(reviewFollowup).not.toContain('git push');
+  });
+
+  test('re-verifies the final working tree with deterministic freshness evidence', () => {
+    expect(skill).toContain('pre_final_verification_fingerprint');
+    expect(skill).toContain('initial_verification_run_summary_ref');
+    expect(skill).toContain('verified_worktree_fingerprint');
+    expect(skill).toContain('working-tree-fingerprint.cjs');
+    expect(skill).toMatch(/verification_run_summary_ref.*different from.*initial_verification_run_summary_ref/is);
+    expect(skill).toMatch(/second helper invocation[\s\S]*same\s+fingerprint/i);
+    expect(skill).toContain('final-verification-stale');
+    expect(skill).toMatch(/Targeted checks.*never replace it/is);
   });
 
   test('preserves the caller argument payload from brainstorm through spec-plan', () => {

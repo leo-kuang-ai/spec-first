@@ -19,7 +19,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { resolveGitPath } = require('./git-path.cjs');
+const { canonicalizeGitPath, resolveGitPath } = require('./git-path.cjs');
 const { assertContainedPath, isPathWithin } = require('./path-safety.cjs');
 
 const MANAGED_BLOCK_START = '# spec-first codegraph exclude start';
@@ -27,7 +27,13 @@ const MANAGED_BLOCK_END = '# spec-first codegraph exclude end';
 const DEFAULT_PATTERNS = ['.codegraph/'];
 
 function resolveExcludePath(repoRoot) {
-  return resolveGitPath(repoRoot, 'info/exclude');
+  const resolved = resolveGitPath(repoRoot, 'info/exclude');
+  if (!resolved.ok) return resolved;
+  try {
+    return { ok: true, absolute: canonicalizeGitPath(resolved.absolute) };
+  } catch (_error) {
+    return { ok: false, reason_code: 'git-path-canonicalization-failed' };
+  }
 }
 
 // Add the managed exclude block to a child repo. Idempotent.

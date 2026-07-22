@@ -732,7 +732,7 @@ describe('Graphify provider', () => {
     };
     const actionPlan = provider.plan(refreshContext);
     expect(actionPlan.actions.find((action) => action.kind === 'refresh')).toMatchObject({
-      args: ['update', path.join('packages', 'api')],
+      args: ['update', 'packages/api'],
       graphify_out: path.join('..', '..', '.graphify'),
     });
     expect(actionPlan.artifact_root).toBe(path.join(fixture.target, '.graphify'));
@@ -740,7 +740,7 @@ describe('Graphify provider', () => {
     const result = provider.refresh(refreshContext, actionPlan);
 
     expect(fixture.graphifyCalls.find((call) => call.args[0] === 'update')).toMatchObject({
-      args: ['update', path.join('packages', 'api')],
+      args: ['update', 'packages/api'],
       env: expect.objectContaining({ GRAPHIFY_OUT: path.join('..', '..', '.graphify') }),
     });
     expect(result).toMatchObject({

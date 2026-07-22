@@ -42,4 +42,23 @@ describe('spec-riffrec-feedback-analysis artifact path contracts', () => {
     expect(extensive).not.toContain('ce-brainstorm');
     expect(analyzer).not.toContain('ce-brainstorm');
   });
+
+  test('keeps credentials out of argv and enforces zip resource budgets', () => {
+    const analyzer = read('skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py');
+
+    expect(analyzer).toContain('"--config"');
+    expect(analyzer).toContain('input=curl_config');
+    expect(analyzer).not.toContain('f"Authorization: Bearer {api_key}"');
+    for (const budget of [
+      'MAX_ZIP_MEMBERS',
+      'MAX_ZIP_MEMBER_BYTES',
+      'MAX_ZIP_TOTAL_BYTES',
+      'MAX_ZIP_COMPRESSION_RATIO',
+      'member_written',
+      'streamed_total',
+    ]) {
+      expect(analyzer).toContain(budget);
+    }
+    expect(analyzer).toContain('shutil.rmtree(staging, ignore_errors=True)');
+  });
 });

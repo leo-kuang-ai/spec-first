@@ -5,13 +5,14 @@ review_date: 2026-07-18
 origin_plan: docs/plans/2026-07-17-002-docs-system-project-audit-validation-approach-plan.md
 baseline_audit: docs/项目审查/2026-07-17-skill-flow-system-audit/review-report.md
 source_head: 0c1b358605c534db50321a5252e5e6d356dbcefb
-current_head_at_calibration: 247f86aeb2225641f93eb3d42f86a192e15a6d2e
+current_head_at_calibration: 27baf79f7d3bb0873deb591218c76b9c11a91bbf
 working_tree_calibrated_at: 2026-07-21
-working_tree_overlay: uncommitted-sf24-sf26-p3-contract-repair
+working_tree_overlay: none
 limitations:
   - 当前批次是基于 2026-07-17 全量 source audit 的增量刷新；未变 source 继承其逐行证据。
   - 未授权 generic subagent dispatch；没有 fresh-source、host-loader 或 field-outcome claim。
-  - source_head 是冻结快照；current_head_at_calibration 已包含 P0-P2 修复，本轮最后 3 项 P3 source/test/docs overlay 尚未提交。
+  - source_head 是冻结快照；current_head_at_calibration 已包含 P0-P3 修复，校准时没有 working-tree overlay。
+  - committed P2 pair delta 为 +2/-3；P3 pair delta 为 0/0。
 ---
 
 # spec-first Skill 关联关系系统审查当前快照刷新报告
@@ -47,7 +48,7 @@ limitations:
 
 这些修复建立了 mutation authority 的共同地板，并闭合了 SF-01 的 9 条 load-bearing caller edge。P2 没有新增状态机或中心化 coordinator：虚假 consumer/reverse edge 被删除，已有 worker/cache/confidence/analyzer owner 在原 owner 内扩展；对抗性复核还将 SF-11 遗留的 requirements-only direct-work wording 收窄为 artifact-kind conditional。最后 3 项 P3 同样只校准现有 owner：Deployment prompt 镜像 orchestrator gate，validator template 接受 optional detail context，LFG 如实描述 Simplify 的 scoped verification。当前 P0/P1/P2/P3 队列均已清空。
 
-此前校准已清空 P0-P2；当前 overlay 关闭 SF-24/SF-25/SF-26，且没有重新打开既有 finding。P3 的关闭证据止于 source contract、RED/GREEN focused tests 与完整回归，不把 prompt/contract 验证升级为真实 deployment、validator recall/precision、host-loader 或 field outcome。`source_head` 保持原始冻结快照，`current_head_at_calibration` 是已提交的 P2 基线，当前 P3 overlay 尚未提交。
+此前校准已清空 P0-P2；`current_head_at_calibration` 已提交 SF-24/SF-25/SF-26 修复，且没有重新打开既有 finding。P3 的关闭证据止于 source contract、RED/GREEN focused tests 与完整回归，不把 prompt/contract 验证升级为真实 deployment、validator recall/precision、host-loader 或 field outcome。`source_head` 保持原始冻结快照；已提交 P2 pair delta 为 `+2/-3`，P3 pair delta 为 `0/0`。
 
 ### 1.1 逐项校准清单
 
@@ -89,7 +90,7 @@ limitations:
 
 | Finding | 当前证据 | 反证检查 | 裁决 |
 | --- | --- | --- | --- |
-| SF-01 | `DELIVERED_INTERNAL_SKILLS` 包含 `spec-commit`、`spec-commit-push-pr`、`spec-proof`；projection plan 与临时 sandbox 五宿主 `init` 覆盖 5 个 delivered internal package 的完整 references；caller-edge contract 覆盖 LFG/dogfood 与 5 条 Proof handoff。commit helpers 保持 `user-invocable:false`，Proof 保留显式点名入口但不进入 public route | Cursor 会过滤不支持的 `user-invocable` 字段，因此 Cursor 对严格内部 helper 只验证 internal description、governance/public-route 隐藏与 package 投射；未做真实 host loader/invocation | RESOLVED（source + focused contracts + sandbox init；claim ceiling=`projection_confirmed`） |
+| SF-01 | `skills-governance.json` 以 `entry_surface: internal_only` 与逐宿主 `host_delivery: internal` 作为 internal delivery 唯一真源；`plugin-governance.js` 直接消费治理记录，不维护第二份 helper 名单。projection plan 与临时 sandbox 五宿主 `init` 覆盖 5 个 delivered internal package 的完整 references；caller-edge contract 覆盖 LFG/dogfood 与 5 条 Proof handoff。commit helpers 保持 `user-invocable:false`，Proof 保留显式点名入口但不进入 public route | Cursor 会过滤不支持的 `user-invocable` 字段，因此 Cursor 对严格内部 helper 只验证 internal description、governance/public-route 隐藏与 package 投射；未做真实 host loader/invocation | RESOLVED（source + focused contracts + sandbox init；claim ceiling=`projection_confirmed`） |
 | SF-02 | 两套 schema/template/YAML guide/validator 保持 byte parity；Knowledge Harness consumer 与当前 deterministic floor 对齐；`--promotion` 要求非空顶层 `source_refs` array 与 `invalidation_condition` string；Full、Lightweight、Refresh Replace 与 materially rewriting 的 Refresh Consolidate 均调用同一 gate，Consolidate 的 destructive delete 明确后置；focused tests 覆盖四类共享 source parity、完整正例、缺失、空值、转义空白、常见 YAML parser 隐式非字符串 scalar、错误类型、普通及 YAML-equivalent 重复键、flow/block array 与 legacy default mode | validator 不检查引用是否真实可信，也不判断失效条件是否语义充分；未执行 fresh-session host load 或真实 compound field run | RESOLVED（source + 43-test focused contract；claim ceiling=`source-contract-confirmed`） |
 | SF-03 | `spec-plan`、`spec-brainstorm`、`spec-ideate` 已有 active non-commented key consumer；Runtime Setup 与 config template 现在统一列为 active local rendering preferences，focused test 同时锁定 consumer、setup 与注释模板 | 示例仍保持注释，缺失/无效/注释值分别回退 `md`/`md`/`html`；setup 不调用 workflow，未执行真实 host/local config field run | RESOLVED（source + focused contract；claim ceiling=`source-contract-confirmed`） |
 | SF-04 | `spec-doc-review` 优先识别 `type: task-pack`，malformed pack 不降级为普通 plan；task pack 强制 `report-only` / `task-pack-derived-artifact`；专属 lens 运行真实 validator receipt，并按 current source plan 审查 fidelity、dependency/wave、files/effects、verification、stop/review semantics 与 human/JSON parity；`spec-write-tasks` 的 copy-ready handoff 只在完整 zero-write JSON envelope、source-plan 对齐及 passed+valid+deterministic+正确 next action 同时成立时升级 `reviewed-existing` | validator 只证明 identity/freshness/structure，不返回 task-pack digest；`Review complete` 不是 execution handoff，`roster:full` 不授予 subagent dispatch；无授权时仍是 inline/serial、非 independent coverage，未执行真实 host/persona field run | RESOLVED（source + 53-test focused replay + 正负 handoff fixtures；claim ceiling=`source-contract-confirmed`） |
@@ -116,7 +117,7 @@ limitations:
 - **SF-24 已关闭：** Deployment prompt 只允许 orchestrator 在 risky migration/schema artifact gate 成立时调用，并显式拒绝 self-invocation 与普通 data-processing 扩张。
 - **SF-25 已关闭：** Validator variable contract 与 Stage 5b 对齐；`why_it_matters` 缺失不再阻断 validator 依据 diff/cited code 独立复核。
 - **SF-26 已关闭：** LFG 将 Simplify verification 校准为 full-project typecheck/lint + default changed-path tests + risk-based broadening，最终 verification gate 保持权威。
-- 当前 overlay 的 `+2/-3` canonical pair 变化与 M-013 artifact-kind conditional 的完整理由见 [edge-ledger.md](evidence/edge-ledger.md)。文本 mention 或新增 route 不自动增加 workflow mutation/runtime authority。
+- 已提交 P2 的 `+2/-3` canonical pair 变化、P3 的 `0/0` pair 结论与 M-013 artifact-kind conditional 的完整理由见 [edge-ledger.md](evidence/edge-ledger.md)。文本 mention 或新增 route 不自动增加 workflow mutation/runtime authority。
 
 ## 5. 后续最高杠杆项
 

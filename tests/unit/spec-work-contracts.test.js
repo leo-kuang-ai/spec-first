@@ -69,7 +69,7 @@ describe('spec-work current contracts', () => {
   test('requires scope, blockers, and verification to close before return-to-caller completion', () => {
     expect(skill).toContain('every in-scope unit/task is accounted for and completed');
     expect(skill).toContain('`blockers` is empty');
-    expect(skill).toContain('Failed, degraded, not-run, vague, or missing required verification/review cannot return complete');
+    expect(skill).toContain('Failed, degraded, not-run, vague, stale, or missing required verification/review cannot return complete');
   });
 
   test('keeps goal terminal completion behind the same closeout owner', () => {

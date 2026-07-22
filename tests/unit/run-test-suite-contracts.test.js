@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {
+  INTEGRATION_TEST_PATHS,
   MCP_SETUP_TEST_PATHS,
   assertTestPathsExist,
   runJestFiles,
@@ -39,6 +40,16 @@ describe('run-test-suite active inventory', () => {
 
     expect([...MCP_SETUP_TEST_PATHS].sort()).toEqual(expectedPaths);
     expect(() => assertTestPathsExist(MCP_SETUP_TEST_PATHS)).not.toThrow();
+  });
+
+  test('runs every integration test file through test:integration', () => {
+    const expectedPaths = fs.readdirSync(path.join(repoRoot, 'tests', 'integration'), { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.test.js'))
+      .map((entry) => `tests/integration/${entry.name}`)
+      .sort((left, right) => left.localeCompare(right));
+
+    expect([...INTEGRATION_TEST_PATHS]).toEqual(expectedPaths);
+    expect(() => assertTestPathsExist(INTEGRATION_TEST_PATHS)).not.toThrow();
   });
 
   test('runs the dedicated mcp-setup suite in Windows CI before the full test chain', () => {

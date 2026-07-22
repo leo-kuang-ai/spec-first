@@ -56,4 +56,29 @@ describe('mutation authority baseline contracts', () => {
     expect(reportTemplate).toContain('<commit-or-uncommitted>');
     expect(reportTemplate).toContain('uncommitted');
   });
+
+  test('spec-doc-review defaults to report-only and requires an explicit apply token', () => {
+    const skill = read('skills/spec-doc-review/SKILL.md');
+
+    expect(skill).toContain('mutation:apply-fixes');
+    expect(skill).toContain('requested_mutation: default-report-only');
+    expect(skill).toMatch(/Without `mutation:apply-fixes`.*resolves to `report-only`/is);
+    expect(skill).toMatch(/commit and landing remain unauthorized/is);
+  });
+
+  test('compound-refresh keeps headless, commit, and landing authority separate', () => {
+    const skill = read('skills/spec-compound-refresh/SKILL.md');
+
+    for (const fact of [
+      'mutation_authorization',
+      'commit_authorization',
+      'landing_authorization',
+    ]) {
+      expect(skill).toContain(fact);
+    }
+    expect(skill).toMatch(/mode:headless.*do not grant commit.*push.*PR authority/is);
+    expect(skill).toContain('commit_reason: commit_authorization_missing');
+    expect(skill).toMatch(/Without landing authorization.*do not push.*open.*PR/is);
+    expect(skill).not.toMatch(/On main\/master.*Create a branch.*commit.*open a PR/is);
+  });
 });

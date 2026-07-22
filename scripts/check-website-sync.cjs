@@ -3,7 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { runNpmChecked: runNpmCliChecked } = require('./lib/npm-cli.cjs');
 
 const repoRoot = path.resolve(__dirname, '..');
 const defaultWebsiteRepo = path.resolve(repoRoot, '..', 'spec-first-official-website');
@@ -27,17 +27,14 @@ function readJson(filePath) {
 }
 
 function runNpmChecked(args, options) {
-  const result = spawnSync('npm', args, {
-    cwd: options.cwd,
-    env: options.env,
-    stdio: 'inherit',
-    windowsHide: true,
-  });
-  if (result.error) {
-    fail(`npm ${args.join(' ')} failed: ${result.error.message}`);
-  }
-  if (result.status !== 0) {
-    fail(`npm ${args.join(' ')} failed with status ${result.status}`);
+  try {
+    runNpmCliChecked(args, {
+      cwd: options.cwd,
+      env: options.env,
+      stdio: 'inherit',
+    });
+  } catch (error) {
+    fail(error.message);
   }
 }
 

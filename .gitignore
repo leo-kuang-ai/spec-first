@@ -44,6 +44,9 @@ logs/
 .spec-first/tmp-review/
 .spec-first/evals/
 
+# spec-first source-checkout host-local config; target repos may choose to track this mixed-ownership file
+/.claude/settings.json
+
 # Published/package artifacts
 *.tgz
 
@@ -78,6 +81,7 @@ __pycache__/
 .codex/hooks/session-start.cmd
 .codex/hooks.json
 .agents/skills/spec-*/
+.agents/skills/source-command-spec-*/
 .agents/skills/using-spec-first/
 .agents/skills/graphify/
 .cursor/skills/spec-*/

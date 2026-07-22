@@ -4,10 +4,10 @@ This file contains post-plan-writing instructions: document review, post-generat
 
 ## 5.3.8 Document Review
 
-Run `spec-doc-review` with `mode:headless <plan-path>` for **both** output formats. Delivery is headless in either case; the document-review skill resolves mutation independently:
+Run `spec-doc-review` headless for both output formats. Delivery is headless in either case; the plan producer supplies mutation authority explicitly:
 
-- `OUTPUT_FORMAT=md` -> `mutation_policy: markdown-write`. Confidence-100 `safe_auto` fixes may apply, and remaining actionable findings can later enter the optional interactive Markdown walkthrough.
-- `OUTPUT_FORMAT=html` -> `mutation_policy: report-only`. The same structural/semantic roster, synthesis, severity routing, Coverage, and limitations run, but `fixes_applied: 0`; no Markdown edit, Open Questions append, walkthrough, or bulk mutation path is available.
+- `OUTPUT_FORMAT=md` -> invoke `mode:headless mutation:apply-fixes <plan-path>`; this producer-owned run may apply bounded Markdown fixes, while commit and landing remain separate.
+- `OUTPUT_FORMAT=html` -> invoke `mode:headless mutation:report-only <plan-path>`; the returned envelope must preserve `mutation_policy: report-only`, the same structural/semantic roster, synthesis, severity routing, Coverage, and limitations run, but `fixes_applied: 0` and reviewer mutation is unavailable.
 
 This phase is mandatory after the confidence check because the two checks catch different classes of issues. HTML is no longer an unreviewed skip path. Capture the structured envelope for both formats, including `mutation_policy`, `review_status`, `fixes_applied`, `producer_fix_candidates`, `proposed_fixes_count`, `decisions_count`, `fyi_count`, `p0_p1_actionable_count`, Coverage, and Limitations.
 
@@ -28,7 +28,7 @@ Capture the headless envelope so it can drive the contextual summary above the p
 
 When spec-doc-review returns "Review complete", proceed to Final Checks.
 
-**Pipeline mode:** Pipeline runs (LFG or any `disable-model-invocation` context) force `OUTPUT_FORMAT=md` at Phase 0.0. They always invoke `spec-doc-review` with `mode:headless` and the plan path, then return findings to the caller without an interactive menu. Address any P0/P1 findings before returning control to the caller.
+**Pipeline mode:** Pipeline runs (LFG or any `disable-model-invocation` context) force `OUTPUT_FORMAT=md` at Phase 0.0. They invoke `spec-doc-review` with `mode:headless mutation:apply-fixes` and the plan path, then return findings to the caller without an interactive menu. Address any P0/P1 findings before returning control to the caller.
 
 ## 5.3.9 Final Checks and Cleanup
 
@@ -82,7 +82,7 @@ Based on selection (the bare per-option routing is also stated inline in the SKI
   - **If only a user-typed `/goal` exists (Claude Code):** print that objective as a single copyable `/goal …` block and tell the user to paste it at the start of a message (a skill cannot issue `/goal` itself there). After printing, return to the options.
 
   Render only for implementation-ready code plans, and only where the host has goal capability at all (Codex `create_goal` or Claude Code user-typed `/goal`) — omit the option where neither exists.
-- **Decide on the review's open items** -> Re-invoke the `spec-doc-review` skill on the plan path **without** `mode:headless` so the interactive routing question and walkthrough fire. The headless pass already applied `safe_auto` fixes and recorded its findings in the session, so the interactive pass picks up where headless stopped — its R29 suppression rule prevents prior-round Skipped/Deferred entries from re-raising. After it returns, re-render this menu with the refreshed counts so the user can pick what to do next.
+- **Decide on the review's open items** -> Re-invoke `spec-doc-review mutation:apply-fixes <plan-path>` **without** `mode:headless` so the interactive routing question and walkthrough fire. The explicit token preserves this producer-owned write boundary. After it returns, re-render this menu with the refreshed counts so the user can pick what to do next.
 - **Create Issue** -> Follow the Issue Creation section below
 - **Publish to Proof — shareable link** -> Load the `spec-proof` skill to publish the plan. Pass:
   - source file: `docs/plans/<plan_filename>.md`
@@ -95,7 +95,7 @@ Based on selection (the bare per-option routing is also stated inline in the SKI
 
   If the upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the options — don't leave them wondering why the option did nothing.
 - **Open in browser** -> Display the absolute path to the `.html` plan file so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the post-generation options so the user can pick a follow-up action.
-- **Free-form prompts that target the findings** (e.g., the user types "review", "walk through", "deep review" instead of picking a numbered option) -> for `markdown-write`, route as if they had picked `Decide on the review's open items`. For HTML/report-only, re-run `spec-doc-review mode:headless <plan-path>` only when a fresh review is requested and surface the report-only envelope; do not offer or imply a mutation walkthrough. Then return to the menu.
+- **Free-form prompts that target the findings** (e.g., the user types "review", "walk through", "deep review" instead of picking a numbered option) -> for the producer-owned Markdown apply path, route as if they had picked `Decide on the review's open items` and pass `mutation:apply-fixes`. For HTML/report-only, re-run `spec-doc-review mode:headless mutation:report-only <plan-path>` only when a fresh review is requested and surface the report-only envelope; do not offer or imply a mutation walkthrough. Then return to the menu.
 - **Other free-form input** -> Accept revisions to the plan and loop back to options.
 
 ## Issue Creation

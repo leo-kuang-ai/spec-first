@@ -25,10 +25,7 @@ const {
   resolveBundledSkillSourceName,
   shouldIgnoreBundledSupportPath,
 } = require('./plugin-manifest');
-const {
-  buildFilteredAssetSet,
-  DELIVERED_INTERNAL_SKILLS,
-} = require('./plugin-governance');
+const { buildFilteredAssetSet } = require('./plugin-governance');
 const {
   findUnresolvedCommandSkillLocalResourcePaths,
   rewriteCommandSkillLocalResourcePaths,
@@ -197,6 +194,7 @@ function syncSkills(projectRoot, adapter, filteredAssetSet = buildFilteredAssetS
     fs.mkdirSync(workflowRoot, { recursive: true });
   }
   const workflowNameSet = new Set(workflowNames);
+  const internalNameSet = new Set(internalNames);
   const skillNames = [...new Set([...standaloneNames, ...internalNames, ...workflowNames])].sort((a, b) =>
     a.localeCompare(b),
   );
@@ -207,7 +205,13 @@ function syncSkills(projectRoot, adapter, filteredAssetSet = buildFilteredAssetS
     const targetDir = isWorkflowSkill
       ? path.join(workflowRoot, skillName)
       : path.join(standaloneRoot, skillName);
-    const transformContext = buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir);
+    const transformContext = buildSkillTransformContext(
+      projectRoot,
+      skillName,
+      isWorkflowSkill,
+      internalNameSet.has(skillName),
+      targetDir,
+    );
 
     fs.rmSync(targetDir, { recursive: true, force: true });
 
@@ -236,6 +240,7 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
   const internalNames = [...(filteredAssetSet.internalSkills || [])];
   const workflowNames = [...filteredAssetSet.workflowSkills];
   const workflowNameSet = new Set(workflowNames);
+  const internalNameSet = new Set(internalNames);
   const skillNames = [...new Set([...standaloneNames, ...internalNames, ...workflowNames])].sort((a, b) =>
     a.localeCompare(b),
   );
@@ -253,7 +258,13 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
     const targetDir = isWorkflowSkill
       ? path.join(workflowRoot, skillName)
       : path.join(standaloneRoot, skillName);
-    const transformContext = buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir);
+    const transformContext = buildSkillTransformContext(
+      projectRoot,
+      skillName,
+      isWorkflowSkill,
+      internalNameSet.has(skillName),
+      targetDir,
+    );
 
     operations.push(buildPlanOperation(
       'remove_dir',
@@ -415,6 +426,7 @@ function inspectSkills(projectRoot, filteredAssetSet, adapter) {
   const internalEntries = [...new Set(internalNames)].sort((a, b) => a.localeCompare(b));
   const workflowEntries = [...new Set(workflowNames)].sort((a, b) => a.localeCompare(b));
   const workflowNameSet = new Set(workflowNames);
+  const internalNameSet = new Set(internalNames);
   const skillNames = [...new Set([...standaloneEntries, ...internalEntries, ...workflowEntries])].sort((a, b) =>
     a.localeCompare(b),
   );
@@ -430,6 +442,7 @@ function inspectSkills(projectRoot, filteredAssetSet, adapter) {
       adapter,
       skillName,
       isWorkflowSkill: workflowNameSet.has(skillName),
+      isInternalSkill: internalNameSet.has(skillName),
       standaloneRoot,
       workflowRoot,
     }))
@@ -649,13 +662,14 @@ function projectSkillContentForRuntimeName(content, context = {}) {
   return String(content || '').replace(/^name:\s*.+$/m, `name: ${skillName}`);
 }
 
-function buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir) {
+function buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, isInternalSkill, targetDir) {
   const context = {
     skillName,
     isWorkflowSkill,
+    isInternalSkill,
   };
 
-  if (!isWorkflowSkill && DELIVERED_INTERNAL_SKILLS.has(skillName)) {
+  if (isInternalSkill) {
     context.runtimeSkillRoot = normalizePathForContent(toRelativeProjectPath(targetDir, projectRoot));
   }
 
@@ -715,6 +729,7 @@ function inspectSkillIntegrity({
   adapter,
   skillName,
   isWorkflowSkill,
+  isInternalSkill,
   standaloneRoot,
   workflowRoot,
 }) {
@@ -724,7 +739,13 @@ function inspectSkillIntegrity({
   const sourceSkillName = resolveBundledSkillSourceName(skillName);
   const sourceDir = path.join(getBundledPath('skills'), sourceSkillName);
   const sourcePath = path.join(sourceDir, 'SKILL.md');
-  const transformContext = buildSkillTransformContext(projectRoot, skillName, isWorkflowSkill, targetDir);
+  const transformContext = buildSkillTransformContext(
+    projectRoot,
+    skillName,
+    isWorkflowSkill,
+    isInternalSkill,
+    targetDir,
+  );
   const projectedSource = projectSkillContentForRuntimeName(
     fs.readFileSync(sourcePath, 'utf8'),
     { skillName, sourceSkillName, relativePath: 'SKILL.md' },

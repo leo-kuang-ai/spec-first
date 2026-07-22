@@ -8,6 +8,14 @@ argument-hint: "[optional: scope hint — directory, filename, module, or keywor
 
 Maintain the quality of `docs/solutions/` over time. This workflow reviews existing learnings against the current codebase, then refreshes any derived pattern docs that depend on them.
 
+## Workflow Contract Summary
+
+- **输入：** `docs/solutions/`、`CONCEPTS.md`、可选 scope hint，以及当前 source/test/doc evidence。
+- **输出：** Keep/Update/Consolidate/Replace/Delete/Stale 分类、已应用的知识维护变更和完整 Applied/Recommended 报告。
+- **硬出口：** source truth、目标 repo、写入范围或语义分类无法确认时不得把猜测写成 current knowledge；headless 只能把歧义标 stale。
+- **权威：** 当前代码与验证证据优先于旧 learning；本地 mutation、commit 和 landing 分别需要独立授权，`mode:headless` 只改变交互方式。
+- **消费者：** 项目维护者，以及读取 `docs/solutions/`/`CONCEPTS.md` 的规划、实现、调试和审查 workflow。
+
 ## Mode Detection
 
 Check if `$ARGUMENTS` contains `mode:headless`. If present, strip it from arguments (use the remainder as a scope hint) and run in **headless mode**.
@@ -16,6 +24,18 @@ Check if `$ARGUMENTS` contains `mode:headless`. If present, strip it from argume
 |------|------|----------|
 | **Interactive** (default) | User is present and can answer questions | Ask for decisions on ambiguous cases, confirm actions |
 | **Headless** | `mode:headless` in arguments | No user interaction. Apply all unambiguous actions (Keep, Update, Consolidate, auto-Delete, Replace with sufficient evidence). Mark ambiguous cases as stale. Generate a summary report at the end. |
+
+### Resolve mutation and landing authority
+
+Record three independent run-local facts before any write or Git action:
+
+```yaml
+mutation_authorization: authorized | missing
+commit_authorization: authorized | missing
+landing_authorization: authorized | missing
+```
+
+A direct request to refresh or maintain `docs/solutions/` authorizes only the bounded local document mutations described by this workflow. Set `commit_authorization` only when the current user or visible upstream handoff separately requests a commit. Set `landing_authorization` only when push or PR creation/update is separately explicit. `mode:headless`, a feature branch, writable permissions, successful edits, or a clean tree do not grant commit, branch creation, push, or PR authority. Without commit authorization, preserve verified edits as uncommitted work; without landing authorization, do not push or open a PR.
 
 ### Headless mode rules
 
@@ -30,7 +50,7 @@ Check if `$ARGUMENTS` contains `mode:headless`. If present, strip it from argume
 
 If invoked specifically to create or bootstrap `CONCEPTS.md` (e.g., "create a CONCEPTS.md", "build the concept map", "set up shared vocabulary"), the intent is ambiguous between two jobs — building the vocabulary file and running a docs/solutions refresh — so disambiguate before proceeding. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. Two options:
 
-1. **Create CONCEPTS.md (build the concept map)** — seed the repo-wide concept map and commit it; skip only the docs/solutions classification phases (Phases 0–4). Read `references/concepts-vocabulary.md` and follow its **Seed goal** and **Scope of a seed** (repo-wide) rules: seed the project's core domain nouns from the declared domain model (schema, core types, primary models, top-level domain docs), each meeting the qualifying bar, the codebase setting the count. Write the preamble (see Phase 4.5), cluster per the organization rules, and run the Discoverability Check so `AGENTS.md`/`CLAUDE.md` surface the new file. Then **enter Phase 5 (Commit Changes)** to commit/PR the new `CONCEPTS.md` and any instruction-file edit through the same durable-write flow the refresh uses — do not leave the bootstrap uncommitted.
+1. **Create CONCEPTS.md (build the concept map)** — seed the repo-wide concept map; skip only the docs/solutions classification phases (Phases 0–4). Read `references/concepts-vocabulary.md` and follow its **Seed goal** and **Scope of a seed** (repo-wide) rules: seed the project's core domain nouns from the declared domain model (schema, core types, primary models, top-level domain docs), each meeting the qualifying bar, the codebase setting the count. Write the preamble (see Phase 4.5), cluster per the organization rules, and run the Discoverability Check so `AGENTS.md`/`CLAUDE.md` surface the new file. Then enter the authority-aware Phase 5 closeout; without separate commit authorization, leave the verified bootstrap edits uncommitted.
 2. **Run a refresh cycle** — proceed with the normal refresh flow below; `CONCEPTS.md` is seeded (if absent) and reconciled as part of Phase 4.5.
 
 In headless mode there is no user to ask: default to the refresh cycle (vocabulary is seeded and reconciled within Phase 4.5 regardless) and note in the report that a standalone repo-wide bootstrap was not run.
@@ -384,7 +404,7 @@ Search efficiently:
 
 Classify each citation by what it does in its citing context:
 
-- **Decorative** — principle stated inline, citation is a "see also" pointer or bare attribution. Delete is fine; clean up citations in the same commit.
+- **Decorative** — principle stated inline, citation is a "see also" pointer or bare attribution. Delete is fine; clean up citations in the same refresh change set.
 - **Substantive** — citing doc relies on the cited doc to provide content not stated inline (e.g., "see X for details on Y" with no inline Y). Signal Replace — write a successor at the same path, or **Keep with narrowed scope** if the doc's actual content is broader than its title implies.
 - **Mixed or unclear** — stale-mark.
 
@@ -585,47 +605,42 @@ If all writes succeed, the Recommended section is empty. If no writes succeed (e
 
 ## Phase 5: Commit Changes
 
-After all actions are executed and the report is generated, handle committing the changes. Skip this phase if no files were modified (all Keep, or all writes failed).
+After all actions are executed and the report is generated, close out Git state without widening authority. Skip this phase if no files were modified (all Keep, or all writes failed).
 
 ### Detect git context
 
-Before offering options, check:
+Before any Git action, check:
 1. Which branch is currently checked out (main/master vs feature branch)
 2. Whether the working tree has other uncommitted changes beyond what compound-refresh modified
 3. Recent commit messages to match the repo's commit style
+4. The exact files modified by this run and whether any pre-existing dirty hunks overlap them
 
-### Headless mode
+### Missing commit authorization
 
-Use sensible defaults — no user to ask:
+When `commit_authorization: missing`, do not create/switch a branch, stage, commit, push, or open a PR. Leave verified refresh edits uncommitted and include:
 
-| Context | Default action |
-|---------|---------------|
-| On main/master | Create a branch named for what was refreshed (e.g., `docs/refresh-auth-and-ci-learnings`), commit, attempt to open a PR. If PR creation fails, report the branch name. |
-| On a feature branch | Commit as a separate commit on the current branch |
-| Git operations fail | Include the recommended git commands in the report and continue |
+- `commit_status: not-created`
+- `commit_reason: commit_authorization_missing`
+- the exact uncommitted paths
+- one logical commit candidate message for a later authorized owner
 
-Stage only the files that compound-refresh modified — not other dirty files in the working tree.
+Headless mode never asks for authority and therefore follows this path unless the visible upstream handoff explicitly supplied commit authorization.
 
-### Interactive mode
+### Authorized commit
 
-First, run `git branch --show-current` to determine the current branch. Then present the correct options based on the result. Stage only compound-refresh files regardless of which option the user picks.
+When `commit_authorization: authorized`, stage only compound-refresh-owned verified paths. Never stage unrelated dirty paths. A pre-existing overlapping dirty hunk requires an explicit bounded preservation decision; otherwise leave the refresh uncommitted instead of guessing ownership.
 
-**If the current branch is main, master, or the repo's default branch:**
+On main/master/default branch, commit authorization alone does not authorize branch creation or direct default-branch commit. Require the current user to name the intended branch/default-branch action explicitly; otherwise keep the changes uncommitted.
 
-1. Create a branch, commit, and open a PR (recommended) — the branch name should be specific to what was refreshed, not generic (e.g., `docs/refresh-auth-learnings` not `docs/compound-refresh`)
-2. Commit directly to `{current branch name}`
-3. Don't commit — I'll handle it
+On an existing feature branch, create one isolated commit only after the refresh checks pass. Report the commit SHA and exact paths.
 
-**If the current branch is a feature branch, clean working tree:**
+### Landing authority
 
-1. Commit to `{current branch name}` as a separate commit (recommended)
-2. Create a separate branch and commit
-3. Don't commit
+`commit_authorization` never implies `landing_authorization`. Without landing authorization, stop after the local commit and do not push or open/update a PR. With explicit landing authorization, push only the authorized branch and create/update only the named PR target after the workflow's verification and report gates pass.
 
-**If the current branch is a feature branch, dirty working tree (other uncommitted changes):**
+### Interactive authorization acquisition
 
-1. Commit only the compound-refresh changes to `{current branch name}` (selective staging — other dirty files stay untouched)
-2. Don't commit
+In interactive mode, if the initial request did not authorize commit, offer only a bounded commit decision after presenting the verified diff: `Commit these refresh-owned paths` or `Leave verified changes uncommitted`. A positive answer authorizes the local commit only. Ask a separate question for push/PR only when outward landing is genuinely requested; never bundle commit and landing into one implied choice.
 
 ### Commit message
 
@@ -645,7 +660,7 @@ Use **Consolidate** proactively when the document set has grown organically and 
 
 ## Discoverability Check
 
-After the refresh report is generated, check whether the project's instruction files would lead an agent to discover and search `docs/solutions/` before starting work in a documented area. This runs every time — the knowledge store only compounds value when agents can find it. If this check produces edits, they are committed as part of (or immediately after) the Phase 5 commit flow — see step 5 below.
+After the refresh report is generated, check whether the project's instruction files would lead an agent to discover and search `docs/solutions/` before starting work in a documented area. This runs every time — the knowledge store only compounds value when agents can find it. If this check produces edits, they stay under the same Phase 5 commit and landing authority facts — see step 6 below.
 
 1. Identify which root-level instruction files exist (AGENTS.md, CLAUDE.md, or both). Read the file(s) and determine which holds the substantive content — one file may just be a shim that `@`-includes the other (e.g., `CLAUDE.md` containing only `@AGENTS.md`, or vice versa). The substantive file is the assessment and edit target; ignore shims. If neither file exists, skip this check entirely.
 2. Assess whether an agent reading the instruction files would learn three things:
@@ -685,4 +700,4 @@ After the refresh report is generated, check whether the project's instruction f
 
    **Skip this step entirely if `CONCEPTS.md` does not exist** — never nag for an artifact the project has not adopted. When skipped, this step produces no output and no edit.
 
-6. **Amend or create a follow-up commit when the check produces edits.** If step 4 or step 5 resulted in an edit to an instruction file and Phase 5 already committed the refresh changes, stage the newly edited file and either amend the existing commit (if still on the same branch and no push has occurred) or create a small follow-up commit (e.g., `docs: add docs/solutions/ discoverability to AGENTS.md`, or `docs: add CONCEPTS.md discoverability to AGENTS.md`, or a combined message when both edits landed). If Phase 5 already pushed the branch to a remote (e.g., the branch+PR path), push the follow-up commit as well so the open PR includes the discoverability change. This keeps the working tree clean and the remote in sync at the end of the run. If the user chose "Don't commit" in Phase 5, leave the instruction-file edits unstaged alongside the other uncommitted refresh changes — no separate commit logic needed.
+6. **Keep discoverability edits under the same authority facts.** If step 4 or step 5 edited an instruction file and an authorized local commit already exists, stage only that run-owned file and amend or create a focused follow-up commit. Without commit authorization, leave it unstaged with the other verified refresh changes. Without landing authorization, do not push either commit; an existing remote branch or PR does not widen authority.

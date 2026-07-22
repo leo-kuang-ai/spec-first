@@ -62,6 +62,7 @@ Graphify 上游推荐用 `graphify hook install` 安装提交自动刷新，但�
 .codex/hooks/session-start.cmd
 .codex/hooks.json
 .agents/skills/spec-*/
+.agents/skills/source-command-spec-*/
 .agents/skills/using-spec-first/
 .agents/skills/graphify/
 .cursor/skills/spec-*/

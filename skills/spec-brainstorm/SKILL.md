@@ -14,6 +14,14 @@ The durable output of this workflow is a **requirements-only unified plan**. In 
 
 This skill does not implement code. It explores, clarifies, and documents decisions for later planning or execution.
 
+## Workflow Contract Summary
+
+- **输入：** 尚未收敛的产品想法、问题、目标用户、约束，以及可回源的仓库或外部证据。
+- **输出：** `artifact_readiness: requirements-only` 的统一计划，明确 Product Contract、范围边界、成功标准、未决问题与证据限制。
+- **硬出口：** 关键产品决定未确认、目标仓库或文档 owner 不明确、证据不足以支撑声明，或请求已属于规划、实现、调试、审查时停止并交还 owning route。
+- **权威：** 用户确认产品语义；LLM 负责探索与语义综合；脚本和 provider 只准备 advisory facts。该 workflow 不授权实现、commit 或 landing。
+- **消费者：** `spec-plan`、`spec-doc-review`、产品 owner 与后续需求/规划审查者。
+
 ## Core Principles
 
 1. **Assess scope first** - Match the amount of ceremony to the size and ambiguity of the work.

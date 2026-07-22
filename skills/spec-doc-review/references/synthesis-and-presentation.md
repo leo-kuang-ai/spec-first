@@ -151,7 +151,7 @@ Document review complete.
 
 delivery_mode: headless|interactive
 mutation_policy: markdown-write|report-only
-mutation_reason: markdown-artifact|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable
+mutation_reason: caller-requested-apply-fixes|default-review-report-only|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable
 review_status: complete|incomplete
 task_pack_outcome: not-applicable | {review_result, task_pack_validity, deterministic_handoff, source_plan, reason_code, next_action}
 fixes_applied: N
@@ -221,7 +221,7 @@ Omit any finding bucket with zero items, but keep every scalar envelope field so
   "delivery_mode": "headless|interactive",
   "output_mode": "json",
   "mutation_policy": "markdown-write|report-only",
-  "mutation_reason": "markdown-artifact|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable",
+  "mutation_reason": "caller-requested-apply-fixes|default-review-report-only|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable",
   "review_status": "complete|incomplete",
   "task_pack_outcome": null,
   "fixes_applied": 0,

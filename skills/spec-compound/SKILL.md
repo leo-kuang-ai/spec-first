@@ -14,6 +14,14 @@ Captures problem solutions while context is fresh, creating structured documenta
 
 **Why "compound"?** Each documented solution compounds your team's knowledge. The first time you solve a problem takes research. Document it, and the next occurrence takes minutes. Knowledge compounds.
 
+## Workflow Contract Summary
+
+- **输入：** 一个最近解决且已有可回源验证的单一问题，或该问题带来的 durable project vocabulary。
+- **输出：** `docs/solutions/` 下带 provenance、适用范围与失效条件的 learning，以及必要时对 `CONCEPTS.md` 的局部补充。
+- **硬出口：** 问题尚未解决、验证证据不足、一次请求包含多个独立 learning、目标 repo/source owner 不明确，或 promotion gate 不满足时不得写入 durable knowledge。
+- **权威：** 当前 source/test/log 和已验证 outcome 决定可沉淀事实；LLM 判断复用价值；只有 orchestrator 可写知识资产，dispatch 不授予 mutation。
+- **消费者：** 后续 `spec-plan`、`spec-work`、`spec-debug`、`spec-code-review` 与项目维护者。
+
 ## Usage
 
 ```bash

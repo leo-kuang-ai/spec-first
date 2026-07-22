@@ -51,7 +51,8 @@ function renderWorkspaceRefreshHookBlock({ node, asyncRefreshScript, setupScript
     rebuildArgs.push('--repos', repoIds.join(','));
   }
   const commandArgs = JSON.stringify([setupScript, ...rebuildArgs]);
-  // 单引号包裹 JSON（内部无单引号），避免 shell 变量展开与二次转义。
+  // 所有动态值都编码成一个严格的 POSIX 双引号 shell word；JSON 可合法包含单引号，
+  // 不能假设 `'${...}'` 安全。shellQuote 同时转义双引号、反斜杠、$ 与反引号。
   return [
     BLOCK_START,
     `# ${HOOK_MARKER}`,
@@ -59,7 +60,7 @@ function renderWorkspaceRefreshHookBlock({ node, asyncRefreshScript, setupScript
     `${shellQuote(node)} ${shellQuote(asyncRefreshScript)} --trigger \\`,
     `  --workspace ${shellQuote(workspaceRoot)} \\`,
     `  --command ${shellQuote(node)} \\`,
-    `  --args '${commandArgs}' >/dev/null 2>&1 || true`,
+    `  --args ${shellQuote(commandArgs)} >/dev/null 2>&1 || true`,
     BLOCK_END,
     '',
   ].join('\n');
