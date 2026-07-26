@@ -1013,7 +1013,7 @@ function recoverGraphifyMigration(repoRoot) {
       }
     }
     if (!fs.existsSync(current) && journal.phase === 'backed-up'
-      && fs.existsSync(staged) && inspectGraphIntegrity(staged, false).ok) {
+      && fs.existsSync(staged) && inspectGraphIntegrity(staged, { status: 'absent', reason_code: 'migration-staged-artifact' }).ok) {
       fs.renameSync(staged, current);
     } else if (!fs.existsSync(current) && fs.existsSync(backup)) {
       fs.renameSync(backup, current);
@@ -1039,15 +1039,34 @@ function resolveJournalPath(repoRoot, relativePath) {
   }
 }
 
-function inspectGraphIntegrity(artifactRoot, supportedCodePresent = true) {
+function inspectGraphIntegrity(artifactRoot, supportedCodeFact = { status: 'present', reason_code: null }) {
   const graphPath = path.join(artifactRoot, 'graph.json');
   if (!fs.existsSync(graphPath)) return { ok: false, reason_code: 'graphify-artifact-missing' };
+  const sourceFact = typeof supportedCodeFact === 'boolean'
+    ? { status: supportedCodeFact ? 'present' : 'absent', reason_code: null }
+    : supportedCodeFact;
+  if (!sourceFact || !['present', 'absent'].includes(sourceFact.status)) {
+    return {
+      ok: false,
+      reason_code: sourceFact && sourceFact.reason_code
+        ? sourceFact.reason_code
+        : 'graphify-source-scan-unavailable',
+      source_scan_status: 'unknown',
+    };
+  }
+  const supportedCodePresent = sourceFact.status === 'present';
   try {
     const graph = JSON.parse(fs.readFileSync(graphPath, 'utf8'));
     const nodes = Array.isArray(graph.nodes) ? graph.nodes.length : null;
     if (nodes === null) return { ok: false, reason_code: 'graphify-artifact-contract-mismatch' };
     if (nodes === 0 && supportedCodePresent) return { ok: false, reason_code: 'graphify-extract-integrity-failed' };
-    return { ok: true, node_count: nodes, supported_code_present: supportedCodePresent, empty_corpus: !supportedCodePresent };
+    return {
+      ok: true,
+      node_count: nodes,
+      supported_code_present: supportedCodePresent,
+      source_scan_status: sourceFact.status,
+      empty_corpus: sourceFact.status === 'absent',
+    };
   } catch (_error) {
     return { ok: false, reason_code: 'graphify-artifact-contract-mismatch' };
   }
@@ -1064,16 +1083,30 @@ function hasSupportedCodeFile(workspace) {
     try {
       item = fs.lstatSync(current);
     } catch (_error) {
-      return false;
+      return { status: 'unknown', reason_code: 'graphify-source-scan-unavailable' };
     }
-    if (item.isSymbolicLink()) return false;
+    if (item.isSymbolicLink()) return { status: 'absent', reason_code: null };
     if (item.isDirectory()) {
-      if (['.git', '.graphify', 'graphify-out', 'node_modules', 'vendor', '.spec-first', '.claude', '.codex', '.cursor', '.kiro', '.qoder', '.agents'].includes(path.basename(current))) return false;
-      return fs.readdirSync(current).some((name) => visit(path.join(current, name)));
+      if (['.git', '.graphify', 'graphify-out', 'node_modules', 'vendor', '.spec-first', '.claude', '.codex', '.cursor', '.kiro', '.qoder', '.agents'].includes(path.basename(current))) {
+        return { status: 'absent', reason_code: null };
+      }
+      let names;
+      try {
+        names = fs.readdirSync(current);
+      } catch (_error) {
+        return { status: 'unknown', reason_code: 'graphify-source-scan-unavailable' };
+      }
+      let unknown = null;
+      for (const name of names) {
+        const result = visit(path.join(current, name));
+        if (result.status === 'present') return result;
+        if (result.status === 'unknown') unknown = result;
+      }
+      return unknown || { status: 'absent', reason_code: null };
     } else if (item.isFile() && supported.has(path.extname(current).toLowerCase())) {
-      return true;
+      return { status: 'present', reason_code: null };
     }
-    return false;
+    return { status: 'absent', reason_code: null };
   };
   return visit(workspace);
 }
@@ -1229,10 +1262,8 @@ function probePythonDistributionIdentity(context, repoRoot, launcher, dependency
     inheritEnv: false,
   });
   if (!succeeded(result)) return { ok: false, reason_code: 'graphify-package-identity-unverified', interpreter };
-  let payload;
-  try {
-    payload = JSON.parse(text(result));
-  } catch (_error) {
+  const payload = parseJsonStdout(result);
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return { ok: false, reason_code: 'graphify-package-identity-unverified', interpreter };
   }
   const version = payload.version || '';
@@ -1262,6 +1293,14 @@ function launcherInterpreter(launcher) {
 
 function firstAbsoluteLine(output) {
   return String(output || '').split(/\r?\n/).map((line) => line.trim()).find((line) => path.isAbsolute(line) || path.win32.isAbsolute(line)) || null;
+}
+
+function parseJsonStdout(result) {
+  try {
+    return JSON.parse(String(result && result.stdout ? result.stdout : ''));
+  } catch (_error) {
+    return null;
+  }
 }
 
 function graphifyProcessEnv(context, additions = {}) {
@@ -1301,12 +1340,10 @@ function cleanupNpmGraphifyIncumbent(context, repoRoot) {
     inheritEnv: false,
   });
   if (!succeeded(list)) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-identity-unverified' };
-  let installedVersion;
-  try {
-    installedVersion = JSON.parse(text(list)).dependencies[packageName].version;
-  } catch (_error) {
-    return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-identity-unverified' };
-  }
+  const payload = parseJsonStdout(list);
+  const installedVersion = payload && payload.dependencies && payload.dependencies[packageName]
+    ? payload.dependencies[packageName].version
+    : '';
   if (!installedVersion) return { ok: false, status: 'failed', reason_code: 'graphify-npm-incumbent-identity-unverified' };
   const rootResult = run(context, 'npm', ['root', '-g'], {
     cwd: repoRoot,
@@ -2091,9 +2128,12 @@ module.exports = {
   apply,
   cleanupNpmGraphifyIncumbent,
   graphifyProcessEnv,
+  hasSupportedCodeFile,
+  inspectGraphIntegrity,
   normalizePythonHostIntegration,
   normalizePythonGraphifyHooks,
   plan,
+  parseJsonStdout,
   recoverGraphifyMigration,
   refresh,
   resolveGraphifyHookTarget,

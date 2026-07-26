@@ -9,7 +9,7 @@ const { inspectInstructionBootstrap } = require('../instruction-bootstrap');
 const { formatInitGuidance } = require('../init-guidance');
 const { inspectManagedClaudeHooks } = require('../claude-settings');
 const { detectGlobalCodexHookPollution } = require('../adapters/codex');
-const { resolveWorkflowArtifactDir } = require('../../verification/artifact-paths');
+const { resolveWorkflowArtifactDir, slugifyArtifactPathSegment } = require('../../verification/artifact-paths');
 const { validateAgainstSchema } = require('../../contracts/schema-validator');
 const { computeDecisionInputHealth } = require('../helpers/setup-facts');
 
@@ -145,7 +145,7 @@ function checkGit() {
   };
 }
 
-function checkPlatformCli(platform) {
+function checkPlatformCli(platform, options = {}) {
   const command = platform === 'codex'
     ? 'codex'
     : platform === 'cursor'
@@ -165,7 +165,14 @@ function checkPlatformCli(platform) {
           ? 'Qoder'
           : 'Claude Code';
   // Note: Codex CLI may not be available yet - this is expected during MVP phase
-  const result = spawnSyncWithTimeout(command, ['--version'], { encoding: 'utf8' });
+  const runner = options.runner || spawnSyncWithTimeout;
+  const isWindows = options.platform === 'win32' || (options.platform === undefined && process.platform === 'win32');
+  // Node >=20.12 rejects direct `.cmd` spawning with shell:false. Host CLIs are
+  // fixed bare commands here, so use the Windows command interpreter only for
+  // this version probe rather than weakening the generic process runner.
+  const result = isWindows
+    ? runner(options.comSpec || process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', `${command} --version`], { encoding: 'utf8' })
+    : runner(command, ['--version'], { encoding: 'utf8' });
   if (result.status === 0) {
     return {
       level: 'PASS',
@@ -1172,7 +1179,7 @@ function formatDriftSummary(entries, key) {
 }
 
 function readWorkflowVerificationEvidence(projectRoot) {
-  const slug = path.basename(path.resolve(projectRoot)) || 'default';
+  const slug = slugifyArtifactPathSegment(path.basename(path.resolve(projectRoot)), 'workspace');
   const artifactDir = resolveWorkflowArtifactDir(projectRoot, 'verification', slug);
   const evidenceFilePath = path.join(artifactDir, 'verification-evidence.json');
   const relativePath = path.relative(projectRoot, evidenceFilePath).replace(/\\/g, '/');
@@ -1694,4 +1701,6 @@ module.exports = {
   buildWorkspaceReadinessView,
   buildDoctorCommonChecks,
   buildDoctorReport,
+  checkPlatformCli,
+  readWorkflowVerificationEvidence,
 };

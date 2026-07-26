@@ -80,6 +80,14 @@ describe('spec-work structured shipping and shared verification contracts', () =
     expect(workSkill).toMatch(/Never reuse the earlier run summary or fingerprint/is);
   });
 
+  test('defines fingerprint helper-failure and non-behavior semantics for the producer', () => {
+    expect(workSkill).toContain('fingerprint-helper-unavailable');
+    expect(workSkill).toMatch(/non-behavior returns still include it/i);
+    expect(workSkill).toMatch(/never fabricate the object or omit it silently/i);
+    expect(shipping).toContain('fingerprint-helper-unavailable');
+    expect(shipping).toMatch(/scripts\/working-tree-fingerprint\.cjs/);
+  });
+
   test('spec-debug records real reproducer and regression evidence without writing work artifacts', () => {
     expect(debug).toContain('verification-run-summary record');
     expect(debug).toContain('--workflow spec-debug');

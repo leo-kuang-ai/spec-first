@@ -91,7 +91,7 @@ def read_json(path: Path, default: Any) -> Any:
         return default
     try:
         return json.loads(path.read_text())
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         return default
 
 
@@ -201,7 +201,10 @@ def ffprobe_duration(path: Path) -> float:
         "default=noprint_wrappers=1:nokey=1",
         str(path),
     ]
-    result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+    except subprocess.TimeoutExpired:
+        return 0.0
     if result.returncode != 0:
         return 0.0
     try:
@@ -225,15 +228,15 @@ def has_video_stream(path: Path) -> bool:
         "csv=p=0",
         str(path),
     ]
-    result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+    except subprocess.TimeoutExpired:
+        return False
     return result.returncode == 0 and "video" in result.stdout
 
 
 def read_notes(path: Path) -> dict[str, Any]:
-    try:
-        text = path.read_text()
-    except UnicodeDecodeError:
-        text = path.read_text(encoding="utf-8", errors="replace")
+    text = path.read_text(encoding="utf-8", errors="replace")
     return {"status": "ok", "text": text.strip(), "source": "meeting_notes"}
 
 
@@ -243,13 +246,21 @@ def prepare_source(source_path: Path, raw_dir: Path) -> dict[str, Any]:
 
     if source_kind == "riffrec_zip":
         safe_extract(source_path, raw_dir)
-        session = read_json(raw_dir / "session.json", {})
+        session_payload = read_json(raw_dir / "session.json", {})
+        session = session_payload if isinstance(session_payload, dict) else {}
         events_payload = read_json(raw_dir / "events.json", {})
-        events = events_payload.get("events", events_payload if isinstance(events_payload, list) else [])
+        if isinstance(events_payload, list):
+            events = events_payload
+        elif isinstance(events_payload, dict):
+            events = events_payload.get("events", [])
+        else:
+            events = []
         if not isinstance(events, list):
             events = []
         try:
-            duration = float(session.get("duration_seconds") or events_payload.get("duration_seconds") or 0)
+            duration = float(session.get("duration_seconds") or (
+                events_payload.get("duration_seconds") if isinstance(events_payload, dict) else 0
+            ) or 0)
         except (TypeError, ValueError):
             duration = 0.0
         return {
@@ -409,6 +420,9 @@ def transcribe_media(media_path: Path | None, model: str) -> dict[str, Any]:
     except json.JSONDecodeError:
         return {"status": "failed", "text": "", "reason": compact_text(result.stdout, 500)}
 
+    if not isinstance(payload, dict):
+        return {"status": "failed", "text": "", "reason": "transcription response must be a JSON object"}
+
     if "error" in payload:
         return {"status": "failed", "text": "", "reason": compact_text(json.dumps(payload["error"]), 500)}
 
@@ -434,6 +448,13 @@ def transcribe_media_chunks(
         return {"status": "missing", "text": ""}
     if not shutil.which("ffmpeg"):
         return {"status": "failed", "text": "", "reason": "ffmpeg is not installed; cannot chunk media"}
+    if not duration or duration <= 0:
+        return {
+            "status": "failed",
+            "text": "",
+            "reason": "media duration is unavailable; refusing partial chunk transcription",
+            "degraded": True,
+        }
 
     chunks_dir.mkdir(parents=True, exist_ok=True)
     chunk_count = max(1, int((duration or chunk_seconds) // chunk_seconds) + (1 if duration % chunk_seconds else 0))
@@ -463,7 +484,16 @@ def transcribe_media_chunks(
             "64k",
             str(chunk_path),
         ]
-        extract = subprocess.run(extract_command, capture_output=True, text=True, timeout=180)
+        try:
+            extract = subprocess.run(extract_command, capture_output=True, text=True, timeout=180)
+        except subprocess.TimeoutExpired:
+            chunk_results.append({
+                "chunk": index + 1,
+                "start_seconds": start,
+                "status": "failed",
+                "reason": "ffmpeg chunk extraction timed out",
+            })
+            continue
         if extract.returncode != 0 or not chunk_path.exists():
             chunk_results.append(
                 {
@@ -604,7 +634,12 @@ def extract_frames(recording_path: Path | None, frames_dir: Path, moments: list[
             "2",
             str(frame_path),
         ]
-        result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        except subprocess.TimeoutExpired:
+            moment["screenshot"] = None
+            moment["screenshot_status"] = "ffmpeg frame extraction timed out"
+            continue
         if result.returncode == 0 and frame_path.exists():
             moment["screenshot"] = str(frame_path)
             moment["screenshot_status"] = "ok"

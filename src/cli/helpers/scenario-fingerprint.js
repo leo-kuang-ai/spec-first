@@ -6,14 +6,18 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const { unquoteGitPath } = require('./git-diff-signals');
+
 const SETUP_SCHEMA_VERSION = 'developer-scenario-fingerprint-setup.v1';
 const BOOTSTRAP_SCHEMA_VERSION = 'developer-scenario-fingerprint.v1';
 const PROVISIONAL_SCENARIO_CLASSES = [
   'clean-single-repo',
   'dirty-single-repo',
+  'git-status-unknown-single-repo',
   'first-time-git-repo',
   'multi-repo-workspace',
   'multi-repo-dirty-workspace',
+  'multi-repo-unknown-workspace',
   'foreign-residual-workspace',
   'non-git-folder',
   'non-git-build-workspace',
@@ -118,8 +122,11 @@ function computeSetupLayer(input = {}) {
     : [];
   const gitDirty = targetKind === 'git-repo'
     ? getGitDirtyFacts(targetRoot)
-    : { dirty: false, paths: [], status_hash: null, head: null };
+    : nonGitDirtyFacts();
   const childDirtyCount = childRepos.filter(repo => repo.git && repo.git.current_worktree_dirty === true).length;
+  const childUnknownDirtyCount = childRepos.filter(
+    repo => repo.git && repo.git.current_worktree_dirty_state === 'unknown',
+  ).length;
   const parentRepoLocalArtifactsPresent = topologyMode !== 'git-repo' && hasParentRepoLocalArtifacts(workspaceRoot);
   const foreignResidualIndicators = collectForeignResidualIndicators(workspaceRoot);
   const buildTargets = scanBuildManifests(workspaceRoot, {
@@ -135,6 +142,12 @@ function computeSetupLayer(input = {}) {
   const firstTimeGitRepo = targetKind === 'git-repo' && !hasPriorSpecFirstArtifacts(targetRoot);
   const multiRepoWorkspace = topologyMode === 'multi-repo-workspace' || childRepos.length > 0;
   const worktreeDirtySourceAffecting = multiRepoWorkspace ? childDirtyCount > 0 : gitDirty.dirty;
+  const worktreeDirtyStateUnknown = multiRepoWorkspace
+    ? childUnknownDirtyCount > 0
+    : gitDirty.dirty_unknown;
+  const worktreeReasonCode = worktreeDirtyStateUnknown && multiRepoWorkspace
+    ? 'child-git-status-unavailable'
+    : gitDirty.reason_code;
   const complexityDimensions = {
     multi_repo_workspace: multiRepoWorkspace,
     non_git_folder_target: targetKind === 'non-git-folder',
@@ -142,6 +155,7 @@ function computeSetupLayer(input = {}) {
     git_alignment_broken: Boolean(coverageGap && Number(coverageGap.uncovered_count || coverageGap.uncovered_build_modules || 0) > 0),
     parent_repo_local_artifacts_present: parentRepoLocalArtifactsPresent,
     worktree_dirty_source_affecting: worktreeDirtySourceAffecting,
+    worktree_dirty_state_unknown: worktreeDirtyStateUnknown,
   };
   const stateClass = classifyState({
     targetKind,
@@ -149,6 +163,7 @@ function computeSetupLayer(input = {}) {
     firstTimeGitRepo,
     nonGitBuildTargetsPresent,
     worktreeDirtySourceAffecting,
+    worktreeDirtyStateUnknown,
     foreignResidualIndicators,
   });
 
@@ -175,12 +190,21 @@ function computeSetupLayer(input = {}) {
         git_root: repo.git_root,
         head: repo.git && repo.git.head ? repo.git.head : null,
         dirty: Boolean(repo.git && repo.git.current_worktree_dirty),
+        dirty_state: repo.git && repo.git.current_worktree_dirty_state
+          ? repo.git.current_worktree_dirty_state
+          : 'unknown',
       })),
       non_git_build_targets_present: nonGitBuildTargetsPresent,
       build_manifest_sample: buildTargets.sample,
     },
     worktree: {
       dirty: worktreeDirtySourceAffecting,
+      dirty_state: resolveWorkspaceDirtyState({
+        gitDirty,
+        dirty: worktreeDirtySourceAffecting,
+        unknown: worktreeDirtyStateUnknown,
+      }),
+      reason_code: worktreeReasonCode,
       dirty_paths_sample: gitDirty.paths.slice(0, 30).map(pathValue => ({
         path: toPosixPath(pathValue),
         source_affecting: isSourceAffectingPath(pathValue),
@@ -188,6 +212,7 @@ function computeSetupLayer(input = {}) {
       status_hash: gitDirty.status_hash,
       head: gitDirty.head,
       dirty_child_count: childDirtyCount,
+      dirty_unknown_child_count: childUnknownDirtyCount,
     },
     complexity_dimensions: complexityDimensions,
     foreign_residual_indicators: foreignResidualIndicators,
@@ -201,6 +226,7 @@ function computeSetupLayer(input = {}) {
       firstTimeGitRepo,
       buildTargets,
       foreignResidualIndicators,
+      gitDirty,
     }),
     generated_from: {
       readiness_ledger: input.ledgerPath ? toPosixPath(path.resolve(input.ledgerPath)) : null,
@@ -233,7 +259,7 @@ function computeBootstrapLayer(input = {}) {
   const targetRoot = path.resolve(setup.target_root || workspaceRoot);
   const gitDirty = isGitRepo(targetRoot)
     ? getGitDirtyFacts(targetRoot)
-    : { dirty: false, paths: [], status_hash: null, head: null };
+    : nonGitDirtyFacts();
   const setupWorktree = setup.worktree && typeof setup.worktree === 'object' ? setup.worktree : {};
   const setupDimensions = setup.complexity_dimensions && typeof setup.complexity_dimensions === 'object'
     ? setup.complexity_dimensions
@@ -249,9 +275,16 @@ function computeBootstrapLayer(input = {}) {
   const worktreeDirtySourceAffecting = Boolean(
     gitDirty.dirty || setupDimensions.worktree_dirty_source_affecting,
   );
+  const worktreeDirtyStateUnknown = Boolean(
+    gitDirty.dirty_unknown || setupDimensions.worktree_dirty_state_unknown,
+  );
+  const worktreeReasonCode = worktreeDirtyStateUnknown
+    ? (gitDirty.reason_code || setupWorktree.reason_code || 'git-status-unavailable')
+    : gitDirty.reason_code;
   const mergedDimensions = {
     ...setupDimensions,
     worktree_dirty_source_affecting: worktreeDirtySourceAffecting,
+    worktree_dirty_state_unknown: worktreeDirtyStateUnknown,
   };
   const setupTopology = setup.topology && typeof setup.topology === 'object' ? setup.topology : {};
   const foreignResidualIndicators = Array.isArray(setup.foreign_residual_indicators)
@@ -264,6 +297,7 @@ function computeBootstrapLayer(input = {}) {
     firstTimeGitRepo: setup.state_class === 'first-time-git-repo',
     nonGitBuildTargetsPresent: Boolean(mergedDimensions.non_git_build_targets_present),
     worktreeDirtySourceAffecting,
+    worktreeDirtyStateUnknown,
     foreignResidualIndicators,
   });
   const generatedAt = new Date().toISOString();
@@ -282,6 +316,12 @@ function computeBootstrapLayer(input = {}) {
     worktree: {
       ...setupWorktree,
       dirty: worktreeDirtySourceAffecting,
+      dirty_state: resolveWorkspaceDirtyState({
+        gitDirty,
+        dirty: worktreeDirtySourceAffecting,
+        unknown: worktreeDirtyStateUnknown,
+      }),
+      reason_code: worktreeReasonCode,
       dirty_paths_sample: gitDirty.paths.slice(0, 30).map(pathValue => ({
         path: toPosixPath(pathValue),
         source_affecting: isSourceAffectingPath(pathValue),
@@ -314,6 +354,9 @@ function computeBootstrapLayer(input = {}) {
     ])),
     limitations: Array.from(new Set([
       ...((setup.limitations && Array.isArray(setup.limitations)) ? setup.limitations : []),
+      ...(gitDirty.dirty_unknown
+        ? ['worktree dirty state is unknown: git status --porcelain did not succeed']
+        : []),
       'scenario fingerprint uses bounded direct source and git status evidence only',
     ])),
   };
@@ -322,7 +365,11 @@ function computeBootstrapLayer(input = {}) {
 function classifyState(facts) {
   if (facts.foreignResidualIndicators.length > 0) return 'foreign-residual-workspace';
   if (facts.targetKind === 'non-git-folder') return facts.nonGitBuildTargetsPresent ? 'non-git-build-workspace' : 'non-git-folder';
-  if (facts.multiRepoWorkspace) return facts.worktreeDirtySourceAffecting ? 'multi-repo-dirty-workspace' : 'multi-repo-workspace';
+  if (facts.multiRepoWorkspace) {
+    if (facts.worktreeDirtyStateUnknown) return 'multi-repo-unknown-workspace';
+    return facts.worktreeDirtySourceAffecting ? 'multi-repo-dirty-workspace' : 'multi-repo-workspace';
+  }
+  if (facts.worktreeDirtyStateUnknown) return 'git-status-unknown-single-repo';
   if (facts.firstTimeGitRepo) return 'first-time-git-repo';
   if (facts.worktreeDirtySourceAffecting) return 'dirty-single-repo';
   return 'clean-single-repo';
@@ -339,6 +386,8 @@ function normalizeCandidates(candidates, workspaceRoot) {
       ? getGitDirtyFacts(absoluteRoot)
       : {
         dirty: Boolean(candidate.current_worktree_dirty),
+        dirty_unknown: true,
+        reason_code: 'candidate-git-facts-unverified',
         paths: [],
         status_hash: candidate.current_worktree_status_hash || null,
         head: candidate.source_revision || null,
@@ -350,6 +399,7 @@ function normalizeCandidates(candidates, workspaceRoot) {
       git: {
         head: gitFacts.head,
         current_worktree_dirty: Boolean(gitFacts.dirty),
+        current_worktree_dirty_state: resolveDirtyState(gitFacts, Boolean(gitFacts.dirty)),
         current_worktree_status_hash: gitFacts.status_hash,
       },
     };
@@ -363,14 +413,41 @@ function getGitDirtyFacts(repoRoot) {
       .map(line => line.slice(3).trim())
       .filter(Boolean)
       .map(line => line.includes(' -> ') ? line.split(' -> ').pop() : line)
+      .map(unquoteGitPath)
     : [];
   const head = spawnGit(repoRoot, ['rev-parse', 'HEAD']);
   return {
     dirty: paths.some(isSourceAffectingPath),
+    // A failed `git status` is an unknown worktree state, not a confirmed clean one.
+    dirty_unknown: !status.ok,
+    reason_code: status.ok ? null : 'git-status-unavailable',
     paths,
     status_hash: status.ok ? `sha256:${sha256(status.stdout)}` : null,
     head: head.ok ? head.stdout.trim() : null,
   };
+}
+
+function nonGitDirtyFacts() {
+  return {
+    dirty: false,
+    dirty_unknown: false,
+    reason_code: 'not-a-git-repo',
+    paths: [],
+    status_hash: null,
+    head: null,
+  };
+}
+
+function resolveDirtyState(gitDirty, dirtyFlag) {
+  if (gitDirty.reason_code === 'not-a-git-repo') return 'not-applicable';
+  if (dirtyFlag) return 'confirmed-dirty';
+  return gitDirty.dirty_unknown ? 'unknown' : 'confirmed-clean';
+}
+
+function resolveWorkspaceDirtyState({ gitDirty, dirty, unknown }) {
+  if (dirty) return 'confirmed-dirty';
+  if (unknown) return 'unknown';
+  return resolveDirtyState(gitDirty, false);
 }
 
 function spawnGit(repoRoot, args) {
@@ -526,8 +603,11 @@ function buildTags(stateClass, dimensions) {
   ];
 }
 
-function buildLimitations({ targetKind, firstTimeGitRepo, buildTargets, foreignResidualIndicators }) {
+function buildLimitations({ targetKind, firstTimeGitRepo, buildTargets, foreignResidualIndicators, gitDirty }) {
   const limitations = [];
+  if (gitDirty && gitDirty.dirty_unknown) {
+    limitations.push('worktree dirty state is unknown: git status --porcelain did not succeed');
+  }
   if (targetKind === 'non-git-folder') {
     limitations.push('non-git folder facts are setup-time orientation only');
   }

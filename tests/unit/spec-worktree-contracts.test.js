@@ -66,6 +66,36 @@ describe('spec-worktree existing-ref isolation contracts', () => {
     expect(second).toContain(worktreePath);
   });
 
+  test.each([['..'], ['../escaped'], ['.'], ['a/b']])(
+    'rejects the traversal-unsafe worktree slug %s instead of building a path from it',
+    (slug) => {
+      const dir = initRepo();
+      const escapeProbe = path.join(path.dirname(dir), 'escaped');
+
+      let failure;
+      try {
+        run('bash', [scriptPath, 'isolate', 'feature/login', slug], { cwd: dir });
+      } catch (error) {
+        failure = error;
+      }
+
+      expect(failure).toBeDefined();
+      expect(String(failure.stderr)).toContain('unsafe worktree slug');
+      expect(fs.existsSync(escapeProbe)).toBe(false);
+      // Rejection happens before any path is built, so no worktree root is created at all.
+      expect(fs.existsSync(path.join(dir, '.worktrees'))).toBe(false);
+    },
+  );
+
+  test('accepts a safe caller-supplied worktree slug', () => {
+    const dir = initRepo();
+
+    const output = run('bash', [scriptPath, 'isolate', 'feature/login', 'my-slug.v2'], { cwd: dir });
+
+    expect(output).toContain('Worktree ready:');
+    expect(fs.existsSync(path.join(dir, '.worktrees', 'my-slug.v2'))).toBe(true);
+  });
+
   test('detect compares git directories through one canonical path resolver', () => {
     const dir = initRepo();
     const bashEnv = path.join(dir, 'bash-env');

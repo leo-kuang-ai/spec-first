@@ -15,7 +15,9 @@ function removeManagedCodingGuidelinesBlock(existing) {
     return normalizeRemovalResult(stripStandaloneMarkerLines(existing));
   }
 
-  return normalizeRemovalResult(existing);
+  // Nothing was removed, so there is no seam to normalize. Reformatting here would rewrite
+  // unrelated user prose in CLAUDE.md / AGENTS.md on every init and clean.
+  return existing;
 }
 
 function stripStandaloneMarkerLines(content) {

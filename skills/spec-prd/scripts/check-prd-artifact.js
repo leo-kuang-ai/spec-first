@@ -1474,7 +1474,7 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
       line: structure.frontmatter.startLine,
     });
   }
-  if (/^\/docs\/prds\//.test(structure.normalizedTarget) || structure.normalizedTarget.includes('/docs/prds/')) {
+  if (/(?:^|\/)docs\/prds\//.test(structure.normalizedTarget)) {
     findings.push({ reason_code: 'forbidden_prds_path', path: structure.normalizedTarget });
   }
   structure.missingCoreSections.forEach((section) => {

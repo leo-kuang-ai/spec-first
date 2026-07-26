@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { validateFixture } = require('../../skills/spec-prd/evals/run-evals');
-const { parseStructure } = require('../../skills/spec-prd/scripts/check-prd-artifact');
+const { buildReport, parseStructure } = require('../../skills/spec-prd/scripts/check-prd-artifact');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const fixturePath = path.join(repoRoot, 'skills/spec-prd/evals/examples.json');
@@ -70,6 +70,17 @@ describe('spec-prd eval fixture contract', () => {
 });
 
 describe('spec-prd requirement acceptance trace contract', () => {
+  test.each(['docs/prds/forbidden.md', '/workspace/docs/prds/forbidden.md'])(
+    'blocks the forbidden PRD output root for %s',
+    (target) => {
+      const report = buildReport(target, requirementTraceFixture([]));
+
+      expect(report.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'forbidden_prds_path', path: target }),
+      ]));
+    },
+  );
+
   test.each([
     [
       '游离说明文字',

@@ -425,7 +425,7 @@ Validation:
 诊断中出现：
 
 - `gitnexus`
-- `hstong`
+- `examplecorp`
 - `writeback`
 - `leokuang`
 
@@ -446,7 +446,7 @@ Validation:
   "words": [
     "gitnexus",
     "GitNexus",
-    "hstong",
+    "examplecorp",
     "leokuang",
     "writeback",
     "codebase",
@@ -748,7 +748,7 @@ cSpell 应配 allowlist，否则会把真实标识符当作噪音。
 
 - 优先级：P1
 - 修改区域：`.cspell.json` 或 spec-first 局部词典
-- 建议词：`gitnexus`、`GitNexus`、`hstong`、`leokuang`、`writeback`
+- 建议词：`gitnexus`、`GitNexus`、`examplecorp`、`leokuang`、`writeback`
 - 验收：不再对真实标识符报错，evidence path 不被修改
 
 ### TASK-009：generated markdown lint 集成

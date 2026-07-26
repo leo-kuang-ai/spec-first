@@ -215,7 +215,7 @@ function writeSpecWorkRunArtifact({ inputPath, runId, targetRepo }) {
   }
 
   const workspaceSlug = slugify(path.basename(targetRepoRoot));
-  const artifactPath = path.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
+  const artifactPath = path.posix.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
   const absoluteArtifactPath = path.join(targetRepoRoot, artifactPath);
   const containment = validateOutputContainment(targetRepoRoot, absoluteArtifactPath);
   if (containment.errors.length > 0) {
@@ -541,7 +541,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
     const workspaceDir = path.join(workflowRootState.path, workspaceSlug);
     if (!isSafeRunDirectory(targetRepoRoot, workspaceDir)) {
       retained.push({
-        artifact_path: path.relative(targetRepoRoot, workspaceDir),
+        artifact_path: toPosixRef(path.relative(targetRepoRoot, workspaceDir)),
         reason_code: 'artifact-path-escape',
       });
       continue;
@@ -549,7 +549,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
     const runEntries = safeReaddir(workspaceDir);
     if (!runEntries.ok) {
       retained.push({
-        artifact_path: path.relative(targetRepoRoot, workspaceDir),
+        artifact_path: toPosixRef(path.relative(targetRepoRoot, workspaceDir)),
         reason_code: 'artifact-unreadable',
       });
       continue;
@@ -558,7 +558,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
       const runDir = path.join(workspaceDir, runId);
       if (!isSafeRunDirectory(targetRepoRoot, runDir)) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, runDir),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, runDir)),
           reason_code: 'artifact-path-escape',
         });
         continue;
@@ -568,7 +568,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
       const safeArtifact = resolveSafeArtifactFile(
         targetRepoRoot,
         artifactPath,
-        path.relative(targetRepoRoot, artifactPath),
+        toPosixRef(path.relative(targetRepoRoot, artifactPath)),
       );
       if (!safeArtifact.ok) {
         retained.push({
@@ -583,7 +583,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
         artifact = JSON.parse(fs.readFileSync(safeArtifact.path, 'utf8'));
       } catch (error) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, artifactPath),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
           reason_code: 'artifact-unreadable',
         });
         continue;
@@ -591,7 +591,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
       const artifactValidation = validateArtifact(artifact);
       if (artifactValidation.errors.length > 0) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, artifactPath),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
           reason_code: 'artifact-schema-invalid',
         });
         continue;
@@ -606,7 +606,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
 
       if (effectiveExpiry > now) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, artifactPath),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
           reason_code: 'retention-active',
         });
         continue;
@@ -617,14 +617,14 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
           fs.rmSync(runDir, { recursive: true, force: true });
         } catch (error) {
           retained.push({
-            artifact_path: path.relative(targetRepoRoot, artifactPath),
+            artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
             reason_code: 'artifact-remove-failed',
           });
           continue;
         }
       }
       removed.push({
-        artifact_path: path.relative(targetRepoRoot, artifactPath),
+        artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
         reason_code: 'expired',
       });
     }
@@ -654,7 +654,7 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
     return {
       ok: false,
       reason_code: workflowRoot.reason_code,
-      relativePath: path.relative(targetRepoRoot, workflowRoot.path || targetRepoRoot),
+      relativePath: toPosixRef(path.relative(targetRepoRoot, workflowRoot.path || targetRepoRoot)),
       errors: workflowRoot.errors,
     };
   }
@@ -664,7 +664,7 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
   const baseRoot = workflowRoot.path;
 
   if (workspaceSlug && runId) {
-    const relativePath = path.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
+    const relativePath = path.posix.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
     const absolutePath = path.join(targetRepoRoot, relativePath);
     const containment = validateOutputContainment(targetRepoRoot, absolutePath);
     if (containment.errors.length > 0) {
@@ -688,7 +688,7 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
       if (!isSafeRunDirectory(targetRepoRoot, runDir)) continue;
       const artifactPath = path.join(runDir, 'run.json');
       if (!fs.existsSync(artifactPath)) continue;
-      const relativePath = path.relative(targetRepoRoot, artifactPath);
+      const relativePath = toPosixRef(path.relative(targetRepoRoot, artifactPath));
       const safeArtifact = resolveSafeArtifactFile(targetRepoRoot, artifactPath, relativePath);
       if (!safeArtifact.ok) {
         if (safeArtifact.reason_code === 'artifact-path-escape') return safeArtifact;
@@ -968,7 +968,7 @@ function validateValidation(validation, errors) {
 function validateRunSummaryReference({ payload, targetRepo, workspaceSlug, runId }) {
   const validation = payload.script_confirmed && payload.script_confirmed.validation;
   const runSummaryRef = validation && validation.run_summary_ref;
-  const expectedRef = path.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'verification-run-summary.json');
+  const expectedRef = path.posix.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'verification-run-summary.json');
   if (runSummaryRef !== expectedRef) {
     return {
       reasonCode: 'validation-run-summary-ref-mismatch',
@@ -1231,6 +1231,13 @@ function slugify(value) {
 
 function isSafeId(value) {
   return SAFE_ID_PATTERN.test(value || '');
+}
+
+// repo-relative ref 是跨平台契约标识符,不是本地文件系统路径:schema pattern、
+// validateRepoRelativeField 与下游 consumer 都只接受 POSIX 正斜杠。真实文件 IO 仍用
+// path.join / path.relative 的原生分隔符,只有对外输出的 ref 经过这里归一化。
+function toPosixRef(value) {
+  return String(value || '').split(path.sep).join('/');
 }
 
 function isSafeRunDirectory(targetRepoRoot, absoluteDirPath) {

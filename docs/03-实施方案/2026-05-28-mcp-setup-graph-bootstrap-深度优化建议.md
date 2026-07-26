@@ -193,7 +193,7 @@ GitNexus 本身能不能索引非 git 目录?根据 1.6.6 的 `analyze` 行为�
   "dirty_paths_breakdown": {"graph_affecting_count": 2, "setup_owned_count": 1},
   "dirty_paths_sample": [
     {"path": "app-kaz/src/main/java/.../HomeFragment.kt", "build_module": "app-kaz", "graph_affecting": true},
-    {"path": "common/src/main/java/com/hstong/router/Router.java", "build_module": "common", "graph_affecting": true}
+    {"path": "common/src/main/java/com/example/router/Router.java", "build_module": "common", "graph_affecting": true}
   ]
 }
 ```

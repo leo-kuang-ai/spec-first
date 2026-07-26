@@ -1,7 +1,9 @@
 'use strict';
 
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const {
   INTEGRATION_TEST_PATHS,
   MCP_SETUP_TEST_PATHS,
@@ -50,6 +52,39 @@ describe('run-test-suite active inventory', () => {
 
     expect([...INTEGRATION_TEST_PATHS]).toEqual(expectedPaths);
     expect(() => assertTestPathsExist(INTEGRATION_TEST_PATHS)).not.toThrow();
+  });
+
+  test('integration discovery stays load-safe outside the source repo', () => {
+    const source = fs.readFileSync(path.join(repoRoot, 'scripts', 'run-test-suite.cjs'), 'utf8');
+    expect(source).toContain('if (!fs.existsSync(integrationDir))');
+    expect(source).toContain('tests/integration is unavailable in this installation');
+  });
+
+  test('release pack uses the Node npm CLI resolver instead of a Windows .cmd shim', () => {
+    const source = fs.readFileSync(path.join(repoRoot, 'scripts', 'run-test-suite.cjs'), 'utf8');
+    expect(source).toContain("runNpmChecked(['pack', '--dry-run'], { stdio: 'inherit' })");
+    expect(source).not.toContain("process.platform === 'win32' ? 'npm.cmd'");
+  });
+
+  test('loads from a packaged-style root that has no tests directory', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-packaged-runner-'));
+    try {
+      const scriptDir = path.join(root, 'scripts');
+      fs.mkdirSync(scriptDir, { recursive: true });
+      const installedScript = path.join(scriptDir, 'run-test-suite.cjs');
+      fs.copyFileSync(path.join(repoRoot, 'scripts', 'run-test-suite.cjs'), installedScript);
+
+      const result = spawnSync(process.execPath, ['-e', 'require(process.argv[1])', installedScript], {
+        cwd: root,
+        encoding: 'utf8',
+      });
+
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   });
 
   test('runs the dedicated mcp-setup suite in Windows CI before the full test chain', () => {

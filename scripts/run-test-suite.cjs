@@ -39,12 +39,20 @@ const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/mcp-setup-workspace-target.test.js',
   'tests/unit/plugin-modules.test.js',
 ]);
-const INTEGRATION_TEST_PATHS = Object.freeze(
-  fs.readdirSync(path.join(repoRoot, 'tests', 'integration'), { withFileTypes: true })
+function discoverIntegrationTestPaths() {
+  const integrationDir = path.join(repoRoot, 'tests', 'integration');
+  // tests/ is not shipped in the npm package; requiring this module from an
+  // installed copy must not throw at load time.
+  if (!fs.existsSync(integrationDir)) {
+    return [];
+  }
+  return fs.readdirSync(integrationDir, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.test.js'))
     .map((entry) => `tests/integration/${entry.name}`)
-    .sort((left, right) => left.localeCompare(right)),
-);
+    .sort((left, right) => left.localeCompare(right));
+}
+
+const INTEGRATION_TEST_PATHS = Object.freeze(discoverIntegrationTestPaths());
 
 function resolveTestCommandTimeoutMs(env = process.env) {
   const raw = env.SPEC_FIRST_TEST_COMMAND_TIMEOUT_MS;
@@ -121,6 +129,10 @@ function runSmoke() {
 }
 
 function runIntegration() {
+  if (INTEGRATION_TEST_PATHS.length === 0) {
+    console.error('run-test-suite: tests/integration is unavailable in this installation; integration suite cannot run.');
+    process.exit(1);
+  }
   runJestFiles(INTEGRATION_TEST_PATHS, ['--runInBand']);
 }
 
@@ -130,7 +142,9 @@ function runReleaseGovernance() {
 
 function runRelease() {
   runReleaseGovernance();
-  run(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['pack', '--dry-run']);
+  // 延迟加载使发布包中仅保留 runner 时仍能作为可导入模块检查。
+  const { runNpmChecked } = require('./lib/npm-cli.cjs');
+  runNpmChecked(['pack', '--dry-run'], { stdio: 'inherit' });
 }
 
 function runAll() {

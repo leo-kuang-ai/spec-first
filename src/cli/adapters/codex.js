@@ -208,9 +208,6 @@ class CodexAdapter extends PlatformAdapter {
   removeRuntimeFiles(projectRoot) {
     removeManagedDirectory(path.join(projectRoot, this.commandRoot), projectRoot);
     removeManagedDirectory(path.join(projectRoot, this.legacyCommandRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyMarketplaceRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyPluginRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyPluginRootAlt), projectRoot);
     removeLegacyCodexSpecFirstSkills(projectRoot, this);
     removeManagedFile(path.join(projectRoot, SESSION_START_RELATIVE_PATH), projectRoot);
     removeManagedFile(path.join(projectRoot, SESSION_START_CMD_RELATIVE_PATH), projectRoot);
@@ -544,7 +541,10 @@ function renderHooksJsonRemoval(projectRoot) {
   }
 
   const cleaned = removeManagedHooksJsonEntries(existing.value, projectRoot);
-  return hasAnyHookEntries(cleaned)
+  // Removing the file once no managed hook entries remain would also discard unrelated top-level
+  // keys the user keeps in .codex/hooks.json. Keep it whenever anything user-owned survives.
+  const hasUserTopLevelKeys = Object.keys(cleaned).some((key) => key !== 'hooks');
+  return hasAnyHookEntries(cleaned) || hasUserTopLevelKeys
     ? { existsAfter: true, contents: `${JSON.stringify(cleaned, null, 2)}\n` }
     : { existsAfter: false, contents: '' };
 }
@@ -595,14 +595,14 @@ function removeLegacyCodexSpecFirstSkills(projectRoot, adapter) {
   }
 }
 
+// Only spec-first's own namespace is removable here. A legacy Codex layout also installed
+// unprefixed copies (`plan`, `work`, `debug`, ...), but those names are indistinguishable from a
+// user's own skills, so they are left in place rather than deleted by name.
 function legacyCodexSpecFirstSkillNames() {
   const names = new Set();
   for (const skillName of listBundledSkills()) {
     if (skillName === 'graphify') continue;
     names.add(skillName);
-    if (skillName.startsWith('spec-')) {
-      names.add(skillName.replace(/^spec-/, ''));
-    }
   }
   return [...names].filter((name) => name !== 'graphify').sort();
 }
@@ -627,17 +627,20 @@ function buildRuntimeCleanupOperations(adapter) {
   const operations = [
     adapter.commandRoot,
     adapter.legacyCommandRoot,
-    adapter.legacyMarketplaceRoot,
-    adapter.legacyPluginRoot,
-    adapter.legacyPluginRootAlt,
   ].map((relativePath) => ({
     kind: 'remove_dir',
     path: relativePath,
     reason: 'managed_runtime_cleanup',
   }));
+
   operations.push(...buildLegacyCodexSpecFirstSkillCleanupOperations(adapter));
   return operations;
 }
+
+// `.agents/plugins` and `plugins/spec*` were historical compatibility locations, but no emitted
+// marker or state file distinguishes a former spec-first install from a user's plugin with a
+// coincidentally similar name. They are therefore mixed-ownership surfaces: preserve them and
+// let the owner remove them explicitly. Only `.codex/**` paths have path-level ownership proof.
 
 function readJsonFile(filePath) {
   try {
@@ -781,7 +784,14 @@ function isStaleManagedSessionStartCommand(command) {
   //   with the managed path (e.g. `.codex/hooks/session-start-custom.sh`, `session-start.bak`)
   //   is NOT misclassified as spec-first-managed.
   const pathPattern = SESSION_START_RELATIVE_PATH.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`^["']?[^"'\\s]*${pathPattern}(\\.cmd)?(["'\\s]|$)`).test(program);
+  // A quoted program is a single token, so its interior may contain spaces -- installation paths
+  // like `/Users/me/My Projects/repo` are common, and a whitespace-free prefix class silently
+  // fails to recognize them, leaving stale entries to accumulate on every refresh. An unquoted
+  // program still ends at the first whitespace, where a space means the managed path is an
+  // argument rather than the invoked program.
+  const quotedProgram = new RegExp(`^(["'])[^"']*${pathPattern}(\\.cmd)?\\1`);
+  const bareProgram = new RegExp(`^[^"'\\s]*${pathPattern}(\\.cmd)?(["'\\s]|$)`);
+  return quotedProgram.test(program) || bareProgram.test(program);
 }
 
 // Strip managed hooks at HOOK granularity (mirror Claude removeManagedHookEntries): only

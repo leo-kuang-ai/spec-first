@@ -451,12 +451,17 @@ function writeHostReadinessLedger({ homeDir, host, hostLedger, writer } = {}) {
     reasonCode: 'host-readiness-ledger-symlink-escape',
   }));
   let previous = null;
+  // `previous === null` also means "the ledger did not exist", so it cannot double as "no backup
+  // taken yet". Track the capture explicitly: containment and payload validation throw before the
+  // backup exists, and rolling back then would delete an existing ledger that was never written.
+  let backupCaptured = false;
   try {
     assertContainedPath(home, ledgerPath, { reasonCode: 'host-readiness-ledger-symlink-escape' });
     if (!hostLedger || hostLedger.schema_version !== 'v2' || hostLedger.host !== host) {
       throw reasonError('host-readiness-ledger-invalid', 'Host readiness ledger payload 与所选 host 不匹配。');
     }
     previous = fs.existsSync(ledgerPath) ? fs.readFileSync(ledgerPath) : null;
+    backupCaptured = true;
     write(ledgerPath, renderJson(hostLedger));
     return {
       status: 'ready',
@@ -465,7 +470,7 @@ function writeHostReadinessLedger({ homeDir, host, hostLedger, writer } = {}) {
       artifact_ref: ledgerPath,
     };
   } catch (error) {
-    if (!writer) {
+    if (!writer && backupCaptured) {
       try {
         if (previous === null) fs.rmSync(ledgerPath, { force: true });
         else atomicWriteContained(home, ledgerPath, previous, {

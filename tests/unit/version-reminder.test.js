@@ -9,6 +9,7 @@ const { runCli } = require('../../src/cli');
 const {
   formatStartupVersionReminder,
   maybeShowStartupVersionReminder,
+  shouldSkipCliVersionReminder,
 } = require('../../src/cli/version-reminder');
 
 function tempRoot() {
@@ -36,6 +37,12 @@ describe('Qoder startup version reminder', () => {
       currentVersion: '1.0.0',
       latestVersion: '1.1.0',
     })).toContain('Update available for Qoder runtime: 1.0.0 -> 1.1.0');
+  });
+
+  test('skips CLI registry lookup for every non-TTY output stream', () => {
+    expect(shouldSkipCliVersionReminder({ env: {}, output: { isTTY: undefined } })).toBe(true);
+    expect(shouldSkipCliVersionReminder({ env: {}, output: { isTTY: false } })).toBe(true);
+    expect(shouldSkipCliVersionReminder({ env: {}, output: { isTTY: true } })).toBe(false);
   });
 
   test('shows the Qoder runtime reminder once within the host cooldown window', async () => {

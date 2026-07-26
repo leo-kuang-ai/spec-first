@@ -391,6 +391,7 @@ function validateTaskPack(taskPackPath, options = {}) {
   if (taskPackRead.error) {
     addFinding(errors, taskPackRead.error.code, taskPackRead.error.message);
     result.task_pack_validity = deriveValidity(errors, validation);
+    result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
     return result;
   }
 

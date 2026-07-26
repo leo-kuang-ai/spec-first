@@ -67,6 +67,15 @@ function normalizeSetupFacts(facts, options = {}) {
     });
   }
 
+  if (hasMalformedFactEntries(facts, schemaVersion)) {
+    return buildUnavailableProjection({
+      status: 'error',
+      reasonCode: 'setup-facts-invalid',
+      artifactRefs: options.factsPath ? [options.factsPath] : [],
+      schemaVersions: { tool_facts: schemaVersion },
+    });
+  }
+
   const items = schemaVersion === 'tool-facts.v2'
     ? normalizeItemsArray(facts.items, facts)
     : normalizeLegacyItems(facts);
@@ -157,6 +166,14 @@ function normalizeLegacyItems(facts) {
     ...Object.entries(tools).map(([id, value]) => normalizeItem(id, value, 'mcp', facts)),
     ...Object.entries(helpers).map(([id, value]) => normalizeItem(id, value, value.type || 'helper', facts)),
   ];
+}
+
+function hasMalformedFactEntries(facts, schemaVersion) {
+  const isObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+  const hasInvalidObjectValues = (value) => isObject(value) && Object.values(value).some((entry) => !isObject(entry));
+  if (schemaVersion === 'tool-facts.v2' && Array.isArray(facts.items) && facts.items.some((entry) => !isObject(entry))) return true;
+  if (schemaVersion === 'tool-facts.v1' && (hasInvalidObjectValues(facts.tools) || hasInvalidObjectValues(facts.helper_tools))) return true;
+  return ['configured_dependencies', 'provider_readiness'].some((key) => Array.isArray(facts[key]) && facts[key].some((entry) => !isObject(entry)));
 }
 
 function normalizeItemsArray(items, facts) {

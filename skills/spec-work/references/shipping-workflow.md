@@ -167,7 +167,7 @@ If this reference cannot be read or a required quality/evidence gate cannot run,
 
    `script_confirmed.validation.run_summary_ref` 必须指向 same workflow、same workspace、same run-id 的 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/verification-run-summary.json`。`script_confirmed.artifact_refs` 与 `llm_asserted.read_artifacts` 只能引用 repo-relative materialized evidence；不得引用 session-temp absolute path。相同 run-id 不可覆盖；`artifact-already-exists`、`producer-error` 或其他 `not-written` reason 原样进入 handoff。
 
-   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
+   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。Return-to-Caller 额外在 A-D 全部完成之后、返回 envelope 之前，从当前已加载 Skill 的 `SKILL_DIR` 运行 `scripts/working-tree-fingerprint.cjs` 捕获 `verified_worktree_fingerprint`——run summary 与 run artifact 都写在被 ignore 的 `.spec-first/workflows/` 下，因此这些写入不改变指纹；helper 无法运行时按 SKILL.md 记录 `fingerprint-helper-unavailable` blocker。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
 
 5.2 **Plan Status Closeout**
 

@@ -40,7 +40,7 @@ dev-server default. An empty, malformed, or repeated modifier records
 
    If `behavior_change: true` but `verification_evidence` is missing or too vague to tell how behavior was protected, invoke `spec-work` one more time with the same `mode:return-to-caller <plan-path-from-step-1>` argument. Do not prompt the user and do not alter the plan path argument. The retry relies on spec-work's idempotency path to inspect the already-implemented work, fill the missing evidence, and return without reimplementing. If the second return still lacks coherent verification evidence, stop as blocked and report the missing fields instead of continuing to simplify/review/ship.
 
-   Record the accepted return's `verification_run_summary_ref` as `initial_verification_run_summary_ref` and require a complete `verified_worktree_fingerprint` object. These prove only the tree before caller-owned Simplify and review-fix mutations; they cannot satisfy step 6.5.
+   Record the accepted return's `verification_run_summary_ref` as `initial_verification_run_summary_ref` and require a complete `verified_worktree_fingerprint` object; only a `blockers`-free return that documents spec-work's deliberate non-behavior exception may substitute that documented exception for the object. These prove only the tree before caller-owned Simplify and review-fix mutations; they cannot satisfy step 6.5.
 
 3. Invoke the `spec-simplify-code` skill on the branch diff.
 
@@ -112,9 +112,14 @@ dev-server default. An empty, malformed, or repeated modifier records
 6.5. **Final working-tree verification** (REQUIRED after all code mutations)
 
    After Simplify, review-fix application, targeted fix checks, and applicable
-   browser verification have finished, run the canonical
-   `skills/spec-work/scripts/working-tree-fingerprint.cjs` helper and store its
-   complete object as `pre_final_verification_fingerprint`.
+   browser verification have finished, resolve `SKILL_DIR` from the directory of
+   this skill's currently loaded `SKILL.md` and run the bundled
+   `node "$SKILL_DIR/scripts/working-tree-fingerprint.cjs"` helper, storing its
+   complete object as `pre_final_verification_fingerprint`. The bundled copy is
+   a byte-identical package-local projection of the canonical `spec-work` helper
+   (`scripts/working-tree-fingerprint.cjs` in the spec-work package); never
+   locate it through a `skills/` source checkout path — target repos only have
+   the host-projected Skill roots.
 
    Re-invoke `spec-work` with the exact same
    `mode:return-to-caller <plan-path-from-step-1>` argument. This is an
@@ -138,6 +143,16 @@ dev-server default. An empty, malformed, or repeated modifier records
      fingerprint. Any mutation during verification, stale evidence reuse,
      helper failure, missing field, or mismatch is `final-verification-stale`
      and stops the pipeline.
+
+   `final-verification-stale` is a stop with a named cause, not a terminal
+   verdict. Before treating a fingerprint mismatch as tree mutation, confirm
+   the spec-first managed `.gitignore` block is present so `.spec-first/workflows/`
+   run summaries stay outside the fingerprint — a missing block makes the fresh
+   verification-run-summary file break equality, and the real cause is setup,
+   not verification staleness. When the helper itself cannot run, report the
+   missing runtime asset (repair via `spec-first init`) instead of estimating a
+   fingerprint by hand. After the named cause is remediated, re-enter step 6.5
+   from a fresh pre-capture; never reuse any earlier fingerprint or summary.
 
    This gate owns final local verification freshness. Targeted checks from
    Simplify or review-fix application are additive and never replace it.

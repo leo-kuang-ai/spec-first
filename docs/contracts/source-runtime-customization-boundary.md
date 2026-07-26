@@ -28,7 +28,7 @@ Do not hand-edit these paths as source fixes:
 
 - spec-first generated `.claude/commands/spec*`, `.claude/skills/spec-*`, `.claude/skills/using-spec-first`, `.claude/spec-first/`, `.claude/agents/spec-*`, and fixed spec-first hooks
 - spec-first generated `.codex/commands/spec*`, `.codex/skills/spec-*`, `.codex/skills/using-spec-first`, `.codex/spec-first/`, `.codex/agents/spec-*`, and fixed spec-first hooks
-- `.agents/skills/spec-*/`, `.agents/skills/source-command-spec-*/`, and `.agents/skills/using-spec-first/`
+- `.agents/skills/spec-*/`, `.agents/skills/source-command-spec-*/` (host-generated legacy command-to-skill migration output — spec-first has no generator for this namespace and only shields it via the managed `.gitignore`/runtime-untrack policy), and `.agents/skills/using-spec-first/`
 - `.cursor/skills/spec-*/` and `.cursor/skills/using-spec-first/`
 - `.cursor/spec-first/`
 - `.cursor/rules/spec-first.mdc` (generated host-native pointer)

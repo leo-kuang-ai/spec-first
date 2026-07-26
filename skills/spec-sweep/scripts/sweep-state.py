@@ -590,9 +590,10 @@ def cmd_import_legacy(args):
     legacy = _read_legacy(args.file)
     cursors_imported = 0
     items_imported = 0
+    items_skipped_unsourced = 0
     if isinstance(legacy, dict):
         cursors_imported = _import_channels(legacy, data, source_map)
-        items_imported = _import_legacy_items(legacy, data)
+        items_imported, items_skipped_unsourced = _import_legacy_items(legacy, data, source_map)
 
     # Persist only when something changed: a fresh state file was seeded, or
     # the import actually brought data in. A no-op import writes nothing.
@@ -601,6 +602,9 @@ def cmd_import_legacy(args):
     return emit("OK", {
         "cursors_imported": cursors_imported,
         "items_imported": items_imported,
+        # Reported rather than silently dropped: without a source these cannot be namespaced
+        # into the items keyspace, so the caller needs to know they were not carried over.
+        "items_skipped_unsourced": items_skipped_unsourced,
     })
 
 
@@ -648,31 +652,48 @@ def _import_channels(legacy, data, source_map=None):
     return count
 
 
-def _import_legacy_items(legacy, data):
+def _import_legacy_items(legacy, data, source_map=None):
     raw_items = legacy.get("items")
     items = data.setdefault("items", {})
+    source_map = source_map or {}
     count = 0
+    skipped = 0
 
     def add(item_id, fields):
         if not item_id:
-            return 0
-        merged = dict(items.get(str(item_id), {}))
-        for k in ("status", "source", "channel", "title", "url"):
+            return 0, 0
+        # The items keyspace is namespaced by source (see _item_key). Writing a bare id here
+        # stored the item under a key no consumer ever reads, so an already-closed legacy item
+        # resurfaced as new on the next sweep -- and bare ids could collide across sources.
+        # Apply source_map for the same reason _import_channels does: a legacy "C42" must land
+        # under the id the live connector actually queries.
+        legacy_source = fields.get("source") or fields.get("channel")
+        if legacy_source is None:
+            return 0, 1
+        source_id = source_map.get(str(legacy_source), str(legacy_source))
+        key = _item_key(source_id, item_id)
+        merged = dict(items.get(key, {}))
+        for k in ("status", "title", "url"):
             if k in fields and fields[k] is not None:
-                key = "source" if k == "channel" else k
-                merged.setdefault(key, fields[k])
-        items[str(item_id)] = merged
-        return 1
+                merged.setdefault(k, fields[k])
+        merged.setdefault("id", str(item_id))
+        merged.setdefault("source", source_id)
+        items[key] = merged
+        return 1, 0
 
     if isinstance(raw_items, dict):
         for item_id, fields in raw_items.items():
             if isinstance(fields, dict):
-                count += add(item_id, fields)
+                added, missed = add(item_id, fields)
+                count += added
+                skipped += missed
     elif isinstance(raw_items, list):
         for entry in raw_items:
             if isinstance(entry, dict):
-                count += add(entry.get("id"), entry)
-    return count
+                added, missed = add(entry.get("id"), entry)
+                count += added
+                skipped += missed
+    return count, skipped
 
 
 # --------------------------------------------------------------------------- #

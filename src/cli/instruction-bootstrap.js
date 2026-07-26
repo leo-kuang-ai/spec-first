@@ -110,7 +110,10 @@ function removeManagedBootstrapBlock(existing) {
     return normalizeRemovalResult(stripKnownBootstrapBodies(stripStandaloneMarkerLines(existing)));
   }
 
-  return normalizeRemovalResult(stripKnownBootstrapBodies(existing, { legacyHeadingsOnly: true }));
+  // Only normalize when the legacy strip actually removed something; otherwise reformatting
+  // would rewrite unrelated user prose in CLAUDE.md / AGENTS.md on every init and clean.
+  const withoutLegacyBodies = stripKnownBootstrapBodies(existing, { legacyHeadingsOnly: true });
+  return withoutLegacyBodies === existing ? existing : normalizeRemovalResult(withoutLegacyBodies);
 }
 
 function stripStandaloneMarkerLines(content) {

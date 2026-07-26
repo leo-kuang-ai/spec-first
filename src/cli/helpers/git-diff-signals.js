@@ -137,8 +137,65 @@ function parsePorcelain(output) {
     .filter((entry) => entry.path);
 }
 
+const C_QUOTE_ESCAPE_BYTES = {
+  a: 0x07,
+  b: 0x08,
+  t: 0x09,
+  n: 0x0a,
+  v: 0x0b,
+  f: 0x0c,
+  r: 0x0d,
+  '"': 0x22,
+  '\\': 0x5c,
+};
+
+// git wraps paths with non-ASCII or special bytes in a double-quoted C string
+// (`core.quotepath` defaults to on). Octal escapes carry raw UTF-8 bytes, so they
+// must be collected as a byte sequence and decoded once — per-character decoding
+// yields mojibake, and leaving them encoded lets `\NNN` degrade into fake path
+// segments during separator normalization.
+function unquoteGitPath(value) {
+  const raw = String(value == null ? '' : value);
+  if (raw.length < 2 || !raw.startsWith('"') || !raw.endsWith('"')) return raw;
+  const body = raw.slice(1, -1);
+  const bytes = [];
+  let index = 0;
+  while (index < body.length) {
+    if (body[index] !== '\\') {
+      const literal = String.fromCodePoint(body.codePointAt(index));
+      bytes.push(...Buffer.from(literal, 'utf8'));
+      index += literal.length;
+      continue;
+    }
+    const next = body[index + 1];
+    if (next === undefined) {
+      bytes.push(0x5c);
+      break;
+    }
+    if (next >= '0' && next <= '7') {
+      let octal = '';
+      index += 1;
+      while (octal.length < 3 && body[index] >= '0' && body[index] <= '7') {
+        octal += body[index];
+        index += 1;
+      }
+      bytes.push(Number.parseInt(octal, 8) & 0xff);
+      continue;
+    }
+    if (Object.prototype.hasOwnProperty.call(C_QUOTE_ESCAPE_BYTES, next)) {
+      bytes.push(C_QUOTE_ESCAPE_BYTES[next]);
+      index += 2;
+      continue;
+    }
+    const literal = String.fromCodePoint(body.codePointAt(index + 1));
+    bytes.push(...Buffer.from(literal, 'utf8'));
+    index += 1 + literal.length;
+  }
+  return Buffer.from(bytes).toString('utf8');
+}
+
 function normalizeRepoPath(filePath) {
-  return String(filePath || '').replace(/\\/g, '/').replace(/^\.\//, '');
+  return unquoteGitPath(filePath || '').replace(/\\/g, '/').replace(/^\.\//, '');
 }
 
 function topDirsForPaths(paths) {
@@ -161,4 +218,5 @@ module.exports = {
   parseNumstat,
   resolveRepoPath,
   topDirsForPaths,
+  unquoteGitPath,
 };

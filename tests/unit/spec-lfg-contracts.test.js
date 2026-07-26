@@ -120,6 +120,56 @@ describe('spec-lfg current contracts', () => {
     expect(skill).toMatch(/Targeted checks.*never replace it/is);
   });
 
+  test('resolves the fingerprint helper from its own package instead of a source checkout', () => {
+    expect(skill).toContain('$SKILL_DIR/scripts/working-tree-fingerprint.cjs');
+    expect(skill).not.toContain('skills/spec-work/scripts/working-tree-fingerprint.cjs');
+    expect(skill).toMatch(/never[\s\S]{0,20}locate it through a `skills\/` source checkout path/i);
+  });
+
+  test('bundles a byte-identical package-local projection of the spec-work fingerprint helper', () => {
+    const owner = fs.readFileSync(
+      path.resolve(__dirname, '../../skills/spec-work/scripts/working-tree-fingerprint.cjs'),
+    );
+    const projection = fs.readFileSync(
+      path.resolve(__dirname, '../../skills/spec-lfg/scripts/working-tree-fingerprint.cjs'),
+    );
+    expect(projection).toEqual(owner);
+    expect(owner.toString('utf8')).toContain('Canonical owner：spec-work');
+    expect(owner.toString('utf8')).toContain('Package-local projection：spec-lfg');
+  });
+
+  test('projects the package-local fingerprint helper into every supported host plan', () => {
+    const sourceHelper = fs.readFileSync(
+      path.resolve(__dirname, '../../skills/spec-lfg/scripts/working-tree-fingerprint.cjs'),
+    );
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-lfg-fingerprint-${platform}-`));
+      try {
+        const adapter = getAdapter(platform);
+        const { plan } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const runtimeRoot = adapter.skillsRoot;
+        const helperPath = path.posix.join(
+          runtimeRoot.replace(/\\/g, '/'),
+          'spec-lfg/scripts/working-tree-fingerprint.cjs',
+        );
+        const operation = plan.operations.find((entry) => entry.path === helperPath);
+
+        expect(operation).toBeDefined();
+        expect(Buffer.from(operation.contents, 'utf8')).toEqual(sourceHelper);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('treats final-verification-stale as a named-cause stop with a re-entry path', () => {
+    expect(skill).toMatch(/final-verification-stale[\s\S]{0,80}not a terminal[\s\S]{0,10}verdict/i);
+    expect(skill).toContain('spec-first init');
+    expect(skill).toMatch(/managed `\.gitignore` block/);
+    expect(skill).toMatch(/re-enter step 6\.5[\s\S]{0,30}fresh pre-capture/i);
+  });
+
   test('preserves the caller argument payload from brainstorm through spec-plan', () => {
     expect(skill).toContain('forwarded_arguments');
     expect(skill).toMatch(/standalone\s+`target-origin:<origin>` token/);

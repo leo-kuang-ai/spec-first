@@ -35,6 +35,12 @@ describe('spec-work current contracts', () => {
     expect(skill).toMatch(/do not normalize.*guess/is);
   });
 
+  test('stops on progress-like readiness values even without the unified contract declaration', () => {
+    expect(skill).toMatch(/progress-like `artifact_readiness` value.*without declaring the unified contract/is);
+    expect(skill).toMatch(/not a legacy plan.*stop and ask for plan repair/is);
+    expect(skill).toMatch(/instead of silently entering the code lifecycle/i);
+  });
+
   test('tracks execution outside the plan body', () => {
     expect(skill).toMatch(/do not (?:edit|mutate).*plan/i);
     expect(skill).toMatch(/progress.*git/i);

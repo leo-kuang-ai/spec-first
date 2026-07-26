@@ -76,6 +76,21 @@ function validateArtifactPathSegment(name, value) {
   }
 }
 
+function slugifyArtifactPathSegment(value, fallback = 'workspace') {
+  const fallbackSlug = String(fallback || 'workspace')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'workspace';
+  const slug = String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^[.-]+|[ .-]+$/g, '')
+    .slice(0, 80) || fallbackSlug;
+  return WINDOWS_RESERVED_BASENAMES.has(slug.split('.')[0].toUpperCase())
+    ? `${fallbackSlug}-${slug}`
+    : slug;
+}
+
 function validateArtifactContainment(artifactAnchorRoot, artifactDir) {
   const anchor = path.resolve(artifactAnchorRoot);
   if (!fs.existsSync(anchor)) return;
@@ -119,4 +134,5 @@ function isInsidePath(parentPath, childPath) {
 
 module.exports = {
   resolveWorkflowArtifactDir,
+  slugifyArtifactPathSegment,
 };

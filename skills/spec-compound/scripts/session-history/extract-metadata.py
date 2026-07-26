@@ -19,10 +19,19 @@ import os
 MAX_LINES = 25  # Only need first ~25 lines for metadata
 
 
+def json_object(line):
+    """Decode one JSONL record and retain only object-shaped entries."""
+    try:
+        value = json.loads(line.strip())
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
 def try_claude(lines):
     for line in lines:
-        try:
-            obj = json.loads(line.strip())
+        obj = json_object(line)
+        if obj is not None:
             if obj.get("type") == "user" and "gitBranch" in obj:
                 return {
                     "platform": "claude",
@@ -30,16 +39,14 @@ def try_claude(lines):
                     "ts": obj.get("timestamp", ""),
                     "session": obj.get("sessionId", ""),
                 }
-        except (json.JSONDecodeError, KeyError):
-            pass
     return None
 
 
 def try_codex(lines):
     meta = {}
     for line in lines:
-        try:
-            obj = json.loads(line.strip())
+        obj = json_object(line)
+        if obj is not None:
             if obj.get("type") == "session_meta":
                 p = obj.get("payload", {})
                 meta["platform"] = "codex"
@@ -52,16 +59,14 @@ def try_codex(lines):
                 p = obj.get("payload", {})
                 meta["model"] = p.get("model", "")
                 meta["cwd"] = meta.get("cwd") or p.get("cwd", "")
-        except (json.JSONDecodeError, KeyError):
-            pass
     return meta if meta else None
 
 
 def try_pi(lines):
     """Pi sessions: type='session' header with cwd, followed by message entries."""
     for line in lines:
-        try:
-            obj = json.loads(line.strip())
+        obj = json_object(line)
+        if obj is not None:
             if obj.get("type") == "session" and "cwd" in obj:
                 return {
                     "platform": "pi",
@@ -69,21 +74,17 @@ def try_pi(lines):
                     "session": obj.get("id", ""),
                     "ts": obj.get("timestamp", ""),
                 }
-        except (json.JSONDecodeError, KeyError):
-            pass
     return None
 
 
 def try_cursor(lines):
     """Cursor agent transcripts: role-based entries, no timestamps or metadata fields."""
     for line in lines:
-        try:
-            obj = json.loads(line.strip())
+        obj = json_object(line)
+        if obj is not None:
             # Cursor entries have 'role' at top level but no 'type'
             if obj.get("role") in ("user", "assistant") and "type" not in obj:
                 return {"platform": "cursor"}
-        except (json.JSONDecodeError, KeyError):
-            pass
     return None
 
 
@@ -102,12 +103,10 @@ def get_last_timestamp(filepath, size):
             tail = f.read().decode("utf-8", errors="ignore")
             lines = tail.strip().split("\n")
         for line in reversed(lines):
-            try:
-                obj = json.loads(line.strip())
+            obj = json_object(line)
+            if obj is not None:
                 if "timestamp" in obj:
                     return obj["timestamp"]
-            except (json.JSONDecodeError, KeyError):
-                pass
     except (OSError, IOError):
         pass
     return None
@@ -214,12 +213,11 @@ def _extract_user_assistant_text(filepath):
     chunks = []
     try:
         objects = []
-        with open(filepath, "r", errors="replace") as f:
+        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
             for line in f:
-                try:
-                    objects.append(json.loads(line.strip()))
-                except (json.JSONDecodeError, ValueError):
-                    continue
+                obj = json_object(line)
+                if obj is not None:
+                    objects.append(obj)
 
         is_pi = any(
             obj.get("type") == "session" and "cwd" in obj for obj in objects
@@ -335,7 +333,11 @@ def process_file(filepath):
     content scan cost."""
     try:
         size = os.path.getsize(filepath)
-        with open(filepath, "r") as f:
+        # Session transcripts are UTF-8 JSONL but historical/corrupted files
+        # can contain one bad byte. Metadata extraction is a best-effort probe:
+        # preserve the batch and surface parse degradation rather than letting
+        # locale-dependent decoding abort every remaining session.
+        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
             lines = []
             for i, line in enumerate(f):
                 if i >= MAX_LINES:

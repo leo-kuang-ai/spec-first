@@ -243,8 +243,10 @@ fi
 if should_probe "$PROJ_TYPE" "docker-compose"; then
   compose_file="$PROJECT_ROOT/docker-compose.yml"
   if [ -f "$compose_file" ]; then
-    # Simple line-anchored grep for port mappings: - "NNNN:NNNN" or - NNNN:NNNN
-    compose_port=$(grep -Eo '"[0-9]+:[0-9]+"' "$compose_file" 2>/dev/null | head -1 | grep -Eo '[0-9]+' | head -1)
+    # Accept quoted and unquoted scalar mappings, but only a YAML list item.
+    # This avoids treating prose, image tags, or arbitrary number pairs as a port.
+    compose_line=$(grep -E "^[[:space:]]*-[[:space:]]*['\"]?[0-9]+:[0-9]+['\"]?[[:space:]]*(#.*)?$" "$compose_file" 2>/dev/null | head -1)
+    compose_port=$(printf '%s' "$compose_line" | grep -Eo '[0-9]+:[0-9]+' | head -1 | cut -d: -f1)
     if [ -n "$compose_port" ]; then
       echo "$compose_port"
       exit 0
@@ -256,9 +258,21 @@ fi
 
 if should_probe "$PROJ_TYPE" "package-json"; then
   pkg_file="$PROJECT_ROOT/package.json"
-  if [ -f "$pkg_file" ]; then
-    # Look for --port or -p in dev/start scripts
-    pkg_port=$(grep -Eo '(-p[= ]+|--port[= ]+)[0-9]+' "$pkg_file" 2>/dev/null | head -1 | grep -Eo '[0-9]+')
+  if [ -f "$pkg_file" ] && command -v node >/dev/null 2>&1; then
+    # Package JSON is structured data: only inspect the exact dev/start script,
+    # so an unrelated Storybook/test script cannot select the server port.
+    pkg_port=$(node -e '
+const fs = require("fs");
+try {
+  const scripts = JSON.parse(fs.readFileSync(process.argv[1], "utf8")).scripts;
+  for (const name of ["dev", "start"]) {
+    const command = scripts && scripts[name];
+    if (typeof command !== "string") continue;
+    const match = command.match(/(?:^|\s)(?:--port(?:\s+|=)|-p(?:\s*|=))(\d+)\b/);
+    if (match) { process.stdout.write(match[1]); break; }
+  }
+} catch (_) {}
+' "$pkg_file")
     if [ -n "$pkg_port" ]; then
       echo "$pkg_port"
       exit 0

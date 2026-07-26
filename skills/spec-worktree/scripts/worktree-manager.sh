@@ -256,6 +256,16 @@ slugify_ref() {
   printf '%s\n' "$slug"
 }
 
+# The slug becomes a path segment under $WORKTREE_DIR. slugify_ref permits dots, so `..` passes
+# through it unchanged and a caller-supplied slug could otherwise escape the worktree root.
+validate_worktree_slug() {
+  local value="${1:-}"
+  if [[ ! "$value" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ || "$value" == *..* ]]; then
+    echo "Error: unsafe worktree slug; use letters, numbers, dot, underscore, and dash without path traversal: ${value:-<empty>}" >&2
+    return 1
+  fi
+}
+
 checked_out_path_for_branch() {
   local branch_name="${1:?Error: branch name required}"
   local branch_ref="refs/heads/$branch_name"
@@ -698,6 +708,7 @@ isolate_existing_ref() {
     return 0
   fi
 
+  validate_worktree_slug "$worktree_slug" || exit 1
   local worktree_path="$WORKTREE_DIR/$worktree_slug"
   if [[ -d "$worktree_path" ]]; then
     echo "Error: worktree already exists at $worktree_path" >&2

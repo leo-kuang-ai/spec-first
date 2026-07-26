@@ -446,7 +446,9 @@ function shouldSkipCliVersionReminder(options = {}) {
   }
 
   const output = options.output || process.stderr;
-  return output && output.isTTY === false;
+  // Node streams report `undefined` when piped, not just `false`; network
+  // version checks must stay out of every non-interactive invocation.
+  return output && output.isTTY !== true;
 }
 
 function isVersionReminderOptedOut(options = {}) {

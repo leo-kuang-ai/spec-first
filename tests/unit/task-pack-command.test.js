@@ -125,6 +125,21 @@ describe('spec-first tasks command', () => {
     expect(JSON.parse(stale.stdout).reason_code).toBe('stale_hash');
   });
 
+  test('returns a machine-readable reason when the task pack cannot be read', () => {
+    const result = runCli([
+      'tasks', 'validate', 'docs/tasks/missing.md', '--repo', tempRoot, '--json',
+    ], tempRoot);
+
+    expect(result.status).toBe(1);
+    expect(JSON.parse(result.stdout)).toEqual(expect.objectContaining({
+      task_pack_validity: 'invalid',
+      reason_code: 'invalid_contract',
+      errors: expect.arrayContaining([
+        expect.objectContaining({ code: 'task-pack-missing' }),
+      ]),
+    }));
+  });
+
   test('accepts missing spec_id as an explicit trace limitation', () => {
     fs.writeFileSync(planPath, '# Source Plan\n', 'utf8');
     const hash = computeSourcePlanHash(planPath).hash;

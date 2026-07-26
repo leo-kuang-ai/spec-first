@@ -48,6 +48,15 @@ def summarize_error(raw):
     return text[:200]
 
 
+def json_object(line):
+    """Decode one JSONL record and retain only object-shaped entries."""
+    try:
+        value = json.loads(line)
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
 def handle_claude(obj):
     if obj.get("type") == "user":
         content = obj.get("message", {}).get("content", [])
@@ -64,28 +73,52 @@ def handle_claude(obj):
 def handle_codex(obj):
     if obj.get("type") == "event_msg":
         p = obj.get("payload", {})
+        if not isinstance(p, dict):
+            return
         if p.get("type") == "exec_command_end":
             output = p.get("aggregated_output", "")
             stderr = p.get("stderr", "")
             command = p.get("command", [])
-            cmd_str = command[-1] if command else ""
+            if isinstance(command, list):
+                cmd_str = str(command[-1]) if command else ""
+            elif isinstance(command, str):
+                cmd_str = command
+            else:
+                cmd_str = ""
 
-            exit_match = None
-            if "Process exited with code " in output:
-                try:
-                    code_str = output.split("Process exited with code ")[1].split("\n")[0]
-                    exit_code = int(code_str)
-                    if exit_code != 0:
-                        exit_match = exit_code
-                except (IndexError, ValueError):
-                    pass
-
-            if exit_match is not None or stderr:
+            exit_match = _codex_exit_code(p, output)
+            if exit_match is not None:
                 ts = obj.get("timestamp", "")[:19]
                 error_summary = summarize_error(stderr if stderr else output)
                 print(f"[{ts}] [error] exit={exit_match} cmd={cmd_str[:120]}: {error_summary}")
                 print("---")
                 stats["errors_found"] += 1
+
+
+def _codex_exit_code(payload, output):
+    """Return a non-zero Codex command exit code, if the event states one.
+
+    Successful tools commonly write progress diagnostics to stderr. Stderr is
+    useful context for a confirmed failure, but it is not itself an error
+    signal. Prefer a structured exit-code field when the producer provides
+    one, then retain the legacy aggregated-output form.
+    """
+    for key in ("exit_code", "exitCode", "status"):
+        value = payload.get(key)
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value if value != 0 else None
+        if isinstance(value, str) and value.isdigit():
+            parsed = int(value)
+            return parsed if parsed != 0 else None
+
+    if isinstance(output, str) and "Process exited with code " in output:
+        try:
+            code_str = output.split("Process exited with code ", 1)[1].split("\n", 1)[0]
+            exit_code = int(code_str)
+            return exit_code if exit_code != 0 else None
+        except (IndexError, ValueError):
+            return None
+    return None
 
 
 def _pi_content_summary(content):
@@ -195,20 +228,26 @@ def handle_pi(obj):
     stats["errors_found"] += 1
 
 
-# Auto-detect platform from first few lines, then process all
+# Auto-detect platform before processing all input. Codex sessions may start
+# with an arbitrary number of metadata records, so a fixed probe window makes
+# a valid session silently look like a no-op.
 detected = None
 buffer = []
 
-for line in sys.stdin:
-    line = line.strip()
+for raw_line in sys.stdin.buffer:
+    try:
+        line = raw_line.decode("utf-8").strip()
+    except UnicodeDecodeError:
+        stats["parse_errors"] += 1
+        continue
     if not line:
         continue
     buffer.append(line)
     stats["lines"] += 1
 
-    if not detected and len(buffer) <= 10:
-        try:
-            obj = json.loads(line)
+    if not detected:
+        obj = json_object(line)
+        if obj is not None:
             if obj.get("type") == "session" and "cwd" in obj:
                 detected = "pi"
             elif obj.get("type") in ("user", "assistant"):
@@ -217,8 +256,6 @@ for line in sys.stdin:
                 detected = "codex"
             elif obj.get("role") in ("user", "assistant") and "type" not in obj:
                 detected = "cursor"
-        except (json.JSONDecodeError, KeyError):
-            pass
 
 # Cursor transcripts don't log tool results — no errors to extract
 def handle_noop(obj):
@@ -229,10 +266,11 @@ handler = handlers.get(detected, handle_noop)
 
 objects = []
 for line in buffer:
-    try:
-        objects.append(json.loads(line))
-    except (json.JSONDecodeError, KeyError):
+    obj = json_object(line)
+    if obj is None:
         stats["parse_errors"] += 1
+    else:
+        objects.append(obj)
 
 if detected == "pi":
     objects = _pi_context_objects(objects)
@@ -240,7 +278,7 @@ if detected == "pi":
 for obj in objects:
     try:
         handler(obj)
-    except KeyError:
+    except (AttributeError, KeyError, TypeError):
         stats["parse_errors"] += 1
 
 print(json.dumps({"_meta": True, **stats}))
@@ -248,7 +286,7 @@ print(json.dumps({"_meta": True, **stats}))
 if args.output:
     body = sys.stdout.getvalue()
     sys.stdout = _original_stdout
-    with open(args.output, "w") as f:
+    with open(args.output, "w", encoding="utf-8") as f:
         f.write(body)
     bytes_written = os.path.getsize(args.output)
     print(json.dumps({"_meta": True, "wrote": args.output, "bytes": bytes_written, **stats}))

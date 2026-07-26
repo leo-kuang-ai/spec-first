@@ -315,6 +315,31 @@ describe('spec-runtime-setup facts reconciliation', () => {
     });
   });
 
+  test('keeps an existing host ledger when the write fails before a backup is captured', () => {
+    const { writeHostReadinessLedger } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
+    const homeDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-home-ledger-keep-')));
+    const ledgerPath = path.join(homeDir, '.claude', 'spec-first', 'host-setup.json');
+    fs.mkdirSync(path.dirname(ledgerPath), { recursive: true });
+    fs.writeFileSync(ledgerPath, JSON.stringify({ schema_version: 'v2', host: 'claude' }), 'utf8');
+
+    // Payload validation throws before the rollback backup exists; the failure must not be
+    // mistaken for "the ledger did not exist" and delete the ledger that was never written.
+    expect(writeHostReadinessLedger({
+      homeDir,
+      host: 'claude',
+      hostLedger: { schema_version: 'v1', host: 'codex' },
+    })).toMatchObject({
+      status: 'failed',
+      reason_code: 'host-readiness-ledger-write-failed',
+    });
+
+    expect(fs.existsSync(ledgerPath)).toBe(true);
+    expect(JSON.parse(fs.readFileSync(ledgerPath, 'utf8'))).toMatchObject({
+      schema_version: 'v2',
+      host: 'claude',
+    });
+  });
+
   test('reconciles a previous host pointer into both runtime capabilities and the host ledger', () => {
     const {
       collectSetupFacts,

@@ -86,13 +86,22 @@ function inspectContext(options) {
 }
 
 function renderHuman(report) {
+  if (report && report.schema_version === 'spec-write-skill.target-payload-smoke/v1') {
+    const lines = [
+      `Target payload smoke: ${report.result}`,
+      `Target readiness: ${report.target_readiness}`,
+      `Runtime files: ${Array.isArray(report.actual_payload_files) ? report.actual_payload_files.length : 0}`,
+    ];
+    for (const finding of report.findings || []) lines.push(`[${finding.status}] ${finding.reason_code}${finding.path ? ` (${finding.path})` : ''}: ${finding.message}`);
+    return lines.join('\n');
+  }
   const lines = [
     `Skill context facts: ${report.result}`,
     `Root: ${report.skill_root}`,
     `Markdown reachable: ${report.reachable_markdown.length}`,
     `Markdown candidates: ${report.unreferenced_markdown_candidates.length}`,
   ];
-  for (const finding of report.findings) lines.push(`[${finding.status}] ${finding.reason_code}${finding.path ? ` (${finding.path})` : ''}: ${finding.message}`);
+  for (const finding of report.findings || []) lines.push(`[${finding.status}] ${finding.reason_code}${finding.path ? ` (${finding.path})` : ''}: ${finding.message}`);
   return lines.join('\n');
 }
 

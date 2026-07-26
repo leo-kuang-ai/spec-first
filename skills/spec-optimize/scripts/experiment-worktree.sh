@@ -54,8 +54,10 @@ ensure_worktree_exclude() {
 is_registered_worktree() {
   local worktree_path="${1:?Error: worktree_path required}"
 
+  # awk splits on whitespace, so `$2` truncates any worktree path containing a space and the
+  # lookup silently never matches. Take the rest of the line instead, like worktree-manager.sh.
   git worktree list --porcelain | awk -v target="$worktree_path" '
-    $1 == "worktree" && $2 == target { found = 1 }
+    /^worktree / && substr($0, 10) == target { found = 1 }
     END { exit(found ? 0 : 1) }
   '
 }
@@ -110,6 +112,19 @@ validate_safe_spec_name() {
     echo -e "${RED}Error: unsafe spec_name. Use only letters, numbers, dot, underscore, and dash; path traversal is not allowed.${NC}" >&2
     return 1
   fi
+}
+
+# `printf %03d` reads a leading-zero argument as octal: `010` formats as 008 and `008` aborts as
+# an invalid number. Displayed indices are zero-padded, so copying one back in is the normal case.
+normalize_experiment_index() {
+  local value="${1:?Error: exp_index required}"
+  # 命名契约固定为三位 exp-000..exp-999。先限制字符数，再做 10 进制转换，避免 Bash
+  # 对超大整数算术溢出后回绕并把 cleanup 重定向到另一个合法 worktree。
+  if [[ ! "$value" =~ ^[0-9]{1,3}$ ]]; then
+    echo -e "${RED}Error: exp_index must be an integer from 0 to 999: ${value}${NC}" >&2
+    return 1
+  fi
+  printf '%03d\n' "$((10#$value))"
 }
 
 assert_cleanup_target_within_worktrees() {
@@ -368,7 +383,7 @@ create_worktree() {
   validate_safe_spec_name "$spec_name"
 
   local padded_index
-  padded_index=$(printf "%03d" "$exp_index")
+  padded_index=$(normalize_experiment_index "$exp_index")
   local worktree_name="optimize-${spec_name}-exp-${padded_index}"
   local branch_name
   branch_name=$(experiment_branch_name "$spec_name" "$padded_index")
@@ -429,7 +444,7 @@ cleanup_worktree() {
   validate_safe_spec_name "$spec_name"
 
   local padded_index
-  padded_index=$(printf "%03d" "$exp_index")
+  padded_index=$(normalize_experiment_index "$exp_index")
   local worktree_name="optimize-${spec_name}-exp-${padded_index}"
   local branch_name
   branch_name=$(experiment_branch_name "$spec_name" "$padded_index")

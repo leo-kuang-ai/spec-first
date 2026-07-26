@@ -65,6 +65,15 @@ def clean_text(text):
     text = re.sub(r"\n{3,}", "\n\n", text).strip()
     return text
 
+
+def json_object(line):
+    """Decode one JSONL record and retain only object-shaped entries."""
+    try:
+        value = json.loads(line)
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
 # Buffer for pending tool entries: [{"ts", "name", "target", "status"}]
 pending_tools = []
 
@@ -516,8 +525,12 @@ def handle_cursor(obj):
 detected = None
 buffer = []
 
-for line in sys.stdin:
-    line = line.strip()
+for raw_line in sys.stdin.buffer:
+    try:
+        line = raw_line.decode("utf-8").strip()
+    except UnicodeDecodeError:
+        stats["parse_errors"] += 1
+        continue
     if not line:
         continue
     buffer.append(line)
@@ -529,8 +542,8 @@ for line in sys.stdin:
     # the first N lines silently misroutes them to the codex handler and
     # produces an empty skeleton with parse_errors: 0 (issue #923).
     if not detected:
-        try:
-            obj = json.loads(line)
+        obj = json_object(line)
+        if obj is not None:
             if obj.get("type") == "session" and "cwd" in obj:
                 detected = "pi"
             elif obj.get("type") in ("user", "assistant"):
@@ -539,18 +552,17 @@ for line in sys.stdin:
                 detected = "codex"
             elif obj.get("role") in ("user", "assistant") and "type" not in obj:
                 detected = "cursor"
-        except (json.JSONDecodeError, KeyError):
-            pass
 
 handlers = {"claude": handle_claude, "codex": handle_codex, "cursor": handle_cursor, "pi": handle_pi}
 handler = handlers.get(detected, handle_codex)
 
 objects = []
 for line in buffer:
-    try:
-        objects.append(json.loads(line))
-    except (json.JSONDecodeError, KeyError):
+    obj = json_object(line)
+    if obj is None:
         stats["parse_errors"] += 1
+    else:
+        objects.append(obj)
 
 if detected == "pi":
     objects = _pi_context_objects(objects)
@@ -558,7 +570,7 @@ if detected == "pi":
 for obj in objects:
     try:
         handler(obj)
-    except KeyError:
+    except (AttributeError, KeyError, TypeError):
         stats["parse_errors"] += 1
 
 # Flush any remaining buffered tools
@@ -569,7 +581,7 @@ print(json.dumps({"_meta": True, **stats}))
 if args.output:
     body = sys.stdout.getvalue()
     sys.stdout = _original_stdout
-    with open(args.output, "w") as f:
+    with open(args.output, "w", encoding="utf-8") as f:
         f.write(body)
     bytes_written = os.path.getsize(args.output)
     print(json.dumps({"_meta": True, "wrote": args.output, "bytes": bytes_written, **stats}))

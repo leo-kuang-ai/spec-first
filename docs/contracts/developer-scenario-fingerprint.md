@@ -36,9 +36,11 @@ These labels are matrix interpretation classes, not durable classifiers:
 
 - `clean-single-repo`
 - `dirty-single-repo`
+- `git-status-unknown-single-repo`
 - `first-time-git-repo`
 - `multi-repo-workspace`
 - `multi-repo-dirty-workspace`
+- `multi-repo-unknown-workspace`
 - `foreign-residual-workspace`
 - `non-git-folder`
 - `non-git-build-workspace`
@@ -54,6 +56,7 @@ All fields are boolean and independent:
 - `git_alignment_broken`
 - `parent_repo_local_artifacts_present`
 - `worktree_dirty_source_affecting`
+- `worktree_dirty_state_unknown`
 
 Downstream workflows choose which dimensions matter for the current user intent. No script may compute an aggregate risk score from these fields.
 
