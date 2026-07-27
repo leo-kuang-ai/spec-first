@@ -12,6 +12,7 @@ docs/10-prompt/
   skill-prompt-设计与优化方法论-v2.md ★ 当前基线(spec-first canonical):skill prompt 设计与优化方法论(含 spec-first 适配层:init 投射/source-runtime/spec-* 入口/task-pack handoff;版本演进见 CHANGELOG)
   spec-first-skill-prompt压缩优化组合方法论.md ◇ 专项 companion:期望成本×内容分级×多 agent 拓扑×伪优化识别×partial-landing×证据晋级
   GPT-5.6提示工程方法论.md        ◇ 外部 provider companion:面向 GPT-5.6 的结果契约、既有 Skill 分层适配、工具/授权边界与评测驱动迁移方法
+  当前分支与远程master-Skill能力审计提示词.md ◇ report-only 操作提示词:冻结远程 master 基线并逐 Skill 审计能力、方法论、边界与证据，不自动修复
   skill-prompt-设计与优化方法论-通用版.md ☆ host/项目中立提取版:同一方法论的通用内核(剥离 spec-first 专属;供其他项目复用,适配层留空待填)
   历史快照/
     审查方法-历史/             系统性项目审查方法 的前身谱系(历史审查/审计 prompt)
@@ -27,6 +28,7 @@ docs/10-prompt/
 - 顶层四份基线（`结构化项目角色契约.md`、`AI-Coding-Harness演化方法论.md`、`系统性项目审查方法.md`、`skill-prompt-设计与优化方法论-v2.md`）是当前有效基线,不是历史快照,但也都不是具体 runtime behavior contract。`AI-Coding-Harness演化方法论.md` 提炼能力演化的判断顺序；`skill-prompt-设计与优化方法论-v2.md` 是唯一 canonical 的 skill prompt 设计与优化 playbook。三份方法论文档与角色契约冲突时,均让位于角色契约。
 - `spec-first-skill-prompt压缩优化组合方法论.md` 是 canonical v2 的专项 companion，负责 expected/aggregate 成本、内容 criticality、reference 可达性、multi-agent fan-out、上下文切片、validator policy、伪优化识别、partial-landing 与 quality/cost 证据晋级；它不取代 canonical，不定义 runtime behavior，与 canonical 或角色契约冲突时让位于上位文档。
 - `GPT-5.6提示工程方法论.md` 是基于 OpenAI 当前开发者文档的外部 provider companion，说明 GPT-5.6 的 prompt 契约、模型配置/Skill source/generated runtime/可选能力分层、既有 Skill 的基线评测与外科式适配、工具/审批边界和迁移方法；它不定义 spec-first runtime contract，不取代 canonical 或角色契约，外部 API/model 事实应回源到链接的官方文档复核。
+- `当前分支与远程master-Skill能力审计提示词.md` 是 report-only 操作提示词，用于冻结 `origin/master` SHA、建立逐 Skill 能力账本并输出可追溯审计 finding；它不授权实现修复，不是新的方法论 canonical，也不改变任何 Skill runtime contract。
 - `历史快照/` 下内容**不是**运行时 source-of-truth,可能落后于当前 `skills/`、`agents/`、`templates/claude/commands/spec/`;与当前运行时行为冲突时,以仓库根目录下的 source-of-truth 为准。
 - **重组说明(2026-06-15):** 历史快照文件由本目录顶层迁入 `历史快照/` 子目录。CHANGELOG、已完成/取代的 dated plans、历史 review/validation 等**冻结历史文档**中对旧路径(`docs/10-prompt/<文件>.md`)的引用**未回改**——历史记录按惯例不重写,这些旧路径指向迁移前状态,属预期。当前 live 引用(skill / contract / 本 docs 索引)已更新到新路径。
 - `结构化项目角色契约.md` 被 4 个测试 + `CLAUDE.md`/`AGENTS.md`/`src/cli` 等 100+ 处引用并由 `contract-drift-guard` 钉死路径,**不可移动**。
