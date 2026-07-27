@@ -19,7 +19,7 @@ deepened: 2026-07-27
 - **Recommended approach:** `extend + compose`。新增薄的 `OpenCodeAdapter`，扩展现有 host registry、governance、CLI lifecycle 与 Runtime Setup；复用项目 `AGENTS.md`、skills source、原子 host-config transaction 和现有 preview 证据分级，不创建第二套工作流、权限引擎或通用 agent runtime。
 - **Decision focus:** OpenCode 使用独立 `.opencode/**` commands/skills/state ownership；workflow 同时提供 `/spec-*` command 与 skill discovery；跨 compatibility roots 的同名 skill 必须显式隔离；helper prompt 保持 skill-local，subagent 执行使用 source-owned OpenCode `task` mapping；MCP/权限写入保持增量、可归属、可撤销并验证最终 effective config。
 - **Verification focus:** 先证明 source→projection、governance、init/doctor/update/clean、配置合并与发布包；再用真实 OpenCode 证明 command、skill、subagent、MCP 和端到端 lifecycle。两层证据不得互相替代。
-- **Largest risk / boundary:** 当前机器没有 OpenCode CLI，且同名 skill discovery、配置 precedence、permission defaults 与 loader 行为属于外部 advisory evidence；在 guarded coexistence 和真实旅程完成前，最高发布口径为 `generated_runtime_preview`。
+- **Largest risk / boundary:** 当前机器没有 OpenCode CLI，且同名 skill discovery、配置 precedence、permission defaults 与 loader 行为属于外部 advisory evidence；真实 command 与 skill 尚未调用确认时，最高发布口径为 `generated_runtime_preview`，取得 loader evidence 后可晋升 `LoaderConfirmedPreview`，guarded coexistence 与完整真实旅程继续阻断完整支持。
 - **Stop conditions:** OpenCode 配置无法在不覆盖用户内容的前提下增量维护、共享 `AGENTS.md` clean ownership 未解决、治理/schema 只能部分迁移，或真实 loader 证据与计划假设冲突时，停止相应 mutation 或支持晋升。
 - **Execution profile:** Deep、跨 CLI/adapter/governance/config/docs/tests 的 source-first 变更；generated runtime 只通过实现后的 `spec-first init --opencode` 在临时项目中产生。
 - **Tail ownership:** `spec-work` 负责实现、简化、review、验证和 closeout；正式支持晋升由维护者基于独立 OpenCode 证据决定。
@@ -66,8 +66,9 @@ flowchart TB
   A --> O
   M --> O
   O --> E{Runtime evidence}
-  E -->|Not yet confirmed| P[generated_runtime_preview]
-  E -->|Loader and journeys confirmed| F[Full support claim eligible]
+  E -->|Loader not yet confirmed| P[generated_runtime_preview]
+  E -->|Command and skill invoked| L[Loader-confirmed preview]
+  L -->|Guarded coexistence and full journeys pass| F[Full support claim eligible]
 ```
 
 ### Requirements
@@ -123,7 +124,7 @@ flowchart TB
   - **Outcome:** 用户能执行完整的 spec-first workflow，且授权和降级语义不因宿主变化而失真。
   - **Covered by:** R6, R7, R8, R9
 - F4. **配置与清理**
-  - **Trigger:** A1 安装、刷新或清理 OpenCode 的 MCP 与权限配置。
+  - **Trigger:** A1 通过 Runtime Setup 安装、刷新 OpenCode MCP/权限配置，或显式执行 `--uninstall-host-config`。
   - **Actors:** A1, A3
   - **Steps:** 系统识别已有用户配置；增量维护 spec-first 条目；检查配置状态；清理时删除可证明归属的内容。
   - **Outcome:** spec-first 能工作，用户自有配置保持不变。
@@ -141,7 +142,7 @@ flowchart TB
 - AE2. **Covers R2, R4.** Given 项目已安装 Codex, when 用户显式安装 OpenCode 并满足已验证的 external-skill collision guard, then 两个宿主均可用；随后清理 OpenCode 不改变 Codex runtime，也不删除仍被 Codex 使用的共享 `AGENTS.md` 管理块。
 - AE3. **Covers R2, R3.** Given 用户执行非交互安装且显式选择 OpenCode, when CLI 应用选择, then OpenCode 被安装；未显式选择时，首版默认集合不自动加入 OpenCode。
 - AE4. **Covers R6, R7, R8.** Given OpenCode 已发现 spec-first runtime, when 用户分别通过 `/spec-*` 和 skill 入口启动 workflow, then 两种入口都加载同一 source-owned 语义；需要 subagent 但未获授权时转为串行执行并披露降级。
-- AE5. **Covers R10, R11, R12.** Given 项目或用户级 OpenCode 配置已含非 spec-first MCP 与权限规则, when 执行安装、刷新和清理, then 原有配置保持不变，不会启用全局 auto-approve；危险工具没有显式用户规则时 resolved permission 为 `ask`，已有显式规则不被覆盖。
+- AE5. **Covers R10, R11, R12.** Given 项目或用户级 OpenCode 配置已含非 spec-first MCP 与权限规则：when 执行安装或刷新，then 原有配置保持不变，不会启用全局 auto-approve；危险工具没有显式用户规则时 resolved permission 为 `ask`，已有显式规则不被覆盖。When 显式执行 `--uninstall-host-config`，then 只移除 receipt 与 current value 同时证明归属的 managed entries，用户配置保持不变；卸载路径不对移除 managed permission 后的 resolved permission 作 `ask` 断言。
 - AE6. **Covers R14, R16.** Given 确定性投射测试通过但当前环境没有 OpenCode CLI, when 用户安装或运行 `doctor`, then 系统报告 `generated_runtime_preview` 与 loader evidence 缺口，不声称正式完整支持。
 - AE7. **Covers R15.** Given 真实 OpenCode 环境完成命令、skill、subagent、MCP 和 lifecycle 用户旅程, when 维护者评估发布状态, then 只有被证据直接覆盖的支持声明可以晋升。
 - AE8. **Covers R17, R18.** Given OpenCode runtime 出现 drift, when 维护者修复问题, then 修改 source 或生成逻辑并重新生成，同时所有 registry、governance、docs 与 tests 保持一致。
@@ -171,6 +172,7 @@ flowchart TB
 - `opencode.jsonc` 的注释保真 mutation。首版 canonical writer 只维护严格 JSON 的 `opencode.json`；检测到仅有 JSONC 或无法无损解析的高优先级配置时 fail closed，并给出 unblock direction。
 - OpenCode hooks/plugins。只有真实运行证明某个确定性 exit gate 无法由现有 CLI、skill contract 或 MCP setup 承载时，才单独规划。
 - 把重复的 supported-host 常量重构为单一跨模块 schema。当前变更只在既有 owner 中原子扩展，避免借新增宿主进行无关架构重写。
+- 跨宿主 MCP package pinning 与 integrity policy。当前 required MCP definitions 包含 `@latest`，这是既有共享 Runtime Setup 风险；本功能只要求 evidence 记录实际解析的 package/version/registry/integrity 并把 resolution 变化视为证据失效，不在 OpenCode host slice 中单独改变所有宿主的 dependency policy。
 
 ### Dependencies / Assumptions
 
@@ -189,6 +191,7 @@ flowchart TB
 - 实现开始时重新读取 OpenCode 官方 command、skill、MCP 与 permission 文档，确认最小 frontmatter、配置容器与 namespaced permission pattern；若当前文档与本计划语义冲突，先更新计划或记录有证据的 deviation。
 - 确认目标 OpenCode 版本仍支持 `OPENCODE_DISABLE_EXTERNAL_SKILLS`、仍共同发现 `.opencode/skills`/`.agents/skills`/`.claude/skills`，并复核 duplicate resolution；任一行为变化都使首版 collision guard 失效并阻断实现继续沿用 KTD1。
 - 真实 OpenCode 是否提供非交互 loader/配置检查命令；若没有，使用可重复的交互用户旅程并保留版本、输入、输出与 limitations。
+- 确认 `opencode debug config` 是否能在不初始化 project plugins、启动 MCP 或访问网络的模式下运行；若无法证明诊断无额外副作用，不自动执行该命令，改用显式用户授权的真实旅程并保持 `opencode_effective_config_unverified`。
 - `opencode.jsonc` 与 `opencode.json` 的实际优先级只用于 collision 诊断和后续 JSONC 支持，不扩大首版 writer scope。
 
 ### Sources / Research
@@ -226,9 +229,9 @@ Product Contract unchanged except AE2 clarifies the already-required shared `AGE
 - KTD1. **OpenCode runtime 独立投射并显式隔离 compatibility skill collision。** Commands 使用 `.opencode/commands/spec-*.md`，workflow/standalone/internal skills 使用 `.opencode/skills/<skill>/`，state 使用 `.opencode/spec-first/state.json`；不共享 `.agents/skills`，避免 Codex/OpenCode 安装和 clean ownership 耦合。由于 OpenCode 也会发现 `.agents/skills` 与 `.claude/skills`，adapter/doctor 必须检查与 managed OpenCode skills 同名的 compatibility copies；不得依赖当前并发加载的 last-writer 行为。collision 存在且无法证明被隔离时，安装保持 preview、doctor 返回 `opencode_external_skill_collision` 与 action-required；首版明确的用户侧 unblock 是以 `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` 启动 OpenCode，spec-first 只检测和提示，不写全局环境。该 guard 会对当前 OpenCode 进程禁用全部 `.agents`/`.claude` compatibility skills，不只禁用 spec-first，README/doctor 必须披露此影响并确认用户需要的 skill 已存在于 `.opencode/skills` 或其他 OpenCode-native path。真实 loader 必须覆盖 guarded Codex+OpenCode coexistence 后才能晋升支持声明。
 - KTD2. **双入口共享同一 source。** `workflow_command` 在 OpenCode governance 中标记为 `command`，现有 filtered asset semantics 同时投射 command 与 backing workflow skill；standalone 为 `skill`，agent-facing internal 为 `internal`。两种入口不得维护不同 workflow body。
 - KTD3. **原生 subagent，source-owned dispatch mapping，不生成 custom helper agents。** OpenCode adapter 首版 `supportsAgents=false`；该 adapter 字段只表示“不投射 bundled/custom agent profiles”，不得被解释为 OpenCode runtime 不支持 subagent，也不得作为 dispatch readiness fact。所有明确依赖 helper 的 project-owned skill source 必须把 OpenCode `task` tool 加入与 Claude `Agent`/Codex `spawn_agent` 同层的 host dispatch mapping，继续由 workflow 判断用户授权、capacity、isolation 与 inline fallback；adapter 只做 representation translation，不在投射时猜测或注入 workflow 语义。正式支持证据必须覆盖一条使用当前 source mapping 的 subagent-dependent workflow。
-- KTD4. **`AGENTS.md` 是共享 project instruction。** OpenCode 不生成 pointer/rule 文件。`clean --opencode` 只有在其他消费同一路径的 adapter 均被 confirmed absent 时，才移除共享 managed instruction block；若其他 host state 缺失、损坏、版本不可读或 runtime/state 证据矛盾，保留 managed block 并返回 action-required reason code。单宿主 clean 不得破坏其他宿主入口。
-- KTD5. **Runtime clean 与配置 uninstall 分权。** `spec-first clean --opencode` 删除 managed OpenCode commands/skills/state，并且只有在其他共享消费者均 confirmed absent 时才删除 root `AGENTS.md` managed block；`spec-runtime-setup --uninstall-host-config` 删除 `opencode.json` 中仍与 ledger/expected value 匹配的 spec-first MCP/permission entries。两个生命周期都保留未知用户内容。
-- KTD6. **MCP 配置 project-first、user-scope 显式授权、effective config 单独验证。** OpenCode project target 为 `opencode.json`，user target 为 `$HOME/.config/opencode/opencode.json`，后者必须通过 `--user-scope`。`MCP_SETUP_HOST=opencode` 是 mutation authority；runtime dirs、PATH 和旧 facts 只能是 advisory candidates。写入后正确不等于最终生效：实现必须识别 remote/global/custom/project/inline/managed precedence；真实 CLI 可用时通过 `opencode debug config` 验证 resolved MCP/permission，CLI 不可用或存在无法解析的 override 时报告 `opencode_effective_config_unverified`，不得晋升安全或 loader readiness。
+- KTD4. **`AGENTS.md` 是共享 project instruction，clean 使用三态 consumer 判定。** OpenCode 不生成 pointer/rule 文件。其他消费同一 `instructionFile` 的 adapter 只有三种互斥状态：存在有效且兼容的 managed state，且没有与其声明 runtime 相矛盾的证据时为 `present`；state 与该 adapter 的全部精确 managed assets 都不存在时为 `confirmed_absent`；缺少有效 state 但仍有精确 managed assets、state 损坏/版本不可读、state/runtime 矛盾或读取失败时为 `uncertain`。asset-only residue 不得归为 `present`。`clean --opencode` 只有在所有其他消费者均为 `confirmed_absent` 时才移除 root `AGENTS.md` managed block；任一 `present` 或 `uncertain` 都保留 block，后者返回 action-required。单宿主 clean 不得破坏其他宿主入口，也不得让从未安装的宿主永久阻断最后清理。
+- KTD5. **Runtime clean 与配置 uninstall 分权，配置 ownership 由版本化 receipt 证明。** `spec-first clean --opencode` 只删除 managed OpenCode commands/skills/state，并按 KTD4 判断共享 `AGENTS.md`；`spec-runtime-setup --uninstall-host-config` 只处理配置。每次成功写入由 per-host readiness ledger 中的 `managed_config_receipts` 记录；为保持现有 host-ledger v2 的 additive compatibility，顶层 schema 不因本功能升级，嵌套 collection 使用 `{ schema_version: 'managed-config-receipts.v1', entries: [...] }` 独立版本。identity 至少包含 host、scope、canonical config path、container 与 entry key，receipt 还保存 normalized value SHA-256、spec-first version 和写入时间；normalized value 固定为递归排序 object keys、保留 array 顺序和 JSON primitive 值的无空白 UTF-8 canonical JSON，再计算 SHA-256。collection 按 canonical target identity 合并，不能因另一个项目运行 setup 而覆盖无关 receipt。collection 缺失按“无 ownership receipt”处理，损坏或版本不兼容不得被静默重置。跨项目并发 mutation 使用 per-host receipt-ledger lock 覆盖 read→merge→config mutation→receipt commit/rollback，统一按 receipt-ledger lock 后 config lock 的顺序取锁，禁止无锁 read-modify-write。任一锁获取失败或 replace 前 ownership check 失败都必须零 mutation；replace 后失锁时只可在仍持有对应锁的边界内自动回滚，无法安全恢复时保留 owner-private backup/evidence、返回 `manual-required` 且绝不声称 commit 成功。只有当前 run 实际创建条目，或已有 receipt identity 与 current normalized hash 同时匹配、证明 ownership 未被用户改写时，setup 才能更新条目并创建/刷新 receipt；预先存在但值相同且无 receipt 的用户条目保持不变且不得被认领。Setup 在配置写入后提交 receipt，receipt 写失败必须在两把锁仍受本事务持有时恢复配置；uninstall 同样要求 receipt identity 与 current normalized hash 匹配，删除配置后再删除 receipt，receipt 删除失败必须在锁内恢复配置。receipt 缺失、损坏、版本不兼容或 hash 不匹配一律 fail closed 并保留用户内容。
+- KTD6. **MCP 配置 project-first、user-scope 显式授权、effective config 单独验证。** OpenCode project target 为 `opencode.json`，user target 为 `$HOME/.config/opencode/opencode.json`，后者必须通过 `--user-scope`。`MCP_SETUP_HOST=opencode` 是 mutation authority；runtime dirs、PATH 和旧 facts 只能是 advisory candidates。写入后正确不等于最终生效：实现必须识别 remote/global/custom/project/inline/managed precedence。调用 `opencode debug config` 前必须将 candidate 解析为绝对 realpath，确认是 target repo/workspace 与 generated runtime 之外的普通可执行文件，记录 source、path 与 version/provenance，并通过无 shell argv、超时和输出上限执行；project-local、symlink 回项目、ambiguous 或 provenance 不完整的 candidate 不得执行，只报告 `opencode_effective_config_unverified`。命令自身可能初始化 plugin/MCP/网络且无法安全关闭时同样不自动执行，不得晋升安全或 loader readiness。
 - KTD7. **配置 shape 由 registry 声明，不按 host 名字散落分支。** 扩展 host-config contract，使 JSON container、server representation 与可归属 permission entries 由 `setup-registry` 描述；现有 hosts 保持默认 `mcpServers`/string-command 行为，OpenCode 使用官方 `mcp` representation。
 - KTD8. **权限最小化并建立显式 ask 地板。** OpenCode 当前未配置时多数权限默认为 `allow`，因此不能把“未写 global allow”等同于安全。registry 只维护两类可比较、可撤销条目：以 `spec-*` 命名空间归属的 skill permission，以及用户未显式决定时 `bash`、`edit`、`task`、`webfetch`、`websearch` 的 `ask` 基线。已有 deny/allow 或更高优先级规则不覆盖；resolved config 仍为 permissive default 时 action-required 并阻断正式支持晋升。禁止写 wildcard/global allow，无法证明安全归属时宁可不写。
 - KTD9. **严格 JSON writer，JSONC 只读并按实际 precedence fail closed。** 首版原子事务只修改 `opencode.json`，永不改写 `opencode.jsonc` 或 comment-bearing content。只有 JSONC 是唯一有效配置、实际 higher-precedence target，或其存在使 resolved target 无法证明时才阻断严格 JSON mutation；其他共存场景保持 JSONC byte-stable，输出 advisory collision fact，不把“发现 JSONC”本身等同于 blocking failure。
@@ -299,10 +302,10 @@ stateDiagram-v2
   [*] --> NotDelivered
   NotDelivered --> GeneratedRuntimePreview: deterministic projection lifecycle package pass
   GeneratedRuntimePreview --> LoaderConfirmedPreview: command and skill discovery invoked
-  LoaderConfirmedPreview --> FullSupportEligible: subagent workflow MCP and end-to-end journey pass
+  LoaderConfirmedPreview --> FullSupportEligible: guarded coexistence subagent MCP permission and end-to-end journey pass
   GeneratedRuntimePreview --> GeneratedRuntimePreview: docs or host changes require recheck
   LoaderConfirmedPreview --> GeneratedRuntimePreview: loader regression or stale evidence
-  FullSupportEligible --> LoaderConfirmedPreview: workflow MCP permission or end-to-end evidence invalidated while loader remains fresh
+  FullSupportEligible --> LoaderConfirmedPreview: guarded coexistence workflow MCP permission or end-to-end evidence invalidated while loader remains fresh
   FullSupportEligible --> GeneratedRuntimePreview: loader regression or stale loader evidence
 ```
 
@@ -315,7 +318,7 @@ stateDiagram-v2
 | `init --opencode -y` | Explicit | Only OpenCode is initialized unless other flags are present |
 | `init --codex --opencode -y` | Explicit multi-host | Independent runtime/state are generated; shared `AGENTS.md` remains coherent |
 | `update` with OpenCode state present | Auto-detected from managed state | Refresh args include `--opencode` |
-| `doctor` without flags | Auto-detected from managed state only | User-owned `.opencode/**` or `opencode.json` alone do not create a false install |
+| `doctor` without flags | Valid managed state or exact registry-declared managed asset candidate | Valid state enters normal inspection；asset-only enters orphan/degraded inspection；unknown `.opencode/**` or `opencode.json` never triggers detection |
 
 ### Interface Contracts
 
@@ -325,7 +328,7 @@ stateDiagram-v2
 | Skills governance / evolution | plugin manifest, filtered asset set, catalog, all governed skills | `src/cli/contracts/dual-host-governance/skills-governance.schema.json` and `.json` | Every record requires `host_delivery.opencode`; workflow=`command`, standalone=`skill`, eligible internal=`internal` | Versioned atomic migration; old partial documents rejected | schema validation and `tests/unit/plugin-modules.test.js` |
 | Runtime ownership / evolution | path rewrite, gitignore/context policy, doctor/clean | `src/cli/adapters/platform-registry.js` | Declares generated `.opencode` surfaces and mixed-ownership `opencode.json`; no blanket root ownership | Additive host record; rollback removes only its declared surfaces | registry pattern and ownership tests |
 | Runtime Setup registry / evolution | setup parser, facts, config resolver, generated skills | `skills/spec-runtime-setup/setup-registry.json` and schema | Canonical host `opencode`, project/user targets, JSON container/server shape, optional namespaced permission entries | Bump registry version; previous hosts retain equivalent effective config | registry/schema/node contract tests |
-| OpenCode project config / greenfield managed slice | OpenCode runtime and Runtime Setup | Target project `opencode.json`; source owner remains setup registry/scripts | Incremental `mcp` entry、namespaced skill permission、unset-only dangerous-tool `ask` baseline；strict JSON target 与 resolved-config verification 分层 | Preserve unknown keys；`--uninstall-host-config` 只移除 current managed values；JSONC 只读并按实际 precedence 决定 blocking | `host-config.cjs` transaction、args/mode、precedence fixtures plus real OpenCode MCP/permission journey |
+| OpenCode project config / greenfield managed slice | OpenCode runtime and Runtime Setup | Target project `opencode.json`; source owner remains setup registry/scripts | Incremental `mcp` entry、namespaced skill permission、unset-only dangerous-tool `ask` baseline；版本化 `managed_config_receipts` 证明 ownership；strict JSON target 与 resolved-config verification 分层 | Preserve unknown keys；uninstall 需要 receipt identity + current normalized hash；receipt/config 任一提交失败恢复另一侧；JSONC 只读并按实际 precedence 决定 blocking | `host-config.cjs` transaction、`facts.cjs` receipt collection、args/mode、precedence fixtures plus real OpenCode MCP/permission journey |
 | Shared project instructions / evolution | Codex, Cursor, Kiro, Qoder, OpenCode | Root `AGENTS.md` managed block; producer in CLI instruction bootstrap | One shared project instruction, multiple host states; clean uses remaining-host ownership | Last-consumer removal only; single-host clean preserves shared block | multi-host clean integration tests |
 
 ### Evidence & Limitations
@@ -333,7 +336,7 @@ stateDiagram-v2
 - **Direct source:** Current extension points and hard-coded consumers were re-read at commit `2c89c5a18eaf85998dbf80fd98bf2d27d7f263fc`; CodeGraph was used as advisory orientation, and load-bearing conclusions were confirmed by direct source reads.
 - **Historical learnings:** Runtime Setup host-authority, source/runtime, entrypoint and skill-publication learnings shape KTD2、KTD5、KTD6、KTD10 and the verification ladder; they remain advisory where current source differs.
 - **External evidence:** OpenCode official docs and `dev` source observed 2026-07-27 shape paths、permission defaults、config precedence、compatibility skill discovery 与 runtime flags, but do not prove the target OpenCode version loads spec-first output. Implementation must re-open them before writing host-specific transforms.
-- **Runtime limitation:** `command -v opencode` is unavailable on this machine, so loader/subagent/MCP/field evidence is not available in planning.
+- **Runtime limitation:** `command -v opencode` is unavailable on this machine, so loader/subagent/MCP/field evidence is not available in planning；当前 shared Runtime Setup 的部分 required MCP command 仍解析 `@latest`，因此未来 evidence 必须记录实际 package/version/registry/integrity，resolution 变化会使对应 MCP evidence 失效。
 - **Dispatch evidence:** 初始 planning 没有 subagent authorization，研究与 flow analysis 使用 inline fallback；2026-07-27 后续 `spec-doc-review` 获得用户明确多-agent 授权并完成 coherence、feasibility、security 三路审查，本次 producer revision 仍需用 headless review 复核修订结果。
 - **Worktree baseline:** 本次 producer revision 从 `leo-2026-07-27-opencode` clean worktree 开始，write set 仅包含 `CHANGELOG.md` 与本计划文件；实施与验证仍必须排除未来并发改动，不把未提交内容当作 OpenCode 证据。
 
@@ -420,10 +423,10 @@ stateDiagram-v2
   - Rename: `tests/integration/init-five-host-lifecycle.integration.test.js` → `tests/integration/init-supported-host-lifecycle.integration.test.js`
 - **Approach:**
   - 在 `INIT_PLATFORM_CHOICES` 增加 OpenCode，`defaultForYes=false`；所有 host labels/help/next-step 文案统一包含显式 `--opencode`，默认集合保持 Claude+Codex。
-  - `doctor --opencode` 与无 flag auto-detection 只依据 managed state/adapter-owned assets，不因 root `opencode.json` 或任意 `.opencode` user file 误判已安装。
+  - `doctor --opencode` 始终检查 OpenCode；无 flag auto-detection 只接受有效 managed state 或 registry 精确声明的 managed asset candidate。有效 state 进入正常检查；asset-only 进入 `opencode_orphaned_managed_runtime` degraded 检查，不得报告 ready；root `opencode.json`、未知 `.opencode/**`、plugins 或 custom agents 不触发检测。
   - `update` 继续从 adapter state 动态构建 refresh flags；OpenCode state 存在时加入 `--opencode`。
   - `clean --opencode` 使用 state ledger 与 adapter removal plan 删除 managed commands/skills/state；只有其他共享 instruction consumers 均 confirmed absent 时才额外删除 root `AGENTS.md` managed block。配置 entry 由 Runtime Setup `--uninstall-host-config` 持有。
-  - 清理共享 instruction 前检查所有消费同一 `instructionFile` 的 adapter；只有其他 consumer 被 confirmed absent 时才移除 `AGENTS.md` managed block。缺失/损坏/旧版本 state、state 与 runtime 矛盾或读取失败都按 ownership uncertain 处理：保留 block、不中断其他 runtime 清理，并输出 action-required reason code。
+  - 清理共享 instruction 前按 KTD4 对所有消费同一 `instructionFile` 的 adapter 做互斥三态判定。有效且兼容的 state 存在、其声明 runtime 无矛盾时是 `present`；state 与精确 managed assets 都不存在时是 `confirmed_absent`；缺少有效 state 但仍有精确 managed assets、state 损坏/旧版本、state/runtime 矛盾或读取失败时是 `uncertain`，asset-only residue 明确落入该状态。只有其他 consumer 全部 confirmed absent 时移除 block；uncertain 保留 block、不中断当前宿主 runtime 清理并输出 action-required reason code。
   - `hasAnyManagedState`、preview aggregation 和 workspace skip roots 应使用 adapter registry 或显式加入 OpenCode，避免 banner、child discovery 和 summary 漏宿主。
   - 顶层 `spec-first --help`、子命令 help、非 TTY guidance 和 machine-readable usage 共用 supported-host truth；`src/cli/index.js` 不再保留漏掉 OpenCode 的手写五宿主文案。
 - **Execution note:** 先补 characterization tests 锁定现有五宿主默认和 clean 行为，再加入 OpenCode，防止新增 host 顺带改变旧 host lifecycle。
@@ -431,14 +434,15 @@ stateDiagram-v2
 - **Test scenarios:**
   1. Covers AE1. 交互选择只有 OpenCode 时，preview/apply 只包含 OpenCode runtime，输出 host label 与 preview support status。
   2. Covers AE3. `init -y` 无 host flag 时不安装 OpenCode；`init --opencode -y` 安装 OpenCode；未知或重复 flag 保持现有 parser semantics。
-  3. Covers AE2. 同项目安装 Codex+OpenCode，OpenCode 以已验证的 external-skill collision guard 启动；分别调用 command 与 skill 后清理 OpenCode，Codex state/skills 与共享 `AGENTS.md` managed block byte-stable；最后清理 Codex 才移除共享 block。
+  3. Covers AE2. 同项目安装 Codex+OpenCode，deterministic inspection 证明未启用 guard 时 collision action-required、启用 guard 时只形成 readiness candidate；清理 OpenCode 后 Codex state/skills 与共享 `AGENTS.md` managed block byte-stable，最后清理 Codex 才移除共享 block。真实 guard、command 与 skill 调用仅由 U6 验证。
   4. 同项目安装 OpenCode+Qoder 后清理 Qoder 或 OpenCode，另一宿主 command/skill/state 不变，重新 init 仍幂等。
-  5. `doctor --opencode --json` 输出 platform、asset checks、preview reason code；无 flag 时只有 OpenCode state 才触发 auto-detection。
+  5. `doctor --opencode --json` 输出 platform、asset checks、preview reason code；无 flag 时有效 OpenCode state 触发正常检查，只有精确 managed assets 时触发 orphan/degraded 检查，任意 user-owned OpenCode file 不触发。
   6. 只有 `opencode.json`、`.opencode/plugins` 或 user-owned `.opencode/agents/custom.md` 时，doctor 不把项目识别为 spec-first OpenCode install。
   7. OpenCode state 存在时 `update` refresh args 保留全部已安装宿主并包含 `--opencode`；无 OpenCode state 时不添加。
   8. Workspace parent/child discovery 不递归进入 `.opencode` runtime，summary index 能记录 `platform=opencode` 且不接受未知 host id。
   9. 顶层和子命令 CLI help、非 TTY guidance、dry-run 与 next steps 都显示 OpenCode opt-in，不暗示已取得 loader evidence。
-  10. 其他 AGENTS-based host 的 state 缺失、损坏、版本不兼容或与 runtime 证据矛盾时，`clean --opencode` 保留共享 managed block 并报告 ownership-uncertain/action-required；OpenCode 自有 runtime 仍按可证明 ownership 清理。
+  10. 其他 AGENTS-based host 的 state 与全部 managed assets 都不存在时判定 confirmed absent；state 缺失但仍有 managed assets、state 损坏或版本不兼容、state 与 runtime 证据矛盾时均判定 uncertain，`clean --opencode` 保留共享 managed block 并报告 ownership-uncertain/action-required；OpenCode 自有 runtime 仍按可证明 ownership 清理。
+  11. OpenCode-only 项目中其他共享 instruction consumers 从未安装时，最后一次 `clean --opencode` 删除 root managed block；任一其他宿主只有精确 managed asset residue 而无有效 state 时判定 uncertain，保留 block 并报告对应 reason。
 - **Verification:** CLI unit tests和 lifecycle integration 证明 opt-in、coexistence、idempotence、shared instruction ownership 与 machine-readable output；真实 host invocation 留给 U6。
 
 ### U3. Governance、Schema 与 Runtime Catalog 原子扩展
@@ -507,11 +511,11 @@ stateDiagram-v2
 - **Approach:**
   - 将 setup registry 升级到下一 schema version，新增 canonical host `opencode`、project/user targets、OpenCode JSON container/server representation 和 permission managed-entry contract。
   - `host-config.cjs` 从 hard-coded `mcpServers` 扩展为 registry-declared JSON container；server normalization 支持 OpenCode 官方 representation，同时保持其他 hosts byte/semantic compatibility。
-  - 项目默认 target 为 `opencode.json`；`--user-scope` 才允许 `$HOME/.config/opencode/opencode.json`。新增显式 `--uninstall-host-config` mode，沿用同一 host authority 与 scope gate，只删除仍匹配 managed expected value 的 MCP/permission entries。所有 mutation 继续执行 containment、symlink、secret、lock、atomic replace、post-write verify 与 rollback。
+  - 项目默认 target 为 `opencode.json`；`--user-scope` 才允许 `$HOME/.config/opencode/opencode.json`。新增显式 `--uninstall-host-config` mode，沿用同一 host authority 与 scope gate。`facts.cjs` 在现有 host-ledger v2 中增加独立版本的 `managed-config-receipts.v1` collection，并提供 owner-checked receipt-ledger lock；持锁读取上一次 ledger 后按 canonical target identity 合并再写回，缺失 collection 是无 ownership，损坏/不兼容 collection 返回稳定 conflict，不覆盖为空。`host-config.cjs` 在同一 compensating transaction 内通过 receipt reader/writer callback 协调 config 与 receipt，固定先取 receipt-ledger lock、再取目标 config lock，直到 receipt commit 或双向 rollback 完成后逆序释放；setup 的 receipt 提交失败恢复 config，uninstall 的 receipt 删除失败恢复 config。所有 mutation 继续执行 containment、symlink、secret、lock、atomic replace、post-write verify 与 rollback。
   - Permission transaction 维护 namespaced skill entries，并在用户没有显式决定时为 `bash`、`edit`、`task`、`webfetch`、`websearch` 写入可比较、可撤销的 `ask` 基线；已有冲突或更高优先级规则返回 action-required，不覆盖，不写 wildcard/global allow。
-  - 配置 resolver 把 remote、global、`OPENCODE_CONFIG`、project、`.opencode`/`OPENCODE_CONFIG_DIR`、`OPENCODE_CONFIG_CONTENT` 与 system/MDM managed config 作为完整 precedence facts。CLI 可用时调用只读 `opencode debug config` 检查最终有效 MCP/permission；不可用、输出不可解析或 provenance 不完整时保持 `opencode_effective_config_unverified`，不得把 target-file post-write verify 提升为 effective-config verified。
+  - 配置 resolver 把 remote、global、`OPENCODE_CONFIG`、project、`.opencode`/`OPENCODE_CONFIG_DIR`、`OPENCODE_CONFIG_CONTENT` 与 system/MDM managed config 作为完整 precedence facts。CLI candidate 只有在解析为 repo/workspace 外的绝对 realpath、确认普通可执行文件并记录 source/version/provenance 后，才可通过无 shell argv、超时和输出上限运行只读 `opencode debug config`；project-local/PATH shadow、symlink 回项目、ambiguous/provenance 不完整或诊断可能产生不可关闭的 plugin/MCP/network 副作用时不执行并保持 `opencode_effective_config_unverified`。不得把 target-file post-write verify 提升为 effective-config verified。
   - `opencode.jsonc` 永不写。只有它是唯一有效配置、实际 higher-precedence target，或导致 resolved target 无法证明时返回 blocking reason；与可安全写入的严格 JSON 共存但不生效时保持 byte-stable，并输出 advisory collision fact。
-  - Facts/human output 分别记录 selected scope、config path、managed entry identifiers、loader/MCP evidence 与 limitations；不得序列化或回显完整用户配置、未知用户条目、literal secret 或解析失败的原始片段，敏感值只保留 redacted/reference-only 事实。LLM 不手改 facts/config。
+  - Facts/human output 分别记录 selected scope、config path、managed entry identifiers、receipt schema/identity/hash、loader/MCP evidence 与 limitations；不得序列化或回显完整用户配置、未知用户条目、literal secret 或解析失败的原始片段，敏感值只保留 redacted/reference-only 事实。LLM 不手改 facts/config。
 - **Execution note:** 先为现有五宿主 host-config 行为补齐 compatibility tests，再扩展 registry-driven container/representation，避免 OpenCode shape 破坏 `mcpServers`/TOML writer。
 - **Patterns to follow:** `host-authority.cjs` 的 explicit pin、`host-config.cjs` 的 transaction/rollback、runtime setup learning 中的 script-owned facts contract。
 - **Test scenarios:**
@@ -520,13 +524,15 @@ stateDiagram-v2
   3. Project scope 是默认 target；请求 user scope 但未传 `--user-scope` 返回 `host-user-scope-not-authorized`，显式 opt-in 才写用户路径。
   4. 已有 conflicting spec-first MCP key、permission deny/allow 或 higher-precedence target 时 action-required，不覆盖用户决策。
   5. Literal secret、path escape、symlink target、lock contention、post-write verification failure 分别 fail closed，并在 fault injection 后恢复原始 bytes/mode。
-  6. `--uninstall-host-config` 与普通 setup mode 冲突时 fail closed；project/user scope 分别需要现有显式 authority。Uninstall 只删除仍匹配 managed expected value 的 MCP/permission entries；用户修改过的条目保留并报告 conflict，空容器按既有 renderer policy 处理。
+  6. `--uninstall-host-config` 与普通 setup mode 冲突时 fail closed；project/user scope 分别需要现有显式 authority。Uninstall 只删除 receipt identity 与 current normalized value hash 同时匹配的 MCP/permission entries；receipt 缺失、损坏、版本不兼容、用户修改过的条目或无 receipt 的同值预存条目全部保留并报告 conflict，空容器按既有 renderer policy 处理。
   7. `opencode.jsonc` 是唯一或实际 higher-precedence target 时阻断 mutation；仅与有效严格 JSON 共存且不生效时文件 byte-stable、严格 JSON 可继续 transaction，并报告 non-blocking collision fact。
   8. 现有 Claude/Codex/Cursor/Kiro/Qoder JSON/TOML config fixtures 在 registry version 升级后仍得到相同 target、server shape、conflict 和 rollback 结果。
-  9. Covers AE4/AE7. 无显式用户权限时，生成配置使 `bash`、`edit`、`task`、`webfetch`、`websearch` 的 resolved action 为 `ask`；真实 OpenCode 能连接至少一个 required MCP，subagent workflow 通过用户授权或 ask 流程完成。任何 resolved default allow、`--auto` 或 higher-precedence permissive override 都阻断正式支持晋升。
+  9. Covers R12/R15. Resolved-config fixtures 证明无显式用户权限时，生成配置使 `bash`、`edit`、`task`、`webfetch`、`websearch` 的 resolved action 为 `ask`；任何 resolved default allow、`--auto` 或 higher-precedence permissive override 都产生 action-required 并阻断正式支持晋升。真实 OpenCode MCP connection、permission prompt/deny 与 subagent workflow 只由 U6 验证。
   10. 已有配置含未知 secret-like value、解析错误或 conflict 时，facts、human output、JSON evidence 与 thrown error 都不包含原始 secret/config fragment，只输出稳定 reason code、redacted key/path 与恢复方向。
   11. OpenCode runtime state path、workspace `AGENTS.md` routing injection 与 Graphify project-skill/provider integration 使用 `.opencode/**`；所有 canonical-host lists 与 host-path regex 都包含 OpenCode，且旧宿主结果不变。
   12. `OPENCODE_CONFIG`、`OPENCODE_CONFIG_DIR`、`OPENCODE_CONFIG_CONTENT`、remote config 和 system/MDM managed config 的 fixture 分别验证 precedence 与 reason code；target file 正确但 resolved config 被覆盖时不得报告 ready。
+  13. 既有 host-ledger v2 无 `managed_config_receipts` 时按无 ownership 处理且不删除同值用户条目；canonical JSON 对象 key 重排产生相同 hash，array 顺序或 primitive 值变化产生不同 hash。合法 `managed-config-receipts.v1` 中多个 project target 按 canonical identity 共存，第二个项目 setup 不覆盖第一个 receipt；两个 project 并发 setup 在 receipt-ledger lock 下都保留对方 entry，不发生 lost update。collection 损坏、版本不兼容、ledger/config 任一锁超时或 replace 前 ownership 丢失时 setup/uninstall 零 mutation；replace 后 fault injection 导致失锁时，不得报告成功，只有锁内恢复被确认才报告 restored，否则保留 backup/evidence 并返回 manual-required。已有 receipt 且 current hash 匹配时允许受管更新并刷新 receipt；current hash 不匹配时 setup 与 uninstall 都 fail closed。Setup 写 config 后 receipt 写入失败恢复原始 config；uninstall 删除 config 后 receipt 删除失败恢复 config；成功 uninstall 只删除命中的 receipt，不影响其他 target。
+  14. PATH 中的 `opencode` 位于 target repo、通过 symlink 回到 workspace、不是普通可执行文件或 provenance 不完整时不运行 `debug config`；可信外部 realpath case 使用 argv 而非 shell，记录 path/version，遵守 timeout/output cap。目标版本无法关闭 plugin/MCP/network 副作用时保持 unverified。
 - **Verification:** Deterministic config transaction tests证明无损 ownership/rollback，CLI args/mode tests 证明 uninstall authority，resolved-config fixtures 证明 evidence ceiling；只有真实 OpenCode connection 与 permission behavior 才能把 MCP/security loader claim 提升为 confirmed。
 
 ### U5. Source/Runtime Policy、Docs、Package 与 Release Surface
@@ -563,7 +569,7 @@ stateDiagram-v2
 - **Patterns to follow:** 精确 mixed-ownership gitignore policy、README 的集中 host entry mapping、generated catalog 和 source-first Changelog。
 - **Test scenarios:**
   1. `.opencode/commands/spec-work.md`、registry 声明的 `.opencode/skills/spec-work/**`、`.opencode/spec-first/**` 被 ignore/untrack policy 精确覆盖。
-  2. `opencode.json`、`.opencode/plugins/**`、`.opencode/agents/custom.md`、非 `spec-*` command/skill 保持可见且不自动 untrack。
+  2. `opencode.json`、`.opencode/plugins/**`、`.opencode/agents/custom.md` 以及非 governance/registry managed 的 command/skill 保持可见且不自动 untrack。
   3. Recursive pathspec 覆盖嵌套 skill files，不因目录 wildcard 漏掉 `SKILL.md` references/scripts。
   4. README/中文 README、help、catalog、package description 对 OpenCode 的 host 名称、opt-in 和 preview 证据口径一致。
   5. Instruction sync 后 CLAUDE/AGENTS managed governance 区一致，OpenCode runtime 被列为 generated surface，root `AGENTS.md` 仍是 source instruction。
@@ -588,7 +594,7 @@ stateDiagram-v2
 - **Approach:**
   - 先执行 focused adapter/CLI/governance/setup tests，再执行 typecheck、skill lint、unit、smoke、integration、full test、build、release continuity 与 diff checks。
   - 从 packed tarball 安装到隔离 prefix/home，在临时 project 执行 OpenCode-only、Codex+OpenCode 和 all-supported-host init/doctor/update/clean，证明发布包而非 source checkout 行为。
-  - Deterministic evidence 记录 commit、package version、commands、exit codes、artifacts、reason codes 与 limitations；缺 OpenCode CLI 时 `real-runtime-summary.json` 不伪造，可记录 `not_run`/reason 或保持未创建。
+  - Deterministic evidence 记录 commit、package version、commands、exit codes、artifacts、reason codes 与 limitations；MCP evidence 额外记录实际解析的 package/version/registry/integrity，无法确定解析身份或 resolution 相对已确认 evidence 发生变化时，对应 MCP claim 降级。缺 OpenCode CLI 时 `real-runtime-summary.json` 不伪造，可记录 `not_run`/reason 或保持未创建。
   - 真实 OpenCode 旅程固定覆盖 command discovery/invocation、skill discovery/invocation、guarded Codex+OpenCode same-name coexistence、subagent-dependent workflow、MCP connection、resolved permission prompt/deny behavior、init→doctor→update→clean/setup-uninstall。
   - 支持晋升由 evidence reviewer 对照状态边界判断；官方 docs、unit tests、自检或 transcript completion statement 都不能单独晋升。
 - **Patterns to follow:** packaged five-host verification learning、Cursor preview promotion gate、`verification-run-summary`/honest evidence ceiling。
@@ -598,7 +604,7 @@ stateDiagram-v2
   3. All-supported-host packed init 使用动态 supported roster，所有 host state、skill packages 和 doctor drift checks 一致，OpenCode 不改变默认 `init -y` roster。
   4. Covers AE7. 真实 OpenCode 通过 `/spec-brainstorm` 或等价 command 与 `spec-brainstorm` skill 两个入口，证明发现和调用，而非只列文件。
   5. 真实 OpenCode 在用户明确授权 dispatch 后运行一条 subagent-dependent workflow；无授权 case 走 inline fallback，并在结果中披露 degradation。
-  6. 真实 OpenCode 连接 required MCP，通过 `opencode debug config` 或等价 confirmed evidence 验证最终 project/user scope、permission ask/deny 和 cleanup；用户已有 config entries 保持。
+  6. 真实 OpenCode 连接 required MCP，通过可信绝对路径执行的 safe diagnostic 或等价 confirmed evidence 验证最终 project/user scope、permission ask/deny 和 cleanup；记录 MCP resolved package identity，用户已有 config entries 保持。
   7. Loader、配置 schema 或 permission 行为与官方 docs/计划不一致时，证据标记 failure/degraded，支持状态回退，不修改 summary 伪装成功。
 - **Verification:** Preview completion 需要 deterministic/package ladder 全部通过；正式支持 completion 还需要 `real-runtime-summary.json` 覆盖全部真实旅程并由维护者确认 claim scope。
 
@@ -627,7 +633,7 @@ stateDiagram-v2
 
 - 从 `npm pack` 产物进行隔离安装，不以 source-tree CLI 代替发布包证明。
 - 临时项目覆盖 OpenCode-only、Codex+OpenCode、all-supported-host；每个场景检查 init、doctor、immediate re-init idempotence、update refresh args、clean 和 user-owned file preservation。
-- 配置 transaction 使用隔离 project/home，覆盖 project/user scope、conflict、secret、symlink、lock、rollback、uninstall 和 JSONC fail-closed。
+- 配置 transaction 使用隔离 project/home，覆盖 project/user scope、conflict、secret、symlink、lock、config+receipt rollback、multi-target receipt preservation、uninstall 和 JSONC fail-closed。
 - Codex+OpenCode 场景覆盖同名 skill collision 的未隔离 action-required 与 `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` guarded journey；不得依赖 duplicate warning 或未承诺加载顺序判定通过。
 - 证据必须记录版本、commit、平台、命令、exit code、artifact path 和 claim limitation；测试输出摘要不是 field outcome。
 
@@ -644,7 +650,7 @@ stateDiagram-v2
 |---|---|
 | `generated_runtime_preview` | Deterministic source/projection/governance/lifecycle/config/package gates |
 | Loader-confirmed preview | OpenCode 版本可追溯；至少一个 command 与一个 skill 被真实发现和调用 |
-| Full support eligible | Loader evidence + guarded compatibility-skill coexistence + subagent-dependent workflow + MCP connection + resolved permission deny/ask + install-to-clean end-to-end journey |
+| Full support eligible | Loader evidence + guarded compatibility-skill coexistence + subagent-dependent workflow + fresh resolved MCP package identity/connection + resolved permission deny/ask + install-to-clean end-to-end journey |
 
 ---
 
@@ -672,6 +678,7 @@ stateDiagram-v2
 |---|---|---|
 | OpenCode docs/config schema drift | Generated assets or config cannot load | Implementation re-reads official docs; real journey gates promotion; degraded reason preserves claim ceiling |
 | OpenCode compatibility skill duplicate | `.opencode/skills` 与 `.agents/skills`/`.claude/skills` 同名记录发生非确定覆盖；guard 又会禁用当前进程全部 external compatibility skills | Adapter/doctor collision inventory；未隔离时 action-required；README/doctor 披露 guard 影响并要求所需 skill 存在于 OpenCode-native path；真实 Codex+OpenCode journey gates promotion |
+| Mutable shared MCP dependency resolution | Existing required MCP commands using `@latest` can resolve to different third-party code after evidence capture | Keep cross-host pinning as follow-up；record resolved package/version/registry/integrity；resolution drift invalidates the MCP evidence slice and blocks full-support retention |
 | Governance/schema partial migration | Init/catalog fails or silently omits skills | Version bump + additionalProperties/required-key tests + atomic change |
 | Reusing `.agents/skills` | Codex/OpenCode clean and precedence collide | Independent `.opencode/skills`; coexistence tests |
 | Shared `AGENTS.md` removed by single-host clean | Remaining hosts lose project routing | Confirmed-absent last-consumer rule；ambiguous state preserves block and reports action-required；Codex/OpenCode/Qoder integration tests |
@@ -703,8 +710,8 @@ stateDiagram-v2
 - Runtime catalog 从 source/governance 生成，OpenCode 初始状态明确为 `generated_runtime_preview`；真实证据落地后再更新 promotion status。
 - `docs/contracts/context-governance.md` 与 `source-runtime-customization-boundary.md` 明确 `.opencode` generated slice、`opencode.json` mixed ownership 和 source-first repair path。
 - 实现阶段创建验证目录，确定性与真实 runtime 证据分开；缺失真实 evidence 是显式 limitation，不是空壳 pass。
-- Rollback 分两步：`spec-first clean --opencode` 移除 runtime，并仅在其他共享消费者 confirmed absent 时移除 root `AGENTS.md` managed block；`spec-runtime-setup --uninstall-host-config` 移除仍可证明归属的 config entries。两步都不删除 unknown user content。
-- 发布为 preview 时无需 feature flag；opt-in `--opencode` 本身是 rollout gate。正式支持晋升 owner 为项目维护者，rollback trigger 是 loader/MCP/subagent/end-to-end 任一回归。
+- Rollback 分两步：`spec-first clean --opencode` 移除 runtime，并按 KTD4 三态判定仅在其他共享消费者 confirmed absent 时移除 root `AGENTS.md` managed block；`spec-runtime-setup --uninstall-host-config` 仅在版本化 receipt 与 current value hash 同时匹配时移除 config entries。两步都不删除 unknown user content。
+- 发布为 preview 时无需 feature flag；opt-in `--opencode` 本身是 rollout gate。正式支持晋升 owner 为项目维护者；loader 回归降至 `GeneratedRuntimePreview`，guarded coexistence、subagent workflow、MCP package resolution/connection、permission 或 end-to-end 任一证据回归则至少降至 `LoaderConfirmedPreview`。
 
 ---
 
@@ -716,7 +723,7 @@ stateDiagram-v2
 - OpenCode adapter、CLI lifecycle、governance/schema、Runtime Setup、ownership/docs/package 全部 source-first 实现；工作树不包含手改 `.opencode/**` runtime。
 - `init --opencode` opt-in 可用，`init -y` defaults 不变；OpenCode 与 Codex/Qoder 等宿主可共存和独立 clean。
 - OpenCode commands、workflow skills、standalone/internal skills、state 和 runtime-setup host pin 按 governance 生成；不生成 custom helper agents。
-- `opencode.json` project/user config merge、resolved permission minimum、conflict、rollback、公开 uninstall mode 和 JSONC precedence-aware fail-closed 由确定性 tests 证明。
+- `opencode.json` project/user config merge、resolved permission minimum、版本化 multi-target receipts、config/receipt 双向 rollback、conflict、公开 uninstall mode、可信 diagnostic executable gate 和 JSONC precedence-aware fail-closed 由确定性 tests 证明。
 - Focused、typecheck、skill lint、runtime setup、unit、smoke、integration、full test、catalog、build、instruction sync 与 diff gate 命令全部成功；只有各 gate 内部明确设计为 conditional 的用例可以 skip，并且必须记录具体 non-success reason，不能用 skip 代替必需 gate pass。
 - Packed tarball 的 OpenCode-only、多宿主和 all-supported-host lifecycle 通过；验证 artifacts 记录实际命令、exit code、paths 和 limitations。
 - README/catalog/release/Changelog 只声明 `generated_runtime_preview`，除非真实 promotion gates 已通过。
@@ -727,15 +734,15 @@ stateDiagram-v2
 | Unit | Done signal |
 |---|---|
 | U1 | OpenCode adapter transform/projection/inspection/ownership 与 source-owned dispatch mapping tests 通过，runtime roots 与 Codex 独立，same-name collision 未隔离时 action-required，preview warning 非 drift；filtered asset completeness 等待 U3 atomic close |
-| U2 | Selector/default/help/doctor/update/clean/workspace tests 通过；单独 clean 保留其他 host runtime 与共享 `AGENTS.md`，ambiguous consumer state fail closed |
+| U2 | Selector/default/help/doctor/update/clean/workspace tests 通过；Doctor 对 valid state、exact managed asset orphan 与 user-owned files 正确分流；shared-instruction consumer 三态判定让单独 clean 保留现有 host、最后 clean 移除 block、uncertain state fail closed |
 | U3 | Versioned governance/schema/data/catalog 原子通过，所有 records 和 active supported-host projection 包含 OpenCode |
-| U4 | Explicit host authority、project/user scope、MCP/permission merge、resolved-config precedence、dangerous-tool ask baseline、conflict、公开 uninstall mode、JSONC precedence handling、rollback 与 secret-safe diagnostics 全部通过，旧 host fixtures 无回归 |
+| U4 | Explicit host authority、project/user scope、MCP/permission merge、versioned multi-target receipts、resolved-config precedence、trusted diagnostic executable、dangerous-tool ask baseline、conflict、公开 uninstall mode、JSONC precedence handling、config/receipt rollback 与 secret-safe diagnostics 全部通过，旧 host fixtures 无回归 |
 | U5 | Git/context/source-runtime/ordinary-workflow consumers/docs/package/Changelog 对精确 managed OpenCode preview paths 一致，未知 user assets 与非 managed skills 可见且保留 |
 | U6 | Deterministic/package evidence 完整；真实 OpenCode 不可用时明确 `not_run` 且不晋升 claim |
 
 ### Full Support Promotion Completion
 
-- `real-runtime-summary.json` 记录 OpenCode 版本与真实 command、skill、subagent、MCP、permission 和 lifecycle 旅程。
+- `real-runtime-summary.json` 记录 OpenCode 版本与真实 command、skill、subagent、MCP resolved package identity/connection、permission 和 lifecycle 旅程。
 - 命令与 skill 都是实际调用成功，不是仅扫描到文件；subagent workflow 与无授权 inline fallback 都有可审计结果。
 - MCP project/user scope、resolved permission ask/deny 与 uninstall 在真实 OpenCode 配置加载后生效，用户已有 config 保持。
-- 维护者确认 evidence freshness、limitations 与 claim scope 后，才更新 catalog/README/release wording；loader evidence 失效时降回 `GeneratedRuntimePreview`，loader 仍有效但 workflow/MCP/permission/end-to-end evidence 失效时降回 `LoaderConfirmedPreview`。
+- 维护者确认 evidence freshness、limitations 与 claim scope 后，才更新 catalog/README/release wording；loader evidence 失效时降回 `GeneratedRuntimePreview`，loader 仍有效但 guarded coexistence、workflow、MCP package resolution/connection、permission 或 end-to-end evidence 失效时降回 `LoaderConfirmedPreview`。
