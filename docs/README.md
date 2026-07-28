@@ -14,6 +14,8 @@
 
 | 路径 | 状态 | 当前用途 |
 |---|---|---|
+| `docs/05-用户手册/` | current | 当前 npm CLI 的用户入口、首次走查、workflow 与产物地图；从其 README 开始阅读 |
+| `docs/10-prompt/结构化项目角色契约.md` | current | spec-first 第一性原理、使命、权威与不可越过边界；架构和治理判断的最高优先级基线 |
 | `docs/contracts/` | current | workflow、artifact、provider、source/runtime、verification 与治理契约 |
 | `docs/contracts/dual-host-governance/` | current | 双宿主治理的专用契约；从其 README 开始阅读 |
 | `docs/adr/` | current | 已记录的架构决策及其背景、取舍和后果 |
