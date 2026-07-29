@@ -2,15 +2,18 @@
 title: Host-Neutral Worker Dispatch - Plan
 type: refactor
 date: 2026-07-28
+revised: 2026-07-29
 topic: host-neutral-worker-dispatch
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
 execution: code
-status: completed
+status: active
 plan_depth: deep
-deepened: 2026-07-28
+deepened: 2026-07-29
 origin: docs/plans/2026-07-27-001-feat-opencode-host-support-plan.md
+claim_status: unclosed
+claim_blocked_by: validator rejects all 3 dated journeys (164 set-level errors) — missing invocation_started_at/capability_probe/worker_dispatch_capability/state_observation_ref/state_observation_sha256 fields added in post-capture schema tightening; spec_first_revision locked to git:5461c55e while HEAD is a77917a4. Journeys must be re-captured with current schema + current git revision + dispatch authorization.
 ---
 
 # Host-Neutral Worker Dispatch - Plan
@@ -710,28 +713,28 @@ U3 原“Versioned Host Binding And Projection Seam”在本次深化中被裁�
 
 ## Definition of Done
 
-- [ ] `docs/contracts/workflows/worker-dispatch-capability.md` 成为唯一 host-neutral semantic port owner，且不含任何宿主 dispatch primitive。
-- [ ] Generic worker eligibility predicate 明确 self-contained task packet、bounded stop、mutation scope、caller-readable output 和 host-mapping independence 五项必要条件；零候选、多候选、字段缺失、prompt-like directive 与 completeness 未确认的 missing/unknown 规则有正反 fixture，脚本不实现语义评分或 primitive selector。
-- [ ] Primitive identity/arguments 只来自 active host tool schema；live response 与 journey evidence 分别拥有 session outcome 和 exact-version claim，Skill、adapter/project state 与 generated runtime 不复制 mapping。
-- [ ] 全部 18 个 governed package 使用统一 semantic vocabulary；U1 的 `16/18/18/18` 只作为 pre-migration characterization，U2 重新计算终态且不冻结 capability=16；canonical native-worker semantic source 的宿主 primitive leakage 为零，例外仅限 provider-owned schema、path-scoped evidence/compatibility fixture 或明确 external provider integration。
-- [ ] `worker_dispatch_capability` 在全部 governed owner 中统一为 `available | missing | unknown`，`capability_probe` 为 `not_applicable | attempted | unavailable`，authorization/capability/outcome 状态表有正反用例。
-- [ ] Required isolation 的 `inherited|unknown` 不关闭 independent gate；preferred isolation、model unknown 和 parallelism unknown 均有明确 degraded/serial behavior。
-- [ ] 未新增 binding manifest/schema/loader/renderer、host-local mapping projection、`dispatch()`、session adapter API、并发池、模型路由或权限代理。
-- [ ] Active tool schema 已检查但 completeness 未确认、必要行为字段缺失、含 prompt-like directive 或候选歧义时为 `attempted + unknown`；只有没有可靠 current-session discovery surface/检查无法执行时为 `unavailable + unknown`；只有 completeness confirmed 且有可复核 basis 时 absence 才能判 `attempted + missing`。
-- [ ] Active schema 全部按 `provider_untrusted` quoted evidence 处理，具备 provenance、长度限制、转义、delimiter 与 redaction；prompt-like directive 不进入 instruction authority，schema/provider 自述不证明只读、隔离或授权。
-- [ ] Dispatch、mutation、受限读取、数据外发、凭证使用与外部通信授权彼此独立；external/unknown trust domain 默认不接收内容型 refs，task packet 只有在最小化、allowlist、secret-redacted 且对应授权齐全时可发送。
-- [ ] Mutation authorization ref contract 完整：forbidden 固定为 `null` ref/空 surfaces；explicitly-scoped 必须非空并回源到 current task/Workflow/visible handoff 的 scope，跨 repo/workspace 或非 repo 副作用使用包含 authority origin、target scope、side-effect types、freshness 的显式 artifact ref；requested surfaces 只能等于或收窄引用授权。
-- [ ] Worker 调用前后核对当前任务可观察 mutation surface；authorization ref 缺失/不可解析/过期/冲突、forbidden 的任何 run-owned mutation、explicitly-scoped 的越界 mutation 或无法观察实际副作用均不关闭 dependent claim。Git/filesystem 是项目任务默认实现，非 Git workflow 不被强制做无关重型快照。
-- [ ] `supportsAgents` 的 static projection 语义保持不变，未被用于 session capability 或 support claim。
-- [ ] U1 的 semantic foundation、focused tests、完整 canonical source-universe inventory 与 preflight capture schema/template/validator 已完成；真实 Gate 0 artifact 不属于 U1 completion。
-- [ ] 独立 post-U1/pre-U2 Discovery-only Gate 0 在两个采用不同 native primitive 的真实宿主上通过合格 current-session capture 使用同一 hashed eligibility excerpt，并记录不同 candidate identity；preflight 不调用 worker、`support_claim: not_applicable`，缺环境/授权/capture、excerpt drift 或结果不合格时 U1 保持 complete、U2 blocked。
-- [ ] U2 Wave A 与 Wave B 在同一 release 原子交付，没有 vocabulary-only、primitive-removal-only 或长期 legacy/advisory dual-write；被删除的 U3 binding variant 未以兼容层或 follow-up placeholder 留在实现中。
-- [ ] Primitive leakage inventory 的 candidate universe 来自完整 canonical `skills/**/*.md`，显式覆盖 `skills/spec-plan/references/universal-planning.md` 与 `skills/spec-write-tasks/references/execution-handoff-contract.md`；test-local path/context/owner facts 不冒充最终语义判断。测试内替换虚拟宿主 tool schema 时既有 Workflow source 无变更且 projection 不新增 worker mapping；静态 consumer scan 证明只有 `tests/**` 可执行代码可引用 fixture。
-- [ ] OpenCode 计划删除逐 Skill `task` mapping 和 binding 假设，并把 `task` 限定在 provider-owned schema、path-scoped fixture 与 exact-version evidence。
-- [ ] Focused、skill lint、integration、full regression、build/package 与 `git diff --check` 全部通过；未执行项和限制被明确记录。
-- [ ] Fresh-source eval 有 traceable 状态；缺授权/primitive/isolation 时不声称独立、隔离或多 agent 验证。
-- [ ] 至少两个使用不同原生 primitive 的真实 positive journeys 和一个真实 degraded journey 通过 versioned evidence contract；每份 evidence 记录 capture owner/method、session/version/authorization refs、current-session schema excerpt/hash、discovery surface、schema completeness/basis、redaction/limitations、actual output/mutation facts，相关输入变化会使 claim stale。
-- [ ] 当前 checkout 的 generated runtime 未被手改；runtime adoption 只通过 source generation 在临时项目验证，后续用户环境刷新另行授权。
-- [x] `AGENTS.md` / `CLAUDE.md` 的 mandatory role contract source 已恢复为有效 source-of-truth，并通过 focused instruction-governance verification；该完成项只关闭实施前置，不代表 U1–U6 已开始或完成。
-- [ ] `README.md`、`README.zh-CN.md`、source/runtime boundary、OpenCode plan 和 `CHANGELOG.md` 对严格解耦范围、evidence 上限与非目标表述一致。
-- [ ] Abandoned binding variants、temporary compatibility hacks 和未采用的 mapping/projection paths 已从最终 diff 清理；保留的 test fixture 不构成隐式 runtime mapping。
+- [x] `docs/contracts/workflows/worker-dispatch-capability.md` 成为唯一 host-neutral semantic port owner，且不含任何宿主 dispatch primitive。
+- [x] Generic worker eligibility predicate 明确五项必要条件；missing/unknown 规则有正反 fixture（`tests/fixtures/worker-dispatch/semantic-candidate-cases.json`），脚本不实现语义评分或 primitive selector。
+- [x] Primitive identity/arguments 只来自 active host tool schema；live response 与 journey evidence 分别拥有 session outcome 和 exact-version claim，Skill、adapter/project state 与 generated runtime 不复制 mapping。
+- [x] 全部 18 个 governed package 使用统一 semantic vocabulary；U2 post-migration 确认 18/18 package 消费统一 vocabulary；canonical native-worker semantic source 的宿主 primitive leakage 为零（`dispatch-authorization-matrix-contracts.test.js` primitive leakage test 40/40 pass）。
+- [x] `worker_dispatch_capability` 全部 unified 为 `available | missing | unknown`，`capability_probe` 为 `not_applicable | attempted | unavailable`，状态表有正反用例。
+- [x] Required isolation `inherited|unknown` 不关闭 independent gate；preferred isolation、model unknown、parallelism unknown 均有 degraded/serial behavior。
+- [x] 未新增 binding manifest/schema/loader/renderer、host-local mapping projection、`dispatch()`、session adapter API、并发池、模型路由或权限代理。
+- [x] Active tool schema 三态 probe 规则（`attempted+unknown` vs `unavailable+unknown` vs `attempted+missing`）已实现，有正反 fixture。
+- [x] Active schema 全部按 `provider_untrusted` quoted evidence 处理，具备 provenance、长度限制、转义、delimiter 与 redaction。
+- [x] Dispatch、mutation、受限读取、数据外发、凭证使用与外部通信授权彼此独立；external/unknown trust domain 默认不接收内容型 refs。
+- [x] Mutation authorization ref contract 完整：forbidden/null/空 surfaces、explicitly-scoped 非空回源 + scope containment + freshness、跨 repo 显式 artifact ref。
+- [x] Worker 调用前后核对 observable mutation surface；Git/filesystem 默认实现，非 Git workflow 不强制无关快照。
+- [x] `supportsAgents` 的 static projection 语义保持不变，未被用于 session capability 或 support claim。
+- [x] U1 semantic foundation、focused tests、完整 canonical source-universe inventory 与 preflight capture schema/template/validator 已完成（`docs/contracts/verification/worker-dispatch-host-preflight.{md,schema.json}` + `src/contracts/worker-dispatch-host-preflight-validator.js` + `tests/unit/worker-dispatch-host-preflight-contracts.test.js` 37/37 pass）。
+- [x] Gate 0 已在两个采用不同 native primitive 的真实宿主上完成（`docs/validation/worker-dispatch/preflight/` 下 4 个 artifacts：Claude `Agent` + Codex `collaboration.spawn_agent`，不同 candidate identity，同一 eligibility hash，preflight 未调用 worker）。
+- [x] U2 Wave A + Wave B 在同一 release 原子交付：vocabulary migration + primitive removal，无 legacy/advisory dual-write。
+- [x] Primitive leakage inventory candidate universe 来自完整 canonical `skills/**/*.md`，显式覆盖 `universal-planning.md` 与 `execution-handoff-contract.md`；test fixture 无 production consumer（consumer scan 限定 `tests/**` 可读）。
+- [x] OpenCode 计划（`docs/plans/2026-07-27-001-feat-opencode-host-support-plan.md`）已更新为 v2，删除逐 Skill `task` mapping 和 binding 假设。
+- [x] Focused 9 suites / 173 tests、skill lint 313 files、typecheck 190 files、unit 1560 tests、smoke 5 tests、integration 37 tests、build 695 files 与 `git diff --check` 全部通过。
+- [x] Fresh-source eval 有 traceable 状态（`docs/validation/worker-dispatch/2026-07-29-fresh-source-eval.md`，`status: passed`，limitations 完整记录，closeout `not_run: dispatch_authorization_missing` 诚实记录）。
+- [ ] **BLOCKED — U6 journey evidence 需重新捕获。** 3 条 dated journeys（Claude `Agent` 2.1.220 positive + Codex `collaboration.spawn_agent` 0.145.0 positive + Claude required-isolation degraded）在 capture 时字段齐全且观察到不同 native primitive，但 post-capture schema 收紧（validator 新增 `invocation_started_at`、`capability_probe`、`worker_dispatch_capability`、`state_observation_ref`、`state_observation_sha256` 必填字段）且 source revision 已从 `git:5461c55e` 演进至 `git:a77917a4`，导致 validator 当前返回 164 set-level errors。CHANGELOG 已诚实记录"被 validator 正确标记为 invalid"。关闭此项需要：① dispatch 授权（当前不可用），② 在真实 Claude/Codex 会话中按当前 schema 重新捕获 3 条 journeys，③ `spec_first_revision` 指向重新捕获时的 git HEAD。详见 `docs/validation/worker-dispatch/2026-07-29-claim-closure-checklist.md`（待生成）。
+- [x] 当前 checkout 的 generated runtime 未被手改；git status 确认无 `.claude/`、`.codex/`、`.agents/`、`.cursor/`、`.kiro/`、`.qoder/` 改动。
+- [x] `AGENTS.md` / `CLAUDE.md` 的 mandatory role contract source 已恢复为有效 source-of-truth（focused instruction-governance verification 通过）。
+- [x] `README.md`、`README.zh-CN.md`、source/runtime boundary、OpenCode plan 和 `CHANGELOG.md` 对严格解耦范围、evidence 上限与非目标表述一致。
+- [x] Abandoned binding variants、temporary compatibility hacks 和未采用的 mapping/projection paths 已从最终 diff 清理；保留的 test fixture 不构成隐式 runtime mapping。

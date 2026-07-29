@@ -150,9 +150,10 @@ function isDoctorAttentionCheck(check) {
 }
 
 function describeDoctorPlatformStatus(checks) {
-  if (!Array.isArray(checks) || checks.length === 0) return '未检测';
-  if (checks.some((check) => check.level === 'ERROR')) return '有问题';
-  if (checks.some((check) => check.level === 'WARNING')) return '需关注';
+  const status = summarizeChecks(checks);
+  if (status === 'error') return '有问题';
+  if (status === 'warn') return '需关注';
+  if (status === 'not_applicable') return '未检测';
   return '正常';
 }
 

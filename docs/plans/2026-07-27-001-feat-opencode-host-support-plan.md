@@ -202,7 +202,7 @@ flowchart TB
 - OpenCode 当前 source 显示 project-local `.opencode/skills`、`.agents/skills` 与 `.claude/skills` 会共同参与发现，同名记录只告警并由后完成加载的记录覆盖；实现不得把这一并发加载顺序当作稳定 precedence contract。
 - 首轮真实 promotion evidence 以 OpenCode `1.18.7` 为目标基线；若实施时 stable 已变化，必须把实际验证版本作为精确集合写入 evidence。未列入该集合的新版本、旧版本或未知版本一律保持 `opencode_version_unverified`，不得从单版本结果推导宽泛 semver 支持。
 - U0 共享 `AGENTS.md` 三态 consumer 判定是 R4 / AE2 的前置；U0 仍未完成时 OpenCode R4 仅能 partial test（state+asset 同时缺失的 `confirmed_absent` 路径可独立验证，`uncertain` 路径需 U0 联合验证）。
-- 07-28 plan 已完成 host-neutral worker-dispatch 切片，OpenCode plan 不复制其内容；`cross_plan_refs.opencode_to_worker_dispatch` 字段为 `eligibility_contract_sha256`。
+- 07-28 plan 的代码迁移（U1-U5）已完成，但**严格解耦 claim（U6）因 post-capture schema 收紧 + source revision 演进导致 validator 拒收全部 3 条 dated journeys（164 set-level errors）而保持未关闭**。OpenCode plan 不复制其内容；`cross_plan_refs.opencode_to_worker_dispatch` 引用的 `eligibility_contract_sha256` 来自 07-28 plan 当前 source——在 07-28 plan U6 claim 关闭前，OpenCode 任何高于 `generated_runtime_preview` 的晋升都永久 blocked。
 
 ### Outstanding Questions
 
