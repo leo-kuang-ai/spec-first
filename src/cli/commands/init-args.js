@@ -36,6 +36,13 @@ const INIT_PLATFORM_CHOICES = [
     defaultChecked: false,
     defaultForYes: false,
   },
+  {
+    id: 'opencode',
+    flag: 'opencode',
+    label: 'OpenCode',
+    defaultChecked: false,
+    defaultForYes: false,
+  },
 ];
 
 const SUPPORTED_HOST_IDS = new Set(INIT_PLATFORM_CHOICES.map((choice) => choice.id));
@@ -218,6 +225,7 @@ function hostDisplayName(platform) {
   if (platform === 'cursor') return 'Cursor';
   if (platform === 'kiro') return 'Kiro';
   if (platform === 'qoder') return 'Qoder';
+  if (platform === 'opencode') return 'OpenCode';
   return platform;
 }
 

@@ -77,8 +77,22 @@ describe('plugin module facade and governance', () => {
       skills: governance.skills,
     })).not.toThrow();
 
+    const missingOpenCodeDelivery = JSON.parse(JSON.stringify(governance));
+    delete missingOpenCodeDelivery.skills[0].host_delivery.opencode;
+    expect(() => plugin.validateSkillsGovernance(missingOpenCodeDelivery))
+      .toThrow('invalid host_delivery.opencode');
+
+    const invalidOpenCodeDelivery = JSON.parse(JSON.stringify(governance));
+    const internalRecord = invalidOpenCodeDelivery.skills.find(
+      (record) => record.entry_surface === 'internal_only',
+    );
+    internalRecord.host_delivery.opencode = 'command';
+    expect(() => plugin.validateSkillsGovernance(invalidOpenCodeDelivery))
+      .toThrow('cannot expose internal_only skill');
+
     const claude = plugin.buildFilteredAssetSet('claude');
     const cursor = plugin.buildFilteredAssetSet('cursor');
+    const opencode = plugin.buildFilteredAssetSet('opencode');
     expect(claude.commands.map((command) => command.name)).toContain('work');
     expect(claude.workflowSkills).toContain('spec-work');
     expect(cursor.commands).toEqual([]);
@@ -95,6 +109,11 @@ describe('plugin module facade and governance', () => {
     expect(cursor.internalSkills).not.toContain('spec-resolve-pr-feedback');
     expect(cursor.internalSkills).not.toContain('spec-test-xcode');
     expect(cursor.agents).toEqual([]);
+    expect(opencode.commands.map((command) => command.name)).toContain('work');
+    expect(opencode.workflowSkills).toContain('spec-work');
+    expect(opencode.internalSkills).toContain('spec-worktree');
+    expect(opencode.agents).toEqual([]);
+    expect(opencode.agentSupportFiles).toEqual([]);
     expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
   });
 
@@ -538,6 +557,7 @@ describe('plugin module facade and governance', () => {
       'spec-runtime-setup/scripts/lib/human-output.cjs',
       'spec-runtime-setup/scripts/lib/installation-executor.cjs',
       'spec-runtime-setup/scripts/lib/mode-policy.cjs',
+      'spec-runtime-setup/scripts/lib/opencode-permissions.cjs',
       'spec-runtime-setup/scripts/lib/path-safety.cjs',
       'spec-runtime-setup/scripts/lib/preflight.cjs',
       'spec-runtime-setup/scripts/lib/process-runner.cjs',
@@ -668,7 +688,7 @@ describe('plugin module facade and governance', () => {
         expect(prdSkill.contents).toContain('by editing a generated host runtime mirror');
         expect(prdSkill.contents).not.toContain('from the source checkout');
         expect(prdSkill.contents).not.toContain('current-source finalize command');
-        expect(prdSkill.contents).not.toMatch(/`[^`]*(?:\.claude|\.agents|\.cursor|\.kiro|\.qoder)[^`]*` on (?:Codex|Claude)/);
+        expect(prdSkill.contents).not.toMatch(/`[^`]*(?:\.claude|\.agents|\.cursor|\.kiro|\.qoder|\.opencode)[^`]*` on (?:Codex|Claude)/);
 
         if (platform === 'qoder') {
           const qoderPrdCommand = contentOperations.find((operation) =>
@@ -694,7 +714,7 @@ describe('plugin module facade and governance', () => {
         );
         expect(setupSkill).toBeDefined();
         expect(setupSkill.contents).toContain(
-          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。',
+          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v9`。',
         );
         expect(setupSkill.contents).toContain(
           'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',

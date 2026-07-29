@@ -1,6 +1,6 @@
 'use strict';
 
-const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'qoder']);
+const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
 const CANONICAL_HOST_SET = new Set(CANONICAL_HOSTS);
 
 function resolveHostAuthority({

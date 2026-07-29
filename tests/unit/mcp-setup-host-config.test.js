@@ -82,6 +82,48 @@ function codexEntry(overrides = {}) {
   };
 }
 
+function openCodeEntry(overrides = {}) {
+  return {
+    id: 'context7',
+    detection: { key: 'context7' },
+    host_config: {
+      command: 'npx',
+      args: ['-y', '@upstash/context7-mcp@latest'],
+      env: { CONTEXT7_API_KEY: '${CONTEXT7_API_KEY}' },
+      json_container_path: ['mcp'],
+      server_representation: 'opencode-local',
+      targets: {
+        project: {
+          config_path: 'opencode.json',
+          config_format: 'json',
+          precedence: 100,
+          precedence_guards: [{
+            config_path: 'opencode.jsonc',
+            config_format: 'jsonc',
+            precedence: 110,
+            reason_code: 'host-config-jsonc-precedence-blocked',
+          }],
+        },
+        user: {
+          config_path: '${XDG_CONFIG_HOME}/opencode/opencode.json',
+          config_format: 'json',
+          precedence: 50,
+          requires_user_scope_opt_in: true,
+          precedence_guards: [{
+            config_path: '${XDG_CONFIG_HOME}/opencode/opencode.jsonc',
+            config_format: 'jsonc',
+            precedence: 60,
+            reason_code: 'host-config-jsonc-precedence-blocked',
+          }],
+        },
+      },
+      fallback_order: ['project'],
+      uninstall_targets: ['project', 'user'],
+    },
+    ...overrides,
+  };
+}
+
 function authority(host, scope) {
   return {
     ok: true,
@@ -310,6 +352,189 @@ describe('grammar-bounded Codex TOML section editor', () => {
 });
 
 describe('host config resolution, inspection, and transaction', () => {
+  test('resolves OpenCode project config by default and requires explicit user scope with XDG fallback', () => {
+    const repoRoot = tempDir('opencode-target-repo');
+    const homeDir = tempDir('opencode-target-home');
+    const entry = openCodeEntry();
+
+    expect(resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: {},
+    })).toMatchObject({
+      ok: true,
+      scope: 'project',
+      config_path: path.join(repoRoot, 'opencode.json'),
+      json_container_path: ['mcp'],
+      server_representation: 'opencode-local',
+    });
+
+    expect(resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      scope: 'user',
+      authority: authority('opencode', 'user'),
+      repoRoot,
+      homeDir,
+      env: {},
+      userScope: false,
+    })).toMatchObject({ ok: false, reason_code: 'host-user-scope-not-authorized' });
+
+    expect(resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: {},
+      userScope: true,
+    })).toMatchObject({
+      ok: true,
+      scope: 'user',
+      config_path: path.join(homeDir, '.config', 'opencode', 'opencode.json'),
+    });
+
+    const xdgConfigHome = tempDir('opencode-custom-xdg');
+    expect(resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: { XDG_CONFIG_HOME: xdgConfigHome },
+      userScope: true,
+    })).toMatchObject({
+      ok: true,
+      scope: 'user',
+      config_path: path.join(xdgConfigHome, 'opencode', 'opencode.json'),
+    });
+  });
+
+  test('writes the OpenCode native mcp container and local server representation', () => {
+    const repoRoot = tempDir('opencode-json-repo');
+    const homeDir = tempDir('opencode-json-home');
+    const entry = openCodeEntry();
+    const target = resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: {},
+    });
+    const original = '\uFEFF{\r\n  "theme": "dark",\r\n  "mcp": {\r\n    "keep": { "type": "remote", "url": "https://example.test/mcp" }\r\n  }\r\n}\r\n';
+    fs.writeFileSync(target.config_path, original);
+    fs.chmodSync(target.config_path, 0o640);
+
+    expect(applyHostConfig({ entry, target })).toMatchObject({
+      ok: true,
+      changed: true,
+      reason_code: 'host-config-updated',
+      post_write_verified: true,
+    });
+    const written = fs.readFileSync(target.config_path, 'utf8');
+    expect(written.startsWith('\uFEFF')).toBe(true);
+    expect(written).toContain('\r\n');
+    const parsed = JSON.parse(written.slice(1));
+    expect(parsed.theme).toBe('dark');
+    expect(parsed.mcp.keep).toEqual({ type: 'remote', url: 'https://example.test/mcp' });
+    expect(parsed.mcp.context7).toEqual({
+      type: 'local',
+      command: ['npx', '-y', '@upstash/context7-mcp@latest'],
+      environment: { CONTEXT7_API_KEY: '${CONTEXT7_API_KEY}' },
+    });
+    expect(parsed).not.toHaveProperty('mcpServers');
+    if (process.platform !== 'win32') expect(fs.statSync(target.config_path).mode & 0o777).toBe(0o640);
+  });
+
+  test('blocks OpenCode JSON mutation when a higher-precedence JSONC sibling exists', () => {
+    const repoRoot = tempDir('opencode-jsonc-repo');
+    const homeDir = tempDir('opencode-jsonc-home');
+    const entry = openCodeEntry();
+    const target = resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: {},
+    });
+    const jsoncPath = path.join(repoRoot, 'opencode.jsonc');
+    const jsonc = '{\n  // user-owned\n  "mcp": {}\n}\n';
+    fs.writeFileSync(jsoncPath, jsonc);
+
+    expect(inspectHostConfig({ entry, target })).toMatchObject({
+      ok: false,
+      configured: false,
+      reason_code: 'host-config-jsonc-precedence-blocked',
+      blocking_path: jsoncPath,
+    });
+    expect(applyHostConfig({ entry, target })).toMatchObject({
+      ok: false,
+      reason_code: 'host-config-jsonc-precedence-blocked',
+    });
+    expect(fs.existsSync(target.config_path)).toBe(false);
+    expect(fs.readFileSync(jsoncPath, 'utf8')).toBe(jsonc);
+    expect(fs.readdirSync(repoRoot).filter((name) => name.includes('.spec-first.'))).toEqual([]);
+  });
+
+  test('uses OpenCode 1.18.7 project-over-user precedence and does not mistake user config for the effective project target', () => {
+    const repoRoot = tempDir('opencode-project-precedence-repo');
+    const homeDir = tempDir('opencode-project-precedence-home');
+    const xdgRoot = path.join(homeDir, 'xdg');
+    const entry = openCodeEntry();
+    const projectTarget = resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: { XDG_CONFIG_HOME: xdgRoot },
+    });
+    const userTarget = resolveHostConfigTarget({
+      entry,
+      host: 'opencode',
+      authority: authority('opencode'),
+      repoRoot,
+      homeDir,
+      env: { XDG_CONFIG_HOME: xdgRoot },
+      userScope: true,
+    });
+
+    fs.mkdirSync(path.dirname(userTarget.config_path), { recursive: true });
+    fs.writeFileSync(userTarget.config_path, JSON.stringify({
+      mcp: {
+        context7: {
+          type: 'local',
+          command: ['/usr/bin/false'],
+        },
+      },
+    }));
+    fs.writeFileSync(projectTarget.config_path, JSON.stringify({
+      mcp: {
+        context7: projectTarget.server,
+      },
+    }));
+
+    expect(inspectHostConfig({ entry, target: projectTarget })).toMatchObject({
+      ok: true,
+      configured: true,
+      reason_code: 'host-config-current',
+      effective_scope: 'project',
+      effective_path: projectTarget.config_path,
+    });
+    expect(inspectHostConfig({ entry, target: userTarget })).toMatchObject({
+      ok: true,
+      configured: true,
+      reason_code: 'host-config-higher-precedence-current',
+      effective_scope: 'project',
+      effective_path: projectTarget.config_path,
+    });
+  });
+
   test('requires explicit matching authority and user-scope opt-in', () => {
     const repoRoot = tempDir('authority-repo');
     const homeDir = tempDir('authority-home');
@@ -835,6 +1060,121 @@ describe('host config resolution, inspection, and transaction', () => {
     });
     expect(JSON.parse(fs.readFileSync(target.config_path, 'utf8')).mcpServers)
       .toEqual({ keep: { command: 'keep', args: [] } });
+  });
+
+  test('preserves conflicting JSON and TOML entries during uninstall', () => {
+    const repoRoot = tempDir('remove-conflict-repo');
+    const homeDir = tempDir('remove-conflict-home');
+    const json = jsonEntry();
+    const jsonTarget = resolveHostConfigTarget({
+      entry: json,
+      host: 'cursor',
+      authority: authority('cursor', 'project'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(jsonTarget.config_path), { recursive: true });
+    const jsonOriginal = '{\n  "mcpServers": {\n    "context7": { "command": "user-owned", "args": [] },\n    "keep": { "command": "keep", "args": [] }\n  }\n}\n';
+    fs.writeFileSync(jsonTarget.config_path, jsonOriginal);
+
+    expect(applyHostConfig({ entry: json, target: jsonTarget, operation: 'remove' })).toMatchObject({
+      ok: false,
+      changed: false,
+      reason_code: 'host-config-uninstall-conflict',
+    });
+    expect(fs.readFileSync(jsonTarget.config_path, 'utf8')).toBe(jsonOriginal);
+
+    const toml = codexEntry();
+    const tomlTarget = resolveHostConfigTarget({
+      entry: toml,
+      host: 'codex',
+      authority: authority('codex', 'user'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(tomlTarget.config_path), { recursive: true });
+    const tomlOriginal = [
+      '[mcp_servers.context7]',
+      'command = "user-owned"',
+      'args = []',
+      '',
+      '[other]',
+      'keep = true',
+      '',
+    ].join('\n');
+    fs.writeFileSync(tomlTarget.config_path, tomlOriginal);
+
+    expect(applyHostConfig({ entry: toml, target: tomlTarget, operation: 'remove' })).toMatchObject({
+      ok: false,
+      changed: false,
+      reason_code: 'host-config-uninstall-conflict',
+    });
+    expect(fs.readFileSync(tomlTarget.config_path, 'utf8')).toBe(tomlOriginal);
+  });
+
+  test('treats extra JSON and TOML entry fields as uninstall conflicts', () => {
+    const repoRoot = tempDir('remove-extra-field-repo');
+    const homeDir = tempDir('remove-extra-field-home');
+    const json = jsonEntry();
+    const jsonTarget = resolveHostConfigTarget({
+      entry: json,
+      host: 'cursor',
+      authority: authority('cursor', 'project'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(jsonTarget.config_path), { recursive: true });
+    const jsonOriginal = JSON.stringify({
+      mcpServers: {
+        context7: {
+          command: 'npx',
+          args: ['-y', '@upstash/context7-mcp@latest'],
+          metadata: { owner: 'user' },
+        },
+      },
+    }, null, 2);
+    fs.writeFileSync(jsonTarget.config_path, jsonOriginal);
+
+    expect(inspectHostConfig({ entry: json, target: jsonTarget })).toMatchObject({
+      ok: true,
+      configured: true,
+    });
+    expect(applyHostConfig({ entry: json, target: jsonTarget, operation: 'remove' })).toMatchObject({
+      ok: false,
+      reason_code: 'host-config-uninstall-conflict',
+      conflict_fields: ['extra:metadata'],
+    });
+    expect(fs.readFileSync(jsonTarget.config_path, 'utf8')).toBe(jsonOriginal);
+
+    const toml = codexEntry();
+    const tomlTarget = resolveHostConfigTarget({
+      entry: toml,
+      host: 'codex',
+      authority: authority('codex', 'user'),
+      repoRoot,
+      homeDir,
+    });
+    fs.mkdirSync(path.dirname(tomlTarget.config_path), { recursive: true });
+    const tomlOriginal = [
+      '[mcp_servers.context7]',
+      'command = "npx"',
+      'args = ["-y", "@upstash/context7-mcp@latest"]',
+      'startup_timeout_sec = 20',
+      'metadata = { owner = "user" }',
+      '',
+    ].join('\n');
+    fs.writeFileSync(tomlTarget.config_path, tomlOriginal);
+
+    expect(inspectHostConfig({ entry: toml, target: tomlTarget })).toMatchObject({
+      ok: true,
+      configured: true,
+    });
+    expect(applyHostConfig({ entry: toml, target: tomlTarget, operation: 'remove' })).toMatchObject({
+      ok: false,
+      reason_code: 'host-config-uninstall-conflict',
+      conflict_fields: ['extra:metadata'],
+    });
+    expect(fs.readFileSync(tomlTarget.config_path, 'utf8')).toBe(tomlOriginal);
   });
 
   test('TOML transaction preserves unrelated content, recovers stale locks, and verifies after replace', () => {

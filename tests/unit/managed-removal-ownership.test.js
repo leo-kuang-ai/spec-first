@@ -3,15 +3,21 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const CodexAdapter = require('../../src/cli/adapters/codex');
 const { removeManagedCodingGuidelinesBlock } = require('../../src/cli/coding-guidelines');
 const { removeManagedBootstrapBlock } = require('../../src/cli/instruction-bootstrap');
+const { LANG_END, LANG_START } = require('../../src/cli/lang-policy');
 const {
   RUNTIME_TOOLS_END,
   RUNTIME_TOOLS_START,
   removeManagedRuntimeToolsBlock,
 } = require('../../src/cli/runtime-tools-index');
+
+const repoRoot = path.resolve(__dirname, '..', '..');
+const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
+const lifecycleSandboxes = new Set();
 
 function tempProjectRoot() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-removal-ownership-')));
@@ -28,6 +34,42 @@ function removeDirTargets(projectRoot) {
     .operations.filter((operation) => operation.kind === 'remove_dir')
     .map((operation) => operation.path);
 }
+
+function tempLifecycleSandbox(prefix) {
+  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const home = path.join(projectRoot, 'home');
+  fs.mkdirSync(home, { recursive: true });
+  lifecycleSandboxes.add(projectRoot);
+  return { projectRoot, home };
+}
+
+function runSpecFirst(args, sandbox) {
+  return spawnSync(process.execPath, [cliPath, ...args], {
+    cwd: sandbox.projectRoot,
+    env: { ...process.env, HOME: sandbox.home },
+    encoding: 'utf8',
+    timeout: 120000,
+  });
+}
+
+function initHosts(hosts, sandbox) {
+  return runSpecFirst([
+    'init',
+    ...hosts.map((host) => `--${host}`),
+    '-y',
+    '-u',
+    'managed-removal-test',
+    '--lang',
+    'en',
+  ], sandbox);
+}
+
+afterEach(() => {
+  for (const projectRoot of lifecycleSandboxes) {
+    fs.rmSync(projectRoot, { recursive: true, force: true });
+  }
+  lifecycleSandboxes.clear();
+});
 
 // Managed-block and managed-directory removal must delete only what spec-first can prove it
 // generated. These contracts pin the ownership boundary so cleanup never eats user content.
@@ -105,6 +147,93 @@ describe('managed block removal leaves marker-free instruction files verbatim', 
   ])('%s removal does not reformat a document without its markers', (_label, remove) => {
     expect(remove(userDoc)).toBe(userDoc);
   });
+});
+
+describe('single-host clean characterization', () => {
+  test('removes host runtime and state without changing user-owned AGENTS.md bytes', () => {
+    const sandbox = tempLifecycleSandbox('spec-first-single-consumer-clean-');
+    const init = initHosts(['qoder'], sandbox);
+    expect(init.status).toBe(0);
+
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const userBytes = '\n# Team-owned guidance\n\nKeep this byte sequence.\n';
+    fs.appendFileSync(instructionPath, userBytes);
+
+    const clean = runSpecFirst(['clean', '--qoder'], sandbox);
+    expect(clean.status).toBe(0);
+    expect(fs.readFileSync(instructionPath, 'utf8')).toContain(userBytes);
+    expect(fs.existsSync(path.join(sandbox.projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(false);
+    expect(fs.existsSync(path.join(sandbox.projectRoot, '.qoder', 'skills', 'spec-work'))).toBe(false);
+  }, 120000);
+
+  test('preserves shared AGENTS.md when another confirmed consumer remains', () => {
+    const sandbox = tempLifecycleSandbox('spec-first-shared-consumer-clean-');
+    const init = initHosts(['codex', 'qoder'], sandbox);
+    expect(init.status).toBe(0);
+
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const before = fs.readFileSync(instructionPath, 'utf8');
+    const preview = runSpecFirst(['clean', '--qoder', '--dry-run'], sandbox);
+    expect(preview.status).toBe(0);
+    expect(preview.stdout).toContain('shared_instruction_consumer_present');
+    expect(fs.readFileSync(instructionPath, 'utf8')).toBe(before);
+
+    const clean = runSpecFirst(['clean', '--qoder'], sandbox);
+    expect(clean.status).toBe(0);
+    expect(clean.stdout).toContain('shared_instruction_consumer_present');
+    expect(fs.readFileSync(instructionPath, 'utf8')).toBe(before);
+    expect(fs.existsSync(path.join(sandbox.projectRoot, '.codex', 'spec-first', 'state.json'))).toBe(true);
+  }, 120000);
+
+  test('preserves shared AGENTS.md when another consumer state is uncertain', () => {
+    const sandbox = tempLifecycleSandbox('spec-first-uncertain-consumer-clean-');
+    const init = initHosts(['qoder'], sandbox);
+    expect(init.status).toBe(0);
+
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const before = fs.readFileSync(instructionPath, 'utf8');
+    const codexStatePath = path.join(sandbox.projectRoot, '.codex', 'spec-first', 'state.json');
+    fs.mkdirSync(path.dirname(codexStatePath), { recursive: true });
+    fs.writeFileSync(codexStatePath, '{ invalid json\n', 'utf8');
+
+    const clean = runSpecFirst(['clean', '--qoder'], sandbox);
+    expect(clean.status).toBe(0);
+    expect(clean.stdout).toContain('shared_instruction_consumer_uncertain');
+    expect(fs.readFileSync(instructionPath, 'utf8')).toBe(before);
+  }, 120000);
+
+  test('preserves shared AGENTS.md when another managed runtime remains without state', () => {
+    const sandbox = tempLifecycleSandbox('spec-first-state-missing-consumer-clean-');
+    const init = initHosts(['codex', 'qoder'], sandbox);
+    expect(init.status).toBe(0);
+
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const before = fs.readFileSync(instructionPath, 'utf8');
+    fs.rmSync(path.join(sandbox.projectRoot, '.codex', 'spec-first', 'state.json'));
+
+    const clean = runSpecFirst(['clean', '--qoder'], sandbox);
+    expect(clean.status).toBe(0);
+    expect(clean.stdout).toContain('shared_instruction_consumer_uncertain');
+    expect(fs.readFileSync(instructionPath, 'utf8')).toBe(before);
+    expect(fs.existsSync(path.join(sandbox.projectRoot, '.agents', 'skills', 'spec-work'))).toBe(true);
+  }, 120000);
+
+  test('removes shared managed blocks only for the final confirmed consumer', () => {
+    const sandbox = tempLifecycleSandbox('spec-first-final-consumer-clean-');
+    const init = initHosts(['qoder'], sandbox);
+    expect(init.status).toBe(0);
+
+    const instructionPath = path.join(sandbox.projectRoot, 'AGENTS.md');
+    const userBytes = '\n# Team-owned guidance\n\nKeep this byte sequence.\n';
+    fs.appendFileSync(instructionPath, userBytes);
+
+    const clean = runSpecFirst(['clean', '--qoder'], sandbox);
+    expect(clean.status).toBe(0);
+    const cleaned = fs.readFileSync(instructionPath, 'utf8');
+    expect(cleaned).not.toContain(LANG_START);
+    expect(cleaned).not.toContain(LANG_END);
+    expect(cleaned).toContain(userBytes);
+  }, 120000);
 });
 
 describe('codex legacy runtime root removal ownership', () => {

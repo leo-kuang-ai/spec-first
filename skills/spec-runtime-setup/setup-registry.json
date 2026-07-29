@@ -1,5 +1,5 @@
 {
-  "schema_version": "setup-registry.v8",
+  "schema_version": "setup-registry.v9",
   "summary_columns": [
     "tool",
     "type",
@@ -29,14 +29,14 @@
       "id": "codegraph",
       "ecosystem": "npm",
       "package": "@colbymchenry/codegraph",
-      "version": "1.4.1",
+      "version": "1.5.0",
       "command": "codegraph"
     },
     {
       "id": "graphify",
       "ecosystem": "pypi",
       "package": "graphifyy",
-      "version": "0.9.17",
+      "version": "0.9.29",
       "command": "graphify",
       "python": {
         "requires": ">=3.10",
@@ -50,8 +50,8 @@
         "plain_pip_allowed": false
       },
       "distribution": {
-        "wheel_url": "https://files.pythonhosted.org/packages/39/37/a28af8342d78d322511b6307fac2760ca7b9b3c859fa2dcfbaf7c4b5ddf9/graphifyy-0.9.17-py3-none-any.whl",
-        "sha256": "ef60768aaee7e315d2e2d7da89e971bc1f445f5c8d73ebe4fed550e40a1d687e",
+        "wheel_url": "https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl",
+        "sha256": "143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b",
         "index_url": "https://pypi.org/simple"
       },
       "hook_normalization_contract": "graphify-python-hook-normalization.v1"
@@ -198,6 +198,63 @@
         "provider": {}
       }
     },
+    "opencode": {
+      "id": "opencode",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "project",
+            "json_container_path": [
+              "mcp"
+            ],
+            "server_representation": "opencode-local",
+            "permission_policy": {
+              "kind": "opencode-governed-assets-v1"
+            },
+            "targets": {
+              "project": {
+                "config_path": "opencode.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "precedence_guards": [
+                  {
+                    "config_path": "opencode.jsonc",
+                    "config_format": "jsonc",
+                    "precedence": 110,
+                    "reason_code": "host-config-jsonc-precedence-blocked"
+                  }
+                ]
+              },
+              "user": {
+                "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true,
+                "precedence_guards": [
+                  {
+                    "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.jsonc",
+                    "config_format": "jsonc",
+                    "precedence": 60,
+                    "reason_code": "host-config-jsonc-precedence-blocked"
+                  }
+                ]
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    },
     "qoder": {
       "id": "qoder",
       "defaults": {
@@ -277,6 +334,15 @@
           }
         },
         "kiro": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest"
+            ]
+          }
+        },
+        "opencode": {
           "host_config": {
             "command": "npx",
             "args": [
@@ -391,6 +457,15 @@
           }
         },
         "kiro": {
+          "host_config": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest"
+            ]
+          }
+        },
+        "opencode": {
           "host_config": {
             "command": "npx",
             "args": [
@@ -583,6 +658,15 @@
             ]
           }
         },
+        "opencode": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ]
+          }
+        },
         "qoder": {
           "host_config": {
             "command": "codegraph",
@@ -712,6 +796,7 @@
         "command": "agent-browser",
         "skill_name": "agent-browser"
       },
+      "usage_note": "Runtime Setup 分开报告 agent-browser dependency 安装状态与 browser execution readiness。CLI/runtime/global skill 齐全只证明 dependency ready；只有 spec-test-browser canonical probe 返回 Spec-First controlled exact-origin conformance passed 才能执行 browser actions。当前 provider 缺少 request-time exact-origin 时保持 report-only degraded，不把重复安装同版本当作 capability 修复。",
       "safety": {
         "risk_flags": [
           "global-npm-install",
@@ -1470,6 +1555,58 @@
             ]
           }
         },
+        "opencode": {
+          "host_config": {
+            "command": "codegraph",
+            "args": [
+              "serve",
+              "--mcp"
+            ],
+            "scope": "project",
+            "json_container_path": [
+              "mcp"
+            ],
+            "server_representation": "opencode-local",
+            "targets": {
+              "project": {
+                "config_path": "opencode.json",
+                "config_format": "json",
+                "precedence": 100,
+                "writable_check": "parent-or-file",
+                "precedence_guards": [
+                  {
+                    "config_path": "opencode.jsonc",
+                    "config_format": "jsonc",
+                    "precedence": 110,
+                    "reason_code": "host-config-jsonc-precedence-blocked"
+                  }
+                ]
+              },
+              "user": {
+                "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file",
+                "requires_user_scope_opt_in": true,
+                "precedence_guards": [
+                  {
+                    "config_path": "${XDG_CONFIG_HOME}/opencode/opencode.jsonc",
+                    "config_format": "jsonc",
+                    "precedence": 60,
+                    "reason_code": "host-config-jsonc-precedence-blocked"
+                  }
+                ]
+              }
+            },
+            "fallback_order": [
+              "project"
+            ],
+            "uninstall_targets": [
+              "project",
+              "user"
+            ]
+          }
+        },
         "qoder": {
           "host_config": {
             "command": "codegraph",
@@ -1639,7 +1776,7 @@
         "hook_default": true,
         "usage_owner": "downstream-skill"
       },
-      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.17` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 `graphify extract . --code-only` 并以 `GRAPHIFY_OUT=.graphify` 维护唯一current artifact。已有`.graphify/`时普通setup只读query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro使用Provider-native project integration，Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和`.graphify`环境。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
+      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.29` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 `graphify extract . --code-only` 并以 `GRAPHIFY_OUT=.graphify` 维护唯一current artifact。已有`.graphify/`时普通setup只读query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro使用Provider-native project integration，Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和`.graphify`环境。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
       "detection": {
         "kind": "command",
         "command": "graphify",
@@ -1665,12 +1802,12 @@
           "git-hook-write"
         ],
         "source": "pypi",
-        "source_repo": "https://pypi.org/project/graphifyy/0.9.17/",
+        "source_repo": "https://pypi.org/project/graphifyy/0.9.29/",
         "version_policy": {
           "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "Installs the release-reviewed `graphifyy@0.9.17` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to `.graphify/` and the selected launcher. First generation is local AST `extract --code-only`; explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter, `.graphify` env and allowed rebuild command. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
+        "install_effect": "Installs the release-reviewed `graphifyy@0.9.29` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to `.graphify/` and the selected launcher. First generation is local AST `extract --code-only`; explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter, `.graphify` env and allowed rebuild command. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
       },
       "readiness": {
         "producer": "spec-runtime-setup",

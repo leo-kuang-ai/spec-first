@@ -12,11 +12,16 @@ const {
   readStateFileRaw,
   summarizeOperationPlan,
 } = require('../state');
-const { getAdapter } = require('../adapters');
+const { getAdapter, getSupportedPlatforms } = require('../adapters');
 const { formatInitGuidance } = require('../init-guidance');
 const { removeManagedCodingGuidelinesBlock } = require('../coding-guidelines');
 const { removeManagedBootstrapBlock } = require('../instruction-bootstrap');
 const { removeManagedRuntimeToolsBlock } = require('../runtime-tools-index');
+const {
+  LANG_END,
+  LANG_START,
+  removeMarkerBlock,
+} = require('../lang-policy');
 const {
   renderManagedClaudeHooksRemoval,
   validateClaudeSettingsFile,
@@ -44,10 +49,10 @@ function runClean(argv, deps = {}) {
     return 2;
   }
 
-  const selectedPlatforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'].filter((platform) => parsed[platform]);
+  const selectedPlatforms = selectedHostPlatforms(parsed);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) [--dry-run]');
     console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
@@ -135,6 +140,7 @@ function parseCleanArgs(argv) {
     cursor: false,
     kiro: false,
     qoder: false,
+    opencode: false,
     dryRun: false,
     workspaceOrphans: false,
     workspaceGraph: false,
@@ -157,6 +163,8 @@ function parseCleanArgs(argv) {
       parsed.kiro = true;
     } else if (arg === '--qoder') {
       parsed.qoder = true;
+    } else if (arg === '--opencode') {
+      parsed.opencode = true;
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
@@ -199,7 +207,7 @@ function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
     console.error('Usage: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
-  if (parsed.claude || parsed.codex || parsed.cursor || parsed.kiro || parsed.qoder) {
+  if (selectedHostPlatforms(parsed).length > 0) {
     console.error('Error: --workspace-graph cannot be combined with host flags.');
     console.error('Workspace graph cleanup is separate from host runtime asset cleanup.');
     return 2;
@@ -310,7 +318,7 @@ function runWorkspaceOrphansClean(parsed) {
     return 2;
   }
 
-  if (parsed.claude || parsed.codex || parsed.cursor || parsed.kiro || parsed.qoder) {
+  if (selectedHostPlatforms(parsed).length > 0) {
     console.error('Error: --workspace-orphans cannot be combined with host flags.');
     console.error('Workspace orphan cleanup is separate from runtime asset cleanup.');
     return 2;
@@ -511,7 +519,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
     '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
@@ -529,7 +537,12 @@ function platformDisplayName(platform) {
   if (platform === 'cursor') return 'Cursor';
   if (platform === 'kiro') return 'Kiro';
   if (platform === 'qoder') return 'Qoder';
+  if (platform === 'opencode') return 'OpenCode';
   return platform;
+}
+
+function selectedHostPlatforms(parsed) {
+  return getSupportedPlatforms().filter((platform) => parsed[platform]);
 }
 
 function buildCleanPlan(projectRoot, state, adapter) {
@@ -541,23 +554,27 @@ function buildCleanPlan(projectRoot, state, adapter) {
 }
 
 function buildRuntimeCleanupPreview(projectRoot, adapter) {
-  const operations = [
-    buildRelativeOperation(
-      fs.existsSync(path.join(projectRoot, adapter.instructionFile)) ? 'update_file' : 'remove_file',
-      adapter.instructionFile,
-      'managed_instruction_cleanup',
-    ),
-    buildRelativeOperation('remove_file', adapter.stateFile, 'managed_state_file'),
-  ];
+  const sharedConsumers = classifySharedInstructionConsumers(projectRoot, adapter);
+  const preservingConsumers = sharedConsumers.filter((consumer) => consumer.status !== 'confirmed_absent');
+  const operations = [];
+  const diagnostics = buildSharedInstructionDiagnostics(adapter, preservingConsumers);
 
   const instructionPath = path.join(projectRoot, adapter.instructionFile);
-  if (fs.existsSync(instructionPath)) {
-    operations[0].contents = removeManagedCodingGuidelinesBlock(
-      removeManagedRuntimeToolsBlock(
-        removeManagedBootstrapBlock(fs.readFileSync(instructionPath, 'utf8')),
-      ),
+  if (preservingConsumers.length === 0) {
+    const instructionOperation = buildRelativeOperation(
+      fs.existsSync(instructionPath) ? 'update_file' : 'remove_file',
+      adapter.instructionFile,
+      'managed_instruction_cleanup',
     );
+    if (fs.existsSync(instructionPath)) {
+      instructionOperation.contents = removeManagedInstructionBlocks(
+        fs.readFileSync(instructionPath, 'utf8'),
+      );
+    }
+    operations.push(instructionOperation);
   }
+
+  operations.push(buildRelativeOperation('remove_file', adapter.stateFile, 'managed_state_file'));
 
   if (adapter.id === 'claude') {
     const rendered = renderManagedClaudeHooksRemoval(projectRoot);
@@ -581,7 +598,91 @@ function buildRuntimeCleanupPreview(projectRoot, adapter) {
   return {
     operations,
     summary: summarizeOperationPlan(operations),
+    diagnostics,
   };
+}
+
+function classifySharedInstructionConsumers(projectRoot, adapter) {
+  return getSupportedPlatforms()
+    .filter((platform) => platform !== adapter.id)
+    .map((platform) => getAdapter(platform))
+    .filter((candidate) => candidate.instructionFile === adapter.instructionFile)
+    .map((candidate) => classifyInstructionConsumer(projectRoot, candidate));
+}
+
+function classifyInstructionConsumer(projectRoot, adapter) {
+  const statePath = path.join(projectRoot, adapter.stateFile);
+  if (!fs.existsSync(statePath)) {
+    if (hasManagedRuntimeSurface(projectRoot, adapter)) {
+      return {
+        platform: adapter.id,
+        status: 'uncertain',
+        reasonCode: 'managed_state_missing_with_runtime',
+      };
+    }
+    return { platform: adapter.id, status: 'confirmed_absent' };
+  }
+
+  try {
+    const state = readState(projectRoot, adapter);
+    if (!state || state.platform !== adapter.id) {
+      return {
+        platform: adapter.id,
+        status: 'uncertain',
+        reasonCode: 'managed_state_platform_mismatch',
+      };
+    }
+    return { platform: adapter.id, status: 'present' };
+  } catch (_error) {
+    return {
+      platform: adapter.id,
+      status: 'uncertain',
+      reasonCode: 'managed_state_unreadable',
+    };
+  }
+}
+
+function hasManagedRuntimeSurface(projectRoot, adapter) {
+  return [...new Set([
+    adapter.managedRoot,
+    adapter.commandRoot,
+    adapter.skillsRoot,
+    adapter.workflowsRoot,
+    adapter.agentsRoot,
+  ].filter(Boolean))].some((relativePath) => fs.existsSync(path.join(projectRoot, relativePath)));
+}
+
+function buildSharedInstructionDiagnostics(adapter, consumers) {
+  const present = consumers.filter((consumer) => consumer.status === 'present');
+  const uncertain = consumers.filter((consumer) => consumer.status === 'uncertain');
+  const diagnostics = [];
+
+  if (present.length > 0) {
+    diagnostics.push({
+      code: 'shared_instruction_consumer_present',
+      message: `Preserved ${adapter.instructionFile}: confirmed managed consumer(s) remain: ${present.map((consumer) => consumer.platform).join(', ')}.`,
+    });
+  }
+  if (uncertain.length > 0) {
+    diagnostics.push({
+      code: 'shared_instruction_consumer_uncertain',
+      message: `Preserved ${adapter.instructionFile}: consumer ownership is uncertain for ${uncertain.map((consumer) => `${consumer.platform} (${consumer.reasonCode})`).join(', ')}.`,
+    });
+  }
+
+  return diagnostics;
+}
+
+function removeManagedInstructionBlocks(existing) {
+  return removeMarkerBlock(
+    removeManagedCodingGuidelinesBlock(
+      removeManagedRuntimeToolsBlock(
+        removeManagedBootstrapBlock(existing),
+      ),
+    ),
+    LANG_START,
+    LANG_END,
+  );
 }
 
 function printCleanSummary(platform, cleanPlan, { mode }) {
@@ -607,6 +708,9 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
   console.log(`${dryRun ? 'Would update' : 'Updating'} ${updateCount} managed file(s).`);
   for (const operation of cleanPlan.runtimeCleanup.operations.filter((entry) => entry.kind === 'update_file')) {
     console.log(`  - ${operation.path}`);
+  }
+  for (const diagnostic of cleanPlan.runtimeCleanup.diagnostics || []) {
+    console.log(`[${diagnostic.code}] ${diagnostic.message}`);
   }
   if (dryRun) {
     console.log(`Would remove ${emptyRootCount} empty managed root(s) after cleanup.`);

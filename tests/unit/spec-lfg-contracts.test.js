@@ -206,8 +206,11 @@ describe('spec-lfg current contracts', () => {
   test('requires LFG to consume wrapper status without becoming a browser executor', () => {
     for (const requiredField of [
       'origin provenance',
-      'wrapper probe `status`/`reason_code`',
-      'capabilities.exact_origin_confirmed',
+      'wrapper probe `status`/`execution_readiness`/`reason_code`',
+      'capabilities.exact_origin_confirmed`/`exact_origin_evidence',
+      '`conformance_status`',
+      '`repair_scope`',
+      '`next_action`',
       'every route/step status',
       'action_process_calls',
       'browser cleanup `status`/`reason_code`',

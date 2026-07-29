@@ -72,15 +72,12 @@ function probeHelper(context, repoRoot, entry) {
   }
   const command = detection.command;
   if (!command) return helperProbe(entry, 'missing', 'helper-detection-invalid');
+  if (detection.kind === 'agent-browser') {
+    return probeAgentBrowserHelper(context, repoRoot, entry, command, detection);
+  }
   const detectionArgs = Array.isArray(detection.args) ? detection.args.map(String) : ['--version'];
   const result = execute(context, command, detectionArgs, { cwd: repoRoot, timeoutMs: 10000 });
   const commandReady = commandSucceeded(result);
-  if (detection.kind === 'agent-browser') {
-    const marker = path.join(context.homeDir, '.agent-browser', 'spec-first-install.json');
-    const skillReady = globalSkillInstalled(context.homeDir, detection.skill_name || 'agent-browser');
-    if (commandReady && fs.existsSync(marker) && skillReady) return helperProbe(entry, 'ready', 'ready');
-    return helperProbe(entry, 'skipped', commandReady ? 'agent-browser-manual-setup-incomplete' : 'agent-browser-not-installed');
-  }
   if (!commandReady && detection.fallback_command) {
     const fallbackArgs = Array.isArray(detection.fallback_args)
       ? detection.fallback_args.map(String)
@@ -91,7 +88,112 @@ function probeHelper(context, repoRoot, entry) {
   return helperProbe(entry, commandReady ? 'ready' : 'missing', commandReady ? 'ready' : 'missing_dependency');
 }
 
-function helperProbe(entry, status, reasonCode) {
+function probeAgentBrowserHelper(context, repoRoot, entry, command, detection) {
+  const capabilityProbe = runAgentBrowserCapabilityProbe(context, repoRoot, command);
+  if (!validAgentBrowserCapabilityProbe(capabilityProbe)) {
+    const versionResult = execute(context, command, ['--version'], { cwd: repoRoot, timeoutMs: 10000 });
+    const dependencyReady = commandSucceeded(versionResult);
+    return helperProbe(entry, dependencyReady ? 'degraded' : 'missing', 'agent-browser-capability-probe-invalid', {
+      dependency_status: dependencyReady ? 'ready' : 'missing',
+      execution_readiness: 'blocked',
+      conformance_status: 'not_run',
+      repair_scope: dependencyReady ? 'spec-first' : 'dependency',
+      next_action: dependencyReady
+        ? '检查 spec-test-browser canonical capability probe 是否可读且输出有效 JSON facts。'
+        : ((entry.installation && entry.installation.next_action) || ''),
+    });
+  }
+  if (capabilityProbe.reason_code === 'agent-browser-unavailable') {
+    return helperProbe(entry, 'missing', 'agent-browser-not-installed', {
+      dependency_status: 'missing',
+      execution_readiness: 'blocked',
+      conformance_status: capabilityProbe.conformance_status,
+      repair_scope: 'dependency',
+    });
+  }
+  const marker = path.join(context.homeDir, '.agent-browser', 'spec-first-install.json');
+  const skillReady = globalSkillInstalled(context.homeDir, detection.skill_name || 'agent-browser');
+  if (!fs.existsSync(marker) || !skillReady) {
+    return helperProbe(entry, 'skipped', 'agent-browser-manual-setup-incomplete', {
+      dependency_status: 'ready',
+      execution_readiness: 'blocked',
+      conformance_status: capabilityProbe.conformance_status,
+      repair_scope: 'dependency',
+    });
+  }
+  const ready = capabilityProbe.execution_readiness === 'ready'
+    && capabilityProbe.capabilities.exact_origin_confirmed === true;
+  return helperProbe(entry, ready ? 'ready' : 'degraded', capabilityProbe.reason_code || 'ready', {
+    dependency_status: 'ready',
+    capability_status: capabilityProbe.status,
+    execution_readiness: capabilityProbe.execution_readiness,
+    conformance_status: capabilityProbe.conformance_status,
+    repair_scope: capabilityProbe.repair_scope,
+    next_action: capabilityProbe.next_action,
+    capabilities: capabilityProbe.capabilities,
+    provider_version: capabilityProbe.version,
+  });
+}
+
+function runAgentBrowserCapabilityProbe(context, repoRoot, command) {
+  let probe = context.agentBrowserProbe;
+  if (typeof probe !== 'function') {
+    try {
+      const wrapperPath = resolveAgentBrowserProbePath();
+      if (!wrapperPath) return null;
+      ({ probeAgentBrowser: probe } = require(wrapperPath));
+    } catch (_error) {
+      return null;
+    }
+  }
+  if (typeof probe !== 'function') return null;
+  try {
+    return probe({
+      command,
+      cwd: repoRoot,
+      env: context.env || process.env,
+      runner: (probeCommand, args, options) => {
+        const observed = execute(context, probeCommand, args, {
+          cwd: options.cwd,
+          env: options.env,
+          timeoutMs: options.timeout,
+        });
+        return {
+          status: Number.isInteger(observed && observed.exit_code) ? observed.exit_code : 1,
+          stdout: observed && observed.stdout ? observed.stdout : '',
+          stderr: observed && observed.stderr ? observed.stderr : '',
+          error: observed ? observed.error : new Error('agent-browser capability probe failed'),
+        };
+      },
+    });
+  } catch (_error) {
+    return null;
+  }
+}
+
+function resolveAgentBrowserProbePath() {
+  const candidates = [
+    path.resolve(__dirname, '../../../spec-test-browser/scripts/agent-browser-run-context.cjs'),
+    path.resolve(__dirname, '../../../../../skills/spec-test-browser/scripts/agent-browser-run-context.cjs'),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) || null;
+}
+
+function validAgentBrowserCapabilityProbe(probe) {
+  if (!probe || typeof probe !== 'object') return false;
+  if (!['ready', 'blocked'].includes(probe.execution_readiness)) return false;
+  if (typeof probe.conformance_status !== 'string') return false;
+  if (typeof probe.repair_scope !== 'string') return false;
+  if (typeof probe.next_action !== 'string') return false;
+  if (!probe.capabilities || typeof probe.capabilities !== 'object') return false;
+  if (probe.execution_readiness === 'ready') {
+    return probe.conformance_status === 'passed'
+      && probe.capabilities.exact_origin_confirmed === true;
+  }
+  return typeof probe.reason_code === 'string' && probe.reason_code.length > 0;
+}
+
+function helperProbe(entry, status, reasonCode, details = {}) {
   return {
     id: entry.id,
     kind: entry.kind || 'helper',
@@ -100,7 +202,10 @@ function helperProbe(entry, status, reasonCode) {
     source: 'read-only-probe',
     reason_code: reasonCode,
     configured_status: 'not-applicable',
-    next_action: status === 'ready' ? '' : ((entry.installation && entry.installation.next_action) || ''),
+    ...details,
+    next_action: Object.prototype.hasOwnProperty.call(details, 'next_action')
+      ? details.next_action
+      : (status === 'ready' ? '' : ((entry.installation && entry.installation.next_action) || '')),
   };
 }
 
@@ -411,6 +516,7 @@ module.exports = {
   interpolateArgs,
   probeHelper,
   probeRegistry,
+  resolveAgentBrowserProbePath,
   resolveInstallation,
   warmupCacheHit,
 };

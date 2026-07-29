@@ -20,6 +20,10 @@ const {
   resolveHostConfigTarget,
 } = require('./host-config.cjs');
 const {
+  createOpenCodePermissionEditor,
+  POLICY_KIND: OPENCODE_PERMISSION_POLICY_KIND,
+} = require('./opencode-permissions.cjs');
+const {
   commandSucceeded,
 } = require('./process-runner.cjs');
 const {
@@ -409,6 +413,11 @@ function failureOutcome(reasonCode, fallback = 'setup-action-required') {
   return { reason_code: reasonCode || fallback };
 }
 
+function hostConfigPrecedenceBlocked(reasonCode) {
+  return reasonCode === 'host-config-higher-precedence-conflict'
+    || reasonCode === 'host-config-jsonc-precedence-blocked';
+}
+
 function configureOrInspectHost(context, repoRoot, {
   applyMutation,
   selectedIds,
@@ -421,6 +430,7 @@ function configureOrInspectHost(context, repoRoot, {
   if (applyMutation) requireCapability(context, 'write-host-config');
   const results = new Map();
   const providerReadiness = new Map((providerResults || []).map((entry) => [entry.provider, entry]));
+  let openCodePermissionEditorResult = null;
   for (const entry of context.effectiveRegistry.tools || []) {
     if (entry.host_config_required === false) continue;
     if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
@@ -443,6 +453,39 @@ function configureOrInspectHost(context, repoRoot, {
         continue;
       }
     }
+    const permissionPolicy = entry.host_config && entry.host_config.permission_policy;
+    let jsonDocumentPolicy = null;
+    if (context.host === 'opencode') {
+      if (!permissionPolicy || permissionPolicy.kind !== OPENCODE_PERMISSION_POLICY_KIND) {
+        results.set(entry.id, {
+          configured_status: 'action-required',
+          reason_code: 'host-config-opencode-permission-policy-missing',
+          permission_status: 'action-required',
+          permission_rule_count: 0,
+        });
+        continue;
+      }
+      if (!openCodePermissionEditorResult) {
+        const editorFactory = context.openCodePermissionEditorFactory
+          || createOpenCodePermissionEditor;
+        openCodePermissionEditorResult = editorFactory({
+          host: context.host,
+          buildAssetSet: context.buildFilteredAssetSet,
+          skillRoot: context.skillRoot,
+        });
+      }
+      if (!openCodePermissionEditorResult.ok || !openCodePermissionEditorResult.editor) {
+        results.set(entry.id, {
+          configured_status: 'action-required',
+          reason_code: openCodePermissionEditorResult.reason_code
+            || 'opencode-permission-asset-derivation-failed',
+          permission_status: 'action-required',
+          permission_rule_count: 0,
+        });
+        continue;
+      }
+      jsonDocumentPolicy = openCodePermissionEditorResult.editor;
+    }
     const target = resolveHostConfigTarget({
       entry,
       host: context.host,
@@ -455,7 +498,7 @@ function configureOrInspectHost(context, repoRoot, {
     });
     if (!target.ok) {
       results.set(entry.id, {
-        configured_status: target.reason_code === 'host-config-higher-precedence-conflict'
+        configured_status: hostConfigPrecedenceBlocked(target.reason_code)
           ? 'precedence-blocked'
           : 'action-required',
         reason_code: target.reason_code,
@@ -479,7 +522,7 @@ function configureOrInspectHost(context, repoRoot, {
       continue;
     }
     if (typeof scopeFilter === 'function' && !scopeFilter(target.scope, target, entry)) continue;
-    let inspection = inspectHostConfig({ entry, target });
+    let inspection = inspectHostConfig({ entry, target, jsonDocumentPolicy });
     const repairAuthorized = context.actionPlan.args.repairHostConfig === true
       && inspection.reason_code === 'host-config-conflict';
     if (applyMutation
@@ -487,14 +530,19 @@ function configureOrInspectHost(context, repoRoot, {
       && (inspection.ok || repairAuthorized)
       && (!inspection.conflict || repairAuthorized)) {
       const applier = context.hostConfigApplier || applyHostConfig;
-      const applied = applier({ entry, target, overwrite: repairAuthorized });
-      if (applied.ok) inspection = inspectHostConfig({ entry, target });
-      else inspection = { ok: false, configured: false, reason_code: applied.reason_code };
+      const applied = applier({
+        entry,
+        target,
+        overwrite: repairAuthorized,
+        jsonDocumentPolicy,
+      });
+      if (applied.ok) inspection = inspectHostConfig({ entry, target, jsonDocumentPolicy });
+      else inspection = { ...applied, ok: false, configured: false };
     }
     results.set(entry.id, {
       configured_status: inspection.ok && inspection.configured
         ? 'ready'
-        : (inspection.reason_code === 'host-config-higher-precedence-conflict' ? 'precedence-blocked' : 'action-required'),
+        : (hostConfigPrecedenceBlocked(inspection.reason_code) ? 'precedence-blocked' : 'action-required'),
       reason_code: inspection.reason_code,
       config_key: target.key,
       config_path: inspection.effective_path || target.config_path,
@@ -502,6 +550,11 @@ function configureOrInspectHost(context, repoRoot, {
       blocking_scope: inspection.blocking_scope || null,
       blocking_path: inspection.blocking_path || null,
       conflict_fields: inspection.conflict_fields || [],
+      permission_status: inspection.permission_status || (jsonDocumentPolicy ? 'unknown' : 'not-applicable'),
+      permission_rule_count: inspection.permission_rule_count
+        || (jsonDocumentPolicy && jsonDocumentPolicy.permission_rule_count)
+        || 0,
+      permission_safe_overrides: inspection.permission_safe_overrides || [],
       repair_authorized: repairAuthorized,
       scope: target.scope,
       phase: hostConfigPhase,
@@ -801,6 +854,7 @@ function runtimeStatePath(host, repoRoot) {
     codex: '.codex/spec-first/state.json',
     cursor: '.cursor/spec-first/state.json',
     kiro: '.kiro/spec-first/state.json',
+    opencode: '.opencode/spec-first/state.json',
     qoder: '.qoder/spec-first/state.json',
   };
   return roots[host] ? path.join(repoRoot, roots[host]) : null;

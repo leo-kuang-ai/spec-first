@@ -171,7 +171,7 @@ describe('CLI smoke checks', () => {
     expect(fs.existsSync(path.join(sandbox.projectRoot, '.gitignore'))).toBe(false);
     expect(fs.existsSync(path.join(sandbox.projectRoot, 'CHANGELOG.md'))).toBe(false);
   });
-  test('packed tarball initializes a coherent five-host runtime', () => {
+  test('packed tarball initializes a coherent six-host runtime', () => {
     const sandbox = tempSandbox('spec-first-smoke-package-');
     const packRoot = path.join(sandbox.projectRoot, 'pack');
     const consumerRoot = path.join(sandbox.projectRoot, 'consumer');
@@ -196,9 +196,12 @@ describe('CLI smoke checks', () => {
         pack.stderr || pack.stdout,
       ].join('\n'));
     }
-    const [{ filename }] = JSON.parse(pack.stdout);
+    const [packResult] = JSON.parse(pack.stdout);
+    const { filename } = packResult;
     const tarballPath = path.join(packRoot, filename);
     expect(fs.existsSync(tarballPath)).toBe(true);
+    expect(packResult.files.map((entry) => entry.path).filter((entry) => entry.startsWith('.opencode/')))
+      .toEqual([]);
 
     const install = runNpmCommand([
       'install',
@@ -226,6 +229,7 @@ describe('CLI smoke checks', () => {
       '--cursor',
       '--kiro',
       '--qoder',
+      '--opencode',
       '-y',
       '-u',
       'package-smoke',
@@ -245,6 +249,7 @@ describe('CLI smoke checks', () => {
       cursor: '.cursor/skills',
       kiro: '.kiro/skills',
       qoder: '.qoder/skills',
+      opencode: '.opencode/skills',
     };
     const requiredDoctorChecks = {
       claude: [
@@ -273,6 +278,12 @@ describe('CLI smoke checks', () => {
         'AGENTS.md workflow entry guidance',
         '.qoder/commands',
         '.qoder/skills',
+      ],
+      opencode: [
+        '.opencode/spec-first/state.json',
+        'AGENTS.md workflow entry guidance',
+        '.opencode/commands/spec',
+        '.opencode/skills',
       ],
     };
     const registrySource = fs.readFileSync(

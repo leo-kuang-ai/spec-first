@@ -30,6 +30,13 @@
       "forbidden": ["treat allowed-domains as exact-origin proof", "launch then inspect the resulting URL"]
     },
     {
+      "id": "provider-self-report-does-not-confirm-exact-origin",
+      "kind": "negative-owner",
+      "input": "agent-browser help advertises --exact-origin, or a caller/provider JSON claims request-time enforcement, but no Spec-First controlled conformance has passed for the same binary.",
+      "expected": "Return exact-origin-conformance-required with conformance_status not_run, keep execution_readiness blocked, and launch zero navigation/interaction subprocess calls.",
+      "forbidden": ["invoke a speculative capabilities command", "promote provider self-report to confirmed evidence", "accept a caller capability override"]
+    },
+    {
       "id": "profile-state-and-caller-literals-are-rejected",
       "kind": "negative-owner",
       "input": "A caller requests profile/state reuse, an eval action, or a literal password/value inside the test plan.",

@@ -13,9 +13,9 @@
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
-**An AI Coding Harness for Claude Code, Codex, Kiro, Qoder, and Cursor.**
+**An AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode.**
 
-`spec-first` helps Claude Code, Codex, Kiro, Qoder, and Cursor become easier to trust in real projects: one-off AI coding conversations become repo-backed requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor; evidence stays in your repository. Kiro and Qoder remain opt-in previews. Cursor is more conservative: it is an opt-in `generated_runtime_preview` that currently proves generation of `.cursor/skills/**`, `.cursor/spec-first/**`, and `.cursor/mcp.json` evidence only. Local Cursor skill discovery/invocation has not been verified, and generated skills may not be loaded by Cursor.
+`spec-first` helps Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode become easier to trust in real projects: one-off AI coding conversations become repo-backed requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor; evidence stays in your repository. Kiro and Qoder remain opt-in previews. Cursor and OpenCode are more conservative opt-in `generated_runtime_preview` hosts: source generation is covered, but current local loader evidence does not yet prove that their generated workflow entries are discovered and invoked correctly.
 
 Official site: [spec-first.cn](http://spec-first.cn/)
 
@@ -27,7 +27,7 @@ Official site: [spec-first.cn](http://spec-first.cn/)
 
 ![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
-The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code, Codex, Kiro, Qoder, or Cursor session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
+The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
 
 The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
 
@@ -41,7 +41,7 @@ Prerequisites:
 
 - Node.js `>=20.0.0` and npm.
 - Git on `PATH`; `doctor`, setup, and workflow checks read repository facts from Git.
-- Claude Code, Codex, Kiro, Qoder, or Cursor installed, with one chosen as the current host. Cursor requires explicit `--cursor` opt-in and is currently generated-runtime preview only.
+- Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode installed, with one chosen as the current host. Cursor and OpenCode require explicit `--cursor` / `--opencode` opt-in and are currently generated-runtime preview only.
 - A terminal opened at the root of the project repo where you want to enable `spec-first`. First-time users can try a throwaway/test repo before initializing a real project.
 
 **Step 1 — Install and check health**
@@ -77,9 +77,9 @@ Expected: `doctor` starts with whether the project is usable, names every affect
 spec-first init
 ```
 
-Select your host (Claude Code, Codex, Cursor, Kiro, and/or Qoder), confirm your developer name and language, then confirm the writes. Interactive confirmation uses a summary-first view: generated scale and risk-operation totals are grouped by host, while project-external writes and degraded warnings stay prominent. Individual remove/prune/untrack paths are hidden from the default view. Run `spec-first init --dry-run` explicitly when you need target/host/root details, critical writes, and bounded path samples. In a parent workspace with many child Git repos, `init` defaults to bootstrapping the parent root with its instruction file, `.gitignore`, a missing `CHANGELOG.md`, and the selected host runtime/state. Use `--repo <child>` to initialize only one child repo; use `--all-repos` to initialize the parent workspace and every discovered child repo. Child setup and readiness truth remains local to each child. Scripted `init -y` setup on fresh machines must pass `-u <name>` because there is no prompt to collect a developer name, for example `spec-first init --codex -y -u <name> --lang <zh|en>`. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro, `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder, or `spec-first init --cursor -y -u <name> --lang <zh|en>` for Cursor generated-runtime preview. Cursor is not part of the `init -y` default host set.
+Select your host (Claude Code, Codex, Cursor, Kiro, Qoder, and/or OpenCode), confirm your developer name and language, then confirm the writes. Interactive confirmation uses a summary-first view: generated scale and risk-operation totals are grouped by host, while project-external writes and degraded warnings stay prominent. Individual remove/prune/untrack paths are hidden from the default view. Run `spec-first init --dry-run` explicitly when you need target/host/root details, critical writes, and bounded path samples. In a parent workspace with many child Git repos, `init` defaults to bootstrapping the parent root with its instruction file, `.gitignore`, a missing `CHANGELOG.md`, and the selected host runtime/state. Use `--repo <child>` to initialize only one child repo; use `--all-repos` to initialize the parent workspace and every discovered child repo. Child setup and readiness truth remains local to each child. Scripted `init -y` setup on fresh machines must pass `-u <name>` because there is no prompt to collect a developer name, for example `spec-first init --codex -y -u <name> --lang <zh|en>`. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro, `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder, `spec-first init --cursor -y -u <name> --lang <zh|en>` for Cursor, or `spec-first init --opencode -y -u <name> --lang <zh|en>` for OpenCode. The `init -y` default host set remains Claude Code + Codex; Cursor, Kiro, Qoder, and OpenCode require explicit flags.
 
-Expected: interactive init first presents a host-level confirmation summary, then reports the result as one run-level receipt. `--dry-run` is the detailed view that lists bounded runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, or `.qoder/`. Generated copies can be rebuilt any time with `spec-first init`.
+Expected: interactive init first presents a host-level confirmation summary, then reports the result as one run-level receipt. `--dry-run` is the detailed view that lists bounded runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, `.qoder/`, or `.opencode/`. Generated copies can be rebuilt any time with `spec-first init`.
 
 Init creates `CHANGELOG.md` only when it is missing; an existing repository changelog remains byte-for-byte user-owned.
 
@@ -87,7 +87,7 @@ If the host reports missing helper or MCP readiness facts, run the unified `spec
 
 For a non-Git multi-repo requirement workspace, default `init` remains parent-only: it does not project generated runtime into child repositories. Before a runtime setup mutation, finish the current host's child projection with `spec-first init --all-repos` (or the narrow `spec-first init --repo <child>` repair). Runtime Setup blocks provider and host-config mutation when a selected child's current-host projection is missing or stale; `--plan --all-repos` instead previews each child without writing. `spec-first doctor` presents projection, managed runtime facts, optional workspace graph, and unmanaged external MCP separately — only the first two can contribute to managed readiness.
 
-Graphify is pinned to PyPI `graphifyy@0.9.17` and requires an existing Python `>=3.10` plus `uv` (preferred) or `pipx`. Setup does not bootstrap Python/tool managers or use plain pip. It verifies the direct wheel hash and package identity, generates the local AST graph with `extract --code-only` under `.graphify/`, and refreshes an existing graph with the provider-native `graphify update` path instead of creating spec-first staging or backup directories. Graphify output remains advisory navigation only. During an explicit Graphify mutation setup, a verified Python cutover automatically removes a confirmed global `@sentropic/graphify` incumbent and only launcher symlinks proven to resolve into that npm package; diagnostic, plan, and verify-only modes remain read-only.
+Graphify is pinned to PyPI `graphifyy@0.9.29` and requires an existing Python `>=3.10` plus `uv` (preferred) or `pipx`. Setup does not bootstrap Python/tool managers or use plain pip. It verifies the direct wheel hash and package identity, generates the local AST graph with `extract --code-only` under `.graphify/`, and refreshes an existing graph with the provider-native `graphify update` path instead of creating spec-first staging or backup directories. Graphify output remains advisory navigation only. During an explicit Graphify mutation setup, a verified Python cutover automatically removes a confirmed global `@sentropic/graphify` incumbent and only launcher symlinks proven to resolve into that npm package; diagnostic, plan, and verify-only modes remain read-only.
 
 Graphify Git hook 是可选的 project-local 自动刷新增强。Runtime Setup 使用 `git rev-parse --git-path hooks` 解析有效 hooks root，只有目标位于当前项目内且通过 no-follow symlink containment 时才安装、规范化和验证 hook。用户级或组织级 `core.hooksPath` 指向项目外时，setup 绝不 write/execute/status 或串联外部 hook、不覆盖 local/global Git 配置，只对 `post-commit`/`post-checkout` 做**只读 marker 检测**：命中报 `hook_status=verified-external` + `refresh_mode=commit-hook-external-verified`，缺失报 `blocked` + 一键安装提示。核心 package、host integration、graph integrity 与真实 query 通过时，完整 setup 仍为 ready，`verified-external`/`manual-only` 均只描述 spec-first 只读可验证的 external commit-time posture（非 project-owned verified）。该状态不证明外部 hook 不存在或不会执行；外部 hook execution 保持 unverified。只有源码已变化且消费前需要新的 currentness evidence 时，才按需运行 `spec-runtime-setup --only graphify --refresh`；该命令不是 hooksPath 修复动作，core-ready `unknown` 也不自动触发 refresh。
 
@@ -96,13 +96,15 @@ Graphify Git hook 是可选的 project-local 自动刷新增强。Runtime Setup 
 
 Cursor note: `spec-first init --cursor` generates the same `spec-*` workflow runtime under `.cursor/skills/**`, spec-first state under `.cursor/spec-first/**`, and project MCP setup targets `.cursor/mcp.json` by default. User-level `~/.cursor/mcp.json` requires `--user-scope` / `CURSOR_USER_SCOPE=1`. Current release evidence records `cursor_loader_validation_unavailable`, so do not treat Cursor as full host support or an `init -y` default.
 
+OpenCode note: `spec-first init --opencode` generates native workflow commands under `.opencode/commands/spec/**`, Agent Skills under `.opencode/skills/**`, and managed state under `.opencode/spec-first/**`. Runtime Setup targets project `opencode.json` by default; user scope requires explicit `--user-scope` and resolves `${XDG_CONFIG_HOME}/opencode/opencode.json`. A higher-precedence `opencode.jsonc` blocks JSON mutation. Setup adds only exact governed skill permissions, keeps dangerous tools at `ask`, preserves unrelated user configuration, and fails closed on conflicting or unsafe rule order. Until the version-matched host journey closes loader evidence, the strongest claim remains `generated_runtime_preview`.
+
 Cursor/Kiro/Qoder native pointer files: `init --cursor`, `init --kiro`, and `init --qoder` also write `.cursor/rules/spec-first.mdc`, `.kiro/steering/spec-first.md`, and `.qoder/rules/spec-first.md`. These files only point the host back to root `AGENTS.md` and that host's installed `using-spec-first` runtime skill (`.cursor/skills/`, `.kiro/skills/`, or `.qoder/skills/`); they are generated runtime pointers, not a second source of truth. If a same-path user-owned file already exists without the spec-first managed marker, init and clean leave it untouched; init and doctor both report the collision as a warning.
 
 For all init options (flags, scripted mode, multi-repo), see the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md).
 
 **Step 3 — Restart the host**
 
-Restart the host or open a new session so it loads the generated runtime assets. Host-session workflow entries are not shell commands — they run inside the Claude Code, Codex, Kiro, Qoder, or Cursor session, not in your terminal.
+Restart the host or open a new session so it loads the generated runtime assets. Host-session workflow entries are not shell commands — they run inside the Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode session, not in your terminal.
 
 **Step 4 — Run your first workflow**
 
@@ -179,6 +181,8 @@ Worker dispatch is host-neutral at the Skill layer. The owning workflow supplies
 
 When `spec-lfg` reaches an applicable browser flow, the caller must provide an explicit `target-origin:<origin>`; a missing or invalid origin blocks that flow as `target-origin-missing` or `target-origin-invalid`. The caller owns project-server startup, monitoring, and shutdown. `spec-test-browser` validates only the resolved credential-free loopback root origin, runs browser actions through its private wrapper, and cleans up only its own browser session. It neither reads a local runtime profile nor starts, probes, or stops a project server. Browser evidence proves only the observed route/step result at that caller-authorized origin, not that the server represents the current branch. A durable or external UI effect needs separate current-call authorization; pipeline mode records `browser-mutation-authorization-required` without writing the blocked step. Failed browser cleanup still blocks lifecycle, commit, push, PR, and CI side effects.
 
+Runtime Setup reports `agent-browser` installation and browser execution as separate dimensions. A present CLI/runtime/global skill can yield `dependency_status: ready` while `execution_readiness` remains `blocked`. `--allowed-domains`, a help marker, a version allowlist, caller input, or provider self-report cannot confirm exact-origin enforcement; only Spec-First controlled conformance may do that. With the current `agent-browser 0.33.1` capability shape, the safe result remains `exact-origin-capability-unavailable` and zero browser action subprocesses. Reinstalling the same release is not presented as a deterministic capability fix.
+
 Support entrypoints (on demand): `spec-runtime-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
 
 Requirements clarification stays inside its current producer. `spec-ideate` passes a focused evidence snapshot to `spec-brainstorm`; `spec-brainstorm` verifies source facts, asks the current user one product question at a time, and persists blockers/source limitations in the requirements-only Product Contract; `spec-prd` does the same for brownfield PRDs. Project glossary/context/ADR files are advisory inputs only during these workflows—cross-release knowledge is emitted as a qualified promotion candidate for a later explicit maintenance request. Visual or spatial decisions use tables, state sequences, ASCII wireframes, or read-only source screenshots; there is no bundled browser helper.
@@ -195,7 +199,7 @@ Without a repo-backed trail, that context disappears with the chat window. The n
 
 ## Why spec-first?
 
-`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, Kiro, Qoder, or Cursor; it gives those hosts a project-local harness. Cursor native rules, Kiro native Specs, and Qoder native rules remain host-owned artifacts; spec-first only treats `.cursor/rules/**`, `.kiro/specs/**`, and `.qoder/rules/**` as advisory input when explicitly named.
+`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode; it gives those hosts a project-local harness. Cursor native rules, Kiro native Specs, Qoder native rules, and user-owned OpenCode configuration remain host-owned artifacts; spec-first only treats them as advisory input when explicitly named.
 
 | Adoption question | Prompt pack / agent orchestration | spec-first |
 |---|---|---|
@@ -203,7 +207,7 @@ Without a repo-backed trail, that context disappears with the chat window. The n
 | Where do decisions and evidence live? | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
 | What does the human review? | Often the final diff or agent output | Requirements, plans, task packs, diffs, review findings, bugs, and learnings |
 | Who enforces mechanical boundaries? | Mostly model discipline or custom glue | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
-| How do Claude Code, Codex, Cursor, Kiro, and Qoder stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates supported host runtime surfaces |
+| How do Claude Code, Codex, Cursor, Kiro, Qoder, and OpenCode stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates supported host runtime surfaces |
 
 Current mechanisms you can inspect today:
 
@@ -214,7 +218,7 @@ Current mechanisms you can inspect today:
 - Work rechecks current owners and thin-glue boundaries before adding durable surfaces, and keeps local mutation separate from commit/landing authority.
 - Work, review, debug, optimize, and compound workflows preserve evidence and learning.
 - Knowledge handoffs stay summary-first, and recalled `docs/solutions/` learnings remain advisory until reconfirmed from source evidence.
-- One source asset set supports unified `spec-*` workflow entries across Claude Code, Codex, Cursor, Kiro, and Qoder without hand-maintaining generated runtime copies.
+- One source asset set supports unified `spec-*` workflow entries across Claude Code, Codex, Cursor, Kiro, Qoder, and OpenCode without hand-maintaining generated runtime copies.
 
 These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.
 
@@ -224,7 +228,7 @@ These are current repo mechanisms, not measured adoption-outcome claims. Trust t
 
 Source assets (`skills/`, skill-local prompt assets under `skills/**/references/{agents,personas}/`, `templates/`, `src/cli/`) are regenerated by `spec-first init` into host runtime assets — producing repo-local workflow artifacts: `ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`.
 
-Generated `spec-*`, `using-spec-first`, Graphify project-skill, `spec-first/` state, command, hook, and pointer assets under the host roots are disposable and can be rebuilt with `spec-first init`. The host roots are mixed-ownership surfaces: team-authored skills, agents, rules, and portable project configuration outside those namespaced assets may be committed. Cursor project `.cursor/mcp.json`, spec-first managed `.kiro/settings/`, Qoder local `.qoder/settings.local.json`, and Qoder `.qoder/settings.json` managed hook entries are local outputs or managed slices rather than source by default; existing tracked team-policy files are not automatically removed from the Git index. See the gitignore reference for the exact generated paths and opt-in sharing guidance.
+Generated `spec-*`, `using-spec-first`, Graphify project-skill, `spec-first/` state, command, hook, and pointer assets under the host roots are disposable and can be rebuilt with `spec-first init`. The host roots are mixed-ownership surfaces: team-authored skills, agents, rules, and portable project configuration outside those namespaced assets may be committed. Cursor project `.cursor/mcp.json`, spec-first managed `.kiro/settings/`, Qoder local `.qoder/settings.local.json`, Qoder `.qoder/settings.json` managed hook entries, and spec-first managed entries inside `opencode.json` are local outputs or managed slices rather than source by default; existing tracked team-policy files are not automatically removed from the Git index. See the gitignore reference for the exact generated paths and opt-in sharing guidance.
 
 Detailed references:
 
@@ -238,7 +242,7 @@ Scripts enforce deterministic invariants; scripts prepare facts; the LLM decides
 
 - **What scripts do:** enforce mechanically decidable invariants, install, validate, generate, report machine facts.
 - **What the LLM decides:** requirements framing, scope boundaries, tradeoffs, implementation judgment, review evidence.
-- **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, generated mirrors such as `.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, spec-first managed `.kiro/settings/**`, `.qoder/commands/spec-*.md`, retired `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, spec-first managed `.qoder/hooks/session-start`, `.qoder/hooks/prd-prewrite-guard`, `.qoder/hooks/prd-readiness-guard`, and host-local config such as `.cursor/mcp.json` and `.qoder/settings.local.json`.
+- **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, generated mirrors such as `.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, spec-first managed `.kiro/settings/**`, `.qoder/commands/spec-*.md`, retired `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.opencode/commands/spec/**`, `.opencode/skills/**`, `.opencode/spec-first/**`, spec-first managed Qoder hooks, and host-local config such as `.cursor/mcp.json`, `.qoder/settings.local.json`, and `opencode.json` / `opencode.jsonc` unless the runtime task explicitly needs them.
 
 [→ Full trust model and verification contracts](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
 
@@ -246,7 +250,7 @@ Scripts enforce deterministic invariants; scripts prepare facts; the LLM decides
 
 Use `spec-first` when:
 
-- You already use Claude Code, Codex, Kiro, Qoder, or Cursor and want project-local workflows instead of one-off prompts.
+- You already use Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode and want project-local workflows instead of one-off prompts.
 - You want AI coding work to leave durable requirements, plans, explicitly routed review summaries, and learnings.
 - You want scripts to handle deterministic setup and enforce machine-checkable boundaries while keeping semantic judgment with the LLM.
 - You want a lightweight workflow layer that can be regenerated from source assets.

@@ -7,6 +7,7 @@ const path = require('node:path');
 const CursorAdapter = require('../../src/cli/adapters/cursor');
 const KiroAdapter = require('../../src/cli/adapters/kiro');
 const QoderAdapter = require('../../src/cli/adapters/qoder');
+const OpenCodeAdapter = require('../../src/cli/adapters/opencode');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const SETUP_SOURCE = fs.readFileSync(
@@ -45,6 +46,15 @@ const ADAPTER_CASES = [
     skillsRoot: '.qoder/skills',
     foreignRuntimePath: '.kiro/skills/spec-work/SKILL.md',
     projectedRuntimePath: '.qoder/skills/spec-work/SKILL.md',
+    comparativeConfigPath: '.kiro/settings/mcp.json',
+  },
+  {
+    id: 'opencode',
+    hostLabel: 'OpenCode',
+    adapter: new OpenCodeAdapter(),
+    skillsRoot: '.opencode/skills',
+    foreignRuntimePath: '.agents/skills/spec-work/SKILL.md',
+    projectedRuntimePath: '.opencode/skills/spec-work/SKILL.md',
     comparativeConfigPath: '.kiro/settings/mcp.json',
   },
 ];
@@ -153,7 +163,7 @@ describe('host runtime projection contracts', () => {
         ]),
       );
 
-      expect(registry.schema_version).toBe('setup-registry.v8');
+      expect(registry.schema_version).toBe('setup-registry.v9');
       expect(hostConfig.kiro.targets).toMatchObject({
         workspace: { config_path: '.kiro/settings/mcp.json' },
         user: { config_path: '$HOME/.kiro/settings/mcp.json' },

@@ -72,8 +72,8 @@ afterEach(() => {
 });
 
 describe('bounded init mutation preview', () => {
-  test('renders a summary-first five-host preview without destructive path details', () => {
-    const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
+  test('renders a summary-first six-host preview without destructive path details', () => {
+    const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder', 'opencode'];
     const plans = platforms.map((platform, platformIndex) => {
       const operations = [
         ...Array.from({ length: 29 }, (_, index) => ({
@@ -100,15 +100,15 @@ describe('bounded init mutation preview', () => {
     });
     const lines = output.split('\n').filter(Boolean);
     expect(lines.length).toBeLessThanOrEqual(40);
-    const labels = ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder'];
+    const labels = ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder', 'OpenCode'];
     for (const [index, platform] of platforms.entries()) {
       expect(output).toContain(`${labels[index]}:`);
       expect(output).not.toContain(`.${platform}/obsolete-01`);
     }
-    expect(output).toContain('145 risk path(s)');
+    expect(output).toContain('174 risk path(s)');
     expect(output).toContain('spec-first init --dry-run');
     expect(output).toContain('Preview only; files change only after confirmation.');
-    expect(output.indexOf('145 risk path(s)')).toBeLessThan(output.indexOf('Claude Code:'));
+    expect(output.indexOf('174 risk path(s)')).toBeLessThan(output.indexOf('Claude Code:'));
     expect(output).not.toContain('remove_dir:');
     expect(output).not.toContain('No files were changed.');
     expect(output).not.toContain('generated-0001.md');

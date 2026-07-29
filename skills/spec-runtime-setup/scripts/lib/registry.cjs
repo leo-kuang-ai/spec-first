@@ -5,8 +5,8 @@ const path = require('node:path');
 
 const REGISTRY_FILE = 'setup-registry.json';
 const SCHEMA_FILE = 'setup-registry.schema.json';
-const REGISTRY_SCHEMA_VERSION = 'setup-registry.v8';
-const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'qoder']);
+const REGISTRY_SCHEMA_VERSION = 'setup-registry.v9';
+const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
 const PLATFORM_IDS = Object.freeze(['macos', 'linux', 'wsl', 'windows']);
 const KIND_COLLECTIONS = Object.freeze({
   tool: 'tools',
@@ -213,6 +213,9 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     }
   }
   if (isPlainObject(value)) {
+    if (schema.minProperties !== undefined && Object.keys(value).length < schema.minProperties) {
+      throw new SchemaValidationError(location, `至少必须包含 ${schema.minProperties} 个 property`);
+    }
     const properties = isPlainObject(schema.properties) ? schema.properties : {};
     for (const required of schema.required || []) {
       if (!Object.prototype.hasOwnProperty.call(value, required)) {
@@ -330,6 +333,12 @@ function resolveHostConfigPlatform(hostConfig, platform) {
     targets[targetId] = {
       ...cloneValue(target),
       config_path: resolveConfigPath(target.config_path, platform),
+      ...(Array.isArray(target.precedence_guards) ? {
+        precedence_guards: target.precedence_guards.map((guard) => ({
+          ...cloneValue(guard),
+          config_path: resolveConfigPath(guard.config_path, platform),
+        })),
+      } : {}),
     };
   }
   return canonicalize({ ...cloneValue(hostConfig), targets });
@@ -353,6 +362,18 @@ function assertNoDuplicateHostTargets(registry) {
           );
         }
         seen.set(fingerprint, targetId);
+        for (const [guardIndex, guard] of (target.precedence_guards || []).entries()) {
+          const guardPath = resolveConfigPath(guard.config_path, platform);
+          const guardFingerprint = path.normalize(guardPath).toLowerCase();
+          if (seen.has(guardFingerprint)) {
+            throw new RegistryError(
+              'registry_duplicate_host_target',
+              `Host ${hostId} 的 target ${seen.get(guardFingerprint)} 与 ${targetId}.precedence_guards.${guardIndex} 在 ${platform} 上都解析为 ${guardPath}。`,
+              { host: hostId, platform, targetId, duplicateOf: seen.get(guardFingerprint), configPath: guardPath },
+            );
+          }
+          seen.set(guardFingerprint, `${targetId}.precedence_guards.${guardIndex}`);
+        }
       }
     }
     for (const targetId of [
@@ -398,6 +419,40 @@ function assertOverrideKeys(registry) {
           throw new RegistryError(
             'registry_conflicting_override',
             `${collection}.${entry.id} 的 platform override ${platform} 不能替换 id。`,
+          );
+        }
+      }
+    }
+  }
+}
+
+function assertOpenCodePermissionPolicyOwnership(registry) {
+  const openCodePolicy = registry.hosts.opencode.defaults.tool.host_config.permission_policy;
+  if (!openCodePolicy || openCodePolicy.kind !== 'opencode-governed-assets-v1') {
+    throw new RegistryError(
+      'registry_opencode_permission_policy_invalid_owner',
+      'OpenCode host config 必须声明 opencode-governed-assets-v1 permission policy。',
+    );
+  }
+  for (const hostId of HOST_IDS) {
+    if (hostId === 'opencode') continue;
+    if (registry.hosts[hostId].defaults.tool.host_config.permission_policy !== undefined) {
+      throw new RegistryError(
+        'registry_opencode_permission_policy_invalid_owner',
+        `Host ${hostId} 不得声明 OpenCode permission policy。`,
+        { host: hostId },
+      );
+    }
+  }
+  for (const collection of Object.values(KIND_COLLECTIONS)) {
+    for (const entry of registry[collection]) {
+      for (const [hostId, override] of Object.entries(entry.host_overrides || {})) {
+        if (hostId === 'opencode') continue;
+        if (override.host_config && override.host_config.permission_policy !== undefined) {
+          throw new RegistryError(
+            'registry_opencode_permission_policy_invalid_owner',
+            `${collection}.${entry.id} 的 ${hostId} override 不得声明 OpenCode permission policy。`,
+            { collection, id: entry.id, host: hostId },
           );
         }
       }
@@ -457,6 +512,7 @@ function validateRegistry(registry, schema) {
   }
   assertNoDuplicateHostTargets(registry);
   assertOverrideKeys(registry);
+  assertOpenCodePermissionPolicyOwnership(registry);
 }
 
 function loadRegistry({ skillRoot }) {

@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const { getSupportedPlatforms } = require('../../src/cli/adapters');
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
@@ -106,7 +107,10 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     for (const skillName of ['spec-resolve-pr-feedback', 'spec-test-xcode']) {
       const record = governance.skills.find((entry) => entry.skill_name === skillName);
       expect(record.entry_surface).toBe('standalone_skill');
-      expect(Object.values(record.host_delivery)).toEqual(['skill', 'skill', 'skill', 'skill', 'skill']);
+      expect(Object.keys(record.host_delivery)).toEqual(getSupportedPlatforms());
+      expect(Object.values(record.host_delivery)).toEqual(
+        getSupportedPlatforms().map(() => 'skill'),
+      );
       expect(routeMap).toContain(`\`${skillName}\``);
     }
 

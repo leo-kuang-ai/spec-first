@@ -55,7 +55,7 @@ const pointerPlatforms = getSupportedPlatforms().filter((platform) =>
   Boolean(getAdapter(platform).pointerPath)
 );
 
-describe('doc-review five-host reference projection', () => {
+describe('doc-review six-host reference projection', () => {
   test.each(getSupportedPlatforms())(
     '%s init projects all doc-review lazy references to runtime',
     (platform) => {

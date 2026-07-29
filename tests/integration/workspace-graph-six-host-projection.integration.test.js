@@ -1,6 +1,6 @@
 'use strict';
 
-// D6 — five-host `spec-first init` projection of the per-requirement workspace
+// D6 — six-host `spec-first init` projection of the per-requirement workspace
 // graph surface. Runs in a clean sandbox (never against the dirty working tree).
 // Asserts each host mirror of `spec-runtime-setup` carries the new workspace-graph
 // modules + SKILL docs, and doctor reports no drift for that host.
@@ -42,6 +42,7 @@ const SETUP_RUNTIME_ROOT = Object.freeze({
   cursor: '.cursor/skills',
   kiro: '.kiro/skills',
   qoder: '.qoder/skills',
+  opencode: '.opencode/skills',
 });
 
 afterEach(() => {
@@ -89,8 +90,8 @@ function runProjectedSetup(setupRoot, args, sandbox) {
   });
 }
 
-describe('D6 five-host workspace-graph projection', () => {
-  test('spec-first init projects workspace-graph modules + docs on all five hosts; doctor no drift', () => {
+describe('D6 six-host workspace-graph projection', () => {
+  test('spec-first init projects workspace-graph modules + docs on all six hosts; doctor no drift', () => {
     const sourceSkill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'), 'utf8');
     const sourceArgumentHint = sourceSkill.split('\n').find((line) => line.startsWith('argument-hint:')) || '';
     expect(sourceArgumentHint).toContain('--workspace-graph');
@@ -98,8 +99,15 @@ describe('D6 five-host workspace-graph projection', () => {
 
     const sandbox = tempSandbox();
     const platforms = getSupportedPlatforms();
-    expect(platforms).toEqual(expect.arrayContaining(['claude', 'codex', 'cursor', 'kiro', 'qoder']));
-    expect(platforms).toHaveLength(5);
+    expect(platforms).toEqual(expect.arrayContaining([
+      'claude',
+      'codex',
+      'cursor',
+      'kiro',
+      'qoder',
+      'opencode',
+    ]));
+    expect(platforms).toHaveLength(6);
 
     const init = runSpecFirst([
       'init',
@@ -112,7 +120,7 @@ describe('D6 five-host workspace-graph projection', () => {
       '--no-sync-user-language',
     ], sandbox);
     if (init.status !== 0) {
-      throw new Error(`five-host init failed:\nstdout:\n${init.stdout}\nstderr:\n${init.stderr}`);
+      throw new Error(`six-host init failed:\nstdout:\n${init.stdout}\nstderr:\n${init.stderr}`);
     }
     expect(init.status).toBe(0);
 

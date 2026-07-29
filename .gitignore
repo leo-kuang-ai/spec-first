@@ -110,6 +110,12 @@ __pycache__/
 .qoder/hooks/prd-readiness-guard
 .qoder/rules/spec-first.md
 .qoder/settings.local.json
+.opencode/commands/spec/
+.opencode/skills/spec-*/
+.opencode/skills/using-spec-first/
+.opencode/skills/graphify/
+.opencode/agents/spec-*
+.opencode/spec-first/
 .context/spec-first/
 
 # spec-first local setup and workflow runtime artifacts

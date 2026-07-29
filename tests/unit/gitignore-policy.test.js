@@ -27,6 +27,9 @@ describe('spec-first gitignore policy', () => {
       '.cursor/rules/spec-first.mdc',
       '.kiro/steering/spec-first.md',
       '.qoder/rules/spec-first.md',
+      '.opencode/commands/spec/',
+      '.opencode/skills/spec-*/',
+      '.opencode/spec-first/',
     ]));
     expect(patterns).not.toEqual(expect.arrayContaining([
       '.claude/skills/',
@@ -36,6 +39,7 @@ describe('spec-first gitignore policy', () => {
       '.cursor/skills/',
       '.kiro/skills/',
       '.qoder/skills/',
+      '.opencode/skills/',
     ]));
   });
 
@@ -50,12 +54,18 @@ describe('spec-first gitignore policy', () => {
       writeFile(repoRoot, '.agents/skills/my-team-skill/SKILL.md');
       writeFile(repoRoot, '.codex/spec-first/state.json');
       writeFile(repoRoot, '.codex/config.toml');
+      writeFile(repoRoot, '.opencode/skills/spec-plan/SKILL.md');
+      writeFile(repoRoot, '.opencode/spec-first/state.json');
+      writeFile(repoRoot, 'opencode.json');
 
       expect(isIgnored(repoRoot, '.agents/skills/spec-plan/SKILL.md')).toBe(true);
       expect(isIgnored(repoRoot, '.agents/skills/source-command-spec-plan/SKILL.md')).toBe(true);
       expect(isIgnored(repoRoot, '.agents/skills/my-team-skill/SKILL.md')).toBe(false);
       expect(isIgnored(repoRoot, '.codex/spec-first/state.json')).toBe(true);
       expect(isIgnored(repoRoot, '.codex/config.toml')).toBe(false);
+      expect(isIgnored(repoRoot, '.opencode/skills/spec-plan/SKILL.md')).toBe(true);
+      expect(isIgnored(repoRoot, '.opencode/spec-first/state.json')).toBe(true);
+      expect(isIgnored(repoRoot, 'opencode.json')).toBe(false);
     } finally {
       fs.rmSync(repoRoot, { recursive: true, force: true });
     }
@@ -113,6 +123,8 @@ describe('spec-first gitignore policy', () => {
       '.agents/skills/spec-*/**',
       '.agents/skills/source-command-spec-*/**',
       '.codex/spec-first/',
+      '.opencode/skills/spec-*/**',
+      '.opencode/spec-first/',
       '.spec-first/workflows/',
     ]));
   });

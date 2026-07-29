@@ -26,17 +26,18 @@ function normalizeHelper(entry, probe, platform) {
   const status = probe && probe.status ? probe.status : 'missing';
   const baselineBlocking = entry.baseline_blocking === true;
   const command = installCommand(entry, platform);
-  let dependencyStatus = status === 'ready' ? 'ready' : 'missing';
+  const dependencyStatus = probe && probe.dependency_status
+    ? probe.dependency_status
+    : (status === 'ready' ? 'ready' : 'missing');
   let result = 'ready';
   let nextAction = '';
 
   if (status !== 'ready') {
     if (entry.id === 'agent-browser') {
-      result = 'skipped';
-      if (probe && probe.reason_code === 'agent-browser-manual-setup-incomplete') {
-        dependencyStatus = 'ready';
-      }
-      nextAction = command;
+      result = status === 'skipped' ? 'skipped' : 'degraded';
+      nextAction = probe && typeof probe.next_action === 'string' && probe.next_action.length > 0
+        ? probe.next_action
+        : command;
     } else if (entry.id === 'ast-grep' && status === 'degraded') {
       result = 'degraded';
       nextAction = '缺少 ast-grep；回退到 rg';
@@ -47,6 +48,7 @@ function normalizeHelper(entry, probe, platform) {
   }
 
   const normalized = {
+    ...(probe || {}),
     id: entry.id,
     kind: entry.kind || 'helper',
     profile: Array.isArray(entry.profiles) && entry.profiles.length > 0
@@ -60,7 +62,9 @@ function normalizeHelper(entry, probe, platform) {
     configured_status: 'not-applicable',
     allowed: 'not-applicable',
     result,
-    reason_code: helperReasonCode(result),
+    reason_code: entry.id === 'agent-browser' && probe && probe.reason_code
+      ? probe.reason_code
+      : helperReasonCode(result),
     next_action: nextAction,
     install_command: command,
     url: entry.safety && entry.safety.source_repo ? entry.safety.source_repo : '',

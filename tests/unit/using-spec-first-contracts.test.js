@@ -148,12 +148,13 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(commit).toMatch(/^user-invocable:\s*false$/m);
   });
 
-  test('supported-host governance includes Cursor in the accepted host contract', () => {
+  test('supported-host governance follows the current adapter registry', () => {
     expect(governanceReadme).toContain(
-      'Accepted supported hosts 固定为 `claude`、`codex`、`cursor`、`kiro`、`qoder`',
+      'Accepted supported hosts 由 canonical adapter registry 枚举，当前为 `claude`、`codex`、`cursor`、`kiro`、`qoder`、`opencode`',
     );
-    expect(governanceReadme).toContain('目标平台：`claude | codex | cursor | kiro | qoder`');
+    expect(governanceReadme).toContain('目标平台：canonical adapter registry 当前枚举的 `claude | codex | cursor | kiro | qoder | opencode`');
     expect(governanceReadme).toContain('host_delivery.cursor = skill');
+    expect(governanceReadme).toContain('host_delivery.opencode = command');
   });
 
   test('does not restore legacy host-specific workflow spellings', () => {

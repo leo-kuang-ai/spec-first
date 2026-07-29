@@ -102,6 +102,13 @@ function buildProjectInitPlan({
       message: 'Warning: Cursor support is generated-runtime preview. Local Cursor skill discovery/invocation is not verified on this machine, so generated skills may not load.',
     });
   }
+  if (platform === 'opencode') {
+    diagnostics.push({
+      level: 'warn',
+      code: 'opencode_generated_runtime_preview',
+      message: 'Warning: OpenCode support is generated-runtime preview. Command and skill loader behavior has not been verified for the installed OpenCode version.',
+    });
+  }
   if (platform === 'qoder') {
     diagnostics.push({
       level: 'warn',

@@ -35,7 +35,7 @@ function runDoctor(argv) {
   }
 
   if (parsed.unknown.length > 0) {
-    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json] [--verbose]');
+    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder|--opencode] [--json] [--verbose]');
     return 2;
   }
 
@@ -48,6 +48,7 @@ function runDoctor(argv) {
   if (parsed.cursor) platforms.push('cursor');
   if (parsed.kiro) platforms.push('kiro');
   if (parsed.qoder) platforms.push('qoder');
+  if (parsed.opencode) platforms.push('opencode');
 
   // 无参数时自动检测
   if (platforms.length === 0) {
@@ -61,7 +62,7 @@ function runDoctor(argv) {
     }
 
     console.log('No spec-first platform detected in this project.');
-    console.log('Run `spec-first init` and select Claude Code, Codex, Cursor, Kiro, and/or Qoder when prompted to initialize.');
+    console.log('Run `spec-first init` and select Claude Code, Codex, Cursor, Kiro, Qoder, and/or OpenCode when prompted to initialize.');
     return 0;
   }
 
@@ -211,7 +212,9 @@ function checkGit() {
 }
 
 function checkPlatformCli(platform, options = {}) {
-  const command = platform === 'codex'
+  const command = platform === 'opencode'
+    ? 'opencode'
+    : platform === 'codex'
     ? 'codex'
     : platform === 'cursor'
       ? 'agent'
@@ -220,7 +223,9 @@ function checkPlatformCli(platform, options = {}) {
         : platform === 'qoder'
           ? 'qodercli'
           : 'claude';
-  const displayName = platform === 'codex'
+  const displayName = platform === 'opencode'
+    ? 'OpenCode'
+    : platform === 'codex'
     ? 'Codex'
     : platform === 'cursor'
       ? 'Cursor CLI'
@@ -239,10 +244,12 @@ function checkPlatformCli(platform, options = {}) {
     ? runner(options.comSpec || process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', `${command} --version`], { encoding: 'utf8' })
     : runner(command, ['--version'], { encoding: 'utf8' });
   if (result.status === 0) {
+    const output = result.stdout.trim();
     return {
       level: 'PASS',
       name: displayName,
-      message: result.stdout.trim() || 'available',
+      message: output || 'available',
+      detectedVersion: extractDetectedVersion(output),
     };
   }
 
@@ -270,6 +277,11 @@ function checkPlatformCli(platform, options = {}) {
     message: 'could not verify version',
     fix: `Run \`${command} --version\` manually to confirm the CLI works.`,
   };
+}
+
+function extractDetectedVersion(output) {
+  const match = String(output || '').match(/\b\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\b/);
+  return match ? match[0] : null;
 }
 
 function checkGeneratedCommands(adapter, assetInspection) {
@@ -1021,6 +1033,7 @@ function buildDoctorReport({ projectRoot, platforms }) {
   const platformChecksByPlatform = {};
   const runtimeChecksByPlatform = {};
   const hostChecksByPlatform = {};
+  const hostSupportByPlatform = {};
 
   for (const platform of platforms) {
     const adapter = getAdapter(platform);
@@ -1055,6 +1068,11 @@ function buildDoctorReport({ projectRoot, platforms }) {
 
     runtimeChecksByPlatform[platform] = runtimeChecks;
     hostChecksByPlatform[platform] = hostChecks;
+    hostSupportByPlatform[platform] = buildHostSupportView(
+      adapter,
+      platformCliCheck,
+      runtimeFileChecks,
+    );
     platformChecksByPlatform[platform] = [
       platformCliCheck,
       ...coreRuntimeChecks,
@@ -1099,6 +1117,7 @@ function buildDoctorReport({ projectRoot, platforms }) {
     workflow_runnability: workflowRunnability.status,
     workflow_runnability_basis: workflowRunnability.basis,
     workspace_readiness: workspaceReadiness,
+    host_support: hostSupportByPlatform,
     common_checks: commonChecks,
     platform_checks: platformChecksByPlatform,
     checks: allChecks,
@@ -1126,11 +1145,34 @@ function printDoctorJson(report) {
     workflow_runnability: report.workflow_runnability,
     workflow_runnability_basis: report.workflow_runnability_basis,
     workspace_readiness: report.workspace_readiness,
+    host_support: report.host_support,
     checks: report.checks,
     common_checks: report.common_checks,
     platform_checks: report.platform_checks,
     warnings: report.warnings,
   }, null, 2));
+}
+
+function buildHostSupportView(adapter, platformCliCheck, runtimeFileChecks = []) {
+  const reasonCodes = [...new Set(
+    runtimeFileChecks
+      .map((check) => check && check.reasonCode)
+      .filter(Boolean),
+  )];
+  const testedVersions = Array.isArray(adapter.testedVersions)
+    ? [...adapter.testedVersions]
+    : [];
+  const evidenceClaim = adapter.evidenceClaim || null;
+  return {
+    support_state: adapter.supportState || 'active',
+    evidence_claim: evidenceClaim,
+    detected_version: platformCliCheck && platformCliCheck.detectedVersion
+      ? platformCliCheck.detectedVersion
+      : null,
+    tested_versions: testedVersions,
+    loader_evidence: evidenceClaim !== 'generated_runtime_preview' && testedVersions.length > 0,
+    reason_codes: reasonCodes,
+  };
 }
 
 function computeWorkflowRunnability({
@@ -1657,12 +1699,12 @@ function printHelp() {
     '🩺 spec-first doctor',
     '',
 	    '📘 Usage:',
-	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json] [--verbose]',
+	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder|--opencode] [--json] [--verbose]',
 	    '  --verbose  在简明总览后显示所有检查明细。',
 	    '',
 	    '📊 JSON status fields:',
 	    '  install_health: Node/Git/package-level checks for running the CLI.',
-	    '  runtime_asset_health: managed Claude/Codex/Cursor/Kiro/Qoder runtime assets generated by spec-first init.',
+	    '  runtime_asset_health: managed Claude/Codex/Cursor/Kiro/Qoder/OpenCode runtime assets generated by spec-first init.',
 	    '  host_readiness: host CLI and host-specific project wiring checks.',
 	    '  decision_input_health: pass | warn | error | stale | missing | not_checked.',
 	    '  workflow_runnability: verified | simulated | not_verified.',
@@ -1696,15 +1738,11 @@ function detectPlatforms(projectRoot) {
 }
 
 function isPlatformRuntimeDetected(projectRoot, adapter) {
-  if (adapter.id !== 'kiro' && adapter.id !== 'qoder' && adapter.id !== 'cursor') {
+  if (!['kiro', 'qoder', 'cursor', 'opencode'].includes(adapter.id)) {
     return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
   }
 
-  if (adapter.id === 'qoder') {
-    return fs.existsSync(path.join(projectRoot, adapter.stateFile));
-  }
-
-  if (adapter.id === 'cursor') {
+  if (adapter.id === 'qoder' || adapter.id === 'cursor' || adapter.id === 'opencode') {
     return fs.existsSync(path.join(projectRoot, adapter.stateFile));
   }
 
@@ -1725,6 +1763,7 @@ function parseDoctorArgs(argv) {
     cursor: false,
     kiro: false,
     qoder: false,
+    opencode: false,
     json: false,
     verbose: false,
     unknown: [],
@@ -1743,6 +1782,8 @@ function parseDoctorArgs(argv) {
       parsed.kiro = true;
     } else if (arg === '--qoder') {
       parsed.qoder = true;
+    } else if (arg === '--opencode') {
+      parsed.opencode = true;
     } else if (arg === '--json') {
       parsed.json = true;
     } else if (arg === '--verbose') {
@@ -1770,6 +1811,7 @@ module.exports = {
   buildWorkspaceReadinessView,
   buildDoctorCommonChecks,
   buildDoctorReport,
+  buildHostSupportView,
   formatDoctorHumanReport,
   checkPlatformCli,
   readWorkflowVerificationEvidence,

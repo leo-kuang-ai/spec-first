@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { getAdapter } = require('../adapters');
+const { getAdapter, getSupportedPlatforms } = require('../adapters');
 const { getInitMessages } = require('../init-i18n');
 const {
   BrandColors,
@@ -56,13 +56,9 @@ function printInitBrandBanner({ root, version, useColor }) {
 }
 
 function hasAnyManagedState(root) {
-  return [
-    path.join(root, '.claude', 'spec-first', 'state.json'),
-    path.join(root, '.codex', 'spec-first', 'state.json'),
-    path.join(root, '.cursor', 'spec-first', 'state.json'),
-    path.join(root, '.kiro', 'spec-first', 'state.json'),
-    path.join(root, '.qoder', 'spec-first', 'state.json'),
-  ].some((statePath) => fs.existsSync(statePath));
+  return getSupportedPlatforms().some((platform) => (
+    fs.existsSync(path.join(root, getAdapter(platform).stateFile))
+  ));
 }
 
 function printInitPreview(plan, options = {}) {
@@ -959,7 +955,7 @@ function printHelp() {
     '🚀 spec-first init',
     '',
     '📘 Usage:',
-    '  spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
+    '  spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
     '',
     'Host selection:',
     '  spec-first init                         Select one or more host runtimes interactively',
@@ -967,13 +963,15 @@ function printHelp() {
     '  spec-first init --cursor                Initialize only Cursor preview runtime after the remaining prompts',
     '  spec-first init --kiro                  Initialize only Kiro after the remaining prompts',
     '  spec-first init --qoder                 Initialize only Qoder after the remaining prompts',
-    '  spec-first init --claude --codex --cursor --kiro --qoder Initialize all supported hosts',
-    '  spec-first init -y -u <name> --lang zh  Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder require explicit flags)',
+    '  spec-first init --opencode               Initialize only OpenCode preview runtime after the remaining prompts',
+    '  spec-first init --claude --codex --cursor --kiro --qoder --opencode Initialize all supported hosts',
+    '  spec-first init -y -u <name> --lang zh  Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder/OpenCode require explicit flags)',
     '  spec-first init --cursor -y -u <name> --lang zh',
     '  spec-first init --qoder -y -u <name> --lang zh',
+    '  spec-first init --opencode -y -u <name> --lang zh',
     '',
     'Interactive steps:',
-    '  1. Select Claude Code, Codex, Cursor, Kiro, and/or Qoder',
+    '  1. Select Claude Code, Codex, Cursor, Kiro, Qoder, and/or OpenCode',
     '  2. Confirm developer name (reuse the existing global profile when present)',
     '  3. Choose response language',
     '  4. Choose workspace target when child Git repos are detected',
@@ -991,7 +989,7 @@ function printHelp() {
     'Non-interactive usage:',
     '  Use -y/--yes to skip prompts. Without -y, init requires an interactive terminal and exits 2 in CI/non-TTY environments.',
     '  Fresh machines without a global developer profile or git user.name must pass -u <name>.',
-    '  Explicit --claude/--codex/--cursor/--kiro/--qoder flags override the default host set.',
+    '  Explicit --claude/--codex/--cursor/--kiro/--qoder/--opencode flags override the default host set.',
     '  Use --dry-run to preview writes without changing runtime assets.',
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',
     '',
@@ -1001,6 +999,7 @@ function printHelp() {
     '  Cursor: restart Cursor. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup. Cursor remains generated-runtime preview until local loader evidence is recorded.',
     '  Kiro: restart Kiro. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
     '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run spec-runtime-setup.',
+    '  OpenCode: restart OpenCode so it reloads generated commands and skills. Support remains generated-runtime preview until version-matched loader evidence is recorded.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',

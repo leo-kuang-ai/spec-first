@@ -1,0 +1,133 @@
+{
+  "schema_version": "opencode-host-support-observation.v1",
+  "captured_at": "2026-07-30T02:54:26+08:00",
+  "runtime": {
+    "executable": "/opt/homebrew/Cellar/opencode/1.18.7/bin/opencode",
+    "version": "1.18.7",
+    "sha256": "4266cf16e70a4c36ac6f0a5e0310dbab6cae84f3befddc6626193efc4fcdc1cf"
+  },
+  "source": {
+    "head": "20ec3331133345794d1781c9b6b50be2c1d78762",
+    "branch": "leo-2026-07-27-opencode",
+    "scoped_binary_diff_sha256": "61951cd6c12b4126bec9c7ebab2bdfe2e98852a471b5b5dc907b989910f3af4a",
+    "files": {
+      "src/cli/adapters/opencode.js": "2f28e63e554f72a59b486ded1549d834d364a2b5da6e1282798c5afe0b2f6570",
+      "skills/spec-runtime-setup/setup-registry.json": "c1c6dc64ece6c0dcf7d6a605288d84204ed830f92c90d1a3187c154234d02c71",
+      "skills/spec-runtime-setup/scripts/lib/host-config.cjs": "4d7e2bd5c36a651868e6278ff03a008a3fd5b52b414ecbcfdc5962600eb64358",
+      "skills/spec-runtime-setup/scripts/lib/opencode-permissions.cjs": "97ad14e4fa02dec0768a88c372da22435bb2493bc846adb6247497fd258427c0",
+      "src/cli/commands/clean.js": "47d38d0f666f1786a9469f4ade2c4dccc3613ac6753a626d0ec705d1dea247cf"
+    }
+  },
+  "fixture": {
+    "root": "/tmp/spec-first-opencode-u6.GcPGUY",
+    "home_isolated": true,
+    "xdg_isolated": true,
+    "project_runtime_counts": {
+      "opencode_commands": 17,
+      "opencode_skills": 35,
+      "codex_agent_skills": 35
+    },
+    "state_hashes": {
+      "opencode": "0806b8f6a3e6419ff685b7e5084eac4c68a39e761a4a02ef4baa8c2c911bc84c",
+      "codex": "2dabf5a0f923fda1690b3a2ed6b332d13265cca35bfc44556dbc66855b07086b",
+      "agents_before_final_clean": "7b58fe966a1d1c2f2a4ca5d88903d9719ef31f8f9001da10dffa4b452fb4cf58"
+    }
+  },
+  "command_loader": {
+    "status": "passed",
+    "key": "spec/work",
+    "description": "Run the Spec-First execution workflow",
+    "support_root_marker": true,
+    "workflow_heading_marker": true,
+    "normalized_loaded_sha256": "c51aa2225159825a8944b019b43cd848c95bae4e8fc9ce565a91facada7f8c18",
+    "normalized_generated_sha256": "c51aa2225159825a8944b019b43cd848c95bae4e8fc9ce565a91facada7f8c18",
+    "normalized_body_equal": true
+  },
+  "skill_loader": {
+    "status": "passed",
+    "name": "spec-work",
+    "selected_location": ".opencode/skills/spec-work/SKILL.md",
+    "same_name_result_count": 1,
+    "loaded_body_sha256": "b9b9d56dee5f69b078bdb3c281024a1e79266c19538d5978d484cd35d53c1037",
+    "opencode_body_sha256": "b9b9d56dee5f69b078bdb3c281024a1e79266c19538d5978d484cd35d53c1037",
+    "codex_body_sha256": "b9b9d56dee5f69b078bdb3c281024a1e79266c19538d5978d484cd35d53c1037",
+    "loaded_matches_both_projections": true,
+    "duplicate_ambiguity": false
+  },
+  "mcp": {
+    "resolved_keys": [
+      "context7",
+      "sequential-thinking",
+      "user-owned"
+    ],
+    "context7_transport": "connected",
+    "sequential_thinking_transport": "failed-timeout-30000ms",
+    "user_owned": "disabled",
+    "unrelated_fields_preserved": true
+  },
+  "permission": {
+    "resolved_exact_skill_allow_count": 35,
+    "dangerous_tool_ask_count": 5,
+    "dangerous_tools": [
+      "bash",
+      "edit",
+      "task",
+      "webfetch",
+      "websearch"
+    ],
+    "conflict_result": "host-config-opencode-permission-conflict",
+    "conflict_fields": [
+      "permission.bash"
+    ],
+    "conflict_preserved_bytes": true,
+    "host_enforcement_prompt": "not_run_no_provider_credential_and_no_external_model_invocation_authority"
+  },
+  "precedence": {
+    "observed_loader_order": [
+      "user-config",
+      "project-config"
+    ],
+    "effective_order": "project-over-user",
+    "canonical_project_precedence": 100,
+    "canonical_project_jsonc_guard": 110,
+    "canonical_user_precedence": 50,
+    "canonical_user_jsonc_guard": 60,
+    "project_jsonc_result": "host-config-jsonc-precedence-blocked",
+    "user_scope_without_project_result": "xdg-json-written",
+    "user_scope_with_project_result": "host-config-higher-precedence-current"
+  },
+  "uninstall": {
+    "exact_entry_result": "host-config-removed",
+    "post_write_verified": true,
+    "other_mcp_entry_preserved": true,
+    "permission_rules_preserved": 40,
+    "conflict_result": "host-config-uninstall-conflict",
+    "conflict_fields": [
+      "command"
+    ],
+    "conflict_preserved_bytes": true
+  },
+  "clean_lifecycle": {
+    "clean_opencode_preserved_codex_and_agents": true,
+    "clean_codex_preserved_opencode_and_agents": true,
+    "final_consumer_removed_managed_agents_content": true,
+    "final_agents_file_state": "present-empty"
+  },
+  "claim_decision": {
+    "tested_versions": [],
+    "evidence_claim": "generated_runtime_preview",
+    "promotion_gate": "incomplete",
+    "reason_codes": [
+      "opencode_sequential_thinking_transport_timeout",
+      "opencode_permission_enforcement_not_observed",
+      "opencode_precedence_corrected_during_journey"
+    ]
+  },
+  "redaction_status": "passed",
+  "limitations": [
+    "No provider-backed permission prompt was executed.",
+    "Sequential-thinking transport timed out after 30000ms.",
+    "Full debug config output is truncated near 64 KiB; a recoverable minimal loader probe was used and full generated assets were restored.",
+    "The first init attempt used the source repo cwd and refreshed ignored runtime through the source-owned generator; no tracked runtime diff or hand edit occurred."
+  ]
+}

@@ -19,6 +19,7 @@ const IGNORED_DIRECTORY_NAMES = new Set([
   '.codex',
   '.cursor',
   '.kiro',
+  '.opencode',
   '.qoder',
   '.agents',
   '.spec-first',

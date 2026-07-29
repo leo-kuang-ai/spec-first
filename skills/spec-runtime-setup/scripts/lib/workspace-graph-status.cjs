@@ -358,7 +358,7 @@ function resolveStateArtifactPath(workspaceRoot, relativePath) {
 function inspectRoutingPresence(workspaceRoot, repos) {
   const files = [
     { entry_file: 'CLAUDE.md', hosts: ['claude'] },
-    { entry_file: 'AGENTS.md', hosts: ['codex', 'cursor', 'kiro', 'qoder'] },
+    { entry_file: 'AGENTS.md', hosts: ['codex', 'cursor', 'kiro', 'opencode', 'qoder'] },
   ];
   const entries = [];
   for (const target of files) {

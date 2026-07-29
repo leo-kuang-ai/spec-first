@@ -7,7 +7,7 @@ const { validateAgainstSchema } = require('../../src/contracts/schema-validator'
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const toolFactsSchema = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs', 'contracts', 'tool-facts.schema.json'), 'utf8'));
-const canonicalHosts = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
+const canonicalHosts = ['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder'];
 
 function tempRepo(label) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-${label}-`));
@@ -164,6 +164,51 @@ describe('spec-runtime-setup facts reconciliation', () => {
     });
   });
 
+  test('preserves agent-browser dependency readiness and blocked execution as separate facts', () => {
+    const { collectSetupFacts } = require('../../skills/spec-runtime-setup/scripts/lib/facts.cjs');
+    const bundle = collectSetupFacts({
+      repoRoot: '/repo',
+      host: 'codex',
+      platform: 'macos',
+      registry: {
+        tools: [],
+        helpers: [{
+          id: 'agent-browser',
+          required: true,
+          baseline_blocking: false,
+          kind: 'browser-helper',
+          profiles: ['recommended'],
+        }],
+      },
+      helperResults: [{
+        id: 'agent-browser',
+        status: 'degraded',
+        dependency_status: 'ready',
+        execution_readiness: 'blocked',
+        conformance_status: 'not_run',
+        repair_scope: 'provider',
+        reason_code: 'exact-origin-capability-unavailable',
+        next_action: '等待支持 request-time exact-origin 的 provider release。',
+        verified: true,
+        source: 'read-only-probe',
+      }],
+    });
+
+    expect(validateAgainstSchema(toolFactsSchema, bundle.toolFacts)).toEqual({ valid: true, errors: [] });
+    expect(bundle.toolFacts.items[0]).toMatchObject({
+      dependency_status: 'ready',
+      execution_readiness: 'blocked',
+      conformance_status: 'not_run',
+      repair_scope: 'provider',
+      result: 'degraded',
+      reason_code: 'exact-origin-capability-unavailable',
+      installed: true,
+      missing_dependency_reason: null,
+      next_action: '等待支持 request-time exact-origin 的 provider release。',
+    });
+    expect(bundle.runtimeCapabilities.setup_summary.baseline_ready).toBe(true);
+  });
+
   test.each([
     ['action-required', 'not-applicable', 'action-required', 'host-config-action-required'],
     ['precedence-blocked', 'not-applicable', 'action-required', 'host-config-precedence-blocked'],
@@ -219,6 +264,9 @@ describe('spec-runtime-setup facts reconciliation', () => {
         config_key: 'context7',
         config_path: '/home/user/.codex/config.toml',
         conflict_fields: ['command', 'args'],
+        permission_status: 'action-required',
+        permission_rule_count: 42,
+        permission_safe_overrides: [],
         next_action: 'spec-runtime-setup --repair-host-config',
       }],
       helperResults: [],
@@ -231,8 +279,13 @@ describe('spec-runtime-setup facts reconciliation', () => {
       result: 'action-required',
       reason_code: 'host-config-conflict',
       conflict_fields: ['command', 'args'],
+      permission_status: 'action-required',
+      permission_rule_count: 42,
       next_action: 'spec-runtime-setup --repair-host-config',
     });
+
+    const { renderHumanSummary } = require('../../skills/spec-runtime-setup/scripts/lib/renderer.cjs');
+    expect(renderHumanSummary(bundle)).toContain('permission: action-required rules=42 safe_overrides=0');
   });
 
   test.each(canonicalHosts)('writes %s readiness ledger v2 under an isolated HOME', (host) => {

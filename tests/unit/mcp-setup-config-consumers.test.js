@@ -76,9 +76,9 @@ describe('spec-runtime-setup active config consumers', () => {
 });
 
 describe('spec-runtime-setup active Node consumers', () => {
-  test('loads helper metadata from setup-registry v8 without jq', () => {
+  test('loads helper metadata from setup-registry v9 without jq', () => {
     const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
-    expect(registry.schema_version).toBe('setup-registry.v8');
+    expect(registry.schema_version).toBe('setup-registry.v9');
     expect(registry.helpers.map((entry) => entry.id)).not.toContain('jq');
 
     const helpers = new Map(registry.helpers.map((entry) => [entry.id, entry]));
@@ -146,10 +146,10 @@ describe('spec-runtime-setup active Node consumers', () => {
     const dependency = {
       ecosystem: 'pypi',
       package: 'graphifyy',
-      version: '0.9.17',
+      version: '0.9.29',
       distribution: {
-        wheel_url: 'https://files.pythonhosted.org/packages/39/37/a28af8342d78d322511b6307fac2760ca7b9b3c859fa2dcfbaf7c4b5ddf9/graphifyy-0.9.17-py3-none-any.whl',
-        sha256: 'ef60768aaee7e315d2e2d7da89e971bc1f445f5c8d73ebe4fed550e40a1d687e',
+        wheel_url: 'https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl',
+        sha256: '143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b',
         index_url: 'https://pypi.org/simple',
       },
     };

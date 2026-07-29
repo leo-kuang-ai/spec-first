@@ -11,7 +11,16 @@ describe('spec-runtime-setup preflight v2 projection', () => {
     const { buildPreflightProjection } = require('../../skills/spec-runtime-setup/scripts/lib/preflight.cjs');
     const registry = loadRegistry({ skillRoot });
     const helperResults = [
-      { id: 'agent-browser', status: 'skipped', reason_code: 'agent-browser-manual-setup-incomplete' },
+      {
+        id: 'agent-browser',
+        status: 'degraded',
+        dependency_status: 'ready',
+        execution_readiness: 'blocked',
+        conformance_status: 'not_run',
+        repair_scope: 'provider',
+        reason_code: 'exact-origin-capability-unavailable',
+        next_action: '等待支持 request-time exact-origin 的 provider release。',
+      },
       { id: 'ast-grep', status: 'degraded', reason_code: 'helper-fallback-active' },
       { id: 'ast-grep-skill', status: 'missing', reason_code: 'global-skill-missing' },
       { id: 'ffmpeg', status: 'ready', reason_code: 'ready' },
@@ -79,8 +88,12 @@ describe('spec-runtime-setup preflight v2 projection', () => {
     expect(preflight.tools.find((entry) => entry.id === 'agent-browser')).toMatchObject({
       required: true,
       dependency_status: 'ready',
-      result: 'skipped',
-      reason_code: 'optional-skipped',
+      result: 'degraded',
+      reason_code: 'exact-origin-capability-unavailable',
+      execution_readiness: 'blocked',
+      conformance_status: 'not_run',
+      repair_scope: 'provider',
+      next_action: '等待支持 request-time exact-origin 的 provider release。',
       install_command: expect.stringContaining('agent-browser'),
     });
     expect(preflight.tools.find((entry) => entry.id === 'ast-grep')).toMatchObject({

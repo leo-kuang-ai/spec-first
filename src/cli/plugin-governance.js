@@ -8,10 +8,6 @@ const {
   loadSkillsGovernance,
 } = require('./plugin-manifest');
 
-const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
-const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
-const AGENTLESS_PLATFORM_IDS = new Set(['cursor']);
-
 function buildFilteredAssetSet(platformOrAdapter) {
   const platform = resolvePlatformId(platformOrAdapter);
   const governance = loadSkillsGovernance();
@@ -111,7 +107,7 @@ function resolvePlatformId(platformOrAdapter) {
       ? platformOrAdapter.id
       : '';
 
-  if (!SUPPORTED_PLATFORMS.has(platform)) {
+  if (!getSupportedPlatformIds().includes(platform)) {
     throw new Error(`Unknown platform for filtered asset set: ${platform}`);
   }
 
@@ -122,7 +118,13 @@ function platformSupportsAgents(platformOrAdapter) {
   if (platformOrAdapter && typeof platformOrAdapter === 'object') {
     return platformOrAdapter.supportsAgents !== false;
   }
-  return !AGENTLESS_PLATFORM_IDS.has(resolvePlatformId(platformOrAdapter));
+  const { getAdapter } = require('./adapters');
+  return getAdapter(resolvePlatformId(platformOrAdapter)).supportsAgents !== false;
+}
+
+function getSupportedPlatformIds() {
+  const { getSupportedPlatforms } = require('./adapters');
+  return getSupportedPlatforms();
 }
 
 module.exports = {

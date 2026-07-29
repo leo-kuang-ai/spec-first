@@ -191,6 +191,10 @@ describe('platform registry path-rule compiler', () => {
 
     expect(cursorPatterns.some((pattern) => pattern.test('.qoder/skills/spec-work/SKILL.md'))).toBe(true);
     expect(cursorPatterns.some((pattern) => pattern.test('.cursor/skills/spec-work/SKILL.md'))).toBe(false);
+
+    const opencodePatterns = deriveUnrewrittenPatterns('opencode');
+    expect(opencodePatterns.some((pattern) => pattern.test('.agents/skills/spec-work/SKILL.md'))).toBe(true);
+    expect(opencodePatterns.some((pattern) => pattern.test('.opencode/skills/spec-work/SKILL.md'))).toBe(false);
   });
 
   test('uses rewriteScope and accepts a pointer-only fixture host declaration', () => {
@@ -232,6 +236,27 @@ describe('platform registry path-rule compiler', () => {
 });
 
 describe('platform registry runtime path consumer', () => {
+  test('declares OpenCode generated runtime separately from host-local config', () => {
+    expect(PLATFORM_REGISTRY.opencode).toMatchObject({
+      runtimeRoot: '.opencode',
+      surfaces: {
+        managedRoot: { ownership: 'generated-runtime' },
+        skillsRoot: { ownership: 'generated-runtime' },
+        commandFiles: { ownership: 'generated-runtime' },
+        projectConfig: { ownership: 'host-local', rewriteExclude: true },
+        projectConfigJsonc: { ownership: 'host-local', rewriteExclude: true },
+      },
+    });
+    expect(contentHasOtherRuntimePathReferences(
+      'opencode',
+      'see `.agents/skills/spec-work/SKILL.md`',
+    )).toBe(true);
+    expect(contentHasOtherRuntimePathReferences(
+      'opencode',
+      'see `.opencode/skills/spec-work/SKILL.md`',
+    )).toBe(false);
+  });
+
   test('records confirmed Qoder command protocol separately from unverified hook activation', () => {
     expect(PLATFORM_REGISTRY.qoder.capabilities.hooks).toEqual({
       shellCommand: { status: 'confirmed' },

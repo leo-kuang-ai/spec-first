@@ -75,7 +75,9 @@ function pageContextStep(action) {
 }
 
 function helpText(options = {}) {
-  const exactOrigin = options.exactOrigin ? '\n  --exact-origin <origin>' : '';
+  const exactOrigin = options.exactOrigin
+    ? `\n  ${options.exactOriginMarker || '--exact-origin <origin>'}`
+    : '';
   return [
     'open <url>',
     'snapshot',
@@ -100,17 +102,25 @@ function helpText(options = {}) {
   ].join('\n');
 }
 
-function probeRunner(help = helpText()) {
-  return (_command, args) => ({
-    status: 0,
-    stdout: args.includes('--version') ? 'agent-browser 0.31.1\n' : help,
-    stderr: '',
-    error: null,
+function probeRunner(options = {}) {
+  const help = options.help || helpText({
+    exactOrigin: options.exactOrigin === true,
+    exactOriginMarker: options.exactOriginMarker,
   });
+  return (_command, args) => {
+    if (Array.isArray(options.calls)) options.calls.push([...args]);
+    if (args.includes('--version')) {
+      return { status: 0, stdout: 'agent-browser 0.31.1\n', stderr: '', error: null };
+    }
+    return { status: 0, stdout: help, stderr: '', error: null };
+  };
 }
 
 function actionCalls(calls) {
-  return calls.filter((call) => !call.args.includes('--version') && !call.args.includes('--help'));
+  return calls.filter((call) => (
+    !call.args.includes('--version')
+    && !call.args.includes('--help')
+  ));
 }
 
 function browserRunner(calls, options = {}) {
@@ -128,6 +138,25 @@ function browserRunner(calls, options = {}) {
   };
 }
 
+function confirmedConformanceProbe() {
+  return {
+    status: 'available',
+    execution_readiness: 'ready',
+    reason_code: null,
+    conformance_status: 'passed',
+    repair_scope: 'none',
+    next_action: '',
+    capabilities: {
+      required_flags: true,
+      exact_origin_advertised: true,
+      exact_origin_confirmed: true,
+      exact_origin_evidence: 'spec-first-conformance',
+      profile_state_with_allowlist: false,
+    },
+    missing: [],
+  };
+}
+
 function prepare(plan = testPlan()) {
   const root = tempRoot();
   const runDir = path.join(root, 'run');
@@ -136,24 +165,98 @@ function prepare(plan = testPlan()) {
   return result;
 }
 
-test('probe reports the deterministic floor and does not upgrade domain allowlisting to exact-origin', () => {
+test('probe reports blocked readiness when exact-origin is absent and does not upgrade domain allowlisting', () => {
   const result = wrapper.probeAgentBrowser({ runner: probeRunner() });
 
   expect(result.status).toBe('available');
+  expect(result.execution_readiness).toBe('blocked');
   expect(result.version).toBe('0.31.1');
   expect(result.capabilities.required_flags).toBe(true);
+  expect(result.capabilities.exact_origin_advertised).toBe(false);
   expect(result.capabilities.exact_origin_confirmed).toBe(false);
+  expect(result.capabilities.exact_origin_evidence).toBe('none');
   expect(result.reason_code).toBe('exact-origin-capability-unavailable');
+  expect(result.conformance_status).toBe('not_run');
+  expect(result.repair_scope).toBe('provider');
+  expect(result.next_action).toContain('request-time exact-origin');
 
-  const missing = wrapper.probeAgentBrowser({ runner: probeRunner('open <url>\n--session <name>') });
+  const missing = wrapper.probeAgentBrowser({ runner: probeRunner({ help: 'open <url>\n--session <name>' }) });
   expect(missing.status).toBe('not_supported');
   expect(missing.reason_code).toBe('required-agent-browser-capability-missing');
   expect(missing.missing).toContain('--allowed-domains');
 });
 
+test('probe does not treat a help marker as proof of request-time enforcement', () => {
+  const calls = [];
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true, calls }),
+  });
+
+  expect(result).toMatchObject({
+    status: 'available',
+    execution_readiness: 'blocked',
+    reason_code: 'exact-origin-conformance-required',
+    conformance_status: 'not_run',
+    repair_scope: 'spec-first',
+  });
+  expect(result.capabilities).toMatchObject({
+    exact_origin_advertised: true,
+    exact_origin_confirmed: false,
+    exact_origin_evidence: 'help-marker',
+  });
+  expect(calls).toEqual([['--version'], ['--help']]);
+});
+
+test.each([
+  '--exact-origin <URL>',
+  '--exact-origin=<origin>',
+  '--exact-origin',
+])('probe recognizes the exact-origin flag token independent of help metavar shape: %s', (marker) => {
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true, exactOriginMarker: marker }),
+  });
+
+  expect(result).toMatchObject({
+    execution_readiness: 'blocked',
+    reason_code: 'exact-origin-conformance-required',
+    conformance_status: 'not_run',
+    repair_scope: 'spec-first',
+  });
+  expect(result.capabilities.exact_origin_advertised).toBe(true);
+  expect(result.capabilities.exact_origin_confirmed).toBe(false);
+});
+
+test('probe ignores provider or caller capability claims and never invokes a capabilities command', () => {
+  const calls = [];
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true, calls }),
+    providerCapabilities: {
+      schema_version: 'agent-browser-capabilities/v1',
+      capabilities: { exact_origin: { status: 'enforced' } },
+    },
+    exactOriginConfirmed: true,
+  });
+
+  expect(result).toMatchObject({
+    status: 'available',
+    execution_readiness: 'blocked',
+    reason_code: 'exact-origin-conformance-required',
+    conformance_status: 'not_run',
+  });
+  expect(result.capabilities).toMatchObject({
+    exact_origin_advertised: true,
+    exact_origin_confirmed: false,
+    exact_origin_evidence: 'help-marker',
+  });
+  expect(calls).toEqual([['--version'], ['--help']]);
+});
+
 test('workflow keeps a caller-owned server boundary around the unique browser wrapper', () => {
   expect(skillSource).toContain('scripts/agent-browser-run-context.cjs');
   expect(skillSource).toContain('node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe');
+  expect(skillSource).toContain('execution_readiness: ready');
+  expect(skillSource).not.toContain('`capabilities --json`');
+  expect(skillSource).toContain('Spec-First controlled conformance');
   expect(skillSource).toContain('当前已加载的 `spec-test-browser/SKILL.md` 所在目录解析 `SKILL_DIR`');
   expect(skillSource).not.toContain('node skills/spec-test-browser/scripts/agent-browser-run-context.cjs');
   expect(skillSource).toContain('所有 browser subprocess 只能由唯一 wrapper');
@@ -457,6 +560,23 @@ test.each(['open', 'click', 'fill', 'type', 'press', 'select'])(
   },
 );
 
+test('launches zero browser actions when exact-origin is advertised but its enforcement contract is unavailable', () => {
+  const prepared = prepare(testPlan([{ action: 'open', route: '/settings' }]));
+  const calls = [];
+
+  const result = wrapper.runPreparedContext({
+    manifestPath: prepared.manifest_path,
+    runner: browserRunner(calls, { exactOrigin: true }),
+  });
+
+  expect(result).toMatchObject({
+    status: 'not_supported',
+    reason_code: 'exact-origin-conformance-required',
+    action_process_calls: 0,
+  });
+  expect(actionCalls(calls)).toEqual([]);
+});
+
 test('does not trust a caller-supplied exact-origin capability claim', () => {
   const prepared = prepare(testPlan([{ action: 'open', route: '/settings' }]));
   const calls = [];
@@ -479,6 +599,20 @@ test('does not trust a caller-supplied exact-origin capability claim', () => {
   expect(actionCalls(calls)).toEqual([]);
 });
 
+test('does not expose the in-process confirmed probe seam through CLI arguments', () => {
+  const output = [];
+  const writeSpy = jest.spyOn(process.stdout, 'write').mockImplementation((value) => {
+    output.push(String(value));
+    return true;
+  });
+  try {
+    expect(wrapper.main(['run', '--probe', 'ready'])).toBe(1);
+  } finally {
+    writeSpy.mockRestore();
+  }
+  expect(output.join('')).toContain('argument-not-supported');
+});
+
 test('detects test-plan replacement before the first action and launches no subprocess', () => {
   const prepared = prepare();
   fs.appendFileSync(prepared.test_plan_path, '\n');
@@ -486,7 +620,8 @@ test('detects test-plan replacement before the first action and launches no subp
 
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
-    runner: browserRunner(calls, { exactOrigin: true }),
+    runner: browserRunner(calls),
+    probe: confirmedConformanceProbe,
   });
 
   expect(result.status).toBe('not_run');
@@ -506,10 +641,10 @@ test('rechecks the test-plan hash before every action and stops later subprocess
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
     runner: browserRunner(calls, {
-      exactOrigin: true,
       stdout: 'UNTRUSTED PAGE OUTPUT',
       onAction: () => fs.appendFileSync(prepared.test_plan_path, '\n'),
     }),
+    probe: confirmedConformanceProbe,
   });
 
   expect(result.status).toBe('not_run');
@@ -526,7 +661,8 @@ test('reserves each private raw-output file before launching the corresponding a
 
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
-    runner: browserRunner(calls, { exactOrigin: true }),
+    runner: browserRunner(calls),
+    probe: confirmedConformanceProbe,
   });
 
   expect(result.status).toBe('not_run');
@@ -546,9 +682,9 @@ test('builds allowlisted argv, synthetic values, sanitized env, and private raw-
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
     runner: browserRunner(calls, {
-      exactOrigin: true,
       stdout: 'RAW SECRET-LIKE PAGE DATA',
     }),
+    probe: confirmedConformanceProbe,
     env: {
       ...process.env,
       AGENT_BROWSER_PROFILE: 'Default',
@@ -597,10 +733,11 @@ test('stops after a failed first open and keeps later page actions private', () 
     { action: 'console' },
   ]));
   const calls = [];
-  const runner = browserRunner(calls, { exactOrigin: true });
+  const runner = browserRunner(calls);
 
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
+    probe: confirmedConformanceProbe,
     runner: (command, args, options) => {
       const probed = runner(command, args, options);
       if (!args.includes('--version') && !args.includes('--help')) {
@@ -626,13 +763,16 @@ test('stops after a failed first open and keeps later page actions private', () 
 test('discards a reserved raw file when the action runner throws', () => {
   const prepared = prepare(testPlan([{ action: 'open', route: '/settings' }]));
   const calls = [];
-  const runner = browserRunner(calls, { exactOrigin: true });
+  const runner = browserRunner(calls);
 
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
+    probe: confirmedConformanceProbe,
     runner: (command, args, options) => {
       const probed = runner(command, args, options);
-      if (!args.includes('--version') && !args.includes('--help')) throw new Error('spawn failed');
+      if (!args.includes('--version') && !args.includes('--help')) {
+        throw new Error('spawn failed');
+      }
       return probed;
     },
   });
@@ -749,8 +889,9 @@ test('source-only capability cases cover browser policy and caller-owned server 
   )).cases;
 
   expect(cases.filter((entry) => entry.kind === 'positive')).toHaveLength(2);
-  expect(cases.filter((entry) => entry.kind === 'negative-owner')).toHaveLength(4);
+  expect(cases.filter((entry) => entry.kind === 'negative-owner')).toHaveLength(5);
   expect(cases.map((entry) => entry.id)).toEqual(expect.arrayContaining([
+    'provider-self-report-does-not-confirm-exact-origin',
     'caller-owned-origin-never-starts-a-project-command',
     'destructive-browser-effect-requires-current-authorization',
   ]));

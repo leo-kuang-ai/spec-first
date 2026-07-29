@@ -92,6 +92,12 @@ Graphify 上游推荐用 `graphify hook install` 安装提交自动刷新，但�
 .qoder/hooks/prd-readiness-guard
 .qoder/rules/spec-first.md
 .qoder/settings.local.json
+.opencode/commands/spec/
+.opencode/skills/spec-*/
+.opencode/skills/using-spec-first/
+.opencode/skills/graphify/
+.opencode/agents/spec-*
+.opencode/spec-first/
 .context/spec-first/
 
 # spec-first local setup and workflow runtime artifacts

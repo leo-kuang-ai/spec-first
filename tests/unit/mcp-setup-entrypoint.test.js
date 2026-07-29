@@ -180,10 +180,10 @@ function fakeRunner(command, args, options = {}) {
     timeout: false,
     stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
       ? (String(args[1]).includes('importlib.metadata')
-        ? JSON.stringify({ version: '0.9.17', packages: [['graphifyy', '0.9.17']] })
+        ? JSON.stringify({ version: '0.9.29', packages: [['graphifyy', '0.9.29']] })
         : '3.12.1')
       : (graphifyCommand && args[0] === '--version'
-        ? 'graphify 0.9.17'
+        ? 'graphify 0.9.29'
         : (command === 'uv' && args.join(' ') === 'tool dir --bin'
           ? path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'bin')
           : (args[0] === 'status' ? 'ready' : 'ok'))),
@@ -198,6 +198,7 @@ function visibleHostRunner(visibleHost) {
     codex: ['codex'],
     cursor: ['agent'],
     kiro: ['kiro'],
+    opencode: ['opencode'],
     qoder: ['qodercli', 'qoder'],
   };
   const hostCommands = new Set(Object.values(commands).flat());
@@ -451,7 +452,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const homeBefore = snapshot(homeDir);
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.4.1' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
       }
       if (command === 'codegraph' && args[0] === 'status') {
         return { ...fakeRunner(command, args, options), stdout: 'index ready' };
@@ -1087,6 +1088,133 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       });
   });
 
+  test('writes OpenCode MCP entries through the native project config shape', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('opencode-project-config');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    installGlobalSkill(homeDir, 'ast-grep');
+    writeRuntimeState(target, 'opencode', '1.13.2');
+
+    const result = runSetup({
+      argv: ['--repair-host-config'],
+      cwd: target,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'opencode' },
+      homeDir,
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result.exit_code).toBe(0);
+    const configPath = path.join(target, 'opencode.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    expect(Object.keys(config.mcp).sort()).toEqual(['context7', 'sequential-thinking']);
+    expect(config.mcp.context7).toEqual({
+      type: 'local',
+      command: ['npx', '-y', '@upstash/context7-mcp@latest'],
+    });
+    expect(config.permission.skill['using-spec-first']).toBe('allow');
+    expect(config.permission.skill['spec-work']).toBe('allow');
+    expect(config.permission).toMatchObject({
+      bash: 'ask',
+      edit: 'ask',
+      task: 'ask',
+      webfetch: 'ask',
+      websearch: 'ask',
+    });
+    expect(Object.keys(config.permission.skill).some((name) => /[?*]/.test(name))).toBe(false);
+    expect(config).not.toHaveProperty('mcpServers');
+    expect(result.payload.tool_facts.items.find((entry) => entry.id === 'context7')).toMatchObject({
+      configured_status: 'ready',
+      permission_status: 'ready',
+      permission_rule_count: expect.any(Number),
+    });
+    expect(result.payload.host_config_receipt).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        scope: 'project',
+        config_path: configPath,
+        outcome: 'ready',
+      }),
+    ]));
+    expect(fs.existsSync(path.join(homeDir, '.opencode', 'spec-first', 'host-setup.json'))).toBe(true);
+  });
+
+  test('blocks the whole OpenCode config transaction when permission rules conflict', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('opencode-permission-conflict');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    installGlobalSkill(homeDir, 'ast-grep');
+    writeRuntimeState(target, 'opencode', '1.13.2');
+    const configPath = path.join(target, 'opencode.json');
+    const original = `${JSON.stringify({
+      permission: { bash: 'allow' },
+      user_field: { preserved: true },
+    }, null, 2)}\n`;
+    fs.writeFileSync(configPath, original);
+
+    const result = runSetup({
+      argv: ['--repair-host-config'],
+      cwd: target,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'opencode' },
+      homeDir,
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 1,
+      reason_code: 'host-config-opencode-permission-conflict',
+    });
+    expect(result.payload.tool_facts.items.find((entry) => entry.id === 'context7')).toMatchObject({
+      configured_status: 'action-required',
+      reason_code: 'host-config-opencode-permission-conflict',
+      permission_status: 'action-required',
+      conflict_fields: expect.arrayContaining(['permission.bash']),
+    });
+    expect(fs.readFileSync(configPath, 'utf8')).toBe(original);
+    expect(JSON.parse(original)).not.toHaveProperty('mcp');
+    expect(fs.readdirSync(target).filter((name) => name.includes('.spec-first.'))).toEqual([]);
+  });
+
+  test('blocks OpenCode setup before provider mutation when project JSONC has precedence', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('opencode-jsonc-precedence');
+    const calls = [];
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    installGlobalSkill(homeDir, 'ast-grep');
+    writeRuntimeState(target, 'opencode', '1.13.2');
+    const jsoncPath = path.join(target, 'opencode.jsonc');
+    fs.writeFileSync(jsoncPath, '{\n  // user-owned\n  "mcp": {}\n}\n');
+
+    const result = runSetup({
+      argv: ['--repair-host-config'],
+      cwd: target,
+      skillRoot,
+      runner(command, args, options) {
+        calls.push([command, ...args]);
+        return fakeRunner(command, args, options);
+      },
+      env: { MCP_SETUP_HOST: 'opencode' },
+      homeDir,
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 1,
+      reason_code: 'host-config-jsonc-precedence-blocked',
+    });
+    expect(result.payload.tool_facts.items.find((entry) => entry.id === 'context7')).toMatchObject({
+      configured_status: 'precedence-blocked',
+      result: 'action-required',
+      reason_code: 'host-config-jsonc-precedence-blocked',
+    });
+    expect(fs.existsSync(path.join(target, 'opencode.json'))).toBe(false);
+    expect(fs.readFileSync(jsoncPath, 'utf8')).toContain('// user-owned');
+    expect(calls.some(([command, action]) => command === 'graphify'
+      && ['install', 'extract', 'update'].includes(action))).toBe(false);
+  });
+
   test('full required setup stays ready when the effective Graphify hooks root is external', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('graphify-external-hooks-full');
@@ -1100,7 +1228,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options = {}) => {
       calls.push({ command, args: [...args], env: { ...(options.env || {}) } });
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.4.1' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
@@ -1167,7 +1295,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const target = tempRepo('codegraph-configured');
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.4.1' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });

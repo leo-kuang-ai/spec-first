@@ -38,7 +38,7 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
     const sharedAgents = renderRoutingInstruction({
       workspaceRoot: '/w',
       repos,
-      hosts: ['codex', 'cursor', 'kiro', 'qoder'],
+      hosts: ['codex', 'cursor', 'kiro', 'opencode', 'qoder'],
     });
     expect(sharedAgents).toContain('honest-degraded');
     expect(sharedAgents).toContain('kiro/qoder');
@@ -46,7 +46,7 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
 
   test('treats a partial-host projection as current when its shared routing contract matches', () => {
     const partial = renderRoutingInstruction({ workspaceRoot: '/w', repos, hosts: ['codex'] });
-    const full = renderRoutingInstruction({ workspaceRoot: '/w', repos, hosts: ['codex', 'cursor', 'kiro', 'qoder'] });
+    const full = renderRoutingInstruction({ workspaceRoot: '/w', repos, hosts: ['codex', 'cursor', 'kiro', 'opencode', 'qoder'] });
 
     expect(isRoutingInstructionCurrent(partial, { workspaceRoot: '/w', repos })).toBe(true);
     expect(isRoutingInstructionCurrent(full, { workspaceRoot: '/w', repos })).toBe(true);

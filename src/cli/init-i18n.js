@@ -105,6 +105,7 @@ const MESSAGES = {
     applyUserLanguageSyncHeader: (status, reasonCode) => `用户级语言同步: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
     diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime 已生成，但本机尚未验证 skill discovery/invocation；生成的 skills 可能不会被 Cursor 加载。',
     diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: Qoder 的 qodercli 1.0.41 evidence baseline 已确认 hook settings 与 command protocol，但 authenticated event execution 和 shared IDE loader safety 尚未验证；settings entries 保持未启用，SessionStart 与 PRD guard 当前不生效。',
+    diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime 已生成，但当前安装版本的 command/skill loader 尚未验证；支持声明保持 generated_runtime_preview。',
   },
   en: {
     selectHosts: 'Select host runtimes to initialize:',
@@ -212,6 +213,7 @@ const MESSAGES = {
     applyUserLanguageSyncHeader: (status, reasonCode) => `User-level language sync: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
     diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime was generated, but local skill discovery/invocation is not verified; generated skills may not load.',
     diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified; settings entries remain disabled, so SessionStart and PRD guard hooks are inactive.',
+    diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime was generated, but command/skill loading is not verified for the installed version; the evidence claim remains generated_runtime_preview.',
   },
 };
 

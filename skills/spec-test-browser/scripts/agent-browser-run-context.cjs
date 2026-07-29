@@ -158,6 +158,30 @@ function isAgentBrowserCommand(command) {
     .includes(path.basename(command).toLowerCase());
 }
 
+function buildCapabilities(options = {}) {
+  return {
+    required_flags: options.requiredFlags === true,
+    exact_origin_advertised: options.exactOriginAdvertised === true,
+    exact_origin_confirmed: false,
+    exact_origin_evidence: options.exactOriginEvidence || 'none',
+    profile_state_with_allowlist: false,
+  };
+}
+
+function buildBlockedProbe(options = {}) {
+  return {
+    status: options.status || 'not_supported',
+    execution_readiness: 'blocked',
+    reason_code: options.reasonCode || 'agent-browser-unavailable',
+    conformance_status: 'not_run',
+    repair_scope: options.repairScope || 'dependency',
+    next_action: options.nextAction || '',
+    version: options.version || null,
+    capabilities: options.capabilities || buildCapabilities(),
+    missing: options.missing || [],
+  };
+}
+
 function probeAgentBrowser(options = {}) {
   const runner = options.runner || defaultRunner;
   const command = options.command || AGENT_BROWSER_COMMAND;
@@ -167,16 +191,12 @@ function probeAgentBrowser(options = {}) {
     timeout: 10000,
   });
   if (!processSucceeded(versionResult)) {
-    return {
-      status: 'not_supported',
-      reason_code: 'agent-browser-unavailable',
-      version: null,
-      capabilities: {
-        required_flags: false,
-        exact_origin_confirmed: false,
-      },
+    return buildBlockedProbe({
+      reasonCode: 'agent-browser-unavailable',
+      repairScope: 'dependency',
+      nextAction: '安装或修复 agent-browser CLI 后重新运行 probe。',
       missing: ['agent-browser'],
-    };
+    });
   }
 
   const helpResult = runner(command, ['--help'], {
@@ -185,47 +205,56 @@ function probeAgentBrowser(options = {}) {
     timeout: 10000,
   });
   if (!processSucceeded(helpResult)) {
-    return {
-      status: 'not_supported',
-      reason_code: 'agent-browser-help-unavailable',
+    return buildBlockedProbe({
+      reasonCode: 'agent-browser-help-unavailable',
+      repairScope: 'provider',
+      nextAction: '检查当前 agent-browser release 为何无法返回 CLI help；未恢复前保持 browser execution blocked。',
       version: parseVersion(versionResult.stdout),
-      capabilities: {
-        required_flags: false,
-        exact_origin_confirmed: false,
-      },
       missing: ['--help'],
-    };
+    });
   }
 
   const help = String(helpResult.stdout || '');
+  const version = parseVersion(versionResult.stdout);
   const missing = REQUIRED_HELP_MARKERS
     .filter((marker) => !help.includes(marker))
     .map((marker) => marker.startsWith('--') ? marker.split(/\s+/, 1)[0] : marker);
-  const exactOriginConfirmed = help.includes('--exact-origin <origin>');
+  const exactOriginAdvertised = /(?:^|[^A-Za-z0-9_-])--exact-origin(?=$|[^A-Za-z0-9_-])/m.test(help);
   if (missing.length > 0) {
-    return {
-      status: 'not_supported',
-      reason_code: 'required-agent-browser-capability-missing',
-      version: parseVersion(versionResult.stdout),
-      capabilities: {
-        required_flags: false,
-        exact_origin_confirmed: false,
-      },
+    return buildBlockedProbe({
+      reasonCode: 'required-agent-browser-capability-missing',
+      repairScope: 'provider',
+      nextAction: '采用包含所有 required CLI markers 的 agent-browser release；不要绕过 wrapper gate。',
+      version,
       missing,
-    };
+    });
   }
 
-  return {
+  if (!exactOriginAdvertised) {
+    return buildBlockedProbe({
+      status: 'available',
+      reasonCode: 'exact-origin-capability-unavailable',
+      repairScope: 'provider',
+      nextAction: '等待或采用支持 request-time exact-origin 的 agent-browser release 或经批准受控 fork；不要用 --allowed-domains 替代。',
+      version,
+      capabilities: buildCapabilities({ requiredFlags: true }),
+      missing: ['request-time exact-origin'],
+    });
+  }
+
+  return buildBlockedProbe({
     status: 'available',
-    reason_code: exactOriginConfirmed ? null : 'exact-origin-capability-unavailable',
-    version: parseVersion(versionResult.stdout),
-    capabilities: {
-      required_flags: true,
-      exact_origin_confirmed: exactOriginConfirmed,
-      profile_state_with_allowlist: false,
-    },
-    missing: exactOriginConfirmed ? [] : ['request-time exact-origin'],
-  };
+    reasonCode: 'exact-origin-conformance-required',
+    repairScope: 'spec-first',
+    nextAction: '实现并通过 Spec-First controlled exact-origin conformance 后才能放行；当前保持 browser execution blocked。',
+    version,
+    capabilities: buildCapabilities({
+      requiredFlags: true,
+      exactOriginAdvertised: true,
+      exactOriginEvidence: 'help-marker',
+    }),
+    missing: ['spec-first controlled exact-origin conformance'],
+  });
 }
 
 function parseVersion(output) {
@@ -553,8 +582,9 @@ function runPreparedContext(options = {}) {
   const command = options.command || AGENT_BROWSER_COMMAND;
   const cwd = options.cwd || process.cwd();
   const env = options.env || process.env;
-  const probe = probeAgentBrowser({ runner, command, cwd, env });
-  if (probe.status !== 'available' || probe.capabilities.exact_origin_confirmed !== true) {
+  const probeRunner = typeof options.probe === 'function' ? options.probe : probeAgentBrowser;
+  const probe = probeRunner({ runner, command, cwd, env });
+  if (probe.execution_readiness !== 'ready' || probe.capabilities.exact_origin_confirmed !== true) {
     return {
       status: 'not_supported',
       reason_code: probe.reason_code || 'exact-origin-capability-unavailable',

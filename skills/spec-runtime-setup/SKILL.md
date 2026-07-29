@@ -1,6 +1,6 @@
 ---
 name: spec-runtime-setup
-description: Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows on Claude Code, Codex, Kiro, Qoder, or Cursor.
+description: Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows on Claude Code, Codex, Cursor, Kiro, Qoder, or OpenCode.
 argument-hint: "[bare auto setup] [--check|--verify-only|--plan|--project-config] [--only codegraph,graphify] [--workspace-graph|--workspace-graph-status|--workspace-graph-clean] [--repos <a,b>] [--json] [--repair-host-config] [--refresh] [--repo <path>] [--requirement-workspace <repo-relative-path>]"
 ---
 
@@ -29,13 +29,13 @@ Overrides: none
 
 ## Source Of Truth
 
-Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v8`。Generated host 从已加载 skill 目录消费共置的 registry projection；该 projection 是 generated runtime，不是第二个 source。当前完整 Runtime Setup 必备项包括 `sequential-thinking`、`context7`、ffmpeg、CodeGraph 与 Graphify；CodeGraph/Graphify first generation 和真实 query probe 属于标准 setup completion，而不是长期可跳过的 optional tail。`--only codegraph` / `--only graphify` 仅用于高级子集修复，不改变完整 setup 的必备定义。
+Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v9`。Generated host 从已加载 skill 目录消费共置的 registry projection；该 projection 是 generated runtime，不是第二个 source。当前完整 Runtime Setup 必备项包括 `sequential-thinking`、`context7`、ffmpeg、CodeGraph 与 Graphify；CodeGraph/Graphify first generation 和真实 query probe 属于标准 setup completion，而不是长期可跳过的 optional tail。`--only codegraph` / `--only graphify` 仅用于高级子集修复，不改变完整 setup 的必备定义。
 
 Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source. If setup prose or scripts change, update source first and use `spec-first init` only for runtime regeneration.
 
 ## Required Harness Runtime
 
-`setup-registry.json` 负责必需 MCP definition、helper readiness 与 install safety、required Provider metadata、external dependency pin、host target、artifact contract 和 platform override。Loader 针对当前 host/platform 确定性展开 registry default，不判断 Provider readiness 或语义充分性。当前 helper 检查包括 ffmpeg、`agent-browser` 与 ast-grep capability detection；ffmpeg 是 setup completion 的 baseline-blocking helper，`agent-browser` 仍保持 report-only/non-blocking。
+`setup-registry.json` 负责必需 MCP definition、helper readiness 与 install safety、required Provider metadata、external dependency pin、host target、artifact contract 和 platform override。Loader 针对当前 host/platform 确定性展开 registry default，不判断 Provider readiness 或语义充分性。当前 helper 检查包括 ffmpeg、`agent-browser` 与 ast-grep capability detection；ffmpeg 是 setup completion 的 baseline-blocking helper，`agent-browser` 仍保持 report-only/non-blocking。对 `agent-browser`，`dependency_status: ready` 只表示 CLI/runtime/global skill 安装完整，不等于 `execution_readiness: ready`；exact-origin capability 缺口必须保留其 canonical reason、`conformance_status`、`repair_scope` 与 `next_action`。
 
 所有可执行 setup 行为均由共置的 Node 入口及 `scripts/` 下的 module 负责。不得在 workflow prose 中重新实现 registry query、host config 写入、Provider 命令或 facts reconciliation。
 
@@ -47,7 +47,7 @@ Generated host runtime mirrors and host-local MCP config files are projections o
 node "$SKILL_DIR/scripts/setup.cjs" <mode-and-target-arguments>
 ```
 
-绝不能从项目 cwd 或 source checkout 路径解析该命令。Generated command surface 使用其 companion support root 作为 `SKILL_DIR`。进入支持 mutation 的 mode 前，通过执行工具的 per-call environment overlay 传入 `MCP_SETUP_HOST=claude|codex|cursor|kiro|qoder`；只读诊断可以报告 advisory host candidate，但不能把它们转换为 write authority。
+绝不能从项目 cwd 或 source checkout 路径解析该命令。Generated command surface 使用其 companion support root 作为 `SKILL_DIR`。进入支持 mutation 的 mode 前，通过执行工具的 per-call environment overlay 传入 `MCP_SETUP_HOST=claude|codex|cursor|kiro|opencode|qoder`；只读诊断可以报告 advisory host candidate，但不能把它们转换为 write authority。
 
 `scripts/check-health` 是带 Node shebang 的 compatibility shim，委托给 `setup.cjs --check`。Windows 直接调用 `node <loaded-skill-root>/scripts/setup.cjs --check`，不存在 platform-specific companion entry。
 
@@ -130,7 +130,7 @@ If setup later reports project convention facts, they must be deterministic exis
 
 ## Host Authority And Write Safety
 
-当前唯一公开入口是 `spec-runtime-setup`（Claude/Qoder 命令拼写 `runtime-setup`）；不提供 `spec-mcp-setup` / `mcp-setup` 兼容别名。调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|qoder` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
+当前唯一公开入口是 `spec-runtime-setup`（Claude/Qoder 命令拼写 `runtime-setup`）；不提供 `spec-mcp-setup` / `mcp-setup` 兼容别名。调用它的 host runtime surface 是权威 host evidence。Generated host-specific runtime surface 必须在调用支持 mutation 的 Node mode 前，通过 per-call environment 固定 `MCP_SETUP_HOST=<host>`。缺少显式 canonical `MCP_SETUP_HOST=claude|codex|cursor|kiro|opencode|qoder` 时，`setup.cjs` 必须 fail closed；不得根据 `PATH`、generated runtime 目录、旧 `.spec-first/config/*` facts 或其他平台的 host config 文件推断 mutation target。只读诊断可以展示 advisory host candidate，但这些 candidate 不具备 write authority。
 
 在写入任何 host config 或刷新 setup-owned facts 前，workflow 必须让 `setup.cjs` 从显式 entrypoint host pin 解析 host authority 与 effective registry target。旧 setup facts 只能作为 drift comparison evidence：若其与当前 entrypoint host 不一致，应报告 host-marker drift，并为当前 host 刷新 setup-owned facts，不得把旧 host 当作当前 host。绝不能仅依据 prose 手动选择 `.kiro/settings/mcp.json`、`.qoder/settings.local.json`、`.cursor/mcp.json`、Codex TOML 或 Claude managed/user config。
 
@@ -147,9 +147,11 @@ If setup later reports project convention facts, they must be deterministic exis
 - `--repair-host-config`：显式授权 setup 仅替换 registry 管理且已确认冲突的 MCP 条目；保留同一 host config 中的其他用户字段和 server，并执行事务回滚与 post-write verification。Bare full setup 由 workflow 自动携带该 flag 处理 selected-target managed drift；显式 subset/repair 调用则必须由用户提供。可单独用于 baseline host config repair，也可与 `--only ...` 组合，在修复后继续 Provider install-init。没有该 flag 时，显式 `--plan` 必须在 package/provider mutation 前报告 `host-config-conflict` 并阻断；高优先级 target 冲突、不可读配置、symlink/path escape 和 literal secret 不能通过该 flag 绕过。
 - `--refresh`: Graphify 显式刷新路径。已有 `.graphify/` 时，与 `--only graphify` 一起使用；setup 调用官方 `graphify update <workspace>` 更新现有 code graph，并在更新后重新执行完整性与 query probe。它不创建 spec-first 顶层 staging/backup；若只有 legacy `graphify-out/` 而没有 current `.graphify/`，仍按首次生成路径建立 provider-native artifact。它是 `manual-only` steady state 的按需更新方式，不是修复项目外 `core.hooksPath` 的动作，也不代表完整 semantic extraction。普通 setup 或 `--verify-only` 返回 core-ready `readiness_status=unknown` 时，不得仅因 unknown 自动追加或执行 `--refresh`；unknown 表示缺少当轮 currentness evidence，不表示 query probe 失败或 required setup 未完成。
 - `--requirement-workspace <repo-relative-path>`: optional Graphify input-scope override. Omit it for normal project-workspace setup; default input scope is the resolved project workspace.
-- `--user-scope`：Kiro/Qoder/Cursor 写入 user-level MCP config 的 opt-in。缺少该 flag 时，即使由 generated host skill/command 间接调用，setup 也只为 Kiro 写 workspace `.kiro/settings/mcp.json`、为 Qoder 写 local `.qoder/settings.local.json`，或为 Cursor 写 project `.cursor/mcp.json`。
+- `--user-scope`：Kiro/Qoder/Cursor/OpenCode 写入 user-level MCP config 的 opt-in。缺少该 flag 时，即使由 generated host skill/command 间接调用，setup 也只为 Kiro 写 workspace `.kiro/settings/mcp.json`、为 Qoder 写 local `.qoder/settings.local.json`、为 Cursor 写 project `.cursor/mcp.json`，或为 OpenCode 写 project `opencode.json`。OpenCode user scope 解析 `${XDG_CONFIG_HOME}/opencode/opencode.json`；project/user scope 任一存在更高优先级 JSONC sibling 时都以 `host-config-jsonc-precedence-blocked` 阻断 JSON mutation。
 
-Graphify setup 使用受控 Provider route；标准 bare workflow 默认选择 Graphify，`--only graphify` 是高级子集修复入口。当前 pin 是 PyPI `graphifyy@0.9.17`，要求 Python `>=3.10`。Setup 只使用已安装的 uv（优先）或 pipx，将 release-reviewed direct wheel 安装到隔离 tool environment；uv 禁止 managed Python download，缺少兼容 Python 或 tool manager 时返回 action-required，不自动 bootstrap，也不回退 plain pip。Package readiness 同时验证 distribution identity、version、CLI version、absolute launcher 与 interpreter。显式 Graphify mutation setup 只有在 Python package/artifact/query/host 都 verified，且 Git 项目中的 project-local hook 也 verified（非 Git 项目不适用）时，才默认卸载已确认的全局 `@sentropic/graphify`，并只删除仍保持原 target 且解析到该 npm package 的旧 symlink。External/unsafe hook target 下不执行 incumbent cleanup；未知命令、普通文件和其他 symlink 一律不改。
+OpenCode host config mutation 把 MCP entry 与 `opencode-governed-assets-v1` permission policy 视为同一 bounded transaction。Permission policy 只允许当前 projected runtime state 中的精确 governed skill names，禁止 wildcard/global allow，并让 `bash`、`edit`、`task`、`webfetch`、`websearch` 等危险工具保持 `ask`；遇到 conflicting user rule、unsafe last-match ordering 或 post-write verification failure 时 fail closed / rollback。Uninstall 只删除仍与 expected value 精确匹配的 managed entries，不删除整份 `opencode.json`，也不覆盖 unrelated user fields。
+
+Graphify setup 使用受控 Provider route；标准 bare workflow 默认选择 Graphify，`--only graphify` 是高级子集修复入口。当前 pin 是 PyPI `graphifyy@0.9.29`，要求 Python `>=3.10`。Setup 只使用已安装的 uv（优先）或 pipx，将 release-reviewed direct wheel 安装到隔离 tool environment；uv 禁止 managed Python download，缺少兼容 Python 或 tool manager 时返回 action-required，不自动 bootstrap，也不回退 plain pip。Package readiness 同时验证 distribution identity、version、CLI version、absolute launcher 与 interpreter。显式 Graphify mutation setup 只有在 Python package/artifact/query/host 都 verified，且 Git 项目中的 project-local hook 也 verified（非 Git 项目不适用）时，才默认卸载已确认的全局 `@sentropic/graphify`，并只删除仍保持原 target 且解析到该 npm package 的旧 symlink。External/unsafe hook target 下不执行 incumbent cleanup；未知命令、普通文件和其他 symlink 一律不改。
 
 Graphify Provider只接受PyPI `graphifyy` dependency。失败恢复使用固定wheel重装、contained artifact backup恢复与Python readiness复验。
 
@@ -205,7 +207,7 @@ Graphify 0.9.x 原生 child hook 只重建 child 默认 output,不能更新上�
 
 仓集来源:`--repos <a,b>` 清单(确认)、`需求文件夹/.spec-first/workspace.yaml` manifest(确认),或自动发现(仅作候选,需确认后才建)。自动发现只扫描需求根的直接子目录；重复 alias 或嵌套仓根会返回 `workspace-targets-ambiguous` 并阻止 build/clean，必须先由 owner 消除歧义。
 
-`workspace.yaml` 是为五宿主 projected runtime 保持零依赖的**严格 YAML 子集**，不是通用 YAML：支持顶层 `schema_version`、`repos`、`exclusions`，2 空格列表缩进、`repos` 下 4 空格的 `path`/可选 `alias`、普通或单/双引号字符串和行尾注释。禁止 tab、flow collection (`[]`/`{}`)、anchor/tag、block scalar、多行值及未声明字段；不符合时返回 `workspace-manifest-unparseable` 或 `workspace-manifest-schema-invalid`，不得猜测或静默忽略。可用格式：
+`workspace.yaml` 是为六宿主 projected runtime 保持零依赖的**严格 YAML 子集**，不是通用 YAML：支持顶层 `schema_version`、`repos`、`exclusions`，2 空格列表缩进、`repos` 下 4 空格的 `path`/可选 `alias`、普通或单/双引号字符串和行尾注释。禁止 tab、flow collection (`[]`/`{}`)、anchor/tag、block scalar、多行值及未声明字段；不符合时返回 `workspace-manifest-unparseable` 或 `workspace-manifest-schema-invalid`，不得猜测或静默忽略。可用格式：
 
 ```yaml
 schema_version: workspace-manifest.v1
@@ -221,7 +223,7 @@ exclusions:
 
 | Flag | 作用 |
 | --- | --- |
-| `--workspace-graph` | 一次性建双层图 + 写 state receipt + 注入五宿主入口路由块;source 变化后显式重跑刷新 |
+| `--workspace-graph` | 一次性建双层图 + 写 state receipt + 注入六宿主入口路由块;source 变化后显式重跑刷新 |
 | `--workspace-graph-status` | 只读汇总各 child/workspace 图状态、state/source freshness、default `projectPath` containment(advisory)、路由块是否已注入;不调用 provider 二进制 |
 | `--workspace-graph-clean` | 幂等清理:删子仓 `.codegraph/`、只移除 spec-first managed exclude 块、清理旧版本可能安装的 Graphify hook、删 `需求/.graphify/`、剥离路由 managed block;不强制 kill CodeGraph daemon。`codegraph daemon` 是 provider 的交互式选择器，因此 clean 只回报需由用户在 provider 中完成的动作，不伪造已停止。宿主级等价入口:`spec-first clean --workspace-graph [--repos a,b] [--dry-run]`(不碰 host runtime mirror) |
 
@@ -243,9 +245,9 @@ Machine contract:
 
 1. Identify the current host from the generated host-specific runtime surface invoking the unified `spec-runtime-setup` entrypoint.
 2. If invoked from a non-Git parent workspace, resolve all discovered supported child repos by default; `--repo <child>` narrows the run. Writes must stay within each resolved child target.
-3. 运行共置 Node 入口，使其加载 `setup-registry.v8`、校验 schema，并展开 effective host/platform registry。
+3. 运行共置 Node 入口，使其加载 `setup-registry.v9`、校验 schema，并展开 effective host/platform registry。
 4. 让 `setup.cjs` 按所选 mode 诊断或安装必需的 package-backed MCP tool；standard workflow 默认选择 registry required Provider，`--only` 只用于高级子集修复；host config 只能通过 registry target 写入，并记录结构化 execution facts。
-5. 让同一 Node 入口验证 baseline helper 与 required Provider。`agent-browser` 保持 diagnostic/manual-command only；ffmpeg、CodeGraph 与 Graphify 核心能力必须进入完整 setup completion。Provider first generation 与 project-local auto-refresh setup 只能通过静态 Provider module 与 bounded argv-array process runner 执行。若默认 project-root scope 中的 `graphify extract .` 失败，setup 可以先尝试 code-only `graphify update .`，再返回 failed readiness。若 Graphify 已安装但不在用户原始 `PATH` 中可见，报告 manual visibility action，不编辑 shell profile。Graphify hook 仅在有效 hooks root 位于项目内时允许 bounded repair；blocked/failed hook 记录 `next_actions` 与 `manual-only` limitation，不得标记 hook refresh 已验证，也不得单独把已通过的核心 Provider readiness 改为 `degraded`。
+5. 让同一 Node 入口验证 baseline helper 与 required Provider。`agent-browser` 保持 diagnostic/manual-command only，并通过 sibling `spec-test-browser` canonical wrapper 读取 capability facts；安装完整但 exact-origin execution blocked 时报告 degraded 而非重复安装，且不影响 baseline completion。ffmpeg、CodeGraph 与 Graphify 核心能力必须进入完整 setup completion。Provider first generation 与 project-local auto-refresh setup 只能通过静态 Provider module 与 bounded argv-array process runner 执行。若默认 project-root scope 中的 `graphify extract .` 失败，setup 可以先尝试 code-only `graphify update .`，再返回 failed readiness。若 Graphify 已安装但不在用户原始 `PATH` 中可见，报告 manual visibility action，不编辑 shell profile。Graphify hook 仅在有效 hooks root 位于项目内时允许 bounded repair；blocked/failed hook 记录 `next_actions` 与 `manual-only` limitation，不得标记 hook refresh 已验证，也不得单独把已通过的核心 Provider readiness 改为 `degraded`。
 6. Run project-local config bootstrap where the selected mode authorizes it. Bare setup reports example/local/gitignore/legacy status；missing local override 记为 `defaults-active`。Explicit project-config actions may refresh the example, create the local override, and ensure ignore coverage. Do not auto-delete legacy project config or migrate legacy keys.
 7. 使用 `setup.cjs --verify-only` 写入 readiness ledger、reconcile host pointer facts、写入 project setup facts，并渲染分组 status block。必须分别读取 `generated_runtime_manifest.status` 与 `baseline_ready`；`baseline_ready=true` 不能掩盖 stale generated runtime。状态为 `stale` 或 `missing` 时，使用符合 topology 的命令刷新 runtime：当前 repo 或 parent workspace runtime 使用 `spec-first init -y`，单个 child repo 使用 `spec-first init --repo <child> -y`，只有明确要批量刷新 child root 时才显式运行 `spec-first init --all-repos -y`；随后重新验证。若刚运行 `spec-first update` 后状态仍 stale，应将其视为 degraded refresh evidence，并展示相同 fallback 命令，不得报告 runtime freshness 为 ready。
 8. Report the status exactly enough for the user to act: ready rows need no action; action-required rows name the missing dependency/config/target step; generated runtime manifest rows name the init refresh command when stale or missing.

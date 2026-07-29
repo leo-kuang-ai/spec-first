@@ -13,9 +13,9 @@
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
-**面向 Claude Code、Codex、Kiro、Qoder 与 Cursor 的 AI Coding Harness。**
+**面向 Claude Code、Codex、Kiro、Qoder、Cursor 与 OpenCode 的 AI Coding Harness。**
 
-`spec-first` 让 Claude Code、Codex、Kiro、Qoder 和 Cursor 在真实项目中更容易被信任：一次性的 AI coding 对话会变成仓库承载的 requirements、plans、scoped work、review 和 reusable learning 闭环。脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。Kiro 与 Qoder 支持当前是 opt-in preview；Cursor 当前更保守，是 opt-in `generated_runtime_preview`，只证明可生成 `.cursor/skills/**`、`.cursor/spec-first/**` 与 `.cursor/mcp.json` 相关证据，本机尚未验证 Cursor skill discovery/invocation，generated skills 可能不会被 Cursor 加载。
+`spec-first` 让 Claude Code、Codex、Kiro、Qoder、Cursor 和 OpenCode 在真实项目中更容易被信任：一次性的 AI coding 对话会变成仓库承载的 requirements、plans、scoped work、review 和 reusable learning 闭环。脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。Kiro 与 Qoder 当前是 opt-in preview；Cursor 与 OpenCode 更保守，均是 opt-in `generated_runtime_preview`：source generation 已有覆盖，但当前本机 loader evidence 尚不能证明 generated workflow entry 会被正确发现和调用。
 
 官网：[spec-first.cn](http://spec-first.cn/)
 
@@ -27,7 +27,7 @@
 
 ![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
-首次评估时，重点不应该是 agent 数量或 prompt 库，而是一次 workflow 是否会留下可复用的东西。健康的第一圈会给你已有的 Claude Code、Codex、Kiro、Qoder 或 Cursor 会话加上一条可治理路径：定义问题、规划方案、必要时拆 task、执行、评审，并把经验沉淀下来。
+首次评估时，重点不应该是 agent 数量或 prompt 库，而是一次 workflow 是否会留下可复用的东西。健康的第一圈会给你已有的 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode 会话加上一条可治理路径：定义问题、规划方案、必要时拆 task、执行、评审，并把经验沉淀下来。
 
 最小成功信号是具体可检查的：安装和 init 后，在宿主里运行一个 workflow，然后查看它写入仓库的 Markdown artifact，通常位于 `docs/brainstorms/` 或 `docs/plans/`。更深的治理内容可以稍后再读；第一次试用先确认工作是否变得可检查。
 
@@ -41,7 +41,7 @@
 
 - Node.js `>=20.0.0` 和 npm。
 - Git 已安装并在 `PATH` 中；`doctor`、setup 和 workflow 检查会读取 Git 仓库事实。
-- 已安装 Claude Code、Codex、Kiro、Qoder 或 Cursor，并选择其中一个作为当前宿主。Cursor 需要显式 `--cursor` opt-in，且当前只处于 generated-runtime preview。
+- 已安装 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode，并选择其中一个作为当前宿主。Cursor 与 OpenCode 需要显式 `--cursor` / `--opencode` opt-in，且当前只处于 generated-runtime preview。
 - terminal 位于你想启用 `spec-first` 的项目仓库根目录。首次试用者可以先在 throwaway/test repo 中体验，再初始化真实项目。
 
 **步骤 1 — 安装并检查环境**
@@ -77,9 +77,9 @@ spec-first doctor
 spec-first init
 ```
 
-选择宿主（Claude Code、Codex、Cursor、Kiro 和/或 Qoder）、确认开发者姓名与语言，然后确认写入。交互确认默认显示摘要：按宿主聚合生成规模和风险操作总量，突出项目外写入与 degraded warnings，不展示具体 remove/prune/untrack 路径；需要检查 target/host/root、关键写入和有界路径样本时，显式运行 `spec-first init --dry-run`。在包含大量 child Git repos 的父级 workspace 中，`init` 默认在父 root 执行 workspace bootstrap：写入 instruction、`.gitignore`、缺失时的 `CHANGELOG.md` 以及 selected host runtime/state。`--repo <child>` 只初始化指定 child repo；`--all-repos` 初始化父 workspace 和所有发现的 child repos。child 的 setup/readiness truth 仍只属于各 child。全新机器上的脚本化 `init -y` 必须传入 `-u <name>`，因为非交互模式不会再提示输入开发者姓名，例如 `spec-first init --codex -y -u <name> --lang <zh|en>`。脚本化 preview 初始化可使用 `spec-first init --kiro -y -u <name> --lang <zh|en>` 初始化 Kiro，使用 `spec-first init --qoder -y -u <name> --lang <zh|en>` 初始化 Qoder，或使用 `spec-first init --cursor -y -u <name> --lang <zh|en>` 初始化 Cursor generated-runtime preview。Cursor 不属于 `init -y` 默认宿主集合。
+选择宿主（Claude Code、Codex、Cursor、Kiro、Qoder 和/或 OpenCode）、确认开发者姓名与语言，然后确认写入。交互确认默认显示摘要：按宿主聚合生成规模和风险操作总量，突出项目外写入与 degraded warnings，不展示具体 remove/prune/untrack 路径；需要检查 target/host/root、关键写入和有界路径样本时，显式运行 `spec-first init --dry-run`。在包含大量 child Git repos 的父级 workspace 中，`init` 默认在父 root 执行 workspace bootstrap：写入 instruction、`.gitignore`、缺失时的 `CHANGELOG.md` 以及 selected host runtime/state。`--repo <child>` 只初始化指定 child repo；`--all-repos` 初始化父 workspace 和所有发现的 child repos。child 的 setup/readiness truth 仍只属于各 child。全新机器上的脚本化 `init -y` 必须传入 `-u <name>`，因为非交互模式不会再提示输入开发者姓名，例如 `spec-first init --codex -y -u <name> --lang <zh|en>`。脚本化 preview 初始化可使用 `spec-first init --kiro -y -u <name> --lang <zh|en>` 初始化 Kiro，使用 `spec-first init --qoder -y -u <name> --lang <zh|en>` 初始化 Qoder，使用 `spec-first init --cursor -y -u <name> --lang <zh|en>` 初始化 Cursor，或使用 `spec-first init --opencode -y -u <name> --lang <zh|en>` 初始化 OpenCode。`init -y` 默认宿主集合仍只有 Claude Code + Codex；Cursor、Kiro、Qoder 与 OpenCode 都需要显式 flag。
 
-预期结果：交互 init 先给出可确认的宿主级摘要，完成后用单一 run-level 回执报告各宿主结果；`--dry-run` 才展开 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/` 或 `.qoder/` 下的有界路径明细。生成的 runtime copies 随时可通过 `spec-first init` 重建。
+预期结果：交互 init 先给出可确认的宿主级摘要，完成后用单一 run-level 回执报告各宿主结果；`--dry-run` 才展开 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 或 `.opencode/` 下的有界路径明细。生成的 runtime copies 随时可通过 `spec-first init` 重建。
 
 Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Changelog 保持逐字节不变并继续由仓库自行拥有。
 
@@ -87,7 +87,7 @@ Init 只在目标仓库缺少 `CHANGELOG.md` 时创建初始文件；已有 Chan
 
 对于非 Git 多仓需求父目录，默认 `init` 仍只投射父目录，不会为子仓生成 runtime。执行 Runtime Setup mutation 前，先用 `spec-first init --all-repos` 完成当前宿主的子仓投射，或用 `spec-first init --repo <child>` 做最窄修复。若所选子仓的当前宿主 projection 缺失或过期，Runtime Setup 会阻断 Provider 与 host-config mutation；`--plan --all-repos` 则只逐仓预览、不写入。`spec-first doctor` 会分开呈现 projection、managed runtime facts、可选 workspace graph 和不受管的 external MCP，只有前两项可贡献 managed readiness。
 
-Graphify 当前固定为 PyPI `graphifyy@0.9.17`，需要预先存在 Python `>=3.10` 与 `uv`（优先）或 `pipx`。Setup 不自动安装 Python/tool manager，也不使用 plain pip；它会验证 direct wheel hash 与 package identity，通过 `extract --code-only` 在 `.graphify/` 生成本地 AST 图，已有图则使用 Provider-native `graphify update` 原位刷新，不创建 spec-first staging 或 backup 目录，并始终把 Graphify 输出视为 advisory navigation。显式Graphify mutation setup在Python cutover完整verified后，会默认卸载已确认的全局`@sentropic/graphify` incumbent，并且只删除被证明指向该npm package的旧launcher symlink；诊断、plan和verify-only仍保持只读。
+Graphify 当前固定为 PyPI `graphifyy@0.9.29`，需要预先存在 Python `>=3.10` 与 `uv`（优先）或 `pipx`。Setup 不自动安装 Python/tool manager，也不使用 plain pip；它会验证 direct wheel hash 与 package identity，通过 `extract --code-only` 在 `.graphify/` 生成本地 AST 图，已有图则使用 Provider-native `graphify update` 原位刷新，不创建 spec-first staging 或 backup 目录，并始终把 Graphify 输出视为 advisory navigation。显式Graphify mutation setup在Python cutover完整verified后，会默认卸载已确认的全局`@sentropic/graphify` incumbent，并且只删除被证明指向该npm package的旧launcher symlink；诊断、plan和verify-only仍保持只读。
 
 Graphify Git hook 只是可选的 project-local 自动刷新增强。Runtime Setup 使用 `git rev-parse --git-path hooks` 解析有效 hooks root；只有目标位于当前项目内并通过 no-follow symlink containment 时才安装、规范化和验证 hook。若用户级或组织级 `core.hooksPath` 指向项目外，setup 绝不 write/execute/status 或串联外部 hook、不覆盖 local/global Git 配置，只对 `post-commit`/`post-checkout` 做**只读 marker 检测**：命中报 `hook_status=verified-external` + `refresh_mode=commit-hook-external-verified`（表示外部已存在 commit-time Graphify hook），缺失报 `blocked` + 一键安装提示。Graphify package、host integration、图完整性和真实 query 全部通过时，完整 setup 仍为 ready，`verified-external`/`manual-only` 均只描述 spec-first 只读可验证的 external commit-time posture（非 project-owned verified）。该状态不证明外部 hook 不存在或不会执行，外部 hook execution 保持 unverified。只有源码已变化且消费前需要新的 currentness evidence 时，才按需运行 `spec-runtime-setup --only graphify --refresh`；core-ready `unknown` 不自动触发 refresh，它也不是 hooksPath 修复命令。
 
@@ -96,13 +96,15 @@ Graphify Git hook 只是可选的 project-local 自动刷新增强。Runtime Set
 
 Cursor 注意事项：`spec-first init --cursor` 会在 `.cursor/skills/**` 下生成同名 `spec-*` workflow runtime、在 `.cursor/spec-first/**` 下生成 spec-first state，并默认把项目 MCP setup 目标设为 `.cursor/mcp.json`。用户级 `~/.cursor/mcp.json` 必须显式使用 `--user-scope` / `CURSOR_USER_SCOPE=1`。当前 release evidence 记录的是 `cursor_loader_validation_unavailable`，不能把 Cursor 视为完整 host support 或 `init -y` 默认宿主。
 
+OpenCode 注意事项：`spec-first init --opencode` 会在 `.opencode/commands/spec/**` 生成原生命令入口、在 `.opencode/skills/**` 生成 Agent Skills，并把 managed state 写入 `.opencode/spec-first/**`。Runtime Setup 默认写项目级 `opencode.json`；用户级配置必须显式使用 `--user-scope`，目标为 `${XDG_CONFIG_HOME}/opencode/opencode.json`。若存在更高优先级 `opencode.jsonc`，JSON mutation 会被阻断。Setup 只增加精确 governed skill permission，危险工具保持 `ask`，保留无关用户配置，并对冲突或不安全 rule order fail closed。完成同版本真实宿主 journey 前，最大诚实声明仍是 `generated_runtime_preview`。
+
 Cursor/Kiro/Qoder native pointer 文件：`init --cursor`、`init --kiro` 和 `init --qoder` 也会写入 `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md` 与 `.qoder/rules/spec-first.md`。这些文件只把宿主指回根目录 `AGENTS.md` 和当前宿主已安装的 `using-spec-first` runtime skill（`.cursor/skills/`、`.kiro/skills/` 或 `.qoder/skills/`）；它们是 generated runtime pointer，不是第二个 source of truth。如果同路径已有无 spec-first managed marker 的用户文件，init 和 clean 都不会覆盖或删除；init 和 doctor 都会显式报告冲突 warning。
 
 所有 init 选项（flags、脚本模式、多仓库）见 [完整快速开始指南](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
 
 **步骤 3 — 重启宿主**
 
-重启宿主或开一个新会话，让宿主加载刚生成的 runtime assets。宿主内 workflow 入口不是 shell 命令——它们在 Claude Code、Codex、Kiro、Qoder 或 Cursor 会话里运行，而不是在终端里。
+重启宿主或开一个新会话，让宿主加载刚生成的 runtime assets。宿主内 workflow 入口不是 shell 命令——它们在 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode 会话里运行，而不是在终端里。
 
 **步骤 4 — 运行第一个 workflow**
 
@@ -172,11 +174,13 @@ docs/
 
 对 validated task pack，`spec-work` 会固定 artifact-root-relative identity、task-pack digest、source-plan body hash，并重新检查 source plan readiness，再由 LLM 判断 Task Cards/Waves 与 scope/non-goals/KTD 的 semantic fit。Task pack 始终是 derived execution index，不成为 scope、progress 或 approval authority；`review_gate: required` 使用 bounded、report-only 的 task review，未关闭 P0/P1、design decision 或 scope attribution 问题前不会启动 dependent wave。实现阶段会基于 current source 重查 `reuse / extend / compose / new`：thin glue 只能协调 translation、sequencing、failure/partial-failure propagation、degradation 与 observability/evidence，不能复制 domain policy、validation truth 或 durable state；未授权的 public/schema/runtime/provider 边界返回 planning。
 
-本地 mutation、reviewer/worker dispatch、commit 与 outward landing 是四个独立授权面。`spec-code-review mode:agent` 始终 report-only；普通 review 默认也只报告，只有明确 review-and-fix 才能在本地 apply，commit 仍需独立授权。最终 work closeout 只记录真实执行的命令和 repo-relative redacted logs，通过 `verification-run-summary.v1` 与 `honest-closeout.v1` 校验结构化 claims，并只在 durable trigger 命中时写 `spec-work-run-artifact/v2`。`spec-debug`、`spec-code-review` 可以返回各自的 run-summary ref、verdict 与 limitation，但不拥有 spec-work run artifact。Prompt/source tests 与五宿主 projection 只证明合同存在，不证明 clean-session 模型行为或外部采用效果。
+本地 mutation、reviewer/worker dispatch、commit 与 outward landing 是四个独立授权面。`spec-code-review mode:agent` 始终 report-only；普通 review 默认也只报告，只有明确 review-and-fix 才能在本地 apply，commit 仍需独立授权。最终 work closeout 只记录真实执行的命令和 repo-relative redacted logs，通过 `verification-run-summary.v1` 与 `honest-closeout.v1` 校验结构化 claims，并只在 durable trigger 命中时写 `spec-work-run-artifact/v2`。`spec-debug`、`spec-code-review` 可以返回各自的 run-summary ref、verdict 与 limitation，但不拥有 spec-work run artifact。Prompt/source tests 与六宿主 projection 只证明合同存在，不证明 clean-session 模型行为或外部采用效果。
 
 Worker dispatch 在 Skill 层保持宿主中立。Owning workflow 提供 bounded task packet、彼此独立的授权事实、mutation scope、output contract 与 stop condition；只有 active host session 的 tool registry/schema 拥有 primitive identity 和 arguments，并且只能在 dispatch 已获授权后作为脱敏的 `provider_untrusted` evidence 消费。`PlatformAdapter.supportsAgents`、generated projection、adapter/project state、CLI help、fixture 和模型自述都不是 session capability probe。Permission、capacity、isolation、model/parallelism、output 与 mutation facts 只能来自 live call response 和 caller 可观察的前后状态；support claim 只能由 dated exact-version journey evidence 限定。详见 [Worker Dispatch Capability Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/worker-dispatch-capability.md)。
 
 当 `spec-lfg` 进入 browser applicable 流程时，调用方必须显式提供 `target-origin:<origin>`；缺失或非法 origin 分别以 `target-origin-missing` 或 `target-origin-invalid` 阻断该 flow。项目 server 的启动、监控和关闭由调用方负责。`spec-test-browser` 只确定性校验已解析的无 credential loopback root origin，经私有 wrapper 执行 browser action，并且只清理自己的 browser session；它不读取 local runtime profile，也不启动、探测或停止项目 server。browser evidence 只能证明该 caller-authorized origin 上观察到的 route/step 结果，不能证明 server 对应当前 branch。会产生持久或外部 effect 的 UI 操作必须获得本次独立授权；pipeline mode 以 `browser-mutation-authorization-required` 记录并且不写入被阻断 step。browser cleanup 失败仍会阻断 lifecycle、commit、push、PR 与 CI 副作用。
+
+Runtime Setup 分开报告 `agent-browser` 安装状态与 browser execution readiness。CLI/runtime/global skill 齐全时可以是 `dependency_status: ready`，但 `execution_readiness` 仍为 `blocked`。`--allowed-domains`、help marker、版本 allowlist、caller 输入或 provider 自报都不能确认 exact-origin enforcement；只有 Spec-First controlled conformance 可以提升该 claim。在当前 `agent-browser 0.33.1` capability shape 下，正确安全结果仍是 `exact-origin-capability-unavailable` 和 0 个 browser action subprocess；不会把重复安装同一 release 表述为确定性 capability 修复。
 
 支撑入口（按需触发）：`spec-runtime-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
 
@@ -194,7 +198,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 
 ## 为什么使用 spec-first？
 
-`spec-first` 让软件生命周期本身保持可读，同时不把 prose 当成证明。它不是替代 Claude Code、Codex、Kiro、Qoder 或 Cursor，而是给这些宿主加上一层项目内 harness。Cursor native rules、Kiro native Specs 与 Qoder native rules 仍由宿主拥有；`.cursor/rules/**`、`.kiro/specs/**` 和 `.qoder/rules/**` 只有在显式命名时才作为 advisory input。
+`spec-first` 让软件生命周期本身保持可读，同时不把 prose 当成证明。它不是替代 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode，而是给这些宿主加上一层项目内 harness。Cursor native rules、Kiro native Specs、Qoder native rules 与用户拥有的 OpenCode 配置仍由宿主或用户拥有；只有显式命名时才作为 advisory input。
 
 | 采纳时真正关心的问题 | Prompt pack / agent 编排 | spec-first |
 |---|---|---|
@@ -202,7 +206,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 | 决策和证据在哪里？ | Session state、消息总线、runtime memory | 项目内文档、generated runtime assets、可验证 CLI facts |
 | 人要 review 什么？ | 通常是最终 diff 或 agent 输出 | Requirements、plans、task packs、diff、review findings、bugs 和 learnings |
 | 谁守住机械边界？ | 主要靠模型自觉或自定义 glue | 脚本强制确定性不变量并准备事实，LLM 在这层地板之上做语义判断 |
-| Claude Code、Codex、Cursor、Kiro 与 Qoder 怎么对齐？ | 分开 setup 和维护 prompt | 一套 source assets 重新生成受支持宿主的 runtime surface |
+| Claude Code、Codex、Cursor、Kiro、Qoder 与 OpenCode 怎么对齐？ | 分开 setup 和维护 prompt | 一套 source assets 重新生成受支持宿主的 runtime surface |
 
 你今天就能检查的当前机制：
 
@@ -213,7 +217,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 - work 在新增 durable surface 前重查 current owner/thin-glue 边界，并把本地 mutation 与 commit/landing authorization 分离。
 - work、review、debug、optimize 和 compound workflows 会沉淀证据与经验。
 - knowledge handoff 默认 summary-first，召回的 `docs/solutions/` learning 在回源确认前保持 advisory。
-- 一套 source assets 以统一 `spec-*` workflow 入口支持 Claude Code、Codex、Cursor、Kiro 和 Qoder，不需要手工维护生成副本。
+- 一套 source assets 以统一 `spec-*` workflow 入口支持 Claude Code、Codex、Cursor、Kiro、Qoder 和 OpenCode，不需要手工维护生成副本。
 
 这些是当前 repo 机制，不是"已经被外部采纳数据证明"的效果宣称。先相信 artifacts、tests 和 source/runtime boundaries，再相信任何营销句子。
 
@@ -223,7 +227,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 
 Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 skill-local prompt assets、`templates/`、`src/cli/`）经 `spec-first init` 重新生成为 host runtime assets——产出仓库内 workflow artifacts：`ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`。
 
-各宿主根目录下由 spec-first 生成的 `spec-*`、`using-spec-first`、Graphify project skill、`spec-first/` state、command、hook 与 pointer 资产是可丢弃镜像，可通过 `spec-first init` 重建。宿主根目录本身是 mixed-ownership surface：不属于上述命名空间的团队 skill、agent、rule 和可移植项目配置可以按团队策略提交。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/`、Qoder local `.qoder/settings.local.json` 与 Qoder `.qoder/settings.json` managed hook entries 默认属于本地输出或 managed slice；已经跟踪的 team-policy 文件不会被 `init` 自动从 Git index 移除。精确生成路径和选择性共享方法见 gitignore 参考。
+各宿主根目录下由 spec-first 生成的 `spec-*`、`using-spec-first`、Graphify project skill、`spec-first/` state、command、hook 与 pointer 资产是可丢弃镜像，可通过 `spec-first init` 重建。宿主根目录本身是 mixed-ownership surface：不属于上述命名空间的团队 skill、agent、rule 和可移植项目配置可以按团队策略提交。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/`、Qoder local `.qoder/settings.local.json`、Qoder `.qoder/settings.json` managed hook entries，以及 `opencode.json` 中由 spec-first 管理的 entries 默认属于本地输出或 managed slice；已经跟踪的 team-policy 文件不会被 `init` 自动从 Git index 移除。精确生成路径和选择性共享方法见 gitignore 参考。
 
 详细参考：
 
@@ -237,7 +241,7 @@ Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 ski
 
 - **脚本负责什么：** 在出口和副作用处强制可机械判定的不变量，install、validate、generate、report machine facts。
 - **LLM 负责什么：** requirements framing、scope boundaries、tradeoffs、implementation judgment、review evidence。
-- **普通上下文排除什么：** `.spec-first/audits/**`、`.spec-first/governance/**` 以及 `.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、spec-first managed `.kiro/settings/**`、`.qoder/commands/spec-*.md`、已退役的 `.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、spec-first managed `.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 等 generated mirrors，以及 `.cursor/mcp.json`、`.qoder/settings.local.json` 这类 host-local config。
+- **普通上下文排除什么：** `.spec-first/audits/**`、`.spec-first/governance/**` 以及 `.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、spec-first managed `.kiro/settings/**`、`.qoder/commands/spec-*.md`、已退役的 `.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.opencode/commands/spec/**`、`.opencode/skills/**`、`.opencode/spec-first/**` 等 generated mirrors，以及 `.cursor/mcp.json`、`.qoder/settings.local.json`、`opencode.json` / `opencode.jsonc` 这类 host-local config；只有 runtime task 显式需要时才读取。
 
 [→ 完整 Trust Model 与验证合同](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
 
@@ -245,7 +249,7 @@ Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 ski
 
 适合使用 `spec-first`：
 
-- 你已经使用 Claude Code、Codex、Kiro、Qoder 或 Cursor，希望用项目内 workflow 替代一次性 prompt。
+- 你已经使用 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode，希望用项目内 workflow 替代一次性 prompt。
 - 你希望 AI coding work 留下 durable requirements、plans、显式路由的 review summaries 和 learnings。
 - 你希望脚本处理确定性 setup 并守住可机器检查的边界，同时让语义判断继续由 LLM 完成。
 - 你希望 workflow layer 足够轻，并能从 source assets 重新生成。

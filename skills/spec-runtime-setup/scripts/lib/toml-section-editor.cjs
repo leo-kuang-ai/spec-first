@@ -487,13 +487,11 @@ function scanValueCompletion(raw) {
 function parseManagedAssignments(section, sectionOffset) {
   const lines = splitLines(section);
   const assignments = new Map();
+  const unmanagedFields = new Set();
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
     const line = lines[lineIndex];
     const key = assignmentKey(line.content);
-    if (!key || key.parts.length !== 1 || !MANAGED_FIELD_SET.has(key.parts[0])) continue;
-    if (assignments.has(key.parts[0])) {
-      return { ok: false, reason_code: 'toml-target-key-duplicate' };
-    }
+    if (!key) continue;
     let endIndex = lineIndex;
     let rawValue = line.content.slice(key.valueIndex);
     while (!scanValueCompletion(rawValue).ok && endIndex + 1 < lines.length) {
@@ -502,6 +500,14 @@ function parseManagedAssignments(section, sectionOffset) {
     }
     if (!scanValueCompletion(rawValue).ok) {
       return { ok: false, reason_code: 'toml-target-value-ambiguous' };
+    }
+    if (key.parts.length !== 1 || !MANAGED_FIELD_SET.has(key.parts[0])) {
+      unmanagedFields.add(key.parts.join('.'));
+      lineIndex = endIndex;
+      continue;
+    }
+    if (assignments.has(key.parts[0])) {
+      return { ok: false, reason_code: 'toml-target-key-duplicate' };
     }
     let value;
     try {
@@ -516,7 +522,7 @@ function parseManagedAssignments(section, sectionOffset) {
     });
     lineIndex = endIndex;
   }
-  return { ok: true, assignments };
+  return { ok: true, assignments, unmanaged_fields: [...unmanagedFields].sort() };
 }
 
 function normalizeExpected(expected = {}) {
@@ -563,6 +569,29 @@ function compareMcpSection(text, key, expected) {
     };
   }
   return { ok: true, matches: true, reason_code: 'toml-target-config-match' };
+}
+
+function compareMcpSectionExact(text, key, expected) {
+  const compared = compareMcpSection(text, key, expected);
+  if (!compared.ok || !compared.matches) return compared;
+  const extracted = extractMcpSection(text, key);
+  if (!extracted.ok || !extracted.found) return extracted;
+  const parsed = parseManagedAssignments(extracted.section, extracted.range.header_end);
+  if (!parsed.ok) return parsed;
+  const subtables = targetSubtables(extracted.analysis, key);
+  const extraFields = [
+    ...(parsed.unmanaged_fields || []),
+    ...subtables.map((header) => header.parts.slice(2).join('.')),
+  ].filter(Boolean);
+  if (extraFields.length > 0) {
+    return {
+      ok: true,
+      matches: false,
+      reason_code: 'toml-target-config-drift',
+      drift_fields: [...new Set(extraFields.map((field) => `extra:${field}`))],
+    };
+  }
+  return compared;
 }
 
 function renderKey(key) {
@@ -662,6 +691,7 @@ function removeMcpSection(text, key) {
 
 module.exports = {
   compareMcpSection,
+  compareMcpSectionExact,
   extractMcpSection,
   removeMcpSection,
   upsertMcpSection,

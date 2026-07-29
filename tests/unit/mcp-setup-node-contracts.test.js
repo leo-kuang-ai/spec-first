@@ -119,10 +119,10 @@ function parityRunner(calls) {
       timeout: false,
       stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
         ? (String(args[1]).includes('importlib.metadata')
-          ? JSON.stringify({ version: '0.9.17', packages: [['graphifyy', '0.9.17']] })
+          ? JSON.stringify({ version: '0.9.29', packages: [['graphifyy', '0.9.29']] })
           : '3.12.1')
         : (graphifyCommand && args[0] === '--version'
-          ? 'graphify 0.9.17'
+          ? 'graphify 0.9.29'
           : (command === 'uv' && args.join(' ') === 'tool dir --bin'
             ? path.join(options.env.HOME, '.local', 'bin')
             : (args[0] === 'status' ? 'ready' : 'ok'))),
@@ -145,12 +145,12 @@ function classifyEffects(repoBefore, repoAfter, homeBefore, homeAfter, calls) {
     || entry === 'compound-engineering.local.md')) {
     effects.add('project-config');
   }
-  if (paths.some((entry) => /^\.(?:claude|codex|cursor|kiro|qoder)\//.test(entry))) effects.add('host-config');
+  if (paths.some((entry) => /^\.(?:claude|codex|cursor|kiro|opencode|qoder)\//.test(entry))) effects.add('host-config');
   if (calls.some(([command, first, second]) => path.basename(command).replace(/\.(?:exe|cmd)$/i, '') === 'graphify'
     && (['install', 'extract', 'update'].includes(first) || (first === 'hook' && second === 'install')))) {
     effects.add('provider-mutation');
   }
-  const hostLedgerPattern = /^\.(?:claude|codex|cursor|kiro|qoder)\/spec-first\/host-setup\.json$/;
+  const hostLedgerPattern = /^\.(?:claude|codex|cursor|kiro|opencode|qoder)\/spec-first\/host-setup\.json$/;
   if (homePaths.some((entry) => hostLedgerPattern.test(entry))) effects.add('setup-facts');
   if (homePaths.some((entry) => !hostLedgerPattern.test(entry))) effects.add('home');
   return [...effects].sort();
@@ -249,6 +249,59 @@ describe('spec-runtime-setup unified Node contract', () => {
     expect(result).toMatchObject({ status: 'ready', reason_code: 'ready' });
   });
 
+  test('keeps agent-browser dependency ready while exact-origin execution remains blocked', () => {
+    const { probeHelper } = require('../../skills/spec-runtime-setup/scripts/lib/installation-executor.cjs');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-home-'));
+    fs.mkdirSync(path.join(homeDir, '.agent-browser'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agent-browser', 'spec-first-install.json'), '{}\n');
+    fs.mkdirSync(path.join(homeDir, '.agents', 'skills', 'agent-browser'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agents', 'skills', 'agent-browser', 'SKILL.md'), '# agent-browser\n');
+    const help = [
+      'open <url>', 'snapshot', 'get <what>', 'console', 'network <action>', 'vitals [url]',
+      'set <setting> [value]', 'viewport <w> <h>', 'screenshot [path]', 'close',
+      '--session <name>', '--namespace <name>', '--config <path>', '--content-boundaries',
+      '--max-output <chars>', '--allowed-domains <list>', '--action-policy <path>',
+      '--screenshot-dir <path>', '--json',
+    ].join('\n');
+    const calls = [];
+
+    const result = probeHelper({
+      homeDir,
+      env: {},
+      runner: (command, args) => {
+        calls.push([command, ...args]);
+        return {
+          exit_code: 0,
+          signal: null,
+          timed_out: false,
+          timeout: false,
+          stdout: args.includes('--version') ? 'agent-browser 0.33.1\n' : help,
+          stderr: '',
+          error: null,
+        };
+      },
+    }, process.cwd(), {
+      id: 'agent-browser',
+      kind: 'browser-helper',
+      detection: { kind: 'agent-browser', command: 'agent-browser', skill_name: 'agent-browser' },
+      installation: { next_action: '安装 agent-browser' },
+    });
+
+    expect(result).toMatchObject({
+      status: 'degraded',
+      dependency_status: 'ready',
+      execution_readiness: 'blocked',
+      conformance_status: 'not_run',
+      repair_scope: 'provider',
+      reason_code: 'exact-origin-capability-unavailable',
+    });
+    expect(result.next_action).toContain('request-time exact-origin');
+    expect(calls).toEqual([
+      ['agent-browser', '--version'],
+      ['agent-browser', '--help'],
+    ]);
+  });
+
   test('keeps the entrypoint thin and exposes explicit runtime owner modules', () => {
     const setupPath = path.join(skillRoot, 'scripts', 'setup.cjs');
     const owners = [
@@ -269,11 +322,11 @@ describe('spec-runtime-setup unified Node contract', () => {
     }
   });
 
-  test('loads one schema v8 registry without jq', () => {
+  test('loads one schema v9 registry without jq', () => {
     const { loadRegistry } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v8');
+    expect(registry.schema_version).toBe('setup-registry.v9');
     expect(registry.tools.map((entry) => entry.id)).toEqual(
       expect.arrayContaining(['sequential-thinking', 'context7', 'codegraph']),
     );
@@ -585,6 +638,11 @@ describe('spec-runtime-setup unified Node contract', () => {
     expect(resolveHostAuthority({ env: { MCP_SETUP_HOST: 'qoder' }, mutationRequested: true })).toMatchObject({
       status: 'ready',
       host: 'qoder',
+      authority_source: 'MCP_SETUP_HOST',
+    });
+    expect(resolveHostAuthority({ env: { MCP_SETUP_HOST: 'opencode' }, mutationRequested: true })).toMatchObject({
+      status: 'ready',
+      host: 'opencode',
       authority_source: 'MCP_SETUP_HOST',
     });
   });

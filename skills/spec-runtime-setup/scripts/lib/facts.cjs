@@ -19,7 +19,7 @@ const CONFIRMED_SOURCES = new Set([
   'read-only-probe',
   'confirmed-local-state',
 ]);
-const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'qoder']);
+const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
 
 function collectSetupFacts(options = {}) {
   const registry = options.registry || {};
@@ -128,9 +128,13 @@ function normalizeItem(entry, observed = null, kind) {
     : entry.baseline_blocking === true;
   const confirmed = source.verified === true && CONFIRMED_SOURCES.has(source.source);
   const observedStatus = source.status || 'unknown';
+  const observedDependencyStatus = source.dependency_status || null;
   const configuredStatus = source.configured_status || source.host_config_status || 'not-applicable';
   const projectStatus = source.project_status || 'not-applicable';
-  const dependencyReady = observedStatus === 'ready' && confirmed;
+  const dependencyReady = confirmed && (
+    observedDependencyStatus === 'ready'
+    || (observedDependencyStatus === null && observedStatus === 'ready')
+  );
   let result;
   let reasonCode;
   if (observedStatus === 'skipped' || source.result === 'skipped') {
@@ -151,15 +155,15 @@ function normalizeItem(entry, observed = null, kind) {
   } else if (projectStatus === 'failed') {
     result = 'action-required';
     reasonCode = 'project-bootstrap-failed';
+  } else if (observedStatus === 'degraded') {
+    result = 'degraded';
+    reasonCode = source.reason_code || (baselineBlocking ? 'baseline-degraded' : 'optional-capability-degraded');
   } else if (dependencyReady) {
     result = 'ready';
     reasonCode = 'ready';
   } else if (observedStatus === 'ready') {
     result = 'degraded';
     reasonCode = 'unconfirmed-probe';
-  } else if (observedStatus === 'degraded') {
-    result = 'degraded';
-    reasonCode = source.reason_code || (baselineBlocking ? 'baseline-degraded' : 'optional-capability-degraded');
   } else if (observedStatus === 'missing' || observedStatus === 'failed' || observedStatus === 'blocked') {
     result = baselineBlocking ? 'action-required' : 'degraded';
     reasonCode = source.reason_code || (observedStatus === 'missing' ? 'missing_dependency' : `${observedStatus}-probe`);
@@ -176,7 +180,9 @@ function normalizeItem(entry, observed = null, kind) {
     required,
     setup_required: entry.setup_required === true,
     baseline_blocking: baselineBlocking,
-    dependency_status: installed ? 'ready' : (observedStatus === 'missing' ? 'missing' : 'unknown'),
+    dependency_status: installed
+      ? 'ready'
+      : (observedDependencyStatus || (observedStatus === 'missing' ? 'missing' : 'unknown')),
     configured_status: configuredStatus,
     project_status: projectStatus,
     result,

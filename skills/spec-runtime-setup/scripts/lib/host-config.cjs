@@ -7,6 +7,7 @@ const crypto = require('node:crypto');
 
 const {
   compareMcpSection,
+  compareMcpSectionExact,
   extractMcpSection,
   removeMcpSection,
   upsertMcpSection,
@@ -32,6 +33,8 @@ const CONFIG_FIELDS = [
   'startup_timeout_sec',
   'startup_timeout_ms',
 ];
+const DEFAULT_JSON_CONTAINER_PATH = Object.freeze(['mcpServers']);
+const DEFAULT_SERVER_REPRESENTATION = 'standard';
 const SECRET_KEY_PATTERN = /(?:token|secret|password|passphrase|api[_-]?key|authorization|credential|private[_-]?key|access[_-]?key)/i;
 const ENV_REFERENCE_PATTERN = /^(?:\$\{[A-Za-z_][A-Za-z0-9_]*\}|\$[A-Za-z_][A-Za-z0-9_]*|%[A-Za-z_][A-Za-z0-9_]*%)$/;
 const DEFAULT_LOCK_TIMEOUT_MS = 10000;
@@ -75,7 +78,22 @@ function hostConfigForEntry(entry) {
   return isObject(entry.host_config) ? entry.host_config : null;
 }
 
-function buildServerConfig(entry) {
+function resolvedHostConfigShape(hostConfig) {
+  const jsonContainerPath = Array.isArray(hostConfig && hostConfig.json_container_path)
+    && hostConfig.json_container_path.length > 0
+    && hostConfig.json_container_path.every((segment) => typeof segment === 'string' && segment.length > 0)
+    ? [...hostConfig.json_container_path]
+    : [...DEFAULT_JSON_CONTAINER_PATH];
+  const serverRepresentation = hostConfig && typeof hostConfig.server_representation === 'string'
+    ? hostConfig.server_representation
+    : DEFAULT_SERVER_REPRESENTATION;
+  return {
+    json_container_path: jsonContainerPath,
+    server_representation: serverRepresentation,
+  };
+}
+
+function buildDeclaredServerConfig(entry) {
   const hostConfig = hostConfigForEntry(entry);
   if (!hostConfig) return null;
   const source = isObject(hostConfig.server) ? hostConfig.server : hostConfig;
@@ -87,6 +105,29 @@ function buildServerConfig(entry) {
   }
   if (!Array.isArray(result.args)) result.args = [];
   return typeof result.command === 'string' && result.command.length > 0 ? result : null;
+}
+
+function buildServerConfig(entry) {
+  const hostConfig = hostConfigForEntry(entry);
+  const declared = buildDeclaredServerConfig(entry);
+  if (!hostConfig || !declared) return null;
+  const shape = resolvedHostConfigShape(hostConfig);
+  if (shape.server_representation === DEFAULT_SERVER_REPRESENTATION) return declared;
+  if (shape.server_representation !== 'opencode-local') return null;
+  return {
+    type: 'local',
+    command: [declared.command, ...declared.args],
+    ...(isObject(declared.env) && Object.keys(declared.env).length > 0
+      ? { environment: clone(declared.env) }
+      : {}),
+    ...(typeof declared.enabled === 'boolean' ? { enabled: declared.enabled } : {}),
+  };
+}
+
+function serverEnvironment(server) {
+  if (isObject(server && server.env)) return server.env;
+  if (isObject(server && server.environment)) return server.environment;
+  return {};
 }
 
 function configKeyForEntry(entry) {
@@ -108,7 +149,17 @@ function expandConfigPath(rawPath, { repoRoot, homeDir, env = process.env }) {
   expanded = expanded.replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (match, name) =>
     Object.prototype.hasOwnProperty.call(env, name) ? String(env[name]) : match
   );
+  if (/\$\{[A-Za-z_][A-Za-z0-9_]*\}/.test(expanded)) return null;
   return path.resolve(path.isAbsolute(expanded) ? expanded : path.join(repoRoot, expanded));
+}
+
+function configPathEnvironment(homeDir, env = process.env) {
+  return {
+    ...env,
+    XDG_CONFIG_HOME: typeof env.XDG_CONFIG_HOME === 'string' && env.XDG_CONFIG_HOME.length > 0
+      ? env.XDG_CONFIG_HOME
+      : path.join(homeDir, '.config'),
+  };
 }
 
 function inspectSymlinkPath(candidate, root) {
@@ -139,6 +190,9 @@ function inspectSymlinkPath(candidate, root) {
 function containmentRootForTarget(rawPath, scope, target, { repoRoot, homeDir, env }) {
   if (target && typeof target.containment_root === 'string') {
     return expandConfigPath(target.containment_root, { repoRoot, homeDir, env });
+  }
+  if (/^\$\{XDG_CONFIG_HOME\}(?=$|[\\/])/.test(rawPath)) {
+    return nearestExistingPath(path.resolve(env.XDG_CONFIG_HOME));
   }
   if (/^(?:~|\$HOME|\$\{HOME\})/.test(rawPath) || scope === 'user') {
     return path.resolve(homeDir);
@@ -195,8 +249,27 @@ function resolveTargetRecord(scope, target, context) {
     requires_user_scope: targetRequiresUserScope(target),
     containment_root: containmentRoot,
     canonical_root: symlink.canonical_root,
-    exists: fs.existsSync(configPath),
   };
+  const precedenceGuards = [];
+  for (const guard of Array.isArray(target.precedence_guards) ? target.precedence_guards : []) {
+    if (!isObject(guard) || typeof guard.config_path !== 'string') {
+      return { ok: false, reason_code: 'host-config-precedence-guard-invalid', scope };
+    }
+    const guardPath = expandConfigPath(guard.config_path, context);
+    if (!guardPath || !isPathWithin(guardPath, containmentRoot)) {
+      return { ok: false, reason_code: 'host-config-path-escape', scope };
+    }
+    const guardSymlink = inspectSymlinkPath(guardPath, containmentRoot);
+    if (!guardSymlink.ok) return { ...guardSymlink, scope };
+    precedenceGuards.push({
+      scope,
+      config_path: guardPath,
+      config_format: guard.config_format || '',
+      precedence: Number.isFinite(guard.precedence) ? guard.precedence : resolved.precedence,
+      reason_code: guard.reason_code || 'host-config-precedence-blocked',
+    });
+  }
+  resolved.precedence_guards = precedenceGuards;
   if (context.requireWritable !== false && !targetIsWritable(configPath, resolved.writable_check)) {
     return { ok: false, reason_code: 'host-config-target-not-writable', scope };
   }
@@ -219,7 +292,7 @@ function resolveHostConfigTarget(options = {}) {
   const context = {
     repoRoot,
     homeDir,
-    env: options.env || process.env,
+    env: configPathEnvironment(homeDir, options.env || process.env),
     defaultFormat: hostConfig.config_format || '',
     requireWritable: options.requireWritable !== false,
   };
@@ -279,6 +352,7 @@ function resolveHostConfigTarget(options = {}) {
     resolved_targets: resolvedTargets,
     key,
     server,
+    ...resolvedHostConfigShape(hostConfig),
     authority_confirmed: true,
   };
 }
@@ -323,12 +397,31 @@ function stripJsonBom(text) {
   return text.startsWith('\uFEFF') ? { bom: '\uFEFF', text: text.slice(1) } : { bom: '', text };
 }
 
-function parseJsonConfig(text) {
+function jsonValueAtPath(value, containerPath) {
+  let current = value;
+  for (const segment of containerPath) {
+    if (!isObject(current) || !Object.prototype.hasOwnProperty.call(current, segment)) return undefined;
+    current = current[segment];
+  }
+  return current;
+}
+
+function ensureJsonObjectAtPath(value, containerPath) {
+  let current = value;
+  for (const segment of containerPath) {
+    if (!isObject(current[segment])) current[segment] = {};
+    current = current[segment];
+  }
+  return current;
+}
+
+function parseJsonConfig(text, jsonContainerPath = DEFAULT_JSON_CONTAINER_PATH) {
   const { bom, text: raw } = stripJsonBom(text);
   try {
     const value = raw.trim() === '' ? {} : JSON.parse(raw);
     if (!isObject(value)) return { ok: false, reason_code: 'host-config-json-invalid' };
-    if (value.mcpServers !== undefined && !isObject(value.mcpServers)) {
+    const container = jsonValueAtPath(value, jsonContainerPath);
+    if (container !== undefined && !isObject(container)) {
       return { ok: false, reason_code: 'host-config-json-invalid' };
     }
     return {
@@ -343,7 +436,15 @@ function parseJsonConfig(text) {
   }
 }
 
-function normalizeServer(server) {
+function normalizeServer(server, representation = DEFAULT_SERVER_REPRESENTATION) {
+  if (representation === 'opencode-local') {
+    return {
+      type: server && server.type,
+      command: Array.isArray(server && server.command) ? [...server.command] : server && server.command,
+      environment: isObject(server && server.environment) ? clone(server.environment) : undefined,
+      enabled: server && server.enabled,
+    };
+  }
   const result = {};
   for (const field of CONFIG_FIELDS) {
     if (Object.prototype.hasOwnProperty.call(server || {}, field) && server[field] !== undefined) {
@@ -354,19 +455,52 @@ function normalizeServer(server) {
   return result;
 }
 
-function serverMatches(actual, expected) {
-  return JSON.stringify(normalizeServer(actual)) === JSON.stringify(normalizeServer(expected));
+function serverMatches(actual, expected, representation = DEFAULT_SERVER_REPRESENTATION) {
+  return JSON.stringify(normalizeServer(actual, representation))
+    === JSON.stringify(normalizeServer(expected, representation));
 }
 
-function serverDriftFields(actual, expected) {
-  const normalizedActual = normalizeServer(actual);
-  const normalizedExpected = normalizeServer(expected);
-  return CONFIG_FIELDS.filter((field) =>
+function serverDriftFields(actual, expected, representation = DEFAULT_SERVER_REPRESENTATION) {
+  const normalizedActual = normalizeServer(actual, representation);
+  const normalizedExpected = normalizeServer(expected, representation);
+  const fields = representation === 'opencode-local'
+    ? ['type', 'command', 'environment', 'enabled']
+    : CONFIG_FIELDS;
+  return fields.filter((field) =>
     JSON.stringify(normalizedActual[field]) !== JSON.stringify(normalizedExpected[field])
   );
 }
 
-function inspectOneTarget({ targetRecord, key, server }) {
+function canonicalComparable(value) {
+  if (Array.isArray(value)) return value.map((item) => canonicalComparable(item));
+  if (!isObject(value)) return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map((key) => [key, canonicalComparable(value[key])]),
+  );
+}
+
+function exactServerMatches(actual, expected) {
+  return JSON.stringify(canonicalComparable(actual)) === JSON.stringify(canonicalComparable(expected));
+}
+
+function exactServerDriftFields(actual, expected, representation) {
+  const drift = serverDriftFields(actual, expected, representation);
+  for (const key of Object.keys(actual || {})) {
+    if (!Object.prototype.hasOwnProperty.call(expected || {}, key)) drift.push(`extra:${key}`);
+  }
+  return [...new Set(drift)];
+}
+
+function inspectOneTarget({
+  targetRecord,
+  key,
+  server,
+  jsonContainerPath,
+  serverRepresentation,
+  exactMatch = false,
+  jsonDocumentPolicy = null,
+  operation = 'upsert',
+}) {
   if (!fs.existsSync(targetRecord.config_path)) {
     return { ok: true, configured: false, conflict: false, reason_code: 'host-config-missing' };
   }
@@ -382,7 +516,9 @@ function inspectOneTarget({ targetRecord, key, server }) {
     if (!extracted.found) {
       return { ok: true, configured: false, conflict: false, reason_code: 'host-config-entry-missing' };
     }
-    const compared = compareMcpSection(text, key, server);
+    const compared = exactMatch
+      ? compareMcpSectionExact(text, key, server)
+      : compareMcpSection(text, key, server);
     if (!compared.ok) return { ...compared, configured: false, conflict: false };
     return compared.matches
       ? { ok: true, configured: true, conflict: false, reason_code: 'host-config-current' }
@@ -394,34 +530,112 @@ function inspectOneTarget({ targetRecord, key, server }) {
         conflict_fields: compared.drift_fields || [],
       };
   }
-  const parsed = parseJsonConfig(text);
+  const parsed = parseJsonConfig(text, jsonContainerPath);
   if (!parsed.ok) return { ...parsed, configured: false, conflict: false };
-  const actual = parsed.value.mcpServers && parsed.value.mcpServers[key];
-  if (actual === undefined) {
-    return { ok: true, configured: false, conflict: false, reason_code: 'host-config-entry-missing' };
+  const policyInspection = jsonDocumentPolicy
+    ? jsonDocumentPolicy.inspect(parsed.value, { operation })
+    : null;
+  if (policyInspection && !policyInspection.ok) {
+    return { ...policyInspection, configured: false, conflict: false };
   }
-  return serverMatches(actual, server)
-    ? { ok: true, configured: true, conflict: false, reason_code: 'host-config-current' }
-    : {
+  if (policyInspection && policyInspection.conflict) {
+    return policyInspection;
+  }
+  const container = jsonValueAtPath(parsed.value, jsonContainerPath);
+  const actual = container && container[key];
+  if (actual === undefined) {
+    if (operation === 'remove'
+      && policyInspection
+      && policyInspection.permission_mutation_required === true) {
+      return {
+        ...policyInspection,
+        ok: true,
+        configured: true,
+        conflict: false,
+        reason_code: policyInspection.reason_code,
+      };
+    }
+    return {
+      ...(policyInspection || {}),
+      ok: true,
+      configured: false,
+      conflict: false,
+      reason_code: 'host-config-entry-missing',
+    };
+  }
+  const matches = exactMatch
+    ? exactServerMatches(actual, server)
+    : serverMatches(actual, server, serverRepresentation);
+  if (!matches) {
+    return {
+      ...(policyInspection || {}),
       ok: true,
       configured: false,
       conflict: true,
       reason_code: 'host-config-conflict',
-      conflict_fields: serverDriftFields(actual, server),
+      conflict_fields: exactMatch
+        ? exactServerDriftFields(actual, server, serverRepresentation)
+        : serverDriftFields(actual, server, serverRepresentation),
     };
+  }
+  if (policyInspection && !policyInspection.configured) {
+    return policyInspection;
+  }
+  return {
+    ...(policyInspection || {}),
+    ok: true,
+    configured: true,
+    conflict: false,
+    reason_code: 'host-config-current',
+  };
 }
 
-function inspectHostConfig({ entry, target } = {}) {
+function inspectHostConfig({
+  entry,
+  target,
+  exactMatch = false,
+  jsonDocumentPolicy = null,
+  operation = 'upsert',
+} = {}) {
   if (!target || target.ok !== true || target.authority_confirmed !== true) {
     return { ok: false, reason_code: 'host-config-target-unresolved' };
   }
   const key = configKeyForEntry(entry) || target.key;
   const server = buildServerConfig(entry) || target.server;
+  const shape = hostConfigForEntry(entry)
+    ? resolvedHostConfigShape(hostConfigForEntry(entry))
+    : {
+      json_container_path: target.json_container_path || [...DEFAULT_JSON_CONTAINER_PATH],
+      server_representation: target.server_representation || DEFAULT_SERVER_REPRESENTATION,
+    };
   const orderedTargets = Object.values(target.resolved_targets || {})
     .sort((left, right) => right.precedence - left.precedence);
+  const blockingGuard = orderedTargets
+    .flatMap((candidate) => candidate.precedence_guards || [])
+    .filter((guard) => fs.existsSync(guard.config_path) && guard.precedence > target.precedence)
+    .sort((left, right) => right.precedence - left.precedence)[0];
+  if (blockingGuard) {
+    return {
+      ok: false,
+      configured: false,
+      conflict: false,
+      reason_code: blockingGuard.reason_code,
+      blocking_scope: blockingGuard.scope,
+      blocking_path: blockingGuard.config_path,
+    };
+  }
   let selectedInspection = null;
   for (const candidate of orderedTargets) {
-    const inspected = inspectOneTarget({ targetRecord: candidate, key, server });
+    const inspected = inspectOneTarget({
+      targetRecord: candidate,
+      key,
+      server,
+      jsonContainerPath: shape.json_container_path,
+      serverRepresentation: shape.server_representation,
+      exactMatch,
+      jsonDocumentPolicy,
+      operation,
+    });
     if (candidate.scope === target.scope) selectedInspection = inspected;
     const higherPrecedence = candidate.precedence > target.precedence;
     if (!inspected.ok) {
@@ -437,6 +651,7 @@ function inspectHostConfig({ entry, target } = {}) {
     }
     if (inspected.configured) {
       return {
+        ...inspected,
         ok: true,
         configured: true,
         conflict: false,
@@ -449,12 +664,13 @@ function inspectHostConfig({ entry, target } = {}) {
     }
     if (inspected.conflict) {
       return {
-        ok: false,
+        ...inspected,
+        ok: higherPrecedence ? false : inspected.ok,
         configured: false,
         conflict: true,
         reason_code: higherPrecedence
           ? 'host-config-higher-precedence-conflict'
-          : 'host-config-conflict',
+          : inspected.reason_code,
         blocking_scope: candidate.scope,
         blocking_path: candidate.config_path,
         conflict_fields: inspected.conflict_fields || [],
@@ -470,6 +686,11 @@ function inspectHostConfig({ entry, target } = {}) {
     },
     key,
     server,
+    jsonContainerPath: shape.json_container_path,
+    serverRepresentation: shape.server_representation,
+    exactMatch,
+    jsonDocumentPolicy,
+    operation,
   });
   return {
     ...inspected,
@@ -801,37 +1022,93 @@ function replaceFile(tempPath, configPath, originalExists, token, options = {}) 
   }
 }
 
-function renderJsonConfig(parsed, key, server, operation) {
+function renderJsonConfig(parsed, key, server, operation, jsonContainerPath, jsonDocumentPolicy) {
   const value = clone(parsed.value);
-  if (!isObject(value.mcpServers)) value.mcpServers = {};
-  if (operation === 'remove') delete value.mcpServers[key];
-  else value.mcpServers[key] = clone(server);
-  let text = JSON.stringify(value, null, 2);
+  if (operation === 'remove') {
+    const container = jsonValueAtPath(value, jsonContainerPath);
+    if (isObject(container)) delete container[key];
+  } else {
+    const container = ensureJsonObjectAtPath(value, jsonContainerPath);
+    container[key] = clone(server);
+  }
+  const policyMutation = jsonDocumentPolicy
+    ? jsonDocumentPolicy.mutate(value, { operation })
+    : { ok: true, changed: false, value };
+  if (!policyMutation.ok) return policyMutation;
+  let text = JSON.stringify(policyMutation.value, null, 2);
   if (parsed.eol !== '\n') text = text.replaceAll('\n', parsed.eol);
-  return `${parsed.bom}${text}${parsed.finalNewline || text.length > 0 ? parsed.eol : ''}`;
+  return {
+    ...policyMutation,
+    ok: true,
+    text: `${parsed.bom}${text}${parsed.finalNewline || text.length > 0 ? parsed.eol : ''}`,
+  };
 }
 
-function buildMutationText({ originalText, configFormat, key, server, operation }) {
+function buildMutationText({
+  originalText,
+  configFormat,
+  key,
+  server,
+  operation,
+  jsonContainerPath,
+  jsonDocumentPolicy,
+}) {
   if (configFormat === 'json') {
-    const parsed = parseJsonConfig(originalText);
+    const parsed = parseJsonConfig(originalText, jsonContainerPath);
     if (!parsed.ok) return parsed;
-    return { ok: true, text: renderJsonConfig(parsed, key, server, operation) };
+    return renderJsonConfig(
+      parsed,
+      key,
+      server,
+      operation,
+      jsonContainerPath,
+      jsonDocumentPolicy,
+    );
+  }
+  if (jsonDocumentPolicy) {
+    return { ok: false, reason_code: 'host-config-json-document-policy-format-unsupported' };
   }
   return operation === 'remove'
     ? removeMcpSection(originalText, key)
     : upsertMcpSection(originalText, key, server);
 }
 
-function verifyTargetText({ text, configFormat, key, server, operation }) {
+function verifyTargetText({
+  text,
+  configFormat,
+  key,
+  server,
+  operation,
+  jsonContainerPath,
+  serverRepresentation,
+  jsonDocumentPolicy,
+}) {
   if (configFormat === 'json') {
-    const parsed = parseJsonConfig(text);
+    const parsed = parseJsonConfig(text, jsonContainerPath);
     if (!parsed.ok) return parsed;
-    const actual = parsed.value.mcpServers && parsed.value.mcpServers[key];
-    const verified = operation === 'remove' ? actual === undefined : serverMatches(actual, server);
-    return {
-      ok: verified,
-      reason_code: verified ? 'host-config-post-write-verified' : 'host-config-post-write-verify-failed',
-    };
+    const container = jsonValueAtPath(parsed.value, jsonContainerPath);
+    const actual = container && container[key];
+    const verified = operation === 'remove'
+      ? actual === undefined
+      : serverMatches(actual, server, serverRepresentation);
+    if (!verified) return { ok: false, reason_code: 'host-config-post-write-verify-failed' };
+    if (jsonDocumentPolicy) {
+      const policyInspection = jsonDocumentPolicy.inspect(parsed.value, { operation });
+      if (!policyInspection.ok || !policyInspection.configured || policyInspection.conflict) {
+        return {
+          ...policyInspection,
+          ok: false,
+          reason_code: policyInspection.reason_code
+            || 'host-config-opencode-permission-post-write-verify-failed',
+        };
+      }
+      return {
+        ...policyInspection,
+        ok: true,
+        reason_code: 'host-config-post-write-verified',
+      };
+    }
+    return { ok: true, reason_code: 'host-config-post-write-verified' };
   }
   if (operation === 'remove') {
     const extracted = extractMcpSection(text, key);
@@ -902,9 +1179,15 @@ function applyHostConfig(options = {}) {
   const key = configKeyForEntry(entry) || target.key;
   const server = buildServerConfig(entry) || target.server;
   if (!key || !server) return { ok: false, reason_code: 'host-config-entry-invalid' };
+  const shape = hostConfigForEntry(entry)
+    ? resolvedHostConfigShape(hostConfigForEntry(entry))
+    : {
+      json_container_path: target.json_container_path || [...DEFAULT_JSON_CONTAINER_PATH],
+      server_representation: target.server_representation || DEFAULT_SERVER_REPRESENTATION,
+    };
   const secretCheck = containsLiteralSecrets(server);
   const secrets = collectRedactionValues(
-    isObject(server.env) ? server.env : {},
+    serverEnvironment(server),
     options.redactValues || [],
   );
   if (!secretCheck.ok) {
@@ -915,16 +1198,42 @@ function applyHostConfig(options = {}) {
     };
   }
 
-  const initial = inspectHostConfig({ entry, target });
+  const jsonDocumentPolicy = options.jsonDocumentPolicy || null;
+  const initial = inspectHostConfig({
+    entry,
+    target,
+    exactMatch: operation === 'remove',
+    jsonDocumentPolicy,
+    operation,
+  });
   if (!initial.ok && initial.reason_code !== 'host-config-conflict') return initial;
   if (operation === 'upsert' && initial.configured) {
-    return { ok: true, changed: false, reason_code: 'host-config-already-current', post_write_verified: true };
+    return {
+      ...initial,
+      ok: true,
+      changed: false,
+      reason_code: 'host-config-already-current',
+      post_write_verified: true,
+    };
   }
   if (operation === 'remove' && !initial.configured && !initial.conflict) {
     return { ok: true, changed: false, reason_code: 'host-config-entry-missing', post_write_verified: true };
   }
+  if (operation === 'remove' && initial.conflict) {
+    return {
+      ok: false,
+      changed: false,
+      reason_code: 'host-config-uninstall-conflict',
+      conflict_fields: initial.conflict_fields || [],
+    };
+  }
   if (operation === 'upsert' && initial.conflict && options.overwrite !== true) {
-    return { ok: false, reason_code: 'host-config-conflict' };
+    return { ...initial, ok: false, changed: false };
+  }
+  if (operation === 'upsert'
+    && initial.conflict
+    && String(initial.reason_code || '').startsWith('host-config-opencode-permission-')) {
+    return { ...initial, ok: false, changed: false };
   }
 
   const configDir = path.dirname(target.config_path);
@@ -958,13 +1267,38 @@ function applyHostConfig(options = {}) {
   };
   try {
     assertContainedMutationPath(target.config_path, target);
-    const refreshed = inspectHostConfig({ entry, target });
+    const refreshed = inspectHostConfig({
+      entry,
+      target,
+      exactMatch: operation === 'remove',
+      jsonDocumentPolicy,
+      operation,
+    });
     if (!refreshed.ok && refreshed.reason_code !== 'host-config-conflict') return rememberOutcome(refreshed);
     if (operation === 'upsert' && refreshed.configured) {
-      return rememberOutcome({ ok: true, changed: false, reason_code: 'host-config-already-current', post_write_verified: true });
+      return rememberOutcome({
+        ...refreshed,
+        ok: true,
+        changed: false,
+        reason_code: 'host-config-already-current',
+        post_write_verified: true,
+      });
     }
     if (operation === 'upsert' && refreshed.conflict && options.overwrite !== true) {
-      return rememberOutcome({ ok: false, reason_code: 'host-config-conflict' });
+      return rememberOutcome({ ...refreshed, ok: false, changed: false });
+    }
+    if (operation === 'upsert'
+      && refreshed.conflict
+      && String(refreshed.reason_code || '').startsWith('host-config-opencode-permission-')) {
+      return rememberOutcome({ ...refreshed, ok: false, changed: false });
+    }
+    if (operation === 'remove' && refreshed.conflict) {
+      return rememberOutcome({
+        ok: false,
+        changed: false,
+        reason_code: 'host-config-uninstall-conflict',
+        conflict_fields: refreshed.conflict_fields || [],
+      });
     }
 
     if (originalExists) {
@@ -979,10 +1313,18 @@ function applyHostConfig(options = {}) {
       key,
       server,
       operation,
+      jsonContainerPath: shape.json_container_path,
+      jsonDocumentPolicy,
     });
     if (!mutation.ok) return rememberOutcome(mutation);
     if (mutation.text === originalText) {
-      return rememberOutcome({ ok: true, changed: false, reason_code: 'host-config-already-current', post_write_verified: true });
+      return rememberOutcome({
+        ...mutation,
+        ok: true,
+        changed: false,
+        reason_code: 'host-config-already-current',
+        post_write_verified: true,
+      });
     }
 
     invokeFault(options.faultInjector, 'before-write-temp', { configPath: target.config_path });
@@ -1006,6 +1348,9 @@ function applyHostConfig(options = {}) {
       key,
       server,
       operation,
+      jsonContainerPath: shape.json_container_path,
+      serverRepresentation: shape.server_representation,
+      jsonDocumentPolicy,
     });
     if (!verified.ok) {
       const error = new Error(verified.reason_code || '写入后验证失败');
@@ -1016,6 +1361,7 @@ function applyHostConfig(options = {}) {
     lock.assertOwned('before-commit');
     if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
     return rememberOutcome({
+      ...verified,
       ok: true,
       changed: true,
       reason_code: operation === 'remove' ? 'host-config-removed' : 'host-config-updated',

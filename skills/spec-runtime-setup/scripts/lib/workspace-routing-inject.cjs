@@ -26,6 +26,7 @@ const HOST_ENTRY_FILE = Object.freeze({
   codex: 'AGENTS.md',
   cursor: 'AGENTS.md',
   kiro: 'AGENTS.md',
+  opencode: 'AGENTS.md',
   qoder: 'AGENTS.md',
 });
 

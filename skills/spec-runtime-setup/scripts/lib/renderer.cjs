@@ -222,6 +222,15 @@ function renderHumanSummary(
     if (Array.isArray(item.conflict_fields) && item.conflict_fields.length > 0) {
       lines.push(`  conflict_fields: ${item.conflict_fields.join(', ')}`);
     }
+    if (item.permission_status && item.permission_status !== 'not-applicable') {
+      const ruleCount = Number.isInteger(item.permission_rule_count)
+        ? ` rules=${item.permission_rule_count}`
+        : '';
+      const safeOverrides = Array.isArray(item.permission_safe_overrides)
+        ? ` safe_overrides=${item.permission_safe_overrides.length}`
+        : '';
+      lines.push(`  permission: ${item.permission_status}${ruleCount}${safeOverrides}`);
+    }
     if (item.blocking_path) {
       lines.push(`  blocking: ${item.blocking_path}${item.blocking_scope ? ` scope=${item.blocking_scope}` : ''}`);
     }

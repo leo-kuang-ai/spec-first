@@ -53,6 +53,9 @@ function knownDiagnosticMessage(code, messages) {
   if (code === 'qoder_hook_activation_unverified') {
     return messages.diagnosticQoderHookActivationUnverified;
   }
+  if (code === 'opencode_generated_runtime_preview') {
+    return messages.diagnosticOpenCodeGeneratedRuntimePreview;
+  }
   return '';
 }
 

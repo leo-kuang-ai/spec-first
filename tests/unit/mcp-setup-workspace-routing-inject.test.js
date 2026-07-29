@@ -17,7 +17,7 @@ function mkWorkspace() {
 describe('entryFilesForHosts — host → workspace entry file mapping', () => {
   test('claude → CLAUDE.md, others → AGENTS.md, deduped', () => {
     expect(entryFilesForHosts(['claude', 'codex']).sort()).toEqual(['AGENTS.md', 'CLAUDE.md']);
-    expect(entryFilesForHosts(['codex', 'cursor', 'kiro', 'qoder'])).toEqual(['AGENTS.md']);
+    expect(entryFilesForHosts(['codex', 'cursor', 'kiro', 'opencode', 'qoder'])).toEqual(['AGENTS.md']);
     expect(entryFilesForHosts(['claude'])).toEqual(['CLAUDE.md']);
   });
 });
@@ -63,12 +63,12 @@ describe('injectRoutingInstruction — upsert routing block into workspace entry
     expect(fs.existsSync(path.join(ws, 'CLAUDE.md'))).toBe(false);
   });
 
-  test('five-host injection renders the shared AGENTS block with Kiro/Qoder degradation', () => {
+  test('six-host injection renders the shared AGENTS block with Kiro/Qoder degradation', () => {
     const ws = mkWorkspace();
     const result = injectRoutingInstruction({
       workspaceRoot: ws,
       repos,
-      hosts: ['claude', 'codex', 'cursor', 'kiro', 'qoder'],
+      hosts: ['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder'],
     });
 
     expect(result.entries.map((entry) => entry.entry_file).sort()).toEqual(['AGENTS.md', 'CLAUDE.md']);

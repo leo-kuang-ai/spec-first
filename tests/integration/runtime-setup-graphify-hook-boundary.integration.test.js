@@ -52,7 +52,7 @@ function createFixture(label) {
 
 function realToolEnvironment(home) {
   const graphifyVersion = requireCommand('graphify').stdout.trim();
-  if (!graphifyVersion.includes('0.9.17')) throw new Error(`需要 graphify 0.9.17，实际为 ${graphifyVersion}`);
+  if (!graphifyVersion.includes('0.9.29')) throw new Error(`需要 graphify 0.9.29，实际为 ${graphifyVersion}`);
   requireCommand('codegraph');
   requireCommand('uv');
   const uvBin = run('uv', ['tool', 'dir', '--bin'], { timeout: 30000 });

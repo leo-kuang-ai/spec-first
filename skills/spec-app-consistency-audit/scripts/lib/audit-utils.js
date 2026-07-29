@@ -6,7 +6,15 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const TEXT_FILE_PATTERN = /\.(kt|kts|java|swift|m|mm|xml|json|ya?ml|gradle|properties|txt|md|strings)$/i;
-const APP_AUDIT_METADATA_HOSTS = Object.freeze(['unknown', 'claude', 'codex', 'cursor', 'kiro', 'qoder']);
+const APP_AUDIT_METADATA_HOSTS = Object.freeze([
+  'unknown',
+  'claude',
+  'codex',
+  'cursor',
+  'kiro',
+  'qoder',
+  'opencode',
+]);
 const GENERATED_OR_CONTROL_ROOTS = Object.freeze([
   '.agents',
   '.claude',
@@ -14,6 +22,7 @@ const GENERATED_OR_CONTROL_ROOTS = Object.freeze([
   '.cursor',
   '.git',
   '.kiro',
+  '.opencode',
   '.qoder',
   '.spec-first',
 ]);

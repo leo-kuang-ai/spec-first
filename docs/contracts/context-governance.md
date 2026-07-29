@@ -46,12 +46,18 @@
 | `.qoder/hooks/prd-prewrite-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed PreToolUse PRD guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
 | `.qoder/hooks/prd-readiness-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed Stop PRD readiness guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
 | `.qoder/settings.local.json` | `host_local_config_excluded` | Qoder local MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --qoder` 保留整文件，server entry 由 setup/uninstall 路径管理 |
+| `.opencode/commands/spec/**` | `generated_runtime_mirror_excluded` | OpenCode generated workflow command runtime mirror |
+| `.opencode/skills/**` | `generated_runtime_mirror_excluded` | OpenCode generated Agent Skills runtime mirror |
+| `.opencode/spec-first/**` | `generated_runtime_mirror_excluded` | OpenCode spec-first managed state/runtime facts |
+| `opencode.json` / `opencode.jsonc` | `host_local_config_excluded` | OpenCode project config 是 mixed-ownership host config，不是 spec-first source truth；普通 context 默认排除，runtime/setup task 可按精确路径读取，clean/uninstall 只删除仍匹配 expected value 的 managed entries |
 
 `.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它；不得把 `.kiro/**` blanket 排除或 blanket 纳入 source context。
 
 `.cursor/rules/**`、`.cursor/agents/**` 和未知 `.cursor/**` host-native/user-owned surface 不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.cursor/**` blanket 排除或 blanket 纳入 source context。
 
 `.qoder/rules/**`、`.qoder/settings.json` 和未知 `.qoder/hooks/**` 是 Qoder-native/user-owned surface，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.qoder/**` blanket 排除或 blanket 纳入 source context。例外是上表列出的三个 spec-first managed Qoder hook scripts：它们是 runtime hook outputs，默认上下文排除。
+
+`.opencode/agents/**`、未被 spec-first 命名空间覆盖的 `.opencode/**` 与 `opencode.json` / `opencode.jsonc` 中的非 managed fields 是 OpenCode-native/user-owned surface。不得 blanket 删除、覆盖或提升为 spec-first source；只有用户、上游 artifact 或 runtime/setup task 显式命名时才读取。
 
 普通 workflow 仍可读取 checked-in source truth，例如 `skills/`、`agents/`、`templates/`、`src/cli/`、`docs/contracts/`、`AGENTS.md`、`CLAUDE.md`、`README*` 和当前任务直接相关的源码、测试、计划或需求文档。
 

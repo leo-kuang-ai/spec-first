@@ -20,8 +20,6 @@ const SOURCE_DIRECTORIES = {
   agents: 'agents',
 };
 const BUNDLED_AGENT_SOURCE_DIRECTORY = 'agents';
-const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
-const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
 const ENTRY_SURFACES = new Set(['workflow_command', 'standalone_skill', 'internal_only']);
 const HOST_SCOPES = new Set(['dual_host', 'host_exclusive', 'target_host_maintenance']);
 const HOST_DELIVERIES = new Set(['command', 'skill', 'internal', 'none']);
@@ -218,13 +216,9 @@ function loadSkillsGovernance() {
         command_name: record.command_name,
         host_scope: record.host_scope,
         owner_host: record.owner_host,
-        host_delivery: {
-          claude: record.host_delivery.claude,
-          codex: record.host_delivery.codex,
-          cursor: record.host_delivery.cursor,
-          kiro: record.host_delivery.kiro,
-          qoder: record.host_delivery.qoder,
-        },
+        host_delivery: Object.fromEntries(
+          getSupportedPlatformIds().map((platform) => [platform, record.host_delivery[platform]]),
+        ),
         ...(record.legacy_aliases
           ? {
             legacy_aliases: {
@@ -258,6 +252,8 @@ function validateSkillsGovernance(governance) {
   const manifest = loadPluginManifest();
   const bundledSkills = listBundledSkills();
   const manifestCommandBySkill = new Map(manifest.commands.map((command) => [command.skill, command.name]));
+  const supportedPlatformIds = getSupportedPlatformIds();
+  const supportedPlatforms = new Set(supportedPlatformIds);
   const seen = new Set();
 
   for (const [index, record] of governance.skills.entries()) {
@@ -292,10 +288,16 @@ function validateSkillsGovernance(governance) {
       throw new Error(`${prefix} is missing host_delivery.`);
     }
 
-    for (const platform of SUPPORTED_PLATFORM_IDS) {
+    for (const platform of supportedPlatformIds) {
       if (!HOST_DELIVERIES.has(record.host_delivery[platform])) {
         throw new Error(`${prefix} has invalid host_delivery.${platform}="${record.host_delivery[platform]}".`);
       }
+    }
+
+    const unknownDeliveryPlatforms = Object.keys(record.host_delivery)
+      .filter((platform) => !supportedPlatforms.has(platform));
+    if (unknownDeliveryPlatforms.length > 0) {
+      throw new Error(`${prefix} has unsupported host_delivery platforms: ${unknownDeliveryPlatforms.join(', ')}.`);
     }
 
     const manifestCommandName = manifestCommandBySkill.get(record.skill_name) || null;
@@ -321,7 +323,7 @@ function validateSkillsGovernance(governance) {
       }
 
       if (record.entry_surface === 'standalone_skill') {
-        for (const platform of SUPPORTED_PLATFORM_IDS) {
+        for (const platform of supportedPlatformIds) {
           if (record.host_delivery[platform] === 'command') {
             throw new Error(`${prefix} cannot deliver standalone skill "${record.skill_name}" as a command.`);
           }
@@ -330,7 +332,7 @@ function validateSkillsGovernance(governance) {
     }
 
     if (record.entry_surface === 'internal_only') {
-      for (const platform of SUPPORTED_PLATFORM_IDS) {
+      for (const platform of supportedPlatformIds) {
         if (record.host_delivery[platform] === 'command' || record.host_delivery[platform] === 'skill') {
           throw new Error(`${prefix} cannot expose internal_only skill "${record.skill_name}" as a user-visible delivery.`);
         }
@@ -344,7 +346,7 @@ function validateSkillsGovernance(governance) {
         throw new Error(`${prefix} must set owner_host=null for dual_host skills.`);
       }
 
-      for (const platform of SUPPORTED_PLATFORM_IDS) {
+      for (const platform of supportedPlatformIds) {
         if (record.host_delivery[platform] === 'none' || record.host_delivery[platform] === 'internal') {
           throw new Error(`${prefix} must deliver dual_host skill "${record.skill_name}" to ${platform}.`);
         }
@@ -352,11 +354,11 @@ function validateSkillsGovernance(governance) {
     }
 
     if (record.host_scope === 'host_exclusive') {
-      if (!SUPPORTED_PLATFORMS.has(record.owner_host)) {
+      if (!supportedPlatforms.has(record.owner_host)) {
         throw new Error(`${prefix} must set owner_host for host_exclusive skills.`);
       }
 
-      const activePlatforms = SUPPORTED_PLATFORM_IDS.filter((platform) => (
+      const activePlatforms = supportedPlatformIds.filter((platform) => (
         record.host_delivery[platform] !== 'none' && record.host_delivery[platform] !== 'internal'
       ));
 
@@ -368,11 +370,11 @@ function validateSkillsGovernance(governance) {
     }
 
     if (record.host_scope === 'target_host_maintenance') {
-      if (!SUPPORTED_PLATFORMS.has(record.owner_host)) {
+      if (!supportedPlatforms.has(record.owner_host)) {
         throw new Error(`${prefix} must set owner_host for target_host_maintenance skills.`);
       }
 
-      const activePlatforms = SUPPORTED_PLATFORM_IDS.filter((platform) => (
+      const activePlatforms = supportedPlatformIds.filter((platform) => (
         record.host_delivery[platform] !== 'none' && record.host_delivery[platform] !== 'internal'
       ));
 
@@ -434,6 +436,11 @@ function validateSkillsGovernance(governance) {
   if (missingSkills.length > 0) {
     throw new Error(`Bundled skills governance truth source is missing skills: ${missingSkills.join(', ')}`);
   }
+}
+
+function getSupportedPlatformIds() {
+  const { getSupportedPlatforms } = require('./adapters');
+  return getSupportedPlatforms();
 }
 
 function listBundledCommands() {

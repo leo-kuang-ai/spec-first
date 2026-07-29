@@ -68,7 +68,7 @@ function expectRegistryError(mutator, code) {
   }
 }
 
-describe('spec-runtime-setup registry v8', () => {
+describe('spec-runtime-setup registry v9', () => {
   test('detects WSL from the real Linux runtime signals', () => {
     expect(detectRuntimePlatform({
       platform: 'linux',
@@ -90,7 +90,7 @@ describe('spec-runtime-setup registry v8', () => {
   test('matches the captured legacy inventory while retiring the jq helper', () => {
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v8');
+    expect(registry.schema_version).toBe('setup-registry.v9');
     expect(registry.install_mirrors).toEqual({
       npm: {
         endpoint: 'https://registry.npmmirror.com',
@@ -105,14 +105,14 @@ describe('spec-runtime-setup registry v8', () => {
         id: 'codegraph',
         ecosystem: 'npm',
         package: '@colbymchenry/codegraph',
-        version: '1.4.1',
+        version: '1.5.0',
         command: 'codegraph',
       },
       {
         id: 'graphify',
         ecosystem: 'pypi',
         package: 'graphifyy',
-        version: '0.9.17',
+        version: '0.9.29',
         command: 'graphify',
         python: {
           requires: '>=3.10',
@@ -123,8 +123,8 @@ describe('spec-runtime-setup registry v8', () => {
           plain_pip_allowed: false,
         },
         distribution: {
-          wheel_url: 'https://files.pythonhosted.org/packages/39/37/a28af8342d78d322511b6307fac2760ca7b9b3c859fa2dcfbaf7c4b5ddf9/graphifyy-0.9.17-py3-none-any.whl',
-          sha256: 'ef60768aaee7e315d2e2d7da89e971bc1f445f5c8d73ebe4fed550e40a1d687e',
+          wheel_url: 'https://files.pythonhosted.org/packages/f1/b1/0cbe4738ca9784850d40aae0d71c34547230e0445e52067f98b8d0b6c070/graphifyy-0.9.29-py3-none-any.whl',
+          sha256: '143f4002f40d5c302ae43bd58487ad604191f2d0ac8216429894c6a913ecf27b',
           index_url: 'https://pypi.org/simple',
         },
         hook_normalization_contract: 'graphify-python-hook-normalization.v1',
@@ -160,7 +160,7 @@ describe('spec-runtime-setup registry v8', () => {
 
   test('keeps complete host and artifact contracts at the top level', () => {
     const registry = loadRegistry({ skillRoot });
-    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'qoder']);
+    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
     for (const host of Object.values(registry.hosts)) {
       expect(host.defaults.tool.host_config.targets).toBeDefined();
       expect(host.defaults.tool.host_config.fallback_order).toBeDefined();
@@ -218,6 +218,50 @@ describe('spec-runtime-setup registry v8', () => {
     }
   });
 
+  test('declares the OpenCode native config container, representation, targets, and tool entries', () => {
+    const registry = loadRegistry({ skillRoot });
+    const effective = getEffectiveRegistry(registry, { host: 'opencode', platform: 'macos' });
+    const context7 = byId(effective.tools).context7;
+
+    expect(effective.host_definition.host_config).toMatchObject({
+      scope: 'project',
+      json_container_path: ['mcp'],
+      server_representation: 'opencode-local',
+      permission_policy: { kind: 'opencode-governed-assets-v1' },
+      fallback_order: ['project'],
+      uninstall_targets: ['project', 'user'],
+      targets: {
+        project: {
+          config_path: 'opencode.json',
+          config_format: 'json',
+          precedence: 100,
+          precedence_guards: [expect.objectContaining({
+            config_path: 'opencode.jsonc',
+            config_format: 'jsonc',
+            precedence: 110,
+          })],
+        },
+        user: {
+          config_path: '${XDG_CONFIG_HOME}/opencode/opencode.json',
+          precedence: 50,
+          requires_user_scope_opt_in: true,
+          precedence_guards: [expect.objectContaining({
+            config_path: '${XDG_CONFIG_HOME}/opencode/opencode.jsonc',
+            config_format: 'jsonc',
+            precedence: 60,
+          })],
+        },
+      },
+    });
+    expect(context7.host_config).toMatchObject({
+      command: 'npx',
+      args: ['-y', '@upstash/context7-mcp@latest'],
+      json_container_path: ['mcp'],
+      server_representation: 'opencode-local',
+      permission_policy: { kind: 'opencode-governed-assets-v1' },
+    });
+  });
+
   test('builds a host-neutral diagnostic registry while preserving platform overrides', () => {
     const registry = loadRegistry({ skillRoot });
     const linux = getDiagnosticRegistry(registry, { platform: 'linux' });
@@ -227,6 +271,8 @@ describe('spec-runtime-setup registry v8', () => {
     expect(linux).not.toHaveProperty('host_definition');
     expect(linux.tools.every((entry) => entry.host_config === undefined)).toBe(true);
     expect(byId(linux.helpers)['agent-browser'].installation.command).toContain('CI=true npm install');
+    expect(byId(linux.helpers)['agent-browser'].usage_note).toContain('dependency 安装状态与 browser execution readiness');
+    expect(byId(linux.helpers)['agent-browser'].usage_note).toContain('Spec-First controlled exact-origin conformance passed');
     expect(byId(windows.helpers)['agent-browser'].installation.command).toContain("$env:CI='true'");
   });
 
@@ -275,6 +321,26 @@ describe('spec-runtime-setup registry v8', () => {
     }, 'registry_null_not_allowed');
     expectRegistryError((registry) => {
       delete registry.install_mirrors.npm.environment.NPM_CONFIG_REGISTRY;
+    }, 'registry_schema_invalid');
+    expectRegistryError((registry) => {
+      registry.hosts.opencode.defaults.tool.host_config.json_container_path = [];
+    }, 'registry_schema_invalid');
+    expectRegistryError((registry) => {
+      registry.hosts.opencode.defaults.tool.host_config.server_representation = 'unknown';
+    }, 'registry_schema_invalid');
+    expectRegistryError((registry) => {
+      registry.hosts.opencode.defaults.tool.host_config.permission_policy.kind = 'global-permission-dsl';
+    }, 'registry_schema_invalid');
+    expectRegistryError((registry) => {
+      delete registry.hosts.opencode.defaults.tool.host_config.permission_policy;
+    }, 'registry_opencode_permission_policy_invalid_owner');
+    expectRegistryError((registry) => {
+      registry.hosts.codex.defaults.tool.host_config.permission_policy = {
+        kind: 'opencode-governed-assets-v1',
+      };
+    }, 'registry_opencode_permission_policy_invalid_owner');
+    expectRegistryError((registry) => {
+      registry.hosts.opencode.defaults.tool.host_config.targets = {};
     }, 'registry_schema_invalid');
   });
 

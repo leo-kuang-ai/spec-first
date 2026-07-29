@@ -334,10 +334,10 @@ describe('init run-level global developer prerequisite', () => {
     expect(output).not.toContain('全局 developer profile');
   });
 
-  test('prints one compact run-level receipt for a five-host apply', () => {
+  test('prints one compact run-level receipt for a six-host apply', () => {
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-output-'));
-    const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
+    const platforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder', 'opencode'];
     const plans = platforms.map((platform) => ({
       platform,
       projectRoot,
@@ -380,8 +380,8 @@ describe('init run-level global developer prerequisite', () => {
     const output = logSpy.mock.calls.flat().join('\n');
     const lines = output.split('\n').filter(Boolean);
     expect(lines.length).toBeLessThanOrEqual(15);
-    expect(output).toContain('Init complete: 5/5 hosts ready');
-    for (const label of ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder']) {
+    expect(output).toContain('Init complete: 6/6 hosts ready');
+    for (const label of ['Claude Code', 'Codex', 'Cursor', 'Kiro', 'Qoder', 'OpenCode']) {
       expect(output.match(new RegExp(`${label}:`, 'g')) || []).toHaveLength(1);
     }
     expect(output.match(/Global developer profile:/g) || []).toHaveLength(1);

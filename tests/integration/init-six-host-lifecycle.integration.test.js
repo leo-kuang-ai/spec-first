@@ -49,7 +49,7 @@ const pointerPlatforms = getSupportedPlatforms().filter((platform) =>
   Boolean(getAdapter(platform).pointerPath)
 );
 
-describe('five-host init lifecycle', () => {
+describe('six-host init lifecycle', () => {
   test.each(getSupportedPlatforms())(
     '%s fresh init is self-consistent and immediately idempotent',
     (platform) => {
@@ -96,6 +96,24 @@ describe('five-host init lifecycle', () => {
           relativePath,
         ))).toBe(true);
       }
+      const runtimeSetupExecutor = path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-runtime-setup',
+        'scripts',
+        'lib',
+        'installation-executor.cjs',
+      );
+      expect(fs.existsSync(runtimeSetupExecutor)).toBe(true);
+      const { resolveAgentBrowserProbePath } = require(runtimeSetupExecutor);
+      expect(resolveAgentBrowserProbePath()).toBe(fs.realpathSync.native(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'spec-test-browser',
+        'scripts',
+        'agent-browser-run-context.cjs',
+      )));
+      expect(fs.existsSync(resolveAgentBrowserProbePath())).toBe(true);
       for (const relativePath of [
         'references/browser-runtime-profile.schema.json',
         'references/browser-runtime-profile.example.json',
@@ -280,7 +298,7 @@ describe('five-host init lifecycle', () => {
     120000,
   );
 
-  test('same-project five-host init stays coherent and removes stale maintainer-only assets', () => {
+  test('same-project six-host init stays coherent and removes stale maintainer-only assets', () => {
     const sandbox = tempSandbox('all-hosts-coexistence');
     const initArgs = [
       'init',
@@ -357,7 +375,7 @@ describe('five-host init lifecycle', () => {
     }
   }, 120000);
 
-  test('five-host init ignores generated runtime while keeping project-owned host files visible', () => {
+  test('six-host init ignores generated runtime while keeping project-owned host files visible', () => {
     const sandbox = tempSandbox('all-hosts-gitignore');
     const gitInit = spawnSync('git', ['init', '-q'], {
       cwd: sandbox.projectRoot,
@@ -434,6 +452,7 @@ describe('five-host init lifecycle', () => {
       '.cursor/spec-first/state.json',
       '.kiro/spec-first/state.json',
       '.qoder/spec-first/state.json',
+      '.opencode/spec-first/state.json',
     ]) {
       const ignored = spawnSync('git', ['check-ignore', '-q', '--', generatedPath], {
         cwd: sandbox.projectRoot,

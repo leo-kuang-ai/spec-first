@@ -3,6 +3,7 @@ const CodexAdapter = require('./codex');
 const CursorAdapter = require('./cursor');
 const KiroAdapter = require('./kiro');
 const QoderAdapter = require('./qoder');
+const OpenCodeAdapter = require('./opencode');
 
 const adapters = {
   claude: new ClaudeAdapter(),
@@ -10,11 +11,12 @@ const adapters = {
   cursor: new CursorAdapter(),
   kiro: new KiroAdapter(),
   qoder: new QoderAdapter(),
+  opencode: new OpenCodeAdapter(),
 };
 
 /**
  * Get platform adapter by ID
- * @param {string} platformId - Platform identifier ('claude', 'codex', 'cursor', 'kiro', or 'qoder')
+ * @param {string} platformId - Platform identifier
  * @returns {PlatformAdapter} Platform adapter instance
  * @throws {Error} If platform is unknown
  */

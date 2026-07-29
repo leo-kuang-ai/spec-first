@@ -17,6 +17,7 @@ const HOST_CLI_COMMANDS = Object.freeze({
   codex: ['codex'],
   cursor: ['agent'],
   kiro: ['kiro'],
+  opencode: ['opencode'],
   qoder: ['qodercli', 'qoder'],
 });
 

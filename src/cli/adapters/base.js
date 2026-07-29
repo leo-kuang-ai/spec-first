@@ -47,6 +47,18 @@ class PlatformAdapter {
     return true;
   }
 
+  get supportState() {
+    return 'active';
+  }
+
+  get evidenceClaim() {
+    return null;
+  }
+
+  get testedVersions() {
+    return [];
+  }
+
   /**
    * Skills directory path (user-visible standalone skills only)
    */

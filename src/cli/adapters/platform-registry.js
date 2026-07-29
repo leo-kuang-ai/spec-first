@@ -140,6 +140,23 @@ const PLATFORM_REGISTRY = {
       },
     },
   },
+  opencode: {
+    runtimeRoot: '.opencode',
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.opencode/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.opencode/skills/', ownership: 'generated-runtime' },
+      workflowsRoot: { kind: 'dir', path: '.opencode/skills/', ownership: 'generated-runtime' },
+      agentsRoot: { kind: 'dir', path: '.opencode/agents/', ownership: 'generated-runtime' },
+      commandFiles: { kind: 'glob', path: '.opencode/commands/spec/*.md', ownership: 'generated-runtime' },
+      projectConfig: { kind: 'file', path: 'opencode.json', ownership: 'host-local', rewriteExclude: true },
+      projectConfigJsonc: { kind: 'file', path: 'opencode.jsonc', ownership: 'host-local', rewriteExclude: true },
+    },
+    capabilities: {
+      hooks: {
+        shellCommand: { status: 'not-supported', reasonCode: 'spec-first-scope' },
+      },
+    },
+  },
 };
 
 function widenDelta(platform, fixture, candidatePath, reasonCode, ownership = 'generated-runtime') {

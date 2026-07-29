@@ -100,7 +100,7 @@ Source-of-truth 路径包括：
 - `CHANGELOG.md`
 - `package.json`
 
-其中 `CLAUDE.md` 与 `AGENTS.md` 是 checked-in host 入口文档；其中的 spec-first managed blocks 是受生成规则管理的 source slice，不等同于 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` runtime mirror 或 managed slice。
+其中 `CLAUDE.md` 与 `AGENTS.md` 是 checked-in host 入口文档；其中的 spec-first managed blocks 是受生成规则管理的 source slice，不等同于 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`、`.opencode/` runtime mirror 或 managed slice。
 
 Generated runtime / host-local runtime surfaces 包括：
 
@@ -125,6 +125,10 @@ Generated runtime / host-local runtime surfaces 包括：
 - `.qoder/rules/spec-first.md`
 - `.qoder/settings.local.json`
 - `.qoder/settings.json` 中的 spec-first managed hook entries
+- `.opencode/commands/spec/`
+- `.opencode/skills/`
+- `.opencode/spec-first/`
+- `opencode.json` / `opencode.jsonc` 中由 Runtime Setup 管理的 exact entries
 
 优先修改 source，不手改 generated runtime assets 来强制修复。source 变更后需要修复 runtime drift 时，使用 `spec-first init`。source 与 runtime 不一致时，先确认 source-of-truth，再检查 generator，最后修 source 或生成逻辑。
 
@@ -142,7 +146,7 @@ Generated runtime / host-local runtime surfaces 包括：
 - `vendor/`：vendored parser dependencies
 - `tests/unit/`、`tests/smoke/`、`tests/integration/`：分层测试（integration 由 Jest 集成测试承载，无独立 `tests/e2e/` 目录）
 
-不要把 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 下的 generated runtime mirror 或 managed slice 当作 source。
+不要把 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`、`.opencode/` 下的 generated runtime mirror 或 managed slice 当作 source。
 
 ## 常用命令
 

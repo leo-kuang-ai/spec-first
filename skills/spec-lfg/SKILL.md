@@ -97,8 +97,8 @@ dev-server default. An empty, malformed, or repeated modifier records
    record `not_run / browser-mutation-authorization-required`, do not write the
    blocked step, and do not continue to lifecycle or landing actions.
 
-   Consume the browser result item by item: origin provenance, wrapper probe `status`/`reason_code`,
-   `capabilities.exact_origin_confirmed`, every route/step status, `action_process_calls`, browser cleanup `status`/`reason_code`,
+   Consume the browser result item by item: origin provenance, wrapper probe `status`/`execution_readiness`/`reason_code`,
+   `capabilities.exact_origin_confirmed`/`exact_origin_evidence`, `conformance_status`, `repair_scope`, `next_action`, every route/step status, `action_process_calls`, browser cleanup `status`/`reason_code`,
    private evidence refs, and limitations. A wrapper, pipeline, applicable
    capability, browser cleanup, or result that is `not_supported`, `not_run`,
    `failed`, missing, or indeterminate is a diagnostic blocker with its returned

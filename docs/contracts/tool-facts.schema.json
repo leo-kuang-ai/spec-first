@@ -59,7 +59,13 @@
         "reason_code": { "type": "string" },
         "installed": { "type": "boolean" },
         "missing_dependency_reason": { "type": ["string", "null"] },
-        "next_action": { "type": "string" }
+        "next_action": { "type": "string" },
+        "capability_status": { "type": "string" },
+        "execution_readiness": { "type": "string" },
+        "conformance_status": { "type": "string" },
+        "repair_scope": { "type": "string" },
+        "capabilities": { "type": "object", "additionalProperties": true },
+        "provider_version": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     },

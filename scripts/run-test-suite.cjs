@@ -16,6 +16,7 @@ const MCP_SETUP_TEST_PATHS = Object.freeze([
   'tests/unit/mcp-setup-host-config.test.js',
   'tests/unit/mcp-setup-mode-target.test.js',
   'tests/unit/mcp-setup-node-contracts.test.js',
+  'tests/unit/mcp-setup-opencode-permissions.test.js',
   'tests/unit/mcp-setup-powershell-contracts.test.js',
   'tests/unit/mcp-setup-preflight.test.js',
   'tests/unit/mcp-setup-process-runner.test.js',
