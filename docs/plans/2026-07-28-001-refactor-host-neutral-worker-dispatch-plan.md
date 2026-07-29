@@ -8,13 +8,15 @@ artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
 execution: code
-status: active
+status: completed
+completed_at: 2026-07-29
 plan_depth: deep
 deepened: 2026-07-29
 origin: docs/plans/2026-07-27-001-feat-opencode-host-support-plan.md
 claim_status: closed
 claim_closed_at: 2026-07-29T15:12Z
-claim_evidence: 3 re-captured journeys pass validator set validation (0 errors) — Claude Agent 2.1.220 positive + Codex collaboration.spawn_agent 0.145.0 positive + Claude required-isolation degraded. spec_first_revision: git:eff20454.
+claim_evidence: 3 re-captured journeys pass validator set semantic validation (0 errors) — Claude Agent 2.1.220 positive + Codex collaboration.spawn_agent 0.145.0 positive + Claude required-isolation degraded.
+claim_known_limitation: spec_first_revision locked to git:eff20454; validator sourceIdentity() returns current HEAD (d6317a8b) — 1-commit drift caused by journey artifact self-reference. Semantic validation unaffected.
 ---
 
 # Host-Neutral Worker Dispatch - Plan
