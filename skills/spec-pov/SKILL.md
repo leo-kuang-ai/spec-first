@@ -24,8 +24,8 @@ When you must ask the user a question, use the platform's blocking question tool
 
 Dispatch is tiered by task shape, never hardcoded to a model name:
 
-- **Extraction tier** — the project-grounding scout and the precedent-&-activity scout: search-and-quote work. Use the platform's cheapest capable model when the harness exposes a known override; otherwise inherit.
-- **Generation tier** — the external-evidence researcher: web/docs retrieval and entailment checking. Use the platform's mid-tier model when a known override exists; otherwise inherit.
+- **Extraction tier** — the project-grounding scout and the precedent-&-activity scout: search-and-quote work. Request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit.
+- **Generation tier** — the external-evidence researcher: web/docs retrieval and entailment checking. Request the balanced mid-tier only when `worker_model_override: supported`; otherwise inherit.
 - **Ceiling tier** — the verdict reasoning itself (the two-floor gate, the skeptic synthesis, the verdict contract). This runs in the main conversation on the orchestrator's model; nothing is dispatched for it.
 
 ## Dispatch Authorization Boundary
@@ -34,12 +34,16 @@ Dispatch is tiered by task shape, never hardcoded to a model name:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。POV tier、外部链接、tool availability、权限设置或需要满足 two floors 都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时采用 bounded inline 或 serial grounding 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。The inline path must not claim independent scout coverage、fresh-context skepticism 或 multi-agent evidence；它只能声明 orchestrator 自身完成了有界的多 lens 核验。
+`workflow invocation does not authorize dispatch`。POV tier、外部链接、tool availability、权限设置或需要满足 two floors 都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，采用 bounded inline 或 serial grounding 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均使用同一 fallback。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。The inline path must not claim independent scout coverage、fresh-context skepticism 或 multi-agent evidence；它只能声明 orchestrator 自身完成了有界的多 lens 核验。
 
-**Degradation rule.** When authorized dispatch exists but the platform cannot select per-agent models, dispatch scouts on the inherited model and keep their read budgets. Otherwise use the bounded inline fallback with the same evidence budgets and the claim limitation above.
+**Degradation rule.** When authorized dispatch exists but `worker_model_override` is unsupported or unknown, dispatch scouts on the inherited model and keep their read budgets. When dispatch capability is missing or unknown, use the bounded inline fallback with the same evidence budgets and the claim limitation above.
 
 ## Execution Flow
 

@@ -7,7 +7,7 @@ artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
 execution: code
-status: active
+status: completed
 plan_depth: deep
 deepened: 2026-07-28
 origin: docs/plans/2026-07-27-001-feat-opencode-host-support-plan.md

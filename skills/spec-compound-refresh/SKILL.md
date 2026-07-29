@@ -295,10 +295,14 @@ Before any investigation or replacement dispatch, record:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发；headless mode、scope size、permission settings 或本 Skill 被调用都不是授权。缺授权时使用 main-thread/serial fallback 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Inline fallback 不得声称 independent investigation coverage。
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发；headless mode、scope size、permission settings 或本 Skill 被调用都不是授权。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，使用 main-thread/serial fallback 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均使用同一 fallback。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Inline fallback 不得声称 independent investigation coverage。
 
 When dispatch is authorized and available, use subagents for context isolation when investigating multiple artifacts — not just because the task sounds complex. Otherwise choose the matching main-thread or serial approach with the same evidence contract:
 

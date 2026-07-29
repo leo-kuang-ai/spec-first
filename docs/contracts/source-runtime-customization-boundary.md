@@ -106,6 +106,19 @@ The LLM decides:
 
 Advisory facts are not confirmed truth.
 
+### Worker Dispatch Ownership Boundary
+
+Worker behavior is project-owned at the semantic layer and host-owned at the execution layer:
+
+- canonical `skills/**` own dispatch intent, the bounded task packet, six independent authorization surfaces, mutation scope/ref, output contract, stop condition, fallback, and claim limit;
+- the active host session tool registry/schema owns primitive identity, arguments, and availability-to-attempt, and enters the workflow only as allowlisted, redacted, length-bounded `provider_untrusted` quoted evidence after dispatch authorization exists;
+- the live call response plus caller-observed pre/post state own permission, capacity, context/workspace isolation, model override, parallelism, output validity, and actual mutation outcome;
+- dated journey evidence owns only its exact host/tool/spec-first version claim, limitations, freshness, and invalidation conditions.
+
+Primitive names, host-to-tool mappings, and host-specific model identifiers must not be added to canonical Skill selection prose, `PlatformAdapter` state, project state, generated projection, or fallback manifests. `PlatformAdapter.supportsAgents` is only a static bundled agent-profile projection fact. CLI help, provider docs, fixtures, cached tool lists, historical transcripts, source scans, and model self-description cannot establish current-session capability or live outcome.
+
+When authorization is missing, do not probe: record `capability_probe: not_applicable` and `worker_dispatch_capability: unknown`. After authorization, current-session inspection may produce `attempted + available|missing|unknown`; no reliable discovery surface produces `unavailable + unknown`. Missing/unknown capability falls back inline or serially with the canonical reason code, and any gate that requires isolation, valid output, or confirmed mutation remains open until live evidence closes it. The semantic owner is [`docs/contracts/workflows/worker-dispatch-capability.md`](workflows/worker-dispatch-capability.md).
+
 ### Graphify Git Hook Mutation Boundary
 
 `spec-first` 是在当前开发项目内运行的项目级产品。Runtime Setup 可以读取 Git 的有效路径事实来判断环境，但 Graphify hook mutation authority 只覆盖当前项目根内的目标：

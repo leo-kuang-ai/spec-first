@@ -309,17 +309,6 @@ function transformCodexContent(content) {
   let transformed = content;
 
   transformed = transformed.replace(
-    /^(\s*-?\s*)Task\s+(spec-[a-z0-9-]+)\((.*)\)\s*$/gm,
-    (_match, prefix, agentName, args) => {
-      const summary = args.trim();
-      const agentPath = `.codex/agents/${agentName}.agent.md`;
-      return summary
-        ? `${prefix}Dispatch \`${agentPath}\` with \`spawn_agent\` when Codex dispatch is available; fallback: read the profile and apply it inline in the current agent only when \`spawn_agent\` is unavailable, explicitly disabled, or unsafe. Task: ${summary}`
-        : `${prefix}Dispatch \`${agentPath}\` with \`spawn_agent\` when Codex dispatch is available; fallback: read the profile and apply it inline in the current agent only when \`spawn_agent\` is unavailable, explicitly disabled, or unsafe.`;
-    },
-  );
-
-  transformed = transformed.replace(
     bundledAgentReferencePattern(),
     (_match, agentName) => `\`.codex/agents/${agentName}.agent.md\``,
   );

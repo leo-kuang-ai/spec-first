@@ -26,11 +26,11 @@ If no authorized callable non-default engine is confirmed, continue inline (or w
 
 ## Step 1: Probe Runtime Capability And Authorization
 
-An engine is usable only when the current runtime exposes a callable primitive and the current user/upstream handoff explicitly selected or authorized that non-default engine. Use runtime capability facts; documentation, a command name, or a host label is not a probe. Host examples are advisory and never promise current availability, isolation, merge behavior, or tail ownership.
+An engine is usable only when the current user/upstream handoff explicitly selected or authorized that non-default engine and its current-session semantic capability is available. Use runtime capability facts; documentation, a command name, or a host label is not a probe. Host examples are advisory and never promise current availability, isolation, merge behavior, or tail ownership.
 
 | Engine | Usable when | Conservative fallback |
 |---|---|---|
-| **Inline / worker** | Inline is always available. Worker dispatch additionally requires explicit `worker_dispatch_authorization` plus a callable primitive. | Inline, with the missing authorization/capability reason recorded. |
+| **Inline / worker** | Inline is always available. Worker dispatch additionally requires `worker_dispatch_authorization: authorized` plus current-session `worker_dispatch_capability: available`. | Inline with `dispatch_authorization_missing`, `subagent_capability_missing`, or `worker_capability_unproven`, as resolved by the shared boundary. |
 | **Goal-mode** | The runtime exposes a callable goal primitive and the user/upstream selected goal-mode. | Continue the current `spec-work` run inline; do not create a persistent goal implicitly. |
 | **Dynamic-workflow** | The runtime exposes a callable orchestration primitive with structured checkpoints/returns and the user/upstream selected it. | Inline/authorized workers; do not emit or invoke a workflow merely because a prompt syntax exists. |
 

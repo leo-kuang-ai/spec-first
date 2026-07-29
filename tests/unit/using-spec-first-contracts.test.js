@@ -100,7 +100,8 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(fs.existsSync(boundaryPath)).toBe(true);
     expect(boundary).toContain('## Runtime Maintenance');
     expect(boundary).toContain('## Scenario Fingerprints');
-    expect(boundary).toContain('## Codex Dispatch And Startup Reminder');
+    expect(boundary).toContain('## Worker Dispatch');
+    expect(boundary).toContain('## Codex Startup Reminder');
     expect(boundary).toContain('## Parent Multi-Repo Scope');
     expect(boundary).toContain('## Handoff And Knowledge Promotion');
     expect(boundary).toContain('## Ordinary Context Exclusions');
@@ -113,6 +114,10 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(boundary).toContain('routing-policy source of truth');
     expect(boundary).toContain('Advisory facts cannot support');
     expect(boundary).toContain('dispatch_authorization_missing');
+    expect(boundary).toContain('capability_probe=not_applicable');
+    expect(boundary).toContain('worker_dispatch_capability=unknown');
+    expect(boundary).toContain('provider_untrusted');
+    expect(boundary).toContain('tool visibility');
     expect(boundary).toContain('target_repo');
     expect(boundary).toContain('routing match alone never authorizes');
     for (const handoffCue of ['summary', 'source refs', 'freshness', 'limitations']) {

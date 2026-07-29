@@ -98,7 +98,7 @@ The orchestrator **does not investigate findings** (no pre-read of cited files t
 
 ### Dispatch decision
 
-After eligibility filtering, use `references/execution-strategy.md` dispatch facts. Explicit worker dispatch authorization and a callable primitive are both required. Permission settings are not dispatch authorization.
+After eligibility filtering, use `references/execution-strategy.md` dispatch facts. `worker_dispatch_authorization: authorized` and current-session `worker_dispatch_capability: available` are both required. Permission settings are not dispatch authorization; use `worker_capability_unproven` when discovery is unavailable, incomplete, or ambiguous.
 
 - authorization + capability present -> use batched fix workers under the isolation/contention rules below;
 - authorization missing -> apply eligible findings inline by file and record `dispatch_authorization_missing`;

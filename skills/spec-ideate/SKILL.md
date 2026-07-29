@@ -57,20 +57,24 @@ If no argument is provided, proceed with open-ended ideation.
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。Depth、mode、agent-count preview、用户请求外部/Slack/issue research、权限设置或 callable tool 都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时 inline 或 serial 执行相同 grounding/lens/rubric contracts 并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Fallback 必须保留 topic-axis 与 six-frame category coverage，但不得声称 agent diversity、independent basis verification、fresh-context 或 multi-agent coverage。
+`workflow invocation does not authorize dispatch`。Depth、mode、agent-count preview、用户请求外部/Slack/issue research、权限设置或 callable tool 都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，inline 或 serial 执行相同 grounding/lens/rubric contracts 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均使用同一 fallback。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Fallback 必须保留 topic-axis 与 six-frame category coverage，但不得声称 agent diversity、independent basis verification、fresh-context 或 multi-agent coverage。
 
 ## Model Tiers
 
 Sub-agent dispatch is tiered by task shape, never hardcoded to a model name:
 
-- **Extraction tier** — evidence scouts and other retrieval/quoting work. Use the platform's cheapest capable model when the current harness exposes a known override. "Capable" is part of the spec — escalate to the generation tier when the repo is large or the stack obscure.
-- **Generation tier** — evidence-driven ideation frames and basis verification. Use the platform's mid-tier model when the current harness exposes a known override. If model names are unknown, omit the override and inherit rather than guessing.
+- **Extraction tier** — evidence scouts and other retrieval/quoting work. Request the cheapest capable tier only when `worker_model_override: supported`. "Capable" is part of the spec — escalate to the generation tier when the repo is large or the stack obscure.
+- **Generation tier** — evidence-driven ideation frames and basis verification. Request the balanced mid-tier only when `worker_model_override: supported`. If the override is unsupported or unknown, omit it and inherit rather than guessing.
 - **Ceiling tier** — ceiling ideation frames, cross-cutting synthesis, and final arbitration. Inherit the orchestrator's model by omitting the model parameter.
 
-**Degradation rule.** When authorized dispatch exists but the platform cannot select per-agent models, dispatch everything on the inherited model and keep the read budgets and dossier caps. When dispatch is unauthorized or unavailable, run the same roles inline or serially with those budgets and the claim limitation above.
+**Degradation rule.** When authorized dispatch exists but `worker_model_override` is unsupported or unknown, dispatch everything on the inherited model and keep the read budgets and dossier caps. When dispatch is unauthorized, missing, or unknown, run the same roles inline or serially with those budgets and the claim limitation above.
 
 Two overrides raise the whole ideation fleet to the ceiling tier: surprise-me mode (subject discovery is judgment-heavy and is the mode's whole value) and the `go deep` depth override (Phase 0.5).
 
@@ -296,7 +300,7 @@ python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 
 On `HIT`, load the profile JSON — that is your agnostic project shape (stack, top-level layout, conventions); do not re-derive it in the scan. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` only when the package-local boundary permits it; otherwise derive the profile inline and record the matching fallback reason. Persist usable JSON under `<scratch-dir>` with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` when available. On `NO-CACHE`, derive the agnostic shape inline and skip the `put`. The cache is an optimization, never a hard dependency.
 
-1. **Quick context scan** — dispatch a general-purpose subagent using the platform's cheapest capable model when the harness exposes a known override; otherwise inherit. Before dispatching, apply the routing test from "User-Supplied Research Artifacts" below to any root-level `*.md` file the focus hint names: research artifacts (evidence) take that subsection's distillation path, so list them on the prompt's research-artifacts line to keep the scan from duplicating them into `User-named references`. Dispatch with this prompt:
+1. **Quick context scan** — dispatch a generic worker and request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit. Before dispatching, apply the routing test from "User-Supplied Research Artifacts" below to any root-level `*.md` file the focus hint names: research artifacts (evidence) take that subsection's distillation path, so list them on the prompt's research-artifacts line to keep the scan from duplicating them into `User-named references`. Dispatch with this prompt:
 
    > **Project profile handling (read first):** if a project profile is supplied at the end of this prompt, its agnostic shape — stack/language/framework, top-level directory layout, conventions, and root instruction-file content — is already established; do **not** re-derive it. Skip reading the instruction files and globbing the layout for those facts, and run only the question-specific slice (notable patterns bearing on the focus, pain points, leverage points; in surprise-me mode also sample a few representative files per area and surface recent PR/commit activity). If no profile is supplied, derive the full shape as described below.
    >
@@ -351,7 +355,7 @@ Always-on for both modes. Skip when the user said "no external research", "skip 
 
 Reuse prior web research within a session via a sidecar cache — see `references/web-research-cache.md` for the cache file shape, reuse check, append behavior, and platform-degradation rules. Read it the first time the `web-researcher` local prompt would be dispatched in this run (and on every subsequent dispatch where the cache might apply).
 
-When dispatching web research, read `references/agents/web-researcher.md` and seed a generic subagent with that prompt. Pass the focus hint, a brief planning context summary (one or two sentences), and the mode. Do not pass codebase content — the prompt operates externally. Use the platform's mid-tier model when a known override exists; otherwise omit the override and inherit.
+When dispatching web research, read `references/agents/web-researcher.md` and seed a generic worker with that prompt. Pass the focus hint, a brief planning context summary (one or two sentences), and the mode. Do not pass codebase content — the prompt operates externally. Request the balanced mid-tier only when `worker_model_override: supported`; otherwise omit the override and inherit.
 
 #### User-Supplied Research Artifacts
 

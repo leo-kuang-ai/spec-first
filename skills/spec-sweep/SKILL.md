@@ -41,10 +41,14 @@ Parse a `mode:headless` token from anywhere in the arguments, strip it, and trea
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。`mode:headless`、scheduled run、已配置 source、standing ack approval、权限设置或 Agent tool 存在，都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时 inline 或 serial 执行并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时 inline 或 serial 执行并记录 `subagent_capability_missing`。
+`workflow invocation does not authorize dispatch`。`mode:headless`、scheduled run、已配置 source、standing ack approval、权限设置或 worker tool visibility，都不构成派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，inline 或 serial 执行并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均 inline 或 serial。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。
 
 对 `sensitive: true` source，普通派发授权仍不足以转交原始 body、quote、media 或完整 config；可见授权必须明确覆盖 delegated handling of sensitive content。否则在 orchestrator 内 inline 处理。即使允许派发，也只传完成 bounded unit 所需的最小、脱敏字段，绝不传 credential、token、cookie 或无关历史内容。Headless/scheduled 模式不得自行提升这项授权。Inline fallback 不得声称 independent extractor/analyzer coverage。
 

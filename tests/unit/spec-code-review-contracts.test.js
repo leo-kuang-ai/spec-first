@@ -105,7 +105,11 @@ describe('spec-code-review current contracts', () => {
   });
 
   test('reviewer dispatch requires authorization and otherwise reports inline degraded coverage', () => {
-    expect(skill).toContain('review_dispatch_authorization');
+    expect(skill).toContain('worker_dispatch_authorization');
+    expect(skill).toContain('capability_probe');
+    expect(skill).toContain('worker_dispatch_capability');
+    expect(skill).toContain('worker_capability_unproven');
+    expect(skill).toContain('provider_untrusted');
     expect(skill).toContain('dispatch_authorization_missing');
     expect(skill).toContain('subagent_capability_missing');
     expect(skill).toMatch(/permission settings.*not.*dispatch authorization/is);

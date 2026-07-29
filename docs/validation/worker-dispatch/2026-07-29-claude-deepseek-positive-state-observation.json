@@ -1,0 +1,14 @@
+{
+  "schema_version": "worker-dispatch-state-observation/v1",
+  "capture_owner": "Codex orchestrator /root",
+  "pre_observed_at": "2026-07-29T09:41:08.310Z",
+  "post_observed_at": "2026-07-29T09:41:40.000Z",
+  "mutation_observation": "within-scope",
+  "observed_surfaces": [
+    "repo:workspace-state:state"
+  ],
+  "pre_state_ref": "docs/validation/worker-dispatch/2026-07-29-claude-deepseek-positive-pre-state.json",
+  "pre_state_sha256": "90751e83f850f6dad9824a00de44967fe245785760a27336b16bdc58cc356032",
+  "post_state_ref": "docs/validation/worker-dispatch/2026-07-29-claude-deepseek-positive-post-state.json",
+  "post_state_sha256": "90751e83f850f6dad9824a00de44967fe245785760a27336b16bdc58cc356032"
+}

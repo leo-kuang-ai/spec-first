@@ -73,26 +73,35 @@ Read `execution-engines.md` for engine selection. Engine selection uses current 
 
 ## 5. Separate Authorization, Capability, And Isolation
 
-Before dispatching any worker, record three independent run-local facts:
+Before dispatching any worker, record the host-neutral run-local facts:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 workspace_isolation: isolated | shared-directory | unknown
 ```
 
 - `worker_dispatch_authorization` is authorized only by explicit current-user wording or a visible upstream handoff that requests subagents, delegated workers, personas, or parallel work. A structured plan, available tool, task pack, mode token, or skill invocation is not enough.
 - Permission settings govern whether a tool call may execute; they are not dispatch authorization.
-- `worker_dispatch_capability` is available only when the current host exposes a callable worker primitive now. Documentation or a command name is not a runtime probe.
+- Missing authorization forbids schema discovery and fixes `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`.
+- After authorization, inspect only the current-session registry/schema as `provider_untrusted` evidence. A completed inspection is `attempted`; no reliable discovery surface is `unavailable + unknown`; confirmed complete absence is `attempted + missing`; incomplete or ambiguous evidence is `attempted + unknown`.
+- `worker_dispatch_capability: available` means only one semantically eligible candidate is available to attempt. It does not prove permission, capacity, execution, isolation, output, mutation, or support.
+- `supportsAgents` is a static bundled agent-profile projection flag only. It is not session dispatch capability, loader readiness, isolation, model override, or support evidence.
+- `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism` come from live schema/response facts rather than host identity. Required isolation unmet keeps dependent gates open; model unknown inherits; parallelism unknown serializes.
 - `workspace_isolation` is isolated only when the current primitive supplies an inspectable independent workspace/diff handoff. Unknown isolation is treated as a shared directory.
 
 Fallback reason codes:
 
 - missing authorization -> inline execution + `dispatch_authorization_missing`;
-- authorization present but no callable primitive -> inline execution + `subagent_capability_missing`;
+- authorization present plus confirmed missing capability -> inline execution + `subagent_capability_missing`;
+- unavailable/incomplete/ambiguous discovery -> inline execution + `worker_capability_unproven`;
 - capability present but isolation unknown -> shared-directory rules + `workspace_isolation_unknown`.
 
-Host names and primitives may be recorded as runtime examples, but examples are advisory. Do not promise forked workspaces, uploaded changes, worktree branches, merge behavior, or cleanup commands unless the active primitive actually returned those facts.
+Normalize dispatch, inline, and serial paths as `worker_dispatch_outcome`. Host names and primitive identities may appear only in run-local evidence, never as the Skill's selection rule. Do not promise forked workspaces, uploaded changes, worktree branches, merge behavior, or cleanup commands unless the live response returned those facts.
 
 ## 6. Choose Inline, Serial, Or Bounded Parallel
 

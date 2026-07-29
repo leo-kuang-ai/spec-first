@@ -301,6 +301,16 @@ describe('CLI smoke checks', () => {
         });
       }
 
+      const verboseDoctor = runCommand(process.execPath, [packagedCli, 'doctor', `--${platform}`, '--verbose'], {
+        cwd: consumerRoot,
+        home: sandbox.home,
+        timeout: 120000,
+      });
+      expect(verboseDoctor.status).toBe(0);
+      expect(verboseDoctor.stdout).toMatch(/^诊断结果：(可用|可用，但需关注)\n/);
+      expect(verboseDoctor.stdout).toContain('宿主状态：');
+      expect(verboseDoctor.stdout).toContain('详细检查：');
+
       const setupRoot = path.join(consumerRoot, runtimeRoot, 'spec-runtime-setup');
       expect(fs.readFileSync(path.join(setupRoot, 'setup-registry.json'), 'utf8'))
         .toBe(registrySource);

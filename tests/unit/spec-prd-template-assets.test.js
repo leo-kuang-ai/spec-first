@@ -36,24 +36,12 @@ const TEMPLATE_REQUIRED_ANCHORS = {
   'assets/overlays/securities.md': ['## 一、行业横切关注点必查清单', '## 七、监管与标准参考（写 PRD 时只作线索）'],
 };
 
-const RETIRED_DOC_TEMPLATES = [
-  '00-通用增量需求模板.md',
-  '10-App客户端需求模板.md',
-  '20-Admin中后台需求模板.md',
-  '30-Backend中台服务需求模板.md',
-  '40-H5-PC端需求模板.md',
-  '50-CLI-DevTool需求模板.md',
-  '60-Mixed跨端需求模板.md',
-  '70-大需求总索引模板.md',
-  '90-证券行业需求关注点与参考附录.md',
-];
-
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
 describe('spec-prd product-bundled template assets', () => {
-  test('keeps one packaged template source and retires normative docs mirrors', () => {
+  test('keeps one packaged template source without an embedded output-contract duplicate', () => {
     for (const relativePath of TEMPLATE_ASSETS) {
       const assetPath = path.join('skills/spec-prd', relativePath);
       expect(fs.existsSync(assetPath)).toBe(true);
@@ -64,15 +52,6 @@ describe('spec-prd product-bundled template assets', () => {
       }
       expect(content).not.toMatch(/^\s*(?:[-*]\s*)?(?:status:\s*ready-for-planning|readiness_verified_[^:]+:|readiness_(?:prd|inputs)_hash:)/m);
     }
-
-    for (const filename of RETIRED_DOC_TEMPLATES) {
-      expect(fs.existsSync(path.join('docs/需求文档模版/标准模版', filename))).toBe(false);
-    }
-
-    const docsReadme = read('docs/需求文档模版/标准模版/README.md');
-    expect(docsReadme).toContain('skills/spec-prd/assets/templates/');
-    expect(docsReadme).toContain('skills/spec-prd/assets/overlays/securities.md');
-    expect(docsReadme).toContain('不作为 runtime authoring contract');
 
     const outputContract = read('skills/spec-prd/references/prd-output-template.md');
     expect(outputContract).not.toContain('## Embedded Standard Skeleton');

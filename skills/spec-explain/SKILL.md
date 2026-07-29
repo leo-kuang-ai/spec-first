@@ -24,7 +24,7 @@ When you must ask the user a question, use the platform's blocking question tool
 
 Dispatch is tiered by task shape, never hardcoded to a model name:
 
-- **Extraction tier** — the work-recap scout and the repo-profiler: search-and-quote work. Use the platform's cheapest capable model when the harness exposes a known override; otherwise inherit.
+- **Extraction tier** — the work-recap scout and the repo-profiler: search-and-quote work. Request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit.
 - **Ceiling tier** — the explainer composition, the check-in reasoning, and the corrections. These run in the main conversation on the orchestrator's model; nothing is dispatched for them.
 
 ## Dispatch Authorization Boundary
@@ -33,12 +33,16 @@ Dispatch is tiered by task shape, never hardcoded to a model name:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时以同一预算 inline 或 serial 执行并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时 inline 或 serial 执行并记录 `subagent_capability_missing`。Inline fallback 不得声称 independent scout、fresh-context 或 multi-agent coverage。
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，以同一预算 inline 或 serial 执行并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均 inline 或 serial。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Inline fallback 不得声称 independent scout、fresh-context 或 multi-agent coverage。
 
-**Degradation rule.** When authorized dispatch is available but the platform cannot select per-agent models, dispatch scouts on the inherited model and keep their read budgets. When dispatch is unauthorized or unavailable, run the scout work inline or serially with the same budgets and preserve the claim limitation above.
+**Degradation rule.** When authorized dispatch is available but `worker_model_override` is unsupported or unknown, dispatch scouts on the inherited model and keep their read budgets. When dispatch is unauthorized, missing, or unknown, run the scout work inline or serially with the same budgets and preserve the claim limitation above.
 
 ## Execution Flow
 

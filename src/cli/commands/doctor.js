@@ -35,7 +35,7 @@ function runDoctor(argv) {
   }
 
   if (parsed.unknown.length > 0) {
-    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json]');
+    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json] [--verbose]');
     return 2;
   }
 
@@ -72,35 +72,99 @@ function runDoctor(argv) {
     return report.has_error ? 3 : 0;
   }
 
-  for (const check of report.common_checks) {
-    const label = check.level.toUpperCase().padEnd(7);
-    console.log(`${label} ${check.name}: ${check.message}`);
-    if (check.fix) {
-      console.log(`         Fix: ${check.fix}`);
+  printDoctorHumanReport(report, { verbose: parsed.verbose });
+  return report.has_error ? 3 : 0;
+}
+
+function printDoctorHumanReport(report, options) {
+  for (const line of formatDoctorHumanReport(report, options)) {
+    console.log(line);
+  }
+}
+
+function formatDoctorHumanReport(report, { verbose = false } = {}) {
+  const platforms = Array.isArray(report.platforms)
+    ? report.platforms
+    : Object.keys(report.platform_checks || {});
+  const commonChecks = Array.isArray(report.common_checks) ? report.common_checks : [];
+  const platformChecks = report.platform_checks || {};
+  const allChecks = [
+    ...commonChecks,
+    ...platforms.flatMap((platform) => platformChecks[platform] || []),
+  ];
+  const hasError = report.has_error === true || allChecks.some((check) => check.level === 'ERROR');
+  const hasWarning = allChecks.some((check) => check.level === 'WARNING');
+  const result = hasError
+    ? '不可用'
+    : hasWarning
+      ? '可用，但需关注'
+      : '可用';
+  const attentionItems = [
+    ...commonChecks
+      .filter(isDoctorAttentionCheck)
+      .map((check) => ({ scope: '通用环境', check })),
+    ...platforms.flatMap((platform) => (platformChecks[platform] || [])
+      .filter(isDoctorAttentionCheck)
+      .map((check) => ({ scope: platform.toUpperCase(), check }))),
+  ];
+  const lines = [
+    `诊断结果：${result}`,
+    '',
+    '宿主状态：',
+  ];
+
+  if (platforms.length === 0) {
+    lines.push('  未检测到宿主');
+  } else {
+    for (const platform of platforms) {
+      lines.push(`  ${platform.toUpperCase()}：${describeDoctorPlatformStatus(platformChecks[platform] || [])}`);
     }
   }
 
-  // 平台特定检查
-  let hasError = report.has_error;
-
-  for (const platform of platforms) {
-    console.log(`\n=== ${platform.toUpperCase()} Platform ===`);
-    const platformChecks = report.platform_checks[platform] || [];
-
-    for (const check of platformChecks) {
-      const label = check.level.toUpperCase().padEnd(7);
-      console.log(`${label} ${check.name}: ${check.message}`);
+  if (attentionItems.length === 0) {
+    lines.push('', '待处理项：无');
+  } else {
+    lines.push('', '待处理项：');
+    for (const { scope, check } of attentionItems) {
+      lines.push(`  [${scope}] ${check.name}: ${check.message}`);
       if (check.fix) {
-        console.log(`         Fix: ${check.fix}`);
+        lines.push(`    修复：${check.fix}`);
+      } else {
+        lines.push('    需要人工处理：此检查未提供可安全执行的修复建议；请根据诊断谨慎处理用户拥有的配置。');
       }
     }
-
-    if (platformChecks.some((check) => check.level === 'ERROR')) {
-      hasError = true;
-    }
   }
 
-  return hasError ? 3 : 0;
+  if (!verbose) return lines;
+
+  lines.push('', '详细检查：');
+  appendDoctorCheckDetails(lines, '通用环境', commonChecks);
+  for (const platform of platforms) {
+    appendDoctorCheckDetails(lines, platform.toUpperCase(), platformChecks[platform] || []);
+  }
+  return lines;
+}
+
+function isDoctorAttentionCheck(check) {
+  return check.level === 'WARNING' || check.level === 'ERROR';
+}
+
+function describeDoctorPlatformStatus(checks) {
+  if (!Array.isArray(checks) || checks.length === 0) return '未检测';
+  if (checks.some((check) => check.level === 'ERROR')) return '有问题';
+  if (checks.some((check) => check.level === 'WARNING')) return '需关注';
+  return '正常';
+}
+
+function appendDoctorCheckDetails(lines, scope, checks) {
+  lines.push(`  ${scope}：`);
+  for (const check of checks) {
+    const label = String(check.level || 'UNKNOWN').toUpperCase().padEnd(7);
+    lines.push(`    ${label} ${check.name}: ${check.message}`);
+    if (check.fix) {
+      lines.push(`             修复：${check.fix}`);
+    }
+  }
 }
 
 function checkNodeVersion() {
@@ -1592,7 +1656,8 @@ function printHelp() {
     '🩺 spec-first doctor',
     '',
 	    '📘 Usage:',
-	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json]',
+	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json] [--verbose]',
+	    '  --verbose  在简明总览后显示所有检查明细。',
 	    '',
 	    '📊 JSON status fields:',
 	    '  install_health: Node/Git/package-level checks for running the CLI.',
@@ -1660,6 +1725,7 @@ function parseDoctorArgs(argv) {
     kiro: false,
     qoder: false,
     json: false,
+    verbose: false,
     unknown: [],
   };
 
@@ -1678,6 +1744,8 @@ function parseDoctorArgs(argv) {
       parsed.qoder = true;
     } else if (arg === '--json') {
       parsed.json = true;
+    } else if (arg === '--verbose') {
+      parsed.verbose = true;
     } else {
       parsed.unknown.push(arg);
     }
@@ -1701,6 +1769,7 @@ module.exports = {
   buildWorkspaceReadinessView,
   buildDoctorCommonChecks,
   buildDoctorReport,
+  formatDoctorHumanReport,
   checkPlatformCli,
   readWorkflowVerificationEvidence,
 };

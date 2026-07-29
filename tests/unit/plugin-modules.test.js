@@ -13,6 +13,36 @@ function tempProject() {
 }
 
 describe('plugin module facade and governance', () => {
+  test('keeps adapters and plugin sync projection-only for worker dispatch', () => {
+    const adapterSources = fs.readdirSync(path.join(__dirname, '../../src/cli/adapters'))
+      .filter((name) => name.endsWith('.js'))
+      .map((name) => fs.readFileSync(path.join(__dirname, '../../src/cli/adapters', name), 'utf8'));
+    const pluginSyncSource = fs.readFileSync(
+      path.join(__dirname, '../../src/cli/plugin-sync.js'),
+      'utf8',
+    );
+    const source = [...adapterSources, pluginSyncSource].join('\n');
+
+    expect(source).not.toMatch(/\bdispatch\s*\(/);
+    expect(source).not.toMatch(/\bspawn_agent\b|OpenCode[^\n]{0,120}\btask\b/i);
+    expect(source).not.toContain('worker_dispatch_capability');
+    expect(source).not.toContain('capability_probe');
+    expect(pluginSyncSource).toContain('adapter.supportsAgents === false');
+  });
+
+  test('ships the deterministic host preflight validator without adding dispatch execution', () => {
+    const validatorSource = fs.readFileSync(
+      path.join(__dirname, '../../src/contracts/worker-dispatch-host-preflight-validator.js'),
+      'utf8',
+    );
+
+    expect(validatorSource).toContain('validateAgainstSchema');
+    expect(validatorSource).toContain('provider_untrusted delimiters');
+    expect(validatorSource).toContain('available capability requires confirmed completeness');
+    expect(validatorSource).toContain('validateWorkerDispatchHostPreflightPair');
+    expect(validatorSource).not.toMatch(/\bdispatch\s*\(|child_process|spawnSync|execSync/);
+  });
+
   test('preserves the plugin facade exports', () => {
     expect(Object.keys(plugin).sort()).toEqual([
       'buildFilteredAssetSet',
@@ -758,6 +788,9 @@ describe('plugin module facade and governance', () => {
         expect(lfgTracker.contents).toBe(workTracker.contents);
         expect(workSkill.contents).toContain('Duplicate critical metadata');
         expect(workStrategy.contents).toContain('worker_dispatch_authorization');
+        expect(workStrategy.contents).toContain('supportsAgents');
+        expect(workStrategy.contents).toContain('static bundled agent-profile projection');
+        expect(workStrategy.contents).not.toMatch(/PlatformAdapter\.dispatch|dispatch\(.*worker/i);
         expect(workStrategy.contents).toContain('landing_authorization');
         expect(shippingWorkflow.contents).toContain(
           'node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"',

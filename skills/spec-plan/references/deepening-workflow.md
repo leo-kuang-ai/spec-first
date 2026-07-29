@@ -195,7 +195,7 @@ Refer to the echoed absolute path as `<scratch-dir>` throughout the rest of this
 
 ## 5.3.6 Run Targeted Research
 
-Launch selected prompt assets as generic subagents only when the host supports dispatch and the user or an upstream handoff explicitly authorized delegation/research dispatch for this run. Otherwise read the same prompt assets and apply them sequentially in the current agent, recording `dispatch_authorization_missing` or the actual capability failure. Plan generation and deepening must still complete through this inline fallback. When dispatching, omit the `mode` parameter so the user's configured permission settings apply.
+Launch selected prompt assets as generic workers only when the main Skill's boundary has `worker_dispatch_authorization: authorized` and current-session `worker_dispatch_capability: available`, with any required data-access authorization also present. Otherwise read the same prompt assets and apply them sequentially in the current agent: use `dispatch_authorization_missing` when authorization is absent, `subagent_capability_missing` only for confirmed absence from a complete current-session schema, and `worker_capability_unproven` when discovery is unavailable, incomplete, or ambiguous. Plan generation and deepening must still complete through this inline fallback. When dispatching, omit the `mode` parameter so the user's configured permission settings apply.
 
 Prefer local repo and institutional evidence first. Use external research only when the gap cannot be closed responsibly from repo context or already-cited sources.
 

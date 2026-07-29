@@ -17,6 +17,7 @@ const SETUP_REGISTRY_SOURCE = fs.readFileSync(
   path.join(REPO_ROOT, 'skills', 'spec-runtime-setup', 'setup-registry.json'),
   'utf8',
 );
+const WORKER_DISPATCH_PRIMITIVE_PATTERN = /\bspawn_agent\b|\bAgent tool\b|\bTask tool\b|OpenCode[^\n]{0,120}\btask\b/i;
 
 const ADAPTER_CASES = [
   {
@@ -72,6 +73,25 @@ function findSkillCheck(adapter, projectRoot, skillsRoot, skillName) {
 }
 
 describe('host runtime projection contracts', () => {
+  test.each(ADAPTER_CASES)(
+    '$id does not inject a worker primitive mapping into semantic-port projection',
+    ({ adapter }) => {
+      const semanticSource = fs.readFileSync(
+        path.join(REPO_ROOT, 'skills', 'using-spec-first', 'references', 'conditional-routing-boundaries.md'),
+        'utf8',
+      );
+      const transformed = adapter.transformSkillContent(semanticSource, {
+        skillName: 'using-spec-first',
+        isWorkflowSkill: false,
+        relativePath: 'references/conditional-routing-boundaries.md',
+      });
+
+      expect(transformed).not.toMatch(WORKER_DISPATCH_PRIMITIVE_PATTERN);
+      expect(transformed).toContain('provider_untrusted');
+      expect(transformed).toContain('capability_probe');
+    },
+  );
+
   test.each(ADAPTER_CASES)(
     '$id keeps retired brainstorm visual helper assets out of projection',
     ({ adapter, skillsRoot }) => {

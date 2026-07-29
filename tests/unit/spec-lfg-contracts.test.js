@@ -48,7 +48,8 @@ describe('spec-lfg current contracts', () => {
 
   test('uses the explicit LFG request as a scoped independent-review dispatch authorization', () => {
     expect(skill).toContain('委派独立代码审查副作用');
-    expect(skill).toContain('review_dispatch_authorization: authorized');
+    expect(skill).toContain('worker_dispatch_authorization: authorized');
+    expect(skill).not.toContain('review_dispatch_authorization');
     expect(skill).toContain('authorization_source: current-user-explicit-spec-lfg');
     expect(skill).toContain('one delegated read-only independent code review');
     expect(skill).toContain('coverage.dispatch_reason_code');

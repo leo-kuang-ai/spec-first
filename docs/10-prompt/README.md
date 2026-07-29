@@ -1,0 +1,53 @@
+# docs/10-prompt 说明
+
+本目录保存历史 prompt / skill / agent 快照（用于研究、对照、翻译留档），以及当前有效基线和专项方法论。
+
+## 目录结构
+
+```text
+docs/10-prompt/
+  结构化项目角色契约.md        ★ 当前基线:顶层方法论与演化判断基线(测试钉死,勿移动)
+  AI-Coding-Harness演化方法论.md ★ 当前基线:面向能力演化的精练判断方法
+  系统性项目审查方法.md        ★ 当前基线:系统性项目审查方法论
+  skill-prompt-设计与优化方法论-v2.md ★ 当前基线(spec-first canonical):skill prompt 设计与优化方法论(含 spec-first 适配层:init 投射/source-runtime/spec-* 入口/task-pack handoff;版本演进见 CHANGELOG)
+  spec-first-skill-prompt压缩优化组合方法论.md ◇ 专项 companion:期望成本×内容分级×多 agent 拓扑×伪优化识别×partial-landing×证据晋级
+  GPT-5.6提示工程方法论.md        ◇ 外部 provider companion:面向 GPT-5.6 的结果契约、既有 Skill 分层适配、工具/授权边界与评测驱动迁移方法
+  当前分支与远程master-Skill能力审计提示词.md ◇ report-only 操作提示词:冻结远程 master 基线并逐 Skill 审计能力、方法论、边界与证据，不自动修复
+  skill-prompt-设计与优化方法论-通用版.md ☆ host/项目中立提取版:同一方法论的通用内核(剥离 spec-first 专属;供其他项目复用,适配层留空待填)
+  历史快照/
+    审查方法-历史/             系统性项目审查方法 的前身谱系(历史审查/审计 prompt)
+      全面项目审查.md  项目审查.md  审查agent.md  审查skill.md  审查token.md
+    角色治理演化-历史/         结构化项目角色契约 的前身谱系(历史角色/治理/自我进化 prompt)
+      项目角色.md  项目owner角色.md  项目治理.md  项目治理-agent.md  自我进化.md
+```
+
+归类主轴是**生命周期**(当前基线 vs 历史快照);历史快照副轴是**基线谱系**——每个历史子文件夹是某个当前基线的前身,而非任意主题分桶。
+
+## 使用边界
+
+- 顶层四份基线（`结构化项目角色契约.md`、`AI-Coding-Harness演化方法论.md`、`系统性项目审查方法.md`、`skill-prompt-设计与优化方法论-v2.md`）是当前有效基线,不是历史快照,但也都不是具体 runtime behavior contract。`AI-Coding-Harness演化方法论.md` 提炼能力演化的判断顺序；`skill-prompt-设计与优化方法论-v2.md` 是唯一 canonical 的 skill prompt 设计与优化 playbook。三份方法论文档与角色契约冲突时,均让位于角色契约。
+- `spec-first-skill-prompt压缩优化组合方法论.md` 是 canonical v2 的专项 companion，负责 expected/aggregate 成本、内容 criticality、reference 可达性、multi-agent fan-out、上下文切片、validator policy、伪优化识别、partial-landing 与 quality/cost 证据晋级；它不取代 canonical，不定义 runtime behavior，与 canonical 或角色契约冲突时让位于上位文档。
+- `GPT-5.6提示工程方法论.md` 是基于 OpenAI 当前开发者文档的外部 provider companion，说明 GPT-5.6 的 prompt 契约、模型配置/Skill source/generated runtime/可选能力分层、既有 Skill 的基线评测与外科式适配、工具/审批边界和迁移方法；它不定义 spec-first runtime contract，不取代 canonical 或角色契约，外部 API/model 事实应回源到链接的官方文档复核。
+- `当前分支与远程master-Skill能力审计提示词.md` 是 report-only 操作提示词，用于冻结 `origin/master` SHA、建立逐 Skill 能力账本并输出可追溯审计 finding；它不授权实现修复，不是新的方法论 canonical，也不改变任何 Skill runtime contract。
+- `历史快照/` 下内容**不是**运行时 source-of-truth,可能落后于当前 `skills/`、`agents/`、`templates/claude/commands/spec/`;与当前运行时行为冲突时,以仓库根目录下的 source-of-truth 为准。
+- **重组说明(2026-06-15):** 历史快照文件由本目录顶层迁入 `历史快照/` 子目录。CHANGELOG、已完成/取代的 dated plans、历史 review/validation 等**冻结历史文档**中对旧路径(`docs/10-prompt/<文件>.md`)的引用**未回改**——历史记录按惯例不重写,这些旧路径指向迁移前状态,属预期。当前 live 引用(skill / contract / 本 docs 索引)已更新到新路径。
+- `结构化项目角色契约.md` 被 4 个测试 + `CLAUDE.md`/`AGENTS.md`/`src/cli` 等 100+ 处引用并由 `contract-drift-guard` 钉死路径,**不可移动**。
+
+## 当前规范优先级
+
+1. `docs/10-prompt/结构化项目角色契约.md`：顶层方法论与演化判断基线
+2. `docs/10-prompt/AI-Coding-Harness演化方法论.md`：AI Coding Harness 能力演化判断方法（冲突时让位于角色契约）
+3. `docs/10-prompt/系统性项目审查方法.md`：系统性项目审查方法论基线（冲突时让位于角色契约）
+3b. `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`：skill prompt 设计与优化方法论基线（唯一 canonical；版本演进见 CHANGELOG；与审查方法平级，冲突时让位于角色契约）。前身 v1 已合并进本文件并删除。
+3c. `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md`：skill prompt 压缩与 multi-agent token 拓扑专项方法；从属于 3b，不提升为第二 canonical。
+3d. `docs/10-prompt/GPT-5.6提示工程方法论.md`：基于当前 OpenAI 官方资料的 GPT-5.6 提示、既有 Skill 适配和迁移专项 companion；不提升为第二 canonical，外部事实以官方当前文档为准。
+4. `skills/`：当前 skill 合同
+5. `agents/`：当前 agent 合同
+6. `templates/claude/commands/spec/`：Claude 命令模板
+7. `docs/02-架构设计/02-目录结构.md`：当前目录结构与运行态布局说明
+8. `CLAUDE.md` / `AGENTS.md`：宿主侧治理与语言规则
+
+## 何时需要更新本目录
+
+- 顶层基线:按其各自的修订纪律更新(角色契约见其「修订纪律」)。
+- `历史快照/`:只在需要同步历史快照、维护翻译版本或做版本对照时更新;常规功能开发、路径迁移和运行时契约变更不要求同步修改。

@@ -149,10 +149,14 @@ Before dispatching any selected expert, evidence auditor, or report-writer worke
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。Planner 选择 expert、`mode:headless`、`depth:deep`、prompt asset 存在、权限设置或 callable tool 都不构成授权。缺授权时由 orchestrator inline 或 serial 应用 selected expert lenses，并记录 `dispatch_authorization_missing`；已有授权但没有 callable worker primitive 时使用同一 fallback 并记录 `subagent_capability_missing`。Inline fallback 可以产出同一 issue-candidate schema，但不得声称 independent expert、fresh-context 或 multi-agent coverage；报告应将其标为 orchestrator-applied lenses。
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。Planner 选择 expert、`mode:headless`、`depth:deep`、prompt asset 存在、权限设置或 callable tool 都不构成授权。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，由 orchestrator inline 或 serial 应用 selected expert lenses并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均使用同一 fallback。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Inline fallback 可以产出同一 issue-candidate schema，但不得声称 independent expert、fresh-context 或 multi-agent coverage；报告应将其标为 orchestrator-applied lenses。
 
 ## Workflow
 

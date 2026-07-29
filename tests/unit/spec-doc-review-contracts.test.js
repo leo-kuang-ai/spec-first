@@ -78,7 +78,11 @@ describe('spec-doc-review current contracts', () => {
   });
 
   test('requires explicit dispatch authorization and preserves the inline fallback', () => {
-    expect(skill).toMatch(/direct invocation.*authorizes.*workflow.*not host-level subagent dispatch/is);
+    expect(skill).toMatch(/direct invocation.*authorizes.*workflow.*not worker dispatch/is);
+    expect(skill).toContain('worker_dispatch_authorization');
+    expect(skill).toContain('capability_probe');
+    expect(skill).toContain('worker_capability_unproven');
+    expect(skill).toContain('provider_untrusted');
     expect(skill).toContain('dispatch_authorization_missing');
     expect(skill).toContain('subagent_capability_missing');
     expect(skill).toMatch(/selected persona prompt assets inline or serially/is);

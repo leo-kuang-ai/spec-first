@@ -8,7 +8,7 @@ CRITICAL: You MUST execute every step below IN ORDER. Do NOT skip any required s
 
 进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断“适合 shipping”都不构成授权。
 
-上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`review_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
+上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`worker_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
 
 When invoking any skill referenced below, resolve its name against the available-skills list the host platform provides and use that exact entry. Some platforms list skills under a plugin namespace (e.g., `spec-first:spec-plan`); others list the bare name. Invoking a short-form guess that isn't in the list will fail — always match a listed entry verbatim before calling the Skill/Task tool.
 
@@ -51,7 +51,7 @@ dev-server default. An empty, malformed, or repeated modifier records
 4. 以 `mode:agent plan:<plan-path-from-step-1>` 调用 `spec-code-review`，并传递以下可见上游上下文：
 
    ```yaml
-   review_dispatch_authorization: authorized
+   worker_dispatch_authorization: authorized
    authorization_source: current-user-explicit-spec-lfg
    authorization_scope: one delegated read-only independent code review
    ```

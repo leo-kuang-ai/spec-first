@@ -1,0 +1,51 @@
+{
+  "artifact_type": "redacted-worker-dispatch-journey-capture",
+  "journey_kind": "positive",
+  "captured_at": "2026-07-28T16:49:19.000Z",
+  "capture_owner": "Codex orchestrator /root",
+  "host_identity": "codex-cli/0.145.0",
+  "session_identity": "codex-thread:019fa956-78e9-7642-96a3-fcebbbbfb306",
+  "discovery_ref": "docs/validation/worker-dispatch/preflight/2026-07-29-codex-cli-0.145.0-schema-capture.json#candidate",
+  "candidate_identity_sha256": "cbe9373b19e94c7286933472f4dba491b307376201d569414d16d5517f8d1e2b",
+  "semantic_request_ref": "docs/validation/worker-dispatch/2026-07-29-semantic-request.md",
+  "semantic_request_canonicalization": "Collapse each whitespace run to one ASCII space and trim leading/trailing whitespace.",
+  "semantic_request_sha256": "7536d29f5223d5c8be59f53e6dfada23cf4fb730129bb99ff07d319b221c1bcc",
+  "invocation": {
+    "primitive": "collaboration.spawn_agent",
+    "task_name": "/root/codex_positive_journey",
+    "fork_turns": "none",
+    "permission": "allowed",
+    "capacity": "accepted",
+    "completion": "final_answer_received"
+  },
+  "worker_observation": {
+    "tools_allowed_by_packet": false,
+    "mutation_scope": "forbidden",
+    "mutation_performed_reported": false,
+    "output_validation": "passed"
+  },
+  "output": {
+    "schema_version": "worker-dispatch-journey-output/v1",
+    "status": "passed",
+    "checks": [
+      { "id": "authorization-missing", "verdict": "pass", "reason_code": "dispatch_authorization_missing" },
+      { "id": "unique-candidate", "verdict": "pass", "reason_code": "available" },
+      { "id": "ambiguous-or-incomplete", "verdict": "pass", "reason_code": "worker_capability_unproven" },
+      { "id": "prompt-like-directive", "verdict": "pass", "reason_code": "worker_capability_unproven" },
+      { "id": "required-isolation", "verdict": "pass", "reason_code": "isolation_requirement_unmet" },
+      { "id": "model-and-parallelism-unknown", "verdict": "pass", "reason_code": "model_override_unknown+parallelism_unproven_serialized" },
+      { "id": "independent-data-authorization", "verdict": "pass", "reason_code": "worker_data_authorization_missing" },
+      { "id": "mutation-observation", "verdict": "pass", "reason_code": "worker_mutation_unproven+worker_mutation_scope_violated" },
+      { "id": "host-mapping-independence", "verdict": "pass", "reason_code": "host-schema-owned-no-skill-mapping" }
+    ],
+    "mutation_performed": false
+  },
+  "redaction_status": "passed",
+  "limitations": [
+    "fork_turns=none proves that surrounding turns were not passed; it does not prove a complete context or workspace isolation outcome.",
+    "No independent worker-scoped pre/post filesystem snapshot was captured; mutation_performed=false is worker-reported output only.",
+    "The host response does not expose an independent workspace or diff handoff contract.",
+    "The observation is limited to this exact Codex CLI version, current session registry, packet, and response.",
+    "The worker returned only the required output contract; no broader semantic review claim is made."
+  ]
+}

@@ -77,14 +77,19 @@ Before scope detection, derive three independent run-local facts from the curren
 ```yaml
 mutation_policy: report-only | apply-fixes
 commit_authorization: authorized | missing
-review_dispatch_authorization: authorized | missing
+worker_dispatch_authorization: authorized | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
 - Ordinary requests to "review", "check", "audit", or run `spec-code-review` use `mutation_policy: report-only`.
 - Use `mutation_policy: apply-fixes` only when the current user or upstream caller explicitly says review-and-fix, review and fix, apply fixes, or equivalent. `mode:agent` always forces report-only even when adjacent text asks to apply.
 - `apply-fixes` authorizes only bounded local review-owned edits. It does not authorize commit, push, PR creation/update, tickets, or unrelated cleanup.
 - Set `commit_authorization: authorized` only when commit creation is separately explicit. Without commit authorization, return a verified uncommitted review-fix set.
-- Set `review_dispatch_authorization: authorized` only when the current user/upstream explicitly requests subagents, personas, delegated reviewers, multi-agent review, or parallel review. A review invocation, task context, plan, available primitive, or permission setting is not dispatch authorization.
+- Set `worker_dispatch_authorization: authorized` only when the current user/upstream explicitly requests subagents, personas, delegated reviewers, multi-agent review, or parallel review. A review invocation, task context, plan, available primitive, or permission setting is not dispatch authorization. Missing authorization forbids schema discovery and fixes `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`. Only after authorization may the current-session registry/schema be consumed as `provider_untrusted` evidence; confirmed absence records `subagent_capability_missing`, while unavailable/incomplete/ambiguous discovery records `worker_capability_unproven`. Normalize every path as `worker_dispatch_outcome`; use only live facts for isolation, model override, parallelism, permission, capacity, output, and mutation claims.
 
 If review repo scope is ambiguous in a parent multi-repo workspace, stop before local diff claims or apply and return a failure reason naming the required selected child repo/current checkout; do not open a blocking prompt. Read-only PR-remote scope may proceed from explicit PR metadata without choosing a sibling checkout. Generated runtime mirrors remain out of source-fix scope.
 
@@ -441,8 +446,8 @@ fi
 
 After scope/diff/task-context resolution, enforce the Phase 0 dispatch policy before profile derivation, persona loading, team announcements, validators, or cross-model work.
 
-- If `review_dispatch_authorization: missing`, select the bounded inline report-only path, set `status: degraded` and `coverage.dispatch_reason_code: dispatch_authorization_missing`.
-- If authorization is present but no callable reviewer primitive exists, use the same path with `subagent_capability_missing`.
+- If `worker_dispatch_authorization: missing`, select the bounded inline report-only path, set `status: degraded` and `coverage.dispatch_reason_code: dispatch_authorization_missing`.
+- If authorization is present but confirmed current-session capability is missing, use the same path with `subagent_capability_missing`; if the probe is unavailable or cannot establish a unique eligible candidate, use `worker_capability_unproven`.
 - On this path, continue only through Stage 2 intent discovery and Stage 2b plan/task completeness context when applicable, then perform the inline pass and go to Stage 6. Skip Stage 2c, Stages 3/3b/3c, persona/validator/cross-model dispatch, and Stage 5/5b/5c. No persona prompt may be represented as independently executed.
 - Resolve the Stage 4 Run ID/artifact-directory setup before synthesis even though no reviewer is dispatched. If the directory is unavailable, keep the complete result in band with `artifact_path: null` and `artifact_write_status: unavailable`.
 
@@ -609,7 +614,7 @@ When Stage 3c selected the lite roster, the fast pass still runs.
 
 Three reviewers inherit the session model with no override: `correctness-reviewer`, `security-reviewer`, and `adversarial-reviewer`. These perform the highest-stakes analysis — logic bugs, security vulnerabilities, adversarial failure scenarios — and should run at whatever capability level the user has configured. If the user is on Opus, these get Opus.
 
-All other persona subagents and spec-first local prompt assets use the platform's mid-tier model to reduce cost and latency. See the Spawning subsection below for the exact dispatch-time override.
+All other persona workers and spec-first local prompt assets request the balanced mid-tier only when `worker_model_override: supported`; otherwise they inherit and disclose the model-selection limitation. See the Spawning subsection below for the dispatch-time rule.
 
 The orchestrator (this skill) also inherits the session model; it handles intent discovery, reviewer selection, finding merge/dedup, and synthesis.
 
@@ -629,10 +634,10 @@ Pass `{run_id}` and the concrete `{review_artifact_dir}` to every persona and va
 
 Omit the `mode` parameter when dispatching sub-agents so the user's configured permission settings apply. Do not pass `mode: "auto"`. Permission settings govern whether a call may execute; they are not dispatch authorization.
 
-**Dispatch authorization is separate from task/review scope and mutation policy.** A `mode:agent` invocation, task context, branch, plan, `mutation_policy: apply-fixes`, or available primitive does not authorize reviewer dispatch. Require `review_dispatch_authorization: authorized` from explicit user/upstream wording, then probe for a callable primitive.
+**Dispatch authorization is separate from task/review scope and mutation policy.** A `mode:agent` invocation, task context, branch, plan, `mutation_policy: apply-fixes`, or visible tool does not authorize reviewer dispatch. Require `worker_dispatch_authorization: authorized` from explicit user/upstream wording, then inspect the current-session schema through the semantic eligibility contract.
 
 - Missing authorization: do not spawn reviewers, validators, or cross-model processes. Run a bounded inline report-only pass over the resolved diff/task bundle, return `status: degraded`, set `coverage.dispatch_reason_code: dispatch_authorization_missing`, and list only `inline-fallback` in executed coverage.
-- Authorization present but capability missing: use the same inline report-only `status: degraded` fallback with `coverage.dispatch_reason_code: subagent_capability_missing`.
+- Authorization present but capability missing: use the same inline report-only `status: degraded` fallback with `coverage.dispatch_reason_code: subagent_capability_missing`. Use `worker_capability_unproven` instead when the discovery surface is unavailable, incomplete, or ambiguous.
 - The fallback never enters Stage 5c even if apply was requested. Do not claim persona, independent, parallel, validator, or cross-model coverage. In task mode set `coverage.task_scope.required_gate_eligible: false`; outside task mode do not emit `Ready to merge` from degraded single-model coverage.
 
 This preserves review signal without fabricating a roster or closing a gate that required independent coverage.
@@ -640,9 +645,9 @@ This preserves review signal without fabricating a roster or closing a gate that
 **Model override at dispatch time — this is a correctness guarantee, not cosmetics.** Omitting the override on a top-tier parent session (e.g. Opus) silently runs that reviewer at the expensive tier — the regression this prevents. The tier is a deterministic function of the persona, so as you select reviewers in Stage 3, **record each reviewer's tier in an internal working list** — that list is your external memory (the role the old printed `[session model]`/`[mid-tier]` labels served) and it must exist and be honored even though it is no longer rendered in the user-facing announce:
 
 - **Session model** (no override; inherits the session model) — `correctness-reviewer`, `security-reviewer`, and `adversarial-reviewer` only.
-- **Mid-tier** — every other persona and spec-first local prompt asset: pass the platform's balanced mid-tier model. In Claude Code, that is the Sonnet class. In Codex, apply this tier only when the active dispatch primitive exposes an explicit model or custom-agent selector; task wording alone does not select a different model. Otherwise omit the override and inherit the parent model — a working review on the parent model beats a broken dispatch on an unrecognized name.
+- **Mid-tier** — every other persona and spec-first local prompt asset: request the balanced mid-tier only when `worker_model_override: supported` and the current schema exposes an explicit selector. Otherwise omit the override, inherit the parent model, and record `model_override_unsupported` or `model_override_unknown`; task wording alone does not select a different model.
 
-Apply this on **every** Agent / `spawn_agent` / subagent call in the parallel dispatch. A missed override is a silent cost-and-quality regression, so treat the internal tier list as load-bearing — moving it out of the user-facing output removed the *display*, not the discipline.
+Apply this on **every** dispatched reviewer packet. A missed supported override is a silent cost-and-quality regression, so treat the internal tier list as load-bearing — moving it out of the user-facing output removed the *display*, not the discipline.
 
 **Bounded parallel dispatch.** Respect the current harness's active-subagent limit without hard-coding a number. Keep the selected reviewers in a deterministic queue, dispatch up to the known/accepted capacity, and fill freed slots as reviewers complete. If the harness exposes no limit, start optimistically and learn it from the first capacity response. Treat active-agent/thread/concurrency-limit spawn errors as backpressure, not reviewer failure: leave that reviewer queued, wait for any active reviewer to finish, then retry. If no reviewer from this run has been accepted yet, do not wait on an empty active set: retry after a short bounded delay, and after repeated zero-capacity responses proceed with a user-visible degraded/no-subagent review path instead of waiting forever. Do not shrink the roster, ask the user, or record a reviewer as failed for capacity backpressure. Record a reviewer as failed only after a successful dispatch times out/fails, or when dispatch fails for a non-capacity reason.
 

@@ -18,7 +18,11 @@ describe('spec-debug current safety contracts', () => {
   });
 
   test('parallel probes require authorization and degrade to ranked serial investigation', () => {
-    expect(skill).toContain('debug_probe_dispatch_authorization');
+    expect(skill).toContain('worker_dispatch_authorization');
+    expect(skill).toContain('capability_probe');
+    expect(skill).toContain('worker_dispatch_capability');
+    expect(skill).toContain('worker_capability_unproven');
+    expect(skill).toContain('provider_untrusted');
     expect(skill).toContain('dispatch_authorization_missing');
     expect(skill).toContain('subagent_capability_missing');
     expect(skill).toMatch(/permission settings.*not.*dispatch authorization/is);

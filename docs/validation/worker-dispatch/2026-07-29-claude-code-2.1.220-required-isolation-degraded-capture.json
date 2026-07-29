@@ -1,0 +1,44 @@
+{
+  "artifact_type": "redacted-worker-dispatch-journey-capture",
+  "journey_kind": "degraded",
+  "captured_at": "2026-07-28T16:53:38.000Z",
+  "capture_owner": "Codex orchestrator /root",
+  "host_identity": "claude-code/2.1.220",
+  "session_identity": "claude-session:2942a434-fdf3-4b49-95e7-32cfa50d7e94:required-isolation-decision",
+  "preflight_context_ref": "docs/validation/worker-dispatch/preflight/2026-07-29-claude-code-2.1.220-schema-capture.json#candidate",
+  "candidate_identity_sha256": "55a89641ab9165b755b0446b26d1f27d8900163de0dd0deab06c192c536e24e3",
+  "semantic_request_ref": "docs/validation/worker-dispatch/2026-07-29-semantic-request.md",
+  "semantic_request_canonicalization": "Collapse each whitespace run to one ASCII space and trim leading/trailing whitespace.",
+  "semantic_request_sha256": "7536d29f5223d5c8be59f53e6dfada23cf4fb730129bb99ff07d319b221c1bcc",
+  "current_session_schema_observation": {
+    "registry_limit": "--tools Agent",
+    "startup_tool_names": [
+      "Task",
+      "mcp__codegraph__codegraph_explore"
+    ],
+    "actual_worker_tool_use": {
+      "name": "Agent",
+      "accepted_arguments": [
+        "description",
+        "prompt",
+        "run_in_background=false"
+      ]
+    },
+    "observed_context_isolation": "unknown"
+  },
+  "decision": {
+    "context_isolation_need": "required",
+    "schema_observation": "The Agent schema exposes optional workspace isolation values but no inspectable independent context, workspace, or diff-handoff guarantee for this invocation.",
+    "observed_context_isolation": "unknown",
+    "reason_code": "isolation_requirement_unmet",
+    "invocation_performed": false,
+    "call_status": "not_invoked"
+  },
+  "redaction_status": "passed",
+  "limitations": [
+    "This artifact proves only the required-isolation fail-closed decision in the recorded current session.",
+    "No worker was invoked because the required isolation contract was not proven.",
+    "The separate preflight full-schema capture is version-matched context only; the degraded decision uses the same-session limited registry observation.",
+    "The observation does not claim that Claude Code cannot isolate workers; it claims only that this captured schema did not prove the required contract."
+  ]
+}

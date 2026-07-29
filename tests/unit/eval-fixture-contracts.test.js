@@ -11,8 +11,6 @@ const fixturePaths = [
   'skills/spec-write-tasks/evals/output-quality-cases.json',
 ];
 const governanceReferenceDocs = [
-  'docs/11-业界调研/README.md',
-  'docs/11-业界调研/2026-06-21-spec-first-综合优先级建议-源码级深度解读.md',
   'docs/solutions/architecture-patterns/front-controller-triggered-references-gates-eval-regression-2026-07-01.md',
 ];
 const clarificationBaselinePath =

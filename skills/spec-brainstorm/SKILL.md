@@ -53,14 +53,18 @@ These rules apply to every brainstorm, including the universal (non-software) fl
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
-worker_dispatch_capability: available | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时，`worker_dispatch_authorization` 才是 `authorized`；工具存在、权限设置、brainstorm tier、用户请求搜索某个来源或本 Skill 被调用，都不构成派发授权。缺授权时 inline 或 serial 执行并记录 `dispatch_authorization_missing`；已有授权但当前宿主没有 callable worker primitive 时 inline 或 serial 执行并记录 `subagent_capability_missing`。Inline fallback 可以保留同一 evidence budget，但不得声称 fresh-context、independent scout 或 multi-agent coverage。
+`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时，`worker_dispatch_authorization` 才是 `authorized`；工具存在、权限设置、brainstorm tier、用户请求搜索某个来源或本 Skill 被调用，都不构成派发授权。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，inline 或 serial 执行并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均 inline 或 serial。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Inline fallback 可以保留同一 evidence budget，但不得声称 fresh-context、independent scout 或 multi-agent coverage。
 
 ## Model Tiers
 
-Sub-agent dispatch is tiered by task shape, never hardcoded to a model name. When dispatching the Phase 1.1 grounding scout, the Phase 2.6 claim verifier, or the opt-in Slack researcher, read `references/model-tiers.md` for the tier definitions (extraction / generation / ceiling) and the degradation rule for platforms without per-agent model selection or with no subagent primitive at all.
+Worker model selection is tiered by task shape, never hardcoded to a host or model name. When dispatching the Phase 1.1 grounding scout, the Phase 2.6 claim verifier, or the opt-in Slack researcher, read `references/model-tiers.md` for the tier definitions (extraction / generation / ceiling) and the degradation rule when `worker_model_override` or dispatch capability is unavailable.
 
 ## Feature Description
 
