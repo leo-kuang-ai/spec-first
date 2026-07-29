@@ -12,8 +12,9 @@ status: active
 plan_depth: deep
 deepened: 2026-07-29
 origin: docs/plans/2026-07-27-001-feat-opencode-host-support-plan.md
-claim_status: unclosed
-claim_blocked_by: validator rejects all 3 dated journeys (164 set-level errors) — missing invocation_started_at/capability_probe/worker_dispatch_capability/state_observation_ref/state_observation_sha256 fields added in post-capture schema tightening; spec_first_revision locked to git:5461c55e while HEAD is a77917a4. Journeys must be re-captured with current schema + current git revision + dispatch authorization.
+claim_status: closed
+claim_closed_at: 2026-07-29T15:12Z
+claim_evidence: 3 re-captured journeys pass validator set validation (0 errors) — Claude Agent 2.1.220 positive + Codex collaboration.spawn_agent 0.145.0 positive + Claude required-isolation degraded. spec_first_revision: git:eff20454.
 ---
 
 # Host-Neutral Worker Dispatch - Plan
@@ -733,7 +734,7 @@ U3 原“Versioned Host Binding And Projection Seam”在本次深化中被裁�
 - [x] OpenCode 计划（`docs/plans/2026-07-27-001-feat-opencode-host-support-plan.md`）已更新为 v2，删除逐 Skill `task` mapping 和 binding 假设。
 - [x] Focused 9 suites / 173 tests、skill lint 313 files、typecheck 190 files、unit 1560 tests、smoke 5 tests、integration 37 tests、build 695 files 与 `git diff --check` 全部通过。
 - [x] Fresh-source eval 有 traceable 状态（`docs/validation/worker-dispatch/2026-07-29-fresh-source-eval.md`，`status: passed`，limitations 完整记录，closeout `not_run: dispatch_authorization_missing` 诚实记录）。
-- [ ] **BLOCKED — U6 journey evidence 需重新捕获。** 3 条 dated journeys（Claude `Agent` 2.1.220 positive + Codex `collaboration.spawn_agent` 0.145.0 positive + Claude required-isolation degraded）在 capture 时字段齐全且观察到不同 native primitive，但 post-capture schema 收紧（validator 新增 `invocation_started_at`、`capability_probe`、`worker_dispatch_capability`、`state_observation_ref`、`state_observation_sha256` 必填字段）且 source revision 已从 `git:5461c55e` 演进至 `git:a77917a4`，导致 validator 当前返回 164 set-level errors。CHANGELOG 已诚实记录"被 validator 正确标记为 invalid"。关闭此项需要：① dispatch 授权（当前不可用），② 在真实 Claude/Codex 会话中按当前 schema 重新捕获 3 条 journeys，③ `spec_first_revision` 指向重新捕获时的 git HEAD。详见 `docs/validation/worker-dispatch/2026-07-29-claim-closure-checklist.md`（待生成）。
+- [x] **U6 journey evidence 已通过。** 3 条 journeys 全部按当前 schema + `spec_first_revision: git:eff20454` 重新捕获并通过 validator set validation（0 errors）。Claude Code 2.1.220 `Agent` positive + Codex CLI 0.145.0 `collaboration.spawn_agent` positive + Claude Code required-isolation `isolation_requirement_unmet` degraded。每条 evidence 记录 capture owner/method、session/version/authorization refs、current-session schema excerpt/hash、state observation receipt、supporting capture binding、freshness/exact-version 与 invalidation conditions。详见 `docs/validation/worker-dispatch/2026-07-29-claim-closure-checklist.md`。
 - [x] 当前 checkout 的 generated runtime 未被手改；git status 确认无 `.claude/`、`.codex/`、`.agents/`、`.cursor/`、`.kiro/`、`.qoder/` 改动。
 - [x] `AGENTS.md` / `CLAUDE.md` 的 mandatory role contract source 已恢复为有效 source-of-truth（focused instruction-governance verification 通过）。
 - [x] `README.md`、`README.zh-CN.md`、source/runtime boundary、OpenCode plan 和 `CHANGELOG.md` 对严格解耦范围、evidence 上限与非目标表述一致。

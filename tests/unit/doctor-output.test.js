@@ -63,6 +63,26 @@ describe('doctor human-readable output', () => {
     expect(output).not.toContain('.claude: ready');
   });
 
+  test('attributes errors to the affected host and preserves the safe fix', () => {
+    const output = formatDoctorHumanReport(createReport({
+      platformChecks: {
+        claude: [{ level: 'PASS', name: '.claude', message: 'ready' }],
+        codex: [{
+          level: 'ERROR',
+          name: 'Codex runtime',
+          message: 'managed file missing',
+          fix: 'Run `spec-first init --codex`.',
+        }],
+      },
+    })).join('\n');
+
+    expect(output).toContain('诊断结果：不可用');
+    expect(output).toContain('CODEX：有问题');
+    expect(output).toContain('[CODEX] Codex runtime: managed file missing');
+    expect(output).toContain('修复：Run `spec-first init --codex`.');
+    expect(output).not.toContain('.claude: ready');
+  });
+
   test('separates common errors and explains the manual boundary when no fix exists', () => {
     const output = formatDoctorHumanReport(createReport({
       commonChecks: [{ level: 'ERROR', name: 'Node.js', message: 'v18.0.0' }],

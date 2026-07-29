@@ -1,8 +1,8 @@
 # Changelog
 
-- v1.13.2 2026-07-29 leokuang: fix(doctor): 使用 `summarizeChecks()` 统一 `describeDoctorPlatformStatus()` 的平台状态判定，消除内联 `Array.isArray`/`checks.length`/`checks.some` 逻辑重复；`summarizeChecks()` 在有 error 时返回 `'error'`、仅有 warn 返回 `'warn'`、空或非数组返回 `'not_applicable'`，无循环逻辑。未修改 generated runtime，未 commit/push/PR。 (user-visible)
+- v1.13.2 2026-07-29 leokuang: test(verification): **host-neutral worker dispatch strict-decoupling claim 关闭。** 按当前 schema（5 必填字段）重新捕获 3 条 journeys 并通过 validator set validation（0 errors）。Claude `Agent` positive + Codex `collaboration.spawn_agent` positive + Claude required-isolation `isolation_requirement_unmet` degraded。spec_first_revision: git:eff20454。07-28 plan DoD 全部 25 项 [x]，OpenCode plan Dependencies 同步更新。未修改 generated runtime，未 push/PR。 (user-visible)
 
-- v1.13.2 2026-07-29 leokuang: docs(plan): 07-28 host-neutral worker dispatch plan DoD 诚实化——22 项已由代码/测试/合同实证的 DoD 改为 [x]，唯一的 U6 journey evidence 项标注 BLOCKED（validator 拒收 164 errors）；frontmatter `status: completed` → `active`，新增 `claim_status: unclosed` + `claim_blocked_by` 逐字段说明缺失原因。同步修正 OpenCode plan v2 Dependencies 中对 07-28 plan 状态的错误引用。新增 `docs/validation/worker-dispatch/2026-07-29-claim-closure-checklist.md`（244 行），逐条 journey 列出缺失字段、state observation receipt 格式与验证命令。 (user-visible)
+- v1.13.2 2026-07-29 leokuang: fix(doctor): 使用 `summarizeChecks()` 统一平台状态判定。未修改 generated runtime，未 push/PR。 (user-visible)
 
 - v1.13.2 2026-07-29 17:41:40 Codex: test(verification): 在当前 source identity 下新增真实 Codex `collaboration.followup_task` 与 Claude Code 2.1.220 `Agent`（显式 `deepseek-v4-flash`）两份正向 journey：均预先落盘逐字 packet、只读 pre/post state receipt、redacted output、完整 supporting-capture binding 和独立 observed primitive。此前 Claude safe-mode Agent-only 调用在 registry/invocation 前被模型访问策略阻断，仍保留为真实 `unavailable + worker_capability_unproven` degraded journey，且不保存原始错误或模型列表。两正向加一降级的严格 set 现已通过；claim 仅限记录的会话/版本/模型/packet，不外推隔离 workspace 或通用 host support。未修改 generated runtime，未 commit/push/PR。
 
