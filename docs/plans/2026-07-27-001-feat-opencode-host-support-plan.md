@@ -43,7 +43,7 @@ spec-first 当前注册 Claude Code、Codex、Cursor、Kiro、Qoder 五个宿主
 
 - **Preview 诊断照抄 Cursor，命令入口照抄 Qoder。** `supportsAgents=false`（只抑制 bundled agent profile 投射）、`degradedByDesign=true`、`opencode_generated_runtime_loader_unverified` reason code。`hasCommands=true`，`/spec-*` command + skill 双入口。OpenCode 是 CLI agent，`extends PlatformAdapter`。worker dispatch 由 07-28 plan 单一 owner——`transformSkillContent` 只做 path rewrite。
 - **预览即交付。** 缺 OpenCode CLI 时，最高交付状态为 `generated_runtime_preview`。真实 loader 证据到达后，按 Cursor 两级晋升（preview → loader-confirmed），不新建状态机。
-- **6th host 增量。** `getSupportedPlatformsWithState()` 新增函数，返回 `[{id, support_state}]`，5 host 默认 `active`，OpenCode 为 `preview`。`getSupportedPlatforms()` 5 host 行为不变。
+- **6th host 直接加入 `getSupportedPlatforms()`。** 不新建第二套 host 枚举函数。OpenCode 加入 `adapters` 字典 → `getSupportedPlatforms()` 自动返回 6 host。`PlatformAdapter` base 新增 `get support_state() { return 'active'; }`，OpenCode override 为 `'preview'`。`init -y` 通过 `support_state === 'preview'` 过滤，doctor/update/clean 通过 `support_state` 区分行为——不再硬编码 `adapter.id === 'cursor'`。
 
 ### Actors
 
@@ -101,7 +101,7 @@ spec-first 当前注册 Claude Code、Codex、Cursor、Kiro、Qoder 五个宿主
 
 ### Success Criteria
 
-- OpenCode 作为 6th preview host 在 `platform-registry` + `getSupportedPlatformsWithState()` 注册。
+- OpenCode 作为 6th preview host 在 `getSupportedPlatforms()` 中注册，`support_state='preview'`。
 - 全部 governed workflow/skills 投射到 `.opencode/`。
 - 与 5 host 共存，共享 `AGENTS.md` 不受 single-host clean 破坏（U0）。
 - 缺 CLI 时 `generated_runtime_preview` 交付；真实 evidence 到达后晋升。
@@ -142,7 +142,7 @@ spec-first 当前注册 Claude Code、Codex、Cursor、Kiro、Qoder 五个宿主
 | Interface | Consumer | Summary |
 |---|---|---|
 | `OpenCodeAdapter` | plugin sync, lifecycle | `hasCommands=true`、`supportsAgents=false`、`.opencode/` paths。`transformSkillContent` 只做 path rewrite |
-| `getSupportedPlatformsWithState()` | doctor, update, catalog | 返回 `[{id, support_state}]`，5 host = `active`，OpenCode = `preview` |
+| `PlatformAdapter.support_state` | doctor, init, update | base 默认 `'active'`，OpenCode override `'preview'`。`init -y` 过滤 preview host |
 | `skills-governance` schema vNext | plugin manifest, filtered asset set | 每条 record 需 `host_delivery.opencode` |
 | `setup-registry` vNext | Runtime Setup | 新增 host `opencode`，JSON container `mcp`，permission entries |
 | `opencode.json` managed slice | OpenCode runtime | 增量 MCP/permission entries，`managed_config_receipts` 证明 ownership |
@@ -161,14 +161,14 @@ spec-first 当前注册 Claude Code、Codex、Cursor、Kiro、Qoder 五个宿主
 ### U1. OpenCodeAdapter + Runtime Ownership
 
 - **Goal:** 新增 `OpenCodeAdapter`，照抄 Cursor 模式。
-- **Files:** Create `src/cli/adapters/opencode.js`；Modify `index.js`（+`getSupportedPlatformsWithState()`）、`platform-registry.js`、projection/plugin tests。
+- **Files:** Create `src/cli/adapters/opencode.js`；Modify `index.js`（+1 require + 1 adapter entry）、`base.js`（+`support_state` getter）、`platform-registry.js`、projection/plugin tests。
 - **Key behavior:** `supportsAgents=false`、`degradedByDesign=true`。`inspectRuntimeFiles` 返回 3 个 check：① `opencode_generated_runtime_loader_unverified`（loader 未验证），② `opencode_external_skill_collision`（`.agents`/`.claude` 同名 skill 未隔离），③ `opencode_command_or_skill_root_partial`（command/skill 文件缺失）。`transformSkillContent` 只做 path rewrite，不注入 primitive mapping。
 
 ### U2. CLI Lifecycle（--opencode flag）
 
 - **Goal:** `--opencode` 接入 init/doctor/update/clean/help。
 - **Files:** `init-args.js`、`init.js`、`doctor.js`、`clean.js`、`update.js`、`index.js` + 相关 tests。
-- **Key behavior:** `init -y` 默认集合不变（5 host）。`doctor --opencode` 输出 `support_state=preview`。`clean --opencode` 依赖 U0 三态判定——U0 未 land 时，`present`/`uncertain` 路径用 conditional skip 标记并阻塞 D2，不得用 conditional skip 代替 gate pass。
+- **Key behavior:** `init -y` 通过 `support_state === 'preview'` 过滤，不安装 OpenCode。`doctor --opencode` 输出 `support_state=preview`。`clean --opencode` 依赖 U0 三态判定——U0 未 land 时，`present`/`uncertain` 路径用 conditional skip 标记并阻塞 D2，不得用 conditional skip 代替 gate pass。
 
 ### U3. Governance Schema + Catalog 原子扩展
 
@@ -198,7 +198,7 @@ spec-first 当前注册 Claude Code、Codex、Cursor、Kiro、Qoder 五个宿主
 
 | Gate | Applies to | Expected |
 |---|---|---|
-| U0-U5 focused tests | Each unit | 新增 scenarios pass；5 host back-compat 不破 |
+| U0-U5 focused tests | Each unit | 新增 scenarios pass；现有 5 host 行为不变 |
 | `npm run typecheck` | CLI/scripts | 190 files |
 | `npm run lint:skill-entrypoints` | Skill/governance | 313 files |
 | `npm run test:unit` | All source owners | 1560 tests |
@@ -216,8 +216,8 @@ spec-first 当前注册 Claude Code、Codex、Cursor、Kiro、Qoder 五个宿主
 - [x] **D1.** v3 重写完成——v2 的 KTD13 三层 evidence contract、7 状态机、cross_plan_refs validator、Appendix A reason code 表全部删除。worker dispatch 由 07-28 plan（claim closed）单一 owner。
 - [ ] **D2.** U0 三态判定 land（OpenCode R4 硬前置）。
 - [ ] **D3.** `OpenCodeAdapter` 按 Cursor 模式实现：`supportsAgents=false`、`degradedByDesign=true`、`opencode_generated_runtime_loader_unverified`；`transformSkillContent` 只做 path rewrite。
-- [ ] **D4.** `getSupportedPlatformsWithState()` 返回 6 entries，OpenCode = `preview`。`getSupportedPlatforms()` 5 host 不变。
-- [ ] **D5.** Governance schema + setup-registry 原子升级，5 host back-compat。
+- [ ] **D4.** `getSupportedPlatforms()` 返回 6 host，`PlatformAdapter.support_state` 区分 `active`/`preview`。`init -y` 过滤 preview host。
+- [ ] **D5.** Governance schema + setup-registry 原子升级，现有 5 host 行为不变。
 - [ ] **D6.** CLI lifecycle（`--opencode` init/doctor/update/clean）通过。
 - [ ] **D7.** U0-U5 tests + typecheck + lint + build 全过。
 - [ ] **D8.** U6 real-runtime evidence 或诚实 `not_run: opencode_cli_unavailable`。
