@@ -5,8 +5,8 @@
 // Given the resolved child repos (U1), build:
 //   - per-child CodeGraph tactical graph (工程N/.codegraph/), then add the
 //     managed `.git/info/exclude` line so `git status` stays clean;
-//   - per-child Graphify subgraph, out-of-tree at <ws>/.graphify/<repo_id>;
-//   - one workspace merged Graphify graph at <ws>/.graphify/merged-graph.json;
+//   - per-child Graphify subgraph, out-of-tree at <ws>/graphify-out/<repo_id>;
+//   - one workspace merged Graphify graph at <ws>/graphify-out/merged-graph.json;
 //   - a single global CodeGraph MCP install.
 //
 // Provider invocation is injected (`runners`) so the orchestration contract —
@@ -23,7 +23,7 @@ const { addManagedExclude } = require('./workspace-git-exclude.cjs');
 const { inspectRepoSnapshot, writeWorkspaceGraphState } = require('./workspace-graph-state.cjs');
 const { directoryHasEntries, jsonFileHasContent } = require('./workspace-graph-artifacts.cjs');
 
-const GRAPHIFY_OUT_DIRNAME = '.graphify';
+const GRAPHIFY_OUT_DIRNAME = 'graphify-out';
 const MERGED_GRAPH_BASENAME = 'merged-graph.json';
 
 function buildWorkspaceGraphs({
@@ -311,7 +311,7 @@ function safe(fn) {
 }
 
 function sanitizeRepoDir(repoId) {
-  // repo_id is a workspace-relative POSIX path; keep it as a nested dir under .graphify/
+  // repo_id is a workspace-relative POSIX path; keep it as a nested dir under graphify-out/
   // but never allow it to climb out.
   return String(repoId).replace(/\\/g, '/').replace(/^\/+/, '').replace(/\.\.(\/|$)/g, '');
 }

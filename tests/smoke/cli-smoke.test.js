@@ -282,7 +282,7 @@ describe('CLI smoke checks', () => {
       opencode: [
         '.opencode/spec-first/state.json',
         'AGENTS.md workflow entry guidance',
-        '.opencode/commands/spec',
+        '.opencode/commands',
         '.opencode/skills',
       ],
     };
@@ -363,6 +363,19 @@ describe('CLI smoke checks', () => {
     expect(writeSkillCommand).not.toContain(
       '`.claude/spec-first/workflows/spec-write-skill/references/`',
     );
+    expect(fs.existsSync(path.join(
+      consumerRoot,
+      '.opencode',
+      'commands',
+      'spec-prd.md',
+    ))).toBe(true);
+    expect(fs.existsSync(path.join(
+      consumerRoot,
+      '.opencode',
+      'commands',
+      'spec',
+      'prd.md',
+    ))).toBe(false);
 
     const crossHostReference = fs.readFileSync(path.join(
       consumerRoot,

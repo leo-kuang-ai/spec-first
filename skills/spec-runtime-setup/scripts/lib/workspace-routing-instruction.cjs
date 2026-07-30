@@ -52,7 +52,7 @@ function renderRoutingInstruction({ workspaceRoot, repos = [], host = null, host
     'This folder is a multi-repo requirement workspace. Graphs are advisory candidates — confirm important conclusions against source.',
     '',
     '- **Tactical (per repo):** query CodeGraph with `projectPath` set to the child repo your cwd is inside. This is **best-effort routing**, not a deterministic resolver.',
-    '- **Cross-repo:** for questions spanning repos, use Graphify CLI against `.graphify/merged-graph.json` (`query` / `path` / `explain`). **Do not cat** `graph.json` or `merged-graph.json` into context (files may be tens or hundreds of MB).',
+    '- **Cross-repo:** for questions spanning repos, use Graphify CLI against `graphify-out/merged-graph.json` (`query` / `path` / `explain`). **Do not cat** `graph.json` or `merged-graph.json` into context (files may be tens or hundreds of MB).',
     '- **Fallback:** if launched from inside a child and `projectPath` is omitted, default to that enclosing child. If launched from the **parent root**, there is **no safe default** — pick an explicit child `projectPath` or use the merged Graphify graph for cross-repo questions. Never query the CodeGraph server root (no index).',
     '- **Isolation:** stay within this workspace; do not pass a `projectPath` pointing at another requirement folder.',
     '- **Freshness gate:** run `spec-runtime-setup --workspace-graph-status` before graph use. Use graph candidates only when status is `ready`; on `partial`/`stale`, fall back to direct source reads and refresh with `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>`.',

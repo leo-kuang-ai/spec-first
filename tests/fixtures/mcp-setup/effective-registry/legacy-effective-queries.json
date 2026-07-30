@@ -2598,8 +2598,8 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`.graphify/` code-only生成、query与hook验证。",
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
       }
@@ -2778,8 +2778,8 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`.graphify/` code-only生成、query与hook验证。",
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
       }
@@ -2958,8 +2958,8 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`.graphify/` code-only生成、query与hook验证。",
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
       }
@@ -3138,8 +3138,8 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`.graphify/` code-only生成、query与hook验证。",
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
       }

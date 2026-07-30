@@ -18,7 +18,7 @@
 5. Cursor 内部投射 `.cursor/skills/spec-*/SKILL.md`；P0 不生成 Cursor command 或 agent layer，loader 证据不足时保持 generated-runtime preview
 6. Kiro 内部投射 `.kiro/skills/spec-*/SKILL.md`；P0 不生成 Kiro command layer，也不占用 Kiro native Specs namespace
 7. Qoder 内部投射 `.qoder/commands/spec-*.md`，并同步 `.qoder/skills/spec-*` workflow skill mirror
-8. OpenCode 内部投射 `.opencode/commands/spec/*.md`，并同步 `.opencode/skills/spec-*` workflow skill mirror；在版本化 loader journey 完成前保持 generated-runtime preview
+8. OpenCode 内部投射 `.opencode/commands/spec-*.md`，并同步 `.opencode/skills/spec-*` workflow skill mirror；`.opencode/commands/spec/` 仅作为已退役 namespace 清理；在版本化 loader journey 完成前保持 generated-runtime preview
 9. standalone skill 只能按 skill 方式表述，不得写成已声明 workflow command
 10. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
 
@@ -131,7 +131,7 @@
    - 同步 `.qoder/skills/spec-*` workflow skill mirrors
 6. OpenCode
    - `host_delivery.opencode = command`
-   - 生成 `.opencode/commands/spec/*.md` workflow runtime files
+   - 生成 `.opencode/commands/spec-*.md` workflow runtime files
    - 同步 `.opencode/skills/spec-*` workflow skill mirrors
    - `supportsAgents=false`，不生成 bundled agent profiles；这不改变 Skill 正文中的 host-neutral worker semantics
 
@@ -262,7 +262,7 @@ machine-readable 真源文件固定落位：
 2. CursorAdapter 不安装 command/agent layer，P0 只交付 `.cursor/skills`、`.cursor/spec-first` 与 generated pointer/config 支撑面
 3. KiroAdapter 不安装 `.kiro/commands/spec/*`，P0 只交付 `.kiro/skills`、`.kiro/agents`、`.kiro/spec-first` 和 Kiro MCP config 支撑面
 4. `init` 对所有 supported hosts 使用统一 `spec-*` 用户可见口径，并用 host delivery 说明承载方式
-5. OpenCodeAdapter 生成 `.opencode/commands/spec/*.md` 与 `.opencode/skills/spec-*`，但不生成 bundled agents
+5. OpenCodeAdapter 生成 `.opencode/commands/spec-*.md` 与 `.opencode/skills/spec-*`，但不生成 bundled agents；init/clean 清理已退役 `.opencode/commands/spec/`
 6. `doctor` 不再把 `.codex/commands/spec/*`、`.cursor/commands/spec/*` 或 `.kiro/commands/spec/*` 当成正式产品面检查项
 7. README、CLI banner、`spec-runtime-setup`、`setup` 全量收口到正确宿主入口
 8. smoke 断言同步切换到新契约
@@ -277,7 +277,7 @@ machine-readable 真源文件固定落位：
 4. 不得把 Codex 用户入口写成 host-specific legacy spelling；用户口径统一为同名 `spec-*` workflow
 5. 不得把 Cursor 用户入口写成 host-specific legacy spelling；用户口径是同名 `spec-*` workflow，Cursor 内部投射到 `.cursor/skills/spec-*`
 6. 不得把 Kiro 用户入口写成 host-specific legacy spelling；用户口径是同名 `spec-*` workflow，Kiro 内部投射到 `.kiro/skills/spec-*`
-7. 不得把 OpenCode 用户入口写成宿主专属 worker primitive；用户口径是同名 `spec-*` workflow，OpenCode 内部投射到 `.opencode/commands/spec/*.md` 与 `.opencode/skills/spec-*`
+7. 不得把 OpenCode 用户入口写成宿主专属 worker primitive；用户口径是同名 `spec-*` workflow，OpenCode 内部投射到 `.opencode/commands/spec-*.md` 与 `.opencode/skills/spec-*`
 8. `Skill(...)`、`skill:`、以及其他内部调用 DSL 明确不属于“用户可见入口治理”范围
 9. `docs/10-prompt/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/10-prompt/skills/` 重新变成双真相源
 10. 新增 lint / doctor / smoke 规则时，应优先引用 `skills-governance.json` 与 canonical adapter registry，而不是重复手写 skill 或宿主名单

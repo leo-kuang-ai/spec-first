@@ -53,12 +53,12 @@ Runtime Setup 配置但不主动启动 MCP server 或 watcher；稳态运行属�
 
 ### Graphify：project skill 编排 CLI，Hook 维护项目图
 
-Graphify 只声明 `cli` native interface，稳态刷新模式是 `skill-cli-hook-on-demand`（`skills/spec-mcp-setup/scripts/providers/graphify.cjs:30`-`49`）。安装流程通过 `graphify install --project --platform <host>` 安装当前宿主的 project skill，CLI 生成和查询 `.graphify/`，Git hook 或显式 refresh 维护项目图（`skills/spec-mcp-setup/scripts/providers/graphify.cjs:99`-`123`）。
+Graphify 只声明 `cli` native interface，稳态刷新模式是 `skill-cli-hook-on-demand`。安装流程通过 `graphify install --project --platform <host>` 安装当前宿主的 project skill，CLI 在 Provider 原生默认目录 `graphify-out/` 生成和查询图，Git hook 或显式 refresh 维护项目图；spec-first 不再用 `GRAPHIFY_OUT` 改写普通单仓消费路径。
 
 ```text
 Graphify project skill：决定何时以及怎样查询
                 ↓
-Graphify CLI：生成、更新和查询 .graphify/
+Graphify CLI：生成、更新和查询 graphify-out/
                 ↑
 Git hook / 显式 refresh：维护 provider-native 项目图
 ```

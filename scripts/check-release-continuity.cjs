@@ -307,7 +307,7 @@ function checkOpenCodeReleaseSurface() {
       tokens: [
         'Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode',
         'spec-first init --opencode',
-        '.opencode/commands/spec/**',
+        '.opencode/commands/spec-*.md',
         'generated_runtime_preview',
         'The `init -y` default host set remains Claude Code + Codex',
         'opencode.jsonc',
@@ -318,7 +318,7 @@ function checkOpenCodeReleaseSurface() {
       tokens: [
         'Claude Code、Codex、Kiro、Qoder、Cursor 和 OpenCode',
         'spec-first init --opencode',
-        '.opencode/commands/spec/**',
+        '.opencode/commands/spec-*.md',
         'generated_runtime_preview',
         '`init -y` 默认宿主集合仍只有 Claude Code + Codex',
         'opencode.jsonc',
@@ -326,15 +326,15 @@ function checkOpenCodeReleaseSurface() {
     },
     {
       path: 'CLAUDE.md',
-      tokens: ['.opencode/commands/spec/', '.opencode/skills/', '.opencode/spec-first/'],
+      tokens: ['.opencode/commands/spec-*.md', '.opencode/commands/spec/', '.opencode/skills/', '.opencode/spec-first/'],
     },
     {
       path: 'AGENTS.md',
-      tokens: ['.opencode/commands/spec/', '.opencode/skills/', '.opencode/spec-first/'],
+      tokens: ['.opencode/commands/spec-*.md', '.opencode/commands/spec/', '.opencode/skills/', '.opencode/spec-first/'],
     },
     {
       path: 'docs/contracts/context-governance.md',
-      tokens: ['.opencode/commands/spec/**', '.opencode/skills/**', 'opencode.jsonc'],
+      tokens: ['.opencode/commands/spec-*.md', '.opencode/commands/spec/**', '.opencode/skills/**', 'opencode.jsonc'],
     },
     {
       path: 'docs/contracts/source-runtime-customization-boundary.md',

@@ -159,8 +159,8 @@ if (name === 'graphify') {
     ensure(path.join(process.cwd(), roots[platformName] || '.qoder', 'skills', 'graphify', 'SKILL.md'), '# Graphify\\n');
     process.stdout.write('installed\\n');
   } else if (args[0] === 'extract' || args[0] === 'update') {
-    ensure(path.join(process.cwd(), '.graphify', 'graph.json'), '{}\\n');
-    ensure(path.join(process.cwd(), '.graphify', 'GRAPH_REPORT.md'), '# Graph\\n');
+    ensure(path.join(process.cwd(), 'graphify-out', 'graph.json'), '{}\\n');
+    ensure(path.join(process.cwd(), 'graphify-out', 'GRAPH_REPORT.md'), '# Graph\\n');
     process.stdout.write('graph ready\\n');
   } else if (args[0] === 'hook' && args[1] === 'install') {
     ensure(path.join(process.cwd(), '.git', 'hooks', 'post-commit'), '#!/bin/sh\\n# Installed by: graphify hook install\\n');
@@ -218,7 +218,7 @@ function createScenarioContext(root, platform, materializedRoot, mode) {
   fs.mkdirSync(path.dirname(runtimeState), { recursive: true });
   fs.writeFileSync(runtimeState, '{"manifestVersion":"1.13.2"}\n');
   if (mode === 'graphify-refresh') {
-    const graphPath = path.join(repo, '.graphify', 'graph.json');
+    const graphPath = path.join(repo, 'graphify-out', 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}\n');
   }
@@ -289,7 +289,7 @@ function classifyEffects(context, beforeRepo, beforeHome) {
     || entry === 'compound-engineering.local.md')) effects.add('project-config');
   if (repoPaths.some((entry) => /^\.(?:claude|codex|cursor|kiro|qoder)\//.test(entry)
     && entry !== '.qoder/spec-first/state.json')) effects.add('host-config');
-  if (repoPaths.some((entry) => entry.startsWith('.graphify/') || entry.includes('/skills/graphify/')
+  if (repoPaths.some((entry) => entry.startsWith('graphify-out/') || entry.startsWith('.graphify/') || entry.includes('/skills/graphify/')
     || entry.startsWith('.git/hooks/'))
     || calls.some((entry) => entry.name === 'graphify'
       && ['install', 'extract', 'update'].includes(entry.args[0]))) effects.add('provider-mutation');

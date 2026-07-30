@@ -34,8 +34,10 @@
     }
   },
   "command_loader": {
-    "status": "passed",
+    "status": "failed_contract_mismatch",
     "key": "spec/work",
+    "expected_key": "spec-work",
+    "reason_code": "opencode_command_key_contract_mismatch",
     "description": "Run the Spec-First execution workflow",
     "support_root_marker": true,
     "workflow_heading_marker": true,
@@ -118,6 +120,7 @@
     "evidence_claim": "generated_runtime_preview",
     "promotion_gate": "incomplete",
     "reason_codes": [
+      "opencode_command_key_contract_mismatch",
       "opencode_sequential_thinking_transport_timeout",
       "opencode_permission_enforcement_not_observed",
       "opencode_precedence_corrected_during_journey"
@@ -125,6 +128,7 @@
   },
   "redaction_status": "passed",
   "limitations": [
+    "The generated nested command path registered spec/work, which violates the public /spec-* command contract and requires a flat spec-work.md projection plus a fresh host journey.",
     "No provider-backed permission prompt was executed.",
     "Sequential-thinking transport timed out after 30000ms.",
     "Full debug config output is truncated near 64 KiB; a recoverable minimal loader probe was used and full generated assets were restored.",

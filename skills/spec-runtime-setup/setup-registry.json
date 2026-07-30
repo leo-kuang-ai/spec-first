@@ -1768,7 +1768,7 @@
         "scope": "project",
         "requires_explicit_gate": false,
         "requirement_workspace_path": null,
-        "artifact_root": ".graphify"
+        "artifact_root": "graphify-out"
       },
       "steady_state": {
         "refresh_owner": "provider-native",
@@ -1776,7 +1776,7 @@
         "hook_default": true,
         "usage_owner": "downstream-skill"
       },
-      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.29` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 `graphify extract . --code-only` 并以 `GRAPHIFY_OUT=.graphify` 维护唯一current artifact。已有`.graphify/`时普通setup只读query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro使用Provider-native project integration，Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和`.graphify`环境。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
+      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.29` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 Provider 原生 `graphify extract . --code-only`，唯一current artifact位于原生默认目录`graphify-out/`，不注入`GRAPHIFY_OUT`。仅有旧版spec-first适配目录`.graphify/`时，setup将其原子迁移到`graphify-out/`；两个目录同时存在则fail closed。已有`graphify-out/`时普通setup执行裸query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro使用Provider-native project integration，Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和Provider原生默认输出，不依赖spec-first环境变量。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
       "detection": {
         "kind": "command",
         "command": "graphify",
@@ -1784,10 +1784,10 @@
           "--version"
         ],
         "artifact_paths": [
-          ".graphify/graph.json",
-          ".graphify/GRAPH_REPORT.md",
           "graphify-out/graph.json",
-          "graphify-out/GRAPH_REPORT.md"
+          "graphify-out/GRAPH_REPORT.md",
+          ".graphify/graph.json",
+          ".graphify/GRAPH_REPORT.md"
         ]
       },
       "safety": {
@@ -1807,7 +1807,7 @@
           "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "Installs the release-reviewed `graphifyy@0.9.29` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to `.graphify/` and the selected launcher. First generation is local AST `extract --code-only`; explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter, `.graphify` env and allowed rebuild command. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
+        "install_effect": "Installs the release-reviewed `graphifyy@0.9.29` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
       },
       "readiness": {
         "producer": "spec-runtime-setup",
@@ -1826,27 +1826,27 @@
       "installation": {
         "strategy": "python-isolated-tool",
         "dependency_ref": "graphify",
-        "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`.graphify/` code-only生成、query与hook验证。"
+        "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。"
       },
       "platform_overrides": {
         "macos": {
           "installation": {
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         },
         "linux": {
           "installation": {
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         },
         "wsl": {
           "installation": {
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         },
         "windows": {
           "installation": {
-            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、GRAPHIFY_OUT=.graphify extract --code-only、query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
       }

@@ -19,7 +19,7 @@ describe('renderRoutingInstruction — A2/CR10 routing guidance', () => {
     const text = renderRoutingInstruction({ workspaceRoot: '/tmp/需求A', repos });
     expect(text).toContain('projectPath');
     expect(text).toContain('best-effort');
-    expect(text).toContain('.graphify/merged-graph.json');
+    expect(text).toContain('graphify-out/merged-graph.json');
     expect(text.toLowerCase()).toContain('fallback');
     expect(text).toContain('another requirement folder'); // isolation guidance
     expect(text).toContain('--workspace-graph-status');

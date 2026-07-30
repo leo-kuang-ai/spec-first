@@ -131,8 +131,8 @@ function runWorkspaceGraphStatus({
     };
   });
 
-  const mergedPath = path.join(workspaceRoot, '.graphify', 'merged-graph.json');
-  const graphifyDir = path.join(workspaceRoot, '.graphify');
+  const mergedPath = path.join(workspaceRoot, 'graphify-out', 'merged-graph.json');
+  const graphifyDir = path.join(workspaceRoot, 'graphify-out');
   const graphifyPresent = fs.existsSync(graphifyDir);
   const mergedArtifact = inspectFileArtifact(mergedPath);
   const mergedPresent = mergedArtifact.present;

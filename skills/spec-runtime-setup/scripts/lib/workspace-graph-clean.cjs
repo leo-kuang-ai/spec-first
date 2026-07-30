@@ -8,7 +8,7 @@
 //     `.git/info/exclude` block (self-only); current explicit-refresh builds do
 //     not install hooks, while legacy/no-state cleanup asks Graphify to uninstall
 //     any older native hook;
-//   - delete the workspace `.graphify/` artifact tree (contained);
+//   - delete the workspace `graphify-out/` artifact tree (contained);
 //   - surface a CodeGraph daemon-cleanup action (spec-first does not force-kill
 //     provider daemons; it reports the action).
 //
@@ -193,7 +193,7 @@ function runWorkspaceGraphClean({
   const childOrRoutingFailed = repoFailed || routingFailed;
 
   // 5. 只有 child/routing 已清理成功才删除 state/tree；否则保留 receipt 供裸重试。
-  const graphifyOut = path.join(workspaceRoot, '.graphify');
+  const graphifyOut = path.join(workspaceRoot, 'graphify-out');
   const graphify = childOrRoutingFailed
     ? { ok: true, status: 'preserved', removed: false, reason_code: '' }
     : safeRemoveDir(workspaceRoot, graphifyOut);

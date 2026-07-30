@@ -3,7 +3,7 @@
 const path = require('node:path');
 const {
   makeWorkspaceRunners,
-  GRAPHIFY_OUT_ENV,
+  GRAPHIFY_OUT_DIRNAME,
 } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function recordingExec(behavior = () => ({ status: 0, stdout: '', stderr: '' })) {
@@ -33,31 +33,31 @@ describe('makeWorkspaceRunners — command/env construction mirrors verified pro
     expect(calls[0].args[0]).toBe('install');
   });
 
-  test('graphifyExtract mirrors extract <src> --out <dest> --code-only with GRAPHIFY_OUT env, returns out-of-tree graphPath', () => {
+  test('graphifyExtract uses the provider-native graphify-out default without an environment override', () => {
     const { exec, calls } = recordingExec();
     const runners = makeWorkspaceRunners({ exec });
-    const outDir = '/ws/.graphify/工程3';
+    const outDir = '/ws/graphify-out/工程3';
     const res = runners.graphifyExtract('/ws/工程3', outDir);
     expect(res.ok).toBe(true);
     expect(calls[0].command).toBe('graphify');
     expect(calls[0].args).toEqual(['extract', '/ws/工程3', '--out', outDir, '--code-only']);
-    expect(calls[0].opts.env.GRAPHIFY_OUT).toBe(GRAPHIFY_OUT_ENV);
-    expect(res.graphPath).toBe(path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json'));
+    expect(calls[0].opts.env).not.toHaveProperty('GRAPHIFY_OUT');
+    expect(res.graphPath).toBe(path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json'));
   });
 
   test('graphifyMerge passes all inputs plus --out', () => {
     const { exec, calls } = recordingExec();
     const runners = makeWorkspaceRunners({ exec });
-    const res = runners.graphifyMerge(['/a/graph.json', '/b/graph.json'], '/ws/.graphify/merged-graph.json');
+    const res = runners.graphifyMerge(['/a/graph.json', '/b/graph.json'], '/ws/graphify-out/merged-graph.json');
     expect(res.ok).toBe(true);
-    expect(calls[0].args).toEqual(['merge-graphs', '/a/graph.json', '/b/graph.json', '--out', '/ws/.graphify/merged-graph.json']);
+    expect(calls[0].args).toEqual(['merge-graphs', '/a/graph.json', '/b/graph.json', '--out', '/ws/graphify-out/merged-graph.json']);
   });
 
   test('non-zero exit maps to a stable reason_code, not a throw', () => {
     const { exec } = recordingExec(() => ({ status: 1, stdout: '', stderr: 'boom' }));
     const runners = makeWorkspaceRunners({ exec });
     expect(runners.codegraphInit('/ws/x')).toEqual(expect.objectContaining({ ok: false, reason_code: 'codegraph-init-failed' }));
-    expect(runners.graphifyExtract('/ws/x', '/ws/.graphify/x')).toEqual(expect.objectContaining({ ok: false, reason_code: 'graphify-extract-failed' }));
+    expect(runners.graphifyExtract('/ws/x', '/ws/graphify-out/x')).toEqual(expect.objectContaining({ ok: false, reason_code: 'graphify-extract-failed' }));
     expect(runners.graphifyMerge(['/a'], '/o')).toEqual(expect.objectContaining({ ok: false, reason_code: 'graphify-merge-failed' }));
   });
 
@@ -85,7 +85,7 @@ describe('makeWorkspaceRunners — integrates with buildWorkspaceGraphs', () => 
     const exec = (command, args) => {
       if (command === 'graphify' && args[0] === 'extract') {
         const outDir = args[args.indexOf('--out') + 1];
-        const graphPath = path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json');
+        const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
         fs.mkdirSync(path.dirname(graphPath), { recursive: true });
         fs.writeFileSync(graphPath, '{}');
       } else if (command === 'graphify' && args[0] === 'merge-graphs') {

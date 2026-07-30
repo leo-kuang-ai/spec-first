@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const OpenCodeAdapter = require('../../src/cli/adapters/opencode');
 const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
+const plugin = require('../../src/cli/plugin');
 const {
   defaultInitPlatforms,
   parseInitArgs,
@@ -14,6 +15,11 @@ const {
 const { parseCleanArgs } = require('../../src/cli/commands/clean');
 const { detectPlatforms } = require('../../src/cli/commands/doctor');
 const { detectInstalledRuntimePlatforms } = require('../../src/cli/commands/update');
+const {
+  applyOperationPlan,
+  planHardResetManagedAssets,
+  planRetiredRuntimeAssetPrune,
+} = require('../../src/cli/state');
 
 function tempProject(label) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-opencode-${label}-`));
@@ -41,7 +47,8 @@ describe('OpenCode adapter', () => {
       id: 'opencode',
       runtimeRoot: '.opencode',
       managedRoot: '.opencode/spec-first',
-      commandRoot: '.opencode/commands/spec',
+      commandRoot: '.opencode/commands',
+      commandRootIsDedicated: false,
       skillsRoot: '.opencode/skills',
       workflowsRoot: '.opencode/skills',
       agentsRoot: '.opencode/agents',
@@ -55,6 +62,77 @@ describe('OpenCode adapter', () => {
     });
     expect('workerPrimitive' in adapter).toBe(false);
     expect('workerCapabilities' in adapter).toBe(false);
+    expect(adapter.commandFilename({ name: 'prd', filename: 'prd.md' })).toBe('spec-prd.md');
+  });
+
+  test('projects every public command as a flat spec-* OpenCode command key', () => {
+    const adapter = new OpenCodeAdapter();
+    const projectRoot = tempProject('flat-command-keys');
+    const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+    const commandPaths = plan.operations
+      .filter((operation) => operation.reason === 'managed_command')
+      .map((operation) => operation.path);
+
+    expect(commandPaths).toHaveLength(syncedAssets.commands.length);
+    expect(commandPaths).toContain('.opencode/commands/spec-prd.md');
+    expect(commandPaths.every((commandPath) => (
+      /^\.opencode\/commands\/spec-[a-z0-9-]+\.md$/.test(commandPath)
+    ))).toBe(true);
+    expect(commandPaths.some((commandPath) => commandPath.startsWith('.opencode/commands/spec/')))
+      .toBe(false);
+  });
+
+  test('retires the nested command namespace without deleting user-owned OpenCode commands', () => {
+    const adapter = new OpenCodeAdapter();
+    const projectRoot = tempProject('legacy-command-migration');
+    writeText(
+      path.join(projectRoot, '.opencode', 'commands', 'spec', 'work.md'),
+      'legacy managed command\n',
+    );
+    writeText(
+      path.join(projectRoot, '.opencode', 'commands', 'spec-work.md'),
+      'current managed command\n',
+    );
+    writeText(
+      path.join(projectRoot, '.opencode', 'commands', 'custom.md'),
+      'user command\n',
+    );
+
+    expect(adapter.planRuntimeFilesRemoval(projectRoot).operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'remove_dir',
+        path: '.opencode/commands/spec',
+        reason: 'retired_runtime_command_namespace',
+      }),
+    ]));
+    expect(planRetiredRuntimeAssetPrune(projectRoot, adapter).operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'remove_dir',
+        path: '.opencode/commands/spec',
+        reason: 'retired_runtime_asset',
+      }),
+    ]));
+
+    const hardReset = planHardResetManagedAssets(projectRoot, {
+      manifestVersion: 'test',
+      platform: 'opencode',
+      commands: ['spec-work.md'],
+      skills: [],
+      workflowSkills: [],
+      agents: [],
+      agentSupportFiles: [],
+    }, adapter);
+    expect(hardReset.operations).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'remove_dir',
+        path: '.opencode/commands',
+      }),
+    ]));
+    applyOperationPlan(projectRoot, hardReset);
+    expect(fs.existsSync(path.join(projectRoot, '.opencode', 'commands', 'spec-work.md')))
+      .toBe(false);
+    expect(fs.readFileSync(path.join(projectRoot, '.opencode', 'commands', 'custom.md'), 'utf8'))
+      .toBe('user command\n');
   });
 
   test('keeps OpenCode opt-in across init, clean, and update detection', () => {
@@ -90,6 +168,7 @@ describe('OpenCode adapter', () => {
       '',
       'Canonical workflow body.',
       'Use `.agents/skills/spec-work/scripts/check.cjs`.',
+      'Compare `.claude/commands/spec/work.md` when checking command projection.',
     ].join('\n');
 
     const command = adapter.renderCommandContent(
@@ -111,6 +190,8 @@ describe('OpenCode adapter', () => {
     expect(command).toContain('Canonical workflow body.');
     expect(command).not.toContain('Template-only explanation.');
     expect(command).toContain('.opencode/skills/spec-work/scripts/check.cjs');
+    expect(command).toContain('.opencode/commands/spec-work.md');
+    expect(command).not.toContain('.opencode/commands/spec/work.md');
     expect(projectedSkill).toContain('Canonical workflow body.');
     expect(projectedSkill).toContain('.opencode/skills/spec-work/scripts/check.cjs');
   });
@@ -133,7 +214,7 @@ describe('OpenCode adapter', () => {
     );
 
     expect(projected).toContain(
-      'generated mirrors (`.opencode/commands/spec/**`, `.opencode/skills/**`, `.opencode/spec-first/**`)',
+      'generated mirrors (`.opencode/commands/spec-*.md`, retired `.opencode/commands/spec/**`, `.opencode/skills/**`, `.opencode/spec-first/**`)',
     );
     expect(adapter.inspectRuntimeFiles(projectRoot)).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -153,7 +234,7 @@ describe('OpenCode adapter', () => {
     ]));
 
     writeText(
-      path.join(projectRoot, '.opencode', 'commands', 'spec', 'work.md'),
+      path.join(projectRoot, '.opencode', 'commands', 'spec-work.md'),
       '---\ndescription: "work"\n---\n\nbody\n',
     );
     expect(adapter.inspectRuntimeFiles(projectRoot)).toEqual(expect.arrayContaining([

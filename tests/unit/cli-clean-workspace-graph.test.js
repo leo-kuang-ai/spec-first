@@ -35,8 +35,8 @@ describe('spec-first clean --workspace-graph', () => {
     const api = initRepo(ws, 'api');
     fs.mkdirSync(path.join(api, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(api, '.codegraph', 'db'), 'x');
-    fs.mkdirSync(path.join(ws, '.graphify'), { recursive: true });
-    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{}');
+    fs.mkdirSync(path.join(ws, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'merged-graph.json'), '{}');
     fs.writeFileSync(
       path.join(ws, 'AGENTS.md'),
       '<!-- spec-first:workspace-routing start -->\nroute\n<!-- spec-first:workspace-routing end -->\n',
@@ -55,7 +55,7 @@ describe('spec-first clean --workspace-graph', () => {
     expect(logs.join('\n')).toContain('.codegraph');
     // Dry-run must not delete.
     expect(fs.existsSync(path.join(api, '.codegraph'))).toBe(true);
-    expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(true);
+    expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(true);
   });
 
   test('apply removes managed graph assets via injectable clean dependency', () => {
@@ -112,7 +112,7 @@ describe('spec-first clean --workspace-graph', () => {
           status: 'ready',
           workspace_root: '/tmp/ws',
           repos: [{ repo_id: 'api', git_root: '/tmp/ws/api', codegraph_present: true }],
-          workspace: { graphify_present: true, graphify_dir: '/tmp/ws/.graphify', refresh_mode: 'explicit' },
+          workspace: { graphify_present: true, graphify_dir: '/tmp/ws/graphify-out', refresh_mode: 'explicit' },
           routing: { entries: [] },
         }),
       })).toBe(0);

@@ -11,7 +11,7 @@ const stateSchema = require('../contracts/workspace-graph-state.schema.json');
 const STATE_BASENAME = 'workspace-graph-state.json';
 
 function workspaceGraphStatePath(workspaceRoot) {
-  return path.join(workspaceRoot, '.graphify', STATE_BASENAME);
+  return path.join(workspaceRoot, 'graphify-out', STATE_BASENAME);
 }
 
 function inspectRepoSnapshot(repo) {
@@ -74,7 +74,7 @@ function writeWorkspaceGraphState({
   refreshMode = 'explicit',
   expectedRepos = null,
 } = {}) {
-  const graphifyDir = path.join(workspaceRoot, '.graphify');
+  const graphifyDir = path.join(workspaceRoot, 'graphify-out');
   const target = workspaceGraphStatePath(workspaceRoot);
   let tempPath = null;
   try {

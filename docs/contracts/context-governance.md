@@ -46,7 +46,8 @@
 | `.qoder/hooks/prd-prewrite-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed PreToolUse PRD guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
 | `.qoder/hooks/prd-readiness-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed Stop PRD readiness guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
 | `.qoder/settings.local.json` | `host_local_config_excluded` | Qoder local MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --qoder` 保留整文件，server entry 由 setup/uninstall 路径管理 |
-| `.opencode/commands/spec/**` | `generated_runtime_mirror_excluded` | OpenCode generated workflow command runtime mirror |
+| `.opencode/commands/spec-*.md` | `generated_runtime_mirror_excluded` | OpenCode generated workflow command runtime file mirror |
+| `.opencode/commands/spec/**` | `generated_runtime_mirror_excluded` | OpenCode retired legacy command namespace；仅 runtime cleanup / drift repair 读取 |
 | `.opencode/skills/**` | `generated_runtime_mirror_excluded` | OpenCode generated Agent Skills runtime mirror |
 | `.opencode/spec-first/**` | `generated_runtime_mirror_excluded` | OpenCode spec-first managed state/runtime facts |
 | `opencode.json` / `opencode.jsonc` | `host_local_config_excluded` | OpenCode project config 是 mixed-ownership host config，不是 spec-first source truth；普通 context 默认排除，runtime/setup task 可按精确路径读取，clean/uninstall 只删除仍匹配 expected value 的 managed entries |

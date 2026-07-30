@@ -95,7 +95,7 @@ function parityRunner(calls) {
       fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Graphify\n');
     }
     if (graphifyCommand && ['extract', 'update'].includes(args[0])) {
-      const artifact = path.resolve(cwd, (options.env && options.env.GRAPHIFY_OUT) || '.graphify');
+      const artifact = path.resolve(cwd, (options.env && options.env.GRAPHIFY_OUT) || 'graphify-out');
       fs.mkdirSync(artifact, { recursive: true });
       fs.writeFileSync(path.join(artifact, 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
     }
@@ -167,8 +167,8 @@ function runModeCharacterization(platform, contract) {
   // preflight 测试覆盖，避免把缺失 runtime state 误当作 legacy mode 语义变更。
   writeCurrentRuntimeState(target);
   if (contract.argv.includes('--refresh')) {
-    fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
-    fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), '{}\n');
+    fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), '{}\n');
   }
   const repoBefore = fileSnapshot(target);
   const homeBefore = fileSnapshot(homeDir);

@@ -2,15 +2,16 @@
 
 ## 结论
 
-本轮确认 OpenCode 1.18.7 能发现并加载 spec-first 的 command 与 Skill，能解析 35 条精确 Skill allow、5 条危险工具 `ask`，并能通过 `context7` 建立真实 MCP transport。Runtime Setup 的 project/user target、JSONC fail-closed、permission conflict、exact-entry uninstall、Codex/OpenCode coexistence 与 consumer-aware clean 均取得真实 fixture 证据。
+本轮确认 OpenCode 1.18.7 能发现并加载 spec-first 的 command 文件与 Skill，但同时暴露 command key contract failure：嵌套 `.opencode/commands/spec/work.md` 被注册为 `spec/work`，不符合公开 `/spec-*` 契约所要求的 `spec-work`。本轮还确认 35 条精确 Skill allow、5 条危险工具 `ask` 的 resolved config，并通过 `context7` 建立真实 MCP transport；Runtime Setup 的 project/user target、JSONC fail-closed、permission conflict、exact-entry uninstall、Codex/OpenCode coexistence 与 consumer-aware clean 均取得真实 fixture 证据。
 
 当前最大诚实声明仍为 `generated_runtime_preview`，`testedVersions` 保持空数组。阻断晋升的直接原因是：
 
+- command loader 返回 `spec/work` 而不是 R6 要求的 `spec-work`；旧投射不能被判为 command contract passed，必须改为扁平 `.opencode/commands/spec-work.md` 并重跑同版本 journey；
 - `sequential-thinking` MCP transport 在 OpenCode 的 30 秒窗口内超时；
 - 隔离环境没有 provider credential，且本轮没有额外的外部模型通信授权，因此未触发真实的危险工具 permission prompt；resolved config 不能替代 enforcement outcome；
 - loader/config journey 发现并修正了 OpenCode 1.18.7 的真实 config precedence：project config 后加载并高于 user config。修复已进入 canonical registry 与聚焦回归，但这一发现本身要求保持谨慎 claim。
 
-因此不修改 `src/cli/adapters/opencode.js` 的 evidence metadata。
+因此不提升 `src/cli/adapters/opencode.js` 的 evidence metadata。
 
 ## 身份与范围
 
@@ -32,8 +33,8 @@
 
 ### Command loader
 
-- recoverable minimal probe 只保留 `spec/work` command；验证后恢复 `17` 个 command 文件。
-- OpenCode 返回 key `spec/work`，description 为 `Run the Spec-First execution workflow`。
+- recoverable minimal probe 只保留由嵌套路径注册出的 `spec/work` command；验证后恢复 `17` 个 command 文件。
+- OpenCode 返回 key `spec/work`，而公开 command contract 期望 `spec-work`；因此 loader 文件发现成立，但 command key contract 判定为 `failed_contract_mismatch`，reason code 为 `opencode_command_key_contract_mismatch`。
 - loaded template 包含 `.opencode/skills/spec-work` support-root marker 与 `# Work Execution Command`。
 - 去除 frontmatter、统一换行并 trim 后，loaded template 与 generated command body SHA-256 均为 `c51aa2225159825a8944b019b43cd848c95bae4e8fc9ce565a91facada7f8c18`。
 
@@ -74,7 +75,7 @@ OpenCode loader 日志显示顺序为 user config → project config，因此 pr
 
 ## Source 修正与验证
 
-U6 真实 loader order 触发了 plan 内 KTD12/U4 已授权的必要 source 修正：调整 OpenCode project/user precedence，并补充 registry 与 host-config 回归。聚焦验证：
+U6 真实 loader order 触发了 plan 内 KTD12/U4 已授权的必要 source 修正：调整 OpenCode project/user precedence，并补充 registry 与 host-config 回归。后续复核又确认 nested command path 的公开 key 不符合 R6；该问题必须由 canonical adapter 改成扁平 `spec-*.md` 后重新运行 host journey，不能把本 artifact 的旧 `spec/work` 观察提升为通过。原聚焦验证：
 
 ```text
 npx jest tests/unit/mcp-setup-host-config.test.js tests/unit/mcp-setup-registry.test.js --runInBand
@@ -88,6 +89,7 @@ npx jest tests/unit/mcp-setup-host-config.test.js tests/unit/mcp-setup-registry.
 - `sequential-thinking` transport 超时；网络、npm cache、package release 或 OpenCode timeout 改变后必须重跑。
 - 未经显式外部模型通信授权，未执行 provider-backed permission prompt；取得授权与 credential 后需分别观察 exact Skill allow 和危险工具 ask/deny outcome。
 - OpenCode 版本、config merge/load order、Skill discovery roots、command key normalization、permission schema/order 或 MCP timeout 变化时，本证据失效。
+- command projection 从 nested namespace 改为 flat `spec-*.md` 后，本文件的 command loader 结果仅保留为旧实现反例；新的 `/spec-*` outcome 必须由 fresh journey 取证。
 - 本轮第一次 fixture init 因 cwd 误指向 source repo，曾通过 source-owned `init` 刷新当前仓库 ignored runtime；没有 tracked diff，也没有手改 generated runtime。后续旅程均在隔离 fixture cwd 执行。
 - minimal loader probe 临时收窄 generated runtime 后已恢复 `17/35/35` 全量资产；其目的仅是规避 OpenCode 约 64 KiB debug JSON 截断，不改变 source claim。
 

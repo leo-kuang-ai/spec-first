@@ -6,7 +6,7 @@
 // 昂贵，必须异步（commit 立即返回）、并发安全（同一 workspace 绝不两个重建并行，
 // 否则 merged graph 可能 corrupt）、失败可见（后台失败落盘 reason_code 供消费侧读取）。
 //
-// 边界：本模块只写 `<workspaceRoot>/.graphify/` 下的 lock/status/pending 三个受控文件，
+// 边界：本模块只写 `<workspaceRoot>/graphify-out/` 下的 lock/status/pending 三个受控文件，
 // 全部经 assertContainedPath 校验；绝不写外部路径、绝不 follow symlink out。重建命令本身
 // 由调用方以 verified 绝对 launcher + workspace root 传入（KTD5），本模块不解析 PATH。
 //
@@ -36,13 +36,13 @@ const STARTING_LOCK_MAX_MS = 2 * 60 * 1000;
 const REBUILD_TIMEOUT_MS = 20 * 60 * 1000;
 
 function graphifyDir(workspaceRoot) {
-  return assertContainedPath(workspaceRoot, path.join(workspaceRoot, '.graphify'), {
+  return assertContainedPath(workspaceRoot, path.join(workspaceRoot, 'graphify-out'), {
     reasonCode: 'workspace-async-refresh-path-escapes-workspace',
   });
 }
 
 function containedFile(workspaceRoot, basename) {
-  return assertContainedPath(workspaceRoot, path.join(workspaceRoot, '.graphify', basename), {
+  return assertContainedPath(workspaceRoot, path.join(workspaceRoot, 'graphify-out', basename), {
     reasonCode: 'workspace-async-refresh-path-escapes-workspace',
   });
 }

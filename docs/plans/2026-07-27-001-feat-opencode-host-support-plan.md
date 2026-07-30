@@ -161,7 +161,7 @@ Product intent 未改变：仍是 opt-in preview 6th host、双入口、五宿�
 - KTD1. **统一的六宿主枚举。** 将 OpenCode 加入 `src/cli/adapters/index.js`，使 `getSupportedPlatforms()` 返回六个 ID。任何 descriptor 或 support-state view 都必须由这些 adapter instances 派生，不维护独立 host list；CLI、governance 与 tests 中的静态 five-host arrays 要么迁移，要么删除。
 - KTD2. **Opt-in 由 init choices 拥有。** `src/cli/commands/init-args.js` 以 `defaultForYes=false` 加入 OpenCode；Claude/Codex 默认集合不变。
 - KTD3. **Preview state 与 evidence claim 分离。** Adapter metadata 报告 `supportState=preview`；doctor 独立报告 detected CLI version、`testedVersions`、runtime checks 与 reason codes。只检测到 OpenCode 1.18.7 时仍保持 `testedVersions=[]` 与 `opencode_generated_runtime_loader_unverified`。
-- KTD4. **OpenCodeAdapter 直接继承 PlatformAdapter。** Runtime roots 为 `.opencode`、`.opencode/commands/spec`、`.opencode/skills`、`.opencode/spec-first/state.json`，共享 instruction file 为 `AGENTS.md`。当前产品决策不需要 host-native pointer，因此不继承 `PointerBasedAdapter`。
+- KTD4. **OpenCodeAdapter 直接继承 PlatformAdapter。** Runtime roots 为 `.opencode`、共享 command root `.opencode/commands` 下的 `spec-*.md`、`.opencode/skills`、`.opencode/spec-first/state.json`，共享 instruction file 为 `AGENTS.md`。`.opencode/commands/spec/` 是会被 init/clean 清理的已退役 namespace；hard reset 只删除 state 记录的 managed command，不整目录删除用户 command。当前产品决策不需要 host-native pointer，因此不继承 `PointerBasedAdapter`。
 - KTD5. **双入口共享 canonical body。** Governed `workflow_command` 对 OpenCode 交付 `command`，同时为 skill discovery 投射同一 skill body；standalone 交付 `skill`，internal 保持 `internal`。内容转换只处理 OpenCode 必需的 path/frontmatter/setup-host pinning。
 - KTD6. **共享 instruction cleanup 使用 consumer 三态。** 对每个共享同一 `instructionFile` 的其他 adapter，clean 判定 `present`、`confirmed_absent` 或 `uncertain`。只有所有其他 consumer 都为 `confirmed_absent` 时才删除 managed blocks；uncertainty 必须保留 block 并给出可行动诊断。
 - KTD7. **Runtime path registry 是 ownership source。** 在 `src/cli/adapters/platform-registry.js` 增加 OpenCode surfaces；generated runtime directories 是 managed，project/user config 保持 host-local 或 host-user-owned，不进入普通 runtime rewrite ownership。
@@ -272,7 +272,7 @@ flowchart TD
 ### Assumptions and Deferred Implementation Notes
 
 - Planning assumption: OpenCode 1.18.7 supports a strict JSON project config and a separate JSONC surface whose precedence must be verified before mutation. U4/U6 must stop if this is false。
-- Planning assumption: command and skill discovery can coexist under `.opencode/commands/spec` and `.opencode/skills`; U6 owns proof。
+- U6 已观察到 OpenCode 会把嵌套 `.opencode/commands/spec/work.md` 注册为 `spec/work`，不符合 R6 的 `/spec-*` 契约；canonical projection 因此改用扁平 `.opencode/commands/spec-*.md`。2026-07-30 的 OpenCode 1.18.9 聚焦 journey 已确认当前项目返回 17 个扁平 key，包含 `spec-prd` 且不存在 `spec/prd`；这只关闭 command-key outcome，不替代完整 MCP/permission/coexistence/clean promotion gate。
 - Planning assumption: exact permission rules can be represented without wildcard/global allow; U7 must preserve user rule ordering and U6 must validate last-match behavior。
 - Exact helper names, config field names and diagnostic JSON shape may change during implementation after current source and version-matched OpenCode evidence are inspected, but ownership boundaries and fail-closed behavior may not weaken。
 

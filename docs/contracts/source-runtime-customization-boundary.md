@@ -48,7 +48,8 @@ Do not hand-edit these paths as source fixes:
 - spec-first managed `.qoder/hooks/prd-prewrite-guard`
 - spec-first managed `.qoder/hooks/prd-readiness-guard`
 - `.qoder/settings.local.json` (host-local MCP config output; not source truth, and not removed by `spec-first clean --qoder`)
-- `.opencode/commands/spec/**`
+- `.opencode/commands/spec-*.md`
+- `.opencode/commands/spec/` (retired legacy namespace)
 - `.opencode/skills/spec-*/` and `.opencode/skills/using-spec-first/`
 - `.opencode/spec-first/`
 

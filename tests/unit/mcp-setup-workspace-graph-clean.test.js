@@ -7,7 +7,7 @@ const { spawnSync } = require('node:child_process');
 
 const { runWorkspaceGraphClean } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs');
 const { runWorkspaceGraphBuild } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-clean-')));
@@ -22,7 +22,7 @@ function initRepo(root, rel) {
 function fakeExec(command, args) {
   if (command === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
-    const graphPath = path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json');
+    const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}');
   } else if (command === 'graphify' && args[0] === 'merge-graphs') {
@@ -38,7 +38,7 @@ function status(repo) {
 }
 
 describe('runWorkspaceGraphClean — reverses the build, self-only and idempotent', () => {
-  test('after build, clean removes .codegraph, .graphify, exclude block, and routing', () => {
+  test('after build, clean removes .codegraph, graphify-out, exclude block, and routing', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     initRepo(ws, 'web');
@@ -52,7 +52,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     });
     expect(build.status).toBe('complete');
     expect(fs.existsSync(path.join(ws, 'api', '.codegraph'))).toBe(true);
-    expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(true);
+    expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(true);
     expect(fs.readFileSync(path.join(ws, 'CLAUDE.md'), 'utf8')).toContain('projectPath');
 
     const uninstalls = [];
@@ -62,7 +62,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(clean.status).toBe('complete');
     expect(fs.existsSync(path.join(ws, 'api', '.codegraph'))).toBe(false);
     expect(fs.existsSync(path.join(ws, 'web', '.codegraph'))).toBe(false);
-    expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(false);
     expect(clean.workspace_graphify_removed).toBe(true);
     // build 安装了 spec-first 自有子仓 hook（children contained）；clean 对称移除 managed block，
     // 绝不调用 graphify hook uninstall。
@@ -185,7 +185,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const first = runWorkspaceGraphClean({ cwd: ws, repos: ['api'], allowDiscovery: false });
     expect(first.status).toBe('partial');
     expect(first.workspace_graphify_status).toBe('preserved');
-    expect(fs.existsSync(path.join(ws, '.graphify', 'workspace-graph-state.json'))).toBe(true);
+    expect(fs.existsSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'))).toBe(true);
 
     fs.writeFileSync(excludePath, '# repaired\n');
     const retry = runWorkspaceGraphClean({ cwd: ws, allowDiscovery: true, exec: () => ({ status: 0 }) });
@@ -213,7 +213,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    fs.rmSync(path.join(ws, '.graphify', 'workspace-graph-state.json'));
+    fs.rmSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'));
 
     const clean = runWorkspaceGraphClean({
       cwd: ws,

@@ -264,7 +264,7 @@ function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
         + ` hook=${repo.hook_uninstalled}`,
     );
   }
-  console.log(`  workspace .graphify removed: ${Boolean(result.workspace_graphify_removed)}`);
+  console.log(`  workspace graphify-out removed: ${Boolean(result.workspace_graphify_removed)}`);
   if (result.routing && Array.isArray(result.routing.entries)) {
     for (const entry of result.routing.entries) {
       console.log(`  routing ${entry.entry_file}: ${entry.status}`);
@@ -524,7 +524,7 @@ function printHelp() {
     '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
     'Workspace orphan cleanup previews parent quarantine evidence by default; add --confirm to delete supported orphan paths.',
-    'Workspace graph cleanup removes managed per-requirement graph assets (child .codegraph/, exclude block, graphify hooks, workspace .graphify/, routing markers) without touching host runtime mirrors.',
+    'Workspace graph cleanup removes managed per-requirement graph assets (child .codegraph/, exclude block, graphify hooks, workspace graphify-out/, routing markers) without touching host runtime mirrors.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',

@@ -123,14 +123,14 @@ function createGraphifyApplyFixture(label) {
     if (command === launcher && args[0] === '--version') return success('graphify 0.9.12');
     if (command === launcher) graphifyCalls.push({ args: [...args], env: { ...(options.env || {}) } });
     if (command === launcher && args[0] === 'extract') {
-      fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
-      fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
+      fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
+      fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
       return success('generated');
     }
     if (command === launcher && args[0] === 'update') {
-      fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
+      fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
       fs.writeFileSync(
-        path.join(target, '.graphify', 'graph.json'),
+        path.join(target, 'graphify-out', 'graph.json'),
         JSON.stringify({ nodes: [{ id: 'fixture-refreshed' }], links: [] }),
       );
       return success('updated');
@@ -579,7 +579,7 @@ describe('Graphify provider', () => {
     commit('c1');
 
     const result = provider.apply(context, provider.plan(context));
-    const baselinePath = path.join(target, '.graphify', 'spec-first-graph-baseline.json');
+    const baselinePath = path.join(target, 'graphify-out', 'spec-first-graph-baseline.json');
     expect(fs.existsSync(baselinePath)).toBe(true);
     expect(result.first_generation.status).toBe('completed');
 
@@ -600,9 +600,9 @@ describe('Graphify provider', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('existing-artifact');
     const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-existing-user-hooks-'));
-    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.mkdirSync(path.join(fixture.target, 'graphify-out'), { recursive: true });
     fs.writeFileSync(
-      path.join(fixture.target, '.graphify', 'graph.json'),
+      path.join(fixture.target, 'graphify-out', 'graph.json'),
       JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
     );
     const configured = spawnSync(
@@ -638,9 +638,9 @@ describe('Graphify provider', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('incremental-refresh');
     const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-refresh-user-hooks-'));
-    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.mkdirSync(path.join(fixture.target, 'graphify-out'), { recursive: true });
     fs.writeFileSync(
-      path.join(fixture.target, '.graphify', 'graph.json'),
+      path.join(fixture.target, 'graphify-out', 'graph.json'),
       JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
     );
     const configured = spawnSync(
@@ -654,7 +654,6 @@ describe('Graphify provider', () => {
     const actionPlan = provider.plan(refreshContext);
     expect(actionPlan.actions.find((action) => action.kind === 'refresh')).toMatchObject({
       args: ['update', '.'],
-      graphify_out: '.graphify',
     });
     expect(actionPlan.actions.find((action) => action.kind === 'refresh')).not.toHaveProperty('clean_rebuild');
 
@@ -669,21 +668,113 @@ describe('Graphify provider', () => {
       },
     });
     expect(fixture.graphifyCalls.filter((call) => call.args[0] === 'update')).toEqual([
-      expect.objectContaining({ args: ['update', '.'], env: expect.objectContaining({ GRAPHIFY_OUT: '.graphify' }) }),
+      expect.objectContaining({ args: ['update', '.'], env: expect.not.objectContaining({ GRAPHIFY_OUT: expect.anything() }) }),
     ]);
-    expect(JSON.parse(fs.readFileSync(path.join(fixture.target, '.graphify', 'graph.json'), 'utf8')))
+    expect(JSON.parse(fs.readFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), 'utf8')))
       .toMatchObject({ nodes: [{ id: 'fixture-refreshed' }] });
     expect(fs.readdirSync(fixture.target).filter((name) => name.startsWith('.graphify.backup-'))).toEqual([]);
     expect(fs.readdirSync(fixture.target).filter((name) => name.startsWith('.graphify.staging-'))).toEqual([]);
     expect(fs.existsSync(path.join(fixture.target, '.graphify-migration-journal.json'))).toBe(false);
   });
 
-  test('preserves the Graphify shrink guard instead of retrying refresh with force', () => {
+  test('migrates the retired .graphify artifact root to provider-native graphify-out without rebuilding', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
-    const fixture = createGraphifyApplyFixture('incremental-refresh-shrink-guard');
+    const fixture = createGraphifyApplyFixture('provider-native-artifact-migration');
     fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
     fs.writeFileSync(
       path.join(fixture.target, '.graphify', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'legacy-preserved' }], links: [] }),
+    );
+
+    const actionPlan = provider.plan(fixture.context);
+
+    expect(actionPlan.artifact_root).toBe(path.join(fixture.target, 'graphify-out'));
+    expect(actionPlan.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'migrate-artifact-root',
+        from: '.graphify',
+        to: 'graphify-out',
+      }),
+    ]));
+    expect(actionPlan.actions.some((action) => action.kind === 'first-generation')).toBe(false);
+
+    const result = provider.apply(fixture.context, actionPlan);
+
+    expect(result).toMatchObject({
+      lifecycle: { artifact_exists: true, query_verified: true },
+      first_generation: {
+        artifact_root: 'graphify-out',
+        artifact_refs: ['graphify-out/graph.json'],
+      },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.graphify'))).toBe(false);
+    expect(JSON.parse(fs.readFileSync(path.join(fixture.target, 'graphify-out', 'graph.json'), 'utf8')))
+      .toMatchObject({ nodes: [{ id: 'legacy-preserved' }] });
+  });
+
+  test('fails closed when both artifact roots exist even if the current root is empty', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('artifact-root-conflict');
+    fs.mkdirSync(path.join(fixture.target, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, '.graphify', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'legacy' }], links: [] }),
+    );
+
+    expect(provider.plan(fixture.context)).toMatchObject({
+      blocked: true,
+      reason_code: 'graphify-artifact-root-conflict',
+      actions: [],
+    });
+    expect(provider.verify(fixture.context)).toMatchObject({
+      readiness_status: 'degraded',
+      limitations: expect.arrayContaining([expect.stringContaining('graphify-artifact-root-conflict')]),
+      next_actions: expect.arrayContaining([expect.stringContaining('同时存在 .graphify/ 与 graphify-out/')]),
+    });
+  });
+
+  test('migrates an empty legacy root before first generation so no second root is left behind', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('empty-legacy-artifact-root');
+    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+
+    const actionPlan = provider.plan(fixture.context);
+    expect(actionPlan.actions.map((action) => action.kind)).toEqual(expect.arrayContaining([
+      'migrate-artifact-root',
+      'first-generation',
+    ]));
+
+    const result = provider.apply(fixture.context, actionPlan);
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: { artifact_exists: true, query_verified: true },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(fixture.target, 'graphify-out', 'graph.json'))).toBe(true);
+  });
+
+  test('rejects a legacy artifact root that is not a real directory', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('unsafe-legacy-artifact-root');
+    fs.writeFileSync(path.join(fixture.target, '.graphify'), 'not-a-directory\n');
+
+    expect(provider.plan(fixture.context)).toMatchObject({
+      blocked: true,
+      reason_code: 'graphify-artifact-migration-path-unsafe',
+    });
+    expect(provider.verify(fixture.context)).toMatchObject({
+      readiness_status: 'degraded',
+      limitations: expect.arrayContaining([expect.stringContaining('graphify-artifact-migration-path-unsafe')]),
+    });
+  });
+
+  test('preserves the Graphify shrink guard instead of retrying refresh with force', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('incremental-refresh-shrink-guard');
+    fs.mkdirSync(path.join(fixture.target, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, 'graphify-out', 'graph.json'),
       JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
     );
     const baseRunner = fixture.context.runner;
@@ -706,7 +797,7 @@ describe('Graphify provider', () => {
     expect(updateCalls).toEqual([
       expect.objectContaining({
         args: ['update', '.'],
-        env: expect.objectContaining({ GRAPHIFY_OUT: '.graphify' }),
+        env: expect.not.objectContaining({ GRAPHIFY_OUT: expect.anything() }),
       }),
     ]);
     expect(result).toMatchObject({
@@ -719,9 +810,9 @@ describe('Graphify provider', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('nested-workspace-refresh');
     fs.mkdirSync(path.join(fixture.target, 'packages', 'api'), { recursive: true });
-    fs.mkdirSync(path.join(fixture.target, '.graphify'), { recursive: true });
+    fs.mkdirSync(path.join(fixture.target, 'graphify-out'), { recursive: true });
     fs.writeFileSync(
-      path.join(fixture.target, '.graphify', 'graph.json'),
+      path.join(fixture.target, 'graphify-out', 'graph.json'),
       JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
     );
 
@@ -733,15 +824,15 @@ describe('Graphify provider', () => {
     const actionPlan = provider.plan(refreshContext);
     expect(actionPlan.actions.find((action) => action.kind === 'refresh')).toMatchObject({
       args: ['update', 'packages/api'],
-      graphify_out: path.join('..', '..', '.graphify'),
+      graphify_out: path.join('..', '..', 'graphify-out'),
     });
-    expect(actionPlan.artifact_root).toBe(path.join(fixture.target, '.graphify'));
+    expect(actionPlan.artifact_root).toBe(path.join(fixture.target, 'graphify-out'));
 
     const result = provider.refresh(refreshContext, actionPlan);
 
     expect(fixture.graphifyCalls.find((call) => call.args[0] === 'update')).toMatchObject({
       args: ['update', 'packages/api'],
-      env: expect.objectContaining({ GRAPHIFY_OUT: path.join('..', '..', '.graphify') }),
+      env: expect.objectContaining({ GRAPHIFY_OUT: path.join('..', '..', 'graphify-out') }),
     });
     expect(result).toMatchObject({
       readiness_status: 'fresh',
@@ -1013,8 +1104,8 @@ describe('Graphify provider', () => {
     fs.writeFileSync(launcher, `#!${interpreter}\n`);
     fs.chmodSync(launcher, 0o755);
     fs.writeFileSync(interpreter, 'fixture');
-    fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
-    fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), JSON.stringify({ nodes: [], links: [] }));
+    fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), JSON.stringify({ nodes: [], links: [] }));
     fs.writeFileSync(path.join(target, 'main.py'), 'print("supported")\n');
     const dependency = { ecosystem: 'pypi', package: 'graphifyy', version: '0.9.12', command: 'graphify' };
     const runner = (command, args) => {
@@ -1079,12 +1170,12 @@ describe('Graphify provider', () => {
     const postCommit = fs.readFileSync(path.join(target, '.git', 'hooks', 'post-commit'), 'utf8');
     const postCheckout = fs.readFileSync(path.join(target, '.git', 'hooks', 'post-checkout'), 'utf8');
     expect(postCommit).toContain('echo user-release-command');
-    expect(postCommit).toContain("export GRAPHIFY_OUT='.graphify'");
+    expect(postCommit).not.toContain('export GRAPHIFY_OUT=');
     expect(postCommit).toContain('# spec-first graphify credential isolation start');
     expect(postCommit).toContain('*) unset');
-    expect(postCheckout).toContain("export GRAPHIFY_OUT='.graphify'");
-    expect(postCommit).not.toContain('graphify-out/');
-    expect(postCheckout).not.toContain('graphify-out');
+    expect(postCheckout).not.toContain('export GRAPHIFY_OUT=');
+    expect(postCommit).toContain('graphify-out/');
+    expect(postCheckout).toContain('graphify-out');
     expect(provider.normalizePythonGraphifyHooks(target, {
       graphifyCommand: launcher,
       graphifyInterpreter: interpreter,
@@ -1098,7 +1189,7 @@ describe('Graphify provider', () => {
     const launcher = path.join(target, 'tools with spaces', 'graphify');
     const interpreter = path.join(target, 'tools', 'python');
     const outsideMarker = path.join(target, 'user-command-ran');
-    const receipt = path.join(target, '.graphify', 'hook-receipt');
+    const receipt = path.join(target, 'graphify-out', 'hook-receipt');
     fs.mkdirSync(path.dirname(launcher), { recursive: true });
     fs.mkdirSync(path.dirname(interpreter), { recursive: true });
     fs.mkdirSync(path.dirname(receipt), { recursive: true });
@@ -1162,8 +1253,8 @@ describe('Graphify provider', () => {
     const target = tempRepo('graphify-python-codex-host');
     const launcher = path.join(target, 'tools', 'graphify');
     fs.mkdirSync(path.join(target, '.codex', 'skills', 'graphify'), { recursive: true });
-    fs.writeFileSync(path.join(target, '.codex', 'skills', 'graphify', 'SKILL.md'), 'Read graphify-out/graph.json\n');
-    fs.writeFileSync(path.join(target, 'AGENTS.md'), 'Team rules\n\n## graphify\nUse graphify-out/\n\n## Other\nKeep me\n');
+    fs.writeFileSync(path.join(target, '.codex', 'skills', 'graphify', 'SKILL.md'), 'Read .graphify/graph.json\n');
+    fs.writeFileSync(path.join(target, 'AGENTS.md'), 'Team rules\n\n## graphify\nUse .graphify/\n\n## Other\nKeep me\n');
     fs.writeFileSync(path.join(target, '.codex', 'hooks.json'), JSON.stringify({
       hooks: { PreToolUse: [{ hooks: [{ type: 'command', command: '/wrong/graphify hook-check' }] }] },
       note: '/user/graphify hook-check',
@@ -1171,7 +1262,7 @@ describe('Graphify provider', () => {
 
     provider.normalizePythonHostIntegration(target, 'codex', { graphifyCommand: launcher });
 
-    expect(fs.readFileSync(path.join(target, '.codex', 'skills', 'graphify', 'SKILL.md'), 'utf8')).toContain('.graphify/graph.json');
+    expect(fs.readFileSync(path.join(target, '.codex', 'skills', 'graphify', 'SKILL.md'), 'utf8')).toContain('graphify-out/graph.json');
     expect(fs.readFileSync(path.join(target, 'AGENTS.md'), 'utf8')).toContain('## Other\nKeep me');
     expect(JSON.parse(fs.readFileSync(path.join(target, '.codex', 'hooks.json'), 'utf8'))
       .hooks.PreToolUse[0].hooks[0].command).toBe(`'${launcher}' hook-check`);
@@ -1253,7 +1344,7 @@ describe('Graphify provider', () => {
 
     const qoder = tempRepo('graphify-python-qoder-host');
     fs.mkdirSync(path.join(qoder, '.qoder', 'rules'), { recursive: true });
-    fs.writeFileSync(path.join(qoder, '.qoder', 'rules', 'spec-first.md'), 'Use graphify query against .graphify/graph.json; fallback to source.\n');
+    fs.writeFileSync(path.join(qoder, '.qoder', 'rules', 'spec-first.md'), 'Use graphify query against graphify-out/graph.json; fallback to source.\n');
     expect(provider.pythonHostIntegrationConfigured(qoder, 'qoder', { graphifyCommand: '/tools/graphify' })).toEqual({
       ok: true,
       mode: 'spec-first-adapter',
@@ -1273,7 +1364,7 @@ describe('Graphify provider', () => {
     expect(provider.verifyPythonGraphifyHooks(target, {
       graphifyCommand: launcher,
       graphifyInterpreter: interpreter,
-    })).toMatchObject({ ok: false, reason_code: 'graphify-hook-artifact-contract-mismatch' });
+    })).toMatchObject({ ok: false, reason_code: 'graphify-hook-credential-isolation-missing' });
     expect(() => provider.normalizePythonGraphifyHooks(target, {
       graphifyCommand: launcher,
       graphifyInterpreter: interpreter,

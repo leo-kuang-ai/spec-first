@@ -242,7 +242,16 @@ describe('platform registry runtime path consumer', () => {
       surfaces: {
         managedRoot: { ownership: 'generated-runtime' },
         skillsRoot: { ownership: 'generated-runtime' },
-        commandFiles: { ownership: 'generated-runtime' },
+        commandFiles: {
+          kind: 'glob',
+          path: '.opencode/commands/spec-*.md',
+          ownership: 'generated-runtime',
+        },
+        retiredCommandNamespace: {
+          kind: 'dir',
+          path: '.opencode/commands/spec/',
+          ownership: 'generated-runtime',
+        },
         projectConfig: { ownership: 'host-local', rewriteExclude: true },
         projectConfigJsonc: { ownership: 'host-local', rewriteExclude: true },
       },

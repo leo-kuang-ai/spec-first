@@ -11,6 +11,7 @@ const {
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const { summarizeOperationPlan } = require('../state');
 
 class OpenCodeAdapter extends PlatformAdapter {
   get id() {
@@ -26,7 +27,15 @@ class OpenCodeAdapter extends PlatformAdapter {
   }
 
   get commandRoot() {
-    return '.opencode/commands/spec';
+    return '.opencode/commands';
+  }
+
+  commandFilename(command) {
+    return `spec-${command.name}.md`;
+  }
+
+  get commandRootIsDedicated() {
+    return false;
   }
 
   get skillsRoot() {
@@ -155,15 +164,27 @@ class OpenCodeAdapter extends PlatformAdapter {
     checks.push(...inspectOpenCodeSkillCollisions(projectRoot));
     return checks;
   }
+
+  planRuntimeFilesRemoval() {
+    const operations = [{
+      kind: 'remove_dir',
+      path: '.opencode/commands/spec',
+      reason: 'retired_runtime_command_namespace',
+    }];
+    return {
+      operations,
+      summary: summarizeOperationPlan(operations),
+    };
+  }
 }
 
 function rewriteSharedPaths(content) {
   const rewritten = String(content || '')
-    .replace(/\.claude\/commands\/spec\/([a-z-]+)\.md/g, '.opencode/commands/spec/$1.md')
-    .replace(/\.claude\/commands\/spec-([a-z-]+)\.md/g, '.opencode/commands/spec/$1.md')
-    .replace(/\.codex\/commands\/spec\/([a-z-]+)\.md/g, '.opencode/commands/spec/$1.md')
-    .replace(/\.kiro\/commands\/spec\/([a-z-]+)\.md/g, '.opencode/commands/spec/$1.md')
-    .replace(/\.qoder\/commands\/spec-([a-z-]+)\.md/g, '.opencode/commands/spec/$1.md')
+    .replace(/\.claude\/commands\/spec\/([a-z-]+)\.md/g, '.opencode/commands/spec-$1.md')
+    .replace(/\.claude\/commands\/spec-([a-z-]+)\.md/g, '.opencode/commands/spec-$1.md')
+    .replace(/\.codex\/commands\/spec\/([a-z-]+)\.md/g, '.opencode/commands/spec-$1.md')
+    .replace(/\.kiro\/commands\/spec\/([a-z-]+)\.md/g, '.opencode/commands/spec-$1.md')
+    .replace(/\.qoder\/commands\/spec-([a-z-]+)\.md/g, '.opencode/commands/spec-$1.md')
     .replace(/\.claude\/spec-first\/workflows\//g, '.opencode/skills/')
     .replace(/\.claude\/skills\//g, '.opencode/skills/')
     .replace(/\.codex\/skills\//g, '.opencode/skills/')
@@ -188,11 +209,11 @@ function rewriteOpenCodeRuntimeContextSections(content) {
   return content
     .replace(
       /generated mirrors \([^)\n]*\)/g,
-      'generated mirrors (`.opencode/commands/spec/**`, `.opencode/skills/**`, `.opencode/spec-first/**`)',
+      'generated mirrors (`.opencode/commands/spec-*.md`, retired `.opencode/commands/spec/**`, `.opencode/skills/**`, `.opencode/spec-first/**`)',
     )
     .replace(
       /generated mirrors（[^）\n]*）/g,
-      'generated mirrors（`.opencode/commands/spec/**`、`.opencode/skills/**`、`.opencode/spec-first/**`）',
+      'generated mirrors（`.opencode/commands/spec-*.md`、已退役的 `.opencode/commands/spec/**`、`.opencode/skills/**`、`.opencode/spec-first/**`）',
     )
     .replace(
       /Cursor-native `[^`]+` \/ `[^`]+`, Kiro-native `[^`]+`, and Qoder-native `[^`]+` (?:remain|are) advisory input only when explicitly named\./g,

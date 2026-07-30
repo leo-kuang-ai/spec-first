@@ -409,7 +409,7 @@ function renderWorkspaceGraphStatusHuman(result) {
     );
   }
   lines.push(`  note: ${result.server_root_default_note || 'pass projectPath for CodeGraph queries'}`);
-  lines.push('  note: do not cat .graphify/graph.json or merged-graph.json; use Graphify CLI query/path/explain');
+  lines.push('  note: do not cat graphify-out/graph.json or merged-graph.json; use Graphify CLI query/path/explain');
   return `${lines.join('\n')}\n`;
 }
 

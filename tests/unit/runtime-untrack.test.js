@@ -23,6 +23,7 @@ describe('runtime untrack policy', () => {
       '.kiro/settings/user-setting.json',
       '.qoder/hooks/session-start',
       '.qoder/skills/my-team-skill/SKILL.md',
+      'graphify-out/graph.json',
       '.graphify/graph.json',
     ];
 

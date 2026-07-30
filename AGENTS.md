@@ -127,7 +127,8 @@ Generated runtime / host-local runtime surfaces 包括：
 - `.qoder/rules/spec-first.md`
 - `.qoder/settings.local.json`
 - `.qoder/settings.json` 中的 spec-first managed hook entries
-- `.opencode/commands/spec/`
+- `.opencode/commands/spec-*.md`
+- `.opencode/commands/spec/`（已退役的 legacy namespace，仅用于迁移清理）
 - `.opencode/skills/`
 - `.opencode/spec-first/`
 - `opencode.json` / `opencode.jsonc` 中由 Runtime Setup 管理的 exact entries

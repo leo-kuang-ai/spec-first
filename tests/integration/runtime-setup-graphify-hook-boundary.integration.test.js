@@ -191,7 +191,7 @@ function waitFor(predicate, timeoutMs = 60000, intervalMs = 250) {
   });
   expect(snapshotTree(externalHooks)).toEqual(before);
 
-  const graphPath = path.join(fixture.project, '.graphify', 'graph.json');
+  const graphPath = path.join(fixture.project, 'graphify-out', 'graph.json');
   const beforeRefreshHash = fileHash(graphPath);
   fs.appendFileSync(
     path.join(fixture.project, 'src', 'index.js'),
@@ -220,7 +220,7 @@ function waitFor(predicate, timeoutMs = 60000, intervalMs = 250) {
   expect(fs.readdirSync(fixture.project).filter((name) => name.startsWith('.graphify.staging-'))).toEqual([]);
   expect(fs.existsSync(path.join(fixture.project, '.graphify-migration-journal.json'))).toBe(false);
   expect(snapshotTree(externalHooks)).toEqual(before);
-  const query = run('graphify', ['query', 'addedByManualRefresh', '--graph', '.graphify/graph.json'], {
+  const query = run('graphify', ['query', 'addedByManualRefresh'], {
     cwd: fixture.project,
     env,
     timeout: 30000,
@@ -256,11 +256,11 @@ function waitFor(predicate, timeoutMs = 60000, intervalMs = 250) {
   for (const hookName of ['post-commit', 'post-checkout']) {
     const hook = fs.readFileSync(path.join(fixture.project, '.githooks', hookName), 'utf8');
     expect(hook).toContain('Installed by: graphify hook install');
-    expect(hook).toContain("export GRAPHIFY_OUT='.graphify'");
+    expect(hook).not.toContain('export GRAPHIFY_OUT=');
     expect(hook).toContain('# spec-first graphify credential isolation start');
   }
 
-  const graphPath = path.join(fixture.project, '.graphify', 'graph.json');
+  const graphPath = path.join(fixture.project, 'graphify-out', 'graph.json');
   const beforeCommitHash = fileHash(graphPath);
   fs.appendFileSync(
     path.join(fixture.project, 'src', 'index.js'),
@@ -279,7 +279,7 @@ function waitFor(predicate, timeoutMs = 60000, intervalMs = 250) {
     const diagnostic = fs.existsSync(rebuildLog) ? fs.readFileSync(rebuildLog, 'utf8') : 'missing rebuild log';
     throw new Error(`commit 后 Graphify graph 未刷新：\n${diagnostic}`);
   }
-  const query = run('graphify', ['query', 'addedByCommit', '--graph', '.graphify/graph.json'], {
+  const query = run('graphify', ['query', 'addedByCommit'], {
     cwd: fixture.project,
     env,
     timeout: 30000,

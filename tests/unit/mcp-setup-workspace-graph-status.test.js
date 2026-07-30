@@ -7,7 +7,7 @@ const { spawnSync } = require('node:child_process');
 
 const { runWorkspaceGraphStatus } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs');
 const { runWorkspaceGraphBuild } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 const {
   inspectRepoSnapshot,
   writeWorkspaceGraphState,
@@ -25,7 +25,7 @@ function initRepo(root, rel) {
 function fakeExec(command, args) {
   if (command === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
-    const graphPath = path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json');
+    const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}');
   } else if (command === 'graphify' && args[0] === 'merge-graphs') {
@@ -45,7 +45,7 @@ describe('runWorkspaceGraphStatus — async refresh consume-side honesty (U6)', 
     initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
     fs.writeFileSync(
-      path.join(ws, '.graphify', 'workspace-async-refresh-status.json'),
+      path.join(ws, 'graphify-out', 'workspace-async-refresh-status.json'),
       JSON.stringify({ schema_version: 'workspace-async-refresh-status.v1', ok: false, reason_code: 'workspace-async-refresh-nonzero-exit' }),
     );
     const rebuildExec = jest.fn(() => ({ status: 0 }));
@@ -59,7 +59,7 @@ describe('runWorkspaceGraphStatus — async refresh consume-side honesty (U6)', 
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    fs.writeFileSync(path.join(ws, '.graphify', 'workspace-async-refresh.lock'), JSON.stringify({ pid: process.pid, started_at_ms: 0 }));
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'workspace-async-refresh.lock'), JSON.stringify({ pid: process.pid, started_at_ms: 0 }));
     const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: () => ({ status: 0 }) });
     expect(status.workspace.async_refresh.status).toBe('in-flight');
   });
@@ -137,7 +137,7 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
     fs.rmSync(path.join(api, '.codegraph'), { recursive: true, force: true });
     fs.mkdirSync(path.join(api, '.codegraph'));
-    const state = JSON.parse(fs.readFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), 'utf8'));
+    const state = JSON.parse(fs.readFileSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'), 'utf8'));
     fs.writeFileSync(path.join(ws, state.repos[0].subgraph_path), '');
     const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
     expect(status.status).toBe('partial');
@@ -149,9 +149,9 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    const state = JSON.parse(fs.readFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), 'utf8'));
+    const state = JSON.parse(fs.readFileSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'), 'utf8'));
     fs.writeFileSync(path.join(ws, state.repos[0].subgraph_path), '{broken');
-    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{broken');
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'merged-graph.json'), '{broken');
 
     const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
 
@@ -241,8 +241,8 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
     fs.mkdirSync(path.join(api, '.codegraph'), { recursive: true });
-    fs.mkdirSync(path.join(ws, '.graphify'), { recursive: true });
-    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{}');
+    fs.mkdirSync(path.join(ws, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'merged-graph.json'), '{}');
 
     const status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
 
@@ -255,7 +255,7 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    const statePath = path.join(ws, '.graphify', 'workspace-graph-state.json');
+    const statePath = path.join(ws, 'graphify-out', 'workspace-graph-state.json');
     const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
     state.operation_status = 'partial';
     state.reason_code = 'workspace-routing-injection-failed';
@@ -269,12 +269,12 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{"changed":true}');
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'merged-graph.json'), '{"changed":true}');
     let status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
     expect(status.reason_code).toBe('workspace-merged-artifact-changed');
 
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
-    const state = JSON.parse(fs.readFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), 'utf8'));
+    const state = JSON.parse(fs.readFileSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'), 'utf8'));
     fs.rmSync(path.join(ws, state.repos[0].subgraph_path));
     status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
     expect(status.reason_code).toBe('workspace-subgraph-missing');
@@ -288,11 +288,11 @@ describe('runWorkspaceGraphStatus — read-only doctor facts', () => {
     let status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false });
     expect(status.reason_code).toBe('workspace-repo-set-changed');
 
-    fs.writeFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), '{bad json');
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'), '{bad json');
     status = runWorkspaceGraphStatus({ cwd: ws, repos: ['api'], allowDiscovery: false });
     expect(status.reason_code).toBe('workspace-graph-state-invalid');
 
-    fs.writeFileSync(path.join(ws, '.graphify', 'workspace-graph-state.json'), JSON.stringify({
+    fs.writeFileSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'), JSON.stringify({
       schema_version: 'workspace-graph-state.v1',
       repos: [],
     }));

@@ -78,7 +78,7 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
     expect(result.merge.status).toBe('merged');
     expect(result.merge.cross_repo_layer).toBe(true);
     expect(result.merge.merged_graph_path).toBe(path.join(ws, GRAPHIFY_OUT_DIRNAME, MERGED_GRAPH_BASENAME));
-    // Graphify subgraphs are out-of-tree under <ws>/.graphify/, not inside child repos.
+    // Graphify subgraphs are out-of-tree under <ws>/graphify-out/, not inside child repos.
     for (const call of calls.graphifyExtract) {
       expect(call.outDir.startsWith(path.join(ws, GRAPHIFY_OUT_DIRNAME))).toBe(true);
     }
@@ -179,7 +179,7 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
       status: 'failed',
       reason_code: 'workspace-merged-graph-invalid',
     }));
-    expect(fs.existsSync(path.join(ws, '.graphify', MERGED_GRAPH_BASENAME))).toBe(false);
+    expect(fs.existsSync(path.join(ws, 'graphify-out', MERGED_GRAPH_BASENAME))).toBe(false);
   });
 
   test('a malformed Graphify subgraph cannot satisfy a successful provider result', () => {
@@ -196,7 +196,7 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
           return { ok: true };
         },
         graphifyExtract: (_root, outDir) => {
-          const graphPath = path.join(outDir, '.graphify', 'graph.json');
+          const graphPath = path.join(outDir, 'graphify-out', 'graph.json');
           fs.mkdirSync(path.dirname(graphPath), { recursive: true });
           fs.writeFileSync(graphPath, '{broken');
           return { ok: true, graphPath };
@@ -216,7 +216,7 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
     const repo = initRepo(ws, 'api');
     fs.mkdirSync(path.join(repo.git_root, '.codegraph'), { recursive: true });
     fs.writeFileSync(path.join(repo.git_root, '.codegraph', 'old.db'), 'old');
-    const staleSubgraph = path.join(ws, '.graphify', 'api', '.graphify', 'graph.json');
+    const staleSubgraph = path.join(ws, 'graphify-out', 'api', 'graphify-out', 'graph.json');
     fs.mkdirSync(path.dirname(staleSubgraph), { recursive: true });
     fs.writeFileSync(staleSubgraph, '{"old":true}');
     const result = buildWorkspaceGraphs({
@@ -249,7 +249,7 @@ describe('buildWorkspaceGraphs — orchestration contract', () => {
           return { ok: true };
         },
         graphifyExtract: (_root, outDir) => {
-          const graphPath = path.join(outDir, '.graphify', 'graph.json');
+          const graphPath = path.join(outDir, 'graphify-out', 'graph.json');
           fs.mkdirSync(path.dirname(graphPath), { recursive: true });
           fs.writeFileSync(graphPath, '');
           return { ok: true, graphPath };

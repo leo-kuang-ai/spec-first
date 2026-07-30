@@ -21,7 +21,7 @@ function mkWorkspace() {
 }
 
 function graphifyFile(root, basename) {
-  return path.join(root, '.graphify', basename);
+  return path.join(root, 'graphify-out', basename);
 }
 
 function ok() {
@@ -35,7 +35,7 @@ function writeLock(root, {
   startedAtMs = 0,
   updatedAtMs = startedAtMs,
 } = {}) {
-  fs.mkdirSync(path.join(root, '.graphify'), { recursive: true });
+  fs.mkdirSync(path.join(root, 'graphify-out'), { recursive: true });
   fs.writeFileSync(graphifyFile(root, LOCK_BASENAME), `${JSON.stringify({
     schema_version: LOCK_SCHEMA_VERSION,
     token,

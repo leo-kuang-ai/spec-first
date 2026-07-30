@@ -111,6 +111,7 @@ __pycache__/
 .qoder/rules/spec-first.md
 .qoder/settings.local.json
 .opencode/commands/spec/
+.opencode/commands/spec-*.md
 .opencode/skills/spec-*/
 .opencode/skills/using-spec-first/
 .opencode/skills/graphify/
@@ -131,8 +132,8 @@ __pycache__/
 
 # optional provider local artifacts
 .codegraph/
-.graphify/
 graphify-out/
+.graphify/
 # spec-first:end
 
 # local-only provider artifacts and session logs (not managed by spec-first init)

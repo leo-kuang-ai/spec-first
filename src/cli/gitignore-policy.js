@@ -61,6 +61,7 @@ const SPEC_FIRST_GITIGNORE_SECTIONS = [
       '.qoder/rules/spec-first.md',
       '.qoder/settings.local.json',
       '.opencode/commands/spec/',
+      '.opencode/commands/spec-*.md',
       '.opencode/skills/spec-*/',
       '.opencode/skills/using-spec-first/',
       '.opencode/skills/graphify/',
@@ -87,8 +88,8 @@ const SPEC_FIRST_GITIGNORE_SECTIONS = [
     title: 'optional provider local artifacts',
     patterns: [
       '.codegraph/',
-      '.graphify/',
       'graphify-out/',
+      '.graphify/',
     ],
   },
 ];

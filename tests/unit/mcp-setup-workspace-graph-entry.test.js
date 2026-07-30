@@ -7,7 +7,7 @@ const { spawnSync } = require('node:child_process');
 
 const { parseArgs } = require('../../skills/spec-runtime-setup/scripts/lib/args.cjs');
 const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 const skillRoot = path.resolve(__dirname, '../../skills/spec-runtime-setup');
 
@@ -25,7 +25,7 @@ function initRepo(root, rel) {
 function fakeExec(command, args) {
   if (command === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
-    const graphPath = path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json');
+    const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}');
   } else if (command === 'graphify' && args[0] === 'merge-graphs') {
@@ -53,8 +53,8 @@ function installProviderShims(binDir) {
     '}',
     "if (command === 'graphify' && args[0] === 'extract') {",
     "  const out = args[args.indexOf('--out') + 1];",
-    "  fs.mkdirSync(path.join(out, '.graphify'), { recursive: true });",
-    "  fs.writeFileSync(path.join(out, '.graphify', 'graph.json'), '{}');",
+    "  fs.mkdirSync(path.join(out, 'graphify-out'), { recursive: true });",
+    "  fs.writeFileSync(path.join(out, 'graphify-out', 'graph.json'), '{}');",
     '}',
     "if (command === 'graphify' && args[0] === 'merge-graphs') {",
     "  fs.writeFileSync(args[args.indexOf('--out') + 1], '{}');",
@@ -161,8 +161,8 @@ describe('runSetup — workspace-graph dispatch', () => {
     expect(result.payload.schema_version).toBe('workspace-graph-executor.v1');
     expect(result.payload.status).toBe('complete');
     expect(result.exit_code).toBe(0);
-    // Merged graph is out-of-tree under <ws>/.graphify/.
-    expect(result.payload.build.merge.merged_graph_path).toBe(path.join(ws, '.graphify', 'merged-graph.json'));
+    // Merged graph is out-of-tree under <ws>/graphify-out/.
+    expect(result.payload.build.merge.merged_graph_path).toBe(path.join(ws, 'graphify-out', 'merged-graph.json'));
     // Children stay git-clean (managed exclude applied).
     for (const rel of ['api', 'web']) {
       const st = spawnSync('git', ['-C', path.join(ws, rel), 'status', '--porcelain'], { encoding: 'utf8' }).stdout;
@@ -194,7 +194,7 @@ describe('runSetup — workspace-graph dispatch', () => {
         argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'api'],
       });
       expect(build.payload.status).toBe('complete');
-      fs.rmSync(path.join(ws, '.graphify', 'workspace-graph-state.json'));
+      fs.rmSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'));
       const clean = runSetup({
         ...common,
         argv: ['--workspace-graph-clean', '--repos', 'api'],
@@ -285,7 +285,7 @@ describe('runSetup — workspace-graph dispatch', () => {
     });
     expect(built.payload.schema_version).toBe('workspace-graph-executor.v1');
     expect(built.payload.status).toBe('complete');
-    expect(fs.existsSync(path.join(ws, '.graphify', 'merged-graph.json'))).toBe(true);
+    expect(fs.existsSync(path.join(ws, 'graphify-out', 'merged-graph.json'))).toBe(true);
     expect(fs.readFileSync(path.join(ws, 'AGENTS.md'), 'utf8')).toContain('projectPath');
 
     const statusReady = runSetup({
@@ -304,7 +304,7 @@ describe('runSetup — workspace-graph dispatch', () => {
     expect(cleaned.payload.schema_version).toBe('workspace-graph-clean.v1');
     expect(cleaned.payload.status).toBe('complete');
     expect(fs.existsSync(path.join(ws, 'api', '.codegraph'))).toBe(false);
-    expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(false);
     // Managed routing block stripped; user file may remain empty.
     if (fs.existsSync(path.join(ws, 'AGENTS.md'))) {
       expect(fs.readFileSync(path.join(ws, 'AGENTS.md'), 'utf8')).not.toContain('spec-first:workspace-routing start');

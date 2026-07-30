@@ -98,7 +98,7 @@ describe('process-runner security and timeout isolation', () => {
       PATH: process.env.PATH,
       HOME: os.homedir(),
       TMPDIR: os.tmpdir(),
-      GRAPHIFY_OUT: '.graphify',
+      GRAPHIFY_OUT: 'graphify-out',
     };
     const script = 'process.stdout.write(JSON.stringify({secret:process.env.OPENAI_API_KEY||null,path:!!process.env.PATH,home:!!process.env.HOME,tmp:!!process.env.TMPDIR,out:process.env.GRAPHIFY_OUT}))';
     try {
@@ -106,7 +106,7 @@ describe('process-runner security and timeout isolation', () => {
         await runProcess({ command: process.execPath, args: ['-e', script], env, inheritEnv: false }),
         runProcessSync({ command: process.execPath, args: ['-e', script], env, inheritEnv: false }),
       ]) {
-        expect(JSON.parse(result.stdout)).toEqual({ secret: null, path: true, home: true, tmp: true, out: '.graphify' });
+        expect(JSON.parse(result.stdout)).toEqual({ secret: null, path: true, home: true, tmp: true, out: 'graphify-out' });
       }
     } finally {
       restoreEnv('OPENAI_API_KEY', previous);

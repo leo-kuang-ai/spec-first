@@ -148,7 +148,7 @@ function fakeRunner(command, args, options = {}) {
     }
   }
   if (graphifyCommand && args[0] === 'extract') {
-    const envOut = options.env && options.env.GRAPHIFY_OUT ? options.env.GRAPHIFY_OUT : '.graphify';
+    const envOut = options.env && options.env.GRAPHIFY_OUT ? options.env.GRAPHIFY_OUT : 'graphify-out';
     const artifactRoot = path.resolve(cwd, envOut);
     fs.mkdirSync(artifactRoot, { recursive: true });
     fs.writeFileSync(path.join(artifactRoot, 'graph.json'), JSON.stringify({ nodes: [{ id: 'fixture' }], links: [] }));
@@ -277,8 +277,8 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
   test('previews an explicit Graphify refresh without mutating the project', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('readonly-graphify-refresh-plan');
-    fs.mkdirSync(path.join(target, '.graphify'), { recursive: true });
-    fs.writeFileSync(path.join(target, '.graphify', 'graph.json'), '{"nodes":[{"id":"main"}],"edges":[]}\n');
+    fs.mkdirSync(path.join(target, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), '{"nodes":[{"id":"main"}],"edges":[]}\n');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
     const before = snapshot(target);
     const homeBefore = snapshot(homeDir);
@@ -300,7 +300,6 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         kind: 'refresh',
         provider: 'graphify',
         args: ['update', '.'],
-        graphify_out: '.graphify',
       }),
     ]));
     expect(snapshot(target)).toEqual(before);
@@ -581,7 +580,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'))).toBe(true);
     expect(fs.existsSync(path.join(target, '.qoder', 'settings.local.json'))).toBe(false);
-    expect(fs.existsSync(path.join(target, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
     expect(fs.existsSync(path.join(target, '.spec-first', 'config.local.example.yaml'))).toBe(false);
     const toolFacts = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'), 'utf8'));
     const runtimeCapabilities = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'runtime-capabilities.json'), 'utf8'));
@@ -699,7 +698,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
 
     expect(calls.some(([command, action, subcommand]) => command === 'graphify'
       && (['install', 'extract', 'update'].includes(action) || (action === 'hook' && subcommand === 'install')))).toBe(false);
-    expect(fs.existsSync(path.join(target, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
     expect(result).toMatchObject({ exit_code: 1, reason_code: 'host-config-json-invalid' });
     expect(result.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify'))
       .toMatchObject({ readiness_status: 'degraded', first_generation: { status: 'failed' } });
@@ -847,7 +846,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.readFileSync(path.join(target, '.gitignore'), 'utf8')).toContain('.spec-first/*.local.yaml');
     expect(fs.existsSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
     expect(fs.existsSync(path.join(target, '.qoder', 'settings.local.json'))).toBe(false);
-    expect(fs.existsSync(path.join(target, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
     expect(snapshotFiles(target, ['.spec-first/config.local.example.yaml', '.gitignore'])).toEqual(repoBefore);
     expect(snapshot(homeDir)).toEqual(homeBefore);
     expect(audit.violations).toEqual([]);
@@ -915,7 +914,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     });
 
     expect(result.exit_code).toBe(0);
-    expect(fs.existsSync(path.join(child, '.graphify', 'graph.json'))).toBe(true);
+    expect(fs.existsSync(path.join(child, 'graphify-out', 'graph.json'))).toBe(true);
   });
 
   test('blocks stale projection but leaves check, plan, verify-only, and project-config outside the mutation gate', () => {
@@ -1063,7 +1062,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.human).not.toContain('继续目标 spec-* workflow');
     const hostConfig = JSON.parse(fs.readFileSync(path.join(target, '.qoder', 'settings.local.json'), 'utf8'));
     expect(Object.keys(hostConfig.mcpServers).sort()).toEqual(['context7', 'sequential-thinking']);
-    expect(fs.existsSync(path.join(target, '.graphify', 'graph.json'))).toBe(true);
+    expect(fs.existsSync(path.join(target, 'graphify-out', 'graph.json'))).toBe(true);
     const facts = JSON.parse(fs.readFileSync(path.join(target, '.spec-first', 'config', 'tool-facts.json'), 'utf8'));
     expect(facts.provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
       readiness_status: 'fresh',
@@ -1361,7 +1360,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       result: 'ready',
       verification_source: 'post-mutation-probe',
     });
-    expect(fs.existsSync(path.join(target, '.graphify', 'graph.json'))).toBe(true);
+    expect(fs.existsSync(path.join(target, 'graphify-out', 'graph.json'))).toBe(true);
   });
 
   test('preserves the first baseline helper install failure after facts reconciliation', () => {
@@ -1798,7 +1797,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(snapshot(workspace)).toEqual(before);
     expect(snapshot(homeDir)).toEqual(homeBefore);
     expect(fs.existsSync(path.join(first, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
-    expect(fs.existsSync(path.join(second, '.graphify', 'graph.json'))).toBe(false);
+    expect(fs.existsSync(path.join(second, 'graphify-out', 'graph.json'))).toBe(false);
   });
 
   test('parent --plan preserves child-specific blockers without falling through to a parent plan', () => {
@@ -1929,7 +1928,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.payload.results.every((entry) => entry.reason_code === 'shared-host-config-injected-failure')).toBe(true);
     expect(providerCalls).toEqual([]);
     expect(fs.existsSync(path.join(first, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
-    expect(fs.existsSync(path.join(second, '.graphify', 'graph.json'))).toBe(false);
+    expect(fs.existsSync(path.join(second, 'graphify-out', 'graph.json'))).toBe(false);
     const summaryPath = path.join(workspace, '.spec-first', 'workspace', 'mcp-setup-summary.json');
     expect(JSON.parse(fs.readFileSync(summaryPath, 'utf8'))).toMatchObject({
       reason_code: 'shared-host-config-injected-failure',
@@ -2161,7 +2160,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
       bundledVersion: '1.13.2',
     });
-    expect(fs.existsSync(path.join(applyTarget, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(applyTarget, 'graphify-out'))).toBe(false);
     expect(applied).toMatchObject({
       exit_code: 1,
       reason_code: 'requirement-workspace-escape',
@@ -2203,7 +2202,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       bundledVersion: '1.13.2',
     });
 
-    expect(fs.existsSync(path.join(target, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(target, 'graphify-out'))).toBe(false);
     expect(calls.some((call) => call[0] === 'graphify' && ['install', 'extract', 'update'].includes(call[1]))).toBe(false);
     const hostConfig = JSON.parse(fs.readFileSync(path.join(target, '.qoder', 'settings.local.json'), 'utf8'));
     expect(Object.keys(hostConfig.mcpServers)).toEqual(['sequential-thinking']);

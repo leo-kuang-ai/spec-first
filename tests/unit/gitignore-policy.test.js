@@ -28,6 +28,7 @@ describe('spec-first gitignore policy', () => {
       '.kiro/steering/spec-first.md',
       '.qoder/rules/spec-first.md',
       '.opencode/commands/spec/',
+      '.opencode/commands/spec-*.md',
       '.opencode/skills/spec-*/',
       '.opencode/spec-first/',
     ]));
@@ -116,8 +117,8 @@ describe('spec-first gitignore policy', () => {
       '.qoder/hooks/prd-prewrite-guard',
       '.qoder/hooks/prd-readiness-guard',
       '.qoder/settings.local.json',
-      '.graphify/',
       'graphify-out/',
+      '.graphify/',
     ]));
     expect(untrackPatterns).toEqual(expect.arrayContaining([
       '.agents/skills/spec-*/**',

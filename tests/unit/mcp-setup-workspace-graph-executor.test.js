@@ -8,7 +8,7 @@ const { spawnSync } = require('node:child_process');
 const {
   runWorkspaceGraphBuild,
 } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wexec-')));
@@ -22,7 +22,7 @@ function initRepo(root, rel) {
 function fakeExec(command, args) {
   if (command === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
-    const graphPath = path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json');
+    const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}');
   } else if (command === 'graphify' && args[0] === 'merge-graphs') {

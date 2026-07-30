@@ -13,7 +13,7 @@ const { spawnSync } = require('node:child_process');
 const { runWorkspaceGraphBuild } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
 const { runWorkspaceGraphStatus } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs');
 const { runClean } = require('../../src/cli/commands/clean');
-const { GRAPHIFY_OUT_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-integ-')));
@@ -33,7 +33,7 @@ function initRepo(root, rel) {
 function fakeExec(command, args) {
   if (command === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
-    const graphPath = path.join(outDir, GRAPHIFY_OUT_ENV, 'graph.json');
+    const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, JSON.stringify({ nodes: [{ id: 'n1' }], edges: [] }));
   } else if (command === 'graphify' && args[0] === 'merge-graphs') {
@@ -80,7 +80,7 @@ describe('workspace graph lifecycle (integration)', () => {
     });
     expect(built.status).toBe('complete');
     expect(built.build.merge.status).toBe('merged');
-    expect(fs.existsSync(path.join(ws, '.graphify', 'merged-graph.json'))).toBe(true);
+    expect(fs.existsSync(path.join(ws, 'graphify-out', 'merged-graph.json'))).toBe(true);
 
     const ready = runWorkspaceGraphStatus({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false });
     expect(ready.status).toBe('ready');
@@ -91,7 +91,7 @@ describe('workspace graph lifecycle (integration)', () => {
     });
     expect(code).toBe(0);
     expect(fs.existsSync(path.join(ws, 'api', '.codegraph'))).toBe(false);
-    expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(false);
+    expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(false);
 
     const absent = runWorkspaceGraphStatus({ cwd: ws, repos: ['api', 'web'], allowDiscovery: false });
     expect(absent.status).toBe('absent');
