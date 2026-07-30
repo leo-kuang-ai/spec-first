@@ -100,6 +100,25 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(again.repos[0].codegraph_removed).toBe(false);
   });
 
+  test('removes a legacy workspace .graphify tree instead of reporting a false complete', () => {
+    const ws = mkWorkspace();
+    initRepo(ws, 'api');
+    fs.mkdirSync(path.join(ws, '.graphify'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.graphify', 'merged-graph.json'), '{}');
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean.status).toBe('complete');
+    expect(clean.workspace_graphify_status).toBe('removed');
+    expect(clean.workspace_graphify_removed).toBe(true);
+    expect(fs.existsSync(path.join(ws, '.graphify'))).toBe(false);
+  });
+
   test('cwd that is a git repo is skipped', () => {
     const ws = mkWorkspace();
     initRepo(ws, '.');

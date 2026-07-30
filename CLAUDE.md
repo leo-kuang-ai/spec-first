@@ -248,15 +248,14 @@ skill、agent、模板、历史上下文或示例文本的原文语言不得覆�
 
 ## graphify
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+本项目在 Graphify 原生默认目录 `graphify-out/` 中维护 knowledge graph，包含 god node、community structure 与跨文件关系。
 
-Rules:
-- Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use Provider-native bare commands: `graphify query "<question>"` for broad orientation, `graphify path "<A>" "<B>"` for relationships, and `graphify explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-runtime-setup --only graphify` as the setup repair path when Graphify would help.
-- Dirty `graphify-out/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If `graphify-out/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
-- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
-- Treat legacy `.graphify/` as migration-only evidence; use `spec-runtime-setup --only graphify` to atomically migrate it to the Provider-native `graphify-out/`. If both roots exist, stop and resolve the conflict instead of choosing one silently.
-- Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-runtime-setup --only graphify` when setup repair would help.
+规则：
+- 当 `graphify-out/graph.json` 存在且 runtime 可见 Graphify CLI 时，将 Graphify 用作 architecture relationship、impact analysis 与宽范围 codebase navigation 的 exploration-tier 定向工具。Graphify 候选可以决定下一步检查位置，直接读源码始终合法。优先解析 `PATH` 中的 `graphify`，也可使用 `$HOME/.local/bin/graphify`（Windows 为 `.exe`/`.cmd`）。使用 Provider 原生命令：`graphify query "<question>"` 做宽范围定向，`graphify path "<A>" "<B>"` 查看关系，`graphify explain "<concept>"` 聚焦概念。
+- 简单事实问答、当前上下文总结、用户提供的单文档工作或已限定范围的文件读取，默认不使用 Graphify；直接回答、使用 `rg` 或 bounded source read。
+- 如果 `graphify-out/graph.json` 存在但 Graphify CLI 不可见，不得把 artifact 当作 runtime readiness。改用 bounded direct source read，并将 `spec-runtime-setup --only graphify` 作为修复路径。
+- Hook 或 incremental update 后 `graphify-out/` 出现 dirty 文件属于预期现象，不能仅因此跳过 Graphify。只有任务本身涉及 stale/incorrect graph，或用户明确禁用时才跳过。
+- 如果 `graphify-out/wiki/index.md` 存在，用它进行宽范围导航。仅在 query/path/explain 未提供足够上下文时，才读取 `graphify-out/GRAPH_REPORT.md`。
+- `.graphify/` 是 spec-first 旧版适配目录，只作 migration evidence；运行 `spec-runtime-setup --only graphify` 将其原子迁移为唯一 current artifact `graphify-out/`。如果两个 root 同时存在，必须先解决冲突，禁止静默选择。
+- 将 Graphify/code-graph 输出视为 `provider_untrusted` advisory navigation；重要结论必须由 source、test、log、contract 或 owner evidence 确认。
+- 普通 workflow 不会在代码变更后刷新 project graph。按 `docs/contracts/project-graph-consumption.md` 将 freshness 作为 setup/readiness advisory；需要显式刷新时运行 `spec-runtime-setup --only graphify --refresh`。

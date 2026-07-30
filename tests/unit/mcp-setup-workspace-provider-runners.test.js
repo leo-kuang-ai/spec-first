@@ -5,6 +5,7 @@ const {
   makeWorkspaceRunners,
   GRAPHIFY_OUT_DIRNAME,
 } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { defaultWorkspaceExec } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs');
 
 function recordingExec(behavior = () => ({ status: 0, stdout: '', stderr: '' })) {
   const calls = [];
@@ -42,6 +43,7 @@ describe('makeWorkspaceRunners — command/env construction mirrors verified pro
     expect(calls[0].command).toBe('graphify');
     expect(calls[0].args).toEqual(['extract', '/ws/工程3', '--out', outDir, '--code-only']);
     expect(calls[0].opts.env).not.toHaveProperty('GRAPHIFY_OUT');
+    expect(calls[0].opts.unsetEnv).toContain('GRAPHIFY_OUT');
     expect(res.graphPath).toBe(path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json'));
   });
 
@@ -51,6 +53,7 @@ describe('makeWorkspaceRunners — command/env construction mirrors verified pro
     const res = runners.graphifyMerge(['/a/graph.json', '/b/graph.json'], '/ws/graphify-out/merged-graph.json');
     expect(res.ok).toBe(true);
     expect(calls[0].args).toEqual(['merge-graphs', '/a/graph.json', '/b/graph.json', '--out', '/ws/graphify-out/merged-graph.json']);
+    expect(calls[0].opts.unsetEnv).toContain('GRAPHIFY_OUT');
   });
 
   test('non-zero exit maps to a stable reason_code, not a throw', () => {
@@ -63,6 +66,24 @@ describe('makeWorkspaceRunners — command/env construction mirrors verified pro
 
   test('requires an exec function', () => {
     expect(() => makeWorkspaceRunners({})).toThrow(/exec/);
+  });
+
+  test('default exec can remove an inherited provider override without dropping the rest of the environment', () => {
+    const previous = process.env.GRAPHIFY_OUT;
+    process.env.GRAPHIFY_OUT = '.graphify';
+    try {
+      const result = defaultWorkspaceExec(
+        process.execPath,
+        ['-e', 'process.stdout.write(JSON.stringify({out:process.env.GRAPHIFY_OUT||null,path:!!process.env.PATH}))'],
+        { unsetEnv: ['GRAPHIFY_OUT'] },
+      );
+
+      expect(result.status).toBe(0);
+      expect(JSON.parse(result.stdout)).toEqual({ out: null, path: true });
+    } finally {
+      if (previous === undefined) delete process.env.GRAPHIFY_OUT;
+      else process.env.GRAPHIFY_OUT = previous;
+    }
   });
 });
 

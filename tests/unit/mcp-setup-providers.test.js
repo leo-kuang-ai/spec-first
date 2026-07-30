@@ -567,6 +567,56 @@ describe('Graphify provider', () => {
     expect(verified.next_actions.join('\n')).toContain('commit-time 自动刷新已只读验证');
   });
 
+  test.each([
+    ["export GRAPHIFY_OUT='.graphify'"],
+    ['GRAPHIFY_OUT=".graphify"'],
+    ['env GRAPHIFY_OUT=.graphify graphify update .'],
+  ])('blocks an external Graphify hook that still overrides the legacy artifact root: %s', (override) => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('external-hooks-legacy-artifact-override');
+    const { target, context, hookCalls } = fixture;
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-legacy-user-hooks-'));
+    fs.writeFileSync(
+      path.join(outsideHooks, 'post-commit'),
+      `#!/bin/sh\n# graphify-hook-start\n# Installed by: graphify hook install\n${override}\ngraphify update .\n# graphify-hook-end\n`,
+    );
+    const configured = spawnSync('git', ['-C', target, 'config', '--local', 'core.hooksPath', outsideHooks], { encoding: 'utf8' });
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+
+    const result = provider.apply(context, provider.plan(context));
+
+    expect(hookCalls).toEqual([]);
+    expect(result.steady_state).toMatchObject({
+      refresh_mode: 'manual-only',
+      hook_installed: false,
+      hook_verified: false,
+      hook_status: 'blocked',
+      hook_skipped_reason: 'graphify-external-hook-legacy-artifact-override',
+    });
+    expect(result.next_actions.join('\n')).toContain('GRAPHIFY_OUT=.graphify');
+  });
+
+  test('does not treat a post-checkout-only external marker as commit-time refresh', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('external-hooks-post-checkout-only');
+    const { target, context } = fixture;
+    const outsideHooks = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-checkout-user-hooks-'));
+    fs.writeFileSync(
+      path.join(outsideHooks, 'post-checkout'),
+      '#!/bin/sh\n# graphify-checkout-hook-start\n# Installed by: graphify hook install\ngraphify update .\n# graphify-checkout-hook-end\n',
+    );
+    const configured = spawnSync('git', ['-C', target, 'config', '--local', 'core.hooksPath', outsideHooks], { encoding: 'utf8' });
+    if (configured.status !== 0) throw new Error(configured.stderr || configured.stdout);
+
+    const result = provider.apply(context, provider.plan(context));
+
+    expect(result.steady_state).toMatchObject({
+      refresh_mode: 'manual-only',
+      hook_status: 'blocked',
+      hook_skipped_reason: 'graphify-hook-path-outside-project',
+    });
+  });
+
   test('writes a single-repo graph baseline on generation and surfaces a head-moved advisory (U6b)', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('single-repo-baseline');
@@ -766,6 +816,22 @@ describe('Graphify provider', () => {
     expect(provider.verify(fixture.context)).toMatchObject({
       readiness_status: 'degraded',
       limitations: expect.arrayContaining([expect.stringContaining('graphify-artifact-migration-path-unsafe')]),
+    });
+  });
+
+  test('fails closed before mutation when graphify-out is not a real directory', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('unsafe-current-artifact-root');
+    fs.writeFileSync(path.join(fixture.target, 'graphify-out'), 'not-a-directory\n');
+
+    expect(provider.plan(fixture.context)).toMatchObject({
+      blocked: true,
+      reason_code: 'graphify-artifact-root-unsafe',
+      actions: [],
+    });
+    expect(provider.verify(fixture.context)).toMatchObject({
+      readiness_status: 'degraded',
+      limitations: expect.arrayContaining([expect.stringContaining('graphify-artifact-root-unsafe')]),
     });
   });
 

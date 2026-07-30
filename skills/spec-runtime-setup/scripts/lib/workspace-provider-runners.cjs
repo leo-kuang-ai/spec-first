@@ -15,8 +15,9 @@ const path = require('node:path');
 
 const GRAPHIFY_OUT_DIRNAME = 'graphify-out';
 const SUBGRAPH_BASENAME = 'graph.json';
+const GRAPHIFY_UNSET_ENV = ['GRAPHIFY_OUT'];
 
-// exec(command, args, { cwd, env }) -> { status:number, stdout, stderr }
+// exec(command, args, { cwd, env, unsetEnv }) -> { status:number, stdout, stderr }
 function makeWorkspaceRunners({ exec, codegraphCommand = 'codegraph', graphifyCommand = 'graphify', baseEnv = {} } = {}) {
   if (typeof exec !== 'function') throw new Error('makeWorkspaceRunners requires an exec function');
 
@@ -37,7 +38,11 @@ function makeWorkspaceRunners({ exec, codegraphCommand = 'codegraph', graphifyCo
     },
 
     graphifyExtract(repoRoot, outDir) {
-      const result = exec(graphifyCommand, ['extract', repoRoot, '--out', outDir, '--code-only'], { cwd: repoRoot, env: baseEnv });
+      const result = exec(graphifyCommand, ['extract', repoRoot, '--out', outDir, '--code-only'], {
+        cwd: repoRoot,
+        env: baseEnv,
+        unsetEnv: GRAPHIFY_UNSET_ENV,
+      });
       if (!ok(result)) {
         return { ok: false, reason_code: 'graphify-extract-failed', stderr: result && result.stderr };
       }
@@ -46,7 +51,10 @@ function makeWorkspaceRunners({ exec, codegraphCommand = 'codegraph', graphifyCo
     },
 
     graphifyMerge(inputGraphPaths, outPath) {
-      const result = exec(graphifyCommand, ['merge-graphs', ...inputGraphPaths, '--out', outPath], { env: baseEnv });
+      const result = exec(graphifyCommand, ['merge-graphs', ...inputGraphPaths, '--out', outPath], {
+        env: baseEnv,
+        unsetEnv: GRAPHIFY_UNSET_ENV,
+      });
       return ok(result) ? { ok: true, mergedPath: outPath } : { ok: false, reason_code: 'graphify-merge-failed', stderr: result && result.stderr };
     },
   };

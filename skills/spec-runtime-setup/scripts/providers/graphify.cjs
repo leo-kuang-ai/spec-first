@@ -655,18 +655,20 @@ function defaultGraphifyHookOutcome(target) {
 
 function probeExternalGraphifyHookMarker(hooksRoot) {
   // 只读验证（R3/KTD2）：仅读取有效 hooks root 下的 post-commit / post-checkout 两个文件，
-  // 只检测 Graphify managed marker 是否存在。绝不 execute、write、`graphify hook status`，
+  // 检测 Graphify managed marker 与会重新生成 legacy root 的 GRAPHIFY_OUT override。绝不 execute、write、`graphify hook status`，
   // 不读其他文件；非普通文件（symlink/目录）无法证明 project-owned，按未命中处理，避免 follow-out。
-  const detected = { post_commit: false, post_checkout: false };
+  const detected = { post_commit: false, post_checkout: false, legacy_artifact_override: false };
   for (const name of GRAPHIFY_HOOK_NAMES) {
     const file = path.join(hooksRoot, name);
     try {
       const stat = fs.lstatSync(file);
       if (!stat.isFile()) continue;
-      if (fs.readFileSync(file, 'utf8').includes(GRAPHIFY_HOOK_MARKER)) {
+      const contents = fs.readFileSync(file, 'utf8');
+      if (contents.includes(GRAPHIFY_HOOK_MARKER)) {
         if (name === 'post-commit') detected.post_commit = true;
         else if (name === 'post-checkout') detected.post_checkout = true;
       }
+      if (usesLegacyGraphifyArtifactOverride(contents)) detected.legacy_artifact_override = true;
     } catch (_error) {
       // 文件缺失或不可读 → 未命中；只读探测绝不抛到外部。
     }
@@ -675,11 +677,30 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
   return detected;
 }
 
+function usesLegacyGraphifyArtifactOverride(contents) {
+  return String(contents)
+    .split(/\r?\n/)
+    .some((line) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return false;
+      return /(?:^|[\s;])(?:export\s+)?GRAPHIFY_OUT\s*=\s*(?:'\.graphify'|"\.graphify"|\.graphify)(?=$|[\s;])/.test(trimmed);
+    });
+}
+
 function externalGraphifyHookOutcome(target) {
   const marker = target && target.absolute
     ? probeExternalGraphifyHookMarker(target.absolute)
     : { any: false };
-  if (marker.any) {
+  if (marker.legacy_artifact_override) {
+    return {
+      installed: false,
+      verified: false,
+      status: 'blocked',
+      reason_code: 'graphify-external-hook-legacy-artifact-override',
+      refresh_mode: 'manual-only',
+    };
+  }
+  if (marker.post_commit) {
     // 只读确认有效 hooks root（项目外）存在 Graphify commit hook。
     // KTD3：verified-external ≠ project-owned verified；hook_installed/hook_verified 保持 false，
     // external hook execution 由 Git 负责、未经 spec-first 结构验证。
@@ -873,6 +894,11 @@ function graphifyHookNextActions(outcome) {
   if (outcome.status === 'verified-external') {
     return [
       'commit-time 自动刷新已只读验证：有效 Git hooks root（项目外）存在 Graphify commit hook，其执行由 Git 负责、未经 spec-first 结构验证；核心图查询可正常使用，图内容仍需回源确认。',
+    ];
+  }
+  if (outcome.status === 'blocked' && outcome.reason_code === 'graphify-external-hook-legacy-artifact-override') {
+    return [
+      '有效 Git hooks root（项目外）的 Graphify hook 仍设置 GRAPHIFY_OUT=.graphify，可能重新生成旧 artifact root；setup 保持只读并降级为 manual-only。请由该外部 hook 的 owner 移除 legacy override 后重试。',
     ];
   }
   if (outcome.status === 'blocked' && outcome.reason_code === 'graphify-hook-path-outside-project') {
@@ -1696,7 +1722,7 @@ function renderGraphifyInstructionSection(host) {
   const lines = [
     '## graphify',
     '',
-    '本项目在 Graphify 原生默认目录 graphify-out/ 中维护 knowledge graph，包含 god node、community structure 与跨文件关系。',
+    '本项目在 Graphify 原生默认目录 `graphify-out/` 中维护 knowledge graph，包含 god node、community structure 与跨文件关系。',
     '',
   ];
   if (host !== 'claude') {
@@ -1704,14 +1730,14 @@ function renderGraphifyInstructionSection(host) {
   }
   lines.push(
     '规则：',
-    '- 当 `graphify-out/graph.json` 存在且 runtime 可见 Graphify CLI 时，将 Graphify 用作 architecture relationship、impact analysis 与宽范围 codebase navigation 的 exploration-tier 定向工具。直接使用 Provider 原生命令：用 `graphify query "<question>"` 做宽范围定向，用 `graphify path "<A>" "<B>"` 查看关系，用 `graphify explain "<concept>"` 聚焦概念。',
-    '- 简单事实问答、当前上下文总结、用户提供的单文档工作或已限定范围的文件读取，默认不使用 Graphify；使用 `rg` 或 bounded source read。',
+    '- 当 `graphify-out/graph.json` 存在且 runtime 可见 Graphify CLI 时，将 Graphify 用作 architecture relationship、impact analysis 与宽范围 codebase navigation 的 exploration-tier 定向工具。Graphify 候选可以决定下一步检查位置，直接读源码始终合法。优先解析 `PATH` 中的 `graphify`，也可使用 `$HOME/.local/bin/graphify`（Windows 为 `.exe`/`.cmd`）。使用 Provider 原生命令：`graphify query "<question>"` 做宽范围定向，`graphify path "<A>" "<B>"` 查看关系，`graphify explain "<concept>"` 聚焦概念。',
+    '- 简单事实问答、当前上下文总结、用户提供的单文档工作或已限定范围的文件读取，默认不使用 Graphify；直接回答、使用 `rg` 或 bounded source read。',
     '- 如果 `graphify-out/graph.json` 存在但 Graphify CLI 不可见，不得把 artifact 当作 runtime readiness。改用 bounded direct source read，并将 `spec-runtime-setup --only graphify` 作为修复路径。',
-    '- Hook 或 incremental update 后 `graphify-out/` 出现 dirty 文件属于预期现象，不能仅因此跳过 Graphify。',
-    '- 如果 `graphify-out/wiki/index.md` 存在，用它进行宽范围导航。只有 query/path/explain 未提供足够上下文时，才读取 `graphify-out/GRAPH_REPORT.md`。',
-    '- `.graphify/` 是 spec-first 旧版适配目录，只作 migration evidence；运行 `spec-runtime-setup --only graphify` 将其原子迁移为唯一 current artifact `graphify-out/`。',
+    '- Hook 或 incremental update 后 `graphify-out/` 出现 dirty 文件属于预期现象，不能仅因此跳过 Graphify。只有任务本身涉及 stale/incorrect graph，或用户明确禁用时才跳过。',
+    '- 如果 `graphify-out/wiki/index.md` 存在，用它进行宽范围导航。仅在 query/path/explain 未提供足够上下文时，才读取 `graphify-out/GRAPH_REPORT.md`。',
+    '- `.graphify/` 是 spec-first 旧版适配目录，只作 migration evidence；运行 `spec-runtime-setup --only graphify` 将其原子迁移为唯一 current artifact `graphify-out/`。如果两个 root 同时存在，必须先解决冲突，禁止静默选择。',
     '- 将 Graphify/code-graph 输出视为 `provider_untrusted` advisory navigation；重要结论必须由 source、test、log、contract 或 owner evidence 确认。',
-    '- 普通 workflow 不会在代码变更后刷新 project graph。仅在显式 refresh 时运行 `spec-runtime-setup --only graphify --refresh`。',
+    '- 普通 workflow 不会在代码变更后刷新 project graph。按 `docs/contracts/project-graph-consumption.md` 将 freshness 作为 setup/readiness advisory；需要显式刷新时运行 `spec-runtime-setup --only graphify --refresh`。',
   );
   return lines.join('\n');
 }
@@ -2155,7 +2181,11 @@ function currentArtifactRefs(repoRoot, artifactRoot) {
 }
 
 function assertGraphifyArtifactSurface(repoRoot, artifactRoot) {
-  assertContainedPath(repoRoot, artifactRoot, { reasonCode: 'graphify-artifact-symlink-escape' });
+  assertContainedPath(repoRoot, artifactRoot, { reasonCode: 'graphify-artifact-root-unsafe' });
+  const rootEntry = lstatOrNull(artifactRoot);
+  if (rootEntry && (rootEntry.isSymbolicLink() || !rootEntry.isDirectory())) {
+    throw reasonError('graphify-artifact-root-unsafe', `Graphify artifact root 必须是真实目录：${artifactRoot}`);
+  }
   for (const name of ['graph.json', 'GRAPH_REPORT.md']) {
     assertContainedPath(repoRoot, path.join(artifactRoot, name), {
       reasonCode: 'graphify-artifact-symlink-escape',
@@ -2198,6 +2228,7 @@ module.exports = {
   refresh,
   resolveGraphifyHookTarget,
   resolvePythonGraphifyCommand,
+  renderGraphifyInstructionSection,
   uninstall,
   pythonHostIntegrationConfigured,
   verifyPythonGraphifyHooks,

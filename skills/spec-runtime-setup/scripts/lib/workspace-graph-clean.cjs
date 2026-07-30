@@ -8,7 +8,8 @@
 //     `.git/info/exclude` block (self-only); current explicit-refresh builds do
 //     not install hooks, while legacy/no-state cleanup asks Graphify to uninstall
 //     any older native hook;
-//   - delete the workspace `graphify-out/` artifact tree (contained);
+//   - delete the workspace current `graphify-out/` tree and legacy `.graphify/`
+//     tree (contained), so clean cannot report complete while a retired root remains;
 //   - surface a CodeGraph daemon-cleanup action (spec-first does not force-kill
 //     provider daemons; it reports the action).
 //
@@ -193,10 +194,13 @@ function runWorkspaceGraphClean({
   const childOrRoutingFailed = repoFailed || routingFailed;
 
   // 5. 只有 child/routing 已清理成功才删除 state/tree；否则保留 receipt 供裸重试。
-  const graphifyOut = path.join(workspaceRoot, 'graphify-out');
+  const graphifyRoots = [
+    path.join(workspaceRoot, 'graphify-out'),
+    path.join(workspaceRoot, '.graphify'),
+  ];
   const graphify = childOrRoutingFailed
     ? { ok: true, status: 'preserved', removed: false, reason_code: '' }
-    : safeRemoveDir(workspaceRoot, graphifyOut);
+    : removeWorkspaceGraphRoots(workspaceRoot, graphifyRoots);
   const failed = childOrRoutingFailed || !graphify.ok;
   const needsConfirmation = pendingConfirm.length > 0;
 
@@ -215,6 +219,19 @@ function runWorkspaceGraphClean({
     reason_code: failed
       ? 'workspace-clean-partial'
       : (needsConfirmation ? 'workspace-repos-need-confirmation' : ''),
+  };
+}
+
+function removeWorkspaceGraphRoots(workspaceRoot, roots) {
+  const outcomes = roots.map((root) => safeRemoveDir(workspaceRoot, root));
+  const failed = outcomes.find((outcome) => !outcome.ok);
+  if (failed) return failed;
+  const removed = outcomes.some((outcome) => outcome.removed);
+  return {
+    ok: true,
+    status: removed ? 'removed' : 'absent',
+    removed,
+    reason_code: '',
   };
 }
 
