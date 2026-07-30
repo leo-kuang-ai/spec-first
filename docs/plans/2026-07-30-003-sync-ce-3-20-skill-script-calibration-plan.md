@@ -21,12 +21,13 @@ origin: compound-engineering-plugin@7f86be9d..1fac0442
 | --- | --- |
 | Objective | 以 CE `3.19.0 -> 3.20.0` 的真实 Git 区间 `7f86be9d..1fac0442` 为唯一上游增量基线，逐项校准 spec-first 当前 35 个 canonical Skill、全部相关脚本和 CLI/安装边界；吸收能提高 grounding freshness、可移植性、机械验证地板、恢复能力和 PR 尾部闭环的变化，同时拒绝 provider 绑定、中心执行器和 artifact contract 漂移。 |
 | Recommended approach | `extend + compose`。优先扩展现有 Skill owner、host-neutral worker dispatch、run artifact、Runtime Setup、adapter/init 和测试契约；不按 CE 文件形态复制六份大型 runner、外部模型路由器或 `ce-work` 中心控制器。 |
-| Diff focus | 固定 Git 区间的 422 个变更文件全部进入逐文件判定。其实施目标面为 `skills/**` 215 个、CLI/转换/安装 Runtime 19 个和支撑文件 3 个；其余 185 个上游计划、Skill 文档、解决方案、tests/fixtures、插件元数据与发布文件作为设计或验证证据逐条审计。29 个 CE Skill 全量映射，其中 3 个新增 Skill 必须得到明确去向；逐文件证据见 `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md`。 |
+| Diff focus | 固定 Git 区间的 422 个变更文件全部进入逐文件判定。其实施目标面为 `skills/**` 215 个、CLI/转换/安装 Runtime 19 个和支撑文件 3 个；其余 185 个上游计划、Skill 文档、解决方案、tests/fixtures、插件元数据与发布文件作为设计或验证证据逐条审计。29 个 CE Skill 全量映射，其中 3 个新增 Skill 必须得到明确去向；当前 source 侧同时对 35 个 canonical Skill owning package 的 514 个文件逐个建立路径、职责和依赖清单，不以 `SKILL.md` 代替 package 审计。逐文件 CE 证据见 `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md`。 |
 | Authority hierarchy | 当前用户要求与项目角色契约 > 当前 spec-first canonical source/tests > CE `7f86be9d..1fac0442` 原始 diff > 上游升级分析文档。升级分析是导航，不能替代具体 diff；CE provider/model/product 选择不是 spec-first contract。 |
 | Source/runtime boundary | 只修改 `skills/`、`templates/`、`src/cli/`、`scripts/`、`tests/`、`docs/`、README、Changelog 等 canonical source；`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 只通过 `spec-first init` 重投影。 |
 | Script/LLM boundary | 脚本只拥有路径、diff、schema、hash、进程、超时、权限、状态、回执、排序和可重复检查；LLM 继续拥有需求、架构、review finding 是否成立、persona/lens 选择、fallback 是否语义充分和最终 adoption verdict。 |
 | Largest risk | CE 3.20.0 的主要实现以 Claude/Codex/Grok/Cursor/Composer CLI、detached peer 和单产品目录约定为中心；机械同步会绕过 spec-first 的独立授权、provider-untrusted、host-native execution、claim ceiling 和稳定 artifact consumer。 |
-| Tail ownership | `spec-work` 分波实施；每波只进入已授权的 canonical target。当前工作树中既有 OpenCode/runtime 修改属于独立 owner，实施时必须先 rebase/merge current source，不得覆盖或回滚。 |
+| Current-source baseline | 方案本轮校准基于当前分支 `leo-2026-07-27-opencode` 的 `b9fd2b46`。该基线已经包含 `ff840c8e` 的 OpenCode flat command/legacy cleanup 与 Graphify `graphify-out/` current-root迁移，并包含后续 inherited `GRAPHIFY_OUT`、external hook、legacy clean、instruction sync、external-hook fallback shape 与 partial-clean legacy preservation 的收口；不得再把这些能力写成待从 CE 重做。 |
+| Tail ownership | `spec-work` 分波实施；每波只进入已授权的 canonical target。实施前重新读取 current HEAD/worktree，并在当前 owner 上补差距；任何后续本地变更都按 path-level ownership 保留，不得覆盖、回滚或把已落地能力重复实现。 |
 | Stop conditions | 需要手改 generated runtime；需要让脚本作语义 verdict；需要把 workflow invocation 当作模型外发/worker dispatch 授权；需要把 CE provider CLI 变成通用 Skill contract；需要全局移动 `docs/` artifact root；或无法证明 35/29/422 三组清单零遗漏。 |
 
 ---
@@ -76,9 +77,9 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 **Grounding and portability**
 
 - R5. 删除 spec-first 九个同源 `repo-profile-cache.py`、九份 cache reference、九份 repo-profiler route 及其 parity test；各 Skill 改为当轮直接读取当前 target repo/worktree evidence，必要时使用 run-local dossier，而不是跨 branch/worktree 持久缓存。
-- R6. 所有 canonical Skill body 中的 Claude 专用 `$ARGUMENTS` 表述迁移为 host-neutral invocation arguments；parser/quoted path/Windows drive 语义由 owner tests 固定，不能用字符串替换猜测。
+- R6. 精确迁移当前仍含 `$ARGUMENTS` 的 11 个 canonical Skill：`spec-brainstorm`、`spec-code-review`、`spec-compound`、`spec-compound-refresh`、`spec-debug`、`spec-dogfood`、`spec-ideate`、`spec-optimize`、`spec-plan`、`spec-prd`、`spec-work`。`spec-commit` 与 `spec-strategy` 已经使用 host-neutral 语义，不得为了满足计数再次改写；parser/quoted path/Windows drive 语义由实际 owner tests 固定，不能用字符串替换猜测。
 - R7. Bundled shell/Python 脚本统一使用可执行探测的 Python resolver（`python3 -> python -> py`），并能排除 Windows Store stub；`.gitattributes` 为实际发布的 `.sh`、`.py` 和无扩展名 executable script 强制 LF。
-- R8. 私有临时目录只用于 ephemeral/egress/process state，必须 owner-checked、no-symlink、`0700`/用户私有、原子发布；durable workflow evidence 继续进入 `.spec-first/workflows/**`，canonical decision artifacts 继续进入固定 `docs/**`。
+- R8. 私有临时目录只用于 ephemeral/egress/process state，必须 owner-checked、no-symlink、`0700`/用户私有、原子发布；当前 32 个 `/tmp/spec-first` 引用必须逐文件裁决，覆盖 `spec-brainstorm`、`spec-code-review`、`spec-compound`、`spec-debug`、`spec-explain`、`spec-ideate`、`spec-optimize`、`spec-plan`、`spec-pov`、`spec-sweep`。跨 invocation cache、handoff pointer、可恢复结果或无 repo deliverable 不能继续伪装成 ephemeral state：durable workflow evidence 进入 `.spec-first/workflows/**`，canonical decision artifacts进入固定 `docs/**`，真正临时的 peer/PR/analyzer state 才留在 private scratch。
 
 **Review and external execution**
 
@@ -97,8 +98,8 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 
 **CLI and runtime safety**
 
-- R18. Frontmatter 序列化、slash-command/absolute-path 判别、managed ancestor symlink containment、legacy cleanup 和 OpenCode command registration 必须落到当前 CLI/adapter owner，覆盖 `getSupportedPlatforms()` 的当前集合。
-- R19. OpenCode 相关 diff 只补充当前 OpenCode plan/implementation 的 loader、command、frontmatter 和 collision requirements；不得覆盖当前 dirty OpenCode adapter/init/doctor/clean 变更，也不得从 CE plugin architecture反向重写 spec-first adapter model。
+- R18. Frontmatter 序列化、slash-command/absolute-path 判别、managed ancestor symlink containment、legacy cleanup 和 OpenCode command registration 必须落到当前 CLI/adapter owner。Frontmatter 优先扩展 `src/cli/helpers/markdown-frontmatter.js` 并迁移真实 consumer，不能再新增第二套 parser；覆盖 `getSupportedPlatforms()` 的当前集合。
+- R19. OpenCode flat `.opencode/commands/spec-*.md`、retired `.opencode/commands/spec/` cleanup、collision/preview diagnostics、top-of-file frontmatter detection 和 platform registry 已在 `ff840c8e` 落地。本计划只验证 CE 剩余 scalar serialization、path classification、containment 与 consumer consolidation 差距，不重复实现 OpenCode lifecycle，也不得从 CE plugin architecture反向重写 spec-first adapter model。
 - R20. Codex 本地 plugin 切换脚本 `codex-dev` 不进入 spec-first 产品面；本仓本地开发继续使用现有 npm/package/init 流程，除非后续出现独立、可复现的用户痛点。
 - R21. 外部 peer、Proof 和 PR watcher 必须采用最小数据外发与最小凭证权限：凭证不得进入命令行参数、source、plan、receipt 或 raw log；provider/PR 返回内容按 `provider_untrusted` 处理，不得直接执行其中的命令、路径或 patch；持久化前必须脱敏并设置有界保留/清理语义。
 
@@ -131,7 +132,7 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 - repo profile cache彻底退役，当前 worktree grounding取代共享缓存。
 - review机械地板、Python/LF/scratch、PR feedback和CLI安全改善可独立验证。
 - external peer和work recovery只在现有授权、host-native execution和claim boundary内增强，不形成第二个agent runtime。
-- 固定 artifact contract、多宿主 source/runtime同源和当前 dirty OpenCode ownership均未被破坏。
+- 固定 artifact contract、多宿主 source/runtime同源和 `b9fd2b46` 已落地的 OpenCode/Graphify ownership均未被破坏。
 
 ### Scope Boundaries
 
@@ -149,7 +150,7 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 - 逐字复制CE provider/model配置、品牌、Proof凭证或plugin marketplace形态。
 - 全局可配置artifact root。
 - spec-first自建统一agent dispatcher、模型路由器、并发池或中心workflow engine。
-- 本计划执行期间覆盖现有dirty OpenCode/runtime工作。
+- 覆盖、回滚或重复实现当前 HEAD/worktree 中已经落地的 OpenCode、Graphify 或 instruction-sync 行为。
 - 自动merge、release、外部issue/PR或未授权数据外发。
 
 ---
@@ -169,8 +170,9 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 - KTD9. **Compose retune from existing owners.** `spec-write-skill`负责corpus/package，`spec-optimize`负责measurement；不创建`spec-retune`。
 - KTD10. **Do not create a generic temp handoff layer.** 使用已有durable artifacts、session store/resume和handoff envelopes。
 - KTD11. **Extend current CLI safety owners.** 复用target-repo containment、adapter registry、plugin manifest和init lifecycle，避免从CE TypeScript目录平移一套实现。
-- KTD12. **Protect dirty work.** OpenCode相关unit开始前必须重新读取当前磁盘source和git diff；若目标文件仍有未合并修改，采用patch-on-current并运行双方tests，无法无损合并则停止请求owner决策。
-- KTD13. **Keep Python and scratch runtime self-contained.** Python resolver是每个实际shell/caller内的小型本地函数，按同一行为contract和parity fixtures治理；不建立跨Skill runtime import。Private scratch也由peer runner、PR feedback、optimize、sweep等实际owner各自实现，共享的是安全不变量测试，不是通用daemon或隐藏目录服务。
+- KTD12. **Rebase every unit on current source.** 当前实现基线是 `b9fd2b46`，不是计划初稿时的 `d807db7f`。OpenCode flat command、Graphify current-root/instruction sync/external-hook fallback 已完成；实施时重新读取当前磁盘 source/git diff，只补 owner 尚未覆盖的 CE 差距。若出现后续本地修改，采用 patch-on-current 并运行双方 tests；无法无损合并则停止请求 owner 决策。
+- KTD13. **Keep Python and scratch runtime self-contained.** Python resolver是每个实际shell/caller内的小型本地函数，按同一行为contract和parity fixtures治理；不建立跨Skill runtime import。Private scratch由 brainstorm/code-review/compound/debug/explain/ideate/optimize/plan/POV/sweep 现有 consumer，以及未来 peer runner/PR feedback 等实际 owner 各自实现；先把跨 invocation cache 与 durable evidence 迁出 `/tmp`，再对剩余真正 ephemeral 路径应用统一安全 fixtures，不建立通用daemon或隐藏目录服务。
+- KTD14. **Preserve stronger current contracts.** CE 同步只能补差距，不能弱化当前 `spec-plan` 的 `planning-evidence-boundaries.md`、high-risk/interface/frontend lenses、plan handoff 与强制 headless doc review，也不能用上游较短实现覆盖当前 PR feedback 的分页/截断 fail-closed、Riffrec zip safety、spec-work run-artifact v2 或 exact-origin browser gate。
 
 ### Architecture Posture
 
@@ -226,7 +228,7 @@ Skill semantic contract -> current host-native primitive or inline fallback
 | `ce-babysit-pr` | 3 | `spec-lfg`, `spec-commit-push-pr` | 按 spec-first 边界改造后吸收 | 不新增public Skill；watch-loop和snapshot状态机改为shipping-tail内部contract。 |
 | `ce-brainstorm` | 16 | `spec-brainstorm` | 按 spec-first 边界改造后吸收 | 3个repo-cache资产直接删除；elevation/runner仅activation-gated，不默认复制。 |
 | `ce-code-review` | 24 | `spec-code-review` | 按 spec-first 边界改造后吸收 | cache资产直接删除；scope/mechanics/peer lifecycle吸收，persona语义不脚本化。 |
-| `ce-commit` | 1 | `spec-commit` | 直接同步 | 移除host专用参数语义；保留internal-only和独立commit授权。 |
+| `ce-commit` | 1 | `spec-commit` | 按 spec-first 边界改造后吸收 | 当前已经没有`$ARGUMENTS`；只吸收“每个 Git fact 使用独立 argv-style 调用、提交前重取 consequential facts”，保留internal-only和独立commit授权。 |
 | `ce-commit-push-pr` | 2 | `spec-commit-push-pr` | 按 spec-first 边界改造后吸收 | 吸收branch-scope reconciliation和PR template；branding/auto babysit不默认。 |
 | `ce-compound` | 13 | `spec-compound` | 按 spec-first 边界改造后吸收 | cache资产直接删除；UTF-8/validator修复直接同步；headless行为与现有owner合并。 |
 | `ce-compound-refresh` | 8 | `spec-compound-refresh` | 按 spec-first 边界改造后吸收 | validator/Python修复直接同步；不采用全局artifact root。 |
@@ -242,16 +244,60 @@ Skill semantic contract -> current host-native primitive or inline fallback
 | `ce-pov` | 15 | `spec-pov` | 按 spec-first 边界改造后吸收 | cache资产直接删除；panel/receipt可选；保留project-grounded decisive verdict。 |
 | `ce-product-pulse` | 2 | `spec-product-pulse` | 按 spec-first 边界改造后吸收 | 参数解析可移植化；输出仍按当前signal/report owner，不全局迁root。 |
 | `ce-proof` | 1 | `spec-proof` | 按 spec-first 边界改造后吸收 | Proof v3需官方/live contract Gate；未验证前不删除当前可用v2/local bridge。 |
-| `ce-resolve-pr-feedback` | 8 | `spec-resolve-pr-feedback` | 直接同步 | payload streaming、index-0、多行Markdown和pending-review保护全部进入现有owner。 |
+| `ce-resolve-pr-feedback` | 8 | `spec-resolve-pr-feedback` | 按 spec-first 边界改造后吸收 | 当前已具备index-0、多行stdin、顶层分页和nested-comment截断fail-closed；只补payload streaming与pending-review显式保护，不用CE较弱脚本覆盖现有行为。 |
 | `ce-retune` | 7 | `spec-write-skill`, `spec-optimize` | 等价能力已存在 | 不新增Skill；把baseline/A-A/noise-floor/cut/halt形状编入组合模式和eval。 |
-| `ce-riffrec-feedback-analysis` | 5 | `spec-riffrec-feedback-analysis` | 直接同步 | Python/LF/path修复同步；与sweep analyzer保持byte parity或单一source策略。 |
+| `ce-riffrec-feedback-analysis` | 5 | `spec-riffrec-feedback-analysis` | 按 spec-first 边界改造后吸收 | 只摘取Python/LF/path增量；保留当前更完整的zip traversal、size、ffmpeg/ffprobe timeout和降级处理，并与sweep analyzer维持byte parity。 |
 | `ce-setup` | 3 | `spec-runtime-setup`, CLI config owners | 按 spec-first 边界改造后吸收 | 不复制CE YAML/product keys；吸收safe path、retired-key和preference diagnostics。 |
 | `ce-simplify-code` | 3 | `spec-simplify-code` | 直接同步 | self-skip、scope和session pins同步；不扩大mutation范围。 |
-| `ce-strategy` | 1 | `spec-strategy` | 直接同步 | 移除`$ARGUMENTS`依赖；保留STRATEGY.md唯一owner。 |
+| `ce-strategy` | 1 | `spec-strategy` | 等价能力已存在 | 当前`Focus Hint`已按current request/conversation读取host-neutral invocation arguments；只做回归，不重复迁移。 |
 | `ce-sweep` | 6 | `spec-sweep` | 按 spec-first 边界改造后吸收 | Python/scratch/host invocation同步；不采用CE artifact root。 |
 | `ce-test-browser` | 3 | `spec-test-browser`, `spec-lfg` | 按 spec-first 边界改造后吸收 | capability-first driver思想吸收；未满足exact-origin conformance的native driver不得放行。 |
 | `ce-work` | 18 | `spec-work`, `spec-worktree`, run-artifact helpers | 按 spec-first 边界改造后吸收 | 吸收receipt/recovery/collision/transaction invariants；不复制central controller/provider routes。 |
 | `lfg` | 3 | `spec-lfg` | 按 spec-first 边界改造后吸收 | 强化PR watch/settled decisions/engine binding receipt；`references/next-work-handoff.md` 因依赖被拒绝的generic `ce-handoff`而单文件不采纳；继续要求显式完整pipeline授权。 |
+
+---
+
+### Current-Source Owning Package Inspection
+
+以下清单固定本轮“逐个文件”检查范围。文件数来自 `b9fd2b46` 的当前 `skills/<name>/` package；总计 514 个文件，均纳入路径、入口、reference、script/eval/schema 与 consumer 关系检查。这里记录当前 package 规模和主要校准焦点，具体方案仍由 S01-S35 条目承载。
+
+| Skill | Current files | Inspection focus |
+| --- | ---: | --- |
+| `spec-app-consistency-audit` | 80 | compiler、source locks、scripts、schemas、headless evidence。 |
+| `spec-brainstorm` | 15 | planning bootstrap、repo cache、handoff、scratch、arguments。 |
+| `spec-code-review` | 38 | review modes、personas、mechanics、peer runtime、cache/scratch。 |
+| `spec-commit` | 1 | authorization、Git context acquisition、scoped commit。 |
+| `spec-commit-push-pr` | 3 | landing authorization、branch reconciliation、PR description。 |
+| `spec-compound` | 22 | session extractors、validators、promotion evidence、cache/scratch。 |
+| `spec-compound-refresh` | 8 | knowledge refresh validators、artifact ownership、arguments。 |
+| `spec-debug` | 8 | diagnosis loop、pipeline return、tracker boundary、cache/scratch。 |
+| `spec-doc-review` | 28 | roster/lenses、headless mutation、rendering、review artifact。 |
+| `spec-dogfood` | 3 | browser QA、worktree/server ownership、arguments。 |
+| `spec-explain` | 10 | activation、rendering、destination、cache/scratch。 |
+| `spec-ideate` | 15 | multi-axis exploration、tracker、handoff、cache/scratch。 |
+| `spec-lfg` | 4 | full pipeline、review followup、tracker defer、fingerprint。 |
+| `spec-optimize` | 19 | measurement specs/logs、parallel probes、cache/scratch。 |
+| `spec-plan` | 40 | evidence boundaries、risk/interface/frontend lenses、handoff、cache/scratch。 |
+| `spec-polish` | 16 | dev-server lifecycle、browser helper paths、UI iteration。 |
+| `spec-pov` | 12 | grounding、approach-set、panel boundary、cache/scratch。 |
+| `spec-prd` | 34 | PRD contracts、readiness、checks、arguments。 |
+| `spec-product-pulse` | 3 | lookback/config/report ownership。 |
+| `spec-promote` | 2 | shipped-feature input与copy output。 |
+| `spec-proof` | 2 | Web API v2/edit-v2、local bridge、HITL sync。 |
+| `spec-resolve-pr-feedback` | 9 | paginated intake、thread identity、reply/resolve scripts。 |
+| `spec-riffrec-feedback-analysis` | 6 | analyzer、feedback schemas、quick/extensive paths。 |
+| `spec-rule-miner` | 4 | code-evidence categories、write targets、trigger eval。 |
+| `spec-runtime-setup` | 57 | registry、host config、process safety、OpenCode、Graphify/workspace graph。 |
+| `spec-simplify-code` | 4 | scope、three lenses、behavior preservation。 |
+| `spec-strategy` | 3 | focus hint、interview、single `STRATEGY.md` owner。 |
+| `spec-sweep` | 12 | source adapters、state lease、analyzer、scratch。 |
+| `spec-test-browser` | 4 | exact-origin capability、run context、cleanup、pipeline。 |
+| `spec-test-xcode` | 1 | XcodeBuildMCP simulator workflow。 |
+| `spec-work` | 14 | intake、execution engines、run artifact、verification/shipping。 |
+| `spec-worktree` | 2 | caller-owned isolation、path/cleanup safety。 |
+| `spec-write-skill` | 18 | authoring branches、preview/receipt、eval promotion。 |
+| `spec-write-tasks` | 14 | derived task-pack identity、schema、handoff evals。 |
+| `using-spec-first` | 3 | public route map、conditional boundaries、single-entry governance。 |
 
 ---
 
@@ -270,8 +316,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** unresolved WHAT探索、requirements-only unified plan、decision surface、output rendering和handoff；已有dispatch authorization/fallback。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应`ce-brainstorm`16文件。
-- **Gap:** 仍使用repo profile cache；`$ARGUMENTS`表述宿主化；缺session-settled decision contract；外部elevation没有独立egress/receipt activation gate。
-- **Planned surfaces:** 删除cache script/reference/profiler route；`SKILL.md`改为fresh orientation；新增/对齐`settled-decisions.md`和handoff字段；将reasoning elevation写成optional capability，首波不落CE shell/runner，后续只有R10-R11证据满足才启用。
+- **Gap:** 仍使用repo profile cache和`$ARGUMENTS`；`/tmp/spec-first`同时承担handoff/cache语义；缺session-settled decision contract；外部elevation没有独立egress/receipt activation gate。
+- **Planned surfaces:** 删除cache script/reference/profiler route；`SKILL.md`改为fresh orientation和host-neutral arguments；把durable handoff/cache迁入现有artifact/run owner，仅保留真正ephemeral scratch；新增/对齐`settled-decisions.md`和handoff字段；将reasoning elevation写成optional capability，首波不落CE shell/runner，后续只有R10-R11证据满足才启用。
 - **优化后提升：** 仓库判断始终对应当前 branch/worktree，减少缓存漂移；已确认的产品决定跨 brainstorm→plan 保真；未来模型提升即使失败也不会误报已提升或泄露未授权上下文。
 - **Do not copy:** Claude CLI只读tool list、硬编码model配置、平台aggregator假设和默认外发。
 - **Verification/risk/priority:** cache双worktree负例、settled decision replay、无授权零外部进程、授权失败inline fallback；P0 cache removal，P1 decision continuity，P2 elevation activation。
@@ -289,9 +335,9 @@ Skill semantic contract -> current host-native primitive or inline fallback
 ### S04. `spec-commit`
 
 - **Current owner/duty:** internal-only、caller已持有commit authorization时做scoped commit，不拥有push/PR。
-- **CE diff/verdict:** `直接同步`，对应`ce-commit/SKILL.md`。
-- **Planned surfaces:** 移除任何load-time/`$ARGUMENTS`假设，统一运行时解析caller payload；补quoted path和空参数contract。
-- **优化后提升：** 同一 internal caller envelope 可在 Claude、Codex、Cursor、Kiro、OpenCode、Qoder 下解释一致，减少空参数、quoted path 和宿主预解析导致的误提交。
+- **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应`ce-commit/SKILL.md`；当前没有`$ARGUMENTS`，但仍保留Claude预填context与shell fallback双路径。
+- **Planned surfaces:** 保留internal-only/commit authorization；把Git status、diff、branch、log、default branch改为各自独立argv-style事实采集，禁止用`;`、`&&`、pipe、redirect或command substitution拼接；commit前重新读取branch/staged set等consequential facts。
+- **优化后提升：** Windows PowerShell与POSIX shell获得一致的Git上下文，单条命令失败可被精确解释；提交前重取关键事实降低并发工作树变化导致的漏提、误提或错误分支提交。
 - **Do not copy:** CE branding、commit授权推导或user-facing入口。
 - **Verification/risk/priority:** internal caller envelope、缺授权零commit、路径含空格；P1 portable invocation。
 
@@ -309,8 +355,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** 把已解决问题或durable vocabulary写入`docs/solutions`/`CONCEPTS.md`，已有full/lightweight/headless、memory scan和grounding validation。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应13文件。
-- **Gap:** repo cache；session-history脚本解释器/UTF-8和doc-claim模板误报；headless输出可更稳定。
-- **Planned surfaces:** 删除cache三件套；直接同步三个extractor UTF-8、frontmatter/claim validator修复和Python resolver；复核schema/assets；保留headless不改instruction的现有边界并加structured result tests。
+- **Gap:** repo cache；`/tmp/spec-first`仍承载session historian过程状态；session-history脚本解释器/UTF-8和doc-claim模板误报；headless输出可更稳定。
+- **Planned surfaces:** 删除cache三件套；区分ephemeral extractor scratch与可复用knowledge evidence，后者进入run artifact/knowledge owner；直接同步三个extractor UTF-8、frontmatter/claim validator修复和Python resolver；复核schema/assets；保留headless不改instruction的现有边界并加structured result tests。
 - **优化后提升：** knowledge promotion 使用当前源码证据且中文 session 在不同 locale 下稳定解析；代码示例不再触发 placeholder 假阳性，headless 结果更适合自动 consumer。
 - **Do not copy:** 可配置docs root、把session transcript声明当outcome evidence、自动promote未验证知识。
 - **Verification/risk/priority:** Chinese/non-UTF locale、fenced/inline`{{...}}`、headless无instruction mutation、fresh grounding；P0/P1。
@@ -328,8 +374,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** diagnosis/root-cause/fix/verification闭环，适用于错误、回归和失败测试。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应5文件。
-- **Gap:** repo cache；作为外层pipeline consumer时缺稳定return；residual durable sink需遵守独立tracker授权。
-- **Planned surfaces:** 删除cache三件套；增加`pipeline-mode.md`或等价reference，返回status/root_cause/evidence/fix/verification/residual；tracker只输出candidate或交给有授权owner。
+- **Gap:** repo cache；`/tmp/spec-first`仍承载diagnosis过程/恢复状态；作为外层pipeline consumer时缺稳定return；residual durable sink需遵守独立tracker授权。
+- **Planned surfaces:** 删除cache三件套；区分ephemeral diagnosis scratch与需跨pipeline携带的evidence，后者进入return envelope/run artifact；增加`pipeline-mode.md`或等价reference，返回status/root_cause/evidence/fix/verification/residual；tracker只输出candidate或交给有授权owner。
 - **优化后提升：** 外层 pipeline 可消费稳定的诊断结果而不是自然语言猜测；失败验证不会被包装成 root cause 已确认，未授权 residual 也不会被自动外发。
 - **Do not copy:** 自动file ticket、把未验证猜测写成root cause、缓存repo profile。
 - **Verification/risk/priority:** outer-caller replay、failed verification不可complete、residual无授权不外发；P1。
@@ -357,8 +403,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** 面向学习的个性化diff/concept/idea/recent-work explainer，支持Markdown/HTML和check-in。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应10文件。
-- **Gap:** repo cache；activation过宽风险、destination和machine identifier泄漏可进一步收紧。
-- **Planned surfaces:** 删除cache三件套；fresh source/work recap；同步intake/destination/renderer限制；artifact失败保留可恢复本地路径。
+- **Gap:** repo cache；`/tmp/spec-first`被用作可恢复输出路径；activation过宽风险、destination和machine identifier泄漏可进一步收紧。
+- **Planned surfaces:** 删除cache三件套；fresh source/work recap；真正需要跨消息恢复的artifact进入显式output owner而非临时目录；同步intake/destination/renderer限制；artifact失败保留repo-relative或明确用户可见的可恢复路径。
 - **优化后提升：** 普通状态问答不再被重型 explainer 误触发，正文减少内部 token/run id 泄漏；Markdown/HTML 交付失败时仍有可恢复 artifact 路径。
 - **Do not copy:** 普通状态问答强制触发、内部token/run id进入正文、全局artifact root。
 - **Verification/risk/priority:** activation negative cases、redaction、Markdown/HTML destination；P1。
@@ -367,8 +413,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** grounded idea generation/evaluation，多轴探索、issue intelligence和handoff到brainstorm。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应12文件。
-- **Gap:** repo cache；tracker探测仍需避免binary/env false negative；settled decisions和多区域连续性可加强。
-- **Planned surfaces:** 删除cache三件套；tracker capability-first contract；settled decision pins；更新agents/rendering/post-workflow；保持dispatch authorization。
+- **Gap:** repo cache；`web-research-cache.md`与post-workflow把`/tmp`当跨invocation cache/无repo deliverable，与ephemeral-only边界冲突；tracker探测仍需避免binary/env false negative；settled decisions和多区域连续性可加强。
+- **Planned surfaces:** 删除repo cache三件套；把可复用web research与无repo deliverable结果迁入明确的session/artifact owner并携freshness/invalidation，不以`/tmp`指针作handoff；tracker capability-first contract；settled decision pins；更新agents/rendering/post-workflow；保持dispatch authorization。
 - **优化后提升：** idea grounding 不受旧 worktree cache 污染，tracker 能力按真实接口而非单一 binary 判断；settled decision 不被后续探索重新打开。
 - **Do not copy:** 自动创建issue、把未加载MCP视为不存在、重复定义plan层决策。
 - **Verification/risk/priority:** no-cache fresh orientation、tracker connector lazy discovery、decision continuity；P1。
@@ -387,7 +433,7 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** metric-driven baseline、measurement scaffolding、parallel experiments、checkpoints和stopping criteria。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应8文件，并承接`ce-retune`measurement面。
-- **Gap:** repo cache；Python/scratch portability；缺显式A/A noise floor和model-upgrade corpus mode。
+- **Gap:** repo cache；Python/scratch portability，且必须分离`.spec-first/workflows` durable checkpoint与`/tmp` probe process state；缺显式A/A noise floor和model-upgrade corpus mode。
 - **Planned surfaces:** 删除cache三件套；measure/parallel-probe Python resolver；private ephemeral scratch与`.spec-first/workflows` durable checkpoint分层；增加A/A/noise-floor/pre-registered threshold模式供spec-write-skill调用。
 - **优化后提升：** 测量脚本跨 Python 环境更可靠，A/A 先量化噪声后再 A/B；模型升级调优结果可归因、可复现，避免把 harness 波动误当优化收益。
 - **Do not copy:** 把静态prompt review称为retune成功、没有repeatable corpus仍跑A/B、CE docs_root。
@@ -397,8 +443,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** implementation-ready/universal/answer-seeking计划，拥有Product/Planning Contract、implementation units、review和handoff。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应19文件。
-- **Gap:** repo cache；`$ARGUMENTS`；settled decisions和跨层single-owner rule需强化；default外部elevation不符合当前授权边界。
-- **Planned surfaces:** 删除cache三件套；host-neutral arguments；新增settled decisions reference；plan sections/deepening/handoff明确每条约束只在拥有层定义；reasoning elevation降为optional activation-gated，不在首波加脚本。
+- **Gap:** repo cache；`$ARGUMENTS`；`universal-planning.md`仍含`/tmp` continuity；settled decisions和跨层single-owner rule需强化；default外部elevation不符合当前授权边界。
+- **Planned surfaces:** 删除cache三件套；host-neutral arguments；将跨session/跨workflow continuation固定到unified plan、handoff envelope或`.spec-first/workflows`，不保留临时指针；新增settled decisions reference；plan sections/deepening/handoff明确每条约束只在拥有层定义；reasoning elevation降为optional activation-gated，不在首波加脚本。保留并回归当前更强的evidence boundaries、high-risk/interface/frontend lenses、plan handoff与mandatory headless doc review。
 - **优化后提升：** 计划 grounding 始终新鲜，已定决策不会被重开，R/KTD/U 约束不再多层重复；可选 elevation 保持零默认外发和诚实 fallback。
 - **Do not copy:** Claude CLI默认detached planning、固定model配置、provider实现进入plan contract。
 - **Verification/risk/priority:** plan replay不重开settled decision、R/KTD/U去重、无授权零peer；P0 cache，P1 contract，P2 elevation。
@@ -416,8 +462,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** 对外部技术/方案/变化给project-grounded decisive verdict，已有grounding scouts和boundary。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应15文件。
-- **Gap:** repo cache；用户给定approach-set识别和cross-model independent panel receipt不足。
-- **Planned surfaces:** 删除cache三件套；扩展intake/method/schema；增加optional peer panel、runner和provider/model receipt；主流程综合而非投票。
+- **Gap:** repo cache；现有grounding路径仍引用`/tmp/spec-first`；用户给定approach-set识别和cross-model independent panel receipt不足。
+- **Planned surfaces:** 删除cache三件套并将durable grounding/approach evidence迁到run-local artifact owner；扩展intake/method/schema；增加optional peer panel、runner和provider/model receipt；主流程综合而非投票。
 - **优化后提升：** 用户给出的每个 approach 都会被逐项覆盖，peer 的 provider/model/独立性可核验；综合结论不再被多数投票或同 provider 伪独立左右。
 - **Do not copy:** 未授权外发repo内容、同provider当独立、oracle panel默认开启、抽象排名遗漏用户approach。
 - **Verification/risk/priority:** approach coverage、privacy/egress gate、same-provider independence negative、fallback；P1。
@@ -462,17 +508,17 @@ Skill semantic contract -> current host-native primitive or inline fallback
 ### S22. `spec-resolve-pr-feedback`
 
 - **Current owner/duty:** 解析PR comments/threads，评价有效性并在授权范围内修复和resolve。
-- **CE diff/verdict:** `直接同步`，对应8文件。
-- **Planned surfaces:** 三个脚本同步stream-to-file、index-0、多行JSON/Markdown和pending review保护；references明确targeted/full和thread identity；Skill只消费结构化结果。
-- **优化后提升：** 大 PR 评论集不会因 shell 变量上限损坏，首条 comment 可正确定位，多行回复保持真实 Markdown，pending review 不再制造“API 成功但 reviewer 不可见”的假完成。
+- **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应8文件。当前已修复index-0、多行stdin、三类top-level connection独立分页、nested comment>100的incomplete-evidence warning，强于CE head的部分脚本。
+- **Planned surfaces:** `get-pr-comments`只吸收stream-to-private-file和pending review结构化字段，保留当前独立分页、bot actionability分层与truncation warning；`get-thread-for-comment`保留当前`set -euo pipefail`、可选owner/repo和nested truncation fail-closed；`reply-to-pr-thread`补pending-review guard说明/consumer gate而不回退stdin多行安全；references明确targeted/full和thread identity。
+- **优化后提升：** 大 PR 评论集不会因 shell 变量上限损坏，pending review 不再制造“API 成功但 reviewer 不可见”的假完成；同时保留当前长PR分页、深线程不把不完整absence误判为confirmed absence的更强证据边界。
 - **Do not copy:** shell变量承载大payload、字面`\n`回复、未提交review回复、自动resolve未验证fix。
 - **Verification/risk/priority:** 大GraphQL fixture、首元素comment、多行/quote、pending review和network failure；P0脚本可靠性。
 
 ### S23. `spec-riffrec-feedback-analysis`
 
 - **Current owner/duty:** 分析Riffrec bundle/录音视频并生成结构化反馈。
-- **CE diff/verdict:** `直接同步`，对应5文件。
-- **Planned surfaces:** analyzer LF/Python/path修复；与sweep的同名analyzer决定保持Skill-local byte parity并加测试，避免runtime跨Skill依赖。
+- **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应5文件；当前1225行analyzer已经包含zip traversal/size、顶层JSON、未知时长、ffmpeg/ffprobe timeout与降级语义，不能用上游较短实现覆盖。
+- **Planned surfaces:** 逐hunk摘取LF/Python/path修复并回放当前security/error fixtures；与sweep的同名analyzer保持Skill-local byte parity并加测试，避免runtime跨Skill依赖。
 - **优化后提升：** Riffrec analyzer 在 Windows/LF/Python 差异下更稳定，两份 Skill-local 副本有 parity 保障，减少反馈摄取入口的环境型失败。
 - **Do not copy:** 全局artifact root或不同副本无parity漂移。
 - **Verification/risk/priority:** Windows newline、zip safety、python resolver、parity；P1。
@@ -490,9 +536,10 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** 多宿主required harness runtime的install/configure/verify/refresh，拥有registry、facts、host authority和degraded status。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应`ce-setup`3文件与19个CLI/安装文件中的安全主题。
-- **Gap:** CE的safe artifact path/retired keys/model preference diagnostics可借鉴；当前OpenCode工作正在扩展平台矩阵，必须避免覆盖。
-- **Planned surfaces:** 在现有Node registry/config helpers中增加unsafe path、retired-key和dormant preference facts；Python resolver作为dependency probe复用；OpenCode command/frontmatter/loader只patch current owner；不复制CE YAML parser/check-health。
-- **优化后提升：** 配置错误、退役键、symlink 逃逸和 dormant preference 会得到明确 facts/reason code；多宿主安装更安全，诊断更可操作且不复制 CE 产品配置。
+- **Current baseline:** `b9fd2b46`已将Graphify current artifact固定为`graphify-out/`，补齐legacy migration/conflict、inherited `GRAPHIFY_OUT`清除、external hook legacy override/fallback shape、workspace clean/partial retry legacy preservation与CLAUDE/AGENTS canonical renderer；`ff840c8e`已完成OpenCode flat commands、legacy namespace cleanup、collision/preview diagnostics、top-of-file frontmatter检查和platform registry。
+- **Gap:** CE的safe artifact path/retired keys/model preference diagnostics仍可借鉴；frontmatter scalar serializer和slash-command/path classifier尚未形成统一owner，多个adapter仍复制simple parser。当前OpenCode/Graphify lifecycle主要是回归基线，不是待重建功能。
+- **Planned surfaces:** 在现有Node registry/config/path-safety/process helpers中补unsafe path、retired-key和dormant preference facts；Python resolver作为dependency probe复用；frontmatter扩展`src/cli/helpers/markdown-frontmatter.js`并迁移真实consumer；OpenCode/Graphify只做CE差距回归和consumer consolidation；不复制CE YAML parser/check-health。
+- **优化后提升：** 配置错误、退役键、symlink逃逸和dormant preference得到明确facts/reason code；frontmatter/path规则减少adapter漂移；已完成的OpenCode/Graphify路径不会因CE同步被回退或重复实现。
 - **Do not copy:** `docs_root`、CE model key闭列表、CLI-local plugin switch、adapter持有session dispatch。
 - **Verification/risk/priority:** symlink/absolute/`..`/repo root/`.git`负例、retired key、current platform matrix；P1，依赖OpenCode owner baseline。
 
@@ -508,9 +555,9 @@ Skill semantic contract -> current host-native primitive or inline fallback
 ### S27. `spec-strategy`
 
 - **Current owner/duty:** 创建/更新`STRATEGY.md`并为ideate/brainstorm/plan提供上游产品grounding。
-- **CE diff/verdict:** `直接同步`，对应1文件。
-- **Planned surfaces:** 移除`$ARGUMENTS`宿主依赖，运行时读取实际invocation arguments；保留唯一文件owner。
-- **优化后提升：** STRATEGY.md 在各宿主读取相同 invocation arguments，减少空参数或 Claude 专用占位符导致的错误写入，同时维持唯一战略 owner。
+- **CE diff/verdict:** `等价能力已存在`，对应1文件；当前`Focus Hint`已从current request/conversation读取可选focus，不含`$ARGUMENTS`。
+- **Planned surfaces:** 不改语义，只增加host projection/quoted focus/empty focus回归并保留`STRATEGY.md`唯一owner。
+- **优化后提升：** 锁定已经完成的host-neutral focus解析，避免全局参数迁移把它误改回模板占位符或引入第二个战略输入owner。
 - **Do not copy:** artifact root、model elevation或自动landing。
 - **Verification/risk/priority:** quoted arguments和empty input；P1。
 
@@ -518,7 +565,7 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** 从配置feedback sources摄取、acknowledge、分析recording、验证fix并产出LFG-ready plan。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应6文件。
-- **Planned surfaces:** host-neutral invocation、private scratch、Python resolver、analyzer parity、sweep-state兼容；artifact继续由现有plan/report owner决定。
+- **Planned surfaces:** host-neutral invocation、private scratch、Python resolver、analyzer parity、sweep-state兼容；保留当前1225行analyzer的安全/降级能力，不用CE较短副本覆盖；artifact继续由现有plan/report owner决定。
 - **优化后提升：** 定时/headless sweep 的 Python、scratch 和状态恢复更可靠；缺少某个 binary 不再被误判为 source 不存在，降低反馈漏摄取。
 - **Do not copy:** CE docs_root、缺少binary即断言source unavailable、无授权source ack。
 - **Verification/risk/priority:** scheduled headless、scratch security、analyzer、state resume；P1。
@@ -531,7 +578,7 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Planned surfaces:** 增加driver capability interface和fresh-inspected locator规则；只有driver能提供同等exact-origin、action evidence和cleanup contract才可成为candidate；pipeline失败收集证据但不能假成功。
 - **优化后提升：** driver 可按当前 capability 扩展，但只有满足 exact-origin、fresh locator、action evidence 和 cleanup 合同才放行；兼顾可用性与 UI 验证可信度。
 - **Do not copy:** native-first无conformance放行、selector猜测、陈旧locator、server autonomy。
-- **Verification/risk/priority:** current exact-origin suites、stale locator、driver unavailable/fallback、zero action on blocked；P1，必须patch current dirty source。
+- **Verification/risk/priority:** current exact-origin suites、stale locator、driver unavailable/fallback、zero action on blocked；P1，基于`b9fd2b46`后current source补丁式扩展，不得用CE native-first逻辑覆盖exact-origin gate。
 
 ### S30. `spec-test-xcode`
 
@@ -546,8 +593,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 - **Current owner/duty:** 执行settled plan/task/concrete request，拥有input triage、execution strategy、verification、return-to-caller和closeout evidence。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应18文件，是最大架构裁决面。
-- **Gap:** current run artifact/recovery已存在，但unit-level interrupted job、collision和actual-engine receipt可加强；`$ARGUMENTS`需portable。
-- **Planned surfaces:** 扩展existing execution-strategy/run-artifact schemas，记录requested/actual engine/capability、unit state、before/after、collision、verification、recovery blocker；复用spec-worktree；必要helper写CommonJS并由CLI/internal owner消费。
+- **Gap:** current `spec-work-run-artifact/v2`、conditional durable trigger、review evidence materialization与fingerprint gate已存在，但unit-level interrupted job、collision和actual-engine receipt可加强；`$ARGUMENTS`需portable。
+- **Planned surfaces:** additive扩展existing execution-strategy/run-artifact v2 consumers，记录requested/actual engine/capability、unit state、before/after、collision、verification、recovery blocker；复用spec-worktree；必要helper写CommonJS并由CLI/internal owner消费，不另建CE controller schema真相源。
 - **优化后提升：** 中断 unit 可恢复，requested/actual engine 与未知结果被诚实记录，路径/共享契约碰撞能在集成前发现，验证失败可回滚而不形成第二套执行 runtime。
 - **Do not copy:** `cross-model-work.sh` provider闭列表、六模块central controller、自动route切换、controller-ownedcommit、clean merge=兼容性、Skill绕过host-native primitive。
 - **Verification/risk/priority:** resume after crash、path/shared-contract collision、unknown engine claim、verification rollback、return envelope；P1，晚于U1/U2基础。
@@ -596,7 +643,7 @@ Skill semantic contract -> current host-native primitive or inline fallback
 | S01 | `spec-app-consistency-audit` | U10 regression matrix only。 |
 | S02 | `spec-brainstorm` | U1 fresh grounding、U2 invocation；future elevation依赖U3 receipt/runner evidence和独立activation gate。 |
 | S03 | `spec-code-review` | U1、U2后进入U3 pilot。 |
-| S04 | `spec-commit` | U2 portable invocation，随U6交付。 |
+| S04 | `spec-commit` | U6独立Git context采集修复；不属于11个`$ARGUMENTS`迁移。 |
 | S05 | `spec-commit-push-pr` | U5 PR-tail contract和updated LFG admission。 |
 | S06 | `spec-compound` | U1 cache removal、U2 Python/UTF-8，随U6交付。 |
 | S07 | `spec-compound-refresh` | U2 validator/runtime portability，随U6交付。 |
@@ -617,9 +664,9 @@ Skill semantic contract -> current host-native primitive or inline fallback
 | S22 | `spec-resolve-pr-feedback` | U2 scratch/argument floor，随U6；U5消费其pipeline return。 |
 | S23 | `spec-riffrec-feedback-analysis` | U2 Python/LF，随U6。 |
 | S24 | `spec-rule-miner` | U10 regression matrix only。 |
-| S25 | `spec-runtime-setup` | U2 Python facts、U9 CLI safety；OpenCode子面等待current implementation baseline。 |
+| S25 | `spec-runtime-setup` | U2 Python facts、U9剩余CLI safety；OpenCode/Graphify以`b9fd2b46`为回归基线。 |
 | S26 | `spec-simplify-code` | U6；不依赖peer runtime。 |
-| S27 | `spec-strategy` | U2 portable invocation，随U6。 |
+| S27 | `spec-strategy` | U10 host projection/entrypoint回归；当前host-neutral focus已存在。 |
 | S28 | `spec-sweep` | U2 Python/scratch，随U6。 |
 | S29 | `spec-test-browser` | 当前exact-origin方案/实现为前置，U9只在current source上patch driver interface。 |
 | S30 | `spec-test-xcode` | U10 regression matrix only。 |
@@ -715,11 +762,11 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 | --- | --- | --- | --- |
 | `skills/ce-optimize/scripts/measure.sh` | 直接同步 | 使用统一Python resolver，安全引用路径/args。 | python3/python/py/stub、spaces、exit propagation。 |
 | `skills/ce-optimize/scripts/parallel-probe.sh` | 直接同步 | 使用统一Python resolver和安全参数引用，保持只测runtime facts并传播partial launch/cleanup结果。 | no runtime、partial launch、cleanup。 |
-| `skills/ce-resolve-pr-feedback/scripts/get-pr-comments` | 直接同步 | GraphQL stdout流式写private temp file，结果结构化输出。 | large payload、API error、temp cleanup。 |
-| `skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment` | 直接同步 | 修复index 0和thread lookup/error。 | first element、missing、multiple candidate。 |
-| `skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread` | 直接同步 | body file/JSON确保真实多行Markdown；拒绝pending review。 | multiline、quotes/backticks、pending review。 |
-| `skills/ce-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` | 直接同步 | LF/Python/path兼容和安全保持。 | existing zip traversal/size tests + newline。 |
-| `skills/ce-sweep/scripts/analyze_riffrec_zip.py` | 直接同步 | 与riffrec副本byte parity或同一同步script维护。 | parity和same analyzer fixtures。 |
+| `skills/ce-resolve-pr-feedback/scripts/get-pr-comments` | 按边界吸收 | 只吸收GraphQL stdout流式private temp file与pending-review字段；保留当前三connection独立分页、bot分层和nested truncation warning。 | large payload、API error、temp cleanup、top-level pagination、nested incomplete evidence。 |
+| `skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment` | 等价能力已存在/回归 | 当前已正确返回index 0，并对nested comments未完整抓取fail closed；不采用CE较弱的首100静默absence。 | first element、missing、multiple candidate、truncated nested comments。 |
+| `skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread` | 等价能力已存在/补说明 | 当前已从stdin读取真实多行Markdown；补pending review consumer gate与GraphQL thread-ID说明。 | multiline、quotes/backticks、pending review。 |
+| `skills/ce-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py` | 按边界吸收 | 逐hunk应用LF/Python/path增量，保留当前zip traversal/size、JSON、duration、media timeout与降级处理。 | existing security/degradation fixtures + newline/Python。 |
+| `skills/ce-sweep/scripts/analyze_riffrec_zip.py` | 按边界吸收 | 与riffrec当前增强版保持byte parity，不以CE较短副本覆盖。 | parity和same analyzer fixtures。 |
 | `skills/ce-sweep/scripts/sweep-state.py` | 直接同步 | 小型状态兼容修复、UTF-8/atomic write/private scratch。 | resume、corrupt state、symlink、atomic replace。 |
 | `scripts/codex-dev.ts` | 明确不采纳 | 不新增spec-first产品脚本；现有本地源码安装、npm和init拥有开发路径。 | package scripts中不出现orphan `codex:dev`。 |
 
@@ -737,7 +784,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 | Upstream file | Verdict | Spec-first owner / action | Key verification |
 | --- | --- | --- | --- |
-| `.opencode/plugins/compound-engineering.js` | 按 spec-first 边界改造后吸收 | 当前`src/cli/adapters/opencode.js`、plugin manifest/init owner实现frontmatter-only command discovery、non-overwrite和collision facts。 | 正文YAML不伪造frontmatter；same-name collision warning；existing command不覆盖。 |
+| `.opencode/plugins/compound-engineering.js` | 等价能力已存在/回归 | `ff840c8e`的`src/cli/adapters/opencode.js`与platform registry已实现top-of-file frontmatter、flat command projection、collision/preview和legacy cleanup；只补统一helper/serializer差距。 | 正文YAML不伪造frontmatter；same-name collision warning；existing command不覆盖；flat 17-command lifecycle。 |
 | `src/commands/convert.ts` | 等价能力已存在/补差距 | 对应plugin-sync/init conversion；确保不写legacy Claude compatibility tool map。 | absent AGENTS不创建；managed block-only可删除。 |
 | `src/commands/install.ts` | 等价能力已存在/补差距 | 对应init/lifecycle；legacy managed block cleanup和ownership。 | unrelated content保留、idempotent install。 |
 | `src/converters/claude-to-copilot.ts` | 按边界吸收 | 在当前content transform owner使用统一slash-command/path判别。 | `/command`与`/etc/hosts`、`/tmp/x`、Windows path。 |
@@ -748,11 +795,11 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 | `src/release/metadata.ts` | 等价能力已存在/无语义迁移 | 只在新增canonical Skill/asset真实发布时更新当前manifest owner；不复制CE metadata shape。 | build manifest和skill count。 |
 | `src/targets/codex.ts` | 按边界吸收 | 当前Codex adapter/init owner采用managed ancestor containment和legacy cleanup。 | ancestor symlink escape整块skip且不claim ownership。 |
 | `src/targets/managed-artifacts.ts` | 直接同步不变量 | 扩展当前target-repo/managed removal helpers，统一realpath containment和nearest-existing ancestor。 | missing descendants、ancestor symlink、TOCTOU recheck。 |
-| `src/targets/opencode.ts` | 按边界吸收 | patch current OpenCode adapter/current plan，不覆盖dirty source。 | six/current-host lifecycle、collision、ownership。 |
+| `src/targets/opencode.ts` | 等价能力已存在/补差距 | 不重做OpenCode lifecycle；在`b9fd2b46`当前adapter上只复用统一frontmatter/path/containment helper并保持legacy/user-owned root保护。 | six/current-host lifecycle、collision、ownership、flat command regression。 |
 | `src/targets/pi.ts` | 按边界吸收 | 当前platform adapter若存在则复用containment；若非supported platform不为CE parity新增。 | `getSupportedPlatforms()` scoped test。 |
 | `src/utils/codex-agents.ts` | 等价能力已存在/补差距 | current instruction/bootstrap owner只清理historical managed block。 | no file creation on absence、preserve user prose。 |
 | `src/utils/codex-content.ts` | 按边界吸收 | current transform owner接入host-neutral invocation和path classification。 | runtime source rewrite parity。 |
-| `src/utils/frontmatter.ts` | 直接同步不变量 | 当前frontmatter serializer对null/bool/number/date-like scalar强制JSON quote；parser和serializer round-trip。 | YAML type matrix、Unicode、colon/hash、multiline rejection。 |
+| `src/utils/frontmatter.ts` | 按边界吸收不变量 | 扩展现有`src/cli/helpers/markdown-frontmatter.js`；当前已有top-of-file inspection parser但尚无统一安全serializer，禁止新增平行helper。 | YAML type matrix、Unicode、colon/hash、multiline rejection、adapter consumer parity。 |
 | `src/utils/legacy-cleanup.ts` | 按边界吸收 | currentmanaged-removal registry增加真正retired assets；no-follow containment。 | user fork/ancestor symlink/unknown manifest不删除。 |
 | `src/utils/slash-command.ts` | 按边界吸收 | 若当前没有统一owner，新增CommonJS helper under`src/cli/helpers/`; converters/adapters共用。 | reserved roots、relative/absolute/URL、quoted invocation。 |
 
@@ -816,13 +863,14 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 ### U0. Freeze the Upstream Diff and Produce a Machine-Checkable Reconciliation Ledger
 
-**Goal:** 把固定区间的 422 个文件变成可复现的全量 ledger，同时保留 237 个实施目标与 185 个证据/测试/发行支撑文件的分类，防止实施中遗漏或因 CE HEAD 变化漂移。
+**Goal:** 把固定区间的422个文件变成可复现的全量ledger，同时冻结当前35个canonical Skill owning package的514文件inventory；分别防止上游diff遗漏和current-source owner漂移。
 
 **Primary files:**
 
 - `docs/validation/2026-07-30-ce-3-20-skill-script-reconciliation.json`
 - `docs/validation/2026-07-30-ce-3-20-skill-script-reconciliation.md`
 - `docs/validation/2026-07-30-ce-3-20-name-status.txt`
+- `docs/validation/2026-07-30-current-skill-package-inventory.json`
 - `scripts/check-ce-upstream-reconciliation.cjs`
 - `tests/unit/ce-upstream-3-20-reconciliation.test.js`
 
@@ -832,6 +880,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 - 从相邻CE checkout的Git object生成并checked-in保存name-status，不读取mutable working tree内容作为authority。
 - 每条路径记录`status`、`ce_skill_or_surface`、`verdict`、`spec_first_owner`、`target_action`、`test_owner`和可选`exception_reason`。
 - 验证422总数、237实施目标、185证据文件、215 Skill runtime、19 CLI/转换/安装Runtime、3支撑文件、29 CE Skill、3新增Skill、47脚本和9 cache删除精确匹配；47脚本是对前述目录分类的交叉维度，不与422再次相加。
+- 从current HEAD逐个列出35个`skills/<name>/` package的全部路径、文件类型、owner role和content hash；基线`b9fd2b46`应为514个文件并与本计划Current-Source表的per-Skill count一致。后续HEAD变化允许计数改变，但必须生成新snapshot并逐个重判新增/删除/owner迁移。
 - Checker默认只校验checked-in name-status snapshot和ledger，因此CI/packaged tests不依赖相邻CE checkout；`--ce-repo <path>`只用于maintainer显式刷新/比对两个commit object。
 - Ledger是历史validation artifact，不成为runtime consumer或通用upstream-sync schema。
 
@@ -869,7 +918,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 **Primary files:**
 
-- 11个含`$ARGUMENTS`的canonical Skill entrypoint
+- 11个含`$ARGUMENTS`的canonical Skill entrypoint：`spec-brainstorm`、`spec-code-review`、`spec-compound`、`spec-compound-refresh`、`spec-debug`、`spec-dogfood`、`spec-ideate`、`spec-optimize`、`spec-plan`、`spec-prd`、`spec-work`
 - `.gitattributes`
 - `skills/spec-compound/**/scripts/*.py`
 - `skills/spec-compound-refresh/scripts/*.py`
@@ -877,13 +926,13 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 - `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py`
 - `skills/spec-sweep/scripts/{analyze_riffrec_zip.py,sweep-state.py}`
 - `tests/unit/python-runtime-resolution-contracts.test.js`
-- 各owner的private-scratch focused tests
+- 当前32个`/tmp/spec-first`引用的逐文件迁移表与各owner private-scratch focused tests
 
 **Implementation:**
 
 - 用host-neutral“invocation arguments”contract替换`$ARGUMENTS`，保留token/quoted path/drive path解析规则。
 - 每个实际shell/caller内实现同形resolver函数，按`python3 -> python -> py`执行`-c`probe，拒绝只存在但不可执行的stub；共享fixtures验证行为，不建立跨Skill runtime import。
-- Durable artifacts、repo-local run evidence和private temp明确分层；peer runner、PR feedback、optimize、sweep等owner各自实现scratch，写入前后recheck containment/ownership。
+- Durable artifacts、repo-local run evidence和private temp明确分层；brainstorm/code-review/compound/debug/explain/ideate/optimize/plan/POV/sweep现有32个引用逐个决定删除、迁durable owner或保留ephemeral。未来peer runner/PR feedback等owner各自实现scratch，写入前后recheck containment/ownership；禁止把跨invocation cache、handoff pointer或唯一可恢复结果留在`/tmp`。
 - 为同名validator/analyzer副本增加byte-parity或single-sync contract。
 
 **Dependencies:** U0；可与U1后半并行，但同一Skill文件冲突时串行合并。
@@ -936,7 +985,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 - Ideate/brainstorm/plan按single-owner rule传递决策引用，禁止在Product Contract/KTD/U/task重复定义。
 - Doc review补whole-doc/rendering floor/answer-withdrawal；POV补approach-set和independence/privacy receipt。
 
-**Dependencies:** U3；settled-decisions部分可在U3后并行，peer部分必须等待runner pilot通过。
+**Dependencies:** settled-decisions/single-owner部分可与U3并行；只有doc-review/POV的external peer部分必须等待U3 runner pilot通过。
 
 **Test scenarios:** three-runner parity、doc report-only bytes、POV approach completeness、decision replay、no-authority zero peer process。
 
@@ -950,7 +999,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 - `skills/spec-worktree/SKILL.md`和scripts
 - `src/cli/helpers/spec-work-run-artifact.js`
 - `skills/spec-lfg/SKILL.md`
-- `skills/spec-lfg/references/{next-work-handoff.md,tracker-defer.md,pr-watch-loop.md}`
+- `skills/spec-lfg/references/{review-followup.md,tracker-defer.md,pr-watch-loop.md}`
 - `skills/spec-lfg/scripts/pr-watch-state.cjs`
 - `skills/spec-commit-push-pr/**`
 - focused work/LFG/worktree/PR fixture tests
@@ -1044,12 +1093,12 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 **Implementation:**
 
-- 新增或统一slash-command/path classifier；所有实际consumer共用。
-- Frontmatter serializer避免YAML隐式类型漂移，parser只读文件开头frontmatter。
+- 在当前CommonJS helper边界新增或统一slash-command/path classifier，精确区分slash command、POSIX absolute path、Windows drive path、URL与quoted invocation；只迁移真实consumer。
+- 扩展`src/cli/helpers/markdown-frontmatter.js`为统一top-of-file parser/安全scalar serializer owner，逐步删除Cursor/Kiro/OpenCode/Qoder等adapter内复制的simple parser；serializer避免null/bool/number/date-like YAML隐式类型漂移。
 - Managed writes/cleanup在nearest existing ancestor和replace前双重containment check；unsafe block不进入manifest ownership。
-- OpenCode command registration/collision patch到current dirty source；只有无损patch和双方tests都通过才完成。
+- 把`ff840c8e`已经完成的OpenCode flat command、legacy cleanup、collision/preview与top-of-file frontmatter列为characterization baseline；U9只补统一helper、scalar/path/containment差距和回归，不再新增或重做command registration。
 
-**Dependencies:** U0；OpenCode子面依赖current OpenCode worktree达到可合并baseline。
+**Dependencies:** U0；以`b9fd2b46`为current-source baseline，实施前仍需重读HEAD/worktree避免后续漂移。
 
 **Test scenarios:** YAML scalar matrix、absolute paths、ancestor symlink/TOCTOU、legacy user fork、OpenCode正文YAML、duplicate skill roots、current platform lifecycle。
 
@@ -1060,6 +1109,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 **Primary files:**
 
 - `README.md`, `README.zh-CN.md`
+- `CLAUDE.md`, `AGENTS.md`, `scripts/sync-instruction-files.js`
 - 相关`docs/contracts/**`, `docs/05-用户手册/**`
 - `CHANGELOG.md`
 - package/init projection tests和generated runtime expectations
@@ -1067,6 +1117,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 **Implementation:**
 
 - 更新cache removal、optional peer、PR watch、retune composition、Proof状态和fixed artifact root。
+- 使用canonical instruction renderer与`npm run sync:instructions`保持CLAUDE/AGENTS checked-in入口同源，避免Graphify/OpenCode source contract只在一个host入口更新。
 - 运行source-first`spec-first init`生成当前平台runtime；不得手改runtime。
 - Fresh-source eval覆盖modified prose；scripts/CLI按常规source tests。
 - Reconciliation ledger记录422条upstream path的最终implemented/deferred/rejected/evidence-only outcome和evidence ref。
@@ -1081,7 +1132,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 | Wave | Units | Exit gate | Rollback boundary |
 | --- | --- | --- | --- |
-| W0 Characterization | U0 | 422=237+185、215/19/3、29、35、47及证据子类计数全匹配 | 删除新ledger/test，不改product source。 |
+| W0 Characterization | U0 | 422=237+185、215/19/3、29、35、47及证据子类计数全匹配；current 35-package/514-file snapshot零遗漏 | 删除新ledger/test，不改product source。 |
 | W1 Freshness and portability | U1-U2 | 九cache consumer fresh grounding通过；Python/LF/scratch/arguments focused tests绿 | 可按U1、U2独立回滚；不恢复generated runtime。 |
 | W2 Review pilot | U3 | code-review mechanics和one peer runner pilot通过，授权/claim negative tests绿 | 删除new helpers/runner并恢复旧review prose，不影响W1。 |
 | W3 Semantic expansion | U4、U6 | doc/POV/settled decisions及specialized fixes focused tests绿 | 按Skill owner独立回滚。 |
@@ -1103,6 +1154,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
    - 上游422文件由ledger唯一分类；`unclassified=0`, `duplicate=0`, `inherited=0`。
    - 237个实施目标和185个证据/测试/发行支撑文件分别精确；24 plans、32 Skill docs、28 solutions、3 host specs、81 tests/fixtures、17 metadata/governance文件可回链。
    - 47脚本、9 cache删除、3新增CE Skill和19 CLI/转换/安装Runtime文件计数精确。
+   - 当前35个owning package的514个文件逐路径入inventory，per-Skill count与本计划表一致；实施时若HEAD变化则生成新的完整snapshot，不复用旧计数。
 
 2. **Source/runtime boundary**
    - Source diff不含手改generated runtime。
@@ -1161,7 +1213,7 @@ git diff --check
 - CLI ledger19个路径、support ledger3个路径。
 - 全区间审计F001-F422连续、路径唯一，且与固定Git区间name-status/numstat逐项一致。
 - 计划正文不写本机绝对路径；外部checkout以repo identity+relative path描述。
-- Changelog只追加本计划条目，不覆盖现有dirty entries。
+- Changelog只追加本计划条目，不覆盖当前历史记录或其他并行条目。
 
 ---
 
@@ -1177,7 +1229,7 @@ git diff --check
 | PR watch无限等待或越权修复 | 高 | active budget、terminal reasons、single writer lane、最多受控fix cycles、无auto merge。 |
 | Peer/PR/Proof输入造成凭证泄漏或命令注入 | 高 | 最小环境allowlist、凭证不进argv/log、provider_untrusted、no-eval/no-auto-apply、durable receipt脱敏和有界retention。 |
 | Proof上游文档过期 | 高 | official/live Gate；未验证不迁移或claim。 |
-| OpenCode dirty source被覆盖 | 高 | U9前重读current diff，patch-on-current，双方tests；冲突无法无损解决即停。 |
+| 已落地OpenCode/Graphify能力被CE同步回退或重复实现 | 高 | 以`b9fd2b46`做characterization baseline；U9/U10前重读current diff，只补未覆盖差距，运行flat command、current-root、external-hook fallback、instruction sync和provider safety回归。 |
 | 全局portable cleanup扩大scope | 中 | 只改当前consumer；no-consumer upstream converter记录不采纳，不扩supported platforms。 |
 | 固定artifact root限制用户定制 | 低/有意 | 稳定producer/consumer优先；非canonical report按Skill显式支持alternative output。 |
 | 大方案一次落地回归面过大 | 高 | W0-W6独立waves、focused exit gates、per-wave rollback和禁止mega-commit。 |
@@ -1214,17 +1266,18 @@ git diff --check
 
 - CE Git range`7f86be9d..1fac0442`和其422-file name-status/stat。
 - `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md`，逐条记录F001-F422的原始diff规模、实际变化、owner、裁决和验证面；其中237个实施目标与185个上游证据/测试/发行支撑文件分层计数，不使用目录继承或抽查结论。
-- CE升级分析`docs/version-upgrades/2026-07-30-7f86be9d-to-1fac0442-skills-scripts.md`，用于交叉核对规模、主题和owning files。
+- 外部CE checkout `compound-engineering-plugin@1fac0442:docs/version-upgrades/2026-07-30-7f86be9d-to-1fac0442-skills-scripts.md`，用于交叉核对规模、主题和owning files；它不是本仓库文件，也不是当前source truth。
 - 当前35个canonical Skill的`SKILL.md`、references、scripts、evals和相关tests。
 - 当前host-neutral worker dispatch、source/runtime、plan/work、knowledge promotion和artifact contracts。
-- 当前dirty OpenCode/runtime工作树事实，仅用于定义ownership/merge边界，不作为已完成能力claim。
+- 当前分支`b9fd2b46`与`d807db7f..b9fd2b46`变更，用于重新确认OpenCode flat command、Graphify `graphify-out/`、instruction sync、external-hook fallback和相关测试已落地；这些source/test事实不等于完整host field outcome。
 
 ### Limitations
 
 - 本计划是implementation-ready设计，不代表任何Skill/脚本变更已实施。
 - 尚未运行CE provider CLI、detached runner、Proof v3、真实PR watch或retune field experiment。
 - 规划阶段已完成422/422逐文件原始diff审计；实施时U0仍须从固定Git objects重新生成机器账本并与validation报告对账，目的是验证输入未漂移，不是补做抽查。
-- 当前OpenCode source在工作树中有独立未提交修改；U9的最终文件列表和测试基线必须以实施时current source为准。
+- 本轮校准结束时current-source baseline为`b9fd2b46`；未来实施若HEAD/worktree变化，U0必须重建35-package/514-file current inventory并重新裁决受影响unit，不能沿用本计划快照冒充fresh evidence。
+- `AGENTS.md`在`ff840c8e`后曾与`CLAUDE.md`/canonical Graphify renderer漂移，已由`84ad3154`收口，并由`b9fd2b46`继续收紧external-hook fallback与partial-clean legacy preservation；这证明checked-in host entry及周边Provider contract都需要source-level parity test，不能只验证generated runtime。
 - Fresh-source eval和真实host journey属于实施验证，不可由本计划审查替代。
 
 ---
@@ -1232,18 +1285,19 @@ git diff --check
 ## Definition of Done
 
 - [x] 规划阶段逐文件审计证明422/422路径均有独立记录；237/237实施目标、185/185证据文件、29/29 CE Skill、35/35 spec Skill、47/47脚本均无遗漏。
+- [x] 规划阶段按`b9fd2b46`逐个清点35个current Skill owning package，共514/514文件；每个Skill的package规模与检查焦点已写入方案。
 - [ ] U0实施前从固定Git objects重建机器账本，并证明与逐文件审计`unclassified=0`、`duplicate=0`、`inherited=0`。
 - [ ] 九个repo profile cache及references/routes/parity test删除，九个consumer都有fresh grounding正负例。
 - [ ] 11个`$ARGUMENTS`entrypoint迁移为host-neutral invocation contract。
-- [ ] Python resolver、LF、UTF-8和private scratch安全覆盖所有实际bundled script consumer。
+- [ ] Python resolver、LF、UTF-8覆盖所有实际bundled script consumer；当前32个`/tmp/spec-first`引用逐文件完成delete/durable-migrate/ephemeral-keep裁决与验证。
 - [ ] Code review scope/findings mechanical floor通过，脚本未接管semantic judgment。
 - [ ] 三个peer-enabled Skill的runner/receipt通过parity、lifecycle、authorization、egress和claim tests；plan/brainstorm无orphan elevation assets。
 - [ ] Spec-work/worktree吸收recovery/collision/transaction invariants但未形成central execution runtime。
 - [ ] Spec-lfg PR tail覆盖reviews、CI、head和base currency，仍不自动merge。
-- [ ] PR feedback、compound/refresh、riffrec/sweep、simplify、commit/strategy等直接修复完成聚焦验证。
+- [ ] PR feedback、compound/refresh、riffrec/sweep、simplify和commit context等差距修复完成聚焦验证；strategy维持等价能力并通过回归。
 - [ ] Proof v3按Gate真实迁移或诚实记录external-contract-unverified，不伪造完成。
 - [ ] Retune通过write-skill+optimize组合落地，无新增public Skill。
-- [ ] CLI/frontmatter/path/managed cleanup/OpenCode patch基于current source完成，未覆盖用户dirty work。
+- [ ] CLI/frontmatter/path/managed cleanup只补`b9fd2b46`尚未覆盖的差距；OpenCode flat command与Graphify current-root/instruction sync/external-hook fallback characterization保持通过。
 - [ ] README/docs/Changelog同步，current supported platform runtime由source-first init生成，无手改mirror。
 - [ ] Focused tests、typecheck、unit、smoke、integration、skill lint、MCP setup、build和`git diff --check`按影响面通过。
 - [ ] Modified Skill完成fresh-source eval；未执行的live provider/PR/Proof/retune evidence明确标`not_run`和原因。
@@ -1252,4 +1306,4 @@ git diff --check
 
 ## Handoff
 
-本计划建议从W0开始，由`spec-work`按U0-U10和wave exit gate实施。第一批只做reconciliation、cache removal和portable script floor；review peer、Work/LFG、Proof和OpenCode分别在后续wave激活，避免与当前dirty OpenCode工作或高风险runtime变更混成一次不可审查提交。
+本计划建议从W0开始，由`spec-work`按U0-U10和wave exit gate实施。第一批只做reconciliation、cache removal和portable script floor；review peer、Work/LFG与Proof分别在后续wave激活。OpenCode/Graphify不再作为“待接入能力”单独成波，而作为`b9fd2b46` characterization baseline贯穿U9/U10，避免把已完成工作与CE新增差距混成一次不可审查提交。
