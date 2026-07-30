@@ -21,14 +21,15 @@ origin: compound-engineering-plugin@7f86be9d..1fac0442
 | --- | --- |
 | Objective | 以 CE `3.19.0 -> 3.20.0` 的真实 Git 区间 `7f86be9d..1fac0442` 为唯一上游增量基线，逐项校准 spec-first 当前 35 个 canonical Skill、全部相关脚本和 CLI/安装边界；吸收能提高 grounding freshness、可移植性、机械验证地板、恢复能力和 PR 尾部闭环的变化，同时拒绝 provider 绑定、中心执行器和 artifact contract 漂移。 |
 | Recommended approach | `extend + compose`。优先扩展现有 Skill owner、host-neutral worker dispatch、run artifact、Runtime Setup、adapter/init 和测试契约；不按 CE 文件形态复制六份大型 runner、外部模型路由器或 `ce-work` 中心控制器。 |
-| Diff focus | 固定 Git 区间的 422 个变更文件全部进入逐文件判定。其实施目标面为 `skills/**` 215 个、CLI/转换/安装 Runtime 19 个和支撑文件 3 个；其余 185 个上游计划、Skill 文档、解决方案、tests/fixtures、插件元数据与发布文件作为设计或验证证据逐条审计。29 个 CE Skill 全量映射，其中 3 个新增 Skill 必须得到明确去向；当前 source 侧同时对 35 个 canonical Skill owning package 的 514 个文件逐个建立路径、职责和依赖清单，不以 `SKILL.md` 代替 package 审计。逐文件 CE 证据见 `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md`。 |
+| Diff focus | 固定 Git 区间的 422 个变更文件全部进入逐文件判定。其实施目标面为 `skills/**` 215 个、CLI/转换/安装 Runtime 19 个和支撑文件 3 个；其余 185 个上游计划、Skill 文档、解决方案、tests/fixtures、插件元数据与发布文件作为设计或验证证据逐条审计。29 个 CE Skill 全量映射，其中 3 个新增 Skill 必须得到明确去向；当前 source 侧同时对 35 个 canonical Skill owning package 的 514 个文件逐个建立路径、职责和依赖清单，不以 `SKILL.md` 代替 package 审计。上游逐文件证据见 `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md`，当前 source 逐文件证据见 `docs/validation/2026-07-30-current-skill-package-file-by-file-audit.md`。 |
 | Authority hierarchy | 当前用户要求与项目角色契约 > 当前 spec-first canonical source/tests > CE `7f86be9d..1fac0442` 原始 diff > 上游升级分析文档。升级分析是导航，不能替代具体 diff；CE provider/model/product 选择不是 spec-first contract。 |
 | Source/runtime boundary | 只修改 `skills/`、`templates/`、`src/cli/`、`scripts/`、`tests/`、`docs/`、README、Changelog 等 canonical source；`.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/` 只通过 `spec-first init` 重投影。 |
 | Script/LLM boundary | 脚本只拥有路径、diff、schema、hash、进程、超时、权限、状态、回执、排序和可重复检查；LLM 继续拥有需求、架构、review finding 是否成立、persona/lens 选择、fallback 是否语义充分和最终 adoption verdict。 |
 | Largest risk | CE 3.20.0 的主要实现以 Claude/Codex/Grok/Cursor/Composer CLI、detached peer 和单产品目录约定为中心；机械同步会绕过 spec-first 的独立授权、provider-untrusted、host-native execution、claim ceiling 和稳定 artifact consumer。 |
 | Current-source baseline | 方案本轮校准基于当前分支 `leo-2026-07-27-opencode` 的 `b9fd2b46`。该基线已经包含 `ff840c8e` 的 OpenCode flat command/legacy cleanup 与 Graphify `graphify-out/` current-root迁移，并包含后续 inherited `GRAPHIFY_OUT`、external hook、legacy clean、instruction sync、external-hook fallback shape 与 partial-clean legacy preservation 的收口；不得再把这些能力写成待从 CE 重做。 |
+| Current-source audit snapshot | 当前 35 个 Skill package 的逐文件审计读取自 `1f1df0de`，权威 source identity 为 `skills_tree_oid=d3763c70d60b724da1f3b5f87f2431394ab17ec8`。后续文档提交不改变该 tree；任何 `skills/` 变化都会使 514-file snapshot 过期并触发全量重审。 |
 | Tail ownership | `spec-work` 分波实施；每波只进入已授权的 canonical target。实施前重新读取 current HEAD/worktree，并在当前 owner 上补差距；任何后续本地变更都按 path-level ownership 保留，不得覆盖、回滚或把已落地能力重复实现。 |
-| Stop conditions | 需要手改 generated runtime；需要让脚本作语义 verdict；需要把 workflow invocation 当作模型外发/worker dispatch 授权；需要把 CE provider CLI 变成通用 Skill contract；需要全局移动 `docs/` artifact root；或无法证明 35/29/422 三组清单零遗漏。 |
+| Stop conditions | 需要手改 generated runtime；需要让脚本作语义 verdict；需要把 workflow invocation 当作模型外发/worker dispatch 授权；需要把 CE provider CLI 变成通用 Skill contract；需要全局移动 `docs/` artifact root；或无法证明 35/29/422/514 四组清单零遗漏。 |
 
 ---
 
@@ -69,7 +70,7 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 
 **Exhaustive reconciliation**
 
-- R1. 35 个当前 canonical Skill 必须各有且仅有一个主裁决条目，写明当前职责、CE diff、差距、修改面、不采纳项、验证、风险、依赖和优先级。
+- R1. 35 个当前 canonical Skill 必须各有且仅有一个主裁决条目，写明当前职责、CE diff、差距、修改面、不采纳项、优化收益、验证、风险、依赖和优先级；其 514 个 tracked package 文件必须各自拥有 exact path、完整内容 hash、结构事实、文件职责和所属 Sxx 语义 owner，禁止用 package 计数或 `SKILL.md` 抽样代替逐文件检查。
 - R2. 29 个 CE Skill 必须全部映射；`ce-babysit-pr`、`ce-handoff`、`ce-retune` 必须有明确 owner 和“建/并/拒/延后”结论，不能停在观察状态。
 - R3. 固定 Git 区间的 422 个上游文件必须各自拥有独立审计记录，写明原始 diff、实际变化、spec-first owner、裁决和验证面；237 个实施目标与 185 个证据/测试/发行支撑文件必须分别可计数、可回链。任何路径未分类、重复分类、继承目录裁决或只按 A/M/D 状态机械迁移都阻断实施。
 - R4. 47 个上游脚本文件（46个Skill-local脚本和1个根级开发脚本）必须逐文件写明 source owner、是否复制、目标实现形态、输入/输出/失败回执和测试。
@@ -125,10 +126,11 @@ CE 3.20.0 的高价值变化集中在五类真实问题：repo profile cache 漂
 - AE9. OpenCode skill frontmatter中含 YAML-like正文示例，不会伪造 command name/description；同名 unmanaged skill collision保持 warning/degraded，loader precedence未知不报 confirmed。
 - AE10. `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md` 含 F001-F422 连续独立记录，classifier返回 `unclassified=0`、`duplicate=0`、`inherited=0`，且 237 个实施目标、185 个证据文件、35 个 spec Skill与29个 CE Skill计数分别精确匹配。
 - AE11. PR 评论或 peer 输出包含伪造 shell 命令、路径和 secret-like 文本时，系统只把它作为不可信输入交给语义 owner；任何 raw output 不进入 durable artifact，receipt 只保留脱敏摘要、hash、状态与限制。
+- AE12. `docs/validation/2026-07-30-current-skill-package-file-by-file-audit.md` 含 35 个 Sxx 小节和 514 条 exact-path 记录；每条 SHA-256/字节数与当前 `skills_tree_oid` 源码一致，`missing=0`、`extra=0`、`unresolved=0`，且每个文件都回链一个 Skill 级 CE 裁决与优化收益。
 
 ### Success Criteria
 
-- 35/35 当前 Skill得到逐项、可实施的校准方案，29/29 CE Skill和422/422上游文件零遗漏。
+- 35/35 当前 Skill得到逐项、可实施的校准方案，514/514 当前 package 文件、29/29 CE Skill和422/422上游文件零遗漏。
 - repo profile cache彻底退役，当前 worktree grounding取代共享缓存。
 - review机械地板、Python/LF/scratch、PR feedback和CLI安全改善可独立验证。
 - external peer和work recovery只在现有授权、host-native execution和claim boundary内增强，不形成第二个agent runtime。
@@ -259,7 +261,7 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### Current-Source Owning Package Inspection
 
-以下清单固定本轮“逐个文件”检查范围。文件数来自 `b9fd2b46` 的当前 `skills/<name>/` package；总计 514 个文件，均纳入路径、入口、reference、script/eval/schema 与 consumer 关系检查。这里记录当前 package 规模和主要校准焦点，具体方案仍由 S01-S35 条目承载。
+以下清单固定本轮“逐个文件”检查范围。文件数来自 `b9fd2b46` 后保持不变的 `skills_tree_oid=d3763c70d60b724da1f3b5f87f2431394ab17ec8`；总计 514 个文件，均纳入路径、入口、reference、script/eval/schema 与 consumer 关系检查。这里记录当前 package 规模和主要校准焦点，S01-S35 承载最终语义方案；每个 exact path、完整 SHA-256、源码结构事实和文件职责见 `docs/validation/2026-07-30-current-skill-package-file-by-file-audit.md`。
 
 | Skill | Current files | Inspection focus |
 | --- | ---: | --- |
@@ -1212,6 +1214,7 @@ git diff --check
 - Script ledger每个上游script path恰出现一次。
 - CLI ledger19个路径、support ledger3个路径。
 - 全区间审计F001-F422连续、路径唯一，且与固定Git区间name-status/numstat逐项一致。
+- 当前 source 审计精确包含35个Sxx小节、514条Skill package路径；路径、字节数、SHA-256、所属Skill与`skills_tree_oid`双向一致，`missing=0`、`extra=0`、`unresolved=0`。
 - 计划正文不写本机绝对路径；外部checkout以repo identity+relative path描述。
 - Changelog只追加本计划条目，不覆盖当前历史记录或其他并行条目。
 
@@ -1266,6 +1269,7 @@ git diff --check
 
 - CE Git range`7f86be9d..1fac0442`和其422-file name-status/stat。
 - `docs/validation/2026-07-30-ce-3-20-file-by-file-diff-audit.md`，逐条记录F001-F422的原始diff规模、实际变化、owner、裁决和验证面；其中237个实施目标与185个上游证据/测试/发行支撑文件分层计数，不使用目录继承或抽查结论。
+- `docs/validation/2026-07-30-current-skill-package-file-by-file-audit.md`，逐条记录当前35个Skill owning package的514个文件：exact path、字节数、SHA-256、结构事实、文件职责、Sxx owner、CE裁决和优化收益；其快照由`skills_tree_oid=d3763c70d60b724da1f3b5f87f2431394ab17ec8`约束。
 - 外部CE checkout `compound-engineering-plugin@1fac0442:docs/version-upgrades/2026-07-30-7f86be9d-to-1fac0442-skills-scripts.md`，用于交叉核对规模、主题和owning files；它不是本仓库文件，也不是当前source truth。
 - 当前35个canonical Skill的`SKILL.md`、references、scripts、evals和相关tests。
 - 当前host-neutral worker dispatch、source/runtime、plan/work、knowledge promotion和artifact contracts。
@@ -1276,7 +1280,7 @@ git diff --check
 - 本计划是implementation-ready设计，不代表任何Skill/脚本变更已实施。
 - 尚未运行CE provider CLI、detached runner、Proof v3、真实PR watch或retune field experiment。
 - 规划阶段已完成422/422逐文件原始diff审计；实施时U0仍须从固定Git objects重新生成机器账本并与validation报告对账，目的是验证输入未漂移，不是补做抽查。
-- 本轮校准结束时current-source baseline为`b9fd2b46`；未来实施若HEAD/worktree变化，U0必须重建35-package/514-file current inventory并重新裁决受影响unit，不能沿用本计划快照冒充fresh evidence。
+- 本轮代码校准基线为`b9fd2b46`，规划审计读取自`1f1df0de`的同一`skills_tree_oid`；未来实施若`skills/` tree变化，U0必须重建35-package/514-file current inventory并重新裁决受影响unit，不能沿用本计划快照冒充fresh evidence。
 - `AGENTS.md`在`ff840c8e`后曾与`CLAUDE.md`/canonical Graphify renderer漂移，已由`84ad3154`收口，并由`b9fd2b46`继续收紧external-hook fallback与partial-clean legacy preservation；这证明checked-in host entry及周边Provider contract都需要source-level parity test，不能只验证generated runtime。
 - Fresh-source eval和真实host journey属于实施验证，不可由本计划审查替代。
 
@@ -1285,7 +1289,7 @@ git diff --check
 ## Definition of Done
 
 - [x] 规划阶段逐文件审计证明422/422路径均有独立记录；237/237实施目标、185/185证据文件、29/29 CE Skill、35/35 spec Skill、47/47脚本均无遗漏。
-- [x] 规划阶段按`b9fd2b46`逐个清点35个current Skill owning package，共514/514文件；每个Skill的package规模与检查焦点已写入方案。
+- [x] 规划阶段按`skills_tree_oid=d3763c70d60b724da1f3b5f87f2431394ab17ec8`逐个读取35个current Skill owning package，共514/514文件；逐文件审计已记录exact path、完整SHA-256、结构事实、职责和Sxx语义owner，且每个Skill的package规模、改造方案与优化收益均可回链。
 - [ ] U0实施前从固定Git objects重建机器账本，并证明与逐文件审计`unclassified=0`、`duplicate=0`、`inherited=0`。
 - [ ] 九个repo profile cache及references/routes/parity test删除，九个consumer都有fresh grounding正负例。
 - [ ] 11个`$ARGUMENTS`entrypoint迁移为host-neutral invocation contract。
