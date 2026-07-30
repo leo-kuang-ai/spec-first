@@ -32,6 +32,7 @@ worker_dispatch_outcome: dispatch_authorization_missing
 | Recommended approach | 复用现有 `using-spec-first` Front Controller、`spec-work` Reference Trigger Map、`context-bundle.v1`、skill-local eval、source/runtime projection 与 contract tests；增加 host-budget profile、invocation posture、context-residency/compaction guardrail 与四维 eval，再用 `spec-code-review`、`spec-plan` 做高 ROI pilot，随后按收益分批迁移。 |
 | User value | 降低常驻 description 与激活正文的无效上下文占用，减少长流程中关键规则被噪声稀释的风险，提高路由清晰度、执行聚焦度、审查稳定性和维护一致性。 |
 | AI leverage | 把 Prompt 从“替 AI 预演全部思考过程”精炼为“目标 + 项目特有事实 + 承重边界 + 决策点 + 证据义务 + done signal”；通用推理、方案生成和语义取舍留给模型，脆弱确定性动作交给 scripts/tools。 |
+| Frontier-model posture | 把“模型升级”、“Prompt 精炼”与“Skill 本身是否仍有边际价值”分成独立 treatment；先跑 new-model + old-skill 的 model-only baseline，再跑 distilled-skill，并保留 same-model no-skill counterfactual。只在新模型下变短、但不能证明 Skill 相对 no-skill 有增益时，不 promotion。 |
 | Quality posture | “质量不降低”不是靠行数目标证明，而是靠 Protected Behavior Map、trigger/outcome/cost/retention 四维 paired A/B、fresh-source eval、compaction/重调用场景、跨 Skill 闭环、全宿主投射与 outcome-gated rollout 共同证明；任一高风险不变量缺失即停止该 Skill 的迁移。 |
 | Promotion policy | 使用非补偿式门禁：安全与授权 → 任务正确性 → artifact/consumer 兼容 → trigger/retention → 成本与 TCO。前一层失败时，后续 token、时延或维护收益不能抵消；只有预注册主目标出现 observed improvement 才能 promotion。 |
 | Architecture posture | `reuse + extend + compose`。不新增中央路由器、universal Skill schema、per-skill lifecycle manifest、动态 system-prompt 平台或 embedding registry。 |
@@ -112,6 +113,8 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - G10. 让已 promotion 的模式带最小 regression subset 与 invalidation trigger，在 host、model、contract 或 consumer 演化后能诚实降级和重验。
 - G11. 对每个需要迁移的 Skill 先做语义精炼，再决定是否拆 reference：删除模型已具备的通用知识和过程叙事，压缩 behavioral anchors，保留项目特有边界，并按任务脆弱度配置自由度。
 - G12. 让 Prompt 成为 decision scaffold 而不是逐 token 遥控器：语义任务给 AI 足够判断空间，确定性或高风险动作通过脚本、schema、preview 和出口 gate 收窄。
+- G13. 使用 frontier-model treatment matrix 分开 model gain、prompt gain 和 Skill marginal value，防止把 GPT-5.6 / Claude 5 本身的能力提升误认为重构收益。
+- G14. 让已 promotion 的 canonical Skill 保持 model-family neutral；只有经实测的模型差异才进入 eval profile 或 host/model-specific guidance，不在跨宿主主 spine 中累积短命 workaround。
 
 ### Non-goals
 
@@ -129,6 +132,8 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - NG12. 不要求每个 docs-only/prose-only 小改动都运行 sealed test 或长期 field trial；评测强度随 treatment 风险增长，避免质量治理本身成为主要成本。
 - NG13. 不使用自动摘要器、LLM compressor 或“把 800 行总结成 100 行”的黑盒结果直接替换 canonical Prompt；语义精炼必须逐段分类、可回源、可消融、可回退。
 - NG14. 不把“充分发挥 AI”理解为删除项目知识、授权边界、例外条件、输出合同或 evidence anchor；模型通用能力不能替代它从未见过的 repo-local truth。
+- NG15. 不从 SDK model enum、provider release note 或模型名称推导 prompt behavior、live availability、质量或宿主已接入；模型存在性、可调用性、官方 prompting claim 与本仓 field outcome 必须分开。
+- NG16. 不为 GPT-5.6、Claude 5 或任一单一 flagship 创建 canonical Skill 分叉、专用模板或逐模型复制的主 Prompt；模型特有优化只能是可失效、可比较的窄 treatment。
 
 ### Actors and Consumers
 
@@ -210,6 +215,17 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - R41. 语义精炼与渐进披露是两个独立 treatment：先删除 `delete` 类、合并重复 behavioral anchor，再把真正条件化的 knowledge/procedure 迁出；不得通过“拆文件”掩盖可以直接删除的冗余，也不得把 reference 数量增加冒充精炼完成。
 - R42. Pilot 必须包含 prompt ablation：对被删除、合并或压短的承重候选做逐层 paired case，验证 route、decision coverage、evidence adequacy、correction burden 和最坏分层。任何只能依赖 reviewer 主观阅读、没有正负案例或 before/after evidence 的大幅精炼，只能保留为未 promotion 的可逆 candidate；原文保存在 frozen baseline/rollback artifact 中，不在 active candidate Prompt 内重复注入。
 
+#### Frontier-model isolation and marginal Skill value
+
+- R43. 新模型与 Prompt 重构不得同时作为一个不可分的 treatment。涉及 GPT-5.6、Claude 5 或后续 frontier model 时，至少保留 `old model + old skill`、`new model + old skill`、`new model + distilled skill` 三臂；只有第二与第三臂的差异可归因于 Prompt/Skill 改造。
+- R44. 每个 pilot 至少对代表性任务增加 `same model + no skill` counterfactual，用于判定 Skill 的边际价值。候选 Skill 若在 correctness、evidence、safety 和 output 上不优于 no-skill，默认 `thin | merge | retire | no-change-after-audit`，不得因为存量资产已经存在而继续增加内容。
+- R45. Canonical Skill 只保留跨模型稳定的 intent、repo/domain delta、failure correction、authority、evidence、artifact 和 stop contract。只在某模型族出现可复现回归时，才允许增加窄的 model-specific eval profile 或 adapter guidance；必须记录 model id/family、reasoning setting、失效条件和移除门槛。
+- R46. Pattern promotion 至少要求在一个当前 frontier model 上通过全量 pilot gates；若要声明 cross-model authoring pattern，还必须在另一模型族或明确的 minimum-supported capability tier 上通过最小 trigger/hard-exit/outcome subset。第二模型不可用时，closeout 保持 model-scoped claim。
+- R47. Activation-L1 的 canonical `description` 必须满足 Agent Skills 可移植上限 1,024 字符，使用简洁的 imperative/intent phrasing，同时表达 what、when、near-neighbor exclusion 和必要关键词。宿主私有 `when_to_use` 或更大上限不得反向放宽 canonical portable ceiling。
+- R48. Description 优化必须使用 should-trigger/should-not-trigger 的 near-miss 数据，保留 development/validation 分割，对宿主非确定性触发重复运行并报告 trigger rate；禁止把 validation 失败反向写成关键词补丁。
+- R49. 不能等到出错后才识别 trigger 的 non-obvious gotcha，例如隐蔽 source/runtime 边界、错误 health/readiness 信号或多系统 ID 异名，必须作为最短 gotcha anchor 留在 spine；只有模型能在行动前稳定识别条件时，才能迁入 reference。
+- R50. 工具名称、description、可见 roster 和路由规则都是有效 Prompt 的一部分。Pilot 必须删除与当前 Skill 无关的工具说明，只保留会改变选择的 when/error/return-field 信息；若宿主可观测 cache，同时记录 stable-prefix churn、cached tokens/cache-write tokens，但不为 cache 命中牺牲语义正确性。
+
 ### Key Flows
 
 - F1. 全量 baseline 与分群
@@ -260,6 +276,12 @@ worker_dispatch_outcome: dispatch_authorization_missing
   - **Outcome:** Prompt 先变得更有决策密度，再决定文件层级；没有价值的内容被删除而不是转存，承重内容仍可达。
   - **Covers:** R36-R42。
 
+- F9. Frontier-model treatment isolation
+  - **Trigger:** Pilot 要在 GPT-5.6、Claude 5 或其他新模型上重跑，或候选精炼依赖“新模型已经更强”的判断。
+  - **Steps:** 冻结 old model/skill/settings；先跑 new model + old skill；再跑 new model + distilled skill 与 new model + no skill；保持任务、证据、授权和 rubric 一致；需要 cross-model claim 时补第二模型族最小回归。
+  - **Outcome:** model gain、prompt gain、Skill marginal value 和 portability 有独立证据；没有边际价值的 Skill 进入 thin/merge/retire 判断。
+  - **Covers:** R43-R50。
+
 ### Acceptance Examples
 
 - AE1. `spec-code-review mode:agent` 在无 dispatch 授权时仍返回 `dispatch_authorization_missing` 的 report-only degraded 结果，不因 spine 瘦身误称独立 reviewer coverage。
@@ -282,6 +304,14 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - AE18. 一段 source/runtime 边界虽然模型通常能推断，但删除后 adversarial case 出现 runtime mirror mutation；该句被判定为 `contract/gate` 并恢复到 spine，不能以“模型够聪明”作为豁免。
 - AE19. 五段重复说明“脚本准备 facts、LLM 判断语义”被合并成一个 leading anchor，并指向唯一角色契约；tests 锁 owner/reachability，避免多副本 wording drift。
 - AE20. 一个确定性 hash/path/schema 流程从 30 行 prose 改为运行现有 CLI 并消费 machine-readable facts；模型只判断 failure consequence 和 next action，输出质量不降且 prompt/tool 总成本改善。
+- AE21. GPT-5.6 + old Skill 已比 old model + old Skill 显著提升，但 GPT-5.6 + distilled Skill 与 GPT-5.6 + old Skill 持平；closeout 只能把收益归因于 model upgrade，Prompt 精炼保持 maintainability experiment。
+- AE22. GPT-5.6 + no Skill 在普通 review 任务上与完整 Skill 等价，但在 spec-first severity/evidence/mutation contract 上失败；通用 review 教学被删除，项目特有 contract 保留。
+- AE23. Candidate 在 GPT-5.6 上通过，但第二模型族上遗漏 gotcha anchor；可以声明 GPT-5.6-scoped experiment，不得 promotion 为 cross-model authoring pattern。
+- AE24. Anthropic SDK 出现 Claude 5 model identifiers，但本轮无法读取可承重的 Claude 5 prompting guide 或 live host outcome；计划只记录 `advertised_sdk_surface`，不推导 availability、quality 或 prompt behavior。
+- AE25. Description 在 development queries 上 100% 触发，但 validation near-miss 出现明显 false-positive；不采用该版本，也不把 validation wording 直接追加为关键词。
+- AE26. 某 gotcha 只在 reference 中出现，但模型在执行错误动作前不会识别需要读取它；恢复为 spine 中的一句 non-obvious gotcha anchor。
+- AE27. 减少工具说明后实际 tool choice 更稳定，但删除 error/return-field 说明后增加了无效重试；恢复最短错误语义，不恢复全量工具教学。
+- AE28. 当宿主能报告 cache 时，candidate 因动态前缀变化导致 cached tokens 下降、cache-write tokens 上升；该运行成本记入 TCO，但不通过恢复语义冗余来换取 cache hit。
 
 ### Success Criteria
 
@@ -303,6 +333,10 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - 两个 pilot 均完成 paragraph classification 与 prompt ablation；能直接删除的 `delete` 类没有被转存成低价值 reference。
 - 主 spine 中每个保留段都能回答它改变哪个 route/action/authority/evidence/output/completion，或提供哪项不可自行恢复的 repo-specific knowledge。
 - Pilot 的自由度设计与任务脆弱度匹配：语义判断没有被微步骤过度约束，危险确定性动作没有退化为“相信 AI 自觉”。
+- 两个 pilot 均分开 model-only、prompt-distillation 和 no-skill treatment；没有把 frontier model 收益归因给 Prompt 重构。
+- 每个 pilot 在同一新模型上证明 Skill 相对 no-skill 仍有项目特有边际价值；否则进入 thin/merge/retire 评估。
+- Cross-model pattern 只在第二模型族/能力层回归通过后声明；不可得时明确保持 model-scoped limitation。
+- Canonical descriptions 均不超过 1,024 字符，trigger eval 使用 development/validation near-miss 数据与重复 trigger-rate 记录。
 
 ### Scope Boundaries
 
@@ -354,6 +388,9 @@ Graphify/CodeGraph 只用于导航；重要结论必须回到 source、tests、l
 | --- | --- | --- | --- |
 | Anthropic Claude Code | Description 常驻、完整 Skill 激活后加载、supporting files 按需；建议 `SKILL.md` 小于 500 行；支持 `disable-model-invocation` / `user-invocable`；正文在会话中驻留，compaction 每个 Skill 最多重附前 5,000 tokens、共享约 25,000-token budget；官方 eval 分开测 trigger 与 outcome，并记录 pass rate、tokens、duration、blind A/B。 | Adopt + Adapt | 采用三层结构和四维 eval；把 hard exits 前置；数字预算只进入 Claude profile，不变成 universal hard gate。 |
 | OpenAI ChatGPT / Codex | Progressive disclosure；初始列表最多占 context 2% 或未知时 8,000 字符，超限先缩短 description、再可能省略 Skill；implicit invocation 依赖 description；支持 `allow_implicit_invocation: false`；Skill 基于 Agent Skills open standard。 | Adopt + Adapt | 前置 trigger/exclusion；建立 explicit-only posture；保留标准 package，不自建私有中央 schema。 |
+| OpenAI GPT-5.6 prompting guidance | 官方建议 outcome-first：定义结果、约束、证据、completion bar 和 stop rules，让模型自选高效路径；删除重复指令、无价值示例、模型已稳定执行的过程指令和无关工具。官方披露的一组内部 coding-agent 样本中，更精简的 system prompt 约提升 10–15% eval score、降低 41–66% tokens 与 33–67% cost；官方明确该数据只是 directional、必须用自身 workload 验证。 | Adopt + Validate | 把语义精炼从维护偏好升级为可消融 treatment；不把官方样本百分比写成 spec-first 预期收益。 |
+| Agent Skills standard + creator guidance | Canonical description 上限 1,024 字符，`SKILL.md` 建议小于 500 行/5,000 tokens；只写模型缺少的 domain/project 知识，把 mutually-exclusive 上下文分开，明确何时读 reference；用 with-skill vs without/old-skill、fresh context、tokens/duration、assertions、blind comparison 和人工反馈迭代。 | Adopt | 引入 no-skill marginal-value arm、portable 1,024-char ceiling、near-miss trigger eval 与 trace-based thinning；500 行/5,000 tokens 只作 architecture smell，不作语义完成 gate。 |
+| Anthropic Claude 5 public SDK surface | 2026-07-30 的 Anthropic Python SDK generated model union 包含 `claude-sonnet-5`、`claude-opus-5`、`claude-fable-5`、`claude-mythos-5`；但本轮 Anthropic platform docs 连续超时，无法取得可承重的 Claude 5 prompting/availability 说明。 | Record + Defer | SDK enum 只证明 advertised SDK surface，不推导 live availability、宿主已接入或 prompt behavior；Claude 5-specific 建议必须在实施时重新抓官方 docs 并跑 live eval。 |
 | GitHub Copilot | Skill 是 instructions/scripts/resources folder；按 description 决定使用并注入 `SKILL.md`；通用且几乎每次都需要的简单规则应放 custom instructions，详细任务流程放 Skill；官方 CLI 支持 preview、pin、provenance/update，强调审查第三方 scripts。 | Adopt | 强化 always-loaded governance 与 on-demand Skill 的边界；source-controlled canonical package 保持可审查；不把第三方 Skill registry 纳入本计划。 |
 | Google Gemini CLI | Discovery → activation → consent → injection → execution；元数据常驻、正文建议小于 5k words、resources 按需；强调按任务脆弱度选择高/中/低自由度，确定性任务交给 scripts。 | Adopt + Adapt | 把“脚本强制确定性、LLM 做语义判断”落实到迁移 checklist；consent 属宿主交互，不进入跨宿主 contract。 |
 | Cursor Rules | Always Apply、file pattern、description-selected、manual 四种模式；建议规则小于 500 行、引用文件而非复制、只在重复错误出现后增加规则。 | Adapt | 用作 invocation/load posture 的概念参照；持久治理继续放 AGENTS/role contract，不能把 Cursor `.mdc` 模式变成 universal Skill schema。 |
@@ -361,6 +398,30 @@ Graphify/CodeGraph 只用于导航；重要结论必须回到 source、tests、l
 | OpenAI Evaluation guidance | Eval-driven development、task-specific/production-shaped dataset、typical/edge/adversarial cases、持续回归；优先 pairwise/pass-fail，自动评分需与人工判断校准。 | Adopt | Promotion gate 从“结构变小”升级为 trigger/outcome/cost/retention 四维 eval，并要求 blind pairwise 与人工校准。 |
 
 明确拒绝或延期：embedding/sub-skill semantic router、中央动态 prompt builder、统一宿主生命周期 schema、对每个宿主私有字段求 feature parity。它们要么重建宿主 primitive，要么没有被当前痛点和 consumer 证明必要。
+
+### Frontier-Model Implications for Skill Content
+
+新一代模型改变的不是“还要不要 Prompt”，而是 Prompt 的价值构成：通用教学和微步骤的边际价值下降，repo/domain delta、不可推断 gotcha、授权、证据、工具语义与 completion contract 的价值上升。因此 Skill 不应继续做“通用能力课本”，而应变成“项目增量知识 + 行为纠错 + 可验证出口”。
+
+```text
+Skill Marginal Value
+= outcome(same model + candidate skill)
+- outcome(same model + no skill)
+
+Prompt Refactor Effect
+= outcome(new model + candidate skill)
+- outcome(new model + old skill)
+```
+
+| Arm | What it isolates | Required interpretation |
+| --- | --- | --- |
+| Old model + old Skill | 历史 behavior/cost baseline | 只是过去对照，不代表新模型下仍需要同等 Prompt。 |
+| New model + old Skill | Model-only gain/regression | 模型升级的净效果；先跑该臂，再修 Prompt。 |
+| New model + distilled Skill | Prompt/Skill treatment | 与上一臂比较，才能归因精炼收益。 |
+| New model + no Skill | Skill marginal value | 若项目特有 correctness/safety/evidence 没有增益，考虑 thin/merge/retire。 |
+| Second model family/tier + distilled Skill | Portability/generalization | 未跑时不得声明 cross-model authoring pattern。 |
+
+对 GPT-5.6 的具体适配还要把 reasoning effort、tool roster、tool descriptions、stable prompt prefix/cache 与 Skill 内容分开。在没有保持这些控制变量时，“回答更好或更短”无法归因给任一 Prompt 修订。Claude 5 同理：在可承重官方 prompting guide 和 live run 缺失时，只能按 cross-model core + model-scoped eval 设计，不能用 model name 填充行为结论。
 
 ### Why Quality Can Improve
 
@@ -645,6 +706,13 @@ Pilot 最低保护集合：
 - KTD23. Prompt 不规定完整推理轨迹，只提供 decision scaffold；高自由度语义判断保留 AI agency，低自由度确定性动作转交 scripts/tools。
 - KTD24. Behavioral anchor 是“最短仍能改变方向”的承重提示，既不能当通用叙事整段保留，也不能因非 hard gate 而全部删除。
 - KTD25. Prompt ablation 与 reference loading eval 分开：前者证明内容可删/可压，后者证明条件上下文能正确触发；两个 treatment 不能混成一次不透明重写。
+- KTD26. Model upgrade 先于 Prompt migration 做 baseline。新模型 + 旧 Prompt 是归因的必要对照，不得在换模型同时重写 Skill 后宣称 Prompt 收益。
+- KTD27. No-skill counterfactual 是 frontier-model 时代的必要投资 gate。Skill 必须证明自己增加了模型缺少的项目知识、纠错、授权、证据或产物能力，而不是仅仅让模型说得更像旧 Prompt。
+- KTD28. Canonical Skill 不为model family分叉；model-specific 内容保持窄、可消融、可失效，且默认应进 eval/adapter profile 而不是 workflow spine。
+- KTD29. Agent Skills 1,024-character description ceiling 是 canonical portability floor；宿主更大预算是 adapter opportunity，不是扩张全体常驻上下文的理由。
+- KTD30. `SKILL.md < 500 lines / 5,000 tokens` 是 progressive-disclosure smell threshold，不是质量 gate。超出时必须解释热路径必要性或进入精炼，但不为达到数字而迁出承重 gotcha。
+- KTD31. Description 是 retrieval classifier，body 是 execution scaffold，references 是 conditional knowledge，scripts 是 deterministic capability；四者分开评测和 closeout。
+- KTD32. Tool roster/description 与 cache topology 是 Prompt 系统的一部分，但只有可观测宿主才能产生运行成本 claim；canonical content 不围绕未证实 cache 行为设计。
 
 ### Failure Modes and Recovery
 
