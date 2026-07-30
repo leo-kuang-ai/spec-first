@@ -1049,44 +1049,44 @@ upstream_range: "7f86be9d02679adeb93951587dee40de42c5bf82..1fac0442ee16996913dd0
 ### F172. `skills/ce-retune/SKILL.md`
 - **原始 diff：** `A`，`+97/-0`，实际变更行 97。
 - **实际变化：** ce-retune 的入口/工作流契约按该文件原始 diff 独立校准；标题变化=# Retune a Corpus for a New Model / ## Phase 0: the measurement gate — check this first / ## Phase 1: mine the archive before spending a run / ## Phase 2: establish the noise floor before any claim / ## Phase 3: audit the corpus, adversarially / ## Phase 4: cut in surgical passes；新增条款摘录=“description: "Retune a skill corpus for a new model, measurement-first: mine the run archive for a baseline, establish a noise floor, audit the corpus…”、“disable-model-invocation: true”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** spec-optimize；`按边界部分吸收（measurement-only）`；spec-write-skill不修改。
+- **理由与验证面：** 只验证baseline、A/A、A/B、broken-run和stop criteria；不创建public retune入口或cross-Skill authoring contract。
 
 ### F173. `skills/ce-retune/references/baseline-mining.md`
 - **原始 diff：** `A`，`+122/-0`，实际变更行 122。
 - **实际变化：** ce-retune 的reference contract按该文件原始 diff 独立校准；标题变化=# Phase 1: mine the archive / ## What the archive must contain / ## Build the phase-marker map first / ## Extract one row per run / ## Derived metrics / ## Outcome taxonomy；新增条款摘录=“Zero model cost. Everything here reads files that already exist on disk. Do not run the harness in this phase — Phase 2 owns the first paid runs…”、“Find the archive by asking the harness where it writes run output, or by locating the directory it appends to after a run. Do not assume a schema; read one run…”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** spec-optimize；`按边界部分吸收（measurement-only）`；spec-write-skill不修改。
+- **理由与验证面：** baseline identity、archive facts和derived metrics进入spec-optimize测量输入；不新增corpus package owner。
 
 ### F174. `skills/ce-retune/references/corpus-audit.md`
 - **原始 diff：** `A`，`+119/-0`，实际变更行 119。
 - **实际变化：** ce-retune 的reference contract按该文件原始 diff 独立校准；标题变化=# Phase 3: Adversarial Corpus Audit / ## Dispatch shape / ## Finding schema / ## Classes worth hunting / ## Defender rulings / ## Protocol regardless of model tier；新增条款摘录=“**Wave 1 — proposers.** One agent per corpus unit. Give it the unit's **full directory**, not just its entry file: conditionally-loaded reference files are…”、“**Wave 2 — defenders.** One agent per unit, given that unit's directory *and* its proposal set, with the opposite job: find a reason each targeted line exists.…”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** 无当前实施owner；`明确不采纳`；spec-write-skill不修改。
+- **理由与验证面：** adversarial corpus rewrite会扩张独有authoring owner并引入peer/外发面；本轮仅保留为上游设计证据。
 
 ### F175. `skills/ce-retune/references/cut-passes.md`
 - **原始 diff：** `A`，`+108/-0`，实际变更行 108。
 - **实际变化：** ce-retune 的reference contract按该文件原始 diff 独立校准；标题变化=# Cut Passes (Phase 4) / ## The pass loop / ## Ownership: one problem per agent, disjoint files / ## Isolation: separate worktrees or disjoint paths in one tree / ## The shared-asset trap / ## Author the contract before a parallel rewrite；新增条款摘录=“2. Write the **ownership manifest**: unit -> owning agent -> exact paths. Shared assets get a single named owner (below).”、“4. Dispatch one agent per unit through whatever sub-agent primitive the platform provides, each prompt carrying: the class, the contract path if any, its own…”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** 无当前实施owner；`明确不采纳`；spec-write-skill不修改。
+- **理由与验证面：** corpus cut/parallel rewrite不属于本次spec-optimize测量owner；不复制controller、dispatch或automatic mutation流程。
 
 ### F176. `skills/ce-retune/references/halt-taxonomy.md`
 - **原始 diff：** `A`，`+119/-0`，实际变更行 119。
 - **实际变化：** ce-retune 的reference contract按该文件原始 diff 独立校准；标题变化=# Halt Taxonomy / ## The mechanism / ## 1. Waits on helpers the runtime already terminated / ## 2. Hand-off across a same-model seam / ## 3. A step ending with no instruction to advance / ## 4. Completion defined without a successor；新增条款摘录=“When a workflow "phase" is invoked by loading its instructions into the **same conversation** — a skill load, an include, a prose route to "the review phase" —…”、“**The diagnostic that settles which seams are real.** In the run archive, find one session id whose trace contains *both* phase-invocation calls (skill loads,…”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** spec-optimize；`按边界部分吸收（measurement-only）`；spec-write-skill不修改。
+- **理由与验证面：** 仅吸收broken-run/halt taxonomy作为测量停止事实；不建立跨Skill phase controller。
 
 ### F177. `skills/ce-retune/references/noise-floor.md`
 - **原始 diff：** `A`，`+131/-0`，实际变更行 131。
 - **实际变化：** ce-retune 的reference contract按该文件原始 diff 独立校准；标题变化=# Noise Floor and the Registered Bar / ## What the A/A run buys / ## Setup / ## Interleave, never batch / ## Provenance per row / ## Statistics that survive small n；新增条款摘录=“Two builds of the corpus at the same commit, run under one harness on one task, produce a distribution rather than a result. That distribution is the floor:…”、“Required capability: a harness that can point a run at a specific source checkout of the corpus (Phase 0's build selector) and writes a per-run artifact you…”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** spec-optimize；`按边界部分吸收（measurement-only）`；spec-write-skill不修改。
+- **理由与验证面：** A/A noise floor、registered bar和provenance进入spec-optimize focused fixtures；无可归因run evidence时不得claim retuned。
 
 ### F178. `skills/ce-retune/references/workflow-shapes.md`
 - **原始 diff：** `A`，`+71/-0`，实际变更行 71。
 - **实际变化：** ce-retune 的reference contract按该文件原始 diff 独立校准；标题变化=# Workflow Shapes / ## The shapes / ## Per phase / ## Cross-cutting rules；新增条款摘录=“- **A dispatch primitive** that launches an independent agent with its own context window and returns a result to the orchestrator (in one host it is a…”、“/---/---/---/---/”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize；`等价能力已存在`。
-- **理由与验证面：** source contract test + fresh-source eval；未授权 peer/外发时零副作用，generated runtime 仅通过 init 投射。
+- **spec-first owner / 裁决：** spec-optimize；`按边界部分吸收（measurement preconditions only）`；spec-write-skill不修改。
+- **理由与验证面：** 只保留repeatable harness、identity和run-evidence前置条件；provider dispatch topology与cross-Skill workflow shape不采纳。
 
 ### F179. `skills/ce-riffrec-feedback-analysis/SKILL.md`
 - **原始 diff：** `M`，`+1/-1`，实际变更行 2。
@@ -1809,8 +1809,8 @@ upstream_range: "7f86be9d02679adeb93951587dee40de42c5bf82..1fac0442ee16996913dd0
 ### F298. `docs/skills/ce-retune.md`
 - **原始 diff：** `A`，`+100/-0`，实际变更行 100。
 - **实际变化：** 新增上游 Skill 用户文档《'ce-retune'》；完整读取 101 行，标题结构包括“'ce-retune'”、“TL;DR”、“Example invocations”、“Start from the symptom”、“Name the target and the bar up front”。
-- **spec-first owner / 裁决：** spec-write-skill + spec-optimize + README/docs；`按当前 Skill 边界重写后吸收`。
-- **理由与验证面：** 核对 canonical Skill、README/docs 与 source contract；行为语义需要 fresh-source eval，generated runtime 只经 init 投射。
+- **spec-first owner / 裁决：** spec-optimize + README/docs；`只按measurement-only边界吸收`；spec-write-skill不修改。
+- **理由与验证面：** 用户文档只可说明spec-optimize的A/A、A/B、停止条件和claim ceiling；不得宣称新增retune Skill或write-skill集成。
 
 ### F299. `docs/skills/ce-riffrec-feedback-analysis.md`
 - **原始 diff：** `M`，`+19/-0`，实际变更行 19。

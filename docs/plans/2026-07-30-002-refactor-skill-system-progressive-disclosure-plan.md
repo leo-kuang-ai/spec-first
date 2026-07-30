@@ -31,6 +31,7 @@ worker_dispatch_outcome: dispatch_authorization_missing
 | Investment verdict | **值得做，但只值得作为受控、可逆、结果门禁的体系实验推进。** 当前证据足以启动 baseline 与两个 pilot，不足以授权全量迁移或宣称用户性能已提升。 |
 | Recommended approach | 复用现有 `using-spec-first` Front Controller、`spec-work` Reference Trigger Map、`context-bundle.v1`、skill-local eval、source/runtime projection 与 contract tests；增加 host-budget profile、invocation posture、context-residency/compaction guardrail 与四维 eval，再用 `spec-code-review`、`spec-plan` 做高 ROI pilot，随后按收益分批迁移。 |
 | User value | 降低常驻 description 与激活正文的无效上下文占用，减少长流程中关键规则被噪声稀释的风险，提高路由清晰度、执行聚焦度、审查稳定性和维护一致性。 |
+| AI leverage | 把 Prompt 从“替 AI 预演全部思考过程”精炼为“目标 + 项目特有事实 + 承重边界 + 决策点 + 证据义务 + done signal”；通用推理、方案生成和语义取舍留给模型，脆弱确定性动作交给 scripts/tools。 |
 | Quality posture | “质量不降低”不是靠行数目标证明，而是靠 Protected Behavior Map、trigger/outcome/cost/retention 四维 paired A/B、fresh-source eval、compaction/重调用场景、跨 Skill 闭环、全宿主投射与 outcome-gated rollout 共同证明；任一高风险不变量缺失即停止该 Skill 的迁移。 |
 | Promotion policy | 使用非补偿式门禁：安全与授权 → 任务正确性 → artifact/consumer 兼容 → trigger/retention → 成本与 TCO。前一层失败时，后续 token、时延或维护收益不能抵消；只有预注册主目标出现 observed improvement 才能 promotion。 |
 | Architecture posture | `reuse + extend + compose`。不新增中央路由器、universal Skill schema、per-skill lifecycle manifest、动态 system-prompt 平台或 embedding registry。 |
@@ -109,6 +110,8 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - G8. 让承重 hard exits、owner、fallback 与 done signal 在长会话、重调用和宿主 compaction 后仍可恢复，不依赖正文尾部或冷 reference 的偶然留存。
 - G9. 用非补偿式质量门禁和正交 evidence 回答“是否值得继续”：只有 observed primary-objective improvement 且 correction burden/Governance TCO 未吞掉收益，才推广默认模式。
 - G10. 让已 promotion 的模式带最小 regression subset 与 invalidation trigger，在 host、model、contract 或 consumer 演化后能诚实降级和重验。
+- G11. 对每个需要迁移的 Skill 先做语义精炼，再决定是否拆 reference：删除模型已具备的通用知识和过程叙事，压缩 behavioral anchors，保留项目特有边界，并按任务脆弱度配置自由度。
+- G12. 让 Prompt 成为 decision scaffold 而不是逐 token 遥控器：语义任务给 AI 足够判断空间，确定性或高风险动作通过脚本、schema、preview 和出口 gate 收窄。
 
 ### Non-goals
 
@@ -124,6 +127,8 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - NG10. 不依赖 OpenAI Evals、Anthropic skill-creator 或其他外部评测平台作为 spec-first 的唯一质量 owner；可借鉴方法，证据仍落回 repo-owned evals 和 validation artifacts。
 - NG11. 不建立把质量、token、时延和维护成本压成单一加权分数的自动决策器；scripts 准备分项 facts，promotion 由 LLM/human 按非补偿式门禁裁决。
 - NG12. 不要求每个 docs-only/prose-only 小改动都运行 sealed test 或长期 field trial；评测强度随 treatment 风险增长，避免质量治理本身成为主要成本。
+- NG13. 不使用自动摘要器、LLM compressor 或“把 800 行总结成 100 行”的黑盒结果直接替换 canonical Prompt；语义精炼必须逐段分类、可回源、可消融、可回退。
+- NG14. 不把“充分发挥 AI”理解为删除项目知识、授权边界、例外条件、输出合同或 evidence anchor；模型通用能力不能替代它从未见过的 repo-local truth。
 
 ### Actors and Consumers
 
@@ -156,7 +161,7 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - R7. 需要迁移的 Skill 主体保留：trigger/non-trigger 摘要、inputs/outputs、热路径 skeleton、五类 hard exits 中适用项、Reference Trigger Map、fallback 与 done signal。
 - R8. 每个迁出的 reference 必须声明 `Owned`、`Not Owned`、`Trigger`、`Fallback` 或等价四要素；主 spine 必须存在可达的具体链接和前置触发语句。
 - R9. 主 spine 中不能只写模糊的 “if needed/read when applicable”；高风险 reference 必须明确在什么出口或动作前读取，未读取时采用什么保守行为。
-- R10. Body-L3 只删除重复叙事、重复例子、过期 provider 细节或已由 canonical contract/脚本拥有的规则；不得删除 source/runtime、mutation、verification、handoff、knowledge promotion、授权或 evidence anchors。
+- R10. `delete` 类只能包含重复叙事、重复例子、过期 provider 细节、强模型已具备的通用知识，或已由 canonical contract/script/schema 唯一拥有的规则；不得删除 source/runtime、mutation、verification、handoff、knowledge promotion、授权或 evidence anchors。
 - R11. `context-bundle.v1` 只用于 current artifact/diff/evidence/related-path 的最小充分交付，不承载 per-skill lifecycle 元数据，不替代 Skill 内部语义 route map。
 
 #### Quality and evidence
@@ -194,6 +199,16 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - R33. Eval corpus 必须覆盖 Protected Behavior Map 的全部承重行为和 route adjacency，而不是追求统一 case 数。每个风险分层至少有独立 holdout；暴露、失败或参与调优的 holdout/sealed case 必须转入 development，后续 promotion 使用新来源或轮换集合。
 - R34. 净收益判断必须同时报告 runtime inference、reference/tool latency、human correction burden 与 Governance TCO。结构更短但 reference fan-out、人工纠正、review 负担或长期维护成本明显上升时，不得 promotion。
 - R35. 只有预注册 primary objective 获得与 claim 匹配的 observed improvement，才能把 pilot 提升为默认 authoring/rollout pattern。`runtime_cost=proxy` 只能支持 source-structure experiment；“用户效率提升”“纠正负担下降”还必须有 `field_outcome=observed`。Host/model/contract/consumer 变化后，受影响的 promotion evidence 必须失效并重跑最小回归集。
+
+#### Semantic distillation and AI degrees of freedom
+
+- R36. 每个 pilot 在拆 reference 前必须先逐段分类为：`contract/gate`、`behavioral anchor`、`conditional knowledge/procedure`、`deterministic handoff` 或 `delete`。不能因历史上写在主 Prompt 就默认承重，也不能因“模型很聪明”就默认可删。
+- R37. 主 Prompt 只保留会改变 route、action、authority、evidence、output 或 completion 的信息，以及模型无法从当前 source/tool 自行恢复的 repo-specific knowledge。通用编程常识、过程叙事、重复 rationale、穷举式同义规则和过多正例默认删除或合并。
+- R38. Behavioral anchor 采用“最短仍能改变行为方向”的表达；每个概念保留一个 canonical leading sentence，详细 why、历史背景、反面案例和变体移到 reference/eval 或删除，禁止在 spine/reference 多处复述。
+- R39. 自由度必须与任务脆弱度匹配：高自由度语义判断只给目标、约束、证据与停止条件；中自由度任务给 decision checklist/pseudocode；低自由度、重复或危险操作交给参数化 script/CLI/schema/preview，不用长 prose 要求模型逐步模拟确定性逻辑。
+- R40. 每段候选文本必须通过五个萃取测试：删除后是否改变关键决策或出口；强模型是否本已具备该通用知识；历史或 eval 是否证明缺少它会产生可复现错误；当前 Prompt 是否是该信息的唯一合法 owner，还是可从 contract/script/schema/reference 回源；任务需要启发式自由度还是确定性执行。五问不做多数表决，而是分别导向 `keep in spine | distill | move | deterministic handoff | delete`；没有 decision/failure 证据、不是 repo-specific truth、且不是当前 Prompt 唯一 owner 时，默认删除而不是迁到 reference 保存。
+- R41. 语义精炼与渐进披露是两个独立 treatment：先删除 `delete` 类、合并重复 behavioral anchor，再把真正条件化的 knowledge/procedure 迁出；不得通过“拆文件”掩盖可以直接删除的冗余，也不得把 reference 数量增加冒充精炼完成。
+- R42. Pilot 必须包含 prompt ablation：对被删除、合并或压短的承重候选做逐层 paired case，验证 route、decision coverage、evidence adequacy、correction burden 和最坏分层。任何只能依赖 reviewer 主观阅读、没有正负案例或 before/after evidence 的大幅精炼，只能保留为未 promotion 的可逆 candidate；原文保存在 frozen baseline/rollback artifact 中，不在 active candidate Prompt 内重复注入。
 
 ### Key Flows
 
@@ -239,6 +254,12 @@ worker_dispatch_outcome: dispatch_authorization_missing
   - **Outcome:** 只产生 `promote`、`revise`、`rollback` 或 `no-change-after-audit` 之一；没有 observed primary-objective improvement 时保持 experiment。
   - **Covers:** R29-R35。
 
+- F8. Semantic distillation before extraction
+  - **Trigger:** Baseline 识别长正文、重复解释或低价值过程 prose。
+  - **Steps:** 逐段分类；先删除 `delete` 类、合并重复 anchor、把 deterministic prose 改为 tool handoff；再对剩余条件内容建立 reference trigger；按任务脆弱度保留合适自由度并运行 ablation cases。
+  - **Outcome:** Prompt 先变得更有决策密度，再决定文件层级；没有价值的内容被删除而不是转存，承重内容仍可达。
+  - **Covers:** R36-R42。
+
 ### Acceptance Examples
 
 - AE1. `spec-code-review mode:agent` 在无 dispatch 授权时仍返回 `dispatch_authorization_missing` 的 report-only degraded 结果，不因 spine 瘦身误称独立 reviewer coverage。
@@ -257,6 +278,10 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - AE14. Candidate 的 deterministic、behavior 与 projection 均通过，但目标宿主没有可信 usage，且 paired output 只与 baseline 持平；closeout 只能标 `source-structure experiment`，不能推广为“用户更快”或全量默认模式。
 - AE15. Candidate 少读正文但每条热路径新增多个总是共同触发的 reference 读取，导致 wall-clock、tool-call 与 correction burden 上升；即使 source 更短，也判定净收益不足并 `revise` 或 `no-change-after-audit`。
 - AE16. 已 promotion 的 Skill 遇到 host loader/compaction 语义或 model family 变化；受影响 evidence 自动失效，先跑最小 trigger/hard-exit/retention regression subset，再恢复对应 claim。
+- AE17. 一段解释“代码审查应关注 correctness、tests 和 regressions”的通用教学 prose 被删除，Prompt 只保留本仓 severity/evidence/authorization/output contract；paired holdout 结果不下降，说明 AI 通用能力可承担该部分。
+- AE18. 一段 source/runtime 边界虽然模型通常能推断，但删除后 adversarial case 出现 runtime mirror mutation；该句被判定为 `contract/gate` 并恢复到 spine，不能以“模型够聪明”作为豁免。
+- AE19. 五段重复说明“脚本准备 facts、LLM 判断语义”被合并成一个 leading anchor，并指向唯一角色契约；tests 锁 owner/reachability，避免多副本 wording drift。
+- AE20. 一个确定性 hash/path/schema 流程从 30 行 prose 改为运行现有 CLI 并消费 machine-readable facts；模型只判断 failure consequence 和 next action，输出质量不降且 prompt/tool 总成本改善。
 
 ### Success Criteria
 
@@ -275,6 +300,9 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - 每个 pilot 有未参与调优的 holdout；若实现改变 gate、roster、invocation enforcement 或 model routing，则升级到 sealed promotion test。
 - Promotion closeout 分项报告 human correction burden 与 Governance TCO；若新增 reference/tool/review 负担抵消收益，则保持 `revise`、`rollback` 或 `no-change-after-audit`。
 - 只有 primary objective 获得 observed improvement 才形成默认 rollout pattern；只有 field outcome 能支持用户效率或纠正负担改善 claim。
+- 两个 pilot 均完成 paragraph classification 与 prompt ablation；能直接删除的 `delete` 类没有被转存成低价值 reference。
+- 主 spine 中每个保留段都能回答它改变哪个 route/action/authority/evidence/output/completion，或提供哪项不可自行恢复的 repo-specific knowledge。
+- Pilot 的自由度设计与任务脆弱度匹配：语义判断没有被微步骤过度约束，危险确定性动作没有退化为“相信 AI 自觉”。
 
 ### Scope Boundaries
 
@@ -309,11 +337,12 @@ worker_dispatch_outcome: dispatch_authorization_missing
 ### Authority and Evidence Hierarchy
 
 1. 当前用户确认的“全部 Skill 体系”范围与仓库 `AGENTS.md` / 角色契约。
-2. `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md` 的 ArchitectureFit、正交 evidence、treatment-aware paired eval、promotion 与 TCO 边界。
-3. 当前 canonical `skills/`、`src/cli/`、tests 与真实 host/runtime probe。
-4. 2026-07-29 两份 validation 的附录 C/D 修订结论。
-5. 2026-07-06 两份 active plans 的已验证设计与未验证假设。
-6. 官方 Agent Skills progressive disclosure 建议，仅作 advisory；不能替代本仓 host 实测。
+2. `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md` 的正文分类、STOP trigger、自由度、精炼与 evidence gate。
+3. `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md` 的 ArchitectureFit、正交 evidence、treatment-aware paired eval、promotion 与 TCO 边界。
+4. 当前 canonical `skills/`、`src/cli/`、tests 与真实 host/runtime probe。
+5. 2026-07-29 两份 validation 的附录 C/D 修订结论。
+6. 2026-07-06 两份 active plans 的已验证设计与未验证假设。
+7. 官方 Agent Skills progressive disclosure 建议，仅作 advisory；不能替代本仓 host 实测。
 
 Graphify/CodeGraph 只用于导航；重要结论必须回到 source、tests、logs 或运行 evidence。
 
@@ -345,6 +374,53 @@ Graphify/CodeGraph 只用于导航；重要结论必须回到 source、tests、l
 6. **把反例变成持久回归集。** Pilot 的漏读、误触发、错误 completion 和 compaction 失败样例进入 development corpus，后续变更必须重新证明没有复发。
 
 质量提升的强 claim 至少需要：baseline 已存在可复现缺陷或纠正负担；candidate 在同一 holdout 上修复该缺陷；其他 protected behavior、compatibility 和安全门禁无回归；自动 judge 与人工锚点一致。仅仅“回答更短”“文件更少”或“reviewer 感觉更清晰”不构成质量提升。
+
+### Semantic Distillation: Prompt as Decision Scaffold
+
+推荐进一步精练，而且顺序应是 **先萃取，再分层**。渐进披露解决“什么时候加载”，语义精炼解决“这段内容是否值得存在”；如果一段话本来可以删除，把它移到 reference 只会把 prompt debt 变成 file debt。
+
+目标 Prompt 不是最短 Prompt，而是最小充分决策骨架：
+
+```text
+Skill Prompt Core
+= intent and route boundary
++ repo-specific facts the model cannot infer
++ load-bearing authority and hard exits
++ decision points and conservative fallbacks
++ evidence and artifact obligations
++ done signal and next owner
+```
+
+模型负责开放空间中的语义判断、方案生成、权衡和表达；Prompt 不预演它的完整思维过程。Prompt 只在三个地方收窄自由度：项目特有真相、可复现失败模式、不可逆出口。其余通用能力默认由当前强模型承担，但必须通过 fresh-source/paired ablation 验证，不能把“AI 很强”写成免测理由。
+
+| Content shape | Default action | Why |
+| --- | --- | --- |
+| Project-specific contract、authorization、exception、claim ceiling | Keep in spine，压成 leading invariant | 模型无法从通用知识恢复，丢失会越权或错误完成。 |
+| Behavioral anchor | Distill to one canonical sentence | 它改变方向，但不需要长篇教学或多处复述。 |
+| Conditional domain/process detail | Move to one-level package-local reference with STOP trigger | 仅特定 route 需要，未触发时不应占 context。 |
+| Deterministic discovery/validation/formatting | Replace prose with script/CLI/schema/preview handoff | 提高可靠性和 token 效率，模型只消费 facts 并解释后果。 |
+| Generic reasoning advice、背景叙事、历史过程、重复例子 | Delete | 强模型已具备或不会改变当前决策；保留只增加干扰。 |
+| Output boilerplate used verbatim | Move to template/asset or narrow schema | 不需要模型反复阅读长样板。 |
+
+每段文本使用五问萃取测试：
+
+1. **Decision test:** 删除后，route/action/authority/evidence/output/completion 会改变吗？
+2. **Novelty test:** 这是 repo-specific knowledge，还是强模型已经具备的常识？
+3. **Failure test:** 是否有真实反例、eval 或高风险推演证明缺少它会出错？
+4. **Owner test:** 它是否已经由角色契约、contract、script、schema 或另一个 reference 唯一拥有？
+5. **Freedom test:** 该任务需要启发式判断，还是需要低自由度确定性执行？
+
+处理顺序固定为：删除 `delete` 类 → 合并重复 anchor → deterministic handoff → 压缩 spine → 迁出真正条件化的 knowledge/procedure。这个顺序能防止“Prompt 变短但 reference 爆炸”，也让 AI 的能力用在需要判断的地方，而不是被微步骤和重复解释束缚。
+
+### Degrees of Freedom by Task Fragility
+
+| Task shape | Prompt posture | Example in spec-first |
+| --- | --- | --- |
+| High freedom：多种方案均有效、依赖上下文判断 | 只给目标、边界、证据、停止条件和少量启发式 | plan 架构取舍、review finding 成立性、scope 解释。 |
+| Medium freedom：有首选模式但允许变体 | 给 decision checklist、接口/伪代码轮廓、对比维度 | reference owner 选择、risk treatment、artifact composition。 |
+| Low freedom：脆弱、重复、危险、机器可判定 | 调用 script/CLI/schema/preview，限制参数和出口 | hash/schema/path/projection 校验、生成、危险 mutation preflight。 |
+
+过度指定和指定不足都属于质量问题。高自由度任务若写成几十步微流程，会导致模型机械照搬、忽略当前证据并降低泛化；低自由度任务若只写原则，会把确定性地板退化为模型自觉。Pilot 必须同时测试这两种失败。
 
 ### Quality Scorecard and Promotion Ladder
 
@@ -431,6 +507,7 @@ Invocation posture 不是新状态机，而是用于审查入口与副作用边�
 | Dynamic context envelope | Reuse | `docs/contracts/context-bundle.md` + CLI helper | 只交付当前 paths/evidence/full-read triggers，不扩 schema。 |
 | Deterministic footprint | Extend | `scripts/lint-skill-entrypoints.js` 或独立窄 reporter | 生成 bytes/lines/files/description facts；不判断语义质量。实现时优先扩展现有 lint/report 能力，只有 owner 边界不合适才新增单一 reporter。 |
 | Semantic route/quality eval | Compose | skill-local evals + fresh-source checklist | deterministic fixture 保证 case topology，LLM/人工判断语义。 |
+| Semantic distillation | Reuse + Extend | `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md` + `spec-write-skill` authoring guidance | 复用四类正文、STOP trigger 与自由度原则；只在两个 pilot 证实后补最小 authoring checklist，不创建 compressor。 |
 | Projection integrity | Extend | `src/cli/plugin-sync.js`、`tests/unit/plugin-modules.test.js`、host projection tests | 增加 route-map/reference reachability 和当前 supported-host matrix。 |
 | Invocation policy | Adapt/Defer | 现有 `entry_surface` / `host_delivery` + adapter transformation | 先在 baseline ledger 分类；仅当现有 owner 无需扩 universal schema 即可表达且 live probe 通过时投射宿主私有策略，否则只保留 workflow gate 并延期。 |
 | Host budget profile | Compose | 官方 docs + live host diagnostics/probes + validation artifact | 记录版本化 advisory facts；不让 lint 用统一字符阈值替代语义判断。 |
@@ -488,11 +565,13 @@ flowchart TB
 | --- | --- |
 | Behavior ID | 稳定的局部编号，例如 `CR-HX-01`、`PL-OUT-03`。 |
 | Protected behavior | 不得回归的 trigger、hard exit、output、degraded 或 consumer behavior。 |
+| Content class / freedom | `contract/gate`、`behavioral anchor`、`conditional`、`deterministic handoff`、`delete`，以及 high/medium/low freedom 依据。 |
 | Before source | 改造前 source section/reference。 |
 | After source | 改造后 spine/reference owner。 |
 | Trigger and fallback | 何时读取，未读取/不可用时如何 fail closed。 |
 | Deterministic evidence | 文件/链接/schema/fixture/projection test。 |
 | Semantic evidence | A/B case、fresh-source question、human/judge rubric。 |
+| Ablation evidence | 删除、合并、压短或迁出该段后的正负 case 与最坏分层。 |
 | Invalidation | 哪个 contract、host loader 或 source change 会使该证据失效。 |
 
 Pilot 最低保护集合：
@@ -508,13 +587,14 @@ Pilot 最低保护集合：
 - 冻结 source identity、supported platforms、35 Skill inventory 与 dirty-worktree boundaries。
 - 生成全量 mechanical footprint；记录官方 host-budget/retention profile；人工完成 migration posture、invocation posture 与相邻 route groups。
 - 将当前投资证据标记为 `trigger_evidence=structural_only`；为每个 pilot 写 no-change counterfactual、预期收益、额外 TCO、falsification、rollback 与 invalidation。
+- 对两个 pilot 的现有正文做 paragraph classification：contract/gate、behavioral anchor、conditional、deterministic handoff、delete；记录保留理由和可消融 case。
 - 以 `using-spec-first` 和 `spec-work` 作为 control 跑现有 contract/eval，验证已存在模式而不是先改它们。
 - 产出 pilot Protected Behavior Map 与 A/B case manifest，覆盖 typical/edge/adversarial、should-trigger/should-not-trigger、hard-exit 和 retention cases；在 candidate 前冻结 development/holdout、重复策略、primary objective、minimum meaningful gain 与不确定性判据。
 
 #### Wave 1 — Representative pilots
 
-1. `spec-code-review`：把大段 Stage 2-5/5c 冷路径重组到 package-local references；主 spine 保留 route、hard exits、mode/output 与 fallback anchors。
-2. `spec-plan`：优先拆分始终触发的大 reference 内 core/details，避免先做跨 Skill shared rendering；保持 plan artifact contract 不变。
+1. `spec-code-review`：先删除通用教学/重复 rationale、合并 behavioral anchors、把确定性 prose 改为现有 owner handoff，再把真正条件化的 Stage 2-5/5c 冷路径重组到 package-local references；主 spine 保留 route、hard exits、mode/output 与 fallback anchors。
+2. `spec-plan`：先精炼主 spine 与始终触发 reference 的语义密度，再决定 core/details 边界；避免先做跨 Skill shared rendering，保持 plan artifact contract 不变。
 3. 每个 pilot 独立完成 source tests、development 调整、未参与调优的 holdout paired A/B、fresh-source、projection、代表性 live-host shadow 和 rollback decision；若 treatment 实际改变 gate/roster/invocation/model policy，升级 sealed promotion protocol。
 
 #### Wave 2 — High-ROI migration batch
@@ -527,6 +607,7 @@ Pilot 最低保护集合：
 #### Wave 3 — Pattern promotion
 
 - 把已验证的 reference owner/trigger/fallback 结构加入现有 quality governance 或 authoring guidance。
+- 把已验证的 paragraph classification、五问萃取测试和 freedom calibration 加入 `spec-write-skill` 或 canonical authoring guidance；不建立自动 compressor 或行数 gate。
 - 扩展 focused lint/tests 保护“可达性、硬边界、trigger/non-trigger fixture、runtime projection”，不添加 semantic state machine。
 - 新 Skill 或重大扩展在 authoring/review 时使用同一 checklist；小 Skill 不被迫建立多层结构。
 
@@ -559,6 +640,11 @@ Pilot 最低保护集合：
 - KTD18. 质量与成本不做加权总分。安全、正确性、兼容性和 retention 是非补偿式前置门，效率只在这些门全部通过后参与 promotion。
 - KTD19. Eval 强度随 treatment 风险增长：纯结构重组使用 development + holdout paired；改变 gate、roster、invocation enforcement 或 model routing 才要求 frozen winner 与 sealed promotion test，避免所有小修改都背负实验平台成本。
 - KTD20. Governance TCO 与 human correction burden 是净收益的一部分。更多 references、tool calls、review surface 或长期 drift 足以推翻 source 变短带来的局部收益。
+- KTD21. “默认模型已经很聪明”是删减候选生成原则，不是行为正确性证据。通用知识优先删，项目特有边界优先留，最终由 ablation eval 裁决。
+- KTD22. 先语义精炼、后渐进披露。删除和合并优先于拆文件，避免把冗余从 body 搬成 reference debt。
+- KTD23. Prompt 不规定完整推理轨迹，只提供 decision scaffold；高自由度语义判断保留 AI agency，低自由度确定性动作转交 scripts/tools。
+- KTD24. Behavioral anchor 是“最短仍能改变方向”的承重提示，既不能当通用叙事整段保留，也不能因非 hard gate 而全部删除。
+- KTD25. Prompt ablation 与 reference loading eval 分开：前者证明内容可删/可压，后者证明条件上下文能正确触发；两个 treatment 不能混成一次不透明重写。
 
 ### Failure Modes and Recovery
 
@@ -615,7 +701,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** none。
 
-**Covers:** R1-R3、R17、R21-R24、R29-R35；F1-F2、F7；KTD1、KTD8-KTD9、KTD11-KTD20；AE5-AE6、AE8-AE10、AE14-AE16。
+**Covers:** R1-R3、R17、R21-R24、R29-R42；F1-F2、F7-F8；KTD1、KTD8-KTD9、KTD11-KTD25；AE5-AE6、AE8-AE10、AE14-AE20。
 
 **Files**
 
@@ -633,6 +719,7 @@ Pilot 最低保护集合：
 - 为 35/35 Skill 人工标注 invocation posture，并核对现有 `entry_surface` / `host_delivery` 是否与公共可见性、副作用和 caller ownership 一致。
 - 在 candidate 代码出现前，为 Activation-L1、Active Body 与 retention track 预注册 primary metric、最小有意义收益、允许噪声和 hard regression；后续不得按结果改阈值。
 - 为两个 pilot 记录 `trigger_evidence=structural_only`、no-change counterfactual、expected gain、implementation/maintenance/correction cost、falsification、rollback 与 invalidation。
+- 对两个 pilot 的每个主段落标注 content class、owner、freedom level、删除/压短/迁出候选和 ablation case；分类由 LLM/human 判断，脚本只输出位置、bytes 和重复候选事实。
 - 冻结 treatment、controlled variables、development/holdout split、风险分层、不可固定随机性时的重复次数和不确定性判据；实现若改变高风险策略，预先声明升级 sealed protocol 的触发条件。
 - 建立四轴 evidence record 和 human correction/Governance TCO baseline；无法观测的字段显式为 `unavailable`，不得填推测值。
 - 收集可得的调用频率/usage evidence；不可得时把 ROI 频率因子标为 `unknown`，不得仅按文件大小决定不可逆迁移。
@@ -657,7 +744,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0。
 
-**Covers:** R8-R16、R18、R20、R25-R35；F3-F7；KTD3-KTD5、KTD9、KTD13-KTD20；AE6-AE7、AE10-AE16。
+**Covers:** R8-R16、R18、R20、R25-R42；F3-F8；KTD3-KTD5、KTD9、KTD13-KTD25；AE6-AE7、AE10-AE20。
 
 **Files**
 
@@ -676,6 +763,7 @@ Pilot 最低保护集合：
 - 记录 invocation enforcement 与 retention claim vocabulary：`workflow_convention`、`host_enforced`、`retention_observed`、`compaction_observed`；未知不能提升。
 - 固化非补偿式 scorecard：safety/authority、correctness、compatibility、trigger/retention、primary objective、net value/TCO 逐层裁决，不生成可掩盖 hard regression 的 composite score。
 - 为 reference load trace 记录实际 read/non-read、fan-out、tool-call 和 fallback；脚本只准备 trace，LLM/human 判断当前 route 是否充分。
+- 定义五问萃取测试、paragraph classification、freedom calibration 与 prompt-ablation case shape；禁止工具按关键词自动删除或自动判定 `delete` 类。
 
 **Test scenarios**
 
@@ -683,6 +771,7 @@ Pilot 最低保护集合：
 - 只有 source projection 时不能产生 `lazy_loading_observed: true`。
 - 只有正文首次激活通过时不能产生 `compaction_observed: true` 或“长会话不回归”结论。
 - 任一 hard gate fail 时，即使 proxy context bytes 明显下降，promotion result 仍只能是 `rollback` 或 `revise`。
+- 删除通用 advice、合并 anchor、deterministic handoff 和 conditional extraction 四种 treatment 的 case/hash/result 分开记录，失败可单独回退。
 
 **Exit evidence**
 
@@ -694,7 +783,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0、U1。
 
-**Covers:** R7-R16、R18-R20、R23、R25、R27-R29；F3-F6；KTD4-KTD15；AE1-AE2、AE6-AE7、AE9-AE12。
+**Covers:** R7-R16、R18-R20、R23、R25、R27-R42；F3-F8；KTD4-KTD25；AE1-AE2、AE6-AE7、AE9-AE20。
 
 **Files**
 
@@ -707,9 +796,10 @@ Pilot 最低保护集合：
 
 **Work**
 
-- 按 Protected Behavior Map 标注 hot spine 与 conditional protocol。
+- 按 Protected Behavior Map 标注 hot spine、behavioral anchors、deterministic handoffs、conditional protocol 与 delete 候选；先做可独立回退的语义精炼，再拆 references。
 - 保留并前置 report-only default、mutation/authorization、dispatch/degraded、scope/evidence、finding/output hard anchors，使其在 Claude compaction stress profile 下位于可重附前部。
 - 将 persona selection、synthesis、apply-fix 细节和冷路径 presentation 迁到明确 references；复用现有资产，不创造第二套 finding schema。
+- 删除模型已有的通用 review 教学、重复 rationale 和历史过程；每条保留 anchor 必须能指出它改变的 decision/failure，不能只因“听起来重要”保留。
 - 对 inline report-only、agent report-only、apply-fixes、verification-required、instruction-prose diff、长会话/重调用等代表路径做 paired A/B。
 
 **Test scenarios**
@@ -718,6 +808,7 @@ Pilot 最低保护集合：
 - 无 mutation authorization 不写文件。
 - P0/P1 seeded finding、plan requirement mismatch、verification-required 和 degraded limitation 均不漏。
 - 未触发 apply/presentation/persona 路径时对应 reference 不进入最小 context bundle。
+- 删除/合并后的 ablation case 仍覆盖 correctness/security/test/regression judgement；若模型泛化下降，恢复最短有效 anchor 而不是恢复整段叙事。
 - 其他 Skill 介入或 compaction 后仍保持 report-only/mutation/verification claim ceiling；不可观察宿主记录 `not_run`。
 
 **Rollback gate**
@@ -730,7 +821,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0、U1；可与 U2 并行，但共享 governance/projection 文件必须串行落地。
 
-**Covers:** R7-R16、R18-R20、R25、R27-R29；F3-F6；KTD4-KTD15；AE3、AE6-AE7、AE10-AE12。
+**Covers:** R7-R16、R18-R20、R25、R27-R42；F3-F8；KTD4-KTD25；AE3、AE6-AE7、AE10-AE20。
 
 **Files**
 
@@ -747,6 +838,7 @@ Pilot 最低保护集合：
 **Work**
 
 - 先测量实际哪些 references 在 Lightweight/Standard/Deep/headless 中必读，再决定 core/details 边界。
+- 先删除重复 planning 教学和 phase narration，合并同义原则，把确定性 artifact/status/path 检查压成现有 CLI/contract handoff；再评估哪些内容真正需要 core/details。
 - 主 spine 保留并前置 WHAT/HOW route、artifact readiness、evidence boundary、plan depth、verification、doc-review/handoff 和 pipeline exits。
 - 不在本单元提取跨 Skill shared HTML/Markdown rendering；先保持 package-local ownership。
 - 对 Lightweight、Standard、Deep、requirements-only enrichment、headless pipeline、answer-seeking、长会话/重调用等 paired A/B。
@@ -758,6 +850,7 @@ Pilot 最低保护集合：
 - 未授权 research/dispatch 保持 inline/serial limitation。
 - Lightweight 不加载 Deep-only、HTML-only 或无关 handoff detail。
 - Compaction/多 Skill 会话后仍不会跳过 source intake、verification claim、doc-review/handoff 或错误进入实现。
+- 精炼后仍能让 AI 对不同 repo/任务形成适配性计划，而不是机械复刻固定模板；同时不会因自由度过高丢失 artifact readiness、evidence 或 handoff hard exits。
 
 **Rollback gate**
 
@@ -799,7 +892,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U2、U3；纳入 Activation-L1 treatment 时还依赖 U4。
 
-**Covers:** R12-R35；F4-F7；KTD3、KTD7、KTD9-KTD20；AE4、AE6、AE8-AE16。
+**Covers:** R12-R42；F4-F8；KTD3、KTD7、KTD9-KTD25；AE4、AE6、AE8-AE20。
 
 **Files**
 
@@ -827,7 +920,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U2、U3、U5；Activation-L1 track 的 promotion 另依赖 U4。
 
-**Covers:** R12-R16、R19-R20、R27-R35；F3-F7；KTD7-KTD10、KTD13-KTD20；AE1-AE16。
+**Covers:** R12-R16、R19-R20、R27-R42；F3-F8；KTD7-KTD10、KTD13-KTD25；AE1-AE20。
 
 **Files**
 
@@ -843,6 +936,7 @@ Pilot 最低保护集合：
 - 当 seed/temperature 或宿主随机性不可固定时，按 U0 预注册重复运行，报告中位、分位、最坏分层与不确定性；不能用最佳单次结果 closeout。
 - 运行 fresh-source eval；若无授权/能力则 `not_run`，且不得删除或迁出尚未有等价复核的承重文本。
 - 对自动 judge 使用人工标注的锚点 case 校准；关键 promotion case 使用 blind pairwise 或明确 pass/fail，不以开放式总分单独放行。
+- 对 semantic distillation 与 reference extraction 使用独立 treatment/hash：先裁决删减/压缩是否保真，再裁决 conditional loading 是否正确，避免一次大重写无法归因。
 - 分项记录 `structure_contract`、`behavior_quality`、`runtime_cost`、`field_outcome`，并测量 reference/tool fan-out、人工纠正、重跑/reopen 与维护面变化。
 - 按非补偿式 scorecard 做 `promote | revise | rollback | no-change-after-audit` 决策；不计算允许 token 收益覆盖质量回归的加权总分。
 
@@ -864,7 +958,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U6 的两个 pilot 均为 `promote`，且没有未解决的 launch-blocking P0/P1 finding。
 
-**Covers:** G4-G8、R19-R35；F5-F7；KTD2-KTD20；全部 Acceptance Examples 的已验证结果。
+**Covers:** G4-G12、R19-R42；F5-F8；KTD2-KTD25；全部 Acceptance Examples 的已验证结果。
 
 **Files**
 
@@ -878,6 +972,7 @@ Pilot 最低保护集合：
 
 - 写入最小规则：何时需要 spine/trigger map、何时小 Skill 保持单文件、哪些 hard exits 不迁出、如何验证和回退。
 - 写入 invocation posture、host budget profile、关键约束前置和四维 eval 的最小 authoring guidance；不复制各宿主私有字段说明。
+- 写入“默认模型已具备通用能力”的删减原则、五问萃取测试、paragraph classification 和自由度分层；强调它们是 authoring judgment + eval，不是自动压缩脚本。
 - 不把 pilot 特有字段提升为 universal schema。
 - 按最新 ROI 生成 Wave 2 候选和独立 acceptance；不在本单元顺手迁移全部 Skill。
 - 记录 invalidation：host loader 变化、context-bundle contract 变化、projection topology 变化、pilot outcome 反转。
@@ -921,6 +1016,7 @@ git diff --check
 - Outcome eval：正确路由、关键不变量、输出完整性、evidence/actionability、误报/漏报、claim honesty。
 - Cost eval：可信 usage 可得时记录 input/output/cached tokens、duration/cost；不可得时只报告 source/context bytes proxy。
 - Retention eval：首次激活、其他 Skill 介入、重调用、可用宿主 compaction 后分别核对 hard exits、owner、fallback 和 done signal。
+- Semantic-distillation eval：删除 generic advice、合并 behavioral anchor、deterministic handoff、conditional extraction 分 treatment 做 prompt ablation；观察 decision coverage、evidence adequacy、correction burden、generalization 和最坏分层。
 - Human/judge calibration：关键 case 使用 blind pairwise 或 pass/fail；自动 judge 与人工/专家样例校准，不以“vibe”或单一开放式分数放行。
 - Cross-skill journey：artifact compatibility、consumer behavior、handoff limitations、knowledge promotion gate。
 
@@ -969,6 +1065,8 @@ git diff --check
 | Dataset integrity | Promotion case 未参与 candidate 调优；暴露/失败 set 已转 development；高风险 treatment 的 sealed set 只在 winner/threshold 冻结后运行 |
 | Correction burden | 人工纠正、重跑、reopen、无效升级不高于 U0 阈值；否则即使 token 降低也不 promotion |
 | Net value / TCO | Reference/tool fan-out、wall-clock、实现与持续维护成本未吞掉主收益；由 LLM/human 基于分项 evidence 判断，不由脚本自动合成分数 |
+| Semantic distillation | 每个删除/合并/压短候选有 content class、owner 与 ablation evidence；承重 gate/anchor 无漏失，generic advice 删除不降低泛化 |
+| Freedom calibration | 高自由度 case 不因微步骤出现模板化误判；低自由度 case 不因过度放权绕过 script/schema/preview 或危险出口 |
 
 ### Evidence record
 
@@ -979,6 +1077,7 @@ git diff --check
 - A/B case inventory、raw output refs、rubric results；
 - trigger/outcome/cost/retention 分项结果与人工校准样例；
 - treatment、controlled variables、development/holdout/sealed split、重复策略、最坏分层与不确定性；
+- paragraph classification、五问萃取结果、freedom level、ablation treatment/hash 与恢复的最短有效 anchor；
 - 四轴 evidence state、human correction burden、reference/tool fan-out 与 Governance TCO 分项；
 - commands、exit code、logs、verification-run-summary ref；
 - fresh-source status 与 reviewer context；
@@ -997,6 +1096,8 @@ git diff --check
 - [ ] 两个 pilot 分别完成 trigger、outcome、cost、retention closeout；可观察宿主 compaction 后 hard exits 与 completion claim 无回归。
 - [ ] 两个 pilot 的 development/holdout 边界、重复策略和 primary objective 在 candidate 前冻结；若 treatment 升级为高风险策略，sealed promotion test 已按规则运行。
 - [ ] 两个 pilot 均按非补偿式 scorecard 裁决，四轴 evidence、人工纠正负担、reference/tool fan-out 与 Governance TCO 已分项记录。
+- [ ] 两个 pilot 均先完成 semantic distillation 再做 reference extraction；paragraph classification、freedom level 和 prompt-ablation evidence 可复核。
+- [ ] 所有删除的 generic advice/`delete` 类没有被复制到新 reference；所有保留的 gate/anchor 能说明具体 failure 或 decision impact。
 - [ ] `using-spec-first` / `spec-work` control 证明“保持不变”也是合法结果，未发生为了统一格式而重写。
 - [ ] Cross-skill `Spec/Plan/Tasks/Work/Review/Knowledge` journey 无 material regression。
 - [ ] 任一失败 pilot 已独立回退并保留 post-mortem；成功 pilot 的 evidence 可复核。
@@ -1027,6 +1128,9 @@ git diff --check
 | Eval 过拟合 development/holdout | Medium | High | 分离数据集；暴露 case 转 development；高风险 treatment 使用 frozen winner + sealed set；禁止只报最佳 run。 |
 | 代理指标冒充 observed improvement | High | High | 四轴 evidence 与 claim ladder；`runtime_cost=proxy` 只能支持 source-structure experiment。 |
 | 维护与纠正成本吞掉 token 收益 | Medium | High | 分项测量 reference/tool fan-out、wall-clock、correction burden 与 Governance TCO；净收益不足则停止或回退。 |
+| 过度相信模型通用能力 | Medium | Critical | Repo-specific truth、授权、exception、claim ceiling 留 spine；逐项 ablation；失败恢复最短有效 anchor。 |
+| 微步骤过多抑制模型泛化 | High | Medium-High | 高自由度任务只保留目标/边界/证据/停止条件；用跨 repo/任务 holdout 检查模板化误判。 |
+| 自动摘要造成隐性语义损失 | Medium | High | 禁止 compressor 直接替换 canonical source；逐段分类、source diff、paired ablation 和独立回退。 |
 
 ---
 
@@ -1049,6 +1153,7 @@ git diff --check
 - 当前没有 worker/subagent dispatch 授权：`worker_dispatch_authorization: missing`、`capability_probe: not_applicable`、`worker_dispatch_capability: unknown`、`worker_dispatch_outcome: dispatch_authorization_missing`。本次方案由主线程串行完成，不声明独立 reviewer coverage。
 - 本轮外部研究仅使用官方一手资料，形成了行业决策矩阵、host budget/invocation matrix、context residency contract 与四维 eval；这些是 advisory planning evidence，未通过本仓 live host probe 证明。
 - 本轮进一步按 `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md` 补齐 ArchitectureFit/投资判断、正交 evidence、development/holdout/sealed 数据纪律、非补偿式 promotion、human correction burden 与 Governance TCO。当前优化激活证据仍是 `structural_only`，不因方案完整而提升为 field outcome。
+- 本轮继续吸收 Codex system `skill-creator` 的“默认模型已经很聪明、上下文窗口是公共品、自由度匹配任务脆弱度”原则，并以本仓 canonical Skill Prompt 方法论校准为 semantic distillation：先删除/合并/确定性下沉，再做 references 分层；该原则只生成候选，是否可删仍由 paired ablation 和项目边界裁决。
 - 当前只输出 implementation-ready plan；尚未修改 Skill source、运行 paired A/B、fresh-source、host loader 或 field outcome 验证。
 
 ---
@@ -1056,6 +1161,7 @@ git diff --check
 ## Sources
 
 - `docs/10-prompt/结构化项目角色契约.md`
+- `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`
 - `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md`
 - `docs/validation/2026-07-29-spec-skill-footprint-analysis.md`
 - `docs/validation/2026-07-29-spec-skill-progressive-loading-design.md`
@@ -1067,6 +1173,7 @@ git diff --check
 - `docs/solutions/architecture-patterns/front-controller-triggered-references-gates-eval-regression-2026-07-01.md`
 - `skills/using-spec-first/SKILL.md`
 - `skills/spec-work/SKILL.md`
+- `skills/spec-write-skill/SKILL.md`
 - `skills/spec-code-review/SKILL.md`
 - `skills/spec-plan/SKILL.md`
 - `src/cli/plugin-sync.js`
