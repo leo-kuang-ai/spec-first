@@ -673,7 +673,6 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
       // 文件缺失或不可读 → 未命中；只读探测绝不抛到外部。
     }
   }
-  detected.any = detected.post_commit || detected.post_checkout;
   return detected;
 }
 
@@ -690,7 +689,7 @@ function usesLegacyGraphifyArtifactOverride(contents) {
 function externalGraphifyHookOutcome(target) {
   const marker = target && target.absolute
     ? probeExternalGraphifyHookMarker(target.absolute)
-    : { any: false };
+    : { post_commit: false, legacy_artifact_override: false };
   if (marker.legacy_artifact_override) {
     return {
       installed: false,

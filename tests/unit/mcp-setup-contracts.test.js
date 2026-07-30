@@ -106,8 +106,9 @@ describe('spec-runtime-setup runner contracts', () => {
     expect(schema.properties.steady_state.properties.refresh_mode.enum).toContain('manual-only');
     expect(contract).toContain('`readiness_status` is the only provider readiness field that enters setup decision health');
     expect(contract).toContain('hook blocked/failed/skipped 不得单独把这些成功事实改写为 Provider `degraded`');
-    expect(contract).toContain('只对 `post-commit`/`post-checkout` 两个文件做**只读 marker 检测**');
-    expect(contract).toContain('从「不读」改为「只读验证、绝不写」');
+    expect(contract).toContain('只有 `post-commit` marker 存在且两个文件均无 legacy override');
+    expect(contract).toContain('graphify-external-hook-legacy-artifact-override + manual-only');
+    expect(contract).toContain('从「不读」改为「限定文件只读验证、绝不写」');
     expect(schema.properties.steady_state.properties.hook_status.enum).toContain('verified-external');
     expect(schema.properties.steady_state.properties.refresh_mode.enum).toContain('commit-hook-external-verified');
   });

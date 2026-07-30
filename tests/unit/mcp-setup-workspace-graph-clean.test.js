@@ -198,6 +198,8 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
     runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    fs.mkdirSync(path.join(ws, '.graphify'), { recursive: true });
+    fs.writeFileSync(path.join(ws, '.graphify', 'legacy-receipt.json'), '{}');
     const { resolveExcludePath, MANAGED_BLOCK_START } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
     const excludePath = resolveExcludePath(api).absolute;
     fs.writeFileSync(excludePath, `${MANAGED_BLOCK_START}\n.codegraph/\n`);
@@ -205,6 +207,7 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(first.status).toBe('partial');
     expect(first.workspace_graphify_status).toBe('preserved');
     expect(fs.existsSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'))).toBe(true);
+    expect(fs.existsSync(path.join(ws, '.graphify', 'legacy-receipt.json'))).toBe(true);
 
     fs.writeFileSync(excludePath, '# repaired\n');
     const retry = runWorkspaceGraphClean({ cwd: ws, allowDiscovery: true, exec: () => ({ status: 0 }) });
