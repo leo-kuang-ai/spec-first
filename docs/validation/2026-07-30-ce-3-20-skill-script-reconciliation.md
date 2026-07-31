@@ -20,7 +20,7 @@ upstream_range: 7f86be9d02679adeb93951587dee40de42c5bf82..1fac0442ee16996913dd08
 
 - canonical Skill：35
 - package 文件：554
-- manifest SHA-256：`2ccd1a0e9636e796163397149b84d3ccb9f27e7339db4c38d806cc07104210fc`
-- HEAD skills tree：`d3763c70d60b724da1f3b5f87f2431394ab17ec8`
+- manifest SHA-256：`3334580bb67351eaf510a1fa22a3a3c81c9124d97ec4b5ae3d225abf5d2e39b1`
+- HEAD skills tree：`af6350c2330ecc5340204702820ccf180f81cf49`
 
 详细逐路径事实见 `docs/validation/2026-07-30-ce-3-20-skill-script-reconciliation.json` 与 `docs/validation/2026-07-30-current-skill-package-inventory.json`。

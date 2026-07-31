@@ -1,9 +1,9 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v1",
-  "source_head": "d213fe477601fd5338b32f55e2c11189608174a3",
-  "skills_tree_oid": "d3763c70d60b724da1f3b5f87f2431394ab17ec8",
+  "source_head": "c3dd8f693c07a94b955e17c547e6dfcd1a896427",
+  "skills_tree_oid": "af6350c2330ecc5340204702820ccf180f81cf49",
   "source_mode": "working-tree",
-  "manifest_sha256": "2ccd1a0e9636e796163397149b84d3ccb9f27e7339db4c38d806cc07104210fc",
+  "manifest_sha256": "3334580bb67351eaf510a1fa22a3a3c81c9124d97ec4b5ae3d225abf5d2e39b1",
   "skill_count": 35,
   "file_count": 554,
   "per_skill_counts": {
@@ -629,8 +629,8 @@
       "path": "skills/spec-brainstorm/references/handoff.md",
       "skill": "spec-brainstorm",
       "owner_role": "reference-contract",
-      "bytes": 12136,
-      "sha256": "152b9b5941e7e7a94558f65c54fb731efbbc49b690b4efb8b9cbbef7f607d00b"
+      "bytes": 12132,
+      "sha256": "ba1d3caa46f0fbfb5e4e516968ea2f9014792433e4a608582fe04d610da23c73"
     },
     {
       "path": "skills/spec-brainstorm/references/html-rendering.md",
@@ -1735,8 +1735,8 @@
       "path": "skills/spec-ideate/references/post-ideation-workflow.md",
       "skill": "spec-ideate",
       "owner_role": "reference-contract",
-      "bytes": 19442,
-      "sha256": "1c93e9da0dc23a0d46acedd756727aa55b17c98a7b983042ad1eb591160bd0c1"
+      "bytes": 19427,
+      "sha256": "87633d2e31403cf4c38a4bf2b79cbb810f8325b675883e4e1dd5effb3a927fc7"
     },
     {
       "path": "skills/spec-ideate/references/universal-ideation.md",
@@ -1756,8 +1756,8 @@
       "path": "skills/spec-ideate/SKILL.md",
       "skill": "spec-ideate",
       "owner_role": "entry-contract",
-      "bytes": 53890,
-      "sha256": "f759b49361107a6f3510dd1916609373326e83ef478902da705846390de90bde"
+      "bytes": 53836,
+      "sha256": "2186012d7207ff39e0e124cd17c17b94cab8c81a8c379f541cd751f191c7e586"
     },
     {
       "path": "skills/spec-lfg/references/next-work-handoff.md",
@@ -2568,8 +2568,8 @@
       "path": "skills/spec-pov/SKILL.md",
       "skill": "spec-pov",
       "owner_role": "entry-contract",
-      "bytes": 18021,
-      "sha256": "feb67cd0544de55dbbf972276d0559717bf39ee9c3354acad18aaf9fa34a104e"
+      "bytes": 18000,
+      "sha256": "d1efe4d5a01e9c2ae608c22cd5d94bd6f10b8a1bd56b906e96a708bf6b97f4f3"
     },
     {
       "path": "skills/spec-prd/assets/overlays/securities.md",

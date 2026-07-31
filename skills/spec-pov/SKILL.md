@@ -131,7 +131,7 @@ The chat verdict (the TL;DR) is the deliverable. What you offer next is **reason
 **On each selection:**
 
 - **Computed next step** → invoke that skill via the platform's skill-invocation primitive, seeding it with the verdict substance (the decision, conditions, and verified facts).
-- **Full write-up** → read `references/report.md` and follow it (HTML by default; opened locally or published via Proof / an available HTML tool). Opt-in; the default stays chat-only.
+- **Full write-up** → read `references/report.md` and follow it (HTML by default; opened locally via an available HTML tool). Opt-in; the default stays chat-only.
 - **"compound it"** → invoke `spec-compound` with `mode:headless`, seeding it with the structured verdict for `tooling_decision` / `architecture_pattern` storage (no schema change; headless avoids its interactive prompts). Never mandatory.
 
 **Warm invocations stay a guest:** output the verdict block, hand control back, and offer none of the above unless the user asks — a mid-session interjection does not push a next-step or capture decision.

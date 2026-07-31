@@ -8,15 +8,15 @@ unified plan is written.
 #### 4.1 Present Next-Step Options
 
 The Phase 4 menu's visible option count varies by state: no unified plan
-artifact hides the review and Proof/browser options, `OUTPUT_FORMAT` selects
-the Proof or browser label and the document-review mutation policy, unresolved
+artifact hides the review and browser options, `OUTPUT_FORMAT` selects
+whether the browser option renders and the document-review mutation policy, unresolved
 `Resolve Before Planning` hides both `Create the implementation plan` and
 `Ship it autonomously with spec-lfg`, and the spec-lfg option is also hidden
 for non-software brainstorms (`execution` other than `code`). Count the visible
 options for the current state and choose the rendering mode accordingly:
 
 - **Visible count fits the current platform's option cap:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex). Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options.
-- **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, Proof/browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
+- **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
 
 Never silently skip the question.
 

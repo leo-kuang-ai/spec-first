@@ -75,7 +75,7 @@ This ranked list doubles as the index the user references when choosing an idea 
 ### 4.3 Open It
 
 - **HTML:** in an interactive session, best-effort open the file in the browser via the platform's open primitive (`open` on macOS, `xdg-open` on Linux, `start` on Windows); always print the absolute path so it can be reopened or shared. Skip auto-open in headless / pipeline runs (no interactive surface).
-- **Markdown:** print the path. Proof (the markdown share surface) is reached through the Phase 5 menu — it is a network action, not auto-invoked.
+- **Markdown:** print the path. There is no browser-open step for Markdown; the Phase 5 menu offers only the next-step options below.
 
 ## Phase 5: Next Steps
 
