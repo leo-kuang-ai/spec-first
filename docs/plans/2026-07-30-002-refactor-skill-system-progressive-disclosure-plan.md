@@ -32,7 +32,7 @@ worker_dispatch_outcome: dispatch_authorization_missing
 | Recommended approach | 复用现有 `using-spec-first` Front Controller、`spec-work` Reference Trigger Map、`context-bundle.v1`、skill-local eval、source/runtime projection 与 contract tests；增加 host-budget profile、invocation posture、context-residency/compaction guardrail 与四维 eval，再用 `spec-code-review`、`spec-plan` 做高 ROI pilot，随后按收益分批迁移。 |
 | User value | 降低常驻 description 与激活正文的无效上下文占用，减少长流程中关键规则被噪声稀释的风险，提高路由清晰度、执行聚焦度、审查稳定性和维护一致性。 |
 | AI leverage | 把 Prompt 从“替 AI 预演全部思考过程”精炼为“目标 + 项目特有事实 + 承重边界 + 决策点 + 证据义务 + done signal”；通用推理、方案生成和语义取舍留给模型，脆弱确定性动作交给 scripts/tools。 |
-| Frontier-model posture | 把“模型升级”、“Prompt 精炼”与“Skill 本身是否仍有边际价值”分成独立 treatment；先跑 new-model + old-skill 的 model-only baseline，再跑 distilled-skill，并保留 same-model no-skill counterfactual。只在新模型下变短、但不能证明 Skill 相对 no-skill 有增益时，不 promotion。 |
+| Frontier-model posture | 把“模型升级”、“Prompt 精炼”与“Skill 本身是否仍有边际价值”分成独立 treatment；先跑 new-model + old-skill 的 Prompt control，再跑 distilled-skill，并保留 same-model no-skill counterfactual；只有 old model 仍可调用时才计算 model-upgrade gain。只在新模型下变短、但不能证明 Skill 相对 no-skill 有增益时，不 promotion。 |
 | Quality posture | “质量不降低”不是靠行数目标证明，而是靠 Protected Behavior Map、trigger/outcome/cost/retention 四维 paired A/B、fresh-source eval、compaction/重调用场景、跨 Skill 闭环、全宿主投射与 outcome-gated rollout 共同证明；任一高风险不变量缺失即停止该 Skill 的迁移。 |
 | Promotion policy | 使用非补偿式门禁：安全与授权 → 任务正确性 → artifact/consumer 兼容 → trigger/retention → 成本与 TCO。前一层失败时，后续 token、时延或维护收益不能抵消；只有预注册主目标出现 observed improvement 才能 promotion。 |
 | Architecture posture | `reuse + extend + compose`。不新增中央路由器、universal Skill schema、per-skill lifecycle manifest、动态 system-prompt 平台或 embedding registry。 |
@@ -166,7 +166,7 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - R7. 需要迁移的 Skill 主体保留：trigger/non-trigger 摘要、inputs/outputs、热路径 skeleton、五类 hard exits 中适用项、Reference Trigger Map、fallback 与 done signal。
 - R8. 每个迁出的 reference 必须声明 `Owned`、`Not Owned`、`Trigger`、`Fallback` 或等价四要素；主 spine 必须存在可达的具体链接和前置触发语句。
 - R9. 主 spine 中不能只写模糊的 “if needed/read when applicable”；高风险 reference 必须明确在什么出口或动作前读取，未读取时采用什么保守行为。
-- R10. `delete` 类只能包含重复叙事、重复例子、过期 provider 细节、强模型已具备的通用知识，或已由 canonical contract/script/schema 唯一拥有的规则；不得删除 source/runtime、mutation、verification、handoff、knowledge promotion、授权或 evidence anchors。
+- R10. `delete` 类只能包含重复叙事、重复例子、过期 provider 细节、强模型已具备的通用知识，或已由 canonical contract/script/schema 唯一拥有的规则；example/style guidance 只有在编码产品要求或纠正已测得的行为缺口时才保留在 spine，否则移入 eval/asset 或删除；不得删除 source/runtime、mutation、verification、handoff、knowledge promotion、授权或 evidence anchors。
 - R11. `context-bundle.v1` 只用于 current artifact/diff/evidence/related-path 的最小充分交付，不承载 per-skill lifecycle 元数据，不替代 Skill 内部语义 route map。
 
 #### Quality and evidence
@@ -217,10 +217,10 @@ worker_dispatch_outcome: dispatch_authorization_missing
 
 #### Frontier-model isolation and marginal Skill value
 
-- R43. 新模型与 Prompt 重构不得同时作为一个不可分的 treatment。涉及 GPT-5.6、Claude 5 或后续 frontier model 时，至少保留 `old model + old skill`、`new model + old skill`、`new model + distilled skill` 三臂；只有第二与第三臂的差异可归因于 Prompt/Skill 改造。
-- R44. 每个 pilot 至少对代表性任务增加 `same model + no skill` counterfactual，用于判定 Skill 的边际价值。候选 Skill 若在 correctness、evidence、safety 和 output 上不优于 no-skill，默认 `thin | merge | retire | no-change-after-audit`，不得因为存量资产已经存在而继续增加内容。
+- R43. 新模型与 Prompt 重构不得同时作为一个不可分的 treatment。涉及 GPT-5.6、Claude 5 或后续 frontier model 时，至少保留 `new model + old skill`、`new model + distilled skill` 两臂来隔离 Prompt treatment；当 old model 仍可调用且需要声明 model-upgrade gain 时，再加入 `old model + old skill`。Old model 不可调用时记录 `not_run` 与 archival baseline limitation，不得从历史输出或 provider claim 补写 model gain。
+- R44. 每个 pilot 至少对代表性任务增加 `same model + no skill` counterfactual，用于判定 Skill 的边际价值。该臂保留相同用户任务、repo/source、项目级 `AGENTS.md`/角色契约、工具、授权、模型与评分 rubric，只排除目标 Skill 的 description、body、references/assets、generated runtime 投影与任何等价替代提示；不得用手工摘要或实验者提示补回目标 Skill 知识。候选 Skill 若在 correctness、evidence、safety 和 output 上不优于 no-skill，默认 `thin | merge | retire | no-change-after-audit`，不得因为存量资产已经存在而继续增加内容。
 - R45. Canonical Skill 只保留跨模型稳定的 intent、repo/domain delta、failure correction、authority、evidence、artifact 和 stop contract。只在某模型族出现可复现回归时，才允许增加窄的 model-specific eval profile 或 adapter guidance；必须记录 model id/family、reasoning setting、失效条件和移除门槛。
-- R46. Pattern promotion 至少要求在一个当前 frontier model 上通过全量 pilot gates；若要声明 cross-model authoring pattern，还必须在另一模型族或明确的 minimum-supported capability tier 上通过最小 trigger/hard-exit/outcome subset。第二模型不可用时，closeout 保持 model-scoped claim。
+- R46. Pilot promotion 至少要求在一个当前 frontier model 上通过全量 pilot gates；若要进入 U7、声明 cross-model authoring pattern 或把该模式作为 Wave 2 默认模板，还必须在另一模型族或明确的 minimum-supported capability tier 上通过最小 trigger/hard-exit/outcome subset。第二模型不可用时，U6 可以形成 model-scoped pilot closeout，但必须停止在 U7 之前，不得修改通用 authoring governance 或生成默认 Wave 2 迁移包。
 - R47. Activation-L1 的 canonical `description` 必须满足 Agent Skills 可移植上限 1,024 字符，使用简洁的 imperative/intent phrasing，同时表达 what、when、near-neighbor exclusion 和必要关键词。宿主私有 `when_to_use` 或更大上限不得反向放宽 canonical portable ceiling。
 - R48. Description 优化必须使用 should-trigger/should-not-trigger 的 near-miss 数据，保留 development/validation 分割，对宿主非确定性触发重复运行并报告 trigger rate；禁止把 validation 失败反向写成关键词补丁。
 - R49. 不能等到出错后才识别 trigger 的 non-obvious gotcha，例如隐蔽 source/runtime 边界、错误 health/readiness 信号或多系统 ID 异名，必须作为最短 gotcha anchor 留在 spine；只有模型能在行动前稳定识别条件时，才能迁入 reference。
@@ -278,8 +278,8 @@ worker_dispatch_outcome: dispatch_authorization_missing
 
 - F9. Frontier-model treatment isolation
   - **Trigger:** Pilot 要在 GPT-5.6、Claude 5 或其他新模型上重跑，或候选精炼依赖“新模型已经更强”的判断。
-  - **Steps:** 冻结 old model/skill/settings；先跑 new model + old skill；再跑 new model + distilled skill 与 new model + no skill；保持任务、证据、授权和 rubric 一致；需要 cross-model claim 时补第二模型族最小回归。
-  - **Outcome:** model gain、prompt gain、Skill marginal value 和 portability 有独立证据；没有边际价值的 Skill 进入 thin/merge/retire 判断。
+  - **Steps:** 冻结 model/skill/settings；先跑 new model + old skill，再跑 new model + distilled skill 与严格排除目标 Skill 全部 surface 的 new model + no skill；old model 可调用且需要 model-gain claim 时补 old model + old skill；保持任务、项目级治理、证据、授权、工具和 rubric 一致；进入 U7 或需要 cross-model claim 时补第二模型族最小回归。
+  - **Outcome:** 可得时的 model gain、prompt gain、Skill marginal value 和 portability 分别有独立证据；没有边际价值的 Skill 进入 thin/merge/retire 判断。
   - **Covers:** R43-R50。
 
 ### Acceptance Examples
@@ -333,7 +333,7 @@ worker_dispatch_outcome: dispatch_authorization_missing
 - 两个 pilot 均完成 paragraph classification 与 prompt ablation；能直接删除的 `delete` 类没有被转存成低价值 reference。
 - 主 spine 中每个保留段都能回答它改变哪个 route/action/authority/evidence/output/completion，或提供哪项不可自行恢复的 repo-specific knowledge。
 - Pilot 的自由度设计与任务脆弱度匹配：语义判断没有被微步骤过度约束，危险确定性动作没有退化为“相信 AI 自觉”。
-- 两个 pilot 均分开 model-only、prompt-distillation 和 no-skill treatment；没有把 frontier model 收益归因给 Prompt 重构。
+- 两个 pilot 均分开 new-model old-skill Prompt control、prompt-distillation 和 strict no-skill treatment；old model 可调用且需要模型升级 claim 时再计算 model-only gain，没有把 frontier model 收益归因给 Prompt 重构。
 - 每个 pilot 在同一新模型上证明 Skill 相对 no-skill 仍有项目特有边际价值；否则进入 thin/merge/retire 评估。
 - Cross-model pattern 只在第二模型族/能力层回归通过后声明；不可得时明确保持 model-scoped limitation。
 - Canonical descriptions 均不超过 1,024 字符，trigger eval 使用 development/validation near-miss 数据与重复 trigger-rate 记录。
@@ -416,9 +416,9 @@ Prompt Refactor Effect
 | Arm | What it isolates | Required interpretation |
 | --- | --- | --- |
 | Old model + old Skill | 历史 behavior/cost baseline | 只是过去对照，不代表新模型下仍需要同等 Prompt。 |
-| New model + old Skill | Model-only gain/regression | 模型升级的净效果；先跑该臂，再修 Prompt。 |
+| New model + old Skill | Prompt-refactor control；也是 model-upgrade comparison 的新模型端点 | 必须先跑该臂再修 Prompt；只有与可调用的 old model + old Skill 对比时，才能计算模型升级净效果。 |
 | New model + distilled Skill | Prompt/Skill treatment | 与上一臂比较，才能归因精炼收益。 |
-| New model + no Skill | Skill marginal value | 若项目特有 correctness/safety/evidence 没有增益，考虑 thin/merge/retire。 |
+| New model + no Skill | Skill marginal value | 只排除目标 Skill 的 discovery/body/resources/runtime surface，不移除项目级治理，也不注入替代摘要；若项目特有 correctness/safety/evidence 没有增益，考虑 thin/merge/retire。 |
 | Second model family/tier + distilled Skill | Portability/generalization | 未跑时不得声明 cross-model authoring pattern。 |
 
 对 GPT-5.6 的具体适配还要把 reasoning effort、tool roster、tool descriptions、stable prompt prefix/cache 与 Skill 内容分开。在没有保持这些控制变量时，“回答更好或更短”无法归因给任一 Prompt 修订。Claude 5 同理：在可承重官方 prompting guide 和 live run 缺失时，只能按 cross-model core + model-scoped eval 设计，不能用 model name 填充行为结论。
@@ -688,13 +688,13 @@ Pilot 最低保护集合：
 - KTD5. Route map 是 semantic index，不是执行状态图；当前请求可以命中多个必要 reference，但不能由脚本按关键词裁决。
 - KTD6. Per-skill package-local references 优先于跨 Skill dedup；先验证加载与 ownership，再考虑共享。
 - KTD7. `spec-code-review` 与 `spec-plan` 构成两个不同 archetype 的 promotion gate；单一 Skill PoC 不足以形成系统规则。
-- KTD8. Line/byte budget 是 advisory；behavior coverage、claim ceiling 与 evidence 才是 hard gate。
+- KTD8. Active Body/reference 的 line/byte budget 是 advisory，Agent Skills 对 canonical description 的 1,024-character 标准上限是可移植性 conformance gate；二者都不能替代 behavior coverage、claim ceiling 与 evidence gate。
 - KTD9. Host loader claim 与 source projection claim 分开。Source tests 通过只能证明 package shape，不能证明宿主实际 lazy-load 或 token 节省。
 - KTD10. Rollback 以 Skill slice 为单位，失败证据保留；不使用全体系原子大迁移。
 - KTD11. Agent Skills open standard 是 canonical package floor；宿主私有 invocation、consent、dynamic injection、fileMatch 和 retention 能力只能由 adapter 选择性表达。
 - KTD12. Invocation posture 是 baseline/审查语义，不是 universal lifecycle schema；`entry_surface`、host delivery 与 hard exits 继续拥有真实入口和副作用边界。
 - KTD13. Context residency 是质量合同的一部分。Hard exits、owner、fallback 和 done signal 必须前置并在 compaction 后可恢复，不能只验证首次激活。
-- KTD14. Description budget 使用 per-host profile，不设跨宿主统一字符阈值；共同规则只有 trigger 前置、相邻 exclusion 清晰和 implicit list 溢出时 fail honestly。
+- KTD14. Canonical description 遵守 Agent Skills 的 1,024-character 可移植上限；除此之外，不把 Claude/Codex 等宿主更小或更大的 listing budget 提升为第二个跨宿主 hard threshold。Per-host profile 只决定截断、name-only、omission 与 explicit-invocation 的适配和 claim limitation。
 - KTD15. Promotion 由 eval-driven development 驱动：trigger selection、workflow outcome、cost 和 retention 分开评分，blind pairwise/pass-fail 优先，自动 judge 必须有人类校准样例。
 - KTD16. 当前全体系改造的激活证据为 `structural_only`。它授权 baseline 和可逆 pilot，不授权把 35 个 Skill 全量迁移或宣称实际 token/用户效率已经改善。
 - KTD17. `structure_contract`、`behavior_quality`、`runtime_cost`、`field_outcome` 是正交 claim axis；任何一轴通过都不能自动提升其他轴。
@@ -769,7 +769,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** none。
 
-**Covers:** R1-R3、R17、R21-R24、R29-R42；F1-F2、F7-F8；KTD1、KTD8-KTD9、KTD11-KTD25；AE5-AE6、AE8-AE10、AE14-AE20。
+**Covers:** R1-R3、R17、R21-R24、R29-R50；F1-F2、F7-F9；KTD1、KTD8-KTD9、KTD11-KTD32；AE5-AE6、AE8-AE10、AE14-AE28。
 
 **Files**
 
@@ -787,6 +787,7 @@ Pilot 最低保护集合：
 - 为 35/35 Skill 人工标注 invocation posture，并核对现有 `entry_surface` / `host_delivery` 是否与公共可见性、副作用和 caller ownership 一致。
 - 在 candidate 代码出现前，为 Activation-L1、Active Body 与 retention track 预注册 primary metric、最小有意义收益、允许噪声和 hard regression；后续不得按结果改阈值。
 - 为两个 pilot 记录 `trigger_evidence=structural_only`、no-change counterfactual、expected gain、implementation/maintenance/correction cost、falsification、rollback 与 invalidation。
+- 冻结每个 pilot 的 model/endpoint/reasoning/tool-roster/cache 可观测配置，预注册 new-model/old-skill、new-model/candidate、new-model/no-skill 三个必需臂；需要 model-gain claim 且 old model 可调用时加入 old-model/old-skill，需要 U7/cross-model pattern 时加入第二模型族回归。No-skill 臂必须记录被排除的目标 description/body/resources/runtime surface，并证明没有 surrogate prompt 泄漏。
 - 对两个 pilot 的每个主段落标注 content class、owner、freedom level、删除/压短/迁出候选和 ablation case；分类由 LLM/human 判断，脚本只输出位置、bytes 和重复候选事实。
 - 冻结 treatment、controlled variables、development/holdout split、风险分层、不可固定随机性时的重复次数和不确定性判据；实现若改变高风险策略，预先声明升级 sealed protocol 的触发条件。
 - 建立四轴 evidence record 和 human correction/Governance TCO baseline；无法观测的字段显式为 `unavailable`，不得填推测值。
@@ -801,6 +802,7 @@ Pilot 最低保护集合：
 - reporter 不输出 semantic grade、production-ready 或 token confirmed claim。
 - explicit-only/internal fixture 不被 baseline 误标为 auto-discoverable；classification 由人工确认而非脚本关键词裁决。
 - Holdout case 不进入 candidate 调优输入；暴露后的 fixture 被标记为 development，不继续冒充独立 promotion evidence。
+- Reporter/model ledger 不得从 model enum 推导 live availability 或 prompt capability；每个 claim 保留 `advertised | callable | behavior_observed` 边界。
 
 **Exit evidence**
 
@@ -812,7 +814,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0。
 
-**Covers:** R8-R16、R18、R20、R25-R42；F3-F8；KTD3-KTD5、KTD9、KTD13-KTD25；AE6-AE7、AE10-AE20。
+**Covers:** R8-R16、R18、R20、R25-R50；F3-F9；KTD3-KTD5、KTD9、KTD13-KTD32；AE6-AE7、AE10-AE28。
 
 **Files**
 
@@ -832,6 +834,7 @@ Pilot 最低保护集合：
 - 固化非补偿式 scorecard：safety/authority、correctness、compatibility、trigger/retention、primary objective、net value/TCO 逐层裁决，不生成可掩盖 hard regression 的 composite score。
 - 为 reference load trace 记录实际 read/non-read、fan-out、tool-call 和 fallback；脚本只准备 trace，LLM/human 判断当前 route 是否充分。
 - 定义五问萃取测试、paragraph classification、freedom calibration 与 prompt-ablation case shape；禁止工具按关键词自动删除或自动判定 `delete` 类。
+- 定义 frontier-model treatment manifest：模型、reasoning、tool roster、Skill hash、cache/retention 配置与 no-skill arm 分开记录；no-skill arm 同时记录保留的 project-level governance、排除的 target-Skill surfaces 与 surrogate-prompt absence；不新增 runtime schema。
 
 **Test scenarios**
 
@@ -840,6 +843,7 @@ Pilot 最低保护集合：
 - 只有正文首次激活通过时不能产生 `compaction_observed: true` 或“长会话不回归”结论。
 - 任一 hard gate fail 时，即使 proxy context bytes 明显下降，promotion result 仍只能是 `rollback` 或 `revise`。
 - 删除通用 advice、合并 anchor、deterministic handoff 和 conditional extraction 四种 treatment 的 case/hash/result 分开记录，失败可单独回退。
+- 缺少 new-model + old-skill Prompt control 或 strict no-skill arm 时，候选只能 closeout 为不可归因的 experiment，不能 promotion；old-model arm 缺失只阻断 model-gain claim，不阻断同一新模型上的 Prompt/Skill pilot。
 
 **Exit evidence**
 
@@ -851,7 +855,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0、U1。
 
-**Covers:** R7-R16、R18-R20、R23、R25、R27-R42；F3-F8；KTD4-KTD25；AE1-AE2、AE6-AE7、AE9-AE20。
+**Covers:** R7-R16、R18-R20、R23、R25、R27-R50；F3-F9；KTD4-KTD32；AE1-AE2、AE6-AE7、AE9-AE28。
 
 **Files**
 
@@ -889,7 +893,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0、U1；可与 U2 并行，但共享 governance/projection 文件必须串行落地。
 
-**Covers:** R7-R16、R18-R20、R25、R27-R42；F3-F8；KTD4-KTD25；AE3、AE6-AE7、AE10-AE20。
+**Covers:** R7-R16、R18-R20、R25、R27-R50；F3-F9；KTD4-KTD32；AE3、AE6-AE7、AE10-AE28。
 
 **Files**
 
@@ -930,7 +934,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U0、U1；可与 U2/U3 的 body 改造并行评测，但同一 Skill 的 description/body treatment 必须分开 hash、分开 closeout。
 
-**Covers:** R4-R6、R13-R17、R21-R24、R28-R29；F2；KTD1-KTD2、KTD8-KTD9、KTD11-KTD12、KTD14-KTD15；AE5、AE9-AE10。
+**Covers:** R4-R6、R13-R17、R21-R24、R28-R29、R47-R48、R50；F2、F9；KTD1-KTD2、KTD8-KTD9、KTD11-KTD12、KTD14-KTD15、KTD26-KTD32；AE5、AE9-AE10、AE21-AE25、AE27-AE28。
 
 **Files**
 
@@ -942,17 +946,19 @@ Pilot 最低保护集合：
 **Work**
 
 - 以 route adjacency 分组审查，不做全量字符裁剪。
-- 每条 description 保留 trigger、关键 exclusion 和定位。
+- 每条 canonical description 保留 trigger、关键 exclusion 和定位，用 intent/imperative phrasing 表达 what + when，且不超过 Agent Skills 1,024-character portable ceiling。
 - 按 Claude/Codex/Kiro 等 per-host budget profile 检查 trigger 是否位于截断前部；没有数值的 host 不套用别人的阈值。
 - 对 explicit-only/internal Skill 评估宿主私有 invocation policy 是否可由 adapter 安全表达；无证据时只补 negative cases 和 loud convention，不修改 canonical universal schema。
 - 对 `plan/prd/brainstorm/ideate/pov`、`work/debug/review`、`runtime-setup/test-browser` 等相邻组做 fresh-source route comparison。
+- 为每个 offender 建立 development/validation 触发集，重点覆盖 near-miss negative；非确定性宿主按预注册次数重复，选择 validation score 最优而非最后一轮的 description。
 - Activation closeout 与 body closeout 分开记录。
 
 **Test scenarios**
 
 - 正向 case、相邻 negative case、明确 skill name、active workflow continuation、Direct Lane 各有覆盖。
-- Description budget 只告警/报告；不能因超预算单独 fail semantic acceptance。
+- Canonical description 超过 1,024 字符时 deterministic portability check fail；Claude/Codex 等更窄或更宽的 per-host listing budget 只告警/报告，不能单独裁决 semantic acceptance。
 - Side-effect Skill 的隐式触发 negative case 必须通过；internal helper 不出现在公共入口。
+- Development 触发率上升但 validation near-miss 退化时不采用；禁止直接复制 validation 关键词进 description。
 
 ### U5. Validate cross-skill and supported-host journeys
 
@@ -960,7 +966,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U2、U3；纳入 Activation-L1 treatment 时还依赖 U4。
 
-**Covers:** R12-R42；F4-F8；KTD3、KTD7、KTD9-KTD25；AE4、AE6、AE8-AE20。
+**Covers:** R12-R50；F4-F9；KTD3、KTD7、KTD9-KTD32；AE4、AE6、AE8-AE28。
 
 **Files**
 
@@ -988,7 +994,7 @@ Pilot 最低保护集合：
 
 **Dependencies:** U2、U3、U5；Activation-L1 track 的 promotion 另依赖 U4。
 
-**Covers:** R12-R16、R19-R20、R27-R42；F3-F8；KTD7-KTD10、KTD13-KTD25；AE1-AE20。
+**Covers:** R12-R16、R19-R20、R27-R50；F3-F9；KTD7-KTD10、KTD13-KTD32；AE1-AE28。
 
 **Files**
 
@@ -1005,6 +1011,8 @@ Pilot 最低保护集合：
 - 运行 fresh-source eval；若无授权/能力则 `not_run`，且不得删除或迁出尚未有等价复核的承重文本。
 - 对自动 judge 使用人工标注的锚点 case 校准；关键 promotion case 使用 blind pairwise 或明确 pass/fail，不以开放式总分单独放行。
 - 对 semantic distillation 与 reference extraction 使用独立 treatment/hash：先裁决删减/压缩是否保真，再裁决 conditional loading 是否正确，避免一次大重写无法归因。
+- 按 R43-R46 运行 frontier-model matrix；保持 reasoning effort、tool roster、host/config、项目级治理与 evidence 一致，分开计算可得时的 model-upgrade gain、prompt delta、严格 no-skill marginal value 和第二模型族 generalization。
+- 读取 execution traces，定位无效工具说明、重复搜索、多余转场和误识 gotcha；只做能回指具体失败/浪费的窄修订。
 - 分项记录 `structure_contract`、`behavior_quality`、`runtime_cost`、`field_outcome`，并测量 reference/tool fan-out、人工纠正、重跑/reopen 与维护面变化。
 - 按非补偿式 scorecard 做 `promote | revise | rollback | no-change-after-audit` 决策；不计算允许 token 收益覆盖质量回归的加权总分。
 
@@ -1019,14 +1027,16 @@ Pilot 最低保护集合：
 - Trigger precision 不下降，side-effect/internal negative cases 0 次错误激活；可观察宿主的 retention/compaction 不出现 hard-exit 或 completion regression。
 - U0 预注册 primary objective 获得 `observed_and_improved`；只有 proxy 时保持 experiment，不 promotion 为默认 pattern。
 - Human correction burden 未越线，reference/tool latency 与 Governance TCO 没有吞掉收益；净收益判断有 source-backed rationale 和 invalidation。
+- New-model + candidate 相对 new-model + old-skill 达到预注册目标，且相对 new-model + no-skill 保留可证明的项目特有边际价值。
+- Cross-model claim 只在第二模型族/能力层最小回归通过时成立；否则限制为已实跑 model/config。
 
 ### U7. Promote the pattern and prepare later waves
 
 **Goal:** 只把被两个不同 archetype 验证的最小模式沉淀为体系能力。
 
-**Dependencies:** U6 的两个 pilot 均为 `promote`，且没有未解决的 launch-blocking P0/P1 finding。
+**Dependencies:** U6 的两个 pilot 均为 `promote`，没有未解决的 launch-blocking P0/P1 finding，且第二模型族或明确 minimum-supported capability tier 的最小 trigger/hard-exit/outcome 回归通过。第二模型不可用时停在 U6 的 model-scoped closeout，不执行 U7。
 
-**Covers:** G4-G12、R19-R42；F5-F8；KTD2-KTD25；全部 Acceptance Examples 的已验证结果。
+**Covers:** G4-G14、R19-R50；F5-F9；KTD2-KTD32；全部 Acceptance Examples 的已验证结果。
 
 **Files**
 
@@ -1041,6 +1051,7 @@ Pilot 最低保护集合：
 - 写入最小规则：何时需要 spine/trigger map、何时小 Skill 保持单文件、哪些 hard exits 不迁出、如何验证和回退。
 - 写入 invocation posture、host budget profile、关键约束前置和四维 eval 的最小 authoring guidance；不复制各宿主私有字段说明。
 - 写入“默认模型已具备通用能力”的删减原则、五问萃取测试、paragraph classification 和自由度分层；强调它们是 authoring judgment + eval，不是自动压缩脚本。
+- 写入 model-upgrade 归因边界、strict no-skill marginal-value gate、portable description ceiling 和 cross-model promotion 规则；不把 GPT-5.6/Claude 5 临时 workaround 或仅有 model-scoped evidence 的模式提升为 canonical workflow prose。
 - 不把 pilot 特有字段提升为 universal schema。
 - 按最新 ROI 生成 Wave 2 候选和独立 acceptance；不在本单元顺手迁移全部 Skill。
 - 记录 invalidation：host loader 变化、context-bundle contract 变化、projection topology 变化、pilot outcome 反转。
@@ -1049,7 +1060,7 @@ Pilot 最低保护集合：
 
 **Exit evidence**
 
-- Pattern 有两个 archetype outcome 和 observed primary-objective improvement 支持；后续 wave 有明确 owner、顺序、stop/rollback/invalidation；全量迁移仍需单独执行授权。
+- Pattern 有两个 archetype outcome、observed primary-objective improvement 与第二模型族/能力层最小回归支持；后续 wave 有明确 owner、顺序、stop/rollback/invalidation；全量迁移仍需单独执行授权。
 
 ---
 
@@ -1085,6 +1096,7 @@ git diff --check
 - Cost eval：可信 usage 可得时记录 input/output/cached tokens、duration/cost；不可得时只报告 source/context bytes proxy。
 - Retention eval：首次激活、其他 Skill 介入、重调用、可用宿主 compaction 后分别核对 hard exits、owner、fallback 和 done signal。
 - Semantic-distillation eval：删除 generic advice、合并 behavioral anchor、deterministic handoff、conditional extraction 分 treatment 做 prompt ablation；观察 decision coverage、evidence adequacy、correction burden、generalization 和最坏分层。
+- Frontier-model eval：固定任务、source evidence、授权、rubric 和可比配置，分开可得时的 model-upgrade gain、new-model Prompt delta、strict no-skill marginal value 和 second-family portability；reasoning/tool/cache 差异必须单独报告。
 - Human/judge calibration：关键 case 使用 blind pairwise 或 pass/fail；自动 judge 与人工/专家样例校准，不以“vibe”或单一开放式分数放行。
 - Cross-skill journey：artifact compatibility、consumer behavior、handoff limitations、knowledge promotion gate。
 
@@ -1135,6 +1147,10 @@ git diff --check
 | Net value / TCO | Reference/tool fan-out、wall-clock、实现与持续维护成本未吞掉主收益；由 LLM/human 基于分项 evidence 判断，不由脚本自动合成分数 |
 | Semantic distillation | 每个删除/合并/压短候选有 content class、owner 与 ablation evidence；承重 gate/anchor 无漏失，generic advice 删除不降低泛化 |
 | Freedom calibration | 高自由度 case 不因微步骤出现模板化误判；低自由度 case 不因过度放权绕过 script/schema/preview 或危险出口 |
+| Model/prompt isolation | `new model + old skill` 先于 Prompt 变更运行；Prompt 收益只从 `new model + candidate` 与该臂差异归因；old model 不可用时不声明 model gain |
+| Skill marginal value | `new model + candidate` 在至少一项 repo-specific correctness/safety/evidence/artifact 上优于 strict `new model + no skill`；no-skill 只排除目标 Skill surface 且无 surrogate prompt，否则该对照无效 |
+| Cross-model claim | 至少一个 frontier model 通过全门禁；U7/cross-model pattern 还需第二模型族/能力层最小回归，未跑时只允许 U6 model-scoped closeout |
+| Description portability | Canonical description ≤ 1,024 字符；development/validation near-miss trigger eval 不退化，非确定性触发有重复率记录 |
 
 ### Evidence record
 
@@ -1145,6 +1161,7 @@ git diff --check
 - A/B case inventory、raw output refs、rubric results；
 - trigger/outcome/cost/retention 分项结果与人工校准样例；
 - treatment、controlled variables、development/holdout/sealed split、重复策略、最坏分层与不确定性；
+- model id/family、endpoint/host、reasoning setting、tool roster、cache/retention 配置，以及 old-skill control、candidate、strict no-skill、可选 old-model/second-family 各臂 hash 与原始输出；
 - paragraph classification、五问萃取结果、freedom level、ablation treatment/hash 与恢复的最短有效 anchor；
 - 四轴 evidence state、human correction burden、reference/tool fan-out 与 Governance TCO 分项；
 - commands、exit code、logs、verification-run-summary ref；
@@ -1166,6 +1183,9 @@ git diff --check
 - [ ] 两个 pilot 均按非补偿式 scorecard 裁决，四轴 evidence、人工纠正负担、reference/tool fan-out 与 Governance TCO 已分项记录。
 - [ ] 两个 pilot 均先完成 semantic distillation 再做 reference extraction；paragraph classification、freedom level 和 prompt-ablation evidence 可复核。
 - [ ] 所有删除的 generic advice/`delete` 类没有被复制到新 reference；所有保留的 gate/anchor 能说明具体 failure 或 decision impact。
+- [ ] 两个 pilot 均完成 new-model old-skill Prompt control、new-model candidate 与 same-model strict no-skill 对照；old model 可调用且声明模型升级收益时另有 old-model arm，Prompt 收益、Skill 边际价值与可得时的 model gain 可分开归因。
+- [ ] 进入 U7 或形成 Cross-model authoring claim 前，第二模型族/能力层最小回归已通过；若未完成，产物明确停在 U6 model-scoped closeout，未修改通用 authoring governance、未生成默认 Wave 2 迁移包。
+- [ ] Canonical descriptions 全部满足 1,024-character portable ceiling，且未用 validation 关键词补丁换取训练集触发率。
 - [ ] `using-spec-first` / `spec-work` control 证明“保持不变”也是合法结果，未发生为了统一格式而重写。
 - [ ] Cross-skill `Spec/Plan/Tasks/Work/Review/Knowledge` journey 无 material regression。
 - [ ] 任一失败 pilot 已独立回退并保留 post-mortem；成功 pilot 的 evidence 可复核。
@@ -1199,6 +1219,11 @@ git diff --check
 | 过度相信模型通用能力 | Medium | Critical | Repo-specific truth、授权、exception、claim ceiling 留 spine；逐项 ablation；失败恢复最短有效 anchor。 |
 | 微步骤过多抑制模型泛化 | High | Medium-High | 高自由度任务只保留目标/边界/证据/停止条件；用跨 repo/任务 holdout 检查模板化误判。 |
 | 自动摘要造成隐性语义损失 | Medium | High | 禁止 compressor 直接替换 canonical source；逐段分类、source diff、paired ablation 和独立回退。 |
+| 把 model upgrade 收益误归因给 Prompt | High | High | Prompt 改造前先跑 new-model + old-skill control；只有 old-model + old-skill 对照可得时才计算 model-upgrade gain，Prompt delta 只来自同一新模型的 old-skill/candidate 差异。 |
+| Skill 对 frontier model 已无边际价值 | Medium | Medium-High | Same-model no-skill counterfactual；无 repo-specific 增益时 thin/merge/retire，不因 sunk cost 保留。 |
+| 单一 flagship 过拟合 | Medium | High | 第二 model family/capability tier 最小回归；未跑时限制 claim；model-specific workaround 不入 canonical spine。 |
+| Description 过拟合触发语料 | Medium | High | Development/validation 分割、near-miss negatives、重复 trigger rate；不复制 validation wording。 |
+| SDK model enum 被误当成 live/model-behavior 证据 | Medium | High | 分开 advertised/callable/behavior-observed；官方 prompting guide 或 live eval 缺失时 fail honestly。 |
 
 ---
 
@@ -1211,6 +1236,8 @@ git diff --check
 - 新增大量 public Skill，使 Activation-L1 route adjacency 显著变化。
 - Pilot 在真实使用中出现新的 P0/P1 漏失、误 mutation、误 completion 或明显 latency 反向。
 - 官方 Agent Skills 规范变化只能触发复评，不能自动覆盖本仓 field evidence。
+- Default/frontier model family、reasoning default、tool-calling semantics 或 prompt-cache 行为变化。
+- 已实跑的 second-family model 退役，或原 model-scoped workaround 已被新模型原生能力覆盖。
 
 ---
 
@@ -1222,6 +1249,8 @@ git diff --check
 - 本轮外部研究仅使用官方一手资料，形成了行业决策矩阵、host budget/invocation matrix、context residency contract 与四维 eval；这些是 advisory planning evidence，未通过本仓 live host probe 证明。
 - 本轮进一步按 `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md` 补齐 ArchitectureFit/投资判断、正交 evidence、development/holdout/sealed 数据纪律、非补偿式 promotion、human correction burden 与 Governance TCO。当前优化激活证据仍是 `structural_only`，不因方案完整而提升为 field outcome。
 - 本轮继续吸收 Codex system `skill-creator` 的“默认模型已经很聪明、上下文窗口是公共品、自由度匹配任务脆弱度”原则，并以本仓 canonical Skill Prompt 方法论校准为 semantic distillation：先删除/合并/确定性下沉，再做 references 分层；该原则只生成候选，是否可删仍由 paired ablation 和项目边界裁决。
+- 2026-07-30 的 GPT-5.6 官方 Prompt 指南为“先精简、再实测”提供了 directional internal-eval 证据，但其 10–15% 评分、41–66% token 与 33–67% cost 区间不作为 spec-first 预注册阈值或收益承诺。
+- Anthropic SDK 当前仅用于确认 Claude 5 identifiers 已出现在 advertised SDK surface；Anthropic platform docs 本轮连续超时，故 Claude 5 availability/prompt behavior 保持 `unverified`，不从 SDK enum 外推。
 - 当前只输出 implementation-ready plan；尚未修改 Skill source、运行 paired A/B、fresh-source、host loader 或 field outcome 验证。
 
 ---
@@ -1261,3 +1290,13 @@ git diff --check
 - <https://kiro.dev/docs/skills/>
 - <https://kiro.dev/docs/steering/>
 - <https://developers.openai.com/api/docs/guides/evaluation-best-practices>
+- <https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6.md>
+- <https://developers.openai.com/api/docs/guides/upgrading-to-gpt-5p6-sol.md>
+- <https://agentskills.io/specification.md>
+- <https://agentskills.io/skill-creation/best-practices.md>
+- <https://agentskills.io/skill-creation/evaluating-skills.md>
+- <https://agentskills.io/skill-creation/optimizing-descriptions.md>
+- <https://agentskills.io/skill-creation/using-scripts.md>
+- <https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills>
+- <https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md>
+- <https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/types/model.py>

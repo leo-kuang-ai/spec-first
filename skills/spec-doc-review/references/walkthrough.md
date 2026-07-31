@@ -1,5 +1,7 @@
 # Per-finding Walk-through
 
+Every terminal finding block must satisfy `references/rendering-floor.md`; this file owns interaction and layout, not a weaker wording contract.
+
 This reference defines Interactive mode's per-finding walk-through — the path the user enters by picking option A (`Review each finding one by one — accept the recommendation or choose another action`) from the routing question, plus the unified completion report that every terminal path (walk-through, best-judgment, Append-to-Open-Questions, zero findings) emits.
 
 **Mutation-policy entry guard:** load and execute this reference only when `mutation_policy: markdown-write`. If the run is `report-only`, **STOP** and return the structured report-only envelope from `synthesis-and-presentation.md`; do not offer Apply, Defer, Open Questions append, or best-judgment mutation options.
@@ -205,6 +207,25 @@ C. Acknowledge without applying — record the decision, no document edit
 **Cascading roots.** When the finding is a root with dependents and the user picks A (Defer) or B (Skip) from this sub-question, run the cascade announcement in "Cascading root decisions" above — treat the sub-question's choice as the root's effective action. Option C (Acknowledge) does not cascade; the root is recorded as acknowledged and dependents each get their own walk-through entry.
 
 ---
+
++## Withdrawing findings the user's earlier answers resolved
+
+Earlier decisions carry information forward. Apply stages a fix that does not execute until end-of-walk-through, so later findings are still being presented against the pre-edit document. Skip and Defer settle a premise. Freeform text, an `Other` answer, or per-option notes may assert a fact the document does not state — the no-freeform-authoring rule below forbids the user hand-writing a *fix*, not supplying information.
+
+Synthesis's premise chains (step 3.5c) do not cover this: they are built on the rejection test, which is why Apply does not cascade under "Cascading root decisions" above.
+
+**When a finding's turn arrives, judge it against everything the user has said so far.** If earlier answers already resolve or contradict it, do not render its terminal block or fire its question. Say succinctly, in plain user-facing language, what the finding was and which earlier answer settled it — enough that the user can tell it was handled rather than lost, and can object if the agent read them wrong. Follow the one-line shape of "Confirmation between findings" above. Then advance to the next finding, or to the completion report if none remain.
+
+Evaluate lazily, at the point the finding would have been presented — do not scan ahead after every answer.
+
+**The cascade opt-out wins.** When the user answered a root's cascade prompt (see "Cascading root decisions" above) with `Decide each dependent individually`, do not auto-withdraw that root's dependents on the strength of the root decision — they explicitly asked to see each one, and a dependent's premise dissolving under the root's rejection is exactly the cascade the opt-out declined. Give those dependents their own walk-through entries. A *different* earlier answer may still withdraw one of them; only the root whose cascade they opted out of is excluded as a trigger.
+
+Record each as `withdrawn` in the decision list, noting which decision retired it. Withdrawn is its own completion-report bucket. It carries forward in the decision primer as a rejected-class decision — alongside Skip, Defer, and Acknowledge — **only when a user decision durably settled it**: a settled premise (Skip/Defer) or a user-asserted fact. Those are user judgments that the finding needn't be actioned, so R29 should suppress a round N+1 re-raise since the document itself never changed.
+
+**An Apply-triggered withdrawal never carries forward as rejected-class.** It is a *prediction* that a staged fix will resolve the finding, not a user judgment that it needn't be. The Apply runs only at end-of-walk-through, and its landing is neither certain nor proof of semantic resolution — it can fail outright, or land in the wrong place and leave the withdrawn finding's evidence untouched (R30 verifies the applied fix's own fingerprint, not the withdrawn finding's). So round N+1 re-synthesis, not R29, is the check: if the fix genuinely resolved the finding, fresh personas won't regenerate it against the edited document; if it didn't — whether the Apply failed or landed ineffectively — the finding resurfaces for the user instead of being silently suppressed. When such an Apply fails outright during execution (write error, or the defensive no-fix fallback), also list its reverted withdrawals in the completion report's failure section as returned to scope, so the user sees them in-run rather than only next round.
+
+---
+
 
 ## Override rule
 

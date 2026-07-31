@@ -11,11 +11,9 @@ describe('CE upstream skill sync contracts', () => {
     const files = [
       'skills/spec-brainstorm/SKILL.md',
       'skills/spec-commit-push-pr/SKILL.md',
-      'skills/spec-commit/SKILL.md',
       'skills/spec-compound/SKILL.md',
       'skills/spec-ideate/SKILL.md',
       'skills/spec-plan/SKILL.md',
-      'skills/spec-product-pulse/SKILL.md',
       'skills/spec-sweep/SKILL.md',
     ];
 
@@ -31,6 +29,19 @@ describe('CE upstream skill sync contracts', () => {
         expect(line).not.toContain('|| echo');
       }
     }
+  });
+
+  test('gathers commit and product-pulse context at runtime without host pre-resolution', () => {
+    const commit = read('skills/spec-commit/SKILL.md');
+    const pulse = read('skills/spec-product-pulse/SKILL.md');
+
+    expect(commit).toContain('each command as its own argv-style shell tool');
+    expect(commit).toContain('Re-read the branch and staged paths immediately');
+    expect(commit).not.toContain('!`git status`');
+    expect(commit).not.toContain('Context fallback');
+    expect(pulse).toContain('Resolve `<repo-root>` at runtime');
+    expect(pulse).toContain('fixed `docs/pulse-reports/` contract');
+    expect(pulse).not.toContain('!`git rev-parse');
   });
 
   test('routes plan execution through spec-work as the recommended layered entry', () => {

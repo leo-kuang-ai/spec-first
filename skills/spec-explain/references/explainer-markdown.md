@@ -7,6 +7,9 @@ How an explainer renders as markdown — the fallback format when intake resolve
 - **YAML frontmatter carries the metadata:** `title`, `date`, `input_shape` (concept / diff / idea / recap), `subject`, and `unverified: true` when Phase 2 fell back to model knowledge. Field names are stable — a future library layer indexes them.
 - **Pure markdown.** No HTML elements, no `<details>`, no inline styles.
 - **Display-only.** No exercise or quiz content in the artifact; the check-in lives in the session.
+- **No internal identifiers in reader content.** Do not render scratch paths,
+  run ids, authorization tokens, provider/model receipts, or machine-specific
+  identifiers in the explainer body. Report the delivery path separately.
 - **Repo-relative paths** for any file reference; never absolute paths.
 
 ## Show-n-tell in markdown

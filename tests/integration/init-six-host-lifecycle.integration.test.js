@@ -139,10 +139,6 @@ describe('six-host init lifecycle', () => {
           'references/branch-creation.md',
           'references/pr-description-writing.md',
         ], false, /description:.*Internal/i],
-        ['spec-proof', [
-          'SKILL.md',
-          'references/hitl-review.md',
-        ], true, /remains an internal helper/i],
       ]) {
         for (const relativePath of relativePaths) {
           const helperPath = path.join(
@@ -164,6 +160,11 @@ describe('six-host init lifecycle', () => {
           }
         }
       }
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'spec-proof',
+      ))).toBe(false);
       for (const [standaloneName, relativePaths] of [
         ['spec-resolve-pr-feedback', [
           'SKILL.md',

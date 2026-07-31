@@ -1,5 +1,7 @@
 # Document Review Output Template
 
+Every rendered finding must satisfy `references/rendering-floor.md`; the tables below map that shared floor into batch layout.
+
 Use this **exact format** when presenting synthesized review findings in Interactive mode. Findings are grouped by severity, not by reviewer.
 
 **IMPORTANT:** Use pipe-delimited markdown tables (`| col | col |`). Do NOT use ASCII box-drawing characters.

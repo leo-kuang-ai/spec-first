@@ -3,6 +3,11 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('./helpers/markdown-frontmatter');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
@@ -113,7 +118,7 @@ function readCommandTemplateMetadata(templatePath, commandName, skillSourcePath)
   }
 
   const { frontmatter } = splitMarkdownFrontmatter(fs.readFileSync(sourcePath, 'utf8'));
-  const fields = parseSimpleFrontmatterFields(frontmatter);
+  const fields = parseFrontmatterScalars(frontmatter);
 
   if (typeof fields.description !== 'string' || fields.description.length === 0) {
     throw new Error(`Bundled workflow command template "${commandName}" is missing description frontmatter.`);
@@ -124,46 +129,6 @@ function readCommandTemplateMetadata(templatePath, commandName, skillSourcePath)
   }
 
   return fields;
-}
-
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
 }
 
 function validateManifest(manifest) {
@@ -584,7 +549,13 @@ function readBundledCommandTemplate(commandName) {
     return fs.readFileSync(skillPath, 'utf8');
   }
 
-  return `---\ndescription: ${JSON.stringify(command.description)}\nargument-hint: ${JSON.stringify(command.argumentHint)}\n---\n`;
+  return [
+    '---',
+    `description: ${formatFrontmatterScalar(command.description)}`,
+    `argument-hint: ${formatFrontmatterScalar(command.argumentHint)}`,
+    '---',
+    '',
+  ].join('\n');
 }
 
 function resolveBundledSkillSourceName(skillName) {

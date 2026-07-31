@@ -137,14 +137,11 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(routeMap).not.toContain('`using-spec-first`');
   });
 
-  test('separates public routing from explicit-name invocation for internal helpers', () => {
-    const proof = fs.readFileSync(path.join(repoRoot, 'skills/spec-proof/SKILL.md'), 'utf8');
+  test('separates public routing from package-level invocation policy for internal helpers', () => {
     const commit = fs.readFileSync(path.join(repoRoot, 'skills/spec-commit/SKILL.md'), 'utf8');
 
     expect(governanceReadme).toContain('不进入 `using-spec-first` 的公共 route/menu');
     expect(governanceReadme).toContain('由 package source 自己声明');
-    expect(proof).toContain('Direct user request');
-    expect(proof).not.toMatch(/^user-invocable:\s*false$/m);
     expect(commit).toMatch(/^user-invocable:\s*false$/m);
   });
 

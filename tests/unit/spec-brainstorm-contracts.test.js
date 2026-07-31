@@ -33,18 +33,12 @@ describe('spec-brainstorm unified plan producer contract', () => {
     expect(sections).toMatch(/universal-brainstorming route does\s+not carry `status`/);
   });
 
-  test('materializes a Proof-only universal summary before publishing it', () => {
+  test('keeps universal brainstorming local after retiring Proof publication', () => {
     const universal = read('skills/spec-brainstorm/references/universal-brainstorming.md');
-    const proof = read('skills/spec-proof/SKILL.md');
 
-    expect(universal).toContain('spec-first/spec-brainstorm/<run-id>/');
-    expect(universal).toMatch(
-      /Publish to Proof[\s\S]*?write the complete summary[\s\S]*?existing local Markdown path[\s\S]*?load `spec-proof`/i,
-    );
-    expect(universal).toContain('publish those same Markdown bytes');
-    expect(universal).toMatch(/Proof publish fails[\s\S]*?local Markdown path/i);
-    expect(proof).toContain('take an existing local markdown file');
-    expect(proof).toContain('passing the file path and title explicitly');
-    expect(proof).toContain('ai:spec-first');
+    expect(universal).toContain('**Save summary to disk**');
+    expect(universal).toContain('**Done**');
+    expect(universal).not.toContain('Publish to Proof');
+    expect(universal).not.toContain('spec-proof');
   });
 });

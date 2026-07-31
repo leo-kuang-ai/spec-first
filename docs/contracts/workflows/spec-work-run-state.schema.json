@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.local/contracts/spec-work-run-state.schema.json",
+  "title": "spec-work append-only run state snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generation",
+    "previous_generation",
+    "previous_sha256",
+    "captured_at",
+    "run_id",
+    "worktree_identity",
+    "units",
+    "authorization",
+    "collision",
+    "recovery",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-work-run-state/v1"
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "previous_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "previous_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$"
+    },
+    "worktree_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo_root",
+        "git_head",
+        "dirty_fingerprint"
+      ],
+      "properties": {
+        "repo_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "git_head": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "dirty_fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "unit_id",
+          "status",
+          "requested_engine",
+          "actual_engine",
+          "authorization",
+          "collision",
+          "recovery",
+          "verification"
+        ],
+        "properties": {
+          "unit_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "running",
+              "passed",
+              "failed",
+              "blocked",
+              "unknown"
+            ]
+          },
+          "requested_engine": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actual_engine": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authorization": {
+            "type": "object"
+          },
+          "collision": {
+            "type": "object"
+          },
+          "recovery": {
+            "type": "object"
+          },
+          "verification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "confirmed",
+              "evidence_refs",
+              "reason_code"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "not-started",
+                  "started",
+                  "passed",
+                  "failed",
+                  "unknown"
+                ]
+              },
+              "confirmed": {
+                "type": "boolean"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reason_code": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "authorization": {
+      "type": "object"
+    },
+    "collision": {
+      "type": "object"
+    },
+    "recovery": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "generation": {
+            "const": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "previous_generation": {
+            "const": 0
+          }
+        }
+      }
+    }
+  ]
+}
+

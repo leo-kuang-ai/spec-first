@@ -44,7 +44,7 @@ All non-setup paths share the same analyzer, which ships in this skill's `script
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
-python "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input
 ```
 
 Accepted inputs: a Riffrec `.zip`, an `.mp4` / `.mov` / `.webm` video, an `.m4a` / `.mp3` / `.wav` audio file, or a meeting-notes `.md`. Use `--output-dir <dir>` to control where artifacts land. In repos with `docs/brainstorms/`, the default remains `docs/brainstorms/riffrec-feedback/` as a documented evidence/kickoff-artifact exception; it is not the durable `spec-brainstorm` output convention. The quick path overrides the output dir to a temp location so nothing pollutes the repo.

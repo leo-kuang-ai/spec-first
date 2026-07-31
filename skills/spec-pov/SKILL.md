@@ -59,6 +59,8 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 3. **Apply the selection escape hatch.** If the input is a *selection* over a field ("what should we use for auth?"), it belongs here only when the realistic field is bounded (roughly five or fewer real candidates) and the criteria are knowable. If the field can't be bounded without inventing options, or the criteria are unclear, **stop**: return a Hold and route to `spec-ideate` (to enumerate) or `spec-brainstorm` (to surface criteria), then offer to re-run. Read `references/boundaries.md` only when the input's fit for `spec-pov` is genuinely in doubt or the field can't be bounded; skip it for a clearly in-scope verdict.
 
+   Freeze an explicit approach set before grounding: every user-supplied candidate, the status quo when relevant, and the option to reject the framing or all candidates. Preserve this set through grounding, any peer cross-check, and the final verdict. Every approach must finish as recommended, rejected with a reason, deferred for missing evidence, or framing-rejected; narrative omission is not a disposition.
+
 4. **Classify the reversibility tier — three levels.** Infer it from project signals:
    - **Tier 1 — two-way door:** a dependency, lint rule, or config; trivially reversible.
    - **Tier 2 — one-way but bounded:** a data store, an internal API/contract, or a migration whose blast radius stays inside this codebase.
@@ -70,22 +72,19 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 Grounding searches code, git, the issue tracker, PRs, and docs. When the package-local boundary permits dispatch, use scout sub-agents that return only a dossier path plus a short gist. Otherwise apply the same persona budgets serially in the orchestrator, keep raw search notes in the scratch directory, and carry only compact evidence into verdict reasoning.
 
-**Resolve the project profile from the shared cache first.** The question-agnostic profile (stack, dependency surface + licenses, conventions, structure) is identical for every run at this commit, so reuse it instead of re-deriving. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
-
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
-
-On `HIT`, load the profile JSON — that is your agnostic project orientation; do not re-derive it. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` only when the package-local boundary permits it; otherwise derive it inline via that persona and record the matching fallback reason. Persist a usable JSON file when available. On `NO-CACHE` — or if the call errors or returns nothing — derive it inline and skip the `put`; never block on the cache.
+**Resolve current project orientation first.** Derive stack, dependency/license surface, conventions, and structure from the current target repo/worktree for this run. Record current git identity and dirty state when available, carry direct source refs, and never persist or reuse the orientation across runs, branches, or worktrees. If git or a required source cannot be read, record the concrete degraded fact and narrow the project-floor claim; do not substitute conversation claims or stale orientation.
 
 Create the scratch dir once, and reuse the echoed path for every scout this run:
 
 ```bash
-SCRATCH_DIR="/tmp/spec-first/spec-pov/$(openssl rand -hex 4)"
-mkdir -p "$SCRATCH_DIR"
+umask 077
+SCRATCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-pov.XXXXXX")"
+[ -d "$SCRATCH_DIR" ] && [ ! -L "$SCRATCH_DIR" ] || { echo 'private scratch creation failed' >&2; exit 1; }
+chmod 700 "$SCRATCH_DIR"
 echo "$SCRATCH_DIR"
 ```
+
+This directory is owner-only, ephemeral scratch. Recheck that it remains a non-symlink directory before atomic publication; durable POV evidence must use its canonical artifact owner rather than this path.
 
 **Every scout payload carries the same context.** A fresh subagent does not inherit this conversation, so fill the persona files' `{subject}` / `{scratch-dir}` placeholders at dispatch: pass each scout the framed question (subject + intent), the named incumbent and the reversibility tier, and the resolved `<scratch-dir>` path — plus any user-supplied links for the external researcher. A scout seeded with only its generic persona grounds "some external thing" and can produce an empty or unfocused dossier.
 
@@ -104,6 +103,8 @@ echo "$SCRATCH_DIR"
 **Read `references/method.md` now**, before reasoning about the verdict — it defines the Verify and Verdict steps, the skeptic stance and reversibility tiering as cross-cutting properties, and the two-floor Invalid-Verdict gate. Apply that gate as a pass/fail checklist over the dossiers: a failed floor forbids Adopt/Reject and returns the matching Hold subtype. Do this reasoning on the clean context — read a dossier on demand, never pull its bulk in.
 
 ### Phase 3: Verdict
+
+When the user or visible upstream handoff explicitly authorized cross-model/delegated work, read `references/cross-model-panel.md` before final synthesis. Apply its canonical authorization, external-data, allowlisted-input, redaction, source-identity, provider-independence, bounded lifecycle, and reap gates. Use `references/agents/pov-peer.md`, `references/pov-schema.json`, and the Skill-local adapter/runner only after every gate passes. Missing authorization or any safety fact means zero peer processes and no independent coverage claim. Reconcile valid peer disagreement against the two floors and the frozen approach set; never decide by vote.
 
 Emit the verdict contract defined in `references/method.md` — grade vocabulary, schema fields, tier sizing, and output economy are all specified there. The verdict is a **compact chat block, not a research report**: lead with the grade, keep each schema field terse, and never reprint scout dossiers or raw search output. Size it to the tier — a Tier 1 verdict fits one screen; Tier 2/3 carries the full workup but still leads with the verdict and cites evidence rather than pasting it.
 

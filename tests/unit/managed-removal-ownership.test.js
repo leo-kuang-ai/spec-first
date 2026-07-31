@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
 const CodexAdapter = require('../../src/cli/adapters/codex');
 const { removeManagedCodingGuidelinesBlock } = require('../../src/cli/coding-guidelines');
 const { removeManagedBootstrapBlock } = require('../../src/cli/instruction-bootstrap');
@@ -14,6 +15,10 @@ const {
   RUNTIME_TOOLS_START,
   removeManagedRuntimeToolsBlock,
 } = require('../../src/cli/runtime-tools-index');
+const {
+  applyOperationPlan,
+  planObsoleteManagedAssetRemoval,
+} = require('../../src/cli/state');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
@@ -234,6 +239,85 @@ describe('single-host clean characterization', () => {
     expect(cleaned).not.toContain(LANG_END);
     expect(cleaned).toContain(userBytes);
   }, 120000);
+});
+
+describe('retired managed skill upgrade ownership', () => {
+  const baseState = {
+    manifestVersion: 'test',
+    platform: 'test',
+    commands: [],
+    workflowSkills: [],
+    agents: [],
+    agentSupportFiles: [],
+  };
+
+  test.each(getSupportedPlatforms())(
+    '%s removes only the previously managed retired skill and is idempotent',
+    (platform) => {
+      const projectRoot = tempProjectRoot();
+      const adapter = getAdapter(platform);
+      const previousState = { ...baseState, platform, skills: ['spec-proof', 'spec-work'] };
+      const nextState = { ...baseState, platform, skills: ['spec-work'] };
+      const retiredRoot = path.join(projectRoot, adapter.skillsRoot, 'spec-proof');
+      const siblingSentinel = path.join(
+        projectRoot,
+        adapter.skillsRoot,
+        'user-owned-sibling',
+        'sentinel.txt',
+      );
+      writeFile(path.join(retiredRoot, 'SKILL.md'), 'previously managed\n');
+      writeFile(siblingSentinel, 'keep\n');
+
+      const plan = planObsoleteManagedAssetRemoval(
+        projectRoot,
+        previousState,
+        nextState,
+        adapter,
+      );
+      expect(plan.operations).toEqual([
+        expect.objectContaining({
+          kind: 'remove_dir',
+          path: path.posix.join(adapter.skillsRoot, 'spec-proof'),
+          reason: 'obsolete_managed_skill',
+        }),
+      ]);
+
+      applyOperationPlan(projectRoot, plan);
+      expect(fs.existsSync(retiredRoot)).toBe(false);
+      expect(fs.readFileSync(siblingSentinel, 'utf8')).toBe('keep\n');
+      expect(planObsoleteManagedAssetRemoval(
+        projectRoot,
+        nextState,
+        nextState,
+        adapter,
+      ).operations).toEqual([]);
+    },
+  );
+
+  test.each(getSupportedPlatforms())(
+    '%s does not guess ownership when previous managed state is missing',
+    (platform) => {
+      const projectRoot = tempProjectRoot();
+      const adapter = getAdapter(platform);
+      const sameNameUserFile = path.join(
+        projectRoot,
+        adapter.skillsRoot,
+        'spec-proof',
+        'user-owned.txt',
+      );
+      writeFile(sameNameUserFile, 'keep\n');
+
+      const plan = planObsoleteManagedAssetRemoval(
+        projectRoot,
+        null,
+        { ...baseState, platform, skills: ['spec-work'] },
+        adapter,
+      );
+      expect(plan.operations).toEqual([]);
+      applyOperationPlan(projectRoot, plan);
+      expect(fs.readFileSync(sameNameUserFile, 'utf8')).toBe('keep\n');
+    },
+  );
 });
 
 describe('codex legacy runtime root removal ownership', () => {

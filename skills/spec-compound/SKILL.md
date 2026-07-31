@@ -39,12 +39,12 @@ If invoked specifically to create or bootstrap `CONCEPTS.md` from scratch rather
 
 ## Mode Detection
 
-Check `$ARGUMENTS` for a `mode:headless` token. Tokens starting with `mode:` are flags, not context — strip `mode:headless` from arguments before treating the remainder as the brief context hint.
+Check the invocation arguments supplied by the current host for the exact `mode:headless` token. Tokens starting with `mode:` are flags, not context — strip only recognized mode tokens while preserving the remainder, quoted paths, and token order before treating it as the brief context hint.
 
 | Mode | When | Behavior |
 |------|------|----------|
 | **Interactive** (default) | No mode token present | Auto-pick Full vs Lightweight and report the choice; run session history as an automatic probe (Full only); prompt for Discoverability Check consent; end with a plain summary (no "What's next?" menu) |
-| **Headless** | `mode:headless` in arguments | No blocking questions. Run **Full mode without session history**. Apply the Discoverability Check edit silently if a gap exists. Skip Phase 3 specialized reviews. End with a structured terminal report — no "What's next?" menu. |
+| **Headless** | `mode:headless` in arguments | No blocking questions. Run **Full mode without session history**. Report discoverability gaps without editing instruction files. Skip Phase 3 specialized reviews. End with a structured terminal report — no "What's next?" menu. |
 
 Headless mode is intended for automations and skill-to-skill invocation where no human is present to answer questions. The doc itself is identical to what an interactive Full run would produce — classification work (track, category, overlap) follows the same rules and writes nothing extra into the artifact. Once detected, headless mode applies for the entire run.
 
@@ -110,7 +110,7 @@ worker_bounded_parallelism: supported | unsupported | unknown
 <critical_requirement>
 **The primary deliverable is ONE file - the final documentation.**
 
-When dispatch is authorized, Phase 1 subagents write their full structured output to a per-run scratch artifact under `/tmp/spec-first/spec-compound/<run-id>/` and return only a compact confirmation containing the artifact path. In inline fallback, the orchestrator runs the same roles serially and writes the same scratch artifacts itself. Phase 2 reads those artifacts in either path. This scratch space does not make the files additional deliverables. **Only the orchestrator writes product files** — the final solution doc and the maintenance side effects below. Subagents must not touch `docs/`, project instruction files, or any tracked path. Beyond the Phase 2 solution doc, the orchestrator's other writes are maintenance side effects — not additional deliverables, and creating one when absent is expected, not a violation of this rule:
+When dispatch is authorized, Phase 1 subagents write their full structured output to the caller-provided owner-only `<private-scratch-dir>` and return only a compact confirmation containing the artifact path. In inline fallback, the orchestrator runs the same roles serially and writes the same scratch artifacts itself. Phase 2 reads those artifacts in either path. Scratch is ephemeral and never the only durable deliverable or handoff evidence. **Only the orchestrator writes product files** — the final solution doc and the maintenance side effects below. Subagents must not touch `docs/`, project instruction files, or any tracked path. Beyond the Phase 2 solution doc, the orchestrator's other writes are maintenance side effects — not additional deliverables, and creating one when absent is expected, not a violation of this rule:
 - **`CONCEPTS.md`** — create or update in Phase 2.4 (Vocabulary Capture) when a qualifying domain term surfaces.
 - **A project instruction file** (AGENTS.md or CLAUDE.md) — a small edit when the Discoverability Check finds a gap.
 
@@ -148,30 +148,23 @@ Run the research roles. When the Dispatch Authorization Boundary is satisfied, l
 
 ```bash
 RUN_ID=$(date +%Y%m%d-%H%M%S)-$(head -c4 /dev/urandom | od -An -tx1 | tr -d ' ')
-mkdir -p "/tmp/spec-first/spec-compound/$RUN_ID"
+umask 077
+SCRATCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-compound.XXXXXX")"
+[ -d "$SCRATCH_DIR" ] && [ ! -L "$SCRATCH_DIR" ] || { echo 'private scratch creation failed' >&2; exit 1; }
+chmod 700 "$SCRATCH_DIR"
+echo "$SCRATCH_DIR"
 ```
 
-**Resolve the agnostic project orientation from the shared cache (before dispatching subagents).** The question-agnostic orientation the Context Analyzer and Related Docs Finder rely on — the project's `CONCEPTS.md` vocabulary and the root instruction-file conventions/digests — is identical for every run at this commit, so reuse it instead of re-deriving. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
+**Resolve current project orientation before dispatching subagents.** Record the current target repo/worktree identity and dirty state when available, then read root instruction files and `CONCEPTS.md` directly for the vocabulary and conventions needed by the Context Analyzer. Keep this as run-local input with direct source refs; never persist or reuse it across runs, branches, or worktrees. If a source cannot be read, record that degraded fact and let the Context Analyzer limit its claims rather than substituting stale orientation.
 
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
+**CRITICAL — glob `docs/solutions/` fresh every run.** `spec-compound` writes new learnings there, so even a run-local orientation assembled earlier cannot stand in for the live enumeration in step 3.
 
-- On `HIT`: load the profile JSON and use its `vocabulary` (CONCEPTS canonical terms) and `conventions` (root instruction/convention digests) as the agnostic orientation; do not re-derive them.
-- On `MISS`: dispatch a generic subagent seeded with `references/agents/repo-profiler.md` only when the package-local boundary permits it; otherwise derive the profile inline and record the matching fallback reason. Persist the resulting JSON with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` when a usable file exists (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations).
-- On `NO-CACHE` (no git repo or no writable cache): derive the orientation inline this run and skip `put`.
+Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 subagent prompt. Recheck that the directory remains owned and non-symlink before publishing each file with same-directory temp + atomic rename. Each subagent **writes its full structured output** to its own file there, **confirms the write succeeded** (the file exists and is non-empty), and then **returns only a one-line confirmation containing the artifact path** — not the prose body inline. Artifact filenames by subagent:
 
-The cache is an optimization, never a correctness dependency — if the helper errors or returns nothing usable, fall back to deriving the orientation inline and continue. Pass the resolved vocabulary/conventions into the Context Analyzer (for vocabulary and instruction-file convention grounding) so it does not re-derive them.
-
-**CRITICAL — the `docs/solutions/` enumeration is NEVER cached; the Related Docs Finder must glob it FRESH every run.** `spec-compound` *writes* new learnings into `docs/solutions/`, so a cached index would miss a doc added moments ago (even an uncommitted one). The cached profile supplies only the agnostic orientation above; the `docs/solutions/` search in step 3 always runs against the live tree.
-
-Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent prompt. Each subagent **writes its full structured output** to its own file under `/tmp/spec-first/spec-compound/{run_id}/`, **confirms the write succeeded** (the file exists and is non-empty), and then **returns only a one-line confirmation containing the artifact path** — not the prose body inline. Artifact filenames by subagent:
-
-- **Context Analyzer** → `/tmp/spec-first/spec-compound/{run_id}/context.json` (frontmatter skeleton, category path, filename, track)
-- **Solution Extractor** → `/tmp/spec-first/spec-compound/{run_id}/solution.md` (the full doc-body prose sections)
-- **Related Docs Finder** → `/tmp/spec-first/spec-compound/{run_id}/related.json` (links, refresh candidates, overlap assessment)
-- **Session History** synthesis subagent (when run) → `/tmp/spec-first/spec-compound/{run_id}/session-history.md` (prose findings)
+- **Context Analyzer** → `<private-scratch-dir>/context.json` (frontmatter skeleton, category path, filename, track)
+- **Solution Extractor** → `<private-scratch-dir>/solution.md` (the full doc-body prose sections)
+- **Related Docs Finder** → `<private-scratch-dir>/related.json` (links, refresh candidates, overlap assessment)
+- **Session History** synthesis subagent (when run) → `<private-scratch-dir>/session-history.md` (prose findings)
 
 **Return the full output inline whenever the artifact write did not succeed.** This covers both cases where the orchestrator's Phase 2 inline fallback would otherwise have nothing to read: (a) `{run_id}` is empty or did not resolve (non-Claude-Code platforms where the pre-resolution failed), so there is no path to write to; and (b) `{run_id}` resolved but the write itself failed — tool permission denied, absolute-path writes unavailable, disk error, or the post-write existence check came back empty. In either case the subagent must return its complete structured output inline instead of a path, because the path would point at a file that does not exist. Return only the bare path when — and only when — the write is confirmed on disk. The artifact pattern is a reliability improvement, not a hard requirement; the orchestrator handles a missing artifact in Phase 2 by using the inline return.
 
@@ -284,7 +277,7 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
      REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
      REPO_NAME=$(basename "$REPO_ROOT")
      SCAN_DAYS="7"
-     bash "$SKILL_DIR/scripts/session-history/discover-sessions.sh" "$REPO_NAME" "$SCAN_DAYS" --cwd "$REPO_ROOT" | tr '\n' '\0' | xargs -0 python3 "$SKILL_DIR/scripts/session-history/extract-metadata.py" --cwd-filter "$REPO_ROOT"
+     bash "$SKILL_DIR/scripts/session-history/discover-sessions.sh" "$REPO_NAME" "$SCAN_DAYS" --cwd "$REPO_ROOT" | tr '\n' '\0' | xargs -0 bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/session-history/extract-metadata.py" --cwd-filter "$REPO_ROOT"
    else
      echo "Session history bundled scripts were not found in this skill's directory; skipping the session-history probe for this run."
    fi
@@ -299,7 +292,7 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
    ```bash
    SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
    if [ -f "$SKILL_DIR/scripts/session-history/extract-skeleton.py" ]; then
-     python3 "$SKILL_DIR/scripts/session-history/extract-skeleton.py" --output "$SCRATCH/<session-id>.skeleton.txt" < <session-file>
+     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/session-history/extract-skeleton.py" --output "$SCRATCH/<session-id>.skeleton.txt" < <session-file>
    else
      echo "Session history bundled scripts were not found in this skill's directory; skipping the session-history probe for this run."
    fi
@@ -311,12 +304,12 @@ Pass `{run_id}` (the resolved `$RUN_ID` value) into every Phase 1 subagent promp
    - the full content of `references/agents/session-historian.md`
    - `problem_topic`
    - `scratch_dir`
-   - `output_path: /tmp/spec-first/spec-compound/{run_id}/session-history.md`
+   - `output_path: <private-scratch-dir>/session-history.md`
    - a `sessions` array with extracted file paths and metadata
    - the output schema above
    - the filter rule above
 
-   The subagent reads only the scratch paths, **writes its prose findings to `/tmp/spec-first/spec-compound/{run_id}/session-history.md`, and returns only that artifact path once the write is confirmed** (same #956 reliability rationale — session-history findings are long-form prose prone to summary-collapse). If `{run_id}` did not resolve or the artifact write failed, it returns the prose inline instead (per the inline-fallback rule above). If synthesis fails, note the failure and continue without session context.
+   The subagent reads only the scratch paths, **writes its prose findings to `<private-scratch-dir>/session-history.md`, and returns only that artifact path once the atomic write is confirmed**. If `{run_id}` or the private scratch directory did not resolve, ownership/symlink recheck failed, or the artifact write failed, it returns the prose inline instead. If synthesis fails, note the failure and continue without session context.
 
 ### Phase 2: Assembly & Write
 
@@ -352,7 +345,7 @@ The orchestrating agent (main conversation) performs these steps:
 
    ```bash
    if [ -n "${SKILL_DIR:-}" ] && [ -f "$SKILL_DIR/scripts/validate-frontmatter.py" ]; then
-     python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
+     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
    else
      echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
    fi
@@ -402,7 +395,7 @@ The doc (and any `CONCEPTS.md` entries from Phase 2.4) is about to become perman
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-   python3 "$SKILL_DIR/scripts/validate-doc-claims.py" <doc-path>
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-doc-claims.py" <doc-path>
    ```
 
    Exit 0 means nothing flagged. Exit 1 means flags to **adjudicate, not auto-fix** — each flagged path, SHA, link, or scaffold pattern is fixed, annotated as historical, or confirmed intentional per the reference's adjudication table. A doc may legitimately cite a path deleted by the very fix it documents; a flag is a question, not a failure. If the script cannot be resolved on this platform, apply the reference's manual checklist and say so in the output — never silently skip.
@@ -490,7 +483,7 @@ After the learning is written and the refresh decision is made, check whether th
 
       `docs/solutions/` — documented solutions to past problems (bugs, best practices, workflow patterns), organized by category with YAML frontmatter (`module`, `tags`, `problem_type`). Relevant when implementing or debugging in documented areas.
       ```
-   c. In full interactive mode, explain to the user why this matters — agents working in this repo (including fresh sessions, other tools, or collaborators without the plugin) won't know to check `docs/solutions/` unless the instruction file surfaces it. Show the proposed change and where it would go, then use the platform's blocking question tool to get consent before making the edit: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to presenting the proposal in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. In lightweight mode, output a one-liner note and move on. In headless mode, apply the edit directly without prompting and surface it in the terminal report under "Instruction-file edit"
+   c. In full interactive mode, explain to the user why this matters — agents working in this repo (including fresh sessions, other tools, or collaborators without the plugin) won't know to check `docs/solutions/` unless the instruction file surfaces it. Show the proposed change and where it would go, then use the platform's blocking question tool to get consent before making the edit: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to presenting the proposal in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. In lightweight mode, output a one-line note and move on. In headless mode, do not edit instruction files; emit the proposed change under `Discoverability recommendation` in the structured terminal report.
 
 5. **If `CONCEPTS.md` exists at repo root, run a parallel discoverability check for it.** Assess whether the instruction file would lead an agent to discover the project's shared domain vocabulary. Use the same workflow as the `docs/solutions/` check above: same target file, same edit-placement judgment, same consent-then-edit interaction shape per mode. A line in an existing section is almost always better than a new headed section. Example calibration when nothing else fits:
 
@@ -540,7 +533,7 @@ The orchestrator (main conversation) performs ALL of the following in one sequen
 5. **Promotion gate**: run the same mechanical promotion validation as Phase 2 step 8. If the script is unavailable, apply that step's four-item manual checklist; do not silently skip or declare completion with either field absent:
    ```bash
    if [ -n "${SKILL_DIR:-}" ] && [ -f "$SKILL_DIR/scripts/validate-frontmatter.py" ]; then
-     python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
+     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
    else
      echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
    fi
@@ -630,7 +623,7 @@ Knowledge track:
 
 | ❌ Wrong | ✅ Correct |
 |----------|-----------|
-| Subagents write product files into `docs/` or edit tracked paths | Subagents write only scratch artifacts under `/tmp/spec-first/spec-compound/<run-id>/` and return the path; orchestrator writes the one final doc |
+| Subagents write product files into `docs/` or edit tracked paths | Subagents write only atomic artifacts under the verified owner-only `<private-scratch-dir>` and return the path; orchestrator writes the one final doc |
 | Subagent returns a long prose body only as its inline response | Subagent writes full output to its run artifact; orchestrator Reads it back (inline return is fallback only) |
 | Research and assembly run in parallel | Research completes → then assembly runs |
 | Multiple files created during workflow | One solution doc written or updated: `docs/solutions/[category]/[filename].md` (plus optional maintenance writes: a `CONCEPTS.md` create/update from Phase 2.4 and a small instruction-file edit for discoverability) |

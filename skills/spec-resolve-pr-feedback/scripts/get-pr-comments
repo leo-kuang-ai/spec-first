@@ -29,7 +29,10 @@ if [ -z "$OWNER" ] || [ -z "$REPO" ]; then
     exit 1
 fi
 
-# Output is a JSON object with four keys:
+# Output is a JSON object with five keys:
+#   pending_review   - viewer-owned PENDING review id or null. Replies can be
+#                      absorbed into this draft and remain invisible, so
+#                      consumers must stop before replying when it is non-null.
 #   review_threads   - unresolved inline review threads, edge-wrapped as
 #                      [{ node: { id, isResolved, isOutdated, path, line, ...,
 #                                 comments: { nodes: [...], pageInfo: ... } } }]
@@ -60,7 +63,13 @@ fi
 # has a content-aware actionability check and Silent Drop rule that handles
 # wrappers correctly, so we trust that layer instead. Add new logins to the CI
 # list only if their output is structurally non-actionable like codecov's.
-threads_pages=$(gh api graphql --paginate --slurp \
+tmp_threads=$(mktemp "${TMPDIR:-/tmp}/spec-pr-threads.XXXXXX")
+tmp_comments=$(mktemp "${TMPDIR:-/tmp}/spec-pr-comments.XXXXXX")
+tmp_reviews=$(mktemp "${TMPDIR:-/tmp}/spec-pr-reviews.XXXXXX")
+chmod 600 "$tmp_threads" "$tmp_comments" "$tmp_reviews"
+trap 'rm -f "$tmp_threads" "$tmp_comments" "$tmp_reviews"' EXIT
+
+gh api graphql --paginate --slurp \
   -f owner="$OWNER" -f repo="$REPO" -F pr="$PR_NUMBER" \
   -f query='
 query Threads($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
@@ -92,9 +101,9 @@ query Threads($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
       }
     }
   }
-}')
+}' > "$tmp_threads"
 
-comments_pages=$(gh api graphql --paginate --slurp \
+gh api graphql --paginate --slurp \
   -f owner="$OWNER" -f repo="$REPO" -F pr="$PR_NUMBER" \
   -f query='
 query Comments($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
@@ -110,12 +119,13 @@ query Comments($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
       }
     }
   }
-}')
+}' > "$tmp_comments"
 
-reviews_pages=$(gh api graphql --paginate --slurp \
+gh api graphql --paginate --slurp \
   -f owner="$OWNER" -f repo="$REPO" -F pr="$PR_NUMBER" \
   -f query='
 query Reviews($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
+  viewer { login }
   repository(owner: $owner, name: $repo) {
     pullRequest(number: $pr) {
       reviews(first: 100, after: $endCursor) {
@@ -129,16 +139,17 @@ query Reviews($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
       }
     }
   }
-}')
+}' > "$tmp_reviews"
 
 jq -n \
-  --argjson threads "$threads_pages" \
-  --argjson comments "$comments_pages" \
-  --argjson reviews "$reviews_pages" '
-  ($threads[0].data.repository.pullRequest.author) as $author |
-  [$threads[].data.repository.pullRequest.reviewThreads.nodes[]] as $all_threads |
-  [$comments[].data.repository.pullRequest.comments.nodes[]] as $all_comments |
-  [$reviews[].data.repository.pullRequest.reviews.nodes[]] as $all_reviews |
+  --slurpfile threads "$tmp_threads" \
+  --slurpfile comments "$tmp_comments" \
+  --slurpfile reviews "$tmp_reviews" '
+  ($threads[0][0].data.repository.pullRequest.author) as $author |
+  [$threads[0][].data.repository.pullRequest.reviewThreads.nodes[]] as $all_threads |
+  [$comments[0][].data.repository.pullRequest.comments.nodes[]] as $all_comments |
+  [$reviews[0][].data.repository.pullRequest.reviews.nodes[]] as $all_reviews |
+  ($reviews[0][0].data.viewer.login) as $viewer |
   # Structurally non-actionable bot output; always dropped.
   ["codecov"] as $ci_bot_logins |
   [$all_threads[]
@@ -157,6 +168,10 @@ jq -n \
   [$all_threads[]
     | select(.isResolved == false)] as $unresolved |
 {
+  pending_review: (first($all_reviews[]
+    | select(.state == "PENDING")
+    | select(($viewer == null) or (.author.login == $viewer))
+    | .id) // null),
   review_threads: [$unresolved[] | { node: . }],
   pr_comments: [$all_comments[]
     | select(.author.login != $author.login)

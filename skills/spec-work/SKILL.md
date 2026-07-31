@@ -45,7 +45,7 @@ Overrides: high-risk
 
 ## Input Document
 
-<input_document> #$ARGUMENTS </input_document>
+<input_document> #<invocation arguments supplied by the current host> </input_document>
 
 ## Execution Workflow
 

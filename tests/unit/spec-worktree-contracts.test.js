@@ -35,14 +35,16 @@ function initRepo() {
 }
 
 describe('spec-worktree existing-ref isolation contracts', () => {
-  test('source documents existing-ref isolation for spec-dogfood', () => {
+  test('source documents caller-owned isolation for spec-dogfood and spec-work', () => {
     const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-worktree/SKILL.md'), 'utf8');
     const dogfood = fs.readFileSync(path.join(repoRoot, 'skills/spec-dogfood/SKILL.md'), 'utf8');
 
     expect(skill).toContain('isolate [--copy-env] <target-ref|pr:<number>|#<number>> [worktree-slug]');
     expect(skill).toContain('already_checked_out branch=<name> path=<path>');
-    expect(skill).toContain('当前已确认的 caller 只有 `spec-dogfood`');
-    expect(skill).not.toContain('`spec-work` and `spec-code-review` offer this skill');
+    expect(skill).toContain('Governed callers are spec-dogfood and spec-work');
+    expect(skill).toContain('caller-owned isolation contract');
+    expect(skill).toMatch(/never selects an execution engine, dispatches a worker/i);
+    expect(skill).not.toContain('`spec-code-review` offer this skill');
     expect(skill).not.toMatch(/description:.*spec-work.*spec-code-review/i);
     expect(dogfood).toContain('isolate pr:<number>');
     expect(dogfood).toContain('isolate <branch>');

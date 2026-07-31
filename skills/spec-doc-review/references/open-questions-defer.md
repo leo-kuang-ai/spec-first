@@ -1,5 +1,7 @@
 # Open Questions Deferral
 
+Persisted entries follow the token and consequence-first rules in `references/rendering-floor.md`; they do not inherit apply authority from an actionable finding.
+
 This reference defines the Defer action's in-doc append mechanic. When the user chooses Defer on a finding (from the walk-through or from the bulk-preview Append-to-Open-Questions path), an entry for that finding appends to a `## Deferred / Open Questions` section at the end of the document under review.
 
 Interactive mode only. Invoked by `references/walkthrough.md` (per-finding Defer option) and `references/bulk-preview.md` (routing option C Proceed).

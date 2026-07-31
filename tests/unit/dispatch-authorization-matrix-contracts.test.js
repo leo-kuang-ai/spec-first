@@ -493,17 +493,16 @@ describe('generic dispatch authorization matrix', () => {
     const source = read('skills/spec-code-review/SKILL.md');
     const trivialPrSection = source.match(/\*\*Trivial-PR judgment\*\*:[\s\S]*?(?=\n\nWhen any skip rule fires)/);
     const dispatchGateIndex = source.indexOf('### Stage 1c: Dispatch gate and inline fallback');
-    const profileDispatchIndex = source.indexOf('`MISS` 时派发 seeded with');
+    const orientationIndex = source.indexOf('### Stage 2c: Resolve current-tree orientation');
 
     expect(trivialPrSection).not.toBeNull();
     expect(trivialPrSection[0]).toContain('orchestrator inline');
     expect(trivialPrSection[0]).toContain('does not dispatch');
     expect(trivialPrSection[0]).not.toMatch(/spawn a .*sub-agent/i);
     expect(dispatchGateIndex).toBeGreaterThanOrEqual(0);
-    expect(profileDispatchIndex).toBeGreaterThan(dispatchGateIndex);
-    expect(source.slice(dispatchGateIndex, profileDispatchIndex)).toContain(
-      'enforce the Phase 0 dispatch policy before profile derivation',
-    );
+    expect(orientationIndex).toBeGreaterThan(dispatchGateIndex);
+    expect(source.slice(dispatchGateIndex, orientationIndex)).toContain('dispatch_authorization_missing');
+    expect(source).not.toContain('repo-profile-cache');
   });
 
   test('mutating resolver no longer treats invocation or silence as dispatch authority', () => {

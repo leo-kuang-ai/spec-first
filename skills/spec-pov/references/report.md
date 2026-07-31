@@ -23,6 +23,5 @@ The verdict, expanded — lead with the decision, then the evidence the TL;DR om
 
 Publish via whatever the user has — best available, never required:
 
-- `spec-proof` (Proof) — markdown-only, so if the report is HTML, render a throwaway markdown copy of it as the Proof source.
-- Otherwise an available HTML publishing tool the user has connected.
-- If neither is reachable, the local file is the deliverable — announce its path.
+- An available HTML publishing tool the user has connected.
+- If none is reachable, the local file is the deliverable — announce its path.

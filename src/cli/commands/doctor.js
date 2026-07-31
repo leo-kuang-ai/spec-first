@@ -258,6 +258,7 @@ function checkPlatformCli(platform, options = {}) {
       level: 'WARNING',
       name: displayName,
       message: 'version check timed out',
+      reasonCode: `${platform}_cli_version_check_timeout`,
       fix: `Run \`${command} --version\` manually and inspect PATH or shell startup scripts.`,
     };
   }
@@ -267,7 +268,8 @@ function checkPlatformCli(platform, options = {}) {
       level: 'WARNING',
       name: displayName,
       message: 'not found on PATH',
-      fix: `Install ${displayName} CLI and restart your shell.`,
+      reasonCode: `${platform}_cli_not_found`,
+      fix: `Install ${displayName} and restart your shell.`,
     };
   }
 
@@ -275,6 +277,7 @@ function checkPlatformCli(platform, options = {}) {
     level: 'WARNING',
     name: displayName,
     message: 'could not verify version',
+    reasonCode: `${platform}_cli_version_check_failed`,
     fix: `Run \`${command} --version\` manually to confirm the CLI works.`,
   };
 }
@@ -1155,7 +1158,7 @@ function printDoctorJson(report) {
 
 function buildHostSupportView(adapter, platformCliCheck, runtimeFileChecks = []) {
   const reasonCodes = [...new Set(
-    runtimeFileChecks
+    [platformCliCheck, ...runtimeFileChecks]
       .map((check) => check && check.reasonCode)
       .filter(Boolean),
   )];

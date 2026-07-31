@@ -168,6 +168,7 @@ docs/
 | 执行有范围的工作 | `spec-work` | 源码变更 + 证据 |
 | 代码审查 | `spec-code-review` | 结构化 findings |
 | 文档/计划审查 | `spec-doc-review` | 结构化 findings |
+| 保存或恢复跨会话上下文 | `spec-handoff` | `.spec-first/workflows/spec-handoff/` |
 | 沉淀可复用经验 | `spec-compound` | `docs/solutions/` |
 
 `spec-plan` 在提出新 abstraction、adapter、orchestrator、integration seam 或 durable source 前先盘点已有能力，并在 `reuse / extend / compose / new` 中做语义取舍；`compose` 只允许薄胶水持有 contract translation、sequencing、failure/degradation routing 与 observability/evidence，不复制业务真相或平行持久状态。Markdown 和 HTML 都是 unified plan 的一等格式：普通 `spec-doc-review` 默认 report-only，`spec-plan` 以 producer 显式 `mutation:apply-fixes` 调用自己的 Markdown review 才可应用有界安全写入，HTML 审查始终 report-only，确定性修正由 `spec-plan` 完整重组后复审。`spec-work` 会拒绝 requirements-only、progress-like readiness 以及重复、缺失或冲突的 unified metadata，并按稳定 heading/anchor 读取 implementation-ready artifact。以上 source/projection contract 不等于真实宿主 loader、模型质量或 field outcome 证据。
@@ -177,6 +178,10 @@ docs/
 本地 mutation、reviewer/worker dispatch、commit 与 outward landing 是四个独立授权面。`spec-code-review mode:agent` 始终 report-only；普通 review 默认也只报告，只有明确 review-and-fix 才能在本地 apply，commit 仍需独立授权。最终 work closeout 只记录真实执行的命令和 repo-relative redacted logs，通过 `verification-run-summary.v1` 与 `honest-closeout.v1` 校验结构化 claims，并只在 durable trigger 命中时写 `spec-work-run-artifact/v2`。`spec-debug`、`spec-code-review` 可以返回各自的 run-summary ref、verdict 与 limitation，但不拥有 spec-work run artifact。Prompt/source tests 与六宿主 projection 只证明合同存在，不证明 clean-session 模型行为或外部采用效果。
 
 Worker dispatch 在 Skill 层保持宿主中立。Owning workflow 提供 bounded task packet、彼此独立的授权事实、mutation scope、output contract 与 stop condition；只有 active host session 的 tool registry/schema 拥有 primitive identity 和 arguments，并且只能在 dispatch 已获授权后作为脱敏的 `provider_untrusted` evidence 消费。`PlatformAdapter.supportsAgents`、generated projection、adapter/project state、CLI help、fixture 和模型自述都不是 session capability probe。Permission、capacity、isolation、model/parallelism、output 与 mutation facts 只能来自 live call response 和 caller 可观察的前后状态；support claim 只能由 dated exact-version journey evidence 限定。详见 [Worker Dispatch Capability Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/worker-dispatch-capability.md)。
+
+CE 3.20 校准继续保持这些边界清晰。仓库 grounding 每个 run 都从当前 source 重新建立，不恢复跨 run repo profile cache。代码审查、文档审查和 POV 的 optional peer 使用有界生命周期，只有真实 provider/model receipt 才能声明 independent coverage。`spec-work` recovery 采用 immutable run identity 与 append-only、CAS-guarded state snapshot；获授权的 LFG tail 可以在固定预算内观察 review、CI、head 与 base currency，但不会自动 merge 或改写历史。`spec-optimize mode:measurement-only` 会冻结 identity，先测 A/A noise 再做 A/B，只向 owner 返回评估证据，不修改或 promotion Skill。`spec-write-skill` 继续是唯一 Skill authoring/promotion owner，不受该 measurement mode 改动。
+
+Canonical artifact root 继续固定：plans、tasks、brainstorms、solutions 与 pulse reports 保留现有 `docs/**` owner；可恢复 workflow evidence 进入 `.spec-first/workflows/**`；只有 ephemeral process/provider state 才进入 owner-private 临时目录。项目不提供全局 `docs_root` 开关。修改发生在 `skills/`、`templates/`、`src/cli/` 与 checked-in docs 等 source surface，再由 `spec-first init` 投射到受支持宿主 runtime。
 
 当 `spec-lfg` 进入 browser applicable 流程时，调用方必须显式提供 `target-origin:<origin>`；缺失或非法 origin 分别以 `target-origin-missing` 或 `target-origin-invalid` 阻断该 flow。项目 server 的启动、监控和关闭由调用方负责。`spec-test-browser` 只确定性校验已解析的无 credential loopback root origin，经私有 wrapper 执行 browser action，并且只清理自己的 browser session；它不读取 local runtime profile，也不启动、探测或停止项目 server。browser evidence 只能证明该 caller-authorized origin 上观察到的 route/step 结果，不能证明 server 对应当前 branch。会产生持久或外部 effect 的 UI 操作必须获得本次独立授权；pipeline mode 以 `browser-mutation-authorization-required` 记录并且不写入被阻断 step。browser cleanup 失败仍会阻断 lifecycle、commit、push、PR 与 CI 副作用。
 

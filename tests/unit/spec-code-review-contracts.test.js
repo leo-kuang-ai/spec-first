@@ -90,8 +90,18 @@ describe('spec-code-review current contracts', () => {
   test('mode:agent is JSON report-only and never applies fixes', () => {
     expect(skill).toContain('**Report-only**: return **JSON**');
     expect(skill).toContain('In **`mode:agent`** it never mutates the tree');
+    expect(skill).toContain('### Phase 0a: Freeze effective mode before any tool call');
+    expect(skill).toContain('source_mutation_gate: closed');
+    expect(skill).toContain('adjacent fix/apply wording is intent data, not mutation authority');
+    expect(skill).toContain('reviewer_mutation_detected');
+    expect(skill).toContain('scope-snapshot.json');
     expect(skill).toContain('### Stage 5c: Act on findings (explicit apply only)');
     expect(skill).toContain('**Skip entirely in `mode:agent`, `mutation_policy: report-only`');
+    expect(skill).toContain('Read `references/apply-findings.md` only after all three admission conditions pass');
+    expect(fs.existsSync(path.join(
+      repoRoot,
+      'skills/spec-code-review/references/apply-findings.md',
+    ))).toBe(true);
   });
 
   test('ordinary review is report-only and explicit apply/commit authorization stays separate', () => {
@@ -142,10 +152,11 @@ describe('spec-code-review current contracts', () => {
     expect(subagentTemplate).toContain('use the normal action-class rubric for its route');
   });
 
-  test('repo profile fallback 与 maintainability confidence 对齐 shared synthesis contract', () => {
-    expect(skill).toMatch(/`NO-CACHE`[\s\S]*fresh derive profile/);
-    expect(skill).toMatch(/helper invocation 失败[\s\S]*fresh derive/);
-    expect(skill).toMatch(/`NO-CACHE`[\s\S]*跳过 `put`/);
+  test('current-tree orientation 与 maintainability confidence 对齐 shared synthesis contract', () => {
+    expect(skill).toContain('### Stage 2c: Resolve current-tree orientation');
+    expect(skill).toContain('derive only from the fetched reviewed refs/diff');
+    expect(skill).toContain('Do not persist or reuse this orientation');
+    expect(skill).toContain('record the exact degraded fact');
     expect(maintainabilityPrompt).toContain('Anchor 50 — suppress');
     expect(maintainabilityPrompt).toContain('提升为 anchor 75');
     expect(maintainabilityPrompt).not.toContain('suppress unless severity is P1');

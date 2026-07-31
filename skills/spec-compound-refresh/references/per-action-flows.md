@@ -39,7 +39,7 @@ The orchestrator handles consolidation directly (no subagent needed — the docs
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the spec-compound-refresh SKILL.md you read>"
-   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <canonical-learning-path>
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <canonical-learning-path>
    ```
 
    Exit 1 blocks the consolidation exit until the canonical learning is repaired and the command passes. If the validator is unavailable, apply the four-item manual promotion checklist in Replace step 3 and state `validator unavailable: <reason>`; do not silently downgrade to the old parser-safety-only checklist. The orchestrator still judges provenance credibility and invalidation adequacy.
@@ -75,12 +75,12 @@ Do not let replacement subagents or inline fallback invent frontmatter fields, e
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the spec-compound-refresh SKILL.md you read>"
-   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <new-learning-path>
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <new-learning-path>
    ```
 
    Exit 0 means the mechanical promotion gate passed; exit 1 means stderr names the offending field(s) — repair the frontmatter and re-run until exit 0. Do not declare success while validation fails. Default validator mode remains parser-safety-only for legacy compatibility; `--promotion` adds only the two promotion field shapes and does not judge reference credibility or invalidation adequacy. It does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps).
 
-   If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify exactly this mechanical scope before deleting the old learning:
+   If `run-python.sh` cannot resolve a runnable Python 3 interpreter or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify exactly this mechanical scope before deleting the old learning:
    - the frontmatter opens and closes with exact `---` lines;
    - no unquoted top-level scalar value contains ` #` or `: `;
    - `source_refs` appears exactly once as a top-level non-empty block or flow array whose items are non-empty strings; plain tokens that common YAML parsers type as null, boolean, number, sexagesimal, date, or timestamp do not count as strings and must be quoted;
@@ -91,7 +91,7 @@ Do not let replacement subagents or inline fallback invent frontmatter fields, e
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-   python3 "$SKILL_DIR/scripts/validate-doc-claims.py" <new-learning-path>
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-doc-claims.py" <new-learning-path>
    ```
 
    Exit 1 flags are **adjudication input, not failures** — a successor doc describing removed code legitimately cites paths that no longer exist. Resolve each flag by fixing the citation, annotating it as historical, or confirming it intentional; always fix scaffold flags. If the script is not resolvable on this platform, scan the body for those same patterns manually and say so in the report.

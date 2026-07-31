@@ -156,7 +156,7 @@ Load references only when their trigger is present:
 
 ## Input
 
-<prd_input> #$ARGUMENTS </prd_input>
+<prd_input> #<invocation arguments supplied by the current host> </prd_input>
 
 If the input is empty, ask for the target increment or existing PRD path before proceeding.
 

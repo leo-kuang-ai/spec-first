@@ -17,7 +17,7 @@ Read summary/metadata first, then only the source sections needed for the active
 
 Generated runtime mirrors and host-local managed slices are not source-of-truth. At minimum this includes `.claude/**`, `.codex/**`, `.agents/skills/**`, and the spec-first-managed/runtime paths under `.cursor/**`, `.kiro/**`, and `.qoder/**` identified by current project instructions or generation contracts. Exclude them from ordinary planning context unless the request explicitly concerns setup, projection, runtime drift, or host behavior. Native host files outside the managed slice may be advisory inputs when explicitly relevant, but they do not override project-owned source. Even when runtime is in scope, use it only as observed evidence and trace the durable fix back to project-owned source or generator logic.
 
-Provider graphs, MCP results, cached profiles, historical learnings, and external research are advisory. Record provenance and freshness, then confirm any load-bearing conclusion against current source, tests, logs, contracts, or a current owner decision. A provider self-report, stale plan, or past transcript cannot support a confirmed planning claim by itself.
+Provider graphs, MCP results, run-local orientation summaries, historical learnings, and external research are advisory. Record provenance and freshness, then confirm any load-bearing conclusion against current source, tests, logs, contracts, or a current owner decision. A provider self-report, stale plan, or past transcript cannot support a confirmed planning claim by itself.
 
 ## Cross-Repo Scope
 

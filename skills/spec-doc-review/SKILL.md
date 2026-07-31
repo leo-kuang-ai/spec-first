@@ -144,6 +144,8 @@ Each subagent's prompt fills these template variables: `{persona_file}` — full
 
 For legacy documents pass the **full document** (`slices=full`); for unified artifacts, default to section slices (`slices=unified`) and escalate to a broader slice only when a reviewer needs cross-section traceability the initial slice can't assess. For `task-pack`, set `slices=mixed` and wrap the four inputs separately as `<task-pack-review-lens>`、`<deterministic-intake>`、`<task-pack>` 与 `<source-plan>`，避免把 validator facts、derived tasks 与 canonical plan 混成同一 authority。**Anti-waste rule:** the orchestrator may read the full document once for classification and roster selection, but after slices are built do not also inject the full document into every leaf "for safety" — mark `slices=mixed` or `full` on cost-shape if a leaf must escalate.
 
+When dispatch is explicitly authorized and at least one normal review lens is active, read `references/cross-model-review.md` and evaluate its independent external-data gates. If every gate passes, start exactly one report-only whole-document peer using `references/personas/whole-doc-reviewer.md` and the Skill-local adapter/runner lifecycle. The peer sweep reads the full document once; it does not multiply by persona and it never replaces the always-on reviewers. Missing authorization, receipt, data authority, redaction, allowlisted document ref, source identity, peer independence, or cleanup evidence means zero peer processes and no cross-model claim. A completed return may corroborate findings but never carries `safe_auto` or mutation authority.
+
 ### Decision primer
 
 On round 1, set `{decision_primer}` to `<prior-decisions>Round 1 — no prior decisions.</prior-decisions>`. On round 2+, accumulate prior-round decisions:
@@ -167,6 +169,8 @@ Accumulate across all rounds in the session. Skip, Defer, and Acknowledge all co
 **Error handling:** if a subagent fails or times out, proceed with completed findings and note the failure in Coverage — do not block the review on one reviewer. If both always-on reviewers (`coherence` and `feasibility`) return no valid result, attempt one equivalent inline review using their already-selected prompt assets and document slices. If that equivalent inline review also does not complete, set `review_status: incomplete`, record `mandatory_review_coverage_missing`, and suppress any clean verdict or execution handoff. Never describe partial roster coverage as complete. **Dispatch limit:** even at maximum (7 agents), use bounded parallel dispatch; queue and launch the remainder as active reviewers complete.
 
 ## Phases 3-5: Synthesis, Presentation, and Next Action
+
+Before rendering any finding, read `references/rendering-floor.md`. Its consequence-first wording, recommendation visibility, opaque-token budget, and trace-on-request rules apply to the structured envelope, batch report, walkthrough, bulk preview, and persisted Open Questions entry. Surface-specific layouts may differ, but none may weaken that shared decision floor.
 
 After all dispatched agents return, read `references/synthesis-and-presentation.md` for the synthesis pipeline (validate, anchor-based gate, dedup, cross-persona promotion, contradiction resolution, auto-promotion, three-tier routing with FYI subsection), mutation-policy enforcement, structured envelope output, and the routing-question handoff.
 

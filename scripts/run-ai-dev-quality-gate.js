@@ -23,7 +23,7 @@ const WORKFLOW_RUNTIME_CONTRACT_TESTS = [
   'tests/unit/plans-command.test.js',
   'tests/unit/plan-status-taxonomy.test.js',
   'tests/unit/requirements-rendering-parity.test.js',
-  'tests/unit/repo-profile-cache-parity.test.js',
+  'tests/unit/fresh-repo-grounding-contracts.test.js',
   'tests/unit/secret-deny-patterns-contracts.test.js',
   'tests/unit/spec-plan-contracts.test.js',
   'tests/unit/spec-brainstorm-contracts.test.js',

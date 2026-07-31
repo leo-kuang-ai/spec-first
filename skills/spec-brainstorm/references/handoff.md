@@ -56,8 +56,7 @@ Present only the options that apply. Renumber so visible options stay contiguous
 1. **Create the implementation plan** *(recommended)* - Hand off to `spec-plan` and sharpen the requirements into a complete, testable plan. Shown only when `Resolve Before Planning` is empty.
 2. **Ship it autonomously with `spec-lfg`** - Hand the requirements to the full autonomous pipeline: `spec-lfg` plans (`spec-plan`), implements, simplifies, 委派一组独立、只读的 reviewer 执行代码审查并应用合格修复, opens a PR, and watches CI to green — hands-off, no pipeline check-ins. It plans first (unlike a raw `/goal` straight from requirements), so it's the safer autonomous path. Best when you trust the requirements and want it built and shipped without steering. **Opens a PR and pushes a branch. 此选择只授权上述委派的独立只读审查，不授权任意 worker dispatch。When browser verification applies, its caller or upstream runtime must provide a caller-owned target origin; selecting this option does not authorize a project server command.** The caller owns project-server startup and shutdown, and a missing origin blocks the applicable browser flow rather than triggering automatic startup. Shown only for software brainstorms (`execution: code`) with `Resolve Before Planning` empty **and a unified plan artifact was created** — `spec-lfg` hands `spec-plan` that artifact path in pipeline mode and cannot prompt, so with no artifact (e.g. a brief-alignment brainstorm that skipped doc creation per the "Decide whether a doc is warranted" rule) there is nothing to enrich; offer option 1 instead, which can plan interactively from the conversation. For a quicker plan-then-decide flow, or to run a `/goal` yourself, pick option 1 and choose at the `spec-plan` handoff.
 3. **Pressure-test the requirements** - Run `spec-doc-review` to find gaps, conflicts, weak premises, and scope issues in the requirements. Shown whenever a unified plan exists, for both `OUTPUT_FORMAT=md` and `OUTPUT_FORMAT=html`. This option is report-only for both formats: `fixes_applied: 0`, findings and producer-fix candidates are surfaced, and requirement edits remain owned by `spec-brainstorm` or a later explicit `mutation:apply-fixes` request.
-4. **Publish to Proof — shareable link** - Publish the markdown unified plan to Every's Proof editor and get a shareable link to read, comment on, or share with others. One-way: the local doc stays canonical. Shown only when a markdown unified plan exists. **Render only when `OUTPUT_FORMAT=md`** (Proof operates on markdown and cannot ingest HTML).
-4. **Open in browser** — open the HTML unified plan locally for review and sharing. Shown only when an HTML unified plan exists. **Render only when `OUTPUT_FORMAT=html`.** Replaces "Publish to Proof" at the same slot under exclusive output mode — the artifact is either markdown OR HTML, never both, so exactly one of the two labels applies per run.
+4. **Open in browser** — open the HTML unified plan locally for review and sharing. Shown only when an HTML unified plan exists. **Render only when `OUTPUT_FORMAT=html`.**
 5. **More clarifying questions to sharpen the doc** - Keep refining scope, edge cases, constraints, and preferences through further dialogue. Always shown.
 
 There is no "done" / "pause" option — the blocking question already waits, and the user ends by dismissing it (Esc) or saying they're finished. The unified plan artifact is already saved.
@@ -74,7 +73,7 @@ Immediately load the `spec-plan` skill in the current session. Pass the unified
 plan artifact path when one exists; otherwise pass a concise summary of the
 finalized brainstorm decisions. When the Phase 1.1 grounding scout produced a
 dossier and the file still exists, also pass its path
-(`/tmp/spec-first/spec-brainstorm/<run-id>/grounding.md`) — it gives
+(`<private-scratch-dir>/grounding.md`) — it gives
 planning verified quotes with `file:line` pointers to start from instead of
 re-scanning the repo. Do not print the closing summary first.
 
@@ -120,24 +119,6 @@ fallback and explain why seamless entry was unavailable.
 Do not print the closing summary first.
 
 **If user selects "More clarifying questions to sharpen the doc":** Return to Phase 1.3 (Collaborative Dialogue) and continue asking the user clarifying questions one at a time to further refine scope, edge cases, constraints, and preferences. Continue until the user is satisfied, then return to Phase 4. Do not show the closing summary yet.
-
-**If user selects "Publish to Proof — shareable link":**
-
-Load the `spec-proof` skill to publish the markdown unified plan. Pass:
-
-- **source file:** `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md`
-- **doc title:** `Plan: <topic title> (requirements-only)`
-- **identity:** `ai:spec-first` / `Spec-First`
-
-spec-proof creates a shared Proof doc from the markdown plan file (Create and
-Share workflow), binds the display name, and returns the share URL. Surface
-the URL to the user — they can open it to read, comment, or share with others
-— then return to the Phase 4 options and re-render the menu. This is a one-way
-publish: the local doc stays canonical and nothing syncs back, so option
-eligibility is unchanged (no need to re-evaluate `Resolve Before Planning`,
-the spec-lfg software gate, or residual findings on account of Proof).
-
-If the upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the Phase 4 options — don't leave them wondering why the option did nothing.
 
 **If user selects "Open in browser":** Display the absolute path to the `.html` unified plan so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the Phase 4 options so the user can pick a follow-up action.
 

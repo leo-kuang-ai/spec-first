@@ -123,6 +123,19 @@ The worker must never commit, stage, push, open a PR, mutate lifecycle status, o
 
 ## 8. Integrate From Actual Facts
 
+### Append-only recovery state
+
+Keep `run.json` immutable: it owns run identity, source/task refs, and initial authorization only. For a resumable run, read and append complete snapshots under `state/<generation>.json` through the canonical `spec-work-run-artifact state-read|state-write` helper.
+
+- Treat a legacy run with no state directory as generation 0, whose digest is the exact `run.json` bytes.
+- Every new snapshot supplies the reader's `expected_generation` and `expected_sha256`. A `run-state-conflict` response means another writer won; re-read and reconcile semantically instead of overwriting.
+- Carry requested/actual engine, authorization, collision, recovery, verification transaction, current worktree identity, and limitations for every unit. Do not use a mutable latest pointer.
+- A temporary file, non-contiguous generation, malformed snapshot, or broken `previous_sha256` chain is not state. Resume only from the highest complete valid prefix.
+- `verification.status: started` or an unknown interrupted outcome remains unknown. Only a confirmed result with evidence refs may become passed.
+- `run-source-drifted` is a semantic stop: inspect the new tree and decide whether the unit is already complete, needs re-verification, or requires user direction. Never automatically rerun a unit that may already have produced side effects.
+
+One orchestrator owns the writer lane. Workers return facts; they never append state directly.
+
 After each serial task or parallel batch:
 
 1. inspect actual git/filesystem changes, not only worker-reported paths;

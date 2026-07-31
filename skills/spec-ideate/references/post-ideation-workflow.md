@@ -53,7 +53,7 @@ The ideation artifact is produced **automatically** — persistence is not opt-i
    - Extension follows `OUTPUT_FORMAT` (`.html` default, `.md` on override).
    - **Repo mode:** ensure `docs/ideation/` exists (create if absent).
    - **Elsewhere mode with `docs/ideation/` already present:** use it.
-   - **Otherwise (no repo, or elsewhere with no `docs/ideation/`):** write into the run's spec-first temp area — the `<scratch-dir>` resolved in Phase 1 (`/tmp/spec-first/spec-ideate/<run-id>/`). Do **not** write into the user's current working directory, and do **not** create a `docs/ideation/` tree for a subject unrelated to the repo. Announce the absolute path and note it is temporary (`/tmp` is cleared on reboot — move it to keep it).
+   - **Otherwise (no repo, or elsewhere with no `docs/ideation/`):** return the complete deliverable inline and offer to write it only after the user selects a durable destination. Do **not** use run-local scratch as the only deliverable, write into an arbitrary current working directory, or create a `docs/ideation/` tree for a subject unrelated to the repo.
 2. **Choose the file path:** `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>` (or `<dir>/YYYY-MM-DD-open-ideation.<ext>` when no focus exists).
 3. **Load the section contract and rendering reference** (deferred from Phase 0.0): read `references/ideation-sections.md` and the format-rendering reference matching `OUTPUT_FORMAT` — `references/markdown-rendering.md` for `md`, `references/html-rendering.md` for `html`.
 4. **Write the document** per those references. `ideation-sections.md` defines the section contract (metadata, Grounding Context, Topic Axes, Ranked Ideas with per-idea fields, Rejection Summary); the rendering reference defines how the resolved format presents it. Content is identical across formats; only presentation differs.
@@ -85,10 +85,9 @@ The deliverable already exists (Phase 4), so the menu is purely *what next* — 
 
 **Stem:** "Your ideation is saved to `<path>`. What next?"
 
-Offer four options (self-contained labels with the distinguishing word front-loaded so they stay distinct when truncated). Option 1 is **format-keyed** — render exactly one of its two labels per run, matching `OUTPUT_FORMAT`:
+Offer the applicable options with self-contained labels and the distinguishing word front-loaded so they stay distinct when truncated. Renumber the visible options contiguously after applying the format gate:
 
 1. *(when `OUTPUT_FORMAT=html`)* **Open in browser** — open the saved HTML deliverable (re-open if it was already opened).
-   *(when `OUTPUT_FORMAT=md`)* **Publish to Proof** — publish the saved markdown to Proof and get a shareable link; one-way, the local file stays canonical.
 2. **Brainstorm one idea with `spec-brainstorm`** — commit a chosen idea to a requirements-only unified plan under `docs/plans/`; leaves spec-ideate. Asks which idea first.
 3. **Discuss or refine the ideas first** — stay here to think across the set before committing: adjust or interrogate one idea, compare several, or combine/merge them. Asks what you want to work on.
 4. **Done — keep the file and stop.**
@@ -97,15 +96,9 @@ Offer four options (self-contained labels with the distinguishing word front-loa
 
 If the user already named what they want to work on inline (e.g. "brainstorm the table tool", "tighten the highlighter idea", "merge the table and highlighter ideas"), skip the follow-up that asks what to work on for §5.2 / §5.3.
 
-### 5.1 Open in Browser (html) / Publish to Proof (md)
+### 5.1 Open in Browser (html)
 
-- **HTML — Open in browser.** (Re)open the saved file via the platform primitive where available; otherwise print the absolute path. Return to the Phase 5 menu. No Proof — the HTML file is the canonical record.
-- **Markdown — Publish to Proof.** The local markdown file already exists (Phase 4) and stays canonical; Proof is a one-way published copy, not a sync target. Load the `spec-proof` skill to publish, passing:
-  - **source file:** the saved `.md` file from Phase 4.
-  - **doc title:** `Ideation: <topic>` or the doc's H1.
-  - **identity:** `ai:spec-first` / `Spec-First`.
-
-  spec-proof creates a shared Proof doc (Create and Share workflow) and returns the share URL. Surface it to the user, then return to the Phase 5 menu — nothing syncs back to disk. If the Proof handoff fails after the proof skill's internal retry plus one orchestrator-side retry (~2s pause, narrated as "Retrying Proof... attempt 2/2"), tell the user Proof is unavailable and that the local file is intact at `<path>`, then return to the menu — the deliverable was never at risk (it was written in Phase 4). *(If the user explicitly asked for Proof during an HTML run: Proof is markdown-only and cannot ingest HTML, so render a throwaway markdown copy of the survivors as the Proof source and do not upload the `.html`.)*
+- **HTML — Open in browser.** (Re)open the saved file via the platform primitive where available; otherwise print the absolute path. Return to the Phase 5 menu. The HTML file is the canonical record.
 
 ### 5.2 Brainstorm One Idea
 
@@ -114,7 +107,7 @@ If the user already named what they want to work on inline (e.g. "brainstorm the
 
    > `<title> — <description>. Basis: <basis/evidence>. Source snapshot: <commit/version/observed state, including dirty/unknown status>. Why it matters: <rationale>. Known tradeoffs: <downsides>. Evidence limitations: <stale/partial/unknown constraints>. Unverified assumptions: <assumptions or none>. Relevant rejected alternative: <one directly adjacent rejected alternative and why it lost>.`
 
-   The basis/evidence directly feeds `spec-brainstorm`'s product-pressure-test, so it won't re-derive what we already know. Snapshot the load-bearing basis from the evidence already held by the orchestrator; if the worktree is dirty or the revision is unknown, say `dirty/unknown` rather than inventing a clean revision. When HEAD or a cited source changed after the idea was evaluated, mark that basis `stale` and keep it as a limitation — `spec-brainstorm` decides whether and how to re-ground it. Carry only one directly adjacent rejected alternative, chosen because it would change the selected idea's Product Contract; omit unrelated rejects and the complete rejection table. Preserve reasoned claims as unverified assumptions when no direct evidence supports them. Append a one-line provenance pointer: `(Seeded from spec-ideate: <path>, idea "<title>")` — it records origin and lets brainstorm pull adjacent detail if it wants, without being forced to read anything. Do not include implementation HOW or start any browser helper from the seed.
+   The basis/evidence directly feeds `spec-brainstorm`'s product-pressure-test, so it won't re-derive what we already know. Snapshot the load-bearing basis from the evidence already held by the orchestrator; if the worktree is dirty or the revision is unknown, say `dirty/unknown` rather than inventing a clean revision. When HEAD or a cited source changed after the idea was evaluated, mark that basis `stale` and keep it as a limitation — `spec-brainstorm` decides whether and how to re-ground it. Carry only one directly adjacent rejected alternative, chosen because it would change the selected idea's Product Contract; omit unrelated rejects and the complete rejection table. Preserve reasoned claims as unverified assumptions when no direct evidence supports them. If the user examined that exact tradeoff and selected the idea, append one transient settled-decision brief entry containing the decision, `user-directed` or `user-approved` class, rejected alternative, and one-line reason. Do not label an agent-ranked idea as settled. `spec-brainstorm` becomes the single durable owner by writing the accepted decision once in the Product Contract; the ideation artifact and handoff seed remain provenance inputs, not competing decision registries. Append a one-line provenance pointer: `(Seeded from spec-ideate: <path>, idea "<title>")` — it records origin and lets brainstorm pull adjacent detail if it wants, without being forced to read anything. Do not include implementation HOW or start any browser helper from the seed.
 3. **Load the `spec-brainstorm` skill** with that seed. The saved file is already the record — no extra write step.
 
 **Repo mode only:** do **not** skip brainstorming and go straight to `spec-plan` — `spec-plan` wants a brainstorm-grounded Product Contract. In elsewhere modes, ideation is a legitimate terminal state; brainstorming is optional deeper development of one idea, not a required next rung on an implementation ladder that does not exist in these modes.
@@ -145,7 +138,7 @@ Then narrate the path and end the session — do not return to the menu.
 
 Only when the file was **created fresh this run**: delete it, confirm the deletion, and end. On a **resume** run (a pre-existing file was updated in place), do **not** delete — tell the user the existing doc at `<path>` remains and offer no destructive action. Discard is never a default; it fires only on an explicit request.
 
-Do not delete the run's scratch directory (`<scratch-dir>`) on completion — it holds the V15 web-research cache reused across run-ids by later ideation invocations in the same session (see `references/web-research-cache.md`), the Checkpoint A/B files, the evidence dossiers, and (in the no-repo case) the deliverable itself. OS handles eventual cleanup.
+After durable outputs and any repo-backed checkpoint are confirmed, reap `<scratch-dir>` best-effort and record cleanup failure as a limitation. Its web research material and evidence dossiers are run-local only; no later invocation may depend on them, and outside a repo the complete deliverable must already have been returned inline or written to a user-selected durable destination.
 
 ## Quality Bar
 

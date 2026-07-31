@@ -16,6 +16,11 @@ const {
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
 const QODER_RULE_POINTER_PATH = '.qoder/rules/spec-first.md';
 const QODER_POINTER_FRONTMATTER = [
@@ -100,7 +105,7 @@ class QoderAdapter extends PointerBasedAdapter {
     const qoderCommand = [
       '---',
       `name: ${normalizeQoderName(commandDisplayName)}`,
-      `description: ${JSON.stringify(description)}`,
+      `description: ${formatFrontmatterScalar(description)}`,
       '---',
       '',
       body,
@@ -136,7 +141,7 @@ class QoderAdapter extends PointerBasedAdapter {
 
   transformAgentContent(content) {
     const { frontmatter, body } = splitMarkdownFrontmatter(content);
-    const fields = parseSimpleFrontmatterFields(frontmatter);
+    const fields = parseFrontmatterScalars(frontmatter);
     const name = normalizeQoderName(fields.name || fields.agent || 'spec-first-agent');
     const description = sanitizeFrontmatterScalar(fields.description || `spec-first agent ${name}`);
     const transformedBody = rewriteSharedPaths(body || content);
@@ -145,7 +150,7 @@ class QoderAdapter extends PointerBasedAdapter {
     return [
       '---',
       `name: ${name}`,
-      `description: ${JSON.stringify(description)}`,
+      `description: ${formatFrontmatterScalar(description)}`,
       `tools: [${tools.join(', ')}]`,
       '---',
       '',
@@ -395,45 +400,6 @@ function qoderRuntimeSkillName(context = {}) {
   return normalizeQoderName(context.runtimeName || context.skillName);
 }
 
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
-}
-
 function normalizeQoderName(value) {
   const normalized = String(value || '')
     .trim()
@@ -619,7 +585,7 @@ function inspectQoderCommandFiles(projectRoot, commandRoot) {
     .flatMap((commandPath) => {
       const content = fs.readFileSync(commandPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, commandPath).replace(/\\/g, '/');
       const issues = [];
       if (!fields.name) issues.push('missing name');
@@ -652,7 +618,7 @@ function inspectQoderSkillNames(projectRoot, skillsRoot) {
       if (!fs.existsSync(skillPath)) return [];
       const content = fs.readFileSync(skillPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, skillPath).replace(/\\/g, '/');
       const issues = [];
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
@@ -682,7 +648,7 @@ function inspectQoderAgentFrontmatter(projectRoot, agentsRoot) {
     .flatMap((agentPath) => {
       const content = fs.readFileSync(agentPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, agentPath).replace(/\\/g, '/');
       const tools = parseQoderTools(fields.tools);
       const issues = [];

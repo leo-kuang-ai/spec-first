@@ -12,6 +12,10 @@ const {
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 const { summarizeOperationPlan } = require('../state');
+const {
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
 class OpenCodeAdapter extends PlatformAdapter {
   get id() {
@@ -239,20 +243,6 @@ function addOpenCodeSetupHostPin(content) {
   ].join('\n'));
 }
 
-function splitMarkdownFrontmatter(content) {
-  if (!String(content || '').startsWith('---\n')) {
-    return { frontmatter: '', body: String(content || '') };
-  }
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
 function inspectOpenCodeSkillCollisions(projectRoot) {
   const roots = [
     { label: '.opencode/skills', path: path.join(projectRoot, '.opencode', 'skills') },
@@ -286,7 +276,7 @@ function inspectOpenCodeSkillFiles(projectRoot, skillsRoot) {
     const skillPath = path.join(skillsRoot, skillName, 'SKILL.md');
     const content = fs.readFileSync(skillPath, 'utf8');
     const { frontmatter } = splitMarkdownFrontmatter(content);
-    const fields = parseSimpleFrontmatterFields(frontmatter);
+    const fields = parseFrontmatterScalars(frontmatter);
     const issues = [];
     if (fields.name !== skillName) {
       issues.push(`name does not match folder (${fields.name || '<missing>'})`);
@@ -315,26 +305,6 @@ function inspectOpenCodeSkillFiles(projectRoot, skillsRoot) {
         fix: formatInitGuidance('opencode', 'in this project to regenerate OpenCode skill runtime assets'),
       };
   });
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-  return value;
 }
 
 function listSkillNames(rootPath) {

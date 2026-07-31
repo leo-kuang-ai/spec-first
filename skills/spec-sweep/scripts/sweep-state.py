@@ -8,7 +8,7 @@ merge, the single-writer lease, and the closed-item evidence rule are enforced
 in exactly one place. See `references/state-schema.md` for the cross-agent
 contract this script implements.
 
-Design rules (mirrors the repo's repo-profile-cache helper):
+Design rules:
   - Pure Python 3 stdlib. No third-party dependencies.
   - Every OPERATIONAL failure path prints a parseable STATUS WORD on line 1 and
     exits 0 — it never raises a traceback to the caller. Only genuine CLI

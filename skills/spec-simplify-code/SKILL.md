@@ -16,6 +16,19 @@ Resolve the simplification scope in this order:
 
 If none of the above produces a non-empty scope, stop and ask the user what to simplify rather than guessing. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
+**Preflight — skip a no-yield scope before loading review lenses.** If the
+resolved scope contains no substantive human-authored code and consists only
+of documentation/Markdown, generated or vendored files, dependency/lockfiles,
+or purely mechanical formatting, lint, or mass-rename churn, stop with a
+one-line `nothing to simplify` result. On a mixed diff, narrow the scope to the
+substantive code files. This is a change-kind gate, not a size threshold, and
+it never widens beyond caller-authorized paths.
+
+When the caller provides a plan as context, the plan is not additional
+simplification scope. Preserve any `session-settled:` structural decisions:
+deliberately separate implementations or duplicated package-local runtime
+assets remain separate even when consolidation would otherwise look cleaner.
+
 ## Step 2: Run 3 review lenses
 
 在派发 reviewer 前记录：

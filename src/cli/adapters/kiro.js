@@ -9,6 +9,11 @@ const {
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
 const KIRO_STEERING_POINTER_PATH = '.kiro/steering/spec-first.md';
 const KIRO_AGENT_READ_TOOLS = ['read'];
@@ -82,7 +87,7 @@ class KiroAdapter extends PointerBasedAdapter {
 
   transformAgentContent(content) {
     const { frontmatter, body } = splitMarkdownFrontmatter(content);
-    const fields = parseSimpleFrontmatterFields(frontmatter);
+    const fields = parseFrontmatterScalars(frontmatter);
     const name = normalizeKiroName(fields.name || fields.agent || 'spec-first-agent');
     const description = sanitizeFrontmatterScalar(fields.description || `spec-first agent ${name}`);
     const transformedBody = rewriteSharedPaths(body || content);
@@ -90,7 +95,7 @@ class KiroAdapter extends PointerBasedAdapter {
     return [
       '---',
       `name: ${name}`,
-      `description: ${JSON.stringify(description)}`,
+      `description: ${formatFrontmatterScalar(description)}`,
       `tools: [${KIRO_AGENT_READ_TOOLS.map((tool) => JSON.stringify(tool)).join(', ')}]`,
       '---',
       '',
@@ -267,45 +272,6 @@ function addKiroSetupHostPin(content) {
   ].join('\n'));
 }
 
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
-}
-
 function normalizeKiroName(value) {
   const normalized = String(value || '')
     .trim()
@@ -330,7 +296,7 @@ function inspectKiroSkillNames(projectRoot, skillsRoot) {
       const skillPath = path.join(skillsRoot, skillDir, 'SKILL.md');
       if (!fs.existsSync(skillPath)) return [];
       const { frontmatter } = splitMarkdownFrontmatter(fs.readFileSync(skillPath, 'utf8'));
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, skillPath).replace(/\\/g, '/');
       const issues = [];
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
@@ -363,7 +329,7 @@ function inspectKiroAgentFrontmatter(projectRoot, agentsRoot) {
     .flatMap((agentPath) => {
       const content = fs.readFileSync(agentPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, agentPath).replace(/\\/g, '/');
       const issues = [];
       if (!fields.name) issues.push('missing name');

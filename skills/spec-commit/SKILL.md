@@ -16,38 +16,21 @@ This helper owns commit composition and the authorized commit checkpoint only. I
 
 ## Context
 
-**On platforms other than Claude Code**, skip to the "Context fallback" section below and run the command there to gather context.
+Gather Git context by running each command as its own argv-style shell tool
+call. Do not join commands with shell separators, pipes, substitutions, or
+redirects; those forms are host-shell-specific and can hide the real exit
+status.
 
-**In Claude Code**, the five labeled sections below (Git status, Working tree diff, Current branch, Recent commits, Remote default branch) contain pre-populated data. Use them directly throughout this skill -- do not re-run these commands.
+| Command | Purpose | Non-zero or empty result |
+| --- | --- | --- |
+| `git status` | Working-tree state | Not a Git repository: stop |
+| `git diff HEAD` | Uncommitted changes | An unborn repo may have no `HEAD`; inspect tracked changes directly |
+| `git branch --show-current` | Current branch | Empty output means detached HEAD |
+| `git log --oneline -10` | Commit-message convention | An unborn repo has no history |
+| `git rev-parse --abbrev-ref origin/HEAD` | Remote default branch | Resolve it using the fallback in Step 1 |
 
-**Git status:**
-!`git status`
-
-**Working tree diff:**
-!`git diff HEAD`
-
-**Current branch:**
-!`git branch --show-current`
-
-**Recent commits:**
-!`git log --oneline -10`
-
-**Remote default branch:**
-!`git rev-parse --abbrev-ref origin/HEAD`
-
-### Context fallback
-
-**In Claude Code, skip this section — the data above is already available.**
-
-Run these commands separately to gather context without interleaving unrelated output:
-
-```bash
-git status
-git diff HEAD
-git branch --show-current
-git log --oneline -10
-git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo '__DEFAULT_BRANCH_UNRESOLVED__'
-```
+These facts are a snapshot. Re-read the branch and staged paths immediately
+before committing because the working tree may change after intake.
 
 ---
 
@@ -55,9 +38,9 @@ git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo '__DEFAULT_BRANCH_UNR
 
 ### Step 1: Gather context
 
-Use the context above (git status, working tree diff, current branch, recent commits, remote default branch). All data needed for this step is already available -- do not re-run those commands.
+Run every command in the Context section as a separate shell tool call.
 
-The remote default branch value returns something like `origin/main`. Strip the `origin/` prefix to get the branch name. If it returned `__DEFAULT_BRANCH_UNRESOLVED__`, an error, or a bare `HEAD`, try:
+The remote default branch value returns something like `origin/main`. Strip the `origin/` prefix to get the branch name. If the command exited non-zero or returned a bare `HEAD`, try:
 
 ```bash
 gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'

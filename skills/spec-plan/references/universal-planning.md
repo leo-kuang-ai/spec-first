@@ -161,8 +161,4 @@ After structuring the plan, ask the user how they want to receive it using the p
    - Use filename convention: `YYYY-MM-DD-<descriptive-name>-plan.md`
    - Start the document with a `# Title` heading, followed by `Created: YYYY-MM-DD` on the next line. No YAML frontmatter.
 
-2. **Publish to Proof — shareable link** — Proof requires an existing local Markdown source. Before loading `spec-proof`, resolve a short unique `<run-id>`, create a run-local directory under the OS temporary root at `spec-first/spec-plan/<run-id>/` (`/tmp/spec-first/spec-plan/<run-id>/` on POSIX), and write the complete plan there using the same Markdown structure and filename convention as the Save-to-disk branch. Confirm the file exists and is non-empty, then pass that existing local Markdown path, its title, and the normal Spec-First identity when you load `spec-proof`; publish those same Markdown bytes rather than reconstructing the plan in the handoff. The run-local file is canonical for this Proof copy. If the Proof publish fails, retain the file and report its concrete local Markdown path.
-
-3. **Save to disk AND publish to Proof** — First write the markdown file to the user's selected destination and confirm it exists and is non-empty. Then load `spec-proof` with that same path and publish that exact saved Markdown file; do not create or publish a second temporary reconstruction. The saved local file stays canonical. If the Proof publish fails, retain the saved file and report its concrete local Markdown path.
-
 Do not offer `/spec-work` (software-only) or issue creation (not applicable to non-software plans).

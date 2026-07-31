@@ -65,4 +65,56 @@ describe('doctor host CLI version probes', () => {
       reason_codes: ['opencode_generated_runtime_loader_unverified'],
     });
   });
+
+  test('keeps environment-scoped CLI failures machine-readable in host support', () => {
+    const error = new Error('spawn kiro ENOENT');
+    error.code = 'ENOENT';
+    const cliCheck = checkPlatformCli('kiro', {
+      platform: 'darwin',
+      runner() {
+        return { status: null, stdout: '', stderr: '', error };
+      },
+    });
+
+    expect(cliCheck).toMatchObject({
+      level: 'WARNING',
+      name: 'Kiro',
+      reasonCode: 'kiro_cli_not_found',
+    });
+    expect(buildHostSupportView(getAdapter('kiro'), cliCheck, [])).toMatchObject({
+      detected_version: null,
+      loader_evidence: false,
+      reason_codes: ['kiro_cli_not_found'],
+    });
+  });
+
+  test.each([
+    [
+      'timeout',
+      { status: null, stdout: '', stderr: '', error: Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' }), timedOut: true },
+      'kiro_cli_version_check_timeout',
+    ],
+    [
+      'nonzero exit',
+      { status: 1, stdout: '', stderr: 'version unavailable' },
+      'kiro_cli_version_check_failed',
+    ],
+  ])('classifies Kiro %s without turning it into loader evidence', (_label, runnerResult, reasonCode) => {
+    const cliCheck = checkPlatformCli('kiro', {
+      platform: 'darwin',
+      runner() {
+        return runnerResult;
+      },
+    });
+
+    expect(cliCheck).toMatchObject({
+      level: 'WARNING',
+      reasonCode,
+    });
+    expect(buildHostSupportView(getAdapter('kiro'), cliCheck, [])).toMatchObject({
+      detected_version: null,
+      loader_evidence: false,
+      reason_codes: [reasonCode],
+    });
+  });
 });

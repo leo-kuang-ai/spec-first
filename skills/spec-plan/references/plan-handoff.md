@@ -45,7 +45,7 @@ If artifact-backed mode was used:
 
 When `OUTPUT_FORMAT=md`, write the markdown directly per `references/markdown-rendering.md`. No HTML is composed.
 
-After all mutations in this run have settled (initial write, deepening synthesis, spec-doc-review `safe_auto` fixes when `OUTPUT_FORMAT=md`, and any bounded producer-owned HTML recompose), the artifact at its single path reflects the final state. Publishing to Proof is one-way and does not mutate the local file. HTML report-only review itself is byte-preserving.
+After all mutations in this run have settled (initial write, deepening synthesis, spec-doc-review `safe_auto` fixes when `OUTPUT_FORMAT=md`, and any bounded producer-owned HTML recompose), the artifact at its single path reflects the final state. HTML report-only review itself is byte-preserving.
 
 ## 5.4 Post-Generation Options
 
@@ -64,12 +64,11 @@ After all mutations in this run have settled (initial write, deepening synthesis
 **Recommended marker:** `spec-work` (option 1) always carries *(recommended)* — render option 1 as **Start `/spec-work`** *(recommended)* and leave option 2 unmarked. `spec-work` owns engine selection and can choose goal or dynamic-workflow execution when plan shape and host capability warrant it, so recommending it does not foreclose autonomous execution. Goal mode is the opt-in preference for users who want to bypass the normal implementation tail. Exactly one option ever carries *(recommended)*.
 3. **Decide on the review's open items** - Confirm or skip the suggested edits, and settle the judgment calls the auto-pass left for you. (Markdown `markdown-write` only; safe, mechanical fixes were already applied and remaining items may be deferred into Open Questions.)
 4. **Create Issue** - Create a tracked issue from this plan in your configured issue tracker (e.g., GitHub Issues, Linear, Jira)
-5. **Publish to Proof — shareable link** - Publish the plan to Every's Proof editor and get a shareable link to read, comment on, or share with others. One-way: the local plan file stays canonical. **Render only when `OUTPUT_FORMAT=md`.**
 5. **Open in browser** - Open the HTML plan file locally for review and sharing. **Render only when `OUTPUT_FORMAT=html`.**
 
 There is no "done" / "pause" option — the blocking question already waits, and the user ends the turn by dismissing it (Esc) or just not picking anything. The plan file is already saved.
 
-**Option 5 format-keyed label.** Under exclusive output mode, the plan exists as exactly one artifact — `.md` or `.html`, never both. Render the option 5 label matching the produced format. Proof ingests the `.md` source, so it does not apply to HTML runs; the browser option opens the local `.html` file directly. Implementation handoff (options 1 and 2) remains available in both modes only when the artifact is implementation-ready code — `spec-work` reads either format, and the launch prompt is emitted at handoff regardless of format (see the spec-work skill's plan-input handling).
+**HTML browser option.** Under exclusive output mode, the plan exists as exactly one artifact — `.md` or `.html`, never both. Render option 5 only for HTML so the browser can open the local `.html` file directly. Markdown remains available at its canonical local path. Implementation handoff (options 1 and 2) remains available in both modes only when the artifact is implementation-ready code — `spec-work` reads either format, and the launch prompt is emitted at handoff regardless of format (see the spec-work skill's plan-input handling).
 
 **Menu rendering:** The menu has up to 5 options (execution options 1 and 2 render only for implementation-ready code, and option 2 only on hosts with goal capability; option 3 is conditional — see below). Detect goal capability by capability, not by slash-command shape: Codex has it when `create_goal` is in the available tool list, while Claude Code has it through user-typed `/goal`. Account for each platform's blocking-question option cap rather than trimming choices: Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options. When the visible menu exceeds the current platform's cap, render it as a numbered list in chat with the hint "Pick a number or describe what you want." When the visible menu fits the cap, use the platform's blocking tool and renumber the visible options 1-N. When the platform's blocking tool is unavailable or errors (e.g., Codex edit modes where `request_user_input` is not exposed), fall back to the same numbered-list-in-chat rendering. Never silently skip the question.
 
@@ -84,16 +83,6 @@ Based on selection (the bare per-option routing is also stated inline in the SKI
   Render only for implementation-ready code plans, and only where the host has goal capability at all (Codex `create_goal` or Claude Code user-typed `/goal`) — omit the option where neither exists.
 - **Decide on the review's open items** -> Re-invoke `spec-doc-review mutation:apply-fixes <plan-path>` **without** `mode:headless` so the interactive routing question and walkthrough fire. The explicit token preserves this producer-owned write boundary. After it returns, re-render this menu with the refreshed counts so the user can pick what to do next.
 - **Create Issue** -> Follow the Issue Creation section below
-- **Publish to Proof — shareable link** -> Load the `spec-proof` skill to publish the plan. Pass:
-  - source file: `docs/plans/<plan_filename>.md`
-  - doc title: `Plan: <plan title from frontmatter>`
-  - identity: `ai:spec-first` / `Spec-First`
-
-  spec-proof creates a shared Proof doc from the plan file (Create and Share workflow), binds the display name, and returns the share URL. Surface the URL to the user — they can open it to read, comment, or share with others — then return to the post-generation options. This is a one-way publish: the local plan file stays canonical and nothing syncs back, so no re-review is needed and the menu re-renders with the same residual findings as before.
-
-  Note: the Proof option only renders when `OUTPUT_FORMAT=md`. Proof ingests markdown; HTML plans use the local browser option instead.
-
-  If the upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the options — don't leave them wondering why the option did nothing.
 - **Open in browser** -> Display the absolute path to the `.html` plan file so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the post-generation options so the user can pick a follow-up action.
 - **Free-form prompts that target the findings** (e.g., the user types "review", "walk through", "deep review" instead of picking a numbered option) -> for the producer-owned Markdown apply path, route as if they had picked `Decide on the review's open items` and pass `mutation:apply-fixes`. For HTML/report-only, re-run `spec-doc-review mode:headless mutation:report-only <plan-path>` only when a fresh review is requested and surface the report-only envelope; do not offer or imply a mutation walkthrough. Then return to the menu.
 - **Other free-form input** -> Accept revisions to the plan and loop back to options.

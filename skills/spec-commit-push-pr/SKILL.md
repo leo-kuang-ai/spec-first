@@ -25,7 +25,9 @@ Three flavors of intent. Pick one and follow the matching path; otherwise defaul
 - **Description update on existing PR.** If the user is asking to update, refresh, or rewrite an existing PR description (with no mention of committing or pushing), follow the Description Update workflow below. The user may also provide a focus (e.g., "update the PR description and add the benchmarking results"). Note any focus for DU-3.
 - **Full workflow.** Otherwise, follow the Full workflow below.
 
-**`mode:pipeline` modifier:** Set by orchestrated callers such as `spec-lfg`. Run the resolved mode non-interactively and suppress every blocking ask. The existing-PR rewrite question defaults to **not rewriting**; in description-update mode the preview ask is skipped and the rewrite applies directly because the update invocation is already the apply intent. Any other suppressed ask takes its conservative documented default: keep the current branch when possible, and stop/report instead of guessing when a base, PR, or branch state cannot be resolved.
+**`mode:pipeline` modifier:** Set by orchestrated callers such as `spec-lfg`. Run the resolved mode non-interactively and suppress every blocking ask. The existing-PR rewrite question defaults to **not rewriting**; in description-update mode the preview ask is skipped and the rewrite applies directly because the update invocation is already the apply intent. Any other suppressed ask takes its conservative documented default: keep the current branch when possible, and stop/report instead of guessing when a base, PR, or branch state cannot be resolved. After an authorized full-workflow landing, return a structured `watch_handoff` containing the PR number/URL, head SHA, base ref/SHA when available, and the caller's existing authorization source and scope. This handoff lets the pipeline owner enter its bounded review/CI/head/base-currency watch; it grants no new authority. Ordinary standalone and description-only runs do not start or recommend a watch by default.
+
+The landing disclosure for `mode:pipeline` includes bounded PR-feedback fixes and only a repo-policy-approved, non-rewriting branch-currency update. This helper never authorizes or performs merge, rebase, force-push, or history rewrite as part of that handoff. If the repository policy is absent or currency requires rewriting history, return `branch-currency-update-required` to the caller.
 
 ## Context
 
@@ -255,5 +257,22 @@ The new commits are already on the PR from Step 5. Report the PR URL, then ask w
 ### Step 8: Report
 
 Output the PR URL.
+
+For an authorized full-workflow `mode:pipeline` landing, also return:
+
+```yaml
+watch_handoff:
+  pr_number: <number>
+  pr_url: <url>
+  head_sha: <sha>
+  base_ref: <ref-or-null>
+  base_sha: <sha-or-null>
+  authorization_source: <visible-upstream-source>
+  authorization_scope: <visible-upstream-scope>
+```
+
+This is a fact-only handoff to the caller. It does not start a watch, retain
+raw provider content, or authorize merge, rebase, force-push, history rewrite,
+additional data egress, credentials, or external communication.
 
 If a body applied by this run contains a `## New concepts` section, print one line after the PR URL in every mode: `New concepts: <name>[, <name>]`. In interactive full-workflow runs, follow it with one line per taught concept: `Run spec-explain <name> to go deeper.` Do not print the trailer when this run applied no body, including a rewrite that was declined or pipeline-defaulted to no, or when no PR exists.

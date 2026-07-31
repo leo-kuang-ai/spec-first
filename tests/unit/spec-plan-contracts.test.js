@@ -30,7 +30,7 @@ describe('spec-plan current contracts', () => {
   });
 
   test('writes active only for Markdown software unified plans', () => {
-    expect(skill).toContain('only when `OUTPUT_FORMAT=md`');
+    expect(skill).toContain('Only when `OUTPUT_FORMAT=md`');
     expect(skill).toContain('status: active');
     expect(sections).toContain('status is independent of `artifact_readiness`');
     expect(sections).toContain('HTML plans do not carry `status`');
@@ -98,12 +98,11 @@ describe('spec-plan current contracts', () => {
     expect(skill).toContain('bounded bootstrap is not permission to decide it silently');
   });
 
-  test('materializes Proof-only universal plans and publishes the saved file for Save plus Proof', () => {
-    expect(universal).toContain('spec-first/spec-plan/<run-id>/');
-    expect(universal).toMatch(
-      /Publish to Proof[\s\S]*?write the complete plan[\s\S]*?existing local Markdown path[\s\S]*?load `spec-proof`/i,
-    );
-    expect(universal).toContain('publish that exact saved Markdown file');
-    expect(universal).toMatch(/Proof publish fails[\s\S]*?local Markdown path/i);
+  test('keeps universal planning local after retiring Proof publication', () => {
+    expect(universal).toContain('**Save to disk**');
+    expect(universal).toContain('Current working directory');
+    expect(universal).not.toContain('Publish to Proof');
+    expect(universal).not.toContain('spec-proof');
+    expect(handoff).toContain('**Open in browser**');
   });
 });

@@ -87,7 +87,7 @@ For email sources there are no source-side actions, so approval is moot — reco
 Ask where the sweep's state file lives:
 
 - **Committed to the repo** (recommended when multiple agents or machines share branches — one source of truth everyone reads and writes). Sets `sweep_state_path` to the committed default `docs/feedback-sweep/state.yml`.
-- **Machine-local under `/tmp`** (solo setups; keeps sweep bookkeeping out of the repo, no commit noise). Sets `sweep_state_path` to `/tmp/spec-first/spec-sweep/<repo-slug>/state.yml`, where `<repo-slug>` is derived from the repo (e.g. the basename of the repo root).
+- **Repo-local durable state** (default): `.spec-first/workflows/spec-sweep/<repo-slug>/state.yml`, where `<repo-slug>` is derived from the resolved repo identity rather than basename alone. This path is recoverable across invocations and follows the state schema's single-writer/atomic-write rules. A non-repo run must receive an explicit durable path or remain one-shot; temporary scratch is not a state owner.
 
 Let the user override the path if they want a different location. If they pick machine-local, note that a fresh checkout or a teammate's machine will not see this state — it is per-machine by design.
 
@@ -127,7 +127,7 @@ Offer to seed state from an existing legacy feedback-tracking file so prior work
 
   ```bash
   SKILL_DIR="<absolute path of this skill's directory>"
-  python3 "$SKILL_DIR/scripts/sweep-state.py" import-legacy --state <sweep_state_path> --file <legacy-path> --source-map '{"<legacy-id>":"<config-source-id>"}'
+  bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/sweep-state.py" import-legacy --state <sweep_state_path> --file <legacy-path> --source-map '{"<legacy-id>":"<config-source-id>"}'
   ```
 
   where `<sweep_state_path>` is the value captured in section 4 and `<legacy-path>` is the file the user named. Omit `--source-map` only when the legacy ids already equal the configured source ids. Report the `cursors_imported` and `items_imported` counts the command returns. The import is additive and best-effort: it maps what matches known shapes and skips the rest. It does **not** re-ingest source content and does **not** re-acknowledge imported items — mapped cursors carry forward so already-processed items stay processed.

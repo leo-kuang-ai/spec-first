@@ -118,6 +118,27 @@ function parseFrontmatterScalars(frontmatter) {
   return metadata;
 }
 
+function formatFrontmatterScalar(value) {
+  const raw = value == null ? '' : String(value);
+  if (raw.includes('\n')) {
+    throw new Error('Frontmatter scalar values must be single-line strings.');
+  }
+  if (raw.length === 0 || raw !== raw.trim() || shouldQuoteScalar(raw)) {
+    return JSON.stringify(raw);
+  }
+  return raw;
+}
+
+function shouldQuoteScalar(raw) {
+  if (/[\x00-\x1f\x7f]/.test(raw)) return true;
+  if (/[:#[\]{}&,*!|>'"%@`]/.test(raw)) return true;
+  if (/^(?:~|null|true|false|yes|no|on|off)$/i.test(raw)) return true;
+  if (/^[-+]?(?:\d[\d_]*)(?:\.\d[\d_]*)?(?:e[-+]?\d+)?$/i.test(raw)) return true;
+  if (/^[-+]?(?:\.inf|\.nan)$/i.test(raw)) return true;
+  if (/^\d{4}-\d{1,2}-\d{1,2}(?:[Tt ].*)?$/.test(raw)) return true;
+  return /^[-?:](?:\s|$)/.test(raw);
+}
+
 function parseScalar(rawScalar, scalarStart, hasSeparator = false) {
   if (hasSeparator && rawScalar.startsWith('#')) {
     return {
@@ -131,8 +152,9 @@ function parseScalar(rawScalar, scalarStart, hasSeparator = false) {
 
   const quoted = /^("|')([\s\S]*?)\1([ \t]*)(#.*)?$/.exec(rawScalar);
   if (quoted) {
+    const value = decodeQuotedScalar(quoted[1], quoted[2]);
     return {
-      value: quoted[2],
+      value,
       quote: quoted[1],
       comment: quoted[4] || null,
       valueStart: scalarStart + 1,
@@ -151,6 +173,17 @@ function parseScalar(rawScalar, scalarStart, hasSeparator = false) {
     valueStart: scalarStart + leadingLength,
     valueEnd: scalarStart + leadingLength + value.length,
   };
+}
+
+function decodeQuotedScalar(quote, rawValue) {
+  if (quote === '"') {
+    try {
+      return JSON.parse(`"${rawValue}"`);
+    } catch (_error) {
+      return rawValue;
+    }
+  }
+  return rawValue.replace(/''/g, "'");
 }
 
 function lineRecords(text) {
@@ -177,6 +210,7 @@ function lineRecords(text) {
 }
 
 module.exports = {
+  formatFrontmatterScalar,
   inspectMarkdownFrontmatter,
   normalizeNewlines,
   parseFrontmatterScalarOccurrences,

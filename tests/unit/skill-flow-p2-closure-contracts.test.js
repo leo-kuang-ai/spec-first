@@ -39,13 +39,14 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     const caller = read('skills/spec-compound/SKILL.md');
     const prompt = read('skills/spec-compound/references/agents/session-historian.md');
 
-    expect(caller).toContain('`output_path: /tmp/spec-first/spec-compound/{run_id}/session-history.md`');
-    expect(prompt).toContain('/tmp/spec-first/spec-compound/{run_id}/session-history.md');
-    expect(prompt).toContain('caller 提供的 run-local scratch path');
-    expect(prompt).toContain('不得写 tracked/product files');
-    expect(prompt).toContain('只返回 artifact path');
-    expect(prompt).toContain('inline 返回完整 prose');
-    expect(prompt).toContain('native file-write tool 写唯一的 `output_path`');
+    expect(caller).toContain('`output_path: <private-scratch-dir>/session-history.md`');
+    expect(prompt).toContain('`output_path`');
+    expect(prompt).toContain('<private-scratch-dir>/session-history.md');
+    expect(prompt).toContain('caller-provided run-local private scratch path');
+    expect(prompt).toContain('do not write tracked/product files');
+    expect(prompt).toContain('return only the artifact path');
+    expect(prompt).toContain('return the complete prose inline');
+    expect(prompt).toContain('native file-write tool');
     expect(prompt).not.toContain('Never write any files');
   });
 
@@ -53,7 +54,8 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     const skill = read('skills/spec-worktree/SKILL.md');
     const callers = section(skill, '## Integration');
 
-    expect(callers).toContain('当前已确认的 caller 只有 `spec-dogfood`');
+    expect(callers).toContain('`spec-dogfood` uses existing-ref mode');
+    expect(callers).toContain('`spec-work` may use new-work or existing-ref mode');
     expect(callers).not.toContain('`spec-work` and `spec-code-review` offer this skill');
   });
 
@@ -69,14 +71,15 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     expect(prompt).toContain('只有修复已应用并完成验证后才能确认完成');
   });
 
-  test('SF-20 code review 在 NO-CACHE 与 helper failure 时 fresh derive 且不持久化', () => {
+  test('SF-20 code review 从真实 reviewed tree 当轮派生且不跨 source identity 复用', () => {
     const skill = read('skills/spec-code-review/SKILL.md');
-    const cacheSection = section(skill, '### Stage 2c: Resolve the shared project profile (cache)');
+    const groundingSection = section(skill, '### Stage 2c: Resolve current-tree orientation');
 
-    expect(cacheSection).toMatch(/`NO-CACHE`[\s\S]*fresh derive profile/i);
-    expect(cacheSection).toMatch(/helper invocation 失败[\s\S]*fresh derive/i);
-    expect(cacheSection).toMatch(/`NO-CACHE`[\s\S]*跳过 `put`/i);
-    expect(cacheSection).not.toContain('skip the cache entirely — do not derive a profile');
+    expect(groundingSection).toContain('tree actually under review');
+    expect(groundingSection).toContain('current git identity and dirty state');
+    expect(groundingSection).toContain('derive only from the fetched reviewed refs/diff');
+    expect(groundingSection).toContain('Do not persist or reuse this orientation');
+    expect(groundingSection).toContain('record the exact degraded fact');
   });
 
   test('SF-21 maintainability 不能用 P1 anchor-50 绕过 synthesis', () => {

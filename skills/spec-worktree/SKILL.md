@@ -1,6 +1,6 @@
 ---
 name: spec-worktree
-description: Internal helper for caller-owned git worktree isolation. 当前受治理的 caller 是 spec-dogfood；未来 caller 必须先定义 forward invocation 与 intake contract。
+description: Internal helper for caller-owned git worktree isolation. Governed callers are spec-dogfood and spec-work; every caller must provide the forward invocation and intake contract.
 user-invocable: false
 allowed-tools: Bash(bash *worktree-manager.sh*)
 ---
@@ -140,7 +140,11 @@ Do not create a new-work worktree for single-task work that can happen on a bran
 
 ## Integration
 
-当前已确认的 caller 只有 `spec-dogfood`。它针对 PR 或非当前分支使用 existing-ref mode：PR target 调用 `isolate pr:<number>`，branch target 调用 `isolate <branch>`；随后消费 `Worktree ready: <path>` 或 `already_checked_out branch=<name> path=<path>`，不得切换 primary checkout。
+This helper accepts only a caller-owned isolation contract: caller identity, target repo, target ref or new branch, reason isolation is needed, allowed setup side effects, environment-copy authorization, and the return path consumer. It detects or creates the worktree and returns facts. It never selects an execution engine, dispatches a worker, stages, commits, pushes, opens a PR, or decides cleanup.
+
+`spec-dogfood` uses existing-ref mode for a PR or non-current branch: `isolate pr:<number>` or `isolate <branch>`. It consumes `Worktree ready: <path>` or `already_checked_out branch=<name> path=<path>` without switching the primary checkout.
+
+`spec-work` may use new-work or existing-ref mode only after `execution-strategy.md` has locked one target repo and recorded mutation authorization. It owns all implementation and recovery state outside this helper. The returned worktree root becomes the snapshot `worktree_identity.repo_root`; any later identity drift routes back to `spec-work` as `run-source-drifted` rather than causing this helper to recreate, reset, or rerun work.
 
 未来 caller 必须先在其 public owner source 中增加 forward invocation 与 intake contract。本 helper 的 reverse claim 不能单独建立 integration edge。
 

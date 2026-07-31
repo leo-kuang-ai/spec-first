@@ -108,4 +108,24 @@ describe('spec-resolve-pr-feedback contracts', () => {
     expect(getThread).toContain('could not resolve owner/repo');
     expect(getThread).toContain('pass OWNER/REPO as the third argument');
   });
+
+  test('streams large GraphQL payloads privately and blocks invisible pending-review replies', () => {
+    const entrypoint = read('skills/spec-resolve-pr-feedback/SKILL.md');
+    const fullMode = read('skills/spec-resolve-pr-feedback/references/full-mode.md');
+    const pipeline = read('skills/spec-resolve-pr-feedback/references/pipeline-return.md');
+    const getComments = read('skills/spec-resolve-pr-feedback/scripts/get-pr-comments');
+    const reply = read('skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread');
+
+    expect(getComments).toContain('mktemp "${TMPDIR:-/tmp}/spec-pr-threads.XXXXXX"');
+    expect(getComments).toContain('chmod 600');
+    expect(getComments).toContain("trap 'rm -f");
+    expect(getComments).toContain('--slurpfile threads');
+    expect(getComments).toContain('pending_review:');
+    expect(getComments).toContain('data.viewer.login');
+    expect(reply).toContain("pending_review field");
+    expect(fullMode).toContain('pending-review-visible-reply-blocked');
+    expect(entrypoint).toContain('mode:pipeline-return');
+    expect(pipeline).toMatch(/Failed,\s+not-run/);
+    expect(pipeline).toMatch(/Do not infer[\s\S]*commit, push, reply, thread\s+resolution/i);
+  });
 });

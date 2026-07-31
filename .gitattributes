@@ -26,6 +26,10 @@
 *.txt   text eol=lf
 *.toml  text eol=lf
 
+# Direct-counterpart Skill 中无扩展名的 bundled script 也需显式锁定；
+# 按扩展名匹配无法保护其 shebang。
+skills/spec-resolve-pr-feedback/scripts/* text eol=lf
+
 # Windows 批处理若将来引入,保持 CRLF(cmd 对 LF 容忍度低)
 *.bat   text eol=crlf
 *.cmd   text eol=crlf

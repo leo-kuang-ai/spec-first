@@ -8,7 +8,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the spec-riffrec-feedback-analysis SKILL.md>"
-   python "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input
    ```
 
    Use `--output-dir <dir>` when the artifact should live somewhere specific. In a repo with `docs/brainstorms/`, the default output goes under `docs/brainstorms/riffrec-feedback/` as an evidence/kickoff-artifact exception, not as the durable brainstorm output convention.

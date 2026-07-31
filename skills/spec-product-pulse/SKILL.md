@@ -50,10 +50,13 @@ Apply a **15-minute trailing buffer** to the window's upper bound. Many analytic
 
 ### Phase 0: Route by Config State
 
-**Read config.** The repo root is pre-resolved at skill load:
-!`git rev-parse --show-toplevel`
-
-If the line above is an absolute path, use it as `<repo-root>`. If it is empty, shows an error, or still shows a backtick command string (a harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.spec-first/config.local.yaml` with the native file-read tool (e.g., Read in Claude Code, read_file in Codex). If the root cannot be resolved or the file does not exist, treat this as a first run. Otherwise extract values for the `pulse_*` keys listed under "Config keys" below.
+**Read config.** Resolve `<repo-root>` at runtime by running
+`git rev-parse --show-toplevel` with the shell tool. Then read
+`<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If
+the root cannot be resolved or the file does not exist, treat this as a first
+run. Otherwise extract the `pulse_*` keys listed below. Reports remain owned by
+the fixed `docs/pulse-reports/` contract; this Skill does not introduce a
+global configurable artifact root.
 
 **Config keys:**
 - `pulse_product_name` -- string, used in report titles. Required for routing: if unset, skill is unconfigured.

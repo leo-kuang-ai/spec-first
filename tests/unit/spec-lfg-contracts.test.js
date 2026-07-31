@@ -16,6 +16,10 @@ const reviewFollowup = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-lfg/references/review-followup.md'),
   'utf8',
 );
+const nextWorkHandoff = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-lfg/references/next-work-handoff.md'),
+  'utf8',
+);
 
 describe('spec-lfg current contracts', () => {
   test('owns plan completion after return-to-caller gates close', () => {
@@ -55,9 +59,9 @@ describe('spec-lfg current contracts', () => {
     expect(skill).toContain('coverage.dispatch_reason_code');
     expect(skill).toMatch(/status: complete[\s\S]*inline-fallback/is);
     expect(skill).toMatch(/`failed`、`degraded`、`skipped`[\s\S]*副作用前停止/is);
-    expect(reviewFollowup).toContain('只消费该对象');
+    expect(reviewFollowup).toContain('Consume only the returned JSON object');
     expect(reviewFollowup).toContain('coverage.dispatch_reason_code');
-    expect(reviewFollowup).toContain('status 为 `failed`、`degraded`、`skipped`');
+    expect(reviewFollowup).toMatch(/`failed`, `degraded`,\s+`skipped`/);
     expect(reviewFollowup).toContain('JSON `actionable_findings`');
     expect(reviewFollowup).not.toContain('or the markdown Actionable Findings section');
   });
@@ -93,7 +97,7 @@ describe('spec-lfg current contracts', () => {
     const residualIndex = skill.indexOf('7. **Autonomous residual handoff**');
     const lifecycleIndex = skill.indexOf('7.5. **Complete the source plan lifecycle marker.**');
     const commitIndex = skill.indexOf('8. Invoke the `spec-commit-push-pr` skill');
-    const ciIndex = skill.indexOf('9. **CI watch and autofix loop**');
+    const ciIndex = skill.indexOf('9. **Bounded review, CI, head, and base-currency watch**');
 
     expect([reviewIndex, browserIndex, finalVerificationIndex, shippingIndex, residualIndex, lifecycleIndex, commitIndex, ciIndex])
       .not.toContain(-1);
@@ -104,8 +108,8 @@ describe('spec-lfg current contracts', () => {
     expect(residualIndex).toBeLessThan(lifecycleIndex);
     expect(lifecycleIndex).toBeLessThan(commitIndex);
     expect(commitIndex).toBeLessThan(ciIndex);
-    expect(reviewFollowup).toContain('leave verified review fixes in the working tree');
-    expect(reviewFollowup).toContain('Do not stage, commit, push, file tracker items, or edit a PR');
+    expect(reviewFollowup).toMatch(/leave verified fixes in the working tree/i);
+    expect(reviewFollowup).toMatch(/Do not stage, commit, push, file\s+tracker items, or edit a PR/);
     expect(reviewFollowup).not.toContain('git commit');
     expect(reviewFollowup).not.toContain('git push');
   });
@@ -197,6 +201,42 @@ describe('spec-lfg current contracts', () => {
         expect(operation.contents).toContain('landing_authorization: authorized');
         expect(operation.contents).toContain('authorization_source: current-user-explicit-spec-lfg');
         expect(operation.contents).toContain('`mode:pipeline` only selects unattended execution and never grants authority');
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('offers spec-handoff only after terminal closeout and explicit user acceptance', () => {
+    const watchIndex = skill.indexOf('9. **Bounded review, CI, head, and base-currency watch**');
+    const handoffIndex = skill.indexOf('10. **Offer an optional next-work handoff, then finish.**');
+    const doneIndex = skill.indexOf('<promise>DONE</promise>', handoffIndex);
+
+    expect(watchIndex).toBeGreaterThan(-1);
+    expect(handoffIndex).toBeGreaterThan(watchIndex);
+    expect(doneIndex).toBeGreaterThan(handoffIndex);
+    expect(skill).toMatch(/after the current pipeline reaches its terminal state/i);
+    expect(skill).toContain('do not invoke `spec-handoff` before the user explicitly accepts');
+    expect(nextWorkHandoff).toMatch(/Do not infer eligibility from a\s+generic non-goal list/);
+    expect(nextWorkHandoff).toContain('LFG owns the recommendation');
+    expect(nextWorkHandoff).toContain('do not ask `spec-handoff` to rediscover or');
+    expect(nextWorkHandoff).toContain('Authoritative prior plan');
+    expect(nextWorkHandoff).toContain('Actual delivery state');
+  });
+
+  test('projects the LFG next-work reference and public handoff target to every host', () => {
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), `spec-lfg-handoff-${platform}-`));
+      try {
+        const adapter = getAdapter(platform);
+        const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const expectedReference = path.posix.join(
+          adapter.skillsRoot.replace(/\\/g, '/'),
+          'spec-lfg/references/next-work-handoff.md',
+        );
+
+        expect(plan.operations.find((operation) => operation.path === expectedReference)).toBeDefined();
+        expect(syncedAssets.skills).toContain('spec-handoff');
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
       }

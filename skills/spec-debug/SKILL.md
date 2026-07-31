@@ -16,7 +16,20 @@ Find root causes, then fix them. This skill investigates bugs systematically —
 - **权威：** 运行时复现、source、test 与 log 提供事实；LLM 判断因果充分性；诊断、local mutation、commit 与 landing 分别授权。
 - **消费者：** 用户、`spec-work`、`spec-code-review`、issue/PR owner 与后续知识沉淀流程。
 
-<bug_description> #$ARGUMENTS </bug_description>
+<bug_description> #<invocation arguments supplied by the current host> </bug_description>
+
+## Mode
+
+The default mode is interactive. Investigate, present the causal chain, and
+use the Phase 2 fix-choice gate and Phase 4 handoff as written below.
+
+When the invocation includes `mode:pipeline-return`, strip that token from
+`<bug_description>` and load `references/pipeline-return.md`. This mode is for
+an outer workflow such as `spec-lfg`: it replaces blocking questions with
+conservative defaults, applies only an inherited and explicitly authorized
+local convergent fix, and returns a structured envelope to the caller. The
+mode token does not authorize mutation, commit, push, external communication,
+credentials, or tracker writes.
 
 ## Scenario Capability
 
@@ -95,14 +108,7 @@ Confirm the bug exists and understand its behavior. Run the test, trigger the er
 - **Manual setup required:** If reproduction needs specific conditions the agent cannot create alone (data states, user roles, external services, environment config), document the exact setup steps and guide the user through them. Clear step-by-step instructions save significant time even when the process is fully manual.
 - **Does not reproduce after 2-3 attempts:** Read `references/investigation-techniques.md` for intermittent-bug techniques.
 - **Cannot reproduce at all in this environment:** Document what was tried and what conditions appear to be missing.
-- **Writing the reproduction test:** Orient on the project's testing conventions before authoring the failing test. Resolve them from the shared repo-grounding cache first — set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
-
-  ```bash
-  SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-  python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-  ```
-
-  On `HIT`, use the cached profile's `conventions.testing` field as the testing-convention orientation — do not re-read the *root* instruction files for it. (If the bug lives under a subdirectory with its own scoped `AGENTS.md`/`CLAUDE.md` testing rules, still read those fresh — subdirectory-scoped instructions are excluded from the cache.) **But if that field is empty or null** (the profile recorded no explicit testing guidance), still fall back to the inline check below — in particular, look for a clear style across the project's existing tests. On `MISS` or `NO-CACHE` (or any error), fall back to deriving it inline as today: if the project has testing-conventions guidance — a dedicated testing skill, an `AGENTS.md`/`CLAUDE.md` testing section, or a clear style across existing tests — apply it. The cache is purely an orientation convenience here; never block on it, and do not derive or persist a full profile just for this lookup. Either way, inspect existing tests before adding coverage: use an existing failing test when it already captures the bug, update an existing test when it owns the contract but has the wrong expectation, strengthen an over-mocked test when it should have caught the bug, or add a new minimal isolated test only when no existing test is the right home. The chosen test must fail on the current bug and pass once the corrected behavior lands; name it descriptively so the failure message itself explains the bug.
+- **Writing the reproduction test:** Orient on testing conventions from the current target repo/worktree immediately before authoring the failing test. Read the active root and scoped `AGENTS.md`/`CLAUDE.md` guidance plus representative existing tests; record the current git identity and dirty state when available. Do not persist or reuse this orientation across runs, branches, or worktrees. If guidance is unreadable or absent, record that concrete degraded fact and use only the observable style in readable existing tests. Use an existing failing test when it already captures the bug, update an existing test when it owns the contract but has the wrong expectation, strengthen an over-mocked test when it should have caught the bug, or add a new minimal isolated test only when no existing test is the right home. The chosen test must fail on the current bug and pass once the corrected behavior lands; name it descriptively so the failure message itself explains the bug.
 
 #### 1.2 Verify environment sanity
 
@@ -199,6 +205,11 @@ Once the root cause is confirmed, present:
 
 Then offer next steps.
 
+In `mode:pipeline-return`, do not ask. Follow
+`references/pipeline-return.md`: apply a convergent local fix only when the
+caller's visible authorization covers it; otherwise return diagnosis or a
+named residual. A design/product conflict is `needs-human`, not a silent fix.
+
 Use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex). In Claude Code, call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded — a pending schema load is not a reason to fall back. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes). Never silently skip the question.
 
 Options to offer:
@@ -270,6 +281,11 @@ Analyze how this was introduced and what allowed it to survive. Note any systemi
 ---
 
 ### Phase 4: Handoff
+
+In `mode:pipeline-return`, skip the interactive menu and emit the structured
+return from `references/pipeline-return.md`. Do not run a nested shipping tail,
+commit, push, edit a PR, or file a tracker item. The outer caller owns those
+exits and any durable handoff.
 
 **Structured summary** — diagnosis-only runs write this immediately. When Phase 3 changed code, assemble the final version after the post-fix tail and structured verification closeout below, so the summary references the final tree rather than a pre-review green result:
 

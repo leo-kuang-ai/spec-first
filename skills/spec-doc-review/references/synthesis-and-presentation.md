@@ -1,5 +1,7 @@
 # Phases 3-5: Synthesis, Presentation, and Next Action
 
+All human-facing findings must satisfy `references/rendering-floor.md` before this surface applies its own layout.
+
 ## Phase 3: Synthesize Findings
 
 Process findings from all agents through this pipeline. Order matters — each step depends on the previous. The pipeline implements the finding-lifecycle state machine: **Raised → (Confidence Gate | FYI-eligible | Dropped) → Deduplicated → Classified → SafeAuto | GatedAuto | Manual | FYI**. Re-evaluate state at each step boundary; do not carry forward assumptions from earlier steps as prose-level shortcuts.

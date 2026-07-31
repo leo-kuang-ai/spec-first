@@ -8,6 +8,10 @@ How an explainer renders as HTML. Load at compose time (Phase 4), not earlier. T
 - **All metadata appears as visible text — single source of truth.** A visible header block carries: title, date, input shape (concept / diff / idea / recap), the subject (topic, ref, or window), and — when Phase 2 fell back to model knowledge — the label `Unverified — from model knowledge, not checked against current sources`. No hidden machine-readable copy: no JSON script block, no `data-*` mirror, no `<meta>` duplication. This header is what a future library layer indexes, so keep the field names stable.
 - **Display-only.** No forms, no click handlers, no embedded quizzes, no "submit" affordances, no scripts. The check-in lives in the session.
 - **ASCII identifiers.** Class names and element IDs are ASCII-only.
+- **No internal identifiers in reader content.** Do not render scratch paths,
+  run ids, authorization tokens, provider/model receipts, or machine-specific
+  identifiers in the explainer body. The delivery path stays outside the
+  teaching artifact.
 - **Composition signal.** A visible footer names the composition timestamp and the composing skill: `Composed 2026-07-02 by spec-explain`.
 
 ## Show-n-tell: match the form to the material

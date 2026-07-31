@@ -33,7 +33,7 @@ Ask one question at a time. Prefer concise single-select choices when natural op
 
 ## Focus Hint
 
-<focus_hint> #$ARGUMENTS </focus_hint>
+<focus_hint> #<invocation arguments supplied by the current host> </focus_hint>
 
 Interpret any provided argument as optional context. It may be:
 
@@ -280,29 +280,24 @@ Generate a `<run-id>` once at the start of Phase 1 (8 hex chars). Reuse it for t
 **Pre-resolve the scratch directory path.** Scratch lives directly under `/tmp` (not under `$TMPDIR` and not under `.context/`). `$TMPDIR` on macOS resolves to an obscure per-user path like `/var/folders/64/.../T/` that is hostile for users who want to inspect checkpoints, copy them elsewhere, or reference them later — `/tmp` is universally accessible on macOS, Linux, and WSL, and the per-user isolation `$TMPDIR` provides is not valuable for ephemeral ideation scratch. Run one bash command to create the directory and capture its absolute path for downstream use.
 
 ```bash
-SCRATCH_DIR="/tmp/spec-first/spec-ideate/<run-id>"
-mkdir -p "$SCRATCH_DIR"
+umask 077
+SCRATCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-ideate.XXXXXX")"
+[ -d "$SCRATCH_DIR" ] && [ ! -L "$SCRATCH_DIR" ] || { echo 'private scratch creation failed' >&2; exit 1; }
+chmod 700 "$SCRATCH_DIR"
 echo "$SCRATCH_DIR"
 ```
 
-Use the echoed absolute path (`/tmp/spec-first/spec-ideate/<run-id>`) as `<scratch-dir>` for every subsequent checkpoint write and cache read in this run. The run directory is not deleted on completion — the V15 cache is session-scoped and reused across run-ids, the checkpoints follow the cross-invocation-reusable convention, and in the no-repo case the deliverable itself is written here (see `references/post-ideation-workflow.md` Phase 4 and §5.5).
+Use the echoed absolute path as `<scratch-dir>` only for this run. Recheck that it remains an owned, non-symlink directory before atomic publication. Web research material may be reused only inside this run; no cache or checkpoint in scratch crosses invocation boundaries. Durable repo-backed checkpoints belong under `.spec-first/workflows/spec-ideate/`; outside a repo, return the complete deliverable inline unless the user selects a durable destination. Scratch must never be the only recoverable deliverable or handoff pointer.
 
 With authorized dispatch, run grounding agents in bounded parallel in the **foreground**. Otherwise execute the same grounding roles serially inline; results are still required before Phase 2.
 
 **Repo mode dispatch:**
 
-**Resolve the project profile from the shared cache first.** The question-agnostic profile (stack, top-level layout, conventions, root instruction files) is identical for every run at this commit, so reuse it instead of re-deriving it in the codebase scan. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
-
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
-
-On `HIT`, load the profile JSON — that is your agnostic project shape (stack, top-level layout, conventions); do not re-derive it in the scan. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` only when the package-local boundary permits it; otherwise derive the profile inline and record the matching fallback reason. Persist usable JSON under `<scratch-dir>` with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` when available. On `NO-CACHE`, derive the agnostic shape inline and skip the `put`. The cache is an optimization, never a hard dependency.
+**Resolve current project orientation first.** Derive the stack, top-level layout, conventions, and root instruction facts from the current target repo/worktree for this run. Record current git identity and dirty state when available, carry direct source refs, and never persist or reuse the orientation across runs, branches, or worktrees. If git or a source cannot be read, record the concrete degraded fact and continue with only the bounded readable evidence; do not claim complete or fresh repo grounding.
 
 1. **Quick context scan** — dispatch a generic worker and request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit. Before dispatching, apply the routing test from "User-Supplied Research Artifacts" below to any root-level `*.md` file the focus hint names: research artifacts (evidence) take that subsection's distillation path, so list them on the prompt's research-artifacts line to keep the scan from duplicating them into `User-named references`. Dispatch with this prompt:
 
-   > **Project profile handling (read first):** if a project profile is supplied at the end of this prompt, its agnostic shape — stack/language/framework, top-level directory layout, conventions, and root instruction-file content — is already established; do **not** re-derive it. Skip reading the instruction files and globbing the layout for those facts, and run only the question-specific slice (notable patterns bearing on the focus, pain points, leverage points; in surprise-me mode also sample a few representative files per area and surface recent PR/commit activity). If no profile is supplied, derive the full shape as described below.
+   > **Run-local orientation handling (read first):** if a current-tree orientation is supplied at the end of this prompt, its agnostic shape and source identity were established for this run; confirm the identity still matches before using it, then run the question-specific slice. If the identity changed or no orientation is supplied, derive the full shape from current sources as described below.
    >
    > Read the project's root agent-instruction file for this harness (e.g., `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or `.cursor/rules`) and `README.md` when present, then discover the top-level directory layout using the native file-search/glob tool (e.g., `Glob` with pattern `*` or `*/*` in Claude Code). Also read `STRATEGY.md` if it exists — it captures the product's target problem, approach, persona, metrics, and tracks.
    >

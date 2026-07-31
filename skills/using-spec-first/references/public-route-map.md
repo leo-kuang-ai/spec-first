@@ -34,6 +34,7 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are advisor
 ## Standalone Skills
 
 - Need a dense personal explainer, exercise, or durable learning aid -> `spec-explain`; a lightweight one-off “how should X be written?” explanation stays in the Direct Lane. Make a project-grounded adoption verdict -> `spec-pov`.
+- Explicitly create cross-session continuity, or find/resume a user-selected handoff source -> `spec-handoff`; ordinary current-session continuation and workflow-internal returns stay with their current owner.
 - Set product direction, roadmap, or metrics -> `spec-strategy`.
 - Simplify recent changes without changing behavior -> `spec-simplify-code`; real bugs still use `spec-debug`.
 - Mine project conventions from code evidence -> `spec-rule-miner`.

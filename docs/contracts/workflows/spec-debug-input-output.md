@@ -1,11 +1,11 @@
 # spec-debug 输入输出与执行流
 
-本文档说明当前 `skills/spec-debug/SKILL.md` 的输入、输出和执行流。当前 `spec-debug` 以 CE `ce-debug` source 为语义基准，保留 CE 英文 skill 内容，只做 spec-first 名称、命令和缓存路径投影。本文档是说明性文档，不替代 `skills/spec-debug/SKILL.md`。
+本文档说明当前 `skills/spec-debug/SKILL.md` 的输入、输出和执行流。当前 `spec-debug` 以 spec-first source 与证据边界为权威，并吸收 CE `ce-debug` 中兼容的调试语义；repo orientation 每次从当前 target repo/worktree 读取，不使用跨 run cache。本文档是说明性文档，不替代 `skills/spec-debug/SKILL.md`。
 
 ## Source Of Truth
 
 - 当前 source：`skills/spec-debug/SKILL.md`
-- 辅助脚本：`skills/spec-debug/scripts/repo-profile-cache.py`
+- 当前 grounding：`skills/spec-debug/SKILL.md` Phase 1.1 的 current target repo/worktree 读取契约
 - 相关 references：`skills/spec-debug/references/**`
 - CE 基准：`/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-debug/**`
 - Generated runtime mirrors 不是 source：`.claude/**`、`.codex/**`、`.agents/skills/**` 等不在本文档范围内。

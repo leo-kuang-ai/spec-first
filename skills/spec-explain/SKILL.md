@@ -1,6 +1,6 @@
 ---
 name: spec-explain
-description: "Turn a concept, a diff, an idea, or a window of your own recent work into a dense, visual explainer written for you personally — with an optional check-in (predict-then-reveal for diffs, corrected exercises) that makes the material stick. For learning, not repo docs or verdicts."
+description: "Create a durable, visual teaching artifact for a concept, diff, idea, or recent-work window, with an optional check-in that makes it stick. Use when the user asks to be taught or wants a deep explainer; not for ordinary Q&A, brief why-followups, diagnosis, status updates, or concise trade-off answers."
 argument-hint: "[a concept, a diff ref, an idea, or 'what happened this week?'] — or invoke bare to be asked"
 ---
 
@@ -24,7 +24,7 @@ When you must ask the user a question, use the platform's blocking question tool
 
 Dispatch is tiered by task shape, never hardcoded to a model name:
 
-- **Extraction tier** — the work-recap scout and the repo-profiler: search-and-quote work. Request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit.
+- **Extraction tier** — the work-recap scout and current-repo grounding scout: search-and-quote work. Request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit.
 - **Ceiling tier** — the explainer composition, the check-in reasoning, and the corrections. These run in the main conversation on the orchestrator's model; nothing is dispatched for them.
 
 ## Dispatch Authorization Boundary
@@ -52,24 +52,28 @@ Read `references/intake.md` now and classify the request into one of the four in
 
 **Bare invocation** (no input at all): ask one blocking question — "What should I explain?" — offering a shortcut option for a recap of recent work in this repo alongside free-text. Do not produce a default artifact unprompted.
 
+**Operational-question gate.** When an inferred concept request is really an
+ordinary question about current behavior, configuration, status, or diagnosis,
+answer it directly in chat. Do not create a run directory or teaching artifact.
+Offer a durable visual explainer only when a substantial underlying concept is
+present and the user plausibly wants to learn it. Explicit teaching language,
+or a `diff:`/`since:` token, enters the full flow directly.
+
 ### Phase 2: Ground
 
 Match grounding to the input shape. Create the run directory first — every run gets one, before any artifact exists:
 
 ```bash
-RUN_DIR="/tmp/spec-first/spec-explain/$(date +%Y%m%d)-$(openssl rand -hex 3)"
-mkdir -p "$RUN_DIR"
+umask 077
+RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-explain.XXXXXX")"
+[ -d "$RUN_DIR" ] && [ ! -L "$RUN_DIR" ] || { echo 'private scratch creation failed' >&2; exit 1; }
+chmod 700 "$RUN_DIR"
 echo "$RUN_DIR"
 ```
 
-**Repo-touching inputs** (a concept with footprint in this repo, a diff, a recap): resolve the question-agnostic project profile from the shared cache instead of re-deriving it. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
+`RUN_DIR` is ephemeral, run-local scratch only. Recheck that it remains an owned, non-symlink directory before publishing any atomic temp-file rename into it; never leave the only durable explainer or handoff evidence there.
 
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
-
-On `HIT`, load the profile JSON — stack, conventions, vocabulary — and take orientation from it. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` only when the Dispatch Authorization Boundary is satisfied; otherwise derive the profile inline and record the matching fallback reason. An authorized profiler writes its JSON to a file, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations). On `NO-CACHE` — or if the call errors — derive orientation inline and skip the `put`. The cache is an optimization, never a correctness dependency. The topic-specific evidence (the diff, the concept's call-sites, the window's commits) is always gathered fresh.
+**Repo-touching inputs** (a concept with footprint in this repo, a diff, a recap): derive a run-local stack/conventions/vocabulary orientation from the current target repo/worktree. Record current git identity and dirty state when available, read active instructions and representative source directly, and retain direct source refs. Never persist or reuse the orientation across runs, branches, or worktrees. If git or a source cannot be read, record the exact degraded fact and narrow the explainer's project-specific claims. Topic-specific evidence — the diff, the concept's call-sites, and the window's commits — is always gathered fresh.
 
 - **Diff mode:** resolve the change (the `diff:` ref, or the most recent substantial change when the request points at one implicitly) and gather its evidence — the diff itself, the files it touches, any plan or solution doc that motivated it. Gather silently: nothing learned here is narrated to the user until Phase 3's ordering rule is satisfied.
 - **Recap mode:** when the Dispatch Authorization Boundary is satisfied, dispatch a generic subagent seeded with `references/agents/work-recap-scout.md` (extraction tier), passing the resolved window, the repo root, and `$RUN_DIR`. Otherwise execute the same bounded recap scan inline or serially, record the matching fallback reason, and do not claim independent scout coverage. The scan returns an evidence summary with commit shas and `file:line` pointers. **Empty window** (no git activity, no doc changes): say so, offer to widen the window, write no artifact, and end the run after the user responds.
@@ -96,11 +100,18 @@ Detect destinations by capability — probe the agent's own toolset and session 
 
 - **Artifact surface** (offered when an artifact-publishing tool is present in the current session's tools) — publish per `references/destinations.md`: re-emit the explainer as body-only markup (no doctype/html/head/body, styles inline, no external font links); the surface wraps content in its own skeleton and blocks external hosts.
 - **Local file** — copy the artifact out of `$RUN_DIR` to the path the user names, then where the platform exposes a browser-opening primitive (`open` on macOS, `xdg-open` on Linux, `start` on Windows) offer to open it; otherwise print the absolute path.
-- **Publish to Proof** (markdown output only) — publish per `references/destinations.md` and surface the returned share URL; on failure retry once, then report and move on.
 - **Send to Thinkroom** (offered only when a Thinkroom skill or CLI capability is detected) — send per `references/destinations.md`.
-- **Leave it** — report the `$RUN_DIR` path and state it is a temporary location that does not survive reboot; nothing else is written.
+- **Leave it** — materialize the canonical artifact under
+  `.spec-first/workflows/spec-explain/<run-id>/explainer.<html|md>` using a
+  private temp file and atomic rename, then report that repo-relative path.
+  Never leave ephemeral `$RUN_DIR` as the only recoverable copy.
 
-**Non-interactive degradation:** when no interaction is possible at this ask (no blocking tool and no reply), do not hang and do not discard — the artifact is already at `$RUN_DIR`; report that path and end, skipping the improvement-observation handoffs below (they are offers, and an offer cannot fire without a user).
+**Non-interactive degradation:** when no interaction is possible at this ask,
+do not hang or publish. Materialize the artifact under the same repo-local
+`.spec-first/workflows/spec-explain/<run-id>/` owner, report the path, and end.
+If no target repo is available, preserve the owned private `$RUN_DIR` path and
+state the durability limitation explicitly; never imply that it survives
+reboot or cleanup.
 
 **Improvement observations.** When composing the explainer surfaced things that could be better, route them by type after the destination ask — offer, don't auto-fire:
 

@@ -43,6 +43,8 @@ If this reference cannot be read or a required quality/evidence gate cannot run,
 
    预留 repo-local run root：`.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/`。此时不要提前调用 `verification-run-summary record`：后续 simplify/review fix 可能改变代码，最终 summary 只能转录所有 mutation 结束后的真实结果。
 
+   Preserve `run.json` as immutable generation-0 identity. Before and after each mutation or verification transaction, use the append-only state contract from `execution-strategy.md`: record `started` before execution and append the confirmed terminal fact afterward. A resumed `started` transaction is unknown, never passed. CAS conflict or source drift blocks completion until the orchestrator re-reads and reconciles the current tree.
+
 2. **Simplify** (conditional — separate from code review)
 
    Before code review, invoke **`spec-simplify-code`** when the diff is non-mechanical and large enough to benefit (default: **>=30 changed lines**). Skip when the diff is purely mechanical (formatting, dependency bumps, lint-only fixes, generated artifacts).

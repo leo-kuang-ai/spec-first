@@ -20,10 +20,16 @@ Returns a JSON object with these keys:
 
 | Key | Contents | Has file/line? | Resolvable? |
 |-----|----------|---------------|-------------|
+| `pending_review` | Viewer-owned unsubmitted review id, or null; a non-null value blocks replies because GitHub may hide them in the draft | No | No |
 | `review_threads` | Unresolved inline code review threads, edge-wrapped as `{ node: ... }`; includes outdated threads and preserves each `isOutdated` flag so the resolver can account for line drift | Yes | Yes (GraphQL) |
 | `pr_comments` | Top-level PR conversation comments after source-level author and CI/status bot filtering | No | No |
 | `review_bodies` | Review submission bodies with non-empty text after source-level author and CI/status bot filtering | No | No |
 | `fetch_warnings` | Deterministic warnings such as truncated nested thread comments; these mean missing nested comments are incomplete evidence, not confirmed absence | No | No |
+
+When `pending_review` is non-null, stop before the reply loop. Do not interpret
+a successful reply mutation as visible reviewer communication. In standalone
+mode, surface the draft-review blocker; in `mode:pipeline-return`, record
+`pending-review-visible-reply-blocked` and return to the caller.
 
 If the script fails, fall back to:
 ```bash

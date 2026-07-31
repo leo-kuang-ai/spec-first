@@ -67,7 +67,7 @@ The scripts below ship in this skill's `scripts/` directory. The Bash tool's wor
 ### 1.1 Check for `.claude/launch.json`
 
 ```bash
-SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
 bash "$SKILL_DIR/scripts/read-launch-json.sh"
 ```
 
@@ -78,7 +78,7 @@ If it finds a configuration, use it — the user already told us how to start th
 Identify the framework:
 
 ```bash
-SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
 bash "$SKILL_DIR/scripts/detect-project-type.sh"
 ```
 
@@ -99,14 +99,14 @@ Route by type to the matching recipe reference for start command and port defaul
 For framework types that need a package manager, run the resolver and substitute the result into the start command:
 
 ```bash
-SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
 bash "$SKILL_DIR/scripts/resolve-package-manager.sh"
 ```
 
 Resolve the port:
 
 ```bash
-SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
 bash "$SKILL_DIR/scripts/resolve-port.sh" --type <type>
 ```
 

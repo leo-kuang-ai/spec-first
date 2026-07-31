@@ -35,7 +35,7 @@ Overrides: high-risk
 
 ## Argument Parsing
 
-Parse `$ARGUMENTS` for optional tokens. Strip each recognized token before interpreting the remainder as a PR number, GitHub URL, or branch name.
+Parse the invocation arguments supplied by the current host for optional tokens. Strip only recognized tokens while preserving quoted paths, Windows drive paths, URLs, and the order of the remainder before interpreting it as a PR number, GitHub URL, or branch name.
 
 | Token | Example | Effect |
 |-------|---------|--------|
@@ -69,6 +69,20 @@ Path-valued tokens split only at their first `:` and may be host-quoted so paths
 Deprecated `mode:autofix` is **not** a conflict — ignore the token and proceed with the normal flow (see below).
 
 Emit a one-line failure reason. In `mode:agent`, return JSON: `{"status":"failed","reason":"..."}`.
+
+### Phase 0a: Freeze effective mode before any tool call
+
+Normalize mode before interpreting intent or running any repository command. This is an exit gate, not a later presentation choice:
+
+```yaml
+effective_mode: default | agent
+source_mutation_gate: open | closed
+artifact_write_gate: review-artifacts-only
+```
+
+When `mode:agent` or its `mode:headless` alias is present, set `effective_mode: agent`, `mutation_policy: report-only`, and `source_mutation_gate: closed`. In this mode, adjacent fix/apply wording is intent data, not mutation authority. Do not call project-writing tools, `apply_patch`, edit/write APIs, `git apply`, `git restore`, `git checkout`, formatters with write flags, or any command that can rewrite reviewed source. The only permitted writes are run-scoped review artifacts and deterministic evidence under the exact artifact roots owned below.
+
+Generate the run ID and resolve `REVIEW_ARTIFACT_DIR` here, before scope inspection. Use the OS-native temporary-directory rules in Stage 4 and reuse the same canonical path for the entire run. Failure to create an artifact directory does not open the source mutation gate; `mode:agent` continues report-only with an in-band limitation.
 
 ### Phase 0: Resolve mutation, commit, and dispatch policy
 
@@ -125,7 +139,7 @@ Same review pipeline for default and `mode:agent`:
 
 ## Quick Review Short-Circuit
 
-If `$ARGUMENTS` indicates the user wants a quick, fast, or light code review — and **`mode:agent` is not active** — do not dispatch the multi-agent flow.
+If the invocation arguments indicate the user wants a quick, fast, or light code review — and **`mode:agent` is not active** — do not dispatch the multi-agent flow.
 
 **Announce the chosen path** before any other work (Quick review vs Multi-agent review). Skip this announcement when `mode:agent` is active.
 
@@ -402,6 +416,21 @@ Using `git diff $BASE` (without `..HEAD`) diffs the merge-base against the worki
 
 **Untracked file handling:** Outside task mode, always inspect `UNTRACKED:`. Untracked paths are out of scope unless staged. When non-empty, list excluded files in Coverage and continue on tracked changes only — never stop or prompt. Task mode uses the caller-captured pre-task/task-owned classification above instead of this blanket exclusion.
 
+### Stage 1a: Freeze the reviewed local scope
+
+For `mode:agent` and every report-only review whose reviewed tree is local (`base:`, standalone, `local-aligned`, or task-scoped current checkout), freeze the diff before semantic review. Set `SKILL_DIR` and run:
+
+```bash
+SCOPE_SNAPSHOT="$REVIEW_ARTIFACT_DIR/scope-snapshot.json"
+SCOPE_ARGS=(--base "$DIFF_A" --snapshot-out "$SCOPE_SNAPSHOT")
+[ -n "${DIFF_B:-}" ] && SCOPE_ARGS+=(--head "$DIFF_B")
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/review-scope.py" "${SCOPE_ARGS[@]}"
+```
+
+The returned `changed_files`, `files_changed`, and `diff_sha256` are immutable scope facts for the rest of the run. `mode:agent` JSON must use the frozen `files_changed`; never recompute it after tests or inspection. For task mode, the task-attributed bundle remains the semantic review scope, while the whole local base-to-working-tree snapshot is only the mutation detector. Remote-only PR/branch review has no reviewed local tree and records the guard as not applicable.
+
+If the helper, snapshot write, or artifact root is unavailable, keep `source_mutation_gate: closed`, record `mutation_guard_unavailable`, and do not emit a successful/complete machine handoff. Do not replace the deterministic snapshot with remembered prose or a later `git diff`.
+
 ### Stage 1b: Compute scope signals (cheap, deterministic)
 
 Derive deterministic signals from the resolved diff once, so reviewer selection (Stage 3) and the small-diff fast path (Stage 3c) do not each re-reason over the whole diff. **These signals only ever shrink the roster via Stage 3c, and that gate fails closed (Stage 3c) — so any failure here (unresolved base, count failure, an uncounted file type) must surface as `UNKNOWN`/non-zero `UNCOUNTED_FILES`, never as a silent `0` that reads as "trivial."**
@@ -411,34 +440,15 @@ Derive deterministic signals from the resolved diff once, so reviewer selection 
 - **`pr-remote` / `branch-remote`** — `DIFF_A=<PR_BASE_REF>`, `DIFF_B=<PR_HEAD_REF>` (or `<branch-head-ref>`) — the **fetched** refs from Stage 1. Do **not** model-count from hunks (it drifts per host/model). If either ref was not fetched, skip the block and emit `EXEC_LINES:UNKNOWN` + `UNCOUNTED_FILES:1` so Stage 3c forces the full roster.
 - **Task-scoped `mode:agent`** — compute signals from the attributed task `FILES`/`DIFF` bundle only, including task-owned full-addition files. Never count the entire base-to-working-tree diff. If any task file is degraded/unattributed or cannot be counted consistently, emit `EXEC_LINES:UNKNOWN` + `UNCOUNTED_FILES:1` so the full roster runs and the coverage limitation remains visible.
 
+For every non-task scope, set `SKILL_DIR` to this Skill's runtime directory and run the facts helper through its portable Python wrapper:
+
+```bash
+SCOPE_ARGS=(--base "$DIFF_A")
+[ -n "${DIFF_B:-}" ] && SCOPE_ARGS+=(--head "$DIFF_B")
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/review-scope.py" "${SCOPE_ARGS[@]}"
 ```
-# Fail closed: an unresolved/invalid endpoint must NOT become a silent EXEC_LINES:0.
-# Validate BOTH endpoints — a set-but-unfetched DIFF_B (pr-remote/branch-remote head ref)
-# would otherwise make `git diff` fail, awk print 0, and the lite gate clear on the wrong tree.
-if [ -z "${DIFF_A:-}" ] || ! git rev-parse --verify --quiet "${DIFF_A}^{commit}" >/dev/null 2>&1 \
-   || { [ -n "${DIFF_B:-}" ] && ! git rev-parse --verify --quiet "${DIFF_B}^{commit}" >/dev/null 2>&1; }; then
-  echo "EXEC_LINES:UNKNOWN"; echo "UNCOUNTED_FILES:1"; echo "SIGNALS:"
-else
-  # EXEC_LINES via --numstat (per-file added/deleted counts) summed in awk — robust across
-  # shells, immune to diff-content edge cases. Do NOT grep raw +/- lines: a content line that
-  # itself starts with + or - (markdown bullets, unary minus, `++i`) is miscounted. Keep the
-  # globs single-quoted and inline so the shell passes them to git literally (an unquoted or
-  # variable-held glob would be expanded against the CWD before git ever sees it).
-  EXEC_LINES=$(git diff --numstat "$DIFF_A" $DIFF_B -- '*.rb' '*.py' '*.js' '*.jsx' '*.ts' '*.tsx' '*.go' '*.rs' '*.java' '*.swift' '*.kt' '*.c' '*.cc' '*.cpp' '*.cs' '*.php' '*.ex' '*.exs' '*.scala' 2>/dev/null | awk '{s+=$1+$2} END{print s+0}')
-  echo "EXEC_LINES:$EXEC_LINES"
-  FILES=$(git diff --name-only "$DIFF_A" $DIFF_B 2>/dev/null)
-  # UNCOUNTED_FILES = changed files NOT in the counted code set (skill prose, schemas, configs,
-  # scripts, lockfiles, unknown extensions). Any >0 disqualifies the lite path (fail closed).
-  UNCOUNTED=$(printf '%s\n' "$FILES" | awk 'NF && $0 !~ /\.(rb|py|js|jsx|ts|tsx|go|rs|java|swift|kt|c|cc|cpp|cs|php|ex|exs|scala)$/ {n++} END{print n+0}')
-  echo "UNCOUNTED_FILES:$UNCOUNTED"
-  echo "SIGNALS:"
-  # here-strings (no pipe) — a piped `grep -q` can drop a true match under `set -o pipefail` via SIGPIPE.
-  grep -qiE 'db/migrate/|schema\.(rb|sql)|/migrations?/|alembic|flyway|liquibase' <<< "$FILES" && echo "  migrations" || true
-  grep -qiE '\.(tsx|jsx|vue|svelte|css|scss|html|erb|haml)$|/components?/|stimulus|turbo' <<< "$FILES" && echo "  frontend" || true
-  grep -qiE '/(routes?|controllers?|api|serializers?|graphql)/|\.proto$|openapi|swagger' <<< "$FILES" && echo "  api" || true
-  grep -qiE '\.(swift|kt|pbxproj|xcconfig|entitlements)$' <<< "$FILES" && echo "  swift-ios" || true
-fi
-```
+
+Consume only its JSON facts (`status`, endpoints, `exec_lines`, `uncounted_files`, `changed_files`, path `signals`, test/agent-surface flags, fixed `docs/solutions` corpus presence, and `lite_eligible`). The helper does not select personas or decide semantic risk. A non-`complete` status, malformed output, invocation failure, or changed-file mismatch becomes `EXEC_LINES:UNKNOWN` plus `UNCOUNTED_FILES:1`; never reconstruct a favorable zero. Task-scoped mode continues to compute from its attributed bundle and uses the same fail-closed fields because the helper intentionally has no authority to reinterpret caller-owned task attribution.
 
 `EXEC_LINES` counts changed executable lines (added + removed, counted code extensions only — so a modified line counts as 2; the Stage 3c `<40` threshold is in add+delete units). `EXEC_LINES:UNKNOWN` means the base was unresolved — treat as non-trivial. `UNCOUNTED_FILES` is the count of changed files outside the code set (skill `.md`, JSON schemas, `.sh`, config, CI, lockfiles, unknown extensions) — **spec-first's own product surface is mostly uncounted, which is exactly why Stage 3c must fail closed on it.** The `SIGNALS` list is **path heuristics, not selection decisions**: Stage 3 still applies judgment and adds the matching conditional persona only when the runtime concern is real. Content-based risk (auth, payments, data mutation) is **not** path-derivable — read it from the diff in Stage 3 as before; it also disqualifies the Stage 3c fast path regardless of line count.
 
@@ -448,7 +458,7 @@ After scope/diff/task-context resolution, enforce the Phase 0 dispatch policy be
 
 - If `worker_dispatch_authorization: missing`, select the bounded inline report-only path, set `status: degraded` and `coverage.dispatch_reason_code: dispatch_authorization_missing`.
 - If authorization is present but confirmed current-session capability is missing, use the same path with `subagent_capability_missing`; if the probe is unavailable or cannot establish a unique eligible candidate, use `worker_capability_unproven`.
-- On this path, continue only through Stage 2 intent discovery and Stage 2b plan/task completeness context when applicable, then perform the inline pass and go to Stage 6. Skip Stage 2c, Stages 3/3b/3c, persona/validator/cross-model dispatch, and Stage 5/5b/5c. No persona prompt may be represented as independently executed.
+- On this path, continue only through Stage 2 intent discovery and Stage 2b plan/task completeness context when applicable, then perform the inline pass, run the mandatory Stage 5e mutation check, and go to Stage 6. Skip Stage 2c, Stages 3/3b/3c, persona/validator/cross-model dispatch, and Stage 5/5b/5c. No persona prompt may be represented as independently executed.
 - Resolve the Stage 4 Run ID/artifact-directory setup before synthesis even though no reviewer is dispatched. If the directory is unavailable, keep the complete result in band with `artifact_path: null` and `artifact_write_status: unavailable`.
 
 Inline fallback output contract:
@@ -501,20 +511,11 @@ Locate the plan document so Stage 6 can verify requirements completeness. Check 
 
 If a plan is found, classify readiness before extraction (see "Plan Requirements Completeness" above): for a unified plan read the metadata/header first, and treat a requirements-only artifact as product intent only — it must not drive implementation-unit completeness findings. Then read its **Requirements** in this order — unified `Product Contract` -> `### Requirements`, then legacy top-level `## Requirements`, then legacy `## Requirements Trace` — and the R-IDs (R1, R2, etc.) listed there, plus **Implementation Units** (current numeric subsections such as `### U1.`, `### U2.`, or `### Unit 1:` under `## Implementation Units`; legacy bullet or checkbox unit entries under that section also count). For HTML unified plans the same section names and R-/U-IDs appear as visible headings/anchors — match on the section name, ignoring HTML wrapper tags. Store the extracted requirements list and `plan_source` for Stage 6. In task mode, retain only the selected Task Card's cited source refs for this review and set `completeness_scope: selected-task`; when `source_plan_section_titles` are present, use the Task-Scoped Live Plan Context branch above rather than injecting a plan body or asserting freshness. Do not compare the bounded task delta with unrelated U-IDs. Do not block the review if no plan is found — requirements verification is additive, not required.
 
-### Stage 2c: Resolve the shared project profile (cache)
+### Stage 2c: Resolve current-tree orientation
 
-Resolve the question-agnostic project profile (stack, dependency surface + licenses, conventions, structure) from the shared cache once, so the orchestrator's reviewer selection and the non-standards reviewers (`correctness`, `testing`, `maintainability`) share one cheap stack/conventions orientation instead of each re-deriving it from the diff. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
+Derive one run-local stack/conventions orientation from the tree actually under review so reviewer selection and the non-standards reviewers (`correctness`, `testing`, `maintainability`) share the same current facts. For `local-aligned`, standalone, and `base:` scope, record the current git identity and dirty state, then read current manifests, layout, and active instructions. For `pr-remote` or `branch-remote`, derive only from the fetched reviewed refs/diff; never substitute the local checkout's profile. Do not persist or reuse this orientation across runs, branches, or worktrees.
 
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
-
-**Only resolve the cache when the working tree is the reviewed tree** — `local-aligned`, standalone, or `base:` scope (Stage 1). In `pr-remote` or `branch-remote` scope, **skip Stage 2c entirely**: the helper keys and derives from the local `HEAD`, which is *not* the reviewed ref, so its profile would describe the wrong tree (e.g. `main`'s stack while reviewing a PR that changes manifests); reviewers work from the fetched refs/diff as those modes already require.
-
-`HIT` 时加载 profile JSON 作为 agnostic project orientation。`MISS` 时派发 seeded with `references/agents/repo-profiler.md` 的 generic subagent 生成 profile，把 JSON 写入文件，再调用 `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` 持久化（该调用必须重新设置 `SKILL_DIR`，因为 Bash invocation 不共享 shell 变量）。`NO-CACHE`（非 git repo 或 cache 不可写）时，本轮 fresh derive profile 并跳过 `put`；当前 review 仍获得同一 question-agnostic orientation，只是不持久化。若 helper invocation 失败、返回空输出或无法解析 `SKILL_DIR`，按 `NO-CACHE` 处理：fresh derive 并跳过 `put`。Cache 只是优化，不是 correctness dependency；cache 不可用不能静默移除 shared profile input。
-
-When a profile is in hand, include a short stack/conventions orientation slice from it in the Stage 4 review context bundle passed to every reviewer **except** `project-standards` and `learnings-researcher`. This is orientation only — it never replaces a fresh read. The `project-standards-reviewer` still reads the actual root and subdirectory `AGENTS.md`/`CLAUDE.md` standards files fresh via the Stage 3b path list (the auditing exception — it audits compliance against real file contents, never against a cached digest), and `docs/solutions/` learnings stay fresh because `learnings-researcher` re-globs and reads them per run.
+Include a compact orientation slice plus direct source refs in the Stage 4 review context bundle passed to every reviewer **except** `project-standards` and `learnings-researcher`. This is orientation only and never replaces a fresh read. The `project-standards-reviewer` still reads the actual root and subdirectory `AGENTS.md`/`CLAUDE.md` standards files through the Stage 3b path list, and `learnings-researcher` re-globs `docs/solutions/` per run. If the reviewed tree or a required source cannot be read, record the exact degraded fact and narrow reviewer claims; do not silently fall back to a profile from another source identity.
 
 ### Stage 3: Select reviewers
 
@@ -620,7 +621,7 @@ The orchestrator (this skill) also inherits the session model; it handles intent
 
 #### Run ID
 
-Generate a unique run identifier before dispatching any agents. This ID scopes all agent artifact files and the post-review run artifact to one concrete directory.
+Reuse the unique run identifier and concrete artifact directory established by Phase 0a. This identity scopes all agent artifact files and the post-review run artifact to one concrete directory; never create a second run directory during dispatch.
 
 Resolve `REVIEW_ARTIFACT_DIR` exactly once with an OS-native temp primitive, then reuse that exact absolute path everywhere. Prefer the runtime API (`os.tmpdir()` in Node.js; an equivalent host temp API otherwise), which already respects platform conventions such as `$TMPDIR` on POSIX and `%TEMP%` on Windows. Create a run-scoped child such as `spec-first/spec-code-review/<run-id>`, canonicalize it, verify it is writable, and never reconstruct it later from a hard-coded root or `run_id` alone. A host-provided writable run-local temp directory is an acceptable fallback.
 
@@ -704,15 +705,17 @@ The artifact file **must** carry the full detail-tier fields (`why_it_matters`, 
 
 #### Cross-model adversarial pass
 
-When `adversarial-reviewer` was selected (Stage 3) **and** scope is `local-aligned` or standalone, also run the same adversarial brief through a different model family in a separate process — genuine independence the in-process subagent cannot provide. **Launch it in parallel with the persona reviewers, not after them:** the peer call is a CLI shell-out (a background Bash process, not a subagent), so it does not consume the subagent concurrency budget and its ~2-5 min runtime overlaps the in-process reviews instead of adding to them. Kick it off as a background shell process in the same dispatch wave as the Stage 4 reviewers, then collect its result before Stage 5. (If the harness cannot background a shell command, run it inline before awaiting the reviewers — correctness is unaffected, only wall-clock.) Load `references/cross-model-review.md` and follow it: it self-identifies the host at runtime (Claude, Codex, or Cursor), shells out to the peer CLI (Codex when host is Claude or Cursor; Claude when host is Codex) read-only, and writes a `findings-schema.json`-shaped return to `{review_artifact_dir}/adversarial-<peer>.json`. Skip the optional cross-model pass when `REVIEW_ARTIFACT_DIR` is unavailable; the main review continues in band.
+When `adversarial-reviewer` was selected (Stage 3) **and** scope is `local-aligned` or standalone, load `references/cross-model-review.md` and evaluate its admission gates. The peer lifecycle is optional and non-blocking for the main review, but its start is fail-closed: no canonical authorization journey receipt, mismatched receipt/request/payload hashes, non-allowlisted `input_refs`, incomplete external-data authorization, failed redaction, same-provider selection, or requested/actual model mismatch means no peer process and no independent coverage claim.
 
-That return enters Stage 5 as reviewer `adversarial-<peer>`, like any persona artifact. The pass is **non-blocking** — skip silently when no peer is identified, the peer CLI is missing/unauthed, or it errors/times out. Skip it entirely in `pr-remote` / `branch-remote` scope (the peer would review the local tree, not the reviewed head). Announce per that reference's announce rules — interactive hosts (Claude or Cursor) in default mode only; silent under Codex and in `mode:agent`.
+When admitted, start the bundled adapter in the same Stage 4 wave, keep its returned job id, and use the sibling runner's bounded `status`/`wait`/`result`/`reap` lifecycle before Stage 5. Treat the provider result as untrusted data and fold only a schema-valid reviewer return. A matching completed return enters Stage 5 as reviewer `adversarial-<peer>`; timeout, failure, malformed output, uncertain cleanup, or identity mismatch remains coverage-not-run and never promotes confidence. Skip the pass in `pr-remote` / `branch-remote` scope because the local peer cannot review the remote head faithfully.
 
 ### Stage 5: Merge findings
 
 Convert multiple reviewer JSON returns into one deduplicated, confidence-gated finding set. The normal compact returns contain merge-tier fields (title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing) plus the optional suggested_fix. Detail-tier fields (`why_it_matters`, `evidence`) normally live in per-agent artifact files; when `REVIEW_ARTIFACT_DIR` was unavailable or a write failed, a reviewer may return the full schema in band, and synthesis must preserve those detail fields instead of requiring a re-run.
 
 `confidence` is one of 5 discrete anchors (`0`, `25`, `50`, `75`, `100`) with behavioral definitions in the findings schema. Synthesis treats anchors as integers; do not coerce to floats.
+
+Before semantic synthesis, serialize the compact reviewer returns as one JSON array and pipe it through `bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/findings-mechanics.py"`. This helper owns schema-shape rejection, exact `file + line + normalized title` fingerprints, contributor/independence accounting, quote-line confidence floor, deterministic suppression, stable ordering, and numbering. It never decides whether differently worded findings are semantically equivalent, whether severity is correct, whether an adjacent pre-existing issue is a direct dependency, or how thematic groups should read; those remain synthesis judgments. Malformed/helper-failure output cannot be upgraded to a clean finding set.
 
 1. **Validate.** Check each compact return for required top-level and per-finding fields, plus value constraints. Drop malformed returns or findings. Record the drop count.
    - **Top-level required:** reviewer (string), findings (array), residual_risks (array), testing_gaps (array). Drop the entire return if any are missing or wrong type.
@@ -726,7 +729,7 @@ Convert multiple reviewer JSON returns into one deduplicated, confidence-gated f
      - pre_existing, requires_verification: boolean
    - **Quote-the-line gate (enforced here).** Any finding at anchor **75 or 100** must carry a non-empty `first_evidence` (the verbatim motivating line with `file:line`). A 75/100 finding missing `first_evidence` is **demoted to anchor 50** (record the demotion count for Coverage) — it then faces the normal anchor-50 fate in the confidence gate (dropped unless P0 or routed to a soft bucket).
    - Do not validate against the full schema here -- the full schema (including why_it_matters and evidence) applies to the artifact files on disk, not the compact returns.
-2. **Deduplicate.** Compute fingerprint: `normalize(file) + line_bucket(line, +/-3) + normalize(title)`. When fingerprints match, merge: keep highest severity, keep highest anchor, note which reviewers flagged it. Dedup runs over the full validated set (including anchor 50) so cross-reviewer promotion in step 3 can lift matching anchor-50 findings into the actionable tier.
+2. **Deduplicate.** Accept the helper's exact fingerprint merges first. Then use semantic judgment for differently worded findings or nearby lines that describe the same failure; record why they are equivalent rather than asking the script to guess. Keep highest severity/anchor and note every contributing reviewer. Dedup runs over the full validated set (including anchor 50) so cross-reviewer promotion in step 3 can lift matching anchor-50 findings into the actionable tier.
 3. **Cross-reviewer agreement.** When 2+ independent reviewers flag the same issue (same fingerprint), promote the merged finding by one anchor step: `50 -> 75`, `75 -> 100`, `100 -> 100`. Note the agreement in the Reviewer column of the output (e.g., "security, correctness"). **Promotion never bypasses the quote-the-line gate (step 1).** A finding may sit at anchor 75 or 100 — whether originally or via this promotion — only if the merged finding carries `first_evidence`. If no contributing reviewer supplied it (e.g. two reviewers reported the same finding without the quote and step 1 demoted both to 50), cap the promotion at 50: agreement corroborates that the issue is *real*, but the quoted line is what licenses *high confidence*, and two un-quoted findings must not combine into a quote-free 75. When at least one contributor supplied `first_evidence`, the merged finding inherits it (step 2 keeps it) and promotes normally. The cross-model `adversarial-<peer>` return counts as an independent reviewer here; agreement between it and the in-process `adversarial` persona is the strongest signal in the set (different model families, separate processes) — render it as `adversarial, adversarial-<peer>`. The Stage 4 `fast-pass` pseudo-reviewer is the orchestrator's own read, **not** independent, so it **never counts toward this promotion** (and is capped at anchor 50): a `fast-pass`+persona fingerprint match is noted in the Reviewer column (e.g. "correctness, fast-pass") but does **not** bump the anchor — the persona's own independent anchor carries the finding. A `fast-pass`-only finding stays at anchor 50 (surfacing solo only when P0).
 4. **Separate pre-existing.** Pull out findings with `pre_existing: true` into a separate list. **Exception — the change depends on it:** a pre-existing or adjacent-file gap that the change under review *relies on for its own correctness* stays in the primary findings, not the pre-existing list. The bar is a direct dependency — the new code is wrong, unsafe, or unverified *because of* this gap. Merely sitting nearby, or the repo being better without it, does not qualify: if the change would be correct regardless of the gap, it stays pre-existing. Do not widen this into general repo cleanup ("fix the whole repo").
 5. **Resolve disagreements.** When reviewers flag the same code region but disagree on severity, autofix_class, or owner, annotate the Reviewer column with the disagreement (e.g., "security (P0), correctness (P1) -- kept P0").
@@ -793,35 +796,7 @@ Independent verification gate. Spawn one validator sub-agent per surviving findi
 
 **Skip entirely in `mode:agent`, `mutation_policy: report-only`, and every inline degraded dispatch fallback.** The caller owns apply in agent mode. Ordinary default review is also report-only. Enter this stage only when default mode has explicit `mutation_policy: apply-fixes` and full reviewed-tree scope is known.
 
-**Act policy (bias to act).** Default to applying every finding that is a clear improvement and a reversible edit, regardless of severity. The work is a tracked, visible diff that can be reverted — so leaving a clean fix unapplied "to be safe" is the failure mode, not the safe choice. Decide by judgment, not a safety checklist:
-
-- **Apply** clear improvements — the common case (test hardening, dead-code removal, a localized fix with a concrete `suggested_fix`).
-- **Push back** — do not apply — when the reviewer is wrong; keep the finding and state the disagreement with reasoning.
-- **Skip with judgment** taste calls and conflicting suggestions, but surface what was skipped and why. Never silently drop.
-
-Severity, confidence, and cross-reviewer agreement tell you what to do first and what to flag loudly — they do not gate the decision. There is no deny-list: downside is controlled after the fact (revert + visible diff + the commit checkpoint), not by a precondition.
-
-**Scope invariant.** Apply only when the working tree *is* what was reviewed — `local-aligned` or standalone. In `pr-remote` / `branch-remote` the working tree is not the reviewed head; do not apply — report instead.
-
-**Verify, then keep.** After applying, run the affected tests and lint (targeted by default; broaden when fixes span files). If they fail, revert that fix and report it as a finding instead — an unverified fix is not finished. Never leave the tree red.
-
-**Review the autofix diff before finishing.** Before committing or reporting applied fixes, diff only the changes introduced during Stage 5c against the pre-apply checkpoint. Run one self-review pass over that diff:
-- If the same helper, policy, or guard was added to multiple parallel surfaces, extract it or explain in the Applied section why duplication is intentional.
-- If an exported/shared function now accepts a broader input shape, update the nearby docs, types, or tests that define the contract so future callers understand it.
-- If a reviewer item is pure information (no defect, no code contract change, no test gap), classify it as advisory/non-actionable in Coverage or residual risks; do not patch it or describe it as a missed defect.
-If this self-review changes files, rerun the affected tests or lint for those follow-up edits before committing or reporting; the earlier validation only covers the original autofix diff.
-
-**Commit authorization is separate.** Before applying, note current `git status --porcelain` and pre-existing dirty overlap.
-
-- `mutation_policy: apply-fixes` does not authorize commit.
-- Without commit authorization, leave verified applied fixes uncommitted and list the logical commit candidate in Applied/Coverage.
-- With explicit `commit_authorization: authorized` and a clean pre-review tree, commit only review-owned verified fixes as one isolated `fix(review): <summary>` commit (or the repo's nearest convention).
-- With pre-existing dirty work, never stage unrelated paths. An overlapping dirty file requires an explicit bounded owner decision; otherwise skip that apply item or leave all review fixes uncommitted.
-- Never push, open a PR, or file tickets; this skill has no landing path.
-
-**Surface green-but-unverifiable edits.** When an applied fix touches auth/authz, a public or cross-service contract/schema, or concurrency/ordering, a passing test does not prove safety — flag it prominently in the Applied section so the diff reviewer's attention goes there.
-
-**Re-partition triage groups after apply.** Triage groups describe the *remaining* work. After Stage 5c, prune applied findings out of `triage_groups` before Stage 6 rendering — a group must never tell the user to handle a finding that was already applied. When an applied fix resolved part of a theme, note that in the group's context line instead of keeping the applied `#` in the group. Re-apply the same minimum-size rule as Stage 5b step 7 (drop sub-two-finding groups under `grouping:auto`).
+Read `references/apply-findings.md` only after all three admission conditions pass: default mode, explicit `mutation_policy: apply-fixes`, and a non-degraded local reviewed-tree scope. Do not load that reference in `mode:agent`, report-only, remote-only, or inline fallback runs. The reference contains apply/verification/commit details but grants no authority by itself.
 
 ### Stage 5d: Structured targeted verification evidence
 
@@ -852,6 +827,20 @@ spec-first internal honest-closeout validate \
 ```
 
 Do not cherry-pick a passing targeted check to hide another failed/not-run check in the same summary. Preserve `run_summary_ref`, `overall`, `overall_reason_code`, per-claim reasons, and limitations in `coverage.verification_evidence`. `spec-code-review` does not own or emit the durable spec-work run artifact; a `spec-work` caller may later materialize the review JSON/summary into its own run directory.
+
+### Stage 5e: Enforce the report-only mutation gate
+
+Before synthesis, every local `mode:agent`, report-only, and inline-fallback run must compare the current tree with the Stage 1a snapshot:
+
+```bash
+bash "$SKILL_DIR/scripts/run-python.sh" \
+  "$SKILL_DIR/scripts/review-scope.py" \
+  --verify-snapshot "$SCOPE_SNAPSHOT"
+```
+
+If the result is `mutation_detected: false`, continue and keep using the frozen scope facts. If it reports `reviewer_mutation_detected`, do not revert, hide, reinterpret, or validate the mutation as a successful fix. In `mode:agent`, return one raw failure JSON with `status: failed`, `reason_code: reviewer_mutation_detected`, `mutated_paths`, the frozen scope, and the already discovered findings when available. In default report-only mode, stop with the same reason and paths. A reviewer-caused mutation invalidates any test result obtained after the mutation and blocks completion claims.
+
+If the snapshot cannot be read or rechecked, return a degraded/failed handoff with `mutation_guard_unavailable`; absence of the deterministic guard is never evidence that the tree stayed unchanged. Explicit default-mode Stage 5c apply runs are excluded because their mutation is separately admitted, scoped, and verified.
 
 ### Stage 6: Synthesize and present
 
@@ -1034,13 +1023,13 @@ Every reference lives in this skill's directory and loads **on demand at the sta
 
 | Reference | Load at | Purpose |
 |-----------|---------|---------|
-| `references/repo-profile-cache.md` | Stage 2c | Shared repo-profile cache protocol |
 | `references/persona-catalog.md` | Stage 3 | Full per-persona selection criteria and spawn gates |
 | `references/subagent-template.md` | Stage 4 | Dispatch shape for every persona subagent |
 | `references/diff-scope.md` | Stage 4 | Shared diff-scope rules passed to each subagent |
 | `references/findings-schema.json` | Stage 4 | JSON output contract passed to each subagent |
 | `references/cross-model-review.md` | Stage 4 (only when the cross-model adversarial pass runs) | Host self-identification + peer-CLI shell-out |
 | `references/action-class-rubric.md` | Action Routing (as needed) | Persona guidance for `autofix_class` |
+| `references/apply-findings.md` | Stage 5c (admitted default apply-only runs) | Apply, verification, and commit boundaries kept out of report-only context |
 | `references/review-output-template.md` | Stage 6 | Canonical section skeleton for the report |
 
 Selected reviewer prompt assets live under `references/personas/`. Read only the prompt files selected for the current review.

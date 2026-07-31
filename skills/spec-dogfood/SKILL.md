@@ -94,7 +94,7 @@ landing_authorization: authorized | missing
 
 ### Phase 0: Scope and Get on the Right Branch
 
-Parse `$ARGUMENTS`: a PR number, a branch name, or blank (use current branch). Strip `--port PORT` if present.
+Parse the invocation arguments supplied by the current host: a PR number, a branch name, or blank (use current branch). Preserve quoted paths/tokens while stripping a recognized `--port PORT` pair if present.
 
 1. **Identify the target — keep PR identity; do not switch the working tree yet.**
    - **PR number:** the target *is the PR* — carry the number through every later step (trunk check, isolation, checkout). Read its head only for display (`gh pr view <number> --json headRefName,isCrossRepository`), but do **not** reduce it to a bare branch name: a fork PR's head can even be named `main`/`master`. Do not check out yet.

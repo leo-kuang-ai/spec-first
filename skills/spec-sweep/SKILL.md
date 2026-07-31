@@ -88,7 +88,7 @@ Resolve once and reuse for the entire run:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/sweep-state.py" <subcommand> --state <state> ...
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/sweep-state.py" <subcommand> --state <state> ...
 ```
 
 Run the phases in order.
@@ -135,7 +135,7 @@ A failed ack write -> upsert the item as `ack_deferred` and hold the cursor (do 
 #### 2e. Media
 
 For each new item carrying `media`:
-- Download attachments into scratch `/tmp/spec-first/spec-sweep/<run-id>/`; raw media is never committed. A download failure -> set the item `needs_download` and continue.
+- Download attachments into owner-only run-local scratch created with `umask 077` and `mktemp -d "${TMPDIR:-/tmp}/spec-first-sweep.XXXXXX"`; reject symlink/non-directory results and recheck before atomic publication. Raw media is ephemeral and never committed. A download failure -> set the item `needs_download` and continue.
 - When the package-local boundary permits the recording's sensitivity class, dispatch one generic subagent per recording, in bounded parallel, at the **generation tier**, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Otherwise analyze recordings inline or serially and record the matching fallback reason. Fill the template's `{skill_dir}` slot with the same absolute spec-sweep skill directory you resolve for your own `SKILL_DIR` Bash calls (a fresh subagent does not inherit your shell state, so it cannot run the bundled analyzer without being told the path). Pass only the required absolute media PATHS, a scratch artifact path, and the item's `sensitive` flag; collect the compact 1-2 line summary each returns. A dispatched subagent failure -> set the item `needs_analysis`, retain the media, and continue.
 - Track attempts on the item (a `media_attempts` count upserted on each try). After 3 failed attempts across runs (`needs_download`/`needs_analysis`), set the item `manual_stuck` and list it separately — out of the routine nag.
 

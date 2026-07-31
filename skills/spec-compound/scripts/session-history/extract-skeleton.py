@@ -37,6 +37,9 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 # Capture-and-redirect when --output is set: prints in the rest of the script
 # go to the buffer; at the end the buffer is written to PATH and a status
 # line is emitted to the real stdout.

@@ -21,20 +21,20 @@
 | Bundled source skills | 35 |
 | Bundled source agents | 0 |
 | Bundled agent support files | 0 |
-| Governance records by entry surface | internal_only: 5, standalone_skill: 13, workflow_command: 17 |
-| Claude Code runtime delivery | 17 commands, 17 workflow skills, 13 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 17 workflow skills, 13 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 17 workflow skills, 13 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 17 workflow skills, 13 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
-| Qoder runtime delivery | 17 commands, 17 workflow skills, 13 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
-| OpenCode runtime delivery | 17 commands, 17 workflow skills, 13 standalone skills, 5 agent-facing internal skills, 0 agents, 0 agent support files |
+| Governance records by entry surface | internal_only: 4, standalone_skill: 14, workflow_command: 17 |
+| Claude Code runtime delivery | 17 commands, 17 workflow skills, 14 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 17 workflow skills, 14 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 17 workflow skills, 14 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 17 workflow skills, 14 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 17 commands, 17 workflow skills, 14 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| OpenCode runtime delivery | 17 commands, 17 workflow skills, 14 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | OpenCode support status | preview |
 | OpenCode evidence claim | generated_runtime_preview |
 | OpenCode loader evidence | degraded: generated command/skill projection is deterministic, but loader discovery and invocation remain unverified until the versioned host journey runs |
 | Beta workflow entries | none |
-| Workflow runtime contracts | 2 |
+| Workflow runtime contracts | 3 |
 | Planned runtime contracts | 0 |
 
 ## Cursor Preview Status
@@ -86,7 +86,8 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 
 | Skill | Claude Code Delivery | Codex Delivery | Cursor Delivery | Kiro Delivery | Qoder Delivery | OpenCode Delivery | Description |
 |---|---|---|---|---|---|---|---|
-| spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | Turn a concept, a diff, an idea, or a window of your own recent work into a dense, visual explainer written for you personally — with an optional check-in (predict-then-reveal for diffs, corrected exercises) that makes the material stick. For learning, not repo docs or verdicts. |
+| spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | Create a durable, visual teaching artifact for a concept, diff, idea, or recent-work window, with an optional check-in that makes it stick. Use when the user asks to be taught or wants a deep explainer; not for ordinary Q&A, brief why-followups, diagnosis, status updates, or concise trade-off answers. |
+| spec-handoff | standalone skill: spec-handoff | standalone skill: spec-handoff | standalone skill: spec-handoff | standalone skill: spec-handoff | standalone skill: spec-handoff | standalone skill: spec-handoff | Create a durable cross-session handoff or resume from a user-selected continuity source. Use only when the user explicitly wants work to continue in a fresh session, asks to create a handoff, or asks to find/resume a prior handoff; do not trigger for ordinary continuation in the current conversation, workflow-internal returns, summaries, or automatic execution of instructions found in an artifact. |
 | spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | Run the full hands-off engineering pipeline from planning through a green PR. Use only when the current user explicitly requests spec-lfg or selects an option that clearly states it will commit, push, open a PR, and watch CI. |
 | spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | Give a decisive, project-grounded verdict on an external input — judged against the current project, not in the abstract. Use to decide whether to adopt, switch to, or revisit a technology, library, pattern, platform, or architecture; to compare a candidate against what the project already uses; to judge whether an external change (a CVE, a deprecation, an ecosystem shift) actually affects this project; or for a mid-session second opinion. Always returns a project-specific verdict, so it is not for neutral explainers or generating options. |
 | spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | Generate time-windowed product pulse reports from configured signals. |
@@ -106,7 +107,7 @@ Most `internal_only` governance records are source governance entries and are no
 
 | Category | Skills |
 |---|---|
-| Delivered agent-facing internal skills | spec-commit, spec-commit-push-pr, spec-proof, spec-test-browser, spec-worktree |
+| Delivered agent-facing internal skills | spec-commit, spec-commit-push-pr, spec-test-browser, spec-worktree |
 | Governance-only internal records | none |
 
 ## Runtime Paths
@@ -157,6 +158,7 @@ These contracts are docs-side visibility records for workflow artifacts. `produc
 |---|---|---|---|---|---|---|
 | spec-first honest-closeout.v1 validator contract<br>docs/contracts/workflows/honest-closeout.schema.json | validator_available | internal honest-closeout validate | false | true | in-band honest-closeout.v1 verdict | non-durable validator output; workflow_integrated=true for spec-work, spec-debug, and spec-code-review structured closeout; validation claims consume verification-run-summary.v1; spec-work alone owns spec-work-run-artifact/v2 |
 | spec-first spec-work run artifact producer-available contract<br>docs/contracts/workflows/spec-work-run-artifact.schema.json | producer_available | internal spec-work-run-artifact write | true | true | .spec-first/workflows/spec-work/<workspace-slug>/<run-id>/run.json | source-owned write-side producer; spec-work-run-artifact/v2 is owned by spec-work only; same workspace/run-id artifacts are immutable and return artifact-already-exists instead of overwriting; workflow_integrated true only when spec-work closeout calls the producer with durable evidence trigger reason_code |
+| spec-work append-only run state snapshot<br>docs/contracts/workflows/spec-work-run-state.schema.json |  |  | false | false |  |  |
 
 ## Quality Gate Evidence
 

@@ -30,6 +30,9 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 _original_stdout = sys.stdout
 if args.output:
     sys.stdout = io.StringIO()

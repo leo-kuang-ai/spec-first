@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const fixturePaths = [
@@ -226,14 +227,25 @@ describe('active eval fixture references', () => {
     const aggregate = readJson(path.join(replayRoot, 'aggregate.json'));
     const equivalence = readJson(path.join(replayRoot, 'final-equivalence.json'));
     const finalSourceManifest = readJson(path.join(replayRoot, 'final-source-manifest.json'));
+    const manifestPath = path.join(clarificationReplayRoot, 'final-source-manifest.json');
+    const snapshotCommit = spawnSync(
+      'git',
+      ['log', '-1', '--format=%H', '--', manifestPath],
+      { cwd: repoRoot, encoding: 'utf8' },
+    ).stdout.trim();
 
     expect(aggregate.schema).toBe('requirements-clarification-unit-replay-aggregate/v1');
     expect(equivalence).toMatchObject({ checked: 34, mismatches: [] });
     expect(finalSourceManifest.files).toHaveLength(34);
     for (const entry of finalSourceManifest.files) {
-      expect(fs.existsSync(path.join(repoRoot, entry.path))).toBe(entry.status === 'present');
+      const historical = spawnSync(
+        'git',
+        ['show', `${snapshotCommit}:${entry.path}`],
+        { cwd: repoRoot, encoding: null, maxBuffer: 8 * 1024 * 1024 },
+      );
+      expect(historical.status === 0).toBe(entry.status === 'present');
       if (entry.status === 'present') {
-        expect(sha256(fs.readFileSync(path.join(repoRoot, entry.path)))).toBe(entry.sha256);
+        expect(sha256(historical.stdout)).toBe(entry.sha256);
       }
     }
 

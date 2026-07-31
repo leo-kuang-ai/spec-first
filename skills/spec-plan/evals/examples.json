@@ -11,8 +11,7 @@
     "skills/spec-plan/references/plan-sections.md",
     "skills/spec-plan/references/plan-handoff.md",
     "skills/spec-plan/references/approach-altitude.md",
-    "skills/spec-plan/references/universal-planning.md",
-    "skills/spec-plan/references/repo-profile-cache.md"
+    "skills/spec-plan/references/universal-planning.md"
   ],
   "source_ref_authority": "source",
   "cases": [
@@ -59,16 +58,16 @@
       "expected_outcome": "Write one HTML plan with visible metadata and stable anchors, do not create a Markdown sidecar or status lifecycle field, run spec-doc-review report-only with zero reviewer mutation, and use bounded producer recompose for uniquely determined fixes before handoff."
     },
     {
-      "id": "repo-profile-cache-miss-has-inline-path",
-      "input": "Plan a repository change when the shared repo profile cache is missing and delegation was not authorized.",
-      "coverage_tags": ["failure", "cache-miss", "fallback"],
-      "expected_outcome": "Derive the bounded repository profile inline from current source, use the cache script only within its documented contract, and continue planning without dispatch or a cache dependency.",
+      "id": "current-repo-orientation-has-inline-path",
+      "input": "Plan a repository change when delegation was not authorized.",
+      "coverage_tags": ["failure", "fresh-grounding", "fallback"],
+      "expected_outcome": "Derive bounded run-local orientation inline from the current target repo/worktree, record its source identity and direct refs, and continue without dispatch or cross-run state.",
       "degraded_contract": {
-        "facts": "repo-profile-cache.py returned MISS and no authorized profiler dispatch is available",
+        "facts": "no authorized grounding worker is available",
         "authorization": "delegation absent",
-        "expected_fallback": "derive the question-agnostic profile inline from current canonical source and continue",
-        "forbidden_behavior": "block planning, reuse an unproved stale profile, or fabricate a cache HIT",
-        "reason_code": "repo_profile_cache_miss",
+        "expected_fallback": "derive run-local orientation inline from current canonical source and continue",
+        "forbidden_behavior": "block planning, reuse orientation from another source identity, or claim independent grounding",
+        "reason_code": "dispatch_authorization_missing",
         "remaining_work": "complete question-specific grounding and the plan inline",
         "claim_ceiling": "current-run inline grounding only; no isolated profiler claim"
       }
@@ -137,18 +136,18 @@
       }
     },
     {
-      "id": "repo-profile-dirty-input-invalidates-hit",
-      "input": "Plan at unchanged HEAD after package.json or root AGENTS.md changed locally while a cache entry exists.",
-      "coverage_tags": ["failure", "cache-dirty", "freshness"],
-      "expected_outcome": "Treat the cache as MISS, derive current facts, and never serve the old profile; a docs/plans-only change may retain a verified HIT.",
+      "id": "current-repo-dirty-input-is-recorded",
+      "input": "Plan at unchanged HEAD after package.json or root AGENTS.md changed locally.",
+      "coverage_tags": ["failure", "dirty-source", "freshness"],
+      "expected_outcome": "Record the dirty worktree, derive current facts from working-tree source, and keep direct refs instead of using a commit-only orientation.",
       "degraded_contract": {
-        "facts": "a profile-input path is dirty at the current HEAD",
-        "authorization": "not applicable to deterministic cache freshness",
-        "expected_fallback": "invalidate the entry and re-derive current profile facts",
-        "forbidden_behavior": "serve the stale cached profile or treat advisory plan dirtiness as a profile input",
-        "reason_code": "profile_input_dirty",
+        "facts": "a load-bearing orientation input is dirty at the current HEAD",
+        "authorization": "not applicable to current-source reads",
+        "expected_fallback": "read the working-tree source and record its dirty identity",
+        "forbidden_behavior": "serve a commit-only orientation or hide the dirty-source limitation",
+        "reason_code": "current_source_dirty",
         "remaining_work": "complete current-source grounding before planning decisions",
-        "claim_ceiling": "deterministic cache MISS plus newly derived current facts"
+        "claim_ceiling": "current working-tree facts with explicit dirty-source provenance"
       }
     },
     {

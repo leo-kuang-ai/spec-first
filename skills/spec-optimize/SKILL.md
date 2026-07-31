@@ -53,7 +53,7 @@ Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (cal
 
 ## Input
 
-<optimization_input> #$ARGUMENTS </optimization_input>
+<optimization_input> #<invocation arguments supplied by the current host> </optimization_input>
 
 If the input above is empty, ask: "What would you like to optimize? Describe the goal, or provide a path to an optimization spec YAML file."
 
@@ -97,6 +97,30 @@ Do not run `spec-optimize` as an expensive substitute for ordinary work. Before 
 - For judge mode, a finite `metric.judge.max_total_cost_usd`, unless the user explicitly approves uncapped spend
 
 If any item is missing, stop and help the user create a safe spec or route the work to the current host's plan/work/debug entrypoint instead. Do not continue with an open-ended optimization loop.
+
+## Measurement-Only Calibration Mode
+
+When the invocation or approved spec selects `mode:measurement-only`, load
+`references/measurement-only-calibration.md`. This mode compares an explicitly
+identified baseline and candidate against the same repeatable task/corpus. It
+must run an A/A noise floor before A/B, use a pre-registered acceptance
+threshold, classify broken runs separately from regressions, and produce only
+a measurement artifact plus stop/defer guidance.
+
+Before the first measurement, materialize the approved frozen inputs as a
+run-local `measurement-admission-input.json`, then run
+`node scripts/measurement-admission.cjs admit --input <path>`. Persist the
+returned normalized admission and `admission_sha256` beside the measurement
+artifact and bind every A/A and A/B attempt to that digest. A rejected admission
+stops before invoking the measurement command. After A/A, run the helper's
+`allow-ab` command with the normalized admission, digest, attempts, and observed
+noise floor; A/B is forbidden unless it returns `ab_allowed: true`.
+
+Measurement-only mode does not mutate either arm, any Skill package, the
+measurement harness, or promotion metadata. It does not select a winner for
+integration, invoke `spec-write-skill`, or authorize commit/landing. If arm
+identity, corpus identity, a repeatable harness, or the pre-registered threshold
+is missing, stop before measurement instead of inventing it after seeing data.
 
 First-run specs should default to `execution.mode: serial`, `execution.max_concurrent: 1`, `stopping.max_iterations: 4`, `stopping.max_hours: 1`, `stopping.plateau_iterations: 3`, and `max_runner_up_merges_per_batch: 0`. Treat higher-throughput settings as opt-in. If a provided spec asks for `execution.max_concurrent > 4`, `stopping.max_iterations > 30`, `stopping.max_hours > 4`, or uncapped judge spend, surface those costs in the approval gate before running the baseline.
 
@@ -455,14 +479,7 @@ Read the code within `scope.mutable` to understand:
 - Obvious improvement opportunities
 - Constraints and dependencies between components
 
-Optionally read `references/agents/repo-research-analyst.md` for deeper codebase analysis if the scope is large or unfamiliar. Dispatch a generic subagent only when the Dispatch And Backend Boundary permits it; otherwise apply the same bounded analysis inline or serially. Do not dispatch a standalone agent by type/name. Before either path, resolve the question-agnostic project profile from the shared cache first (set `SKILL_DIR` to this skill's directory; protocol in `references/repo-profile-cache.md`):
-
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
-
-On `HIT` load the profile JSON; on `MISS` derive it via `references/agents/repo-profiler.md` and `put` the result; on `NO-CACHE` derive inline. Pass the profile to `repo-research-analyst` and request only the question-specific scopes (e.g. `patterns`) so it skips re-deriving the agnostic stack/architecture/conventions.
+Optionally read `references/agents/repo-research-analyst.md` for deeper codebase analysis if the scope is large or unfamiliar. Dispatch a generic subagent only when the Dispatch And Backend Boundary permits it; otherwise apply the same bounded analysis inline or serially. Do not dispatch a standalone agent by type/name. Before either path, derive a run-local stack/architecture/conventions orientation from the current target repo/worktree and record its source identity and dirty state. Pass that orientation with direct source refs to `repo-research-analyst`, requesting only question-specific scopes such as `patterns`. Never reuse it across runs, branches, or worktrees. On resume, compare the checkpoint's source identity with the current tree; if it changed, re-baseline affected measurements or stop with an explicit source-drift limitation instead of carrying old grounding forward. If the current sources cannot be read, record the concrete degraded fact and narrow optimization claims.
 
 ### 2.2 Generate Hypothesis List
 

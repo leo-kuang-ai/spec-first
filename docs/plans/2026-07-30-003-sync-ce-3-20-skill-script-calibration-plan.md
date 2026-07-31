@@ -1,7 +1,7 @@
 ---
 title: "Calibrate Spec-First Skills and Scripts Against CE 3.20.0 Diff - Plan"
 type: refactor
-status: active
+status: completed
 date: 2026-07-30
 sequence: 003
 topic: ce-3-20-skill-script-calibration
@@ -212,10 +212,10 @@ Skill semantic contract -> current host-native primitive or inline fallback
 | Fresh repo orientation | each consuming Skill | run-local summary + source refs + current git identity; no cross-run cache |
 | Python resolution | shared script convention/test helper | ordered executable probe + selected command + failure reason; no semantic fallback |
 | Private scratch | skill-local helper or shared CLI helper | owner/no-symlink/mode/atomic-write facts; never canonical decision artifact |
-| Peer job receipt | peer-enabled Skill scripts | requested/actual provider/model, run id, timestamps, exit/timeout, result/log refs and hashes, limitation/reason code |
+| Peer job receipt | peer-enabled Skill scripts | 引用 canonical `worker_dispatch_outcome`/authorization receipts；只新增 requested/actual provider/model、run id、timestamps、exit/timeout、result/log refs and hashes、limitation/reason code，不复制授权语义 |
 | Review scope facts | spec-code-review | endpoints, files, executable line facts, uncounted/risk signals, lite eligibility inputs; no final roster verdict |
 | Findings mechanics | spec-code-review | schema errors, exact fingerprints, contributor set, stable order; LLM supplies semantic equivalence/severity |
-| Work run artifact | spec-work/CLI helpers | unit/task refs, before/after identity, authorization refs, verification and recovery state |
+| Work run artifact | spec-work/CLI helpers | immutable `run.json` identity + append-only full-state snapshots with generation/hash chain；包含 unit/task refs、before/after identity、authorization refs、verification and recovery state |
 | PR watch snapshot | spec-lfg | PR/head/base/review/CI state, generation, active budget, blocker/looks-ready state; no merge action |
 | Runtime projection | CLI adapters/init | current supported platform set, managed ownership, collision and containment facts |
 
@@ -324,6 +324,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S01. `spec-app-consistency-audit`
 
+- **实施状态：** 已完成（回归确认）；本轮无 CE 直接差距，保留现有 App/Figma/source 一致性审计边界。
+
 - **Current owner/duty:** App PRD、Figma和local source跨页面/架构/组件/埋点/i18n一致性审计，拥有run-scoped evidence、headless runner和writeback边界。
 - **CE diff/verdict:** `无本次 diff 影响`。CE 29个Skill没有对应App assurance surface。
 - **Planned change:** 不改`SKILL.md`、rules、scripts或schema；只在全量回归中确认新Python/LF/argument治理没有误扫其22个脚本和source locks。
@@ -332,6 +334,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** 运行现有App consistency contracts和headless fixture；风险是全局script检查误报；P2 regression-only。
 
 ### S02. `spec-brainstorm`
+
+- **实施状态：** 已完成；已移除 repo profile cache，改为 fresh grounding，并接入 settled-decision 单一 owner 规则。
 
 - **Current owner/duty:** unresolved WHAT探索、requirements-only unified plan、decision surface、output rendering和handoff；已有dispatch authorization/fallback。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应`ce-brainstorm`16文件。
@@ -343,6 +347,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S03. `spec-code-review`
 
+- **实施状态：** 已完成；mechanical floor、host-neutral/private runtime、受治理 peer lifecycle 与聚焦测试均已落地。
+
 - **Current owner/duty:** report-only默认、显式apply、risk-driven persona、lite/full、cross-model adversarial、structured findings、coverage/claim ceiling和dispatch gate。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应24文件，是本次最高ROI owner。
 - **Gap:** repo cache和`$ARGUMENTS`；scope shell facts分散；finding dedupe/order主要靠prose；cross-model脚本缺统一detached lifecycle、actual-model receipt、large-result/failure recovery。
@@ -353,6 +359,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S04. `spec-commit`
 
+- **实施状态：** 已完成；Git context 改为跨宿主独立 argv-style 采集，并在 commit 前重新确认关键状态。
+
 - **Current owner/duty:** internal-only、caller已持有commit authorization时做scoped commit，不拥有push/PR。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应`ce-commit/SKILL.md`；当前没有`$ARGUMENTS`，但仍保留Claude预填context与shell fallback双路径。
 - **Planned surfaces:** 保留internal-only/commit authorization；把Git status、diff、branch、log、default branch改为各自独立argv-style事实采集，禁止用`;`、`&&`、pipe、redirect或command substitution拼接；commit前重新读取branch/staged set等consequential facts。
@@ -361,6 +369,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** internal caller envelope、缺授权零commit、路径含空格；P1 portable invocation。
 
 ### S05. `spec-commit-push-pr`
+
+- **实施状态：** 已完成；pipeline authority 下返回 bounded watch handoff，standalone 不默认 watch，且不授权 merge/rebase/force-push。
 
 - **Current owner/duty:** internal landing helper，持有独立commit/landing authorization后commit、push、create/update PR。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应2文件。
@@ -372,6 +382,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S06. `spec-compound`
 
+- **实施状态：** 已完成；fresh grounding、UTF-8/Python/private scratch、validator 与 headless structured result 边界已校准。
+
 - **Current owner/duty:** 把已解决问题或durable vocabulary写入`docs/solutions`/`CONCEPTS.md`，已有full/lightweight/headless、memory scan和grounding validation。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应13文件。
 - **Gap:** repo cache；`/tmp/spec-first`仍承载session historian过程状态；session-history脚本解释器/UTF-8和doc-claim模板误报；headless输出可更稳定。
@@ -382,6 +394,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S07. `spec-compound-refresh`
 
+- **实施状态：** 已完成；validator parity、Python runtime 与固定 knowledge artifact owner 已通过聚焦验证。
+
 - **Current owner/duty:** 审计和更新/替换/合并/删除`docs/solutions`知识，拥有scope、inbound link和授权式commit/landing。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应8文件。
 - **Planned surfaces:** 同步两个validator、Python resolver和runtime argument表达；assets/schema与compound保持兼容；固定`docs/solutions`和`CONCEPTS.md` owner。
@@ -390,6 +404,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** validator parity、claim code block负例、artifact discovery不漂移；P1。
 
 ### S08. `spec-debug`
+
+- **实施状态：** 已完成；新增 `mode:pipeline-return`，以 confirmed causal/verification evidence 返回且不接管 landing。
 
 - **Current owner/duty:** diagnosis/root-cause/fix/verification闭环，适用于错误、回归和失败测试。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应5文件。
@@ -401,6 +417,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S09. `spec-doc-review`
 
+- **实施状态：** 已完成；whole-document peer、rendering floor、answered-finding withdrawal 与 optional peer receipt 已落地。
+
 - **Current owner/duty:** requirements/plan/task/spec的角色化审查，standard/full roster、headless apply/report-only和producer closure。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应15文件。
 - **Gap:** 当前无cross-model detached pass；whole-doc和rendering floor可更显式；用户已回答问题的撤回规则可加强。
@@ -411,6 +429,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S10. `spec-dogfood`
 
+- **实施状态：** 已完成；host-neutral invocation 与既有 fixed report/exact-origin/caller-owned-server 边界通过回归。
+
 - **Current owner/duty:** diff-scoped autonomous browser QA，使用agent-browser、caller-ownedworktree和report artifact。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应2文件。
 - **Planned surfaces:** runtime arguments/skill invocation改为host-neutral；report path保持固定contract；引用当前browser readiness和caller-owned server，不扩大driver。
@@ -419,6 +439,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** current browser contracts、report discovery、无能力honest degraded；P2。
 
 ### S11. `spec-explain`
+
+- **实施状态：** 已完成；普通问答 activation gate、可恢复 destination owner 与正文 machine-identifier exclusion 已落地。
 
 - **Current owner/duty:** 面向学习的个性化diff/concept/idea/recent-work explainer，支持Markdown/HTML和check-in。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应10文件。
@@ -430,6 +452,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S12. `spec-ideate`
 
+- **实施状态：** 已完成；fresh grounding、private evidence continuity 与 transient settled-decision brief 已校准。
+
 - **Current owner/duty:** grounded idea generation/evaluation，多轴探索、issue intelligence和handoff到brainstorm。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应12文件。
 - **Gap:** repo cache；`web-research-cache.md`与post-workflow把`/tmp`当跨invocation cache/无repo deliverable，与ephemeral-only边界冲突；tracker探测仍需避免binary/env false negative；settled decisions和多区域连续性可加强。
@@ -439,6 +463,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** no-cache fresh orientation、tracker connector lazy discovery、decision continuity；P1。
 
 ### S13. `spec-lfg`
+
+- **实施状态：** 已完成；PR tail 已扩展为 review/CI/head/base-currency bounded watch，并保持无自动 merge。
 
 - **Current owner/duty:** 显式授权下从plan到implementation/review/commit/push/PR/CI green的完整shipping pipeline。
 - **CE diff/verdict:** 直接 counterpart 为`lfg -> spec-lfg`的3个文件；另按“无直接 counterpart”独立裁决吸收`ce-babysit-pr`的3个文件，不把后者冒充为同名映射。
@@ -450,6 +476,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S14. `spec-optimize`
 
+- **实施状态：** 已完成；新增 measurement-only A/A→A/B、预注册阈值与 broken-run taxonomy，未获得 Skill mutation/promotion authority。
+
 - **Current owner/duty:** metric-driven baseline、measurement scaffolding、parallel experiments、checkpoints和stopping criteria。
 - **CE diff/verdict:** 直接 counterpart 为`ce-optimize -> spec-optimize`的8个文件；另按“无直接 counterpart”独立裁决承接`ce-retune`的measurement面，不宣称存在`spec-retune`。
 - **Gap:** repo cache；Python/scratch portability，且必须分离`.spec-first/workflows` durable checkpoint与`/tmp` probe process state；缺显式A/A noise floor和model-upgrade corpus mode。
@@ -459,6 +487,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** A/A variance fixture、broken-run taxonomy、resume、scratch symlink；P0 portability，P1 measurement-only retune discipline。
 
 ### S15. `spec-plan`
+
+- **实施状态：** 已完成；fresh grounding、host-neutral invocation、settled decisions 与现有 stronger planning contracts 已合并验证。
 
 - **Current owner/duty:** implementation-ready/universal/answer-seeking计划，拥有Product/Planning Contract、implementation units、review和handoff。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应19文件。
@@ -470,6 +500,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S16. `spec-polish`
 
+- **实施状态：** 已完成；bundled helper 的 flattened-shell/path-with-spaces 调用形态已修复，server/browser authority 未变化。
+
 - **Current owner/duty:** 启动caller-authorized dev server、浏览器检查和UI polish迭代。
 - **CE diff/verdict:** `直接同步`，对应1文件。
 - **Planned surfaces:** 修复bundled script path在多行shell被host压平时的解析；不改变launch/server/browser contract。
@@ -478,6 +510,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** flattened invocation fixture、path with spaces；P2。
 
 ### S17. `spec-pov`
+
+- **实施状态：** 已完成；完整 approach set、status-quo/framing reject、optional peer panel 与独立性 receipt 已落地。
 
 - **Current owner/duty:** 对外部技术/方案/变化给project-grounded decisive verdict，已有grounding scouts和boundary。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应15文件。
@@ -489,6 +523,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S18. `spec-prd`
 
+- **实施状态：** 已完成；仅完成 host-neutral invocation 校准，未引入无 CE 证据的语义重构。
+
 - **Current owner/duty:** brownfield PRD requirements与planning-readiness，拥有Decision Card、evidence和legal stop points。
 - **CE diff/verdict:** `无本次 diff 影响`。CE区间没有PRD对应Skill。
 - **Planned change:** 不做CE驱动重构；仅把全局`$ARGUMENTS`portable invocation机械迁移纳入U2，因为当前source仍含一次宿主化表述。
@@ -497,6 +533,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** existing PRD contract/reset/eval；P1 portable invocation only。
 
 ### S19. `spec-product-pulse`
+
+- **实施状态：** 已完成；lookback/config 运行时解析已 host-neutral，报告继续固定由 `docs/pulse-reports/` 拥有。
 
 - **Current owner/duty:** 从配置signals生成time-windowed product pulse report。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应2文件。
@@ -507,6 +545,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S20. `spec-promote`
 
+- **实施状态：** 已完成（回归确认）；无本次 CE 差距，入口与 projection 保持不变。
+
 - **Current owner/duty:** 为已shipping feature起草launch/promotion copy。
 - **CE diff/verdict:** `无本次 diff 影响`。
 - **Planned change:** 不改Skill；仅全量lint/projection回归。
@@ -515,6 +555,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** existing entrypoint lint；P2 regression-only。
 
 ### S21. `spec-proof`
+
+- **实施状态：** `blocked-external-contract-unverified`；未获得 approved live v3 contract/journey，当前 source 保持不变且未伪造 field outcome。
 
 - **Current owner/duty:** 通过Proof editor创建、分享、读取、评论、suggest/edit并pull回local，当前同时含Web API和local bridge。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应1个重大协议文件。
@@ -526,6 +568,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S22. `spec-resolve-pr-feedback`
 
+- **实施状态：** 已完成；大 payload private-file streaming、pending-review guard、既有分页/截断强边界与 pipeline return 已合并。
+
 - **Current owner/duty:** 解析PR comments/threads，评价有效性并在授权范围内修复和resolve。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应8文件。当前已修复index-0、多行stdin、三类top-level connection独立分页、nested comment>100的incomplete-evidence warning，强于CE head的部分脚本。
 - **Planned surfaces:** `get-pr-comments`只吸收stream-to-private-file和pending review结构化字段，保留当前独立分页、bot actionability分层与truncation warning；`get-thread-for-comment`保留当前`set -euo pipefail`、可选owner/repo和nested truncation fail-closed；`reply-to-pr-thread`补pending-review guard说明/consumer gate而不回退stdin多行安全；references明确targeted/full和thread identity。
@@ -534,6 +578,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** 大GraphQL fixture、首元素comment、多行/quote、pending review和network failure；P0脚本可靠性。
 
 ### S23. `spec-riffrec-feedback-analysis`
+
+- **实施状态：** 已完成；Python/LF/private scratch 增量已吸收，并与 `spec-sweep` analyzer 保持 byte parity。
 
 - **Current owner/duty:** 分析Riffrec bundle/录音视频并生成结构化反馈。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应5文件；当前1225行analyzer已经包含zip traversal/size、顶层JSON、未知时长、ffmpeg/ffprobe timeout与降级语义，不能用上游较短实现覆盖。
@@ -544,6 +590,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S24. `spec-rule-miner`
 
+- **实施状态：** 已完成（回归确认）；无本次 CE 语义差距，继续只从真实 code evidence 挖规则。
+
 - **Current owner/duty:** 从真实code evidence挖现有编码约定并生成/刷新项目rules。
 - **CE diff/verdict:** `无本次 diff 影响`。
 - **Planned change:** 不改语义；全量host invocation扫描确认没有`$ARGUMENTS`或docs_root回归。
@@ -552,6 +600,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** existing standalone contracts；P2 regression-only。
 
 ### S25. `spec-runtime-setup`
+
+- **实施状态：** 已完成；统一 frontmatter/containment owner 已落地，因无真实 consumer 未保留 orphan path classifier；U10 已从 canonical source 投射六个受支持宿主。Claude/Codex doctor 正常，Cursor/Kiro/Qoder/OpenCode 保留各自 loader/CLI/duplicate-root 的诚实 degraded warnings，未提升为 field outcome。
 
 - **Current owner/duty:** 多宿主required harness runtime的install/configure/verify/refresh，拥有registry、facts、host authority和degraded status。
 - **CE diff/verdict:** spec-first 不存在直接 counterpart `spec-setup`；按“无直接 counterpart”独立裁决逐文件吸收`ce-setup`3文件与19个CLI/安装文件中的安全主题，不能把`spec-runtime-setup`表述为同名映射。
@@ -564,6 +614,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S26. `spec-simplify-code`
 
+- **实施状态：** 已完成；新增 no-yield self-skip、scope containment 与 `session-settled:` structure pins。
+
 - **Current owner/duty:** 在授权scope内保持行为地简化recent changes，运行必要检查并self-skip低价值改动。
 - **CE diff/verdict:** `直接同步`，对应3文件。
 - **Planned surfaces:** 明确necessity scan不越scope、无价值自动skip、pipeline task visibility和`session-settled` pins；同步两个persona。
@@ -572,6 +624,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** out-of-scope duplicate negative、no-op、pipeline pins；P1。
 
 ### S27. `spec-strategy`
+
+- **实施状态：** 已完成（回归确认）；既有 host-neutral focus 与 `STRATEGY.md` 单一 owner 保持不变。
 
 - **Current owner/duty:** 创建/更新`STRATEGY.md`并为ideate/brainstorm/plan提供上游产品grounding。
 - **CE diff/verdict:** `等价能力已存在`，对应1文件；当前`Focus Hint`已从current request/conversation读取可选focus，不含`$ARGUMENTS`。
@@ -582,6 +636,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S28. `spec-sweep`
 
+- **实施状态：** 已完成；host-neutral invocation、private scratch、Python/state 与 Riffrec analyzer parity 已验证。
+
 - **Current owner/duty:** 从配置feedback sources摄取、acknowledge、分析recording、验证fix并产出LFG-ready plan。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应6文件。
 - **Planned surfaces:** host-neutral invocation、private scratch、Python resolver、analyzer parity、sweep-state兼容；保留当前1225行analyzer的安全/降级能力，不用CE较短副本覆盖；artifact继续由现有plan/report owner决定。
@@ -590,6 +646,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** scheduled headless、scratch security、analyzer、state resume；P1。
 
 ### S29. `spec-test-browser`
+
+- **实施状态：** 已完成（stronger-current-contract 保留）；拒绝 CE native-first 放行，exact-origin/action-evidence/cleanup gate 继续有效。
 
 - **Current owner/duty:** 对当前PR/branch受影响页面运行browser verification；当前正由exact-origin readiness和caller-owned server contract治理。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应3文件。
@@ -601,6 +659,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S30. `spec-test-xcode`
 
+- **实施状态：** 已完成（回归确认）；无本次 CE 直接差距，既有 simulator build/test owner 不变。
+
 - **Current owner/duty:** 使用XcodeBuildMCP构建和测试iOS simulator。
 - **CE diff/verdict:** `无本次 diff 影响`。
 - **Planned change:** 不因CE browser或work engine改动而抽象成通用test provider；只做entrypoint/projection回归。
@@ -609,6 +669,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** existing skill lint；P2 regression-only。
 
 ### S31. `spec-work`
+
+- **实施状态：** 已完成；immutable run identity + append-only CAS/hash-chain recovery state 已落地，未形成 central controller。
 
 - **Current owner/duty:** 执行settled plan/task/concrete request，拥有input triage、execution strategy、verification、return-to-caller和closeout evidence。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，对应18文件，是最大架构裁决面。
@@ -620,6 +682,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S32. `spec-worktree`
 
+- **实施状态：** 已完成；新增 `spec-work` governed caller，helper 仍只拥有 caller-owned isolation facts。
+
 - **Current owner/duty:** caller-owned git worktree isolation，当前受治理caller为dogfood，新增caller必须定义forward/intake contract。
 - **CE diff/verdict:** `按 spec-first 边界改造后吸收`，来自`ce-work`unit workspace不变量。
 - **Planned surfaces:** 增加`spec-work`caller contract前置，记录unit/worktree owner、base/head、path collision和cleanup authority；保持helper内部、非用户入口。
@@ -628,6 +692,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** existing/isolate-ref/new-work、owner mismatch、dirty cleanup、parallel collision；P1依赖spec-work schema。
 
 ### S33. `spec-write-skill`
+
+- **实施状态：** 已完成（zero-diff guard）；本轮未修改该唯一 Skill authoring owner，也未引入 retune promotion contract。
 
 - **Current owner/duty:** 创建、修改、迁移或只读验证项目拥有Skill package，拥有promotion evidence、eval和source/runtime边界。
 - **CE diff/verdict:** `无同名CE Skill，且无本次diff影响`。`spec-write-skill`是spec-first独有的Skill authoring owner，不承接`ce-retune`改造。
@@ -638,6 +704,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 
 ### S34. `spec-write-tasks`
 
+- **实施状态：** 已完成（回归确认）；task-pack compiler/validator contract 未被 Work state 或 CLI 迁移破坏。
+
 - **Current owner/duty:** 从settled local plan编译optional derived task pack，plan保持single source of truth。
 - **CE diff/verdict:** `无本次 diff 影响`。
 - **Planned change:** 不引入CE work controller或重复settled decisions；只确认spec-work新增unit receipt仍以source_plan/U-ID为owner。
@@ -646,6 +714,8 @@ Skill semantic contract -> current host-native primitive or inline fallback
 - **Verification/risk/priority:** existing task-pack source hash/consumer tests；P2 regression-only。
 
 ### S35. `using-spec-first`
+
+- **实施状态：** 已完成（回归确认）；public entry governor 与 Direct Lane/exit gates 保持既有 owner 边界。
 
 - **Current owner/duty:** public workflow front controller， substantial work前选择一个入口，避免并行workflow和runtime mirror edits。
 - **CE diff/verdict:** `无本次 diff 影响`。
@@ -974,6 +1044,9 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 - `skills/spec-code-review/SKILL.md`
 - `skills/spec-code-review/references/{diff-scope.md,findings-schema.json,cross-model-review.md,cross-model-eval.md,dispatch-reviewers.md,finish-review.md}`
 - `skills/spec-code-review/scripts/{review-scope.py,findings-mechanics.py,peer-job-runner.py,cross-model-adversarial-review.sh}`
+- `docs/contracts/workflows/worker-dispatch-capability.md`
+- `docs/contracts/verification/worker-dispatch-host-{preflight,journey}.schema.json`
+- `src/contracts/worker-dispatch-host-{preflight,journey}-validator.js`
 - code-review evals与focused tests
 
 **Implementation:**
@@ -981,12 +1054,13 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 - 先characterize当前scope/lite/findings行为，再落deterministic helpers。
 - Helper输出facts和schema errors，Skill继续决定risk roster、semantic duplicates、severity和response。
 - Peer runner只在已有cross-model adversarial consumer中pilot；adapter记录requested/actual model/provider和failure class。
-- 对现有worker dispatch authorization、egress、isolation和claim ceiling做negative contract，防止runner存在即扩大权限。
-- Credential只允许由获准host机制或进程环境注入，采用显式最小环境allowlist；不得进入argv、prompt、receipt、stdout/stderr持久化或repo文件。Prompt和provider result均按不可信数据处理，runner不得执行result中的命令、路径或patch；raw output只留在owner-checked private scratch，durable receipt仅保留脱敏摘要、hash、状态、限制和有界retention/reap结果。
+- Peer runner不得创建第二套dispatch authorization、restricted-read、data-egress、credential-use、external-communication或mutation authority；每个peer job必须消费`docs/contracts/workflows/worker-dispatch-capability.md`定义的canonical request/outcome并通过source ref/hash引用authorization receipts。缺`worker_dispatch_authorization`时不得probe；external/unknown provider缺任一必要数据授权时不得spawn，并复用既有reason code与claim ceiling。
+- Peer job receipt只新增job lifecycle facts，不复制或重命名canonical authorization fields。External peer task packet必须携带allowlisted `input_refs`、payload byte count、redaction status和current source identity；只有payload已最小化、secret-redacted且与授权范围一致时才能发送，未知敏感性、redaction失败或receipt与canonical outcome不一致均fail closed。
+- Credential只允许由获准host机制或进程环境注入，采用显式最小环境allowlist；不得进入argv、prompt、receipt、stdout/stderr持久化或repo文件。Prompt和provider result均按不可信数据处理，runner不得执行result中的命令、路径或patch；raw provider output只可进入owner-checked private scratch，不属于durable artifact，并必须设置size cap、expiry和reap outcome；durable receipt仅保留脱敏摘要、content hash、状态、provenance、限制和清理结果。
 
 **Dependencies:** U1、U2。
 
-**Test scenarios:** empty/large diff、unresolved base、Skill/config mixed surface、invalid reviewer JSON、large stdout、timeout/reap、auth failure、same-provider和actual-model mismatch、secret-like stdout/argv leak、malicious command/patch result不执行、retention cleanup。
+**Test scenarios:** empty/large diff、unresolved base、Skill/config mixed surface、invalid reviewer JSON、large stdout、timeout/reap、auth failure、same-provider和actual-model mismatch；有dispatch授权但缺data-egress授权时不probe/not spawn、external provider缺allowlisted `input_refs`时阻断、prompt含secret-like value时阻断而非仅日志脱敏、peer receipt与canonical outcome不一致时validator失败、无canonical authorization receipt不得claim independent coverage；secret-like stdout/argv leak、malicious command/patch result不执行、retention cleanup。
 
 ### U4. Extend Doc Review and POV; Add Settled Decisions to Brainstorm/Plan/Ideate
 
@@ -1032,7 +1106,9 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 **Implementation:**
 
-- Run artifact增加unit state、requested/actual engine、authorization、collision、recovery和verification transaction fields，保持additive/versioned consumer迁移。
+- 保留`run.json`作为不可变run identity、source/task refs和初始authorization artifact；在同一run目录下新增append-only、atomic-create的完整状态快照序列`state/<generation>.json`，记录unit state、requested/actual engine、authorization、collision、recovery和verification transaction。每个快照携`generation`、`previous_generation`、`previous_sha256`、current worktree identity和limitations；reader只消费schema、containment与hash chain完整的最高generation，不依赖可变`latest`指针。
+- State writer必须提交`expected_generation`与`expected_sha256`做乐观并发检查；不匹配返回`run-state-conflict`，不得覆盖已有generation。临时文件或未原子发布的generation被reader忽略；verification只有confirmed result才能进入passed，`started`/unknown outcome在恢复时保持unknown。Worktree identity漂移返回`run-source-drifted`交给`spec-work`语义判断，不自动重跑可能已产生副作用的unit。
+- 旧run-artifact schema保持read-only兼容并解释为generation 0；新writer只生成versioned新结构，不原地改写旧artifact。Prune继续以整个`<run-id>/`目录为单位，consumer迁移完成前保留旧schema reader。
 - Worktree只接受caller-owned contract，不调度engine或commit。
 - LFG admission和handoff文案先明确披露bounded PR-feedback修复与repo-policy branch-currency update；不含merge、force-push或任意历史重写。
 - PR body、review comment、check output和provider message均视为不可信内容；状态脚本只解析允许字段，不把评论文本拼入shell/eval。需要采纳的建议由`spec-resolve-pr-feedback`回到current source验证，watch snapshot不得保存token、完整敏感正文或可执行payload。
@@ -1042,7 +1118,7 @@ Runner复制策略的裁决是：**保持Skill package自包含的三份副本�
 
 **Dependencies:** U2、U3、U6中的`spec-debug`/`spec-resolve-pr-feedback` pipeline return；与U4无强依赖，但共享receipt vocabulary要一致。
 
-**Test scenarios:** interrupted unit resume、path/shared-schema collision、verify rollback、green-but-stale PR、review-after-green、base advanced、manual chain、no remote、3-cycle兼容migration、comment中的shell/prompt injection不执行、snapshot脱敏。
+**Test scenarios:** interrupted unit resume、expected-generation/hash冲突、断裂hash chain、半写临时文件、worktree identity漂移、verification started/unknown不假通过、legacy generation-0读取与whole-run prune、path/shared-schema collision、verify rollback、green-but-stale PR、review-after-green、base advanced、manual chain、no remote、3-cycle兼容migration、comment中的shell/prompt injection不执行、snapshot脱敏。
 
 ### U6. Apply Specialized Skill Diff Fixes
 
@@ -1223,9 +1299,11 @@ git diff --check
 
 - Canonical Skill不得出现CE provider route闭列表作为唯一执行路径。
 - Workflow invocation不得等于worker dispatch、data egress、credential、commit、landing或external communication authorization。
+- Peer runner不得定义平行dispatch/data/credential/mutation authority；缺canonical `worker_dispatch_outcome`、authorization receipt或external payload redaction evidence时不得spawn或claim independent coverage。
 - 无`docs_root`全局配置，无canonical artifact discovery漂移。
 - 无generic`spec-handoff`、首波无public`spec-babysit-pr`、无`spec-retune`。
 - `spec-work`无central dispatcher/controller/provider CLI wrapper。
+- Work run state不得覆盖immutable `run.json`或既有generation，不得依赖可变`latest`指针；hash chain、expected generation或source identity不一致时fail closed。
 - 无orphan runner、orphan`codex:dev`、无未消费schema。
 - 脚本不输出semantic adoption/review/root-cause verdict。
 - 凭证不进入argv/source/plan/receipt/log；外部评论、prompt和provider result不被直接执行或自动应用。
@@ -1250,7 +1328,7 @@ git diff --check
 | 删除cache后重复扫描增加token/time | 中 | 共享同一run-local orientation/dossier；用progressive references，不恢复跨run cache。 |
 | 三份peer runner再次漂移 | 高 | 限定三consumer、byte-parity、同fixtures、single contract review；任何一份差异阻断。 |
 | Runner成为隐性外部模型授权 | 高 | admission在Skill语义层；缺authorization/egress时不probe、不spawn；negative subprocess tests。 |
-| Review mechanics吞掉语义finding | 高 | 只允许exact fingerprint和schema/order；fuzzy/semantic merge由LLM；保留raw reviewer artifacts。 |
+| Review mechanics吞掉语义finding | 高 | 只允许exact fingerprint和schema/order；fuzzy/semantic merge由LLM；raw reviewer output只保留在owner-checked private scratch并执行size cap与有界retention/reap，durable artifact只保存脱敏摘要、hash、provenance、状态与限制。 |
 | Work recovery演变成中心engine | 高 | 不复制controller topology；host runtime执行、spec-work语义、helpers只facts；architecture negative test。 |
 | PR watch无限等待或越权修复 | 高 | active budget、terminal reasons、single writer lane、最多受控fix cycles、无auto merge。 |
 | Peer/PR/Proof输入造成凭证泄漏或命令注入 | 高 | 最小环境allowlist、凭证不进argv/log、provider_untrusted、no-eval/no-auto-apply、durable receipt脱敏和有界retention。 |
@@ -1300,12 +1378,23 @@ git diff --check
 
 ### Limitations
 
-- 本计划是implementation-ready设计，不代表任何Skill/脚本变更已实施。
-- 尚未运行CE provider CLI、detached runner、Proof v3、真实PR watch或retune field experiment。
-- 规划阶段已完成422/422逐文件原始diff审计；实施时U0仍须从固定Git objects重新生成机器账本并与validation报告对账，目的是验证输入未漂移，不是补做抽查。
-- 本轮代码校准基线为`b9fd2b46`，规划审计读取自`1f1df0de`的同一`skills_tree_oid`；未来实施若`skills/` tree变化，U0必须重建35-package/514-file current inventory并重新裁决受影响unit，不能沿用本计划快照冒充fresh evidence。
+- U0-U10 canonical source 实施已完成；当前 source inventory 为35个Skill、513个文件，manifest SHA-256为`073ee1d64d78db93a8566e7167531db703d26230f0be75a8d0055aca34cbf08f`。规划阶段的514-file snapshot仍只描述其冻结的`skills_tree_oid=d3763c70d60b724da1f3b5f87f2431394ab17ec8`，不冒充实施后current inventory。
+- Fresh-source independent eval未执行：`not_run: dispatch_authorization_missing`。最终code review只能由当前orchestrator执行bounded inline report-only fallback；其actionable findings已修复，但没有persona、validator、cross-model或独立reviewer coverage，review状态按契约为`degraded`，不能作为merge-readiness证明。
+- Proof v3未运行approved live journey，状态保持`blocked-external-contract-unverified`；未运行真实GitHub PR watch/resume journey，也未运行Optimize真实corpus A/A/A-B field experiment。Fixture、contract和source test只证明本地mechanism，不提升为field outcome。
+- Cursor、Kiro、Qoder、OpenCode的source-first init投射成功，但doctor仍保留各自loader、CLI、hook activation或duplicate-root warning；这些warning未被包装为fully confirmed host support。
+- Inline `spec-simplify-code` 三个lens无finding。Inline `spec-code-review`最初发现frontmatter quoted-scalar round-trip与spec-work state Schema未接线两项缺口，均已修复并加入回归；最终actionable findings为空。
+- 所有改动仍未提交，未push，未创建PR。
+- 规划阶段已完成422/422逐文件原始diff审计；实施U0已从固定Git objects重建机器账本并与validation报告对账，确认`unclassified=0`、`duplicate=0`、`inherited=0`。
 - `AGENTS.md`在`ff840c8e`后曾与`CLAUDE.md`/canonical Graphify renderer漂移，已由`84ad3154`收口，并由`b9fd2b46`继续收紧external-hook fallback与partial-clean legacy preservation；这证明checked-in host entry及周边Provider contract都需要source-level parity test，不能只验证generated runtime。
-- Fresh-source eval和真实host journey属于实施验证，不可由本计划审查替代。
+
+### Implementation Closeout Evidence
+
+- `npm test`：unit 165 suites/1740 tests；smoke 1 suite/5 tests；integration 11 suites/40 tests，另1 suite/2 tests按环境条件跳过。
+- `npm run test:mcp-setup`：31 suites/482 tests。
+- `npm run typecheck`：194 files；`npm run lint:skill-entrypoints`：307 files；`npm run build`：697 packaged files。
+- `npm run sync:instructions`、`git diff --check`、35 Skill/35实施状态计数、`spec-write-skill/**`零差异检查全部通过。
+- Reconciliation checker：422=237+185，implementation targets按215 Skill runtime/19 CLI runtime/3 support精确分解，29 CE Skill按25 direct counterpart+4 no-direct-counterpart精确分解，47 scripts与9 cache删除精确匹配。
+- Source-first init已投射Claude、Codex、Cursor、Kiro、Qoder、OpenCode；Claude/Codex doctor正常，其余宿主warning按上方Limitations保留。
 
 ---
 
@@ -1313,24 +1402,24 @@ git diff --check
 
 - [x] 规划阶段逐文件审计证明422/422路径均有独立记录；237/237实施目标、185/185证据文件、29/29 CE Skill、35/35 spec Skill、47/47脚本均无遗漏；29个CE Skill已精确分解为25个直接 counterpart与4个无直接 counterpart。无直接 counterpart 集合为`ce-babysit-pr`、`ce-handoff`、`ce-retune`、`ce-setup`；其中前三项为本区间新增，共11个新增package文件，`ce-setup`为修改项，共3个修改文件。
 - [x] 规划阶段按`skills_tree_oid=d3763c70d60b724da1f3b5f87f2431394ab17ec8`逐个读取35个current Skill owning package，共514/514文件；逐文件审计已记录exact path、完整SHA-256、结构事实、职责和Sxx语义owner，且每个Skill的package规模、改造方案与优化收益均可回链。
-- [ ] U0实施前从固定Git objects重建机器账本，并证明与逐文件审计`unclassified=0`、`duplicate=0`、`inherited=0`。
-- [ ] 九个repo profile cache及references/routes/parity test删除，九个consumer都有fresh grounding正负例。
-- [ ] 11个`$ARGUMENTS`entrypoint迁移为host-neutral invocation contract。
-- [ ] Python resolver、LF、UTF-8覆盖所有实际bundled script consumer；当前32个`/tmp/spec-first`引用逐文件完成delete/durable-migrate/ephemeral-keep裁决与验证。
-- [ ] Code review scope/findings mechanical floor通过，脚本未接管semantic judgment。
-- [ ] 三个peer-enabled Skill的runner/receipt通过parity、lifecycle、authorization、egress和claim tests；plan/brainstorm无orphan elevation assets。
-- [ ] Spec-work/worktree吸收recovery/collision/transaction invariants但未形成central execution runtime。
-- [ ] Spec-lfg PR tail覆盖reviews、CI、head和base currency，仍不自动merge。
-- [ ] PR feedback、compound/refresh、riffrec/sweep、simplify和commit context等差距修复完成聚焦验证；strategy维持等价能力并通过回归。
-- [ ] Proof v3按Gate真实迁移或诚实记录external-contract-unverified，不伪造完成。
-- [ ] CE retune仅以measurement-only模式进入`spec-optimize`，`spec-write-skill`保持零语义变更且无新增public Skill。
-- [ ] CLI/frontmatter/path/managed cleanup只补`b9fd2b46`尚未覆盖的差距；OpenCode flat command与Graphify current-root/instruction sync/external-hook fallback characterization保持通过。
-- [ ] README/docs/Changelog同步，current supported platform runtime由source-first init生成，无手改mirror。
-- [ ] Focused tests、typecheck、unit、smoke、integration、skill lint、MCP setup、build和`git diff --check`按影响面通过。
-- [ ] Modified Skill完成fresh-source eval；未执行的live provider/PR/Proof/retune evidence明确标`not_run`和原因。
+- [x] U0实施前从固定Git objects重建机器账本，并证明与逐文件审计`unclassified=0`、`duplicate=0`、`inherited=0`。
+- [x] 九个repo profile cache及references/routes/parity test删除，九个consumer都有fresh grounding正负例。
+- [x] 11个`$ARGUMENTS`entrypoint迁移为host-neutral invocation contract。
+- [x] Python resolver、LF、UTF-8覆盖所有实际bundled script consumer；当前32个`/tmp/spec-first`引用逐文件完成delete/durable-migrate/ephemeral-keep裁决与验证。
+- [x] Code review scope/findings mechanical floor通过，脚本未接管semantic judgment。
+- [x] 三个peer-enabled Skill的runner/receipt通过parity、lifecycle、authorization、egress和claim tests；plan/brainstorm无orphan elevation assets。
+- [x] Spec-work/worktree吸收recovery/collision/transaction invariants但未形成central execution runtime。
+- [x] Spec-lfg PR tail覆盖reviews、CI、head和base currency，仍不自动merge。
+- [x] PR feedback、compound/refresh、riffrec/sweep、simplify和commit context等差距修复完成聚焦验证；strategy维持等价能力并通过回归。
+- [x] Proof v3按Gate诚实记录`blocked-external-contract-unverified`，未伪造迁移或field outcome。
+- [x] CE retune仅以measurement-only模式进入`spec-optimize`，`spec-write-skill`保持零语义变更且无新增public Skill。
+- [x] CLI/frontmatter/path/managed cleanup只补`b9fd2b46`尚未覆盖的差距；OpenCode flat command与Graphify current-root/instruction sync/external-hook fallback characterization保持通过。
+- [x] README/docs/Changelog同步，current supported platform runtime由source-first init生成，无手改mirror。
+- [x] Focused tests、typecheck、unit、smoke、integration、skill lint、MCP setup、build和`git diff --check`按影响面通过。
+- [x] Modified Skill fresh-source independent eval因缺授权记录`not_run: dispatch_authorization_missing`；live provider/PR/Proof/retune evidence均明确标记未执行原因，没有用inline self-review冒充独立性。
 
 ---
 
 ## Handoff
 
-本计划建议从W0开始，由`spec-work`按U0-U10和wave exit gate实施。第一批只做reconciliation、cache removal和portable script floor；review peer、Work/LFG与Proof分别在后续wave激活。OpenCode/Graphify不再作为“待接入能力”单独成波，而作为`b9fd2b46` characterization baseline贯穿U9/U10，避免把已完成工作与CE新增差距混成一次不可审查提交。
+U0-U10已由`spec-work`按wave exit gate完成canonical source实施与验证。后续只保留上述真实field-evidence激活条件：Proof v3 approved live contract/journey、真实GitHub PR watch/resume、Optimize预注册corpus A/A/A-B，以及有独立dispatch授权时的fresh-source评估；这些限制不改变本计划已完成的source机制，也不得被后续文档直接提升为confirmed outcome。

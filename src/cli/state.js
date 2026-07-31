@@ -588,11 +588,13 @@ function applyOperationPlan(projectRoot, plan) {
 
     if (operation.kind === 'ensure_dir') {
       ensureDirectory(targetPath);
+      assertOperationTargetContained(projectRootReal, targetPath, operation);
       continue;
     }
 
     if (operation.kind === 'write_file' || operation.kind === 'update_file') {
       writeManagedFile(targetPath, operation.contents, operation.mode, operation.encoding);
+      assertOperationTargetContained(projectRootReal, targetPath, operation);
       continue;
     }
 

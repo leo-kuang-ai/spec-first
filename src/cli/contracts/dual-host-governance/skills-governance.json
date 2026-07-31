@@ -48,21 +48,6 @@
       }
     },
     {
-      "skill_name": "spec-proof",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal",
-        "opencode": "internal"
-      }
-    },
-    {
       "skill_name": "spec-resolve-pr-feedback",
       "entry_surface": "standalone_skill",
       "command_name": null,
@@ -199,6 +184,21 @@
     },
     {
       "skill_name": "spec-explain",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-handoff",
       "entry_surface": "standalone_skill",
       "command_name": null,
       "host_scope": "dual_host",

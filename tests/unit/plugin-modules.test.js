@@ -101,7 +101,6 @@ describe('plugin module facade and governance', () => {
     expect(cursor.internalSkills).toContain('spec-test-browser');
     expect(cursor.internalSkills).toContain('spec-commit');
     expect(cursor.internalSkills).toContain('spec-commit-push-pr');
-    expect(cursor.internalSkills).toContain('spec-proof');
     expect(cursor.skills).toEqual(expect.arrayContaining([
       'spec-resolve-pr-feedback',
       'spec-test-xcode',
@@ -229,15 +228,6 @@ describe('plugin module facade and governance', () => {
         userInvocable: false,
         descriptionPattern: /description:.*Internal/i,
       },
-      {
-        name: 'spec-proof',
-        paths: [
-          'SKILL.md',
-          'references/hitl-review.md',
-        ],
-        userInvocable: true,
-        descriptionPattern: /remains an internal helper/i,
-      },
     ];
 
     for (const platform of getSupportedPlatforms()) {
@@ -260,9 +250,6 @@ describe('plugin module facade and governance', () => {
               expect(operation.contents).toMatch(helper.descriptionPattern);
               if (helper.userInvocable === false && platform !== 'cursor') {
                 expect(operation.contents).toMatch(/^user-invocable:\s*false$/m);
-              } else if (helper.userInvocable === true) {
-                expect(operation.contents).not.toMatch(/^user-invocable:\s*false$/m);
-                expect(operation.contents).toContain('Direct user request');
               }
               if (platform === 'cursor') {
                 expect(operation.contents).toMatch(/^disable-model-invocation:\s*true$/m);
@@ -276,7 +263,7 @@ describe('plugin module facade and governance', () => {
     }
   });
 
-  test('在每个宿主递归投射用户显式调用的 PR feedback 与 Xcode skill', () => {
+  test('在每个宿主递归投射用户显式调用的 handoff、PR feedback 与 Xcode skill', () => {
     const resolverSource = fs.readFileSync(
       path.join(__dirname, '../../skills/spec-resolve-pr-feedback/SKILL.md'),
       'utf8',
@@ -286,6 +273,14 @@ describe('plugin module facade and governance', () => {
     expect(resolverSource).toMatch(/^  - Agent$/m);
 
     const standalonePackages = [
+      {
+        name: 'spec-handoff',
+        paths: [
+          'SKILL.md',
+          'references/artifact-contract.md',
+          'scripts/handoff-artifact.cjs',
+        ],
+      },
       {
         name: 'spec-resolve-pr-feedback',
         paths: [
@@ -348,11 +343,6 @@ describe('plugin module facade and governance', () => {
       ['skills/spec-lfg/SKILL.md', 'spec-commit-push-pr'],
       ['skills/spec-dogfood/SKILL.md', 'spec-commit'],
       ['skills/spec-dogfood/SKILL.md', 'spec-worktree'],
-      ['skills/spec-plan/references/plan-handoff.md', 'spec-proof'],
-      ['skills/spec-brainstorm/references/handoff.md', 'spec-proof'],
-      ['skills/spec-ideate/references/post-ideation-workflow.md', 'spec-proof'],
-      ['skills/spec-explain/references/destinations.md', 'spec-proof'],
-      ['skills/spec-pov/references/report.md', 'spec-proof'],
     ];
     const requiredTargets = new Set(callerEdges.map(([, target]) => target));
 
@@ -370,6 +360,57 @@ describe('plugin module facade and governance', () => {
         }
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('does not project the retired Proof package on any supported host', () => {
+    expect(plugin.listBundledSkills()).not.toContain('spec-proof');
+    expect(plugin.loadSkillsGovernance().skills.map((record) => record.skill_name))
+      .not.toContain('spec-proof');
+
+    for (const platform of getSupportedPlatforms()) {
+      const projectRoot = tempProject();
+      try {
+        const adapter = getAdapter(platform);
+        const { plan, syncedAssets } = plugin.planBundledAssetSync(projectRoot, adapter);
+        const operationPaths = plan.operations.map((operation) => operation.path);
+        expect(syncedAssets.workflowSkills).not.toContain('spec-proof');
+        expect(syncedAssets.skills).not.toContain('spec-proof');
+        expect(syncedAssets.internalSkills).not.toContain('spec-proof');
+        expect(operationPaths.some((operationPath) =>
+          operationPath.includes('/spec-proof/')
+        )).toBe(false);
+      } finally {
+        fs.rmSync(projectRoot, { recursive: true, force: true });
+      }
+    }
+  });
+
+  test('keeps former Proof callers free of retired integration identifiers', () => {
+    const formerCallerPaths = [
+      'skills/spec-plan/SKILL.md',
+      'skills/spec-plan/references/plan-handoff.md',
+      'skills/spec-plan/references/universal-planning.md',
+      'skills/spec-brainstorm/references/handoff.md',
+      'skills/spec-brainstorm/references/universal-brainstorming.md',
+      'skills/spec-ideate/references/post-ideation-workflow.md',
+      'skills/spec-ideate/references/universal-ideation.md',
+      'skills/spec-explain/SKILL.md',
+      'skills/spec-explain/references/destinations.md',
+      'skills/spec-pov/references/report.md',
+    ];
+    const retiredIdentifiers = [
+      'spec-proof',
+      'Publish to Proof',
+      "Every's Proof",
+      'proofeditor.ai',
+    ];
+
+    for (const callerPath of formerCallerPaths) {
+      const source = fs.readFileSync(path.join(__dirname, '../..', callerPath), 'utf8');
+      for (const identifier of retiredIdentifiers) {
+        expect(source).not.toContain(identifier);
       }
     }
   });

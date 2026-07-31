@@ -24,8 +24,9 @@ citations against the repository:
        a-f letter) resolve to commits, classified by reachability from
        HEAD and the upstream default branch.
     3. Relative markdown link targets resolve from the doc's location.
-    4. Dangling drafting scaffold: "Learning(s) N" numbering and
-       unresolved {{...}} placeholder tokens.
+    4. Dangling drafting scaffold: "Learning(s) N" numbering and unresolved
+       {{...}} placeholder tokens. Inline code spans and fenced code blocks are
+       masked first, so documented syntax is not mistaken for leaked scaffold.
 
 Flags are adjudication input, NOT hard failures — a doc may legitimately
 cite a path deleted by the very fix it documents. The calling agent
@@ -48,6 +49,7 @@ PLACEHOLDER_SUBSTRINGS = ("path/to", "...", "…")
 SHA_RE = re.compile(r"\b[0-9a-f]{7,40}\b")
 BACKTICK_RE = re.compile(r"`([^`\n]+)`")
 MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
 SCAFFOLD_RES = (
     re.compile(r"\bLearnings?\s+#?\d"),
     re.compile(r"\{\{[^}\n]*\}\}"),
@@ -112,6 +114,30 @@ def is_path_shaped(token: str, base: str) -> bool:
     if token.endswith("/"):
         return True
     return os.path.isdir(os.path.join(base, segments[0]))
+
+
+def mask_code(lines: list[str]) -> list[str]:
+    """Mask fenced and inline code while preserving line positions."""
+    masked: list[str] = []
+    fence: str | None = None
+    for line in lines:
+        match = FENCE_RE.match(line)
+        if fence is None and match:
+            fence = match.group(1)
+            masked.append(" " * len(line))
+            continue
+        if fence is not None:
+            if (
+                match
+                and match.group(1)[0] == fence[0]
+                and len(match.group(1)) >= len(fence)
+                and not match.group(2).strip()
+            ):
+                fence = None
+            masked.append(" " * len(line))
+            continue
+        masked.append(BACKTICK_RE.sub(lambda value: " " * len(value.group(0)), line))
+    return masked
 
 
 def normalize_path(token: str) -> str:
@@ -317,7 +343,7 @@ def main(argv: list[str]) -> int:
             )
 
     # --- 4. Dangling drafting scaffold ---------------------------------------
-    for i, line_text in enumerate(body_lines):
+    for i, line_text in enumerate(mask_code(body_lines)):
         for pattern in SCAFFOLD_RES:
             m = pattern.search(line_text)
             if m:

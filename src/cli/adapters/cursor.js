@@ -12,6 +12,11 @@ const {
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
 const CURSOR_RULE_POINTER_PATH = '.cursor/rules/spec-first.mdc';
 const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
@@ -284,13 +289,13 @@ function normalizeCursorSkillFrontmatter(content, context = {}) {
     return content;
   }
 
-  const fields = parseSimpleFrontmatterFields(frontmatter);
+  const fields = parseFrontmatterScalars(frontmatter);
   const name = normalizeCursorName(context.runtimeName || context.skillName || fields.name);
   const description = sanitizeFrontmatterScalar(fields.description || `spec-first skill ${name}`);
   const lines = [
     '---',
     `name: ${name}`,
-    `description: ${JSON.stringify(description)}`,
+    `description: ${formatFrontmatterScalar(description)}`,
   ];
 
   const pathsValue = fields.paths || fields.globs;
@@ -331,45 +336,6 @@ function addCursorSetupHostPin(content) {
   ].join('\n'));
 }
 
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
-}
-
 function normalizeCursorName(value) {
   const normalized = String(value || '')
     .trim()
@@ -396,7 +362,7 @@ function inspectCursorSkillNames(projectRoot, skillsRoot) {
       if (!fs.existsSync(skillPath)) return [];
       const content = fs.readFileSync(skillPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, skillPath).replace(/\\/g, '/');
       const issues = [];
       const frontmatterKeys = listFrontmatterKeys(frontmatter);

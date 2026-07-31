@@ -227,6 +227,91 @@ required_fields:
             type: number
             default: 0.02
             description: "Minimum improvement that must exceed this value to count as a real improvement (not noise). Applied to hard metrics only."
+      calibration:
+        type: object
+        description: "Optional frozen-arm measurement-only calibration. When enabled, the measurement-only reference owns the sequence and this run cannot mutate or integrate either arm."
+        required_children:
+          mode:
+            type: enum
+            values:
+              - disabled
+              - measurement-only
+            default: disabled
+        optional_children:
+          baseline_identity:
+            type: string
+            pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Immutable source ref or content hash for the baseline arm"
+          candidate_identity:
+            type: string
+            pattern: "^(?:[a-f0-9]{40}|sha256:[a-f0-9]{64})$"
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Immutable source ref or content hash for the candidate arm"
+          task_or_corpus_identity:
+            type: string
+            pattern: "^sha256:[a-f0-9]{64}$"
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Frozen repeatable task/corpus identity, including the selection seed when applicable"
+          harness_identity:
+            type: string
+            pattern: "^sha256:[a-f0-9]{64}$"
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Content identity for the exact measurement harness"
+          environment_identity:
+            type: string
+            pattern: "^sha256:[a-f0-9]{64}$"
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Content identity for the frozen runtime and dependency environment"
+          sample_seed:
+            type: integer
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Deterministic task/corpus selection seed"
+          aggregation:
+            type: enum
+            values:
+              - median
+              - mean
+              - min
+              - max
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Pre-registered aggregation method used for both A/A and A/B"
+          aa_repetitions:
+            type: integer
+            default: 2
+            minimum: 2
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Number of baseline-vs-baseline repetitions; must be at least 2 in measurement-only mode"
+          preregistered_acceptance_threshold:
+            type: number
+            minimum: 0
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Acceptance delta fixed before A/A or A/B results are observed"
+          noise_ceiling:
+            type: number
+            minimum: 0
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            description: "Maximum A/A noise allowed before A/B is stopped as inconclusive"
+          broken_run_policy:
+            type: object
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            required_children:
+              max_retries:
+                type: integer
+                minimum: 0
+              synthetic_scores:
+                type: boolean
+                const: false
+          stop_budget:
+            type: object
+            required_when: "measurement.calibration.mode == 'measurement-only'"
+            required_children:
+              max_attempts:
+                type: integer
+                minimum: 2
+              timeout_seconds:
+                type: integer
+                minimum: 1
 
   scope:
     type: object

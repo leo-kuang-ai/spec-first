@@ -68,7 +68,7 @@ Worker model selection is tiered by task shape, never hardcoded to a host or mod
 
 ## Feature Description
 
-<feature_description> #$ARGUMENTS </feature_description>
+<feature_description> #<invocation arguments supplied by the current host> </feature_description>
 
 **If the feature description above is empty, ask the user:** "What would you like to explore? Please describe the feature, problem, or improvement you're thinking about."
 
@@ -77,6 +77,8 @@ Do not proceed until you have a feature description from the user.
 ## Execution Flow
 
 ### Phase 0: Resume, Assess, and Route
+
+Before asking scope questions, read `references/settled-decisions.md`. Classify conversation-carried choices as settled, directives, or unlabeled proposals. Carry settled product decisions forward without re-asking them; spend at most one in-pipeline challenge on an unexamined directive. The Product Contract's Key Decision entry is the single owner of each accepted product decision: annotate it there and reference it elsewhere instead of repeating the decision in Requirements, Scope Boundaries, synthesis, or handoff prose.
 
 #### 0.0 Resolve Output Mode
 
@@ -181,16 +183,9 @@ Classify each load-bearing gap in run-local reasoning as a **source fact**, **cu
 
 **Standard and Deep** — Two passes:
 
-*Constraint Check (inline)* — Source the agnostic orientation (STRATEGY summary, CONCEPTS vocabulary, conventions) from the shared repo-grounding profile cache instead of re-reading those files every run. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
+*Constraint Check (inline)* — Derive a run-local orientation from the current target repo/worktree immediately before use. Confirm the current git root/ref/HEAD and dirty state when available, then read the active project instructions, `STRATEGY.md` when present, and root `CONCEPTS.md` when present as advisory vocabulary. Never reuse an orientation from another run, branch, or worktree. Reuse established language when it fits, but surface conflicts and preserve the Product Contract-local meaning instead of letting a filename or age silently decide. If git or a source is unavailable, record the concrete degraded fact, use only the bounded current sources that can be read, and do not claim complete or fresh project grounding. This pass stays in the main conversation so the dialogue can apply the calibration semantically.
 
-```bash
-SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
-```
-
-On `HIT`, load the profile JSON and take the agnostic orientation from it — `conventions.strategy` for the STRATEGY summary, `vocabulary` for advisory CONCEPTS terms, and `conventions` (coding standards, testing, review process, instruction files) for workflow/product/scope constraints; do not re-read those files. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` only when the Dispatch Authorization Boundary is satisfied; otherwise derive the profile inline and record the matching fallback reason. An authorized profiler writes its JSON to a file, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations), and use the same fields. On `NO-CACHE`, derive the orientation inline and skip the `put`. The cache is an optimization, never a correctness dependency: if it is unavailable, or any cached field is absent/null, fall back to reading the source inline — the project's active instructions and conventions already in your context for workflow, product, or scope constraints (no need to open or name specific instruction files); `STRATEGY.md` if it exists; and `CONCEPTS.md` at repo root if it exists as an advisory calibration source. Reuse established language when it fits, but surface conflicts and preserve the Product Contract-local meaning instead of letting a filename or age silently decide. If any source adds nothing, move on. This pass stays in the main conversation so the dialogue can apply the calibration semantically.
-
-*Topic Scan (grounding scout)* — Create a scratch dir at `/tmp/spec-first/spec-brainstorm/<run-id>/` (short unique slug). Dispatch one extraction-tier sub-agent only when `worker_dispatch_authorization: authorized` and `worker_dispatch_capability: available`; otherwise run the same bounded scan inline or serially and record the matching fallback reason. Only an authorized background dispatch may proceed during the user's think-time without waiting. Scout prompt:
+*Topic Scan (grounding scout)* — Create an owner-only run-local directory with `umask 077` plus `mktemp -d "${TMPDIR:-/tmp}/spec-first-brainstorm.XXXXXX"`; reject a symlink/non-directory result, set mode `0700`, and recheck it before atomic publication. This is ephemeral scratch, never the only durable handoff evidence. Dispatch one extraction-tier sub-agent only when `worker_dispatch_authorization: authorized` and `worker_dispatch_capability: available`; otherwise run the same bounded scan inline or serially and record the matching fallback reason. Only an authorized background dispatch may proceed during the user's think-time without waiting. Scout prompt:
 
 > Gather grounding for a requirements brainstorm about **{topic}** in this repo. Search first with the native file-search and content-search tools, then read targeted sections — budget ~20 reads, preferring ranges over whole files. Find: whether something similar already exists, the most relevant existing artifacts (brainstorms, plans, specs, feature docs), adjacent examples of similar behavior, and the current state of anything the topic would touch (tables, routes, config, dependencies). Write a **grounding dossier** to `{scratch-dir}/grounding.md`: at most 150 lines of verbatim quotes and short code snippets, each with a `file:line` pointer. Extraction only — quote what the repo says; do not interpret or propose. If the topic has little footprint, write less rather than padding. Return only a gist: 3-5 lines summarizing what the dossier holds, plus its absolute path.
 

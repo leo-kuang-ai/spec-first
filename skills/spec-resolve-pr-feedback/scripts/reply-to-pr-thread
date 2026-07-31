@@ -2,6 +2,11 @@
 
 # Replies to a PR review thread. Body is read from stdin to avoid
 # shell escaping issues with markdown (quotes, newlines, etc.).
+#
+# This GraphQL helper consumes the PRRT_ thread ids returned by
+# get-pr-comments. Omitting pullRequestReviewId means GitHub can absorb the
+# reply into the viewer's PENDING review. Callers must check the fetcher's
+# pending_review field and stop before invoking this helper when it is non-null.
 
 set -e
 

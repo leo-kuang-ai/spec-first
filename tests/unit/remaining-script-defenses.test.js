@@ -7,6 +7,7 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const validateClaims = path.join(repoRoot, 'skills/spec-compound/scripts/validate-doc-claims.py');
+const refreshValidateClaims = path.join(repoRoot, 'skills/spec-compound-refresh/scripts/validate-doc-claims.py');
 const parallelProbe = path.join(repoRoot, 'skills/spec-optimize/scripts/parallel-probe.sh');
 const riffrec = path.join(repoRoot, 'skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py');
 const sweepRiffrec = path.join(repoRoot, 'skills/spec-sweep/scripts/analyze_riffrec_zip.py');
@@ -21,6 +22,31 @@ describe('remaining script failure-path defenses', () => {
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
       expect(result.stdout).toContain('not a git repository');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('claim validator mirrors stay identical and ignore scaffold syntax inside code', () => {
+    expect(fs.readFileSync(validateClaims).equals(fs.readFileSync(refreshValidateClaims))).toBe(true);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-doc-code-mask-'));
+    const doc = path.join(root, 'example.md');
+    fs.writeFileSync(doc, [
+      '# Example',
+      '',
+      'Inline `{{documented}}` syntax is allowed.',
+      '',
+      '```handlebars',
+      '{{also_documented}}',
+      '```',
+      '',
+    ].join('\n'));
+    try {
+      const result = spawnSync('python3', [validateClaims, doc], { cwd: root, encoding: 'utf8' });
+      expect(result.status).toBe(0);
+      expect(result.stdout).not.toContain('drafting scaffold');
+      expect(result.stdout).not.toContain('{{documented}}');
+      expect(result.stdout).not.toContain('{{also_documented}}');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

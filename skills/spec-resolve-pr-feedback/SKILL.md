@@ -1,7 +1,7 @@
 ---
 name: spec-resolve-pr-feedback
 description: Resolve PR review feedback by evaluating validity and fixing issues with conflict-aware resolver dispatch. Use when addressing PR review comments, resolving review threads, or fixing code review feedback.
-argument-hint: "[PR number, comment URL, or blank for current branch's PR]"
+argument-hint: "[PR number, comment URL, or blank for current branch's PR] [mode:pipeline-return]"
 disable-model-invocation: true
 allowed-tools:
   - Read
@@ -53,6 +53,12 @@ thread_resolution_authorization: authorized | missing
 
 ## Mode Detection
 
+If the invocation contains `mode:pipeline-return`, strip the token, load
+`references/pipeline-return.md`, and then use Full or Targeted mode only for
+fetch, source validation, and local fix mechanics. The pipeline-return
+reference overrides every blocking question and all commit, push, reply, and
+thread-resolution steps. The token is not authorization.
+
 | Argument | Mode |
 |----------|------|
 | No argument | **Full** -- all unresolved threads on the current branch's PR |
@@ -66,6 +72,7 @@ After determining mode, read the matching reference and follow it. Each referenc
 - **Full Mode** -> [references/full-mode.md](references/full-mode.md) (fetch, triage, plan, dispatch or sequential implementation, validate, commit/push, reply/resolve, verify, summary)
 - **Targeted Mode** -> [references/targeted-mode.md](references/targeted-mode.md) (extract one thread from a URL, then handle it through the same mutation, validation, reply, and resolution pipeline)
 - **Evaluation Rubric** -> [references/evaluation-rubric.md](references/evaluation-rubric.md) (the orchestrator reads this before any resolver dispatch to decide fix/reply/human verdicts)
+- **Pipeline Return** -> [references/pipeline-return.md](references/pipeline-return.md) (bounded non-interactive return to an outer caller; no nested landing tail)
 
 Resolve all `scripts/<name>` helper paths relative to this skill's loaded directory. Do not assume the current project checkout has a top-level `scripts/` directory containing these helpers.
 

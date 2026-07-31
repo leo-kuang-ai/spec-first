@@ -69,6 +69,7 @@
 | --- | --- |
 | `using-spec-first` | 入口治理：选一个下一步入口，不创建 artifact |
 | `spec-explain` | 把概念 / diff / 想法 / 近期工作做成面向你的 dense explainer |
+| `spec-handoff` | **仅在用户明确要求跨会话延续时**创建 immutable 本地 handoff，或从用户选定 source 恢复只读上下文；恢复后必须停下等待用户选择 |
 | `spec-pov` | 对外部输入给出**项目语境下的**采纳 / 否决 verdict |
 | `spec-strategy` | 创建或更新 `STRATEGY.md` |
 | `spec-simplify-code` | 在行为不变前提下简化近期改动 |
@@ -79,7 +80,9 @@
 | `spec-resolve-pr-feedback` | **仅由用户显式调用**，读取并判断 PR review feedback；本地修复、commit、push、回复与 thread resolve 分别要求当前请求授权 |
 | `spec-test-xcode` | **仅由用户显式调用**，通过 XcodeBuildMCP 在 iOS Simulator 上 build/install/launch/verify |
 | `spec-promote` | 为已上线特性起草发布 / 推广文案 |
-| `spec-lfg` | **仅在用户明确要求时**跑从规划到绿 PR 的全自动管线；该明确选择只额外授权一次委派的独立只读代码审查，审查结果缺失、降级或无独立覆盖会阻断后续 shipping，且不扩展为任意 worker dispatch。browser applicable 时要求调用方提供 `target-origin:<origin>`，只消费 browser 结果与 browser cleanup；它不管理项目 server，缺 origin 或缺少持久/外部 UI effect 授权会阻断 shipping |
+| `spec-lfg` | **仅在用户明确要求时**跑从规划到绿 PR 的全自动管线；该明确选择只额外授权一次委派的独立只读代码审查，审查结果缺失、降级或无独立覆盖会阻断后续 shipping，且不扩展为任意 worker dispatch。browser applicable 时要求调用方提供 `target-origin:<origin>`，只消费 browser 结果与 browser cleanup；它不管理项目 server，缺 origin 或缺少持久/外部 UI effect 授权会阻断 shipping。当前 pipeline 到达 terminal state 且 canonical plan 明确存在独立 future area 时，只提供可选 `spec-handoff`，用户后续明确接受后才创建 |
+
+当前 CE 3.20 校准边界：`spec-work` 使用 immutable run identity 与 append-only CAS recovery state；获授权的 LFG tail 只做有预算的 review/CI/head/base-currency watch，不自动 merge；`spec-optimize mode:measurement-only` 只产生 owner evaluation evidence，不修改或 promotion Skill；`spec-write-skill` 保持唯一 authoring/promotion owner。Canonical `docs/**` artifact root 不支持全局 `docs_root` 重定位。
 
 ## 5. Internal helpers（`entry_surface: internal_only`）
 
@@ -90,7 +93,6 @@
 | `spec-worktree` | 为并行 feature / PR review 准备隔离 worktree |
 | `spec-commit` | 结构化 commit message |
 | `spec-commit-push-pr` | commit + push + 开 PR / 刷新 PR 描述 |
-| `spec-proof` | Proof editor 协作审阅环 |
 | `spec-test-browser` | 针对分支/PR 影响面的浏览器测试；持有 resolved loopback exact origin 的确定性校验、私有 browser run/cleanup 与 route/step 证据；项目 server 由调用方管理，origin 不授权持久/外部 UI effect |
 
 ## 6. Agent 与 skill 的关系（用户需要知道的）
