@@ -13,6 +13,7 @@ const {
   upsertMcpSection,
 } = require('./toml-section-editor.cjs');
 const { collectRedactionValues, redactText } = require('./process-runner.cjs');
+const { processAlive: processIsAlive, sleepSync } = require('./process-utils.cjs');
 const {
   isPathWithin,
   nearestExistingPath,
@@ -697,22 +698,6 @@ function inspectHostConfig({
     effective_scope: target.scope,
     effective_path: target.config_path,
   };
-}
-
-function sleepSync(milliseconds) {
-  if (milliseconds <= 0) return;
-  const view = new Int32Array(new SharedArrayBuffer(4));
-  Atomics.wait(view, 0, 0, milliseconds);
-}
-
-function processIsAlive(pid) {
-  if (!Number.isInteger(pid) || pid <= 0) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    return error.code === 'EPERM';
-  }
 }
 
 function readLockOwner(lockPath) {

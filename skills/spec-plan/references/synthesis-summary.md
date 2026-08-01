@@ -4,7 +4,7 @@
 
 **Two-stage shape: internal draft, then chat-time synthesis.** The synthesis is composed in two stages. Stage 1 is an internal three-bucket draft (Stated / Inferred / Out of scope) the agent uses to think comprehensively about scope. Stage 2 is the compressed chat-time output: a tier-shaped summary plus "Call outs" (zero or more, capped by plan depth — see the cap table under "How many call-outs are right?") — the specific forks where the user might redirect. The user only sees stage 2. The internal draft still informs the plan body via the doc-shape routing below; it just doesn't reach the user verbatim. This split exists because the comprehensive audit shape produced too much detail for the user to weigh in on, even when the granularity rules were followed.
 
-**Three-bucket structure is the internal draft, not the user-facing artifact.** It does its scope-thinking job during stage 1 and dissolves when Phase 5.2 writes the plan: Stated content informs the Product Contract's Requirements, Inferred content informs Key Technical Decisions / Implementation Units (normal interactive mode) or the Planning Contract's `### Assumptions` (non-interactive mode, or an interactive `SKIP_SCOPING_CONFIRM` skip run), Out-of-scope content informs the Product Contract's Scope Boundaries. The plan has no parallel `## Synthesis` section — only the stage-2 summary embeds, under the Product Contract's `### Summary`. See "Doc shape after confirmation" below for the exact routing and section nesting.
+**Three-bucket structure is the internal draft, not the user-facing artifact.** It does its scope-thinking job during stage 1 and dissolves when Phase 5.2 writes the plan. For a newly authored Product Contract (direct bootstrap or a new unified plan derived from a legacy origin), Stated content informs Product Contract Requirements, Out-of-scope content informs Product Contract Scope Boundaries, and the stage-2 summary may populate Product Contract Summary. For brainstorm-sourced requirements-only enrichment, the upstream Product Contract is a read-only source slice: leave Stated content in the existing Product Contract, route plan-local exclusions to Planning Contract `### Implementation Scope Boundaries`, and never route the stage-2 summary back into the Product Contract. In either shape, Inferred content informs Key Technical Decisions / Implementation Units in normal interactive mode or Planning Contract `### Assumptions` in non-interactive mode or an interactive `SKIP_SCOPING_CONFIRM` run. The plan has no parallel `## Synthesis` section. See "Doc shape after confirmation" below for the exact routing.
 
 This content is loaded when a synthesis-summary phase fires in spec-plan. There are two variants — they share structure but differ in timing and content focus:
 
@@ -351,7 +351,9 @@ Fall back to numbered list in chat only when no blocking tool exists or the call
 
 When the skill is invoked from an automated workflow such as LFG or any `disable-model-invocation` context, the skill runs in non-interactive mode (no synchronous user). The artifact is read by downstream skills (spec-doc-review, spec-work) and human reviewers (PR review).
 
-**Stage 2 is moot in headless mode.** Compose the internal draft (stage 1) as usual, but skip the chat-time compression — there is no synchronous user to confirm to, no call-outs to derive, no auto-proceed announcement. Route the internal draft directly into the plan body via the doc-shape table below.
+The Assumptions routing in this section applies only after Phase 0.5 has cleared every true product blocker. An unresolved item from `Resolve Before Planning`, `can_enter_spec_plan: no`, or an equivalent checkpoint must not enter `### Assumptions` when it would change product behavior, scope, or success criteria. Headless mode, pipeline mode, `confirm:auto`, and skipped synchronous confirmation do not change this boundary. On such a blocker, return to Phase 0.5 and fail closed: keep the canonical artifact unchanged and return to the owning producer or an authorized Product Owner.
+
+**Stage 2 is moot in headless mode.** Compose the internal draft (stage 1) as usual, but skip the chat-time compression — there is no synchronous user to confirm to, no call-outs to derive, no auto-proceed announcement. Route the internal draft directly into the plan body via the variant-aware doc-shape rules below.
 
 **Per-variant behavior** (the timing matters for which phases follow):
 
@@ -361,10 +363,10 @@ When the skill is invoked from an automated workflow such as LFG or any `disable
 **Shared behavior across both variants:**
 
 - **No user prompt; no stage 2; no auto-proceed announcement.** All three are moot.
-- **Route internal-draft content with mode-aware shape** (nested under Product Contract / Planning Contract in a `spec-unified-plan/v1` artifact; top-level `##` headings in a legacy standalone plan):
-  - **Stated** content → Product Contract `### Requirements` (user-stated constraints, traced to origin's R-IDs when present)
-  - **Out-of-scope** content → Product Contract `### Scope Boundaries`
-  - **Inferred** content → Planning Contract `### Assumptions` — explicitly labeled as un-validated agent bets. Do NOT route Inferred items into Key Technical Decisions or Implementation Units; that would make un-validated bets indistinguishable from user-confirmed decisions.
+- **Route internal-draft content with mode- and origin-aware shape:**
+  - For direct bootstrap or a new unified plan derived from a legacy origin, **Stated** content may populate Product Contract `### Requirements`, **Out-of-scope** content may populate Product Contract `### Scope Boundaries`, and **Inferred** content routes to Planning Contract `### Assumptions`.
+  - For brainstorm-sourced requirements-only enrichment, **Stated** content remains byte-preserved in the existing Product Contract, **Out-of-scope** planning deductions route to Planning Contract `### Implementation Scope Boundaries`, and **Inferred** content routes to Planning Contract `### Assumptions`. Do not add a Summary, normalize IDs, or otherwise rewrite the upstream region.
+  - In headless or skipped-confirmation runs, never route Inferred items into Key Technical Decisions or Implementation Units; that would make un-validated bets indistinguishable from user-confirmed decisions.
 
 The `### Assumptions` section appears in non-interactive plans and in interactive plans where the user opted into `SKIP_SCOPING_CONFIRM` — both cases proceed without confirming Inferred bets, so those bets must stay visibly labeled. A normal interactive plan doesn't need it (Inferred bets either get user-corrected via call-outs and become Key Technical Decisions, are revised away, or were judged not-fork material by the keep test and dissolved into Implementation Units silently).
 
@@ -385,7 +387,9 @@ In either case: stop spec-plan, suggest the alternative skill, offer to load it 
 
 ## Doc shape after confirmation
 
-After user confirmation (or after the soft-cut decision proceeds), Phase 5.2 writes the plan doc. The internal draft does NOT carry into the plan as a `## Synthesis` section. Only the stage-2 summary embeds, under the Product Contract's `### Summary`. Internal-draft content dissolves into the unified plan's sections. In a `spec-unified-plan/v1` artifact these destinations are nested — Summary, Problem Frame, Requirements, and Scope Boundaries live under `## Product Contract`; Key Technical Decisions and Assumptions live under `## Planning Contract`; Implementation Units is its own top-level section. (Legacy standalone plans without `artifact_contract` keep these as top-level `##` headings.)
+After user confirmation (or after the soft-cut decision proceeds), Phase 5.2 writes the plan doc. The internal draft does NOT carry into the plan as a `## Synthesis` section. Routing depends on source ownership: newly authored Product Contracts may receive the summary and confirmed product scope; brainstorm-sourced requirements-only enrichment must keep its captured Product Contract region byte-identical and place all new HOW material outside that region.
+
+For direct bootstrap or a new unified plan derived from a legacy origin:
 
 | Internal-draft element | Where it goes in the unified plan |
 |---|---|
@@ -394,9 +398,18 @@ After user confirmation (or after the soft-cut decision proceeds), Phase 5.2 wri
 | Inferred bullets | Planning Contract `### Key Technical Decisions` (with rationale) and Implementation Units when the bet drives a structural choice. In non-interactive mode **or an interactive `SKIP_SCOPING_CONFIRM` skip run**, route to Planning Contract `### Assumptions` instead — both proceed without confirming the bets, so they must stay labeled; see Headless mode above. |
 | Out-of-scope bullets | Product Contract `### Scope Boundaries` — including the `#### Deferred to Follow-Up Work` subsection when relevant |
 
+For brainstorm-sourced requirements-only enrichment:
+
+| Internal-draft element | Where it goes in the enriched plan |
+|---|---|
+| Summary (stage 2) | Goal Capsule or a concise Planning Contract orientation when useful; never the upstream Product Contract |
+| Stated bullets | Remain in the byte-preserved Product Contract; reference stable IDs rather than copying or normalizing text |
+| Inferred bullets | Planning Contract `### Key Technical Decisions` and Implementation Units after normal interactive confirmation; Planning Contract `### Assumptions` in non-interactive or skipped-confirmation runs |
+| Out-of-scope bullets | Planning Contract `### Implementation Scope Boundaries`; product-scope changes return to the owning producer |
+
 No italic capture-context note (e.g., "Captured at Phase 0.7..."). It would leak engineering process into an artifact whose readers do not need that signal.
 
-The Product Contract's `### Summary` and `### Problem Frame` must serve distinct purposes: Summary answers "what is this plan proposing?" (forward-looking, 1-3 lines); Problem Frame answers "why does this proposal exist?" (backward-looking, paragraphs). Don't restate the proposal in Problem Frame; don't pad Summary with situational context.
+In a newly authored Product Contract, `### Summary` and `### Problem Frame` must serve distinct purposes: Summary answers "what is this plan proposing?" (forward-looking, 1-3 lines); Problem Frame answers "why does this proposal exist?" (backward-looking, paragraphs). During requirements-only enrichment, do not add or rewrite either section.
 
 ---
 

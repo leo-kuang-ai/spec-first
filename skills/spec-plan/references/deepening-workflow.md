@@ -104,11 +104,11 @@ Before dispatching agents, report what sections are being strengthened and why:
 Strengthening [section names] — [brief reason for each, e.g., "decision rationale is thin", "cross-boundary effects aren't mapped"]
 ```
 
-For each selected section, choose the smallest useful agent set. Do **not** run every agent. Use at most **1-3 agents per section** and usually no more than **8 agents total**.
+For each selected section, choose the smallest sufficient set of specialist perspectives. Do **not** run every specialist. Use at most **1-3 specialists per section** and usually no more than **8 specialists total**.
 
-The names below are skill-local prompt asset file stems under `references/agents/`, not standalone agent types. For each selected name, read `references/agents/<name>.md` and seed a generic subagent with that prompt content plus the section context described below. Do not use `subagent_type`, typed `Agent` names, or platform-level spec-first agent registration.
+The names below are skill-local prompt asset file stems under `references/agents/`, not standalone agent types. Selecting a section never selects a prompt asset by itself. First apply a **specialist applicability gate**: the plan must contain the specialist's positive trigger, the selected section must pose a concrete unresolved question for that specialist, and the perspective must add something not already established by the origin artifact or current source. If direct source or the in-context section already closes the fired trigger, do not load the prompt asset. For authorized dispatch, read `references/agents/<name>.md` and seed a generic subagent with that content plus the section context described below. Under inline fallback, use the concise candidate description as the default lens; the full file is worker seed material and is loaded only when its specialized criteria remain necessary. Do not use `subagent_type`, typed `Agent` names, or platform-level spec-first agent registration.
 
-**Deterministic Section-to-Agent Mapping:**
+**Conditional Section-to-Specialist Candidate Map:**
 
 **Requirements / Open Questions classification**
 - `spec-flow-analyzer` for missing user flows, edge cases, and handoff gaps
@@ -151,7 +151,7 @@ The names below are skill-local prompt asset file stems under `references/agents
 - Use the specialist that matches the actual risk:
   - `security-sentinel` for security, auth, privacy, and exploit risk
   - `data-integrity-guardian` for migrations, backfills, persistent data safety, constraints, transaction boundaries, and production data transformation risk (plan context — not the PR-review `data-migration-reviewer` persona)
-  - `deployment-verification-agent` for rollout checklists, rollback planning, and launch verification
+  - `deployment-verification-agent` only for a real deployment surface such as a persistent data migration or backfill, a staged or feature-flagged rollout, multi-version deployment compatibility, or a concrete production launch sequence with owner-visible stop/go verification. A normal module change, a generic rollback mention, or the mere presence of Operational Notes do not by themselves justify `deployment-verification-agent`
   - `performance-oracle` for capacity, latency, and scaling concerns
 
 **Agent Prompt Shape:**
@@ -195,11 +195,13 @@ Refer to the echoed absolute path as `<scratch-dir>` throughout the rest of this
 
 ## 5.3.6 Run Targeted Research
 
-Launch selected prompt assets as generic workers only when the main Skill's boundary has `worker_dispatch_authorization: authorized` and current-session `worker_dispatch_capability: available`, with any required data-access authorization also present. Otherwise read the same prompt assets and apply them sequentially in the current agent: use `dispatch_authorization_missing` when authorization is absent, `subagent_capability_missing` only for confirmed absence from a complete current-session schema, and `worker_capability_unproven` when discovery is unavailable, incomplete, or ambiguous. Plan generation and deepening must still complete through this inline fallback. When dispatching, omit the `mode` parameter so the user's configured permission settings apply.
+Launch selected prompt assets as generic workers only when the main Skill's boundary has `worker_dispatch_authorization: authorized` and current-session `worker_dispatch_capability: available`, with any required data-access authorization also present. Otherwise apply the selected concise specialist lenses sequentially in the current agent without preloading full worker prompts: use `dispatch_authorization_missing` when authorization is absent, `subagent_capability_missing` only for confirmed absence from a complete current-session schema, and `worker_capability_unproven` when discovery is unavailable, incomplete, or ambiguous. Load one full asset inline only when its positive applicability gate passed and its specialized criteria are still needed. Plan generation and deepening must still complete through this inline fallback. When dispatching, omit the `mode` parameter so the user's configured permission settings apply.
 
 Prefer local repo and institutional evidence first. Use external research only when the gap cannot be closed responsibly from repo context or already-cited sources.
 
 If a selected section can be improved by reading the origin document more carefully, do that before dispatching external agents.
+
+Re-evaluate remaining triggers after each inline improvement. Stop when the current source and in-context plan facts close them; do not continue loading prompt assets to satisfy a target count or because another section maps to the same specialist. The completion budget is the smallest sufficient set, not the maximum allowed set.
 
 **Direct mode:** Have each selected prompt-seeded subagent return its findings directly to the parent. Keep the return payload focused: strongest findings only, the evidence or sources that matter, the concrete planning improvement implied by the finding.
 

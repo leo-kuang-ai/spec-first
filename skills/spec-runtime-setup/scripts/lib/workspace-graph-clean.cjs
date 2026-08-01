@@ -25,8 +25,14 @@ const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
 const { stripRoutingInstruction } = require('./workspace-routing-inject.cjs');
 const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
 const { readWorkspaceGraphState, resolveStateRepoIds } = require('./workspace-graph-state.cjs');
-const { removeWorkspaceChildHook } = require('./workspace-child-hook.cjs');
+const {
+  probeChildHookMarker,
+  removeWorkspaceChildHook,
+} = require('./workspace-child-hook.cjs');
 const { CANONICAL_HOSTS } = require('./host-authority.cjs');
+const {
+  acquireWorkspaceGraphLifecycleLease,
+} = require('./workspace-graph-lifecycle-lease.cjs');
 
 function runWorkspaceGraphClean({
   cwd = process.cwd(),
@@ -37,27 +43,80 @@ function runWorkspaceGraphClean({
   stripRouting = true,
   hosts = [...CANONICAL_HOSTS],
 } = {}) {
-  const stateResult = readWorkspaceGraphState(cwd);
-  const explicitRefreshState = stateResult.status === 'ready'
-    && stateResult.state.refresh_mode === 'explicit';
-  const specFirstHookState = stateResult.status === 'ready'
-    && stateResult.state.refresh_mode === 'commit-hook-spec-first-async';
-  const effectiveRepos = repos.length > 0 ? repos : resolveStateRepoIds(stateResult);
-  const targets = resolveWorkspaceTargets({
-    cwd,
-    repos: effectiveRepos,
-    allowDiscovery,
+  const initial = resolveCleanContext({ cwd, repos, allowDiscovery });
+  if (initial.targets.topology !== 'requirement-workspace') {
+    return ineligibleCleanResult(initial.targets);
+  }
+
+  const lifecycle = acquireWorkspaceGraphLifecycleLease({
+    workspaceRoot: initial.targets.workspace_root,
+    operation: 'clean',
   });
-  if (targets.topology !== 'requirement-workspace') {
+  if (!lifecycle.ok) {
     return {
       schema_version: 'workspace-graph-clean.v1',
-      status: 'skipped',
-      topology: targets.topology,
-      reason_code: targets.reason_code || 'workspace-not-eligible',
-      workspace_root: targets.workspace_root,
+      status: 'failed',
+      topology: initial.targets.topology,
+      reason_code: lifecycle.reason_code,
+      active_operation: lifecycle.active_operation || null,
+      workspace_root: initial.targets.workspace_root,
       repos: [],
       routing: null,
     };
+  }
+
+  let result;
+  let release = null;
+  try {
+    lifecycle.assertOwned('before-clean-resolution');
+    result = runWorkspaceGraphCleanOwned({
+      context: resolveCleanContext({ cwd, repos, allowDiscovery }),
+      exec,
+      graphifyCommand,
+      stripRouting,
+      hosts,
+      lifecycle,
+    });
+  } finally {
+    release = lifecycle.release();
+  }
+  if (!release.ok && result.status === 'complete') {
+    result.status = 'partial';
+    result.reason_code = release.reason_code || 'workspace-graph-lifecycle-release-failed';
+  }
+  result.lifecycle_release = release;
+  return result;
+}
+
+function resolveCleanContext({ cwd, repos, allowDiscovery }) {
+  const stateResult = readWorkspaceGraphState(cwd);
+  const effectiveRepos = repos.length > 0 ? repos : resolveStateRepoIds(stateResult);
+  const targets = resolveWorkspaceTargets({ cwd, repos: effectiveRepos, allowDiscovery });
+  return {
+    stateResult,
+    targets,
+    explicitRefreshState: stateResult.status === 'ready'
+      && stateResult.state.refresh_mode === 'explicit',
+    specFirstHookState: stateResult.status === 'ready'
+      && stateResult.state.refresh_mode === 'commit-hook-spec-first-async',
+  };
+}
+
+function runWorkspaceGraphCleanOwned({
+  context,
+  exec,
+  graphifyCommand,
+  stripRouting,
+  hosts,
+  lifecycle,
+}) {
+  const {
+    targets,
+    explicitRefreshState,
+    specFirstHookState,
+  } = context;
+  if (targets.topology !== 'requirement-workspace') {
+    return ineligibleCleanResult(targets);
   }
   if (targets.manifest_error) {
     return {
@@ -99,7 +158,9 @@ function runWorkspaceGraphClean({
   }
   const repoResults = [];
 
+  lifecycle.assertOwned('before-child-clean');
   for (const repo of confirmed) {
+    lifecycle.assertOwned(`before-child-clean:${repo.repo_id}`);
     const entry = {
       repo_id: repo.repo_id,
       codegraph_status: 'absent',
@@ -125,51 +186,68 @@ function runWorkspaceGraphClean({
       entry.reason_code = excl && excl.reason_code ? excl.reason_code : 'exclude-remove-failed';
     }
 
-    // 3. Hook cleanup 按 state refresh_mode 分三态：
-    //    - commit-hook-spec-first-async：移除 spec-first 自有 managed block（contained only，绝不写外部）。
-    //    - explicit：当前 build 不装 hook；仅当 contained + 有 legacy graphify marker 才 provider-native uninstall。
-    //    - 其余（legacy/无 state）：向 Graphify 请求 uninstall 任何旧 native hook。
+    // 3. State 只提供已知 posture；实际 cleanup 还会探测 contained hook marker，
+    //    因而旧/损坏 receipt 也不会让 spec-first managed block 变成孤儿。
     const hooks = resolveHooksPath(repo.git_root);
-    let shouldUninstallLegacyHook = !explicitRefreshState && !specFirstHookState;
-    if (specFirstHookState) {
-      if (!hooks.ok) {
+    let shouldUninstallLegacyHook = false;
+    if (!hooks.ok) {
+      if (explicitRefreshState) {
+        entry.hook_status = 'not-installed';
+      } else {
         entry.hook_status = 'failed';
         if (!entry.reason_code) entry.reason_code = hooks.reason_code;
-      } else if (!isContained(workspaceRoot, hooks.absolute)) {
-        // 有效 hooks root 在项目外：绝不写；spec-first 自有 hook 不可能装在此，标 blocked。
+      }
+    } else if (!isContained(workspaceRoot, hooks.absolute)) {
+      if (explicitRefreshState) {
+        entry.hook_status = 'not-installed';
+      } else {
         entry.hook_status = 'blocked';
         if (!entry.reason_code) entry.reason_code = 'hook-target-escapes-workspace';
-      } else {
-        const removal = safe(() => removeWorkspaceChildHook(repo.git_root, hooks.absolute));
-        if (removal && removal.ok) {
-          entry.hook_status = removal.changed ? 'uninstalled' : 'not-installed';
-        } else {
-          entry.hook_status = 'failed';
-          if (!entry.reason_code) entry.reason_code = (removal && removal.reason_code) || 'workspace-child-hook-remove-failed';
-        }
       }
-    } else if (explicitRefreshState) {
-      if (hooks.ok && isContained(workspaceRoot, hooks.absolute)) {
-        shouldUninstallLegacyHook = hasGraphifyManagedHook(hooks.absolute);
-      }
-      entry.hook_status = shouldUninstallLegacyHook ? 'skipped' : 'not-installed';
     } else {
-      if (!hooks.ok) {
-        entry.hook_status = 'failed';
-        if (!entry.reason_code) entry.reason_code = hooks.reason_code;
+      let markers = probeChildHookMarker(hooks.absolute);
+      if (!markers.ok) {
+        entry.hook_status = 'blocked';
+        if (!entry.reason_code) entry.reason_code = markers.reason_code || 'workspace-child-hook-unreadable';
       } else {
-        try {
-          assertContainedPath(workspaceRoot, hooks.absolute, { reasonCode: 'hook-target-escapes-workspace' });
-        } catch (error) {
-          entry.hook_status = 'blocked';
-          if (!entry.reason_code) entry.reason_code = error.reason_code || 'hook-target-escapes-workspace';
+        if (specFirstHookState || markers.spec_first) {
+          const removal = safe(() => removeWorkspaceChildHook(repo.git_root, hooks.absolute));
+          if (removal && removal.ok) {
+            entry.hook_status = removal.changed ? 'uninstalled' : 'not-installed';
+            markers = probeChildHookMarker(hooks.absolute);
+            if (!markers.ok) {
+              entry.hook_status = 'blocked';
+              if (!entry.reason_code) entry.reason_code = markers.reason_code || 'workspace-child-hook-unreadable';
+            }
+          } else {
+            entry.hook_status = 'failed';
+            if (!entry.reason_code) entry.reason_code = (removal && removal.reason_code) || 'workspace-child-hook-remove-failed';
+          }
+        }
+        if (!['failed', 'blocked'].includes(entry.hook_status)) {
+          shouldUninstallLegacyHook = markers.graphify_native;
+          if (shouldUninstallLegacyHook) entry.hook_status = 'skipped';
+          else if (entry.hook_status === 'skipped') entry.hook_status = 'not-installed';
         }
       }
     }
     if (entry.hook_status === 'skipped' && shouldUninstallLegacyHook && typeof exec === 'function') {
       const result = safe(() => exec(graphifyCommand, ['hook', 'uninstall'], { cwd: repo.git_root }));
-      entry.hook_status = result && result.status === 0 ? 'uninstalled' : 'failed';
-      if (entry.hook_status === 'failed' && !entry.reason_code) entry.reason_code = 'graphify-hook-uninstall-failed';
+      if (result && result.status === 0) {
+        const remaining = probeChildHookMarker(hooks.absolute);
+        if (!remaining.ok) {
+          entry.hook_status = 'blocked';
+          if (!entry.reason_code) entry.reason_code = remaining.reason_code || 'workspace-child-hook-unreadable';
+        } else if (remaining.graphify_native) {
+          entry.hook_status = 'failed';
+          if (!entry.reason_code) entry.reason_code = 'graphify-hook-uninstall-incomplete';
+        } else {
+          entry.hook_status = 'uninstalled';
+        }
+      } else {
+        entry.hook_status = 'failed';
+        if (!entry.reason_code) entry.reason_code = 'graphify-hook-uninstall-failed';
+      }
     }
     entry.hook_uninstalled = entry.hook_status;
     repoResults.push(entry);
@@ -178,6 +256,7 @@ function runWorkspaceGraphClean({
   // 4. 只剥离 workspace host 入口文档中的 managed routing block。
   let routing = null;
   if (stripRouting) {
+    lifecycle.assertOwned('before-routing-clean');
     routing = safe(() => stripRoutingInstruction({ workspaceRoot, hosts }));
   }
 
@@ -198,6 +277,7 @@ function runWorkspaceGraphClean({
     path.join(workspaceRoot, 'graphify-out'),
     path.join(workspaceRoot, '.graphify'),
   ];
+  lifecycle.assertOwned('before-workspace-artifact-clean');
   const graphify = childOrRoutingFailed
     ? { ok: true, status: 'preserved', removed: false, reason_code: '' }
     : removeWorkspaceGraphRoots(workspaceRoot, graphifyRoots);
@@ -219,6 +299,18 @@ function runWorkspaceGraphClean({
     reason_code: failed
       ? 'workspace-clean-partial'
       : (needsConfirmation ? 'workspace-repos-need-confirmation' : ''),
+  };
+}
+
+function ineligibleCleanResult(targets) {
+  return {
+    schema_version: 'workspace-graph-clean.v1',
+    status: 'skipped',
+    topology: targets.topology,
+    reason_code: targets.reason_code || 'workspace-not-eligible',
+    workspace_root: targets.workspace_root,
+    repos: [],
+    routing: null,
   };
 }
 
@@ -246,16 +338,6 @@ function isContained(workspaceRoot, target) {
   } catch (_error) {
     return false;
   }
-}
-
-function hasGraphifyManagedHook(hooksDir) {
-  return ['post-commit', 'post-checkout'].some((name) => {
-    try {
-      return fs.readFileSync(path.join(hooksDir, name), 'utf8').includes('Installed by: graphify hook install');
-    } catch (_error) {
-      return false;
-    }
-  });
 }
 
 function safeRemoveDir(workspaceRoot, dir) {

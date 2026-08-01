@@ -1,0 +1,41 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "codex",
+  "model_name": "",
+  "start_time": "2026-08-01T22:39:08.630383+08:00",
+  "end_time": "2026-08-01T22:51:18.452988+08:00",
+  "case_results": [
+    {
+      "case_id": "enriches-product-contract-in-place",
+      "title": "requirements-only Product Contract 应原地深化且保持产品权威",
+      "status": "FAIL",
+      "duration_ms": 729057,
+      "turns": 1,
+      "input_tokens": 3385947,
+      "output_tokens": 24709,
+      "grading": {
+        "status": "FAIL",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+            "passed": false,
+            "evidence": "script exited with code 1 [stderr: FAIL: 缺少 Product Contract preservation 说明]"
+          }
+        ],
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "total": 1,
+          "pass_rate": 0
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。\n先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。\n本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。\n请直接使用 spec-plan，将 `docs/plans/2026-07-31-001-feat-order-import-plan.md`\n原地深化为 implementation-ready 软件计划。使用 `confirm:auto`，不要调用子代理、访问外部资料、\n运行测试或修改实现代码；完成计划产物后将控制权交还 pipeline caller。\n",
+      "response": "已将计划原地深化为 `implementation-ready`：\n\n[docs/plans/2026-07-31-001-feat-order-import-plan.md](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-843018374/docs/plans/2026-07-31-001-feat-order-import-plan.md)\n\n- 补齐 Planning Contract、接口契约、显式假设、技术设计、Implementation Units、Verification Contract 和 Definition of Done。\n- 置信度检查加强了重试幂等性、最终失败恢复、发布门禁和回滚边界。\n- 文档审查状态：`degraded`；原因是后续 model invocation 已禁用，`independent_review: not_run`。有界生产者自审应用了 2 项修正；独立 reviewer 专属计数保持未知。\n- 元数据、章节、相对路径、Product Contract 保留和 diff 格式检查通过。\n- 仅修改了指定计划文件；未运行测试、未修改实现代码、未调用子代理或访问外部资料。\n\n控制权已交还 pipeline caller。"
+    }
+  ],
+  "total_tokens": 3410656
+}

@@ -1,9 +1,23 @@
-# spec-prd Skill 重构优化方案
+---
+title: "spec-prd Skill 重构优化 - Plan"
+type: refactor
+status: completed
+date: 2026-07-09
+sequence: 003
+topic: spec-prd-skill-optimization
+execution: code
+plan_depth: deep
+superseded_by: docs/plans/2026-07-11-002-refactor-spec-prd-product-decision-synthesis-plan.md
+---
 
-**状态：** superseded（历史实施证据；不再作为当前 implementation contract）
+# spec-prd Skill 重构优化 - Plan
+
+**状态：** completed（方案生命周期已收口；当前 implementation contract 由 `docs/plans/2026-07-11-002-refactor-spec-prd-product-decision-synthesis-plan.md` 接管）
 **目标 surface：** `skills/spec-prd/` source（含 npm 内置 PRD 模板资产）、按激活单元新增的最小定向测试、五宿主 runtime projection
 **历史分析：** 重构前的完整候选机制与五视角审查轨迹保留在 Git 历史 `5b8d8637^..5b8d8637`，不再作为当前实施合同
 **当前权威：** `docs/plans/2026-07-11-002-refactor-spec-prd-product-decision-synthesis-plan.md`；当前 source 与测试事实仍优先于历史描述
+
+> Closeout note（2026-07-31）：本方案按用户要求标记为 `completed`，表示方案生命周期完成并已完成移交；它不提升原始候选项、未执行的 fresh-session/独立 reviewer 证据或后续 field outcome 为 confirmed。2026-07-11 的 unified plan 仍是当前 implementation contract。
 
 > Supersession note（2026-07-11）：当前重构由上述 unified plan 接管。本文保留 M1 模板资产迁移、U1 Decision Card consistency 与 U4 Handoff Context Slice 的已完成历史，以及当时的 subtraction-first 取舍；未完成或待激活内容不得再被当作当前 runtime contract、rollout authority 或 Gate A outcome evidence。
 

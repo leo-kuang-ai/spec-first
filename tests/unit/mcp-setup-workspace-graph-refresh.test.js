@@ -20,6 +20,9 @@ describe('codegraphRefreshPosture — provider-native, spec-first does not start
     const posture = codegraphRefreshPosture('running');
     expect(posture.spec_first_starts_watcher).toBe(false);
     expect(posture.refresh_owner).toBe('provider-native');
+    expect(posture.watcher_scope).toBe('default-project-only');
+    expect(posture.workspace_refresh_owner).toBe('spec-first-workspace-hook');
+    expect(posture.workspace_mechanism).toContain('codegraph sync');
     expect(posture.watcher_fact).toBe('running');
     expect(posture.trust).toBe('provider_untrusted');
   });

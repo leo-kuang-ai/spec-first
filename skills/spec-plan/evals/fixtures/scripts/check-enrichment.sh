@@ -11,6 +11,11 @@ fail() {
 [[ -f "$plan" ]] || fail '原始 unified plan 不存在'
 [[ ! -f 'docs/plans/2026-07-31-002-feat-order-import-plan.md' ]] || fail '不应创建重复计划'
 
+cmp -s \
+  <(git show HEAD:"$plan" | sed -n '/<!-- PRODUCT_CONTRACT_START -->/,/<!-- PRODUCT_CONTRACT_END -->/p') \
+  <(sed -n '/<!-- PRODUCT_CONTRACT_START -->/,/<!-- PRODUCT_CONTRACT_END -->/p' "$plan") \
+  || fail 'Product Contract region changed'
+
 grep -q '^artifact_readiness: implementation-ready$' "$plan" || fail '未提升为 implementation-ready'
 grep -q '^product_contract_source: spec-brainstorm$' "$plan" || fail 'Product Contract 来源被改写'
 grep -q '^execution: code$' "$plan" || fail '缺少 code execution metadata'

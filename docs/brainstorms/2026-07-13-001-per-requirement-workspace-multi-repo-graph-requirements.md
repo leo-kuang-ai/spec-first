@@ -92,7 +92,7 @@ spec-first 已有的相关能力:
 
 > owner 指出原 §3 痛点框错了。经本轮澄清,真实模型如下(owner 确认)。
 
-**要做的事:** 在每个"需求文件夹"(非 Git 多仓父 workspace)内,一键为工作准备两层代码图,并保持自动新鲜:
+**要做的事:** 在每个"需求文件夹"(非 Git 多仓父 workspace)内,先完成 child runtime projection，再用一条 workspace graph 命令准备两层代码图并保持自动新鲜:
 
 - **每个子仓的战术图**(符号 / 调用 / 影响面):由 CodeGraph 承担。
 - **workspace 级的跨仓宏观图**(跨服务 / 前后端的结构、社区、路径):由 Graphify 承担。
@@ -104,15 +104,15 @@ spec-first 已有的相关能力:
 - **当前版本不考虑复用**:各 workspace 独立生成;同一工程在 `需求A/`、`需求B/` 各建各的,不做缓存 / 软链 / 内容寻址复用。
 - 从需求文件夹根进工具后,按 cwd **尽量(best-effort)**路由到对应子仓的战术图(A2 靠注入指令引导 agent 传 `projectPath`,非确定性 resolver);需要跨仓时用 workspace 宏观图。
 
-**真实 gap(要解决的):** 今天 `spec-mcp-setup` 以**单一 project root** 为中心,没有一等的方式从一个**非 Git 多仓父目录**一键建立"每仓战术图 + workspace 跨仓宏观图"并让两者自动保持新鲜;开发者要么逐仓手动配置,要么把父目录误当单仓。
+**真实 gap(要解决的):** 今天 `spec-mcp-setup` 以**单一 project root** 为中心,没有一等的方式在 child projection current 后从一个**非 Git 多仓父目录**统一建立"每仓战术图 + workspace 跨仓宏观图"并让两者自动保持新鲜;开发者要么逐仓手动配置 Provider,要么把父目录误当单仓。
 
 ---
 
 ## 4. Provider 建图 / 刷新能力与端到端验证
 
-> 基于本机已安装 `codegraph`(homebrew)与 `graphify 0.9.12` 的真实 CLI 能力核对;确定性事实,不随后续取舍改变。
+> 初始核对基于当时安装的 CodeGraph 1.4.1 与 Graphify 0.9.12。2026-08-01 以 CodeGraph 1.5.0 / Graphify 0.9.29 重新校准：MCP watcher 只绑定 server 默认项目，通过 `projectPath` 打开的其他子仓不会各自启动 watcher；该 field evidence 覆盖下文旧 claim 2 的 workspace 解释。
 
-> **claim 1 / claim 2** = owner 在澄清中提出、本节据实核对的两条机制表述:**claim 1** = Graphify git / 非 git 都能建,git 下 commit 刷新、非 git 下由子 git 工程 commit 触发 hook 刷新 workspace 图;**claim 2** = CodeGraph 无需 Git、任何代码改动后延迟自动刷新。
+> **claim 1 / claim 2** = owner 在澄清中提出的两条机制表述。claim 1 的 workspace merged refresh 现由 spec-first contained hook 实现；claim 2 只对 MCP server 默认项目成立，不能外推到非 Git parent 下的多个 `projectPath` 子仓。
 
 ### 4.1 已确认的端到端基线
 
@@ -120,7 +120,7 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 
 - init 可 eager 建立全部子仓 CodeGraph 战术图、Graphify 子图与 workspace 合并图;
 - 从 workspace 会话可通过 `projectPath` 命中不同子仓的 CodeGraph 图;
-- CodeGraph watcher 可在代码变化后自动同步对应子仓图;
+- CodeGraph 默认项目 watcher 可延迟同步其绑定项目；workspace 中其他 `projectPath` 子仓由 spec-first hook bounded sync；
 - Graphify 子仓刷新与 workspace `merge-graphs` 收敛链路可自动完成;
 - 单仓与跨仓查询均可路由到对应 scope,图谱候选仍需回到正确子仓源码确认。
 
@@ -131,8 +131,8 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 **CodeGraph**
 
 - `init` / `index` / `sync` / `status [path]` 只认路径,**不依赖 Git**;建图走文件系统遍历 + `.gitignore`。产物是 per-project 的 `.codegraph/codegraph.db`(写在建图根)。
-- `serve --mcp` 作为 MCP server 运行,**默认开启 file watcher**(`--no-watch` 才关),代码变更后延迟 auto-sync。MCP 模式下建图 / watch 路径来自 **client 的 rootUri**(宿主从需求文件夹启动时传入)。
-- ⇒ **claim 2 成立**:无 Git、代码变更后延迟自动刷新。
+- `serve --mcp` 作为 MCP server 运行时默认开启 file watcher，但 CodeGraph 1.5.0 field journey 证明 watcher 只绑定 server 默认项目；`projectPath` 打开的第二个及后续项目连接不会启动 watcher。
+- ⇒ **claim 2 仅对默认项目成立**：多 `projectPath` workspace freshness 需要 spec-first managed hook 对全部 confirmed 子仓执行 bounded `codegraph sync <repo>`。
 - **多仓最佳实践(官方 README 推荐)= per-project 索引 + `projectPath` 跨项目查询。** 每个 project 各建 `.codegraph/`;MCP server **一次性全局 install**(不逐仓装,README:451);同一 session 里给工具传 `projectPath` 即可查询任意已索引子仓 / 第二个仓,server root 自身没索引也行(README:499、607)。⇒ **per-child 是 CodeGraph 原生多仓形态,且不丢跨仓能力**(跨仓 = 一个 session 按 projectPath 查多个子图)。
 - **产物只能在仓内(无 out-of-tree)。** `init` 无 `--out`/`--db`;仅 `CODEGRAPH_DIR` env 可改**目录名**(文档示例是同树 sibling 如 `.codegraph-win`;能否指到仓外绝对路径**未验证,仅列为 optional exploration,不阻塞主路径**)。⇒ 没有像 Graphify `--out` 那样把产物写进 workspace 的原生途径;CodeGraph 的"不侵入"惯用做法是把 `.codegraph/` 放进 `.gitignore` 或 `.git/info/exclude`(git 不显示 / 不 track / 不改 committed 文件,但目录物理仍在子仓工作树内)。
 - **父目录一张(在 `需求A/` init)可行但非惯用**:能一图覆盖全部子仓、产物落 workspace,但是单体图、索引整棵树,且脱离 `projectPath` per-project 模型,属 workaround。
@@ -178,21 +178,21 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 
 **A. 低摩擦批量 init(清单 + 自动发现)**
 
-- CR1. "照清单批量 init":owner 给出需求文件夹内仓清单(命令参数或 manifest),一条命令为全部子仓备齐 MCP + 图,免逐仓。
+- CR1. "照清单批量 init":首次接入先用 `spec-first init --all-repos` 或逐仓 init 让 child projection current；随后一条 workspace graph 命令按 manifest 与 CLI 并集为全部 confirmed 子仓备齐 MCP + 图，免逐仓执行 provider setup。
 - CR2. "自动发现补齐":扫需求文件夹发现清单外的子 Git 仓作为候选,保留一层轻确认防误收(vendor / build / 无关目录)。发现必须 **symlink-contained**:realpath 逃逸出 workspace 根的候选一律拒绝 / 标记,不随 symlink 收录仓外目录。
 - CR3. init 对两种来源给出一致的批量结果与 per-repo 状态(ready / partial / failed + 原因)。
 
 **B. workspace 双层图建立(per-需求 隔离)**
 
 - CR4. 每个子仓建 CodeGraph 战术图 `工程N/.codegraph/`;`.codegraph/` 加入该子仓 `.git/info/exclude` 保持 git 干净;MCP server **全局 install 一次**,跨仓查询通过传 `projectPath` 命中对应子图(**不建 CodeGraph 父目录单体图**)。
-- CR5. Graphify 每子仓子图 + 需求文件夹一张 `merge-graphs` 合并图,全部用 `--out`/`GRAPHIFY_OUT` 写到 `需求A/.graphify/` 下(**子仓物理零侵入**,不写机器级 global)。建图用 `extract --code-only`(纯 AST、零 LLM key);合并图 = 各子仓 AST 图 union,不含社区归纳/命名(A1)。
+- CR5. Graphify 每子仓子图 + 需求文件夹一张 `merge-graphs` 合并图,全部用 `--out` 写到 `需求A/graphify-out/` 下(**子仓物理零侵入**,不写机器级 global)。建图用 `extract --code-only`(纯 AST、零 LLM key);合并图 = 各子仓 AST 图 union,不含社区归纳/命名(A1)。
 - CR6. 两层图与产物严格 scope 在当前需求文件夹内,不跨需求共享或串味。执行点:`projectPath` 解析须校验落在当前 workspace 根内(拒绝 / 告警指向他需求的 projectPath);跨 workspace query 为非目标。
 
 **C. 自动刷新**
 
-- CR7. CodeGraph:`serve --mcp` 默认 watcher,代码变更延迟 auto-sync,无需手动重建。
-- CR8. Graphify:每个子 Git 仓装 git hook,commit 后刷新子图;自动化编排在子图变化后重新执行 `merge-graphs`,使 workspace 跨仓图收敛。plan 必须把实际触发、等待完成、失败报告与恢复方式写入实现合同和回归验收。
-- CR9. 非 Git 变更或无 hook 的场景,用 Graphify `watch` 或显式 refresh 兜底,并如实标注 freshness。
+- CR7. CodeGraph 默认项目继续使用 Provider watcher advisory；非 Git parent 下的其他 `projectPath` 子仓由 spec-first contained hook 对全部 confirmed 子仓执行 bounded `codegraph sync <repo>`。
+- CR8. 同一 spec-first managed child hook 在 CodeGraph sync 后重新执行 Graphify 全 workspace `extract --code-only` + `merge-graphs`；event single-flight/coalesce 与 writer lifecycle lease 负责并发、失败和恢复。
+- CR9. 可恢复的 Provider partial 允许下一次 Git 事件重试；owner 确认、runtime/hook contract 漂移、非 Git 变更或 hook 不可用时保留显式 workspace build 兜底，并如实标注 freshness。
 
 **D. cwd-aware 查询路由**
 
@@ -202,7 +202,7 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 **E. 诚实边界(继承 005/006/角色契约)**
 
 - CR12. 图输出始终 advisory;partial / stale / unmapped 空结果无否定权,重要结论回源。
-- CR13. workspace / parent 只拥有编排与图 artifact 权威,不获得子仓 Git / source mutation / finding / verification 权威。**唯一授权例外**:向子仓 `.git/info/exclude` 写入 `.codegraph/` 忽略行、及 `graphify hook install`——保持 git 干净 / 刷新所需的最小 Git-metadata 写入;写目标须经 realpath + containment 校验(拒 symlink 逃逸,复用 `assertContainedPath`),`clean` 只幂等移除 spec-first 自写的行 / 块,不碰用户内容。此例外不构成对子仓 source / finding / verification 的权威。
+- CR13. workspace / parent 只拥有编排与图 artifact 权威,不获得子仓 Git / source mutation / finding / verification 权威。**唯一授权例外**:向子仓 `.git/info/exclude` 写入 `.codegraph/` 忽略行，以及向 contained `post-commit` / `post-checkout` 写入 spec-first managed refresh block；写目标须经 realpath + containment 校验，`clean` 只幂等移除 spec-first 自写的行 / 块，不碰用户内容。此例外不构成对子仓 source / finding / verification 的权威。
 
 **当前版本明确不做(deferred):** 跨 workspace 图复用、内容寻址缓存、软链挂载、机器级 global graph。
 
@@ -293,12 +293,12 @@ owner 已在真实 per-需求多仓 workspace 中验证双图谱全量自动化�
 
 1. **形态已收敛**(见 §3-§6,owner 决策全部落定):
    - CodeGraph:per-child `工程N/.codegraph/` + `.git/info/exclude` + 全局 MCP install 一次 + 跨仓 `projectPath`;
-   - Graphify:per-child 子图 + `需求A/.graphify/` 合并图(out-of-tree,子仓零侵入);
+   - Graphify:per-child 子图 + `需求A/graphify-out/` 合并图(out-of-tree,子仓零侵入);
    - init 一次性 eager 建全部子仓图 + 合并图;
-   - 刷新:CodeGraph watcher + Graphify 子仓 git hook + workspace `merge-graphs` 自动化编排 + 非 git `watch`/显式;
+   - 刷新:默认项目 CodeGraph watcher advisory + spec-first 全 child `codegraph sync` + Graphify workspace re-extract/merge + 非 Git/contract 漂移显式兜底;
    - per-需求 隔离、当前版本不复用。
 2. **走 `spec-plan` 另起独立 plan**(006 留作 vision,不改写),plan 内承载:
-   - 把已验证的全量 eager 建图、`projectPath` 路由、CodeGraph watcher、Graphify 子图刷新与 workspace `merge-graphs` 收敛固化为可重复回归验收;
+   - 把全量 eager 建图、`projectPath` 路由、默认项目 watcher 边界、全 child CodeGraph sync 与 Graphify workspace 收敛固化为可重复回归验收;
    - 确定 manifest schema、写入位置、是否 checkin 及其 freshness / drift 语义;
    - 明确批量 init、doctor、clean、失败隔离和恢复合同;
    - 明确五宿主 projection,以及 Kiro/Qoder 的 adapter / degraded 行为;

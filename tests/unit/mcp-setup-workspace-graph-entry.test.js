@@ -4,35 +4,51 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const packageJson = require('../../package.json');
 
 const { parseArgs } = require('../../skills/spec-runtime-setup/scripts/lib/args.cjs');
 const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
 const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const { writeWorkspaceGraphState } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs');
+const { acquireWorkspaceGraphLifecycleLease } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs');
+const { resolveRuntimeProjectionTargets } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs');
+const { INTERNAL_REFRESH_ONLY_ENV } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-child-hook.cjs');
 
 const skillRoot = path.resolve(__dirname, '../../skills/spec-runtime-setup');
+const resolveFixtureCodegraph = () => ({ ok: true, command: '/verified/bin/codegraph' });
+const resolveFixtureGraphify = () => ({ ok: true, command: '/verified/bin/graphify' });
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-entry-')));
 }
-function initRepo(root, rel) {
+function initRepo(root, rel, { runtimeReady = true } = {}) {
   const repo = path.resolve(root, rel);
   fs.mkdirSync(repo, { recursive: true });
   spawnSync('git', ['-C', repo, 'init', '-q']);
   // Isolate from developer-global core.hooksPath (e.g. ~/.githooks).
   spawnSync('git', ['-C', repo, 'config', '--local', 'core.hooksPath', '.git/hooks']);
+  if (runtimeReady) {
+    const runtimeStateDir = path.join(repo, '.codex', 'spec-first');
+    fs.mkdirSync(runtimeStateDir, { recursive: true });
+    fs.writeFileSync(path.join(runtimeStateDir, 'state.json'), `${JSON.stringify({
+      manifestVersion: packageJson.version,
+    })}\n`);
+    fs.appendFileSync(path.join(repo, '.git', 'info', 'exclude'), '.codex/\n');
+  }
   return repo;
 }
 function fakeExec(command, args) {
-  if (command === 'graphify' && args[0] === 'extract') {
+  const executable = path.basename(command);
+  if (executable === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
     const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}');
-  } else if (command === 'graphify' && args[0] === 'merge-graphs') {
+  } else if (executable === 'graphify' && args[0] === 'merge-graphs') {
     fs.writeFileSync(args[args.indexOf('--out') + 1], '{}');
-  } else if (command === 'codegraph' && args[0] === 'init') {
+  } else if (executable === 'codegraph' && args[0] === 'init') {
     fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });
-    fs.writeFileSync(path.join(args[1], '.codegraph', 'db'), 'x');
+    fs.writeFileSync(path.join(args[1], '.codegraph', 'codegraph.db'), 'x');
   }
   return { status: 0, stdout: '', stderr: '' };
 }
@@ -49,7 +65,7 @@ function installProviderShims(binDir) {
     "if (process.env.WORKSPACE_EXEC_LOG) fs.appendFileSync(process.env.WORKSPACE_EXEC_LOG, `${command} ${args.join(' ')}\\n`);",
     "if (command === 'codegraph' && args[0] === 'init') {",
     "  fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });",
-    "  fs.writeFileSync(path.join(args[1], '.codegraph', 'db'), 'x');",
+    "  fs.writeFileSync(path.join(args[1], '.codegraph', 'codegraph.db'), 'x');",
     '}',
     "if (command === 'graphify' && args[0] === 'extract') {",
     "  const out = args[args.indexOf('--out') + 1];",
@@ -58,6 +74,14 @@ function installProviderShims(binDir) {
     '}',
     "if (command === 'graphify' && args[0] === 'merge-graphs') {",
     "  fs.writeFileSync(args[args.indexOf('--out') + 1], '{}');",
+    '}',
+    "if (command === 'graphify' && args[0] === 'hook' && args[1] === 'uninstall') {",
+    "  for (const name of ['post-commit', 'post-checkout']) {",
+    "    const hook = path.join(process.cwd(), '.git', 'hooks', name);",
+    "    if (fs.existsSync(hook) && fs.readFileSync(hook, 'utf8').includes('Installed by: graphify hook install')) {",
+    "      fs.rmSync(hook, { force: true });",
+    '    }',
+    '  }',
     '}',
     '',
   ].join('\n');
@@ -121,6 +145,38 @@ describe('runSetup — workspace-graph dispatch', () => {
     }));
   });
 
+  test('internal refresh reuses the baseline repo set without comma-separated reserialization', () => {
+    const ws = mkWorkspace();
+    const repo = initRepo(ws, 'api,legacy');
+    const receipt = writeWorkspaceGraphState({
+      workspaceRoot: ws,
+      operationStatus: 'complete',
+      refreshMode: 'commit-hook-spec-first-async',
+      repos: [{
+        repo_id: 'api,legacy',
+        git_root: repo,
+        codegraph_status: 'ready',
+        exclude_status: 'applied',
+        graphify_status: 'ready',
+      }],
+      merge: null,
+    });
+    expect(receipt.ok).toBe(true);
+
+    const selection = resolveRuntimeProjectionTargets({
+      actionPlan: { mode: 'workspace-graph-build', args: { repos: [] } },
+      cwd: ws,
+      env: { [INTERNAL_REFRESH_ONLY_ENV]: '1' },
+    });
+
+    expect(selection.targets).toEqual([
+      expect.objectContaining({ repo_label: 'api,legacy', workspace_relative_path: 'api,legacy' }),
+    ]);
+    expect(selection.workspaceGraphTargets.repos).toEqual([
+      expect.objectContaining({ repo_id: 'api,legacy', needs_confirm: false }),
+    ]);
+  });
+
   test('workspace mutations skipped from a Git cwd return a non-zero usage result', () => {
     const ws = mkWorkspace();
     initRepo(ws, '.');
@@ -156,6 +212,8 @@ describe('runSetup — workspace-graph dispatch', () => {
       env: { MCP_SETUP_HOST: 'codex' },
       homeDir,
       workspaceExec: fakeExec,
+      resolveWorkspaceCodegraphCommand: resolveFixtureCodegraph,
+      resolveWorkspaceGraphifyCommand: resolveFixtureGraphify,
     });
 
     expect(result.payload.schema_version).toBe('workspace-graph-executor.v1');
@@ -188,6 +246,14 @@ describe('runSetup — workspace-graph dispatch', () => {
         skillRoot,
         env: { MCP_SETUP_HOST: 'codex' },
         homeDir: path.join(root, 'home'),
+        resolveWorkspaceCodegraphCommand: () => ({
+          ok: true,
+          command: path.join(binDir, 'codegraph'),
+        }),
+        resolveWorkspaceGraphifyCommand: () => ({
+          ok: true,
+          command: path.join(binDir, 'graphify'),
+        }),
       };
       const build = runSetup({
         ...common,
@@ -195,6 +261,10 @@ describe('runSetup — workspace-graph dispatch', () => {
       });
       expect(build.payload.status).toBe('complete');
       fs.rmSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'));
+      fs.writeFileSync(
+        path.join(ws, 'api', '.git', 'hooks', 'post-commit'),
+        '#!/bin/sh\n# Installed by: graphify hook install\n',
+      );
       const clean = runSetup({
         ...common,
         argv: ['--workspace-graph-clean', '--repos', 'api'],
@@ -224,6 +294,7 @@ describe('runSetup — workspace-graph dispatch', () => {
       env: { MCP_SETUP_HOST: 'codex' },
       homeDir,
       workspaceExec: fakeExec,
+      resolveWorkspaceGraphifyCommand: resolveFixtureGraphify,
     });
     // Whatever the existing workspace batch returns, it is NOT the graph executor envelope.
     expect(result.payload && result.payload.schema_version).not.toBe('workspace-graph-executor.v1');
@@ -231,7 +302,7 @@ describe('runSetup — workspace-graph dispatch', () => {
 
   test('workspace graph confirmation and partial outcomes use non-zero exit codes', () => {
     const needsWs = mkWorkspace();
-    initRepo(needsWs, 'api');
+    initRepo(needsWs, 'api', { runtimeReady: false });
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-exit-home-'));
     const needs = runSetup({
       argv: ['--only', 'codegraph,graphify', '--workspace-graph'],
@@ -249,7 +320,7 @@ describe('runSetup — workspace-graph dispatch', () => {
     initRepo(partialWs, 'api');
     initRepo(partialWs, 'web');
     const failWeb = (command, args, opts) => {
-      if (command === 'graphify' && args[0] === 'extract' && args[1].endsWith('web')) {
+      if (path.basename(command) === 'graphify' && args[0] === 'extract' && args[1].endsWith('web')) {
         return { status: 1, stdout: '', stderr: 'fail' };
       }
       return fakeExec(command, args, opts);
@@ -261,6 +332,8 @@ describe('runSetup — workspace-graph dispatch', () => {
       env: { MCP_SETUP_HOST: 'codex' },
       homeDir,
       workspaceExec: failWeb,
+      resolveWorkspaceCodegraphCommand: resolveFixtureCodegraph,
+      resolveWorkspaceGraphifyCommand: resolveFixtureGraphify,
     });
     expect(partial.payload.status).toBe('partial');
     expect(partial.exit_code).toBe(1);
@@ -271,12 +344,22 @@ describe('runSetup — workspace-graph dispatch', () => {
     initRepo(ws, 'api');
     initRepo(ws, 'web');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-home3-'));
+    const binDir = path.join(homeDir, 'bin');
+    installProviderShims(binDir);
     const common = {
       cwd: ws,
       skillRoot,
       env: { MCP_SETUP_HOST: 'codex' },
       homeDir,
       workspaceExec: fakeExec,
+      resolveWorkspaceCodegraphCommand: () => ({
+        ok: true,
+        command: path.join(binDir, 'codegraph'),
+      }),
+      resolveWorkspaceGraphifyCommand: () => ({
+        ok: true,
+        command: path.join(binDir, 'graphify'),
+      }),
     };
 
     const built = runSetup({
@@ -296,6 +379,20 @@ describe('runSetup — workspace-graph dispatch', () => {
     expect(statusReady.payload.status).toBe('ready');
     expect(statusReady.exit_code).toBe(0);
     expect(statusReady.human).toContain('no default index');
+
+    const activeLifecycle = acquireWorkspaceGraphLifecycleLease({
+      workspaceRoot: ws,
+      operation: 'successor-clean',
+      pid: process.pid,
+    });
+    const statusBusy = runSetup({
+      ...common,
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph-status', '--repos', 'api,web'],
+    });
+    expect(statusBusy.payload.status).toBe('partial');
+    expect(statusBusy.human).toContain('lifecycle: active');
+    expect(statusBusy.human).toContain('workspace-graph-lifecycle-busy');
+    expect(activeLifecycle.release()).toMatchObject({ ok: true, status: 'released' });
 
     const cleaned = runSetup({
       ...common,

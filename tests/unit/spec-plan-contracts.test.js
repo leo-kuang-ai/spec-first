@@ -16,6 +16,22 @@ const universal = fs.readFileSync(
   path.resolve(__dirname, '../../skills/spec-plan/references/universal-planning.md'),
   'utf8',
 );
+const evidence = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-plan/references/planning-evidence-boundaries.md'),
+  'utf8',
+);
+const synthesis = fs.readFileSync(
+  path.resolve(__dirname, '../../skills/spec-plan/references/synthesis-summary.md'),
+  'utf8',
+);
+
+function sectionBetween(source, start, end) {
+  const startIndex = source.indexOf(start);
+  const endIndex = source.indexOf(end, startIndex + start.length);
+
+  if (startIndex === -1 || endIndex === -1) return '';
+  return source.slice(startIndex, endIndex);
+}
 
 describe('spec-plan current contracts', () => {
   test('enriches requirements-only unified plans in place', () => {
@@ -27,6 +43,33 @@ describe('spec-plan current contracts', () => {
     expect(skill).toContain('never turn `completed`, `partially-shipped`, or `superseded` back into `active`');
     expect(skill).toContain('does not add a non-`active` execution intake gate');
     expect(sections).toContain('Duplicate, malformed, or non-canonical status');
+  });
+
+  test('requirements-only enrichment keeps the upstream Product Contract byte-identical', () => {
+    const sourceIntake = sectionBetween(
+      skill,
+      '#### 0.3 Use the Product Contract as Primary Input',
+      '#### 0.4 Planning Bootstrap',
+    );
+
+    expect(sourceIntake).toContain('treat the existing Product Contract region as read-only');
+    expect(sourceIntake).toContain('`<!-- PRODUCT_CONTRACT_START -->`');
+    expect(sourceIntake).toContain('`<!-- PRODUCT_CONTRACT_END -->`');
+    expect(sourceIntake).toContain('byte-for-byte unchanged');
+    expect(sourceIntake).toContain('Do not add, delete, reorder, reformat, renumber, or normalize');
+    expect(sourceIntake).toContain('`Product Contract unchanged (byte-preserved upstream source slice)`');
+    expect(sourceIntake).toContain('return the requested product change to the owning producer');
+    expect(sourceIntake).not.toContain('either "Product Contract unchanged" or "changed:');
+
+    expect(synthesis).toContain('For brainstorm-sourced requirements-only enrichment');
+    expect(synthesis).toContain('leave Stated content in the existing Product Contract');
+    expect(synthesis).toContain('Planning Contract `### Implementation Scope Boundaries`');
+    expect(synthesis).toContain('never route the stage-2 summary back into the Product Contract');
+
+    expect(sections).toContain('byte-preserved upstream source slice');
+    expect(sections).toContain('Planning Contract `### Implementation Scope Boundaries`');
+    expect(handoff).toContain('verify that the captured Product Contract region is byte-identical');
+    expect(handoff).toContain('block completion and restore the upstream region');
   });
 
   test('writes active only for Markdown software unified plans', () => {
@@ -87,6 +130,64 @@ describe('spec-plan current contracts', () => {
     expect(skill).toContain('direct bootstrap returns to the current user');
     expect(skill).toContain('accepted risk');
     expect(skill).toContain('Do not silently ignore');
+  });
+
+  test('进入 resume 或 deepen fast path 前先读取 artifact readiness', () => {
+    const resume = sectionBetween(
+      skill,
+      '#### 0.1 Resume Existing Plan Work When Appropriate',
+      '#### 0.1a Recognize Approach-Altitude Requests',
+    );
+
+    expect(resume).toContain('Read the target artifact metadata and major-section outline');
+    expect(resume).toContain('before committing to a resume or deepen route');
+    expect(resume).toContain('artifact_readiness: requirements-only');
+    expect(resume).toContain('can_enter_spec_plan: no');
+    expect(resume).toContain('Implementation Units');
+    expect(resume).toContain('must not enter the Phase 5.3 deepening fast path');
+    expect(resume).toContain('A user\'s use of `deepen`');
+    expect(resume).toContain('cannot override this eligibility gate');
+    expect(skill).toContain('entering planning evaluation does not promise an `implementation-ready` output');
+    expect(skill).toContain('A blocked checkpoint or producer handoff is a valid outcome');
+    expect(skill).toContain('generate Implementation Units or an implementation handoff');
+  });
+
+  test('区分产品决策权限、任务方向与 headless assumptions', () => {
+    const blockers = sectionBetween(
+      skill,
+      '#### 0.5 Classify Outstanding Questions Before Planning',
+      '#### 0.6 Assess Plan Depth',
+    );
+
+    expect(blockers).toContain('Product Contract decision authority');
+    expect(blockers).toContain('explicitly states that they are not the Product Owner');
+    expect(blockers).toContain('option 2 is unavailable');
+    for (const nonAuthoritySignal of [
+      '"Decide it yourself',
+      '"don\'t ask',
+      '`confirm:auto`',
+      'headless',
+      'pipeline',
+    ]) {
+      expect(blockers).toContain(nonAuthoritySignal);
+    }
+    expect(blockers).toContain('do not create or transfer WHAT decision authority');
+    expect(blockers).toContain('Keep the artifact unchanged');
+    expect(blockers).toContain('return to the owning producer');
+    expect(blockers).toContain('fail closed');
+
+    expect(evidence).toContain('task-direction authority');
+    expect(evidence).toContain('Product Contract decision authority');
+    expect(evidence).toContain('Asking the model to invent a product decision is not a confirmed decision');
+    expect(evidence).toContain('an explicit authority disclaimer takes precedence over a general task instruction');
+
+    expect(synthesis).toContain('only after Phase 0.5 has cleared every true product blocker');
+    expect(synthesis).toContain('`Resolve Before Planning`');
+    expect(synthesis).toContain('`can_enter_spec_plan: no`');
+    expect(synthesis).toContain('must not enter `### Assumptions`');
+    expect(synthesis).toContain('product behavior, scope, or success criteria');
+    expect(skill.match(/If Phase 0\.5 has not cleared every true product blocker/g)).toHaveLength(2);
+    expect(skill).toContain('blocked checkpoint / producer handoff must not rewrite the canonical artifact');
   });
 
   test('does not launder direct-bootstrap WHAT into confirmed product fact', () => {

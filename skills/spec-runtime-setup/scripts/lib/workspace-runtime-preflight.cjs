@@ -2,10 +2,15 @@
 
 const path = require('node:path');
 
+const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
+const { readWorkspaceGraphState, resolveStateRepoIds } = require('./workspace-graph-state.cjs');
+const { INTERNAL_REFRESH_ONLY_ENV } = require('./workspace-refresh-contract.cjs');
+
 const MUTATION_MODES = new Set([
   'only',
   'graphify-refresh',
   'host-config-repair',
+  'workspace-graph-build',
 ]);
 
 function requiresRuntimeProjectionPreflight(actionPlan) {
@@ -27,6 +32,42 @@ function selectedRuntimeProjectionTargets(target) {
     repo_label: target.repo_label || path.basename(target.target_root),
     workspace_relative_path: '',
   }];
+}
+
+function resolveRuntimeProjectionTargets(context = {}) {
+  const actionPlan = context.actionPlan || {};
+  if (actionPlan.mode !== 'workspace-graph-build') {
+    return {
+      targets: selectedRuntimeProjectionTargets(context.target),
+      workspaceGraphTargets: null,
+    };
+  }
+  const internalRefresh = context.env && context.env[INTERNAL_REFRESH_ONLY_ENV] === '1';
+  const baseline = internalRefresh ? readWorkspaceGraphState(context.cwd) : null;
+  const baselineRepos = baseline && baseline.status === 'ready'
+    ? resolveStateRepoIds(baseline)
+    : [];
+  const workspaceGraphTargets = resolveWorkspaceTargets({
+    cwd: context.cwd,
+    repos: internalRefresh
+      ? baselineRepos
+      : (actionPlan.args && actionPlan.args.repos ? actionPlan.args.repos : []),
+    allowDiscovery: !internalRefresh,
+  });
+  const eligible = workspaceGraphTargets.topology === 'requirement-workspace'
+    && !workspaceGraphTargets.manifest_error
+    && workspaceGraphTargets.ambiguous.length === 0;
+  const targets = eligible
+    ? workspaceGraphTargets.repos
+      .filter((repo) => !repo.needs_confirm)
+      .map((repo) => ({
+        repo_root: repo.git_root,
+        repo_label: repo.alias || repo.repo_id || path.basename(repo.git_root || ''),
+        workspace_relative_path: repo.workspace_relative_path || repo.repo_id || '',
+      }))
+      .filter((repo) => repo.repo_root)
+    : [];
+  return { targets, workspaceGraphTargets };
 }
 
 function buildWorkspaceRuntimePreflight({ context, targets, computeHealth } = {}) {
@@ -76,5 +117,5 @@ function quoteCommandArgument(value) {
 module.exports = {
   buildWorkspaceRuntimePreflight,
   requiresRuntimeProjectionPreflight,
-  selectedRuntimeProjectionTargets,
+  resolveRuntimeProjectionTargets,
 };

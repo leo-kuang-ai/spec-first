@@ -2,19 +2,35 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Workspace Graph State Receipt",
   "type": "object",
-  "required": ["schema_version", "generated_at", "operation_status", "reason_code", "refresh_mode", "repos", "merge", "merged_artifact"],
+  "required": ["schema_version", "generated_at", "operation_status", "reason_code", "refresh_mode", "refresh_hook", "repos", "merge", "merged_artifact"],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "type": "string", "const": "workspace-graph-state.v1" },
+    "schema_version": { "type": "string", "const": "workspace-graph-state.v3" },
     "generated_at": { "type": "string", "minLength": 1 },
     "operation_status": { "type": "string", "enum": ["building", "complete", "partial", "failed"] },
     "reason_code": { "type": "string" },
     "refresh_mode": { "type": "string", "enum": ["explicit", "commit-hook-spec-first-async"] },
+    "refresh_hook": {
+      "type": ["object", "null"],
+      "required": ["schema_version", "managed_block_sha256", "node", "async_refresh_script", "setup_script", "codegraph_command", "graphify_command", "runtime_host", "bundled_version"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "type": "string", "const": "workspace-child-hook-contract.v2" },
+        "managed_block_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "node": { "type": "string", "minLength": 1 },
+        "async_refresh_script": { "type": "string", "minLength": 1 },
+        "setup_script": { "type": "string", "minLength": 1 },
+        "codegraph_command": { "type": "string", "minLength": 1 },
+        "graphify_command": { "type": "string", "minLength": 1 },
+        "runtime_host": { "type": "string", "minLength": 1 },
+        "bundled_version": { "type": "string", "minLength": 1 }
+      }
+    },
     "repos": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["repo_id", "head_sha", "head_state", "worktree_clean", "worktree_fingerprint", "observed", "subgraph_path", "codegraph_status", "exclude_status", "graphify_status", "reason_code"],
+        "required": ["repo_id", "head_sha", "head_state", "worktree_clean", "worktree_fingerprint", "observed", "subgraph_path", "codegraph_status", "exclude_status", "graphify_status", "promotion_cleanup_pending", "promotion_cleanup_reason_code", "reason_code"],
         "additionalProperties": false,
         "properties": {
           "repo_id": { "type": "string", "minLength": 1 },
@@ -27,28 +43,33 @@
           "codegraph_status": { "type": "string", "minLength": 1 },
           "exclude_status": { "type": "string", "minLength": 1 },
           "graphify_status": { "type": "string", "minLength": 1 },
+          "promotion_cleanup_pending": { "type": "boolean" },
+          "promotion_cleanup_reason_code": { "type": "string" },
           "reason_code": { "type": "string" }
         }
       }
     },
     "merge": {
       "type": ["object", "null"],
-      "required": ["status", "reason_code", "merged_graph_path"],
+      "required": ["status", "reason_code", "merged_graph_path", "promotion_cleanup_pending", "promotion_cleanup_reason_code"],
       "additionalProperties": false,
       "properties": {
         "status": { "type": "string", "minLength": 1 },
         "reason_code": { "type": "string" },
-        "merged_graph_path": { "type": ["string", "null"] }
+        "merged_graph_path": { "type": ["string", "null"] },
+        "promotion_cleanup_pending": { "type": "boolean" },
+        "promotion_cleanup_reason_code": { "type": "string" }
       }
     },
     "merged_artifact": {
       "type": ["object", "null"],
-      "required": ["path", "size_bytes", "mtime_ms"],
+      "required": ["path", "size_bytes", "mtime_ms", "sha256"],
       "additionalProperties": false,
       "properties": {
         "path": { "type": "string", "minLength": 1 },
         "size_bytes": { "type": "number" },
-        "mtime_ms": { "type": "number" }
+        "mtime_ms": { "type": "number" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
       }
     }
   }

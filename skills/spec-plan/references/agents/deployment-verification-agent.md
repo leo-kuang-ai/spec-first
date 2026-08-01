@@ -149,9 +149,12 @@ Produce a complete Go/No-Go checklist that an engineer can literally execute:
 
 Invoke this prompt when:
 - The planned change touches database migrations with data changes
-- The planned change modifies data processing logic
+- The planned change modifies production data processing in a way that can corrupt or lose durable data, or requires partial-deploy compatibility
 - The planned change involves backfills or data transformations
 - Migration analysis flags critical findings
-- Any change that could silently corrupt/lose data
+- The rollout is staged or feature-flagged and needs explicit stop/go evidence
+- Multiple deployed versions, an irreversible launch step, or a concrete production release sequence creates a verification boundary
+
+Do not invoke this prompt for ordinary stateless module changes, generic rollback wording, or Operational Notes without a concrete deployment or durable-data risk surface. Use the caller's architecture, risk, and verification lenses for those cases.
 
 Every checklist item must name the command or observable signal that proves the step succeeded.

@@ -40,7 +40,7 @@ const METADATA = {
     methods: ['rg', 'ast-grep', 'direct-source-read'],
     reason_code: 'code-graph-provider-unavailable',
   },
-  usage_note: '使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 负责 provider-native Auto-Sync freshness；结论需由 source/test/log/contract/user evidence 确认。',
+  usage_note: '使用 CodeGraph MCP 工具获取 impact/call graph candidate。`codegraph serve --mcp` 只为 server 默认项目提供 provider-native watcher；从非 Git parent 打开的其他 `projectPath` 子仓由 spec-first workspace hook 执行 bounded `codegraph sync`。结论需由 source/test/log/contract/user evidence 确认。',
 };
 const CONFIG_UNKNOWN_ACTION = '通过当前 host 的 spec-runtime-setup --verify-only 确认 CodeGraph MCP 配置。';
 const CONFIG_REPAIR_ACTION = '运行 spec-runtime-setup --only codegraph，配置 CodeGraph MCP entry。';
@@ -380,6 +380,46 @@ function versionReady(result, versionPin) {
   return versionOutputMatches(text(result), versionPin);
 }
 
+function resolveCodegraphCommand(context = {}, repoRoot = process.cwd(), dependency = context.dependency) {
+  const windows = context.platform === 'windows' || process.platform === 'win32';
+  const env = context.env || process.env;
+  const executable = commandFromSearchPath('codegraph', env.PATH || '', windows, env);
+  if (!executable) {
+    return { ok: false, reason_code: 'codegraph-command-unavailable' };
+  }
+  const versionResult = run(context, executable, ['--version'], {
+    cwd: path.resolve(repoRoot),
+    timeoutMs: 10000,
+  });
+  if (!versionReady(versionResult, dependency && dependency.version)) {
+    return { ok: false, reason_code: 'codegraph-version-pin-mismatch' };
+  }
+  return { ok: true, command: executable, version_result: versionResult };
+}
+
+function commandFromSearchPath(command, searchPath, windows, env = {}) {
+  const extensions = windows
+    ? String(env.PATHEXT || '.COM;.EXE;.BAT;.CMD')
+      .split(';')
+      .filter(Boolean)
+      .map((extension) => extension.toLowerCase())
+    : [''];
+  for (const directory of String(searchPath || '').split(path.delimiter).filter(Boolean)) {
+    for (const extension of extensions) {
+      const candidate = path.resolve(directory, windows ? `${command}${extension}` : command);
+      try {
+        const stat = fs.statSync(candidate);
+        if (!stat.isFile()) continue;
+        fs.accessSync(candidate, windows ? fs.constants.F_OK : fs.constants.X_OK);
+        return candidate;
+      } catch (_error) {
+        // Continue to the next bounded PATH candidate.
+      }
+    }
+  }
+  return null;
+}
+
 function statusNeedsSync(output) {
   return /pending changes|run\s+codegraph\s+sync/i.test(String(output || ''));
 }
@@ -392,6 +432,7 @@ module.exports = {
   apply,
   plan,
   reconcileConfigured,
+  resolveCodegraphCommand,
   refresh,
   uninstall,
   verify,

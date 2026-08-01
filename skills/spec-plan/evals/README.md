@@ -2,7 +2,7 @@
 
 These files protect route boundaries and plan-output quality while `spec-plan` evolves.
 
-- `eval.yaml` 与 `cases/` 提供真实 `skill-up` 执行入口；三个隔离 Git fixture 使用 script Judge
+- `eval.yaml` 只安装真实 `spec-plan`，三个隔离 Git fixture 使用 script Judge
   校验 requirements-only 原地深化、planning-only mutation boundary 与产品 blocker fail-closed。
 - They are maintainer-only source evidence, not runtime instructions, a deterministic router, provider telemetry, or proof that model behavior improved.
 - `examples.json` covers positive triggers, near-neighbors, safety, authorization, and failure/degraded paths. Degraded cases carry facts, authorization, fallback, forbidden behavior, reason code, remaining work, and claim ceiling.

@@ -1,6 +1,6 @@
 # Plan Handoff
 
-This file contains post-plan-writing instructions: document review, post-generation options, and issue creation. Load it after the plan file has been written and the confidence check (5.3.1-5.3.7) is complete.
+This file contains post-plan-writing instructions: document review, post-generation options, and issue creation. Load it only after the plan file has been written and the confidence check (5.3.1-5.3.7) is complete. Never preload it while composing the initial plan.
 
 ## 5.3.8 Document Review
 
@@ -10,6 +10,8 @@ Run `spec-doc-review` headless for both output formats. Delivery is headless in 
 - `OUTPUT_FORMAT=html` -> invoke `mode:headless mutation:report-only <plan-path>`; the returned envelope must preserve `mutation_policy: report-only`, the same structural/semantic roster, synthesis, severity routing, Coverage, and limitations run, but `fixes_applied: 0` and reviewer mutation is unavailable.
 
 This phase is mandatory after the confidence check because the two checks catch different classes of issues. HTML is no longer an unreviewed skip path. Capture the structured envelope for both formats, including `mutation_policy`, `review_status`, `fixes_applied`, `producer_fix_candidates`, `proposed_fixes_count`, `decisions_count`, `fyi_count`, `p0_p1_actionable_count`, Coverage, and Limitations.
+
+**Unavailable review capability — explicit degraded exit.** Inspect the current host's available Skill-invocation capability once. When `spec-doc-review` cannot be invoked, downstream model invocation is disabled, or the host has no equivalent independent reviewer, do not search repeatedly, wait for an impossible invocation, or claim that independent review ran. Perform one bounded producer self-review using the in-context draft, its section outline, the scoped diff, and deterministic metadata/path/structure checks. Do not re-read the complete generated artifact and do not start a second semantic review pass; after any uniquely determined producer correction, rerun only the affected deterministic checks. Capture an explicit degraded envelope with `review_status: degraded`, `reason_code: spec_doc_review_capability_unavailable`, `independent_review: not_run`, the actual `fixes_applied` count, known findings, and the capability limitation. Unknown reviewer-only counts remain unknown rather than being reported as zero. This fallback satisfies the document-review exit only as a loud degraded convention; it must not be described as `Review complete` or `Doc review clean`.
 
 **HTML producer-owned closure.** `spec-doc-review` never patches HTML. When its report-only envelope contains a producer-fix candidate whose correction is uniquely determined from current source and does not require a Product Contract decision, `spec-plan` may perform a **full recompose** of the exclusive HTML artifact, preserving metadata, stable anchors, Product Contract IDs/semantics, and material architecture-posture KTDs. Then run headless report-only review again. Allow at most two producer recompose + review cycles after the initial review; never loop indefinitely or convert the finding into a local string/DOM patch.
 
@@ -28,7 +30,7 @@ Capture the headless envelope so it can drive the contextual summary above the p
 
 When spec-doc-review returns "Review complete", proceed to Final Checks.
 
-**Pipeline mode:** Pipeline runs (LFG or any `disable-model-invocation` context) force `OUTPUT_FORMAT=md` at Phase 0.0. They invoke `spec-doc-review` with `mode:headless mutation:apply-fixes` and the plan path, then return findings to the caller without an interactive menu. Address any P0/P1 findings before returning control to the caller.
+**Pipeline mode:** Pipeline runs (LFG or any `disable-model-invocation` context) force `OUTPUT_FORMAT=md` at Phase 0.0. When invocation capability exists, invoke `spec-doc-review` with `mode:headless mutation:apply-fixes` and the plan path, then return findings to the caller without an interactive menu. When it does not exist, use the explicit degraded exit above and return control to the pipeline caller immediately after the bounded Final Checks; do not enter the menu, repeat document reads, or keep searching for review capability. Address any known P0/P1 finding before returning control to the caller, and preserve unknown independent-review coverage as a limitation.
 
 ## 5.3.9 Final Checks and Cleanup
 
@@ -36,6 +38,7 @@ Before proceeding to post-generation options:
 - Confirm the plan is stronger in specific ways, not merely longer
 - Confirm the planning boundary is intact
 - Confirm origin decisions were preserved when an origin document exists
+- For requirements-only enrichment, verify that the captured Product Contract region is byte-identical after initial writing, deepening, and review fixes. If it drifted, block completion and restore the upstream region from the captured baseline before any implementation handoff. If restoration would overwrite concurrent external edits, leave the artifact blocked and return to the owning producer; never describe a changed region as preserved.
 
 If artifact-backed mode was used:
 - Clean up the temporary scratch directory after the plan is safely updated
@@ -49,7 +52,7 @@ After all mutations in this run have settled (initial write, deepening synthesis
 
 ## 5.4 Post-Generation Options
 
-**Pipeline mode:** If invoked from an automated workflow such as LFG or any `disable-model-invocation` context, skip the interactive menu below and return control to the caller immediately. The plan file has already been written, the confidence check has already run, and spec-doc-review has already run — the caller (e.g., `spec-lfg`) determines the next step.
+**Pipeline mode:** If invoked from an automated workflow such as LFG or any `disable-model-invocation` context, skip the interactive menu below and return control to the caller immediately. The plan file has already been written, the confidence check has already run, and either spec-doc-review or the explicit degraded fallback completed — the caller (e.g., `spec-lfg`) determines the next step.
 
 **Path format:** Use absolute paths for chat-output file references — relative paths are not auto-linked as clickable in most terminals.
 

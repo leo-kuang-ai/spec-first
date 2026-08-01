@@ -27,14 +27,26 @@ const {
   readWorkspaceGraphState,
   resolveStateRepoIds,
 } = require('./workspace-graph-state.cjs');
+const {
+  inspectWorkspaceChildHookPosture,
+  prepareWorkspaceChildHookInspection,
+} = require('./workspace-child-hook.cjs');
 const { readAsyncRefreshStatus } = require('./workspace-async-refresh.cjs');
-const { directoryHasEntries, jsonFileHasContent } = require('./workspace-graph-artifacts.cjs');
+const {
+  codegraphArtifactHasContent,
+  jsonFileDescriptorHasContent,
+  jsonFileHasContent,
+  sha256FileDescriptor,
+} = require('./workspace-graph-artifacts.cjs');
+const { inspectWorkspaceGraphLifecycle } = require('./workspace-graph-lifecycle-lease.cjs');
+const { readStableRegularFile } = require('./regular-file-snapshot.cjs');
 
 function runWorkspaceGraphStatus({
   cwd = process.cwd(),
   repos = [],
   allowDiscovery = true,
   manifestPath = null,
+  bundledVersion = '',
   // Optional path used only for enclosing-child projectPath hint (defaults to cwd).
   // Topology is always resolved from `cwd` (must be the requirement parent).
   pathHintCwd = null,
@@ -91,19 +103,37 @@ function runWorkspaceGraphStatus({
   const workspaceRoot = targets.workspace_root;
   const confirmed = targets.repos.filter((repo) => !repo.needs_confirm);
   const pendingConfirm = targets.repos.filter((repo) => repo.needs_confirm);
+  const configuredRefreshMode = stateResult.status === 'ready'
+    ? stateResult.state.refresh_mode
+    : 'unknown';
 
   const stateRepos = new Map(
     stateResult.status === 'ready'
       ? stateResult.state.repos.map((repo) => [repo.repo_id, repo])
       : [],
   );
+  const preparedHookInspection = configuredRefreshMode === 'commit-hook-spec-first-async'
+    ? prepareWorkspaceChildHookInspection({
+      workspaceRoot,
+      bundledVersion,
+      expectedHookContract: stateResult.status === 'ready' ? stateResult.state.refresh_hook : null,
+    })
+    : null;
   const repoFacts = confirmed.map((repo) => {
-    const codegraphDir = path.join(repo.git_root, '.codegraph');
-    const codegraphPresent = directoryHasEntries(codegraphDir);
+    const codegraphPresent = codegraphArtifactHasContent(repo.git_root, workspaceRoot);
     const stateRepo = stateRepos.get(repo.repo_id) || null;
     const subgraphPath = resolveStateArtifactPath(workspaceRoot, stateRepo && stateRepo.subgraph_path);
     const subgraphPresent = Boolean(subgraphPath && jsonFileHasContent(subgraphPath));
     const projectPathCheck = resolveContainedProjectPath(workspaceRoot, repo.git_root);
+    const autoRefreshHook = configuredRefreshMode === 'commit-hook-spec-first-async'
+      ? inspectWorkspaceChildHookPosture({
+        child: repo,
+        workspaceRoot,
+        bundledVersion,
+        expectedHookContract: stateResult.status === 'ready' ? stateResult.state.refresh_hook : null,
+        preparedHookInspection,
+      })
+      : { hook_status: 'not-applicable', reason_code: null };
     const freshness = classifyGraphFreshness({
       scope_id: repo.repo_id,
       scope_kind: 'child',
@@ -123,20 +153,30 @@ function runWorkspaceGraphStatus({
       last_codegraph_status: stateRepo ? stateRepo.codegraph_status : 'unknown',
       last_exclude_status: stateRepo ? stateRepo.exclude_status : 'unknown',
       last_graphify_status: stateRepo ? stateRepo.graphify_status : 'unknown',
+      promotion_cleanup_pending: Boolean(stateRepo && stateRepo.promotion_cleanup_pending),
+      promotion_cleanup_reason_code: stateRepo ? stateRepo.promotion_cleanup_reason_code : '',
       last_reason_code: stateRepo ? stateRepo.reason_code : '',
+      auto_refresh_hook_status: autoRefreshHook.hook_status,
+      auto_refresh_hook_reason_code: autoRefreshHook.reason_code,
       project_path: projectPathCheck.ok ? projectPathCheck.project_path : null,
       project_path_contained: projectPathCheck.ok,
       project_path_enforcement: 'advisory',
       freshness,
     };
   });
+  const promotionCleanup = summarizePromotionCleanup(stateResult, repoFacts);
 
   const mergedPath = path.join(workspaceRoot, 'graphify-out', 'merged-graph.json');
   const graphifyDir = path.join(workspaceRoot, 'graphify-out');
   const graphifyPresent = fs.existsSync(graphifyDir);
-  const mergedArtifact = inspectFileArtifact(mergedPath);
+  const mergedArtifact = inspectFileArtifact(workspaceRoot, mergedPath, {
+    validateContent: stateResult.status === 'ready'
+      && stateResult.state.operation_status === 'complete',
+  });
   const mergedPresent = mergedArtifact.present;
   const mergedSizeBytes = mergedArtifact.size_bytes;
+  const asyncRefresh = readAsyncRefreshStatus(workspaceRoot);
+  const initialLifecycle = inspectWorkspaceGraphLifecycle(workspaceRoot);
   const stateEvaluation = evaluateWorkspaceState({
     workspaceRoot,
     stateResult,
@@ -147,18 +187,27 @@ function runWorkspaceGraphStatus({
     mergedArtifact,
   });
   const limitations = stateEvaluation.limitations.slice();
+  limitations.push(...promotionCleanup.reason_codes);
+  const autoRefreshHooksReady = configuredRefreshMode !== 'commit-hook-spec-first-async'
+    || repoFacts.every((repo) => repo.auto_refresh_hook_status === 'installed');
+  const autoRefreshHookReasonCode = autoRefreshHooksReady
+    ? ''
+    : 'workspace-auto-refresh-hook-incomplete';
+  if (autoRefreshHookReasonCode) {
+    limitations.push(autoRefreshHookReasonCode);
+    for (const repo of repoFacts.filter((entry) => entry.auto_refresh_hook_status !== 'installed')) {
+      limitations.push(
+        (repo.auto_refresh_hook_reason_code || 'workspace-child-hook-unavailable')
+          + ':' + repo.repo_id,
+      );
+    }
+  }
   if (mergedSizeBytes != null && mergedSizeBytes > 50 * 1024 * 1024) {
     limitations.push('merged-graph-large — do not cat full file; use Graphify CLI query/path');
   }
   if (!mergedPresent) limitations.push('no-merged-graph — run --workspace-graph to build');
-  const workspaceFreshness = classifyGraphFreshness({
-    scope_id: path.basename(workspaceRoot),
-    scope_kind: 'workspace',
-    provider: 'graphify',
-    freshness: stateEvaluation.freshness,
-    hasResults: mergedPresent ? true : null,
-    limitations,
-  });
+  const asyncReasonCode = asyncRefreshReasonCode(asyncRefresh);
+  if (asyncReasonCode) limitations.push(asyncReasonCode);
 
   // Advisory projectPath hint: only when pathHintCwd (or cwd) is inside a confirmed child.
   // Parent-root status intentionally has no default — do not invent a lexicographic "main" repo.
@@ -179,6 +228,26 @@ function runWorkspaceGraphStatus({
   }
 
   const routing = inspectRoutingPresence(workspaceRoot, confirmed);
+  const lifecycle = initialLifecycle.status === 'none'
+    ? inspectWorkspaceGraphLifecycle(workspaceRoot)
+    : initialLifecycle;
+  const lifecycleReasonCode = lifecycle.status === 'none' ? '' : lifecycle.reason_code;
+  if (lifecycleReasonCode) limitations.push(lifecycleReasonCode);
+  const effectiveFreshness = (
+    asyncReasonCode
+    || lifecycleReasonCode
+    || autoRefreshHookReasonCode
+  ) && mergedPresent
+    ? 'stale'
+    : stateEvaluation.freshness;
+  const workspaceFreshness = classifyGraphFreshness({
+    scope_id: path.basename(workspaceRoot),
+    scope_kind: 'workspace',
+    provider: 'graphify',
+    freshness: effectiveFreshness,
+    hasResults: mergedPresent ? true : null,
+    limitations,
+  });
 
   const anyGraph = repoFacts.some((repo) => repo.codegraph_present || repo.graphify_subgraph_present) || mergedPresent;
   const allChildGraphs = repoFacts.length > 0 && repoFacts.every((r) => r.codegraph_present);
@@ -186,19 +255,38 @@ function runWorkspaceGraphStatus({
   const routingReady = routing.entries.length === 2 && routing.entries.every((entry) => entry.routing_current);
   let status = 'absent';
   let reasonCode = 'absent';
-  if (anyGraph && allChildGraphs && allSubgraphs && mergedPresent && stateEvaluation.ready && routingReady) {
+  if (anyGraph
+    && allChildGraphs
+    && allSubgraphs
+    && mergedPresent
+    && stateEvaluation.ready
+    && !promotionCleanup.pending
+    && autoRefreshHooksReady
+    && routingReady) {
     status = 'ready';
     reasonCode = '';
   }
   else if (anyGraph) status = 'partial';
   if (status === 'partial') {
-    reasonCode = !stateEvaluation.ready
-      ? stateEvaluation.reason_code
-      : (routingReady ? 'workspace-graph-partial' : 'workspace-routing-incomplete');
+    reasonCode = partialWorkspaceReason({
+      stateEvaluation,
+      promotionCleanup,
+      autoRefreshHooksReady,
+      autoRefreshHookReasonCode,
+      routingReady,
+    });
   }
   if (pendingConfirm.length > 0) {
     status = confirmed.length === 0 ? 'needs-confirmation' : 'partial';
     reasonCode = 'workspace-repos-need-confirmation';
+  }
+  if (status === 'ready' && asyncReasonCode) {
+    status = 'partial';
+    reasonCode = asyncReasonCode;
+  }
+  if (status === 'ready' && lifecycleReasonCode) {
+    status = 'partial';
+    reasonCode = lifecycleReasonCode;
   }
 
   return {
@@ -218,10 +306,14 @@ function runWorkspaceGraphStatus({
       freshness: workspaceFreshness,
       state_path: stateResult.path,
       state_status: stateResult.status,
-      refresh_mode: stateResult.status === 'ready' ? stateResult.state.refresh_mode : 'unknown',
+      promotion_cleanup_pending: promotionCleanup.pending,
+      promotion_cleanup_reason_codes: promotionCleanup.reason_codes,
+      configured_refresh_mode: configuredRefreshMode,
+      refresh_mode: autoRefreshHooksReady ? configuredRefreshMode : 'explicit',
       // 消费侧只读事实（R10/U6）：commit 触发的 merged 重建异步执行，此处只报告其在途/失败/成功，
       // 绝不在消费时触发重建。in-flight 表示图可能落后当前 HEAD；failed 表示后台重建失败需关注。
-      async_refresh: readAsyncRefreshStatus(workspaceRoot),
+      async_refresh: asyncRefresh,
+      lifecycle,
     },
     routing,
     // CR10: doctor-facing advisory projectPath when cwd is inside a child.
@@ -231,6 +323,47 @@ function runWorkspaceGraphStatus({
     default_project_path_policy: hintRepo ? 'cwd-enclosing-child' : 'none-at-parent-root',
     server_root_default_note:
       'CodeGraph global MCP server root has no workspace index; agents must pass projectPath for the child cwd is inside. At parent root there is no default index — do not query the server root. Do not cat merged-graph.json; use Graphify CLI query/path/explain.',
+  };
+}
+
+function asyncRefreshReasonCode(asyncRefresh) {
+  if (!asyncRefresh || asyncRefresh.status === 'none' || asyncRefresh.status === 'succeeded') return '';
+  if (asyncRefresh.status === 'in-flight') return 'workspace-async-refresh-in-flight';
+  return asyncRefresh.reason_code || 'workspace-async-refresh-status-unknown';
+}
+
+function partialWorkspaceReason({
+  stateEvaluation,
+  promotionCleanup,
+  autoRefreshHooksReady,
+  autoRefreshHookReasonCode,
+  routingReady,
+}) {
+  if (!stateEvaluation.ready) return stateEvaluation.reason_code;
+  if (promotionCleanup.pending) return 'workspace-artifact-cleanup-pending';
+  if (!autoRefreshHooksReady) return autoRefreshHookReasonCode;
+  if (!routingReady) return 'workspace-routing-incomplete';
+  return 'workspace-graph-partial';
+}
+
+function summarizePromotionCleanup(stateResult, repoFacts) {
+  if (!stateResult || stateResult.status !== 'ready') {
+    return { pending: false, reason_codes: [] };
+  }
+  const reasonCodes = repoFacts
+    .filter((repo) => repo.promotion_cleanup_pending)
+    .map((repo) => (
+      `${repo.promotion_cleanup_reason_code || 'promotion-cleanup-pending'}:repo:${repo.repo_id}`
+    ));
+  const merge = stateResult.state.merge;
+  if (merge && merge.promotion_cleanup_pending) {
+    reasonCodes.push(
+      `${merge.promotion_cleanup_reason_code || 'promotion-cleanup-pending'}:merge`,
+    );
+  }
+  return {
+    pending: reasonCodes.length > 0,
+    reason_codes: reasonCodes,
   };
 }
 
@@ -273,7 +406,7 @@ function evaluateWorkspaceState({
     };
   }
 
-  if (!mergedArtifactMatches(workspaceRoot, state.merged_artifact, mergedPath, mergedArtifact)) {
+  if (!mergedArtifactMetadataMatches(workspaceRoot, state.merged_artifact, mergedPath, mergedArtifact)) {
     return {
       ready: false,
       freshness: 'stale',
@@ -321,24 +454,70 @@ function evaluateWorkspaceState({
     };
   }
 
+  if (!mergedArtifactDigestMatches(state.merged_artifact, mergedPath, mergedArtifact)) {
+    return {
+      ready: false,
+      freshness: 'stale',
+      reason_code: 'workspace-merged-artifact-changed',
+      limitations: ['workspace-merged-artifact-changed'],
+    };
+  }
+
   return { ready: true, freshness: 'complete', reason_code: '', limitations: [] };
 }
 
-function mergedArtifactMatches(workspaceRoot, artifact, mergedPath, observed) {
+function mergedArtifactMetadataMatches(workspaceRoot, artifact, mergedPath, observed) {
   if (!artifact || !observed.present) return false;
   const expectedPath = path.resolve(workspaceRoot, artifact.path || '');
   if (expectedPath !== path.resolve(mergedPath)) return false;
   if (artifact.size_bytes !== observed.size_bytes) return false;
-  return Math.abs(Number(artifact.mtime_ms) - observed.mtime_ms) < 1;
+  if (Math.abs(Number(artifact.mtime_ms) - observed.mtime_ms) >= 1) return false;
+  return true;
 }
 
-function inspectFileArtifact(filePath) {
+function mergedArtifactDigestMatches(artifact, mergedPath, observed) {
+  const snapshot = readStableRegularFile(mergedPath, {
+    read: (descriptor) => sha256FileDescriptor(descriptor),
+  });
+  return snapshot.ok
+    && snapshot.stat.dev === observed.dev
+    && snapshot.stat.ino === observed.ino
+    && snapshot.stat.size === observed.size_bytes
+    && snapshot.stat.mtime_ms === observed.mtime_ms
+    && artifact.sha256 === snapshot.value;
+}
+
+function inspectFileArtifact(workspaceRoot, filePath, { validateContent = true } = {}) {
   try {
-    const stat = fs.statSync(filePath);
-    if (!stat.isFile() || !jsonFileHasContent(filePath)) {
-      return { present: false, size_bytes: null, mtime_ms: null };
+    assertContainedPath(workspaceRoot, filePath, {
+      reasonCode: 'workspace-merged-artifact-escapes-workspace',
+    });
+    if (validateContent) {
+      const snapshot = readStableRegularFile(filePath, {
+        read: (descriptor, stat) => jsonFileDescriptorHasContent(descriptor, stat),
+      });
+      if (!snapshot.ok || !snapshot.value) {
+        return { present: false, size_bytes: null, mtime_ms: null, sha256: null };
+      }
+      return {
+        present: true,
+        size_bytes: snapshot.stat.size,
+        mtime_ms: snapshot.stat.mtime_ms,
+        dev: snapshot.stat.dev,
+        ino: snapshot.stat.ino,
+      };
     }
-    return { present: true, size_bytes: stat.size, mtime_ms: stat.mtimeMs };
+    const stat = fs.lstatSync(filePath);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size === 0) {
+      return { present: false, size_bytes: null, mtime_ms: null, sha256: null };
+    }
+    return {
+      present: true,
+      size_bytes: stat.size,
+      mtime_ms: stat.mtimeMs,
+      dev: stat.dev,
+      ino: stat.ino,
+    };
   } catch (_error) {
     return { present: false, size_bytes: null, mtime_ms: null };
   }

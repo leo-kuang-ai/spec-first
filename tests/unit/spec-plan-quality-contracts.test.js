@@ -18,6 +18,14 @@ function readJson(relativePath) {
   return JSON.parse(read(relativePath));
 }
 
+function listMarkdownFiles(rootPath) {
+  return fs.readdirSync(rootPath, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = path.join(rootPath, entry.name);
+    if (entry.isDirectory()) return listMarkdownFiles(entryPath);
+    return entry.isFile() && entry.name.endsWith('.md') ? [entryPath] : [];
+  });
+}
+
 describe('spec-plan quality integration contracts', () => {
   const skill = read('SKILL.md');
   const sections = read('references/plan-sections.md');
@@ -28,14 +36,34 @@ describe('spec-plan quality integration contracts', () => {
   const interfaceEvolution = read('references/interface-and-evolution-lens.md');
   const frontendEngineering = read('references/frontend-engineering-lens.md');
   const architecture = read('references/agents/architecture-strategist.md');
+  const deployment = read('references/agents/deployment-verification-agent.md');
   const patterns = read('references/agents/pattern-recognition-specialist.md');
   const handoff = read('references/plan-handoff.md');
+  const enrichmentJudge = read('evals/fixtures/scripts/check-enrichment.sh');
 
   test('keeps planning-only and blocking handoff in the hot path', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
     expect(skill).toContain('planning is the only authorized effect');
     expect(skill).toContain('Handoff stays blocking');
     expect(skill).toMatch(/do not claim a hard write guarantee from prose alone/i);
+  });
+
+  test('运行时 Skill 指令正文统一使用英文', () => {
+    const runtimeMarkdownPaths = [
+      path.join(SKILL_ROOT, 'SKILL.md'),
+      ...listMarkdownFiles(path.join(SKILL_ROOT, 'references')),
+    ];
+    const cjkPattern = /[\u3000-\u303f\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff00-\uffef]/u;
+
+    for (const markdownPath of runtimeMarkdownPaths) {
+      expect({
+        path: path.relative(REPO_ROOT, markdownPath),
+        containsCjk: cjkPattern.test(fs.readFileSync(markdownPath, 'utf8')),
+      }).toEqual({
+        path: path.relative(REPO_ROOT, markdownPath),
+        containsCjk: false,
+      });
+    }
   });
 
   test('makes the Goal Capsule a compact first-screen decision surface', () => {
@@ -58,7 +86,9 @@ describe('spec-plan quality integration contracts', () => {
     expect(skill).toContain('references/high-risk-plan-lens.md');
     expect(skill).toContain('references/interface-and-evolution-lens.md');
     expect(skill).toContain('references/frontend-engineering-lens.md');
-    expect(skill).toContain('且不影响 contrast/focus/layout/responsive/motion/状态表达的 token-value-only');
+    expect(skill).toContain(
+      'token-value-only changes that do not affect contrast, focus, layout, responsive behavior, motion, or state expression',
+    );
     expect(evidence).toContain('advisory');
     expect(evidence).toContain('Generated runtime mirrors and host-local managed slices are not source-of-truth');
     expect(evidence).toContain('Evidence & Limitations');
@@ -134,6 +164,39 @@ describe('spec-plan quality integration contracts', () => {
     expect(deepening).toContain('Plan generation and deepening must still complete through this inline fallback');
   });
 
+  test('inline fallback uses bounded semantic lenses instead of preloading worker prompt assets', () => {
+    expect(skill).toContain('worker seed material, not a mandatory inline dependency');
+    expect(skill).toContain('Do not read a worker prompt asset merely because inline fallback is active');
+    expect(skill).toContain('apply the concise scope in this file directly');
+
+    expect(deepening).toContain('Conditional Section-to-Specialist Candidate Map');
+    expect(deepening).toContain('Selecting a section never selects a prompt asset by itself');
+    expect(deepening).toContain('specialist applicability gate');
+    expect(deepening).toContain(
+      'If direct source or the in-context section already closes the fired trigger, do not load the prompt asset',
+    );
+    expect(deepening).toContain('normal module change');
+    expect(deepening).toContain('generic rollback mention');
+    expect(deepening).toContain('the mere presence of Operational Notes');
+    expect(deepening).toContain('do not by themselves justify `deployment-verification-agent`');
+    expect(deepening).toContain('persistent data migration or backfill');
+    expect(deepening).toContain('staged or feature-flagged rollout');
+    expect(deepening).toContain('multi-version deployment compatibility');
+    expect(deepening).toContain('concrete production launch sequence');
+    expect(deepening).toContain('Re-evaluate remaining triggers after each inline improvement');
+    expect(deepening).toContain('smallest sufficient set');
+
+    expect(deployment).toContain('Do not invoke this prompt for ordinary stateless module changes');
+    expect(deployment).toContain('without a concrete deployment or durable-data risk surface');
+  });
+
+  test('enrichment Judge compares the complete Product Contract region against the fixture baseline', () => {
+    expect(enrichmentJudge).toContain('git show HEAD:"$plan"');
+    expect(enrichmentJudge).toContain("sed -n '/<!-- PRODUCT_CONTRACT_START -->/,/<!-- PRODUCT_CONTRACT_END -->/p'");
+    expect(enrichmentJudge).toContain('cmp -s');
+    expect(enrichmentJudge).toContain('Product Contract region changed');
+  });
+
   test('reviews HTML plans report-only and keeps producer-owned recompose bounded', () => {
     expect(skill).toMatch(/HTML.*report-only review/is);
     expect(skill).not.toContain('skipped_reason: output_format_html');
@@ -147,6 +210,20 @@ describe('spec-plan quality integration contracts', () => {
     expect(handoff).toMatch(/suppress.*spec-work.*goal/is);
     expect(handoff).not.toContain('skipped_reason = "output_format_html"');
     expect(handoff).not.toContain('HTML plans skip this phase entirely');
+  });
+
+  test('文档审查能力不可用时有界降级并立即返回 pipeline caller', () => {
+    expect(handoff).toContain('spec_doc_review_capability_unavailable');
+    expect(handoff).toContain('one bounded producer self-review');
+    expect(handoff).toMatch(/do not re-read the complete generated artifact/i);
+    expect(handoff).toContain('review_status: degraded');
+    expect(handoff).toContain('independent_review: not_run');
+    expect(handoff).toContain('must not be described as `Review complete` or `Doc review clean`');
+    expect(handoff).toContain('return control to the pipeline caller immediately');
+    expect(skill).toContain(
+      'Do not preload `references/deepening-workflow.md` or `references/plan-handoff.md` before the initial plan write',
+    );
+    expect(skill).toContain('the explicit degraded fallback completed');
   });
 
   test('keeps maintainer fixtures structural, source-owned, and coverage-balanced', () => {

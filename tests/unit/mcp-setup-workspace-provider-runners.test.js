@@ -114,7 +114,7 @@ describe('makeWorkspaceRunners — integrates with buildWorkspaceGraphs', () => 
         fs.writeFileSync(outPath, '{}');
       } else if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });
-        fs.writeFileSync(path.join(args[1], '.codegraph', 'db'), 'x');
+        fs.writeFileSync(path.join(args[1], '.codegraph', 'codegraph.db'), 'x');
       }
       return { status: 0, stdout: '', stderr: '' };
     };

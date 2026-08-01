@@ -6,9 +6,14 @@ const crypto = require('node:crypto');
 const { assertContainedPath } = require('./path-safety.cjs');
 const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
 const { validateSchemaValue } = require('./registry.cjs');
+const {
+  jsonFileReceiptMatches,
+  sha256File,
+} = require('./workspace-graph-artifacts.cjs');
 const stateSchema = require('../contracts/workspace-graph-state.schema.json');
 
 const STATE_BASENAME = 'workspace-graph-state.json';
+const STATE_SCHEMA_VERSION = stateSchema.properties.schema_version.const;
 
 function workspaceGraphStatePath(workspaceRoot) {
   return path.join(workspaceRoot, 'graphify-out', STATE_BASENAME);
@@ -71,7 +76,9 @@ function writeWorkspaceGraphState({
   reasonCode = '',
   repos = [],
   merge = null,
+  mergedArtifactReceipt = null,
   refreshMode = 'explicit',
+  refreshHook = null,
   expectedRepos = null,
 } = {}) {
   const graphifyDir = path.join(workspaceRoot, 'graphify-out');
@@ -88,17 +95,25 @@ function writeWorkspaceGraphState({
       codegraph_status: repo.codegraph_status || 'unknown',
       exclude_status: repo.exclude_status || 'unknown',
       graphify_status: repo.graphify_status || 'unknown',
+      promotion_cleanup_pending: repo.promotion_cleanup_pending === true,
+      promotion_cleanup_reason_code: repo.promotion_cleanup_reason_code || '',
       reason_code: repo.reason_code || '',
     }));
-    const mergedArtifact = inspectMergedArtifact(workspaceRoot, merge && merge.merged_graph_path);
+    const mergedPath = merge && merge.merged_graph_path;
+    const mergedArtifact = inspectMergedArtifact(workspaceRoot, mergedPath, mergedArtifactReceipt);
     const sourceChanged = Array.isArray(expectedRepos)
       && !repoSnapshotsMatch(expectedRepos, repoRecords);
+    const mergedArtifactChanged = Boolean(mergedPath && mergedArtifactReceipt && !mergedArtifact);
+    const forcedPartialReason = sourceChanged
+      ? 'workspace-source-changed-during-build'
+      : (mergedArtifactChanged ? 'workspace-merged-artifact-changed-before-state' : null);
     const payload = {
-      schema_version: 'workspace-graph-state.v1',
+      schema_version: STATE_SCHEMA_VERSION,
       generated_at: new Date().toISOString(),
-      operation_status: sourceChanged ? 'partial' : (operationStatus || 'unknown'),
-      reason_code: sourceChanged ? 'workspace-source-changed-during-build' : (reasonCode || ''),
+      operation_status: forcedPartialReason ? 'partial' : (operationStatus || 'unknown'),
+      reason_code: forcedPartialReason || reasonCode || '',
       refresh_mode: refreshMode,
+      refresh_hook: refreshHook,
       repos: repoRecords,
       merge: merge ? {
         status: merge.status || 'unknown',
@@ -106,6 +121,8 @@ function writeWorkspaceGraphState({
         merged_graph_path: merge.merged_graph_path
           ? relativePath(workspaceRoot, merge.merged_graph_path)
           : null,
+        promotion_cleanup_pending: merge.promotion_cleanup_pending === true,
+        promotion_cleanup_reason_code: merge.promotion_cleanup_reason_code || '',
       } : null,
       merged_artifact: mergedArtifact,
     };
@@ -175,14 +192,24 @@ function resolveStateRepoIds(stateResult) {
   return stateResult.state.repos.map((repo) => repo.repo_id).filter(Boolean);
 }
 
-function inspectMergedArtifact(workspaceRoot, mergedPath) {
+function inspectMergedArtifact(workspaceRoot, mergedPath, receipt = null) {
   if (!mergedPath || !fs.existsSync(mergedPath)) return null;
   try {
+    if (receipt) {
+      if (!jsonFileReceiptMatches(mergedPath, receipt, workspaceRoot)) return null;
+      return {
+        path: relativePath(workspaceRoot, mergedPath),
+        size_bytes: receipt.generation.size,
+        mtime_ms: receipt.generation.mtime_ms,
+        sha256: receipt.sha256,
+      };
+    }
     const stat = fs.statSync(mergedPath);
     return {
       path: relativePath(workspaceRoot, mergedPath),
       size_bytes: stat.size,
       mtime_ms: stat.mtimeMs,
+      sha256: sha256File(mergedPath),
     };
   } catch (_error) {
     return null;

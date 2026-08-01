@@ -19,8 +19,8 @@ upstream_range: 7f86be9d02679adeb93951587dee40de42c5bf82..1fac0442ee16996913dd08
 ## 当前 Source Inventory
 
 - canonical Skill：35
-- package 文件：554
-- manifest SHA-256：`3334580bb67351eaf510a1fa22a3a3c81c9124d97ec4b5ae3d225abf5d2e39b1`
-- HEAD skills tree：`af6350c2330ecc5340204702820ccf180f81cf49`
+- package 文件：559
+- manifest SHA-256：`ff3c5f7b7ed427310f8e4d95b4a809e309021ec79ce161d5efd76a4a2baf2fc7`
+- HEAD skills tree：`bebfcb81c0bad3fb1c82b73c50dd66627cbeae34`
 
 详细逐路径事实见 `docs/validation/2026-07-30-ce-3-20-skill-script-reconciliation.json` 与 `docs/validation/2026-07-30-current-skill-package-inventory.json`。

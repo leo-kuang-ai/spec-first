@@ -10,17 +10,17 @@ Note: Use the current date from the active host context. Use this when weighting
 
 `spec-brainstorm` defines **WHAT** to build by creating a requirements-only unified plan. `spec-plan` enriches that same artifact with **HOW** to build it. `spec-work` executes implementation-ready plans. A prior brainstorm is useful context but never required — `spec-plan` works from any input: a requirements-only unified plan, a legacy requirements doc, a bug report, a feature idea, or a rough description.
 
-**When directly invoked, always plan.** Never classify a direct invocation as "not a planning task" and abandon the workflow. If the input is unclear, ask clarifying questions or use the planning bootstrap (Phase 0.4) to establish enough context — but always stay in the planning workflow.
+**When directly invoked, always plan.** Never classify a direct invocation as "not a planning task" and abandon the workflow. If the input is unclear, ask clarifying questions or use the planning bootstrap (Phase 0.4) to establish enough context — but always stay in the planning workflow. Here, "always plan" means entering and remaining in planning evaluation; entering planning evaluation does not promise an `implementation-ready` output. A blocked checkpoint or producer handoff is a valid outcome while product blockers remain.
 
 This workflow produces a durable implementation plan. It does **not** implement code, run tests, or learn from execution-time results. If the answer depends on changing code and seeing what happens, that belongs in `spec-work`, not here.
 
 ## Workflow Contract Summary
 
-- **输入：** requirements-only unified plan、legacy requirements、bug/feature 描述、现有 plan 或明确的 answer-seeking 目标。
-- **输出：** implementation-ready unified plan 或对应非代码/answer-seeking 产物，包含 owner、files、units、risks、verification contract、DoD 与证据限制。
-- **硬出口：** WHAT 仍未收敛、目标 repo/source owner 不明确、关键架构/验收决定未确认、artifact metadata 无效，或 handoff 尚未由用户选择时不得进入实现。
-- **权威：** Product Contract 拥有 WHAT；当前 source/evidence 约束 HOW；LLM 做架构判断，脚本只准备 facts。规划不授权代码 mutation、test、commit 或 landing。
-- **消费者：** `spec-write-tasks`、`spec-work`、`spec-doc-review`、人工 reviewer 与 caller-owned pipeline。
+- **Input:** A requirements-only unified plan, legacy requirements, a bug or feature description, an existing plan, or an explicit answer-seeking objective.
+- **Output:** An implementation-ready unified plan, the corresponding non-code or answer-seeking artifact, or a blocked checkpoint / producer handoff that preserves unresolved product questions.
+- **Hard exits:** While WHAT is unsettled, the target repo or source owner is unclear, a load-bearing architecture or acceptance decision is unconfirmed, artifact metadata is invalid, or the user has not selected the owning handoff, do not modify the artifact to promote it to `implementation-ready`, generate Implementation Units or an implementation handoff, or enter implementation.
+- **Authority:** The Product Contract owns WHAT; current source and evidence constrain HOW; the LLM makes architecture judgments while scripts only prepare facts. Planning does not authorize code mutation, tests, commits, or landing.
+- **Consumers:** `spec-write-tasks`, `spec-work`, `spec-doc-review`, human reviewers, and caller-owned pipelines.
 
 ## Planning-Only Safety Contract
 
@@ -128,18 +128,20 @@ Pipeline / `disable-model-invocation` runs already skip the chat confirmation (h
 
 #### 0.1 Resume Existing Plan Work When Appropriate
 
+**Metadata-first eligibility gate:** Read the target artifact metadata and major-section outline before committing to a resume or deepen route, then classify its artifact type, readiness, and blocker state. A unified software plan is eligible for the Phase 5.3 deepening fast path only when it has `artifact_readiness: implementation-ready` and all major implementation sections; a complete legacy software plan may establish equivalent eligibility through the section check. An artifact with `artifact_readiness: requirements-only`, `can_enter_spec_plan: no`, or a missing Planning Contract, Implementation Units, Verification Contract, or Definition of Done must not enter the Phase 5.3 deepening fast path. Route it through Phase 0.2 source intake and then Phase 0.5 blocker classification. A user's use of `deepen`, `deepening`, or similar wording expresses intent but cannot override this eligibility gate.
+
 If the user references an existing plan file or there is an obvious recent matching plan in `docs/plans/`:
 - Read it
 - Confirm whether to update it in place or create a new plan
 - If updating, revise only the still-relevant sections. Plans do not carry per-unit progress state — progress is derived from git by `spec-work`, so there is no progress to preserve across edits
 
-**A requirements-only unified plan is not a resume target.** A `docs/plans/` file with `artifact_readiness: requirements-only` is an *enrichment input*, not an existing plan to resume — do **not** fire the update-or-create confirm for it. Fall through to Phase 0.2, which enriches it in place to `implementation-ready`. This matters most for the hands-off `spec-brainstorm` -> `spec-lfg` flow: `spec-lfg` hands `spec-plan` the requirements-only path as its exact pipeline argument, where no user is present to answer a resume prompt. More generally, in pipeline mode the resume choice is made automatically (default to in-place update of the referenced plan) and never prompted.
+**A requirements-only unified plan is not a resume target.** A `docs/plans/` file with `artifact_readiness: requirements-only` is an *enrichment input*, not an existing plan to resume — do **not** fire the update-or-create confirm for it. Continue from Phase 0.2 through Phase 0.5, and enrich it in place to `implementation-ready` only after all true product blockers are cleared. This matters most for the hands-off `spec-brainstorm` -> `spec-lfg` flow: `spec-lfg` passes the requirements-only path to `spec-plan` as the exact pipeline argument, with no user present to answer a resume prompt. More generally, pipeline mode automatically chooses an in-place update of the referenced plan and never emits a resume prompt.
 
-**Deepen intent:** The word "deepen" (or "deepening") in reference to a plan is the primary trigger for the deepening fast path. When the user says "deepen the plan", "deepen my plan", "run a deepening pass", or similar, the target document is a **plan** in `docs/plans/`, not a requirements document. Use any path, keyword, or context the user provides to identify the right plan. If a path is provided, verify it is actually a plan document. If the match is not obvious, confirm with the user before proceeding.
+**Deepen intent:** After the metadata-first eligibility gate passes, the word "deepen" (or "deepening") in reference to a plan is the primary intent trigger for the deepening fast path. When the user says "deepen the plan", "deepen my plan", "run a deepening pass", or similar, the target document is a **plan** in `docs/plans/`, not a requirements document. Use any path, keyword, or context the user provides to identify the right plan. If a path is provided, verify it is actually a plan document. If the match is not obvious, confirm with the user before proceeding.
 
 Words like "strengthen", "confidence", "gaps", and "rigor" are NOT sufficient on their own to trigger deepening. These words appear in normal editing requests ("strengthen that section about the diagram", "there are gaps in the test scenarios") and should not cause a holistic deepening pass. Only treat them as deepening intent when the request clearly targets the plan as a whole and does not name a specific section or content area to change — and even then, prefer to confirm with the user before entering the deepening flow.
 
-Once the plan is identified and appears complete (all major sections present, implementation units defined):
+Only after the metadata-first eligibility gate passes and the plan is confirmed complete (all major sections are present and Implementation Units are defined) may the following fast path run:
 - **Routing is keyed on file extension first, then frontmatter.** HTML plans (`.html`) are always software plans — the html-rendering invariant forbids YAML frontmatter, so frontmatter absence is not a non-software signal for HTML. Treat the visible-header metadata (title, date) as the frontmatter equivalent.
   - **`.html` plan:** short-circuit to Phase 5.3 (Confidence Check and Deepening) in **interactive mode**. Never route to `references/universal-planning.md` based on missing YAML.
   - **`.md` plan WITH YAML frontmatter:** short-circuit to Phase 5.3 in **interactive mode**.
@@ -205,9 +207,10 @@ If multiple source documents match, ask which one to use using the platform's bl
 If a relevant requirements-only unified plan exists:
 1. Read metadata, Goal Capsule, Product Contract, Resolve Before Planning / Open Questions, Sources, source refs, snapshots/versions, limitations, and invalidation conditions (scan headings to locate them; don't read long appendices unless referenced).
 2. Announce that `spec-plan` will enrich that same file to `artifact_readiness: implementation-ready`.
-3. Preserve the existing Product Contract text and stable R/A/F/AE IDs unless planning discovers a direct conflict. Conflicts become explicit assumptions or questions; do not silently rewrite product scope.
-   - Because enrichment edits the same file that holds the user's product decisions, record a one-line **Product Contract preservation** note in the enriched plan: either "Product Contract unchanged" or "changed: \<R-IDs\> — \<why\>". This keeps the WHAT/HOW review boundary visible to reviewers (`spec-doc-review`, PR review) when there is no separate brainstorm file to diff against. For a *substantive* product-scope change (not a clarification), pause and confirm with the user before writing implementation units.
-4. Carry forward all applicable Product Contract sections listed below.
+3. For this workflow, treat the existing Product Contract region as read-only. Before planning, capture its exact source bytes: when present, include `<!-- PRODUCT_CONTRACT_START -->` through `<!-- PRODUCT_CONTRACT_END -->`; otherwise capture `## Product Contract` through the next top-level heading. Requirements-only enrichment must publish that region byte-for-byte unchanged. Do not add, delete, reorder, reformat, renumber, or normalize anything inside it, including Summary, Requirements, IDs, examples, or Scope Boundaries.
+   - Immediately after `## Planning Contract`, outside the captured region, record `Product Contract unchanged (byte-preserved upstream source slice)`. This keeps the WHAT/HOW boundary visible without rewriting WHAT and preserves the established machine-readable phrase consumed by enrichment checks.
+   - If planning discovers a conflict, desired clarification, missing product boundary, or other requested product change, record the issue outside the region and return the requested product change to the owning producer. A load-bearing product change blocks implementation-ready promotion until that owner updates the Product Contract; current-user status, `confirm:auto`, headless mode, or planning judgment does not transfer source ownership to `spec-plan`.
+4. Leave every existing Product Contract section in place and reference its stable R/A/F/AE IDs from Planning Contract and Implementation Units rather than restating or normalizing them.
 5. Use the Product Contract as the primary input to planning and research.
 6. Do not create a duplicate plan unless an explicit `output:` conversion or pipeline override requires a new canonical path; when conversion happens, report old path and new canonical path.
 
@@ -278,15 +281,19 @@ If the origin document contains `Resolve Before Planning` or similar blocking qu
 
 Treat `checkpoint-prd`, `can_enter_spec_plan: no`, and any load-bearing PRD Outstanding Question as the same user-control signal. Do not silently ignore, downgrade, or convert one merely because the document is old or otherwise readable.
 
+**Product-decision authority guard:** A task instruction from the current user does not automatically grant Product Contract decision authority. Option 2 is available only when the current user has authority over the relevant WHAT, personally provides or confirms the concrete product decision, and has not disclaimed that authority. "Decide it yourself," "don't ask," `confirm:auto`, headless mode, pipeline / `disable-model-invocation`, and the mere fact that someone is the current user do not create or transfer WHAT decision authority. If the user explicitly states that they are not the Product Owner, lack authority to decide, or can only execute, do not ask them a product question they cannot answer; option 2 is unavailable. Keep the artifact unchanged, surface the blocker, and return to the owning producer. For direct bootstrap with no producer, return a blocked checkpoint that names the required Product Owner or caller.
+
+Headless and pipeline modes must fail closed on a true product blocker: do not silently choose product behavior, route the blocker into Assumptions, promote readiness, or generate an implementation handoff. An automated caller may only return the blocked checkpoint to the owning producer or an owner with product-decision authority.
+
 If true product blockers remain:
 - Surface them clearly
-- For an upstream-sourced run, return to the upstream producer by default (`spec-brainstorm` for a brainstorm Product Contract, `spec-prd` for a legacy PRD checkpoint). For direct bootstrap, direct bootstrap returns to the current user because no producer artifact owns the gap.
-- Ask the current user, using the platform's blocking question tool when available (see Interaction Method), whether to:
+- For an upstream-sourced run, return to the upstream producer by default (`spec-brainstorm` for a brainstorm Product Contract, `spec-prd` for a legacy PRD checkpoint). For direct bootstrap, direct bootstrap returns to the current user because no producer artifact owns the gap. If that user explicitly disclaims product-decision authority, emit the blocked checkpoint described above instead.
+- Only when the current user passes the Product-decision authority guard above, use the platform's blocking question tool (see Interaction Method) to ask whether to:
   1. Return to the owning producer to resolve them
   2. Convert each blocker into an explicit assumption or decision and continue
 - Do not continue planning while true blockers remain unresolved
 
-When the current user chooses option 2, record the original blocker, the explicit assumption/decision, consequence, and accepted risk in the plan. This preserves user control without laundering the blocker into producer-confirmed WHAT.
+When an authorized current user chooses option 2 and provides or confirms the concrete product decision, record the original blocker, explicit assumption or decision, consequence, and accepted risk in the plan. This preserves user control without laundering the blocker into producer-confirmed WHAT.
 
 #### 0.6 Assess Plan Depth
 
@@ -298,9 +305,9 @@ Classify the work into one of these plan depths:
 
 When the request, Product Contract, or source evidence hits a high-risk domain, read `references/high-risk-plan-lens.md` before finalizing depth. Its trigger matrix is a semantic readiness lens, not a script-owned classifier: it may raise a plan toward Standard/Deep, require explicit decisions, or expose a blocking question, but the LLM still decides applicability and adequacy.
 
-当请求、Product Contract 或 source evidence 新增或演进 durable interface（public API、CLI contract、event/schema、shared type 或跨模块协议）时，读取 `references/interface-and-evolution-lens.md`。它持有 greenfield/evolution 双分支、`### Interface Contracts` landing、canonical artifact 与 parser/test 边界；private helper refactor 与 implementation drift review 不触发该 planning owner。
+When the request, Product Contract, or source evidence adds or evolves a durable interface (public API, CLI contract, event/schema, shared type, or cross-module protocol), read `references/interface-and-evolution-lens.md`. It owns the greenfield/evolution branches, `### Interface Contracts` landing, canonical artifact, and parser/test boundaries; private-helper refactors and implementation-drift review do not trigger this planning owner.
 
-当请求或 source evidence 改变用户可见页面、表单、导航、组件行为、async state、responsive layout 或 accessibility contract 时，读取 `references/frontend-engineering-lens.md`。它持有 component/state/a11y/responsive/runtime-verification 的 plan-time 决策；backend/type/fixture、且不影响 contrast/focus/layout/responsive/motion/状态表达的 token-value-only 变更，以及无结构行为变化的 visual polish 不触发，polish/browser/race/diff review 保持各自 owner。
+When the request or source evidence changes a user-visible page, form, navigation path, component behavior, async state, responsive layout, or accessibility contract, read `references/frontend-engineering-lens.md`. It owns plan-time component/state/a11y/responsive/runtime-verification decisions. Backend-only, type-only, fixture-only, and token-value-only changes that do not affect contrast, focus, layout, responsive behavior, motion, or state expression do not trigger it; neither does visual polish without structural behavior change. Polish, browser, race, and diff review retain their respective owners.
 
 If depth is unclear, ask one targeted question and then continue.
 
@@ -316,13 +323,13 @@ Fires **only in solo invocation** — when Phase 0.2 found no upstream Product C
 
 **Blocking decision:** auto-proceed — announce without waiting — only when plan depth is **Lightweight AND zero call-outs survive**. Standard and Deep always fire the confirmation gate, even with zero call-outs.
 
-**Headless / opt-in skip:** in headless mode, or when `SKIP_SCOPING_CONFIRM` resolved to skip in Phase 0.0, do not block — compose the internal draft, skip the chat-time confirmation, and route Inferred bets to a `## Assumptions` section at plan-write (Phase 5.2). The skip covers only this scoping confirmation; Phase 0.4 routing, Phase 0.5 blockers, Phase 2 questions, source-doc disambiguation, and the Phase 5.4 menu still fire. Announcement wording and full routing: `references/synthesis-summary.md` ("Headless mode", "When to skip the blocking confirmation").
+**Headless / opt-in skip:** If Phase 0.5 has not cleared every true product blocker, do not enter this branch. Once it has, headless mode or a Phase 0.0 resolution of `SKIP_SCOPING_CONFIRM` to skip may bypass chat-time confirmation and route eligible Inferred bets to `## Assumptions` in Phase 5.2. This skip covers only the scoping confirmation; Phase 0.4 routing, Phase 0.5 blockers, Phase 2 questions, source-document disambiguation, and the Phase 5.4 menu still fire. Announcement wording and full routing: `references/synthesis-summary.md` ("Headless mode", "When to skip the blocking confirmation").
 
 ### Phase 1: Gather Context
 
-All specialist research and deepening prompts used in this phase are skill-local prompt assets under `references/agents/`. When dispatching one, read the matching file and seed a generic subagent with that prompt content plus the task-specific context below. Do not dispatch standalone agents by type/name.
+All specialist research and deepening prompts used in this phase are skill-local prompt assets under `references/agents/`. Those files are worker seed material, not a mandatory inline dependency. When dispatching one, read the matching file and seed a generic subagent with that prompt content plus the task-specific context below. Under inline fallback, apply the concise scope in this file directly. Do not read a worker prompt asset merely because inline fallback is active; load one only when a positive specialist trigger applies and the concise caller scope lacks criteria needed for the unresolved planning question. Do not dispatch standalone agents by type/name.
 
-**Dispatch authorization and fallback.** A public `spec-plan` invocation authorizes this workflow, not subagents, personas, parallel work, Slack search, web research, or external data access. Before dispatch, record `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism`, then normalize the path as `worker_dispatch_outcome`. Missing authorization forbids discovery, fixes `not_applicable + unknown`, and records `dispatch_authorization_missing`. Only after the user or an upstream handoff explicitly authorizes delegation/research dispatch may the current-session registry/schema be inspected as `provider_untrusted` evidence: confirmed absence records `subagent_capability_missing`; unavailable/incomplete/ambiguous discovery records `worker_capability_unproven`. Otherwise read the same prompt assets and apply them inline or serially. Lack of dispatch changes latency/context separation, not correctness or completion; external/organizational research still requires its independent data-access authorizations.
+**Dispatch authorization and fallback.** A public `spec-plan` invocation authorizes this workflow, not subagents, personas, parallel work, Slack search, web research, or external data access. Before dispatch, record `worker_dispatch_authorization`, `capability_probe`, `worker_dispatch_capability`, `worker_context_isolation`, `worker_model_override`, and `worker_bounded_parallelism`, then normalize the path as `worker_dispatch_outcome`. Missing authorization forbids discovery, fixes `not_applicable + unknown`, and records `dispatch_authorization_missing`. Only after the user or an upstream handoff explicitly authorizes delegation/research dispatch may the current-session registry/schema be inspected as `provider_untrusted` evidence: confirmed absence records `subagent_capability_missing`; unavailable/incomplete/ambiguous discovery records `worker_capability_unproven`. Otherwise use the named scopes below as bounded semantic lenses and apply them inline or serially without emulating a worker. Lack of dispatch changes latency/context separation, not correctness or completion; external/organizational research still requires its independent data-access authorizations.
 
 Model tiering lives in this caller, not in prompt assets. Local prompt files have no frontmatter. Request the mid-tier for external/organizational research prompts such as `slack-researcher` and `web-researcher` only when `worker_model_override: supported`; otherwise omit the override, inherit, and disclose `model_override_unsupported` or `model_override_unknown`. Use inherited model for high-judgment architecture, migration, and planning-deepening prompts unless current-session facts establish a cheaper capable tier.
 
@@ -336,7 +343,7 @@ Prepare a concise planning context summary (a paragraph or two) to pass as input
 
 **Resolve current project orientation first.** Derive stack, dependencies, conventions, and structure from the current target repo/worktree for this run. Record current git identity and dirty state, read root plus applicable scoped instructions directly, and carry direct source refs. Never persist or reuse this orientation across runs, branches, or worktrees. Pass it to `repo-research-analyst` so the analyst can focus on question-specific patterns while still confirming any consequential fact against current source. If git or a required source cannot be read, record the concrete degraded fact and narrow the plan's evidence claims; do not substitute a profile from another source identity.
 
-When dispatch is authorized, run these agents in parallel. Under inline fallback, apply the same prompt scopes sequentially and keep only the strongest source-backed findings:
+When dispatch is authorized, read and run these prompt assets in parallel. Under inline fallback, apply the same concise scopes sequentially from current source and keep only the strongest source-backed findings; do not preload their full worker prompts:
 
 - `references/agents/repo-research-analyst.md` — scope: **patterns** (the question-specific slice; pass the planning context summary and current-tree orientation, including its source identity and refs).
 - `references/agents/learnings-researcher.md` — pass the planning context summary.
@@ -472,7 +479,7 @@ This ensures flow analysis (Phase 1.5) runs and the confidence check (Phase 5.3)
 
 #### 1.5 Flow and Edge-Case Analysis (Conditional)
 
-For **Standard** or **Deep** plans, or when user flow completeness is still unclear, run through authorized dispatch or apply inline:
+For **Standard** or **Deep** plans, or when user flow completeness is still unclear, run through authorized dispatch or apply the concise scope below inline. Read the full prompt asset only for authorized dispatch or when the inline analysis exposes a specialized flow question that the concise scope does not cover:
 
 - `references/agents/spec-flow-analyzer.md` with the planning context summary and research findings.
 
@@ -686,8 +693,8 @@ Before finalizing, check:
 - Deferred items are explicit and not hidden as fake certainty
 - Multi-surface work names every materially-considered client, service/backend, API/schema/event contract, data, operational/rollout, verification/test, and agent/tool surface as in-scope, out-of-scope with a reason, or deferred with an owner/trigger; irrelevant surfaces are omitted
 - When a high-risk trigger applies, the plan satisfies `references/high-risk-plan-lens.md` through concrete decisions or explicit Open Questions/deferments; a launch-blocking risk gap prevents `artifact_readiness: implementation-ready`
-- 当 interface/evolution trigger 适用时，计划按 `references/interface-and-evolution-lens.md` 记录 shared contract core、greenfield 或 evolution posture，并在 `### Interface Contracts` 中落 canonical artifact、consumer、compatibility 与 verification owner；`parser_unavailable` 必须带 reason、owner 和 unblock condition
-- 当 frontend trigger 适用时，计划按 `references/frontend-engineering-lens.md` 记录 component reuse、适用 state matrix、keyboard/focus/semantic/contrast、responsive 行为与 runtime verification owner；未运行 browser 或不可用 capability 只能限制对应 claim，不得冒充已验证 UI outcome
+- When the interface/evolution trigger applies, follow `references/interface-and-evolution-lens.md` to record the shared contract core and a greenfield or evolution posture, then land the canonical artifact, consumers, compatibility, and verification owner in `### Interface Contracts`; `parser_unavailable` must include a reason, owner, and unblock condition
+- When the frontend trigger applies, follow `references/frontend-engineering-lens.md` to record component reuse, the applicable state matrix, keyboard/focus/semantic/contrast behavior, responsive behavior, and the runtime-verification owner; a browser run that did not occur or an unavailable capability may only limit the corresponding claim, never masquerade as a verified UI outcome
 - **High-Level Technical Design presence audit (load-bearing).** For each architecture trigger in Phase 3.4 that the plan content satisfies (3+ components with directed relationships, 3+ protocol steps, 3+ state machine states, lifecycle, 3+ decision points, 3+ data-flow stages, mode/flag combinations, DSL/API surface design, non-obvious single-component shape), verify a corresponding sketch/diagram is present in the High-Level Technical Design section. Count the firing triggers; count the sketches; the sketch count must be at least the count of distinct trigger categories that fired. Missing the section when a trigger fired, OR including the section but skipping a triggered sketch within it, is incomplete — return to Phase 3.4 and add the missing sketch. Token cost is not a valid reason to fail this check.
 - If a High-Level Technical Design section is included, it uses the right medium for the work, carries the non-prescriptive framing, and does not contain implementation code (no imports, exact signatures, or framework-specific syntax)
 - Per-unit technical design fields, if present, are concise and directional rather than copy-paste-ready
@@ -716,11 +723,15 @@ Fires **whenever Phase 0.2 resolved an upstream Product Contract source** — a 
 
 **Blocking decision:** auto-proceed — announce without waiting — only when plan depth is **Lightweight AND zero call-outs survive**. Standard and Deep always fire the confirmation gate, even with zero call-outs.
 
-**Headless / opt-in skip:** in headless mode, or when `SKIP_SCOPING_CONFIRM` resolved to skip in Phase 0.0, do not block — compose the internal draft, skip the chat-time confirmation, and route Inferred bets to a `## Assumptions` section at plan-write (Phase 5.2). The skip covers only this scoping confirmation; Phase 0.4 routing, Phase 0.5 blockers, Phase 2 questions, source-doc disambiguation, and the Phase 5.4 menu still fire. Announcement wording and full routing: `references/synthesis-summary.md` ("Headless mode", "When to skip the blocking confirmation").
+**Headless / opt-in skip:** If Phase 0.5 has not cleared every true product blocker, do not enter this branch. Once it has, headless mode or a Phase 0.0 resolution of `SKIP_SCOPING_CONFIRM` to skip may bypass chat-time confirmation and route eligible Inferred bets to `## Assumptions` in Phase 5.2. This skip covers only the scoping confirmation; Phase 0.4 routing, Phase 0.5 blockers, Phase 2 questions, source-document disambiguation, and the Phase 5.4 menu still fire. Announcement wording and full routing: `references/synthesis-summary.md` ("Headless mode", "When to skip the blocking confirmation").
 
 #### 5.2 Write Plan File
 
 **REQUIRED: Write the plan file to disk before presenting any options.**
+
+This REQUIRED applies only after Phase 0.5 has cleared every true product blocker. A blocked checkpoint / producer handoff must not rewrite the canonical artifact or use this phase to add Implementation Units, a Verification Contract, a Definition of Done, or `implementation-ready` metadata.
+
+**Pipeline context budget:** Do not preload `references/deepening-workflow.md` or `references/plan-handoff.md` before the initial plan write. Compose and write from the already-loaded planning sources, run the confidence gate, then load only the reference selected by that gate. This ordering preserves enough context to complete the mandatory tail instead of spending the exit budget on instructions that may not apply.
 
 HTML note: `spec-doc-review` runs structural/semantic review with
 `mutation_policy: report-only`. It never patches HTML; uniquely determined
@@ -741,7 +752,7 @@ Compose the plan using the content from `references/plan-sections.md` and the fo
 
 Write the unified plan artifact according to `references/plan-sections.md`.
 
-- If the source is a requirements-only unified plan, update that file in place unless `OUTPUT_FORMAT`, pipeline mode, or an explicit conversion requires a new canonical path. Preserve Product Contract IDs and content; add Planning Contract, Implementation Units, Verification Contract, and Definition of Done. When a new canonical path *is* required (format conversion), the original artifact is left in place but is **no longer canonical** — it keeps its `requirements-only` metadata, so discovery treats a requirements-only artifact that has an implementation-ready same-basename sibling as superseded (see Phase 0.2 step 2 and `spec-work`'s blank-invocation discovery) rather than re-enriching or stopping on it.
+- If the source is a requirements-only unified plan, update that file in place unless `OUTPUT_FORMAT`, pipeline mode, or an explicit conversion requires a new canonical path. Preserve the captured Product Contract region byte-for-byte; add Planning Contract, Implementation Units, Verification Contract, and Definition of Done outside it. When a new canonical path *is* required (format conversion), the original artifact is left in place but is **no longer canonical** — it keeps its `requirements-only` metadata, so discovery treats a requirements-only artifact that has an implementation-ready same-basename sibling as superseded (see Phase 0.2 step 2 and `spec-work`'s blank-invocation discovery) rather than re-enriching or stopping on it.
 - If the source is a legacy requirements doc, create a new unified plan in `docs/plans/` and carry the legacy path in `origin:`.
 - If this is direct planning, create a complete unified plan in `docs/plans/` with `product_contract_source: spec-plan-bootstrap`.
 - Set `artifact_contract: spec-unified-plan/v1`, `artifact_readiness: implementation-ready`, and `execution: code` for software implementation plans.
@@ -810,7 +821,7 @@ When deepening is warranted, read `references/deepening-workflow.md` for confide
 
 ##### 5.3.8–5.4 Document Review, Final Checks, and Post-Generation Options
 
-**STOP. Load `references/plan-handoff.md` now before continuing.** It carries the full instructions for 5.3.8 (document review), 5.3.9 (final checks and cleanup), and 5.4 (post-generation handoff, including Issue Creation branching). **This load is non-optional** — without it, the agent renders the post-generation menu, captures the user's selection, and stops without firing the routed action. Document review at 5.3.8 runs headless for both formats regardless of whether the confidence check already ran. Markdown is invoked with `mutation:apply-fixes` and resolves `mutation_policy: markdown-write`; HTML is invoked with `mutation:report-only`, returns findings without mutation, and may trigger at most two producer-owned full recompose + review cycles. A deeper interactive mutation walkthrough is available only for Markdown with the same explicit token.
+**STOP. Load `references/plan-handoff.md` now before continuing.** It carries the full instructions for 5.3.8 (document review), 5.3.9 (final checks and cleanup), and 5.4 (post-generation handoff, including Issue Creation branching). **This load is non-optional** — without it, the agent renders the post-generation menu, captures the user's selection, and stops without firing the routed action. Document review at 5.3.8 runs headless for both formats regardless of whether the confidence check already ran. Markdown is invoked with `mutation:apply-fixes` and resolves `mutation_policy: markdown-write`; HTML is invoked with `mutation:report-only`, returns findings without mutation, and may trigger at most two producer-owned full recompose + review cycles. When independent review invocation is unavailable or downstream model invocation is disabled, follow that reference's one-pass explicit degraded fallback instead of searching, waiting, or fabricating a review result. A deeper interactive mutation walkthrough is available only for Markdown with the same explicit token.
 
 After document review and final checks, print a one-line summary of the headless review state above the menu (e.g., `Doc review applied 3 fixes. 2 decisions, 1 proposed fix, 4 FYI observations remain (1 at P1).`; for HTML, `Doc review completed report-only — 0 fixes applied; 2 producer-fix candidates and 3 FYI observations reported.`), then present the menu. Options 1 (`Start /spec-work`) and 2 (`Run it as a /goal`) render only for implementation-ready code plans, and option 2 only when the host has goal capability: Codex has goal capability when `create_goal` is in the available tool list, while Claude Code has goal capability through the user-typed `/goal` command. Do not require Codex to expose a literal slash command. The `Decide on the review's open items` option renders only for `mutation_policy: markdown-write` when actionable findings remain (`proposed_fixes_count + decisions_count > 0`); FYI-only and report-only cases hide it. See `references/plan-handoff.md` for the full rule. For menu rendering, account for each platform's question-tool option cap instead of trimming choices: Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options. When the visible menu exceeds the current platform's cap, render it as a numbered list in chat with the hint "Pick a number or describe what you want." When the visible menu fits the cap, use the platform's blocking tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex), with the same numbered-list fallback if the tool is unavailable or errors. Renumber the visible options 1-N. Never silently skip the question.
 
@@ -839,15 +850,15 @@ If the user types free-form prompts targeting the findings (e.g., "review", "wal
 **Final pre-response checklist:** Before sending any response that could end `spec-plan`, verify:
 - Plan file exists on disk
 - Confidence check ran or was intentionally skipped by the interactive re-deepen no-accepted-findings path
-- `spec-doc-review` ran in headless mode for the produced format, unless the interactive re-deepen no-accepted-findings path intentionally skipped the whole review phase
-- Headless review state and `markdown-write` or `report-only` mutation policy were summarized above the menu
+- `spec-doc-review` ran in headless mode for the produced format, the explicit degraded fallback completed, or the interactive re-deepen no-accepted-findings path intentionally skipped the whole review phase
+- Headless review state and `markdown-write`, `report-only`, or explicit degraded-review limitation were summarized above the menu or in the pipeline return
 - Phase 5.4 menu was presented for software implementation-plan runs, even if the user only asked to create the plan or run doc review, unless pipeline mode returned control to the caller
 - If the user selected an action, the selected routing was executed
 
-**Completion check:** This skill is not complete until the post-generation menu above has been presented, the user has selected an action, and the inline routing for that selection has been executed. Presenting the menu and stopping at the user's selection is not completion — fire the routed action.
+**Interactive completion check:** An interactive run is not complete until the post-generation menu above has been presented, the user has selected an action, and the inline routing for that selection has been executed. Presenting the menu and stopping at the user's selection is not completion — fire the routed action. Pipeline runs use the exception below.
 
 Incorrect final response: "Created the plan and ran doc review."
 
 Correct terminal handoff: "Created the plan and ran doc review. Plan ready at `<absolute path to plan>`. What would you like to do next?" followed by the numbered handoff options or the platform's blocking question.
 
-**Pipeline mode exception:** In LFG or any `disable-model-invocation` context, skip the interactive menu and return control to the caller after the plan file is written, confidence check has run, and `spec-doc-review` has run in headless mode (per `references/plan-handoff.md`). Pipeline mode forces `OUTPUT_FORMAT=md` at Phase 0.0.
+**Pipeline mode exception:** In LFG or any `disable-model-invocation` context, skip the interactive menu and return control to the caller after the plan file is written, the confidence check has run, and either `spec-doc-review` has run headless or the explicit degraded fallback completed (per `references/plan-handoff.md`). Return immediately after the concise review/limitation summary; do not re-read the complete plan or continue exploring. Pipeline mode forces `OUTPUT_FORMAT=md` at Phase 0.0.

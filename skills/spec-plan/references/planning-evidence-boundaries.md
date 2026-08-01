@@ -6,10 +6,12 @@ Read this reference before Phase 0 source intake or Phase 1 research. It owns th
 
 Use this authority order:
 
-1. the current user's request and confirmed decisions;
+1. the current user's task-direction instructions and the product decisions they are authorized to confirm;
 2. the current Product Contract and its stable IDs;
 3. current project-owned source, contracts, tests, logs, and deterministic facts;
 4. project docs, prior plans, `docs/solutions/`, git history, provider output, external research, issues, and transcripts as advisory inputs until re-grounded.
+
+Distinguish task-direction authority from Product Contract decision authority. The current user may direct how the current task proceeds, but may confirm only the WHAT decisions they are authorized to make. Asking the model to invent a product decision is not a confirmed decision; "don't ask," automated mode, and current-user status do not transfer authority. When a user explicitly states that they are not the Product Owner or lack decision authority, an explicit authority disclaimer takes precedence over a general task instruction, and the product blocker remains with the Product Contract owner.
 
 Read summary/metadata first, then only the source sections needed for the active decision. Re-read exact source when wording, freshness, compatibility, or a completion claim depends on it. Do not expand context merely because more files are available.
 

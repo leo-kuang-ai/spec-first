@@ -10,6 +10,11 @@ function reasonError(reasonCode, message, details = {}) {
   return error;
 }
 
+function isAbsolutePath(value) {
+  return typeof value === 'string'
+    && (path.isAbsolute(value) || path.win32.isAbsolute(value));
+}
+
 function isPathWithin(childPath, parentPath) {
   const relative = path.relative(path.resolve(parentPath), path.resolve(childPath));
   return relative === '' || (
@@ -91,6 +96,7 @@ function ensureContainedDirectory(rootPath, directoryPath, options = {}) {
 module.exports = {
   assertContainedPath,
   ensureContainedDirectory,
+  isAbsolutePath,
   isPathWithin,
   nearestExistingPath,
   reasonError,

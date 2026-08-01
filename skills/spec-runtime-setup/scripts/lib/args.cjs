@@ -23,6 +23,48 @@ const VALUE_OPTIONS = new Map([
   ['--repos', 'repos'],
 ]);
 
+const OUTPUT_FLAGS = new Set([
+  '--json',
+  '--help',
+  '-h',
+  '--refresh-example',
+  '--create-local',
+  '--ensure-gitignore',
+  '--delete-legacy-markdown',
+]);
+
+function parseEntrypointOptions(argv = []) {
+  const modeArgv = [];
+  const options = {
+    json: false,
+    help: false,
+    pluginVersion: '',
+    refreshExample: false,
+    createLocal: false,
+    ensureGitignore: false,
+    deleteLegacyMarkdown: false,
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = String(argv[index]);
+    if (token === '--json') options.json = true;
+    else if (token === '--help' || token === '-h') options.help = true;
+    else if (token === '--refresh-example') options.refreshExample = true;
+    else if (token === '--create-local') options.createLocal = true;
+    else if (token === '--ensure-gitignore') options.ensureGitignore = true;
+    else if (token === '--delete-legacy-markdown') options.deleteLegacyMarkdown = true;
+    else if (token === '--version') {
+      const value = argv[index + 1];
+      if (value !== undefined && !String(value).startsWith('--')) {
+        options.pluginVersion = String(value);
+        index += 1;
+      }
+    } else if (!OUTPUT_FLAGS.has(token)) {
+      modeArgv.push(token);
+    }
+  }
+  return { options, modeArgv };
+}
+
 function parseArgs(argv = []) {
   const input = Array.isArray(argv) ? argv.map(String) : [];
   const result = {
@@ -117,4 +159,5 @@ function uniqueStrings(values) {
 
 module.exports = {
   parseArgs,
+  parseEntrypointOptions,
 };

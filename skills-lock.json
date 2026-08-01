@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "autoresearch": {
+      "source": "uditgoenka/autoresearch",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/autoresearch/SKILL.md",
+      "computedHash": "7103cf31ae8542bd74f5c95b84577157ac965f1f6992cf2a0886c5c0843513fb"
+    },
     "baoyu-article-illustrator": {
       "source": "jimliu/baoyu-skills",
       "sourceType": "github",

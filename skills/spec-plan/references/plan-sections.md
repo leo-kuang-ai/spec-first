@@ -174,11 +174,17 @@ present. They carry the contracts downstream consumers depend on.
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,
   Outstanding Questions, and Sources. This replaces the separate requirements
-  artifact in new brainstorm-to-plan flows.
+  artifact in new brainstorm-to-plan flows. In requirements-only enrichment it
+  is a byte-preserved upstream source slice, not a planning-owned composition
+  surface; additions, normalization, and product-scope revisions return to the
+  owning producer.
 - **Planning Contract** — the implementation-facing decisions: Key Technical
   Decisions, high-level design, assumptions, implementation constraints,
   sequencing, architecture posture, composition/source-ownership decisions,
-  and evidence that shapes how the Product Contract will be built.
+  and evidence that shapes how the Product Contract will be built. Plan-local
+  exclusions discovered while enriching an upstream Product Contract belong in
+  Planning Contract `### Implementation Scope Boundaries`, not in the preserved
+  Product Contract.
 - **Implementation Units** (with stable U-IDs) — discrete work packets sized so
   each is independently executable. Each unit names Goal, Requirements,
   Files, Approach, Test Scenarios, and Verification. `spec-work` and goal-mode

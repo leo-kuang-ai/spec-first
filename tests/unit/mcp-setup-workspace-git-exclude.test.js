@@ -103,7 +103,7 @@ describe('workspace-git-exclude — managed .git/info/exclude writer', () => {
     expect(result.target).not.toBe(path.join(worktree, '.git', 'info', 'exclude'));
 
     fs.mkdirSync(path.join(worktree, '.codegraph'), { recursive: true });
-    fs.writeFileSync(path.join(worktree, '.codegraph', 'db'), 'x');
+    fs.writeFileSync(path.join(worktree, '.codegraph', 'codegraph.db'), 'x');
     expect(status(worktree).trim()).toBe('');
   });
 

@@ -8,6 +8,13 @@ const { spawnSync } = require('node:child_process');
 const { runWorkspaceGraphClean } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs');
 const { runWorkspaceGraphBuild } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs');
 const { GRAPHIFY_OUT_DIRNAME } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs');
+const {
+  BLOCK_END,
+  HOOK_MARKER,
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-child-hook.cjs');
+const {
+  acquireWorkspaceGraphLifecycleLease,
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs');
 
 function mkWorkspace() {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-wg-clean-')));
@@ -20,16 +27,17 @@ function initRepo(root, rel) {
   return repo;
 }
 function fakeExec(command, args) {
-  if (command === 'graphify' && args[0] === 'extract') {
+  const commandName = path.basename(command);
+  if (commandName === 'graphify' && args[0] === 'extract') {
     const outDir = args[args.indexOf('--out') + 1];
     const graphPath = path.join(outDir, GRAPHIFY_OUT_DIRNAME, 'graph.json');
     fs.mkdirSync(path.dirname(graphPath), { recursive: true });
     fs.writeFileSync(graphPath, '{}');
-  } else if (command === 'graphify' && args[0] === 'merge-graphs') {
+  } else if (commandName === 'graphify' && args[0] === 'merge-graphs') {
     fs.writeFileSync(args[args.indexOf('--out') + 1], '{}');
-  } else if (command === 'codegraph' && args[0] === 'init') {
+  } else if (commandName === 'codegraph' && args[0] === 'init') {
     fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });
-    fs.writeFileSync(path.join(args[1], '.codegraph', 'db'), 'x');
+    fs.writeFileSync(path.join(args[1], '.codegraph', 'codegraph.db'), 'x');
   }
   return { status: 0, stdout: '', stderr: '' };
 }
@@ -48,6 +56,10 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
       repos: ['api', 'web'],
       allowDiscovery: false,
       exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
       hosts: ['claude', 'codex'],
     });
     expect(build.status).toBe('complete');
@@ -86,7 +98,16 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     const excludePath = resolveExcludePath(repo).absolute;
     fs.writeFileSync(excludePath, '# user\n*.tmp\n');
 
-    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+    });
     runWorkspaceGraphClean({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: () => ({ status: 0 }) });
 
     const contents = fs.readFileSync(excludePath, 'utf8');
@@ -197,7 +218,15 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
   test('partial child cleanup preserves the state receipt for a bare retry', () => {
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
-    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+    });
     fs.mkdirSync(path.join(ws, '.graphify'), { recursive: true });
     fs.writeFileSync(path.join(ws, '.graphify', 'legacy-receipt.json'), '{}');
     const { resolveExcludePath, MANAGED_BLOCK_START } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs');
@@ -218,7 +247,16 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
   test('clean without --repos reuses the last managed state repo set', () => {
     const ws = mkWorkspace();
     initRepo(ws, 'api');
-    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+    });
 
     const clean = runWorkspaceGraphClean({
       cwd: ws,
@@ -231,11 +269,25 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(fs.existsSync(path.join(ws, 'api', '.codegraph'))).toBe(false);
   });
 
-  test('hook uninstall failure makes clean partial', () => {
+  test('native Graphify hook uninstall failure makes clean partial', () => {
     const ws = mkWorkspace();
-    initRepo(ws, 'api');
-    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec });
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+      installHooks: false,
+    });
     fs.rmSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'));
+    fs.writeFileSync(
+      path.join(api, '.git', 'hooks', 'post-commit'),
+      '#!/bin/sh\n# Installed by: graphify hook install\n',
+    );
 
     const clean = runWorkspaceGraphClean({
       cwd: ws,
@@ -249,12 +301,217 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(clean.repos[0].hook_status).toBe('failed');
   });
 
+  test('native Graphify hook uninstall zero-exit no-op makes clean partial', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+      installHooks: false,
+    });
+    const hookPath = path.join(api, '.git', 'hooks', 'post-commit');
+    fs.writeFileSync(hookPath, '#!/bin/sh\n# Installed by: graphify hook install\n');
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean.status).toBe('partial');
+    expect(clean.repos[0]).toMatchObject({
+      hook_status: 'failed',
+      reason_code: 'graphify-hook-uninstall-incomplete',
+    });
+    expect(clean.workspace_graphify_status).toBe('preserved');
+    expect(fs.readFileSync(hookPath, 'utf8')).toContain('Installed by: graphify hook install');
+  });
+
+  test('mixed spec-first and native hook uninstall zero-exit no-op makes clean partial', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+    });
+    const hookPath = path.join(api, '.git', 'hooks', 'post-commit');
+    fs.appendFileSync(hookPath, '\n# Installed by: graphify hook install\n');
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean.status).toBe('partial');
+    expect(clean.repos[0]).toMatchObject({
+      hook_status: 'failed',
+      reason_code: 'graphify-hook-uninstall-incomplete',
+    });
+    expect(clean.workspace_graphify_status).toBe('preserved');
+    const remaining = fs.readFileSync(hookPath, 'utf8');
+    expect(remaining).not.toContain(HOOK_MARKER);
+    expect(remaining).toContain('Installed by: graphify hook install');
+  });
+
+  test.each(['explicit', 'invalid', 'missing'])(
+    'an unreadable contained hook in %s state makes clean partial',
+    (stateMode) => {
+      const ws = mkWorkspace();
+      const api = initRepo(ws, 'api');
+      runWorkspaceGraphBuild({
+        cwd: ws,
+        repos: ['api'],
+        allowDiscovery: false,
+        exec: fakeExec,
+        codegraphCommand: '/verified/bin/codegraph',
+        graphifyCommand: '/verified/bin/graphify',
+        runtimeHost: 'codex',
+        bundledVersion: '1.13.2',
+        installHooks: false,
+      });
+      const statePath = path.join(ws, 'graphify-out', 'workspace-graph-state.json');
+      if (stateMode === 'invalid') fs.writeFileSync(statePath, '{broken');
+      if (stateMode === 'missing') fs.rmSync(statePath);
+      const hookPath = path.join(api, '.git', 'hooks', 'post-commit');
+      fs.writeFileSync(hookPath, '#!/bin/sh\n# Installed by: graphify hook install\n');
+      const originalOpenSync = fs.openSync;
+      const openSpy = jest.spyOn(fs, 'openSync').mockImplementation((filePath, ...args) => {
+        if (typeof filePath === 'string' && path.resolve(filePath) === hookPath) {
+          const error = new Error('hook unreadable');
+          error.code = 'EACCES';
+          throw error;
+        }
+        return originalOpenSync(filePath, ...args);
+      });
+
+      let clean;
+      try {
+        clean = runWorkspaceGraphClean({
+          cwd: ws,
+          repos: ['api'],
+          allowDiscovery: false,
+          exec: () => ({ status: 0 }),
+        });
+      } finally {
+        openSpy.mockRestore();
+      }
+
+      expect(clean.status).toBe('partial');
+      expect(clean.repos[0]).toMatchObject({
+        hook_status: 'blocked',
+        reason_code: 'workspace-child-hook-unreadable',
+      });
+      expect(clean.workspace_graphify_status).toBe('preserved');
+      expect(fs.existsSync(path.join(ws, 'graphify-out'))).toBe(true);
+    },
+  );
+
+  test.each(['workspace-graph-state.v1', 'workspace-graph-state.v2'])(
+    'an unreadable %s receipt still removes contained spec-first managed hooks',
+    (schemaVersion) => {
+      const ws = mkWorkspace();
+      const api = initRepo(ws, 'api');
+      const hookPath = path.join(api, '.git', 'hooks', 'post-commit');
+      fs.writeFileSync(hookPath, '#!/bin/sh\necho user-hook\n');
+      const build = runWorkspaceGraphBuild({
+        cwd: ws,
+        repos: ['api'],
+        allowDiscovery: false,
+        exec: fakeExec,
+        codegraphCommand: '/verified/bin/codegraph',
+        graphifyCommand: '/verified/bin/graphify',
+        runtimeHost: 'codex',
+        bundledVersion: '1.13.2',
+      });
+      expect(build.status).toBe('complete');
+      const statePath = path.join(ws, 'graphify-out', 'workspace-graph-state.json');
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+      state.schema_version = schemaVersion;
+      fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`);
+      let nativeUninstallCalls = 0;
+
+      const clean = runWorkspaceGraphClean({
+        cwd: ws,
+        repos: ['api'],
+        allowDiscovery: false,
+        exec: () => { nativeUninstallCalls += 1; return { status: 0 }; },
+      });
+
+      expect(clean.status).toBe('complete');
+      expect(clean.repos[0].hook_status).toBe('uninstalled');
+      expect(nativeUninstallCalls).toBe(0);
+      const cleanedHook = fs.readFileSync(hookPath, 'utf8');
+      expect(cleanedHook).toContain('#!/bin/sh');
+      expect(cleanedHook).toContain('echo user-hook');
+      expect(cleanedHook).not.toContain(HOOK_MARKER);
+    },
+  );
+
+  test('a malformed managed hook makes clean partial and preserves the workspace receipt', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    const build = runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+    });
+    expect(build.status).toBe('complete');
+    const hookPath = path.join(api, '.git', 'hooks', 'post-commit');
+    fs.writeFileSync(hookPath, fs.readFileSync(hookPath, 'utf8').replace(BLOCK_END, ''));
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean.status).toBe('partial');
+    expect(clean.reason_code).toBe('workspace-clean-partial');
+    expect(clean.repos[0]).toMatchObject({
+      hook_status: 'failed',
+      reason_code: 'workspace-child-hook-managed-block-stale',
+    });
+    expect(clean.workspace_graphify_status).toBe('preserved');
+    expect(fs.existsSync(path.join(ws, 'graphify-out', 'workspace-graph-state.json'))).toBe(true);
+  });
+
   test('explicit state still removes a contained legacy Graphify hook marker', () => {
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
     // installHooks:false → build 保持 explicit refresh state（不装 spec-first 自有 hook），
     // 从而走 legacy 分支：contained + graphify marker → provider-native uninstall。
-    runWorkspaceGraphBuild({ cwd: ws, repos: ['api'], allowDiscovery: false, exec: fakeExec, installHooks: false });
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+      installHooks: false,
+    });
     const hooks = path.join(api, '.git', 'hooks');
     fs.writeFileSync(path.join(hooks, 'post-commit'), '#!/bin/sh\n# Installed by: graphify hook install\n');
     let calls = 0;
@@ -262,7 +519,11 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
       cwd: ws,
       repos: ['api'],
       allowDiscovery: false,
-      exec: () => { calls += 1; return { status: 0 }; },
+      exec: () => {
+        calls += 1;
+        fs.rmSync(path.join(hooks, 'post-commit'), { force: true });
+        return { status: 0 };
+      },
     });
     expect(clean.status).toBe('complete');
     expect(clean.repos[0].hook_status).toBe('uninstalled');
@@ -288,5 +549,44 @@ describe('runWorkspaceGraphClean — reverses the build, self-only and idempoten
     expect(clean.repos[0].hook_status).toBe('blocked');
     expect(clean.repos[0].reason_code).toBe('hook-target-escapes-workspace');
     expect(execCalled).toBe(false);
+  });
+
+  test('an active build blocks clean before any managed asset is removed', () => {
+    const ws = mkWorkspace();
+    const api = initRepo(ws, 'api');
+    runWorkspaceGraphBuild({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: fakeExec,
+      codegraphCommand: '/verified/bin/codegraph',
+      graphifyCommand: '/verified/bin/graphify',
+      runtimeHost: 'codex',
+      bundledVersion: '1.13.2',
+    });
+    const mergedPath = path.join(ws, 'graphify-out', 'merged-graph.json');
+    const hookPath = path.join(api, '.git', 'hooks', 'post-commit');
+    const active = acquireWorkspaceGraphLifecycleLease({
+      workspaceRoot: ws,
+      operation: 'async-refresh',
+      pid: process.pid,
+    });
+
+    const clean = runWorkspaceGraphClean({
+      cwd: ws,
+      repos: ['api'],
+      allowDiscovery: false,
+      exec: () => ({ status: 0 }),
+    });
+
+    expect(clean).toMatchObject({
+      status: 'failed',
+      reason_code: 'workspace-graph-lifecycle-busy',
+      active_operation: 'async-refresh',
+    });
+    expect(fs.existsSync(mergedPath)).toBe(true);
+    expect(fs.readFileSync(hookPath, 'utf8')).toContain('spec-first-graphify-workspace-refresh');
+    expect(fs.existsSync(path.join(api, '.codegraph'))).toBe(true);
+    active.release();
   });
 });

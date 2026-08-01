@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "skill_name": "spec-plan",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-plan",
+    "timestamp": "2026-08-01T13:48:46Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "requirements-only Product Contract 应原地深化且保持产品权威",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 899.975,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": null
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "直接调用即使夹带实现要求也必须停留在规划阶段",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 718.682,
+        "tokens": 3774859,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "产品级 blocker 未决时不得伪造 implementation-ready",
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 189.067,
+        "tokens": 1177967,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.6666666666666666,
+        "stddev": 0.4714045207910317,
+        "min": 0,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 602.5746666666668,
+        "stddev": 301.6159044837582,
+        "min": 189.067,
+        "max": 899.975
+      },
+      "tokens": {
+        "mean": 1650942,
+        "stddev": 1576952.573888215,
+        "min": 0,
+        "max": 3774859
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

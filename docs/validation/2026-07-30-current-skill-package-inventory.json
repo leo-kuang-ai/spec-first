@@ -1,11 +1,11 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v1",
-  "source_head": "c3dd8f693c07a94b955e17c547e6dfcd1a896427",
-  "skills_tree_oid": "af6350c2330ecc5340204702820ccf180f81cf49",
+  "source_head": "b72a6234ba37ec7f3177cbf7ab7438f91b129070",
+  "skills_tree_oid": "bebfcb81c0bad3fb1c82b73c50dd66627cbeae34",
   "source_mode": "working-tree",
-  "manifest_sha256": "3334580bb67351eaf510a1fa22a3a3c81c9124d97ec4b5ae3d225abf5d2e39b1",
+  "manifest_sha256": "374edb27dc87fd3c29c8ba5469a6592c81b9ad19d1728c848ef701bc86285398",
   "skill_count": 35,
-  "file_count": 554,
+  "file_count": 559,
   "per_skill_counts": {
     "spec-app-consistency-audit": 80,
     "spec-brainstorm": 13,
@@ -31,7 +31,7 @@
     "spec-resolve-pr-feedback": 10,
     "spec-riffrec-feedback-analysis": 7,
     "spec-rule-miner": 4,
-    "spec-runtime-setup": 57,
+    "spec-runtime-setup": 62,
     "spec-simplify-code": 4,
     "spec-strategy": 3,
     "spec-sweep": 13,
@@ -2120,8 +2120,8 @@
       "path": "skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
       "skill": "spec-plan",
       "owner_role": "deterministic-helper",
-      "bytes": 2335,
-      "sha256": "e39c393ed91f4e7d08e8fa9b37effcf7dde3bec991795d8b444f9ee0002f52cf"
+      "bytes": 2587,
+      "sha256": "7428edfba6c31009e2ec60696b5b45faa1e970e7e8c24771e2d653a879b7b427"
     },
     {
       "path": "skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
@@ -2148,8 +2148,8 @@
       "path": "skills/spec-plan/evals/README.md",
       "skill": "spec-plan",
       "owner_role": "evaluation",
-      "bytes": 1494,
-      "sha256": "53393afea280b3bc99b8316d76743e8f37f177ee0551e74728d9bfb7c2c17b4f"
+      "bytes": 1472,
+      "sha256": "5cadccb623b8cb564ff924a308a9b82fb2c005e917a663d4b1bfd00ab79a785c"
     },
     {
       "path": "skills/spec-plan/references/agents/agent-native-planning-strategist.md",
@@ -2190,8 +2190,8 @@
       "path": "skills/spec-plan/references/agents/deployment-verification-agent.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 5151,
-      "sha256": "5396d0068f5aaa9c34ecd6dceaaf189c1bd2805907c6e1145f61a49af8aaa27d"
+      "bytes": 5657,
+      "sha256": "e90eaab26736715c6ae4eaebf3aa05331f1c371b2dbb546ff057643377d07ea6"
     },
     {
       "path": "skills/spec-plan/references/agents/framework-docs-researcher.md",
@@ -2274,15 +2274,15 @@
       "path": "skills/spec-plan/references/deepening-workflow.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 21170,
-      "sha256": "46598f143d1fe4409b6a78636f375b49f0dd3faf4b8481e6910229a2447055ec"
+      "bytes": 22689,
+      "sha256": "0e696875bc418e78e4a24ce34fb8464261f00ed0b3cbfa395489f5bec6482c27"
     },
     {
       "path": "skills/spec-plan/references/frontend-engineering-lens.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 4418,
-      "sha256": "bf4773a9764cac1dd6e863d2eedd58b4e6ee840a8a6ae868658ec80fd892b859"
+      "bytes": 4987,
+      "sha256": "f678b9f905b70ccb70933400ed2171d89184ef3f5e3bc5f88218487d9e826b8d"
     },
     {
       "path": "skills/spec-plan/references/high-risk-plan-lens.md",
@@ -2302,8 +2302,8 @@
       "path": "skills/spec-plan/references/interface-and-evolution-lens.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 5456,
-      "sha256": "89f4d9800e526072ccdf1435808e187d05860b3936d4126f693d92f2de6b0f47"
+      "bytes": 6189,
+      "sha256": "9d39c05d52bae8076a430e7b34c1c232c5cc7efa6b544a65de761d225c48b640"
     },
     {
       "path": "skills/spec-plan/references/markdown-rendering.md",
@@ -2316,22 +2316,22 @@
       "path": "skills/spec-plan/references/plan-handoff.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 20726,
-      "sha256": "2d2933bf286c18422809a04450f0cb358c8120bdbfe0d073fdeaa4d0eb8d50b8"
+      "bytes": 22787,
+      "sha256": "fd316148811e7d4ec494235f217dd2131aacc2fe3dc7a26f09e806f910b832a1"
     },
     {
       "path": "skills/spec-plan/references/plan-sections.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 25105,
-      "sha256": "9c537d25a74960dbb48dcac0acde1260a1112f9fa081314d92be9a15aa87cc24"
+      "bytes": 25506,
+      "sha256": "e5f7326a0e0e09a1bfd5f17cfa4f73c074be366ec2810677aa7426002b835f5d"
     },
     {
       "path": "skills/spec-plan/references/planning-evidence-boundaries.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 7389,
-      "sha256": "11c9e56c6891365f16390aa7d0d4164806d0e3bbc89ce3010155f69b2c22d969"
+      "bytes": 8047,
+      "sha256": "3147727567747f35055f3f64c2cadb345f1892019736524a3cf1e0710b0212f5"
     },
     {
       "path": "skills/spec-plan/references/settled-decisions.md",
@@ -2344,8 +2344,8 @@
       "path": "skills/spec-plan/references/synthesis-summary.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 40634,
-      "sha256": "7c8893b33ed469e913fcaf473927a320d0bdce1ed887f0c39e0c4adf9517c63f"
+      "bytes": 42483,
+      "sha256": "68fc446d14d01c7c1a6bd85968407d9fd4df7de0f7f1132da03fa9b7a5cd321d"
     },
     {
       "path": "skills/spec-plan/references/universal-planning.md",
@@ -2358,8 +2358,8 @@
       "path": "skills/spec-plan/SKILL.md",
       "skill": "spec-plan",
       "owner_role": "entry-contract",
-      "bytes": 110013,
-      "sha256": "827f3f6fec79f4fe677ead3ab8caa0a4e27a3246510b8c31e206124564b66843"
+      "bytes": 115997,
+      "sha256": "86c71fa9c2ee28fec4c4e45ff03b2511bdbe93f0e15528d2f54d59ec1a990689"
     },
     {
       "path": "skills/spec-polish/references/dev-server-astro.md",
@@ -3030,8 +3030,8 @@
       "path": "skills/spec-runtime-setup/scripts/contracts/workspace-graph-state.schema.json",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 2418,
-      "sha256": "96190308a968a528d7c7062b37601b47930ecdea0f60be0d440046f97d5757f3"
+      "bytes": 3824,
+      "sha256": "c82c280962de173445db9ec66d3142e27f36de933599a481b9d1208134348393"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/contracts/workspace-manifest.schema.json",
@@ -3044,8 +3044,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/args.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 3200,
-      "sha256": "85e215d102f5c41b86d400af9eccc2aa6c9cf04e2d43d70bcf27542b61cdd6df"
+      "bytes": 4513,
+      "sha256": "f2059baef3a7d53d51c9c1f0774db556ad88a0eae52054664316c78b40b0ec85"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
@@ -3086,8 +3086,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 52162,
-      "sha256": "4d7e2bd5c36a651868e6278ff03a008a3fd5b52b414ecbcfdc5962600eb64358"
+      "bytes": 51876,
+      "sha256": "245e7329877698802163be0726346d3985a723d8b5afc604f3c092e0d329a214"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/human-output.cjs",
@@ -3121,8 +3121,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/path-safety.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 3357,
-      "sha256": "94cf3924f6fd09fb77996bcc39918c22a9c97e7231c45d3c70421ce6267659fe"
+      "bytes": 3511,
+      "sha256": "5d9d72e8ccb7b15687e08d818c6bf113e3ad27ed1f1d86e293b8edf09203facb"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/preflight.cjs",
@@ -3137,6 +3137,13 @@
       "owner_role": "deterministic-helper",
       "bytes": 16693,
       "sha256": "04aad38cb71720f7e239ff0423b23066d9fb80dfc69b117ca690e3eca63a0c0d"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/process-utils.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 452,
+      "sha256": "bebc6e10bfcf3d4d17a7fb41f52483fe162507426edf4ad3672fa8bb74832050"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
@@ -3158,6 +3165,20 @@
       "owner_role": "deterministic-helper",
       "bytes": 23386,
       "sha256": "5028b418ab322c40a606d7f1ba5bc67d104df8aaa2566d38173774ce4eb4093b"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/regular-file-publication.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1030,
+      "sha256": "7015c98fcc5c65409ad940d0f04804e417525193f3a4de6313309b517bef5492"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 4161,
+      "sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
@@ -3191,15 +3212,15 @@
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-async-refresh.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 15217,
-      "sha256": "25b9ebd306c0033ff817727da8101dc5db7be1c6cba7ebf5e4d7cad889e2822c"
+      "bytes": 38210,
+      "sha256": "322787ff7efcde66c062c4a9a3bc68e93438280b9f609088130e6dde114c9611"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-child-hook.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 9857,
-      "sha256": "9c54bc3706bb864bb2aeea0143f951f87b565a8683fe8d96e03b2ff31a8c5c2f"
+      "bytes": 24748,
+      "sha256": "eceb7164fd0cf5a051a2a66b0add199ddd93db54b38eac01ba8bb7aab1fac061"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs",
@@ -3226,36 +3247,43 @@
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-artifacts.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 1878,
-      "sha256": "518301300871e92e2ce9d144fb472c7ee87271f00527502433a0391d3ddd8c8f"
+      "bytes": 12003,
+      "sha256": "99f1587ef3726b67fd567886674efc3d616e585806b2de7e1a8c831e49b1e9e9"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 13219,
-      "sha256": "63a7730433cb2da6f246f08acb22d48ba0ae8aeb5ee4f6918740cf68140f6a37"
+      "bytes": 22735,
+      "sha256": "47ad0de6894550b5b0b08dc6e46d8f6c5bea4a5c214f4e37291189ea966747f6"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 11416,
-      "sha256": "6bb6dd91356d35dc10872b983197fef52a4981e5bffef44f21bddcca688b1997"
+      "bytes": 13549,
+      "sha256": "f6cf7744a558755d7a8a753857fd2e5ce091a6c27966dcd8670bd206fa068a53"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 6255,
-      "sha256": "bebd46f2f306c7f70842374500bafcadec8be1067686c8a3cba469ff35f0313b"
+      "bytes": 13549,
+      "sha256": "633681f084c629741763be14f810e9a1294ca504033690717aa15d6cf49f048f"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 21756,
+      "sha256": "aada47c0d55368df53b6b4090cd894b9b6ff387cc3e1175067dcad787b17c581"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-refresh.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 2335,
-      "sha256": "eecf9f1f7ba6bcb1fb1fca60c1912a33dd61925fb623d90c5255d8c4356fa1f9"
+      "bytes": 2679,
+      "sha256": "42ae67f60394ac5bf3e329e98a4e98527bb482bd0fa2d8695d326e29407cb83f"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-scope.cjs",
@@ -3268,15 +3296,15 @@
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 7782,
-      "sha256": "cbd64dbad9bbad2ab049df00d6f8ef85d6c15f2d723e21f67ecbf105e2f4c6d1"
+      "bytes": 9022,
+      "sha256": "12782079cad5230f02a00b8162a0639f59ba3034fc9b8687e35e130feda76801"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 14360,
-      "sha256": "9935bd5eb987db13cf46ae39242a96d72f4d01aead2ae6a15625a45e501af504"
+      "bytes": 20918,
+      "sha256": "496af0a45a1f8c8db93d6dab32f85fc1ce2b73f14690cfbc98785acd4f5dd5a3"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-manifest.cjs",
@@ -3296,8 +3324,15 @@
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 2725,
-      "sha256": "2fafab3c3ab401c3376a5428179b03e6b44a172d96aa39d2eb8efbff04c1fc73"
+      "bytes": 3155,
+      "sha256": "38099c6c8622e72561387957cf9e4d6069dd5aef17b20932135c6a97ea1a8e48"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-refresh-contract.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1502,
+      "sha256": "ea4b348b79f18197f6463148620c86311e40d7820a30e797c6313879a9214ac7"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
@@ -3317,8 +3352,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 2877,
-      "sha256": "717ce6fb1abd8e98c02c41e7df4234a6f2643e0e4cfebaeac5c9d76cd7fb3654"
+      "bytes": 4590,
+      "sha256": "b8788ff34ecb1484802f3cd57af1530e5dfd3b09dadae95fba8d47a3512f66b5"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/workspace-target.cjs",
@@ -3338,8 +3373,8 @@
       "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 14668,
-      "sha256": "326986f38d07778707173430a6210962ddef6d5d162bb9adad71567c045245ef"
+      "bytes": 16404,
+      "sha256": "d8d54243e7f10de6706f83a949b4f45105c8b44b1cbb7b755a393a0a8e8f1a0d"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
@@ -3366,8 +3401,8 @@
       "path": "skills/spec-runtime-setup/scripts/setup.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 28206,
-      "sha256": "27d163f8176e369a9dd874514fd87ca195ab0ecd663bdeff6696b0c03ce31a45"
+      "bytes": 32437,
+      "sha256": "b000db660fd78383cc486a782ff8082f9d0482baa4b9feb669eb27ccc339623c"
     },
     {
       "path": "skills/spec-runtime-setup/setup-registry.json",
@@ -3387,8 +3422,8 @@
       "path": "skills/spec-runtime-setup/SKILL.md",
       "skill": "spec-runtime-setup",
       "owner_role": "entry-contract",
-      "bytes": 45657,
-      "sha256": "a9bec468eaac0bc24badd5be9e9fd12dda4a52ba49ca808a3d922d96af02f41e"
+      "bytes": 49907,
+      "sha256": "df30124cbd2be526bab4dfe6065c1a66d40d6835d58676a236d4061a2e66bac5"
     },
     {
       "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",

@@ -981,7 +981,7 @@ baseline 不只复制 `SKILL.md`。必须记录完整相关 source revision：
 
 ## 15. 与现有优化方案的关系
 
-现有 [`docs/plans/spec-prd-optimization-proposal.md`](../../plans/spec-prd-optimization-proposal.md) 建立在“当前 Phase spine 不重排、主要按失败样本做局部激活”的前提上。
+现有 [`docs/plans/2026-07-09-003-refactor-spec-prd-skill-optimization-plan.md`](../../plans/2026-07-09-003-refactor-spec-prd-skill-optimization-plan.md) 建立在“当前 Phase spine 不重排、主要按失败样本做局部激活”的前提上。
 
 本次审查发现：
 
@@ -1083,4 +1083,4 @@ baseline 不只复制 `SKILL.md`。必须记录完整相关 source revision：
 - [`skills/spec-app-consistency-audit/scripts/extract-figma-contract.js`](../../../skills/spec-app-consistency-audit/scripts/extract-figma-contract.js)
 - [`tests/unit/spec-prd-plan-handoff-contracts.test.js`](../../../tests/unit/spec-prd-plan-handoff-contracts.test.js)
 - [`docs/10-prompt/结构化项目角色契约.md`](../../10-prompt/结构化项目角色契约.md)
-- [`docs/plans/spec-prd-optimization-proposal.md`](../../plans/spec-prd-optimization-proposal.md)
+- [`docs/plans/2026-07-09-003-refactor-spec-prd-skill-optimization-plan.md`](../../plans/2026-07-09-003-refactor-spec-prd-skill-optimization-plan.md)

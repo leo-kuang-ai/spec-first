@@ -7,6 +7,15 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const skillRoot = path.join(repoRoot, 'skills', 'spec-runtime-setup');
+const {
+  INTERNAL_CODEGRAPH_COMMAND_ENV,
+  INTERNAL_GRAPHIFY_COMMAND_ENV,
+  INTERNAL_REFRESH_ONLY_ENV,
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-child-hook.cjs');
+const {
+  acquireWorkspaceGraphLifecycleLease,
+  workspaceGraphLifecycleEnv,
+} = require('../../skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs');
 
 function tempRepo(label) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-entry-${label}-`));
@@ -190,6 +199,22 @@ function fakeRunner(command, args, options = {}) {
     stderr: '',
     error: null,
   };
+}
+
+function fakeWorkspaceGraphExec(command, args) {
+  const commandName = path.basename(command);
+  if (commandName === 'codegraph' && args[0] === 'init') {
+    fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });
+    fs.writeFileSync(path.join(args[1], '.codegraph', 'codegraph.db'), 'fixture');
+  } else if (commandName === 'graphify' && args[0] === 'extract') {
+    const outDir = args[args.indexOf('--out') + 1];
+    const graphPath = path.join(outDir, 'graphify-out', 'graph.json');
+    fs.mkdirSync(path.dirname(graphPath), { recursive: true });
+    fs.writeFileSync(graphPath, '{}');
+  } else if (commandName === 'graphify' && args[0] === 'merge-graphs') {
+    fs.writeFileSync(args[args.indexOf('--out') + 1], '{}');
+  }
+  return { status: 0, stdout: '', stderr: '' };
 }
 
 function visibleHostRunner(visibleHost) {
@@ -1033,6 +1058,184 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       expect(fs.existsSync(path.join(child, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
       expect(fs.existsSync(path.join(child, '.qoder', 'settings.local.json'))).toBe(false);
     }
+  });
+
+  test('blocks workspace graph build before provider mutation when a child projection is missing', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-workspace-graph-'));
+    const child = childRepo(workspace, 'child');
+    const workspaceExec = jest.fn(() => ({ status: 0, stdout: '', stderr: '' }));
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'child'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      workspaceExec,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      mode: 'workspace-graph-build',
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        results: [expect.objectContaining({
+          repo_root: child,
+          blocked: true,
+          generated_runtime_manifest: expect.objectContaining({
+            status: 'missing',
+            reason_code: 'runtime-state-missing',
+          }),
+        })],
+      },
+    });
+    expect(workspaceExec).not.toHaveBeenCalled();
+    expect(fs.existsSync(path.join(child, '.codegraph'))).toBe(false);
+    expect(fs.existsSync(path.join(workspace, 'graphify-out'))).toBe(false);
+  });
+
+  test('workspace graph preflight evaluates confirmed repos but leaves discovered candidates pending', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-workspace-selected-')));
+    const selected = childRepo(workspace, 'selected');
+    const pending = childRepo(workspace, 'pending');
+    writeRuntimeState(selected, 'qoder', '1.13.2');
+    const workspaceExec = jest.fn(fakeWorkspaceGraphExec);
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'selected'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      workspaceExec,
+      resolveWorkspaceCodegraphCommand: () => ({ ok: true, command: '/verified/bin/codegraph' }),
+      resolveWorkspaceGraphifyCommand: () => ({ ok: true, command: '/verified/bin/graphify' }),
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 1,
+      mode: 'workspace-graph-build',
+      reason_code: 'workspace-repos-need-confirmation',
+      payload: {
+        schema_version: 'workspace-graph-executor.v1',
+        status: 'partial',
+        pending_confirm: ['pending'],
+      },
+    });
+    expect(workspaceExec).toHaveBeenCalled();
+    expect(fs.existsSync(path.join(selected, '.codegraph'))).toBe(true);
+    expect(fs.existsSync(path.join(pending, '.codegraph'))).toBe(false);
+  });
+
+  test('explicit workspace graph setup pins both resolved provider launchers into child hooks', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-context-')));
+    const child = childRepo(workspace, 'child');
+    writeRuntimeState(child, 'qoder', '1.13.2');
+    const resolvedCodegraph = jest.fn(() => ({ ok: true, command: '/verified/bin/codegraph' }));
+    const resolvedGraphify = jest.fn(() => ({ ok: true, command: '/verified/bin/graphify' }));
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'child'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      workspaceExec: fakeWorkspaceGraphExec,
+      resolveWorkspaceCodegraphCommand: resolvedCodegraph,
+      resolveWorkspaceGraphifyCommand: resolvedGraphify,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({ exit_code: 0, mode: 'workspace-graph-build' });
+    expect(resolvedCodegraph).toHaveBeenCalledTimes(1);
+    expect(resolvedGraphify).toHaveBeenCalledTimes(1);
+    const hook = fs.readFileSync(path.join(child, '.git', 'hooks', 'post-commit'), 'utf8');
+    expect(hook).toContain(`${INTERNAL_REFRESH_ONLY_ENV}="1"`);
+    expect(hook).toContain(`${INTERNAL_CODEGRAPH_COMMAND_ENV}="/verified/bin/codegraph"`);
+    expect(hook).toContain(`${INTERNAL_GRAPHIFY_COMMAND_ENV}="/verified/bin/graphify"`);
+    expect(hook).toContain('MCP_SETUP_HOST="qoder"');
+    expect(hook).toContain('SPEC_FIRST_BUNDLED_VERSION="1.13.2"');
+  });
+
+  test('internal workspace refresh reuses the pinned launcher and never reruns setup mutations', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-refresh-')));
+    const child = childRepo(workspace, 'child');
+    writeRuntimeState(child, 'qoder', '1.13.2');
+    const resolvedCodegraphCommand = '/verified/bin/codegraph';
+    const resolvedGraphifyCommand = '/verified/bin/graphify';
+    const initial = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'child'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      workspaceExec: fakeWorkspaceGraphExec,
+      resolveWorkspaceCodegraphCommand: () => ({ ok: true, command: resolvedCodegraphCommand }),
+      resolveWorkspaceGraphifyCommand: () => ({ ok: true, command: resolvedGraphifyCommand }),
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+    expect(initial.exit_code).toBe(0);
+    const routingPath = path.join(workspace, 'AGENTS.md');
+    const hookPath = path.join(child, '.git', 'hooks', 'post-commit');
+    const before = [routingPath, hookPath].map((file) => ({
+      contents: fs.readFileSync(file, 'utf8'),
+      mtimeMs: fs.statSync(file).mtimeMs,
+    }));
+    const lifecycle = acquireWorkspaceGraphLifecycleLease({
+      workspaceRoot: workspace,
+      operation: 'async-refresh',
+      pid: process.pid,
+    });
+    const calls = [];
+    const internalEnv = workspaceGraphLifecycleEnv(lifecycle, {
+      MCP_SETUP_HOST: 'qoder',
+      SPEC_FIRST_BUNDLED_VERSION: '1.13.2',
+      [INTERNAL_REFRESH_ONLY_ENV]: '1',
+      [INTERNAL_CODEGRAPH_COMMAND_ENV]: resolvedCodegraphCommand,
+      [INTERNAL_GRAPHIFY_COMMAND_ENV]: resolvedGraphifyCommand,
+    });
+
+    const refreshed = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'child'],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      workspaceExec: (command, args, options) => {
+        calls.push([command, ...args]);
+        return fakeWorkspaceGraphExec(command, args, options);
+      },
+      resolveWorkspaceCodegraphCommand: () => { throw new Error('internal refresh must not resolve from PATH'); },
+      resolveWorkspaceGraphifyCommand: () => { throw new Error('internal refresh must not resolve from PATH'); },
+      env: internalEnv,
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(refreshed.exit_code).toBe(0);
+    expect(calls.map(([command]) => command)).toEqual([
+      resolvedCodegraphCommand,
+      resolvedGraphifyCommand,
+      resolvedGraphifyCommand,
+    ]);
+    expect(calls.map(([, action]) => action)).toEqual(['sync', 'extract', 'merge-graphs']);
+    expect([routingPath, hookPath].map((file) => ({
+      contents: fs.readFileSync(file, 'utf8'),
+      mtimeMs: fs.statSync(file).mtimeMs,
+    }))).toEqual(before);
+    expect(lifecycle.assertOwned('after-internal-entrypoint-refresh')).toMatchObject({
+      operation: 'async-refresh',
+    });
+    lifecycle.release();
   });
 
   test('explicit graphify setup applies baseline host config, provider mutation, and post-probe facts', () => {

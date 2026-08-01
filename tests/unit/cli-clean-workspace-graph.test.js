@@ -34,7 +34,7 @@ describe('spec-first clean --workspace-graph', () => {
     const ws = mkWorkspace();
     const api = initRepo(ws, 'api');
     fs.mkdirSync(path.join(api, '.codegraph'), { recursive: true });
-    fs.writeFileSync(path.join(api, '.codegraph', 'db'), 'x');
+    fs.writeFileSync(path.join(api, '.codegraph', 'codegraph.db'), 'x');
     fs.mkdirSync(path.join(ws, 'graphify-out'), { recursive: true });
     fs.writeFileSync(path.join(ws, 'graphify-out', 'merged-graph.json'), '{}');
     fs.writeFileSync(

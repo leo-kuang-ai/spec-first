@@ -6,11 +6,21 @@ source_head: d213fe477601fd5338b32f55e2c11189608174a3
 captured_at: 2026-07-30T23:54:05+08:00
 authority_level: mixed-by-entry
 status_vocabulary: confirmed|blocked-external-authorization|degraded-by-design|failed
+freshness_reviewed_at: 2026-08-01T18:26:25+08:00
+freshness_review_head: b72a6234ba37ec7f3177cbf7ab7438f91b129070
+freshness_status: historical-source-identities-preserved-revalidation-required
 ---
 
 # External Evidence Closure Ledger
 
-本账本是上述计划专属的证据索引，不是 runtime schema、领域规则副本或全局 workflow 状态机。领域 contract 仍分别由 `spec-proof`、`spec-lfg`、`spec-optimize` 与 host adapter/doctor 持有。条目中的 current claim 只描述当前 source 和直接证据能够支持的上限；fixture、unit test、历史 validation 不能替代 version-matched live journey。
+本账本是上述计划专属的证据索引，不是 runtime schema、领域规则副本或全局 workflow 状态机。领域 contract 由当前仍存在的 `spec-lfg`、`spec-optimize` 与 host adapter/doctor 持有；`spec-proof` 已退役，E01 只保留历史 track identity，不能继续充当 current owner。条目中的 current claim 只描述对应 source identity 和直接证据能够支持的上限；fixture、unit test、历史 validation 不能替代 version-matched live journey。
+
+## 2026-08-01 Freshness Overlay
+
+- E01 的原 source owner `skills/spec-proof/**` 已不存在，当前处置为 `stale-reference`；为保持本 ledger 的 status vocabulary，entry status 仍保守保留 `blocked-external-authorization`，但不得沿用旧 closure path。
+- E02–E18 的保守 `blocked-external-authorization` / `degraded-by-design` ceiling 继续有效，但 entry-local `source_identity` 是 2026-07-30 历史身份，不是 current-source closure receipt。
+- 在关闭或提升任何条目前，必须先按该条 `re_evaluate_when` 冻结当时的 current source、exact host/provider version、授权与 receipt；一个 host journey 不提升其他条目。
+- Current freshness review 见 `docs/validation/2026-08-01-full-system-audit-report.md`。本 overlay 不把任何历史条目提升为 confirmed。
 
 ## Status Rules
 
@@ -27,21 +37,21 @@ status_vocabulary: confirmed|blocked-external-authorization|degraded-by-design|f
 - **track:** `proof-v3`
 - **subclaim:** `owner-approved-live-contract-and-crud-journey`
 - **status:** `blocked-external-authorization`
-- **current_claim:** 当前 Proof Web API/Local Bridge source 可用；Proof v3 field contract 未验证。
-- **claim_ceiling:** 仅能声明外部 gate 和所需场景已定义，不能声明 v3 endpoint/schema/auth/lifecycle 可用。
-- **source_identity:** HEAD `d213fe477601fd5338b32f55e2c11189608174a3` 加当前 `skills/spec-proof/**` 工作树；本轨未修改该 Skill。
-- **target_identity:** 等待项目 owner 批准的 live Proof v3 endpoint、schema、auth 与 owner lifecycle。
+- **current_claim:** 原 Proof source owner 已退役，当前没有可确认的 successor owner；历史 Proof v3 field contract 未验证。
+- **claim_ceiling:** 只能声明历史 track 与外部 gate 曾被记录；不能声明 current Proof owner、endpoint/schema/auth/lifecycle 或可执行 closure path 存在。
+- **source_identity:** 2026-08-01 在 HEAD `b72a6234ba37ec7f3177cbf7ab7438f91b129070` 加冻结工作树确认 `skills/spec-proof/**` 不存在；原 2026-07-30 source identity 已失效。
+- **target_identity:** 等待项目 owner 明确 Proof 能力已退役，或指定 current successor owner、contract 与 exact-version target。
 - **authorization_ref:** `not-granted: proof-v3-contract-data-credential-crud-claim-delete`
-- **evidence_refs:** `docs/validation/2026-07-30-proof-v3-external-contract-gate.md`; `skills/spec-proof/SKILL.md`
-- **reason_code:** `blocked-external-contract-unverified`
-- **limitations:** 缺非敏感测试文档、短时凭证路径和 create/read/edit/comment/suggest/claim/delete 授权；未运行 live journey。
-- **owner:** 项目 Proof contract owner 与 `skills/spec-proof/` 维护者。
-- **re_evaluate_when:** owner 批准 endpoint/schema/auth/lifecycle，并提供隔离测试文档、最小权限和 cleanup owner。
-- **closure_path:** 执行 CRUD、idempotency、revision conflict、ownerless claim、rotation/revocation、401/403 negative journey，发布脱敏 receipt 后再判断是否修改 Skill。
-- **freshness:** 2026-07-30 current-worktree baseline；只证明本次 gate 状态。
-- **invalidated_by:** Proof contract、auth、endpoint、owner lifecycle 或 `skills/spec-proof/**` 变化。
+- **evidence_refs:** `docs/validation/2026-07-30-proof-v3-external-contract-gate.md`; `docs/validation/2026-08-01-full-system-audit-report.md`
+- **reason_code:** `stale_reference_owner_removed`
+- **limitations:** current successor owner、contract、endpoint、auth 与 lifecycle 均未解析；历史 live journey 仍未运行。
+- **owner:** External evidence ledger maintainer；current Proof/successor product owner 尚未解析。
+- **re_evaluate_when:** 项目 owner 明确退役结论，或指定 current successor owner、contract、isolated target、最小权限和 cleanup owner。
+- **closure_path:** 先解析 retire-or-successor 决策；只有 successor 存在时，才在新计划中定义并执行 version-matched negative/CRUD journey，发布脱敏 receipt。
+- **freshness:** 2026-08-01 current-source absence check；只证明旧 owner/path 已失效，不证明 successor 不存在于外部系统。
+- **invalidated_by:** 新 successor owner/contract 出现、Proof 能力正式退役裁决、或项目重新引入同名 source owner。
 - **cleanup:** 未创建外部文档；未来 journey 必须删除测试文档或记录 owner 批准的保留例外。
-- **rollback:** 保持当前 Proof source 和 claim，不迁移未批准的 v3 contract。
+- **rollback:** 保持 blocked/stale-reference ceiling，不恢复已退役 source，也不迁移未批准的 v3 contract。
 
 ### E02 — GitHub PR watch lifecycle
 

@@ -18,7 +18,13 @@ const SUBGRAPH_BASENAME = 'graph.json';
 const GRAPHIFY_UNSET_ENV = ['GRAPHIFY_OUT'];
 
 // exec(command, args, { cwd, env, unsetEnv }) -> { status:number, stdout, stderr }
-function makeWorkspaceRunners({ exec, codegraphCommand = 'codegraph', graphifyCommand = 'graphify', baseEnv = {} } = {}) {
+function makeWorkspaceRunners({
+  exec,
+  codegraphCommand = 'codegraph',
+  graphifyCommand = 'graphify',
+  baseEnv = {},
+  unsetEnv = [],
+} = {}) {
   if (typeof exec !== 'function') throw new Error('makeWorkspaceRunners requires an exec function');
 
   function ok(result) {
@@ -27,21 +33,32 @@ function makeWorkspaceRunners({ exec, codegraphCommand = 'codegraph', graphifyCo
 
   return {
     codegraphInstallGlobal() {
-      const result = exec(codegraphCommand, ['install', '--yes'], { env: baseEnv });
+      const result = exec(codegraphCommand, ['install', '--yes'], { env: baseEnv, unsetEnv });
       return ok(result) ? { ok: true } : { ok: false, reason_code: 'codegraph-install-failed', stderr: result && result.stderr };
     },
 
     codegraphInit(repoRoot) {
       // `codegraph init [path]` builds the initial index in-place at repoRoot.
-      const result = exec(codegraphCommand, ['init', repoRoot], { cwd: repoRoot, env: baseEnv });
+      const result = exec(codegraphCommand, ['init', repoRoot], { cwd: repoRoot, env: baseEnv, unsetEnv });
       return ok(result) ? { ok: true } : { ok: false, reason_code: 'codegraph-init-failed', stderr: result && result.stderr };
+    },
+
+    codegraphSync(repoRoot) {
+      const result = exec(codegraphCommand, ['sync', repoRoot], {
+        cwd: repoRoot,
+        env: baseEnv,
+        unsetEnv,
+      });
+      return ok(result)
+        ? { ok: true }
+        : { ok: false, reason_code: 'codegraph-sync-failed', stderr: result && result.stderr };
     },
 
     graphifyExtract(repoRoot, outDir) {
       const result = exec(graphifyCommand, ['extract', repoRoot, '--out', outDir, '--code-only'], {
         cwd: repoRoot,
         env: baseEnv,
-        unsetEnv: GRAPHIFY_UNSET_ENV,
+        unsetEnv: [...new Set([...unsetEnv, ...GRAPHIFY_UNSET_ENV])],
       });
       if (!ok(result)) {
         return { ok: false, reason_code: 'graphify-extract-failed', stderr: result && result.stderr };
@@ -53,7 +70,7 @@ function makeWorkspaceRunners({ exec, codegraphCommand = 'codegraph', graphifyCo
     graphifyMerge(inputGraphPaths, outPath) {
       const result = exec(graphifyCommand, ['merge-graphs', ...inputGraphPaths, '--out', outPath], {
         env: baseEnv,
-        unsetEnv: GRAPHIFY_UNSET_ENV,
+        unsetEnv: [...new Set([...unsetEnv, ...GRAPHIFY_UNSET_ENV])],
       });
       return ok(result) ? { ok: true, mergedPath: outPath } : { ok: false, reason_code: 'graphify-merge-failed', stderr: result && result.stderr };
     },

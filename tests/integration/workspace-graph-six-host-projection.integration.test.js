@@ -18,21 +18,29 @@ const sandboxRoots = new Set();
 
 const WORKSPACE_LIB_MODULES = [
   'git-path.cjs',
+  'process-utils.cjs',
+  'regular-file-publication.cjs',
+  'regular-file-snapshot.cjs',
   'workspace-manifest.cjs',
+  'workspace-async-refresh.cjs',
+  'workspace-child-hook.cjs',
   'workspace-graph-artifacts.cjs',
   'workspace-target.cjs',
   'workspace-git-exclude.cjs',
   'workspace-graph-build.cjs',
   'workspace-graph-clean.cjs',
   'workspace-graph-executor.cjs',
+  'workspace-graph-lifecycle-lease.cjs',
   'workspace-graph-refresh.cjs',
   'workspace-graph-scope.cjs',
   'workspace-graph-status.cjs',
   'workspace-graph-state.cjs',
   'workspace-exec.cjs',
   'workspace-provider-runners.cjs',
+  'workspace-refresh-contract.cjs',
   'workspace-routing-inject.cjs',
   'workspace-routing-instruction.cjs',
+  'workspace-runtime-preflight.cjs',
 ];
 
 // Claude projects workflow skills under workflowsRoot; others use skillsRoot.

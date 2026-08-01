@@ -3,6 +3,8 @@
 
 const os = require('node:os');
 const path = require('node:path');
+const { parseEntrypointOptions } = require('./lib/args.cjs');
+const { isAbsolutePath } = require('./lib/path-safety.cjs');
 const {
   buildActionPlan,
 } = require('./lib/mode-policy.cjs');
@@ -51,7 +53,7 @@ const {
 const {
   buildWorkspaceRuntimePreflight,
   requiresRuntimeProjectionPreflight,
-  selectedRuntimeProjectionTargets,
+  resolveRuntimeProjectionTargets,
 } = require('./lib/workspace-runtime-preflight.cjs');
 const {
   runWorkspaceGraphBuild,
@@ -62,6 +64,14 @@ const {
 const {
   runWorkspaceGraphStatus,
 } = require('./lib/workspace-graph-status.cjs');
+const {
+  INTERNAL_CODEGRAPH_COMMAND_ENV,
+  INTERNAL_GRAPHIFY_COMMAND_ENV,
+  INTERNAL_REFRESH_ONLY_ENV,
+} = require('./lib/workspace-refresh-contract.cjs');
+const {
+  workspaceGraphLifecycleCredentialFromEnv,
+} = require('./lib/workspace-graph-lifecycle-lease.cjs');
 const {
   buildParentWorkspaceDiagnostic,
   renderParentWorkspaceDiagnosticHuman,
@@ -85,48 +95,6 @@ const {
   verifyProviders,
 } = require('./lib/runtime-executor.cjs');
 const providers = require('./providers/registry.cjs');
-
-const OUTPUT_FLAGS = new Set([
-  '--json',
-  '--help',
-  '-h',
-  '--refresh-example',
-  '--create-local',
-  '--ensure-gitignore',
-  '--delete-legacy-markdown',
-]);
-
-function parseEntrypointOptions(argv = []) {
-  const modeArgv = [];
-  const options = {
-    json: false,
-    help: false,
-    pluginVersion: '',
-    refreshExample: false,
-    createLocal: false,
-    ensureGitignore: false,
-    deleteLegacyMarkdown: false,
-  };
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = String(argv[index]);
-    if (token === '--json') options.json = true;
-    else if (token === '--help' || token === '-h') options.help = true;
-    else if (token === '--refresh-example') options.refreshExample = true;
-    else if (token === '--create-local') options.createLocal = true;
-    else if (token === '--ensure-gitignore') options.ensureGitignore = true;
-    else if (token === '--delete-legacy-markdown') options.deleteLegacyMarkdown = true;
-    else if (token === '--version') {
-      const value = argv[index + 1];
-      if (value !== undefined && !String(value).startsWith('--')) {
-        options.pluginVersion = String(value);
-        index += 1;
-      }
-    } else if (!OUTPUT_FLAGS.has(token)) {
-      modeArgv.push(token);
-    }
-  }
-  return { options, modeArgv };
-}
 
 function runSetup(input = {}) {
   const argv = Array.isArray(input.argv) ? input.argv.map(String) : [];
@@ -207,6 +175,7 @@ function runSetup(input = {}) {
   const effectiveRegistry = host
     ? getEffectiveRegistry(registry, { host, platform })
     : getDiagnosticRegistry(registry, { platform });
+  const needsBundledVersion = mutationNeedsHost || actionPlan.mode === 'workspace-graph-status';
   const context = {
     ...input,
     argv,
@@ -224,7 +193,9 @@ function runSetup(input = {}) {
     host,
     runner,
     bundledVersion: input.bundledVersion
-      || (mutationNeedsHost ? parsed.options.pluginVersion || resolveBundledVersion({ skillRoot, env, runner }) : ''),
+      || (needsBundledVersion
+        ? parsed.options.pluginVersion || resolveBundledVersion({ skillRoot, env, runner })
+        : ''),
     setupScriptDir: __dirname,
   };
 
@@ -232,7 +203,10 @@ function runSetup(input = {}) {
     if (actionPlan.args.workspaceGraphStatus) {
       return runWorkspaceGraphStatusSetup(context);
     }
-    const runtimePreflight = buildRuntimeProjectionPreflight(context);
+    const runtimeProjectionSelection = requiresRuntimeProjectionPreflight(actionPlan)
+      ? resolveRuntimeProjectionTargets(context)
+      : null;
+    const runtimePreflight = buildRuntimeProjectionPreflight(context, runtimeProjectionSelection);
     if (runtimePreflight && runtimePreflight.overall_status === 'action-required') {
       return blockedRuntimeProjectionResult(context, runtimePreflight);
     }
@@ -242,7 +216,10 @@ function runSetup(input = {}) {
         return runWorkspaceGraphCleanSetup(context);
       }
       if (actionPlan.args.workspaceGraph) {
-        return runWorkspaceGraphSetup(context);
+        return runWorkspaceGraphSetup(
+          context,
+          runtimeProjectionSelection,
+        );
       }
       if (!['bare', 'check'].includes(actionPlan.mode)) {
         return runWorkspaceBatch(context, { runSingleTarget });
@@ -261,9 +238,10 @@ function runSetup(input = {}) {
   }
 }
 
-function buildRuntimeProjectionPreflight(context) {
+function buildRuntimeProjectionPreflight(context, selection = null) {
   if (!requiresRuntimeProjectionPreflight(context.actionPlan)) return null;
-  const targets = selectedRuntimeProjectionTargets(context.target);
+  const resolvedSelection = selection || resolveRuntimeProjectionTargets(context);
+  const { targets } = resolvedSelection;
   if (targets.length === 0) return null;
   return buildWorkspaceRuntimePreflight({
     context,
@@ -302,13 +280,42 @@ function runParentWorkspaceDiagnostic(context) {
   };
 }
 
-function runWorkspaceGraphSetup(context) {
+function runWorkspaceGraphSetup(context, runtimeProjectionSelection) {
   const { actionPlan, cwd, target } = context;
+  const workspaceGraphTargets = runtimeProjectionSelection
+    ? runtimeProjectionSelection.workspaceGraphTargets
+    : null;
+  const executionContext = !runtimeProjectionSelection || runtimeProjectionSelection.targets.length > 0
+    ? resolveWorkspaceGraphExecutionContext(context)
+    : {
+      ok: true,
+      refreshOnly: false,
+      codegraphCommand: 'codegraph',
+      graphifyCommand: 'graphify',
+      lifecycleCredential: null,
+    };
+  if (!executionContext.ok) {
+    return {
+      exit_code: 2,
+      mode: actionPlan.mode,
+      reason_code: executionContext.reason_code,
+      payload: executionContext,
+      human: `Workspace 双层图构建被阻止：${executionContext.reason_code}\n`,
+      target,
+    };
+  }
   const result = runWorkspaceGraphBuild({
     cwd,
     repos: actionPlan.args.repos || [],
     // exec is injectable for tests; undefined falls back to spawnSync inside the executor.
     exec: context.workspaceExec,
+    codegraphCommand: executionContext.codegraphCommand,
+    graphifyCommand: executionContext.graphifyCommand,
+    lifecycleCredential: executionContext.lifecycleCredential,
+    refreshOnly: executionContext.refreshOnly,
+    runtimeHost: context.host,
+    bundledVersion: context.bundledVersion,
+    resolvedTargets: workspaceGraphTargets,
   });
   const exitCode = workspaceMutationExitCode(result.status);
   const detail = result.reason_code ? ` (${result.reason_code})` : '';
@@ -323,6 +330,98 @@ function runWorkspaceGraphSetup(context) {
     payload: result,
     human: `Workspace 双层图构建：${result.status}${detail}${confirmation}\n`,
     target,
+  };
+}
+
+function resolveWorkspaceGraphExecutionContext(context) {
+  const env = context.env || {};
+  const lifecycleCredential = workspaceGraphLifecycleCredentialFromEnv(env);
+  const refreshMarker = env[INTERNAL_REFRESH_ONLY_ENV];
+  const pinnedCodegraphCommand = env[INTERNAL_CODEGRAPH_COMMAND_ENV];
+  const pinnedGraphifyCommand = env[INTERNAL_GRAPHIFY_COMMAND_ENV];
+  const hasInternalInput = refreshMarker !== undefined
+    || pinnedCodegraphCommand !== undefined
+    || pinnedGraphifyCommand !== undefined
+    || lifecycleCredential !== null;
+
+  if (hasInternalInput) {
+    if (refreshMarker !== '1') {
+      return {
+        ok: false,
+        reason_code: 'workspace-graph-refresh-context-invalid',
+      };
+    }
+    if (!lifecycleCredential) {
+      return {
+        ok: false,
+        reason_code: 'workspace-graph-refresh-credential-required',
+      };
+    }
+    if (!isAbsolutePath(pinnedCodegraphCommand) || !isAbsolutePath(pinnedGraphifyCommand)) {
+      return {
+        ok: false,
+        reason_code: 'workspace-graph-refresh-launcher-invalid',
+      };
+    }
+    return {
+      ok: true,
+      reason_code: null,
+      refreshOnly: true,
+      codegraphCommand: pinnedCodegraphCommand,
+      graphifyCommand: pinnedGraphifyCommand,
+      lifecycleCredential,
+    };
+  }
+
+  const codegraphResolutionContext = providerContext(context, context.cwd, 'codegraph', { selected: true });
+  const codegraphResolver = typeof context.resolveWorkspaceCodegraphCommand === 'function'
+    ? context.resolveWorkspaceCodegraphCommand
+    : (providerCtx, repoRoot) => providers.codegraph.resolveCodegraphCommand(
+      providerCtx,
+      repoRoot,
+      providerCtx.dependency,
+    );
+  let resolvedCodegraph;
+  try {
+    resolvedCodegraph = codegraphResolver(codegraphResolutionContext, context.cwd);
+  } catch (_error) {
+    resolvedCodegraph = null;
+  }
+  if (!resolvedCodegraph || !resolvedCodegraph.ok || !isAbsolutePath(resolvedCodegraph.command)) {
+    return {
+      ok: false,
+      reason_code: (resolvedCodegraph && resolvedCodegraph.reason_code)
+        || 'workspace-graph-codegraph-launcher-unverified',
+    };
+  }
+
+  const resolutionContext = providerContext(context, context.cwd, 'graphify', { selected: true });
+  const resolver = typeof context.resolveWorkspaceGraphifyCommand === 'function'
+    ? context.resolveWorkspaceGraphifyCommand
+    : (providerCtx, repoRoot) => providers.graphify.resolvePythonGraphifyCommand(
+      providerCtx,
+      repoRoot,
+      providerCtx.dependency,
+    );
+  let resolved;
+  try {
+    resolved = resolver(resolutionContext, context.cwd);
+  } catch (_error) {
+    resolved = null;
+  }
+  if (!resolved || !resolved.ok || !isAbsolutePath(resolved.command)) {
+    return {
+      ok: false,
+      reason_code: (resolved && resolved.reason_code) || 'workspace-graph-graphify-launcher-unverified',
+    };
+  }
+  return {
+    ok: true,
+    reason_code: null,
+    refreshOnly: false,
+    codegraphCommand: resolvedCodegraph.command,
+    graphifyCommand: resolved.command,
+    lifecycleCredential: null,
   };
 }
 
@@ -352,10 +451,11 @@ function runWorkspaceGraphCleanSetup(context) {
 }
 
 function runWorkspaceGraphStatusSetup(context) {
-  const { actionPlan, cwd, target } = context;
+  const { actionPlan, cwd, target, bundledVersion } = context;
   const result = runWorkspaceGraphStatus({
     cwd,
     repos: actionPlan.args.repos || [],
+    bundledVersion,
   });
   // Status is diagnostic: absent/partial still exit 0 so doctor-style consumers can read the envelope.
   return {
@@ -398,6 +498,15 @@ function renderWorkspaceGraphStatusHuman(result) {
           : 'unknown'}`
         + ` refresh=${result.workspace.refresh_mode || 'unknown'}`,
     );
+    const lifecycle = result.workspace.lifecycle;
+    if (lifecycle && lifecycle.status && lifecycle.status !== 'none') {
+      lines.push(
+        `  lifecycle: ${lifecycle.status}`
+          + `${lifecycle.active_operation ? ` operation=${lifecycle.active_operation}` : ''}`
+          + `${lifecycle.reason_code ? ` reason=${lifecycle.reason_code}` : ''}`
+          + `${lifecycle.quarantine_count ? ` quarantine=${lifecycle.quarantine_count}` : ''}`,
+      );
+    }
   }
   if (Array.isArray(result.pending_confirm) && result.pending_confirm.length > 0) {
     lines.push(`  pending_confirm: ${result.pending_confirm.join(', ')}`);
@@ -717,7 +826,7 @@ function helpResult() {
     'Workspace 双层图构建：--only codegraph,graphify --workspace-graph [--repos <a,b>]',
     'Workspace 双层图状态：--workspace-graph-status [--repos <a,b>]',
     'Workspace 双层图清理：--workspace-graph-clean [--repos <a,b>]',
-    '约束：workspace-graph action 互斥，且不可与 --all-repos 组合；source 变化后显式重跑构建命令刷新。',
+    '约束：workspace-graph action 互斥，且不可与 --all-repos 组合；contained child Git 事件异步刷新，hook 不可用、失败或需即时刷新时显式重跑。',
     '',
   ].join('\n');
   return { exit_code: 0, mode: 'help', reason_code: 'help', payload: { help: human }, human, target: null };

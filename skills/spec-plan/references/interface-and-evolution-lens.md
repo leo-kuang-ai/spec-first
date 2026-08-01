@@ -1,79 +1,79 @@
 # Interface Design And Evolution Planning Lens
 
-当请求、Product Contract 或当前 source 表明计划将新增、公开、替换或演进一个 durable interface 时，读取本 reference。这里的 interface 包括 public API、CLI contract、event/message schema、shared type、跨模块协议，以及被多个独立 consumer 依赖的持久输入/输出/error contract。
+Read this reference when the request, Product Contract, or current source shows that the plan will add, expose, replace, or evolve a durable interface. Interfaces include public APIs, CLI contracts, event/message schemas, shared types, cross-module protocols, and durable input/output/error contracts used by multiple independent consumers.
 
-本 lens 负责 plan-time 的接口设计与演进决策。它不负责实现期 drift finding，不取代 `api-contract-reviewer`，也不把 REST、TypeScript 或某个 schema 工具提升为全局规范。
+This lens owns plan-time interface design and evolution decisions. It does not own implementation-time drift findings, replace `api-contract-reviewer`, or elevate REST, TypeScript, or a particular schema tool into a universal standard.
 
 ## Trigger And Negative Boundary
 
-触发本 lens：
+Trigger this lens when the work:
 
-- 创建一个将被外部或跨模块 consumer 使用的新接口；
-- 改变既有接口的字段、类型、error model、nullability、default、ordering、versioning 或 lifecycle；
-- 替换、弃用或删除一个有 consumer 的接口；
-- 新增或迁移 canonical contract artifact。
+- creates a new interface for external or cross-module consumers;
+- changes an existing interface's fields, types, error model, nullability, defaults, ordering, versioning, or lifecycle;
+- replaces, deprecates, or removes an interface that has consumers;
+- adds or migrates a canonical contract artifact.
 
-保持 lightweight，不触发本 lens：
+Stay lightweight and do not trigger this lens for:
 
-- private helper、private method 或模块内部重排，且 observable contract 不变；
-- 只改实现、不改变 plan-time interface 决策的 ordinary refactor；
-- 由 code review 发现的实现与既有 canonical artifact 漂移；该 finding 仍由 `api-contract-reviewer` 持有，除非修复需要新的产品或架构决策。
+- a private helper, private method, or internal module rearrangement with no observable-contract change;
+- an ordinary refactor that changes implementation but no plan-time interface decision;
+- implementation drift from an existing canonical artifact found during code review. That finding remains owned by `api-contract-reviewer` unless fixing it requires a new product or architecture decision.
 
-是否触发、接口是否 durable、consumer 是否独立，均由 LLM 基于 source 与 Product Contract 判断；脚本只校验 path、schema、parser/test exit 或 artifact existence 等确定性事实。
+The LLM judges applicability, whether the interface is durable, and whether consumers are independent from current source and the Product Contract. Scripts validate only deterministic facts such as paths, schemas, parser/test exits, and artifact existence.
 
 ## Shared Contract Core
 
-Greenfield 与 evolution 都先明确同一组核心决策：
+Both greenfield and evolution work begin by making the same core decisions explicit:
 
-- interface 的用途、owner 与 named consumers；
-- canonical artifact 的 repo-relative path、类型与 source owner；
-- protocol 或调用边界，以及 request/input、response/output、error model；
-- validation、authorization、privacy 或 data-classification boundary（适用时链接 high-risk 决策，不在此复制安全规则）；
-- compatibility、versioning/deprecation posture 与 rollback path；
-- 哪个 repo-native parser、contract test 或 executable check 在实施期验证 artifact 与实现。
+- the interface purpose, owner, and named consumers;
+- the canonical artifact's repo-relative path, type, and source owner;
+- the protocol or invocation boundary, including request/input, response/output, and error model;
+- validation, authorization, privacy, or data-classification boundaries, linking applicable high-risk decisions instead of duplicating security rules here;
+- the compatibility, versioning/deprecation posture, and rollback path;
+- the repo-native parser, contract test, or executable check that will verify the artifact and implementation during execution.
 
-只记录会改变实现、迁移、consumer 或验证的 contract 决策。命名风格、HTTP verb、pagination shape、PATCH 语义等可以作为当前 stack 的条件模式，但不是跨项目刚性模板。
+Record only contract decisions that change implementation, migration, consumers, or verification. Naming style, HTTP verbs, pagination shape, PATCH semantics, and similar choices may be conditional patterns for the current stack, but they are not rigid cross-project templates.
 
 ## Greenfield Branch
 
-当接口尚不存在：
+When the interface does not yet exist:
 
-- 先定义 consumer 需要观察的 contract，再选择 representation 或 framework shape；
-- 在计划中记录目标 artifact path/type/owner，并绑定负责创建它的 U-ID；
-- 定义 success/error/null/empty 边界和最小 compatibility posture；
-- 把 consumer integration 与 contract verification 放入相关 implementation unit，不创建长期悬空的接口框架。
+- define the contract consumers need to observe before choosing a representation or framework shape;
+- record the target artifact path, type, and owner in the plan, and bind it to the U-ID responsible for creating it;
+- define success, error, null, and empty boundaries plus the minimum compatibility posture;
+- place consumer integration and contract verification in the relevant implementation unit instead of creating a long-lived, unconnected interface scaffold.
 
-Greenfield 的 canonical artifact 可以尚未存在，但计划必须给出创建 owner 与 verification owner。缺少这两者时，保留 Open Question，不能把相关 unit 声称为 implementation-ready。
+A greenfield canonical artifact may not exist yet, but the plan must name both its creation owner and verification owner. If either is missing, retain an Open Question and do not claim that the affected unit is implementation-ready.
 
 ## Evolution Branch
 
-当接口已存在：
+When the interface already exists:
 
-- 直接读取当前 canonical artifact，并按 additive、compatible behavior change、deprecating 或 breaking 分类；
-- additive optional change 默认优先，但仍检查 consumer 是否会误解新 sentinel/default/ordering；
-- breaking 或 removal 采用 replacement-first：先定义 replacement 与 consumer migration，再定义 compatibility window、deprecation signal、rollback 和 removal condition；
-- 删除前需要 zero-use evidence，来源可以是 current consumer search、telemetry/query 或 owner-confirmed inventory；只靠“看起来没人用”不充分；
-- artifact 不可读、consumer 不可定位或 parser/test 不可用时，记录 limitation 与 unblock owner，不把未知升级为兼容结论。
+- read the current canonical artifact directly and classify the change as additive, a compatible behavior change, deprecating, or breaking;
+- prefer an additive optional change by default, while still checking whether consumers could misinterpret a new sentinel, default, or ordering rule;
+- use replacement-first for breaking changes or removal: define the replacement and consumer migration before the compatibility window, deprecation signal, rollback, and removal condition;
+- require zero-use evidence before deletion, from a current consumer search, telemetry/query, or an owner-confirmed inventory. "It looks unused" is insufficient;
+- when the artifact is unreadable, consumers cannot be located, or a parser/test is unavailable, record the limitation and unblock owner instead of upgrading the unknown into a compatibility conclusion.
 
 ## Planning Contract Landing
 
-适用时，在 Planning Contract 中增加轻量 `### Interface Contracts` subsection。每个 load-bearing interface 记录：
+When applicable, add a lightweight `### Interface Contracts` subsection to the Planning Contract. Record the following for each load-bearing interface:
 
 | Field | Required content |
 | --- | --- |
-| Interface / mode | 名称，以及 `greenfield` 或 `evolution` |
-| Consumers | 当前或目标 consumers；未知项显式标记 |
-| Canonical artifact | repo-relative path、type、owner；greenfield 绑定 creation U-ID |
-| Contract summary | protocol、input/output、error 与关键 boundary |
-| Compatibility | additive/deprecating/breaking、window、replacement/rollback/removal posture |
-| Verification | repo-native parser/test/check owner，或 `parser_unavailable` + reason/owner/unblock condition |
+| Interface / mode | Name plus `greenfield` or `evolution` |
+| Consumers | Current or target consumers, with unknowns marked explicitly |
+| Canonical artifact | Repo-relative path, type, and owner; bind greenfield creation to a U-ID |
+| Contract summary | Protocol, input/output, error model, and load-bearing boundaries |
+| Compatibility | Additive/deprecating/breaking classification, window, and replacement/rollback/removal posture |
+| Verification | Repo-native parser/test/check owner, or `parser_unavailable` plus reason, owner, and unblock condition |
 
-不要把完整 schema 正文复制进 plan。Plan 记录 owner、path、关键 contract decision 与验证方式；canonical artifact 持有机器可读或可执行的完整 contract。
+Do not copy the complete schema body into the plan. The plan records the owner, path, load-bearing contract decisions, and verification method; the canonical artifact owns the complete machine-readable or executable contract.
 
 ## Review And Failure Boundary
 
-- `spec-plan` 负责 WHAT/HOW 层的 interface design、evolution posture 与 canonical artifact landing。
-- implementation unit 负责创建或修改 artifact、运行 repo-native parser/test，并记录真实结果。
-- `api-contract-reviewer` 负责检查 diff 是否偏离当前 plan/artifact 和 consumer contract；它不反向成为接口设计 owner。
-- 没有 repo-native parser/test 时记录 `parser_unavailable`，使用最窄替代证据并限制 claim；不要在本任务中发明跨格式 parser 基础设施。
-- 需要新的 public API-design Skill、第二套 canonical contract、跨 repo mutation owner 或未获授权的 schema/runtime boundary 时，停止并返回 plan owner。
+- `spec-plan` owns WHAT/HOW-level interface design, the evolution posture, and canonical-artifact landing.
+- The implementation unit owns creating or modifying the artifact, running the repo-native parser/test, and recording the actual result.
+- `api-contract-reviewer` checks whether a diff diverges from the current plan/artifact and consumer contract; it does not become the interface-design owner in reverse.
+- When no repo-native parser/test exists, record `parser_unavailable`, use the narrowest substitute evidence, and limit the claim. Do not invent cross-format parser infrastructure in this task.
+- If the work requires a new public API-design Skill, a second canonical contract, a cross-repo mutation owner, or an unauthorized schema/runtime boundary, stop and return to the plan owner.

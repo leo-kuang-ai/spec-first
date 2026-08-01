@@ -199,6 +199,41 @@ describe('spec-runtime-setup provider registry', () => {
 });
 
 describe('CodeGraph provider', () => {
+  test('resolves an absolute pinned launcher from the bounded PATH', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-launcher');
+    const binRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-codegraph-bin-'));
+    const executable = path.join(binRoot, process.platform === 'win32' ? 'codegraph.cmd' : 'codegraph');
+    fs.writeFileSync(executable, process.platform === 'win32' ? '@exit /b 0\r\n' : '#!/bin/sh\nexit 0\n');
+    fs.chmodSync(executable, 0o755);
+    const runner = jest.fn(() => success('codegraph 1.5.0'));
+
+    const resolved = provider.resolveCodegraphCommand({
+      repoRoot: target,
+      runner,
+      env: {
+        PATH: binRoot,
+        PATHEXT: '.CMD;.EXE',
+      },
+      dependency: { version: '1.5.0' },
+    }, target);
+
+    expect(resolved).toMatchObject({ ok: true, command: executable });
+    expect(runner).toHaveBeenCalledWith(executable, ['--version'], expect.objectContaining({
+      cwd: target,
+      timeoutMs: 10000,
+    }));
+    expect(provider.resolveCodegraphCommand({
+      repoRoot: target,
+      runner,
+      env: { PATH: binRoot, PATHEXT: '.CMD;.EXE' },
+      dependency: { version: '1.4.1' },
+    }, target)).toMatchObject({
+      ok: false,
+      reason_code: 'codegraph-version-pin-mismatch',
+    });
+  });
+
   test('requires explicit selection and performs bounded sync/reindex before confirmed readiness', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph');

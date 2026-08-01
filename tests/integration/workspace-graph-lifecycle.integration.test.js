@@ -41,7 +41,7 @@ function fakeExec(command, args) {
     fs.writeFileSync(args[args.indexOf('--out') + 1], JSON.stringify({ merged: true }));
   } else if (command === 'codegraph' && args[0] === 'init') {
     fs.mkdirSync(path.join(args[1], '.codegraph'), { recursive: true });
-    fs.writeFileSync(path.join(args[1], '.codegraph', 'db'), 'x');
+    fs.writeFileSync(path.join(args[1], '.codegraph', 'codegraph.db'), 'x');
   }
   return { status: 0, stdout: '', stderr: '' };
 }
