@@ -1,2 +1,3 @@
 iteration	commit	metric	delta	status	description
 0	f259b179	55	0.0	baseline	初始状态：Cursor CLI 未找到 + worktree 重复 skills + drift
+1	3af30586	56	+1.0	keep	同步 Cursor runtime assets (skills, mcp config)
