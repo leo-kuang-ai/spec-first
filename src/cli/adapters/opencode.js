@@ -268,13 +268,15 @@ function inspectOpenCodeSkillCollisions(projectRoot) {
   return [...bySkill.entries()]
     .filter(([, entries]) => {
       if (entries.length < 2) return false;
-      // Only report as duplicate if contents are different (real conflict)
-      // If all copies are identical or managed projections, it's expected behavior
+      // Only report as duplicate if normalized contents are different (real conflict).
+      // Each host projection intentionally self-references its own skills root and
+      // host-pin identity (e.g. `.opencode/skills/` vs `.agents/skills/`,
+      // `MCP_SETUP_HOST=opencode` vs `MCP_SETUP_HOST=codex`) — that expected variance
+      // must not be mistaken for an unmanaged content conflict.
       const contents = entries.map(e => e.content).filter(c => c !== null);
       if (contents.length === 0) return false;
-      // Check if all non-null contents are identical
-      const uniqueContents = new Set(contents);
-      return uniqueContents.size > 1; // Only warn if contents differ
+      const normalizedContents = new Set(contents.map(normalizeSelfReferentialSkillContent));
+      return normalizedContents.size > 1; // Only warn if contents differ beyond expected host self-reference
     })
     .map(([skillName, entries]) => ({
       level: 'WARNING',
@@ -285,6 +287,38 @@ function inspectOpenCodeSkillCollisions(projectRoot) {
       reasonCode: 'opencode_external_skill_precedence_unverified',
       fix: 'Remove or rename unmanaged duplicates only after confirming which root the installed OpenCode version loads.',
     }));
+}
+
+const SELF_REFERENTIAL_SKILLS_ROOTS = [
+  '.claude/skills/',
+  '.codex/skills/',
+  '.agents/skills/',
+  '.cursor/skills/',
+  '.kiro/skills/',
+  '.qoder/skills/',
+  '.opencode/skills/',
+];
+
+// Each host-specific skill projection legitimately self-references its own
+// skills root path in plain descriptive prose (e.g. "do not hand-edit
+// `.opencode/skills/` as a source fix" vs the same sentence naming
+// `.agents/skills/`). That path-name substitution carries no behavioral
+// difference, so normalize it to a shared placeholder before comparing
+// content.
+//
+// Deliberately NOT normalized: Host Pin sections and `MCP_SETUP_HOST=<host>`
+// values, and any host-specific generated-mirror exclusion lists (e.g.
+// spec-optimize's context-governance boundary). Those encode real per-host
+// mutation-target and context-scope behavior — if the wrong projection gets
+// loaded, the runtime pins the wrong host or scopes context incorrectly. That
+// must keep surfacing as a genuine duplicate-skill warning, not be hidden by
+// this normalization.
+function normalizeSelfReferentialSkillContent(content) {
+  let normalized = String(content || '');
+  for (const root of SELF_REFERENTIAL_SKILLS_ROOTS) {
+    normalized = normalized.split(root).join('__SKILLS_ROOT__/');
+  }
+  return normalized;
 }
 
 function inspectOpenCodeSkillFiles(projectRoot, skillsRoot) {

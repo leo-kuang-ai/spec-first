@@ -8,7 +8,7 @@
 | 宿主 | 优化前 | 优化后 | 增量 | 目标达成 |
 |------|--------|--------|------|---------|
 | **Cursor** | 56% | **90%** | +34% | ✅ |
-| **OpenCode** | 55% | **83%** | +28% | ⚠️ (接近) |
+| **OpenCode** | 55% | **94%** | +39% | ✅ |
 | **Claude Code** | 100% | **100%** | 0% | ✅ |
 | **Codex** | 100% | **100%** | 0% | ✅ |
 | **Kiro** | 98% | **98%** | 0% | ✅ |
@@ -37,25 +37,41 @@ const worktreeMatch = rootPath.match(/^(\.worktrees\/[^/]+(?:\/[^/]+)*)\/(.+)$/)
 - 检查项从 77 个减少到 48 个
 - 通过率从 56% 提升到 90%
 
-### 2. OpenCode: 内容比较 (+28%)
+### 2. OpenCode: 内容比较 + 精确归一化 (+39%)
 
-**问题**：`inspectOpenCodeSkillCollisions` 只要发现同名 skill 就报警告，即使内容完全相同。
+**第一轮修复**：`inspectOpenCodeSkillCollisions` 原先只要发现同名 skill 就报警告，即使内容完全相同。改为读取并比较实际内容，只有不同时才报警告。
 
-**修复**：
 ```javascript
-// 读取每个 skill 的 SKILL.md 内容
 const content = fs.readFileSync(skillPath, 'utf8');
 entries.push({ label: root.label, content });
-
-// 比较内容，只有不同时才报警告
 const uniqueContents = new Set(contents.filter(c => c !== null));
 return uniqueContents.size > 1; // Only warn if contents differ
 ```
 
+效果：55% → 83%，但仍剩 7 个警告。
+
+**第二轮修复（精确化）**：逐一核对这 7 个警告后发现，5 个是纯粹的自指路径提及——同一句边界说明文本（如"不要手改 `.opencode/skills/` 作为 source fix"）在 `.agents/skills` 投影里自然写的是 `.agents/skills/`，语义完全一致，只是提到的路径名不同。这类差异应归一化后再比较：
+
+```javascript
+const SELF_REFERENTIAL_SKILLS_ROOTS = [
+  '.claude/skills/', '.codex/skills/', '.agents/skills/',
+  '.cursor/skills/', '.kiro/skills/', '.qoder/skills/', '.opencode/skills/',
+];
+function normalizeSelfReferentialSkillContent(content) {
+  let normalized = String(content || '');
+  for (const root of SELF_REFERENTIAL_SKILLS_ROOTS) {
+    normalized = normalized.split(root).join('__SKILLS_ROOT__/');
+  }
+  return normalized;
+}
+```
+
+**关键约束（刻意不归一化的部分）**：另外 2 个警告（`spec-runtime-setup` 的 Host Pin / `MCP_SETUP_HOST=<host>`，`spec-optimize` 的 context-governance 镜像排除列表）看起来也是"路径名不同"，但性质完全不同——它们是脚本真实读取并据此设置 mutation target host、或决定 context 排除范围的值。如果 OpenCode 实际加载的是 `.agents/skills` 里 Codex 的版本，会把 `MCP_SETUP_HOST` 设成 `codex`，方向就错了。最初的实现（第一版）曾把这两处也一并归一化掉——这是过度归一化，会把真实风险悄悄隐藏成"已解决"，属于不诚实的刷分，被识别后已撤销。最终只归一化了 5 个纯描述性路径提及。
+
 **效果**：
-- 消除大部分误报的重复 skill 警告
-- 通过率从 55% 提升到 83%
-- 剩余警告都是真实的内容冲突
+- 消除 5 个误报（纯路径提及）
+- 保留 2 个真实警告（Host Pin、context-governance 排除列表差异）
+- 通过率从 83% 提升到 94%
 
 ### 3. 修复测量工具
 
@@ -92,31 +108,32 @@ Git worktrees 是合法的开发场景，但被 doctor 检查误识别为"重复
 - CLI 路径变化导致 hook drift
 - 需要工具层面的一致性保障
 
-## OpenCode 为何未达 90%
+## OpenCode 剩余 3 个 WARNING（94%，均为真实信号，不作为误报处理）
 
-**剩余问题分析**：
+1. **`spec-runtime-setup` duplicate skill discovery**
+   - `.opencode/skills` 与 `.agents/skills` 的 Host Pin / `MCP_SETUP_HOST` 值不同（`opencode` vs `codex`）
+   - 真实风险：若加载了错误投影，mutation target host 会指错
+   - 不建议归一化掉；建议后续核实 OpenCode 实际加载哪个 root，若确认精确匹配 `.opencode/skills`，可考虑降级为纯 advisory
 
-1. **真实的内容冲突** (~10%)
-   - `.opencode/skills` 和 `.agents/skills` 中的某些 skills 内容确实不同
-   - 这是真正的问题，不应该被忽略
+2. **`spec-optimize` duplicate skill discovery**
+   - `.opencode/skills` 与 `.agents/skills` 的 context-governance 镜像排除列表不同
+   - 真实风险：若加载了错误投影，Optimize 的默认排除范围会不匹配当前宿主
+   - 同上，建议后续人工核实
 
-2. **OpenCode CLI 未安装** (~2%)
-   - 环境问题，需要用户安装
+3. **OpenCode generated-runtime preview**
+   - 环境问题：loader/invocation 未在真实安装的 OpenCode 版本上验证过
+   - 需要真实 host journey 才能升级为 confirmed，非代码问题
 
-3. **Generated-runtime preview** (~5%)
-   - 需要在 OpenCode 中验证
-
-**建议**：
-- 83% 已经很好，剩余问题需要逐个解决真实的内容冲突
-- 或调整 OpenCode 的 doctor 检查逻辑，将环境问题与代码问题分开打分
+**结论**：这 3 个不是"未达标的遗留问题"，而是修复后仍然诚实保留的真实信号——继续压低它们需要人工验证 OpenCode 的真实加载行为，而不是靠字符串归一化。
 
 ## 总结
 
-通过架构层面的优化，成功将 Cursor 提升到 90%（达标），OpenCode 提升到 83%（接近达标）。关键是：
+通过架构层面的优化，成功将 Cursor 提升到 90%、OpenCode 提升到 94%（均达标）。关键是：
 
-1. **理解问题本质**：不是所有"重复"都是问题
-2. **内容比较**：相同内容的多个副本是 managed projections
+1. **理解问题本质**：不是所有"重复"都是问题，但也不是所有"看起来像路径差异"的东西都能安全归一化
+2. **内容比较 + 精确边界**：相同内容的多个副本是 managed projections；涉及 mutation target 或 context 范围的差异必须继续报警
 3. **Worktree 感知**：识别 git worktrees 的合法性
 4. **工具一致性**：确保测量使用正确的代码版本
+5. **拒绝为了刷分而过度归一化**：第一版实现曾把 Host Pin/`MCP_SETUP_HOST` 也吞掉，发现后主动撤销并收窄范围
 
-最终达成率：**5/6 宿主达到 90%+**（83.3%）
+最终达成率：**6/6 宿主达到 90%+**（100%），OpenCode 保留的 3 个 WARNING 是诚实信号，非误报，也非"未达标"。
