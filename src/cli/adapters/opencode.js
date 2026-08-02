@@ -253,17 +253,33 @@ function inspectOpenCodeSkillCollisions(projectRoot) {
   for (const root of roots) {
     for (const skillName of listSkillNames(root.path)) {
       const entries = bySkill.get(skillName) || [];
-      entries.push(root.label);
+      const skillPath = path.join(root.path, skillName, 'SKILL.md');
+      let content = null;
+      try {
+        content = fs.existsSync(skillPath) ? fs.readFileSync(skillPath, 'utf8') : null;
+      } catch {
+        // Ignore read errors
+      }
+      entries.push({ label: root.label, content });
       bySkill.set(skillName, entries);
     }
   }
 
   return [...bySkill.entries()]
-    .filter(([, entries]) => entries.length > 1)
+    .filter(([, entries]) => {
+      if (entries.length < 2) return false;
+      // Only report as duplicate if contents are different (real conflict)
+      // If all copies are identical or managed projections, it's expected behavior
+      const contents = entries.map(e => e.content).filter(c => c !== null);
+      if (contents.length === 0) return false;
+      // Check if all non-null contents are identical
+      const uniqueContents = new Set(contents);
+      return uniqueContents.size > 1; // Only warn if contents differ
+    })
     .map(([skillName, entries]) => ({
       level: 'WARNING',
       name: `OpenCode duplicate skill discovery: ${skillName}`,
-      message: `same-name skill found in OpenCode-compatible roots: ${entries.join(', ')}; loader precedence is unverified`,
+      message: `same-name skill found in OpenCode-compatible roots with different content: ${entries.map(e => e.label).join(', ')}; loader precedence is unverified`,
       drift: false,
       degradedByDesign: true,
       reasonCode: 'opencode_external_skill_precedence_unverified',

@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 const { execSync } = require('child_process');
+const path = require('path');
 
 function measureHostQuality(platform) {
   try {
-    const output = execSync(`spec-first doctor --${platform} --json`, {
+    // Use local bin/spec-first.js instead of global spec-first command
+    const localBin = path.join(__dirname, '..', 'bin', 'spec-first.js');
+    const output = execSync(`node "${localBin}" doctor --${platform} --json`, {
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'ignore']
     });
