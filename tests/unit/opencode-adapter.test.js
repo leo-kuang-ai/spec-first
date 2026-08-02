@@ -30,6 +30,18 @@ function writeText(filePath, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
+function writeState(projectRoot, relativePath, platform, skills = [], workflowSkills = []) {
+  writeText(path.join(projectRoot, relativePath), `${JSON.stringify({
+    manifestVersion: 'test-manifest',
+    platform,
+    commands: [],
+    skills,
+    workflowSkills,
+    agents: [],
+    agentSupportFiles: [],
+  }, null, 2)}\n`);
+}
+
 describe('OpenCode adapter', () => {
   test('is the sixth canonical adapter with preview-only support metadata', () => {
     expect(getSupportedPlatforms()).toEqual([
@@ -255,6 +267,51 @@ describe('OpenCode adapter', () => {
       expect.objectContaining({ reasonCode: 'opencode_external_skill_precedence_unverified' }),
       expect.objectContaining({ reasonCode: 'opencode_bundled_agents_unsupported' }),
       expect.objectContaining({ reasonCode: 'opencode_generated_runtime_loader_unverified' }),
+    ]));
+  });
+
+  test('groups divergent managed projections as a known loader-precedence limitation', () => {
+    const adapter = new OpenCodeAdapter();
+    const projectRoot = tempProject('managed-collision');
+    const openCodeSkill = '---\nname: spec-runtime-setup\ndescription: "setup"\n---\n\nMCP_SETUP_HOST=opencode\n';
+    const codexSkill = '---\nname: spec-runtime-setup\ndescription: "setup"\n---\n\nMCP_SETUP_HOST=codex\n';
+
+    writeText(
+      path.join(projectRoot, '.opencode', 'skills', 'spec-runtime-setup', 'SKILL.md'),
+      openCodeSkill,
+    );
+    writeText(
+      path.join(projectRoot, '.agents', 'skills', 'spec-runtime-setup', 'SKILL.md'),
+      codexSkill,
+    );
+    writeState(
+      projectRoot,
+      '.opencode/spec-first/state.json',
+      'opencode',
+      ['spec-runtime-setup'],
+    );
+    writeState(
+      projectRoot,
+      '.codex/spec-first/state.json',
+      'codex',
+      ['spec-runtime-setup'],
+    );
+
+    const checks = adapter.inspectRuntimeFiles(projectRoot);
+
+    expect(checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        name: 'OpenCode managed skill projection precedence',
+        reasonCode: 'opencode_managed_projection_precedence_unverified',
+        disposition: 'known_limitation',
+        degradedByDesign: true,
+        message: expect.stringContaining('spec-runtime-setup'),
+      }),
+    ]));
+    expect(checks).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        reasonCode: 'opencode_external_skill_precedence_unverified',
+      }),
     ]));
   });
 });

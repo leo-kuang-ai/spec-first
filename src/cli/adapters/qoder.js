@@ -526,6 +526,7 @@ function qoderHookStatusToRuntimeCheck(status) {
     message: status.message,
     drift: false,
     degradedByDesign: status.degradedByDesign === true,
+    disposition: status.degradedByDesign === true ? 'known_limitation' : undefined,
     reasonCode: status.reasonCode,
   };
 }

@@ -318,7 +318,7 @@ describe('CLI smoke checks', () => {
         timeout: 120000,
       });
       expect(verboseDoctor.status).toBe(0);
-      expect(verboseDoctor.stdout).toMatch(/^诊断结果：(可用|可用，但需关注)\n/);
+      expect(verboseDoctor.stdout).toMatch(/^诊断结果：(可用|可用，但需处理)\n/);
       expect(verboseDoctor.stdout).toContain('宿主状态：');
       expect(verboseDoctor.stdout).toContain('详细检查：');
 

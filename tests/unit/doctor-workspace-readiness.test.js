@@ -217,5 +217,37 @@ describe('doctor workspace readiness view', () => {
       level: 'PASS',
       workspace_readiness_layer: { readiness_eligible: false, status: 'not_evaluated' },
     });
+    expect(readinessChecks.find((check) => check.name === 'workspace projection')).toMatchObject({
+      level: 'WARNING',
+      disposition: 'action_required',
+    });
+    expect(readinessChecks.find((check) => check.name === 'workspace managed runtime')).toMatchObject({
+      level: 'WARNING',
+      disposition: 'known_limitation',
+    });
+    expect(readinessChecks.find((check) => check.name === 'workspace graph')).toMatchObject({
+      level: 'WARNING',
+      disposition: 'optional',
+    });
+  });
+
+  test('keeps confirmed stale workspace projection action-required', () => {
+    const workspace = mkWorkspace();
+    const api = initRepo(workspace, 'api');
+    confirmWorkspace(workspace, ['api']);
+    writeRuntimeState(api, 'codex', 'old-version');
+    writeSetupFacts(api, 'codex');
+
+    const checks = buildDoctorCommonChecks(workspace, {
+      platforms: ['codex'],
+      bundledManifestVersion: 'test-version',
+      runWorkspaceGraphStatus: () => null,
+    });
+
+    expect(checks.find((check) => check.name === 'workspace projection')).toMatchObject({
+      level: 'WARNING',
+      disposition: 'action_required',
+      reasonCode: 'runtime-projection-incomplete',
+    });
   });
 });

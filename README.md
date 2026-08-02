@@ -44,6 +44,8 @@ Prerequisites:
 - Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode installed, with one chosen as the current host. Cursor and OpenCode require explicit `--cursor` / `--opencode` opt-in and are currently generated-runtime preview only.
 - A terminal opened at the root of the project repo where you want to enable `spec-first`. First-time users can try a throwaway/test repo before initializing a real project.
 
+Prefer fewer steps? After `npm install -g spec-first`, run `spec-first quickstart`: it detects Node.js, Git, and installed host CLIs, then either continues straight into `init` for the one host it found, or falls back to interactive `init` host selection. It is a thin wrapper around `doctor`'s probes and `init`'s existing apply path — it does not run any host-session `spec-*` workflow on its own. The step-by-step path below is the same underlying flow made explicit.
+
 **Step 1 — Install and check health**
 
 macOS / Linux:

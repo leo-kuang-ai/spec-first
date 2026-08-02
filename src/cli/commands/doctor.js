@@ -49,6 +49,7 @@ function runDoctor(argv) {
   if (parsed.kiro) platforms.push('kiro');
   if (parsed.qoder) platforms.push('qoder');
   if (parsed.opencode) platforms.push('opencode');
+  const selectionMode = platforms.length > 0 ? 'explicit' : 'auto';
 
   // 无参数时自动检测
   if (platforms.length === 0) {
@@ -57,7 +58,7 @@ function runDoctor(argv) {
 
   if (platforms.length === 0) {
     if (parsed.json) {
-      printDoctorJson(buildDoctorReport({ projectRoot, platforms }));
+      printDoctorJson(buildDoctorReport({ projectRoot, platforms, selectionMode }));
       return 0;
     }
 
@@ -66,7 +67,7 @@ function runDoctor(argv) {
     return 0;
   }
 
-  const report = buildDoctorReport({ projectRoot, platforms });
+  const report = buildDoctorReport({ projectRoot, platforms, selectionMode });
 
   if (parsed.json) {
     printDoctorJson(report);
@@ -89,17 +90,13 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
     : Object.keys(report.platform_checks || {});
   const commonChecks = Array.isArray(report.common_checks) ? report.common_checks : [];
   const platformChecks = report.platform_checks || {};
+  const hostSupport = report.host_support || {};
+  const selectionMode = report.selection_mode === 'explicit' ? 'explicit' : 'auto';
   const allChecks = [
     ...commonChecks,
     ...platforms.flatMap((platform) => platformChecks[platform] || []),
   ];
   const hasError = report.has_error === true || allChecks.some((check) => check.level === 'ERROR');
-  const hasWarning = allChecks.some((check) => check.level === 'WARNING');
-  const result = hasError
-    ? '不可用'
-    : hasWarning
-      ? '可用，但需关注'
-      : '可用';
   const attentionItems = [
     ...commonChecks
       .filter(isDoctorAttentionCheck)
@@ -107,7 +104,18 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
     ...platforms.flatMap((platform) => (platformChecks[platform] || [])
       .filter(isDoctorAttentionCheck)
       .map((check) => ({ scope: platform.toUpperCase(), check }))),
-  ];
+  ].map((item) => ({
+    ...item,
+    disposition: resolveDoctorDisposition(item.check, { selectionMode }),
+  }));
+  const requiredItems = attentionItems.filter((item) => item.disposition === 'action_required');
+  const optionalItems = attentionItems.filter((item) => item.disposition === 'optional');
+  const limitationItems = attentionItems.filter((item) => item.disposition === 'known_limitation');
+  const result = hasError
+    ? '不可用'
+    : requiredItems.length > 0
+      ? '可用，但需处理'
+      : '可用';
   const lines = [
     `诊断结果：${result}`,
     '',
@@ -118,30 +126,28 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
     lines.push('  未检测到宿主');
   } else {
     for (const platform of platforms) {
-      lines.push(`  ${platform.toUpperCase()}：${describeDoctorPlatformStatus(platformChecks[platform] || [])}`);
+      lines.push(`  ${platform.toUpperCase()}：${describeDoctorPlatformStatus(
+        platformChecks[platform] || [],
+        {
+          selectionMode,
+          hostSupport: hostSupport[platform] || {},
+        },
+      )}`);
     }
   }
 
-  if (attentionItems.length === 0) {
-    lines.push('', '待处理项：无');
-  } else {
-    lines.push('', '待处理项：');
-    for (const { scope, check } of attentionItems) {
-      lines.push(`  [${scope}] ${check.name}: ${check.message}`);
-      if (check.fix) {
-        lines.push(`    修复：${check.fix}`);
-      } else {
-        lines.push('    需要人工处理：此检查未提供可安全执行的修复建议；请根据诊断谨慎处理用户拥有的配置。');
-      }
-    }
-  }
+  appendDoctorAttentionSection(lines, '需要处理', requiredItems, 'required');
+  appendDoctorAttentionSection(lines, '按需配置', optionalItems, 'optional');
+  appendDoctorAttentionSection(lines, '已知限制', limitationItems, 'limitation');
 
   if (!verbose) return lines;
 
   lines.push('', '详细检查：');
-  appendDoctorCheckDetails(lines, '通用环境', commonChecks);
+  appendDoctorCheckDetails(lines, '通用环境', commonChecks, { selectionMode });
   for (const platform of platforms) {
-    appendDoctorCheckDetails(lines, platform.toUpperCase(), platformChecks[platform] || []);
+    appendDoctorCheckDetails(lines, platform.toUpperCase(), platformChecks[platform] || [], {
+      selectionMode,
+    });
   }
   return lines;
 }
@@ -150,21 +156,88 @@ function isDoctorAttentionCheck(check) {
   return check.level === 'WARNING' || check.level === 'ERROR';
 }
 
-function describeDoctorPlatformStatus(checks) {
-  const status = summarizeChecks(checks);
-  if (status === 'error') return '有问题';
-  if (status === 'warn') return '需关注';
-  if (status === 'not_applicable') return '未检测';
+function resolveDoctorDisposition(check, { selectionMode = 'auto' } = {}) {
+  if (check.level === 'ERROR') return 'action_required';
+  if (check.level !== 'WARNING') return null;
+  if (
+    selectionMode === 'explicit'
+    && typeof check.reasonCode === 'string'
+    && check.reasonCode.endsWith('_cli_not_found')
+  ) {
+    return 'action_required';
+  }
+  if (
+    check.disposition === 'action_required'
+    || check.disposition === 'optional'
+    || check.disposition === 'known_limitation'
+  ) {
+    return check.disposition;
+  }
+  if (check.degradedByDesign === true) return 'known_limitation';
+  return 'action_required';
+}
+
+function appendDoctorAttentionSection(lines, title, items, kind) {
+  if (items.length === 0) {
+    if (kind === 'required') lines.push('', `${title}：无`);
+    return;
+  }
+
+  lines.push('', `${title}：`);
+  for (const { scope, check } of items) {
+    lines.push(`  [${scope}] ${check.name}: ${check.message}`);
+    if (kind === 'optional') {
+      if (check.fix) lines.push(`    按需操作：${check.fix}`);
+      continue;
+    }
+    if (kind === 'limitation') {
+      if (check.fix) {
+        lines.push(`    验证建议：${check.fix}`);
+      } else {
+        lines.push('    说明：当前为已知限制，无需手工修改用户配置。');
+      }
+      continue;
+    }
+    if (check.fix) {
+      lines.push(`    修复：${check.fix}`);
+    } else {
+      lines.push('    需要人工处理：此检查未提供可安全执行的修复建议；请根据诊断谨慎处理用户拥有的配置。');
+    }
+  }
+}
+
+function describeDoctorPlatformStatus(checks, { selectionMode = 'auto', hostSupport = {} } = {}) {
+  if (!Array.isArray(checks) || checks.length === 0) return '未检测';
+  if (checks.some((check) => check.level === 'ERROR')) return '有问题';
+  const warningChecks = checks.filter((check) => check.level === 'WARNING');
+  if (warningChecks.some((check) => (
+    resolveDoctorDisposition(check, { selectionMode }) === 'action_required'
+  ))) return '需处理';
+  if (warningChecks.some((check) => (
+    typeof check.reasonCode === 'string' && check.reasonCode.endsWith('_cli_not_found')
+  ))) return '未安装';
+  if (
+    hostSupport.support_state === 'preview'
+    || warningChecks.some((check) => resolveDoctorDisposition(check, { selectionMode }) === 'known_limitation')
+  ) return hostSupport.support_state === 'preview' ? '预览/受限' : '受限';
   return '正常';
 }
 
-function appendDoctorCheckDetails(lines, scope, checks) {
+function appendDoctorCheckDetails(lines, scope, checks, { selectionMode = 'auto' } = {}) {
   lines.push(`  ${scope}：`);
   for (const check of checks) {
     const label = String(check.level || 'UNKNOWN').toUpperCase().padEnd(7);
     lines.push(`    ${label} ${check.name}: ${check.message}`);
     if (check.fix) {
-      lines.push(`             修复：${check.fix}`);
+      const disposition = resolveDoctorDisposition(check, { selectionMode });
+      const actionLabel = disposition === 'optional'
+        ? '按需操作'
+        : disposition === 'known_limitation'
+          ? '验证建议'
+          : '修复';
+      lines.push(`             ${actionLabel}：${check.fix}`);
+    } else if (resolveDoctorDisposition(check, { selectionMode }) === 'known_limitation') {
+      lines.push('             说明：当前为已知限制，无需手工修改用户配置。');
     }
   }
 }
@@ -259,6 +332,7 @@ function checkPlatformCli(platform, options = {}) {
       name: displayName,
       message: 'version check timed out',
       reasonCode: `${platform}_cli_version_check_timeout`,
+      disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
       fix: `Run \`${command} --version\` manually and inspect PATH or shell startup scripts.`,
     };
   }
@@ -269,6 +343,7 @@ function checkPlatformCli(platform, options = {}) {
       name: displayName,
       message: 'not found on PATH',
       reasonCode: `${platform}_cli_not_found`,
+      disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
       fix: `Install ${displayName} and restart your shell.`,
     };
   }
@@ -278,6 +353,7 @@ function checkPlatformCli(platform, options = {}) {
     name: displayName,
     message: 'could not verify version',
     reasonCode: `${platform}_cli_version_check_failed`,
+    disposition: options.selectionMode === 'explicit' ? 'action_required' : 'optional',
     fix: `Run \`${command} --version\` manually to confirm the CLI works.`,
   };
 }
@@ -887,6 +963,13 @@ function workspaceLayerCheck(layer, name) {
   const ready = layer.status === 'ready';
   const unmanaged = layer.status === 'not_evaluated';
   const level = ready || unmanaged ? 'PASS' : 'WARNING';
+  const disposition = level === 'PASS'
+    ? undefined
+    : layer.status === 'action_required'
+      ? 'action_required'
+      : layer.readiness_eligible === false
+        ? 'optional'
+        : 'known_limitation';
   const message = unmanaged
     ? 'unmanaged / not evaluated; does not contribute to managed readiness.'
     : `${layer.status} (freshness=${layer.freshness || 'unknown'}; reason=${layer.reason_code || 'none'}).`;
@@ -895,6 +978,7 @@ function workspaceLayerCheck(layer, name) {
     name,
     message,
     reasonCode: layer.reason_code || null,
+    disposition,
     advisory: layer.readiness_eligible === false,
     workspace_readiness_layer: layer,
   };
@@ -1030,7 +1114,7 @@ function summarizeWorkspaceGraphForDoctor(status) {
   };
 }
 
-function buildDoctorReport({ projectRoot, platforms }) {
+function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
   const workspaceReadiness = buildWorkspaceReadinessView({ projectRoot, platforms });
   const commonChecks = buildDoctorCommonChecks(projectRoot, { platforms, workspaceReadiness });
   const platformChecksByPlatform = {};
@@ -1041,7 +1125,7 @@ function buildDoctorReport({ projectRoot, platforms }) {
   for (const platform of platforms) {
     const adapter = getAdapter(platform);
     const assetInspection = inspectRuntimeAssetInventory(projectRoot, adapter);
-    const platformCliCheck = checkPlatformCli(platform);
+    const platformCliCheck = checkPlatformCli(platform, { selectionMode });
     const runtimeFileChecks = adapter.inspectRuntimeFiles(projectRoot);
     const commandChecks = adapter.hasCommands ? [checkGeneratedCommands(adapter, assetInspection)] : [];
     const hostSpecificChecks = buildHostSpecificChecks(projectRoot, adapter);
@@ -1112,6 +1196,7 @@ function buildDoctorReport({ projectRoot, platforms }) {
   return {
     schema_version: 'v1',
     platforms,
+    selection_mode: selectionMode,
     install_health: installHealth,
     runtime_asset_health: runtimeAssetHealth,
     host_readiness: hostReadiness,
@@ -1140,6 +1225,7 @@ function printDoctorJson(report) {
   console.log(JSON.stringify({
     schema_version: report.schema_version,
     platforms: report.platforms,
+    selection_mode: report.selection_mode,
     install_health: report.install_health,
     runtime_asset_health: report.runtime_asset_health,
     host_readiness: report.host_readiness,
@@ -1607,6 +1693,8 @@ function checkCursorProjectMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing project MCP config',
+      reasonCode: 'cursor_mcp_config_missing',
+      disposition: 'optional',
       fix: 'Run `spec-runtime-setup` when MCP setup is required.',
     };
   }
@@ -1632,7 +1720,9 @@ function checkCursorProjectMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} project MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found project MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run `spec-runtime-setup` to configure required MCP servers.',
+    reasonCode: serverCount > 0 ? undefined : 'cursor_mcp_config_empty',
+    disposition: serverCount > 0 ? undefined : 'optional',
+    fix: serverCount > 0 ? undefined : 'Run `spec-runtime-setup` when MCP setup is required.',
   };
 }
 
@@ -1644,6 +1734,8 @@ function checkQoderLocalMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing local MCP config',
+      reasonCode: 'qoder_mcp_config_missing',
+      disposition: 'optional',
       fix: 'Run `spec-runtime-setup` when MCP setup is required.',
     };
   }
@@ -1669,7 +1761,9 @@ function checkQoderLocalMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} local MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found local MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run `spec-runtime-setup` to configure required MCP servers.',
+    reasonCode: serverCount > 0 ? undefined : 'qoder_mcp_config_empty',
+    disposition: serverCount > 0 ? undefined : 'optional',
+    fix: serverCount > 0 ? undefined : 'Run `spec-runtime-setup` when MCP setup is required.',
   };
 }
 
@@ -1817,5 +1911,7 @@ module.exports = {
   buildHostSupportView,
   formatDoctorHumanReport,
   checkPlatformCli,
+  checkNodeVersion,
+  checkGit,
   readWorkflowVerificationEvidence,
 };

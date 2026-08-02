@@ -11,7 +11,7 @@ const {
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
-const { summarizeOperationPlan } = require('../state');
+const { readState, summarizeOperationPlan } = require('../state');
 const {
   parseFrontmatterScalars,
   splitMarkdownFrontmatter,
@@ -121,6 +121,7 @@ class OpenCodeAdapter extends PlatformAdapter {
       message: 'OpenCode command and skill loader behavior is not verified for the installed runtime version.',
       drift: false,
       degradedByDesign: true,
+      disposition: 'known_limitation',
       reasonCode: 'opencode_generated_runtime_loader_unverified',
       fix: 'Run the version-matched OpenCode host journey before promoting beyond generated-runtime preview.',
     }];
@@ -245,9 +246,24 @@ function addOpenCodeSetupHostPin(content) {
 
 function inspectOpenCodeSkillCollisions(projectRoot) {
   const roots = [
-    { label: '.opencode/skills', path: path.join(projectRoot, '.opencode', 'skills') },
-    { label: '.agents/skills', path: path.join(projectRoot, '.agents', 'skills') },
-    { label: '.claude/skills', path: path.join(projectRoot, '.claude', 'skills') },
+    {
+      label: '.opencode/skills',
+      path: path.join(projectRoot, '.opencode', 'skills'),
+      adapter: { id: 'opencode', stateFile: '.opencode/spec-first/state.json' },
+      stateFields: ['skills', 'workflowSkills'],
+    },
+    {
+      label: '.agents/skills',
+      path: path.join(projectRoot, '.agents', 'skills'),
+      adapter: { id: 'codex', stateFile: '.codex/spec-first/state.json' },
+      stateFields: ['skills', 'workflowSkills'],
+    },
+    {
+      label: '.claude/skills',
+      path: path.join(projectRoot, '.claude', 'skills'),
+      adapter: { id: 'claude', stateFile: '.claude/spec-first/state.json' },
+      stateFields: ['skills'],
+    },
   ];
   const bySkill = new Map();
   for (const root of roots) {
@@ -260,33 +276,78 @@ function inspectOpenCodeSkillCollisions(projectRoot) {
       } catch {
         // Ignore read errors
       }
-      entries.push({ label: root.label, content });
+      entries.push({
+        label: root.label,
+        content,
+        managed: stateListsOpenCodeSkill(projectRoot, root, skillName),
+      });
       bySkill.set(skillName, entries);
     }
   }
 
-  return [...bySkill.entries()]
-    .filter(([, entries]) => {
-      if (entries.length < 2) return false;
-      // Only report as duplicate if normalized contents are different (real conflict).
-      // Each host projection intentionally self-references its own skills root and
-      // host-pin identity (e.g. `.opencode/skills/` vs `.agents/skills/`,
-      // `MCP_SETUP_HOST=opencode` vs `MCP_SETUP_HOST=codex`) — that expected variance
-      // must not be mistaken for an unmanaged content conflict.
-      const contents = entries.map(e => e.content).filter(c => c !== null);
-      if (contents.length === 0) return false;
-      const normalizedContents = new Set(contents.map(normalizeSelfReferentialSkillContent));
-      return normalizedContents.size > 1; // Only warn if contents differ beyond expected host self-reference
-    })
-    .map(([skillName, entries]) => ({
+  const checks = [];
+  const managedDivergentGroups = [];
+  for (const [skillName, entries] of bySkill.entries()) {
+    if (entries.length < 2) continue;
+    const contents = entries.map((entry) => entry.content).filter((content) => content !== null);
+    if (contents.length === 0) continue;
+    const normalizedContents = new Set(contents.map(normalizeSelfReferentialSkillContent));
+    if (normalizedContents.size <= 1) continue;
+
+    if (entries.every((entry) => entry.managed)) {
+      managedDivergentGroups.push({ skillName, entries });
+      continue;
+    }
+
+    checks.push({
       level: 'WARNING',
       name: `OpenCode duplicate skill discovery: ${skillName}`,
       message: `same-name skill found in OpenCode-compatible roots with different content: ${entries.map(e => e.label).join(', ')}; loader precedence is unverified`,
       drift: false,
-      degradedByDesign: true,
       reasonCode: 'opencode_external_skill_precedence_unverified',
       fix: 'Remove or rename unmanaged duplicates only after confirming which root the installed OpenCode version loads.',
-    }));
+    });
+  }
+
+  if (managedDivergentGroups.length > 0) {
+    const affectedSkills = managedDivergentGroups.map((group) => group.skillName).sort();
+    const rootsWithCounts = countOpenCodeManagedRoots(managedDivergentGroups);
+    checks.push({
+      level: 'WARNING',
+      name: 'OpenCode managed skill projection precedence',
+      message: `${managedDivergentGroups.length} same-name managed projection(s) have host-specific content (${affectedSkills.join(', ')}) across ${rootsWithCounts}; OpenCode loader precedence is unverified and may select a non-OpenCode projection`,
+      drift: false,
+      degradedByDesign: true,
+      disposition: 'known_limitation',
+      reasonCode: 'opencode_managed_projection_precedence_unverified',
+      fix: 'Keep managed host runtimes intact and verify that OpenCode prioritizes .opencode/skills; do not delete other host projections to silence this limitation.',
+    });
+  }
+
+  return checks;
+}
+
+function stateListsOpenCodeSkill(projectRoot, root, skillName) {
+  try {
+    const state = readState(projectRoot, root.adapter);
+    if (!state) return false;
+    return root.stateFields.some((field) => state[field].includes(skillName));
+  } catch {
+    return false;
+  }
+}
+
+function countOpenCodeManagedRoots(groups) {
+  const counts = new Map();
+  for (const group of groups) {
+    for (const entry of group.entries) {
+      counts.set(entry.label, (counts.get(entry.label) || 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([rootPath, count]) => `${rootPath} (${count})`)
+    .join(', ');
 }
 
 const SELF_REFERENTIAL_SKILLS_ROOTS = [

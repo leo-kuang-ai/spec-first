@@ -7,6 +7,7 @@ const { runDoctor } = require('./commands/doctor');
 const { runInit } = require('./commands/init');
 const { runInternal } = require('./commands/internal');
 const { runPlans } = require('./commands/plans');
+const { runQuickstart } = require('./commands/quickstart');
 const { runRepairWorktree } = require('./commands/repair-worktree');
 const { runSession } = require('./commands/session');
 const { runTasks } = require('./commands/tasks');
@@ -66,6 +67,10 @@ async function runCli(argv) {
     return Promise.resolve(runPlans(args.slice(1)));
   }
 
+  if (cmd === 'quickstart') {
+    return runQuickstart(args.slice(1));
+  }
+
   if (cmd === 'repair-worktree') {
     return Promise.resolve(runRepairWorktree(args.slice(1)));
   }
@@ -85,7 +90,7 @@ async function runCli(argv) {
 }
 
 function shouldRunVersionReminder(cmd, subcommandArgs) {
-  if (cmd !== 'doctor' && cmd !== 'init' && cmd !== 'clean' && cmd !== 'update') {
+  if (cmd !== 'doctor' && cmd !== 'init' && cmd !== 'clean' && cmd !== 'update' && cmd !== 'quickstart') {
     return false;
   }
   return !subcommandArgs.some((arg) => arg === '-h' || arg === '--help');
@@ -173,6 +178,7 @@ function printHelp(withErrorPrefix = false) {
     '',
     '🧩 Commands:',
     '  doctor                 Check environment, runtime asset manifest, and managed runtime assets',
+    '  quickstart [-y|--yes]  Detect Node/Git/host CLIs, then hand off to `init` (auto-selects host when exactly one is detected)',
     '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
     '  update                 Upgrade the spec-first CLI package and refresh runtime assets with `spec-first init`',
     '  clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',

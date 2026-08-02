@@ -7,6 +7,7 @@ const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 const { listBundledCommands } = require('../plugin-manifest');
 const { readState } = require('../state');
+const { spawnSyncWithTimeout } = require('../external-command');
 const {
   contentHasUnexpectedRuntimePathReferences,
   rewritePreservingHostComparativeConfigPaths,
@@ -35,6 +36,7 @@ const CURSOR_NESTED_SCAN_SKIP_DIRS = new Set([
   '.cursor',
   '.kiro',
   '.qoder',
+  '.worktrees',
   'node_modules',
   'vendor',
 ]);
@@ -60,6 +62,14 @@ class CursorAdapter extends PointerBasedAdapter {
 
   get supportsAgents() {
     return false;
+  }
+
+  get supportState() {
+    return 'preview';
+  }
+
+  get evidenceClaim() {
+    return 'generated_runtime_preview';
   }
 
   get commandRoot() {
@@ -147,6 +157,7 @@ class CursorAdapter extends PointerBasedAdapter {
       message: 'Cursor skill discovery/invocation is not verified on this machine; generated skills may not load.',
       drift: false,
       degradedByDesign: true,
+      disposition: 'known_limitation',
       reasonCode: 'cursor_generated_runtime_loader_unverified',
       fix: 'Open Cursor runtime UI or run a current Cursor CLI/user journey to record loader evidence before promoting beyond generated-runtime preview.',
     });
@@ -473,6 +484,7 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
       fix: 'Keep the managed host runtimes intact and verify that Cursor prioritizes .cursor/skills; do not delete other host projections to silence this warning.',
       drift: false,
       degradedByDesign: true,
+      disposition: 'known_limitation',
       reasonCode: 'cursor_managed_projection_precedence_unverified',
     });
   }
@@ -484,6 +496,7 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
       message: `nested_roots_not_fully_enumerated (${duplicateRoots.limitWarnings.join(', ')})`,
       fix: 'Inspect nested workspace Cursor skill roots manually if duplicate discovery behavior matters for this project.',
       drift: false,
+      disposition: 'known_limitation',
       reasonCode: 'cursor_nested_skill_roots_partial',
     });
   }
@@ -503,11 +516,63 @@ function collectCursorSkillRoots(projectRoot) {
     userSkillRoot(home, '.claude/skills', 'user_compat'),
     userSkillRoot(home, '.codex/skills', 'user_compat'),
   ];
+  const worktrees = collectGitWorktreeSkillRoots(projectRoot);
   const nested = collectNestedCursorSkillRoots(projectRoot);
   return {
-    roots: dedupeRoots([...roots, ...nested.roots]),
+    roots: dedupeRoots([...roots, ...worktrees, ...nested.roots]),
     limitWarnings: nested.limitWarnings,
   };
+}
+
+function collectGitWorktreeSkillRoots(projectRoot) {
+  let canonicalProjectRoot;
+  try {
+    canonicalProjectRoot = fs.realpathSync.native(projectRoot);
+  } catch {
+    canonicalProjectRoot = path.resolve(projectRoot);
+  }
+  const result = spawnSyncWithTimeout(
+    'git',
+    ['-C', projectRoot, 'worktree', 'list', '--porcelain'],
+    { encoding: 'utf8' },
+  );
+  if (result.status !== 0) return [];
+
+  const roots = [];
+  for (const line of String(result.stdout || '').split(/\r?\n/)) {
+    if (!line.startsWith('worktree ')) continue;
+    const reportedWorktreeRoot = path.resolve(line.slice('worktree '.length));
+    let worktreeRoot;
+    try {
+      worktreeRoot = fs.realpathSync.native(reportedWorktreeRoot);
+    } catch {
+      worktreeRoot = reportedWorktreeRoot;
+    }
+    const relativeWorktree = path.relative(canonicalProjectRoot, worktreeRoot);
+    if (
+      relativeWorktree === ''
+      || relativeWorktree === '..'
+      || relativeWorktree.startsWith(`..${path.sep}`)
+      || path.isAbsolute(relativeWorktree)
+    ) {
+      continue;
+    }
+
+    for (const relativeSkillPath of ['.cursor/skills', '.agents/skills']) {
+      const absolutePath = path.join(worktreeRoot, relativeSkillPath);
+      if (!fs.existsSync(absolutePath)) continue;
+      const displayPath = path.relative(canonicalProjectRoot, absolutePath).replace(/\\/g, '/');
+      roots.push({
+        absolutePath,
+        displayPath,
+        relativePath: displayPath,
+        scope: 'nested_project',
+        nestedProjectRoot: worktreeRoot,
+        relativeSkillPath,
+      });
+    }
+  }
+  return roots;
 }
 
 function projectSkillRoot(projectRoot, relativePath, scope) {
@@ -575,6 +640,8 @@ function collectNestedCursorSkillRoots(projectRoot) {
             displayPath,
             relativePath: displayPath,
             scope: 'nested_project',
+            nestedProjectRoot: childPath,
+            relativeSkillPath: relativeRoot,
           });
         }
       }
@@ -618,32 +685,22 @@ function isManagedSkillRoot(projectRoot, root, skillName, cursorAdapter) {
     return stateListsSkill(projectRoot, adapterForState('claude'), skillName, ['skills']);
   }
 
-  // Worktree roots (nested_project scope)
-  // Pattern: .worktrees/<branch>/.cursor/skills or .worktrees/<branch>/.agents/skills
-  if (root.scope === 'nested_project') {
-    // Extract the worktree root path (e.g., .worktrees/feat/app-assurance-compiler)
-    const worktreeMatch = rootPath.match(/^(\.worktrees\/[^/]+(?:\/[^/]+)*)\/(.+)$/);
-    if (worktreeMatch) {
-      const worktreeRoot = worktreeMatch[1];
-      const relativeSkillPath = worktreeMatch[2];
-
-      // Check if the worktree has its own state file
-      if (relativeSkillPath === '.cursor/skills') {
-        const worktreeStateFile = path.join(projectRoot, worktreeRoot, '.cursor/spec-first/state.json');
-        if (fs.existsSync(worktreeStateFile)) {
-          return stateListsSkill(path.join(projectRoot, worktreeRoot), cursorAdapter, skillName, ['skills', 'workflowSkills']);
-        }
-      }
-      if (relativeSkillPath === '.agents/skills') {
-        const worktreeStateFile = path.join(projectRoot, worktreeRoot, '.agents/spec-first/state.json');
-        if (fs.existsSync(worktreeStateFile)) {
-          return stateListsSkill(path.join(projectRoot, worktreeRoot), adapterForState('codex'), skillName, ['skills', 'workflowSkills']);
-        }
-      }
-
-      // If no state file in worktree, consider it managed if it exists in main project
-      // (likely a git worktree sharing the same skill source)
-      return true;
+  if (root.scope === 'nested_project' && root.nestedProjectRoot) {
+    if (root.relativeSkillPath === '.cursor/skills') {
+      return stateListsSkill(
+        root.nestedProjectRoot,
+        cursorAdapter,
+        skillName,
+        ['skills', 'workflowSkills'],
+      );
+    }
+    if (root.relativeSkillPath === '.agents/skills') {
+      return stateListsSkill(
+        root.nestedProjectRoot,
+        adapterForState('codex'),
+        skillName,
+        ['skills', 'workflowSkills'],
+      );
     }
   }
 
@@ -654,6 +711,7 @@ function adapterForState(platform) {
   const stateFiles = {
     claude: '.claude/spec-first/state.json',
     codex: '.codex/spec-first/state.json',
+    cursor: '.cursor/spec-first/state.json',
   };
   return {
     id: platform,

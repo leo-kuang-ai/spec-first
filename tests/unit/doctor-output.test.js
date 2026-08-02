@@ -6,6 +6,8 @@ function createReport({
   platforms = ['claude', 'codex'],
   commonChecks = [],
   platformChecks = {},
+  hostSupport = {},
+  selectionMode = 'auto',
   hasError = false,
 } = {}) {
   const resolvedPlatformChecks = Object.fromEntries(
@@ -20,6 +22,8 @@ function createReport({
     platforms,
     common_checks: commonChecks,
     platform_checks: resolvedPlatformChecks,
+    host_support: hostSupport,
+    selection_mode: selectionMode,
     checks,
     warnings: checks.filter((check) => check.level === 'WARNING'),
     has_error: hasError,
@@ -38,12 +42,12 @@ describe('doctor human-readable output', () => {
     expect(output).toContain('诊断结果：可用');
     expect(output).toContain('CLAUDE：正常');
     expect(output).toContain('CODEX：正常');
-    expect(output).toContain('待处理项：无');
+    expect(output).toContain('需要处理：无');
     expect(output).not.toContain('.claude: ready');
     expect(output).not.toContain('.codex: ready');
   });
 
-  test('attributes warnings to the affected host and preserves the safe fix', () => {
+  test('attributes actionable warnings to the affected host and preserves the safe fix', () => {
     const output = formatDoctorHumanReport(createReport({
       platformChecks: {
         claude: [{ level: 'PASS', name: '.claude', message: 'ready' }],
@@ -56,11 +60,79 @@ describe('doctor human-readable output', () => {
       },
     })).join('\n');
 
-    expect(output).toContain('诊断结果：可用，但需关注');
-    expect(output).toContain('CODEX：需关注');
+    expect(output).toContain('诊断结果：可用，但需处理');
+    expect(output).toContain('CODEX：需处理');
     expect(output).toContain('[CODEX] Codex hook: duplicate hook');
     expect(output).toContain('修复：Run `spec-first clean --codex`.');
     expect(output).not.toContain('.claude: ready');
+  });
+
+  test('separates optional setup and known limitations from required work', () => {
+    const output = formatDoctorHumanReport(createReport({
+      platforms: ['cursor', 'qoder', 'opencode'],
+      hostSupport: {
+        cursor: { support_state: 'preview' },
+        qoder: { support_state: 'active' },
+        opencode: { support_state: 'preview' },
+      },
+      platformChecks: {
+        cursor: [{
+          level: 'WARNING',
+          name: 'Cursor CLI',
+          message: 'not found on PATH',
+          reasonCode: 'cursor_cli_not_found',
+          disposition: 'optional',
+          fix: 'Install Cursor CLI and restart your shell.',
+        }],
+        qoder: [{
+          level: 'WARNING',
+          name: '.qoder/settings.local.json',
+          message: 'missing local MCP config',
+          disposition: 'optional',
+          fix: 'Run `spec-runtime-setup` when MCP setup is required.',
+        }],
+        opencode: [{
+          level: 'WARNING',
+          name: 'OpenCode generated-runtime preview',
+          message: 'loader behavior is unverified',
+          degradedByDesign: true,
+          disposition: 'known_limitation',
+        }],
+      },
+    })).join('\n');
+
+    expect(output).toContain('诊断结果：可用');
+    expect(output).toContain('CURSOR：未安装');
+    expect(output).toContain('QODER：正常');
+    expect(output).toContain('OPENCODE：预览/受限');
+    expect(output).toContain('需要处理：无');
+    expect(output).toContain('按需配置：');
+    expect(output).toContain('按需操作：Install Cursor CLI and restart your shell.');
+    expect(output).toContain('已知限制：');
+    expect(output).toContain('说明：当前为已知限制，无需手工修改用户配置。');
+    expect(output).not.toContain('需要人工处理：');
+  });
+
+  test('treats a missing CLI as required when the host was selected explicitly', () => {
+    const output = formatDoctorHumanReport(createReport({
+      platforms: ['cursor'],
+      selectionMode: 'explicit',
+      platformChecks: {
+        cursor: [{
+          level: 'WARNING',
+          name: 'Cursor CLI',
+          message: 'not found on PATH',
+          reasonCode: 'cursor_cli_not_found',
+          disposition: 'optional',
+          fix: 'Install Cursor CLI and restart your shell.',
+        }],
+      },
+    })).join('\n');
+
+    expect(output).toContain('诊断结果：可用，但需处理');
+    expect(output).toContain('CURSOR：需处理');
+    expect(output).toContain('[CURSOR] Cursor CLI: not found on PATH');
+    expect(output).toContain('修复：Install Cursor CLI and restart your shell.');
   });
 
   test('attributes errors to the affected host and preserves the safe fix', () => {

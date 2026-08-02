@@ -66,6 +66,48 @@ describe('doctor host CLI version probes', () => {
     });
   });
 
+  test('reports Cursor as generated-runtime preview in host support metadata', () => {
+    const cliCheck = {
+      level: 'WARNING',
+      name: 'Cursor CLI',
+      message: 'not found on PATH',
+      reasonCode: 'cursor_cli_not_found',
+    };
+
+    expect(buildHostSupportView(
+      getAdapter('cursor'),
+      cliCheck,
+      [{ reasonCode: 'cursor_generated_runtime_loader_unverified' }],
+    )).toEqual({
+      support_state: 'preview',
+      evidence_claim: 'generated_runtime_preview',
+      detected_version: null,
+      tested_versions: [],
+      loader_evidence: false,
+      reason_codes: [
+        'cursor_cli_not_found',
+        'cursor_generated_runtime_loader_unverified',
+      ],
+    });
+  });
+
+  test('makes a missing CLI action-required for an explicitly selected host', () => {
+    const error = new Error('spawn agent ENOENT');
+    error.code = 'ENOENT';
+
+    expect(checkPlatformCli('cursor', {
+      platform: 'darwin',
+      selectionMode: 'explicit',
+      runner() {
+        return { status: null, stdout: '', stderr: '', error };
+      },
+    })).toMatchObject({
+      level: 'WARNING',
+      reasonCode: 'cursor_cli_not_found',
+      disposition: 'action_required',
+    });
+  });
+
   test('keeps environment-scoped CLI failures machine-readable in host support', () => {
     const error = new Error('spawn kiro ENOENT');
     error.code = 'ENOENT';

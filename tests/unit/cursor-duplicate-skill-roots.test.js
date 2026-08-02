@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const CursorAdapter = require('../../src/cli/adapters/cursor');
 const { inspectCursorDuplicateSkillRoots } = require('../../src/cli/adapters/cursor');
@@ -32,6 +33,22 @@ function writeSkill(rootPath, skillName, content) {
   const skillPath = path.join(rootPath, skillName, 'SKILL.md');
   fs.mkdirSync(path.dirname(skillPath), { recursive: true });
   fs.writeFileSync(skillPath, content, 'utf8');
+}
+
+function git(cwd, args) {
+  const result = spawnSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
+  if (result.status !== 0) {
+    throw new Error(`git ${args.join(' ')} failed: ${result.stderr || result.stdout}`);
+  }
+}
+
+function initGitRepo(repoRoot) {
+  git(repoRoot, ['init', '-q']);
+  git(repoRoot, ['config', 'user.email', 'test@example.com']);
+  git(repoRoot, ['config', 'user.name', 'Test']);
+  fs.writeFileSync(path.join(repoRoot, 'README.md'), '# fixture\n');
+  git(repoRoot, ['add', 'README.md']);
+  git(repoRoot, ['commit', '-q', '-m', 'fixture']);
 }
 
 describe('Cursor duplicate skill root inspection', () => {
@@ -215,5 +232,45 @@ describe('Cursor duplicate skill root inspection', () => {
       message: 'nested_roots_not_fully_enumerated (max-directory-count)',
     }));
     expect(nestedCandidateProbes).toBeLessThanOrEqual(2000);
+  });
+
+  test('does not spend the recursive directory budget inside the registered worktree container', () => {
+    for (let index = 0; index < 1050; index += 1) {
+      fs.mkdirSync(path.join(
+        projectRoot,
+        '.worktrees',
+        'large-branch',
+        `directory-${String(index).padStart(4, '0')}`,
+      ), { recursive: true });
+    }
+
+    const checks = inspectCursorDuplicateSkillRoots(projectRoot, new CursorAdapter());
+
+    expect(checks.find((check) => check.name === 'Cursor nested skill root scan')).toBeUndefined();
+  });
+
+  test('treats a registered worktree projection as managed only when its own state lists the skill', () => {
+    initGitRepo(projectRoot);
+    const worktreeRoot = path.join(projectRoot, '.worktrees', 'feat', 'doctor-fixture');
+    fs.mkdirSync(path.dirname(worktreeRoot), { recursive: true });
+    git(projectRoot, ['worktree', 'add', '-q', '-b', 'feat/doctor-fixture', worktreeRoot]);
+
+    writeSkill(path.join(projectRoot, '.agents', 'skills'), 'spec-explain', 'main projection\n');
+    writeState(projectRoot, '.codex/spec-first/state.json', 'codex', ['spec-explain']);
+    writeSkill(path.join(worktreeRoot, '.agents', 'skills'), 'spec-explain', 'worktree projection\n');
+
+    const checks = inspectCursorDuplicateSkillRoots(projectRoot, new CursorAdapter());
+
+    expect(checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        name: 'Cursor duplicate skill discovery: spec-explain',
+        reasonCode: 'cursor_external_skill_precedence_unverified',
+      }),
+    ]));
+    expect(checks).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        name: 'Cursor managed skill projection precedence',
+      }),
+    ]));
   });
 });

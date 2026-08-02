@@ -44,6 +44,8 @@
 - 已安装 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode，并选择其中一个作为当前宿主。Cursor 与 OpenCode 需要显式 `--cursor` / `--opencode` opt-in，且当前只处于 generated-runtime preview。
 - terminal 位于你想启用 `spec-first` 的项目仓库根目录。首次试用者可以先在 throwaway/test repo 中体验，再初始化真实项目。
 
+想少走几步？`npm install -g spec-first` 之后直接运行 `spec-first quickstart`：它会探测 Node.js、Git 和已安装的宿主 CLI，若只找到一个宿主就直接继续 `init`，否则回退到交互式 `init` 宿主选择。它只是对 `doctor` 探测和 `init` 既有流程的一层薄封装，不会代为运行任何宿主会话内的 `spec-*` workflow。下面的分步说明是同一条流程的展开版本。
+
 **步骤 1 — 安装并检查环境**
 
 macOS / Linux：
