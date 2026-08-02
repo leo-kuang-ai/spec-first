@@ -601,11 +601,13 @@ function dedupeRoots(roots) {
 }
 
 function isManagedSkillRoot(projectRoot, root, skillName, cursorAdapter) {
-  if (root.scope !== 'project' && root.scope !== 'project_compat') {
+  if (root.scope !== 'project' && root.scope !== 'project_compat' && root.scope !== 'nested_project') {
     return false;
   }
 
   const rootPath = root.relativePath;
+
+  // Main project roots
   if (rootPath === '.cursor/skills') {
     return stateListsSkill(projectRoot, cursorAdapter, skillName, ['skills', 'workflowSkills']);
   }
@@ -615,6 +617,36 @@ function isManagedSkillRoot(projectRoot, root, skillName, cursorAdapter) {
   if (rootPath === '.claude/skills') {
     return stateListsSkill(projectRoot, adapterForState('claude'), skillName, ['skills']);
   }
+
+  // Worktree roots (nested_project scope)
+  // Pattern: .worktrees/<branch>/.cursor/skills or .worktrees/<branch>/.agents/skills
+  if (root.scope === 'nested_project') {
+    // Extract the worktree root path (e.g., .worktrees/feat/app-assurance-compiler)
+    const worktreeMatch = rootPath.match(/^(\.worktrees\/[^/]+(?:\/[^/]+)*)\/(.+)$/);
+    if (worktreeMatch) {
+      const worktreeRoot = worktreeMatch[1];
+      const relativeSkillPath = worktreeMatch[2];
+
+      // Check if the worktree has its own state file
+      if (relativeSkillPath === '.cursor/skills') {
+        const worktreeStateFile = path.join(projectRoot, worktreeRoot, '.cursor/spec-first/state.json');
+        if (fs.existsSync(worktreeStateFile)) {
+          return stateListsSkill(path.join(projectRoot, worktreeRoot), cursorAdapter, skillName, ['skills', 'workflowSkills']);
+        }
+      }
+      if (relativeSkillPath === '.agents/skills') {
+        const worktreeStateFile = path.join(projectRoot, worktreeRoot, '.agents/spec-first/state.json');
+        if (fs.existsSync(worktreeStateFile)) {
+          return stateListsSkill(path.join(projectRoot, worktreeRoot), adapterForState('codex'), skillName, ['skills', 'workflowSkills']);
+        }
+      }
+
+      // If no state file in worktree, consider it managed if it exists in main project
+      // (likely a git worktree sharing the same skill source)
+      return true;
+    }
+  }
+
   return false;
 }
 

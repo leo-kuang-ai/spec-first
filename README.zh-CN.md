@@ -203,6 +203,21 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 
 如果没有仓库承载的轨迹，这些上下文会随聊天窗口一起消失。下一次会话缺上下文，reviewer 看不到计划为什么变化，团队也很难复用一次成功经验。`spec-first` 把这些工作作为持久 artifact 留在仓库里：requirements、PRD、plans、task packs、work evidence、debug notes、reviews 和 learnings。
 
+## Before / After
+
+下面是具体场景对比，不是效果宣称。每一行 spec-first 列都指向一个你可以自己打开检查的 repo 路径或 contract。
+
+| 场景 | 没有 spec-first | 使用 spec-first |
+|---|---|---|
+| 需求在对话中被讨论 | 决策和 trade-off 只留在已关闭的聊天窗口里 | 实现前先写入 `docs/plans/`（或 `spec-prd` 场景下的 `docs/brainstorms/`） |
+| Reviewer 打开一个 PR | 只看到 diff，看不到为什么选这个 scope 或方案 | 可以在 diff 旁打开关联的 plan/task pack 和 required review findings |
+| Agent 声称"测试通过" | 只是 transcript 里的一句话，会话结束后无法验证 | 有 `verification-run-summary.v1` 记录实际执行过的命令和日志 |
+| 同一个 bug 后来又出现 | root cause 和修复方法留在旧聊天记录里，全凭有人记得 | 通过 `spec-compound` 记录在 `docs/solutions/`，并带自己的适用范围 |
+| 新会话接续旧工作 | Agent 从零开始，你要重新解释 scope 和之前的决策 | `spec-handoff` 携带结构化上下文、source refs 和新鲜度/局限性说明 |
+| 同一个任务换宿主（Claude Code / Codex / Cursor / …） | 每个宿主都要重新搭建 prompt 和配置 | 一套 source assets（`skills/`、`templates/`、`src/cli/`）通过 `spec-first init` 为每个受支持宿主重新生成 runtime |
+
+这些是你今天就能在本仓库检查的当前机制，不是已测得的效率宣称。底层模型见下方[为什么使用 spec-first？](#为什么使用-spec-first)。
+
 ## 为什么使用 spec-first？
 
 `spec-first` 让软件生命周期本身保持可读，同时不把 prose 当成证明。它不是替代 Claude Code、Codex、Kiro、Qoder、Cursor 或 OpenCode，而是给这些宿主加上一层项目内 harness。Cursor native rules、Kiro native Specs、Qoder native rules 与用户拥有的 OpenCode 配置仍由宿主或用户拥有；只有显式命名时才作为 advisory input。

@@ -204,6 +204,21 @@ AI can write code quickly. The expensive part is preserving the judgment around 
 
 Without a repo-backed trail, that context disappears with the chat window. The next session starts cold, reviewers cannot see why a plan changed, and teams cannot reuse what worked. `spec-first` keeps that work as durable artifacts: requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings.
 
+## Before / After
+
+Concrete scenarios, not outcome claims. Each `spec-first` column names a repo path or contract you can open and check yourself.
+
+| Scenario | Without spec-first | With spec-first |
+|---|---|---|
+| Requirement gets discussed mid-chat | Decision and trade-offs live only in the closed chat window | Written to `docs/plans/` (or `docs/brainstorms/` for `spec-prd`) before implementation starts |
+| Reviewer opens a PR | Sees the diff, not why that scope or approach was chosen | Can open the linked plan/task pack and required review findings alongside the diff |
+| Agent claims "tests passed" | A sentence in the transcript, unverifiable after the session ends | A `verification-run-summary.v1` record with the commands and logs that were actually run |
+| Same bug resurfaces later | Root cause and fix live in old chat history, if anyone remembers | Recorded in `docs/solutions/` via `spec-compound`, with its own applicability limits |
+| New session picks up old work | Agent starts cold; you re-explain scope and prior decisions | `spec-handoff` carries structured context, source refs, and freshness/limitations forward |
+| Same task, different host (Claude Code / Codex / Cursor / …) | Prompts and setup are re-created per host | One source asset set (`skills/`, `templates/`, `src/cli/`) regenerates every supported host's runtime via `spec-first init` |
+
+These are current repo mechanisms you can inspect in this repository today — not a measured productivity claim. See [Why spec-first?](#why-spec-first) below for the underlying model.
+
 ## Why spec-first?
 
 `spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode; it gives those hosts a project-local harness. Cursor native rules, Kiro native Specs, Qoder native rules, and user-owned OpenCode configuration remain host-owned artifacts; spec-first only treats them as advisory input when explicitly named.
