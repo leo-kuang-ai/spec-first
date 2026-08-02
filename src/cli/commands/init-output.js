@@ -911,20 +911,49 @@ function printInitNextSteps(platform, lang = 'zh') {
   const entryKind = hostEntrypointLabel(platform);
   const mcpSetupCommand = hostMcpSetupCommand(platform);
 
+  // 检测是否首次项目（.spec-first/workflows是否存在）
+  const fs = require('fs');
+  const path = require('path');
+  const workflowHistoryExists = fs.existsSync(path.join(process.cwd(), '.spec-first', 'workflows'));
+
   if (lang === 'en') {
     console.log('Setup complete. Next steps:');
     console.log(`  1. Restart ${hostDisplay} or open a new session so it loads the generated ${entryKind}.`);
-    console.log(`  2. Start with the matching ${entryKind} for lightweight docs, small fixes, first trials, plan, work, review, or debug.`);
-    console.log(`  3. For stronger readiness, run ${mcpSetupCommand} to install and verify the required MCP/helper runtime.`);
-    console.log('  4. Then choose the workflow by user intent. Project guidance comes from AGENTS.md, CLAUDE.md, docs/contracts, direct source evidence, tests, and logs.');
+
+    if (!workflowHistoryExists) {
+      // 首次项目：直接给出快速上手的workflow建议
+      console.log('  2. Quick start workflow guide:');
+      console.log('     • spec-first prd     → Define requirements and product decisions');
+      console.log('     • spec-first plan    → Generate implementation plan');
+      console.log('     • spec-first work    → Execute planned changes');
+      console.log(`  3. For stronger readiness, run ${mcpSetupCommand} to install and verify the required MCP/helper runtime.`);
+      console.log('  4. Then choose the workflow by user intent. Project guidance comes from AGENTS.md, CLAUDE.md, docs/contracts, direct source evidence, tests, and logs.');
+    } else {
+      // 有执行历史：维持原有的generic提示
+      console.log(`  2. Start with the matching ${entryKind} for lightweight docs, small fixes, first trials, plan, work, review, or debug.`);
+      console.log(`  3. For stronger readiness, run ${mcpSetupCommand} to install and verify the required MCP/helper runtime.`);
+      console.log('  4. Then choose the workflow by user intent. Project guidance comes from AGENTS.md, CLAUDE.md, docs/contracts, direct source evidence, tests, and logs.');
+    }
     return;
   }
 
   console.log('初始化完成。下一步:');
   console.log(`  1. 重启 ${hostDisplay} 或新开会话，让宿主加载刚生成的 ${entryKind}。`);
-  console.log(`  2. docs、小修复、首次试用、plan、work、review 或 debug，可直接启动匹配的 ${entryKind}。`);
-  console.log(`  3. 需要更完整的 readiness 时，运行 ${mcpSetupCommand} 安装并验证必装 MCP/helper runtime。`);
-  console.log('  4. 然后按用户意图选择 workflow；项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts、直接源码证据、测试和日志。');
+
+  if (!workflowHistoryExists) {
+    // 首次项目：直接给出快速上手的workflow建议
+    console.log('  2. 快速上手流程指南:');
+    console.log('     • spec-first prd     → 定义需求与产品决策');
+    console.log('     • spec-first plan    → 生成实施计划');
+    console.log('     • spec-first work    → 执行计划变更');
+    console.log(`  3. 需要更完整的 readiness 时，运行 ${mcpSetupCommand} 安装并验证必装 MCP/helper runtime。`);
+    console.log('  4. 然后按用户意图选择 workflow；项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts、直接源码证据、测试和日志。');
+  } else {
+    // 有执行历史：维持原有的generic提示
+    console.log(`  2. docs、小修复、首次试用、plan、work、review 或 debug，可直接启动匹配的 ${entryKind}。`);
+    console.log(`  3. 需要更完整的 readiness 时，运行 ${mcpSetupCommand} 安装并验证必装 MCP/helper runtime。`);
+    console.log('  4. 然后按用户意图选择 workflow；项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts、直接源码证据、测试和日志。');
+  }
 }
 
 function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
@@ -934,20 +963,49 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
     return;
   }
 
+  // 检测是否首次项目（.spec-first/workflows是否存在）
+  const fs = require('fs');
+  const path = require('path');
+  const workflowHistoryExists = fs.existsSync(path.join(process.cwd(), '.spec-first', 'workflows'));
+
   if (lang === 'en') {
     console.log('Setup complete. Next steps:');
     console.log(`  1. Restart ${uniquePlatforms.map(hostDisplayName).join(', ')} or open new sessions so each host loads the generated entrypoints.`);
-    console.log('  2. Use the matching spec-* workflow entrypoint for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
-    console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
-    console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
+
+    if (!workflowHistoryExists) {
+      // 首次项目：直接给出快速上手的workflow建议
+      console.log('  2. Quick start workflow guide:');
+      console.log('     • spec-first prd     → Define requirements and product decisions');
+      console.log('     • spec-first plan    → Generate implementation plan');
+      console.log('     • spec-first work    → Execute planned changes');
+      console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
+      console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
+    } else {
+      // 有执行历史：维持原有的generic提示
+      console.log('  2. Use the matching spec-* workflow entrypoint for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
+      console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
+      console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
+    }
     return;
   }
 
   console.log('初始化完成。下一步:');
   console.log(`  1. 重启 ${uniquePlatforms.map(hostDisplayName).join('、')} 或分别新开会话，让宿主加载刚生成的入口。`);
-  console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动同名 spec-* workflow 入口。');
-  console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
-  console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
+
+  if (!workflowHistoryExists) {
+    // 首次项目：直接给出快速上手的workflow建议
+    console.log('  2. 快速上手流程指南:');
+    console.log('     • spec-first prd     → 定义需求与产品决策');
+    console.log('     • spec-first plan    → 生成实施计划');
+    console.log('     • spec-first work    → 执行计划变更');
+    console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
+    console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
+  } else {
+    // 有执行历史：维持原有的generic提示
+    console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动同名 spec-* workflow 入口。');
+    console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
+    console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
+  }
 }
 
 function printHelp() {
