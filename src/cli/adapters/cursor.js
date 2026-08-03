@@ -531,6 +531,10 @@ function collectGitWorktreeSkillRoots(projectRoot) {
   } catch {
     canonicalProjectRoot = path.resolve(projectRoot);
   }
+  // git worktree list --porcelain requires Git 2.7+ (released Jan 2016).
+  // doctor already checks Git availability; if this fails, it's likely either
+  // not a git repo or an edge-case git version. Silently return empty and let
+  // nested skill root detection handle the rest.
   const result = spawnSyncWithTimeout(
     'git',
     ['-C', projectRoot, 'worktree', 'list', '--porcelain'],

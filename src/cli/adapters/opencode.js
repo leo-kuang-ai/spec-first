@@ -350,15 +350,25 @@ function countOpenCodeManagedRoots(groups) {
     .join(', ');
 }
 
-const SELF_REFERENTIAL_SKILLS_ROOTS = [
-  '.claude/skills/',
-  '.codex/skills/',
-  '.agents/skills/',
-  '.cursor/skills/',
-  '.kiro/skills/',
-  '.qoder/skills/',
-  '.opencode/skills/',
-];
+// Dynamically derive from getSupportedPlatforms() to ensure new hosts are
+// automatically included. This list is used only for normalizing pure
+// descriptive path mentions — not Host Pin values or behavioral config.
+function getSelfReferentialSkillsRoots() {
+  const { getSupportedPlatforms } = require('./index');
+  const platforms = getSupportedPlatforms();
+  return platforms.map((platform) => {
+    // Map platform ID to its actual skills root path
+    switch (platform) {
+      case 'claude': return '.claude/skills/';
+      case 'codex': return '.agents/skills/'; // Codex uses .agents/skills
+      case 'cursor': return '.cursor/skills/';
+      case 'kiro': return '.kiro/skills/';
+      case 'qoder': return '.qoder/skills/';
+      case 'opencode': return '.opencode/skills/';
+      default: return `.${platform}/skills/`; // fallback pattern for future hosts
+    }
+  });
+}
 
 // Each host-specific skill projection legitimately self-references its own
 // skills root path in plain descriptive prose (e.g. "do not hand-edit
@@ -376,7 +386,7 @@ const SELF_REFERENTIAL_SKILLS_ROOTS = [
 // this normalization.
 function normalizeSelfReferentialSkillContent(content) {
   let normalized = String(content || '');
-  for (const root of SELF_REFERENTIAL_SKILLS_ROOTS) {
+  for (const root of getSelfReferentialSkillsRoots()) {
     normalized = normalized.split(root).join('__SKILLS_ROOT__/');
   }
   return normalized;

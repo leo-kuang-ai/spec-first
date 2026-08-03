@@ -40,6 +40,9 @@ async function runQuickstart(argv, promptOverrides = {}) {
   }
 
   const platforms = getSupportedPlatforms();
+  // checkPlatformCli is synchronous (spawnSync internally), so this is
+  // sequential execution despite the Promise.all wrapper. Keep the wrapper
+  // for consistency with async signature, but note no actual concurrency.
   const hostChecks = await Promise.all(
     platforms.map((platform) => Promise.resolve(checkPlatformCli(platform))),
   );
