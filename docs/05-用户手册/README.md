@@ -6,7 +6,7 @@
 
 落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files、项目级 `.developer` 和受管状态。
 
-完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `spec-*` workflow。`spec-runtime-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
+完成 `doctor`、`init` 和宿主重启后，首次进入业务 workflow 前先运行 `spec-runtime-setup`，准备 required harness runtime、MCP/helper readiness 与 setup facts。后续普通 plan/work/debug/review 不需要每次重复 setup，继续使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据；宿主、provider、helper 配置或 setup facts 变化时再重跑。
 
 当前推荐的事实准备、专项审查、治理与知识沉淀入口：
 
@@ -75,7 +75,7 @@ Plan lifecycle audit 的边界：
 
 ```text
 using-spec-first（入口路由，可选）
-  -> runtime-setup（环境/MCP 需要时）
+  -> runtime-setup（首次 workflow 前；环境/MCP 变化后重跑）
   -> ideate / brainstorm / prd / doc-review
   -> plan
   -> write-tasks（可选）
@@ -90,7 +90,7 @@ using-spec-first（入口路由，可选）
 
 这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由 `using-spec-first` 推荐一个公开入口。`write-tasks` 是可选派生 workflow，入口是 `spec-write-tasks`；它不替代 source plan，也不是强制阶段。完整入口表见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)。skill 包治理入口为 `spec-write-skill`。
 
-当外部工具或 setup facts 缺失时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation；不要把缺失证据包装成成功证据，也不要把 setup 当成所有 workflow 的硬前置。
+首次 setup 必须完成 required baseline；后续普通 workflow 不把 setup 当成每次运行的硬前置。当外部工具或 setup facts 后续变得 stale 或不可用时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation，不能把缺失证据包装成成功证据。
 
 ## 支持的开发模式
 

@@ -23,6 +23,7 @@ function collectSourceFiles(relativePath, found = []) {
 const currentSources = [
   'package.json',
   'README.md',
+  'README.en.md',
   'README.zh-CN.md',
   ...collectSourceFiles('scripts'),
   ...collectSourceFiles('src'),

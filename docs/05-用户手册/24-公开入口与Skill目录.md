@@ -24,7 +24,7 @@
 | 场景 | 公开入口 | 典型 durable 产物 |
 | --- | --- | --- |
 | 需要 0–1 个方向 / 候选想法 | `spec-ideate` | `docs/ideation/*-ideation.md` |
-| 想法有了，问题框架 / 用户 / 成功标准未定 | `spec-brainstorm` | `docs/brainstorms/*-requirements.md` |
+| 想法有了，问题框架 / 用户 / 成功标准未定 | `spec-brainstorm` | `docs/plans/*-plan.md`（requirements-only） |
 | 已有产品 PRD/材料，进入研发前澄清与 plan 准入 | `spec-prd` | `docs/brainstorms/*-requirements.md`（planning-readiness） |
 | 批评已有需求 / 计划 / 任务文档 | `spec-doc-review` | 审查结论（通常会话内；可写入团队约定路径） |
 | 结果清楚，HOW 未定 | `spec-plan` | `docs/plans/*-plan.md` |
@@ -42,7 +42,7 @@
 
 | 入口 | 一句话用途 | 何时用 / 不用 |
 | --- | --- | --- |
-| `spec-runtime-setup` | 安装、校验、刷新 required harness runtime 与 helper readiness facts | 首次 setup、MCP/helper 缺失、provider 配置变化；不是每次 plan/work 的硬前置 |
+| `spec-runtime-setup` | 安装、校验、刷新 required harness runtime 与 helper readiness facts | 首次 workflow 前、MCP/helper 缺失或 provider 配置变化；不是每次 plan/work 的硬前置 |
 | `spec-ideate` | 生成并评估 grounded 候选方向 | 还没选定方向；选定后转 brainstorm，不要在 ideate 里写 plan |
 | `spec-brainstorm` | 把模糊想法收敛成 requirements-only 统一计划输入 | 要定 WHAT；不要用来直接写代码或做技术选型 verdict |
 | `spec-prd` | 棕地 PRD / 需求材料的研发澄清与 plan 准入 | 已有产品材料要进入 planning；不要替代 brainstorm 的从零 framing |

@@ -36,6 +36,7 @@ describe('required CI producers', () => {
     expect(workflow).toContain('node: [20, 22, 24]');
     expect(workflow).toContain('run: node scripts/npm-install-matrix-smoke.cjs');
     expect(read('README.md')).toContain('actions/workflows/npm-install-matrix.yml');
+    expect(read('README.en.md')).toContain('actions/workflows/npm-install-matrix.yml');
     expect(read('README.zh-CN.md')).toContain('actions/workflows/npm-install-matrix.yml');
   });
 

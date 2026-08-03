@@ -32,6 +32,7 @@ const EXPECTED_PARENT_ARTIFACT_AUTHORITY = Object.freeze({
 
 const USER_CONTRACT_PATHS = [
   'README.md',
+  'README.en.md',
   'README.zh-CN.md',
   'docs/05-用户手册/01-快速开始.md',
   'docs/05-用户手册/02-核心概念.md',

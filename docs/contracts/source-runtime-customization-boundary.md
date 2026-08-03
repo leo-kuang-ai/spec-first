@@ -15,6 +15,7 @@ Edit checked-in source assets when changing spec-first behavior:
 - `src/cli/contracts/**`
 - `docs/`
 - `README.md`
+- `README.en.md`
 - `README.zh-CN.md`
 - `AGENTS.md`
 - `CLAUDE.md`

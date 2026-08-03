@@ -69,7 +69,8 @@
     "!skills/**/*.pyc",
     "!skills/**/*.pyo",
     "templates/",
-    "README.md"
+    "README.md",
+    "README.en.md"
   ],
   "keywords": [
     "spec-first",

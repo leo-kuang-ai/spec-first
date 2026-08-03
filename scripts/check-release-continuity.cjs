@@ -178,6 +178,8 @@ function checkSupportedHostGovernanceCoherence() {
 function checkPackageDeliverySurface() {
   const pkg = readJson(PACKAGE_JSON_PATH);
   const requiredFiles = [
+    'README.md',
+    'README.en.md',
     'docs/catalog/runtime-capabilities.md',
     'docs/contracts/workflows/',
     'scripts/check-release-continuity.cjs',
@@ -284,18 +286,23 @@ function checkWebsiteGatePreserved() {
 
 function checkReadmeBoundaryLinks() {
   const readme = read(repoPath('README.md'));
-  const readmeZh = read(repoPath('README.zh-CN.md'));
+  const readmeEn = read(repoPath('README.en.md'));
+  const readmeZhCompat = read(repoPath('README.zh-CN.md'));
   const target = 'docs/contracts/source-runtime-customization-boundary.md';
-  const ok = readme.includes(target) && readmeZh.includes(target);
+  const boundaryLinksCurrent = [readme, readmeEn, readmeZhCompat]
+    .every((markdown) => markdown.includes(target));
+  const compatibilityCurrent = readme === readmeZhCompat;
 
   return guard({
     guardId: 'readme-source-runtime-boundary-links',
     classification: 'docs-only-no-impact',
     artifactPath: 'docs/contracts/source-runtime-customization-boundary.md',
-    checkedSources: ['README.md', 'README.zh-CN.md', target],
-    ok,
+    checkedSources: ['README.md', 'README.en.md', 'README.zh-CN.md', target],
+    ok: boundaryLinksCurrent && compatibilityCurrent,
     passReason: 'readme-boundary-links-current',
-    failReason: 'readme-boundary-links-missing',
+    failReason: boundaryLinksCurrent
+      ? 'readme-zh-compatibility-drift'
+      : 'readme-boundary-links-missing',
   });
 }
 
@@ -304,6 +311,15 @@ function checkOpenCodeReleaseSurface() {
   const surfaces = [
     {
       path: 'README.md',
+      tokens: [
+        '| OpenCode |',
+        '`--opencode`',
+        'generated_runtime_preview',
+        'docs/catalog/runtime-capabilities.md',
+      ],
+    },
+    {
+      path: 'README.en.md',
       tokens: [
         '| OpenCode |',
         '`--opencode`',
@@ -433,7 +449,7 @@ function runChecks(options = {}) {
       guardId: 'readme-source-runtime-boundary-links',
       classification: 'docs-only-no-impact',
       artifactPath: 'docs/contracts/source-runtime-customization-boundary.md',
-      checkedSources: ['README.md', 'README.zh-CN.md'],
+      checkedSources: ['README.md', 'README.en.md', 'README.zh-CN.md'],
       run: checkReadmeBoundaryLinks,
     },
     {
@@ -442,6 +458,7 @@ function runChecks(options = {}) {
       artifactPath: 'README.md',
       checkedSources: [
         'README.md',
+        'README.en.md',
         'README.zh-CN.md',
         'CLAUDE.md',
         'AGENTS.md',

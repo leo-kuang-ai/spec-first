@@ -15,7 +15,7 @@ package 仓库拥有这些事实：
 - `templates/claude/commands/spec/*.md`.
 - `skills/*/SKILL.md`.
 - `agents/*.agent.md`.
-- `README.md`、`README.zh-CN.md` 和 `docs/05-用户手册/**`。
+- `README.md`、`README.en.md`、`README.zh-CN.md` 和 `docs/05-用户手册/**`。
 
 官网仓库通过自己的 generated data 和 content audit 消费这些事实。package 发布流程不能修改官网 source files。
 

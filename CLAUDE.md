@@ -96,6 +96,7 @@ Source-of-truth 路径包括：
 - `src/cli/contracts/dual-host-governance/**`
 - `docs/`
 - `README.md`
+- `README.en.md`
 - `README.zh-CN.md`
 - `CHANGELOG.md`
 - `package.json`
@@ -203,6 +204,7 @@ Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启
 
 - `CHANGELOG.md`
 - `README.md`
+- `README.en.md`
 - `README.zh-CN.md`
 - `docs/`
 - `skills/**/SKILL.md`

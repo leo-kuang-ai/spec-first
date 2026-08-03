@@ -5,9 +5,11 @@ const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const readmePath = path.join(repoRoot, 'README.md');
-const readmeZhPath = path.join(repoRoot, 'README.zh-CN.md');
+const readmeEnPath = path.join(repoRoot, 'README.en.md');
+const readmeZhCompatPath = path.join(repoRoot, 'README.zh-CN.md');
 const readme = fs.readFileSync(readmePath, 'utf8');
-const readmeZh = fs.readFileSync(readmeZhPath, 'utf8');
+const readmeEn = fs.readFileSync(readmeEnPath, 'utf8');
+const readmeZhCompat = fs.readFileSync(readmeZhCompatPath, 'utf8');
 
 function headings(markdown) {
   return [...markdown.matchAll(/^## (.+)$/gm)].map((match) => match[1]);
@@ -31,7 +33,7 @@ function expectOrdered(content, values) {
 }
 
 function repositoryLinks(markdown) {
-  const root = 'https://github.com/sunrain520/spec-first/blob/main/';
+  const root = 'https://github.com/sunrain520/spec-first/blob/master/';
   return [...markdown.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)]
     .map((match) => match[1])
     .filter((target) => target.startsWith(root))
@@ -39,52 +41,64 @@ function repositoryLinks(markdown) {
 }
 
 describe('README community entry contract', () => {
-  test('keeps a compact mirrored information architecture', () => {
+  test('keeps Chinese as the default with an English entry and a compatible legacy path', () => {
     expect(headings(readme)).toEqual([
-      'See It In 90 Seconds',
-      'Why spec-first?',
-      'Quickstart',
-      'What You Get',
-      'Core Workflows',
-      'Trust Model',
-      'Host Support',
-      'Documentation',
-      'CLI Reference',
-      'Development & Contributing',
-    ]);
-    expect(headings(readmeZh)).toEqual([
-      '90 秒看懂',
       '为什么使用 spec-first？',
       '快速开始',
-      '你能得到什么',
-      '核心 Workflows',
-      '信任模型',
+      '从 Prompt 到可信变更',
+      '仓库会留下什么',
+      '选择合适的 Workflow',
+      '信任如何建立',
       '宿主支持',
+      '适用边界',
       '相关文档',
       'CLI 参考',
       '开发与贡献',
     ]);
+    expect(headings(readmeEn)).toEqual([
+      'Why spec-first?',
+      'Quickstart',
+      'From Prompt to Trusted Change',
+      'What Stays in the Repository',
+      'Choose the Right Workflow',
+      'How Trust Works',
+      'Host Support',
+      'When It Fits',
+      'Documentation',
+      'CLI Reference',
+      'Development & Contributing',
+    ]);
+    expect(readme).toContain('把 AI coding 会话变成可信、由项目拥有的变更。');
+    expect(readmeEn).toContain('Turn AI coding sessions into trusted, repo-owned change.');
+    expect(readmeZhCompat).toBe(readme);
+    for (const markdown of [readme, readmeEn, readmeZhCompat]) {
+      expect(markdown).toContain('blob/master/README.en.md');
+      expect(markdown).toContain('blob/master/README.md');
+    }
     expect(Buffer.byteLength(readme)).toBeLessThanOrEqual(16 * 1024);
-    expect(Buffer.byteLength(readmeZh)).toBeLessThanOrEqual(16 * 1024);
+    expect(Buffer.byteLength(readmeEn)).toBeLessThanOrEqual(16 * 1024);
+    expect(Buffer.byteLength(readmeZhCompat)).toBeLessThanOrEqual(16 * 1024);
   });
 
   test('keeps the first-run path short and observable', () => {
-    expectOrdered(readme, [
+    expectOrdered(readmeEn, [
       'npm install -g spec-first',
       'spec-first quickstart',
       'Restart the selected host',
+      'spec-runtime-setup',
       'spec-brainstorm "Improve onboarding for first-time CLI users"',
       'docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md',
     ]);
-    expectOrdered(readmeZh, [
+    expectOrdered(readme, [
       'npm install -g spec-first',
       'spec-first quickstart',
       '重启已选择的宿主',
+      'spec-runtime-setup',
       'spec-brainstorm "改进 CLI 新用户的 onboarding"',
       'docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md',
     ]);
 
-    for (const quickstart of [section(readme, 'Quickstart'), section(readmeZh, '快速开始')]) {
+    for (const quickstart of [section(readmeEn, 'Quickstart'), section(readme, '快速开始')]) {
       expect(quickstart).toContain('Node.js `>=20.0.0`');
       expect(quickstart).toContain('spec-first init --codex -y -u <name> --lang <zh|en>');
       for (const implementationDetail of [
@@ -125,10 +139,32 @@ describe('README community entry contract', () => {
     ];
     for (const claim of sharedClaims) {
       expect(readme).toContain(claim);
-      expect(readmeZh).toContain(claim);
+      expect(readmeEn).toContain(claim);
+      expect(readmeZhCompat).toContain(claim);
     }
 
-    for (const markdown of [readme, readmeZh]) {
+    const workflowSections = [
+      [readme, '从 Prompt 到可信变更'],
+      [readmeEn, 'From Prompt to Trusted Change'],
+      [readmeZhCompat, '从 Prompt 到可信变更'],
+    ];
+    for (const [markdown, heading] of workflowSections) {
+      const workflow = section(markdown, heading);
+      expect(workflow).toContain(
+        'spec-brainstorm -> [spec-doc-review] -> spec-plan -> [spec-write-tasks] -> spec-work',
+      );
+      expectOrdered(workflow, [
+        'spec-brainstorm',
+        'spec-doc-review',
+        'spec-plan',
+        'spec-write-tasks',
+        'spec-work',
+        'spec-code-review',
+        'spec-compound',
+      ]);
+    }
+
+    for (const markdown of [readme, readmeEn, readmeZhCompat]) {
       for (const referenceDetail of [
         '.opencode/commands/spec-*.md',
         'opencode.jsonc',
@@ -142,12 +178,17 @@ describe('README community entry contract', () => {
   });
 
   test('keeps open-source trust signals and repository links valid', () => {
-    for (const markdown of [readme, readmeZh]) {
+    for (const markdown of [readme, readmeEn, readmeZhCompat]) {
       expect(markdown).toContain('[![npm version]');
       expect(markdown).toContain('[![license]');
       expect(markdown).toContain('npm-install-matrix.yml');
       expect(markdown).toContain('http://spec-first.cn/');
-      for (const target of repositoryLinks(markdown)) {
+      expect(markdown).not.toContain('docs/reviews');
+      expect(markdown).not.toContain('blob/main');
+      expect(markdown).not.toContain('/main/docs/');
+      const targets = repositoryLinks(markdown);
+      expect(targets.length).toBeGreaterThan(0);
+      for (const target of targets) {
         expect(fs.existsSync(path.join(repoRoot, target))).toBe(true);
       }
     }
@@ -155,5 +196,13 @@ describe('README community entry contract', () => {
       repoRoot,
       'docs/assets/readme/spec-first-cli-workflow-demo.svg',
     ))).toBe(true);
+    const demo = fs.readFileSync(
+      path.join(repoRoot, 'docs/assets/readme/spec-first-cli-workflow-demo.svg'),
+      'utf8',
+    );
+    expect(demo).toContain('spec-runtime-setup');
+    expect(demo).toContain('✓ docs/plans/');
+    expect(demo).not.toContain('spec-mcp-setup');
+    expect(demo).not.toContain('reviews/');
   });
 });

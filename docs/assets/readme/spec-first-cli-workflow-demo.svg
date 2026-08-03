@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
   <title id="title">spec-first CLI workflow demo</title>
-  <desc id="desc">模拟从安装 spec-first、init 初始化、mcp-setup 准备运行时，到执行 ideate、brainstorm、prd、doc-review、plan、write-tasks、work、code-review、compound 研发 workflow；debug 作为失败或根因不明时的旁路循环，并在仓库中留下带文件名的 docs artifacts。</desc>
+  <desc id="desc">模拟从安装 spec-first、init 初始化、runtime-setup 准备运行时，到执行 ideate、brainstorm、prd、doc-review、plan、write-tasks、work、code-review、compound 研发 workflow；debug 作为失败或根因不明时的旁路循环，并在仓库中留下带文件名的 docs artifacts。</desc>
   <defs>
     <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#F7F8FA"/>
@@ -77,7 +77,7 @@
   <circle cx="1040" cy="560" r="158" fill="#FFFFFF" opacity="0.54"/>
 
   <text x="600" y="58" class="title">跑完一圈可检查的研发闭环</text>
-  <text x="600" y="88" class="subtitle">init → mcp-setup → ideate → brainstorm → PRD → doc-review → plan → write-tasks → work → review → compound</text>
+  <text x="600" y="88" class="subtitle">init → runtime-setup → ideate → brainstorm → PRD → doc-review → plan → write-tasks → work → review → compound</text>
 
   <g transform="translate(64 122)" filter="url(#shadow)">
     <rect x="0" y="0" width="742" height="520" rx="22" fill="#0B1020"/>
@@ -97,14 +97,14 @@
       <text x="0" y="34" class="mono cmd">$ spec-first init</text>
       <text x="430" y="34" class="mono-small ok">✓ runtime  ✓ .gitignore</text>
 
-      <text x="0" y="68" class="mono cmd">spec-mcp-setup</text>
+      <text x="0" y="68" class="mono cmd">spec-runtime-setup</text>
       <text x="430" y="68" class="mono-small ok">✓ MCP/helper readiness</text>
 
       <text x="0" y="102" class="mono cmd">spec-ideate "新用户 onboarding"</text>
       <text x="430" y="102" class="mono-small ok">✓ ranked ideas</text>
 
       <text x="0" y="136" class="mono cmd">spec-brainstorm "改进 onboarding"</text>
-      <text x="430" y="136" class="mono-small ok">✓ docs/brainstorms/</text>
+      <text x="430" y="136" class="mono-small ok">✓ docs/plans/</text>
 
       <text x="0" y="170" class="mono cmd">spec-prd docs/brainstorms/...md</text>
       <text x="430" y="170" class="mono-small ok">✓ PRD-ready requirements</text>
@@ -174,17 +174,13 @@
         <text x="38" y="143" class="mono-small artifact-file-small">task-pack.md</text>
       </g>
       <g class="artifact5">
-        <text x="18" y="162" class="mono-small path">reviews/</text>
-        <text x="38" y="177" class="mono-small artifact-file-small">doc-review.md</text>
+        <text x="18" y="162" class="mono-small path">solutions/</text>
+        <text x="38" y="177" class="mono-small artifact-file-small">learning.md</text>
       </g>
       <g class="artifact6">
-        <text x="18" y="196" class="mono-small path">solutions/</text>
-        <text x="38" y="211" class="mono-small artifact-file-small">learning.md</text>
-      </g>
-      <g class="artifact7">
-        <text x="0" y="232" class="mono-small muted">.spec-first/</text>
-        <text x="18" y="250" class="mono-small path">workflows/</text>
-        <text x="38" y="266" class="mono-small artifact-file">work-run.json</text>
+        <text x="0" y="196" class="mono-small muted">.spec-first/</text>
+        <text x="18" y="214" class="mono-small path">workflows/</text>
+        <text x="38" y="230" class="mono-small artifact-file">verification-run-summary.json</text>
       </g>
     </g>
   </g>

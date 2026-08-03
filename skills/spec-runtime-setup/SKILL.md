@@ -107,10 +107,13 @@ The summary must make skipped, declined, optional, degraded, and action-required
 
 ## Setup Posture And Project Conventions
 
-Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture:
+Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture, with **fast-path execution for bare invocations**:
 
 1. **Explore** host, target repo, generated runtime manifest, existing setup facts, `.spec-first/config.local.yaml`, verification profile visibility, provider artifacts, and project instructions.
-2. **Present** discovered facts, missing dependencies, local-only overrides, provider first-generation/refresh actions, generated runtime freshness, and explicit non-actions before applying setup changes.
+2. **Present & Decide**:
+   - **Bare invocation** (default `spec-runtime-setup`): After exploration, present a consolidated single summary of all pending operations (missing dependencies, config changes, provider installations) and request **one confirmation** before batch execution. The user approves the entire setup plan with a single response.
+   - **Explicit modes** (`--check`, `--plan`, `--verify-only`): Present detailed diagnostics without requesting confirmation; these modes do not mutate.
+   - **Subset repairs** (`--only ...`, `--refresh`): Execute the narrowed scope immediately after exploration; subset authorization is implicit in the flag itself.
 3. **Decide** only where the runtime setup workflow has authority: install/verify helper tools, configure host MCP/runtime wiring, refresh setup-owned facts, or choose a documented degraded path. Team workflow conventions and semantic project decisions remain LLM/owner judgment in downstream workflows.
 4. **Write** only setup-owned facts, supported local config examples, host runtime config through documented targets, and generated runtime refreshes through `spec-first init`. Do not write team-shared tracker policy, label vocabulary, external PR request-surface policy, issue acceptance decisions, or durable rejected-scope decisions from setup.
 
@@ -163,14 +166,15 @@ CodeGraph setup 使用受控 MCP/Provider route。被选中后，setup 安装 `s
 
 ## Default Full Setup Flow
 
-For bare `spec-runtime-setup`, do this inside the skill:
+For bare `spec-runtime-setup`, execute with **batch authorization and single confirmation**:
 
 1. Resolve the project target. In a non-Git parent workspace, default to all discovered supported child repos; use `--repo <child>` only to narrow the run. Every repo-local write remains contained in its child target.
 2. Run the read-only check。若 example config missing/outdated 或 local-config ignore rule missing，先运行 `--project-config --refresh-example --ensure-gitignore`；`.spec-first/config.local.yaml` 缺失保持 `defaults-active`，不创建空 override。
 3. Run `node "$SKILL_DIR/scripts/setup.cjs" --plan --repo <resolved-project-root>` for a single-repo target. For the default parent-workspace batch, preview every discovered child with its own `--repo <child>` target before the shared apply. Plan 默认选择 registry 中 `setup_required=true` 的 CodeGraph/Graphify，并同时预览 baseline MCP/helper、host config、Provider artifact、hook 与 facts writes。
 4. If the plan reports an unresolved target, higher-precedence conflict, unsafe path, unreadable config, or unsupported install path, stop with the exact blocker. If it reports a selected-target `host-config-conflict`, show config path/key/drift fields。Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`：自动携带 `--repair-host-config` 重新 preview 并继续 apply，不再请求用户二次确认。
-5. Plan 无 blocker 后运行等价 apply：单仓使用 `node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify --repo <resolved-project-root>`；默认 parent-workspace batch 则从 parent 运行 `node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify`，由 resolver 对全部 discovered child 执行。两条路径都携带已授权的 repair/target/workspace flags。Bare workflow invocation 已授权标准 required setup，不再追加二次确认。
-6. Apply 必须完成 ffmpeg/baseline helper、CodeGraph init/index/query、Graphify package/host integration/graph/query、host config、project status 和 facts verification。Graphify hook 只在有效目标位于项目内时作为 optional auto-refresh enhancement 安装并验证；blocked/skipped/failed 必须显式展示 steady-state limitation，但不得单独把 core-ready 完整 setup 改为 action-required。任一真正 required item 未 ready 时，完整 setup 返回 action-required；不得以 direct-source fallback 把 setup 本身报告为 complete。
+5. **Present consolidated setup summary and request single confirmation**: Show all pending operations in one grouped summary (missing dependencies, config changes, provider installations). Ask exactly one yes/no confirmation for the whole batch, using the platform's blocking question tool when available (e.g. `AskUserQuestion` in Claude Code, `request_user_input` in Codex) and falling back to a plain-text yes/no prompt in chat when no blocking tool exists in the harness. Never ask a second confirmation per item. On approval, immediately proceed to step 6. On decline, exit with the diagnostic summary and no mutation.
+6. Plan 无 blocker 且用户确认后，批量执行 apply：单仓使用 `node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify --repo <resolved-project-root>`；默认 parent-workspace batch 则从 parent 运行 `node "$SKILL_DIR/scripts/setup.cjs" --only codegraph,graphify`，由 resolver 对全部 discovered child 执行。两条路径都携带已授权的 repair/target/workspace flags。
+7. Apply 必须完成 ffmpeg/baseline helper、CodeGraph init/index/query、Graphify package/host integration/graph/query、host config、project status 和 facts verification。Graphify hook 只在有效目标位于项目内时作为 optional auto-refresh enhancement 安装并验证；blocked/skipped/failed 必须显式展示 steady-state limitation，但不得单独把 core-ready 完整 setup 改为 action-required。任一真正 required item 未 ready 时，完整 setup 返回 action-required；不得以 direct-source fallback 把 setup 本身报告为 complete。
 
 ## Subset / Repair Flow
 
