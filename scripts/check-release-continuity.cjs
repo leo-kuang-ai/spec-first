@@ -305,23 +305,19 @@ function checkOpenCodeReleaseSurface() {
     {
       path: 'README.md',
       tokens: [
-        'Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode',
-        'spec-first init --opencode',
-        '.opencode/commands/spec-*.md',
+        '| OpenCode |',
+        '`--opencode`',
         'generated_runtime_preview',
-        'The `init -y` default host set remains Claude Code + Codex',
-        'opencode.jsonc',
+        'docs/catalog/runtime-capabilities.md',
       ],
     },
     {
       path: 'README.zh-CN.md',
       tokens: [
-        'Claude Code、Codex、Kiro、Qoder、Cursor 和 OpenCode',
-        'spec-first init --opencode',
-        '.opencode/commands/spec-*.md',
+        '| OpenCode |',
+        '`--opencode`',
         'generated_runtime_preview',
-        '`init -y` 默认宿主集合仍只有 Claude Code + Codex',
-        'opencode.jsonc',
+        'docs/catalog/runtime-capabilities.md',
       ],
     },
     {

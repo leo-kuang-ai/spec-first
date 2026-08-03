@@ -115,18 +115,16 @@ describe('spec-runtime-setup runner contracts', () => {
 
   test('Runtime Setup docs describe Graphify commit refresh as an explicit project-owner choice', () => {
     const skill = fs.readFileSync(path.join(repoRoot, 'skills', 'spec-runtime-setup', 'SKILL.md'), 'utf8');
-    const readme = fs.readFileSync(path.join(repoRoot, 'README.zh-CN.md'), 'utf8');
     const manual = fs.readFileSync(path.join(repoRoot, 'docs', '05-用户手册', '12-gitignore参考.md'), 'utf8');
     const boundary = fs.readFileSync(path.join(repoRoot, 'docs', 'contracts', 'source-runtime-customization-boundary.md'), 'utf8');
 
-    for (const contents of [skill, readme, boundary]) {
+    for (const contents of [skill, manual, boundary]) {
       expect(contents).toContain('git rev-parse --git-path hooks');
       expect(contents).toContain('manual-only');
     }
     expect(skill).toContain('不运行 hook 命令、不读取外部 hook 内容、不修改 local/global `core.hooksPath`');
     expect(skill).toContain('不得声称外部 hook 不存在、不会执行或“安装失败”');
     expect(skill).toContain('不得仅因 unknown 自动追加或执行 `--refresh`');
-    expect(readme).toContain('完整 setup 仍为 ready');
     expect(manual).toContain('git config --local core.hooksPath .githooks');
     expect(manual).toContain('仓库级 `core.hooksPath` 会覆盖全局值');
     expect(boundary).toContain('不得把它描述成外部 hook 不存在/安装失败');

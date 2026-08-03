@@ -13,11 +13,11 @@
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
-**An AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode.**
+**A repo-native AI coding harness that turns intent into trusted change.**
 
-`spec-first` helps Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode become easier to trust in real projects: one-off AI coding conversations become repo-backed requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor; evidence stays in your repository. Kiro and Qoder remain opt-in previews. Cursor and OpenCode are more conservative opt-in `generated_runtime_preview` hosts: source generation is covered, but current local loader evidence does not yet prove that their generated workflow entries are discovered and invoked correctly.
+`spec-first` turns one-off AI coding conversations into inspectable requirements, plans, scoped work, review evidence, and reusable learning. It works inside the AI coding hosts you already use; scripts enforce deterministic invariants and prepare facts, while LLMs make semantic judgments above that floor.
 
-Official site: [spec-first.cn](http://spec-first.cn/)
+[Official site](http://spec-first.cn/) | [User manual](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
 
 </div>
 
@@ -27,312 +27,188 @@ Official site: [spec-first.cn](http://spec-first.cn/)
 
 ![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
-The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
+```text
+Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
+```
 
-The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
+The loop leaves three things behind that a chat window does not:
 
-<sub>Simulated demo path: install → init → runtime-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; runtime-setup is the readiness/setup step to run when helper or MCP facts are missing, debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
+- **Intent:** requirements and plans that explain what should change and why.
+- **Evidence:** review and verification records that constrain what an agent may claim.
+- **Learning:** reusable solutions with provenance, scope, and invalidation conditions.
+
+The demo is simulated. The artifacts, commands, and contracts it shows are inspectable in this repository.
+
+## Why spec-first?
+
+AI can write code quickly. The expensive part is preserving the judgment around the code: why this scope was chosen, which evidence was checked, what was verified, and what the next agent or teammate should inherit.
+
+| Without spec-first | With spec-first |
+|---|---|
+| Decisions disappear with the chat session | Requirements and plans stay in `docs/` |
+| A reviewer sees only the diff | The diff can be read with its plan, task pack, and findings |
+| "Tests passed" is a transcript claim | Closeout can reference commands and redacted logs that actually ran |
+| A repeated bug starts from zero | A verified solution can be preserved in `docs/solutions/` |
+| Moving to another host means rebuilding prompts | One source asset set projects the same `spec-*` workflow identities |
+
+Use `spec-first` when you already use an AI coding host and want project-local workflows, reviewable artifacts, and evidence-aware completion. It may not fit if you only need a prompt snippet, a generic agent marketplace, a host-independent application, or a process that must not write workflow artifacts into the repository.
 
 ## Quickstart
 
-Install, initialize, and run your first workflow in about 5 minutes.
-
 Prerequisites:
 
-- Node.js `>=20.0.0` and npm.
-- Git on `PATH`; `doctor`, setup, and workflow checks read repository facts from Git.
-- Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode installed, with one chosen as the current host. Cursor and OpenCode require explicit `--cursor` / `--opencode` opt-in and are currently generated-runtime preview only.
-- A terminal opened at the root of the project repo where you want to enable `spec-first`. First-time users can try a throwaway/test repo before initializing a real project.
+- Node.js `>=20.0.0`, npm, and Git on `PATH`.
+- One supported AI coding host installed.
+- A terminal opened at the root of the Git repository you want to enable. Use a throwaway repository for the first trial if you prefer.
 
-Prefer fewer steps? After `npm install -g spec-first`, run `spec-first quickstart`: it detects Node.js, Git, and installed host CLIs, then either continues straight into `init` for the one host it found, or falls back to interactive `init` host selection. It is a thin wrapper around `doctor`'s probes and `init`'s existing apply path — it does not run any host-session `spec-*` workflow on its own. The step-by-step path below is the same underlying flow made explicit.
+### 1. Install and initialize
 
-**Step 1 — Install and check health**
+```bash
+npm install -g spec-first
+spec-first quickstart
+```
 
-macOS / Linux:
+`quickstart` checks Node.js, Git, and installed host CLIs. If it finds one host, it continues into that host's existing `init` flow; otherwise it opens interactive host selection. It does not run an LLM workflow for you.
+
+Prefer the explicit path?
 
 ```bash
 npm install -g spec-first
 spec-first doctor
-```
-
-Windows PowerShell 7+ or Windows PowerShell 5.1:
-
-```powershell
-npm install -g spec-first
-spec-first doctor
-```
-
-Windows cmd.exe:
-
-```bat
-npm install -g spec-first
-spec-first doctor
-```
-
-On Win64, prefer native Windows Terminal with PowerShell 7+ or `cmd.exe` for installation and smoke checks. Windows PowerShell 5.1 is supported, but PowerShell 7+ has better UTF-8 behavior.
-
-Expected: `doctor` starts with whether the project is usable, names every affected host, and prints the next action for each issue. “Usable, but needs attention” means there are non-blocking warnings; use `spec-first doctor --verbose` for every check detail, or `spec-first doctor --json` for scripts and CI.
-
-**Step 2 — Initialize the host runtime**
-
-```bash
 spec-first init
 ```
 
-Select your host (Claude Code, Codex, Cursor, Kiro, Qoder, and/or OpenCode), confirm your developer name and language, then confirm the writes. Interactive confirmation uses a summary-first view: generated scale and risk-operation totals are grouped by host, while project-external writes and degraded warnings stay prominent. Individual remove/prune/untrack paths are hidden from the default view. Run `spec-first init --dry-run` explicitly when you need target/host/root details, critical writes, and bounded path samples. In a parent workspace with many child Git repos, `init` defaults to bootstrapping the parent root with its instruction file, `.gitignore`, a missing `CHANGELOG.md`, and the selected host runtime/state. Use `--repo <child>` to initialize only one child repo; use `--all-repos` to initialize the parent workspace and every discovered child repo. Child setup and readiness truth remains local to each child. Scripted `init -y` setup on fresh machines must pass `-u <name>` because there is no prompt to collect a developer name, for example `spec-first init --codex -y -u <name> --lang <zh|en>`. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro, `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder, `spec-first init --cursor -y -u <name> --lang <zh|en>` for Cursor, or `spec-first init --opencode -y -u <name> --lang <zh|en>` for OpenCode. The `init -y` default host set remains Claude Code + Codex; Cursor, Kiro, Qoder, and OpenCode require explicit flags.
+`init` previews and confirms the managed files it will write. For scripted setup, select the host explicitly and provide the developer profile, for example:
 
-Expected: interactive init first presents a host-level confirmation summary, then reports the result as one run-level receipt. `--dry-run` is the detailed view that lists bounded runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, `.qoder/`, or `.opencode/`. Generated copies can be rebuilt any time with `spec-first init`.
-
-Init creates `CHANGELOG.md` only when it is missing; an existing repository changelog remains byte-for-byte user-owned.
-
-If the host reports missing helper or MCP readiness facts, run the unified `spec-runtime-setup` entry in your current host. Its standard flow prepares the required baseline plus CodeGraph and Graphify; `--only` is reserved for advanced subset repair, while `--verify-only` remains non-installing verification.
-
-For a non-Git multi-repo requirement workspace, default `init` remains parent-only: it does not project generated runtime into child repositories. Before a runtime setup mutation, finish the current host's child projection with `spec-first init --all-repos` (or the narrow `spec-first init --repo <child>` repair). Runtime Setup blocks provider and host-config mutation when a selected child's current-host projection is missing or stale; `--plan --all-repos` instead previews each child without writing. `spec-first doctor` presents projection, managed runtime facts, optional workspace graph, and unmanaged external MCP separately — only the first two can contribute to managed readiness.
-
-Graphify is pinned to PyPI `graphifyy@0.9.29` and requires an existing Python `>=3.10` plus `uv` (preferred) or `pipx`. Setup does not bootstrap Python/tool managers or use plain pip. It verifies the direct wheel hash and package identity, generates the local AST graph with Provider-native `extract --code-only` under the default `graphify-out/` root, and refreshes an existing graph with `graphify update` instead of creating spec-first staging or backup directories. A sole legacy `.graphify/` tree is atomically migrated; dual roots fail closed. Normal single-repo commands and hooks do not receive a spec-first `GRAPHIFY_OUT` override, so bare `graphify query` resolves the same current artifact. Graphify output remains advisory navigation only. During an explicit Graphify mutation setup, a verified Python cutover automatically removes a confirmed global `@sentropic/graphify` incumbent and only launcher symlinks proven to resolve into that npm package; diagnostic, plan, and verify-only modes remain read-only.
-
-Graphify Git hook 是可选的 project-local 自动刷新增强。Runtime Setup 使用 `git rev-parse --git-path hooks` 解析有效 hooks root，只有目标位于当前项目内且通过 no-follow symlink containment 时才安装、规范化和验证 hook。用户级或组织级 `core.hooksPath` 指向项目外时，setup 绝不 write/execute/status 或串联外部 hook、不覆盖 local/global Git 配置，只对 `post-commit`/`post-checkout` 做**只读 marker 检测**：命中报 `hook_status=verified-external` + `refresh_mode=commit-hook-external-verified`，缺失报 `blocked` + 一键安装提示。核心 package、host integration、graph integrity 与真实 query 通过时，完整 setup 仍为 ready，`verified-external`/`manual-only` 均只描述 spec-first 只读可验证的 external commit-time posture（非 project-owned verified）。该状态不证明外部 hook 不存在或不会执行；外部 hook execution 保持 unverified。只有源码已变化且消费前需要新的 currentness evidence 时，才按需运行 `spec-runtime-setup --only graphify --refresh`；该命令不是 hooksPath 修复动作，core-ready `unknown` 也不自动触发 refresh。
-
-在**按需求组织的非 Git 多仓父目录**中，首次接入分两阶段：先用 `spec-first init --all-repos`（或逐仓 `spec-first init --repo <child>`）让所选宿主的 child projection current，再运行 `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos a,b` 一次性建立 per-child CodeGraph 战术图和 workspace Graphify 合并图。Manifest 与 `--repos` 取并集；同仓重复声明时保留 manifest 的 alias/entry，CLI 只增补其他仓。构建状态写入 `graphify-out/workspace-graph-state.json`；`workspace-graph-state.v3` 顶层记录 merged artifact SHA-256，并在 repo/merge record 中保留 `promotion_cleanup_pending` 与独立 reason code，其可选 `refresh_hook` 使用 `workspace-child-hook-contract.v2`，只记录 managed block SHA-256、绝对 Node/async/setup/CodeGraph/Graphify 路径、runtime host 与 bundled version。旧 v1/v2 state、v1 hook receipt 或缺失 hook identity 均不自动迁移，升级后需显式重跑 workspace build。`--workspace-graph-status` 保留主要 build reason，同时把 artifact cleanup pending 作为附加事实暴露并阻断 ready；只有在最近构建完整、repo/source snapshot 未变化、两个 hook 内容与 POSIX 执行位仍合法、receipt runtime files/version 未漂移，且每个 child 的 `.codegraph/codegraph.db` 为稳定非 symlink 普通文件、Graphify JSON 通过完整语法校验、路由块齐备时才报告 ready。自动发现只扫描直接子目录；重复 alias 或嵌套仓根会 fail closed。
-
-CodeGraph 1.5.0 的 `serve --mcp` watcher 只覆盖 server 默认项目；通过 `projectPath` 打开的其他子仓不会各自启动 watcher。因此 spec-first contained `post-commit` / `post-checkout` hook 在 lifecycle lease 内先对**全部 confirmed child**执行 bounded `codegraph sync <repo>`，再重建 Graphify 子图并 `merge-graphs`；它不重复 CodeGraph install/init、managed exclude、routing injection 或 hook installation。Graphify 0.9.x 原生 child hook 仍只重建 child 默认输出，不能承担 workspace out-of-tree merged freshness。event lease 负责 single-flight/coalesce/release handoff，writer lifecycle lease 串行后台 refresh、显式 build 与 clean；显式 build/clean 遇到 active writer 会在 mutation 前返回 `workspace-graph-lifecycle-busy`。可恢复的 provider partial（如 CodeGraph sync、Graphify extract/merge 失败）允许下一次 Git 事件重试；需要 owner 确认、路由写入失败或 runtime/hook contract 漂移仍保持显式修复。clean 删除 state 后，旧 trigger/worker 不得复活资产。消费侧只读上报 stale 与 async in-flight/failed；需要即时刷新、非 Git 变化或 hook 不可用时重跑 `--workspace-graph --repos ...`。
-
-
-Cursor note: `spec-first init --cursor` generates the same `spec-*` workflow runtime under `.cursor/skills/**`, spec-first state under `.cursor/spec-first/**`, and project MCP setup targets `.cursor/mcp.json` by default. User-level `~/.cursor/mcp.json` requires `--user-scope` / `CURSOR_USER_SCOPE=1`. Current release evidence records `cursor_loader_validation_unavailable`, so do not treat Cursor as full host support or an `init -y` default.
-
-OpenCode note: `spec-first init --opencode` generates native workflow commands as `.opencode/commands/spec-*.md` so OpenCode exposes `/spec-*`, Agent Skills under `.opencode/skills/**`, and managed state under `.opencode/spec-first/**`. The retired `.opencode/commands/spec/**` namespace is removed during init/clean migration. Runtime Setup targets project `opencode.json` by default; user scope requires explicit `--user-scope` and resolves `${XDG_CONFIG_HOME}/opencode/opencode.json`. A higher-precedence `opencode.jsonc` blocks JSON mutation. Setup adds only exact governed skill permissions, keeps dangerous tools at `ask`, preserves unrelated user configuration, and fails closed on conflicting or unsafe rule order. Until the version-matched host journey closes loader evidence, the strongest claim remains `generated_runtime_preview`.
-
-Cursor/Kiro/Qoder native pointer files: `init --cursor`, `init --kiro`, and `init --qoder` also write `.cursor/rules/spec-first.mdc`, `.kiro/steering/spec-first.md`, and `.qoder/rules/spec-first.md`. These files only point the host back to root `AGENTS.md` and that host's installed `using-spec-first` runtime skill (`.cursor/skills/`, `.kiro/skills/`, or `.qoder/skills/`); they are generated runtime pointers, not a second source of truth. If a same-path user-owned file already exists without the spec-first managed marker, init and clean leave it untouched; init and doctor both report the collision as a warning.
-
-For all init options (flags, scripted mode, multi-repo), see the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md).
-
-**Step 3 — Restart the host**
-
-Restart the host or open a new session so it loads the generated runtime assets. Host-session workflow entries are not shell commands — they run inside the Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode session, not in your terminal.
-
-**Step 4 — Run your first workflow**
-
-Start with `brainstorm` — it is the most natural first entry and writes a visible artifact you can immediately inspect:
-
-```text
-# In any supported host session
-spec-brainstorm "describe your first task here"
+```bash
+spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-**Step 5 — Verify success**
+See the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md) for multi-host, multi-repo, dry-run, preview-host, and Runtime Setup options.
 
-After the brainstorm completes, check your repo for a new file:
+### 2. Restart the host
+
+Restart the selected host or open a new session so it loads the generated runtime assets. `spec-*` workflows run inside the host session, not in your terminal.
+
+### 3. Run the first workflow
+
+Start with a rough product or engineering change:
+
+```text
+spec-brainstorm "Improve onboarding for first-time CLI users"
+```
+
+Then inspect the requirements-only plan created under:
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 ```
 
-That file is your first artifact. The work is now repo-local, inspectable, and ready to hand off to planning. From here, continue to the current host's plan entrypoint.
-
-For subsequent tasks, use this quick route to pick the right entrypoint:
-
-| If your first task is... | Start with... |
-|---|---|
-| A rough idea, feature, or product change | `spec-brainstorm` |
-| An existing PRD, requirement note, or brownfield change request | `spec-prd` |
-| A bug, failing test, stack trace, or abnormal behavior | `spec-debug` |
-| A settled plan, task pack, or scoped implementation request | `spec-work` |
-| A document, plan, task pack, diff, or implementation that needs review | `spec-doc-review` or `spec-code-review` |
-
-Detailed manuals are Chinese-first; this README is the English quick path. Walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
+That file is the completion signal for the first trial: the intent is now repo-local, inspectable, and ready for `spec-plan`.
 
 ## What You Get
 
-A typical workflow chain produces these repo-local artifacts:
+A workflow writes only the artifacts it owns. A typical project may accumulate:
 
 ```text
 docs/
   ideation/      ranked ideas and exploration notes
-  brainstorms/   legacy PRD-grade requirements from spec-prd and older brainstorms
-  plans/         requirements-only Product Contracts and implementation-ready plans
-  tasks/         derived task packs for structured handoff
+  brainstorms/   PRD artifacts produced by spec-prd
+  plans/         requirements-only and implementation-ready plans
+  tasks/         derived task packs for structured execution
   reviews/       document and code review findings
-  solutions/     reusable learnings after solving problems
+  solutions/     reusable, qualified learnings
 .spec-first/
-  workflows/     structured work closeout evidence (gitignored by default)
+  workflows/     structured workflow evidence (gitignored by default)
 ```
 
-Not every workflow writes every artifact. A new `spec-brainstorm` run writes a requirements-only unified plan under `docs/plans/`; `spec-prd` keeps its legacy PRD artifact under `docs/brainstorms/`. Deeper chains add tasks, code changes, review findings, and learnings over time — all inspectable, all in your repository.
+These artifacts are project-owned. Generated host runtime assets are disposable projections and can be rebuilt from source with `spec-first init`.
 
-## Workflow Entry Points
+## Core Workflows
 
-The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge`. Public workflow identifiers use the same `spec-*` form across supported hosts.
+Public workflow identifiers use the same `spec-*` form across hosts. The entry governor chooses one route from the current intent; it does not force every task through a rigid state machine.
 
-| Task | Unified entry | Artifact |
+| Intent | Start with | Primary result |
 |---|---|---|
-| Requirements from a rough idea | `spec-brainstorm` | `docs/plans/` (`requirements-only`) |
-| Requirements from an existing PRD | `spec-prd` | `docs/brainstorms/` |
-| Implementation plan | `spec-plan` | `docs/plans/` |
-| Split a plan into executable tasks | `spec-write-tasks` | `docs/tasks/` |
-| Execute scoped work | `spec-work` | source changes + evidence |
-| Dogfood a branch in browser | `spec-dogfood` | `docs/dogfood-reports/` |
-| Review code | `spec-code-review` | structured findings |
-| Review docs or plans | `spec-doc-review` | structured findings |
-| Preserve or resume cross-session context | `spec-handoff` | `.spec-first/workflows/spec-handoff/` |
-| Capture reusable learning | `spec-compound` | `docs/solutions/` |
+| Explore possible directions | `spec-ideate` | ranked ideas in `docs/ideation/` |
+| Turn a rough idea into requirements | `spec-brainstorm` | requirements-only plan in `docs/plans/` |
+| Refine an existing PRD or brownfield request | `spec-prd` | PRD artifact in `docs/brainstorms/` |
+| Decide how to implement settled requirements | `spec-plan` | implementation-ready plan in `docs/plans/` |
+| Split a plan for structured handoff | `spec-write-tasks` | derived task pack in `docs/tasks/` |
+| Execute scoped work | `spec-work` | source changes plus verification evidence |
+| Diagnose a failure | `spec-debug` | root-cause and verification evidence |
+| Review a document or implementation | `spec-doc-review` / `spec-code-review` | structured findings |
+| Preserve reusable learning | `spec-compound` | qualified solution in `docs/solutions/` |
 
-Before proposing a new abstraction, adapter, orchestrator, integration seam, or durable source, `spec-plan` inventories existing capabilities and chooses semantically among `reuse / extend / compose / new`. `compose` permits thin glue to own only contract translation, sequencing, failure/degradation routing, and observability/evidence; it must not duplicate business truth or parallel durable state. Markdown and HTML are both first-class unified-plan formats: ordinary `spec-doc-review` runs default to report-only, `spec-plan` invokes its own Markdown review with explicit producer-owned `mutation:apply-fixes` so bounded safe writes may apply, HTML review is always report-only, and `spec-plan` owns any deterministic full recompose and re-review. `spec-work` rejects requirements-only artifacts, progress-like readiness values, and duplicate, missing, or conflicting unified metadata, then reads implementation-ready artifacts through stable headings or anchors. These source and projection contracts are not evidence of a real host loader, model quality, or field outcomes.
-
-For a validated task pack, `spec-work` pins artifact-root-relative identity, the task-pack digest, the source-plan body hash, and a fresh source-plan readiness replay before the LLM judges semantic fit. It executes the machine-readable Task Cards and waves without turning the pack into progress or scope authority; a required task review is bounded and report-only, and it must close before dependent work starts. During implementation, work rechecks current source with `reuse / extend / compose / new`: thin glue may coordinate translation, sequencing, failure/partial-failure propagation, degradation, and observability/evidence, but it may not copy domain policy, validation truth, or durable state. Scope-changing public/schema/runtime/provider decisions return to planning.
-
-Repository mutation, reviewer/worker dispatch, commit, and outward landing are separate authorities. `spec-code-review mode:agent` is always report-only; an ordinary review is also report-only unless review-and-fix is explicit, and commit still needs separate authorization. Final work closeout records commands that actually ran and repo-relative redacted logs in `verification-run-summary.v1`, checks structured claims through `honest-closeout.v1`, and writes `spec-work-run-artifact/v2` only when a durable trigger applies. `spec-debug` and `spec-code-review` may return their own run-summary refs and closeout limitations, but they do not own the spec-work run artifact. Prompt/source tests and generated projection prove these contracts exist; they do not prove clean-session model behavior or external adoption outcomes.
-
-Worker dispatch is host-neutral at the Skill layer. The owning workflow supplies the bounded task packet, independent authorization facts, mutation scope, output contract, and stop condition; only the active host session's tool registry/schema owns primitive identity and arguments, and it is consumed as redacted `provider_untrusted` evidence after dispatch authorization exists. `PlatformAdapter.supportsAgents`, generated projections, adapter/project state, CLI help, fixtures, and model self-description are not session capability probes. A live call response and caller-observed pre/post state own permission, capacity, isolation, model/parallelism, output, and mutation facts; dated exact-version journey evidence limits any support claim. See [Worker Dispatch Capability Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/worker-dispatch-capability.md).
-
-The CE 3.20 calibration keeps these boundaries explicit. Repository grounding is fresh per run rather than restored from a cross-run profile cache. Optional code-review, document-review, and POV peers use a bounded lifecycle and may claim independent coverage only from actual provider/model receipts. `spec-work` recovery uses immutable run identity plus append-only, CAS-guarded state snapshots; the authorized LFG tail can watch review, CI, head, and base currency within a fixed budget, but it never auto-merges or rewrites history. `spec-optimize mode:measurement-only` freezes identities, measures A/A noise before A/B, and returns evidence for owner evaluation without changing or promoting a Skill. `spec-write-skill` remains the sole Skill authoring/promotion owner and is intentionally unchanged by that measurement mode.
-
-Canonical artifact roots remain fixed: plans, tasks, brainstorms, solutions, and pulse reports keep their existing `docs/**` owners; recoverable workflow evidence belongs under `.spec-first/workflows/**`; only ephemeral process/provider state belongs in owner-private temporary storage. There is no global `docs_root` switch. Source assets are edited under `skills/`, `templates/`, `src/cli/`, and checked-in docs, then projected to supported host runtime surfaces with `spec-first init`.
-
-When `spec-lfg` reaches an applicable browser flow, the caller must provide an explicit `target-origin:<origin>`; a missing or invalid origin blocks that flow as `target-origin-missing` or `target-origin-invalid`. The caller owns project-server startup, monitoring, and shutdown. `spec-test-browser` validates only the resolved credential-free loopback root origin, runs browser actions through its private wrapper, and cleans up only its own browser session. It neither reads a local runtime profile nor starts, probes, or stops a project server. Browser evidence proves only the observed route/step result at that caller-authorized origin, not that the server represents the current branch. A durable or external UI effect needs separate current-call authorization; pipeline mode records `browser-mutation-authorization-required` without writing the blocked step. Failed browser cleanup still blocks lifecycle, commit, push, PR, and CI side effects.
-
-Runtime Setup reports `agent-browser` installation and browser execution as separate dimensions. A present CLI/runtime/global skill can yield `dependency_status: ready` while `execution_readiness` remains `blocked`. `--allowed-domains`, a help marker, a version allowlist, caller input, or provider self-report cannot confirm exact-origin enforcement; only Spec-First controlled conformance may do that. With the current `agent-browser 0.33.1` capability shape, the safe result remains `exact-origin-capability-unavailable` and zero browser action subprocesses. Reinstalling the same release is not presented as a deterministic capability fix.
-
-Support entrypoints (on demand): `spec-runtime-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, dogfood, and write-skill entries for the current host.
-
-Requirements clarification stays inside its current producer. `spec-ideate` passes a focused evidence snapshot to `spec-brainstorm`; `spec-brainstorm` verifies source facts, asks the current user one product question at a time, and persists blockers/source limitations in the requirements-only Product Contract; `spec-prd` does the same for brownfield PRDs. Project glossary/context/ADR files are advisory inputs only during these workflows—cross-release knowledge is emitted as a qualified promotion candidate for a later explicit maintenance request. Visual or spatial decisions use tables, state sequences, ASCII wireframes, or read-only source screenshots; there is no bundled browser helper.
-
-`spec-write-skill` is a general project-level Agent Skill authoring workbench: it creates or revises a project-owned canonical package, or validates an existing/external package read-only. Full apply records a compact Design Record and minimum pre-patch eval plan; capability maps, explicit shape/module decisions, and topology expand only when they change ownership, consumers, carriers, architecture, or risk. A current explicit create/revise request covers an exact write set that stays in scope; re-confirmation is reserved for scope expansion, uncovered dirty overwrite, or new external/high-risk side effects. Scripts verify source shape plus preview hash/scope/write-set binding, while people/LLMs retain semantic judgment. Model-family work separates model configuration, Skill source, runtime projection, and semantic/field evidence instead of treating prompt edits as model proof. Audit-only quality review stays a bounded review, third-party installation stays with the installer, and generated runtime mirrors are rebuilt from source rather than patched directly.
-
-[→ Full entrypoint reference with routing rules](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
-
-## The Problem
-
-AI can write code quickly. The expensive part is preserving the judgment around the code: why this scope, what evidence was checked, which review findings mattered, and what the next agent or teammate should inherit.
-
-Without a repo-backed trail, that context disappears with the chat window. The next session starts cold, reviewers cannot see why a plan changed, and teams cannot reuse what worked. `spec-first` keeps that work as durable artifacts: requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings.
-
-## Before / After
-
-Concrete scenarios, not outcome claims. Each `spec-first` column names a repo path or contract you can open and check yourself.
-
-| Scenario | Without spec-first | With spec-first |
-|---|---|---|
-| Requirement gets discussed mid-chat | Decision and trade-offs live only in the closed chat window | Written to `docs/plans/` (or `docs/brainstorms/` for `spec-prd`) before implementation starts |
-| Reviewer opens a PR | Sees the diff, not why that scope or approach was chosen | Can open the linked plan/task pack and required review findings alongside the diff |
-| Agent claims "tests passed" | A sentence in the transcript, unverifiable after the session ends | A `verification-run-summary.v1` record with the commands and logs that were actually run |
-| Same bug resurfaces later | Root cause and fix live in old chat history, if anyone remembers | Recorded in `docs/solutions/` via `spec-compound`, with its own applicability limits |
-| New session picks up old work | Agent starts cold; you re-explain scope and prior decisions | `spec-handoff` carries structured context, source refs, and freshness/limitations forward |
-| Same task, different host (Claude Code / Codex / Cursor / …) | Prompts and setup are re-created per host | One source asset set (`skills/`, `templates/`, `src/cli/`) regenerates every supported host's runtime via `spec-first init` |
-
-These are current repo mechanisms you can inspect in this repository today — not a measured productivity claim. See [Why spec-first?](#why-spec-first) below for the underlying model.
-
-## Why spec-first?
-
-`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode; it gives those hosts a project-local harness. Cursor native rules, Kiro native Specs, Qoder native rules, and user-owned OpenCode configuration remain host-owned artifacts; spec-first only treats them as advisory input when explicitly named.
-
-| Adoption question | Prompt pack / agent orchestration | spec-first |
-|---|---|---|
-| What do I get after the first run? | A better chat answer or agent transcript | A repo-local artifact such as a requirements brief or plan |
-| Where do decisions and evidence live? | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
-| What does the human review? | Often the final diff or agent output | Requirements, plans, task packs, diffs, review findings, bugs, and learnings |
-| Who enforces mechanical boundaries? | Mostly model discipline or custom glue | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
-| How do Claude Code, Codex, Cursor, Kiro, Qoder, and OpenCode stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates supported host runtime surfaces |
-
-Current mechanisms you can inspect today:
-
-- Requirements become durable briefs instead of disappearing prompts.
-- Plans and task packs turn vague intent into reviewable execution context; deterministic validation prepares identity/drift facts while the LLM still judges task semantic fit.
-- Work closeout can point to structured verification evidence instead of a free-form "tests passed" claim.
-- Required task-level review is report-only and blocks dependent waves when scope attribution or blocking findings remain unresolved.
-- Work rechecks current owners and thin-glue boundaries before adding durable surfaces, and keeps local mutation separate from commit/landing authority.
-- Work, review, debug, optimize, and compound workflows preserve evidence and learning.
-- Knowledge handoffs stay summary-first, and recalled `docs/solutions/` learnings remain advisory until reconfirmed from source evidence.
-- One source asset set supports unified `spec-*` workflow entries across Claude Code, Codex, Cursor, Kiro, Qoder, and OpenCode without hand-maintaining generated runtime copies.
-
-These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.
-
-## Operating Model
-
-`spec-first` has two durable surfaces: repo-local workflow artifacts and generated host runtime assets.
-
-Source assets (`skills/`, skill-local prompt assets under `skills/**/references/{agents,personas}/`, `templates/`, `src/cli/`) are regenerated by `spec-first init` into host runtime assets — producing repo-local workflow artifacts: `ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`.
-
-Generated `spec-*`, `using-spec-first`, Graphify project-skill, `spec-first/` state, command, hook, and pointer assets under the host roots are disposable and can be rebuilt with `spec-first init`. The host roots are mixed-ownership surfaces: team-authored skills, agents, rules, and portable project configuration outside those namespaced assets may be committed. Cursor project `.cursor/mcp.json`, spec-first managed `.kiro/settings/`, Qoder local `.qoder/settings.local.json`, Qoder `.qoder/settings.json` managed hook entries, and spec-first managed entries inside `opencode.json` are local outputs or managed slices rather than source by default; existing tracked team-policy files are not automatically removed from the Git index. See the gitignore reference for the exact generated paths and opt-in sharing guidance.
-
-Detailed references:
-
-- [Source / Runtime / Provider Customization Boundary](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/source-runtime-customization-boundary.md)
-- [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/catalog/runtime-capabilities.md)
-- [Architecture Overview](https://github.com/sunrain520/spec-first/blob/main/docs/02-%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/01-%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.md)
+Other public entries cover browser dogfooding, optimization, polishing, handoff, skill authoring, and release workflows. See the [complete workflows and artifacts map](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md).
 
 ## Trust Model
 
-Scripts enforce deterministic invariants; scripts prepare facts; the LLM decides semantic adequacy above that floor.
+The core rule is: **scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor.**
 
-- **What scripts do:** enforce mechanically decidable invariants, install, validate, generate, report machine facts.
-- **What the LLM decides:** requirements framing, scope boundaries, tradeoffs, implementation judgment, review evidence.
-- **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, generated mirrors such as `.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, spec-first managed `.kiro/settings/**`, `.qoder/commands/spec-*.md`, retired `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.opencode/commands/spec-*.md`, retired `.opencode/commands/spec/**`, `.opencode/skills/**`, `.opencode/spec-first/**`, spec-first managed Qoder hooks, and host-local config such as `.cursor/mcp.json`, `.qoder/settings.local.json`, and `opencode.json` / `opencode.jsonc` unless the runtime task explicitly needs them.
+- **Scripts and tools own facts:** paths, Git state, hashes, schema checks, exit codes, generation, and machine-readable receipts.
+- **LLMs and people own judgment:** requirements, scope, trade-offs, implementation choices, review conclusions, and business value.
+- **Evidence limits claims:** an artifact, passing source test, or confident model response proves only what its direct evidence supports.
+- **Exit gates stay explicit:** local mutation, worker dispatch, commit, push, handoff, and durable knowledge promotion are separate authorities.
+- **Source stays authoritative:** edit `skills/`, `templates/`, `src/cli/`, and checked-in docs; do not patch generated runtime mirrors as source fixes.
 
-[→ Full trust model and verification contracts](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
+For the full boundaries, read the [source/runtime contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/source-runtime-customization-boundary.md), [runtime capability catalog](https://github.com/sunrain520/spec-first/blob/main/docs/catalog/runtime-capabilities.md), and [honest closeout contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md).
 
-## Use spec-first when
+## Host Support
 
-Use `spec-first` when:
+Host delivery and host evidence are different claims. A generated projection does not by itself prove that a host loader discovered and invoked it correctly.
 
-- You already use Claude Code, Codex, Kiro, Qoder, Cursor, or OpenCode and want project-local workflows instead of one-off prompts.
-- You want AI coding work to leave durable requirements, plans, explicitly routed review summaries, and learnings.
-- You want scripts to handle deterministic setup and enforce machine-checkable boundaries while keeping semantic judgment with the LLM.
-- You want a lightweight workflow layer that can be regenerated from source assets.
+| Host | Current posture | Setup |
+|---|---|---|
+| Claude Code | primary supported host | interactive `init` or `--claude` |
+| Codex | primary supported host | interactive `init` or `--codex` |
+| Kiro | opt-in preview | `--kiro` |
+| Qoder | opt-in preview | `--qoder` |
+| Cursor | opt-in `generated_runtime_preview`; local loader journey remains unverified | `--cursor` |
+| OpenCode | opt-in `generated_runtime_preview`; version-matched loader journey remains unverified | `--opencode` |
 
-It may not fit when you only need a single prompt snippet, a generic agent marketplace, a no-host standalone app, or a team process that does not want workflow artifacts written into the repo.
+Run `spec-first doctor --verbose` for current project facts. The [runtime capability catalog](https://github.com/sunrain520/spec-first/blob/main/docs/catalog/runtime-capabilities.md) is the detailed support reference.
 
 ## Documentation
 
 **Get started**
-- [spec-first.cn](http://spec-first.cn/) — official site
-- [Chinese User Manual](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
-- [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)
-- [Chinese Workflows and Artifacts Map](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
+
+- [User manual](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
+- [First workflow walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)
+- [Artifact catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md)
 
 **Understand the model**
-- [Chinese Architecture Overview](https://github.com/sunrain520/spec-first/blob/main/docs/02-%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/01-%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.md)
-- [Source / Runtime / Provider Customization Boundary](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/source-runtime-customization-boundary.md)
-- [Verification Run Summary Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/verification/verification-run-summary.md)
-- [Honest Closeout Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
-- [Chinese Release Notes](https://github.com/sunrain520/spec-first/blob/main/docs/08-%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0/README.md)
 
-Detailed manuals and implementation docs are currently Chinese-first.
+- [Project role contract](https://github.com/sunrain520/spec-first/blob/main/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
+- [Runtime capability catalog](https://github.com/sunrain520/spec-first/blob/main/docs/catalog/runtime-capabilities.md)
+- [Verification run summary contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/verification/verification-run-summary.md)
 
-## Runtime And CLI Reference
+Detailed manuals are Chinese-first; this README is the English quick path.
 
-First-run users: `source assets -> spec-first init -> host runtime assets -> workflow artifacts`.
-
-Key commands:
+## CLI Reference
 
 ```bash
-spec-first doctor    # check health
-spec-first init      # generate runtime
-spec-first update    # upgrade CLI + refresh runtime
-spec-first clean     # remove generated runtime
-spec-first plans audit --status completed --json  # 只读盘点 Markdown code plan 的 lifecycle marker
+spec-first doctor      # inspect environment and managed runtime health
+spec-first quickstart  # detect prerequisites and continue into init
+spec-first init        # generate selected host runtime assets
+spec-first update      # upgrade the CLI and refresh runtime assets
+spec-first clean       # remove selected generated runtime assets
+spec-first plans audit --status completed --json
 ```
 
-新的 Markdown software unified plan 以 `status: active` 创建；拥有完整 shipping tail 的 workflow 只有在 verification、required review 与 residual gate 收口后，才把 direct plan 或 task pack 的 `source_plan` 更新为 `completed`。`plans audit` 只扫描当前仓库 `docs/plans/*.md` 的直接普通文件，不写文件、不扫描 HTML。`completed` 只是 lifecycle marker，不是 tests、CI、merge、release 或 field outcome 证据。
-
-[→ Full CLI reference with all flags and options](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
+Use `spec-first --help` and the [user manual](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md) for all commands and options.
 
 ## Development & Contributing
 
 ```bash
 npm run typecheck
-npm run test:runtime-setup
 npm run test:unit
 npm run test:smoke
 npm run test:integration
-npm run test:ai-dev:gate
 npm run test:release
-npm run test:release:website
 npm run build
-npm test
 ```
 
-`npm run build` runs `npm pack --dry-run` and verifies the package payload shape through npm.
+`npm run build` performs `npm pack --dry-run` and validates the package payload shape. Source changes belong in canonical source surfaces; regenerate runtime copies with `spec-first init` only when those runtime sources change.
 
-When changing source assets, edit `skills/`, skill-local prompt assets under `skills/**/references/{agents,personas}/`, `templates/`, or `src/cli/`, then regenerate runtime copies with `spec-first init` and choose the target host in a fresh host session.
-
-For contribution and support details, see [CONTRIBUTING.md](https://github.com/sunrain520/spec-first/blob/main/CONTRIBUTING.md), [SECURITY.md](https://github.com/sunrain520/spec-first/blob/main/SECURITY.md), [LICENSE](https://github.com/sunrain520/spec-first/blob/main/LICENSE), and [GitHub Issues](https://github.com/sunrain520/spec-first/issues).
+See [CONTRIBUTING.md](https://github.com/sunrain520/spec-first/blob/main/CONTRIBUTING.md), [SECURITY.md](https://github.com/sunrain520/spec-first/blob/main/SECURITY.md), [LICENSE](https://github.com/sunrain520/spec-first/blob/main/LICENSE), [release history](https://github.com/sunrain520/spec-first/blob/main/CHANGELOG.md), and [GitHub Issues](https://github.com/sunrain520/spec-first/issues).
