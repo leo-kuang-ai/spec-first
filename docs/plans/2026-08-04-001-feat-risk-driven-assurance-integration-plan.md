@@ -19,7 +19,7 @@ execution: code
 - **Verification focus:** 检查风险到验证的可追溯性、最后一次 mutation 后的 fresh rerun、not-run/degraded claim ceiling、TDD 历史证据边界，以及多 workflow artifact ownership。
 - **Largest risk:** 将 assurance posture、mutation/property 等机制误变成所有任务的固定仪式，或引入 `EVIDENCE.md` / `gauntlet.sh` 造成第二事实源。
 - **Authority:** Product Contract 继续拥有 WHAT；`spec-plan` 拥有 assurance 语义与验证设计；`spec-work`、`spec-debug` 和 `spec-code-review` 只对真实执行结果作结构化记录；脚本只准备事实和校验确定性不变量。
-- **Stop conditions:** 发现需要改变产品 acceptance、公共 contract、source/runtime ownership、现有 schema 语义、commit/landing 授权边界，或需要新增通用 workflow 时，停止当前实现并返回 `spec-plan` 重新规划。
+- **Stop conditions:** 发现需要改变产品 acceptance、source/runtime ownership、commit/landing 授权边界，或需要在本计划明确的 duplicate-check-id validation hardening 之外改变公共 artifact schema/语义、增加通用 workflow 时，停止当前实现并返回 `spec-plan` 重新规划。
 - **Tail ownership:** 后续 `spec-work` 负责实现、review follow-up、最终 verification、honest closeout 和可选的 `spec-work-run-artifact/v2`；本计划本身不授权实现、测试、commit 或 landing。
 
 ---
@@ -49,7 +49,7 @@ spec-first 已经有证据记录和 closeout contract，但风险驱动的验证
 #### Execution evidence
 
 - R4. `spec-work` 必须在第一个 behavior-bearing mutation 前选择最小 feedback loop，并在适用时保留 observed RED 或 characterization evidence；没有 run-local RED 不能声称 TDD 历史。
-- R5. 对计划声明 required 的 mutation、property、changed-line coverage、hostile-input、regression-reproducer 或 real-execution check，执行结果必须进入现有 `verification-run-summary.v1`，未运行时记录具体 `not-run` / `degraded` reason。
+- R5. 对计划声明 required 的 mutation、property、changed-line coverage、hostile-input、regression-reproducer 或 real-execution intent，只有在绑定真实非空 command 后，执行结果才进入现有 `verification-run-summary.v1`；bounded provider invocation 也必须提供可回源的非空 canonical command identity。尚未绑定可执行入口时必须保留为 plan/task limitation；不得用占位 command 伪造 `not-run`、`degraded` 或 `passed` check。
 - R6. 最后一次代码 mutation、simplify 或 review-fix 后，必须对受影响的 Verification Contract 重新执行；旧的绿色结果不能充当最终树证据。
 - R7. `honest-closeout.v1` 的 validation claim 只能引用真实记录的 `verification-run-summary:<check-id>`；provider readiness、自然语言声明和历史 transcript 不能提升 claim。
 
@@ -62,6 +62,7 @@ spec-first 已经有证据记录和 closeout contract，但风险驱动的验证
 - R12. `spec-test-browser`、`spec-test-xcode` 等真实执行 provider 只返回带 provenance、freshness 和 limitation 的 evidence，由 caller 写入自己的 run summary；provider 内部实现不成为 workflow contract。
 - R13. 不创建新的公共 `spec-assurance` workflow、第二套 `EVIDENCE.md`、通用 `gauntlet.sh`、全局强制 mutation/property 流程或新的中心状态机。
 - R14. SPEC 批准、工具安装、mutation、commit 和 landing 必须保持分离授权；任何集成不得把其中一个授权推导成另一个。
+- R15. 同一份 `verification-run-summary.v1` 中的 check id 必须唯一并使用 `<owner>.<intent>[.<scope>]` 命名空间；validator 必须在 closeout 构造 id map 前拒绝重复 id，防止后项静默覆盖前项。
 
 ### Actors and Responsibilities
 
@@ -119,6 +120,16 @@ spec-first 已经有证据记录和 closeout contract，但风险驱动的验证
   - **When:**执行 assurance workflow。
   - **Then:**只执行已授权的 planning/verification 范围，不能从 plan、绿测或 checkpoint 自动推导其他副作用授权。
 
+- AE10. **Unbound intent is not a synthetic check**
+  - **Given:** 计划要求 property 或 real-execution proof，但目标 repo 还没有真实 command 或 provider invocation。
+  - **When:** `spec-work` 准备 verification summary。
+  - **Then:** 该 intent 留在 plan/task limitation，并阻断相应 verified claim；summary 不写占位 command，也不生成虚假的 not-run check。
+
+- AE11. **Duplicate check identity fails closed**
+  - **Given:** 两个 owner 或两个执行步骤准备写入相同 check id。
+  - **When:** summary validator 或 honest closeout 读取该 artifact。
+  - **Then:** validator 返回确定性 duplicate-id reason，closeout 不构造有损 map，也不接受后项覆盖前项。
+
 ### Scope Boundaries
 
 #### In scope
@@ -163,7 +174,7 @@ spec-first 已经有证据记录和 closeout contract，但风险驱动的验证
 
 #### 第三重审视：关键事实与综合架构
 
-当前 source 已有 `spec-work/references/feedback-and-tests.md`、`spec-plan/references/high-risk-plan-lens.md`、`verification-profile.v1`、`verification-run-summary.v1`、`honest-closeout.v1` 和 `spec-work-run-artifact/v2`。这些能力分别拥有反馈回路、风险 lens、命令身份、实际结果、claim validator 和 spec-work durable artifact。`verification-run-summary.v1` 的 check id 是开放字符串，能够记录 mutation、property、real-execution 等风险触发 check，而不需要 schema bump。
+当前 source 已有 `spec-work/references/feedback-and-tests.md`、`spec-plan/references/high-risk-plan-lens.md`、`verification-profile.v1`、`verification-run-summary.v1`、`honest-closeout.v1` 和 `spec-work-run-artifact/v2`。这些能力分别拥有反馈回路、风险 lens、命令身份、实际结果、claim validator 和 spec-work durable artifact。`verification-run-summary.v1` 的 check id 是开放字符串，能够记录 mutation、property、real-execution 等风险触发 check；但当前 validator 没有拒绝重复 id，而 closeout 会按 id 构造 map，因此 Phase 1 必须先补唯一性验证和 owner 命名空间约定。
 
 **这一重审视改变了什么：** 架构姿态确定为 `extend`：`spec-plan` 决策、`spec-work` 执行、现有 summary/closeout 记录；不创建 `EVIDENCE.md`、`gauntlet.sh` 或新的公共 owner。
 
@@ -171,9 +182,9 @@ spec-first 已经有证据记录和 closeout contract，但风险驱动的验证
 
 最强反方认为，完整的独立 assurance workflow 更容易培训、审计和复用，也可能比分散到多个 skill 更不容易漏步骤。该反方在高风险 regulated project 或已有成熟 mutation/property runner 的团队中成立。
 
-本方案的前提是 spec-first 已经拥有足够稳定的 artifact/closeout 基础，且大多数任务不需要全量 gauntlet。如果该前提被 field benchmark 推翻，或多个 caller 反复丢失同一 trace，结论必须升级：先补现有 owner 的 contract，再考虑独立 wrapper。
+本方案的前提是 spec-first 已经拥有足够稳定的 artifact/closeout 基础、现有字段可以无损承载 acceptance-to-check trace，且大多数任务不需要全量 gauntlet。字段承载能力不得留到全量实现后再判断：U0 必须先完成 plan → task → summary → closeout 的 trace-carrier spike。若 spike 失败、早期 Gate A 没有显示收益，或多个 caller 反复丢失同一 trace，停止后续 owner 扩展；先决定 additive field/contract，再考虑独立 wrapper。
 
-**这一重审视改变了什么：** 推荐级别降为 Trial，不声称 Adopt 已被 field outcome 验证；同时把代表性任务对照实验和 invalidation condition 写入 DoD。
+**这一重审视改变了什么：** 推荐级别降为 Trial，不声称 Adopt 已被 field outcome 验证；同时把字段承载 spike、U1/U2 后的早期否证 Gate A、最终三组对照实验、预注册阈值和 invalidation condition 写入实施顺序与 DoD。
 
 #### 第五重审视：全貌理解与可验证收束
 
@@ -198,11 +209,12 @@ flowchart LR
 - KTD1. **Architecture posture = `extend` existing owners.** `spec-plan` 和 `spec-work` 已分别拥有 planning 与 execution contract；新增机制应落在既有 skill-local references、现有 Verification Contract 和现有 artifacts 中。新 reference 文件只作为同一 owner 的 progressive-disclosure surface，不形成新的 workflow owner。
 - KTD2. **Assurance posture is semantic prose, not a schema enum.** 推荐用 `lightweight`、`standard`、`high-assurance` 描述验证姿态，但必须附理由、触发风险、claim ceiling 和降级条件。脚本不得根据 posture 自动决定命令集合。
 - KTD3. **Failure model precedes check selection.** 先问“什么会坏、谁受影响、如何发现、如何恢复”，再选择 unit、integration、property、mutation、coverage 或真实执行。不能用 coverage 百分比替代 failure model。
-- KTD4. **Use existing check identity and evidence contracts.** 风险触发 check 使用现有 profile/summary 的开放 `id` 字段，例如 `mutation`、`property`、`changed-line-coverage`、`hostile-input`、`regression-reproducer` 和 `real-execution`。没有可执行 command 时必须记录 not-run/degraded，而不是创建虚假 passed。
+- KTD4. **Use namespaced, executable check identity.** 风险触发 check 复用现有 profile/summary 的字符串 `id` 字段，但统一写为 `<owner>.<intent>[.<scope>]`，例如 `spec-work.mutation.auth-policy`、`spec-debug.regression-reproducer.issue-123`、`spec-test-browser.real-execution.checkout`。同一 summary 中重复 id 必须在 closeout 前 fail closed。没有真实非空 command identity 时，该 intent 留在 plan/task limitation；provider invocation 也必须给出 canonical command identity，不得创建占位 summary check。
 - KTD5. **No automatic profile mutation.** 第一阶段不把所有风险 check 添加到团队默认 profile；plan 的 Verification Contract 声明 required intent，执行时由目标 repo 已有 profile、明确命令或 bounded provider 提供事实。需要扩展默认 profile 时，另开明确的 profile/config 变更。
 - KTD6. **Freshness after tail mutations is mandatory.** simplify、review fix、fixture change 或行为代码修改后，受影响 checks 必须重新执行，并生成新的 summary/fingerprint。
 - KTD7. **Authorization remains orthogonal.** SPEC approval only confirms scope/WHAT；dependency install、test mutation、commit、push/landing 分别需要自己的 authorization。
 - KTD8. **Evidence ownership remains asymmetric.** `verification-run-summary.v1` 是共享 command-result surface；`honest-closeout.v1` 是 validator output；只有 `spec-work` 可选写 `spec-work-run-artifact/v2`。debug/review 不得写该 artifact。
+- KTD9. **Adoption thresholds are frozen before implementation results.** U0 先固定 Trial cases、三组 arms、rubric、阈值、artifact 路径和 rerun contract；实施结果只能触发预注册的 Adopt Trial / Defer / Rollback，不得事后改口径。脚本只验证 schedule、receipt、hash 和指标完整性；语义评分由独立 fresh reviewer 或 human adjudicator 完成。
 
 ### Assurance Posture Contract
 
@@ -211,9 +223,11 @@ flowchart LR
 ```text
 Assurance posture: <lightweight | standard | high-assurance, or explicit equivalent>
 Why this posture: <risk, ambiguity, irreversibility, impact surface, and rollback facts>
+Largest unproven risk: <the highest-loss assumption that current evidence does not establish>
 Failure model: <failure mode -> affected actor/surface -> detection -> recovery>
 Required proof: <acceptance/failure group -> verification intent/check id>
 Optional proof: <useful but non-blocking checks>
+Deferred proof: <proof intentionally postponed -> owner -> activation or reevaluation condition>
 Not applicable: <checks considered and rejected with reason>
 Degraded path: <missing tool/environment -> reason_code -> claim ceiling>
 Freshness rule: <what must rerun after implementation/review/simplify mutation>
@@ -260,7 +274,7 @@ The PRD should carry product meaning such as “denied actor sees X” or “dup
 
 #### `spec-plan`
 
-At planning time, inspect current source and the high-risk lens. Add the assurance posture contract, failure model, and mapping to Verification Contract. The plan must state why a stronger check is not applicable when a reviewer could reasonably expect it. A missing command is a limitation to be handed to `spec-work`; it is not permission to mark the check passed.
+At planning time, inspect current source and the high-risk lens. Add the assurance posture contract, largest unproven risk, failure model, deferred proof and mapping to Verification Contract. The plan must state why a stronger check is not applicable when a reviewer could reasonably expect it. A missing command is a limitation to be handed to `spec-work`; until a real executable command or bounded provider invocation is bound, it must not be serialized as a synthetic run-summary check.
 
 Do not encode posture as frontmatter, a finite enum, or an automatic route. The existing `artifact_readiness` still answers whether the plan is executable; assurance posture answers how the plan should be proven.
 
@@ -274,7 +288,7 @@ If a task cannot be mapped to an acceptance or verification signal, set `stop_if
 
 Before behavior mutation, choose the smallest loop from `feedback-and-tests.md`. For high-assurance posture, use risk-first or proof-first when the highest-loss assumption can be falsified cheaply. Select mutation/property/coverage/real-execution only when the failure model gives them a purpose.
 
-After every implementation, simplify, or review-fix mutation that can affect the claim, rerun affected checks. The final summary must contain only commands actually run in this invocation, and the final fingerprint must be captured after those checks.
+After every implementation, simplify, or review-fix mutation that can affect the claim, rerun affected checks. The final summary must contain only real commands/provider invocations handled by the summary contract, use unique namespaced check ids, and reject duplicates before closeout. The final fingerprint must be captured after those checks.
 
 #### `spec-debug`
 
@@ -293,6 +307,8 @@ Browser/Xcode providers return real execution evidence only for the observed rou
 | Failure | Deterministic fact | Semantic response | Recovery / exit behavior |
 | --- | --- | --- | --- |
 | Required tool missing | `missing_tools`, `reason_code: missing_dependency`, `status: not-run` | Decide whether replacement evidence closes the claim | Keep unit incomplete or downgrade claim; never promote to passed |
+| Required intent has no command/provider binding | Plan/task limitation with owner and activation condition; no summary check | Decide whether to bind an executable entry, defer, or narrow the claim | Do not synthesize a command or summary result; block the unsupported verified claim |
+| Duplicate summary check id | Validator duplicate-id reason before closeout map construction | Rename with `<owner>.<intent>[.<scope>]` and determine whether both executions are required | Reject the summary; never let the later check overwrite the earlier check |
 | Command dry-run only | `ran: false`, `reason_code: schedulable` | Decide which claim remains unsupported | Require executable alternative or explicit degraded closeout |
 | Provider unavailable | Provider status, freshness and limitation | Bound surface claim to code-level or partial evidence | Caller records degraded evidence; no provider-internal claim |
 | Acceptance/failure mapping unclear | Missing plan prose, not a script error | Return to `spec-plan` or Product Contract owner | Do not invent test scope in `spec-work` |
@@ -302,13 +318,13 @@ Browser/Xcode providers return real execution evidence only for the observed rou
 
 ### Compatibility and Migration
 
-Phase 1 is additive prose and eval guidance. Existing plans without an assurance section remain valid; consumers interpret absent posture as “use existing feedback-and-tests and high-risk lens” rather than failing the artifact. Existing verification profiles and summaries remain schema-compatible.
+Phase 1 is additive prose/eval guidance plus duplicate-check-id validation hardening. Existing plans without an assurance section remain valid; consumers interpret absent posture as “use existing feedback-and-tests and high-risk lens” rather than failing the artifact. Existing verification profiles and summaries retain their fields and schema version, but a summary containing duplicate check ids becomes invalid because it cannot support an unambiguous closeout claim. The changelog and focused downstream tests must call out this accepted-set tightening.
 
 Phase 2 can add a reference file under an existing skill owner and focused contract/eval cases. It must not alter generated runtime directly. If source prose changes host projection, run `spec-first init` only through an explicitly authorized runtime-maintenance path.
 
 Phase 3 is optional schema evolution only after benchmark evidence shows a deterministic consumer gap. Any schema change requires version note, downstream consumer tests, migration/read compatibility, and changelog entry.
 
-Rollback is a source revert of the added prose/eval changes. Because no runtime mirror, durable state schema, or default verification profile is mutated in Phase 1, rollback does not require data migration.
+Rollback is a source revert of the added prose/eval and validator-hardening changes. Because no runtime mirror, durable state field/schema version, or default verification profile is mutated in Phase 1, rollback does not require data migration; retained historical summaries with duplicate ids remain explicitly ambiguous evidence and cannot support a verified closeout claim.
 
 ### System-Wide Impact
 
@@ -316,8 +332,8 @@ Rollback is a source revert of the added prose/eval changes. Because no runtime 
 | --- | --- | --- |
 | Product / PRD | in-scope | Acceptance examples become more observable and include relevant negative paths |
 | Plan / tasks | in-scope | Assurance posture and trace flow through existing sections/fields |
-| CLI / schemas | deferred | No schema or CLI change until consumer evidence proves a gap |
-| Verification helpers | in-scope as consumers | Record arbitrary check ids already allowed by current contract |
+| CLI surface / schema fields | deferred | No public CLI or additive schema field until consumer evidence proves a gap |
+| Verification helpers | in-scope | Preserve current result fields, require namespaced unique ids and reject duplicates before closeout |
 | Browser / iOS | in-scope as providers | Return bounded real-execution evidence; no automatic universal invocation |
 | Runtime generation | out-of-scope | Do not hand-edit generated mirrors; regenerate only if source projection changes and is authorized |
 | Knowledge promotion | deferred | Only verified, reusable lessons with invalidation conditions can enter `docs/solutions/` |
@@ -328,21 +344,47 @@ Rollback is a source revert of the added prose/eval changes. Because no runtime 
 - Direct source evidence: current `spec-plan`, `spec-work`, `spec-debug`, `spec-write-tasks`, `spec-code-review`, verification contracts, closeout contracts and focused tests in this repository.
 - External evidence: the user-provided `old-coder` source and its `gauntlet` reference were read as advisory input; they are not source-of-truth for spec-first ownership or authorization.
 - Snapshot: repository `HEAD` was `d989629c` during planning. The worktree already contained unrelated user changes in README, CHANGELOG, an SVG asset and `tests/unit/readme-community-entry.test.js`; those changes are preserved and are not evidence that this plan is implemented.
-- Provider limitation: no independent subagent or fresh field benchmark was authorized or run during this planning pass. Semantic conclusions are therefore a Trial recommendation, not a confirmed outcome.
-- Document-review envelope: `review_status: degraded`; `reason_code: dispatch_authorization_missing`; `independent_review: not_run`; `fresh_source_eval: not_run`; `fixes_applied: 0`; limitation: this pass used bounded producer self-review only because independent reviewer/worker dispatch was not authorized. This is not a `Doc review clean` or `fresh-source eval passed` claim.
+- Provider limitation: no fresh field benchmark has run. Semantic conclusions are therefore a Trial recommendation, not a confirmed outcome.
+- Document-review envelope: on 2026-08-05 the plan received authorized independent coherence, feasibility and adversarial reviewer passes. Twelve actionable findings were synthesized; this revision applies their plan-level fixes. External cross-model peer review and implementation fresh-source eval remain `not_run`, so this is not a field-outcome or implementation-validation claim.
 - Runtime limitation: no generated runtime refresh, host loader run, browser run, Xcode run or production/field outcome was performed for this plan.
 
 ### Deferred Implementation Unknowns
 
 - Which target repositories already expose mutation, property, changed-line coverage, browser, iOS or hostile-input commands in their explicit verification profile.
-- Whether each consumer can preserve acceptance-to-check references in current prose without a small additive field.
 - Which representative task families produce measurable quality-adjusted throughput improvement without inflating low-risk task cost.
 
-These unknowns do not block the plan because they are execution-time facts. If any answer changes Product Contract, source ownership, schema compatibility or default workflow routing, stop and return to planning.
+Command/provider availability remains an execution-time fact and does not authorize a synthetic summary record. Trace-carrier sufficiency is no longer deferred: U0 must prove it before broad implementation. If that spike or any remaining unknown changes Product Contract, source ownership, schema compatibility or default workflow routing, stop and return to planning.
 
 ---
 
 ## Implementation Units
+
+Dependency order, not numeric label order, controls execution:
+
+```text
+U0 -> U4 -> U1 -> U2 -> Gate A -> U3 -> U5 -> U6 -> final U7 -> U8
+```
+
+Gate A is the early U7 checkpoint defined below. It must complete before U3 starts; a Rollback or Defer decision stops the remaining owner expansion.
+
+### U0. Pre-register the Trial and prove trace-carrier feasibility
+
+- **Goal:** Before broad owner changes, prove that current plan/task/summary/closeout fields can carry one complete assurance trace without loss, and freeze the experiment contract before implementation results exist.
+- **Requirements:** R1, R2, R5, R7, R9, R15.
+- **Files:** `skills/spec-plan/evals/risk-driven-assurance-trial.json` (new frozen Trial manifest), `tests/unit/risk-driven-assurance-trial-contracts.test.js` (new deterministic contract test), `src/cli/helpers/verification-run-summary.js`, `tests/unit/verification-run-summary.test.js`, `tests/unit/honest-closeout.test.js`, `docs/contracts/workflows/risk-driven-assurance-trial.md` (new artifact contract and runbook; no result claims before execution).
+- **Approach:**
+  1. Materialize one controlled high-risk fixture through plan requirement/acceptance refs, task `requirement_refs` / `test_focus` / `done_signal`, a namespaced executable summary check and honest closeout.
+  2. Assert that every source anchor, intent, owner, command identity, result reference, limitation and freshness fact survives the chain without an additive schema field.
+  3. Add deterministic rejection for duplicate summary check ids before closeout map construction. Preserve existing fields and schema version; document the stricter accepted set.
+  4. Freeze the U7 case ids, arms, invocation profile, rubric, thresholds, artifact paths, balanced order and rerun rule in the Trial manifest. The deterministic test validates completeness and hashes, not semantic quality.
+- **Test scenarios:**
+  1. A complete trace reaches closeout with no ambiguous or dropped anchor.
+  2. A required intent without a real command/provider binding remains a limitation and cannot be serialized with a placeholder command.
+  3. Duplicate `spec-work.real-execution` ids fail with a stable duplicate-id reason before honest closeout consumes them.
+  4. The Trial manifest rejects missing cases, arms, thresholds, invocation profile, artifact paths or adjudication rules.
+- **Verification:** `npm run test:jest -- tests/unit/risk-driven-assurance-trial-contracts.test.js tests/unit/verification-run-summary.test.js tests/unit/honest-closeout.test.js --runInBand`, `npm run typecheck`, and manual inspection of the controlled trace receipt.
+- **Dependencies:** None.
+- **Stop if:** Any load-bearing trace needs a new deterministic field, duplicate-id hardening requires ambiguous compatibility behavior, or the experiment cannot freeze comparable baseline/integrated inputs. Return to `spec-plan` for an explicit schema/version decision before U1–U6.
 
 ### U1. Add the assurance posture and failure-model planning contract
 
@@ -351,13 +393,13 @@ These unknowns do not block the plan because they are execution-time facts. If a
 - **Files:** `skills/spec-plan/SKILL.md`, `skills/spec-plan/references/high-risk-plan-lens.md`, `skills/spec-plan/references/assurance-posture.md` (new owner-local progressive-disclosure reference), `tests/unit/spec-plan-contracts.test.js`, `tests/unit/spec-plan-quality-contracts.test.js`, `skills/spec-plan/evals/output-quality-cases.json`, `skills/spec-plan/evals/examples.json`.
 - **Approach:** Reuse the high-risk trigger matrix and plan section contract. Put durable rules in `SKILL.md` and detailed calibration/examples in the owner-local reference. Preserve semantic judgment in prose; scripts only assert required headings/anchors and explicit boundary phrases.
 - **Test scenarios:**
-  1. A high-risk plan includes failure model, invariant/rollback/observability decisions and acceptance-to-check mapping.
+  1. A high-risk plan includes largest unproven risk, failure model, invariant/rollback/observability decisions, deferred proof and acceptance-to-check mapping.
   2. A low-risk plan can remain lightweight without mutation/property/full-suite requirements.
   3. Posture labels are not added to frontmatter enum, CLI classifier or workflow state schema.
   4. Missing verification command becomes a visible limitation/degraded path, not a passed check.
   5. A Product Contract ambiguity keeps readiness below implementation-ready and routes back to the owner.
 - **Verification:** Focused contract tests, plan eval fixture structural assertions, `npm run lint:skill-entrypoints`, fresh-source eval.
-- **Dependencies:** None.
+- **Dependencies:** U0 and U4; U4 owns the observable Product Contract inputs that U1 consumes.
 - **Stop if:** An implementation requires a new schema field, profile default or public command not covered by this plan.
 
 ### U2. Add risk-triggered feedback and final-tree freshness to `spec-work`
@@ -379,7 +421,7 @@ These unknowns do not block the plan because they are execution-time facts. If a
 ### U3. Strengthen reproducer-to-regression verification in `spec-debug`
 
 - **Goal:** Make bug closeout distinguish original reproducer, regression test and broader verification, with risk-triggered hostile-input/property/mutation escalation.
-- **Requirements:** R4, R5, R7, R11.
+- **Requirements:** R4, R5, R6, R7, R11.
 - **Files:** `skills/spec-debug/SKILL.md`, `skills/spec-debug/references/defense-in-depth.md`, `skills/spec-debug/references/anti-patterns.md`, `tests/unit/spec-debug-contracts.test.js`, `docs/contracts/workflows/spec-debug-input-output.md`.
 - **Approach:** Extend existing causal-chain and not-run rules. Keep `spec-debug` summary/closeout ownership and explicitly prohibit writing `spec-work-run-artifact/v2`.
 - **Test scenarios:**
@@ -403,7 +445,7 @@ These unknowns do not block the plan because they are execution-time facts. If a
   3. Guidance does not emit a mechanical test matrix or implementation command.
   4. Product blocker remains a blocker rather than being converted into a silent planning assumption.
 - **Verification:** Focused PRD contract tests, eval fixture shape checks, fresh-source eval.
-- **Dependencies:** None; U1 consumes the output.
+- **Dependencies:** U0. U4 must complete before U1 because U1 consumes its Product Contract output.
 - **Stop if:** A requested negative path changes product scope or acceptance and needs Product Owner confirmation.
 
 ### U5. Preserve assurance trace in task packs and code review
@@ -425,32 +467,53 @@ These unknowns do not block the plan because they are execution-time facts. If a
 
 - **Goal:** Ensure browser/Xcode evidence, refactor assistance and LFG orchestration preserve assurance posture and limitation semantics.
 - **Requirements:** R6, R12.
-- **Files:** `skills/spec-test-browser/SKILL.md`, `skills/spec-test-xcode/SKILL.md`, `skills/spec-simplify-code/SKILL.md`, `skills/spec-lfg/SKILL.md`, `skills/spec-test-browser/references/pipeline-orchestration.md`, `tests/unit/spec-test-browser-contracts.test.js`, `tests/unit/spec-lfg-contracts.test.js`, `tests/unit/spec-work-implementation-quality-contracts.test.js`.
+- **Files:** `skills/spec-test-browser/SKILL.md`, `skills/spec-test-xcode/SKILL.md`, `skills/spec-simplify-code/SKILL.md`, `skills/spec-lfg/SKILL.md`, `skills/spec-test-browser/references/pipeline-orchestration.md`, `tests/unit/spec-test-browser-contracts.test.js`, `tests/unit/spec-test-xcode-contracts.test.js` (new), `tests/unit/spec-simplify-code-contracts.test.js` (new), `tests/unit/spec-lfg-contracts.test.js`, `tests/unit/spec-work-implementation-quality-contracts.test.js`.
 - **Approach:** Keep each existing owner. Providers return bounded evidence to the caller; simplify is REFACTOR assistance; LFG forwards posture and reruns final verification after review/fix. Do not auto-invoke browser or Xcode for every high-assurance task.
 - **Test scenarios:**
   1. Browser provider records actual route execution and limitation when exact-origin or runtime readiness blocks the run.
   2. Xcode provider remains user-invoked and does not become a universal workflow dependency.
   3. Simplify cannot remove or weaken required behavior proof.
   4. LFG re-enters final verification after caller-owned review/fix mutation.
-- **Verification:** Focused contract tests, fresh-source eval; real browser/Xcode runs only when the target environment is available and explicitly authorized.
+- **Verification:** `npm run test:jest -- tests/unit/spec-test-browser-contracts.test.js tests/unit/spec-test-xcode-contracts.test.js tests/unit/spec-simplify-code-contracts.test.js tests/unit/spec-lfg-contracts.test.js tests/unit/spec-work-implementation-quality-contracts.test.js --runInBand`, fresh-source eval; real browser/Xcode runs only when the target environment is available and explicitly authorized.
 - **Dependencies:** U2, U3 and U5.
 - **Stop if:** Provider-specific behavior leaks into a public workflow contract or a host cannot express the evidence without a degraded marker.
 
 ### U7. Build the evaluation and adoption measurement loop
 
 - **Goal:** Prove or falsify the Trial recommendation with representative tasks before expanding defaults or schemas.
-- **Requirements:** R1–R14.
-- **Files:** `skills/spec-plan/evals/output-quality-cases.json`, `skills/spec-work/evals/examples.json`, `skills/spec-debug/evals/examples.json`, `skills/spec-code-review/evals/testing-capability-cases.json`, `skills/spec-write-tasks/evals/output-quality-cases.json`, `docs/contracts/workflows/fresh-source-eval-checklist.md`, `docs/validation/` (experiment artifacts only when the experiment runs).
-- **Approach:** Compare baseline guidance with assurance-integrated guidance across low-risk local change, auth/permission, migration/rollback, external retry, concurrency/cancellation, UI real-execution and regression-debug tasks. Measure trace completeness, false-pass resistance, claim honesty, elapsed effort and unnecessary-check rate. Treat model judgments and field outcomes as advisory evidence until independently reviewed.
+- **Requirements:** R1–R15.
+- **Files:** `skills/spec-plan/evals/risk-driven-assurance-trial.json`, `skills/spec-plan/evals/output-quality-cases.json`, `skills/spec-work/evals/examples.json`, `skills/spec-debug/evals/examples.json`, `skills/spec-code-review/evals/testing-capability-cases.json`, `skills/spec-write-tasks/evals/output-quality-cases.json`, `scripts/run-risk-driven-assurance-trial.js` (new deterministic scheduler/receipt validator), `tests/unit/risk-driven-assurance-trial-contracts.test.js`, `docs/contracts/workflows/fresh-source-eval-checklist.md`, `docs/validation/risk-driven-assurance/<run-id>/` (run-local artifacts only).
+- **Frozen cases:**
+  - `RA-01-low-risk-local`: local docs/mechanical change; protects the lightweight path.
+  - `RA-02-auth-deny`: authorization enforcement and deny behavior.
+  - `RA-03-migration-rollback`: compatibility window, verification query and rollback.
+  - `RA-04-external-retry`: dedupe, retry exhaustion and manual recovery.
+  - `RA-05-concurrency-cancel`: terminal state, cleanup and repeated execution.
+  - `RA-06-ui-real-execution`: browser/mobile evidence with an unavailable-provider degraded branch.
+  - `RA-07-regression-false-green`: reproducer, regression and a seeded false-green completion claim.
+- **Trial arms:**
+  - `A-baseline`: frozen parent revision before risk-driven integration.
+  - `B-plan-work-only`: only U1/U2 behavior, using the same Product Contract fixtures; this isolates planning/execution-loop value.
+  - `C-full-integrated`: U1–U6 behavior and consumers.
+- **Invocation contract:** Every arm runs in a fresh isolated context with the same host, model tier, tool posture, task input, time/token budget and no cross-arm transcript. U0 freezes source revision/tree hash and arm patch chain. `node scripts/run-risk-driven-assurance-trial.js --manifest skills/spec-plan/evals/risk-driven-assurance-trial.json --run-id gate-a-001 --phase gate-a --json` produces the early schedule; replace the immutable run id with `final-001` and `--phase final` for the final Trial. The runner writes under `docs/validation/risk-driven-assurance/<run-id>/`, fails if that directory already exists, and validates receipts/hashes; every rerun uses a new run id rather than overwriting evidence. Authorized host workers execute the scheduled prompts. The runner never assigns semantic scores.
+- **Early Gate A:** Immediately after U1/U2, run `RA-01-low-risk-local`, `RA-02-auth-deny` and `RA-04-external-retry` for arms A and B. Stop U3–U6 if B introduces an unsupported verified claim, loses a load-bearing trace, exceeds the pre-registered low-risk ceiling, or improves neither high-risk trace completeness nor false-pass resistance. A stopped Gate A records a rollback/defer report; it does not continue merely because implementation work has begun.
+- **Final Trial:** After U3–U6, run all seven cases across A/B/C in a balanced order. This comparison measures full value and whether C adds material benefit beyond B. One frozen run per case/arm supports only a bounded Trial decision; promotion to a field-proven default requires a separately authorized repeated or real-project study.
+- **Rubric:** For every run, record load-bearing trace completeness, seeded false-pass detection, unsupported verified claims, degraded-path honesty, elapsed time, agent/tool turns and unnecessary-check count. Deterministic facts come from receipts and artifacts; two independent adjudicators score semantic fields against the frozen rubric. Disagreement routes to a third adjudicator and is never averaged silently.
+- **Pre-registered decision thresholds:**
+  - **Adopt Trial:** no arm B/C run makes an unsupported verified claim; all seeded false-green cases are rejected; C preserves every load-bearing trace; B or C improves high-risk trace completeness or false-pass detection by at least 20 percentage points over A; and `RA-01` elapsed effort does not increase by more than 20% or add more than one unnecessary check.
+  - **Defer:** safety/claim-honesty floors pass, but benefit is below the material-improvement threshold, adjudication remains inconclusive, or required provider evidence is unavailable. Record the missing evidence and reevaluation trigger; do not expand defaults or schemas.
+  - **Rollback:** any integrated arm creates an unsupported verified claim, drops a load-bearing acceptance/failure trace, misses a seeded false-green case that baseline catches, or exceeds the low-risk carrying-cost ceiling without compensating high-risk benefit. Revert the integration source patch and retain only the frozen manifest plus failed-Trial report.
+- **Approach:** Execute the pre-registered arms rather than treating `npm run test:eval-fixtures` as behavioral evidence. Fixture tests validate structure only. Measure trace completeness, false-pass resistance, claim honesty, elapsed effort and unnecessary-check rate, and preserve raw outputs plus adjudication receipts. Treat model judgments and field outcomes as advisory evidence until independently reviewed.
 - **Test scenarios:**
   1. Low-risk tasks do not gain material unnecessary verification cost.
   2. High-risk tasks gain explicit failure-to-check mapping and fewer unsupported completion claims.
   3. Missing provider/tool paths remain loud degraded rather than silent pass.
   4. A deliberately adversarial false-green fixture is detected by review/eval.
-  5. Results carry source revision, task class, commands, limitations and invalidation condition.
-- **Verification:** `npm run test:eval-fixtures`, fresh-source eval, human adjudication or equivalent fresh reviewer, and a repo-local experiment report.
-- **Dependencies:** U1–U6.
-- **Stop if:** Benchmark evidence does not show benefit over baseline, or carrying cost rises for low-risk tasks without compensating quality gain.
+  5. Results carry source revision/tree hash, arm patch chain, task class, raw output hash, commands, limitations, adjudicator identity and invalidation condition.
+  6. The plan/work-only arm distinguishes core loop value from full consumer integration.
+- **Verification:** `npm run test:eval-fixtures`, `npm run test:jest -- tests/unit/risk-driven-assurance-trial-contracts.test.js --runInBand`, the phase-specific runner command above, fresh-source eval, independent adjudication and immutable `docs/validation/risk-driven-assurance/<run-id>/report.md` plus machine-readable receipts.
+- **Dependencies:** U0 freezes the protocol. Gate A runs after U1/U2 and must pass before U3–U6 continue. The final Trial runs after U3–U6.
+- **Stop if:** Gate A or the final Trial reaches the pre-registered Rollback condition, receipts/source hashes are incomparable, adjudication independence is unavailable, or carrying cost rises for low-risk tasks without compensating high-risk benefit.
 
 ### U8. Documentation, release continuity and source/runtime audit
 
@@ -473,21 +536,25 @@ These unknowns do not block the plan because they are execution-time facts. If a
 | Gate | Command / method | Applies when | Required evidence |
 | --- | --- | --- | --- |
 | Source syntax and skill entrypoints | `npm run typecheck` and `npm run lint:skill-entrypoints` | Any source skill/reference/JS change | Exit code, output/log refs |
+| Trace-carrier and summary identity contracts | `npm run test:jest -- tests/unit/risk-driven-assurance-trial-contracts.test.js tests/unit/verification-run-summary.test.js tests/unit/honest-closeout.test.js --runInBand` | U0 or evidence-helper change | Lossless trace receipt, placeholder-command rejection, duplicate-id rejection before closeout |
+| Focused PRD contracts | `npm run test:jest -- tests/unit/spec-prd-contracts.test.js tests/unit/spec-prd-plan-handoff-contracts.test.js --runInBand` | U4 | Observable positive/negative/error/boundary acceptance and WHAT/HOW boundary |
 | Focused planning contracts | `npm run test:jest -- tests/unit/spec-plan-contracts.test.js tests/unit/spec-plan-quality-contracts.test.js --runInBand` | U1 | Assertions for posture, failure model, no-schema/no-state-machine boundary |
-| Focused work/debug contracts | `npm run test:jest -- tests/unit/spec-work-contracts.test.js tests/unit/spec-work-implementation-quality-contracts.test.js tests/unit/spec-debug-contracts.test.js --runInBand` | U2/U3 | Feedback loop, fresh rerun, not-run/degraded and reproducer chain |
+| Focused work/debug contracts | `npm run test:jest -- tests/unit/spec-work-contracts.test.js tests/unit/spec-work-implementation-quality-contracts.test.js tests/unit/spec-work-consumer-chain-contracts.test.js tests/unit/spec-debug-contracts.test.js --runInBand` | U2/U3 | Feedback loop, consumer-chain trace, fresh rerun, limitation/degraded and reproducer chain |
+| Work closeout integration | `npm run test:jest -- tests/integration/spec-work-closeout-producer.test.js --runInBand` | U2 | Final-tail rerun, final fingerprint and closeout producer integration |
 | Task/review contracts | `npm run test:jest -- tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-code-review-mechanics.test.js --runInBand` | U5 | Trace fields, report-only boundary, no TDD inference |
-| Provider/orchestration contracts | `npm run test:jest -- tests/unit/spec-test-browser-contracts.test.js tests/unit/spec-lfg-contracts.test.js --runInBand` | U6 | Bounded provider evidence and final verification re-entry |
+| Provider/orchestration contracts | `npm run test:jest -- tests/unit/spec-test-browser-contracts.test.js tests/unit/spec-test-xcode-contracts.test.js tests/unit/spec-simplify-code-contracts.test.js tests/unit/spec-lfg-contracts.test.js tests/unit/spec-work-implementation-quality-contracts.test.js --runInBand` | U6 | Browser/Xcode bounded evidence, simplify proof preservation and LFG final verification re-entry |
 | Existing artifact contracts | `npm run test:jest -- tests/unit/verification-run-summary.test.js tests/unit/honest-closeout.test.js tests/unit/spec-work-run-artifact-contract.test.js --runInBand` | Any change touching evidence references | Existing schema/owner compatibility |
 | Eval fixture structure | `npm run test:eval-fixtures` | U1/U5/U7 | Fixture shape, decision/failure coverage and declared missing evidence |
 | Fresh-source semantic review | Fresh read-only reviewer using current `skills/**`, `docs/contracts/**`, tests and this plan; if unavailable record `fresh_source_eval: not_run` with reason | Any skill/agent prose change | Trigger precision, source/runtime boundary, deterministic-vs-semantic ownership, findings |
-| Representative task experiment | Baseline vs integrated guidance on the task classes in U7 | Before default adoption or schema work | Repo-local report with revision, task cases, effort, trace quality, claim ceiling and limitations |
+| Gate A experiment | `node scripts/run-risk-driven-assurance-trial.js --manifest skills/spec-plan/evals/risk-driven-assurance-trial.json --run-id gate-a-001 --phase gate-a --json` plus authorized scheduled workers | After U1/U2, before U3–U6 | Arms A/B receipts for RA-01/02/04, adjudication, threshold decision and rollback/defer receipt |
+| Final representative Trial | Same runner with a new immutable run id and `--phase final` plus authorized scheduled workers | After U3–U6, before default adoption or schema expansion | A/B/C receipts for RA-01–07, raw-output hashes, independent adjudication and Adopt Trial/Defer/Rollback report |
 | Package and diff hygiene | `npm run build` and `git diff --check` | When packaged source/docs or broad skill surfaces change | Dry-run package result and clean diff check |
 
 Verification semantics:
 
 - Commands record only checks that actually ran. `verification-run-summary.v1` remains the result source; `honest-closeout.v1` remains the claim validator.
-- Required checks that are not applicable must have an explicit semantic reason in the plan/task; required checks that cannot run must remain not-run/degraded and block a verified completion claim.
-- `mutation`, `property`, `changed-line-coverage`, `hostile-input`, `regression-reproducer` and `real-execution` are candidate check ids, not a universal mandatory list.
+- Required intents that are not applicable must have an explicit semantic reason in the plan/task. A bound real command/provider invocation that cannot run may record not-run/degraded under the existing contract; an unbound intent stays outside the summary as a loud limitation and blocks the unsupported verified claim.
+- `<owner>.<intent>[.<scope>]` is the namespaced identity shape. Candidate ids are not a universal mandatory list, and duplicate ids invalidate the summary before closeout.
 - A final verification summary created before a later mutation is stale. The final worktree fingerprint and summary must be generated after the last implementation, simplify, fixture or review-fix mutation.
 - Fresh-source eval is not replaced by current-session cached skill invocation. When dispatch is unavailable or unauthorized, report `not_run`; do not claim independent reviewer coverage.
 
@@ -497,25 +564,30 @@ Verification semantics:
 
 ### Global
 
+- [ ] U0 proves the existing trace carrier or stops for an explicit schema/version decision before broad implementation.
+- [ ] Trial cases, arms, rubric, thresholds, invocation profile and artifact paths are frozen before U1/U2 results are observed.
 - [ ] The source plan and all implementation units preserve the `extend` posture and name the existing owner, source-of-truth and rejected parallel shape.
 - [ ] Product acceptance, planning assurance, task projection, execution evidence, review and closeout have an explicit trace with no duplicated durable artifact.
 - [ ] Low-risk tasks retain a narrow path; high-risk tasks have a failure model and risk-matched Verification Contract.
 - [ ] No new public workflow, central state machine, `EVIDENCE.md`, `gauntlet.sh`, default profile mutation or generated-runtime hand edit is introduced.
 - [ ] Mutation, dependency install, commit and landing remain separately authorized.
 - [ ] All required focused tests, typecheck, skill lint and applicable build/diff checks have confirmed evidence.
+- [ ] Every run-summary check uses a unique namespaced id; unbound verification intents remain limitations rather than placeholder checks.
 - [ ] Fresh-source eval status is `passed`, or `not_run` with an explicit capability/authorization limitation; it is never silently omitted.
-- [ ] U7 experiment either confirms a bounded benefit and adoption condition or records a failed/deferred Trial with rollback and reevaluation trigger.
+- [ ] Gate A runs after U1/U2 and either authorizes U3–U6 or records a stopped Trial before further cross-owner investment.
+- [ ] U7 final experiment compares baseline, plan/work-only and full integration, then applies the frozen Adopt Trial / Defer / Rollback rule.
 - [ ] Abandoned experiments, temporary fixtures and dead-end code are removed from the final diff.
 
 ### Per-unit completion
 
+- [ ] U0: lossless trace receipt, duplicate-id rejection and frozen Trial manifest are confirmed before broad implementation.
 - [ ] U1: posture and failure-model guidance is present, semantic, and covered by focused plan contracts/evals.
 - [ ] U2: risk-triggered feedback and final-tree fresh rerun are explicit and tested without universal TDD ceremony.
 - [ ] U3: debug reproducer/regression/broader evidence and artifact ownership are explicit and tested.
 - [ ] U4: PRD acceptance examples expose relevant negative/error/boundary behavior without HOW leakage.
 - [ ] U5: task/review consumers preserve traceability and report-only/TDD-history boundaries.
-- [ ] U6: providers, simplify and LFG pass bounded evidence and rerun final verification after tail mutations.
-- [ ] U7: representative benchmark is recorded with limitations and invalidation condition.
+- [ ] U6: browser, Xcode, simplify and LFG each have an explicit contract suite; final verification reruns after tail mutations.
+- [ ] U7: Gate A and final Trial artifacts include frozen cases/arms, raw hashes, independent adjudication, limitations and invalidation condition.
 - [ ] U8: README, changelog, contracts and runtime expectations are source-first and honest.
 
 ### Non-goals verified
@@ -535,11 +607,11 @@ These names are examples for plan/task mapping and run-summary records. They do 
 
 | Check id | Evidence intent | Minimum result shape |
 | --- | --- | --- |
-| `mutation` | Tests detect behavior-preserving mutants in the risk-bearing surface | Executed command, exit code, redacted log, scope and limitation |
-| `property` | Invariants hold across generated or adversarial input | Executed property runner and observed counterexample/absence within stated budget |
-| `changed-line-coverage` | New behavior-bearing lines have meaningful execution | Runner output tied to changed scope; percentage alone is insufficient |
-| `hostile-input` | Deny, malformed, abuse or boundary input is rejected safely | Input class, observed response/state, log or artifact ref |
-| `regression-reproducer` | Original bug path remains fixed | Original reproducer and regression test both executed after final mutation |
-| `real-execution` | Actual browser, simulator, service or production-like path ran | Provider, target, revision, route, freshness and limitation |
+| `spec-work.mutation` | Tests detect behavior-preserving mutants in the risk-bearing surface | Executed command, exit code, redacted log, scope and limitation |
+| `spec-work.property` | Invariants hold across generated or adversarial input | Executed property runner and observed counterexample/absence within stated budget |
+| `spec-work.changed-line-coverage` | New behavior-bearing lines have meaningful execution | Runner output tied to changed scope; percentage alone is insufficient |
+| `spec-work.hostile-input` | Deny, malformed, abuse or boundary input is rejected safely | Input class, observed response/state, log or artifact ref |
+| `spec-debug.regression-reproducer` | Original bug path remains fixed | Original reproducer and regression test both executed after final mutation |
+| `spec-test-browser.real-execution` | Actual browser, simulator, service or production-like path ran | Provider, target, revision, route, freshness and limitation |
 
-An absent candidate check is not a failure by itself. The plan must explain whether it is not applicable, optional, deferred, unavailable or required, and the final claim must not exceed the evidence actually recorded.
+The `<owner>.<intent>[.<scope>]` names are examples, not a global registry. An absent candidate check is not a failure by itself. The plan must explain whether it is not applicable, optional, deferred, unavailable or required. An unbound intent remains outside the summary, and the final claim must not exceed the evidence actually recorded.
