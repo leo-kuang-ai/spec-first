@@ -222,7 +222,11 @@ describe('active eval fixture references', () => {
     }
   });
 
-  test('requirements clarification replay preserves unit provenance and counted reviewers', () => {
+  // Quarantined: resolves a "snapshot commit" via `git log -1 -- <path>`, which
+  // assumes the historical commit stays an ancestor of the checked-out ref. A
+  // squash merge (this repo's ruleset only allows squash/rebase) breaks that
+  // assumption deterministically. See https://github.com/sunrain520/spec-first/issues/35
+  test.skip('requirements clarification replay preserves unit provenance and counted reviewers', () => {
     const replayRoot = path.join(repoRoot, clarificationReplayRoot);
     const aggregate = readJson(path.join(replayRoot, 'aggregate.json'));
     const equivalence = readJson(path.join(replayRoot, 'final-equivalence.json'));
