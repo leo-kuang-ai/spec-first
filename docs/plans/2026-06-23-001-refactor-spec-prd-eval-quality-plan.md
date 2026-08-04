@@ -19,7 +19,7 @@ plan_depth: standard
 
 - **推荐方案：** 先做 U1/U2 的 eval contract 与 runner，建立可重复质量信号；再做 U3 canary 覆盖，用真实边界 case 决定是否需要 U4 入口瘦身。
 - **关键决策：** 不把 PRD 语义质量脚本化；不新增公开 workflow；不手改 generated runtime mirrors；runner 只做结构、覆盖和 fixture 完整性检查。
-- **验证重点：** `examples.json` 的 case 类型覆盖、runner exit code/reason code、`spec-prd-contracts` 回归断言、`skill-creator` quick validate、`spec-skill-audit` target audit。
+- **验证重点：** `examples.json` 的 case 类型覆盖、runner exit code/reason code、`spec-prd-contracts` 回归断言、`skill-creator` quick validate、`retired-skill-review` target audit。
 - **最大风险/边界：** 最大风险是把 eval runner 做成伪语义裁判，或为了提高分数继续堆 prompt prose。本计划明确脚本准备 facts，LLM/reviewer 做语义判断。
 
 ---
@@ -47,7 +47,7 @@ plan_depth: standard
 ## 假设
 
 - A1. 本计划直接来自当前会话对 `spec-prd` 质量的审查和技术方案讨论，没有上游 PRD requirements 文档，因此使用 plan-local `spec_id`。
-- A2. `.spec-first/audits/skill-audit/latest` 是本次会话生成的运行审计 artifact，可作为 advisory evidence；计划 source 不把它当长期 source-of-truth。
+- A2. `.spec-first/audits/skill-review/latest` 是本次会话生成的运行审计 artifact，可作为 advisory evidence；计划 source 不把它当长期 source-of-truth。
 - A3. 当前工作区已有大量其他未提交改动。后续执行本计划时必须重跑 `git status --short`，只触碰本计划声明的 `spec-prd` source/test/docs/changelog surface，不回退或覆盖无关改动。
 - A4. `spec-prd` 的质量瓶颈目前不是 routing/safety P1 缺陷，而是 eval 可执行性和语义覆盖可观察性不足。
 
@@ -75,7 +75,7 @@ plan_depth: standard
 - `skills/spec-prd/scripts/run-evals.js` 能稳定输出 pass/fail、coverage summary 和 reason code；坏参数、坏 JSON、缺 bucket 都有可测试失败路径。
 - `spec-prd` 至少覆盖 route-out、wrong-stage、source-candidate、prompt-injection、oversized-split、glossary-advisory 和 readiness-fail canary。
 - `skills/spec-prd/SKILL.md` 仍能独立表达 when-to-use、when-not-to-use、input/output、failure、handoff 和 source/runtime boundary。
-- `$spec-skill-audit` target audit 对 `skills/spec-prd` 仍为 `0 P0 / 0 P1 / 0 P2`，eval readiness 的保守信号能被 fixture contract 或 runner 证据解释。
+- `$retired-skill-review` target audit 对 `skills/spec-prd` 仍为 `0 P0 / 0 P1 / 0 P2`，eval readiness 的保守信号能被 fixture contract 或 runner 证据解释。
 - `CHANGELOG.md` 记录 source 变更、验证命令和未手改 generated runtime mirrors。
 
 ---
@@ -94,8 +94,8 @@ plan_depth: standard
   - `skills/spec-prd/references/prd-output-template.md`
   - `skills/spec-prd/references/prd-readiness-lens.md`
   - `tests/unit/spec-prd-contracts.test.js`
-  - `skills/spec-skill-audit/SKILL.md`
-  - `skills/spec-skill-audit/references/expert-audit-rubric.md`
+  - `skills/retired-skill-review/SKILL.md`
+  - `skills/retired-skill-review/references/expert-audit-rubric.md`
   - `skills/spec-plan/references/plan-template.md`
   - `skills/spec-plan/references/plan-sections.md`
   - `skills/spec-plan/references/markdown-rendering.md`
@@ -121,7 +121,7 @@ plan_depth: standard
   - 实现 U2 前检查本仓已有 eval runner 或 fixture normalizer 模式，优先复用局部测试风格。
   - 实现 U4 前重新审计 `SKILL.md` 与 reference trigger map，避免移动关键 hot-path 边界。
 - commands_or_tools_used:
-  - `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-prd`
+  - `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-prd`
   - `git status --short`
   - `git rev-parse --short HEAD`
   - `ls docs/plans`
@@ -142,7 +142,7 @@ plan_depth: standard
 
 - `skills/spec-prd/scripts/check-glossary-drift.js` 已是小型确定性脚本模式：参数错误返回 exit 2，领域事实输出供 LLM readiness 使用。
 - `tests/unit/spec-prd-contracts.test.js` 是最直接的 contract test 承载面，适合加入 eval fixture coverage 和 runner 行为断言。
-- `skills/spec-skill-audit/scripts/write-audit-artifacts.js` 的 scorecard 明确“scripts prepare facts，LLM decides”，本计划的 runner 应遵守同一边界。
+- `skills/retired-skill-review/scripts/write-audit-artifacts.js` 的 scorecard 明确“scripts prepare facts，LLM decides”，本计划的 runner 应遵守同一边界。
 - `skills/spec-plan/evals/output-quality-cases.json` 和其他 workflow eval fixtures 可作为 output-quality fixture 的后续参考，但本轮先做 `spec-prd` 局部最小 runner。
 
 ### 组织经验
@@ -282,7 +282,7 @@ Runner 不负责：
 
 **参考模式：**
 - `skills/spec-prd/scripts/check-glossary-drift.js` 的小型 CLI 参数处理和 exit code 姿态。
-- `skills/spec-skill-audit` 的 deterministic report 姿态：只准备 facts，不做语义裁决。
+- `skills/retired-skill-review` 的 deterministic report 姿态：只准备 facts，不做语义裁决。
 
 **测试场景：**
 - 正常路径：当前 fixture 通过，runner 输出 `status: passed` 和 coverage summary。
@@ -385,7 +385,7 @@ Runner 不负责：
 
 **参考模式：**
 - `CHANGELOG.md` 顶部现有 compact 记录格式。
-- `skills/spec-skill-audit/references/report-format.md` 的 finding/report 边界。
+- `skills/retired-skill-review/references/report-format.md` 的 finding/report 边界。
 
 **测试场景：**
 - 正常路径：focused test suite 与 runner 全部通过。
@@ -436,7 +436,7 @@ Runner 不负责：
 - 相关 eval fixture: `skills/spec-prd/evals/examples.json`
 - 相关测试: `tests/unit/spec-prd-contracts.test.js`
 - 相关脚本: `skills/spec-prd/scripts/check-glossary-drift.js`, `skills/spec-prd/scripts/check-prd-artifact.js`
-- Skill 审计 workflow: `skills/spec-skill-audit/SKILL.md`
+- Skill 审计 workflow: `skills/retired-skill-review/SKILL.md`
 - 计划格式参考: `skills/spec-plan/references/plan-template.md`, `skills/spec-plan/references/plan-sections.md`, `skills/spec-plan/references/markdown-rendering.md`
 
 ---
@@ -446,5 +446,5 @@ Runner 不负责：
 - **实现范围：** 完成收缩版 U1/U2/U3/U5。`examples.json` 增加 `case_contract`、`case_type`、`quality_buckets` 与高风险 `must_not`；新增 `scripts/run-evals.js`，只检查 fixture structure、coverage bucket、`must_not` 和 reason code；合同测试覆盖 runner 成功、缺 bucket、坏 JSON 和坏参数路径。
 - **未执行范围：** U4 入口 prose 调整未执行；当前 canary、runner 和 focused contract tests 未显示需要移动 `SKILL.md` hot-path 边界。未新增公开 workflow、agent、CLI command、LLM judge 或语义打分器。
 - **验证：** `node --check skills/spec-prd/scripts/run-evals.js`、`node skills/spec-prd/scripts/run-evals.js --json`、`node --check tests/unit/spec-prd-contracts.test.js`、`node node_modules/jest/bin/jest.js tests/unit/spec-prd-contracts.test.js tests/unit/changelog-format.test.js --runInBand`、`git diff --check -- CHANGELOG.md skills/spec-prd/evals/examples.json skills/spec-prd/scripts/run-evals.js skills/spec-prd/references/evaluation-governance.md tests/unit/spec-prd-contracts.test.js`、`python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-prd`、`npm run lint:skill-entrypoints`、`npm run typecheck` 均通过。
-- **审计与 review：** `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-prd` 生成 target audit，结果为 `0 P0 / 0 P1 / 0 P2`、`89/B+`；scorecard 仍是 conservative signal，当前 audit 文案尚未消费 per-skill runner 证据。收尾 review 使用 single-agent report-only fallback（`dispatch_authorization_missing`），发现并修复 runner 坏参数路径缺少 `reason_code=bad_arguments` 的问题。
+- **审计与 review：** `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-prd` 生成 target audit，结果为 `0 P0 / 0 P1 / 0 P2`、`89/B+`；scorecard 仍是 conservative signal，当前 audit 文案尚未消费 per-skill runner 证据。收尾 review 使用 single-agent report-only fallback（`dispatch_authorization_missing`），发现并修复 runner 坏参数路径缺少 `reason_code=bad_arguments` 的问题。
 - **Runtime 边界：** 未手改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors；如需刷新 host runtime，应另行运行 `spec-first init`。

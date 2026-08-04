@@ -1,0 +1,1 @@
+{"handoff_target":"direct-answer/bounded-read","loaded_skills":["using-spec-first"],"invocation_mode":"none","effect":"not-entered","reason":"真实请求只是总结一份单独的 Skill 设计文档，属于单文档理解与摘要，应走 Direct Lane；不涉及创建、修改、迁移、修复或验证 Skill 包，因此不进入 spec-write-skill。","entrypoint":"using-spec-first"}

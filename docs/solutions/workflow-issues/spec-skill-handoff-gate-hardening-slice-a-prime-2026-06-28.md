@@ -35,7 +35,7 @@ source_refs:
 
 ### T001 — Scanner 误报修复
 
-`skills/spec-skill-audit/scripts/lib/security-patterns.js` `PROHIBITION_HINTS` 补入：
+`skills/retired-skill-review/scripts/lib/security-patterns.js` `PROHIBITION_HINTS` 补入：
 ```js
 /\bare not\b/i, /\bdoes not\b/i, /\bexcludes?\b/i, /\bnot source\b/i, /\bnot owned\b/i
 ```
@@ -59,7 +59,7 @@ source_refs:
 
 ## 验证
 
-- T001：`npx jest tests/unit/skill-audit-scripts.test.js`（38/39，1 pre-existing fail）；全仓实扫 P0 runtime_governance 降为 0
+- T001：`npx jest tests/unit/skill-review-scripts.test.js`（38/39，1 pre-existing fail）；全仓实扫 P0 runtime_governance 降为 0
 - T003：`npx jest tests/unit/task-pack-command.test.js`（51/51）
 - T005：`npx jest tests/unit/spec-doc-review-contracts.test.js`（19/19）；fresh-source eval PASS
 - T002/T004：合约测试通过；fresh-source eval strongly recommended

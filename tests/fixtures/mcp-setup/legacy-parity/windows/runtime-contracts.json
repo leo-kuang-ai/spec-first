@@ -1,0 +1,72 @@
+{
+  "schema_version": "mcp-setup-legacy-parity.v2",
+  "platform": "windows",
+  "provenance": {
+    "source_sha": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+    "capture_method": "baseline-tree-materialized-runtime-replay",
+    "capture_status": "partial",
+    "authority_level": "confirmed-runtime",
+    "reason_code": "legacy-runtime-reason-unavailable",
+    "limitations": [
+      "Baseline Windows owners 不会为 bare/check/verify/only/graphify-refresh 或 repo/folder 冲突输出统一的顶层 outcome reason；raw exit、artifact presence 与 side effect 已由 runtime 确认，但对应场景保持 degraded。",
+      "verify/only/graphify-refresh 的 legacy scenario fingerprint 依赖真实 spec-first CLI；replay 使用 deterministic command stub，因此旧 owner 会显式记录 fingerprint failed 并继续，核心 setup facts、host config 与 Provider side effect 仍由物化 baseline runtime 确认。",
+      "Node 20/22 artifact 仅在 raw_stderr 中的随机临时路径不同；移除该诊断字段后的 normalized capture 完全一致。"
+    ],
+    "known_differences": [
+      "旧版 verify-tools.ps1 写入 action-required facts 后以 0 退出；统一 Node 入口在 host-config-missing 时以 1 退出。",
+      "旧版 bootstrap-project-config.ps1 在 fresh repo 创建 .gitignore 时调用无效的 New-Item -LiteralPath，已产生 project-config side effect 但以 1 退出；统一 Node 入口完成写入并以 0 退出。",
+      "旧版 install-mcp.ps1 接受裸 --refresh 并写入 host config；公开 SKILL contract 与统一 Node 入口使用 refresh-without-only-graphify fail closed。"
+    ],
+    "capture_run_id": 29153023637,
+    "capture_run_url": "https://github.com/sunrain520/spec-first/actions/runs/29153023637",
+    "capture_matrix": ["node-20", "node-22"],
+    "normalized_capture_sha256": "7b4e2376b801792f2c5a8d05c7fcdd86eab0af95841fa163e6fcb578acb341aa",
+    "capture_command": "node tests/fixtures/mcp-setup/legacy-parity/replay-runtime-contracts.cjs --platform windows --source a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+    "ci_validation_command": "npx jest tests/unit/mcp-setup-node-contracts.test.js --runInBand",
+    "runtime_requirement": "Windows host 上需要 PowerShell 7；通过 windows-compatibility Node 20/22 matrix 执行",
+    "source_files": [
+      { "path": "skills/spec-runtime-setup/SKILL.md", "sha256": "33d4df4e7893670a4f26ac86fe40b162e8d4214554b41f4a2287daa074145164" },
+      { "path": "skills/spec-runtime-setup/scripts/check-health.ps1", "sha256": "58cd7ceb9e4f9880927092d15335485fee5d0a3eb179afea1d12ba34cb1aa848" },
+      { "path": "skills/spec-runtime-setup/scripts/verify-tools.ps1", "sha256": "7d5fdfd64a29ec05cfb241b4f4657cbc9db0cbb254626139f03a2b06f3ddfea3" },
+      { "path": "skills/spec-runtime-setup/scripts/setup-plan-renderer.cjs", "sha256": "6f366b0e17841d055e6eb363f80bd8db3f93f31eb1dffbcc66217732defd148a" },
+      { "path": "skills/spec-runtime-setup/scripts/bootstrap-project-config.ps1", "sha256": "c34852640ce61a9719f5bc9061ab27905314711420aa760d77371804b9cdb550" },
+      { "path": "skills/spec-runtime-setup/scripts/install-mcp.ps1", "sha256": "be513a9b16ec799106af14ed2a7ac2176cbf92d2ae94bb1b16e038c77d07366e" },
+      { "path": "skills/spec-runtime-setup/scripts/install-helpers.ps1", "sha256": "21e4c85ae1ed84caf828ec0c2aa84837d9decde1a31b3660bb7f5ea4e882c655" },
+      { "path": "src/cli/helpers/secret-deny-patterns.js", "sha256": "9073027525b8e07c9eca721446a9f647c29bb8897b536db1782f175710abaa10" },
+      { "path": "src/cli/helpers/setup-facts.js", "sha256": "3133614ec7d8d8c0ea94c645788efe1b57d2d67d416b877a20bcc582bb7643ab" },
+      { "path": "src/cli/helpers/target-repo.js", "sha256": "a471fc0fcd2625bb62e495075026e3440a58c4925ee25741161539fd77a13999" },
+      { "path": "src/contracts/schema-validator.js", "sha256": "a2c67d997c30a33dcb2ebc9f520698c39894c9fd29d6f4ffe0110bc8db3ed603" },
+      { "path": "src/verification/profile-loader.js", "sha256": "3af09713d33da659abeeb7f6b3753c5ba09e81c40203a3ae8d95e5f7e5cf2ff2" },
+      { "path": "docs/contracts/verification/verification-profile.schema.json", "sha256": "cee1d6ca812ef3a5e9160f671f9d8f9c0b3e05bf92633a5150d89337595c0929" }
+    ]
+  },
+  "modes": {
+    "bare": { "argv": [], "mutation": false, "capabilities": [], "exit_code": 0, "reason_code": "diagnostic-ready", "artifact_schema": "spec-runtime-setup-preflight.v2", "side_effect_categories": [], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "check-health.ps1", "raw_exit_code": 0, "raw_reason_code": null, "raw_artifact_schema": "spec-mcp-setup-preflight.v2", "raw_artifact_schemas": ["spec-mcp-setup-preflight.v2"], "side_effect_categories": [] } },
+    "check": { "argv": ["--check"], "mutation": false, "capabilities": [], "exit_code": 0, "reason_code": "diagnostic-ready", "artifact_schema": "spec-runtime-setup-preflight.v2", "side_effect_categories": [], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "check-health.ps1", "raw_exit_code": 0, "raw_reason_code": null, "raw_artifact_schema": "spec-mcp-setup-preflight.v2", "raw_artifact_schemas": ["spec-mcp-setup-preflight.v2"], "side_effect_categories": [] } },
+    "verify": { "argv": ["--verify-only"], "mutation": true, "capabilities": ["write-setup-facts"], "exit_code": 1, "reason_code": "host-config-missing", "artifact_schema": "spec-runtime-setup-execution.v1", "side_effect_categories": ["setup-facts"], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "verify-tools.ps1", "raw_exit_code": 0, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": ["runtime-capabilities.v1", "tool-facts.v2", "v2"], "side_effect_categories": ["setup-facts"] } },
+    "plan": { "argv": ["--plan"], "mutation": false, "capabilities": [], "exit_code": 0, "reason_code": "setup-install-plan-ready", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "confirmed", "capture_reason_code": null, "owner": "install-mcp.ps1 -> setup-plan-renderer.cjs", "raw_exit_code": 0, "raw_reason_code": "setup-install-plan-ready", "raw_artifact_schema": "setup-install-plan.v1", "raw_artifact_schemas": ["setup-install-plan.v1"], "side_effect_categories": [] } },
+    "project-config": { "argv": ["--project-config"], "mutation": true, "capabilities": ["write-project-config"], "exit_code": 0, "reason_code": "project-config-ready", "artifact_schema": "project-config-bootstrap.v1", "side_effect_categories": ["project-config"], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-evidence-incomplete", "owner": "bootstrap-project-config.ps1", "raw_exit_code": 1, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": [], "side_effect_categories": ["project-config"] } },
+    "only": { "argv": ["--only", "graphify"], "mutation": true, "capabilities": ["install-tools", "write-host-config", "provider-mutation", "write-setup-facts"], "exit_code": 0, "reason_code": "setup-facts-written", "artifact_schema": "spec-runtime-setup-execution.v1", "side_effect_categories": ["host-config", "provider-mutation", "setup-facts"], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "install-mcp.ps1 -> install-helpers.ps1 -> verify-tools.ps1", "raw_exit_code": 0, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": ["runtime-capabilities.v1", "tool-facts.v2", "v2"], "side_effect_categories": ["host-config", "provider-mutation", "setup-facts"] } },
+    "graphify-refresh": { "argv": ["--only", "graphify", "--refresh"], "mutation": true, "capabilities": ["install-tools", "write-host-config", "provider-refresh", "write-setup-facts"], "exit_code": 0, "reason_code": "setup-facts-written", "artifact_schema": "spec-runtime-setup-execution.v1", "side_effect_categories": ["host-config", "provider-mutation", "setup-facts"], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "install-mcp.ps1 -> install-helpers.ps1 -Refresh -> verify-tools.ps1", "raw_exit_code": 0, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": ["runtime-capabilities.v1", "tool-facts.v2", "v2"], "side_effect_categories": ["host-config", "provider-mutation", "setup-facts"] } }
+  },
+  "invalid": [
+    { "id": "refresh-without-only-graphify", "argv": ["--refresh"], "exit_code": 2, "reason_code": "refresh-without-only-graphify", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "install-mcp.ps1", "raw_exit_code": 0, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": [], "side_effect_categories": ["host-config"] } },
+    { "id": "unknown-optional-provider-selection", "argv": ["--only", "unknown"], "exit_code": 2, "reason_code": "unknown-optional-provider-selection", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "confirmed", "capture_reason_code": null, "owner": "install-mcp.ps1", "raw_exit_code": 1, "raw_reason_code": "unknown-optional-provider-selection", "raw_artifact_schema": null, "raw_artifact_schemas": [], "side_effect_categories": [] } },
+    { "id": "repo-and-all-repos", "argv": ["--repo", "child", "--all-repos"], "exit_code": 2, "reason_code": "repo-and-all-repos", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "confirmed", "capture_reason_code": null, "owner": "install-mcp.ps1", "raw_exit_code": 1, "raw_reason_code": "all-repos-conflicts-with-repo", "raw_artifact_schema": "workspace-mcp-setup-summary.v1", "raw_artifact_schemas": ["workspace-mcp-setup-summary.v1"], "side_effect_categories": [] } },
+    { "id": "repo-and-folder", "argv": ["--repo", "child", "--folder", "folder"], "exit_code": 2, "reason_code": "repo-and-folder", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "install-mcp.ps1", "raw_exit_code": 1, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": [], "side_effect_categories": [] } },
+    { "id": "folder-and-all-repos", "argv": ["--folder", "folder", "--all-repos"], "exit_code": 2, "reason_code": "folder-and-all-repos", "artifact_schema": "setup-install-plan.v1", "side_effect_categories": [], "runtime_capture": { "capture_status": "degraded", "capture_reason_code": "legacy-runtime-reason-unavailable", "owner": "install-mcp.ps1", "raw_exit_code": 1, "raw_reason_code": null, "raw_artifact_schema": null, "raw_artifact_schemas": [], "side_effect_categories": [] } }
+  ],
+  "artifacts": {
+    "setup-install-plan.v1": ["schema_version", "mutation", "blocked", "reason_code", "planned_operations", "safety"],
+    "spec-runtime-setup-execution.v1": ["schema_version", "mode", "mutation", "target", "host", "tool_facts", "runtime_capabilities", "write_result"],
+    "spec-runtime-setup-diagnostic-snapshot.v1": ["schema_version", "setup_facts_status", "setup_facts_reason_code", "generated_runtime_manifest", "baseline_ready", "host_runtime_ready", "provider_readiness", "configured_dependencies"],
+    "spec-runtime-setup-preflight.v2": ["schema_version", "target", "host", "tools", "skills", "project", "runtime", "provider_readiness", "configured_dependencies"],
+    "tool-facts.v2": ["schema_version", "generated_at", "repo_root", "host", "platform", "tools", "helper_tools", "provider_readiness", "items", "configured_dependencies", "source"],
+    "runtime-capabilities.v1": ["schema_version", "generated_at", "repo_root", "host", "direct_evidence", "setup_summary"],
+    "workspace-mcp-setup-summary.v1": ["schema_version", "workflow_mode", "selection_source", "workspace_root", "parent_writes_repo_local_artifacts", "results", "counts", "overall_status", "reason_code"],
+    "workspace-mcp-verify-summary.v1": ["schema_version", "workflow_mode", "selection_source", "workspace_root", "parent_writes_repo_local_artifacts", "results", "counts", "overall_status", "reason_code"],
+    "project-config-bootstrap.v1": ["schema_version", "overall_status", "repo_root", "target_kind", "project", "legacy"],
+    "workspace-project-config-bootstrap-summary.v1": ["schema_version", "workflow_mode", "selection_source", "workspace_root", "parent_writes_repo_local_artifacts", "results", "counts", "overall_status", "reason_code"],
+    "project-local-config-status.v1": ["schema_version", "status", "repo_root", "example_config", "local_config", "local_config_gitignore", "legacy_markdown_config", "legacy_local_config"]
+  }
+}

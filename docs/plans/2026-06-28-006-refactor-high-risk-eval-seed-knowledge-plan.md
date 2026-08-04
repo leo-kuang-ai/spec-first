@@ -37,11 +37,11 @@ origin_grade: prd
 
 - R1. 高风险 public workflow（spec-mcp-setup/spec-optimize/spec-compound-refresh）必须有 eval seed。Origin trace: R-24, AE-10。
 - R2. section lint 必须按 entry_surface 分层，internal_only skill 缺 section 默认降为 P2/P3，不淹没 public workflow 风险。Origin trace: R-25, AE-10。
-- R3. top 5 boundary pair（brainstorm/prd、debug/optimize、skill-audit/write-skill、prd/write-tasks、code-review/doc-review）必须各补 negative eval。Origin trace: R-26, AE-10。
+- R3. top 5 boundary pair（brainstorm/prd、debug/optimize、skill-review/write-skill、prd/write-tasks、code-review/doc-review）必须各补 negative eval。Origin trace: R-26, AE-10。
 - R4. `docs/项目审查/README.md` 必须有最新审查索引与 active recommendations 指针。Origin trace: R-37, AE-11。
 - R5. spec-compound-refresh 必须有"审查报告候选可否晋升 durable knowledge"判定 eval。Origin trace: R-38, AE-10。
 
-**Origin actors:** Spec-First Evolution Architect；skill-audit 消费者；高风险 workflow 维护者；知识沉淀消费者。
+**Origin actors:** Spec-First Evolution Architect；skill-review 消费者；高风险 workflow 维护者；知识沉淀消费者。
 **Origin flows:** Slice D 高风险 eval seed + 知识沉淀同一 release wave。
 **Origin acceptance examples:** AE-10（R-24/R-25/R-26/R-35/R-38）；AE-11（R-37 等 governance/reporting 切片）。
 
@@ -87,7 +87,7 @@ origin_grade: prd
 
 - target_repo: `.`
 - evidence_sources: direct source reads, `grep`/`find`, governance JSON, eval fixture 结构, git status, package scripts。
-- source_refs: `skills/spec-skill-audit/scripts/lint-skill-structure.js`, `skills/spec-skill-audit/scripts/collect-skill-facts.js`, `skills/spec-skill-audit/scripts/lib/scoring.js`, `src/cli/contracts/dual-host-governance/skills-governance.json`, `skills/spec-mcp-setup/`, `skills/spec-optimize/`, `skills/spec-compound-refresh/`, `skills/spec-brainstorm/evals/routing-cases.json`, `skills/spec-work/evals/examples.json`, `docs/项目审查/README.md`, `tests/unit/workflow-eval-readiness-contracts.test.js`, `tests/unit/eval-fixture-contracts.test.js`, `tests/unit/skill-audit-scripts.test.js`。
+- source_refs: `skills/retired-skill-review/scripts/lint-skill-structure.js`, `skills/retired-skill-review/scripts/collect-skill-facts.js`, `skills/retired-skill-review/scripts/lib/scoring.js`, `src/cli/contracts/dual-host-governance/skills-governance.json`, `skills/spec-mcp-setup/`, `skills/spec-optimize/`, `skills/spec-compound-refresh/`, `skills/spec-brainstorm/evals/routing-cases.json`, `skills/spec-work/evals/examples.json`, `docs/项目审查/README.md`, `tests/unit/workflow-eval-readiness-contracts.test.js`, `tests/unit/eval-fixture-contracts.test.js`, `tests/unit/skill-review-scripts.test.js`。
 - current_revision: `bc71b4be`（worktree 含 Slice A'/B/C 已落地变更）。
 - worktree_status: dirty；Slice A'/B/C 变更已落地；本计划不修改它们。
 - confidence: high — 5 条 requirement 均已 bounded direct read 确认当前缺口；R-37 README 现状（5 行 stub）已读全文。
@@ -111,9 +111,9 @@ origin_grade: prd
 
 ### Relevant Code and Patterns
 
-- `skills/spec-skill-audit/scripts/lint-skill-structure.js` — REQUIRED_SECTIONS（flat P1/P2）+ missing_section finding；R-25 分层改点。
-- `skills/spec-skill-audit/scripts/collect-skill-facts.js` — inventory 来源，当前不带 entry_surface；R-25 需 join governance。
-- `skills/spec-skill-audit/scripts/lib/scoring.js` — eval_readiness 维度（`has_evals ? 'conservative_signal' : 'missing'`）；R-24 落地后该维度变化。
+- `skills/retired-skill-review/scripts/lint-skill-structure.js` — REQUIRED_SECTIONS（flat P1/P2）+ missing_section finding；R-25 分层改点。
+- `skills/retired-skill-review/scripts/collect-skill-facts.js` — inventory 来源，当前不带 entry_surface；R-25 需 join governance。
+- `skills/retired-skill-review/scripts/lib/scoring.js` — eval_readiness 维度（`has_evals ? 'conservative_signal' : 'missing'`）；R-24 落地后该维度变化。
 - `skills/spec-work/evals/examples.json`、`skills/spec-plan/evals/examples.json` — `prompt-examples/v1` schema 模板，R-24/R-38 复用。
 - `skills/spec-brainstorm/evals/routing-cases.json` — negative-case 结构（forbidden_signals/boundary_note），R-26 复用。
 - `src/cli/contracts/dual-host-governance/skills-governance.json` — entry_surface 来源，R-25 join。
@@ -169,7 +169,7 @@ flowchart TB
     CR[spec-compound-refresh/evals<br/>R-24 seed + R-38 晋升判定]
   end
   subgraph Boundary[R-26 top5 negative eval]
-    BP[brainstorm/prd · debug/optimize ·<br/>skill-audit/write-skill · prd/write-tasks ·<br/>code-review/doc-review]
+    BP[brainstorm/prd · debug/optimize ·<br/>skill-review/write-skill · prd/write-tasks ·<br/>code-review/doc-review]
   end
   subgraph Lint[R-25 section lint 分层]
     LJ[lint join governance entry_surface]
@@ -284,9 +284,9 @@ flowchart TB
 **Dependencies:** None
 
 **Files:**
-- Modify: `skills/spec-skill-audit/scripts/lint-skill-structure.js`
-- Possibly Modify: `skills/spec-skill-audit/scripts/collect-skill-facts.js`（若需把 entry_surface 带进 inventory）
-- Modify/Test: `tests/unit/skill-audit-scripts.test.js`
+- Modify: `skills/retired-skill-review/scripts/lint-skill-structure.js`
+- Possibly Modify: `skills/retired-skill-review/scripts/collect-skill-facts.js`（若需把 entry_surface 带进 inventory）
+- Modify/Test: `tests/unit/skill-review-scripts.test.js`
 
 **Approach:**
 - 在 lint 输入处 join skills-governance.json 取每个 skill 的 entry_surface（或在 collect-skill-facts join 后带入 inventory）。
@@ -304,7 +304,7 @@ flowchart TB
 - Error path: 不得把 public workflow section 降级。
 - Integration: 现有 lint 单测不回归。
 
-**Verification:** `npx jest tests/unit/skill-audit-scripts.test.js`；全仓 audit 确认分层生效。
+**Verification:** `npx jest tests/unit/skill-review-scripts.test.js`；全仓 audit 确认分层生效。
 
 ---
 
@@ -317,11 +317,11 @@ flowchart TB
 **Dependencies:** None
 
 **Files:**
-- Modify/Create: 相关 workflow 的 evals（如 `skills/spec-brainstorm/evals/routing-cases.json`、`skills/spec-debug/evals/`、`skills/spec-skill-audit/evals/`、`skills/spec-prd/evals/`、`skills/spec-code-review/evals/`）——具体落点取决于每个 pair 的 owner skill。
+- Modify/Create: 相关 workflow 的 evals（如 `skills/spec-brainstorm/evals/routing-cases.json`、`skills/spec-debug/evals/`、`skills/retired-skill-review/evals/`、`skills/spec-prd/evals/`、`skills/spec-code-review/evals/`）——具体落点取决于每个 pair 的 owner skill。
 - Modify/Test: `tests/unit/eval-fixture-contracts.test.js`
 
 **Approach:**
-- 5 pair：brainstorm/prd、debug/optimize、skill-audit/write-skill、prd/write-tasks、code-review/doc-review。
+- 5 pair：brainstorm/prd、debug/optimize、skill-review/write-skill、prd/write-tasks、code-review/doc-review。
 - 每 pair 在其中一侧 workflow 的 eval 加 1 条 negative case：input 是易混淆到对面的请求，forbidden_signals/boundary_note 断言"必须 NOT 路由到对面 workflow"。
 - 复用现有 routing-cases.json / examples.json negative-case 结构。
 
@@ -409,7 +409,7 @@ flowchart TB
 
 - 更新 `CHANGELOG.md`，记录 Slice D 实施。
 - eval seed 是 maintainer fixture，不触发 runtime regeneration（除非顺带改 SKILL prose，那时跑 `spec-first init`）。
-- R-25 改 lint 逻辑后跑全仓 `skill-audit` 确认 audit 基线变化符合预期。
+- R-25 改 lint 逻辑后跑全仓 `skill-review` 确认 audit 基线变化符合预期。
 - 落地后更新源 PRD Feature Slices 段 Slice D 状态标注，刷新 ready receipt。
 - 若任一 eval seed 改了 workflow SKILL prose，该 prose 改动需 fresh-source eval。
 
@@ -419,13 +419,13 @@ flowchart TB
 
 - **Origin document:** [docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md](../brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md)
 - **前序 plan:** [Slice A'](2026-06-28-003-refactor-spec-skill-stability-gates-plan.md) · [Slice C+B](2026-06-28-005-refactor-routing-governance-link-checker-plan.md)
-- Related code: `skills/spec-skill-audit/scripts/lint-skill-structure.js`
-- Related code: `skills/spec-skill-audit/scripts/collect-skill-facts.js`
-- Related code: `skills/spec-skill-audit/scripts/lib/scoring.js`
+- Related code: `skills/retired-skill-review/scripts/lint-skill-structure.js`
+- Related code: `skills/retired-skill-review/scripts/collect-skill-facts.js`
+- Related code: `skills/retired-skill-review/scripts/lib/scoring.js`
 - Related code: `src/cli/contracts/dual-host-governance/skills-governance.json`
 - Related fixture template: `skills/spec-work/evals/examples.json`
 - Related fixture template: `skills/spec-brainstorm/evals/routing-cases.json`
 - Related doc: `docs/项目审查/README.md`
 - Related tests: `tests/unit/workflow-eval-readiness-contracts.test.js`
 - Related tests: `tests/unit/eval-fixture-contracts.test.js`
-- Related tests: `tests/unit/skill-audit-scripts.test.js`
+- Related tests: `tests/unit/skill-review-scripts.test.js`

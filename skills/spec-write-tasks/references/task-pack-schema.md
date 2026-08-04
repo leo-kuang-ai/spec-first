@@ -16,7 +16,7 @@ title: "<Task Pack Title>"
 type: "task-pack"
 status: "derived"
 date: "2026-04-26"
-spec_id: "YYYY-MM-DD-NNN-<slug>"
+spec_id: "YYYY-MM-DD-NNN-<slug>" # optional compatibility trace when the source plan carries one
 source_plan: "docs/plans/YYYY-MM-DD-NNN-<type>-<slug>-plan.md"
 source_plan_hash: "sha256:<64-hex>"
 generated_by: "spec-write-tasks"
@@ -30,14 +30,14 @@ source_sections:
 
 ### Deterministic Frontmatter
 
-These fields are required for executable handoff and are validated by `spec-first tasks validate`:
+The core fields below are required for executable handoff and are validated by `spec-first tasks validate`. Executable identity is `source-plan-path+body-hash`; `spec_id` is an optional compatibility trace validated only when present on both artifacts.
 
 | Field | Meaning |
 | --- | --- |
 | `type` | Must be `task-pack` |
 | `status` | Executable handoff must be `derived`; unverified drafts must use `draft` and are reported as non-executable by the validator |
-| `spec_id` | Spec-chain identity copied from the source plan; executable handoff requires it |
-| `source_plan` | Concrete repo-relative POSIX file path to the single source plan |
+| `spec_id` | Optional compatibility trace copied from the source plan when available; when both artifacts carry it, mismatch is rejected as wrong-chain |
+| `source_plan` | Concrete artifact-root-relative POSIX file path to the single source plan; this path is part of executable identity |
 | `source_plan_hash` | Canonical source plan body hash; executable handoff must use `sha256:<64-hex>` |
 | `generated_by` | Must be `spec-write-tasks` |
 | `mode` | Executable handoff must be `derived`; transient slices are not stable `spec-work` input |
@@ -53,11 +53,11 @@ These fields improve review and regeneration quality, but current deterministic 
 | `source_sections` | Plan sections actually consumed by this task pack |
 | `target_repo` | Selected child repo for parent-workspace single-repo work, when applicable |
 
-`spec_id` and `source_plan_hash` have separate jobs. `spec_id` identifies the requirements/plan/task-pack chain; `source_plan_hash` proves the task pack is still derived from the current source plan body. A task pack whose `spec_id` does not match the source plan is a wrong-chain handoff. A task pack whose hash does not match is stale.
+`source_plan` and `source_plan_hash` form executable identity. The path identifies the source plan within the artifact root; the hash proves the task pack is still derived from the current canonical plan body. `spec_id` is an optional compatibility trace: when task pack and source plan both carry it, a mismatch is a wrong-chain handoff; when either side omits it, validation remains executable and returns limitation `task-pack-spec-id-trace-missing`.
 
-`source_plan_hash` must be produced by `spec-first tasks hash <plan-path>` using canonical source plan body hashing: UTF-8 text, normalized newlines, complete frontmatter removed when present, and the remaining Markdown body hashed without section extraction or whitespace collapsing.
+`source_plan_hash` must be produced by `spec-first tasks hash <plan-path> --repo <artifact-root> --json` using canonical source plan body hashing: UTF-8 text, normalized newlines, complete frontmatter removed when present, and the remaining Markdown body hashed without section extraction or whitespace collapsing. Copy the command's artifact-root-relative POSIX `source_plan` field into task-pack metadata; `plan_path` is an absolute compatibility diagnostic, not portable identity.
 
-If the source plan lacks `spec_id`, do not write an executable task pack. Return to `spec-plan` to add plan frontmatter, or write only a draft/transient task pack that is explicitly not valid `spec-work` input.
+Resolve both hash and validation operands under the same existing directory passed as `--repo <artifact-root>`. The CLI reports canonical `artifact_root`; validation temporarily also reports same-value `repo_root` as a compatibility alias. Neither field selects the downstream mutation repository.
 
 If the current environment cannot produce a verifiable hash, do not write an executable handoff. A draft/non-executable task pack is allowed only when:
 
@@ -302,10 +302,10 @@ For detailed quality guidance, bad smells, and examples, see [Task Quality Guide
 Scripts may check:
 
 - frontmatter fields are complete,
-- `spec_id` is present and matches the current source plan when the source plan has one,
+- when both task pack and source plan carry `spec_id`, the values match; otherwise the validator records the optional compatibility trace limitation,
 - `source_plan` exists,
 - `source_plan_hash` format is valid and executable handoff uses `sha256:<64-hex>`,
-- if `spec_id` does not match the current source plan, execution must be rejected,
+- if both `spec_id` values exist and do not match, execution is rejected as wrong-chain,
 - `Task Pack Contract` exists as a single fenced JSON block and parses,
 - `task_id` values are unique,
 - MVP required task fields, including `stop_if`, are present and structurally valid,
@@ -340,6 +340,6 @@ Rebuild the task pack when any of these changes:
 
 If `source_plan_hash` does not match, execution must be rejected and the task pack must be rebuilt.
 
-If `spec_id` does not match the current source plan, execution must be rejected as wrong-chain handoff and the task pack must be rebuilt from the source plan.
+If both artifacts carry `spec_id` and the values do not match, execution must be rejected as wrong-chain handoff and the task pack must be rebuilt from the source plan. A missing trace alone does not require regeneration when path, hash, and structure still validate.
 
 If execution triggers a task's `stop_if`, return to `spec-plan` or rerun `spec-write-tasks`.

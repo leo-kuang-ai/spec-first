@@ -1,0 +1,23 @@
+{
+  "arm": "old-full",
+  "repeat": 2,
+  "case_id": "portable-create-non-spec-first",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "near-neighbor",
+    "case_id": "portable-create-non-spec-first",
+    "effect": "No spec-first source patch; route to a portable Agent Skill authoring workflow.",
+    "layer_result": "Reusable job qualifies as a skill, but the target repository lacks the required spec-first ownership, governance, catalog, and projection contracts.",
+    "modifier": "non-spec-first-target",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "这是可复用任务，但不应套用 spec-first 的治理和 runtime 投影约定。改走通用 Agent Skill authoring：在项目约定的 skills 目录创建 kebab-case package，写清 API 变更输入、兼容性清单输出、正负触发边界，并只添加被入口引用的必要 references/evals；先确认该仓库的宿主、安装位置和验证命令。",
+    "route_decision": "near-neighbor: generic portable skill creation",
+    "source_owner_assumption": "The ordinary Node.js repository owns the package under its own conventions; no spec-first source owner is assumed.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

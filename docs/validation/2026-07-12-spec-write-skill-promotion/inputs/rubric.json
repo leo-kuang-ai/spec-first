@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reviews"
+  ],
+  "properties": {
+    "reviews": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "variant_id",
+          "requirements_coverage",
+          "trigger_boundary",
+          "execution_completeness",
+          "required_references",
+          "no_contamination",
+          "result",
+          "rationale"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string"
+          },
+          "variant_id": {
+            "type": "string"
+          },
+          "requirements_coverage": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "trigger_boundary": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "execution_completeness": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "required_references": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "no_contamination": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail"
+            ]
+          },
+          "rationale": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

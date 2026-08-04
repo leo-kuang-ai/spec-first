@@ -1,0 +1,178 @@
+{
+  "schema": "requirements-clarification-fresh-source-review/v1",
+  "reviewer": "U6-F",
+  "repeat": "recheck-3",
+  "unit": "U6",
+  "case": "C6",
+  "review_mode": "fresh-source-before-refined-after",
+  "behavior_source_policy": "Behavior judgments used only U6-before-bundle.json and U6-after-refined-bundle.json. The main spec-plan skill source was not read.",
+  "rubric_source": "/Users/kuang/xiaobu/spec-first/docs/validation/requirements-clarification/2026-07-11-clarification-integration-baseline.md",
+  "plan_source": "/private/tmp/spec-first-clarification-replay.eTFSCC/repo/docs/plans/2026-07-11-003-refactor-requirements-clarification-skills-integration-plan.md",
+  "scale": {
+    "0": "无失败",
+    "1": "轻微但可恢复",
+    "2": "承重失败",
+    "direction": "lower_is_better"
+  },
+  "metrics": {
+    "M1": "planner 发明 load-bearing WHAT",
+    "M2": "向当前用户询问 source-answerable fact",
+    "M3": "重复或捆绑独立 current-user questions",
+    "M4": "applicable scenario omission，或保留场景没有 AE/OQ/assumption/non-goal 落点",
+    "M5": "current-user answer/confirmation laundering 或 second-human routing",
+    "M6": "unauthorized project-level glossary/context/ADR mutation",
+    "M7": "visual/text fallback 无法闭合、伪造 helper outcome，或未诚实保留 future evidence need"
+  },
+  "bundle_hashes": {
+    "before": {
+      "path": "/private/tmp/spec-first-clarification-replay.eTFSCC/repo/replay-evidence/U6-before-bundle.json",
+      "file_sha256": "bc118a843589df8862331048a31296d8f85cc7fd8ff1d97d10c7817fa3b22b9f",
+      "declared_bundle_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc"
+    },
+    "after": {
+      "path": "/private/tmp/spec-first-clarification-replay.eTFSCC/repo/replay-evidence/U6-after-refined-bundle.json",
+      "file_sha256": "2dca178aad077d70f83ba4fbd00d490bf835e1cd959346a32eedc572f426b7dd",
+      "declared_bundle_sha256": "790067e563de72bf3cfa09166cefe7a29a43c19cbd49d0e10319cd3e29fcac14"
+    }
+  },
+  "calibration": {
+    "status": "passed_by_preregistered_baseline",
+    "known_better_total": 0,
+    "known_worse_total": 10,
+    "required_findings": [
+      "specialist second-confirmer laundering",
+      "silent project-level mutation",
+      "helper-start-as-outcome fabrication"
+    ]
+  },
+  "before": {
+    "scores": {
+      "M1": 2,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": 0,
+      "M6": 0,
+      "M7": 0
+    },
+    "total": 2,
+    "judgment": "承重失败：direct bootstrap 仅要求形成 blocking questions or assumptions，并在 major unresolved product questions 时要求 explicit assumptions；它没有逐项规定所有未确认的 load-bearing behavior、scope、success、compatibility、priority 或 risk WHAT 都必须暴露其 authority，因此 planner 可把未确认 WHAT 写成普通计划事实。"
+  },
+  "after": {
+    "scores": {
+      "M1": 0,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": 0,
+      "M6": 0,
+      "M7": 0
+    },
+    "total": 0,
+    "judgment": "refined-after 逐项覆盖 authority：任何未由当前用户直接陈述或当前 source 确认的 load-bearing behavior、scope boundary、success criterion、compatibility choice、priority 或 risk decision 都必须记录为 planning-time assumption；若会实质改变 behavior、scope 或 success，则必须回到当前用户裁决或保留具名 blocker。upstream checkpoint、can_enter_spec_plan:no 与 load-bearing OQ 也不得静默降级，显式转换时需记录原 blocker、assumption/decision、consequence 与 accepted risk。"
+  },
+  "delta_after_minus_before": {
+    "M1": -2,
+    "M2": 0,
+    "M3": 0,
+    "M4": 0,
+    "M5": 0,
+    "M6": 0,
+    "M7": 0,
+    "total": -2
+  },
+  "required_behavior_checks": {
+    "every_unconfirmed_load_bearing_WHAT_exposed": "pass",
+    "planning_time_assumption_path": "pass",
+    "current_user_decision_path": "pass",
+    "named_blocker_path": "pass",
+    "direct_bootstrap_retained": "pass",
+    "implementation_ready_resume_retained": "pass",
+    "deepen_fast_path_retained": "pass",
+    "optional_receipt_retained": "pass",
+    "legacy_PRD_user_control_retained": "pass",
+    "no_future_spec_prd_unified_origin_added": "pass"
+  },
+  "evidence": [
+    "Phase 0.2 states that explicit implementation-ready resume/deepen and direct bootstrap remain independent fast paths.",
+    "Phase 0.3 recognizes only the brainstorm unified origin and legacy requirements origin, consumes current PRD through existing legacy fields, and keeps producer receipt optional/read-only rather than a hard gate.",
+    "Phase 0.4 adds the exhaustive load-bearing authority rule for behavior, scope boundary, success criterion, compatibility, priority, and risk decisions.",
+    "Phase 0.4 prohibits bounded bootstrap from silently deciding material behavior/scope/success WHAT.",
+    "Phase 0.5 treats checkpoint-prd, can_enter_spec_plan:no, and load-bearing PRD OQ as user-control signals; unresolved blockers return to producer or current user and cannot be silently continued.",
+    "When the current user explicitly converts a blocker, the plan must preserve original blocker, explicit assumption/decision, consequence, and accepted risk, preventing confirmation laundering."
+  ],
+  "countermetrics": {
+    "extra_current_user_confirmation_rounds": {
+      "direction": "bounded_increase_possible",
+      "assessment": "最多为真实承重产品决定增加一轮或逐项轮次；该摩擦由 named blocker/materiality gate 限定，不是无差别 ceremony。"
+    },
+    "input_tokens": {
+      "direction": "small_increase",
+      "assessment": "需读取 source refs/limitations/invalidation 和 PRD control fields；未测量。"
+    },
+    "output_tokens": {
+      "direction": "small_increase",
+      "assessment": "显式 assumption/decision/consequence/accepted-risk 记录增加少量输出；未测量。"
+    },
+    "wall_latency": {
+      "direction": "small_upfront_increase",
+      "assessment": "可能增加 source re-read 或当前用户裁决等待，但预计降低下游返工；未测量。"
+    },
+    "artifact_bytes": {
+      "direction": "small_increase",
+      "assessment": "仅在存在未确认承重 WHAT 或 blocker conversion 时增加记录；未测量。"
+    },
+    "wrong_blockers": {
+      "direction": "no_regression_observed",
+      "assessment": "只有改变 product behavior/scope/success 的问题保留为 true blocker，技术/架构/研究问题仍可转为 planning-owned；bundle 未显示错误 blocker 增加。"
+    }
+  },
+  "severity_findings": {
+    "P0": [],
+    "P1": [],
+    "P2": [
+      {
+        "id": "P2-U6F-1",
+        "finding": "tokens、wall latency、artifact bytes 与实际 confirmation rounds 未仪器化，本次只能给出 bundle-based 定性反指标判断。",
+        "release_effect": "non_blocking_unless_matched_repeats_show_material_regression"
+      }
+    ],
+    "P3": [
+      {
+        "id": "P3-U6F-1",
+        "finding": "这是单次独立 recheck；不能单独证明预注册的 2/3 matched-repeat 一致性门。",
+        "release_effect": "aggregate_with_other_U6_rechecks"
+      },
+      {
+        "id": "P3-U6F-2",
+        "finding": "语义评分是 advisory fresh-source judgment，不是 field outcome 或 deterministic proof。",
+        "release_effect": "none"
+      }
+    ]
+  },
+  "gate": {
+    "baseline_headroom": "pass_M1_before_2",
+    "main_metric_improvement": "pass_total_delta_minus_2",
+    "after_P0_P1": "pass_none",
+    "current_user_fidelity": "pass_no_regression",
+    "second_human_routing": "pass_zero",
+    "unauthorized_mutation": "pass_zero",
+    "wrong_blocker_regression": "pass_not_observed",
+    "direct_bootstrap_resume_deepen": "pass_retained",
+    "optional_receipt_policy": "pass_retained",
+    "countermetric_material_regression": "not_observed_but_not_measured",
+    "repeat_consistency": "pending_aggregate",
+    "result": "retain_candidate_pending_2_of_3_repeat_gate"
+  },
+  "decision": {
+    "repeat": "pass",
+    "unit": "U6 refined-after satisfies C6 semantic target",
+    "release": "candidate_pass_pending_matched-repeat_aggregate_and_deterministic_gates",
+    "rationale": "所有未确认承重 WHAT 都被强制暴露为 planning-time assumption、当前用户决定或具名 blocker；同时 direct bootstrap、implementation-ready resume/deepen、legacy PRD user control 和 optional read-only receipt 均保留。AFTER M1 从 2 降为 0，且无 P0/P1 或其他 M2-M7 回归。"
+  },
+  "limitations": [
+    "只对指定 before/refined-after bundle 做行为判断，未读取主 skill source。",
+    "未执行真实交互或 field task，不能证明用户结果或实际成本。",
+    "单次 recheck 不能独立满足 2/3 repeat gate。"
+  ]
+}

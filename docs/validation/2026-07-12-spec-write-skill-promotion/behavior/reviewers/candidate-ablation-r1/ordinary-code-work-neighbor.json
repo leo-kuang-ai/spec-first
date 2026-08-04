@@ -1,0 +1,8 @@
+{
+  "schema_version": "spec-write-skill.blind-review/v1",
+  "blind": true,
+  "independent": true,
+  "result": "not_run",
+  "reason": "This case was outside the scoped authoring-output blind review; deterministic machine evidence is preserved separately.",
+  "comparison_source": "raw/comparison-summary.json"
+}

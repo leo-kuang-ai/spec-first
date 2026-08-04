@@ -1,0 +1,16 @@
+{
+  "base_operation": null,
+  "case_id": "audit-only-neighbor",
+  "effect": "validate-only",
+  "layer_result": "This is a focused trigger-boundary review, not package authoring or readiness work.",
+  "modifier": "none",
+  "required_references": [
+    "The supplied `skills/spec-prd/SKILL.md` content",
+    "Representative positive, negative, and near-neighbor user requests"
+  ],
+  "response": "按只读审查处理：检查 description 是否明确 recurring job、真实触发动作、负向边界以及必要的显式调用或只读限制；用正向、负向和近邻样例判断误触发与漏触发，并给出按严重度排序、带原文定位和建议措辞的 findings。不扩展到 package readiness，也不修改文件。",
+  "route_decision": "near-neighbor-audit-only",
+  "source_owner_assumption": "No source-owner decision is needed because the request authorizes findings only.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

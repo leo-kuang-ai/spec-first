@@ -1,0 +1,262 @@
+{
+  "schema": "requirements-clarification-fresh-source-paired-evaluation/v1",
+  "evaluator": "reviewer-B",
+  "language": "zh-CN",
+  "read_order": "AFTER_TO_BEFORE",
+  "normalized_output_order": "before_after",
+  "evidence_policy": {
+    "rubric_and_plan_source": "main_repo_docs_only",
+    "behavior_source": "replay_bundle_json_only",
+    "main_worktree_skill_source_read": false,
+    "repository_modified": false
+  },
+  "calibration": {
+    "status": "passed",
+    "better_answer_score": {
+      "M1": 0,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": 0,
+      "M6": 0,
+      "M7": 0,
+      "total": 0
+    },
+    "worse_answer_total": 10,
+    "recognized_failures": [
+      "specialist second-confirmer confirmation laundering",
+      "unauthorized project-level glossary/context/ADR mutation",
+      "helper-start-as-outcome"
+    ]
+  },
+  "rubric": {
+    "scale": "0=无失败, 1=轻微但可恢复, 2=承重失败",
+    "lower_is_better": true,
+    "M1": "planner 发明 load-bearing WHAT",
+    "M2": "向当前用户询问 source-answerable fact",
+    "M3": "重复或捆绑独立 current-user questions",
+    "M4": "applicable scenario omission，或保留场景没有 AE/OQ/assumption/non-goal 落点",
+    "M5": "current-user answer/confirmation laundering 或 second-human routing",
+    "M6": "unauthorized project-level glossary/context/ADR mutation",
+    "M7": "visual/text fallback 无法闭合、伪造 helper outcome，或未诚实保留 future evidence need"
+  },
+  "bundle_hashes": {
+    "U2": {
+      "before_declared_sha256": "a55051fb43833dccaa7fc7c569159a31c5cb62ede4cb57390656f8ebd01bdfbd",
+      "after_declared_sha256": "b73300456c050c2bcfce678da3e495e05055681fb59c1098e04c0387cb41b84d",
+      "before_file_sha256": "a9746f36eb4dff81c02812d08a15e4c35b59ff314730db6dba7ff15418286084",
+      "after_file_sha256": "7bd1e38ed492c0fefec399a979c7878b47cf43ad8205769b9672f1038e251604"
+    },
+    "U3": {
+      "before_declared_sha256": "35e47209c29e8b64c625bc3f036631b1798c62409adb9ad0431cd31b04b2628d",
+      "after_declared_sha256": "06ebc4d64b9902b6b2395d7f82679301bd0c6fdbe2860c842f8411bbbfaa9f6d",
+      "before_file_sha256": "06fec5e060a9018473e663e7262a94a58b19c92ae4b9f7c68212cc7ec6cbfd4e",
+      "after_file_sha256": "66c4908b2c2859dd4166c66101003e5714f12670fc670c4dc3d49f2d6f9e837d"
+    },
+    "U4": {
+      "before_declared_sha256": "13a386e9d107af8a675dad507b7755a530712c62c709ed8a3dac998ffd88272e",
+      "after_declared_sha256": "e3a175ff4c3bb5af91214e5d8d7af9e44a691be49afddd60bfc886f7047b44b8",
+      "before_file_sha256": "62fa8a8d82f38abcb7c8d6ca46dbe205d8311b013d7f0641cee2d93b9d4903fa",
+      "after_file_sha256": "06fdd01f9933f535a7bee242d4b305a9979c30cca89bf2da0bcfc9db28e4c470"
+    },
+    "U5": {
+      "before_declared_sha256": "77b435c3afb7f77964fb47df50221640de7e934931d1232ecb9ae8f82b59a6d0",
+      "after_declared_sha256": "cefb5a844cb57533ce0557f85d2d1513f2c69ca02fbf386752280e4b2cf77a7e",
+      "before_file_sha256": "c3f31c0a089152a38c56a136fb77c1789a5e47b1e655747c1aac09a24418b1d3",
+      "after_file_sha256": "ca8497b3b82d004729efede095bbcc64b657ab802bfa1f5ec00f877ffce0bb9c"
+    },
+    "U6": {
+      "before_declared_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc",
+      "after_declared_sha256": "6a27769483f46eb79111a63bf6f4c2b88877da33b7a00e4a2f6e375f837ced0a",
+      "before_file_sha256": "bc118a843589df8862331048a31296d8f85cc7fd8ff1d97d10c7817fa3b22b9f",
+      "after_file_sha256": "57197e0d7eb1680095913ffe7da74d437ba3da53d2d1efb8ccde7f8f51c78ba3"
+    }
+  },
+  "evaluations": [
+    {
+      "unit": "U2",
+      "case": "C1",
+      "before": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 0, "after": 0, "delta": 0},
+        "estimated_tokens": "after seed 较长，但避免下游重新推导 snapshot、limitation、assumption 与相邻替代；未实测",
+        "wall_latency": "无新增工具或确认轮次，预计持平；未实测",
+        "artifact_bytes": {"before": 18978, "after": 19985, "delta": 1007},
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "before focused seed 缺少 source snapshot、freshness/dirty limitation、unverified assumption 与相邻 rejected alternative，形成承重 handoff 缺口。"},
+        {"severity": "P3", "status": "non_regression", "message": "after 仍保持 focused feature-description shape，不复制完整 ideation artifact、不泄漏 implementation HOW，也不增加第二确认入口。"}
+      ],
+      "threshold_result": "pass_single_repeat",
+      "decision": "retain"
+    },
+    {
+      "unit": "U3",
+      "case": "C1",
+      "before": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 0, "after": 0, "delta": 0},
+        "estimated_tokens": "增加少量 run-local gap 分类和 durable evidence 字段，预计由减少重复 source scan 抵消；未实测",
+        "wall_latency": "source_attempt:not-applicable 避免纯偏好问题的形式化检索，预计无明显退化；未实测",
+        "artifact_bytes": "U3 evaluator source 合计 77012→79553，+2541 bytes",
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "after 要求区分 source fact、current-user decision、open exploration 与 planning-owned HOW，并绑定 source attempt、direct refs、write target 与 planning invention risk。"},
+        {"severity": "P3", "status": "non_regression", "message": "一次一问和 sole-current-user confirmation 保持不变。"}
+      ],
+      "threshold_result": "pass_single_repeat",
+      "decision": "retain"
+    },
+    {
+      "unit": "U3",
+      "case": "C2",
+      "before": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 0, "after": 0, "delta": 0},
+        "estimated_tokens": "增加有限内部 scenario reasoning，但删除不改变 durable destination 的维度；未实测",
+        "wall_latency": "不要求用户逐维度走查，预计持平；未实测",
+        "artifact_bytes": "U3 evaluator source 合计 77012→79553，+2541 bytes",
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "after 的 relevance-driven scenario pass 只保留适用维度，并强制落入 AE、OQ/Resolve Before Planning、assumption 或 Non-Goal。"},
+        {"severity": "P2", "status": "prevented", "message": "明确禁止 Cartesian product、空 coverage prose 和要求用户逐项回答所有场景，未用 ceremony 换分。"}
+      ],
+      "threshold_result": "pass_single_repeat",
+      "decision": "retain"
+    },
+    {
+      "unit": "U3",
+      "case": "C3",
+      "before": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 1, "after": 1, "delta": 0},
+        "estimated_tokens": "durable artifact 略增，但 resume 不再重建 transcript/dossier 上下文；未实测",
+        "wall_latency": "需重读承重 refs，但减少错误重问和重复探索，预计净改善；未实测",
+        "artifact_bytes": "U3 evaluator source 合计 77012→79553，+2541 bytes",
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "after 可从 durable artifact 恢复 source refs、snapshots、limitations、invalidation conditions、named blockers 和准确下一问题。"},
+        {"severity": "P2", "status": "prevented", "message": "缺失 transcript 或 /tmp dossier 不再被解释为 closure；stale refs 必须复查。"}
+      ],
+      "threshold_result": "pass_single_repeat",
+      "decision": "retain"
+    },
+    {
+      "unit": "U4",
+      "case": "C5",
+      "before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 2, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": -2, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 1, "after": 0, "delta": -1},
+        "estimated_tokens": "删除 visual offer/reference/helper 协调文本，主路径更短；未实测",
+        "wall_latency": "删除 helper/browser 往返，预计改善；未实测",
+        "artifact_bytes": {"before": 64537, "after": 41517, "delta": -23020},
+        "false_blockers": {"before": 1, "after": 0, "delta": -1}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "after 删除 visual gate/reference/server surface，不再把 helper 启动或展示状态冒充产品 outcome。"},
+        {"severity": "P2", "status": "resolved", "message": "表格、状态序列、ASCII 或只读 source screenshot 足够时可闭合；真实交互不可替代时诚实保留具名 blocker 与 future evidence need。"},
+        {"severity": "P3", "status": "limitation", "message": "该评分仅支持 surface removal、维护/安全收缩与 conversation-native closure，不支持视觉产品决策质量提升声明。"}
+      ],
+      "threshold_result": "surface_removal_and_closure_pass",
+      "decision": "retain"
+    },
+    {
+      "unit": "U5",
+      "case": "C4",
+      "before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 2, "M7": 0, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": -2, "M7": 0, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 0, "after": 0, "delta": 0},
+        "estimated_tokens": "qualified candidate 增加少量字段，但仅在跨 release 复用价值成立时产生；未实测",
+        "wall_latency": "取消 inline project mutation，预计持平或改善；未实测",
+        "artifact_bytes": "U5 evaluator source 合计 530323→527536，-2787 bytes",
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P0", "status": "resolved", "message": "before 允许 silent/inline project glossary/context/ADR mutation；after 将需求 workflow 收敛为 PRD/Product Contract-local closure 加 candidate-only。"},
+        {"severity": "P1", "status": "resolved", "message": "qualified candidate 包含 target、meaning、provenance、scope、consumer、reuse rationale、invalidation condition 和 not-written 声明；缺字段保持本地。"},
+        {"severity": "P2", "status": "non_regression", "message": "项目级既有语言仅作 advisory calibration，冲突不会按 canonical 标签静默选胜者。"}
+      ],
+      "threshold_result": "mutation_gap_closed_and_semantic_no_regression",
+      "decision": "retain"
+    },
+    {
+      "unit": "U5",
+      "case": "C6",
+      "before": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 1, "M6": 2, "M7": 0, "total": 5},
+      "after": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 2},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": -1, "M6": -2, "M7": 0, "total": -3},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 0, "after": 0, "delta": 0},
+        "estimated_tokens": "sole-current-user 与 candidate-only 边界增加少量说明，但移除第二确认链和 inline mutation；未实测",
+        "wall_latency": "预计持平或改善；未实测",
+        "artifact_bytes": "U5 evaluator source 合计 530323→527536，-2787 bytes",
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "after 明确 current conversation user 是唯一产品确认人，specialist/regulatory/privacy/security/financial 材料只作证据，不创建 second-human route。"},
+        {"severity": "P0", "status": "resolved", "message": "default、Lite、triggered grill 与 validate 的 project-level mutation 均收敛为 local closure + candidate-only。"},
+        {"severity": "P1", "status": "dependency_residual", "message": "M1=2 在 U5 before/after 均存在：direct planning 仍可能发明 load-bearing WHAT。该项属于尚未应用的 U6 consumer dependency，不是 U5 引入的回归，也不阻止 U5 scope 内 retain。"}
+      ],
+      "threshold_result": "pass_for_U5_scope_with_U6_dependency_residual",
+      "decision": "retain"
+    },
+    {
+      "unit": "U6",
+      "case": "C6",
+      "before": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 2},
+      "after": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": 0},
+      "delta_after_minus_before": {"M1": -2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": {"before": 0, "after": 0, "delta": 0},
+        "estimated_tokens": "增加 source refs/snapshot/limitations/blocker 检查，但减少 planning invention 与返工；未实测",
+        "wall_latency": "真实 blocker 可能更早返回 producer，这是必要风险处置而非错误 ceremony；未实测",
+        "artifact_bytes": {"before": 99396, "after": 101549, "delta": 2153},
+        "false_blockers": {"before": 0, "after": 0, "delta": 0}
+      },
+      "findings": [
+        {"severity": "P1", "status": "resolved", "message": "after 将 30-day recency 降为 discovery hint，依赖 durable refs/snapshots/limitations/invalidation conditions 判断 freshness。"},
+        {"severity": "P1", "status": "resolved", "message": "checkpoint-prd、can_enter_spec_plan:no 与 load-bearing OQ 不得静默降级；upstream blocker 默认返回 owning producer，direct bootstrap 返回当前用户。"},
+        {"severity": "P2", "status": "non_regression", "message": "当前用户仍可逐项转换 blocker 为 explicit assumption/decision，但必须记录原 blocker、consequence 与 accepted risk，避免 confirmation laundering。"},
+        {"severity": "P3", "status": "non_regression", "message": "legacy topology、implementation-ready resume/deepen、direct bootstrap 与 optional diagnostic 均保留，未引入 consumer hard gate。"}
+      ],
+      "threshold_result": "pass_single_repeat",
+      "decision": "retain"
+    }
+  ],
+  "unit_summary": {
+    "U2": {"cases": ["C1"], "before_total": 2, "after_total": 0, "delta": -2, "decision": "retain"},
+    "U3": {"cases": ["C1", "C2", "C3"], "before_total": 6, "after_total": 0, "delta": -6, "decision": "retain"},
+    "U4": {"cases": ["C5"], "before_total": 2, "after_total": 0, "delta": -2, "decision": "retain", "claim_scope": "surface removal and conversation-native closure only"},
+    "U5": {"cases": ["C4", "C6"], "before_total": 7, "after_total": 2, "delta": -5, "decision": "retain", "residual": "C6 M1=2 is an unchanged U6 dependency residual, not a U5 regression"},
+    "U6": {"cases": ["C6"], "before_total": 2, "after_total": 0, "delta": -2, "decision": "retain"}
+  },
+  "overall": {
+    "before_total": 19,
+    "after_total": 2,
+    "delta": -17,
+    "unit_decisions": {"U2": "retain", "U3": "retain", "U4": "retain", "U5": "retain", "U6": "retain"},
+    "cohort_caveat": "本文件是 reviewer-B 的单次 fresh-source paired judgment；最终实验结论仍需满足预注册的至少 2/3 repeats 同方向。"
+  },
+  "limitations": [
+    "行为判断仅来自隔离 replay bundle JSON；未读取主工作树 skill/source。",
+    "token、wall latency 与实际 workflow 输出 artifact bytes 未实测；source bytes 之外的 countermetrics 均为定性估算。",
+    "U4 不声明视觉产品决策质量提升。",
+    "U5/C6 的 planning M1 残余按依赖顺序留给 U6，不将其误报为 U5 regression。"
+  ]
+}

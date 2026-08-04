@@ -26,7 +26,7 @@ This task pack is the executable Phase 3 handoff for the source plan. It closes 
 
 - U1-full-batch-2 public workflow contract summaries.
 - U9 release/source-runtime continuity guard.
-- U10 skill-audit guard consumption and rejected/out-of-scope replay.
+- U10 skill-review guard consumption and rejected/out-of-scope replay.
 - U3b retention/prune and U12 checkpoint replay minimal consumer.
 - U11 closeout evidence.
 
@@ -45,7 +45,7 @@ It does not flip `workflow_integrated=true`, create a full replay index, add a n
 | --- | --- | --- | --- |
 | U1-full-batch-2 | R1, R2, R17; all workflow-command skills plus required standalone entry skills have summaries | T001 | public workflow summary tests, release continuity guard |
 | U9 | R13, R14, R15; deterministic guard exposes catalog/governance/docs/package drift with reason codes | T002 | release continuity guard, release governance suite |
-| U10 | R15, R16; skill audit consumes guard results and plan/work consume rejected/out-of-scope replay refs | T003 | skill-audit/plan/work/session/compound contract tests |
+| U10 | R15, R16; skill audit consumes guard results and plan/work consume rejected/out-of-scope replay refs | T003 | skill-review/plan/work/session/compound contract tests |
 | U3b / U12-checkpoint-replay | R5, R23, R26; run evidence can be read/pruned safely without becoming workflow state | T004 | run artifact contract/producer tests |
 | U11 | R17, R26; changelog, validation, runtime impact, fresh-source eval, full acceptance | T005 | changelog, typecheck, release/build checks, validation artifact |
 
@@ -53,7 +53,7 @@ It does not flip `workflow_integrated=true`, create a full replay index, add a n
 
 - T001 should run first so release guards can check complete public summary coverage.
 - T002 depends on T001 because the guard reads the summary inventory.
-- T003 can follow T002 so skill-audit guidance can reference guard results.
+- T003 can follow T002 so skill-review guidance can reference guard results.
 - T004 can run after T002 and T003; it touches the same `spec-work` surface as replay guidance.
 - T005 closes the phase after verification and fresh-source eval.
 
@@ -108,7 +108,7 @@ It does not flip `workflow_integrated=true`, create a full replay index, add a n
         "skills/spec-polish-beta/SKILL.md",
         "skills/spec-release-notes/SKILL.md",
         "skills/spec-sessions/SKILL.md",
-        "skills/spec-skill-audit/SKILL.md",
+        "skills/retired-skill-review/SKILL.md",
         "skills/spec-slack-research/SKILL.md",
         "tests/unit/public-workflow-contract-summary.test.js",
         "CHANGELOG.md"
@@ -163,13 +163,13 @@ It does not flip `workflow_integrated=true`, create a full replay index, add a n
       "task_id": "T003",
       "source_unit": "U10",
       "requirement_refs": ["R15", "R16"],
-      "goal": "Ensure skill-audit consumes guard results and plan/work/session/compound surfaces consume provenance-backed rejected/out-of-scope rationale without creating workflow state.",
+      "goal": "Ensure skill-review consumes guard results and plan/work/session/compound surfaces consume provenance-backed rejected/out-of-scope rationale without creating workflow state.",
       "dependencies": ["T002"],
       "files": [
-        "skills/spec-skill-audit/SKILL.md",
+        "skills/retired-skill-review/SKILL.md",
         "skills/spec-plan/SKILL.md",
         "skills/spec-work/SKILL.md",
-        "tests/unit/spec-skill-audit-contracts.test.js",
+        "tests/unit/retired-skill-review-contracts.test.js",
         "tests/unit/spec-plan-contracts.test.js",
         "tests/unit/spec-work-contracts.test.js",
         "tests/unit/spec-sessions-contracts.test.js",
@@ -178,7 +178,7 @@ It does not flip `workflow_integrated=true`, create a full replay index, add a n
       ],
       "context_refs": [
         "docs/plans/2026-05-11-002-feat-spec-first-project-optimization-upgrade-plan.md#U10. Skill public surface、dependency tier 与 rejected-scope replay",
-        "skills/spec-skill-audit/SKILL.md",
+        "skills/retired-skill-review/SKILL.md",
         "skills/spec-sessions/SKILL.md",
         "skills/spec-compound/SKILL.md"
       ],

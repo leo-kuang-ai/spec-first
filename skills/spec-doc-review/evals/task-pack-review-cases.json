@@ -1,0 +1,53 @@
+{
+  "schema_version": "spec-first.spec-doc-review.task-pack-review-cases/v1",
+  "skill": "spec-doc-review",
+  "source_refs": [
+    "skills/spec-doc-review/SKILL.md",
+    "skills/spec-doc-review/references/task-pack-review-lens.md",
+    "skills/spec-doc-review/references/synthesis-and-presentation.md",
+    "skills/spec-write-tasks/references/execution-handoff-contract.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "valid-reviewed-task-pack",
+      "input": "A current executable task pack validates, matches an implementation-ready source plan, has complete mandatory coverage, and has no unresolved P0/P1 finding.",
+      "expected": {
+        "review_result": "passed",
+        "reason_code": "task-pack-review-passed",
+        "next_action": "spec-work-task-pack"
+      },
+      "forbidden": ["patch derived task pack", "infer semantic-fit from validator success alone"]
+    },
+    {
+      "id": "stale-task-pack-intake",
+      "input": "The current task pack fails deterministic validation because its source-plan hash is stale.",
+      "expected": {
+        "review_result": "incomplete",
+        "reason_code": "stale_hash",
+        "next_action": "spec-write-tasks"
+      },
+      "forbidden": ["dispatch personas", "reclassify as plan", "hand-calculate hash"]
+    },
+    {
+      "id": "task-pack-semantic-gap",
+      "input": "The source plan is sufficient, but task dependencies, waves, or files omit material execution semantics.",
+      "expected": {
+        "review_result": "blocked",
+        "reason_code": "task-pack-regeneration-required",
+        "next_action": "spec-write-tasks"
+      },
+      "forbidden": ["send directly to spec-work", "change source-plan scope"]
+    },
+    {
+      "id": "source-plan-decision-gap",
+      "input": "The task pack exposes a missing architecture, repo-owner, acceptance, or verification decision in the current source plan.",
+      "expected": {
+        "review_result": "blocked",
+        "reason_code": "source-plan-revision-required",
+        "next_action": "spec-plan"
+      },
+      "forbidden": ["invent the decision in task pack", "regenerate without plan repair"]
+    }
+  ]
+}

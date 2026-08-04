@@ -20,6 +20,21 @@
 
 set -euo pipefail
 
+resolve_python() {
+  local candidate
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+      PYTHON_CMD=("$candidate")
+      return 0
+    fi
+  done
+  if command -v py >/dev/null 2>&1 && py -3 -c 'import sys; raise SystemExit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+    PYTHON_CMD=(py -3)
+    return 0
+  fi
+  return 1
+}
+
 # Parse arguments
 COMMAND="${1:?Error: command argument required}"
 TIMEOUT="${2:?Error: timeout_seconds argument required}"
@@ -55,8 +70,8 @@ run_with_timeout() {
     return
   fi
 
-  if command -v python3 >/dev/null 2>&1; then
-    python3 - "$TIMEOUT" "$COMMAND" <<'PY'
+  if resolve_python; then
+    "${PYTHON_CMD[@]}" - "$TIMEOUT" "$COMMAND" <<'PY'
 import os
 import signal
 import subprocess
@@ -80,7 +95,7 @@ PY
     return
   fi
 
-  echo "Error: no timeout implementation available (tried timeout, gtimeout, python3)" >&2
+  echo "Error: no timeout implementation available (tried timeout, gtimeout, python3, python, py -3)" >&2
   exit 1
 }
 

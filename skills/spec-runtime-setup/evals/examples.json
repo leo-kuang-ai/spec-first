@@ -1,0 +1,51 @@
+{
+  "schema_version": "spec-first.workflow-eval-fixtures.v1",
+  "skill": "spec-runtime-setup",
+  "description": "Examples-as-context for spec-runtime-setup trigger and boundary coverage. They are not a deterministic router or runtime-readiness gate.",
+  "source_refs": [
+    "skills/spec-runtime-setup/SKILL.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "setup-runtime-readiness-trigger",
+      "input": "Set up the required harness runtime and verify MCP servers and provider tools are installed for this repo.",
+      "coverage_tags": ["trigger"],
+      "expected_outcome": "Discover current setup facts, present missing dependencies and non-actions, then apply only setup-owned host runtime configuration through documented targets."
+    },
+    {
+      "id": "runtime-drift-repair-trigger",
+      "input": "Generated runtime mirrors look stale after a source change; refresh the host runtime.",
+      "coverage_tags": ["trigger", "runtime-drift"],
+      "expected_outcome": "Run source-first regeneration through spec-first init for the selected host; do not hand-edit generated mirrors as a source fix."
+    },
+    {
+      "id": "ordinary-code-edit-boundary",
+      "input": "Fix a typo in a skill SKILL.md paragraph.",
+      "coverage_tags": ["boundary", "scope-routing"],
+      "expected_outcome": "A clearly scoped low-risk source edit is not a setup task; do not route to runtime-setup or run state-changing setup commands.",
+      "boundary_note": "Setup owns runtime/provider readiness, not ordinary source edits.",
+      "forbidden_signals": ["run-setup-for-source-edit", "spec-first-init-for-typo"]
+    },
+    {
+      "id": "degraded-provider-failure",
+      "input": "A required provider tool cannot be installed in this environment; what does setup return?",
+      "coverage_tags": ["failure", "degraded-mode"],
+      "expected_outcome": "Report the missing dependency and a documented degraded path with reason; do not fabricate provider readiness."
+    },
+    {
+      "id": "graphify-core-ready-unknown-freshness",
+      "input": "Graphify package, artifact integrity, and real query probe are ready, but verify-only reports readiness_status=unknown. Finish runtime setup.",
+      "coverage_tags": ["provider-readiness", "freshness", "manual-only"],
+      "expected_outcome": "Treat core-ready unknown as successful setup with no current-run freshness claim; do not automatically run or recommend an immediate Graphify refresh unless source changed and the next graph consumer needs new currentness evidence.",
+      "forbidden_signals": ["unknown-means-query-failed", "automatic-refresh-after-verify"]
+    },
+    {
+      "id": "graphify-external-hooks-unverified",
+      "input": "The effective core.hooksPath points outside the repository and Graphify core setup is ready. Report the hook state.",
+      "coverage_tags": ["provider-readiness", "project-boundary", "git-hooks"],
+      "expected_outcome": "Report optional project-local auto-refresh as blocked/manual-only and external hook execution as unverified; do not inspect or mutate the external hook and do not claim it is absent, uninstalled, or unable to execute.",
+      "forbidden_signals": ["external-hook-not-installed", "external-hook-cannot-run", "mutate-global-hooks"]
+    }
+  ]
+}

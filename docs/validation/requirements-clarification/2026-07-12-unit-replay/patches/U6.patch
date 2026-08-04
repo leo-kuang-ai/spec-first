@@ -1,0 +1,59 @@
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -164,0 +165,2 @@ Before asking planning questions, resolve the upstream product source in this or
++Discovery recognizes exactly two durable origin shapes: a `spec-brainstorm` requirements-only unified plan (`product_contract_source: spec-brainstorm`) and a legacy `docs/brainstorms/*-requirements.{md,html}` document. A current `spec-prd` artifact is consumed as the legacy shape when its existing artifact/readiness/Handoff fields are present. Do not add a future `product_contract_source: spec-prd` unified origin without a separately approved producer-migration plan. Explicit implementation-ready resume/deepen and direct bootstrap remain independent fast paths.
++
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -171 +172,0 @@ Before asking planning questions, resolve the upstream product source in this or
+-- It was created within the last 30 days (use judgment to override if the document is clearly still relevant or clearly stale)
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -173,0 +175,2 @@ Before asking planning questions, resolve the upstream product source in this or
++Creation within the last 30 days only raises a candidate's discovery and ordering priority. Age is never required for relevance or freshness: an older source that still matches the topic and user problem remains eligible, while a recent source is not automatically relevant or current. Before relying on an origin, inspect its durable source refs, snapshots/versions, limitations, and invalidation conditions. Re-read changed source refs and record the resulting limitation; absence of a recent timestamp does not invalidate a still-current source, and recency does not confirm truth.
++
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -179 +182 @@ If a relevant requirements-only unified plan exists:
+-1. Read metadata, Goal Capsule, Product Contract, Open Questions, and Sources (scan headings to locate them; don't read long appendices unless referenced).
++1. Read metadata, Goal Capsule, Product Contract, Resolve Before Planning / Open Questions, Sources, source refs, snapshots/versions, limitations, and invalidation conditions (scan headings to locate them; don't read long appendices unless referenced).
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -200,0 +204 @@ If a relevant legacy requirements document exists:
++7. Inspect current PRD compatibility fields when present, including `checkpoint-prd`, `can_enter_spec_plan: no`, readiness/write status, and Handoff Context Slice. Producer receipt remains an optional read-only diagnostic, never a consumer hard gate.
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -248,0 +253,2 @@ If the origin document contains `Resolve Before Planning` or similar blocking qu
++Treat `checkpoint-prd`, `can_enter_spec_plan: no`, and any load-bearing PRD Outstanding Question as the same user-control signal. Do not silently ignore, downgrade, or convert one merely because the document is old or otherwise readable.
++
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -251,3 +257,4 @@ If true product blockers remain:
+-- Ask the user, using the platform's blocking question tool when available (see Interaction Method), whether to:
+-  1. Resume `spec-brainstorm` to resolve them
+-  2. Convert them into explicit assumptions or decisions and continue
++- For an upstream-sourced run, return to the upstream producer by default (`spec-brainstorm` for a brainstorm Product Contract, `spec-prd` for a legacy PRD checkpoint). For direct bootstrap, direct bootstrap returns to the current user because no producer artifact owns the gap.
++- Ask the current user, using the platform's blocking question tool when available (see Interaction Method), whether to:
++  1. Return to the owning producer to resolve them
++  2. Convert each blocker into an explicit assumption or decision and continue
+diff --git a/skills/spec-plan/SKILL.md b/skills/spec-plan/SKILL.md
+index 754900b6..71b7191c 100644
+--- a/skills/spec-plan/SKILL.md
++++ b/skills/spec-plan/SKILL.md
+@@ -255,0 +263,2 @@ If true product blockers remain:
++When the current user chooses option 2, record the original blocker, the explicit assumption/decision, consequence, and accepted risk in the plan. This preserves user control without laundering the blocker into producer-confirmed WHAT.
++

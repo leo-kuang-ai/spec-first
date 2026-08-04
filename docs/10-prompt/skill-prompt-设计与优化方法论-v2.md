@@ -14,6 +14,11 @@
 > - **第三部分（§23–§26）· 决策模型透镜：** 用精选思维模型锐化设计与优化决策。
 > - **§27 端到端样板：** 把上面的方法走一遍长什么样（照做参考）。
 >
+> 多 agent review 的 fan-out、context isolation、validator budget、aggregate token 与质量/成本
+> Pareto，见专项 companion
+> [`spec-first-skill-prompt压缩优化组合方法论.md`](./spec-first-skill-prompt压缩优化组合方法论.md)；
+> 本文继续作为唯一 canonical，专项文档不重复定义通用 skill 设计合同。
+>
 > **阅读导引：** 新写 skill → 先读第二部分（§11 起）再回第一部分核对边界；精简既有 skill
 > → 读第一部分；想看「照着做一遍」→ 直接跳 §27；需要更锋利的决策直觉 → 查第三部分。
 >
@@ -21,7 +26,7 @@
 >
 > **规范优先级：** 与 `docs/10-prompt/系统性项目审查方法.md` 平级，冲突时让位于
 > `docs/10-prompt/结构化项目角色契约.md`。审计**信号**的 owner 仍是
-> `skills/spec-skill-audit/references/skill-authoring-quality.md`——本文是那些信号
+> `skills/retired-skill-review/references/skill-authoring-quality.md`——本文是那些信号
 > 背后的**设计与优化 playbook**：rubric 告诉你「哪里有问题」，本文告诉你「怎么设计、
 > 怎么改、怎么验证、什么时候不该改」。
 
@@ -326,7 +331,7 @@ Eval 需要报告**充分性等级**，而不是只报「有/没有」。按最�
 
 ## 8. 与现有治理的对齐
 
-- **审计信号 owner：** `skills/spec-skill-audit/references/skill-authoring-quality.md`。其 P1（trigger 误触发、entry/body 不符、越界 ownership、无 completion criterion、source/runtime 误导）与 P2（长 examples/rubric 未下沉、重复真相源、reference 无指针、缺 eval、tier 模糊）信号，正是本方法论要优化的对象。**审计发现问题 → 本 playbook 指导修复。**
+- **审计信号 owner：** `skills/retired-skill-review/references/skill-authoring-quality.md`。其 P1（trigger 误触发、entry/body 不符、越界 ownership、无 completion criterion、source/runtime 误导）与 P2（长 examples/rubric 未下沉、重复真相源、reference 无指针、缺 eval、tier 模糊）信号，正是本方法论要优化的对象。**审计发现问题 → 本 playbook 指导修复。**
 - **审查方法：** `docs/10-prompt/系统性项目审查方法.md`，本文是其在 skill-prompt 维度的专项优化补充。
 - **价值基线：** `docs/10-prompt/结构化项目角色契约.md`（Light contract + Explicit boundaries + Deterministic floor + LLM semantic judgment）。本文所有原则都是该契约在 skill-prompt 场景的具体化；冲突时以契约为准。
 - **参考实现：** `skills/spec-plan` 是当前最佳的 spine + STOP-triggered references 本地范例（其 `spec-plan-contracts.test.js` 断言 runtime 投射与 drift）。注意：spec-plan 用的是**分散内联 STOP 触发**；集中式 `Reference Trigger Map` 是**新增结构**，需自带 contract test，不能声称是现成模式的直接复用。

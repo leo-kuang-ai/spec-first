@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Notification Preference Delivery - Requirements</title>
+</head>
+<body>
+  <header>
+    <h1>Notification Preference Delivery - Requirements</h1>
+    <dl id="artifact-metadata">
+      <dt>artifact_contract</dt><dd>spec-unified-plan/v1</dd>
+      <dt>artifact_readiness</dt><dd>requirements-only</dd>
+      <dt>product_contract_source</dt><dd>spec-plan-consumer-replay-fixture</dd>
+      <dt>execution</dt><dd>code</dd>
+    </dl>
+  </header>
+  <main>
+    <section id="goal-capsule">
+      <h2>Goal Capsule</h2>
+      <p><strong>Objective:</strong> Honor each user's notification preference while preserving reliable delivery evidence.</p>
+      <p><strong>Authority hierarchy:</strong> Existing notification preference state and event intake contracts are authoritative.</p>
+      <p><strong>Largest risk or boundary:</strong> A retry must not create duplicate delivery or bypass a preference change.</p>
+    </section>
+    <section id="product-contract">
+      <h2>Product Contract</h2>
+      <h3>Summary</h3>
+      <p>The system must consume the existing event intake, resolve the current notification preference, avoid duplicate delivery, and retain delivery evidence without creating a second preference truth.</p>
+      <h3>Actors</h3>
+      <ul>
+        <li>A1. Notification recipient: owns the notification preference that controls eligible channels.</li>
+        <li>A2. Support operator: inspects delivery evidence without changing subscription state.</li>
+      </ul>
+      <h3>Requirements</h3>
+      <ul>
+        <li>R1. Resolve the current notification preference before dispatch and fail closed when the preference cannot be read.</li>
+        <li>R2. Prevent duplicate delivery when the existing event intake retries the same event.</li>
+        <li>R3. Record delivery evidence that links the event, chosen channel, outcome, and terminal failure without becoming subscription state.</li>
+      </ul>
+      <h3>Key Flows</h3>
+      <ul>
+        <li>F1. Eligible delivery: existing event intake receives an event, current preference permits a channel, one delivery occurs, and delivery evidence records the result.</li>
+        <li>F2. Retry or preference change: the same event is retried or the preference changes before dispatch; the system deduplicates or suppresses delivery and records the decision.</li>
+      </ul>
+      <h3>Acceptance Examples</h3>
+      <ul>
+        <li>AE1. Given an event whose current notification preference allows email, one email is sent and one delivery evidence record is queryable.</li>
+        <li>AE2. Given a retried event or a preference changed to disabled before dispatch, no duplicate delivery occurs and the evidence explains the suppression.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

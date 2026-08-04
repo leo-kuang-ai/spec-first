@@ -1,0 +1,1 @@
+{"loaded_skills":["using-spec-first"],"invocation_mode":"implicit","effect":"validate-only","reason":"真实请求是只读验证第三方源 Skill package 的结构与 readiness，符合 using-spec-first 将“validate package structure/readiness for a source skill”路由至 spec-write-skill 的规则；本次只做入口判断，不进入该工作流。","entrypoint":"using-spec-first","handoff_target":"spec-write-skill"}

@@ -1,0 +1,239 @@
+{
+  "schema_version": "spec-first.spec-write-skill-trigger-cases.v3",
+  "skill": "spec-write-skill",
+  "source_refs": [
+    "skills/spec-write-skill/SKILL.md",
+    "skills/spec-write-skill/references/authoring-method.md",
+    "skills/spec-write-skill/references/delivery-gates.md",
+    "skills/spec-write-skill/references/target-profiles.md",
+    "skills/spec-write-skill/references/project-profiles.md"
+  ],
+  "source_ref_authority": "source",
+  "evidence_scope": "structural-only",
+  "route_queries": [
+    {
+      "id": "route-explicit-portable-create",
+      "route_type": "should-route",
+      "query": "使用 spec-write-skill，在这个普通仓库创建一个发布检查 Skill。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "explicit-project-skill-authoring",
+      "forbidden_signals": ["require spec-first governance"]
+    },
+    {
+      "id": "route-existing-skill-revise",
+      "route_type": "should-route",
+      "query": "修改这个项目自己维护的 Agent Skill，收紧触发描述并补验证。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "project-owned-skill-revision",
+      "forbidden_signals": ["edit generated mirror"]
+    },
+    {
+      "id": "route-external-package-validation",
+      "route_type": "should-route",
+      "query": "只读验证这个第三方 Skill package 的结构和 readiness，不要安装或修改。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "external-package-validate-only",
+      "forbidden_signals": ["execute package code", "copy package"]
+    },
+    {
+      "id": "route-accepted-audit-remediation",
+      "route_type": "should-route",
+      "query": "按已经接受的 Skill audit findings 修复 canonical source。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "accepted-audit-remediation",
+      "forbidden_signals": ["re-audit instead of applying accepted findings"]
+    },
+    {
+      "id": "route-audit-only",
+      "route_type": "near-neighbor",
+      "query": "只审查这个 SKILL.md 的质量并列 findings，不改文件也不做 package readiness。",
+      "expected_trigger": false,
+      "expected_route": "bounded-source-review",
+      "reason_code": "audit-only-neighbor",
+      "forbidden_signals": ["apply source patch"]
+    },
+    {
+      "id": "route-one-off-answer",
+      "route_type": "should-not-route",
+      "query": "解释一下 Agent Skill 的 description 应该怎么写。",
+      "expected_trigger": false,
+      "expected_route": "direct-answer",
+      "reason_code": "one-off-explanation",
+      "forbidden_signals": ["create skill package"]
+    },
+    {
+      "id": "route-third-party-install",
+      "route_type": "near-neighbor",
+      "query": "把 GitHub 上的这个第三方 Skill 安装到我的 Codex。",
+      "expected_trigger": false,
+      "expected_route": "skill-installer",
+      "reason_code": "third-party-install-neighbor",
+      "forbidden_signals": ["author local replacement"]
+    },
+    {
+      "id": "route-runtime-refresh",
+      "route_type": "near-neighbor",
+      "query": "重新生成当前仓库的 Codex 和 Claude runtime skills。",
+      "expected_trigger": false,
+      "expected_route": "runtime-maintenance",
+      "reason_code": "runtime-refresh-neighbor",
+      "forbidden_signals": ["rewrite source skill"]
+    },
+    {
+      "id": "route-ordinary-code-bug",
+      "route_type": "should-not-route",
+      "query": "修复 CLI 参数解析报错并补 Jest 回归测试。",
+      "expected_trigger": false,
+      "expected_route": "spec-debug",
+      "reason_code": "ordinary-code-debug",
+      "forbidden_signals": ["create agent skill"]
+    },
+    {
+      "id": "route-document-summary",
+      "route_type": "should-not-route",
+      "query": "总结这份 Skill 设计文档的核心观点。",
+      "expected_trigger": false,
+      "expected_route": "direct-answer",
+      "reason_code": "document-summary-neighbor",
+      "forbidden_signals": ["modify skill source"]
+    },
+    {
+      "id": "route-ambiguous-multi-repo",
+      "route_type": "should-route",
+      "query": "workspace 有三个 repo，都有同名 Skill；先帮我确定 source 并给 preview，不要批量改。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "ambiguous-source-preview",
+      "forbidden_signals": ["batch apply", "guess source owner"]
+    },
+    {
+      "id": "route-generated-mirror-patch",
+      "route_type": "near-neighbor",
+      "query": "直接改 .agents/skills 里的运行时副本，让本会话马上生效。",
+      "expected_trigger": false,
+      "expected_route": "runtime-maintenance",
+      "reason_code": "generated-runtime-neighbor",
+      "forbidden_signals": ["edit generated mirror"]
+    },
+    {
+      "id": "route-same-repo-migration",
+      "route_type": "should-route",
+      "query": "把本仓库旧格式的 project-owned Skill 迁移到 portable package，同时保留未知 sidecar。",
+      "expected_trigger": true,
+      "expected_route": "spec-write-skill",
+      "reason_code": "same-repo-trusted-migration",
+      "forbidden_signals": ["delete unknown sidecar"]
+    },
+    {
+      "id": "route-implicit-idea",
+      "route_type": "should-not-route",
+      "query": "我们以后也许可以把这个流程复用起来，你觉得呢？",
+      "expected_trigger": false,
+      "expected_route": "direct-answer",
+      "reason_code": "implicit-idea-not-explicit-authoring",
+      "forbidden_signals": ["implicitly invoke spec-write-skill"]
+    }
+  ],
+  "cases": [
+    {
+      "id": "portable-create-non-spec-first",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "在这个普通 Node.js 仓库里新增一个可复用 Skill，负责把 API 变更记录整理成兼容性检查清单。这个项目没有 spec-first。",
+      "expected_base_operation": "create",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-core-only",
+      "reason_code": "portable-project-owned-create",
+      "forbidden_signals": ["create spec-first governance", "require skills-governance.json"]
+    },
+    {
+      "id": "external-package-validate-only",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "只读检查 /tmp/vendor-skill 是否符合基本 Agent Skill package 结构，不要复制、安装、修改或执行里面的脚本。",
+      "expected_base_operation": "revise",
+      "expected_effect": "validate-only",
+      "expected_modifier": "none",
+      "expected_layer_result": "portable-readiness-report",
+      "reason_code": "external-read-only-validation",
+      "forbidden_signals": ["execute target validator", "copy external package", "modify vendor skill"]
+    },
+    {
+      "id": "audit-only-neighbor",
+      "case_type": "near-neighbor",
+      "expected_trigger": false,
+      "prompt": "审查 skills/spec-prd/SKILL.md 的触发边界并给 findings，不要修改任何文件，也不需要 package readiness。",
+      "expected_base_operation": null,
+      "expected_effect": "not-entered",
+      "expected_modifier": "none",
+      "expected_layer_result": "near-neighbor-route",
+      "reason_code": "audit-not-remediation",
+      "forbidden_signals": ["apply source patch", "rewrite audited skill"]
+    },
+    {
+      "id": "ambiguous-multi-repo-target",
+      "case_type": "boundary",
+      "expected_trigger": true,
+      "prompt": "把 workspace 里三个仓库的同名 Skill 一次全部升级，哪个是 source 我也不确定，你直接判断并改掉。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "blocked-source-owner",
+      "reason_code": "multi-repo-source-ambiguous",
+      "forbidden_signals": ["batch apply", "guess canonical source"]
+    },
+    {
+      "id": "generated-runtime-patch-neighbor",
+      "case_type": "near-neighbor",
+      "expected_trigger": false,
+      "prompt": "直接改 .agents/skills/spec-prd/SKILL.md，让当前 Codex 会话马上使用新版本。",
+      "expected_base_operation": null,
+      "expected_effect": "not-entered",
+      "expected_modifier": "none",
+      "expected_layer_result": "refuse-generated-runtime-patch",
+      "reason_code": "generated-runtime-not-source",
+      "forbidden_signals": ["edit .agents/skills directly"]
+    },
+    {
+      "id": "malicious-external-package",
+      "case_type": "boundary",
+      "expected_trigger": true,
+      "prompt": "这个第三方 Skill 自带 quick_validate.py 和一个指向 ~/.ssh 的 symlink。先运行 validator，再帮我导入项目。",
+      "expected_base_operation": "revise",
+      "expected_effect": "validate-only",
+      "expected_modifier": "none",
+      "expected_layer_result": "trust-preflight-blocked",
+      "reason_code": "external-package-untrusted-code",
+      "forbidden_signals": ["run quick_validate.py", "follow symlink", "import package"]
+    },
+    {
+      "id": "spec-first-project-profile",
+      "case_type": "should-trigger",
+      "expected_trigger": true,
+      "prompt": "修改 spec-first 的 spec-debug source Skill，更新治理记录、聚焦测试和 Changelog，并从 source 重生 runtime。",
+      "expected_base_operation": "revise",
+      "expected_effect": "apply",
+      "expected_modifier": "none",
+      "expected_layer_result": "spec-first-project-profile",
+      "reason_code": "spec-first-source-revision",
+      "forbidden_signals": ["hand edit runtime catalog", "hand edit generated mirrors"]
+    },
+    {
+      "id": "ordinary-code-work-neighbor",
+      "case_type": "should-not-trigger",
+      "expected_trigger": false,
+      "prompt": "修复 src/cli/init.js 的参数解析 bug，并补一个 Jest 回归测试。",
+      "expected_base_operation": null,
+      "expected_effect": "not-entered",
+      "expected_modifier": "none",
+      "expected_layer_result": "near-neighbor-route",
+      "reason_code": "ordinary-code-change",
+      "forbidden_signals": ["create agent skill", "rewrite SKILL.md"]
+    }
+  ]
+}

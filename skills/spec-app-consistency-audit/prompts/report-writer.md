@@ -28,7 +28,7 @@
 - writeback preview
 - degraded modes
 - source_inputs
-- headless envelope 需要的 `summary_path`、`issues_path`、`audit_verdict_scope` 和 `code_review_handoff`
+- headless envelope 需要的 `summary_path`、`issues_path`、`audit_verdict_scope`，以及旧 artifact replay 中可选的休眠兼容字段 `code_review_handoff`；不得将其描述为当前 consumer。
 
 ## 必含章节
 

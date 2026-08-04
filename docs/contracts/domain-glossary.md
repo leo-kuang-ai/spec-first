@@ -1,6 +1,6 @@
 # Project Domain Glossary
 
-本文件是 spec-first 项目级 **canonical 领域语言** 的 source-of-truth。它解决一个真实债务:`docs/brainstorms/` 下已有数十个 requirements/PRD,共享大量术语(readiness、reason_code、degraded-mode 等),但若每个 PRD 各自定义,领域语言会随时间漂移。本 glossary 让第 N 个 PRD 不必重新发明第 1 个 PRD 已确立的术语。
+本文件是 spec-first 项目级 **canonical 领域语言** 的 source-of-truth，但对单次需求 workflow 只作为 advisory calibration source。它解决跨 PRD 术语漂移；它 does not automatically override 当前 Product Contract / PRD-local meaning，也不因文件名、年龄或 canonical 标签静默赢得冲突。
 
 这是 `docs/contracts/` 拓扑下的一个 contract artifact,**不是** 独立的 `CONTEXT.md` 或 `docs/adr/` 文件树。它是 glossary,不是 spec、不是 scratchpad、不是实现决策仓库。
 
@@ -8,7 +8,7 @@
 
 - **PRD 内 `## Glossary` section** = 单个 PRD 草稿层的术语,session-local。
 - **本文件** = 跨 PRD 晋升后的 canonical 层。一个术语被 ≥2 个 PRD 磨锐过,且用户确认后,才从草稿层晋升到这里。
-- 晋升是 **preview-first** 的:LLM 提议晋升,用户确认后 spec-prd 才写入本文件。绝不 silent write。
+- 需求 workflow 只输出 candidate-only promotion 记录，不写本文件。实际晋升由后续显式知识维护或文档编辑请求授权；当前产品确认不隐含项目级 mutation 权限。
 
 ## 写作纪律
 
@@ -58,11 +58,12 @@
 
 ## 消费者
 
-- `spec-prd`:primary provider(磨锐、晋升、冲突挑战)+ consumer(起草前读取对齐)。
-- 未来 `spec-brainstorm` / `spec-plan` / `spec-doc-review` 可作为 consumer 读取对齐(尚未接入,见路线图)。
+- `spec-prd`:负责 PRD-local 术语磨锐与冲突挑战，作为 advisory consumer 读取本文件，并只生产 project-level promotion candidate；不拥有本文件的 mutation。
+- `spec-brainstorm` / `spec-plan` / `spec-doc-review`:可作为 advisory consumer 读取对齐；需求 workflow 需要跨 release 复用时同样只生产 candidate。
+- 实际项目 glossary mutation 由后续显式知识维护或文档编辑 workflow 在独立授权后拥有和执行。
 
 ## 术语条目
 
-<!-- 由 spec-prd 在 preview-first 晋升后写入。初始为空;migration bootstrap 从存量 PRD 提取高频术语种入。 -->
+<!-- 由后续显式知识维护或文档编辑 workflow 在独立授权后写入。需求 workflow 只产生 candidate。 -->
 
 _(暂无条目)_

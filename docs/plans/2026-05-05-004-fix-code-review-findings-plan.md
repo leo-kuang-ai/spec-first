@@ -260,8 +260,8 @@ Decision:
 
 Files:
 
-- `skills/spec-skill-audit/scripts/lib/security-patterns.js`
-- `tests/unit/skill-audit-scripts.test.js`
+- `skills/retired-skill-review/scripts/lib/security-patterns.js`
+- `tests/unit/skill-review-scripts.test.js`
 - `docs/2026-05-05-skill-agent-audit/fix-log.md`
 - `CHANGELOG.md`
 
@@ -280,8 +280,8 @@ Implementation:
 
 Verification:
 
-- `node --check skills/spec-skill-audit/scripts/lib/security-patterns.js`
-- `npx jest tests/unit/skill-audit-scripts.test.js --runInBand`
+- `node --check skills/retired-skill-review/scripts/lib/security-patterns.js`
+- `npx jest tests/unit/skill-review-scripts.test.js --runInBand`
 
 Completion evidence:
 
@@ -301,8 +301,8 @@ Decision:
 
 Files:
 
-- `skills/spec-skill-audit/scripts/lib/security-patterns.js`
-- `tests/unit/skill-audit-scripts.test.js`
+- `skills/retired-skill-review/scripts/lib/security-patterns.js`
+- `tests/unit/skill-review-scripts.test.js`
 - `docs/2026-05-05-skill-agent-audit/fix-log.md`
 - `CHANGELOG.md`
 
@@ -321,8 +321,8 @@ Implementation:
 
 Verification:
 
-- `node --check skills/spec-skill-audit/scripts/lib/security-patterns.js`
-- `npx jest tests/unit/skill-audit-scripts.test.js --runInBand`
+- `node --check skills/retired-skill-review/scripts/lib/security-patterns.js`
+- `npx jest tests/unit/skill-review-scripts.test.js --runInBand`
 
 Completion evidence:
 
@@ -563,7 +563,7 @@ Rationale: P1 issues affect whether the PR contains the intended source truth an
 
 Rationale: These two issues share helper functions and tests; fixing separately risks contradictory package-manager behavior.
 
-### Wave 3. skill-audit scanner safety coverage
+### Wave 3. skill-review scanner safety coverage
 
 - Fix F5 PowerShell remote script pipe scanner.
 - Fix F6 `.env` boundary scanner.
@@ -602,7 +602,7 @@ Rationale: This is user-facing documentation and should be checked against publi
 
 - Run the narrow full bundle:
   - `npm run typecheck`
-  - `npx jest tests/unit/resolve-pr-feedback-contracts.test.js tests/unit/mcp-setup-powershell-contracts.test.js tests/unit/skill-audit-scripts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/runtime-plan-contracts.test.js tests/unit/using-spec-first-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-work-beta-contracts.test.js --runInBand`
+  - `npx jest tests/unit/resolve-pr-feedback-contracts.test.js tests/unit/mcp-setup-powershell-contracts.test.js tests/unit/skill-review-scripts.test.js tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/runtime-plan-contracts.test.js tests/unit/using-spec-first-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-work-beta-contracts.test.js --runInBand`
   - `bash tests/unit/mcp-setup.sh`
   - `npm run lint:skill-entrypoints`
   - `git diff --check`
@@ -613,10 +613,10 @@ Rationale: This is user-facing documentation and should be checked against publi
 
 | Area | Commands |
 |---|---|
-| Syntax | `npm run typecheck`; `node --check src/cli/adapters/codex.js`; `node --check skills/spec-skill-audit/scripts/lib/security-patterns.js`; `bash -n skills/spec-mcp-setup/scripts/check-deps.sh` |
+| Syntax | `npm run typecheck`; `node --check src/cli/adapters/codex.js`; `node --check skills/retired-skill-review/scripts/lib/security-patterns.js`; `bash -n skills/spec-mcp-setup/scripts/check-deps.sh` |
 | PR feedback safety | `npx jest tests/unit/resolve-pr-feedback-contracts.test.js --runInBand` |
 | MCP setup | `bash tests/unit/mcp-setup.sh`; `npx jest tests/unit/mcp-setup-powershell-contracts.test.js --runInBand` |
-| Skill audit scanner | `npx jest tests/unit/skill-audit-scripts.test.js --runInBand` |
+| Skill audit scanner | `npx jest tests/unit/skill-review-scripts.test.js --runInBand` |
 | Codex projection | `npx jest tests/unit/spec-dispatch-boundary-contracts.test.js tests/unit/runtime-plan-contracts.test.js tests/unit/using-spec-first-contracts.test.js tests/unit/spec-update-contracts.test.js tests/unit/init-dry-run.test.js --runInBand` |
 | Self-reflection contract | `npx jest tests/unit/self-reflection-contracts.test.js --runInBand` |
 | Workflow entrypoints | `npm run lint:skill-entrypoints`; `npx jest tests/unit/spec-work-contracts.test.js tests/unit/spec-work-beta-contracts.test.js tests/unit/using-spec-first-contracts.test.js --runInBand` |

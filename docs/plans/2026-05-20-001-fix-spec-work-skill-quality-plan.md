@@ -56,7 +56,7 @@ deepening_round: 2
 - **U2 自指否定 blockquote 单独成段**：会成为孤立 blockquote 破坏 H2+8H3 contract pattern，**合并入 U8**
 - **U3 / U5 / U6（Phase B）**：保持 defer
 - **跨 5 核心 skill batch review**：仍是 follow-up plan
-- **spec-work-beta / spec-write-tasks / git-worktree owner 文档化主动同步**：跨 skill 治理问题，重路由到 spec-skill-audit batch
+- **spec-work-beta / spec-write-tasks / git-worktree owner 文档化主动同步**：跨 skill 治理问题，重路由到 retired-skill-review batch
 
 ---
 
@@ -85,13 +85,13 @@ deepening_round: 2
 
 ### Outside this Plan's Identity
 
-- 修改 spec-work-beta / spec-write-tasks / git-worktree 主动加 owner anchor（重路由到 spec-skill-audit batch）
+- 修改 spec-work-beta / spec-write-tasks / git-worktree 主动加 owner anchor（重路由到 retired-skill-review batch）
 - 新建 `docs/contracts/skill-design-principles.md` 或迁移 Cache-Friendly 内容（origin §8.4 已否决）
 - 撤回当前分支 commit 8f294258 的工作（第 5 例保留）
 - 加 Phase 0 blockquote（与现有内容冗余）
 - spec-work-beta 等邻近 skill 修改（origin Decision #1 选项 B 已确认不推荐：BETA-edge skill 不接管 stable production 边界 example）
 - `审查agent.md` 同步 Step 1.5 改进（meta-review，独立 plan）
-- spec-skill-audit batch 跑 tracker-defer ownership 评估（P2-006 重路由 destination）
+- retired-skill-review batch 跑 tracker-defer ownership 评估（P2-006 重路由 destination）
 
 ---
 

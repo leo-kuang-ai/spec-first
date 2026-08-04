@@ -15,13 +15,17 @@ domain: host-runtime-setup
 pattern: "Entrypoint host authority plus script-owned setup facts"
 rejected_alternatives:
   - "Inferring the current host from PATH, generated runtime directories, or stale setup facts can select a different installed host."
-  - "Letting the LLM Write, Update, or Edit setup facts bypasses detect-host and can create invalid host ids."
+  - "允许 LLM 通过 Write、Update 或 Edit 修改 setup facts，会绕过统一 host-authority gate，并可能创建无效 host id。"
   - "Patching generated runtime mirrors directly fixes one project temporarily but does not repair the source projection."
 applicable_versions:
   - "spec-first 1.12.1 multi-host runtime setup"
-invalidation_condition: "Re-evaluate when host runtimes expose a deterministic current-host API that replaces entrypoint pins and detect-host scripts."
+invalidation_condition: "当 host runtime 暴露可替代 entrypoint host pin 的确定性 current-host API 时重新评估。"
 source_refs:
   - "skills/spec-mcp-setup/SKILL.md"
+  - "skills/spec-mcp-setup/scripts/setup.cjs"
+  - "skills/spec-mcp-setup/scripts/lib/host-authority.cjs"
+  - "skills/spec-mcp-setup/scripts/lib/host-config.cjs"
+  - "skills/spec-mcp-setup/scripts/lib/facts.cjs"
   - "src/cli/adapters/claude.js"
   - "src/cli/adapters/kiro.js"
   - "src/cli/adapters/qoder.js"
@@ -44,14 +48,14 @@ That value was not a valid spec-first host id, and it was not produced by the se
 For Runtime Setup, the current host must come from an explicit host authority:
 
 - The public entrypoint is authoritative: `spec-mcp-setup` means Claude, `spec-mcp-setup` means Codex, generated Kiro Agent Skill means Kiro, and generated Qoder command/Skill means Qoder.
-- Generated host setup surfaces should pin script execution with `MCP_SETUP_HOST=<host>` when invoking setup scripts.
-- A fresh `detect-host.*` JSON result is the deterministic fact used to select host config paths and setup facts.
+- Generated host setup surface 调用 `setup.cjs` 时，应使用 `MCP_SETUP_HOST=<host>` 固定 Node 入口执行身份。
+- `setup.cjs` 在解析 host config path 或写入 setup facts 前校验该显式 canonical host pin。自动发现的 host candidate 保持 advisory-only。
 - Previous `.spec-first/config/*` files are drift evidence only. They must not override the current entrypoint host.
 
 The write boundary is just as important:
 
-- `.spec-first/config/tool-facts.json` and `.spec-first/config/runtime-capabilities.json` must be written by `verify-tools.*` / `write-setup-facts.*`.
-- Host MCP config must be written by `configure-host.*` / `install-mcp.*` after host detection.
+- `.spec-first/config/tool-facts.json` 与 `.spec-first/config/runtime-capabilities.json` 必须由 `setup.cjs` 通过 facts module 和 atomic write gate 写入。
+- Host MCP config 必须在显式 host authority 确认后，由 `setup.cjs` 通过 host-config transaction 写入。
 - Do not use `Write`, `Update`, or `Edit` to patch setup facts or host MCP config, even when the desired JSON change looks obvious.
 - Do not infer host identity from `PATH`, the presence of `.kiro/`, `.qoder/`, `.codex/`, or another generated runtime directory.
 
@@ -87,8 +91,8 @@ Correct host projection pattern:
 ```text
 Generated Claude Runtime Setup:
 - Treat `spec-mcp-setup` as Claude host authority.
-- Set `MCP_SETUP_HOST=claude` before setup script calls.
-- Use `verify-tools.sh` to refresh `.spec-first/config/*`.
+- 调用共置 Node 入口前设置 `MCP_SETUP_HOST=claude`。
+- 使用 `node <loaded-skill-root>/scripts/setup.cjs --verify-only` 刷新 `.spec-first/config/*`。
 ```
 
 Incorrect pattern:
@@ -100,7 +104,7 @@ The project contains `.kiro/settings/mcp.json`, so update setup facts to host `k
 Correct repair after polluted facts:
 
 ```bash
-MCP_SETUP_HOST=claude bash .claude/spec-first/workflows/spec-mcp-setup/scripts/verify-tools.sh
+spec-mcp-setup --verify-only
 ```
 
 Incorrect repair:
@@ -115,7 +119,7 @@ For new hosts, the minimum regression coverage should assert:
 - generated setup surface includes `MCP_SETUP_HOST=<host>`
 - generated setup surface says entrypoint host is authoritative
 - generated setup surface forbids Write/Update/Edit on setup facts and host MCP config
-- setup facts are refreshed through the script path in tests or smoke evidence
+- tests 或 smoke evidence 通过统一 Node 入口刷新 setup facts
 ```
 
 ## Related

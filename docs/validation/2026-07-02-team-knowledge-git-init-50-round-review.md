@@ -106,7 +106,7 @@ status: complete
 - `docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md` 当前约 1490 行，§13-§23 是高密度 planning 输入。
 - `docs/brainstorms/2026-06-12-002-context-injection-progressive-disclosure-requirements.md` 将方向定义为“最小常驻锚点 + 按需 source 展开 + summary-first handoff”。
 - `docs/11-业界调研/spec-first-skills-优化方案-50轮深度审查报告.md` 第 011-014 轮明确 Progressive Disclosure 不是简单拆文件，而是让模型在正确时刻看到正确粒度的信息，并保留 L0-L3 主线合同、压力点提醒和不可下沉约束。
-- `skills/spec-skill-audit/SKILL.md` 的 Progressive Disclosure Checks 将长例子、重复 rubrics、provider 细节、长 checklist 视为优化信号，但不是自动改写命令。
+- `skills/retired-skill-review/SKILL.md` 的 Progressive Disclosure Checks 将长例子、重复 rubrics、provider 细节、长 checklist 视为优化信号，但不是自动改写命令。
 
 **判断：** 该问题不推翻 PRD ready 结论，也不要求把 PRD 拆成多份 truth source。正确落点是在同一 PRD 中追加一个轻量 `Progressive Disclosure / Planning Consumption Contract`，明确下游 planner 的 minimum handoff slice、按 slice 展开的 must-read sections、示例块边界和 coverage reporting requirement。
 

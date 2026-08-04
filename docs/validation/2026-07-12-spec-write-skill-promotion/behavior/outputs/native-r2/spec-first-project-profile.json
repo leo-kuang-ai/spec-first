@@ -1,0 +1,30 @@
+{
+  "base_operation": "revise",
+  "case_id": "spec-first-project-profile",
+  "effect": "apply",
+  "layer_result": "Apply the spec-first project profile to the canonical source and regenerate runtime output.",
+  "modifier": "none",
+  "required_references": [
+    "Project source/runtime mapping and generator documentation",
+    "Project Skill governance policy",
+    "Focused test conventions",
+    "native/references/openai_yaml.md"
+  ],
+  "response": "Revise the canonical `skills/spec-debug/` source package, preserving unknown metadata and sidecars. Preview changes to trigger boundaries, workflow instructions, and any justified resources; update the project governance record, focused tests, and changelog in the same change. Validate the source, run the focused tests, and invoke the documented generator to refresh `.agents/skills/spec-debug/`; inspect the generated diff but never hand-edit it. Keep all changes within the identified repository.",
+  "route_decision": "authoring-revise-spec-first",
+  "source_owner_assumption": "`skills/spec-debug/` is the repository's canonical source and `.agents/skills/spec-debug/` is its generated runtime mirror.",
+  "would_modify_paths": [
+    "skills/spec-debug/SKILL.md",
+    "skills/spec-debug/agents/openai.yaml",
+    "governance/",
+    "tests/",
+    "CHANGELOG.md",
+    ".agents/skills/spec-debug/"
+  ],
+  "would_run_commands": [
+    "scripts/quick_validate.py skills/spec-debug",
+    "<project focused-test command for spec-debug>",
+    "<project documented source-to-runtime generator command>",
+    "git diff -- skills/spec-debug governance tests CHANGELOG.md .agents/skills/spec-debug"
+  ]
+}

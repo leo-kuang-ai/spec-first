@@ -1,0 +1,14 @@
+{
+  "id": "native-r1",
+  "arm": "native",
+  "repeat": 1,
+  "exit_code": 0,
+  "signal": null,
+  "duration_ms": 82237,
+  "usage": {
+    "input_tokens": 21566,
+    "cached_input_tokens": 0,
+    "output_tokens": 3315,
+    "reasoning_output_tokens": 1503
+  }
+}

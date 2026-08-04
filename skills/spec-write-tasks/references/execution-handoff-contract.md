@@ -11,7 +11,10 @@ Every `spec-write-tasks` run must end with a compact decision envelope. The enve
 
 ```yaml
 decision: compile | skip | return-to-plan | draft-only | validate-only
-reason_code: source_plan_missing | ambiguous_plan | missing_spec_id | wrong_chain | stale_hash | unverifiable_hash | invalid_contract | repo_scope_missing | scope_gap | small_plan | task_pack_compiled | task_pack_validated | not_applicable
+reason_code: source_plan_missing | ambiguous_plan | wrong_chain | stale_hash | unverifiable_hash | invalid_contract | repo_scope_missing | scope_gap | small_plan | task_pack_compiled | task_pack_validated | not_applicable
+identity_basis: source-plan-path+body-hash
+artifact_root: <canonical artifact/source resolution root> | null
+repo_root: <compat alias equal to artifact_root> | null
 source_plan: docs/plans/... | null
 task_pack: docs/tasks/... | null
 task_pack_validity: valid | draft | stale | wrong-chain | invalid | unverifiable | not-applicable
@@ -57,7 +60,14 @@ Run:
 spec-first tasks validate <task-pack-path> --json
 ```
 
-Run `spec-first tasks hash <plan-path>` when computing or comparing the source plan hash.
+Run the commands against one explicit artifact/source resolution root:
+
+```bash
+spec-first tasks validate <task-pack-path> --repo <artifact-root> --json
+spec-first tasks hash <plan-path> --repo <artifact-root> --json
+```
+
+`--repo` is the artifact/source resolution root, not the mutation target repository. Copy `identity_basis`, `artifact_root`, the same-value compatibility alias `repo_root`, portable `source_plan`, and the `validation` fields from CLI JSON. Do not derive portable identity from absolute `plan_path` or treat `repo_root` as mutation authority.
 
 Copy `deterministic_handoff` and each `validation` field from the CLI JSON output. If the `tasks` subcommand is not runtime-visible or returns an unknown-subcommand error, treat the run as `unverifiable_hash`, set `deterministic_handoff: false`, and downgrade to `draft-only`; never self-report `deterministic_handoff: true` or `validation` matches without the CLI JSON in hand.
 
@@ -71,16 +81,16 @@ Copy `deterministic_handoff` and each `validation` field from the CLI JSON outpu
 
 Use `next_action: review-task-pack` as the decisive handoff recommendation for high-risk task packs.
 
-Choose it when the pack contains `review_gate: required` tasks, touches shared contracts, public workflow prose, source/runtime boundaries, security/release/CI surfaces, or has enough tasks/dependencies that semantic drift or over-splitting would be costly. The output must include one concrete reason and a copy-ready current-host document-review invocation for this task pack. This shared reference owns the handoff semantics, not the per-host entrypoint mapping.
+Choose it when the pack contains `review_gate: required` tasks, touches shared contracts, public workflow prose, source/runtime boundaries, security/release/CI surfaces, or has enough tasks/dependencies that semantic drift or over-splitting would be costly. The output must include one concrete reason and the copy-ready current-host document-review invocation `spec-doc-review mode:headless mutation:report-only output:json roster:full <task-pack-path>` for this task pack. This shared reference owns the handoff semantics, not the per-host entrypoint mapping. `mutation:report-only` 保持 derived artifact byte-preserving；`output:json` 提供可验证的 `task_pack_outcome`；`roster:full` 保留所有 qualified high-risk lenses，三者都不构成 subagent dispatch authority。不得只消费自由文本 `Review complete`。
 
 For a high-risk pack that resolves to `review-task-pack`, do not dispatch by default. Continue directly into the current host's document review without a separate confirmation step only under all of these conditions:
 
 - the pack is executable (`deterministic_handoff: true`) and `review-task-pack` was selected by the high-risk criteria above,
 - the invoking parent workflow or user explicitly authorized this single bounded continuation for the current run; invoking the public write-tasks workflow alone is not document-review dispatch authorization,
 - the current session is an interactive host that exposes the current host's document-review entrypoint,
-- the continuation targets exactly the doc-review of the just-written task pack; do not chain any further workflow, and do not invoke document review as an Agent/Task/subagent type.
+- the continuation targets exactly the doc-review of the just-written task pack; do not chain any further workflow, and do not invoke document review through a worker/persona dispatch surface.
 
-When continuing, invoke the current host's document-review entrypoint in headless mode on the task-pack path, then report the doc-review outcome alongside this envelope.
+When continuing, invoke `spec-doc-review mode:headless mutation:report-only output:json roster:full <task-pack-path>`, then parse exactly one JSON object and report that outcome alongside this envelope。先 fail closed 校验 `output_mode: json`、`mutation_policy: report-only`、`mutation_reason: task-pack-derived-artifact`、`review_status: complete`、`fixes_applied: 0`、`terminal_signal: Review complete`，并确认 `task_pack_outcome.source_plan` 与本次 deterministic receipt 的 `source_plan.path` 相同；任一字段缺失、类型错误或不匹配都按 `incomplete` 停止，不能升级 handoff。只有上述 envelope 合同成立，且 `task_pack_outcome.review_result: passed`、`task_pack_outcome.next_action: spec-work-task-pack`、`task_pack_outcome.deterministic_handoff: true` 与 `task_pack_outcome.task_pack_validity: valid` 同时成立时，当前 envelope 才可把 `semantic_posture` 设为 `reviewed-existing` 并交给 `spec-work`。`blocked` 跟随 outcome 返回 `spec-write-tasks` 或 `spec-plan`；`incomplete` 必须停止，不得升级 handoff。`terminal_signal` 是完整 envelope 的必要字段，但单独的 `Review complete` 永远不是 execution handoff 证据。
 
 This is bounded auto-continuation, not general workflow chaining: it covers only the single write-tasks -> doc-review edge for high-risk packs, and `spec-write-tasks` still does not become an orchestrator or execution state machine. Set `dispatch_authorization: authorized` only when the explicit authorization condition is met. When any condition is not met, surface the `review-task-pack` recommendation in the returned envelope, and let the caller decide.
 
@@ -95,11 +105,11 @@ Do not imply the CLI validator proves the semantic adequacy of quality fields. T
 
 ## Drift And Hash
 
-`source_plan_hash` must be the canonical source plan body hash produced by `spec-first tasks hash <plan-path>`.
+`source_plan_hash` must be the canonical source plan body hash produced by `spec-first tasks hash <plan-path> --repo <artifact-root> --json`.
 
-`spec_id` is copied from the source plan and is not part of freshness. It links the task pack to the same spec chain; `source_plan_hash` proves the task pack is still derived from the current source plan body.
+Executable identity is `source-plan-path+body-hash`: the artifact-root-relative POSIX `source_plan` identifies the source artifact and `source_plan_hash` proves freshness of its canonical body.
 
-If the source plan has no `spec_id`, do not generate an executable task pack. Return to `spec-plan` to add the plan-local identity, or produce only a `draft` / `transient` output that is not valid `spec-work` input.
+`spec_id` is an optional compatibility trace, not part of freshness or executable identity. When both task pack and source plan carry it, values must match; mismatch is `wrong_chain`. When either side omits it, keep `validation.spec_id: missing`, add limitation `task-pack-spec-id-trace-missing`, and allow deterministic handoff when path, hash, and structure otherwise validate.
 
 Hash rules:
 
@@ -107,7 +117,7 @@ Hash rules:
 - Normalize `CRLF` / `CR` to `LF`.
 - If the first line is `---`, remove the complete frontmatter block; if closing frontmatter is missing, fail closed.
 - Hash the remaining Markdown body exactly as canonicalized; do not extract sections or collapse whitespace in MVP.
-- Frontmatter fields such as `status` and `spec_id` are not part of freshness; identity is checked separately.
+- Frontmatter fields such as `status` and `spec_id` are not part of freshness; path and canonical body hash own executable identity, while `spec_id` remains only a compatibility trace.
 
 A task pack that can be handed to `spec-work` must use a concrete canonical source plan body hash, for example `sha256:<64-hex>`.
 

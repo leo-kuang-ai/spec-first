@@ -7,7 +7,7 @@
   "x-spec-first-producer-available": true,
   "x-spec-first-workflow-integrated": true,
   "x-spec-first-runtime-path": ".spec-first/workflows/spec-work/<workspace-slug>/<run-id>/run.json",
-  "x-spec-first-boundary": "source-owned write-side producer; same workspace/run-id artifacts are immutable and return artifact-already-exists instead of overwriting; workflow_integrated true only when spec-work closeout calls the producer with durable evidence trigger reason_code",
+  "x-spec-first-boundary": "source-owned write-side producer; spec-work-run-artifact/v2 is owned by spec-work only; same workspace/run-id artifacts are immutable and return artifact-already-exists instead of overwriting; workflow_integrated true only when spec-work closeout calls the producer with durable evidence trigger reason_code",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -122,7 +122,7 @@
       "anyOf": [
         {
           "type": "string",
-          "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.spec-first/).+[^/]$"
+          "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.qoder/(?:commands/spec(?:-|/|$)|skills(?:/|$)|agents(?:/|$)|spec-first(?:/|$)|hooks/(?:session-start|prd-prewrite-guard|prd-readiness-guard)$|settings\\.local\\.json$))(?!\\.spec-first/).+[^/]$"
         },
         { "type": "null" }
       ]
@@ -135,7 +135,7 @@
       "anyOf": [
         {
           "type": "string",
-          "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.spec-first/).+[^/]$"
+          "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.qoder/(?:commands/spec(?:-|/|$)|skills(?:/|$)|agents(?:/|$)|spec-first(?:/|$)|hooks/(?:session-start|prd-prewrite-guard|prd-readiness-guard)$|settings\\.local\\.json$))(?!\\.spec-first/).+[^/]$"
         },
         { "type": "null" }
       ]
@@ -144,7 +144,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.spec-first/).+[^/]$"
+        "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.qoder/(?:commands/spec(?:-|/|$)|skills(?:/|$)|agents(?:/|$)|spec-first(?:/|$)|hooks/(?:session-start|prd-prewrite-guard|prd-readiness-guard)$|settings\\.local\\.json$))(?!\\.spec-first/).+[^/]$"
       }
     },
     "script_confirmed": {
@@ -159,14 +159,14 @@
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.spec-first/).+[^/]$"
+            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.qoder/(?:commands/spec(?:-|/|$)|skills(?:/|$)|agents(?:/|$)|spec-first(?:/|$)|hooks/(?:session-start|prd-prewrite-guard|prd-readiness-guard)$|settings\\.local\\.json$))(?!\\.spec-first/).+[^/]$"
           }
         },
         "artifact_refs": {
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.spec-first/(?!workflows/)).+[^/]$"
+            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.qoder/(?:commands/spec(?:-|/|$)|skills(?:/|$)|agents(?:/|$)|spec-first(?:/|$)|hooks/(?:session-start|prd-prewrite-guard|prd-readiness-guard)$|settings\\.local\\.json$))(?!\\.spec-first/(?!workflows/)).+[^/]$"
           }
         },
         "raw_log_ref": {
@@ -213,7 +213,7 @@
           "items": {
             "type": "string",
             "maxLength": 500,
-            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.spec-first/(?!workflows/)).+[^/]$"
+            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!\\.claude/)(?!\\.codex/)(?!\\.agents/skills/)(?!\\.kiro/(?:skills|agents|spec-first|settings)/)(?!\\.qoder/(?:commands/spec(?:-|/|$)|skills(?:/|$)|agents(?:/|$)|spec-first(?:/|$)|hooks/(?:session-start|prd-prewrite-guard|prd-readiness-guard)$|settings\\.local\\.json$))(?!\\.spec-first/(?!workflows/)).+[^/]$"
           }
         },
         "key_decisions": {

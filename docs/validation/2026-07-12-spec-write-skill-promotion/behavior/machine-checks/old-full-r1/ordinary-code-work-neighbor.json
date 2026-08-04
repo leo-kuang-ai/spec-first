@@ -1,0 +1,27 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_Handle as ordinary implementation work; do not create or revise an Agent Skill."
+  ],
+  "observed": {
+    "base_operation": "fix-code",
+    "case_id": "ordinary-code-work-neighbor",
+    "effect": "Handle as ordinary implementation work; do not create or revise an Agent Skill.",
+    "layer_result": "near-neighbor-direct-code-work",
+    "modifier": "CLI bug fix with regression test",
+    "required_references": [],
+    "response": "这是普通代码修复。定位 `src/cli/init.js` 的参数解析分支和现有 Jest 测试约定，补一个能先复现错误输入/期望解析结果的回归用例，再做最小实现修复。运行聚焦 Jest、相关 CLI 测试及 diff check；不修改任何 skill、governance、catalog 或 generated runtime。",
+    "route_decision": "Route directly to code implementation and testing, outside skill authoring.",
+    "source_owner_assumption": "`src/cli/init.js` and its existing Jest test suite are the relevant project-owned sources.",
+    "would_modify_paths": [
+      "src/cli/init.js",
+      "existing matching Jest test file, or the repository-standard new test file"
+    ],
+    "would_run_commands": [
+      "focused Jest test for init argument parsing",
+      "related CLI Jest suite",
+      "git diff --check"
+    ]
+  }
+}

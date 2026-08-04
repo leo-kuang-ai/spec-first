@@ -14,8 +14,6 @@ const {
 function makeRepo() {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'target-repo-containment-'));
   execFileSync('git', ['init', '-q'], { cwd: repo });
-  execFileSync('git', ['config', 'user.name', 'Spec First Test'], { cwd: repo });
-  execFileSync('git', ['config', 'user.email', 'spec-first-test@example.invalid'], { cwd: repo });
   return repo;
 }
 
@@ -37,15 +35,15 @@ describe('target repo containment helpers', () => {
     }
   });
 
-  test('accepts missing descendants but rejects existing symlink ancestors that escape the repo', () => {
+  test('accepts missing descendants but rejects an existing symlink ancestor that escapes', () => {
     const repo = makeRepo();
     const outside = makeRepo();
     try {
-      const safePath = path.join(repo, '.spec-first', 'workflows', 'spec-work', 'workspace-a', 'run-a', 'run.json');
+      const safePath = path.join(repo, '.spec-first', 'workflows', 'spec-work', 'run-a', 'run.json');
       expect(validateOutputContainment(repo, safePath).errors).toEqual([]);
 
       fs.symlinkSync(outside, path.join(repo, '.spec-first'));
-      const unsafePath = path.join(repo, '.spec-first', 'workflows', 'spec-work', 'workspace-a', 'run-a', 'run.json');
+      const unsafePath = path.join(repo, '.spec-first', 'workflows', 'spec-work', 'run-a', 'run.json');
       expect(validateOutputContainment(repo, unsafePath).errors).toEqual(expect.arrayContaining([
         'artifact output ancestor escapes target repo: .spec-first',
       ]));
@@ -55,32 +53,46 @@ describe('target repo containment helpers', () => {
     }
   });
 
-  test('enforces shared repo-relative path boundaries', () => {
+  test('rejects source writes into every current generated runtime surface', () => {
     const errors = [];
-    validateRepoRelativeField('/tmp/log.txt', 'field.absolute', errors);
-    validateRepoRelativeField('.git/config', 'field.git', errors);
-    validateRepoRelativeField('.env', 'field.secret', errors);
-    validateRepoRelativeField('.claude/commands/spec-work.md', 'field.runtime', errors);
-    validateRepoRelativeField('.cursor/skills/spec-work/SKILL.md', 'field.cursor_runtime', errors);
-    validateRepoRelativeField('.cursor/spec-first/state.json', 'field.cursor_state', errors);
-    validateRepoRelativeField('.cursor/mcp.json', 'field.cursor_config', errors);
-    validateRepoRelativeField('.kiro/skills/spec-work/SKILL.md', 'field.kiro_runtime', errors);
-    validateRepoRelativeField('.kiro/specs/feature-a/requirements.md', 'field.kiro_specs', errors);
-    validateRepoRelativeField('.spec-first/config/tool-facts.json', 'field.specfirst', errors);
-    validateRepoRelativeField('.spec-first/workflows/spec-work/spec-first/run-1/run.json', 'field.workflow', errors, {
-      allowSpecFirstWorkflows: true,
-    });
+    const cases = [
+      ['/tmp/log.txt', 'field.absolute'],
+      ['.git/config', 'field.git'],
+      ['.env', 'field.secret'],
+      ['.claude/commands/spec-work.md', 'field.claude'],
+      ['.codex/skills/spec-work/SKILL.md', 'field.codex'],
+      ['.agents/skills/spec-work/SKILL.md', 'field.agents'],
+      ['.cursor/skills/spec-work/SKILL.md', 'field.cursor_skill'],
+      ['.cursor/spec-first/state.json', 'field.cursor_state'],
+      ['.cursor/rules/spec-first.mdc', 'field.cursor_rule'],
+      ['.cursor/mcp.json', 'field.cursor_mcp'],
+      ['.kiro/skills/spec-work/SKILL.md', 'field.kiro_skill'],
+      ['.kiro/agents/reviewer.md', 'field.kiro_agent'],
+      ['.kiro/steering/spec-first.md', 'field.kiro_steering'],
+      ['.qoder/commands/spec-work.md', 'field.qoder_command'],
+      ['.qoder/rules/spec-first.md', 'field.qoder_rule'],
+      ['.qoder/settings.json', 'field.qoder_settings'],
+      ['.spec-first/config/tool-facts.json', 'field.specfirst'],
+    ];
 
-    expect(errors).toEqual([
+    for (const [value, field] of cases) validateRepoRelativeField(value, field, errors);
+    validateRepoRelativeField(
+      '.spec-first/workflows/spec-work/spec-first/run-1/run.json',
+      'field.workflow',
+      errors,
+      { allowSpecFirstWorkflows: true },
+    );
+
+    expect(errors).toHaveLength(cases.length);
+    expect(errors).toEqual(expect.arrayContaining([
       'field.absolute must be a concrete repo-relative path',
       'field.git must not point at Git internals',
       'field.secret must not point at secret-denied paths',
-      'field.runtime must not point at generated runtime mirrors',
-      'field.cursor_runtime must not point at generated runtime mirrors',
-      'field.cursor_state must not point at generated runtime mirrors',
-      'field.cursor_config must not point at generated runtime mirrors',
-      'field.kiro_runtime must not point at generated runtime mirrors',
+      'field.cursor_rule must not point at generated runtime mirrors',
+      'field.kiro_steering must not point at generated runtime mirrors',
+      'field.qoder_rule must not point at generated runtime mirrors',
+      'field.qoder_settings must not point at generated runtime mirrors',
       'field.specfirst uses unsupported .spec-first artifact path',
-    ]);
+    ]));
   });
 });

@@ -1,0 +1,166 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-summary/v1",
+  "artifact_type": "fresh-semantic",
+  "blind": true,
+  "independent": true,
+  "reviewer_dispatches": 2,
+  "reviewed_variants": 16,
+  "provider": "codex-cli",
+  "host_version": "codex-cli 0.144.1",
+  "model": "provider-default (not exposed in Codex JSONL)",
+  "configured_reference_model": "gpt-5.6-sol",
+  "totals": {
+    "input_tokens": 34034,
+    "output_tokens": 2109,
+    "reasoning_output_tokens": 223,
+    "duration_ms": 46141
+  },
+  "comparison": "review/scoped-v2/comparison-summary.json",
+  "comparison_sha256": "df10e2a976fa32b3e1fd53ad86e09c988d66cdeec1b6c925489e78c60bdb205e",
+  "artifacts": [
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-full-r1/portable-create-non-spec-first.json",
+      "artifact_sha256": "85f7d3c4ac63f169ae3cb974cf7720a2230db659cabc366b00a355cc19af9afc",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "case_id": "portable-create-non-spec-first",
+      "result": "pass",
+      "total_score": 8
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/native-r1/portable-create-non-spec-first.json",
+      "artifact_sha256": "185b4e79b4d1515f77b2d09c158b25924e812297fb3f765560b2bbcd457f76ca",
+      "arm": "native",
+      "repeat": 1,
+      "case_id": "portable-create-non-spec-first",
+      "result": "fail",
+      "total_score": 8
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-ablation-r2/portable-create-non-spec-first.json",
+      "artifact_sha256": "2bc093976fb81955a3fe28eb840728fa14560ca09e89cbbd605c0d4d5088cd85",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "case_id": "portable-create-non-spec-first",
+      "result": "pass",
+      "total_score": 9
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-full-r2/portable-create-non-spec-first.json",
+      "artifact_sha256": "24d200c872a573d89875966e23002c4c17b7b99056a812441b9ee0dae6d9e7bb",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "case_id": "portable-create-non-spec-first",
+      "result": "pass",
+      "total_score": 10
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/native-r2/portable-create-non-spec-first.json",
+      "artifact_sha256": "6bec893d1f6a6a8ff16ab4c633296874e7731bf0d63a03e5b23f60b6f885df6e",
+      "arm": "native",
+      "repeat": 2,
+      "case_id": "portable-create-non-spec-first",
+      "result": "fail",
+      "total_score": 7
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/old-full-r2/portable-create-non-spec-first.json",
+      "artifact_sha256": "245c8af18357fbbe17425aa9d75d7588696c0be0b624aa2f1a6dea407ef3862a",
+      "arm": "old-full",
+      "repeat": 2,
+      "case_id": "portable-create-non-spec-first",
+      "result": "fail",
+      "total_score": 7
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/old-full-r1/portable-create-non-spec-first.json",
+      "artifact_sha256": "ff549e46769e0b9043066d0c6d15d21062c1b3540e23d7547a902b2ae64d98cb",
+      "arm": "old-full",
+      "repeat": 1,
+      "case_id": "portable-create-non-spec-first",
+      "result": "pass",
+      "total_score": 9
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-ablation-r1/portable-create-non-spec-first.json",
+      "artifact_sha256": "2f73965a56ba078a99a6cb6907d16d088dd6fc342364aa530bae3c4cd364ed4d",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "case_id": "portable-create-non-spec-first",
+      "result": "pass",
+      "total_score": 10
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-ablation-r2/spec-first-project-profile.json",
+      "artifact_sha256": "2ce4aa80562627efb29233ca9f2227bac3e7154b9ac74065d1a9660655a4a905",
+      "arm": "candidate-ablation",
+      "repeat": 2,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 10
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/native-r1/spec-first-project-profile.json",
+      "artifact_sha256": "9adb5fbbd7c5776d7ae6b44e5e13e7531579afbe2dff699d5352b82c195269b7",
+      "arm": "native",
+      "repeat": 1,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 9
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/native-r2/spec-first-project-profile.json",
+      "artifact_sha256": "66bf26ccbc7225fe92ff31fb42881525eb092b1e5640154e78454267a20139d6",
+      "arm": "native",
+      "repeat": 2,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 9
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-full-r2/spec-first-project-profile.json",
+      "artifact_sha256": "81575e50ef0a19bc6bd9e000c0656a9a90a1523e16b7bfa902e5117dd059a95d",
+      "arm": "candidate-full",
+      "repeat": 2,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 7
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/old-full-r2/spec-first-project-profile.json",
+      "artifact_sha256": "1ee403dda36238652ae3b234d0f34db51965c76ec2bef927c8240a33dccc233b",
+      "arm": "old-full",
+      "repeat": 2,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 8
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-full-r1/spec-first-project-profile.json",
+      "artifact_sha256": "11153e063f8ba10a161ce8eab70eb12b812635df4d5fa52d0e1e160ec5057dbb",
+      "arm": "candidate-full",
+      "repeat": 1,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 9
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/old-full-r1/spec-first-project-profile.json",
+      "artifact_sha256": "0f8f44449461c0e715a54d4b2fafb47bc5a3f95def76d4e96cef448a9f7a56df",
+      "arm": "old-full",
+      "repeat": 1,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 8
+    },
+    {
+      "artifact": "review/scoped-v2/artifacts/candidate-ablation-r1/spec-first-project-profile.json",
+      "artifact_sha256": "e0de8a1c3eb3318ba0390c682d23555870c217c92b20ea6ecc4bebfcb5f3bccb",
+      "arm": "candidate-ablation",
+      "repeat": 1,
+      "case_id": "spec-first-project-profile",
+      "result": "pass",
+      "total_score": 10
+    }
+  ]
+}

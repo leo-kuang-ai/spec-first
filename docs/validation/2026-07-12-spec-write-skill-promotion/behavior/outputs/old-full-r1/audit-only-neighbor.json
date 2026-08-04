@@ -1,0 +1,22 @@
+{
+  "arm": "old-full",
+  "repeat": 1,
+  "case_id": "audit-only-neighbor",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "audit-trigger-boundary",
+    "case_id": "audit-only-neighbor",
+    "effect": "Produce trigger and boundary findings without patching the skill.",
+    "layer_result": "near-neighbor-bounded-source-review",
+    "modifier": "audit-only, no package-readiness work",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md"
+    ],
+    "response": "执行只读触发审查：核对 frontmatter `description` 的正向意图、真实分支、负向边界、entry surface 和 near-neighbor route；标出同义触发堆叠、摘要式描述、误触发及 boundary takeover。交付按严重度排列的 findings，每项包含原文证据、可能误路由示例和建议措辞方向；不改文件、不扩展到资源布局或 package readiness。",
+    "route_decision": "Route to audit-only source review; do not enter audit-remediation mode.",
+    "source_owner_assumption": "`skills/spec-prd/SKILL.md` is treated as the reviewed source, but ownership is not mutated or reclassified.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

@@ -409,11 +409,11 @@ PromptCancelled 在 runInit 顶层捕获 → 恢复 stdin cooked mode → 打印
 **Dependencies:** U4（保持术语一致），U3（smoke 测试需要 init 已经是交互式），U1（matrix install fixture 改造依赖 buildInitPlan API）。
 
 **Files:**
-- Modify: `templates/claude/commands/spec/debug.md`、`mcp-setup.md`、`release-notes.md`、`work.md`、`slack-research.md`、`compound.md`、`doc-review.md`、`graph-bootstrap.md`、`code-review.md`、`app-consistency-audit.md`、`skill-audit.md`、`optimize.md`、`compound-refresh.md`、`plan.md`、`sessions.md`、`update.md`、`polish-beta.md`、`ideate.md`、`brainstorm.md`（19 个 boilerplate 行；**已确认无共享 generator——逐个手改**）
+- Modify: `templates/claude/commands/spec/debug.md`、`mcp-setup.md`、`release-notes.md`、`work.md`、`slack-research.md`、`compound.md`、`doc-review.md`、`graph-bootstrap.md`、`code-review.md`、`app-consistency-audit.md`、`skill-review.md`、`optimize.md`、`compound-refresh.md`、`plan.md`、`sessions.md`、`update.md`、`polish-beta.md`、`ideate.md`、`brainstorm.md`（19 个 boilerplate 行；**已确认无共享 generator——逐个手改**）
 - Modify: `templates/claude/hooks/session-start`（hook body 中的 `Run \`spec-first init --claude\``，约 2 处；该文件作为 SessionStart hook 内容直接渲染给每个 Claude 用户）
 - Modify: `skills/spec-update/SKILL.md`（约 6 处 init flag 引用）
 - Modify: `skills/using-spec-first/SKILL.md`（约 4 处）
-- Modify: `skills/spec-skill-audit/SKILL.md`（约 1 处）+ `skills/spec-skill-audit/references/source-vs-runtime-contract.md`
+- Modify: `skills/retired-skill-review/SKILL.md`（约 1 处）+ `skills/retired-skill-review/references/source-vs-runtime-contract.md`
 - Modify: `skills/spec-graph-bootstrap/SKILL.md`（约 2 处）
 - Modify: `skills/spec-graph-bootstrap/scripts/bootstrap-providers.sh`（line 373 stderr 输出）
 - Modify: `skills/spec-graph-bootstrap/scripts/bootstrap-providers.ps1`（lines 724、740 stderr 输出，注意 PowerShell 字符串引号兼容性）

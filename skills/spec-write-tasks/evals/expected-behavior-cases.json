@@ -3,9 +3,9 @@
   "cases": [
     {
       "id": "compile-valid-plan",
-      "input": "A settled source plan with spec_id, clear scope boundaries, implementation units, files, and verification.",
+      "input": "A settled source plan with clear scope boundaries, implementation units, files, and verification; spec_id is optional.",
       "expected_decision": "compile",
-      "expected_output": "An executable task pack with matching spec_id, canonical source_plan_hash, Task Pack Contract, task cards, waves, and final decision envelope.",
+      "expected_output": "An executable task pack with artifact-root-relative source_plan, canonical source_plan_hash, optional compatibility trace handling, Task Pack Contract, task cards, waves, and final decision envelope.",
       "coverage_tags": ["expected"]
     },
     {

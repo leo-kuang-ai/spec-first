@@ -9,6 +9,7 @@ const {
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 const { listBundledAgentNames, listBundledSkills } = require('../plugin');
 const { isCodexHomeProjectRoot, effectiveCodexHome } = require('../helpers/global-config-dir');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 const SESSION_START_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'codex', 'hooks', 'session-start');
 const SESSION_START_CMD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'codex', 'hooks', 'session-start.cmd');
 const HOOKS_JSON_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'codex', 'hooks', 'hooks.json');
@@ -95,14 +96,15 @@ class CodexAdapter extends PlatformAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    const sharedPathContent = shouldPreserveHostComparativeRuntimeProse(context)
+    const isEntrypoint = isSkillEntrypointContext(context);
+    const sharedPathContent = !isEntrypoint || shouldPreserveHostComparativeRuntimeProse(context)
       ? content
       : rewriteSharedPaths(content);
-    let transformed = rewriteSkillName(
-      transformCodexContent(sharedPathContent),
-      codexRuntimeSkillName(context),
-    );
-    if (isCodexRuntimeSetupSurface(context)) {
+    let transformed = transformCodexContent(sharedPathContent);
+    if (isEntrypoint) {
+      transformed = rewriteSkillName(transformed, codexRuntimeSkillName(context));
+    }
+    if (isEntrypoint && isCodexRuntimeSetupSurface(context)) {
       transformed = addCodexSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
@@ -206,9 +208,6 @@ class CodexAdapter extends PlatformAdapter {
   removeRuntimeFiles(projectRoot) {
     removeManagedDirectory(path.join(projectRoot, this.commandRoot), projectRoot);
     removeManagedDirectory(path.join(projectRoot, this.legacyCommandRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyMarketplaceRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyPluginRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyPluginRootAlt), projectRoot);
     removeLegacyCodexSpecFirstSkills(projectRoot, this);
     removeManagedFile(path.join(projectRoot, SESSION_START_RELATIVE_PATH), projectRoot);
     removeManagedFile(path.join(projectRoot, SESSION_START_CMD_RELATIVE_PATH), projectRoot);
@@ -276,7 +275,12 @@ function shouldPreserveHostComparativeRuntimeProse(context = {}) {
 }
 
 function isCodexRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addCodexSetupHostPin(content) {
@@ -287,7 +291,7 @@ function addCodexSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Codex Host Pin',
     '',
-    'When this generated Codex Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=codex` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    'When this generated Codex Skill invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=codex` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
@@ -303,17 +307,6 @@ function preserveUsingSpecFirstHostInstallNotes(content) {
 
 function transformCodexContent(content) {
   let transformed = content;
-
-  transformed = transformed.replace(
-    /^(\s*-?\s*)Task\s+(spec-[a-z0-9-]+)\((.*)\)\s*$/gm,
-    (_match, prefix, agentName, args) => {
-      const summary = args.trim();
-      const agentPath = `.codex/agents/${agentName}.agent.md`;
-      return summary
-        ? `${prefix}Dispatch \`${agentPath}\` with \`spawn_agent\` when Codex dispatch is available; fallback: read the profile and apply it inline in the current agent only when \`spawn_agent\` is unavailable, explicitly disabled, or unsafe. Task: ${summary}`
-        : `${prefix}Dispatch \`${agentPath}\` with \`spawn_agent\` when Codex dispatch is available; fallback: read the profile and apply it inline in the current agent only when \`spawn_agent\` is unavailable, explicitly disabled, or unsafe.`;
-    },
-  );
 
   transformed = transformed.replace(
     bundledAgentReferencePattern(),
@@ -537,7 +530,10 @@ function renderHooksJsonRemoval(projectRoot) {
   }
 
   const cleaned = removeManagedHooksJsonEntries(existing.value, projectRoot);
-  return hasAnyHookEntries(cleaned)
+  // Removing the file once no managed hook entries remain would also discard unrelated top-level
+  // keys the user keeps in .codex/hooks.json. Keep it whenever anything user-owned survives.
+  const hasUserTopLevelKeys = Object.keys(cleaned).some((key) => key !== 'hooks');
+  return hasAnyHookEntries(cleaned) || hasUserTopLevelKeys
     ? { existsAfter: true, contents: `${JSON.stringify(cleaned, null, 2)}\n` }
     : { existsAfter: false, contents: '' };
 }
@@ -588,14 +584,14 @@ function removeLegacyCodexSpecFirstSkills(projectRoot, adapter) {
   }
 }
 
+// Only spec-first's own namespace is removable here. A legacy Codex layout also installed
+// unprefixed copies (`plan`, `work`, `debug`, ...), but those names are indistinguishable from a
+// user's own skills, so they are left in place rather than deleted by name.
 function legacyCodexSpecFirstSkillNames() {
   const names = new Set();
   for (const skillName of listBundledSkills()) {
     if (skillName === 'graphify') continue;
     names.add(skillName);
-    if (skillName.startsWith('spec-')) {
-      names.add(skillName.replace(/^spec-/, ''));
-    }
   }
   return [...names].filter((name) => name !== 'graphify').sort();
 }
@@ -620,17 +616,20 @@ function buildRuntimeCleanupOperations(adapter) {
   const operations = [
     adapter.commandRoot,
     adapter.legacyCommandRoot,
-    adapter.legacyMarketplaceRoot,
-    adapter.legacyPluginRoot,
-    adapter.legacyPluginRootAlt,
   ].map((relativePath) => ({
     kind: 'remove_dir',
     path: relativePath,
     reason: 'managed_runtime_cleanup',
   }));
+
   operations.push(...buildLegacyCodexSpecFirstSkillCleanupOperations(adapter));
   return operations;
 }
+
+// `.agents/plugins` and `plugins/spec*` were historical compatibility locations, but no emitted
+// marker or state file distinguishes a former spec-first install from a user's plugin with a
+// coincidentally similar name. They are therefore mixed-ownership surfaces: preserve them and
+// let the owner remove them explicitly. Only `.codex/**` paths have path-level ownership proof.
 
 function readJsonFile(filePath) {
   try {
@@ -774,7 +773,14 @@ function isStaleManagedSessionStartCommand(command) {
   //   with the managed path (e.g. `.codex/hooks/session-start-custom.sh`, `session-start.bak`)
   //   is NOT misclassified as spec-first-managed.
   const pathPattern = SESSION_START_RELATIVE_PATH.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`^["']?[^"'\\s]*${pathPattern}(\\.cmd)?(["'\\s]|$)`).test(program);
+  // A quoted program is a single token, so its interior may contain spaces -- installation paths
+  // like `/Users/me/My Projects/repo` are common, and a whitespace-free prefix class silently
+  // fails to recognize them, leaving stale entries to accumulate on every refresh. An unquoted
+  // program still ends at the first whitespace, where a space means the managed path is an
+  // argument rather than the invoked program.
+  const quotedProgram = new RegExp(`^(["'])[^"']*${pathPattern}(\\.cmd)?\\1`);
+  const bareProgram = new RegExp(`^[^"'\\s]*${pathPattern}(\\.cmd)?(["'\\s]|$)`);
+  return quotedProgram.test(program) || bareProgram.test(program);
 }
 
 // Strip managed hooks at HOOK granularity (mirror Claude removeManagedHookEntries): only

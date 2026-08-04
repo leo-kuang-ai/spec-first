@@ -1,0 +1,21 @@
+id: conflicting-scope-fails-early
+title: 冲突 scope 参数必须在审查前失败
+description: |
+  验证 base: 与 branch target 同时出现时，mode:agent 返回单个失败 JSON，
+  不继续执行审查、不制造 findings，也不修改工作区。
+
+input:
+  prompt: |
+    请使用 spec-code-review 执行 mode:agent base:HEAD feature/other-branch 审查。
+    不要调用子代理。最终只返回该 Skill 规定的机器可消费结果。
+
+context:
+  repo_fixture: evals/fixtures/repos/tenant-orders
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-conflicting-scope.sh
+  timeout_seconds: 30

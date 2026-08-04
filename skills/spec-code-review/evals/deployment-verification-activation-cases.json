@@ -1,0 +1,32 @@
+{
+  "schema_version": "spec-first.spec-code-review.deployment-verification-activation-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "spec-code-review-orchestrator",
+  "source_refs": [
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-code-review/references/persona-catalog.md",
+    "skills/spec-code-review/references/personas/deployment-verification-agent.md"
+  ],
+  "cases": [
+    {
+      "id": "safe-additive-migration-does-not-dispatch",
+      "kind": "negative-owner",
+      "input": "Diff 新增一个 nullable column；包含 migration artifact，但没有 backfill、drop、rename、destructive DDL 或 NOT NULL tightening。",
+      "expected": "Stage 3 可以选择 data-migration reviewer，但不得把 deployment-verification-agent 加入 selected_local_prompt_assets；Stage 4 不 dispatch，也不生成 Deployment Notes。",
+      "forbidden": [
+        "仅因存在 migration 文件就 dispatch deployment verification",
+        "把 safe additive migration 描述成 risky gate 已通过"
+      ]
+    },
+    {
+      "id": "risky-migration-dispatches-deployment-verification",
+      "kind": "positive",
+      "input": "Diff 包含 db/migrate/20260721_backfill_accounts.rb，并执行 backfill 后把 account_id 改为 NOT NULL without default。",
+      "expected": "Stage 3 选择 deployment-verification-agent，记录 artifact path 与 backfill/NOT NULL risky operation；Stage 4 只消费该选择并 dispatch。",
+      "forbidden": [
+        "只派发 data-migration reviewer 而漏掉 deployment verification",
+        "applicability reason 只列 migration 文件名而不列 risky operation"
+      ]
+    }
+  ]
+}

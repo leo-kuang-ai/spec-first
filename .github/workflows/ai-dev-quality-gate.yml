@@ -2,46 +2,16 @@ name: AI Dev Quality Gate
 
 on:
   pull_request:
-    paths:
-      - 'src/contracts/**'
-      - 'src/verification/**'
-      - 'src/cli/contracts/quality-gates/**'
-      - 'docs/plans/**'
-      - 'docs/contracts/workflows/**'
-      - 'docs/contracts/verifiers/**'
-      - 'docs/contracts/quality-gates/**'
-      - 'scripts/run-ai-dev-benchmark-fixtures.js'
-      - 'scripts/run-ai-dev-quality-gate.js'
-      - 'scripts/run-test-suite.cjs'
-      - 'src/cli/gitignore-policy.js'
-      - 'skills/spec-plan/**'
-      - 'skills/spec-write-tasks/**'
-      - 'skills/spec-work/**'
-      - 'skills/spec-code-review/**'
-      - 'skills/spec-doc-review/**'
-      - 'skills/spec-mcp-setup/**'
-      - '.github/workflows/ai-dev-quality-gate.yml'
-      - 'tests/unit/branch-protection-policy.test.js'
-      - 'tests/unit/init-source-path-coverage.test.js'
-      - 'tests/unit/package-install-contracts.test.js'
-      - 'tests/unit/mcp-setup-powershell-contracts.test.js'
-      - 'tests/unit/spec-plan-contracts.test.js'
-      - 'tests/unit/task-pack-command.test.js'
-      - 'tests/unit/spec-write-tasks-contracts.test.js'
-      - 'tests/unit/spec-work-contracts.test.js'
-      - 'tests/unit/spec-doc-review-contracts.test.js'
-      - 'tests/unit/spec-code-review-contracts.test.js'
-      - 'tests/unit/plan-status-taxonomy.test.js'
-      - 'tests/unit/ai-dev-quality-gate.test.js'
-      - 'tests/unit/ai-dev-benchmark-fixtures.test.js'
-      - 'tests/fixtures/ai-dev-benchmarks/**'
-      - 'tests/integration/verification-gate.integration.test.js'
-      - 'package.json'
-      - 'package-lock.json'
+  push:
+    branches: [main, master]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   ai-dev-gate:
+    name: ai-dev-gate
     runs-on: ubuntu-latest
 
     steps:
@@ -66,3 +36,4 @@ jobs:
         with:
           name: ai-dev-quality-gate
           path: .spec-first/workflows/quality-gates/
+          if-no-files-found: ignore

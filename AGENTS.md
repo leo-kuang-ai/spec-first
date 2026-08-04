@@ -90,7 +90,6 @@ Source-of-truth 路径包括：
 - `CLAUDE.md`
 - `AGENTS.md`
 - `skills/`
-- `agents/`
 - `templates/`
 - `templates/claude/commands/spec/*.md`
 - `src/cli/`
@@ -99,17 +98,41 @@ Source-of-truth 路径包括：
 - `src/cli/contracts/dual-host-governance/**`
 - `docs/`
 - `README.md`
+- `README.en.md`
 - `README.zh-CN.md`
 - `CHANGELOG.md`
 - `package.json`
 
-其中 `CLAUDE.md` 与 `AGENTS.md` 是 checked-in host 入口文档；其中的 spec-first managed blocks 是受生成规则管理的 source slice，不等同于 `.claude/`、`.codex/`、`.agents/skills/` runtime mirror。
+其中 `CLAUDE.md` 与 `AGENTS.md` 是 checked-in host 入口文档；其中的 spec-first managed blocks 是受生成规则管理的 source slice，不等同于 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`、`.opencode/` runtime mirror 或 managed slice。
 
-Generated runtime assets 包括：
+Generated runtime / host-local runtime surfaces 包括：
 
 - `.claude/`
 - `.codex/`
 - `.agents/skills/`
+- `.cursor/skills/`
+- `.cursor/spec-first/`
+- `.cursor/rules/spec-first.mdc`
+- `.cursor/mcp.json`
+- `.kiro/skills/`
+- `.kiro/agents/`
+- `.kiro/spec-first/`
+- `.kiro/settings/`
+- `.kiro/steering/spec-first.md`
+- `.qoder/commands/spec-*.md`
+- `.qoder/commands/spec/`
+- `.qoder/skills/`
+- `.qoder/agents/`
+- `.qoder/spec-first/`
+- `.qoder/hooks/` 中的 spec-first managed hook scripts
+- `.qoder/rules/spec-first.md`
+- `.qoder/settings.local.json`
+- `.qoder/settings.json` 中的 spec-first managed hook entries
+- `.opencode/commands/spec-*.md`
+- `.opencode/commands/spec/`（已退役的 legacy namespace，仅用于迁移清理）
+- `.opencode/skills/`
+- `.opencode/spec-first/`
+- `opencode.json` / `opencode.jsonc` 中由 Runtime Setup 管理的 exact entries
 
 优先修改 source，不手改 generated runtime assets 来强制修复。source 变更后需要修复 runtime drift 时，使用 `spec-first init`。source 与 runtime 不一致时，先确认 source-of-truth，再检查 generator，最后修 source 或生成逻辑。
 
@@ -119,8 +142,7 @@ Generated runtime assets 包括：
 
 - `bin/spec-first.js`：可执行入口
 - `src/cli/`：CLI implementation、commands、adapters、contracts、state、bootstrap logic
-- `skills/`：workflow 与 standalone skill 源码资产
-- `agents/`：agent profile 源码资产
+- `skills/`：workflow、standalone skill 与 skill-local prompt asset 源码资产（例如 `skills/**/references/agents/`、`skills/**/references/personas/`）
 - `templates/`：host runtime templates
 - `docs/`：需求、计划、架构说明、验证报告、角色契约
 - `docs/solutions/`：解决问题后沉淀的可复用工程知识，供后续 plan/work/debug/review/compound 检索
@@ -128,7 +150,7 @@ Generated runtime assets 包括：
 - `vendor/`：vendored parser dependencies
 - `tests/unit/`、`tests/smoke/`、`tests/integration/`：分层测试（integration 由 Jest 集成测试承载，无独立 `tests/e2e/` 目录）
 
-不要把 `.claude/`、`.codex/`、`.agents/skills/` 当作 source。
+不要把 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`、`.opencode/` 下的 generated runtime mirror 或 managed slice 当作 source。
 
 ## 常用命令
 
@@ -151,7 +173,7 @@ Generated runtime assets 包括：
 - CLI 代码使用 CommonJS、2 空格缩进、单引号和分号。
 - 遵循局部模块边界，例如 `commands/`、`adapters/`、`helpers/` 和 contract-specific directories。
 - Shell 脚本使用 `#!/bin/bash` 和 `set -euo pipefail`。
-- Skill 目录使用 kebab-case，例如 `spec-mcp-setup`。
+- Skill 目录使用 kebab-case，例如 `spec-runtime-setup`。
 - 只有在解释非显然行为时才添加注释。
 - 避免无关重构、speculative fallback、一次性抽象。
 
@@ -160,7 +182,7 @@ Generated runtime assets 包括：
 根据任务大小调整审查和验证强度：
 
 - 小任务：文案修正、注释、单文件局部修复、docs-only 变更。默认直接执行，保持审查范围窄，不引入新架构，并保留 CHANGELOG、最窄验证和 source/runtime 边界纪律。
-- 中型任务：skill/agent/CLI 行为调整、文档结构调整、小幅 schema 扩展、runtime generation 调整、测试补充。检查 source/runtime 边界、双宿主影响、CHANGELOG/docs 需求、workflow 影响和测试覆盖。
+- 中型任务：skill/agent/CLI 行为调整、文档结构调整、小幅 schema 扩展、runtime generation 调整、测试补充。检查 source/runtime 边界、多宿主影响（当前 Claude、Codex、Cursor、Kiro、Qoder，以 `getSupportedPlatforms()` 为准）、CHANGELOG/docs 需求、workflow 影响和测试覆盖。
 - 大型任务：新增 skill 或 agent 体系、CLI 重构、provider/readiness 协议变更、source-of-truth 变更、runtime generation 变更、核心 workflow 变更、删除/迁移。必须明确 goals/non-goals、artifact contracts、failure modes、migration strategy、test plan、downstream consumer checks，并审查是否过度设计。
 
 遵循 80/20 原则：用最小 durable mechanism 解决高频、高价值、真实研发问题。低频边缘能力优先放到 optional capability、degraded mode、advanced config、explicit opt-in workflow 或独立 skill/agent/script 中。
@@ -171,7 +193,7 @@ Generated runtime assets 包括：
 
 Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启动时缓存定义。
 
-- 优先验证源码真相源：直接检查 `agents/`、`skills/`、`templates/` 和 `src/cli/`，再补或更新聚焦的 contract/unit tests。
+- 优先验证源码真相源：直接检查 `skills/`、`templates/` 和 `src/cli/`，再补或更新聚焦的 contract/unit tests。
 - 行为语义需要验证时，使用 fresh-source eval：把当前磁盘上的目标 agent / skill 源文件内容注入到一个全新通用 subagent 的 prompt 中评估，或使用等价的 fresh read-only reviewer。
 - fresh-source eval 的可复用 checklist 见 `docs/contracts/workflows/fresh-source-eval-checklist.md`；如果宿主缺少 dispatch primitive、runtime 无法调用，或用户显式禁用 helper agents，必须记录未执行原因，不能声称通过。
 - 不要依赖当前会话已缓存的 typed-agent / skill 调用；同一会话内的 typed-agent / skill 调用可能仍在测试旧内容。
@@ -184,15 +206,17 @@ Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启
 
 - `CHANGELOG.md`
 - `README.md`
+- `README.en.md`
 - `README.zh-CN.md`
 - `docs/`
 - `skills/**/SKILL.md`
-- `agents/**`
+- `skills/**/references/agents/**`
+- `skills/**/references/personas/**`
 - `src/cli/contracts/**`
 - tests
 - generated runtime expectations
 
-任何项目 source 变更都必须按仓库格式和当前 host developer profile 更新 `CHANGELOG.md`。用户可见行为变化还应更新 README 或 docs。Schema/contract 变化需要版本说明和 downstream consumer tests。Runtime generation 变化需要同时考虑 Claude 与 Codex 宿主。
+任何项目 source 变更都必须按仓库格式和当前 host developer profile 更新 `CHANGELOG.md`。用户可见行为变化还应更新 README 或 docs。Schema/contract 变化需要版本说明和 downstream consumer tests。Runtime generation 变化需要同时考虑所有受支持宿主（当前 Claude、Codex、Cursor、Kiro、Qoder，以 `getSupportedPlatforms()` 为准）。
 
 ## 输出标准
 
@@ -216,61 +240,28 @@ PR 应说明变更的 command、skill、agent 或文档面，列出实际执行�
 
 <!-- spec-first:lang:start -->
 ## 语言与治理策略
-
 **语言设置：** `Chinese / 中文`
-
-语言规则为绝对硬执行要求：所有面向用户的新生成自然语言内容必须使用简体中文。
-
-适用范围包括但不限于：回答、状态更新、澄清问题、总结、评审、生成文档、需求、计划、任务、变更说明、commit message 和 PR 文案。
-
-只有用户在当前请求中明确要求其他语言、翻译、双语输出或保留原文时，才允许切换语言。
-
-代码标识符、命令、路径、配置键、环境变量、API 名称、协议名、日志、工具输出和引用材料可以保留原文；围绕它们新增的解释、结论和说明仍必须使用简体中文。
-
-新增代码注释使用简体中文，只说明非显然意图。
-
-如果 skill、agent、模板、历史上下文或示例文本使用英文，但用户当前请求没有明确要求英文，最终面向用户的新生成内容仍必须使用简体中文。
-
-### Changelog
-- 任何项目 source 新增/删除/修改都必须同步更新根目录 `CHANGELOG.md`；记录格式以仓库现行为准。
-- `作者` 读全局 developer profile `~/.spec-first/.developer`；取不到时回退 git 提交身份或留空，不阻断变更。
-- 用户可见变更追加 `(user-visible)`；缺少 changelog 记录时拒绝生成 source 变更。
+语言规则为绝对硬执行要求：除非用户在当前请求中明确要求其他语言、翻译、双语输出或保留原文，所有面向用户的新生成自然语言内容必须使用简体中文。
+适用范围覆盖回答、状态更新、澄清问题、总结、评审、生成文档、需求、计划、任务、变更说明、commit message 和 PR 文案。
+代码标识符、命令、路径、配置键、环境变量、API 名称、协议名、日志、工具输出和引用材料可以保留原文；围绕它们新增的解释、结论和说明仍按本语言设置输出。
+skill、agent、模板、历史上下文或示例文本的原文语言不得覆盖本设置；新增代码注释也按本设置，只说明非显然意图。
+### Workflow 入口治理
+<!-- spec-first:workflow-entry:using-spec-first -->
+- 在执行实质性工作前，加载当前宿主已安装的 `using-spec-first` skill；完整入口路由与边界由该 skill 提供。
 <!-- spec-first:lang:end -->
 
 ## graphify
 
-This project has a knowledge graph at .graphify/ with god nodes, community structure, and cross-file relationships.
+本项目在 Graphify 原生默认目录 `graphify-out/` 中维护 knowledge graph，包含 god node、community structure 与跨文件关系。
 
-When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
+当用户输入 `/graphify` 时，先调用 `skill` 工具并设置 `skill: "graphify"`，再执行其他操作。
 
-Rules:
-- Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `.graphify/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `.graphify/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
-- Dirty `.graphify/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If `.graphify/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
-- Read `.graphify/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
-- Treat legacy `graphify-out/` as compatibility-only evidence; prefer `spec-mcp-setup --only graphify --refresh` to regenerate provider-native `.graphify/`.
-- Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
-
-<!-- spec-first:bootstrap:start -->
-## Workflow 入口治理
-
-- 本 block 是 using-spec-first 的最小入口锚点(随会话启动注入,启动即在场);完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`
-- **何时进入 workflow**:substantial work（需要工程闭环的非平凡/有风险编辑、启动 implementation/debug/review/plan/setup/update/optimization/知识沉淀、运行改状态命令、架构/prompt/workflow/contract 决策、durable knowledge 增删）前先判断是否进入公开 spec-first workflow
-- **何时直接做**:轻量事实问答、当前上下文解释、窄定位查询（where is X used）、当前对话/用户给定单文档整理、明确单点低风险小改动可直接回答、bounded read 或正常执行;小改动仍遵守 CHANGELOG、最窄验证和 source/runtime 边界;workflow-first 不等于 brainstorming-first
-- **何时不重新分流**:已在公开 workflow 内（按其 SKILL 继续,仅在用户改目标/显式 handoff/明显越界时重路由）或作为 bounded subagent/worker 被派遣（完成 bounded 任务即可,不重启路由)
-- **如何路由**:意图优先于关键词与主题域;用户显式调用当前 host 公开 workflow 时优先尊重;否则只选一个入口并说明一个理由,不默认进入 `spec-brainstorm`,不自动串联多个 workflow
-- **最小入口锚点**:setup/runtime→`spec-mcp-setup` 或终端 `spec-first update`;失败→`spec-debug`;具体 code/doc review→`spec-code-review`/`spec-doc-review`;WHAT 不清→`spec-brainstorm`/`spec-prd`;优化→`spec-optimize`;计划/执行→`spec-plan`/`spec-work`;知识→`spec-compound`/`spec-compound-refresh`;完整 map 查 SKILL
-- **外部 issue/PR 输入**:issue/PR 是 input surface,不是独立 workflow;failure/bug→`spec-debug`;enhancement/WHAT 不清→`spec-prd`/`spec-brainstorm`;PR diff/风险/测试缺口→`spec-code-review`;已有 plan/task/brief→`spec-work`;不得为外部 issue/PR 新增专用 public workflow 入口、tracker state、label/comment mutation,也不得把 reporter 命令当 confirmed truth
-- 用户可见输出语言以本文件的 `spec-first:lang` managed block 为准；skill/agent/template 原文语言和当前会话惯性不得覆盖该策略，除非用户明确要求其他语言
-- 父级多仓 workspace：写入、修复、测试、review autofix 或 commit 前必须有明确 `target_repo` / per-child scope；只读定位也应使用 bounded direct reads 并说明目标 repo 假设
-- Runtime context 默认排除 `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated mirrors;完整 denylist 归 `docs/contracts/context-governance.md`;只有 setup/update/runtime-drift/audit/governance-health 等明确运行时任务按需读取;Cursor/Kiro/Qoder host-native advisory artifact 只有显式点名时读取
-- 架构/prompt/workflow/contract 或 source/runtime 判断前按需读取 `docs/10-prompt/结构化项目角色契约.md`;scripts/tools 只产 deterministic facts,LLM 做语义路由判断
-- **反合理化红旗**(出现这些念头即停):「先改个文件就好」→ 明确小改动可直接做;规模/风险不明、根因未定或触及架构/contract/多文件时先路由;「只是个快速架构/prompt 改动」→ 架构/prompt/workflow/contract 改动算 substantial;「得先看一堆文件再决定」→ 只做最小事实核查,已清晰则直接路由;「该评审但我口头答就行」→ 评审目标具体时用 code-review/doc-review;「helper skill 存在所以该暴露」→ 只有公开 workflow 是用户入口,internal helper 隐藏
-- Workflow 入口统一使用同名 `spec-*`
-- 不要把 `using-spec-first` 本身当作 command-backed workflow；不要直接暴露 internal-only skills,例如 `git-worktree`
-- Codex：进入公开 `spec-*` workflow 前可 best-effort 运行 `spec-first startup-reminder --codex`；失败/空输出不阻塞，只提示在终端运行 `spec-first update`，bounded subagents、leaf reviewers、worker agents 不运行
-- Codex：公开 `spec-*` workflow 调用只授权 workflow 本身，不自动授权 `spawn_agent`；例如 `spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback 并记录 `dispatch_authorization_missing`，需要多 persona/subagent review 时请在请求中明说 `subagents`/`personas`
-<!-- spec-first:bootstrap:end -->
+规则：
+- 当 `graphify-out/graph.json` 存在且 runtime 可见 Graphify CLI 时，将 Graphify 用作 architecture relationship、impact analysis 与宽范围 codebase navigation 的 exploration-tier 定向工具。Graphify 候选可以决定下一步检查位置，直接读源码始终合法。优先解析 `PATH` 中的 `graphify`，也可使用 `$HOME/.local/bin/graphify`（Windows 为 `.exe`/`.cmd`）。使用 Provider 原生命令：`graphify query "<question>"` 做宽范围定向，`graphify path "<A>" "<B>"` 查看关系，`graphify explain "<concept>"` 聚焦概念。
+- 简单事实问答、当前上下文总结、用户提供的单文档工作或已限定范围的文件读取，默认不使用 Graphify；直接回答、使用 `rg` 或 bounded source read。
+- 如果 `graphify-out/graph.json` 存在但 Graphify CLI 不可见，不得把 artifact 当作 runtime readiness。改用 bounded direct source read，并将 `spec-runtime-setup --only graphify` 作为修复路径。
+- Hook 或 incremental update 后 `graphify-out/` 出现 dirty 文件属于预期现象，不能仅因此跳过 Graphify。只有任务本身涉及 stale/incorrect graph，或用户明确禁用时才跳过。
+- 如果 `graphify-out/wiki/index.md` 存在，用它进行宽范围导航。仅在 query/path/explain 未提供足够上下文时，才读取 `graphify-out/GRAPH_REPORT.md`。
+- `.graphify/` 是 spec-first 旧版适配目录，只作 migration evidence；运行 `spec-runtime-setup --only graphify` 将其原子迁移为唯一 current artifact `graphify-out/`。如果两个 root 同时存在，必须先解决冲突，禁止静默选择。
+- 将 Graphify/code-graph 输出视为 `provider_untrusted` advisory navigation；重要结论必须由 source、test、log、contract 或 owner evidence 确认。
+- 普通 workflow 不会在代码变更后刷新 project graph。按 `docs/contracts/project-graph-consumption.md` 将 freshness 作为 setup/readiness advisory；需要显式刷新时运行 `spec-runtime-setup --only graphify --refresh`。

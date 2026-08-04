@@ -12,17 +12,22 @@ const {
   readStateFileRaw,
   summarizeOperationPlan,
 } = require('../state');
-const { getAdapter } = require('../adapters');
+const { getAdapter, getSupportedPlatforms } = require('../adapters');
 const { formatInitGuidance } = require('../init-guidance');
 const { removeManagedCodingGuidelinesBlock } = require('../coding-guidelines');
 const { removeManagedBootstrapBlock } = require('../instruction-bootstrap');
 const { removeManagedRuntimeToolsBlock } = require('../runtime-tools-index');
 const {
+  LANG_END,
+  LANG_START,
+  removeMarkerBlock,
+} = require('../lang-policy');
+const {
   renderManagedClaudeHooksRemoval,
   validateClaudeSettingsFile,
 } = require('../claude-settings');
 
-function runClean(argv) {
+function runClean(argv, deps = {}) {
   const args = [...argv];
   const parsed = parseCleanArgs(args);
 
@@ -35,15 +40,20 @@ function runClean(argv) {
     return runWorkspaceOrphansClean(parsed);
   }
 
+  if (parsed.workspaceGraph) {
+    return runWorkspaceGraphCleanCommand(parsed, deps);
+  }
+
   if (parsed.confirm) {
     console.error('Error: --confirm is only valid with --workspace-orphans.');
     return 2;
   }
 
-  const selectedPlatforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'].filter((platform) => parsed[platform]);
+  const selectedPlatforms = selectedHostPlatforms(parsed);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) [--dry-run]');
+    console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
 
@@ -130,13 +140,17 @@ function parseCleanArgs(argv) {
     cursor: false,
     kiro: false,
     qoder: false,
+    opencode: false,
     dryRun: false,
     workspaceOrphans: false,
+    workspaceGraph: false,
+    repos: [],
     confirm: false,
     unknown: [],
   };
 
-  for (const arg of argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
     if (arg === '-h' || arg === '--help') {
       parsed.help = true;
     } else if (arg === '--claude') {
@@ -149,12 +163,34 @@ function parseCleanArgs(argv) {
       parsed.kiro = true;
     } else if (arg === '--qoder') {
       parsed.qoder = true;
+    } else if (arg === '--opencode') {
+      parsed.opencode = true;
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
       parsed.workspaceOrphans = true;
+    } else if (arg === '--workspace-graph') {
+      parsed.workspaceGraph = true;
     } else if (arg === '--confirm') {
       parsed.confirm = true;
+    } else if (arg === '--repos' || arg.startsWith('--repos=')) {
+      let value = null;
+      if (arg.startsWith('--repos=')) {
+        value = arg.slice('--repos='.length);
+      } else {
+        value = argv[index + 1];
+        if (value !== undefined && !String(value).startsWith('--')) {
+          index += 1;
+        } else {
+          value = null;
+        }
+      }
+      if (!value) {
+        parsed.unknown.push(arg);
+      } else {
+        const selected = String(value).split(',').map((entry) => entry.trim()).filter(Boolean);
+        parsed.repos.push(...selected);
+      }
     } else {
       parsed.unknown.push(arg);
     }
@@ -163,13 +199,126 @@ function parseCleanArgs(argv) {
   return parsed;
 }
 
+// Host-level counterpart of `spec-runtime-setup --workspace-graph-clean` (U6 / AE8).
+// Cleans managed per-requirement workspace graph assets only; does not touch host
+// runtime mirrors (those stay under clean --claude|--codex|...).
+function runWorkspaceGraphCleanCommand(parsed, deps = {}) {
+  if (parsed.unknown.length > 0) {
+    console.error('Usage: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
+    return 2;
+  }
+  if (selectedHostPlatforms(parsed).length > 0) {
+    console.error('Error: --workspace-graph cannot be combined with host flags.');
+    console.error('Workspace graph cleanup is separate from host runtime asset cleanup.');
+    return 2;
+  }
+  if (parsed.confirm) {
+    console.error('Error: --confirm is only valid with --workspace-orphans.');
+    return 2;
+  }
+
+  const projectRoot = deps.cwd || process.cwd();
+  const runStatus = deps.runWorkspaceGraphStatus || requireWorkspaceGraphStatus();
+  const runCleanGraph = deps.runWorkspaceGraphClean || requireWorkspaceGraphClean();
+  const exec = deps.workspaceExec;
+
+  if (parsed.dryRun) {
+    const status = runStatus({
+      cwd: projectRoot,
+      repos: parsed.repos,
+      allowDiscovery: parsed.repos.length === 0,
+    });
+    printWorkspaceGraphCleanPreview(status);
+    return 0;
+  }
+
+  const result = runCleanGraph({
+    cwd: projectRoot,
+    repos: parsed.repos,
+    allowDiscovery: parsed.repos.length === 0,
+    exec,
+  });
+
+  if (result.status === 'skipped') {
+    console.log(`Workspace graph clean skipped (${result.reason_code || result.topology}).`);
+    console.log('This mode only applies to a non-Git multi-repo requirement parent folder.');
+    return 0;
+  }
+
+  if (result.status === 'needs-confirmation') {
+    const pending = Array.isArray(result.pending_confirm) ? result.pending_confirm : [];
+    console.log(`Workspace graph clean: ${result.status}`);
+    console.log(`  pending_confirm: ${pending.join(', ') || 'discovered repos'}`);
+    if (pending.length > 0) {
+      console.log(`  confirm: spec-first clean --workspace-graph --repos ${pending.join(',')}`);
+    }
+    return 2;
+  }
+
+  console.log(`Workspace graph clean: ${result.status}`);
+  console.log(`  root: ${result.workspace_root}`);
+  for (const repo of result.repos || []) {
+    console.log(
+      `  child ${repo.repo_id}: codegraph_removed=${repo.codegraph_removed}`
+        + ` exclude_removed=${repo.exclude_removed}`
+        + ` hook=${repo.hook_uninstalled}`,
+    );
+  }
+  console.log(`  workspace graphify-out removed: ${Boolean(result.workspace_graphify_removed)}`);
+  if (result.routing && Array.isArray(result.routing.entries)) {
+    for (const entry of result.routing.entries) {
+      console.log(`  routing ${entry.entry_file}: ${entry.status}`);
+    }
+  }
+  if (result.codegraph_daemon_action) {
+    console.log(`  daemon: ${result.codegraph_daemon_action}`);
+  }
+  return result.status === 'complete' || result.status === 'skipped' ? 0 : 1;
+}
+
+function printWorkspaceGraphCleanPreview(status) {
+  console.log('Dry run: spec-first clean --workspace-graph');
+  if (status.status === 'skipped') {
+    console.log(`Would skip (${status.reason_code || status.topology}).`);
+    return;
+  }
+  console.log(`  root: ${status.workspace_root}`);
+  const explicitRefresh = status.workspace && status.workspace.refresh_mode === 'explicit';
+  for (const repo of status.repos || []) {
+    if (repo.codegraph_present) {
+      console.log(`  would remove: ${path.join(repo.git_root, '.codegraph')}`);
+    }
+    console.log(`  would strip managed exclude block in: ${repo.repo_id}`);
+    if (!explicitRefresh) {
+      console.log(`  would run: graphify hook uninstall (cwd=${repo.repo_id})`);
+    }
+  }
+  if (status.workspace && status.workspace.graphify_present) {
+    console.log(`  would remove: ${status.workspace.graphify_dir}`);
+  }
+  for (const entry of (status.routing && status.routing.entries) || []) {
+    if (entry.has_routing_block) {
+      console.log(`  would strip routing block from: ${entry.entry_file}`);
+    }
+  }
+  console.log('No files were changed.');
+}
+
+function requireWorkspaceGraphClean() {
+  return require('../../../skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs').runWorkspaceGraphClean;
+}
+
+function requireWorkspaceGraphStatus() {
+  return require('../../../skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs').runWorkspaceGraphStatus;
+}
+
 function runWorkspaceOrphansClean(parsed) {
   if (parsed.unknown.length > 0) {
     console.error('Usage: spec-first clean --workspace-orphans [--confirm]');
     return 2;
   }
 
-  if (parsed.claude || parsed.codex || parsed.cursor || parsed.kiro || parsed.qoder) {
+  if (selectedHostPlatforms(parsed).length > 0) {
     console.error('Error: --workspace-orphans cannot be combined with host flags.');
     console.error('Workspace orphan cleanup is separate from runtime asset cleanup.');
     return 2;
@@ -179,7 +328,7 @@ function runWorkspaceOrphansClean(parsed) {
   const quarantinePath = path.join(projectRoot, '.spec-first', 'workspace', 'parent-artifact-quarantine.json');
   if (!fs.existsSync(quarantinePath)) {
     console.error('No parent artifact quarantine found.');
-    console.error('Run `spec-mcp-setup` from the parent workspace to generate workspace orphan evidence first.');
+    console.error('Run `spec-runtime-setup` from the parent workspace to generate workspace orphan evidence first.');
     return 1;
   }
 
@@ -190,7 +339,7 @@ function runWorkspaceOrphansClean(parsed) {
     console.error(
       `Could not read parent artifact quarantine. ${error instanceof Error ? error.message : String(error)}`,
     );
-    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-runtime-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 
@@ -199,7 +348,7 @@ function runWorkspaceOrphansClean(parsed) {
     entries = validateWorkspaceOrphanQuarantine(payload);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
-    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-runtime-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 
@@ -370,10 +519,12 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
+    '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
     'Workspace orphan cleanup previews parent quarantine evidence by default; add --confirm to delete supported orphan paths.',
+    'Workspace graph cleanup removes managed per-requirement graph assets (child .codegraph/, exclude block, graphify hooks, workspace graphify-out/, routing markers) without touching host runtime mirrors.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
@@ -386,7 +537,12 @@ function platformDisplayName(platform) {
   if (platform === 'cursor') return 'Cursor';
   if (platform === 'kiro') return 'Kiro';
   if (platform === 'qoder') return 'Qoder';
+  if (platform === 'opencode') return 'OpenCode';
   return platform;
+}
+
+function selectedHostPlatforms(parsed) {
+  return getSupportedPlatforms().filter((platform) => parsed[platform]);
 }
 
 function buildCleanPlan(projectRoot, state, adapter) {
@@ -398,23 +554,27 @@ function buildCleanPlan(projectRoot, state, adapter) {
 }
 
 function buildRuntimeCleanupPreview(projectRoot, adapter) {
-  const operations = [
-    buildRelativeOperation(
-      fs.existsSync(path.join(projectRoot, adapter.instructionFile)) ? 'update_file' : 'remove_file',
-      adapter.instructionFile,
-      'managed_instruction_cleanup',
-    ),
-    buildRelativeOperation('remove_file', adapter.stateFile, 'managed_state_file'),
-  ];
+  const sharedConsumers = classifySharedInstructionConsumers(projectRoot, adapter);
+  const preservingConsumers = sharedConsumers.filter((consumer) => consumer.status !== 'confirmed_absent');
+  const operations = [];
+  const diagnostics = buildSharedInstructionDiagnostics(adapter, preservingConsumers);
 
   const instructionPath = path.join(projectRoot, adapter.instructionFile);
-  if (fs.existsSync(instructionPath)) {
-    operations[0].contents = removeManagedCodingGuidelinesBlock(
-      removeManagedRuntimeToolsBlock(
-        removeManagedBootstrapBlock(fs.readFileSync(instructionPath, 'utf8')),
-      ),
+  if (preservingConsumers.length === 0) {
+    const instructionOperation = buildRelativeOperation(
+      fs.existsSync(instructionPath) ? 'update_file' : 'remove_file',
+      adapter.instructionFile,
+      'managed_instruction_cleanup',
     );
+    if (fs.existsSync(instructionPath)) {
+      instructionOperation.contents = removeManagedInstructionBlocks(
+        fs.readFileSync(instructionPath, 'utf8'),
+      );
+    }
+    operations.push(instructionOperation);
   }
+
+  operations.push(buildRelativeOperation('remove_file', adapter.stateFile, 'managed_state_file'));
 
   if (adapter.id === 'claude') {
     const rendered = renderManagedClaudeHooksRemoval(projectRoot);
@@ -438,7 +598,91 @@ function buildRuntimeCleanupPreview(projectRoot, adapter) {
   return {
     operations,
     summary: summarizeOperationPlan(operations),
+    diagnostics,
   };
+}
+
+function classifySharedInstructionConsumers(projectRoot, adapter) {
+  return getSupportedPlatforms()
+    .filter((platform) => platform !== adapter.id)
+    .map((platform) => getAdapter(platform))
+    .filter((candidate) => candidate.instructionFile === adapter.instructionFile)
+    .map((candidate) => classifyInstructionConsumer(projectRoot, candidate));
+}
+
+function classifyInstructionConsumer(projectRoot, adapter) {
+  const statePath = path.join(projectRoot, adapter.stateFile);
+  if (!fs.existsSync(statePath)) {
+    if (hasManagedRuntimeSurface(projectRoot, adapter)) {
+      return {
+        platform: adapter.id,
+        status: 'uncertain',
+        reasonCode: 'managed_state_missing_with_runtime',
+      };
+    }
+    return { platform: adapter.id, status: 'confirmed_absent' };
+  }
+
+  try {
+    const state = readState(projectRoot, adapter);
+    if (!state || state.platform !== adapter.id) {
+      return {
+        platform: adapter.id,
+        status: 'uncertain',
+        reasonCode: 'managed_state_platform_mismatch',
+      };
+    }
+    return { platform: adapter.id, status: 'present' };
+  } catch (_error) {
+    return {
+      platform: adapter.id,
+      status: 'uncertain',
+      reasonCode: 'managed_state_unreadable',
+    };
+  }
+}
+
+function hasManagedRuntimeSurface(projectRoot, adapter) {
+  return [...new Set([
+    adapter.managedRoot,
+    adapter.commandRoot,
+    adapter.skillsRoot,
+    adapter.workflowsRoot,
+    adapter.agentsRoot,
+  ].filter(Boolean))].some((relativePath) => fs.existsSync(path.join(projectRoot, relativePath)));
+}
+
+function buildSharedInstructionDiagnostics(adapter, consumers) {
+  const present = consumers.filter((consumer) => consumer.status === 'present');
+  const uncertain = consumers.filter((consumer) => consumer.status === 'uncertain');
+  const diagnostics = [];
+
+  if (present.length > 0) {
+    diagnostics.push({
+      code: 'shared_instruction_consumer_present',
+      message: `Preserved ${adapter.instructionFile}: confirmed managed consumer(s) remain: ${present.map((consumer) => consumer.platform).join(', ')}.`,
+    });
+  }
+  if (uncertain.length > 0) {
+    diagnostics.push({
+      code: 'shared_instruction_consumer_uncertain',
+      message: `Preserved ${adapter.instructionFile}: consumer ownership is uncertain for ${uncertain.map((consumer) => `${consumer.platform} (${consumer.reasonCode})`).join(', ')}.`,
+    });
+  }
+
+  return diagnostics;
+}
+
+function removeManagedInstructionBlocks(existing) {
+  return removeMarkerBlock(
+    removeManagedCodingGuidelinesBlock(
+      removeManagedRuntimeToolsBlock(
+        removeManagedBootstrapBlock(existing),
+      ),
+    ),
+    LANG_START,
+    LANG_END,
+  );
 }
 
 function printCleanSummary(platform, cleanPlan, { mode }) {
@@ -465,6 +709,9 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
   for (const operation of cleanPlan.runtimeCleanup.operations.filter((entry) => entry.kind === 'update_file')) {
     console.log(`  - ${operation.path}`);
   }
+  for (const diagnostic of cleanPlan.runtimeCleanup.diagnostics || []) {
+    console.log(`[${diagnostic.code}] ${diagnostic.message}`);
+  }
   if (dryRun) {
     console.log(`Would remove ${emptyRootCount} empty managed root(s) after cleanup.`);
   } else {
@@ -478,4 +725,6 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
 
 module.exports = {
   runClean,
+  parseCleanArgs,
+  runWorkspaceGraphCleanCommand,
 };

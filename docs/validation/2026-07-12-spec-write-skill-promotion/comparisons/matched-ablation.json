@@ -1,0 +1,10 @@
+{
+  "schema_version": "spec-write-skill.comparative-verdict/v1",
+  "artifact_type": "comparative",
+  "result": "pass",
+  "rationale": "On portable-create, candidate-ablation passed 2/2 at mean score 9.5 while native passed 0/2 at mean score 7.5, so the matched authoring-core comparison is non-regressive and visibly better.",
+  "source": {
+    "path": "raw/comparison-summary.json",
+    "sha256": "df10e2a976fa32b3e1fd53ad86e09c988d66cdeec1b6c925489e78c60bdb205e"
+  }
+}

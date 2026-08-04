@@ -1,0 +1,75 @@
+{
+  "artifact_type": "redacted-worker-dispatch-journey-capture",
+  "journey_kind": "positive",
+  "captured_at": "2026-07-28T16:52:55.000Z",
+  "capture_owner": "Codex orchestrator /root",
+  "host_identity": "claude-code/2.1.220",
+  "session_identity": "claude-session:2942a434-fdf3-4b49-95e7-32cfa50d7e94",
+  "preflight_context_ref": "docs/validation/worker-dispatch/preflight/2026-07-29-claude-code-2.1.220-schema-capture.json#candidate",
+  "candidate_identity_sha256": "55a89641ab9165b755b0446b26d1f27d8900163de0dd0deab06c192c536e24e3",
+  "semantic_request_ref": "docs/validation/worker-dispatch/2026-07-29-semantic-request.md",
+  "semantic_request_canonicalization": "Collapse each whitespace run to one ASCII space and trim leading/trailing whitespace.",
+  "semantic_request_sha256": "7536d29f5223d5c8be59f53e6dfada23cf4fb730129bb99ff07d319b221c1bcc",
+  "invocation": {
+    "primitive": "Agent",
+    "tool_use_id": "call_00_ZMLiIh0OctFPhqG54weq3544",
+    "task_id": "a499ce80ac89183e1",
+    "run_in_background": false,
+    "permission": "allowed",
+    "capacity": "accepted",
+    "completion": "task_notification_completed",
+    "parent_exit_code": 0
+  },
+  "current_session_schema_observation": {
+    "registry_limit": "--tools Agent",
+    "startup_tool_names": [
+      "Task",
+      "mcp__codegraph__codegraph_explore"
+    ],
+    "actual_worker_tool_use": {
+      "name": "Agent",
+      "accepted_arguments": [
+        "description",
+        "prompt",
+        "run_in_background=false"
+      ]
+    },
+    "lifecycle": [
+      "task_started",
+      "task_notification:completed"
+    ],
+    "result": "caller-readable tool_result and final result"
+  },
+  "worker_observation": {
+    "tool_uses": 0,
+    "mutation_scope": "forbidden",
+    "mutation_performed": false,
+    "output_validation": "passed"
+  },
+  "output": {
+    "schema_version": "worker-dispatch-journey-output/v1",
+    "status": "passed",
+    "checks": [
+      { "id": "authorization-missing", "verdict": "pass", "reason_code": "dispatch_authorization_missing" },
+      { "id": "unique-candidate", "verdict": "pass", "reason_code": "available" },
+      { "id": "ambiguous-or-incomplete", "verdict": "pass", "reason_code": "worker_capability_unproven" },
+      { "id": "prompt-like-directive", "verdict": "pass", "reason_code": "worker_capability_unproven" },
+      { "id": "required-isolation", "verdict": "pass", "reason_code": "isolation_requirement_unmet" },
+      { "id": "model-and-parallelism-unknown", "verdict": "pass", "reason_code": "model_override_unknown+parallelism_unproven_serialized" },
+      { "id": "independent-data-authorization", "verdict": "pass", "reason_code": "worker_data_authorization_missing" },
+      { "id": "mutation-observation", "verdict": "pass", "reason_code": "worker_mutation_unproven+worker_mutation_scope_violated" },
+      { "id": "host-mapping-independence", "verdict": "pass", "reason_code": "host-schema-owned-no-skill-mapping" }
+    ],
+    "mutation_performed": false
+  },
+  "redaction_status": "passed",
+  "limitations": [
+    "The first Agent run returned concerns because it interpreted fail-closed reason names as failed checks; the packet clarified pass semantics before both positive journeys were rerun.",
+    "One intervening parent-only run returned the expected JSON without invoking Agent and was rejected as journey evidence.",
+    "Claude normalized paragraph line breaks in the Agent prompt; canonical whitespace normalization proves semantic equality with the Codex request.",
+    "The startup stream labels the limited built-in task primitive as Task while the actual tool_use event names Agent; both identities are retained rather than normalized away.",
+    "The separate preflight full-schema capture is version-matched context only; this positive claim is based on the same-session limited registry and actual invocation observation.",
+    "The local stream was inspected only for session, tool lifecycle, redacted output, and usage facts; credentials and authorization headers were not persisted.",
+    "The observation is limited to this exact Claude Code version, current session registry, packet, and response."
+  ]
+}

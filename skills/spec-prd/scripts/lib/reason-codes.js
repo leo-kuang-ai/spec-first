@@ -15,6 +15,10 @@
 const BLOCKING_REASON_CODES = new Set([
   // 基础结构 / 声明类
   'machine_section_identity_missing',
+  'core_section_missing',
+  'requirements_row_missing',
+  'acceptance_example_row_missing',
+  'requirement_acceptance_trace_missing',
   'forbidden_prds_path',
   'write_mode_undeclared',
   'clarification_evidence_undeclared',
@@ -23,6 +27,7 @@ const BLOCKING_REASON_CODES = new Set([
   'preflight_sweep_closure_absent',
   'preflight_sweep_closure_blocked',
   'decision_card_undeclared',
+  'decision_card_path_mismatch',
   'design_source_inventory_undeclared',
   'design_source_coverage_undeclared',
   'design_sources_read_undeclared',

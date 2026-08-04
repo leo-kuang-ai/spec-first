@@ -25,9 +25,9 @@ source_refs:
   - "docs/validation/project-graph/2026-06-15-relay-diagnostic.md"
   - "docs/contracts/project-graph-consumption.md"
   - "docs/contracts/knowledge/knowledge-harness.md"
-  - "skills/spec-mcp-setup/scripts/install-helpers.sh"
-  - "skills/spec-mcp-setup/scripts/install-helpers.ps1"
-  - "skills/spec-mcp-setup/scripts/provider-readiness-renderer.cjs"
+  - "skills/spec-mcp-setup/scripts/providers/graphify.cjs"
+  - "skills/spec-mcp-setup/scripts/providers/common.cjs"
+  - "tests/unit/mcp-setup-providers.test.js"
 ---
 
 # Graphify 命令可靠性分化:query 弱定向、explain/path 可靠、脚本索引覆盖需实测
@@ -76,11 +76,11 @@ mcp-setup 对此**只做诚实暴露,不修 provider**:`query_verified` fact 仅
 - **query 种子劫持**:`query "project graph consumption candidate evidence boundary"` → 种子 `['Trust', 'candidate()', 'candidate()']`(撞同名函数),召回全是 `spec-app-consistency-audit/scripts/` 工具函数,零召回 `provider-readiness.md`。`query "verify graphify artifact ... probe"` → 种子含 `graphify`,召回被 CLAUDE.md/AGENTS.md 的 graphify 小节**自指**占据。
 - **explain 可靠**:`explain "loadPluginManifest"` 与 `explain "loadPluginManifest()"` 均命中 `src/cli/plugin.js:106` 节点(degree 16)。
 - **path 可靠**:`path "init.js" "doctor.js"` → `init.js --imports--> loadPluginManifest() <--imports-- doctor.js`(准确 import 关系)。
-- **关键 `.cjs` helper 覆盖仍需实测**:v0.8.36 当时观察到 `graph.json` 中 `.cjs` 出现 **0** 次,5 个 `skills/spec-mcp-setup/scripts/*.cjs` 节点数全 **0**。2026-06-22 用 graphify v0.8.39 与当前 `graphify-out/graph.json` 复核后,`.cjs` 已非全局 0 覆盖(`nodes_with_cjs=1`),因此不能再概括为 extractor 完全不处理 `.cjs`。但 `provider-readiness-renderer.cjs`、`knownCommandCandidates`、`buildEntry` 仍未进入当前图,`graphify explain` 也找不到这些节点。结论收窄为:关键 `.cjs` helper 的索引覆盖仍是未确认能力,涉及这些 helper 的结论必须直读源码确认。
+- **关键 `.cjs` module 覆盖仍需实测**:v0.8.36 当时观察到 `graph.json` 中 `.cjs` 出现 **0** 次。2026-06-22 用 graphify v0.8.39 与当时的兼容图产物复核后,`.cjs` 已非全局 0 覆盖(`nodes_with_cjs=1`),因此不能再概括为 extractor 完全不处理 `.cjs`。当前 Runtime Setup 已收敛到 `scripts/setup.cjs`、`scripts/lib/*.cjs` 与 `scripts/providers/*.cjs`;这些关键 module 是否被完整索引仍须按当前 provider artifact 实测,涉及其行为的结论必须直读源码确认。
 
 ## Source Refs
 
 - 计划:`docs/plans/2026-06-12-004-fix-graphify-readiness-honesty-plan.md`(本诊断的承载计划,含完整 Direct Evidence)
 - 前置:`docs/plans/2026-06-12-002-fix-graphify-runtime-visibility-plan.md`(completed,让 graphify runtime-visible)
 - 挂起:`docs/plans/2026-06-11-002-feat-project-graph-consumption-protocol-plan.md`(消费协议,等召回解冻)
-- 源码:`skills/spec-mcp-setup/scripts/{install-helpers.sh,install-helpers.ps1,provider-readiness-renderer.cjs}`、`tests/unit/dependency-readiness-baseline.test.js`
+- 源码:`skills/spec-mcp-setup/scripts/providers/graphify.cjs`、`skills/spec-mcp-setup/scripts/providers/common.cjs`、`tests/unit/mcp-setup-providers.test.js`

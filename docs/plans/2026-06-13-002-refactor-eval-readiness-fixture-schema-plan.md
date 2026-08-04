@@ -11,7 +11,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 ## Summary
 
-本计划把 agent-native 审查报告中的 W1 主线落成一个 Deep 级 eval readiness 改造方案：先建立最小 normalized fixture envelope 和 source-owned normalizer，再让 `spec-skill-audit` 评分器消费同一个 normalized 解释层和结构化 `coverage_tags`，随后按 first-wave heuristic 给 4 个 workflow 补 `trigger` / `boundary` 样例，并把 fresh-source-eval 变成有节奏的 advisory 验证，而不是硬 CI gate。
+本计划把 agent-native 审查报告中的 W1 主线落成一个 Deep 级 eval readiness 改造方案：先建立最小 normalized fixture envelope 和 source-owned normalizer，再让 `retired-skill-review` 评分器消费同一个 normalized 解释层和结构化 `coverage_tags`，随后按 first-wave heuristic 给 4 个 workflow 补 `trigger` / `boundary` 样例，并把 fresh-source-eval 变成有节奏的 advisory 验证，而不是硬 CI gate。
 
 ---
 
@@ -29,7 +29,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 审查报告确认 spec-first 的 eval 方法论方向是对的：结构化 examples、廉价断言、fresh-source-eval 和人工/LLM 抽样，符合“scripts prepare, LLM decides”。真实短板不是“没做 eval”，而是两点：
 
 - fixture schema 已经形成 5 套局部形态，字段名和语义入口发散，后续补 case 时很难复用判断。
-- `skills/spec-skill-audit/scripts/write-audit-artifacts.js` 当前用文件名中的 `trigger`、`boundary`、`failure`、`expected` 判 readiness，导致内容充分但文件名不匹配的 eval 被低估。
+- `skills/retired-skill-review/scripts/write-audit-artifacts.js` 当前用文件名中的 `trigger`、`boundary`、`failure`、`expected` 判 readiness，导致内容充分但文件名不匹配的 eval 被低估。
 
 这会让 Evaluation Harness 的信号不诚实：scorecard 可能惩罚命名而不是覆盖，也可能鼓励为得分而改文件名。计划目标是让 readiness 分数回到“覆盖了什么语义风险”这个问题上，同时继续保持 spec-first 的 light contract。
 
@@ -38,8 +38,8 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 ## Requirements
 
 - R1. 建立一个 repo 内最小 eval fixture envelope，能表达 `id`、`input`、按 tag 分级的 `expected_outcome`、`coverage_tags[]`、`source_refs[]`、`source_ref_authority`、`boundary_note`、`forbidden_signals[]`，并允许各 skill 保留局部扩展字段。
-- R2. 提供 source-owned legacy normalizer，让现有 `prompt-examples/v1`、`spec-prd-evals.v1`、`spec-write-tasks` 四件套、`spec-skill-audit` cases、`agent-native-architecture` examples 都能规范化为同一 normalized shape；生产 scorer 与 contract tests 必须消费同一个 normalizer，避免双实现漂移。
-- R3. `spec-skill-audit` readiness 评分必须读取 normalized schema、declared structural `coverage_tags` 和 bucket-level 最低结构证据，而不是从文件名 regex 推断覆盖类型；report 必须把 tags 表述为 declared structural coverage，不声称它们证明语义质量。
+- R2. 提供 source-owned legacy normalizer，让现有 `prompt-examples/v1`、`spec-prd-evals.v1`、`spec-write-tasks` 四件套、`retired-skill-review` cases、`agent-native-architecture` examples 都能规范化为同一 normalized shape；生产 scorer 与 contract tests 必须消费同一个 normalizer，避免双实现漂移。
+- R3. `retired-skill-review` readiness 评分必须读取 normalized schema、declared structural `coverage_tags` 和 bucket-level 最低结构证据，而不是从文件名 regex 推断覆盖类型；report 必须把 tags 表述为 declared structural coverage，不声称它们证明语义质量。
 - R4. 新增或迁移 fixture 的 deterministic tests 只校验结构、枚举、source refs、coverage completeness，不判断 prose 语义质量。
 - R5. 按 first-wave selection table 给 `spec-plan`、`spec-code-review`、`spec-debug`、`spec-compound` 各补最小 trigger/boundary eval fixtures，覆盖核心链路入口和边界误触发，不追求 failure/expected 四件套。
 - R6. fresh-source-eval 作为 L2 语义验证节奏进入 PR/closeout 可见面，并支持 judge 与人工抽样校准；它不能成为随机、不可复现的硬 gate，且 PR template 字段必须允许非 prompt/skill 变更填写 `N/A`，避免把 eval 术语强加给所有 PR。
@@ -76,7 +76,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 ## Completion Criteria
 
-- `spec-skill-audit` readiness report 能基于 normalized cases、declared structural `coverage_tags` 和最低结构证据判断 `trigger`、`boundary`、`failure`、`expected` 覆盖，并在 report 中说明 coverage basis；report 文案不得把 tag 自声明称为 semantic truth。
+- `retired-skill-review` readiness report 能基于 normalized cases、declared structural `coverage_tags` 和最低结构证据判断 `trigger`、`boundary`、`failure`、`expected` 覆盖，并在 report 中说明 coverage basis；report 文案不得把 tag 自声明称为 semantic truth。
 - `using-spec-first/evals/routing-cases.json` 这类非 `trigger` 文件名的 fixture 不再仅因文件名被判 `partial`。
 - 现有 5 类 fixture 家族均能通过同一个 normalizer 的 contract test。
 - `spec-plan`、`spec-code-review`、`spec-debug`、`spec-compound` 均有最小 eval 文件，并被对应 SKILL.md 作为 examples-as-context 引用。
@@ -90,7 +90,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 - **target_repo:** `.`
 - **evidence_sources:** audit report, bounded source reads, `rg`, `find`, `git status`, CodeGraph exploration, Graphify query, `task-governance-signals`, official external docs fetches, 2026-06-13 deep-research 多源对抗式核查
-- **source_refs:** `docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md`, `skills/spec-skill-audit/scripts/write-audit-artifacts.js`, `skills/spec-skill-audit/references/eval-readiness-rubric.md`, `docs/contracts/workflows/fresh-source-eval-checklist.md`, `tests/unit/prompt-examples-contracts.test.js`, `tests/unit/spec-prd-contracts.test.js`, `tests/unit/spec-write-tasks-contracts.test.js`, `tests/unit/agent-native-architecture-eval-readiness.test.js`, `.github/workflows/skill-entrypoint-gate.yml`, `.github/workflows/ai-dev-quality-gate.yml`, `package.json`
+- **source_refs:** `docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md`, `skills/retired-skill-review/scripts/write-audit-artifacts.js`, `skills/retired-skill-review/references/eval-readiness-rubric.md`, `docs/contracts/workflows/fresh-source-eval-checklist.md`, `tests/unit/prompt-examples-contracts.test.js`, `tests/unit/spec-prd-contracts.test.js`, `tests/unit/spec-write-tasks-contracts.test.js`, `tests/unit/agent-native-architecture-eval-readiness.test.js`, `.github/workflows/skill-entrypoint-gate.yml`, `.github/workflows/ai-dev-quality-gate.yml`, `package.json`
 - **current_revision:** `68ba27ef`
 - **worktree_status:** dirty at planning time; unrelated modified/untracked files already existed, including `CHANGELOG.md`, several docs/plans, `skills/spec-plan/references/*`, and `tests/unit/spec-plan-contracts.test.js`. Execution must re-check in-scope diffs before editing.
 - **confidence:** high for local file layout, scoring regex, and existing fixture family differences; medium for CI implications until implementation re-runs full focused tests; external docs are design pressure only.
@@ -103,7 +103,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 - **repo_scope:** `spec-first` package repo, Node.js CommonJS CLI with source/runtime split.
 - **source_reads_completed:**
   - `find skills -path '*/evals/*' -type f` confirmed current eval file distribution.
-  - `skills/spec-skill-audit/scripts/write-audit-artifacts.js` lines around `buildEvalReadinessReport()` confirmed filename regex scoring.
+  - `skills/retired-skill-review/scripts/write-audit-artifacts.js` lines around `buildEvalReadinessReport()` confirmed filename regex scoring.
   - `tests/unit/prompt-examples-contracts.test.js` confirmed `prompt-examples/v1` shape for `spec-work`、`spec-doc-review`、`using-spec-first`。
   - `tests/unit/spec-prd-contracts.test.js` confirmed `spec-prd-evals.v1` large case set and fresh-source eval artifact expectations.
   - `tests/unit/spec-write-tasks-contracts.test.js` and `skills/spec-write-tasks/evals/README.md` confirmed decision/failure enum coverage pattern and LLM review boundary.
@@ -116,7 +116,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 - **commands_or_tools_used:** `rg`, `find`, `git status --short`, `git rev-parse --short HEAD`, `spec-first internal task-governance-signals --source plan-declared --json`, CodeGraph `codegraph_explore`, Graphify `query`, official docs fetch.
 - **impact_on_plan:** confirms Deep scope because work crosses fixture contracts, scoring script, public workflow skills, tests, CI, docs contracts, PR/closeout process, and source/runtime governance.
 - **key_findings:**
-  - Current eval files exist under `agent-native-architecture`, `spec-work`, `spec-doc-review`, `spec-prd`, `spec-skill-audit`, `spec-write-tasks`, and `using-spec-first`; the four target public workflows currently lack `evals/`.
+  - Current eval files exist under `agent-native-architecture`, `spec-work`, `spec-doc-review`, `spec-prd`, `retired-skill-review`, `spec-write-tasks`, and `using-spec-first`; the four target public workflows currently lack `evals/`.
   - `buildEvalReadinessReport()` currently infers coverage by regex matching filenames, not case metadata.
   - Existing fixture families already prove useful local patterns: prompt examples, enum-covered cases, coverage-tag examples, and source-ref boundary tests.
   - `fresh-source-eval-checklist.md` already has the source/runtime and not-run honesty boundary; this plan should extend cadence, not reinvent it.
@@ -131,7 +131,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 ### Relevant Code and Patterns
 
-- `skills/spec-skill-audit/scripts/write-audit-artifacts.js` currently produces `spec-first.eval-readiness-report.v1` and is the right narrow place to fix readiness scoring.
+- `skills/retired-skill-review/scripts/write-audit-artifacts.js` currently produces `spec-first.eval-readiness-report.v1` and is the right narrow place to fix readiness scoring.
 - `tests/unit/spec-write-tasks-contracts.test.js` is the strongest local precedent for deterministic eval fixture checks that validate shape, allowed enums, and coverage while explicitly leaving semantic quality to LLM review.
 - `tests/unit/agent-native-architecture-eval-readiness.test.js` is the strongest precedent for `coverage_tags`, `forbidden_signals`, and `source_refs` guarding source-first examples.
 - `tests/unit/prompt-examples-contracts.test.js` is the existing owner for prompt examples used by `spec-work`、`spec-doc-review`、`using-spec-first`。
@@ -162,7 +162,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 | `spec-code-review` | 目前无 `skills/spec-code-review/evals/` | in-scope | Review 是闭环质量节点，且 Codex dispatch / report-only / diff boundary 最近频繁变化，边界误触发风险高。 |
 | `spec-debug` | 目前无 `skills/spec-debug/evals/` | in-scope | Debug 是 failure-first 入口；应覆盖 stack trace/test failure 触发与 feature planning/code review 边界。 |
 | `spec-compound` | 目前无 `skills/spec-compound/evals/` | in-scope | Knowledge promotion 是硬 gate 类边界；需要防止 unresolved/advisory findings 被沉淀为 durable knowledge。 |
-| `using-spec-first` / `spec-work` / `spec-doc-review` / `spec-prd` / `spec-write-tasks` / `agent-native-architecture` / `spec-skill-audit` | 已有 eval 或专门 cases | out-of-scope this wave | 本轮通过 U3 接入 normalized contract，不新增首批 workflow cases。 |
+| `using-spec-first` / `spec-work` / `spec-doc-review` / `spec-prd` / `spec-write-tasks` / `agent-native-architecture` / `retired-skill-review` | 已有 eval 或专门 cases | out-of-scope this wave | 本轮通过 U3 接入 normalized contract，不新增首批 workflow cases。 |
 | 其他 public workflows（setup、sessions、slack-research、ideate、brainstorm、optimize、polish、release-notes、compound-refresh、app-consistency-audit 等） | 未全量核查或非 W1 核心 | deferred | 有价值但不是本轮 W1 最小闭环；后续按真实 failure/support 信号或 `eval-readiness-rubric.md` 再排期。 |
 
 ---
@@ -207,11 +207,11 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 ```mermaid
 flowchart TB
-  LEGACY[Existing eval files<br/>prompt examples / PRD / write-tasks / skill-audit / agent-native] --> NORMALIZER[source-owned eval fixture normalizer]
+  LEGACY[Existing eval files<br/>prompt examples / PRD / write-tasks / skill-review / agent-native] --> NORMALIZER[source-owned eval fixture normalizer]
   NEW[New canonical workflow fixtures<br/>spec-plan / code-review / debug / compound] --> NORMALIZER
   CONTRACT[docs/contracts/workflows/eval-fixture-contract.md] --> NORMALIZER
   NORMALIZER --> TESTS[focused deterministic Jest]
-  NORMALIZER --> SCORE[spec-skill-audit readiness scoring]
+  NORMALIZER --> SCORE[retired-skill-review readiness scoring]
   TESTS --> CI[GitHub focused eval fixture check]
   SCORE --> REPORT[eval-readiness-report.json]
   NEW --> FRESH[fresh-source-eval examples-as-context]
@@ -251,7 +251,7 @@ flowchart TB
 
 **Files:**
 - Create: `docs/contracts/workflows/eval-fixture-contract.md`
-- Create: `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js`
+- Create: `skills/retired-skill-review/scripts/eval-fixture-normalizer.js`
 - Create: `tests/unit/eval-fixture-contracts.test.js`
 - Modify: `tests/unit/agent-native-architecture-eval-readiness.test.js`
 
@@ -287,16 +287,16 @@ flowchart TB
 
 ### U2. Rewrite eval readiness scoring to consume normalized coverage
 
-**Goal:** Make `spec-skill-audit` readiness scores reflect actual fixture coverage instead of file naming conventions.
+**Goal:** Make `retired-skill-review` readiness scores reflect actual fixture coverage instead of file naming conventions.
 
 **Requirements:** R3, R4
 
 **Dependencies:** U1
 
 **Files:**
-- Modify: `skills/spec-skill-audit/scripts/write-audit-artifacts.js`
-- Modify: `skills/spec-skill-audit/references/eval-readiness-rubric.md`
-- Modify: `tests/unit/skill-audit-scripts.test.js`
+- Modify: `skills/retired-skill-review/scripts/write-audit-artifacts.js`
+- Modify: `skills/retired-skill-review/references/eval-readiness-rubric.md`
+- Modify: `tests/unit/skill-review-scripts.test.js`
 - Modify: `tests/unit/eval-fixture-contracts.test.js`
 
 **Approach:**
@@ -315,8 +315,8 @@ flowchart TB
 - Keep filename regex only as a temporary compatibility fallback for legacy files that have not yet been migrated, and mark fallback usage in the report as `coverage_basis: legacy_filename_fallback`. Remove or tighten this fallback after U3 if implementation fully migrates all existing fixtures.
 
 **Patterns to follow:**
-- Existing report writer style in `skills/spec-skill-audit/scripts/write-audit-artifacts.js`.
-- Existing contract tests in `tests/unit/skill-audit-scripts.test.js` for temp fixture repos.
+- Existing report writer style in `skills/retired-skill-review/scripts/write-audit-artifacts.js`.
+- Existing contract tests in `tests/unit/skill-review-scripts.test.js` for temp fixture repos.
 
 **Test scenarios:**
 - Happy path: a skill with `evals/routing-cases.json` containing `coverage_tags: ["trigger", "boundary"]` is scored ready for those buckets even though the filename lacks `trigger` or `boundary`.
@@ -345,10 +345,10 @@ flowchart TB
 - Modify: `skills/using-spec-first/evals/examples.json`
 - Modify: `skills/using-spec-first/evals/routing-cases.json`
 - Modify: `skills/spec-prd/evals/examples.json`
-- Modify: `skills/spec-skill-audit/evals/trigger-review-cases.json`
-- Modify: `skills/spec-skill-audit/evals/boundary-review-cases.json`
-- Modify: `skills/spec-skill-audit/evals/security-review-cases.json`
-- Modify: `skills/spec-skill-audit/evals/audit-quality-cases.json`
+- Modify: `skills/retired-skill-review/evals/trigger-review-cases.json`
+- Modify: `skills/retired-skill-review/evals/boundary-review-cases.json`
+- Modify: `skills/retired-skill-review/evals/security-review-cases.json`
+- Modify: `skills/retired-skill-review/evals/audit-quality-cases.json`
 - Modify: `skills/spec-write-tasks/evals/trigger-cases.json`
 - Modify: `skills/spec-write-tasks/evals/boundary-cases.json`
 - Modify: `skills/spec-write-tasks/evals/failure-cases.json`
@@ -499,9 +499,9 @@ flowchart TB
 - Add a focused npm script such as `test:eval-fixtures` if current test-suite conventions make it useful; otherwise update CI to call focused Jest directly.
 - Include at minimum:
   - `tests/unit/eval-fixture-contracts.test.js`;
-  - `tests/unit/skill-audit-scripts.test.js`;
+  - `tests/unit/skill-review-scripts.test.js`;
   - existing fixture-family tests touched by migration.
-- Update workflow path filters so changes to `skills/**/evals/**`, `skills/spec-plan/**`, `skills/spec-code-review/**`, `skills/spec-debug/**`, `skills/spec-compound/**`, `skills/spec-skill-audit/**`, `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js`, `docs/contracts/workflows/eval-fixture-contract.md`, `docs/contracts/workflows/fresh-source-eval-checklist.md`, `docs/contracts/source-runtime-customization-boundary.md`, `.github/pull_request_template.md`, and eval fixture tests trigger the check.
+- Update workflow path filters so changes to `skills/**/evals/**`, `skills/spec-plan/**`, `skills/spec-code-review/**`, `skills/spec-debug/**`, `skills/spec-compound/**`, `skills/retired-skill-review/**`, `skills/retired-skill-review/scripts/eval-fixture-normalizer.js`, `docs/contracts/workflows/eval-fixture-contract.md`, `docs/contracts/workflows/fresh-source-eval-checklist.md`, `docs/contracts/source-runtime-customization-boundary.md`, `.github/pull_request_template.md`, and eval fixture tests trigger the check.
 - Keep this CI deterministic. No model calls, no subagent dispatch, no network.
 
 **Test scenarios:**
@@ -532,7 +532,7 @@ flowchart TB
 **Approach:**
 - Update `CHANGELOG.md` with a compact entry naming the eval fixture contract, scorer change, four workflow fixtures, fresh-source-eval cadence, tests run, runtime impact, and whether generated mirrors were regenerated.
 - Run focused tests first, then broaden only as impact requires:
-  - eval fixture and skill-audit focused Jest;
+  - eval fixture and skill-review focused Jest;
   - changed workflow contract tests;
   - `npm run typecheck`;
   - `npm run lint:skill-entrypoints`;
@@ -554,7 +554,7 @@ flowchart TB
 ## System-Wide Impact
 
 - **Workflow skills:** `spec-plan`、`spec-code-review`、`spec-debug`、`spec-compound` gain eval examples-as-context. Their trigger prose may become slightly more constrained, so fresh-source-eval or honest not-run is required.
-- **Skill audit:** `spec-skill-audit` readiness score becomes more accurate and less vulnerable to naming drift.
+- **Skill audit:** `retired-skill-review` readiness score becomes more accurate and less vulnerable to naming drift.
 - **Tests:** A source-owned eval fixture normalizer creates one source of test and scorer interpretation for existing fixture families.
 - **CI:** New focused deterministic checks may run more often on skill/eval changes. This is intended; no model calls should be added.
 - **Generated runtime:** Source SKILL.md/evals changes may require `spec-first init` for local host mirrors, but runtime mirrors are generated artifacts, not source.
@@ -595,7 +595,7 @@ flowchart TB
 
 ## Success Metrics
 
-- `spec-skill-audit` readiness reports no longer change solely because a file is renamed to include or exclude `trigger` / `boundary`; before/after comparison records at least one corrected false partial/false missing and no known new false ready.
+- `retired-skill-review` readiness reports no longer change solely because a file is renamed to include or exclude `trigger` / `boundary`; before/after comparison records at least one corrected false partial/false missing and no known new false ready.
 - Existing eval files across the five fixture families all pass shared normalization checks.
 - Targeted public workflow eval presence improves from 4 public workflows with evals to 8, counting only the four W1 first-wave additions, and closeout links this to the First-Wave Workflow Selection table rather than unsupported usage claims.
 - Each new target workflow has at least one positive trigger and one negative boundary case.
@@ -649,8 +649,8 @@ flowchart TB
 
 - Origin review: `docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md`
 - Role contract: `docs/10-prompt/结构化项目角色契约.md`
-- Existing eval rubric: `skills/spec-skill-audit/references/eval-readiness-rubric.md`
-- Current scoring script: `skills/spec-skill-audit/scripts/write-audit-artifacts.js`
+- Existing eval rubric: `skills/retired-skill-review/references/eval-readiness-rubric.md`
+- Current scoring script: `skills/retired-skill-review/scripts/write-audit-artifacts.js`
 - Fresh-source eval contract: `docs/contracts/workflows/fresh-source-eval-checklist.md`
 - Prompt examples tests: `tests/unit/prompt-examples-contracts.test.js`
 - PRD eval tests: `tests/unit/spec-prd-contracts.test.js`

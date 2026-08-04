@@ -1,0 +1,20 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_Produce findings only; preserve all files and package-readiness state."
+  ],
+  "observed": {
+    "base_operation": "near-neighbor",
+    "case_id": "audit-only-neighbor",
+    "effect": "Produce findings only; preserve all files and package-readiness state.",
+    "layer_result": "The request is a bounded trigger-boundary review, not authoring or remediation.",
+    "modifier": "audit-only",
+    "required_references": [],
+    "response": "只审查 frontmatter description 与实际 workflow 是否一致，覆盖正向触发、负向边界、真实 branch、近邻误触发和 entry-surface takeover；每条 finding 给出严重度、原文证据、风险和建议措辞，但不生成 patch、不改治理或 runtime，也不扩展到 package readiness。",
+    "route_decision": "near-neighbor: source review",
+    "source_owner_assumption": "skills/spec-prd/SKILL.md is review evidence only; ownership is unchanged.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

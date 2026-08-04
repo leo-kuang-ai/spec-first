@@ -48,7 +48,7 @@ spec-first 已经具备双宿主 runtime generation、public workflow skills、t
 - G6. 让 agent dispatch 更可治理：复用现有 agents，明确 research/review/worker suitability gate、fallback 和 fresh-source eval 要求。
 - G7. 让 debug/work/review 更工程化：先建立反馈环，再修复；优先纵向切片；重大取舍进入 decision ledger；领域语言和 ADR-like artifacts 先消费后追问。
 - G8. 让 release 与 public surface drift 更早暴露：release/catalog/governance checks 只验证确定性事实，输出 reason_code、artifact path 和 blocking/advisory classification。
-- G9. 让知识沉淀可复用：`spec-plan` / `spec-work` / `spec-skill-audit` 能消费 provenance-backed learnings、sessions、solutions、standards 和 rejected/out-of-scope rationale。
+- G9. 让知识沉淀可复用：`spec-plan` / `spec-work` / `retired-skill-review` 能消费 provenance-backed learnings、sessions、solutions、standards 和 rejected/out-of-scope rationale。
 - G10. 让 token 消耗可治理：通过 progressive disclosure、minimal sufficient context、phase task pack、deterministic inventory、bounded reviewer dispatch、durable checkpoint 和 distilled external inventory，减少重复读取长文档和外部仓库。
 
 ---
@@ -121,7 +121,7 @@ spec-first 已经具备双宿主 runtime generation、public workflow skills、t
 |------|----------|------|
 | 默认产品面 | 对所有 public workflow 可见；不增加必经状态。 | contract summary、source/runtime boundary、task-pack source-plan 聚焦核对、final evidence summary、not-run/degraded reason、changelog discipline。 |
 | Advanced / opt-in | 由复杂度或用户意图触发。 | task-pack compilation、fresh-source eval、deep research、worker suitability gate、decision ledger、feedback-loop-first debug、release/package guard 扩展。 |
-| Internal-only | 服务维护、审计或 release。 | catalog/governance drift scripts、runtime capability generation、provider readiness facts、skill-audit deterministic inventory checks、rejected/out-of-scope replay indexes。 |
+| Internal-only | 服务维护、审计或 release。 | catalog/governance drift scripts、runtime capability generation、provider readiness facts、skill-review deterministic inventory checks、rejected/out-of-scope replay indexes。 |
 
 ---
 
@@ -171,7 +171,7 @@ Phase 1 不能作为一个单 PR 或单次 `$spec-work` 直接执行。它必须
 1. **Phase 1A -- task-pack handoff tracer bullet：** `spec-work` task-pack mode 回查 source plan 聚焦片段；`spec-write-tasks` 明确 `context_refs` 粒度要求，避免默认整份 plan 或全目录；用 fresh-source eval 证明执行者会消费 task card 与 source plan 聚焦片段。
 2. **Phase 1B -- run evidence write-side foundation：** 定义 `spec-work` evidence / not-run / degraded / deferred 收尾 contract，交付最小 schema-aligned closeout producer；producer 只证明 write-side artifact 可写、可校验、可安全拒绝，不宣称 replay/retention 生命周期已完成。
 3. **Phase 1C -- standards next-action candidate facts：** 只在 Phase 1A/1B 关闭后交付 `spec-standards` 最小 `next_action_candidates` facts artifact；不实现复杂 mode matrix、排序、自动路由或单值 workflow recommendation。
-4. **Phase 1D -- core workflow intake cleanup：** 只给核心链路补 contract summary 与 intake order：`using-spec-first`、`spec-plan`、`spec-write-tasks`、`spec-work`、`spec-standards`；`spec-doc-review`、`spec-code-review`、`spec-skill-audit` 只在测试、入口联动或 closeout 需要时做最小触达。
+4. **Phase 1D -- core workflow intake cleanup：** 只给核心链路补 contract summary 与 intake order：`using-spec-first`、`spec-plan`、`spec-write-tasks`、`spec-work`、`spec-standards`；`spec-doc-review`、`spec-code-review`、`retired-skill-review` 只在测试、入口联动或 closeout 需要时做最小触达。
 5. **每个 gate 的 closeout：** 更新 `CHANGELOG.md`，补 targeted contract tests，记录 runtime impact、evidence safety 和 fresh-source eval 结果；Phase 1A 的 fresh-source eval 是 hard gate，不得用普通 not-run reason 替代。
 
 ### Phase 1 暂缓项
@@ -261,7 +261,7 @@ Generated runtime assets：
 - `skills/spec-debug/SKILL.md`
 - `skills/spec-code-review/SKILL.md`
 - `skills/spec-doc-review/SKILL.md`
-- `skills/spec-skill-audit/SKILL.md`
+- `skills/retired-skill-review/SKILL.md`
 - `skills/spec-compound/SKILL.md`
 - `skills/spec-compound-refresh/SKILL.md`
 - `skills/spec-sessions/SKILL.md`
@@ -317,7 +317,7 @@ flowchart LR
 
   J[Source inventory] --> K[Release/catalog guards]
   K --> L[Guard result]
-  L --> M[spec-skill-audit]
+  L --> M[retired-skill-review]
   M --> F
 
   N[Domain docs / ADR / learnings] --> C
@@ -345,7 +345,7 @@ flowchart LR
 
 **依赖：** 无
 
-**Phase 1 MVP 范围：** 第一轮只覆盖核心执行链路：`using-spec-first`、`spec-plan`、`spec-write-tasks`、`spec-work`、`spec-standards`。`spec-doc-review`、`spec-code-review`、`spec-skill-audit` 只在测试、入口联动或 closeout 需要时做最小触达。全 public workflow 覆盖保留为后续批次。
+**Phase 1 MVP 范围：** 第一轮只覆盖核心执行链路：`using-spec-first`、`spec-plan`、`spec-write-tasks`、`spec-work`、`spec-standards`。`spec-doc-review`、`spec-code-review`、`retired-skill-review` 只在测试、入口联动或 closeout 需要时做最小触达。全 public workflow 覆盖保留为后续批次。
 
 **Phase 1 U1-core 文件：**
 - 修改: `skills/using-spec-first/SKILL.md`
@@ -371,7 +371,7 @@ flowchart LR
 - 修改: `skills/spec-polish-beta/SKILL.md`
 - 修改: `skills/spec-release-notes/SKILL.md`
 - 修改: `skills/spec-sessions/SKILL.md`
-- 修改: `skills/spec-skill-audit/SKILL.md`
+- 修改: `skills/retired-skill-review/SKILL.md`
 - 修改: `skills/spec-slack-research/SKILL.md`
 - 修改: `skills/spec-update/SKILL.md`
 - 修改: `skills/spec-work-beta/SKILL.md`
@@ -380,7 +380,7 @@ flowchart LR
 **U1-full 分批规则：**
 - U1-full 不作为单个 implementation PR 执行；必须按 workflow 家族拆成多个批次，每批不超过 12 个 skill，且不得触发“一个 PR 修改 15 个以上 skill”的红线。
 - 阶段 2 承接 U1-full-batch-1：`spec-brainstorm`、`spec-debug`、`spec-doc-review`、`spec-code-review`、`spec-mcp-setup`、`spec-graph-bootstrap`、`spec-update`、`spec-work-beta`。
-- 阶段 3 承接 U1-full-batch-2：`spec-app-consistency-audit`、`spec-compound`、`spec-compound-refresh`、`spec-ideate`、`spec-optimize`、`spec-polish-beta`、`spec-release-notes`、`spec-sessions`、`spec-skill-audit`、`spec-slack-research`。
+- 阶段 3 承接 U1-full-batch-2：`spec-app-consistency-audit`、`spec-compound`、`spec-compound-refresh`、`spec-ideate`、`spec-optimize`、`spec-polish-beta`、`spec-release-notes`、`spec-sessions`、`retired-skill-review`、`spec-slack-research`。
 - 计划完成 gate 以所有 `entry_surface: workflow_command` skills 的 summary 与对应测试覆盖为准；阶段 2/3 完成但该 gate 未满足时，不得宣告本计划完成。
 
 **做法：**
@@ -781,21 +781,21 @@ flowchart LR
 **依赖：** U9 的 guard results；U5 的 source/runtime docs
 
 **文件：**
-- 修改: `skills/spec-skill-audit/SKILL.md`
+- 修改: `skills/retired-skill-review/SKILL.md`
 - 修改: `skills/spec-compound/SKILL.md`
 - 修改: `skills/spec-compound-refresh/SKILL.md`
 - 修改: `skills/spec-sessions/SKILL.md`
 - 修改: `skills/spec-plan/SKILL.md`
 - 修改: `skills/spec-work/SKILL.md`
 - 测试: `tests/unit/lint-skill-entrypoints.test.js`
-- 测试: `tests/unit/skill-audit-scripts.test.js`
+- 测试: `tests/unit/skill-review-scripts.test.js`
 - 测试: `tests/unit/spec-compound-contracts.test.js`
 - 测试: `tests/unit/spec-sessions-contracts.test.js`
 - 测试: `tests/unit/spec-plan-contracts.test.js`
 - 测试: `tests/unit/spec-work-contracts.test.js`
 
 **做法：**
-- `spec-skill-audit` 消费 U9 guard result，解释 public surface drift，不重新实现 guard。
+- `retired-skill-review` 消费 U9 guard result，解释 public surface drift，不重新实现 guard。
 - Hard dependency 缺失输出 setup/doctor pointer；soft context 缺失只降低 confidence。
 - `spec-compound` / `spec-compound-refresh` / `spec-sessions` 支持 rejected/out-of-scope rationale 检索与 replay。
 - `spec-plan` / `spec-work` 在相似需求或范围争议时消费 provenance-backed replay refs。
@@ -807,7 +807,7 @@ flowchart LR
 
 **验证：**
 - `npm run lint:skill-entrypoints`
-- `npm run test:unit` 或 targeted skill-audit/compound/sessions/plan/work tests。
+- `npm run test:unit` 或 targeted skill-review/compound/sessions/plan/work tests。
 
 ---
 
@@ -871,7 +871,7 @@ flowchart LR
 **后续批次文件：**
 - 修改: `skills/spec-doc-review/SKILL.md`
 - 修改: `skills/spec-code-review/SKILL.md`
-- 修改: `skills/spec-skill-audit/SKILL.md`
+- 修改: `skills/retired-skill-review/SKILL.md`
 - 修改: `skills/spec-sessions/SKILL.md`
 - 修改: `skills/spec-compound/SKILL.md`
 - 修改: `skills/spec-compound-refresh/SKILL.md`
@@ -881,19 +881,19 @@ flowchart LR
 
 **做法：**
 - Phase 1 minimal scope 只更新核心链路 intake order：contract summary -> existing deterministic facts substrate -> current phase/task refs -> source-of-truth focused sections -> deeper references。
-- Phase 1 不改造 review dispatch、sessions/compound replay 或 skill-audit progressive-disclosure checks；这些保留到阶段 2/3。因此 Phase 1 只宣称 work/task-pack intake token discipline，不宣称 doc-review/code-review dispatch token economy 已交付。
+- Phase 1 不改造 review dispatch、sessions/compound replay 或 skill-review progressive-disclosure checks；这些保留到阶段 2/3。因此 Phase 1 只宣称 work/task-pack intake token discipline，不宣称 doc-review/code-review dispatch token economy 已交付。
 - Existing facts substrate reuse：review/token-economy 相关 deterministic inventory 默认复用 `docs/contracts/workflows/review-pre-facts-extraction.md` 和 `src/cli/helpers/review-pre-facts.js` 的 trust model、temp boundary、budget、provenance、reason_code 与 untrusted-data handling；不得新增第二条 reviewer facts pipeline。
 - 为 Phase 1 核心链路 workflows 增加 context intake order：summary -> deterministic inventory -> current task/phase refs -> source-of-truth focused sections -> deeper references。
 - 在 `spec-write-tasks` 中要求 `context_refs` 标注 section/file/test/contract 粒度，避免默认整份 plan 或全目录。
 - 在 `spec-work` 中要求大型计划先按 phase/wave 消费 task pack；直接执行整份大计划必须记录为什么不需要 task pack。
 - 后续批次再在 `spec-doc-review` / `spec-code-review` 中加入 scale-aware reviewer dispatch guidance：小改动最小 reviewer set，高风险 contract/workflow/release 变化扩大 reviewer set。
 - 后续批次再在 `spec-sessions` / `spec-compound` / `spec-compound-refresh` 中强调 durable checkpoint 和 distilled replay refs，避免重新读取完整历史。
-- 后续批次再在 `spec-skill-audit` 中加入 progressive disclosure 检查：主入口过长、重复 examples、provider-specific 细节未下沉时标记为优化项。
+- 后续批次再在 `retired-skill-review` 中加入 progressive disclosure 检查：主入口过长、重复 examples、provider-specific 细节未下沉时标记为优化项。
 
 **测试场景：**
 - Workflow prose 明确先读 summary/inventory，再按需读取 references。
 - Task-pack guidance 拒绝把整份 plan 当作高质量 `context_refs`。
-- Phase 1 tests 不要求修改 `spec-doc-review`、`spec-code-review`、`spec-sessions`、`spec-compound`、`spec-compound-refresh` 或 `spec-skill-audit`。
+- Phase 1 tests 不要求修改 `spec-doc-review`、`spec-code-review`、`spec-sessions`、`spec-compound`、`spec-compound-refresh` 或 `retired-skill-review`。
 - Review/token-economy facts guidance 引用现有 `review-pre-facts` contract，不创建平行 facts pipeline。
 - 后续批次测试：Review workflow guidance 区分 low-risk docs-only 与 high-risk workflow/contract/release 变更的 reviewer set。
 - 后续批次测试：Sessions/compound guidance 支持 checkpoint/replay refs，不鼓励重读完整历史。
@@ -974,7 +974,7 @@ Phase 1 放行门槛：
 - Release/catalog/governance drift deterministic checks 稳定。
 - 所有 public workflow contract summary coverage gate 关闭。
 - Skill audit 消费 guard results。
-- Dependency tier 和 rejected/out-of-scope replay 进入 plan/work/skill-audit。
+- Dependency tier 和 rejected/out-of-scope replay 进入 plan/work/skill-review。
 - Run evidence retention / prune lifecycle 有独立 consumer、reason_code、owner/expiry 和删除失败处理，不污染 Phase 1 closeout producer。
 - Durable checkpoint replay 能消费阶段 1 write-side checkpoint，降低长任务恢复与深度审查重复读取成本。
 
@@ -1081,7 +1081,7 @@ $spec-work <phase-1a-task-pack-path>
 - Work workflow：`skills/spec-work/SKILL.md`
 - Standards workflow：`skills/spec-standards/SKILL.md`
 - Debug workflow：`skills/spec-debug/SKILL.md`
-- Skill audit workflow：`skills/spec-skill-audit/SKILL.md`
+- Skill audit workflow：`skills/retired-skill-review/SKILL.md`
 - Task-pack traceability：`docs/contracts/workflows/spec-id-traceability.md`
 - Work run artifact schema：`docs/contracts/workflows/spec-work-run-artifact.schema.json`
 - Review pre-facts extraction：`docs/contracts/workflows/review-pre-facts-extraction.md`

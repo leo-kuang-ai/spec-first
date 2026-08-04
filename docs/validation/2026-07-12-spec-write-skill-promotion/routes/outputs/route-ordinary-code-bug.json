@@ -1,0 +1,1 @@
+{"entrypoint":"using-spec-first","handoff_target":"spec-debug","loaded_skills":["using-spec-first"],"invocation_mode":"none","effect":"not-entered","reason":"真实请求是修复 CLI 参数解析异常并补充 Jest 回归测试，属于失败/回归修复，应由 using-spec-first 路由至 spec-debug；本轮仅评估入口，未进入该工作流，也未修改文件。"}

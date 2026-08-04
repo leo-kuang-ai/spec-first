@@ -1150,7 +1150,7 @@ python3 -m py_compile skills/gemini-imagegen/scripts/*.py
 不运行：
 
 ```bash
-node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .
+node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .
 ```
 
 除非本轮明确修改了 `write-audit-artifacts.js` 或 eval readiness 生成逻辑。

@@ -1,0 +1,180 @@
+{
+  "schema_version": "spec-write-skill.route-evidence/v1",
+  "source_hashes": {
+    "using_spec_first": "90f936e048b239ed07cae67d0c32e0b96239855a80281adc6cc3fa7ea5b47021",
+    "spec_write_skill": "7860f97cb9a20f748204cf557d1430eba563a52fcaa0cd2fb7169077503e2651"
+  },
+  "completed": 14,
+  "passed": 14,
+  "failed": 0,
+  "routes": [
+    {
+      "id": "route-explicit-portable-create",
+      "expected_route": "spec-write-skill",
+      "actual_route": "spec-write-skill",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-explicit-portable-create.current.output.json",
+      "events": "route-explicit-portable-create.current.events.jsonl",
+      "run": "route-explicit-portable-create.current.run.json",
+      "machine": "route-explicit-portable-create.current.machine.json"
+    },
+    {
+      "id": "route-existing-skill-revise",
+      "expected_route": "spec-write-skill",
+      "actual_route": "spec-write-skill",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-existing-skill-revise.current.output.json",
+      "events": "route-existing-skill-revise.current.events.jsonl",
+      "run": "route-existing-skill-revise.current.run.json",
+      "machine": "route-existing-skill-revise.current.machine.json"
+    },
+    {
+      "id": "route-external-package-validation",
+      "expected_route": "spec-write-skill",
+      "actual_route": "spec-write-skill",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-external-package-validation.current.output.json",
+      "events": "route-external-package-validation.current.events.jsonl",
+      "run": "route-external-package-validation.current.run.json",
+      "machine": "route-external-package-validation.current.machine.json"
+    },
+    {
+      "id": "route-accepted-audit-remediation",
+      "expected_route": "spec-write-skill",
+      "actual_route": "spec-write-skill",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-accepted-audit-remediation.current.output.json",
+      "events": "route-accepted-audit-remediation.current.events.jsonl",
+      "run": "route-accepted-audit-remediation.current.run.json",
+      "machine": "route-accepted-audit-remediation.current.machine.json"
+    },
+    {
+      "id": "route-audit-only",
+      "expected_route": "bounded-source-review",
+      "actual_route": "bounded-source-review",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-audit-only.current.output.json",
+      "events": "route-audit-only.current.events.jsonl",
+      "run": "route-audit-only.current.run.json",
+      "machine": "route-audit-only.current.machine.json"
+    },
+    {
+      "id": "route-one-off-answer",
+      "expected_route": "direct-answer",
+      "actual_route": "direct-answer",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-one-off-answer.current.output.json",
+      "events": "route-one-off-answer.current.events.jsonl",
+      "run": "route-one-off-answer.current.run.json",
+      "machine": "route-one-off-answer.current.machine.json"
+    },
+    {
+      "id": "route-third-party-install",
+      "expected_route": "skill-installer",
+      "actual_route": "skill-installer",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-third-party-install.current.output.json",
+      "events": "route-third-party-install.current.events.jsonl",
+      "run": "route-third-party-install.current.run.json",
+      "machine": "route-third-party-install.current.machine.json"
+    },
+    {
+      "id": "route-runtime-refresh",
+      "expected_route": "runtime-maintenance",
+      "actual_route": "runtime-maintenance",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-runtime-refresh.current.output.json",
+      "events": "route-runtime-refresh.current.events.jsonl",
+      "run": "route-runtime-refresh.current.run.json",
+      "machine": "route-runtime-refresh.current.machine.json"
+    },
+    {
+      "id": "route-ordinary-code-bug",
+      "expected_route": "spec-debug",
+      "actual_route": "spec-debug",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-ordinary-code-bug.current.output.json",
+      "events": "route-ordinary-code-bug.current.events.jsonl",
+      "run": "route-ordinary-code-bug.current.run.json",
+      "machine": "route-ordinary-code-bug.current.machine.json"
+    },
+    {
+      "id": "route-document-summary",
+      "expected_route": "direct-answer",
+      "actual_route": "direct-answer",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-document-summary.current.output.json",
+      "events": "route-document-summary.current.events.jsonl",
+      "run": "route-document-summary.current.run.json",
+      "machine": "route-document-summary.current.machine.json"
+    },
+    {
+      "id": "route-ambiguous-multi-repo",
+      "expected_route": "spec-write-skill",
+      "actual_route": "spec-write-skill",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-ambiguous-multi-repo.current.output.json",
+      "events": "route-ambiguous-multi-repo.current.events.jsonl",
+      "run": "route-ambiguous-multi-repo.current.run.json",
+      "machine": "route-ambiguous-multi-repo.current.machine.json"
+    },
+    {
+      "id": "route-generated-mirror-patch",
+      "expected_route": "runtime-maintenance",
+      "actual_route": "runtime-maintenance",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-generated-mirror-patch.current.output.json",
+      "events": "route-generated-mirror-patch.current.events.jsonl",
+      "run": "route-generated-mirror-patch.current.run.json",
+      "machine": "route-generated-mirror-patch.current.machine.json"
+    },
+    {
+      "id": "route-same-repo-migration",
+      "expected_route": "spec-write-skill",
+      "actual_route": "spec-write-skill",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-same-repo-migration.current.output.json",
+      "events": "route-same-repo-migration.current.events.jsonl",
+      "run": "route-same-repo-migration.current.run.json",
+      "machine": "route-same-repo-migration.current.machine.json"
+    },
+    {
+      "id": "route-implicit-idea",
+      "expected_route": "direct-answer",
+      "actual_route": "direct-answer",
+      "exit_code": 0,
+      "result": "pass",
+      "route_high_risk_misroute": false,
+      "output": "route-implicit-idea.current.output.json",
+      "events": "route-implicit-idea.current.events.jsonl",
+      "run": "route-implicit-idea.current.run.json",
+      "machine": "route-implicit-idea.current.machine.json"
+    }
+  ]
+}

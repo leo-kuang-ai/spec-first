@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { writeFileAtomic } = require('./atomic-write');
 const { spawnSyncWithTimeout } = require('./external-command');
 
 const GLOBAL_DEVELOPER_RELATIVE_PATH = path.join('.spec-first', '.developer');
@@ -133,8 +134,7 @@ function resolveChangelogAuthorName(projectRoot, fallbackName = '') {
 
 function writeGlobalDeveloperFile(developer) {
   const filePath = getGlobalDeveloperPath();
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, formatDeveloperContents(developer), 'utf8');
+  writeFileAtomic(filePath, formatDeveloperContents(developer), 'utf8');
 }
 
 function formatDeveloperContents(developer) {
@@ -253,6 +253,7 @@ function readGitUserName(projectRoot) {
 module.exports = {
   formatDeveloperContents,
   getGlobalDeveloperPath,
+  normalizeDeveloper,
   parseDeveloperContents,
   readDeveloperFile,
   readGitUserName,

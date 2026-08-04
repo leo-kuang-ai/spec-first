@@ -1,0 +1,10 @@
+{
+  "schema_version": "spec-write-skill.comparative-verdict/v1",
+  "artifact_type": "comparative",
+  "result": "pass",
+  "rationale": "On the spec-first profile, candidate-full and fixed old-full both passed 2/2 at mean score 8.0, establishing non-regression for the historical compatibility control.",
+  "source": {
+    "path": "raw/comparison-summary.json",
+    "sha256": "df10e2a976fa32b3e1fd53ad86e09c988d66cdeec1b6c925489e78c60bdb205e"
+  }
+}

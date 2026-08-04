@@ -1,0 +1,24 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_none"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "ordinary-code-work-neighbor",
+    "effect": "none",
+    "layer_result": "Ordinary implementation work; Skill package routing does not apply.",
+    "modifier": "none",
+    "required_references": [
+      "src/cli/init.js",
+      "Existing CLI argument-parser tests",
+      "package.json or Jest configuration"
+    ],
+    "response": "这是普通代码修复，不进入 Skill authoring。实施方案是复现失败参数组合，定位 `src/cli/init.js` 中 token、flag、默认值或 `--` 分隔处理的错误，做最小修复，并在现有 Jest 测试位置加入能先失败后通过的回归用例，同时覆盖一个相邻正常场景以防解析退化。由于本次是只读评估，仅给出方案，不修改或执行测试。",
+    "route_decision": "Ordinary code work near-neighbor, outside reusable Skill authoring and package readiness.",
+    "source_owner_assumption": "The application source and its existing Jest suite are the relevant owners; no Skill source is involved.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

@@ -1,51 +1,17 @@
 name: npm Install Matrix
 
 on:
-  push:
-    paths:
-      - 'bin/**'
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.npmignore'
-      - 'README.md'
-      - 'agents/**'
-      - 'docs/contracts/verifiers/**'
-      - 'docs/contracts/release-package-evidence.schema.json'
-      - 'scripts/generate-runtime-capability-catalog.js'
-      - 'scripts/npm-install-matrix-smoke.js'
-      - 'scripts/run-test-suite.cjs'
-      - 'scripts/typecheck-js.js'
-      - 'skills/**'
-      - 'templates/**'
-      - 'tests/smoke/install-tarball.sh'
-      - 'tests/unit/npm-install-matrix-smoke.test.js'
-      - '.github/workflows/npm-install-matrix.yml'
   pull_request:
-    paths:
-      - 'bin/**'
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.npmignore'
-      - 'README.md'
-      - 'agents/**'
-      - 'docs/contracts/verifiers/**'
-      - 'docs/contracts/release-package-evidence.schema.json'
-      - 'scripts/generate-runtime-capability-catalog.js'
-      - 'scripts/npm-install-matrix-smoke.js'
-      - 'scripts/run-test-suite.cjs'
-      - 'scripts/typecheck-js.js'
-      - 'skills/**'
-      - 'templates/**'
-      - 'tests/smoke/install-tarball.sh'
-      - 'tests/unit/npm-install-matrix-smoke.test.js'
-      - '.github/workflows/npm-install-matrix.yml'
+  push:
+    branches: [main, master]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   install-tarball:
-    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    name: npm-install-${{ matrix.os }}-node-${{ matrix.node }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -62,26 +28,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
 
-      - name: Pack and install tarball
-        if: runner.os != 'Windows'
-        env:
-          SPEC_FIRST_SMOKE_ARTIFACT_DIR: .spec-first/ci/npm-install-matrix/${{ runner.os }}-node-${{ matrix.node }}-default
-        run: node scripts/npm-install-matrix-smoke.js
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Pack and install tarball (Windows pwsh)
-        if: runner.os == 'Windows'
-        shell: pwsh
+      - name: Pack, install and execute the tarball
         env:
-          SPEC_FIRST_SMOKE_ARTIFACT_DIR: .spec-first/ci/npm-install-matrix/${{ runner.os }}-node-${{ matrix.node }}-pwsh
-        run: node scripts/npm-install-matrix-smoke.js
-
-      - name: Pack and install tarball (Windows cmd)
-        if: runner.os == 'Windows'
-        shell: cmd
-        env:
-          SPEC_FIRST_SMOKE_ARTIFACT_DIR: .spec-first/ci/npm-install-matrix/${{ runner.os }}-node-${{ matrix.node }}-cmd
-        run: node scripts\npm-install-matrix-smoke.js
+          SPEC_FIRST_SMOKE_ARTIFACT_DIR: .spec-first/ci/npm-install-matrix/${{ runner.os }}-node-${{ matrix.node }}
+        run: node scripts/npm-install-matrix-smoke.cjs
 
       - name: Upload install smoke artifacts
         if: always()

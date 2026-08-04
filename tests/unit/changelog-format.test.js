@@ -2,39 +2,30 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { buildInitialChangelog } = require('../../src/cli/changelog');
 
-const REPO_ROOT = path.join(__dirname, '..', '..');
-const CHANGELOG_PATH = path.join(REPO_ROOT, 'CHANGELOG.md');
+const repoRoot = path.resolve(__dirname, '../..');
+const entryPattern = /^- v(?:\d+\.\d+\.\d+|X\.Y\.Z) \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [^:]+: .+$/;
+const legacyEntryPattern = /^- v\d+\.\d+\.\d+ \d{4}-\d{2}-\d{2} [^:]+: .+$/;
 
-function read(filePath) {
-  return fs.readFileSync(filePath, 'utf8');
+function changelogEntries(content) {
+  return content.split('\n').filter((line) => /^- v(?:\d|X)/.test(line));
 }
 
 describe('CHANGELOG format', () => {
-  test('intro guidance keeps current project record format', () => {
-    const changelog = read(CHANGELOG_PATH);
-
-    expect(changelog).toContain('- 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`');
-    expect(changelog).toContain('- 条目保持 compact：记录 source surface、用户可见影响、验证/未验证状态和必要 artifact 路径；长推理放 requirements、plan、review 或 validation 文档');
+  test('repository changelog keeps the documented entry shape', () => {
+    const content = fs.readFileSync(path.join(repoRoot, 'CHANGELOG.md'), 'utf8');
+    expect(content).toContain('- 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`');
+    const entries = changelogEntries(content);
+    expect(entries.length).toBeGreaterThan(0);
+    expect(entryPattern.test(entries[0])).toBe(true);
+    expect(entries.filter((line) => !entryPattern.test(line) && !legacyEntryPattern.test(line))).toEqual([]);
   });
 
-  test('latest dated entries use timestamped format without constraining author identity', () => {
-    const changelog = read(CHANGELOG_PATH);
-    const entries = changelog
-      .split(/\r?\n/)
-      .filter((line) => line.startsWith('- v'));
-    const latestEntry = entries[0] || '';
-    const latestDateMatch = latestEntry.match(/^- v\d+\.\d+\.\d+ (\d{4}-\d{2}-\d{2}) /);
-
-    expect(latestDateMatch).not.toBeNull();
-    const latestDate = latestDateMatch[1];
-    const entryPattern = new RegExp(
-      `^- v\\d+\\.\\d+\\.\\d+ ${latestDate} \\d{2}:\\d{2}:\\d{2} [^:]+: .+(?: \\(user-visible\\))?$`,
-    );
-    const latestDateEntries = entries
-      .filter((line) => line.includes(latestDate));
-
-    expect(latestDateEntries.length).toBeGreaterThan(0);
-    expect(latestDateEntries.filter((line) => !entryPattern.test(line))).toEqual([]);
+  test('bootstrap output follows the same contract', () => {
+    const content = buildInitialChangelog('2026-07-10 21:00:00', 'maintainer', '1.2.3');
+    expect(changelogEntries(content)).toEqual([
+      '- v1.2.3 2026-07-10 21:00:00 maintainer: 使用 spec-first 初始化项目',
+    ]);
   });
 });

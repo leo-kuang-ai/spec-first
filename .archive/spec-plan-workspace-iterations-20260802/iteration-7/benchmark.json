@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-plan",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-plan",
+    "timestamp": "2026-08-01T15:26:24Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "requirements-only Product Contract 应原地深化且保持产品权威",
+      "configuration": "with_skill",
+      "run_number": 7,
+      "result": {
+        "pass_rate": 1,
+        "passed": 1,
+        "failed": 0,
+        "total": 1,
+        "time_seconds": 781.43,
+        "tokens": 3145619,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+          "passed": true,
+          "evidence": "script passed (exit code 0)"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1,
+        "stddev": 0,
+        "min": 1,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 781.43,
+        "stddev": 0,
+        "min": 781.43,
+        "max": 781.43
+      },
+      "tokens": {
+        "mean": 3145619,
+        "stddev": 0,
+        "min": 3145619,
+        "max": 3145619
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

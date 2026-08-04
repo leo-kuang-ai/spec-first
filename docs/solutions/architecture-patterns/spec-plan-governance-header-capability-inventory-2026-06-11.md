@@ -35,8 +35,8 @@ tags: [spec-plan, governance-header, prompt-slimming, architecture-pattern, runt
 | 节 | 行号 | 行数 | owner_consumer | cross_skill | global_dup | ablation | 裁决 |
 |---|---|---|---|---|---|---|---|
 | Plan-Only Safety Contract | 17-24 | 8 | **`spec-plan-guard` hook**(运行时注意力增强,非硬阻断)+ hot-path contract test | 1/37(独有) | 否(003 owns) | — | **KEEP** |
-| Workflow Contract Summary | 25-57 | 34 | **`lint-skill-structure.js` REQUIRED_SECTIONS**(When To Use/When Not To Use/Outputs/Workflow=P1;Inputs/Failure Modes=P2)+ spec-skill-audit | 18/37 | 否 | — | **KEEP**(内联;各 skill 内容不同) |
-| Scenario Capability | 59-62 | 5 | spec-skill-audit + 指向 `scenario-capability-matrix.md` | 18/37 | 否 | — | **KEEP**(已是引用范式) |
+| Workflow Contract Summary | 25-57 | 34 | **`lint-skill-structure.js` REQUIRED_SECTIONS**(When To Use/When Not To Use/Outputs/Workflow=P1;Inputs/Failure Modes=P2)+ retired-skill-review | 18/37 | 否 | — | **KEEP**(内联;各 skill 内容不同) |
+| Scenario Capability | 59-62 | 5 | retired-skill-review + 指向 `scenario-capability-matrix.md` | 18/37 | 否 | — | **KEEP**(已是引用范式) |
 | Context Orientation Anchor | 64-70 | 8 | 无 | 4/37 | 否(intake 顺序不在全局) | 6-run A/B 弱/null(两臂都正确降级 graph/mirror;A 臂更明确 intake order) | **EXTRACT** |
 | Domain Language And Decision Ledger | 72-76 | 6 | 无 | 6/37 | 否(决策账本不在全局) | 未决(未完成 formal backlog) | **EXTRACT** |
 | Runtime Context Exclusion | 78-80 | 4 | 无 | 7/37 | **是**(CLAUDE.md L234 逐字) | 仓内 NULL(全局泄漏;未 clean-room) | **EXTRACT**(收敛,见下) |
@@ -60,7 +60,7 @@ tags: [spec-plan, governance-header, prompt-slimming, architecture-pattern, runt
 ## KEEP 三节的消费链路(R6 守护对象,不得断)
 
 - **Plan-Only Safety Contract** → `templates/claude/hooks/spec-plan-guard`(Claude `UserPromptExpansion` planning-only additionalContext,非硬阻断;Codex 侧为 prose 约束)。
-- **Workflow Contract Summary** → `skills/spec-skill-audit/scripts/lint-skill-structure.js` 的 `REQUIRED_SECTIONS`(P1/P2 机读校验);删任一子节产 audit finding。
+- **Workflow Contract Summary** → `skills/retired-skill-review/scripts/lint-skill-structure.js` 的 `REQUIRED_SECTIONS`(P1/P2 机读校验);删任一子节产 audit finding。
 - **Scenario Capability** → `docs/contracts/workflows/scenario-capability-matrix.md`(audit 据此判 capability)。
 
 ## 共享载体设计要求(U4 输入 + 001 复用接口)

@@ -1,0 +1,23 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "revise",
+    "effect": "validate-only",
+    "modifier": "none",
+    "source_owner_assumption": "/tmp/vendor-skill 是外部且未知来源的现有 package，不视为项目 canonical source。",
+    "case_id": "external-package-validate-only",
+    "route_decision": "进入外部 package 的只读结构 preflight；不安装、复制、修改或执行 package 自带代码。",
+    "layer_result": "validate-only-external",
+    "response": "对 /tmp/vendor-skill 做 no-follow inventory，并仅运行本 workflow 固定来源的 bundled validator；检查 package root、SKILL.md、name/description、引用、资源清单、symlink、special files、scripts 和 secret-like paths。不得运行目标目录中的脚本、hooks、binaries 或 lifecycle，也不得跟随 symlink。输出机械结果 pass/fail/incomplete、语义与来源限制、未检查项及 portable/target/project/semantic/mutation 五轴 readiness；全程零写入。",
+    "would_modify_paths": [],
+    "would_run_commands": [
+      "node \"$SKILL_DIR/scripts/validate-skill.cjs\" /tmp/vendor-skill --json"
+    ],
+    "required_references": [
+      "references/authoring-method.md",
+      "references/delivery-gates.md"
+    ]
+  }
+}

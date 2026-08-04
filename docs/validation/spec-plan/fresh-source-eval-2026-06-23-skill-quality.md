@@ -64,14 +64,14 @@ Other `$yao-meta-skill` advisory checks:
 Source-owned command:
 
 ```text
-node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-plan
+node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-plan
 ```
 
 Latest source-owned run:
 
 - run_id: `2026-06-22T18-39-10-449Z`
 - executor_origin: `source`
-- executor_path: `skills/spec-skill-audit/scripts/write-audit-artifacts.js`
+- executor_path: `skills/retired-skill-review/scripts/write-audit-artifacts.js`
 - warnings: none
 
 Latest `eval-readiness-report.json` facts:
@@ -111,7 +111,7 @@ Three read-only reviewers were dispatched:
 Follow-up read-only reviewers checked the current closeout:
 
 - workflow-correctness reviewer found P3 changelog wording that incorrectly attributed all 21 cases to `evals/examples.json`; fixed by recording `examples.json` 17 cases and `output-quality-cases.json` 4 cases.
-- testing-governance reviewer found P3 gaps in fresh-source prompt boundary and eval readiness provenance; fixed by adding `reviewer_context` and rerunning the source-owned `skills/spec-skill-audit/scripts/write-audit-artifacts.js` command.
+- testing-governance reviewer found P3 gaps in fresh-source prompt boundary and eval readiness provenance; fixed by adding `reviewer_context` and rerunning the source-owned `skills/retired-skill-review/scripts/write-audit-artifacts.js` command.
 - runtime-boundary reviewer found P1 untracked support files; fixed by adding the four new source files to the git index: this validation artifact, eval README, output-quality cases, and `references/planning-flow.md`.
 
 Final closeout reviewers checked the latest code and artifacts:

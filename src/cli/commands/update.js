@@ -11,6 +11,7 @@ const {
 const {
   clearCliVersionReminderCooldown,
 } = require('../version-reminder');
+const { runNpm } = require('../../../scripts/lib/npm-cli.cjs');
 
 const PACKAGE_NAME = pkg.name;
 const UPGRADE_COMMAND = `npm install -g ${PACKAGE_NAME}@latest`;
@@ -44,6 +45,7 @@ async function runUpdate(argv, deps = {}) {
   const runInstall = deps.runInstall || defaultRunInstall;
   const runRuntimeRefresh = deps.runRuntimeRefresh || defaultRunRuntimeRefresh;
   const resolveRuntimeRefresh = deps.resolveRuntimeRefreshCommand || resolveRuntimeRefreshCommand;
+  const resolveInstalledCli = deps.resolveInstalledCliPath || resolveInstalledCliPath;
   const clearVersionReminderCooldown = deps.clearVersionReminderCooldown || clearCliVersionReminderCooldown;
   const cwd = deps.cwd || process.cwd();
 
@@ -74,8 +76,21 @@ async function runUpdate(argv, deps = {}) {
     console.log('Runtime refresh: skipped (scope could not be determined safely).');
     printRuntimeRefreshFallback(refresh);
   } else {
+    const installedCli = resolveInstalledCli();
+    if (!installedCli || !installedCli.ok || !installedCli.cliPath) {
+      const reasonCode = installedCli && installedCli.reason_code
+        ? installedCli.reason_code
+        : 'global-package-cli-unresolved';
+      console.error('');
+      console.error(`Runtime refresh: degraded (${reasonCode}).`);
+      printRuntimeRefreshFallback(refresh);
+      return 1;
+    }
     console.log(`Refreshing runtime assets via: ${formatSpecFirstCommand(refresh.args)}`);
-    const refreshResult = runRuntimeRefresh(refresh.args, { cwd: refresh.cwd || cwd });
+    const refreshResult = runRuntimeRefresh(refresh.args, {
+      cwd: refresh.cwd || cwd,
+      cliPath: installedCli.cliPath,
+    });
     if (refreshResult && refreshResult.errorCode === 'ENOENT') {
       console.error('');
       console.error('Runtime refresh: degraded (`spec-first` was not found on PATH after upgrade).');
@@ -104,21 +119,29 @@ async function runUpdate(argv, deps = {}) {
 
 // 默认 install 执行器:跨平台调用 npm,stdio 直通让 npm 进度直达用户。
 // 返回 { status, errorCode },便于测试注入替身。
+// Node >=20.12 (CVE-2024-27980) 拒绝 shell:false 下 spawn `.cmd`,直接 spawn `npm.cmd` 会 EINVAL;
+// 复用仓库既有的 npm CLI JavaScript resolver,统一走 `node npm-cli.js`。
 function defaultRunInstall() {
-  const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const result = spawnSync(npmCommand, ['install', '-g', `${PACKAGE_NAME}@latest`], {
-    stdio: 'inherit',
-    windowsHide: true,
-  });
-  return {
-    status: result.status,
-    errorCode: result.error ? result.error.code : null,
-  };
+  try {
+    const result = runNpm(['install', '-g', `${PACKAGE_NAME}@latest`], { stdio: 'inherit' });
+    return {
+      status: result.status,
+      errorCode: result.error ? result.error.code : null,
+    };
+  } catch (error) {
+    return {
+      status: typeof error.status === 'number' ? error.status : 1,
+      errorCode: error.code || 'npm-cli-unresolved',
+    };
+  }
 }
 
+// 同上:不按 PATH 猜 `spec-first.cmd`,直接用当前 Node 执行刚升级的 global package bin。
 function defaultRunRuntimeRefresh(args, options = {}) {
-  const specFirstCommand = process.platform === 'win32' ? 'spec-first.cmd' : 'spec-first';
-  const result = spawnSync(specFirstCommand, args, {
+  if (!options.cliPath) {
+    return { status: 1, errorCode: 'global-package-cli-unresolved' };
+  }
+  const result = spawnSync(process.execPath, [options.cliPath, ...args], {
     cwd: options.cwd || process.cwd(),
     stdio: 'inherit',
     windowsHide: true,
@@ -129,12 +152,83 @@ function defaultRunRuntimeRefresh(args, options = {}) {
   };
 }
 
+function resolveInstalledCliPath(options = {}) {
+  const runNpmCommand = options.runNpm || runNpm;
+  let result;
+  try {
+    result = runNpmCommand(['root', '-g'], { encoding: 'utf8' });
+  } catch (_error) {
+    return { ok: false, cliPath: null, reason_code: 'global-npm-root-unavailable' };
+  }
+  if (!result || result.error || result.status !== 0) {
+    return { ok: false, cliPath: null, reason_code: 'global-npm-root-unavailable' };
+  }
+  const globalRoot = String(result.stdout || '').trim();
+  if (!globalRoot) {
+    return { ok: false, cliPath: null, reason_code: 'global-npm-root-empty' };
+  }
+  return resolvePackageCliFromGlobalRoot(globalRoot, options);
+}
+
+function resolvePackageCliFromGlobalRoot(globalRoot, options = {}) {
+  const existsSync = options.existsSync || fs.existsSync;
+  const readFileSync = options.readFileSync || fs.readFileSync;
+  const statSync = options.statSync || fs.statSync;
+  const packageRoot = path.resolve(globalRoot, ...PACKAGE_NAME.split('/'));
+  const manifestPath = path.join(packageRoot, 'package.json');
+  if (!existsSync(manifestPath)) {
+    return { ok: false, cliPath: null, reason_code: 'global-package-manifest-missing' };
+  }
+  let manifest;
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  } catch (_error) {
+    return { ok: false, cliPath: null, reason_code: 'global-package-manifest-invalid' };
+  }
+  if (!manifest || manifest.name !== PACKAGE_NAME) {
+    return { ok: false, cliPath: null, reason_code: 'global-package-identity-mismatch' };
+  }
+  const binEntry = typeof manifest.bin === 'string'
+    ? manifest.bin
+    : manifest.bin && typeof manifest.bin === 'object'
+      ? manifest.bin[PACKAGE_NAME]
+      : null;
+  if (typeof binEntry !== 'string' || !binEntry || path.isAbsolute(binEntry) || path.win32.isAbsolute(binEntry)) {
+    return { ok: false, cliPath: null, reason_code: 'global-package-bin-invalid' };
+  }
+  const cliPath = path.resolve(packageRoot, binEntry);
+  if (!isPathWithin(packageRoot, cliPath)) {
+    return { ok: false, cliPath: null, reason_code: 'global-package-bin-outside-package' };
+  }
+  try {
+    if (!statSync(cliPath).isFile()) {
+      return { ok: false, cliPath: null, reason_code: 'global-package-bin-not-file' };
+    }
+  } catch (_error) {
+    return { ok: false, cliPath: null, reason_code: 'global-package-bin-missing' };
+  }
+  return {
+    ok: true,
+    cliPath,
+    globalRoot: path.resolve(globalRoot),
+    reason_code: 'global-package-cli-resolved',
+  };
+}
+
+function isPathWithin(root, candidate) {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate));
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
 function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
   const root = path.resolve(cwd);
-  if (findGitRoot(root)) {
+  // 必须用 findGitRoot 的返回值:从子目录执行时 cwd 不是 repo root,platform detection 会一律为空并
+  // 静默回落到 `init -y` 默认宿主,反而制造本步骤要修的 drift。
+  const gitRoot = findGitRoot(root);
+  if (gitRoot) {
     return {
-      args: buildRuntimeRefreshArgs(root),
-      cwd: root,
+      args: buildRuntimeRefreshArgs(gitRoot),
+      cwd: gitRoot,
       reason_code: 'single-git-repo',
     };
   }
@@ -269,6 +363,10 @@ function printHelp() {
     'Claude Code plugin, upgrade it with `claude plugin update` inside Claude Code instead —',
     'npm -g manages a separate copy.',
     '',
+    'Per-requirement multi-repo graphs are not rebuilt by `update`. After upgrading, re-run',
+    '`spec-runtime-setup --only codegraph,graphify --workspace-graph` from the requirement folder',
+    'to rebuild graphs, or `spec-first clean --workspace-graph` to remove managed graph assets.',
+    '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
   ].join('\n'));
@@ -278,6 +376,8 @@ module.exports = {
   buildRuntimeRefreshArgs,
   detectInstalledRuntimePlatforms,
   insertInitTargetArgs,
+  resolveInstalledCliPath,
+  resolvePackageCliFromGlobalRoot,
   resolveRuntimeRefreshCommand,
   runUpdate,
   stripInitTargetArgs,

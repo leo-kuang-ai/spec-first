@@ -6,27 +6,48 @@ const { spawnSync } = require('node:child_process');
 
 const { resolveWorkflowArtifactDir } = require('../src/verification/artifact-paths');
 const { buildQualityFeedbackTopics } = require('../src/verification/quality-feedback');
-const {
-  BENCHMARK_SUITE_ID,
-  runAiDevBenchmarkFixtures,
-} = require('./run-ai-dev-benchmark-fixtures');
-
 const GATE_ID = 'ai-dev-quality-gate';
 const QUALITY_FEEDBACK_FILE = 'quality-feedback-topics.json';
 const WORKFLOW_RUNTIME_CONTRACT_TESTS = [
-  'tests/unit/branch-protection-policy.test.js',
-  'tests/unit/init-source-path-coverage.test.js',
-  'tests/unit/package-install-contracts.test.js',
-  'tests/unit/mcp-setup-powershell-contracts.test.js',
-  'tests/unit/ai-dev-quality-gate.test.js',
-  'tests/unit/ai-dev-benchmark-fixtures.test.js',
+  'tests/unit/changelog-format.test.js',
+  'tests/unit/mcp-setup-config-consumers.test.js',
+  'tests/unit/mcp-setup-entrypoint.test.js',
+  'tests/unit/mcp-setup-facts-renderer.test.js',
+  'tests/unit/mcp-setup-node-contracts.test.js',
+  'tests/unit/mcp-setup-providers.test.js',
+  'tests/unit/mcp-setup-registry.test.js',
+  'tests/unit/platform-registry-patterns.test.js',
+  'tests/unit/plugin-modules.test.js',
+  'tests/unit/pipeline-mode-contracts.test.js',
+  'tests/unit/plan-status-helper.test.js',
+  'tests/unit/plans-command.test.js',
+  'tests/unit/plan-status-taxonomy.test.js',
+  'tests/unit/requirements-rendering-parity.test.js',
+  'tests/unit/fresh-repo-grounding-contracts.test.js',
+  'tests/unit/secret-deny-patterns-contracts.test.js',
   'tests/unit/spec-plan-contracts.test.js',
+  'tests/unit/spec-brainstorm-contracts.test.js',
+  'tests/unit/spec-lfg-contracts.test.js',
   'tests/unit/task-pack-command.test.js',
   'tests/unit/spec-write-tasks-contracts.test.js',
   'tests/unit/spec-work-contracts.test.js',
+  'tests/unit/spec-work-execution-strategy-contracts.test.js',
+  'tests/unit/spec-work-front-controller-contracts.test.js',
+  'tests/unit/spec-work-implementation-quality-contracts.test.js',
+  'tests/unit/spec-work-shipping-contracts.test.js',
+  'tests/unit/verification-run-summary.test.js',
+  'tests/unit/honest-closeout.test.js',
+  'tests/unit/spec-work-run-artifact-contract.test.js',
+  'tests/unit/spec-work-run-artifact-producer.test.js',
+  'tests/unit/anti-rationalization-contracts.test.js',
+  'tests/unit/scenario-capability-matrix-contracts.test.js',
+  'tests/unit/target-repo-containment.test.js',
+  'tests/unit/spec-debug-contracts.test.js',
   'tests/unit/spec-doc-review-contracts.test.js',
   'tests/unit/spec-code-review-contracts.test.js',
-  'tests/unit/plan-status-taxonomy.test.js',
+  'tests/unit/test-inventory-contracts.test.js',
+  'tests/integration/plan-status-closeout.integration.test.js',
+  'tests/integration/spec-work-closeout-producer.test.js',
 ];
 
 function ensureDir(dirPath) {
@@ -42,63 +63,16 @@ function relativeArtifactPath(repoRoot, filePath) {
   return path.relative(repoRoot, filePath).replace(/\\/g, '/');
 }
 
-function unique(values) {
-  return [...new Set((values || []).filter(Boolean))];
-}
-
-function buildBenchmarkFixturesCheck(benchmarkFixtures) {
-  return {
-    check_id: BENCHMARK_SUITE_ID,
-    kind: 'benchmark',
-    passed: benchmarkFixtures.passed,
-    advisory: true,
-    summary: {
-      fixtures_total: Array.isArray(benchmarkFixtures.fixtures) ? benchmarkFixtures.fixtures.length : 0,
-      fixtures_failed: Array.isArray(benchmarkFixtures.fixtures)
-        ? benchmarkFixtures.fixtures.filter((fixture) => fixture.status === 'failed').length
-        : 0,
-      failures_total: Array.isArray(benchmarkFixtures.failures) ? benchmarkFixtures.failures.length : 0,
-    },
-    artifact_path: benchmarkFixtures.artifact_path || null,
-  };
-}
-
-function buildAdvisoryFailures(checks, benchmarkFixtures = null) {
-  return checks
-    .filter((check) => check.advisory === true && check.passed === false)
-    .map((check) => {
-      const benchmarkFailures = check.check_id === BENCHMARK_SUITE_ID && benchmarkFixtures
-        ? benchmarkFixtures.failures || []
-        : [];
-      const reasonCode = benchmarkFailures.find((failure) => failure.reason_code)?.reason_code
-        || 'advisory-check-failed';
-      const artifactPaths = unique([
-        check.artifact_path,
-        ...benchmarkFailures.flatMap((failure) => failure.artifact_paths || []),
-      ]);
-
-      return {
-        check_id: check.check_id,
-        reason_code: reasonCode,
-        artifact_paths: artifactPaths,
-      };
-    });
-}
-
-function buildGateResult({ generatedAt, workflowRuntimeContracts, benchmarkFixtures = null }) {
+function buildGateResult({ generatedAt, workflowRuntimeContracts }) {
   const checks = [workflowRuntimeContracts];
-  if (benchmarkFixtures) {
-    checks.push(buildBenchmarkFixturesCheck(benchmarkFixtures));
-  }
-  const blockingChecks = checks.filter((check) => check.advisory !== true);
   return {
     schema_version: 'v1',
     generated_at: generatedAt,
     gate_id: GATE_ID,
-    passed: blockingChecks.every((check) => check.passed),
+    passed: checks.every((check) => check.passed),
     checks,
-    failures: blockingChecks.filter((check) => !check.passed).map((check) => check.check_id),
-    advisory_failures: buildAdvisoryFailures(checks, benchmarkFixtures),
+    failures: checks.filter((check) => !check.passed).map((check) => check.check_id),
+    advisory_failures: [],
   };
 }
 
@@ -141,12 +115,7 @@ function runAiDevQualityGate({ repoRoot = process.cwd() } = {}) {
   ensureDir(artifactDir);
 
   const workflowRuntimeContracts = runWorkflowRuntimeContractsSuite({ repoRoot, artifactDir });
-  const benchmarkFixtures = runAiDevBenchmarkFixtures({
-    repoRoot,
-    fixturesRoot: path.join(repoRoot, 'tests', 'fixtures', 'ai-dev-benchmarks'),
-    generatedAt,
-  });
-  const gateResult = buildGateResult({ generatedAt, workflowRuntimeContracts, benchmarkFixtures });
+  const gateResult = buildGateResult({ generatedAt, workflowRuntimeContracts });
   const resultPath = path.join(artifactDir, 'ai-dev-quality-gate-result.json');
   writeJson(resultPath, gateResult);
   const feedbackTopics = buildQualityFeedbackTopics({
@@ -176,8 +145,6 @@ module.exports = {
   GATE_ID,
   QUALITY_FEEDBACK_FILE,
   WORKFLOW_RUNTIME_CONTRACT_TESTS,
-  buildAdvisoryFailures,
-  buildBenchmarkFixturesCheck,
   buildGateResult,
   runAiDevQualityGate,
 };

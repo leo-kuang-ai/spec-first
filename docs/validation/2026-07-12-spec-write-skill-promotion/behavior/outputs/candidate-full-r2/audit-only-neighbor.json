@@ -1,0 +1,13 @@
+{
+  "layer_result": "routed-near-neighbor",
+  "response": "这是 bounded source audit，不是 package authoring 或 readiness。只审查 `description` 与正文触发规则，输出 positive、negative、near-neighbor 路由 findings、证据位置和建议修订；不运行 inventory/validator，不修改文件。若用户接受 findings，后续可单独进入 audit-remediation。",
+  "would_modify_paths": [],
+  "case_id": "audit-only-neighbor",
+  "route_decision": "not-entered-audit-only",
+  "base_operation": null,
+  "modifier": "none",
+  "would_run_commands": [],
+  "source_owner_assumption": "仅把 `skills/spec-prd/SKILL.md` 视为待审查文本，不推断或改变其 source ownership。",
+  "required_references": [],
+  "effect": "not-entered"
+}

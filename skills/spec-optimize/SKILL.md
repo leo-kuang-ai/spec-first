@@ -40,16 +40,12 @@ Validate the spec and budget, establish the baseline, run bounded experiments, m
 
 ### Downstream Consumers
 
-`spec-work`, code review, benchmark maintainers, release reviewers when performance/relevance changes matter, and humans inspecting experiment logs.
+Code review、benchmark maintainer、在性能/相关性变更时参与的 release reviewer，以及检查 experiment logs 的人工审查者。
 
 ## Scenario Capability
 
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
-
-## Examples As Context
-
-When editing or reviewing this workflow prompt, or when running fresh-source eval for optimization posture drift, read `skills/spec-optimize/evals/examples.json` as examples-as-context. These examples are not a deterministic router or substitute for LLM judgment during ordinary optimization runs.
 
 ## Interaction Method
 
@@ -57,7 +53,7 @@ Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (cal
 
 ## Input
 
-<optimization_input> #$ARGUMENTS </optimization_input>
+<optimization_input> #<invocation arguments supplied by the current host> </optimization_input>
 
 If the input above is empty, ask: "What would you like to optimize? Describe the goal, or provide a path to an optimization spec YAML file."
 
@@ -102,6 +98,30 @@ Do not run `spec-optimize` as an expensive substitute for ordinary work. Before 
 
 If any item is missing, stop and help the user create a safe spec or route the work to the current host's plan/work/debug entrypoint instead. Do not continue with an open-ended optimization loop.
 
+## Measurement-Only Calibration Mode
+
+When the invocation or approved spec selects `mode:measurement-only`, load
+`references/measurement-only-calibration.md`. This mode compares an explicitly
+identified baseline and candidate against the same repeatable task/corpus. It
+must run an A/A noise floor before A/B, use a pre-registered acceptance
+threshold, classify broken runs separately from regressions, and produce only
+a measurement artifact plus stop/defer guidance.
+
+Before the first measurement, materialize the approved frozen inputs as a
+run-local `measurement-admission-input.json`, then run
+`node scripts/measurement-admission.cjs admit --input <path>`. Persist the
+returned normalized admission and `admission_sha256` beside the measurement
+artifact and bind every A/A and A/B attempt to that digest. A rejected admission
+stops before invoking the measurement command. After A/A, run the helper's
+`allow-ab` command with the normalized admission, digest, attempts, and observed
+noise floor; A/B is forbidden unless it returns `ab_allowed: true`.
+
+Measurement-only mode does not mutate either arm, any Skill package, the
+measurement harness, or promotion metadata. It does not select a winner for
+integration, invoke `spec-write-skill`, or authorize commit/landing. If arm
+identity, corpus identity, a repeatable harness, or the pre-registered threshold
+is missing, stop before measurement instead of inventing it after seeing data.
+
 First-run specs should default to `execution.mode: serial`, `execution.max_concurrent: 1`, `stopping.max_iterations: 4`, `stopping.max_hours: 1`, `stopping.plateau_iterations: 3`, and `max_runner_up_merges_per_batch: 0`. Treat higher-throughput settings as opt-in. If a provided spec asks for `execution.max_concurrent > 4`, `stopping.max_iterations > 30`, `stopping.max_hours > 4`, or uncapped judge spend, surface those costs in the approval gate before running the baseline.
 
 ## Runtime Context Exclusion
@@ -114,9 +134,20 @@ Optimization may consume prior direct-read summaries, degraded reason counts, so
 
 ## Dispatch And Backend Boundary
 
-Optimization dispatch is an optional capability selected by the approved optimization spec and runtime readiness, not a correctness requirement. Serial local/worktree execution remains the safe fallback when Codex delegation, subagent dispatch, or parallel execution is unavailable or unsafe.
+Optimization dispatch is optional. Before any learnings researcher, repo analyst, experiment worker, Codex delegation, or parallel worker run, record:
 
-Parallel experiments require explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions.
+```yaml
+worker_dispatch_authorization: authorized | missing
+capability_probe: not_applicable | attempted | unavailable
+worker_dispatch_capability: available | missing | unknown
+worker_context_isolation: isolated | inherited | unknown
+worker_model_override: supported | unsupported | unknown
+worker_bounded_parallelism: supported | unsupported | unknown
+```
+
+`workflow invocation does not authorize dispatch`。Approved optimization spec、baseline approval、`execution.mode: parallel`、预算、权限设置或 runtime readiness 都不是派发授权。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，强制采用 serial inline/local execution 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均同样降级。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Fallback 可以继续使用串行 worktree，但不得声称 parallel experiment 或 independent worker coverage。
+
+Parallel experiments additionally require both dispatch facts above, explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions. Workers never stage, commit, merge, push, or mutate the authoritative experiment log.
 
 ---
 
@@ -196,20 +227,7 @@ Check whether the input is:
 
 **If spec file provided:**
 1. Read the YAML spec file. The orchestrating agent parses YAML natively -- no shell script parsing.
-2. Validate against `references/optimize-spec-schema.yaml`:
-   - All required fields present
-   - `name` is lowercase kebab-case and safe to use in git refs / worktree paths
-   - `metric.primary.type` is `hard` or `judge`
-   - If type is `judge`, `metric.judge` section exists with `rubric` and `scoring`
-   - At least one degenerate gate defined
-   - `measurement.command` is non-empty
-   - `scope.mutable` and `scope.immutable` each have at least one entry
-   - `stopping.max_iterations`, `stopping.max_hours`, and `stopping.plateau_iterations` are present and finite
-   - `execution.mode` and `execution.max_concurrent` are present
-   - Gate check operators are valid (`>=`, `<=`, `>`, `<`, `==`, `!=`)
-   - `execution.max_concurrent` is at least 1
-   - `execution.max_concurrent` does not exceed 6 when backend is `worktree`
-   - High-throughput settings are called out for explicit user approval before baseline: `execution.max_concurrent > 4`, `stopping.max_iterations > 30`, or `stopping.max_hours > 4`
+2. Validate the spec against **every** rule in the `validation_rules` section of `references/optimize-spec-schema.yaml`. That section is the single source of truth for what a valid spec requires; do not rely on a remembered subset. Conditional rules such as exclusive-resource serial execution, singleton-rubric requirements, uncapped judge spend approval, high-throughput approval, and stopping criteria live there.
 3. If validation fails, report errors and ask the user to fix them
 
 **If description provided:**
@@ -294,7 +312,7 @@ Check whether the input is:
 
 ### 0.3 Search Prior Learnings
 
-Dispatch `spec-learnings-researcher` to search for prior optimization work on similar topics. If relevant learnings exist, incorporate them into the approach.
+Read `references/agents/learnings-researcher.md`. Dispatch a generic subagent seeded with that local prompt only when the Dispatch And Backend Boundary permits it; otherwise search inline with the same bounded scope and record the matching fallback reason. Do not dispatch a standalone agent by type/name. If relevant learnings exist, incorporate them into the approach.
 
 ### 0.4 Run Identity Detection
 
@@ -327,6 +345,13 @@ mkdir -p .spec-first/workflows/spec-optimize/<spec-name>/
 
 **This phase is a HARD GATE. The user must approve baseline and parallel readiness before Phase 2.**
 
+**Bundled scripts.** Phases 1 and 3 call helper scripts that ship in this skill's `scripts/` directory (`measure.sh`, `parallel-probe.sh`, `experiment-worktree.sh`). The Bash tool's working directory is the user's project, not the skill directory, so a bare `scripts/<name>` path will not resolve — invoke each by the skill's own absolute path. Every runnable block below already sets `SKILL_DIR` inline (shell state does not persist between Bash tool calls, so each block must carry it); replace the `<absolute path ...>` placeholder with the directory you loaded this `spec-optimize` SKILL.md from before running. The shape:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/<name>"
+```
+
 ### 1.1 Clean-Tree Gate
 
 Verify no uncommitted changes to files within `scope.mutable` or `scope.immutable`:
@@ -347,7 +372,8 @@ Resolve `scripts/measure.sh`, `scripts/parallel-probe.sh`, and `scripts/experime
 **If user provides a measurement harness** (the `measurement.command` already exists):
 1. Run it once via the measurement script:
    ```bash
-   bash scripts/measure.sh "<measurement.command>" <timeout_seconds> "<measurement.working_directory or .>"
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   bash "$SKILL_DIR/scripts/measure.sh" "<measurement.command>" <timeout_seconds> "<measurement.working_directory or .>"
    ```
 2. Validate the JSON output:
    - Contains keys for all degenerate gate metric names
@@ -390,7 +416,8 @@ If primary type is `judge`, also run the judge evaluation on baseline output to 
 
 Run the parallelism probe script:
 ```bash
-bash scripts/parallel-probe.sh "<project_directory>" "<measurement.command>" "<measurement.working_directory>" <shared_files...>
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/parallel-probe.sh" "<project_directory>" "<measurement.command>" "<measurement.working_directory>" <shared_files...>
 ```
 
 Read the JSON output. Present any blockers to the user with suggested mitigations. Treat the probe as intentionally narrow: it should inspect the measurement command, the measurement working directory, and explicitly declared shared files, not the entire repository.
@@ -399,7 +426,8 @@ Read the JSON output. Present any blockers to the user with suggested mitigation
 
 Count existing worktrees:
 ```bash
-bash scripts/experiment-worktree.sh count
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/experiment-worktree.sh" count
 ```
 
 If count + `execution.max_concurrent` would exceed 12:
@@ -451,7 +479,7 @@ Read the code within `scope.mutable` to understand:
 - Obvious improvement opportunities
 - Constraints and dependencies between components
 
-Optionally dispatch `spec-repo-research-analyst` for deeper codebase analysis if the scope is large or unfamiliar.
+Optionally read `references/agents/repo-research-analyst.md` for deeper codebase analysis if the scope is large or unfamiliar. Dispatch a generic subagent only when the Dispatch And Backend Boundary permits it; otherwise apply the same bounded analysis inline or serially. Do not dispatch a standalone agent by type/name. Before either path, derive a run-local stack/architecture/conventions orientation from the current target repo/worktree and record its source identity and dirty state. Pass that orientation with direct source refs to `repo-research-analyst`, requesting only question-specific scopes such as `patterns`. Never reuse it across runs, branches, or worktrees. On resume, compare the checkpoint's source identity with the current tree; if it changed, re-baseline affected measurements or stop with an explicit source-drift limitation instead of carrying old grounding forward. If the current sources cannot be read, record the concrete degraded fact and narrow optimization claims.
 
 ### 2.2 Generate Hypothesis List
 
@@ -511,14 +539,19 @@ Select hypotheses for this batch:
 If the backlog is empty and no new hypotheses can be generated, proceed to Phase 4 (wrap-up).
 If the backlog is non-empty but no runnable hypotheses remain because everything needs approval or is otherwise blocked, proceed to Phase 4 so the user can approve dependencies instead of spinning forever.
 
-### 3.2 Dispatch Experiments
+### 3.2 Execute Experiments
 
-For each hypothesis in the batch, dispatch according to `execution.mode`. In `serial` mode, run exactly one experiment to completion before selecting the next hypothesis. In `parallel` mode, dispatch the full batch concurrently.
+For each hypothesis in the batch, use the effective run mode. If either dispatch fact is missing, override the worker mode to serial inline/local execution for this run, retain the spec's requested mode as an unmet capability note, and run exactly one experiment to completion before selecting the next hypothesis. Only when the package-local boundary permits dispatch may `execution.mode: parallel` dispatch a batch concurrently.
+
+**Bounded dispatch.** For authorized dispatch only, do not assume the host will accept all concurrent subagents at once; the active-subagent cap varies by host and profile and is independent of `execution.max_concurrent` (which caps worktrees, a separate budget). Queue the selected experiments, dispatch only as many as the host accepts, and when a capacity or active-agent-limit error appears, treat it as backpressure — retry the queued experiment after a slot frees rather than marking it failed. Mark an experiment failed only when dispatch fails for a non-capacity reason or a successfully dispatched experiment errors/times out.
+
+The Phase 3 blocks below each set `SKILL_DIR` inline as well (the loaded `spec-optimize` skill directory; see the Bundled scripts note in Phase 1) — shell state does not persist from Phase 1, so each block carries its own assignment.
 
 **Worktree backend:**
 1. Create experiment worktree:
    ```bash
-   WORKTREE_PATH=$(bash scripts/experiment-worktree.sh create "<spec_name>" <exp_index> "optimize/<spec_name>" <shared_files...>)  # creates optimize-exp/<spec_name>/exp-<NNN>
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   WORKTREE_PATH=$(bash "$SKILL_DIR/scripts/experiment-worktree.sh" create "<spec_name>" <exp_index> "optimize/<spec_name>" <shared_files...>)  # creates .worktrees/optimize-<spec_name>-exp-<NNN>/
    ```
 2. Apply port parameterization if configured (set env vars for the measurement script)
 3. Fill the experiment prompt template (`references/experiment-prompt-template.md`) with:
@@ -528,7 +561,7 @@ For each hypothesis in the batch, dispatch according to `execution.mode`. In `se
    - Mutable and immutable scope
    - Constraints and approved dependencies
    - Rolling window of last 10 experiments (concise summaries)
-4. Dispatch a subagent with the filled prompt, working in the experiment worktree
+4. With authorized dispatch, dispatch a subagent with the filled prompt in the experiment worktree; otherwise execute the filled prompt inline in that worktree before moving to the next hypothesis
 
 **Codex backend:**
 1. Check environment guard -- do NOT delegate if already inside a Codex sandbox:
@@ -538,7 +571,7 @@ For each hypothesis in the batch, dispatch according to `execution.mode`. In `se
    ```
 2. Fill the experiment prompt template
 3. Write the filled prompt to a temp file
-4. Dispatch via Codex:
+4. Dispatch via Codex only when the package-local dispatch boundary is satisfied; otherwise use the serial local/worktree path:
    ```bash
    cat /tmp/optimize-exp-XXXXX.txt | codex exec --skip-git-repo-check - 2>&1
    ```
@@ -552,7 +585,8 @@ For each completed experiment, **immediately**:
 
 1. **Run measurement** in the experiment's worktree:
    ```bash
-   bash scripts/measure.sh "<measurement.command>" <timeout_seconds> "<worktree_path>/<measurement.working_directory or .>" <env_vars...>
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   bash "$SKILL_DIR/scripts/measure.sh" "<measurement.command>" <timeout_seconds> "<worktree_path>/<measurement.working_directory or .>" <env_vars...>
    ```
    - If stability mode is `repeat`, run the measurement harness `repeat_count` times in that working directory and aggregate the results exactly as in Phase 1 before evaluating gates or ranking the experiment.
    - Use the aggregated metrics as the experiment's score; if variance exceeds `noise_threshold`, record that in learnings so the operator knows the result is noisy.
@@ -571,10 +605,10 @@ For each completed experiment, **immediately**:
    - Apply stratified sampling per `metric.judge.stratification` config (using `sample_seed`)
    - Group samples into batches of `metric.judge.batch_size`
    - Fill the judge prompt template (`references/judge-prompt-template.md`) for each batch
-   - Dispatch `ceil(sample_size / batch_size)` parallel judge sub-agents
-   - Each sub-agent returns structured JSON scores
+   - When the package-local dispatch boundary is satisfied, dispatch the `ceil(sample_size / batch_size)` judge sub-agents using the same bounded scheduler as Phase 3.2. Otherwise evaluate the same batches serially inline, record the matching fallback reason, and do not claim independent judge coverage. Judge work is a separate budget from experiment worktrees in either path.
+   - Each dispatched sub-agent or inline judge batch returns structured JSON scores
    - Aggregate scores: compute the configured primary judge field from `metric.judge.scoring.primary` (which should match `metric.primary.name`) plus any `scoring.secondary` values
-   - If `singleton_sample > 0`: also dispatch singleton evaluation sub-agents
+   - If `singleton_sample > 0`: evaluate singleton batches through the same authorized-dispatch or serial-inline path
 
 6. **If gates pass AND primary type is `hard`**:
    - Use the metric value directly from the measurement output
@@ -658,7 +692,7 @@ If no stopping criterion is met, proceed to the next batch (step 3.1).
 
 ### 3.7 Cross-Cutting Concerns
 
-**Codex failure cascade**: Track consecutive Codex delegation failures. After 3 consecutive failures, auto-disable Codex for remaining experiments and fall back to subagent dispatch. Log the switch.
+**Codex failure cascade**: Track consecutive Codex delegation failures. After 3 consecutive failures, auto-disable Codex for remaining experiments. Fall back to subagent dispatch only when authorization and callable capability still permit it; otherwise continue through serial inline/local execution. Log the switch and reason code.
 
 **Error handling**: If an experiment's measurement command crashes, times out, or produces malformed output:
 - Log as outcome `error` or `timeout` with the error message
@@ -718,8 +752,10 @@ The experiment log and strategy digest remain in local `.spec-first/workflows/sp
 
 Present post-completion options via the platform question tool:
 
-1. **Run code review** on the cumulative diff (baseline to final). Execute the current host's code-review entrypoint with `mode:autofix` on the optimization branch.
-2. **Capture learning** by executing the current host's compound entrypoint to document the winning strategy as an institutional learning.
+1. **Run code review** on the cumulative diff (baseline to final). Execute `spec-code-review` on the optimization branch, interactive or `mode:agent`. To land eligible fixes before the next option, apply the mechanical-apply bar below.
+
+   **Mechanical-apply bar:** apply any finding with a concrete `suggested_fix` that is a clear, reversible improvement; push back and keep the diff when the reviewer is wrong, noting why. Defer anything whose right fix needs a design or product decision, including architecture direction, contract shape, behavior change needing sign-off, and any finding with no concrete fix to act on. Confirm evidence still matches at `file:line` before editing. After applying, run tests, at least targeted tests for what changed and a broader suite for multi-file edits. Do not commit or push from this step; leave the diff on the optimization branch for the Create PR option.
+2. **Capture learning** by executing `spec-compound` to document the winning strategy as an institutional learning.
 3. **Create PR** from the optimization branch to the default branch.
 4. **Continue** with more experiments: re-enter Phase 3 with the current state. State re-read first.
 5. **Done** -- leave the optimization branch for manual review.

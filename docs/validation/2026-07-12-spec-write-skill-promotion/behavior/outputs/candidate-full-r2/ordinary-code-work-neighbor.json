@@ -1,0 +1,13 @@
+{
+  "layer_result": "routed-near-neighbor",
+  "response": "这是普通代码修复与回归测试，不属于 Skill authoring/readiness。路由到 bounded code-work：定位 `src/cli/init.js` 参数解析失败路径，实施最小修复，增加覆盖该输入与预期行为的 Jest 测试，并运行聚焦测试；不执行 Skill inventory、validator 或 package 修改。",
+  "would_modify_paths": [],
+  "case_id": "ordinary-code-work-neighbor",
+  "route_decision": "not-entered-code-work",
+  "base_operation": null,
+  "modifier": "none",
+  "would_run_commands": [],
+  "source_owner_assumption": "目标是应用源码和测试，不涉及 Agent Skill source owner。",
+  "required_references": [],
+  "effect": "not-entered"
+}

@@ -38,8 +38,8 @@ Skill prompt 可以包含 examples-as-context，但 examples 不等于 semantic 
 | Risk surface | Required boundary | Example |
 |---|---|---|
 | writes | 明确 source-of-truth、generated runtime 与 repo write scope | spec-work |
-| shell/network | 明确何时执行、何时只读、何时需要 handoff | mcp-setup |
-| secrets | 默认不传播，opt-in 必须可审计且不泄露内容 | git-worktree |
+| shell/network | 明确何时执行、何时只读、何时需要 handoff | runtime-setup |
+| secrets | 默认不传播，opt-in 必须可审计且不泄露内容 | spec-worktree |
 | git staging | 只 stage batch-owned files 和显式 expected_side_effects | spec-work |
 | external service | 区分 current official facts、repo convention 与 social signal | researcher |
 | rollback/stop | 定义 stop condition，不 silent cleanup 用户改动 | delegation |

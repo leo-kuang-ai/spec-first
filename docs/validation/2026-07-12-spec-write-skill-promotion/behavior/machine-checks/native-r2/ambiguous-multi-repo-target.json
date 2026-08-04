@@ -1,0 +1,18 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "revise",
+    "case_id": "ambiguous-multi-repo-target",
+    "effect": "apply",
+    "layer_result": "Requested mutation is blocked because the canonical source and authorized target repository are unknown.",
+    "modifier": "none",
+    "required_references": [],
+    "response": "Do not modify any copy. First require the user to identify one target repository and its canonical Skill source root, or provide authoritative project documentation that maps the three copies to one source and generated consumers. Then preview the proposed diff and containment boundary for that single source; preserve the other repositories until their ownership and synchronization rules are confirmed.",
+    "route_decision": "authoring-blocked-ambiguous-source",
+    "source_owner_assumption": "No canonical source owner can be safely inferred among the three repositories.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

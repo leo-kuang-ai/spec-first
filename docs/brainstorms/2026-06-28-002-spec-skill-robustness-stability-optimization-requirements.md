@@ -58,7 +58,7 @@ readiness_inputs_hash: sha256:e40974a4adbed2d0fa27f057a2a33cd406ffc0220e4599e711
 | R-05 | P1 | routing-red-flags.md 不得含反转 skill 名 | `:25` 写 bug-report，真实为 report-bug |
 | R-06 | P1 | sensitive surfaces 必须在 scope-guards.md 或红旗中有定义与举例 | `routing-red-flags.md:7` 唯一出现且无定义，是最大合理化漏洞 |
 | R-07 | P1 | 红旗 route target 不得用裸名 update/setup 引发 spec-* 命名混淆 | `routing-red-flags.md:13` 裸名，应写 spec-first update/`spec-mcp-setup` |
-| R-08 | P1 | bootstrap 显式缺席集必须覆盖 slack-research/skill-audit/app-consistency-audit/polish-beta | `instruction-bootstrap.test.js:539-540` 仅断言 sessions/release-notes 缺席 |
+| R-08 | P1 | bootstrap 显式缺席集必须覆盖 slack-research/skill-review/app-consistency-audit/polish-beta | `instruction-bootstrap.test.js:539-540` 仅断言 sessions/release-notes 缺席 |
 | R-09 | P1 | CURATED_CORE 必须从 skills-governance.json 派生，不得硬编码 | `instruction-bootstrap.test.js:514-517` 数组字面量，无 registry 引用 |
 | R-10 | P1 | 两条 load-bearing 红旗（vague→brainstorm/plan、run-init-now→route first）必须在 bootstrap 内联或有 intentional deferral 测试 | routing-red-flags.md 有 7 条，bootstrap 仅内联 5 条；无测试守护 |
 | R-11 | P1 | prompt-examples-contracts.test.js 的 cases.length 上限必须留 breathing margin | `:107` `<= 14` 当前恰为 14，补 case 即破测 |
@@ -76,7 +76,7 @@ readiness_inputs_hash: sha256:e40974a4adbed2d0fa27f057a2a33cd406ffc0220e4599e711
 | R-23 | P1 | brainstorm RBP convert 必须记入 closure_disposition 且可追溯 | `handoff.md:26-28` 允许 convert 后显示 Plan，转换事件无独立审计痕迹 |
 | R-24 | P1 | 高风险 public workflow（spec-mcp-setup/spec-optimize/spec-compound-refresh 等）必须有 eval seed | eval-readiness 15/22 missing；spec-mcp-setup 有 44 个 scripts 但 eval missing |
 | R-25 | P1 | section lint 必须按 entry_surface 分层，internal_only 默认 P2/P3 | 61 P1 + 61 P2 missing-section 淹没 public workflow 风险 |
-| R-26 | P1 | top 5 boundary pair 必须各补 negative eval | brainstorm/prd、debug/optimize、skill-audit/write-skill、prd/write-tasks、code-review/doc-review |
+| R-26 | P1 | top 5 boundary pair 必须各补 negative eval | brainstorm/prd、debug/optimize、skill-review/write-skill、prd/write-tasks、code-review/doc-review |
 | R-27 | P1 | governance schema 必须拆分 entry_surface 与 host_discoverability | git-worktree 标 internal_only 但 harness available-skills 仍 surface |
 | R-28 | P2 | docs/workflow-skill-agent-map.md 必须有防回归 test | P0-1 盘面已无 stale（grep exit 1），仅防复发；token 集 ⊆ governance workflow_command |
 | R-29 | P2 | routing-cases.json 必须有顶层 description 与完整 source_refs | 缺 description；source_refs 缺 dispatch-boundaries.md（与 2 个 dispatch tag case 相关） |
@@ -151,7 +151,7 @@ Then entry_surface 与 host_discoverability 分离，route map 覆盖可机械�
 
 AE-12（对应 R-40）
 Given Markdown link checker 扫描含 `{url}`、`{older_url}` 或代码块内 markdown link 的 skill 文档
-When 运行 skill-audit markdown link 检查
+When 运行 skill-review markdown link 检查
 Then placeholder 和代码块链接不产生 broken_local_link，真实本地 broken link 仍被报告
 
 ## Scope Boundaries（范围边界）

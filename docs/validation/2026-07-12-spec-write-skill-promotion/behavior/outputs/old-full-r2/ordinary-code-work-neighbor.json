@@ -1,0 +1,26 @@
+{
+  "arm": "old-full",
+  "repeat": 2,
+  "case_id": "ordinary-code-work-neighbor",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "near-neighbor",
+    "case_id": "ordinary-code-work-neighbor",
+    "effect": "Perform ordinary code implementation and regression testing without changing any skill package.",
+    "layer_result": "This is a one-off implementation/debugging task, explicitly outside skill authoring.",
+    "modifier": "ordinary-code-work",
+    "required_references": [],
+    "response": "直接走普通代码修复流程：复现 src/cli/init.js 的参数解析问题，定位最小根因，修改实现并添加覆盖该输入与相邻边界的 Jest 回归测试，然后运行聚焦测试和必要 lint。不要创建或修改 Skill、治理记录、runtime catalog 或 generated mirrors。",
+    "route_decision": "near-neighbor: direct implementation/spec-work",
+    "source_owner_assumption": "src/cli/init.js and its existing Jest suite own this behavior; no skill source is involved.",
+    "would_modify_paths": [
+      "src/cli/init.js",
+      "<existing-init-jest-test-file>"
+    ],
+    "would_run_commands": [
+      "<focused Jest test for src/cli/init.js>",
+      "<applicable project lint/typecheck>",
+      "git diff --check"
+    ]
+  }
+}

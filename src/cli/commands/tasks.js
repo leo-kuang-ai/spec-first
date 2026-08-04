@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs');
 const path = require('node:path');
 const {
   computeSourcePlanHash,
@@ -35,13 +36,22 @@ function runTasks(argv) {
 function runHash(args) {
   const planPath = getPositionalArgs(args)[0];
   const json = args.includes('--json');
-  const unknown = getUnknownArgs(args, new Set(['--json']));
+  const repoArg = resolveRepoArg(args);
+  const unknown = getUnknownArgs(args, new Set(['--json', '--repo']));
 
   if (unknown.length > 0) {
     return writeCliError({
       json,
       code: 'tasks-unknown-option',
       message: `unknown option: ${unknown[0]}`,
+    });
+  }
+
+  if (repoArg.error) {
+    return writeCliError({
+      json,
+      code: repoArg.error.code,
+      message: repoArg.error.message,
     });
   }
 
@@ -54,7 +64,16 @@ function runHash(args) {
     return 2;
   }
 
-  const result = computeSourcePlanHash(path.resolve(planPath));
+  const resolvedPlan = resolveArtifactOperand(planPath, repoArg.repoRoot, 'plan');
+  if (resolvedPlan.error) {
+    return writeCliError({
+      json,
+      code: resolvedPlan.error.code,
+      message: resolvedPlan.error.message,
+    });
+  }
+
+  const result = computeSourcePlanHash(resolvedPlan.absolutePath);
   if (!result.ok) {
     if (json) {
       process.stdout.write(`${JSON.stringify({
@@ -69,7 +88,9 @@ function runHash(args) {
 
   const payload = {
     schema_version: 'task-plan-hash/v1',
-    plan_path: path.resolve(planPath),
+    artifact_root: repoArg.repoRoot,
+    source_plan: resolvedPlan.relativePath,
+    plan_path: resolvedPlan.absolutePath,
     hash: result.hash,
     canonicalization_version: result.canonicalization_version,
     removed_frontmatter: result.removed_frontmatter,
@@ -116,7 +137,16 @@ function runValidate(args) {
     return 2;
   }
 
-  const result = validateTaskPack(path.resolve(taskPackPath), { repoRoot: repoArg.repoRoot });
+  const resolvedTaskPack = resolveArtifactOperand(taskPackPath, repoArg.repoRoot, 'task-pack');
+  if (resolvedTaskPack.error) {
+    return writeCliError({
+      json,
+      code: resolvedTaskPack.error.code,
+      message: resolvedTaskPack.error.message,
+    });
+  }
+
+  const result = validateTaskPack(resolvedTaskPack.absolutePath, { repoRoot: repoArg.repoRoot });
 
   if (json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -163,7 +193,7 @@ function resolveRepoArg(args) {
   if (equalsArg) {
     const value = equalsArg.slice('--repo='.length);
     return value
-      ? { repoRoot: path.resolve(value), error: null }
+      ? resolveArtifactRoot(value)
       : { repoRoot: null, error: { code: 'tasks-repo-path-required', message: 'repo path is required after --repo' } };
   }
 
@@ -171,11 +201,73 @@ function resolveRepoArg(args) {
   if (repoFlagIndex !== -1) {
     const value = args[repoFlagIndex + 1];
     return value && !value.startsWith('-')
-      ? { repoRoot: path.resolve(value), error: null }
+      ? resolveArtifactRoot(value)
       : { repoRoot: null, error: { code: 'tasks-repo-path-required', message: 'repo path is required after --repo' } };
   }
 
-  return { repoRoot: process.cwd(), error: null };
+  return resolveArtifactRoot(process.cwd());
+}
+
+function resolveArtifactRoot(value) {
+  const resolved = path.resolve(value);
+  let stat;
+  try {
+    stat = fs.statSync(resolved);
+  } catch (_error) {
+    return {
+      repoRoot: null,
+      error: {
+        code: 'tasks-repo-not-found',
+        message: `artifact root does not exist: ${resolved}`,
+      },
+    };
+  }
+  if (!stat.isDirectory()) {
+    return {
+      repoRoot: null,
+      error: {
+        code: 'tasks-repo-not-directory',
+        message: `artifact root is not a directory: ${resolved}`,
+      },
+    };
+  }
+  return { repoRoot: realpath(resolved), error: null };
+}
+
+function resolveArtifactOperand(value, artifactRoot, kind) {
+  const candidate = path.isAbsolute(value)
+    ? path.resolve(value)
+    : path.resolve(artifactRoot, value);
+  const existingCandidate = fs.existsSync(candidate) ? realpath(candidate) : candidate;
+  if (!isInsidePath(artifactRoot, existingCandidate)) {
+    return {
+      absolutePath: null,
+      relativePath: null,
+      error: {
+        code: `tasks-${kind}-outside-artifact-root`,
+        message: `${kind} path must resolve inside artifact root`,
+      },
+    };
+  }
+  return {
+    absolutePath: existingCandidate,
+    relativePath: toPosixPath(path.relative(artifactRoot, existingCandidate)),
+    error: null,
+  };
+}
+
+function isInsidePath(parentPath, childPath) {
+  const relative = path.relative(parentPath, childPath);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function realpath(value) {
+  const resolver = fs.realpathSync.native || fs.realpathSync;
+  return resolver(value);
+}
+
+function toPosixPath(value) {
+  return value.split(path.sep).join('/');
 }
 
 function printTasksHelp(withErrorPrefix = false) {
@@ -183,10 +275,11 @@ function printTasksHelp(withErrorPrefix = false) {
     'Usage: spec-first tasks <subcommand> [options]',
     '',
     'Subcommands:',
-    '  hash <plan-path> [--json]                 Compute canonical source plan hash',
+    '  hash <plan-path> [--json] [--repo=<path>|--repo <path>]  Compute canonical source plan hash',
     '  validate <task-pack-path> [--json] [--repo=<path>|--repo <path>]  Validate a derived task pack',
     '',
     'Notes:',
+    '  --repo is the artifact/source resolution root, not the mutation target repository.',
     '  validate only checks identity, freshness, and structure.',
     '  It does not judge task splitting quality or business scope.',
   ];

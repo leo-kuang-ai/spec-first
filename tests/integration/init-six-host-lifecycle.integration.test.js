@@ -1,0 +1,505 @@
+'use strict';
+
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+
+const { getAdapter, getSupportedPlatforms } = require('../../src/cli/adapters');
+
+const repoRoot = path.resolve(__dirname, '..', '..');
+const cliPath = path.join(repoRoot, 'bin', 'spec-first.js');
+const sandboxRoots = new Set();
+
+afterEach(() => {
+  for (const root of sandboxRoots) {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+  sandboxRoots.clear();
+});
+
+function tempSandbox(platform) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `spec-first-${platform}-lifecycle-`));
+  sandboxRoots.add(root);
+  const projectRoot = path.join(root, 'project');
+  const home = path.join(root, 'home');
+  fs.mkdirSync(projectRoot, { recursive: true });
+  fs.mkdirSync(home, { recursive: true });
+  return { projectRoot, home };
+}
+
+function runSpecFirst(args, sandbox) {
+  return spawnSync(process.execPath, [cliPath, ...args], {
+    cwd: sandbox.projectRoot,
+    env: { ...process.env, HOME: sandbox.home },
+    encoding: 'utf8',
+    timeout: 120000,
+  });
+}
+
+function parseJsonOutput(result) {
+  try {
+    return JSON.parse(result.stdout);
+  } catch (error) {
+    throw new Error(`failed to parse JSON output: ${error.message}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`);
+  }
+}
+
+const pointerPlatforms = getSupportedPlatforms().filter((platform) =>
+  Boolean(getAdapter(platform).pointerPath)
+);
+
+describe('six-host init lifecycle', () => {
+  test.each(getSupportedPlatforms())(
+    '%s fresh init is self-consistent and immediately idempotent',
+    (platform) => {
+      const sandbox = tempSandbox(platform);
+      const adapter = getAdapter(platform);
+      const initArgs = [
+        'init',
+        `--${platform}`,
+        '-y',
+        '-u',
+        'lifecycle-test',
+        '--lang',
+        'en',
+      ];
+
+      const firstInit = runSpecFirst(initArgs, sandbox);
+      expect(firstInit.status).toBe(0);
+
+      const instruction = fs.readFileSync(
+        path.join(sandbox.projectRoot, adapter.instructionFile),
+        'utf8',
+      );
+      expect(instruction).toContain('`using-spec-first`');
+      expect(instruction).not.toContain('skills/using-spec-first/SKILL.md');
+      expect(instruction).not.toContain('CHANGELOG.md');
+      expect(instruction).not.toContain('### Changelog');
+
+      const runtimeSkillPath = path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'using-spec-first',
+        'SKILL.md',
+      );
+      expect(fs.existsSync(runtimeSkillPath)).toBe(true);
+      for (const relativePath of [
+        'SKILL.md',
+        'references/pipeline-orchestration.md',
+        'scripts/agent-browser-run-context.cjs',
+      ]) {
+        expect(fs.existsSync(path.join(
+          sandbox.projectRoot,
+          adapter.skillsRoot,
+          'spec-test-browser',
+          relativePath,
+        ))).toBe(true);
+      }
+      const runtimeSetupExecutor = path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-runtime-setup',
+        'scripts',
+        'lib',
+        'installation-executor.cjs',
+      );
+      expect(fs.existsSync(runtimeSetupExecutor)).toBe(true);
+      const { resolveAgentBrowserProbePath } = require(runtimeSetupExecutor);
+      expect(resolveAgentBrowserProbePath()).toBe(fs.realpathSync.native(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'spec-test-browser',
+        'scripts',
+        'agent-browser-run-context.cjs',
+      )));
+      expect(fs.existsSync(resolveAgentBrowserProbePath())).toBe(true);
+      for (const relativePath of [
+        'references/browser-runtime-profile.schema.json',
+        'references/browser-runtime-profile.example.json',
+        'scripts/dev-server-run-context.cjs',
+      ]) {
+        expect(fs.existsSync(path.join(
+          sandbox.projectRoot,
+          adapter.skillsRoot,
+          'spec-test-browser',
+          relativePath,
+        ))).toBe(false);
+      }
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'spec-test-browser',
+        'evals',
+      ))).toBe(false);
+      for (const [helperName, relativePaths, userInvocable, descriptionPattern] of [
+        ['spec-commit', ['SKILL.md'], false, /description:.*Internal/i],
+        ['spec-commit-push-pr', [
+          'SKILL.md',
+          'references/branch-creation.md',
+          'references/pr-description-writing.md',
+        ], false, /description:.*Internal/i],
+      ]) {
+        for (const relativePath of relativePaths) {
+          const helperPath = path.join(
+            sandbox.projectRoot,
+            adapter.skillsRoot,
+            helperName,
+            relativePath,
+          );
+          expect(fs.existsSync(helperPath)).toBe(true);
+          if (relativePath === 'SKILL.md') {
+            const helperSource = fs.readFileSync(helperPath, 'utf8');
+            expect(helperSource).toMatch(descriptionPattern);
+            if (userInvocable === false && platform !== 'cursor') {
+              expect(helperSource).toMatch(/^user-invocable:\s*false$/m);
+            }
+            if (platform === 'cursor') {
+              expect(helperSource).toMatch(/^disable-model-invocation:\s*true$/m);
+            }
+          }
+        }
+      }
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'spec-proof',
+      ))).toBe(false);
+      for (const [standaloneName, relativePaths] of [
+        ['spec-resolve-pr-feedback', [
+          'SKILL.md',
+          'references/full-mode.md',
+          'references/targeted-mode.md',
+          'references/agents/pr-comment-resolver.md',
+          'scripts/get-pr-comments',
+          'scripts/reply-to-pr-thread',
+          'scripts/resolve-pr-thread',
+        ]],
+        ['spec-test-xcode', ['SKILL.md']],
+      ]) {
+        for (const relativePath of relativePaths) {
+          expect(fs.existsSync(path.join(
+            sandbox.projectRoot,
+            adapter.skillsRoot,
+            standaloneName,
+            relativePath,
+          ))).toBe(true);
+        }
+      }
+      const changelog = fs.readFileSync(
+        path.join(sandbox.projectRoot, 'CHANGELOG.md'),
+        'utf8',
+      );
+      expect(changelog).toContain('使用 spec-first 初始化项目');
+
+      if (adapter.pointerPath) {
+        const pointer = fs.readFileSync(
+          path.join(sandbox.projectRoot, adapter.pointerPath),
+          'utf8',
+        );
+        expect(pointer).toContain(`${adapter.skillsRoot}/using-spec-first/SKILL.md`);
+        expect(pointer).not.toContain('Workflow entry routing lives in `skills/using-spec-first/SKILL.md`.');
+      }
+
+      if (platform === 'qoder') {
+        expect(firstInit.stderr).toContain('qoder_hook_activation_unverified');
+        expect(firstInit.stderr).toContain('qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol');
+        expect(firstInit.stderr).toContain('inactive');
+      }
+
+      const doctor = runSpecFirst(['doctor', `--${platform}`, '--json'], sandbox);
+      expect(doctor.status).toBe(0);
+      const report = parseJsonOutput(doctor);
+      const instructionCheck = report.checks.find((check) =>
+        check.name === `${adapter.instructionFile} workflow entry guidance`
+      );
+      expect(instructionCheck).toMatchObject({ level: 'PASS' });
+      expect(report.checks.filter((check) => check.drift === true)).toEqual([]);
+      if (platform === 'qoder') {
+        const degradedHookChecks = report.checks.filter((check) =>
+          check.reasonCode === 'qoder_hook_activation_unverified'
+        );
+        expect(degradedHookChecks).toHaveLength(3);
+        expect(degradedHookChecks).toEqual(expect.arrayContaining([
+          expect.objectContaining({
+            level: 'WARNING',
+            degradedByDesign: true,
+            drift: false,
+          }),
+        ]));
+      }
+
+      const secondInit = runSpecFirst([...initArgs, '--dry-run'], sandbox);
+      expect(secondInit.status).toBe(0);
+      const secondOutput = `${secondInit.stdout}\n${secondInit.stderr}`;
+      expect(secondInit.stdout).toContain('Preview coverage:');
+      expect(secondInit.stdout).toContain('Target detail:');
+      expect(secondInit.stdout).toContain('Preview omitted:');
+      expect(secondOutput).not.toContain('current_runtime_drift');
+      expect(secondOutput).not.toContain('managed hard reset before regenerating runtime assets (current runtime drift detected)');
+    },
+    120000,
+  );
+
+  test.each(getSupportedPlatforms())(
+    '%s preserves an existing CHANGELOG byte-for-byte',
+    (platform) => {
+      const sandbox = tempSandbox(`${platform}-changelog`);
+      const changelogPath = path.join(sandbox.projectRoot, 'CHANGELOG.md');
+      const sentinel = '# User-owned changelog\n\n- keep this byte-for-byte\n';
+      fs.writeFileSync(changelogPath, sentinel);
+
+      const init = runSpecFirst([
+        'init',
+        `--${platform}`,
+        '-y',
+        '-u',
+        'lifecycle-test',
+        '--lang',
+        'en',
+      ], sandbox);
+
+      expect(init.status).toBe(0);
+      expect(fs.readFileSync(changelogPath, 'utf8')).toBe(sentinel);
+    },
+    120000,
+  );
+
+  test.each(pointerPlatforms)(
+    '%s preserves a user-owned pointer and keeps immediate re-init stable',
+    (platform) => {
+      const sandbox = tempSandbox(`${platform}-pointer-collision`);
+      const adapter = getAdapter(platform);
+      const pointerPath = path.join(sandbox.projectRoot, adapter.pointerPath);
+      const userOwnedContents = '# User-owned host rule\n';
+      fs.mkdirSync(path.dirname(pointerPath), { recursive: true });
+      fs.writeFileSync(pointerPath, userOwnedContents);
+      const initArgs = [
+        'init',
+        `--${platform}`,
+        '-y',
+        '-u',
+        'lifecycle-test',
+        '--lang',
+        'en',
+      ];
+
+      const firstInit = runSpecFirst(initArgs, sandbox);
+      expect(firstInit.status).toBe(0);
+      expect(firstInit.stderr).toContain('host_native_pointer_user_owned_collision');
+      expect(fs.readFileSync(pointerPath, 'utf8')).toBe(userOwnedContents);
+
+      const secondInit = runSpecFirst([...initArgs, '--dry-run'], sandbox);
+      expect(secondInit.status).toBe(0);
+      expect(secondInit.stderr).toContain('host_native_pointer_user_owned_collision');
+      const secondOutput = `${secondInit.stdout}\n${secondInit.stderr}`;
+      expect(secondOutput).not.toContain('current_runtime_drift');
+      expect(secondOutput).not.toContain('managed hard reset before regenerating runtime assets');
+    },
+    120000,
+  );
+
+  test('same-project six-host init stays coherent and removes stale maintainer-only assets', () => {
+    const sandbox = tempSandbox('all-hosts-coexistence');
+    const initArgs = [
+      'init',
+      ...getSupportedPlatforms().map((platform) => `--${platform}`),
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ];
+
+    const firstInit = runSpecFirst(initArgs, sandbox);
+    expect(firstInit.status).toBe(0);
+
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      const prdRoot = path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-prd',
+      );
+      const appAuditRoot = path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-app-consistency-audit',
+      );
+      fs.mkdirSync(path.join(prdRoot, 'evals'), { recursive: true });
+      fs.writeFileSync(path.join(prdRoot, 'evals', 'stale.json'), '{}\n');
+      fs.writeFileSync(path.join(appAuditRoot, 'README.md'), '# stale runtime maintainer README\n');
+    }
+
+    const secondInit = runSpecFirst(initArgs, sandbox);
+    expect(secondInit.status).toBe(0);
+
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-prd',
+        'evals',
+      ))).toBe(false);
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.workflowsRoot,
+        'spec-app-consistency-audit',
+        'README.md',
+      ))).toBe(false);
+
+      const doctor = runSpecFirst(['doctor', `--${platform}`, '--json'], sandbox);
+      expect(doctor.status).toBe(0);
+      const report = parseJsonOutput(doctor);
+      expect(report.checks.filter((check) => check.drift === true)).toEqual([]);
+
+      if (platform === 'claude') {
+        expect(report.checks.find((check) => check.name === '.claude/skills')).toMatchObject({
+          level: 'PASS',
+          message: 'found 18 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
+        });
+      }
+      if (platform === 'cursor') {
+        expect(report.checks.filter((check) =>
+          check.reasonCode === 'cursor_managed_projection_precedence_unverified'
+        )).toHaveLength(1);
+        expect(report.checks.filter((check) =>
+          check.reasonCode === 'cursor_external_skill_precedence_unverified'
+        )).toEqual([]);
+      }
+      if (platform === 'qoder') {
+        expect(report.checks.filter((check) =>
+          check.reasonCode === 'qoder_hook_activation_unverified'
+        )).toHaveLength(3);
+      }
+    }
+  }, 120000);
+
+  test('six-host init ignores generated runtime while keeping project-owned host files visible', () => {
+    const sandbox = tempSandbox('all-hosts-gitignore');
+    const gitInit = spawnSync('git', ['init', '-q'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(gitInit.status).toBe(0);
+
+    const trackedLegacyRuntime = '.agents/skills/source-command-spec-legacy/SKILL.md';
+    const trackedLegacyRuntimePath = path.join(sandbox.projectRoot, trackedLegacyRuntime);
+    fs.mkdirSync(path.dirname(trackedLegacyRuntimePath), { recursive: true });
+    fs.writeFileSync(trackedLegacyRuntimePath, 'legacy generated runtime\n', 'utf8');
+    const gitAdd = spawnSync('git', ['add', '--', trackedLegacyRuntime], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(gitAdd.status).toBe(0);
+
+    const init = runSpecFirst([
+      'init',
+      ...getSupportedPlatforms().map((platform) => `--${platform}`),
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ], sandbox);
+    expect(init.status).toBe(0);
+
+    const trackedAfterInit = spawnSync('git', ['ls-files', '--', trackedLegacyRuntime], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(trackedAfterInit.status).toBe(0);
+    expect(trackedAfterInit.stdout).toBe('');
+
+    for (const relativePath of [
+      '.agents/skills/my-team-skill/SKILL.md',
+      '.codex/config.toml',
+      '.qoder/settings.json',
+    ]) {
+      const absolutePath = path.join(sandbox.projectRoot, relativePath);
+      fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+      fs.writeFileSync(absolutePath, 'team-owned\n', 'utf8');
+    }
+
+    const status = spawnSync('git', ['status', '--short', '--untracked-files=all'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(status.status).toBe(0);
+    const visibleUntrackedPaths = status.stdout
+      .trim()
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => line.slice(3))
+      .sort();
+
+    expect(visibleUntrackedPaths).toEqual([
+      '.agents/skills/my-team-skill/SKILL.md',
+      '.claude/settings.json',
+      '.codex/config.toml',
+      '.gitignore',
+      '.qoder/settings.json',
+      'AGENTS.md',
+      'CHANGELOG.md',
+      'CLAUDE.md',
+    ].sort());
+
+    for (const generatedPath of [
+      '.agents/skills/spec-plan/SKILL.md',
+      trackedLegacyRuntime,
+      '.claude/spec-first/state.json',
+      '.codex/spec-first/state.json',
+      '.cursor/spec-first/state.json',
+      '.kiro/spec-first/state.json',
+      '.qoder/spec-first/state.json',
+      '.opencode/spec-first/state.json',
+    ]) {
+      const ignored = spawnSync('git', ['check-ignore', '-q', '--', generatedPath], {
+        cwd: sandbox.projectRoot,
+      });
+      expect(ignored.status).toBe(0);
+    }
+  }, 120000);
+
+  test('doctor reports managed pointer body drift', () => {
+    const platform = 'kiro';
+    const sandbox = tempSandbox(`${platform}-pointer-drift`);
+    const adapter = getAdapter(platform);
+    const initArgs = [
+      'init',
+      `--${platform}`,
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ];
+    const firstInit = runSpecFirst(initArgs, sandbox);
+    expect(firstInit.status).toBe(0);
+
+    const pointerPath = path.join(sandbox.projectRoot, adapter.pointerPath);
+    const pointer = fs.readFileSync(pointerPath, 'utf8');
+    fs.writeFileSync(
+      pointerPath,
+      pointer.replace(
+        `${adapter.skillsRoot}/using-spec-first/SKILL.md`,
+        'skills/using-spec-first/SKILL.md',
+      ),
+    );
+
+    const doctor = runSpecFirst(['doctor', `--${platform}`, '--json'], sandbox);
+    expect(doctor.status).toBe(0);
+    const report = parseJsonOutput(doctor);
+    const pointerCheck = report.checks.find((check) => check.name === adapter.pointerPath);
+    expect(pointerCheck).toMatchObject({
+      level: 'WARNING',
+      drift: true,
+      reasonCode: 'host_native_pointer_content_drift',
+    });
+
+    const secondInit = runSpecFirst([...initArgs, '--dry-run'], sandbox);
+    expect(secondInit.status).toBe(0);
+    expect(`${secondInit.stdout}\n${secondInit.stderr}`).toContain('current runtime drift detected');
+  }, 120000);
+});

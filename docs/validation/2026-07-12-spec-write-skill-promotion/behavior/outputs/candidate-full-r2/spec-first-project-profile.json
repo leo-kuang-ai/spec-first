@@ -1,0 +1,30 @@
+{
+  "layer_result": "apply-plan",
+  "response": "修改 canonical `skills/spec-debug/` source，并同步 governance、必要 tests/docs 和 `CHANGELOG.md`；先预览 diff、确认 containment 与 preserved files，再运行 bundled validator 和聚焦 Jest。随后运行 runtime catalog generator 与项目批准的 `spec-first init` 重建派生 runtime，绝不直接编辑 `.claude/`、`.codex/`、`.agents/skills/` 等 mirrors。Closeout 分别报告 deterministic、semantic、portable、target、project、mutation 证据及 residual risks。",
+  "would_modify_paths": [
+    "skills/spec-debug/SKILL.md",
+    "src/cli/contracts/dual-host-governance/skills-governance.json",
+    "tests/unit/spec-debug-contracts.test.js",
+    "CHANGELOG.md"
+  ],
+  "case_id": "spec-first-project-profile",
+  "route_decision": "entered-spec-first-revision",
+  "base_operation": "revise",
+  "modifier": "none",
+  "would_run_commands": [
+    "node \"$SKILL_DIR/scripts/validate-skill.cjs\" skills/spec-debug --json",
+    "npx jest --runTestsByPath tests/unit/spec-debug-contracts.test.js --runInBand",
+    "npm run lint:skill-entrypoints",
+    "npm run docs:runtime-catalog",
+    "spec-first init",
+    "git diff --check"
+  ],
+  "source_owner_assumption": "项目规则确认 `skills/spec-debug/` 为 canonical source，governance JSON 为治理 owner，catalog/runtime 均为 generator consumers。",
+  "required_references": [
+    "references/authoring-method.md",
+    "references/project-profiles.md",
+    "references/delivery-gates.md",
+    "references/target-profiles.md"
+  ],
+  "effect": "apply"
+}

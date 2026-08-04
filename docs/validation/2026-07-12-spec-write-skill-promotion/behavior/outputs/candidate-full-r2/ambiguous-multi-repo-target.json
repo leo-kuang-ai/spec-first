@@ -1,0 +1,16 @@
+{
+  "layer_result": "blocked-source-owner",
+  "response": "请求明确是升级，但同时涉及三个仓库且 canonical owner 未知，不能批量判断并写入。零修改、零执行；唯一下一步是列出三个候选 package 及各自项目规则、canonical source/runtime 证据，由用户选择一个 repo 和 source owner 后再为该单一目标提供 preview。",
+  "would_modify_paths": [],
+  "case_id": "ambiguous-multi-repo-target",
+  "route_decision": "entered-but-blocked-multiple-sources",
+  "base_operation": "revise",
+  "modifier": "none",
+  "would_run_commands": [],
+  "source_owner_assumption": "存在三个 repo 和多个同名候选，当前无法绑定唯一 canonical source。",
+  "required_references": [
+    "references/authoring-method.md",
+    "references/project-profiles.md"
+  ],
+  "effect": "apply"
+}

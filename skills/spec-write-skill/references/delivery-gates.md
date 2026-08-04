@@ -1,101 +1,97 @@
 # Delivery Gates
 
-本 reference 定义 `spec-write-skill` 的 risk-based 交付 gate：按质量层级和改动风险选择最窄验证。提高 rigor 优先增加必要 references/evals/tests，不扩大 `SKILL.md` 初始加载，也不把更多 gate 当作默认更好。
+**trigger_condition：** `validate-only`、写入前验证、package readiness、closeout，或 package/source/target risk signal 命中时读取。
+**purpose：** 将 bundled validator、preview、风险匹配证据与五轴 readiness 连接到对应 claim。
+**fallback_if_unread：** 未完成本 reference 所需的检查时，只能报告 `not-run` / degraded；不得以 fixture、自检或 target-provided validator 伪造 readiness。
 
-## Quality Tiers
+Gate 随实际风险增长，不按固定 maturity 标签堆叠文件。
 
-| Tier | 使用场景 | 默认交付物 | 最小验证 |
-| --- | --- | --- | --- |
-| `scaffold` | 探索性、个人、短期、低误触发风险 | `SKILL.md`，必要时 1 个 small reference | `npm run lint:skill-entrypoints`、`git diff --check`；目标 package 提供 `quick_validate.py` 时加跑 |
-| `production` | 团队复用、route confusion 真实存在、输出质量重要 | lean `SKILL.md`、必要 references、trigger/boundary eval | scaffold 验证 + 聚焦 Jest contract + `spec-skill-audit` target run |
-| `library` | 共享基础能力，或会影响其他 skill 写作/治理 | trigger positive/negative/near-neighbor eval、packaging readiness、维护说明 | production 验证 + package smoke 或 runtime sync test |
-| `governed` | 安全、合规、发布、事故、组织规范、高权限脚本 | owner、review cadence、rollback boundary、trust/security notes | library 验证 + owner/review evidence 或 proposal-only 限制 |
+## Base Mechanical Gate
 
-默认从 `scaffold` 起步；只有复用、误触发、治理或分发风险真实存在时才升级。
+所有 package 先运行 bundled validator。先从当前已加载 `SKILL.md` 解析 package root 的绝对路径并记作 `SKILL_DIR`；不要依赖宿主预设同名环境变量：
 
-## Resource Boundary
+```bash
+node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
+```
 
-资源放置映射的概念 owner 见 [Skill Quality Vocabulary](skill-quality-vocabulary.md) 的 Information Hierarchy；本节只定义交付 gate 专属的准入规则（baseline 排除、非空目录必须被指向）。
+它只确认可机械判断的事实：路径 containment、no-follow inventory、frontmatter subset、名称/长度、引用、symlink/special file、资源和脚本清单。结果：
 
-资源只在当前需求需要时添加：
+- `pass` / exit 0：未发现 blocking mechanical finding；
+- `fail` / exit 1：确认 package mechanically invalid；
+- `incomplete` / exit 2：输入不可读、超预算或 YAML/文件类型超出 validator 能力。
 
-- `SKILL.md`：触发面、核心执行骨架、输出合同、branch selection、安全默认值。
-- `references/`：长规则、模式、示例、schema、tier/gate 细节。
-- `scripts/`：确定性、重复、容易手写错的逻辑。
-- `assets/`：输出中会复制或改造的模板/素材。
-- `evals/`：路由、边界或输出质量需要可回归证据。
+`pass` 不等于语义正确、安全或 package-ready。
 
-不要创建空目录、装饰性 reports、未引用 references、未请求 adapters、宽泛配置旋钮。新增非空目录必须被 `SKILL.md` 指向，或被测试/packaging contract 覆盖。
+## Apply Preview Gate
 
-## Gate Selection
+create/revise apply 在写前生成 run-local preview manifest、host scope 与 exact candidate write set，并运行 `validate-authoring-preview.cjs`。它验证 hash/snapshot、path set、collision、source/runtime boundary 和 host binding；它不证明真实用户授权、Design Record 质量或 patch 语义。宿主检查 exact write set 是否仍被当前轮明确 create/revise 请求覆盖，仅在 root/scope 扩大、未覆盖的 dirty overwrite 或新增 external/network/高风险副作用时重新确认。写入仍使用原子 expected-old-hash / expected-nonexistence conditional patch primitive；没有该能力时 mutation readiness 必须为 `not-ready`，不可 apply 或声明确定性 gate 已关闭。写后 receipt 必须逐 path 核对 after hash；partial failure 只报告当前 diff、changed/unchanged 和 rollback preview，不自动回滚。
 
-按改动类型选择最窄 gate：
+## Risk-Triggered Checks
 
-| 改动 | 需要的证据 |
+| Signal | Additional evidence |
 | --- | --- |
-| `description` / route 边界 | trigger/boundary eval，near-neighbor case，`npm run lint:skill-entrypoints` |
-| branch / context pointer / information hierarchy | branch list or reviewer note，`SKILL.md` pointer 说明读取条件，failure/expected eval 覆盖弱 pointer 或 sprawl 风险 |
-| source/runtime 边界 | contract test 或 runtime sync test，禁止手改 generated mirrors |
-| 新增 standalone skill | `skills-governance.json`、runtime catalog、public workflow summary test |
-| 新增 reference | `SKILL.md` 有清晰读取条件；入口 lint / 可用 quick validate 通过 |
-| 新增 eval | normalized cases valid；覆盖 positive、negative/near-neighbor 或 boundary |
-| 可分发 package | 目标 package 提供时运行官方 `quick_validate.py`；可行时 package smoke，确认不依赖 maintainer-only evidence |
-| 写入脚本或 shell 行为 | 脚本语法/单测、安全边界、失败 reason_code |
-| 复杂或高风险语义行为 | fresh-source eval、forward-testing 或人工 reviewer note；若未执行，记录 `not_checked_with_reason` |
+| description / route 变化 | realistic positive、negative、near-neighbor fixtures；需要声明行为充分性时运行 fresh-source semantic sample，runner 不可用则记录 `not_run` 与原因 |
+| persona、few-shot、输出合同或 agent loop 变化 | good/bad/why 或等价边界样例；成功路径、近邻错误、主要 failure mode 的 fresh-source sample；完成/停止声明与直接证据对应 |
+| 新增或移动 reference | 每个 runtime reference 有明确 pointer；validator 引用检查通过 |
+| 新增 script/shell | syntax/unit test、输入/输出/权限/失败行为；确认不读取 secret、不越出授权 root |
+| 外部或未知 package | validate-only、no-follow inventory、零 package-code execution；无法确认 provenance 的 validator 不运行 |
+| same-repo migration | 每个未知文件有 disposition；写前后 realpath containment 复核 |
+| target-specific metadata | 读取 target profile，记录 source、核对日期、limitations 和实际 target evidence |
+| project governance/catalog/runtime | 读取 project profile；先改 source/governance，再运行 generator/init，不手改派生物 |
+| 高权限/network/外发/不可逆行为 | explicit-only intent、最小权限、允许数据/目的地、secret redaction、确认点与 rollback |
+| 可分发 package | 实际 target payload smoke；确认 runtime 不依赖 `evals/`、reports 或 repo-local docs |
 
-如果改动来自外部 skill 借鉴，证据还要说明 external benchmark -> local fit 的转换结果：哪些 pattern 被吸收，哪些 invocation 假设、wording 或平台能力没有复制。
+## Trusted Validator Boundary
 
-## Packaging Readiness
+只运行以下 validator：
 
-对 package-ready 或 library/governed skill，必须说明：
+- 本 Skill bundled 的 `scripts/validate-skill.cjs`；
+- 来源、版本和调用方式已固定并可回源的官方工具；
+- 用户明确授权且经过 trust review 的其他工具。
 
-- runtime 用户是否需要 `agents/openai.yaml` 或其他 host metadata。
-- package-local runtime 依赖只来自 `SKILL.md`、`references/`、必要 `scripts/`、必要 `assets/`。
-- `evals/`、reports、历史计划、repo-local validation docs 默认是 maintainer evidence，不是 runtime 必读依赖。
-- target-specific packaging claims 必须有实际 target 或明确 `not_checked_with_reason`。
+不得因为目标 package 内存在 `quick_validate.py`、`validate.sh`、package script 或 hook 就执行。未知工具只记录路径和 `not_checked_with_reason`。
 
-## Output Eval Boundary
+## Eval Evidence
 
-只有当 skill 负责生成用户可见报告、教程、文档、UI/视觉证据或可审查 artifact 时，才要求 output eval。普通 authoring scaffold 不强制。
+按实际证据类型报告，不维护 maturity 等级：
 
-输出 eval 至少包含：
+- `not_run`：没有执行对应评测，附原因；
+- `structural-only`：fixture/schema/contract test，只证明结构与期望被消费；
+- `fresh-semantic`：fresh-source 单版本真实请求样例；
+- `comparative`：与固定 baseline/previous version 的对照；
+- `field-outcome`：代表性真实任务与用户结果。
 
-- real prompt / task shape
-- required input files when file-backed
-- required sections, paths, contracts, or boundary language
-- forbidden generic placeholders or unsafe actions
-- human review note when质量判断不能机械断言
+Route fixture 至少覆盖 positive、negative/near-neighbor、只读边界和一个主要 failure mode。复杂 prose 的输出评测应检查真实 artifact/response 是否满足判据，不接受“我已遵守指令”、隐藏自检或 checklist 勾选作为通过依据。没有 model runner 时不能把 structural-only 写成触发率或行为改善。
 
-不要把 fixture 或 recorded sample 描述成 provider-backed model evidence；没有真实 runner 时标记为 review input。
+## Five-Axis Readiness
 
-## Skill Quality Eval Boundary
+Closeout 分别报告，不能合成模糊总分：
 
-当本次改动改变 skill 写作方法、触发边界、信息层级或 completion criteria 时，优先补结构性 eval fixture。fixture 至少覆盖一个会漂移的行为，而不是只重复 happy path：
+- `portable`：portable package 结构和行为合同；
+- `target`：指定宿主 metadata、invocation、packaging；
+- `project`：本地规则、治理、catalog、source/runtime；
+- `semantic`：route/output 行为证据；
+- `mutation`：授权、containment、preview/diff 与 rollback。
 
-- `failure`：弱 context pointer、模糊 completion criterion、over-split granularity、package leak、auto-rewrite audit。
-- `expected`：branch-first 资源分配、sentence-level no-op pruning、source/runtime closeout、near-neighbor route。
+每轴使用 `ready|degraded|not-ready|not-applicable`，并附直接证据或限制。
 
-这些 fixture 是维护者 review input；没有真实 runner 或 fresh-source eval 时，不要把它描述成已证明模型行为改善。
+## Spec-First Project Closeout
 
-## Forward Testing Boundary
+只有目标项目确认为 spec-first 时应用：
 
-使用 forward-testing 只验证 skill 是否能泛化，不把它变成泄漏答案的二次 review。
+1. 修改 `skills/`、governance、templates/tests/docs 等 source。
+2. Runtime catalog 由 `npm run docs:runtime-catalog` 生成；它不是 source-owned consumer。
+3. Host runtime 只通过 `spec-first init` 投影；不得手改 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`。
+4. 运行与影响面匹配的聚焦 Jest、`npm run lint:skill-entrypoints`、`git diff --check`，再按需扩大。
+5. Source 变更更新 `CHANGELOG.md`；用户可见定位变化再更新 README/docs。
 
-- 只在复杂、团队复用、迁移、分发或高风险语义行为时要求；普通 scaffold 可标记 `not_checked_with_reason`。
-- 使用新上下文或 subagent 时，传入 skill 路径、真实请求形态和 raw artifact；不要传入预期答案、已知 bug、intended fix 或上轮结论。
-- 如果 forward-testing 会耗时很长、需要额外授权或会修改生产系统，先把拟运行 prompt 和风险交给用户确认。
-- 结果只作为语义证据；仍需结合 source patch、contract tests、可用 validator 和 audit smoke 判断是否可交付。
+## Closeout Envelope
 
-fresh-source eval 与 forward-testing 一样只提供语义证据。修改 skill/agent prose 后，如果宿主调度能力、时间或授权不足，记录 `not_checked_with_reason`；不要用当前会话已加载的旧 skill 行为冒充 fresh-source 验证。
-
-## Closeout
-
-交付时说明：
-
-- `mode` 和 `quality_tier`
-- `changed_surfaces`：source files、references、evals、tests、docs/catalog/governance
-- `deterministic_checks`：实际运行的命令，不写未运行命令
-- `eval_adequacy`：`L0 none`、`L1 structural`、`L2 semantic sample`、`L3 before/after` 或 `L4 production evidence`
-- `boundary_result`：source/runtime、mutation、handoff、verification 和 generated mirror 状态
-- `not_checked_with_reason`：未跑 validator、fresh-source eval、package smoke 或 runtime sync 时逐项说明
-- `residual_risks` 和必要下一步
+- `base_operation`、`effect`、`modifier`、`layer_result` 和 target/source owner；
+- `changed_surfaces` 与明确未修改 surfaces；
+- `deterministic_checks`；
+- `eval_adequacy` 与实际 semantic/comparative evidence；
+- five-axis readiness；
+- generated catalog/runtime 状态；
+- `not_checked_with_reason`；
+- residual risks 和下一步。

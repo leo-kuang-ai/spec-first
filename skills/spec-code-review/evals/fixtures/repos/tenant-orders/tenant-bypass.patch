@@ -1,0 +1,17 @@
+diff --git a/src/orders.js b/src/orders.js
+index c2c171b..f7dd522 100644
+--- a/src/orders.js
++++ b/src/orders.js
+@@ -1,11 +1,7 @@
+ 'use strict';
+ 
+ function getOrderForUser(orders, orderId, user) {
+-  const order = orders.find((candidate) => candidate.id === orderId);
+-  if (!order || order.tenantId !== user.tenantId) {
+-    return null;
+-  }
+-  return order;
++  return orders.find((candidate) => candidate.id === orderId) || null;
+ }
+ 
+ module.exports = { getOrderForUser };

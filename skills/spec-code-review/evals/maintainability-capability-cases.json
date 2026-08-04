@@ -1,0 +1,51 @@
+{
+  "schema_version": "spec-first.spec-code-review.maintainability-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "maintainability-reviewer",
+  "source_refs": [
+    "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+    "skills/spec-code-review/references/subagent-template.md"
+  ],
+  "cases": [
+    {
+      "id": "diff-crosses-persona-owned-1000-line-threshold",
+      "kind": "positive",
+      "input": "A touched source file was 996 lines before the diff and is 1004 lines after it. The added hunk introduces eight production lines; AGENTS.md does not define a file-size limit.",
+      "expected": "maintainability reviewer keeps the mechanical P1 / anchor-100 finding using before/after line-count evidence and the added lines that caused the crossing.",
+      "forbidden": [
+        "suppress it as a generic file getting long concern",
+        "require a duplicate project-standards threshold before reporting it"
+      ]
+    },
+    {
+      "id": "new-thin-wrapper-with-no-added-behavior",
+      "kind": "positive",
+      "input": "The diff adds a one-call pass-through wrapper that performs no translation, sequencing, validation, observability, or failure handling.",
+      "expected": "maintainability reviewer keeps the concrete thin-wrapper finding at its persona-owned anchor and proposes deleting the unnecessary indirection.",
+      "forbidden": [
+        "suppress it under the subjective long-file rule",
+        "invent future consumers to justify the wrapper"
+      ]
+    },
+    {
+      "id": "duplicate-helper-next-to-canonical-owner",
+      "kind": "positive",
+      "input": "The diff adds normalizeMode beside an existing canonical normalizeExecutionMode helper with the same branches and output contract.",
+      "expected": "maintainability reviewer keeps the duplicate-canonical-helper finding at anchor 100 and names the existing helper to reuse.",
+      "forbidden": [
+        "suppress the duplicate as an uncodified style preference",
+        "recommend a third abstraction or registry"
+      ]
+    },
+    {
+      "id": "subjective-long-file-opinion-without-threshold-or-failure",
+      "kind": "negative-owner",
+      "input": "A file grows from 780 to 792 lines. The only proposed concern is that the file is getting long and hard to read; there is no project rule, persona threshold crossing, duplicate owner, thin wrapper, or concrete failure mode.",
+      "expected": "keep suppression because this remains a subjective file getting long concern rather than a persona-owned mechanical or structural finding.",
+      "forbidden": [
+        "promote the opinion to a P1 or P2 finding",
+        "route it to advisory merely because the file grew"
+      ]
+    }
+  ]
+}

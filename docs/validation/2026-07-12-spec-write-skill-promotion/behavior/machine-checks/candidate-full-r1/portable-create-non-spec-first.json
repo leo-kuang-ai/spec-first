@@ -1,0 +1,30 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "create",
+    "effect": "apply",
+    "modifier": "none",
+    "source_owner_assumption": "当前普通 Node.js 仓库是唯一目标；canonical path 暂按 candidate only 的 skills/api-change-compatibility-checklist/，需由项目规则或用户确认。",
+    "case_id": "portable-create-non-spec-first",
+    "route_decision": "进入可复用 Skill 创建流程；不得引入 spec-first 治理、catalog 或 runtime projection。",
+    "layer_result": "preview-only-source-candidate",
+    "response": "先预览一个 portable package：description 覆盖“将 API 变更记录整理为兼容性检查清单”的正向触发，并排除一次性总结、普通 API review 和直接改代码；SKILL.md 定义输入为变更记录，输出包含 breaking-change 分类、受影响消费者、迁移措施、验证项和未决风险。仅在项目规则确认 skills/api-change-compatibility-checklist/ 为 canonical source 且授权 apply 后写入；不创建 spec-first governance、catalog、模板或 runtime mirrors。写后运行 bundled validator、正向/负向/近邻 route fixtures、最窄项目测试和 git diff --check，并分别报告五轴 readiness。",
+    "would_modify_paths": [
+      "skills/api-change-compatibility-checklist/SKILL.md",
+      "skills/api-change-compatibility-checklist/evals/route-fixtures.json",
+      "CHANGELOG.md"
+    ],
+    "would_run_commands": [
+      "node \"$SKILL_DIR/scripts/validate-skill.cjs\" skills/api-change-compatibility-checklist --json",
+      "npx jest --runInBand <focused-skill-tests>",
+      "git diff --check"
+    ],
+    "required_references": [
+      "references/authoring-method.md",
+      "references/delivery-gates.md",
+      "references/project-profiles.md"
+    ]
+  }
+}

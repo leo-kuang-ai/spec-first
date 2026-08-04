@@ -8,16 +8,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// 路口路由信号3 的 owner-owned gap 词表。与 check-prd-artifact.js:100 WHAT_TOUCHING_KEYWORDS
-// 同步(冻结契约,扩展须两边同步 + 加 fixture)。限定扫 Outstanding Questions 区域 + frontmatter
-// gap 字段,不扫 Requirements 正文(这些词在需求陈述里常见,全文扫会假阳使 final-prd 首次写几乎不可达)。
-// 必须声明在调用 ownerOwnedGapKeywordHit 的顶层执行段之前,否则触发 const TDZ。
-const WHAT_TOUCHING_KEYWORDS = [
-  'interface', '接口', 'availability', '可用性', 'permission', '权限',
-  'scope', '范围', 'source-of-truth', '数据权威', 'fallback', '降级',
-  'analytics', '埋点', '指标',
-];
-
 const projectDir = resolveProjectDir();
 const rawInput = readStdin();
 const input = parseJsonObject(rawInput);
@@ -56,24 +46,21 @@ if (!mutation.currentContent && !mutation.candidateContent && mutation.mutatedFr
 
 const identityText = [mutation.candidateContent, mutation.currentContent].filter(Boolean).join('\n');
 const prdIdentityPresent = isPrdRequirementsArtifact(identityText);
-const readyOrReceiptSignal = hasReadyOrReceiptMutationSignal(
-  [
-    mutation.candidateContent,
-    ...mutation.mutatedFragments,
-  ].filter(Boolean).join('\n'),
-);
-if (!prdIdentityPresent && !readyOrReceiptSignal) {
+const machineReadySignal = mutation.reconstructionDegraded
+  ? hasMachineReadyMutationSignal(mutation.mutatedFragments.join('\n'))
+  : machineReadyFieldsChanged(mutation.currentContent, mutation.candidateContent);
+if (!prdIdentityPresent && !machineReadySignal) {
   process.exit(0);
 }
 
 if (mutation.reconstructionDegraded) {
-  if (hasReadyOrReceiptMutationSignal(mutation.mutatedFragments.join('\n'))) {
+  if (hasMachineReadyMutationSignal(mutation.mutatedFragments.join('\n'))) {
     const reasonLines = [
       `[spec-first] PRD prewrite guard blocked ${toolName}.`,
       `Target: ${relativeTarget}`,
       '',
       'The hook could not reconstruct the full candidate PRD content for this mutation, but the edit payload directly changes machine-owned ready/final receipt fields.',
-      '`status: ready-for-planning`, `readiness_*` receipt fields, and the `write_mode=final-prd` + `can_enter_spec_plan=yes` ready pair are producer-owned. Do not write them through Claude file mutation tools.',
+      '`status: ready-for-planning` and `readiness_*` receipt fields are producer-owned. Do not write them through Claude file mutation tools; `write_mode=final-prd` + `can_enter_spec_plan=yes` is LLM-owned final intent and is checked at closeout until finalize writes the receipt.',
       'Run the producer-local finalize path instead: `node .claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js docs/brainstorms/<slug>-requirements.md --inputs <input-path>`.',
       '',
       'reconstruction_status: degraded',
@@ -88,13 +75,14 @@ if (!content) {
   process.exit(0);
 }
 
-const readyStatus = /^\s*status:\s*ready-for-planning\s*$/im.test(content);
-const machineReceipt = hasMachineReceiptField(content);
 const firstWrite = !fs.existsSync(absoluteTarget);
+if (!firstWrite && !machineReadySignal) {
+  process.exit(0);
+}
+
 const checkerReport = tryBuildCheckerReport(relativeTarget, content);
 const checkerFacts = checkerReport ? checkerReport.facts : null;
 const fallbackFacts = checkerFacts || buildFallbackFacts(content);
-const readyIntent = fallbackFacts.ready_claim_present === true;
 const hasDurableWriteMode = checkerFacts
   && typeof checkerFacts.write_mode === 'string'
   && checkerFacts.write_mode.length > 0
@@ -104,34 +92,15 @@ const hasFallbackDurableWriteMode = fallbackFacts.write_mode_declared_valid === 
 const missingWriteModeOnFirstWrite = firstWrite
   && (checkerFacts !== null ? !hasDurableWriteMode : !hasFallbackDurableWriteMode);
 
-// 路口路由文案:首次写带"该 grill"信号却直写 final-prd → 已被 readyIntent 拦(Codex 全禁 final
-// 首次写,因 checker 把 final-prd 当 claimsReady),此处只给命中信号的拦截加明确 grill 路由文案,
-// 不改变"所有 final-prd 首次写被拦"的现有语义。信号只判结构,不判 grill 律是否真执行(R12 天花板)。
-const hasDesignSignal = fallbackFacts.design_source_refs_present === true;
-const multiSourceCount = countMultiSourceInputs(content);
-const hasOwnerOwnedGap = ownerOwnedGapKeywordHit(content);
-const hasOutstandingQuestions = fallbackFacts.outstanding_questions_present === true;
-const hasGrillSignal = hasDesignSignal || multiSourceCount >= 2 || hasOwnerOwnedGap || hasOutstandingQuestions;
-const finalPrdOnFirstWriteWithSignal = firstWrite
-  && fallbackFacts.write_mode === 'final-prd'
-  && hasGrillSignal;
-
-if (readyStatus || machineReceipt || readyIntent || missingWriteModeOnFirstWrite) {
+if (machineReadySignal || missingWriteModeOnFirstWrite) {
   const reasonLines = [
     `[spec-first] PRD prewrite guard blocked ${toolName}.`,
     `Target: ${relativeTarget}`,
     '',
     'A new PRD artifact must declare a durable-write path in `write_mode` before the first durable Write.',
-    'A PRD artifact must not be written or mutated into ready/final state through Claude file mutation tools.',
-    '`status: ready-for-planning` and `readiness_*` receipt fields are machine-owned; use the producer-local finalize path after the Requirements Grill and readiness lens pass.',
+    'A PRD artifact must not write machine-owned ready receipt state through Claude file mutation tools.',
+    '`status: ready-for-planning` and `readiness_*` receipt fields are machine-owned. The LLM may write final intent (`write_mode: final-prd` + `can_enter_spec_plan: yes`) only after semantic closure; the Stop guard keeps closeout blocked until producer-local finalize writes a current receipt.',
   ];
-  if (finalPrdOnFirstWriteWithSignal) {
-    reasonLines.push(
-      '',
-      'This first PRD write carries a grill signal — design source refs, multi-source inputs, an owner-owned gap, or outstanding questions are present.',
-      '`final-prd` is never allowed on the first Write (it self-claims ready). Route into the Requirements Grill instead: `write_mode: ask-owner-first` to ask the next load-bearing owner question through the Interaction Method, or `write_mode: checkpoint-prd` with `can_enter_spec_plan: no` and `next_owner_question` to preserve recoverable context. `final-prd` is allowed only later, after every load-bearing branch reaches a Canonical stop point and no grill signal remains.',
-    );
-  }
   reasonLines.push(
     '',
     'Do not repair this by only changing enum values, deleting rich requirements, or rewriting the PRD into a checker-friendly skeleton.',
@@ -231,57 +200,6 @@ function isWithinRoot(candidatePath, rootPath) {
   return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
-// 信号2:source_inputs frontmatter 列表项数。≥2 项即多源信号(偏严,符合"尽可能澄清")。
-function countMultiSourceInputs(text) {
-  const lines = text.split(/\r?\n/);
-  if (lines[0] !== '---') return 0;
-  const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
-  if (fmEnd === -1) return 0;
-  const fm = lines.slice(1, fmEnd);
-  const start = fm.findIndex((line) => /^source_inputs:\s*$/.test(line));
-  if (start === -1) return 0;
-  let count = 0;
-  for (let i = start + 1; i < fm.length; i += 1) {
-    const line = fm[i];
-    if (/^[A-Za-z0-9_-]+:\s*/.test(line)) break;
-    if (/^\s*-\s+(.+?)\s*$/.test(line) || /^\s*path:\s+(.+?)\s*$/.test(line)) count += 1;
-  }
-  return count;
-}
-
-// 信号3:扫"模型自述未决区域"——Outstanding Questions section 文本 + frontmatter
-// next_owner_question / highest_risk_gap 字段值。不扫 Requirements 正文(避免假阳)。
-function ownerOwnedGapKeywordHit(text) {
-  const lines = text.split(/\r?\n/);
-  const candidates = [];
-
-  // frontmatter gap 字段值
-  if (lines[0] === '---') {
-    const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
-    if (fmEnd !== -1) {
-      const fm = lines.slice(1, fmEnd);
-      for (const line of fm) {
-        const m = line.match(/^\s*(next_owner_question|highest_risk_gap|preflight_sweep_closure)\s*:\s*(.*)$/i);
-        if (m && m[2]) candidates.push(m[2]);
-      }
-    }
-  }
-
-  // Outstanding Questions section 文本(到下一个 ## 或文末)
-  const oqStart = lines.findIndex((line) => /^##\s+Outstanding Questions/i.test(line));
-  if (oqStart !== -1) {
-    let end = lines.length;
-    for (let i = oqStart + 1; i < lines.length; i += 1) {
-      if (/^##\s/.test(lines[i])) { end = i; break; }
-    }
-    candidates.push(lines.slice(oqStart, end).join('\n'));
-  }
-
-  if (candidates.length === 0) return false;
-  const lower = candidates.join('\n').toLowerCase();
-  return WHAT_TOUCHING_KEYWORDS.some((kw) => lower.includes(kw.toLowerCase()));
-}
-
 function isPrdRequirementsArtifact(text) {
   return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(text);
 }
@@ -290,29 +208,46 @@ function hasMachineReceiptField(text) {
   return /^\s*(?:readiness_verified_by|readiness_verified_at|readiness_checker_schema|readiness_finding_count|readiness_blocking_count|readiness_prd_hash|readiness_inputs_hash)\s*:/im.test(text);
 }
 
-function hasReadyOrReceiptMutationSignal(text) {
+function hasMachineReadyMutationSignal(text) {
   if (!text) return false;
   if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
   if (hasMachineReceiptField(text)) return true;
-  return extractDeclarationValue(text, 'write_mode', [
-    'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
-  ]) === 'final-prd'
-    || extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']) === 'yes';
+  return false;
+}
+
+function machineReadyFieldsChanged(currentText, candidateText) {
+  return JSON.stringify(machineReadyFieldState(currentText))
+    !== JSON.stringify(machineReadyFieldState(candidateText));
+}
+
+function machineReadyFieldState(text) {
+  const lines = String(text || '').split(/\r?\n/);
+  if (lines[0] !== '---') return {};
+  const end = lines.findIndex((line, index) => index > 0 && line === '---');
+  if (end === -1) return {};
+  const state = {};
+  for (const line of lines.slice(1, end)) {
+    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (!match) continue;
+    const key = match[1].toLowerCase();
+    const value = match[2].replace(/^["']|["']$/g, '').trim();
+    const machineOwned = key === 'status'
+      ? value.toLowerCase() === 'ready-for-planning'
+      : /^readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)$/.test(key);
+    if (!machineOwned) continue;
+    if (!state[key]) state[key] = [];
+    state[key].push(value);
+  }
+  return state;
 }
 
 function buildFallbackFacts(text) {
   const writeMode = extractDeclarationValue(text, 'write_mode', [
     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
   ]);
-  const canEnterSpecPlan = extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']);
   return {
     write_mode: writeMode,
     write_mode_declared_valid: Boolean(writeMode),
-    ready_claim_present: /^\s*status:\s*ready-for-planning\s*$/im.test(text)
-      || writeMode === 'final-prd'
-      || canEnterSpecPlan === 'yes',
-    design_source_refs_present: detectDesignSourceRefs(text),
-    outstanding_questions_present: /^##\s+Outstanding Questions/im.test(text),
   };
 }
 
@@ -331,16 +266,12 @@ function escapeRegExp(value) {
   return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
-function detectDesignSourceRefs(text) {
-  return /(?:figma\.com|mastergo\.com|js\.design|sketch\.cloud|axure|modao|摹客|蓝湖|lanhuapp|设计稿|design source|design link)/i.test(text);
-}
-
 function buildCandidateContent(currentToolName, currentToolInput, absolutePath) {
   if (currentToolName === 'Write') {
     const writeContent = typeof currentToolInput.content === 'string' ? currentToolInput.content : '';
     return {
       candidateContent: writeContent,
-      currentContent: '',
+      currentContent: readExistingFile(absolutePath),
       mutatedFragments: writeContent ? [writeContent] : [],
       reconstructionDegraded: false,
     };
@@ -358,7 +289,9 @@ function buildCandidateContent(currentToolName, currentToolInput, absolutePath) 
 
   if (currentToolName === 'Edit') {
     const edit = normalizeEdit(currentToolInput);
-    const fragments = edit ? [edit.newString] : collectMutationFragments(currentToolName, currentToolInput);
+    const fragments = edit
+      ? [edit.oldString, edit.newString]
+      : collectMutationFragments(currentToolName, currentToolInput);
     const applied = edit ? applySingleEdit(currentContent, edit) : null;
     return {
       candidateContent: applied && applied.ok ? applied.text : '',
@@ -387,7 +320,7 @@ function buildCandidateContent(currentToolName, currentToolInput, absolutePath) 
     return {
       candidateContent: degraded ? '' : nextContent,
       currentContent,
-      mutatedFragments: edits.map((edit) => edit.newString),
+      mutatedFragments: edits.flatMap((edit) => [edit.oldString, edit.newString]),
       reconstructionDegraded: degraded,
     };
   }
@@ -435,11 +368,13 @@ function collectMutationFragments(currentToolName, currentToolInput) {
     return typeof currentToolInput.content === 'string' ? [currentToolInput.content] : [];
   }
   if (currentToolName === 'Edit') {
-    return typeof currentToolInput.new_string === 'string' ? [currentToolInput.new_string] : [];
+    return [currentToolInput.old_string, currentToolInput.new_string]
+      .filter((value) => typeof value === 'string');
   }
   if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
     return currentToolInput.edits
-      .map((entry) => (entry && typeof entry.new_string === 'string' ? entry.new_string : ''))
+      .flatMap((entry) => (entry ? [entry.old_string, entry.new_string] : []))
+      .filter((value) => typeof value === 'string')
       .filter(Boolean);
   }
   return [];

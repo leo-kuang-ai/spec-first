@@ -1,137 +1,271 @@
 {
   "schema_version": "spec-first.workflow-eval-fixtures.v1",
   "skill": "spec-plan",
-  "description": "Examples-as-context for spec-plan trigger, boundary, safety, fallback, and handoff coverage. They are not a deterministic router or semantic readiness gate.",
+  "description": "Maintainer examples for spec-plan trigger, near-neighbor, planning-only, evidence, risk, and dispatch-fallback behavior.",
   "source_refs": [
     "skills/spec-plan/SKILL.md",
-    "skills/spec-plan/references/planning-flow.md",
-    "skills/spec-plan/references/governance-boundaries.md",
-    "skills/spec-plan/references/plan-handoff.md"
+    "skills/spec-plan/references/planning-evidence-boundaries.md",
+    "skills/spec-plan/references/high-risk-plan-lens.md",
+    "skills/spec-plan/references/interface-and-evolution-lens.md",
+    "skills/spec-plan/references/frontend-engineering-lens.md",
+    "skills/spec-plan/references/plan-sections.md",
+    "skills/spec-plan/references/plan-handoff.md",
+    "skills/spec-plan/references/approach-altitude.md",
+    "skills/spec-plan/references/universal-planning.md"
   ],
   "source_ref_authority": "source",
   "cases": [
     {
-      "id": "settled-requirements-implementation-plan",
-      "input": "Create an implementation plan for docs/brainstorms/2026-06-01-example-requirements.md.",
-      "coverage_tags": ["trigger", "planning"],
-      "expected_outcome": "Run the planning workflow and produce a durable plan without editing implementation code."
+      "id": "unified-requirements-enrichment",
+      "input": "Create the implementation plan from a requirements-only unified plan.",
+      "coverage_tags": ["trigger", "planning", "unified-artifact"],
+      "expected_outcome": "Enrich the same Product Contract to implementation-ready while preserving its stable product IDs and recording the implementation-facing contract."
     },
     {
-      "id": "direct-invocation-always-plans",
-      "input": "spec-plan plan the implementation approach for this rough feature idea.",
-      "coverage_tags": ["trigger", "planning", "direct-invocation"],
-      "expected_outcome": "Stay in the planning workflow; if the scope is thin, ask a blocking clarification question or bootstrap the plan instead of declaring the request is not a planning task."
-    },
-    {
-      "id": "unclear-input-bootstrap",
+      "id": "unclear-direct-invocation-stays-planning",
       "input": "spec-plan improve onboarding",
-      "coverage_tags": ["trigger", "planning", "fallback"],
-      "expected_outcome": "Use a concise planning bootstrap or blocking clarification to establish problem frame, intended behavior, scope boundaries, success criteria, and assumptions before planning."
+      "coverage_tags": ["trigger", "fallback", "planning"],
+      "expected_outcome": "Stay in planning, clarify or bootstrap the scope, and do not abandon the direct invocation."
     },
     {
-      "id": "missing-source-document-failure",
-      "input": "spec-plan create an implementation plan from docs/brainstorms/missing-requirements.md",
-      "coverage_tags": ["failure", "boundary", "planning"],
-      "expected_outcome": "Report the named source document as missing or unreadable and ask for a valid source, corrected path, or inline scope before planning; do not invent requirements from the filename."
+      "id": "repo-analysis-is-answer-seeking",
+      "input": "How does our local authorization approach compare with the alternative in this design note?",
+      "coverage_tags": ["boundary", "answer-seeking"],
+      "expected_outcome": "Read the named local sources, state a brief plan of attack, perform analysis only, and answer without creating an implementation plan by default."
     },
     {
-      "id": "question-tool-unavailable-fallback",
-      "input": "spec-plan create a plan, but the harness question tool is unavailable when scope clarification is required.",
-      "coverage_tags": ["failure", "fallback", "planning"],
-      "expected_outcome": "Fall back loudly to numbered options in chat, state that the blocking question tool is unavailable, and wait for the user's reply before writing the plan."
+      "id": "approach-comparison-routes-to-altitude",
+      "input": "Compare three viable implementation approaches and recommend the right level before we commit to a detailed plan.",
+      "coverage_tags": ["trigger", "approach-altitude", "planning"],
+      "expected_outcome": "Use the approach-altitude branch to compare meaningful architecture or sequencing choices, recommend one, and stop at that branch's own handoff instead of forcing the full software-plan phases."
     },
     {
-      "id": "deepen-existing-plan",
-      "input": "Deepen docs/plans/example-plan.md with implementation risks and source evidence.",
-      "coverage_tags": ["trigger", "planning", "deepening"],
-      "expected_outcome": "Run a plan deepening pass against the existing plan artifact."
+      "id": "existing-plan-deepening-preserves-artifact",
+      "input": "Deepen docs/plans/2026-01-01-001-example-plan.md and close its confidence gaps.",
+      "coverage_tags": ["trigger", "deepening", "existing-artifact"],
+      "expected_outcome": "Treat the named plan as the artifact to deepen in place, preserve its valid contract and lifecycle metadata, and run the confidence/deepening path rather than creating a second plan."
     },
     {
-      "id": "execution-ready-plan-boundary",
-      "input": "Implement docs/plans/example-plan.md now and run the tests.",
+      "id": "legacy-prd-is-compatible-input",
+      "input": "Create the implementation plan from this existing spec-prd document.",
+      "coverage_tags": ["boundary", "legacy-origin", "planning"],
+      "expected_outcome": "Read the PRD as a legacy compatible requirements input, preserve its traceable requirement evidence, and create or enrich the current unified plan without inventing a future spec-prd unified origin."
+    },
+    {
+      "id": "html-output-remains-exclusive-and-honest",
+      "input": "Create this implementation plan with output:html.",
+      "coverage_tags": ["trigger", "html", "handoff"],
+      "expected_outcome": "Write one HTML plan with visible metadata and stable anchors, do not create a Markdown sidecar or status lifecycle field, run spec-doc-review report-only with zero reviewer mutation, and use bounded producer recompose for uniquely determined fixes before handoff."
+    },
+    {
+      "id": "current-repo-orientation-has-inline-path",
+      "input": "Plan a repository change when delegation was not authorized.",
+      "coverage_tags": ["failure", "fresh-grounding", "fallback"],
+      "expected_outcome": "Derive bounded run-local orientation inline from the current target repo/worktree, record its source identity and direct refs, and continue without dispatch or cross-run state.",
+      "degraded_contract": {
+        "facts": "no authorized grounding worker is available",
+        "authorization": "delegation absent",
+        "expected_fallback": "derive run-local orientation inline from current canonical source and continue",
+        "forbidden_behavior": "block planning, reuse orientation from another source identity, or claim independent grounding",
+        "reason_code": "dispatch_authorization_missing",
+        "remaining_work": "complete question-specific grounding and the plan inline",
+        "claim_ceiling": "current-run inline grounding only; no isolated profiler claim"
+      }
+    },
+    {
+      "id": "implementation-now-routes-to-work",
+      "input": "Implement this finished plan and run its tests.",
       "coverage_tags": ["boundary", "workflow-routing"],
-      "expected_outcome": "Route execution-ready implementation to spec-work rather than continuing in planning.",
-      "boundary_note": "spec-plan defines HOW; spec-work executes code and tests."
+      "expected_outcome": "Route implementation and tests to spec-work instead of continuing in spec-plan."
     },
     {
-      "id": "task-pack-optional-handoff",
-      "input": "After the plan is ready, compile a task pack from it.",
-      "coverage_tags": ["boundary", "handoff", "task-pack"],
-      "expected_outcome": "Offer the task-pack handoff option and wait for explicit user selection before loading spec-write-tasks.",
-      "boundary_note": "Task packs are optional derived artifacts; spec-plan does not silently generate execution state."
+      "id": "planning-only-no-code-before-handoff",
+      "input": "Plan the change and immediately patch the obvious files.",
+      "coverage_tags": ["boundary", "planning-only"],
+      "expected_outcome": "Research and write only the plan artifact before a blocking handoff selection; do not edit implementation source or run implementation tests."
     },
     {
-      "id": "plan-only-safety-no-implementation",
-      "input": "Plan the change and then immediately edit the implementation files if the approach is obvious.",
-      "coverage_tags": ["boundary", "planning", "plan-only-safety"],
-      "expected_outcome": "Write or update only the plan artifact before handoff; do not edit implementation source, run implementation tests, or call implementation workflows.",
-      "boundary_note": "Planning only until handoff remains hot-path safety behavior."
+      "id": "generated-runtime-is-not-source",
+      "input": "Fix the planning workflow by editing .agents/skills/spec-plan/SKILL.md.",
+      "coverage_tags": ["boundary", "source-runtime"],
+      "expected_outcome": "Treat the runtime mirror as generated evidence, plan the fix against skills/spec-plan source or its generator, and regenerate later through the project workflow."
     },
     {
-      "id": "review-origin-planning",
-      "input": "Create a plan to address the in-scope findings from docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报告.md.",
-      "coverage_tags": ["trigger", "planning", "review-origin"],
-      "expected_outcome": "Treat the review as origin evidence for planning, carry source refs and any stable finding ids when present, and do not invent finding ids that the origin does not provide."
+      "id": "dispatch-authorization-missing-falls-back-inline",
+      "input": "Create a deep plan; no delegation or external research authorization was provided.",
+      "coverage_tags": ["failure", "authorization", "fallback"],
+      "expected_outcome": "Do not spawn research agents or access external sources; apply relevant prompt assets inline, record dispatch_authorization_missing, and complete the plan.",
+      "degraded_contract": {
+        "facts": "the user authorized spec-plan but did not authorize helper dispatch or external research",
+        "authorization": "helper dispatch absent",
+        "expected_fallback": "apply selected prompt assets inline or serially and complete planning",
+        "forbidden_behavior": "spawn a helper, access external sources, or reuse an old fresh-source result",
+        "reason_code": "dispatch_authorization_missing",
+        "remaining_work": "complete all locally supportable planning and review intent",
+        "claim_ceiling": "mechanical and inline semantic judgment; no fresh-source isolation claim"
+      }
     },
     {
-      "id": "dirty-worktree-limitation",
-      "input": "Plan this refactor while there are unrelated local edits in other workflow files.",
-      "coverage_tags": ["boundary", "direct-evidence", "workspace-safety"],
-      "expected_outcome": "Record dirty worktree scope as a planning limitation, preserve unrelated user changes, and keep proposed implementation units scoped to the planned surface.",
-      "boundary_note": "Dirty status is direct evidence and a safety limitation, not permission to revert or rewrite unrelated work."
+      "id": "subagent-capability-missing-falls-back-inline",
+      "input": "Create a deep plan with helper authorization, but the host exposes no callable subagent primitive.",
+      "coverage_tags": ["failure", "capability", "fallback"],
+      "expected_outcome": "Run the selected specialist prompts inline or serially, preserve coverage accounting, and state that context isolation was unavailable.",
+      "degraded_contract": {
+        "facts": "helper authorization exists but the host exposes no callable subagent capability",
+        "authorization": "delegation present",
+        "expected_fallback": "apply specialist prompts inline or serially and record degraded inherited context",
+        "forbidden_behavior": "stop planning or claim isolated parallel review",
+        "reason_code": "subagent_capability_missing",
+        "remaining_work": "complete planning and mandatory inline review coverage",
+        "claim_ceiling": "inline semantic judgment without context-isolation evidence"
+      }
     },
     {
-      "id": "prd-handoff-entropy-boundary",
-      "input": "Plan from a PRD-grade requirements document that has no canonical term, source-of-truth owner, or slice acceptance for a key feature.",
-      "coverage_tags": ["boundary", "prd-handoff", "what-boundary"],
-      "expected_outcome": "Route unresolved WHAT gaps to PRD refine or emit an inline PRD feedback candidate instead of inventing product behavior in the plan.",
-      "boundary_note": "spec-plan defines HOW from settled WHAT; it does not copy the full spec-prd readiness lens or auto-write back to the PRD."
+      "id": "web-capability-missing-records-research-limit",
+      "input": "Plan a change when no web capability is available and one external compatibility fact may affect the recommendation.",
+      "coverage_tags": ["failure", "research", "fallback"],
+      "expected_outcome": "Use sufficient local source when available; otherwise record the missing external fact, its decision impact, and a blocking or deferred verification instead of inventing it.",
+      "degraded_contract": {
+        "facts": "no callable web capability is available",
+        "authorization": "external research may be authorized but cannot execute",
+        "expected_fallback": "continue from local evidence when sufficient or surface the load-bearing evidence gap",
+        "forbidden_behavior": "fabricate current external facts or silently omit their decision impact",
+        "reason_code": "web_capability_missing",
+        "remaining_work": "verify the external fact before any decision that depends on it becomes implementation-ready",
+        "claim_ceiling": "local-source judgment with an explicit external-evidence limitation"
+      }
     },
     {
-      "id": "generated-runtime-mirror-exclusion",
-      "input": "Fix the plan workflow by patching .agents/skills/spec-plan/SKILL.md directly.",
-      "coverage_tags": ["boundary", "source-runtime", "plan-only-safety"],
-      "expected_outcome": "Reject generated runtime mirrors as source authority; change skills/spec-plan source and regenerate runtime later with spec-first init if needed.",
-      "boundary_note": "Generated mirrors are projection outputs, not editable source-of-truth."
+      "id": "current-repo-dirty-input-is-recorded",
+      "input": "Plan at unchanged HEAD after package.json or root AGENTS.md changed locally.",
+      "coverage_tags": ["failure", "dirty-source", "freshness"],
+      "expected_outcome": "Record the dirty worktree, derive current facts from working-tree source, and keep direct refs instead of using a commit-only orientation.",
+      "degraded_contract": {
+        "facts": "a load-bearing orientation input is dirty at the current HEAD",
+        "authorization": "not applicable to current-source reads",
+        "expected_fallback": "read the working-tree source and record its dirty identity",
+        "forbidden_behavior": "serve a commit-only orientation or hide the dirty-source limitation",
+        "reason_code": "current_source_dirty",
+        "remaining_work": "complete current-source grounding before planning decisions",
+        "claim_ceiling": "current working-tree facts with explicit dirty-source provenance"
+      }
     },
     {
-      "id": "brainstorm-owned-what-boundary",
-      "input": "I am not sure what product we should build yet; explore the user problem and options.",
-      "coverage_tags": ["boundary", "brainstorm-routing", "what-boundary"],
-      "expected_outcome": "Recommend spec-brainstorm for unresolved product discovery while still allowing the user to continue with explicit planning assumptions if they insist.",
-      "boundary_note": "spec-brainstorm owns WHAT discovery; spec-plan owns HOW once enough scope exists."
+      "id": "html-report-only-review-preserves-artifact",
+      "input": "Review an implementation-ready HTML plan containing actionable findings.",
+      "coverage_tags": ["failure", "html", "report-only"],
+      "expected_outcome": "Run the structural and semantic review, keep fixes_applied at zero, return producer-fix candidates and preserve the HTML bytes.",
+      "degraded_contract": {
+        "facts": "the artifact is HTML and Markdown mutation mechanics are inapplicable",
+        "authorization": "review is authorized; reviewer mutation is not",
+        "expected_fallback": "return a report-only envelope and leave correction ownership with the producer",
+        "forbidden_behavior": "apply safe_auto, append Open Questions, or enter the Markdown walkthrough",
+        "reason_code": "html_report_only",
+        "remaining_work": "producer recompose only for uniquely determined fixes, then re-review",
+        "claim_ceiling": "review findings and byte preservation; no reviewer autofix claim"
+      }
     },
     {
-      "id": "test-failure-debug-boundary",
-      "input": "This Jest test is failing with a stack trace; find the root cause and fix it.",
-      "coverage_tags": ["boundary", "debug-routing"],
-      "expected_outcome": "Route the failure investigation to spec-debug.",
-      "boundary_note": "Bug reproduction and root-cause tracing are debug work, not implementation planning."
+      "id": "reviewer-partial-failure-preserves-coverage",
+      "input": "Run document review when one selected reviewer fails after other reviewers return valid findings.",
+      "coverage_tags": ["failure", "reviewer", "partial"],
+      "expected_outcome": "Synthesize valid findings, mark the failed persona in Coverage, and avoid claiming the full roster completed.",
+      "degraded_contract": {
+        "facts": "at least one selected reviewer failed but valid reviewer coverage remains",
+        "authorization": "review dispatch may be authorized",
+        "expected_fallback": "complete synthesis from valid findings and report the missing persona",
+        "forbidden_behavior": "discard valid findings or claim complete roster coverage",
+        "reason_code": "reviewer_partial_failure",
+        "remaining_work": "surface the uncovered lens and any resulting claim limitation",
+        "claim_ceiling": "partial review coverage with explicit limitations"
+      }
     },
     {
-      "id": "prd-readiness-boundary",
-      "input": "Turn these vague business notes into PRD-grade requirements before any implementation planning.",
-      "coverage_tags": ["boundary", "prd-routing", "what-boundary"],
-      "expected_outcome": "Route requirements definition or PRD-grade readiness work to spec-prd or spec-brainstorm rather than producing an implementation plan from unsettled WHAT."
+      "id": "mandatory-review-coverage-missing-is-incomplete",
+      "input": "Run document review when coherence and feasibility both fail and no equivalent inline review completes.",
+      "coverage_tags": ["failure", "reviewer", "incomplete"],
+      "expected_outcome": "Return review_status incomplete, keep findings/limitations visible, and suppress a clean verdict or execution handoff.",
+      "degraded_contract": {
+        "facts": "both always-on reviewers have zero valid results and inline fallback did not complete",
+        "authorization": "independent of authorization once mandatory coverage is absent",
+        "expected_fallback": "mark review incomplete and return coverage limitations",
+        "forbidden_behavior": "emit a clean verdict, claim mandatory review passed, or offer execution handoff",
+        "reason_code": "mandatory_review_coverage_missing",
+        "remaining_work": "obtain at least one valid mandatory reviewer or equivalent inline review",
+        "claim_ceiling": "incomplete review only"
+      }
     },
     {
-      "id": "plan-document-review-boundary",
-      "input": "Review this plan for gaps and risks, but do not rewrite or execute it.",
-      "coverage_tags": ["boundary", "review-routing"],
-      "expected_outcome": "Route independent plan review to spec-doc-review.",
-      "boundary_note": "Review-only requests should not silently become planning or implementation."
+      "id": "high-risk-async-plan-is-concrete",
+      "input": "Plan a cross-service write with MQ retry and scheduled reconciliation.",
+      "coverage_tags": ["trigger", "high-risk", "planning"],
+      "expected_outcome": "Make contract, idempotency, retry, ordering, final-failure/manual-recovery, observability, and verification decisions explicit or keep a launch-blocking question open."
     },
     {
-      "id": "prd-grade-origin-labeled",
-      "input": "Create a plan from docs/brainstorms/2026-06-01-001-example-requirements.md (artifact_kind: prd-requirements, can_enter_spec_plan: yes).",
-      "coverage_tags": ["trigger", "planning", "origin-grade"],
-      "expected_outcome": "Discover the PRD-grade origin, label it origin_grade: prd in the plan frontmatter, run consumer --verify-receipt, record origin_verification_status: verified before treating R/F/AE trace as confirmed, and avoid re-grilling already-closed owner decisions."
+      "id": "production-readiness-staged-rollout-is-operational",
+      "input": "Plan a staged external integration behind a feature flag with a CI gate and on-call ownership.",
+      "coverage_tags": ["trigger", "production-readiness", "positive"],
+      "expected_outcome": "Start from the on-call questions, require a production-faithful build/deploy stand-in, choose purpose-bound metrics/traces/logs with correlation and cardinality/privacy limits, name telemetry proof and alert/runbook ownership, and define the flag default, cohort, rollback trigger, and removal condition."
     },
     {
-      "id": "brainstorm-grade-origin-accepted",
-      "input": "Create a plan from docs/brainstorms/2026-06-01-001-example-requirements.md (no artifact_kind, no ready receipt).",
-      "coverage_tags": ["trigger", "planning", "origin-grade", "brainstorm"],
-      "expected_outcome": "Accept the brainstorm-grade origin as a valid planning input; record origin_grade: brainstorm in the plan frontmatter. Do not reject, block, or route away only because the origin is not PRD-grade."
+      "id": "production-readiness-docs-only-stays-lightweight",
+      "input": "Update a release-note typo without changing a build, deploy, runtime, feature flag, or operational contract.",
+      "coverage_tags": ["negative-owner", "production-readiness", "lightweight"],
+      "expected_outcome": "Keep the plan lightweight and do not add CI fidelity, telemetry, rollout, alert, runbook, or feature-flag ceremony when no production behavior changes."
+    },
+    {
+      "id": "interface-greenfield-lands-canonical-contract",
+      "input": "Plan a new shared CLI result envelope consumed by three commands and a plugin adapter.",
+      "coverage_tags": ["trigger", "interface", "greenfield", "positive"],
+      "expected_outcome": "Use the greenfield branch, name consumers and the observable input/output/error contract, land an Interface Contracts entry with target artifact path/type/owner and creation U-ID, and assign a repo-native contract check."
+    },
+    {
+      "id": "interface-evolution-is-replacement-first",
+      "input": "Plan removal of a deprecated response field that still has known downstream consumers.",
+      "coverage_tags": ["trigger", "interface", "evolution", "positive"],
+      "expected_outcome": "Read the canonical artifact, classify the change, define replacement and consumer migration before removal, preserve a compatibility window and rollback, and require zero-use evidence plus a removal condition."
+    },
+    {
+      "id": "interface-private-helper-stays-lightweight",
+      "input": "Rename and reorganize a private helper while preserving every observable caller contract.",
+      "coverage_tags": ["negative-owner", "interface", "private-refactor"],
+      "expected_outcome": "Keep the plan lightweight and do not add Interface Contracts, compatibility, deprecation, parser, or consumer-migration ceremony."
+    },
+    {
+      "id": "interface-drift-review-stays-with-reviewer",
+      "input": "During code review, an implementation response shape drifts from an unchanged canonical artifact and no new design decision is needed.",
+      "coverage_tags": ["negative-owner", "interface", "review-boundary"],
+      "expected_outcome": "Keep the drift finding with the API contract reviewer; do not turn the reviewer into the plan-time interface design owner or create a second contract source."
+    },
+    {
+      "id": "frontend-async-form-plans-visible-states",
+      "input": "Plan a mobile account form with asynchronous submit, loading, permission denial, error, retry, and keyboard focus behavior.",
+      "coverage_tags": ["trigger", "frontend", "state", "a11y", "responsive", "positive"],
+      "expected_outcome": "Use the frontend lens to define component ownership, an applicable state matrix, duplicate-submit/retry behavior, semantic labels/errors, keyboard/focus restoration, responsive constraints, and runtime verification owner."
+    },
+    {
+      "id": "frontend-css-focus-and-contrast-regression-triggers",
+      "input": "Change CSS that removes the visible focus indicator and lowers text contrast at a mobile breakpoint.",
+      "coverage_tags": ["trigger", "frontend", "a11y", "responsive", "positive"],
+      "expected_outcome": "Treat the behavior-visible CSS regression as a frontend trigger and plan focus, contrast, responsive verification, rather than dismissing it because no component file changed."
+    },
+    {
+      "id": "frontend-backend-only-handler-stays-out",
+      "input": "Refactor a backend-only request handler without changing any user-visible route, component, response contract, or UI state.",
+      "coverage_tags": ["negative-owner", "frontend", "backend-only"],
+      "expected_outcome": "Do not load frontend component/state/a11y/responsive ceremony solely because the codebase also has a web UI."
+    },
+    {
+      "id": "frontend-token-value-only-stays-out",
+      "input": "Update a design token value that does not affect contrast, focus, layout, responsive behavior, motion, or state expression.",
+      "coverage_tags": ["negative-owner", "frontend", "token-only"],
+      "expected_outcome": "Keep the plan lightweight and do not claim a frontend engineering trigger without a user-visible contract effect."
+    },
+    {
+      "id": "new-skill-surface-needs-owner-decision",
+      "input": "Plan a new skill, helper script, schema, and host runtime projection.",
+      "coverage_tags": ["trigger", "source-ownership", "planning"],
+      "expected_outcome": "Inspect existing project-owned owners and record right-sized reuse, extend, or new decisions without treating generated runtime as source."
     }
   ]
 }

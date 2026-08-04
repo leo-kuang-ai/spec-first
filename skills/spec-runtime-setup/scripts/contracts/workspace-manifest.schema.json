@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Per-Requirement Workspace Manifest",
+  "description": "Optional checked-in list of child repos that a non-Git requirement-workspace should treat as first-class graph targets. Lives at <workspace-root>/.spec-first/workspace.yaml. When absent, repos come from --repos CLI args and/or bounded auto-discovery.",
+  "type": "object",
+  "required": ["schema_version"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "workspace-manifest.v1",
+      "description": "Contract version. Distinct from provider-readiness.v2; not extended into that contract."
+    },
+    "repos": {
+      "type": "array",
+      "description": "Workspace-relative child repo entries. Order is not significant; identity is the normalized workspace_relative_path.",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Workspace-relative path to a child repo directory (POSIX separators). Must resolve inside the workspace root; symlink escape and parent traversal are rejected.",
+            "minLength": 1
+          },
+          "alias": {
+            "type": "string",
+            "description": "Optional human-facing label. Does not affect identity. Duplicate aliases across repos are an ambiguity, not an error.",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "description": "Workspace-relative directory paths to exclude from auto-discovery candidates (in addition to the built-in ignore list).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

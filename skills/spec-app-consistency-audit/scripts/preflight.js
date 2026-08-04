@@ -8,6 +8,7 @@ const path = require('node:path');
 const {
   DEFAULT_MAX_SOURCE_HASH_BYTES,
   DEFAULT_MAX_SKIPPED_LARGE_FILES,
+  GENERATED_OR_CONTROL_ROOTS,
   buildFigmaReference,
   parseCommonArgs,
   resolvePathAgainstRoot,
@@ -18,8 +19,10 @@ const {
 
 const DEFAULT_PRD_MAX_BYTES = 5 * 1024 * 1024;
 const DEFAULT_MAX_SCAN_FILES = 2000;
+// Generated/control roots must be skipped, otherwise preflight hashes artifacts this very run
+// writes under .spec-first and source_hash can never reproduce across runs.
 const SKIPPED_DIRS = new Set([
-  '.git',
+  ...GENERATED_OR_CONTROL_ROOTS,
   '.gradle',
   '.idea',
   '.next',
@@ -376,9 +379,9 @@ function scanSourceTree(root, options = {}) {
       commonMain: relFiles.some((file) => file.includes('commonMain/')),
       androidMain: relFiles.some((file) => file.includes('androidMain/')),
       iosMain: relFiles.some((file) => file.includes('iosMain/')),
-      androidApp: /(^|\/)(androidmanifest\.xml|build\.gradle|build\.gradle\.kts)/i.test(relFiles.join('\n')),
-      iosApp: /(^|\/)(project\.pbxproj|package\.swift|\.xcodeproj\/)/i.test(relFiles.join('\n')),
-      gradle: /(^|\/)(settings\.gradle|settings\.gradle\.kts|build\.gradle|build\.gradle\.kts)$/i.test(relFiles.join('\n')),
+      androidApp: /(^|\/)(androidmanifest\.xml|build\.gradle|build\.gradle\.kts)/im.test(signalText),
+      iosApp: /(^|\/)(project\.pbxproj|package\.swift|\.xcodeproj\/)/im.test(signalText),
+      gradle: /(^|\/)(settings\.gradle|settings\.gradle\.kts|build\.gradle|build\.gradle\.kts)$/im.test(signalText),
       analytics: /analytics|eventtracker|telemetry|tracking|trackevent/.test(signalText) || contentSignals.analytics,
       i18n: /strings\.xml|localizable\.strings|(^|\/)(i18n|l10n|locale|locales)(\/|$)|values-[a-z]/.test(signalText),
       componentSystem: /design-system|designsystem|components|ui-components|uikit/.test(signalText),

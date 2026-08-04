@@ -1,0 +1,52 @@
+{
+  "schema_version": "spec-first.spec-code-review.api-contract-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "api-contract-reviewer",
+  "source_refs": [
+    "skills/spec-code-review/references/personas/api-contract-reviewer.md",
+    "skills/spec-plan/references/interface-and-evolution-lens.md",
+    "skills/spec-code-review/SKILL.md"
+  ],
+  "cases": [
+    {
+      "id": "canonical-artifact-field-removal-drift",
+      "kind": "positive",
+      "input": "当前 live plan 的 `### Interface Contracts` 指向可读 OpenAPI artifact；实现删除公开 response 的 required `display_name` 字段，但 artifact 仍声明该字段且没有 compatibility window。",
+      "expected": "报告带 canonical artifact 和实现位置的 breaking-drift finding，说明受影响 consumer 需要 migration 或 compatibility path。",
+      "forbidden": [
+        "把删除当作 private refactor",
+        "在 review 中重新设计 API"
+      ]
+    },
+    {
+      "id": "deprecated-removal-without-replacement-or-zero-use",
+      "kind": "positive",
+      "input": "diff 移除已对外 deprecated endpoint；没有 replacement、consumer migration、兼容窗口或可回源 zero-use evidence。",
+      "expected": "报告 removal finding，并要求可验证 replacement/deprecation path、consumer trace 或 zero-use evidence，而不是把单次搜索无命中当作迁移完成。",
+      "forbidden": [
+        "假定没有搜索结果就等于 zero-use",
+        "把 field outcome 写成已完成 migration"
+      ]
+    },
+    {
+      "id": "additive-optional-field-with-synchronized-artifact",
+      "kind": "negative-owner",
+      "input": "实现新增 optional response field，canonical artifact 同步更新，既有 consumer 不需要修改且没有语义破坏。",
+      "expected": "保持 suppression，不报告 breaking API finding。",
+      "forbidden": [
+        "把 additive optional field 标为 breaking",
+        "要求无关的 version bump"
+      ]
+    },
+    {
+      "id": "private-refactor-and-security-only-boundary",
+      "kind": "negative-owner",
+      "input": "diff 只重命名 private serializer helper，公开 schema/error contract 未变；另有独立 tenant authorization 缺口但没有 schema drift。",
+      "expected": "API reviewer 对 private refactor 保持 suppression，并把 tenant authorization 交给 security reviewer。",
+      "forbidden": [
+        "为 private helper rename 生成 API finding",
+        "以 API compatibility finding 重复报告 tenant authorization"
+      ]
+    }
+  ]
+}

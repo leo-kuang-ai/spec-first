@@ -1,0 +1,45 @@
+{
+  "schema_version": "repair-worktree-parity.v1",
+  "platform": "posix",
+  "legacy_owner": "skills/spec-runtime-setup/scripts/repair-worktree.sh",
+  "contract": {
+    "help": {
+      "argv": ["--help"],
+      "exit_code": 0,
+      "stdout_contains": ["用法：spec-first repair-worktree [--dry-run]", "绝不会删除 .git"],
+      "stderr_contains": []
+    },
+    "apply": {
+      "argv": ["--apply"],
+      "exit_code": 1,
+      "reason_code": "repair-worktree-apply-deferred",
+      "output_channel": "stderr"
+    },
+    "unlink": {
+      "argv": ["--unlink"],
+      "exit_code": 1,
+      "reason_code": "repair-worktree-apply-deferred",
+      "output_channel": "stderr"
+    },
+    "unknown": {
+      "argv": ["--unknown"],
+      "exit_code": 2,
+      "reason_code": "repair-worktree-unknown-option",
+      "output_channel": "stderr"
+    },
+    "dry_run": {
+      "argv": ["--dry-run"],
+      "exit_code": 0,
+      "reason_code": "broken-worktree",
+      "stdout_contains": ["repair_worktree_dry_run=true", "损坏的 worktree pointer：", "Unlink 预览："],
+      "stderr_contains": [],
+      "preserves_git_entry": true
+    },
+    "not_broken": {
+      "argv": ["--dry-run"],
+      "exit_code": 1,
+      "reason_code": "repair-worktree-not-broken-worktree",
+      "output_channel": "stderr"
+    }
+  }
+}

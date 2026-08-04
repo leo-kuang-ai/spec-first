@@ -36,6 +36,10 @@ A deferred workflow reference loaded only when its trigger signal appears. It ke
 
 A script, hook, or verifier boundary that blocks an exit based on mechanically checkable facts such as schema fields, receipts, paths, hashes, or reason codes. It must not replace LLM semantic judgment above the fact floor.
 
+### App Assurance Compiler
+
+面向 App 的 pre-runtime assurance 架构：把产品、设计、源码、状态、导航、平台、analytics、i18n 与 accessibility 证据编译为带 provenance 的行为模型、proof obligations、counterexamples 和 verification tasks。它不替代编译器、测试、模拟器、真机、产品判断或 code review；AI 只在确定性事实地板之上做有界语义推理，未验证结论保持 advisory 或 runtime-required。
+
 ### Eval Regression
 
 A fixture, test, or fresh-source evaluation that proves a prompt or workflow refactor kept protected behavior intact. It is useful for guarding route boundaries, source/runtime rules, handoff discipline, and known failure modes during prompt compression.
@@ -78,6 +82,14 @@ Checked-in source files that govern behavior, docs, tests, runtime generation, o
 
 Host-specific projected assets under `.claude/`, `.codex/`, or `.agents/skills/`. Repair them through source changes plus `spec-first init`; do not patch them as source fixes.
 
+### Product-Bundled Runtime Asset
+
+An asset distributed as part of the spec-first product because installed workflow behavior depends on it across supported hosts. Maintainer-only documentation cannot substitute for this distribution responsibility.
+
+### Project-Local Overlay
+
+A consumer project's templates, standards, glossary, compliance guidance, or industry rules layered onto a generic workflow as advisory input. It remains outside the product default and requires project evidence or confirmation before becoming a product fact.
+
 ### Direct Evidence
 
 Current source reads, diffs, tests, logs, schema checks, or user-provided artifacts that directly support a claim.
@@ -102,6 +114,10 @@ Mechanical setup evidence about an optional provider's installation, artifact pr
 
 An advisory provider output used for broad orientation, relationship navigation, or candidate discovery. Conclusion-tier claims from a project graph must be confirmed from source, tests, logs, contracts, or docs.
 
+### Code Graph
+
+An advisory provider output used for tactical code-structure location, such as call relationships, impact surfaces, ownership candidates, or affected-test hints. Its relationship claims require direct confirmation before entering conclusion-tier work.
+
 ### Managed Hook
 
 A host runtime hook installed or inspected by `spec-first init`, `doctor`, or setup helpers. Source templates and helper scripts remain the durable contract when a generated hook drifts, fails, or is missing.
@@ -119,3 +135,7 @@ A broader rule distilled from multiple learnings. Pattern docs are useful but hi
 ### Compound
 
 The practice of turning solved problems into reusable knowledge so future implementation, debugging, planning, and review runs start with better context.
+
+### CE-first Projection
+
+The migration rule for CE-derived skills: preserve CE behavior, phases, artifacts, and helper semantics first, then project only the names, paths, entrypoints, and source/runtime boundaries required by spec-first.

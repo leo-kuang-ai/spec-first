@@ -132,7 +132,7 @@ spec_id: SYNC-CE-834CA4E5
 - `src/cli/contracts/dual-host-governance/skills-governance.json`
 - `src/cli/instruction-bootstrap.js`
 - `skills/using-spec-first/SKILL.md`，如仍提到 primitive internal skills
-- `skills/spec-skill-audit/scripts/lint-skill-structure.js`，如仍内置 primitive name mapping
+- `skills/retired-skill-review/scripts/lint-skill-structure.js`，如仍内置 primitive name mapping
 - `docs/catalog/runtime-capabilities.md`
 - `README.md`
 - `README.zh-CN.md`
@@ -141,7 +141,7 @@ spec_id: SYNC-CE-834CA4E5
 - `tests/unit/runtime-capability-catalog.test.js`
 - `tests/unit/dual-host-governance-contracts.test.js`
 - `tests/unit/using-spec-first-contracts.test.js`，如 bootstrap prose 改动
-- `tests/unit/skill-audit-scripts.test.js`，如 lint mapping 改动
+- `tests/unit/skill-review-scripts.test.js`，如 lint mapping 改动
 - `tests/smoke/cli.sh`
 
 **必要行为：**
@@ -167,7 +167,7 @@ spec_id: SYNC-CE-834CA4E5
 - `tests/unit/runtime-capability-catalog.test.js`
 - `tests/unit/dual-host-governance-contracts.test.js`
 - `tests/smoke/cli.sh`
-- 如清理 `using-spec-first` 或 skill-audit 引用，同步更新对应 unit tests。
+- 如清理 `using-spec-first` 或 skill-review 引用，同步更新对应 unit tests。
 - stale cleanup 聚焦测试：构造旧 managed state 含 `spec-session-inventory` / `spec-session-extract`，断言 `planObsoleteManagedAssetRemoval()` 在 Claude 和 Codex 上会移除旧 runtime skill 目录。
 
 **验证：**

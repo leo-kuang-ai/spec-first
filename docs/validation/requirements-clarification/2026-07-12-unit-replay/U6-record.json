@@ -1,0 +1,42 @@
+{
+  "unit": "U6",
+  "patches": [
+    {
+      "path": "patches/U6.patch",
+      "sha256": "f282509de6a40c2c9ee17c5a7aec3e0a1856896e46605b71effb538a9d434e1f"
+    },
+    {
+      "operation": "U6 direct-bootstrap authority refinement",
+      "before_sha256": "15fc61ae908a392e8332912fd10ec8d7365de5174f1cd069381e3eb68c8add93",
+      "after_sha256": "c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f",
+      "description": "Every unconfirmed load-bearing WHAT becomes a planning-time assumption; behavior/scope/success-changing WHAT returns to current user or remains a named blocker."
+    }
+  ],
+  "paths": [
+    "skills/spec-plan/SKILL.md"
+  ],
+  "pre": [
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "status": "present",
+      "sha256": "fc4d768884d9eba68d5e575ec031af2a080901590969713d4e3779dd67398130",
+      "bytes": 99396
+    }
+  ],
+  "post": [
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "status": "present",
+      "sha256": "c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f",
+      "bytes": 102131
+    }
+  ],
+  "evaluator_paths": [
+    "skills/spec-plan/SKILL.md"
+  ],
+  "before_bundle_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc",
+  "after_bundle_sha256": "790067e563de72bf3cfa09166cefe7a29a43c19cbd49d0e10319cd3e29fcac14",
+  "applied_at": "2026-07-12T08:00:22.650Z",
+  "after_bundle_file": "U6-after-refined-bundle.json",
+  "refined_at": "2026-07-12T08:15:49.581Z"
+}

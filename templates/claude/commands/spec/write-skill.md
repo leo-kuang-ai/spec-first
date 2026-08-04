@@ -1,5 +1,5 @@
 ---
-description: "Write, revise, migrate, or remediate spec-first source skills"
+description: "Design and author project-owned Agent Skills, or validate packages read-only"
 argument-hint: "[target skill or authoring request]"
 ---
 

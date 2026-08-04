@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { writeFileAtomicIfAbsent } = require('../atomic-write');
 const { validateAgainstSchema } = require('../../contracts/schema-validator');
 const { readVerificationRunSummary, aggregateRunSummaryStatus } = require('./verification-run-summary');
@@ -13,6 +14,7 @@ const {
 
 const PAYLOAD_SCHEMA_VERSION = 'spec-work-run-artifact-payload/v2';
 const ARTIFACT_SCHEMA_VERSION = 'spec-work-run-artifact/v2';
+const STATE_SCHEMA_VERSION = 'spec-work-run-state/v1';
 // 此 producer 仅服务 spec-work closeout,故 ref 固定 spec-work。verification-run-summary
 // 已支持 spec-debug/spec-code-review workflow,但本 producer 当前不消费它们;若未来为 debug/
 // review 接线 run artifact,validateRunSummaryReference 的 spec-work 硬编码需同步放宽。
@@ -56,6 +58,7 @@ const DIRECT_EVIDENCE_ITEM_MAX_LENGTH = 300;
 const DIRECT_EVIDENCE_MAX_ITEMS = 20;
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$/;
 const ARTIFACT_SCHEMA_PATH = path.join(__dirname, '..', '..', '..', 'docs', 'contracts', 'workflows', 'spec-work-run-artifact.schema.json');
+const STATE_SCHEMA_PATH = path.join(__dirname, '..', '..', '..', 'docs', 'contracts', 'workflows', 'spec-work-run-state.schema.json');
 const ALLOWED_PAYLOAD_FIELDS = new Set([
   'schema_version',
   'workflow',
@@ -110,6 +113,7 @@ const ALLOWED_RETENTION_FIELDS = new Set([
 ]);
 
 let cachedArtifactSchema = null;
+let cachedStateSchema = null;
 
 function getArtifactSchema() {
   if (!cachedArtifactSchema) {
@@ -118,11 +122,28 @@ function getArtifactSchema() {
   return cachedArtifactSchema;
 }
 
+function getStateSchema() {
+  if (!cachedStateSchema) {
+    cachedStateSchema = JSON.parse(fs.readFileSync(STATE_SCHEMA_PATH, 'utf8'));
+  }
+  return cachedStateSchema;
+}
+
 function runCli(argv) {
   const args = Array.isArray(argv) ? [...argv] : [];
   const subcommand = args[0];
 
   if (subcommand !== 'write') {
+    if (subcommand === 'state-write') {
+      const result = runStateWriteCli(args.slice(1));
+      writeJson(result.output);
+      return result.exitCode;
+    }
+    if (subcommand === 'state-read') {
+      const result = runStateReadCli(args.slice(1));
+      writeJson(result.output);
+      return result.exitCode;
+    }
     if (subcommand === 'read') {
       const result = runReadCli(args.slice(1));
       writeJson(result.output);
@@ -136,7 +157,7 @@ function runCli(argv) {
     writeJson({
       status: 'rejected',
       reason_code: 'invalid-command',
-      errors: ['Usage: spec-work-run-artifact <write|read|prune> ...'],
+      errors: ['Usage: spec-work-run-artifact <write|read|state-write|state-read|prune> ...'],
     });
     return 2;
   }
@@ -190,6 +211,79 @@ function parseArgs(args) {
   return parsed;
 }
 
+function runStateWriteCli(argv) {
+  const parsed = parseStateWriteArgs(argv);
+  if (parsed.errors.length > 0) {
+    return rejected('invalid-arguments', parsed.errors);
+  }
+  return writeSpecWorkRunState(parsed);
+}
+
+function runStateReadCli(argv) {
+  const parsed = parseStateReadArgs(argv);
+  if (parsed.errors.length > 0) {
+    return rejected('invalid-arguments', parsed.errors);
+  }
+  return readSpecWorkRunState(parsed);
+}
+
+function parseStateWriteArgs(args) {
+  const parsed = {
+    inputPath: '',
+    runId: '',
+    targetRepo: '',
+    expectedGeneration: null,
+    expectedSha256: '',
+    errors: [],
+  };
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    const value = args[index + 1] || '';
+    if (arg === '--input') parsed.inputPath = value;
+    else if (arg === '--run-id') parsed.runId = value;
+    else if (arg === '--target-repo') parsed.targetRepo = value;
+    else if (arg === '--expected-generation') {
+      if (!/^\d+$/.test(value)) parsed.errors.push('--expected-generation must be a non-negative integer');
+      else parsed.expectedGeneration = Number(value);
+    } else if (arg === '--expected-sha256') parsed.expectedSha256 = value;
+    else {
+      parsed.errors.push(`unknown argument: ${arg}`);
+      continue;
+    }
+    index += 1;
+  }
+  if (!parsed.inputPath) parsed.errors.push('--input is required');
+  if (!parsed.runId) parsed.errors.push('--run-id is required');
+  if (!parsed.targetRepo) parsed.errors.push('--target-repo is required');
+  if (parsed.expectedGeneration === null) parsed.errors.push('--expected-generation is required');
+  if (!/^[a-f0-9]{64}$/.test(parsed.expectedSha256)) {
+    parsed.errors.push('--expected-sha256 must be a lowercase SHA-256 digest');
+  }
+  return parsed;
+}
+
+function parseStateReadArgs(args) {
+  const parsed = { targetRepo: '', workspaceSlug: '', runId: '', errors: [] };
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    const value = args[index + 1] || '';
+    if (arg === '--target-repo') parsed.targetRepo = value;
+    else if (arg === '--workspace-slug') parsed.workspaceSlug = value;
+    else if (arg === '--run-id') parsed.runId = value;
+    else {
+      parsed.errors.push(`unknown argument: ${arg}`);
+      continue;
+    }
+    index += 1;
+  }
+  if (!parsed.targetRepo) parsed.errors.push('--target-repo is required');
+  if (!parsed.workspaceSlug) parsed.errors.push('--workspace-slug is required');
+  if (!parsed.runId) parsed.errors.push('--run-id is required');
+  if (parsed.workspaceSlug && !isSafeId(parsed.workspaceSlug)) parsed.errors.push('invalid workspace slug');
+  if (parsed.runId && !isSafeId(parsed.runId)) parsed.errors.push('invalid run id');
+  return parsed;
+}
+
 function writeSpecWorkRunArtifact({ inputPath, runId, targetRepo }) {
   const target = resolveTargetRepoRoot(targetRepo);
   if (!target.ok) {
@@ -215,7 +309,7 @@ function writeSpecWorkRunArtifact({ inputPath, runId, targetRepo }) {
   }
 
   const workspaceSlug = slugify(path.basename(targetRepoRoot));
-  const artifactPath = path.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
+  const artifactPath = path.posix.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
   const absoluteArtifactPath = path.join(targetRepoRoot, artifactPath);
   const containment = validateOutputContainment(targetRepoRoot, absoluteArtifactPath);
   if (containment.errors.length > 0) {
@@ -487,6 +581,321 @@ function readSpecWorkRunArtifact({ targetRepo, workspaceSlug = '', runId = '' })
   };
 }
 
+function writeSpecWorkRunState({
+  inputPath,
+  runId,
+  targetRepo,
+  expectedGeneration,
+  expectedSha256,
+}) {
+  if (!isSafeId(runId)) return rejected('invalid-run-id', ['run-id must be a stable safe identifier']);
+  const target = resolveTargetRepoRoot(targetRepo);
+  if (!target.ok) return notWritten('target-repo-not-found', target.errors);
+  const targetRepoRoot = target.root;
+  const workspaceSlug = slugify(path.basename(targetRepoRoot));
+  const current = readSpecWorkRunState({ targetRepo, workspaceSlug, runId });
+  if (current.exitCode !== 0) return current;
+  if (current.output.generation !== expectedGeneration
+    || current.output.snapshot_sha256 !== expectedSha256) {
+    return {
+      exitCode: 1,
+      output: {
+        status: 'not-written',
+        reason_code: 'run-state-conflict',
+        expected_generation: expectedGeneration,
+        actual_generation: current.output.generation,
+        expected_sha256: expectedSha256,
+        actual_sha256: current.output.snapshot_sha256,
+        errors: ['run state changed after the caller read it'],
+      },
+    };
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(fs.readFileSync(path.resolve(inputPath), 'utf8'));
+  } catch (error) {
+    return rejected('input-json-invalid', [error.message]);
+  }
+  const validation = validateRunStatePayload(payload, runId);
+  if (validation.length > 0) return rejected('run-state-schema-invalid', validation);
+
+  const previous = current.output.state;
+  if (previous && !sameWorktreeIdentity(previous.worktree_identity, payload.worktree_identity)) {
+    return {
+      exitCode: 1,
+      output: {
+        status: 'not-written',
+        reason_code: 'run-source-drifted',
+        generation: current.output.generation,
+        snapshot_sha256: current.output.snapshot_sha256,
+        errors: ['current worktree identity differs from the last confirmed snapshot'],
+      },
+    };
+  }
+
+  const generation = expectedGeneration + 1;
+  const relativePath = path.posix.join(
+    '.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'state',
+    `${String(generation).padStart(6, '0')}.json`,
+  );
+  const absolutePath = path.join(targetRepoRoot, relativePath);
+  const containment = validateOutputContainment(targetRepoRoot, absolutePath);
+  if (containment.errors.length > 0) return rejected('artifact-path-escape', containment.errors);
+  const snapshot = {
+    schema_version: STATE_SCHEMA_VERSION,
+    generation,
+    previous_generation: expectedGeneration,
+    previous_sha256: expectedSha256,
+    captured_at: new Date().toISOString(),
+    run_id: runId,
+    worktree_identity: payload.worktree_identity,
+    units: payload.units,
+    authorization: payload.authorization === undefined ? {} : payload.authorization,
+    collision: payload.collision === undefined
+      ? { status: 'none', reason_code: 'none' }
+      : payload.collision,
+    recovery: payload.recovery === undefined
+      ? { status: 'not-needed', reason_code: 'not-needed' }
+      : payload.recovery,
+    limitations: payload.limitations === undefined ? [] : payload.limitations,
+  };
+  const snapshotValidation = validateRunStateSnapshot(snapshot, runId);
+  if (snapshotValidation.length > 0) return rejected('run-state-schema-invalid', snapshotValidation);
+  const serialized = `${JSON.stringify(snapshot, null, 2)}\n`;
+  try {
+    fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+    const postMkdirContainment = validateOutputContainment(targetRepoRoot, absolutePath);
+    if (postMkdirContainment.errors.length > 0) return rejected('artifact-path-escape', postMkdirContainment.errors);
+    writeFileAtomicIfAbsent(absolutePath, serialized, 'utf8');
+  } catch (error) {
+    const collision = error && error.code === 'EEXIST';
+    return {
+      exitCode: 1,
+      output: {
+        status: 'not-written',
+        reason_code: collision ? 'run-state-conflict' : 'run-state-write-failed',
+        generation,
+        artifact_path: relativePath,
+        errors: [error.message],
+      },
+    };
+  }
+  return {
+    exitCode: 0,
+    output: {
+      status: 'written',
+      reason_code: 'written',
+      schema_version: STATE_SCHEMA_VERSION,
+      generation,
+      previous_generation: expectedGeneration,
+      previous_sha256: expectedSha256,
+      snapshot_sha256: sha256(serialized),
+      artifact_path: relativePath,
+      warnings: current.output.warnings,
+    },
+  };
+}
+
+function readSpecWorkRunState({ targetRepo, workspaceSlug, runId }) {
+  if (!isSafeId(workspaceSlug) || !isSafeId(runId)) {
+    return rejected('invalid-arguments', ['workspace slug and run id must be stable safe identifiers']);
+  }
+  const target = resolveTargetRepoRoot(targetRepo);
+  if (!target.ok) return notWritten('target-repo-not-found', target.errors);
+  const targetRepoRoot = target.root;
+  const runRelativePath = path.posix.join(
+    '.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json',
+  );
+  const runPath = path.join(targetRepoRoot, runRelativePath);
+  const containment = validateOutputContainment(targetRepoRoot, runPath);
+  if (containment.errors.length > 0) return rejected('artifact-path-escape', containment.errors);
+  let runRaw;
+  let runArtifact;
+  try {
+    runRaw = fs.readFileSync(runPath, 'utf8');
+    runArtifact = JSON.parse(runRaw);
+  } catch (error) {
+    return {
+      exitCode: 1,
+      output: {
+        status: 'not-readable',
+        reason_code: 'artifact-unreadable',
+        artifact_path: runRelativePath,
+        errors: [error.message],
+      },
+    };
+  }
+  const runValidation = validateArtifact(runArtifact);
+  if (runValidation.errors.length > 0) {
+    return rejected('artifact-schema-invalid', runValidation.errors);
+  }
+  let generation = 0;
+  let snapshotSha256 = sha256(runRaw);
+  let state = null;
+  const warnings = [];
+  const stateDir = path.join(path.dirname(runPath), 'state');
+  if (fs.existsSync(stateDir)) {
+    const stateContainment = validateOutputContainment(targetRepoRoot, path.join(stateDir, '000001.json'));
+    if (stateContainment.errors.length > 0) return rejected('artifact-path-escape', stateContainment.errors);
+    let entries;
+    try {
+      const stat = fs.lstatSync(stateDir);
+      if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('state path is not a real directory');
+      entries = fs.readdirSync(stateDir)
+        .filter((entry) => /^\d{6}\.json$/.test(entry))
+        .sort();
+    } catch (error) {
+      return rejected('run-state-unreadable', [error.message]);
+    }
+    for (const entry of entries) {
+      const expectedEntry = `${String(generation + 1).padStart(6, '0')}.json`;
+      if (entry !== expectedEntry) {
+        warnings.push(`ignored non-contiguous state snapshot: ${entry}`);
+        break;
+      }
+      const snapshotPath = path.join(stateDir, entry);
+      try {
+        const stat = fs.lstatSync(snapshotPath);
+        if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('snapshot is not a regular file');
+        const raw = fs.readFileSync(snapshotPath, 'utf8');
+        const candidate = JSON.parse(raw);
+        const errors = validateRunStateSnapshot(candidate, runId);
+        if (errors.length > 0
+          || candidate.previous_generation !== generation
+          || candidate.previous_sha256 !== snapshotSha256) {
+          warnings.push(`ignored invalid state snapshot: ${entry}`);
+          break;
+        }
+        generation = candidate.generation;
+        snapshotSha256 = sha256(raw);
+        state = candidate;
+      } catch (_error) {
+        warnings.push(`ignored unreadable state snapshot: ${entry}`);
+        break;
+      }
+    }
+  }
+  return {
+    exitCode: 0,
+    output: {
+      status: 'read',
+      reason_code: generation === 0 ? 'legacy-generation-zero' : 'read',
+      schema_version: state ? STATE_SCHEMA_VERSION : runArtifact.schema_version,
+      generation,
+      snapshot_sha256: snapshotSha256,
+      run_artifact: runArtifact,
+      state,
+      warnings,
+    },
+  };
+}
+
+function validateRunStatePayload(payload, runId) {
+  const errors = [];
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return ['payload must be an object'];
+  const allowed = new Set(['run_id', 'worktree_identity', 'units', 'authorization', 'collision', 'recovery', 'limitations']);
+  for (const key of Object.keys(payload)) if (!allowed.has(key)) errors.push(`unknown state payload field: ${key}`);
+  if (payload.run_id !== runId) errors.push('payload run_id does not match the selected run');
+  validateWorktreeIdentity(payload.worktree_identity, errors);
+  validateUnits(payload.units, errors);
+  if (!Array.isArray(payload.limitations || [])) errors.push('limitations must be an array');
+  return errors;
+}
+
+function validateRunStateSnapshot(snapshot, runId) {
+  const errors = [];
+  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) return ['snapshot must be an object'];
+  const allowed = new Set([
+    'schema_version', 'generation', 'previous_generation', 'previous_sha256',
+    'captured_at', 'run_id', 'worktree_identity', 'units', 'authorization',
+    'collision', 'recovery', 'limitations',
+  ]);
+  for (const key of Object.keys(snapshot)) if (!allowed.has(key)) errors.push(`unknown snapshot field: ${key}`);
+  if (snapshot.schema_version !== STATE_SCHEMA_VERSION) errors.push('unsupported run state schema version');
+  if (!Number.isInteger(snapshot.generation) || snapshot.generation < 1) errors.push('generation must be a positive integer');
+  if (!Number.isInteger(snapshot.previous_generation) || snapshot.previous_generation !== snapshot.generation - 1) {
+    errors.push('previous_generation must immediately precede generation');
+  }
+  if (!/^[a-f0-9]{64}$/.test(snapshot.previous_sha256 || '')) errors.push('previous_sha256 must be a SHA-256 digest');
+  if (!Number.isFinite(Date.parse(snapshot.captured_at))) errors.push('captured_at must be an ISO timestamp');
+  if (snapshot.run_id !== runId) errors.push('snapshot run_id does not match the selected run');
+  validateWorktreeIdentity(snapshot.worktree_identity, errors);
+  validateUnits(snapshot.units, errors);
+  if (!Array.isArray(snapshot.limitations)) errors.push('limitations must be an array');
+  const schemaResult = validateAgainstSchema(getStateSchema(), snapshot);
+  if (!schemaResult.valid) errors.push(...schemaResult.errors);
+  return errors;
+}
+
+function validateWorktreeIdentity(identity, errors) {
+  if (!identity || typeof identity !== 'object' || Array.isArray(identity)) {
+    errors.push('worktree_identity must be an object');
+    return;
+  }
+  const allowed = new Set(['repo_root', 'git_head', 'dirty_fingerprint']);
+  for (const key of Object.keys(identity)) if (!allowed.has(key)) errors.push(`unknown worktree identity field: ${key}`);
+  if (typeof identity.repo_root !== 'string' || !path.isAbsolute(identity.repo_root)) {
+    errors.push('worktree_identity.repo_root must be absolute');
+  }
+  if (identity.git_head !== null && !/^[a-f0-9]{40}$/.test(identity.git_head || '')) {
+    errors.push('worktree_identity.git_head must be null or a full commit SHA');
+  }
+  if (!/^[a-f0-9]{64}$/.test(identity.dirty_fingerprint || '')) {
+    errors.push('worktree_identity.dirty_fingerprint must be a SHA-256 digest');
+  }
+}
+
+function validateUnits(units, errors) {
+  if (!Array.isArray(units)) {
+    errors.push('units must be an array');
+    return;
+  }
+  const ids = new Set();
+  const statuses = new Set(['pending', 'running', 'passed', 'failed', 'blocked', 'unknown']);
+  for (const unit of units) {
+    if (!unit || typeof unit !== 'object' || Array.isArray(unit)) {
+      errors.push('each unit must be an object');
+      continue;
+    }
+    const allowed = new Set([
+      'unit_id', 'status', 'requested_engine', 'actual_engine', 'authorization',
+      'collision', 'recovery', 'verification',
+    ]);
+    for (const key of Object.keys(unit)) if (!allowed.has(key)) errors.push(`unknown unit field: ${key}`);
+    if (!isSafeId(unit.unit_id) || ids.has(unit.unit_id)) errors.push('unit_id must be unique and safe');
+    ids.add(unit.unit_id);
+    if (!statuses.has(unit.status)) errors.push(`unsupported unit status: ${unit.status}`);
+    const verification = unit.verification;
+    if (!verification || typeof verification !== 'object' || Array.isArray(verification)) {
+      errors.push(`unit ${unit.unit_id || '<unknown>'} requires verification transaction`);
+      continue;
+    }
+    const verificationStatuses = new Set(['not-started', 'started', 'passed', 'failed', 'unknown']);
+    if (!verificationStatuses.has(verification.status)) errors.push('unsupported verification status');
+    if (verification.status === 'passed') {
+      if (verification.confirmed !== true
+        || !Array.isArray(verification.evidence_refs)
+        || verification.evidence_refs.length === 0) {
+        errors.push('passed verification requires confirmed evidence refs');
+      }
+    } else if (verification.confirmed === true) {
+      errors.push('only passed verification may set confirmed=true');
+    }
+  }
+}
+
+function sameWorktreeIdentity(left, right) {
+  return Boolean(left && right
+    && left.repo_root === right.repo_root
+    && left.git_head === right.git_head
+    && left.dirty_fingerprint === right.dirty_fingerprint);
+}
+
+function sha256(value) {
+  return crypto.createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
 function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
   const target = resolveTargetRepoRoot(targetRepo);
   if (!target.ok) {
@@ -541,7 +950,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
     const workspaceDir = path.join(workflowRootState.path, workspaceSlug);
     if (!isSafeRunDirectory(targetRepoRoot, workspaceDir)) {
       retained.push({
-        artifact_path: path.relative(targetRepoRoot, workspaceDir),
+        artifact_path: toPosixRef(path.relative(targetRepoRoot, workspaceDir)),
         reason_code: 'artifact-path-escape',
       });
       continue;
@@ -549,7 +958,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
     const runEntries = safeReaddir(workspaceDir);
     if (!runEntries.ok) {
       retained.push({
-        artifact_path: path.relative(targetRepoRoot, workspaceDir),
+        artifact_path: toPosixRef(path.relative(targetRepoRoot, workspaceDir)),
         reason_code: 'artifact-unreadable',
       });
       continue;
@@ -558,7 +967,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
       const runDir = path.join(workspaceDir, runId);
       if (!isSafeRunDirectory(targetRepoRoot, runDir)) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, runDir),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, runDir)),
           reason_code: 'artifact-path-escape',
         });
         continue;
@@ -568,7 +977,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
       const safeArtifact = resolveSafeArtifactFile(
         targetRepoRoot,
         artifactPath,
-        path.relative(targetRepoRoot, artifactPath),
+        toPosixRef(path.relative(targetRepoRoot, artifactPath)),
       );
       if (!safeArtifact.ok) {
         retained.push({
@@ -583,7 +992,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
         artifact = JSON.parse(fs.readFileSync(safeArtifact.path, 'utf8'));
       } catch (error) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, artifactPath),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
           reason_code: 'artifact-unreadable',
         });
         continue;
@@ -591,7 +1000,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
       const artifactValidation = validateArtifact(artifact);
       if (artifactValidation.errors.length > 0) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, artifactPath),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
           reason_code: 'artifact-schema-invalid',
         });
         continue;
@@ -606,7 +1015,7 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
 
       if (effectiveExpiry > now) {
         retained.push({
-          artifact_path: path.relative(targetRepoRoot, artifactPath),
+          artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
           reason_code: 'retention-active',
         });
         continue;
@@ -617,14 +1026,14 @@ function pruneSpecWorkRunArtifacts({ targetRepo, retentionDays, dryRun }) {
           fs.rmSync(runDir, { recursive: true, force: true });
         } catch (error) {
           retained.push({
-            artifact_path: path.relative(targetRepoRoot, artifactPath),
+            artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
             reason_code: 'artifact-remove-failed',
           });
           continue;
         }
       }
       removed.push({
-        artifact_path: path.relative(targetRepoRoot, artifactPath),
+        artifact_path: toPosixRef(path.relative(targetRepoRoot, artifactPath)),
         reason_code: 'expired',
       });
     }
@@ -654,7 +1063,7 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
     return {
       ok: false,
       reason_code: workflowRoot.reason_code,
-      relativePath: path.relative(targetRepoRoot, workflowRoot.path || targetRepoRoot),
+      relativePath: toPosixRef(path.relative(targetRepoRoot, workflowRoot.path || targetRepoRoot)),
       errors: workflowRoot.errors,
     };
   }
@@ -664,7 +1073,7 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
   const baseRoot = workflowRoot.path;
 
   if (workspaceSlug && runId) {
-    const relativePath = path.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
+    const relativePath = path.posix.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'run.json');
     const absolutePath = path.join(targetRepoRoot, relativePath);
     const containment = validateOutputContainment(targetRepoRoot, absolutePath);
     if (containment.errors.length > 0) {
@@ -688,7 +1097,7 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
       if (!isSafeRunDirectory(targetRepoRoot, runDir)) continue;
       const artifactPath = path.join(runDir, 'run.json');
       if (!fs.existsSync(artifactPath)) continue;
-      const relativePath = path.relative(targetRepoRoot, artifactPath);
+      const relativePath = toPosixRef(path.relative(targetRepoRoot, artifactPath));
       const safeArtifact = resolveSafeArtifactFile(targetRepoRoot, artifactPath, relativePath);
       if (!safeArtifact.ok) {
         if (safeArtifact.reason_code === 'artifact-path-escape') return safeArtifact;
@@ -968,7 +1377,7 @@ function validateValidation(validation, errors) {
 function validateRunSummaryReference({ payload, targetRepo, workspaceSlug, runId }) {
   const validation = payload.script_confirmed && payload.script_confirmed.validation;
   const runSummaryRef = validation && validation.run_summary_ref;
-  const expectedRef = path.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'verification-run-summary.json');
+  const expectedRef = path.posix.join('.spec-first', 'workflows', WORKFLOW, workspaceSlug, runId, 'verification-run-summary.json');
   if (runSummaryRef !== expectedRef) {
     return {
       reasonCode: 'validation-run-summary-ref-mismatch',
@@ -1233,6 +1642,13 @@ function isSafeId(value) {
   return SAFE_ID_PATTERN.test(value || '');
 }
 
+// repo-relative ref 是跨平台契约标识符,不是本地文件系统路径:schema pattern、
+// validateRepoRelativeField 与下游 consumer 都只接受 POSIX 正斜杠。真实文件 IO 仍用
+// path.join / path.relative 的原生分隔符,只有对外输出的 ref 经过这里归一化。
+function toPosixRef(value) {
+  return String(value || '').split(path.sep).join('/');
+}
+
 function isSafeRunDirectory(targetRepoRoot, absoluteDirPath) {
   try {
     const stat = fs.lstatSync(absoluteDirPath);
@@ -1263,9 +1679,12 @@ module.exports = {
   ARTIFACT_SCHEMA_VERSION,
   DEFAULT_RETENTION_DAYS,
   PAYLOAD_SCHEMA_VERSION,
+  STATE_SCHEMA_VERSION,
   runCli,
   readSpecWorkRunArtifact,
+  readSpecWorkRunState,
   pruneSpecWorkRunArtifacts,
   validatePayload,
   writeSpecWorkRunArtifact,
+  writeSpecWorkRunState,
 };

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.local/contracts/worker-dispatch-host-preflight.schema.json",
+  "title": "Worker Dispatch Host Preflight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "gate",
+    "status",
+    "support_claim",
+    "capture_owner",
+    "capture_method",
+    "captured_at",
+    "freshness_expires_at",
+    "session_identity",
+    "host_identity",
+    "host_startup_or_version_ref",
+    "dispatch_authorization_receipt",
+    "authorization_basis",
+    "discovery_surface",
+    "schema_excerpt_ref",
+    "schema_excerpt",
+    "schema_excerpt_sha256",
+    "schema_completeness",
+    "completeness_basis",
+    "redaction_status",
+    "capture_limitations",
+    "capability_probe",
+    "worker_dispatch_capability",
+    "eligibility_contract_ref",
+    "eligibility_contract_sha256",
+    "eligible_candidates",
+    "invocation_performed"
+  ],
+  "properties": {
+    "schema_version": { "const": "worker-dispatch-host-preflight/v1" },
+    "artifact_type": { "const": "advisory" },
+    "gate": { "const": "post-u1-pre-u2-discovery-only" },
+    "status": { "enum": ["passed", "failed", "not_run"] },
+    "support_claim": { "const": "not_applicable" },
+    "capture_owner": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "capture_method": {
+      "enum": [
+        "host-session-tool-registry-api",
+        "host-startup-registration-record",
+        "equivalent-current-session-source"
+      ]
+    },
+    "captured_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+    "freshness_expires_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+    "session_identity": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "host_identity": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "host_startup_or_version_ref": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "dispatch_authorization_receipt": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "authorization_basis": { "enum": ["explicit-user", "visible-upstream-handoff"] },
+    "discovery_surface": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "schema_excerpt_ref": { "type": ["string", "null"], "maxLength": 512 },
+    "schema_excerpt": { "type": ["string", "null"], "maxLength": 4096 },
+    "schema_excerpt_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "schema_completeness": { "enum": ["confirmed", "unconfirmed"] },
+    "completeness_basis": { "type": ["string", "null"], "maxLength": 512 },
+    "redaction_status": { "enum": ["passed", "failed"] },
+    "capture_limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": { "type": "string", "minLength": 1, "maxLength": 500 }
+    },
+    "capability_probe": { "enum": ["attempted", "unavailable"] },
+    "worker_dispatch_capability": { "enum": ["available", "missing", "unknown"] },
+    "eligibility_contract_ref": {
+      "const": "docs/contracts/workflows/worker-dispatch-capability.md#generic-worker-eligibility"
+    },
+    "eligibility_contract_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "eligible_candidates": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate_identity_sha256", "unique", "rationale"],
+        "properties": {
+          "candidate_identity_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "unique": { "type": "boolean" },
+          "rationale": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    },
+    "invocation_performed": { "const": false }
+  }
+}

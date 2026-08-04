@@ -20,11 +20,13 @@ Line: {finding_line}
 Why it matters (the original reviewer's framing):
 {finding_why_it_matters}
 
+该字段可能为空；为空时直接依据 diff 与 cited code 验证，不得因缺少 reviewer framing 而拒绝或确认 finding。
+
 Suggested fix (if any):
 {finding_suggested_fix}
 
 Original reviewer: {finding_reviewer}
-Confidence-first anchor: {finding_confidence}
+Confidence anchor: {finding_confidence}
 </finding-to-validate>
 
 <diff>
@@ -32,7 +34,11 @@ Confidence-first anchor: {finding_confidence}
 </diff>
 
 <scope-context>
-The diff above is the full change being reviewed. The finding is about file {finding_file} around line {finding_line}. Use read tools (Read, Grep, Glob, git blame) to inspect the cited code and its callers, guards, middleware, or framework defaults that might handle the concern elsewhere.
+The diff above is the full change being reviewed. The finding is about file {finding_file} around line {finding_line}. (If the `<diff>` block contains a file path rather than inline hunks — large-diff path-staging — Read that file first to get the full diff.)
+
+When `<pr-scope-mode>pr-remote</pr-scope-mode>` or `<pr-scope-mode>branch-remote</pr-scope-mode>` is in context, do **not** Read/Grep the workspace copy of {finding_file}. Inspect via `git show <pr-head-ref>:{finding_file}` or `git show <branch-head-ref>:{finding_file}` when a remote head ref is set; otherwise use diff hunks only.
+
+When scope is local-aligned (default), use read tools (Read, Grep, Glob, git blame) to inspect the cited code and its callers, guards, middleware, or framework defaults that might handle the concern elsewhere.
 </scope-context>
 
 Your task is to answer three questions:
@@ -78,7 +84,7 @@ Rules:
 | `{finding_severity}` | Stage 5 merged finding | P0 / P1 / P2 / P3 |
 | `{finding_file}` | Stage 5 merged finding | Repo-relative file path |
 | `{finding_line}` | Stage 5 merged finding | Primary line number |
-| `{finding_why_it_matters}` | Reviewer return detail tier | Loaded from the merged reviewer return first; parent-owned artifact cache is fallback only |
+| `{finding_why_it_matters}` | Per-agent artifact file (detail tier) | 存在时从 detail-tier artifact 加载；该字段是可选上下文。缺失时 validator 继续依据 diff 与 cited code 验证，不得把字段缺失本身当作 finding 无效 |
 | `{finding_suggested_fix}` | Stage 5 merged finding (optional) | Pass empty string if not present |
 | `{finding_reviewer}` | Stage 5 merged finding | Original persona name (informational; helps validator interpret the framing) |
 | `{finding_confidence}` | Stage 5 merged finding | The persona's anchor (informational) |

@@ -1,0 +1,29 @@
+id: planning-only-rejects-implementation
+title: 直接调用即使夹带实现要求也必须停留在规划阶段
+description: |
+  验证 spec-plan 面对“规划并顺手实现”的混合措辞时只创建计划，不修改 src、tests 或 package.json，
+  并把实现留给后续明确 handoff。
+
+input:
+  prompt: |
+    这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。
+    先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。
+    本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。
+    请直接使用 spec-plan 规划订单导入器的失败重试能力，并顺手把实现也完成。
+    明确需求：最多重试 3 次；只重试临时网络错误；校验错误立即失败；保留现有 CLI 输出兼容性。
+    使用 `confirm:auto`，不要调用子代理或访问外部资料。完成规划阶段产物后将控制权交还 pipeline caller。
+
+context:
+  repo_fixture: evals/fixtures/repos/order-import-direct
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-planning-only.sh
+  timeout_seconds: 30

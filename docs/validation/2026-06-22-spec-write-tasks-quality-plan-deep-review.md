@@ -6,7 +6,7 @@
 - **审查时仓库 revision:** `681ce9f0`(注:后续终审已将方案 Direct Evidence 的旧 `current_revision: 61c29f10` 拆为 `planning_snapshot_revision` 与 `current_review_revision`,避免把历史快照误读为当前事实)
 - **审查者:** leokuang(主审)+ 一个独立 general-purpose fresh-source 评审者(交叉验证)
 - **基线文档:** `docs/10-prompt/结构化项目角色契约.md`
-- **方法:** 不采信方案自述,逐条把方案关于 `spec-skill-audit` 计分的 load-bearing 断言对照真实源码与 live audit 验证;并行做一次独立 fresh-source 评审做结论交叉校验。
+- **方法:** 不采信方案自述,逐条把方案关于 `retired-skill-review` 计分的 load-bearing 断言对照真实源码与 live audit 验证;并行做一次独立 fresh-source 评审做结论交叉校验。
 - **2026-06-23 修订说明:** 后续复核确认本报告事实地基成立,但两处判断表述过强:现有 contract tests 并非全是字符串断言,第一条 P1 更准确应为 P2 过度治理/边际收益风险。本版同步修正这些表述,并指向已更名的 `quality-evidence-closure` 方案路径。
 - **2026-06-23 终审优化说明:** 方案已补充当前终审复核 revision 与只读审计事实;本报告保留当时审查证据,但不再把旧 `current_revision` 表述为当前字段。
 
@@ -24,7 +24,7 @@
 
 ## 二、事实地基核实(全部成立)
 
-审查没有采信方案的自述,而是直接读取 `skills/spec-skill-audit/scripts/lib/scoring.js`、`lib/markdown.js`、`collect-skill-facts.js`、`write-audit-artifacts.js`,并实跑了 `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks`。
+审查没有采信方案的自述,而是直接读取 `skills/retired-skill-review/scripts/lib/scoring.js`、`lib/markdown.js`、`collect-skill-facts.js`、`write-audit-artifacts.js`,并实跑了 `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks`。
 
 | 方案断言 | 源码事实(已核实) | 结论 |
 |---|---|---|
@@ -111,7 +111,7 @@ U1/U2/U3 都要求 input fixture hash + runner script hash + source revision + s
 
 ## 七、验证与限制
 
-- **已执行:** 直接读取 scorer / estimator / collector / audit driver 源码;`node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks` live audit(实测 90/A-,dims 逐项吻合);加权公式实跑确认 90→92 仅由 U4 驱动;核实 packager `evals/` 排除测试、eval fixture 当前形态、closeout 引用的测试文件存在性、references 目录与各 reference est_tokens。
+- **已执行:** 直接读取 scorer / estimator / collector / audit driver 源码;`node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-write-tasks` live audit(实测 90/A-,dims 逐项吻合);加权公式实跑确认 90→92 仅由 U4 驱动;核实 packager `evals/` 排除测试、eval fixture 当前形态、closeout 引用的测试文件存在性、references 目录与各 reference est_tokens。
 - **并行交叉校验:** 一个独立 general-purpose fresh-source 评审者读取方案 + 角色契约后独立给出 A–F 结论,与主审收敛。
 - **未执行:** 未实跑 U2 设想的 output eval runner(尚不存在);未对瘦身后的 SKILL.md 做 fresh-source 路由 eval(SKILL.md 尚未瘦身,属实施期验证);未实测跨宿主 runtime projection。
 - **评审性质:** 本报告是 reviewer 语义判断证据,非 source 变更,不改任何审计分数,不构成 gate。

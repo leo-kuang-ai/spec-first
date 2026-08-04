@@ -1,0 +1,43 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [
+    "effect_mismatch:Revise the authoritative source, update source-owned consumers, validate it, and regenerate mirrors through the projector.",
+    "base_operation_mismatch:revise-skill"
+  ],
+  "observed": {
+    "base_operation": "revise-skill",
+    "case_id": "spec-first-project-profile",
+    "effect": "Revise the authoritative source, update source-owned consumers, validate it, and regenerate mirrors through the projector.",
+    "layer_result": "source-first-authoring-plan",
+    "modifier": "spec-first production update with governance and runtime projection",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "采用 `revise-skill`、至少 `production` tier。先列出 `spec-debug` 的真实分支和受保护行为，再修改 source `SKILL.md`，确保 description 是含正向意图、负向边界和近邻 route 的触发合同，并对新增 prose 做逐句 no-op pruning。同步更新 governance、聚焦 trigger/boundary contract test 与 `CHANGELOG.md`；运行入口 lint、聚焦 Jest、diff check，随后用 `spec-first init` 从 source 重生 runtime，并运行可用的 runtime sync 检查。交付需列出实际命令、eval adequacy、mirror 状态、未检查项和 residual risks。",
+    "route_decision": "Proceed with authorized source-first revision and projector-driven runtime regeneration.",
+    "source_owner_assumption": "`skills/spec-debug/` and the repository's governance/tests/docs are authoritative; `.agents/`, `.claude/`, and `.codex/` copies are generated.",
+    "would_modify_paths": [
+      "skills/spec-debug/SKILL.md",
+      "skills/spec-debug/references/* (only when branch-specific detail requires it)",
+      "skills/spec-debug/evals/* (if used for boundary regression)",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "focused Jest contract test files",
+      "CHANGELOG.md",
+      "runtime catalog source or generated catalog required by repository contract",
+      ".agents/skills/spec-debug/** (projector output)",
+      ".claude/** (projector output if configured)",
+      ".codex/** (projector output if configured)"
+    ],
+    "would_run_commands": [
+      "npm run lint:skill-entrypoints",
+      "focused Jest contract test for spec-debug",
+      "git diff --check",
+      "spec-first init",
+      "repository runtime-sync or projection test, if available",
+      "package quick_validate.py, if officially provided by the target package"
+    ]
+  }
+}

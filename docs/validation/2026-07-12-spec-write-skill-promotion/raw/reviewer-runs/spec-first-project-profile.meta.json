@@ -1,0 +1,21 @@
+{
+  "case_id": "spec-first-project-profile",
+  "prompt": "review/scoped-v2/prompt-spec-first-project-profile.txt",
+  "result": "review/scoped-v2/runs/spec-first-project-profile.json",
+  "raw_jsonl": "review/scoped-v2/runs/spec-first-project-profile.jsonl",
+  "raw_stderr": "review/scoped-v2/runs/spec-first-project-profile.stderr.txt",
+  "provider": "codex-cli",
+  "model": "provider-default (not exposed in Codex JSONL)",
+  "configured_reference_model": "gpt-5.6-sol",
+  "host_version": "codex-cli 0.144.1",
+  "exit_code": 0,
+  "signal": null,
+  "spawn_error": null,
+  "duration_ms": 21884,
+  "usage": {
+    "input_tokens": 17242,
+    "cached_input_tokens": 0,
+    "output_tokens": 1004,
+    "reasoning_output_tokens": 111
+  }
+}

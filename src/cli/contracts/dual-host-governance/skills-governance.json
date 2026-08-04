@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "skills": [
     {
-      "skill_name": "agent-native-architecture",
+      "skill_name": "spec-commit",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -13,11 +13,12 @@
         "codex": "internal",
         "cursor": "internal",
         "kiro": "internal",
-        "qoder": "internal"
+        "qoder": "internal",
+        "opencode": "internal"
       }
     },
     {
-      "skill_name": "changelog",
+      "skill_name": "spec-commit-push-pr",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -27,25 +28,12 @@
         "codex": "internal",
         "cursor": "internal",
         "kiro": "internal",
-        "qoder": "internal"
+        "qoder": "internal",
+        "opencode": "internal"
       }
     },
     {
-      "skill_name": "spec-doc-review",
-      "entry_surface": "workflow_command",
-      "command_name": "doc-review",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "feature-video",
+      "skill_name": "spec-worktree",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -55,137 +43,12 @@
         "codex": "internal",
         "cursor": "internal",
         "kiro": "internal",
-        "qoder": "internal"
+        "qoder": "internal",
+        "opencode": "internal"
       }
     },
     {
-      "skill_name": "frontend-design",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "gemini-imagegen",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-clean-gone-branches",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-commit",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-commit-push-pr",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-worktree",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "proof",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "report-bug",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "resolve-pr-feedback",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "spec-rule-miner",
+      "skill_name": "spec-resolve-pr-feedback",
       "entry_surface": "standalone_skill",
       "command_name": null,
       "host_scope": "dual_host",
@@ -195,7 +58,8 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "skill"
+        "qoder": "skill",
+        "opencode": "skill"
       }
     },
     {
@@ -209,7 +73,8 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
@@ -223,161 +88,8 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-prd",
-      "entry_surface": "workflow_command",
-      "command_name": "prd",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-compound",
-      "entry_surface": "workflow_command",
-      "command_name": "compound",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-compound-refresh",
-      "entry_surface": "workflow_command",
-      "command_name": "compound-refresh",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-debug",
-      "entry_surface": "workflow_command",
-      "command_name": "debug",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-dhh-rails-style",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "spec-ideate",
-      "entry_surface": "workflow_command",
-      "command_name": "ideate",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-mcp-setup",
-      "entry_surface": "workflow_command",
-      "command_name": "mcp-setup",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-optimize",
-      "entry_surface": "workflow_command",
-      "command_name": "optimize",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-plan",
-      "entry_surface": "workflow_command",
-      "command_name": "plan",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-polish-beta",
-      "entry_surface": "workflow_command",
-      "command_name": "polish-beta",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-release-notes",
-      "entry_surface": "workflow_command",
-      "command_name": "release-notes",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
@@ -391,13 +103,14 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
-      "skill_name": "spec-sessions",
+      "skill_name": "spec-compound",
       "entry_surface": "workflow_command",
-      "command_name": "sessions",
+      "command_name": "compound",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -405,13 +118,14 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
-      "skill_name": "spec-write-skill",
+      "skill_name": "spec-compound-refresh",
       "entry_surface": "workflow_command",
-      "command_name": "write-skill",
+      "command_name": "compound-refresh",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -419,13 +133,14 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
-      "skill_name": "spec-skill-audit",
+      "skill_name": "spec-debug",
       "entry_surface": "workflow_command",
-      "command_name": "skill-audit",
+      "command_name": "debug",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -433,13 +148,14 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
-      "skill_name": "spec-slack-research",
+      "skill_name": "spec-dogfood",
       "entry_surface": "workflow_command",
-      "command_name": "slack-research",
+      "command_name": "dogfood",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -447,13 +163,14 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
-      "skill_name": "spec-write-tasks",
+      "skill_name": "spec-doc-review",
       "entry_surface": "workflow_command",
-      "command_name": "write-tasks",
+      "command_name": "doc-review",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -461,7 +178,263 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-explain",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-handoff",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-lfg",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-ideate",
+      "entry_surface": "workflow_command",
+      "command_name": "ideate",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-runtime-setup",
+      "entry_surface": "workflow_command",
+      "command_name": "runtime-setup",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-optimize",
+      "entry_surface": "workflow_command",
+      "command_name": "optimize",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-plan",
+      "entry_surface": "workflow_command",
+      "command_name": "plan",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-polish",
+      "entry_surface": "workflow_command",
+      "command_name": "polish",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-pov",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-prd",
+      "entry_surface": "workflow_command",
+      "command_name": "prd",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-product-pulse",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-promote",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-riffrec-feedback-analysis",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-rule-miner",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-simplify-code",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-sweep",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-strategy",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
       }
     },
     {
@@ -475,11 +448,57 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "command",
+        "opencode": "command"
       }
     },
     {
-      "skill_name": "spec-team-standards-governance",
+      "skill_name": "spec-write-skill",
+      "entry_surface": "workflow_command",
+      "command_name": "write-skill",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-write-tasks",
+      "entry_surface": "workflow_command",
+      "command_name": "write-tasks",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command",
+        "opencode": "command"
+      }
+    },
+    {
+      "skill_name": "spec-test-browser",
+      "entry_surface": "internal_only",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "internal",
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal",
+        "opencode": "internal"
+      }
+    },
+    {
+      "skill_name": "spec-test-xcode",
       "entry_surface": "standalone_skill",
       "command_name": null,
       "host_scope": "dual_host",
@@ -489,35 +508,8 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "skill"
-      }
-    },
-    {
-      "skill_name": "test-browser",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "test-xcode",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
+        "qoder": "skill",
+        "opencode": "skill"
       }
     },
     {
@@ -531,7 +523,8 @@
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "skill"
+        "qoder": "skill",
+        "opencode": "skill"
       }
     }
   ]

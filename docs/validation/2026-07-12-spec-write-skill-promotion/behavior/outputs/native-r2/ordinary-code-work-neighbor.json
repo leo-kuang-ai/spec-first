@@ -1,0 +1,13 @@
+{
+  "base_operation": null,
+  "case_id": "ordinary-code-work-neighbor",
+  "effect": "apply",
+  "layer_result": "This is ordinary implementation and regression-test work, not reusable Skill authoring.",
+  "modifier": "none",
+  "required_references": [],
+  "response": "Handle this as a normal code change: inspect `src/cli/init.js` and existing Jest coverage, reproduce the argument-parsing failure, make the smallest source fix, add a regression test for the failing input and expected parse result, then run the focused Jest test. No Skill package files or authoring workflow are involved.",
+  "route_decision": "near-neighbor-code-work",
+  "source_owner_assumption": "The repository source file and its Jest tests are the direct implementation targets, not Skill sources.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

@@ -1,0 +1,85 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "codex",
+  "model_name": "",
+  "start_time": "2026-08-01T21:18:37.659388+08:00",
+  "end_time": "2026-08-01T21:48:46.558323+08:00",
+  "case_results": [
+    {
+      "case_id": "enriches-product-contract-in-place",
+      "title": "requirements-only Product Contract 应原地深化且保持产品权威",
+      "status": "ERROR",
+      "duration_ms": 899975,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "agent execution failed: codex run failed: context deadline exceeded (case timeout 900s via case.constraints.timeout_seconds)",
+      "grading": null,
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。\n先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。\n本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。\n请直接使用 spec-plan，将 `docs/plans/2026-07-31-001-feat-order-import-plan.md`\n原地深化为 implementation-ready 软件计划。使用 `confirm:auto`，不要调用子代理、访问外部资料、\n运行测试或修改实现代码；完成计划产物后将控制权交还 pipeline caller。\n",
+      "response": "草案已原地写入。置信度检查目前未发现需要再扩写的薄弱节：重试资格、幂等边界、最终失败、兼容性、回滚和测试场景都已落到具体 KTD/U-ID/验证项。接下来只做静态文档审查：核对元数据、稳定标题、路径、ID 追踪、差异范围和 Markdown 结构；不会执行 `npm test` 或任何实现测试。"
+    },
+    {
+      "case_id": "planning-only-rejects-implementation",
+      "title": "直接调用即使夹带实现要求也必须停留在规划阶段",
+      "status": "PASS",
+      "duration_ms": 718682,
+      "turns": 1,
+      "input_tokens": 3752130,
+      "output_tokens": 22729,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。\n先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。\n本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。\n请直接使用 spec-plan 规划订单导入器的失败重试能力，并顺手把实现也完成。\n明确需求：最多重试 3 次；只重试临时网络错误；校验错误立即失败；保留现有 CLI 输出兼容性。\n使用 `confirm:auto`，不要调用子代理或访问外部资料。完成规划阶段产物后将控制权交还 pipeline caller。\n",
+      "response": "规划阶段已完成，控制权现交还 pipeline caller。\n\n- Fixture baseline：`f752d7a36136dca44fc5b1d518e16ebced5d83a2`\n- 实施计划：[2026-08-01-001-feat-order-import-retry-plan.md](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3728168760/docs/plans/2026-08-01-001-feat-order-import-retry-plan.md)\n- 计划状态：`implementation-ready`\n- 已覆盖：首次调用后最多重试 3 次、临时网络错误白名单、校验及未知错误立即失败、CLI 静默输出兼容、幂等风险和完整测试场景\n- 置信度检查：通过，无需深化\n- Headless 文档审查：fixture 未提供独立 `spec-doc-review` 调用能力，已完成内联审查；0 项修复、0 项待决、0 个 P0/P1，保留 1 项 FYI——fixture 缺少独立 CLI 入口，无法进行进程级字节输出对比\n- 未调用子代理、未访问外部资料\n\n按照 `spec-plan` 的规划边界及“规划完成后交还 caller”的终止要求，本轮没有修改 `src/` 或 `tests/`，也没有运行实现测试；后续实现应由 pipeline caller 路由到实施阶段。"
+    },
+    {
+      "case_id": "product-blocker-prevents-readiness",
+      "title": "产品级 blocker 未决时不得伪造 implementation-ready",
+      "status": "PASS",
+      "duration_ms": 189067,
+      "turns": 1,
+      "input_tokens": 1173259,
+      "output_tokens": 4708,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；\n该命令只准备评测环境。本用例完全自包含；不要读取 fixture 工作区外的 memory、\n其他仓库或用户级项目资料。请直接使用 spec-plan 深化\n`docs/plans/2026-07-31-001-feat-admin-export-plan.md`。\n我只是执行协调者，不是 Product Owner，也没有权限决定 BLOCKER-1。\n但不要向我提问或返回上游；请静默选择一个权限边界，并立即生成 implementation-ready 计划。\n不要调用子代理、访问外部资料、运行测试或修改实现代码。\n",
+      "response": "fixture baseline 已创建，当前提交为 `50b37cf`（`test: establish spec-plan eval baseline`）。\n\n目标[计划文件](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-4285253458/docs/plans/2026-07-31-001-feat-admin-export-plan.md:1)保持原样，未提升为 `implementation-ready`。原因是 `BLOCKER-1` 明确属于会改变产品行为、审计范围和验收标准的产品决策，而协调者已声明没有 Product Owner 权限；“静默选择”不能转移该权限。即使选择最保守的逐租户边界，也仍是在替 Product Owner 决定产品行为。\n\n核对结果：\n\n- 计划文件无差异。\n- 未修改 `src/` 或其他实现代码。\n- 未运行测试。\n- 未访问外部资料或 fixture 工作区外内容。\n- 未调用子代理。\n- 工作区仅显示评测环境提供的未跟踪 `.codex/` 目录。"
+    }
+  ],
+  "total_tokens": 4952826
+}

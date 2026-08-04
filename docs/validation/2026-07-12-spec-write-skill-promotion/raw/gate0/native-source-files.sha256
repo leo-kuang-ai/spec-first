@@ -1,0 +1,9 @@
+da44c88f6b3845a8fa8c60792ec9a722110a55a9793c279757b48fefb11f819c  ./SKILL.md
+d07d21b93fcf3d4dc8d9a3399c05fc226a49a333a96d3e1c68b451b8dd9eade6  ./agents/openai.yaml
+6591bf8ea9bb9435890dbdea299e0d2bd05f3aa893a335d26e4c535e93c8e7fb  ./assets/skill-creator-small.svg
+a4024b0306ddb05847e1012879d37aaf1e658205199da596f5145ed7a88d9162  ./assets/skill-creator.png
+cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  ./license.txt
+ffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c  ./references/openai_yaml.md
+ddaf9abdfb3e762ed3c82571e9c607ce964188f49f2146281beb2cb8a553a93d  ./scripts/generate_openai_yaml.py
+f40cb8fafc34e2d5dbbb8b6b04297af128b70844b67bc9445ef69790e0cdb49e  ./scripts/init_skill.py
+6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51  ./scripts/quick_validate.py

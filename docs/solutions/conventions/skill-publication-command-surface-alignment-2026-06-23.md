@@ -21,12 +21,11 @@ applicable_versions:
   - "Claude spec-* workflow surface"
   - "Codex spec-* workflow surface"
 invalidation_condition: "If host skill discovery stops using SKILL.md frontmatter name or spec-first replaces dual-host init/runtime projection governance, re-check this convention."
+retirement_note: "2026-07-08: the historical standalone skill and dedicated tests that originally exposed this issue were retired. Keep this learning only for the generic publication rule; do not treat retired source refs or examples as current surfaces."
 source_refs:
   - "src/cli/adapters/claude.js"
   - "src/cli/adapters/codex.js"
   - "src/cli/contracts/dual-host-governance/skills-governance.json"
-  - "skills/spec-team-standards-governance/SKILL.md"
-  - "tests/unit/team-standards-governance-contracts.test.js"
   - "tests/unit/spec-write-tasks-contracts.test.js"
 tags: [skill-publication, command-surface, dual-host, runtime-projection, standalone-skill]
 ---
@@ -35,12 +34,12 @@ tags: [skill-publication, command-surface, dual-host, runtime-projection, standa
 
 ## Context
 
-`spec-team-standards-governance` 是项目级 standalone skill。修复过程中发现 source skill 的 `name: spec-team-standards-governance` 是正确的，但 `spec-first init` 后 Claude 和 Codex runtime 都被 adapter 改写成 `name: team-standards-governance`。这会导致用户按 source 名称重新安装或调用时找不到预期 skill。
+一个历史项目级 standalone skill 暴露过 runtime 投影名称漂移：source skill 的 `name` 是正确的，但 `spec-first init` 后 Claude 和 Codex runtime 被 adapter 改写成去前缀名称。这会导致用户按 source 名称重新安装或调用时找不到预期 skill。该具体 skill 已于 2026-07-07 退役；本条 learning 仅保留通用发布检查规则。
 
 同一轮还暴露了命令文案混写问题：共享说明不能只写 `spec-*`，也不能把 standalone skill 伪装成 `spec-*` 或 `spec-*` workflow。需要同时表达两层事实：
 
 - public workflow 命令面：Claude 用 `spec-*`，Codex 用 `spec-*`。
-- standalone skill：保留治理 source 名称，例如 `spec-team-standards-governance` 或 `spec-write-tasks`，但不新增 `spec-*` 或 `spec-*` workflow entrypoint。
+- standalone skill：保留治理 source 名称，例如 `spec-write-tasks`，但不新增 `spec-*` 或 `spec-*` workflow entrypoint。
 
 ## Guidance
 
@@ -82,7 +81,7 @@ Standalone skill 的正确形态：
 
 ```yaml
 ---
-name: spec-team-standards-governance
+name: spec-write-tasks
 description: "Govern team development standards as source documents..."
 ---
 ```
@@ -98,7 +97,7 @@ or equivalent source-edit workflow.
 不应表达为：
 
 ```markdown
-Run `spec-team-standards-governance`.
+Run a standalone skill as if it were a public workflow command.
 ```
 
 Runtime projection 回归测试应覆盖两个宿主，而不是只检查 source：
@@ -107,8 +106,8 @@ Runtime projection 回归测试应覆盖两个宿主，而不是只检查 source
 syncSkills(projectRoot, new ClaudeAdapter());
 syncSkills(projectRoot, new CodexAdapter());
 
-expect(runtimeSkill).toContain('name: spec-team-standards-governance');
-expect(runtimeSkill).not.toContain('name: team-standards-governance');
+expect(runtimeSkill).toContain('name: spec-write-tasks');
+expect(runtimeSkill).not.toContain('name: write-tasks');
 ```
 
 ## Related

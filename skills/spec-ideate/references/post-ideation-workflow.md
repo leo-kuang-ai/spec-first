@@ -1,10 +1,16 @@
 # Post-Ideation Workflow
 
-Read this file after Phase 2 ideation agents return and the orchestrator has merged and deduped their outputs into a master candidate list. Do not load before Phase 2 completes.
+Read this file after Phase 2 ideation roles return and the orchestrator has merged and deduped their outputs into a master candidate list. Every dispatch instruction in this reference inherits the main Skill's Dispatch Authorization Boundary; inline/serial execution must keep the matching reason code and must not claim fresh-context or independent coverage. Do not load before Phase 2 completes.
 
 ## Phase 3: Adversarial Filtering
 
-Review every candidate idea critically. The orchestrator performs this filtering directly -- do not dispatch sub-agents for critique.
+Review every candidate idea critically. Critique has two roles — basis verification, then orchestrator arbitration. Only authorized, capable dispatch makes the first role a fresh-context verifier; inline fallback is an orchestrator self-check with the explicit coverage limitation from the main Skill.
+
+1. **Basis verification (generation-tier role — see SKILL.md Model Tiers).** When `worker_dispatch_authorization: authorized` and `worker_dispatch_capability: available`, dispatch a verifier whose payload is only the consolidated grounding summary (including evidence gists and dossier file paths) plus the merged candidate list, with none of the generation history. Otherwise run the same refutation rubric inline or serially, record `dispatch_authorization_missing`, `subagent_capability_missing`, or `worker_capability_unproven` according to the main Skill's boundary, and do not describe the result as independent or fresh-context. Check that each stated basis supports the move, that `direct:` quotes exist where cited, that `external:` prior art is real and relevantly analogous, that `reasoned:` arguments hold, and that the idea passes the meeting-test. A dispatched verifier returns sound/weak/refuted verdicts; only that fresh-context verdict may supersede generator self-attestation. Under `go deep`, a second ceiling-tier critic is eligible only through the same gate; inline fallback applies the second rubric serially without upgrading coverage.
+
+2. **Orchestrator arbitration.** The orchestrator makes the final cut, weighing verifier verdicts without being bound by them — overrule a verdict when evidence in context contradicts it, and say so in the rejection reason.
+
+If an authorized verifier dispatch fails, fall back to orchestrator-only filtering, record the capability/failure reason, and note the degradation in the rejection summary.
 
 Do not generate replacement ideas in this phase unless explicitly refining.
 
@@ -19,222 +25,136 @@ Rejection criteria:
 - already covered by existing workflows or docs
 - interesting but better handled as a brainstorm variant, not a product improvement
 - **unjustified — no articulated basis** (sub-agent failed to provide `direct:`, `external:`, or `reasoned:` justification, or the stated basis does not actually support the claimed move)
-- **below ambition floor** (fails the meeting-test: would not merit team discussion — except when Phase 0.5 detected tactical focus signals, in which case this criterion is waived)
+- **basis refuted by verification** (the verifier found a cited quote absent, prior art mischaracterized, or a reasoned argument unsound — and the orchestrator concurs)
+- **below ambition floor** (fails the meeting-test: would not warrant team discussion — except when Phase 0.5 detected tactical focus signals, in which case this criterion is waived)
 - **subject-replacement** (abandons or replaces the subject of ideation rather than operating on it — e.g., "pivot to an unrelated domain," "become a different organization")
+- **scope overrun** (expands beyond the asked scope rather than ideating within it — e.g., proposes changes to the whole product when the user asked about one flow, stage, or section). Allowed only when the basis explicitly justifies the expansion; default is reject or downgrade.
 
-Score survivors using a consistent rubric weighing: groundedness in stated context, **basis strength** (`direct:` > `external:` > `reasoned:`; none excluded, but direct-evidence ideas score higher all else equal), expected value, novelty, pragmatism, leverage on future work, implementation burden, and overlap with stronger ideas.
+Score survivors using a consistent rubric weighing: groundedness in stated context, **basis strength** (`direct:` > `external:` > `reasoned:`; none excluded, but direct-evidence ideas score higher all else equal), expected value, novelty, pragmatism, leverage on future work, implementation burden, overlap with stronger ideas, and **axis spread** (when Phase 1.5 produced an axis list) — survivor sets that cover the topic's surface outscore sets that cluster on one axis, all else equal.
+
+**Axis coverage as a list-level concern.** When axes were defined, axis spread is evaluated across the survivor set, not per-idea. After per-idea filtering, check the survivor set: if axis coverage is uneven and stronger candidates exist on under-represented axes, prefer the spread when promoting borderline candidates. Phase 2's recovery dispatch should already have surfaced candidates for empty axes; this is a polish step on the survivor selection. If an axis ends up with zero survivors despite recovery (or because recovery hit the 2-axis cap), note it in the rejection summary as a deliberate gap rather than an oversight.
 
 Target output:
 - keep 5-7 survivors by default
 - if too many survive, run a second stricter pass
 - if fewer than 5 survive, report that honestly rather than lowering the bar
 
-## Phase 4: Present the Survivors
+## Phase 4: Write and Present the Deliverable
 
-**Checkpoint B (V17).** Before presenting, write `<scratch-dir>/survivors.md` (using the absolute path captured in Phase 1) containing the survivor list plus key context (focus hint, grounding summary, rejection summary). This protects the post-critique state before the user reaches the persistence menu. Best-effort: if the write fails (disk full, permissions), log a warning and proceed; the checkpoint is not load-bearing. Reuses the same `<run-id>` and `<scratch-dir>` generated in Phase 1; not cleaned up at the end of the run (the run directory is preserved so the V15 cache remains reusable across run-ids in the same session — see Phase 6).
+The ideation artifact is produced **automatically** — persistence is not opt-in. After filtering, write the deliverable, show a concise summary, and open it. The full content lives in the file; the session shows only an orienting summary, so the rich format is what the reader actually engages with.
 
-Present the surviving ideas to the user. The terminal review loop is a complete ideation cycle in itself — persistence is opt-in (Phase 5), and refinement happens in conversation with no file or network cost (Phase 6).
+**Checkpoint B (V17).** Before writing the deliverable, write `<scratch-dir>/survivors.md` (absolute path from Phase 1) containing the survivor list plus key context (focus hint, grounding summary, rejection summary). Best-effort: if the write fails, log a warning and proceed; the checkpoint is not load-bearing. Reuses the same `<run-id>` / `<scratch-dir>` generated in Phase 1.
 
-Present only the surviving ideas in structured form:
+### 4.1 Write the Deliverable (automatic, both modes)
 
-- title
-- description
-- **basis** (tagged `direct:` / `external:` / `reasoned:`, with the quoted evidence, cited source, or written-out argument)
-- rationale (how the basis connects to the move's significance)
-- downsides
-- confidence-first score
-- estimated complexity
+`OUTPUT_FORMAT` (resolved in SKILL.md Phase 0.0; default `html`) sets the extension. Write the file every run — do not wait for the user to ask.
 
-Then include a brief rejection summary so the user can see what was considered and cut.
+1. **Resolve the target directory and extension.**
+   - Extension follows `OUTPUT_FORMAT` (`.html` default, `.md` on override).
+   - **Repo mode:** ensure `docs/ideation/` exists (create if absent).
+   - **Elsewhere mode with `docs/ideation/` already present:** use it.
+   - **Otherwise (no repo, or elsewhere with no `docs/ideation/`):** return the complete deliverable inline and offer to write it only after the user selects a durable destination. Do **not** use run-local scratch as the only deliverable, write into an arbitrary current working directory, or create a `docs/ideation/` tree for a subject unrelated to the repo.
+2. **Choose the file path:** `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>` (or `<dir>/YYYY-MM-DD-open-ideation.<ext>` when no focus exists).
+3. **Load the section contract and rendering reference** (deferred from Phase 0.0): read `references/ideation-sections.md` and the format-rendering reference matching `OUTPUT_FORMAT` — `references/markdown-rendering.md` for `md`, `references/html-rendering.md` for `html`.
+4. **Write the document** per those references. `ideation-sections.md` defines the section contract (metadata, Grounding Context, Topic Axes, Ranked Ideas with per-idea fields, Rejection Summary); the rendering reference defines how the resolved format presents it. Content is identical across formats; only presentation differs.
+   - **On write failure** (no writable path, permissions): announce the failure and offer a custom path (validate writable; create parent dirs). Never lose the survivors silently.
 
-Keep the presentation concise. Allow brief follow-up questions and lightweight clarification.
+**Resume:** update the existing file in place, in its existing format (per SKILL.md Phase 0.1 format precedence); carry the prior ideas and rejection summary forward, adding to them rather than overwriting.
 
-## Phase 5: Persistence (Opt-In, Mode-Aware)
+### 4.2 Present a Concise Summary (not the full deliverable)
 
-Persistence is opt-in. The terminal review loop is a complete ideation cycle. Refinement loops happen in conversation with no file or network cost. Persistence triggers only when the user explicitly chooses to save, share, or hand off (selected in Phase 6).
+The full cards, rationale, downsides, diagrams, and the rejection table live in the file. Do **not** reproduce them in the session — reprinting the whole deliverable as chat text defeats the rich format and leads the reader through plain text before they ever see it. Show a tight orientation instead:
 
-When the user picks an option in Phase 6 that requires a durable record (Open and iterate in Proof, Brainstorm, Save and end), ensure a record exists first. When the user chooses to keep refining, no record is needed unless the user asks.
+- One line with counts and the path: e.g. `Wrote 7 ranked ideas (36 raw, 13 cut) across 5 axes → <absolute path>`.
+- A ranked list, **one line per survivor**: `1. <Title> · <axis> · Conf <High/Med/Low> · Cx <S/M/L>`.
+- The top pick called out in a sentence.
+- Any axis with zero survivors noted in one line (the deliberate gap).
 
-**Mode-determined defaults:**
+This ranked list doubles as the index the user references when choosing an idea in Phase 5. Terminal-only readers still get a usable view; depth is one open away.
 
-| Action | Repo mode default | Elsewhere mode default |
-|---|---|---|
-| Save | `docs/ideation/YYYY-MM-DD-<topic>-ideation.md` | Proof |
-| Share | Proof (additional) | Proof (primary) |
-| Brainstorm handoff | `spec-brainstorm` | `spec-brainstorm` (universal-brainstorming) |
-| End | Conversation only is fine | Conversation only is fine |
+### 4.3 Open It
 
-Either mode can also use the other destination on explicit request ("save to Proof even though this is repo mode", "save to a local file even though this is elsewhere"). Honor such overrides directly.
+- **HTML:** in an interactive session, best-effort open the file in the browser via the platform's open primitive (`open` on macOS, `xdg-open` on Linux, `start` on Windows); always print the absolute path so it can be reopened or shared. Skip auto-open in headless / pipeline runs (no interactive surface).
+- **Markdown:** print the path. There is no browser-open step for Markdown; the Phase 5 menu offers only the next-step options below.
 
-### 5.1 File Save (default for repo mode; on request for elsewhere mode)
+## Phase 5: Next Steps
 
-1. Ensure `docs/ideation/` exists
-2. Choose the file path:
-   - `docs/ideation/YYYY-MM-DD-<topic>-ideation.md`
-   - `docs/ideation/YYYY-MM-DD-open-ideation.md` when no focus exists
-3. Write or update the ideation document
+Ask what to do next using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. Free-text answers are accepted.
 
-Use this structure and omit clearly irrelevant fields only when necessary:
+The deliverable already exists (Phase 4), so the menu is purely *what next* — there is no "save" step.
 
-```markdown
----
-date: YYYY-MM-DD
-topic: <kebab-case-topic>
-focus: <optional focus hint>
-mode: <repo-grounded | elsewhere-software | elsewhere-non-software>
----
+**Stem:** "Your ideation is saved to `<path>`. What next?"
 
-# Ideation: <Title>
+Offer the applicable options with self-contained labels and the distinguishing word front-loaded so they stay distinct when truncated. Renumber the visible options contiguously after applying the format gate:
 
-## Grounding Context
-[Grounding summary from Phase 1 — labeled "Codebase Context" in repo mode, "Topic Context" in elsewhere mode]
+1. *(when `OUTPUT_FORMAT=html`)* **Open in browser** — open the saved HTML deliverable (re-open if it was already opened).
+2. **Brainstorm one idea with `spec-brainstorm`** — commit a chosen idea to a requirements-only unified plan under `docs/plans/`; leaves spec-ideate. Asks which idea first.
+3. **Discuss or refine the ideas first** — stay here to think across the set before committing: adjust or interrogate one idea, compare several, or combine/merge them. Asks what you want to work on.
+4. **Done — keep the file and stop.**
 
-## Ranked Ideas
+**Adjacent nudge (prose, not a slot):** "Don't want it kept? Say 'discard' and the agent deletes the file." Handled via free text (see §5.5); it is create-only and never deletes a resumed or pre-existing doc.
 
-### 1. <Idea Title>
-**Description:** [Concrete explanation]
-**Basis:** [`direct:` / `external:` / `reasoned:` — the actual basis, quoted or cited]
-**Rationale:** [How the basis connects to the move's significance]
-**Downsides:** [Tradeoffs or costs]
-**Confidence:** [0-100%]
-**Complexity:** [Low / Medium / High]
-**Status:** [Unexplored / Explored]
+If the user already named what they want to work on inline (e.g. "brainstorm the table tool", "tighten the highlighter idea", "merge the table and highlighter ideas"), skip the follow-up that asks what to work on for §5.2 / §5.3.
 
-## Rejection Summary
+### 5.1 Open in Browser (html)
 
-| # | Idea | Reason Rejected |
-|---|------|-----------------|
-| 1 | <Idea> | <Reason rejected> |
-```
+- **HTML — Open in browser.** (Re)open the saved file via the platform primitive where available; otherwise print the absolute path. Return to the Phase 5 menu. The HTML file is the canonical record.
 
-If resuming:
-- update the existing file in place
-- preserve explored markers
+### 5.2 Brainstorm One Idea
 
-### 5.2 Proof Save (default for elsewhere mode; on request for repo mode)
+1. **Identify the idea** by number or name (skip if the user already named it). Match against the ranked list from Phase 4.2.
+2. **Build a focused seed** from the idea's substance already in the orchestrator's context. Do **not** pass the whole file — wasteful and noisy (the other survivors, grounding, and rejection table are irrelevant to defining this one idea, and an HTML file carries CSS/SVG chrome). Do **not** pass only a file pointer — that forces `spec-brainstorm` to re-open and re-extract the idea the orchestrator already holds. The seed is feature-description-shaped:
 
-Hand off the ideation content to the `proof` skill in HITL review mode. This uploads the doc, runs an iterative review loop (user annotates in Proof, agent ingests feedback, applies agreed edits, and replies/resolves in-thread), and (in repo mode) syncs the reviewed markdown back to `docs/ideation/`.
+   > `<title> — <description>. Basis: <basis/evidence>. Source snapshot: <commit/version/observed state, including dirty/unknown status>. Why it matters: <rationale>. Known tradeoffs: <downsides>. Evidence limitations: <stale/partial/unknown constraints>. Unverified assumptions: <assumptions or none>. Relevant rejected alternative: <one directly adjacent rejected alternative and why it lost>.`
 
-Load the `proof` skill (host-provided; if the host does not expose it, tell the user this review surface is unavailable) in HITL-review mode with:
+   The basis/evidence directly feeds `spec-brainstorm`'s product-pressure-test, so it won't re-derive what we already know. Snapshot the load-bearing basis from the evidence already held by the orchestrator; if the worktree is dirty or the revision is unknown, say `dirty/unknown` rather than inventing a clean revision. When HEAD or a cited source changed after the idea was evaluated, mark that basis `stale` and keep it as a limitation — `spec-brainstorm` decides whether and how to re-ground it. Carry only one directly adjacent rejected alternative, chosen because it would change the selected idea's Product Contract; omit unrelated rejects and the complete rejection table. Preserve reasoned claims as unverified assumptions when no direct evidence supports them. If the user examined that exact tradeoff and selected the idea, append one transient settled-decision brief entry containing the decision, `user-directed` or `user-approved` class, rejected alternative, and one-line reason. Do not label an agent-ranked idea as settled. `spec-brainstorm` becomes the single durable owner by writing the accepted decision once in the Product Contract; the ideation artifact and handoff seed remain provenance inputs, not competing decision registries. Append a one-line provenance pointer: `(Seeded from spec-ideate: <path>, idea "<title>")` — it records origin and lets brainstorm pull adjacent detail if it wants, without being forced to read anything. Do not include implementation HOW or start any browser helper from the seed.
+3. **Load the `spec-brainstorm` skill** with that seed. The saved file is already the record — no extra write step.
 
-- **source content:** the survivors and rejection summary from Phase 4 (in repo mode, this is the file written in 5.1; in elsewhere mode, render to a temp file as the source for upload)
-- **doc title:** `Ideation: <topic>` or the H1 of the ideation doc
-- **attribution:** use the proof skill's fixed HITL identity, `ai:spec-first` / `Spec-First`
-- **recommended next step:** current host's brainstorm entrypoint (shown in the proof skill's final terminal output)
+**Repo mode only:** do **not** skip brainstorming and go straight to `spec-plan` — `spec-plan` wants a brainstorm-grounded Product Contract. In elsewhere modes, ideation is a legitimate terminal state; brainstorming is optional deeper development of one idea, not a required next rung on an implementation ladder that does not exist in these modes.
 
-The Proof failure ladder in Phase 6.5 governs what happens when this hand-off fails.
+### 5.3 Discuss or Refine the Ideas First
 
-**Caller-aware return.** The return-rule bullets below describe the default control flow, but the next step depends on which Phase 6 option invoked the Proof save. Apply the right branch for the caller:
+This stays in spec-ideate — no skill handoff. It is the "think across the set before committing" step, and it is a normal, expected outcome of ideation: seeing several strong candidates and wanting to deliberate is more common than instantly committing one. The orchestrator still holds the full grounding and generation context, so it can reason across every survivor — this is where that context pays off. The work here is either **single-idea** (sharpen or interrogate one) or **cross-idea** (compare, combine, or merge several); do not force the user to name a single idea before they can engage.
 
-- **§6.2 Open and iterate in Proof.** Behavior is mode-aware:
-    - *Repo mode:* return to the Phase 6 menu on every status. The Proof-reviewed content is now synced locally, and the user typically has a follow-up action in the repo (brainstorm toward a plan, save and end, or keep refining).
-    - *Elsewhere mode:* on a successful Proof return (`proceeded` or `done_for_now`), exit cleanly — narrate that the artifact lives at `docUrl` (including any stale-local note if applicable) and stop. Proof iteration is often the terminal act in elsewhere mode; forcing another menu choice after the user already got what they came for produces decision fatigue. Only the `aborted` branch returns to the Phase 6 menu so the user can retry or pick another path.
-- **§6.3 Brainstorm a selected idea.** On a successful Proof return (`proceeded` or `done_for_now`), do **not** stop at the Phase 6 menu — after applying the per-status handling below (including any stale-local pull offer), continue into §6.3's remaining bullets (mark the chosen idea as `Explored`, then load `spec-brainstorm`). Only the `aborted` branch returns to the Phase 6 menu, since no durable record was written.
-- **§6.4 Save and end.** On a successful Proof return (`proceeded` or `done_for_now`), exit cleanly: narrate that the ideation was saved, surface the `docUrl` (and the local-path note if applicable), and stop. Do **not** re-ask the Phase 6 question — the user already chose to end. Only the `aborted` branch returns to the Phase 6 menu so the user can retry or pick a different path.
+1. **Establish what the user wants to work on and how.** Infer from their phrasing when given; otherwise ask one open question ("What do you want to work on?") rather than assuming a single idea. The scope may be one idea, a subset, or the whole set.
+2. **Route by intent:**
+   - **Ask / compare** ("why High confidence?", "how does this compare to FigJam?", "which of these overlap?", "which two are closest?") — answer in conversation, grounded in the ideas' bases and the Phase 1 grounding. Spans one idea or many. **No file rewrite** unless the discussion yields a change the user wants captured.
+   - **Adjust** ("smaller scope", "drop the paste-import part", "reframe around X") — revise that idea's framing, scope, or basis as discussed, then **rewrite the saved file** so the deliverable stays current.
+   - **Deepen** ("expand the second-order effects") — extend an idea's analysis; capture into the file only if the user wants it kept.
+   - **Combine / merge** ("merge the table and highlighter ideas", "fold 2 into 5") — synthesize the named ideas into one: write a unified title, description, and basis that draws from each source idea (carry the strongest basis forward; union their evidence). On a file rewrite, **replace the merged source entries with the single combined entry** — do not leave the originals alongside the merge — and renumber the ranked list. Re-evaluate the combined idea's axis and confidence rather than copying one source's. Note the merge in the rejection summary if a source idea effectively drops out.
+3. **Rewrite only on change.** The file is rewritten only when idea content actually changes (adjust, deepen-and-keep, or merge) — Q&A and comparison alone do not churn it.
+4. **Return to the Phase 5 menu.** Typically the user next brainstorms a sharpened or merged idea (§5.2), discusses more, opens it, or finishes.
 
-When the proof skill returns control:
+### 5.4 Done
 
-- `status: proceeded` with `localSynced: true` → the ideation doc on disk now reflects the review. Apply the caller-aware return rule above for the invoking branch.
-- `status: proceeded` with `localSynced: false` → the reviewed version lives in Proof at `docUrl` but the local copy is stale. Offer to pull the Proof doc to `localPath` using the proof skill's Pull workflow. Apply the caller-aware return rule above; if the pull was declined, include a one-line note that `<localPath>` is stale vs. Proof so the next handoff (or final exit narration) doesn't read the old content silently. Placement: above the Phase 6 menu when the caller-aware rule returns to it, in the handoff preamble to `spec-brainstorm` for §6.3, or alongside the final save/exit narration for §6.2 elsewhere / §6.4.
-- `status: done_for_now` → the doc on disk may be stale if the user edited in Proof before leaving. Offer to pull the Proof doc to `localPath` so the local ideation artifact stays in sync, then apply the caller-aware return rule above. `done_for_now` means the user stopped the HITL loop — it does not mean they ended the whole ideation session unless the caller-aware rule exits (§6.2 elsewhere mode or §6.4). If the pull was declined, include the stale-local note at the placement described in the previous bullet.
-- `status: aborted` → fall back to the Phase 6 menu without changes, regardless of caller. No durable record was written, so §6.3 must not proceed with the brainstorm handoff and §6.4 must not end — the menu lets the user retry or pick another path.
+The file is already written, so there is no save step.
 
-## Phase 6: Refine or Hand Off
+- **Inside a git repo:** offer to commit only the ideation doc (do not create a branch, do not push; if the user declines, leave it uncommitted).
+- **Temp-area or non-repo file:** skip the commit offer.
 
-Ask what should happen next using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+Then narrate the path and end the session — do not return to the menu.
 
-**Question:** "What should the agent do next?"
+### 5.5 Discard (free text)
 
-Offer these four options (labels are self-contained with the distinguishing word front-loaded so options stay distinct when truncated):
+Only when the file was **created fresh this run**: delete it, confirm the deletion, and end. On a **resume** run (a pre-existing file was updated in place), do **not** delete — tell the user the existing doc at `<path>` remains and offer no destructive action. Discard is never a default; it fires only on an explicit request.
 
-1. **Refine the ideation in conversation (or stop here — no save)** — add ideas, re-evaluate, or deepen analysis. No file or network side effects; ending the conversation at any point after this pick is a valid no-save exit.
-2. **Open and iterate in Proof** — save the ideation to Proof and enter the proof skill's HITL review loop: iterate via comments in the Proof editor; reviewed edits sync back to `docs/ideation/` in repo mode.
-3. **Brainstorm a selected idea** — load `spec-brainstorm` with the chosen idea as the seed. The orchestrator first writes a durable record using the mode default in Phase 5.
-4. **Save and end** — persist the ideation using the mode default (file in repo mode, Proof in elsewhere mode), then end.
-
-No-save exit is supported without a dedicated menu option. Pick option 1 and stop the conversation, or use the question tool's free-text escape to say so directly — persistence is opt-in and the terminal review loop is already a complete ideation cycle.
-
-Do not delete the run's scratch directory (`<scratch-dir>` resolved in Phase 1) on completion. The V15 web-research cache is session-scoped and reused across run-ids by later ideation invocations in the same session (see `references/web-research-cache.md`); per-run cleanup would defeat that reuse. Checkpoint A (`raw-candidates.md`) and Checkpoint B (`survivors.md`) are cheap to leave behind and follow the repo's Scratch Space cross-invocation-reusable convention — OS handles eventual cleanup.
-
-### 6.1 Refine the Ideation in Conversation
-
-Route refinement by intent:
-
-- `add more ideas` or `explore new angles` -> return to Phase 2
-- `re-evaluate` or `raise the bar` -> return to Phase 3
-- `dig deeper on idea #N` -> expand only that idea's analysis
-
-No persistence triggers during refinement. The user can choose Save and end (or Brainstorm, or Open and iterate in Proof) when they are ready to persist.
-
-Ending after refinement — or without any refinement at all — is a valid no-save exit. There is no required next step; stopping the conversation here leaves no durable artifact, which matches the opt-in persistence contract.
-
-### 6.2 Open and Iterate in Proof
-
-Invoke the Proof HITL review path via §5.2 with §6.2 as the caller. In repo mode, ensure the local file exists first (run §5.1) so the HITL sync-back has a target; in elsewhere mode, §5.2 renders to a temp file as usual. Honor Phase 5's "ensure a record exists first" contract either way.
-
-Apply §5.2's caller-aware return rule for the §6.2 branch — behavior is mode-aware. In repo mode, return to the Phase 6 menu on every status so the user can pick a follow-up (brainstorm toward a plan, save-and-end, or keep refining) now that the Proof review is reflected in the local file. In elsewhere mode, exit cleanly on a successful Proof return since Proof iteration is often the terminal act — the artifact lives at `docUrl` and is the canonical record; only the `aborted` status returns to the menu.
-
-If the Proof handoff fails, the §6.5 Proof Failure Ladder governs recovery.
-
-### 6.3 Brainstorm a Selected Idea
-
-- Write or update the durable record per the mode default in Phase 5 (file in repo mode, Proof in elsewhere mode). When this routes through §5.2 Proof Save, apply §5.2's caller-aware return rule: continue into the next bullet on a successful Proof return instead of bouncing back to the Phase 6 menu. If Proof returned `aborted` (no durable record written), go back to the Phase 6 menu and do **not** proceed with the brainstorm handoff.
-- Mark the chosen idea as `Explored` in the saved record
-- Execute the `spec-brainstorm` workflow with the chosen idea as the seed
-
-**Repo mode only:** do **not** skip brainstorming and go straight to `spec-plan` from ideation output — `spec-plan` wants brainstorm-grounded requirements. In elsewhere modes, ideation (or ideation + Proof iteration) is a legitimate terminal state; brainstorming is optional deeper development of one idea, not a required next rung on an implementation ladder that does not exist in these modes.
-
-### 6.4 Save and End
-
-Persist via the mode default (5.1 in repo mode, 5.2 in elsewhere mode), then end. If the user instead asked to use the non-default destination, honor that explicit request.
-
-When the path lands in a Proof save (5.2), apply §5.2's caller-aware return rule for the §6.4 branch: on a successful Proof return, exit cleanly — narrate the save, surface the `docUrl` (and any stale-local note if the pull was declined), and stop. Do **not** loop back to the Phase 6 menu; the user already chose to end. Only a `status: aborted` from Proof returns to the menu so the user can retry or pick another path (file save, custom path, or keep refining). The §6.5 Proof Failure Ladder still governs persistent Proof failures and ends at the Phase 6 menu — that failure-recovery path is distinct from the successful-save exit described here.
-
-When the path lands in a file save (5.1):
-
-- offer to commit only the ideation doc
-- do not create a branch
-- do not push
-- if the user declines, leave the file uncommitted
-
-After the file save (and optional commit), end the session — do not return to the Phase 6 menu.
-
-### 6.5 Proof Failure Ladder
-
-The `proof` skill performs single-retry-once internally on transient failures (`STALE_BASE`, `BASE_TOKEN_REQUIRED`) before surfacing failure. The proof skill's return contract does not expose typed error classes to callers — the orchestrator cannot distinguish retryable vs terminal failures from outside.
-
-**Orchestrator-side retry harness (intentionally minimal):** wrap the proof skill invocation in **one** additional best-effort retry with a short pause (~2 seconds). The proof skill already retried internally, so this catches transient races at the orchestrator boundary without compounding latency. Do not classify error types from outside the skill — no detection mechanism exists.
-
-Distinguish create-failure from ops-failure by inspecting whether the proof skill returned a `docUrl` before failing:
-
-- **Create-failure** (no `docUrl` returned): retry the create.
-- **Ops-failure** (a `docUrl` was returned, but a later operation failed): retry only the failing operation. **Do not recreate** the document.
-
-**Failure narration.** Narrate the single retry to the terminal so the pause does not look like a hang ("Retrying Proof... attempt 2/2"). On persistent failure, narrate that retry exhausted before showing the fallback menu.
-
-**Fallback menu after persistent failure.** Use the platform's blocking question tool. Present these options (omit option (a) if no repo exists at CWD):
-
-- "Save to `docs/ideation/` instead" (repo-mode default destination, available when CWD is inside a git repo)
-- "Save to a custom path the user provides" (validate writable; create parent dirs)
-- "Skip save and keep the ideation in conversation" (no persistence)
-
-If proof returned a partial `docUrl` before failing, surface that URL alongside the fallback options so the user can recover or share the partial record.
-
-After the fallback completes (any path), continue back to the Phase 6 menu so the user can still refine, iterate in Proof, brainstorm, or save and end.
+After durable outputs and any repo-backed checkpoint are confirmed, reap `<scratch-dir>` best-effort and record cleanup failure as a limitation. Its web research material and evidence dossiers are run-local only; no later invocation may depend on them, and outside a repo the complete deliverable must already have been returned inline or written to a user-selected durable destination.
 
 ## Quality Bar
 
 Before finishing, check:
 
 - the idea set is grounded in the stated context (codebase in repo mode; user-supplied context in elsewhere mode)
-- **every surviving idea has articulated basis** (`direct:`, `external:`, or `reasoned:`) that actually supports the claimed move — speculation dressed as ambition was rejected, with reasons
+- **every surviving idea has an articulated basis** (`direct:`, `external:`, or `reasoned:`) that actually supports the claimed move — speculation dressed as ambition was rejected, with reasons
+- load-bearing `direct:` bases were verified against the repo (or the supplied context) — by the generating agent's verification reads or the Phase 3 verifier — not taken on faith
 - **every surviving idea passes the meeting-test** unless Phase 0.5 detected tactical focus signals that waived the floor
 - **no surviving idea replaces the subject** rather than operating on it
+- when Phase 1.5 produced an axis list, the survivor set spreads across axes rather than clustering on one — and any axis with zero survivors is noted as a deliberate gap in the rejection summary, not silently absent
 - the candidate list was generated before filtering
 - the original many-ideas -> critique -> survivors mechanism was preserved
 - if sub-agents were used, they improved diversity without replacing the core workflow
 - every rejected idea has a reason
 - survivors are materially better than a naive "give me ideas" list
-- persistence followed user choice — terminal-only sessions did not write a file or call Proof
-- when persistence did trigger, the mode default was respected unless the user explicitly overrode it
-- acting on an idea routes to `spec-brainstorm`, not directly to implementation
+- the deliverable was written automatically in both modes (Phase 4) — to `docs/ideation/` when present, else the spec-first temp area, never the user's CWD
+- the session showed a concise summary, not a reproduction of the full deliverable
+- acting on an idea routes to `spec-brainstorm` (with a substance seed, not the whole file), not directly to implementation

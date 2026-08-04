@@ -1,0 +1,9 @@
+{
+  "case": "validate-only",
+  "logical_id": "codex-system-skill-creator",
+  "native_source_manifest_sha256": "473b9dd5ff3df1d352b499d83e00864290bd2874ac3f9243e33f09ab7e9e835c",
+  "prompt_sha256": "077f62db67c054bbc3aa630e27639b40932d0cb7438830ce73a4e59cb354407c",
+  "output_schema_sha256": "f7443099cbf8fdf6e59b8ffb3eea5dd783f4639ffdc8aab45907dff6e89fbc9b",
+  "cwd": "/tmp/spec-write-skill-gate0-20260711T195327Z/fixtures/validate-only",
+  "cli": "codex exec --ephemeral --sandbox read-only --ignore-rules --skip-git-repo-check --json --color never --output-schema <schema> --output-last-message <output> -"
+}

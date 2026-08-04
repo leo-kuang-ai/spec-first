@@ -1,0 +1,44 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "spec-first-project-profile",
+  "arm": "old-full",
+  "repeat": 1,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 2,
+    "required_references": 1,
+    "no_contamination": 1
+  },
+  "total_score": 8,
+  "rationale": "Excellent treatment of branch inventory, protected behavior, positive/negative/neighbor trigger contracts, focused tests, Changelog, projection, and closeout evidence. It invents production-tier and prose-pruning obligations and assumes several runtime consumers before repository mapping is confirmed; project-profile and generator references are also missing.",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/old-full-r1.json",
+    "sha256": "ace577e559de5c6918d4c6e78dea89ecd509f4615f47b7466776be022cc47cea",
+    "hash_verified": true
+  },
+  "fixed_old_source": {
+    "sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+    "hash_verified": true
+  },
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-spec-first-project-profile.txt",
+    "raw_jsonl": "review/scoped-v2/runs/spec-first-project-profile.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/spec-first-project-profile.stderr.txt",
+    "last_json": "review/scoped-v2/runs/spec-first-project-profile.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 17242,
+    "output_tokens": 1004,
+    "reasoning_output_tokens": 111,
+    "duration_ms": 21884,
+    "reviewer_last_json_sha256": "5a3de33aadd77d76ecb7deaf9a9503a546388dbb8156925fa83adbdde352db93"
+  }
+}

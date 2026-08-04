@@ -1,35 +1,24 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PlatformAdapter = require('./base');
+const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const {
+  contentHasUnexpectedRuntimePathReferences,
+  rewritePreservingHostComparativeConfigPaths,
+} = require('./host-comparative-config-paths');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
+const KIRO_STEERING_POINTER_PATH = '.kiro/steering/spec-first.md';
 const KIRO_AGENT_READ_TOOLS = ['read'];
-const KIRO_UNREWRITTEN_PATH_PATTERNS = [
-  /\.claude\/commands\/spec\/[a-z-]+\.md/,
-  /\.claude\/commands\/spec-\*\.md/,
-  /\.claude\/spec-first\/workflows\//,
-  /\.claude\/skills\//,
-  /\.claude\/agents\//,
-  /\.codex\/commands\/spec\/[a-z-]+\.md/,
-  /\.codex\/commands\/spec-\*\.md/,
-  /\.codex\/skills\//,
-  /\.codex\/agents\//,
-  /\.agents\/skills\//,
-  /\.cursor\/skills\//,
-  /\.cursor\/spec-first\//,
-  /\.cursor\/mcp\.json/,
-  /\.qoder\/commands\/spec-[a-z-]+\.md/,
-  /\.qoder\/commands\/spec-\*\.md/,
-  /\.qoder\/commands\/spec\//,
-  /\.qoder\/skills\//,
-  /\.qoder\/agents\//,
-  /\.qoder\/spec-first\//,
-  /\.qoder\/settings\.local\.json/,
-];
 
-class KiroAdapter extends PlatformAdapter {
+class KiroAdapter extends PointerBasedAdapter {
   get id() {
     return 'kiro';
   }
@@ -70,12 +59,23 @@ class KiroAdapter extends PlatformAdapter {
     return 'AGENTS.md';
   }
 
+  get pointerPath() {
+    return KIRO_STEERING_POINTER_PATH;
+  }
+
+  get pointerHostLabel() {
+    return 'Kiro';
+  }
+
   transformSkillContent(content, context = {}) {
-    let transformed = rewriteSkillName(
-      rewriteSharedPaths(content),
-      kiroRuntimeSkillName(context),
-    );
-    if (isKiroRuntimeSetupSurface(context)) {
+    const isEntrypoint = isSkillEntrypointContext(context);
+    let transformed = isEntrypoint
+      ? rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths)
+      : content;
+    if (isEntrypoint) {
+      transformed = rewriteSkillName(transformed, kiroRuntimeSkillName(context));
+    }
+    if (isEntrypoint && isKiroRuntimeSetupSurface(context)) {
       transformed = addKiroSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
@@ -87,7 +87,7 @@ class KiroAdapter extends PlatformAdapter {
 
   transformAgentContent(content) {
     const { frontmatter, body } = splitMarkdownFrontmatter(content);
-    const fields = parseSimpleFrontmatterFields(frontmatter);
+    const fields = parseFrontmatterScalars(frontmatter);
     const name = normalizeKiroName(fields.name || fields.agent || 'spec-first-agent');
     const description = sanitizeFrontmatterScalar(fields.description || `spec-first agent ${name}`);
     const transformedBody = rewriteSharedPaths(body || content);
@@ -95,7 +95,7 @@ class KiroAdapter extends PlatformAdapter {
     return [
       '---',
       `name: ${name}`,
-      `description: ${JSON.stringify(description)}`,
+      `description: ${formatFrontmatterScalar(description)}`,
       `tools: [${KIRO_AGENT_READ_TOOLS.map((tool) => JSON.stringify(tool)).join(', ')}]`,
       '---',
       '',
@@ -139,6 +139,7 @@ class KiroAdapter extends PlatformAdapter {
     if (fs.existsSync(agentsRoot)) {
       checks.push(...inspectKiroAgentFrontmatter(projectRoot, agentsRoot));
     }
+    checks.push(this.inspectPointerRuntime(projectRoot));
 
     return checks.length > 0
       ? checks
@@ -148,9 +149,11 @@ class KiroAdapter extends PlatformAdapter {
         message: 'no Kiro-specific runtime drift detected',
       }];
   }
+
 }
 
 module.exports = KiroAdapter;
+module.exports.KIRO_STEERING_POINTER_PATH = KIRO_STEERING_POINTER_PATH;
 module.exports.KIRO_AGENT_READ_TOOLS = KIRO_AGENT_READ_TOOLS;
 module.exports.normalizeKiroName = normalizeKiroName;
 
@@ -189,7 +192,7 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --kiro')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --kiro')
     .replace(/\$spec-\*/g, '`spec-*`')
-    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`');
+    .replace(/\$spec-runtime-setup/g, '`spec-runtime-setup`');
   return rewriteKiroRuntimeContextSections(rewriteUsingSpecFirstKiroSections(rewritten));
 }
 
@@ -246,7 +249,12 @@ function kiroRuntimeSkillName(context = {}) {
 }
 
 function isKiroRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addKiroSetupHostPin(content) {
@@ -257,50 +265,11 @@ function addKiroSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Kiro Host Pin',
     '',
-    'When this generated Kiro `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Cursor, Kiro, and Qoder CLIs can coexist on the same machine.',
+    'When this generated Kiro `spec-runtime-setup` runtime surface invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Cursor, Kiro, and Qoder CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
   ].join('\n'));
-}
-
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
 }
 
 function normalizeKiroName(value) {
@@ -327,12 +296,16 @@ function inspectKiroSkillNames(projectRoot, skillsRoot) {
       const skillPath = path.join(skillsRoot, skillDir, 'SKILL.md');
       if (!fs.existsSync(skillPath)) return [];
       const { frontmatter } = splitMarkdownFrontmatter(fs.readFileSync(skillPath, 'utf8'));
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, skillPath).replace(/\\/g, '/');
       const issues = [];
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
-      if (KIRO_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(fs.readFileSync(skillPath, 'utf8')))) {
+      if (contentHasUnexpectedRuntimePathReferences(
+        'kiro',
+        fs.readFileSync(skillPath, 'utf8'),
+        { skillName: skillDir },
+      )) {
         issues.push('contains non-Kiro runtime path references');
       }
       return issues.length === 0
@@ -356,7 +329,7 @@ function inspectKiroAgentFrontmatter(projectRoot, agentsRoot) {
     .flatMap((agentPath) => {
       const content = fs.readFileSync(agentPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, agentPath).replace(/\\/g, '/');
       const issues = [];
       if (!fields.name) issues.push('missing name');

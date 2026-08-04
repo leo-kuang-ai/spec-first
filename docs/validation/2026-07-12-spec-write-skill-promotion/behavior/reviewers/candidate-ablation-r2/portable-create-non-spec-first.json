@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "portable-create-non-spec-first",
+  "arm": "candidate-ablation",
+  "repeat": 2,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 2,
+    "required_references": 1,
+    "no_contamination": 2
+  },
+  "total_score": 9,
+  "rationale": "正确要求先确认精确 canonical source，再预览、检查 containment 并执行项目认可的聚焦验证；兼容性分类、输出字段和触发边界也充分。引用项偏概括，缺少更明确的作者方法或交付门槛参考，但仍足以支持后续执行。",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/candidate-ablation-r2.json",
+    "sha256": "4b9e8f04ff0d90d88086cd28016efe70bebd028040cee993a2f3d98965e7b9cb",
+    "hash_verified": true
+  },
+  "fixed_old_source": null,
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-portable-create-non-spec-first.txt",
+    "raw_jsonl": "review/scoped-v2/runs/portable-create-non-spec-first.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/portable-create-non-spec-first.stderr.txt",
+    "last_json": "review/scoped-v2/runs/portable-create-non-spec-first.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 16792,
+    "output_tokens": 1105,
+    "reasoning_output_tokens": 112,
+    "duration_ms": 24257,
+    "reviewer_last_json_sha256": "b97d22c889a3e18a48328eeef6e161503e5e6416373294a3985bfc4c1af4959e"
+  }
+}

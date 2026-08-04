@@ -1,0 +1,44 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "spec-first-project-profile",
+  "arm": "old-full",
+  "repeat": 2,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 2,
+    "required_references": 1,
+    "no_contamination": 1
+  },
+  "total_score": 8,
+  "rationale": "Thoroughly covers ownership confirmation, real branches, trigger boundaries, governance, focused tests, Changelog, validation, projection, sync evidence, and residual risks. It overcommits to particular governance files and three runtime hosts before confirming the repository mapping, while its reference list omits the project profile and generator documentation.",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/old-full-r2.json",
+    "sha256": "0cf0011cd4972c22507c02084d76410ecaedb393538e95cc1c32de313cfcb066",
+    "hash_verified": true
+  },
+  "fixed_old_source": {
+    "sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+    "hash_verified": true
+  },
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-spec-first-project-profile.txt",
+    "raw_jsonl": "review/scoped-v2/runs/spec-first-project-profile.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/spec-first-project-profile.stderr.txt",
+    "last_json": "review/scoped-v2/runs/spec-first-project-profile.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 17242,
+    "output_tokens": 1004,
+    "reasoning_output_tokens": 111,
+    "duration_ms": 21884,
+    "reviewer_last_json_sha256": "5a3de33aadd77d76ecb7deaf9a9503a546388dbb8156925fa83adbdde352db93"
+  }
+}

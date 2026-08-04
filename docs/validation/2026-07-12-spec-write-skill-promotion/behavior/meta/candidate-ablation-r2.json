@@ -1,0 +1,14 @@
+{
+  "id": "candidate-ablation-r2",
+  "arm": "candidate-ablation",
+  "repeat": 2,
+  "exit_code": 0,
+  "signal": null,
+  "duration_ms": 60555,
+  "usage": {
+    "input_tokens": 16878,
+    "cached_input_tokens": 0,
+    "output_tokens": 2492,
+    "reasoning_output_tokens": 339
+  }
+}

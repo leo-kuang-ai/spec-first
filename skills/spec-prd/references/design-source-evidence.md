@@ -52,7 +52,7 @@ Figma is optional per run, per user, per host, and per OS:
 
 - do not assume Figma MCP/plugin, Figma Desktop, browser login, team access, local shell, Node package manager, or a specific host tool name exists
 - do not install MCP/plugins from `spec-prd`
-- do not claim `spec-mcp-setup` installs Figma unless setup contracts explicitly add that optional capability
+- do not claim `spec-runtime-setup` installs Figma unless setup contracts explicitly add that optional capability
 - do not write OS-specific installation commands into this reference or generated PRDs
 - do not store maintainer-local identity probe output, account names, team ids, auth state, or successful tool probes in long-lived contracts or eval fixtures
 
@@ -104,6 +104,10 @@ When the run cannot fetch remote design context because it is headless, report-o
 - state that design-source capability was not semantically verified in closeout when it matters
 - if unread design-source inventory items affect page structure, state, interaction, acceptance, or scope, do not mark the PRD `ready-for-planning`
 - owner-accepted degradation is the only ready-for-planning release valve; record the owner decision and keep unread design residue visible
+
+## Validate report-only boundary
+
+When `intent=validate`, design evidence remains read-only. An already available, authorized provider may return scoped facts in memory, but do not persist or materialize screenshots, exports, or provider JSON, and do not create a local design artifact. When the provider or permission is unavailable, record the remote URL as a sanitized ref with degraded/unread consequence; do not fetch around the missing capability. Carry affected PRD write targets and readiness consequences into the validation report only. A later repair or design capture is a separately confirmed `refine` run.
 
 ## Route-Out Boundary
 

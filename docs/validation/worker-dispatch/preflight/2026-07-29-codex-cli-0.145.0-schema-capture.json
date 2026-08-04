@@ -1,0 +1,59 @@
+{
+  "artifact_type": "advisory-current-session-schema-capture",
+  "captured_at": "2026-07-28T16:15:17Z",
+  "session_identity": "codex-thread:019fa956-78e9-7642-96a3-fcebbbbfb306",
+  "host_identity": "codex-cli/0.145.0",
+  "capture_method": "host-startup-registration-record",
+  "discovery_surface": "Current Codex session developer-injected collaboration tool registry and schemas.",
+  "registry_scope": {
+    "namespace": "collaboration",
+    "schema_completeness": "confirmed",
+    "tools": [
+      "followup_task",
+      "interrupt_agent",
+      "list_agents",
+      "send_message",
+      "spawn_agent",
+      "wait_agent"
+    ]
+  },
+  "candidate": {
+    "name": "collaboration.spawn_agent",
+    "description_fact": "Spawns a new agent for a caller-provided task and returns an identity whose messages and final result are readable by the caller.",
+    "input_schema": {
+      "type": "object",
+      "required": [
+        "task_name",
+        "message"
+      ],
+      "properties": {
+        "task_name": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "fork_turns": {
+          "type": "string",
+          "description": "none, all, or a positive turn count"
+        },
+        "model": {
+          "type": "string"
+        },
+        "reasoning_effort": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "semantic_exclusions": [
+    "followup_task and send_message require an already-existing target and cannot create a worker from a new task packet.",
+    "interrupt_agent, list_agents, and wait_agent are lifecycle or observation operations, not worker creation primitives."
+  ],
+  "redaction_status": "passed",
+  "invocation_performed": false,
+  "limitations": [
+    "This capture proves only the current session registration shape, not permission, capacity, isolation, execution, output validity, or host support.",
+    "No worker primitive was invoked during Gate 0."
+  ]
+}

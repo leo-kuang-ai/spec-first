@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "skill_name": "spec-plan",
+    "skill_path": "/Users/kuang/xiaobu/spec-first/skills/spec-plan",
+    "timestamp": "2026-08-01T15:12:13Z",
+    "evals_run": [
+      0
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "requirements-only Product Contract 应原地深化且保持产品权威",
+      "configuration": "with_skill",
+      "run_number": 6,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 1,
+        "total": 1,
+        "time_seconds": 759.042,
+        "tokens": 3933511,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+          "passed": false,
+          "evidence": "script exited with code 1 [stderr: FAIL: 缺少 Product Contract preservation 说明]"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0,
+        "stddev": 0,
+        "min": 0,
+        "max": 0
+      },
+      "time_seconds": {
+        "mean": 759.042,
+        "stddev": 0,
+        "min": 759.042,
+        "max": 759.042
+      },
+      "tokens": {
+        "mean": 3933511,
+        "stddev": 0,
+        "min": 3933511,
+        "max": 3933511
+      }
+    },
+    "without_skill": null,
+    "delta": null
+  }
+}

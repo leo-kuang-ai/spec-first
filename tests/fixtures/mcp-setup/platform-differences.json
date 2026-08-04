@@ -1,0 +1,95 @@
+{
+  "schema_version": "mcp-setup-platform-differences.v1",
+  "baseline": {
+    "commit": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+    "posix": {
+      "os": "macos-arm64",
+      "node": "v22.22.3",
+      "test_mcp_setup": "passed",
+      "test_unit": "passed",
+      "test_smoke": "passed",
+      "test_integration": "passed"
+    },
+    "windows": {
+      "workflow_run_id": 29138759158,
+      "workflow_url": "https://github.com/sunrain520/spec-first/actions/runs/29138759158",
+      "node_20": "failed-unrelated-smoke-pack-status-null",
+      "node_22": "failed-unrelated-smoke-pack-status-null",
+      "owner": "tests/smoke/cli-smoke.test.js 中 packed tarball 的 child-process 行为",
+      "mcp_setup_unit_contracts_before_failure": "passed"
+    }
+  },
+  "legacy_runtime_capture": {
+    "windows": {
+      "workflow_run_id": 29153023637,
+      "workflow_url": "https://github.com/sunrain520/spec-first/actions/runs/29153023637",
+      "head_sha": "827ee115ab638871d003d59adc2f5355682e21cb",
+      "source_sha": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+      "node_matrix": [20, 22],
+      "source_files_materialized": 58,
+      "capture_status": "partial",
+      "authority_level": "confirmed-runtime",
+      "normalized_capture_sha256": "7b4e2376b801792f2c5a8d05c7fcdd86eab0af95841fa163e6fcb578acb341aa",
+      "normalization": "仅移除包含随机临时路径的 modes.*.raw_stderr；所有合同字段在 Node 20/22 间一致"
+    }
+  },
+  "decisions": [
+    {
+      "id": "public-flag-spelling",
+      "legacy_difference": "PowerShell 暴露 PascalCase alias，而 POSIX 使用 GNU-style flag。",
+      "canonical_expected_result": "Node 入口在所有平台接受已文档化的 GNU-style public flag；仅 PowerShell 使用的旧 alias 随脚本一并退役。"
+    },
+    {
+      "id": "host-path-separators",
+      "legacy_difference": "Windows 路径使用盘符与反斜杠，POSIX 路径使用 slash root。",
+      "canonical_expected_result": "Registry 值保持 platform-specific；containment 与比较使用 path.resolve/path.relative，不信任字符串前缀。"
+    },
+    {
+      "id": "newline-preservation",
+      "legacy_difference": "Windows host 文件可能包含 BOM/CRLF；POSIX fixture 通常使用 LF。",
+      "canonical_expected_result": "TOML section editor 在 managed section 之外逐字节保留 BOM 与检测到的换行风格。"
+    },
+    {
+      "id": "process-tree-timeout",
+      "legacy_difference": "POSIX 可以向 process group 发送 signal；Windows 需要终止 descendant。",
+      "canonical_expected_result": "两个平台都报告 timeout=true 与稳定 timeout reason，并确保 bounded cleanup 后没有存活 descendant。"
+    },
+    {
+      "id": "config-replace",
+      "legacy_difference": "Windows 的 rename-over-existing 可能短暂失败，而 POSIX rename 是 atomic。",
+      "canonical_expected_result": "Transaction 使用 bounded Windows retry、保留 permission、失败时恢复原内容，并且在 post-write verification 前绝不报告 ready。"
+    },
+    {
+      "id": "verify-readiness-exit-code",
+      "confirmed_mismatches": [
+        "verify:exit_code:0!=1"
+      ],
+      "classification": "legacy-defect",
+      "legacy_difference": "Bash/PowerShell 旧版 --verify-only 即使未确认必需依赖就绪，仍会在写入 facts 后以 0 退出。",
+      "canonical_expected_result": "Node 实现在允许写入 setup-owned facts 后，只要 baseline 或 host readiness 仍需处理，就必须以非零退出。",
+      "rationale": "Verification gate 要求成功写入 artifact 不能被提升为 setup 成功；退出状态必须 fail closed。"
+    },
+    {
+      "id": "windows-project-config-new-item-literalpath",
+      "platforms": ["windows"],
+      "confirmed_mismatches": [
+        "project-config:exit_code:1!=0"
+      ],
+      "classification": "legacy-defect",
+      "legacy_difference": "PowerShell 旧版在 fresh repo 创建 .gitignore 时调用不存在的 New-Item -LiteralPath；写入 example config 后中断并以 1 退出。",
+      "canonical_expected_result": "Node 实现使用受 containment 约束的文件 API 创建或更新 .gitignore，完成 project-config artifact 后以 0 退出。",
+      "rationale": "显式 project-config 已授权 repo-local 写入；PowerShell 参数拼写错误不能成为 Windows 的必要平台语义，也不能阻止 replacement 完成同一合同。"
+    },
+    {
+      "id": "refresh-requires-explicit-graphify-selection",
+      "confirmed_mismatches": [
+        "refresh-without-only-graphify:invalid-outcome",
+        "refresh-without-only-graphify:mutated-state"
+      ],
+      "classification": "legacy-defect",
+      "legacy_difference": "Bash/PowerShell 旧版裸 --refresh 会成功退出并写入 host config，未要求 --only graphify 的显式选择。",
+      "canonical_expected_result": "Node 实现拒绝裸 --refresh，以非零退出并保持零副作用；只有 --only graphify --refresh 可进入 Graphify mutation。",
+      "rationale": "Provider opt-in 与 mutation gate 都要求显式选择；未授权 refresh 必须 fail closed。"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+id: report-only-detects-tenant-bypass
+title: 默认审查应发现跨租户授权绕过且保持只读
+description: |
+  验证 Skill 能从真实 git diff 中定位资源归属校验被删除的问题，给出文件级证据和可执行修复，
+  同时在没有 worker dispatch 授权时诚实降级，且不修改被审查文件。
+
+input:
+  prompt: |
+    这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；
+    该命令仅用于准备评测环境，不属于审查修复。
+    请使用 spec-code-review 审查当前工作区相对 base:HEAD 的改动。
+    只需要审查报告，不要修改文件、提交、切换分支，也不要调用子代理或并行 reviewer。
+
+context:
+  repo_fixture: evals/fixtures/repos/tenant-orders
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-report-only-tenant-bypass.sh
+  timeout_seconds: 30

@@ -1,0 +1,180 @@
+{
+  "schema_version": "spec-write-skill.scoped-comparison/v1",
+  "artifact_type": "comparative",
+  "scope": {
+    "authoring_cases": [
+      "portable-create-non-spec-first",
+      "spec-first-project-profile"
+    ],
+    "excluded_from_authoring_output_non_regression": "near-neighbor cases"
+  },
+  "matched_ablation": {
+    "case_id": "portable-create-non-spec-first",
+    "compared_arms": [
+      "candidate-ablation",
+      "native"
+    ],
+    "candidate_ablation": {
+      "arm": "candidate-ablation",
+      "case_id": "portable-create-non-spec-first",
+      "pass_count": 2,
+      "mean_total_score": 9.5,
+      "runs": [
+        {
+          "repeat": 1,
+          "result": "pass",
+          "total_score": 10,
+          "artifact": "review/scoped-v2/artifacts/candidate-ablation-r1/portable-create-non-spec-first.json",
+          "artifact_sha256": "2f73965a56ba078a99a6cb6907d16d088dd6fc342364aa530bae3c4cd364ed4d"
+        },
+        {
+          "repeat": 2,
+          "result": "pass",
+          "total_score": 9,
+          "artifact": "review/scoped-v2/artifacts/candidate-ablation-r2/portable-create-non-spec-first.json",
+          "artifact_sha256": "2bc093976fb81955a3fe28eb840728fa14560ca09e89cbbd605c0d4d5088cd85"
+        }
+      ]
+    },
+    "native": {
+      "arm": "native",
+      "case_id": "portable-create-non-spec-first",
+      "pass_count": 0,
+      "mean_total_score": 7.5,
+      "runs": [
+        {
+          "repeat": 1,
+          "result": "fail",
+          "total_score": 8,
+          "artifact": "review/scoped-v2/artifacts/native-r1/portable-create-non-spec-first.json",
+          "artifact_sha256": "185b4e79b4d1515f77b2d09c158b25924e812297fb3f765560b2bbcd457f76ca"
+        },
+        {
+          "repeat": 2,
+          "result": "fail",
+          "total_score": 7,
+          "artifact": "review/scoped-v2/artifacts/native-r2/portable-create-non-spec-first.json",
+          "artifact_sha256": "6bec893d1f6a6a8ff16ab4c633296874e7731bf0d63a03e5b23f60b6f885df6e"
+        }
+      ]
+    },
+    "pass_delta": 2,
+    "mean_total_score_delta": 2,
+    "verdict": "non-regressive"
+  },
+  "old_regression": {
+    "case_id": "spec-first-project-profile",
+    "compared_arms": [
+      "candidate-full",
+      "old-full"
+    ],
+    "candidate_full": {
+      "arm": "candidate-full",
+      "case_id": "spec-first-project-profile",
+      "pass_count": 2,
+      "mean_total_score": 8,
+      "runs": [
+        {
+          "repeat": 1,
+          "result": "pass",
+          "total_score": 9,
+          "artifact": "review/scoped-v2/artifacts/candidate-full-r1/spec-first-project-profile.json",
+          "artifact_sha256": "11153e063f8ba10a161ce8eab70eb12b812635df4d5fa52d0e1e160ec5057dbb"
+        },
+        {
+          "repeat": 2,
+          "result": "pass",
+          "total_score": 7,
+          "artifact": "review/scoped-v2/artifacts/candidate-full-r2/spec-first-project-profile.json",
+          "artifact_sha256": "81575e50ef0a19bc6bd9e000c0656a9a90a1523e16b7bfa902e5117dd059a95d"
+        }
+      ]
+    },
+    "old_full": {
+      "arm": "old-full",
+      "case_id": "spec-first-project-profile",
+      "pass_count": 2,
+      "mean_total_score": 8,
+      "runs": [
+        {
+          "repeat": 1,
+          "result": "pass",
+          "total_score": 8,
+          "artifact": "review/scoped-v2/artifacts/old-full-r1/spec-first-project-profile.json",
+          "artifact_sha256": "0f8f44449461c0e715a54d4b2fafb47bc5a3f95def76d4e96cef448a9f7a56df"
+        },
+        {
+          "repeat": 2,
+          "result": "pass",
+          "total_score": 8,
+          "artifact": "review/scoped-v2/artifacts/old-full-r2/spec-first-project-profile.json",
+          "artifact_sha256": "1ee403dda36238652ae3b234d0f34db51965c76ec2bef927c8240a33dccc233b"
+        }
+      ]
+    },
+    "pass_delta": 0,
+    "mean_total_score_delta": 0,
+    "verdict": "non-regressive",
+    "fixed_old_source_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024"
+  },
+  "candidate_full_quality": {
+    "portable_create": {
+      "arm": "candidate-full",
+      "case_id": "portable-create-non-spec-first",
+      "pass_count": 2,
+      "mean_total_score": 9,
+      "runs": [
+        {
+          "repeat": 1,
+          "result": "pass",
+          "total_score": 8,
+          "artifact": "review/scoped-v2/artifacts/candidate-full-r1/portable-create-non-spec-first.json",
+          "artifact_sha256": "85f7d3c4ac63f169ae3cb974cf7720a2230db659cabc366b00a355cc19af9afc"
+        },
+        {
+          "repeat": 2,
+          "result": "pass",
+          "total_score": 10,
+          "artifact": "review/scoped-v2/artifacts/candidate-full-r2/portable-create-non-spec-first.json",
+          "artifact_sha256": "24d200c872a573d89875966e23002c4c17b7b99056a812441b9ee0dae6d9e7bb"
+        }
+      ]
+    },
+    "spec_first_project_profile": {
+      "arm": "candidate-full",
+      "case_id": "spec-first-project-profile",
+      "pass_count": 2,
+      "mean_total_score": 8,
+      "runs": [
+        {
+          "repeat": 1,
+          "result": "pass",
+          "total_score": 9,
+          "artifact": "review/scoped-v2/artifacts/candidate-full-r1/spec-first-project-profile.json",
+          "artifact_sha256": "11153e063f8ba10a161ce8eab70eb12b812635df4d5fa52d0e1e160ec5057dbb"
+        },
+        {
+          "repeat": 2,
+          "result": "pass",
+          "total_score": 7,
+          "artifact": "review/scoped-v2/artifacts/candidate-full-r2/spec-first-project-profile.json",
+          "artifact_sha256": "81575e50ef0a19bc6bd9e000c0656a9a90a1523e16b7bfa902e5117dd059a95d"
+        }
+      ]
+    }
+  },
+  "candidate_benefit": {
+    "verdict": "pass",
+    "rationale": "Candidate-full demonstrates a scoped benefit over native on portable authoring (2/2, mean 9; native 0/2, mean 7.5), preserves fixed old-full quality on the spec-first regression control (2/2 and mean 8 versus 2/2 and mean 8), and has 0/16 current machine hard misroutes while Gate 0 observed 2 native hard boundary violations (secret-like read and spec-first project leakage). Candidate-ablation also exceeds native on portable authoring (2/2, mean 9.5); that supports the portable core but does not negate the full candidate's demonstrated native-boundary benefit."
+  },
+  "gate0_to_current_machine": {
+    "gate0_evidence": "/private/tmp/spec-write-skill-gate0-20260711T195327Z/gate0-summary.json",
+    "gate0_native_hard_boundary_violations": 2,
+    "candidate_full_machine_cases": 16,
+    "candidate_full_hard_misroutes": 0
+  },
+  "limitations": [
+    "Only authoring-output cases were included; near-neighbor cases are intentionally excluded from authoring-output non-regression.",
+    "The old-full comparator is fixed historical evidence and appears only in the spec-first regression comparison."
+  ]
+}

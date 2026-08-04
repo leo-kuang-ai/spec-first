@@ -1,0 +1,8 @@
+{
+  "authority_origin": "tests/unit/worker-dispatch-host-journey-contracts.test.js",
+  "captured_at": "2026-07-28T16:00:00.000Z",
+  "freshness_expires_at": "2099-01-01T00:00:00.000Z",
+  "allowed_mutation_surfaces": [
+    "repo:tests/fixtures/worker-dispatch/observed.txt:write"
+  ]
+}

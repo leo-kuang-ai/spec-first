@@ -1,170 +1,181 @@
 'use strict';
 
+const { execFileSync, spawnSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const {
   SPEC_FIRST_GITIGNORE_END,
   SPEC_FIRST_GITIGNORE_START,
   applySpecFirstGitignoreBlock,
   buildSpecFirstGitignoreBlock,
-  getSpecFirstGitignorePatternMetadata,
   getSpecFirstGitignorePatterns,
+  getSpecFirstRuntimeUntrackPatterns,
 } = require('../../src/cli/gitignore-policy');
+const { loadPluginManifest } = require('../../src/cli/plugin-manifest');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
-const USER_MANUAL_GITIGNORE_PATH = path.join(REPO_ROOT, 'docs', '05-用户手册', '12-gitignore参考.md');
-const ROOT_GITIGNORE_PATH = path.join(REPO_ROOT, '.gitignore');
 
 describe('spec-first gitignore policy', () => {
-  test('renders one managed block with narrow default patterns', () => {
-    const block = buildSpecFirstGitignoreBlock();
+  test('ignores only spec-first-managed names inside shareable host roots', () => {
     const patterns = getSpecFirstGitignorePatterns();
 
-    expect(block).toContain(SPEC_FIRST_GITIGNORE_START);
-    expect(block).toContain(SPEC_FIRST_GITIGNORE_END);
-    expect(patterns).toContain('.claude/commands/spec/');
-    expect(patterns).toContain('.claude/commands/spec-*.md');
-    expect(patterns).toContain('.claude/hooks/session-start');
-    expect(patterns).toContain('.claude/hooks/spec-plan-guard');
-    expect(patterns).toContain('.claude/hooks/prd-prewrite-guard');
-    expect(patterns).toContain('.claude/hooks/prd-readiness-guard');
-    expect(patterns).toContain('.codex/');
-    expect(patterns).toContain('.agents/skills/');
-    expect(patterns).toContain('.cursor/skills/');
-    expect(patterns).toContain('.cursor/spec-first/');
-    expect(patterns).toContain('.cursor/mcp.json');
-    expect(patterns).toContain('.kiro/skills/');
-    expect(patterns).toContain('.kiro/agents/');
-    expect(patterns).toContain('.kiro/spec-first/');
-    expect(patterns).toContain('.kiro/settings/');
-    expect(patterns).toContain('.qoder/commands/spec/');
-    expect(patterns).toContain('.qoder/commands/spec-*.md');
-    expect(patterns).toContain('.qoder/skills/');
-    expect(patterns).toContain('.qoder/agents/');
-    expect(patterns).toContain('.qoder/spec-first/');
-    expect(patterns).toContain('.qoder/settings.local.json');
-    expect(getSpecFirstGitignorePatternMetadata()).toEqual({});
-    expect(patterns).toContain('.spec-first/config/*.json');
-    expect(patterns).toContain('.spec-first/governance/');
-    expect(patterns).toContain('.codegraph/');
-    expect(patterns).toContain('.graphify/');
-    expect(patterns).toContain('graphify-out/');
-    expect(patterns).not.toContain('graphify-out/cost.json');
-    expect(patterns).not.toContain('graphify-out/.graphify_python');
-    expect(patterns).not.toContain('.spec-first/standards/');
-    expect(patterns).toContain('.spec-first/sessions/');
-    expect(patterns).not.toContain('.claude/');
-    expect(patterns).not.toContain('.codex/commands/spec/');
-    expect(patterns).not.toContain('.codex/spec-first/');
-    expect(patterns).not.toContain('.codex/agents/');
-    expect(patterns).not.toContain('.agents/');
-    expect(patterns).not.toContain('.cursor/');
-    expect(patterns).not.toContain('.cursor/rules/');
-    expect(patterns).not.toContain('.cursor/agents/');
-    expect(patterns).not.toContain('.kiro/');
-    expect(patterns).not.toContain('.kiro/specs/');
-    expect(patterns).not.toContain('.qoder/');
-    expect(patterns).not.toContain('.qoder/rules/');
-    expect(patterns).not.toContain('.qoder/settings.json');
-    expect(patterns).not.toContain('.qoder/hooks/');
-    expect(patterns).not.toContain('.spec-first/');
-    expect(patterns).not.toContain('*.tgz');
-    expect(block).toContain([
-      '# spec-first local setup and workflow runtime artifacts',
-      '.spec-first/*.local.yaml',
-      '.spec-first/config.local.yaml',
-      '.spec-first/config/*.json',
-      '.spec-first/audits/',
-      '.spec-first/governance/',
-      '.spec-first/app-audit/',
-    ].join('\n'));
+    expect(patterns).toEqual(expect.arrayContaining([
+      '.claude/skills/spec-*/',
+      '.agents/skills/source-command-spec-*/',
+      '.agents/skills/using-spec-first/',
+      '.cursor/rules/spec-first.mdc',
+      '.kiro/steering/spec-first.md',
+      '.qoder/rules/spec-first.md',
+      '.opencode/commands/spec/',
+      '.opencode/commands/spec-*.md',
+      '.opencode/skills/spec-*/',
+      '.opencode/spec-first/',
+    ]));
+    expect(patterns).not.toEqual(expect.arrayContaining([
+      '.claude/skills/',
+      '.claude/agents/',
+      '.codex/',
+      '.agents/skills/',
+      '.cursor/skills/',
+      '.kiro/skills/',
+      '.qoder/skills/',
+      '.opencode/skills/',
+    ]));
   });
 
-  test('adds a managed block to empty content', () => {
-    const result = applySpecFirstGitignoreBlock('');
+  test('keeps team-owned host assets visible while ignoring generated runtime', () => {
+    const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-gitignore-'));
 
-    expect(result.status).toBe('added');
-    expect(result.content).toBe(`${buildSpecFirstGitignoreBlock()}\n`);
-    expect(countStartMarkers(result.content)).toBe(1);
+    try {
+      execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+      fs.writeFileSync(path.join(repoRoot, '.gitignore'), `${buildSpecFirstGitignoreBlock()}\n`, 'utf8');
+      writeFile(repoRoot, '.agents/skills/spec-plan/SKILL.md');
+      writeFile(repoRoot, '.agents/skills/source-command-spec-plan/SKILL.md');
+      writeFile(repoRoot, '.agents/skills/my-team-skill/SKILL.md');
+      writeFile(repoRoot, '.codex/spec-first/state.json');
+      writeFile(repoRoot, '.codex/config.toml');
+      writeFile(repoRoot, '.opencode/skills/spec-plan/SKILL.md');
+      writeFile(repoRoot, '.opencode/spec-first/state.json');
+      writeFile(repoRoot, 'opencode.json');
+
+      expect(isIgnored(repoRoot, '.agents/skills/spec-plan/SKILL.md')).toBe(true);
+      expect(isIgnored(repoRoot, '.agents/skills/source-command-spec-plan/SKILL.md')).toBe(true);
+      expect(isIgnored(repoRoot, '.agents/skills/my-team-skill/SKILL.md')).toBe(false);
+      expect(isIgnored(repoRoot, '.codex/spec-first/state.json')).toBe(true);
+      expect(isIgnored(repoRoot, '.codex/config.toml')).toBe(false);
+      expect(isIgnored(repoRoot, '.opencode/skills/spec-plan/SKILL.md')).toBe(true);
+      expect(isIgnored(repoRoot, '.opencode/spec-first/state.json')).toBe(true);
+      expect(isIgnored(repoRoot, 'opencode.json')).toBe(false);
+    } finally {
+      fs.rmSync(repoRoot, { recursive: true, force: true });
+    }
   });
 
-  test('preserves existing user content before and after the managed block', () => {
-    const existing = [
-      'node_modules/',
-      '',
+  test('refuses unmatched or duplicate markers instead of guessing a replacement range', () => {
+    expect(() => applySpecFirstGitignoreBlock([
+      'dist/',
       SPEC_FIRST_GITIGNORE_START,
-      '# old policy',
-      '.old-spec-first/',
+      'keep-this-user-rule/',
+    ].join('\n'))).toThrow('Invalid spec-first .gitignore managed block');
+
+    expect(() => applySpecFirstGitignoreBlock([
+      SPEC_FIRST_GITIGNORE_START,
+      SPEC_FIRST_GITIGNORE_START,
       SPEC_FIRST_GITIGNORE_END,
-      '',
+    ].join('\n'))).toThrow('Invalid spec-first .gitignore managed block');
+
+    expect(() => applySpecFirstGitignoreBlock(
+      `${SPEC_FIRST_GITIGNORE_START} trailing-text\n`,
+    )).toThrow('Invalid spec-first .gitignore managed block');
+  });
+
+  test('updates one valid managed block while preserving surrounding user rules', () => {
+    const result = applySpecFirstGitignoreBlock([
+      'node_modules/',
+      SPEC_FIRST_GITIGNORE_START,
+      '.old-runtime/',
+      SPEC_FIRST_GITIGNORE_END,
       'dist/',
       '',
-    ].join('\n');
-
-    const result = applySpecFirstGitignoreBlock(existing);
+    ].join('\n'));
 
     expect(result.status).toBe('updated');
-    expect(result.content.startsWith('node_modules/\n\n')).toBe(true);
-    expect(result.content).toContain(`${SPEC_FIRST_GITIGNORE_END}\n\ndist/\n`);
-    expect(result.content).not.toContain('.old-spec-first/');
-    expect(countStartMarkers(result.content)).toBe(1);
+    expect(result.content).toContain('node_modules/\n');
+    expect(result.content).toContain(`${SPEC_FIRST_GITIGNORE_END}\ndist/\n`);
+    expect(result.content).not.toContain('.old-runtime/');
   });
 
-  test('adds a separating newline when existing content has no trailing newline', () => {
-    const result = applySpecFirstGitignoreBlock('dist/');
+  test('does not auto-untrack team-policy files even when they are ignored by default', () => {
+    const untrackPatterns = getSpecFirstRuntimeUntrackPatterns();
 
-    expect(result.status).toBe('added');
-    expect(result.content.startsWith('dist/\n\n# spec-first:start')).toBe(true);
-    expect(result.content.endsWith('\n')).toBe(true);
+    expect(untrackPatterns).not.toEqual(expect.arrayContaining([
+      '.codex/hooks.json',
+      '.cursor/mcp.json',
+      '.kiro/settings/',
+      '.qoder/hooks/session-start',
+      '.qoder/hooks/prd-prewrite-guard',
+      '.qoder/hooks/prd-readiness-guard',
+      '.qoder/settings.local.json',
+      'graphify-out/',
+      '.graphify/',
+    ]));
+    expect(untrackPatterns).toEqual(expect.arrayContaining([
+      '.agents/skills/spec-*/**',
+      '.agents/skills/source-command-spec-*/**',
+      '.codex/spec-first/',
+      '.opencode/skills/spec-*/**',
+      '.opencode/spec-first/',
+      '.spec-first/workflows/',
+    ]));
   });
 
-  test('leaves an already-current block unchanged', () => {
-    const existing = `# user rule\n\n${buildSpecFirstGitignoreBlock()}\n`;
-    const result = applySpecFirstGitignoreBlock(existing);
-
-    expect(result.status).toBe('already-current');
-    expect(result.content).toBe(existing);
-    expect(countStartMarkers(result.content)).toBe(1);
-  });
-
-  test('does not suppress duplicate standalone rules outside the managed block', () => {
-    const result = applySpecFirstGitignoreBlock('.spec-first/*.local.yaml\n');
-
-    expect(result.status).toBe('added');
-    expect(result.content.match(/^\.spec-first\/\*\.local\.yaml$/gm)).toHaveLength(2);
-    expect(countStartMarkers(result.content)).toBe(1);
-  });
-
-  test('rejects non-string content', () => {
-    expect(() => applySpecFirstGitignoreBlock(null)).toThrow('existingContent must be a string');
-  });
-
-  test('user manual mirrors the generated managed block and does not revive retired provider paths', () => {
-    const manual = fs.readFileSync(USER_MANUAL_GITIGNORE_PATH, 'utf8');
+  test('keeps the repo block and user manual synchronized with the generated policy', () => {
     const block = buildSpecFirstGitignoreBlock();
+    const rootGitignore = normalizeLineEndings(
+      fs.readFileSync(path.join(REPO_ROOT, '.gitignore'), 'utf8'),
+    );
+    const manual = normalizeLineEndings(
+      fs.readFileSync(
+        path.join(REPO_ROOT, 'docs', '05-用户手册', '12-gitignore参考.md'),
+        'utf8',
+      ),
+    );
 
+    expect(rootGitignore).toContain(`${block}\n`);
     expect(manual).toContain(`\`\`\`gitignore\n${block}\n\`\`\``);
-    expect(manual).toContain('Graphify provider-native 项目图谱运行时目录，默认不提交');
-    expect(manual).toContain('`graphify-out/` 是旧版 Graphify artifact 目录，默认继续忽略');
-    expect(manual).toContain('默认整体忽略，不提交');
-    expect(block).not.toContain('.direct-source-evidence/');
-    expect(block).not.toContain('.code-review-graph/');
-    expect(block).not.toContain('.spec-first-graph/');
-    expect(manual).toContain('不属于当前 `init` managed block');
   });
 
-  test('repo-local ignore covers CI and host-local config without exporting them to user managed block', () => {
-    const rootGitignore = fs.readFileSync(ROOT_GITIGNORE_PATH, 'utf8');
-    const block = buildSpecFirstGitignoreBlock();
+  test('keeps source-checkout Claude settings local without hiding target-repo team policy', () => {
+    const rootGitignore = normalizeLineEndings(
+      fs.readFileSync(path.join(REPO_ROOT, '.gitignore'), 'utf8'),
+    );
+    expect(rootGitignore).toContain('/.claude/settings.json');
+    expect(getSpecFirstGitignorePatterns()).not.toContain('.claude/settings.json');
+  });
 
-    expect(rootGitignore).toContain('.spec-first/ci/');
-    expect(rootGitignore).toContain('.claude/settings.local.json');
-    expect(rootGitignore).not.toContain('\n.agents/\n');
-    expect(block).not.toContain('.spec-first/ci/');
-    expect(block).not.toContain('.claude/settings.local.json');
+  test('keeps bundled runtime names inside the reserved ignore namespace', () => {
+    const manifest = loadPluginManifest();
+
+    expect(manifest.skills.filter((name) => (
+      name !== 'using-spec-first' && !name.startsWith('spec-')
+    ))).toEqual([]);
+    expect(manifest.agents.filter((agentPath) => (
+      !agentPath.split('/').pop().startsWith('spec-')
+    ))).toEqual([]);
   });
 });
 
-function countStartMarkers(content) {
-  return (content.match(new RegExp(SPEC_FIRST_GITIGNORE_START, 'g')) || []).length;
+function writeFile(repoRoot, relativePath) {
+  const absolutePath = path.join(repoRoot, relativePath);
+  fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+  fs.writeFileSync(absolutePath, 'test\n', 'utf8');
+}
+
+function normalizeLineEndings(content) {
+  return content.replace(/\r\n?/g, '\n');
+}
+
+function isIgnored(repoRoot, relativePath) {
+  return spawnSync('git', ['check-ignore', '-q', '--', relativePath], { cwd: repoRoot }).status === 0;
 }

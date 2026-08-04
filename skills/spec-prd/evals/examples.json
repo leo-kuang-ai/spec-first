@@ -1405,8 +1405,9 @@
       "expected": [
         "load grill-with-docs-integration.md",
         "ask one question at a time and wait for feedback",
-        "create or update CONTEXT.md lazily when the first project-specific term is resolved",
-        "fold resolved terms back into PRD Glossary or Decision Notes"
+        "fold resolved terms into PRD Glossary or Decision Notes",
+        "emit a qualified candidate-only CONTEXT.md promotion record with not-written status",
+        "leave project-level files unchanged"
       ],
       "coverage_tags": [
         "trigger",
@@ -1703,8 +1704,9 @@
       "expected": [
         "load grill-with-docs-integration.md",
         "persist resolution in PRD-local sections",
-        "update CONTEXT.md inline for resolved project-specific terms",
-        "create ADR only when hard to reverse, surprising without context, and a real tradeoff"
+        "close resolved project-specific terms in PRD-local sections",
+        "emit candidate-only promotion records without project mutation",
+        "emit an ADR candidate only when hard to reverse, surprising without context, and a real tradeoff"
       ],
       "coverage_tags": [
         "boundary",
@@ -1851,7 +1853,8 @@
         "perform source-first lookup",
         "sharpen fuzzy terms through concrete scenarios",
         "surface code contradictions with consequences",
-        "update CONTEXT.md inline when a project-specific term is resolved"
+        "close the project-specific term in PRD-local sections",
+        "leave CONTEXT.md unchanged and emit only a qualified promotion candidate"
       ],
       "coverage_tags": [
         "expected",
@@ -2210,10 +2213,12 @@
       ],
       "input_shape": "owner accepted repeated project-specific term with clear definition and avoid terms",
       "expected": [
-        "CONTEXT.md promotion candidate",
+        "candidate-only CONTEXT.md promotion record",
         "project-specific term",
         "owner accepted",
         "definition and avoid terms",
+        "provenance, real consumer, reuse rationale, invalidation condition, and not-written status",
+        "project-level files remain unchanged",
         "preview-first",
         "no silent write"
       ],
@@ -2232,9 +2237,10 @@
       ],
       "input_shape": "PRD contains a hard product tradeoff with long-lived consequences",
       "expected": [
-        "suggest ADR promotion only for hard-to-reverse, surprising tradeoffs",
+        "suggest candidate-only ADR promotion only for hard-to-reverse, surprising tradeoffs",
         "keep ADR candidates sparse with PRD source refs",
-        "routine decisions stay in Decision Notes"
+        "routine decisions stay in Decision Notes",
+        "ADR files remain unchanged"
       ],
       "coverage_tags": [
         "expected",
@@ -2584,19 +2590,20 @@
       ]
     },
     {
-      "id": "codex-degraded-receipt-gate",
-      "intent": "validate",
+      "id": "codex-degraded-producer-finalize",
+      "intent": "refine",
       "case_type": "boundary",
       "quality_buckets": [
-        "validate",
+        "refine",
         "workflow-runtime-quality"
       ],
-      "input_shape": "Codex run prepares a PRD origin for spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs current-source finalize/verify commands when possible, and treats producer finalize plus spec-plan --verify-receipt as mandatory handoff discipline rather than hook-enforced protection.",
+      "input_shape": "Codex refine run prepares a PRD that the user may later pass to spec-plan. There is no confirmed managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records the degraded host posture, runs the producer-local finalize command from the loaded spec-prd skill root before claiming ready, and leaves downstream plan entry to the user instead of requiring an automatic consumer receipt gate.",
       "expected": [
         "Codex degraded enforcement must be explicit, not implied equal protection with Claude",
-        "--verify-receipt is the consumer-only read check for spec-plan origin verification",
-        "--check-only remains producer closeout preview and must not be used as a consumer pass signal",
-        "degraded verification such as missing inputs is not a verified origin"
+        "producer finalize remains mandatory before spec-prd claims the artifact is ready",
+        "spec-plan continues to treat docs/brainstorms/*-requirements.md as user-selected legacy requirements input",
+        "--verify-receipt remains an optional read-only diagnostic rather than a mandatory spec-plan gate",
+        "--check-only remains producer closeout preview and must not be represented as a finalized producer receipt"
       ],
       "coverage_tags": [
         "workflow-runtime-quality",
@@ -2612,9 +2619,10 @@
         "brownfield-create",
         "p1-pack"
       ],
-      "input_shape": "Long clarified requirements artifact includes a handoff_context_slice with confirmed WHAT, owner decisions, accepted assumptions, source refs to re-read, unresolved blockers, Planning Recheck items, degraded facts, and downstream_sync_unknown, but no implementation files, task sequencing, database schema, or API field design.",
+      "input_shape": "长篇已澄清需求产物的 handoff_context_slice 包含 confirmed WHAT、最多三个 load-bearing R/AE 的 top requirement / acceptance refs、must-preserve behaviors、owner decisions、accepted assumptions、需要重读的 source refs、未解决 blocker、Planning Recheck、degraded facts 与 downstream_sync_unknown，但不包含实现文件、任务顺序、数据库 schema 或 API 字段设计。",
       "expected": [
         "handoff_context_slice should reduce spec-plan intake questions without becoming implementation planning",
+        "context slice 包含最多三个 load-bearing Requirement / Acceptance Example 引用和 must-preserve behaviors",
         "downstream_sync_unknown is acceptable when affected plans/tasks cannot be verified",
         "context slice carries confirmed WHAT and residue, not task sequencing or file-level HOW"
       ],
@@ -2675,12 +2683,186 @@
         "readiness",
         "traceability"
       ]
+    },
+    {
+      "id": "validate-report-only-existing-prd",
+      "intent": "validate",
+      "case_type": "positive",
+      "quality_buckets": [
+        "validate",
+        "readiness"
+      ],
+      "input_shape": "User asks for planning-readiness validation of an existing PRD and explicitly forbids file changes. The workflow reads bounded source, runs checker/finalizer only in check-only or receipt-verification mode, and returns source-grounded findings without rewriting or finalizing the artifact.",
+      "expected": [
+        "validate locks mutation_posture=report-only before evidence gathering",
+        "artifact bytes, mtime, frontmatter, and receipt remain unchanged",
+        "checker facts and semantic readiness judgment remain visibly separate",
+        "missing or stale receipt is reported rather than repaired"
+      ],
+      "must_not": [
+        "must not rewrite the PRD",
+        "must not invoke finalize in write mode",
+        "must not refresh generated runtime"
+      ],
+      "coverage_tags": [
+        "validate",
+        "readiness",
+        "mutation-boundary"
+      ]
+    },
+    {
+      "id": "validate-figma-degraded-no-materialization",
+      "intent": "validate",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "validate",
+        "design-evidence"
+      ],
+      "input_shape": "Existing PRD validation includes a remote Figma URL, but the current host has no authorized provider. The run records a sanitized ref, unread/degraded reason, affected PRD write targets, and readiness consequence in the report.",
+      "expected": [
+        "remote design input remains provider_untrusted or degraded evidence",
+        "load-bearing unread design state blocks a ready conclusion",
+        "the report names affected requirements or acceptance targets"
+      ],
+      "must_not": [
+        "must not persist or materialize screenshot, export, or provider JSON",
+        "must not create a design artifact",
+        "must not mutate the PRD"
+      ],
+      "coverage_tags": [
+        "validate",
+        "design-evidence",
+        "degraded"
+      ]
+    },
+    {
+      "id": "validate-and-fix-reenters-refine",
+      "intent": "validate",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "validate",
+        "preview-first"
+      ],
+      "input_shape": "User asks to validate and fix an existing PRD. The workflow first returns the report and a proposed patch preview, waits for explicit confirmation, then starts a separate refine posture before any write.",
+      "expected": [
+        "validate itself remains report-only",
+        "proposed edits are previewed before mutation",
+        "confirmed repair is reclassified as refine and follows normal finalize gates"
+      ],
+      "must_not": [
+        "must not treat validate and fix as implicit mutation authority",
+        "must not write before explicit confirmation"
+      ],
+      "coverage_tags": [
+        "validate",
+        "preview-first",
+        "mutation-boundary"
+      ]
+    },
+    {
+      "id": "contract-reset-lite-explicit-opt-in",
+      "intent": "create",
+      "case_type": "positive",
+      "quality_buckets": [
+        "brownfield-create"
+      ],
+      "input_shape": "A brownfield PRD authoring request explicitly includes analysis_profile=contract-reset-lite and provides a rough PRD, current source, and one ratified meeting decision.",
+      "expected": [
+        "one run-local Product Analysis Brief represents analysis gate, product risk ranking, and owner checkpoint",
+        "source inventory records read status, evidence posture, freshness, confirmation scope and basis, limitation, and affected PRD write target",
+        "all human product confirmation routes only to the current user while specialist material remains evidence",
+        "the durable output remains docs/brainstorms/*-requirements.md and uses the existing Decision Card, checker, finalizer, and producer receipt"
+      ],
+      "must_not": [
+        "must not create a second Product Analysis artifact or unified-plan sibling",
+        "must not route a question or confirmation to a second human contact",
+        "must not enable a mandatory spec-plan receipt gate",
+        "must not promote the historical Contract Reset candidate"
+      ],
+      "coverage_tags": [
+        "contract-reset-lite",
+        "source-authority",
+        "information-hierarchy"
+      ]
+    },
+    {
+      "id": "contract-reset-lite-near-neighbor-default",
+      "intent": "create",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "brownfield-create"
+      ],
+      "input_shape": "The user asks to make the PRD concise and reduce ceremony but does not include the exact analysis_profile=contract-reset-lite token.",
+      "expected": [
+        "analysis_profile remains default",
+        "the normal spec-prd reference and clarification path remains authoritative",
+        "no experimental branch is inferred from style or concision wording"
+      ],
+      "must_not": [
+        "must not infer Contract Reset Lite from a generic request for concision",
+        "must not silently reduce default closure or evidence requirements"
+      ],
+      "coverage_tags": [
+        "contract-reset-lite",
+        "near-neighbor",
+        "trigger-boundary"
+      ]
+    },
+    {
+      "id": "contract-reset-lite-validate-report-only",
+      "intent": "validate",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "validate"
+      ],
+      "input_shape": "An existing legacy PRD is validated with analysis_profile=contract-reset-lite. The Brief organizes source, authority, acceptance gaps, and closure residue for the report.",
+      "expected": [
+        "the Lite Brief is a report structure only",
+        "checker and receipt verification remain read-only facts",
+        "the report names the next source or current-user confirmation"
+      ],
+      "must_not": [
+        "must not write, rewrite, finalize in write mode, or materialize provider output",
+        "must not create a Product Analysis artifact",
+        "must not change the current artifact readiness state"
+      ],
+      "coverage_tags": [
+        "contract-reset-lite",
+        "validate",
+        "mutation-boundary"
+      ]
+    },
+    {
+      "id": "contract-reset-lite-specialist-evidence-single-confirmer",
+      "intent": "refine",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "brownfield-refine"
+      ],
+      "input_shape": "A Lite PRD contains a privacy or regulatory claim backed only by an advisory specialist note, with no formal project source. The current user is the sole product confirmer.",
+      "expected": [
+        "the specialist note remains evidence or source-candidate rather than a second confirmation role",
+        "the only human confirmation route is the current user",
+        "the current user may explicitly confirm, defer, scope-cap, or keep a blocker with a reopen condition"
+      ],
+      "must_not": [
+        "must not route the question to a named specialist or other human contact",
+        "must not let the LLM automatically confirm the professional claim",
+        "must not mark final-prd while the current user leaves the load-bearing claim unresolved"
+      ],
+      "coverage_tags": [
+        "contract-reset-lite",
+        "single-human-confirmer",
+        "source-authority",
+        "closure-boundary"
+      ]
     }
   ],
   "skill": "spec-prd",
   "source_refs": [
     "skills/spec-prd/SKILL.md",
     "skills/spec-prd/references/evidence-and-topology.md",
+    "skills/spec-prd/references/product-analysis-lite.md",
     "skills/spec-prd/references/domain-language-and-decision-ledger.md",
     "skills/spec-prd/references/grill-with-docs-integration.md",
     "skills/spec-prd/references/product-expert-lens.md",

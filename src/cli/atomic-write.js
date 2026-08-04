@@ -44,6 +44,20 @@ function renameWithWindowsRetry(tmpPath, filePath) {
   }
 }
 
+function cleanupAtomicTempPath(tmpPath, primaryError = null) {
+  try {
+    fs.rmSync(tmpPath, { force: true });
+  } catch (cleanupError) {
+    if (primaryError && typeof primaryError === 'object') {
+      try {
+        primaryError.atomicTempCleanupError = cleanupError;
+      } catch (_error) {
+        // Cleanup evidence is secondary; never replace the primary write failure.
+      }
+    }
+  }
+}
+
 function writeFileAtomic(filePath, contents, encoding = 'utf8') {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   const tmpPath = createAtomicTempPath(filePath);
@@ -51,7 +65,7 @@ function writeFileAtomic(filePath, contents, encoding = 'utf8') {
     fs.writeFileSync(tmpPath, contents, encoding);
     renameWithWindowsRetry(tmpPath, filePath);
   } catch (error) {
-    fs.rmSync(tmpPath, { force: true });
+    cleanupAtomicTempPath(tmpPath, error);
     throw error;
   }
 }
@@ -65,15 +79,11 @@ function writeFileAtomicIfAbsent(filePath, contents, encoding = 'utf8') {
     fs.linkSync(tmpPath, filePath);
     linked = true;
   } catch (error) {
-    fs.rmSync(tmpPath, { force: true });
+    cleanupAtomicTempPath(tmpPath, error);
     throw error;
   }
   if (linked) {
-    try {
-      fs.rmSync(tmpPath, { force: true });
-    } catch (_error) {
-      // The final artifact is already linked; leftover temp cleanup is best-effort.
-    }
+    cleanupAtomicTempPath(tmpPath);
   }
 }
 

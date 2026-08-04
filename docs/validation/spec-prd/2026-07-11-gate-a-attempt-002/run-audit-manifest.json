@@ -1,0 +1,46 @@
+{
+  "schema_version": "contract-reset-run-audit/v1",
+  "artifact_type": "generated",
+  "producer": "prepare-contract-reset-evidence.js",
+  "source_run_id": "2026-07-11-gate-a-attempt-002",
+  "deterministic_validation": {
+    "status": "passed",
+    "gate_a_status": "inconclusive",
+    "reason_codes": [
+      "holdout_commitment_unavailable",
+      "isolation_probe_execution_failed",
+      "model_outcomes_missing",
+      "session_execution_incomplete"
+    ]
+  },
+  "retained_files": {
+    "source-manifest.json": {
+      "sha256": "sha256:3d3bb5c27d3d4351238f268ab53d9511c90054cd60190f9293f84091490ed21f",
+      "artifact_type": "generated"
+    },
+    "materialization-verification.json": {
+      "sha256": "sha256:6604ceb8dc92104b3f358ffd268c6eb44e218f03bdeb0dc9fb935a0bf2baefbb",
+      "artifact_type": "confirmed"
+    },
+    "control.patch": {
+      "sha256": "sha256:52fdd946fba0aaf9fcfb35e76d7777165983d65f618728ab70f33c241c5897e0",
+      "artifact_type": "generated"
+    },
+    "candidate.patch": {
+      "sha256": "sha256:722f07312513b88877115c42f26e388b721ae8a5b1fedd7617aeec846afcb89d",
+      "artifact_type": "generated"
+    },
+    "promotion-holdout-commitment.json": {
+      "sha256": "sha256:be393272fbc451da55a814d3aa204dd0a09edfe431e97eb9c99314ab85861f43",
+      "artifact_type": "degraded"
+    },
+    "run-facts.json": {
+      "sha256": "sha256:2552bd0654fc9ee9737a54f49d62f304b7a284904b4c7d15cad63b8e21388794",
+      "artifact_type": "degraded"
+    }
+  },
+  "limitations": [
+    "No semantic Gate A outcome is inferred from this deterministic export.",
+    "Absent model outputs remain absent rather than being replaced by replay or aggregate scores."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "worker-dispatch-host-preflight/v1",
+  "artifact_type": "advisory",
+  "gate": "post-u1-pre-u2-discovery-only",
+  "status": "passed",
+  "support_claim": "not_applicable",
+  "capture_owner": "Codex orchestrator /root",
+  "capture_method": "equivalent-current-session-source",
+  "captured_at": "2026-07-28T16:15:17Z",
+  "freshness_expires_at": "2026-07-29T16:15:17Z",
+  "session_identity": "claude-session:3ce5aa5f-0abb-44fd-8a24-4f3bed4b3529",
+  "host_identity": "claude-code/2.1.220",
+  "host_startup_or_version_ref": "/opt/homebrew/bin/claude --version returned 2.1.220; the captured headless session exited 0 with terminal_reason=completed.",
+  "dispatch_authorization_receipt": "Current user message on 2026-07-29: 进行验证; it confirms the previously stated Codex and Claude discovery/dispatch validation scope.",
+  "authorization_basis": "explicit-user",
+  "discovery_surface": "Redacted local transparent capture of the completed current session outbound /anthropic/v1/messages tools array.",
+  "schema_excerpt_ref": "docs/validation/worker-dispatch/preflight/2026-07-29-claude-code-2.1.220-schema-capture.json#candidate",
+  "schema_excerpt": "<provider_untrusted>{\"name\":\"Agent\",\"purpose\":\"launch a new agent for a caller-provided task\",\"required\":{\"description\":\"string\",\"prompt\":\"string\"},\"optional\":{\"subagent_type\":\"string; omitted selects general-purpose\",\"model\":[\"sonnet\",\"opus\",\"haiku\",\"fable\"],\"run_in_background\":\"boolean; false is synchronous\",\"isolation\":[\"worktree\",\"remote\"]},\"result\":\"synchronous return or completion notification readable by caller\",\"complete_tool_registry\":{\"tool_count\":11,\"tool_names\":[\"Agent\",\"Bash\",\"Edit\",\"Read\",\"ReportFindings\",\"ScheduleWakeup\",\"Skill\",\"ToolSearch\",\"Workflow\",\"DeferredToolPlaceholder\",\"Write\"]}}</provider_untrusted>",
+  "schema_excerpt_sha256": "b2bdf505a4c8bbe2af66581bf4ffa5833a12519b8102c2be546952421de42c48",
+  "schema_completeness": "confirmed",
+  "completeness_basis": "The transparent capture parsed the complete tools array from the completed session's outbound request: 11 names with names-list SHA-256 cd805fd001feccd01c9257b7def6e8c3e8b9483095e4685a397488de14b77605.",
+  "redaction_status": "passed",
+  "capture_limitations": [
+    "Authorization headers and credential values were forwarded without logging; only request paths and the tools request body were inspected.",
+    "The capture proves current registration shape only; permission, capacity, isolation, execution, output validity, and host support remain untested.",
+    "The fixed READY model response was not used for primitive discovery or semantic selection.",
+    "No worker primitive was invoked during Gate 0."
+  ],
+  "capability_probe": "attempted",
+  "worker_dispatch_capability": "available",
+  "eligibility_contract_ref": "docs/contracts/workflows/worker-dispatch-capability.md#generic-worker-eligibility",
+  "eligibility_contract_sha256": "eebec18fa4c9bcede11c54b9c506204945a5e59f175424b3812e6433b8c033d3",
+  "eligible_candidates": [
+    {
+      "candidate_identity_sha256": "f4cc4417ab89ac165246404423bd8fd0fc18315e8898f3a1185c9b77f4c70549",
+      "unique": true,
+      "rationale": "prompt accepts the self-contained packet and can carry bounded stop and mutation scope; omitting subagent_type selects a generic agent; run_in_background=false gives a synchronous caller-readable result. Workflow is a multi-agent script orchestrator and Skill selects predefined packages, so neither is the single generic-worker port. No Skill host mapping is needed."
+    }
+  ],
+  "invocation_performed": false
+}

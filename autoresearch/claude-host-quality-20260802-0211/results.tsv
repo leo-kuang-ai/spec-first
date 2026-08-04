@@ -1,0 +1,4 @@
+iteration	commit	metric	delta	status	description
+0	b72a6234	0	0.0	baseline	初始状态：spec-plan-workspace 导致 manifest 验证失败
+1	605352b2	84	+84.0	keep	移除无效的 spec-plan-workspace 工作目录
+2	8d559887	100	+16.0	keep	同步 Claude runtime assets (hooks, commands, skills)
