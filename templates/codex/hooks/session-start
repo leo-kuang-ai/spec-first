@@ -3,7 +3,7 @@
 
 const FALLBACK_CONTEXT = [
   '[spec-first] using-spec-first SessionStart injection',
-  'Managed using-spec-first bootstrap could not be inspected from `AGENTS.md`.',
+  'Managed language/governance workflow entry guidance could not be inspected from `AGENTS.md`.',
   'Run `spec-first doctor --codex` in this project to inspect the managed SessionStart hook.',
 ].join('\n');
 
@@ -29,12 +29,17 @@ async function main() {
   const projectDir = process.env.CODEX_PROJECT_DIR || process.cwd();
   const instructionPath = path.join(projectDir, 'AGENTS.md');
   const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
-  const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
-  const BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
+  const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;
+  const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
+  const LANG_START = '<!-- spec-first:lang:start -->';
+  const LANG_END = '<!-- spec-first:lang:end -->';
+  const WORKFLOW_ENTRY_ANCHOR = '<!-- spec-first:workflow-entry:using-spec-first -->';
+  const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
+  const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
   const missingMessage = [
     '[spec-first] using-spec-first SessionStart injection',
-    'Managed using-spec-first bootstrap is missing from `AGENTS.md`.',
-    'Run `spec-first init` in this project and choose Codex when prompted to restore the managed bootstrap block.',
+    'Managed language/governance block is missing from `AGENTS.md`.',
+    'Run `spec-first init` in this project and choose Codex when prompted to restore the managed language/governance block.',
   ].join('\n');
 
   let additionalContext = missingMessage;
@@ -42,25 +47,22 @@ async function main() {
   // or a TOCTOU delete degrades to a pointer instead of throwing and aborting the hook.
   const instructionBody = readInstructionBody(instructionPath);
   if (instructionBody !== null) {
-    const startIdx = instructionBody.indexOf(BOOTSTRAP_START);
-    const endIdx = instructionBody.indexOf(BOOTSTRAP_END);
+    const status = inspectWorkflowEntryGuidance(instructionBody);
 
-    if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-      // AGENTS.md already carries the managed bootstrap block; inject a short pointer.
+    if (status.installed) {
+      // AGENTS.md already carries the managed language/governance block; inject a short pointer.
       additionalContext = [
         '[spec-first] using-spec-first SessionStart injection',
-        "Workflow entry governance is active in this repo's AGENTS.md (using-spec-first managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
-        'Full routing policy: skills/using-spec-first/SKILL.md.',
+        "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+        'Full routing policy: .agents/skills/using-spec-first/SKILL.md.',
+      ].join('\n');
+    } else {
+      additionalContext = [
+        '[spec-first] using-spec-first SessionStart injection',
+        status.message,
+        'Run `spec-first init` in this project and choose Codex when prompted to restore the managed language/governance block.',
       ].join('\n');
     }
-  }
-
-  if (additionalContext === missingMessage && instructionBody !== null) {
-    additionalContext = [
-      '[spec-first] using-spec-first SessionStart injection',
-      'Managed using-spec-first bootstrap markers are missing or incomplete in `AGENTS.md`.',
-      'Run `spec-first init` in this project and choose Codex when prompted to restore the managed bootstrap block.',
-    ].join('\n');
   }
 
   const startupReminder = readStartupReminder(projectDir);
@@ -82,6 +84,74 @@ async function main() {
     }
   }
 
+  function inspectWorkflowEntryGuidance(body) {
+    const legacyMarkers = inspectMarkerStructure(body, LEGACY_BOOTSTRAP_START, LEGACY_BOOTSTRAP_END);
+    if (!legacyMarkers.absent) {
+      if (!legacyMarkers.valid) {
+        return {
+          installed: false,
+          message: 'Legacy standalone bootstrap markers must form exactly one balanced pair in `AGENTS.md`.',
+        };
+      }
+      return {
+        installed: false,
+        message: 'Legacy standalone using-spec-first bootstrap should be merged into the `spec-first:lang` block in `AGENTS.md`.',
+      };
+    }
+
+    const langMarkers = inspectMarkerStructure(body, LANG_START, LANG_END);
+    if (langMarkers.absent) {
+      return {
+        installed: false,
+        message: 'Managed language/governance block is missing from `AGENTS.md`.',
+      };
+    }
+    if (!langMarkers.valid) {
+      return {
+        installed: false,
+        message: 'Managed language/governance markers must form exactly one balanced pair in `AGENTS.md`.',
+      };
+    }
+
+    const managedBlock = body.slice(langMarkers.startIdx, langMarkers.endIdx + LANG_END.length);
+    if (countOccurrences(managedBlock, WORKFLOW_ENTRY_ANCHOR) === 1) {
+      return { installed: true };
+    }
+    return {
+      installed: false,
+      message: 'Workflow entry guidance is missing from the `spec-first:lang` block in `AGENTS.md`.',
+    };
+  }
+
+  function inspectMarkerStructure(contents, startMarker, endMarker) {
+    const startIndexes = findMarkerIndexes(contents, startMarker);
+    const endIndexes = findMarkerIndexes(contents, endMarker);
+    return {
+      absent: startIndexes.length === 0 && endIndexes.length === 0,
+      valid: startIndexes.length === 1 && endIndexes.length === 1 && startIndexes[0] < endIndexes[0],
+      startIdx: startIndexes.length === 1 ? startIndexes[0] : -1,
+      endIdx: endIndexes.length === 1 ? endIndexes[0] : -1,
+    };
+  }
+
+  function findMarkerIndexes(contents, marker) {
+    const indexes = [];
+    let searchFrom = 0;
+    while (searchFrom <= contents.length - marker.length) {
+      const index = contents.indexOf(marker, searchFrom);
+      if (index === -1) {
+        break;
+      }
+      indexes.push(index);
+      searchFrom = index + marker.length;
+    }
+    return indexes;
+  }
+
+  function countOccurrences(contents, value) {
+    return findMarkerIndexes(contents, value).length;
+  }
+
   function readStartupReminder(cwd) {
     try {
       if (!isTrustedSpecFirstCliPath(SPEC_FIRST_CLI_PATH)) {
@@ -90,12 +160,13 @@ async function main() {
 
       const result = spawnSync(process.execPath, [SPEC_FIRST_CLI_PATH, 'startup-reminder', '--codex'], {
         cwd,
-        // Deliberate session-start latency cap. The child records its cooldown only after a
-        // successful display, so on a dead/slow network it re-spawns every session — a larger
-        // timeout would block every offline session-start by that much. The reminder is a
-        // best-effort cosmetic notice and still completes on a healthy network (~600ms).
         encoding: 'utf8',
-        timeout: 1200,
+        env: {
+          ...process.env,
+          SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS: String(STARTUP_REMINDER_LOOKUP_TIMEOUT_MS),
+        },
+        // 子进程网络超时必须小于 hook 总预算，避免外层先终止而 attempt cooldown 已经落盘。
+        timeout: STARTUP_REMINDER_PROCESS_TIMEOUT_MS,
       });
 
       if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {

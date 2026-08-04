@@ -9,6 +9,40 @@ const SOURCE_TRUTH_MARKERS = [
   /\bsource fixes?\b/i,
 ];
 
+function commandSkillLocalResourcePathPattern() {
+  return /(^|[^A-Za-z0-9_./@\\-])(@?\.\/)?(references|scripts|assets|prompts|schemas|rule-packs)\/(?=[A-Za-z0-9_.@-])/gm;
+}
+
+function rewriteCommandSkillLocalResourcePaths(content, runtimeSkillRoot) {
+  if (typeof content !== 'string' || typeof runtimeSkillRoot !== 'string') {
+    return content;
+  }
+
+  const normalizedRuntimeRoot = runtimeSkillRoot
+    .replace(/\\/g, '/')
+    .replace(/^\.\//, '')
+    .replace(/\/+$/, '');
+  if (normalizedRuntimeRoot.length === 0) {
+    return content;
+  }
+
+  return content.replace(
+    commandSkillLocalResourcePathPattern(),
+    (_match, boundary, relativePrefix, resourceRoot) => (
+      `${boundary}${relativePrefix || ''}${normalizedRuntimeRoot}/${resourceRoot}/`
+    ),
+  );
+}
+
+function findUnresolvedCommandSkillLocalResourcePaths(content) {
+  if (typeof content !== 'string') {
+    return [];
+  }
+
+  return [...content.matchAll(commandSkillLocalResourcePathPattern())]
+    .map((match) => match[3]);
+}
+
 function rewriteSourceSkillRuntimePaths(content, skillName, runtimeSkillRoot) {
   if (typeof skillName !== 'string' || skillName.length === 0) {
     return content;
@@ -47,10 +81,6 @@ function shouldPreserveSourceSkillPathLine(line, skillName) {
     return false;
   }
 
-  if (/^\s*\|\s*Inputs\s*\|/.test(line)) {
-    return true;
-  }
-
   return SOURCE_TRUTH_MARKERS.some((marker) => marker.test(line));
 }
 
@@ -79,6 +109,8 @@ function escapeRegExp(value) {
 
 module.exports = {
   SOURCE_TRUTH_MARKERS,
+  findUnresolvedCommandSkillLocalResourcePaths,
+  rewriteCommandSkillLocalResourcePaths,
   rewriteSourceSkillRuntimePaths,
   shouldPreserveSourceSkillPathLine,
 };

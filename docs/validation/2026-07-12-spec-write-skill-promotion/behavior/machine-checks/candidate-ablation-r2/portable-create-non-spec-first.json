@@ -1,0 +1,29 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "create",
+    "case_id": "portable-create-non-spec-first",
+    "effect": "apply",
+    "layer_result": "Portable authoring applies; spec-first governance is not imposed.",
+    "modifier": "none",
+    "required_references": [
+      "Repository-local Agent Skill conventions, if present",
+      "API change-record input format and compatibility policy"
+    ],
+    "response": "建议在该 Node.js 仓库的 canonical skills source 下创建 `api-change-compatibility-checklist`。先用正向、负向和近邻请求验证 description 的触发边界，再编写共享流程：接收 API 变更记录，分类 breaking、behavioral、deprecation 和 additive changes，输出带证据、影响范围、迁移建议及未决项的检查清单。仅把分支专属的兼容性规则放入 references；只有存在可重复且易错的确定性转换时才新增脚本，并实际验证无意外写入。预览完整变更并确认所有路径位于目标仓库后再应用。",
+    "route_decision": "authoring-create",
+    "source_owner_assumption": "The ordinary Node.js repository is the single target and owns a canonical, repository-local Skill source directory; its exact convention must be confirmed before mutation.",
+    "would_modify_paths": [
+      "<target-repo>/skills/api-change-compatibility-checklist/SKILL.md",
+      "<target-repo>/skills/api-change-compatibility-checklist/references/compatibility-rules.md",
+      "<target-repo>/skills/api-change-compatibility-checklist/evals/route-cases.json"
+    ],
+    "would_run_commands": [
+      "Inspect repository-local Skill conventions and confirm the canonical source root",
+      "Preview the proposed package diff and verify containment within the target repository",
+      "Run repository-approved package checks and focused route/output regression tests"
+    ]
+  }
+}

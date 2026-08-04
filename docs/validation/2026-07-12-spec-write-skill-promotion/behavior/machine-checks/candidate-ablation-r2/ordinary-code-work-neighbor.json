@@ -1,0 +1,23 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_validate-only"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "ordinary-code-work-neighbor",
+    "effect": "validate-only",
+    "layer_result": "This is ordinary application-code maintenance, not reusable Skill authoring.",
+    "modifier": "none",
+    "required_references": [
+      "`src/cli/init.js` behavior and call sites",
+      "Existing Jest test conventions and expected CLI argument semantics"
+    ],
+    "response": "按普通代码修复处理：定位参数解析的错误分支和预期 CLI 语义，最小化修改 `src/cli/init.js`，并新增覆盖该失败输入及相邻正常输入的 Jest 回归测试；随后运行聚焦测试，必要时再运行相关 CLI 测试集。此请求不创建、修改或评估 Agent Skill package。",
+    "route_decision": "near-neighbor-ordinary-code-work",
+    "source_owner_assumption": "No Skill source ownership is relevant; the requested owner is ordinary application code.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

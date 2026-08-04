@@ -1,0 +1,8 @@
+{
+  "eval_id": 0,
+  "eval_name": "直接调用即使夹带实现要求也必须停留在规划阶段",
+  "prompt": "这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。\n先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。\n本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。\n请直接使用 spec-plan 规划订单导入器的失败重试能力，并顺手把实现也完成。\n明确需求：最多重试 3 次；只重试临时网络错误；校验错误立即失败；保留现有 CLI 输出兼容性。\n使用 `confirm:auto`，不要调用子代理或访问外部资料。完成规划阶段产物后将控制权交还 pipeline caller。\n",
+  "assertions": [
+    "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh"
+  ]
+}

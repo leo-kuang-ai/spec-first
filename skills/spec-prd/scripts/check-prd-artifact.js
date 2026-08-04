@@ -582,6 +582,72 @@ function isEmptyish(value) {
     || /^<.*>$/.test(v);
 }
 
+function validRequirementIds(sectionText) {
+  const ids = new Set();
+  tableRows(sectionText).forEach((cells) => {
+    const id = String(cells[0] || '').trim().toUpperCase();
+    if (!/^R-\d{2,}$/.test(id)) return;
+    const hasSubstantiveCell = cells.slice(1).some((cell) => (
+      !isEmptyish(cell) && !/^P[0-3]$/i.test(cell)
+    ));
+    if (hasSubstantiveCell) ids.add(id);
+  });
+  return [...ids].sort();
+}
+
+function validAcceptanceExamples(sectionText) {
+  const ids = new Set();
+  const requirementIds = new Set();
+  tableRows(sectionText).forEach((cells) => {
+    const id = String(cells[0] || '').trim().toUpperCase();
+    const rowText = cells.slice(1).join(' ');
+    if (/^AE-\d{2,}$/.test(id) && /\bR-\d{2,}\b/i.test(rowText)) {
+      const substantive = rowText
+        .replace(/\b(?:AE|R)-\d{2,}\b/gi, '')
+        .replace(/\bP[0-3]\b/gi, '')
+        .trim();
+      if (!isEmptyish(substantive)) {
+        ids.add(id);
+        uniqueMatches(rowText, /\b(R-\d{2,})\b/gi).forEach((requirementId) => {
+          requirementIds.add(requirementId.toUpperCase());
+        });
+      }
+    }
+  });
+
+  const lines = splitLines(sectionText);
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = lines[index].match(/\b(AE-\d{2,})\b/i);
+    if (!match) continue;
+    let end = lines.length;
+    for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+      if (/\bAE-\d{2,}\b/i.test(lines[cursor])) {
+        end = cursor;
+        break;
+      }
+    }
+    const blockLines = lines.slice(index, end);
+    const block = blockLines.join('\n');
+    const givenIndex = blockLines.findIndex((line) => /^\s*Given\b/i.test(line));
+    const traceDeclaration = givenIndex === -1
+      ? ''
+      : blockLines.slice(0, givenIndex).join('\n');
+    if (/\bR-\d{2,}\b/i.test(traceDeclaration)
+      && /(?:^|\n)\s*Given\b/i.test(block)
+      && /(?:^|\n)\s*When\b/i.test(block)
+      && /(?:^|\n)\s*Then\b/i.test(block)) {
+      ids.add(match[1].toUpperCase());
+      uniqueMatches(traceDeclaration, /\b(R-\d{2,})\b/gi).forEach((requirementId) => {
+        requirementIds.add(requirementId.toUpperCase());
+      });
+    }
+  }
+  return {
+    ids: [...ids].sort(),
+    requirementIds: [...requirementIds].sort(),
+  };
+}
+
 // 一条 Owner Decision Trace 行是否有效:chosen_answer + write target + consequence 三非空。
 function isValidTraceRow(row) {
   return !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence);
@@ -764,11 +830,14 @@ function hasValidDeclaration(text, fieldPattern, values) {
 }
 
 function extractDeclarationValue(text, fieldPattern, values) {
+  return extractDeclarationValues(text, fieldPattern, values)[0] || null;
+}
+
+function extractDeclarationValues(text, fieldPattern, values) {
   const body = stripFencedCode(text);
   const valuePattern = values.map((value) => value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
-  const regex = new RegExp(`^\\s*(?:[-*]\\s*)?${fieldPattern}\\s*:\\s*(${valuePattern})\\s*$`, 'im');
-  const match = body.match(regex);
-  return match ? match[1].trim() : null;
+  const regex = new RegExp(`^\\s*(?:[-*]\\s*)?${fieldPattern}\\s*:\\s*(${valuePattern})\\s*$`, 'gim');
+  return [...body.matchAll(regex)].map((match) => match[1].trim());
 }
 
 function hasConcreteFieldBlock(text, fieldPattern) {
@@ -1042,13 +1111,24 @@ function parseStructure(target, text) {
   const missingCoreSections = CORE_SECTIONS.filter((section) => (
     !sectionRange(lines, headings, section)
   ));
+  const requirementsSection = sectionRange(lines, headings, 'Requirements');
   const requirementIds = uniqueMatches(text, /\b(R-\d{2,})\b/g);
+  const validRequirementRowIds = requirementsSection
+    ? validRequirementIds(requirementsSection.text)
+    : [];
   const acceptanceIds = uniqueMatches(text, /\b(AE-\d{2,})\b/g);
   const nfrIds = uniqueMatches(text, /\b(NFR-\d{2,})\b/g);
   const acceptanceSection = sectionRange(lines, headings, 'Acceptance Examples');
-  const acceptanceText = acceptanceSection ? acceptanceSection.text : '';
+  const validAcceptanceCoverage = acceptanceSection
+    ? validAcceptanceExamples(acceptanceSection.text)
+    : { ids: [], requirementIds: [] };
+  const validAcceptanceExampleIdsInSection = validAcceptanceCoverage.ids;
+  const acceptanceRequirementIds = new Set(validAcceptanceCoverage.requirementIds);
+  const requirementsWithoutAcceptanceTrace = validRequirementRowIds.filter((id) => (
+    !acceptanceRequirementIds.has(id)
+  ));
   const uncoveredRequirements = requirementIds.filter((id) => (
-    !new RegExp(`\\b${id}\\b`).test(acceptanceText)
+    !acceptanceRequirementIds.has(id)
   ));
   const evidenceTagHits = EVIDENCE_TAGS.filter((tag) => text.includes(tag));
   const placeholderLines = lineNumbersFor(lines, /<[^>\n]+>|\bTODO\b|\bTBD\b|\bpending-tooling\b/i)
@@ -1060,9 +1140,10 @@ function parseStructure(target, text) {
   const planningRecheckPresent = sectionPresent(lines, headings, 'Planning Recheck');
   const outstandingQuestionCount = countSectionRows(lines, headings, 'Outstanding Questions');
   const planningRecheckCount = countSectionRows(lines, headings, 'Planning Recheck');
-  const writeModeValue = extractDeclarationValue(text, 'write_mode', [
+  const writeModeValues = extractDeclarationValues(text, 'write_mode', [
     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
   ]);
+  const writeModeValue = writeModeValues[0] || null;
   const writeModeDeclaredValid = Boolean(writeModeValue);
   const clarificationEvidenceValue = extractDeclarationValue(text, 'clarification_evidence', [
     'asked-owner', 'source-proven-no-ask', 'headless-degraded-logged', 'skipped',
@@ -1080,9 +1161,15 @@ function parseStructure(target, text) {
   // highest_risk_gap / next_action / why_no_invention。把 Phase 1 中间产物从"对话语义"
   // 外化为"artifact 可验证事实",防模型压缩 Phase 1 直接到 Write(R12 天花板内可推一步)。
   const decisionCardHighestRiskGap = hasConcreteFieldBlock(text, 'decision_card_highest_risk_gap');
-  const decisionCardNextAction = extractDeclarationValue(text, 'decision_card_next_action', [
+  const decisionCardNextActions = extractDeclarationValues(text, 'decision_card_next_action', [
     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out',
   ]);
+  const decisionCardNextAction = decisionCardNextActions[0] || null;
+  const decisionCardPathMismatch = new Set(writeModeValues).size > 1
+    || new Set(decisionCardNextActions).size > 1
+    || (writeModeDeclaredValid
+      && Boolean(decisionCardNextAction)
+      && writeModeValue !== decisionCardNextAction);
   const decisionCardWhyNoInvention = hasConcreteFieldBlock(text, 'decision_card_why_no_invention');
   const decisionCardPresent = decisionCardHighestRiskGap
     && Boolean(decisionCardNextAction)
@@ -1147,14 +1234,17 @@ function parseStructure(target, text) {
     target, normalizedTarget, prdHash, lines, frontmatter, headings,
     unknownSectionIds, duplicateSectionIds, duplicateMachineSectionIds, orphanSectionIds,
     sectionIdTitleMismatches,
-    missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
+    missingCoreSections, requirementIds, validRequirementRowIds,
+    acceptanceIds, validAcceptanceExampleIdsInSection, requirementsWithoutAcceptanceTrace,
+    nfrIds, uncoveredRequirements,
     evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
     outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
-    writeModeValue, writeModeDeclaredValid, clarificationEvidenceValue,
+    writeModeValue, writeModeValues, writeModeDeclaredValid, clarificationEvidenceValue,
     clarificationEvidenceDeclaredValid, clarificationEvidenceSubstantive,
     canEnterSpecPlanValue, canEnterSpecPlanDeclaredValid,
     preflightSweepClosureValue, preflightSweepClosureDeclaredValid,
-    decisionCardHighestRiskGap, decisionCardNextAction, decisionCardWhyNoInvention, decisionCardPresent,
+    decisionCardHighestRiskGap, decisionCardNextAction, decisionCardNextActions,
+    decisionCardWhyNoInvention, decisionCardPresent, decisionCardPathMismatch,
     designSourceRefsPresent, designSourceInventoryDeclared, designSourceCoverageDeclared,
     designSourcesReadPresent, designSourcesUnreadPresent,
     needsReadinessDeclarations, prdShaped, writeModeIsFinalPrd, writeModeIsCheckpoint,
@@ -1193,7 +1283,12 @@ function computeFacts(structure, inputPaths, options) {
     core_sections_present: CORE_SECTIONS.filter((s) => !structure.missingCoreSections.includes(s)),
     core_sections_missing: structure.missingCoreSections,
     requirement_ids: structure.requirementIds,
+    valid_requirement_row_ids: structure.validRequirementRowIds,
+    valid_requirement_row_count: structure.validRequirementRowIds.length,
     acceptance_ids: structure.acceptanceIds,
+    valid_acceptance_example_ids: structure.validAcceptanceExampleIdsInSection,
+    valid_acceptance_example_count: structure.validAcceptanceExampleIdsInSection.length,
+    requirements_without_acceptance_trace: structure.requirementsWithoutAcceptanceTrace,
     nfr_ids: structure.nfrIds,
     uncovered_requirements: structure.uncoveredRequirements,
     evidence_tags_present: structure.evidenceTagHits,
@@ -1273,6 +1368,24 @@ function computeFacts(structure, inputPaths, options) {
 function gateReadyClaims(facts, oqAnalysis) {
   if (!facts.ready_claim_present) return [];
   const findings = [];
+  facts.core_sections_missing.forEach((section) => {
+    findings.push({ reason_code: 'core_section_missing', section });
+  });
+  if (!facts.core_sections_missing.includes('Requirements')
+    && facts.valid_requirement_row_count === 0) {
+    findings.push({ reason_code: 'requirements_row_missing', section: 'Requirements' });
+  }
+  if (!facts.core_sections_missing.includes('Acceptance Examples')
+    && facts.valid_acceptance_example_count === 0) {
+    findings.push({ reason_code: 'acceptance_example_row_missing', section: 'Acceptance Examples' });
+  }
+  facts.requirements_without_acceptance_trace.forEach((requirement_id) => {
+    findings.push({
+      reason_code: 'requirement_acceptance_trace_missing',
+      section: 'Acceptance Examples',
+      requirement_id,
+    });
+  });
   if (facts.preflight_sweep_closure === 'blocked') {
     findings.push({ reason_code: 'preflight_sweep_closure_blocked' });
   }
@@ -1305,6 +1418,10 @@ const REMEDIATION_BY_REASON_CODE = {
   decision_card_undeclared: {
     expected_shape: 'Readiness Self-Check includes decision_card_highest_risk_gap, decision_card_next_action, and decision_card_why_no_invention before a ready/final claim.',
     remediation_hint: 'Add the missing Decision Card fields, or keep write_mode as checkpoint-prd with can_enter_spec_plan: no until the highest-risk gap is explicit.',
+  },
+  decision_card_path_mismatch: {
+    expected_shape: 'decision_card_next_action 与已声明的 write_mode 路径完全一致。',
+    remediation_hint: '选择唯一写入路径，并在 closeout 前对齐 write_mode 与 decision_card_next_action。',
   },
   open_oq_without_owner_closure: {
     expected_shape: 'Each non-blocking open OQ has a legal closure_disposition with checkable source evidence or a matching Owner Decision Trace row.',
@@ -1357,7 +1474,7 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
       line: structure.frontmatter.startLine,
     });
   }
-  if (/^\/docs\/prds\//.test(structure.normalizedTarget) || structure.normalizedTarget.includes('/docs/prds/')) {
+  if (/(?:^|\/)docs\/prds\//.test(structure.normalizedTarget)) {
     findings.push({ reason_code: 'forbidden_prds_path', path: structure.normalizedTarget });
   }
   structure.missingCoreSections.forEach((section) => {
@@ -1423,6 +1540,15 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   if ((structure.claimsReady || structure.writeModeIsFinalPrd)
     && !structure.decisionCardPresent) {
     findings.push({ reason_code: 'decision_card_undeclared' });
+  }
+  if (structure.decisionCardPathMismatch) {
+    findings.push({
+      reason_code: 'decision_card_path_mismatch',
+      write_mode: structure.writeModeValue,
+      write_mode_values: [...new Set(structure.writeModeValues)],
+      decision_card_next_action: structure.decisionCardNextAction,
+      decision_card_next_action_values: [...new Set(structure.decisionCardNextActions)],
+    });
   }
   // design source findings
   if (structure.designSourceRefsPresent && !structure.designSourceInventoryDeclared) {

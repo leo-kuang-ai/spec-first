@@ -1,0 +1,13 @@
+{
+  "base_operation": null,
+  "case_id": "audit-only-neighbor",
+  "effect": "validate-only",
+  "layer_result": "This is a focused trigger-boundary audit, not package authoring or readiness work.",
+  "modifier": "none",
+  "required_references": [],
+  "response": "Review only `skills/spec-prd/SKILL.md` and report trigger-boundary findings: over-broad positive triggers, missing intended triggers, near-neighbor requests that should not activate it, conflicts between the frontmatter description and body, and concrete wording recommendations. Do not edit files, assess the whole package, or run validation.",
+  "route_decision": "near-neighbor-audit",
+  "source_owner_assumption": "No source-ownership assumption is needed because no mutation or package-readiness review is requested.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

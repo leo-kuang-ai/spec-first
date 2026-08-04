@@ -110,12 +110,12 @@
       "required": ["refresh_owner", "refresh_mode", "hook_default", "usage_owner"],
       "properties": {
         "refresh_owner": { "enum": ["provider-native", "runtime-setup", "user", "none", "unknown"] },
-        "refresh_mode": { "enum": ["watcher", "skill-cli-hook-on-demand", "cli-mcp-hook-on-demand", "manual-only", "none", "unknown"] },
+        "refresh_mode": { "enum": ["watcher", "skill-cli-hook-on-demand", "cli-mcp-hook-on-demand", "commit-hook-external-verified", "commit-hook-spec-first-async", "manual-only", "none", "unknown"] },
         "hook_default": { "type": "boolean" },
         "usage_owner": { "enum": ["downstream-skill", "provider-native", "user", "none", "unknown"] },
         "hook_installed": { "type": "boolean" },
         "hook_verified": { "type": "boolean" },
-        "hook_status": { "enum": ["verified", "installed", "failed", "skipped", "unknown"] },
+        "hook_status": { "enum": ["verified", "verified-external", "installed", "failed", "blocked", "skipped", "unknown"] },
         "hook_skipped_reason": { "type": ["string", "null"] }
       },
       "additionalProperties": false

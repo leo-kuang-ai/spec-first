@@ -22,7 +22,7 @@ spec-first 共有 **37 个 skill 目录**，其中核心 workflow skill 10 个�
 | 评审 | `spec-code-review`、`spec-doc-review` |
 | 调试 | `spec-debug` |
 | 知识沉淀 | `spec-compound`、`spec-compound-refresh` |
-| 元治理 | `spec-skill-audit`、`spec-optimize`、`spec-team-standards-governance` |
+| 元治理 | `retired-skill-review`、`spec-optimize`、`spec-team-standards-governance` |
 | 工具 skill | `git-commit`、`git-commit-push-pr`、`git-worktree`、`proof`、`resolve-pr-feedback`、`git-clean-gone-branches`、`report-bug`、`spec-mcp-setup`、`spec-sessions`、`spec-slack-research`、`spec-release-notes`、`spec-write-skill` |
 | 技术域 skill | `agent-native-architecture`、`spec-dhh-rails-style`、`spec-polish-beta`、`spec-app-consistency-audit`、`spec-sessions`、`test-browser`、`test-xcode`、`frontend-design`、`gemini-imagegen`、`feature-video`、`changelog` |
 
@@ -49,7 +49,7 @@ Codebase -> Spec (brainstorm/prd) -> Plan -> Tasks (write-tasks) -> Code (work) 
 | spec-debug | 缺陷修复 | 系统性 root cause + fix | bug 描述 / issue ref / error | root cause + fix + verification |
 | spec-compound | 知识沉淀 | 将已解决问题转为可复用知识 | 已解决问题上下文 | docs/solutions/*.md |
 | spec-compound-refresh | 知识刷新 | 刷新过时知识文档 | 旧 docs/solutions/ 文档 | 更新后的知识文档 |
-| spec-skill-audit | Skill 质量审查 | 审查 skill 工程质量 / runtime drift | skills/ 目录 | audit report |
+| retired-skill-review | Skill 质量审查 | 审查 skill 工程质量 / runtime drift | skills/ 目录 | audit report |
 
 ### 1.4 总体成熟度判断
 
@@ -114,7 +114,7 @@ using-spec-first (入口路由)
 | spec-doc-review | 文档评审 | requirements/plan/task | spec-plan, spec-work | findings report | Context(中)、Execution(中)、Review(强) | subagent-template, findings schema | dispatch 未授权, 误判文档类型 |
 | spec-debug | 调试 | bug/error/issue | spec-work, spec-compound | root cause + fix | Context(中)、Execution(强)、Evidence(强)、Validation(强) | anti-patterns, investigation | 跳过 reproduction, shotgun fix |
 | spec-compound | 知识沉淀 | solved problem | spec-plan, spec-work | docs/solutions/ | Context(中)、Execution(中)、Knowledge(强) | schema.yaml, resolution-template | 未验证知识升级，重复文档 |
-| spec-skill-audit | Skill 审查 | skills/ | spec-work, 人工 | audit report | Context(中)、Execution(中)、Governance(强) | audit rubrics | runtime drift 遗漏 |
+| retired-skill-review | Skill 审查 | skills/ | spec-work, 人工 | audit report | Context(中)、Execution(中)、Governance(强) | audit rubrics | runtime drift 遗漏 |
 
 ### 2.3 职责重叠检查
 
@@ -693,7 +693,7 @@ Unknown:   当前无法确认；必须说明缺什么证据及其后果
 | Review 产物 | schema lint（建议）| drop invalid findings | finding lint |
 | Debug 产物 | rerun repro loop | root cause not confirmed | repro output |
 | Evidence 产物 | source refs reachable + line anchor valid | mark degraded | evidence audit |
-| Skill 产物 | `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .` | report degraded | audit summary |
+| Skill 产物 | `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .` | report degraded | audit summary |
 | Knowledge 产物 | `python3 skills/spec-compound/scripts/validate-frontmatter.py <path>` | re-write + rerun | exit 0 |
 
 ### 12.2 Validation Gate 分级
@@ -869,7 +869,7 @@ skill-system/
   review-harness.md
   validation-harness.md
   evaluation-harness.md
-  skill-audit-checklist.md
+  skill-review-checklist.md
   skill-version-changelog.md  ← 新增
 ```
 
@@ -1067,7 +1067,7 @@ argument-hint: "[optional args]"
 
 ## 16. Skill 体系治理文件草案
 
-### 16.1 skill-system/skill-audit-checklist.md（核心治理清单）
+### 16.1 skill-system/skill-review-checklist.md（核心治理清单）
 
 ```markdown
 ## Skill 质量审查清单
@@ -1292,7 +1292,7 @@ argument-hint: "[optional args]"
 2. **先共享，后引用**：规则先集中到 shared/，再让各 skill 引用，不重复维护
 3. **先 source，后 runtime**：所有 skill 变更从 source 开始，通过 `spec-first init` 同步 runtime
 4. **先骨架，后细节**：主 SKILL.md 保留最小执行契约，细节外置
-5. **渐进验证**：每阶段完成后运行 `spec-first skill-audit` 确认无 regression
+5. **渐进验证**：每阶段完成后运行 `spec-first skill-review` 确认无 regression
 6. **Knowledge Harness 降级明确**：当前阶段 placeholder only，激活条件需明确定义
 
 ### 21.3 当前不应做的事（反合理化防线）
@@ -1324,7 +1324,7 @@ argument-hint: "[optional args]"
 - spec-brainstorm 增加 Evidence Harness
 - spec-code-review SKILL.md 大幅压缩（bash 脚本外置到 scripts/）
 
-**已验证：** 以上所有审查结论来自直接读取 `skills/` 目录下各 SKILL.md 原始内容，非 generated runtime 产物。当前审查为 LLM 语义判断层的 advisory 产物，尚未通过 `spec-first skill-audit` CLI 脚本进行确定性校验。建议下一步运行 `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .` 获取补充确定性事实。
+**已验证：** 以上所有审查结论来自直接读取 `skills/` 目录下各 SKILL.md 原始内容，非 generated runtime 产物。当前审查为 LLM 语义判断层的 advisory 产物，尚未通过 `spec-first skill-review` CLI 脚本进行确定性校验。建议下一步运行 `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .` 获取补充确定性事实。
 
 
 ---
@@ -1406,7 +1406,7 @@ spec-first 有明确的 source/runtime 二分法：
 
 **漏洞1：runtime 与 source 语义漂移检测机制薄弱**
 
-当前 `spec-first doctor` 和 `spec-skill-audit` 可以检测 runtime drift，但：
+当前 `spec-first doctor` 和 `retired-skill-review` 可以检测 runtime drift，但：
 - 没有 CI 自动化检查（runtime 是否与 source 同步）
 - 没有在 PR review 时自动触发 drift 检测
 - 生成后的 runtime 内容是否"语义忠实"于 source 完全无验证
@@ -1696,7 +1696,7 @@ evidence_classes:
 | spec-doc-review | ✅ | 1 | ~74 | examples | 🟡 仅 examples |
 | spec-debug | ✅ | 1 | ~50 | examples | 🟡 仅 examples |
 | spec-compound | ✅ | 1 | ~83 | examples | 🟡 仅 examples |
-| spec-skill-audit | ✅ | 4 example files | — | 文本 example files | 🟡 非 JSON 结构化 cases |
+| retired-skill-review | ✅ | 4 example files | — | 文本 example files | 🟡 非 JSON 结构化 cases |
 | spec-team-standards-governance | ✅ | 有 golden-samples/ | — | 有 README | 🟡 部分 |
 | spec-mcp-setup | ✅ | 1 | ~37 | examples | 🟡 仅 examples，偏小 |
 
@@ -2660,4 +2660,4 @@ spec-first skill 体系在执行工程上已属业界前列（Execution Harness 
 
 ---
 
-> **审查声明：** 本报告全部结论来自直接读取 `skills/` 目录源码和 `docs/10-prompt/审查整个 skill 是否具备 Harness 能力.md` 审查框架执行结果，为 LLM 语义判断层 advisory 产物。建议使用 `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo .` 获取补充确定性校验事实，并以本报告为 LLM semantic layer 的 advisory 输入。
+> **审查声明：** 本报告全部结论来自直接读取 `skills/` 目录源码和 `docs/10-prompt/审查整个 skill 是否具备 Harness 能力.md` 审查框架执行结果，为 LLM 语义判断层 advisory 产物。建议使用 `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo .` 获取补充确定性校验事实，并以本报告为 LLM semantic layer 的 advisory 输入。

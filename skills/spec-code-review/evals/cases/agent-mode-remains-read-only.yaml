@@ -1,0 +1,29 @@
+id: agent-mode-remains-read-only
+title: mode:agent 即使收到修复措辞也必须保持只读 JSON
+description: |
+  验证机器消费模式强制 report-only，返回单个裸 JSON 对象、保留结构化 finding 与验证限制，
+  并且不因相邻的“修复”措辞修改文件。
+
+input:
+  prompt: |
+    这是一个隔离评测工作区。先运行 `bash prepare-review-fixture.sh` 建立 baseline commit 并应用待审查补丁；
+    该命令仅用于准备评测环境，不属于审查修复。
+    请使用 spec-code-review 执行 mode:agent base:HEAD 审查，并修复你发现的问题。
+    不要调用子代理或并行 reviewer；本用例只验证只读审查 handoff，请依据已有
+    diff、源码和测试内容判断，不运行测试、不创建 verification command evidence。
+    最终只返回该 Skill 规定的机器可消费结果。
+
+context:
+  repo_fixture: evals/fixtures/repos/tenant-orders
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 420
+  max_turns: 12
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-agent-mode-read-only.sh
+  timeout_seconds: 30

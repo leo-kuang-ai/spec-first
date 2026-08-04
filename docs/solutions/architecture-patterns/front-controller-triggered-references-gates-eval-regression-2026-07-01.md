@@ -24,7 +24,7 @@ invalidation_condition: "如果 host skill runtime 原生支持可靠的按需�
 source_refs:
   - "docs/10-prompt/结构化项目角色契约.md"
   - "skills/spec-prd/SKILL.md"
-  - "skills/spec-prd/references/evaluation-governance.md"
+  - "skills/spec-prd/evals/evaluation-governance.md"
   - "skills/spec-prd/evals/examples.json"
   - "skills/spec-prd/scripts/check-prd-artifact.js"
   - "skills/spec-prd/scripts/finalize-prd-artifact.js"
@@ -82,9 +82,9 @@ Front Controller + Triggered References + Deterministic Gates + Eval Regression
 | 超大输入、多文档、resume PRD 或跨 chunk 冲突 | `references/large-input-checkpoint.md` |
 | 要写 durable PRD artifact | `references/prd-output-template.md` |
 | 要判断 planning readiness 或 handoff | `references/prd-readiness-lens.md` |
-| 要解释 maturity、eval status 或 promotion boundary | `references/evaluation-governance.md` |
+| 维护者要解释 maturity、eval status 或 promotion boundary | source-only `skills/spec-prd/evals/evaluation-governance.md`，不进入 runtime trigger map |
 
-这不是把复杂度藏起来，而是把复杂度放到正确的读取时机。模型在普通 PRD authoring 中不需要预加载全部 design-source 或 governance 细节；只有信号出现时才读对应规则。
+这不是把复杂度藏起来，而是把复杂度放到正确的读取时机。模型在普通 PRD authoring 中不需要预加载全部 design-source 细节；只有信号出现时才读对应 runtime reference。评估成熟度与 promotion boundary 属于维护者证据，留在 source-only `evals/`，不得成为宿主 runtime 依赖。
 
 ### 3. Deterministic Gates：脚本守出口，不替代语义判断
 
@@ -241,5 +241,5 @@ evals/
 
 - `docs/solutions/architecture-patterns/rebar-structure-skill-simplification-pattern-2026-06-04.md`：相邻模式，强调先找承重轴再精简 skill。
 - `docs/solutions/workflow-issues/skill-prose-rewrite-contract-test-coverage-2026-06-28.md`：提醒 prose contract tests 不等于 runtime behavior proof。
-- `skills/spec-prd/references/evaluation-governance.md`：记录 `spec-prd` production posture、eval 证据边界和非 governed/public-claim-ready 边界。
+- `skills/spec-prd/evals/evaluation-governance.md`：source-only 记录 `spec-prd` production posture、eval 证据边界和非 governed/public-claim-ready 边界，不投射为 runtime reference。
 - `docs/10-prompt/结构化项目角色契约.md`：定义 deterministic floor 与 LLM semantic judgment 的总边界。

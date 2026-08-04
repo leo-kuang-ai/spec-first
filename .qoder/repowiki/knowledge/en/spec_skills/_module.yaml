@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: spec_skills
+title: spec_skills
+scope:
+    - skills/
+source_files: []
+depends_on: []
+related_to: []

@@ -1,0 +1,1 @@
+{"entrypoint":"using-spec-first","handoff_target":"runtime-maintenance","loaded_skills":["using-spec-first"],"invocation_mode":"none","effect":"not-entered","reason":"真实请求要求直接修改 .agents/skills 下的生成运行时副本。using-spec-first 将此类请求路由到 runtime-maintenance；运行时副本不是事实源，且在进入 spec-write-skill 前需要另行提出源 Skill 修订请求。本次仅评估路由，未执行请求或修改文件。"}

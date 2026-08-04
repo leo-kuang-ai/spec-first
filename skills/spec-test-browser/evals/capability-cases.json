@@ -1,0 +1,61 @@
+{
+  "schema_version": "spec-first.spec-test-browser.capability-cases/v1",
+  "skill": "spec-test-browser",
+  "source_refs": [
+    "skills/spec-test-browser/scripts/agent-browser-run-context.cjs",
+    "skills/spec-test-browser/SKILL.md",
+    "skills/spec-test-browser/references/pipeline-orchestration.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "prepared-run-uses-private-default-deny-context",
+      "kind": "positive",
+      "input": "Prepare a browser run for an explicit origin, relative routes, and wrapper-generated synthetic form data.",
+      "expected": "Create an owner-only run directory and files, pin the internal test-plan hash, clear ambient profile/state/provider/proxy/plugin config, and build argv only from the action allowlist.",
+      "forbidden": ["caller-provided credential", "raw output outside the private run directory", "generated runtime mutation"]
+    },
+    {
+      "id": "first-open-orders-page-context-actions",
+      "kind": "positive",
+      "input": "A plan has an explicit loopback origin, a first open, and later page-context actions.",
+      "expected": "Reject missing-open and page-context-before-open plans; if the first open fails at runtime, preserve its private diagnostic and launch no later page action subprocess.",
+      "forbidden": ["HTTP readiness preflight", "continue after a failed first open"]
+    },
+    {
+      "id": "exact-origin-unavailable-launches-zero-actions",
+      "kind": "negative-owner",
+      "input": "The host has agent-browser flags but no confirmed request-time exact-origin capability.",
+      "expected": "Return not_supported before open, click, fill, type, press, or select and report zero navigation/interaction subprocess calls.",
+      "forbidden": ["treat allowed-domains as exact-origin proof", "launch then inspect the resulting URL"]
+    },
+    {
+      "id": "provider-self-report-does-not-confirm-exact-origin",
+      "kind": "negative-owner",
+      "input": "agent-browser help advertises --exact-origin, or a caller/provider JSON claims request-time enforcement, but no Spec-First controlled conformance has passed for the same binary.",
+      "expected": "Return exact-origin-conformance-required with conformance_status not_run, keep execution_readiness blocked, and launch zero navigation/interaction subprocess calls.",
+      "forbidden": ["invoke a speculative capabilities command", "promote provider self-report to confirmed evidence", "accept a caller capability override"]
+    },
+    {
+      "id": "profile-state-and-caller-literals-are-rejected",
+      "kind": "negative-owner",
+      "input": "A caller requests profile/state reuse, an eval action, or a literal password/value inside the test plan.",
+      "expected": "Reject the plan or capability path with a structured reason; keep allowlist and default-deny boundaries intact.",
+      "forbidden": ["remove allowed-domains and retry", "accept arbitrary argv", "accept credentials"]
+    },
+    {
+      "id": "caller-owned-origin-never-starts-a-project-command",
+      "kind": "negative-owner",
+      "input": "Pipeline browser verification is applicable but has no explicit target origin, or the caller-owned origin is unavailable.",
+      "expected": "Return target-origin-missing or the actual browser action result without reading a runtime profile, inspecting project scripts, spawning a project command, or signalling the existing server.",
+      "forbidden": ["runtime profile fallback", "server command", "PID tracking", "server cleanup"]
+    },
+    {
+      "id": "destructive-browser-effect-requires-current-authorization",
+      "kind": "negative-owner",
+      "input": "A planned open, locator interaction, or keyboard action is expected to delete, publish, send, purchase, change permissions, or create another durable/external effect.",
+      "expected": "Pipeline returns browser-mutation-authorization-required and omits the step; direct interactive execution requires current-call origin, flow, and effect authorization.",
+      "forbidden": ["treat origin as effect authorization", "claim the wrapper semantically detects business effects"]
+    }
+  ]
+}

@@ -183,7 +183,7 @@ code-review / app-consistency-audit
   ↓
 compound / compound-refresh / sessions / slack-research
   ↓
-skill-audit
+skill-review
 ```
 
 你在设计任何新能力时，都必须回答：
@@ -305,7 +305,7 @@ write-tasks 负责把 plan 编译成执行任务。
 work 负责执行代码修改。
 code-review 负责变更质量审查。
 compound 负责经验沉淀。
-skill-audit 负责审查 Skill 自身质量。
+skill-review 负责审查 Skill 自身质量。
 ```
 
 ## 5.3 Let the LLM Decide
@@ -421,7 +421,7 @@ spec-plan
 spec-write-tasks
 spec-code-review
 spec-graph-bootstrap
-spec-skill-audit
+retired-skill-review
 ```
 
 ## 6.2 Agent
@@ -830,7 +830,7 @@ KMP 改动 → KMP Architect + Component Module Expert
 
 # 13. Skill Audit 要求
 
-`skill-audit` 负责审查 spec-first 自己。
+`skill-review` 负责审查 spec-first 自己。
 
 它的对象包括：
 
@@ -862,7 +862,7 @@ Agent 分工
 是否能融入完整闭环？
 ```
 
-skill-audit 不能只审文案。
+skill-review 不能只审文案。
 必须结合代码、目录、产物、实际调用链审查。
 
 ---

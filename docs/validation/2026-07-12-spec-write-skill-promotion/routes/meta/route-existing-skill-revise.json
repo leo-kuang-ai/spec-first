@@ -1,0 +1,10 @@
+{
+  "id": "route-existing-skill-revise",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 44299,
+    "cached_input_tokens": 0,
+    "output_tokens": 521,
+    "reasoning_output_tokens": 173
+  }
+}

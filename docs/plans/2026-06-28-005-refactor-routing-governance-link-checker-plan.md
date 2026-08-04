@@ -38,14 +38,14 @@ origin_grade: prd
 - R1. routing-red-flags.md 不得含反转 skill 名 `bug-report`，应为真实名 `report-bug`。Origin trace: R-05。
 - R2. sensitive surfaces 必须在 scope-guards.md 或红旗中有定义与举例，LLM 不得把架构/contract/governance/runtime-delivery/multi-file 改动判为"非 sensitive"绕过路由。Origin trace: R-06, AE-05。
 - R3. 红旗 route target 不得用裸名 `update`/`setup` 引发 `spec-*` 命名混淆，应写 `spec-first update`/`spec-mcp-setup`。Origin trace: R-07。
-- R4. bootstrap 显式缺席集必须覆盖 `slack-research`/`skill-audit`/`app-consistency-audit`/`polish-beta`（当前仅断言 `sessions`/`release-notes`）。Origin trace: R-08。
+- R4. bootstrap 显式缺席集必须覆盖 `slack-research`/`skill-review`/`app-consistency-audit`/`polish-beta`（当前仅断言 `sessions`/`release-notes`）。Origin trace: R-08。
 - R5. CURATED_CORE 必须从 `skills-governance.json` 派生，不得硬编码数组字面量。Origin trace: R-09。
 - R6. 两条 load-bearing 红旗（vague→brainstorm/plan、run-init-now→route first）必须在 bootstrap 内联或有 intentional deferral 测试。Origin trace: R-10。
 - R7. prompt-examples / routing-cases 的 cases.length 上限必须留 breathing margin（当前恰为 14，上限 `<= 14`，补 case 即破测）。Origin trace: R-11。
 - R8. lint-skill-entrypoints scanRoots 必须覆盖 `CLAUDE.md`/`AGENTS.md` host 入口文档（当前仅 `["skills"]`）。Origin trace: R-12。
 - R9. Markdown link checker 必须跳过 `{url}`/`{older_url}` placeholder 与代码块内链接，真实本地 broken link 仍被报告。Origin trace: R-40, AE-12。
 
-**Origin actors:** Spec-First Evolution Architect；using-spec-first 路由消费者；bootstrap 生成器；skill-audit 消费者。
+**Origin actors:** Spec-First Evolution Architect；using-spec-first 路由消费者；bootstrap 生成器；skill-review 消费者。
 **Origin flows:** Slice C 入口路由防守同一 release wave；Slice B 复用 A' 的 scanner fixture 分层但不重新拥有 R-01。
 **Origin acceptance examples:** AE-05（R-06）；AE-07（R-05/R-07/R-08/R-09/R-10/R-11/R-12）；AE-12（R-40）。
 
@@ -81,7 +81,7 @@ origin_grade: prd
 - routing-red-flags.md 用 `report-bug`，contract test 守护无反转名回归。
 - sensitive surfaces 在 scope-guards.md 有定义与举例，fresh-source eval 确认 LLM 不会把架构改动判为非 sensitive。
 - 红旗 route target 用 `spec-first update`/`spec-mcp-setup` 而非裸名。
-- bootstrap 缺席集断言覆盖 6 项（sessions/release-notes + slack-research/skill-audit/app-consistency-audit/polish-beta）。
+- bootstrap 缺席集断言覆盖 6 项（sessions/release-notes + slack-research/skill-review/app-consistency-audit/polish-beta）。
 - CURATED_CORE 从 skills-governance.json 派生，test 守护其不硬编码。
 - 两条 load-bearing 红旗在 bootstrap 内联或有 intentional deferral 测试。
 - cases.length 上限上调并留 margin，补 1 个 case 不破测。
@@ -94,7 +94,7 @@ origin_grade: prd
 
 - target_repo: `.`
 - evidence_sources: direct source reads, targeted `rg`/`grep`, git status, package scripts, origin PRD。
-- source_refs: `skills/using-spec-first/references/routing-red-flags.md`, `skills/using-spec-first/references/scope-guards.md`, `tests/unit/instruction-bootstrap.test.js`, `src/cli/instruction-bootstrap.js`, `src/cli/contracts/dual-host-governance/skills-governance.json`, `tests/unit/prompt-examples-contracts.test.js`, `skills/using-spec-first/evals/routing-cases.json`, `scripts/lint-skill-entrypoints.config.json`, `scripts/lint-skill-entrypoints.js`, `tests/unit/lint-skill-entrypoints.test.js`, `skills/spec-skill-audit/scripts/lib/markdown.js`, `skills/spec-skill-audit/scripts/lint-skill-structure.js`, `skills/spec-release-notes/SKILL.md`。
+- source_refs: `skills/using-spec-first/references/routing-red-flags.md`, `skills/using-spec-first/references/scope-guards.md`, `tests/unit/instruction-bootstrap.test.js`, `src/cli/instruction-bootstrap.js`, `src/cli/contracts/dual-host-governance/skills-governance.json`, `tests/unit/prompt-examples-contracts.test.js`, `skills/using-spec-first/evals/routing-cases.json`, `scripts/lint-skill-entrypoints.config.json`, `scripts/lint-skill-entrypoints.js`, `tests/unit/lint-skill-entrypoints.test.js`, `skills/retired-skill-review/scripts/lib/markdown.js`, `skills/retired-skill-review/scripts/lint-skill-structure.js`, `skills/spec-release-notes/SKILL.md`。
 - current_revision: `bc71b4be`（worktree 含 Slice A' 已落地变更 + 本计划文件）。
 - worktree_status: dirty；Slice A' 变更已落地（security-patterns.js、task-pack.js、spec-doc-review/SKILL.md 等）；本计划不修改 A' 文件。
 - confidence: high — 9 条 requirement 均已 bounded direct read 确认当前源码状态与缺口。
@@ -124,7 +124,7 @@ origin_grade: prd
 - `src/cli/contracts/dual-host-governance/skills-governance.json` — R-09 CURATED_CORE 派生来源。
 - `tests/unit/prompt-examples-contracts.test.js` + `skills/using-spec-first/evals/routing-cases.json` — R-11 cases.length 上限与 fixture。
 - `scripts/lint-skill-entrypoints.config.json` + `scripts/lint-skill-entrypoints.js` + `tests/unit/lint-skill-entrypoints.test.js` — R-12 scanRoots 扩展面。
-- `skills/spec-skill-audit/scripts/lib/markdown.js` `extractLocalLinks` — R-40 修复点；`lint-skill-structure.js:143-146` 是 broken_local_link 消费端（不改）。
+- `skills/retired-skill-review/scripts/lib/markdown.js` `extractLocalLinks` — R-40 修复点；`lint-skill-structure.js:143-146` 是 broken_local_link 消费端（不改）。
 
 ### Institutional Learnings
 
@@ -277,7 +277,7 @@ flowchart TB
 
 ### U4. R-08 补全 bootstrap 缺席集断言
 
-**Goal:** bootstrap 缺席集断言覆盖 slack-research/skill-audit/app-consistency-audit/polish-beta。
+**Goal:** bootstrap 缺席集断言覆盖 slack-research/skill-review/app-consistency-audit/polish-beta。
 
 **Requirements:** R4
 
@@ -292,7 +292,7 @@ flowchart TB
 **Patterns to follow:** L539-540 现有 progressive-disclosure 负向断言。
 
 **Test scenarios:**
-- Happy: slack-research/skill-audit/app-consistency-audit/polish-beta 均不在 bootstrap block。
+- Happy: slack-research/skill-review/app-consistency-audit/polish-beta 均不在 bootstrap block。
 - Edge: 若未来误把这些加进 block，断言失败。
 
 **Verification:** `npx jest tests/unit/instruction-bootstrap.test.js` 通过。
@@ -420,8 +420,8 @@ flowchart TB
 **Dependencies:** None
 
 **Files:**
-- Modify: `skills/spec-skill-audit/scripts/lib/markdown.js`
-- Modify/Test: `tests/unit/skill-audit-scripts.test.js`
+- Modify: `skills/retired-skill-review/scripts/lib/markdown.js`
+- Modify/Test: `tests/unit/skill-review-scripts.test.js`
 
 **Approach:**
 - `extractLocalLinks` 跳过 target 含 `{...}` placeholder 的链接。
@@ -443,7 +443,7 @@ flowchart TB
 
 ## System-Wide Impact
 
-- **Interaction graph:** routing-red-flags/scope-guards 改 prose → using-spec-first 路由消费者；bootstrap 派生改动 → CLAUDE.md/AGENTS.md managed block 双宿主投影；lint scanRoots 扩展 → CI 入口治理；markdown.js 改动 → skill-audit broken_local_link 消费者。
+- **Interaction graph:** routing-red-flags/scope-guards 改 prose → using-spec-first 路由消费者；bootstrap 派生改动 → CLAUDE.md/AGENTS.md managed block 双宿主投影；lint scanRoots 扩展 → CI 入口治理；markdown.js 改动 → skill-review broken_local_link 消费者。
 - **Error propagation:** R-09 派生若读错 governance 字段会导致 bootstrap block 缺失 core 入口——双向守护断言拦截。
 - **API surface parity:** R-12 scanRoots 改 config + 可能改 lint.js 遍历；R-40 改 markdown.js 提取——均需对应 test 同步。
 - **Surface coverage:** routing governance source → 范围内；bootstrap 生成器 → 范围内；lint/markdown scanner → 范围内；generated runtime mirrors → 范围外（spec-first init 重生成）。
@@ -501,9 +501,9 @@ flowchart TB
 - Related code: `src/cli/instruction-bootstrap.js`
 - Related code: `src/cli/contracts/dual-host-governance/skills-governance.json`
 - Related code: `scripts/lint-skill-entrypoints.config.json`
-- Related code: `skills/spec-skill-audit/scripts/lib/markdown.js`
+- Related code: `skills/retired-skill-review/scripts/lib/markdown.js`
 - Related tests: `tests/unit/instruction-bootstrap.test.js`
 - Related tests: `tests/unit/prompt-examples-contracts.test.js`
 - Related tests: `tests/unit/lint-skill-entrypoints.test.js`
 - Related tests: `tests/unit/using-spec-first-contracts.test.js`
-- Related tests: `tests/unit/skill-audit-scripts.test.js`
+- Related tests: `tests/unit/skill-review-scripts.test.js`

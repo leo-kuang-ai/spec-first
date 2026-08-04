@@ -1,0 +1,1165 @@
+diff --git a/skills/spec-prd/SKILL.md b/skills/spec-prd/SKILL.md
+index 66985bf0..5f4aa075 100644
+--- a/skills/spec-prd/SKILL.md
++++ b/skills/spec-prd/SKILL.md
+@@ -7,17 +7,17 @@ description: "Public workflow entrypoint (spec-prd): create, write, refine, or v
+ 
+ ## Purpose
+ 
+-Turn an existing-system increment, rough product note, or low-quality PRD into a standard durable PRD artifact by first thoroughly clarifying requirements with source-first `grill-with-docs` discipline, then writing WHAT/WHY, current-state evidence, acceptance, scope boundaries, assumptions, and unresolved blockers into the PRD template so `spec-plan` can plan without inventing product behavior. For existing PRDs, diagnose quality gaps, grill unresolved requirements until they are resolved or explicitly blocked, then rewrite the final PRD-grade artifact.
++Turn an existing-system increment, rough product note, or low-quality PRD into a standard durable PRD artifact by first thoroughly clarifying requirements with source-first `grill-with-docs` discipline, then writing WHAT/WHY, current-state evidence, acceptance, scope boundaries, assumptions, and unresolved blockers into the PRD template so `spec-plan` can plan without inventing product behavior. For existing PRDs, `refine` diagnoses and rewrites after closure; `validate` produces a read-only planning-readiness report and never mutates the artifact.
+ 
+ Mental map: `spec-prd` is analysis-first: materials become a run-local Requirement Analysis Gate map, the map identifies uncertainty and contradiction points, Product Expert Lens ranks which product/design/technical decisions must be grilled, Requirements Grill closes or carries the load-bearing WHAT gaps, Standard PRD write-in records the decisions, and Readiness Lens asks whether planning or work would still have to invent product behavior. Treat this as the workflow spine, not a direct external skill chain or persistent artifact topology.
+ 
+-Main workflow spine: `Input -> Classify / Route Decision -> Input Inventory & Sanitization -> Current-State Evidence -> Requirement Analysis Gate -> Product Expert Lens -> Requirements Grill -> Pre-Write Closure Decision -> PRD Write / Refine -> Readiness Lens + Finalize -> Handoff`. Treat `ready-for-planning`, `ask-owner`, `revise-prd`, `doc-review`, and `route-out` as readiness/handoff outcomes, not the main workflow chain. Treat `checkpoint-prd` as a `write_mode` recovery shape under Pre-Write Closure Decision, never as a readiness outcome or planning handoff.
++Main workflow spine: `Input -> Classify / Route Decision -> Input Inventory & Sanitization -> Current-State Evidence -> Requirement Analysis Gate -> Product Expert Lens -> Requirements Grill -> Pre-Write Closure Decision -> PRD Write / Refine -> Readiness Lens + Finalize -> Handoff`; `validate` branches after evidence into `Readiness Lens + check-only -> Report`, never the write/finalize spine. Treat `ready-for-planning`, `ask-owner`, `revise-prd`, `doc-review`, and `route-out` as readiness/handoff outcomes, not the main workflow chain. Treat `checkpoint-prd` as a `write_mode` recovery shape under Pre-Write Closure Decision, never as a readiness outcome or planning handoff.
+ 
+ Use the current host/session date when dating PRD requirements documents. If the date is unavailable, read it with a deterministic command; do not hard-code calendar years in this source file. All file references in generated documents must use repo-relative paths.
+ 
+ Default artifact invariant: write Markdown requirements under `docs/brainstorms/*-requirements.md` with `artifact_kind: prd-requirements`. Do not create `docs/prds/`, implement code, write implementation plans, or edit generated runtime mirrors.
+ 
+-Claude runtime mutation guard: managed Claude installs `prd-prewrite-guard` as a `PreToolUse` guard for `Write|Edit|MultiEdit`. It blocks `docs/brainstorms/*-requirements.md` PRD artifacts that lack a durable-write `write_mode` path on first write (`ask-owner-first`, `checkpoint-prd`, `final-prd`, or `route-out`; `not-run` is not a write path), self-claim machine ready/final state through Claude file mutation tools (`status: ready-for-planning` or machine readiness receipt fields), or use direct first-write ready intent. For `Edit` / `MultiEdit`, the guard reconstructs candidate content from `old_string` / `new_string` edits when possible; if reconstruction is degraded, it still blocks payloads that directly touch machine-owned ready/receipt fields. This is a control-flow guard for observed direct-write and later-mutation shortcuts; it does not judge product semantics or prove an owner really answered. If it blocks, return to Requirements Grill, ask the next owner question through the Interaction Method, or write a non-ready checkpoint (`write_mode: checkpoint-prd`, `can_enter_spec_plan: no`) when preserving context is necessary. Codex currently has no equivalent managed PreToolUse/Stop hook for this PRD ready-field mutation path; treat Codex enforcement as degraded and rely on explicit producer finalize discipline rather than claiming the same hard guard.
++Runtime mutation guard: the LLM owns final intent (`write_mode: final-prd`, `can_enter_spec_plan: yes`, and the semantic readiness outcome); `finalize-prd-artifact.js` alone owns `status: ready-for-planning` and `readiness_*` receipt fields. Managed Claude installs `prd-prewrite-guard` for `Write|Edit|MultiEdit`: it requires a durable `write_mode` on the first PRD write and blocks direct machine-field mutation, including degraded Edit/MultiEdit reconstruction that still touches those fields. Claude is the only host with confirmed managed hard enforcement for this path. Qoder hook projection is present but activation remains unverified. Codex, Cursor, and Kiro remain loud degraded and rely on explicit producer-finalize discipline; never imply equal hard protection. The Stop/readiness guard treats final intent without a current receipt as blocking, so allowing the LLM to persist intent does not allow closeout.
+ 
+ ## Workflow Contract Summary
+ 
+@@ -35,7 +35,7 @@ An increment request, existing PRD or requirements draft, rough Markdown notes,
+ 
+ ### Outputs
+ 
+-A PRD-grade requirements artifact, concise PRD quality diagnosis and optimization suggestions for refine/validate mode, a source-resolved compact PRD or explicit route-out when PRD authoring adds no durable WHAT value, a split-decision summary pending owner confirmation, or a validation report with grill questions, blockers, and readiness outcome.
++A PRD-grade requirements artifact for create/refine, concise optimization suggestions for refine, a source-resolved compact PRD or explicit route-out when PRD authoring adds no durable WHAT value, a split-decision summary pending owner confirmation, or a report-only validation result with source/checker facts, blockers, questions, and readiness outcome.
+ 
+ ### Artifacts
+ 
+@@ -47,7 +47,7 @@ Missing target surface, unresolved product identity, current-state claims withou
+ 
+ ### Workflow
+ 
+-Classify intent and input mode, gather current-state evidence, run the Requirement Analysis Gate to map materials into understanding, uncertainty/contradiction points, grill decisions, and PRD write targets, run source-first requirements grilling until standard PRD write targets are resolved or explicitly blocked, draft/refine the PRD or analysis conclusion from the template, run readiness, then hand off to refine, doc review, plan, or done.
++Classify intent and input mode, gather current-state evidence, run the Requirement Analysis Gate to map materials into understanding, uncertainty/contradiction points, grill decisions, and PRD write targets, then branch: create/refine may write after closure and run finalize; validate runs readiness/check-only and returns a report without mutation. Hand off to refine, doc review, plan, or done from the observed result.
+ 
+ ### Downstream Consumers
+ 
+@@ -94,7 +94,7 @@ This table is the run-local quick reference for `spec-prd`; it is not a second s
+ | --- | --- | --- |
+ | Intake | Decide route-out/bypass, `intent`, `input_posture`, and split posture, and state why the PRD would or would not add durable WHAT value. | Enter Phase 1; or route out to the current host's brainstorm/app-audit/plan/work/debug workflow. |
+ | Phase 1+ durable action | Show a visible task list first, covering load-bearing OQ/source work, PRD write target, owner question, and the finalize/checker gap. | Continue source-first evidence / Requirements Grill; a lightweight route-out may close with a single reason. |
+-| 🔴 First durable PRD Write | Have the Requirement Analysis Gate map, the Product Expert Lens risk->write-target result, the Decision Card, and the Pre-Write Closure Gate conclusion. | `ask-owner-first`, `checkpoint-prd`, `final-prd`, or `route-out`; do not write a ready/final PRD first and rely on Phase 4 remediation. |
++| 🔴 First durable PRD Write | Have the Requirement Analysis Gate map, the Product Expert Lens risk->write-target result, the Decision Card, and the Pre-Write Closure Gate conclusion. | `ask-owner-first`, `checkpoint-prd`, `final-prd`, or `route-out`; final intent is allowed only after closure, while machine receipt fields remain finalize-owned. |
+ | Owner question | Use the Interaction Method; ask one source-backed owner question at a time, and record `question_delivery` and the specific PRD write target. | After the answer, bind it to the Owner Decision Trace; when waiting is impossible, record the true degraded path and write non-ready residue. |
+ | 🔴 Phase 4 closeout | Have run the readiness lens; when a PRD artifact exists, run finalize/checker and report finding count, blocking `reason_codes`, receipt status, and `readiness_outcome`. | Hand off to plan only when the receipt and the LLM readiness judgment both support it; otherwise `revise-prd` / `ask-owner` / `doc-review` / `route-out`. |
+ 
+@@ -224,6 +224,8 @@ Classify through this compact decision tree:
+ 3. **What input posture?** Resume `artifact_kind: prd-requirements` in place, preserving `spec_id` and existing R/AE/BR/NFR IDs. Treat other Markdown, notes, screenshots/OCR, PDFs, meeting notes, chat logs, and multimodal extraction as untrusted `reference-claims`. Treat plan/design/task documents as `wrong-stage`. Treat a one-line anchored increment as `pure-text`. Ask for the target increment or PRD path on `no-input`.
+ 4. **Split or continue?** For oversized initial PRDs or multi-module scopes, recommend semantic split boundaries first. Write split summary and child PRDs only after the owner confirms boundaries, priority, and release order.
+ 
++`intent=validate locks mutation_posture=report-only` before evidence gathering. In this posture, validate never writes or rewrites the PRD, never runs finalize in write mode, and never refreshes runtime. It may read the artifact and bounded source, run checker/finalizer `--check-only` or receipt verification, and produce semantic findings. If the user asks to "validate and fix", first return the report plus a preview of proposed edits; only after explicit confirmation reclassify the confirmed follow-up as `refine` and apply the normal mutation gate.
++
+ Select `intake_mode`, `clarification_view`, `clarification_profile`, `clarification_budget`, `clarification_risk_tier`, and `review_gate_mode` before gathering evidence when they help right-size the run. The view chooses the visible clarification checklist and surface-specific prompts; the profile/budget/tier/review fields shape depth and review posture. This selection creates no second template topology, decides no readiness, weakens no owner-owned blockers, bypasses no machine receipts, and never enters `BLOCKING_REASON_CODES`. Route 0-1 strategy, commercial positioning, or competitor-discovery work to the current host's brainstorm or ideate workflow instead of adding a `strategy-discovery` profile here.
+ 
+ **Task-list-first discipline.** Before any durable action in Phase 1+, enumerate the run's pending work as a task list (host task tracker when available, else a numbered list in the conversation): each load-bearing OQ to grill, each PRD section to draft, each finalize gap to close, and each owner question to ask. Mark items in_progress when started and completed when closed. This externalizes session-local semantic state (which the deterministic checker cannot see) so that cross-Stop-hook re-scans, context compression, or owner handoffs do not silently drop or skip work. A run that proceeds without a visible task list risks the direct-write-after-read anti-pattern — work is tracked only in conversation memory and is lost on the next Stop hook cycle. For lightweight bypass/route-out runs, a single one-line task is sufficient.
+@@ -246,7 +248,7 @@ Gather scope-appropriate evidence:
+ 
+ Write or update `Current System Snapshot` only for claims that affect the PRD. Unsupported current-state claims go to `Evidence And Assumptions` or `Outstanding Questions`.
+ 
+-For existing PRD or draft inputs, also extract a `quality_diagnosis` before rewriting by applying the canonical Product Expert Lens in `product-expert-lens.md`. Treat external research and industry norms as advisory overlays unless confirmed by project source or owner decision.
++For existing PRD or draft inputs, also extract a `quality_diagnosis` by applying the canonical Product Expert Lens in `product-expert-lens.md`. In refine this diagnosis precedes rewriting; in validate it feeds only the report. Treat external research and industry norms as advisory overlays unless confirmed by project source or owner decision.
+ 
+ For rough PRD / draft / reference-claims / resume-prd / pure-text inputs, default to source-first deep clarification through `grill-with-docs-integration.md` before final rewrite/readiness, not only after a high-severity gap label appears. Run the PRD-local `Pre-PRD Clarification Loop` after sanitization and current-state evidence, and keep its shared understanding map run-local: `claim -> evidence/source -> gap -> question_or_assumption -> PRD write target`. Resolve source/docs/tests/contracts/glossary/prior-PRD-answerable gaps before owner questions; source-resolved facts must not become owner questions and should carry a source ref or lookup marker in the trace. Ask owner questions one at a time with recommended answers and write targets, walking down each branch relentlessly by default: actor, flow, state, exception, acceptance, scope, permission, release-slice, terminology, decision intersections, and every triggered standard-template section. A branch stops only at a legal stop point defined in `Canonical: Four Legal Stop Points`. The run-local progress state must be one of `closed`, `narrowed`, `accepted-assumption`, `owner-capped`, `outstanding-question`, `blocker`, or `route-out`. Use compact output only when the PRD still needs a durable WHAT trace but source-first evidence already proves every relevant branch and no owner interview is needed; use bypass only when implementation-ready/direct route-out makes PRD authoring unnecessary with an explicit reason. Route missing product/system anchors to brainstorm, and never create standalone `CONTEXT.md`, `CONTEXT-MAP.md`, ADR, report, schema, or runtime artifacts in normal mode. Question order is set by `downstream_confirmation_risk`, but "the question would only expand scope" or "does not affect the current release slice" reorders rather than stops; only `route-out` (anchor missing / broad discovery / non-adjudicable) ends a branch without a Canonical stop point.
+ 
+@@ -258,9 +260,11 @@ Before the first durable PRD Write in an authoring/refinement run, emit a compac
+ 
+ Run the **Pre-Write Closure Gate** before durable PRD write-in. Relentless grilling continues by default; `write_mode=ask-owner-first` means keep grilling the highest-risk branch, not "ask one question then stop drafting". Use `write_mode=checkpoint-prd` as the relentless fallback when the owner gives no cap/continue signal (absent/headless, or silent after a soft-cap offer), or for true large-input recovery that cannot wait, and mark it a recovery checkpoint (`can_enter_spec-plan: no` + `next_owner_question`) rather than a final PRD. Use `write_mode=final-prd` only when every load-bearing branch has reached a Canonical stop point (source evidence, owner answer, evidence-backed `accepted-assumption`, or owner cap); Outstanding Questions, Planning Recheck, blocker cluster, or route-out residue still in the PRD prevents `final-prd`. An owner who has not capped a branch that still has reachable sub-decisions prevents `final-prd`. Use `write_mode=route-out` when the input is wrong-stage or no PRD artifact would add durable WHAT value.
+ 
+-🔴 **STOP — Pre-Write Closure Gate**: Do not satisfy the Pre-Write Closure Gate by writing a ready/final PRD first and relying on Phase 4 to catch it later. On Claude, the `prd-prewrite-guard` blocks the direct `Write` shape for new PRD artifacts; on hosts without an equivalent pre-tool guard, treat the same rule as a loud convention and report the degraded enforcement boundary rather than silently continuing.
++🔴 **STOP — Pre-Write Closure Gate**: Do not use `write_mode=final-prd` as a shortcut around semantic closure. The LLM may persist final intent only after this gate; it must keep `status: draft` and omit `readiness_*`. Claude hard-blocks direct machine-field mutation, Qoder projection is activation-unverified, and Codex/Cursor/Kiro use this as a loud convention. In every host, producer finalize remains mandatory before closeout can claim ready.
++
++Degraded enforcement boundary: record the actual host posture in closeout when relevant. Claude is confirmed hard-enforced; Qoder is `qoder_hook_activation_unverified`; Codex, Cursor, and Kiro have no equivalent confirmed managed PreToolUse/Stop pair. Across all hosts, producer finalize remains mandatory before `spec-prd` claims a PRD is ready, but downstream entry into `spec-plan` is user-owned and legacy `docs/brainstorms/*-requirements.md` remains readable. `--verify-receipt` remains available as an optional read-only diagnostic, not a mandatory consumer gate. Never self-fill ready receipt fields or imply equal host protection.
+ 
+-Codex degraded enforcement boundary: set `codex_prd_guard: not_available` in closeout when relevant. Codex has no equivalent managed PreToolUse prewrite guard and no managed Stop closeout guard for PRD readiness; producer finalize remains mandatory before `spec-prd` claims a PRD is ready, but downstream entry into `spec-plan` is user-owned and `spec-plan` continues to treat `docs/brainstorms/*-requirements.md` as legacy requirements input. `--verify-receipt` remains available as an optional read-only diagnostic, not a mandatory consumer gate. Do not imply equal protection with Claude, do not self-fill ready receipt fields, and do not claim producer readiness without running the producer-local finalize command from the loaded `spec-prd` skill root or explicitly reporting the degraded reason.
++Codex degraded enforcement boundary: record `codex_prd_guard: not_available` in closeout when relevant. Codex has no confirmed managed PreToolUse prewrite guard or Stop closeout guard for this PRD receipt path. Persist LLM-owned final intent only after semantic closure, then run the producer-local finalize command from the loaded `spec-prd` skill root before claiming ready. Do not imply equal protection with Claude, self-fill machine receipt fields, or convert the optional `--verify-receipt` diagnostic into a mandatory consumer gate.
+ 
+ **Closure-disposition razor.** Each Outstanding Question carries a `closure_disposition` column. An open question defaults to not-ready; it becomes non-blocking only by declaring one legal disposition plus its evidence — `source-resolved` / `source-backed-non-WHAT-assumption` (a checkable ref: repo path, URL, `file:line`, or anchor), `owner-answered` / `owner-capped` / `owner-accepted-assumption` (a matching Owner Decision Trace row), or `implementation-only-how-pushdown` (declares `planning_would_invent_what=no` and does not touch interface availability / permission / scope / source-of-truth / fallback display / analytics). "I judged it a parallel planning-time item" is NOT a disposition — that is exactly the observed failure where a load-bearing interface/permission question was self-downgraded to non-blocking and never asked. The model has no free "non-blocking" verdict; `blocks_planning=no` must be derived from a legal disposition, never asserted. The deterministic `check-prd-artifact.js` only reads the declared token and evidence-cell presence; it does not decide whether a question is load-bearing.
+ 
+@@ -278,7 +282,7 @@ Design degraded owner acceptance must be evidence-backed. A naked `design_degrad
+ 
+ When input is oversized, multi-source, or long-chain, load `large-input-checkpoint.md`. Reduce output feeds Product Expert Lens risk ordering; checkpoint write-in uses normal PRD sections and source refs instead of a transcript or progress schema.
+ 
+-Use `Preliminary Diagnosis` only to choose how to run the full clarification path: source-resolved compact PRD, shared understanding map, large-input Map-Reduce, triggered P0/P1 packs, deep grill, blocker cluster, or route-out. Only the post-rewrite `Final Readiness Diagnosis` can emit `ready-for-planning`.
++Use `Preliminary Diagnosis` only to choose how to run the full clarification path: source-resolved compact PRD, shared understanding map, large-input Map-Reduce, triggered P0/P1 packs, deep grill, blocker cluster, or route-out. For create/refine, only the post-rewrite `Final Readiness Diagnosis` can support a new `ready-for-planning` claim. Validate performs its final diagnosis after the read-only source/check-only pass and can only report the current claim; it cannot create one.
+ 
+ ### Phase 2: Change Delta And Domain Language
+ 
+@@ -290,11 +294,13 @@ When domain terminology, source/user contradiction, ownership, permission/state/
+ 
+ The Requirements Grill / Domain Grill Gate is PRD-local in normal mode: ask one owner question at a time, require a named gap and PRD write target, persist results into existing PRD sections, and do not create standalone context, ADR, or runtime artifacts unless `grill-with-docs-integration.md` is triggered for resolved context updates. For rough, draft, reference-claim, resume, or pure-text inputs, deep clarification through `grill-with-docs-integration.md` is the default path; compact output is only a source-resolved PRD shape, not a shortcut around clarification. Continue one-question-at-a-time relentlessly by default, update `CONTEXT.md` inline for resolved project terms when triggered, and create ADRs only when the three ADR conditions hold. A branch stops only at a legal stop point in `Canonical: Four Legal Stop Points`; "the next question would not change a PRD write target" reorders questions, it is not by itself a stop. Keep its focus distinct from Pre-PRD Clarification: Domain Grill handles terminology, source/user/glossary contradictions, source-of-truth, ownership, permissions, state/exception edges, and hard product boundaries; Pre-PRD Clarification handles rough PRD behavioral completeness, scenario coverage, acceptance, scope, and write-target closure. If one question touches both, classify by the consequence for the PRD.
+ 
+-### Phase 3: Draft, Refine, Or Split
++### Phase 3: Draft, Refine, Validate Report, Or Split
+ 
+ Choose `output_shape` before drafting, apply the machine-safe contract from `prd-output-template.md`, then compose `assets/templates/00-generic.md`, one primary surface template, and only the triggered built-in/project-local overlays. Include conditional sections only when they reduce planning invention; do not copy run-local scratch into the PRD by default.
+ 
+-When refining or validating an existing PRD, produce optimization suggestions in the compact form `original -> recommendation -> reason -> write target` before the final rewrite or blocking question. The final durable artifact is the rewritten PRD-grade document under `docs/brainstorms/`, not a standalone critique report.
++When refining an existing PRD, produce optimization suggestions in the compact form `original -> recommendation -> reason -> write target` before the final rewrite or blocking question. The final durable artifact is the rewritten PRD-grade document under `docs/brainstorms/`, not a standalone critique report.
++
++When validating, return the same source-grounded diagnosis and optimization suggestions as a report-only result. Include checker/check-only facts, semantic gaps, readiness consequence, and the exact sections a later refine would change. Do not write the artifact, create a critique file, call the write-mode finalizer, materialize design exports, or change runtime. A repair request is a separate preview-first `refine` run after confirmation.
+ 
+ For rough PRDs that ran Pre-PRD Clarification, fold source-resolved gaps, owner answers, accepted assumptions, blocker clusters, and write targets into existing PRD-local sections from `prd-output-template.md`. Do not copy Map rows, Reduce outputs, question cards, or topology-promotion notes into the PRD unless the content itself reduces planning invention.
+ 
+@@ -302,7 +308,7 @@ For oversized initial PRDs, produce a split-decision recommendation first. Write
+ 
+ ### Phase 4: Readiness And Handoff
+ 
+-🔴 **STOP — Phase 4 Mandatory Gate**: Phase 4 is a mandatory producer-local gate, not an optional closeout. Do not declare the PRD done, call it a "standard PRD", write confirmed ready fields, or offer a planning handoff (including `spec-plan`) before you have actually run the readiness lens and, when a PRD artifact path exists, executed the producer-local finalize path. Producing the artifact and updating the changelog is not the end of the run; entering Phase 4 is. Self-declaring readiness or recommending planning without an executed checker/finalize receipt and a stated readiness outcome is a Phase 4 violation, even when the draft looks complete.
++🔴 **STOP — Phase 4 Mandatory Gate**: Phase 4 is mandatory but mutation posture depends on intent. Create/refine must not declare the PRD done, call it a "standard PRD", write confirmed ready fields, or offer a planning handoff before running the readiness lens and producer-local finalize. Validate must run the readiness lens plus checker/finalizer `--check-only` (and receipt verification when relevant), then report the current state without writing a receipt or changing the artifact. Self-declaring readiness or recommending planning without observed checker/receipt facts and a stated readiness outcome is a Phase 4 violation.
+ 
+ Run the readiness lens before recommending planning:
+ 
+@@ -311,7 +317,7 @@ Run the readiness lens before recommending planning:
+ - If the document needs independent critique, hand off to the current host's document-review workflow. Trigger doc-review when: (a) the grill trace shows fewer owner interactions than load-bearing OQs identified in the Requirement Analysis Gate — a signal that some OQs were parked rather than grilled; (b) `design_sources_unread` is non-empty and there is no explicit owner acceptance of the degraded risk; or (c) Owner Decision Trace rows do not individually bind to each owner-* OQ (meaning some owner closures were asserted without per-OQ evidence). Doc-review does not replace grill — it is a human-readable audit that can catch the patterns that deterministic checks cannot: shallow owner interactions, acceptance reversals, and load-bearing OQs quietly treated as planning-time items.
+ - If the input is better served by brainstorm, app consistency audit, debug, plan, or work, route out with a short reason.
+ 
+-When a PRD artifact path exists, resolve `SKILL_DIR` to the directory containing the currently loaded `spec-prd/SKILL.md`. Run both lines below in the same shell invocation, replacing the placeholder with that loaded skill directory:
++For create/refine when a PRD artifact path exists, resolve `SKILL_DIR` to the directory containing the currently loaded `spec-prd/SKILL.md`. Run both lines below in the same shell invocation, replacing the placeholder with that loaded skill directory:
+ 
+ ```bash
+ SKILL_DIR="<absolute path of the directory containing the loaded spec-prd/SKILL.md>"
+@@ -319,7 +325,9 @@ node "$SKILL_DIR/scripts/finalize-prd-artifact.js" <prd-path> --inputs <input-pa
+ ```
+ 
+ Use this as the producer-local ready exit; add `--check-only` when you need to preview the receipt without writing. If the PRD frontmatter already lists every locatable input in `source_inputs:` / legacy `prd_input:`, `--inputs-from-frontmatter` may be used instead of manually copying the same paths. The finalize script calls `check-prd-artifact.js` to seed deterministic closeout counts and trace facts; omit both `--inputs` and `--inputs-from-frontmatter` only when no original input/source file is locatable, and then record that input-side design-source detection was not covered. Persist every locatable original input/source/design file in the PRD artifact frontmatter `source_inputs:` list before closeout; the Claude Stop hook reads that field (and the legacy alias `prd_input:`) to pass `--inputs` into finalize/checker, so input-side Figma/design-source accounting cannot depend on model memory. If `prd_input`, source docs, or source refs identify original input files but you cannot pass them to `--inputs` or use `--inputs-from-frontmatter`, record `input_refs_unavailable` in the readiness bridge and degrade rather than pretending a product-only scan covered input-side design sources. Readiness remains LLM-owned, but `status: ready-for-planning`, `write_mode=final-prd`, and `can_enter_spec_plan: yes` require a current machine-owned finalize receipt. Report the finalize/checker outcome in the handoff and closeout — at minimum the finding count, blocking reason_codes, receipt status, and readiness outcome — so the gate is verifiable in the artifact instead of asserted. A handoff that names no finalize/checker receipt has not passed Phase 4. The deterministic checker anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id; pure localized headings are valid when they carry the matching section id, while machine-owned safety sections must remain locatable before final ready.
+-If the checker/finalize path returns any blocking `reason_codes` from `scripts/lib/reason-codes.js`, Phase 4 must not return `ready-for-planning`. Consume the full list through `prd-readiness-lens.md` `The readiness orchestrator must consume declaration findings` instead of duplicating it here. Either fill the valid declaration from current evidence and rerun finalize, or set `write_mode=checkpoint-prd` when preserving recoverable PRD context is necessary while keeping `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`; otherwise degrade readiness to `revise-prd`, `ask-owner`, or `route-out`. For final UI/design-surface PRDs, advisory fact `input_scan_attempted=false` is must-not-ready-until-confirmed. A degraded design-source path may become ready only when the PRD explicitly records `design_sources_unread`, the degraded reason, owner acceptance of that risk, and the remaining Planning Recheck / Outstanding Questions residue, then passes finalize. Repeat the finding in closeout instead of silently swallowing it.
++
++For validate, invoke the same script only with `--check-only` or `--verify-receipt`; never invoke its write mode. Missing/stale receipt or other blockers remain report findings and do not authorize validate to repair or finalize the artifact.
++If the checker/finalize path returns any blocking `reason_codes` from `scripts/lib/reason-codes.js`, Phase 4 must not return `ready-for-planning`. Consume the full list through `prd-readiness-lens.md` `The readiness orchestrator must consume declaration findings` instead of duplicating it here. For create/refine, either fill a valid declaration from current evidence and rerun finalize, or set `write_mode=checkpoint-prd` when preserving recoverable PRD context is necessary while keeping `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`; otherwise degrade readiness to `revise-prd`, `ask-owner`, or `route-out`. For validate, report the blocker and proposed write target only; any repair waits for confirmed reclassification to refine. For final UI/design-surface PRDs, advisory fact `input_scan_attempted=false` is must-not-ready-until-confirmed. A degraded design-source path may become ready only when the PRD explicitly records `design_sources_unread`, the degraded reason, owner acceptance of that risk, and the remaining Planning Recheck / Outstanding Questions residue, then passes finalize. Repeat the finding in closeout instead of silently swallowing it.
+ Close with a PRD summary: included sections, requirement count, acceptance example count, priority distribution, NFR/assumption/outstanding count, optimization suggestion count, trace gaps, and whether planning would still have to invent WHAT.
+ 
+ For medium/high/regulated, UI-heavy, tool/export-heavy, workflow/contract, or mixed-surface outputs, include the triggered P1 readiness residue in the closeout when it affects planning: Requirements Quality Rubric concerns, full Coverage Pack weak rows, Interaction Analysis findings, Regression Guard, Supporting Evidence Refs, Handoff Context Slice, Living Lifecycle, rollout/backout, and `downstream_sync_impact` or `downstream_sync_unknown`. 对于 long、mixed 或 high-risk PRD，按 `prd-output-template.md` 的 canonical Handoff Context Slice 组合下游阅读字段；本文件只保留触发与 ownership 边界，不复制字段表。These are LLM-owned readiness/doc-review facts; they must not be represented as checker-passed semantic proof.
+diff --git a/skills/spec-prd/assets/templates/00-generic.md b/skills/spec-prd/assets/templates/00-generic.md
+index e3e8cde4..f4d67891 100644
+--- a/skills/spec-prd/assets/templates/00-generic.md
++++ b/skills/spec-prd/assets/templates/00-generic.md
+@@ -307,13 +307,13 @@ Then <系统拒绝并提示，且不产生未声明的状态、数据或审计
+ | 风控 | | | | | | |
+ | 法务（如涉及） | | | | | | |
+ 
+-## Outstanding Questions [conditional]
++## 待闭合问题候选 [conditional]
+ 
+-> 只记当前无法决定、必须确认的问题。确认后回填正文对应章节；所有人类问题只询问当前执行对话的用户。
++> 这是 authoring prompt，不是 machine schema。先查 source，只把仍会改变 WHAT、验收或范围的缺口移入 `references/prd-output-template.md` 唯一 canonical `Outstanding Questions` section；所有人类问题只询问当前执行对话的用户。
+ 
+-| 编号 | 问题 | 推荐答案 / 候选方案 | 决定路径 | 状态 |
+-| --- | --- | --- | --- | --- |
+-| OQ-01 | | | source / 当前执行对话用户 | 待确认 |
++| 候选缺口 | 先查 source | PRD write target | 推荐答案 / 待确认原因 |
++| --- | --- | --- | --- |
++| | | | |
+ 
+ ---
+ 
+diff --git a/skills/spec-prd/assets/templates/10-app.md b/skills/spec-prd/assets/templates/10-app.md
+index ce1b4f08..b7743d33 100644
+--- a/skills/spec-prd/assets/templates/10-app.md
++++ b/skills/spec-prd/assets/templates/10-app.md
+@@ -83,6 +83,6 @@
+ - 最低支持版本、旧客户端和灰度边界。
+ - 命中设计证据时，read/unread/degraded 与 readiness consequence 已记录。
+ 
+-## App Outstanding Questions
++## App 待闭合问题候选
+ 
+-只保留会改变 App WHAT、验收、范围、权限、fallback、analytics 或发布行为的问题；纯组件实现和架构选择进入 `spec-plan`。
++这里只提示候选缺口，不生成第二套 OQ schema。只把会改变 App WHAT、验收、范围、权限、fallback、analytics 或发布行为的问题移入 output contract 的 canonical `Outstanding Questions`；纯组件实现和架构选择进入 `spec-plan`。
+diff --git a/skills/spec-prd/assets/templates/20-admin.md b/skills/spec-prd/assets/templates/20-admin.md
+index 9fa656d9..b1b3ca07 100644
+--- a/skills/spec-prd/assets/templates/20-admin.md
++++ b/skills/spec-prd/assets/templates/20-admin.md
+@@ -89,6 +89,6 @@ PRD 只定义能力和数据范围，不写权限码、接口字段或鉴权实
+ - 批量操作部分成功与重试。
+ - 导出脱敏、有效期、失败通知和审计。
+ 
+-## Admin Outstanding Questions
++## Admin 待闭合问题候选
+ 
+-只保留会改变角色、数据范围、状态、审核、导出、审计或验收的问题；实现层权限码、组件和接口设计进入 `spec-plan`。
++这里只提示候选缺口，不生成第二套 OQ schema。只把会改变角色、数据范围、状态、审核、导出、审计或验收的问题移入 output contract 的 canonical `Outstanding Questions`；实现层权限码、组件和接口设计进入 `spec-plan`。
+diff --git a/skills/spec-prd/assets/templates/30-backend.md b/skills/spec-prd/assets/templates/30-backend.md
+index 428e77df..aea35066 100644
+--- a/skills/spec-prd/assets/templates/30-backend.md
++++ b/skills/spec-prd/assets/templates/30-backend.md
+@@ -90,6 +90,6 @@ PRD 可以定义字段的产品含义和必需信息，但不定义具体字段
+ - 批处理重复运行、失败清单和补偿结果。
+ - 产品级幂等和可观察最终状态。
+ 
+-## Backend Outstanding Questions
++## Backend 待闭合问题候选
+ 
+-会改变产品状态、错误结果、compatibility、source-of-truth、默认行为或 consumer 可见契约的问题仍属于 PRD；缓存、数据库、消息系统和代码拆分进入 `spec-plan`。
++这里只提示候选缺口，不生成第二套 OQ schema。会改变产品状态、错误结果、compatibility、source-of-truth、默认行为或 consumer 可见契约的问题移入 output contract 的 canonical `Outstanding Questions`；缓存、数据库、消息系统和代码拆分进入 `spec-plan`。
+diff --git a/skills/spec-prd/assets/templates/40-h5-pc.md b/skills/spec-prd/assets/templates/40-h5-pc.md
+index 311c077f..eb5e8198 100644
+--- a/skills/spec-prd/assets/templates/40-h5-pc.md
++++ b/skills/spec-prd/assets/templates/40-h5-pc.md
+@@ -55,6 +55,6 @@
+ - 表单错误、离开未保存、重复提交和部分成功。
+ - 分享、外链、公开索引与敏感信息边界。
+ 
+-## H5/PC Outstanding Questions
++## H5/PC 待闭合问题候选
+ 
+-只保留会改变路由、会话、viewport、表单、分享、安全或验收的问题；框架、组件、构建和 header 实现进入 `spec-plan`。
++这里只提示候选缺口，不生成第二套 OQ schema。只把会改变路由、会话、viewport、表单、分享、安全或验收的问题移入 output contract 的 canonical `Outstanding Questions`；框架、组件、构建和 header 实现进入 `spec-plan`。
+diff --git a/skills/spec-prd/assets/templates/50-cli-devtool.md b/skills/spec-prd/assets/templates/50-cli-devtool.md
+index 9668943c..3e806cbd 100644
+--- a/skills/spec-prd/assets/templates/50-cli-devtool.md
++++ b/skills/spec-prd/assets/templates/50-cli-devtool.md
+@@ -78,6 +78,6 @@ Source-first：修 source/generator，再运行正式 init；不手改 generated
+ - 中途失败无静默残留，恢复路径明确。
+ - 五宿主 source/runtime projection 按实际支持范围验证。
+ 
+-## CLI/DevTool Outstanding Questions
++## CLI/DevTool 待闭合问题候选
+ 
+-会改变公开入口、默认行为、副作用、输出 contract、兼容或恢复的决定属于 PRD；模块拆分、依赖库和内部函数进入 `spec-plan`。
++这里只提示候选缺口，不生成第二套 OQ schema。会改变公开入口、默认行为、副作用、输出 contract、兼容或恢复的决定移入 output contract 的 canonical `Outstanding Questions`；模块拆分、依赖库和内部函数进入 `spec-plan`。
+diff --git a/skills/spec-prd/assets/templates/60-mixed.md b/skills/spec-prd/assets/templates/60-mixed.md
+index 91134654..a23024b2 100644
+--- a/skills/spec-prd/assets/templates/60-mixed.md
++++ b/skills/spec-prd/assets/templates/60-mixed.md
+@@ -58,6 +58,6 @@
+ - source-of-truth 冲突和负向验收。
+ - 回退后不发生双写、错误覆盖或用户不可解释状态。
+ 
+-## Mixed Outstanding Questions
++## Mixed 待闭合问题候选
+ 
+-会改变 source-of-truth、surface 覆盖、允许差异、同步时效、fallback 或 E2E 验收的问题仍属于 PRD；协议、消息系统、数据库和部署编排进入 `spec-plan`。
++这里只提示候选缺口，不生成第二套 OQ schema。会改变 source-of-truth、surface 覆盖、允许差异、同步时效、fallback 或 E2E 验收的问题移入 output contract 的 canonical `Outstanding Questions`；协议、消息系统、数据库和部署编排进入 `spec-plan`。
+diff --git a/skills/spec-prd/assets/templates/70-large-requirement-index.md b/skills/spec-prd/assets/templates/70-large-requirement-index.md
+index 944188e9..eae77176 100644
+--- a/skills/spec-prd/assets/templates/70-large-requirement-index.md
++++ b/skills/spec-prd/assets/templates/70-large-requirement-index.md
+@@ -49,11 +49,13 @@
+ 
+ 整体验收只覆盖跨 child 结果；单模块验收留在对应子 PRD。
+ 
+-## 大需求级 Outstanding Questions
++## 大需求级待闭合问题候选
+ 
+-| OQ | 问题 | 影响 child | 推荐答案 | 决定路径 | blocks planning? |
+-| --- | --- | --- | --- | --- | --- |
+-| OQ-X01 | | | | source / 当前执行对话用户 | yes / no |
++> 这里只提示跨 child 候选缺口，不生成第二套 OQ schema；真正未闭合的问题统一移入 output contract 的 canonical `Outstanding Questions`。
++
++| 候选缺口 | 影响 child | 先查 source | 推荐答案 / 待确认原因 |
++| --- | --- | --- | --- |
++| | | | |
+ 
+ ## Handoff
+ 
+diff --git a/skills/spec-prd/references/design-source-evidence.md b/skills/spec-prd/references/design-source-evidence.md
+index 7bd25209..554cb42a 100644
+--- a/skills/spec-prd/references/design-source-evidence.md
++++ b/skills/spec-prd/references/design-source-evidence.md
+@@ -105,6 +105,10 @@ When the run cannot fetch remote design context because it is headless, report-o
+ - if unread design-source inventory items affect page structure, state, interaction, acceptance, or scope, do not mark the PRD `ready-for-planning`
+ - owner-accepted degradation is the only ready-for-planning release valve; record the owner decision and keep unread design residue visible
+ 
++## Validate report-only boundary
++
++When `intent=validate`, design evidence remains read-only. An already available, authorized provider may return scoped facts in memory, but do not persist or materialize screenshots, exports, or provider JSON, and do not create a local design artifact. When the provider or permission is unavailable, record the remote URL as a sanitized ref with degraded/unread consequence; do not fetch around the missing capability. Carry affected PRD write targets and readiness consequences into the validation report only. A later repair or design capture is a separately confirmed `refine` run.
++
+ ## Route-Out Boundary
+ 
+ `spec-prd` extracts PRD facts from design sources. It does not audit implementation consistency across PRD, Figma, and source. When the user asks for consistency, drift, visual implementation accuracy, or app-vs-design verification, route to `spec-app-consistency-audit`.
+diff --git a/skills/spec-prd/references/prd-output-template.md b/skills/spec-prd/references/prd-output-template.md
+index db7be374..b071ebf9 100644
+--- a/skills/spec-prd/references/prd-output-template.md
++++ b/skills/spec-prd/references/prd-output-template.md
+@@ -68,7 +68,7 @@ Every PRD artifact includes the standard core sections unless it is a route-out/
+ 
+ Compact PRDs may omit non-load-bearing conditional detail, but they still need enough evidence, acceptance, and scope boundary for planning. Bypass output writes no PRD artifact.
+ 
+-Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Ordinary core-section gaps produce advisory `template_structure_hint` findings; final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must still be locatable or the checker blocks with `machine_section_identity_missing`.
++Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Draft/checkpoint core-section gaps remain advisory `template_structure_hint` findings. A final/ready claim fails closed with `core_section_missing`, `requirements_row_missing`, `acceptance_example_row_missing`, or `requirement_acceptance_trace_missing` when a core section is absent, Requirements/Acceptance Examples have no valid row, or an R item has no AE trace. Final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must also be locatable or the checker blocks with `machine_section_identity_missing`.
+ 
+ ## Clarification Checklist Display Protocol
+ 
+@@ -255,7 +255,7 @@ design_sources_unread:
+ design_source_coverage: read | unread | partial | degraded | not-applicable
+ design_degraded_owner_acceptance_ref: <Owner Decision Trace row, checkable owner ref, or none>
+ 
+-Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`.
++Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. For create/refine, `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`. Validate only reports the recommended checkpoint/refine write target and never mutates these fields.
+ 
+ ## Readiness Self-Check
+ 
+@@ -280,7 +280,7 @@ why_not:
+ 
+ `decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). `decision_card_next_action` 必须与其完全一致；两个有效声明互相冲突时，checker 报告 `decision_card_path_mismatch`。The three `decision_card_*` fields are required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` 在仍处于 grill 时只豁免完整性，不豁免显式路径矛盾。
+ 
+-The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
++`write_mode: final-prd` plus `can_enter_spec_plan: yes` is LLM-owned final intent, not a receipt. Persist that pair only after semantic closure while frontmatter remains `status: draft`. The `status: ready-for-planning` and `readiness_verified_*` fields are producer-local machine receipt fields: never fill or invent them manually; `skills/spec-prd/scripts/finalize-prd-artifact.js` writes them atomically after `check-prd-artifact.js` reports no producer blocking reasons. Check-only must block final intent while the receipt is missing or stale; write mode may create the first receipt. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
+ 
+ Use the selected packaged template asset and project-local overlay to add only the conditional sections the increment needs.
+ 
+@@ -300,7 +300,7 @@ Resolve every source-answerable gap first (relentless, one question at a time ag
+ 
+ ## PRD Quality Diagnosis And Optimization
+ 
+-For refine or validate mode, diagnose before rewriting and keep the diagnosis concise:
++For validate mode, diagnose and return a report-only result:
+ 
+ ```text
+ quality_diagnosis: ready | minor-gaps | material-gaps | blockers
+@@ -311,14 +311,16 @@ rewrite_strategy:
+ 
+ Give optimization suggestions as `original -> recommendation -> reason -> write target`. Prioritize suggestions that reduce planning invention: missing current-state evidence, unclear delta, untestable wording, missing priority, missing acceptance, industry/compliance uncertainty, source/user contradiction, or scope creep.
+ 
+-Then produce the final rewritten PRD using the packaged generic template, the selected surface asset, and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
++Run checker/finalizer only with `--check-only` or receipt verification. Report current bytes/receipt/readiness facts and semantic gaps; do not write a replacement artifact, a standalone report file, a receipt, screenshots, provider JSON, or runtime assets. If the user asks to validate and fix, show the proposed patch first and re-enter as `refine` only after explicit confirmation.
++
++For refine mode, diagnose before rewriting with the same compact block and suggestions. Then produce the final rewritten PRD using the packaged generic template, the selected surface asset, and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
+ 
+ `not-run` is a run-local decision-card state only; do not emit it in the diagnosis block because an emitted refine/validate diagnosis has run by definition. Do not create numeric PRD scorecards, 0-100 quality ratings, or industry hard-threshold rubrics.
+ 
+ Use two different diagnosis moments:
+ 
+ - `Preliminary Diagnosis` happens after sanitization and source/current-state evidence. It decides input scale, system anchor, how to run Pre-PRD Clarification, whether large-input Map-Reduce is needed, which P0/P1 packs are triggered, and whether to route out.
+-- `Final Readiness Diagnosis` happens after rewrite and closure. It decides whether unresolved gaps still force planning to invent WHAT. Preliminary labels such as `ready`, `minor-gaps`, `material-gaps`, or `blockers` are not final `ready-for-planning`.
++- `Final Readiness Diagnosis` happens after refine rewrite and closure, or after validate completes its read-only source/check-only pass. It decides whether unresolved gaps still force planning to invent WHAT. Preliminary labels such as `ready`, `minor-gaps`, `material-gaps`, or `blockers` are not final `ready-for-planning`.
+ 
+ If Pre-PRD Clarification ran, feed its results into final PRD rewrite through section-level write targets. Do not leave a detached critique, interview transcript, chunk summary, Map row, Reduce output, or standalone grill report as the durable output.
+ 
+@@ -545,7 +547,7 @@ Every PRD handoff should report:
+ - producer receipt status
+ - readiness_outcome
+ 
+-When a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js` before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
++For create/refine when a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. Validate uses only `--check-only` or receipt verification and reports the current state without writing. The finalize/checker path seeds deterministic counts and trace facts before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
+ 
+ The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, feature-to-R/AE trace gaps, finding count, blocking reason_codes, and producer receipt status. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, `readiness_outcome`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
+ 
+diff --git a/skills/spec-prd/references/prd-readiness-lens.md b/skills/spec-prd/references/prd-readiness-lens.md
+index 31438678..0d69bd51 100644
+--- a/skills/spec-prd/references/prd-readiness-lens.md
++++ b/skills/spec-prd/references/prd-readiness-lens.md
+@@ -34,15 +34,15 @@ The base dimensions are:
+ 
+ Run checks by pack. Always run the core pack; run conditional packs only when their trigger is present. This is a prompt economy rule, not a weaker quality bar.
+ 
+-When a PRD artifact path exists, running `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` is required before this lens can emit `ready-for-planning`, not optional; `--inputs-from-frontmatter` is acceptable when `source_inputs:` / legacy `prd_input:` already lists the same locatable inputs, and `--check-only` only previews the producer-local receipt without writing. The finalize script calls `check-prd-artifact.js` and consumes deterministic `spec-prd-artifact-check.v1` facts such as frontmatter, core-section presence, requirement/acceptance trace gaps, placeholder lines, forbidden `docs/prds/` path, Feature Slice acceptance trace gaps, missing run-local readiness declarations, grill trace absence, input scan status, Requirement Analysis Gate closure through the compatibility `preflight_sweep_closure` declaration, ready receipt freshness, machine-owned section identity, and design-source inventory/read/unread/coverage/accounting declaration gaps. Treat those findings as script-owned facts for this lens; they do not decide semantic readiness by themselves. But an artifact-backed PRD with no current producer-local finalize receipt is itself not ready: the lens has no confirmed producer exit to consume yet, so the only legal outcomes are to run finalize or degrade to `revise-prd` / `ask-owner`. The checker anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id; pure localized headings are valid when they carry the matching section id, while machine-owned safety sections must remain locatable before final ready.
++For create/refine when a PRD artifact path exists, running `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` is required before this lens can emit a new `ready-for-planning` producer claim; `--inputs-from-frontmatter` is acceptable when `source_inputs:` / legacy `prd_input:` already lists the same locatable inputs. Validate-mode exception: use `--check-only` and receipt verification only. A validate run never invokes the write-mode finalizer; a missing/stale receipt is reported as current not-ready evidence rather than repaired. The finalize/checker path consumes deterministic `spec-prd-artifact-check.v1` facts such as frontmatter, core-section presence, requirement/acceptance trace gaps, placeholder lines, forbidden `docs/prds/` path, Feature Slice acceptance trace gaps, missing run-local readiness declarations, grill trace absence, input scan status, Requirement Analysis Gate closure through the compatibility `preflight_sweep_closure` declaration, ready receipt freshness, machine-owned section identity, and design-source inventory/read/unread/coverage/accounting declaration gaps. Treat those findings as script-owned facts for this lens; they do not decide semantic readiness by themselves. The checker anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id; pure localized headings are valid when they carry the matching section id, while machine-owned safety sections must remain locatable before final ready.
+ 
+-The readiness orchestrator must consume declaration findings semantically. If the checker/finalize path reports `clarification_evidence_undeclared`, `clarification_trace_absent`, `write_mode_undeclared`, `can_enter_spec_plan_undeclared`, `preflight_sweep_closure_absent`, `preflight_sweep_closure_blocked`, `decision_card_undeclared`, `decision_card_path_mismatch`, `outstanding_question_closure_undeclared`, `blocking_outstanding_question_present`, `planning_invention_question_present`, `unclosed_owner_question_present`, `design_source_inventory_undeclared`, `design_source_coverage_undeclared`, `design_sources_read_undeclared`, `design_sources_unread_undeclared`, `design_source_unaccounted`, `design_unread_without_owner_acceptance`, `design_partial_coverage_unaccepted`, `open_oq_without_owner_closure`, `how_pushdown_touches_what`, `owner_decision_trace_required_but_absent`, `preflight_closure_contradicted`, `checkpoint_claims_ready`, `input_refs_unavailable`, `input_scan_degraded`, `prd_readiness_declarations_evaded`, `ready_receipt_absent`, `ready_receipt_stale`, `machine_section_identity_missing`, `forbidden_prds_path`, or `finalize_required`, the lens must not return `ready-for-planning`. It must either fill a valid declaration from current evidence and rerun finalize, or set `write_mode=checkpoint-prd` when preserving recoverable PRD context is necessary while keeping `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`; otherwise it degrades readiness to `revise-prd`, `ask-owner`, or `route-out`. For final UI/design-surface PRDs, advisory fact `input_scan_attempted=false` is must-not-ready-until-confirmed. Repeat the finding in closeout.
++The readiness orchestrator must consume declaration findings semantically. If the checker/finalize path reports `clarification_evidence_undeclared`, `clarification_trace_absent`, `write_mode_undeclared`, `can_enter_spec_plan_undeclared`, `preflight_sweep_closure_absent`, `preflight_sweep_closure_blocked`, `decision_card_undeclared`, `decision_card_path_mismatch`, `outstanding_question_closure_undeclared`, `blocking_outstanding_question_present`, `planning_invention_question_present`, `unclosed_owner_question_present`, `design_source_inventory_undeclared`, `design_source_coverage_undeclared`, `design_sources_read_undeclared`, `design_sources_unread_undeclared`, `design_source_unaccounted`, `design_unread_without_owner_acceptance`, `design_partial_coverage_unaccepted`, `open_oq_without_owner_closure`, `how_pushdown_touches_what`, `owner_decision_trace_required_but_absent`, `preflight_closure_contradicted`, `checkpoint_claims_ready`, `input_refs_unavailable`, `input_scan_degraded`, `prd_readiness_declarations_evaded`, `ready_receipt_absent`, `ready_receipt_stale`, `machine_section_identity_missing`, `forbidden_prds_path`, or `finalize_required`, the lens must not return `ready-for-planning`. In create/refine, fill a valid declaration from current evidence and rerun finalize, or keep/degrade to checkpoint, `revise-prd`, `ask-owner`, or `route-out`. In validate, report the finding and proposed write target without mutation; only a separately confirmed refine run may repair and finalize it. For final UI/design-surface PRDs, advisory fact `input_scan_attempted=false` is must-not-ready-until-confirmed. Repeat the finding in closeout.
+ 
+ Closeout must show the finalize/checker summary facts before any planning handoff: finding count, blocking `reason_codes`, producer receipt status, and the LLM-owned `readiness_outcome`. Treat finding count, reason_codes, and receipt status as script-owned facts; treat `readiness_outcome`, `Resolved before planning`, `Still carried`, and whether planning would invent WHAT as LLM-owned judgment above those facts. Do not call source-candidate, assumption, external-research, degraded, or checker-presence-only evidence "confirmed", "ready", or "口径已明确" unless source, owner, or checker evidence supports that exact claim.
+ 
+ Closure-disposition razor (004): see SKILL.md `Closure-disposition razor` for the legal disposition set and evidence requirements (single source of truth). The deterministic checker only reads the declared token and evidence-cell presence (KTD2); it does not adjudicate whether a question is load-bearing or whether an owner answer is genuine. The model has no free non-blocking verdict — `blocks_planning=no` is derived from a disposition, never asserted. Deliberate forgery of an owner answer remains beyond artifact-level proof until host question-receipt / transcript-bound provenance exists.
+ 
+-`placeholder_or_todo_present` and `requirement_without_acceptance_ref` / `uncovered_requirements` hits that correspond to an intentional placeholder inside the embedded template skeleton, an explicitly recorded trace gap, or an item deliberately deferred to `Outstanding Questions` are expected advisory noise: record the rationale, do not fabricate an acceptance reference or delete a deliberate trace-gap marker to zero the findings array. The Core Pack already blesses "an explicit trace gap" as a valid readiness state, so silencing the script would invert it from an advisory fact into a coercive gate that drives the WHAT decision instead of informing it. Feature Slice trace gaps are already honored script-side, so this carve-out's load-bearing scope is the placeholder and uncovered-requirement paths plus the recorded-trace-gap state.
++`placeholder_or_todo_present` and draft/checkpoint `requirement_without_acceptance_ref` / `uncovered_requirements` hits that correspond to an intentional placeholder inside the embedded template skeleton, an explicitly recorded trace gap, or an item deliberately deferred to `Outstanding Questions` are expected advisory noise: record the rationale, do not fabricate an acceptance reference or delete a deliberate trace-gap marker to zero the findings array. This carve-out never releases a final/ready claim: `core_section_missing`, `requirements_row_missing`, `acceptance_example_row_missing`, and `requirement_acceptance_trace_missing` are deterministic exit blockers. Feature Slice trace gaps are already honored script-side, so the advisory scope remains draft/checkpoint authoring rather than a ready-path bypass.
+ 
+ ## Observed Failure Details
+ 
+@@ -79,9 +79,9 @@ Run this pack when the input is an existing PRD, requirements draft, rough notes
+ 
+ - `product expert lens fit` - the applied surface/industry/product lens follows the actual target surface, current source evidence, and owner-stated objective; generic checklists are not applied as confirmed project facts.
+ - `canonical lens reuse` - the diagnosis uses `product-expert-lens.md`'s Product Expert Lens as the quality-dimension source instead of copying a second near-duplicate dimension list.
+-- `preliminary-vs-final diagnosis` - Preliminary Diagnosis may choose source-resolved compact/L1/L2/L3/L4/L5 expansion, route-out, or blocker posture, but only Final Readiness Diagnosis after rewrite and closure may emit `ready-for-planning`.
+-- `optimization suggestion closure` - major PRD gaps are expressed as `original -> recommendation -> reason -> write target`, prioritized by planning-invention risk, and either incorporated into the rewritten PRD or left as visible blockers.
+-- `rewrite integrity` - the final PRD preserves stable IDs where applicable, separates critique from durable requirements, keeps HOW out of requirements, and does not drop confirmed source evidence, owner decisions, assumptions, or unresolved questions during cleanup.
++- `preliminary-vs-final diagnosis` - Preliminary Diagnosis may choose source-resolved compact/L1/L2/L3/L4/L5 expansion, route-out, or blocker posture. Only create/refine Final Readiness Diagnosis after rewrite and closure may proceed to producer finalize; validate may only report whether an existing readiness claim is supported and never emits a new claim.
++- `optimization suggestion closure` - major PRD gaps are expressed as `original -> recommendation -> reason -> write target`, prioritized by planning-invention risk. Refine incorporates them or leaves visible blockers; validate reports them without mutation.
++- `rewrite integrity` - for refine, the final PRD preserves stable IDs where applicable, separates critique from durable requirements, keeps HOW out of requirements, and does not drop confirmed source evidence, owner decisions, assumptions, or unresolved questions during cleanup. For validate, integrity means artifact bytes and receipt remain unchanged.
+ 
+ ### P0 Quality Floor Pack
+ 
+@@ -129,7 +129,7 @@ Run this pack when terminology, domain boundary, source/user contradiction, owne
+ Run this pack only for triggered conditional signals. It is not an all-section checklist.
+ 
+ - `stakeholder-actor closure` - when Admin, Backend, CLI/DevTool, Mixed surface, permission, approval, producer/consumer, or downstream-consumer signals are present, beneficiary, operator, admin, downstream consumer, and owner are distinguished enough that planning will not invent roles.
+-- `design-evidence closure` - when screenshot/design-link/exported design context/page/interaction input is present, `design-source-evidence.md` External Evidence Interface has been consumed or explicitly deferred. Readiness checks the resulting PRD write targets and Planning Recheck residue, not a copied design WHAT extraction list. If input contains design-source refs but the PRD does not account for them (`design_source_unaccounted`), input refs are unavailable/degraded (`input_refs_unavailable` / `input_scan_degraded`), or a final UI/design-surface PRD did not attempt input scanning (`input_scan_attempted=false`), readiness must not return `ready-for-planning`. If Figma/design-source nodes are unread and may affect page structure, state, interaction, acceptance, or scope, readiness must not return `ready-for-planning`; continue reading design evidence, ask owner for the design authority/default, or set `write_mode=checkpoint-prd` when preserving recoverable PRD context is necessary while keeping readiness at `revise-prd` or `ask-owner`. When design evidence contradicts product requirements, owner decisions, API/source contracts, source-of-truth, fallback display, analytics, or user-visible interaction in a way that changes WHAT, acceptance, or scope, readiness cannot treat it as `source-resolved`; the only ready path is a bound Owner Decision Trace row for that exact conflict, otherwise `ask-owner` or checkpoint. A degraded design-source path can be ready only when `design_sources_unread`, degraded reason, owner acceptance, and remaining Planning Recheck / Outstanding Questions residue are explicit. A naked `design_degraded_owner_acceptance: true` is not owner evidence; acceptance must bind to an Owner Decision Trace row or checkable `design_degraded_owner_acceptance_ref`. PRD/design-source/source consistency remains a route-out to `spec-app-consistency-audit`.
++- `design-evidence closure` - when screenshot/design-link/exported design context/page/interaction input is present, `design-source-evidence.md` External Evidence Interface has been consumed or explicitly deferred. Readiness checks the resulting PRD write targets and Planning Recheck residue, not a copied design WHAT extraction list. If input contains design-source refs but the PRD does not account for them (`design_source_unaccounted`), input refs are unavailable/degraded (`input_refs_unavailable` / `input_scan_degraded`), or a final UI/design-surface PRD did not attempt input scanning (`input_scan_attempted=false`), readiness must not return `ready-for-planning`. If Figma/design-source nodes are unread and may affect page structure, state, interaction, acceptance, or scope, readiness must not return `ready-for-planning`; continue reading design evidence or ask owner for the design authority/default. For create/refine, preserve recoverable context with `write_mode=checkpoint-prd` and readiness `revise-prd` or `ask-owner`; validate only reports that checkpoint/refine recommendation and does not mutate readiness fields. When design evidence contradicts product requirements, owner decisions, API/source contracts, source-of-truth, fallback display, analytics, or user-visible interaction in a way that changes WHAT, acceptance, or scope, readiness cannot treat it as `source-resolved`; the only ready path is a bound Owner Decision Trace row for that exact conflict, otherwise `ask-owner` or checkpoint. A degraded design-source path can be ready only when `design_sources_unread`, degraded reason, owner acceptance, and remaining Planning Recheck / Outstanding Questions residue are explicit. A naked `design_degraded_owner_acceptance: true` is not owner evidence; acceptance must bind to an Owner Decision Trace row or checkable `design_degraded_owner_acceptance_ref`. PRD/design-source/source consistency remains a route-out to `spec-app-consistency-audit`.
+ - `release-slice closure` - when requirement count, goals, mixed surfaces, or release order affect scope/acceptance, the PRD records P0/P1/deferred, owner-confirmed split, or Feature Slices. Feature Slices remain PRD handoff units, not task or implementation units.
+ - `change-management closure` - for `resume-prd`, existing PRD path, multi-round refine, or new meeting/screenshot/review conclusion input, stable R/AE IDs are preserved and added/replaced/deprecated/needs-confirmation deltas are visible.
+ - `requirements quality rubric` - when wording quality is material, review each load-bearing requirement using Necessary, Single, Unambiguous, Complete, Feasible, Verifiable, and WHAT-not-HOW. This is a vocabulary for LLM/doc-review judgment, not a numeric scorecard or checker rule.
+diff --git a/skills/spec-prd/scripts/check-prd-artifact.js b/skills/spec-prd/scripts/check-prd-artifact.js
+index cfd5089d..85f479b0 100644
+--- a/skills/spec-prd/scripts/check-prd-artifact.js
++++ b/skills/spec-prd/scripts/check-prd-artifact.js
+@@ -582,6 +582,72 @@ function isEmptyish(value) {
+     || /^<.*>$/.test(v);
+ }
+ 
++function validRequirementIds(sectionText) {
++  const ids = new Set();
++  tableRows(sectionText).forEach((cells) => {
++    const id = String(cells[0] || '').trim().toUpperCase();
++    if (!/^R-\d{2,}$/.test(id)) return;
++    const hasSubstantiveCell = cells.slice(1).some((cell) => (
++      !isEmptyish(cell) && !/^P[0-3]$/i.test(cell)
++    ));
++    if (hasSubstantiveCell) ids.add(id);
++  });
++  return [...ids].sort();
++}
++
++function validAcceptanceExamples(sectionText) {
++  const ids = new Set();
++  const requirementIds = new Set();
++  tableRows(sectionText).forEach((cells) => {
++    const id = String(cells[0] || '').trim().toUpperCase();
++    const rowText = cells.slice(1).join(' ');
++    if (/^AE-\d{2,}$/.test(id) && /\bR-\d{2,}\b/i.test(rowText)) {
++      const substantive = rowText
++        .replace(/\b(?:AE|R)-\d{2,}\b/gi, '')
++        .replace(/\bP[0-3]\b/gi, '')
++        .trim();
++      if (!isEmptyish(substantive)) {
++        ids.add(id);
++        uniqueMatches(rowText, /\b(R-\d{2,})\b/gi).forEach((requirementId) => {
++          requirementIds.add(requirementId.toUpperCase());
++        });
++      }
++    }
++  });
++
++  const lines = splitLines(sectionText);
++  for (let index = 0; index < lines.length; index += 1) {
++    const match = lines[index].match(/\b(AE-\d{2,})\b/i);
++    if (!match) continue;
++    let end = lines.length;
++    for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
++      if (/\bAE-\d{2,}\b/i.test(lines[cursor])) {
++        end = cursor;
++        break;
++      }
++    }
++    const blockLines = lines.slice(index, end);
++    const block = blockLines.join('\n');
++    const givenIndex = blockLines.findIndex((line) => /^\s*Given\b/i.test(line));
++    const traceDeclaration = givenIndex === -1
++      ? ''
++      : blockLines.slice(0, givenIndex).join('\n');
++    if (/\bR-\d{2,}\b/i.test(traceDeclaration)
++      && /(?:^|\n)\s*Given\b/i.test(block)
++      && /(?:^|\n)\s*When\b/i.test(block)
++      && /(?:^|\n)\s*Then\b/i.test(block)) {
++      ids.add(match[1].toUpperCase());
++      uniqueMatches(traceDeclaration, /\b(R-\d{2,})\b/gi).forEach((requirementId) => {
++        requirementIds.add(requirementId.toUpperCase());
++      });
++    }
++  }
++  return {
++    ids: [...ids].sort(),
++    requirementIds: [...requirementIds].sort(),
++  };
++}
++
+ // 一条 Owner Decision Trace 行是否有效:chosen_answer + write target + consequence 三非空。
+ function isValidTraceRow(row) {
+   return !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence);
+@@ -1045,13 +1111,24 @@ function parseStructure(target, text) {
+   const missingCoreSections = CORE_SECTIONS.filter((section) => (
+     !sectionRange(lines, headings, section)
+   ));
++  const requirementsSection = sectionRange(lines, headings, 'Requirements');
+   const requirementIds = uniqueMatches(text, /\b(R-\d{2,})\b/g);
++  const validRequirementRowIds = requirementsSection
++    ? validRequirementIds(requirementsSection.text)
++    : [];
+   const acceptanceIds = uniqueMatches(text, /\b(AE-\d{2,})\b/g);
+   const nfrIds = uniqueMatches(text, /\b(NFR-\d{2,})\b/g);
+   const acceptanceSection = sectionRange(lines, headings, 'Acceptance Examples');
+-  const acceptanceText = acceptanceSection ? acceptanceSection.text : '';
++  const validAcceptanceCoverage = acceptanceSection
++    ? validAcceptanceExamples(acceptanceSection.text)
++    : { ids: [], requirementIds: [] };
++  const validAcceptanceExampleIdsInSection = validAcceptanceCoverage.ids;
++  const acceptanceRequirementIds = new Set(validAcceptanceCoverage.requirementIds);
++  const requirementsWithoutAcceptanceTrace = validRequirementRowIds.filter((id) => (
++    !acceptanceRequirementIds.has(id)
++  ));
+   const uncoveredRequirements = requirementIds.filter((id) => (
+-    !new RegExp(`\\b${id}\\b`).test(acceptanceText)
++    !acceptanceRequirementIds.has(id)
+   ));
+   const evidenceTagHits = EVIDENCE_TAGS.filter((tag) => text.includes(tag));
+   const placeholderLines = lineNumbersFor(lines, /<[^>\n]+>|\bTODO\b|\bTBD\b|\bpending-tooling\b/i)
+@@ -1157,7 +1234,9 @@ function parseStructure(target, text) {
+     target, normalizedTarget, prdHash, lines, frontmatter, headings,
+     unknownSectionIds, duplicateSectionIds, duplicateMachineSectionIds, orphanSectionIds,
+     sectionIdTitleMismatches,
+-    missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
++    missingCoreSections, requirementIds, validRequirementRowIds,
++    acceptanceIds, validAcceptanceExampleIdsInSection, requirementsWithoutAcceptanceTrace,
++    nfrIds, uncoveredRequirements,
+     evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
+     outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
+     writeModeValue, writeModeValues, writeModeDeclaredValid, clarificationEvidenceValue,
+@@ -1204,7 +1283,12 @@ function computeFacts(structure, inputPaths, options) {
+     core_sections_present: CORE_SECTIONS.filter((s) => !structure.missingCoreSections.includes(s)),
+     core_sections_missing: structure.missingCoreSections,
+     requirement_ids: structure.requirementIds,
++    valid_requirement_row_ids: structure.validRequirementRowIds,
++    valid_requirement_row_count: structure.validRequirementRowIds.length,
+     acceptance_ids: structure.acceptanceIds,
++    valid_acceptance_example_ids: structure.validAcceptanceExampleIdsInSection,
++    valid_acceptance_example_count: structure.validAcceptanceExampleIdsInSection.length,
++    requirements_without_acceptance_trace: structure.requirementsWithoutAcceptanceTrace,
+     nfr_ids: structure.nfrIds,
+     uncovered_requirements: structure.uncoveredRequirements,
+     evidence_tags_present: structure.evidenceTagHits,
+@@ -1284,6 +1368,24 @@ function computeFacts(structure, inputPaths, options) {
+ function gateReadyClaims(facts, oqAnalysis) {
+   if (!facts.ready_claim_present) return [];
+   const findings = [];
++  facts.core_sections_missing.forEach((section) => {
++    findings.push({ reason_code: 'core_section_missing', section });
++  });
++  if (!facts.core_sections_missing.includes('Requirements')
++    && facts.valid_requirement_row_count === 0) {
++    findings.push({ reason_code: 'requirements_row_missing', section: 'Requirements' });
++  }
++  if (!facts.core_sections_missing.includes('Acceptance Examples')
++    && facts.valid_acceptance_example_count === 0) {
++    findings.push({ reason_code: 'acceptance_example_row_missing', section: 'Acceptance Examples' });
++  }
++  facts.requirements_without_acceptance_trace.forEach((requirement_id) => {
++    findings.push({
++      reason_code: 'requirement_acceptance_trace_missing',
++      section: 'Acceptance Examples',
++      requirement_id,
++    });
++  });
+   if (facts.preflight_sweep_closure === 'blocked') {
+     findings.push({ reason_code: 'preflight_sweep_closure_blocked' });
+   }
+diff --git a/skills/spec-prd/scripts/finalize-prd-artifact.js b/skills/spec-prd/scripts/finalize-prd-artifact.js
+index 741bc9c1..7cecd84b 100755
+--- a/skills/spec-prd/scripts/finalize-prd-artifact.js
++++ b/skills/spec-prd/scripts/finalize-prd-artifact.js
+@@ -154,6 +154,23 @@ function upsertFrontmatterFields(text, fields) {
+   ].join('\n');
+ }
+ 
++function writeFileAtomic(targetPath, content) {
++  const crypto = require('node:crypto');
++  const directory = path.dirname(targetPath);
++  const basename = path.basename(targetPath);
++  const tempPath = path.join(
++    directory,
++    `.${basename}.${process.pid}.${crypto.randomBytes(6).toString('hex')}.tmp`,
++  );
++  const mode = fs.statSync(targetPath).mode;
++  try {
++    fs.writeFileSync(tempPath, content, { encoding: 'utf8', mode });
++    fs.renameSync(tempPath, targetPath);
++  } finally {
++    fs.rmSync(tempPath, { force: true });
++  }
++}
++
+ function buildFinalizeReceipt(target, text, inputs, options = {}) {
+   const initialReport = buildReport(target, text, {
+     inputs,
+@@ -162,17 +179,19 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
+   });
+   const facts = initialReport.facts;
+   const readyStatusClaimPresent = frontmatterHasReadyStatus(text);
++  const readyIntentPresent = facts.write_mode === 'final-prd' && facts.can_enter_spec_plan === 'yes';
+   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
+     !isReceiptOnly(reasonCode)
+   ));
+   // ready_receipt_absent 在写入模式不阻断 finalize(写入即补 receipt),但 check-only 预览时保留阻断
+-  // (声称 ready 却没 receipt 是矛盾态,预览应警告)。这避免循环依赖:模型写 status: ready-for-planning
+-  // 后跑 finalize 写入,旧逻辑因 ready_receipt_absent 进 blockingReasons → can_finalize=false → 永远写不了 receipt。
++  // (frontmatter ready 或 LLM-owned final intent 缺 receipt 都是不可 closeout 的中间态)。这避免循环依赖:
++  // LLM 先写 final intent,finalize 写模式再原子补 machine receipt。
+   const receiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
+     reasonCode === 'ready_receipt_stale'
+-    || (options.checkOnly === true && readyStatusClaimPresent && reasonCode === 'ready_receipt_absent')
++    || (options.checkOnly === true
++      && (readyStatusClaimPresent || readyIntentPresent)
++      && reasonCode === 'ready_receipt_absent')
+   ));
+-  const readyIntentPresent = facts.write_mode === 'final-prd' && facts.can_enter_spec_plan === 'yes';
+   const missingReadyIntentReasons = readyIntentPresent ? [] : ['finalize_required'];
+   const missingDesignInputScanReasons = readyIntentPresent
+     && facts.design_source_refs_present === true
+@@ -288,7 +307,7 @@ function finalizePrd(target, inputs, options = {}) {
+     readiness_inputs_hash: receipt.checker.inputs_hash,
+   });
+ 
+-  fs.writeFileSync(targetPath, nextText.endsWith('\n') ? nextText : `${nextText}\n`, 'utf8');
++  writeFileAtomic(targetPath, nextText.endsWith('\n') ? nextText : `${nextText}\n`);
+   return {
+     ...receipt,
+     status: 'finalized',
+diff --git a/skills/spec-prd/scripts/lib/reason-codes.js b/skills/spec-prd/scripts/lib/reason-codes.js
+index 2af2a501..4101cc3f 100644
+--- a/skills/spec-prd/scripts/lib/reason-codes.js
++++ b/skills/spec-prd/scripts/lib/reason-codes.js
+@@ -15,6 +15,10 @@
+ const BLOCKING_REASON_CODES = new Set([
+   // 基础结构 / 声明类
+   'machine_section_identity_missing',
++  'core_section_missing',
++  'requirements_row_missing',
++  'acceptance_example_row_missing',
++  'requirement_acceptance_trace_missing',
+   'forbidden_prds_path',
+   'write_mode_undeclared',
+   'clarification_evidence_undeclared',
+diff --git a/templates/claude/hooks/prd-prewrite-guard b/templates/claude/hooks/prd-prewrite-guard
+index c3418b8d..3d149f70 100644
+--- a/templates/claude/hooks/prd-prewrite-guard
++++ b/templates/claude/hooks/prd-prewrite-guard
+@@ -8,16 +8,6 @@
+ const fs = require('node:fs');
+ const path = require('node:path');
+ 
+-// 路口路由信号3 的 owner-owned gap 词表。与 check-prd-artifact.js:100 WHAT_TOUCHING_KEYWORDS
+-// 同步(冻结契约,扩展须两边同步 + 加 fixture)。限定扫 Outstanding Questions 区域 + frontmatter
+-// gap 字段,不扫 Requirements 正文(这些词在需求陈述里常见,全文扫会假阳使 final-prd 首次写几乎不可达)。
+-// 必须声明在调用 ownerOwnedGapKeywordHit 的顶层执行段之前,否则触发 const TDZ。
+-const WHAT_TOUCHING_KEYWORDS = [
+-  'interface', '接口', 'availability', '可用性', 'permission', '权限',
+-  'scope', '范围', 'source-of-truth', '数据权威', 'fallback', '降级',
+-  'analytics', '埋点', '指标',
+-];
+-
+ const projectDir = resolveProjectDir();
+ const rawInput = readStdin();
+ const input = parseJsonObject(rawInput);
+@@ -56,24 +46,21 @@ if (!mutation.currentContent && !mutation.candidateContent && mutation.mutatedFr
+ 
+ const identityText = [mutation.candidateContent, mutation.currentContent].filter(Boolean).join('\n');
+ const prdIdentityPresent = isPrdRequirementsArtifact(identityText);
+-const readyOrReceiptSignal = hasReadyOrReceiptMutationSignal(
+-  [
+-    mutation.candidateContent,
+-    ...mutation.mutatedFragments,
+-  ].filter(Boolean).join('\n'),
+-);
+-if (!prdIdentityPresent && !readyOrReceiptSignal) {
++const machineReadySignal = mutation.reconstructionDegraded
++  ? hasMachineReadyMutationSignal(mutation.mutatedFragments.join('\n'))
++  : machineReadyFieldsChanged(mutation.currentContent, mutation.candidateContent);
++if (!prdIdentityPresent && !machineReadySignal) {
+   process.exit(0);
+ }
+ 
+ if (mutation.reconstructionDegraded) {
+-  if (hasReadyOrReceiptMutationSignal(mutation.mutatedFragments.join('\n'))) {
++  if (hasMachineReadyMutationSignal(mutation.mutatedFragments.join('\n'))) {
+     const reasonLines = [
+       `[spec-first] PRD prewrite guard blocked ${toolName}.`,
+       `Target: ${relativeTarget}`,
+       '',
+       'The hook could not reconstruct the full candidate PRD content for this mutation, but the edit payload directly changes machine-owned ready/final receipt fields.',
+-      '`status: ready-for-planning`, `readiness_*` receipt fields, and the `write_mode=final-prd` + `can_enter_spec_plan=yes` ready pair are producer-owned. Do not write them through Claude file mutation tools.',
++      '`status: ready-for-planning` and `readiness_*` receipt fields are producer-owned. Do not write them through Claude file mutation tools; `write_mode=final-prd` + `can_enter_spec_plan=yes` is LLM-owned final intent and is checked at closeout until finalize writes the receipt.',
+       'Run the producer-local finalize path instead: `node .claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js docs/brainstorms/<slug>-requirements.md --inputs <input-path>`.',
+       '',
+       'reconstruction_status: degraded',
+@@ -88,13 +75,14 @@ if (!content) {
+   process.exit(0);
+ }
+ 
+-const readyStatus = /^\s*status:\s*ready-for-planning\s*$/im.test(content);
+-const machineReceipt = hasMachineReceiptField(content);
+ const firstWrite = !fs.existsSync(absoluteTarget);
++if (!firstWrite && !machineReadySignal) {
++  process.exit(0);
++}
++
+ const checkerReport = tryBuildCheckerReport(relativeTarget, content);
+ const checkerFacts = checkerReport ? checkerReport.facts : null;
+ const fallbackFacts = checkerFacts || buildFallbackFacts(content);
+-const readyIntent = fallbackFacts.ready_claim_present === true;
+ const hasDurableWriteMode = checkerFacts
+   && typeof checkerFacts.write_mode === 'string'
+   && checkerFacts.write_mode.length > 0
+@@ -104,34 +92,15 @@ const hasFallbackDurableWriteMode = fallbackFacts.write_mode_declared_valid ===
+ const missingWriteModeOnFirstWrite = firstWrite
+   && (checkerFacts !== null ? !hasDurableWriteMode : !hasFallbackDurableWriteMode);
+ 
+-// 路口路由文案:首次写带"该 grill"信号却直写 final-prd → 已被 readyIntent 拦(Codex 全禁 final
+-// 首次写,因 checker 把 final-prd 当 claimsReady),此处只给命中信号的拦截加明确 grill 路由文案,
+-// 不改变"所有 final-prd 首次写被拦"的现有语义。信号只判结构,不判 grill 律是否真执行(R12 天花板)。
+-const hasDesignSignal = fallbackFacts.design_source_refs_present === true;
+-const multiSourceCount = countMultiSourceInputs(content);
+-const hasOwnerOwnedGap = ownerOwnedGapKeywordHit(content);
+-const hasOutstandingQuestions = fallbackFacts.outstanding_questions_present === true;
+-const hasGrillSignal = hasDesignSignal || multiSourceCount >= 2 || hasOwnerOwnedGap || hasOutstandingQuestions;
+-const finalPrdOnFirstWriteWithSignal = firstWrite
+-  && fallbackFacts.write_mode === 'final-prd'
+-  && hasGrillSignal;
+-
+-if (readyStatus || machineReceipt || readyIntent || missingWriteModeOnFirstWrite) {
++if (machineReadySignal || missingWriteModeOnFirstWrite) {
+   const reasonLines = [
+     `[spec-first] PRD prewrite guard blocked ${toolName}.`,
+     `Target: ${relativeTarget}`,
+     '',
+     'A new PRD artifact must declare a durable-write path in `write_mode` before the first durable Write.',
+-    'A PRD artifact must not be written or mutated into ready/final state through Claude file mutation tools.',
+-    '`status: ready-for-planning` and `readiness_*` receipt fields are machine-owned; use the producer-local finalize path after the Requirements Grill and readiness lens pass.',
++    'A PRD artifact must not write machine-owned ready receipt state through Claude file mutation tools.',
++    '`status: ready-for-planning` and `readiness_*` receipt fields are machine-owned. The LLM may write final intent (`write_mode: final-prd` + `can_enter_spec_plan: yes`) only after semantic closure; the Stop guard keeps closeout blocked until producer-local finalize writes a current receipt.',
+   ];
+-  if (finalPrdOnFirstWriteWithSignal) {
+-    reasonLines.push(
+-      '',
+-      'This first PRD write carries a grill signal — design source refs, multi-source inputs, an owner-owned gap, or outstanding questions are present.',
+-      '`final-prd` is never allowed on the first Write (it self-claims ready). Route into the Requirements Grill instead: `write_mode: ask-owner-first` to ask the next load-bearing owner question through the Interaction Method, or `write_mode: checkpoint-prd` with `can_enter_spec_plan: no` and `next_owner_question` to preserve recoverable context. `final-prd` is allowed only later, after every load-bearing branch reaches a Canonical stop point and no grill signal remains.',
+-    );
+-  }
+   reasonLines.push(
+     '',
+     'Do not repair this by only changing enum values, deleting rich requirements, or rewriting the PRD into a checker-friendly skeleton.',
+@@ -231,57 +200,6 @@ function isWithinRoot(candidatePath, rootPath) {
+   return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+ }
+ 
+-// 信号2:source_inputs frontmatter 列表项数。≥2 项即多源信号(偏严,符合"尽可能澄清")。
+-function countMultiSourceInputs(text) {
+-  const lines = text.split(/\r?\n/);
+-  if (lines[0] !== '---') return 0;
+-  const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+-  if (fmEnd === -1) return 0;
+-  const fm = lines.slice(1, fmEnd);
+-  const start = fm.findIndex((line) => /^source_inputs:\s*$/.test(line));
+-  if (start === -1) return 0;
+-  let count = 0;
+-  for (let i = start + 1; i < fm.length; i += 1) {
+-    const line = fm[i];
+-    if (/^[A-Za-z0-9_-]+:\s*/.test(line)) break;
+-    if (/^\s*-\s+(.+?)\s*$/.test(line) || /^\s*path:\s+(.+?)\s*$/.test(line)) count += 1;
+-  }
+-  return count;
+-}
+-
+-// 信号3:扫"模型自述未决区域"——Outstanding Questions section 文本 + frontmatter
+-// next_owner_question / highest_risk_gap 字段值。不扫 Requirements 正文(避免假阳)。
+-function ownerOwnedGapKeywordHit(text) {
+-  const lines = text.split(/\r?\n/);
+-  const candidates = [];
+-
+-  // frontmatter gap 字段值
+-  if (lines[0] === '---') {
+-    const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+-    if (fmEnd !== -1) {
+-      const fm = lines.slice(1, fmEnd);
+-      for (const line of fm) {
+-        const m = line.match(/^\s*(next_owner_question|highest_risk_gap|preflight_sweep_closure)\s*:\s*(.*)$/i);
+-        if (m && m[2]) candidates.push(m[2]);
+-      }
+-    }
+-  }
+-
+-  // Outstanding Questions section 文本(到下一个 ## 或文末)
+-  const oqStart = lines.findIndex((line) => /^##\s+Outstanding Questions/i.test(line));
+-  if (oqStart !== -1) {
+-    let end = lines.length;
+-    for (let i = oqStart + 1; i < lines.length; i += 1) {
+-      if (/^##\s/.test(lines[i])) { end = i; break; }
+-    }
+-    candidates.push(lines.slice(oqStart, end).join('\n'));
+-  }
+-
+-  if (candidates.length === 0) return false;
+-  const lower = candidates.join('\n').toLowerCase();
+-  return WHAT_TOUCHING_KEYWORDS.some((kw) => lower.includes(kw.toLowerCase()));
+-}
+-
+ function isPrdRequirementsArtifact(text) {
+   return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(text);
+ }
+@@ -290,29 +208,46 @@ function hasMachineReceiptField(text) {
+   return /^\s*(?:readiness_verified_by|readiness_verified_at|readiness_checker_schema|readiness_finding_count|readiness_blocking_count|readiness_prd_hash|readiness_inputs_hash)\s*:/im.test(text);
+ }
+ 
+-function hasReadyOrReceiptMutationSignal(text) {
++function hasMachineReadyMutationSignal(text) {
+   if (!text) return false;
+   if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
+   if (hasMachineReceiptField(text)) return true;
+-  return extractDeclarationValue(text, 'write_mode', [
+-    'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
+-  ]) === 'final-prd'
+-    || extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']) === 'yes';
++  return false;
++}
++
++function machineReadyFieldsChanged(currentText, candidateText) {
++  return JSON.stringify(machineReadyFieldState(currentText))
++    !== JSON.stringify(machineReadyFieldState(candidateText));
++}
++
++function machineReadyFieldState(text) {
++  const lines = String(text || '').split(/\r?\n/);
++  if (lines[0] !== '---') return {};
++  const end = lines.findIndex((line, index) => index > 0 && line === '---');
++  if (end === -1) return {};
++  const state = {};
++  for (const line of lines.slice(1, end)) {
++    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
++    if (!match) continue;
++    const key = match[1].toLowerCase();
++    const value = match[2].replace(/^["']|["']$/g, '').trim();
++    const machineOwned = key === 'status'
++      ? value.toLowerCase() === 'ready-for-planning'
++      : /^readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)$/.test(key);
++    if (!machineOwned) continue;
++    if (!state[key]) state[key] = [];
++    state[key].push(value);
++  }
++  return state;
+ }
+ 
+ function buildFallbackFacts(text) {
+   const writeMode = extractDeclarationValue(text, 'write_mode', [
+     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
+   ]);
+-  const canEnterSpecPlan = extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']);
+   return {
+     write_mode: writeMode,
+     write_mode_declared_valid: Boolean(writeMode),
+-    ready_claim_present: /^\s*status:\s*ready-for-planning\s*$/im.test(text)
+-      || writeMode === 'final-prd'
+-      || canEnterSpecPlan === 'yes',
+-    design_source_refs_present: detectDesignSourceRefs(text),
+-    outstanding_questions_present: /^##\s+Outstanding Questions/im.test(text),
+   };
+ }
+ 
+@@ -331,16 +266,12 @@ function escapeRegExp(value) {
+   return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+ }
+ 
+-function detectDesignSourceRefs(text) {
+-  return /(?:figma\.com|mastergo\.com|js\.design|sketch\.cloud|axure|modao|摹客|蓝湖|lanhuapp|设计稿|design source|design link)/i.test(text);
+-}
+-
+ function buildCandidateContent(currentToolName, currentToolInput, absolutePath) {
+   if (currentToolName === 'Write') {
+     const writeContent = typeof currentToolInput.content === 'string' ? currentToolInput.content : '';
+     return {
+       candidateContent: writeContent,
+-      currentContent: '',
++      currentContent: readExistingFile(absolutePath),
+       mutatedFragments: writeContent ? [writeContent] : [],
+       reconstructionDegraded: false,
+     };
+@@ -358,7 +289,9 @@ function buildCandidateContent(currentToolName, currentToolInput, absolutePath)
+ 
+   if (currentToolName === 'Edit') {
+     const edit = normalizeEdit(currentToolInput);
+-    const fragments = edit ? [edit.newString] : collectMutationFragments(currentToolName, currentToolInput);
++    const fragments = edit
++      ? [edit.oldString, edit.newString]
++      : collectMutationFragments(currentToolName, currentToolInput);
+     const applied = edit ? applySingleEdit(currentContent, edit) : null;
+     return {
+       candidateContent: applied && applied.ok ? applied.text : '',
+@@ -387,7 +320,7 @@ function buildCandidateContent(currentToolName, currentToolInput, absolutePath)
+     return {
+       candidateContent: degraded ? '' : nextContent,
+       currentContent,
+-      mutatedFragments: edits.map((edit) => edit.newString),
++      mutatedFragments: edits.flatMap((edit) => [edit.oldString, edit.newString]),
+       reconstructionDegraded: degraded,
+     };
+   }
+@@ -435,11 +368,13 @@ function collectMutationFragments(currentToolName, currentToolInput) {
+     return typeof currentToolInput.content === 'string' ? [currentToolInput.content] : [];
+   }
+   if (currentToolName === 'Edit') {
+-    return typeof currentToolInput.new_string === 'string' ? [currentToolInput.new_string] : [];
++    return [currentToolInput.old_string, currentToolInput.new_string]
++      .filter((value) => typeof value === 'string');
+   }
+   if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
+     return currentToolInput.edits
+-      .map((entry) => (entry && typeof entry.new_string === 'string' ? entry.new_string : ''))
++      .flatMap((entry) => (entry ? [entry.old_string, entry.new_string] : []))
++      .filter((value) => typeof value === 'string')
+       .filter(Boolean);
+   }
+   return [];
+diff --git a/templates/claude/hooks/prd-readiness-guard b/templates/claude/hooks/prd-readiness-guard
+index 1f75844d..7b1bfc00 100755
+--- a/templates/claude/hooks/prd-readiness-guard
++++ b/templates/claude/hooks/prd-readiness-guard
+@@ -20,7 +20,18 @@ const finalizeScript = path.join(
+   'finalize-prd-artifact.js',
+ );
+ 
+-const prdPaths = changedPrdArtifacts(projectDir);
++const prdScan = changedPrdArtifacts(projectDir);
++if (prdScan.error) {
++  block([
++    '[spec-first] PRD readiness guard blocked closeout.',
++    'Could not inspect changed PRD artifacts under docs/brainstorms.',
++    `reason_codes: ${prdScan.error.reasonCode}`,
++    '',
++    'Next action: rerun from a valid git worktree or fix git status before closing out ready/final PRD work.',
++  ].join('\n'));
++}
++
++const prdPaths = prdScan.paths;
+ if (prdPaths.length === 0) {
+   process.exit(0);
+ }
+@@ -102,7 +113,14 @@ function changedPrdArtifacts(cwd) {
+     timeout: 2000,
+   });
+   if (result.status !== 0 || typeof result.stdout !== 'string') {
+-    return [];
++    return {
++      paths: [],
++      error: {
++        reasonCode: result.status === null || (result.signal && result.signal !== null)
++          ? 'git_status_timeout'
++          : 'git_status_unavailable',
++      },
++    };
+   }
+ 
+   const entries = result.stdout.split('\0').filter(Boolean);
+@@ -110,17 +128,19 @@ function changedPrdArtifacts(cwd) {
+   for (let i = 0; i < entries.length; i += 1) {
+     const entry = entries[i];
+     const status = entry.slice(0, 2);
+-    let filePath = entry.slice(3);
++    const filePath = entry.slice(3);
+     if (status.includes('R') || status.includes('C')) {
+       i += 1;
+-      filePath = entries[i] || filePath;
+     }
+     if (/^docs\/brainstorms\/.+-requirements\.md$/.test(filePath)
+       && isReadyClaimPrdArtifact(path.join(cwd, filePath))) {
+       paths.push(filePath);
+     }
+   }
+-  return [...new Set(paths)].sort();
++  return {
++    paths: [...new Set(paths)].sort(),
++    error: null,
++  };
+ }
+ 
+ // docs/brainstorms/*-requirements.md 同时承载 spec-brainstorm 的需求 brief 与
+diff --git a/templates/qoder/hooks/prd-prewrite-guard b/templates/qoder/hooks/prd-prewrite-guard
+index 1aaf7e84..9a9b5ce7 100644
+--- a/templates/qoder/hooks/prd-prewrite-guard
++++ b/templates/qoder/hooks/prd-prewrite-guard
+@@ -35,7 +35,8 @@ if (!/^docs\/brainstorms\/.+-requirements\.md$/.test(relativeTarget)) {
+   process.exit(0);
+ }
+ 
+-const candidateText = collectCandidateText(toolName, toolInput, absoluteTarget);
++const mutation = buildCandidateContent(toolName, toolInput, absoluteTarget);
++const candidateText = mutation.candidateContent || '';
+ if (isFirstWritePrdWithoutWriteMode(toolName, toolInput, absoluteTarget, candidateText)) {
+   block([
+     '[spec-first] PRD prewrite guard blocked Qoder file mutation.',
+@@ -45,7 +46,10 @@ if (isFirstWritePrdWithoutWriteMode(toolName, toolInput, absoluteTarget, candida
+     'Use `write_mode: checkpoint-prd` with `can_enter_spec_plan: no` for recoverable drafts, or return to `spec-prd` before claiming ready/final state.',
+   ].join('\n'));
+ }
+-if (!hasReadyOrReceiptMutationSignal(candidateText)) {
++const machineReadySignal = mutation.reconstructionDegraded
++  ? hasMachineReadyMutationSignal(mutation.mutatedFragments.join('\n'))
++  : machineReadyFieldsChanged(mutation.currentContent, mutation.candidateContent);
++if (!machineReadySignal) {
+   process.exit(0);
+ }
+ 
+@@ -53,8 +57,8 @@ block([
+   '[spec-first] PRD prewrite guard blocked Qoder file mutation.',
+   `Target: ${relativeTarget}`,
+   '',
+-  'A PRD artifact must not be written or mutated into ready/final state through file mutation tools.',
+-  '`status: ready-for-planning`, `readiness_*` receipt fields, `readiness_outcome: ready-for-planning`, `write_mode: final-prd`, and `can_enter_spec_plan: yes` are producer-owned readiness signals.',
++  'A PRD artifact must not write machine-owned ready receipt state through file mutation tools.',
++  '`status: ready-for-planning` and `readiness_*` receipt fields are producer-owned. The LLM may write final intent (`write_mode: final-prd` + `can_enter_spec_plan: yes`) after semantic closure; the readiness guard blocks closeout until producer-local finalize writes a current receipt.',
+   'Return to `spec-prd`, complete the Requirements Grill/readiness path, then use the producer-local finalize command instead of patching receipt fields directly.',
+ ].join('\n'));
+ 
+@@ -66,37 +70,147 @@ function resolveProjectDir() {
+   return process.cwd();
+ }
+ 
+-function collectCandidateText(currentToolName, currentToolInput, absolutePath) {
+-  const fragments = [];
+-  if (currentToolName === 'Write' && typeof currentToolInput.content === 'string') {
+-    fragments.push(currentToolInput.content);
++function hasMachineReadyMutationSignal(text) {
++  if (!text) return false;
++  if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
++  if (/^\s*readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)\s*:/im.test(text)) return true;
++  return false;
++}
++
++function machineReadyFieldsChanged(currentText, candidateText) {
++  return JSON.stringify(machineReadyFieldState(currentText))
++    !== JSON.stringify(machineReadyFieldState(candidateText));
++}
++
++function machineReadyFieldState(text) {
++  const lines = String(text || '').split(/\r?\n/);
++  if (lines[0] !== '---') return {};
++  const end = lines.findIndex((line, index) => index > 0 && line === '---');
++  if (end === -1) return {};
++  const state = {};
++  for (const line of lines.slice(1, end)) {
++    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
++    if (!match) continue;
++    const key = match[1].toLowerCase();
++    const value = match[2].replace(/^["']|["']$/g, '').trim();
++    const machineOwned = key === 'status'
++      ? value.toLowerCase() === 'ready-for-planning'
++      : /^readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)$/.test(key);
++    if (!machineOwned) continue;
++    if (!state[key]) state[key] = [];
++    state[key].push(value);
+   }
++  return state;
++}
++
++function buildCandidateContent(currentToolName, currentToolInput, absolutePath) {
++  if (currentToolName === 'Write') {
++    const writeContent = typeof currentToolInput.content === 'string' ? currentToolInput.content : '';
++    return {
++      candidateContent: writeContent,
++      currentContent: readExistingFile(absolutePath),
++      mutatedFragments: writeContent ? [writeContent] : [],
++      reconstructionDegraded: false,
++    };
++  }
++
++  const currentContent = readExistingFile(absolutePath);
++  if (!currentContent) {
++    return {
++      candidateContent: '',
++      currentContent: '',
++      mutatedFragments: collectMutationFragments(currentToolName, currentToolInput),
++      reconstructionDegraded: true,
++    };
++  }
++
+   if (currentToolName === 'Edit') {
+-    if (typeof currentToolInput.new_string === 'string') fragments.push(currentToolInput.new_string);
+-    if (typeof currentToolInput.old_string === 'string') fragments.push(currentToolInput.old_string);
++    const edit = normalizeEdit(currentToolInput);
++    const fragments = edit
++      ? [edit.oldString, edit.newString]
++      : collectMutationFragments(currentToolName, currentToolInput);
++    const applied = edit ? applySingleEdit(currentContent, edit) : null;
++    return {
++      candidateContent: applied && applied.ok ? applied.text : '',
++      currentContent,
++      mutatedFragments: fragments,
++      reconstructionDegraded: !applied || !applied.ok,
++    };
+   }
+-  if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
+-    for (const edit of currentToolInput.edits) {
+-      if (edit && typeof edit.new_string === 'string') fragments.push(edit.new_string);
+-      if (edit && typeof edit.old_string === 'string') fragments.push(edit.old_string);
++
++  if (currentToolName === 'MultiEdit') {
++    const edits = Array.isArray(currentToolInput.edits)
++      ? currentToolInput.edits.map(normalizeEdit).filter(Boolean)
++      : [];
++    let nextContent = currentContent;
++    let degraded = edits.length === 0;
++    for (const edit of edits) {
++      const applied = applySingleEdit(nextContent, edit);
++      if (!applied.ok) {
++        degraded = true;
++        break;
++      }
++      nextContent = applied.text;
+     }
++    return {
++      candidateContent: degraded ? '' : nextContent,
++      currentContent,
++      mutatedFragments: edits.flatMap((edit) => [edit.oldString, edit.newString]),
++      reconstructionDegraded: degraded,
++    };
+   }
++
++  return {
++    candidateContent: '',
++    currentContent,
++    mutatedFragments: collectMutationFragments(currentToolName, currentToolInput),
++    reconstructionDegraded: true,
++  };
++}
++
++function readExistingFile(absolutePath) {
+   try {
+-    fragments.push(fs.readFileSync(absolutePath, 'utf8'));
++    if (!fs.existsSync(absolutePath)) return '';
++    return fs.readFileSync(absolutePath, 'utf8');
+   } catch {
+-    // no-op
++    return '';
+   }
+-  return fragments.join('\n');
+ }
+ 
+-function hasReadyOrReceiptMutationSignal(text) {
+-  if (!text) return false;
+-  if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
+-  if (/^\s*readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)\s*:/im.test(text)) return true;
+-  if (/^\s*(?:-\s*)?readiness_outcome:\s*ready-for-planning\s*$/im.test(text)) return true;
+-  if (/^\s*(?:-\s*)?write_mode:\s*final-prd\s*$/im.test(text)) return true;
+-  if (/^\s*(?:-\s*)?can_enter_spec_plan:\s*yes\s*$/im.test(text)) return true;
+-  return false;
++function normalizeEdit(value) {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
++  if (typeof value.old_string !== 'string' || typeof value.new_string !== 'string') return null;
++  if (value.old_string.length === 0) return null;
++  return {
++    oldString: value.old_string,
++    newString: value.new_string,
++    replaceAll: value.replace_all === true,
++  };
++}
++
++function applySingleEdit(text, edit) {
++  if (!text.includes(edit.oldString)) return { ok: false, text };
++  if (edit.replaceAll) {
++    return { ok: true, text: text.split(edit.oldString).join(edit.newString) };
++  }
++  return { ok: true, text: text.replace(edit.oldString, edit.newString) };
++}
++
++function collectMutationFragments(currentToolName, currentToolInput) {
++  if (currentToolName === 'Write') {
++    return typeof currentToolInput.content === 'string' ? [currentToolInput.content] : [];
++  }
++  if (currentToolName === 'Edit') {
++    return [currentToolInput.old_string, currentToolInput.new_string]
++      .filter((value) => typeof value === 'string');
++  }
++  if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
++    return currentToolInput.edits
++      .flatMap((entry) => (entry ? [entry.old_string, entry.new_string] : []))
++      .filter((value) => typeof value === 'string')
++      .filter(Boolean);
++  }
++  return [];
+ }
+ 
+ function isFirstWritePrdWithoutWriteMode(currentToolName, currentToolInput, absolutePath, candidateText) {

@@ -2,9 +2,11 @@
 
 `parent-artifact-quarantine.v1` is a setup-owned advisory artifact for parent multi-repo workspaces. It marks repo-local setup artifacts that exist at the parent workspace root, where downstream workflows could otherwise mistake them for current child-repo truth.
 
+The quarantine surface does not include init-owned parent workspace bootstrap artifacts: the parent instruction file, `.gitignore`, `CHANGELOG.md`, selected host runtime/state, or advisory `.spec-first/workspace/*summary.json` files. Those are expected parent-root artifacts. They remain non-authoritative for child repo setup/readiness and become quarantine candidates only when they contain foreign or child-canonical setup facts covered by the supported orphan surface.
+
 ## Producer
 
-- Producer: `spec-mcp-setup` verify phase (`verify-tools.sh` / `verify-tools.ps1`)
+- Producer：parent-workspace verify/setup 期间统一执行的 `spec-runtime-setup` Node 入口（`scripts/setup.cjs`）
 - Artifact path: `.spec-first/workspace/parent-artifact-quarantine.json`
 - Topology: `multi-repo-workspace`
 - Freshness: generated at verify time
@@ -22,7 +24,7 @@ The producer may write an empty `quarantined_paths[]` list when a parent workspa
   "authority_level": "advisory",
   "freshness": "generated",
   "generated_at": "2026-05-28T00:00:00Z",
-  "generated_by": "spec-mcp-setup",
+  "generated_by": "spec-runtime-setup",
   "consumers": [
     "spec-first clean --workspace-orphans",
     "LLM workflow degraded-evidence judgment"
@@ -57,4 +59,4 @@ LLM workflows may use the artifact as degraded-evidence context when deciding wh
 
 ## Failure Mode
 
-If the artifact is missing, unreadable, or has an unknown `schema_version`, cleanup consumers should ask the user to rerun `spec-mcp-setup` from the parent workspace. Setup must warn-and-continue if quarantine writing fails, except when the shared workspace summary path itself is rejected as a symlink escape.
+If the artifact is missing, unreadable, or has an unknown `schema_version`, cleanup consumers should ask the user to rerun `spec-runtime-setup` from the parent workspace. Setup must warn-and-continue if quarantine writing fails, except when the shared workspace summary path itself is rejected as a symlink escape.

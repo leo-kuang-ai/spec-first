@@ -6,14 +6,17 @@
 
 落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files、项目级 `.developer` 和受管状态。
 
-完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `spec-*` workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
+完成 `doctor`、`init` 和宿主重启后，首次进入业务 workflow 前先运行 `spec-runtime-setup`，准备 required harness runtime、MCP/helper readiness 与 setup facts。后续普通 plan/work/debug/review 不需要每次重复 setup，继续使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据；宿主、provider、helper 配置或 setup facts 变化时再重跑。
 
-当前推荐的事实准备、专项审查与知识沉淀入口：
+当前推荐的事实准备、专项审查、治理与知识沉淀入口：
 
-- `spec-mcp-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
+- `using-spec-first`：入口路由治理（standalone；只选下一步，不写 artifact）
+- `spec-runtime-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
 - `spec-app-consistency-audit`：移动 App 的 PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查入口
-- `spec-skill-audit`：source skill 质量、治理投递、runtime drift 与安全信号审计入口
-- `spec-compound`：工作完成后的稳定知识捕获入口
+- `spec-write-skill`：创建 / 修改 / 迁移项目拥有的 Agent Skill package，或只读 readiness 校验
+- `spec-dogfood` / `spec-polish`：分支/PR 浏览器 QA 与 UI polish
+- `spec-compound` / `spec-compound-refresh`：工作完成后的稳定知识捕获与 learnings 刷新
+- 完整公开 / standalone / internal 清单见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)
 
 当前功能状态：
 
@@ -23,6 +26,18 @@
 - `spec-first clean --claude / --codex / --kiro / --qoder`：已支持
 - `spec-first repair-worktree`：已支持；预览失效 worktree pointer 的修复指引（`--dry-run` 仅预览）
 - `spec-first tasks <subcommand>` / `spec-first session <subcommand>`：派生 task pack 的确定性校验入口，以及 opt-in 多 actor 会话 advisory
+- `spec-first plans audit [--status <active|partially-shipped|completed|superseded>] [--json]`：只读扫描当前仓库 `docs/plans/*.md` 的直接普通文件，盘点 unified code plan 和兼容的 legacy `feat|fix|refactor` plan；历史 missing/closed/invalid 是 advisory，不改变成功退出码。
+
+Plan lifecycle audit 的边界：
+
+- 新的 Markdown software unified plan 默认写 `status: active`；`artifact_readiness` 仍只表示文档能否执行。
+- Standalone `spec-work`、goal 或 LFG/caller 只有在各自完整 shipping tail 的 verification、required review 与 residual gate 收口后，才调用内部 helper 执行 `active → completed`。Direct plan 更新自身；task pack 只更新 `source_plan`，自身保持 derived/draft。
+- `partially-shipped` 与 `superseded` 首期仅做读取兼容，不提供自动 mutation、恢复协议或非 active intake gate。
+- JSON 固定输出 `schema_version: plan-status-audit/v1` 与 `plans[]`，每条只包含 `path/status/readiness/validity`。
+- `--status` 只接受 canonical taxonomy，并且只匹配 `validity: valid` 记录。
+- HTML plan 不参与首期 audit，这是显式 degraded boundary。
+- `completed` 只表示 plan 文件的 lifecycle marker；它不证明 tests、CI、merge、release 或 field outcome 已完成。
+- Internal helper 的 expected-old-status 与 temp-file + rename 不是跨进程 CAS；shipping-tail 单写者是未硬强制的 loud convention。
 
 `init` 支持在交互式引导中选择开发者姓名和语言；`-y` 会使用默认宿主集合和默认身份/语言，显式 `--claude` / `--codex` / `--kiro` / `--qoder` 会覆盖默认宿主集合。如果没有传用户名，它会优先回退到已选宿主的项目级 `.developer`，再回退到全局 `~/.spec-first/.developer` 和 `git config user.name`。
 
@@ -40,7 +55,7 @@
 
 - 一个前置的 `spec-ideate` 候选发散入口
 - 跨宿主统一的 `spec-*` workflow 入口
-- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、source skill 审计入口 `spec-skill-audit`，以及知识沉淀入口 `spec-compound`
+- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、skill 包治理入口 `spec-write-skill`，以及知识沉淀入口 `spec-compound`（完整清单见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)）
 - 一条 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 的标准闭环
 - 项目级 `.claude/commands/spec-*.md`
 - 项目级 `.claude/skills`、`.claude/spec-first/workflows` 与 `.claude/agents`
@@ -59,21 +74,23 @@
 主链路可以从 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 理解，但当前用户手册覆盖的是更完整的工程闭环：
 
 ```text
-mcp-setup
-  -> ideate
-  -> brainstorm
-  -> doc-review
+using-spec-first（入口路由，可选）
+  -> runtime-setup（首次 workflow 前；环境/MCP 变化后重跑）
+  -> ideate / brainstorm / prd / doc-review
   -> plan
-  -> write-tasks
-  -> work / debug / optimize / polish
+  -> write-tasks（可选）
+  -> work / debug / optimize / polish / dogfood
   -> code-review / app-consistency-audit
-  -> compound / compound-refresh / sessions / slack-research / skill-audit
+  -> compound / compound-refresh
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
+旁路（按意图直接进入，非主链路状态）：
+  write-skill | explain | pov | strategy | rule-miner | simplify-code
+  | product-pulse | sweep | riffrec-feedback-analysis | promote | lfg（仅显式）
 ```
 
-这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由入口治理推荐一个公开 workflow。`write-tasks` 是可选派生 workflow，入口是 `spec-write-tasks`；它不替代 source plan，也不是强制阶段。
+这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由 `using-spec-first` 推荐一个公开入口。`write-tasks` 是可选派生 workflow，入口是 `spec-write-tasks`；它不替代 source plan，也不是强制阶段。完整入口表见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)。skill 包治理入口为 `spec-write-skill`。
 
-当外部工具或 setup facts 缺失时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation；不要把缺失证据包装成成功证据，也不要把 setup 当成所有 workflow 的硬前置。
+首次 setup 必须完成 required baseline；后续普通 workflow 不把 setup 当成每次运行的硬前置。当外部工具或 setup facts 后续变得 stale 或不可用时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation，不能把缺失证据包装成成功证据。
 
 ## 支持的开发模式
 
@@ -98,7 +115,7 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 边界：
 
 - `figma-context:<path>` 是可抽取 evidence；`figma-ref:<id-or-url>` 只是 reference。
-- Figma MCP 是宿主可选能力，只在默认交互模式下用于 materialize 本地 JSON；它不是 `spec-mcp-setup` 的 required baseline。
+- Figma MCP 是宿主可选能力，只在默认交互模式下用于 materialize 本地 JSON；它不是 `spec-runtime-setup` 的 required baseline。
 - 缺 PRD、Figma 或直接源码证据时应降级披露能力范围，不把缺失输入直接当作整个审查失败。
 
 ![Spec-First 五阶段工作流](../assets/svg/spec-first-workflow.svg)
@@ -119,21 +136,24 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 8. [研发场景与降级路径](./20-研发场景与降级路径.md)
 9. [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 10. [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
-11. [团队开发规范治理](./23-团队开发规范治理.md)
-12. [常见问题](./04-常见问题.md)
-13. [最佳实践](./05-最佳实践.md)
-14. [三种开发模式](./08-三种开发模式.md)
-15. [本地源码安装](./06-本地源码安装.md)
-16. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
+11. [spec-prd 当前执行逻辑与流程图](./23-spec-prd当前执行逻辑.md)
+12. [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)
+13. [常见问题](./04-常见问题.md)
+14. [最佳实践](./05-最佳实践.md)
+15. [三种开发模式](./08-三种开发模式.md)
+16. [本地源码安装](./06-本地源码安装.md)
+17. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
 
 ## 建议阅读路径
 
 - 如果你第一次使用，先看 [快速开始](./01-快速开始.md)，再看 [首次工作流走查](./09-首次工作流走查.md)
 - 如果你要理解运行模型、工程闭环和 evidence 边界，先看 [核心概念](./02-核心概念.md)
-- 如果你要共享 confirmed project standards，先看 [团队开发规范治理](./23-团队开发规范治理.md)，再看 [Gitignore 参考](./12-gitignore参考.md) 的提交边界
+- 如果你要共享 project guidance，优先放在 `AGENTS.md`、`CLAUDE.md`、目录级 instruction 文件或明确的 `docs/contracts/**`，再看 [Gitignore 参考](./12-gitignore参考.md) 的提交边界
 - 如果你要判断单仓、多模块或多仓 workspace 怎么使用，先看 [三种开发模式](./08-三种开发模式.md)
 - 如果你要判断 OpenSpec 和 spec-first 在不同项目阶段怎么取舍，先看 [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 - 如果产品或 owner 已经给出 PRD、需求材料、会议纪要、设计说明或系统增量说明，你要在进入研发 planning 前澄清 WHAT/WHY、owner 决策和计划准入条件，先看 [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
+- 如果你要快速理解当前 `spec-prd` 从输入、模板选择、grill、Decision Card 到 checker/finalize 和 handoff 的实际执行逻辑，看 [spec-prd 当前执行逻辑与流程图](./23-spec-prd当前执行逻辑.md)
+- 如果你要查当前全部公开 workflow、standalone skill 与 internal helper 清单，看 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)
 - 如果你要确认真实执行过程，看 [完整示例](./03-完整示例.md)
 - 如果你要判断某个文档或 runtime 目录该不该手改、该不该提交，先看 [产物目录](./10-产物目录.md)
 - 如果你要判断当前仓库属于哪类研发场景、dirty / multi-repo / non-git build target 该如何降级，先看 [研发场景与降级路径](./20-研发场景与降级路径.md)
@@ -145,6 +165,6 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 
 ## 版本
 
-本手册对应当前 `spec-first` 代码与运行时资产布局。当前版本以 `spec-first -v` 与 `package.json` 的 `version` 字段为单一真相源（撰写时为 `v1.11.0`），手册不再单独维护版本号以避免漂移。
+本手册对应当前 `spec-first` 代码与运行时资产布局。当前版本以 `spec-first -v` 与 `package.json` 的 `version` 字段为单一真相源（撰写时为 `v1.13.2`），手册不再单独维护版本号以避免漂移。
 
 > 说明：遇到行为疑问时，优先以 source-of-truth 文件、CLI contract 和本手册当前章节为准。

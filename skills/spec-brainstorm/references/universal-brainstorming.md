@@ -1,6 +1,14 @@
 # Universal Brainstorming Facilitator
 
-This file is loaded when spec-brainstorm detects a non-software task (Phase 0). It replaces the software-specific brainstorming phases (Phases 0.2 through 4) with facilitation principles for any domain. The Core Principles in `references/discovery-flow.md` and the **Interaction Rules** in `references/interaction-rules.md` still apply unchanged — including one-question-per-turn and the default to the platform's blocking question tool. This file extends those rules with universal-domain facilitation guidance; it does not relax them.
+This file is loaded when spec-brainstorm detects a non-software task (Phase 0). It replaces the software-specific brainstorming phases (Phases 0.2 through 4) with facilitation principles for any domain. The Core Principles and **Interaction Rules** in the parent `spec-brainstorm/SKILL.md` still apply unchanged — including one-question-per-turn and the default to the platform's blocking question tool. This file extends those rules with universal-domain facilitation guidance; it does not relax them.
+
+This route is intentionally outside the software unified-plan artifact contract.
+Do not write `artifact_contract: spec-unified-plan/v1`,
+`artifact_readiness: requirements-only`, or a requirements-only plan under
+`docs/plans/` from this route. If the user wants a durable next artifact, hand
+the synthesis to `spec-plan`, which can create an appropriate universal or
+knowledge-work plan without pretending it is an implementation-ready code
+artifact.
 
 ---
 
@@ -16,7 +24,7 @@ Be a thinking partner, not an answer machine. The user came here because they're
 
 "What's prompting this?", "what matters most here?", and "what have you ruled out?" feel open-ended and conversational, but that's not a reason to skip the tool. The free-text option preserves flexibility while a well-crafted option set teaches the user the dimensions they might not have separated. Pick-plus-optional-note is lower activation energy than composing prose from scratch — especially for emotional or values-laden topics where prose can feel like an essay prompt.
 
-Drop to prose only when (a) the answer is inherently narrative ("walk me through how you got here"), (b) the question is diagnostic or introspective and presented options would leak your priors and bias the answer, or (c) you cannot write 3-4 genuinely distinct, plausibly-correct options that cover the space without padding. If you'd be straining to fill the option slots, the question is open — use prose.
+Drop the blocking tool only when (a) the answer is inherently narrative ("walk me through how you got here"), (b) the question is diagnostic or introspective and presented options would unintentionally influence the user's answer, or (c) you cannot write 3-4 genuinely distinct, plausibly-correct options that cover the space without padding. If you'd be straining to fill the option slots, the question is open — ask it open-ended (see Interaction Rule 6 in SKILL.md for how to phrase open-ended questions so they earn their place).
 
 ## How to start
 
@@ -26,6 +34,8 @@ Drop to prose only when (a) the answer is inherently narrative ("walk me through
 - **Full** (vague goal, lots of uncertainty, or high-stakes decision): Deep exploration, many exchanges, structured convergence.
 
 **Ask what they're already thinking.** Before offering ideas, find out what the user has considered, tried, or rejected. This prevents fixation on AI-generated ideas and surfaces hidden constraints.
+
+**When the user doesn't know the domain** — if they flag missing working knowledge of the territory ("I need to grade this video but don't know what color grading is"), or two consecutive answers show they *cannot evaluate* a question's substance rather than merely haven't decided, read `references/blindspot-pass.md` and offer the pass before questioning them further on that territory. It applies on this route unchanged (see its "Universal route" section).
 
 **When the user represents a group** (couple, family, team) — surface whose preferences are in play and where they diverge. The brainstorm shifts from "help you decide" to "help you find alignment." Ask about each person's priorities, not just the speaker's.
 
@@ -53,11 +63,10 @@ When the conversation has enough material to narrow — reflect back what you've
 
 **Always synthesize a summary in the chat.** Before offering any next steps, reflect back what emerged: key decisions, the direction chosen, open threads, and any assumptions made. This is the primary output of the brainstorm — the user should be able to read the summary and know what they landed on.
 
-**Then offer next steps** using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+**Then offer next steps** using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
 **Question:** "Brainstorm wrapped. What would you like to do next?"
 
-- **Create a plan** → hand off to the current host's plan entrypoint with the decided goal and constraints
+- **Create a plan** → hand off to `spec-plan` with the decided goal and constraints; let `spec-plan` choose the universal/knowledge-work artifact shape, not the software unified-plan contract
 - **Save summary to disk** → write the summary as a markdown file in the current working directory
-- **Open in Proof (web app) — review and comment to iterate with the agent** → load the `proof` skill (host-provided; if the host does not expose it, tell the user this review surface is unavailable) to open the doc in Every's Proof editor, iterate with the agent via comments, or copy a link to share with others
 - **Done** → the conversation was the value, no artifact needed

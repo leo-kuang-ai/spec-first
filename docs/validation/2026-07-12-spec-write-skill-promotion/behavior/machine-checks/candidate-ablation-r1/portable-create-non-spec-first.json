@@ -1,0 +1,28 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": "create",
+    "case_id": "portable-create-non-spec-first",
+    "effect": "apply",
+    "layer_result": "Portable package with repository-local placement; no spec-first governance or runtime-mirror workflow applies.",
+    "modifier": "none",
+    "required_references": [
+      "Repository conventions for local Skill placement and validation",
+      "Representative API change-record formats used by the project"
+    ],
+    "response": "建议在单一目标仓库的 `skills/api-change-compat-checklist/` 创建包。先预览目录、frontmatter 和分支：输入 API 变更记录，按删除/重命名、签名或类型变化、行为变化、弃用与迁移要求生成兼容性清单；明确排除直接修改 API、实现迁移或普通代码审查。`SKILL.md` 承载通用流程、输出格式、失败与交接规则；仅当不同变更来源确有不同解析规则时建立条件化 `references/`；加入正向、负向和近邻路由 eval。无需脚本，除非发现可重复且可测试的确定性转换。实施前确认该仓库及 `skills/` 是授权 canonical source，并将改动限制在该包内。",
+    "route_decision": "Reusable Skill authoring in one non-spec-first repository.",
+    "source_owner_assumption": "The current Node.js repository is the explicit target, and `skills/api-change-compat-checklist/` is its repository-local canonical source after convention confirmation.",
+    "would_modify_paths": [
+      "skills/api-change-compat-checklist/SKILL.md",
+      "skills/api-change-compat-checklist/evals/route-cases.json"
+    ],
+    "would_run_commands": [
+      "Run the repository's documented Skill/package validator if one exists",
+      "Run focused route/output evals with raw artifacts and user requests",
+      "git diff --check"
+    ]
+  }
+}

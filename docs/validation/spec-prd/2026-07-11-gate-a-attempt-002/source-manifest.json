@@ -1,0 +1,570 @@
+{
+  "schema_version": "contract-reset-source-manifest/v1",
+  "artifact_type": "generated",
+  "run_id": "2026-07-11-gate-a-attempt-002",
+  "attempt_id": "gate-a-2026-07-11-002",
+  "created_at": "2026-07-11T11:28:07.694Z",
+  "parent_revision": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+  "cases_path": "skills/spec-prd/evals/contract-reset-cases.json",
+  "cases_hash": "sha256:ef9ed4e2d200c6b2bd267ac96a5fa1fd8c2f0338070251f488beac94ae4b4526",
+  "patches": {
+    "phase1_control": {
+      "path": "control.patch",
+      "sha256": "sha256:52fdd946fba0aaf9fcfb35e76d7777165983d65f618728ab70f33c241c5897e0"
+    },
+    "candidate": {
+      "path": "candidate.patch",
+      "sha256": "sha256:722f07312513b88877115c42f26e388b721ae8a5b1fedd7617aeec846afcb89d"
+    }
+  },
+  "source_files": [
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/overlays/securities.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/00-generic.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/10-app.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/20-admin.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/30-backend.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/40-h5-pc.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/50-cli-devtool.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/60-mixed.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/70-large-requirement-index.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/design-source-evidence.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/evidence-and-topology.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/grill-with-docs-integration.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/large-input-checkpoint.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/prd-output-template.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/prd-readiness-lens.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/references/product-contract-authoring.md",
+      "tracked": true,
+      "baseline_present": false
+    },
+    {
+      "path": "skills/spec-prd/references/product-expert-lens.md",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-glossary-drift.js",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-prd-artifact.js",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/scripts/finalize-prd-artifact.js",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "skills/spec-prd/scripts/lib/reason-codes.js",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "templates/claude/hooks/prd-prewrite-guard",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "templates/claude/hooks/prd-readiness-guard",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "templates/qoder/hooks/prd-prewrite-guard",
+      "tracked": true,
+      "baseline_present": true
+    },
+    {
+      "path": "templates/qoder/hooks/prd-readiness-guard",
+      "tracked": true,
+      "baseline_present": true
+    }
+  ],
+  "arms": {
+    "baseline": {
+      "patch_chain": [],
+      "tree_hash": "sha256:64ea8c078cebeaed08c053f0d0a7350949da720f67e7e8ab949db8a0f4f5c594"
+    },
+    "phase1_control": {
+      "patch_chain": [
+        "phase1_control"
+      ],
+      "tree_hash": "sha256:95bb225b3aa369b3f656e223b4955e2d43cdff89794e10a1b0f135b24228e1ac"
+    },
+    "candidate": {
+      "patch_chain": [
+        "phase1_control",
+        "candidate"
+      ],
+      "tree_hash": "sha256:948584c8a5a42e46c0af49aefe714ebcbd4adef52602ead13a127a1f40f85f99"
+    }
+  },
+  "invocation_profile": {
+    "host": "codex",
+    "model": "gpt-5",
+    "agent_type": "fresh-generic-agent",
+    "temperature": "host-default",
+    "context_reuse": "forbidden",
+    "tool_posture": "sandbox-root-only",
+    "authority_profile": "product-owner input plus claim-specific specialist authority"
+  },
+  "threshold_contract_hash": "sha256:100b94a041521d5289e3a364c701e59205a438a8bc6253ba28a6d14a316135a9",
+  "sessions": [
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "b6b1a30a-58c3-4339-bc6d-988bb9ed6cac"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "dcc0dd49-d207-4eaa-8a15-85c06cc6acf1"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "b8db4418-9ddc-4fdd-9cec-d2685759b90c"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "679ef605-73b1-407b-9e68-33a3f385e593"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "47f99ff7-51aa-4e53-b9f8-3ac1ddd79145"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "405015ba-7e95-4661-a0b6-84fe8e6ec9fc"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "4a3f50ba-a2ea-4472-bb7f-6c94a5f79841"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "e01f8680-bc08-4737-9675-27628ace92e2"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "d1ca7cee-d37a-498d-a4ce-dec9ebaebe5f"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "c988a898-c768-457c-a887-90e46d3afa5a"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "2473ece2-dfe2-4623-931f-f51ac5765a42"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "126b183a-00c1-406a-98e4-1f0b3f6633b2"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "b7b5eeda-52ac-497b-a87b-069f91ef04d5"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "f84dd892-f967-46a2-abc7-743102fa6e35"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "6a817e72-790b-4fa9-864d-36f81d491cdc"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "ba269bc1-eab1-41e4-8981-87edb99a09f8"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "207d9884-6af2-4175-b4a2-8815ccc507f0"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "7f1d5117-fa5f-416e-adb9-b61134d49c65"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "94e67c98-a71e-468f-b9e8-e6c8bdbf3764"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "06e9721e-a944-4661-a350-57e731fa5198"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "5cd76c44-d84e-493e-aeb0-de3ba7ae8c49"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "c6c52b8c-f8c7-41cd-94f4-606df46ece7c"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "9075cfb3-c1e2-441d-b856-9f31e5be2bc8"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "9ce519d8-f5b7-4238-854e-0cc5f1e83c7e"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "72257f5e-9539-49a1-a517-027c518cc921"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "06ceaa5f-f09b-48a1-aa12-3922b1ed5bf2"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "76fea0f1-4d4b-48b4-b6a3-498e99863235"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "a04b437a-6c95-406e-ae77-24a6ac4bf4cd"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "7f0bc35d-b977-4858-b194-0f00cc51717f"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "2869a1c2-c144-4aca-b768-24f8c2e8543b"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "5ab954da-8328-4e1f-ae2b-04daeaa90f6f"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "340bee64-0745-4331-9c03-cf03991c6612"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "a554825e-b49f-4cef-b470-bcbd646facbd"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "1175f4b3-6042-43e1-9255-c307624721cb"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "e50b41ee-90d6-4b43-9df3-e02b9bac11c5"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "37563d20-d465-4fc2-a380-34f16281987d"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "7353bcc5-7554-4e78-81dc-0a4668ea7ac3"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "0c67a16e-0246-487d-a680-34a4b10a175e"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "608a27c0-ee9c-48a7-aa5f-fe65afe61028"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "7a3aebb3-a468-4e8c-9f12-f305adcb1867"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "deece82c-1284-4ce5-95bb-b68234ccc5ce"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "2c43f80f-f433-43cb-824f-0c773acb78d3"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "f055aa86-d886-47a3-bc41-7b21afe4cc9e"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "c29ab98b-6232-4cd6-8c87-8cb642fc5e03"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "db37c283-7ed3-4c2f-9dd5-34b4969b5613"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "273681f7-bcb7-4294-a716-bd37c4b2c651"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "4dd9f760-d725-474f-a3af-6e2fa74322be"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "b3e4e162-2b4e-4b63-aa87-ad0a6b75d425"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "4da223c9-da69-4231-a06b-c8d860a8de63"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "c865b769-5da1-426c-aec4-6f90b810f96a"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "e0ebab31-6122-4d3b-9078-915cfd2f0ab7"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "4129e8cc-bfcb-43ba-954b-48cef5184107"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "ce1c7be3-0444-4175-8c87-274bae97b7c1"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "113de20c-5008-4bc2-8bdb-53fdd9827c98"
+    }
+  ],
+  "materialization_verification": {
+    "path": "materialization-verification.json",
+    "sha256": "sha256:6604ceb8dc92104b3f358ffd268c6eb44e218f03bdeb0dc9fb935a0bf2baefbb"
+  }
+}

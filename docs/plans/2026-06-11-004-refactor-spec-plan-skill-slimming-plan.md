@@ -39,7 +39,7 @@ v1 方案(同 spec_id 旧版)主路线是「按 rebar 把 Phase 0.1 resume/deepe
 
 治理头部 10 节按「是否有可验证消费者」截然两类:
 
-- **有消费者/运行时对应面(必须保留,3 节)**:`Workflow Contract Summary`(其 `When To Use` / `When Not To Use` / `Outputs` / `Workflow` 是 `skills/spec-skill-audit/scripts/lint-skill-structure.js` 的 **P1 REQUIRED_SECTIONS**,机器校验);`Plan-Only Safety Contract`(与 `templates/claude/hooks/spec-plan-guard` 的 planning-only attention guard 对应,非硬阻断);`Scenario Capability`(5 行指针,指向共享 matrix,audit 消费)。
+- **有消费者/运行时对应面(必须保留,3 节)**:`Workflow Contract Summary`(其 `When To Use` / `When Not To Use` / `Outputs` / `Workflow` 是 `skills/retired-skill-review/scripts/lint-skill-structure.js` 的 **P1 REQUIRED_SECTIONS**,机器校验);`Plan-Only Safety Contract`(与 `templates/claude/hooks/spec-plan-guard` 的 planning-only attention guard 对应,非硬阻断);`Scenario Capability`(5 行指针,指向共享 matrix,audit 消费)。
 - **无消费者的纯劝导(7 节 ≈ 38 行 ≈ ~4KB)**:`Context Orientation Anchor`、`Domain Language And Decision Ledger`、`Cache-Friendly Context Layout`、`Summary-First Handoff`、`Runtime Context Exclusion`、`Recall Trust Boundary`、`Capability-Class Evidence Boundary`。测试只断言其 prose **存在**(`toContain`),**不验证其生效**;无脚本/hook/路由消费;采纳稀疏(3-7/37);其中 `Runtime Context Exclusion` 与 `Recall Trust Boundary` 的语义**逐字**已在始终加载的 `CLAUDE.md`(L234 / L63)与 `AGENTS.md` 中。
 
 **三类成本必须区分:**
@@ -106,7 +106,7 @@ v1 方案(同 spec_id 旧版)主路线是「按 rebar 把 Phase 0.1 resume/deepe
 
 - target_repo: spec-first(当前仓库根);对照仓 compound-engineering-plugin(上游 ce-plan,只读对照)
 - evidence_sources: bounded direct reads、`wc`/`grep -rl`/`awk` 跨 skill 计数、本会话已读 SKILL.md / ce-plan 全文 / contract test / lint-skill-structure.js / CLAUDE.md / AGENTS.md、`planBundledAssetSync` projection precheck、首轮 ablation validation 文档、deep-research 外部报告(19 条 3-0 验证)
-- source_refs: skills/spec-plan/SKILL.md、tests/unit/spec-plan-contracts.test.js、skills/spec-skill-audit/scripts/lint-skill-structure.js、src/cli/plugin.js、src/cli/adapters/{claude,codex}.js、CLAUDE.md、AGENTS.md、templates/claude/hooks/spec-plan-guard、compound-engineering-plugin/plugins/compound-engineering/skills/ce-plan/SKILL.md
+- source_refs: skills/spec-plan/SKILL.md、tests/unit/spec-plan-contracts.test.js、skills/retired-skill-review/scripts/lint-skill-structure.js、src/cli/plugin.js、src/cli/adapters/{claude,codex}.js、CLAUDE.md、AGENTS.md、templates/claude/hooks/spec-plan-guard、compound-engineering-plugin/plugins/compound-engineering/skills/ce-plan/SKILL.md
 - current_revision: 9f24dfa9(工作树含本计划与 `docs/validation/spec-plan/` 首轮 ablation 文档修订;implementation source 尚未改)
 - worktree_status: dirty-docs-only at review-fix time(`docs/plans/2026-06-11-004-refactor-spec-plan-skill-slimming-plan.md` modified, `docs/validation/spec-plan/` untracked;本次修复会同步 `CHANGELOG.md`)
 - confidence: high on target selection and consumer ownership; medium on final extract/remove verdicts until formal U2 backlog completes
@@ -116,7 +116,7 @@ v1 方案(同 spec_id 旧版)主路线是「按 rebar 把 Phase 0.1 resume/deepe
 
 ## Direct Evidence
 
-- repo_scope: skills/spec-plan/、skills/spec-skill-audit/scripts/、tests/unit/、templates/claude/hooks/、CLAUDE.md、AGENTS.md;对照 compound-engineering-plugin/.../ce-plan/
+- repo_scope: skills/spec-plan/、skills/retired-skill-review/scripts/、tests/unit/、templates/claude/hooks/、CLAUDE.md、AGENTS.md;对照 compound-engineering-plugin/.../ce-plan/
 - source_reads_completed: SKILL.md 逐节字节(L17-101 治理头 85行/10.6KB;候选 7 节 ≈38行/~4KB)、跨 skill 治理节计数(Workflow Contract Summary 18/37、Scenario Capability 18/37、其余 3-7/37)、每 skill 治理节命中数(plan10/work8/code-review8/debug7,17 个 helper 为 0)、lint-skill-structure.js 的 REQUIRED_SECTIONS、spec-plan-guard hook 存在性、contract test 仅 `toContain`/`indexOf` 断言存在、CLAUDE.md L63/L234 与 AGENTS.md 同款语义、上游 ce-plan 791行/83.2KB 且内联 fast-path、`planBundledAssetSync` 确认 `docs/contracts/**` 不在 Claude/Codex runtime operations 中
 - source_reads_required: U1 期逐节精读 L17-101 产出 capability 清单;U2 期需 fresh-source dispatch 能力;U5 期读 command projection 生成逻辑与 codex 投影
 - commands_or_tools_used: `wc -c -l`、`grep -n/-rl/-c`、`awk` 分节、`git rev-parse`、deep-research workflow(98 agent)
@@ -131,7 +131,7 @@ v1 方案(同 spec_id 旧版)主路线是「按 rebar 把 Phase 0.1 resume/deepe
 ### Relevant Code and Patterns
 
 - `skills/spec-plan/SKILL.md` L17-101 — 治理头部,收束目标。
-- `skills/spec-skill-audit/scripts/lint-skill-structure.js` — `Workflow Contract Summary` 子节的 P1/P2 REQUIRED 校验者(keep 依据)。
+- `skills/retired-skill-review/scripts/lint-skill-structure.js` — `Workflow Contract Summary` 子节的 P1/P2 REQUIRED 校验者(keep 依据)。
 - `templates/claude/hooks/spec-plan-guard` — `Plan-Only Safety Contract` 的 Claude runtime attention guard 对应面(非硬阻断;keep 依据)。
 - `tests/unit/spec-plan-contracts.test.js` — 当前仅断言治理节 prose 存在;R3 改造对象。
 - `CLAUDE.md` L63 / L234、`AGENTS.md` — `Recall Trust Boundary` / `Runtime Context Exclusion` 的全局层同款语义(remove 候选依据)。
@@ -202,7 +202,7 @@ v1 方案(同 spec_id 旧版)主路线是「按 rebar 把 Phase 0.1 resume/deepe
 
 治理头 10 节裁决矩阵(U1 待确认细节,当前基于实测):
   KEEP(有可验证消费者):
-    Workflow Contract Summary   —— lint P1/P2 REQUIRED(skill-audit 机读)
+    Workflow Contract Summary   —— lint P1/P2 REQUIRED(skill-review 机读)
     Plan-Only Safety Contract   —— spec-plan-guard attention guard 对应面(非硬阻断)
     Scenario Capability         —— 指向共享 matrix,audit 消费(已是抽取范式)
   EXTRACT(无消费者 + 跨节点重复;ablation 证有效则抽取):
@@ -440,7 +440,7 @@ v1 方案(同 spec_id 旧版)主路线是「按 rebar 把 Phase 0.1 resume/deepe
 
 - Project role contract: `docs/10-prompt/结构化项目角色契约.md`
 - 收束目标: `skills/spec-plan/SKILL.md`(L17-101 治理头)
-- keep 依据(消费者): `skills/spec-skill-audit/scripts/lint-skill-structure.js`、`templates/claude/hooks/spec-plan-guard`、`docs/contracts/workflows/scenario-capability-matrix.md`
+- keep 依据(消费者): `skills/retired-skill-review/scripts/lint-skill-structure.js`、`templates/claude/hooks/spec-plan-guard`、`docs/contracts/workflows/scenario-capability-matrix.md`
 - 全局层同款语义: `CLAUDE.md` L63/L234、`AGENTS.md`
 - contract 测试网: `tests/unit/spec-plan-contracts.test.js`
 - source/runtime 边界: `docs/contracts/source-runtime-customization-boundary.md`、`docs/contracts/context-governance.md`

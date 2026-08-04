@@ -1,0 +1,278 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const projectDir = resolveProjectDir();
+const rawInput = readStdin();
+const input = parseJsonObject(rawInput);
+const toolName = String(input.tool_name || input.toolName || input.name || '');
+const toolInput = input.tool_input && typeof input.tool_input === 'object' && !Array.isArray(input.tool_input)
+  ? input.tool_input
+  : {};
+
+if (!['Write', 'Edit', 'MultiEdit'].includes(toolName)) {
+  process.exit(0);
+}
+
+const targetPath = typeof toolInput.file_path === 'string' ? toolInput.file_path : '';
+if (!targetPath) {
+  process.exit(0);
+}
+
+const cwd = typeof input.cwd === 'string' && input.cwd ? input.cwd : projectDir;
+const absoluteTarget = path.isAbsolute(targetPath)
+  ? path.resolve(targetPath)
+  : path.resolve(cwd, targetPath);
+const normalizedRoot = path.resolve(projectDir);
+if (!isWithinRoot(absoluteTarget, normalizedRoot)) {
+  process.exit(0);
+}
+
+const relativeTarget = path.relative(normalizedRoot, absoluteTarget).split(path.sep).join('/');
+if (!/^docs\/brainstorms\/.+-requirements\.md$/.test(relativeTarget)) {
+  process.exit(0);
+}
+
+const mutation = buildCandidateContent(toolName, toolInput, absoluteTarget);
+const candidateText = mutation.candidateContent || '';
+if (isFirstWritePrdWithoutWriteMode(toolName, toolInput, absoluteTarget, candidateText)) {
+  block([
+    '[spec-first] PRD prewrite guard blocked Qoder file mutation.',
+    `Target: ${relativeTarget}`,
+    '',
+    'A new PRD artifact must declare a durable-write path in `write_mode` before the first durable Write.',
+    'Use `write_mode: checkpoint-prd` with `can_enter_spec_plan: no` for recoverable drafts, or return to `spec-prd` before claiming ready/final state.',
+  ].join('\n'));
+}
+const machineReadySignal = mutation.reconstructionDegraded
+  ? hasMachineReadyMutationSignal(mutation.mutatedFragments.join('\n'))
+  : machineReadyFieldsChanged(mutation.currentContent, mutation.candidateContent);
+if (!machineReadySignal) {
+  process.exit(0);
+}
+
+block([
+  '[spec-first] PRD prewrite guard blocked Qoder file mutation.',
+  `Target: ${relativeTarget}`,
+  '',
+  'A PRD artifact must not write machine-owned ready receipt state through file mutation tools.',
+  '`status: ready-for-planning` and `readiness_*` receipt fields are producer-owned. The LLM may write final intent (`write_mode: final-prd` + `can_enter_spec_plan: yes`) after semantic closure; the readiness guard blocks closeout until producer-local finalize writes a current receipt.',
+  'Return to `spec-prd`, complete the Requirements Grill/readiness path, then use the producer-local finalize command instead of patching receipt fields directly.',
+].join('\n'));
+
+function resolveProjectDir() {
+  const fromEnv = process.env.QODER_PROJECT_DIR;
+  if (typeof fromEnv === 'string' && fromEnv.trim()) {
+    return fromEnv;
+  }
+  return process.cwd();
+}
+
+function hasMachineReadyMutationSignal(text) {
+  if (!text) return false;
+  if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
+  if (/^\s*readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)\s*:/im.test(text)) return true;
+  return false;
+}
+
+function machineReadyFieldsChanged(currentText, candidateText) {
+  return JSON.stringify(machineReadyFieldState(currentText))
+    !== JSON.stringify(machineReadyFieldState(candidateText));
+}
+
+function machineReadyFieldState(text) {
+  const lines = String(text || '').split(/\r?\n/);
+  if (lines[0] !== '---') return {};
+  const end = lines.findIndex((line, index) => index > 0 && line === '---');
+  if (end === -1) return {};
+  const state = {};
+  for (const line of lines.slice(1, end)) {
+    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (!match) continue;
+    const key = match[1].toLowerCase();
+    const value = match[2].replace(/^["']|["']$/g, '').trim();
+    const machineOwned = key === 'status'
+      ? value.toLowerCase() === 'ready-for-planning'
+      : /^readiness_(?:verified_by|verified_at|checker_schema|finding_count|blocking_count|prd_hash|inputs_hash)$/.test(key);
+    if (!machineOwned) continue;
+    if (!state[key]) state[key] = [];
+    state[key].push(value);
+  }
+  return state;
+}
+
+function buildCandidateContent(currentToolName, currentToolInput, absolutePath) {
+  if (currentToolName === 'Write') {
+    const writeContent = typeof currentToolInput.content === 'string' ? currentToolInput.content : '';
+    return {
+      candidateContent: writeContent,
+      currentContent: readExistingFile(absolutePath),
+      mutatedFragments: writeContent ? [writeContent] : [],
+      reconstructionDegraded: false,
+    };
+  }
+
+  const currentContent = readExistingFile(absolutePath);
+  if (!currentContent) {
+    return {
+      candidateContent: '',
+      currentContent: '',
+      mutatedFragments: collectMutationFragments(currentToolName, currentToolInput),
+      reconstructionDegraded: true,
+    };
+  }
+
+  if (currentToolName === 'Edit') {
+    const edit = normalizeEdit(currentToolInput);
+    const fragments = edit
+      ? [edit.oldString, edit.newString]
+      : collectMutationFragments(currentToolName, currentToolInput);
+    const applied = edit ? applySingleEdit(currentContent, edit) : null;
+    return {
+      candidateContent: applied && applied.ok ? applied.text : '',
+      currentContent,
+      mutatedFragments: fragments,
+      reconstructionDegraded: !applied || !applied.ok,
+    };
+  }
+
+  if (currentToolName === 'MultiEdit') {
+    const edits = Array.isArray(currentToolInput.edits)
+      ? currentToolInput.edits.map(normalizeEdit).filter(Boolean)
+      : [];
+    let nextContent = currentContent;
+    let degraded = edits.length === 0;
+    for (const edit of edits) {
+      const applied = applySingleEdit(nextContent, edit);
+      if (!applied.ok) {
+        degraded = true;
+        break;
+      }
+      nextContent = applied.text;
+    }
+    return {
+      candidateContent: degraded ? '' : nextContent,
+      currentContent,
+      mutatedFragments: edits.flatMap((edit) => [edit.oldString, edit.newString]),
+      reconstructionDegraded: degraded,
+    };
+  }
+
+  return {
+    candidateContent: '',
+    currentContent,
+    mutatedFragments: collectMutationFragments(currentToolName, currentToolInput),
+    reconstructionDegraded: true,
+  };
+}
+
+function readExistingFile(absolutePath) {
+  try {
+    if (!fs.existsSync(absolutePath)) return '';
+    return fs.readFileSync(absolutePath, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function normalizeEdit(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  if (typeof value.old_string !== 'string' || typeof value.new_string !== 'string') return null;
+  if (value.old_string.length === 0) return null;
+  return {
+    oldString: value.old_string,
+    newString: value.new_string,
+    replaceAll: value.replace_all === true,
+  };
+}
+
+function applySingleEdit(text, edit) {
+  if (!text.includes(edit.oldString)) return { ok: false, text };
+  if (edit.replaceAll) {
+    return { ok: true, text: text.split(edit.oldString).join(edit.newString) };
+  }
+  return { ok: true, text: text.replace(edit.oldString, edit.newString) };
+}
+
+function collectMutationFragments(currentToolName, currentToolInput) {
+  if (currentToolName === 'Write') {
+    return typeof currentToolInput.content === 'string' ? [currentToolInput.content] : [];
+  }
+  if (currentToolName === 'Edit') {
+    return [currentToolInput.old_string, currentToolInput.new_string]
+      .filter((value) => typeof value === 'string');
+  }
+  if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
+    return currentToolInput.edits
+      .flatMap((entry) => (entry ? [entry.old_string, entry.new_string] : []))
+      .filter((value) => typeof value === 'string')
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function isFirstWritePrdWithoutWriteMode(currentToolName, currentToolInput, absolutePath, candidateText) {
+  if (currentToolName !== 'Write' || fs.existsSync(absolutePath)) {
+    return false;
+  }
+  const writeContent = typeof currentToolInput.content === 'string'
+    ? currentToolInput.content
+    : candidateText;
+  return isPrdRequirementsArtifact(writeContent)
+    && frontmatterFieldValue(writeContent, 'write_mode') === '';
+}
+
+function isPrdRequirementsArtifact(text) {
+  return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(text);
+}
+
+function frontmatterFieldValue(text, fieldName) {
+  const lines = String(text || '').split(/\r?\n/);
+  if (lines[0] !== '---') {
+    return '';
+  }
+  const fmEnd = lines.findIndex((line, index) => index > 0 && line === '---');
+  if (fmEnd === -1) {
+    return '';
+  }
+  const pattern = new RegExp(`^\\s*${fieldName}:\\s*(.*)$`, 'i');
+  for (let i = 1; i < fmEnd; i += 1) {
+    const match = lines[i].match(pattern);
+    if (match) {
+      return match[1].trim();
+    }
+  }
+  return '';
+}
+
+function isWithinRoot(candidatePath, rootPath) {
+  const relative = path.relative(rootPath, candidatePath);
+  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function block(message) {
+  process.stderr.write(`${message}\n`);
+  process.exit(2);
+}
+
+function readStdin() {
+  if (process.stdin.isTTY) {
+    return '';
+  }
+  try {
+    return fs.readFileSync(0, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function parseJsonObject(raw) {
+  try {
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}

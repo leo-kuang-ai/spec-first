@@ -1,0 +1,10 @@
+{
+  "id": "route-runtime-refresh",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 44863,
+    "cached_input_tokens": 12800,
+    "output_tokens": 589,
+    "reasoning_output_tokens": 154
+  }
+}

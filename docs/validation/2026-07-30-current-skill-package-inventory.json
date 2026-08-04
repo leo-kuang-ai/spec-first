@@ -1,0 +1,3961 @@
+{
+  "schema_version": "spec-first-current-skill-package-inventory/v1",
+  "source_head": "b72a6234ba37ec7f3177cbf7ab7438f91b129070",
+  "skills_tree_oid": "bebfcb81c0bad3fb1c82b73c50dd66627cbeae34",
+  "source_mode": "working-tree",
+  "manifest_sha256": "374edb27dc87fd3c29c8ba5469a6592c81b9ad19d1728c848ef701bc86285398",
+  "skill_count": 35,
+  "file_count": 559,
+  "per_skill_counts": {
+    "spec-app-consistency-audit": 80,
+    "spec-brainstorm": 13,
+    "spec-code-review": 53,
+    "spec-commit": 1,
+    "spec-commit-push-pr": 3,
+    "spec-compound": 20,
+    "spec-compound-refresh": 9,
+    "spec-debug": 6,
+    "spec-doc-review": 34,
+    "spec-dogfood": 3,
+    "spec-explain": 7,
+    "spec-handoff": 4,
+    "spec-ideate": 12,
+    "spec-lfg": 7,
+    "spec-optimize": 18,
+    "spec-plan": 61,
+    "spec-polish": 16,
+    "spec-pov": 14,
+    "spec-prd": 34,
+    "spec-product-pulse": 3,
+    "spec-promote": 2,
+    "spec-resolve-pr-feedback": 10,
+    "spec-riffrec-feedback-analysis": 7,
+    "spec-rule-miner": 4,
+    "spec-runtime-setup": 62,
+    "spec-simplify-code": 4,
+    "spec-strategy": 3,
+    "spec-sweep": 13,
+    "spec-test-browser": 4,
+    "spec-test-xcode": 1,
+    "spec-work": 14,
+    "spec-worktree": 2,
+    "spec-write-skill": 18,
+    "spec-write-tasks": 14,
+    "using-spec-first": 3
+  },
+  "files": [
+    {
+      "path": "skills/spec-app-consistency-audit/evals/evaluation-governance.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "evaluation",
+      "bytes": 2435,
+      "sha256": "c83de1fed0ad10a7bc7bb64ccb5357959c31b8022cfe82a89ec8c3fe070b6b17"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/evals/examples.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "evaluation",
+      "bytes": 5867,
+      "sha256": "9d26b0ccfa1268b7d84ae31b73b3c6b87bc10b3662c50f879a3f203307e643de"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/evals/README.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "evaluation",
+      "bytes": 537,
+      "sha256": "dc00f022c4e1bc51d1840ca0fc0bb389578b1b8de36d7b85c3bdc819cf85c07a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/evals/recorded-output-fixtures.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "evaluation",
+      "bytes": 3833,
+      "sha256": "fbb73262d0c85180a4231dac438edc6dab83212208862b14ae3994d0ba6ac25a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/accessibility-i18n-lens.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 1666,
+      "sha256": "fb534ada001ed3bd9789700da04d88df4a2ce7aa213f8c16be40c2445c91a543"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/analytics-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2075,
+      "sha256": "5444b8fc19476534a1a08f211b292bff9377a78927f91f05e3aedcd3bf5a171a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/audit-planner.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2965,
+      "sha256": "eaa749964721638205d8d2e11625e7db76181cd569bb6795dfd1187925d8a047"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/component-module-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2064,
+      "sha256": "0addc66a8b8c70c5c772be733e8544c4ca734b2161123117aae7a283c0629a60"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/engineering-quality-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 3071,
+      "sha256": "1151982ecf12ae0c7eb214ca413e401b0e70f5ac36c17bf1d9a79c652dd1834b"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/evidence-auditor.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2788,
+      "sha256": "c45ea47aa7996887558b8b23aa0c4c7ac57b1a52b17c4ddb76ecaef447fa871f"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/figma-design-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2186,
+      "sha256": "96e0aa9ceba371716d476d41e7fdaefb335a9036f27dbdcb530d8f087c722ad8"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/i18n-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2083,
+      "sha256": "56c9dc85bbecc151be88c3cb40175141a37c01d8d82a608f7531bc792c670afb"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/industry-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 1882,
+      "sha256": "a09114a9f1e4850ab8d2e875688cd17c771d1dcecee83597c4399ea30217de7a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/kmp-clean-architect.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2607,
+      "sha256": "4ff2092fda9674e1aa7c7655dd7997a94f09b45eaf6297d3949dbd6db430b9e8"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/mobile-ux-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2472,
+      "sha256": "fc4137450056afbd1f2462f803dd612caba5800e24bf1406f93a9f6f397c525d"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/orchestrator.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2645,
+      "sha256": "1e7634016d5f9fddedb4a3c74085a6470ad0186de9c4beba7ed17ae62a12eb3a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/page-route-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2337,
+      "sha256": "1be48a9a0dbb7f5d226df70f1cc0a9e4484fa38d244afc5a20ccde82472d83f7"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/product-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2214,
+      "sha256": "267c4906b6ff31290fa710f0f45abdc2023ef34d8969b4a26676fa50ddfef116"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/regression-expert.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 1927,
+      "sha256": "36f728c885dff45a7b62bad5f9f92fe3147bc5dc8a964bc46262794e7a9be2cc"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/prompts/report-writer.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2036,
+      "sha256": "b399d32b84f3d8d42cccb2c987ab6cbdd745cabd65f5f16c902cd8c81f69702c"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/README.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 3724,
+      "sha256": "6748ef59c2e235c3894f8f7f68cfdf645b903badb88f0c084212f5315dce7b15"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/references/ecc-source-lock.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 10467,
+      "sha256": "3f7aa98492c00df56f8a5cd631b12468b16dfcce0f14394bca33c3c9fbcaa5db"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/references/headless-runner.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 5790,
+      "sha256": "dc2b0402da9cde3563a19d227f062ae1f65fb60274b0475a75366a1d2e858325"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/references/mode-output-contract.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 8363,
+      "sha256": "2bda3e1c716bc4a7a1dd06058604824ba6d0c02f6f1a3c2a955cbaad4ff7415c"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/references/pilot-validation.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 2148,
+      "sha256": "e0beb253ac9abee166fcde8e6d9fcec79b50c729f6904e516f6b5710e8fde774"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/references/report-format.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 1257,
+      "sha256": "2c910d356e4d1bf1cc4d11a69c50c6bdee764ee1362ff97288c42a0daa98d6c9"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/analytics/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 502,
+      "sha256": "4960972ce883a2968d8ffba808ea13f0a905ebc29ae2c8296472fe3dad49bc33"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/common-app/checklist.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "reference-contract",
+      "bytes": 320,
+      "sha256": "0490242be7ebd68b564ce7bce79483f3e949d3c4dcfc086f7c4fb49b6eec16cc"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/common-app/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 555,
+      "sha256": "e8db58e3ce8abdc473e262305256a59e7518d7dc8a92b0b99cb34a576830d0bf"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/component-module-reuse/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 697,
+      "sha256": "ddf0cd0101ac7ff1e3ef1e299f5517624509e6ea9ecad15a051964fb34eb7796"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/i18n/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 570,
+      "sha256": "4cf9a7d59c01b02ed5882352ba34beef77b4a146cc3223e06c4c80f48ea0a70a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/industries/ecommerce/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 618,
+      "sha256": "fcce6bc94bdc2f1b97b6580369e9c69d0aaa1e9175ab0adf34d3fe926ce6e17e"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/industries/finance-common/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 912,
+      "sha256": "8b1b191de5209a80b0f4892c11ef94337821a8dd51e7fef343fa20d7c2b30972"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/industries/securities/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 730,
+      "sha256": "93c5a3e27144a298b54ed70fd86ba3a3bd99d87619748d6c881d49ce5564532c"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/rule-packs/kmp-clean-architecture/rules.yaml",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "support-asset",
+      "bytes": 622,
+      "sha256": "fc731420629cffd24cc4b8b7559c0a93c0e5518571c22d9ab6c41ca3a9f3eb2d"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/analytics-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 945,
+      "sha256": "eaccdf68f4925878dccde7d0e28a7ceb312bf6f47524aafa337e638a248f3aed"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/app-audit-context.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1236,
+      "sha256": "c10e4b72e5c89acd3309cc21a9cbc1761a4c456bded845b62d2dc815a046c9b5"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/artifact-manifest.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1431,
+      "sha256": "ae512d0964ed52e4297fbe9ec61c901573df6e0f450414b84dd08c29632a571f"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/audit-plan.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1167,
+      "sha256": "d7529359ce1c52074ee1100f089dc13522f1fd48ec70b97086e77da571736e5f"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/audit-report.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 5295,
+      "sha256": "433ca911378f68b8647a081828ac513c5712cbb33ee91d0e694d14d8f7494e14"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/codebase-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 975,
+      "sha256": "aca5d333d0e41719fca2399ae6a14558125cccdea090ce6b48d379c9b746c579"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/component-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1029,
+      "sha256": "69613a333162eba98faed87230d159a9210846ed9c5562a97ff1894fbed21ca8"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/engineering-quality-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 989,
+      "sha256": "da96749acf3a6348ac2c638c9614fa43e02de337570d86f9bcbf56ff5ef874f5"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/figma-design-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1103,
+      "sha256": "52a40eeeec92f16172db37ad03d0d137cc384a5e5dcb19135bc75a4fe98583e0"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/i18n-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1037,
+      "sha256": "873b915c91a0b39412940ee2e8ae28911d2cf33a31d320b64528b9dfc3505c25"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/impact-facts.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1697,
+      "sha256": "28356fabded432edafcf7aebb0cea077e0491b4f53fb744ba26531614c0e986b"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/industry-profile.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 950,
+      "sha256": "8c1cb4923a25ae8fbc544f84848d22c5ceeb7f7d94f7d5749112af11d38ecd44"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/issue.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 3554,
+      "sha256": "ada287c8f5da57b9b23a7ce56b14b9f83c5a83c50391f4324902bde0403a331a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/issues.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1028,
+      "sha256": "62e3a82650732a6e4530b0aa012ff1706c23f924ade021fd8230f869623d258e"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/kmp-architecture-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1092,
+      "sha256": "bf8bd74f0de093b0feacad85956e1f9b9d1070c385b5cdd5d6ee91939059c185"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/merged-app-audit-context.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 947,
+      "sha256": "3d476cf9a419fe5a0d522322d794bc5404fe2653e9af0073d31f5c0a29fa93d0"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/metadata.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1679,
+      "sha256": "a61a6c8f172e067462ffb8690b60293aff40584d8657511a28be834852f36932"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/module-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 1131,
+      "sha256": "004b44b6757d943fda65cae47be9d69e14d4bf6f2017452cb0299d4b9836b2a2"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/page-route-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 940,
+      "sha256": "c277d8c4cbbaef601dbc9c9edb559e24346990f0c28d75dea2ace8b86ad76938"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/preflight.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 2426,
+      "sha256": "260a04c018dbc9a8e18253282e924b798b50105dcac2dc8126d95e72bba615a1"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/product-contract.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 971,
+      "sha256": "cd1c04bafc26cbd12b273a6434fddc6ec8e0db10b418bbdc2f6b1433e2ae16c0"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/schemas/rule-pack-selection.schema.json",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "machine-contract",
+      "bytes": 985,
+      "sha256": "1b90e8324c4cb32e1fb9d4d1de08adfc800ab812b37425d2be2d34e124040486"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/build-artifact-manifest.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 4394,
+      "sha256": "1b551c6c296e0afbd70f80cf513d5a058d36e50209d1972020c18d788ddee770"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/build-audit-context.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 4890,
+      "sha256": "b43d1d671f0723a44d72925de848104d14c972e030c898b6695bf3ad94f8ba40"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/build-impact-facts.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 14350,
+      "sha256": "feaa18f06dea9e1f7c64e8c09361ceab0f526aac3ee605d1fd5fe2133577e2a4"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/build-industry-profile.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 6293,
+      "sha256": "cc2f650a82ed60df1076dd41112fa64d2a53103e68ea1e8b3ae2c5223e997927"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/build-run-metadata.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 7178,
+      "sha256": "c8f4f189bd90fb7a914b48c69bf8e909431d22ae44360f10d96355b6ad6803cd"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-analytics.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 3884,
+      "sha256": "d9b62a9251e0442c3f8fee16d4005a94d24495df584fc8346cda66673c545d1c"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-code-contract.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 7527,
+      "sha256": "6ed86dab7501d6e0a3d85d638f29612a220a4a4a9a04d49ec2a2bbbe7be0295c"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-components.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 5658,
+      "sha256": "bbdf7b32544b1c4698a5997485022606f159c27cd57cba80f9180bfea2dfe8f7"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-engineering-quality.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 6500,
+      "sha256": "e75ee7dd77954a30515c838e14a2a9f2e220b51e94f81fd7bab30f4fdbc104bc"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-figma-contract.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 11055,
+      "sha256": "99b525b74672ddb0d6ac3f08683d581ce91368145295e0583635dafe52a2c70f"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-i18n.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 5483,
+      "sha256": "ec23b67c4e268e3c414733e65d72f14cb5ce43dd47faff92fbd8bf784481e848"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-kmp-architecture.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 6709,
+      "sha256": "9a44f856cf5b1601b0bfd6d3da8c26fcdbf0e21b14f67412c6757b5e55a863f1"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-modules.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 7729,
+      "sha256": "9f6d73e956bff9175a3db345b7fb06cdb94fedae92cc6cb8d8b37914de3fd3c8"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-page-routes.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 7178,
+      "sha256": "cea9ddb3bffe1e0af6ce41756493b0acd1cdb63cbe3174b7681fbb5aef57e8ce"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/extract-prd-contract.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 8146,
+      "sha256": "9a11814e8bd7703ea9037f72d4a3f6e845d85215879cdf35e04bb90b77866091"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/lib/audit-utils.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 35819,
+      "sha256": "07c22d91369918b64881d3f6c57a9b9060dc48d7154d9d982175625b363a9cd3"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/merge-contracts.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 31298,
+      "sha256": "075def36026d22f8c56ad9e5d00c427c72da5266d0879c0ad2340ac732fbc7f3"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/preflight.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 21598,
+      "sha256": "39f44117a67b9f24e24b1be1aa5dbff59c365c7b26cf223f4ab96a306720a265"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/render-headless-envelope.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 8326,
+      "sha256": "c9c900c78359a2a6c8d4108129f97842ac693b7e2e1502b01a4f71b6236f71ce"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/run-audit.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 21759,
+      "sha256": "32ca9eb7f6a1598cd3a1ff40aed21c84565c3aa3cea2076b58b6dd038ebb429a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/select-rule-packs.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 5705,
+      "sha256": "30a1eaa0f8777aa42fcea96a9642bebce536fe4b37963fbf5a167c51bfc85dfb"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/scripts/validate-artifacts.js",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "deterministic-helper",
+      "bytes": 38467,
+      "sha256": "4ef4196afcbdad3a039cbbc4ef65ffa7605e02cda5ffab8a73435c390a1af59a"
+    },
+    {
+      "path": "skills/spec-app-consistency-audit/SKILL.md",
+      "skill": "spec-app-consistency-audit",
+      "owner_role": "entry-contract",
+      "bytes": 17676,
+      "sha256": "15e75ce0985990f04ed92d2f2231a5f0e939614d883b7e05ac85688eb3cc3a05"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/agents/slack-researcher.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 10456,
+      "sha256": "74b5168f5c71001da2552d3e1f546d68dcb69918e8d3d72da774be9f34654cea"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/blindspot-pass.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 7562,
+      "sha256": "d173accf20219ad100a048382e453436f6ece885d586678f4106bc750da7e57e"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 19696,
+      "sha256": "9db1310fbfe61e0d3676feed8be10913b2e8cfe73357f544f0418676400b2105"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 12132,
+      "sha256": "ba1d3caa46f0fbfb5e4e516968ea2f9014792433e4a608582fe04d610da23c73"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/html-rendering.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 34523,
+      "sha256": "62685237eeab7a1d213c631f607f8f79104971c686baa99eaf5767d57f5b8b9b"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/markdown-rendering.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 10321,
+      "sha256": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/model-tiers.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 1512,
+      "sha256": "cb8dc0df5b4eb782a1405e71641f206e76cc50eae1f42a35c10262ba20793208"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 4405,
+      "sha256": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/settled-decisions.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 4951,
+      "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/synthesis-summary.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 25727,
+      "sha256": "2e22de0fbeabf5b265e023a690a33711b8756d730c3a9b898dda5a9202255497"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/universal-brainstorming.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 7275,
+      "sha256": "f3090f0c5315d09ad0d44ed66a2b5b31afd630d9345e4fa26aba0561d8776769"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/verdict-routing.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "reference-contract",
+      "bytes": 4369,
+      "sha256": "be20df74222ad7107016495029317d51406817181c216285376943c68362a47c"
+    },
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "skill": "spec-brainstorm",
+      "owner_role": "entry-contract",
+      "bytes": 44658,
+      "sha256": "7d38006a3eb1362d43cb6ec52dabcef8fcd5c959c992a1e3b46ae2b36bb89fca"
+    },
+    {
+      "path": "skills/spec-code-review/evals/api-contract-capability-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 2563,
+      "sha256": "8a411c04bdec6f9cb573d43d4476e19c4a38c2097970e0eec00e14c8f5627297"
+    },
+    {
+      "path": "skills/spec-code-review/evals/cases/agent-mode-remains-read-only.yaml",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 1151,
+      "sha256": "038133d88c5ed6524755e14f615b633e8a89404bd9adc9f78fdc55899a40c04e"
+    },
+    {
+      "path": "skills/spec-code-review/evals/cases/conflicting-scope-fails-early.yaml",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 670,
+      "sha256": "3de1d2df77a1646fa8fbe9e35d1bf726b80939b724a72a6aa63aeec7d6dea768"
+    },
+    {
+      "path": "skills/spec-code-review/evals/cases/report-only-detects-tenant-bypass.yaml",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 978,
+      "sha256": "20804d25a204ba30d08559e2db78bc5bc90be4ea8f121ef0432dbc4029d933f2"
+    },
+    {
+      "path": "skills/spec-code-review/evals/deployment-verification-activation-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 1654,
+      "sha256": "6f142599fd1ca8b39641f947ded90c6669cb7672fcd7d42572600606675d8e51"
+    },
+    {
+      "path": "skills/spec-code-review/evals/eval.yaml",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 460,
+      "sha256": "e3eac9f2cfbc5d7a1598a74764cd6ecd0056232c514b4cfe3efa700d9c4a66e9"
+    },
+    {
+      "path": "skills/spec-code-review/evals/examples.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 2529,
+      "sha256": "a7eb322523a338d3e83eaec4e74e8300750e2c5142481d6662161ea368c021f2"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/AGENTS.md",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 139,
+      "sha256": "8713d817e36a234a9b2aee073a06bd7621b82ed1eb0b75e52e111de8da1850ce"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/package.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 130,
+      "sha256": "1cf5818d60b260024aa2b494643cbe0ddbebe034acc032bb5384393af8ee790d"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/prepare-review-fixture.sh",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 195,
+      "sha256": "1bec15a4056e617692ad571768e4fb964ac60b28bc48fccd23cf0055b1e5846f"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/src/orders.js",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 265,
+      "sha256": "539f53e835599f8bd4e43baf21ceb6bdefa0fd38a24f3427a15a8196e648ad91"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/tenant-bypass.patch",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 478,
+      "sha256": "fc5a7e8600697a29205d45d68279ab5845fcd75aebecce7353db30fc39a0f1b8"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/repos/tenant-orders/test/orders.test.js",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 338,
+      "sha256": "c064f02cb0a295730de0da929df3e67376e352aa8a735d560635078d7e48ddde"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-agent-mode-read-only.sh",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 1689,
+      "sha256": "225b40996884048a1d510d6e65bcd25636a18550901a2725e8e31112cc6d1f53"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-conflicting-scope.sh",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 698,
+      "sha256": "73fc75375b64db3435516b72f7079aee6d5e8a0509ea63903bcc4083e23582d4"
+    },
+    {
+      "path": "skills/spec-code-review/evals/fixtures/scripts/check-report-only-tenant-bypass.sh",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 908,
+      "sha256": "dc827d5904945a1a5d7c51cfb5fc565b4edb529facb3cc595f314bc421b37556"
+    },
+    {
+      "path": "skills/spec-code-review/evals/frontend-quality-capability-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 4218,
+      "sha256": "970aa9a77d7f682b510a28ecfb391e7d4b87ebdfbbee90f6f112426da8d278d8"
+    },
+    {
+      "path": "skills/spec-code-review/evals/maintainability-capability-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 2728,
+      "sha256": "50dd7f60138422a9de6a4d749b37b27fb1a688b26a133af91e7a7aa4f26e5853"
+    },
+    {
+      "path": "skills/spec-code-review/evals/reliability-capability-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 2355,
+      "sha256": "2dcad73bb1409f70ff4d734e4ed149a28553e72e94329280792c54884f082b64"
+    },
+    {
+      "path": "skills/spec-code-review/evals/security-capability-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 2439,
+      "sha256": "ab7536d0eed9073a9d95fa00502560bf59fc5c37bee0684b568065e7fb794b33"
+    },
+    {
+      "path": "skills/spec-code-review/evals/testing-capability-cases.json",
+      "skill": "spec-code-review",
+      "owner_role": "evaluation",
+      "bytes": 2347,
+      "sha256": "2bae5e78fcd3627265e2f783bc864bc267633f767bc1ab5533f5c21c232c390f"
+    },
+    {
+      "path": "skills/spec-code-review/references/action-class-rubric.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 1587,
+      "sha256": "c0e4aaa3263ca4f9f7b9776cd805bbeabc0d68a6238e9dacd6df45ab14d0fa9d"
+    },
+    {
+      "path": "skills/spec-code-review/references/apply-findings.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 2043,
+      "sha256": "704217f4629c2e4ed9744d6c91fe1ce40973e1ace678e55e26588532dc82f79b"
+    },
+    {
+      "path": "skills/spec-code-review/references/cross-model-review.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 3176,
+      "sha256": "6bf5cdccf7cadc87e243f9bf3b108ee690c161996c1c93c4a7ca96f71ec467d9"
+    },
+    {
+      "path": "skills/spec-code-review/references/diff-scope.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 2765,
+      "sha256": "591a46abfd277ac701b4b50e2326d2e52aa487a81fbfe21a2fc4762ca44e1c4f"
+    },
+    {
+      "path": "skills/spec-code-review/references/findings-schema.json",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 9074,
+      "sha256": "777cc5a72b9fc03fb69f7425af082b1c5d80df598d36b9843e48d6cea439f805"
+    },
+    {
+      "path": "skills/spec-code-review/references/persona-catalog.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 6594,
+      "sha256": "367ece581175107c09f52f5c72008d62766407666af9402d55d7238c4e37ea50"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/adversarial-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 9750,
+      "sha256": "0b39270f6c585430f1bcce4154b7b54664ee6dbcbb37396536dfbcb8cbb16820"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/agent-native-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 9379,
+      "sha256": "41548eb73a661d6491cf968e6401d9d4608d26f4137b10c3169ce55a0e81740d"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/api-contract-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 6216,
+      "sha256": "3654f37a85d9c122ab19c27dc132eacc23a189c49cb313d993e4d06ac2b4c94c"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/correctness-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 5722,
+      "sha256": "36a5e5378753345688741a20faa3c19878a6a64e2b4d41c2c06695c15d6eaa81"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/data-migration-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 5000,
+      "sha256": "be7dc853a91d5c404638ab2eea1018513b81d9579857bcb7c7aac616f929152e"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/deployment-verification-agent.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 5430,
+      "sha256": "04d8a5e5dad6c84955ab841aa2e2362f58a6b1f2111e88caaa4ca96ca2b65e8a"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/frontend-quality-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 3001,
+      "sha256": "36e65a9eb34863b8f072b85210202758da703606e3584b1d32688cef34e1a9f4"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/julik-frontend-races-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 3684,
+      "sha256": "915289507bb863444d3ccb155a75c1a099121b6807dea3e451908d0a51ec48e0"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/learnings-researcher.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 16607,
+      "sha256": "4db7ba4d4273e3c3f2b528aa8151bdd33b993fe80e33c8660329f38e84a63813"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/maintainability-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 6495,
+      "sha256": "1ce20f2617a8aab1b62cd1122822bcc8d986fa8131f15d18fa6b2bfeaab3a9c5"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/performance-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 3554,
+      "sha256": "014136a7c3f58494752396e7716a20d75adf8fdea47fa015a43bbbcd17909125"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/previous-comments-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 3417,
+      "sha256": "27cf0694aec33972d2dd802f03a25411df3cf1d10cc0714750165f4377df1e56"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/project-standards-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 6819,
+      "sha256": "f936be9a265ae7249341886c23e81fae7ca27d3767b7f104fc116b5c77e4d7f5"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/reliability-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 5753,
+      "sha256": "5ad0d41c3e520e0857541ab09b462182e15308ea02f80f5746bab4b87026eaee"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/security-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 6093,
+      "sha256": "7b64a3011510fe1478e3ffadb7a70322648278292105214a6052bc2bb64e7a58"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/swift-ios-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 10779,
+      "sha256": "5c706ddaf1986312d15cbb1146f41a5373f1048741d33916cd86303adda9a18f"
+    },
+    {
+      "path": "skills/spec-code-review/references/personas/testing-reviewer.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 6830,
+      "sha256": "1980da7cd825b7f49e3faecec6c234458684f054406458a5e023d0acb412c9e4"
+    },
+    {
+      "path": "skills/spec-code-review/references/review-output-template.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 15092,
+      "sha256": "902a60fbf871ee2c81ce0df8cc958ee1d1c2220b091365c63152ae17692cb5d6"
+    },
+    {
+      "path": "skills/spec-code-review/references/subagent-template.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 25449,
+      "sha256": "04de8b6a4e48777b6f70c52d876225577a2e083feae91100d6090994db40f79e"
+    },
+    {
+      "path": "skills/spec-code-review/references/validator-template.md",
+      "skill": "spec-code-review",
+      "owner_role": "reference-contract",
+      "bytes": 5456,
+      "sha256": "360f7b9b935e8c39c190a2cac2dc88aa31b661af5f4592355cfc6ac10e8ee4da"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/cross-model-adversarial-review.sh",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 8549,
+      "sha256": "03aa09491b9c14e677ce6de5a0a403aecda887eedbce9abd1da347e5007b0290"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/findings-mechanics.py",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 8934,
+      "sha256": "b025d98df3fc5f571451a3a43673362fc010c43c4adb2a9be581cec600af345e"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 88497,
+      "sha256": "35d33380f2cc1c07d7852deb983726723ccd20ebb028991dca04a7358d517c93"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/review-scope.py",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 10118,
+      "sha256": "ba359514ba60020b18381b1b1cf9268d16056e539f2bdd8e9c109ff1b8c8cc52"
+    },
+    {
+      "path": "skills/spec-code-review/scripts/run-python.sh",
+      "skill": "spec-code-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 774,
+      "sha256": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9"
+    },
+    {
+      "path": "skills/spec-code-review/SKILL.md",
+      "skill": "spec-code-review",
+      "owner_role": "entry-contract",
+      "bytes": 123834,
+      "sha256": "e6d1b0c08bb22f105e4c00a162144c61a1c8a4de1ec385319e50b6e954811ba6"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/branch-creation.md",
+      "skill": "spec-commit-push-pr",
+      "owner_role": "reference-contract",
+      "bytes": 4021,
+      "sha256": "5cb38eb8314ad50a1d4f2a892081e6bc802d7fcd23080b8bcd198987d60c97ef"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/references/pr-description-writing.md",
+      "skill": "spec-commit-push-pr",
+      "owner_role": "reference-contract",
+      "bytes": 26255,
+      "sha256": "e55b6585b53ea6b483d328c12693a92c4fd2ec1654caa1b4f37bc5096039dde4"
+    },
+    {
+      "path": "skills/spec-commit-push-pr/SKILL.md",
+      "skill": "spec-commit-push-pr",
+      "owner_role": "entry-contract",
+      "bytes": 21594,
+      "sha256": "d49005675aafaee34f33716ed1a081c697d13256b771c2f6d24a02cb0e2e7a2e"
+    },
+    {
+      "path": "skills/spec-commit/SKILL.md",
+      "skill": "spec-commit",
+      "owner_role": "entry-contract",
+      "bytes": 7436,
+      "sha256": "debaaaa92095c210e91403465ea5146e4050722bd0dda513ef95fa71195c1b74"
+    },
+    {
+      "path": "skills/spec-compound-refresh/assets/resolution-template.md",
+      "skill": "spec-compound-refresh",
+      "owner_role": "reference-contract",
+      "bytes": 2910,
+      "sha256": "5497072f9386e7d96cd84e6b07363a0ba75078a074e2f529292e02da427dbac5"
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/concepts-vocabulary.md",
+      "skill": "spec-compound-refresh",
+      "owner_role": "reference-contract",
+      "bytes": 6336,
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71"
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/per-action-flows.md",
+      "skill": "spec-compound-refresh",
+      "owner_role": "reference-contract",
+      "bytes": 10913,
+      "sha256": "e17dd2539696057668afcc44d54f597ad1ae85cffa23bd120fc0a681f5c60d14"
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/schema.yaml",
+      "skill": "spec-compound-refresh",
+      "owner_role": "reference-contract",
+      "bytes": 8605,
+      "sha256": "0964ba09dd528ad09c079e16ee6e5d6b8e847d32034ff49e7c6ea203b5fd58ac"
+    },
+    {
+      "path": "skills/spec-compound-refresh/references/yaml-schema.md",
+      "skill": "spec-compound-refresh",
+      "owner_role": "reference-contract",
+      "bytes": 7755,
+      "sha256": "5b05f640df1c53608073cceaa64be706fea96b4f3febb6802f6dec73537e971a"
+    },
+    {
+      "path": "skills/spec-compound-refresh/scripts/run-python.sh",
+      "skill": "spec-compound-refresh",
+      "owner_role": "deterministic-helper",
+      "bytes": 774,
+      "sha256": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9"
+    },
+    {
+      "path": "skills/spec-compound-refresh/scripts/validate-doc-claims.py",
+      "skill": "spec-compound-refresh",
+      "owner_role": "deterministic-helper",
+      "bytes": 14095,
+      "sha256": "557ba58cc7b7f8041d0b7338c8e0724c1fd0a7fc8c6384189812b570125e04e9"
+    },
+    {
+      "path": "skills/spec-compound-refresh/scripts/validate-frontmatter.py",
+      "skill": "spec-compound-refresh",
+      "owner_role": "deterministic-helper",
+      "bytes": 12740,
+      "sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+    },
+    {
+      "path": "skills/spec-compound-refresh/SKILL.md",
+      "skill": "spec-compound-refresh",
+      "owner_role": "entry-contract",
+      "bytes": 58534,
+      "sha256": "4424b53322b041a796df771279fd5f22e974158b42d65292c42cee02c022ab70"
+    },
+    {
+      "path": "skills/spec-compound/assets/resolution-template.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 2910,
+      "sha256": "5497072f9386e7d96cd84e6b07363a0ba75078a074e2f529292e02da427dbac5"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/best-practices-researcher.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 7423,
+      "sha256": "be205f2e10c5e153bd5db293e3e41885414d0e75c62a8026b5857bee983c9852"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/data-integrity-guardian.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 3216,
+      "sha256": "db9cd2ee40e30bdf8b84bb6abaff03f61b44a04218875637a651a66cbf0d7900"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/framework-docs-researcher.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 5682,
+      "sha256": "8d336dfcfcf36f8b8e5eed1070932c7ffb1af48c9eb813b5c00a029cf32d4753"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/pattern-recognition-specialist.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 3675,
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/performance-oracle.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 4588,
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/security-sentinel.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 4147,
+      "sha256": "f84717fe79958d66eab7528d5eecf91704b05121dd565e31b7536eadf2d9e5ed"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/session-historian.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 7910,
+      "sha256": "c90377c86e04ea79aa6e89c5f3be02f6b6cfefeeb3c5c51f895ae7258f035ef8"
+    },
+    {
+      "path": "skills/spec-compound/references/concepts-vocabulary.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 6336,
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71"
+    },
+    {
+      "path": "skills/spec-compound/references/grounding-validation.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 6319,
+      "sha256": "0295ee3be2f19b22b95568cbf17b846d20ff75e358331077fd477da95aa5ad19"
+    },
+    {
+      "path": "skills/spec-compound/references/schema.yaml",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 8605,
+      "sha256": "0964ba09dd528ad09c079e16ee6e5d6b8e847d32034ff49e7c6ea203b5fd58ac"
+    },
+    {
+      "path": "skills/spec-compound/references/yaml-schema.md",
+      "skill": "spec-compound",
+      "owner_role": "reference-contract",
+      "bytes": 7755,
+      "sha256": "5b05f640df1c53608073cceaa64be706fea96b4f3febb6802f6dec73537e971a"
+    },
+    {
+      "path": "skills/spec-compound/scripts/run-python.sh",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 774,
+      "sha256": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9"
+    },
+    {
+      "path": "skills/spec-compound/scripts/session-history/discover-sessions.sh",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 4282,
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4"
+    },
+    {
+      "path": "skills/spec-compound/scripts/session-history/extract-errors.py",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 9960,
+      "sha256": "be8fc525516eca1c2438b1ba95da82a4dee1080f2fcc0a55dbec6988722de1b2"
+    },
+    {
+      "path": "skills/spec-compound/scripts/session-history/extract-metadata.py",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 17763,
+      "sha256": "6128adcdf1b4627e4090afd564c8f275e6087fc3c2e32a9c062d2283452c7e71"
+    },
+    {
+      "path": "skills/spec-compound/scripts/session-history/extract-skeleton.py",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 21462,
+      "sha256": "04db8e446b88c83978ec31e82b0f737c2d70b1ae88b1c6b5f23fe7c5906dcceb"
+    },
+    {
+      "path": "skills/spec-compound/scripts/validate-doc-claims.py",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 14095,
+      "sha256": "557ba58cc7b7f8041d0b7338c8e0724c1fd0a7fc8c6384189812b570125e04e9"
+    },
+    {
+      "path": "skills/spec-compound/scripts/validate-frontmatter.py",
+      "skill": "spec-compound",
+      "owner_role": "deterministic-helper",
+      "bytes": 12740,
+      "sha256": "097dd8a84c70ab5888e115d30c63cd8f346fc59a0d835061409c8f9e95871dfb"
+    },
+    {
+      "path": "skills/spec-compound/SKILL.md",
+      "skill": "spec-compound",
+      "owner_role": "entry-contract",
+      "bytes": 69403,
+      "sha256": "4175df37b71893dffda7eec5acea42f28cea136bb0edce668879e85838703c21"
+    },
+    {
+      "path": "skills/spec-debug/evals/examples.json",
+      "skill": "spec-debug",
+      "owner_role": "evaluation",
+      "bytes": 2373,
+      "sha256": "965fad3a9696c3bb3a1348c3bba0a425e2cd29687110eff785bbc6cbf27b4ee9"
+    },
+    {
+      "path": "skills/spec-debug/references/anti-patterns.md",
+      "skill": "spec-debug",
+      "owner_role": "reference-contract",
+      "bytes": 6213,
+      "sha256": "9597012ed66df7e52caa38bfaaaab886e2e48b3807f1aa89640139b907976e6b"
+    },
+    {
+      "path": "skills/spec-debug/references/defense-in-depth.md",
+      "skill": "spec-debug",
+      "owner_role": "reference-contract",
+      "bytes": 2828,
+      "sha256": "56211e8ff51d10df8b46b58d04420ab65f1fd02ec4e4588be4b5af246cc7e046"
+    },
+    {
+      "path": "skills/spec-debug/references/investigation-techniques.md",
+      "skill": "spec-debug",
+      "owner_role": "reference-contract",
+      "bytes": 22977,
+      "sha256": "b18813d9da67613f7469c68d4db34594c8d2cb8b87006f6bf99aa94b5d754149"
+    },
+    {
+      "path": "skills/spec-debug/references/pipeline-return.md",
+      "skill": "spec-debug",
+      "owner_role": "reference-contract",
+      "bytes": 2277,
+      "sha256": "88d86e860573cd0fb8edf94222867a2fe648179ca3d577bdf7b572c2ce1d8018"
+    },
+    {
+      "path": "skills/spec-debug/SKILL.md",
+      "skill": "spec-debug",
+      "owner_role": "entry-contract",
+      "bytes": 38986,
+      "sha256": "b72184a8b9e6eb623c17f7f0897e1b16468f95fca22b0075b713fd751e1e49fc"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/report-only-cases.json",
+      "skill": "spec-doc-review",
+      "owner_role": "evaluation",
+      "bytes": 2331,
+      "sha256": "c72bc1957c93d24f6b63eabe44556e70203e467000f066a6493cba7426a17d03"
+    },
+    {
+      "path": "skills/spec-doc-review/evals/task-pack-review-cases.json",
+      "skill": "spec-doc-review",
+      "owner_role": "evaluation",
+      "bytes": 2169,
+      "sha256": "23cca2f48c73a39a5a2746d103e206aa49a01ac55d87a73071f80d2d338cfd7b"
+    },
+    {
+      "path": "skills/spec-doc-review/references/bulk-preview.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 11672,
+      "sha256": "3f56ae33affe9d2afc3f197e70f048bcb80ebf7c61c1cfa2aa84fda4d06dc2cd"
+    },
+    {
+      "path": "skills/spec-doc-review/references/cross-model-eval.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 8542,
+      "sha256": "0f8f9df48e60327d4ec9c61a4858754795c499c7abdc5d32e84632fd86443374"
+    },
+    {
+      "path": "skills/spec-doc-review/references/cross-model-review.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 2267,
+      "sha256": "b8fef7dda5596c1d51e848f4520428070b736112df0a8b934a1b603dfb1726d8"
+    },
+    {
+      "path": "skills/spec-doc-review/references/document-classification-signals.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 2845,
+      "sha256": "9383df56bc9cfd61bbb0c7d12881b144abb2322036d82a5c116e12f3358cd158"
+    },
+    {
+      "path": "skills/spec-doc-review/references/findings-schema.json",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 5012,
+      "sha256": "d20a74985ed53841a717472783f44ded059aac0f4ceb78cedcf53437ed2fbfb7"
+    },
+    {
+      "path": "skills/spec-doc-review/references/open-questions-defer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 10419,
+      "sha256": "9deabe78d81007f13b42c07a77e1e651508d45ead59018a5c40f948791092fd1"
+    },
+    {
+      "path": "skills/spec-doc-review/references/persona-activation-matrix.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 4130,
+      "sha256": "b7093ad807a0bd03076c2f7edfc13afaa27c02dcb981eaa07692efdbc9ea27c5"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/adversarial-document-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 10493,
+      "sha256": "c47fe9915999684e9a1fa2ceda50e0ad20481434c20ae29ceae1df778bf49550"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/coherence-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 9318,
+      "sha256": "e84c8fa209e0b3f6126cb10c21c7e12fffb39952697e38fa14071303e2e14355"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/design-lens-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 4642,
+      "sha256": "f3ae3cd744dab956f519d48a7a87e43f9ec04b97a8071d4ee4ed5b411e44a801"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/feasibility-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 6131,
+      "sha256": "1e186dabf2b6cac325dbfe8466744f8f1b63cda0c15f69fa160e92c97810de36"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/product-lens-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 9180,
+      "sha256": "859381bcc92d914745573a18b418f3e856400af465ec2fce253d6959c9fd5b25"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/scope-guardian-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 5814,
+      "sha256": "1d97e4827eba49bd188c58ed304d3faed797962d22326e763cc63080d7909ae2"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/security-lens-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 4577,
+      "sha256": "8ee54ce6ad97d87c7c959d6e0341701d462fffad7efb75c887df2fc7c337cd8a"
+    },
+    {
+      "path": "skills/spec-doc-review/references/personas/whole-doc-reviewer.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 3056,
+      "sha256": "d1677639d9ad15f14a357d5e88d960475aeb7d7e70b6f5be4b824a5f2b57ac71"
+    },
+    {
+      "path": "skills/spec-doc-review/references/rendering-floor.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 7069,
+      "sha256": "810870373cf8a2621fccc3486ea3642b07fad359f5ffa13e75edc203d836560f"
+    },
+    {
+      "path": "skills/spec-doc-review/references/review-output-template.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 11134,
+      "sha256": "53fe50efbc0267a9f47651a0b4432d2ce51568e071ffe212001b73e93ed81d04"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-confidence-rubric-detail.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 3721,
+      "sha256": "b755358f454798289880e97a0ac4a638a462ea9052cf8b12598995e2ba2bfb3c"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-suggested-fix-advanced.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 5116,
+      "sha256": "4d3d83b04bf0741697e6f3a5f557c2baf7bcf1782447d0ce8869389d664de8ca"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-template.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 10754,
+      "sha256": "8d34d69e638e1fdef76e9404ea16e236609c2ee199f55bf2f935d07a5ba68237"
+    },
+    {
+      "path": "skills/spec-doc-review/references/subagent-why-it-matters-guide.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 3010,
+      "sha256": "16b842e6db99c301d8f13598c631b8a77aa37853f9247ff7c76c2b7aa23438c8"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-and-presentation.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 24449,
+      "sha256": "1b85c98f9358888769235a3ce4e74f6e71625d57575f2e83a3694fd5e6315f3c"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-chain-linking.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 7411,
+      "sha256": "453728ea41289af93c5b501d4063d35fd453f380dbd76bb2feb9f599fabd8a80"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-contradictions.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 1250,
+      "sha256": "5a761ddc035aff52861eb1818e23aebbc3941a8cb50019a84d6441fcbc75e474"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-multi-round.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 3418,
+      "sha256": "20d1585b1662d6f6d77c17e5dca9176b4db44f97a1b9a796893e06c42db36b26"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-premise-collapse.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 2257,
+      "sha256": "a52bf0263c0ca2757bf725a607782de4839ed933f4dc49df86630397c161417b"
+    },
+    {
+      "path": "skills/spec-doc-review/references/synthesis-restatement-suppression.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 2012,
+      "sha256": "617673a2c0953ee0a2e7e4692499d6e67e801ddd46acfe47f3b79773f3d17a4e"
+    },
+    {
+      "path": "skills/spec-doc-review/references/task-pack-review-lens.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 7085,
+      "sha256": "8a1db7a96f948d6be2f2c97c56556799d23f7da8c8c69181bf6562647bad55cf"
+    },
+    {
+      "path": "skills/spec-doc-review/references/walkthrough.md",
+      "skill": "spec-doc-review",
+      "owner_role": "reference-contract",
+      "bytes": 30507,
+      "sha256": "6c2d625488f92b73b1f3f0cc780767ecad98e649844d9f1f7b16841502bdea27"
+    },
+    {
+      "path": "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
+      "skill": "spec-doc-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 8640,
+      "sha256": "535f4350491129276f4b10944546daf645e26b3fe84abe2dc6b846439359a9c0"
+    },
+    {
+      "path": "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skill": "spec-doc-review",
+      "owner_role": "deterministic-helper",
+      "bytes": 88497,
+      "sha256": "35d33380f2cc1c07d7852deb983726723ccd20ebb028991dca04a7358d517c93"
+    },
+    {
+      "path": "skills/spec-doc-review/SKILL.md",
+      "skill": "spec-doc-review",
+      "owner_role": "entry-contract",
+      "bytes": 26942,
+      "sha256": "cd7bbcb4838b3cd6b779140da986b18e1ac25b707676936253225a6c0784e5ca"
+    },
+    {
+      "path": "skills/spec-dogfood/references/dogfood-report-template.md",
+      "skill": "spec-dogfood",
+      "owner_role": "reference-contract",
+      "bytes": 3977,
+      "sha256": "ca894047f4c68dab792cc5a72c16e64b7a393544b990294f22a739fa91f8b02d"
+    },
+    {
+      "path": "skills/spec-dogfood/references/test-matrix-taxonomy.md",
+      "skill": "spec-dogfood",
+      "owner_role": "reference-contract",
+      "bytes": 3871,
+      "sha256": "dbb9951a04279575dd7a6bfcf62a53626fdd6a4bcac98e5f5706f837a3ae357d"
+    },
+    {
+      "path": "skills/spec-dogfood/SKILL.md",
+      "skill": "spec-dogfood",
+      "owner_role": "entry-contract",
+      "bytes": 23470,
+      "sha256": "f29ef6a37a7dbcdbe7ef367f29daf09df3d7d5a4766caa092c25b1707cadb310"
+    },
+    {
+      "path": "skills/spec-explain/references/agents/work-recap-scout.md",
+      "skill": "spec-explain",
+      "owner_role": "reference-contract",
+      "bytes": 2162,
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20"
+    },
+    {
+      "path": "skills/spec-explain/references/check-in.md",
+      "skill": "spec-explain",
+      "owner_role": "reference-contract",
+      "bytes": 2856,
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47"
+    },
+    {
+      "path": "skills/spec-explain/references/destinations.md",
+      "skill": "spec-explain",
+      "owner_role": "reference-contract",
+      "bytes": 2465,
+      "sha256": "b870898dca3895330a91f76ad5c5e315be2d7182b99a2d1499da4e275cfb1853"
+    },
+    {
+      "path": "skills/spec-explain/references/explainer-html.md",
+      "skill": "spec-explain",
+      "owner_role": "reference-contract",
+      "bytes": 3442,
+      "sha256": "c0ea2bce10e12516786e74b1707e3cfab20c1b8f5996643a2be6178bae43d451"
+    },
+    {
+      "path": "skills/spec-explain/references/explainer-markdown.md",
+      "skill": "spec-explain",
+      "owner_role": "reference-contract",
+      "bytes": 2009,
+      "sha256": "d6486b167d61e69cd9a8070908bb5b2921d9dac2e7c528b787abd8af837bda9a"
+    },
+    {
+      "path": "skills/spec-explain/references/intake.md",
+      "skill": "spec-explain",
+      "owner_role": "reference-contract",
+      "bytes": 2376,
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8"
+    },
+    {
+      "path": "skills/spec-explain/SKILL.md",
+      "skill": "spec-explain",
+      "owner_role": "entry-contract",
+      "bytes": 13625,
+      "sha256": "42f65e927ac125e1c5ff1d54cae2fe6faaa15963d6579cebc124692d217d001c"
+    },
+    {
+      "path": "skills/spec-handoff/evals/examples.json",
+      "skill": "spec-handoff",
+      "owner_role": "evaluation",
+      "bytes": 2454,
+      "sha256": "d2da52de91310af01d71d8f163264b35ee4df98f047ceff57b1c45f2222fc917"
+    },
+    {
+      "path": "skills/spec-handoff/references/artifact-contract.md",
+      "skill": "spec-handoff",
+      "owner_role": "reference-contract",
+      "bytes": 3805,
+      "sha256": "b5e06bbffc4b2242b8ac8f7b34bfc4259d02241b4c6e981aa13de183865d3a46"
+    },
+    {
+      "path": "skills/spec-handoff/scripts/handoff-artifact.cjs",
+      "skill": "spec-handoff",
+      "owner_role": "deterministic-helper",
+      "bytes": 14096,
+      "sha256": "4e2474d903338c6215135736296625ea745a8776168aae74bd94762e210e03da"
+    },
+    {
+      "path": "skills/spec-handoff/SKILL.md",
+      "skill": "spec-handoff",
+      "owner_role": "entry-contract",
+      "bytes": 7133,
+      "sha256": "845e122ffb4da32e0e482b535f1a594ab97e907bb66e1079466aaf71ee5ab8af"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 14274,
+      "sha256": "8875cb3b842800f944bb1c175f1646207b7e83371a32c757c0b9acd407be6ab4"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/learnings-researcher.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 16576,
+      "sha256": "7c355f1163ef167efd7b724f7d52b4defde37fab3b774c648024a63013272085"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/slack-researcher.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 10491,
+      "sha256": "9e13ed667d5563d3edb79e1e3e289dc271d126ec81c8529d838445e0d3a06e30"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/web-researcher.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 9079,
+      "sha256": "2556702b89359bd25b0f938f20a43a18db20a09ac3e1de26edc59b8c137b2740"
+    },
+    {
+      "path": "skills/spec-ideate/references/divergent-ideation.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 14135,
+      "sha256": "c55933f2a8b53a515b751498d852d7794a1a0c6b4382018873c56c733f8a188b"
+    },
+    {
+      "path": "skills/spec-ideate/references/html-rendering.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 34523,
+      "sha256": "62685237eeab7a1d213c631f607f8f79104971c686baa99eaf5767d57f5b8b9b"
+    },
+    {
+      "path": "skills/spec-ideate/references/ideation-sections.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 8748,
+      "sha256": "f0a1e5417971f24ed8066dadc05ec694f469dc177e485820ee12b8dff4efc598"
+    },
+    {
+      "path": "skills/spec-ideate/references/markdown-rendering.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 10321,
+      "sha256": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60"
+    },
+    {
+      "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 19427,
+      "sha256": "87633d2e31403cf4c38a4bf2b79cbb810f8325b675883e4e1dd5effb3a927fc7"
+    },
+    {
+      "path": "skills/spec-ideate/references/universal-ideation.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 15249,
+      "sha256": "0081d108f350e178e364929e20b5550edae26cdce04a4dbd0b2015818740a29d"
+    },
+    {
+      "path": "skills/spec-ideate/references/web-research-cache.md",
+      "skill": "spec-ideate",
+      "owner_role": "reference-contract",
+      "bytes": 4154,
+      "sha256": "1169aadede895ccb3f4e8e06731b833d324abd98ab529f08d2f5c5ea021c4edd"
+    },
+    {
+      "path": "skills/spec-ideate/SKILL.md",
+      "skill": "spec-ideate",
+      "owner_role": "entry-contract",
+      "bytes": 53836,
+      "sha256": "2186012d7207ff39e0e124cd17c17b94cab8c81a8c379f541cd751f191c7e586"
+    },
+    {
+      "path": "skills/spec-lfg/references/next-work-handoff.md",
+      "skill": "spec-lfg",
+      "owner_role": "reference-contract",
+      "bytes": 4369,
+      "sha256": "a3164be63fc57c568e04d9960f1d8b0d7c1c570488837f8023e027f8ba2d4de5"
+    },
+    {
+      "path": "skills/spec-lfg/references/pr-watch-loop.md",
+      "skill": "spec-lfg",
+      "owner_role": "reference-contract",
+      "bytes": 3011,
+      "sha256": "d130767f1776f9fd0067fa154158c69aa452229829e50f07280e4bfbd4fe818b"
+    },
+    {
+      "path": "skills/spec-lfg/references/review-followup.md",
+      "skill": "spec-lfg",
+      "owner_role": "reference-contract",
+      "bytes": 3625,
+      "sha256": "01eabbb1154e74263271ebbdf16879aa44942fd60b0aae49eb079521bd0e5ec8"
+    },
+    {
+      "path": "skills/spec-lfg/references/tracker-defer.md",
+      "skill": "spec-lfg",
+      "owner_role": "reference-contract",
+      "bytes": 15494,
+      "sha256": "144db0fc330d7dd20a4f67d297d39c9e1415999f041fa39d77a7c3a416e59f58"
+    },
+    {
+      "path": "skills/spec-lfg/scripts/pr-watch-state.cjs",
+      "skill": "spec-lfg",
+      "owner_role": "deterministic-helper",
+      "bytes": 14629,
+      "sha256": "d00153d777b03bdd226c7f4cca9b92576374cda4e9a0be07505a1bbbd0391132"
+    },
+    {
+      "path": "skills/spec-lfg/scripts/working-tree-fingerprint.cjs",
+      "skill": "spec-lfg",
+      "owner_role": "deterministic-helper",
+      "bytes": 4091,
+      "sha256": "62c6d6a47d6fde296225a6d9063bac841e630b13bc0e44f5a24c491ef8658cb3"
+    },
+    {
+      "path": "skills/spec-lfg/SKILL.md",
+      "skill": "spec-lfg",
+      "owner_role": "entry-contract",
+      "bytes": 23415,
+      "sha256": "f5be47b544ee5a8312f4b33db88499d3bcc4be3bf1c58a3a236b127708d6a21c"
+    },
+    {
+      "path": "skills/spec-optimize/evals/examples.json",
+      "skill": "spec-optimize",
+      "owner_role": "evaluation",
+      "bytes": 1897,
+      "sha256": "cd2f6d1efa75849d334e2fd7c5c557748bb4282589c31c4bdc20cdf3a9b85390"
+    },
+    {
+      "path": "skills/spec-optimize/evals/README.md",
+      "skill": "spec-optimize",
+      "owner_role": "evaluation",
+      "bytes": 385,
+      "sha256": "484162e7060694b4ffc1e2eec87234b55b4ab49945fa9ce4f119e28281301e10"
+    },
+    {
+      "path": "skills/spec-optimize/README.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 1924,
+      "sha256": "395d55fd1fd6c15382814305ba347d3250537a9d8a0c7559f54c2b932e6746d5"
+    },
+    {
+      "path": "skills/spec-optimize/references/agents/learnings-researcher.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 16580,
+      "sha256": "d0161176aec31d84a307c9b4b528393c037a57445e76957d152e541de3b8c982"
+    },
+    {
+      "path": "skills/spec-optimize/references/agents/repo-research-analyst.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 15352,
+      "sha256": "591395e57a3332b5c38824c736e15c85ea9b6184047a30b588c878fabf9b165f"
+    },
+    {
+      "path": "skills/spec-optimize/references/example-hard-spec.yaml",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 1324,
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b"
+    },
+    {
+      "path": "skills/spec-optimize/references/example-judge-spec.yaml",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 1847,
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec"
+    },
+    {
+      "path": "skills/spec-optimize/references/experiment-log-schema.yaml",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 10949,
+      "sha256": "96b505357754fdf8be841cc5c07a6b514693441155ee64a5468417c7d189412a"
+    },
+    {
+      "path": "skills/spec-optimize/references/experiment-prompt-template.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 4070,
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654"
+    },
+    {
+      "path": "skills/spec-optimize/references/judge-prompt-template.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 4716,
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801"
+    },
+    {
+      "path": "skills/spec-optimize/references/measurement-only-calibration.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 3588,
+      "sha256": "0be64c47ea29327fc90e803709fc6b08565795f39d61f62a761f726987cfe562"
+    },
+    {
+      "path": "skills/spec-optimize/references/optimize-spec-schema.yaml",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 19794,
+      "sha256": "8e3520b0a003dde0ad8b17be6f107aa5eb7934ba02d9480ecc63944b52666976"
+    },
+    {
+      "path": "skills/spec-optimize/references/usage-guide.md",
+      "skill": "spec-optimize",
+      "owner_role": "reference-contract",
+      "bytes": 4458,
+      "sha256": "65aa1728ae2f7780b66125994ecbeb13c8ea6be0f745e069104313cc6fc980e4"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/experiment-worktree.sh",
+      "skill": "spec-optimize",
+      "owner_role": "deterministic-helper",
+      "bytes": 19226,
+      "sha256": "413c50424494e44bb181448a37e4bebe8fe5bcdcde2dee40212e67ecd0d3f7d8"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/measure.sh",
+      "skill": "spec-optimize",
+      "owner_role": "deterministic-helper",
+      "bytes": 2804,
+      "sha256": "be7d2878bf0c821ef41cf50e0137b13f2123dbfcc0d347045908b6ab3463357b"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/measurement-admission.cjs",
+      "skill": "spec-optimize",
+      "owner_role": "deterministic-helper",
+      "bytes": 9866,
+      "sha256": "4af1f0dfbe492193937b4317af3cb20b701e5007754296cb25b4cf498973d879"
+    },
+    {
+      "path": "skills/spec-optimize/scripts/parallel-probe.sh",
+      "skill": "spec-optimize",
+      "owner_role": "deterministic-helper",
+      "bytes": 5547,
+      "sha256": "ca3227a9e0b323a5917c469d0e4923ff17d514c703d45be345738abefef4e22c"
+    },
+    {
+      "path": "skills/spec-optimize/SKILL.md",
+      "skill": "spec-optimize",
+      "owner_role": "entry-contract",
+      "bytes": 49405,
+      "sha256": "0d5f22f19d52691f7458098fd87854caddd05cf7e5ec4f81527b8a218c51648b"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 1268,
+      "sha256": "1c80bc1a0182b31e212b1c9a83138144c446a78337635aed57060637bfb9ba9a"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 1295,
+      "sha256": "4f6489dcbdebe8adabc889edad414cfe9d22d9553629095b08523569038c3188"
+    },
+    {
+      "path": "skills/spec-plan/evals/cases/product-blocker-prevents-readiness.yaml",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 1284,
+      "sha256": "81b2ce31d8fea8b96b45581bd9796f4ba4bb49ff97b4043e7be9806b50dcb444"
+    },
+    {
+      "path": "skills/spec-plan/evals/consumer-replay-cases.json",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 17646,
+      "sha256": "2733cdd5373515e8c8924597caa1bce159066259e080afd88ba3e19acff54fd0"
+    },
+    {
+      "path": "skills/spec-plan/evals/eval.yaml",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 511,
+      "sha256": "9ba17aa68c075dad5c11f39b719fdaa5c34810fabf53d513fd8a0493f087ecda"
+    },
+    {
+      "path": "skills/spec-plan/evals/examples.json",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 18790,
+      "sha256": "48f344044bac6ee5e9de830aec42fa1a3087dc5f201d5288ac2c0fc0fb2c5c3a"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/consumer-replay/implementation-ready.html",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 5789,
+      "sha256": "b1400215419aabdf22a2729a667e6ea5e734f231f59d1d5a0a4b1db49197eb8b"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/consumer-replay/implementation-ready.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 4278,
+      "sha256": "8e19662c334095a6275dfe6c98aeea1bcb72201fd93dcbb569a09d3fc79d8bdc"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/consumer-replay/requirements-only.html",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 2829,
+      "sha256": "17299eb8a858fc70fadfa6b99731beffcf4120ddb9bd80c66a5a1bf4c1c918b2"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/consumer-replay/requirements-only.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 2140,
+      "sha256": "fcbc39366c3ffaf53e88f5f3d936548ed9080fd0ef7ef0eb3df2ef605779879e"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/AGENTS.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 218,
+      "sha256": "b2c0b88b1a117ab6f15230857c6fd76229ccb4cd787dfe716be07d0033d7d92d"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/docs/plans/2026-07-31-001-feat-admin-export-plan.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 841,
+      "sha256": "b8ce5e6d8627d3f170c5a30c72fa0f0a2344496460e658eb177a38cab0362cf8"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/package.json",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 64,
+      "sha256": "f9b20e6ad57d4d2762764856e1cbcc0cbaa2f87ce24c1288f80785702d86d796"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/prepare-eval-fixture.sh",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 251,
+      "sha256": "6d6f1d3ec939ec0fc6af440c09114c9603b530a9ff0f6616b9e52482dbf18976"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/admin-export-blocker/src/admin-export.js",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 132,
+      "sha256": "f4c74c00cf1843f03d7b29cc45925e87e10f6017f471466d7d4916e54fae205a"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/AGENTS.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 260,
+      "sha256": "fa0b67fb74ea556467796f0141937da02d5a5cef96bc8ab932959431f9a6fa97"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/package.json",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 125,
+      "sha256": "9cc48b34ffd9c1f6d30f938e6fbce1377c43ed5bee9d8cb3dab468eefb5b5261"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/prepare-eval-fixture.sh",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 252,
+      "sha256": "08e027f481b1fc667cdff6889115eac2efde9d99e581b5a24d0db3f9e5d9f541"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/src/order-importer.js",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 119,
+      "sha256": "db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-direct/tests/order-importer.test.js",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 353,
+      "sha256": "70fb5552f686bc5332ed1ecbfd5df8cf8d063b6cc31d271e96de63fbb439bdc1"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/AGENTS.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 253,
+      "sha256": "4a29307bd8aab00e3adef728b6442ffe985e1b553f65aaf08b15999488289cd9"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/docs/plans/2026-07-31-001-feat-order-import-plan.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 1289,
+      "sha256": "e2a497444666b4fda5f56325f7bc5c4941cffed48efb0b4c40d073d041429e5b"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/package.json",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 129,
+      "sha256": "9a6bcbc365d9209312b8241f989d209c65cbb53fe786324173ae6e9e80f2cc0a"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/prepare-eval-fixture.sh",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 257,
+      "sha256": "c3c40addb2d12c3ed416e73fec03b2d2728cf6d23a1d1fbac040ee7588ba46b1"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/src/order-importer.js",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 119,
+      "sha256": "db67e0a54ffc50ba0e00476190d96d72d972945649a0a7e4ceabd83b1e128125"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/repos/order-import-enrichment/tests/order-importer.test.js",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 353,
+      "sha256": "70fb5552f686bc5332ed1ecbfd5df8cf8d063b6cc31d271e96de63fbb439bdc1"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+      "skill": "spec-plan",
+      "owner_role": "deterministic-helper",
+      "bytes": 2587,
+      "sha256": "7428edfba6c31009e2ec60696b5b45faa1e970e7e8c24771e2d653a879b7b427"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+      "skill": "spec-plan",
+      "owner_role": "deterministic-helper",
+      "bytes": 1734,
+      "sha256": "b3fcbc95cb687ae7db9037aee7613356a4b739d2caa3a03bb44e5c8c8783b63f"
+    },
+    {
+      "path": "skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+      "skill": "spec-plan",
+      "owner_role": "deterministic-helper",
+      "bytes": 894,
+      "sha256": "062121c3beca475531ea6576ac6bc7e53b237acd0e20ab346555d09e9b465b86"
+    },
+    {
+      "path": "skills/spec-plan/evals/output-quality-cases.json",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 31194,
+      "sha256": "8af33ef52462b6ef0f71f61a79e8e13dcf61518b2ca8b8dfd709cbcffa36c70d"
+    },
+    {
+      "path": "skills/spec-plan/evals/README.md",
+      "skill": "spec-plan",
+      "owner_role": "evaluation",
+      "bytes": 1472,
+      "sha256": "5cadccb623b8cb564ff924a308a9b82fb2c005e917a663d4b1bfd00ab79a785c"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/agent-native-planning-strategist.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4107,
+      "sha256": "c1fa081b48f74b2f6ddee983e864de31f2008c3c6ae7ffd7b4baddd6333cfb68"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/architecture-strategist.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4837,
+      "sha256": "6fbcedec0d402f40c6ab64364a534cde2d8b38b9b79e1480098c571ae93674ff"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/best-practices-researcher.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 7193,
+      "sha256": "79dceea93c937dcbefd4d9c785d667f3ca03c4c79df8068959c5281b04276af0"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/data-integrity-guardian.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 3246,
+      "sha256": "e524b44001f54043ca74fff19ffced4d1f8945fb181eb931fcae5609d9e6e1a8"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/data-migration-reviewer.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 5806,
+      "sha256": "93f0a3aff200978b6149857769edf511a4768072f8834ca604ea72cc031750c3"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/deployment-verification-agent.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 5657,
+      "sha256": "e90eaab26736715c6ae4eaebf3aa05331f1c371b2dbb546ff057643377d07ea6"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/framework-docs-researcher.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 5647,
+      "sha256": "cc20d86fb9b55cea64e23a332640738b233f3a508627563b1be09e93e4e91670"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/git-history-analyzer.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 2856,
+      "sha256": "ba2d86a09385decf1d29d4e0a587678b15509bdd6c8ff7aafd0cccf2fcc179a3"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/learnings-researcher.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 16592,
+      "sha256": "fc6f523cc5c597c49e007b88de3dd0f465bfcef88f6f9fe7070032f1f2caf399"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/pattern-recognition-specialist.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4697,
+      "sha256": "b6315cb0deec7c85346b88d3b30b9547feb36e1a8c058b4248f91e9c326b6ddb"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/performance-oracle.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4566,
+      "sha256": "3290155a1e41b7631988168602c195adaf46b20286c46dfe23c8fcb26d4d2525"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/repo-research-analyst.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 15399,
+      "sha256": "451bd0deeab4327142ed1106ed1085f07335d80fe760fa7c155b894051a1ae56"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/security-sentinel.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4135,
+      "sha256": "dc4c05421f11c924beeafc426bfd8aa95f43ec9af684f571faa0da357c7cd17c"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/slack-researcher.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 10489,
+      "sha256": "616ecefae5e6a786dff863c77b1ed196b806175b73b5a0cef8ad1cfe2cea4424"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/spec-flow-analyzer.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4802,
+      "sha256": "d189fdb10b5698336502f0aedbe60dbdd8ec54cedf23e1dbd8d27b6ba4fa1807"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/web-researcher.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 9135,
+      "sha256": "19e87545bfe37ff3910475fdfdaa742ce2c6b2efcaec77a429acd069ae4e41ce"
+    },
+    {
+      "path": "skills/spec-plan/references/approach-altitude.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 7210,
+      "sha256": "1514bc41a250d0c654a9ce0f8f09e2b52a22aeca4dfdc68823504cdf877ea7f7"
+    },
+    {
+      "path": "skills/spec-plan/references/deepening-workflow.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 22689,
+      "sha256": "0e696875bc418e78e4a24ce34fb8464261f00ed0b3cbfa395489f5bec6482c27"
+    },
+    {
+      "path": "skills/spec-plan/references/frontend-engineering-lens.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4987,
+      "sha256": "f678b9f905b70ccb70933400ed2171d89184ef3f5e3bc5f88218487d9e826b8d"
+    },
+    {
+      "path": "skills/spec-plan/references/high-risk-plan-lens.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 5792,
+      "sha256": "0a91496cd2ef242d6b5ae90272b235fef968de64e3a62f80b899a28a1e0c73d3"
+    },
+    {
+      "path": "skills/spec-plan/references/html-rendering.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 34875,
+      "sha256": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383"
+    },
+    {
+      "path": "skills/spec-plan/references/interface-and-evolution-lens.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 6189,
+      "sha256": "9d39c05d52bae8076a430e7b34c1c232c5cc7efa6b544a65de761d225c48b640"
+    },
+    {
+      "path": "skills/spec-plan/references/markdown-rendering.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 10321,
+      "sha256": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-handoff.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 22787,
+      "sha256": "fd316148811e7d4ec494235f217dd2131aacc2fe3dc7a26f09e806f910b832a1"
+    },
+    {
+      "path": "skills/spec-plan/references/plan-sections.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 25506,
+      "sha256": "e5f7326a0e0e09a1bfd5f17cfa4f73c074be366ec2810677aa7426002b835f5d"
+    },
+    {
+      "path": "skills/spec-plan/references/planning-evidence-boundaries.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 8047,
+      "sha256": "3147727567747f35055f3f64c2cadb345f1892019736524a3cf1e0710b0212f5"
+    },
+    {
+      "path": "skills/spec-plan/references/settled-decisions.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 4951,
+      "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971"
+    },
+    {
+      "path": "skills/spec-plan/references/synthesis-summary.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 42483,
+      "sha256": "68fc446d14d01c7c1a6bd85968407d9fd4df7de0f7f1132da03fa9b7a5cd321d"
+    },
+    {
+      "path": "skills/spec-plan/references/universal-planning.md",
+      "skill": "spec-plan",
+      "owner_role": "reference-contract",
+      "bytes": 15227,
+      "sha256": "2f59bb65fe0f2fd6d7d6803a266c47dbba5dd295d6f2b95da51970b2bf485540"
+    },
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "skill": "spec-plan",
+      "owner_role": "entry-contract",
+      "bytes": 115997,
+      "sha256": "86c71fa9c2ee28fec4c4e45ff03b2511bdbe93f0e15528d2f54d59ec1a990689"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-astro.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 1856,
+      "sha256": "db9d8648577b00e58d7e5c2c2fb704998a979b5fe9433a6b9d1f68aeca26ec2c"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-detection.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 2771,
+      "sha256": "e3ba10d028a46daa1184c0b04c18fbfd3fd709f95fd81d58db8d5bf06b7ec8a0"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-next.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 1692,
+      "sha256": "243c6bd874ed64a31cdecbf01b333afd7ce5b73cd8376d0b47fa8e36ecbb8c62"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-nuxt.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 1774,
+      "sha256": "c9139317f1c7e86ae8cf86f484dd9098c1100025948365082730cd32a889e20b"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-procfile.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 2353,
+      "sha256": "97a21464364a4cdbd316bea61c5af144f81fe0d4671eb3e0e9aa8e9c6ff87919"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-rails.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 2376,
+      "sha256": "b8f9c8f39d42ffcd959c18ce97ca383c6fa260052673733d82dfd88191e8e6e3"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-remix.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 1995,
+      "sha256": "4208c1b37881752799576d1188070b208357009b12d980a4184bb276f1be7ab0"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-sveltekit.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 2010,
+      "sha256": "b4bee3d7e69660021aea8ed6716f70a6e2132ea298db568512f2891691db46d7"
+    },
+    {
+      "path": "skills/spec-polish/references/dev-server-vite.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 2177,
+      "sha256": "31dc15f95e73a92914bb5bbd2a12f5fb3882644437809f2b139841958548f008"
+    },
+    {
+      "path": "skills/spec-polish/references/ide-detection.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 2655,
+      "sha256": "196a1b06f3fe39f39dff45a7baeabeb5f694585b5831f1c1dc60c80a06f6e637"
+    },
+    {
+      "path": "skills/spec-polish/references/launch-json-schema.md",
+      "skill": "spec-polish",
+      "owner_role": "reference-contract",
+      "bytes": 4489,
+      "sha256": "0200124e5c5c7cbf4f999b8b4cba0211fafc897fb860e4b39e981eedcf226f88"
+    },
+    {
+      "path": "skills/spec-polish/scripts/detect-project-type.sh",
+      "skill": "spec-polish",
+      "owner_role": "deterministic-helper",
+      "bytes": 8171,
+      "sha256": "585193885b42afe92a3b1dd62dc3c94ef0dcefd34e5d372419250f44e6f684d6"
+    },
+    {
+      "path": "skills/spec-polish/scripts/read-launch-json.sh",
+      "skill": "spec-polish",
+      "owner_role": "deterministic-helper",
+      "bytes": 2897,
+      "sha256": "58fe4d1dc2ca29d14bf57aea99e1c73e3cafdd117865dcf40fa6079727509bb2"
+    },
+    {
+      "path": "skills/spec-polish/scripts/resolve-package-manager.sh",
+      "skill": "spec-polish",
+      "owner_role": "deterministic-helper",
+      "bytes": 2673,
+      "sha256": "9d9b1132fb8e4f68f79695ebe428501467be62e90a9779e02e287298db9b754f"
+    },
+    {
+      "path": "skills/spec-polish/scripts/resolve-port.sh",
+      "skill": "spec-polish",
+      "owner_role": "deterministic-helper",
+      "bytes": 10892,
+      "sha256": "c81d5f29989e8c32a120e8337ae4b0457caab13eca115dc8bd67b20af86664e4"
+    },
+    {
+      "path": "skills/spec-polish/SKILL.md",
+      "skill": "spec-polish",
+      "owner_role": "entry-contract",
+      "bytes": 8924,
+      "sha256": "376af814dcb154e13b0f55003bca604548d5ff1b649b5e50aeef9404d62bea6b"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/external-evidence-researcher.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 2524,
+      "sha256": "5012308c4ecf6e3efafb6d9e606792c5ae0be3d5ccd92652105d224b7d184c05"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/pov-peer.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 2267,
+      "sha256": "203b511af2e932c93ecad5fd9c9e8574119b7d093cc3f110817488fc97b2f02e"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/precedent-activity-scout.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 3003,
+      "sha256": "313a956a682bdb25de245b77c1504342fcf59de4e6eaf9e7575ba4766c8fce11"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/project-grounding-scout.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 4583,
+      "sha256": "e2c12c99205f2a9b2713c9dbf5371b952bc406619f81a58e6518d60b3bb4254f"
+    },
+    {
+      "path": "skills/spec-pov/references/boundaries.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 2890,
+      "sha256": "768b304e0b738da3e20382ce184a33606ad58129b52d416e8d63b08ed3c245bf"
+    },
+    {
+      "path": "skills/spec-pov/references/cross-model-panel.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 3477,
+      "sha256": "4abd50046c5eb412bff61c58bac1ca807e4f64d2eabe1c5661402e4fcd4cf372"
+    },
+    {
+      "path": "skills/spec-pov/references/intake.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 3865,
+      "sha256": "31c4a0245e78b9d004a38be59a02088512c0d21cb36b86c28a72b9767e9cb684"
+    },
+    {
+      "path": "skills/spec-pov/references/invocation.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 3094,
+      "sha256": "5ed38e1b8dfccc06dac1fdff9df54c63a1933c9221aaeab9eb0e5b65ed04c572"
+    },
+    {
+      "path": "skills/spec-pov/references/method.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 5890,
+      "sha256": "da191e48d582739b63c72b5d31056d443dfc0fa0c5dd3d2786475547f85fc5ef"
+    },
+    {
+      "path": "skills/spec-pov/references/pov-schema.json",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 1716,
+      "sha256": "094b766f040d28c657deaa3e1777d5defb52e684189587e029ed0be973ee6154"
+    },
+    {
+      "path": "skills/spec-pov/references/report.md",
+      "skill": "spec-pov",
+      "owner_role": "reference-contract",
+      "bytes": 1712,
+      "sha256": "3a234fcf8d957fd1f1b00495961872e93eead2186bfb675d34afbc3fc34a104d"
+    },
+    {
+      "path": "skills/spec-pov/scripts/cross-model-pov.sh",
+      "skill": "spec-pov",
+      "owner_role": "deterministic-helper",
+      "bytes": 8810,
+      "sha256": "07670aaef1d475cd05bcbfe691ceb7f5baf0d56c1720dce12259c1a8d016be57"
+    },
+    {
+      "path": "skills/spec-pov/scripts/peer-job-runner.py",
+      "skill": "spec-pov",
+      "owner_role": "deterministic-helper",
+      "bytes": 88497,
+      "sha256": "35d33380f2cc1c07d7852deb983726723ccd20ebb028991dca04a7358d517c93"
+    },
+    {
+      "path": "skills/spec-pov/SKILL.md",
+      "skill": "spec-pov",
+      "owner_role": "entry-contract",
+      "bytes": 18000,
+      "sha256": "d1efe4d5a01e9c2ae608c22cd5d94bd6f10b8a1bd56b906e96a708bf6b97f4f3"
+    },
+    {
+      "path": "skills/spec-prd/assets/overlays/securities.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 22798,
+      "sha256": "46dedd31f549c47f67d5cf73ff4baf9098e308b1e0277ff5b81e7cd2ef619033"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/00-generic.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 14978,
+      "sha256": "4e6cf43431a25d038ac054ff738807a5d7fd1b1409ccc55050846e62b465aacf"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/10-app.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 3907,
+      "sha256": "8abc5527f9ff59fcaa16813b2a75a484c60d5e2f41c4016db197d1c590f39a4e"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/20-admin.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 3792,
+      "sha256": "2b4e27872cc445635775b12aa0d4f0899c99c3231d8a4e16a55611b1d43d6514"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/30-backend.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 3847,
+      "sha256": "7cd552126b1554f66826d6349f792c014d957fea0cfc8bb8d1cdde0292e526b9"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/40-h5-pc.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 2337,
+      "sha256": "a9e0dc77ed33df7694955c24296fe3e8a4664d1ade53eb0650ed28fe46f68fb8"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/50-cli-devtool.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 3501,
+      "sha256": "92c3c3a758b0d22b8b45215561e214b746c1bcce9e11b57777c79bb3aeeb9fbc"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/60-mixed.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 2425,
+      "sha256": "c0cecbb661dbf633509610e8d7477aed257d40566553c0f03bdd05dcdf8f4039"
+    },
+    {
+      "path": "skills/spec-prd/assets/templates/70-large-requirement-index.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 2240,
+      "sha256": "5c2d3caa2b3c1994cdf6fbec1db78ea932c092f3b99e123c302ed2f9d7df84b8"
+    },
+    {
+      "path": "skills/spec-prd/evals/contract-reset-candidate.patch",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 8359,
+      "sha256": "722f07312513b88877115c42f26e388b721ae8a5b1fedd7617aeec846afcb89d"
+    },
+    {
+      "path": "skills/spec-prd/evals/contract-reset-cases.json",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 9198,
+      "sha256": "ef9ed4e2d200c6b2bd267ac96a5fa1fd8c2f0338070251f488beac94ae4b4526"
+    },
+    {
+      "path": "skills/spec-prd/evals/contract-reset-protocol.md",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 10850,
+      "sha256": "baddf3935e43e32d132cd9ed9d153fc0fbecf6595dbcdcfb1bcc1ae3ca44742b"
+    },
+    {
+      "path": "skills/spec-prd/evals/evaluation-governance.md",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 6175,
+      "sha256": "4b05eac95ba59ed40987337246d62a5ae22ab838c89387198e62469192b9a90b"
+    },
+    {
+      "path": "skills/spec-prd/evals/examples.json",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 106435,
+      "sha256": "ebc9039ee0a8a47287380370ed56c2466d8300e742b4e939b8ae84f397dc3733"
+    },
+    {
+      "path": "skills/spec-prd/evals/lib/contract-reset-contract.js",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 1831,
+      "sha256": "0bd54f5d1ba3cb6a68c9eb76e5b56bc39d07d959bc903cc470527d53a610490f"
+    },
+    {
+      "path": "skills/spec-prd/evals/lib/contract-reset-safety.js",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 9641,
+      "sha256": "548cb8727a01054c956189cb1ee5942da6d8803a3577db18158d92b1caff2111"
+    },
+    {
+      "path": "skills/spec-prd/evals/prepare-contract-reset-evidence.js",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 34678,
+      "sha256": "66367e5cff21729cb8920c08e8f642f8e91da1dbe253776255a3e0c260d2ed11"
+    },
+    {
+      "path": "skills/spec-prd/evals/README.md",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 2746,
+      "sha256": "b4f0384424269500702ec39ef0d96f21b099074d9fd0b7e4773c530b2de88fe7"
+    },
+    {
+      "path": "skills/spec-prd/evals/run-contract-reset-arm.js",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 36188,
+      "sha256": "fef56cda90d4ea2e1be0add5d5ff16148b2c2009f0854093e9a279e6ee1fb81f"
+    },
+    {
+      "path": "skills/spec-prd/evals/run-evals.js",
+      "skill": "spec-prd",
+      "owner_role": "evaluation",
+      "bytes": 44095,
+      "sha256": "724c6d47545d0fc1368507270b152c070fe00a027ec934b1a5e6adeec9dee678"
+    },
+    {
+      "path": "skills/spec-prd/references/design-source-evidence.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 8296,
+      "sha256": "6e28b24c4824c59f801b1152f74b306b0be84cb63b9d1094ca294fe6792da66a"
+    },
+    {
+      "path": "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 22890,
+      "sha256": "f1ecde33b3bf5b37e3801e69f95284198506397d355c7dc343fce9acb26acfe3"
+    },
+    {
+      "path": "skills/spec-prd/references/evidence-and-topology.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 15142,
+      "sha256": "e596b313e36f2ace3a635da75e5dd28a9993ff9e8220b1f8fb9227c56748f95b"
+    },
+    {
+      "path": "skills/spec-prd/references/grill-with-docs-integration.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 12508,
+      "sha256": "aaa90931129db5db520d8836214a4bcc7146bd0b79710bb304906a6b97e7d14f"
+    },
+    {
+      "path": "skills/spec-prd/references/large-input-checkpoint.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 5947,
+      "sha256": "83318f6a0a5e7626024657e8ea7ec8bf374daef9086b4d9cd50eea19f32f28d3"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-output-template.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 49347,
+      "sha256": "59a776888f79c76d7d8c0869773ece95a828918e310ece2a53dbd06bd4858c89"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-readiness-lens.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 33608,
+      "sha256": "fddbff2c86451191210d99f2690af85490be2fd1d4016789c7b284a67839ba35"
+    },
+    {
+      "path": "skills/spec-prd/references/product-analysis-lite.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 8286,
+      "sha256": "465b94f085904363524dc11cade3b65e1058d79f37359da766bba8f2774d4dc4"
+    },
+    {
+      "path": "skills/spec-prd/references/product-expert-lens.md",
+      "skill": "spec-prd",
+      "owner_role": "reference-contract",
+      "bytes": 11954,
+      "sha256": "3a82ec526647fb69003b5da3e0d2dfa544746aac5ced3b8b9ee6c13584740a66"
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-glossary-drift.js",
+      "skill": "spec-prd",
+      "owner_role": "deterministic-helper",
+      "bytes": 5374,
+      "sha256": "cd4f0da50c71eceb51ec2ff1760bf15b81b316811bf8f41570f7358618a7f7a4"
+    },
+    {
+      "path": "skills/spec-prd/scripts/check-prd-artifact.js",
+      "skill": "spec-prd",
+      "owner_role": "deterministic-helper",
+      "bytes": 72945,
+      "sha256": "123c3a246a5050178380f44b185b197a16734cd79af6e7c61692fc76085b37c9"
+    },
+    {
+      "path": "skills/spec-prd/scripts/finalize-prd-artifact.js",
+      "skill": "spec-prd",
+      "owner_role": "deterministic-helper",
+      "bytes": 17571,
+      "sha256": "a28fbff58e9c2b9ed0adc4e218f1b1afb35cab84e47ce6a54983bd92835eb915"
+    },
+    {
+      "path": "skills/spec-prd/scripts/lib/reason-codes.js",
+      "skill": "spec-prd",
+      "owner_role": "deterministic-helper",
+      "bytes": 4170,
+      "sha256": "34d73c24e56b1843cbb472b52b29710da01354c63a2b4bb648d52421a6671a46"
+    },
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "skill": "spec-prd",
+      "owner_role": "entry-contract",
+      "bytes": 65669,
+      "sha256": "26199b91a9d78b1c612a89cf022773653f31eedfa495957ef3dd79f6ad9c46eb"
+    },
+    {
+      "path": "skills/spec-product-pulse/references/interview.md",
+      "skill": "spec-product-pulse",
+      "owner_role": "reference-contract",
+      "bytes": 21564,
+      "sha256": "ce76a7105f5fa097d548bd82fa03d80a634819596e767c040e0ee85dc52d8b68"
+    },
+    {
+      "path": "skills/spec-product-pulse/references/report-template.md",
+      "skill": "spec-product-pulse",
+      "owner_role": "reference-contract",
+      "bytes": 4572,
+      "sha256": "79223c2aa647ef33d7b26f423197d10907b809160c3eac220d946d8435c0a552"
+    },
+    {
+      "path": "skills/spec-product-pulse/SKILL.md",
+      "skill": "spec-product-pulse",
+      "owner_role": "entry-contract",
+      "bytes": 13402,
+      "sha256": "635a9e8cf2099c658e09e4774818cc11538fcc517c61eb2e052dfdbcd0da9617"
+    },
+    {
+      "path": "skills/spec-promote/references/spiral-cli.md",
+      "skill": "spec-promote",
+      "owner_role": "reference-contract",
+      "bytes": 12255,
+      "sha256": "6a21652749d8db9a3b45ca983e9f16906358ffd61cba617b32aae348ba737f53"
+    },
+    {
+      "path": "skills/spec-promote/SKILL.md",
+      "skill": "spec-promote",
+      "owner_role": "entry-contract",
+      "bytes": 9952,
+      "sha256": "90cc6038052529e4eb2ed1852b2e90f54595e6fc884b01d771e0d34fff2bd511"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "reference-contract",
+      "bytes": 3872,
+      "sha256": "ed587f3ee7ca0f98034c9d68557c5fab2cea2c90ca074338e644f0a886ac7b7a"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/evaluation-rubric.md",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "reference-contract",
+      "bytes": 6203,
+      "sha256": "0e2760765c31fefd39817e13055cbd234d83d53294e1b2653cb017c696cefb06"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/full-mode.md",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "reference-contract",
+      "bytes": 17200,
+      "sha256": "2e96d8ff3f1a84e5c6498e48a82c74cfea336fb7f4121e474c0e9c36753a1643"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/pipeline-return.md",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "reference-contract",
+      "bytes": 1918,
+      "sha256": "040beeb9716bfcce56f76e9d5cdf782306ef2ca0b256b3b9afaa9928e7523761"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/references/targeted-mode.md",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "reference-contract",
+      "bytes": 3352,
+      "sha256": "d6902d53d5482e4a94fb35fbcbbd8184da6c59ccbab3611d05c8642f09eabc28"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/scripts/get-pr-comments",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "deterministic-helper",
+      "bytes": 7963,
+      "sha256": "3de30b6ef575d9464c0d20f70a5292b4e70389029c70cc5ec1d2e0ccfad28c03"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "deterministic-helper",
+      "bytes": 2952,
+      "sha256": "e5a57044be9182dc4b3e2e4e584a9a8da6da98168a3d64189c4fde29d153f106"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "deterministic-helper",
+      "bytes": 1047,
+      "sha256": "47d6c27939825ef7fa97de7e1a68d658e0e528956658b8625889fd58919df32e"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "deterministic-helper",
+      "bytes": 406,
+      "sha256": "a2582a71110c49ad66e66c4954d0647d0ab0597838409e1f4896ac8f6b90d83f"
+    },
+    {
+      "path": "skills/spec-resolve-pr-feedback/SKILL.md",
+      "skill": "spec-resolve-pr-feedback",
+      "owner_role": "entry-contract",
+      "bytes": 8261,
+      "sha256": "5a3896a9c1c5b9ca65a98f17224af03bdd63913c750ff55dd1d7cf583ed789ed"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "reference-contract",
+      "bytes": 9675,
+      "sha256": "6e7ee433d5cd1348617c4d67d3b059b770775b829e58385191e705a2b1392e9f"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/references/install-riffrec.md",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "reference-contract",
+      "bytes": 1941,
+      "sha256": "e6a9466ea78cf16616b57c83067002d71bd5b047a241e0cf365b81eec31c7ca1"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "reference-contract",
+      "bytes": 3308,
+      "sha256": "d9eac75353e1dded697d5015e372deca3af528d0df94ec3e806f441ff0ae33bb"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/references/spec-first-feedback-format.md",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "reference-contract",
+      "bytes": 2348,
+      "sha256": "e5d9e48e8076f563ed96c2acfef6f9a8b3584b99ae4d7949d8a82e070896db82"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "deterministic-helper",
+      "bytes": 50725,
+      "sha256": "805f3b5c14c200b220c98e1d8c6fc62d8f6e03c59e2c0b2287d04473ae6627f9"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/scripts/run-python.sh",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "deterministic-helper",
+      "bytes": 774,
+      "sha256": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9"
+    },
+    {
+      "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+      "skill": "spec-riffrec-feedback-analysis",
+      "owner_role": "entry-contract",
+      "bytes": 5114,
+      "sha256": "29bdff37db4b24dec8dc56e4e0f7897c8ce6f7990e386af54ac5f082976aeffd"
+    },
+    {
+      "path": "skills/spec-rule-miner/evals/trigger-cases.json",
+      "skill": "spec-rule-miner",
+      "owner_role": "evaluation",
+      "bytes": 15087,
+      "sha256": "4e58bc30960a93d684477099754e28bab5bc203d154f9ea83a0bce113a8f3837"
+    },
+    {
+      "path": "skills/spec-rule-miner/references/pattern-categories.md",
+      "skill": "spec-rule-miner",
+      "owner_role": "reference-contract",
+      "bytes": 5853,
+      "sha256": "67abf834610050d9d798b4c14e2c648039eecd797b68218437205e6d1baa5428"
+    },
+    {
+      "path": "skills/spec-rule-miner/references/write-targets.md",
+      "skill": "spec-rule-miner",
+      "owner_role": "reference-contract",
+      "bytes": 4546,
+      "sha256": "4bc16cc54c9f34fe88e0db40abcd1d2f4ccb69f8061919d3f9a939084f32715d"
+    },
+    {
+      "path": "skills/spec-rule-miner/SKILL.md",
+      "skill": "spec-rule-miner",
+      "owner_role": "entry-contract",
+      "bytes": 8138,
+      "sha256": "01b5af41925dac85c5446fadebf80efd528cc1d00ec8b2d3bfcf1cadd056764c"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/examples.json",
+      "skill": "spec-runtime-setup",
+      "owner_role": "evaluation",
+      "bytes": 3295,
+      "sha256": "9bc00802d05bc78efa712bfd45f68c2a7773b46a245a6f40b3e7169d4fd9bcfe"
+    },
+    {
+      "path": "skills/spec-runtime-setup/evals/README.md",
+      "skill": "spec-runtime-setup",
+      "owner_role": "evaluation",
+      "bytes": 401,
+      "sha256": "4d45452e642cff2002574983e0410d20550f913750f524f0d90c7929a33a34e5"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/config-template.yaml",
+      "skill": "spec-runtime-setup",
+      "owner_role": "reference-contract",
+      "bytes": 3763,
+      "sha256": "c5ddf1200df529803a7f3c4121c7433905332ccd70e986fc47739dac2b8fcf0e"
+    },
+    {
+      "path": "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+      "skill": "spec-runtime-setup",
+      "owner_role": "reference-contract",
+      "bytes": 3718,
+      "sha256": "3181c4a22b52573ce39805b07849860d387b99647199bf26d11df22956a58e1d"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/check-health",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 141,
+      "sha256": "7bd44bda51054835b3d10fe4c0e1e41e958961156cd4417a71fe095a433d9c79"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/contracts/workspace-graph-state.schema.json",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 3824,
+      "sha256": "c82c280962de173445db9ec66d3142e27f36de933599a481b9d1208134348393"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/contracts/workspace-manifest.schema.json",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1820,
+      "sha256": "fdbfc117661dc96d6a9b97ae77deb58d2f1f869fd4489e62b464fda7ff415ba3"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/args.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 4513,
+      "sha256": "f2059baef3a7d53d51c9c1f0774db556ad88a0eae52054664316c78b40b0ec85"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/baseline-policy.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 225,
+      "sha256": "56bc330dce96fc185e4bcc897ae093958e085806e87ac3277287f3483f0f03c1"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 12901,
+      "sha256": "a084fc43a1443353d401a14529874b1589ae018f58e52b4158edf6211bfea2be"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 29032,
+      "sha256": "bc51bf7d7e29c9837c070c65884b7c4e064924200b18b059dcc7786963d689c5"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/git-path.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1782,
+      "sha256": "ad2f424e71072d476b9df26fb17bece0bf7e5f1375293d8b5b27a36bdf37b74a"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1871,
+      "sha256": "461ef1510e2a6ce0406147d1cf3e2814da829f0246160b664140fe7b1bad1f81"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 51876,
+      "sha256": "245e7329877698802163be0726346d3985a723d8b5afc604f3c092e0d329a214"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/human-output.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 7764,
+      "sha256": "18019683f60a8a1bb3fe56d38dc38d1a6354b618a09c43a4134001375d7ef6c9"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 20060,
+      "sha256": "9431408280bf48920e43998b94fb1ec33b551204f0616a6dfe8a4922a5f36a28"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 5833,
+      "sha256": "3c7109c853995dad5dc696bcaf7854670a4fcc880eb70b37a7980745bd731bbb"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/opencode-permissions.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 16865,
+      "sha256": "97ad14e4fa02dec0768a88c372da22435bb2493bc846adb6247497fd258427c0"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/path-safety.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 3511,
+      "sha256": "5d9d72e8ccb7b15687e08d818c6bf113e3ad27ed1f1d86e293b8edf09203facb"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/preflight.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 7254,
+      "sha256": "b9b2676f38e642bf473dc21883a8dbb4f87c6259d9745395ee9226326adcfd99"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/process-runner.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 16693,
+      "sha256": "04aad38cb71720f7e239ff0423b23066d9fb80dfc69b117ca690e3eca63a0c0d"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/process-utils.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 452,
+      "sha256": "bebc6e10bfcf3d4d17a7fb41f52483fe162507426edf4ad3672fa8bb74832050"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 12700,
+      "sha256": "5b330df0315e08cd257e1f3c7a261328024edf22c8c7dbf5131c8c0f29dba09a"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/project-target.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 11162,
+      "sha256": "e3feedfd94ba00fd0733f346924adbbb30d2c027c99d3d6c76a1cc5c2f751e0f"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 23386,
+      "sha256": "5028b418ab322c40a606d7f1ba5bc67d104df8aaa2566d38173774ce4eb4093b"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/regular-file-publication.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1030,
+      "sha256": "7015c98fcc5c65409ad940d0f04804e417525193f3a4de6313309b517bef5492"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/regular-file-snapshot.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 4161,
+      "sha256": "581aae6be3402874addb43047a87e80aa5af0b2cb7b308a62cb4918d114e7283"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/renderer.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 14251,
+      "sha256": "35dcd4335d53a5bd74aefae38b2c3bf9eda13ee662ec3491e01ef2622fab2cec"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 34581,
+      "sha256": "ee21d7178ccd4bf13bb15d093052b116c29a057ab18a3ed157919b80ac95cdd2"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/scenario-fingerprint.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 8166,
+      "sha256": "b8898a9f9c7948d3f820b7c963bbe55ddf6a49c01bef2d187b2eae51a991e985"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/toml-section-editor.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 21414,
+      "sha256": "2f462b2bdabb29f4a9df949f8834cd593a9a3030761edbada8bb2eefed82fdc8"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-async-refresh.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 38210,
+      "sha256": "322787ff7efcde66c062c4a9a3bc68e93438280b9f609088130e6dde114c9611"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-child-hook.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 24748,
+      "sha256": "eceb7164fd0cf5a051a2a66b0add199ddd93db54b38eac01ba8bb7aab1fac061"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 618,
+      "sha256": "e3b1c5ca246c159778d9447e3ea57186646f26f50999167f9a9caacc3d4872e7"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-executor.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 28837,
+      "sha256": "b9cefa9375334801f73f8abdb3d573bbf6757f13cfb4640837aeb0ccf26aa5f6"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-git-exclude.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 5753,
+      "sha256": "b6457c5382e2bd738dc6ef4be6e7d08682d6f58b262f357ccfb77d521ef70250"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-artifacts.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 12003,
+      "sha256": "99f1587ef3726b67fd567886674efc3d616e585806b2de7e1a8c831e49b1e9e9"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-build.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 22735,
+      "sha256": "47ad0de6894550b5b0b08dc6e46d8f6c5bea4a5c214f4e37291189ea966747f6"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-clean.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 13549,
+      "sha256": "f6cf7744a558755d7a8a753857fd2e5ce091a6c27966dcd8670bd206fa068a53"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-executor.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 13549,
+      "sha256": "633681f084c629741763be14f810e9a1294ca504033690717aa15d6cf49f048f"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-lifecycle-lease.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 21756,
+      "sha256": "aada47c0d55368df53b6b4090cd894b9b6ff387cc3e1175067dcad787b17c581"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-refresh.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 2679,
+      "sha256": "42ae67f60394ac5bf3e329e98a4e98527bb482bd0fa2d8695d326e29407cb83f"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-scope.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 3077,
+      "sha256": "d3fe13eb2c27a1540d2ed7a0e23e4b09438f3c6e50dd6dbb8f1cba089d2d178b"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-state.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 9022,
+      "sha256": "12782079cad5230f02a00b8162a0639f59ba3034fc9b8687e35e130feda76801"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-graph-status.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 20918,
+      "sha256": "496af0a45a1f8c8db93d6dab32f85fc1ce2b73f14690cfbc98785acd4f5dd5a3"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-manifest.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 4628,
+      "sha256": "7abeb81101b13aee1dd6dfbe77ace692033c7a8387f9f7a1a8081015d7697c38"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-parent-diagnostic.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 6488,
+      "sha256": "9a8cc006badbfd7abb7165b80cb641bbc95c2e26708470a4a858e2fbe4a2e547"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-provider-runners.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 3155,
+      "sha256": "38099c6c8622e72561387957cf9e4d6069dd5aef17b20932135c6a97ea1a8e48"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-refresh-contract.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 1502,
+      "sha256": "ea4b348b79f18197f6463148620c86311e40d7820a30e797c6313879a9214ac7"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-inject.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 5185,
+      "sha256": "392cdeed3b47142b83c8b04354c160152305df48423cd328f7309231c3b09901"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-routing-instruction.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 7660,
+      "sha256": "214327e5b4e6ec8e9779f9a18e1d1aba5f4bbd2f422699b40e2f2e06e803bf37"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-runtime-preflight.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 4590,
+      "sha256": "b8788ff34ecb1484802f3cd57af1530e5dfd3b09dadae95fba8d47a3512f66b5"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/workspace-target.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 9616,
+      "sha256": "d33efc9ef33b23816246bcab41abcb47c4ca7602bdaf557138f7495bb04c47d6"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/lib/worktree-health.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 4722,
+      "sha256": "4d7045451fd27caff57721410d44beb44f4a24ea52c2069e6eedafb8d0854a16"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 16404,
+      "sha256": "d8d54243e7f10de6706f83a949b4f45105c8b44b1cbb7b755a393a0a8e8f1a0d"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/common.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 5114,
+      "sha256": "78bedf93f25c1d299d54cd089451aabf4833020e5193c33efeba894119ea31a0"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/graphify.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 103334,
+      "sha256": "64b939ab26fee1abc23746543aefeeb0115ac7b3a0f4f48ae5c9ea94bf906f43"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/providers/registry.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 117,
+      "sha256": "767f164a54118795afd7fe700cb221dc9446d7862c91d27693f5eadd89e01a39"
+    },
+    {
+      "path": "skills/spec-runtime-setup/scripts/setup.cjs",
+      "skill": "spec-runtime-setup",
+      "owner_role": "deterministic-helper",
+      "bytes": 32437,
+      "sha256": "b000db660fd78383cc486a782ff8082f9d0482baa4b9feb669eb27ccc339623c"
+    },
+    {
+      "path": "skills/spec-runtime-setup/setup-registry.json",
+      "skill": "spec-runtime-setup",
+      "owner_role": "support-asset",
+      "bytes": 58634,
+      "sha256": "747679c4d9a255825bb2cd85c54bc89f2177f15ecece993b56908c8f56a8f3c2"
+    },
+    {
+      "path": "skills/spec-runtime-setup/setup-registry.schema.json",
+      "skill": "spec-runtime-setup",
+      "owner_role": "machine-contract",
+      "bytes": 15976,
+      "sha256": "08cfe81accd0bdc653da38ce7f30af7a28d6c74e06f808abc14cffdd1de01cb1"
+    },
+    {
+      "path": "skills/spec-runtime-setup/SKILL.md",
+      "skill": "spec-runtime-setup",
+      "owner_role": "entry-contract",
+      "bytes": 49907,
+      "sha256": "df30124cbd2be526bab4dfe6065c1a66d40d6835d58676a236d4061a2e66bac5"
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
+      "skill": "spec-simplify-code",
+      "owner_role": "reference-contract",
+      "bytes": 3195,
+      "sha256": "17d705186aa32af33549bebbc065cba1bd50952c1d0c6a304e5b246f2f7dc979"
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/code-reuse-reviewer.md",
+      "skill": "spec-simplify-code",
+      "owner_role": "reference-contract",
+      "bytes": 1687,
+      "sha256": "b795d3dcfcbb0992ea8905a88ccbbd81810c941306ef71ceb6588a29e3452d70"
+    },
+    {
+      "path": "skills/spec-simplify-code/references/personas/efficiency-reviewer.md",
+      "skill": "spec-simplify-code",
+      "owner_role": "reference-contract",
+      "bytes": 1423,
+      "sha256": "82c1ad7d0b58ed1517ec8916d3c758833b4870e6e7d31039d42ac7efcacd4b08"
+    },
+    {
+      "path": "skills/spec-simplify-code/SKILL.md",
+      "skill": "spec-simplify-code",
+      "owner_role": "entry-contract",
+      "bytes": 9411,
+      "sha256": "f3930a20910262b36a759a582c15293f401d036c3f3b1027481caf532e55bd51"
+    },
+    {
+      "path": "skills/spec-strategy/references/interview.md",
+      "skill": "spec-strategy",
+      "owner_role": "reference-contract",
+      "bytes": 10729,
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43"
+    },
+    {
+      "path": "skills/spec-strategy/references/strategy-template.md",
+      "skill": "spec-strategy",
+      "owner_role": "reference-contract",
+      "bytes": 3038,
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3"
+    },
+    {
+      "path": "skills/spec-strategy/SKILL.md",
+      "skill": "spec-strategy",
+      "owner_role": "entry-contract",
+      "bytes": 6174,
+      "sha256": "3a3bc443564235455de872444be815e935924cbf041fad0d2e216feb6c03cdbd"
+    },
+    {
+      "path": "skills/spec-sweep/references/agents/media-analyzer.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 5315,
+      "sha256": "9769811ff208b4acde439ef39efb8cf6f2298aba6694579e0402a82bdabc2620"
+    },
+    {
+      "path": "skills/spec-sweep/references/interview.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 14089,
+      "sha256": "7f6bb9df01d21853b75d634a859ed30920a038a3041a29e3916d803235ba06d7"
+    },
+    {
+      "path": "skills/spec-sweep/references/model-tiers.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 1662,
+      "sha256": "564f0733ddde252607fb71b12ed800a6ea25c6859ef41b41a632e2ee78ee88bc"
+    },
+    {
+      "path": "skills/spec-sweep/references/plan-template.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 3370,
+      "sha256": "2c1c3c578ef14c38ee79bface82211803c144e3e5be25b6288e0c214615088c2"
+    },
+    {
+      "path": "skills/spec-sweep/references/sources/email.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 5591,
+      "sha256": "a0b73cff1075cfdc7289de84c78eb4bd695ca09a86281b199d5952ffa59fe03b"
+    },
+    {
+      "path": "skills/spec-sweep/references/sources/github-issues.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 5638,
+      "sha256": "84369bb4551ecab47a11e726094f878618ac0f04ff81fe580fb159b7a9b8fb35"
+    },
+    {
+      "path": "skills/spec-sweep/references/sources/slack.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 5304,
+      "sha256": "833872155e6478bbbbecf44d27a5dba3b9877d881ce70654ef6348eef8078aac"
+    },
+    {
+      "path": "skills/spec-sweep/references/state-schema.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 11158,
+      "sha256": "0632d9ebe2b864d0c36f075725f4a1f2d17df0baa861bfa8a11ab21e9329e791"
+    },
+    {
+      "path": "skills/spec-sweep/references/subagent-template.md",
+      "skill": "spec-sweep",
+      "owner_role": "reference-contract",
+      "bytes": 2346,
+      "sha256": "f1432a0ac7f85f918d49a7b07e5b0dc2bfe68d0705178865e5c3a3e52fa85962"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/analyze_riffrec_zip.py",
+      "skill": "spec-sweep",
+      "owner_role": "deterministic-helper",
+      "bytes": 50725,
+      "sha256": "805f3b5c14c200b220c98e1d8c6fc62d8f6e03c59e2c0b2287d04473ae6627f9"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/run-python.sh",
+      "skill": "spec-sweep",
+      "owner_role": "deterministic-helper",
+      "bytes": 774,
+      "sha256": "ae5ff4417bb96ac45a8f2aee143dc0bea59fa69bf101968b543e22dd766ef7c9"
+    },
+    {
+      "path": "skills/spec-sweep/scripts/sweep-state.py",
+      "skill": "spec-sweep",
+      "owner_role": "deterministic-helper",
+      "bytes": 29543,
+      "sha256": "dfeb18f5bdec0b38d9658ce57bf9cbd2b90b4cebd18e09e852a526a0c56a64d0"
+    },
+    {
+      "path": "skills/spec-sweep/SKILL.md",
+      "skill": "spec-sweep",
+      "owner_role": "entry-contract",
+      "bytes": 16270,
+      "sha256": "364b62f4a1c1ccef1e9df503f4d683d1c240fb15f5dedc688c22f8be04fd4d10"
+    },
+    {
+      "path": "skills/spec-test-browser/evals/capability-cases.json",
+      "skill": "spec-test-browser",
+      "owner_role": "evaluation",
+      "bytes": 4153,
+      "sha256": "79e48dd1bf9e7c990f5bb54771a1ea7516a40304e3ed219ddbe3e990897a6682"
+    },
+    {
+      "path": "skills/spec-test-browser/references/pipeline-orchestration.md",
+      "skill": "spec-test-browser",
+      "owner_role": "reference-contract",
+      "bytes": 2576,
+      "sha256": "7a7d76a86e50ddd3eec97a01dee874bbd9e1c2d07b1fafc76e2beafe4e4cd71d"
+    },
+    {
+      "path": "skills/spec-test-browser/scripts/agent-browser-run-context.cjs",
+      "skill": "spec-test-browser",
+      "owner_role": "deterministic-helper",
+      "bytes": 38971,
+      "sha256": "52d395062bc68137328c6fb7a0204e349a943be09915512ac0c9839af8f28785"
+    },
+    {
+      "path": "skills/spec-test-browser/SKILL.md",
+      "skill": "spec-test-browser",
+      "owner_role": "entry-contract",
+      "bytes": 8737,
+      "sha256": "62ddcec02343dc561faa343732cf995c7949a61efed0ffd9e78711d220db366a"
+    },
+    {
+      "path": "skills/spec-test-xcode/SKILL.md",
+      "skill": "spec-test-xcode",
+      "owner_role": "entry-contract",
+      "bytes": 6546,
+      "sha256": "fc4481ca7bd008b2935ca18cbaab45e3f53e4a9946838998a06cbfe764e64044"
+    },
+    {
+      "path": "skills/spec-work/evals/examples.json",
+      "skill": "spec-work",
+      "owner_role": "evaluation",
+      "bytes": 10522,
+      "sha256": "ae6c96ebe140c7ca746a992a44d8950778b5734f709a2b9be02f7105d742dd02"
+    },
+    {
+      "path": "skills/spec-work/references/agents/figma-design-sync.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 9367,
+      "sha256": "23ee37bf730071d693ca6d5498f2fb1507d1d97588b6c6fb75708b2a10cec40b"
+    },
+    {
+      "path": "skills/spec-work/references/execution-engines.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 11798,
+      "sha256": "53a296b2dea190dcde3d340526d87f8775eabcc144c98c8e9dcfc72542b0cd4a"
+    },
+    {
+      "path": "skills/spec-work/references/execution-strategy.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 15496,
+      "sha256": "bfe35ed85a33bc7fc7e37d84bdeaddad7531d1ff1a335267b3f195bdf7c0c363"
+    },
+    {
+      "path": "skills/spec-work/references/feedback-and-tests.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 10087,
+      "sha256": "7f10a42c817f44ba8e1679b93c0218d1562e54645c05bd004a3e938d7cb20ea2"
+    },
+    {
+      "path": "skills/spec-work/references/implementation-quality.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 8279,
+      "sha256": "408e18f00b691df6e9ecb75f64a44f342c3ec5b3541a78af14fc784800e6e45e"
+    },
+    {
+      "path": "skills/spec-work/references/non-code-execution.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 3145,
+      "sha256": "6b6c4c7776258333c8d6be1e432f714a1c6b02b1677f0dec194355d758c49000"
+    },
+    {
+      "path": "skills/spec-work/references/review-findings-followup.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 11672,
+      "sha256": "c7aa22d33c91cfb41e6e72d78a8d8c4617487af002e650f257795c331942f993"
+    },
+    {
+      "path": "skills/spec-work/references/shipping-workflow.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 28477,
+      "sha256": "e3958fd53524c649483a02752b2ccda7ed5a418f95aa417529474de8cdc001dc"
+    },
+    {
+      "path": "skills/spec-work/references/tracker-defer.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 15494,
+      "sha256": "144db0fc330d7dd20a4f67d297d39c9e1415999f041fa39d77a7c3a416e59f58"
+    },
+    {
+      "path": "skills/spec-work/references/work-intake-and-task-pack.md",
+      "skill": "spec-work",
+      "owner_role": "reference-contract",
+      "bytes": 13597,
+      "sha256": "6638611d94988a4499d6f662050fd268c04af9b464c4c38a85dc22df40847708"
+    },
+    {
+      "path": "skills/spec-work/scripts/source-plan-file-hash.cjs",
+      "skill": "spec-work",
+      "owner_role": "deterministic-helper",
+      "bytes": 2120,
+      "sha256": "84f9febee7627cc267b46e555ad25baf7795edae7df54c2790b2553b7931a586"
+    },
+    {
+      "path": "skills/spec-work/scripts/working-tree-fingerprint.cjs",
+      "skill": "spec-work",
+      "owner_role": "deterministic-helper",
+      "bytes": 4091,
+      "sha256": "62c6d6a47d6fde296225a6d9063bac841e630b13bc0e44f5a24c491ef8658cb3"
+    },
+    {
+      "path": "skills/spec-work/SKILL.md",
+      "skill": "spec-work",
+      "owner_role": "entry-contract",
+      "bytes": 36197,
+      "sha256": "ab4ab7848424576f3a040c42473848c0e7d1d3af2e6a06d3e888a90d0715b1fd"
+    },
+    {
+      "path": "skills/spec-worktree/scripts/worktree-manager.sh",
+      "skill": "spec-worktree",
+      "owner_role": "deterministic-helper",
+      "bytes": 26329,
+      "sha256": "d9e8291931961d80b1184803211d1ab4f192fdce61f21c4fc4148b2e1f0afa05"
+    },
+    {
+      "path": "skills/spec-worktree/SKILL.md",
+      "skill": "spec-worktree",
+      "owner_role": "entry-contract",
+      "bytes": 12640,
+      "sha256": "6acb7b538fe55d6957f7332daebc5e26a8c7cbd637d1d0fbe2c3f8dec9f31340"
+    },
+    {
+      "path": "skills/spec-write-skill/agents/openai.yaml",
+      "skill": "spec-write-skill",
+      "owner_role": "support-asset",
+      "bytes": 991,
+      "sha256": "68490830c65e6d49afaedf6acf967f1f81de3e12e11bf0bbfe50b13a44a5b851"
+    },
+    {
+      "path": "skills/spec-write-skill/evals/export-trigger-evals.cjs",
+      "skill": "spec-write-skill",
+      "owner_role": "evaluation",
+      "bytes": 2268,
+      "sha256": "0f6a8337e74450f7cd1f033d167a5d38e96ad9f06275a931ccbfaf4a92f0f033"
+    },
+    {
+      "path": "skills/spec-write-skill/evals/README.md",
+      "skill": "spec-write-skill",
+      "owner_role": "evaluation",
+      "bytes": 4988,
+      "sha256": "98f773d0df9aa624cd5228f70813a1aeb39850c6a17c3f3f8b5d656d218cba37"
+    },
+    {
+      "path": "skills/spec-write-skill/evals/trigger-cases.json",
+      "skill": "spec-write-skill",
+      "owner_role": "evaluation",
+      "bytes": 16431,
+      "sha256": "ce54d5f33b02a67361b3b7da2502cf9f7e7f041f4cc67f61a3479ce9c0b96ec0"
+    },
+    {
+      "path": "skills/spec-write-skill/evals/validate-promotion-evidence.cjs",
+      "skill": "spec-write-skill",
+      "owner_role": "evaluation",
+      "bytes": 31920,
+      "sha256": "fccb3545eb0190a4bac9e836b561d459fc773626331ff5291aa61590d46c7af7"
+    },
+    {
+      "path": "skills/spec-write-skill/references/authoring-method.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 10331,
+      "sha256": "1568273afdc4a542754427daa76e0f938cb19c3150097214e4b603a2023ff197"
+    },
+    {
+      "path": "skills/spec-write-skill/references/authoring-workbench.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 5830,
+      "sha256": "e94344ee8dbeb9dee3a2c71f46e1649279f62f2ba3ecd4a5cfa5ca122c358bbd"
+    },
+    {
+      "path": "skills/spec-write-skill/references/behavior-contract-design.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 6002,
+      "sha256": "ac0e6a47e48e45b1cd77eec93167a2967763f78aa056bb83e3ea600d91f2349c"
+    },
+    {
+      "path": "skills/spec-write-skill/references/delivery-gates.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 6344,
+      "sha256": "2c978e3566928ad65f82f9f877ef92c9ea9ae60e194bc97502d4158be7e72a22"
+    },
+    {
+      "path": "skills/spec-write-skill/references/evaluation-design.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 3268,
+      "sha256": "b75c237adb8865c7b8e0c6ac7a3ec25f7264dc881988f93af089f13bdc4d2465"
+    },
+    {
+      "path": "skills/spec-write-skill/references/optimization-and-lifecycle.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 1763,
+      "sha256": "e497b64b9b5af2d28530b63a199205c2e839b6344aba9f37fde042283cebade8"
+    },
+    {
+      "path": "skills/spec-write-skill/references/project-profiles.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 1877,
+      "sha256": "72eba0d339c3e32b96d78fff86de8fb18d5a6f6be4cad81fdd18755a09a6fe3f"
+    },
+    {
+      "path": "skills/spec-write-skill/references/target-profiles.md",
+      "skill": "spec-write-skill",
+      "owner_role": "reference-contract",
+      "bytes": 3500,
+      "sha256": "a5125bb53c7980030dc86a9aad5865c40ba794efbe6e03c946de14a2c837edba"
+    },
+    {
+      "path": "skills/spec-write-skill/scripts/inspect-context.cjs",
+      "skill": "spec-write-skill",
+      "owner_role": "deterministic-helper",
+      "bytes": 7354,
+      "sha256": "f01c1ca42afa98a2499a4a113b750f26dd657200b9043540c5b8524171581556"
+    },
+    {
+      "path": "skills/spec-write-skill/scripts/lib/package-inspection.cjs",
+      "skill": "spec-write-skill",
+      "owner_role": "deterministic-helper",
+      "bytes": 13757,
+      "sha256": "8aeb18b338facb68503bf7896952df91eb973031acfe4d63a21ddc2fa39e43ec"
+    },
+    {
+      "path": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "skill": "spec-write-skill",
+      "owner_role": "deterministic-helper",
+      "bytes": 21442,
+      "sha256": "20a84ac75b1ff6d162505afdc883d49a27f8b55bef1c99cf4047e7866a5b1dab"
+    },
+    {
+      "path": "skills/spec-write-skill/scripts/validate-skill.cjs",
+      "skill": "spec-write-skill",
+      "owner_role": "deterministic-helper",
+      "bytes": 18863,
+      "sha256": "7325709632b7675f7010568efe9535590ef0e9da2929da6fb757e2238e627e2f"
+    },
+    {
+      "path": "skills/spec-write-skill/SKILL.md",
+      "skill": "spec-write-skill",
+      "owner_role": "entry-contract",
+      "bytes": 8492,
+      "sha256": "0c47a193000a8f70f75c7b018c3dac86c5d4078bd9d0a4869301ace91a0ae48a"
+    },
+    {
+      "path": "skills/spec-write-tasks/agents/openai.yaml",
+      "skill": "spec-write-tasks",
+      "owner_role": "support-asset",
+      "bytes": 538,
+      "sha256": "ade0102a959f8418a02b96969ff7add4afbabeeffd031dbce1015727e92de56c"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/boundary-cases.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 5920,
+      "sha256": "6b666a9b5a336c02199ef46eb6bc2642d9533bc0290f1edf0ab877a9f0e8fc20"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/expected-behavior-cases.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 2070,
+      "sha256": "76dd6498a8d826b2aa5124855939189a808a8c4dd7d98889dcaaa15c83ca4c49"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/failure-cases.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 3683,
+      "sha256": "e335baa8d6f7e3a9a0991eed198184ca3cc11ba43440c05ea0f644546c581a3f"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/output-quality-cases.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 11873,
+      "sha256": "f483a13608d8c1f70b76cafad57b508fe13db75ef95ac78a3db1b3550a97c820"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/output/cases.jsonl",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 2675,
+      "sha256": "77a6a23388193bd5b84fbca4735219c2897bfe7d1a0c21e4a0c7c99183c4ad2d"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/README.md",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 2697,
+      "sha256": "e6456a3506ca9dff2b246c2133e2c0fc75be7e132b4da5a0245573155cc61435"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/semantic_config.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 1219,
+      "sha256": "3b4d0af4b3f2eb0ff56c969b0bc07bfaa8c2a92036577960ac9d37a6e03d09e1"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/trigger-cases.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 1622,
+      "sha256": "5cbce4795097e0350ffcf02fec2630625ea481498f9c6ca4495f9bec65ab9ec4"
+    },
+    {
+      "path": "skills/spec-write-tasks/evals/yao-trigger-cases.json",
+      "skill": "spec-write-tasks",
+      "owner_role": "evaluation",
+      "bytes": 1500,
+      "sha256": "c43a7def49cb78e90f8eb85876692c5d95f673e79d1ae1e2c497570d162613bb"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/execution-handoff-contract.md",
+      "skill": "spec-write-tasks",
+      "owner_role": "reference-contract",
+      "bytes": 12570,
+      "sha256": "543d4a4bcea92d1127dd615cf72ffda2125ae5ae6645d3d1531d59d3cc65ec1b"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-pack-schema.md",
+      "skill": "spec-write-tasks",
+      "owner_role": "reference-contract",
+      "bytes": 17227,
+      "sha256": "328f458f4493b5f5a99e00bcb8cf283a4e22c4d1ac07b03bbbba7d9c40a96644"
+    },
+    {
+      "path": "skills/spec-write-tasks/references/task-quality-guide.md",
+      "skill": "spec-write-tasks",
+      "owner_role": "reference-contract",
+      "bytes": 21684,
+      "sha256": "9d610790ddc60402b7ebc060ea6c5ac83ba0a30e81bb5f6ab8e0ae553677a651"
+    },
+    {
+      "path": "skills/spec-write-tasks/SKILL.md",
+      "skill": "spec-write-tasks",
+      "owner_role": "entry-contract",
+      "bytes": 9970,
+      "sha256": "f59ad8b2838661e411914d51410a0ab3c60251362127e1983c1a902d0855ab03"
+    },
+    {
+      "path": "skills/using-spec-first/references/conditional-routing-boundaries.md",
+      "skill": "using-spec-first",
+      "owner_role": "reference-contract",
+      "bytes": 4273,
+      "sha256": "dd4cc1862d67526e47be70a1bdca9600279bbfd55be8abb1ec66533efb9a1bc5"
+    },
+    {
+      "path": "skills/using-spec-first/references/public-route-map.md",
+      "skill": "using-spec-first",
+      "owner_role": "reference-contract",
+      "bytes": 4322,
+      "sha256": "9895d313bcbd9cbf5a6318dbe42734d3cc80ebc1c00d43515bea11706089d419"
+    },
+    {
+      "path": "skills/using-spec-first/SKILL.md",
+      "skill": "using-spec-first",
+      "owner_role": "entry-contract",
+      "bytes": 4149,
+      "sha256": "0f65e00250fb8a63a57a6b99bfdc0b26c74f9d132fe2bc2e9395ff41b60e69d3"
+    }
+  ]
+}

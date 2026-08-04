@@ -4,11 +4,12 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { runNpm } = require('./lib/npm-cli.cjs');
 const {
   DEFAULT_OUTPUT_PATH,
   buildRuntimeCapabilityCatalog,
 } = require('./generate-runtime-capability-catalog');
+const { getSupportedPlatforms } = require('../src/cli/adapters');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
@@ -19,6 +20,14 @@ const GOVERNANCE_PATH = path.join(
   'contracts',
   'dual-host-governance',
   'skills-governance.json',
+);
+const GOVERNANCE_SCHEMA_PATH = path.join(
+  REPO_ROOT,
+  'src',
+  'cli',
+  'contracts',
+  'dual-host-governance',
+  'skills-governance.schema.json',
 );
 const REQUIRED_STANDALONE_SUMMARIES = ['using-spec-first', 'spec-write-tasks'];
 
@@ -116,9 +125,61 @@ function checkPublicWorkflowSummaries() {
   });
 }
 
+function checkSupportedHostGovernanceCoherence() {
+  const supportedHosts = [...getSupportedPlatforms()].sort();
+  const governance = readJson(GOVERNANCE_PATH);
+  const schema = readJson(GOVERNANCE_SCHEMA_PATH);
+  const hostSchema = schema.$defs && schema.$defs.host;
+  const recordSchema = schema.$defs && schema.$defs.skillGovernanceRecord;
+  const deliverySchema = recordSchema
+    && recordSchema.properties
+    && recordSchema.properties.host_delivery;
+  const ownerHostValues = recordSchema
+    && recordSchema.properties
+    && recordSchema.properties.owner_host
+    && recordSchema.properties.owner_host.enum;
+  const schemaHostSets = [
+    Array.isArray(hostSchema && hostSchema.enum) ? [...hostSchema.enum].sort() : [],
+    Array.isArray(deliverySchema && deliverySchema.required) ? [...deliverySchema.required].sort() : [],
+    deliverySchema && deliverySchema.properties
+      ? Object.keys(deliverySchema.properties).sort()
+      : [],
+    Array.isArray(ownerHostValues)
+      ? ownerHostValues.filter((value) => value !== null).sort()
+      : [],
+  ];
+  const mismatchedRecords = (governance.skills || [])
+    .filter((record) => (
+      JSON.stringify(Object.keys(record.host_delivery || {}).sort()) !== JSON.stringify(supportedHosts)
+    ))
+    .map((record) => record.skill_name);
+  const schemaMatches = schemaHostSets.every((hostSet) => (
+    JSON.stringify(hostSet) === JSON.stringify(supportedHosts)
+  ));
+  const ok = schemaMatches && mismatchedRecords.length === 0;
+
+  return guard({
+    guardId: 'supported-host-governance-coherence',
+    classification: 'blocking',
+    artifactPath: 'src/cli/contracts/dual-host-governance/skills-governance.json',
+    checkedSources: [
+      'src/cli/adapters/index.js',
+      'src/cli/contracts/dual-host-governance/skills-governance.json',
+      'src/cli/contracts/dual-host-governance/skills-governance.schema.json',
+    ],
+    ok,
+    passReason: 'supported-host-governance-current',
+    failReason: schemaMatches
+      ? `supported-host-governance-record-mismatch:${mismatchedRecords.join(',')}`
+      : 'supported-host-governance-schema-mismatch',
+  });
+}
+
 function checkPackageDeliverySurface() {
   const pkg = readJson(PACKAGE_JSON_PATH);
   const requiredFiles = [
+    'README.md',
+    'README.en.md',
     'docs/catalog/runtime-capabilities.md',
     'docs/contracts/workflows/',
     'scripts/check-release-continuity.cjs',
@@ -163,7 +224,7 @@ function readPackageDryRunFiles() {
   const cacheRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-release-continuity-npm-cache-'));
   let result;
   try {
-    result = spawnSync('npm', ['pack', '--dry-run', '--json'], {
+    result = runNpm(['pack', '--dry-run', '--json'], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
       maxBuffer: 10 * 1024 * 1024,
@@ -172,6 +233,8 @@ function readPackageDryRunFiles() {
         npm_config_cache: cacheRoot,
       },
     });
+  } catch (error) {
+    return { ok: false, reason: error.message, files: new Set() };
   } finally {
     fs.rmSync(cacheRoot, { recursive: true, force: true });
   }
@@ -223,18 +286,103 @@ function checkWebsiteGatePreserved() {
 
 function checkReadmeBoundaryLinks() {
   const readme = read(repoPath('README.md'));
-  const readmeZh = read(repoPath('README.zh-CN.md'));
+  const readmeEn = read(repoPath('README.en.md'));
+  const readmeZhCompat = read(repoPath('README.zh-CN.md'));
   const target = 'docs/contracts/source-runtime-customization-boundary.md';
-  const ok = readme.includes(target) && readmeZh.includes(target);
+  const boundaryLinksCurrent = [readme, readmeEn, readmeZhCompat]
+    .every((markdown) => markdown.includes(target));
+  const compatibilityCurrent = readme === readmeZhCompat;
 
   return guard({
     guardId: 'readme-source-runtime-boundary-links',
     classification: 'docs-only-no-impact',
     artifactPath: 'docs/contracts/source-runtime-customization-boundary.md',
-    checkedSources: ['README.md', 'README.zh-CN.md', target],
-    ok,
+    checkedSources: ['README.md', 'README.en.md', 'README.zh-CN.md', target],
+    ok: boundaryLinksCurrent && compatibilityCurrent,
     passReason: 'readme-boundary-links-current',
-    failReason: 'readme-boundary-links-missing',
+    failReason: boundaryLinksCurrent
+      ? 'readme-zh-compatibility-drift'
+      : 'readme-boundary-links-missing',
+  });
+}
+
+function checkOpenCodeReleaseSurface() {
+  const pkg = readJson(PACKAGE_JSON_PATH);
+  const surfaces = [
+    {
+      path: 'README.md',
+      tokens: [
+        '| OpenCode |',
+        '`--opencode`',
+        'generated_runtime_preview',
+        'docs/catalog/runtime-capabilities.md',
+      ],
+    },
+    {
+      path: 'README.en.md',
+      tokens: [
+        '| OpenCode |',
+        '`--opencode`',
+        'generated_runtime_preview',
+        'docs/catalog/runtime-capabilities.md',
+      ],
+    },
+    {
+      path: 'README.zh-CN.md',
+      tokens: [
+        '| OpenCode |',
+        '`--opencode`',
+        'generated_runtime_preview',
+        'docs/catalog/runtime-capabilities.md',
+      ],
+    },
+    {
+      path: 'CLAUDE.md',
+      tokens: ['.opencode/commands/spec-*.md', '.opencode/commands/spec/', '.opencode/skills/', '.opencode/spec-first/'],
+    },
+    {
+      path: 'AGENTS.md',
+      tokens: ['.opencode/commands/spec-*.md', '.opencode/commands/spec/', '.opencode/skills/', '.opencode/spec-first/'],
+    },
+    {
+      path: 'docs/contracts/context-governance.md',
+      tokens: ['.opencode/commands/spec-*.md', '.opencode/commands/spec/**', '.opencode/skills/**', 'opencode.jsonc'],
+    },
+    {
+      path: 'docs/contracts/source-runtime-customization-boundary.md',
+      tokens: ['spec-first init --opencode', 'doctor --opencode', '${XDG_CONFIG_HOME}/opencode/opencode.json'],
+    },
+    {
+      path: 'skills/spec-runtime-setup/SKILL.md',
+      tokens: ['Kiro/Qoder/Cursor/OpenCode', 'opencode-governed-assets-v1', 'host-config-jsonc-precedence-blocked'],
+    },
+    {
+      path: 'src/cli/brand.js',
+      tokens: ['OpenCode preview'],
+    },
+  ];
+  const missing = [];
+  for (const surface of surfaces) {
+    const content = read(repoPath(surface.path));
+    for (const token of surface.tokens) {
+      if (!content.includes(token)) missing.push(`${surface.path}:${token}`);
+    }
+  }
+  if (!String(pkg.description || '').includes('OpenCode')) {
+    missing.push('package.json:description:OpenCode');
+  }
+  if (!Array.isArray(pkg.keywords) || !pkg.keywords.includes('opencode')) {
+    missing.push('package.json:keywords:opencode');
+  }
+
+  return guard({
+    guardId: 'opencode-release-surface',
+    classification: 'blocking',
+    artifactPath: 'README.md',
+    checkedSources: [...surfaces.map((surface) => surface.path), 'package.json'],
+    ok: missing.length === 0,
+    passReason: 'opencode-release-surface-current',
+    failReason: `opencode-release-surface-missing:${missing.join(',')}`,
   });
 }
 
@@ -266,6 +414,17 @@ function runChecks(options = {}) {
       run: () => checkRuntimeCatalogFresh(options),
     },
     {
+      guardId: 'supported-host-governance-coherence',
+      classification: 'blocking',
+      artifactPath: 'src/cli/contracts/dual-host-governance/skills-governance.json',
+      checkedSources: [
+        'src/cli/adapters/index.js',
+        'src/cli/contracts/dual-host-governance/skills-governance.json',
+        'src/cli/contracts/dual-host-governance/skills-governance.schema.json',
+      ],
+      run: checkSupportedHostGovernanceCoherence,
+    },
+    {
       guardId: 'public-workflow-contract-summary-coverage',
       classification: 'blocking',
       artifactPath: 'src/cli/contracts/dual-host-governance/skills-governance.json',
@@ -290,8 +449,26 @@ function runChecks(options = {}) {
       guardId: 'readme-source-runtime-boundary-links',
       classification: 'docs-only-no-impact',
       artifactPath: 'docs/contracts/source-runtime-customization-boundary.md',
-      checkedSources: ['README.md', 'README.zh-CN.md'],
+      checkedSources: ['README.md', 'README.en.md', 'README.zh-CN.md'],
       run: checkReadmeBoundaryLinks,
+    },
+    {
+      guardId: 'opencode-release-surface',
+      classification: 'blocking',
+      artifactPath: 'README.md',
+      checkedSources: [
+        'README.md',
+        'README.en.md',
+        'README.zh-CN.md',
+        'CLAUDE.md',
+        'AGENTS.md',
+        'docs/contracts/context-governance.md',
+        'docs/contracts/source-runtime-customization-boundary.md',
+        'skills/spec-runtime-setup/SKILL.md',
+        'src/cli/brand.js',
+        'package.json',
+      ],
+      run: checkOpenCodeReleaseSurface,
     },
   ];
   const guards = checks.map((check) => {

@@ -1,0 +1,673 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/schemas/setup-registry.v9.json",
+  "title": "spec-runtime-setup registry v9",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "summary_columns",
+    "defaults",
+    "install_mirrors",
+    "external_dependencies",
+    "hosts",
+    "tools",
+    "helpers",
+    "providers",
+    "provider_readiness_defaults",
+    "artifact_contracts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "setup-registry.v9"
+    },
+    "summary_columns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "defaults": {
+      "$ref": "#/$defs/kindDefaults"
+    },
+    "install_mirrors": {
+      "$ref": "#/$defs/installMirrors"
+    },
+    "external_dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/externalDependency"
+      }
+    },
+    "hosts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claude",
+        "codex",
+        "cursor",
+        "kiro",
+        "opencode",
+        "qoder"
+      ],
+      "properties": {
+        "claude": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "codex": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "cursor": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "kiro": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "opencode": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "qoder": {
+          "$ref": "#/$defs/hostDefinition"
+        }
+      }
+    },
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/toolEntry"
+      }
+    },
+    "helpers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/helperEntry"
+      }
+    },
+    "providers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/providerEntry"
+      }
+    },
+    "provider_readiness_defaults": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "schema_version"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifact_contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/artifactContract"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "kindDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "helper",
+        "provider"
+      ],
+      "properties": {
+        "tool": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "host_config": {
+              "$ref": "#/$defs/hostConfig"
+            }
+          }
+        },
+        "helper": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "provider": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "installMirrors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "npm"
+      ],
+      "properties": {
+        "npm": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "endpoint",
+            "environment"
+          ],
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "environment": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "NPM_CONFIG_REGISTRY",
+                "npm_config_registry"
+              ],
+              "properties": {
+                "NPM_CONFIG_REGISTRY": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "npm_config_registry": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hostDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "defaults"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "defaults": {
+          "$ref": "#/$defs/kindDefaults"
+        }
+      }
+    },
+    "configPath": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "macos",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "properties": {
+            "macos": { "type": "string", "minLength": 1 },
+            "linux": { "type": "string", "minLength": 1 },
+            "wsl": { "type": "string", "minLength": 1 },
+            "windows": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "precedenceGuard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config_path",
+        "config_format",
+        "precedence",
+        "reason_code"
+      ],
+      "properties": {
+        "config_path": { "$ref": "#/$defs/configPath" },
+        "config_format": { "const": "jsonc" },
+        "precedence": { "type": "number" },
+        "reason_code": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        }
+      }
+    },
+    "hostConfigTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config_path",
+        "config_format",
+        "precedence"
+      ],
+      "properties": {
+        "config_path": { "$ref": "#/$defs/configPath" },
+        "config_format": {
+          "enum": ["json", "toml"]
+        },
+        "precedence": { "type": "number" },
+        "writable_check": {
+          "enum": ["parent-or-file", "file-only"]
+        },
+        "requires_user_scope": { "type": "boolean" },
+        "requires_user_scope_opt_in": { "type": "boolean" },
+        "containment_root": { "type": "string", "minLength": 1 },
+        "precedence_guards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/precedenceGuard" }
+        }
+      }
+    },
+    "hostConfig": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "scope": { "type": "string", "minLength": 1 },
+        "json_container_path": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+          }
+        },
+        "server_representation": {
+          "enum": ["standard", "opencode-local"]
+        },
+        "permission_policy": {
+          "$ref": "#/$defs/opencodePermissionPolicy"
+        },
+        "targets": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/hostConfigTarget" }
+        },
+        "fallback_order": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "uninstall_targets": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "opencodePermissionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "const": "opencode-governed-assets-v1"
+        }
+      }
+    },
+    "externalDependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "ecosystem",
+        "package",
+        "version",
+        "command"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "ecosystem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "package": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/python"
+        },
+        "installers": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/installers"
+        },
+        "distribution": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/distribution"
+        },
+        "hook_normalization_contract": {
+          "$ref": "#/$defs/pythonToolCandidate/properties/hook_normalization_contract"
+        },
+        "candidate": {
+          "$ref": "#/$defs/pythonToolCandidate"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "ecosystem": { "const": "pypi" } },
+            "required": ["ecosystem"]
+          },
+          "then": {
+            "required": ["python", "installers", "distribution", "hook_normalization_contract"]
+          }
+        }
+      ]
+    },
+    "pythonToolCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ecosystem",
+        "package",
+        "version",
+        "command",
+        "python",
+        "installers",
+        "distribution",
+        "hook_normalization_contract"
+      ],
+      "properties": {
+        "ecosystem": {
+          "const": "pypi"
+        },
+        "package": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requires", "allow_managed_download"],
+          "properties": {
+            "requires": {
+              "type": "string",
+              "pattern": "^>=3\\.10$"
+            },
+            "allow_managed_download": {
+              "const": false
+            }
+          }
+        },
+        "installers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["preference", "plain_pip_allowed"],
+          "properties": {
+            "preference": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "prefixItems": [
+                { "const": "uv" },
+                { "const": "pipx" }
+              ],
+              "items": false
+            },
+            "plain_pip_allowed": {
+              "const": false
+            }
+          }
+        },
+        "distribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wheel_url", "sha256", "index_url"],
+          "properties": {
+            "wheel_url": {
+              "type": "string",
+              "pattern": "^https://files\\.pythonhosted\\.org/.+\\.whl$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "index_url": {
+              "const": "https://pypi.org/simple"
+            }
+          }
+        },
+        "hook_normalization_contract": {
+          "type": "string",
+          "const": "graphify-python-hook-normalization.v1"
+        }
+      }
+    },
+    "hostOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claude": {
+          "$ref": "#/$defs/hostOverride"
+        },
+        "codex": {
+          "$ref": "#/$defs/hostOverride"
+        },
+        "cursor": {
+          "$ref": "#/$defs/hostOverride"
+        },
+        "kiro": {
+          "$ref": "#/$defs/hostOverride"
+        },
+        "opencode": {
+          "$ref": "#/$defs/hostOverride"
+        },
+        "qoder": {
+          "$ref": "#/$defs/hostOverride"
+        }
+      }
+    },
+    "hostOverride": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "host_config": {
+          "$ref": "#/$defs/hostConfig"
+        }
+      }
+    },
+    "platformOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "macos": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "linux": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "wsl": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "windows": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "firstGeneration": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "requirement_workspace_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "providerReadiness": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "first_generation": {
+          "$ref": "#/$defs/firstGeneration"
+        }
+      }
+    },
+    "entityEntry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "host_overrides": {
+          "$ref": "#/$defs/hostOverrides"
+        },
+        "platform_overrides": {
+          "$ref": "#/$defs/platformOverrides"
+        },
+        "first_generation": {
+          "$ref": "#/$defs/firstGeneration"
+        },
+        "provider_readiness": {
+          "$ref": "#/$defs/providerReadiness"
+        }
+      }
+    },
+    "toolEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entityEntry"
+        },
+        {
+          "type": "object",
+          "required": [
+            "required",
+            "installation",
+            "host_overrides",
+            "platform_overrides"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "installation": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "helperEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entityEntry"
+        },
+        {
+          "type": "object",
+          "required": [
+            "required",
+            "baseline_blocking",
+            "installation",
+            "platform_overrides"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "baseline_blocking": {
+              "type": "boolean"
+            },
+            "installation": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "providerEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entityEntry"
+        },
+        {
+          "type": "object",
+          "required": [
+            "installation",
+            "first_generation",
+            "platform_overrides"
+          ],
+          "properties": {
+            "installation": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "artifactContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "schema_version",
+        "path",
+        "producer",
+        "consumers"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "schema_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "consumers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

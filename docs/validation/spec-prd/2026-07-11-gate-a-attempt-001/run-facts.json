@@ -1,0 +1,416 @@
+{
+  "schema_version": "contract-reset-run-facts/v1",
+  "status": "inconclusive",
+  "model_invoked": false,
+  "isolation": {
+    "status": "inconclusive",
+    "primitive": "macos-sandbox-exec",
+    "probes": {},
+    "reason_code": "isolation_probe_execution_failed",
+    "exit_code": null,
+    "signal": "SIGABRT",
+    "error": null
+  },
+  "scheduled_session_count": 54,
+  "attempted_sessions": [
+    {
+      "case_id": "create-brownfield-single-surface",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "b3e861fb-1091-4a07-b367-484a66915f70",
+      "namespace_id": "ns-7240e0cf01418b8ce259",
+      "status": "inconclusive",
+      "reason_code": "isolation_probe_execution_failed",
+      "model_invoked": false
+    }
+  ],
+  "sessions": [
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "b3e861fb-1091-4a07-b367-484a66915f70"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "354e248f-db6d-4f60-86ca-1757b464c530"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "c398443c-4fd9-4ecd-8042-644035ac4c50"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "439d9015-14e0-4c41-9d38-482e05ae9a96"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "2ebcef17-b8c4-49cf-bffc-62e63d4bd137"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "72740214-662a-4803-ad0e-141f4588feb0"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "d5879641-5ea9-4ad1-a404-c4c01e88b5d1"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "3a3cb08a-a245-4f32-a14a-274c3b9524f0"
+    },
+    {
+      "case_id": "create-brownfield-single-surface",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "9fc7f5f0-d19c-4e86-8827-cd37e4802bd2"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "6f25694f-d90b-44bc-b93e-1e1f98403ac0"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "b5a4e29f-4794-4cd7-8a0b-18d539d8f914"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "2959e2ce-88e4-490c-a5bb-2fd1fd27fbcf"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "966880a8-4859-4876-997b-994a132ee051"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "0a9aa9b4-572c-4da5-934e-f7cf31efec51"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "143d0570-e56b-4387-b5cd-4427652aea61"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "76cf8a9e-8b2d-4c38-b12a-856e88a0becf"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "3d11536e-37c0-4ae3-9c84-fc088e8d28e9"
+    },
+    {
+      "case_id": "refine-ratified-meeting-code-conflict",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "f5482eda-c8b6-42fe-9555-b0ad40eae6a1"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "419866cb-60b5-4ee3-8a1e-834c05a0ec91"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "f8b24647-2e74-4787-8cbd-7a3bbc3c60fc"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "30236f99-0766-4e57-aed8-9b72d16d4509"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "1c5012fa-81c3-4026-b843-4663e5465f2f"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "1454f66b-6561-4b36-af38-29120570eab7"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "2da281d3-d996-4e73-982b-6f147269f499"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "27d15330-2623-479e-a1a1-f79d64f49c37"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "a47c3ba5-8087-46dc-829b-659fbe4e5cc3"
+    },
+    {
+      "case_id": "validate-read-only-mutation-sentinel",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "fc694326-efb2-4a5a-af65-f3790113c7dd"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "ea8f102d-6d93-4cc7-b555-c1baf3215c9e"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "f31b8a1d-8c96-4180-b500-824e852bc0e7"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "6772f759-8468-4342-808d-d9b41c7d0ebd"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "1e57a0a3-9c6f-459d-9610-a5482e9bb6ad"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "65dd2cb9-f32c-4912-bfb3-17b2c50edaa2"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "267bf9f1-f1d5-45ca-8aaf-9bfa8655447c"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "7289ea9c-b062-432c-834e-cce5a9e4a73c"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "3c68d5bf-8d6b-44ab-a547-b736989fd9d4"
+    },
+    {
+      "case_id": "critical-design-degraded-authority",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "cc354fff-e6bc-41a8-af42-079801d6e899"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "765c9433-b686-472f-9cad-d7b2f5835eea"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "09e73e5a-fc62-4be1-a5cb-ca4bdf20f931"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "c4167569-8b00-494e-8be2-196052738ffc"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "d3915f1c-60b6-43e6-933e-451a940e57ed"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "03a7fa46-0abd-4cf5-95c5-b3789d04864f"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "6450bc93-3922-471e-be24-ab8563cdea87"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "573805d7-44b7-41d6-990e-d811275fe5af"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "8e246f5e-0f91-4af4-9eda-0dc523845788"
+    },
+    {
+      "case_id": "critical-domain-signoff-timing",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "f3753bc8-7127-47d5-92ed-5657815a574b"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "baseline",
+      "repeat": 1,
+      "order_position": 1,
+      "session_id": "3bbd9da0-f04c-4589-8d26-1d11eefdf300"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "phase1_control",
+      "repeat": 1,
+      "order_position": 2,
+      "session_id": "643b6a7a-0573-480f-8abe-606d3849e6bc"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "candidate",
+      "repeat": 1,
+      "order_position": 3,
+      "session_id": "0310c69d-43c5-4477-b605-5f412a80bfba"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "phase1_control",
+      "repeat": 2,
+      "order_position": 1,
+      "session_id": "a4ff8432-3ee1-4414-96a8-ef6f3c653c99"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "candidate",
+      "repeat": 2,
+      "order_position": 2,
+      "session_id": "b31a44c6-07af-4911-8752-fb5116b53845"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "baseline",
+      "repeat": 2,
+      "order_position": 3,
+      "session_id": "e3e6f8ff-a4da-42b2-9c71-4ecd32b5fce3"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "candidate",
+      "repeat": 3,
+      "order_position": 1,
+      "session_id": "3bfb5f2f-5219-4811-92d4-b7ec3e67a800"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "baseline",
+      "repeat": 3,
+      "order_position": 2,
+      "session_id": "6629da7b-2b8e-4759-9bd1-e834b5b94280"
+    },
+    {
+      "case_id": "critical-stress-multisource",
+      "arm": "phase1_control",
+      "repeat": 3,
+      "order_position": 3,
+      "session_id": "3ce432d2-6e79-42a7-a675-0511386f741d"
+    }
+  ],
+  "reason_codes": [
+    "holdout_commitment_unavailable",
+    "isolation_probe_execution_failed",
+    "model_outcomes_missing"
+  ],
+  "limitations": [
+    "No model output was counted without a passed hard-isolation probe.",
+    "Product quality and materiality remain reviewer/owner judgments."
+  ]
+}

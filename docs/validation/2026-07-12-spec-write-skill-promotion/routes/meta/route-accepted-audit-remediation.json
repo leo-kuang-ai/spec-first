@@ -1,0 +1,10 @@
+{
+  "id": "route-accepted-audit-remediation",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 44374,
+    "cached_input_tokens": 0,
+    "output_tokens": 620,
+    "reasoning_output_tokens": 239
+  }
+}

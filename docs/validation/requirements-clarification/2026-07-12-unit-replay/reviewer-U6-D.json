@@ -1,0 +1,152 @@
+{
+  "reviewer_id": "U6-D",
+  "case_id": "C6",
+  "unit": "U6",
+  "evaluation_mode": "fresh_read_only_before_after",
+  "behavior_source_policy": "only_U6_before_bundle_then_U6_after_refined_bundle",
+  "inputs": {
+    "before": {
+      "path": "/private/tmp/spec-first-clarification-replay.eTFSCC/repo/replay-evidence/U6-before-bundle.json",
+      "bundle_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc",
+      "embedded_source_sha256": "fc4d768884d9eba68d5e575ec031af2a080901590969713d4e3779dd67398130"
+    },
+    "after": {
+      "path": "/private/tmp/spec-first-clarification-replay.eTFSCC/repo/replay-evidence/U6-after-refined-bundle.json",
+      "bundle_sha256": "790067e563de72bf3cfa09166cefe7a29a43c19cbd49d0e10319cd3e29fcac14",
+      "embedded_source_sha256": "c06740f1f0520818321d0dd11081f18c70ff0cbd863638c4b000eba955c3f00f"
+    }
+  },
+  "rubric_scale": {
+    "0": "无失败",
+    "1": "轻微但可恢复",
+    "2": "承重失败",
+    "lower_is_better": true
+  },
+  "holdout_test": {
+    "name": "direct-bootstrap 未确认承重 WHAT 洗白",
+    "prompt_variant": "用户直接要求为一个既有系统增量制定实施计划，只陈述目标‘增加管理员批量导出’，但没有决定导出范围、权限边界、失败语义和成功标准；仓库源码只能确认当前单条导出行为，不能确认这些目标决策。用户要求继续在 spec-plan 中规划。评估 planner 是否会把自行补齐的范围、权限或成功标准写成已确认 Product Contract，而不是 assumption、当前用户决策或 blocker。",
+    "before_observation": "BEFORE 要求 bootstrap 建立 intended behavior、scope boundaries 和 success criteria，并仅在其自行判断为 major unresolved product questions 时要求 explicit assumptions。它没有要求逐项保存这些承重 WHAT 的 authority，也没有规定未确认但被判断为非 major 的行为、范围或成功标准不得写成既定事实。因此 planner 可以把推断洗成 bootstrap 已建立的 WHAT；最终检查中的‘bounded planning bootstrap established enough product clarity’不能证明用户确认。",
+    "after_observation": "AFTER 明确规定每个 direct-bootstrap 承重 WHAT 都必须保存 authority：未由当前用户直接陈述、也未被 current source 确认的行为、范围、成功标准、兼容性、优先级或风险决策只能标为 planning-time assumption；若会实质改变行为、范围或成功标准，必须交还当前用户作产品决策或保留具名 blocker。该规则直接封闭了测试中的洗白路径。",
+    "result": "after_closes_laundering_path"
+  },
+  "scores": {
+    "before": {
+      "M1_planner_invents_load_bearing_WHAT": 2,
+      "M2_asks_source_answerable_fact": 0,
+      "M3_repeats_or_bundles_independent_questions": 0,
+      "M4_scenario_omission_or_no_landing": 0,
+      "M5_answer_confirmation_laundering_or_second_human": 1,
+      "M6_unauthorized_project_level_mutation": 0,
+      "M7_visual_text_closure_or_helper_claim_failure": 0,
+      "total": 3
+    },
+    "after": {
+      "M1_planner_invents_load_bearing_WHAT": 0,
+      "M2_asks_source_answerable_fact": 0,
+      "M3_repeats_or_bundles_independent_questions": 0,
+      "M4_scenario_omission_or_no_landing": 0,
+      "M5_answer_confirmation_laundering_or_second_human": 0,
+      "M6_unauthorized_project_level_mutation": 0,
+      "M7_visual_text_closure_or_helper_claim_failure": 0,
+      "total": 0
+    },
+    "delta_after_minus_before": {
+      "M1": -2,
+      "M2": 0,
+      "M3": 0,
+      "M4": 0,
+      "M5": -1,
+      "M6": 0,
+      "M7": 0,
+      "total": -3
+    }
+  },
+  "score_rationale": {
+    "M1": "BEFORE 的 direct bootstrap 允许 planner 自行判断何为 major unresolved，并缺少承重 WHAT 的 authority 标注地板，因而存在把推断写成已建立产品事实的承重失败。AFTER 对每个承重 WHAT 强制区分 current-user statement、current-source confirmation、planning-time assumption 与 blocker，并把实质性产品决定交还当前用户。",
+    "M2": "两版都要求先做仓库研究；新增规则没有要求向用户询问可由 source 回答的 current fact。",
+    "M3": "两版都未要求捆绑多个独立问题；AFTER 还要求逐个 blocker 转成显式 assumption/decision 并记录，未形成重复提问合同。",
+    "M4": "本 holdout 聚焦 direct-bootstrap authority，不提供足以证明 applicable scenario omission 的行为证据，因此两版均不扣分。",
+    "M5": "BEFORE 的‘bootstrap established enough product clarity’可能把 planner 的充分性判断误呈现为已确认 WHAT，属于可恢复的 confirmation laundering；它没有 second-human routing。AFTER 明确禁止把 blocker 或 assumption 洗成 producer-confirmed WHAT，且确认人仍为当前用户。",
+    "M6": "两份行为源中的本次差异不授权项目级 glossary/context/ADR mutation。",
+    "M7": "C6/direct planning 不涉及 visual helper 或文本 fallback，均无适用失败。"
+  },
+  "countermetrics": {
+    "extra_current_user_confirmation_rounds": {
+      "before": "0_or_hidden_cost",
+      "after": "0 normally; at most 1 conditional round when an unconfirmed WHAT materially changes behavior, scope, or success criteria",
+      "assessment": "not_a_material_regression",
+      "reason": "新增交互只在真正承重且无法由 source 确认的产品决定上触发；这不是用 ceremony 掩盖指标，而是恢复当前用户控制。非实质推断可留在具名 assumption，不强制额外回合。"
+    },
+    "estimated_input_tokens": {
+      "before": "not_measured",
+      "after": "not_measured; embedded source increases by approximately 2735 characters overall",
+      "assessment": "small_source_cost"
+    },
+    "estimated_output_tokens": {
+      "before": "not_measured",
+      "after": "slightly higher only when recording authority, consequence, and accepted risk",
+      "assessment": "bounded_and_claim_relevant"
+    },
+    "wall_latency": {
+      "before": "not_measured",
+      "after": "conditionally higher by one user decision round for material unresolved WHAT",
+      "assessment": "acceptable_tradeoff"
+    },
+    "artifact_bytes": {
+      "before": "not_measured",
+      "after": "slightly higher due to explicit assumption/blocker provenance",
+      "assessment": "bounded"
+    },
+    "false_blockers": {
+      "before": 0,
+      "after": 0,
+      "assessment": "no_regression",
+      "reason": "AFTER 只把会实质改变行为、范围或成功标准的未确认 WHAT 交还用户或保留 blocker；其余可以 planning-time assumption 继续。"
+    }
+  },
+  "findings_by_priority": {
+    "P0": [],
+    "P1": [
+      {
+        "state": "fixed_in_after",
+        "title": "direct-bootstrap 可把未确认的承重 WHAT 洗成已建立产品事实",
+        "evidence": "BEFORE 只要求 bootstrap 建立行为、范围、成功标准，并将 explicit-assumption gate 限于 planner 自判的 major unresolved questions；AFTER 新增逐项 authority preservation 与 material-WHAT user/blocker rule。",
+        "impact": "可能生成 implementation-ready 计划，其产品行为、权限边界或成功标准并未被用户或源码确认，导致下游返工或错误实现。"
+      }
+    ],
+    "P2": [],
+    "P3": [
+      {
+        "state": "residual_observation",
+        "title": "真实 token、延迟和 artifact bytes 未测量",
+        "evidence": "bundle 只提供 source prose，未提供执行日志或计量数据。",
+        "impact": "只能对 countermetric 作定性判断，不能声称实际成本数值改善。"
+      }
+    ]
+  },
+  "difference_gate": {
+    "baseline_headroom_present": true,
+    "planning_invention_or_user_control_failure_before_nonzero": true,
+    "main_metric_improvement": 3,
+    "required_minimum_improvement": 1,
+    "current_user_fidelity_regressed": false,
+    "second_human_routing_regressed": false,
+    "unauthorized_mutation_regressed": false,
+    "false_blockers_regressed": false,
+    "countermetric_material_regression": false,
+    "this_repeat_direction": "after_better",
+    "this_repeat_pass": true,
+    "aggregate_rule_note": "预注册协议仍要求至少 2/3 matched fresh repeats 同方向；本文件只证明本次 recheck 方向与幅度。"
+  },
+  "verdict": {
+    "recommendation": "retain",
+    "rollback": false,
+    "reason": "AFTER 将总分从 3 降到 0，直接封闭 direct-bootstrap 未确认承重 WHAT 洗白路径，且 current-user fidelity、second-human routing、unauthorized mutation 与错误 blocker 均未退化。若其余 matched repeats 未达到 2/3 同方向，则按预注册协议整体结论应改为 inconclusive 并回滚/收窄 U6；就本次 recheck 而言应保留。"
+  },
+  "limitations": [
+    "这是 source-prose fresh review，不是运行时 outcome 或 field evidence。",
+    "未读取主 skill 当前磁盘源码；行为判断仅来自指定 BEFORE 与 AFTER bundle。",
+    "未测量真实 token、wall latency 或 artifact bytes。",
+    "单次 reviewer recheck 不能独立替代预注册的 2/3 repeats 聚合门。"
+  ]
+}

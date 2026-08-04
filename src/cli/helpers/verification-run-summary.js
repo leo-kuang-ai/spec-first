@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { StringDecoder } = require('node:string_decoder');
 
 const { writeFileAtomicIfAbsent } = require('../atomic-write');
 const { validateAgainstSchema } = require('../../contracts/schema-validator');
@@ -34,7 +35,11 @@ const ALLOWED_CHECK_FIELDS = new Set([
 ]);
 const ALLOWED_STATUSES = new Set(['passed', 'failed', 'not-run', 'degraded']);
 const ALLOWED_REDACTION_STATUSES = new Set(['redacted', 'none-required']);
-const LOG_SCAN_MAX_BYTES = 64 * 1024;
+const LOG_SCAN_CHUNK_BYTES = 64 * 1024;
+const LOG_SCAN_OVERLAP_CHARS = 4 * 1024;
+// URL credential/query 模式允许无界非空白前缀。跨 chunk 保留未闭合 URL 候选，
+// 超出有界检查预算后 fail closed，不依赖固定 overlap 侥幸覆盖。
+const LOG_SCAN_MAX_URL_CANDIDATE_CHARS = 64 * 1024;
 
 let cachedSchema = null;
 
@@ -160,7 +165,9 @@ function writeVerificationRunSummary({ inputPath, runId, targetRepo, workflow = 
   const targetRepoRoot = target.root;
   const workspaceSlug = slugify(path.basename(targetRepoRoot));
   const runRoot = resolveRunRoot(targetRepoRoot, workflowName, workspaceSlug, runId);
-  const summaryRef = path.join('.spec-first', 'workflows', workflowName, workspaceSlug, runId, 'verification-run-summary.json');
+  // repo-relative ref 是跨平台契约标识符,不是本地路径:读侧(readVerificationRunSummary)与
+  // 下游 consumer 只接受 POSIX 正斜杠,所以 ref 用 path.posix.join,真实文件 IO 仍用 path.join。
+  const summaryRef = path.posix.join('.spec-first', 'workflows', workflowName, workspaceSlug, runId, 'verification-run-summary.json');
   const absoluteSummaryPath = path.join(targetRepoRoot, summaryRef);
   const containment = validateOutputContainment(targetRepoRoot, absoluteSummaryPath);
   if (containment.errors.length > 0) {
@@ -476,6 +483,10 @@ function validateCheckLogPath(check, pointer, context, errors) {
   // 从「信任」升级为「可验证」——即便声明已脱敏,残留 secret 仍拒绝写入。
   const secretScan = scanLogForSecretLikeContent(absoluteLogPath);
   if (!secretScan.ok) {
+    if (secretScan.unreadable) {
+      errors.push(`${pointer}.log_path cannot be inspected: ${secretScan.error}`);
+      return;
+    }
     errors.push(`${pointer}.log_path contains secret-like content: ${secretScan.reason_code}`);
   }
 }
@@ -485,25 +496,72 @@ function validateRunSummary(summary) {
   return result.valid ? { errors: [] } : { errors: result.errors };
 }
 
+// fail-closed secret gate:全文扫描,不设静默截断上限。只看前 64KiB 会让「把 secret 放在
+// 第 65537 字节」直接绕过 gate,而验证日志(npm test 输出等)超过 64KiB 是常态,所以这里选择
+// 分块流式扫全文,而不是保留上限 + 标注截断——一个 fail-closed 的安全 gate 不能默认放行未读区域。
 function scanLogForSecretLikeContent(absoluteLogPath) {
-  const fd = fs.openSync(absoluteLogPath, 'r');
+  let fd;
   try {
-    const buffer = Buffer.alloc(LOG_SCAN_MAX_BYTES);
-    const bytesRead = fs.readSync(fd, buffer, 0, LOG_SCAN_MAX_BYTES, 0);
-    const text = buffer.subarray(0, bytesRead).toString('utf8');
-    if (/https?:\/\/[^/\s]+:[^@\s]+@/i.test(text)) {
-      return { ok: false, reason_code: 'credential-bearing-url' };
+    fd = fs.openSync(absoluteLogPath, 'r');
+  } catch (error) {
+    return { ok: false, unreadable: true, reason_code: 'log-not-scannable', error: error.message };
+  }
+  try {
+    const decoder = new StringDecoder('utf8');
+    const buffer = Buffer.alloc(LOG_SCAN_CHUNK_BYTES);
+    let carry = '';
+    for (;;) {
+      let bytesRead;
+      try {
+        bytesRead = fs.readSync(fd, buffer, 0, LOG_SCAN_CHUNK_BYTES, null);
+      } catch (error) {
+        return { ok: false, unreadable: true, reason_code: 'log-not-scannable', error: error.message };
+      }
+      if (bytesRead === 0) break;
+      const text = carry + decoder.write(buffer.subarray(0, bytesRead));
+      const hit = matchSecretLikeContent(text);
+      if (hit) return { ok: false, reason_code: hit };
+      const nextCarry = buildSecretScanCarry(text);
+      if (!nextCarry.ok) return { ok: false, reason_code: nextCarry.reason_code };
+      carry = nextCarry.carry;
     }
-    if (/https?:\/\/\S*[?&](?:token|access_token|api_key|key|secret|password)=/i.test(text)) {
-      return { ok: false, reason_code: 'credential-query-parameter' };
-    }
-    if (/(?:authorization|api[_-]?key|access[_-]?token|secret|password)\s*[:=]\s*[^<\s][^\s]*/i.test(text)) {
-      return { ok: false, reason_code: 'secret-like-value' };
-    }
+    const hit = matchSecretLikeContent(carry + decoder.end());
+    if (hit) return { ok: false, reason_code: hit };
     return { ok: true, reason_code: 'no-secret-like-content' };
   } finally {
-    fs.closeSync(fd);
+    try {
+      fs.closeSync(fd);
+    } catch (error) {
+      // close 失败不得覆盖已判定的扫描结论,否则又会退回未捕获异常。
+    }
   }
+}
+
+function buildSecretScanCarry(text) {
+  const trailingTokenMatch = String(text || '').match(/\S+$/);
+  if (!trailingTokenMatch) return { ok: true, carry: '' };
+  const trailingToken = trailingTokenMatch[0];
+  const lowerToken = trailingToken.toLowerCase();
+  const httpIndex = Math.max(lowerToken.lastIndexOf('http://'), lowerToken.lastIndexOf('https://'));
+  if (httpIndex >= 0) {
+    const candidate = trailingToken.slice(httpIndex);
+    if (candidate.length > LOG_SCAN_MAX_URL_CANDIDATE_CHARS) {
+      return { ok: false, carry: '', reason_code: 'unterminated-secret-candidate' };
+    }
+    return { ok: true, carry: candidate };
+  }
+  return { ok: true, carry: trailingToken.slice(-LOG_SCAN_OVERLAP_CHARS) };
+}
+
+function matchSecretLikeContent(text) {
+  if (/https?:\/\/[^/\s]+:[^@\s]+@/i.test(text)) return 'credential-bearing-url';
+  if (/https?:\/\/\S*[?&](?:token|access_token|api_key|key|secret|password)=/i.test(text)) {
+    return 'credential-query-parameter';
+  }
+  if (/(?:authorization|api[_-]?key|access[_-]?token|secret|password)\s*[:=]\s*[^<\s][^\s]*/i.test(text)) {
+    return 'secret-like-value';
+  }
+  return null;
 }
 
 function resolveRunRoot(targetRepoRoot, workflow, workspaceSlug, runId) {

@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "expected_route": "runtime-maintenance",
+  "actual_route": "runtime-maintenance",
+  "reason_code": "runtime-refresh-neighbor"
+}

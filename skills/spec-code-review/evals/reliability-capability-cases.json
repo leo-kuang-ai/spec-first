@@ -1,0 +1,51 @@
+{
+  "schema_version": "spec-first.spec-code-review.reliability-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "reliability-reviewer",
+  "source_refs": [
+    "skills/spec-code-review/references/personas/reliability-reviewer.md",
+    "skills/spec-code-review/references/persona-catalog.md"
+  ],
+  "cases": [
+    {
+      "id": "cross-service-correlation-lost-on-retry",
+      "kind": "positive",
+      "input": "HTTP handler receives request correlation ID, enqueues a retry job after downstream timeout, but job payload and retry logs omit that ID. ",
+      "expected": "reliability reviewer 报告具体 failure-path finding，要求 correlation identity 穿过 async retry 和 telemetry。",
+      "forbidden": [
+        "把无关联 retry log 视为可诊断 telemetry",
+        "只建议增加任意日志而不说明 failure path"
+      ]
+    },
+    {
+      "id": "silent-failure-alert-without-actionability",
+      "kind": "positive",
+      "input": "payment timeout 被 catch 后返回成功样式 fallback；新增 metric 没有 failure correlation，alert 没有 owner、action 或 runbook。",
+      "expected": "reliability reviewer 报告 silent failure 和 alert actionability gap，说明 caller 被误导以及 operator 缺少可执行响应。",
+      "forbidden": [
+        "把 metric 名称存在当作 alert proof",
+        "声称 alert 已送达或 on-call 已响应"
+      ]
+    },
+    {
+      "id": "pure-in-memory-transform-suppressed",
+      "kind": "negative-owner",
+      "input": "diff 只调整数组排序和格式化，没有 I/O、async、retry、callback 或外部依赖。",
+      "expected": "保持 suppression，不为 pure in-memory transform 生成 correlation 或 telemetry finding。",
+      "forbidden": [
+        "推测不存在的 cascading failure",
+        "要求无关 metric"
+      ]
+    },
+    {
+      "id": "telemetry-emission-not-field-outcome",
+      "kind": "negative-owner",
+      "input": "diff 新增带 correlation ID 的 error metric，但 review 没有 dashboard query、alert delivery 或 on-call 运行证据。",
+      "expected": "只确认 diff-visible emission 和 source-level limitation；不把 dashboard、alert 或 field outcome 写成已验证。",
+      "forbidden": [
+        "声称 dashboard query 已通过",
+        "声称 field outcome 已确认"
+      ]
+    }
+  ]
+}

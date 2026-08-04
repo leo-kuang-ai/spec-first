@@ -2,279 +2,220 @@
 
 # spec-first
 
+**把 AI coding 会话变成可信、由项目拥有的变更。**
+
+`spec-first` 是面向 Claude Code、Codex、Kiro、Qoder、Cursor 与 OpenCode 的仓库原生 AI Coding Harness。宿主仍负责写代码；`spec-first` 负责保留意图、约束执行范围、让完成声明受证据约束，并把已验证工作沉淀为可复用的项目知识。
+
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
-[![npm yearly downloads](https://img.shields.io/npm/dy/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
-[![npm weekly downloads](https://img.shields.io/npm/dw/spec-first.svg)](https://www.npmjs.com/package/spec-first)
-[![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/main/LICENSE)
-[![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/main/package.json)
 [![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
-[![docs](https://img.shields.io/badge/docs-spec--first.cn-0b7285.svg)](http://spec-first.cn/)
+[![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/master/package.json)
+[![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/master/LICENSE)
 
-[English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
+[English](https://github.com/sunrain520/spec-first/blob/master/README.en.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/master/README.md)
 
-**An AI Coding Harness for Claude Code, Codex, Kiro, Qoder, and Cursor.**
-
-`spec-first` helps Claude Code, Codex, Kiro, Qoder, and Cursor become easier to trust in real projects: one-off AI coding conversations become repo-backed requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor; evidence stays in your repository. Kiro and Qoder remain opt-in previews. Cursor is more conservative: it is an opt-in `generated_runtime_preview` that currently proves generation of `.cursor/skills/**`, `.cursor/spec-first/**`, and `.cursor/mcp.json` evidence only. Local Cursor skill discovery/invocation has not been verified, and generated skills may not be loaded by Cursor.
-
-Official site: [spec-first.cn](http://spec-first.cn/)
+[快速开始](#快速开始) | [选择 Workflow](#选择合适的-workflow) | [用户手册](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md) | [官方网站](http://spec-first.cn/)
 
 </div>
 
----
-
-## See It In 90 Seconds
-
-![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
-
-The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code, Codex, Kiro, Qoder, or Cursor session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
-
-The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
-
-<sub>Simulated demo path: install → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; mcp-setup is the readiness/setup step to run when helper or MCP facts are missing, debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
-
-## Quickstart
-
-Install, initialize, and run your first workflow in about 5 minutes.
-
-Prerequisites:
-
-- Node.js `>=20.0.0` and npm.
-- Git on `PATH`; `doctor`, setup, and workflow checks read repository facts from Git.
-- Claude Code, Codex, Kiro, Qoder, or Cursor installed, with one chosen as the current host. Cursor requires explicit `--cursor` opt-in and is currently generated-runtime preview only.
-- A terminal opened at the root of the project repo where you want to enable `spec-first`. First-time users can try a throwaway/test repo before initializing a real project.
-
-**Step 1 — Install and check health**
-
-macOS / Linux:
-
-```bash
-npm install -g spec-first
-spec-first doctor
-```
-
-Windows PowerShell 7+ or Windows PowerShell 5.1:
-
-```powershell
-npm install -g spec-first
-spec-first doctor
-```
-
-Windows cmd.exe:
-
-```bat
-npm install -g spec-first
-spec-first doctor
-```
-
-On Win64, prefer native Windows Terminal with PowerShell 7+ or `cmd.exe` for installation and smoke checks. Windows PowerShell 5.1 is supported, but PowerShell 7+ has better UTF-8 behavior.
-
-Expected: `doctor` reports no blocking issues. If issues appear, follow the printed suggestions before continuing.
-
-**Step 2 — Initialize the host runtime**
-
-```bash
-spec-first init
-```
-
-Select your host (Claude Code, Codex, Cursor, Kiro, and/or Qoder), confirm your developer name and language, then confirm the writes. In a parent workspace with many child Git repos, `init` defaults to writing only the parent workspace runtime; use `--repo <child>` only when one child repo should be an independent agent root, and reserve `--all-repos` for explicit batch maintenance. Scripted `init -y` setup on fresh machines must pass `-u <name>` because there is no prompt to collect a developer name, for example `spec-first init --codex -y -u <name> --lang <zh|en>`. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro, `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder, or `spec-first init --cursor -y -u <name> --lang <zh|en>` for Cursor generated-runtime preview. Cursor is not part of the `init -y` default host set.
-
-Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, or `.qoder/`. Generated copies can be rebuilt any time with `spec-first init`.
-
-If the host reports missing helper or MCP readiness facts, run the unified `spec-mcp-setup` entry in your current host before continuing.
-
-Cursor note: `spec-first init --cursor` generates the same `spec-*` workflow runtime under `.cursor/skills/**`, spec-first state under `.cursor/spec-first/**`, and project MCP setup targets `.cursor/mcp.json` by default. User-level `~/.cursor/mcp.json` requires `--user-scope` / `CURSOR_USER_SCOPE=1`. Current release evidence records `cursor_loader_validation_unavailable`, so do not treat Cursor as full host support or an `init -y` default.
-
-For all init options (flags, scripted mode, multi-repo), see the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md).
-
-**Step 3 — Restart the host**
-
-Restart the host or open a new session so it loads the generated runtime assets. Host-session workflow entries are not shell commands — they run inside the Claude Code, Codex, Kiro, Qoder, or Cursor session, not in your terminal.
-
-**Step 4 — Run your first workflow**
-
-Start with `brainstorm` — it is the most natural first entry and writes a visible artifact you can immediately inspect:
+![spec-first workflow: intent to trusted change](https://raw.githubusercontent.com/sunrain520/spec-first/master/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
 ```text
-# In any supported host session
-spec-brainstorm "describe your first task here"
+Intent -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 ```
 
-**Step 5 — Verify success**
+## 为什么使用 spec-first？
 
-After the brainstorm completes, check your repo for a new file:
+AI 已经能快速生成代码。更难的问题是保留代码背后的判断：用户到底要什么、为什么选择这个范围、实际运行过哪些检查、还有什么不确定，以及下一次会话应该继承什么。
 
-```text
-docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
-```
-
-That file is your first artifact. The work is now repo-local, inspectable, and ready to hand off to planning. From here, continue to the current host's plan entrypoint.
-
-For subsequent tasks, use this quick route to pick the right entrypoint:
-
-| If your first task is... | Start with... |
+| 只有聊天会话 | 使用 spec-first |
 |---|---|
-| A rough idea, feature, or product change | `spec-brainstorm` |
-| An existing PRD, requirement note, or brownfield change request | `spec-prd` |
-| A bug, failing test, stack trace, or abnormal behavior | `spec-debug` |
-| A settled plan, task pack, or scoped implementation request | `spec-work` |
-| A document, plan, task pack, diff, or implementation that needs review | `spec-doc-review` or `spec-code-review` |
+| 会话结束后，意图与取舍随之消失 | 需求和计划作为可检查文档保留在仓库中 |
+| 下一位 Agent 需要从头重建上下文 | plan、task pack、findings 与 source refs 持续传递上下文 |
+| “测试通过”只是一句对话声明 | 收尾可以指向真实运行的命令、exit code 和脱敏日志 |
+| 更换宿主就要重建 workflow prompts | 一套 canonical source 向各宿主投射相同的 `spec-*` 标识 |
+| 已解决问题最终变成被遗忘的历史 | 合格经验可以带来源和失效条件沉淀为项目知识 |
 
-Detailed manuals are Chinese-first; this README is the English quick path. Walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
+它不是一套僵硬研发流程，而是一份围绕关键出口建立的轻量契约：mutation、verification、handoff、source/runtime ownership 和 durable learning。
 
-## What You Get
+## 快速开始
 
-A typical workflow chain produces these repo-local artifacts:
+你需要 Node.js `>=20.0.0`、npm、Git，以及至少一个受支持的 AI coding 宿主。以下终端命令应在需要启用的 Git 仓库根目录执行。
+
+### 1. 安装并初始化
+
+```bash
+npm install -g spec-first
+spec-first quickstart
+```
+
+`quickstart` 会检查 Node.js、Git 和已安装的宿主 CLI，再进入既有 `init` 流程。只有恰好发现一个宿主时才自动选择，否则由你交互式选择。它不会在宿主会话之外替你运行 LLM workflow。
+
+需要显式或脚本化初始化时：
+
+```bash
+spec-first doctor
+spec-first init --codex -y -u <name> --lang <zh|en>
+```
+
+`init` 会在写入前预览受管 runtime 文件。多宿主、多仓、dry-run 和预览宿主用法见[完整快速开始指南](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
+
+### 2. 重启宿主
+
+重启已选择的宿主或新开会话，让它发现生成的 runtime assets。下面的 `spec-*` 入口运行在宿主会话中，不是 shell 子命令。对于 Cursor 和 OpenCode 这类 preview 宿主，生成 runtime assets 不等于宿主 loader 已发现它们；如果重启后看不到入口，请运行 `spec-first doctor --verbose`，并核对 [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)。
+
+### 3. 准备 Runtime
+
+```text
+spec-runtime-setup
+```
+
+Runtime Setup 会安装或验证 required harness runtime、MCP servers、helper tools、providers 和项目 readiness facts。首次 workflow 前先运行一次；后续只在宿主、provider、helper 配置或 setup facts 变化时重跑。
+
+### 4. 生成第一个可检查产物
+
+```text
+spec-brainstorm "改进 CLI 新用户的 onboarding"
+```
+
+对于这个非平凡示例，`spec-brainstorm` 通常会在范围确认后写入 requirements-only unified plan：
+
+```text
+docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
+```
+
+如果本轮没有值得持久化的决策，workflow 可以合法地不创建文档；这不表示运行失败。若生成了该文件，它就是首次可检查信号：意图已经由项目拥有、可以审查，并可继续交给 `spec-plan` 原位深化。
+
+## 从 Prompt 到可信变更
+
+两类常见输入可以汇合到同一条实施路径：
+
+```text
+粗略想法 -> spec-brainstorm --\
+已有 PRD -> spec-prd ----------+-> spec-plan -> [spec-write-tasks] -> spec-work -> spec-code-review -> spec-compound
+```
+
+- `spec-brainstorm` 从粗略想法确定**做什么**；有值得持久化的决策时，写入 requirements-only unified plan。
+- `spec-prd` 是已有 PRD 或 brownfield 请求的替代入口，不是 `spec-brainstorm` 之后的必经步骤。
+- `spec-doc-review` 是跨阶段的可选 review lane，可在 requirements、implementation-ready plan 或 task pack 形成后插入，并返回结构化文档 findings。
+- `spec-plan` 确定**怎么做**，把同一份 plan 原位深化为 implementation-ready。
+- `spec-write-tasks` 在大型、并行或交接密集的工作中可选地派生 task pack；plan 仍是权威来源。
+- `spec-work` 执行范围明确的工作，并为实际运行过的检查记录验证证据。
+- `spec-code-review` 返回结构化 findings，不会静默获得 commit 或 landing 权限。
+- `spec-compound` 只把合格经验提升为持久项目知识。
+
+这是一张地图，不是强制状态机。应从当前意图最匹配的入口开始；当入口不清楚时，`using-spec-first` 会选择一个公开 workflow。
+
+## 仓库会留下什么
+
+每个 producer 只拥有明确的 artifact surface：
 
 ```text
 docs/
-  ideation/      ranked ideas and exploration notes
-  brainstorms/   requirements briefs and PRD-grade requirements
-  plans/         implementation plans ready for review and execution
-  tasks/         derived task packs for structured handoff
-  reviews/       document and code review findings
-  solutions/     reusable learnings after solving problems
+  ideation/      spec-ideate 生成的候选方向排序
+  brainstorms/   spec-prd 生成的 clarified PRD artifacts
+  plans/         requirements-only 与 implementation-ready unified plans
+  tasks/         从 plan 派生的可选 task packs
+  solutions/     合格且可复用的经验
 .spec-first/
-  workflows/     structured work closeout evidence (gitignored by default)
+  workflows/     条件式验证证据（默认 gitignore）
 ```
 
-Not every workflow writes every artifact. The first run writes one file under `docs/brainstorms/`. Deeper chains add plans, tasks, code changes, review findings, and learnings over time — all inspectable, all in your repository.
+持久文档属于项目。宿主 runtime assets 是可丢弃的投射，可以随时通过 `spec-first init` 从 canonical source 重建。
 
-## Workflow Entry Points
+Review findings 通常在会话内返回；code review 的完整协调产物使用 OS 临时目录。只有 workflow 实际执行 targeted commands 或命中持久证据触发条件时，才会在 `.spec-first/workflows/` 写入 repo-local evidence。任何 artifact 只能证明其直接证据覆盖的 claim。
 
-The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge`. Public workflow identifiers use the same `spec-*` form across supported hosts.
+## 选择合适的 Workflow
 
-| Task | Unified entry | Artifact |
+| 当前意图 | 入口 | 主要结果 |
 |---|---|---|
-| Requirements from a rough idea | `spec-brainstorm` | `docs/brainstorms/` |
-| Requirements from an existing PRD | `spec-prd` | `docs/brainstorms/` |
-| Implementation plan | `spec-plan` | `docs/plans/` |
-| Split a plan into executable tasks | `spec-write-tasks` | `docs/tasks/` |
-| Execute scoped work | `spec-work` | source changes + evidence |
-| Review code | `spec-code-review` | structured findings |
-| Review docs or plans | `spec-doc-review` | structured findings |
-| Capture reusable learning | `spec-compound` | `docs/solutions/` |
+| 准备或修复 required runtime readiness | `spec-runtime-setup` | setup facts 与具体下一步 |
+| 探索多个可能方向 | `spec-ideate` | `docs/ideation/` 中的排序结果 |
+| 把粗略想法收敛为确定需求 | `spec-brainstorm` | `docs/plans/` 中的 requirements-only plan |
+| 澄清已有 PRD 或 brownfield 请求 | `spec-prd` | `docs/brainstorms/` 中的 planning-readiness artifact |
+| 审查需求、计划或 task pack | `spec-doc-review` | 结构化文档 findings |
+| 为已确定需求决定实现方式 | `spec-plan` | `docs/plans/` 中的 implementation-ready plan |
+| 为大型计划派生可执行交接 | `spec-write-tasks` | `docs/tasks/` 中的可选 task pack |
+| 执行 plan、brief、task pack 或明确工作项 | `spec-work` | 源码变更与验证证据 |
+| 诊断失败、回归或 flaky test | `spec-debug` | 根因、修复与验证证据 |
+| 审查 diff、branch 或 PR | `spec-code-review` | 结构化代码 findings 与 residual risks |
+| 沉淀或刷新可复用经验 | `spec-compound` / `spec-compound-refresh` | `docs/solutions/` 中的合格知识 |
 
-Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish-beta, and write-skill entries for the current host.
+其他入口覆盖浏览器 dogfood、UI polish、指标驱动优化、App 一致性审查、跨会话 handoff、项目规则、产品战略、Skill 编写，以及经显式授权后直达 green PR 的 hands-off 路径。完整清单见[公开入口与 Skill 目录](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/24-%E5%85%AC%E5%BC%80%E5%85%A5%E5%8F%A3%E4%B8%8ESkill%E7%9B%AE%E5%BD%95.md)。
 
-[→ Full entrypoint reference with routing rules](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
+## 信任如何建立
 
-## The Problem
+`spec-first` 把事实、判断和授权分开，避免让一次模型回答同时冒充三者。
 
-AI can write code quickly. The expensive part is preserving the judgment around the code: why this scope, what evidence was checked, which review findings mattered, and what the next agent or teammate should inherit.
-
-Without a repo-backed trail, that context disappears with the chat window. The next session starts cold, reviewers cannot see why a plan changed, and teams cannot reuse what worked. `spec-first` keeps that work as durable artifacts: requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings.
-
-## Why spec-first?
-
-`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, Kiro, Qoder, or Cursor; it gives those hosts a project-local harness. Cursor native rules, Kiro native Specs, and Qoder native rules remain host-owned artifacts; spec-first only treats `.cursor/rules/**`, `.kiro/specs/**`, and `.qoder/rules/**` as advisory input when explicitly named.
-
-| Adoption question | Prompt pack / agent orchestration | spec-first |
+| 层次 | Owner | 职责 |
 |---|---|---|
-| What do I get after the first run? | A better chat answer or agent transcript | A repo-local artifact such as a requirements brief or plan |
-| Where do decisions and evidence live? | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
-| What does the human review? | Often the final diff or agent output | Requirements, plans, task packs, diffs, review findings, bugs, and learnings |
-| Who enforces mechanical boundaries? | Mostly model discipline or custom glue | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
-| How do Claude Code, Codex, Cursor, Kiro, and Qoder stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates supported host runtime surfaces |
+| 确定性事实 | scripts 与 tools | 路径、Git 状态、hash、schema、exit code、runtime generation 和 receipts |
+| 语义判断 | LLM 与人 | 需求、scope、取舍、架构、review 结论和业务价值 |
+| 副作用授权 | 项目 owner / 当前请求 | 本地 mutation、worker dispatch、commit、push、外部通信和 knowledge promotion |
 
-Current mechanisms you can inspect today:
+五条规则让三层保持一致：
 
-- Requirements become durable briefs instead of disappearing prompts.
-- Plans and task packs turn vague intent into reviewable execution context.
-- Work closeout can point to structured verification evidence instead of a free-form "tests passed" claim.
-- Task-pack handoffs now recommend splitting from source-plan structure and recommend document review for high-risk packs while keeping the engineer in the loop.
-- Work, review, debug, optimize, and compound workflows preserve evidence and learning.
-- Knowledge handoffs stay summary-first, and recalled `docs/solutions/` learnings remain advisory until reconfirmed from source evidence.
-- Team standards live as source docs under `docs/contracts/team-standards.md` and `docs/standards/**`; workflows pick the confirmed rules in scope rather than adding a new entrypoint.
-- One source asset set supports unified `spec-*` workflow entries across Claude Code, Codex, Cursor, Kiro, and Qoder without hand-maintaining generated runtime copies.
+1. **Evidence over confidence**：模型自信、生成 artifact 或 source test 通过，都只能证明直接 evidence 覆盖的范围。
+2. **Gate the exits, not the thinking**：推理保持灵活；mutation、verification、handoff、source/runtime 和 knowledge 出口保持明确。
+3. **Source first**：修改 `skills/`、`templates/`、`src/cli/` 和 checked-in docs，通过重建修复 generated runtime，而不是把 mirror 当 source patch。
+4. **Bounded autonomy**：长时或高影响工作必须带 scope、权限、checkpoint、停止条件和恢复边界。
+5. **Reversible learning**：只有带来源、适用边界和失效条件的经验才能进入 durable knowledge。
 
-These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.
+完整模型见[项目角色契约](https://github.com/sunrain520/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)、[Source/Runtime 边界](https://github.com/sunrain520/spec-first/blob/master/docs/contracts/source-runtime-customization-boundary.md)、[Verification Summary 合同](https://github.com/sunrain520/spec-first/blob/master/docs/contracts/verification/verification-run-summary.md)和 [Honest Closeout 合同](https://github.com/sunrain520/spec-first/blob/master/docs/contracts/workflows/honest-closeout.md)。
 
-## Operating Model
+## 宿主支持
 
-`spec-first` has two durable surfaces: repo-local workflow artifacts and generated host runtime assets.
+Runtime delivery 和宿主实机证据是不同声明。能够生成投射，并不自动证明宿主 loader 已正确发现和调用它。
 
-Source assets (`skills/`, `agents/`, `templates/`, `src/cli/`) are regenerated by `spec-first init` into host runtime assets — producing repo-local workflow artifacts: `ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`.
+| 宿主 | 当前状态 | 初始化方式 |
+|---|---|---|
+| Claude Code | 主要支持宿主 | 交互式 `init` 或 `--claude` |
+| Codex | 主要支持宿主 | 交互式 `init` 或 `--codex` |
+| Kiro | opt-in preview | `--kiro` |
+| Qoder | opt-in preview | `--qoder` |
+| Cursor | opt-in `generated_runtime_preview`；本机 loader journey 尚未验证 | `--cursor` |
+| OpenCode | opt-in `generated_runtime_preview`；同版本 loader journey 尚未验证 | `--opencode` |
 
-Generated runtime copies under `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/skills/`, `.cursor/spec-first/`, `.kiro/skills/`, `.kiro/agents/`, `.kiro/spec-first/`, `.qoder/commands/spec-*.md`, `.qoder/commands/spec/` (retired legacy namespace), `.qoder/skills/`, `.qoder/agents/`, and `.qoder/spec-first/` are disposable and can be rebuilt with `spec-first init`. Cursor project `.cursor/mcp.json`, spec-first managed `.kiro/settings/`, and Qoder local `.qoder/settings.local.json` are config outputs, not source; Cursor and Qoder clean preserve user-owned MCP entries. Cursor native `.cursor/rules/**`, Kiro native `.kiro/specs/**`, and Qoder native `.qoder/rules/**` are not spec-first source.
+运行 `spec-first doctor --verbose` 查看当前项目的 runtime facts。自动生成的 [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)是详细支持状态的权威参考。
 
-Detailed references:
+## 适用边界
 
-- [Source / Runtime / Provider Customization Boundary](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/source-runtime-customization-boundary.md)
-- [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/catalog/runtime-capabilities.md)
-- [Architecture Overview](https://github.com/sunrain520/spec-first/blob/main/docs/02-%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/01-%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.md)
+当团队已经使用 AI coding 宿主，并希望在不同会话或宿主之间保留项目内意图、可检查交接、明确 review 边界、受证据约束的完成声明和可复用经验时，适合使用 `spec-first`。
 
-## Trust Model
+如果你只需要一次性 prompt、不允许在仓库中写入 workflow artifacts、想要独立 coding 应用，或期待中心化流程引擎替你决定产品优先级和架构，它通常没有必要。
 
-Scripts enforce deterministic invariants; scripts prepare facts; the LLM decides semantic adequacy above that floor.
+## 相关文档
 
-- **What scripts do:** enforce mechanically decidable invariants, install, validate, generate, report machine facts.
-- **What the LLM decides:** requirements framing, scope boundaries, tradeoffs, implementation judgment, review evidence.
-- **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, generated mirrors such as `.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, spec-first managed `.kiro/settings/**`, `.qoder/commands/spec-*.md`, retired `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, and host-local config such as `.cursor/mcp.json` and `.qoder/settings.local.json`.
+- [用户手册](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)：完整用法与运行模型
+- [首次工作流走查](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)：从首次 setup 到工程闭环
+- [产物目录](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md)：producer、consumer 与 Git 边界
+- [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)：自动生成的宿主与 workflow facts
+- [贡献指南](https://github.com/sunrain520/spec-first/blob/master/CONTRIBUTING.md)与[安全策略](https://github.com/sunrain520/spec-first/blob/master/SECURITY.md)
 
-[→ Full trust model and verification contracts](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
-
-## Use spec-first when
-
-Use `spec-first` when:
-
-- You already use Claude Code, Codex, Kiro, Qoder, or Cursor and want project-local workflows instead of one-off prompts.
-- You want AI coding work to leave durable requirements, plans, explicitly routed review summaries, and learnings.
-- You want scripts to handle deterministic setup and enforce machine-checkable boundaries while keeping semantic judgment with the LLM.
-- You want a lightweight workflow layer that can be regenerated from source assets.
-
-It may not fit when you only need a single prompt snippet, a generic agent marketplace, a no-host standalone app, or a team process that does not want workflow artifacts written into the repo.
-
-## Documentation
-
-**Get started**
-- [spec-first.cn](http://spec-first.cn/) — official site
-- [Chinese User Manual](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
-- [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)
-- [Chinese Workflows and Artifacts Map](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
-
-**Understand the model**
-- [Chinese Architecture Overview](https://github.com/sunrain520/spec-first/blob/main/docs/02-%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/01-%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.md)
-- [Source / Runtime / Provider Customization Boundary](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/source-runtime-customization-boundary.md)
-- [Verification Run Summary Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/verification/verification-run-summary.md)
-- [Honest Closeout Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
-- [Chinese Release Notes](https://github.com/sunrain520/spec-first/blob/main/docs/08-%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0/README.md)
-
-Detailed manuals and implementation docs are currently Chinese-first.
-
-## Runtime And CLI Reference
-
-First-run users: `source assets -> spec-first init -> host runtime assets -> workflow artifacts`.
-
-Key commands:
+## CLI 参考
 
 ```bash
-spec-first doctor    # check health
-spec-first init      # generate runtime
-spec-first update    # upgrade CLI + refresh runtime
-spec-first clean     # remove generated runtime
+spec-first doctor      # 检查环境和受管 runtime 健康状态
+spec-first quickstart  # 检查前置条件并继续进入 init
+spec-first init        # 生成所选宿主的 runtime assets
+spec-first update      # 升级 CLI 并刷新 runtime assets
+spec-first clean       # 移除所选 generated runtime assets
+spec-first plans audit --status completed --json
 ```
 
-[→ Full CLI reference with all flags and options](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
+运行 `spec-first --help` 查看全部 package CLI 选项。主要支持宿主通常会在 `init` 并重启后发现 Workflow 入口；Cursor 和 OpenCode 的 preview 投射仍可能无法被 loader 发现。以 `spec-first doctor --verbose` 和 [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md) 为准。
 
-## Development & Contributing
+## 开发与贡献
 
 ```bash
 npm run typecheck
-npm run test:mcp-setup
 npm run test:unit
 npm run test:smoke
 npm run test:integration
-npm run test:ai-dev:gate
-npm run test:ai-dev:benchmarks
 npm run test:release
-npm run test:release:website
 npm run build
-npm test
 ```
 
-`npm run build` runs `npm pack --dry-run` and verifies the package payload shape through npm.
+`npm run build` 会执行 `npm pack --dry-run` 并验证发布包内容。Source 变更应发生在 canonical source surfaces；只有 runtime source 变化时才通过 `spec-first init` 重新生成 runtime copies。
 
-When changing source assets, edit `skills/`, `agents/`, `templates/`, or `src/cli/`, then regenerate runtime copies with `spec-first init` and choose the target host in a fresh host session.
-
-For contribution and support details, see [CONTRIBUTING.md](https://github.com/sunrain520/spec-first/blob/main/CONTRIBUTING.md), [SECURITY.md](https://github.com/sunrain520/spec-first/blob/main/SECURITY.md), [LICENSE](https://github.com/sunrain520/spec-first/blob/main/LICENSE), and [GitHub Issues](https://github.com/sunrain520/spec-first/issues).
+项目使用 MIT License。更多信息见[版本记录](https://github.com/sunrain520/spec-first/blob/master/CHANGELOG.md)与 [GitHub Issues](https://github.com/sunrain520/spec-first/issues)。

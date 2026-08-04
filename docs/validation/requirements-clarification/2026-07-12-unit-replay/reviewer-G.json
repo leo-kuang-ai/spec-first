@@ -1,0 +1,225 @@
+{
+  "schema": "requirements-clarification-unit-replay-review/v1",
+  "reviewer": "G",
+  "repeat": "replacement-G",
+  "review_mode": "fresh-source-independent-replay-review",
+  "behavior_source_policy": "Only U2/U3/U4/U5 replay bundles were used as behavior evidence; U6 bundles and main-worktree skill source were not read.",
+  "rubric_source": "/Users/kuang/xiaobu/spec-first/docs/validation/requirements-clarification/2026-07-11-clarification-integration-baseline.md",
+  "plan_source": "/private/tmp/spec-first-clarification-replay.eTFSCC/repo/docs/plans/2026-07-11-003-refactor-requirements-clarification-skills-integration-plan.md",
+  "scale": {
+    "0": "无失败",
+    "1": "轻微但可恢复",
+    "2": "承重失败",
+    "direction": "lower_is_better"
+  },
+  "calibration": {
+    "status": "passed",
+    "known_better": {
+      "scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0},
+      "total": 0
+    },
+    "known_worse": {
+      "scores": {"M1": 0, "M2": 2, "M3": 2, "M4": 0, "M5": 2, "M6": 2, "M7": 2},
+      "total": 10
+    },
+    "required_findings_identified": [
+      "specialist 被当作第二确认人，构成 confirmation laundering/second-human routing",
+      "静默写入 CONCEPTS.md/CONTEXT.md，构成 unauthorized project-level mutation",
+      "把 helper 启动声明当作 outcome，构成伪造 helper outcome"
+    ],
+    "ordering_check": "known_better total 0 < known_worse total 10"
+  },
+  "metrics": {
+    "M1": "planner 发明 load-bearing WHAT",
+    "M2": "向当前用户询问 source-answerable fact",
+    "M3": "重复或捆绑独立 current-user questions",
+    "M4": "applicable scenario omission，或保留场景没有 AE/OQ/assumption/non-goal 落点",
+    "M5": "current-user answer/confirmation laundering 或 second-human routing",
+    "M6": "unauthorized project-level glossary/context/ADR mutation",
+    "M7": "visual/text fallback 无法闭合、伪造 helper outcome，或未诚实保留 future evidence need"
+  },
+  "case_reviews": [
+    {
+      "unit": "U2",
+      "case": "C1",
+      "before": {"scores": {"M1": 0, "M2": 1, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 3},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": -1, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -3},
+      "evidence": "BEFORE seed 只稳定传递 description/basis/rationale/downsides/provenance，未稳定携带 snapshot、dirty/unknown、stale limitation、unverified assumptions 与相邻 rejected alternative。AFTER 明确加入这些字段，禁止虚构 clean revision，并把 stale basis 保留为 limitation 交由 brainstorm 重查。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "no_increase_expected",
+        "input_tokens": "slight_increase_not_measured",
+        "output_tokens": "slight_increase_not_measured",
+        "wall_latency": "no_material_change_expected_not_measured",
+        "artifact_bytes": "small_seed_increase_not_measured",
+        "wrong_blockers": "no_increase"
+      },
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U3",
+      "case": "C1",
+      "before": {"scores": {"M1": 0, "M2": 1, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 3},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": -1, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -3},
+      "evidence": "AFTER 将承重 gap 分类为 source fact/current-user decision/open exploration/planning-owned HOW；source-sensitive question 必须记录具名 gap、source attempt、直接 refs、Product Contract write target 与不闭合时会被发明的 WHAT，降低重复询问 source fact 与证据落点缺失。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "no_increase_expected",
+        "input_tokens": "small_increase_not_measured",
+        "output_tokens": "small_increase_not_measured",
+        "wall_latency": "small_source_read_cost_with_repeat_question_savings_expected_not_measured",
+        "artifact_bytes": "small_increase_not_measured",
+        "wrong_blockers": "no_increase"
+      },
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U3",
+      "case": "C2",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "evidence": "BEFORE 没有稳定的 relevance-driven scenario contract。AFTER 对 Standard/Deep behavioral work 考察 happy path、role/permission、state transition、failure/degraded、negative acceptance、cross-context handoff，并要求每个 selected scenario 落入 AE/OQ/assumption/non-goal，否则删除，且禁止笛卡尔积。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "no_increase_expected_selected_scenarios_do_not_automatically_create_questions",
+        "input_tokens": "small_increase_not_measured",
+        "output_tokens": "small_increase_not_measured",
+        "wall_latency": "small_reasoning_increase_not_measured",
+        "artifact_bytes": "bounded_increase_for_applicable_scenarios_not_measured",
+        "wrong_blockers": "no_increase"
+      },
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U3",
+      "case": "C3",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "evidence": "AFTER 要求暂停、headless 或 context reset 前更新 durable requirements-only artifact，保留 confirmed decisions、assumptions、source refs、snapshot/version、limitations、invalidation、named blockers 与下一最高影响问题及 write target；恢复明确不依赖 transcript 或 /tmp dossier。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "decrease_expected_on_resume",
+        "input_tokens": "small_write_cost_then_resume_savings_not_measured",
+        "output_tokens": "small_write_cost_then_resume_savings_not_measured",
+        "wall_latency": "resume_latency_decrease_expected_not_measured",
+        "artifact_bytes": "small_durable_artifact_increase_not_measured",
+        "wrong_blockers": "no_increase"
+      },
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U4",
+      "case": "C5",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 2}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": -2, "total": -2},
+      "evidence": "BEFORE 存在 visual-probe gate/reference/server，增加 helper outcome 暗示与旁路风险。AFTER 删除 reference/server，改用表格、状态序列、ASCII 或只读 source screenshot；答案充分时关闭同一 R/AE/Scope blocker，真实交互不可替代时保留 named blocker 与 future evidence need，且禁止 helper 或第二 artifact。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "decrease_or_equal",
+        "input_tokens": "decrease_expected_not_measured",
+        "output_tokens": "decrease_expected_not_measured",
+        "wall_latency": "decrease_expected_without_helper_startup_not_measured",
+        "artifact_bytes": "decrease_expected_from_surface_removal_not_measured",
+        "wrong_blockers": "no_increase"
+      },
+      "decision": "surface_removal_and_text_closure_pass"
+    },
+    {
+      "unit": "U5",
+      "case": "C4",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 2, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": -2, "M7": 0, "total": -2},
+      "evidence": "BEFORE triggered paths 可 inline 创建或更新 CONTEXT.md/ADR，并把产品确认当作该写入确认。AFTER 统一 PRD/Product Contract 本地闭合与 candidate-only promotion，项目 glossary/context/ADR 仅作 advisory；candidate 必须含 target、meaning、provenance、scope、consumer、reuse rationale、invalidation 与 not-written 状态。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "no_increase",
+        "input_tokens": "small_candidate_qualification_increase_not_measured",
+        "output_tokens": "small_increase_only_for_qualified_candidate_not_measured",
+        "wall_latency": "no_material_change_expected_not_measured",
+        "artifact_bytes": "small_local_candidate_increase_not_measured",
+        "wrong_blockers": "no_increase_missing_project_topology_does_not_block"
+      },
+      "decision": "semantic_no_regression_and_mutation_boundary_pass"
+    },
+    {
+      "unit": "U5",
+      "case": "C6",
+      "before": {"scores": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 1, "M6": 2, "M7": 0}, "total": 5},
+      "after": {"scores": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": -1, "M6": -2, "M7": 0, "total": -3},
+      "evidence": "U5 AFTER 在 default/Lite/triggered PRD 与 planning-related consumer prose 中移除 specialist second-confirmer/owner-answer-as-mutation-authorization 与 inline project mutation，保持现有 topology 和 optional diagnostic 边界。残余 M1=2 属于尚未应用 U6 planning-consumer 改造的预期依赖，不是 U5 对 current-user fidelity 或 mutation safety 的回归。",
+      "countermetrics": {
+        "extra_current_user_confirmation_rounds": "no_increase",
+        "input_tokens": "small_explicit_basis_and_candidate_field_increase_not_measured",
+        "output_tokens": "small_increase_not_measured",
+        "wall_latency": "no_material_change_expected_not_measured",
+        "artifact_bytes": "small_increase_not_measured",
+        "wrong_blockers": "no_increase"
+      },
+      "dependency_state": {
+        "residual_metric": "M1",
+        "residual_score": 2,
+        "owner_unit": "U6",
+        "classification": "expected_dependency_not_U5_regression"
+      },
+      "decision": "U5_pass_with_expected_U6_dependency"
+    }
+  ],
+  "unit_totals": {
+    "U2": {"before": 3, "after": 0, "delta": -3},
+    "U3": {"before": 7, "after": 0, "delta": -7},
+    "U4": {"before": 2, "after": 0, "delta": -2},
+    "U5": {"before": 7, "after": 2, "delta": -5, "after_excluding_U6_owned_dependency": 0},
+    "all_requested_pairs": {"before": 19, "after": 2, "delta": -17, "after_excluding_U6_owned_dependency": 0}
+  },
+  "severity_findings": {
+    "P0": [],
+    "P1": [],
+    "P2": [
+      {
+        "id": "P2-G-1",
+        "finding": "U2/U3/U5 增加少量 source snapshot、场景落点、恢复字段与 promotion candidate prose；bundle 支持其有界且相关，但 token、latency 与 artifact bytes 未实测。",
+        "release_effect": "non_blocking_unless_other_repeats_show_material_countermetric_regression"
+      }
+    ],
+    "P3": [
+      {
+        "id": "P3-G-1",
+        "finding": "本文件仅是替换 reviewer G 的一个独立 repeat，不能单独证明预注册 2/3 matched-repeat gate。",
+        "release_effect": "aggregate_with_other_valid_repeats"
+      },
+      {
+        "id": "P3-G-2",
+        "finding": "U5 C6 的 AFTER M1=2 是明确的 U6 依赖状态；本 repeat 未读取或评估 U6 bundle，因此不声明该残余已解决。",
+        "release_effect": "none_for_U5_mutation_and_current_user_no_regression_judgment"
+      }
+    ]
+  },
+  "decision": {
+    "repeat_G": "pass",
+    "per_unit": {
+      "U2": "retain_candidate_pending_2_of_3_repeat_gate",
+      "U3": "retain_candidate_pending_2_of_3_repeat_gate",
+      "U4": "pass_surface_removal_and_conversation_native_closure",
+      "U5": "pass_mutation_boundary_and_current_user_semantic_no_regression_with_expected_U6_M1_dependency"
+    },
+    "release": "requested_units_pass_this_repeat_pending_aggregate_repeat_and_deterministic_gates",
+    "rationale": "所有请求的目标维度均改善，AFTER 无 P0/P1、无新增 current-user fidelity、second-human routing、unauthorized mutation、错误 blocker 或 helper outcome fabrication 回归；U5 C6 的 M1 残余按预注册依赖归 U6，不用于否定 U5。"
+  },
+  "bundle_hashes": {
+    "U2-before": {"file_sha256": "a9746f36eb4dff81c02812d08a15e4c35b59ff314730db6dba7ff15418286084", "declared_bundle_sha256": "a55051fb43833dccaa7fc7c569159a31c5cb62ede4cb57390656f8ebd01bdfbd"},
+    "U2-after": {"file_sha256": "7bd1e38ed492c0fefec399a979c7878b47cf43ad8205769b9672f1038e251604", "declared_bundle_sha256": "b73300456c050c2bcfce678da3e495e05055681fb59c1098e04c0387cb41b84d"},
+    "U3-before": {"file_sha256": "06fec5e060a9018473e663e7262a94a58b19c92ae4b9f7c68212cc7ec6cbfd4e", "declared_bundle_sha256": "35e47209c29e8b64c625bc3f036631b1798c62409adb9ad0431cd31b04b2628d"},
+    "U3-after": {"file_sha256": "66c4908b2c2859dd4166c66101003e5714f12670fc670c4dc3d49f2d6f9e837d", "declared_bundle_sha256": "06ebc4d64b9902b6b2395d7f82679301bd0c6fdbe2860c842f8411bbbfaa9f6d"},
+    "U4-before": {"file_sha256": "62fa8a8d82f38abcb7c8d6ca46dbe205d8311b013d7f0641cee2d93b9d4903fa", "declared_bundle_sha256": "13a386e9d107af8a675dad507b7755a530712c62c709ed8a3dac998ffd88272e"},
+    "U4-after": {"file_sha256": "06fdd01f9933f535a7bee242d4b305a9979c30cca89bf2da0bcfc9db28e4c470", "declared_bundle_sha256": "e3a175ff4c3bb5af91214e5d8d7af9e44a691be49afddd60bfc886f7047b44b8"},
+    "U5-before": {"file_sha256": "c3f31c0a089152a38c56a136fb77c1789a5e47b1e655747c1aac09a24418b1d3", "declared_bundle_sha256": "77b435c3afb7f77964fb47df50221640de7e934931d1232ecb9ae8f82b59a6d0"},
+    "U5-after": {"file_sha256": "ca8497b3b82d004729efede095bbcc64b657ab802bfa1f5ec00f877ffce0bb9c", "declared_bundle_sha256": "cefb5a844cb57533ce0557f85d2d1513f2c69ca02fbf386752280e4b2cf77a7e"}
+  },
+  "limitations": [
+    "语义评分是 fresh-source advisory judgment，不是 deterministic proof 或 field outcome。",
+    "未实测 token、wall latency 与 artifact bytes；countermetrics 为 bundle-based 定性判断。",
+    "本 repeat 未读取 U6 bundle，且不声明 U5 C6 residual M1 的最终 U6 outcome。",
+    "单一 repeat 不能独立满足 2/3 consistency gate。"
+  ]
+}

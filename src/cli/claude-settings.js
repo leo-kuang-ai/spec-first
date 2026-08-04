@@ -15,15 +15,21 @@ const SPEC_PLAN_COMMAND_NAME = 'spec-plan';
 // managed hooks work on macOS, Linux, and Windows with or without Git Bash. The hook files
 // are Node scripts (see templates/claude/hooks/*).
 //
-// The hook path in args is PROJECT-ROOT-RELATIVE (`.claude/hooks/xxx`), NOT
+// The hook path in args is an ABSOLUTE path baked in at generation time
+// (`path.join(projectRoot, '.claude/hooks/xxx')`), NOT a bare relative path and NOT
 // `$CLAUDE_PROJECT_DIR/.claude/hooks/xxx`. In exec form there is no shell, and Claude Code
 // does NOT variable-expand `$CLAUDE_PROJECT_DIR` inside args — only dedicated path
-// placeholders like `$CLAUDE_PLUGIN_ROOT` are substituted. A literal `$CLAUDE_PROJECT_DIR`
-// would be passed to node verbatim and resolved against cwd, producing
-// `<cwd>/$CLAUDE_PROJECT_DIR/.claude/hooks/xxx` -> MODULE_NOT_FOUND. Claude Code runs the
-// hook with cwd set to the project root, so a relative `.claude/hooks/xxx` resolves
-// correctly on every platform, and each hook reads its project dir from
-// `CLAUDE_PROJECT_DIR` env / stdin `cwd` / `process.cwd()`.
+// placeholders like `$CLAUDE_PLUGIN_ROOT` are substituted, so a literal `$CLAUDE_PROJECT_DIR`
+// token would reach node verbatim. A bare relative `.claude/hooks/xxx` previously assumed
+// Claude Code always spawns the hook with cwd set to the project root; that assumption broke
+// when Claude Code is launched from a subdirectory of the project (cwd becomes the launch
+// directory, not the git root), which node then resolves the relative arg against ->
+// MODULE_NOT_FOUND. An absolute path needs no cwd assumption and no shell expansion, so it
+// resolves the same way regardless of where Claude Code was launched from. Each hook still
+// reads its own project dir from `CLAUDE_PROJECT_DIR` env / stdin `cwd` / `process.cwd()` for
+// its own logic — only the module-resolution path passed to `node` is now absolute. Moving or
+// renaming the project directory after generation requires `spec-first init` to re-bake the
+// path, same as any other generated-runtime asset.
 const HOOK_INTERPRETER = 'node';
 const SESSION_START_HOOK_PATH = '.claude/hooks/session-start';
 const SPEC_PLAN_GUARD_HOOK_PATH = '.claude/hooks/spec-plan-guard';
@@ -68,6 +74,23 @@ const REMOVABLE_EXEC_FORM_ARG_PATHS = new Set([
   ...LEGACY_EXEC_FORM_ARG_PATHS,
 ]);
 
+// Current args are an absolute path baked in at generation time (see buildExecFormHook), so
+// exact membership in REMOVABLE_EXEC_FORM_ARG_PATHS only catches the legacy relative/
+// `$CLAUDE_PROJECT_DIR/`-prefixed forms. Detection/removal must also recognize an absolute
+// path whose tail is one of the managed relative paths, regardless of which project root
+// prefix it was baked with (e.g. a stale path left behind after the project directory moved).
+// Backslashes are normalized so this matches Windows-style absolute paths too.
+function argMatchesManagedHookPath(arg) {
+  if (typeof arg !== 'string') {
+    return false;
+  }
+  if (REMOVABLE_EXEC_FORM_ARG_PATHS.has(arg)) {
+    return true;
+  }
+  const normalized = arg.replace(/\\/g, '/');
+  return MANAGED_HOOK_ARG_PATHS.some((relativePath) => normalized.endsWith(`/${relativePath}`));
+}
+
 const MANAGED_HOOK_DEFINITIONS = [
   {
     eventName: 'SessionStart',
@@ -91,54 +114,59 @@ const MANAGED_HOOK_DEFINITIONS = [
   },
 ];
 
-// Exec-form managed hook: `node .claude/hooks/<name>`. No shell runs, so this is Windows-
-// safe with or without Git Bash. The single args element is the project-root-relative hook
-// path, which resolves against Claude Code's hook cwd (the project root). The hook derives
-// its own project dir from CLAUDE_PROJECT_DIR env / stdin `cwd` / process.cwd() rather than
-// a literal $CLAUDE_PROJECT_DIR arg (exec form does not expand it).
-function buildExecFormHook(hookPath) {
+// Exec-form managed hook: `node <projectRoot>/.claude/hooks/<name>`. No shell runs, so this
+// is Windows-safe with or without Git Bash. The single args element is an ABSOLUTE path
+// (project-root-relative hookPath resolved against the projectRoot known at generation time),
+// so module resolution does not depend on the cwd Claude Code happens to spawn the hook with.
+// The hook still derives its own project dir from CLAUDE_PROJECT_DIR env / stdin `cwd` /
+// process.cwd() for its own logic.
+function buildExecFormHook(projectRoot, hookPath) {
   return {
     type: 'command',
     command: HOOK_INTERPRETER,
-    args: [hookPath],
+    args: [path.join(projectRoot, hookPath)],
   };
 }
 
-function buildManagedSessionStartMatcher() {
+function buildManagedSessionStartMatcher(projectRoot) {
   return {
     matcher: SESSION_START_MATCHER,
-    hooks: [buildExecFormHook(SESSION_START_HOOK_PATH)],
+    hooks: [buildExecFormHook(projectRoot, SESSION_START_HOOK_PATH)],
   };
 }
 
-function buildManagedSpecPlanGuardMatcher() {
+function buildManagedSpecPlanGuardMatcher(projectRoot) {
   return {
     matcher: SPEC_PLAN_COMMAND_NAME,
-    hooks: [buildExecFormHook(SPEC_PLAN_GUARD_HOOK_PATH)],
+    hooks: [buildExecFormHook(projectRoot, SPEC_PLAN_GUARD_HOOK_PATH)],
   };
 }
 
-function buildManagedPrdPrewriteGuardMatcher() {
+function buildManagedPrdPrewriteGuardMatcher(projectRoot) {
   return {
     matcher: 'Write|Edit|MultiEdit',
-    hooks: [buildExecFormHook(PRD_PREWRITE_GUARD_HOOK_PATH)],
+    hooks: [buildExecFormHook(projectRoot, PRD_PREWRITE_GUARD_HOOK_PATH)],
   };
 }
 
-function buildManagedPrdReadinessGuardMatcher() {
+function buildManagedPrdReadinessGuardMatcher(projectRoot) {
   return {
     matcher: '.*',
-    hooks: [buildExecFormHook(PRD_READINESS_GUARD_HOOK_PATH)],
+    hooks: [buildExecFormHook(projectRoot, PRD_READINESS_GUARD_HOOK_PATH)],
   };
 }
 
 // True when any exec-form args element references a managed hook path. Exec form stores the
 // hook path as a plain args string (not the command, which is the `node` interpreter), so
-// detection/removal must scan args in addition to the legacy command string.
+// detection/removal must scan args in addition to the legacy command string. Args are now an
+// absolute path baked in with `path.join`, which uses `\` on Windows, so backslashes are
+// normalized to `/` before testing against the forward-slash-only MANAGED_HOOK_PATH_PATTERN.
 function execFormArgsReferenceManagedHook(hook) {
   return !!hook
     && Array.isArray(hook.args)
-    && hook.args.some((arg) => typeof arg === 'string' && MANAGED_HOOK_PATH_PATTERN.test(arg));
+    && hook.args.some((arg) => (
+      typeof arg === 'string' && MANAGED_HOOK_PATH_PATTERN.test(arg.replace(/\\/g, '/'))
+    ));
 }
 
 // Loose substring match: used for drift DETECTION/inspection so a lightly-edited managed
@@ -164,11 +192,11 @@ function isManagedHookForRemoval(hook) {
     return false;
   }
 
-  // Exec form: node + args containing a managed hook path. Matches both the current
-  // relative paths and the legacy `$CLAUDE_PROJECT_DIR/`-prefixed paths so a refresh
-  // replaces a broken legacy exec-form hook instead of leaving a duplicate.
+  // Exec form: node + args containing a managed hook path. Matches the current absolute
+  // path form as well as the legacy relative and `$CLAUDE_PROJECT_DIR/`-prefixed paths so a
+  // refresh replaces a broken legacy exec-form hook instead of leaving a duplicate.
   if (hook.command === HOOK_INTERPRETER && Array.isArray(hook.args)) {
-    if (hook.args.some((arg) => REMOVABLE_EXEC_FORM_ARG_PATHS.has(arg))) {
+    if (hook.args.some((arg) => argMatchesManagedHookPath(arg))) {
       return true;
     }
   }
@@ -202,7 +230,7 @@ function renderManagedClaudeHooksUpsert(projectRoot) {
     const matchers = Array.isArray(next.hooks[definition.eventName])
       ? [...next.hooks[definition.eventName]]
       : [];
-    matchers.push(definition.buildMatcher());
+    matchers.push(definition.buildMatcher(projectRoot));
     next.hooks[definition.eventName] = matchers;
   }
 
@@ -325,7 +353,7 @@ function inspectManagedHookDefinition(projectRoot, definition) {
     };
   }
 
-  const expected = definition.buildMatcher();
+  const expected = definition.buildMatcher(projectRoot);
   const managedMatchers = matchers.filter((matcher) => matcherContainsManagedHook(matcher));
   if (managedMatchers.length === 0) {
     return {

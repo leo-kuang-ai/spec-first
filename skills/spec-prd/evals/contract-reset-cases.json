@@ -1,0 +1,249 @@
+{
+  "schema_version": "contract-reset-cases/v1",
+  "frozen_at": "2026-07-11T09:00:00.000Z",
+  "freeze_authority": "user-authorized execution of the approved implementation-ready plan",
+  "run_contract": {
+    "arms": [
+      "baseline",
+      "phase1_control",
+      "candidate"
+    ],
+    "repeats_per_arm": 3,
+    "balanced_orders": [
+      [
+        "baseline",
+        "phase1_control",
+        "candidate"
+      ],
+      [
+        "phase1_control",
+        "candidate",
+        "baseline"
+      ],
+      [
+        "candidate",
+        "baseline",
+        "phase1_control"
+      ]
+    ],
+    "invocation_profile": {
+      "host": "codex",
+      "model": "gpt-5",
+      "agent_type": "fresh-generic-agent",
+      "temperature": "host-default",
+      "context_reuse": "forbidden",
+      "tool_posture": "sandbox-root-only",
+      "authority_profile": "product-owner input plus claim-specific specialist authority"
+    },
+    "tie_rule": "no-go: a tie against phase1_control cannot authorize U7-U13",
+    "inconclusive_rule": "Gate A remains inconclusive and U7-U13 stay forbidden when isolation, replay, custody, retained evidence, or independent grading is incomplete",
+    "arm_failure_rule": "model non-completion, unauthorized mutation, missing artifact, or context contamination is an arm fail; infrastructure failure gets one balanced paired retry before inconclusive",
+    "primary_decision_rule": "candidate must reach frozen material effect in at least two of create/refine/validate; the remaining primary must not regress",
+    "critical_decision_rule": "design/domain/stress and all Non-regression checks are zero-tolerance vetoes and never count as wins",
+    "maximum_complexity_budget": {
+      "mandatory_state_concepts": 5,
+      "always_read_references": 6,
+      "canonical_owners": 4,
+      "hot_path_reference_reads": 6,
+      "front_controller_lines": 500,
+      "frozen_before_results": true
+    },
+    "blind_product_rubric": [
+      "planning_invention",
+      "interaction_waste",
+      "actor_problem_outcome",
+      "why_now",
+      "success_evidence",
+      "right_size"
+    ]
+  },
+  "cases": [
+    {
+      "id": "create-brownfield-single-surface",
+      "gate_role": "gate_a_primary",
+      "intent": "create",
+      "minimum_material_effect": {
+        "eliminated_load_bearing_what": 1,
+        "interaction_waste_reduction": 1,
+        "core_product_quality_floor": "no-new-fail",
+        "materiality_note": "The candidate must close at least one planning-blocking WHAT without inventing product scope and remove at least one avoidable owner turn versus phase1_control."
+      },
+      "authority_profile": [
+        "current user owns release scope and product defaults",
+        "source confirms current behavior only"
+      ],
+      "inputs": [
+        {
+          "path": "request.md",
+          "content": "在现有后台订单页增加失败原因筛选和导出，目标是让运营在本期发布中定位失败订单。当前草稿未说明默认时间范围、空结果或导出失败反馈。"
+        },
+        {
+          "path": "current-state.md",
+          "content": "当前订单页已有状态筛选，默认最近 7 天；导出接口异步生成文件并可能返回权限不足或超时。"
+        }
+      ],
+      "review_focus": [
+        "actor/problem/outcome/why now",
+        "default time range",
+        "empty, permission, timeout and export states",
+        "observable acceptance"
+      ]
+    },
+    {
+      "id": "refine-ratified-meeting-code-conflict",
+      "gate_role": "gate_a_primary",
+      "intent": "refine",
+      "minimum_material_effect": {
+        "eliminated_load_bearing_what": 1,
+        "interaction_waste_reduction": 1,
+        "core_product_quality_floor": "no-new-fail",
+        "materiality_note": "The candidate must reconcile the ratified target with conflicting current code and remove one duplicate or source-resolvable question versus phase1_control."
+      },
+      "authority_profile": [
+        "ratified meeting decision owns target default",
+        "code owns current-state evidence",
+        "current user owns release scope"
+      ],
+      "inputs": [
+        {
+          "path": "existing-prd.md",
+          "content": "现有 PRD 写明批量重试默认处理全部失败项，但没有区分永久失败与可重试失败。"
+        },
+        {
+          "path": "meeting.md",
+          "content": "已批准决定：本期默认只选择可重试失败项；永久失败必须保留并显示原因，不进入批量动作。"
+        },
+        {
+          "path": "current-code.md",
+          "content": "当前实现会把所有失败项放入同一选择集合，接口只返回 reason_code 和 retryable。"
+        }
+      ],
+      "review_focus": [
+        "current/target separation",
+        "ratified decision fidelity",
+        "selection and failure states",
+        "R to AE trace"
+      ]
+    },
+    {
+      "id": "validate-read-only-mutation-sentinel",
+      "gate_role": "gate_a_primary",
+      "intent": "validate",
+      "minimum_material_effect": {
+        "eliminated_load_bearing_what": 0,
+        "interaction_waste_reduction": 1,
+        "core_product_quality_floor": "no-new-fail",
+        "materiality_note": "The candidate must preserve zero mutation while removing at least one redundant readiness ceremony or non-actionable clarification versus phase1_control."
+      },
+      "authority_profile": [
+        "existing artifact is read-only",
+        "reviewer may report but not decide target WHAT"
+      ],
+      "inputs": [
+        {
+          "path": "existing-product-contract.md",
+          "content": "已有 PRD 包含 Summary、Requirements、Acceptance Examples 和一个未闭合权限问题；运行前后由 mutation sentinel 比较 bytes、mtime、receipt 和目录内容。"
+        }
+      ],
+      "review_focus": [
+        "report-only behavior",
+        "actionable blocker diagnosis",
+        "no rewrite/finalize/runtime/design materialization"
+      ]
+    },
+    {
+      "id": "critical-design-degraded-authority",
+      "gate_role": "gate_a_critical",
+      "intent": "design",
+      "minimum_material_effect": null,
+      "authority_profile": [
+        "design proposal is partial and not approved",
+        "current user cannot substitute missing design authority"
+      ],
+      "inputs": [
+        {
+          "path": "design-evidence.md",
+          "content": "Figma 只读证据仅覆盖默认态；权限拒绝态节点不可读，approval authority unknown。该状态会改变页面反馈与验收。"
+        }
+      ],
+      "review_focus": [
+        "degraded consequence",
+        "authority fidelity",
+        "no provider mutation or invented approved state"
+      ]
+    },
+    {
+      "id": "critical-domain-signoff-timing",
+      "gate_role": "gate_a_critical",
+      "intent": "domain",
+      "minimum_material_effect": null,
+      "authority_profile": [
+        "specialist owns regulated claim",
+        "current user is question recipient only"
+      ],
+      "inputs": [
+        {
+          "path": "domain-constraint.md",
+          "content": "资金冻结提示文案需要 before-planning 专业会签；当前材料只有模型建议和未批准的历史草稿。"
+        }
+      ],
+      "review_focus": [
+        "sign-off timing",
+        "claim-specific authority",
+        "checkpoint until specialist evidence"
+      ]
+    },
+    {
+      "id": "critical-stress-multisource",
+      "gate_role": "gate_a_critical",
+      "intent": "stress",
+      "minimum_material_effect": null,
+      "authority_profile": [
+        "user owns release scope",
+        "meeting owns ratified target decision",
+        "code owns current state",
+        "design and domain claims require separate authority"
+      ],
+      "inputs": [
+        {
+          "path": "stress-input.md",
+          "content": "组合输入包含粗 PRD、已批准会议决定、冲突代码、部分可读 Figma、专业会签要求和项目规则。必须闭合本期 WHAT，同时保留 unread design 与 specialist blocker。"
+        }
+      ],
+      "review_focus": [
+        "source authority reconciliation",
+        "release-bounded closure",
+        "critical residue",
+        "right-size and readability"
+      ]
+    },
+    {
+      "id": "routing-trigger-matrix",
+      "gate_role": "trigger_matrix",
+      "intent": "trigger-matrix",
+      "minimum_material_effect": null,
+      "authority_profile": [
+        "routing only; scored separately from output quality"
+      ],
+      "should_trigger": [
+        "source-resolvable brownfield framing",
+        "API/SDK external product surface",
+        "current release-slice PRD/meeting/code/design reconciliation"
+      ],
+      "near_miss": [
+        "unbounded 0-1 product exploration",
+        "mutually exclusive unresolved product shapes",
+        "implementation plan",
+        "debugging request",
+        "mobile App full-system consistency audit",
+        "non-App full-system consistency audit",
+        "format-only document cleanup"
+      ],
+      "inputs": [],
+      "review_focus": [
+        "route precision",
+        "no output-quality score mixing"
+      ]
+    }
+  ]
+}

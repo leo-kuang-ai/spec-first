@@ -238,7 +238,7 @@ Choose the narrowest review surface:
 | Change type | Review path |
 |---|---|
 | docs/report/contract only | `spec-doc-review` or single-agent report-only fallback |
-| skill source prose | `spec-skill-audit` plus fresh-source eval when semantic behavior matters |
+| skill source prose | bounded source review plus fresh-source eval when semantic behavior matters |
 | agent source prose | fresh-source eval and relevant doc/code review |
 | CLI/scripts/tests | `spec-code-review` and targeted tests |
 | runtime generation | source tests plus host runtime regeneration checks |

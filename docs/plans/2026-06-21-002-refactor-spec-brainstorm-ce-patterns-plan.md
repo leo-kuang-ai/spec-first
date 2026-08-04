@@ -87,7 +87,7 @@ spec_id: 2026-06-21-002-refactor-spec-brainstorm-ce-patterns
   - `skills/spec-brainstorm/evals/routing-cases.json`
   - `tests/unit/spec-brainstorm-contracts.test.js`
   - `tests/unit/spec-brainstorm-routing-contracts.test.js`
-  - `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js`
+  - `skills/retired-skill-review/scripts/eval-fixture-normalizer.js`
   - `docs/plans/2026-06-21-001-refactor-spec-brainstorm-boundary-plan.md`
 - current_revision: `f7eb0d88b05bb62bc648c5d4f4ad0a428806aebb`
 - worktree_status: dirty with existing in-scope changes to `CHANGELOG.md`, `skills/spec-brainstorm/SKILL.md`, `skills/spec-brainstorm/references/synthesis-summary.md`, `tests/unit/spec-brainstorm-contracts.test.js`, `tests/unit/spec-brainstorm-routing-contracts.test.js`, plus untracked `skills/spec-brainstorm/README.md` and new reference files

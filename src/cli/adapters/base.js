@@ -40,11 +40,31 @@ class PlatformAdapter {
   }
 
   /**
+   * Whether the command root contains only spec-first managed commands.
+   * Shared host command roots must opt out so hard reset preserves user commands.
+   */
+  get commandRootIsDedicated() {
+    return true;
+  }
+
+  /**
    * Whether this platform installs bundled agent profiles.
    * Preview hosts can opt out until their native agent/subagent surface is proven.
    */
   get supportsAgents() {
     return true;
+  }
+
+  get supportState() {
+    return 'active';
+  }
+
+  get evidenceClaim() {
+    return null;
+  }
+
+  get testedVersions() {
+    return [];
   }
 
   /**

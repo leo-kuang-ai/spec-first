@@ -1,0 +1,35 @@
+{
+  "arm": "old-full",
+  "repeat": 2,
+  "case_id": "generated-runtime-patch-neighbor",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "revise-skill",
+    "case_id": "generated-runtime-patch-neighbor",
+    "effect": "Redirect the requested behavior change to source and project it into runtime; do not hand-edit the generated mirror.",
+    "layer_result": "The desired behavior may qualify for remediation, but the named path is a forbidden generated runtime surface.",
+    "modifier": "source-first-runtime-projection",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "不得直接修改 .agents/skills/spec-prd/SKILL.md。应在 skills/spec-prd/ 的 source 中实施同一行为变更，更新必要的治理、聚焦测试和 Changelog，验证后通过 spec-first init 重生 runtime mirror。若当前会话已缓存旧内容，还需重新加载或开启新会话；不能承诺手改镜像会让本会话安全热更新。",
+    "route_decision": "route generated-mirror request to source remediation",
+    "source_owner_assumption": "skills/spec-prd/ is the presumed source only if repository contracts confirm it; .agents/skills/spec-prd/ is generated.",
+    "would_modify_paths": [
+      "skills/spec-prd/SKILL.md",
+      "skills/spec-prd/references/*",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "<focused-tests>",
+      "CHANGELOG.md"
+    ],
+    "would_run_commands": [
+      "npm run lint:skill-entrypoints",
+      "<focused Jest contract test>",
+      "git diff --check",
+      "spec-first init",
+      "<runtime sync test>"
+    ]
+  }
+}

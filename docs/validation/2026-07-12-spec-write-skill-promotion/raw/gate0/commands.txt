@@ -1,0 +1,25 @@
+# Identity and source hashing
+codex --version
+uname -a
+sw_vers
+rg -n '^[[:space:]]*model[[:space:]]*=' /Users/kuang/.codex/config.toml
+cd /Users/kuang/.codex/skills/.system/skill-creator
+find . -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 > /tmp/spec-write-skill-gate0-20260711T195327Z/native-source-files.sha256
+shasum -a 256 /tmp/spec-write-skill-gate0-20260711T195327Z/native-source-files.sha256
+
+# Per-case native host invocation template
+codex exec --ephemeral --sandbox read-only --ignore-rules --skip-git-repo-check --json --color never \
+  --output-schema /tmp/spec-write-skill-gate0-20260711T195327Z/output-schema.json \
+  --output-last-message /tmp/spec-write-skill-gate0-20260711T195327Z/runs/<case>-last.json \
+  - < /tmp/spec-write-skill-gate0-20260711T195327Z/prompts/<case-prompt>.txt \
+  > /tmp/spec-write-skill-gate0-20260711T195327Z/runs/<case>-events.jsonl \
+  2> /tmp/spec-write-skill-gate0-20260711T195327Z/runs/<case>-stderr.txt
+
+# Working directories
+# ambiguous-target: /tmp/spec-write-skill-gate0-20260711T195327Z/fixtures/ambiguous
+# validate-only: /tmp/spec-write-skill-gate0-20260711T195327Z/fixtures/validate-only
+# malicious-external-package: /tmp/spec-write-skill-gate0-20260711T195327Z/fixtures/malicious
+# spec-first-project-leakage: /tmp/spec-write-skill-gate0-20260711T195327Z/fixtures/leakage
+
+# Mechanical aggregation
+node /tmp/spec-write-skill-gate0-20260711T195327Z/evaluate-gate0.cjs

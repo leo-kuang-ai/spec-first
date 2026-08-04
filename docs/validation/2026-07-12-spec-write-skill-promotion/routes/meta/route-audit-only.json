@@ -1,0 +1,10 @@
+{
+  "id": "route-audit-only",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28856,
+    "cached_input_tokens": 0,
+    "output_tokens": 374,
+    "reasoning_output_tokens": 104
+  }
+}

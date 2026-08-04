@@ -23,6 +23,31 @@ const MESSAGES = {
     previewSelectedHosts: (labels) => `已选择宿主运行时: ${labels}`,
     previewHostRuntime: (index, total, label) => `宿主运行时 ${index}/${total}: ${label}`,
     previewDryRunHeader: (platform) => `预览: spec-first init (${platform})`,
+    previewCoverage: (targets, hosts, groups, budget) => (
+      `预览覆盖: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
+    ),
+    previewSummaryCoverage: (targets, hosts) => `初始化预览: ${targets} 个目标 · ${hosts} 个宿主`,
+    previewHostSummary: (label, destructive, critical, generated) => (
+      `  ${label}: 风险操作 ${destructive} · 关键写入 ${critical} · 生成 ${generated}`
+    ),
+    previewSummaryDestructive: (count, groups) => `风险操作: ${count} 个 path · ${groups} 个 target/host group（默认不展开路径）`,
+    previewSummaryDestructiveDetails: '  查看具体路径: spec-first init --dry-run',
+    previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
+      `全局 developer profile: ${action} · ${displayPath} · ${name} (${lang})`
+    ),
+    previewSummaryLanguageReady: '用户级语言同步: ready（无需修改）',
+    previewSummaryLanguageChanges: (count) => `用户级语言同步: ${count} 项计划变更`,
+    previewAwaitingConfirmation: '以上为预览；确认后才会修改文件。',
+    previewGlobalDeveloperHeader: '全局 developer profile 预览:',
+    previewDestructivePaths: (count) => `删除 / prune / runtime-untrack paths (${count}):`,
+    previewCriticalWritePaths: (count) => `关键写入 paths (${count}):`,
+    previewGeneratedPaths: (count) => `生成路径 (${count}):`,
+    previewTargetDetail: (platform, kind, label, root, resetReason) => (
+      `目标明细: host=${platform} kind=${kind} label=${label} root=${root} reset=${resetReason}`
+    ),
+    previewOmittedCoverage: (targets, targetHostGroups, paths) => (
+      `预览省略: targets=${targets} target_host_groups=${targetHostGroups} paths=${paths}`
+    ),
     previewHardResetLegacy: '将先执行 managed hard reset，再重新生成 runtime assets。',
     previewHardResetDrift: '将先执行 managed hard reset，再重新生成 runtime assets（检测到当前 runtime drift）。',
     previewDestructiveReset: '破坏性预览: 包含 managed runtime reset/removal/prune 操作。',
@@ -36,8 +61,8 @@ const MESSAGES = {
     previewRuntimeUntrackDiagnostic: (diagnostic) => `  ${diagnostic}`,
     previewOmittedPaths: (count) => `  ... 还有 ${count} 个 path 未在 preview 中展示`,
     previewNoFilesChanged: '不会修改文件。',
-    previewUserLanguageSyncHeader: 'User-level language sync / 用户级语言同步:',
-    previewUserLanguageSyncDryRun: 'Dry run: 不会写入用户级 instruction 文件或全局 developer profile。',
+    previewUserLanguageSyncHeader: '用户级语言同步:',
+    previewUserLanguageSyncDryRun: '预览模式：不会写入用户级 instruction 文件或全局 developer profile。',
     applyInstalledClaudeHook: '🪝 已安装 Claude managed hook matchers 到 .claude/settings.json',
     applyInstalledCodexHook: '🪝 已安装 Codex SessionStart hook 到 .codex/hooks/',
     applyGeneratedCommands: (count, dir) => `📦 已在 ${dir} 生成 ${count} 个 command 文件`,
@@ -46,7 +71,6 @@ const MESSAGES = {
     applyGeneratedAgentSupport: (count, dir) => `🧰 已在 ${dir} 生成 ${count} 个 agent support 文件`,
     applyGitignoreAdded: '🧹 已新增 .gitignore spec-first managed block',
     applyGitignoreUpdated: '🧹 已更新 .gitignore spec-first managed block',
-    applyBootstrappedChangelog: '📝 已初始化 CHANGELOG.md',
     applySkippedCodexHook: '🪝 已跳过 Codex SessionStart hook 安装：当前目录的 .codex 是 CODEX_HOME 全局 hook 位置',
     applyDeveloperProfileCreate: '🪪 已写入全局 developer profile:',
     applyDeveloperProfileOverwrite: '🪪 已更新全局 developer profile:',
@@ -54,8 +78,34 @@ const MESSAGES = {
     applyRuntimeUntracked: (count) => `🧯 已从 git index untrack ${count} 个 managed runtime path（工作区文件保留）。`,
     applyRuntimeUntrackNone: '🧯 没有 managed runtime path 需要 untrack。',
     applyRuntimeUntrackSkipped: (reasonCode) => `🧯 Runtime untrack 已跳过: ${reasonCode}`,
+    applyRunSummary: (ready, total) => `初始化结果: ${ready}/${total} 个宿主 ready`,
+    applyRunFailureSummary: (ready, total) => `初始化结果: ${ready}/${total} 个宿主 ready（存在失败）`,
+    applyHostSummary: (label, status, details) => `  ${label}: ${status}${details ? ` · ${details}` : ''}`,
+    applyStatusReady: 'ready',
+    applyStatusFailed: 'failed',
+    applyCommandsCount: (count) => `${count} commands`,
+    applySkillsCount: (count) => `${count} skills`,
+    applyAgentsCount: (count) => `${count} agents`,
+    applyHookUpdated: 'hook 已更新',
+    applyHookSkippedCompact: 'hook 已跳过',
+    applyGitignoreCompact: '已更新 .gitignore managed block',
+    applyChangelogCompact: '已创建 CHANGELOG.md',
+    applyAgentSupportCount: (count) => `${count} agent support`,
+    applyWorkspaceCount: (ready, total) => `workspace ${ready}/${total} ready`,
+    applyProfileCompact: (action, displayPath, name, lang) => (
+      `全局 developer profile: ${action} · ${displayPath} · ${name} (${lang})`
+    ),
+    applyLanguageCompact: (status, reasonCode) => (
+      `用户级语言同步: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`
+    ),
+    applyLanguageIssue: (host, displayPath, error) => `  ${host}: ${displayPath}${error ? ` · ${error}` : ''}`,
+    applyRuntimeUntrackCompact: (count) => `Runtime untrack: ${count} 个 managed path`,
+    applyRuntimeUntrackSample: (displayPath) => `  - ${displayPath}`,
     applyRefreshParentRuntime: '▶ 刷新父级宿主 runtime assets',
-    applyUserLanguageSyncHeader: (status, reasonCode) => `User-level language sync / 用户级语言同步: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
+    applyUserLanguageSyncHeader: (status, reasonCode) => `用户级语言同步: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
+    diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime 已生成，但本机尚未验证 skill discovery/invocation；生成的 skills 可能不会被 Cursor 加载。',
+    diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: Qoder 的 qodercli 1.0.41 evidence baseline 已确认 hook settings 与 command protocol，但 authenticated event execution 和 shared IDE loader safety 尚未验证；settings entries 保持未启用，SessionStart 与 PRD guard 当前不生效。',
+    diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime 已生成，但当前安装版本的 command/skill loader 尚未验证；支持声明保持 generated_runtime_preview。',
   },
   en: {
     selectHosts: 'Select host runtimes to initialize:',
@@ -81,6 +131,31 @@ const MESSAGES = {
     previewSelectedHosts: (labels) => `Selected host runtimes: ${labels}`,
     previewHostRuntime: (index, total, label) => `Host runtime ${index}/${total}: ${label}`,
     previewDryRunHeader: (platform) => `Dry run: spec-first init (${platform})`,
+    previewCoverage: (targets, hosts, groups, budget) => (
+      `Preview coverage: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
+    ),
+    previewSummaryCoverage: (targets, hosts) => `Init preview: ${targets} target(s) · ${hosts} host(s)`,
+    previewHostSummary: (label, destructive, critical, generated) => (
+      `  ${label}: risk operations ${destructive} · critical writes ${critical} · generated ${generated}`
+    ),
+    previewSummaryDestructive: (count, groups) => `${count} risk path(s) across ${groups} target/host group(s) (paths hidden by default)`,
+    previewSummaryDestructiveDetails: '  Inspect paths: spec-first init --dry-run',
+    previewSummaryGlobalDeveloper: (action, displayPath, name, lang) => (
+      `Global developer profile: ${action} · ${displayPath} · ${name} (${lang})`
+    ),
+    previewSummaryLanguageReady: 'User-level language sync: ready (no changes)',
+    previewSummaryLanguageChanges: (count) => `User-level language sync: ${count} planned change(s)`,
+    previewAwaitingConfirmation: 'Preview only; files change only after confirmation.',
+    previewGlobalDeveloperHeader: 'Global developer profile preview:',
+    previewDestructivePaths: (count) => `Destructive / prune / runtime-untrack paths (${count}):`,
+    previewCriticalWritePaths: (count) => `Critical write paths (${count}):`,
+    previewGeneratedPaths: (count) => `Generated paths (${count}):`,
+    previewTargetDetail: (platform, kind, label, root, resetReason) => (
+      `Target detail: host=${platform} kind=${kind} label=${label} root=${root} reset=${resetReason}`
+    ),
+    previewOmittedCoverage: (targets, targetHostGroups, paths) => (
+      `Preview omitted: targets=${targets} target_host_groups=${targetHostGroups} paths=${paths}`
+    ),
     previewHardResetLegacy: 'Would perform a managed hard reset before regenerating runtime assets.',
     previewHardResetDrift: 'Would perform a managed hard reset before regenerating runtime assets (current runtime drift detected).',
     previewDestructiveReset: 'Destructive preview: managed runtime reset/removal/prune operations are included.',
@@ -104,7 +179,6 @@ const MESSAGES = {
     applyGeneratedAgentSupport: (count, dir) => `🧰 Generated ${count} agent support file(s) in ${dir}`,
     applyGitignoreAdded: '🧹 Added .gitignore spec-first managed block',
     applyGitignoreUpdated: '🧹 Updated .gitignore spec-first managed block',
-    applyBootstrappedChangelog: '📝 Bootstrapped CHANGELOG.md',
     applySkippedCodexHook: '🪝 Skipped Codex SessionStart hook install: this directory .codex is the CODEX_HOME global hook location',
     applyDeveloperProfileCreate: '🪪 Wrote global developer profile:',
     applyDeveloperProfileOverwrite: '🪪 Updated global developer profile:',
@@ -112,8 +186,34 @@ const MESSAGES = {
     applyRuntimeUntracked: (count) => `🧯 Untracked ${count} managed runtime path(s) from git index (work tree files preserved).`,
     applyRuntimeUntrackNone: '🧯 No managed runtime paths require untracking.',
     applyRuntimeUntrackSkipped: (reasonCode) => `🧯 Runtime untrack skipped: ${reasonCode}`,
+    applyRunSummary: (ready, total) => `Init complete: ${ready}/${total} hosts ready`,
+    applyRunFailureSummary: (ready, total) => `Init result: ${ready}/${total} hosts ready`,
+    applyHostSummary: (label, status, details) => `  ${label}: ${status}${details ? ` · ${details}` : ''}`,
+    applyStatusReady: 'ready',
+    applyStatusFailed: 'failed',
+    applyCommandsCount: (count) => `${count} command${count === 1 ? '' : 's'}`,
+    applySkillsCount: (count) => `${count} skill${count === 1 ? '' : 's'}`,
+    applyAgentsCount: (count) => `${count} agent${count === 1 ? '' : 's'}`,
+    applyHookUpdated: 'hook updated',
+    applyHookSkippedCompact: 'hook skipped',
+    applyGitignoreCompact: 'updated .gitignore managed block',
+    applyChangelogCompact: 'created CHANGELOG.md',
+    applyAgentSupportCount: (count) => `${count} agent support file${count === 1 ? '' : 's'}`,
+    applyWorkspaceCount: (ready, total) => `workspace ${ready}/${total} ready`,
+    applyProfileCompact: (action, displayPath, name, lang) => (
+      `Global developer profile: ${action} · ${displayPath} · ${name} (${lang})`
+    ),
+    applyLanguageCompact: (status, reasonCode) => (
+      `User-level language sync: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`
+    ),
+    applyLanguageIssue: (host, displayPath, error) => `  ${host}: ${displayPath}${error ? ` · ${error}` : ''}`,
+    applyRuntimeUntrackCompact: (count) => `Runtime untrack: ${count} managed path(s)`,
+    applyRuntimeUntrackSample: (displayPath) => `  - ${displayPath}`,
     applyRefreshParentRuntime: '▶ Refresh parent host runtime assets',
     applyUserLanguageSyncHeader: (status, reasonCode) => `User-level language sync: ${status}${reasonCode && reasonCode !== 'none' ? ` (${reasonCode})` : ''}`,
+    diagnosticCursorGeneratedRuntimePreview: 'Warning [cursor_generated_runtime_preview]: Cursor runtime was generated, but local skill discovery/invocation is not verified; generated skills may not load.',
+    diagnosticQoderHookActivationUnverified: 'Warning [qoder_hook_activation_unverified]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified; settings entries remain disabled, so SessionStart and PRD guard hooks are inactive.',
+    diagnosticOpenCodeGeneratedRuntimePreview: 'Warning [opencode_generated_runtime_preview]: OpenCode runtime was generated, but command/skill loading is not verified for the installed version; the evidence claim remains generated_runtime_preview.',
   },
 };
 

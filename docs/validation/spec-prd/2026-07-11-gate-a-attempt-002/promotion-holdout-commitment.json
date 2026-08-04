@@ -1,0 +1,15 @@
+{
+  "schema_version": "contract-reset-holdout-commitment/v1",
+  "artifact_type": "degraded",
+  "attempt_id": "gate-a-2026-07-11-002",
+  "commitment_status": "unavailable",
+  "candidate_hash": "sha256:948584c8a5a42e46c0af49aefe714ebcbd4adef52602ead13a127a1f40f85f99",
+  "source_hash": "sha256:95bb225b3aa369b3f656e223b4955e2d43cdff89794e10a1b0f135b24228e1ac",
+  "opaque_custody_id": null,
+  "bundle_hash": null,
+  "custodian": null,
+  "retention_authority": null,
+  "expires_at": null,
+  "reason_code": "independent_custody_boundary_unavailable",
+  "limitation": "当前 host 没有与实现者身份隔离的 custody primitive；未创建伪 sealed bundle。"
+}

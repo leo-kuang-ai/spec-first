@@ -1,0 +1,16 @@
+{
+  "base_operation": null,
+  "case_id": "generated-runtime-patch-neighbor",
+  "effect": "validate-only",
+  "layer_result": "Direct generated-runtime patching is excluded from authoring and must not be performed.",
+  "modifier": "none",
+  "required_references": [
+    "Canonical source mapping for `.agents/skills/spec-prd`",
+    "Project generator or synchronization instructions"
+  ],
+  "response": "不会直接修改 `.agents/skills/spec-prd/SKILL.md`。该路径应视为运行时或生成镜像，手改可能被覆盖并造成 source/runtime 分叉。应先定位唯一 canonical source；若用户授权修改该 source，则预览 source 变更，按项目生成流程重生 runtime，并通过聚焦测试验证。当前只要求直接补丁且未提供 source ownership，因此停止写入。",
+  "route_decision": "near-neighbor-generated-runtime-patch-blocked",
+  "source_owner_assumption": "`.agents/skills/spec-prd/SKILL.md` is a generated runtime consumer, not an authorized canonical source.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

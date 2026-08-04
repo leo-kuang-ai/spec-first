@@ -1,0 +1,24 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "ambiguous_target_not_blocked"
+  ],
+  "observed": {
+    "base_operation": "revise",
+    "case_id": "ambiguous-multi-repo-target",
+    "effect": "apply",
+    "layer_result": "Mutation is blocked because neither a single target repository nor the canonical source owner is known.",
+    "modifier": "none",
+    "required_references": [
+      "Repository ownership or provenance records for each copy",
+      "Generator or synchronization mapping between canonical and generated copies",
+      "User selection of one authorized target repository and source root"
+    ],
+    "response": "不能直接批量修改。三个仓库及同名副本可能分别是 canonical source、生成镜像或独立分叉；在未确认唯一目标仓库、source owner、授权 source root 和同步关系前，任何写入都可能污染项目或被生成器覆盖。下一步应先列出三份副本的 provenance 与差异，给出 source-owner 判定和单仓库变更预览；由用户确认唯一目标后，再只修改 canonical source，并按该项目规则更新或重生消费者。",
+    "route_decision": "authoring-blocked-ambiguous-target",
+    "source_owner_assumption": "Unknown; no repository or same-named Skill copy can safely be treated as canonical.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

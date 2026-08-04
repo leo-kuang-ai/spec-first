@@ -1,20 +1,36 @@
 # Plan Handoff
 
-This file contains post-plan-writing instructions: document review, post-generation options, and issue creation. Load it after the plan file has been written and the confidence-first check (5.3.1-5.3.7) is complete.
+This file contains post-plan-writing instructions: document review, post-generation options, and issue creation. Load it only after the plan file has been written and the confidence check (5.3.1-5.3.7) is complete. Never preload it while composing the initial plan.
 
 ## 5.3.8 Document Review
 
-After the confidence-first check (and any deepening), execute the `spec-doc-review` workflow on the plan file. Pass the plan path as the argument. Do not dispatch `spec-doc-review` as an Agent/Task/subagent type; it is a workflow entrypoint whose Phase 2 dispatches reviewer agents internally. When this step is reached, it is mandatory — do not skip it because the confidence-first check already ran. The two tools catch different classes of issues.
+Run `spec-doc-review` headless for both output formats. Delivery is headless in either case; the plan producer supplies mutation authority explicitly:
 
-The confidence-first check and spec-doc-review are complementary:
-- The confidence-first check strengthens rationale, sequencing, risk treatment, and grounding
+- `OUTPUT_FORMAT=md` -> invoke `mode:headless mutation:apply-fixes <plan-path>`; this producer-owned run may apply bounded Markdown fixes, while commit and landing remain separate.
+- `OUTPUT_FORMAT=html` -> invoke `mode:headless mutation:report-only <plan-path>`; the returned envelope must preserve `mutation_policy: report-only`, the same structural/semantic roster, synthesis, severity routing, Coverage, and limitations run, but `fixes_applied: 0` and reviewer mutation is unavailable.
+
+This phase is mandatory after the confidence check because the two checks catch different classes of issues. HTML is no longer an unreviewed skip path. Capture the structured envelope for both formats, including `mutation_policy`, `review_status`, `fixes_applied`, `producer_fix_candidates`, `proposed_fixes_count`, `decisions_count`, `fyi_count`, `p0_p1_actionable_count`, Coverage, and Limitations.
+
+**Unavailable review capability — explicit degraded exit.** Inspect the current host's available Skill-invocation capability once. When `spec-doc-review` cannot be invoked, downstream model invocation is disabled, or the host has no equivalent independent reviewer, do not search repeatedly, wait for an impossible invocation, or claim that independent review ran. Perform one bounded producer self-review using the in-context draft, its section outline, the scoped diff, and deterministic metadata/path/structure checks. Do not re-read the complete generated artifact and do not start a second semantic review pass; after any uniquely determined producer correction, rerun only the affected deterministic checks. Capture an explicit degraded envelope with `review_status: degraded`, `reason_code: spec_doc_review_capability_unavailable`, `independent_review: not_run`, the actual `fixes_applied` count, known findings, and the capability limitation. Unknown reviewer-only counts remain unknown rather than being reported as zero. This fallback satisfies the document-review exit only as a loud degraded convention; it must not be described as `Review complete` or `Doc review clean`.
+
+**HTML producer-owned closure.** `spec-doc-review` never patches HTML. When its report-only envelope contains a producer-fix candidate whose correction is uniquely determined from current source and does not require a Product Contract decision, `spec-plan` may perform a **full recompose** of the exclusive HTML artifact, preserving metadata, stable anchors, Product Contract IDs/semantics, and material architecture-posture KTDs. Then run headless report-only review again. Allow at most two producer recompose + review cycles after the initial review; never loop indefinitely or convert the finding into a local string/DOM patch.
+
+If any high-confidence launch-blocking P0/P1 finding remains after the bounded cycles, or `review_status: incomplete` leaves execution readiness unproved, fully recompose the HTML artifact into a valid `artifact_readiness: requirements-only` content shape: preserve the Product Contract and stable product IDs, remove Planning Contract, Implementation Units, Verification Contract, and Definition of Done, then suppress both `spec-work` and goal handoff. Surface the unresolved finding and limitation. Never flip readiness metadata while leaving implementation-ready sections in place. Non-blocking report-only findings remain visible in the envelope but do not themselves require readiness downgrade.
+
+Headless is the default because most users want to start work after planning, not adjudicate every reviewer concern up front. For Markdown only, the post-generation menu can offer `Decide on the review's open items`; HTML remains report-only and has no interactive mutation walkthrough.
+
+The confidence check and spec-doc-review are complementary:
+- The confidence check strengthens rationale, sequencing, risk treatment, and grounding
 - Document-review checks coherence, feasibility, scope alignment, and surfaces role-specific issues
 
-If spec-doc-review returns findings that were auto-applied, note them briefly when presenting handoff options. If residual P0/P1 findings were surfaced, mention them so the user can decide whether to address them before proceeding.
+Capture the headless envelope so it can drive the contextual summary above the post-generation menu:
+- The number of fixes auto-applied
+- The count of remaining findings, broken out by user-facing bucket (proposed fixes, decisions, FYI observations)
+- The severity breakdown of decisions and proposed fixes (specifically the P0/P1 count, since those benefit from explicit user attention)
 
 When spec-doc-review returns "Review complete", proceed to Final Checks.
 
-**Pipeline mode:** If invoked from an automated workflow such as LFG or any `disable-model-invocation` context, execute `spec-doc-review` with `mode:headless` and the plan path. Headless mode applies auto-fixes silently and returns structured findings without interactive prompts. Address any P0/P1 findings before returning control to the caller.
+**Pipeline mode:** Pipeline runs (LFG or any `disable-model-invocation` context) force `OUTPUT_FORMAT=md` at Phase 0.0. When invocation capability exists, invoke `spec-doc-review` with `mode:headless mutation:apply-fixes` and the plan path, then return findings to the caller without an interactive menu. When it does not exist, use the explicit degraded exit above and return control to the pipeline caller immediately after the bounded Final Checks; do not enter the menu, repeat document reads, or keep searching for review capability. Address any known P0/P1 finding before returning control to the caller, and preserve unknown independent-review coverage as a limitation.
 
 ## 5.3.9 Final Checks and Cleanup
 
@@ -22,78 +38,76 @@ Before proceeding to post-generation options:
 - Confirm the plan is stronger in specific ways, not merely longer
 - Confirm the planning boundary is intact
 - Confirm origin decisions were preserved when an origin document exists
+- For requirements-only enrichment, verify that the captured Product Contract region is byte-identical after initial writing, deepening, and review fixes. If it drifted, block completion and restore the upstream region from the captured baseline before any implementation handoff. If restoration would overwrite concurrent external edits, leave the artifact blocked and return to the owning producer; never describe a changed region as preserved.
 
 If artifact-backed mode was used:
-- In auto mode, or in interactive mode where findings were accepted and the plan was safely updated, clean up the temporary scratch directory
-- If cleanup fails or is not practical on the current platform, note where the artifacts were left
-- Do not apply this cleanup to the interactive no-accepted-findings branch in 5.3.6b; that branch preserves `<scratch-dir>` for debugging and reports the path before Phase 5.4
+- Clean up the temporary scratch directory after the plan is safely updated
+- If cleanup is not practical on the current platform, note where the artifacts were left
+
+**Format-specific composition.** When `OUTPUT_FORMAT=html` (resolved in SKILL.md Phase 0.0), the plan is written as a single self-contained `.html` file — there is no markdown sibling. Read `references/html-rendering.md` for composition rules: invariants, precedence stack, format principles, agent-consumability rules, and the post-compose audit. The `.html` file is the artifact downstream consumers (spec-work, human readers, and report-only spec-doc-review) read. Review findings that require a uniquely determined producer correction trigger bounded full recompose, never reviewer-owned local patching.
+
+When `OUTPUT_FORMAT=md`, write the markdown directly per `references/markdown-rendering.md`. No HTML is composed.
+
+After all mutations in this run have settled (initial write, deepening synthesis, spec-doc-review `safe_auto` fixes when `OUTPUT_FORMAT=md`, and any bounded producer-owned HTML recompose), the artifact at its single path reflects the final state. HTML report-only review itself is byte-preserving.
 
 ## 5.4 Post-Generation Options
 
-**Pipeline mode:** If invoked from an automated workflow such as LFG or any `disable-model-invocation` context, skip the interactive menu below and return control to the caller immediately. The plan file has already been written, the confidence-first check has already run, and spec-doc-review has already run — the caller determines the next step.
+**Pipeline mode:** If invoked from an automated workflow such as LFG or any `disable-model-invocation` context, skip the interactive menu below and return control to the caller immediately. The plan file has already been written, the confidence check has already run, and either spec-doc-review or the explicit degraded fallback completed — the caller (e.g., `spec-lfg`) determines the next step.
 
-After spec-doc-review completes, present the options using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+**Path format:** Use absolute paths for chat-output file references — relative paths are not auto-linked as clickable in most terminals.
 
-**Path format:** Use absolute paths for chat-output file references so they are clickable in modern terminals. Plan document contents themselves must keep repo-relative file references.
+**Summary line above the menu (always):** Print a single concise line summarizing the headless review state — e.g., `Doc review applied 3 fixes. 2 decisions, 1 proposed fix, 4 FYI observations remain (1 at P1).` When no fixes were applied and no findings remain, print `Doc review clean — no fixes needed.` For HTML, name the report-only boundary and real counts, for example: `Doc review completed report-only — 0 fixes applied; 2 producer-fix candidates, 1 decision, and 3 FYI observations reported.` Never describe HTML as skipped or reviewed clean merely because mutation was forbidden.
 
 **Question:** "Plan ready at `<absolute path to plan>`. What would you like to do next?"
 
 **Options:**
-1. **Start work** (recommended) - Begin implementing this plan in the current session using the current host's work entrypoint
-2. **Compile task pack with `spec-write-tasks`** - Recommended when source plan structure shows high execution complexity: many implementation units, declared `Files`, dependency chains, cross-module surfaces, broad verification spread, or `plan_depth: deep`; this reduces single-run context load, broad review scope, and coupled rollback cost
-3. **Create Issue** - Create a tracked issue from this plan in your configured issue tracker (GitHub or Linear)
-4. **Open in Proof (web app) — review and comment to iterate with the agent** - Open the doc in Every's Proof editor, iterate with the agent via comments, or copy a link to share with others
-5. **Done for now** - Pause; the plan file is saved and can be resumed later
+1. **Start `/spec-work`** - Build and ship the plan in this session; `spec-work` selects the appropriate implementation engine and owns simplification, review, verification, and closeout. Show only for `artifact_readiness: implementation-ready` plus `execution: code`; universal-planning, answer-seeking, approach-plan, and requirements-only artifacts keep their own handoff/checkpoint behavior.
+2. **Run it as a `/goal`** - Choose this only when you prefer to bypass `spec-work` and drive the plan directly through the harness's autonomous goal mode. The alternative to option 1, not an add-on — pick one. Show only when (a) the artifact is `artifact_readiness: implementation-ready` plus `execution: code` AND (b) the host has goal capability at all — Codex `create_goal` in the available tool list, or a user-typed `/goal` in Claude Code; omit it where neither exists. Where the host can start a goal directly the session begins it immediately; where it cannot, it hands over a copyable `/goal` prompt. See the routing below.
 
-**Surface additional document review contextually, not as a menu fixture:** When the prior spec-doc-review pass surfaced residual P0/P1 findings that the user has not addressed, mention them adjacent to the menu and offer another review pass in prose (e.g., "Document review flagged 2 P1 findings you may want to address — want me to run another pass before you pick?"). Do not add it to the option list.
+**Recommended marker:** `spec-work` (option 1) always carries *(recommended)* — render option 1 as **Start `/spec-work`** *(recommended)* and leave option 2 unmarked. `spec-work` owns engine selection and can choose goal or dynamic-workflow execution when plan shape and host capability warrant it, so recommending it does not foreclose autonomous execution. Goal mode is the opt-in preference for users who want to bypass the normal implementation tail. Exactly one option ever carries *(recommended)*.
+3. **Decide on the review's open items** - Confirm or skip the suggested edits, and settle the judgment calls the auto-pass left for you. (Markdown `markdown-write` only; safe, mechanical fixes were already applied and remaining items may be deferred into Open Questions.)
+4. **Create Issue** - Create a tracked issue from this plan in your configured issue tracker (e.g., GitHub Issues, Linear, Jira)
+5. **Open in browser** - Open the HTML plan file locally for review and sharing. **Render only when `OUTPUT_FORMAT=html`.**
 
-Based on selection:
-- **Start work** -> Invoke the current host's work entrypoint with the plan path in the current session. Do not merely tell the user to run it manually.
-- **Compile task pack with `spec-write-tasks`** -> Invoke the `spec-write-tasks` workflow with the plan path. If it writes an executable task pack with matching `spec_id` and verifiable `source_plan_hash`, follow the workflow's returned `next_action`: when it resolves to `review-task-pack`, surface the copy-ready current-host doc-review invocation unless the invoking parent workflow or user explicitly authorized that single bounded continuation and the workflow reports a completed doc-review outcome; otherwise offer the current host's work entrypoint using the task-pack path directly. If it returns `skip`, `return-to-plan`, `draft-only`, unverifiable identity/hash, or a non-executable task pack, do not offer task-pack execution; follow the returned recommendation instead.
+There is no "done" / "pause" option — the blocking question already waits, and the user ends the turn by dismissing it (Esc) or just not picking anything. The plan file is already saved.
+
+**HTML browser option.** Under exclusive output mode, the plan exists as exactly one artifact — `.md` or `.html`, never both. Render option 5 only for HTML so the browser can open the local `.html` file directly. Markdown remains available at its canonical local path. Implementation handoff (options 1 and 2) remains available in both modes only when the artifact is implementation-ready code — `spec-work` reads either format, and the launch prompt is emitted at handoff regardless of format (see the spec-work skill's plan-input handling).
+
+**Menu rendering:** The menu has up to 5 options (execution options 1 and 2 render only for implementation-ready code, and option 2 only on hosts with goal capability; option 3 is conditional — see below). Detect goal capability by capability, not by slash-command shape: Codex has it when `create_goal` is in the available tool list, while Claude Code has it through user-typed `/goal`. Account for each platform's blocking-question option cap rather than trimming choices: Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options. When the visible menu exceeds the current platform's cap, render it as a numbered list in chat with the hint "Pick a number or describe what you want." When the visible menu fits the cap, use the platform's blocking tool and renumber the visible options 1-N. When the platform's blocking tool is unavailable or errors (e.g., Codex edit modes where `request_user_input` is not exposed), fall back to the same numbered-list-in-chat rendering. Never silently skip the question.
+
+**Hide `Decide on the review's open items` (option 3) when no actionable findings remain or mutation is report-only.** Show this option only when `mutation_policy: markdown-write` and the headless envelope reports `proposed_fixes_count + decisions_count > 0` — i.e., at least one `gated_auto` or `manual` finding at confidence anchor `75` or `100`. Drop it for FYI-only state and for every HTML/report-only run. FYI observations do not enter the walkthrough, and report-only findings cannot enter Markdown Apply/Defer mechanics. Always renumber visible options 1-N. The summary line still reports every bucket, so hiding the mutation walkthrough does not hide findings.
+
+Based on selection (the bare per-option routing is also stated inline in the SKILL.md so it cannot be missed when this reference is not loaded; the elaborate sub-flows below are the reason this reference still exists):
+- **Start `/spec-work`** -> Classify the artifact first. If it is not `artifact_readiness: implementation-ready` plus `execution: code`, do not execute it; route requirements-only artifacts back to `spec-plan` enrichment and non-code artifacts to their own workflow. If it is executable, invoke the `spec-work` skill via the platform's skill-invocation primitive, passing the plan path as the skill argument; `spec-work` then owns engine selection (inline/subagent vs goal-mode vs dynamic-workflow) and the implementation tail. That shipping-tail owner alone may perform the Markdown source plan `active → completed` closeout after verification/review/residual gates; Return-to-Caller returns a candidate for its caller instead of writing. If no skill-invocation primitive exists on this host, print the `spec-work` fallback prompt for the user to run; in that prompt, tell the executor to read Goal Capsule, Verification Contract, Definition of Done, and active U-IDs (scanning headings to find them) rather than the whole document first. Do not merely tell the user to type `/spec-work` when a skill invocation primitive is available.
+- **Run it as a `/goal`** -> Build a **thin** implementation objective from the plan (generated here at handoff, never written into the doc). It points to the plan's sections; do **not** copy the plan's resolved decisions, exact verification commands, or requirements into the prompt. **Deletion test:** if your draft names a specific command, file path, U-ID dependency relationship, stop condition, or DoD item, cut it — the objective should read identically for any plan except the substituted path. Don't hardcode an open-a-PR or do-not-open-a-PR directive; carry the PR-precedence line instead. The objective: *implement `<plan-path>` to its Definition of Done; the plan is the authority — scan headings, don't read it whole; read the Goal Capsule, then work the units in dependency order, reading each unit plus its cited R/F/AE/KTD; run the plan's Verification Contract gates and satisfy each unit's test scenarios; track progress outside the plan file; follow the plan's PR/landing strategy if it defines one, with the repo's conventions and the user's preferences overriding it; surface a genuine blocker (something that changes scope or contradicts the plan) instead of guessing, using judgment on details the plan leaves open.* Then, by host capability — either way `spec-work` does **not** also run (that would double-execute and split tail ownership):
+  - **If `create_goal` is in the available tool list (Codex):** call `create_goal` with that objective. The current session works toward it; do **not** call `update_goal` (the goal session marks its own completion). As the full shipping-tail owner, it must run the same Markdown source-plan closeout before terminal goal completion. No copy-paste.
+  - **If only a user-typed `/goal` exists (Claude Code):** print that objective as a single copyable `/goal …` block and tell the user to paste it at the start of a message (a skill cannot issue `/goal` itself there). After printing, return to the options.
+
+  Render only for implementation-ready code plans, and only where the host has goal capability at all (Codex `create_goal` or Claude Code user-typed `/goal`) — omit the option where neither exists.
+- **Decide on the review's open items** -> Re-invoke `spec-doc-review mutation:apply-fixes <plan-path>` **without** `mode:headless` so the interactive routing question and walkthrough fire. The explicit token preserves this producer-owned write boundary. After it returns, re-render this menu with the refreshed counts so the user can pick what to do next.
 - **Create Issue** -> Follow the Issue Creation section below
-- **Open in Proof (web app) — review and comment to iterate with the agent** -> Load the `proof` skill (host-provided; if the host does not expose it, tell the user this review surface is unavailable) in HITL-review mode with:
-  - source file: `docs/plans/<plan_filename>.md`
-  - doc title: `Plan: <plan title from frontmatter>`
-  - identity: `ai:spec-first` / `Spec-First`
-  - recommended next step: current host's work entrypoint (shown in the proof skill's final terminal output)
-
-  Follow `references/hitl-review.md` in the proof skill. It uploads the plan, prompts the user for review in Proof's web UI, ingests each thread by reading it fresh and replying in-thread, applies agreed edits as tracked suggestions, and syncs the final markdown back to the plan file atomically on proceed.
-
-  When the proof skill returns:
-  - `status: proceeded` with `localSynced: true` -> the plan on disk now reflects the review. Re-execute the `spec-doc-review` workflow on the updated plan before re-rendering the menu — HITL can materially rewrite the plan body, so the prior spec-doc-review pass no longer covers the current file and section 5.3.8 requires a review before any handoff option is offered. Then return to the post-generation options with the refreshed residual findings.
-  - `status: proceeded` with `localSynced: false` -> the reviewed version lives in Proof at `docUrl` but the local copy is stale. Offer to pull the Proof doc to `localPath` using the proof skill's Pull workflow. If the pull happened, re-execute the `spec-doc-review` workflow on the pulled file before re-rendering the options (same 5.3.8 rationale — the local plan was materially updated by the pull). If the pull was declined, include a one-line note above the menu that `<localPath>` is stale vs. Proof — otherwise `Start work`, `Compile task pack`, or `Create Issue` will silently use the pre-review copy.
-  - `status: done_for_now` -> the plan on disk may be stale if the user edited in Proof before leaving. Offer to pull the Proof doc to `localPath` so the local plan file stays in sync. If the pull happened, re-execute the `spec-doc-review` workflow on the pulled file before re-rendering the options (same 5.3.8 rationale). If the pull was declined, include the stale-local note above the menu. `done_for_now` means the user stopped the HITL loop — it does not mean they ended the whole plan session; they may still want to start work or create an issue.
-  - `status: aborted` -> fall back to the options without changes.
-
-  If the initial upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the options — don't leave them wondering why the option did nothing.
-- **Done for now** -> Display a brief confirmation that the plan file is saved and end the turn. Do not start follow-up work without an explicit further user prompt.
-- **If the user asks for another document review** (either from the contextual prompt when P0/P1 findings remain, or by free-form request) -> Execute the `spec-doc-review` workflow with the plan path for another pass, then return to the options
-- **Other** -> Accept free text for revisions and loop back to options
+- **Open in browser** -> Display the absolute path to the `.html` plan file so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the post-generation options so the user can pick a follow-up action.
+- **Free-form prompts that target the findings** (e.g., the user types "review", "walk through", "deep review" instead of picking a numbered option) -> for the producer-owned Markdown apply path, route as if they had picked `Decide on the review's open items` and pass `mutation:apply-fixes`. For HTML/report-only, re-run `spec-doc-review mode:headless mutation:report-only <plan-path>` only when a fresh review is requested and surface the report-only envelope; do not offer or imply a mutation walkthrough. Then return to the menu.
+- **Other free-form input** -> Accept revisions to the plan and loop back to options.
 
 ## Issue Creation
 
-When the user selects "Create Issue", detect their project tracker:
+When the user selects "Create Issue":
 
-1. Check already-loaded project guidance for `project_tracker: github` or `project_tracker: linear`. If unavailable, perform a precise lookup for `project_tracker:` in repo-root `AGENTS.md` / `CLAUDE.md`; do not read the full instruction file just to detect the tracker.
-2. If `project_tracker: github`:
+1. **Identify the project's issue tracker from the active instructions and conventions already in your context** — the issue / project-management tool the project uses (e.g., GitHub Issues, Linear, Jira). Don't open or name specific instruction files to do this; the project's instructions are already available to you. Look for an explicit `project_tracker:` declaration (`github`, `linear`, …) or any documented tracker convention. Only if your context doesn't already carry the project's instructions (e.g., you're a fresh subagent) or they're silent, consult supplementary signals: `README.md`, `CONTRIBUTING.md`, PR templates under `.github/`, or visible tracker URLs.
 
-   ```bash
-   gh issue create --title "<type>: <title>" --body-file <plan_path>
-   ```
+2. **Create the issue through whatever interface that tracker actually exposes in this environment** — a platform connector/MCP tool, documented API/GraphQL credentials, or a documented CLI. First actively discover what's available: use the platform's tool-discovery primitive (e.g., `ToolSearch` in Claude Code) to look for a tracker connector or MCP tool before assuming none exists — lazy-loaded connectors and credentials stored outside the shell won't surface in a passive check. Do not assume a tracker means a particular CLI, and do not treat a missing binary, env var, or unloaded MCP server as proof the tracker is unavailable — those are false negatives when access comes through a connector or a raw API with credentials stored outside the shell. When using a direct API, never print secret values; read the plan body from disk and send it as the issue's markdown/description per the API contract. Worked examples for the common cases:
+   - **GitHub** — `gh issue create --title "<type>: <title>" --body-file <plan_path>`
+   - **Linear** (no guaranteed first-party CLI) — prefer, in order: a Linear connector or MCP tool that can create issues → documented direct API/GraphQL credentials and endpoint → a documented local Linear CLI, only when the project or user explicitly states it is installed and authenticated.
 
-3. If `project_tracker: linear`:
-
-   ```bash
-   linear issue create --title "<title>" --description "$(cat <plan_path>)"
-   ```
-
-4. If no tracker is configured, ask the user which tracker they use with the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to asking in chat only when no blocking tool exists or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip. Options: `GitHub`, `Linear`, `Skip`. Then:
-   - Proceed with the chosen tracker's command above
-   - Offer to persist the choice by adding `project_tracker: <value>` to `AGENTS.md`, where `<value>` is the lowercase tracker key (`github` or `linear`) — not the display label — so future runs match the detector in step 1 and skip this prompt
+3. If no tracker is configured, ask the user which tracker they use with the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. Fall back to asking in chat only when no blocking tool exists or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip. Offer three explicit options — `GitHub`, `Linear`, `Skip` — and let the user name a different tracker (Jira, etc.) through the tool's built-in free-form / "Other" input: `AskUserQuestion` always provides it, and `request_user_input` supplies its own. Don't add an explicit fourth `Other` option — that's redundant where the tool already offers free-form and can exceed the option cap on tools that accept only 2–3 explicit choices (e.g., Codex `request_user_input`). When the tool exposes no free-form path, capture the other-tracker name via the chat fallback. Then:
+   - Proceed with the chosen tracker's creation path above
+   - If the user names a different tracker through the free-form path, ask for its reachable interface if they didn't say, then create the issue via the capability path in step 2
+   - Offer to persist the choice by adding a `project_tracker: <value>` declaration to the project's root agent-instructions file (e.g., `AGENTS.md`; if it `@`-includes another file, write to the substantive one). Use the lowercase tracker key (`github`, `linear`, `jira`, …) — not the display label — so future runs match step 1 and skip this prompt
    - If `Skip`, return to the options without creating an issue
 
-5. If the detected tracker's CLI is not installed or not authenticated, surface a clear error (e.g., "`gh` CLI not found — install it or create the issue manually") and return to the options.
+4. If the detected tracker has no reachable interface after actively discovering available connector/MCP tools and following its documented access method — no working connector, MCP tool, CLI, or API path — surface a clear error (e.g., "`gh` CLI not found or not authenticated for GitHub Issues"; "Linear is documented for this project, but no connector, MCP tool, or API credentials were found") and return to the options. Do not silently fall back to a local issue-plan document unless the user explicitly asks for a local-only artifact.
 
 After issue creation:
 - Display the issue URL
-- Ask whether to proceed to the current host's work entrypoint using the platform's blocking question tool
+- Ask whether to proceed to `/spec-work` using the platform's blocking question tool

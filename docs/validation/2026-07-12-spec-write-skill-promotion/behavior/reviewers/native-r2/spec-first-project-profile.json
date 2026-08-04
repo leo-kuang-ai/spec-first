@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "spec-first-project-profile",
+  "arm": "native",
+  "repeat": 2,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 2,
+    "required_references": 1,
+    "no_contamination": 2
+  },
+  "total_score": 9,
+  "rationale": "Addresses trigger boundaries, preservation of sidecars, governance, tests, Changelog, validation, generation, and containment. Required references omit an explicit Changelog convention and identify only a narrow metadata reference; broad governance and test paths are also less precise.",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/native-r2.json",
+    "sha256": "4b1b96f1979f0a248a0c69e1ff593967cb129420244a7505c28c25d42e1dbc44",
+    "hash_verified": true
+  },
+  "fixed_old_source": null,
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-spec-first-project-profile.txt",
+    "raw_jsonl": "review/scoped-v2/runs/spec-first-project-profile.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/spec-first-project-profile.stderr.txt",
+    "last_json": "review/scoped-v2/runs/spec-first-project-profile.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 17242,
+    "output_tokens": 1004,
+    "reasoning_output_tokens": 111,
+    "duration_ms": 21884,
+    "reviewer_last_json_sha256": "5a3de33aadd77d76ecb7deaf9a9503a546388dbb8156925fa83adbdde352db93"
+  }
+}

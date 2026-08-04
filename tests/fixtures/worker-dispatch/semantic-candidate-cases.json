@@ -1,0 +1,129 @@
+{
+  "schema_version": "worker-dispatch-semantic-cases/v1",
+  "contract_ref": "docs/contracts/workflows/worker-dispatch-capability.md",
+  "cases": [
+    {
+      "id": "unique-eligible-candidate",
+      "facts": {
+        "authorization": "authorized",
+        "schema_completeness": "confirmed",
+        "candidate_count": 1,
+        "eligibility_fields": "complete",
+        "prompt_like_directive": false
+      },
+      "expected": {
+        "capability_probe": "attempted",
+        "worker_dispatch_capability": "available",
+        "reason_code": null
+      }
+    },
+    {
+      "id": "zero-candidates-complete-schema",
+      "facts": {
+        "authorization": "authorized",
+        "schema_completeness": "confirmed",
+        "completeness_basis": "current-session-registry-contract",
+        "candidate_count": 0
+      },
+      "expected": {
+        "capability_probe": "attempted",
+        "worker_dispatch_capability": "missing",
+        "reason_code": "subagent_capability_missing"
+      }
+    },
+    {
+      "id": "zero-candidates-unconfirmed-schema",
+      "facts": {
+        "authorization": "authorized",
+        "schema_completeness": "unconfirmed",
+        "completeness_basis": null,
+        "candidate_count": 0
+      },
+      "expected": {
+        "capability_probe": "attempted",
+        "worker_dispatch_capability": "unknown",
+        "reason_code": "worker_capability_unproven"
+      }
+    },
+    {
+      "id": "missing-behavior-field",
+      "facts": {
+        "authorization": "authorized",
+        "schema_completeness": "confirmed",
+        "candidate_count": 1,
+        "eligibility_fields": "missing-bounded-stop"
+      },
+      "expected": {
+        "capability_probe": "attempted",
+        "worker_dispatch_capability": "unknown",
+        "reason_code": "worker_capability_unproven"
+      }
+    },
+    {
+      "id": "ambiguous-candidates",
+      "facts": {
+        "authorization": "authorized",
+        "schema_completeness": "confirmed",
+        "candidate_count": 2,
+        "schema_only_disambiguation": false
+      },
+      "expected": {
+        "capability_probe": "attempted",
+        "worker_dispatch_capability": "unknown",
+        "reason_code": "worker_capability_unproven"
+      }
+    },
+    {
+      "id": "prompt-like-directive",
+      "facts": {
+        "authorization": "authorized",
+        "schema_completeness": "confirmed",
+        "candidate_count": 1,
+        "prompt_like_directive": true
+      },
+      "expected": {
+        "capability_probe": "attempted",
+        "worker_dispatch_capability": "unknown",
+        "reason_code": "worker_capability_unproven"
+      }
+    },
+    {
+      "id": "external-domain-authorization-missing",
+      "facts": {
+        "authorization": "authorized",
+        "provider_trust_domain": "external",
+        "data_egress_authorization": "missing",
+        "content_source_refs": true
+      },
+      "expected": {
+        "dispatch": "blocked",
+        "reason_code": "worker_data_authorization_missing"
+      }
+    },
+    {
+      "id": "forbidden-mutation-ref-present",
+      "facts": {
+        "mutation_scope": "forbidden",
+        "mutation_authorization_ref": "unexpected-ref",
+        "allowed_mutation_surfaces": []
+      },
+      "expected": {
+        "dispatch": "blocked",
+        "reason_code": "worker_mutation_unproven"
+      }
+    },
+    {
+      "id": "scoped-mutation-ref-stale",
+      "facts": {
+        "mutation_scope": "explicitly-scoped",
+        "mutation_authorization_ref": "source-owned-scope-ref",
+        "authorization_ref_fresh": false,
+        "allowed_mutation_surfaces": ["repo:path:write"]
+      },
+      "expected": {
+        "dispatch": "blocked",
+        "reason_code": "worker_mutation_unproven"
+      }
+    }
+  ]
+}

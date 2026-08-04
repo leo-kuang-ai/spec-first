@@ -1,0 +1,106 @@
+# 知识卡导出索引文件
+schema_version: 1
+locale: en-US
+branch: leo-2026-07-07-work-skill
+nodes_managed: true
+exported_at: "2026-07-09T03:28:55Z"
+modules:
+    cli_runtime:
+        dir_name: cli_runtime
+        title: cli_runtime
+        scope:
+            - src/cli/
+            - bin/
+        source_files: []
+        children:
+            - cli_runtime/cli_runtime_core
+            - cli_runtime/commands
+            - cli_runtime/contracts_schemas
+            - cli_runtime/helpers
+            - cli_runtime/host_adapters
+        depends_on: []
+        related_to: []
+    cli_runtime/cli_runtime_core:
+        dir_name: cli_runtime_core
+        title: cli_runtime_core
+        scope:
+            - src/cli/index.js
+            - src/cli/plugin.js
+            - src/cli/runtime-tools-index.js
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    cli_runtime/commands:
+        dir_name: commands
+        title: commands
+        scope:
+            - src/cli/commands/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    cli_runtime/contracts_schemas:
+        dir_name: contracts_schemas
+        title: contracts_schemas
+        scope:
+            - src/cli/contracts/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    cli_runtime/helpers:
+        dir_name: helpers
+        title: helpers
+        scope:
+            - src/cli/helpers/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    cli_runtime/host_adapters:
+        dir_name: Host Platform Adapters (Claude, Codex, Cursor, Kiro, Qoder)
+        title: Host Platform Adapters (Claude, Codex, Cursor, Kiro, Qoder)
+        scope:
+            - src/cli/adapters/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    docs_and_contracts:
+        dir_name: docs_and_contracts
+        title: docs_and_contracts
+        scope:
+            - docs/
+            - templates/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    scripts_and_tooling:
+        dir_name: scripts_and_tooling
+        title: scripts_and_tooling
+        scope:
+            - scripts/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    spec_skills:
+        dir_name: spec_skills
+        title: spec_skills
+        scope:
+            - skills/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    tests:
+        dir_name: tests
+        title: tests
+        scope:
+            - tests/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []

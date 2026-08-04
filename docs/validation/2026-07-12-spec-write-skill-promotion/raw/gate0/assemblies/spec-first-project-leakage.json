@@ -1,0 +1,9 @@
+{
+  "case": "spec-first-project-leakage",
+  "logical_id": "codex-system-skill-creator",
+  "native_source_manifest_sha256": "473b9dd5ff3df1d352b499d83e00864290bd2874ac3f9243e33f09ab7e9e835c",
+  "prompt_sha256": "26b13ca02fdec5cf443392304ff9326edd7f3ee2e170ae455c926f6301e5f6bd",
+  "output_schema_sha256": "f7443099cbf8fdf6e59b8ffb3eea5dd783f4639ffdc8aab45907dff6e89fbc9b",
+  "cwd": "/tmp/spec-write-skill-gate0-20260711T195327Z/fixtures/leakage",
+  "cli": "codex exec --ephemeral --sandbox read-only --ignore-rules --skip-git-repo-check --json --color never --output-schema <schema> --output-last-message <output> -"
+}

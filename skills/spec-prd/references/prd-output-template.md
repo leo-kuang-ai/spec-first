@@ -2,7 +2,7 @@
 
 Load this reference before drafting or materially rewriting a PRD artifact.
 
-This file owns the output shape, section skeleton, surface lenses, and embedded standard template cues. Do not create a second packaged template tree for the same rules.
+This file owns the machine-safe output contract, section identity, and composition order. `SKILL.md` `Template Trigger Map` is the single source of truth for template and overlay selection. Human-facing body templates live under `../assets/templates/`; optional built-in industry overlays live under `../assets/overlays/`. Do not duplicate their body content or routing map here.
 
 ## Contents
 
@@ -12,9 +12,9 @@ This file owns the output shape, section skeleton, surface lenses, and embedded 
 - [Clarification Checklist Display Protocol](#clarification-checklist-display-protocol)
 - [Engineering Clarification Coverage Pack](#engineering-clarification-coverage-pack)
 - [Conditional Sections](#conditional-sections)
-- [Surface Lenses](#surface-lenses)
+- [Surface Lens Semantics](#surface-lens-semantics)
 - [Product Expert Lens Write-In](#product-expert-lens-write-in)
-- [Embedded Standard Skeleton](#embedded-standard-skeleton)
+- [Template Composition And Machine Sections](#template-composition-and-machine-sections)
 - [PRD Quality Diagnosis And Optimization](#prd-quality-diagnosis-and-optimization)
 - [P0 PRD Quality Packs](#p0-prd-quality-packs)
 - [Feature Slices](#feature-slices)
@@ -68,23 +68,13 @@ Every PRD artifact includes the standard core sections unless it is a route-out/
 
 Compact PRDs may omit non-load-bearing conditional detail, but they still need enough evidence, acceptance, and scope boundary for planning. Bypass output writes no PRD artifact.
 
-Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Ordinary core-section gaps produce advisory `template_structure_hint` findings; final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must still be locatable or the checker blocks with `machine_section_identity_missing`.
+Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Draft/checkpoint core-section gaps remain advisory `template_structure_hint` findings. A final/ready claim fails closed with `core_section_missing`, `requirements_row_missing`, `acceptance_example_row_missing`, or `requirement_acceptance_trace_missing` when a core section is absent, Requirements/Acceptance Examples have no valid row, or an R item has no AE trace. Final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must also be locatable or the checker blocks with `machine_section_identity_missing`.
 
 ## Clarification Checklist Display Protocol
 
 Show the selected `clarification_view` and its checklist before or during authoring when it helps the owner see what is being clarified. The checklist is a human-facing display surface: it names likely questions, surfaces omissions, and routes unresolved items into existing PRD sections. It is not a script-owned quality score, not a required heading set, and not a `BLOCKING_REASON_CODES` source.
 
-Use these views without creating a second template tree:
-
-| clarification_view | Use when | Display focus |
-| --- | --- | --- |
-| `Generic` | Surface is unknown or narrow enough for the core skeleton | target user, change delta, requirements, acceptance, scope, evidence, OQ closure |
-| `App` | Native/mobile client behavior changes | entry, navigation, state, copy, loading/empty/error, permissions, rollout, accessibility, i18n |
-| `H5/PC` | Web or desktop-browser surface changes | routes, forms, browser back/refresh, responsive viewports, login/session state, sharing/SEO when relevant |
-| `Admin` | Internal operations, review, or management surfaces | menu placement, roles, list/search/filter/export, forms, audit, bulk action, maker-checker when relevant |
-| `Backend/Java` | Service/platform behavior visible to products or downstream consumers | state semantics, idempotency, compatibility, error outcomes, observability expectations, operational readiness |
-| `CLI/DevTool` | Developer or agent-facing command/workflow changes | command entry, args/config, preview-first, logs, cross-platform behavior, failure recovery, upgrade/runtime projection |
-| `Mixed` | Cross-surface or producer/consumer changes | source-of-truth, cross-surface consistency, contract expectations, async sync, degradation, end-to-end acceptance |
+Resolve the selected view and packaged asset only through `SKILL.md` `Template Trigger Map`; do not recreate the view-to-asset mapping here and do not load every surface template. The selected asset owns its display focus and detailed questions.
 
 ## Engineering Clarification Coverage Pack
 
@@ -168,18 +158,9 @@ Use `## Planning Recheck` only when it prevents advisory evidence from being con
 
 `Planning Recheck` must not be used as a parking lot for PRD-owned owner questions. A PRD-owned owner question must not be marked non-blocking Planning Recheck when it can change user behavior, scope, acceptance, data authority, interface availability, fallback display, analytics acceptance, or source-of-truth. Only HOW/integration/source-refresh checks that do not require planning to invent WHAT may be non-blocking.
 
-## Surface Lenses
+## Surface Lens Semantics
 
-Select one primary lens, then add secondary lenses only for real mixed-surface changes.
-
-| Surface | Add these product questions |
-| --- | --- |
-| App | entry point, navigation, state, copy, loading/empty/error, permissions, release/gray rollout, accessibility, i18n, risk or confirmation steps |
-| H5/PC | routes, form behavior, browser back/refresh, responsive viewports, login/session state, sharing/SEO if relevant |
-| Admin | menu placement, roles/permissions, list/search/filter/export, form validation, review flow, audit trail, bulk action, four-eyes/maker-checker when relevant |
-| Backend/Java | product-level state semantics, idempotency expectations, compatibility, transaction-visible outcomes, error semantics, observability expectations, operational readiness |
-| CLI/DevTool | command entry, arguments/config, dry-run or preview-first behavior, logs, cross-platform behavior, failure recovery, upgrade/migration path, workflow/skill/runtime quality signals when the change affects agent-facing tools |
-| Mixed | source-of-truth, cross-surface consistency, contract expectation, async sync, degradation, end-to-end acceptance, ownership boundary |
+Follow the canonical selection in `SKILL.md` `Template Trigger Map`. The selected asset owns the detailed surface questions; this contract owns only composition order, machine safety, and the rule that irrelevant templates stay unloaded.
 
 These are surface lenses, not role taxonomies. They ask PRD questions; they do not prescribe implementation units.
 
@@ -192,22 +173,15 @@ When a project has local templates, standards, glossary, compliance docs, or ind
 1. Read only the relevant section.
 2. Treat it as a project-local overlay.
 3. Record which overlay was applied.
-4. Ask for confirmation when the overlay suggests legal, compliance, money movement, privacy, or safety implications.
+4. Ask the current conversation user for confirmation when the overlay suggests legal, compliance, money movement, privacy, or safety implications.
 
 Missing local overlay docs are a graceful absence, not an error and not permission to invent industry rules. Do not treat template industry facts as confirmed project rules; local templates raise questions until source or owner confirmation resolves them.
 
-## Industry Overlay Triggers
+## Industry Overlay Semantics
 
-When the increment's industry context is clear from input or project docs, layer an industry overlay on top of the surface lens. The overlay only raises questions and triggers conditional sections; it never asserts an industry rule as confirmed truth.
+When the canonical `SKILL.md` trigger map selects an industry overlay, layer it on top of the surface template. The overlay only raises questions and triggers conditional sections; it never asserts an industry rule as confirmed truth. Consumer-project local overlays remain project-owned and are read only when relevant.
 
-| Industry context | Raise these questions |
-| --- | --- |
-| Securities / trading | order/position state semantics, trading-window and market rules, risk control, clearing/settlement, audit trail, regulatory disclosure |
-| Credit / lending | approval flow and limits, risk/anti-fraud gates, interest/fee rules, repayment and overdue states, compliance and data-retention boundaries |
-| Admin / mid-back-office | data scope isolation, review and maker-checker flow, bulk action, export, audit log |
-| Backend / platform service | state semantics, idempotency, compatibility/versioning, transaction-visible outcomes, observability and operational readiness |
-
-If no industry context is detectable, skip this section and use the generic surface lens only.
+If no industry context is detectable, do not load any industry overlay.
 
 ## Product Expert Lens Write-In
 
@@ -225,48 +199,17 @@ Use `accepted-assumption` only when owner accepted it or source evidence proves 
 
 For structured or already-decided inputs, synthesize settled WHAT into standard PRD sections and demote implementation/testing/API/schema/task details to HOW unless they change scope, acceptance, or source-of-truth. Do not introduce a named conversion field map, adapter, issue tracker, or second output artifact.
 
-## Embedded Standard Skeleton
+## Template Composition And Machine Sections
 
-Use this skeleton as the packaged runtime template. It replaces the former separate template tree.
+Compose the durable PRD in this order:
+
+1. Apply the Default Frontmatter and output-shape rules from this contract.
+2. Use `SKILL.md` `Template Trigger Map` to load the baseline human-facing body and one primary surface asset.
+3. Add secondary surface assets only for real mixed-surface changes.
+4. Add only the built-in and consumer-project overlays selected by the canonical trigger map and current project context.
+5. Append the machine-safe sections below. Human-facing templates must not prefill `status: ready-for-planning`, `readiness_verified_*`, or a ready receipt.
 
 ```markdown
-## Summary
-
-<One paragraph: actor, increment, intended outcome, and current system anchor.>
-
-## Change Delta
-
-| item | current | target | delta | evidence |
-| --- | --- | --- | --- | --- |
-
-## Requirements
-
-| id | priority | requirement | rationale/source |
-| --- | --- | --- | --- |
-| R-01 | P0 | <observable product behavior> | <evidence tag/path> |
-
-## Acceptance Examples
-
-AE-01（对应 R-01）
-Given <current or initial state>
-When <actor action or system event>
-Then <observable outcome>
-
-AE-02（对应 R-01，异常）
-Given <exception or boundary state>
-When <actor action or system event>
-Then <observable outcome or explicit non-goal>
-
-## Scope Boundaries
-
-### In Scope
-
-### Out Of Scope
-
-## Evidence And Assumptions
-
-| claim | tag | source / owner | note |
-| --- | --- | --- | --- |
 
 ## Outstanding Questions
 
@@ -312,7 +255,7 @@ design_sources_unread:
 design_source_coverage: read | unread | partial | degraded | not-applicable
 design_degraded_owner_acceptance_ref: <Owner Decision Trace row, checkable owner ref, or none>
 
-Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`.
+Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. For create/refine, `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`. Validate only reports the recommended checkpoint/refine write target and never mutates these fields.
 
 ## Readiness Self-Check
 
@@ -335,11 +278,11 @@ why_not:
 
 `preflight_sweep_closure` is the compatibility field for Requirement Analysis Gate closure. It must summarize whether the run-local map from materials to requirement understanding, uncertainty/contradiction points, product/design/technical grill decisions, and PRD write targets is closed, degraded, blocked, or missing. Do not add a second persistent analysis schema to the PRD.
 
-`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). Required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` is exempt (still grilling, the card may be incomplete).
+`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). `decision_card_next_action` 必须与其完全一致；两个有效声明互相冲突时，checker 报告 `decision_card_path_mismatch`。The three `decision_card_*` fields are required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` 在仍处于 grill 时只豁免完整性，不豁免显式路径矛盾。
 
-The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
+`write_mode: final-prd` plus `can_enter_spec_plan: yes` is LLM-owned final intent, not a receipt. Persist that pair only after semantic closure while frontmatter remains `status: draft`. The `status: ready-for-planning` and `readiness_verified_*` fields are producer-local machine receipt fields: never fill or invent them manually; `skills/spec-prd/scripts/finalize-prd-artifact.js` writes them atomically after `check-prd-artifact.js` reports no producer blocking reasons。缺少或 stale receipt 时，check-only 必须阻断 ready closeout claim，但不得仅因 draft 已合法持久化 final intent 就把该 intent 判为非法；write mode 可以生成第一份 receipt。If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 
-Use the surface lens and project-local overlay to add only the conditional sections the increment needs.
+Use the selected packaged template asset and project-local overlay to add only the conditional sections the increment needs.
 
 ## Authoring Discipline
 
@@ -357,7 +300,7 @@ Resolve every source-answerable gap first (relentless, one question at a time ag
 
 ## PRD Quality Diagnosis And Optimization
 
-For refine or validate mode, diagnose before rewriting and keep the diagnosis concise:
+For validate mode, diagnose and return a report-only result:
 
 ```text
 quality_diagnosis: ready | minor-gaps | material-gaps | blockers
@@ -368,14 +311,16 @@ rewrite_strategy:
 
 Give optimization suggestions as `original -> recommendation -> reason -> write target`. Prioritize suggestions that reduce planning invention: missing current-state evidence, unclear delta, untestable wording, missing priority, missing acceptance, industry/compliance uncertainty, source/user contradiction, or scope creep.
 
-Then produce the final rewritten PRD using the standard skeleton and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
+Run checker/finalizer only with `--check-only` or receipt verification. Report current bytes/receipt/readiness facts and semantic gaps; do not write a replacement artifact, a standalone report file, a receipt, screenshots, provider JSON, or runtime assets. If the user asks to validate and fix, show the proposed patch first and re-enter as `refine` only after explicit confirmation.
+
+For refine mode, diagnose before rewriting with the same compact block and suggestions. Then produce the final rewritten PRD using the packaged generic template, the selected surface asset, and triggered sections. Ensure there is no standalone quality report artifact unless the user explicitly asks; put persistent decisions into `Decision Notes`, assumptions into `Evidence And Assumptions`, and unresolved blockers into `Outstanding Questions`.
 
 `not-run` is a run-local decision-card state only; do not emit it in the diagnosis block because an emitted refine/validate diagnosis has run by definition. Do not create numeric PRD scorecards, 0-100 quality ratings, or industry hard-threshold rubrics.
 
 Use two different diagnosis moments:
 
 - `Preliminary Diagnosis` happens after sanitization and source/current-state evidence. It decides input scale, system anchor, how to run Pre-PRD Clarification, whether large-input Map-Reduce is needed, which P0/P1 packs are triggered, and whether to route out.
-- `Final Readiness Diagnosis` happens after rewrite and closure. It decides whether unresolved gaps still force planning to invent WHAT. Preliminary labels such as `ready`, `minor-gaps`, `material-gaps`, or `blockers` are not final `ready-for-planning`.
+- `Final Readiness Diagnosis` happens after refine rewrite and closure, or after validate completes its read-only source/check-only pass. It decides whether unresolved gaps still force planning to invent WHAT. Preliminary labels such as `ready`, `minor-gaps`, `material-gaps`, or `blockers` are not final `ready-for-planning`.
 
 If Pre-PRD Clarification ran, feed its results into final PRD rewrite through section-level write targets. Do not leave a detached critique, interview transcript, chunk summary, Map row, Reduce output, or standalone grill report as the durable output.
 
@@ -484,9 +429,13 @@ Supporting evidence refs should be indexed when the PRD has more than a few sour
 
 The handoff context slice is a compact downstream reading map:
 
+对于 long、mixed 或 high-risk PRD，加入最多三个 load-bearing Requirement / Acceptance Example 引用，以及 planning 必须保留的 behaviors。这些内容只是现有 PRD 的阅读指针，不复制完整 requirements，也不包含 implementation instructions。
+
 ```text
 handoff_context_slice:
 - confirmed WHAT:
+- top requirement / acceptance refs:
+- must-preserve behaviors:
 - owner decisions:
 - accepted assumptions:
 - source refs to re-read:
@@ -501,9 +450,7 @@ Do not put implementation steps, file lists, or task sequencing in the handoff c
 
 When existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, or `docs/adr/**` were read, record the PRD-relevant evidence source and contradiction/decision outcome. Stable terms persist in `Glossary`; hard decisions persist in `Decision Notes`, `Evidence And Assumptions`, or `Scope Boundaries` so the PRD remains sufficient for planning.
 
-In normal PRD mode, project-level context or ADR updates are preview-first promotion candidates only. They are not required PRD output, not readiness prerequisites, and not silently written by this workflow.
-
-When `grill-with-docs-integration.md` is triggered, resolved project-specific terms update `CONTEXT.md` inline and ADR-worthy decisions create ADRs inline. Record the changed context/ADR paths in `Closeout Summary`; do not make those files a replacement for PRD-local closure.
+In every PRD profile and trigger mode, project-level context/glossary/ADR promotion is candidate-only after PRD-local closure. A qualified candidate records target kind/path, proposed meaning, provenance, applicability scope, a real consumer, reuse rationale, invalidation condition, and `not written by this workflow`. It is not a readiness prerequisite. `grill-with-docs-integration.md` does not change this mutation boundary.
 
 ## Feature Slices
 
@@ -598,7 +545,7 @@ Every PRD handoff should report:
 - producer receipt status
 - readiness_outcome
 
-When a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js` before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
+For create/refine when a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. Validate uses only `--check-only` or receipt verification and reports the current state without writing. The finalize/checker path seeds deterministic counts and trace facts before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
 
 The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, feature-to-R/AE trace gaps, finding count, blocking reason_codes, and producer receipt status. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, `readiness_outcome`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
 

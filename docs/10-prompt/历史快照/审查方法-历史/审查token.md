@@ -101,7 +101,7 @@ spec-first 在真实使用过程中非常消耗 token。
 - spec-compound
 - spec-compound-refresh
 - spec-sessions
-- spec-skill-audit
+- retired-skill-review
 - spec-mcp-setup
 - spec-graph-bootstrap
 - 所有 reviewer agents
@@ -314,7 +314,7 @@ mcp-setup
 → code-review/app-consistency-audit
 → compound/compound-refresh
 → sessions
-→ skill-audit
+→ skill-review
 ````
 
 ---
@@ -383,7 +383,7 @@ hotspot type 可选：
 6. 是否存在 app-consistency-audit 默认调用所有专家。
 7. 是否存在 compound 默认读取所有历史。
 8. 是否存在 sessions 默认恢复所有历史。
-9. 是否存在 skill-audit 默认读取所有文件但不分层。
+9. 是否存在 skill-review 默认读取所有文件但不分层。
 10. 是否存在 graph-bootstrap 输出过大 JSON 后直接喂给 LLM。
 11. 是否存在 tool results 原样进入 LLM 上下文。
 12. 是否存在 scripts 输出 verbose logs 而无 compact JSON。
@@ -525,7 +525,7 @@ skill/
 * spec-code-review
 * spec-app-consistency-audit
 * spec-compound
-* spec-skill-audit
+* retired-skill-review
 * spec-graph-bootstrap
 * spec-mcp-setup
 

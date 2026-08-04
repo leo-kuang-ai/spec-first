@@ -8,9 +8,13 @@ This guide defines quality expectations for task cards produced by `spec-write-t
 
 Accepted inputs are local source plan paths, existing local task-pack paths, or clear task-splitting requests that resolve to one local source plan. Rejected near-neighbors are implementation prompts, unresolved product or architecture scope, remote repositories, package names, marketplace skill names, and generic task-list requests that do not name a settled source plan.
 
-Executable task-pack input requires `type: task-pack`, `generated_by: spec-write-tasks`, `status: derived`, `mode: derived`, `spec_id`, a concrete repo-relative `source_plan`, a concrete `sha256:<64-hex>` source plan hash, and a valid `Task Pack Contract` JSON block. Existing task packs with missing identity, stale hash, wrong-chain `spec_id`, unverifiable hash tooling, generated runtime file ownership, or ambiguous workspace repo scope are not executable handoff.
+Executable task-pack input requires `type: task-pack`, `generated_by: spec-write-tasks`, `status: derived`, `mode: derived`, a concrete artifact-root-relative POSIX `source_plan`, a concrete `sha256:<64-hex>` source plan hash, and a valid `Task Pack Contract` JSON block. Executable identity is `source-plan-path+body-hash`; `spec_id` is an optional compatibility trace. Existing task packs with missing path/hash identity, stale hash, wrong-chain present-on-both-sides `spec_id`, unverifiable hash tooling, generated runtime file ownership, or ambiguous workspace repo scope are not executable handoff.
 
 Downstream consumers are `spec-work`, high-risk doc-review handoff, human reviewers, and later code-review/compound workflows. These consumers need source anchors, bounded context refs, task file ownership, and validation posture; they do not need maintainer eval fixtures or validation reports.
+
+### Downstream `spec-work` intake
+
+`spec-work` executes only the validated `Task Pack Contract` JSON and `execution_waves`; human-readable Task Cards are context compression, not a second executable source. The executor pins the current validation receipt, task-pack file digest, and source-plan hash, replays source-plan implementation readiness, then judges semantic-fit against scope/non-goals/KTD before creating tracker tasks. Keep task IDs, files, `stop_if`, review intent, and dependencies precise enough for that consumer; a validator-green but semantically incomplete pack must return to `spec-write-tasks` or `spec-plan` rather than forcing private re-splitting.
 
 ## Quality Bar
 
@@ -46,7 +50,7 @@ Source orientation exists only to make task boundaries accurate enough.
 
 Use this intake order for context economy: first read the plan/task summary and contract metadata, then deterministic inventory or validation facts, then current task/phase refs, then focused source-of-truth sections, and only then deeper references. Keep orientation facts compact by summarizing direct source reads, changed files, tests/logs, and limitations; do not create an external-tool facts pipeline.
 
-Start from the source plan, plan-indicated source files, and nearby tests. Reuse already-loaded host/project instructions. Read `AGENTS.md` / `CLAUDE.md` source only when the active host/project instruction reuse policy allows it, such as a user-named path, missing or stale loaded context, source/runtime governance work, or directory-scoped instructions that may govern changed files. Read local contract docs only by precise path or section when they exist and materially improve task boundaries. Team standards under `docs/standards/**` are selected through `docs/contracts/team-standards.md`: use the contract and `docs/standards/index.md`, then only matched rule files. Written project standards may become hard task constraints only when they are `trust=confirmed,lifecycle_state=active`, apply to the changed files, and remain consistent with the source plan. Include standards as bounded `context_refs` with matched/excluded/uncertainty/fallback/limitations when useful; they must not expand source-plan scope. Other docs, prior plans, standards candidates, and external-tool facts are advisory context refs and must not become a workflow state machine or expand source-plan scope.
+Start from the source plan, plan-indicated source files, and nearby tests. Reuse already-loaded host/project instructions. Read `AGENTS.md` / `CLAUDE.md` source only when the active host/project instruction reuse policy allows it, such as a user-named path, missing or stale loaded context, source/runtime governance work, or directory-scoped instructions that may govern changed files. Read local contract docs only by precise path or section when they exist and materially improve task boundaries. Written project guidance may become hard task constraints only when it comes from active host/project instructions, directory-scoped instruction files, explicit contracts, or direct source evidence, applies to the changed files, and remains consistent with the source plan. Include guidance as bounded `context_refs` with source/applicability/uncertainty/fallback/limitations when useful; it must not expand source-plan scope. Other docs, prior plans, and external-tool facts are advisory context refs and must not become a workflow state machine or expand source-plan scope.
 
 Provider order:
 
@@ -268,7 +272,7 @@ Bad stop signals:
     - skills/spec-write-tasks/references/task-pack-schema.md#Regeneration-Rules
   entry_hint: Compare Phase 1 input handling with task pack regeneration rules
   test_focus: Task pack path is validated before execution task creation
-  done_signal: `spec-work` documents spec_id/source_plan/source_plan_hash checks plus stale-pack and wrong-chain rejection
+  done_signal: `spec-work` documents source_plan/source_plan_hash identity, optional compatibility trace handling, and stale-pack/wrong-chain rejection
   parallelizable: false
   risk_note: Treating task pack as authoritative would break plan SoT
   review_gate: required

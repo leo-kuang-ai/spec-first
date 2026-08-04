@@ -1,0 +1,1 @@
+{"invocation_mode":"none","effect":"not-entered","reason":"真实用户请求只是询问当前流程未来是否值得复用，属于轻量的当前上下文讨论，应走 Direct Lane 直接回答；不涉及创建、修改、迁移或验证 Skill，因此不进入 spec-write-skill。","entrypoint":"using-spec-first","handoff_target":"direct-answer","loaded_skills":["using-spec-first"]}

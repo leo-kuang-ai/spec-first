@@ -1,0 +1,211 @@
+#!/usr/bin/env node
+'use strict';
+
+const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
+const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;
+const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
+const LANG_START = '<!-- spec-first:lang:start -->';
+const LANG_END = '<!-- spec-first:lang:end -->';
+const WORKFLOW_ENTRY_ANCHOR = '<!-- spec-first:workflow-entry:using-spec-first -->';
+const MISSING_CONTEXT = [
+  '[spec-first] using-spec-first SessionStart injection',
+  'Managed language/governance block is missing from `AGENTS.md`.',
+  'Run `spec-first init --qoder` in this project to refresh managed runtime assets.',
+  'Hook activation remains degraded (`qoder_hook_activation_unverified`) until authenticated event execution and shared IDE loader safety are verified.',
+].join('\n');
+
+main().catch(() => writeHookOutput(MISSING_CONTEXT));
+
+async function main() {
+  const input = parseJsonObject(await readStdin());
+  const projectDir = resolveProjectDir(input);
+  const instructionPath = path.join(projectDir, 'AGENTS.md');
+  let additionalContext = MISSING_CONTEXT;
+
+  const instructionBody = readInstructionBody(instructionPath);
+  if (instructionBody !== null) {
+    const status = inspectWorkflowEntryGuidance(instructionBody);
+    additionalContext = status.installed
+      ? [
+        '[spec-first] using-spec-first SessionStart injection',
+        "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+        'Full routing policy: .qoder/skills/using-spec-first/SKILL.md.',
+      ].join('\n')
+      : [
+        '[spec-first] using-spec-first SessionStart injection',
+        status.message,
+        'Run `spec-first init --qoder` in this project to refresh managed runtime assets.',
+        'Hook activation remains degraded (`qoder_hook_activation_unverified`) until authenticated event execution and shared IDE loader safety are verified.',
+      ].join('\n');
+  }
+
+  const startupReminder = readStartupReminder(projectDir);
+  if (startupReminder) {
+    additionalContext = [
+      additionalContext,
+      '',
+      startupReminder,
+    ].join('\n');
+  }
+
+  writeHookOutput(additionalContext);
+}
+
+function resolveProjectDir(input) {
+  const fromEnv = process.env.QODER_PROJECT_DIR;
+  if (typeof fromEnv === 'string' && fromEnv.trim()) {
+    return fromEnv;
+  }
+
+  if (typeof input.cwd === 'string' && input.cwd.trim()) {
+    return input.cwd;
+  }
+
+  return process.cwd();
+}
+
+function readInstructionBody(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return null;
+  }
+}
+
+function inspectWorkflowEntryGuidance(body) {
+  const langMarkers = inspectMarkerStructure(body, LANG_START, LANG_END);
+  if (langMarkers.absent) {
+    return {
+      installed: false,
+      message: 'Managed language/governance block is missing from `AGENTS.md`.',
+    };
+  }
+  if (!langMarkers.valid) {
+    return {
+      installed: false,
+      message: 'Managed language/governance markers must form exactly one balanced pair in `AGENTS.md`.',
+    };
+  }
+
+  const managedBlock = body.slice(langMarkers.startIdx, langMarkers.endIdx + LANG_END.length);
+  if (countOccurrences(managedBlock, WORKFLOW_ENTRY_ANCHOR) === 1) {
+    return { installed: true };
+  }
+  return {
+    installed: false,
+    message: 'Workflow entry guidance is missing from the `spec-first:lang` block in `AGENTS.md`.',
+  };
+}
+
+function inspectMarkerStructure(contents, startMarker, endMarker) {
+  const startIndexes = findMarkerIndexes(contents, startMarker);
+  const endIndexes = findMarkerIndexes(contents, endMarker);
+  return {
+    absent: startIndexes.length === 0 && endIndexes.length === 0,
+    valid: startIndexes.length === 1 && endIndexes.length === 1 && startIndexes[0] < endIndexes[0],
+    startIdx: startIndexes.length === 1 ? startIndexes[0] : -1,
+    endIdx: endIndexes.length === 1 ? endIndexes[0] : -1,
+  };
+}
+
+function findMarkerIndexes(contents, marker) {
+  const indexes = [];
+  let searchFrom = 0;
+  while (searchFrom <= contents.length - marker.length) {
+    const index = contents.indexOf(marker, searchFrom);
+    if (index === -1) {
+      break;
+    }
+    indexes.push(index);
+    searchFrom = index + marker.length;
+  }
+  return indexes;
+}
+
+function countOccurrences(contents, value) {
+  return findMarkerIndexes(contents, value).length;
+}
+
+function readStdin() {
+  if (process.stdin.isTTY) {
+    return Promise.resolve('');
+  }
+
+  return new Promise((resolve) => {
+    let body = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => {
+      body += chunk;
+    });
+    process.stdin.once('end', () => resolve(body));
+    process.stdin.once('error', () => resolve(''));
+    process.stdin.resume();
+  });
+}
+
+function parseJsonObject(raw) {
+  try {
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function readStartupReminder(cwd) {
+  try {
+    if (!isTrustedSpecFirstCliPath(SPEC_FIRST_CLI_PATH)) {
+      return '';
+    }
+
+    const result = spawnSync(process.execPath, [SPEC_FIRST_CLI_PATH, 'startup-reminder', '--qoder'], {
+      cwd,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS: String(STARTUP_REMINDER_LOOKUP_TIMEOUT_MS),
+      },
+      // 子进程网络超时必须小于 hook 总预算，避免外层先终止而 attempt cooldown 已经落盘。
+      timeout: STARTUP_REMINDER_PROCESS_TIMEOUT_MS,
+    });
+
+    if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {
+      return '';
+    }
+
+    return result.stdout.trim();
+  } catch {
+    return '';
+  }
+}
+
+function isTrustedSpecFirstCliPath(cliPath) {
+  if (
+    typeof cliPath !== 'string'
+    || cliPath.length === 0
+    || cliPath === '__SPEC_FIRST_CLI_PATH__'
+    || !path.isAbsolute(cliPath)
+    || path.basename(cliPath) !== 'spec-first.js'
+  ) {
+    return false;
+  }
+
+  try {
+    return fs.statSync(cliPath).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function writeHookOutput(additionalContext) {
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'SessionStart',
+      additionalContext,
+    },
+  }));
+}

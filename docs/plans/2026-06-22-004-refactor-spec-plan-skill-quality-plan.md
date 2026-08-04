@@ -569,7 +569,7 @@ flowchart TB
 
 本计划已完成落地。实施范围包括 `skills/spec-plan/SKILL.md` 热路径瘦身、新增 `skills/spec-plan/references/planning-flow.md`、扩展 `skills/spec-plan/evals/examples.json`、新增 `skills/spec-plan/evals/output-quality-cases.json` 与 README、调整 `src/cli/plugin.js` 对 `evals/` support files 的 source-ref rewrite 边界、补充 runtime projection/init dry-run/downstream PRD/governance contract tests、更新集中治理 waiver、补 `CHANGELOG.md` 和 `docs/validation/spec-plan/fresh-source-eval-2026-06-23-skill-quality.md`。
 
-验证已覆盖 focused Jest、eval fixture suite、skill entrypoint lint、JS typecheck、`git diff --check`、`spec-skill-audit` eval readiness 和 `$yao-meta-skill` advisory scripts。多 agent review 发现的 P1/P2/P3 已修复，最终 fresh-source reviewer 结论为 `passed` 且无 P0/P1/P2 findings。Generated runtime mirrors 未手改；如需刷新宿主 runtime，后续运行 `spec-first init`。
+验证已覆盖 focused Jest、eval fixture suite、skill entrypoint lint、JS typecheck、`git diff --check`、`retired-skill-review` eval readiness 和 `$yao-meta-skill` advisory scripts。多 agent review 发现的 P1/P2/P3 已修复，最终 fresh-source reviewer 结论为 `passed` 且无 P0/P1/P2 findings。Generated runtime mirrors 未手改；如需刷新宿主 runtime，后续运行 `spec-first init`。
 
 ---
 

@@ -13,7 +13,7 @@ status: passed
 - Source plan: `docs/plans/2026-05-11-002-feat-spec-first-project-optimization-upgrade-plan.md`
 - Task pack: `docs/tasks/2026-05-17-003-feat-spec-first-optimization-phase1d-tasks.md`
 - Tasks: T001 / U1-core, T002 / U12-minimal, T003 / U11 closeout.
-- Boundary: core chain contract summary and intake-order cleanup only. This phase did not implement full public workflow summary coverage, review dispatch resizing, sessions/compound replay, skill-audit scoring, hard token budget automation, release/source-runtime guards, or retention/prune lifecycle.
+- Boundary: core chain contract summary and intake-order cleanup only. This phase did not implement full public workflow summary coverage, review dispatch resizing, sessions/compound replay, skill-review scoring, hard token budget automation, release/source-runtime guards, or retention/prune lifecycle.
 
 ## Deterministic Validation
 

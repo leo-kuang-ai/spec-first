@@ -1,0 +1,6 @@
+timestamp=2026-07-29T18:40:51.368Z level=INFO message=loading path=<XDG_CONFIG_HOME>/opencode/config.json
+timestamp=2026-07-29T18:40:51.368Z level=INFO message=loading path=<XDG_CONFIG_HOME>/opencode/opencode.json
+timestamp=2026-07-29T18:40:51.368Z level=INFO message=loading path=<XDG_CONFIG_HOME>/opencode/opencode.jsonc
+timestamp=2026-07-29T18:40:51.370Z level=INFO message=loading path=<PROJECT_ROOT>/opencode.json
+timestamp=2026-07-29T18:40:51.376Z level=INFO message=loading path=<PROJECT_ROOT>/.opencode/opencode.json
+timestamp=2026-07-29T18:40:51.376Z level=INFO message=loading path=<PROJECT_ROOT>/.opencode/opencode.jsonc

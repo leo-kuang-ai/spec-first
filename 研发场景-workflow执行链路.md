@@ -37,7 +37,7 @@ Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
 | --- | --- |
 | `spec-debug` | 失败、报错、测试挂、异常行为(诊断优先于 work) |
 | `spec-optimize` | 指标驱动的实验式优化 |
-| `spec-mcp-setup` | 环境/host/MCP/工具就绪(执行前置) |
+| `spec-runtime-setup` | 环境/host/MCP/工具就绪(执行前置) |
 | `spec-polish-beta` | 跑起 app 迭代浏览器可见 UI |
 | `spec-write-skill` | 编写、改写、迁移或按 audit findings 修复 spec-first source skill |
 
@@ -50,8 +50,8 @@ Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
 ## 边界提示
 
 - 公开 workflow 用户入口统一为 `spec-*`;`using-spec-first` 和 `spec-write-tasks` 是 standalone skill,不是命令;`git-worktree` 是隐藏 helper。
-- 不属于研发执行流程(可排除):团队治理类 `spec-team-standards-governance`;上下文检索类 `spec-sessions`、`spec-slack-research`、`spec-release-notes`;以及与研发流程无关的 `baoyu-*`、`lark-*`、图像/视频类 skill。
-- `spec-skill-audit`、`spec-app-consistency-audit` 和 `spec-write-skill` 现在是公开 workflow 入口,但属于治理/支撑链路,不是 Codebase → Spec → Plan → Tasks → Code → Review → Knowledge 主链路节点。
+- 不属于研发执行流程(可排除):上下文检索类 `spec-sessions`、`spec-slack-research`、`spec-release-notes`;以及与研发流程无关的 `baoyu-*`、`lark-*`、图像/视频类 skill。
+- `retired-skill-review`、`spec-app-consistency-audit` 和 `spec-write-skill` 现在是公开 workflow 入口,但属于治理/支撑链路,不是 Codebase → Spec → Plan → Tasks → Code → Review → Knowledge 主链路节点。
 - 路由原则:意图优先于关键词,只选一个入口、给一个理由,不自动串联多个 workflow——除非某 workflow 显式 handoff。
 
 ## 流程图
@@ -61,7 +61,7 @@ flowchart TD
     Start([研发请求]) --> Gov{using-spec-first<br/>入口路由}
 
     %% 旁路/支撑
-    Gov -->|环境/工具未就绪| Setup["spec-mcp-setup"]
+    Gov -->|环境/工具未就绪| Setup["spec-runtime-setup"]
     Gov -->|失败/报错/测试挂| Debug["spec-debug"]
     Gov -->|指标驱动优化| Opt["spec-optimize"]
     Gov -->|编写/修复 source skill| WriteSkill["spec-write-skill"]

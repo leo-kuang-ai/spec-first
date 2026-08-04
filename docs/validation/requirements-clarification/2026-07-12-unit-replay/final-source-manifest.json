@@ -1,0 +1,176 @@
+{
+  "schema": "requirements-clarification-final-source-manifest/v1",
+  "base": "89c732603b0d544bdd2aeb2fd520525c6301a574",
+  "files": [
+    {
+      "path": "docs/contracts/domain-glossary.md",
+      "status": "present",
+      "sha256": "6c16fdd75f22f72014cf9b9cb1f843906b5a38ff645a888accdfffb3fb534d41"
+    },
+    {
+      "path": "skills/spec-brainstorm/SKILL.md",
+      "status": "present",
+      "sha256": "8e7ee4e5c0fb626bfbe3feaff5f1fb3b47bae6891683418b7293eaf2c608fd7b"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/brainstorm-sections.md",
+      "status": "present",
+      "sha256": "9db1310fbfe61e0d3676feed8be10913b2e8cfe73357f544f0418676400b2105"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/handoff.md",
+      "status": "present",
+      "sha256": "6edf1c469ea4f572d5e45317bc11dcf471ae82a11d2d4e17b52a6b82a49692eb"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/product-pressure-test.md",
+      "status": "present",
+      "sha256": "2e5f4ad474d6b174cfe54555e31d695085e942c3559127153cfbb2dde928fd84"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-brainstorm/references/visual-probes.md",
+      "status": "absent",
+      "sha256": null
+    },
+    {
+      "path": "skills/spec-brainstorm/scripts/visual-probe-server.js",
+      "status": "absent",
+      "sha256": null
+    },
+    {
+      "path": "skills/spec-code-review/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-code-review/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-compound/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-compound/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-debug/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-debug/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-explain/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-explain/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-ideate/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-ideate/references/post-ideation-workflow.md",
+      "status": "present",
+      "sha256": "843dcdb7f624bb56ac56a07be419845fd686273894c0d98fdd39dee74f8df689"
+    },
+    {
+      "path": "skills/spec-ideate/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-optimize/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-optimize/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-plan/SKILL.md",
+      "status": "present",
+      "sha256": "eac738ad027cd1874b88dc25e0b99203da45c600750ac319161dc4f7e606dd10"
+    },
+    {
+      "path": "skills/spec-plan/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-plan/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-pov/references/agents/repo-profiler.md",
+      "status": "present",
+      "sha256": "e765ded1bf1a16b25a63851a7259eead76c233484e651f27d51331c90913c2ea"
+    },
+    {
+      "path": "skills/spec-pov/references/repo-profile-cache.md",
+      "status": "present",
+      "sha256": "136e2b0a6063afa64a2dcbb4dd96ce27344407580f28ba265858b8af487b4f1f"
+    },
+    {
+      "path": "skills/spec-prd/SKILL.md",
+      "status": "present",
+      "sha256": "38f26a519741cab7f1538448cec6f703b608041b094533b302cf29149bb8f023"
+    },
+    {
+      "path": "skills/spec-prd/evals/examples.json",
+      "status": "present",
+      "sha256": "ebc9039ee0a8a47287380370ed56c2466d8300e742b4e939b8ae84f397dc3733"
+    },
+    {
+      "path": "skills/spec-prd/references/domain-language-and-decision-ledger.md",
+      "status": "present",
+      "sha256": "f1ecde33b3bf5b37e3801e69f95284198506397d355c7dc343fce9acb26acfe3"
+    },
+    {
+      "path": "skills/spec-prd/references/evidence-and-topology.md",
+      "status": "present",
+      "sha256": "e596b313e36f2ace3a635da75e5dd28a9993ff9e8220b1f8fb9227c56748f95b"
+    },
+    {
+      "path": "skills/spec-prd/references/grill-with-docs-integration.md",
+      "status": "present",
+      "sha256": "aaa90931129db5db520d8836214a4bcc7146bd0b79710bb304906a6b97e7d14f"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-output-template.md",
+      "status": "present",
+      "sha256": "59a776888f79c76d7d8c0869773ece95a828918e310ece2a53dbd06bd4858c89"
+    },
+    {
+      "path": "skills/spec-prd/references/prd-readiness-lens.md",
+      "status": "present",
+      "sha256": "fddbff2c86451191210d99f2690af85490be2fd1d4016789c7b284a67839ba35"
+    }
+  ]
+}

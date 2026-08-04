@@ -1,8 +1,12 @@
 # Open Questions Deferral
 
+Persisted entries follow the token and consequence-first rules in `references/rendering-floor.md`; they do not inherit apply authority from an actionable finding.
+
 This reference defines the Defer action's in-doc append mechanic. When the user chooses Defer on a finding (from the walk-through or from the bulk-preview Append-to-Open-Questions path), an entry for that finding appends to a `## Deferred / Open Questions` section at the end of the document under review.
 
 Interactive mode only. Invoked by `references/walkthrough.md` (per-finding Defer option) and `references/bulk-preview.md` (routing option C Proceed).
+
+**Mutation-policy entry guard:** the append mechanic is Markdown-only and requires `mutation_policy: markdown-write`. If the run is `report-only`, **STOP** without reading for an append location and return the finding in the report-only envelope; never insert Markdown headings or bullets into HTML or an ambiguous format.
 
 ---
 
@@ -27,14 +31,12 @@ Date format: ISO 8601 calendar date (`YYYY-MM-DD`). If multiple reviews occur on
 
 ### Step 3: Format and append the entry
 
-Per deferred finding, append a bullet-point entry with the following fields. The visible content is a reader-friendly summary; an HTML comment on the entry persists the dedup-key fields so Step 4's compound-key check can run reliably across retries and same-day reruns without requiring the entry format itself to carry machine-oriented metadata:
+Per deferred finding, append a reader-facing bullet-point entry. The entry carries no HTML comment — the markdown rendering contract forbids mixed-in HTML, and every field Step 4's dedup needs is reconstructable from the visible entry text:
 
 ```
-- **{title}** — {section} ({severity}, {reviewer}, confidence-first {confidence})
+- **{title}** — {section} ({severity}, {reviewer}, confidence {confidence})
 
   {why_it_matters}
-
-  <!-- dedup-key: section="{normalized_section}" title="{normalized_title}" evidence="{evidence_fingerprint}" -->
 ```
 
 Fields come from the finding's schema:
@@ -42,39 +44,27 @@ Fields come from the finding's schema:
 - `{title}` — the finding's title field
 - `{section}` — the finding's section field, unmodified (human-readable)
 - `{severity}` — P0 / P1 / P2 / P3
-- `{reviewer}` — the persona that produced the finding (after dedup, the persona with the highest confidence-first anchor; surface all co-flagging personas if multiple)
+- `{reviewer}` — the persona that produced the finding (after dedup, the persona with the highest confidence anchor; surface all co-flagging personas if multiple)
 - `{confidence}` — the integer anchor (`50`, `75`, or `100`), emitted without a decimal point or percent sign
 - `{why_it_matters}` — the full why_it_matters text, preserving the framing guidance from the subagent template
 
-HTML-comment fields (machine-readable, used by Step 4 dedup):
-
-- `{normalized_section}` — `normalize(section)` (lowercase, punctuation-stripped, whitespace-collapsed)
-- `{normalized_title}` — `normalize(title)` (same normalization)
-- `{evidence_fingerprint}` — first ~120 chars of the finding's first evidence quote, word-boundary-preserving, then sanitized for single-line HTML-comment embedding; empty string when the finding had no evidence. Sanitization (apply in order, before the 120-char slice so the resulting fingerprint stays under the budget):
-  1. Collapse any run of whitespace — including newlines, carriage returns, and tabs — to a single space.
-  2. Strip any occurrence of `-->` (HTML-comment terminator) and any stray `<!--` sequence; replace each with a single space. This prevents the evidence from closing the dedup-key comment prematurely or injecting a nested comment.
-  3. Replace the double-quote character with `\"` (quote escaping, as before).
-  4. Trim leading/trailing whitespace.
-
-  The sanitized fingerprint MUST be a single line with no embedded `-->` so the dedup-key comment stays parseable by Step 4's compound-key reconstruction. When computing the fingerprint for a new finding, apply this sanitization; when reading back from an existing entry, treat the parsed `evidence="..."` value as already-sanitized and compare verbatim.
-
-Do not include `suggested_fix` or the full `evidence` array in the appended entry. Those live in the review run artifact (when applicable) and do not belong in the document's Open Questions section — the entry is a concern summary for the reader returning later, not a full decision packet. The HTML-comment dedup-key line is the minimum machine-oriented metadata required for reliable idempotence and deliberately sits on a single line with simple `key="value"` shape so a retry can parse it without a markdown parser.
+Do not include `suggested_fix` or the full `evidence` array in the appended entry. Those live in the review run artifact (when applicable) and do not belong in the document's Open Questions section — the entry is a concern summary for the reader returning later, not a full decision packet.
 
 ### Step 4: Idempotence on compound-key collisions
 
 If an entry with the same compound key already exists under the same `### From YYYY-MM-DD review` subsection, do not append a duplicate. This can happen when:
 
-- The same review session re-routes the same finding to Defer a second time (rare but possible via Auto-resolve with best judgment on the rest after a walk-through Defer)
+- The same review session re-routes the same finding to Defer a second time (rare but possible via best-judgment-the-rest after a walk-through Defer)
 - The orchestrator retries after a partial failure
 
-**Compound key for dedup:** `normalize(section) + normalize(title) + evidence_fingerprint`, reconstructed from each existing entry's `<!-- dedup-key: ... -->` HTML comment (see Step 3 entry format). For a new finding about to append, compute the same fields from the finding's schema data; for existing entries, parse them out of the HTML comment. Match on all three fields.
+**Compound key for dedup:** `normalize(section) + normalize(title) + why_fingerprint`. All three reconstruct from the visible entry, so no hidden metadata is needed:
 
-- `normalize(section)` and `normalize(title)` use the same normalization as synthesis step 3.3 dedup (lowercase, strip punctuation, collapse whitespace)
-- `evidence_fingerprint` is the first ~120 characters of the finding's first evidence quote, sanitized per Step 3 (whitespace collapsed to single spaces, `-->` and stray `<!--` stripped, quotes escaped). The same slice is used in the decision primer — see `SKILL.md` under "Decision primer". When no evidence is available on the new finding, fall back to section+title alone. When an existing entry's HTML comment has `evidence=""`, treat the entry as evidence-less and also fall back to section+title for that comparison. If an existing entry's dedup-key comment is malformed (e.g., a newline or `-->` sequence split the comment across lines in a pre-sanitization entry), treat that entry under the legacy-fallback rule below rather than attempting a partial reconstruction.
+- `normalize(section)` and `normalize(title)` use the same normalization as synthesis step 3.3 dedup (lowercase, strip punctuation, collapse whitespace). For a new finding, compute from the schema; for an existing entry, parse `{title}` (the bold leader) and `{section}` (the text between the em-dash and the opening `(`) out of the rendered bullet.
+- `why_fingerprint` is the first ~120 characters of the entry's `{why_it_matters}` prose, word-boundary-preserving, with any run of whitespace collapsed to a single space. Because why_it_matters renders verbatim in the entry, the same fingerprint recomputes from the visible bullet on any retry or reread. When why_it_matters is empty, fall back to `normalize(section) + normalize(title)` alone.
 
-Title-only dedup is not sufficient: two different findings in the same document (even in the same review date) can legitimately share a short title if their sections and evidence differ. Using only `{title}` would silently drop one of them — losing user-visible backlog context. The compound key mirrors the R29/R30 matching predicate (`section + title + evidence-substring overlap`) so cross-round and intra-round dedup behave consistently.
+Title-only dedup is not sufficient: two different findings in the same document (even on the same review date) can legitimately share a short title if their sections or rationale differ. Using only `{title}` would silently drop one — losing user-visible backlog context. Matching on section and the why-fingerprint keeps distinct findings distinct, and stays close to the R29/R30 matching predicate (`section + title + evidence-substring overlap`) so cross-round and intra-round dedup behave consistently.
 
-**Legacy entries without dedup-key comments:** entries written before this format (if any survive in the wild) lack the HTML comment. When Step 4 encounters such an entry, fall back to title-only comparison for that entry — imperfect, but strictly better than duplicate-appending. This is a backwards-compat behavior for legacy data, not a sanctioned format.
+**Pre-existing entries with a `dedup-key` HTML comment:** entries written by the prior format carry a trailing `<!-- dedup-key: ... -->` comment. Ignore it for matching — the visible-text key above is authoritative — and strip the comment if the entry is otherwise edited. Do not write new ones.
 
 On collision, record the no-op in the completion report's Coverage section so the user sees the duplicate was suppressed. Cross-subsection collisions (same compound key, different dates) are not deduplicated — each review is allowed to re-raise the same concern.
 
@@ -133,11 +123,9 @@ Starting document state:
 
 ### From 2026-04-10 review
 
-- **Alias compatibility-theater concern** — Risks (P1, scope-guardian, confidence-first 75)
+- **Alias compatibility-theater concern** — Risks (P1, scope-guardian, confidence 75)
 
   The alias exists without documented external consumers...
-
-  <!-- dedup-key: section="risks" title="alias compatibilitytheater concern" evidence="the alias exists without documented external consumers" -->
 
 ```
 
@@ -152,26 +140,20 @@ After appending two findings in a 2026-04-18 session:
 
 ### From 2026-04-10 review
 
-- **Alias compatibility-theater concern** — Risks (P1, scope-guardian, confidence-first 75)
+- **Alias compatibility-theater concern** — Risks (P1, scope-guardian, confidence 75)
 
   The alias exists without documented external consumers...
 
-  <!-- dedup-key: section="risks" title="alias compatibilitytheater concern" evidence="the alias exists without documented external consumers" -->
-
 ### From 2026-04-18 review
 
-- **Unit 2/3 merge judgment call** — Scope Boundaries (P2, scope-guardian, confidence-first 75)
+- **Unit 2/3 merge judgment call** — Scope Boundaries (P2, scope-guardian, confidence 75)
 
   The two units update consumer sites that deploy together. Splitting
   adds dependency tracking without enabling independent delivery.
 
-  <!-- dedup-key: section="scope boundaries" title="unit 23 merge judgment call" evidence="the two units update consumer sites that deploy together" -->
-
-- **Strawman alternatives on migration strategy** — Unit 3 Files (P2, coherence, confidence-first 75)
+- **Strawman alternatives on migration strategy** — Unit 3 Files (P2, coherence, confidence 75)
 
   The fix options list (a) through (c) as alternatives, but (b) and (c)
   are "accept the regression" framings that don't solve the problem the
   finding describes.
-
-  <!-- dedup-key: section="unit 3 files" title="strawman alternatives on migration strategy" evidence="the fix options list a through c as alternatives but b and c" -->
 ```

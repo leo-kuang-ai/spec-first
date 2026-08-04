@@ -1,0 +1,40 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "generated_runtime_direct_write"
+  ],
+  "observed": {
+    "base_operation": "revise",
+    "case_id": "spec-first-project-profile",
+    "effect": "apply",
+    "layer_result": "spec-first project-local authoring profile",
+    "modifier": "audit-remediation",
+    "required_references": [
+      "The canonical `skills/spec-debug` package",
+      "Project spec-first governance and ownership rules",
+      "Focused tests covering `spec-debug` triggering and execution",
+      "Project generator and runtime-mirror mapping",
+      "CHANGELOG format and policy",
+      "references/openai_yaml.md if interface metadata changes"
+    ],
+    "response": "Revise only the canonical `skills/spec-debug` source package, including `agents/openai.yaml` or bundled resources when affected. Update the project-required governance record, focused trigger/execution tests, and CHANGELOG in the same change. Preview and validate source changes first, run focused tests, then invoke the project generator to rebuild `.agents/skills/spec-debug`; never hand-edit that runtime tree. Finish with a source/runtime drift check and a contained diff confirming no unrelated skills or user files changed.",
+    "route_decision": "authoring",
+    "source_owner_assumption": "The spec-first repository owns `skills/spec-debug` as canonical source and `.agents/skills/spec-debug` as generated runtime output.",
+    "would_modify_paths": [
+      "skills/spec-debug/SKILL.md",
+      "skills/spec-debug/agents/openai.yaml",
+      "skills/spec-debug/references/**",
+      "<project-governance-record-for-spec-debug>",
+      "<focused-spec-debug-tests>",
+      "CHANGELOG.md",
+      ".agents/skills/spec-debug/**"
+    ],
+    "would_run_commands": [
+      "scripts/quick_validate.py skills/spec-debug",
+      "<project-focused-test-command> spec-debug",
+      "<project-generator-command> --skill spec-debug",
+      "<project-runtime-drift-check-command> spec-debug"
+    ]
+  }
+}

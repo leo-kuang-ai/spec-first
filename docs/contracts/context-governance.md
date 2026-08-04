@@ -42,17 +42,25 @@
 | `.qoder/skills/**` | `generated_runtime_mirror_excluded` | Qoder generated project skill runtime mirror |
 | `.qoder/agents/**` | `generated_runtime_mirror_excluded` | Qoder generated subagent runtime mirror |
 | `.qoder/spec-first/**` | `generated_runtime_mirror_excluded` | Qoder spec-first managed state/runtime facts |
+| `.qoder/hooks/session-start` | `managed_runtime_hook_excluded` | Qoder spec-first managed SessionStart hook script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
+| `.qoder/hooks/prd-prewrite-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed PreToolUse PRD guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
+| `.qoder/hooks/prd-readiness-guard` | `managed_runtime_hook_excluded` | Qoder spec-first managed Stop PRD readiness guard script；settings entry remains degraded-by-design until authenticated event execution and shared-loader safety are verified |
 | `.qoder/settings.local.json` | `host_local_config_excluded` | Qoder local MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --qoder` 保留整文件，server entry 由 setup/uninstall 路径管理 |
+| `.opencode/commands/spec-*.md` | `generated_runtime_mirror_excluded` | OpenCode generated workflow command runtime file mirror |
+| `.opencode/commands/spec/**` | `generated_runtime_mirror_excluded` | OpenCode retired legacy command namespace；仅 runtime cleanup / drift repair 读取 |
+| `.opencode/skills/**` | `generated_runtime_mirror_excluded` | OpenCode generated Agent Skills runtime mirror |
+| `.opencode/spec-first/**` | `generated_runtime_mirror_excluded` | OpenCode spec-first managed state/runtime facts |
+| `opencode.json` / `opencode.jsonc` | `host_local_config_excluded` | OpenCode project config 是 mixed-ownership host config，不是 spec-first source truth；普通 context 默认排除，runtime/setup task 可按精确路径读取，clean/uninstall 只删除仍匹配 expected value 的 managed entries |
 
 `.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它；不得把 `.kiro/**` blanket 排除或 blanket 纳入 source context。
 
 `.cursor/rules/**`、`.cursor/agents/**` 和未知 `.cursor/**` host-native/user-owned surface 不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.cursor/**` blanket 排除或 blanket 纳入 source context。
 
-`.qoder/rules/**`、`.qoder/settings.json` 和 `.qoder/hooks/**` 是 Qoder-native/user-owned surface，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.qoder/**` blanket 排除或 blanket 纳入 source context。
+`.qoder/rules/**`、`.qoder/settings.json` 和未知 `.qoder/hooks/**` 是 Qoder-native/user-owned surface，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.qoder/**` blanket 排除或 blanket 纳入 source context。例外是上表列出的三个 spec-first managed Qoder hook scripts：它们是 runtime hook outputs，默认上下文排除。
+
+`.opencode/agents/**`、未被 spec-first 命名空间覆盖的 `.opencode/**` 与 `opencode.json` / `opencode.jsonc` 中的非 managed fields 是 OpenCode-native/user-owned surface。不得 blanket 删除、覆盖或提升为 spec-first source；只有用户、上游 artifact 或 runtime/setup task 显式命名时才读取。
 
 普通 workflow 仍可读取 checked-in source truth，例如 `skills/`、`agents/`、`templates/`、`src/cli/`、`docs/contracts/`、`AGENTS.md`、`CLAUDE.md`、`README*` 和当前任务直接相关的源码、测试、计划或需求文档。
-
-`docs/standards/**` 是 checked-in team standards source surface，而不是 runtime artifact。普通 workflow 只能通过 `docs/contracts/team-standards.md` 的 summary-first、scope-filtered rule selection contract 消费它：先读 contract 和 `docs/standards/index.md`，再按 matched rule files 精确读取。只有 `trust=confirmed,lifecycle_state=active` 且 scope 命中的规则可成为 hard project context；`observed`、`suggested`、`imported`、`conflict`、`confirmed-draft` 和 `docs/standards/candidates/**` 保持 advisory 或 blocked。
 
 ## Host Instruction Reuse Policy
 
@@ -64,8 +72,6 @@
 2. 当前任务正在修改、审查、生成或诊断 instruction / runtime / setup / update / audit / source-runtime drift 行为。
 3. 已加载指令缺失、明显 stale、与当前 source 冲突，或 workflow 需要核对 source-of-truth 以避免漂移。
 4. 需要检查目录级 `AGENTS.md` / `CLAUDE.md` 是否管辖当前 changed files，而该目录级指令未出现在已加载 host context 中。
-5. `spec-code-review` 的 project-standards persona 需要自包含 standards path list；父级 orchestrator 只发现并传递路径，leaf reviewer 只读取与 changed files 相关的 sections。
-
 禁止把根 `AGENTS.md` / `CLAUDE.md` 当作每次 plan/work/debug/review 的普通必读上下文。若只是为了执行方向校准，使用已加载 instruction summary；若因上述例外读取 source 文件，在输出、Coverage 或 closeout 中说明读取原因即可。
 
 ## Runtime Artifact Policy
@@ -106,9 +112,7 @@ New changelog entries should be compact breadcrumbs: one concise summary naming 
 
 | workflow / task | allowed scope |
 | --- | --- |
-| `spec-mcp-setup` / `spec-first update` CLI | runtime delivery、host setup、drift repair 所需的 host runtime paths |
-| `spec-skill-audit` | `.spec-first/audits/skill-audit/**` 的本轮 summary、scorecard、runtime-drift evidence |
-| `spec-skill-audit` governance health pass | `.spec-first/governance/rule-maturity.json` 的 rule-maturity 观测汇总，输出周期治理健康 artifact |
+| `spec-runtime-setup` / `spec-first update` CLI | runtime delivery、host setup、drift repair 所需的 host runtime paths |
 | `spec-app-consistency-audit` | `.spec-first/app-audit/**` 的 run-scoped evidence |
 | changelog author resolution | 读取全局 developer profile：`~/.spec-first/.developer`，只用于 `CHANGELOG.md` 作者字段，不纳入 broad context bundle |
 | user-explicit path request | 只读取用户明确点名的文件或目录，并说明它是 runtime/generated/audit context |
@@ -124,7 +128,7 @@ New changelog entries should be compact breadcrumbs: one concise summary naming 
 3. validated summaries, review facts, or deterministic setup facts.
 4. 精确路径的 full artifact 或 raw evidence，仅当用户要求、workflow 明确需要，或 summary 显示证据不足。
 
-禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json` 纳入默认 `rg --files` / file-search / agent prompt bundle 的普通候选集。`.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 与 `.qoder/rules/**` 不在 generated mirror denylist 内；它们只在显式命名时作为 advisory input 消费。
+禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard`、`.qoder/settings.local.json` 纳入默认 `rg --files` / file-search / agent prompt bundle 的普通候选集。`.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 与 `.qoder/rules/**` 不在 generated mirror denylist 内；它们只在显式命名时作为 advisory input 消费。
 
 内部 context helper 在匹配排除规则前必须先把输入路径规范化为 repo-relative canonical path；解析后位于当前 repo 外的路径，或 repo 内 symlink 解析后指向 repo 外的路径，必须以 `outside_repo_context_excluded` 排除，除非上游 workflow 明确使用了自己的外部路径合同。
 

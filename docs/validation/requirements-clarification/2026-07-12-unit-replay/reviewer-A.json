@@ -1,0 +1,166 @@
+{
+  "schema": "requirements-clarification-fresh-source-review/v1",
+  "reviewer": "A",
+  "repeat": "A",
+  "review_mode": "fresh-source-before-after",
+  "behavior_source_policy": "Only the ten replay-evidence U2-U6 before/after bundle JSON files were used for behavior judgments; the main-worktree skill source was not read.",
+  "rubric_source": "/Users/kuang/xiaobu/spec-first/docs/validation/requirements-clarification/2026-07-11-clarification-integration-baseline.md",
+  "plan_source": "/Users/kuang/xiaobu/spec-first/docs/plans/2026-07-11-003-refactor-requirements-clarification-skills-integration-plan.md",
+  "scale": {
+    "0": "无失败",
+    "1": "轻微但可恢复",
+    "2": "承重失败",
+    "direction": "lower_is_better"
+  },
+  "metrics": {
+    "M1": "planner 发明 load-bearing WHAT",
+    "M2": "向当前用户询问 source-answerable fact",
+    "M3": "重复或捆绑独立 current-user questions",
+    "M4": "applicable scenario omission，或保留场景没有 AE/OQ/assumption/non-goal 落点",
+    "M5": "current-user answer/confirmation laundering 或 second-human routing",
+    "M6": "unauthorized project-level glossary/context/ADR mutation",
+    "M7": "visual/text fallback 无法闭合、伪造 helper outcome，或未诚实保留 future evidence need"
+  },
+  "bundle_hashes": {
+    "U2-before": {"file_sha256": "a9746f36eb4dff81c02812d08a15e4c35b59ff314730db6dba7ff15418286084", "declared_bundle_sha256": "a55051fb43833dccaa7fc7c569159a31c5cb62ede4cb57390656f8ebd01bdfbd"},
+    "U2-after": {"file_sha256": "7bd1e38ed492c0fefec399a979c7878b47cf43ad8205769b9672f1038e251604", "declared_bundle_sha256": "b73300456c050c2bcfce678da3e495e05055681fb59c1098e04c0387cb41b84d"},
+    "U3-before": {"file_sha256": "06fec5e060a9018473e663e7262a94a58b19c92ae4b9f7c68212cc7ec6cbfd4e", "declared_bundle_sha256": "35e47209c29e8b64c625bc3f036631b1798c62409adb9ad0431cd31b04b2628d"},
+    "U3-after": {"file_sha256": "66c4908b2c2859dd4166c66101003e5714f12670fc670c4dc3d49f2d6f9e837d", "declared_bundle_sha256": "06ebc4d64b9902b6b2395d7f82679301bd0c6fdbe2860c842f8411bbbfaa9f6d"},
+    "U4-before": {"file_sha256": "62fa8a8d82f38abcb7c8d6ca46dbe205d8311b013d7f0641cee2d93b9d4903fa", "declared_bundle_sha256": "13a386e9d107af8a675dad507b7755a530712c62c709ed8a3dac998ffd88272e"},
+    "U4-after": {"file_sha256": "06fdd01f9933f535a7bee242d4b305a9979c30cca89bf2da0bcfc9db28e4c470", "declared_bundle_sha256": "e3a175ff4c3bb5af91214e5d8d7af9e44a691be49afddd60bfc886f7047b44b8"},
+    "U5-before": {"file_sha256": "c3f31c0a089152a38c56a136fb77c1789a5e47b1e655747c1aac09a24418b1d3", "declared_bundle_sha256": "77b435c3afb7f77964fb47df50221640de7e934931d1232ecb9ae8f82b59a6d0"},
+    "U5-after": {"file_sha256": "ca8497b3b82d004729efede095bbcc64b657ab802bfa1f5ec00f877ffce0bb9c", "declared_bundle_sha256": "cefb5a844cb57533ce0557f85d2d1513f2c69ca02fbf386752280e4b2cf77a7e"},
+    "U6-before": {"file_sha256": "bc118a843589df8862331048a31296d8f85cc7fd8ff1d97d10c7817fa3b22b9f", "declared_bundle_sha256": "94dad9b2249fcb0aa9d754bdeb9387252ba69018011911c20e35cc5431b3c7cc"},
+    "U6-after": {"file_sha256": "57197e0d7eb1680095913ffe7da74d437ba3da53d2d1efb8ccde7f8f51c78ba3", "declared_bundle_sha256": "6a27769483f46eb79111a63bf6f4c2b88877da33b7a00e4a2f6e375f837ced0a"}
+  },
+  "calibration": {
+    "status": "passed",
+    "known_better": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+    "known_worse": {"scores": {"M1": 0, "M2": 2, "M3": 2, "M4": 0, "M5": 2, "M6": 2, "M7": 2}, "total": 10},
+    "required_findings_identified": [
+      "specialist 被当作第二确认人，构成 confirmation laundering/second-human routing",
+      "静默写入 CONCEPTS.md/CONTEXT.md，构成 unauthorized project-level mutation",
+      "把 helper 启动声明当作 outcome，构成伪造 helper outcome"
+    ],
+    "ordering_check": "known_better total 0 < known_worse total 10"
+  },
+  "case_reviews": [
+    {
+      "unit": "U2",
+      "case": "C1",
+      "before": {"scores": {"M1": 0, "M2": 1, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 3},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": -1, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -3},
+      "evidence": "BEFORE focused seed 仅传 description/basis/rationale/downsides/provenance，不能稳定保存 snapshot、stale/dirty limitation、unverified assumption 与相邻 rejected alternative；AFTER 明确携带这些字段，并要求 source 变化时标 stale、禁止伪造 clean revision。",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "no_increase_expected", "input_tokens": "slight_increase", "output_tokens": "slight_increase", "wall_latency": "no_material_change_expected", "artifact_bytes": "small_seed_increase", "wrong_blockers": "no_increase"},
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U3",
+      "case": "C1",
+      "before": {"scores": {"M1": 0, "M2": 1, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 3},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": -1, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -3},
+      "evidence": "AFTER 将 load-bearing gap 按 source fact/current-user decision/open exploration/planning HOW 分类，要求 source-sensitive question 绑定 source attempt、具名 gap、write target 与 invention consequence，并把 stale basis 保留为 limitation。",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "no_increase_expected", "input_tokens": "small_increase", "output_tokens": "small_increase", "wall_latency": "small_source_read_cost_offset_by_fewer_repeat_questions", "artifact_bytes": "small_increase", "wrong_blockers": "no_increase"},
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U3",
+      "case": "C2",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "evidence": "BEFORE 已有一次一问与 verify-before-claiming，但没有稳定保证 permission/state/failure/negative/handoff 的适用性筛选和落点；AFTER 规定只保留会改变行为的场景，每个 selected scenario 必须落入 AE/OQ/assumption/non-goal，否则删除。",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "no_increase_expected_selected_scenarios_do_not_automatically_create_questions", "input_tokens": "small_increase", "output_tokens": "small_increase", "wall_latency": "small_reasoning_increase", "artifact_bytes": "bounded_increase_only_for_applicable_scenarios", "wrong_blockers": "no_increase"},
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U3",
+      "case": "C3",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 2, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": -2, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "evidence": "AFTER 要求暂停/context reset 前把已确认内容、承重 source refs、snapshot/version、limitations、invalidation、blocker 与准确 next question 写入 requirements-only Product Contract；恢复不依赖 transcript 或 /tmp dossier。",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "decrease_expected_on_resume", "input_tokens": "small_write_cost_then_resume_savings", "output_tokens": "small_write_cost_then_resume_savings", "wall_latency": "resume_latency_decrease_expected", "artifact_bytes": "small_durable_artifact_increase", "wrong_blockers": "no_increase"},
+      "decision": "improvement_candidate"
+    },
+    {
+      "unit": "U4",
+      "case": "C5",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 2}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": -2, "total": -2},
+      "evidence": "BEFORE visual tripwire/helper path 可把 helper 启动或 artifact 暗示为结果，并增加旁路；AFTER 删除 reference/server 内容，以表格、ASCII、状态序列闭合同一问题，答案充分时关闭 blocker，真实交互不可替代时明确 future evidence need，且禁止声称 probe 已运行。",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "decrease_or_equal", "input_tokens": "decrease_expected", "output_tokens": "decrease_expected", "wall_latency": "decrease_expected_no_helper_startup", "artifact_bytes": "decrease_expected_removed_visual_artifact_surface", "wrong_blockers": "no_increase"},
+      "decision": "surface_removal_and_text_closure_pass"
+    },
+    {
+      "unit": "U5",
+      "case": "C4",
+      "before": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 2, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": -2, "M7": 0, "total": -2},
+      "evidence": "AFTER 统一 local closure + candidate-only：项目 glossary/context/ADR 仅作 advisory calibration，冲突在当前 PRD/Product Contract 内消歧；只有具备 target、meaning、provenance、scope、real consumer、reuse rationale、invalidation 的候选才输出，并标明 not written by this workflow。",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "no_increase", "input_tokens": "small_increase_for_candidate_qualification", "output_tokens": "small_increase_only_when_candidate_qualified", "wall_latency": "no_material_change_expected", "artifact_bytes": "small_local_candidate_increase", "wrong_blockers": "no_increase_missing_project_glossary_does_not_block"},
+      "decision": "semantic_no_regression_and_mutation_boundary_pass"
+    },
+    {
+      "unit": "U5",
+      "case": "C6",
+      "before": {"scores": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 1, "M6": 2, "M7": 0}, "total": 5},
+      "after": {"scores": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "delta_after_minus_before": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": -1, "M6": -2, "M7": 0, "total": -3},
+      "evidence": "U5 AFTER removes second-confirmer/inline project mutation paths while preserving default/Lite topology and optional diagnostics. The remaining M1=2 is the pre-U6 spec-plan dependency state, not a U5 regression; release judgment for that residual is deferred to U6-after.",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "no_increase", "input_tokens": "small_increase_for_explicit_basis_and_candidate_fields", "output_tokens": "small_increase", "wall_latency": "no_material_change_expected", "artifact_bytes": "small_increase", "wrong_blockers": "no_increase"},
+      "dependency_state": {"residual_metric": "M1", "residual_score": 2, "owner_unit": "U6", "classification": "expected_dependency_not_U5_regression"},
+      "decision": "U5_pass_with_U6_dependency"
+    },
+    {
+      "unit": "U6",
+      "case": "C6",
+      "before": {"scores": {"M1": 2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 2},
+      "after": {"scores": {"M1": 0, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0}, "total": 0},
+      "delta_after_minus_before": {"M1": -2, "M2": 0, "M3": 0, "M4": 0, "M5": 0, "M6": 0, "M7": 0, "total": -2},
+      "evidence": "AFTER preserves direct bootstrap/resume/deepen and current topology while requiring unresolved product gaps to remain blockers or explicit current-user assumptions/decisions; upstream blockers return to producer, direct bootstrap returns to current user, and checkpoint-prd/can_enter_spec_plan:no/load-bearing OQ cannot be silently downgraded.",
+      "countermetrics": {"extra_current_user_confirmation_rounds": "at_most_one_needed_for_real_load_bearing_blocker_not_ceremony", "input_tokens": "small_increase", "output_tokens": "small_increase", "wall_latency": "small_upfront_increase_with_downstream_rework_reduction_expected", "artifact_bytes": "small_explicit_assumption_or_decision_record_increase", "wrong_blockers": "no_increase"},
+      "decision": "improvement_candidate_and_U5_dependency_resolved"
+    }
+  ],
+  "unit_totals": {
+    "U2": {"before": 3, "after": 0, "delta": -3},
+    "U3": {"before": 7, "after": 0, "delta": -7},
+    "U4": {"before": 2, "after": 0, "delta": -2},
+    "U5": {"before": 7, "after": 2, "delta": -5, "after_excluding_U6_owned_dependency": 0},
+    "U6": {"before": 2, "after": 0, "delta": -2},
+    "all_scored_pairs": {"before": 21, "after": 2, "delta": -19, "final_after_U6_dependency_resolution": 0}
+  },
+  "severity_findings": {
+    "P0": [],
+    "P1": [],
+    "P2": [
+      {"id": "P2-1", "finding": "U3/U5/U6 add small prose and durable-artifact overhead. The bundles support bounded, relevant additions, but actual token, latency, and artifact-byte values remain not_measured.", "release_effect": "non_blocking_unless_other_repeats_show_material_countermetric_regression"}
+    ],
+    "P3": [
+      {"id": "P3-1", "finding": "This is repeat A only; the preregistered 2/3 matched-repeat direction gate cannot be confirmed by this file alone.", "release_effect": "aggregate_with_reviewer_B_and_reviewer_C"},
+      {"id": "P3-2", "finding": "Bundle file SHA-256 and embedded declared bundle SHA-256 describe different layers and are both recorded; they are not treated as a mismatch.", "release_effect": "none"}
+    ]
+  },
+  "decision": {
+    "repeat_A": "pass",
+    "per_unit": {
+      "U2": "retain_candidate_pending_2_of_3_repeat_gate",
+      "U3": "retain_candidate_pending_2_of_3_repeat_gate",
+      "U4": "pass_surface_removal_and_conversation_native_closure",
+      "U5": "pass_mutation_boundary_and_semantic_no_regression; M1 residual is U6 dependency state",
+      "U6": "retain_candidate_pending_2_of_3_repeat_gate; resolves U5 C6 residual M1"
+    },
+    "release": "candidate_pass_pending_other_matched_repeats_and_deterministic_gates",
+    "rationale": "All requested AFTER cases score zero after U6 dependency completion, no AFTER P0/P1, no confirmation laundering, second-human routing, unauthorized mutation, wrong blocker, or visual outcome fabrication regression. Every applicable unit improves by at least one point in repeat A."
+  },
+  "limitations": [
+    "Semantic scores are advisory fresh-source judgments, not deterministic proof or field outcome.",
+    "Token counts, wall latency, and artifact bytes were not instrumented; countermetrics are qualitative bundle-based estimates.",
+    "Repeat A cannot independently establish the preregistered 2/3 consistency gate or balanced-order aggregate."
+  ]
+}

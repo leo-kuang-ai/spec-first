@@ -18,11 +18,11 @@
       "coverage_tags": ["failure"]
     },
     {
-      "id": "legacy-plan-missing-spec-id",
-      "input": "docs/plans/legacy-plan.md",
-      "context": "The plan has no spec_id frontmatter.",
-      "expected_failure": "missing_spec_id",
-      "expected_next_action": "Do not write an executable task pack; return to spec-plan or produce a draft only.",
+      "id": "source-plan-path-escape",
+      "input": "docs/tasks/path-escape-tasks.md",
+      "context": "The task pack source_plan escapes the selected artifact root even though the hash field is well formed.",
+      "expected_failure": "invalid_contract",
+      "expected_next_action": "Reject the handoff and regenerate it with an artifact-root-relative POSIX source_plan.",
       "coverage_tags": ["failure"]
     },
     {

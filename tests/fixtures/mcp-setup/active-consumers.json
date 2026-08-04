@@ -1,0 +1,449 @@
+{
+  "schema_version": "mcp-setup-active-consumers.v2",
+  "baseline_commit": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+  "captured_at": "2026-07-11T19:30:00+08:00",
+  "entries": [
+    {
+      "id": "setup-runtime",
+      "legacy_surface": "install/detect/configure/verify/normalize/setup-plan 脚本",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/setup.cjs",
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs",
+        "skills/spec-runtime-setup/scripts/lib/preflight.cjs",
+        "skills/spec-runtime-setup/scripts/lib/installation-executor.cjs",
+        "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs",
+        "skills/spec-runtime-setup/scripts/lib/workspace-executor.cjs",
+        "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+        "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+        "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+        "skills/spec-runtime-setup/scripts/lib/renderer.cjs"
+      ],
+      "active_consumers": [
+        "skills/spec-runtime-setup/SKILL.md",
+        "skills/spec-runtime-setup/references/supported-mcp-tools.md",
+        "scripts/run-test-suite.cjs",
+        "tests/unit/mcp-setup-contracts.test.js",
+        "tests/unit/mcp-setup-config-consumers.test.js",
+        "tests/unit/mcp-setup-powershell-contracts.test.js"
+      ]
+    },
+    {
+      "id": "repair-install",
+      "legacy_surface": "repair-install.*",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/setup.cjs",
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs"
+      ],
+      "active_consumers": [
+        "skills/spec-runtime-setup/SKILL.md"
+      ]
+    },
+    {
+      "id": "project-config",
+      "legacy_surface": "bootstrap-project-config.* 与 lib-template.*",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/lib/project-config.cjs"
+      ],
+      "active_consumers": [
+        "skills/spec-runtime-setup/SKILL.md",
+        "tests/unit/mcp-setup-project-config.test.js"
+      ]
+    },
+    {
+      "id": "worktree-health",
+      "legacy_surface": "repair-worktree.* 与 lib-git-health.*",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/lib/worktree-health.cjs",
+        "src/cli/commands/repair-worktree.js"
+      ],
+      "active_consumers": [
+        "src/cli/commands/repair-worktree.js",
+        "tests/unit/mcp-setup-project-config.test.js",
+        "tests/smoke/cli-smoke.test.js"
+      ]
+    },
+    {
+      "id": "uninstall",
+      "legacy_surface": "uninstall-mcp.*",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+        "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+        "skills/spec-runtime-setup/scripts/providers/graphify.cjs"
+      ],
+      "active_consumers": [
+        "skills/spec-runtime-setup/SKILL.md"
+      ]
+    },
+    {
+      "id": "configured-dependencies",
+      "legacy_surface": "scan-configured-deps.* 与 status helper",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/lib/configured-dependencies.cjs",
+        "skills/spec-runtime-setup/scripts/lib/facts.cjs",
+        "skills/spec-runtime-setup/scripts/lib/renderer.cjs"
+      ],
+      "active_consumers": [
+        "src/cli/helpers/setup-facts.js",
+        "tests/unit/mcp-setup-config-consumers.test.js"
+      ]
+    },
+    {
+      "id": "providers",
+      "legacy_surface": "CodeGraph 与 Graphify install/init/refresh 分支",
+      "classification": "absorb",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/providers/codegraph.cjs",
+        "skills/spec-runtime-setup/scripts/providers/graphify.cjs"
+      ],
+      "active_consumers": [
+        "skills/spec-runtime-setup/SKILL.md",
+        "src/cli/host-comparative-workflows.js"
+      ]
+    },
+    {
+      "id": "registry-v8",
+      "legacy_surface": "mcp-tools.json, helper-tools.json, provider-tools.json",
+      "classification": "migrate",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/setup-registry.json",
+        "skills/spec-runtime-setup/setup-registry.schema.json",
+        "skills/spec-runtime-setup/scripts/lib/registry.cjs"
+      ],
+      "active_consumers": [
+        "skills/spec-runtime-setup/SKILL.md",
+        "src/cli/helpers/setup-facts.js",
+        "tests/unit/host-runtime-projection-contracts.test.js",
+        "tests/unit/plugin-modules.test.js"
+      ]
+    },
+    {
+      "id": "jq-retirement",
+      "legacy_surface": "jq hard prerequisite 与 jq-specific 路径",
+      "classification": "retire",
+      "replacement_owner": [
+        "skills/spec-runtime-setup/scripts/lib/registry.cjs",
+        "Node.js JSON.parse / JSON.stringify"
+      ],
+      "active_consumers": []
+    },
+    {
+      "id": "source-consumer-switch",
+      "legacy_surface": "source template、quality gate、test runner、runtime projection 与 package asset tests 中的旧入口引用",
+      "classification": "migrate",
+      "replacement_owner": [
+        "templates/claude/commands/spec/runtime-setup.md",
+        "scripts/run-test-suite.cjs",
+        "scripts/run-ai-dev-quality-gate.js",
+        "src/cli/plugin-sync.js"
+      ],
+      "active_consumers": [
+        "templates/claude/commands/spec/runtime-setup.md",
+        "scripts/run-ai-dev-quality-gate.js",
+        "scripts/run-test-suite.cjs",
+        ".github/workflows/windows-compatibility.yml",
+        "tests/unit/host-runtime-projection-contracts.test.js",
+        "tests/unit/plugin-modules.test.js",
+        "tests/smoke/cli-smoke.test.js",
+        "package.json"
+      ]
+    }
+  ],
+  "legacy_source_inventory": [
+    {
+      "path": "skills/spec-mcp-setup/helper-tools.json",
+      "classification": "migrate",
+      "owner_id": "registry-v8"
+    },
+    {
+      "path": "skills/spec-mcp-setup/mcp-tools.json",
+      "classification": "migrate",
+      "owner_id": "registry-v8"
+    },
+    {
+      "path": "skills/spec-mcp-setup/provider-tools.json",
+      "classification": "migrate",
+      "owner_id": "registry-v8"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/bootstrap-project-config.ps1",
+      "classification": "absorb",
+      "owner_id": "project-config"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/bootstrap-project-config.sh",
+      "classification": "absorb",
+      "owner_id": "project-config"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/check-deps.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/check-deps.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/check-health.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/configure-host.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/configure-host.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/detect-host.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/detect-host.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/detect-tools.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/detect-tools.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/install-helpers.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/install-helpers.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/install-mcp.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/install-mcp.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-git-health.sh",
+      "classification": "absorb",
+      "owner_id": "worktree-health"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-helper-registry.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-helper-registry.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-template.ps1",
+      "classification": "absorb",
+      "owner_id": "project-config"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-template.sh",
+      "classification": "absorb",
+      "owner_id": "project-config"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-toml.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/lib-toml.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/normalize-setup-facts.cjs",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/normalize-setup-facts.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/normalize-setup-facts.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/provider-readiness-renderer.cjs",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/render-status-block.cjs",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/repair-install.ps1",
+      "classification": "absorb",
+      "owner_id": "repair-install"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/repair-install.sh",
+      "classification": "absorb",
+      "owner_id": "repair-install"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/repair-worktree.ps1",
+      "classification": "absorb",
+      "owner_id": "worktree-health"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/repair-worktree.sh",
+      "classification": "absorb",
+      "owner_id": "worktree-health"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/resolve-project-target.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/resolve-project-target.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/scan-configured-deps.cjs",
+      "classification": "absorb",
+      "owner_id": "configured-dependencies"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/scan-configured-deps.ps1",
+      "classification": "absorb",
+      "owner_id": "configured-dependencies"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/scan-configured-deps.sh",
+      "classification": "absorb",
+      "owner_id": "configured-dependencies"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/setup-plan-renderer.cjs",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/uninstall-mcp.ps1",
+      "classification": "absorb",
+      "owner_id": "uninstall"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/uninstall-mcp.sh",
+      "classification": "absorb",
+      "owner_id": "uninstall"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/verify-tools.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/verify-tools.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/write-setup-facts.ps1",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    },
+    {
+      "path": "skills/spec-mcp-setup/scripts/write-setup-facts.sh",
+      "classification": "absorb",
+      "owner_id": "setup-runtime"
+    }
+  ],
+  "jq_reference_inventory": {
+    "classification": "retire",
+    "owner_id": "jq-retirement",
+    "source_paths": [
+      "skills/spec-mcp-setup/helper-tools.json",
+      "skills/spec-mcp-setup/scripts/bootstrap-project-config.sh",
+      "skills/spec-mcp-setup/scripts/check-deps.ps1",
+      "skills/spec-mcp-setup/scripts/check-deps.sh",
+      "skills/spec-mcp-setup/scripts/check-health",
+      "skills/spec-mcp-setup/scripts/check-health.ps1",
+      "skills/spec-mcp-setup/scripts/configure-host.sh",
+      "skills/spec-mcp-setup/scripts/detect-host.sh",
+      "skills/spec-mcp-setup/scripts/detect-tools.sh",
+      "skills/spec-mcp-setup/scripts/install-helpers.ps1",
+      "skills/spec-mcp-setup/scripts/install-helpers.sh",
+      "skills/spec-mcp-setup/scripts/install-mcp.sh",
+      "skills/spec-mcp-setup/scripts/lib-helper-registry.ps1",
+      "skills/spec-mcp-setup/scripts/lib-helper-registry.sh",
+      "skills/spec-mcp-setup/scripts/lib-template.sh",
+      "skills/spec-mcp-setup/scripts/repair-install.sh",
+      "skills/spec-mcp-setup/scripts/uninstall-mcp.sh",
+      "skills/spec-mcp-setup/scripts/verify-tools.ps1",
+      "skills/spec-mcp-setup/scripts/verify-tools.sh",
+      "skills/spec-mcp-setup/scripts/write-setup-facts.sh"
+    ]
+  },
+  "required_consumer_surfaces": [
+    {
+      "category": "repair-worktree CLI",
+      "path": "src/cli/commands/repair-worktree.js"
+    },
+    {
+      "category": "setup facts consumer",
+      "path": "src/cli/helpers/setup-facts.js"
+    },
+    {
+      "category": "source template",
+      "path": "templates/claude/commands/spec/runtime-setup.md"
+    },
+    {
+      "category": "quality gate",
+      "path": "scripts/run-ai-dev-quality-gate.js"
+    },
+    {
+      "category": "test runner",
+      "path": "scripts/run-test-suite.cjs"
+    },
+    {
+      "category": "runtime projection test",
+      "path": "tests/unit/host-runtime-projection-contracts.test.js"
+    },
+    {
+      "category": "package asset test",
+      "path": "tests/unit/plugin-modules.test.js"
+    },
+    {
+      "category": "packed runtime smoke",
+      "path": "tests/smoke/cli-smoke.test.js"
+    }
+  ]
+}

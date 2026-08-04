@@ -4,8 +4,8 @@
 #
 # Location: .spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml
 #
-# PERSISTENSpec-First MODEL:
-# The experiment log on disk is the SINGLE SOURSpec-First OF TRUTH. The agent's
+# PERSISTENCE MODEL:
+# The experiment log on disk is the SINGLE SOURCE OF TRUTH. The agent's
 # in-memory context is expendable and will be compacted during long runs.
 #
 # Write discipline:
@@ -66,6 +66,43 @@ structure:
             type: integer
           judge_cost_usd:
             type: number
+
+  measurement_calibration:
+    type: object
+    required: false
+    description: "Measurement-only A/A and A/B record; never mutation or promotion authority"
+    children:
+      admission_sha256:
+        type: string
+        description: "SHA-256 digest of the normalized frozen admission used by every attempt"
+      normalized_admission:
+        type: object
+        description: "Validated frozen identities, metric, A/A count, thresholds, broken-run policy, and stop budget"
+      baseline_identity:
+        type: string
+      candidate_identity:
+        type: string
+      task_or_corpus_identity:
+        type: string
+      preregistered_acceptance_threshold:
+        type: number
+      aa_attempts:
+        type: array
+      observed_noise_floor:
+        type: number
+      ab_gate:
+        type: object
+        description: "Deterministic allow-ab result; A/B may run only when ab_allowed is true"
+      ab_attempts:
+        type: array
+      broken_run_counts:
+        type: object
+      result:
+        type: enum
+        values: [regression, inconclusive, threshold-clearing-improvement, noise-floor-too-high, blocked]
+      recommendation:
+        type: enum
+        values: [stop, defer, collect-more-evidence, eligible-for-owner-evaluation]
 
   experiments:
     type: array

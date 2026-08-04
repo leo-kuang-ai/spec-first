@@ -1,0 +1,10 @@
+schema_version: 1
+module_path: cli_runtime/cli_runtime_core
+title: cli_runtime_core
+scope:
+    - src/cli/index.js
+    - src/cli/plugin.js
+    - src/cli/runtime-tools-index.js
+source_files: []
+depends_on: []
+related_to: []

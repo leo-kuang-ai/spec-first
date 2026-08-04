@@ -3,7 +3,16 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  GENERATED_RUNTIME_PREFIXES,
+  GENERATED_RUNTIME_ROOTS,
+} = require('./helpers/target-repo');
 const { isSecretDeniedPath } = require('./helpers/secret-deny-patterns');
+const {
+  parseFrontmatterScalarOccurrences,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('./helpers/markdown-frontmatter');
 
 const CANONICALIZATION_VERSION = 'source-plan-body-v1';
 const TASK_PACK_SCHEMA_VERSION = 'task-pack/v1';
@@ -51,92 +60,8 @@ const ALLOWED_REVIEW_GATES = new Set(['optional', 'required']);
 const WINDOWS_RESERVED_NAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;
 const WINDOWS_ILLEGAL_SEGMENT_CHARS = /[<>:"|]/;
 const CONTROL_CHARS = /[\x00-\x1f]/;
-const GENERATED_RUNTIME_MIRROR_PREFIXES = [
-  '.claude/',
-  '.codex/',
-  '.agents/skills/',
-  '.cursor/skills/',
-  '.cursor/spec-first/',
-  '.kiro/skills/',
-  '.kiro/agents/',
-  '.kiro/spec-first/',
-  '.kiro/settings/',
-  '.qoder/commands/spec-',
-  '.qoder/commands/spec/',
-  '.qoder/skills/',
-  '.qoder/agents/',
-  '.qoder/spec-first/',
-];
-const GENERATED_RUNTIME_MIRROR_ROOTS = new Set([
-  '.claude',
-  '.codex',
-  '.agents/skills',
-  '.cursor/skills',
-  '.cursor/spec-first',
-  '.cursor/mcp.json',
-  '.kiro/skills',
-  '.kiro/agents',
-  '.kiro/spec-first',
-  '.kiro/settings',
-  '.qoder/commands/spec',
-  '.qoder/skills',
-  '.qoder/agents',
-  '.qoder/spec-first',
-  '.qoder/settings.local.json',
-]);
-
-function normalizeNewlines(text) {
-  return String(text).replace(/\r\n?/g, '\n');
-}
-
-function splitMarkdownFrontmatter(content) {
-  const normalized = normalizeNewlines(content);
-  const lines = normalized.split('\n');
-
-  if (lines[0] !== '---') {
-    return {
-      frontmatter: '',
-      body: normalized,
-      removedFrontmatter: false,
-      error: null,
-    };
-  }
-
-  const closingIndex = lines.findIndex((line, index) => index > 0 && line === '---');
-  if (closingIndex === -1) {
-    return {
-      frontmatter: '',
-      body: '',
-      removedFrontmatter: false,
-      error: {
-        code: 'frontmatter-invalid',
-        message: 'Frontmatter starts with --- but has no closing --- line.',
-      },
-    };
-  }
-
-  return {
-    frontmatter: lines.slice(1, closingIndex).join('\n'),
-    body: lines.slice(closingIndex + 1).join('\n'),
-    removedFrontmatter: true,
-    error: null,
-  };
-}
-
-function stripQuotes(value) {
-  const trimmed = String(value || '').trim();
-  return trimmed.replace(/^["']|["']$/g, '');
-}
-
-function parseFrontmatterScalars(frontmatter) {
-  const metadata = {};
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    metadata[match[1]] = stripQuotes(match[2]);
-  }
-  return metadata;
-}
+const GENERATED_RUNTIME_MIRROR_PREFIXES = GENERATED_RUNTIME_PREFIXES;
+const GENERATED_RUNTIME_MIRROR_ROOTS = new Set(GENERATED_RUNTIME_ROOTS);
 
 function readMarkdownFile(filePath, codePrefix) {
   if (!filePath || !fs.existsSync(filePath)) {
@@ -242,6 +167,15 @@ function parseTaskPackContract(markdown) {
 function isInsidePath(parentPath, childPath) {
   const relative = path.relative(parentPath, childPath);
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function realpath(value) {
+  const resolver = fs.realpathSync.native || fs.realpathSync;
+  return resolver(value);
+}
+
+function realpathIfExists(value) {
+  return fs.existsSync(value) ? realpath(value) : path.resolve(value);
 }
 
 function isConcreteRepoRelativeFile(filePath) {
@@ -397,14 +331,16 @@ function deriveReasonCode(validity, errors) {
   // invalid: inspect first deterministic error code for a more specific reason
   const first = errors[0] && errors[0].code;
   if (first === 'task-pack-source-plan-file-missing' || first === 'task-pack-source-plan-missing') return 'source_plan_missing';
-  if (first === 'task-pack-missing-spec-id' || first === 'source-plan-missing-spec-id') return 'missing_spec_id';
   if (first && first.includes('contract')) return 'invalid_contract';
   return 'invalid_contract';
 }
 
 function validateTaskPack(taskPackPath, options = {}) {
-  const repoRoot = path.resolve(options.repoRoot || process.cwd());
-  const resolvedTaskPackPath = path.resolve(taskPackPath || '');
+  const repoRoot = realpathIfExists(path.resolve(options.repoRoot || process.cwd()));
+  const taskPackCandidate = path.isAbsolute(taskPackPath || '')
+    ? path.resolve(taskPackPath || '')
+    : path.resolve(repoRoot, taskPackPath || '');
+  const resolvedTaskPackPath = realpathIfExists(taskPackCandidate);
   const errors = [];
   const limitations = [];
   const validation = {
@@ -417,7 +353,9 @@ function validateTaskPack(taskPackPath, options = {}) {
 
   const result = {
     schema_version: 'task-pack-validation/v1',
+    identity_basis: 'source-plan-path+body-hash',
     task_pack_path: resolvedTaskPackPath,
+    artifact_root: repoRoot,
     repo_root: repoRoot,
     task_pack_validity: 'invalid',
     deterministic_handoff: false,
@@ -436,10 +374,24 @@ function validateTaskPack(taskPackPath, options = {}) {
     limitations,
   };
 
+  if (!fs.existsSync(taskPackCandidate) && !isInsidePath(repoRoot, taskPackCandidate)) {
+    addFinding(errors, 'task-pack-file-outside-artifact-root', 'Task pack path must resolve inside artifact root.');
+    result.task_pack_validity = deriveValidity(errors, validation);
+    result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
+    return result;
+  }
+  if (fs.existsSync(taskPackCandidate) && !isInsidePath(repoRoot, resolvedTaskPackPath)) {
+    addFinding(errors, 'task-pack-file-symlink-escape', 'Task pack symlink must resolve inside artifact root.');
+    result.task_pack_validity = deriveValidity(errors, validation);
+    result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
+    return result;
+  }
+
   const taskPackRead = readMarkdownFile(resolvedTaskPackPath, 'task-pack');
   if (taskPackRead.error) {
     addFinding(errors, taskPackRead.error.code, taskPackRead.error.message);
     result.task_pack_validity = deriveValidity(errors, validation);
+    result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
     return result;
   }
 
@@ -449,6 +401,8 @@ function validateTaskPack(taskPackPath, options = {}) {
   }
 
   const metadata = parseFrontmatterScalars(split.frontmatter);
+  const sourcePlanOccurrences = parseFrontmatterScalarOccurrences(split.frontmatter)
+    .filter((occurrence) => occurrence.key === 'source_plan');
   result.task_pack.metadata = metadata;
 
   const requiredMetadata = {
@@ -465,12 +419,10 @@ function validateTaskPack(taskPackPath, options = {}) {
     }
   }
 
-  if (!metadata.spec_id) {
-    validation.spec_id = 'missing';
-    addFinding(errors, 'task-pack-missing-spec-id', 'Task pack is missing spec_id.');
-  }
-
-  if (!metadata.source_plan) {
+  if (sourcePlanOccurrences.length > 1) {
+    validation.source_plan_path = 'invalid';
+    addFinding(errors, 'task-pack-source-plan-duplicate', 'Task pack source_plan must occur exactly once.');
+  } else if (!metadata.source_plan) {
     validation.source_plan_path = 'missing';
     addFinding(errors, 'task-pack-source-plan-missing', 'Task pack is missing source_plan.');
   } else if (!isConcreteRepoRelativeFile(metadata.source_plan)) {
@@ -487,7 +439,14 @@ function validateTaskPack(taskPackPath, options = {}) {
       validation.source_plan_path = 'missing';
       addFinding(errors, 'task-pack-source-plan-file-missing', 'source_plan file does not exist.');
     } else {
-      validation.source_plan_path = 'resolved';
+      const sourcePlanRealPath = realpath(sourcePlanPath);
+      if (!isInsidePath(repoRoot, sourcePlanRealPath)) {
+        validation.source_plan_path = 'invalid';
+        addFinding(errors, 'task-pack-source-plan-symlink-escape', 'source_plan symlink must resolve inside artifact root.');
+      } else {
+        result.source_plan.absolute_path = sourcePlanRealPath;
+        validation.source_plan_path = 'resolved';
+      }
     }
   }
 
@@ -511,14 +470,22 @@ function validateTaskPack(taskPackPath, options = {}) {
         addFinding(errors, 'source-plan-frontmatter-invalid', sourcePlanSplit.error.message);
       } else {
         const sourcePlanMetadata = parseFrontmatterScalars(sourcePlanSplit.frontmatter);
-        if (!sourcePlanMetadata.spec_id) {
-          validation.spec_id = metadata.spec_id ? 'missing' : validation.spec_id;
-          addFinding(errors, 'source-plan-missing-spec-id', 'Source plan is missing spec_id.');
-        } else if (metadata.spec_id && metadata.spec_id !== sourcePlanMetadata.spec_id) {
+        if (metadata.spec_id && sourcePlanMetadata.spec_id && metadata.spec_id !== sourcePlanMetadata.spec_id) {
           validation.spec_id = 'mismatch';
           addFinding(errors, 'task-pack-wrong-chain', 'Task pack spec_id does not match source plan spec_id.');
-        } else if (metadata.spec_id) {
+        } else if (metadata.spec_id && sourcePlanMetadata.spec_id) {
           validation.spec_id = 'matched';
+        } else {
+          validation.spec_id = 'missing';
+          addFinding(
+            limitations,
+            'task-pack-spec-id-trace-missing',
+            'spec_id compatibility trace is missing on the task pack, source plan, or both; source_plan path and hash remain the executable identity.',
+            {
+              task_pack_spec_id: metadata.spec_id ? 'present' : 'missing',
+              source_plan_spec_id: sourcePlanMetadata.spec_id ? 'present' : 'missing',
+            },
+          );
         }
 
         const hashResult = computeSourcePlanHash(result.source_plan.absolute_path);

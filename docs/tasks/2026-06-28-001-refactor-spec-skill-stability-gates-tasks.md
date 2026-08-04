@@ -92,12 +92,12 @@ T001, T002, T003, T005 are independent (Wave 1). T004 requires T003 complete (Wa
       "goal": "Add boundary-context classification to PROHIBITION_HINTS so generated-runtime guardrail lines no longer produce P0 findings; preserve true-positive severity for direct runtime edit instructions.",
       "dependencies": [],
       "files": [
-        "skills/spec-skill-audit/scripts/lib/security-patterns.js",
-        "tests/unit/skill-audit-scripts.test.js"
+        "skills/retired-skill-review/scripts/lib/security-patterns.js",
+        "tests/unit/skill-review-scripts.test.js"
       ],
       "context_refs": [
         "docs/plans/2026-06-28-003-refactor-spec-skill-stability-gates-plan.md#U1",
-        "skills/spec-skill-audit/scripts/scan-instruction-security.js"
+        "skills/retired-skill-review/scripts/scan-instruction-security.js"
       ],
       "entry_hint": "Read the classifyPatternContext function and existing negative-boundary fixtures first.",
       "test_focus": "Fixture: known guardrail lines produce no P0; direct runtime-edit instructions remain P0; remote script pipe patterns unchanged.",
@@ -231,11 +231,11 @@ T001, T002, T003, T005 are independent (Wave 1). T004 requires T003 complete (Wa
 - **goal:** Add boundary-context classification to PROHIBITION_HINTS so generated-runtime guardrail lines no longer produce P0 findings; preserve true-positive severity for direct runtime edit instructions.
 - **dependencies:** []
 - **files:**
-  - `skills/spec-skill-audit/scripts/lib/security-patterns.js`
-  - `tests/unit/skill-audit-scripts.test.js`
+  - `skills/retired-skill-review/scripts/lib/security-patterns.js`
+  - `tests/unit/skill-review-scripts.test.js`
 - **context_refs:**
   - `docs/plans/2026-06-28-003-refactor-spec-skill-stability-gates-plan.md#U1`
-  - `skills/spec-skill-audit/scripts/scan-instruction-security.js`
+  - `skills/retired-skill-review/scripts/scan-instruction-security.js`
 - **entry_hint:** Read `classifyPatternContext` and existing negative-boundary fixtures first.
 - **test_focus:** Fixture: known guardrail lines produce no P0; direct runtime-edit instructions remain P0; remote script pipe patterns unchanged.
 - **done_signal:** `npm run test:unit` passes; known false-positive lines no longer P0 in full scanner run.

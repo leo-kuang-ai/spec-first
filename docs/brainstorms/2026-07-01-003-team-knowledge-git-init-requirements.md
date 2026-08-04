@@ -765,7 +765,7 @@ v1 首批真正接入 team knowledge resolver 的 workflow 只有四个：
 | `$spec-compound`         | 可产出 card 草稿或 contribution 建议，不直接写团队仓     |
 | `$spec-compound-refresh` | 后续版本再接入，用于 card 刷新、合并、废弃                 |
 | `$spec-doc-review`       | 后续版本再接入，用于检查文档是否误把 advisory 写成 confirmed |
-| `$spec-skill-audit`      | 后续版本再接入，用于审查 skill 是否遵守知识边界              |
+| `$retired-skill-review`      | 后续版本再接入，用于审查 skill 是否遵守知识边界              |
 
 ---
 

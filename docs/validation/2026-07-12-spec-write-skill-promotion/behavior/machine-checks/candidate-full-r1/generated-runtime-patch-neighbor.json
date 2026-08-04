@@ -1,0 +1,18 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "base_operation": null,
+    "effect": "not-entered",
+    "modifier": "none",
+    "source_owner_assumption": ".agents/skills/spec-prd/ 是 generated runtime mirror，而非 canonical source。",
+    "case_id": "generated-runtime-patch-neighbor",
+    "route_decision": "路由到 source/runtime maintenance；拒绝直接修补 generated mirror。",
+    "layer_result": "near-neighbor-runtime-maintenance",
+    "response": "不要修改 .agents/skills/spec-prd/SKILL.md。先定位项目拥有的 canonical source（通常由项目规则或 generator 声明），在那里提出变更并验证，再通过项目批准的 init/sync 流程重建 runtime。当前会话是否热加载新版本属于宿主生命周期问题，不能靠手改 mirror 保证；本次不进入 authoring workflow，也不执行 mutation。",
+    "would_modify_paths": [],
+    "would_run_commands": [],
+    "required_references": []
+  }
+}

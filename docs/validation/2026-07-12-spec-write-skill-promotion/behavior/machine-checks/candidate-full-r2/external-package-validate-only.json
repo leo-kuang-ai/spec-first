@@ -1,0 +1,23 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [],
+  "observed": {
+    "layer_result": "validate-only-report",
+    "response": "对 `/tmp/vendor-skill` 做 no-follow、零执行的结构预检：使用可信 bundled validator 盘点文件类型、frontmatter、引用、symlink、special files、资源和脚本；不运行 package 内任何 validator、hook、binary 或 lifecycle，不读取 secret-like 内容，不复制、安装或修改。分别报告 mechanical 结果、语义未验证项和 five-axis readiness；`incomplete` 不得宣称 package-ready。",
+    "would_modify_paths": [],
+    "case_id": "external-package-validate-only",
+    "route_decision": "entered-external-preflight",
+    "base_operation": "revise",
+    "modifier": "none",
+    "would_run_commands": [
+      "node \"$SKILL_DIR/scripts/validate-skill.cjs\" /tmp/vendor-skill --json"
+    ],
+    "source_owner_assumption": "该目录是 repo-external、来源未知的第三方 package，仅可作为只读检查对象。",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/delivery-gates.md"
+    ],
+    "effect": "validate-only"
+  }
+}

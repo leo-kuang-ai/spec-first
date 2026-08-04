@@ -18,17 +18,18 @@ Read this when checking the V15 cache before dispatching `web-researcher`, or wh
 ]
 ```
 
-Files live under `<scratch-dir>/web-research-cache.json`, where `<scratch-dir>` is resolved once in SKILL.md Phase 1 using Node's `os.tmpdir()` plus `spec-first/spec-ideate/<run-id>`.
+Files live under `<scratch-dir>/web-research-cache.json`, where `<scratch-dir>` is the owner-only run-local directory resolved once in SKILL.md Phase 1. It is never reused by another invocation.
 
 ## Reuse check
 
-Before dispatching `web-researcher`, resolve the scratch root (the parent of `<scratch-dir>`) and list sibling run-id directories — refinement loops within a session may legitimately reuse another run's cache by topic, not run-id. Use Node rather than `find` so the lookup works in PowerShell and `cmd.exe` as well as POSIX shells:
+Before dispatching `web-researcher`, resolve the scratch root (the parent of `<scratch-dir>`) in bash and list sibling run-id directories — refinement loops within a session may legitimately reuse another run's cache by topic, not run-id:
 
 ```bash
-node -e "const fs=require('node:fs'); const path=require('node:path'); const root=process.argv[1]; if (!fs.existsSync(root)) process.exit(0); for (const entry of fs.readdirSync(root,{withFileTypes:true})) { if (!entry.isDirectory()) continue; const file=path.join(root,entry.name,'web-research-cache.json'); if (fs.existsSync(file)) console.log(file); }" "<scratch-root>"
+SCRATCH_ROOT="<private-scratch-dir-for-this-run>"
+find "$SCRATCH_ROOT" -maxdepth 2 -name 'web-research-cache.json' -type f 2>/dev/null
 ```
 
-The command exits 0 with empty output when no cache files exist, so the first-run case does not abort the reuse-check step.
+`find` exits 0 with empty output when no cache files exist, so the first-run case does not abort the reuse-check step.
 
 Read each matching file. If any entry's `key` matches the current dispatch (same full mode variant — `repo`, `elsewhere-software`, or `elsewhere-non-software` — plus same case-insensitive normalized focus hint plus same topic surface hash), skip the dispatch and pass the cached `result` to the consolidated grounding summary. Mode variants must match exactly: `elsewhere-software` and `elsewhere-non-software` are distinct domains and must not cross-reuse. Note in the summary: "Reusing prior web research from this session — say 're-research' to refresh."
 

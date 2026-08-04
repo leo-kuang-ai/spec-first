@@ -1,0 +1,16 @@
+{
+  "base_operation": "revise",
+  "case_id": "external-package-validate-only",
+  "effect": "validate-only",
+  "layer_result": "External package inspection is restricted to passive structural validation.",
+  "modifier": "none",
+  "required_references": [
+    "Portable package baseline: directory, SKILL.md, name, and description requirements",
+    "Any explicitly supplied target-host profile, without assuming one"
+  ],
+  "response": "仅做被动结构审查：确认包根目录存在 `SKILL.md`，frontmatter 至少含与目录一致的 kebab-case `name` 和具备 recurring job、正向动作及负向边界的 `description`；检查 references、scripts、assets、evals 是否按条件分支拥有明确用途，context pointer 是否说明读取条件和支持的判断，并标记重复 owner、无完成标准或不必要 prose。不会执行脚本、validator 或 hooks，不跟随 symlink，不复制、安装或修改内容；无法安全读取的项目记为未验证，而非通过。",
+  "route_decision": "authoring-validation-external",
+  "source_owner_assumption": "`/tmp/vendor-skill` is third-party or otherwise externally owned; no canonical source ownership or mutation authority is assumed.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

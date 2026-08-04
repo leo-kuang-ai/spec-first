@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "expected_route": "direct-answer",
+  "actual_route": "direct-answer",
+  "reason_code": "document-summary-neighbor"
+}

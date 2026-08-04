@@ -4,23 +4,27 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { ISSUE_SYNTHESIS_STATUSES } = require('./lib/audit-utils');
+const {
+  APP_AUDIT_METADATA_HOSTS,
+  ISSUE_SYNTHESIS_STATUSES,
+  isGeneratedOrControlPath,
+} = require('./lib/audit-utils');
 
 const ARTIFACT_CONTRACT_STATUSES = new Set(['candidate', 'confirmed', 'rejected', 'degraded']);
 const DATA_SENSITIVITY_VALUES = new Set(['public', 'internal', 'confidential', 'restricted']);
 const RUNTIME_MODES = new Set(['static_only', 'runtime_suggested', 'real_device_suggested']);
 const ISSUE_SEVERITIES = new Set(['blocker', 'high', 'medium', 'low', 'info']);
 const ISSUE_CONTRACT_STATUSES = new Set(['candidate', 'confirmed', 'rejected']);
+const REJECTED_ISSUE_REASON_ACTIONS = new Set(['rejected', 'preserved']);
 const VALIDATION_STATUSES = new Set(['not_required', 'validated', 'validator_rejected', 'validator_unavailable']);
 const SENSITIVE_TEXT_PATTERN = /(https?:\/\/|Authorization\s*[:=]|Bearer\s+|Cookie\s*[:=]|(?:api[_-]?key|access[_-]?token|refresh[_-]?token|client[_-]?secret|token|secret|password|passwd|session(?:id)?|jwt)\s*[:=])/i;
-const METADATA_HOSTS = new Set(['unknown', 'claude', 'codex']);
+const METADATA_HOSTS = new Set(APP_AUDIT_METADATA_HOSTS);
 const DIFF_SCOPE_KINDS = new Set(['git_diff', 'working_tree', 'source_snapshot']);
 const METADATA_STATUSES = new Set(['started', 'complete', 'degraded', 'failed']);
 const TRACEABLE_EVIDENCE_FIELDS = ['file', 'path', 'artifact_id', 'node_id', 'route', 'event', 'key'];
 const PUBLIC_PLACEHOLDER_PATTERN = /^<[A-Za-z0-9._:-]+>$/;
 const FIGMA_REFERENCE_PATH_PATTERN = /^figma-(?:ref|node|file):[a-f0-9]{12}$/;
 const SECRET_PATH_PATTERN = /(?:^|\/)(?:\.env(?:\.|$)|\.npmrc$|\.pypirc$|\.netrc$|\.git-credentials$|.*(?:token|secret|credentials|password|apikey|api_key).*|.*\.(?:pem|key|p12|pfx|keystore|kdbx|mobileprovision|cer)$)/i;
-const GENERATED_OR_CONTROL_PATH_PATTERN = /^(?:\.git(?:\/|$)|\.spec-first\/|\.claude\/|\.codex\/|\.agents\/)/;
 
 function validateArtifact(artifact, options = {}) {
   const errors = [];
@@ -122,7 +126,7 @@ function isSafeSourceInputPath(value) {
   ) {
     return false;
   }
-  if (GENERATED_OR_CONTROL_PATH_PATTERN.test(sourcePath)) return false;
+  if (isGeneratedOrControlPath(sourcePath)) return false;
   if (SECRET_PATH_PATTERN.test(sourcePath)) return false;
   return true;
 }
@@ -202,11 +206,7 @@ function validateAuditReportArtifact(artifact, errors, options = {}) {
   if (!Array.isArray(artifact.rejected_issues)) {
     errors.push(error('rejected_issues', 'rejected_issues_array_required', 'audit report must include rejected_issues array.'));
   } else {
-    artifact.rejected_issues.forEach((issue, index) => validateAuditIssue(issue, index, errors, {
-      ...options,
-      strictIssues: true,
-      issuePrefix: `rejected_issues[${index}]`,
-    }));
+    artifact.rejected_issues.forEach((issue, index) => validateRejectedIssue(issue, index, errors, options));
   }
   if (!Array.isArray(artifact.scope_and_degraded_modes)) {
     errors.push(error('scope_and_degraded_modes', 'scope_degraded_modes_required', 'audit report must expose scope_and_degraded_modes.'));
@@ -229,11 +229,7 @@ function validateIssuesArtifact(artifact, errors, options = {}) {
   if (!Array.isArray(artifact.rejected_issues)) {
     errors.push(error('rejected_issues', 'rejected_issues_array_required', 'issues artifact must include rejected_issues array.'));
   } else {
-    artifact.rejected_issues.forEach((issue, index) => validateAuditIssue(issue, index, errors, {
-      ...options,
-      strictIssues: true,
-      issuePrefix: `rejected_issues[${index}]`,
-    }));
+    artifact.rejected_issues.forEach((issue, index) => validateRejectedIssue(issue, index, errors, options));
   }
 }
 
@@ -293,6 +289,80 @@ function validateAuditIssue(issue, index, errors, options = {}) {
   if (options.strictIssues) {
     validateStrictIssueFields(issue, prefix, errors, options);
   }
+}
+
+// rejected_issues is the deterministic evidence gate's own degradation output: the inputs it
+// exists to absorb (no evidence, no claim_family) can never satisfy the strict issue schema, so
+// strict validation here would make the graceful path unreachable and fail the whole run.
+// Validate identity, the rejection reason_code, and redaction instead, so a headless audit can
+// finish and report the degradation honestly.
+function validateRejectedIssue(issue, index, errors, options = {}) {
+  const prefix = options.issuePrefix || `rejected_issues[${index}]`;
+  if (!issue || typeof issue !== 'object' || Array.isArray(issue)) {
+    errors.push(error(prefix, 'issue_not_object', 'rejected issue must be an object.'));
+    return;
+  }
+  for (const field of ['title', 'severity', 'data_sensitivity']) {
+    requireString(issue, field, errors, prefix);
+  }
+  if (typeof issue.severity === 'string' && !ISSUE_SEVERITIES.has(issue.severity)) {
+    errors.push(error(`${prefix}.severity`, 'invalid_issue_severity', `${prefix}.severity is invalid.`));
+  }
+  if (issue.contract_status !== 'rejected') {
+    errors.push(error(`${prefix}.contract_status`, 'rejected_issue_contract_status_required', 'rejected issue contract_status must be rejected.'));
+  }
+  if (issue.static_confirmed !== false) {
+    errors.push(error(`${prefix}.static_confirmed`, 'rejected_issue_must_not_be_static_confirmed', 'rejected issue must set static_confirmed to false.'));
+  }
+  if (!rejectedIssueReasonCode(issue)) {
+    errors.push(error(
+      `${prefix}.evidence_gate.reason`,
+      'rejected_issue_reason_code_required',
+      'rejected issue must carry a rejection reason_code in evidence_gate.reason or review_lifecycle.',
+    ));
+  }
+  if (!Array.isArray(issue.review_lifecycle) || issue.review_lifecycle.length === 0) {
+    errors.push(error(`${prefix}.review_lifecycle`, 'review_lifecycle_required', 'rejected issue must include review_lifecycle.'));
+  }
+  validateArtifactText(issue.title, `${prefix}.title`, errors, 240);
+  for (const field of ['impact', 'recommendation']) {
+    const value = issue[field];
+    if (Array.isArray(value)) {
+      value.forEach((entry, entryIndex) => validateArtifactText(entry, `${prefix}.${field}[${entryIndex}]`, errors, 500));
+    } else {
+      validateArtifactText(value, `${prefix}.${field}`, errors, 500);
+    }
+  }
+  if (Array.isArray(issue.provenance)) {
+    issue.provenance.forEach((entry, entryIndex) => validateTraceableEvidenceEntry(
+      entry,
+      `${prefix}.provenance[${entryIndex}]`,
+      errors,
+      { requireSource: false, requireTrace: false },
+    ));
+  }
+  validateEvidenceArtifactText(issue.evidence, `${prefix}.evidence`, errors, {
+    requireSource: false,
+    requireTrace: false,
+  });
+  if (issue.affected_surface && typeof issue.affected_surface === 'object' && !Array.isArray(issue.affected_surface)) {
+    validateArtifactPath(issue.affected_surface.file, `${prefix}.affected_surface.file`, errors);
+  }
+}
+
+function rejectedIssueReasonCode(issue) {
+  const gate = issue.evidence_gate;
+  if (gate && typeof gate === 'object' && !Array.isArray(gate)
+    && typeof gate.reason === 'string' && gate.reason.length > 0) {
+    return gate.reason;
+  }
+  if (!Array.isArray(issue.review_lifecycle)) return '';
+  const entry = issue.review_lifecycle.find((current) => current
+    && typeof current === 'object'
+    && REJECTED_ISSUE_REASON_ACTIONS.has(current.action)
+    && typeof current.reason_code === 'string'
+    && current.reason_code.length > 0);
+  return entry ? entry.reason_code : '';
 }
 
 function validateStrictIssueFields(issue, prefix, errors, options = {}) {
@@ -366,10 +436,12 @@ function validateStrictIssueArtifactText(issue, prefix, errors) {
   }
 }
 
-function validateEvidenceArtifactText(evidence, prefix, errors) {
+function validateEvidenceArtifactText(evidence, prefix, errors, options = {}) {
+  const requireSource = options.requireSource !== false;
+  const requireTrace = options.requireTrace !== false;
   if (Array.isArray(evidence)) {
     evidence.forEach((entry, index) => {
-      validateTraceableEvidenceEntry(entry, `${prefix}[${index}]`, errors, { requireSource: true });
+      validateTraceableEvidenceEntry(entry, `${prefix}[${index}]`, errors, { requireSource, requireTrace });
     });
     return;
   }
@@ -377,7 +449,7 @@ function validateEvidenceArtifactText(evidence, prefix, errors) {
   for (const [bucket, values] of Object.entries(evidence)) {
     if (!Array.isArray(values)) continue;
     values.forEach((entry, index) => {
-      validateTraceableEvidenceEntry(entry, `${prefix}.${bucket}[${index}]`, errors, { bucket });
+      validateTraceableEvidenceEntry(entry, `${prefix}.${bucket}[${index}]`, errors, { bucket, requireTrace });
     });
   }
 }
@@ -390,7 +462,7 @@ function validateTraceableEvidenceEntry(entry, pathName, errors, options = {}) {
   if (options.requireSource && (typeof entry.source !== 'string' || entry.source.length === 0)) {
     errors.push(error(`${pathName}.source`, 'evidence_source_required', 'array-shaped evidence entries must include source.'));
   }
-  if (!hasTraceableEvidenceField(entry)) {
+  if (options.requireTrace !== false && !hasTraceableEvidenceField(entry)) {
     errors.push(error(pathName, 'evidence_trace_required', 'evidence entry must include a traceable field.'));
   }
   validateArtifactPath(entry.file, `${pathName}.file`, errors);
@@ -525,7 +597,7 @@ function validateKnownContractArtifact(artifact, errors) {
         requireString(artifact, field, errors);
       }
       if (typeof artifact.host === 'string' && !METADATA_HOSTS.has(artifact.host)) {
-        errors.push(error('host', 'invalid_metadata_host', 'metadata host must be unknown, claude, or codex.'));
+        errors.push(error('host', 'invalid_metadata_host', `metadata host must be one of: ${APP_AUDIT_METADATA_HOSTS.join(', ')}.`));
       }
       if (typeof artifact.status === 'string' && !METADATA_STATUSES.has(artifact.status)) {
         errors.push(error('status', 'invalid_metadata_status', 'metadata status is invalid.'));
@@ -699,4 +771,5 @@ module.exports = {
   validateAuditIssue,
   validateAuditReportArtifact,
   validatePreflightArtifact,
+  validateRejectedIssue,
 };

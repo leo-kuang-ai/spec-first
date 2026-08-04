@@ -1,0 +1,20 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "expected_not_entered_got_validate-only"
+  ],
+  "observed": {
+    "base_operation": null,
+    "case_id": "generated-runtime-patch-neighbor",
+    "effect": "validate-only",
+    "layer_result": "Directly patching a generated runtime mirror is excluded from Skill authoring.",
+    "modifier": "none",
+    "required_references": [],
+    "response": "Do not edit `.agents/skills/spec-prd/SKILL.md`. It is a runtime mirror and a direct patch would be overwritten or contaminate generated state. Identify and revise the canonical source Skill, then use the owning project's generator to refresh the runtime copy. If the canonical source or generator mapping is unknown, request that information before proposing changes.",
+    "route_decision": "near-neighbor-generated-runtime-patch-blocked",
+    "source_owner_assumption": "`.agents/skills/spec-prd/` is generated runtime output, not the canonical source.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

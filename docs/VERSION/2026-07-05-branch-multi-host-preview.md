@@ -61,7 +61,7 @@ Kiro、Qoder、Cursor 三宿主均为**显式 opt-in preview**，不进入 `init
 - 修复 Runtime Setup 在多宿主 runtime 文案中误把当前 host 语义判断为其他宿主的风险（Host Authority And Write Safety：当前入口 host 优先于 PATH/runtime 目录/历史 setup facts）。
 - 修复 Graphify npm 安装/升级后旧 `graphify` symlink 抢占 PATH 导致 provider 判断错误的问题。
 - 修复 Cursor/Kiro/Qoder generated skill runtime context 中 host-native advisory 文案被路径 rewrite 拼接成混合表述的问题。
-- 修复入口归一化过度替换产生的错误路径（如 `.claude/commands/spec-*.mdskill-audit.md`、`.qoder/settings.local.jsonmcp.json`）。
+- 修复入口归一化过度替换产生的错误路径（如 `.claude/commands/spec-*.mdskill-review.md`、`.qoder/settings.local.jsonmcp.json`）。
 - 恢复 `AGENTS.md` 被误删的 `spec-first:bootstrap` managed block 标记，使 start/end 重新配对。
 - 修复 Windows 平台 helper 命令的 PS 5.1 不兼容与 frontmatter 验证默认编码问题。
 

@@ -1,0 +1,27 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: codex
+
+cases:
+  files:
+    - evals/cases/report-only-detects-tenant-bypass.yaml
+    - evals/cases/agent-mode-remains-read-only.yaml
+    - evals/cases/conflicting-scope-fails-early.yaml
+  defaults:
+    timeout_seconds: 300
+    max_turns: 12
+    expect:
+      exit_code: 0
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

@@ -1,74 +1,166 @@
 {
-  "schema_version": "prompt-examples/v1",
+  "schema_version": "spec-first.spec-work.examples/v1",
   "skill": "spec-work",
-  "examples": [
-    {
-      "name": "execute validated task pack without expanding scope",
-      "user_intent": "用户提供一个已经通过 validator 的 task-pack，要求按任务包执行开发。",
-      "expected_posture": "读取 task-pack 和 source_plan，只按 Task Pack Contract 的 task boundaries、files、stop_if、review metadata 执行。",
-      "boundary_note": "不得从 free-form task card 或邻近代码推断新 scope；task pack 是 derived execution input，不是第二份 plan。",
-      "negative_signal": "未声明 expected_side_effects 却修改当前 batch 以外的大量文件。",
-      "context_snippets": ["type: task-pack", "Task Pack Contract", "expected_side_effects"],
-      "source_note": "existing prompt clause: validated task packs are first-class executable work documents",
-      "id": "execute-validated-task-pack-without-expanding-scope",
-      "coverage_tags": ["trigger"]
-    },
-    {
-      "name": "plan target repo missing blocks writes",
-      "user_intent": "用户给出 plan path，但 plan 没有 target_repo，当前 workspace 又可能包含多个 repo。",
-      "expected_posture": "停止并要求 repo scope 或回到 plan/task-pack handoff；不要写入任何 child repo。",
-      "boundary_note": "write, test, review autofix, and commit require a single selected repo or per-task repo scopes。",
-      "negative_signal": "根据 cwd 猜测目标仓库并开始改文件。",
-      "context_snippets": ["target_repo missing", "parent workspace"],
-      "source_note": "current source/runtime governance rule: Workspace Repo Scope in spec-work",
-      "id": "plan-target-repo-missing-blocks-writes",
-      "coverage_tags": ["boundary", "failure"]
-    },
-    {
-      "name": "generated runtime mirror stays read-only for source fixes",
-      "user_intent": "计划要求修复 workflow 或 host runtime behavior，搜索命中 `.claude/` 或 `.agents/skills/`。",
-      "expected_posture": "优先修改 source-of-truth under `skills/`, `agents/`, `templates/`, or `src/cli`; runtime regeneration 是后续步骤。",
-      "boundary_note": "不得手改 generated runtime mirror 来冒充 source fix。",
-      "negative_signal": "直接改 `.claude/`, `.codex/`, or `.agents/skills/` 并把它当成完成。",
-      "context_snippets": ["generated runtime assets", "source-first"],
-      "source_note": "current source/runtime governance rule: Source 与 Runtime boundary in AGENTS.md",
-      "id": "generated-runtime-mirror-stays-read-only-for-source-fixes",
-      "coverage_tags": ["boundary", "failure"]
-    },
-    {
-      "name": "unrelated complexity becomes follow-up",
-      "user_intent": "执行某个计划单元时发现邻近模块有旧债或可重构点。",
-      "expected_posture": "只修当前 plan/task scope；记录 residual risk 或 follow-up，不把 unrelated cleanup 纳入本次 diff。",
-      "boundary_note": "每一行修改都必须追溯到当前计划、task pack 或验证失败。",
-      "negative_signal": "顺手重构未触达的 helper、格式化大量邻近文件或删除预先存在的 dead code。",
-      "context_snippets": ["scope boundaries", "unrelated cleanup"],
-      "source_note": "existing prompt clause: execution stops or returns upstream when scope expands beyond plan/task pack",
-      "id": "unrelated-complexity-becomes-follow-up",
-      "coverage_tags": ["boundary"]
-    },
-    {
-      "name": "durable surface preflight refuses future-only abstraction",
-      "user_intent": "执行一个小型 source 修改时，模型想顺手新增 helper/adapter/service，并用可能的未来复用为理由。",
-      "expected_posture": "先应用 Minimality + Architecture Fit Preflight；如果当前消费者、protected behavior 或 concrete plan/task requirement 都不能证明需要该 abstraction、adapter、wrapper 或 service，就拒绝新增，只在现有 owner 内完成当前 slice。",
-      "boundary_note": "preflight 是注意力提示而非 hard gate；ordinary reuse decision 由既有 reuse recheck 和 Follow Existing Patterns 处理，本 case 只覆盖 future-only-abstraction-refusal 这一单一新增 minimality 信号。",
-      "negative_signal": "接受并新增只为假想未来消费者准备的 future-only abstraction。",
-      "context_snippets": ["future-only-abstraction-refusal"],
-      "source_note": "current source prompt clause: Minimality + Architecture Fit Preflight in spec-work",
-      "id": "durable-surface-preflight-avoids-future-only-architecture-drift",
-      "coverage_tags": ["expected", "boundary", "future-only-abstraction-refusal"]
-    },
-    {
-      "name": "secrets and staging require high-risk boundary",
-      "user_intent": "计划涉及 worktree、delegation、git staging、env 文件或 credentials。",
-      "expected_posture": "使用 batch-owned file set、expected_side_effects 和 secret deny patterns；env copy 必须 opt-in 且 staging 默认拒绝 secrets。",
-      "boundary_note": "允许写入不等于允许 stage；secrets 需要精确 allowlist 和明确 IU 意图。",
-      "negative_signal": "使用 unbounded `git add`, stage `.env`, token, key, or credential paths。",
-      "context_snippets": ["batch-owned files", "secret-deny-patterns.json", "--copy-env"],
-      "source_note": "known failure mode: high-risk execution boundary from skill-agent quality governance plan",
-      "id": "secrets-and-staging-require-high-risk-boundary",
-      "coverage_tags": ["boundary", "failure"]
-    }
+  "source_refs": [
+    "skills/spec-work/SKILL.md",
+    "skills/spec-work/references/work-intake-and-task-pack.md",
+    "skills/spec-work/references/feedback-and-tests.md",
+    "skills/spec-work/references/implementation-quality.md",
+    "skills/spec-work/references/review-findings-followup.md",
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-write-tasks/references/task-pack-schema.md"
   ],
-  "source_refs": ["skills/spec-work/SKILL.md"],
-  "source_ref_authority": "source"
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "valid-task-pack-intake",
+      "input": "mode:agent is not used; execute docs/tasks/example-tasks.md",
+      "expected": "Validate under an explicit artifact root, pin validation/digest/source hash, replay source-plan readiness, pass semantic-fit, then create tracker tasks from Task Pack Contract waves.",
+      "forbidden": ["infer tasks from human-readable cards", "treat validator as semantic approval"]
+    },
+    {
+      "id": "stale-task-pack-rejected",
+      "input": "Task-pack source_plan_hash no longer matches the source plan.",
+      "expected": "Stop before task creation with stale_hash and a copy-ready spec-write-tasks regeneration handoff.",
+      "forbidden": ["continue with cached tasks", "fall back to legacy plan parsing"]
+    },
+    {
+      "id": "metadata-only-source-plan-drift",
+      "input": "Body hash still matches, but source plan frontmatter changed to requirements-only or execution: knowledge-work.",
+      "expected": "Replay plan intake, return source-plan-intake-drift, and suppress code execution.",
+      "forbidden": ["trust body hash as readiness proof"]
+    },
+    {
+      "id": "required-review-p1-block",
+      "input": "A required Task Card completes focused verification and task-scoped review returns one P1 finding.",
+      "expected": "Block dependent waves, apply eligible caller-owned fix, rerun affected verification and one bounded follow-up review; stop if round two still blocks.",
+      "forbidden": ["start the dependent wave", "replace final full review"]
+    },
+    {
+      "id": "required-review-degraded-scope",
+      "input": "Task delta cannot be attributed and task_diff_isolation is degraded.",
+      "expected": "Return a required-review blocker with required_gate_eligible false.",
+      "forbidden": ["claim task-scoped clean"]
+    },
+    {
+      "id": "task-pack-drift-before-next-task",
+      "input": "The task-pack byte digest changes after the first task.",
+      "expected": "Stop before the next task and rerun full validation plus semantic-fit.",
+      "forbidden": ["patch the pinned receipt"]
+    },
+    {
+      "id": "stop-if-blocks-dependent-wave",
+      "input": "The active Task Card stop_if condition is observed.",
+      "expected": "Stop the task and dependent wave and return to plan/task regeneration.",
+      "forbidden": ["create replacement tasks", "weaken stop_if"]
+    },
+    {
+      "id": "direct-plan-does-not-trigger-task-pack-intake",
+      "input": "Execute a direct implementation-ready plan with moderate complexity.",
+      "expected": "Use the existing direct-plan section map; task-pack compilation remains an optional advisory only.",
+      "forbidden": ["auto-compile a task pack", "load task-pack intake for a trivial bare prompt"]
+    },
+    {
+      "id": "reuse-existing-capability",
+      "input": "The requested behavior is already fully provided by a current source-owned helper and its public contract.",
+      "expected": "Choose reuse, verify the existing contract satisfies the active scope, and do not add a wrapper or parallel implementation.",
+      "forbidden": ["new abstraction for symmetry", "duplicate existing capability"]
+    },
+    {
+      "id": "extend-canonical-owner",
+      "input": "A current owner already owns the boundary and needs one focused behavior supported by its existing extension point.",
+      "expected": "Choose extend at the canonical owner, preserve its source-of-truth, and verify downstream consumers.",
+      "forbidden": ["second owner", "unrelated convenience service"]
+    },
+    {
+      "id": "compose-thin-glue",
+      "input": "Two authoritative capabilities must be sequenced and their partial failures exposed to one caller.",
+      "expected": "Choose compose/thin-glue; bound translation, sequencing, failure/degradation routing, and evidence aggregation while leaving domain truth and durable state with participants.",
+      "forbidden": ["copy participant validation rules", "swallow partial failure", "parallel durable truth"]
+    },
+    {
+      "id": "justified-new-boundary",
+      "input": "Existing owners and composition seams would mix responsibilities and the implementation-ready plan explicitly authorizes a new source-owned contract.",
+      "expected": "Choose new with the rejected owner/composition evidence, clear source-of-truth, consumers, failure behavior, and verification.",
+      "forbidden": ["new because it feels cleaner", "runtime mirror as owner"]
+    },
+    {
+      "id": "future-only-wrapper-rejected",
+      "input": "A wrapper has no current consumer and adds no translation, sequencing, safety, or evidence boundary.",
+      "expected": "Do not create it; keep the current path or record a deferred idea without widening scope.",
+      "forbidden": ["future-proofing as authorization"]
+    },
+    {
+      "id": "wrong-owner-reuse-rejected",
+      "input": "A nearby helper looks reusable but belongs to a different domain and would need copied policy to fit.",
+      "expected": "Reject forced reuse, locate the correct owner or return to planning if a new boundary is required.",
+      "forbidden": ["reuse quota", "hide policy in glue"]
+    },
+    {
+      "id": "trivial-non-trigger",
+      "input": "Change one docs sentence without behavior, contract, source-owner, or durable-surface impact.",
+      "expected": "Use the narrow docs/diff check, stay quiet, and do not emit an architecture matrix or material-deviation note.",
+      "forbidden": ["load every architecture reference", "ceremony note"]
+    },
+    {
+      "id": "docs-only-feedback",
+      "input": "Update a schema-backed documentation table with no runtime behavior change.",
+      "expected": "Use schema/render/link or generated-catalog diff checks as the feedback loop and state the non-runtime claim ceiling.",
+      "forbidden": ["invent TDD", "claim host behavior"]
+    },
+    {
+      "id": "contract-first-shared-cli-contract",
+      "input": "Change a shared CLI envelope consumed by three commands before implementing each command-specific behavior.",
+      "expected": "Choose contract-first only for the shared boundary, stabilize its observable input/output/error contract with the earliest runnable check, then close each consumer as a vertical slice.",
+      "forbidden": ["finish all shared abstractions before feedback", "duplicate one test per consumer without a contract reason", "select contract-first by file type"]
+    },
+    {
+      "id": "risk-first-high-loss-parser-change",
+      "input": "Change a legacy parser with uncertain malformed-input behavior and a high-cost rollback if production data is corrupted.",
+      "expected": "Choose risk-first to characterize the highest-loss uncertainty first, keep the slice rollback-friendly, and prove observable parser outcomes before broad cleanup.",
+      "forbidden": ["start with low-risk refactoring", "treat a green mock interaction as parser behavior proof", "select risk-first by keyword"]
+    },
+    {
+      "id": "docs-only-keeps-no-test-exception",
+      "input": "Correct prose in a source-owned reference without changing a contract or runtime behavior.",
+      "expected": "Record the no-test exception, use the narrow docs/diff-shape check, and keep the claim ceiling at source wording only.",
+      "forbidden": ["invent a failing runtime test", "claim TDD history"]
+    },
+    {
+      "id": "green-only-does-not-prove-tdd-history",
+      "input": "A behavior change and its tests are both present in the final diff, but no run-local evidence observed the test fail before implementation.",
+      "expected": "Describe tests as added or updated and verified; do not claim TDD or RED history. Prefer DAMP state/behavior assertions and use mock call counts only when the interaction itself is the contract.",
+      "forbidden": ["infer RED from the final green diff", "prefer interaction counts over observable state by default"]
+    },
+    {
+      "id": "test-double-fidelity-does-not-prove-integration",
+      "input": "A mock-backed test skips serialization, middleware, permissions, retry, and error translation but is presented as end-to-end integration proof.",
+      "expected": "Reject the integration claim, prefer the real implementation or a high-fidelity fake where feasible, and add the narrowest real-object or integration check that observes the skipped seam.",
+      "forbidden": ["call a seam-skipping mock integration evidence", "choose mock before a usable real implementation or fake"]
+    },
+    {
+      "id": "knowledge-work-code-references-not-triggered",
+      "input": "Execute a plan explicitly marked execution: knowledge-work.",
+      "expected": "Load only the non-code production route, read named sources, and produce the deliverable without branch/test/shipping references.",
+      "forbidden": ["code task loop", "shipping workflow", "implementation-quality matrix"]
+    },
+    {
+      "id": "shipping-not-triggered-mid-execution",
+      "input": "One implementation unit is complete but dependent units remain.",
+      "expected": "Continue the execution loop and focused verification; do not load shipping or claim lifecycle completion yet.",
+      "forbidden": ["plan-status complete", "final run artifact"]
+    },
+    {
+      "id": "tracker-defer-not-triggered-without-choice",
+      "input": "Review returned one residual finding, but no residual-gate decision selected tracker filing.",
+      "expected": "Keep the finding in the residual gate; do not load tracker-defer or perform external actions.",
+      "forbidden": ["auto-file ticket", "infer tracker authorization"]
+    },
+    {
+      "id": "non-default-engine-not-triggered-without-capability",
+      "input": "A large plan mentions parallelism, but no callable/authorized goal or workflow engine is available.",
+      "expected": "Use inline or separately authorized workers and record the capability/authorization limitation.",
+      "forbidden": ["copy-paste goal prompt", "host-name capability assumption"]
+    }
+  ]
 }

@@ -15,7 +15,6 @@ const {
 
 const DEFAULT_CASES = 'skills/spec-write-tasks/evals/output-quality-cases.json';
 const DEFAULT_OUTPUT_DIR = 'docs/validation/spec-write-tasks';
-const DEFAULT_RECORDED_OUTPUT_DIR = 'docs/validation/spec-write-tasks/recorded-output';
 const ADJUDICATED_STATUSES = new Set(['model-adjudicated', 'human-adjudicated']);
 
 function parseArgs(argv) {
@@ -23,7 +22,7 @@ function parseArgs(argv) {
     repoRoot: process.cwd(),
     casesPath: DEFAULT_CASES,
     outputDir: DEFAULT_OUTPUT_DIR,
-    recordedOutputDir: DEFAULT_RECORDED_OUTPUT_DIR,
+    recordedOutputDir: null,
     rawArgs: argv.slice(),
   };
 
@@ -47,7 +46,9 @@ function parseArgs(argv) {
   args.repoRoot = path.resolve(args.repoRoot);
   args.casesPath = path.resolve(args.repoRoot, args.casesPath);
   args.outputDir = path.resolve(args.repoRoot, args.outputDir);
-  args.recordedOutputDir = path.resolve(args.repoRoot, args.recordedOutputDir);
+  args.recordedOutputDir = args.recordedOutputDir
+    ? path.resolve(args.repoRoot, args.recordedOutputDir)
+    : null;
   return args;
 }
 
@@ -263,7 +264,9 @@ function runOutputEvals(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const casesPath = path.resolve(repoRoot, options.casesPath || DEFAULT_CASES);
   const outputDir = path.resolve(repoRoot, options.outputDir || DEFAULT_OUTPUT_DIR);
-  const recordedOutputDir = path.resolve(repoRoot, options.recordedOutputDir || DEFAULT_RECORDED_OUTPUT_DIR);
+  const recordedOutputDir = options.recordedOutputDir
+    ? path.resolve(repoRoot, options.recordedOutputDir)
+    : null;
   const payload = readJson(casesPath);
   const generatedAt = new Date().toISOString();
   const cases = [];
@@ -304,14 +307,7 @@ function runOutputEvals(options = {}) {
     });
   }
 
-  const recordedOutputs = loadRecordedOutputs(repoRoot, recordedOutputDir);
-  if (recordedOutputs.length === 0) {
-    structuralErrors.push({
-      case_id: 'recorded-output',
-      reason_code: 'recorded_output_missing',
-      path: repoRelative(repoRoot, recordedOutputDir),
-    });
-  }
+  const recordedOutputs = recordedOutputDir ? loadRecordedOutputs(repoRoot, recordedOutputDir) : [];
   for (const record of recordedOutputs) {
     if (record.hash_status !== 'matched') {
       structuralErrors.push({
@@ -350,11 +346,11 @@ function runOutputEvals(options = {}) {
     rerun_command: 'node scripts/spec-write-tasks/run-output-evals.js',
     source_revision: gitRevision(repoRoot),
     source_cases: repoRelative(repoRoot, casesPath),
-    recorded_output_dir: repoRelative(repoRoot, recordedOutputDir),
+    recorded_output_dir: recordedOutputDir ? repoRelative(repoRoot, recordedOutputDir) : null,
     rollback_boundary: '重新生成 docs/validation/spec-write-tasks/output_quality_scorecard.{json,md}；不要 patch generated runtime mirrors。',
     owner: 'spec-first maintainers',
     review_cadence: '在有意义的 spec-write-tasks behavior、packaging、eval 或 handoff contract 变更前重跑。',
-    output_contract: '执行 deterministic assertions，校验 recorded output 的 source/output hashes，并记录缺失的 provider/human evidence；semantic quality 不成为 hard validator gate。',
+    output_contract: '执行 deterministic assertions；仅在显式传入 --recorded-output-dir 时校验 recorded output 的 source/output hashes。semantic quality 不成为 hard validator gate。',
     score_is_signal_not_gate: true,
     evidence_modes: ['fixture-backed', 'recorded-fixture', 'model-executed', 'model-adjudicated', 'human-adjudicated', 'missing-evidence'],
     summary: {

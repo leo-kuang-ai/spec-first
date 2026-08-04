@@ -1,15 +1,18 @@
 ---
 title: "refactor: confirmed-first code standards extraction"
 type: refactor
-status: active
+status: superseded
 date: 2026-07-05
 spec_id: 2026-07-05-001-standards-acquisition-flow
 supersedes: docs/plans/2026-07-05-001-refactor-standards-acquisition-flow-plan.md
+superseded_by: 2026-07-07 complete retirement of spec-team-standards-governance and downstream standards consumption
 origin_verification_status: not-applicable
 implements_schemas: []
 ---
 
 # refactor: confirmed-first code standards extraction
+
+> Superseded 2026-07-07: the confirmed-first extraction direction was replaced by the complete retirement of `spec-team-standards-governance`, the `docs/standards/**` source surface, and downstream standards consumption. This document remains historical planning evidence only.
 
 ## Summary
 

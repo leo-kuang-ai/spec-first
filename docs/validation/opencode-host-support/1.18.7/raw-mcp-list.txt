@@ -1,0 +1,13 @@
+MCP Servers
+
+user-owned: disabled
+command: /usr/bin/true
+
+sequential-thinking: failed
+reason: Operation timed out after 30000ms
+command: npx -y @modelcontextprotocol/server-sequential-thinking@latest
+
+context7: connected
+command: npx -y @upstash/context7-mcp@latest
+
+server_count: 3

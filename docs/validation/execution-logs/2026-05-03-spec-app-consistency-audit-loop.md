@@ -482,7 +482,7 @@ mcp__gitnexus__.detect_changes({ repo: "/Users/kuang/xiaobu/spec-first-app-consi
 ## Round 04
 
 - 问题描述: 初始 deterministic skill audit 显示 eval readiness 偏弱，`spec-graph-bootstrap` 缺少可复查样例。
-- 修复细节: 运行 `spec-skill-audit`，确认无 P0/P1/P2，但 `eval_readiness` 是主要质量弱点。
+- 修复细节: 运行 `retired-skill-review`，确认无 P0/P1/P2，但 `eval_readiness` 是主要质量弱点。
 - 修复结论: 该问题不是运行时 bug，而是 skill 作为可复用 workflow 的审查输入质量不足。
 - 修复效果: 确定补 eval fixtures，而不是增加脚本状态机。
 
@@ -804,7 +804,7 @@ mcp__gitnexus__.detect_changes({ repo: "/Users/kuang/xiaobu/spec-first-app-consi
 ## Round 50
 
 - 问题描述: 需要最终审查本轮改动是否服务 Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge 链路。
-- 修复细节: 复跑 `spec-skill-audit`，确认无 P0/P1/P2，score signal 为 89(B+)；剩余非完美项主要是 progressive disclosure 的保守信号。
+- 修复细节: 复跑 `retired-skill-review`，确认无 P0/P1/P2，score signal 为 89(B+)；剩余非完美项主要是 progressive disclosure 的保守信号。
 - 修复结论: 本轮修复提高 Graph 节点 readiness facts、workspace routing handoff、eval review input 和 artifact freshness，可治理性提升，没有引入强编排状态机。
 - 修复效果: 多仓 workspace 下 no-source、degraded、dirty freshness 与 session-local GitNexus evidence 的边界更清晰，后续 skill 可以更稳定地消费 GitNexus/code-review-graph readiness。
 
@@ -820,9 +820,9 @@ mcp__gitnexus__.detect_changes({ repo: "/Users/kuang/xiaobu/spec-first-app-consi
 - `npm run lint:skill-entrypoints`: passed, 162 files scanned
 - `npm run build`: passed, `npm pack --dry-run`
 - `git diff --check`: passed
-- `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/spec-graph-bootstrap`: passed, no P0/P1/P2, score signal 89(B+)
+- `node skills/retired-skill-review/scripts/write-audit-artifacts.js --repo . --target skills/spec-graph-bootstrap`: passed, no P0/P1/P2, score signal 89(B+)
 
 ## 剩余风险
 
 - 当前机器没有可用 `pwsh` 行为运行环境；PowerShell 侧通过 source-contract Jest 断言验证，仍建议后续在 Windows runner 上补真实行为测试。
-- `spec-graph-bootstrap/SKILL.md` 仍是较长 skill，skill-audit 保守提示 progressive disclosure=3；本轮不拆分正文到 references，避免在修复 readiness 根因时扩大架构变更。
+- `spec-graph-bootstrap/SKILL.md` 仍是较长 skill，skill-review 保守提示 progressive disclosure=3；本轮不拆分正文到 references，避免在修复 readiness 根因时扩大架构变更。

@@ -1,0 +1,19 @@
+{
+  "arm": "old-full",
+  "repeat": 2,
+  "case_id": "external-package-validate-only",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "near-neighbor",
+    "case_id": "external-package-validate-only",
+    "effect": "Return static structural findings without mutation, installation, copying, or script execution.",
+    "layer_result": "Audit-only and third-party package validation are explicitly outside source authoring.",
+    "modifier": "read-only-static-audit",
+    "required_references": [],
+    "response": "执行有界静态审计：确认顶层 SKILL.md、仅含 name/description 的有效 frontmatter、名称与目录一致、引用资源存在、非空目录有入口指针，并标出绝对路径、越界 symlink、未引用资源和可疑脚本。不得跟随 symlink、执行 quick_validate.py、复制或安装内容；结果按 error/warning/evidence 输出。",
+    "route_decision": "near-neighbor: bounded package audit",
+    "source_owner_assumption": "/tmp/vendor-skill remains externally owned and untrusted.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

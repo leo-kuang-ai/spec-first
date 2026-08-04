@@ -1,0 +1,33 @@
+{
+  "base_operation": "revise",
+  "case_id": "spec-first-project-profile",
+  "effect": "apply",
+  "layer_result": "Portable authoring plus the confirmed spec-first project profile applies.",
+  "modifier": "none",
+  "required_references": [
+    "The spec-first repository's canonical `skills/spec-debug` source",
+    "Governance record schema and ownership rules",
+    "Focused test conventions",
+    "Changelog format",
+    "Project generator instructions and source-to-runtime mapping"
+  ],
+  "response": "修改 canonical `skills/spec-debug` source，而非手改 runtime。先核对 description 的正向、负向和近邻路由，再更新共享执行骨架及仅在特定分支读取的 references；同步治理记录、聚焦 route/output 测试和 Changelog。新增脚本时必须实际运行并证明零意外写入。应用前提供受控路径预览；随后运行项目认可的验证与 forward tests，最后使用项目生成器从 source 重生 runtime，并确认生成差异仅落在映射目标内。任一 ownership、测试或生成步骤失败即停止，不留下手工 runtime 补丁。",
+  "route_decision": "authoring-revise-spec-first",
+  "source_owner_assumption": "The spec-first repository is the single authorized target, and `skills/spec-debug` is its canonical Skill source.",
+  "would_modify_paths": [
+    "<target-repo>/skills/spec-debug/SKILL.md",
+    "<target-repo>/skills/spec-debug/references/<affected-branch>.md",
+    "<target-repo>/<governance-record-for-spec-debug>",
+    "<target-repo>/<focused-tests-for-spec-debug>",
+    "<target-repo>/CHANGELOG.md",
+    "<target-repo>/.agents/skills/spec-debug/<generated-runtime-files>"
+  ],
+  "would_run_commands": [
+    "Inspect the repository's governance, focused-test, Changelog, and generator instructions",
+    "Preview the canonical-source and governance changes and verify repository containment",
+    "Run repository-approved focused route/output tests with raw artifacts and real user requests",
+    "Run any newly added deterministic script and verify zero unintended writes",
+    "Invoke the project generator from canonical source",
+    "Verify generated runtime matches source mappings and run final package checks"
+  ]
+}

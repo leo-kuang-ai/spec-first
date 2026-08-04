@@ -33,7 +33,7 @@
   "key_conclusions": ["下游需要先看到的决策或结果"],
   "changed_facts": ["此 artifact 改变的确定性事实"],
   "unresolved_risks": ["仍相关的风险或未知项"],
-  "evidence_paths": ["tests/unit/example.test.js"],
+  "evidence_paths": ["<test-path>"],
   "evidence_summaries": [
     {
       "kind": "direct-evidence",

@@ -88,7 +88,7 @@ referenced_reviews:
 - current_revision: `082999e2`
 - worktree_status: dirty with unrelated existing changes; implementation must not revert or overwrite unrelated work
 - confidence: high for desired source boundary; medium for final route quality until fixture/fresh-source evidence exists
-- limitations: this plan was written from current source and review evidence; no source edits or tests were executed during planning. The canonical eval-fixture contract (`skills/spec-skill-audit/scripts/eval-fixture-normalizer.js`, `tests/unit/eval-fixture-contracts.test.js`, `docs/contracts/workflows/eval-fixture-contract.md`) was read to align U4’s fixture shape, but the new fixture has not yet been run through `normalizeFixtureFile` / `validateNormalizedCases`; the implementer must run `tests/unit/eval-fixture-contracts.test.js` after creating it.
+- limitations: this plan was written from current source and review evidence; no source edits or tests were executed during planning. The canonical eval-fixture contract (`skills/retired-skill-review/scripts/eval-fixture-normalizer.js`, `tests/unit/eval-fixture-contracts.test.js`, `docs/contracts/workflows/eval-fixture-contract.md`) was read to align U4’s fixture shape, but the new fixture has not yet been run through `normalizeFixtureFile` / `validateNormalizedCases`; the implementer must run `tests/unit/eval-fixture-contracts.test.js` after creating it.
 
 ---
 
@@ -138,7 +138,7 @@ referenced_reviews:
 - `tests/unit/public-workflow-contract-summary.test.js`: ensures public workflows expose required compact contract summary.
 - `tests/unit/project-graph-consumption-contracts.test.js`: ensures `spec-brainstorm` keeps project graph optional and user-led.
 - `skills/using-spec-first/evals/routing-cases.json`: example of routing fixtures as examples-as-context rather than deterministic router.
-- `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js`: source-owned canonical normalizer (`spec-first.workflow-eval-fixtures.v1`) that the new U4 fixture must satisfy.
+- `skills/retired-skill-review/scripts/eval-fixture-normalizer.js`: source-owned canonical normalizer (`spec-first.workflow-eval-fixtures.v1`) that the new U4 fixture must satisfy.
 - `tests/unit/eval-fixture-contracts.test.js`: global contract test that walks every `skills/**/evals/*.json`; the new fixture is auto-covered here.
 - `docs/contracts/workflows/eval-fixture-contract.md`: canonical envelope and tag-dependent `expected_outcome` rules.
 
@@ -336,7 +336,7 @@ The implementation should make the `S` path sharper without moving the whole `B`
 **Binding constraint — the canonical eval-fixture contract already governs this file.**
 
 Any `skills/**/evals/*.json` is automatically walked and validated by:
-- source-owned normalizer: `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js` (canonical `schema_version: "spec-first.workflow-eval-fixtures.v1"`)
+- source-owned normalizer: `skills/retired-skill-review/scripts/eval-fixture-normalizer.js` (canonical `schema_version: "spec-first.workflow-eval-fixtures.v1"`)
 - global contract test: `tests/unit/eval-fixture-contracts.test.js` → `all source eval JSON files normalize and validate with unique ids per skill`
 - contract doc: `docs/contracts/workflows/eval-fixture-contract.md`
 
@@ -590,7 +590,7 @@ Fresh-source eval is a required closeout decision, not optional: after source ed
 - **Brainstorm references:** `skills/spec-brainstorm/references/requirements-capture.md`, `skills/spec-brainstorm/references/synthesis-summary.md`, `skills/spec-brainstorm/references/handoff.md`
 - **Neighbor skill boundaries:** `skills/spec-ideate/SKILL.md`, `skills/spec-prd/SKILL.md`, `skills/using-spec-first/SKILL.md`
 - **Existing tests:** `tests/unit/spec-brainstorm-contracts.test.js`, `tests/unit/public-workflow-contract-summary.test.js`, `tests/unit/project-graph-consumption-contracts.test.js`
-- **Canonical eval-fixture contract:** `skills/spec-skill-audit/scripts/eval-fixture-normalizer.js`, `tests/unit/eval-fixture-contracts.test.js`, `docs/contracts/workflows/eval-fixture-contract.md`
+- **Canonical eval-fixture contract:** `skills/retired-skill-review/scripts/eval-fixture-normalizer.js`, `tests/unit/eval-fixture-contracts.test.js`, `docs/contracts/workflows/eval-fixture-contract.md`
 - **Fixture precedent:** `skills/using-spec-first/evals/routing-cases.json`
 - **Role contract:** `docs/10-prompt/结构化项目角色契约.md`
 

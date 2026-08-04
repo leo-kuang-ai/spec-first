@@ -1,0 +1,1 @@
+{"reason":"真实请求是显式重新生成 Codex 和 Claude 的受管 runtime skills，属于 runtime maintenance，而非修改 source skill；using-spec-first 将其路由到终端维护命令 `spec-first init`。本次仅评估入口，未执行命令或修改文件。","entrypoint":"using-spec-first","handoff_target":"spec-first init","loaded_skills":["using-spec-first"],"invocation_mode":"none","effect":"not-entered"}

@@ -30,7 +30,8 @@
         "codex",
         "cursor",
         "kiro",
-        "qoder"
+        "qoder",
+        "opencode"
       ]
     },
     "entrySurface": {
@@ -94,6 +95,7 @@
             "cursor",
             "kiro",
             "qoder",
+            "opencode",
             null
           ]
         },
@@ -105,7 +107,8 @@
             "codex",
             "cursor",
             "kiro",
-            "qoder"
+            "qoder",
+            "opencode"
           ],
           "properties": {
             "claude": {
@@ -122,6 +125,31 @@
             },
             "qoder": {
               "$ref": "#/$defs/hostDelivery"
+            },
+            "opencode": {
+              "$ref": "#/$defs/hostDelivery"
+            }
+          }
+        },
+        "legacy_aliases": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "skill_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "command_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
             }
           }
         }

@@ -1,0 +1,8 @@
+{
+  "schema_version": "spec-write-skill.promotion-limitations/v1",
+  "limitations": [
+    "The current route runner captured tokens and raw events but did not capture wall-clock duration; route duration_ms is therefore recorded as 0 with duration_status=not_captured_by_source_run.",
+    "Blind semantic review was scoped to the two authoring-output cases; non-authoring near-neighbor reviewer artifacts are explicitly not_run and are not promotion cases.",
+    "Semantic comparison is scoped to the two authoring-output cases; all eight cases still retain double-run deterministic machine evidence."
+  ]
+}

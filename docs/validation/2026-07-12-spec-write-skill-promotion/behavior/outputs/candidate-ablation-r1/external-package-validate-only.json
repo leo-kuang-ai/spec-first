@@ -1,0 +1,16 @@
+{
+  "base_operation": "revise",
+  "case_id": "external-package-validate-only",
+  "effect": "validate-only",
+  "layer_result": "Static portable-baseline validation only; external package contents remain isolated.",
+  "modifier": "none",
+  "required_references": [
+    "/tmp/vendor-skill/SKILL.md",
+    "Non-symlink package manifest and directly referenced package files"
+  ],
+  "response": "执行纯静态结构检查：确认目录含 `SKILL.md`，frontmatter 至少有 kebab-case `name` 和同时覆盖 recurring job、正向触发及负向边界的 `description`，目录名与 name 一致；检查正文是否给出完整执行、失败和交接条件，并核对 references/scripts/assets/evals 是否按条件归属且引用有效。保留未知元数据。不会运行 validator、脚本或 hooks，不跟随 symlink，不读取包外目标，也不复制、安装或修改。报告按 error/warning/note 列出证据路径和修复建议。",
+  "route_decision": "External package readiness review, restricted to validate-only static inspection.",
+  "source_owner_assumption": "The package is third-party or otherwise externally owned; no canonical source or mutation authority is assumed.",
+  "would_modify_paths": [],
+  "would_run_commands": []
+}

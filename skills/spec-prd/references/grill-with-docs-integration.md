@@ -35,6 +35,8 @@ Do not skip this mode merely because the input looks small. First perform source
 
 This section is the package-local source snapshot for the upstream benchmark. It makes `spec-prd` self-contained at runtime: agents read this reference, not `/Users/kuang/xiaobu/skills/...`, to recover the original `grill-with-docs` execution discipline. The snapshot anchors behavior only; the adapted `spec-prd` rules below remain the executable local contract. Do not expose these upstream files as separate public entrypoints, and do not copy their artifact topology over the PRD chain.
 
+The embedded upstream snapshot is historical input, not mutation authorization. Any quoted instruction to create or update glossary/context/ADR files is superseded by the adapted candidate-only contract below.
+
 Snapshot source paths and date:
 
 - `/Users/kuang/xiaobu/skills/skills/engineering/grill-with-docs/SKILL.md`
@@ -47,7 +49,7 @@ Snapshot source paths and date:
 ```md
 ---
 name: grill-with-docs
-description: A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.
+description: A relentless interview to sharpen a plan or design through source-first questions and concrete scenarios.
 disable-model-invocation: true
 ---
 
@@ -74,44 +76,12 @@ If a question can be answered by exploring the codebase, explore the codebase in
 ```md
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+description: Build and sharpen a project's domain model by clarifying terminology, boundaries, and decisions.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
-
-## File structure
-
-Most repos have a single context:
-
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
-
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
-
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
-
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Actively sharpen the domain model by challenging terms, inventing relevant edge-case scenarios, and making decisions explicit in the current requirements artifact.
 
 ## During the session
 
@@ -130,22 +100,6 @@ When domain relationships are being discussed, stress-test them with specific sc
 ### Cross-reference with code
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
-
-### Update CONTEXT.md inline
-
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
-
-### Offer ADRs sparingly
-
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse** — the cost of changing your mind later is meaningful
-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
 ```
 
 ## Original Behavior Contract
@@ -178,135 +132,47 @@ Continue this loop relentlessly by default, walking down each branch. A branch s
 
 ## Context Topology
 
-Most repos have one context:
+Read existing `CONTEXT.md`, `CONTEXT-MAP.md`, project glossary, and ADR files only as advisory calibration sources when relevant. A filename, age, or canonical label does not automatically override the PRD-local meaning. Missing topology never blocks planning after the PRD closes the current release meaning.
 
-```text
-/
-+-- CONTEXT.md
-+-- docs/
-|   +-- adr/
-|       +-- 0001-event-sourced-orders.md
-|       +-- 0002-postgres-for-write-model.md
-+-- src/
-```
-
-Repos with multiple contexts use a root `CONTEXT-MAP.md`:
-
-```text
-/
-+-- CONTEXT-MAP.md
-+-- docs/
-|   +-- adr/
-+-- src/
-    +-- ordering/
-    |   +-- CONTEXT.md
-    |   +-- docs/adr/
-    +-- billing/
-        +-- CONTEXT.md
-        +-- docs/adr/
-```
-
-Infer topology in this order:
-
-1. If `CONTEXT-MAP.md` exists, read it and route to the matching context.
-2. If only a root `CONTEXT.md` exists, use the root context.
-3. If neither exists, create a root `CONTEXT.md` lazily when the first project-specific term is resolved.
-4. If multiple contexts exist but ownership is unclear, ask one context-routing question before writing.
-
-Create files lazily, only when there is something resolved to write. Do not create `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` as empty ceremony.
+Never create or update topology in this workflow. If cross-release reuse is qualified, the candidate records the target kind/path that a later explicit knowledge-maintenance or document-editing request may choose to use.
 
 ## CONTEXT.md Format
 
-`CONTEXT.md` is a glossary and nothing else. Do not use it as a spec, scratch pad, implementation decision log, planning artifact, or repository for HOW.
+Close the current release terminology in the PRD-local `Glossary`, `Decision Notes`, or `Evidence And Assumptions`. A project-level context candidate is candidate-only and not written by this workflow.
 
-When a term is resolved, update the relevant `CONTEXT.md` inline before continuing the interview. Do not batch resolved terms for the end.
-
-Use this structure:
+When qualified, use this candidate shape:
 
 ```md
-# {Context Name}
-
-{One or two sentence description of what this context is and why it exists.}
-
-## Language
-
-**Order**:
-{A one or two sentence description of the term}
-_Avoid_: Purchase, transaction
-
-**Invoice**:
-A request for payment sent to a customer after delivery.
-_Avoid_: Bill, payment request
-
-**Customer**:
-A person or organization that places orders.
-_Avoid_: Client, buyer, account
+target kind/path: <CONTEXT/glossary path candidate>
+proposed meaning: <definition or decision>
+provenance: <PRD/source refs>
+applicability scope: <where it applies>
+real consumer: <who will use it>
+reuse rationale: <why it belongs beyond this release>
+invalidation condition: <what makes it stale>
+write status: not written by this workflow
 ```
 
-Rules:
-
-- Be opinionated: pick the best term and list confusing alternatives under `_Avoid_`.
-- Keep definitions tight: one or two sentences max.
-- Define what the term IS, not what it DOES.
-- Include only project/domain-specific terms. General engineering concepts such as timeout, retry, error type, cache, or pagination do not belong unless they are uniquely defined business concepts in this context.
-- Group terms under subheadings when natural clusters emerge; otherwise keep a flat `## Language` section.
-
-For multi-context repos, a root `CONTEXT-MAP.md` lists contexts and relationships:
-
-```md
-# Context Map
-
-## Contexts
-
-- [Ordering](./src/ordering/CONTEXT.md) - receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md) - generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/CONTEXT.md) - manages warehouse picking and shipping
-
-## Relationships
-
-- **Ordering -> Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
-- **Fulfillment -> Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
-- **Ordering <-> Billing**: Shared types for `CustomerId` and `Money`
-```
-
-Only create or update `CONTEXT-MAP.md` when multiple contexts are actually needed and their relationships are known enough to record. A single small PRD increment does not need a map.
+Keep definitions concise and domain-specific. Missing any qualification keeps the result PRD-local.
 
 ## ADR Format
 
-Offer ADRs sparingly. Create or update an ADR only when all three conditions are true:
+Offer an ADR candidate only when all three conditions are true:
 
 1. **Hard to reverse** - changing the decision later has meaningful cost.
 2. **Surprising without context** - a future reader would wonder why the decision was made.
 3. **Real tradeoff** - there were genuine alternatives and one was chosen for specific reasons.
 
-If any condition is missing, do not create an ADR. Keep the decision in PRD `Decision Notes`, `Evidence And Assumptions`, or `Scope Boundaries`.
-
-ADRs live in `docs/adr/` for system-wide decisions or the relevant context's `docs/adr/` for context-specific decisions. Create the directory lazily when the first ADR is needed. Scan existing ADRs for the highest number and increment it with `0001-slug.md`, `0002-slug.md`, and so on.
-
-Minimal template:
-
-```md
-# {Short title of the decision}
-
-{One to three sentences: what's the context, what did we decide, and why.}
-```
-
-Optional sections are allowed only when they add genuine value:
-
-- `Status` frontmatter: `proposed`, `accepted`, `deprecated`, or `superseded by ADR-NNNN`
-- `Considered Options`
-- `Consequences`
-
-Good ADR candidates include architectural shape, integration patterns between contexts, lock-in technology choices, ownership and scope boundaries, deliberate deviations from the obvious path, constraints not visible in code, and non-obvious rejected alternatives.
+If any condition is missing, keep the decision PRD-local. Even when all conditions hold, emit only the candidate shape above with an ADR target kind/path; never create or update the ADR in this workflow.
 
 ## Spec-PRD Persistence Rules
 
-This mode adds durable context/decision updates, but it does not replace the PRD artifact:
+This mode adds durable PRD-local closure and candidate-only handoff; it does not replace the PRD artifact:
 
 - Keep writing the PRD requirements artifact under `docs/brainstorms/*-requirements.md`.
 - Fold resolved terms, decisions, source contradictions, assumptions, and blockers into PRD-local sections so `spec-plan` does not need to read context files to recover the requirements.
-- When a term is resolved, update `CONTEXT.md` inline before moving to the next question.
-- When an ADR-worthy decision is resolved, create the ADR inline before moving to the next branch.
-- Treat an owner answer, accepted recommendation, or confirmed source evidence as the confirmation for that specific glossary/ADR write. Do not create unrelated context files without a resolved term or decision.
-- Record updated `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR paths in the PRD closeout summary.
+- Keep project-level files unchanged before and after create, refine, and validate runs.
+- When a term or decision has qualified cross-release value, record the complete promotion candidate after PRD-local closure.
+- Product confirmation authorizes PRD WHAT; it does not authorize project-level glossary/context/ADR mutation.
+- Record candidate targets and `not written by this workflow` in the PRD closeout summary.
 - Do not edit generated runtime mirrors (`.claude/`, `.codex/`, `.agents/skills/`) as part of this mode.

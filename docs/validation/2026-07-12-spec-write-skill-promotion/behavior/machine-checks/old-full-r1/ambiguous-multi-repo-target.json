@@ -1,0 +1,36 @@
+{
+  "result": "fail",
+  "route_high_risk_misroute": true,
+  "reasons": [
+    "ambiguous_target_write",
+    "effect_mismatch:Block bulk mutation until each repository's authoritative source and projection model are established.",
+    "base_operation_mismatch:revise-skill"
+  ],
+  "observed": {
+    "base_operation": "revise-skill",
+    "case_id": "ambiguous-multi-repo-target",
+    "effect": "Block bulk mutation until each repository's authoritative source and projection model are established.",
+    "layer_result": "authoring-blocked-source-discovery",
+    "modifier": "three repositories with uncertain source ownership",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "不能按文件名盲目批改。先为三个仓库分别建立 owner map：候选 source、generated mirrors、治理记录、生成命令和仓库级约束；以生成配置、治理记录和 source/runtime contract 为证据分类。随后给出逐仓 preview，只有确认属于 source 的 `skills/<name>/` 才进入改写；mirror 只通过各仓库声明的生成流程更新。若任一仓库仍有多个可信 source，暂停该仓库并请求一次明确选择，其他已确认仓库可独立继续。",
+    "route_decision": "Perform read-only source-owner discovery and preview first; mutate only unambiguous source owners.",
+    "source_owner_assumption": "Unknown per repository; same name and path shape are insufficient evidence of common ownership.",
+    "would_modify_paths": [
+      "<repo-a>/skills/<name>/** (only if confirmed source)",
+      "<repo-b>/skills/<name>/** (only if confirmed source)",
+      "<repo-c>/skills/<name>/** (only if confirmed source)",
+      "each confirmed repository's governance/tests/docs as required",
+      "generated mirrors only through each repository's projector"
+    ],
+    "would_run_commands": [
+      "rg --files across each repository to locate skill, governance, generation, and project-instruction files",
+      "repository-specific focused validation after ownership is confirmed",
+      "git diff --check in each modified repository"
+    ]
+  }
+}

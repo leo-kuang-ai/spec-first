@@ -1,0 +1,17 @@
+{
+  "schema_version": "worker-dispatch-state-observation/v1",
+  "capture_owner": "Claude Code session /root",
+  "captured_at": "2026-07-29T15:07:12.000Z",
+  "pre_observed_at": "2026-07-29T15:06:50.000Z",
+  "post_observed_at": "2026-07-29T15:07:10.000Z",
+  "pre_state_ref": "docs/validation/worker-dispatch/2026-07-29-pre-snapshot.txt",
+  "post_state_ref": "docs/validation/worker-dispatch/2026-07-29-post-snapshot.txt",
+  "pre_state_sha256": "fb2875e442c69b48ad547758850ac92ddb634332d32d5ac8aa4c9111c26892aa",
+  "post_state_sha256": "fb2875e442c69b48ad547758850ac92ddb634332d32d5ac8aa4c9111c26892aa",
+  "mutation_scope": "forbidden",
+  "mutation_observation": "within-scope",
+  "observed_surfaces": [
+    "repo:spec-first:git-tree"
+  ],
+  "run_owned_mutation_detected": false
+}

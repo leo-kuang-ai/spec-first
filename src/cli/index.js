@@ -6,6 +6,8 @@ const { runClean } = require('./commands/clean');
 const { runDoctor } = require('./commands/doctor');
 const { runInit } = require('./commands/init');
 const { runInternal } = require('./commands/internal');
+const { runPlans } = require('./commands/plans');
+const { runQuickstart } = require('./commands/quickstart');
 const { runRepairWorktree } = require('./commands/repair-worktree');
 const { runSession } = require('./commands/session');
 const { runTasks } = require('./commands/tasks');
@@ -61,6 +63,14 @@ async function runCli(argv) {
     return Promise.resolve(runTasks(args.slice(1)));
   }
 
+  if (cmd === 'plans') {
+    return Promise.resolve(runPlans(args.slice(1)));
+  }
+
+  if (cmd === 'quickstart') {
+    return runQuickstart(args.slice(1));
+  }
+
   if (cmd === 'repair-worktree') {
     return Promise.resolve(runRepairWorktree(args.slice(1)));
   }
@@ -80,7 +90,7 @@ async function runCli(argv) {
 }
 
 function shouldRunVersionReminder(cmd, subcommandArgs) {
-  if (cmd !== 'doctor' && cmd !== 'init' && cmd !== 'clean' && cmd !== 'update') {
+  if (cmd !== 'doctor' && cmd !== 'init' && cmd !== 'clean' && cmd !== 'update' && cmd !== 'quickstart') {
     return false;
   }
   return !subcommandArgs.some((arg) => arg === '-h' || arg === '--help');
@@ -114,7 +124,7 @@ function parseStartupReminderArgs(args) {
   };
 
   const setHost = (host) => {
-    if (host !== 'claude' && host !== 'codex') {
+    if (host !== 'claude' && host !== 'codex' && host !== 'qoder') {
       parsed.error = `invalid host "${host}"`;
       return;
     }
@@ -137,6 +147,10 @@ function parseStartupReminderArgs(args) {
       setHost('codex');
       continue;
     }
+    if (arg === '--qoder') {
+      setHost('qoder');
+      continue;
+    }
     if (arg === '--reset') {
       parsed.reset = true;
       continue;
@@ -149,7 +163,7 @@ function parseStartupReminderArgs(args) {
   }
 
   if (!parsed.error && !parsed.host) {
-    parsed.error = 'missing host selector (--claude or --codex)';
+    parsed.error = 'missing host selector (--claude, --codex, or --qoder)';
   }
 
   return parsed;
@@ -157,18 +171,20 @@ function parseStartupReminderArgs(args) {
 
 function printHelp(withErrorPrefix = false) {
   const lines = [
-    '🚀 spec-first — Manage spec-first workflow assets for Claude Code, Codex, Kiro, Qoder, and Cursor generated-runtime preview',
+    '🚀 spec-first — Manage spec-first workflow assets for Claude Code, Codex, Kiro, Qoder, Cursor preview, and OpenCode preview',
     '',
     '📘 Usage:',
     '  spec-first <command> [options]',
     '',
     '🧩 Commands:',
     '  doctor                 Check environment, runtime asset manifest, and managed runtime assets',
-    '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
+    '  quickstart [-y|--yes]  Detect Node/Git/host CLIs, then hand off to `init` (auto-selects host when exactly one is detected)',
+    '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
     '  update                 Upgrade the spec-first CLI package and refresh runtime assets with `spec-first init`',
-    '  clean (--claude|--codex|--cursor|--kiro|--qoder) Remove spec-first managed assets from the current project',
+    '  clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',
     '  repair-worktree        Preview broken worktree pointer repair guidance',
     '  tasks <subcommand>      Hash and validate derived task packs',
+    '  plans <subcommand>      Read-only plan lifecycle audit (`plans audit`)',
     '  session <subcommand>    Opt-in multi-actor session advisory (register|list|heartbeat|unregister)',
     '',
     '🪝 Installed workflow entrypoints are provided by the host after `spec-first init`.',
@@ -209,9 +225,9 @@ function printVersion() {
 
     5. 在对话中使用当前宿主对应入口开始工作流
 
-       例如: spec-plan、spec-work、spec-code-review、spec-mcp-setup
+       例如: spec-plan、spec-work、spec-code-review、spec-runtime-setup
        注意: 这些是宿主 workflow 入口，不是 package CLI 子命令
-       Cursor 需要显式运行 spec-first init --cursor，且当前 loader validation unavailable；它只代表 generated-runtime preview。
+       Cursor/OpenCode 需要显式运行 spec-first init --cursor / --opencode，且当前 loader validation unavailable；它们只代表 generated-runtime preview。
 
   了解更多:
     https://github.com/sunrain520/spec-first

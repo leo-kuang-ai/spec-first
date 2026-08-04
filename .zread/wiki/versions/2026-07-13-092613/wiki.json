@@ -1,0 +1,207 @@
+{
+  "id": "2026-07-13-092613",
+  "generated_at": "2026-07-13T01:26:13.920305Z",
+  "language": "zh",
+  "pages": [
+    {
+      "slug": "1-xiang-mu-gai-lan-ai-coding-harness-de-ding-wei-yu-jie-zhi",
+      "title": "项目概览：AI Coding Harness 的定位与价值",
+      "file": "1-xiang-mu-gai-lan-ai-coding-harness-de-ding-wei-yu-jie-zhi.md",
+      "section": "快速开始",
+      "level": "Beginner"
+    },
+    {
+      "slug": "2-wu-fen-zhong-shang-shou-an-zhuang-doctor-yu-init",
+      "title": "五分钟上手：安装、doctor 与 init",
+      "file": "2-wu-fen-zhong-shang-shou-an-zhuang-doctor-yu-init.md",
+      "section": "快速开始",
+      "level": "Beginner"
+    },
+    {
+      "slug": "3-duo-su-zhu-xuan-ze-claude-code-codex-kiro-qoder-yu-cursor",
+      "title": "多宿主选择：Claude Code、Codex、Kiro、Qoder 与 Cursor",
+      "file": "3-duo-su-zhu-xuan-ze-claude-code-codex-kiro-qoder-yu-cursor.md",
+      "section": "快速开始",
+      "level": "Beginner"
+    },
+    {
+      "slug": "4-shou-ci-gong-zuo-liu-zou-cha-cong-brainstorm-dao-ke-jian-cha-chan-wu",
+      "title": "首次工作流走查：从 brainstorm 到可检查产物",
+      "file": "4-shou-ci-gong-zuo-liu-zou-cha-cong-brainstorm-dao-ke-jian-cha-chan-wu.md",
+      "section": "快速开始",
+      "level": "Beginner"
+    },
+    {
+      "slug": "5-ru-kou-lu-you-su-cha-an-ren-wu-xuan-ze-spec-gong-zuo-liu",
+      "title": "入口路由速查：按任务选择 spec-* 工作流",
+      "file": "5-ru-kou-lu-you-su-cha-an-ren-wu-xuan-ze-spec-gong-zuo-liu.md",
+      "section": "快速开始",
+      "level": "Beginner"
+    },
+    {
+      "slug": "6-chan-wu-mu-lu-yu-cheng-gong-xin-hao-cang-ku-nei-artifact-qu-na-zhao",
+      "title": "产物目录与成功信号：仓库内 artifact 去哪找",
+      "file": "6-chan-wu-mu-lu-yu-cheng-gong-xin-hao-cang-ku-nei-artifact-qu-na-zhao.md",
+      "section": "快速开始",
+      "level": "Beginner"
+    },
+    {
+      "slug": "7-san-chong-kai-fa-mo-shi-dan-cang-duo-module-yu-duo-git-gong-zuo-qu",
+      "title": "三种开发模式：单仓、多 module 与多 Git 工作区",
+      "file": "7-san-chong-kai-fa-mo-shi-dan-cang-duo-module-yu-duo-git-gong-zuo-qu.md",
+      "section": "快速开始",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "8-ben-di-yuan-ma-an-zhuang-yu-ban-ben-sheng-ji",
+      "title": "本地源码安装与版本升级",
+      "file": "8-ben-di-yuan-ma-an-zhuang-yu-ban-ben-sheng-ji.md",
+      "section": "快速开始",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "9-spec-first-fang-fa-lun-cong-dui-hua-dao-ke-zhi-li-gong-cheng-bi-huan",
+      "title": "Spec-First 方法论：从对话到可治理工程闭环",
+      "file": "9-spec-first-fang-fa-lun-cong-dui-hua-dao-ke-zhi-li-gong-cheng-bi-huan.md",
+      "section": "深入解析",
+      "group": "设计哲学与核心概念",
+      "level": "Beginner"
+    },
+    {
+      "slug": "10-he-xin-ci-hui-skill-workflow-artifact-yu-zheng-ju-bian-jie",
+      "title": "核心词汇：Skill、Workflow、Artifact 与证据边界",
+      "file": "10-he-xin-ci-hui-skill-workflow-artifact-yu-zheng-ju-bian-jie.md",
+      "section": "深入解析",
+      "group": "设计哲学与核心概念",
+      "level": "Beginner"
+    },
+    {
+      "slug": "11-que-ding-xing-men-jin-yu-yu-yi-pan-duan-jiao-ben-di-ban-zhi-shang-de-llm-zhi-ze",
+      "title": "确定性门禁与语义判断：脚本地板之上的 LLM 职责",
+      "file": "11-que-ding-xing-men-jin-yu-yu-yi-pan-duan-jiao-ben-di-ban-zhi-shang-de-llm-zhi-ze.md",
+      "section": "深入解析",
+      "group": "设计哲学与核心概念",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "12-source-of-truth-yu-generated-runtime-fen-chi-yuan-ze",
+      "title": "Source of Truth 与 Generated Runtime 分离原则",
+      "file": "12-source-of-truth-yu-generated-runtime-fen-chi-yuan-ze.md",
+      "section": "深入解析",
+      "group": "设计哲学与核心概念",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "13-xu-qiu-cheng-qing-ideate-brainstorm-yu-product-contract",
+      "title": "需求澄清：ideate、brainstorm 与 Product Contract",
+      "file": "13-xu-qiu-cheng-qing-ideate-brainstorm-yu-product-contract.md",
+      "section": "深入解析",
+      "group": "主链路工作流",
+      "level": "Beginner"
+    },
+    {
+      "slug": "14-zong-di-prd-spec-prd-de-grill-write-yu-readiness-bi-huan",
+      "title": "棕地 PRD：spec-prd 的 grill、write 与 readiness 闭环",
+      "file": "14-zong-di-prd-spec-prd-de-grill-write-yu-readiness-bi-huan.md",
+      "section": "深入解析",
+      "group": "主链路工作流",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "15-shi-xian-gui-hua-spec-plan-ru-he-ba-what-chong-shi-wei-how",
+      "title": "实现规划：spec-plan 如何把 WHAT 充实为 HOW",
+      "file": "15-shi-xian-gui-hua-spec-plan-ru-he-ba-what-chong-shi-wei-how.md",
+      "section": "深入解析",
+      "group": "主链路工作流",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "16-ren-wu-chai-jie-yu-zhi-xing-write-tasks-work-yu-verification-evidence",
+      "title": "任务拆解与执行：write-tasks、work 与 verification evidence",
+      "file": "16-ren-wu-chai-jie-yu-zhi-xing-write-tasks-work-yu-verification-evidence.md",
+      "section": "深入解析",
+      "group": "主链路工作流",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "17-shen-cha-yu-zhi-shi-chen-dian-code-review-doc-review-yu-compound",
+      "title": "审查与知识沉淀：code-review、doc-review 与 compound",
+      "file": "17-shen-cha-yu-zhi-shi-chen-dian-code-review-doc-review-yu-compound.md",
+      "section": "深入解析",
+      "group": "主链路工作流",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "18-cli-kong-zhi-mian-init-doctor-update-yu-clean",
+      "title": "CLI 控制面：init、doctor、update 与 clean",
+      "file": "18-cli-kong-zhi-mian-init-doctor-update-yu-clean.md",
+      "section": "深入解析",
+      "group": "运行时与宿主集成",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "19-runtime-setup-spec-mcp-setup-yu-provider-readiness",
+      "title": "Runtime Setup：spec-mcp-setup 与 provider readiness",
+      "file": "19-runtime-setup-spec-mcp-setup-yu-provider-readiness.md",
+      "section": "深入解析",
+      "group": "运行时与宿主集成",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "20-duo-su-zhu-runtime-tou-ying-yu-pointer-wen-jian-zhi-li",
+      "title": "多宿主 Runtime 投影与 pointer 文件治理",
+      "file": "20-duo-su-zhu-runtime-tou-ying-yu-pointer-wen-jian-zhi-li.md",
+      "section": "深入解析",
+      "group": "运行时与宿主集成",
+      "level": "Advanced"
+    },
+    {
+      "slug": "21-gong-zuo-qu-tu-yu-kua-cang-zheng-ju-codegraph-graphify-de-advisory-bian-jie",
+      "title": "工作区图与跨仓证据：CodeGraph、Graphify 的 advisory 边界",
+      "file": "21-gong-zuo-qu-tu-yu-kua-cang-zheng-ju-codegraph-graphify-de-advisory-bian-jie.md",
+      "section": "深入解析",
+      "group": "运行时与宿主集成",
+      "level": "Advanced"
+    },
+    {
+      "slug": "22-zheng-ti-jia-gou-fen-ceng-kong-zhi-mian-zhi-xing-mian-yu-qi-yue-chuan-lian",
+      "title": "整体架构分层：控制面、执行面与契约串联",
+      "file": "22-zheng-ti-jia-gou-fen-ceng-kong-zhi-mian-zhi-xing-mian-yu-qi-yue-chuan-lian.md",
+      "section": "深入解析",
+      "group": "架构、契约与扩展",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "23-gong-zuo-liu-qi-yue-yu-zhi-liang-men-jin-contracts-hooks-yu-eval",
+      "title": "工作流契约与质量门禁：contracts、hooks 与 eval",
+      "file": "23-gong-zuo-liu-qi-yue-yu-zhi-liang-men-jin-contracts-hooks-yu-eval.md",
+      "section": "深入解析",
+      "group": "架构、契约与扩展",
+      "level": "Advanced"
+    },
+    {
+      "slug": "24-using-spec-first-ru-kou-zhi-li-yu-chang-jing-lu-you",
+      "title": "using-spec-first 入口治理与场景路由",
+      "file": "24-using-spec-first-ru-kou-zhi-li-yu-chang-jing-lu-you.md",
+      "section": "深入解析",
+      "group": "架构、契约与扩展",
+      "level": "Advanced"
+    },
+    {
+      "slug": "25-xin-zeng-skill-yu-agent-jie-ru-gui-fan-gang-jia-jie-gou-yu-hui-gui-bao-hu",
+      "title": "新增 Skill 与 Agent：接入规范、钢架结构与回归保护",
+      "file": "25-xin-zeng-skill-yu-agent-jie-ru-gui-fan-gang-jia-jie-gou-yu-hui-gui-bao-hu.md",
+      "section": "深入解析",
+      "group": "架构、契约与扩展",
+      "level": "Advanced"
+    },
+    {
+      "slug": "26-diao-shi-you-hua-yu-pang-lu-gong-zuo-liu-debug-optimize-yu-app-audit",
+      "title": "调试、优化与旁路工作流：debug、optimize 与 app audit",
+      "file": "26-diao-shi-you-hua-yu-pang-lu-gong-zuo-liu-debug-optimize-yu-app-audit.md",
+      "section": "深入解析",
+      "group": "架构、契约与扩展",
+      "level": "Intermediate"
+    }
+  ]
+}

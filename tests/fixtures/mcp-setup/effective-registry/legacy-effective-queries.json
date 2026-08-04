@@ -1,0 +1,3148 @@
+{
+  "schema_version": "mcp-setup-effective-registry-fixtures.v1",
+  "source_schemas": [
+    "7",
+    "helper-tools-registry.v1",
+    "provider-tools-registry.v1"
+  ],
+  "host_cases": [
+    {
+      "host": "claude",
+      "platform": "macos",
+      "host_definition": {
+        "scope": "managed",
+        "targets": {
+          "managed": {
+            "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.claude.json",
+            "config_format": "json",
+            "precedence": 10,
+            "writable_check": "parent-or-file"
+          }
+        },
+        "fallback_order": [
+          "managed",
+          "user"
+        ],
+        "uninstall_targets": [
+          "managed",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "claude",
+      "platform": "linux",
+      "host_definition": {
+        "scope": "managed",
+        "targets": {
+          "managed": {
+            "config_path": "/etc/claude-code/managed-mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.claude.json",
+            "config_format": "json",
+            "precedence": 10,
+            "writable_check": "parent-or-file"
+          }
+        },
+        "fallback_order": [
+          "managed",
+          "user"
+        ],
+        "uninstall_targets": [
+          "managed",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/etc/claude-code/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/etc/claude-code/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/etc/claude-code/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "claude",
+      "platform": "wsl",
+      "host_definition": {
+        "scope": "managed",
+        "targets": {
+          "managed": {
+            "config_path": "/etc/claude-code/managed-mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.claude.json",
+            "config_format": "json",
+            "precedence": 10,
+            "writable_check": "parent-or-file"
+          }
+        },
+        "fallback_order": [
+          "managed",
+          "user"
+        ],
+        "uninstall_targets": [
+          "managed",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/etc/claude-code/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/etc/claude-code/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "/etc/claude-code/managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "claude",
+      "platform": "windows",
+      "host_definition": {
+        "scope": "managed",
+        "targets": {
+          "managed": {
+            "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.claude.json",
+            "config_format": "json",
+            "precedence": 10,
+            "writable_check": "parent-or-file"
+          }
+        },
+        "fallback_order": [
+          "managed",
+          "user"
+        ],
+        "uninstall_targets": [
+          "managed",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "managed",
+          "targets": {
+            "managed": {
+              "config_path": "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.claude.json",
+              "config_format": "json",
+              "precedence": 10,
+              "writable_check": "parent-or-file"
+            }
+          },
+          "fallback_order": [
+            "managed",
+            "user"
+          ],
+          "uninstall_targets": [
+            "managed",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "codex",
+      "platform": "macos",
+      "host_definition": {
+        "scope": "user",
+        "targets": {
+          "user": {
+            "config_path": "$HOME/.codex/config.toml",
+            "config_format": "toml",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "system": {
+            "config_path": "/etc/codex/config.toml",
+            "config_format": "toml",
+            "precedence": 100,
+            "writable_check": "file-only"
+          }
+        },
+        "fallback_order": [
+          "user"
+        ],
+        "uninstall_targets": [
+          "user",
+          "system"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        }
+      }
+    },
+    {
+      "host": "codex",
+      "platform": "linux",
+      "host_definition": {
+        "scope": "user",
+        "targets": {
+          "user": {
+            "config_path": "$HOME/.codex/config.toml",
+            "config_format": "toml",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "system": {
+            "config_path": "/etc/codex/config.toml",
+            "config_format": "toml",
+            "precedence": 100,
+            "writable_check": "file-only"
+          }
+        },
+        "fallback_order": [
+          "user"
+        ],
+        "uninstall_targets": [
+          "user",
+          "system"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        }
+      }
+    },
+    {
+      "host": "codex",
+      "platform": "wsl",
+      "host_definition": {
+        "scope": "user",
+        "targets": {
+          "user": {
+            "config_path": "$HOME/.codex/config.toml",
+            "config_format": "toml",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "system": {
+            "config_path": "/etc/codex/config.toml",
+            "config_format": "toml",
+            "precedence": 100,
+            "writable_check": "file-only"
+          }
+        },
+        "fallback_order": [
+          "user"
+        ],
+        "uninstall_targets": [
+          "user",
+          "system"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        }
+      }
+    },
+    {
+      "host": "codex",
+      "platform": "windows",
+      "host_definition": {
+        "scope": "user",
+        "targets": {
+          "user": {
+            "config_path": "$HOME/.codex/config.toml",
+            "config_format": "toml",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "system": {
+            "config_path": "/etc/codex/config.toml",
+            "config_format": "toml",
+            "precedence": 100,
+            "writable_check": "file-only"
+          }
+        },
+        "fallback_order": [
+          "user"
+        ],
+        "uninstall_targets": [
+          "user",
+          "system"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "user",
+          "targets": {
+            "user": {
+              "config_path": "$HOME/.codex/config.toml",
+              "config_format": "toml",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "system": {
+              "config_path": "/etc/codex/config.toml",
+              "config_format": "toml",
+              "precedence": 100,
+              "writable_check": "file-only"
+            }
+          },
+          "fallback_order": [
+            "user"
+          ],
+          "uninstall_targets": [
+            "user",
+            "system"
+          ]
+        }
+      }
+    },
+    {
+      "host": "cursor",
+      "platform": "macos",
+      "host_definition": {
+        "scope": "project",
+        "targets": {
+          "project": {
+            "config_path": ".cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "project"
+        ],
+        "uninstall_targets": [
+          "project",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "context7": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "type": "stdio",
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "cursor",
+      "platform": "linux",
+      "host_definition": {
+        "scope": "project",
+        "targets": {
+          "project": {
+            "config_path": ".cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "project"
+        ],
+        "uninstall_targets": [
+          "project",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "context7": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "type": "stdio",
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "cursor",
+      "platform": "wsl",
+      "host_definition": {
+        "scope": "project",
+        "targets": {
+          "project": {
+            "config_path": ".cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "project"
+        ],
+        "uninstall_targets": [
+          "project",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "context7": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "type": "stdio",
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "cursor",
+      "platform": "windows",
+      "host_definition": {
+        "scope": "project",
+        "targets": {
+          "project": {
+            "config_path": ".cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.cursor/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "project"
+        ],
+        "uninstall_targets": [
+          "project",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "context7": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "type": "stdio",
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "kiro",
+      "platform": "macos",
+      "host_definition": {
+        "scope": "workspace",
+        "targets": {
+          "workspace": {
+            "config_path": ".kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "workspace"
+        ],
+        "uninstall_targets": [
+          "workspace",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "kiro",
+      "platform": "linux",
+      "host_definition": {
+        "scope": "workspace",
+        "targets": {
+          "workspace": {
+            "config_path": ".kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "workspace"
+        ],
+        "uninstall_targets": [
+          "workspace",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "kiro",
+      "platform": "wsl",
+      "host_definition": {
+        "scope": "workspace",
+        "targets": {
+          "workspace": {
+            "config_path": ".kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "workspace"
+        ],
+        "uninstall_targets": [
+          "workspace",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "kiro",
+      "platform": "windows",
+      "host_definition": {
+        "scope": "workspace",
+        "targets": {
+          "workspace": {
+            "config_path": ".kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.kiro/settings/mcp.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "workspace"
+        ],
+        "uninstall_targets": [
+          "workspace",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "workspace",
+          "targets": {
+            "workspace": {
+              "config_path": ".kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.kiro/settings/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "workspace"
+          ],
+          "uninstall_targets": [
+            "workspace",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "qoder",
+      "platform": "macos",
+      "host_definition": {
+        "scope": "local",
+        "targets": {
+          "local": {
+            "config_path": ".qoder/settings.local.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.qoder/settings.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "local"
+        ],
+        "uninstall_targets": [
+          "local",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "qoder",
+      "platform": "linux",
+      "host_definition": {
+        "scope": "local",
+        "targets": {
+          "local": {
+            "config_path": ".qoder/settings.local.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.qoder/settings.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "local"
+        ],
+        "uninstall_targets": [
+          "local",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "qoder",
+      "platform": "wsl",
+      "host_definition": {
+        "scope": "local",
+        "targets": {
+          "local": {
+            "config_path": ".qoder/settings.local.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.qoder/settings.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "local"
+        ],
+        "uninstall_targets": [
+          "local",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        }
+      }
+    },
+    {
+      "host": "qoder",
+      "platform": "windows",
+      "host_definition": {
+        "scope": "local",
+        "targets": {
+          "local": {
+            "config_path": ".qoder/settings.local.json",
+            "config_format": "json",
+            "precedence": 50,
+            "writable_check": "parent-or-file"
+          },
+          "user": {
+            "config_path": "$HOME/.qoder/settings.json",
+            "config_format": "json",
+            "precedence": 100,
+            "writable_check": "parent-or-file",
+            "requires_user_scope_opt_in": true
+          }
+        },
+        "fallback_order": [
+          "local"
+        ],
+        "uninstall_targets": [
+          "local",
+          "user"
+        ]
+      },
+      "tool_host_config": {
+        "sequential-thinking": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "context7": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        },
+        "codegraph": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
+        }
+      }
+    }
+  ],
+  "platform_cases": [
+    {
+      "platform": "macos",
+      "tools": {
+        "sequential-thinking": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "context7": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        }
+      },
+      "helpers": {
+        "agent-browser": {
+          "installation": {
+            "strategy": "manual-command",
+            "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
+            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "gh": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 gh",
+            "command": "brew install gh"
+          },
+          "platform_required_tools": []
+        },
+        "vhs": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 vhs",
+            "command": "brew install vhs"
+          },
+          "platform_required_tools": []
+        },
+        "silicon": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 silicon",
+            "command": "brew install silicon"
+          },
+          "platform_required_tools": []
+        },
+        "ffmpeg": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ffmpeg",
+            "command": "brew install ffmpeg"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ast-grep",
+            "command": "brew install ast-grep"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep-skill": {
+          "installation": {
+            "strategy": "skills-cli",
+            "next_action": "安装全局 ast-grep skill",
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        }
+      },
+      "providers": {
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "graphify": {
+          "installation": {
+            "strategy": "python-isolated-tool",
+            "dependency_ref": "graphify",
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+          }
+        }
+      }
+    },
+    {
+      "platform": "linux",
+      "tools": {
+        "sequential-thinking": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "context7": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        }
+      },
+      "helpers": {
+        "agent-browser": {
+          "installation": {
+            "strategy": "manual-command",
+            "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
+            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "gh": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 gh",
+            "command": "install gh from https://cli.github.com"
+          },
+          "platform_required_tools": []
+        },
+        "vhs": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 vhs",
+            "command": "go install github.com/charmbracelet/vhs@latest"
+          },
+          "platform_required_tools": []
+        },
+        "silicon": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 silicon",
+            "command": "cargo install silicon --force"
+          },
+          "platform_required_tools": []
+        },
+        "ffmpeg": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ffmpeg",
+            "command": "install ffmpeg with your package manager"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ast-grep",
+            "command": "cargo install ast-grep --locked --force"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep-skill": {
+          "installation": {
+            "strategy": "skills-cli",
+            "next_action": "安装全局 ast-grep skill",
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        }
+      },
+      "providers": {
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "graphify": {
+          "installation": {
+            "strategy": "python-isolated-tool",
+            "dependency_ref": "graphify",
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+          }
+        }
+      }
+    },
+    {
+      "platform": "wsl",
+      "tools": {
+        "sequential-thinking": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "context7": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        }
+      },
+      "helpers": {
+        "agent-browser": {
+          "installation": {
+            "strategy": "manual-command",
+            "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
+            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "gh": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 gh",
+            "command": "install gh from https://cli.github.com"
+          },
+          "platform_required_tools": []
+        },
+        "vhs": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 vhs",
+            "command": "go install github.com/charmbracelet/vhs@latest"
+          },
+          "platform_required_tools": []
+        },
+        "silicon": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 silicon",
+            "command": "cargo install silicon --force"
+          },
+          "platform_required_tools": []
+        },
+        "ffmpeg": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ffmpeg",
+            "command": "install ffmpeg with your package manager"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ast-grep",
+            "command": "cargo install ast-grep --locked --force"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep-skill": {
+          "installation": {
+            "strategy": "skills-cli",
+            "next_action": "安装全局 ast-grep skill",
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        }
+      },
+      "providers": {
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "graphify": {
+          "installation": {
+            "strategy": "python-isolated-tool",
+            "dependency_ref": "graphify",
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+          }
+        }
+      }
+    },
+    {
+      "platform": "windows",
+      "tools": {
+        "sequential-thinking": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-sequential-thinking@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "context7": {
+          "installation": {
+            "kind": "warmup",
+            "command": "npx",
+            "args": [
+              "-y",
+              "@upstash/context7-mcp@latest",
+              "--help"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "none",
+            "required": false
+          }
+        },
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        }
+      },
+      "helpers": {
+        "agent-browser": {
+          "installation": {
+            "strategy": "manual-command",
+            "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
+            "command": "$env:CI='true'; npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error; if ($LASTEXITCODE -eq 0) { agent-browser install }; if ($LASTEXITCODE -eq 0) { npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y }"
+          },
+          "platform_required_tools": [
+            "node",
+            "npm",
+            "npx"
+          ]
+        },
+        "gh": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 gh",
+            "command": "winget install --id GitHub.cli -e"
+          },
+          "platform_required_tools": []
+        },
+        "vhs": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 vhs",
+            "command": "go install github.com/charmbracelet/vhs@latest"
+          },
+          "platform_required_tools": []
+        },
+        "silicon": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 silicon",
+            "command": "cargo install silicon --force"
+          },
+          "platform_required_tools": []
+        },
+        "ffmpeg": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ffmpeg",
+            "command": "winget install --id Gyan.FFmpeg -e"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep": {
+          "installation": {
+            "strategy": "package-manager",
+            "next_action": "安装 ast-grep",
+            "command": "npm install -g @ast-grep/cli@latest"
+          },
+          "platform_required_tools": []
+        },
+        "ast-grep-skill": {
+          "installation": {
+            "strategy": "skills-cli",
+            "next_action": "安装全局 ast-grep skill",
+            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+          },
+          "platform_required_tools": [
+            "node",
+            "npx"
+          ]
+        }
+      },
+      "providers": {
+        "codegraph": {
+          "installation": {
+            "kind": "global-npm",
+            "verify_command": {
+              "command": "codegraph",
+              "args": [
+                "--version"
+              ]
+            },
+            "command": "npm",
+            "args": [
+              "install",
+              "-g",
+              "{{package}}@{{version}}",
+              "--no-audit",
+              "--no-fund",
+              "--loglevel=error"
+            ]
+          },
+          "project_bootstrap": {
+            "kind": "command",
+            "required": true,
+            "project_file": ".codegraph/codegraph.db",
+            "status_probe": {
+              "command": "codegraph",
+              "args": [
+                "status"
+              ]
+            },
+            "command": "codegraph",
+            "args": [
+              "init"
+            ]
+          }
+        },
+        "graphify": {
+          "installation": {
+            "strategy": "python-isolated-tool",
+            "dependency_ref": "graphify",
+            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
+          }
+        }
+      }
+    }
+  ]
+}

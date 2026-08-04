@@ -1,0 +1,52 @@
+{
+  "schema_version": "spec-first.spec-code-review.security-cases/v1",
+  "skill": "spec-code-review",
+  "owner": "security-reviewer",
+  "source_refs": [
+    "skills/spec-code-review/SKILL.md",
+    "skills/spec-code-review/references/personas/security-reviewer.md",
+    "skills/spec-code-review/references/persona-catalog.md"
+  ],
+  "cases": [
+    {
+      "id": "untrusted-tool-output-reaches-shell-sink",
+      "kind": "positive",
+      "input": "Agent 直接把 tool result 中的 `workspace` 字段拼接进 shell command；没有 allowlist、路径边界或 command argument validation。",
+      "expected": "security reviewer 追踪 tool result 到 shell sink 的完整 attack path，并报告具体 exploitable finding。",
+      "forbidden": [
+        "把 tool result 当成可信 command",
+        "只给泛化 hardening 建议"
+      ]
+    },
+    {
+      "id": "tenant-resource-authorization-gap-with-stable-schema",
+      "kind": "positive",
+      "input": "公开 API schema 未变，但 handler 按 caller supplied resource ID 读取对象，未绑定 current actor 和 tenant ownership。",
+      "expected": "只有 security reviewer 报告 tenant/resource authorization finding，并说明可替换 ID 的跨 tenant 影响。",
+      "forbidden": [
+        "把 schema 一致视为 authorization 证据",
+        "由 API compatibility reviewer 重复报告"
+      ]
+    },
+    {
+      "id": "unreachable-dependency-advisory-suppressed",
+      "kind": "negative-owner",
+      "input": "dependency advisory 指向 lockfile 中的 transitive package，但 diff、build 和 runtime source 没有可达 import/call path。",
+      "expected": "保持 suppression，不能把 dependency 名称或过期扫描输出升级为安全 finding。",
+      "forbidden": [
+        "仅凭 lockfile 名称报告 exploitable vulnerability",
+        "要求无关的全局 hardening"
+      ]
+    },
+    {
+      "id": "schema-only-drift-owned-by-api-reviewer",
+      "kind": "negative-owner",
+      "input": "response pagination contract 有未同步 artifact，但没有 authorization、credential、dangerous sink 或 sensitive error exposure 改动。",
+      "expected": "security reviewer 保持 suppression，并把 schema/compatibility drift 留给 API reviewer。",
+      "forbidden": [
+        "以 security finding 重复报告 pagination drift",
+        "把 contract drift 解释为 tenant isolation 问题"
+      ]
+    }
+  ]
+}

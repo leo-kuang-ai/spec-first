@@ -1,0 +1,91 @@
+{
+  "artifact_type": "advisory-current-session-schema-capture",
+  "captured_at": "2026-07-28T16:15:17Z",
+  "session_identity": "claude-session:3ce5aa5f-0abb-44fd-8a24-4f3bed4b3529",
+  "host_identity": "claude-code/2.1.220",
+  "capture_method": "equivalent-current-session-source",
+  "discovery_surface": "Redacted local transparent capture of the completed headless session outbound /anthropic/v1/messages tools array.",
+  "session_result": {
+    "exit_code": 0,
+    "terminal_reason": "completed",
+    "result": "READY",
+    "worker_tool_calls": 0
+  },
+  "registry_scope": {
+    "schema_completeness": "confirmed",
+    "tool_count": 11,
+    "tool_names_sha256": "cd805fd001feccd01c9257b7def6e8c3e8b9483095e4685a397488de14b77605",
+    "tools": [
+      "Agent",
+      "Bash",
+      "Edit",
+      "Read",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "Skill",
+      "ToolSearch",
+      "Workflow",
+      "DeferredToolPlaceholder",
+      "Write"
+    ]
+  },
+  "candidate": {
+    "name": "Agent",
+    "description_facts": [
+      "Launches a new agent for a caller-provided task.",
+      "Omitting subagent_type selects the general-purpose agent.",
+      "run_in_background=false provides a synchronous caller-readable result."
+    ],
+    "input_schema": {
+      "type": "object",
+      "required": [
+        "description",
+        "prompt"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "subagent_type": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string",
+          "enum": [
+            "sonnet",
+            "opus",
+            "haiku",
+            "fable"
+          ]
+        },
+        "run_in_background": {
+          "type": "boolean"
+        },
+        "isolation": {
+          "type": "string",
+          "enum": [
+            "worktree",
+            "remote"
+          ]
+        }
+      }
+    }
+  },
+  "semantic_exclusions": [
+    "Workflow accepts a workflow script for multi-agent orchestration and is not the single generic-worker task-packet port evaluated by this gate.",
+    "Skill selects a preconfigured skill package rather than accepting an unconstrained generic worker packet.",
+    "The remaining registered tools do not create a generic worker."
+  ],
+  "redaction_status": "passed",
+  "invocation_performed": false,
+  "limitations": [
+    "The transparent capture recorded request paths and the tools request body only; authorization headers and credential values were forwarded without logging.",
+    "This capture proves only the current session registration shape, not permission, capacity, isolation, execution, output validity, or host support.",
+    "The model response was used only to confirm session completion and was not used for primitive discovery or semantic selection.",
+    "No worker primitive was invoked during Gate 0."
+  ]
+}

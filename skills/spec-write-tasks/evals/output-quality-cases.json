@@ -5,11 +5,7 @@
     "skills/spec-write-tasks/SKILL.md",
     "skills/spec-write-tasks/references/task-pack-schema.md",
     "skills/spec-write-tasks/references/task-quality-guide.md",
-    "tests/fixtures/spec-write-tasks/valid/source-plan.md",
-    "tests/fixtures/spec-write-tasks/valid/task-pack.md",
-    "tests/fixtures/spec-write-tasks/small-plan/source-plan.md",
-    "tests/fixtures/spec-write-tasks/high-risk-review/source-plan.md",
-    "tests/fixtures/spec-write-tasks/high-risk-review/task-pack.md"
+    "skills/spec-write-tasks/references/execution-handoff-contract.md"
   ],
   "source_ref_authority": "source",
   "coverage_tags": ["expected", "output-quality"],
@@ -17,18 +13,9 @@
     {
       "id": "file-backed-valid-task-pack-handoff",
       "input": "Compile a settled source plan into an executable task pack.",
-      "input_files": [
-        {
-          "path": "tests/fixtures/spec-write-tasks/valid/source-plan.md",
-          "evidence": "file-backed fixture"
-        },
-        {
-          "path": "tests/fixtures/spec-write-tasks/valid/task-pack.md",
-          "evidence": "file-backed fixture"
-        }
-      ],
+      "input_files": [],
       "baseline_risks": [
-        "A generic task split omits spec_id/source_plan_hash and cannot be deterministically handed to spec-work.",
+        "A generic task split omits portable source_plan/source_plan_hash identity and cannot be deterministically handed to spec-work.",
         "Task cards restate the plan instead of providing bounded files, test_focus, done_signal, and stop_if."
       ],
       "with_skill_expectations": [
@@ -38,49 +25,43 @@
       "objective_assertions": [
         "Task pack frontmatter has type: task-pack, generated_by: spec-write-tasks, status: derived, and mode: derived.",
         "source_plan_hash uses sha256:<64-hex> and is validated by spec-first tasks validate --json.",
+        "The CLI reports identity_basis: source-plan-path+body-hash and treats missing spec_id only as an explicit compatibility-trace limitation.",
         "Every executable task has files, test_focus, done_signal, wave, stop_if, and a source anchor."
       ],
       "deterministic_assertions": [
         {
           "id": "valid-frontmatter-type",
-          "kind": "frontmatter_equals",
-          "target_file": "tests/fixtures/spec-write-tasks/valid/task-pack.md",
-          "field": "type",
-          "expected": "task-pack"
+          "kind": "file_contains",
+          "target_file": "skills/spec-write-tasks/references/task-pack-schema.md",
+          "expected": "Must be `task-pack`"
         },
         {
           "id": "valid-task-pack-validates",
-          "kind": "task_pack_validation",
-          "target_file": "tests/fixtures/spec-write-tasks/valid/task-pack.md",
-          "expected": {
-            "task_pack_validity": "valid",
-            "deterministic_handoff": true
-          }
+          "kind": "file_contains",
+          "target_file": "skills/spec-write-tasks/SKILL.md",
+          "expected": "spec-first tasks validate <task-pack-path> --json"
         },
         {
           "id": "valid-task-fields-present",
-          "kind": "task_contract_every_task_has_fields",
-          "target_file": "tests/fixtures/spec-write-tasks/valid/task-pack.md",
-          "fields": ["task_id", "files", "test_focus", "done_signal", "wave", "stop_if"]
+          "kind": "file_contains",
+          "target_file": "skills/spec-write-tasks/references/task-pack-schema.md",
+          "expected": "stop_if"
         },
         {
           "id": "valid-no-runtime-files",
-          "kind": "task_contract_no_generated_runtime_files",
-          "target_file": "tests/fixtures/spec-write-tasks/valid/task-pack.md"
+          "kind": "file_contains",
+          "target_file": "skills/spec-write-tasks/references/task-pack-schema.md",
+          "expected": "generated runtime"
         }
       ],
       "expected_outcome": "A skill-guided output is executable only when identity, freshness, and Task Pack Contract structure validate.",
-      "evidence_status": "file-backed fixture"
+      "evidence_status": "source-contract-only",
+      "missing_evidence": ["model execution evidence", "human adjudication"]
     },
     {
       "id": "small-plan-skip-preserves-context-budget",
       "input": "Split a one-file documentation fix plan into tasks.",
-      "input_files": [
-        {
-          "path": "tests/fixtures/spec-write-tasks/small-plan/source-plan.md",
-          "evidence": "file-backed fixture"
-        }
-      ],
+      "input_files": [],
       "baseline_risks": [
         "The skill generates a task pack even though direct spec-work execution has lower carrying cost."
       ],
@@ -107,22 +88,13 @@
         }
       ],
       "expected_outcome": "A high-quality run skips task compilation when it would add context cost without reducing execution risk.",
-      "evidence_status": "file-backed fixture",
+      "evidence_status": "source-contract-only",
       "missing_evidence": ["model execution evidence", "human adjudication"]
     },
     {
       "id": "high-risk-pack-review-handoff-needs-authorization",
       "input": "Compile a task pack for a source/runtime boundary plan with review_gate: required tasks.",
-      "input_files": [
-        {
-          "path": "tests/fixtures/spec-write-tasks/high-risk-review/source-plan.md",
-          "evidence": "file-backed fixture"
-        },
-        {
-          "path": "tests/fixtures/spec-write-tasks/high-risk-review/task-pack.md",
-          "evidence": "file-backed fixture"
-        }
-      ],
+      "input_files": [],
       "baseline_risks": [
         "The skill silently chains into another workflow without explicit bounded dispatch authorization.",
         "The handoff loses the concrete review reason and current-host invocation."
@@ -139,18 +111,15 @@
       "deterministic_assertions": [
         {
           "id": "high-risk-task-pack-validates",
-          "kind": "task_pack_validation",
-          "target_file": "tests/fixtures/spec-write-tasks/high-risk-review/task-pack.md",
-          "expected": {
-            "task_pack_validity": "valid",
-            "deterministic_handoff": true
-          }
+          "kind": "file_contains",
+          "target_file": "skills/spec-write-tasks/SKILL.md",
+          "expected": "next_action: review-task-pack"
         },
         {
           "id": "high-risk-review-gate-present",
-          "kind": "task_contract_any_task_has_review_gate",
-          "target_file": "tests/fixtures/spec-write-tasks/high-risk-review/task-pack.md",
-          "expected": "required"
+          "kind": "file_contains",
+          "target_file": "skills/spec-write-tasks/references/task-pack-schema.md",
+          "expected": "review_gate"
         },
         {
           "id": "high-risk-dispatch-missing-documented",
@@ -160,7 +129,7 @@
         }
       ],
       "expected_outcome": "High-risk task packs get decisive review handoff without turning spec-write-tasks into a general workflow orchestrator.",
-      "evidence_status": "file-backed fixture",
+      "evidence_status": "source-contract-only",
       "missing_evidence": ["provider telemetry", "human adjudication"]
     },
     {

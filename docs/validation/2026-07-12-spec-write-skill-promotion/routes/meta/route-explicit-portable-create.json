@@ -1,0 +1,10 @@
+{
+  "id": "route-explicit-portable-create",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 44375,
+    "cached_input_tokens": 0,
+    "output_tokens": 710,
+    "reasoning_output_tokens": 202
+  }
+}

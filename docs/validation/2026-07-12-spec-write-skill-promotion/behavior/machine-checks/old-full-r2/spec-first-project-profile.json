@@ -1,0 +1,41 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "reasons": [
+    "effect_mismatch:Patch the source-owned skill and consumers, validate it, then regenerate runtime mirrors from source.",
+    "base_operation_mismatch:revise-skill"
+  ],
+  "observed": {
+    "base_operation": "revise-skill",
+    "case_id": "spec-first-project-profile",
+    "effect": "Patch the source-owned skill and consumers, validate it, then regenerate runtime mirrors from source.",
+    "layer_result": "This is an authorized spec-first source-edit workflow with explicit governance, testing, changelog, and projection requirements.",
+    "modifier": "production-source-first",
+    "required_references": [
+      "references/authoring-method.md",
+      "references/skill-quality-vocabulary.md",
+      "references/delivery-gates.md"
+    ],
+    "response": "按 production 级 revise-skill 执行：先确认 spec-debug 的真实 branches、触发/近邻边界和 source ownership；修改 skills/spec-debug/ 及必要 references/evals，更新 skills-governance.json、聚焦 contract test 和 CHANGELOG.md。通过入口 lint、聚焦 Jest、diff check 后运行 spec-first init，从 source 重生 .claude/.codex/.agents runtime，并用 runtime-sync evidence 确认镜像无手工漂移。交付时列实际检查、eval adequacy、未检查项和 residual risks。",
+    "route_decision": "authoring-brief: spec-first source revision",
+    "source_owner_assumption": "skills/spec-debug/ and the repository governance/test/docs surfaces are authoritative; runtime host directories are generated consumers.",
+    "would_modify_paths": [
+      "skills/spec-debug/SKILL.md",
+      "skills/spec-debug/references/*",
+      "skills/spec-debug/evals/*",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "<focused-spec-debug-tests>",
+      "CHANGELOG.md",
+      ".claude/skills/spec-debug/*",
+      ".codex/skills/spec-debug/*",
+      ".agents/skills/spec-debug/*"
+    ],
+    "would_run_commands": [
+      "npm run lint:skill-entrypoints",
+      "<focused Jest contract test for spec-debug>",
+      "git diff --check",
+      "spec-first init",
+      "<runtime sync test>"
+    ]
+  }
+}

@@ -19,7 +19,9 @@ function removeManagedRuntimeToolsBlock(existing) {
     return normalizeRemovalResult(stripStandaloneMarkerLines(existing));
   }
 
-  return normalizeRemovalResult(existing);
+  // Nothing was removed, so there is no seam to normalize. Reformatting here would rewrite
+  // unrelated user prose in CLAUDE.md / AGENTS.md on every init and clean.
+  return existing;
 }
 
 function removePartialBlockFromStart(content, startIdx) {
@@ -32,11 +34,19 @@ function removePartialBlockFromStart(content, startIdx) {
     return /^#{1,6}\s+/.test(trimmed) && !isRetiredRuntimeToolsHeading(trimmed);
   });
 
+  // No following heading means the managed region has no provable end. Only delete the
+  // tail when the block still opens with a heading we generated; otherwise the content is
+  // unattributable and stays with the user, with just the orphaned marker stripped.
   if (nextSectionIdx === -1) {
-    return before;
+    return startsWithRetiredRuntimeToolsHeading(lines) ? before : `${before}${afterStart}`;
   }
 
   return `${before}${lines.slice(nextSectionIdx).join('\n')}`;
+}
+
+function startsWithRetiredRuntimeToolsHeading(linesAfterStart) {
+  const firstContentLine = linesAfterStart.find((line) => line.trim() !== '');
+  return firstContentLine !== undefined && isRetiredRuntimeToolsHeading(firstContentLine.trim());
 }
 
 function isRetiredRuntimeToolsHeading(line) {

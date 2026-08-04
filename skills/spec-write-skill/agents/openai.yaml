@@ -1,0 +1,7 @@
+interface:
+  display_name: "Write Skill"
+  short_description: "Design and author owned Skills, or validate packages read-only"
+  default_prompt: "Use the spec-write-skill workflow for explicit project-owned Skill authoring, migration, or remediation, or for an explicitly requested validate-only check of an existing or external package. Resolve one target repo and canonical source first. For full apply, record a compact Design Record and minimum pre-patch eval plan; expand capability map, shape, or topology only when they change ownership, consumers, carriers, architecture, or risk. Treat the current explicit create/revise request as authorization while the exact write set stays in scope; re-confirm only for scope expansion, uncovered dirty overwrite, or new external/high-risk side effects. Keep external or unknown packages read-only, bind mutations to a validated exact write set, and report readiness and evidence limits separately."
+
+policy:
+  allow_implicit_invocation: false

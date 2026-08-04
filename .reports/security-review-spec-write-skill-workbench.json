@@ -1,0 +1,179 @@
+{
+  "reviewer": "security",
+  "review_context": "spec-write-skill authoring workbench implementation — package-inspection.cjs, inspect-context.cjs, validate-authoring-preview.cjs, authoring-workbench.md, and corresponding unit tests",
+  "findings": [
+    {
+      "title": "TOCTOU: parent directory symlink swap between findSymlinkSegment and openSync in readStableRegularFile",
+      "severity": "P1",
+      "file": "skills/spec-write-skill/scripts/lib/package-inspection.cjs",
+      "line": 92,
+      "confidence": 100,
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "This is a classic TOCTOU. O_NOFOLLOW only protects the final path component, not intermediate directories. On Linux, openat2 with RESOLVE_NO_SYMLINKS or openat-per-segment with O_NOFOLLOW would close the window. On macOS (no openat2), the tightest mitigation is to open each directory segment via openat(2) with O_NOFOLLOW — though the race window between two synchronous V8 calls is very narrow and requires local FS write access. Document this limitation in the code. Downstream: the host MUST use an atomic conditional-patch primitive (expected-old-hash / expected-nonexistence at the storage layer) as the authoritative write gate, and the preview validator already downgrades to `not-ready` when that primitive is absent.",
+      "first_evidence": "skills/spec-write-skill/scripts/lib/package-inspection.cjs:92-94 -- if (findSymlinkSegment(absolutePath)) throw new Error('path traverses a symbolic-link segment'); const flags = fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW; const descriptor = fs.openSync(absolutePath, flags);"
+    },
+    {
+      "title": "TOCTOU: between resolveWithin and hashFile/hashDirectoryEntries in the entire preview-validate-apply pipeline",
+      "severity": "P1",
+      "file": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "line": 51,
+      "confidence": 100,
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "The pipeline's TOCTOU window spans the gap between validateAuthoringPreview (which checks hashes, containment, collision at T1) and the host's actual write at T2. The write receipt in verifyWriteReceipt provides post-write verification but cannot prevent a write that was already performed to a tampered path. This is correctly documented in authoring-workbench.md line 40: '不得用最终 recheck 或 loud convention 掩盖 TOCTOU' — but the mitigations remain advisory (host capability) rather than code-enforced. Add fs.readSync-level after-write hash verification against after_sha256 per file, not just post-hoc receipt checking. Require the host to provide a confirmed atomic-patch capability proof at the API level, not a string claim.",
+      "first_evidence": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs:51-56 -- function resolveWithin(root, relative) { if (!isSafeRelative(relative)) return null; const absolute = path.resolve(root, relative); if (!isInside(absolute, root) || findSymlinkSegment(absolute)) return null; return absolute; }"
+    },
+    {
+      "title": "findSymlinkSegment returns null on any error, silently degrading the check",
+      "severity": "P2",
+      "file": "skills/spec-write-skill/scripts/lib/package-inspection.cjs",
+      "line": 71,
+      "confidence": 100,
+      "autofix_class": "manual",
+      "owner": "human",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "Replace the bare catch block with granular error handling: throw (or return a distinct sentinel) on EACCES, ENOENT, and other unexpected errors. Returning null on EACCES tells callers 'path is safe' when the check was actually inconclusive. While subsequent file operations would also fail under EACCES, the error message would be confusing (generic 'not a regular file' rather than 'symlink check failed: permission denied').",
+      "first_evidence": "skills/spec-write-skill/scripts/lib/package-inspection.cjs:71-72 -- } catch { return null; }"
+    },
+    {
+      "title": "Sensitive content detection misses several credential types",
+      "severity": "P2",
+      "file": "skills/spec-write-skill/scripts/lib/package-inspection.cjs",
+      "line": 18,
+      "confidence": 100,
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "Add patterns for: GitHub App installation tokens (ghs_...), GitLab personal/project tokens (glpat-...), npm tokens (npm_...), generic JWT tokens without Bearer prefix, database connection strings (postgres://..., mysql://..., mongodb+srv://...), and SSH keys in non-PEM formats (putty ppk, OpenSSH key comment lines). Add .pem, .cert, .crt, .key to TEXT_EXTENSIONS or handle them through isSecretLikePath name matching.",
+      "first_evidence": "skills/spec-write-skill/scripts/lib/package-inspection.cjs:18-27 -- const SENSITIVE_CONTENT_PATTERNS = [ /* PEM, Bearer, sk-, gh_, xox, AKIA, generic key pattern */ ];"
+    },
+    {
+      "title": "Non-text-format secret-bearing files bypass content scanning",
+      "severity": "P2",
+      "file": "skills/spec-write-skill/scripts/lib/package-inspection.cjs",
+      "line": 143,
+      "confidence": 100,
+      "autofix_class": "advisory",
+      "owner": "downstream-resolver",
+      "requires_verification": false,
+      "pre_existing": false,
+      "suggested_fix": "TEXT_EXTENSIONS does not include .pem, .cert, .key, .crt, .env, .cfg, .ini, .toml, .properties. A file named config.properties containing password=... or server.key containing a RSA private key would be inventoried as a regular file but its content would never be scanned for sensitive patterns. Either expand TEXT_EXTENSIONS or add name-based detection via isSecretLikePath for these extensions — ideally both. Note that .env files ARE caught by isSecretLikePath name matching, but files with innocuous names but sensitive content remain unscanned.",
+      "first_evidence": "skills/spec-write-skill/scripts/lib/package-inspection.cjs:15 -- const TEXT_EXTENSIONS = new Set(['.md', '.txt', '.json', '.yaml', '.yml', '.js', '.cjs', '.mjs', '.py', '.sh']);"
+    },
+    {
+      "title": "Inconsistent control/bidi character rejection between inspector and preview validator",
+      "severity": "P2",
+      "file": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "line": 43,
+      "confidence": 75,
+      "autofix_class": "manual",
+      "owner": "human",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "inspectPackage (package-inspection.cjs:201-204) rejects paths containing control characters or Unicode bidirectional override characters via UNSAFE_PATH_CHARACTERS. But isSafeRelative in validate-authoring-preview.cjs does not check for these characters at all. A manifest could list a path with control characters that passes preview validation but would fail inspector checks. Port the UNSAFE_PATH_CHARACTERS check from package-inspection.cjs into isSafeRelative in validate-authoring-preview.cjs, or share the constant.",
+      "first_evidence": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs:43-49 -- function isSafeRelative(value) { ... value.split('/').every((segment) => segment && segment !== '.' && segment !== '..'); } -- No UNSAFE_PATH_CHARACTERS check."
+    },
+    {
+      "title": "nearestExistingAncestor does not verify symlink safety for discovered ancestor paths",
+      "severity": "P2",
+      "file": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "line": 27,
+      "confidence": 75,
+      "autofix_class": "manual",
+      "owner": "human",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "After finding the nearest existing ancestor via lstatSync (line 31), call findSymlinkSegment on the returned path to verify no symlinks are traversed. If the ancestor path traverses a symlink, emit a parent_snapshot_unsafe finding and skip the parent snapshot check. Combined with the TOCTOU in resolveWithin, an attacker who can modify a parent directory between the resolveWithin check and the nearestExistingAncestor call could influence the parent snapshot, potentially bypassing new-file creation safeguards.",
+      "first_evidence": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs:27-41 -- function nearestExistingAncestor(absolutePath, boundary) { let current = absolutePath; while (isInside(current, boundary)) { try { fs.lstatSync(current); return current; } catch ... } }"
+    },
+    {
+      "title": "TOCTOU in hashDirectoryEntries between directory-type check and readdirSync",
+      "severity": "P3",
+      "file": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "line": 19,
+      "confidence": 100,
+      "autofix_class": "advisory",
+      "owner": "release",
+      "requires_verification": false,
+      "pre_existing": false,
+      "suggested_fix": "Between fs.lstatSync (line 19) and fs.readdirSync (line 21), the directory could be replaced with a symlink to a different directory. readdirSync follows the symlink and returns entries from the target. lstatSync detects a symlink at the final component (fail-safe immediate reject), but the race window is still open. Mitigation: re-stat after readdirSync or use O_DIRECTORY + O_NOFOLLOW with openSync on Linux (not portable to macOS). For now, document the residual race and rely on the fact that the parent-hash check would only affect new-file creation validation, not existing file reading.",
+      "first_evidence": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs:18-25 -- function hashDirectoryEntries(absolutePath) { const stat = fs.lstatSync(absolutePath); if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('not a regular directory'); const entries = fs.readdirSync(absolutePath, { withFileTypes: true })"
+    },
+    {
+      "title": "Argument parser consumes next flag as value when flag argument is missing",
+      "severity": "P3",
+      "file": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "line": 353,
+      "confidence": 100,
+      "autofix_class": "manual",
+      "owner": "human",
+      "requires_verification": true,
+      "pre_existing": false,
+      "suggested_fix": "Args like --authorized-root, --allowed-paths, --write-set, --payload-smoke, --runtime-file-set use `argv[++index] || null` which silently consumes the next argument if the value is missing. For example, --authorized-root --json /tmp/manifest.json sets authorizedRoot to '--json'. Add a lookahead check: verify that argv[index + 1] exists and does not start with '--' before consuming it. If missing, throw an explicit usage error.",
+      "first_evidence": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs:353-355 -- else if (arg === '--authorized-root') args.authorizedRoot = argv[++index] || null; else if (arg === '--allowed-paths') args.allowedPathsPath = argv[++index] || null; else if (arg === '--write-set') args.writeSetPath = argv[++index] || null;"
+    },
+    {
+      "title": "No Unicode normalization resistance in manifest path validation",
+      "severity": "P3",
+      "file": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs",
+      "line": 43,
+      "confidence": 50,
+      "autofix_class": "advisory",
+      "owner": "release",
+      "requires_verification": false,
+      "pre_existing": false,
+      "suggested_fix": "isSafeRelative operates on JavaScript strings without normalizing them. On macOS APFS, filenames are NFD-normalized (decomposed) while JavaScript string comparisons are byte-exact. A path like '\\u0065\\u0301' (e + combining acute, NFD form of '\\u00E9') would pass isSafeRelative and path.resolve but the actual file might be stored under '\\u00E9' (NFC) at the filesystem level, causing a hash-resolution mismatch. Consider calling String.prototype.normalize('NFC') on paths before validation, or documenting that all manifest paths must be NFC-normalized.",
+      "first_evidence": "skills/spec-write-skill/scripts/validate-authoring-preview.cjs:43-49 -- function isSafeRelative(value) { ... } -- no normalize() call"
+    }
+  ],
+  "residual_risks": [
+    {
+      "risk": "No chain-of-trust for authorization_claim: The manifest's authorization_claim field is validated structurally but NOT cryptographically signed or independently verified. The documentation explicitly acknowledges this (validate-authoring-preview.cjs:311). If the manifest producer is compromised, a false 'ready' claim would pass structural validation. The host must re-confirm authorization independently before writing.",
+      "severity": "P2",
+      "mitigation": "Documented as a known limitation in the output schema's limitations array. However, there is no mechanism to detect manifest tampering between creation and consumption."
+    },
+    {
+      "risk": "No automatic rollback on partial write failure: verifyWriteReceipt reports changed/unchanged paths and a failure reason when writes are incomplete, but does not roll back. The authoring-workbench.md explicitly says '不自动回滚'. A partial write could leave the canonical source in an inconsistent state requiring manual recovery.",
+      "severity": "P3",
+      "mitigation": "Explicitly a design choice documented in authoring-workbench.md. Downstream workflows must handle partial failure recovery themselves."
+    },
+    {
+      "risk": "Host-side atomic conditional-patch primitive is a string claim, not a proof: The validator checks scope.conditional_patch_primitive === 'atomic-expected-hash' and downgrades mutation_readiness to 'not-ready' otherwise. But the check is purely string comparison — there's no way for the validator to confirm the host actually has the claimed primitive at the storage layer. A dishonest or misconfigured host could claim the primitive without having it.",
+      "severity": "P2",
+      "mitigation": "Downgrades to 'not-ready' when the primitive name does not match exactly; stops the apply gate as documented. This is the correct fail-closed behavior even if the string is unreliable."
+    }
+  ],
+  "testing_gaps": [
+    {
+      "gap": "No TOCTOU tests: No tests verify correct fail-closed behavior when filesystem state changes between validation check and file operation. While TOCTOU tests are inherently flaky (race-condition dependent), a deterministic pattern (e.g., stub filesystem calls to inject a delayed symlink creation) would improve coverage.",
+      "file": "tests/unit/spec-write-skill-authoring-preview.test.js"
+    },
+    {
+      "gap": "No direct unit tests for containsSensitiveContent or isSecretLikePath: These functions have zero direct test coverage. They are only exercised indirectly through full pipeline tests that hit secret-like paths.",
+      "file": "tests/unit/spec-write-skill-context-inspector.test.js"
+    },
+    {
+      "gap": "No Unicode path safety tests: No tests for control character (`\\x00-\\x1f`), bidirectional override characters (`\\u202A-\\u202E`), or Unicode normalization in manifest paths.",
+      "file": "tests/unit/spec-write-skill-authoring-preview.test.js"
+    },
+    {
+      "gap": "No edge-case tests for hashDirectoryEntries with empty directories, directories with huge numbers of entries, or special file types (FIFO, socket, device) in the preview validator path.",
+      "file": "tests/unit/spec-write-skill-authoring-preview.test.js"
+    },
+    {
+      "gap": "No cross-platform path tests for Windows separators, drive letters (e.g., C:), or UNC paths — all rejected by isSafeRelative but not verified in tests.",
+      "file": "tests/unit/spec-write-skill-authoring-preview.test.js"
+    },
+    {
+      "gap": "verifyWriteReceipt has only one test covering happy path and failure_reason path. Missing: path-not-found-after-write, hash-mismatch, root-path-resolution-failure, empty writeSet edge case.",
+      "file": "tests/unit/spec-write-skill-authoring-preview.test.js"
+    }
+  ]
+}

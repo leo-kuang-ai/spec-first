@@ -1,6 +1,6 @@
 ---
 name: spec-rule-miner
-description: "Use this standalone skill when the user asks to mine a repo's existing coding conventions for future AI coding, generate or refresh project rules with AGENTS.md/CLAUDE.md pointers, create Cursor or Qoder rule files from actual code evidence, or make AI-generated code follow a specific project's habits. Do not use for team standards governance, normal code review/debug/refactor work, linter/formatter configuration, generic best practices, unsupported tool rule files such as .cursorrules or .kiro/steering rules, or generated runtime mirror edits."
+description: "Use this standalone skill when the user asks to mine a repo's existing coding conventions for future AI coding, generate or refresh project rules with AGENTS.md/CLAUDE.md pointers, create Cursor or Qoder rule files from actual code evidence, or make AI-generated code follow a specific project's habits. Do not use for confirmed team policy governance, normal code review/debug/refactor work, linter/formatter configuration, generic best practices, unsupported tool rule files such as .cursorrules or .kiro/steering rules, or generated runtime mirror edits."
 ---
 
 # Spec Rule Miner
@@ -17,8 +17,8 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 
 ## When Not To Use
 
-- 不使用本 skill：用户要审查当前 diff、修复代码、重构、调试、写 lint/format 配置、生成通用语言规范，或治理 `docs/standards/**` confirmed team standards。
-- 近邻路由：团队标准的查询/提升/废弃走 `spec-team-standards-governance`；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`；创建或修改 spec-first source skill 走 `spec-write-skill`。
+- 不使用本 skill：用户要审查当前 diff、修复代码、重构、调试、写 lint/format 配置、生成通用语言规范，或治理 confirmed team policy。
+- 近邻路由：confirmed team policy governance 已退役，不再提供专用入口；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`；创建或修改 spec-first source skill 走 `spec-write-skill`。
 
 ## Inputs
 

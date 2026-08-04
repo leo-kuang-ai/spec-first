@@ -1,0 +1,41 @@
+{
+  "schema_version": "spec-write-skill.scoped-blind-review-artifact/v1",
+  "artifact_type": "fresh-semantic",
+  "case_id": "portable-create-non-spec-first",
+  "arm": "candidate-ablation",
+  "repeat": 1,
+  "blind": true,
+  "independent": true,
+  "result": "pass",
+  "verdict": "pass",
+  "dimensions": {
+    "requirements_coverage": 2,
+    "trigger_boundary": 2,
+    "execution_completeness": 2,
+    "required_references": 2,
+    "no_contamination": 2
+  },
+  "total_score": 10,
+  "rationale": "覆盖 API 兼容性分类、输出和交接规则，明确排除实现型近邻任务，并提供正负及近邻 eval。它把 skills/ 视为确认前的候选位置，要求确认 canonical source 和限制改动范围；验证与无脚本默认策略也适合普通非 spec-first 仓库。",
+  "source_output": {
+    "path": "../spec-write-skill-behavior-20260711T195445Z/outputs/candidate-ablation-r1.json",
+    "sha256": "13bd29315144066555d0632e9ef2ef66b37abbde15e8d8d56313aa467aba21b2",
+    "hash_verified": true
+  },
+  "fixed_old_source": null,
+  "reviewer_run": {
+    "prompt": "review/scoped-v2/prompt-portable-create-non-spec-first.txt",
+    "raw_jsonl": "review/scoped-v2/runs/portable-create-non-spec-first.jsonl",
+    "raw_stderr": "review/scoped-v2/runs/portable-create-non-spec-first.stderr.txt",
+    "last_json": "review/scoped-v2/runs/portable-create-non-spec-first.json",
+    "provider": "codex-cli",
+    "model": "provider-default (not exposed in Codex JSONL)",
+    "configured_reference_model": "gpt-5.6-sol",
+    "host_version": "codex-cli 0.144.1",
+    "input_tokens": 16792,
+    "output_tokens": 1105,
+    "reasoning_output_tokens": 112,
+    "duration_ms": 24257,
+    "reviewer_last_json_sha256": "b97d22c889a3e18a48328eeef6e161503e5e6416373294a3985bfc4c1af4959e"
+  }
+}

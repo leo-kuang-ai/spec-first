@@ -86,7 +86,7 @@ Example output format (adapt field names to match the rubric):
 Rules:
 - A singleton that genuinely has no match in existing clusters should get should_cluster: false
 - A singleton that clearly belongs in an existing cluster should get should_cluster: true with the cluster ID
-- High confidence-first (4-5) means you are very sure. Low confidence-first (1-2) means the item is borderline.
+- High confidence (4-5) means you are very sure. Low confidence (1-2) means the item is borderline.
 - Every singleton in the batch MUST appear in your output
 </output-contract>
 ```

@@ -25,7 +25,7 @@ This task pack is the executable Phase 1D handoff for the source plan. It covers
 - U12-minimal context intake order for core workflows.
 - U11 closeout checklist.
 
-It does not implement full public workflow summary coverage, review dispatch resizing, sessions/compound replay, skill-audit progressive-disclosure scoring, release blocking guards, or Phase 2/3 lifecycle work.
+It does not implement full public workflow summary coverage, review dispatch resizing, sessions/compound replay, skill-review progressive-disclosure scoring, release blocking guards, or Phase 2/3 lifecycle work.
 
 ## Source Summary
 
@@ -139,9 +139,9 @@ It does not implement full public workflow summary coverage, review dispatch res
       "done_signal": "Targeted core contract tests pass and no new parallel reviewer facts pipeline exists.",
       "wave": 2,
       "review_gate": "required",
-      "review_focus": "Check Phase 1D did not expand into doc-review/code-review dispatch, sessions/compound replay, skill-audit scoring, or hard token budget automation.",
+      "review_focus": "Check Phase 1D did not expand into doc-review/code-review dispatch, sessions/compound replay, skill-review scoring, or hard token budget automation.",
       "risk_note": "The main risk is turning token economy into a rigid budget engine or a second deterministic reviewer facts pipeline.",
-      "stop_if": "Review dispatch resizing, sessions/compound replay, skill-audit progressive-disclosure checks, hard token budgets, or a new facts pipeline become necessary."
+      "stop_if": "Review dispatch resizing, sessions/compound replay, skill-review progressive-disclosure checks, hard token budgets, or a new facts pipeline become necessary."
     },
     {
       "task_id": "T003",
@@ -229,7 +229,7 @@ It does not implement full public workflow summary coverage, review dispatch res
 - done_signal: targeted core contract tests pass.
 - parallelizable: false
 - review_gate: required
-- review_focus: no review dispatch/session/compound/skill-audit scope creep.
+- review_focus: no review dispatch/session/compound/skill-review scope creep.
 - stop_if: hard token budgets or new reviewer facts pipeline becomes necessary.
 - wave: 2
 

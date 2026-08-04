@@ -62,7 +62,7 @@ function helpText() {
     '  --raw-issues <path>           已经审过的 raw issues JSON;默认查找 <run-dir>/input/raw-issues.json',
     '  --issue-synthesis-status <s>  not_run | llm_provided | fixture_provided (无 raw issues 默认 not_run;有 raw issues 时必须 llm_provided 或 fixture_provided)',
     '  --max-files <n>               传给 metadata/diff 扫描的最大文件数',
-    '  --prd-max-bytes <n>           传给 PRD 抽取的最大字节数',
+    '  --prd-max-bytes <n>           传给 preflight PRD 输入校验的最大字节数 (PRD 抽取步骤另有独立上限)',
     '  --help                        打印用法并退出',
     '',
     'Output:',
@@ -133,6 +133,12 @@ function validateRunId(runId) {
   return typeof runId === 'string'
     && SAFE_RUN_ID_PATTERN.test(runId)
     && !runId.includes('..');
+}
+
+// Numeric passthrough flags are only forwarded when they are usable bounds; parseCommonArgs turns
+// non-numeric input into NaN, and forwarding that would only turn a typo into a step failure.
+function boundedNumberFlag(flag, value) {
+  return Number.isFinite(value) && value > 0 ? [flag, String(value)] : [];
 }
 
 function validateBoundedExistingPath({ repoRoot, inputPath, kind, expected }) {
@@ -353,6 +359,8 @@ function main(argv) {
     const sharedSourceFlags = ['--source', sourceArg];
     const prdFlags = options.prd ? ['--prd', options.prd] : [];
     const figmaFlags = options.figmaContext ? ['--figma-context', options.figmaContext] : [];
+    const maxFilesFlags = boundedNumberFlag('--max-files', options.maxFiles);
+    const prdMaxBytesFlags = boundedNumberFlag('--prd-max-bytes', options.prdMaxBytes);
 
     runStep('build-run-metadata', [
       script('build-run-metadata.js'),
@@ -362,6 +370,7 @@ function main(argv) {
       ...sharedSourceFlags,
       ...prdFlags,
       ...figmaFlags,
+      ...maxFilesFlags,
       '--run-dir', absoluteRunDir,
       '--output', artifacts.metadata,
     ], repoRoot);
@@ -372,6 +381,7 @@ function main(argv) {
       ...sharedSourceFlags,
       ...prdFlags,
       ...figmaFlags,
+      ...prdMaxBytesFlags,
       '--output', artifacts.preflight,
     ], repoRoot);
 
@@ -382,6 +392,7 @@ function main(argv) {
       ...sharedSourceFlags,
       ...prdFlags,
       ...figmaFlags,
+      ...maxFilesFlags,
       '--output', artifacts.impact,
     ], repoRoot);
 

@@ -53,6 +53,9 @@ const RETIRED_RUNTIME_ASSET_PATHS = {
   qoder: [
     { kind: 'remove_dir', path: '.qoder/commands/spec' },
   ],
+  opencode: [
+    { kind: 'remove_dir', path: '.opencode/commands/spec' },
+  ],
 };
 
 function isSpecFirstManagedCommandFile(fileName) {
@@ -360,7 +363,7 @@ function removeManagedAssets(projectRoot, managedState, adapter) {
 function planHardResetManagedAssets(projectRoot, managedState, adapter) {
   const operations = [...planManagedAssetRemoval(projectRoot, managedState, adapter).operations];
 
-  if (adapter.hasCommands) {
+  if (adapter.hasCommands && adapter.commandRootIsDedicated !== false) {
     operations.push(
       buildOperation(
         'remove_dir',
@@ -585,11 +588,13 @@ function applyOperationPlan(projectRoot, plan) {
 
     if (operation.kind === 'ensure_dir') {
       ensureDirectory(targetPath);
+      assertOperationTargetContained(projectRootReal, targetPath, operation);
       continue;
     }
 
     if (operation.kind === 'write_file' || operation.kind === 'update_file') {
       writeManagedFile(targetPath, operation.contents, operation.mode, operation.encoding);
+      assertOperationTargetContained(projectRootReal, targetPath, operation);
       continue;
     }
 

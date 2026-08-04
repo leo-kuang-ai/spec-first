@@ -1,0 +1,10 @@
+{
+  "id": "route-same-repo-migration",
+  "exit_code": 0,
+  "usage": {
+    "input_tokens": 28869,
+    "cached_input_tokens": 0,
+    "output_tokens": 526,
+    "reasoning_output_tokens": 225
+  }
+}

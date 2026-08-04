@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "route_high_risk_misroute": false,
+  "expected_route": "spec-write-skill",
+  "actual_route": "spec-write-skill",
+  "reason_code": "accepted-audit-remediation"
+}

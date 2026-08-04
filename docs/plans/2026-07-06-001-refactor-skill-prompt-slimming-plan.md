@@ -33,7 +33,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 
 ## 决策摘要
 
-- **推荐方案：** 第一刀先做最小、最可验证的 `spec-work` task-pack 校验 prose 下沉：让 prompt 消费 `spec-first tasks validate --json` 的 `deterministic_handoff` / `reason_code`，不再自然语言复写 hash/结构规则。它是行为承重的 ownership 迁移，不再误称为“只改 wording”。随后用 `spec-code-review` 做共享治理段落下沉样板，再进入两大 workflow 的完整 spine 重排；`spec-skill-audit` rubric 在 pilot 后沉淀，不阻塞第一刀。
+- **推荐方案：** 第一刀先做最小、最可验证的 `spec-work` task-pack 校验 prose 下沉：让 prompt 消费 `spec-first tasks validate --json` 的 `deterministic_handoff` / `reason_code`，不再自然语言复写 hash/结构规则。它是行为承重的 ownership 迁移，不再误称为“只改 wording”。随后用 `spec-code-review` 做共享治理段落下沉样板，再进入两大 workflow 的完整 spine 重排；`retired-skill-review` rubric 在 pilot 后沉淀，不阻塞第一刀。
 - **关键决策：** 主 `SKILL.md` 只保留 workflow contract、热路径 Body-L1 phase spine、Reference Trigger Map、hard boundary 和 CLI handoff；Body-L2 条件细节进入 `references/`；Body-L3 背景叙事直接删除；确定性校验用 CLI 输出而不是 prompt prose 重写。
 - **验证重点：** 以 line-count budget、reference trigger tests、fresh-source eval、现有 workflow contract tests、`spec-first tasks validate --json` 行为和 runtime projection drift tests 共同验证。
 - **最大风险 / 边界：** 最大风险是把内容搬到 `references/` 后触发失败，所以每次 extraction 必须配套 `trigger_condition`、`must_read`、`fallback_if_unread` 和 eval/test 锚点。不得手改 `.claude/`、`.codex/`、`.agents/skills/` 等 generated runtime mirrors。
@@ -110,7 +110,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 ## 范围边界
 
 - 不新增新的 public workflow、skill 或 agent。
-- 不新增新的 schema/contract 概念来替代已有 `spec-skill-audit`、`spec-plan`、`spec-work`、`spec-code-review` 边界。
+- 不新增新的 schema/contract 概念来替代已有 `retired-skill-review`、`spec-plan`、`spec-work`、`spec-code-review` 边界。
 - 不做全量 38 个 skill 的机械瘦身；先完成 `spec-work` 和 `spec-code-review` 样板。
 - 不把 generated runtime mirrors 当 source 修复；runtime drift 只通过 `spec-first init` 修复。
 - 不让脚本判断语义充分性；脚本只输出 deterministic facts、reason_code、artifact path、exit code。
@@ -190,7 +190,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
   - `skills/spec-work/SKILL.md`
   - `skills/spec-code-review/SKILL.md`
   - `skills/spec-plan/SKILL.md`
-  - `skills/spec-skill-audit/references/skill-authoring-quality.md`
+  - `skills/retired-skill-review/references/skill-authoring-quality.md`
   - `src/cli/commands/tasks.js`
   - `src/cli/task-pack.js`
   - `src/cli/plugin.js`
@@ -212,7 +212,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
   - 已读取 `spec-work` 与 `spec-code-review` spine，以及 references 目录清单。
   - 已读取本计划所需的 `spec-plan` 规划 references。
   - 已读取 task-pack validator 与 runtime skill copy/drift 代码。
-  - 已读取 `spec-skill-audit` authoring quality rubric，作为 skill prompt 质量的现有 owner。
+  - 已读取 `retired-skill-review` authoring quality rubric，作为 skill prompt 质量的现有 owner。
 - source_reads_required:
   - 实施每个单元前，重新读取精确目标 skill 与 reference 文件，因为 prompt source 变化较快。
   - 修改断言前，重新读取受影响的 unit tests。
@@ -246,7 +246,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 - `src/cli/plugin.js` 会带 transform 复制整个 skill 目录；`skillSupportFileIntegrityIssues` 会检查非 `SKILL.md` support files，因此移出的 references 仍属于 drift detection。
 - `src/cli/skill-path-rewrite-markers.js` 会把 operational source skill paths 重写为 runtime paths，同时保留 source-of-truth marker lines。新的 reference pointers 必须写成该 transform 能处理的形式。
 - `src/cli/task-pack.js` 校验 task-pack frontmatter、source plan path、`spec_id`、`source_plan_hash`、Task Pack Contract JSON、execution waves、task fields，并产出 `execution_focus`。
-- `skills/spec-skill-audit/references/skill-authoring-quality.md` 拥有 prompt writing quality vocabulary，应扩展 prompt-budget/progressive-disclosure audit signals。
+- `skills/retired-skill-review/references/skill-authoring-quality.md` 拥有 prompt writing quality vocabulary，应扩展 prompt-budget/progressive-disclosure audit signals。
 
 ### 已有经验
 
@@ -263,7 +263,7 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 
 ## 现有能力 / 复用分析
 
-- **清单：** 现有 owner 包括 `skills/spec-skill-audit/references/skill-authoring-quality.md`、`skills/spec-plan/references/plan-sections.md`、`src/cli/task-pack.js`、`src/cli/plugin.js` 和 workflow-specific reference directories。
+- **清单：** 现有 owner 包括 `skills/retired-skill-review/references/skill-authoring-quality.md`、`skills/spec-plan/references/plan-sections.md`、`src/cli/task-pack.js`、`src/cli/plugin.js` 和 workflow-specific reference directories。
 - **决策：** 扩展现有 owner，而不是创建新的 prompt-budget contract 或 schema。audit rubric 拥有 skill quality language，各 workflow 拥有自己的 spine/reference split，CLI validator 拥有 deterministic task-pack facts。
 - **真相源：** Source 变更位于 `skills/`、`src/cli/`、`tests/`、`docs/plans/` 和 `CHANGELOG.md`。
 - **拒绝的 owner：** 不把 prompt-budget 规则放进 `docs/10-prompt/结构化项目角色契约.md`；角色契约拥有 value boundaries，不拥有 execution details。不把所有细节放进 `docs/contracts/context-governance.md`；该文档拥有 context exclusions 和 trust boundaries，不拥有 per-skill prompt architecture。
@@ -726,15 +726,15 @@ flowchart TB
 
 ### U7. 将 pilot 经验沉淀到 skill audit lens
 
-**目标：** 在 pilots 产出具体样例后，用 reusable prompt-slimming signals 更新现有 skill-audit rubric。这不再阻塞 U1/U3，因为第一刀直接复用已验证的 `spec-plan` 模式。
+**目标：** 在 pilots 产出具体样例后，用 reusable prompt-slimming signals 更新现有 skill-review rubric。这不再阻塞 U1/U3，因为第一刀直接复用已验证的 `spec-plan` 模式。
 
 **需求：** R1, R2, R3, R4, R8
 
 **依赖：** U6
 
 **文件：**
-- 修改：`skills/spec-skill-audit/references/skill-authoring-quality.md`
-- 修改：`tests/unit/spec-skill-audit-contracts.test.js`
+- 修改：`skills/retired-skill-review/references/skill-authoring-quality.md`
+- 修改：`tests/unit/retired-skill-review-contracts.test.js`
 - 如果当前 assertions 位于其中，修改：`tests/unit/skill-agent-quality-governance-contracts.test.js`
 - 修改：`CHANGELOG.md`
 
@@ -751,7 +751,7 @@ flowchart TB
 
 **遵循模式：**
 - 本计划 U1-U6 的结果。
-- `skills/spec-skill-audit/references/skill-authoring-quality.md`
+- `skills/retired-skill-review/references/skill-authoring-quality.md`
 - `docs/11-业界调研/spec-first-skills-优化方案-基于16个思维模型.md`
 
 **测试场景：**
@@ -853,7 +853,7 @@ flowchart TB
 
 - **一次性机械压缩所有 skill prompts：** 拒绝。它最大化 churn，并让 regressions 难以归因。
 - **自动 LLM prompt compression：** 拒绝。它可能节省 tokens，但不能证明 workflow safety 或 boundary preservation。
-- **新增 prompt-budget schema/contract：** 本阶段拒绝。现有 skill-audit rubric 和 focused tests 足够，审查报告也明确警告不要新增 contract/schema。
+- **新增 prompt-budget schema/contract：** 本阶段拒绝。现有 skill-review rubric 和 focused tests 足够，审查报告也明确警告不要新增 contract/schema。
 - **只把文本移到 references 而不加 tests：** 拒绝。既有审查指出 trigger failure 才是真正的 progressive-disclosure failure mode。
 
 ---
@@ -892,7 +892,7 @@ flowchart TB
 - 16 模型优化报告：`docs/11-业界调研/spec-first-skills-优化方案-基于16个思维模型.md`
 - work skill source：`skills/spec-work/SKILL.md`
 - code review skill source：`skills/spec-code-review/SKILL.md`
-- skill audit rubric：`skills/spec-skill-audit/references/skill-authoring-quality.md`
+- skill audit rubric：`skills/retired-skill-review/references/skill-authoring-quality.md`
 - Task-pack CLI：`src/cli/commands/tasks.js`
 - Task-pack validator：`src/cli/task-pack.js`
 - Runtime skill projection：`src/cli/plugin.js`

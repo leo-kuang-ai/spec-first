@@ -3,7 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { runNpm } = require('./npm-install-matrix-smoke');
+const { runNpmChecked: runNpmCliChecked } = require('./lib/npm-cli.cjs');
 
 const repoRoot = path.resolve(__dirname, '..');
 const defaultWebsiteRepo = path.resolve(repoRoot, '..', 'spec-first-official-website');
@@ -28,13 +28,13 @@ function readJson(filePath) {
 
 function runNpmChecked(args, options) {
   try {
-    runNpm(args, {
+    runNpmCliChecked(args, {
       cwd: options.cwd,
       env: options.env,
       stdio: 'inherit',
     });
   } catch (error) {
-    fail(`npm ${args.join(' ')} failed: ${error.message}`);
+    fail(error.message);
   }
 }
 

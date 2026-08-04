@@ -1,0 +1,39 @@
+{
+  "schema_version": "worker-dispatch-host-preflight/v1",
+  "artifact_type": "advisory",
+  "gate": "post-u1-pre-u2-discovery-only",
+  "status": "passed",
+  "support_claim": "not_applicable",
+  "capture_owner": "Codex orchestrator /root",
+  "capture_method": "host-startup-registration-record",
+  "captured_at": "2026-07-28T16:15:17Z",
+  "freshness_expires_at": "2026-07-29T16:15:17Z",
+  "session_identity": "codex-thread:019fa956-78e9-7642-96a3-fcebbbbfb306",
+  "host_identity": "codex-cli/0.145.0",
+  "host_startup_or_version_ref": "Current Codex SessionStart registry; /opt/homebrew/bin/codex --version returned codex-cli 0.145.0.",
+  "dispatch_authorization_receipt": "Current user message on 2026-07-29: 进行验证; it confirms the previously stated Codex and Claude discovery/dispatch validation scope.",
+  "authorization_basis": "explicit-user",
+  "discovery_surface": "Current session developer-injected collaboration namespace registry and schemas.",
+  "schema_excerpt_ref": "docs/validation/worker-dispatch/preflight/2026-07-29-codex-cli-0.145.0-schema-capture.json#candidate",
+  "schema_excerpt": "<provider_untrusted>{\"name\":\"collaboration.spawn_agent\",\"purpose\":\"spawn a new agent for a bounded task\",\"required\":{\"task_name\":\"string\",\"message\":\"string\"},\"optional\":{\"fork_turns\":\"none, all, or positive turn count\",\"model\":\"string override\",\"reasoning_effort\":\"string override\"},\"result\":\"agent identity plus later caller-readable messages or final return\",\"relevant_registry\":[\"spawn_agent\",\"followup_task\",\"interrupt_agent\",\"list_agents\",\"send_message\",\"wait_agent\"]}</provider_untrusted>",
+  "schema_excerpt_sha256": "388ad2c6a5e49e003acecb127ec07c77427df0e0976733d2268cbc969e6150de",
+  "schema_completeness": "confirmed",
+  "completeness_basis": "The current session startup registration record completely enumerates six collaboration schemas; all six were inspected and only spawn_agent can create a new worker from a caller-supplied packet.",
+  "redaction_status": "passed",
+  "capture_limitations": [
+    "The capture proves current registration shape only; permission, capacity, isolation, execution, output validity, and host support remain untested.",
+    "No worker primitive was invoked during Gate 0."
+  ],
+  "capability_probe": "attempted",
+  "worker_dispatch_capability": "available",
+  "eligibility_contract_ref": "docs/contracts/workflows/worker-dispatch-capability.md#generic-worker-eligibility",
+  "eligibility_contract_sha256": "eebec18fa4c9bcede11c54b9c506204945a5e59f175424b3812e6433b8c033d3",
+  "eligible_candidates": [
+    {
+      "candidate_identity_sha256": "cbe9373b19e94c7286933472f4dba491b307376201d569414d16d5517f8d1e2b",
+      "unique": true,
+      "rationale": "message accepts a self-contained packet containing bounded stop and mutation scope; task_name labels it; the result exposes the agent identity and caller-readable messages/final return. The other collaboration schemas require an existing target or only manage/observe lifecycle. No Skill host mapping is needed."
+    }
+  ],
+  "invocation_performed": false
+}

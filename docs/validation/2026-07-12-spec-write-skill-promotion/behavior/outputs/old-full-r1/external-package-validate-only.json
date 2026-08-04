@@ -1,0 +1,21 @@
+{
+  "arm": "old-full",
+  "repeat": 1,
+  "case_id": "external-package-validate-only",
+  "source_input_sha256": "4a056ff9f7697f3404fdf6673ff9c32643530cf09754d74c9a082a25df5a7024",
+  "result": {
+    "base_operation": "validate-package",
+    "case_id": "external-package-validate-only",
+    "effect": "Return static package findings only; make no changes and execute no package content.",
+    "layer_result": "near-neighbor-read-only-audit",
+    "modifier": "external package, static inspection only",
+    "required_references": [
+      "references/authoring-method.md"
+    ],
+    "response": "这是只读第三方 package 审计，不进入 source authoring。检查目录名与 frontmatter `name` 一致、frontmatter 仅含允许字段、`description` 是否包含正向触发和负向边界、`SKILL.md` 是否指向所有运行时必需资源、是否存在空目录/未引用资源，以及运行时是否错误依赖 README、报告或维护者 eval。仅报告 findings、严重度、证据路径和建议；不复制、安装、修改，也不运行 validator 或其他脚本。",
+    "route_decision": "Route to bounded static package review, not skill authoring or installation.",
+    "source_owner_assumption": "`/tmp/vendor-skill` is externally owned and is not a writable project source.",
+    "would_modify_paths": [],
+    "would_run_commands": []
+  }
+}

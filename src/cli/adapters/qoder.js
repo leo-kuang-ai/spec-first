@@ -1,37 +1,47 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PlatformAdapter = require('./base');
+const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
+const {
+  MANAGED_HOOK_DEFINITIONS,
+  SETTINGS_RELATIVE_PATH,
+  inspectManagedQoderHooks,
+  renderManagedQoderHooksCleanup,
+  renderManagedQoderHooksRemoval,
+} = require('../qoder-settings');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const {
+  contentHasUnexpectedRuntimePathReferences,
+  rewritePreservingHostComparativeConfigPaths,
+} = require('./host-comparative-config-paths');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
+const QODER_RULE_POINTER_PATH = '.qoder/rules/spec-first.md';
+const QODER_POINTER_FRONTMATTER = [
+  '---',
+  'trigger: always_on',
+  '---',
+].join('\n');
+const QODER_HOOK_TEMPLATE_ROOT = path.join(__dirname, '..', '..', '..', 'templates', 'qoder', 'hooks');
+const SESSION_START_CLI_PLACEHOLDER = '__SPEC_FIRST_CLI_PATH__';
+const TRUSTED_SPEC_FIRST_CLI_PATH = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
+const MANAGED_QODER_HOOK_FILES = MANAGED_HOOK_DEFINITIONS.map((definition) => ({
+  relativePath: definition.hookPath,
+  displayName: definition.displayName,
+  render: definition.templateName === 'session-start'
+    ? renderSessionStartHookTemplate
+    : () => fs.readFileSync(path.join(QODER_HOOK_TEMPLATE_ROOT, definition.templateName), 'utf8'),
+}));
 const QODER_AGENT_BASE_TOOLS = ['Read', 'Grep', 'Glob'];
 const QODER_AGENT_WEB_TOOLS = ['WebFetch', 'WebSearch'];
-const QODER_UNREWRITTEN_PATH_PATTERNS = [
-  /\.claude\/commands\/spec\/[a-z-]+\.md/,
-  /\.claude\/commands\/spec-[a-z-]+\.md/,
-  /\.claude\/commands\/spec-\*\.md/,
-  /\.claude\/spec-first\/workflows\//,
-  /\.claude\/skills\//,
-  /\.claude\/agents\//,
-  /\.codex\/commands\/spec\/[a-z-]+\.md/,
-  /\.codex\/commands\/spec-\*\.md/,
-  /\.codex\/skills\//,
-  /\.codex\/agents\//,
-  /\.agents\/skills\//,
-  /\.cursor\/skills\//,
-  /\.cursor\/spec-first\//,
-  /\.cursor\/mcp\.json/,
-  /\.cursor\/agents\//,
-  /\.kiro\/commands\/spec\/[a-z-]+\.md/,
-  /\.kiro\/commands\/spec-\*\.md/,
-  /\.kiro\/skills\//,
-  /\.kiro\/agents\//,
-  /\.kiro\/spec-first\//,
-  /\.kiro\/settings\//,
-];
 
-class QoderAdapter extends PlatformAdapter {
+class QoderAdapter extends PointerBasedAdapter {
   get id() {
     return 'qoder';
   }
@@ -72,6 +82,18 @@ class QoderAdapter extends PlatformAdapter {
     return 'AGENTS.md';
   }
 
+  get pointerPath() {
+    return QODER_RULE_POINTER_PATH;
+  }
+
+  get pointerHostLabel() {
+    return 'Qoder';
+  }
+
+  get pointerFrontmatter() {
+    return QODER_POINTER_FRONTMATTER;
+  }
+
   renderCommandContent(command, templateContent, context = {}) {
     if (typeof context.skillContent !== 'string') {
       return this.transformSkillContent(templateContent, context);
@@ -83,7 +105,7 @@ class QoderAdapter extends PlatformAdapter {
     const qoderCommand = [
       '---',
       `name: ${normalizeQoderName(commandDisplayName)}`,
-      `description: ${JSON.stringify(description)}`,
+      `description: ${formatFrontmatterScalar(description)}`,
       '---',
       '',
       body,
@@ -97,12 +119,18 @@ class QoderAdapter extends PlatformAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    let transformed = rewriteSkillName(
-      rewriteSharedPaths(content),
-      qoderRuntimeSkillName(context),
-    );
-    if (isQoderRuntimeSetupSurface(context)) {
+    const isEntrypoint = isSkillEntrypointContext(context);
+    let transformed = isEntrypoint
+      ? rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths)
+      : content;
+    if (isEntrypoint) {
+      transformed = rewriteSkillName(transformed, qoderRuntimeSkillName(context));
+    }
+    if (isEntrypoint && isQoderRuntimeSetupSurface(context)) {
       transformed = addQoderSetupHostPin(transformed);
+    }
+    if (isEntrypoint && isQoderPrdRuntimeSurface(context)) {
+      transformed = addQoderPrdDegradedEnforcement(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
       || (context.isWorkflowSkill ? `${this.workflowsRoot}/${context.skillName}` : '');
@@ -113,7 +141,7 @@ class QoderAdapter extends PlatformAdapter {
 
   transformAgentContent(content) {
     const { frontmatter, body } = splitMarkdownFrontmatter(content);
-    const fields = parseSimpleFrontmatterFields(frontmatter);
+    const fields = parseFrontmatterScalars(frontmatter);
     const name = normalizeQoderName(fields.name || fields.agent || 'spec-first-agent');
     const description = sanitizeFrontmatterScalar(fields.description || `spec-first agent ${name}`);
     const transformedBody = rewriteSharedPaths(body || content);
@@ -122,7 +150,7 @@ class QoderAdapter extends PlatformAdapter {
     return [
       '---',
       `name: ${name}`,
-      `description: ${JSON.stringify(description)}`,
+      `description: ${formatFrontmatterScalar(description)}`,
       `tools: [${tools.join(', ')}]`,
       '---',
       '',
@@ -162,6 +190,9 @@ class QoderAdapter extends PlatformAdapter {
     if (fs.existsSync(agentsRoot)) {
       checks.push(...inspectQoderAgentFrontmatter(projectRoot, agentsRoot));
     }
+    checks.push(this.inspectPointerRuntime(projectRoot));
+    checks.push(...inspectManagedQoderHookFiles(projectRoot));
+    checks.push(...inspectManagedQoderHooks(projectRoot).map(qoderHookStatusToRuntimeCheck));
 
     return checks.length > 0
       ? checks
@@ -172,21 +203,58 @@ class QoderAdapter extends PlatformAdapter {
       }];
   }
 
-  planRuntimeFilesRemoval() {
+  planRuntimeFilesSync(projectRoot) {
+    const pointerPlan = this.planPointerRuntimeFilesSync(projectRoot);
+    const operations = [
+      ...pointerPlan.operations,
+      ...buildManagedQoderHookWriteOperations(projectRoot),
+      ...buildRenderedQoderSettingsOperations(
+        projectRoot,
+        renderManagedQoderHooksCleanup(projectRoot),
+        'managed_qoder_hook_settings_cleanup',
+      ),
+    ];
+
+    return {
+      operations,
+      summary: summarizeOperations(operations),
+      diagnostics: pointerPlan.diagnostics || [],
+    };
+  }
+
+  planRuntimeFilesRemoval(projectRoot) {
     const operations = [{
       kind: 'remove_dir',
       path: '.qoder/commands/spec',
       reason: 'retired_runtime_command_namespace',
-    }];
+    },
+    ...this.planPointerRuntimeFilesRemoval(projectRoot).operations,
+    ...MANAGED_QODER_HOOK_FILES.map((hook) => ({
+      kind: 'remove_file',
+      path: hook.relativePath.replace(/\\/g, '/'),
+      reason: 'managed_runtime_hook',
+    })),
+    ...buildRenderedQoderSettingsOperations(
+      projectRoot,
+      renderManagedQoderHooksRemoval(projectRoot),
+      'managed_qoder_hook_settings_cleanup',
+    )];
 
     return {
       operations,
       summary: summarizeOperations(operations),
     };
   }
+
+  removeRuntimeFiles(projectRoot) {
+    for (const hook of MANAGED_QODER_HOOK_FILES) {
+      removeManagedQoderHookFile(path.join(projectRoot, hook.relativePath), projectRoot);
+    }
+  }
 }
 
 module.exports = QoderAdapter;
+module.exports.QODER_RULE_POINTER_PATH = QODER_RULE_POINTER_PATH;
 module.exports.QODER_AGENT_BASE_TOOLS = QODER_AGENT_BASE_TOOLS;
 module.exports.normalizeQoderName = normalizeQoderName;
 
@@ -233,9 +301,8 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --qoder')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --qoder')
     .replace(/\$spec-\*/g, '`spec-*`')
-    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/\$spec-runtime-setup/g, '`spec-runtime-setup`')
     .replace(/Kiro Agent\s+Skills/g, '`spec-*`')
-    .replace(/Kiro Agent\s+Skill `spec-mcp-setup`/g, '`spec-mcp-setup`');
 
   return rewriteQoderRuntimeContextSections(rewriteUsingSpecFirstQoderSections(rewritten));
 }
@@ -248,11 +315,11 @@ function rewriteUsingSpecFirstQoderSections(content) {
     )
     .replace(
       /Runtime copies under .*? are generated mirrors\. Repair stale or missing runtime guidance with `spec-first init` after choosing the target host; do not hand-edit generated mirrors as the source of truth\. Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` remain advisory input only when explicitly named\./,
-      'Runtime copies under `.qoder/commands/spec-*.md`, `.qoder/commands/spec/` (retired legacy namespace), `.qoder/skills/`, `.qoder/agents/`, `.qoder/spec-first/`, and `.qoder/settings.local.json` are generated runtime or host-local config outputs for this host. Repair stale or missing runtime guidance with `spec-first init --qoder`, and do not hand-edit generated mirrors as the source of truth. Qoder-native `.qoder/rules/**` remain advisory input only when explicitly named.',
+      'Runtime copies under `.qoder/commands/spec-*.md`, `.qoder/commands/spec/` (retired legacy namespace), `.qoder/skills/`, `.qoder/agents/`, `.qoder/spec-first/`, spec-first managed `.qoder/hooks/session-start`, `.qoder/hooks/prd-prewrite-guard`, `.qoder/hooks/prd-readiness-guard`, and `.qoder/settings.local.json` are generated runtime, managed hook outputs, or host-local config outputs for this host. Repair stale or missing runtime guidance with `spec-first init --qoder`, and do not hand-edit generated mirrors as the source of truth. Qoder-native `.qoder/rules/**` remain advisory input only when explicitly named.',
     )
     .replace(
       /Ordinary context routing follows `docs\/contracts\/context-governance\.md`: `\.spec-first\/audits\/\*\*`, `\.spec-first\/governance\/\*\*`, and generated mirrors \(.*?\) are excluded from default workflow context\. Route to setup\/update\/runtime-drift\/audit\/governance-health workflows, or require a precise user-named path, before treating those directories as evidence\. Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` remain advisory input only when explicitly named\./,
-      'Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`) are excluded from default workflow context. Route to setup/update/runtime-drift/audit/governance-health workflows, or require a precise user-named path, before treating those directories as evidence. Qoder-native `.qoder/rules/**` remain advisory input only when explicitly named.',
+      'Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, spec-first managed `.qoder/hooks/session-start`, `.qoder/hooks/prd-prewrite-guard`, `.qoder/hooks/prd-readiness-guard`, `.qoder/settings.local.json`) are excluded from default workflow context. Route to setup/update/runtime-drift/audit/governance-health workflows, or require a precise user-named path, before treating those directories as evidence. Qoder-native `.qoder/rules/**` remain advisory input only when explicitly named.',
     );
 }
 
@@ -260,11 +327,11 @@ function rewriteQoderRuntimeContextSections(content) {
   return content
     .replace(
       /generated mirrors \([^)\n]*\)/g,
-      'generated mirrors (`.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)',
+      'generated mirrors (`.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/hooks/session-start`, `.qoder/hooks/prd-prewrite-guard`, `.qoder/hooks/prd-readiness-guard`, `.qoder/settings.local.json`)',
     )
     .replace(
       /generated mirrors（[^）\n]*）/g,
-      'generated mirrors（`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）',
+      'generated mirrors（`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard`、`.qoder/settings.local.json`）',
     )
     .replace(
       /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` (?:remain|are) advisory input only when explicitly named\./g,
@@ -281,9 +348,12 @@ function rewriteQoderRuntimeContextSections(content) {
 }
 
 function isQoderRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup'
-    || context.commandName === 'mcp-setup'
-    || context.runtimeName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addQoderSetupHostPin(content) {
@@ -294,11 +364,28 @@ function addQoderSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Qoder Host Pin',
     '',
-    'When this generated Qoder `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=qoder` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, and Qoder CLIs can coexist on the same machine.',
+    'When this generated Qoder `spec-runtime-setup` runtime surface invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=qoder` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, and Qoder CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
   ].join('\n'));
+}
+
+function isQoderPrdRuntimeSurface(context = {}) {
+  return context.skillName === 'spec-prd'
+    || context.commandName === 'prd'
+    || context.runtimeName === 'spec-prd';
+}
+
+function addQoderPrdDegradedEnforcement(content) {
+  if (content.includes('Qoder degraded enforcement boundary:')) {
+    return content;
+  }
+
+  return content.replace(
+    /^Codex degraded enforcement boundary:.*$/m,
+    'Qoder degraded enforcement boundary: record `reason_code: qoder_hook_activation_unverified` in closeout when relevant. The qodercli 1.0.41 settings/exec protocol is confirmed, but authenticated event execution and shared IDE loader safety are not; `.qoder/settings.json` entries are therefore intentionally omitted and all three managed hook scripts remain inactive (SessionStart, PreToolUse, and Stop). Treat the Pre-Write Closure Gate and PRD closeout guard as loud conventions, not hard protection. Before `spec-prd` claims readiness, run the producer-local finalize command from the loaded `spec-prd` skill root. Do not imply equal protection with Claude or present generated scripts as activated hooks.',
+  );
 }
 
 function rewriteSkillName(content, skillName) {
@@ -311,45 +398,6 @@ function rewriteSkillName(content, skillName) {
 
 function qoderRuntimeSkillName(context = {}) {
   return normalizeQoderName(context.runtimeName || context.skillName);
-}
-
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
 }
 
 function normalizeQoderName(value) {
@@ -369,6 +417,142 @@ function summarizeOperations(operations) {
     summary[operation.kind] = (summary[operation.kind] || 0) + 1;
   }
   return summary;
+}
+
+function buildManagedQoderHookWriteOperations(projectRoot) {
+  return MANAGED_QODER_HOOK_FILES.map((hook) => {
+    const targetPath = path.join(projectRoot, hook.relativePath);
+    return {
+      kind: fs.existsSync(targetPath) ? 'update_file' : 'write_file',
+      path: hook.relativePath.replace(/\\/g, '/'),
+      reason: 'managed_runtime_hook',
+      contents: hook.render(),
+      mode: 0o755,
+    };
+  });
+}
+
+function renderSessionStartHookTemplate() {
+  const template = fs.readFileSync(path.join(QODER_HOOK_TEMPLATE_ROOT, 'session-start'), 'utf8');
+  return template.replace(
+    JSON.stringify(SESSION_START_CLI_PLACEHOLDER),
+    () => JSON.stringify(TRUSTED_SPEC_FIRST_CLI_PATH),
+  );
+}
+
+function buildRenderedQoderSettingsOperations(projectRoot, rendered, reason) {
+  if (!rendered) {
+    return [];
+  }
+  const relativePath = path.relative(projectRoot, rendered.filePath).replace(/\\/g, '/');
+  return [rendered.existsAfter
+    ? {
+      kind: fs.existsSync(rendered.filePath) ? 'update_file' : 'write_file',
+      path: relativePath,
+      reason,
+      contents: rendered.contents,
+    }
+    : {
+      kind: 'remove_file',
+      path: relativePath,
+      reason,
+    }];
+}
+
+function inspectManagedQoderHookFiles(projectRoot) {
+  return MANAGED_QODER_HOOK_FILES.map((hook) => {
+    const targetPath = path.join(projectRoot, hook.relativePath);
+    let actual;
+    try {
+      actual = fs.readFileSync(targetPath, 'utf8');
+    } catch (error) {
+      if (!error || error.code !== 'ENOENT') {
+        throw error;
+      }
+      return {
+        level: 'WARNING',
+        name: hook.relativePath,
+        message: `managed Qoder ${hook.displayName} hook script is missing`,
+        fix: formatInitGuidance('qoder', `in this project to write ${hook.relativePath}`),
+      };
+    }
+
+    const expected = hook.render();
+    if (actual !== expected) {
+      return {
+        level: 'WARNING',
+        name: hook.relativePath,
+        message: `managed Qoder ${hook.displayName} hook script drifted from the bundled template`,
+        fix: formatInitGuidance('qoder', `in this project to refresh ${hook.relativePath}`),
+      };
+    }
+
+    if (process.platform !== 'win32') {
+      const mode = fs.statSync(targetPath).mode & 0o777;
+      if ((mode & 0o111) === 0) {
+        return {
+          level: 'WARNING',
+          name: hook.relativePath,
+          message: `managed Qoder ${hook.displayName} hook script is not executable`,
+          fix: formatInitGuidance('qoder', `in this project to restore executable mode on ${hook.relativePath}`),
+        };
+      }
+    }
+
+    return {
+      level: 'PASS',
+      name: hook.relativePath,
+      message: `managed Qoder ${hook.displayName} hook script is installed`,
+    };
+  });
+}
+
+function qoderHookStatusToRuntimeCheck(status) {
+  const name = `${SETTINGS_RELATIVE_PATH} ${status.eventName}`;
+  if (status.drift) {
+    return {
+      level: 'WARNING',
+      name,
+      message: status.message,
+      drift: true,
+      reasonCode: status.reasonCode,
+      fix: formatInitGuidance('qoder', 'to remove managed Qoder hook settings entries that were activated without verified execution evidence'),
+    };
+  }
+
+  return {
+    level: 'WARNING',
+    name,
+    message: status.message,
+    drift: false,
+    degradedByDesign: status.degradedByDesign === true,
+    disposition: status.degradedByDesign === true ? 'known_limitation' : undefined,
+    reasonCode: status.reasonCode,
+  };
+}
+
+function removeManagedQoderHookFile(filePath, projectRoot) {
+  try {
+    fs.rmSync(filePath, { force: true });
+  } catch {
+    return;
+  }
+  removeEmptyParents(path.dirname(filePath), projectRoot);
+}
+
+function removeEmptyParents(startPath, stopRoot) {
+  let current = startPath;
+  while (current.startsWith(stopRoot) && current !== stopRoot) {
+    if (!fs.existsSync(current)) {
+      current = path.dirname(current);
+      continue;
+    }
+    if (fs.readdirSync(current).length > 0) {
+      break;
+    }
+    fs.rmdirSync(current);
+    current = path.dirname(current);
+  }
 }
 
 function sanitizeFrontmatterScalar(value) {
@@ -402,13 +586,15 @@ function inspectQoderCommandFiles(projectRoot, commandRoot) {
     .flatMap((commandPath) => {
       const content = fs.readFileSync(commandPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, commandPath).replace(/\\/g, '/');
       const issues = [];
       if (!fields.name) issues.push('missing name');
       if (!fields.description) issues.push('missing description');
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
-      if (QODER_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(content))) {
+      if (contentHasUnexpectedRuntimePathReferences('qoder', content, {
+        skillName: path.basename(commandPath, '.md'),
+      })) {
         issues.push('contains non-Qoder runtime path references');
       }
       return issues.length === 0
@@ -433,13 +619,13 @@ function inspectQoderSkillNames(projectRoot, skillsRoot) {
       if (!fs.existsSync(skillPath)) return [];
       const content = fs.readFileSync(skillPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, skillPath).replace(/\\/g, '/');
       const issues = [];
       if (fields.name !== skillDir) issues.push(`name does not match folder (${fields.name || '<missing>'})`);
       if (String(fields.name || '').length > 64) issues.push('name exceeds 64 characters');
       if (!fields.description) issues.push('missing description');
-      if (QODER_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(content))) {
+      if (contentHasUnexpectedRuntimePathReferences('qoder', content, { skillName: skillDir })) {
         issues.push('contains non-Qoder runtime path references');
       }
       return issues.length === 0
@@ -463,7 +649,7 @@ function inspectQoderAgentFrontmatter(projectRoot, agentsRoot) {
     .flatMap((agentPath) => {
       const content = fs.readFileSync(agentPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, agentPath).replace(/\\/g, '/');
       const tools = parseQoderTools(fields.tools);
       const issues = [];

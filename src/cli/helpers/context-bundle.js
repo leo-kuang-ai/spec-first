@@ -136,6 +136,24 @@ const EXCLUDED_PREFIXES = [
     reason: 'generated runtime mirrors are excluded from ordinary context',
   },
   {
+    prefix: '.qoder/hooks/session-start',
+    kind: 'managed_runtime_hook',
+    reason_code: 'managed_runtime_hook_excluded',
+    reason: 'managed runtime hooks are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/hooks/prd-prewrite-guard',
+    kind: 'managed_runtime_hook',
+    reason_code: 'managed_runtime_hook_excluded',
+    reason: 'managed runtime hooks are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/hooks/prd-readiness-guard',
+    kind: 'managed_runtime_hook',
+    reason_code: 'managed_runtime_hook_excluded',
+    reason: 'managed runtime hooks are excluded from ordinary context',
+  },
+  {
     prefix: '.qoder/settings.local.json',
     kind: 'host_local_config',
     reason_code: 'host_local_config_excluded',

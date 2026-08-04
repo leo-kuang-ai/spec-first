@@ -314,7 +314,7 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 
 **Test scenarios:**
 - Happy path: English and Chinese README section-order assertions pass with mirrored information architecture.
-- Happy path: canonical entry table includes mcp-setup, graph-bootstrap, update, sessions, slack-research, skill-audit, ideate, brainstorm, prd, doc-review, plan, write-tasks, app-consistency-audit, debug, work, optimize, polish-beta, code-review, compound, compound-refresh, and release-notes.
+- Happy path: canonical entry table includes mcp-setup, graph-bootstrap, update, sessions, slack-research, skill-review, ideate, brainstorm, prd, doc-review, plan, write-tasks, app-consistency-audit, debug, work, optimize, polish-beta, code-review, compound, compound-refresh, and release-notes.
 - Edge case: tests fail if `spec-*` and `spec-*` mappings are scattered into multiple full entry tables.
 - Error path: tests fail if local docs links introduced by downshifting do not exist.
 

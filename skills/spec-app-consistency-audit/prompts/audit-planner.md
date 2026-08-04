@@ -20,7 +20,7 @@
 - `preflight.json`
 - `impact-facts.json`
 - `app-audit-context.json`
-- 用户显式参数：`mode`、`depth`、`from:code-review`、`industry`、`expected_inputs`
+- 用户显式参数：`mode`、`depth`、`industry`、`expected_inputs`；`from:code-review` 仅作为旧 envelope 的休眠兼容 marker，不代表当前 caller。
 
 ## 输出
 

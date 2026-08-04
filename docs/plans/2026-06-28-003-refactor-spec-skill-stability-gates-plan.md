@@ -87,7 +87,7 @@ origin PRD 确认了 spec-first skill system 的四个 P0 质量债：scanner fa
 
 - target_repo: `.`
 - evidence_sources: direct source reads、Codegraph source reads、Graphify query、targeted `rg`、git status、package scripts、origin PRD、source review artifact、single-agent report-only doc-review。
-- source_refs: `docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md`, `docs/项目审查/2026-06-28-spec-skill-健壮性稳定性优化审查.md`, `skills/spec-skill-audit/scripts/lib/security-patterns.js`, `skills/spec-skill-audit/scripts/scan-instruction-security.js`, `tests/unit/skill-audit-scripts.test.js`, `src/cli/task-pack.js`, `tests/unit/task-pack-command.test.js`, `skills/spec-write-tasks/references/execution-handoff-contract.md`, `skills/spec-write-tasks/references/task-pack-schema.md`, `skills/spec-work/SKILL.md`, `skills/spec-plan/references/planning-flow.md`, `skills/spec-plan/references/plan-sections.md`, `skills/spec-plan/references/plan-template.md`, `skills/spec-doc-review/SKILL.md`, `skills/spec-code-review/SKILL.md`, `tests/unit/spec-code-review-contracts.test.js`, `tests/unit/spec-plan-contracts.test.js`, `skills/spec-plan/evals/examples.json`, `skills/spec-doc-review/evals/examples.json`, `package.json`。
+- source_refs: `docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md`, `docs/项目审查/2026-06-28-spec-skill-健壮性稳定性优化审查.md`, `skills/retired-skill-review/scripts/lib/security-patterns.js`, `skills/retired-skill-review/scripts/scan-instruction-security.js`, `tests/unit/skill-review-scripts.test.js`, `src/cli/task-pack.js`, `tests/unit/task-pack-command.test.js`, `skills/spec-write-tasks/references/execution-handoff-contract.md`, `skills/spec-write-tasks/references/task-pack-schema.md`, `skills/spec-work/SKILL.md`, `skills/spec-plan/references/planning-flow.md`, `skills/spec-plan/references/plan-sections.md`, `skills/spec-plan/references/plan-template.md`, `skills/spec-doc-review/SKILL.md`, `skills/spec-code-review/SKILL.md`, `tests/unit/spec-code-review-contracts.test.js`, `tests/unit/spec-plan-contracts.test.js`, `skills/spec-plan/evals/examples.json`, `skills/spec-doc-review/evals/examples.json`, `package.json`。
 - planning_snapshot_revision: `bc71b4be`
 - current_review_revision: `bc71b4be`
 - worktree_status: dirty before this plan；已有 modified files 包括 `CHANGELOG.md`、`skills/spec-prd/scripts/check-prd-artifact.js`、`skills/spec-prd/scripts/finalize-prd-artifact.js`、`tests/unit/spec-prd-checker-unit.test.js`、`tests/unit/spec-prd-reason-codes-unit.test.js`，另有未跟踪 PRD/source-analysis docs。completion audit 时还看到并发/无关变更：删除旧 `docs/plans/2026-06-26-001-feat-spec-plan-enterprise-readiness-plan.md` 与 `docs/plans/2026-06-26-002-refactor-spec-plan-architect-grade-upgrade-plan.md`，并新增 `docs/plans/2026-06-28-004-refactor-spec-plan-enterprise-architect-upgrade-plan.md`。本计划只 owns `docs/plans/2026-06-28-003-refactor-spec-skill-stability-gates-plan.md` 及其 changelog entry，不回退或吸收这些并发变更。
@@ -112,8 +112,8 @@ origin PRD 确认了 spec-first skill system 的四个 P0 质量债：scanner fa
 
 ### Relevant Code and Patterns
 
-- `skills/spec-skill-audit/scripts/lib/security-patterns.js` 拥有 dangerous pattern definitions 与 `PROHIBITION_HINTS`；`skills/spec-skill-audit/scripts/scan-instruction-security.js` 负责 context classification，并只排除 detector catalog 自身。
-- `tests/unit/skill-audit-scripts.test.js` 已有 real dangerous commands、negative-boundary downgrades、runtime path references 和 detector-own-source exclusion fixtures。U1 应扩展这组 fixture，而不是新建 test harness。
+- `skills/retired-skill-review/scripts/lib/security-patterns.js` 拥有 dangerous pattern definitions 与 `PROHIBITION_HINTS`；`skills/retired-skill-review/scripts/scan-instruction-security.js` 负责 context classification，并只排除 detector catalog 自身。
+- `tests/unit/skill-review-scripts.test.js` 已有 real dangerous commands、negative-boundary downgrades、runtime path references 和 detector-own-source exclusion fixtures。U1 应扩展这组 fixture，而不是新建 test harness。
 - `src/cli/task-pack.js` 拥有 deterministic task-pack validation，包括 `REQUIRED_TASK_FIELDS`、`ALLOWED_TASK_FIELDS`、hash/identity checks、generated-runtime file rejection、dependency/wave checks、same-wave file overlap checks，以及供 parity tests 消费的 exported field whitelist。
 - `skills/spec-write-tasks/references/task-pack-schema.md` 说明 deterministic validation 只检查 identity、freshness、structure，并记录 validator fields 与 task-card schema tables 必须同步维护。
 - `skills/spec-write-tasks/references/execution-handoff-contract.md` 已定义 final envelope、posture enum、dispatch authorization enum，以及 deterministic handoff 不证明 semantic task quality 的 non-goal。
@@ -198,9 +198,9 @@ flowchart TB
 **Dependencies:** None
 
 **Files:**
-- Modify: `skills/spec-skill-audit/scripts/lib/security-patterns.js`
-- Modify: `tests/unit/skill-audit-scripts.test.js`
-- Test: `tests/unit/skill-audit-scripts.test.js`
+- Modify: `skills/retired-skill-review/scripts/lib/security-patterns.js`
+- Modify: `tests/unit/skill-review-scripts.test.js`
+- Test: `tests/unit/skill-review-scripts.test.js`
 
 **Approach:**
 - 扩展 scanner 对 generated-runtime contexts 中 boundary/prohibition language 的识别，例如 "does not"、"are not source"、"not source"、"excludes generated mirrors"。
@@ -208,8 +208,8 @@ flowchart TB
 - 保留已有 detector-own-source exclusion 和 documented-pattern handling。
 
 **Patterns to follow:**
-- `tests/unit/skill-audit-scripts.test.js` 中已有 negative-boundary 与 runtime-path-reference fixtures。
-- `skills/spec-skill-audit/scripts/lib/security-patterns.js` 中的 `classifyPatternContext`。
+- `tests/unit/skill-review-scripts.test.js` 中已有 negative-boundary 与 runtime-path-reference fixtures。
+- `skills/retired-skill-review/scripts/lib/security-patterns.js` 中的 `classifyPatternContext`。
 
 **Test scenarios:**
 - Happy path: 声明 generated mirrors are not source and are excluded from ordinary context 的行不产生 P0 `runtime_governance` finding。
@@ -456,8 +456,8 @@ flowchart TB
 
 - **Origin document:** [docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md](../brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md)
 - **Source review:** [docs/项目审查/2026-06-28-spec-skill-健壮性稳定性优化审查.md](../项目审查/2026-06-28-spec-skill-健壮性稳定性优化审查.md)
-- Related code: `skills/spec-skill-audit/scripts/lib/security-patterns.js`
-- Related code: `skills/spec-skill-audit/scripts/scan-instruction-security.js`
+- Related code: `skills/retired-skill-review/scripts/lib/security-patterns.js`
+- Related code: `skills/retired-skill-review/scripts/scan-instruction-security.js`
 - Related code: `src/cli/task-pack.js`
 - Related workflow source: `skills/spec-plan/references/planning-flow.md`
 - Related workflow source: `skills/spec-plan/references/plan-sections.md`
@@ -467,7 +467,7 @@ flowchart TB
 - Related workflow source: `skills/spec-work/SKILL.md`
 - Related workflow source: `skills/spec-doc-review/SKILL.md`
 - Related workflow source: `skills/spec-code-review/SKILL.md`
-- Related tests: `tests/unit/skill-audit-scripts.test.js`
+- Related tests: `tests/unit/skill-review-scripts.test.js`
 - Related tests: `tests/unit/task-pack-command.test.js`
 - Related tests: `tests/unit/spec-plan-contracts.test.js`
 - Related tests: `tests/unit/spec-doc-review-contracts.test.js`

@@ -1,0 +1,607 @@
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -33 +34 @@ These rules apply to every brainstorm, including the universal (non-software) fl
+-4. **Default to the platform's blocking question tool** - Use `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. These tools include a free-text fallback, so well-chosen options scaffold the answer without confining it. This default holds for opening and elicitation questions too, not only narrowing. Fall back to numbered options in chat only when no blocking tool exists in the harness (including `ToolSearch` returning no match for it) or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. **Exception — visual-probe gate:** on an inherently-visual topic (Phase 0.3 tripwire), the first shape/behavior/state/layout/flow/diagram decision is governed by `references/visual-probes.md`, which takes precedence over this rule. See the Phase 1.3 gate.
++4. **Default to the platform's blocking question tool** - Use `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex. These tools include a free-text fallback, so well-chosen options scaffold the answer without confining it. This default holds for opening and elicitation questions too, not only narrowing. Fall back to numbered options in chat only when no blocking tool exists in the harness (including `ToolSearch` returning no match for it) or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -143 +145 @@ Product-tier triggers additional Phase 1.2 questions and additional Product Cont
+-**Visual probe tripwire.** If the feature is inherently visual or spatial — drawing/canvas tools, annotation behavior, visual editors, UI layout or navigation, interaction states, charts, diagrams, animation, maps, timelines, or spatial flows — read `references/visual-probes.md` now. Strong signals include freehand vs constrained drawing behavior, canvas annotation tools, layout comparisons, and state/flow placement. Loading the reference here is readiness only; it owns when the gate fires (state-based, at the first shape/behavior/state/layout/flow/diagram decision), the text-vs-visual offer, and helper invocation.
++**Visual and spatial decisions stay conversation-native.** Ask about a layout, state, flow, diagram, or interaction with a comparison table, state sequence, ASCII wireframe, or read-only source screenshot. Keep one question at a time and use the normal current-user confirmation path. When the answer is sufficient, close the affected Requirement, Acceptance Example, or Scope blocker normally. When real interaction or application state is indispensable, keep a named blocker and future evidence need. Do not generate HTML, CSS, or JavaScript, start a browser helper, or create a second artifact.
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -196,2 +199,0 @@ Follow the Interaction Rules above. Use the platform's blocking question tool wh
+-**Visual-probe gate — precondition, check it before raising the first shape decision.** If the Phase 0.3 tripwire fired, then before raising the first decision about shape, behavior, state, layout, flow, or a diagram — in any form, plain chat or a blocking tool — fire the text-vs-visual offer from `references/visual-probes.md`. The gate is state-based: offer unless this specific decision has already been through it; anchor the check to the decision you are about to raise, not a "pending gate" remembered since Phase 0.3. It **takes precedence over the default blocking-question path** (Interaction Rule 4): do not raise the shape decision as an `AskUserQuestion`/`request_user_input` menu until the user has declined visual. **An ASCII preview or text mockup inside the question's choices does not satisfy the offer** — that is the shortcut this gate exists to stop. Use the platform's blocking question tool for the text-vs-visual offer itself when available; the reference owns the offer wording, the cheapest-probe build, helper invocation, and the display-only feedback contract.
+-
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index aa2282ba..9ff52d06 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -220 +222 @@ Present approaches first, then evaluate. Let the user see all options before hea
+-If approach differences are spatial, behavioral, or otherwise visual enough that prose would be slower or lower-fidelity, use `references/visual-probes.md` before presenting the choice. If the Phase 0.3 tripwire fired and no shape decision has yet been through the gate, the offer fires here, per that reference. The visual path remains opt-in and display-only; text remains a first-class path.
++If approach differences are spatial, behavioral, or otherwise visual, present the smallest conversation-native comparison that preserves the decision: a table, numbered states, or ASCII wireframe. A sufficient current-user answer closes the same Product Contract target as any other product decision.
+diff --git a/skills/spec-brainstorm/references/visual-probes.md b/skills/spec-brainstorm/references/visual-probes.md
+deleted file mode 100644
+index 070c84e1..00000000
+--- a/skills/spec-brainstorm/references/visual-probes.md
++++ /dev/null
+@@ -1,146 +0,0 @@
+-# Visual Probes
+-
+-Use visual probes when a brainstorm decision is faster to judge by seeing a rough artifact than by reading prose. A visual probe is a disposable decision sketch, not a prototype, implementation plan, UI spec, or design deliverable.
+-
+-## Trigger
+-
+-Use this reference only when the next question has a specific visual decision:
+-
+-- behavior shape: "Which annotation or drawing behavior feels right?"
+-- layout shape: "Which navigation structure matches the workflow?"
+-- flow shape: "Where should this decision point sit?"
+-- state shape: "Which empty/loading/error state communicates the right thing?"
+-- diagram shape: "Which relationship or system boundary is clearer?"
+-
+-Do not use a visual probe for product goals, scope boundaries, success criteria, evidence probes, tradeoff prose, or technical decisions that are easier to discuss in chat.
+-
+-## The gate (when the offer must fire)
+-
+-When the Phase 0.3 tripwire flagged an inherently-visual topic, the offer must fire before the **first** decision about shape, behavior, state, layout, flow, or a diagram is raised in *any* form — plain chat or a blocking question.
+-
+-**Timing is state-based, not memory-based.** Anchor the check to the decision you are about to raise, not to a "pending gate" remembered since Phase 0.3: offer unless this specific decision has already been through the offer (the user already chose text or visual for it). This gate takes precedence over the default blocking-question path — do not raise the shape decision as an `AskUserQuestion`/`request_user_input` menu, or as a plain-chat shape question, until the user has declined visual (or visual feedback has returned to chat).
+-
+-**An ASCII preview or text mockup embedded inside the question's choices does NOT satisfy the offer** — that shortcut is exactly what this gate exists to stop. The offer is its own prior question with two options (sketch vs describe); only after the user chooses does the shape decision proceed.
+-
+-## Offer
+-
+-Ask once at the decision point. Do not enable a session-wide mode.
+-
+-Use the platform's blocking question tool for the opt-in when available (`AskUserQuestion`, `request_user_input`, or equivalent). Use a plain chat question only when no interactive question tool exists or the tool errors. The opt-in should have two clear options:
+-
+-- Visual sketch — create rough options in a local browser
+-- Text description — keep the decision in chat
+-
+-Use this wording:
+-
+-> This decision may be easier to judge visually. I can either sketch rough options in a local browser so you can react to the shape, or keep it in chat and describe the options textually, which is faster but lower-fidelity. Which do you prefer?
+-
+-The text path must be credible. If you cannot explain the decision clearly in text, you do not understand it well enough to sketch it.
+-
+-If the user chooses text, continue in chat and do not re-offer for the same decision. If they choose visual, proceed below.
+-
+-## Visual Path
+-
+-Create the cheapest artifact that answers the current question. Optimize for fast feedback, not polish.
+-
+-Allowed:
+-
+-- rough behavior sketches
+-- low-fidelity wireframes
+-- state comparisons
+-- flow diagrams
+-- simple A/B/C visual contrasts
+-- disposable interaction demos only when behavior itself is the decision
+-
+-Avoid:
+-
+-- polished branding
+-- final colors or typography
+-- component-library precision
+-- pixel-perfect layout
+-- production-like implementation
+-- unnecessary animation
+-- details that imply exact UI commitments
+-
+-Label the artifact as directional. State what the user should judge and what they should ignore.
+-
+-## Display Helper
+-
+-Use the bundled display-only helper when the current platform can run a bundled skill script. Invoke it via the `SKILL_DIR` anchor: set `SKILL_DIR` to the absolute path of the directory containing the `spec-brainstorm` `SKILL.md` you loaded (the Bash tool's cwd is the user's project, not the skill dir), and re-set it in the same command on each call since shell vars don't persist between Bash invocations. Do not resolve the helper from the user's project CWD.
+-
+-Start (detached):
+-
+-```bash
+-SKILL_DIR="<absolute path of the spec-brainstorm skill directory>"
+-node "$SKILL_DIR/scripts/visual-probe-server.js" start --root /tmp/spec-first/spec-brainstorm-visual/<run-id>
+-```
+-
+-Append `--foreground` to that `start` command for foreground mode. Status and stop take the same anchor — and because `SKILL_DIR` does not persist between Bash invocations, each must re-set it in its own call rather than reuse the `start` block's value:
+-
+-```bash
+-SKILL_DIR="<absolute path of the spec-brainstorm skill directory>"
+-node "$SKILL_DIR/scripts/visual-probe-server.js" status --root /tmp/spec-first/spec-brainstorm-visual/<run-id>
+-# stop: the same command with `stop` in place of `status` (re-set SKILL_DIR again)
+-```
+-
+-If `SKILL_DIR` cannot be resolved to a concrete skill directory, do not guess from the project CWD — use the text path.
+-
+-The helper creates `screens/` and `state/`, serves the newest `.html` file in `screens/`, writes `state/display-info.json`, and exposes `/version` so the browser can poll for screen changes. The browser reloads only when the newest screen changes; it must not continually reload on a timer. `/version` polling does not count as activity, so an abandoned browser tab cannot keep the server alive forever. Detached servers monitor the owning harness process when it can be resolved, and all servers exit after an idle timeout. The helper has no click tracking or browser-to-agent event path.
+-
+-If the helper path is unavailable or the platform cannot display a local URL cleanly, say so briefly and use the text path. Do not build a custom event system or long-lived server to compensate during the brainstorm.
+-
+-## Launch Mode by Platform
+-
+-The server is the same everywhere; only the launch mode changes.
+-
+-- **Claude Code / Claude desktop app:** detached `start` is the default path. If the app opens localhost URLs, show the returned URL and continue. If the browser surface is unavailable, use the text path.
+-- **Codex CLI / Codex app:** if detached processes are reaped or the URL dies after the tool call, use `start --foreground` through the platform's long-running/background terminal mechanism. If there is no stable browser surface, use the text path.
+-- **Plain terminal UI:** print the returned URL for the user to open manually. If opening a browser would interrupt the flow, keep the decision in chat.
+-- **Remote or containerized sessions:** if `localhost` is not reachable from the user's browser, start with `--host 0.0.0.0` and tell the user which host/port to open. If that cannot be made clear, use the text path.
+-
+-Never force the visual path because a local server exists. The user chose visual to understand the decision faster; if the platform plumbing gets in the way, switch back to text.
+-
+-## Post-Artifact Feedback
+-
+-After showing the visual artifact, use the platform's blocking question tool for bounded artifact feedback when available. This is still chat-based feedback, not browser event capture.
+-
+-Use a bounded interactive question when the expected response is a small choice set:
+-
+-- A/B/C/D option selection
+-- visual direction vs mix
+-- choose one layout/state/behavior
+-- accept one option with requested tweaks
+-
+-Include a free-text fallback option when the tool supports it. Use plain chat only when feedback is genuinely open critique, no interactive question tool exists, or the tool errors.
+-
+-Good post-artifact prompt:
+-
+-> Which direction best matches what you want? Pick A, B, C, D, or mix, and use the free-text fallback for anything that feels off. Judge the behavior shape, not the exact styling.
+-
+-Do not ask the user to click inside the browser artifact. The question tool is for the chat/session response after the artifact is visible.
+-
+-## Interaction Contract
+-
+-The browser/artifact is display-only. Feedback happens in chat.
+-
+-Do not add click tracking, selected states, event ingestion, forms, analytics, or "submit" affordances in v1. Do not ask the user to click an option. Ask them to look at the artifact and reply in chat with the choice, mix, or correction.
+-
+-If no interactive question tool is available, use this plain-chat fallback after showing the artifact:
+-
+-> I’m showing three rough options. Reply here with A, B, C, or "mix", plus anything that feels off. Judge the behavior shape, not the exact styling.
+-
+-The user's chat response is authoritative. The visual artifact is supporting context only.
+-
+-## File Placement
+-
+-Use OS temp by default because visual probes are disposable scratch:
+-
+-```text
+-/tmp/spec-first/spec-brainstorm-visual/<run-id>/
+-  screens/
+-    001-<decision>.html
+-  state/
+-    display-info.json
+-```
+-
+-Use `.context/spec-first/spec-brainstorm-visual/<run-id>/` only when the user explicitly wants to inspect, preserve, or curate the sketches after the session. The probe is disposable scratch; the durable artifact is the Phase 3 requirements-only unified plan under `docs/plans/`.
+diff --git a/skills/spec-brainstorm/scripts/visual-probe-server.js b/skills/spec-brainstorm/scripts/visual-probe-server.js
+deleted file mode 100644
+index ecc568fb..00000000
+--- a/skills/spec-brainstorm/scripts/visual-probe-server.js
++++ /dev/null
+@@ -1,421 +0,0 @@
+-#!/usr/bin/env node
+-'use strict';
+-
+-const { execFileSync, spawn } = require("node:child_process")
+-const fs = require("node:fs")
+-const http = require("node:http")
+-const path = require("node:path")
+-
+-const scriptPath = __filename
+-const DEFAULT_HOST = "127.0.0.1"
+-const DEFAULT_URL_HOST = "localhost"
+-const IDLE_TIMEOUT_MS = Number(process.env.SPEC_FIRST_VISUAL_PROBE_IDLE_TIMEOUT_MS) || 30 * 60 * 1000
+-const LIFECYCLE_CHECK_MS = Number(process.env.SPEC_FIRST_VISUAL_PROBE_LIFECYCLE_CHECK_MS) || 60 * 1000
+-
+-function usage() {
+-  return [
+-    "Usage:",
+-    "  node visual-probe-server.js start --root <dir> [--host 127.0.0.1] [--port 0] [--foreground] [--owner-pid <pid>]",
+-    "  node visual-probe-server.js stop --root <dir>",
+-    "  node visual-probe-server.js status --root <dir>",
+-  ].join("\n")
+-}
+-
+-function parseArgs(argv) {
+-  const command = argv[2]
+-  const options = {
+-    command,
+-    host: DEFAULT_HOST,
+-    port: 0,
+-    foreground: false,
+-  }
+-
+-  for (let i = 3; i < argv.length; i++) {
+-    const arg = argv[i]
+-    if (arg === "--root") {
+-      options.root = argv[++i]
+-    } else if (arg === "--host") {
+-      options.host = argv[++i]
+-    } else if (arg === "--port") {
+-      options.port = Number(argv[++i])
+-    } else if (arg === "--foreground") {
+-      options.foreground = true
+-    } else if (arg === "--owner-pid") {
+-      options.ownerPid = Number(argv[++i])
+-    } else {
+-      throw new Error(`Unknown argument: ${arg}`)
+-    }
+-  }
+-
+-  if (!["start", "serve", "stop", "status"].includes(command)) {
+-    throw new Error(usage())
+-  }
+-  if (!options.root) {
+-    throw new Error("--root is required")
+-  }
+-  if (!Number.isInteger(options.port) || options.port < 0 || options.port > 65535) {
+-    throw new Error("--port must be an integer from 0 to 65535")
+-  }
+-  if (options.ownerPid !== undefined && (!Number.isInteger(options.ownerPid) || options.ownerPid <= 1)) {
+-    throw new Error("--owner-pid must be an integer greater than 1")
+-  }
+-
+-  options.root = path.resolve(options.root)
+-  options.screensDir = path.join(options.root, "screens")
+-  options.stateDir = path.join(options.root, "state")
+-  options.pidFile = path.join(options.stateDir, "server.pid")
+-  options.infoFile = path.join(options.stateDir, "display-info.json")
+-  options.logFile = path.join(options.stateDir, "server.log")
+-  return options
+-}
+-
+-function ensureDirs(options) {
+-  fs.mkdirSync(options.screensDir, { recursive: true })
+-  fs.mkdirSync(options.stateDir, { recursive: true })
+-}
+-
+-function jsonOut(value) {
+-  process.stdout.write(`${JSON.stringify(value)}\n`)
+-}
+-
+-function readJson(filePath) {
+-  return JSON.parse(fs.readFileSync(filePath, "utf8"))
+-}
+-
+-function processAlive(pid) {
+-  if (!pid || !Number.isInteger(pid)) return false
+-  try {
+-    process.kill(pid, 0)
+-    return true
+-  } catch (error) {
+-    return error?.code === "EPERM"
+-  }
+-}
+-
+-function processArgs(pid) {
+-  try {
+-    return execFileSync("ps", ["-p", String(pid), "-o", "args="], {
+-      encoding: "utf8",
+-      stdio: ["ignore", "pipe", "ignore"],
+-    }).trim()
+-  } catch {
+-    return null
+-  }
+-}
+-
+-function ownsServerProcess(options, pid) {
+-  const args = processArgs(pid)
+-  // Process-command inspection is best-effort; when unavailable, fall back to
+-  // PID-file behavior so stop still works on platforms without a compatible ps.
+-  if (args === null) return true
+-  return args.includes(scriptPath) && args.includes("serve") && args.includes(options.root)
+-}
+-
+-function resolveOwnerPid() {
+-  const parentPid = process.ppid
+-  if (!parentPid || parentPid <= 1) return null
+-  try {
+-    const grandparent = Number(execFileSync("ps", ["-o", "ppid=", "-p", String(parentPid)], {
+-      encoding: "utf8",
+-      stdio: ["ignore", "pipe", "ignore"],
+-    }).trim())
+-    if (Number.isInteger(grandparent) && grandparent > 1) return grandparent
+-  } catch {
+-    // Fall back to the direct parent when grandparent lookup is unavailable.
+-  }
+-  return parentPid
+-}
+-
+-function readPid(options) {
+-  if (!fs.existsSync(options.pidFile)) return null
+-  const pid = Number(fs.readFileSync(options.pidFile, "utf8").trim())
+-  return Number.isInteger(pid) ? pid : null
+-}
+-
+-function getRunningInfo(options) {
+-  const pid = readPid(options)
+-  if (!processAlive(pid)) return null
+-  if (!ownsServerProcess(options, pid)) return null
+-  if (!fs.existsSync(options.infoFile)) return null
+-  return readJson(options.infoFile)
+-}
+-
+-function newestScreen(options) {
+-  if (!fs.existsSync(options.screensDir)) return null
+-  const files = fs.readdirSync(options.screensDir)
+-    .filter((file) => file.endsWith(".html"))
+-    .map((file) => {
+-      const filePath = path.join(options.screensDir, file)
+-      return { filePath, mtimeMs: fs.statSync(filePath).mtimeMs }
+-    })
+-    .sort((a, b) => b.mtimeMs - a.mtimeMs)
+-  return files[0]?.filePath ?? null
+-}
+-
+-function isFullDocument(html) {
+-  const trimmed = html.trimStart().toLowerCase()
+-  return trimmed.startsWith("<!doctype") || trimmed.startsWith("<html")
+-}
+-
+-function screenVersion(options) {
+-  const screen = newestScreen(options)
+-  if (!screen) return { screen: null, mtimeMs: 0 }
+-  return {
+-    screen: path.basename(screen),
+-    mtimeMs: fs.statSync(screen).mtimeMs,
+-  }
+-}
+-
+-function refreshScript(options) {
+-  const initialVersion = JSON.stringify(screenVersion(options))
+-  return `<script>
+-(function(){
+-  var currentVersion = ${initialVersion};
+-  function key(version) {
+-    return String(version && version.screen) + ":" + String(version && version.mtimeMs);
+-  }
+-  async function checkForVisualProbeUpdate() {
+-    try {
+-      var response = await fetch("/version", { cache: "no-store" });
+-      if (!response.ok) return;
+-      var nextVersion = await response.json();
+-      if (key(nextVersion) !== key(currentVersion)) {
+-        window.location.reload();
+-      }
+-    } catch (error) {
+-      // Keep the current sketch visible if the transient version check fails.
+-    }
+-  }
+-  setInterval(checkForVisualProbeUpdate, 1000);
+-})();
+-</script>`
+-}
+-
+-function wrapFragment(options, content) {
+-  return `<!doctype html>
+-<html>
+-<head>
+-  <meta charset="utf-8">
+-  <meta name="viewport" content="width=device-width, initial-scale=1">
+-  <title>Spec-First Brainstorm Visual Probe</title>
+-  <style>
+-    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f7f7f8; color: #1f2328; }
+-    header { padding: 10px 18px; border-bottom: 1px solid #d8dee4; background: #fff; color: #57606a; font-size: 13px; }
+-    main { padding: 24px; }
+-  </style>
+-</head>
+-<body>
+-  <header>Spec-First Brainstorm Visual Probe - directional sketch, reply in chat</header>
+-  <main>${content}</main>
+-  ${refreshScript(options)}
+-</body>
+-</html>`
+-}
+-
+-function injectRefresh(options, html) {
+-  if (html.includes("</body>")) {
+-    return html.replace("</body>", `${refreshScript(options)}\n</body>`)
+-  }
+-  return `${html}\n${refreshScript(options)}`
+-}
+-
+-function renderPage(options) {
+-  const screen = newestScreen(options)
+-  if (!screen) {
+-    return wrapFragment(options, "<h1>Waiting for a visual probe...</h1><p>The agent will update this page when a sketch is ready.</p>")
+-  }
+-  const html = fs.readFileSync(screen, "utf8")
+-  return isFullDocument(html) ? injectRefresh(options, html) : wrapFragment(options, html)
+-}
+-
+-function safeFileResponse(options, req, res) {
+-  const name = decodeURIComponent(req.url.slice("/files/".length))
+-  const filePath = path.join(options.screensDir, path.basename(name))
+-  if (!fs.existsSync(filePath)) {
+-    res.writeHead(404)
+-    res.end("Not found")
+-    return
+-  }
+-  res.writeHead(200, { "Content-Type": contentType(filePath) })
+-  res.end(fs.readFileSync(filePath))
+-}
+-
+-function contentType(filePath) {
+-  const ext = path.extname(filePath).toLowerCase()
+-  if (ext === ".svg") return "image/svg+xml"
+-  if (ext === ".png") return "image/png"
+-  if (ext === ".jpg" || ext === ".jpeg") return "image/jpeg"
+-  if (ext === ".gif") return "image/gif"
+-  if (ext === ".html") return "text/html; charset=utf-8"
+-  if (ext === ".css") return "text/css; charset=utf-8"
+-  if (ext === ".js") return "text/javascript; charset=utf-8"
+-  return "application/octet-stream"
+-}
+-
+-async function start(options) {
+-  ensureDirs(options)
+-  options.ownerPid = options.ownerPid ?? resolveOwnerPid()
+-  const running = getRunningInfo(options)
+-  if (running) {
+-    jsonOut({ ...running, status: "running" })
+-    return
+-  }
+-
+-  fs.rmSync(options.pidFile, { force: true })
+-  fs.rmSync(options.infoFile, { force: true })
+-
+-  if (options.foreground) {
+-    await serve(options)
+-    return
+-  }
+-
+-  const logFd = fs.openSync(options.logFile, "a")
+-  const child = spawn(process.execPath, [
+-    scriptPath,
+-    "serve",
+-    "--root",
+-    options.root,
+-    "--host",
+-    options.host,
+-    "--port",
+-    String(options.port),
+-    ...(options.ownerPid ? ["--owner-pid", String(options.ownerPid)] : []),
+-  ], {
+-    detached: true,
+-    stdio: ["ignore", logFd, logFd],
+-  })
+-  child.unref()
+-  fs.closeSync(logFd)
+-
+-  const started = await waitForInfo(options, child.pid)
+-  if (!started) {
+-    throw new Error(`Server failed to start. See ${options.logFile}`)
+-  }
+-  jsonOut({ ...started, status: "started" })
+-}
+-
+-async function waitForInfo(options, pid) {
+-  for (let i = 0; i < 100; i++) {
+-    if (fs.existsSync(options.infoFile)) return readJson(options.infoFile)
+-    if (pid && !processAlive(pid)) return null
+-    await new Promise((resolve) => setTimeout(resolve, 50))
+-  }
+-  return null
+-}
+-
+-async function serve(options) {
+-  ensureDirs(options)
+-
+-  let lastActivity = Date.now()
+-  const touch = () => {
+-    lastActivity = Date.now()
+-  }
+-
+-  const server = http.createServer((req, res) => {
+-    if (req.method === "GET" && req.url === "/") {
+-      touch()
+-      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
+-      res.end(renderPage(options))
+-      return
+-    }
+-    if (req.method === "GET" && req.url === "/version") {
+-      res.writeHead(200, {
+-        "Content-Type": "application/json; charset=utf-8",
+-        "Cache-Control": "no-store",
+-      })
+-      res.end(`${JSON.stringify(screenVersion(options))}\n`)
+-      return
+-    }
+-    if (req.method === "GET" && req.url.startsWith("/files/")) {
+-      touch()
+-      safeFileResponse(options, req, res)
+-      return
+-    }
+-    res.writeHead(404)
+-    res.end("Not found")
+-  })
+-
+-  server.listen(options.port, options.host, () => {
+-    const address = server.address()
+-    const port = typeof address === "object" && address ? address.port : options.port
+-    const info = {
+-      status: "running",
+-      root: options.root,
+-      host: options.host,
+-      port,
+-      url: `http://${DEFAULT_URL_HOST}:${port}`,
+-      screen_dir: options.screensDir,
+-      state_dir: options.stateDir,
+-      pid: process.pid,
+-      owner_pid: options.ownerPid ?? null,
+-    }
+-    fs.writeFileSync(options.pidFile, `${process.pid}\n`)
+-    fs.writeFileSync(options.infoFile, `${JSON.stringify(info, null, 2)}\n`)
+-    console.log(JSON.stringify(info))
+-  })
+-
+-  const idleTimer = setInterval(() => {
+-    if (options.ownerPid && !processAlive(options.ownerPid)) {
+-      server.close(() => process.exit(0))
+-    } else if (Date.now() - lastActivity > IDLE_TIMEOUT_MS) {
+-      server.close(() => process.exit(0))
+-    }
+-  }, LIFECYCLE_CHECK_MS)
+-  idleTimer.unref()
+-}
+-
+-async function stop(options) {
+-  const pid = readPid(options)
+-  if (!processAlive(pid)) {
+-    fs.rmSync(options.pidFile, { force: true })
+-    jsonOut({ status: "stopped", root: options.root })
+-    return
+-  }
+-  if (!ownsServerProcess(options, pid)) {
+-    fs.rmSync(options.pidFile, { force: true })
+-    jsonOut({ status: "stopped", root: options.root })
+-    return
+-  }
+-
+-  process.kill(pid)
+-  for (let i = 0; i < 20; i++) {
+-    if (!processAlive(pid)) break
+-    await new Promise((resolve) => setTimeout(resolve, 100))
+-  }
+-  if (processAlive(pid)) {
+-    try {
+-      process.kill(pid, "SIGKILL")
+-    } catch {
+-      // Process may have exited between the liveness check and kill.
+-    }
+-  }
+-
+-  fs.rmSync(options.pidFile, { force: true })
+-  jsonOut({ status: "stopped", root: options.root })
+-}
+-
+-function status(options) {
+-  const info = getRunningInfo(options)
+-  if (!info) {
+-    jsonOut({ status: "stopped", root: options.root })
+-    return
+-  }
+-  jsonOut({ ...info, status: "running" })
+-}
+-
+-async function main() {
+-  try {
+-    const options = parseArgs(process.argv)
+-    if (options.command === "start") await start(options)
+-    else if (options.command === "serve") await serve(options)
+-    else if (options.command === "stop") await stop(options)
+-    else if (options.command === "status") status(options)
+-  } catch (error) {
+-    console.error(error.message)
+-    process.exit(1)
+-  }
+-}
+-
+-if (require.main === module) {
+-  main()
+-}

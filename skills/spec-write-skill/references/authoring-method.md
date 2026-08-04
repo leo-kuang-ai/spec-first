@@ -1,145 +1,135 @@
 # Authoring Method
 
-本 reference 是 `spec-write-skill` 的资格判断与写作方法边界：先确认是否值得写成 skill，再收敛意图、扫描可复用 pattern、识别反模式。`yao-meta-skill` 只作为来源背景；不要引入完整 SkillOps 平台、全量 IR、registry、reports 或 cross-packager。
+**trigger_condition：** core branch 已确定为 owner blocked、Tier A apply 或 full apply，需判断是否值得 authoring、解析 canonical source/effect，或设计 portable core。
+**purpose：** 只承接 portable authoring 的 qualification、source/effect resolution、resource placement 与迁移 disposition。
+**fallback_if_unread：** near-neighbor 只路由；无法确认 owner 时只给 candidate preview 并保持零 mutation；不得用本 reference 代替 delivery evidence。
 
-## Contents
+宿主差异见 `target-profiles.md`，项目治理与 source/runtime 见 `project-profiles.md`，验证见 `delivery-gates.md`。
 
-- §1 Qualification
-- §2 Intent Dialogue
-- §2.2 Evidence Matrix Readiness
-- §2.5 Skill Creator Compatibility
-- §3 Reference Scan
-- §3.5 Branch And Pointer Design
-- §4 Authoring Discipline
-- §5 Anti-Pattern Families
+## Qualification And Intent Contract
 
-## 1. Qualification
+只有满足至少一项才创建或扩展 Skill：
 
-先判断是否值得写成 skill。至少满足一项，才继续进入 source authoring：
+- recurring job 会重复发生；
+- near-neighbor 容易误路由；
+- deterministic script/reference 能减少重复错误；
+- portability、治理或 source ownership 是承重边界。
 
-- 会被重复使用，且重复场景能被一句 recurring job 描述。
-- 近邻请求容易误触发，需要可维护的 trigger/boundary contract。
-- 确定性脚本、eval 或 package-local reference 能减少重复劳动。
-- 双宿主、治理、可移植或 source/runtime 边界很重要。
+默认不创建或修改 Skill：一次性回答、解释/总结/翻译、普通文档导出、只讨论未来大纲、普通 code review/debug/plan/work、第三方安装或导入。纯安装/导入请求直接路由 installer，不进入本 workflow，也不强制附加 readiness 检查。只有用户明确同时要求独立的 readiness、安全或结构检查时，才先以 `base_operation=revise`、`effect=validate-only` 完成 no-follow 检查并停止；复制、安装或导入仍交给独立入口重新授权。
 
-以下请求默认不创建 skill：
+Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operation=null`、`effect=not-entered`、`modifier=none`。后续入口可以建议普通 code work、bounded source review、installer 或 runtime maintenance，但不得把那些入口的预期动作记成本 workflow 的 `apply`/`validate-only`，也不得继续执行本 workflow 的 inventory、validator 或 mutation步骤。
 
-- 一次性回答、一次性 prompt、单次文案或单次解释。
-- 只要求解释、总结、翻译、整理当前材料含义。
-- 只要求把内容导出为文档、README、报告、幻灯片或 release note。
-- 只是在构思未来可能的 skill，明确说“不创建文件”或“先讨论”。
-- 普通代码 review、debug、plan/work 执行、安装第三方 skill。
+进入 authoring 前至少得到：
 
-输出姿态：
+- one-sentence recurring job；
+- real inputs 与 required outputs；
+- should-trigger 和 should-not-trigger/near-neighbor 各一个真实示例；
+- base operation：`create|revise`；
+- effect：`apply|validate-only`；
+- modifier：`migrate|audit-remediation|none`；
+- target repo、Skill root、canonical source owner；
+- mutation authorization：`ready|preview-only|blocked`；
+- first verification target。
 
-- `do-not-create-skill`：明确不应写 skill，并说明更小的 durable surface 或直接回答方式。
-- `near-neighbor`：推荐 `spec-skill-audit`、`spec-doc-review`、`spec-work` 等更合适入口。
-- `authoring-brief`：只有重复任务、目标输出和排除边界足够清晰时才进入写作。
+`ready` 表示当前轮明确 create/revise，且已确认 target root 与预期 source surfaces 未超出请求范围；`preview-only` 表示用户只要求设计/preview，或 owner/scope 尚未解析；`blocked` 表示没有 mutation 授权。不要只因为生成了 preview 就再次询问；只有 exact write set 扩大范围、覆盖当前请求未明确包含的 dirty path，或新增 external/network/高风险副作用时才重新确认。
 
-## 2. Intent Dialogue
+当 revision 仅是 typo、计数、metadata/术语修正、明确不可达内容删除或等价结构整理，且不改变 trigger、schema、contract、threshold、gate、roster 或 model routing，可按 `authoring-workbench.md` 的 Tier A short path 处理；它仍要 owner、授权、preview/write-set binding 与最窄结构验证。不要把承重行为变化伪装成 Tier A。
 
-用户目标模糊时，只问会改变 package 设计的 2-3 个问题。不要用长表单开场。
+只询问答案会改变 package 设计、权限或不可逆结果的最少问题，并尽量合并为一轮。能从 source 发现或以低风险、可撤销假设推进时，记录假设并继续；不要用更多目录、profiles 或 fallback 掩盖真正未决的意图。
 
-优先澄清：
+## Source And Effect Resolution
 
-- 这个 skill 要接住哪类重复工作？
-- 用户实际会给它什么输入？
-- 它完成后必须交回什么输出？
-- 哪些近邻请求不应该触发？
-- 更看重速度、一致性、审计性、可移植、治理，还是本地风格适配？
+按以下顺序确认 target：
 
-意图澄清完成后，应得到：
+1. 用户明确给出的 Skill directory；
+2. 当前 repo 中与名称匹配的 project-owned source；
+3. 项目规则声明的 canonical Skill root；
+4. 都无法确认时保持 `preview-only`。
 
-- one-sentence capability
-- real inputs
-- required outputs
-- exclusions
-- at least one should-trigger example prompt
-- at least one near-neighbor or should-not-trigger example prompt
-- suggested mode: `new-skill` / `revise-skill` / `migrate-skill` / `audit-remediation` / `package-readiness`
-- quality tier: `scaffold` / `production` / `library` / `governed`
-- first eval target
+用户已绑定单一 target repo、但未写出 Skill root 时，不要立即以 `blocked-source-owner` 结束：先检查项目规则与相邻 project-owned packages。若仍不能唯一确认，给出一个明确标注“candidate only”的 canonical path preview、完整 package outline、不会修改的 surfaces 和一个会改变路径的澄清问题；在用户确认前保持零 mutation。只有跨 repo、多候选 owner、repo-external 或 generated-only 等无法绑定单一 source owner 的情况才使用 `layer_result=blocked-source-owner`。
 
-如果重复任务、目标输出或排除边界仍不清，不要用更多 references/scripts 弥补；继续问最小 follow-up。
+当用户明确要求 create/revise、但 target/source owner 不唯一、跨 repo 或 generated-only 时，保留该请求的 `base_operation=create|revise` 与 `effect=apply`，但以 `layer_result=blocked-source-owner` 报告，且 would-change paths/commands 必须为空、不得 mutation。`not-entered` 只用于根本不是 authoring/readiness 的 near-neighbor；不要把 source-resolution blocker 误路由成拒绝后的近邻。
 
-## 2.2 Evidence Matrix Readiness
+`validate-only` 永远不升级为 apply。对已存在 package 的 readiness 检查使用 `base_operation=revise`；`revise` 在此只表示输入是现有 package，不代表允许修改。`audit-remediation` modifier 只处理已接受 finding。`migrate` modifier 只处理同 repo trusted source；第三方 package 和跨仓目标只允许 inventory/readiness。Modifier 不改变 base operation 或 effect，也不创建第三套执行主干。
 
-中型、高风险或不可逆 skill 改动先列轻量 Evidence Matrix，不新增 schema：`candidate`、`protected_behavior`、`evidence`、`implementation_permission`。只有 `implementation_permission: ready` 才删除承重文本、迁移 hard boundary 或重写 entry surface；`candidate` 只允许可逆补充，`blocked` 先补证据或降级为建议。
+对现有 package 先列 inventory，不把全部正文加载给 LLM：文件、目录、symlink、special file、frontmatter fields、Markdown references、scripts 和 secret-like paths。Bundled validator 会在本地预算内读取非 secret-like 文本字节，用于 UTF-8、敏感内容和引用检查，但不返回正文或敏感值；Inventory 仍是 advisory facts，是否采用内容由 LLM 判断。
 
-## 2.5 Skill Creator Compatibility
+## Portable Authoring Core
 
-把官方 `skill-creator` 规则改写成 spec-first source 规则：
+### Description As Trigger Contract
 
-- skill 名称使用 kebab-case，目录名、frontmatter `name`、治理记录和 runtime catalog 必须一致。
-- `SKILL.md` frontmatter 只放 `name` 和 `description`；触发条件必须写在 `description`，不要把 “when to use” 只放进正文。
-- 不创建 README、安装指南、历史说明或空资源目录来显得完整；只有当前 recurring job 需要的 `references/`、`scripts/`、`assets/`、`evals/` 才进入 package。
-- 在 spec-first repo 中新增 skill 时，source 位置是 `skills/<name>/`，不是默认写入个人 `$CODEX_HOME/skills`；全局安装只属于明确的分发/安装任务。
-- `scripts/` 只承接确定性、重复、容易手写错的逻辑；新增脚本必须有实际运行证据。
-- 复杂或高风险 skill 需要 forward-testing 时，只传 raw artifact 和用户形态请求，不泄漏预期答案、诊断或 intended fix。
+Frontmatter `description` 必须同时表达：
 
-## 3. Reference Scan
+- Skill 拥有的 recurring job；
+- 会触发的真实用户动作；
+- 容易混淆的负向边界；
+- 必要时声明只读或显式调用边界。
 
-需要借鉴时，按顺序短扫：
+避免尖括号占位符、同义词堆叠和只在正文出现的触发规则。先用 positive、negative、near-neighbor 样例检查 route，再扩展 package。
 
-1. external benchmark：公开高质量 skill、官方文档或已验证方法。
-2. user source：用户给的历史 prompt、workflow、transcript、docs、notes。
-3. local fit：当前仓库相邻 skill、治理记录、tests、runtime catalog。
+### Branch-First Information Hierarchy
 
-只借鉴满足以下条件的 pattern：
+先列只有在输入、步骤、输出或验证不同才成立的 branch，再放置资源：
 
-- recurrence：能覆盖重复任务，不是一次性技巧。
-- generativity：能帮助生成新的正确行为，而不是复制固定措辞。
-- distinctiveness：与当前 skill 已有能力不同。
-- boundary clarity：能减少误触发、越权或 source/runtime 混淆。
+- `SKILL.md`：所有 branch 共用的执行骨架、边界、输出和安全默认值；
+- `references/`：只有特定 branch 才需要的长规则、target/project profile、schema 或示例；
+- `scripts/`：确定性、重复、容易手写错且可测试的逻辑；
+- `assets/`：输出中复制或改造的静态素材；
+- `evals/`：维护者 route/output regression，不是 runtime 必读内容。
 
-明确记录不借鉴什么：完整 SkillOps 平台、装饰性 reports、未请求 adapters、未验证 public claims、照搬外部 wording。
+Context pointer 必须说明“什么条件下读取”和“读完支持什么判断”。如果正常路径每次都读取全部 references，说明分支或 owner 切分失败，应合并承重规则或重新按条件拆分。
 
-外部 benchmark 只能提供 pattern，不能直接提供 spec-first entry surface。迁移前先重判：
+### Match Freedom To Failure Cost
 
-- invocation：它在原宿主里靠什么触发，spec-first 中应落到 `workflow_command`、`standalone_skill` 还是 `internal_only`。
-- information hierarchy：哪些内容是所有 branch 必读，哪些只属于某个 branch，应下沉到 `references/`。
-- steering：哪些 wording 真正改变触发、completion criterion、legwork 或 handoff。
-- pruning：哪些句子只是解释背景、重复原文身份或模型默认行为。
+按任务脆弱度分配约束强度：开放式语义判断使用原则与判据；有首选路径但允许变化时使用步骤骨架或参数化模板；容易造成数据损坏、越权或格式破坏的动作交给窄脚本和 hard gate。不要用长 prompt 模拟本可确定性验证的 schema/path/hash，也不要用脚本替代产品、架构或语义判断。
 
-如果 local fit 后只能保留外部措辞而不能产生新的 spec-first 行为，不要借鉴。
+当 Skill 的主要机制是 prose、角色/persona、few-shot、输出格式或 agent loop 时，读取 `behavior-contract-design.md`。它只负责模型行为合同，不取代本文件的 package、source owner、resource placement 与 portability 规则。
 
-## 3.5 Branch And Pointer Design
+### Completion Criteria And Pruning
 
-写 source 前先列 branch，再分配资源。常见 branch 包括 `new-skill`、`revise-skill`、`migrate-skill`、`audit-remediation`、`package-readiness`；只有输入、步骤、输出或验证不同，才算真实 branch。
+写入、shell、runtime、network、delegate 和 handoff 步骤必须同时有：
 
-对每个 branch 判断：
+- clarity：能判断 done/not done；
+- demand：明确需要完成的调查、验证或交付物；
+- failure behavior：条件不满足时停止、降级或交接什么。
 
-- 必走步骤是否需要留在 `SKILL.md`。
-- 条件细节是否可下沉到 `references/`。
-- context pointer 是否说明“何时读取”和“读完用于什么判断”。
-- must-have reference 是否被弱 pointer 隐藏；若是，先 sharpen wording，仍不可靠才 inline。
-- 是否需要 eval 记录 positive、negative/near-neighbor、boundary、failure 或 expected behavior。
+逐句检查 prose 是否改变触发、读取、写入、判断、验证或 handoff；没有改变就删除。一个概念只保留一个 owner，不用重复解释制造多真相源。
 
-不要用“多建一个 reference”掩盖 branch 不清，也不要用“全部 inline”逃避 pointer wording 设计。
+## External Pattern And Migration Rules
 
-## 4. Authoring Discipline
+借鉴顺序是 external benchmark → user source → local fit。只吸收可复用 pattern，不复制平台 invocation、绝对路径、权限假设或未经验证的 public claims。
 
-每个新增指令、文件、脚本、eval 或治理规则，都必须追溯到用户真实 recurring job。
+Same-repo migration 对每个非 portable 文件给出 disposition：
 
-- 不基于猜测目标扩大 package。
-- 不添加 speculative feature、通用配置旋钮或空目录。
-- 改现有 skill 时只动直接服务本次目标的文件。
-- 每个 meaningful change 绑定一种检查：route evidence、sample run、resource-boundary check、governance check、package smoke 或 reviewer note。
-- 暂不可验证的想法进入 next-step candidate，不进 baseline。
-- 改 prose 时做 sentence-level no-op pruning：逐句问它是否改变触发、读取、写入、判断、验证或 handoff；没有改变就删除，不优先润色。
-- 写 completion criterion 时同时检查 clarity 和 demand；只有动作名、没有 done signal 的句子不算完成条件。
+- `preserve`：目标仍消费且内容不需改变；
+- `translate`：有 confirmed target/project mapping；
+- `drop-with-reason`：确认是生成物、maintainer-only 或目标不支持；
+- `manual-decision`：owner、语义或消费者不明确。
 
-## 5. Anti-Pattern Families
+未知 metadata、sidecar 和用户文件默认 `preserve` 或 `manual-decision`，不能为了“干净”删除。
 
-本表是 eval 覆盖族清单：资格/边界类（`one-off-vs-reusable`、`explain-not-package`、`document-export-vs-agent-skill`、`future-outline-vs-build`、`audit-not-authoring`、`runtime-mirror-patch`）语义见 §1 Qualification 与 `evals/trigger-cases.json` 的 `reason_code`；写作质量类（弱 pointer、模糊 completion criterion、over-split、no-op）语义框架见 [Skill Quality Vocabulary](skill-quality-vocabulary.md)。维护 eval 时优先覆盖这些失败族：
+## Anti-Pattern Families
 
-- `one-off-vs-reusable`：把一次性回答误做成 skill package。
-- `explain-not-package`：把解释/总结请求误当成 skill 创建。
-- `document-export-vs-agent-skill`：把文档导出/整理误当成 agent skill。
-- `future-outline-vs-build`：用户只要未来构思，却提前写 source。
-- `audit-not-authoring`：只要审计 finding，却直接改 source。
-- `runtime-mirror-patch`：把 generated runtime mirror 当 source 修。
-- `weak-context-pointer`：must-have reference 被弱 pointer 隐藏，导致 agent 不稳定读取。
-- `over-split-granularity`：没有独立触发或 sequence 风险，却为了模块化新增 skill。
-- `vague-completion-criterion`：步骤只有动作名，没有清晰和有要求的完成条件。
-- `leading-word-no-op`：把弱口号当 leading word，实际不改变行为。
+- `one-off-vs-reusable`：把一次性请求包装成 Skill。
+- `audit-not-authoring`：只审计却直接写 source。
+- `external-import-mutation`：第三方 package 未经 trust/source-owner 确认就复制或执行。
+- `runtime-mirror-patch`：把 generated runtime 当 canonical source。
+- `project-profile-leak`：把单一项目治理写成 portable contract。
+- `target-profile-leak`：把单一宿主 metadata 当通用标准。
+- `weak-context-pointer`：条件 reference 没有读取条件。
+- `vague-completion-criterion`：步骤只有动作名，没有 done signal。
+- `fixture-as-behavior-proof`：结构样例通过却声称模型行为改善。
+- `leading-word-no-op`：口号不改变实际动作。
+- `adjective-persona`：用形容词堆人设，却没有可观察行为倾向。
+- `flat-must-wall`：把 hard gate、偏好和启发式都写成同强度命令。
+- `example-without-boundary`：只有理想正例，没有 near-neighbor/bad/why 校准。
+- `self-check-as-evidence`：把模型自检或“已遵守”当成 semantic/field proof。
+- `fixed-tool-quota`：用固定调用次数或“工具免费”假设替代成本、依赖与风险判断。
+
+## Skill Creator Compatibility
+
+- `name` 使用 kebab-case，并与目录及目标项目治理记录一致。
+- Portable baseline 只要求 `name` 和 `description`；目标扩展字段由 target profile 判断并保留未知字段。
+- Description 不使用 `<placeholder>`；需要占位时用自然语言或 `{placeholder}`。
+- 新增脚本必须有实际运行和零意外写入证据。
+- Forward testing 只传 raw artifact 和真实用户请求，不泄漏预期答案或 intended fix。

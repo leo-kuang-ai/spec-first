@@ -14,19 +14,6 @@ function readJsonFile(filePath) {
   return JSON.parse(raw);
 }
 
-function loadHelperRegistry(repoRoot = path.join(__dirname, '..', '..', '..')) {
-  const registryPath = path.join(repoRoot, 'skills', 'spec-mcp-setup', 'helper-tools.json');
-  return {
-    path: registryPath,
-    registry: readJsonFile(registryPath),
-  };
-}
-
-function helperById(registry) {
-  const entries = Array.isArray(registry && registry.helpers) ? registry.helpers : [];
-  return new Map(entries.map((entry) => [entry.id, entry]));
-}
-
 function normalizeSetupFactsFile(factsPath, options = {}) {
   if (!factsPath) {
     return buildUnavailableProjection({
@@ -77,6 +64,15 @@ function normalizeSetupFacts(facts, options = {}) {
       reasonCode: 'setup-facts-schema-unsupported',
       artifactRefs: options.factsPath ? [options.factsPath] : [],
       schemaVersions: { tool_facts: schemaVersion || 'unknown' },
+    });
+  }
+
+  if (hasMalformedFactEntries(facts, schemaVersion)) {
+    return buildUnavailableProjection({
+      status: 'error',
+      reasonCode: 'setup-facts-invalid',
+      artifactRefs: options.factsPath ? [options.factsPath] : [],
+      schemaVersions: { tool_facts: schemaVersion },
     });
   }
 
@@ -170,6 +166,14 @@ function normalizeLegacyItems(facts) {
     ...Object.entries(tools).map(([id, value]) => normalizeItem(id, value, 'mcp', facts)),
     ...Object.entries(helpers).map(([id, value]) => normalizeItem(id, value, value.type || 'helper', facts)),
   ];
+}
+
+function hasMalformedFactEntries(facts, schemaVersion) {
+  const isObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+  const hasInvalidObjectValues = (value) => isObject(value) && Object.values(value).some((entry) => !isObject(entry));
+  if (schemaVersion === 'tool-facts.v2' && Array.isArray(facts.items) && facts.items.some((entry) => !isObject(entry))) return true;
+  if (schemaVersion === 'tool-facts.v1' && (hasInvalidObjectValues(facts.tools) || hasInvalidObjectValues(facts.helper_tools))) return true;
+  return ['configured_dependencies', 'provider_readiness'].some((key) => Array.isArray(facts[key]) && facts[key].some((entry) => !isObject(entry)));
 }
 
 function normalizeItemsArray(items, facts) {
@@ -568,7 +572,7 @@ function decisionInputNextAction(reasonCode, requestedPlatforms = []) {
 }
 
 function setupWorkflowCommandForPlatforms(requestedPlatforms = []) {
-  return 'spec-mcp-setup';
+  return 'spec-runtime-setup';
 }
 
 function toBoolean(value, fallback) {
@@ -579,8 +583,6 @@ function toBoolean(value, fallback) {
 module.exports = {
   SETUP_FACTS_MAX_AGE_MS,
   computeDecisionInputHealth,
-  helperById,
-  loadHelperRegistry,
   normalizeSetupFacts,
   normalizeSetupFactsFile,
 };

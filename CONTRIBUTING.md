@@ -2,7 +2,7 @@
 
 Thanks for helping improve `spec-first`.
 
-This project is Chinese-first in detailed manuals and governance docs, while the root README also serves international open-source readers. Keep contributions small, traceable, and grounded in the existing source/runtime boundary.
+This project is Chinese-first: `README.md` is the default entry, while `README.en.md` serves international open-source readers. Keep contributions small, traceable, and grounded in the existing source/runtime boundary.
 
 ## Local Setup
 
@@ -37,7 +37,7 @@ Use the project developer profile for the author. In Codex, that profile is read
 
 ## Common Change Areas
 
-- README/docs changes: update `README.md`, `README.zh-CN.md`, relevant docs, and README contract tests when the public surface changes.
+- README/docs changes: update `README.md`, `README.en.md`, the compatible `README.zh-CN.md`, relevant docs, and README contract tests when the public surface changes.
 - CLI changes: update `src/cli/` and the narrowest unit/smoke tests that prove the behavior.
 - Skill or agent changes: update source assets, not generated runtime copies, and add contract tests when behavior changes.
 - Runtime governance changes: verify supported-host behavior and keep unified `spec-*` entrypoint mappings centralized.

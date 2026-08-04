@@ -1,0 +1,1 @@
+置信度评分选中了三个需要再压实的区域：`Key Technical Decisions`（错误分类与替代方案的取舍仍可更明确）、`Implementation Units`（fail-closed 标记边界与混合失败测试还可更强）、`Risks & Dependencies / Operational Notes`（真实 client 缺失时的发布证据和回滚门要避免含糊）。按“禁止子代理”，这些技能内审查提示只会由我串行内联应用。

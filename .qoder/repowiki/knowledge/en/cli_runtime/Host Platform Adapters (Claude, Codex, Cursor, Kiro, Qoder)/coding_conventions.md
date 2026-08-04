@@ -1,0 +1,6 @@
+- Each platform is a class extending `PlatformAdapter` and overrides only the getters/hook methods that differ from the base defaults; unimplemented base methods throw `Not implemented`.
+- Adapters expose their identity via an `id` getter returning a lowercase string key that matches the filename and the registry map in `index.js`.
+- Content transformation is split into `renderCommandContent` (merges command + skill frontmatter) and `transformSkillContent` (rewrites paths, injects host pins), with `isXxxSetupSurface(context)` gating host-specific injections.
+- Managed runtime artifacts are declared as a `MANAGED_HOOK_FILES` array of `{ relativePath, displayName, render }` entries, then iterated uniformly by `planRuntimeFilesSync`, `planRuntimeFilesRemoval`, and `inspectRuntimeFiles`.
+- Inspection results use a uniform `{ level, name, message, fix? }` shape where `level` is `'PASS' | 'WARNING' | 'ERROR'` and `fix` points back to `formatInitGuidance(hostId, ...)`.
+- Cross-host path rewriting uses regex chains against known host prefixes (`.claude/`, `.codex/`, `.kiro/`, `.qoder/`) to normalize references into the target host's directory layout.

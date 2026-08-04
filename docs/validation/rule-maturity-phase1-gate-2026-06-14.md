@@ -9,7 +9,7 @@ recommended_next_action: continue-phase1
 
 ## Conclusion
 
-最小 demo 已通过自动测试,证明 v1.17 phase 1 的 producer -> reader -> skill-audit consumer -> phase gate facts 链路可以闭合。但当前真实仓库的本地 rule-maturity evidence store 仍为空,没有可供 phase 2 人审裁决/晋升计划使用的 shadow hit 样本。
+最小 demo 已通过自动测试,证明 v1.17 phase 1 的 producer -> reader -> skill-review consumer -> phase gate facts 链路可以闭合。但当前真实仓库的本地 rule-maturity evidence store 仍为空,没有可供 phase 2 人审裁决/晋升计划使用的 shadow hit 样本。
 
 因此本次 gate 结论是:继续 phase 1 观测,暂不打开 R9-R17 的 phase 2 active implementation plan。
 
@@ -18,7 +18,7 @@ recommended_next_action: continue-phase1
 - as_of: `2026-06-14T15:06:04+08:00`
 - source_refs:
   - `spec-first internal rule-maturity list --json`
-  - `.spec-first/audits/skill-audit/rule-maturity-phase1-gate-2026-06-14/rule-maturity-observations.json`
+  - `.spec-first/audits/skill-review/rule-maturity-phase1-gate-2026-06-14/rule-maturity-observations.json`
   - `tests/unit/rule-maturity-phase1-demo.test.js`
 - status_class: `empty`
 - rule_count: `0`
@@ -68,7 +68,7 @@ recommended_next_action: continue-phase1
 
 1. `spec-first internal rule-maturity record --json`
 2. `spec-first internal rule-maturity list --json`
-3. `spec-skill-audit` source script 写出 `rule-maturity-observations.json`
+3. `retired-skill-review` source script 写出 `rule-maturity-observations.json`
 4. `buildRuleMaturityPhase1GateFacts()` 生成 phase gate facts
 
 测试验证两条关键行为:
@@ -80,7 +80,7 @@ recommended_next_action: continue-phase1
 
 ## Verification
 
-- Passed: `npx jest tests/unit/rule-maturity-phase1-demo.test.js tests/unit/rule-maturity.test.js tests/unit/skill-audit-scripts.test.js --runInBand`
+- Passed: `npx jest tests/unit/rule-maturity-phase1-demo.test.js tests/unit/rule-maturity.test.js tests/unit/skill-review-scripts.test.js --runInBand`
 - Passed: `npm run typecheck`
 - Passed: `npm run lint:skill-entrypoints`
 - Passed: `npx jest tests/unit/governance-contracts.test.js tests/unit/changelog-format.test.js --runInBand`

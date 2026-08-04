@@ -3,1101 +3,517 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { getAdapter } = require('../../src/cli/adapters');
+const repoRoot = path.resolve(__dirname, '../..');
+const skill = fs.readFileSync(path.join(repoRoot, 'skills/spec-code-review/SKILL.md'), 'utf8');
+const deploymentPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/deployment-verification-agent.md'),
+  'utf8',
+);
+const validatorTemplate = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/validator-template.md'),
+  'utf8',
+);
+const subagentTemplate = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/subagent-template.md'),
+  'utf8',
+);
+const maintainabilityPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/maintainability-reviewer.md'),
+  'utf8',
+);
+const maintainabilityCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/maintainability-capability-cases.json'),
+  'utf8',
+));
+const outputTemplate = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/review-output-template.md'),
+  'utf8',
+);
+const crossModel = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/cross-model-review.md'),
+  'utf8',
+);
+const crossModelScript = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/scripts/cross-model-adversarial-review.sh'),
+  'utf8',
+);
+const apiContractPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/api-contract-reviewer.md'),
+  'utf8',
+);
+const apiCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/api-contract-capability-cases.json'),
+  'utf8',
+));
+const securityPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/security-reviewer.md'),
+  'utf8',
+);
+const personaCatalog = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/persona-catalog.md'),
+  'utf8',
+);
+const securityCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/security-capability-cases.json'),
+  'utf8',
+));
+const testingPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/testing-reviewer.md'),
+  'utf8',
+);
+const testingCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/testing-capability-cases.json'),
+  'utf8',
+));
+const reliabilityPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/reliability-reviewer.md'),
+  'utf8',
+);
+const reliabilityCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/reliability-capability-cases.json'),
+  'utf8',
+));
+const frontendQualityPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/frontend-quality-reviewer.md'),
+  'utf8',
+);
+const frontendQualityCapabilityCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/frontend-quality-capability-cases.json'),
+  'utf8',
+));
+const deploymentVerificationActivationCases = JSON.parse(fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/evals/deployment-verification-activation-cases.json'),
+  'utf8',
+));
 
-const SKILL_PATH = path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'SKILL.md');
-
-function renderWorkflowSkill(platform) {
-  const adapter = getAdapter(platform);
-  return adapter.transformSkillContent(fs.readFileSync(SKILL_PATH, 'utf8'), {
-    skillName: 'spec-code-review',
-    isWorkflowSkill: true,
+describe('spec-code-review current contracts', () => {
+  test('mode:agent is JSON report-only and never applies fixes', () => {
+    expect(skill).toContain('**Report-only**: return **JSON**');
+    expect(skill).toContain('In **`mode:agent`** it never mutates the tree');
+    expect(skill).toContain('### Phase 0a: Freeze effective mode before any tool call');
+    expect(skill).toContain('source_mutation_gate: closed');
+    expect(skill).toContain('adjacent fix/apply wording is intent data, not mutation authority');
+    expect(skill).toContain('reviewer_mutation_detected');
+    expect(skill).toContain('scope-snapshot.json');
+    expect(skill).toContain('### Stage 5c: Act on findings (explicit apply only)');
+    expect(skill).toContain('**Skip entirely in `mode:agent`, `mutation_policy: report-only`');
+    expect(skill).toContain('Read `references/apply-findings.md` only after all three admission conditions pass');
+    expect(fs.existsSync(path.join(
+      repoRoot,
+      'skills/spec-code-review/references/apply-findings.md',
+    ))).toBe(true);
   });
-}
 
-describe('spec-code-review frontmatter trigger contract', () => {
-  test('description distinguishes code review from docs, work, planning, and shipping', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
-
-    expect(frontmatter).toContain('code diffs, PRs, or branch implementation changes');
-    expect(frontmatter).toContain('requirements/plan/task-pack document review');
-    expect(frontmatter).toContain('implementation execution');
-    expect(frontmatter).toContain('planning unresolved work');
-    expect(frontmatter).toContain('commit/push/PR creation');
-  });
-});
-
-describe('spec-code-review context orientation contract', () => {
-  test('starts from diff evidence and keeps findings reviewer-owned', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    expect(text).toContain('Context Orientation Anchor');
-    expect(text).toContain('diff scope');
-    expect(text).toContain('plan/task/work artifacts when present');
-    expect(text).toContain('already-loaded host/project instructions');
-    expect(text).toContain('not automatic re-read targets for every review run');
-    expect(text).toContain('Stage 3b is the narrow project-standards persona exception');
-    expect(text).toContain('nearby implementation files');
-    expect(text).toContain('nearby tests');
-    expect(text).toContain('Use direct diff reads, source reads, `rg`, ast-grep, package/test facts, logs, and user-provided artifacts');
-    expect(text).toContain('If a claimed impact surface cannot be confirmed from bounded direct evidence');
-    expect(text).toContain('record it as residual risk or a test candidate');
-    expect(text).toContain('External tools may prioritize inspection, but they do not define scope authority or replace reviewer judgment');
-    expect(text).toContain('group changed files by Git repo');
-    expect(text).toContain('risk assessments scoped to the repo that owns the file');
-    expect(text).toContain('direct evidence per child repo');
-    expect(text).toContain('direct evidence targets instead of external-tool calls');
-    expect(text).toContain('not external-tool output alone');
-    expect(text).toContain('Autofix review must not edit a child repo unless that repo is explicit');
-    expect(text).toContain('risk assessments scoped to the repo that owns the file');
-    expect(text).toContain('Discover project standards paths');
-    expect(text).toContain('find all `**/CLAUDE.md` and `**/AGENTS.md` in the repo');
-    expect(text).toContain('If `docs/contracts/team-standards.md` exists, include that contract and `docs/standards/index.md` in the path list');
-    expect(text).toContain('select only `trust=confirmed,lifecycle_state=active`, scope-matched rule files from `docs/standards/**`');
-    expect(text).toContain('must not receive or read the full standards corpus by default');
-    expect(text).toContain('Pass the resulting path list to the `project-standards` persona inside a `<standards-paths>` block');
-    expect(text).not.toContain('docs/examples/standards-glue-consumption-examples.md');
-    expect(text).not.toContain('.spec-first/standards/');
-    expect(text).not.toContain('<standards-baseline-paths>');
-    expect(text).not.toContain('stage0-context');
-    expect(text).not.toContain('selected_assets');
+  test('ordinary review is report-only and explicit apply/commit authorization stays separate', () => {
+    expect(skill).toContain('mutation_policy: report-only');
+    expect(skill).toContain('mutation_policy: apply-fixes');
+    expect(skill).toMatch(/ordinary.*review.*report-only/is);
+    expect(skill).toMatch(/explicit.*review-and-fix|review and fix/is);
+    expect(skill).toContain('commit_authorization');
+    expect(skill).toMatch(/apply-fixes.*does not authorize.*commit/is);
+    expect(skill).toMatch(/without commit authorization.*verified uncommitted/is);
   });
 
-  test('consumes domain context before findings without fixed ADR directory mandates', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('Domain Language And Decision Ledger');
-    expect(text).toContain('consume existing context before asking questions or raising gaps that repo/docs can answer');
-    expect(text).toContain('already-loaded project standards and host instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
-    expect(text).toContain('Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy or the Stage 3b project-standards persona exception');
-    expect(text).toContain('repo-local glossary or ADR-like artifacts that actually exist');
-    expect(text).toContain('Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory.');
-    expect(text).toContain('record the limitation in Coverage as advisory context rather than blocking the review');
-    expect(text).toContain('`question`, `recommended_answer`, `source_tag`, `chosen_answer`, `consequence`, and `deferred_reason`');
-    expect(text).toContain('`confirmed`, `advisory`, `session-local`, `stale`, or `user`');
-    expect(text).toContain('hard to reverse, would be surprising without context, and reflects a real tradeoff');
-    expect(text).not.toContain('must use `CONTEXT.md`');
-    expect(text).not.toContain('must use `docs/adr/`');
+  test('reviewer dispatch requires authorization and otherwise reports inline degraded coverage', () => {
+    expect(skill).toContain('worker_dispatch_authorization');
+    expect(skill).toContain('capability_probe');
+    expect(skill).toContain('worker_dispatch_capability');
+    expect(skill).toContain('worker_capability_unproven');
+    expect(skill).toContain('provider_untrusted');
+    expect(skill).toContain('dispatch_authorization_missing');
+    expect(skill).toContain('subagent_capability_missing');
+    expect(skill).toMatch(/permission settings.*not.*dispatch authorization/is);
+    expect(skill).toMatch(/inline report-only.*status: degraded/is);
+    expect(skill).toMatch(/do not claim.*persona.*independent.*cross-model/is);
+    expect(skill).toContain('Inline fallback output contract');
+    expect(skill).toContain('`reviewers: ["inline-fallback"]`');
+    expect(skill).toContain('`verdict: Not ready`');
+    expect(skill).toMatch(/resolve the Stage 4 Run ID.*before synthesis/is);
   });
 
-  test('review checks feedback loops without forcing TDD ritual on docs-only changes', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('Feedback Loop Review Boundary');
-    expect(text).toContain('When reviewing behavior-bearing changes, check whether the work established and reran a feedback loop appropriate to the change');
-    expect(text).toContain('failing or characterization tests, CLI invocation, HTTP/browser script, trace replay, throwaway harness, property/fuzz loop');
-    expect(text).toContain('Findings should name the missing observable risk, not demand TDD ritual by default');
-    expect(text).toContain('For docs-only and config-only changes, docs contract checks, schema/help/render checks, generated catalog diff checks, or diff-shape review can be sufficient verification');
-    expect(text).toContain('Do not flag "no test-first loop" when the change has no behavior-bearing code');
+  test('high-risk scenario posture limits review claims before dispatch or apply', () => {
+    expect(skill).toContain('## Scenario Capability');
+    expect(skill).toContain('Overrides: high-risk');
+    expect(skill).toContain('`foreign-residual-workspace` -> `blocked-action-required`');
+    expect(skill).toContain('optional external-tool evidence unavailable -> `fallback-only`');
+    expect(skill).toContain('`non-git-build-workspace` coverage gaps -> `partial`');
   });
 
-  test('stage 6 closeout uses structured verification evidence when validation is claimed', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('verification-run-summary.v1');
-    expect(text).toContain('honest-closeout.v1');
-    expect(text).toContain('instead of a freeform "tests passed" claim');
-    expect(text).toContain('mark the closeout `degraded`');
+  test('maintainability mechanical thresholds survive subjective long-file suppression', () => {
+    expect(maintainabilityPrompt).toContain('crossing **1000 lines** because of this diff');
+    expect(maintainabilityPrompt).toContain('file line count crosses 1k in the diff');
+    expect(maintainabilityPrompt).toContain('persona-defined mechanical threshold');
+    expect(subagentTemplate).toContain('persona-defined mechanical threshold');
+    expect(subagentTemplate).toContain('before/after line-count evidence');
+    expect(subagentTemplate).toContain('subjective “file getting long” concern');
+    expect(subagentTemplate).toContain('thin wrapper or duplicate canonical helper');
+    expect(subagentTemplate).toContain('Do not reclassify that proven persona-owned condition as advisory');
+    expect(subagentTemplate).toContain('Preserve the persona-assigned severity and confidence anchor');
+    expect(subagentTemplate).toContain('use the normal action-class rubric for its route');
   });
-});
 
-describe('spec-code-review compound recommendation contract', () => {
-  test('final report can recommend compound only as advisory learning capture', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'review-output-template.md'),
-      'utf8',
+  test('current-tree orientation 与 maintainability confidence 对齐 shared synthesis contract', () => {
+    expect(skill).toContain('### Stage 2c: Resolve current-tree orientation');
+    expect(skill).toContain('derive only from the fetched reviewed refs/diff');
+    expect(skill).toContain('Do not persist or reuse this orientation');
+    expect(skill).toContain('record the exact degraded fact');
+    expect(maintainabilityPrompt).toContain('Anchor 50 — suppress');
+    expect(maintainabilityPrompt).toContain('提升为 anchor 75');
+    expect(maintainabilityPrompt).not.toContain('suppress unless severity is P1');
+  });
+
+  test('maintainability planted cases preserve mechanical findings and suppress subjective opinions', () => {
+    expect(maintainabilityCapabilityCases.schema_version).toBe(
+      'spec-first.spec-code-review.maintainability-cases/v1',
     );
+    expect(maintainabilityCapabilityCases.owner).toBe('maintainability-reviewer');
+    expect(maintainabilityCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/maintainability-reviewer.md',
+      'skills/spec-code-review/references/subagent-template.md',
+    ]));
 
-    expect(skill).toContain('Learning Capture Recommendation');
-    expect(skill).toContain('new reusable lesson worth capturing');
-    expect(skill).toContain('advisory only');
-    expect(skill).toContain('not a finding');
-    expect(skill).toContain('not residual actionable work');
-    expect(skill).toContain('not a verdict input');
-    expect(skill).toContain('not an autofix item');
-    expect(skill).toContain('not a merge gate');
-    expect(skill).toContain('Skip silently');
-    expect(skill).toContain('mechanical fixes');
-    expect(skill).toContain('one-off docs edits');
-    expect(skill).toContain('formatting-only changes');
-    expect(skill).toContain('cannot be stated in one sentence');
-    expect(skill).toContain('Offer neutrally');
-    expect(skill).toContain('repeated finding pattern');
-    expect(skill).toContain('reusable review heuristic');
-    expect(skill).toContain('Lean into the offer');
-    expect(skill).toContain('pattern appears in 3+ places');
-    expect(skill).toContain('current host\'s compound entrypoint with brief context');
-    expect(skill).toContain('In report-only, autofix, and headless modes, ask no questions');
-    expect(skill).toContain('include at most one advisory line');
-    expect(skill).toContain('Do not automatically run `spec-compound`');
-    expect(skill).toContain('do not write `docs/solutions/`');
-    expect(skill).toContain('do not file tickets');
-    expect(skill).toContain('do not add extra prompts because of this checklist');
-    expect(skill).toContain('recommend `spec-compound-refresh` only with a narrow scope hint');
-    expect(skill).toContain('Learning Capture Recommendation:');
-    expect(template).toContain('### Learning Capture Recommendation');
-    expect(template).toContain('current host\'s compound entrypoint with brief context');
-    expect(template).toContain('include only when the current review produced a new reusable lesson');
-    expect(skill).not.toContain('$spec-compound-auto');
-    expect(skill).not.toContain('/spec:compound-auto');
-    expect(skill).not.toContain('spec-first compound-auto');
-  });
-});
+    const cases = new Map(maintainabilityCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const crossing = cases.get('diff-crosses-persona-owned-1000-line-threshold');
+    const thinWrapper = cases.get('new-thin-wrapper-with-no-added-behavior');
+    const duplicateHelper = cases.get('duplicate-helper-next-to-canonical-owner');
+    const subjectiveLongFile = cases.get('subjective-long-file-opinion-without-threshold-or-failure');
 
-describe('spec-code-review CE sync contracts', () => {
-  test('quick review only short-circuits to a real host built-in', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('Quick Review Short-Circuit');
-    expect(text).toContain('Use a real built-in only');
-    expect(text).toContain('No invented fallback');
-    expect(text).toContain('Codex currently has no universal slash-command review primitive');
-    expect(text).toContain('quick intent falls through to the full pipeline');
+    expect(crossing).toMatchObject({ kind: 'positive' });
+    expect(crossing.expected).toContain('P1 / anchor-100');
+    expect(crossing.forbidden).toContain('suppress it as a generic file getting long concern');
+    expect(thinWrapper).toMatchObject({ kind: 'positive' });
+    expect(thinWrapper.expected).toContain('concrete thin-wrapper finding');
+    expect(thinWrapper.forbidden).toContain('suppress it under the subjective long-file rule');
+    expect(duplicateHelper).toMatchObject({ kind: 'positive' });
+    expect(duplicateHelper.expected).toContain('duplicate-canonical-helper finding at anchor 100');
+    expect(duplicateHelper.forbidden).toContain('recommend a third abstraction or registry');
+    expect(subjectiveLongFile).toMatchObject({ kind: 'negative-owner' });
+    expect(subjectiveLongFile.expected).toContain('keep suppression');
+    expect(subjectiveLongFile.forbidden).toContain('route it to advisory merely because the file grew');
   });
 
-  test('requirements completeness reads current and legacy implementation unit formats', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('Recognize both current heading-style units (`### U1. [Name]`)');
-    expect(text).toContain('legacy list-item units (`- U1. **[Name]**`)');
-    expect(text).toContain('Store the extracted requirements list, implementation unit IDs/titles, and `plan_source`');
-  });
-
-  test('interactive findings tables escape literal pipe characters', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'review-output-template.md'),
-      'utf8',
+  test('deployment verification requires executable evidence per item', () => {
+    expect(deploymentPrompt).toContain(
+      'Every checklist item must name the command or observable signal that proves the step succeeded.',
     );
-
-    for (const text of [skill, template]) {
-      expect(text).toContain('Escape every literal pipe');
-      expect(text).toContain('`\\|`');
-      expect(text).toContain('TypeScript union types');
-    }
   });
 
-  test('uses OS temp run artifacts and best-judgment routing without bulk preview', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const bulkPreview = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'bulk-preview.md'),
-      'utf8',
-    );
-    const walkthrough = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'walkthrough.md'),
-      'utf8',
-    );
+  test('deployment verification activation mirrors the orchestrator risk gate and cannot self-invoke', () => {
+    const whenToUse = deploymentPrompt.match(/## When to Use This Agent([\s\S]*?)$/)?.[1] || '';
+    const stage3 = skill.match(/### Stage 3: Select reviewers([\s\S]*?)### Stage 4:/)?.[1] || '';
+    const stage4 = skill.match(/### Stage 4:([\s\S]*?)### Stage 5:/)?.[1] || '';
 
-    expect(text).toContain('`<review-artifact-dir>/` is a session/orchestrator handoff');
-    expect(text).toContain('Resolve it under the current OS temp directory');
-    expect(text).toContain('`os.tmpdir()` / `$TMPDIR` / `%TEMP%`');
-    expect(text).toContain('Do not hardcode `/tmp`');
-    expect(text).toContain('include the concrete path in every `Artifact:` line or structured return');
-    expect(text).toContain('session/orchestrator handoff, not repo-local durable truth');
-    expect(text).toContain('Do not promise it will be committed or retained.');
-    expect(text).toContain('docs/residual-review-findings/<branch-or-head-sha>.md');
-    expect(text).toContain('do not durable-store the full per-reviewer JSON bundle by default');
-    expect(text).not.toContain('.spec-first/workflows/spec:code-review');
-    expect(text).toContain('Auto-resolve with best judgment — apply per-finding fixes the agent can defend, surface the rest');
-    expect(text).toContain('No Stage 5b validator pre-pass. No bulk-preview approval gate.');
-    expect(text).toContain('post-run failure-handling question');
-    expect(text).toContain('no issue tracker is configured for this checkout');
-    expect(text).not.toContain('tracker sink');
-    expect(text).not.toContain('/tmp/spec-first/spec-code-review/<run-id>');
+    expect(skill).toContain('只有 orchestrator 能应用该 gate');
+    expect(stage3).toContain('Only when both conditions pass');
+    expect(stage3).toContain('selected_local_prompt_assets');
+    expect(stage3).toContain('artifact path and the concrete risky operation');
+    expect(stage4).toContain('only when Stage 3 already selected the asset');
+    expect(stage4).toContain('both the migration/schema-artifact gate and risky-change gate passed');
+    expect(stage4).toContain('safe additive migration');
+    expect(stage4).toContain('does not authorize Stage 4 dispatch');
+    expect(whenToUse).not.toBe('');
+    expect(whenToUse).toContain('只能由 `spec-code-review` orchestrator 调用');
+    expect(whenToUse).toContain('必须同时满足');
+    expect(whenToUse).toContain('migration 或 schema artifact');
+    expect(whenToUse).toContain('destructive DDL');
+    expect(whenToUse).toContain('NOT NULL without default');
+    expect(whenToUse).toContain('column rename/drop');
+    expect(whenToUse).toContain('普通 data-processing logic');
+    expect(whenToUse).toContain('不能单独授权调用');
+    expect(whenToUse).not.toContain('PR modifies data processing logic');
+    expect(whenToUse).not.toContain('Any change that could silently corrupt/lose data');
 
-    expect(bulkPreview).toContain('One call site');
-    expect(bulkPreview).toContain('Routing option C (top-level File tickets)');
-    expect(bulkPreview).toContain('Best-judgment fix paths do **not** use this preview.');
-    expect(bulkPreview).not.toContain('Routing option B (top-level');
-
-    expect(walkthrough).toContain('No `suggested_fix`:');
-    expect(walkthrough).toContain('hide option A (`Apply the proposed fix`)');
-    expect(walkthrough).toContain('Do not run Stage 5b and do not call `bulk-preview.md` for this path.');
-    expect(walkthrough).toContain('There is no second dispatch in that branch.');
-    expect(walkthrough).not.toContain('Auto-resolve with best judgment on the rest → Proceed');
-    expect(walkthrough).not.toContain('Auto-resolve with best judgment on the rest → Cancel');
-    expect(walkthrough).toContain('Walk-through bailed via `Auto-resolve with best judgment on the rest`');
-    expect(walkthrough).not.toContain('Walk-through bailed via `Auto-resolve with best judgment on the rest → Proceed`');
+    const cases = new Map(deploymentVerificationActivationCases.cases.map((entry) => [entry.id, entry]));
+    expect(cases.get('safe-additive-migration-does-not-dispatch')).toMatchObject({ kind: 'negative-owner' });
+    expect(cases.get('safe-additive-migration-does-not-dispatch').expected).toContain('不得把 deployment-verification-agent 加入 selected_local_prompt_assets');
+    expect(cases.get('risky-migration-dispatches-deployment-verification')).toMatchObject({ kind: 'positive' });
+    expect(cases.get('risky-migration-dispatches-deployment-verification').expected).toContain('artifact path 与 backfill/NOT NULL risky operation');
   });
 
-  test('schema and subagent template push reviewers to provide defensible suggested fixes', () => {
-    const schema = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'findings-schema.json'),
-      'utf8',
-    );
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
-      'utf8',
-    );
-
-    expect(schema).toContain('safe_auto = local mechanical fix');
-    expect(schema).toContain('The wrong-side cost is symmetric');
-    expect(schema).toContain('bias toward safe_auto when the rubric permits');
-    expect(schema).toContain('no change to function signature, public-API/error contract, security posture, or permission model');
-    expect(schema).toContain('helper extraction, naming/placement must follow mechanically');
-    expect(schema).toContain('Propose one whenever any defensible code change is reachable');
-    expect(schema).toContain('I need <specific input> to commit');
-    expect(template).toContain('you can articulate the fix in one sentence');
-    expect(template).toContain('Boundary cases that often feel risky but are still `safe_auto`');
-    expect(template).toContain('A nil guard that turns a crash into a nil-return is `safe_auto`');
-    expect(template).toContain('The "I need `<specific input>` before I can commit" framing is a soft punt');
-    expect(template).toContain('Pair `manual` with a concrete `suggested_fix` whenever you can defend one');
-    expect(template).toContain('Imperfect information is not grounds for omission');
-    expect(template).toContain('do not force a decision');
+  test('validator treats why_it_matters as optional context exactly like Stage 5b', () => {
+    expect(skill).toContain('`why_it_matters` when available');
+    expect(validatorTemplate).toContain('该字段是可选上下文');
+    expect(validatorTemplate).toContain('缺失时 validator 继续依据 diff 与 cited code 验证');
+    expect(validatorTemplate).toContain('该字段可能为空；为空时直接依据 diff 与 cited code 验证');
+    expect(validatorTemplate).toContain('不得因缺少 reviewer framing 而拒绝或确认 finding');
+    expect(validatorTemplate).not.toContain('required for the validator to understand the finding');
   });
 
-  test('leaf reviewers may propose finding-scoped structural fixes but not speculative refactors', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
-      'utf8',
-    );
-
-    expect(skill).toContain('must not propose unrelated or speculative refactors');
-    expect(skill).toContain('may propose the smallest finding-scoped structural fix');
-    expect(skill).toContain('mechanical helper extraction');
-    expect(template).toContain('Helper extraction is `safe_auto` when the duplication is identical');
-    expect(template).toContain('Pair `manual` with a concrete `suggested_fix` whenever you can defend one');
-    expect(skill).not.toContain('or propose refactors. Artifact persistence');
+  test('prompt assets are skill-local', () => {
+    expect(skill).toContain('Read the prompt file from `references/personas/`');
+    expect(fs.existsSync(path.join(repoRoot, 'agents/spec-pr-comment-resolver.agent.md'))).toBe(false);
   });
 
-  test('pre-existing findings are routed independently from confidence zero', () => {
-    const schema = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'findings-schema.json'),
-      'utf8',
-    );
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
-      'utf8',
-    );
-    const diffScope = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'diff-scope.md'),
-      'utf8',
-    );
-
-    expect(schema).toContain('False positive or non-finding -- do not report');
-    expect(schema).toContain('Pre-existing status is represented separately by the `pre_existing` boolean');
-    expect(schema).toContain('Pre-existing findings are routed separately and do not count toward the review verdict.');
-    expect(template).toContain('Pre-existing status is represented separately by `pre_existing: true`');
-    expect(diffScope).toContain('Mark these as `"pre_existing": true` in your output.');
-    expect(schema).not.toContain('False positive or pre-existing -- do not report');
-    expect(schema).not.toContain('or a pre-existing issue this PR did not introduce');
+  test('task review context is paired, digest-pinned, and honestly scoped', () => {
+    expect(skill).toContain('`task-pack:<path>`');
+    expect(skill).toContain('`task:<task_id>`');
+    expect(skill).toContain('`task-context:<path>`');
+    expect(skill).toContain('spec-code-review-task-context/v1');
+    expect(skill).toContain('task_pack_digest');
+    expect(skill).toContain('source_plan_section_titles');
+    expect(skill).toContain('plan_context_mode');
+    expect(skill).toContain('exact-file');
+    expect(skill).toContain('cumulative-file');
+    expect(skill).toContain('task_diff_isolation');
+    expect(skill).toContain('required_gate_eligible');
+    expect(skill).toContain('task-pack and task tokens must appear together');
+    expect(skill).toContain('unknown task_id');
+    expect(skill).toContain('task-plan-unreadable');
+    expect(skill).toContain('task-plan-section-unreadable');
+    expect(skill).toContain('task-plan-section-hints-missing');
+    expect(skill).toContain('diff-only');
+    expect(skill).toMatch(/section labels are absent[\s\S]*plan_context_mode: diff-only[\s\S]*do not fail the task solely/is);
+    expect(skill).toMatch(/never plan body bytes, hashes, byte offsets, anchors/is);
+    expect(subagentTemplate).toContain('Live plan context');
+    expect(subagentTemplate).toMatch(/re-read the listed current file.*named section titles/is);
   });
 
-  test('merge validation keeps current full schema detail fields while allowing explicit legacy degradation', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const schema = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'findings-schema.json'),
-      'utf8',
-    );
-
-    expect(schema).toContain('"why_it_matters"');
-    expect(schema).toContain('"evidence"');
-    expect(text).toContain('Per-finding required for current full reviewer returns');
-    expect(text).toContain('why_it_matters, evidence, confidence');
-    expect(text).toContain('Legacy/compact degraded returns');
-    expect(text).toContain('Headless output, tracker externalization');
-    expect(text).toContain('must not claim full-schema validation');
-    expect(text).toContain('Validate current reviewer returns against the full schema');
+  test('task mode keeps task-owned untracked files and rejects unattributed scope', () => {
+    expect(skill).toContain('task_owned_untracked_files');
+    expect(skill).toContain('pre_task_untracked_files');
+    expect(skill).toContain('full-addition patch');
+    expect(skill).toContain('task-scope-expansion');
+    expect(skill).toContain('task-scope-unattributed');
   });
 
-  test('cross-reviewer agreement does not promote interpretive findings to certainty', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('promote the merged finding by one anchor step up to the high-confidence tier');
-    expect(text).toContain('`50 -> 75`, `75 -> 75`, `100 -> 100`');
-    expect(text).toContain('does not by itself satisfy the `100` anchor');
-    expect(text).toContain('Promote to `100` only when the merged direct evidence independently meets that bar');
-    expect(text).not.toContain('`50 -> 75`, `75 -> 100`, `100 -> 100`');
-  });
-
-  test('maintainability reviewer targets structural simplification without gaining write access', () => {
-    const reviewer = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-maintainability-reviewer.agent.md'),
-      'utf8',
-    );
-
-    expect(reviewer).toContain('structural quality, complexity deletion');
-    expect(reviewer).toContain('catch changes that make the codebase harder to change, delete, or reason about');
-    expect(reviewer).toContain('delete complexity');
-    expect(reviewer).toContain('Structural simplification (highest priority)');
-    expect(reviewer).toContain('Complexity moved, not removed');
-    expect(reviewer).toContain('Code-judo misses');
-    expect(reviewer).toContain('Spaghetti growth');
-    expect(reviewer).toContain('File-size regression');
-    expect(reviewer).toContain('1000 lines');
-    expect(reviewer).toContain('Wrong layer / leaked logic');
-    expect(reviewer).toContain('Thin wrappers');
-    expect(reviewer).toContain('new `any`, `@ts-ignore`, unchecked `as` casts, `unknown as Foo`');
-    expect(reviewer).toContain('Ad-hoc object shapes');
-    expect(reviewer).toContain('P1');
-    expect(reviewer).toContain('P2');
-    expect(reviewer).toContain('P3');
-    expect(reviewer).toContain('Structural findings need a **concrete reframe** in `suggested_fix`');
-    expect(reviewer).toContain('explicit `any` or `@ts-ignore` in new code');
-    expect(reviewer).toContain('new wrapper with no added behavior');
-    expect(reviewer).toContain('suppress unless severity is P1');
-    expect(reviewer).toContain('Philosophy without a concrete structural fix');
-    expect(reviewer).toContain('"reviewer": "maintainability"');
-    expect(reviewer).toContain('tools: Read, Grep, Glob, Bash');
-    expect(reviewer).not.toContain('tools: Read, Grep, Glob, Bash, Write');
-    expect(reviewer).not.toContain('ce-maintainability');
-  });
-
-  test('data-migrations reviewer adds verification rubric without absorbing schema drift', () => {
-    const reviewer = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-data-migrations-reviewer.agent.md'),
-      'utf8',
-    );
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(reviewer).toContain('deploy-window safety, rollback risk, and verification plans');
-    expect(reviewer).toContain('Never trust fixtures as proof of production shape');
-    expect(reviewer).toContain('Migration safety');
-    expect(reviewer).toContain('Verification and observability');
-    expect(reviewer).toContain('Read-only SQL to prove correctness after deploy');
-    expect(reviewer).toContain('Rollback or feature-flag guardrails for risky paths');
-    expect(reviewer).toContain('Flag missing verification for risky transforms as **P2** `manual`');
-    expect(reviewer).toContain('concrete verification shape in `suggested_fix`');
-    expect(reviewer).toContain('verifiable swapped mapping');
-    expect(reviewer).toContain('concrete orphaned reference');
-    expect(reviewer).toContain('Schema drift is still owned by `spec-schema-drift-detector`');
-    expect(reviewer).toContain('Do not replace it');
-    expect(reviewer).toContain('"reviewer": "data-migrations"');
-    expect(reviewer).toContain('tools: Read, Grep, Glob, Bash');
-    expect(reviewer).not.toContain('tools: Read, Grep, Glob, Bash, Write');
-    expect(reviewer).not.toContain('"reviewer": "data-migration"');
-    expect(reviewer).not.toContain('ce-data-migration');
-    expect(catalog).toContain('Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, or data transformations -- not model/query-only changes without migration artifacts');
-    expect(catalog).toContain('Do not trigger migration-only agents for model/query-only changes without migration artifacts');
-    expect(catalog).toContain('Do not spawn these agents for model/query-only changes without migration artifacts');
-    expect(skill).toContain('Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, or data transformations -- not model/query-only changes without migration artifacts');
-    expect(skill).toContain('Do not trigger migration-only agents for model/query-only changes without migration artifacts');
-    expect(skill).toContain('Select when diff includes migration artifacts');
-    expect(catalog).toContain('`spec-schema-drift-detector` | Cross-references schema.rb changes against included migrations to catch unrelated drift');
-    expect(skill).toContain('For spec-schema-drift-detector specifically, pass the resolved review base branch explicitly so it never assumes `main`');
-  });
-
-  test('project-standards reviewer enforces only confirmed team standards with source evidence', () => {
-    const reviewer = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-project-standards-reviewer.agent.md'),
-      'utf8',
-    );
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
-
-    expect(reviewer).toContain('docs/contracts/team-standards.md');
-    expect(reviewer).toContain('docs/standards/index.md');
-    expect(reviewer).toContain('trust=confirmed');
-    expect(reviewer).toContain('lifecycle_state=active');
-    expect(reviewer).toContain('matching scope');
-    expect(reviewer).toContain('Suppress `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`');
-    expect(reviewer).toContain('Do not scan the full `docs/standards/**` tree');
-    expect(reviewer).toContain('Every finding must include');
-    expect(reviewer).toContain('specific line(s) in the diff');
-    expect(catalog).toContain('confirmed `docs/standards/**` rule cards');
-  });
-
-  test('tracker defer references keep the tracker confidence tuple consistent', () => {
-    const files = [
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'tracker-defer.md'),
-      path.join(__dirname, '..', '..', 'skills', 'spec-work', 'references', 'tracker-defer.md'),
-    ];
-
-    for (const filePath of files) {
-      const text = fs.readFileSync(filePath, 'utf8');
-
-      expect(text).toContain('{ tracker_name, confidence, named_sink_available, any_sink_available }');
-      expect(text).toContain('Primary sources are already-loaded project guidance plus precise tracker lookups');
-      expect(text).toContain('Check already-loaded project guidance for tracker references');
-      expect(text).toContain('perform a precise lookup for tracker references');
-      expect(text).toContain('avoid full-file reads unless the exact lookup is inconclusive and Defer execution is imminent');
-      expect(text).toContain('confidence = high');
-      expect(text).toContain('confidence = low');
-      expect(text).not.toContain('Primary sources: `CLAUDE.md` and `AGENTS.md`');
-      expect(text).not.toContain('Read `CLAUDE.md` / `AGENTS.md` for tracker references');
-      expect(text).not.toContain('confidence-first');
-      expect(text).not.toContain('tracker_confidence');
-    }
-  });
-
-  test('all tracker defer references use emitted review artifact paths instead of hardcoded temp roots', () => {
-    const files = [
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'tracker-defer.md'),
-      path.join(__dirname, '..', '..', 'skills', 'spec-work', 'references', 'tracker-defer.md'),
-    ];
-
-    for (const filePath of files) {
-      const text = fs.readFileSync(filePath, 'utf8');
-
-      expect(text).toContain('<artifact-path>/<reviewer>.json');
-      expect(text).toContain('Do not hardcode `/tmp`');
-      expect(text).toContain('review workflow\'s returned artifact path is the authority');
-      expect(text).not.toContain('/tmp/spec-first/spec-code-review/<run-id>');
-    }
-  });
-
-  test('tracker defer durable tickets do not rely on session artifacts as continuation truth', () => {
-    const text = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'tracker-defer.md'),
-      'utf8',
-    );
-
-    expect(text).toContain('Include enough inline evidence for the ticket to remain understandable without opening the session artifact.');
-    expect(text).toContain('preserve the title, one-sentence problem statement, suggested fix when present, at least one compact evidence item');
-    expect(text).toContain('Do not rely on a session-scoped spec-code-review run artifact as the only continuation target');
-    expect(text).toContain('never as the durable source of truth');
-    expect(text).not.toContain('continued in spec-code-review run artifact');
-  });
-
-  test('bulk preview remains option-C only after best-judgment migration', () => {
-    const bulkPreview = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'bulk-preview.md'),
-      'utf8',
-    );
-
-    expect(bulkPreview).toContain('One call site');
-    expect(bulkPreview).toContain('Options (exactly two for routing option C)');
-    expect(bulkPreview).not.toContain('in all three cases');
-  });
-
-  test('model tiering avoids hard-coded non-Claude model names', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('use only a host-provided stable alias or omit the model parameter');
-    expect(text).toContain('do not invent a model name from memory');
-    expect(text).toContain('on other platforms use a host-provided cheap stable alias or omit the model parameter');
-    expect(text).not.toContain('gpt-5.4-mini');
-    expect(text).not.toContain('gpt-5.4-nano');
-  });
-
-  test('runtime readiness preflight prevents multiplying broken MCP startup across reviewers', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const claudeRuntime = renderWorkflowSkill('claude');
-    const codexRuntime = renderWorkflowSkill('codex');
-
-    for (const content of [text, claudeRuntime, codexRuntime]) {
-      expect(content).toContain('Runtime readiness preflight');
-      expect(content).toContain('spec-mcp-setup');
-      expect(content).toContain('detect-tools.sh');
-      expect(content).toContain('host_config_status: ready | fallback-active | registry-args-drift | not-required');
-      expect(content).toContain('acceptable-but-degraded');
-      expect(content).toContain('do not treat it as unsafe by itself');
-      expect(content).toContain('host_config_status: action-required | precedence-blocked');
-      expect(content).toContain('not safe for multi-persona dispatch');
-      expect(content).toContain('runtime boundary issue');
-      expect(content).toContain('Record it once in Coverage');
-      expect(content).toContain('Missing optional external-tool evidence does not by itself disable reviewer dispatch');
-      expect(content).toContain('When a required MCP server is not host-config-ready before dispatch');
-      expect(content).toContain('do not spawn reviewer agents');
-      expect(content).toContain('single_agent_report_only_fallback: true');
-      expect(content).toContain('runtime readiness preflight unavailable');
-      expect(content).toContain('MCP startup incomplete');
-      expect(content).toContain('fallback is mode-aware');
-      expect(content).toContain('Review failed (headless mode). Reason: required MCP runtime not ready');
-      expect(content).toContain('Mutating review requires safe reviewer/fixer dispatch capability');
+  test('review artifacts use one concrete portable path returned to every consumer', () => {
+    for (const source of [skill, subagentTemplate, outputTemplate, crossModel]) {
+      expect(source).toContain('REVIEW_ARTIFACT_DIR');
+      expect(source).toContain('artifact_path');
+      expect(source).not.toContain('/tmp/spec-first/spec-code-review');
     }
 
-    expect(text).toContain('bash skills/spec-mcp-setup/scripts/detect-tools.sh');
-    expect(claudeRuntime).toContain('bash .claude/spec-first/workflows/spec-mcp-setup/scripts/detect-tools.sh');
-    expect(codexRuntime).toContain('bash .agents/skills/spec-mcp-setup/scripts/detect-tools.sh');
-    expect(codexRuntime).toContain('| Claude runtime | `bash .claude/spec-first/workflows/spec-mcp-setup/scripts/detect-tools.sh` |');
-    expect(codexRuntime).not.toContain('| Claude runtime | `bash .agents/skills/spec-mcp-setup/scripts/detect-tools.sh` |');
+    expect(skill).toContain('os.tmpdir()');
+    expect(skill).toContain('%TEMP%');
+    expect(skill).toContain('$TMPDIR');
+    expect(crossModelScript).toContain('<run-dir>');
+    expect(crossModelScript).toContain('RUN_DIR=');
+    expect(crossModelScript).not.toContain('/tmp/spec-first/spec-code-review');
   });
 
-  test('trivial PR skip pre-check does not bypass dispatch authorization', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const skipRuleStart = text.indexOf('**Trivial-PR judgment**');
-    const skipRuleEnd = text.indexOf('When any skip rule fires', skipRuleStart);
-    const skipRule = text.slice(skipRuleStart, skipRuleEnd);
-
-    expect(skipRule).toContain('make a conservative inline orchestrator judgment');
-    expect(skipRule).toContain('Do not call `Agent`, `Task`, `spawn_agent`, or an equivalent dispatch primitive');
-    expect(skipRule).toContain('Stage 4 dispatch gate');
-    expect(skipRule).not.toContain('spawn a lightweight sub-agent');
+  test('mode:agent coverage exposes task scope and artifact write limitations', () => {
+    expect(skill).toContain('"task_scope"');
+    expect(skill).toContain('"artifact_write_status"');
+    expect(skill).toContain('"artifact_path": "<absolute path or null>"');
+    expect(skill).toContain('dispatch_authorization_missing');
   });
 
-  test('preflight consumes plan and work direct evidence once and reports Coverage posture', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'review-output-template.md'),
-      'utf8',
-    );
-
-    expect(text).toContain('If a `plan:` argument or Stage 2b discovery found a plan, inspect its source refs, direct evidence notes, limitations, and repo scope.');
-    expect(text).toContain('spec-work run artifact path / `run_id`');
-    expect(text).toContain('spec-first internal spec-work-run-artifact read --target-repo <repo>');
-    expect(text).toContain('do not directly scan `.spec-first/workflows/spec-work/**`');
-    expect(text).toContain('artifact `plan_path` / `source_refs` reasonably match');
-    expect(text).toContain('reader returns not-found/not-readable');
-    expect(text).toContain('scope mismatches');
-    expect(text).toContain('do not inject the artifact evidence into reviewer prompts');
-    expect(text).toContain('Carry the consolidated direct evidence posture to Stage 6 Coverage.');
-    expect(text).toContain('Do not ask each persona reviewer to repeat the same setup preflight.');
-    expect(template).toContain('Coverage section');
-    expect(template).toContain('direct evidence posture');
+  test('API reviewer checks canonical drift and consumer evolution without owning API design', () => {
+    expect(apiContractPrompt).toContain('### Interface Contracts');
+    expect(apiContractPrompt).toContain('canonical artifact');
+    expect(apiContractPrompt).toContain('schema、error shape、nullability、pagination、idempotency、compatibility');
+    expect(apiContractPrompt).toContain('replacement、deprecation 或 removal');
+    expect(apiContractPrompt).toContain('zero-use evidence');
+    expect(apiContractPrompt).toContain('单次搜索没有命中不是充分证明');
+    expect(apiContractPrompt).toContain('不把 review 变成接口设计');
+    expect(apiContractPrompt).toContain('tenant/resource authorization');
+    expect(apiContractPrompt).toContain('security reviewer');
+    expect(apiContractPrompt).toContain('diff-only');
+    expect(apiContractPrompt).not.toContain('第二套 findings schema');
   });
 
-  test('records direct evidence targets for broad or impact-sensitive diffs', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+  test('API capability cases protect breaking, additive, and negative-owner boundaries', () => {
+    expect(apiCapabilityCases.schema_version).toBe('spec-first.spec-code-review.api-contract-cases/v1');
+    expect(apiCapabilityCases.owner).toBe('api-contract-reviewer');
+    expect(apiCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/api-contract-reviewer.md',
+      'skills/spec-plan/references/interface-and-evolution-lens.md',
+    ]));
 
-    expect(text).toContain('When the diff is broad or impact-sensitive, Stage 3 records direct evidence targets instead of external-tool calls:');
-    expect(text).toContain('Route handler / public API diff -> inspect handler source, callers/consumers found by `rg`');
-    expect(text).toContain('Response shape / consumer access diff -> inspect the route response source, consumer property reads');
-    expect(text).toContain('Shared symbol / helper diff -> inspect direct imports/callers found by `rg` or ast-grep');
-    expect(text).toContain('MCP/RPC tool definition diff -> inspect the tool definition, handler, descriptions');
-    expect(text).toContain('Workspace multi-repo diff -> resolve direct evidence per child repo');
-    expect(text).toContain('Do not raise a finding solely from a name match');
-    expect(text).toContain('confirmed by diff/source/test/contract/log evidence');
+    const cases = new Map(apiCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const fieldRemoval = cases.get('canonical-artifact-field-removal-drift');
+    const endpointRemoval = cases.get('deprecated-removal-without-replacement-or-zero-use');
+    const additive = cases.get('additive-optional-field-with-synchronized-artifact');
+    const privateRefactor = cases.get('private-refactor-and-security-only-boundary');
+
+    expect(fieldRemoval).toMatchObject({ kind: 'positive' });
+    expect(fieldRemoval.input).toContain('required `display_name`');
+    expect(fieldRemoval.expected).toContain('breaking-drift finding');
+    expect(fieldRemoval.forbidden).toContain('把删除当作 private refactor');
+    expect(endpointRemoval).toMatchObject({ kind: 'positive' });
+    expect(endpointRemoval.expected).toContain('zero-use evidence');
+    expect(endpointRemoval.forbidden).toContain('假定没有搜索结果就等于 zero-use');
+    expect(additive).toMatchObject({ kind: 'negative-owner' });
+    expect(additive.expected).toContain('保持 suppression');
+    expect(additive.forbidden).toContain('把 additive optional field 标为 breaking');
+    expect(privateRefactor).toMatchObject({ kind: 'negative-owner' });
+    expect(privateRefactor.expected).toContain('交给 security reviewer');
+    expect(privateRefactor.forbidden).toContain('为 private helper rename 生成 API finding');
   });
 
-  test('phase A boundary graph and test-gap contracts have stable report fields', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const diffScope = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'diff-scope.md'),
-      'utf8',
-    );
-    const template = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'review-output-template.md'),
-      'utf8',
-    );
-    const subagentTemplate = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
-      'utf8',
-    );
-    const walkthrough = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'walkthrough.md'),
-      'utf8',
-    );
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
-
-    for (const field of [
-      'scope_boundary',
-      'authorized_scope_source',
-      'scope_boundary_evidence',
-      'graph_assist',
-      'graph_reason_code',
-      'expansion_budget',
-      'provider_untrusted.summaries[]',
-      'changed_symbols',
-      'changed_entrypoints',
-      'changed_contracts',
-      'symbol_mapping_status',
-      'impact_chain_candidates',
-      'blast_radius_candidates',
-      'caller_callee_paths',
-      'affected_test_candidates',
-      'tests_for_query_result',
-      'missing_test_confirmation',
-      'review_priority_candidates',
-      'test_gaps',
-    ]) {
-      expect(skill).toContain(field);
-      expect(template).toContain(field);
-    }
-
-    expect(skill).toContain('`scope_boundary`: `clean | concern | violation | unknown`');
-    expect(skill).toContain('`authorized_scope_source`: `explicit-touch-set | declared-files-only | inferred-plan | diff-only | unknown`');
-    expect(skill).toContain('Use `clean` only when an explicit touch set, declared files, or plan requirements directly cover the changed files and behavior.');
-    expect(skill).toContain('A diff-only inference is never enough for `clean`.');
-    expect(skill).toContain('Implementer reports, PR prose, commit messages, or work closeouts are claim sources only.');
-    expect(skill).toContain('Minimum derived labels are `scope_creep`, `unauthorized_file_change`, `unverifiable_claim`, and `missing_verification`.');
-    expect(skill).toContain('High-confidence scope-boundary findings must remain in the primary finding set');
-    expect(skill).toContain('Stage 5 synthesis derives `finding_type`');
-    expect(skill).toContain('finding_type: <derived labels present in this report, or none>');
-
-    expect(skill).toContain('Graph-Assisted Impact Review is a bounded advisory lens');
-    expect(skill).toContain('`graph_assist`: `used | fallback | not_applicable`');
-    expect(skill).toContain('`graph_reason_code`: `candidate_results | provider_missing | readiness_unknown | stale | call_failed | disabled_or_unsafe | markdown_only_diff | no_candidates`');
-    expect(skill).toContain('`expansion_budget`: minimal-first budget used for candidate expansion');
-    expect(skill).toContain('`graph_assist: used` requires `graph_reason_code: candidate_results` plus at least one of `changed_symbols`, `caller_callee_paths`, or `affected_test_candidates`');
-    expect(skill).toContain('`no_candidates` proves only that the provider path ran.');
-    expect(skill).toContain('Use minimal-first expansion: start with at most 5 high-impact symbols or entrypoints.');
-    expect(skill).toContain('Ordinary docs-only/prose-only diffs can use `graph_assist: not_applicable`');
-    expect(skill).toContain('source-runtime instruction prose such as `skills/**`, workflow contracts, templates, runtime projection source, or CLI/workflow harness docs remains impact-sensitive');
-    expect(skill).toContain('do not read raw project-graph artifact JSON');
-    expect(skill).toContain('`symbol_mapping_status`: `mapped | degraded | not_applicable`');
-    expect(skill).toContain('`tests_for_query_result`, `missing_test_confirmation`, and `test_gaps`');
-    expect(skill).toContain('Keep `test_gaps` as a first-class Coverage signal');
-    expect(skill).toContain('wrapped in `<boundary-context>`');
-    expect(skill).toContain('wrapped in `<graph-impact-context>`');
-    expect(skill).toContain('Validator failure (timeout, dispatch error, malformed JSON) -> keep the finding');
-    expect(skill).toContain('Do not treat infrastructure failure as counter-evidence.');
-
-    expect(diffScope).toContain('### Boundary (authorized scope)');
-    expect(diffScope).toContain('Use the resolved `BASE:`, `FILES:`, and `DIFF:` markers passed by the parent orchestrator.');
-    expect(diffScope).toContain('Do not recompute the diff range');
-    expect(diffScope).toContain('If an explicit touch set or declared file list exists');
-    expect(diffScope).toContain('scope_boundary: unknown');
-    expect(diffScope).toContain('Implementer summaries, commit messages, or PR prose are claims to verify, not proof.');
-
-    expect(subagentTemplate).toContain('Treat Graph-Assisted Impact Review and code-graph/project-graph output as `provider_untrusted` candidate context only.');
-    expect(subagentTemplate).toContain('<boundary-context>');
-    expect(subagentTemplate).toContain('{boundary_context}');
-    expect(subagentTemplate).toContain('<graph-impact-context>');
-    expect(subagentTemplate).toContain('{graph_impact_context}');
-    expect(subagentTemplate).toContain('a finding must cite confirming diff/source/test/log/contract evidence');
-    expect(subagentTemplate).toContain('populate top-level `testing_gaps`');
-    expect(walkthrough).toContain('Stage 6 stable boundary/graph fields');
-    expect(walkthrough).toContain('scope_boundary');
-    expect(walkthrough).toContain('graph_assist');
-    expect(walkthrough).toContain('missing_test_confirmation');
-
-    expect(catalog).toContain('Diff Boundary Review, Graph-Assisted Impact Review, and first-class test gaps do not add a new persona in Phase A.');
-    expect(catalog).toContain('Boundary/graph escalation');
+  test('security reviewer selects concrete agent-native attack paths without taking API drift', () => {
+    expect(skill).toContain('**Security selection boundary.**');
+    expect(skill).toContain('agent/model/tool/web-content trust boundary');
+    expect(skill).toContain('tenant/resource authorization');
+    expect(skill).toContain('an unreachable dependency advisory or generic hardening idea is not a security finding');
+    expect(personaCatalog).toContain('untrusted model/tool/web outputs crossing into a reachable dangerous sink');
+    expect(securityPrompt).toContain('完整 attack path');
+    expect(securityPrompt).toContain('tenant/resource access');
+    expect(securityPrompt).toContain('plan_context_mode: live-plan');
+    expect(securityPrompt).toContain('dependency advisory');
+    expect(securityPrompt).toContain('schema/error/nullability/pagination/idempotency/compatibility drift 由 API reviewer 持有');
+    expect(securityPrompt).toContain('不得发明计划中的 authorization intent');
   });
 
-  test('phase A eval fixtures and adoption readout cover R-30 floor without overclaiming', () => {
-    const examplesPath = path.join(
-      __dirname,
-      '..',
-      '..',
-      'skills',
-      'spec-code-review',
-      'evals',
-      'examples.json',
-    );
-    const examples = JSON.parse(fs.readFileSync(examplesPath, 'utf8'));
-    const cases = new Map(examples.cases.map((fixture) => [fixture.id, fixture]));
-    const readoutPath = path.join(
-      __dirname,
-      '..',
-      '..',
-      'docs',
-      'validation',
-      'spec-code-review',
-      'phase-a-boundary-graph-readout.md',
-    );
-    const readout = fs.readFileSync(readoutPath, 'utf8');
+  test('security capability cases protect trusted-input, reachability, and owner boundaries', () => {
+    expect(securityCapabilityCases.schema_version).toBe('spec-first.spec-code-review.security-cases/v1');
+    expect(securityCapabilityCases.owner).toBe('security-reviewer');
+    expect(securityCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/security-reviewer.md',
+      'skills/spec-code-review/references/persona-catalog.md',
+    ]));
 
-    for (const id of [
-      'phase-a-scope-violation-with-explicit-touch-set',
-      'phase-a-graph-candidate-rejected-with-test-gap',
-      'phase-a-graph-provider-fallback-with-degraded-symbol-mapping',
-      'phase-a-clean-diff-noise-floor',
-    ]) {
-      expect(cases.has(id)).toBe(true);
-      const fixture = cases.get(id);
-      expect(fixture).toHaveProperty('diff_or_input');
-      expect(fixture).toHaveProperty('expected_scope_boundary');
-      expect(fixture).toHaveProperty('authorized_scope_source');
-      expect(fixture).toHaveProperty('must_find');
-      expect(fixture).toHaveProperty('must_not_find');
-      expect(fixture).toHaveProperty('expected_coverage_signals');
-      expect(fixture).toHaveProperty('expected_graph_assist');
-      expect(fixture).toHaveProperty('expected_reason_code');
-      expect(fixture).toHaveProperty('expected_symbol_mapping');
-      expect(fixture).toHaveProperty('expected_test_gaps');
-      expect(fixture).toHaveProperty('expected_review_priority_candidates');
-      expect(fixture).toHaveProperty('expected_expansion_budget');
-      expect(fixture).toHaveProperty('limitations');
-    }
+    const cases = new Map(securityCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const shellSink = cases.get('untrusted-tool-output-reaches-shell-sink');
+    const tenantGap = cases.get('tenant-resource-authorization-gap-with-stable-schema');
+    const unreachableDependency = cases.get('unreachable-dependency-advisory-suppressed');
+    const schemaOnly = cases.get('schema-only-drift-owned-by-api-reviewer');
 
-    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').expected_scope_boundary).toBe('violation');
-    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').provider_readiness).toBe('unknown');
-    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').expected_graph_assist).toBe('fallback');
-    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').expected_reason_code).toBe('readiness_unknown');
-    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_graph_assist).toBe('used');
-    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_reason_code).toBe('candidate_results');
-    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_symbol_mapping).toContain('changed_symbols');
-    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_review_priority_candidates.length).toBeGreaterThan(0);
-    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_expansion_budget).toBe('max_5_high_impact_symbols');
-    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').expected_graph_assist).toBe('fallback');
-    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').provider_readiness).toBe('unknown');
-    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').expected_symbol_mapping).toContain('symbol_mapping_status=degraded');
-    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').must_not_find).toContain('graph_assist=used');
-    expect(cases.get('phase-a-clean-diff-noise-floor').must_not_find).toContain('graph_assist=used');
-
-    expect(readout).toContain('scope_boundary: violation');
-    expect(readout).toContain('scope_boundary: unknown');
-    expect(readout).toContain('graph_assist: fallback');
-    expect(readout).toContain('graph_assist: used');
-    expect(readout).toContain('provider_untrusted.summaries[]');
-    expect(readout).toContain('test_gaps');
-    expect(readout).toContain('pilot limitation');
-    expect(readout).toContain('does not prove durable graph impact capability');
+    expect(shellSink).toMatchObject({ kind: 'positive' });
+    expect(shellSink.expected).toContain('完整 attack path');
+    expect(shellSink.forbidden).toContain('把 tool result 当成可信 command');
+    expect(tenantGap).toMatchObject({ kind: 'positive' });
+    expect(tenantGap.expected).toContain('只有 security reviewer');
+    expect(tenantGap.forbidden).toContain('由 API compatibility reviewer 重复报告');
+    expect(unreachableDependency).toMatchObject({ kind: 'negative-owner' });
+    expect(unreachableDependency.expected).toContain('保持 suppression');
+    expect(unreachableDependency.forbidden).toContain('仅凭 lockfile 名称报告 exploitable vulnerability');
+    expect(schemaOnly).toMatchObject({ kind: 'negative-owner' });
+    expect(schemaOnly.expected).toContain('留给 API reviewer');
+    expect(schemaOnly.forbidden).toContain('以 security finding 重复报告 pagination drift');
   });
 
-  test('changelog path references to untracked artifacts stay boundary concerns', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(skill).toContain('When `CHANGELOG.md`, release notes, review docs, or validation docs add repo-relative path references');
-    expect(skill).toContain('referenced artifacts that are claimed as shipped are in `FILES:` / tracked diff');
-    expect(skill).toContain('already tracked by `git ls-files -- <path>`');
-    expect(skill).toContain('exists only in `UNTRACKED:`');
-    expect(skill).toContain('`scope_boundary: concern`');
-    expect(skill).toContain('`finding_type: untracked_referenced_artifact`');
-    expect(skill).toContain('Changelog/release-note path reference check');
-    expect(skill).toContain('If `CHANGELOG.md` or a release-note/validation doc is in `FILES:`');
-    expect(skill).toContain('Compare to `FILES:`, `git ls-files -- <path>`, and `UNTRACKED:`');
-    expect(skill).toContain('untracked-referenced-artifact:<path>');
-    expect(skill).toContain('workflow-local and does not require a findings-schema change');
-    expect(skill).toContain('do not stage the artifact');
+  test('testing reviewer distinguishes observable proof, contract interactions, and execution history', () => {
+    expect(testingPrompt).toContain('DAMP');
+    expect(testingPrompt).toContain('state/behavior outcome');
+    expect(testingPrompt).toContain('interaction 本身确实是公开 contract 时例外成立');
+    expect(testingPrompt).toContain('real implementation -> high-fidelity fake -> stub -> mock');
+    expect(testingPrompt).toContain('serialization、middleware、callback、permission、retry 或 error translation');
+    expect(testingPrompt).toContain('不能从最终绿测或 production/test 同时出现的 diff 推断“没有做 TDD”');
+    expect(testingPrompt).toContain('spec-work` run-local evidence');
+    expect(testingPrompt).toContain('Unobserved TDD history');
   });
 
-  test('phase A fixture graph combinations stay semantically consistent', () => {
-    const examples = JSON.parse(fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'evals', 'examples.json'),
-      'utf8',
-    ));
-    const phaseACases = examples.cases.filter((fixture) => fixture.coverage_tags.includes('phase-a-floor'));
+  test('testing capability cases protect proof and TDD ownership boundaries', () => {
+    expect(testingCapabilityCases.schema_version).toBe('spec-first.spec-code-review.testing-cases/v1');
+    expect(testingCapabilityCases.owner).toBe('testing-reviewer');
+    expect(testingCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/testing-reviewer.md',
+      'skills/spec-work/references/feedback-and-tests.md',
+    ]));
 
-    for (const fixture of phaseACases) {
-      if (fixture.expected_graph_assist === 'used') {
-        expect(fixture.expected_reason_code).toBe('candidate_results');
-        const candidateSignals = [
-          ...(fixture.expected_symbol_mapping || []),
-          ...(fixture.expected_coverage_signals || []),
-        ].join(' ');
-        expect(candidateSignals).toMatch(/changed_symbols|caller_callee_paths|affected_test_candidates/);
-        expect(fixture.expected_expansion_budget).toBe('max_5_high_impact_symbols');
-      }
+    const cases = new Map(testingCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const mockOnly = cases.get('mock-call-count-without-observable-state-proof');
+    const weakDouble = cases.get('double-bypasses-real-cross-layer-seam');
+    const interactionContract = cases.get('interaction-itself-is-public-contract');
+    const noHistory = cases.get('green-diff-without-execution-history');
 
-      if (fixture.expected_graph_assist === 'fallback') {
-        expect(fixture.expected_reason_code).not.toBe('candidate_results');
-        expect(fixture.limitations.length).toBeGreaterThan(0);
-        expect(['unknown', 'missing', undefined]).toContain(fixture.provider_readiness);
-      }
-
-      if (fixture.expected_graph_assist === 'not_applicable') {
-        expect(fixture.expected_reason_code).toBe('markdown_only_diff');
-        expect(fixture.expected_expansion_budget).toBe('not_applicable');
-      }
-    }
+    expect(mockOnly).toMatchObject({ kind: 'positive' });
+    expect(mockOnly.expected).toContain('state/behavior outcome proof');
+    expect(mockOnly.forbidden).toContain('把 mock call count 当成完整行为验证');
+    expect(weakDouble).toMatchObject({ kind: 'positive' });
+    expect(weakDouble.expected).toContain('double fidelity gap');
+    expect(weakDouble.forbidden).toContain('把跳过关键 seam 的 fake 视为 integration proof');
+    expect(interactionContract).toMatchObject({ kind: 'negative-owner' });
+    expect(interactionContract.expected).toContain('interaction 本身是 contract');
+    expect(interactionContract.forbidden).toContain('把公开 protocol interaction 报为 brittle implementation coupling');
+    expect(noHistory).toMatchObject({ kind: 'negative-owner' });
+    expect(noHistory.expected).toContain('不推断开发者未做 TDD');
+    expect(noHistory.forbidden).toContain('从最终 diff 报告未做 TDD');
   });
 
-  test('Codex reviewer dispatch avoids fork_context and agent_type parameter conflicts', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const codexRuntime = renderWorkflowSkill('codex');
-
-    for (const content of [text, codexRuntime]) {
-      expect(content).toContain('Codex `spawn_agent` parameter hygiene');
-      expect(content).toContain('Codex reviewer prompts are self-contained');
-      expect(content).toContain('pass the persona, diff-scope rules, output schema, PR metadata, intent, file list, diff, and standards paths');
-      expect(content).toContain('Dispatch one reviewer per `spawn_agent` call');
-      expect(content).toContain('do not bundle multiple reviewer personas into one sub-agent prompt');
-      expect(content).toContain('prefer the default sub-agent type and omit `agent_type`');
-      expect(content).toContain('specialized by the prompt, not by a generic explorer/worker role');
-      expect(content).toContain('omit `fork_context`');
-      expect(content).toContain('do not combine `fork_context: true` with `agent_type`');
-      expect(content).toContain('If a runtime requires `fork_context: true`');
-      expect(content).toContain('omit `agent_type` and still include the full self-contained review context');
-      expect(content).toContain('correct the parameters once and retry through the bounded scheduler');
-      expect(content).toContain('not a reviewer failure');
-    }
+  test('reliability reviewer connects failure paths to correlation and actionable telemetry', () => {
+    expect(reliabilityPrompt).toContain('Correlation, telemetry, and operational actionability');
+    expect(reliabilityPrompt).toContain('correlation/request/trace identity');
+    expect(reliabilityPrompt).toContain('silent failure');
+    expect(reliabilityPrompt).toContain('alert config 是否声明 owner、action 和 runbook');
+    expect(reliabilityPrompt).toContain('不能证明 dashboard query、alert delivery、on-call response 或 field outcome 已发生');
+    expect(reliabilityPrompt).toContain('pure in-memory transform');
+    expect(personaCatalog).toContain('correlation propagation, telemetry emission, alert owner/action/runbook');
   });
 
-  test('workflow progress updates do not expose private reasoning scratchpads', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+  test('reliability capability cases protect failure-path and field-evidence boundaries', () => {
+    expect(reliabilityCapabilityCases.schema_version).toBe('spec-first.spec-code-review.reliability-cases/v1');
+    expect(reliabilityCapabilityCases.owner).toBe('reliability-reviewer');
+    expect(reliabilityCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/reliability-reviewer.md',
+      'skills/spec-code-review/references/persona-catalog.md',
+    ]));
 
-    expect(text).toContain('Progress Reporting Boundary');
-    expect(text).toContain('User-visible progress updates are operational evidence, not a reasoning scratchpad.');
-    expect(text).toContain('Do not expose private deliberation, tentative inner monologue, or first-person reasoning');
-    expect(text).toContain('"I\'m thinking"');
-    expect(text).toContain('"I need to consider"');
-    expect(text).toContain('"I think"');
-    expect(text).toContain('state the verified limitation and the next check');
-    expect(text).toContain('Use the repository language policy from the active `CLAUDE.md` / `AGENTS.md` `spec-first:lang` block for new prose');
-    expect(text).not.toContain('Use the session language for new prose');
+    const cases = new Map(reliabilityCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const lostCorrelation = cases.get('cross-service-correlation-lost-on-retry');
+    const silentFailure = cases.get('silent-failure-alert-without-actionability');
+    const pureTransform = cases.get('pure-in-memory-transform-suppressed');
+    const fieldOutcome = cases.get('telemetry-emission-not-field-outcome');
+
+    expect(lostCorrelation).toMatchObject({ kind: 'positive' });
+    expect(lostCorrelation.expected).toContain('correlation identity');
+    expect(lostCorrelation.forbidden).toContain('把无关联 retry log 视为可诊断 telemetry');
+    expect(silentFailure).toMatchObject({ kind: 'positive' });
+    expect(silentFailure.expected).toContain('alert actionability gap');
+    expect(silentFailure.forbidden).toContain('把 metric 名称存在当作 alert proof');
+    expect(pureTransform).toMatchObject({ kind: 'negative-owner' });
+    expect(pureTransform.expected).toContain('保持 suppression');
+    expect(pureTransform.forbidden).toContain('推测不存在的 cascading failure');
+    expect(fieldOutcome).toMatchObject({ kind: 'negative-owner' });
+    expect(fieldOutcome.expected).toContain('source-level limitation');
+    expect(fieldOutcome.forbidden).toContain('声称 field outcome 已确认');
   });
 
-  test('resolve-base script lives under scripts and runtime calls use the trusted skill path', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    const claudeRuntime = renderWorkflowSkill('claude');
-    const codexRuntime = renderWorkflowSkill('codex');
-    const scriptPath = path.join(
-      __dirname,
-      '..',
-      '..',
-      'skills',
-      'spec-code-review',
-      'scripts',
-      'resolve-base.sh',
-    );
-    const legacyPath = path.join(
-      __dirname,
-      '..',
-      '..',
-      'skills',
-      'spec-code-review',
-      'references',
-      'resolve-base.sh',
-    );
-    const script = fs.readFileSync(scriptPath, 'utf8');
-
-    expect(fs.existsSync(scriptPath)).toBe(true);
-    expect(fs.existsSync(legacyPath)).toBe(false);
-    expect(text).toContain('skills/spec-code-review/scripts/resolve-base.sh');
-    expect(text).not.toContain('bash scripts/resolve-base.sh');
-    expect(text).not.toContain('references/resolve-base.sh');
-    expect(claudeRuntime).toContain('.claude/spec-first/workflows/spec-code-review/scripts/resolve-base.sh');
-    expect(codexRuntime).toContain('.agents/skills/spec-code-review/scripts/resolve-base.sh');
-    expect(claudeRuntime).not.toContain('bash scripts/resolve-base.sh');
-    expect(codexRuntime).not.toContain('bash scripts/resolve-base.sh');
-    expect(script).toContain('Usage from source: bash skills/spec-code-review/scripts/resolve-base.sh');
-    expect(script).toContain('Runtime adapters rewrite that source path');
-    expect(script).toContain('gh pr view --json baseRefName,url --jq');
-    expect(script).not.toContain('jq -r');
+  test('frontend-quality stays internal, semantic, and separated from adjacent reviewers', () => {
+    expect(skill).toContain('14 reviewer personas');
+    expect(skill).toContain('`frontend-quality-reviewer`');
+    expect(skill).toContain('**Frontend-quality selection boundary.**');
+    expect(skill).toContain('semantic activation judgment, not an extension test');
+    expect(skill).toContain('CSS-only changes that affect contrast/focus/layout/responsive/motion activate it');
+    expect(skill).toContain('timing/race findings remain `julik-frontend-races`');
+    expect(personaCatalog).toContain('## Conditional (8 personas)');
+    expect(personaCatalog).toContain('Internal-only diff review');
+    expect(frontendQualityPrompt).toContain('状态完整性');
+    expect(frontendQualityPrompt).toContain('语义和键盘可用性');
+    expect(frontendQualityPrompt).toContain('可读性和 responsive');
+    expect(frontendQualityPrompt).toContain('julik-frontend-races-reviewer');
+    expect(frontendQualityPrompt).toContain('不能声称浏览器验证已通过');
+    expect(skill).not.toContain('spec-frontend');
   });
 
-  test('previous-comments reviewer is gated by actual prior feedback', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
+  test('frontend-quality capability cases protect visible-state, CSS edge, and owner boundaries', () => {
+    expect(frontendQualityCapabilityCases.schema_version).toBe('spec-first.spec-code-review.frontend-quality-cases/v1');
+    expect(frontendQualityCapabilityCases.owner).toBe('frontend-quality-reviewer');
+    expect(frontendQualityCapabilityCases.source_refs).toEqual(expect.arrayContaining([
+      'skills/spec-code-review/references/personas/frontend-quality-reviewer.md',
+      'skills/spec-code-review/references/persona-catalog.md',
+    ]));
 
-    expect(skill).toContain('hasPriorComments');
-    expect(skill).toContain('approval-state submissions with empty bodies');
-    expect(skill).toContain('previous-comments` is PR-only AND comment-gated');
-    expect(skill).toContain('approval-only reviews with empty bodies');
-    expect(catalog).toContain('PR-only AND comment-gated');
-    expect(catalog).toContain('hasPriorComments');
-  });
+    const cases = new Map(frontendQualityCapabilityCases.cases.map((entry) => [entry.id, entry]));
+    const asyncForm = cases.get('async-form-missing-error-focus-and-retry-state');
+    const cssRegression = cases.get('css-only-focus-contrast-and-breakpoint-regression');
+    const noVisibleChange = cases.get('backend-docs-type-fixture-and-safe-token-only-suppressed');
+    const raceOnly = cases.get('timing-race-owned-by-frontend-races');
+    const unsafeRendering = cases.get('unsafe-rendering-owned-by-security');
+    const testSufficiency = cases.get('test-sufficiency-owned-by-testing');
+    const structuralComplexity = cases.get('structural-complexity-owned-by-maintainability');
 
-  test('scale-aware reviewer preflight allows low-risk minimum reviewer sets', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
-
-    for (const text of [skill, catalog]) {
-      expect(text).toContain('scale-aware reviewer preflight');
-      expect(text).toContain('minimum set');
-      expect(text).toContain('sensitive');
-      expect(text).toContain('prior');
-      expect(text).toContain('explicit plan');
-      expect(text).not.toContain('Spawned on every review regardless of diff content.');
-      expect(text).not.toContain('a small config change triggers 0 conditionals = 6 reviewers');
-    }
-
-    expect(skill).toContain('`changed_file_count <= 2`');
-    expect(skill).toContain('`untracked_excluded_count == 0`');
-    expect(skill).toContain('`sensitive_diff == false`');
-    expect(skill).toContain('`plan_explicit == false`');
-    expect(skill).toContain('`docs_only == true`');
-    expect(skill).toContain('`simple_config_only == true`');
-    expect(skill).toContain('`non_test_non_generated_non_lock_line_count <= 25`');
-    expect(skill).toContain('Progressive disclosure boundary: low-risk docs-only, simple config, and tiny executable diffs may use a minimum reviewer set');
-    expect(skill).toContain('high-risk workflow, contract, release, source/runtime boundary, external-tool evidence, security, or cross-module changes must use the full default core plus applicable conditional reviewers');
-    expect(skill).toContain('avoid unbounded fan-out on small diffs without hiding risk');
-    expect(skill).toContain('| `docs_only` | `spec-project-standards-reviewer`, `spec-maintainability-reviewer` |');
-    expect(skill).toContain('| `simple_config_only` | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-project-standards-reviewer` |');
-    expect(skill).toContain('| tiny executable diff | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer` |');
-    expect(skill).toContain('`mode:headless` and `mode:report-only` keep their structured output contracts');
-    expect(skill).toContain('`mode:autofix` may use the minimum set only for `docs_only` or `simple_config_only`');
-    expect(skill).toContain('Record the preflight facts, selected core tier (`minimum` or `full`), and reason in Coverage');
-    expect(skill).toContain('If the facts are missing, ambiguous, or contradicted by the diff, choose the full default core.');
-
-    expect(catalog).toContain('Default Core');
-    expect(catalog).toContain('Low-risk tiny diffs may use a minimum core of 2-3 reviewers');
-    expect(catalog).toContain('Announce the team');
-    expect(catalog).toContain('selected core tier');
-  });
-
-  test('retains CLI readiness reviewers as a spec-first product boundary', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
-    const cliAgentReadiness = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-cli-agent-readiness-reviewer.agent.md'),
-      'utf8',
-    );
-    const cliReadiness = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-cli-readiness-reviewer.agent.md'),
-      'utf8',
-    );
-
-    expect(skill).toContain('CLI readiness boundary');
-    expect(skill).toContain('Keep `spec-cli-readiness-reviewer` as the conditional reviewer for CLI-facing diffs');
-    expect(skill).toContain('This project is itself a CLI/workflow harness');
-    expect(skill).toContain('not a replacement for the structured JSON persona');
-    expect(skill).not.toContain('U9 divergence note');
-    expect(skill).not.toContain('CE `06a7cee0` removed its CLI readiness reviewers');
-    expect(catalog).toContain('CLI readiness boundary');
-    expect(catalog).toContain('this repository ships a CLI/workflow harness');
-    expect(catalog).not.toContain('CE removed its CLI readiness reviewers');
-    expect(catalog).toContain('These Spec-First conditional agents provide specialized analysis');
-    expect(catalog).not.toContain('CE-native agents');
-    expect(catalog).toContain('| `cli-readiness` | `spec-cli-readiness-reviewer` |');
-    expect(cliReadiness).toContain('"reviewer": "cli-readiness"');
-    expect(cliReadiness).toContain('Return your findings as JSON matching the findings schema');
-    expect(cliAgentReadiness).toContain('source code**, **plans**, and **specs**');
-    expect(cliAgentReadiness).toContain('CLI Agent-Readiness Review');
-  });
-
-  test('finding numbers are stable across severity and residual sections', () => {
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    const template = fs.readFileSync(
-      path.join(
-        __dirname,
-        '..',
-        '..',
-        'skills',
-        'spec-code-review',
-        'references',
-        'review-output-template.md',
-      ),
-      'utf8',
-    );
-
-    expect(skill).toContain('Sort and number');
-    expect(skill).toContain('assign monotonically increasing `#` values across the full primary finding set');
-    expect(skill).toContain('reuse the same stable `#`');
-    expect(skill).toContain('Finding numbers come from the stable assignment in Stage 5');
-    expect(template).toContain('Stable sequential finding numbers');
-    expect(template).toContain('| 3 | `export_service.rb:91`');
-  });
-
-  test('reviewer and validator dispatch are bounded instead of treating capacity as failure', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('Bounded parallel dispatch');
-    expect(text).toContain('Respect the current harness\'s active-subagent limit');
-    expect(text).toContain('active-agent/thread/concurrency-limit spawn errors as backpressure');
-    expect(text).toContain('Start with at most 4 active reviewer agents');
-    expect(text).toContain('Do not launch every selected reviewer in one burst');
-    expect(text).toContain('A generic `Agent spawn failed` with one or more active reviewers is presumed capacity/backpressure first');
-    expect(text).toContain('Wait for any active reviewer to complete');
-    expect(text).toContain('retry the same queued reviewer once');
-    expect(text).toContain('A spawn failure that includes `MCP startup incomplete`, `MCP startup failed`, or a required MCP server name');
-    expect(text).toContain('Stop launching new reviewers');
-    expect(text).toContain('collect any already-started reviewers that can complete');
-    expect(text).toContain('apply remaining persona lenses inline through the single-agent report-only fallback');
-    expect(text).toContain('Only mark a queued reviewer as failed after the bounded retry path rules out capacity/backpressure');
-    expect(text).toContain('Spawn validators with bounded parallelism');
-    expect(text).toContain('bounded queueing rules in Stage 4');
-    expect(text).toContain('supports reviewer dispatch but not parallel sub-agents');
-    expect(text).toContain('dispatch reviewers sequentially through the same Stage 4 scheduler');
-    expect(text).toContain('If the platform has no dispatch primitive, or dispatch is explicitly disabled or unsafe, use the Stage 4 single-agent report-only fallback');
-  });
-
-  test('validator budget cap skips validation without dropping surviving findings', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('dispatch validators only for the highest-severity 15');
-    expect(text).toContain('Do not drop the remainder.');
-    expect(text).toContain('validation_skipped/over_budget');
-    expect(text).toContain('carry it unchanged into the next phase');
-    expect(text).toContain('The cap limits validator fan-out only');
-    expect(text).toContain('must not erase already-surviving findings from headless, autofix, ticket, or final-report outputs');
-    expect(text).toContain('over-budget validation skips');
-    expect(text).toContain('Validator over-budget skips');
-    expect(text).not.toContain('Drop the remainder and record the over-budget count');
-    expect(text).not.toContain('Validator over-budget drops');
-  });
-
-  test('code-review dispatch is analysis-only and mutation is mode-bound', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('Reviewers are analysis agents, not implementation workers.');
-    expect(text).toContain('Dispatch is bounded to the resolved diff scope, selected reviewer personas, advisory facts, and output schema.');
-    expect(text).toContain('Do not create hidden implement/check agents from code review.');
-    expect(text).toContain('Mutation is allowed only through documented `safe_auto` / selected Apply paths in the chosen mode');
-    expect(text).toContain('report-only fallback, unsafe runtime, or missing dispatch capability must not edit source, generated runtime mirrors, or workflow artifacts.');
-    expect(text).not.toContain('fallback may edit source');
-    expect(text).not.toContain('hidden implement/check lifecycle');
-  });
-
-  test('code-review leaf reviewers remain read-only while artifacts are parent-owned', () => {
-    const reviewers = [
-      'spec-adversarial-reviewer',
-      'spec-api-contract-reviewer',
-      'spec-correctness-reviewer',
-      'spec-data-migrations-reviewer',
-      'spec-dhh-rails-reviewer',
-      'spec-julik-frontend-races-reviewer',
-      'spec-kieran-python-reviewer',
-      'spec-kieran-rails-reviewer',
-      'spec-kieran-typescript-reviewer',
-      'spec-maintainability-reviewer',
-      'spec-performance-reviewer',
-      'spec-previous-comments-reviewer',
-      'spec-project-standards-reviewer',
-      'spec-reliability-reviewer',
-      'spec-security-reviewer',
-      'spec-swift-ios-reviewer',
-      'spec-testing-reviewer',
-    ];
-
-    for (const reviewer of reviewers) {
-      const text = fs.readFileSync(
-        path.join(__dirname, '..', '..', 'agents', `${reviewer}.agent.md`),
-        'utf8',
-      );
-      expect(text).toContain('tools: Read, Grep, Glob, Bash');
-      expect(text).not.toContain('tools: Read, Grep, Glob, Bash, Write');
-    }
-
-    for (const reviewer of ['spec-cli-agent-readiness-reviewer', 'spec-cli-readiness-reviewer']) {
-      const text = fs.readFileSync(
-        path.join(__dirname, '..', '..', 'agents', `${reviewer}.agent.md`),
-        'utf8',
-      );
-      expect(text).toContain('tools: Read, Grep, Glob, Bash');
-      expect(text).not.toContain('tools: Read, Grep, Glob, Bash, Write');
-    }
-
-    const template = fs.readFileSync(
-      path.join(
-        __dirname,
-        '..',
-        '..',
-        'skills',
-        'spec-code-review',
-        'references',
-        'subagent-template.md',
-      ),
-      'utf8',
-    );
-    expect(template).toContain('Do not write files.');
-    expect(template).toContain('the orchestrator writes your returned JSON itself');
-    expect(template).toContain('reviewer agents read-only');
-    expect(template).toContain('You are operationally read-only.');
-    expect(template).not.toContain('This is the ONE write operation you are permitted to make');
-
-    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
-    expect(skill).toContain('Do not ask leaf reviewers to write files directly.');
-    expect(skill).toContain('const reviewArtifactDir = path.join(os.tmpdir(), \'spec-first\', \'spec-code-review\', runId);');
-    expect(skill).toContain('the orchestrator may write that JSON to `<review-artifact-dir>/{reviewer_name}.json`');
-    expect(skill).toContain('Artifact persistence is parent/orchestrator-owned');
-  });
-
-  test('supports single-agent report-only fallback when reviewer dispatch is unavailable or unsafe', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-
-    expect(text).toContain('When dispatch is unavailable, explicitly disabled, or unsafe, falls back to a single-agent report-only review instead of bypassing host boundaries.');
-    expect(text).toContain('Dispatch capability gate');
-    expect(text).toContain('Dispatch capability is part of the runtime boundary, not a reviewer-selection preference.');
-    expect(text).toContain('the current tool contract controls dispatch permission');
-    expect(text).toContain('A workflow entrypoint by itself is not enough to call `spawn_agent`');
-    expect(text).toContain('require an explicit user request for subagents/parallel agents/delegated review');
-    expect(text).toContain('parent-orchestrator delegation whose visible parent request or handoff evidence carries that permission');
-    expect(text).toContain('visible delegation includes reviewer-dispatch permission');
-    expect(text).toContain('Codex may expose reviewer dispatch through `spawn_agent`');
-    expect(text).toContain('only when both the host capability and the current permission boundary allow it');
-    expect(text).toContain('Do not downgrade solely because the host is Codex when the permission boundary is satisfied.');
-    expect(text).toContain('set `single_agent_report_only_fallback: true`');
-    expect(text).toContain('Treat the effective mode as report-only');
-    expect(text).toContain('Do not create `<review-artifact-dir>/` and do not write reviewer artifacts.');
-    expect(text).toContain('Skip Stage 5b validator dispatch and all fixer paths.');
-    expect(text).toContain('single-agent report-only fallback: reviewer dispatch unavailable, explicitly disabled, or unsafe');
-    expect(text).toContain('| single-agent report-only fallback | No -- dispatch is unavailable, explicitly disabled, or unsafe | n/a |');
-    expect(text).not.toContain('Codex-specific rule: do not call `spawn_agent` merely because this skill mentions reviewer personas.');
-    expect(text).not.toContain('Codex should inline reviewer personas');
-    expect(text).not.toContain('explicit user authorization');
+    expect(asyncForm).toMatchObject({ kind: 'positive' });
+    expect(asyncForm.expected).toContain('状态完整性和 keyboard/focus finding');
+    expect(asyncForm.forbidden).toContain('只检查 happy path spinner');
+    expect(cssRegression).toMatchObject({ kind: 'positive' });
+    expect(cssRegression.expected).toContain('focus、contrast 和 responsive regression');
+    expect(cssRegression.forbidden).toContain('因为只有 CSS 文件而跳过 reviewer');
+    expect(noVisibleChange).toMatchObject({ kind: 'negative-owner' });
+    expect(noVisibleChange.expected).toContain('不启用');
+    expect(noVisibleChange.forbidden).toContain('仅按文件扩展名假定前端风险');
+    expect(raceOnly).toMatchObject({ kind: 'negative-owner' });
+    expect(raceOnly.expected).toContain('julik-frontend-races reviewer');
+    expect(raceOnly.forbidden).toContain('以 frontend-quality finding 重复报告 stale response race');
+    expect(unsafeRendering).toMatchObject({ kind: 'negative-owner' });
+    expect(unsafeRendering.expected).toContain('security reviewer 作为 canonical owner');
+    expect(unsafeRendering.forbidden).toContain('以 frontend-quality finding 重复报告同一 unsafe rendering sink');
+    expect(testSufficiency).toMatchObject({ kind: 'negative-owner' });
+    expect(testSufficiency.expected).toContain('testing reviewer 作为 canonical owner');
+    expect(testSufficiency.forbidden).toContain('把测试充分性重复写成 frontend-quality finding');
+    expect(structuralComplexity).toMatchObject({ kind: 'negative-owner' });
+    expect(structuralComplexity.expected).toContain('maintainability reviewer 作为 canonical owner');
+    expect(structuralComplexity.forbidden).toContain('以 frontend-quality finding 重复报告纯结构复杂度');
   });
 });

@@ -1,0 +1,13 @@
+{
+  "layer_result": "routed-near-neighbor",
+  "response": "目标是 generated runtime mirror，不能直接修补。应先从项目规则解析 canonical source，在 source workflow 中修改并验证，再由项目批准的 init/sync 投影 runtime；若只要求当前会话即时替换，则路由到 runtime maintenance，而不是记录为 Skill source 修改。",
+  "would_modify_paths": [],
+  "case_id": "generated-runtime-patch-neighbor",
+  "route_decision": "not-entered-runtime-maintenance",
+  "base_operation": null,
+  "modifier": "none",
+  "would_run_commands": [],
+  "source_owner_assumption": "`.agents/skills/spec-prd/` 是派生 runtime surface，不是 canonical source。",
+  "required_references": [],
+  "effect": "not-entered"
+}

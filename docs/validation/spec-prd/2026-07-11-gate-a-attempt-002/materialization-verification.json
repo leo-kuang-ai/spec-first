@@ -1,0 +1,29 @@
+{
+  "schema_version": "contract-reset-materialization-verification/v1",
+  "artifact_type": "confirmed",
+  "producer": "run-contract-reset-arm.js",
+  "parent_revision": "a574194b13ee3e53e1d7cd36bbfc86ac058db0cc",
+  "contract_hash": "sha256:1d8104c9257faae76bab07df8ad6afd201f12d61db88435cee922897910ae5dd",
+  "arms": {
+    "baseline": {
+      "patch_chain": [],
+      "tree_hash": "sha256:64ea8c078cebeaed08c053f0d0a7350949da720f67e7e8ab949db8a0f4f5c594",
+      "source_file_count": 26
+    },
+    "phase1_control": {
+      "patch_chain": [
+        "phase1_control"
+      ],
+      "tree_hash": "sha256:95bb225b3aa369b3f656e223b4955e2d43cdff89794e10a1b0f135b24228e1ac",
+      "source_file_count": 26
+    },
+    "candidate": {
+      "patch_chain": [
+        "phase1_control",
+        "candidate"
+      ],
+      "tree_hash": "sha256:948584c8a5a42e46c0af49aefe714ebcbd4adef52602ead13a127a1f40f85f99",
+      "source_file_count": 27
+    }
+  }
+}

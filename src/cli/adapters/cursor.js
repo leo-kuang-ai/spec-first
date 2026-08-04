@@ -2,11 +2,24 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const PlatformAdapter = require('./base');
+const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
+const { listBundledCommands } = require('../plugin-manifest');
 const { readState } = require('../state');
+const { spawnSyncWithTimeout } = require('../external-command');
+const {
+  contentHasUnexpectedRuntimePathReferences,
+  rewritePreservingHostComparativeConfigPaths,
+} = require('./host-comparative-config-paths');
+const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
+const {
+  formatFrontmatterScalar,
+  parseFrontmatterScalars,
+  splitMarkdownFrontmatter,
+} = require('../helpers/markdown-frontmatter');
 
+const CURSOR_RULE_POINTER_PATH = '.cursor/rules/spec-first.mdc';
 const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
   'name',
   'description',
@@ -14,48 +27,23 @@ const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
   'disable-model-invocation',
   'metadata',
 ]);
-const CURSOR_UNREWRITTEN_PATH_PATTERNS = [
-  /\.claude\/commands\/spec\/[a-z-]+\.md/,
-  /\.claude\/commands\/spec-[a-z-]+\.md/,
-  /\.claude\/commands\/spec-\*\.md/,
-  /\.claude\/spec-first\/workflows\//,
-  /\.claude\/skills\//,
-  /\.claude\/agents\//,
-  /\.codex\/commands\/spec\/[a-z-]+\.md/,
-  /\.codex\/commands\/spec-\*\.md/,
-  /\.codex\/skills\//,
-  /\.codex\/agents\//,
-  /\.agents\/skills\//,
-  /\.kiro\/commands\/spec\/[a-z-]+\.md/,
-  /\.kiro\/commands\/spec-\*\.md/,
-  /\.kiro\/skills\//,
-  /\.kiro\/agents\//,
-  /\.kiro\/spec-first\//,
-  /\.kiro\/settings\//,
-  /\.qoder\/commands\/spec\/[a-z-]+\.md/,
-  /\.qoder\/commands\/spec-[a-z-]+\.md/,
-  /\.qoder\/commands\/spec-\*\.md/,
-  /\.qoder\/skills\//,
-  /\.qoder\/agents\//,
-  /\.qoder\/spec-first\//,
-  /\.qoder\/settings(?:\.local)?\.json/,
-];
 const CURSOR_NESTED_SCAN_SKIP_DIRS = new Set([
   '.git',
+  '.agents',
   '.spec-first',
   '.claude',
   '.codex',
   '.cursor',
   '.kiro',
   '.qoder',
+  '.worktrees',
   'node_modules',
   'vendor',
 ]);
-const CURSOR_NESTED_SCAN_MAX_DEPTH = 4;
-const CURSOR_NESTED_SCAN_MAX_DIRECTORIES = 400;
+const CURSOR_NESTED_SCAN_MAX_DIRECTORIES = 1000;
 const CURSOR_NESTED_SCAN_MAX_MS = 500;
 
-class CursorAdapter extends PlatformAdapter {
+class CursorAdapter extends PointerBasedAdapter {
   get id() {
     return 'cursor';
   }
@@ -74,6 +62,14 @@ class CursorAdapter extends PlatformAdapter {
 
   get supportsAgents() {
     return false;
+  }
+
+  get supportState() {
+    return 'preview';
+  }
+
+  get evidenceClaim() {
+    return 'generated_runtime_preview';
   }
 
   get commandRoot() {
@@ -100,12 +96,31 @@ class CursorAdapter extends PlatformAdapter {
     return 'AGENTS.md';
   }
 
+  get pointerPath() {
+    return CURSOR_RULE_POINTER_PATH;
+  }
+
+  get pointerHostLabel() {
+    return 'Cursor';
+  }
+
+  get pointerFrontmatter() {
+    return [
+      '---',
+      'alwaysApply: true',
+      '---',
+    ].join('\n');
+  }
+
   transformSkillContent(content, context = {}) {
-    let transformed = normalizeCursorSkillFrontmatter(
-      rewriteSharedPaths(content),
-      context,
-    );
-    if (isCursorRuntimeSetupSurface(context)) {
+    const isEntrypoint = isSkillEntrypointContext(context);
+    let transformed = isEntrypoint
+      ? rewritePreservingHostComparativeConfigPaths(content, context, rewriteSharedPaths)
+      : content;
+    if (isEntrypoint) {
+      transformed = normalizeCursorSkillFrontmatter(transformed, context);
+    }
+    if (isEntrypoint && isCursorRuntimeSetupSurface(context)) {
       transformed = addCursorSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
@@ -140,6 +155,10 @@ class CursorAdapter extends PlatformAdapter {
       level: 'WARNING',
       name: 'Cursor generated-runtime preview',
       message: 'Cursor skill discovery/invocation is not verified on this machine; generated skills may not load.',
+      drift: false,
+      degradedByDesign: true,
+      disposition: 'known_limitation',
+      reasonCode: 'cursor_generated_runtime_loader_unverified',
       fix: 'Open Cursor runtime UI or run a current Cursor CLI/user journey to record loader evidence before promoting beyond generated-runtime preview.',
     });
 
@@ -162,6 +181,7 @@ class CursorAdapter extends PlatformAdapter {
     if (fs.existsSync(skillsRoot)) {
       checks.push(...inspectCursorSkillNames(projectRoot, skillsRoot));
     }
+    checks.push(this.inspectPointerRuntime(projectRoot));
     checks.push(...inspectCursorDuplicateSkillRoots(projectRoot, this));
 
     return checks.length > 0
@@ -172,9 +192,11 @@ class CursorAdapter extends PlatformAdapter {
         message: 'no Cursor-specific runtime drift detected',
       }];
   }
+
 }
 
 module.exports = CursorAdapter;
+module.exports.CURSOR_RULE_POINTER_PATH = CURSOR_RULE_POINTER_PATH;
 module.exports.normalizeCursorName = normalizeCursorName;
 module.exports.inspectCursorDuplicateSkillRoots = inspectCursorDuplicateSkillRoots;
 
@@ -224,12 +246,12 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --cursor')
     .replace(/\$spec-\*/g, '`spec-*`')
     .replace(/\/spec:\*/g, '`spec-*`')
-    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`')
-    .replace(/\/spec:mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/\$spec-runtime-setup/g, '`spec-runtime-setup`')
+    .replace(/\/spec:runtime-setup/g, '`spec-runtime-setup`')
     .replace(/Kiro Agent\s+Skills/g, '`spec-*`')
-    .replace(/Kiro Agent\s+Skill `spec-mcp-setup`/g, '`spec-mcp-setup`')
+    .replace(/Kiro Agent\s+Skill `spec-runtime-setup`/g, '`spec-runtime-setup`')
     .replace(/Qoder project (?:commands|entrypoints)\s+or\s+Skills/g, '`spec-*`')
-    .replace(/Qoder `(?:\/spec:mcp-setup|spec-mcp-setup)` entrypoint/g, '`spec-mcp-setup`');
+    .replace(/Qoder `(?:\/spec:runtime-setup|spec-runtime-setup)` entrypoint/g, '`spec-runtime-setup`');
   return rewriteCursorRuntimeContextSections(rewriteUsingSpecFirstCursorSections(rewritten));
 }
 
@@ -278,20 +300,20 @@ function normalizeCursorSkillFrontmatter(content, context = {}) {
     return content;
   }
 
-  const fields = parseSimpleFrontmatterFields(frontmatter);
+  const fields = parseFrontmatterScalars(frontmatter);
   const name = normalizeCursorName(context.runtimeName || context.skillName || fields.name);
   const description = sanitizeFrontmatterScalar(fields.description || `spec-first skill ${name}`);
   const lines = [
     '---',
     `name: ${name}`,
-    `description: ${JSON.stringify(description)}`,
+    `description: ${formatFrontmatterScalar(description)}`,
   ];
 
   const pathsValue = fields.paths || fields.globs;
   if (pathsValue) {
     lines.push(`paths: ${pathsValue}`);
   }
-  if (context.isWorkflowSkill || fields['disable-model-invocation'] === 'true') {
+  if (context.isWorkflowSkill || context.isInternalSkill || fields['disable-model-invocation'] === 'true') {
     lines.push('disable-model-invocation: true');
   }
   if (fields.metadata) {
@@ -302,7 +324,12 @@ function normalizeCursorSkillFrontmatter(content, context = {}) {
 }
 
 function isCursorRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup';
+  return isRuntimeSetupSurface(context);
+}
+
+function isSkillEntrypointContext(context = {}) {
+  return typeof context.relativePath !== 'string'
+    || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
 function addCursorSetupHostPin(content) {
@@ -313,50 +340,11 @@ function addCursorSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Cursor Host Pin',
     '',
-    'When this generated Cursor `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=cursor` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    'When this generated Cursor `spec-runtime-setup` runtime surface invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=cursor` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
   ].join('\n'));
-}
-
-function splitMarkdownFrontmatter(content) {
-  if (!content.startsWith('---\n')) {
-    return { frontmatter: '', body: content };
-  }
-
-  const closingIndex = content.indexOf('\n---', 4);
-  if (closingIndex === -1) {
-    return { frontmatter: '', body: content };
-  }
-
-  return {
-    frontmatter: content.slice(4, closingIndex),
-    body: content.slice(closingIndex + 5),
-  };
-}
-
-function parseSimpleFrontmatterFields(frontmatter) {
-  const fields = {};
-
-  for (const line of String(frontmatter || '').split('\n')) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!match) continue;
-    fields[match[1]] = unquoteFrontmatterScalar(match[2].trim());
-  }
-
-  return fields;
-}
-
-function unquoteFrontmatterScalar(value) {
-  if (
-    (value.startsWith('"') && value.endsWith('"'))
-    || (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-
-  return value;
 }
 
 function normalizeCursorName(value) {
@@ -385,7 +373,7 @@ function inspectCursorSkillNames(projectRoot, skillsRoot) {
       if (!fs.existsSync(skillPath)) return [];
       const content = fs.readFileSync(skillPath, 'utf8');
       const { frontmatter } = splitMarkdownFrontmatter(content);
-      const fields = parseSimpleFrontmatterFields(frontmatter);
+      const fields = parseFrontmatterScalars(frontmatter);
       const relativePath = path.relative(projectRoot, skillPath).replace(/\\/g, '/');
       const issues = [];
       const frontmatterKeys = listFrontmatterKeys(frontmatter);
@@ -398,10 +386,10 @@ function inspectCursorSkillNames(projectRoot, skillsRoot) {
       if (isPublicWorkflowSkillName(skillDir) && fields['disable-model-invocation'] !== 'true') {
         issues.push('workflow skill must set disable-model-invocation: true');
       }
-      if (skillDir === 'spec-mcp-setup' && !content.includes('MCP_SETUP_HOST=cursor')) {
+      if ((skillDir === 'spec-runtime-setup') && !content.includes('MCP_SETUP_HOST=cursor')) {
         issues.push('missing Cursor MCP_SETUP_HOST pin');
       }
-      if (CURSOR_UNREWRITTEN_PATH_PATTERNS.some((pattern) => pattern.test(content))) {
+      if (contentHasUnexpectedRuntimePathReferences('cursor', content, { skillName: skillDir })) {
         issues.push('contains non-Cursor runtime path references');
       }
       return issues.length === 0
@@ -430,7 +418,17 @@ function listFrontmatterKeys(frontmatter) {
 }
 
 function isPublicWorkflowSkillName(skillName) {
-  return String(skillName || '').startsWith('spec-');
+  return governedWorkflowSkillNames().has(String(skillName || ''));
+}
+
+let governedWorkflowSkillNamesCache = null;
+function governedWorkflowSkillNames() {
+  if (governedWorkflowSkillNamesCache === null) {
+    governedWorkflowSkillNamesCache = new Set(
+      listBundledCommands().map((command) => command.skill),
+    );
+  }
+  return governedWorkflowSkillNamesCache;
 }
 
 function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
@@ -454,6 +452,7 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
   }
 
   const checks = [];
+  const managedDivergentGroups = [];
   for (const [skillName, entries] of bySkill.entries()) {
     if (entries.length < 2) continue;
     const allManaged = entries.every((entry) => entry.managed);
@@ -461,12 +460,32 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
     if (allManaged && identical) {
       continue;
     }
+    if (allManaged) {
+      managedDivergentGroups.push({ skillName, entries });
+      continue;
+    }
 
     checks.push({
       level: 'WARNING',
       name: `Cursor duplicate skill discovery: ${skillName}`,
-      message: `same-name skill found in Cursor-compatible roots: ${entries.map((entry) => entry.displayPath).join(', ')}; precedence is unverified and at least one root is unmanaged or divergent`,
-      fix: 'Remove or rename unmanaged duplicate skills, or rerun spec-first init for managed roots that should match current source.',
+      message: `same-name skill found in Cursor-compatible roots: ${entries.map((entry) => entry.displayPath).join(', ')}; Cursor precedence is unverified and at least one entry is outside its current spec-first-managed runtime root`,
+      fix: 'Remove or rename the unmanaged duplicate, or rerun spec-first init for the host that owns a stale compatibility path.',
+      drift: false,
+      reasonCode: 'cursor_external_skill_precedence_unverified',
+    });
+  }
+
+  if (managedDivergentGroups.length > 0) {
+    const rootCounts = countManagedProjectionRoots(managedDivergentGroups);
+    checks.push({
+      level: 'WARNING',
+      name: 'Cursor managed skill projection precedence',
+      message: `${managedDivergentGroups.length} same-name skill projection(s) are not byte-identical across Cursor-compatible managed roots: ${formatRootCounts(rootCounts)}; Cursor precedence is unverified and may select a non-Cursor host projection`,
+      fix: 'Keep the managed host runtimes intact and verify that Cursor prioritizes .cursor/skills; do not delete other host projections to silence this warning.',
+      drift: false,
+      degradedByDesign: true,
+      disposition: 'known_limitation',
+      reasonCode: 'cursor_managed_projection_precedence_unverified',
     });
   }
 
@@ -476,6 +495,9 @@ function inspectCursorDuplicateSkillRoots(projectRoot, adapter) {
       name: 'Cursor nested skill root scan',
       message: `nested_roots_not_fully_enumerated (${duplicateRoots.limitWarnings.join(', ')})`,
       fix: 'Inspect nested workspace Cursor skill roots manually if duplicate discovery behavior matters for this project.',
+      drift: false,
+      disposition: 'known_limitation',
+      reasonCode: 'cursor_nested_skill_roots_partial',
     });
   }
 
@@ -494,11 +516,67 @@ function collectCursorSkillRoots(projectRoot) {
     userSkillRoot(home, '.claude/skills', 'user_compat'),
     userSkillRoot(home, '.codex/skills', 'user_compat'),
   ];
+  const worktrees = collectGitWorktreeSkillRoots(projectRoot);
   const nested = collectNestedCursorSkillRoots(projectRoot);
   return {
-    roots: [...roots, ...nested.roots],
+    roots: dedupeRoots([...roots, ...worktrees, ...nested.roots]),
     limitWarnings: nested.limitWarnings,
   };
+}
+
+function collectGitWorktreeSkillRoots(projectRoot) {
+  let canonicalProjectRoot;
+  try {
+    canonicalProjectRoot = fs.realpathSync.native(projectRoot);
+  } catch {
+    canonicalProjectRoot = path.resolve(projectRoot);
+  }
+  // git worktree list --porcelain requires Git 2.7+ (released Jan 2016).
+  // doctor already checks Git availability; if this fails, it's likely either
+  // not a git repo or an edge-case git version. Silently return empty and let
+  // nested skill root detection handle the rest.
+  const result = spawnSyncWithTimeout(
+    'git',
+    ['-C', projectRoot, 'worktree', 'list', '--porcelain'],
+    { encoding: 'utf8' },
+  );
+  if (result.status !== 0) return [];
+
+  const roots = [];
+  for (const line of String(result.stdout || '').split(/\r?\n/)) {
+    if (!line.startsWith('worktree ')) continue;
+    const reportedWorktreeRoot = path.resolve(line.slice('worktree '.length));
+    let worktreeRoot;
+    try {
+      worktreeRoot = fs.realpathSync.native(reportedWorktreeRoot);
+    } catch {
+      worktreeRoot = reportedWorktreeRoot;
+    }
+    const relativeWorktree = path.relative(canonicalProjectRoot, worktreeRoot);
+    if (
+      relativeWorktree === ''
+      || relativeWorktree === '..'
+      || relativeWorktree.startsWith(`..${path.sep}`)
+      || path.isAbsolute(relativeWorktree)
+    ) {
+      continue;
+    }
+
+    for (const relativeSkillPath of ['.cursor/skills', '.agents/skills']) {
+      const absolutePath = path.join(worktreeRoot, relativeSkillPath);
+      if (!fs.existsSync(absolutePath)) continue;
+      const displayPath = path.relative(canonicalProjectRoot, absolutePath).replace(/\\/g, '/');
+      roots.push({
+        absolutePath,
+        displayPath,
+        relativePath: displayPath,
+        scope: 'nested_project',
+        nestedProjectRoot: worktreeRoot,
+        relativeSkillPath,
+      });
+    }
+  }
+  return roots;
 }
 
 function projectSkillRoot(projectRoot, relativePath, scope) {
@@ -526,16 +604,17 @@ function collectNestedCursorSkillRoots(projectRoot) {
   let directoryCount = 0;
   let stopped = false;
 
-  function walk(currentPath, depth) {
-    if (stopped) return;
-    if (Date.now() - startedAt > CURSOR_NESTED_SCAN_MAX_MS) {
-      stopped = true;
-      limitWarnings.push('max-duration');
-      return;
+  function stopForDurationBudget() {
+    if (Date.now() - startedAt <= CURSOR_NESTED_SCAN_MAX_MS) {
+      return false;
     }
-    if (depth > CURSOR_NESTED_SCAN_MAX_DEPTH) {
-      return;
-    }
+    stopped = true;
+    limitWarnings.push('max-duration');
+    return true;
+  }
+
+  function walk(currentPath) {
+    if (stopped || stopForDurationBudget()) return;
     directoryCount += 1;
     if (directoryCount > CURSOR_NESTED_SCAN_MAX_DIRECTORIES) {
       stopped = true;
@@ -551,6 +630,7 @@ function collectNestedCursorSkillRoots(projectRoot) {
     }
 
     for (const entry of entries) {
+      if (stopped || stopForDurationBudget()) break;
       if (!entry.isDirectory()) continue;
       if (entry.isSymbolicLink()) continue;
       if (CURSOR_NESTED_SCAN_SKIP_DIRS.has(entry.name)) continue;
@@ -564,18 +644,17 @@ function collectNestedCursorSkillRoots(projectRoot) {
             displayPath,
             relativePath: displayPath,
             scope: 'nested_project',
+            nestedProjectRoot: childPath,
+            relativeSkillPath: relativeRoot,
           });
         }
       }
-      if (depth === CURSOR_NESTED_SCAN_MAX_DEPTH) {
-        limitWarnings.push('max-depth');
-        continue;
-      }
-      walk(childPath, depth + 1);
+      walk(childPath);
+      if (stopped) break;
     }
   }
 
-  walk(projectRoot, 0);
+  walk(projectRoot);
   return {
     roots: dedupeRoots(roots),
     limitWarnings: [...new Set(limitWarnings)],
@@ -593,19 +672,42 @@ function dedupeRoots(roots) {
 }
 
 function isManagedSkillRoot(projectRoot, root, skillName, cursorAdapter) {
+  if (root.scope !== 'project' && root.scope !== 'project_compat' && root.scope !== 'nested_project') {
+    return false;
+  }
+
   const rootPath = root.relativePath;
+
+  // Main project roots
   if (rootPath === '.cursor/skills') {
-    return stateListsSkill(projectRoot, cursorAdapter, skillName);
+    return stateListsSkill(projectRoot, cursorAdapter, skillName, ['skills', 'workflowSkills']);
   }
   if (rootPath === '.agents/skills') {
-    return stateListsSkill(projectRoot, adapterForState('codex'), skillName);
+    return stateListsSkill(projectRoot, adapterForState('codex'), skillName, ['skills', 'workflowSkills']);
   }
   if (rootPath === '.claude/skills') {
-    return stateListsSkill(projectRoot, adapterForState('claude'), skillName);
+    return stateListsSkill(projectRoot, adapterForState('claude'), skillName, ['skills']);
   }
-  if (rootPath === '.codex/skills') {
-    return stateListsSkill(projectRoot, adapterForState('codex'), skillName);
+
+  if (root.scope === 'nested_project' && root.nestedProjectRoot) {
+    if (root.relativeSkillPath === '.cursor/skills') {
+      return stateListsSkill(
+        root.nestedProjectRoot,
+        cursorAdapter,
+        skillName,
+        ['skills', 'workflowSkills'],
+      );
+    }
+    if (root.relativeSkillPath === '.agents/skills') {
+      return stateListsSkill(
+        root.nestedProjectRoot,
+        adapterForState('codex'),
+        skillName,
+        ['skills', 'workflowSkills'],
+      );
+    }
   }
+
   return false;
 }
 
@@ -613,6 +715,7 @@ function adapterForState(platform) {
   const stateFiles = {
     claude: '.claude/spec-first/state.json',
     codex: '.codex/spec-first/state.json',
+    cursor: '.cursor/spec-first/state.json',
   };
   return {
     id: platform,
@@ -620,14 +723,30 @@ function adapterForState(platform) {
   };
 }
 
-function stateListsSkill(projectRoot, adapter, skillName) {
+function stateListsSkill(projectRoot, adapter, skillName, fields) {
   try {
     const state = readState(projectRoot, adapter);
     if (!state) return false;
-    return state.skills.includes(skillName) || state.workflowSkills.includes(skillName);
+    return fields.some((field) => state[field].includes(skillName));
   } catch {
     return false;
   }
+}
+
+function countManagedProjectionRoots(groups) {
+  const counts = new Map();
+  for (const group of groups) {
+    for (const entry of group.entries) {
+      counts.set(entry.displayPath, (counts.get(entry.displayPath) || 0) + 1);
+    }
+  }
+  return [...counts.entries()].sort(([left], [right]) => left.localeCompare(right));
+}
+
+function formatRootCounts(rootCounts) {
+  return rootCounts
+    .map(([rootPath, count]) => `${rootPath} (${count})`)
+    .join(', ');
 }
 
 function normalizeContentForComparison(content) {

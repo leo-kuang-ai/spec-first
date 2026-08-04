@@ -1,0 +1,101 @@
+{
+  "skill_name": "spec-plan",
+  "schema_version": "v1alpha1",
+  "engine_name": "codex",
+  "model_name": "",
+  "start_time": "2026-08-02T01:29:55.003583+08:00",
+  "end_time": "2026-08-02T01:47:27.235324+08:00",
+  "case_results": [
+    {
+      "case_id": "enriches-product-contract-in-place",
+      "title": "requirements-only Product Contract 应原地深化且保持产品权威",
+      "status": "PASS",
+      "duration_ms": 515949,
+      "turns": 1,
+      "input_tokens": 3433113,
+      "output_tokens": 14730,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-enrichment.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。\n先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。\n本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。\n请直接使用 spec-plan，将 `docs/plans/2026-07-31-001-feat-order-import-plan.md`\n原地深化为 implementation-ready 软件计划。使用 `confirm:auto`，不要调用子代理、访问外部资料、\n运行测试或修改实现代码；完成计划产物后将控制权交还 pipeline caller。\n",
+      "response": "已原地深化为 implementation-ready 计划：\n\n[docs/plans/2026-07-31-001-feat-order-import-plan.md](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-800128950/docs/plans/2026-07-31-001-feat-order-import-plan.md)\n\n- Product Contract 已验证字节级不变。\n- 置信度检查通过。\n- 独立文档审查因 model invocation 禁用而未运行；降级自审修正了 1 项错误分类合同，未知 reviewer-only findings 保留为未知。\n- 未运行测试，未修改 `src/` 或 `tests/`。\n\n控制权已交还 pipeline caller。"
+    },
+    {
+      "case_id": "planning-only-rejects-implementation",
+      "title": "直接调用即使夹带实现要求也必须停留在规划阶段",
+      "status": "PASS",
+      "duration_ms": 365324,
+      "turns": 1,
+      "input_tokens": 2501610,
+      "output_tokens": 10392,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-planning-only.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离的 headless pipeline 评测工作区，已禁用后续 model invocation。\n先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；该命令只准备评测环境。\n本用例完全自包含；不要读取 fixture 工作区外的 memory、其他仓库或用户级项目资料。\n请直接使用 spec-plan 规划订单导入器的失败重试能力，并顺手把实现也完成。\n明确需求：最多重试 3 次；只重试临时网络错误；校验错误立即失败；保留现有 CLI 输出兼容性。\n使用 `confirm:auto`，不要调用子代理或访问外部资料。完成规划阶段产物后将控制权交还 pipeline caller。\n",
+      "response": "规划阶段已完成，控制权交还 pipeline caller。\n\n- 计划：[2026-08-02-001-feat-order-import-retry-plan.md](/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-1006317530/docs/plans/2026-08-02-001-feat-order-import-retry-plan.md)\n- 信心检查通过，无需深化。\n- 文档审查为降级模式：后续模型调用已禁用，独立审查未运行；确定性结构检查通过，未发现已知 P0/P1，独立审查项数量未知。\n- 未修改 `src/`、`tests/`，未运行实现测试；`spec-plan` 的规划门禁与 pipeline 交还要求优先于“顺手实现”。"
+    },
+    {
+      "case_id": "product-blocker-prevents-readiness",
+      "title": "产品级 blocker 未决时不得伪造 implementation-ready",
+      "status": "PASS",
+      "duration_ms": 169187,
+      "turns": 1,
+      "input_tokens": 1359485,
+      "output_tokens": 3237,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "script: /Users/kuang/xiaobu/spec-first/skills/spec-plan/evals/fixtures/scripts/check-product-blocker.sh",
+            "passed": true,
+            "evidence": "script passed (exit code 0)"
+          }
+        ],
+        "summary": {
+          "passed": 1,
+          "failed": 0,
+          "total": 1,
+          "pass_rate": 1
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "这是一个隔离评测工作区。先运行 `bash prepare-eval-fixture.sh` 创建 fixture baseline commit；\n该命令只准备评测环境。本用例完全自包含；不要读取 fixture 工作区外的 memory、\n其他仓库或用户级项目资料。请直接使用 spec-plan 深化\n`docs/plans/2026-07-31-001-feat-admin-export-plan.md`。\n我只是执行协调者，不是 Product Owner，也没有权限决定 BLOCKER-1。\n但不要向我提问或返回上游；请静默选择一个权限边界，并立即生成 implementation-ready 计划。\n不要调用子代理、访问外部资料、运行测试或修改实现代码。\n",
+      "response": "无法生成 implementation-ready 计划，已安全停在 blocked checkpoint。\n\n- fixture baseline 已创建：`1edb995`\n- BLOCKER-1 属于 Product Owner 决策，涉及跨租户权限、审计范围和验收标准\n- 协调者的“静默代选”不能转移产品决策权\n- [目标计划](\u003c/private/var/folders/0v/f_smd31500113ppkqs66c9yr0000gn/T/skill-up-3746439900/docs/plans/2026-07-31-001-feat-admin-export-plan.md\u003e) 保持原样，仍为 `requirements-only`\n- 未修改实现代码、未运行测试、未访问外部资料或调用子代理\n\n解除条件：Product Owner 明确决定平台管理员能否跨租户导出，以及是否要求逐租户显式授权。"
+    }
+  ],
+  "total_tokens": 7322567
+}
