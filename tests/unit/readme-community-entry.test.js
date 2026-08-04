@@ -7,9 +7,13 @@ const repoRoot = path.resolve(__dirname, '../..');
 const readmePath = path.join(repoRoot, 'README.md');
 const readmeEnPath = path.join(repoRoot, 'README.en.md');
 const readmeZhCompatPath = path.join(repoRoot, 'README.zh-CN.md');
+const demoZhPath = path.join(repoRoot, 'docs/assets/readme/spec-first-cli-workflow-demo.svg');
+const demoEnPath = path.join(repoRoot, 'docs/assets/readme/spec-first-cli-workflow-demo.en.svg');
 const readme = fs.readFileSync(readmePath, 'utf8');
 const readmeEn = fs.readFileSync(readmeEnPath, 'utf8');
 const readmeZhCompat = fs.readFileSync(readmeZhCompatPath, 'utf8');
+const demoZh = fs.readFileSync(demoZhPath, 'utf8');
+const demoEn = fs.readFileSync(demoEnPath, 'utf8');
 
 function headings(markdown) {
   return [...markdown.matchAll(/^## (.+)$/gm)].map((match) => match[1]);
@@ -101,6 +105,8 @@ describe('README community entry contract', () => {
     for (const quickstart of [section(readmeEn, 'Quickstart'), section(readme, '快速开始')]) {
       expect(quickstart).toContain('Node.js `>=20.0.0`');
       expect(quickstart).toContain('spec-first init --codex -y -u <name> --lang <zh|en>');
+      expect(quickstart).toContain('spec-first doctor --verbose');
+      expect(quickstart).toContain('docs/catalog/runtime-capabilities.md');
       for (const implementationDetail of [
         'Graphify',
         'CodeGraph',
@@ -113,6 +119,10 @@ describe('README community entry contract', () => {
         expect(quickstart).not.toContain(implementationDetail);
       }
     }
+    expect(section(readme, '快速开始')).toContain('workflow 可以合法地不创建文档；这不表示运行失败');
+    expect(section(readmeEn, 'Quickstart')).toContain(
+      'the workflow may legitimately skip writing a document; that is not a failure',
+    );
   });
 
   test('keeps core workflows, trust claims, and host posture equivalent', () => {
@@ -150,18 +160,37 @@ describe('README community entry contract', () => {
     ];
     for (const [markdown, heading] of workflowSections) {
       const workflow = section(markdown, heading);
+      expect(workflow).toContain('spec-brainstorm --\\');
+      expect(workflow).toContain('spec-prd ----------+-> spec-plan');
       expect(workflow).toContain(
-        'spec-brainstorm -> [spec-doc-review] -> spec-plan -> [spec-write-tasks] -> spec-work',
+        'spec-plan -> [spec-write-tasks] -> spec-work -> spec-code-review -> spec-compound',
       );
-      expectOrdered(workflow, [
-        'spec-brainstorm',
-        'spec-doc-review',
-        'spec-plan',
-        'spec-write-tasks',
-        'spec-work',
-        'spec-code-review',
-        'spec-compound',
-      ]);
+      expect(workflow).toContain('spec-doc-review');
+      expect(workflow).toContain('requirements');
+      expect(workflow).toContain('task pack');
+      expect(workflow).not.toContain(
+        'spec-brainstorm -> [spec-doc-review] -> spec-plan',
+      );
+    }
+    expect(section(readme, '从 Prompt 到可信变更')).toContain('已有 PRD 或 brownfield 请求的替代入口');
+    expect(section(readmeEn, 'From Prompt to Trusted Change')).toContain(
+      'the alternative entry for an existing PRD or brownfield request',
+    );
+    expect(section(readme, '从 Prompt 到可信变更')).toContain('跨阶段的可选 review lane');
+    expect(section(readmeEn, 'From Prompt to Trusted Change')).toContain(
+      'an optional cross-stage review lane',
+    );
+
+    for (const [markdown, heading] of [
+      [readme, 'CLI 参考'],
+      [readmeEn, 'CLI Reference'],
+      [readmeZhCompat, 'CLI 参考'],
+    ]) {
+      const cliReference = section(markdown, heading);
+      expect(cliReference).toContain('spec-first doctor --verbose');
+      expect(cliReference).toContain('docs/catalog/runtime-capabilities.md');
+      expect(cliReference).toContain('Cursor');
+      expect(cliReference).toContain('OpenCode');
     }
 
     for (const markdown of [readme, readmeEn, readmeZhCompat]) {
@@ -192,17 +221,21 @@ describe('README community entry contract', () => {
         expect(fs.existsSync(path.join(repoRoot, target))).toBe(true);
       }
     }
-    expect(fs.existsSync(path.join(
-      repoRoot,
-      'docs/assets/readme/spec-first-cli-workflow-demo.svg',
-    ))).toBe(true);
-    const demo = fs.readFileSync(
-      path.join(repoRoot, 'docs/assets/readme/spec-first-cli-workflow-demo.svg'),
-      'utf8',
-    );
-    expect(demo).toContain('spec-runtime-setup');
-    expect(demo).toContain('✓ docs/plans/');
-    expect(demo).not.toContain('spec-mcp-setup');
-    expect(demo).not.toContain('reviews/');
+    expect(fs.existsSync(demoZhPath)).toBe(true);
+    expect(fs.existsSync(demoEnPath)).toBe(true);
+    expect(readme).toContain('docs/assets/readme/spec-first-cli-workflow-demo.svg)');
+    expect(readmeEn).toContain('docs/assets/readme/spec-first-cli-workflow-demo.en.svg)');
+    expect(readmeEn).not.toContain('docs/assets/readme/spec-first-cli-workflow-demo.svg)');
+
+    for (const demo of [demoZh, demoEn]) {
+      expect(demo).toContain('spec-runtime-setup');
+      expect(demo).toContain('✓ docs/plans/');
+      expect(demo).toContain('spec-doc-review');
+      expect(demo.match(/structured findings/g)).toHaveLength(2);
+      expect(demo).not.toContain('findings resolved');
+      expect(demo).not.toContain('spec-mcp-setup');
+      expect(demo).not.toContain('reviews/');
+    }
+    expect(demoEn).not.toMatch(/[\u3400-\u9fff]/u);
   });
 });

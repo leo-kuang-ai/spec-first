@@ -62,7 +62,7 @@ spec-first init --codex -y -u <name> --lang <zh|en>
 
 ### 2. 重启宿主
 
-重启已选择的宿主或新开会话，让它发现生成的 runtime assets。下面的 `spec-*` 入口运行在宿主会话中，不是 shell 子命令。
+重启已选择的宿主或新开会话，让它发现生成的 runtime assets。下面的 `spec-*` 入口运行在宿主会话中，不是 shell 子命令。对于 Cursor 和 OpenCode 这类 preview 宿主，生成 runtime assets 不等于宿主 loader 已发现它们；如果重启后看不到入口，请运行 `spec-first doctor --verbose`，并核对 [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)。
 
 ### 3. 准备 Runtime
 
@@ -78,25 +78,26 @@ Runtime Setup 会安装或验证 required harness runtime、MCP servers、helper
 spec-brainstorm "改进 CLI 新用户的 onboarding"
 ```
 
-检查它生成的 requirements-only unified plan：
+对于这个非平凡示例，`spec-brainstorm` 通常会在范围确认后写入 requirements-only unified plan：
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 ```
 
-这个文件就是首次成功信号：意图已经由项目拥有、可以审查，并可继续交给 `spec-plan` 原位深化。
+如果本轮没有值得持久化的决策，workflow 可以合法地不创建文档；这不表示运行失败。若生成了该文件，它就是首次可检查信号：意图已经由项目拥有、可以审查，并可继续交给 `spec-plan` 原位深化。
 
 ## 从 Prompt 到可信变更
 
-一个典型功能可以沿这条路径推进：
+两类常见输入可以汇合到同一条实施路径：
 
 ```text
-spec-brainstorm -> [spec-doc-review] -> spec-plan -> [spec-write-tasks] -> spec-work
-               -> spec-code-review -> spec-compound
+粗略想法 -> spec-brainstorm --\
+已有 PRD -> spec-prd ----------+-> spec-plan -> [spec-write-tasks] -> spec-work -> spec-code-review -> spec-compound
 ```
 
-- `spec-brainstorm` 确定**做什么**，写入 requirements-only unified plan。
-- `spec-doc-review` 可选地在实现前审查需求、计划或 task pack，并返回结构化文档 findings。
+- `spec-brainstorm` 从粗略想法确定**做什么**；有值得持久化的决策时，写入 requirements-only unified plan。
+- `spec-prd` 是已有 PRD 或 brownfield 请求的替代入口，不是 `spec-brainstorm` 之后的必经步骤。
+- `spec-doc-review` 是跨阶段的可选 review lane，可在 requirements、implementation-ready plan 或 task pack 形成后插入，并返回结构化文档 findings。
 - `spec-plan` 确定**怎么做**，把同一份 plan 原位深化为 implementation-ready。
 - `spec-write-tasks` 在大型、并行或交接密集的工作中可选地派生 task pack；plan 仍是权威来源。
 - `spec-work` 执行范围明确的工作，并为实际运行过的检查记录验证证据。
@@ -202,7 +203,7 @@ spec-first clean       # 移除所选 generated runtime assets
 spec-first plans audit --status completed --json
 ```
 
-运行 `spec-first --help` 查看全部 package CLI 选项。Workflow 入口会在 `init` 并重启后出现在所选宿主中。
+运行 `spec-first --help` 查看全部 package CLI 选项。主要支持宿主通常会在 `init` 并重启后发现 Workflow 入口；Cursor 和 OpenCode 的 preview 投射仍可能无法被 loader 发现。以 `spec-first doctor --verbose` 和 [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md) 为准。
 
 ## 开发与贡献
 

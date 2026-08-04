@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
   <title id="title">spec-first CLI workflow demo</title>
-  <desc id="desc">模拟从安装 spec-first、init 初始化、runtime-setup 准备运行时，到从 brainstorm 或已有 PRD 替代入口进入 plan、write-tasks、work、code-review、compound；doc-review 可在 requirements、plan 或 task pack 后插入，debug 是失败或根因不明时的旁路循环。</desc>
+  <desc id="desc">A simulated path from installation, init, and runtime setup through alternative brainstorm or existing-PRD entries into plan, task derivation, work, code review, and compound. Document review can run after requirements, a plan, or a task pack; debug is a side loop for failures or unknown causes.</desc>
   <defs>
     <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#F7F8FA"/>
@@ -14,7 +14,7 @@
       <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#111827" flood-opacity="0.18"/>
     </filter>
     <style>
-      text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; letter-spacing:0; }
+      text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Arial, sans-serif; letter-spacing:0; }
       .title { fill:#111827; font-size:34px; font-weight:760; text-anchor:middle; }
       .subtitle { fill:#667085; font-size:16px; font-weight:520; text-anchor:middle; }
       .mono { font-family:"SFMono-Regular", ui-monospace, Menlo, Consolas, monospace; font-size:13.5px; font-weight:620; }
@@ -37,7 +37,6 @@
       .artifact4 { animation: artifactPulse 16s ease-in-out infinite; animation-delay:9.2s; }
       .artifact5 { animation: artifactPulse 16s ease-in-out infinite; animation-delay:11.0s; }
       .artifact6 { animation: artifactPulse 16s ease-in-out infinite; animation-delay:12.4s; }
-      .artifact7 { animation: artifactPulse 16s ease-in-out infinite; animation-delay:14.0s; }
       .cursor { animation: blink 1s steps(2, start) infinite; }
       @keyframes scan {
         0% { transform:translateY(0); opacity:0.95; }
@@ -76,8 +75,8 @@
   <circle cx="170" cy="150" r="118" fill="#FFFFFF" opacity="0.72"/>
   <circle cx="1040" cy="560" r="158" fill="#FFFFFF" opacity="0.54"/>
 
-  <text x="600" y="58" class="title">一条可检查、可组合的研发路径</text>
-  <text x="600" y="88" class="subtitle">init → runtime-setup → brainstorm / 已有 PRD → plan → work → code-review → compound</text>
+  <text x="600" y="58" class="title">An inspectable, composable engineering path</text>
+  <text x="600" y="88" class="subtitle">init → runtime-setup → brainstorm / existing PRD → plan → work → code-review → compound</text>
 
   <g transform="translate(64 122)" filter="url(#shadow)">
     <rect x="0" y="0" width="742" height="520" rx="22" fill="#0B1020"/>
@@ -100,14 +99,14 @@
       <text x="0" y="68" class="mono cmd">spec-runtime-setup</text>
       <text x="430" y="68" class="mono-small ok">✓ MCP/helper readiness</text>
 
-      <text x="0" y="102" class="mono cmd">spec-ideate "新用户 onboarding"</text>
+      <text x="0" y="102" class="mono cmd">spec-ideate "onboarding"</text>
       <text x="430" y="102" class="mono-small ok">✓ ranked ideas</text>
 
-      <text x="0" y="136" class="mono cmd">spec-brainstorm "改进 onboarding"</text>
+      <text x="0" y="136" class="mono cmd">spec-brainstorm "improve onboarding"</text>
       <text x="430" y="136" class="mono-small ok">✓ docs/plans/</text>
 
-      <text x="0" y="170" class="mono cmd"># 或：spec-prd existing-prd.md</text>
-      <text x="430" y="170" class="mono-small ok">✓ 替代入口</text>
+      <text x="0" y="170" class="mono cmd"># or: spec-prd existing-prd.md</text>
+      <text x="430" y="170" class="mono-small ok">✓ alternative entry</text>
 
       <text x="0" y="204" class="mono cmd">spec-doc-review &lt;requirements|plan|task-pack&gt;</text>
       <text x="430" y="204" class="mono-small ok">✓ structured findings</text>
@@ -132,8 +131,8 @@
 
   <g transform="translate(842 122)">
     <rect x="0" y="0" width="292" height="148" rx="18" fill="#FFFFFF" stroke="#E4E7EC"/>
-    <text x="24" y="34" class="panel-title">可组合流程进度</text>
-    <text x="24" y="60" class="panel-copy">setup、替代入口、计划、实现、审查、沉淀</text>
+    <text x="24" y="34" class="panel-title">Composable workflow</text>
+    <text x="24" y="60" class="panel-copy">setup, entry, plan, work, review, learn</text>
     <rect x="24" y="86" width="244" height="12" rx="6" fill="#EAECF0"/>
     <rect class="progressBar" x="24" y="86" width="244" height="12" rx="6" fill="#22C55E"/>
     <g transform="translate(24 112)">
@@ -152,8 +151,8 @@
 
   <g transform="translate(842 292)">
     <rect x="0" y="0" width="292" height="350" rx="18" fill="#FFFFFF" stroke="#E4E7EC"/>
-    <text x="24" y="36" class="panel-title">仓库留下的证据</text>
-    <text x="24" y="62" class="panel-copy">不是隐藏记忆，而是可检查文件</text>
+    <text x="24" y="36" class="panel-title">Repository evidence</text>
+    <text x="24" y="62" class="panel-copy">Inspectable files, not hidden memory</text>
 
     <g transform="translate(24 82)">
       <text x="0" y="0" class="mono-small muted">docs/</text>

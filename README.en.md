@@ -18,7 +18,7 @@
 
 </div>
 
-![spec-first workflow: intent to trusted change](https://raw.githubusercontent.com/sunrain520/spec-first/master/docs/assets/readme/spec-first-cli-workflow-demo.svg)
+![spec-first workflow: intent to trusted change](https://raw.githubusercontent.com/sunrain520/spec-first/master/docs/assets/readme/spec-first-cli-workflow-demo.en.svg)
 
 ```text
 Intent -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
@@ -62,7 +62,7 @@ spec-first init --codex -y -u <name> --lang <zh|en>
 
 ### 2. Restart the host
 
-Restart the selected host or open a new session so it discovers the generated runtime assets. The `spec-*` entries below run inside that host session; they are not shell subcommands.
+Restart the selected host or open a new session so it discovers the generated runtime assets. The `spec-*` entries below run inside that host session; they are not shell subcommands. For preview hosts such as Cursor and OpenCode, generated runtime assets do not prove loader discovery. If the entries are missing after restart, run `spec-first doctor --verbose` and check the [runtime capability catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md).
 
 ### 3. Prepare the runtime
 
@@ -78,25 +78,26 @@ Runtime Setup installs or verifies the required harness runtime, MCP servers, he
 spec-brainstorm "Improve onboarding for first-time CLI users"
 ```
 
-Inspect the requirements-only unified plan it creates:
+For this non-trivial example, `spec-brainstorm` normally writes a requirements-only unified plan after the scope is settled:
 
 ```text
 docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 ```
 
-That file is the first success signal: intent is now project-owned, reviewable, and ready for `spec-plan` to deepen in place.
+If the run produces no decision worth preserving, the workflow may legitimately skip writing a document; that is not a failure. When the file is created, it is the first inspectable signal: intent is now project-owned, reviewable, and ready for `spec-plan` to deepen in place.
 
 ## From Prompt to Trusted Change
 
-A typical feature can move through this loop:
+Two common inputs can converge on the same implementation path:
 
 ```text
-spec-brainstorm -> [spec-doc-review] -> spec-plan -> [spec-write-tasks] -> spec-work
-               -> spec-code-review -> spec-compound
+rough idea   -> spec-brainstorm --\
+existing PRD -> spec-prd ----------+-> spec-plan -> [spec-write-tasks] -> spec-work -> spec-code-review -> spec-compound
 ```
 
-- `spec-brainstorm` settles **what** to build and writes a requirements-only unified plan.
-- `spec-doc-review` optionally reviews requirements, plans, or task packs before implementation and returns structured document findings.
+- `spec-brainstorm` starts from a rough idea and settles **what** to build. It writes a requirements-only unified plan when the run has decisions worth preserving.
+- `spec-prd` is the alternative entry for an existing PRD or brownfield request, not a mandatory step after `spec-brainstorm`.
+- `spec-doc-review` is an optional cross-stage review lane after requirements, an implementation-ready plan, or a task pack; it returns structured document findings.
 - `spec-plan` settles **how** to build it and deepens that same plan to implementation-ready.
 - `spec-write-tasks` optionally derives a task pack for large, parallel, or handoff-heavy work. The plan remains authoritative.
 - `spec-work` executes bounded work and records verification evidence for checks that actually ran.
@@ -204,7 +205,7 @@ spec-first clean       # remove selected generated runtime assets
 spec-first plans audit --status completed --json
 ```
 
-Use `spec-first --help` for all package CLI options. Workflow entries become available inside the selected host after `init` and restart.
+Use `spec-first --help` for all package CLI options. Primary hosts normally discover Workflow entries after `init` and restart; Cursor and OpenCode preview projections may still remain undiscovered by their loaders. Treat `spec-first doctor --verbose` and the [runtime capability catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md) as authoritative.
 
 ## Development & Contributing
 
