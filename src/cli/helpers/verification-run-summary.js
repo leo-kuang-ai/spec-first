@@ -192,7 +192,7 @@ function writeVerificationRunSummary({ inputPath, runId, targetRepo, workflow = 
   };
   const schemaValidation = validateRunSummary(summary);
   if (schemaValidation.errors.length > 0) {
-    return rejected('run-summary-schema-invalid', schemaValidation.errors);
+    return rejected(schemaValidation.reasonCode || 'run-summary-schema-invalid', schemaValidation.errors);
   }
 
   try {
@@ -308,7 +308,7 @@ function readVerificationRunSummary({ targetRepo, runSummaryRef }) {
       exitCode: 1,
       output: {
         status: 'not-readable',
-        reason_code: 'run-summary-schema-invalid',
+        reason_code: validation.reasonCode || 'run-summary-schema-invalid',
         run_summary_ref: runSummaryRef,
         errors: validation.errors,
         summary: null,
@@ -339,6 +339,7 @@ function validateRunSummaryInput(payload, context) {
     errors.push('checks must be a non-empty array');
   } else {
     payload.checks.forEach((check, index) => validateCheck(check, index, context, errors));
+    validateUniqueCheckIds(payload.checks, errors);
   }
 
   return {
@@ -493,7 +494,30 @@ function validateCheckLogPath(check, pointer, context, errors) {
 
 function validateRunSummary(summary) {
   const result = validateAgainstSchema(getRunSummarySchema(), summary);
-  return result.valid ? { errors: [] } : { errors: result.errors };
+  const errors = result.valid ? [] : [...result.errors];
+  if (result.valid) validateUniqueCheckIds(summary.checks, errors);
+  let reasonCode = null;
+  if (errors.some((error) => error.startsWith('checks contains duplicate id:'))) {
+    reasonCode = 'run-summary-duplicate-check-id';
+  } else if (errors.length > 0) {
+    reasonCode = 'run-summary-schema-invalid';
+  }
+  return {
+    errors,
+    reasonCode,
+  };
+}
+
+function validateUniqueCheckIds(checks, errors) {
+  const seen = new Set();
+  for (const check of checks) {
+    if (!check || typeof check.id !== 'string') continue;
+    if (seen.has(check.id)) {
+      errors.push(`checks contains duplicate id: ${check.id}`);
+      continue;
+    }
+    seen.add(check.id);
+  }
 }
 
 // fail-closed secret gate:全文扫描,不设静默截断上限。只看前 64KiB 会让「把 secret 放在
@@ -598,6 +622,7 @@ function getRunSummarySchema() {
 }
 
 function classifyErrors(errors) {
+  if (errors.some((error) => error.startsWith('checks contains duplicate id:'))) return 'duplicate-check-id';
   if (errors.some((error) => /secret|credential/i.test(error))) return 'security-rejected';
   if (errors.some((error) => /path|repo-relative|runtime|log_path/.test(error))) return 'path-rejected';
   return 'schema-rejected';

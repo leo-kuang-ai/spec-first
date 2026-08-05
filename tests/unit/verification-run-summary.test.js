@@ -144,6 +144,45 @@ describe('verification run summary contract and capture helper', () => {
     expect(validateRunSummary(summary).errors).toEqual([]);
   });
 
+  test('rejects duplicate check ids before persistence and when reading a stored summary', () => {
+    const repo = makeRepo();
+    try {
+      const runId = 'duplicate-check-id';
+      const duplicatePayload = payload(repo, runId);
+      duplicatePayload.checks.push({
+        ...duplicatePayload.checks[0],
+        command: 'npm run test:unit',
+        log_path: logRef(repo, runId, 'duplicate.log'),
+      });
+      const context = {
+        targetRepoRoot: repo,
+        workspaceSlug: slugify(path.basename(repo)),
+        runId,
+      };
+
+      const inputValidation = validateRunSummaryInput(duplicatePayload, context);
+      expect(inputValidation.reasonCode).toBe('duplicate-check-id');
+      expect(inputValidation.errors).toContain('checks contains duplicate id: typecheck');
+
+      const inputPath = writePayload(repo, duplicatePayload);
+      const writeResult = writeVerificationRunSummary({ inputPath, runId, targetRepo: repo });
+      expect(writeResult.exitCode).toBe(1);
+      expect(writeResult.output.reason_code).toBe('duplicate-check-id');
+
+      const storedSummary = {
+        schema_version: 'verification-run-summary.v1',
+        generated_at: '2026-08-05T00:00:00.000Z',
+        profile: duplicatePayload.profile,
+        checks: duplicatePayload.checks,
+      };
+      const storedValidation = validateRunSummary(storedSummary);
+      expect(storedValidation.reasonCode).toBe('run-summary-duplicate-check-id');
+      expect(storedValidation.errors).toContain('checks contains duplicate id: typecheck');
+    } finally {
+      fs.rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
   test('records passed checks and reads them through the internal CLI boundary', () => {
     const repo = makeRepo();
     try {

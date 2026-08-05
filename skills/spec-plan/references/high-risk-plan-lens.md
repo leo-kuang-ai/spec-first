@@ -39,6 +39,18 @@ Apply this branch when the change affects shipped runtime behavior, a production
 - A feature flag names its safe default, owner, cohort, success and failure signals, rollback trigger, and removal condition. A flag name alone is not a rollout or rollback plan.
 - A staged rollout names entry and exit criteria, observation window, operational owner, support impact, rollback action, and runbook. Alerts must identify an actionable threshold or condition, an owner, and the response the runbook enables.
 
+## 风险驱动保障追踪
+
+对每个高风险计划，显式写出信任链，但不要把它变成刚性 schema 或所有任务通用的测试仪式：
+
+- 将 **Product Contract confirmation** 记录为 `confirmed`、`unconfirmed` 或 `inherited`，并附 owner/source basis。如果同一模型或 Agent 编写了 Product Contract、计划、实现和审查，却没有 owner confirmation reference，应声明 correlation limitation，不得暗示已经发生独立人工批准。
+- 在选择 checks 前明确 **largest unproven risk**。把每个 load-bearing acceptance group 或 failure mode 映射到标记为 `required`、`optional`、`not applicable` 或 `deferred` 的 proof intents；deferred 项必须写明 owner、unblock condition 或 claim limitation。
+- 分开记录 evidence authority 与 source identity。`transcribed` 表示 command result 由 caller 提供；`provider-confirmed` 需要可验证 provider 或 supervised-process receipt；`source-bound` 表示 enclosing evidence 还标识最终 revision、fingerprint 或等价 source state。source-bound 不证明 provider-confirmed execution，provider-confirmed execution 也不证明它运行在最终 source state 上。
+- closeout 必须执行 **required-proof reconciliation**：每个 required intent 都要落到实际 result、明确的 not-applicable reason、deferred item 或 unbound limitation。即使 recorded checks 全绿，完全遗漏 required intent 仍阻断 `complete` 或 `verified` claim。
+- 首轮把 reconciliation 作为 `workflow-level semantic exit gate`，而不是 runtime hard enforcement。Scripts 继续校验 schema、identity、hash、path、exit code 和 duplicate check IDs 等确定性事实；LLM 或人工判断 intent coverage 与 not-applicable reasoning 的语义充分性。
+
+低风险工作保持轻量。如果不存在 high-risk trigger 或 load-bearing proof gap，不要仅为填满模板而制造扩展 trace。
+
 ## Review Checks
 
 - High-risk KTDs state what the choice buys, what it sacrifices, and why a rejected alternative lost.

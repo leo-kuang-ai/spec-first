@@ -199,9 +199,11 @@ present. They carry the contracts downstream consumers depend on.
     paths, not an exhaustive restatement. **Omit it below ~10 units** — there
     the per-unit `Dependencies`/`Files` (and any sequencing or dependency
     diagram) already suffice, and an index would be ceremony.
-- **Verification Contract** — repo-specific commands and quality gates,
-  including which tests prove the plan, when `release:validate` applies, and
-  what behavioral skill evaluation is required. Avoid generic "run tests"
+- **Verification Contract** — repo-specific commands and quality gates；在相关时
+  写明 Product Contract confirmation、largest unproven risk、proof-intent status、
+  evidence authority、source binding 与 required-proof reconciliation，同时说明
+  哪些 tests 证明计划、何时适用 `release:validate`，以及需要何种 behavioral skill
+  evaluation。避免使用泛化的 "run tests"
   language when the repo has concrete commands. When the goal is
   optimization-shaped (build time, latency, coverage, bundle size), express a
   measurable threshold as the exit criterion (e.g., "p95 latency < 200ms",

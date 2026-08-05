@@ -62,6 +62,16 @@ describe('spec-work feedback and implementation quality contracts', () => {
     expect(feedback).toMatch(/跳过 serialization.*middleware.*callback.*permission.*retry.*error translation.*不能作为.*integration proof/is);
   });
 
+  test('risk-triggered proof strength distinguishes mutation testing, coverage, baseline, and anti-gaming', () => {
+    expect(feedback).toContain('## Risk-Triggered Proof Strength');
+    expect(feedback).toMatch(/source mutation.*mutation testing/is);
+    expect(feedback).toMatch(/equivalent mutant.*survivor.*error/is);
+    expect(feedback).toMatch(/changed-line coverage.*不等于.*行为证明/is);
+    expect(feedback).toMatch(/pre-existing baseline.*task-introduced/is);
+    expect(feedback).toMatch(/anti-gaming.*false-green/is);
+    expect(feedback).toMatch(/named failure mode.*canonical command identity|canonical command identity.*named failure mode/is);
+  });
+
   test('feedback-and-tests remains the deterministic owner for slice and test-design anchors', () => {
     const referencesRoot = path.join(repoRoot, 'skills/spec-work/references');
     const ownerFiles = fs.readdirSync(referencesRoot)

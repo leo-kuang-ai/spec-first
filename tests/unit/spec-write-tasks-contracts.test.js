@@ -15,6 +15,10 @@ const handoff = fs.readFileSync(
 );
 const casesPath = path.join(repoRoot, 'skills/spec-write-tasks/evals/output-quality-cases.json');
 const failureCasesPath = path.join(repoRoot, 'skills/spec-write-tasks/evals/failure-cases.json');
+const qualityGuide = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-write-tasks/references/task-quality-guide.md'),
+  'utf8',
+);
 
 describe('spec-write-tasks current contracts', () => {
   test('keeps the plan canonical and task packs derived', () => {
@@ -46,6 +50,17 @@ describe('spec-write-tasks current contracts', () => {
     expect(skill).toContain('next_action: review-task-pack');
     expect(skill).toContain('dispatch_authorization: missing');
     expect(skill).toContain('Do not auto-dispatch review');
+  });
+
+  test('task cards preserve assurance intent without adding a parallel schema', () => {
+    expect(qualityGuide).toContain('## Assurance Trace Preservation');
+    expect(qualityGuide).toContain('`requirement_refs`');
+    expect(qualityGuide).toContain('`test_focus`');
+    expect(qualityGuide).toContain('`done_signal`');
+    expect(qualityGuide).toContain('`risk_note`');
+    expect(qualityGuide).toContain('`review_gate`');
+    expect(qualityGuide).toMatch(/required proof intent.*不得丢失/is);
+    expect(qualityGuide).toMatch(/unbound.*limitation.*不得.*synthetic check/is);
   });
 
   test('output-quality cases are parseable and reference current source', () => {

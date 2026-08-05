@@ -40,6 +40,21 @@ describe('spec-work review consumer chain contracts', () => {
     expect(followup).toContain('dependent wave');
   });
 
+  test('shipping separates evidence authority from source binding and reconciles every required proof', () => {
+    expect(shipping).toContain('## Required-Proof Reconciliation');
+    expect(shipping).toContain('`transcribed`');
+    expect(shipping).toContain('`provider-confirmed`');
+    expect(shipping).toContain('`source-bound`');
+    expect(shipping).toMatch(/source-bound.*不等于.*provider-confirmed/is);
+    expect(shipping).toMatch(/全部 required proof intent.*result.*not applicable.*deferred.*unbound limitation/is);
+    expect(shipping).toMatch(/完全遗漏.*阻断.*complete.*verified/is);
+    expect(shipping).toMatch(/semantic exit gate.*不是.*schema.*hard enforcement/is);
+    expect(shipping).toMatch(/authority.*source binding.*不写入.*verification-run-summary\.v1/is);
+    expect(shipping).toContain('`claim_limitations`');
+    expect(shipping).toContain('`verified_worktree_fingerprint`');
+    expect(shipping).toContain('`spec-work-run-artifact/v2`');
+  });
+
   test('keeps spec-work as the tracker-defer owner and projects one byte-identical LFG copy', () => {
     expect(tracker).toContain("Canonical owner: the `spec-work` package's co-located `references/tracker-defer.md` source");
     expect(tracker).toContain('package-local projection');

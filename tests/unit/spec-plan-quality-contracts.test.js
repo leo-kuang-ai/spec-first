@@ -18,14 +18,6 @@ function readJson(relativePath) {
   return JSON.parse(read(relativePath));
 }
 
-function listMarkdownFiles(rootPath) {
-  return fs.readdirSync(rootPath, { withFileTypes: true }).flatMap((entry) => {
-    const entryPath = path.join(rootPath, entry.name);
-    if (entry.isDirectory()) return listMarkdownFiles(entryPath);
-    return entry.isFile() && entry.name.endsWith('.md') ? [entryPath] : [];
-  });
-}
-
 describe('spec-plan quality integration contracts', () => {
   const skill = read('SKILL.md');
   const sections = read('references/plan-sections.md');
@@ -48,22 +40,12 @@ describe('spec-plan quality integration contracts', () => {
     expect(skill).toMatch(/do not claim a hard write guarantee from prose alone/i);
   });
 
-  test('运行时 Skill 指令正文统一使用英文', () => {
-    const runtimeMarkdownPaths = [
-      path.join(SKILL_ROOT, 'SKILL.md'),
-      ...listMarkdownFiles(path.join(SKILL_ROOT, 'references')),
-    ];
-    const cjkPattern = /[\u3000-\u303f\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff00-\uffef]/u;
-
-    for (const markdownPath of runtimeMarkdownPaths) {
-      expect({
-        path: path.relative(REPO_ROOT, markdownPath),
-        containsCjk: cjkPattern.test(fs.readFileSync(markdownPath, 'utf8')),
-      }).toEqual({
-        path: path.relative(REPO_ROOT, markdownPath),
-        containsCjk: false,
-      });
-    }
+  test('新增 assurance 指令遵循项目中文治理且保留 contract literals', () => {
+    expect(highRisk).toContain('## 风险驱动保障追踪');
+    expect(highRisk).toContain('对每个高风险计划');
+    expect(highRisk).not.toContain('For each high-risk plan');
+    expect(sections).toContain('在相关时');
+    expect(sections).toContain('避免使用泛化的');
   });
 
   test('makes the Goal Capsule a compact first-screen decision surface', () => {
@@ -135,6 +117,27 @@ describe('spec-plan quality integration contracts', () => {
     expect(sections).toContain('Omit irrelevant surfaces');
     expect(deepening).toContain('service/backend');
     expect(deepening).toContain('verification/test');
+  });
+
+  test('high-risk planning lands confirmation, risk-to-proof trace, and evidence claim boundaries', () => {
+    for (const marker of [
+      '## 风险驱动保障追踪',
+      'Product Contract confirmation',
+      'largest unproven risk',
+      '`required`',
+      '`optional`',
+      '`not applicable`',
+      '`deferred`',
+      '`transcribed`',
+      '`provider-confirmed`',
+      '`source-bound`',
+      'required-proof reconciliation',
+    ]) {
+      expect(highRisk).toContain(marker);
+    }
+    expect(highRisk).toMatch(/source-bound.*不证明.*provider-confirmed/is);
+    expect(highRisk).toMatch(/workflow-level semantic exit gate.*不是.*runtime hard enforcement/is);
+    expect(sections).toMatch(/Verification Contract.*Product Contract confirmation.*evidence authority.*source binding.*required-proof reconciliation/is);
   });
 
   test('makes composition-first architecture a prompt-level judgment without banning justified new boundaries', () => {

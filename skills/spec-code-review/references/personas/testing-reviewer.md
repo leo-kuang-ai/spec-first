@@ -32,6 +32,9 @@ Use the anchored confidence rubric in the subagent template. Persona-specific gu
 - interaction 本身确实是公开 contract 时例外成立，例如协议规定必须调用某个 sink、次数或顺序对外可见、或安全边界要求绝不调用某个 sink。此时断言 interaction 是适当 proof；不要把该例外误报成 implementation coupling。
 - test double 的优先顺序是 real implementation -> high-fidelity fake -> stub -> mock。若 fake/mock 跳过 serialization、middleware、callback、permission、retry 或 error translation，它不能单独证明真实跨层链路；报告缺失的 real/fidelity proof，而不是把 mock interaction 当 integration coverage。
 - review 只能判断当前 diff 可见的 test proof，不能从最终绿测或 production/test 同时出现的 diff 推断“没有做 TDD”。RED 或 characterization 历史只属于实施期 `spec-work` run-local evidence；没有该 evidence 时，最多说明当前测试的断言范围，不报告 TDD-history finding。
+- 当 plan 声明 mutation testing 时，核对真实 mutant、killed/survivor/error 与 equivalent mutant 理由；survivor 不得被隐藏，equivalent 不能只为提高 kill score 而主观豁免。Changed-line coverage 只证明执行触达，不等于 meaningful assertion 或行为正确。
+- 区分 evidence authority 与 source identity：`transcribed` command result 不是 `provider-confirmed` execution；`source-bound` 只证明 evidence 绑定某个最终 revision/fingerprint，不自动证明命令受监督执行。Review 不得自行提升这些层级。
+- 检查 required-proof reconciliation：若 plan/task 中的 required intent 在 result、not-applicable、deferred、unbound limitation 四类中完全 omitted，报告 completion/claim gap；不要用已有绿色 check 代替缺失 intent。
 
 ## What you don't flag
 
