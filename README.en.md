@@ -221,3 +221,12 @@ npm run build
 `npm run build` performs `npm pack --dry-run` and validates the package payload. Source changes belong in canonical source surfaces; regenerate runtime copies with `spec-first init` only when those runtime sources change.
 
 MIT licensed. See the [release history](https://github.com/sunrain520/spec-first/blob/master/CHANGELOG.md) and [GitHub Issues](https://github.com/sunrain520/spec-first/issues).
+
+## Community
+
+- WeChat group: scan the QR code to join the Chinese-language community chat.
+- WeChat official account: follow `spec-first` for release notes (Chinese only).
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/sunrain520/spec-first/master/docs/assets/readme/spec-first-wechat-group.jpg" alt="spec-first WeChat group QR code" width="220" />
+</div>
