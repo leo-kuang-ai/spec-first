@@ -219,3 +219,12 @@ npm run build
 `npm run build` 会执行 `npm pack --dry-run` 并验证发布包内容。Source 变更应发生在 canonical source surfaces；只有 runtime source 变化时才通过 `spec-first init` 重新生成 runtime copies。
 
 项目使用 MIT License。更多信息见[版本记录](https://github.com/sunrain520/spec-first/blob/master/CHANGELOG.md)与 [GitHub Issues](https://github.com/sunrain520/spec-first/issues)。
+
+## 加入社区
+
+- 微信群：扫码加入交流群，与其他用户和维护者讨论用法与反馈。
+- 公众号：关注 `spec-first`，获取版本更新与实践文章。
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/sunrain520/spec-first/master/docs/assets/readme/spec-first-wechat-group.jpg" alt="spec-first 微信群二维码" width="220" />
+</div>

@@ -58,6 +58,7 @@ describe('README community entry contract', () => {
       '相关文档',
       'CLI 参考',
       '开发与贡献',
+      '加入社区',
     ]);
     expect(headings(readmeEn)).toEqual([
       'Why spec-first?',
@@ -71,6 +72,7 @@ describe('README community entry contract', () => {
       'Documentation',
       'CLI Reference',
       'Development & Contributing',
+      'Community',
     ]);
     expect(readme).toContain('把 AI coding 会话变成可信、由项目拥有的变更。');
     expect(readmeEn).toContain('Turn AI coding sessions into trusted, repo-owned change.');
