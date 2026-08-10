@@ -58,7 +58,7 @@ spec-first doctor
 spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-`init` previews the managed runtime files before writing them. See the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md) for multi-host, multi-repo, dry-run, and preview-host setup.
+`init` previews managed runtime files before writing them. Skills, agents, commands, hooks, pointers, and state for the hosts selected in this run remain Git-visible by default; review and commit them with the project so the team receives the same host projection. `init` never stages or untracks files. See the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md) for multi-host, multi-repo, dry-run, and preview-host setup.
 
 ### 2. Restart the host
 
@@ -121,7 +121,7 @@ docs/
   workflows/     conditional verification evidence (gitignored by default)
 ```
 
-Durable documents belong to the project. Generated host runtime assets are disposable projections and can be rebuilt from canonical source with `spec-first init`.
+Durable documents belong to the project. Generated host runtime assets are rebuildable delivery projections, not canonical source, but they are committed with the target project by default. Change behavior in source, then refresh the projection with `spec-first init`.
 
 Review findings normally return in the session. Full code-review coordination artifacts use the OS temporary directory; repo-local `.spec-first/workflows/` evidence is written only when a workflow actually runs targeted commands or a durable evidence trigger applies. An artifact proves only the claim its direct evidence supports.
 

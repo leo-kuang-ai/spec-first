@@ -19,11 +19,8 @@ const SESSION_START_CMD_RELATIVE_PATH = '.codex/hooks/session-start.cmd';
 // (codex-rs hooks discovery 用 config_folder.join("hooks.json"),config_folder = .codex/;
 //  带 hooks/ 子目录的 hooks/hooks.json 仅用于 plugin 层,不适用于 project 层)。
 const HOOKS_JSON_RELATIVE_PATH = '.codex/hooks.json';
-const SESSION_START_CLI_PLACEHOLDER = '__SPEC_FIRST_CLI_PATH__';
 const SESSION_START_COMMAND_PLACEHOLDER = '__CODEX_SESSION_START_COMMAND__';
 const SESSION_START_COMMAND_WINDOWS_PLACEHOLDER = '__CODEX_SESSION_START_COMMAND_WINDOWS__';
-const SESSION_START_NODE_PLACEHOLDER = '__CODEX_SESSION_START_NODE__';
-const TRUSTED_SPEC_FIRST_CLI_PATH = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
 
 /**
  * Codex platform adapter
@@ -486,22 +483,11 @@ function inspectSkippedCodexHomeHook(relativePath) {
 }
 
 function renderSessionStartHookTemplate() {
-  const template = fs.readFileSync(SESSION_START_TEMPLATE_PATH, 'utf8');
-  // Function replacement: a string replacement would interpret $&/$`/$'/$$/$n in the
-  // baked path (e.g. an install dir containing `$&`), corrupting the generated hook.
-  return template.replace(
-    JSON.stringify(SESSION_START_CLI_PLACEHOLDER),
-    () => JSON.stringify(TRUSTED_SPEC_FIRST_CLI_PATH),
-  );
+  return fs.readFileSync(SESSION_START_TEMPLATE_PATH, 'utf8');
 }
 
 function renderSessionStartCommandHookTemplate() {
-  // Function replacement: keep $&/$$ in the node path literal instead of letting
-  // String.prototype.replace treat them as replacement patterns.
-  return fs.readFileSync(SESSION_START_CMD_TEMPLATE_PATH, 'utf8').replace(
-    SESSION_START_NODE_PLACEHOLDER,
-    () => escapeBatchFileLiteral(process.execPath),
-  );
+  return fs.readFileSync(SESSION_START_CMD_TEMPLATE_PATH, 'utf8');
 }
 
 function renderHooksJsonTemplate(projectRoot) {
@@ -705,35 +691,12 @@ function managedSessionStartEntries(hooksJson) {
     : [];
 }
 
-function formatSessionStartCommand(projectRoot) {
-  return [
-    shellQuote(process.execPath),
-    shellQuote(normalizeSessionStartCommandPath(projectRoot)),
-  ].join(' ');
+function formatSessionStartCommand() {
+  return `node ${SESSION_START_RELATIVE_PATH}`;
 }
 
-function formatWindowsSessionStartCommand(projectRoot) {
-  return windowsCommandQuote(path.join(projectRoot, SESSION_START_CMD_RELATIVE_PATH));
-}
-
-function normalizeSessionStartCommandPath(projectRoot) {
-  return path.join(projectRoot, SESSION_START_RELATIVE_PATH).replace(/\\/g, '/');
-}
-
-function shellQuote(value) {
-  return `'${String(value).replace(/'/g, "'\\''")}'`;
-}
-
-function windowsCommandQuote(value) {
-  // Codex itself runs commandWindows through the platform shell (Windows: cmd.exe /C),
-  // so commandWindows should be the command body only, not a nested "cmd.exe /c".
-  // This value is consumed on a cmd command line, not inside a batch-file body: do not
-  // apply % -> %% here. Batch-body escaping lives in escapeBatchFileLiteral.
-  return `"${String(value).replace(/"/g, '\\"')}"`;
-}
-
-function escapeBatchFileLiteral(value) {
-  return String(value).replace(/%/g, '%%');
+function formatWindowsSessionStartCommand() {
+  return '".codex\\hooks\\session-start.cmd"';
 }
 
 function isManagedSessionStartHook(hook, projectRoot) {

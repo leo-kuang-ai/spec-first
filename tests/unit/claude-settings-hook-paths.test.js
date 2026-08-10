@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const {
   inspectManagedClaudeHooks,
   removeManagedClaudeHooks,
@@ -24,38 +25,60 @@ function readSettings(projectRoot) {
   return JSON.parse(fs.readFileSync(path.join(projectRoot, '.claude', 'settings.json'), 'utf8'));
 }
 
-function collectExecFormArgs(settings) {
-  const args = [];
+function collectExecFormHooks(settings) {
+  const hooks = [];
   for (const matchers of Object.values(settings.hooks || {})) {
     for (const matcher of matchers) {
       for (const hook of matcher.hooks || []) {
         if (hook.command === 'node' && Array.isArray(hook.args)) {
-          args.push(...hook.args);
+          hooks.push(hook);
         }
       }
     }
   }
-  return args;
+  return hooks;
 }
 
 describe('claude-settings managed hook paths', () => {
-  test('bakes an absolute, project-root-scoped path into each managed hook so resolution does not depend on the spawn cwd', () => {
+  test('uses portable runtime launchers that resolve from CLAUDE_PROJECT_DIR instead of generation paths', () => {
     const projectRoot = makeProjectRoot();
     try {
       upsertManagedClaudeHooks(projectRoot);
       const settings = readSettings(projectRoot);
-      const args = collectExecFormArgs(settings);
+      const hooks = collectExecFormHooks(settings);
 
-      expect(args).toHaveLength(MANAGED_RELATIVE_HOOK_PATHS.length);
+      expect(hooks).toHaveLength(MANAGED_RELATIVE_HOOK_PATHS.length);
       for (const relativePath of MANAGED_RELATIVE_HOOK_PATHS) {
-        const expectedAbsolute = path.join(projectRoot, relativePath);
-        expect(args).toContain(expectedAbsolute);
-        // Regression guard: a bare relative arg silently resolves against whatever cwd
-        // Claude Code happens to spawn the hook with (e.g. a launch subdirectory), which is
-        // exactly the MODULE_NOT_FOUND failure this fix addresses.
-        expect(args).not.toContain(relativePath);
-        expect(path.isAbsolute(expectedAbsolute)).toBe(true);
+        const hook = hooks.find((entry) => entry.args[1].includes(JSON.stringify(relativePath)));
+        expect(hook).toBeDefined();
+        expect(hook.args[0]).toBe('-e');
+        expect(hook.args[1]).toContain('process.env.CLAUDE_PROJECT_DIR || process.cwd()');
+        expect(hook.args.join('\n')).not.toContain(projectRoot);
       }
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('portable SessionStart launcher works when Claude starts from a project subdirectory', () => {
+    const projectRoot = makeProjectRoot();
+    try {
+      upsertManagedClaudeHooks(projectRoot);
+      const settings = readSettings(projectRoot);
+      const hook = settings.hooks.SessionStart[0].hooks[0];
+      const hookPath = path.join(projectRoot, '.claude', 'hooks', 'session-start');
+      const launchDirectory = path.join(projectRoot, 'packages', 'app');
+      fs.mkdirSync(path.dirname(hookPath), { recursive: true });
+      fs.mkdirSync(launchDirectory, { recursive: true });
+      fs.writeFileSync(hookPath, "process.stdout.write('portable-hook');\n", 'utf8');
+
+      const result = spawnSync(hook.command, hook.args, {
+        cwd: launchDirectory,
+        env: { ...process.env, CLAUDE_PROJECT_DIR: projectRoot },
+        encoding: 'utf8',
+      });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toBe('portable-hook');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -75,12 +98,39 @@ describe('claude-settings managed hook paths', () => {
     }
   });
 
-  test('removal recognizes the absolute-path managed hooks and clears the settings file', () => {
+  test('removal recognizes the portable managed hooks and clears the settings file', () => {
     const projectRoot = makeProjectRoot();
     try {
       upsertManagedClaudeHooks(projectRoot);
       const removed = removeManagedClaudeHooks(projectRoot);
       expect(removed).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.claude', 'settings.json'))).toBe(false);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('removal still recognizes an absolute-path managed hook left by an older install', () => {
+    const projectRoot = makeProjectRoot();
+    try {
+      fs.mkdirSync(path.join(projectRoot, '.claude'), { recursive: true });
+      fs.writeFileSync(
+        path.join(projectRoot, '.claude', 'settings.json'),
+        JSON.stringify({
+          hooks: {
+            SessionStart: [{
+              matcher: 'startup|resume|clear|compact',
+              hooks: [{
+                type: 'command',
+                command: 'node',
+                args: [path.join(projectRoot, '.claude/hooks/session-start')],
+              }],
+            }],
+          },
+        }, null, 2),
+      );
+
+      expect(removeManagedClaudeHooks(projectRoot)).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.claude', 'settings.json'))).toBe(false);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });

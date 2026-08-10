@@ -45,6 +45,29 @@ function parseJsonOutput(result) {
   }
 }
 
+function findGeneratedPathLeaks(root, needles) {
+  const hits = [];
+  const pending = [root];
+  while (pending.length > 0) {
+    const directory = pending.pop();
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      if (entry.name === '.git') continue;
+      const absolutePath = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(absolutePath);
+        continue;
+      }
+      const contents = fs.readFileSync(absolutePath);
+      for (const needle of needles) {
+        if (contents.includes(Buffer.from(needle))) {
+          hits.push({ path: path.relative(root, absolutePath), needle });
+        }
+      }
+    }
+  }
+  return hits;
+}
+
 const pointerPlatforms = getSupportedPlatforms().filter((platform) =>
   Boolean(getAdapter(platform).pointerPath)
 );
@@ -68,6 +91,13 @@ describe('six-host init lifecycle', () => {
       const firstInit = runSpecFirst(initArgs, sandbox);
       expect(firstInit.status).toBe(0);
 
+      for (const unselectedPlatform of getSupportedPlatforms().filter((entry) => entry !== platform)) {
+        expect(fs.existsSync(path.join(
+          sandbox.projectRoot,
+          getAdapter(unselectedPlatform).stateFile,
+        ))).toBe(false);
+      }
+
       const instruction = fs.readFileSync(
         path.join(sandbox.projectRoot, adapter.instructionFile),
         'utf8',
@@ -84,6 +114,29 @@ describe('six-host init lifecycle', () => {
         'SKILL.md',
       );
       expect(fs.existsSync(runtimeSkillPath)).toBe(true);
+      const portableHookFiles = {
+        claude: ['.claude/settings.json', '.claude/hooks/session-start'],
+        codex: [
+          '.codex/hooks.json',
+          '.codex/hooks/session-start',
+          '.codex/hooks/session-start.cmd',
+        ],
+        qoder: ['.qoder/hooks/session-start'],
+      }[platform] || [];
+      for (const relativePath of portableHookFiles) {
+        const contents = fs.readFileSync(path.join(sandbox.projectRoot, relativePath), 'utf8');
+        expect(contents).not.toContain(sandbox.projectRoot);
+        expect(contents).not.toContain(repoRoot);
+        expect(contents).not.toContain(process.execPath);
+        expect(contents).not.toContain('__SPEC_FIRST_CLI_PATH__');
+        expect(contents).not.toContain('__CODEX_SESSION_START_NODE__');
+      }
+      expect(findGeneratedPathLeaks(sandbox.projectRoot, [
+        sandbox.projectRoot,
+        sandbox.home,
+        repoRoot,
+        process.execPath,
+      ])).toEqual([]);
       for (const relativePath of [
         'SKILL.md',
         'references/pipeline-orchestration.md',
@@ -265,6 +318,277 @@ describe('six-host init lifecycle', () => {
     120000,
   );
 
+  test.each(getSupportedPlatforms())(
+    '%s clean removes exact managed assets and preserves custom siblings',
+    (platform) => {
+      const sandbox = tempSandbox(`${platform}-clean-ownership`);
+      const adapter = getAdapter(platform);
+      const initArgs = [
+        'init',
+        `--${platform}`,
+        '-y',
+        '-u',
+        'lifecycle-test',
+        '--lang',
+        'en',
+      ];
+      const init = runSpecFirst(initArgs, sandbox);
+      expect(init.status).toBe(0);
+
+      const customSkill = path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'spec-company-skill',
+        'SKILL.md',
+      );
+      fs.mkdirSync(path.dirname(customSkill), { recursive: true });
+      fs.writeFileSync(customSkill, 'team-owned skill\n');
+
+      const customPaths = [customSkill];
+      if (adapter.hasCommands) {
+        const customCommand = path.join(
+          sandbox.projectRoot,
+          adapter.commandRoot,
+          'spec-company-command.md',
+        );
+        fs.mkdirSync(path.dirname(customCommand), { recursive: true });
+        fs.writeFileSync(customCommand, 'team-owned command\n');
+        customPaths.push(customCommand);
+      }
+      const retiredCommandRoot = {
+        claude: '.claude/commands/spec',
+        qoder: '.qoder/commands/spec',
+        opencode: '.opencode/commands/spec',
+      }[platform];
+      if (retiredCommandRoot) {
+        const legacyNamespaceSibling = path.join(
+          sandbox.projectRoot,
+          retiredCommandRoot,
+          'company.md',
+        );
+        fs.mkdirSync(path.dirname(legacyNamespaceSibling), { recursive: true });
+        fs.writeFileSync(legacyNamespaceSibling, 'team-owned legacy namespace command\n');
+        customPaths.push(legacyNamespaceSibling);
+      }
+      if (adapter.supportsAgents !== false) {
+        const customAgent = path.join(
+          sandbox.projectRoot,
+          adapter.agentsRoot,
+          'spec-company-agent.md',
+        );
+        fs.mkdirSync(path.dirname(customAgent), { recursive: true });
+        fs.writeFileSync(customAgent, 'team-owned agent\n');
+        customPaths.push(customAgent);
+      }
+      if (adapter.workflowsRoot !== adapter.skillsRoot) {
+        const customWorkflow = path.join(
+          sandbox.projectRoot,
+          adapter.workflowsRoot,
+          'spec-company-workflow',
+          'SKILL.md',
+        );
+        fs.mkdirSync(path.dirname(customWorkflow), { recursive: true });
+        fs.writeFileSync(customWorkflow, 'team-owned workflow\n');
+        customPaths.push(customWorkflow);
+      }
+      const customContents = new Map(customPaths.map((customPath) => [
+        customPath,
+        fs.readFileSync(customPath),
+      ]));
+
+      fs.appendFileSync(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'using-spec-first',
+        'SKILL.md',
+      ), '\nmanaged drift\n');
+      const repaired = runSpecFirst(initArgs, sandbox);
+      expect(repaired.status).toBe(0);
+      expect(`${repaired.stdout}\n${repaired.stderr}`).toContain('current spec-first runtime drift');
+      for (const customPath of customPaths) {
+        expect(fs.readFileSync(customPath)).toEqual(customContents.get(customPath));
+      }
+
+      const clean = runSpecFirst(['clean', `--${platform}`], sandbox);
+      expect(clean.status).toBe(0);
+      expect(fs.existsSync(path.join(sandbox.projectRoot, adapter.stateFile))).toBe(false);
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        adapter.skillsRoot,
+        'using-spec-first',
+      ))).toBe(false);
+      for (const customPath of customPaths) {
+        expect(fs.readFileSync(customPath)).toEqual(customContents.get(customPath));
+      }
+    },
+    120000,
+  );
+
+  test('selected-host init leaves unselected legacy runtime untouched and visible', () => {
+    const sandbox = tempSandbox('selected-host-boundary');
+    expect(spawnSync('git', ['init', '-q'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+
+    const legacyPath = '.qoder/spec-first/unselected-legacy.json';
+    const legacyAbsolutePath = path.join(sandbox.projectRoot, legacyPath);
+    fs.mkdirSync(path.dirname(legacyAbsolutePath), { recursive: true });
+    fs.writeFileSync(legacyAbsolutePath, '{"owner":"team"}\n');
+    fs.writeFileSync(path.join(sandbox.projectRoot, '.gitignore'), [
+      '# spec-first:start',
+      '.qoder/spec-first/',
+      '# spec-first:end',
+      '',
+    ].join('\n'));
+
+    const init = runSpecFirst([
+      'init',
+      '--codex',
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ], sandbox);
+    expect(init.status).toBe(0);
+    expect(fs.readFileSync(legacyAbsolutePath, 'utf8')).toBe('{"owner":"team"}\n');
+    expect(fs.existsSync(path.join(
+      sandbox.projectRoot,
+      getAdapter('qoder').stateFile,
+    ))).toBe(false);
+    expect(spawnSync('git', ['check-ignore', '-q', '--', legacyPath], {
+      cwd: sandbox.projectRoot,
+    }).status).toBe(1);
+  }, 120000);
+
+  test('dual-host init generates and exposes exactly the selected host set', () => {
+    const sandbox = tempSandbox('dual-host-selection');
+    expect(spawnSync('git', ['init', '-q'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+
+    const selectedPlatforms = ['claude', 'codex'];
+    const initArgs = [
+      'init',
+      ...selectedPlatforms.map((platform) => `--${platform}`),
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ];
+    const init = runSpecFirst(initArgs, sandbox);
+    expect(init.status).toBe(0);
+    expect(`${init.stdout}\n${init.stderr}`).not.toMatch(/runtime_untrack|untrack_index/);
+
+    for (const platform of selectedPlatforms) {
+      const adapter = getAdapter(platform);
+      for (const relativePath of [
+        adapter.stateFile,
+        path.posix.join(adapter.skillsRoot, 'using-spec-first', 'SKILL.md'),
+      ]) {
+        expect(fs.existsSync(path.join(sandbox.projectRoot, relativePath))).toBe(true);
+        expect(spawnSync('git', ['check-ignore', '-q', '--', relativePath], {
+          cwd: sandbox.projectRoot,
+        }).status).toBe(1);
+      }
+    }
+
+    for (const platform of getSupportedPlatforms().filter(
+      (entry) => !selectedPlatforms.includes(entry),
+    )) {
+      expect(fs.existsSync(path.join(
+        sandbox.projectRoot,
+        getAdapter(platform).stateFile,
+      ))).toBe(false);
+    }
+
+    const preview = runSpecFirst([...initArgs, '--dry-run'], sandbox);
+    expect(preview.status).toBe(0);
+    expect(`${preview.stdout}\n${preview.stderr}`).not.toMatch(/runtime_untrack|untrack_index/);
+  }, 120000);
+
+  test('fresh init succeeds without a git binary in PATH', () => {
+    const sandbox = tempSandbox('git-unavailable');
+    const emptyBin = path.join(sandbox.home, 'empty-bin');
+    fs.mkdirSync(emptyBin, { recursive: true });
+
+    const init = spawnSync(process.execPath, [
+      cliPath,
+      'init',
+      '--codex',
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ], {
+      cwd: sandbox.projectRoot,
+      env: {
+        ...process.env,
+        HOME: sandbox.home,
+        PATH: emptyBin,
+      },
+      encoding: 'utf8',
+      timeout: 120000,
+    });
+
+    expect(init.status).toBe(0);
+    expect(fs.existsSync(path.join(
+      sandbox.projectRoot,
+      getAdapter('codex').stateFile,
+    ))).toBe(true);
+    expect(`${init.stdout}\n${init.stderr}`).not.toMatch(/runtime_untrack|untrack_index/);
+  }, 120000);
+
+  test('codex hook projection remains runnable after the project directory moves', () => {
+    const sandbox = tempSandbox('codex-portable-hook');
+    const init = runSpecFirst([
+      'init',
+      '--codex',
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ], sandbox);
+    expect(init.status).toBe(0);
+
+    const hooks = JSON.parse(fs.readFileSync(
+      path.join(sandbox.projectRoot, '.codex', 'hooks.json'),
+      'utf8',
+    ));
+    const managedHook = hooks.hooks.SessionStart[0].hooks[0];
+    expect(managedHook).toMatchObject({
+      type: 'command',
+      command: 'node .codex/hooks/session-start',
+      commandWindows: '".codex\\hooks\\session-start.cmd"',
+    });
+
+    const movedProjectRoot = path.join(path.dirname(sandbox.projectRoot), 'moved-project');
+    fs.renameSync(sandbox.projectRoot, movedProjectRoot);
+    const emptyBin = path.join(sandbox.home, 'empty-bin');
+    fs.mkdirSync(emptyBin, { recursive: true });
+    const hook = spawnSync(process.execPath, ['.codex/hooks/session-start'], {
+      cwd: movedProjectRoot,
+      input: '{}',
+      env: {
+        ...process.env,
+        HOME: sandbox.home,
+        PATH: emptyBin,
+        CODEX_PROJECT_DIR: movedProjectRoot,
+      },
+      encoding: 'utf8',
+      timeout: 10000,
+    });
+    expect(hook.status).toBe(0);
+    expect(JSON.parse(hook.stdout).hookSpecificOutput.additionalContext).toContain(
+      'Workflow entry governance is active',
+    );
+  }, 120000);
+
   test.each(pointerPlatforms)(
     '%s preserves a user-owned pointer and keeps immediate re-init stable',
     (platform) => {
@@ -376,7 +700,7 @@ describe('six-host init lifecycle', () => {
     }
   }, 120000);
 
-  test('six-host init ignores generated runtime while keeping project-owned host files visible', () => {
+  test('six-host init keeps generated runtime visible and never mutates the git index', () => {
     const sandbox = tempSandbox('all-hosts-gitignore');
     const gitInit = spawnSync('git', ['init', '-q'], {
       cwd: sandbox.projectRoot,
@@ -384,11 +708,32 @@ describe('six-host init lifecycle', () => {
     });
     expect(gitInit.status).toBe(0);
 
+    fs.writeFileSync(path.join(sandbox.projectRoot, '.gitignore'), [
+      '# user-owned rule',
+      'dist/',
+      '# spec-first:start',
+      '# legacy generated runtime policy',
+      '.agents/skills/spec-*/',
+      '.codex/spec-first/',
+      '# spec-first:end',
+      '',
+    ].join('\n'));
+
     const trackedLegacyRuntime = '.agents/skills/source-command-spec-legacy/SKILL.md';
+    const trackedLocalOnly = '.spec-first/config.local.yaml';
     const trackedLegacyRuntimePath = path.join(sandbox.projectRoot, trackedLegacyRuntime);
     fs.mkdirSync(path.dirname(trackedLegacyRuntimePath), { recursive: true });
     fs.writeFileSync(trackedLegacyRuntimePath, 'legacy generated runtime\n', 'utf8');
-    const gitAdd = spawnSync('git', ['add', '--', trackedLegacyRuntime], {
+    const trackedLocalOnlyPath = path.join(sandbox.projectRoot, trackedLocalOnly);
+    fs.mkdirSync(path.dirname(trackedLocalOnlyPath), { recursive: true });
+    fs.writeFileSync(trackedLocalOnlyPath, 'tracked local-only config\n', 'utf8');
+    const gitAdd = spawnSync('git', [
+      'add',
+      '-f',
+      '--',
+      trackedLegacyRuntime,
+      trackedLocalOnly,
+    ], {
       cwd: sandbox.projectRoot,
       encoding: 'utf8',
     });
@@ -410,11 +755,31 @@ describe('six-host init lifecycle', () => {
       encoding: 'utf8',
     });
     expect(trackedAfterInit.status).toBe(0);
-    expect(trackedAfterInit.stdout).toBe('');
+    expect(trackedAfterInit.stdout.trim()).toBe(trackedLegacyRuntime);
+
+    const indexedAfterInit = spawnSync('git', ['ls-files'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    });
+    expect(indexedAfterInit.status).toBe(0);
+    expect(indexedAfterInit.stdout.trim().split('\n').sort()).toEqual([
+      trackedLegacyRuntime,
+      trackedLocalOnly,
+    ].sort());
+
+    const migratedGitignore = fs.readFileSync(
+      path.join(sandbox.projectRoot, '.gitignore'),
+      'utf8',
+    );
+    expect(migratedGitignore).toContain('# user-owned rule\ndist/');
+    expect(migratedGitignore).not.toContain('.agents/skills/spec-*/');
+    expect(migratedGitignore).not.toContain('.codex/spec-first/');
 
     for (const relativePath of [
       '.agents/skills/my-team-skill/SKILL.md',
       '.codex/config.toml',
+      '.cursor/mcp.json',
+      '.kiro/settings/mcp.json',
       '.qoder/settings.json',
     ]) {
       const absolutePath = path.join(sandbox.projectRoot, relativePath);
@@ -422,30 +787,7 @@ describe('six-host init lifecycle', () => {
       fs.writeFileSync(absolutePath, 'team-owned\n', 'utf8');
     }
 
-    const status = spawnSync('git', ['status', '--short', '--untracked-files=all'], {
-      cwd: sandbox.projectRoot,
-      encoding: 'utf8',
-    });
-    expect(status.status).toBe(0);
-    const visibleUntrackedPaths = status.stdout
-      .trim()
-      .split('\n')
-      .filter(Boolean)
-      .map((line) => line.slice(3))
-      .sort();
-
-    expect(visibleUntrackedPaths).toEqual([
-      '.agents/skills/my-team-skill/SKILL.md',
-      '.claude/settings.json',
-      '.codex/config.toml',
-      '.gitignore',
-      '.qoder/settings.json',
-      'AGENTS.md',
-      'CHANGELOG.md',
-      'CLAUDE.md',
-    ].sort());
-
-    for (const generatedPath of [
+    for (const visiblePath of [
       '.agents/skills/spec-plan/SKILL.md',
       trackedLegacyRuntime,
       '.claude/spec-first/state.json',
@@ -454,12 +796,121 @@ describe('six-host init lifecycle', () => {
       '.kiro/spec-first/state.json',
       '.qoder/spec-first/state.json',
       '.opencode/spec-first/state.json',
+      '.cursor/mcp.json',
+      '.kiro/settings/mcp.json',
+      '.qoder/settings.json',
     ]) {
-      const ignored = spawnSync('git', ['check-ignore', '-q', '--', generatedPath], {
+      const ignored = spawnSync('git', ['check-ignore', '-q', '--', visiblePath], {
+        cwd: sandbox.projectRoot,
+      });
+      expect(ignored.status).toBe(1);
+    }
+
+    for (const localOnlyPath of [
+      '.claude/tasks/task.json',
+      '.claude/worktrees/runtime.json',
+      '.qoder/settings.local.json',
+      '.spec-first/config.local.yaml',
+      '.spec-first/workflows/run.json',
+      '.codegraph/index.db',
+      'graphify-out/graph.json',
+    ]) {
+      const absolutePath = path.join(sandbox.projectRoot, localOnlyPath);
+      fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+      fs.writeFileSync(absolutePath, 'local-only\n');
+      const ignored = spawnSync('git', ['check-ignore', '-q', '--no-index', '--', localOnlyPath], {
         cwd: sandbox.projectRoot,
       });
       expect(ignored.status).toBe(0);
     }
+  }, 120000);
+
+  test('tracked runtime stays idempotent and clean leaves only reviewable managed deletions', () => {
+    const sandbox = tempSandbox('tracked-runtime-clean');
+    expect(spawnSync('git', ['init', '-q'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+    const initArgs = [
+      'init',
+      '--codex',
+      '-y',
+      '-u',
+      'lifecycle-test',
+      '--lang',
+      'en',
+    ];
+    const firstInit = runSpecFirst(initArgs, sandbox);
+    expect(firstInit.status).toBe(0);
+    expect(spawnSync('git', ['add', '-A'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+    expect(spawnSync('git', [
+      '-c',
+      'user.name=Lifecycle Test',
+      '-c',
+      'user.email=lifecycle@example.invalid',
+      'commit',
+      '-q',
+      '-m',
+      'track codex runtime',
+    ], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+
+    const trackedBefore = spawnSync('git', ['ls-files'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).stdout;
+    const secondInit = runSpecFirst(initArgs, sandbox);
+    expect(secondInit.status).toBe(0);
+    expect(spawnSync('git', ['ls-files'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).stdout).toBe(trackedBefore);
+    expect(spawnSync('git', ['status', '--short'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).stdout).toBe('');
+
+    const customRelativePath = '.agents/skills/spec-company-skill/SKILL.md';
+    const customPath = path.join(sandbox.projectRoot, customRelativePath);
+    fs.mkdirSync(path.dirname(customPath), { recursive: true });
+    fs.writeFileSync(customPath, 'team-owned skill\n');
+    expect(spawnSync('git', ['add', '--', customRelativePath], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+    expect(spawnSync('git', [
+      '-c',
+      'user.name=Lifecycle Test',
+      '-c',
+      'user.email=lifecycle@example.invalid',
+      'commit',
+      '-q',
+      '-m',
+      'track team skill',
+    ], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
+
+    const clean = runSpecFirst(['clean', '--codex'], sandbox);
+    expect(clean.status).toBe(0);
+    const cleanStatus = spawnSync('git', ['status', '--short'], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).stdout;
+    expect(cleanStatus).toContain(' D .codex/spec-first/state.json');
+    expect(cleanStatus).toContain(' D .agents/skills/using-spec-first/SKILL.md');
+    expect(cleanStatus).not.toContain(customRelativePath);
+    expect(fs.readFileSync(customPath, 'utf8')).toBe('team-owned skill\n');
+    expect(spawnSync('git', ['ls-files', '--error-unmatch', '--', customRelativePath], {
+      cwd: sandbox.projectRoot,
+      encoding: 'utf8',
+    }).status).toBe(0);
   }, 120000);
 
   test('doctor reports managed pointer body drift', () => {

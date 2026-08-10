@@ -151,16 +151,11 @@ describe('Qoder runtime lifecycle', () => {
     expect(sessionStart.contents).toContain("'startup-reminder', '--qoder'");
     expect(sessionStart.contents).toContain('const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;');
     expect(sessionStart.contents).toContain('const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;');
-    expect(sessionStart.contents).toContain(JSON.stringify(path.join(
-      __dirname,
-      '..',
-      '..',
-      'bin',
-      'spec-first.js',
-    )));
-    expect(sessionStart.contents).not.toContain(
-      'const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";',
+    expect(sessionStart.contents).toContain(
+      "const SPEC_FIRST_CLI_COMMAND = process.platform === 'win32' ? 'spec-first.cmd' : 'spec-first';",
     );
+    expect(sessionStart.contents).not.toContain('__SPEC_FIRST_CLI_PATH__');
+    expect(sessionStart.contents).not.toContain(path.join(__dirname, '..', '..'));
     expect(sessionStart.contents).toContain('qoder_hook_activation_unverified');
     const readinessGuard = plan.operations.find((operation) =>
       operation.path === '.qoder/hooks/prd-readiness-guard'
@@ -187,8 +182,8 @@ describe('Qoder runtime lifecycle', () => {
     const adapter = new QoderAdapter();
     const plan = adapter.planRuntimeFilesSync(projectRoot);
     const sessionStart = plan.operations.find((operation) => operation.path === '.qoder/hooks/session-start');
-    const bundledCliPath = path.join(__dirname, '..', '..', 'bin', 'spec-first.js');
-    const fakeCliPath = path.join(projectRoot, 'test-bin', 'spec-first.js');
+    const testBin = path.join(projectRoot, 'test-bin');
+    const fakeCliPath = path.join(testBin, 'spec-first.js');
     const hookPath = path.join(projectRoot, '.qoder', 'hooks', 'session-start');
 
     writeText(fakeCliPath, [
@@ -198,20 +193,28 @@ describe('Qoder runtime lifecycle', () => {
       '}, 1300);',
       '',
     ].join('\n'));
-    writeText(
-      hookPath,
-      sessionStart.contents.replace(
-        JSON.stringify(bundledCliPath),
-        () => JSON.stringify(fakeCliPath),
-      ),
-    );
+    if (process.platform === 'win32') {
+      writeText(
+        path.join(testBin, 'spec-first.cmd'),
+        `@"${process.execPath}" "${fakeCliPath}" %*\r\n`,
+      );
+    } else {
+      const executable = path.join(testBin, 'spec-first');
+      writeText(executable, `#!/bin/sh\nexec "${process.execPath}" "${fakeCliPath}" "$@"\n`);
+      fs.chmodSync(executable, 0o755);
+    }
+    writeText(hookPath, sessionStart.contents);
     writeText(path.join(projectRoot, 'AGENTS.md'), `${buildManagedBlock('en')}\n`);
 
     const result = spawnSync(process.execPath, [hookPath], {
       cwd: projectRoot,
       input: JSON.stringify({ cwd: projectRoot }),
       encoding: 'utf8',
-      env: { ...process.env, QODER_PROJECT_DIR: projectRoot },
+      env: {
+        ...process.env,
+        PATH: `${testBin}${path.delimiter}${process.env.PATH || ''}`,
+        QODER_PROJECT_DIR: projectRoot,
+      },
     });
 
     expect(result.status).toBe(0);

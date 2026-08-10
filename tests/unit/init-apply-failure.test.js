@@ -43,7 +43,6 @@ function makeProjectPlan(projectRoot, globalDeveloperWrite, overrides = {}) {
         contents: 'project mutation\n',
       },
     ]),
-    untrackDiagnostic: {},
     globalDeveloperWrite,
     ...overrides,
   };
@@ -322,10 +321,7 @@ describe('init run-level global developer prerequisite', () => {
       diagnostics: [],
     };
 
-    initOutput.printInitApplySuccess(plan, {
-      exit_code: 0,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
-    }, {
+    initOutput.printInitApplySuccess(plan, { exit_code: 0 }, {
       showDiagnostics: false,
       showNextSteps: false,
     });
@@ -353,14 +349,13 @@ describe('init run-level global developer prerequisite', () => {
         agents: [],
         agentSupportFiles: [],
       },
-      writePlan: emptyOperationPlan(),
+      writePlan: platform === 'claude'
+        ? emptyOperationPlan([{ reason: 'managed_gitignore_policy' }])
+        : emptyOperationPlan(),
       changelogCreated: false,
       diagnostics: [],
     }));
-    const results = platforms.map(() => ({
-      exit_code: 0,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
-    }));
+    const results = platforms.map(() => ({ exit_code: 0 }));
 
     initOutput.printInitApplySummaries(plans, results, {
       lang: 'en',
@@ -386,8 +381,9 @@ describe('init run-level global developer prerequisite', () => {
     }
     expect(output.match(/Global developer profile:/g) || []).toHaveLength(1);
     expect(output.match(/User-level language sync:/g) || []).toHaveLength(1);
+    expect(output.match(/selected-host runtime remains Git-visible/g) || []).toHaveLength(1);
+    expect(output).toContain('Git index unchanged');
     expect(output).not.toContain('0 agent');
-    expect(output).not.toContain('No managed runtime paths require untracking');
   });
 
   test('does not label a partial apply as complete and keeps failure evidence', () => {
@@ -404,15 +400,17 @@ describe('init run-level global developer prerequisite', () => {
         internalSkills: [],
         agents: [],
       },
+      writePlan: platform === 'codex'
+        ? emptyOperationPlan([{ reason: 'managed_gitignore_policy' }])
+        : emptyOperationPlan(),
       diagnostics: [],
     }));
 
     initOutput.printInitApplySummaries(plans, [
-      { exit_code: 0, runtime_untrack: { count: 0, reason_code: 'none-tracked' } },
+      { exit_code: 0 },
       {
         exit_code: 1,
         error: 'managed write failed (permission-denied)',
-        runtime_untrack: { count: 0, reason_code: 'none-tracked' },
       },
     ], { lang: 'en' });
 
@@ -421,6 +419,8 @@ describe('init run-level global developer prerequisite', () => {
     expect(output).not.toContain('Init complete:');
     expect(output).toContain('Codex: failed');
     expect(output).toContain('managed write failed (permission-denied)');
+    expect(output).not.toContain('updated .gitignore managed block');
+    expect(output).not.toContain('selected-host runtime remains Git-visible');
   });
 
   test('keeps all-repos reason codes and diagnostics in the compact failure receipt', () => {
@@ -432,7 +432,6 @@ describe('init run-level global developer prerequisite', () => {
     };
     const result = {
       exit_code: 1,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
       workspace_summary: {
         counts: { ready: 1, total: 2 },
         reason_code: 'all-repos-partial-or-action-required',

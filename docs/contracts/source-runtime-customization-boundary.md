@@ -29,7 +29,7 @@ Do not hand-edit these paths as source fixes:
 
 - spec-first generated `.claude/commands/spec*`, `.claude/skills/spec-*`, `.claude/skills/using-spec-first`, `.claude/spec-first/`, `.claude/agents/spec-*`, and fixed spec-first hooks
 - spec-first generated `.codex/commands/spec*`, `.codex/skills/spec-*`, `.codex/skills/using-spec-first`, `.codex/spec-first/`, `.codex/agents/spec-*`, and fixed spec-first hooks
-- `.agents/skills/spec-*/`, `.agents/skills/source-command-spec-*/` (host-generated legacy command-to-skill migration output — spec-first has no generator for this namespace and only shields it via the managed `.gitignore`/runtime-untrack policy), and `.agents/skills/using-spec-first/`
+- `.agents/skills/spec-*/` and `.agents/skills/using-spec-first/`; `.agents/skills/source-command-spec-*/` is historical compatibility output with no current generator, so current init/clean must not infer ownership from that prefix without an exact state entry or explicit legacy allowlist item
 - `.cursor/skills/spec-*/` and `.cursor/skills/using-spec-first/`
 - `.cursor/spec-first/`
 - `.cursor/rules/spec-first.mdc` (generated host-native pointer)
@@ -40,7 +40,7 @@ Do not hand-edit these paths as source fixes:
 - `.kiro/steering/spec-first.md` (generated host-native pointer)
 - spec-first managed `.kiro/settings/`
 - `.qoder/commands/spec-*.md`
-- `.qoder/commands/spec/` (retired legacy namespace)
+- `.qoder/commands/spec/` (retired legacy namespace；cleanup 只处理显式历史文件并保留未知 sibling)
 - `.qoder/skills/spec-*/` and `.qoder/skills/using-spec-first/`
 - `.qoder/agents/spec-*`
 - `.qoder/spec-first/`
@@ -50,7 +50,7 @@ Do not hand-edit these paths as source fixes:
 - spec-first managed `.qoder/hooks/prd-readiness-guard`
 - `.qoder/settings.local.json` (host-local MCP config output; not source truth, and not removed by `spec-first clean --qoder`)
 - `.opencode/commands/spec-*.md`
-- `.opencode/commands/spec/` (retired legacy namespace)
+- `.opencode/commands/spec/` (retired legacy namespace；cleanup 只处理显式历史文件并保留未知 sibling)
 - `.opencode/skills/spec-*/` and `.opencode/skills/using-spec-first/`
 - `.opencode/spec-first/`
 
@@ -64,7 +64,7 @@ Choose the target host when prompted. Run it once per host when Claude Code, Cod
 Choose Cursor explicitly when refreshing Cursor generated-runtime preview assets; Cursor loader discovery/invocation remains degraded until local loader evidence is recorded.
 Choose OpenCode explicitly with `spec-first init --opencode`; it is not part of the `init -y` default host set. OpenCode command/skill loading remains `generated_runtime_preview` until a version-matched real-host journey records loader evidence.
 
-In target repositories, the host roots themselves remain mixed-ownership surfaces. Team-authored skills, agents, rules, and portable project configuration outside the namespaced paths above may be committed when the team chooses to share them; `init` must not blanket-ignore or automatically untrack those user-owned assets. Those files still do not become source for spec-first package behavior, and the spec-first source repository continues to treat its generated runtime mirrors as non-source.
+In target repositories, host roots remain mixed-ownership surfaces. Runtime mirrors generated for the hosts selected in the current `init` run stay Git-visible and are committed with the target project by default as checked-in delivery projections. Generated project runtime must remain location-independent: it must not bake the creator's project root, spec-first installation path, Node executable path, credentials, or other machine-local facts into checked-in hook/config projection. Team-authored skills, agents, rules, and portable project configuration remain user-owned and may also be committed when the team chooses to share them. `init` must not blanket-ignore host roots, infer deletion ownership from a `spec-*` prefix, or mutate Git index membership. Exact managed-state entries, exact managed-slice identity, and explicit legacy allowlist items are the only removal authorities. None of these target-repo projections become source for spec-first package behavior, and the spec-first source repository continues to treat its own generated runtime mirrors as non-source through source-checkout-only ignore rules outside the target managed block.
 
 Use `spec-first doctor --claude|--codex|--cursor|--kiro|--qoder|--opencode` to inspect runtime drift. A drift report is evidence that source and runtime may need reconciliation; it is not permission to patch the mirror directly. `doctor --cursor` and `doctor --opencode` report generated-runtime preview posture and do not prove that the host can discover or invoke generated skills or commands.
 

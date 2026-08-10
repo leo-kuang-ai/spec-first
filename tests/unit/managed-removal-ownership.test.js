@@ -17,6 +17,7 @@ const {
 } = require('../../src/cli/runtime-tools-index');
 const {
   applyOperationPlan,
+  planHardResetManagedAssets,
   planObsoleteManagedAssetRemoval,
 } = require('../../src/cli/state');
 
@@ -318,6 +319,71 @@ describe('retired managed skill upgrade ownership', () => {
       expect(fs.readFileSync(sameNameUserFile, 'utf8')).toBe('keep\n');
     },
   );
+});
+
+describe('managed hard reset ownership', () => {
+  test.each(getSupportedPlatforms())(
+    '%s hard reset removes exact state entries and preserves custom siblings',
+    (platform) => {
+      const projectRoot = tempProjectRoot();
+      const adapter = getAdapter(platform);
+      const state = {
+        manifestVersion: 'test',
+        platform,
+        commands: adapter.hasCommands ? ['spec-work.md'] : [],
+        skills: ['spec-work'],
+        workflowSkills: adapter.workflowsRoot !== adapter.skillsRoot ? ['spec-plan'] : [],
+        agents: adapter.supportsAgents === false ? [] : ['spec-review.md'],
+        agentSupportFiles: [],
+      };
+
+      if (adapter.hasCommands) {
+        writeFile(path.join(projectRoot, adapter.commandRoot, 'spec-work.md'), 'managed\n');
+        writeFile(path.join(projectRoot, adapter.commandRoot, 'spec-company-policy.md'), 'keep\n');
+      }
+      writeFile(path.join(projectRoot, adapter.skillsRoot, 'spec-work', 'SKILL.md'), 'managed\n');
+      writeFile(path.join(projectRoot, adapter.skillsRoot, 'spec-company-skill', 'SKILL.md'), 'keep\n');
+      if (state.workflowSkills.length > 0) {
+        writeFile(path.join(projectRoot, adapter.workflowsRoot, 'spec-plan', 'SKILL.md'), 'managed\n');
+        writeFile(path.join(projectRoot, adapter.workflowsRoot, 'spec-company-workflow', 'SKILL.md'), 'keep\n');
+      }
+      if (state.agents.length > 0) {
+        writeFile(path.join(projectRoot, adapter.agentsRoot, 'spec-review.md'), 'managed\n');
+        writeFile(path.join(projectRoot, adapter.agentsRoot, 'spec-company-agent.md'), 'keep\n');
+      }
+
+      const plan = planHardResetManagedAssets(projectRoot, state, adapter);
+      expect(plan.operations).not.toEqual(expect.arrayContaining([
+        expect.objectContaining({ kind: 'remove_dir', path: adapter.commandRoot }),
+        expect.objectContaining({ kind: 'remove_dir', path: adapter.workflowsRoot }),
+      ]));
+      applyOperationPlan(projectRoot, plan);
+
+      if (adapter.hasCommands) {
+        expect(fs.readFileSync(
+          path.join(projectRoot, adapter.commandRoot, 'spec-company-policy.md'),
+          'utf8',
+        )).toBe('keep\n');
+      }
+      expect(fs.readFileSync(
+        path.join(projectRoot, adapter.skillsRoot, 'spec-company-skill', 'SKILL.md'),
+        'utf8',
+      )).toBe('keep\n');
+      if (state.workflowSkills.length > 0) {
+        expect(fs.readFileSync(
+          path.join(projectRoot, adapter.workflowsRoot, 'spec-company-workflow', 'SKILL.md'),
+          'utf8',
+        )).toBe('keep\n');
+      }
+      if (state.agents.length > 0) {
+        expect(fs.readFileSync(
+          path.join(projectRoot, adapter.agentsRoot, 'spec-company-agent.md'),
+          'utf8',
+        )).toBe('keep\n');
+      }
+    },
+  );
+
 });
 
 describe('codex legacy runtime root removal ownership', () => {

@@ -3,6 +3,7 @@ const path = require('node:path');
 
 const PointerBasedAdapter = require('./pointer-based-adapter');
 const { formatInitGuidance } = require('../init-guidance');
+const { planRetiredCommandNamespaceRemoval } = require('../state');
 const {
   MANAGED_HOOK_DEFINITIONS,
   SETTINGS_RELATIVE_PATH,
@@ -29,8 +30,6 @@ const QODER_POINTER_FRONTMATTER = [
   '---',
 ].join('\n');
 const QODER_HOOK_TEMPLATE_ROOT = path.join(__dirname, '..', '..', '..', 'templates', 'qoder', 'hooks');
-const SESSION_START_CLI_PLACEHOLDER = '__SPEC_FIRST_CLI_PATH__';
-const TRUSTED_SPEC_FIRST_CLI_PATH = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
 const MANAGED_QODER_HOOK_FILES = MANAGED_HOOK_DEFINITIONS.map((definition) => ({
   relativePath: definition.hookPath,
   displayName: definition.displayName,
@@ -223,22 +222,24 @@ class QoderAdapter extends PointerBasedAdapter {
   }
 
   planRuntimeFilesRemoval(projectRoot) {
-    const operations = [{
-      kind: 'remove_dir',
-      path: '.qoder/commands/spec',
-      reason: 'retired_runtime_command_namespace',
-    },
-    ...this.planPointerRuntimeFilesRemoval(projectRoot).operations,
-    ...MANAGED_QODER_HOOK_FILES.map((hook) => ({
-      kind: 'remove_file',
-      path: hook.relativePath.replace(/\\/g, '/'),
-      reason: 'managed_runtime_hook',
-    })),
-    ...buildRenderedQoderSettingsOperations(
+    const retiredCommands = planRetiredCommandNamespaceRemoval(
       projectRoot,
-      renderManagedQoderHooksRemoval(projectRoot),
-      'managed_qoder_hook_settings_cleanup',
-    )];
+      '.qoder/commands/spec',
+    );
+    const operations = [
+      ...retiredCommands.operations,
+      ...this.planPointerRuntimeFilesRemoval(projectRoot).operations,
+      ...MANAGED_QODER_HOOK_FILES.map((hook) => ({
+        kind: 'remove_file',
+        path: hook.relativePath.replace(/\\/g, '/'),
+        reason: 'managed_runtime_hook',
+      })),
+      ...buildRenderedQoderSettingsOperations(
+        projectRoot,
+        renderManagedQoderHooksRemoval(projectRoot),
+        'managed_qoder_hook_settings_cleanup',
+      ),
+    ];
 
     return {
       operations,
@@ -433,11 +434,7 @@ function buildManagedQoderHookWriteOperations(projectRoot) {
 }
 
 function renderSessionStartHookTemplate() {
-  const template = fs.readFileSync(path.join(QODER_HOOK_TEMPLATE_ROOT, 'session-start'), 'utf8');
-  return template.replace(
-    JSON.stringify(SESSION_START_CLI_PLACEHOLDER),
-    () => JSON.stringify(TRUSTED_SPEC_FIRST_CLI_PATH),
-  );
+  return fs.readFileSync(path.join(QODER_HOOK_TEMPLATE_ROOT, 'session-start'), 'utf8');
 }
 
 function buildRenderedQoderSettingsOperations(projectRoot, rendered, reason) {
