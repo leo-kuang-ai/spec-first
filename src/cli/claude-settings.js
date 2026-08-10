@@ -15,21 +15,11 @@ const SPEC_PLAN_COMMAND_NAME = 'spec-plan';
 // managed hooks work on macOS, Linux, and Windows with or without Git Bash. The hook files
 // are Node scripts (see templates/claude/hooks/*).
 //
-// The hook path in args is an ABSOLUTE path baked in at generation time
-// (`path.join(projectRoot, '.claude/hooks/xxx')`), NOT a bare relative path and NOT
-// `$CLAUDE_PROJECT_DIR/.claude/hooks/xxx`. In exec form there is no shell, and Claude Code
-// does NOT variable-expand `$CLAUDE_PROJECT_DIR` inside args — only dedicated path
-// placeholders like `$CLAUDE_PLUGIN_ROOT` are substituted, so a literal `$CLAUDE_PROJECT_DIR`
-// token would reach node verbatim. A bare relative `.claude/hooks/xxx` previously assumed
-// Claude Code always spawns the hook with cwd set to the project root; that assumption broke
-// when Claude Code is launched from a subdirectory of the project (cwd becomes the launch
-// directory, not the git root), which node then resolves the relative arg against ->
-// MODULE_NOT_FOUND. An absolute path needs no cwd assumption and no shell expansion, so it
-// resolves the same way regardless of where Claude Code was launched from. Each hook still
-// reads its own project dir from `CLAUDE_PROJECT_DIR` env / stdin `cwd` / `process.cwd()` for
-// its own logic — only the module-resolution path passed to `node` is now absolute. Moving or
-// renaming the project directory after generation requires `spec-first init` to re-bake the
-// path, same as any other generated-runtime asset.
+// A bare relative hook path breaks when Claude Code is launched from a project subdirectory,
+// while a generated absolute path is not portable enough to commit. The managed exec form
+// therefore uses `node -e <launcher>` and resolves the fixed repo-relative hook path from
+// `CLAUDE_PROJECT_DIR` at runtime, falling back to cwd. No shell or generation-machine path
+// is involved.
 const HOOK_INTERPRETER = 'node';
 const SESSION_START_HOOK_PATH = '.claude/hooks/session-start';
 const SPEC_PLAN_GUARD_HOOK_PATH = '.claude/hooks/spec-plan-guard';
@@ -73,18 +63,20 @@ const REMOVABLE_EXEC_FORM_ARG_PATHS = new Set([
   ...MANAGED_HOOK_ARG_PATHS,
   ...LEGACY_EXEC_FORM_ARG_PATHS,
 ]);
+const PORTABLE_EXEC_FORM_LAUNCHERS = new Set(
+  MANAGED_HOOK_ARG_PATHS.map((hookPath) => buildPortableHookLauncher(hookPath)),
+);
 
-// Current args are an absolute path baked in at generation time (see buildExecFormHook), so
-// exact membership in REMOVABLE_EXEC_FORM_ARG_PATHS only catches the legacy relative/
-// `$CLAUDE_PROJECT_DIR/`-prefixed forms. Detection/removal must also recognize an absolute
-// path whose tail is one of the managed relative paths, regardless of which project root
-// prefix it was baked with (e.g. a stale path left behind after the project directory moved).
-// Backslashes are normalized so this matches Windows-style absolute paths too.
+// Exact membership covers current portable launchers and legacy relative forms. The tail
+// check still recognizes absolute paths left by older installs.
 function argMatchesManagedHookPath(arg) {
   if (typeof arg !== 'string') {
     return false;
   }
   if (REMOVABLE_EXEC_FORM_ARG_PATHS.has(arg)) {
+    return true;
+  }
+  if (PORTABLE_EXEC_FORM_LAUNCHERS.has(arg)) {
     return true;
   }
   const normalized = arg.replace(/\\/g, '/');
@@ -114,18 +106,18 @@ const MANAGED_HOOK_DEFINITIONS = [
   },
 ];
 
-// Exec-form managed hook: `node <projectRoot>/.claude/hooks/<name>`. No shell runs, so this
-// is Windows-safe with or without Git Bash. The single args element is an ABSOLUTE path
-// (project-root-relative hookPath resolved against the projectRoot known at generation time),
-// so module resolution does not depend on the cwd Claude Code happens to spawn the hook with.
-// The hook still derives its own project dir from CLAUDE_PROJECT_DIR env / stdin `cwd` /
-// process.cwd() for its own logic.
-function buildExecFormHook(projectRoot, hookPath) {
+// No shell runs, so this stays Windows-safe with or without Git Bash. The launcher resolves
+// the checked-in hook at invocation time and remains byte-identical across checkout paths.
+function buildExecFormHook(_projectRoot, hookPath) {
   return {
     type: 'command',
     command: HOOK_INTERPRETER,
-    args: [path.join(projectRoot, hookPath)],
+    args: ['-e', buildPortableHookLauncher(hookPath)],
   };
+}
+
+function buildPortableHookLauncher(hookPath) {
+  return `require(require('node:path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), ${JSON.stringify(hookPath)}));`;
 }
 
 function buildManagedSessionStartMatcher(projectRoot) {
@@ -156,11 +148,8 @@ function buildManagedPrdReadinessGuardMatcher(projectRoot) {
   };
 }
 
-// True when any exec-form args element references a managed hook path. Exec form stores the
-// hook path as a plain args string (not the command, which is the `node` interpreter), so
-// detection/removal must scan args in addition to the legacy command string. Args are now an
-// absolute path baked in with `path.join`, which uses `\` on Windows, so backslashes are
-// normalized to `/` before testing against the forward-slash-only MANAGED_HOOK_PATH_PATTERN.
+// Detection scans args in addition to the legacy command string. This covers the current
+// portable launcher and legacy relative/absolute hook paths.
 function execFormArgsReferenceManagedHook(hook) {
   return !!hook
     && Array.isArray(hook.args)
@@ -192,9 +181,7 @@ function isManagedHookForRemoval(hook) {
     return false;
   }
 
-  // Exec form: node + args containing a managed hook path. Matches the current absolute
-  // path form as well as the legacy relative and `$CLAUDE_PROJECT_DIR/`-prefixed paths so a
-  // refresh replaces a broken legacy exec-form hook instead of leaving a duplicate.
+  // Exec form: node + args containing a current or legacy managed hook identity.
   if (hook.command === HOOK_INTERPRETER && Array.isArray(hook.args)) {
     if (hook.args.some((arg) => argMatchesManagedHookPath(arg))) {
       return true;

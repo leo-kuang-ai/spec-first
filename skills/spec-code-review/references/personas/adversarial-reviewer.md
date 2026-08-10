@@ -63,6 +63,8 @@ Find legitimate-seeming usage patterns that cause bad outcomes. These are not se
 
 When the change *is* a guard that stands in for the real thing -- a CI/CD gate, merge-blocking check, build/deploy step, coverage/lint gate, or test harness/mock -- its risk is not blast radius, it is fidelity: it can go green while production is red. Construct the scenario where the guard passes but the thing it protects fails. Verify it reproduces the same context, inputs, and steps as the real thing -- build context, working directory, prepared dirs, environment, and the exact command sequence -- not merely that it runs. A guard that exercises a different context than production, mocks away the code path that actually breaks, or asserts on a proxy rather than the real output is the green-while-red failure. This lens is yours whenever a verification mechanism is in the diff, independent of changed-line count.
 
+还要攻击 required-proof reconciliation 本身：构造 recorded checks 全部通过，但某个 required proof intent 被遗漏、无 owner 地 deferred、由 synthetic command 代替，或绑定 stale source 的 false-green 路径。如果 closeout 仍能报告 `complete` 或 `verified`，应报告具体的 required proof false-green failure，而不是泛化为 coverage concern。
+
 ## Confidence calibration
 
 Use the anchored confidence rubric in the subagent template. Persona-specific guidance:

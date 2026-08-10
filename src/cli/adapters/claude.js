@@ -3,6 +3,7 @@ const path = require('node:path');
 
 const PlatformAdapter = require('./base');
 const { formatInitGuidance } = require('../init-guidance');
+const { planRetiredCommandNamespaceRemoval } = require('../state');
 const { rewriteSourceSkillRuntimePaths } = require('../skill-path-rewrite-markers');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
 const SESSION_START_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'claude', 'hooks', 'session-start');
@@ -13,8 +14,6 @@ const PRD_PREWRITE_GUARD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 
 const PRD_PREWRITE_GUARD_RELATIVE_PATH = '.claude/hooks/prd-prewrite-guard';
 const PRD_READINESS_GUARD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'claude', 'hooks', 'prd-readiness-guard');
 const PRD_READINESS_GUARD_RELATIVE_PATH = '.claude/hooks/prd-readiness-guard';
-const SESSION_START_CLI_PLACEHOLDER = '__SPEC_FIRST_CLI_PATH__';
-const TRUSTED_SPEC_FIRST_CLI_PATH = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
 const MANAGED_HOOK_FILES = [
   {
     relativePath: SESSION_START_RELATIVE_PATH,
@@ -201,13 +200,13 @@ class ClaudeAdapter extends PlatformAdapter {
     };
   }
 
-  planRuntimeFilesRemoval() {
+  planRuntimeFilesRemoval(projectRoot) {
+    const retiredCommands = planRetiredCommandNamespaceRemoval(
+      projectRoot,
+      '.claude/commands/spec',
+    );
     const operations = [
-      {
-        kind: 'remove_dir',
-        path: '.claude/commands/spec',
-        reason: 'retired_runtime_command_namespace',
-      },
+      ...retiredCommands.operations,
       ...MANAGED_HOOK_FILES.map((hook) => ({
         kind: 'remove_file',
         path: hook.relativePath.replace(/\\/g, '/'),
@@ -359,13 +358,7 @@ function inspectManagedHookFile(projectRoot, hook) {
 }
 
 function renderSessionStartHookTemplate() {
-  const template = fs.readFileSync(SESSION_START_TEMPLATE_PATH, 'utf8');
-  // Function replacement: a string replacement would interpret $&/$`/$'/$$/$n in the
-  // baked path (e.g. an install dir containing `$&`), corrupting the generated hook.
-  return template.replace(
-    JSON.stringify(SESSION_START_CLI_PLACEHOLDER),
-    () => JSON.stringify(TRUSTED_SPEC_FIRST_CLI_PATH),
-  );
+  return fs.readFileSync(SESSION_START_TEMPLATE_PATH, 'utf8');
 }
 
 function renderSpecPlanGuardHookTemplate() {

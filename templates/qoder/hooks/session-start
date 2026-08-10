@@ -5,7 +5,7 @@ const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
+const SPEC_FIRST_CLI_COMMAND = process.platform === 'win32' ? 'spec-first.cmd' : 'spec-first';
 const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;
 const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
 const LANG_START = '<!-- spec-first:lang:start -->';
@@ -158,17 +158,14 @@ function parseJsonObject(raw) {
 
 function readStartupReminder(cwd) {
   try {
-    if (!isTrustedSpecFirstCliPath(SPEC_FIRST_CLI_PATH)) {
-      return '';
-    }
-
-    const result = spawnSync(process.execPath, [SPEC_FIRST_CLI_PATH, 'startup-reminder', '--qoder'], {
+    const result = spawnSync(SPEC_FIRST_CLI_COMMAND, ['startup-reminder', '--qoder'], {
       cwd,
       encoding: 'utf8',
       env: {
         ...process.env,
         SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS: String(STARTUP_REMINDER_LOOKUP_TIMEOUT_MS),
       },
+      shell: process.platform === 'win32',
       // 子进程网络超时必须小于 hook 总预算，避免外层先终止而 attempt cooldown 已经落盘。
       timeout: STARTUP_REMINDER_PROCESS_TIMEOUT_MS,
     });
@@ -180,24 +177,6 @@ function readStartupReminder(cwd) {
     return result.stdout.trim();
   } catch {
     return '';
-  }
-}
-
-function isTrustedSpecFirstCliPath(cliPath) {
-  if (
-    typeof cliPath !== 'string'
-    || cliPath.length === 0
-    || cliPath === '__SPEC_FIRST_CLI_PATH__'
-    || !path.isAbsolute(cliPath)
-    || path.basename(cliPath) !== 'spec-first.js'
-  ) {
-    return false;
-  }
-
-  try {
-    return fs.statSync(cliPath).isFile();
-  } catch {
-    return false;
   }
 }
 

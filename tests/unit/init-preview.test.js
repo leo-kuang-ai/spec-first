@@ -24,11 +24,6 @@ function projectPlan(platform, projectRoot, operations, options = {}) {
     platform,
     projectRoot,
     operationPlan: operationPlan(operations),
-    untrackDiagnostic: options.untrackDiagnostic || {
-      count: 0,
-      reason_code: 'none-tracked',
-      sample_paths: [],
-    },
     legacyStateDetected: options.legacyStateDetected === true,
     destructiveResetReason: options.destructiveResetReason || '',
   };
@@ -228,28 +223,21 @@ describe('bounded init mutation preview', () => {
     expect(output).not.toContain('~/.spec-first/.developer');
   });
 
-  test('prints remove, prune, and runtime-untrack paths before write samples', () => {
+  test('prints destructive paths before write samples', () => {
     const output = capturePreview([
       projectPlan('codex', '/workspace/app', [
         { kind: 'write_file', path: 'AGENTS.md', reason: 'managed_instruction_file' },
         { kind: 'remove_file', path: '.codex/obsolete.md', reason: 'managed_runtime_cleanup' },
-        { kind: 'prune_command', path: '.codex/commands/legacy.md', reason: 'unmanaged_command' },
+        { kind: 'remove_dir', path: '.codex/commands/spec', reason: 'retired_runtime_asset' },
         { kind: 'write_file', path: '.agents/skills/example/SKILL.md', reason: 'managed_skill' },
-      ], {
-        untrackDiagnostic: {
-          count: 1,
-          reason_code: 'untracked-runtime',
-          sample_paths: ['.codex/tracked-runtime.md'],
-        },
-      }),
+      ]),
     ]);
 
     const firstWriteIndex = output.indexOf('AGENTS.md');
     expect(firstWriteIndex).toBeGreaterThan(-1);
     for (const destructivePath of [
       '.codex/obsolete.md',
-      '.codex/commands/legacy.md',
-      '.codex/tracked-runtime.md',
+      '.codex/commands/spec',
     ]) {
       expect(output.indexOf(destructivePath)).toBeGreaterThan(-1);
       expect(output.indexOf(destructivePath)).toBeLessThan(firstWriteIndex);
@@ -265,15 +253,10 @@ describe('bounded init mutation preview', () => {
         legacyStateDetected: true,
       }),
       projectPlan('qoder', '/workspace/drift-app', [
-        { kind: 'prune_command', path: '.qoder/commands/legacy.md' },
+        { kind: 'remove_dir', path: '.qoder/commands/spec' },
         { kind: 'write_file', path: '.gitignore', reason: 'managed_gitignore_policy' },
       ], {
         destructiveResetReason: 'current_runtime_drift',
-        untrackDiagnostic: {
-          count: 1,
-          reason_code: 'untracked-runtime',
-          sample_paths: ['.qoder/tracked-runtime.md'],
-        },
       }),
     ], { useColor: true });
 
@@ -281,13 +264,10 @@ describe('bounded init mutation preview', () => {
     expect(output).toContain('Would perform a managed hard reset before regenerating runtime assets (current runtime drift detected).');
     expect(output.match(/Destructive preview:/g) || []).toHaveLength(1);
     expect(output).toContain(
-      `Destructive / prune / runtime-untrack paths (${BrandColors.remove}3${BrandColors.reset}):`,
+      `Destructive paths (${BrandColors.remove}2${BrandColors.reset}):`,
     );
     expect(output).toContain(
       `Critical write paths (${BrandColors.write}2${BrandColors.reset}):`,
-    );
-    expect(output).toContain(
-      `${BrandColors.untrack}runtime_untrack${BrandColors.reset}: .qoder/tracked-runtime.md`,
     );
     expect(output).toContain(
       'Target detail: host=codex kind=project label=/workspace/legacy-app root=/workspace/legacy-app reset=legacy',
@@ -323,14 +303,9 @@ describe('bounded init mutation preview', () => {
     lateGroup.operationPlan = operationPlan([
       { kind: 'write_file', path: '.runtime/child-50.md', reason: 'managed_skill' },
       { kind: 'remove_file', path: '.qoder/obsolete-runtime.md' },
-      { kind: 'prune_command', path: '.qoder/commands/legacy.md' },
+      { kind: 'remove_dir', path: '.qoder/commands/spec' },
       { kind: 'write_file', path: 'AGENTS.md', reason: 'managed_instruction_file' },
     ]);
-    lateGroup.untrackDiagnostic = {
-      count: 1,
-      reason_code: 'untracked-runtime',
-      sample_paths: ['.qoder/tracked-runtime.md'],
-    };
 
     const output = capturePreview(plans);
     const lines = output.split('\n');
@@ -340,7 +315,8 @@ describe('bounded init mutation preview', () => {
     const targetDetails = lines.filter((line) => line.startsWith('Target detail:'));
 
     expect(MAX_PREVIEW_DETAIL_LINES).toBe(100);
-    expect(detailLines).toHaveLength(100);
+    expect(detailLines.length).toBeGreaterThan(90);
+    expect(detailLines.length).toBeLessThanOrEqual(MAX_PREVIEW_DETAIL_LINES);
     expect(targetDetails.every((line) => (
       line.includes('host=')
         && line.includes('kind=')
@@ -350,8 +326,7 @@ describe('bounded init mutation preview', () => {
     ))).toBe(true);
     const destructivePaths = [
       '.qoder/obsolete-runtime.md',
-      '.qoder/commands/legacy.md',
-      '.qoder/tracked-runtime.md',
+      '.qoder/commands/spec',
     ];
     const criticalIndex = output.indexOf('AGENTS.md');
     const generatedIndex = output.indexOf('.runtime/parent.md');

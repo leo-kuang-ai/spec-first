@@ -11,7 +11,11 @@ const {
   rewritePreservingHostComparativeConfigPaths,
 } = require('./host-comparative-config-paths');
 const { isRuntimeSetupSurface } = require('../runtime-setup-identity');
-const { readState, summarizeOperationPlan } = require('../state');
+const {
+  planRetiredCommandNamespaceRemoval,
+  readState,
+  summarizeOperationPlan,
+} = require('../state');
 const {
   parseFrontmatterScalars,
   splitMarkdownFrontmatter,
@@ -170,12 +174,11 @@ class OpenCodeAdapter extends PlatformAdapter {
     return checks;
   }
 
-  planRuntimeFilesRemoval() {
-    const operations = [{
-      kind: 'remove_dir',
-      path: '.opencode/commands/spec',
-      reason: 'retired_runtime_command_namespace',
-    }];
+  planRuntimeFilesRemoval(projectRoot) {
+    const operations = planRetiredCommandNamespaceRemoval(
+      projectRoot,
+      '.opencode/commands/spec',
+    ).operations;
     return {
       operations,
       summary: summarizeOperationPlan(operations),

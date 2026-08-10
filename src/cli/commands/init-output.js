@@ -21,7 +21,6 @@ const {
 } = require('./init-args');
 const { findGitRoot } = require('./init-workspace');
 const { printInitDiagnostics } = require('./init-diagnostics');
-const { buildRuntimeUntrackSummary } = require('./init-result');
 const { mergeStringArrays } = require('./init-project-plan');
 
 const MAX_PREVIEW_PATH_SAMPLES_PER_GROUP = 8;
@@ -30,8 +29,6 @@ const MAX_PREVIEW_DETAIL_LINES = 100;
 const DESTRUCTIVE_OPERATION_ORDER = Object.freeze({
   remove_file: 0,
   remove_dir: 1,
-  prune_command: 2,
-  runtime_untrack: 3,
 });
 
 const CRITICAL_WRITE_REASON_ORDER = Object.freeze({
@@ -175,9 +172,7 @@ function buildInitSummaryPreview(groups) {
 function addDestructiveTotals(groups) {
   return groups.map((group) => ({
     ...group,
-    destructiveTotal: group.destructive.length
-      + Math.max(0, group.runtimeUntrackCount - group.destructive
-        .filter((operation) => operation.kind === 'runtime_untrack').length),
+    destructiveTotal: group.destructive.length,
   }));
 }
 
@@ -288,14 +283,6 @@ function buildInitPreviewGroup({ platform, targetKind, targetLabel, targetRoot, 
     .map((operation) => ({ kind: operation.kind, path: operation.path }))
     .sort((left, right) => DESTRUCTIVE_OPERATION_ORDER[left.kind]
       - DESTRUCTIVE_OPERATION_ORDER[right.kind]);
-  const runtimeUntrack = buildRuntimeUntrackSummary(
-    projectPlan && projectPlan.untrackDiagnostic,
-  );
-  destructive.push(...runtimeUntrack.sample_paths.map((samplePath) => ({
-    kind: 'runtime_untrack',
-    path: samplePath,
-  })));
-
   const writeOperations = operations.filter((operation) => (
     operation.kind === 'write_file' || operation.kind === 'update_file'
   ));
@@ -335,7 +322,6 @@ function buildInitPreviewGroup({ platform, targetKind, targetLabel, targetRoot, 
     generatedSamples,
     generatedTotal,
     resetReason: resolvePreviewResetReason(projectPlan),
-    runtimeUntrackCount: runtimeUntrack.count,
   };
 }
 
@@ -487,9 +473,6 @@ function printBoundedMutationPreview(preview, messages, options = {}) {
 }
 
 function previewOperationColor(kind) {
-  if (kind === 'runtime_untrack') {
-    return BrandColors.untrack;
-  }
   if (Object.prototype.hasOwnProperty.call(DESTRUCTIVE_OPERATION_ORDER, kind)) {
     return BrandColors.remove;
   }
@@ -532,8 +515,6 @@ function printInitApplySummaries(plans, results, options = {}) {
     ? messages.applyRunSummary(readyCount, normalizedPlans.length)
     : messages.applyRunFailureSummary(readyCount, normalizedPlans.length));
 
-  let runtimeUntrackCount = 0;
-  const runtimeUntrackSamples = [];
   for (const [index, plan] of normalizedPlans.entries()) {
     const result = normalizedResults[index] || { exit_code: 1 };
     const status = result.exit_code === 0 ? messages.applyStatusReady : messages.applyStatusFailed;
@@ -543,26 +524,16 @@ function printInitApplySummaries(plans, results, options = {}) {
       status,
       details.join(' · '),
     ));
-    runtimeUntrackCount += Number(result.runtime_untrack && result.runtime_untrack.count) || 0;
-    for (const samplePath of result.runtime_untrack && Array.isArray(result.runtime_untrack.sample_paths)
-      ? result.runtime_untrack.sample_paths
-      : []) {
-      if (runtimeUntrackSamples.length >= 3) {
-        break;
-      }
-      if (runtimeUntrackSamples.includes(samplePath)) {
-        continue;
-      }
-      runtimeUntrackSamples.push(samplePath);
-    }
   }
 
-  const hasGitignoreChange = normalizedPlans.some((plan) => (
-    plan.writePlan && Array.isArray(plan.writePlan.operations)
+  const hasGitignoreChange = normalizedPlans.some((plan, index) => (
+    normalizedResults[index] && normalizedResults[index].exit_code === 0
+      && plan.writePlan && Array.isArray(plan.writePlan.operations)
       && plan.writePlan.operations.some((operation) => operation.reason === 'managed_gitignore_policy')
   ));
   if (hasGitignoreChange) {
     console.log(messages.applyGitignoreCompact);
+    console.log(messages.applyRuntimeGitVisibleCompact);
   }
   if (normalizedPlans.some((plan) => plan.changelogCreated)) {
     console.log(messages.applyChangelogCompact);
@@ -603,13 +574,6 @@ function printInitApplySummaries(plans, results, options = {}) {
       ));
     }
   }
-  if (runtimeUntrackCount > 0) {
-    console.log(messages.applyRuntimeUntrackCompact(runtimeUntrackCount));
-    for (const samplePath of runtimeUntrackSamples) {
-      console.log(messages.applyRuntimeUntrackSample(samplePath));
-    }
-  }
-
   printInitTopologyHandoffs(normalizedPlans, normalizedResults, options.lang || 'zh');
 }
 
@@ -803,9 +767,8 @@ function printInitApplySuccess(plan, result, options = {}) {
     console.log(gitignoreOperation.gitignoreStatus === 'added'
       ? messages.applyGitignoreAdded
       : messages.applyGitignoreUpdated);
+    console.log(messages.applyRuntimeGitVisible);
   }
-  const runtimeUntrack = result.runtime_untrack;
-  printRuntimeUntrackApplySummary(runtimeUntrack, messages);
   if (plan.changelogCreated && !options.suppressChangelogCreated) {
     console.log(messages.applyBootstrappedChangelog);
   }
@@ -1067,7 +1030,6 @@ function printHelp() {
 function printInitDryRun({
   platform,
   plan,
-  untrackDiagnostic,
   legacyStateDetected,
   destructiveResetReason = '',
   maxEntries = Infinity,
@@ -1081,26 +1043,11 @@ function printInitDryRun({
     resolvePreviewResetReason({ legacyStateDetected, destructiveResetReason }),
   ], messages);
 
-  const pruneCount = plan.summary.prune_command || 0;
   const removeCount = (plan.summary.remove_file || 0) + (plan.summary.remove_dir || 0);
   const ensureCount = plan.summary.ensure_dir || 0;
   const writeCount = (plan.summary.write_file || 0) + (plan.summary.update_file || 0);
 
   console.log(messages.previewWouldRemove(formatPreviewCount(removeCount, BrandColors.remove, useColor)));
-  if (pruneCount > 0) {
-    console.log(messages.previewWouldPrune(
-      formatPreviewCount(pruneCount, BrandColors.remove, useColor),
-      previewListSuffix(showPathSamples, lang),
-    ));
-    if (showPathSamples) {
-      printOperationPathSample(
-        plan.operations.filter((entry) => entry.kind === 'prune_command'),
-        maxEntries,
-        { lang },
-      );
-    }
-  }
-
   if (ensureCount > 0) {
     console.log(messages.previewWouldEnsureDir(
       formatPreviewCount(ensureCount, BrandColors.write, useColor),
@@ -1128,7 +1075,6 @@ function printInitDryRun({
       );
     }
   }
-  printRuntimeUntrackDryRunSummary(untrackDiagnostic, { lang, useColor });
   console.log(messages.previewNoFilesChanged);
 }
 
@@ -1156,44 +1102,6 @@ function printOperationPathSample(operations, maxEntries = Infinity, options = {
   }
 }
 
-function printRuntimeUntrackDryRunSummary(untrackDiagnostic = buildRuntimeUntrackSummary(), options = {}) {
-  const lang = options.lang || 'en';
-  const useColor = options.useColor === true;
-  const messages = getInitMessages(lang);
-  const summary = buildRuntimeUntrackSummary(untrackDiagnostic);
-  if (summary.count > 0) {
-    console.log(messages.previewWouldUntrack(formatPreviewCount(summary.count, BrandColors.untrack, useColor)));
-    for (const samplePath of summary.sample_paths) {
-      console.log(`  - ${samplePath}`);
-    }
-    return;
-  }
-
-  if (summary.reason_code === 'none-tracked') {
-    console.log(messages.previewNoRuntimeUntrack);
-    return;
-  }
-
-  console.log(messages.previewRuntimeUntrackCheck(summary.reason_code));
-  if (summary.diagnostic) {
-    console.log(messages.previewRuntimeUntrackDiagnostic(summary.diagnostic));
-  }
-}
-
-function printRuntimeUntrackApplySummary(summary = buildRuntimeUntrackSummary(), messages = getInitMessages('zh')) {
-  if (summary.count > 0) {
-    console.log(messages.applyRuntimeUntracked(summary.count));
-    return;
-  }
-
-  if (summary.reason_code === 'none-tracked') {
-    console.log(messages.applyRuntimeUntrackNone);
-    return;
-  }
-
-  console.log(messages.applyRuntimeUntrackSkipped(summary.reason_code));
-}
-
 module.exports = {
   MAX_PREVIEW_DETAIL_LINES,
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
@@ -1209,8 +1117,6 @@ module.exports = {
   printInitNextStepsForPlatforms,
   printInitPreview,
   printInitPreviews,
-  printRuntimeUntrackApplySummary,
-  printRuntimeUntrackDryRunSummary,
   printUserLanguageProfileOperation,
   printUserLanguageSyncApplySummary,
   printUserLanguageSyncDetails,

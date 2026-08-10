@@ -12,20 +12,17 @@ const {
 const { applyOperationPlan } = require('../state');
 const { resolveEffectiveGlobalDeveloperWrite } = require('./init-developer');
 const { canonicalizeExistingPath } = require('./init-paths');
-const { buildRuntimeUntrackSummary } = require('./init-result');
 
 function applyProjectInitPlan(projectRoot, plan, context = {}) {
   if (Array.isArray(plan.errors) && plan.errors.length > 0) {
     return {
       exit_code: 1,
-      runtime_untrack: buildRuntimeUntrackSummary(plan.untrackDiagnostic),
       globalDeveloperWriteResult: null,
     };
   }
   const prerequisite = ensureGlobalDeveloperPrerequisite([plan], context);
   const normalizedRoot = canonicalizeExistingPath(projectRoot || plan.projectRoot);
 
-  let untrackApplyResult = null;
   if (plan.destructiveResetPlan) {
     const destructiveBackup = createRuntimeRollbackBackup({
       projectRoot: normalizedRoot,
@@ -34,7 +31,7 @@ function applyProjectInitPlan(projectRoot, plan, context = {}) {
     try {
       applyOperationPlan(normalizedRoot, plan.destructiveResetPlan);
       applyOperationPlan(normalizedRoot, plan.preSyncPlan);
-      untrackApplyResult = applyOperationPlan(normalizedRoot, plan.writePlan);
+      applyOperationPlan(normalizedRoot, plan.writePlan);
       removeRuntimeRollbackBackup(destructiveBackup);
     } catch (error) {
       restoreRuntimeRollbackBackup(normalizedRoot, destructiveBackup);
@@ -44,7 +41,7 @@ function applyProjectInitPlan(projectRoot, plan, context = {}) {
   } else {
     try {
       applyOperationPlan(normalizedRoot, plan.preSyncPlan);
-      untrackApplyResult = applyOperationPlan(normalizedRoot, plan.writePlan);
+      applyOperationPlan(normalizedRoot, plan.writePlan);
     } catch (error) {
       throw annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
     }
@@ -52,7 +49,6 @@ function applyProjectInitPlan(projectRoot, plan, context = {}) {
 
   return {
     exit_code: 0,
-    runtime_untrack: buildRuntimeUntrackSummary(plan.untrackDiagnostic, untrackApplyResult),
     globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
   };
 }
@@ -144,7 +140,7 @@ function createRuntimeRollbackBackup({ projectRoot, plans = [] } = {}) {
     if (!plan || !Array.isArray(plan.operations)) continue;
     for (const operation of plan.operations) {
       if (!operation || !operation.path) continue;
-      if (!['remove_file', 'remove_dir', 'prune_command', 'write_file', 'update_file'].includes(operation.kind)) {
+      if (!['remove_file', 'remove_dir', 'write_file', 'update_file'].includes(operation.kind)) {
         continue;
       }
 

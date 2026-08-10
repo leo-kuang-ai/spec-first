@@ -27,6 +27,18 @@ If this reference cannot be read or a required quality/evidence gate cannot run,
 - [Quality Checklist](#quality-checklist)
 - [Code Review](#code-review)
 
+## Required-Proof Reconciliation
+
+Final verification 不只检查已经写入 run summary 的 check 是否绿色，还要回到 source plan / task 的 Verification Contract，对全部 required proof intent 做一次语义对账：
+
+- 每个 required intent 必须对应实际 result、明确 `not applicable` 理由、带 owner/unblock condition 的 `deferred`，或具体 `unbound limitation`；完全遗漏的 required intent 阻断 `complete` 和 `verified`。
+- 记录 evidence authority：`transcribed` 表示 caller 转录 command/result；`provider-confirmed` 需要可验证 provider 或 supervised-process receipt。二者都不得从自然语言声明、非空 command 或 exit code 自动推导。
+- 单独记录 source binding：`source-bound` 需要最终 revision、working-tree fingerprint 或 enclosing artifact identity。source-bound 不等于 provider-confirmed；provider-confirmed 也不等于运行在最后一次 behavior-bearing mutation 之后。
+- 最后一次 implementation、simplify、fixture 或 review-fix mutation 之后，受影响的 required checks 必须 fresh rerun，再完成 reconciliation。
+- 首轮 reconciliation 是 LLM-owned semantic exit gate，不是现有 schema 的 runtime hard enforcement。Scripts 强制 summary/claim 的确定性地板；LLM/人工判断 intent 是否完整、N/A 理由是否成立及 claim ceiling。不得因为 schema 通过就声称全部 required proof 已被机械验证。
+
+在 Completion Response 和 structured closeout limitation 中保存 reconciliation 结论或 missing-intent 列表。Evidence authority 与 source binding 不写入 `verification-run-summary.v1` 的 check 字段：分别由 closeout envelope 的 `claim_limitations`、`verified_worktree_fingerprint`，以及触发持久化时的 enclosing `spec-work-run-artifact/v2` 承载；三者必须引用同一 run-id/source state，不能互相自动推导。未通过对账时，即使已有 checks 全部 passed，也不能声称完成。
+
 ## Phase 3: Quality Check
 
 1. **准备最终验证运行（Prepare Verification Run）**

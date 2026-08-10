@@ -58,7 +58,7 @@ spec-first doctor
 spec-first init --codex -y -u <name> --lang <zh|en>
 ```
 
-`init` 会在写入前预览受管 runtime 文件。多宿主、多仓、dry-run 和预览宿主用法见[完整快速开始指南](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
+`init` 会在写入前预览受管 runtime 文件。本次选中宿主的 skills、agents、commands、hooks、pointer 和 state 默认保持 Git 可见，建议 review 后跟随项目提交，让团队获得相同的宿主投影。`init` 不会自动 stage 或 untrack 文件。多宿主、多仓、dry-run 和预览宿主用法见[完整快速开始指南](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
 
 ### 2. 重启宿主
 
@@ -121,7 +121,7 @@ docs/
   workflows/     条件式验证证据（默认 gitignore）
 ```
 
-持久文档属于项目。宿主 runtime assets 是可丢弃的投射，可以随时通过 `spec-first init` 从 canonical source 重建。
+持久文档属于项目。宿主 runtime assets 是可重建的 delivery projection，不是 canonical source，但默认跟随用户项目提交；行为修改应回到 source，再用 `spec-first init` 刷新投影。
 
 Review findings 通常在会话内返回；code review 的完整协调产物使用 OS 临时目录。只有 workflow 实际执行 targeted commands 或命中持久证据触发条件时，才会在 `.spec-first/workflows/` 写入 repo-local evidence。任何 artifact 只能证明其直接证据覆盖的 claim。
 

@@ -181,6 +181,15 @@ Use these field-level checks before handing a task pack to `spec-work`:
 
 `review_gate` and `review_focus` are review intent. They do not record whether review passed, who approved the task, or whether execution state advanced. The task pack stays a derived execution input; progress and review outcomes live in the work run, git diff, and downstream review handoff.
 
+## Assurance Trace Preservation
+
+当 source plan 声明 high-risk assurance 或 required proof intent 时，优先用现有字段无损投射，不新增平行 task schema：
+
+- `requirement_refs` 保留对应 R/AE/failure anchor；`test_focus` 写明该 task 负责的 proof intent 与行为类别；`done_signal` 写可观察结果；`risk_note` 保存 largest unproven risk、evidence authority/source-binding 限制；`review_gate` / `review_focus` 指定需要检查的 false-green、baseline 或 claim-ceiling 风险。
+- 同一 requirement fan-out 到多个 tasks 时，required proof intent 不得丢失：每个 intent 都必须有明确 owner task，或者在 `stop_if` / `risk_note` 中留下 deferred/unbound limitation。
+- Unbound intent 保持 limitation，不得用占位 command 或 synthetic check 伪装成 task 已具备可执行 verification。
+- Task card 只保留计划语义和验证焦点；`transcribed`、`provider-confirmed`、`source-bound` 与最终 required-proof reconciliation 结果属于 downstream work/review evidence，不在 task pack 中伪造执行状态。
+
 ## Task Pack Review Checklist
 
 When reviewing a task pack, check:

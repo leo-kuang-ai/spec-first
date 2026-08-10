@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { spawnSync } = require('node:child_process');
+const zlib = require('node:zlib');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const fixturePaths = [
@@ -20,6 +20,8 @@ const clarificationCurrentSourcePath =
   'docs/validation/requirements-clarification/2026-07-11-clarification-integration-current-source-evaluation.md';
 const clarificationReplayRoot =
   'docs/validation/requirements-clarification/2026-07-12-unit-replay';
+const clarificationFinalSourceSnapshotPath =
+  `${clarificationReplayRoot}/final-source-snapshot.json`;
 const rubricDimensions = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7'];
 
 function sha256(value) {
@@ -222,34 +224,45 @@ describe('active eval fixture references', () => {
     }
   });
 
-  // Quarantined: resolves a "snapshot commit" via `git log -1 -- <path>`, which
-  // assumes the historical commit stays an ancestor of the checked-out ref. A
-  // squash merge (this repo's ruleset only allows squash/rebase) breaks that
-  // assumption deterministically. See https://github.com/sunrain520/spec-first/issues/35
-  test.skip('requirements clarification replay preserves unit provenance and counted reviewers', () => {
+  test('requirements clarification replay preserves unit provenance and counted reviewers', () => {
     const replayRoot = path.join(repoRoot, clarificationReplayRoot);
     const aggregate = readJson(path.join(replayRoot, 'aggregate.json'));
     const equivalence = readJson(path.join(replayRoot, 'final-equivalence.json'));
-    const finalSourceManifest = readJson(path.join(replayRoot, 'final-source-manifest.json'));
-    const manifestPath = path.join(clarificationReplayRoot, 'final-source-manifest.json');
-    const snapshotCommit = spawnSync(
-      'git',
-      ['log', '-1', '--format=%H', '--', manifestPath],
-      { cwd: repoRoot, encoding: 'utf8' },
-    ).stdout.trim();
+    const finalSourceManifestPath = path.join(replayRoot, 'final-source-manifest.json');
+    const finalSourceManifestBuffer = fs.readFileSync(finalSourceManifestPath);
+    const finalSourceManifest = JSON.parse(finalSourceManifestBuffer.toString('utf8'));
+    const finalSourceSnapshot = readJson(
+      path.join(repoRoot, clarificationFinalSourceSnapshotPath),
+    );
+    const compressedSnapshot = Buffer.from(finalSourceSnapshot.payload_chunks.join(''), 'base64');
+    const snapshotPayloadBuffer = zlib.gunzipSync(compressedSnapshot);
+    const snapshotPayload = JSON.parse(snapshotPayloadBuffer.toString('utf8'));
+    const snapshotFiles = new Map(snapshotPayload.files.map((entry) => [entry.path, entry]));
 
     expect(aggregate.schema).toBe('requirements-clarification-unit-replay-aggregate/v1');
     expect(equivalence).toMatchObject({ checked: 34, mismatches: [] });
+    expect(finalSourceSnapshot).toMatchObject({
+      schema: 'requirements-clarification-final-source-snapshot/v1',
+      encoding: 'gzip+base64-chunks',
+      file_count: 34,
+    });
+    expect(finalSourceSnapshot.payload_chunks.every((chunk) => chunk.length <= 4096)).toBe(true);
+    expect(finalSourceSnapshot.source_revision).toMatch(/^[0-9a-f]{40}$/);
+    expect(sha256(finalSourceManifestBuffer)).toBe(finalSourceSnapshot.source_manifest_sha256);
+    expect(sha256(compressedSnapshot)).toBe(finalSourceSnapshot.compressed_sha256);
+    expect(sha256(snapshotPayloadBuffer)).toBe(finalSourceSnapshot.payload_sha256);
+    expect(snapshotPayload.files).toHaveLength(finalSourceSnapshot.file_count);
+    expect(snapshotFiles.size).toBe(snapshotPayload.files.length);
     expect(finalSourceManifest.files).toHaveLength(34);
     for (const entry of finalSourceManifest.files) {
-      const historical = spawnSync(
-        'git',
-        ['show', `${snapshotCommit}:${entry.path}`],
-        { cwd: repoRoot, encoding: null, maxBuffer: 8 * 1024 * 1024 },
-      );
-      expect(historical.status === 0).toBe(entry.status === 'present');
+      const snapshotEntry = snapshotFiles.get(entry.path);
+      expect(snapshotEntry).toBeDefined();
+      expect(snapshotEntry.status).toBe(entry.status);
       if (entry.status === 'present') {
-        expect(sha256(historical.stdout)).toBe(entry.sha256);
+        expect(typeof snapshotEntry.content).toBe('string');
+        expect(sha256(Buffer.from(snapshotEntry.content, 'utf8'))).toBe(entry.sha256);
+      } else {
+        expect(snapshotEntry).not.toHaveProperty('content');
       }
     }
 

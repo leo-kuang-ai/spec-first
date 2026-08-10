@@ -80,6 +80,17 @@ Proof-first 时，测试和实现不能在同一步同时完成；必须观察�
 - No observed RED means no TDD-history claim。最终 diff 里同时存在实现和绿测，只能证明测试当前通过；只有 run-local evidence 在 production change 前观察到与目标行为对应的失败，才能声称 RED/TDD 历史。
 - 一个 fake/mock 若跳过 serialization、middleware、callback、permission、retry 或 error translation，不能作为真实跨层链路的 integration proof；补最窄真实对象或 integration check。
 
+## Risk-Triggered Proof Strength
+
+只有 named failure mode、invariant 或 load-bearing acceptance 需要更强反证时，才选择以下 proof；不要把它们变成所有任务的固定层级：
+
+- 明确区分 `source mutation` / `behavior-bearing mutation` 与 `mutation testing` / `mutant`。前者属于文件或行为修改授权，后者是向实现注入受控 plausible fault 来验证测试敏感度；不得只写裸 `mutation`。
+- Mutation testing 必须绑定真实 canonical command identity 或可复跑的 bounded runner，并记录 killed、survivor、error 与 equivalent mutant。Survivor 不能静默算 killed；equivalent mutant 必须给出语义理由；runner error、no tests collected 或未实际注入 mutant 不能算有效 mutation evidence。
+- Changed-line coverage 只能说明目标行被执行，不等于行为证明。没有 meaningful assertion、状态结果、错误结果或真实跨层 proof 时，coverage 百分比不能支撑 behavior-verified claim。
+- Pre-existing baseline 必须把既有失败与 task-introduced failure 分开。允许诚实记录旧失败和 zero-new-failure 边界，但不能声称全绿，也不要求顺手修复 unrelated failure。
+- Anti-gaming / false-green 检查要构造“真实行为仍错误、guard 却变绿”的具体路径，例如 vacuous assertion、过度 mock、错误 working directory、未执行真实 mutant 或只检查代理输出。能通过这种攻击的验证机制不能支持对应 claim。
+- Proof intent 未绑定真实 command/provider 时保留为 unbound limitation，不得生成 synthetic check；已绑定但工具缺失时才按 `not-run` / `missing_dependency` 记录。
+
 ## Test Discovery
 
 在修改 implementation file 前：

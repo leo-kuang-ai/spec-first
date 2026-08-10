@@ -102,6 +102,10 @@ describe('OpenCode adapter', () => {
       'legacy managed command\n',
     );
     writeText(
+      path.join(projectRoot, '.opencode', 'commands', 'spec', 'company.md'),
+      'team-owned legacy namespace sibling\n',
+    );
+    writeText(
       path.join(projectRoot, '.opencode', 'commands', 'spec-work.md'),
       'current managed command\n',
     );
@@ -110,20 +114,43 @@ describe('OpenCode adapter', () => {
       'user command\n',
     );
 
-    expect(adapter.planRuntimeFilesRemoval(projectRoot).operations).toEqual(expect.arrayContaining([
+    const runtimeRemoval = adapter.planRuntimeFilesRemoval(projectRoot);
+    expect(runtimeRemoval.operations).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        kind: 'remove_dir',
-        path: '.opencode/commands/spec',
+        kind: 'remove_file',
+        path: '.opencode/commands/spec/work.md',
         reason: 'retired_runtime_command_namespace',
       }),
     ]));
-    expect(planRetiredRuntimeAssetPrune(projectRoot, adapter).operations).toEqual(expect.arrayContaining([
+    expect(runtimeRemoval.operations).not.toEqual(expect.arrayContaining([
       expect.objectContaining({
-        kind: 'remove_dir',
+        kind: expect.stringMatching(/^remove_(?:dir|empty_root)$/),
         path: '.opencode/commands/spec',
+      }),
+    ]));
+
+    const retiredPrune = planRetiredRuntimeAssetPrune(projectRoot, adapter);
+    expect(retiredPrune.operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'remove_file',
+        path: '.opencode/commands/spec/work.md',
         reason: 'retired_runtime_asset',
       }),
     ]));
+    expect(retiredPrune.operations).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: expect.stringMatching(/^remove_(?:dir|empty_root)$/),
+        path: '.opencode/commands/spec',
+      }),
+    ]));
+
+    applyOperationPlan(projectRoot, runtimeRemoval);
+    expect(fs.existsSync(path.join(projectRoot, '.opencode', 'commands', 'spec', 'work.md')))
+      .toBe(false);
+    expect(fs.readFileSync(
+      path.join(projectRoot, '.opencode', 'commands', 'spec', 'company.md'),
+      'utf8',
+    )).toBe('team-owned legacy namespace sibling\n');
 
     const hardReset = planHardResetManagedAssets(projectRoot, {
       manifestVersion: 'test',

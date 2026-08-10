@@ -19,8 +19,8 @@ const { writeVerificationRunSummary } = require('../../src/cli/helpers/verificat
 
 const SCHEMA_PATH = path.join(__dirname, '..', '..', 'docs', 'contracts', 'workflows', 'spec-work-run-artifact.schema.json');
 
-function makeRepo() {
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-work-run-artifact-'));
+function makeRepo(prefix = 'spec-work-run-artifact-') {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   execFileSync('git', ['init', '-q'], { cwd: repo });
   execFileSync('git', ['config', 'user.name', 'Spec First Test'], { cwd: repo });
   execFileSync('git', ['config', 'user.email', 'spec-first-test@example.invalid'], { cwd: repo });
@@ -778,11 +778,10 @@ describe('spec-work run artifact producer', () => {
     }
   });
 
-  // Quarantined: intermittently fails on Linux CI due to mtime-resolution races
-  // when selecting the "latest" artifact. See https://github.com/sunrain520/spec-first/issues/33
-  test.skip('reads the latest artifact when run ids are omitted and specific run ids when provided', () => {
-    const repo = makeRepo();
+  test('reads the latest artifact when run ids are omitted and specific run ids when provided', () => {
+    const repo = makeRepo('spec-work-run-artifact-UPPER-');
     try {
+      const workspaceSlug = slugify(path.basename(repo));
       writeRunSummary(repo, 'run-a');
       writeRunSummary(repo, 'run-b');
       const firstPayloadPath = writePayload(repo, validPayloadForRun(repo, 'run-a', {
@@ -828,6 +827,10 @@ describe('spec-work run artifact producer', () => {
       ]));
       expect(second.code).toBe(0);
 
+      const tiedMtime = new Date('2026-01-01T00:00:00.000Z');
+      fs.utimesSync(path.join(repo, '.spec-first', 'workflows', 'spec-work', workspaceSlug, 'run-a', 'run.json'), tiedMtime, tiedMtime);
+      fs.utimesSync(path.join(repo, '.spec-first', 'workflows', 'spec-work', workspaceSlug, 'run-b', 'run.json'), tiedMtime, tiedMtime);
+
       const readLatest = captureStdout(() => runInternal([
         'spec-work-run-artifact',
         'read',
@@ -847,7 +850,7 @@ describe('spec-work run artifact producer', () => {
         '--target-repo',
         repo,
         '--workspace-slug',
-        path.basename(repo),
+        workspaceSlug,
         '--run-id',
         'run-a',
         '--json',
@@ -944,11 +947,10 @@ describe('spec-work run artifact producer', () => {
     }
   });
 
-  // Quarantined: intermittently fails on Linux CI due to mtime-resolution races
-  // when selecting the "latest" artifact. See https://github.com/sunrain520/spec-first/issues/33
-  test.skip('prunes expired artifacts and preserves active artifacts in dry-run mode', () => {
-    const repo = makeRepo();
+  test('prunes expired artifacts and preserves active artifacts in dry-run mode', () => {
+    const repo = makeRepo('spec-work-run-artifact-UPPER-');
     try {
+      const workspaceSlug = slugify(path.basename(repo));
       writeRunSummary(repo, 'expired-run');
       writeRunSummary(repo, 'active-run');
       const expiredPayload = validPayloadForRun(repo, 'expired-run', {
@@ -1025,8 +1027,8 @@ describe('spec-work run artifact producer', () => {
       expect(prune.code).toBe(0);
       expect(prunePayload.status).toBe('pruned');
       expect(prunePayload.removed.length).toBeGreaterThanOrEqual(1);
-      expect(fs.existsSync(path.join(repo, '.spec-first', 'workflows', 'spec-work', path.basename(repo), 'expired-run', 'run.json'))).toBe(false);
-      expect(fs.existsSync(path.join(repo, '.spec-first', 'workflows', 'spec-work', path.basename(repo), 'active-run', 'run.json'))).toBe(true);
+      expect(fs.existsSync(path.join(repo, '.spec-first', 'workflows', 'spec-work', workspaceSlug, 'expired-run', 'run.json'))).toBe(false);
+      expect(fs.existsSync(path.join(repo, '.spec-first', 'workflows', 'spec-work', workspaceSlug, 'active-run', 'run.json'))).toBe(true);
     } finally {
       fs.rmSync(repo, { recursive: true, force: true });
     }

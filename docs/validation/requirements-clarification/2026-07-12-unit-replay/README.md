@@ -10,6 +10,8 @@
 - 原始 reviewer JSON、presentation order、M1-M7、countermetrics 与 limitations；
 - replay final source 与当前工作树 34 个目标 source 的逐字 equivalence 检查。
 
+`final-source-snapshot.json` 固化这 34 个目标 source 的自包含 UTF-8 内容快照，并以分块的 `gzip+base64` payload、manifest SHA-256、压缩体 SHA-256 与解压后 payload SHA-256 形成可复核绑定。它保留原始 source revision 作为 provenance，但验证不再通过 `git log` / `git show` 读取该 revision；因此 squash/rebase、浅克隆或 topic branch 删除不会破坏 fixture replay。
+
 `aggregate.json` 是消费入口。U2-U5 计数 reviewer 为 A、B、G；Reviewer C 因在单一 session 内错误生成内部三重复数组而不计入 matched-repeat gate，但原始文件保留供审计。U6 首轮 finding 促成 direct-bootstrap authority refinement，最终由 D、E、F 三个新的独立 session 复核。
 
 `U6-after-bundle.json` 保留 refinement 前的第一次 replay 结果；最终计数输入是 `U6-after-refined-bundle.json`，并由 `U6-record.json` 的 `after_bundle_file` 指向。前者用于说明 finding 的来源，不进入最终 U6 gate。

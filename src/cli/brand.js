@@ -2,7 +2,6 @@ const BrandColors = {
   brand: '\x1b[36m',
   write: '\x1b[32m',
   remove: '\x1b[31m',
-  untrack: '\x1b[33m',
   secondary: '\x1b[2m',
   reset: '\x1b[0m',
 };

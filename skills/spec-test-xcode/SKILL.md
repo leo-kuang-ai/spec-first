@@ -43,11 +43,15 @@ and restart your agent.
 
 Do NOT proceed until XcodeBuildMCP is confirmed working.
 
+MCP readiness 只证明 provider 能响应 capability probe；它不证明目标 App 已完成 build、install、launch，或渲染了任何被测 screen。
+
 ### 1. Discover Project and Scheme
 
 Call XcodeBuildMCP's `discover_projs` tool to find available projects, then `list_schemes` with the project path to get available schemes.
 
 If an argument was provided, use that scheme name. If "current", use the default/last-used scheme.
+
+第一次 build 前，记录目标 project/workspace path、scheme、所选 simulator identity，以及当前可获得的最佳 source identity。优先记录 Git revision 与 dirty-state/fingerprint context；目标不是 Git worktree 或无法捕获 fingerprint 时，必须将其保留为显式 source-binding limitation，不得让该字段隐式缺失。
 
 ### 2. Boot Simulator
 
@@ -145,7 +149,7 @@ When a test fails:
    2. Skip - continue testing other screens
    ```
 
-3. **If "Fix now":** investigate, propose a fix, rebuild and retest
+3. **If "Fix now":** investigate, propose a fix, rebuild and retest。发生 behavior-bearing source mutation 后，在下一次 rebuild 前刷新 build-source identity，并以新 identity 取代旧 build identity
 4. **If "Skip":** log as skipped, continue
 
 ### 8. Test Summary
@@ -158,6 +162,13 @@ After all tests complete, present a summary:
 **Project:** [project name]
 **Scheme:** [scheme name]
 **Simulator:** [simulator name]
+**Provider:** XcodeBuildMCP [可用时填写 server/tool identity]
+**Target identity:** [project/workspace path、scheme、simulator UUID、bundle ID]
+**Source binding:** [Git revision 加 clean/dirty state、caller fingerprint，或显式 unavailable limitation]
+**Evidence authority:** [provider-confirmed / transcribed / mixed]
+**Freshness:** [build 开始时间、final tested action 完成时间、最近一次 pre-build identity 与最终 identity 的比较结果]
+**Limitations:** [manual-only flows、skipped screens、missing logs、provider/tool gaps]
+**Claim ceiling:** [observed build/run/screens 能直接支持的精确范围]
 
 ### Build: Success / Failed
 
@@ -182,6 +193,14 @@ After all tests complete, present a summary:
 
 ### Result: [PASS / FAIL / PARTIAL]
 ```
+
+只有真实调用 XcodeBuildMCP tool 并取得返回结果时，才能使用 `provider-confirmed`。人工观察和 caller 提供的 command output 保持为 `transcribed`，除非它们自身带有可验证的 provider/process receipt。
+
+在最后一次 build/retest 以及全部 final tested actions 完成后，重新捕获与最近一次 pre-build identity 同口径的 revision 与 working-tree fingerprint，并比较两者。只有 comparison 一致时，summary 才能标记 `source-bound`；comparison 不一致或无法重新捕获时，必须记录 limitation、禁止 `source-bound`，并将结果降为 `PARTIAL`/degraded。caller 需要最终树证据时，必须对新 identity 重新 build/retest。只有 revision 而没有 dirty-state 或 fingerprint context 属于显式 limitation，不能证明完整 working tree。
+
+`PARTIAL` 必须列出 limitation，不得改写成 `PASS`。Provider readiness、successful build、App launch、screenshot capture、log inspection 与 human verification 是彼此分离的 observations；只能报告实际完成的阶段。
+
+本 Skill 向 caller 返回 bounded evidence，不创建平行的 `EVIDENCE.md` 或 shared evidence artifact。只有存在真实 canonical command identity，且 caller 保留 provider、target、source binding、freshness 与 limitations 时，才能在自己的 run summary 中引用结果；否则将其作为 `verification-run-summary.v1` 之外的 provider evidence，并降低 claim。
 
 ### 9. Cleanup
 

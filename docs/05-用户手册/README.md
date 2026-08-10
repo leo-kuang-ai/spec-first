@@ -4,7 +4,7 @@
 
 `spec-first` 是面向 Claude Code、Codex、Cursor、Kiro 与 Qoder 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。Kiro 与 Qoder 当前都是 opt-in preview 宿主，Cursor 当前是 opt-in generated-runtime preview。
 
-落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files、项目级 `.developer` 和受管状态。
+落到 CLI，它通过 `doctor / init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--cursor|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到各宿主 runtime assets，并同步 workflow skills、agents、agent support files 和受管状态。开发者偏好单独保存在全局 `~/.spec-first/.developer`。
 
 完成 `doctor`、`init` 和宿主重启后，首次进入业务 workflow 前先运行 `spec-runtime-setup`，准备 required harness runtime、MCP/helper readiness 与 setup facts。后续普通 plan/work/debug/review 不需要每次重复 setup，继续使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据；宿主、provider、helper 配置或 setup facts 变化时再重跑。
 
@@ -39,7 +39,7 @@ Plan lifecycle audit 的边界：
 - `completed` 只表示 plan 文件的 lifecycle marker；它不证明 tests、CI、merge、release 或 field outcome 已完成。
 - Internal helper 的 expected-old-status 与 temp-file + rename 不是跨进程 CAS；shipping-tail 单写者是未硬强制的 loud convention。
 
-`init` 支持在交互式引导中选择开发者姓名和语言；`-y` 会使用默认宿主集合和默认身份/语言，显式 `--claude` / `--codex` / `--kiro` / `--qoder` 会覆盖默认宿主集合。如果没有传用户名，它会优先回退到已选宿主的项目级 `.developer`，再回退到全局 `~/.spec-first/.developer` 和 `git config user.name`。
+`init` 支持在交互式引导中选择开发者姓名和语言；`-y` 会使用默认宿主集合和默认身份/语言，显式 `--claude` / `--codex` / `--kiro` / `--qoder` 会覆盖默认宿主集合。如果没有传用户名，它会优先回退到全局 `~/.spec-first/.developer`，再回退到 `git config user.name`。
 
 关于升级：
 
@@ -60,9 +60,9 @@ Plan lifecycle audit 的边界：
 - 项目级 `.claude/commands/spec-*.md`
 - 项目级 `.claude/skills`、`.claude/spec-first/workflows` 与 `.claude/agents`
 - 项目级 `.agents/skills` 与 `.codex/agents`
-- 项目级 `.claude/spec-first/.developer` / `.codex/spec-first/.developer`
+- 全局 `~/.spec-first/.developer` 中的开发者与宿主选择偏好（不跟随项目提交）
 - 严格 schema 的 `.claude/spec-first/state.json` / `.codex/spec-first/state.json`
-- `init` 自动维护的 `.gitignore` spec-first managed block，用于忽略可重建 runtime 和本地 readiness facts
+- `init` 自动维护的 `.gitignore` spec-first managed block，只忽略明确的 host-local scratch/settings、`.spec-first` 本地 facts 与 optional provider artifacts；selected-host generated runtime 默认 Git 可见并跟随项目提交
 - 一份研发场景与降级路径手册，说明 scenario fingerprint、capability matrix、parent orphan quarantine、build-target coverage 和 quality signals 如何帮助 workflow 在单仓、多仓、非 Git folder 与 dirty worktree 场景中选择证据路径
 - 可更新、可恢复、可清理的受管资产模型
 - 一条面向首次使用者的 workflow 走查，说明从一个需求句子到 requirements / plan / task pack 的真实产物链路

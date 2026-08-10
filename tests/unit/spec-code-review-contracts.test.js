@@ -69,6 +69,10 @@ const reliabilityPrompt = fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/references/personas/reliability-reviewer.md'),
   'utf8',
 );
+const adversarialPrompt = fs.readFileSync(
+  path.join(repoRoot, 'skills/spec-code-review/references/personas/adversarial-reviewer.md'),
+  'utf8',
+);
 const reliabilityCapabilityCases = JSON.parse(fs.readFileSync(
   path.join(repoRoot, 'skills/spec-code-review/evals/reliability-capability-cases.json'),
   'utf8',
@@ -196,6 +200,17 @@ describe('spec-code-review current contracts', () => {
     expect(deploymentPrompt).toContain(
       'Every checklist item must name the command or observable signal that proves the step succeeded.',
     );
+  });
+
+  test('existing review personas consume assurance evidence without inventing execution history', () => {
+    expect(testingPrompt).toMatch(/mutation testing.*equivalent mutant.*survivor/is);
+    expect(testingPrompt).toMatch(/changed-line coverage.*does not prove|changed-line coverage.*不等于/is);
+    expect(testingPrompt).toContain('`transcribed`');
+    expect(testingPrompt).toContain('`provider-confirmed`');
+    expect(testingPrompt).toContain('`source-bound`');
+    expect(testingPrompt).toMatch(/required-proof reconciliation.*omitted/is);
+    expect(reliabilityPrompt).toMatch(/pre-existing baseline.*task-introduced/is);
+    expect(adversarialPrompt).toMatch(/false-green.*required proof|required proof.*false-green/is);
   });
 
   test('deployment verification activation mirrors the orchestrator risk gate and cannot self-invoke', () => {

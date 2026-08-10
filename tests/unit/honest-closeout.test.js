@@ -145,6 +145,56 @@ describe('honest closeout contract and validator', () => {
     }
   });
 
+  test('fails closed on a stored run summary with duplicate check ids before id-map lookup', () => {
+    const repo = makeRepo();
+    try {
+      const runId = 'duplicate-check-id';
+      const workspaceSlug = slugify(path.basename(repo));
+      const runSummaryRef = path.join(
+        '.spec-first',
+        'workflows',
+        'spec-work',
+        workspaceSlug,
+        runId,
+        'verification-run-summary.json',
+      );
+      const duplicatePayload = runSummaryPayload(repo, runId, [
+        { id: 'typecheck' },
+        {
+          id: 'typecheck',
+          command: 'npm run test:unit',
+        },
+      ]);
+      writeJson(path.join(repo, runSummaryRef), {
+        schema_version: 'verification-run-summary.v1',
+        generated_at: '2026-08-05T00:00:00.000Z',
+        ...duplicatePayload,
+      });
+
+      const output = validateHonestCloseout({
+        targetRepo: repo,
+        payload: {
+          run_summary_ref: runSummaryRef,
+          claims: [
+            {
+              claim_type: 'validation',
+              asserted_status: 'passed',
+              evidence_refs: ['verification-run-summary:typecheck'],
+            },
+          ],
+        },
+      });
+
+      expect(output.overall).toBe('unsupported');
+      expect(output.claims[0]).toEqual(expect.objectContaining({
+        verdict: 'unsupported',
+        reason_code: 'run-summary-duplicate-check-id',
+      }));
+    } finally {
+      fs.rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
   test('degrades when validation is honestly not-run instead of pretending verified', () => {
     const repo = makeRepo();
     try {

@@ -101,7 +101,6 @@ function readyParentRuntime() {
     overall_status: 'ready',
     reason_code: null,
     diagnostic: '',
-    runtime_untrack: { count: 0 },
   };
 }
 
@@ -114,7 +113,6 @@ function readyChildResult(childRoot) {
     overall_status: 'ready',
     reason_code: null,
     diagnostic: '',
-    runtime_untrack: { count: 0 },
   };
 }
 
@@ -231,7 +229,6 @@ describe('init workspace contract', () => {
         action_required: 0,
         parent_runtime_ready: 1,
         parent_runtime_action_required: 0,
-        runtime_untrack_total: 0,
       }),
     });
     fs.writeFileSync(summaryPath, `${JSON.stringify(legacyPayload, null, 2)}\n`);
@@ -352,7 +349,7 @@ describe('init workspace contract', () => {
     expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace'))).toBe(false);
   });
 
-  test('unsafe summary path preserves run-level result shape and parent runtime-untrack evidence', () => {
+  test('unsafe summary path preserves the run-level result shape', () => {
     const { workspaceRoot, childRoot } = createWorkspace();
     const outsideRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-summary-escape-'));
     tempRoots.push(outsideRoot);
@@ -362,12 +359,6 @@ describe('init workspace contract', () => {
       process.platform === 'win32' ? 'junction' : 'dir',
     );
     const plan = buildCodexWorkspacePlan(workspaceRoot, childRoot, { dryRun: false });
-    plan.parentPlan.untrackDiagnostic = {
-      count: 2,
-      reason_code: 'untracked-runtime',
-      sample_paths: ['.codex/tracked-a', '.codex/tracked-b'],
-      diagnostic: 'parent-specific runtime-untrack evidence',
-    };
     const resolvedPath = path.join(workspaceRoot, 'home', '.spec-first', '.developer');
     const writer = jest.fn();
 
@@ -380,12 +371,6 @@ describe('init workspace contract', () => {
     expect(result).toMatchObject({
       exit_code: 1,
       workspace_summary_paths: [],
-      runtime_untrack: {
-        count: 0,
-        reason_code: 'none-tracked',
-        sample_paths: ['.codex/tracked-a', '.codex/tracked-b'],
-        diagnostic: 'parent-specific runtime-untrack evidence',
-      },
       globalDeveloperWriteResult: {
         action: 'create',
         status: 'applied',
@@ -393,9 +378,6 @@ describe('init workspace contract', () => {
       },
       error: 'workspace init summary path is unsafe (workspace-summary-symlink-escape)',
     });
-    expect(result.runtime_untrack).toEqual(
-      result.workspace_summary.parent_host_runtime.runtime_untrack,
-    );
     expect(writer).toHaveBeenCalledTimes(1);
     expect(fs.readdirSync(outsideRoot)).toEqual([]);
   });
@@ -442,10 +424,7 @@ describe('init workspace contract', () => {
       gitRootTopology: 'multi-repo-workspace',
       platform: 'codex',
       projectRoot: workspaceRoot,
-    }], [{
-      exit_code: 0,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
-    }], { lang: 'en' });
+    }], [{ exit_code: 0 }], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
     expect(output).toContain('Child repo projections: pending (not covered by this init).');
@@ -481,10 +460,7 @@ describe('init workspace contract', () => {
       gitRootTopology: 'single-repo',
       platform: 'codex',
       projectRoot: childRoot,
-    }], [{
-      exit_code: 0,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
-    }], { lang: 'en' });
+    }], [{ exit_code: 0 }], { lang: 'en' });
 
     const output = logSpy.mock.calls.flat().join('\n');
     expect(output).not.toContain('Child repo projections:');
@@ -501,7 +477,6 @@ describe('init workspace contract', () => {
       workspaceRoot,
     }], [{
       exit_code: 0,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
       workspace_summary: buildWorkspaceInitSummary({
         workspaceRoot,
         plan: buildCodexWorkspacePlan(workspaceRoot, childRoot),
@@ -526,7 +501,6 @@ describe('init workspace contract', () => {
       workspaceRoot,
     }], [{
       exit_code: 1,
-      runtime_untrack: { count: 0, reason_code: 'none-tracked' },
       workspace_summary: buildWorkspaceInitSummary({
         workspaceRoot,
         plan: buildCodexWorkspacePlan(workspaceRoot, childRoot),

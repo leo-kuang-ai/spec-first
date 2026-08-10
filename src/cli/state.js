@@ -1,7 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { writeFileAtomic } = require('./atomic-write');
-const runtimeUntrack = require('./runtime-untrack');
 
 const REQUIRED_MANAGED_STATE_ARRAY_FIELDS = [
   'commands',
@@ -34,15 +33,49 @@ const WINDOWS_RESERVED_PATH_NAMES = new Set([
   'LPT8',
   'LPT9',
 ]);
-const RETIRED_UNMANAGED_COMMAND_FILES = new Set();
 const RETIRED_STANDARDS_SKILL = ['spec', 'standards'].join('-');
+const RETIRED_COMMAND_FILENAMES = [
+  'app-consistency-audit.md',
+  'bootstrap.md',
+  'brainstorm.md',
+  'code-review.md',
+  'compound-refresh.md',
+  'compound.md',
+  'debug.md',
+  'doc-review.md',
+  'dogfood.md',
+  'graph-bootstrap.md',
+  'ideate.md',
+  'mcp-setup.md',
+  'optimize.md',
+  'plan.md',
+  'polish-beta.md',
+  'polish.md',
+  'pr-description.md',
+  'prd.md',
+  'release-notes.md',
+  'review.md',
+  'runtime-setup.md',
+  'sessions.md',
+  'setup.md',
+  'skill-audit.md',
+  'slack-research.md',
+  'standards.md',
+  'update.md',
+  'work-beta.md',
+  'work.md',
+  'write-skill.md',
+];
+const RETIRED_COMMAND_NAMESPACE_ROOTS = {
+  claude: '.claude/commands/spec',
+  qoder: '.qoder/commands/spec',
+  opencode: '.opencode/commands/spec',
+};
 const RETIRED_COMMON_RUNTIME_ASSET_PATHS = [
   { kind: 'remove_dir', path: '.spec-first/standards' },
 ];
 const RETIRED_RUNTIME_ASSET_PATHS = {
   claude: [
-    { kind: 'remove_dir', path: '.claude/commands/spec' },
-    { kind: 'remove_file', path: '.claude/commands/spec/standards.md' },
     { kind: 'remove_dir', path: `.claude/spec-first/workflows/${RETIRED_STANDARDS_SKILL}` },
     { kind: 'remove_dir', path: `.claude/skills/${RETIRED_STANDARDS_SKILL}` },
   ],
@@ -50,17 +83,7 @@ const RETIRED_RUNTIME_ASSET_PATHS = {
     { kind: 'remove_dir', path: `.agents/skills/${RETIRED_STANDARDS_SKILL}` },
     { kind: 'remove_file', path: '.codex/commands/spec/standards.md' },
   ],
-  qoder: [
-    { kind: 'remove_dir', path: '.qoder/commands/spec' },
-  ],
-  opencode: [
-    { kind: 'remove_dir', path: '.opencode/commands/spec' },
-  ],
 };
-
-function isSpecFirstManagedCommandFile(fileName) {
-  return /^spec-[A-Za-z0-9-]+\.md$/.test(fileName);
-}
 
 function getStateFilePath(projectRoot, adapter) {
   return path.join(projectRoot, adapter.stateFile);
@@ -361,34 +384,7 @@ function removeManagedAssets(projectRoot, managedState, adapter) {
 }
 
 function planHardResetManagedAssets(projectRoot, managedState, adapter) {
-  const operations = [...planManagedAssetRemoval(projectRoot, managedState, adapter).operations];
-
-  if (adapter.hasCommands && adapter.commandRootIsDedicated !== false) {
-    operations.push(
-      buildOperation(
-        'remove_dir',
-        path.join(projectRoot, adapter.commandRoot),
-        projectRoot,
-        'managed_command_root_reset',
-      ),
-    );
-  }
-
-  if (adapter.workflowsRoot !== adapter.skillsRoot) {
-    operations.push(
-      buildOperation(
-        'remove_dir',
-        path.join(projectRoot, adapter.workflowsRoot),
-        projectRoot,
-        'managed_workflow_root_reset',
-      ),
-    );
-  }
-
-  return {
-    operations,
-    summary: summarizeOperations(operations),
-  };
+  return planManagedAssetRemoval(projectRoot, managedState, adapter);
 }
 
 function hardResetManagedAssets(projectRoot, managedState, adapter) {
@@ -496,49 +492,48 @@ function planRetiredRuntimeAssetPrune(projectRoot, adapter) {
     );
   }
 
+  const retiredCommandRoot = RETIRED_COMMAND_NAMESPACE_ROOTS[adapter.id];
+  if (retiredCommandRoot) {
+    operations.push(...planRetiredCommandNamespaceRemoval(
+      projectRoot,
+      retiredCommandRoot,
+      'retired_runtime_asset',
+    ).operations);
+  }
+
   return {
     operations,
     summary: summarizeOperations(operations),
   };
 }
 
-function planCommandNamespacePrune(projectRoot, managedCommandFiles, adapter) {
-  const commandDir = path.join(projectRoot, adapter.commandRoot);
-  if (!fs.existsSync(commandDir)) {
-    return buildEmptyOperationPlan();
-  }
-
+function planRetiredCommandNamespaceRemoval(
+  projectRoot,
+  namespaceRoot,
+  reason = 'retired_runtime_command_namespace',
+) {
   const operations = [];
-  const allowed = new Set(normalizeStringArray(managedCommandFiles));
-  for (const entry of fs.readdirSync(commandDir, { withFileTypes: true })) {
-    if (!entry.isFile()) {
+  const removableEntries = new Set();
+  for (const filename of RETIRED_COMMAND_FILENAMES) {
+    const absolutePath = path.join(projectRoot, namespaceRoot, filename);
+    if (!fs.existsSync(absolutePath) || !fs.lstatSync(absolutePath).isFile()) {
       continue;
     }
+    operations.push(buildOperation('remove_file', absolutePath, projectRoot, reason));
+    removableEntries.add(filename);
+  }
 
-    if (!isSpecFirstManagedCommandFile(entry.name)) {
-      continue;
-    }
-
-    if (!allowed.has(entry.name) && !RETIRED_UNMANAGED_COMMAND_FILES.has(entry.name)) {
-      operations.push(
-        buildOperation(
-          'prune_command',
-          path.join(commandDir, entry.name),
-          projectRoot,
-          'namespace_not_managed',
-        ),
-      );
-    }
+  const absoluteRoot = path.join(projectRoot, namespaceRoot);
+  const rootBecomesEmpty = fs.existsSync(absoluteRoot)
+    && fs.readdirSync(absoluteRoot).every((entry) => removableEntries.has(entry));
+  if (rootBecomesEmpty) {
+    operations.push(buildOperation('remove_empty_root', absoluteRoot, projectRoot, reason));
   }
 
   return {
     operations,
     summary: summarizeOperations(operations),
   };
-}
-
-function pruneCommandNamespace(projectRoot, managedCommandFiles, adapter) {
-  applyOperationPlan(projectRoot, planCommandNamespacePrune(projectRoot, managedCommandFiles, adapter));
 }
 
 function planEmptyManagedRootCleanup(projectRoot, adapter) {
@@ -581,7 +576,6 @@ function applyOperationPlan(projectRoot, plan) {
   }
 
   const projectRootReal = fs.realpathSync.native(path.resolve(projectRoot));
-  const untrackResults = [];
   for (const operation of plan.operations) {
     const targetPath = resolveOperationTarget(projectRoot, operation);
     assertOperationTargetContained(projectRootReal, targetPath, operation);
@@ -598,7 +592,7 @@ function applyOperationPlan(projectRoot, plan) {
       continue;
     }
 
-    if (operation.kind === 'remove_file' || operation.kind === 'prune_command') {
+    if (operation.kind === 'remove_file') {
       removeFile(targetPath, projectRoot);
       continue;
     }
@@ -613,34 +607,9 @@ function applyOperationPlan(projectRoot, plan) {
       continue;
     }
 
-    if (operation.kind === 'untrack_index') {
-      untrackResults.push(runtimeUntrack.applyOne({ projectRoot, operation }));
-    }
   }
 
-  return {
-    runtime_untrack: summarizeRuntimeUntrackResults(untrackResults),
-    untrack_results: untrackResults,
-  };
-}
-
-function summarizeRuntimeUntrackResults(results) {
-  const appliedCount = results.filter((result) => result.applied).length;
-  const skippedCount = results.length - appliedCount;
-  const reasonCodes = [...new Set(results.map((result) => result.reason_code).filter(Boolean))]
-    .sort((left, right) => left.localeCompare(right));
-  const diagnostic = results
-    .map((result) => result.diagnostic)
-    .filter(Boolean)
-    .join('\n');
-
-  return {
-    applied_count: appliedCount,
-    skipped_count: skippedCount,
-    reason_codes: reasonCodes,
-    reason_code: appliedCount > 0 ? 'untracked-runtime' : (reasonCodes[0] || 'none-tracked'),
-    diagnostic,
-  };
+  return {};
 }
 
 function ensureDirectory(directoryPath) {
@@ -666,7 +635,7 @@ function resolveOperationTarget(projectRoot, operation) {
   }
   if (
     targetPath === projectRootResolved &&
-    ['remove_file', 'remove_dir', 'remove_empty_root', 'prune_command', 'untrack_index'].includes(operation.kind)
+    ['remove_file', 'remove_dir', 'remove_empty_root'].includes(operation.kind)
   ) {
     throw new Error(`Unsafe operation path targets project root: ${operation.path}`);
   }
@@ -757,13 +726,12 @@ module.exports = {
   isLegacyManagedState,
   mergeOperationPlans,
   normalizeOperationPath,
-  planCommandNamespacePrune,
   planEmptyManagedRootCleanup,
   planHardResetManagedAssets,
   planManagedAssetRemoval,
   planObsoleteManagedAssetRemoval,
+  planRetiredCommandNamespaceRemoval,
   planRetiredRuntimeAssetPrune,
-  pruneCommandNamespace,
   readStateFileRaw,
   readState,
   removeManagedAssets,

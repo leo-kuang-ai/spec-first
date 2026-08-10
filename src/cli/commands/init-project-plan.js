@@ -22,7 +22,6 @@ const {
   buildState,
   isLegacyManagedState,
   mergeOperationPlans,
-  planCommandNamespacePrune,
   planHardResetManagedAssets,
   planObsoleteManagedAssetRemoval,
   planRetiredRuntimeAssetPrune,
@@ -30,7 +29,6 @@ const {
   readStateFileRaw,
   summarizeOperationPlan,
 } = require('../state');
-const { planRuntimeUntrack } = require('../runtime-untrack');
 const { detectGlobalCodexHookPollution } = require('../adapters/codex');
 const { applyManagedBlock, buildManagedBlock } = require('../lang-policy');
 const { removeManagedCodingGuidelinesBlock } = require('../coding-guidelines');
@@ -57,7 +55,6 @@ const {
   resolveGlobalDeveloperWriteAction,
 } = require('./init-developer');
 const { canonicalizeExistingPath } = require('./init-paths');
-const { buildRuntimeUntrackSummary } = require('./init-result');
 
 function buildProjectInitPlan({
   projectRoot,
@@ -266,7 +263,6 @@ function buildProjectInitPlan({
 
   const preSyncPlan = mergeOperationPlans(
     planObsoleteManagedAssetRemoval(normalizedRoot, previousState, previewState, adapter),
-    planCommandNamespacePrune(normalizedRoot, previewState.commands, adapter),
     planRetiredRuntimeAssetPrune(normalizedRoot, adapter),
     planLegacyDeveloperProfileCleanup(normalizedRoot),
   );
@@ -281,7 +277,7 @@ function buildProjectInitPlan({
     gitRootTopology,
   });
 
-  const operationPlan = mergeOperationPlans(destructiveResetPlan, preSyncPlan, initWritePlan.plan);
+  const operationPlan = mergeOperationPlans(destructiveResetPlan, preSyncPlan, initWritePlan);
   const globalDeveloperWrite = resolveGlobalDeveloperWriteAction(developer, {
     explicitName: !!user || !!name,
     explicitLang: !!lang,
@@ -303,9 +299,8 @@ function buildProjectInitPlan({
     destructiveResetReason,
     legacyStateDetected,
     preSyncPlan,
-    writePlan: initWritePlan.plan,
+    writePlan: initWritePlan,
     operationPlan,
-    untrackDiagnostic: initWritePlan.untrackDiagnostic,
     syncedAssets: assetSync.syncedAssets,
     changelogCreated: !fs.existsSync(path.join(normalizedRoot, 'CHANGELOG.md')),
     diagnostics,
@@ -343,7 +338,6 @@ function buildErroredProjectInitPlan({
     preSyncPlan: emptyPlan,
     writePlan: emptyPlan,
     operationPlan: emptyPlan,
-    untrackDiagnostic: buildRuntimeUntrackSummary(),
     syncedAssets: {
       commands: [],
       skills: [],
@@ -470,18 +464,12 @@ function buildInitWritePlan({
   runtimePlan,
   gitRootTopology = 'single-repo',
 }) {
-  const untrackPlan = buildInitUntrackPlan(projectRoot);
-  const plan = mergeOperationPlans(
+  return mergeOperationPlans(
     assetPlan,
     runtimePlan || buildInitRuntimePreviewPlan(projectRoot, adapter),
     buildInitGitignorePlan(projectRoot),
     buildInitMetadataPlan({ projectRoot, adapter, developer, nextState, platform, gitRootTopology }),
-    untrackPlan.plan,
   );
-  return {
-    plan,
-    untrackDiagnostic: untrackPlan.diagnostic,
-  };
 }
 
 function buildInitRuntimePreviewPlan(projectRoot, adapter) {
@@ -513,23 +501,6 @@ function buildInitGitignorePlan(projectRoot) {
   return {
     operations: [operation],
     summary: summarizeOperationPlan([operation]),
-  };
-}
-
-function buildInitUntrackPlan(projectRoot) {
-  const diagnostic = planRuntimeUntrack({ projectRoot });
-  const plan = {
-    operations: diagnostic.operations,
-    summary: summarizeOperationPlan(diagnostic.operations),
-  };
-  return {
-    plan,
-    diagnostic: {
-      count: diagnostic.count,
-      reason_code: diagnostic.reason_code,
-      sample_paths: diagnostic.sample_paths,
-      diagnostic: diagnostic.diagnostic,
-    },
   };
 }
 
@@ -612,7 +583,6 @@ function buildPlanFileOperation(projectRoot, relativePath, contents, reason) {
 module.exports = {
   buildInitWritePlan,
   buildProjectInitPlan,
-  buildRuntimeUntrackSummary,
   findDuplicateClaudeAgentNames,
   inspectCurrentRuntimeDrift,
   mergeStringArrays,

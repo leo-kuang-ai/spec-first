@@ -19,7 +19,7 @@ const {
   ensureGlobalDeveloperPrerequisite,
 } = require('./init-apply');
 const { buildProjectInitPlan } = require('./init-project-plan');
-const { buildRuntimeUntrackSummary, normalizeProjectInitResult } = require('./init-result');
+const { normalizeProjectInitResult } = require('./init-result');
 
 // 物理写入事实与 child authority 分开表达，不能由路径位置推断 canonical/setup/readiness truth。
 const PARENT_ARTIFACT_AUTHORITY = Object.freeze({
@@ -211,7 +211,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
       exit_code: 1,
       workspace_summary: null,
       workspace_summary_paths: [],
-      runtime_untrack: buildRuntimeUntrackSummary(),
       globalDeveloperWriteResult: null,
     };
   }
@@ -228,7 +227,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
     overall_status: 'ready',
     reason_code: null,
     diagnostic: '',
-    runtime_untrack: buildRuntimeUntrackSummary(),
   };
 
   try {
@@ -242,7 +240,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
       overall_status: parentResult.exit_code === 0 ? 'ready' : 'action-required',
       reason_code: parentResult.exit_code === 0 ? null : 'parent-runtime-init-failed',
       diagnostic: collectPlanErrorMessages(plan.parentPlan),
-      runtime_untrack: parentResult.runtime_untrack,
     };
   } catch (error) {
     parentRuntime = {
@@ -250,7 +247,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
       overall_status: 'action-required',
       reason_code: 'parent-runtime-init-exception',
       diagnostic: error instanceof Error ? error.message : String(error),
-      runtime_untrack: buildRuntimeUntrackSummary(),
     };
   }
 
@@ -271,7 +267,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
         overall_status: projectResult.exit_code === 0 ? 'ready' : 'action-required',
         reason_code: projectResult.exit_code === 0 ? null : 'init-failed',
         diagnostic: collectPlanErrorMessages(entry.plan),
-        runtime_untrack: projectResult.runtime_untrack,
       });
     } catch (error) {
       results.push({
@@ -282,7 +277,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
         overall_status: 'action-required',
         reason_code: 'init-exception',
         diagnostic: error instanceof Error ? error.message : String(error),
-        runtime_untrack: buildRuntimeUntrackSummary(),
       });
     }
   }
@@ -301,7 +295,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
         exit_code: 1,
         workspace_summary: summary,
         workspace_summary_paths: [],
-        runtime_untrack: parentRuntime.runtime_untrack,
         globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
         error: `workspace init summary path is unsafe (${writeResult.reason_code})`,
       };
@@ -315,7 +308,6 @@ function applyWorkspaceInitPlan(workspaceRoot, plan, context = {}) {
     exit_code: actionRequiredCount === 0 ? 0 : 1,
     workspace_summary: summary,
     workspace_summary_paths: summary.workspace_summary_paths || [],
-    runtime_untrack: parentRuntime.runtime_untrack,
     globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
   };
 }
@@ -362,11 +354,6 @@ function buildWorkspaceInitSummary({
       action_required: childActionRequiredCount,
       parent_runtime_ready: parentRuntime.overall_status === 'ready' ? 1 : 0,
       parent_runtime_action_required: parentActionRequiredCount,
-      runtime_untrack_total: results.reduce((total, result) => (
-        total + (result.runtime_untrack && Number.isFinite(result.runtime_untrack.count)
-          ? result.runtime_untrack.count
-          : 0)
-      ), 0),
     },
     overall_status: overallStatus,
     reason_code: actionRequiredCount === 0 ? null : 'all-repos-partial-or-action-required',
@@ -507,7 +494,6 @@ function buildWorkspaceInitSummaryIndex({
   const childActionRequired = entries.reduce((total, entry) => total + entry.counts.action_required, 0);
   const parentRuntimeReady = entries.reduce((total, entry) => total + entry.counts.parent_runtime_ready, 0);
   const parentRuntimeActionRequired = entries.reduce((total, entry) => total + entry.counts.parent_runtime_action_required, 0);
-  const runtimeUntrackTotal = entries.reduce((total, entry) => total + entry.counts.runtime_untrack_total, 0);
 
   return {
     schema_version: 'workspace-init-summary-index.v1',
@@ -533,7 +519,6 @@ function buildWorkspaceInitSummaryIndex({
       action_required: childActionRequired,
       parent_runtime_ready: parentRuntimeReady,
       parent_runtime_action_required: parentRuntimeActionRequired,
-      runtime_untrack_total: runtimeUntrackTotal,
     },
     overall_status: actionRequiredCount === 0
       ? 'ready'
@@ -602,7 +587,6 @@ function buildWorkspaceInitPlatformEntry(summary, summaryRelativePath) {
       action_required: numberOrZero(counts.action_required),
       parent_runtime_ready: numberOrZero(counts.parent_runtime_ready),
       parent_runtime_action_required: numberOrZero(counts.parent_runtime_action_required),
-      runtime_untrack_total: numberOrZero(counts.runtime_untrack_total),
     },
   };
 }

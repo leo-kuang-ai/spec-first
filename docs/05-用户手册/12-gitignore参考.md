@@ -1,17 +1,19 @@
 # spec-first `.gitignore` 参考
 
-本文面向把 `spec-first` 安装到业务项目里的用户，说明在执行 `spec-first init` 和 `spec-runtime-setup` 后，哪些产物应该加入 `.gitignore`，哪些产物可以按团队协作需要提交。
+本文面向把 `spec-first` 安装到业务项目里的用户，说明在执行 `spec-first init` 和 `spec-runtime-setup` 后，哪些产物应该加入 `.gitignore`，哪些产物应跟随项目提交。
 
 从 `v1.7.0` 起，`spec-first init` 会在当前目标项目的 `.gitignore` 中自动写入或更新一个 `# spec-first:start` / `# spec-first:end` managed block。交互式 init 会在确认前预览这次写入；取消时不会改变文件系统。团队仍然应该 review 并提交 `.gitignore`，让后续成员获得相同忽略规则。
 
 核心原则：
 
-- 各宿主目录中的 `spec-*`、`using-spec-first`、Graphify project skill、`spec-first/` state、`spec-*` command、明确的 spec-first hook 与 pointer 文件可重建，不作为项目 source truth；同目录下的团队自定义 skill、agent、rule 或宿主配置不因位于宿主目录就自动视为 runtime。
-- `.agents/skills/source-command-spec-*/` 是历史 Codex 投射曾使用的 spec-first 命令源兼容 runtime 命名；当前已退役，但仍作为可重建的清理命名空间保留在 policy 中。`init` 默认忽略并对已跟踪的该命名空间执行递归 untrack。
-- `.cursor/mcp.json` 是 Cursor project MCP 配置落点；`.kiro/settings/` 是 Kiro workspace MCP 配置落点；`.qoder/settings.local.json` 是 Qoder local MCP 配置落点；`.qoder/settings.json` 中 spec-first managed hook entries 是 managed slice 而非整文件 ownership。它们默认按本地配置忽略，但如果内容可移植、不含密钥且团队明确需要共享，可以在 managed block 后用 negation 规则重新纳入 Git；`init` 不会自动解除这些 team-policy 文件的已有跟踪状态。
-- `.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 和 `.qoder/rules/**` 是宿主原生或用户维护 artifact，不属于 spec-first generated runtime mirror。三个固定 pointer `.cursor/rules/spec-first.mdc`、`.kiro/steering/spec-first.md`、`.qoder/rules/spec-first.md` 除外，它们由 `init` 生成并默认忽略。
+- 用户在本次 `init` 选择的宿主 runtime，包括 skills、agents、commands、hooks、pointer 和 state，默认保持 Git 可见并跟随项目提交。它们虽是 generated mirror，但是团队共用 spec-first 的宿主可执行投影。
+- checked-in projection 不应固定生成机器的项目路径、spec-first 安装路径或 Node 路径。Claude/Codex/Qoder 的 SessionStart projection 在运行时从宿主项目环境解析 hook，并从 `PATH` 查找 `spec-first` 以执行可选版本提醒；找不到 CLI 时只跳过提醒，不影响入口治理注入。团队成员仍应先按安装步骤提供可用的 `spec-first` CLI。
+- selected host 只决定本次生成、刷新、检查或清理哪个宿主；`init` 不维护一套额外的“已选宿主 Git 状态”，也不执行 `git rm --cached` 或其他 Git index mutation。
+- 各宿主目录中的团队自定义 skill、agent、rule 或宿主配置始终保持用户 ownership。`init` / `clean` 只按 managed state 精确条目、adapter 明确的 managed slice 与显式 legacy allowlist 处理 spec-first 资产，不按共享 root 或 `spec-*` 前缀批量删除。
+- `.cursor/mcp.json` 是 Cursor project MCP 配置落点，`.kiro/settings/` 是 Kiro workspace MCP 配置落点，`opencode.json` / `opencode.jsonc` 承载 OpenCode 受管 entries。它们不再由 `init` 强制忽略，是否提交由团队根据可移植性与密钥策略决定。`.qoder/settings.local.json` 仍是明确的本地配置，默认忽略。
+- `.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 和 `.qoder/rules/**` 是宿主原生或用户维护 artifact；由 `init` 生成的固定 pointer 也保持 Git 可见，便于团队共享同一宿主入口。
 - `.spec-first/config/` 和 `.spec-first/workspace/` 是本地 setup/control-plane facts，默认不提交。
-- `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated runtime mirrors 也不应作为普通 LLM 上下文扫描源；只有 setup/update/runtime-drift/audit/governance evidence 任务或用户明确点名路径时才按需读取。
+- `.spec-first/audits/**`、`.spec-first/governance/**` 不应作为普通 LLM 上下文扫描源；只有 setup/update/runtime-drift/audit/governance evidence 任务或用户明确点名路径时才按需读取。
 - `.spec-first/sessions/` 是 multi-actor 治理协议的 opt-in advisory 记录目录，由 `spec-first session register` 等命令写入；属于 runtime state，默认不提交。
 - `.codegraph/` 是 CodeGraph 项目级 SQLite 索引，默认不提交。
 - `graphify-out/` 是 Graphify Provider 原生默认的项目图谱运行时目录，默认不提交；`spec-first init` 会忽略整个目录。
@@ -38,68 +40,10 @@ Graphify 上游推荐用 `graphify hook install` 安装提交自动刷新，但�
 
 ```gitignore
 # spec-first:start
-# spec-first generated runtime assets
-.claude/commands/spec/
-.claude/commands/spec-*.md
-.claude/skills/spec-*/
-.claude/skills/using-spec-first/
-.claude/skills/graphify/
-.claude/spec-first/
-.claude/agents/spec-*
-.claude/hooks/session-start
-.claude/hooks/spec-plan-guard
-.claude/hooks/prd-prewrite-guard
-.claude/hooks/prd-readiness-guard
+# host-local scratch and settings
 .claude/tasks/
 .claude/worktrees/
-.codex/commands/spec/
-.codex/commands/spec-*.md
-.codex/skills/spec-*/
-.codex/skills/using-spec-first/
-.codex/skills/graphify/
-.codex/spec-first/
-.codex/agents/spec-*
-.codex/hooks/session-start
-.codex/hooks/session-start.cmd
-.codex/hooks.json
-.agents/skills/spec-*/
-.agents/skills/source-command-spec-*/
-.agents/skills/using-spec-first/
-.agents/skills/graphify/
-.cursor/skills/spec-*/
-.cursor/skills/using-spec-first/
-.cursor/spec-first/
-.cursor/mcp.json
-.cursor/rules/spec-first.mdc
-.kiro/commands/spec/
-.kiro/commands/spec-*.md
-.kiro/skills/spec-*/
-.kiro/skills/using-spec-first/
-.kiro/skills/graphify/
-.kiro/agents/spec-*
-.kiro/spec-first/
-.kiro/settings/
-.kiro/steering/spec-first.md
-.qoder/commands/spec/
-.qoder/commands/spec-*.md
-.qoder/skills/spec-*/
-.qoder/skills/using-spec-first/
-.qoder/skills/graphify/
-.qoder/agents/spec-*
-.qoder/spec-first/
-.qoder/hooks/session-start
-.qoder/hooks/prd-prewrite-guard
-.qoder/hooks/prd-readiness-guard
-.qoder/rules/spec-first.md
 .qoder/settings.local.json
-.opencode/commands/spec/
-.opencode/commands/spec-*.md
-.opencode/skills/spec-*/
-.opencode/skills/using-spec-first/
-.opencode/skills/graphify/
-.opencode/agents/spec-*
-.opencode/spec-first/
-.context/spec-first/
 
 # spec-first local setup and workflow runtime artifacts
 .spec-first/*.local.yaml
@@ -123,17 +67,15 @@ graphify-out/
 
 如果项目里已经有同类规则，`init` 仍会保留 spec-first managed block，保证后续版本可以幂等更新。它不会尝试判断所有语义等价的 glob，也不会删除 block 外的用户规则。若 marker 缺失、重复或顺序错误，`init` 会停止并要求先修复 `.gitignore`，不会猜测替换范围。
 
-`init` 的 runtime untrack 只覆盖可明确识别且整项归 spec-first 所有的命名空间与本地运行状态。默认忽略但可能按团队策略提交的 MCP config、Graphify artifact，以及位于 host-user-owned surface 的 pointer / Qoder hook managed slice，不会被自动执行 `git rm --cached`。
+`init` 只写文件，不执行 `git rm --cached`、`git add` 或其他 Git index mutation。从旧版 managed block 升级时，旧的 generated runtime ignore 规则会被移除，对应文件自然重新出现在 `git status`；团队 review 后正常提交即可。
 
-如果你的项目明确把整个 `.agents/skills/` 都视为本地生成资产，也可以在 managed block 外自行简化成：
+如果你的项目明确不共享宿主 runtime，可以在 managed block 外自行添加项目策略，例如：
 
 ```gitignore
 .agents/
 ```
 
-如果项目里已经用 `.agents/skills/`、`.agents/plugins/` 或其他 `.agents/` 内容承载团队自定义资产，不要忽略整个 `.agents/` 或 `.agents/skills/`；默认 managed block 只忽略 spec-first 与 Graphify 的已知生成项。
-
-`spec-*` 与 `using-spec-first` 是 spec-first runtime 的保留命名空间。团队自定义 skill/agent 应使用其他名称，避免被后续 `init` 识别为可重建 runtime。
+这是团队自己的 Git 策略，`init` 不会生成该规则。如果项目里已经用 `.agents/skills/`、`.agents/plugins/` 或其他 `.agents/` 内容承载团队自定义资产，不要忽略整个 `.agents/` 或 `.agents/skills/`。
 
 ## 执行后常见产物树
 
@@ -144,61 +86,70 @@ graphify-out/
   .gitignore                        # 建议提交
 
   .claude/
-    commands/spec-*.md              # spec-* workflow runtime mirror，忽略
-    commands/spec/                  # legacy command namespace，init/clean 会清理
-    skills/spec-*/ using-spec-first/ # spec-first generated runtime，忽略
+    commands/spec-*.md              # selected-host workflow runtime mirror，默认提交
+    commands/spec/                  # legacy namespace；只清理已知旧命令，保留团队 sibling
+    skills/spec-*/ using-spec-first/ # selected-host generated runtime，默认提交
     skills/<team-skill>/            # 团队自定义 skill，可提交
-    spec-first/                     # runtime state/profile，忽略
-    agents/spec-*                   # spec-first generated agent，忽略
+    spec-first/                     # selected-host state，默认提交
+    agents/spec-*                   # selected-host generated agent，默认提交
     agents/<team-agent>             # 团队自定义 agent，可提交
-    hooks/session-start             # generated runtime hook，忽略
-    hooks/prd-prewrite-guard        # generated runtime hook，忽略
-    hooks/prd-readiness-guard        # generated runtime hook，忽略
+    hooks/session-start             # selected-host generated hook，默认提交
+    hooks/prd-prewrite-guard        # selected-host generated hook，默认提交
+    hooks/prd-readiness-guard       # selected-host generated hook，默认提交
     tasks/ worktrees/               # host-local scratch，忽略
 
   .codex/
-    commands/spec/                  # legacy cleanup/runtime path，忽略
-    spec-first/                     # runtime state/profile，忽略
-    agents/spec-*                   # spec-first generated runtime，忽略
-    hooks.json hooks/               # Codex host/runtime hook config，忽略
+    commands/spec/                  # legacy cleanup path，不按前缀扩大 ownership
+    spec-first/                     # selected-host state，默认提交
+    agents/spec-*                   # selected-host generated runtime，默认提交
+    hooks.json hooks/               # Codex host/runtime hook config，默认提交
     config.toml                     # 团队/用户配置，是否提交按团队策略
 
   .agents/
-    skills/spec-*/ using-spec-first/ # Codex skill runtime mirror，忽略
+    skills/spec-*/ using-spec-first/ # Codex skill runtime mirror，默认提交
     skills/<team-skill>/            # 团队自定义 skill，可提交
 
   .cursor/
-    skills/spec-*/ using-spec-first/ # Cursor workflow runtime mirror，忽略
+    skills/spec-*/ using-spec-first/ # Cursor workflow runtime mirror，默认提交
     skills/<team-skill>/            # 团队自定义 skill，可提交
-    spec-first/                     # spec-first state/profile，忽略
-    mcp.json                        # Cursor project MCP config，忽略；clean 保留整文件
+    spec-first/                     # selected-host state，默认提交
+    mcp.json                        # Cursor project MCP config，是否提交按团队策略
     rules/                          # Cursor-native rules，是否提交按团队策略
     agents/                         # Cursor-native/user agents，是否提交按团队策略
 
   .kiro/
-    skills/spec-*/ using-spec-first/ # Kiro workflow runtime mirror，忽略
+    skills/spec-*/ using-spec-first/ # Kiro workflow runtime mirror，默认提交
     skills/<team-skill>/            # 团队自定义 skill，可提交
-    agents/spec-*                   # spec-first subagent runtime mirror，忽略
+    agents/spec-*                   # spec-first subagent runtime mirror，默认提交
     agents/<team-agent>             # 团队自定义 agent，可提交
-    spec-first/                     # spec-first state/profile，忽略
-    settings/                       # spec-first MCP workspace config，忽略
-    steering/spec-first.md          # generated pointer，忽略
+    spec-first/                     # selected-host state，默认提交
+    settings/                       # Kiro MCP workspace config，是否提交按团队策略
+    steering/spec-first.md          # generated pointer，默认提交
     specs/                          # Kiro-native specs，是否提交按团队策略
 
   .qoder/
-    commands/spec-*.md              # Qoder spec-* workflow runtime file mirror，忽略
-    commands/spec/                  # legacy command namespace，init/clean 会清理
-    skills/spec-*/ using-spec-first/ # Qoder project skill runtime mirror，忽略
+    commands/spec-*.md              # Qoder spec-* workflow runtime file mirror，默认提交
+    commands/spec/                  # legacy namespace；init/clean 只清理已知旧命令
+    skills/spec-*/ using-spec-first/ # Qoder project skill runtime mirror，默认提交
     skills/<team-skill>/            # 团队自定义 skill，可提交
-    agents/spec-*                   # spec-first subagent runtime mirror，忽略
+    agents/spec-*                   # spec-first subagent runtime mirror，默认提交
     agents/<team-agent>             # 团队自定义 agent，可提交
-    spec-first/                     # spec-first state/profile，忽略
-    hooks/session-start             # spec-first managed hook script，忽略
-    hooks/prd-prewrite-guard        # spec-first managed hook script，忽略
-    hooks/prd-readiness-guard       # spec-first managed hook script，忽略
+    spec-first/                     # selected-host state，默认提交
+    hooks/session-start             # spec-first managed hook script，默认提交
+    hooks/prd-prewrite-guard        # spec-first managed hook script，默认提交
+    hooks/prd-readiness-guard       # spec-first managed hook script，默认提交
     settings.local.json             # Qoder local MCP config，忽略；clean 保留整文件
-    rules/spec-first.md             # generated pointer，忽略
+    rules/spec-first.md             # generated pointer，默认提交
     rules/<team-rule>.md            # Qoder-native rule，是否提交按团队策略
+
+  .opencode/
+    commands/spec-*.md              # OpenCode workflow runtime mirror，默认提交
+    commands/spec/                  # legacy namespace；只清理已知旧命令，保留团队 sibling
+    skills/spec-*/ using-spec-first/ # OpenCode skill runtime mirror，默认提交
+    skills/<team-skill>/            # 团队自定义 skill，可提交
+    spec-first/                     # selected-host state，默认提交
+
+  opencode.json / opencode.jsonc    # OpenCode project config，是否提交按团队策略
 
   .spec-first/
     config.local.example.yaml       # 本地配置模板，可提交
@@ -228,6 +179,8 @@ graphify-out/
 
 ```
 
+`.claude/commands/spec/`、`.qoder/commands/spec/` 与 `.opencode/commands/spec/` 是已退役 namespace。`init` / `clean` 只删除显式列入兼容清单的历史 spec-first command 文件，并仅在目录实际为空时清理目录；未知文件与团队自定义 sibling 不会因整目录删除而丢失。
+
 ## 需要提交的内容
 
 通常应该提交：
@@ -237,20 +190,23 @@ graphify-out/
 | `.gitignore` | 让团队统一忽略本地 runtime/control-plane 产物 |
 | `AGENTS.md` | Codex 入口文档，包含项目级 workflow 入口治理和语言策略 |
 | `CLAUDE.md` | Claude Code 入口文档，包含项目级 workflow 入口治理和语言策略 |
+| 本次 selected host 的 generated skills / agents / commands / hooks / pointer / state | 这是团队共同使用 spec-first 的宿主可执行投影；默认 Git 可见，可由 `init` 幂等刷新 |
 | `.spec-first/config.local.example.yaml` | 本地配置模板，不包含个人密钥时可作为 onboarding 模板提交 |
 | `docs/brainstorms/`、`docs/plans/`、`docs/tasks/`、`docs/solutions/` | durable workflow artifacts 和工程知识 |
 | `.spec-first/specs/repo-profile.yaml` | 如果团队明确使用它承载 confirmed project profile，应作为项目知识 source 提交 |
-`AGENTS.md` 和 `CLAUDE.md` 是 checked-in host entry docs，不等同于 `.agents/skills/`、`.codex/agents/` 或 `.claude/skills/` 里的 runtime mirror。
+
+`AGENTS.md` 和 `CLAUDE.md` 是 checked-in host entry docs；`.agents/skills/`、`.codex/agents/` 或 `.claude/skills/` 中由 `init` 投射的 runtime mirror 虽不是 canonical source，但同样默认跟随用户项目提交。要修改 runtime 行为，仍应修改 spec-first source 后重新 `init`，不应手改 mirror。
 
 ## 按团队策略决定的内容
 
 | 路径 | 建议 |
 | --- | --- |
 | `.claude/settings.json` | Claude Code 项目配置；`init --claude` 会写入 spec-first 受管 hook matchers。团队希望共享 Claude hooks、permissions 或 MCP 配置时可提交；仅个人使用的配置应放到 `.claude/settings.local.json` 并在 managed block 外自行忽略。 |
-| 各宿主的自定义 `skills/<team-skill>/`、`agents/<team-agent>` | 团队维护且需要跨人复用时应提交；`init` 默认只忽略 `spec-*`、`using-spec-first` 和 Graphify 等已知生成项。 |
+| 各宿主的自定义 `skills/<team-skill>/`、`agents/<team-agent>` | 团队维护且需要跨人复用时应提交；`init` 不为它们写入 ignore 规则。 |
 | `.cursor/rules/**`、`.cursor/agents/**`、未知 `.cursor/**` | Cursor-native 团队规则、用户 agent 或宿主文件；是否提交按 Cursor/团队策略决定，spec-first P0 只管理 `.cursor/skills/**`、`.cursor/spec-first/**` 和 `.cursor/mcp.json`。 |
 | `.qoder/rules/**`、`.qoder/settings.json`、未知 `.qoder/hooks/**` | Qoder-native 团队规则、用户级配置或 hooks；是否提交按 Qoder/团队策略决定。`.qoder/hooks/session-start`、`.qoder/hooks/prd-prewrite-guard`、`.qoder/hooks/prd-readiness-guard` 三个 spec-first managed hook scripts 除外。 |
-| `.cursor/mcp.json`、`.kiro/settings/`、`.qoder/settings.local.json` | 默认本地忽略；仅当配置使用可移植命令/环境变量引用、不含密钥且团队需要统一 provider 配置时，通过 block 后的 negation 规则选择性提交。 |
+| `.cursor/mcp.json`、`.kiro/settings/`、`opencode.json` / `opencode.jsonc` | `init` 不强制忽略；使用可移植命令/环境变量引用且不含密钥时通常可提交，否则由团队自行忽略或拆分本地配置。 |
+| `.qoder/settings.local.json` | 明确的 host-local 配置，已在 managed block 中默认忽略。 |
 | `graphify-out/cache/`、`graphify-out/graph.html`、`graphify-out/.graphify_labels.json` | Graphify Provider runtime/cache 输出，默认随整个 `graphify-out/` 忽略。 |
 | `.graphify/**` | spec-first 旧版适配 artifact，默认继续忽略；运行 `spec-runtime-setup --only graphify` 将唯一旧 root 原子迁移为 `graphify-out/`。 |
 
@@ -260,15 +216,7 @@ graphify-out/
 
 | 路径 | 原因 |
 | --- | --- |
-| `.claude/commands/spec-*.md`、`.claude/commands/spec/`、`.claude/skills/spec-*/`、`.claude/skills/using-spec-first/`、`.claude/spec-first/`、`.claude/agents/spec-*` | `spec-first init` 可重建的 runtime assets；团队自定义 skill/agent 不在此列 |
 | `.claude/tasks/`、`.claude/worktrees/` | Claude Code host-local scratch/worktree 产物 |
-| `.codex/commands/spec*`、`.codex/spec-first/`、`.codex/skills/spec-*/`、`.codex/skills/using-spec-first/`、`.codex/agents/spec-*`、spec-first hooks | Codex spec-first runtime assets；`.codex/config.toml` 等非 spec-first 配置不再被整目录忽略 |
-| `.agents/skills/spec-*/`、`.agents/skills/using-spec-first/` | Codex skill runtime mirror；团队自定义 `.agents/skills/<team-skill>/` 可按策略提交 |
-| `.cursor/skills/spec-*/`、`.cursor/skills/using-spec-first/`、`.cursor/spec-first/`、`.cursor/rules/spec-first.mdc` | Cursor preview spec-first-managed runtime mirror、state 与 generated pointer，可由 `init --cursor` 重建 |
-| `.cursor/mcp.json` | Cursor project MCP config output，默认忽略且不是 source；`spec-first clean --cursor` 保留整文件，server entry 由 `spec-runtime-setup` setup/uninstall 管理 |
-| `.kiro/skills/spec-*/`、`.kiro/skills/using-spec-first/`、`.kiro/agents/spec-*`、`.kiro/spec-first/`、`.kiro/steering/spec-first.md` | Kiro spec-first-managed runtime mirror、state 与 generated pointer；团队自定义 skill/agent 不在此列 |
-| `.kiro/settings/` | Kiro MCP workspace config，默认本地忽略；需要团队共享时仅提交可移植且无密钥的配置 |
-| `.qoder/commands/spec-*.md`、`.qoder/commands/spec/`、`.qoder/skills/spec-*/`、`.qoder/skills/using-spec-first/`、`.qoder/agents/spec-*`、`.qoder/spec-first/`、`.qoder/rules/spec-first.md`、三个 spec-first hook | Qoder spec-first-managed runtime mirror、pointer、hook scripts 与 state，可由 `init` 重建 |
 | `.qoder/settings.local.json` | Qoder local MCP config output，默认忽略且不是 source；`spec-first clean --qoder` 保留整文件，server entry 由 `spec-runtime-setup` setup/uninstall 管理 |
 | `.spec-first/config.local.yaml`、`.spec-first/*.local.yaml` | 本地配置，可能包含个人路径或私有设置 |
 | `.spec-first/config/*.json` | `spec-runtime-setup` 生成的 setup-owned 本地投影，不是第二个版本源 |
@@ -297,18 +245,23 @@ graphify-out/
 
 ```gitignore
 .claude/
+.codex/
 .agents/
 .spec-first/
 .cursor/
+.kiro/
 .qoder/
+.opencode/
 ```
 
 原因：
 
-- 整个 `.claude/` 可能会隐藏团队有意提交的项目设置、hook 或非 spec-first 配置；`.codex/` 是当前默认例外，Codex host/runtime config 与 spec-first Codex runtime mirror 都按本地可重建资产处理。
+- 整个 `.claude/` 或 `.codex/` 可能会隐藏团队有意提交的项目设置、hook、selected-host runtime 或非 spec-first 配置。
 - 整个 `.agents/` 可能会隐藏团队自定义 plugins 或 marketplace 配置。
 - 整个 `.spec-first/` 会隐藏 `.spec-first/config.local.example.yaml`、`.spec-first/specs/repo-profile.yaml` 和团队可能选择提交的其他 source 文件。
-- 整个 `.cursor/` 可能会隐藏团队有意维护的 Cursor rules、agents 或其它 host-native 文件；默认只忽略 spec-first managed Cursor preview runtime 和 project MCP config。
-- 整个 `.qoder/` 可能会隐藏团队有意维护的 Qoder rules、settings 或 hooks；默认只忽略 spec-first managed Qoder runtime。
+- 整个 `.cursor/` 可能会隐藏团队需要共享的 selected-host skills、state、pointer、Cursor rules、agents 或其它 host-native 文件。
+- 整个 `.kiro/` 可能会隐藏团队需要共享的 selected-host skills、agents、state、steering pointer 或 workspace 配置。
+- 整个 `.qoder/` 可能会隐藏团队需要共享的 selected-host commands、skills、agents、hooks、rules 或 settings。
+- 整个 `.opencode/` 可能会隐藏团队需要共享的 selected-host commands、skills 与 state。
 
-默认推荐是忽略 spec-first 可重建 runtime、Codex host runtime root 和本地 facts，同时保留明确 source 路径的提交决策空间。
+默认推荐是提交本次 `init` 生成的 selected-host runtime，只忽略明确的 host-local scratch/settings、`.spec-first` 本地 facts 与 optional provider artifacts。
