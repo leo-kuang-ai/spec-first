@@ -1103,7 +1103,11 @@ function resolveRunArtifactPath(targetRepoRoot, { workspaceSlug = '', runId = ''
         if (safeArtifact.reason_code === 'artifact-path-escape') return safeArtifact;
         continue;
       }
-      if (!latest || safeArtifact.mtimeMs > latest.mtimeMs) {
+      if (
+        !latest
+        || safeArtifact.mtimeMs > latest.mtimeMs
+        || (safeArtifact.mtimeMs === latest.mtimeMs && safeArtifact.relativePath > latest.relativePath)
+      ) {
         latest = {
           path: safeArtifact.path,
           relativePath: safeArtifact.relativePath,
