@@ -106,6 +106,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "overrides": {
+    "js-yaml": "3.15.1"
+  },
   "devDependencies": {
     "jest": "^29.0.0"
   }
