@@ -8,7 +8,8 @@
             "type": "command",
             "command": "node",
             "args": [
-              "/Users/kuang/xiaobu/spec-first/.claude/hooks/session-start"
+              "-e",
+              "require(require('node:path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), \".claude/hooks/session-start\"));"
             ]
           }
         ]
@@ -22,7 +23,8 @@
             "type": "command",
             "command": "node",
             "args": [
-              "/Users/kuang/xiaobu/spec-first/.claude/hooks/spec-plan-guard"
+              "-e",
+              "require(require('node:path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), \".claude/hooks/spec-plan-guard\"));"
             ]
           }
         ]
@@ -36,7 +38,8 @@
             "type": "command",
             "command": "node",
             "args": [
-              "/Users/kuang/xiaobu/spec-first/.claude/hooks/prd-prewrite-guard"
+              "-e",
+              "require(require('node:path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), \".claude/hooks/prd-prewrite-guard\"));"
             ]
           }
         ]
@@ -50,7 +53,8 @@
             "type": "command",
             "command": "node",
             "args": [
-              "/Users/kuang/xiaobu/spec-first/.claude/hooks/prd-readiness-guard"
+              "-e",
+              "require(require('node:path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), \".claude/hooks/prd-readiness-guard\"));"
             ]
           }
         ]
