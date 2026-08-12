@@ -323,7 +323,7 @@ flowchart TB
 
 ### U7. Re-evaluate spec-decompose and close the program cycle
 
-- **Goal:** 根据 U2–U6 的真实证据决定 `spec-decompose` 是 revise、defer 还是 supersede，并关闭本轮优化计划的 claim。
+- **Goal:** 根据 U2–U6 的真实证据决定 `spec-decompose` 是 revise、defer 还是 supersede，并关闭本轮优化计划的 claim。本 U7 是 `spec-decompose` successor Plan 的**唯一创建/授权 owner**：消费 `docs/plans/2026-07-28-002-feat-spec-decompose-vertical-closed-loop-plan.md` U5 的 case-local recommendation 与全局 Adoption/Assurance/Project Intelligence 证据；`2026-07-28-002` 自身不得直接创建 successor。
 - **Requirements:** R10, R11, R12。
 - **Dependencies:** U2 完成；U3–U6 已完成、停止、回退或记录 deferred verdict。
 - **Files:** `docs/plans/2026-07-28-002-feat-spec-decompose-vertical-closed-loop-plan.md`, `skills/using-spec-first/references/public-route-map.md`, 当前 `spec-brainstorm` / `spec-prd` / `spec-plan` / `spec-work` source，`CHANGELOG.md`；只有 Build verdict 才新增 successor plan。

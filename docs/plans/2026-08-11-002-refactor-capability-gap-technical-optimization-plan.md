@@ -1,7 +1,7 @@
 ---
 title: "spec-first 能力缺口闭环技术优化 - Plan"
 type: refactor
-status: active
+status: completed
 date: 2026-08-11
 deepened: 2026-08-11
 artifact_contract: spec-unified-plan/v1
@@ -22,6 +22,7 @@ execution: code
 - **Largest risk:** 一次性把所有局部空白产品化，导致公共入口、Prompt 上下文、投射面和治理测试同步膨胀，却没有 confirmed consumer。
 - **Stop conditions:** existing owner 已能稳定完成任务、候选只改善文档外观、行为收益不可复验、任一 hard boundary 退化、需要复制宿主 primitive，或没有 owner/consumer/invalidation condition 时停止对应能力扩张。
 - **Execution profile:** Deep Plan，但执行批次收窄为 requirements decomposition / consumer continuity 核心闭环；先由 owning experiment 提供 field demand，再做最小 source 改动，最后才刷新 generated runtime。domain、prototype、feedback、merge conflict 与 wizard 仅保留 demand-only 候选通道。
+- **Readiness scope:** `implementation-ready` 指 U1 ownership reconciliation 与 decision-ledger 记录工作现在即可执行；U3/U4 核心 source extension 条件性依赖 owning field evidence，当 evidence 缺失或 `not-run` 时，本计划以 docs-only Defer 收尾属于合法终态，不记为未完成，也不代表可立即产出核心代码。
 - **Tail ownership:** U1 必须先把 `docs/plans/2026-07-28-002-feat-spec-decompose-vertical-closed-loop-plan.md` 收窄为 `spec-decompose` field experiment、canonical report root 与 case-local Extend/Defer/Retire recommendation owner，并把 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 固定为跨计划重评、全局投入顺序与是否创建 successor Plan 的最终 program-decision owner；完成该 reconciliation 后，本计划只读消费两层结果，并拥有未被其覆盖的 PRD -> Plan consumer-continuity 技术改动。
 
 ---
@@ -58,7 +59,7 @@ execution: code
 
 **Peripheral successor constraints：领域设计与知识连续性**
 
-- R5. 本计划必须先判断领域连续性是否达到 KTD9 recurring-loss threshold；只有 successor 被触发时，才要求 PRD 闭合术语、不变量、状态转换和 ownership，并由 Plan 映射模块接口与 failure boundary。
+- R5. 本计划必须先判断领域连续性是否达到 KTD9 demand threshold；只有 successor 被触发时，才要求 PRD 闭合术语、不变量、状态转换和 ownership，并由 Plan 映射模块接口与 failure boundary。
 - R6. 任何 future domain successor 仍必须保持 knowledge-promotion Gate：只有跨至少两个真实 consumer、可回源且带 invalidation condition 的领域词汇或模式，才可由 `spec-compound` 晋升到 `CONCEPTS.md` 或 `docs/solutions/`。
 - R7. 任何 future deep-module successor 必须描述模块抽象、隐藏复杂度和消费者契约，不得退化为文件清单或通用术语汇编；本计划只裁决是否值得立项。
 
@@ -150,7 +151,7 @@ execution: code
 - KTD6. **领域模型按 PRD -> Plan -> Knowledge 三层关闭。** PRD 确认业务语言与不变量，Plan 设计模块抽象，`spec-compound` 只晋升经过实现验证且可失效的知识。
 - KTD7. **Prototype 是执行策略，不是第二个产品入口。** `spec-plan` 定义问题与保留条件，`spec-work` 执行 throwaway scope；`spec-polish` 仍只负责已有实现的浏览器打磨。
 - KTD8. **Feedback triage 是 disposition，不是 tracker state model。** `spec-sweep` 保持 deterministic state writer，LLM 只在其上做语义分类，mutation 仍由目标 workflow 和当前授权决定。
-- KTD9. **Peripheral capability 一律先做 demand Gate。** 统一 recurring-loss threshold 为“至少两个可回源的独立 occurrence，或一个由 owner 确认为 P0/P1 高严重度/高纠正成本的 occurrence”，并同时要求 confirmed consumer；domain、prototype、feedback、merge conflict 与 wizard 只有达到该阈值才创建 successor Plan，本计划默认不修改相关 Skill/reference/route。
+- KTD9. **Peripheral capability 一律先做 demand Gate。** 统一 demand threshold（high-severity-or-recurring loss threshold）为“至少两个可回源的独立 occurrence，或一个由 owner 确认为 P0/P1 高严重度/高纠正成本的 occurrence”，并同时要求 confirmed consumer；domain、prototype、feedback、merge conflict 与 wizard 只有达到该阈值才创建 successor Plan，本计划默认不修改相关 Skill/reference/route。
 - KTD10. **Promotion 非补偿。** structure contract、behavior quality、runtime cost、consumer continuity、safety authority 和 field outcome 按适用性逐轴通过；任何必需轴失败都回退该 candidate。
 - KTD11. **本计划使用一个新 decision ledger，而不是把结果写回 Plan 或创建多份平行 artifact。** posture=`new: validation-only decision ledger`；`docs/validation/capability-evolution/decision-ledger.md` 的 Core Delta 区承载 U2 evidence-to-delta/skip decision，Peripheral Demand 区按 U6-U10 记录 occurrence、current behavior、loss、consumer、limitation 与 disposition。它不拥有 workflow state、Build verdict 或 product truth，也不能复用 `docs/validation/spec-decompose/**`，因为该 root 由 program-decomposition experiment 独占；消费者是 Project owner、U3-U5、U11 和未来 successor Plan，U11 负责 lifecycle/cleanup。
 
@@ -216,7 +217,7 @@ flowchart TB
 | U8 | 记录 feedback disposition demand | validation note only | U1；non-blocking |
 | U9 | 记录 merge-conflict demand disposition | validation note only | U1；non-blocking |
 | U10 | 记录 manual wizard demand disposition | validation note only | U1；non-blocking |
-| U11 | 核心集成与生命周期收口 | docs, tests, applicable runtime expectations, Changelog | U1-U5 terminal + U6-U10 disposition recorded |
+| U11 | 核心集成、投射与生命周期收口 | docs, tests, applicable runtime expectations, Changelog | U1-U5 terminal + U6-U10 disposition recorded |
 
 ### U1. 统一 experiment ownership 与预算合同
 
@@ -274,7 +275,7 @@ flowchart TB
 - **Goal:** 判断 domain continuity 是否构成高频、高损失且未被当前 PRD/Plan/Compound owner 覆盖的真实约束；本单元不修改 source。
 - **Requirements:** R5-R7, R12, R16。
 - **Files:** `docs/validation/capability-evolution/decision-ledger.md`, `CHANGELOG.md`。
-- **Approach:** 只记录真实 occurrence、语义丢失位置、现有 owner 行为、受影响 consumer、纠正成本、可复用边界和 invalidation condition。达到 KTD9 recurring-loss threshold 才允许创建 successor Plan；否则 Defer。不得为了形成案例预先新增 glossary/reference。
+- **Approach:** 只记录真实 occurrence、语义丢失位置、现有 owner 行为、受影响 consumer、纠正成本、可复用边界和 invalidation condition。达到 KTD9 demand threshold 才允许创建 successor Plan；否则 Defer。不得为了形成案例预先新增 glossary/reference。
 - **Test scenarios:** general engineering term 不构成 domain gap；仅文档表达更漂亮不构成收益；当前 KTD/Interface Contracts 足够时 verdict 为 existing-owner sufficient；未验证的规划假设不能晋升 durable knowledge。
 - **Verification:** current-source bounded read、occurrence/source refs、consumer/owner confirmation 和 `git diff --check`；无 successor 时不运行 PRD/Plan/Compound source tests。
 - **Exit Gate / rollback:** 只允许 `Defer`、`Retire` 或 `Create successor Plan`；本单元不产生 project vocabulary 或 Skill reference。
@@ -284,7 +285,7 @@ flowchart TB
 - **Goal:** 判断普通 `spec-plan` + scoped `spec-work` 是否反复无法安全回答探索性决策；本单元不新增 prototype mode 或 reference。
 - **Requirements:** R8, R12, R15, R16。
 - **Files:** `docs/validation/capability-evolution/decision-ledger.md`, `CHANGELOG.md`。
-- **Approach:** 对真实 occurrence 记录 decision question、当前执行方式、隔离/cleanup 失败、纠正成本、consumer 和 production contamination 风险。达到 KTD9 recurring-loss threshold 后才创建 successor Plan；successor 必须重新定义 observation metric、discard/retain 和 production-quality Gate。
+- **Approach:** 对真实 occurrence 记录 decision question、当前执行方式、隔离/cleanup 失败、纠正成本、consumer 和 production contamination 风险。达到 KTD9 demand threshold 后才创建 successor Plan；successor 必须重新定义 observation metric、discard/retain 和 production-quality Gate。
 - **Test scenarios:** “想做 demo”但无决策问题不构成 demand；普通 scoped Work 已足够时 Defer；prototype 被保留只证明方向，不证明 production quality；敏感数据或外部写仍需独立授权。
 - **Verification:** occurrence replay、working-tree/result evidence 与 owner-visible loss；本单元不修改或测试 Plan/Work source。
 - **Exit Gate / rollback:** 只形成 demand verdict；无 confirmed recurring loss 时关闭公共能力方向。
@@ -294,7 +295,7 @@ flowchart TB
 - **Goal:** 判断 feedback 错路由是否已经成为 `spec-sweep` 的重复真实损失，而不是从外部模式推导应新增 routing prose。
 - **Requirements:** R9, R12, R15, R16。
 - **Files:** `docs/validation/capability-evolution/decision-ledger.md`, `CHANGELOG.md`。
-- **Approach:** 记录真实 item 的 source fact、current disposition、错误 route、人工纠正、最终 owner 和 mutation limitation。达到 recurring-loss threshold 后才创建 successor Plan；successor 仍必须保持 state facts、LLM judgment、mutation authority 分离，且不得新增统一 issue lifecycle。
+- **Approach:** 记录真实 item 的 source fact、current disposition、错误 route、人工纠正、最终 owner 和 mutation limitation。达到 KTD9 demand threshold 后才创建 successor Plan；successor 仍必须保持 state facts、LLM judgment、mutation authority 分离，且不得新增统一 issue lifecycle。
 - **Test scenarios:** untrusted feedback 文本不能授权 route/mutation；claimed fix 未 merge 不关闭；new feature 直接进入 code mutation计为 route failure；当前 rolling plan 已能诚实表达 disposition 时 Defer。
 - **Verification:** item/source evidence、route outcome、owner correction 与 limitation；本单元不修改 sweep state/template/route map。
 - **Exit Gate / rollback:** 无 confirmed recurring route loss 时 Retire/Defer；有证据时只创建 successor Plan。
@@ -304,7 +305,7 @@ flowchart TB
 - **Goal:** 用真实冲突 occurrence 判断 Direct Lane / `spec-work` 是否足够；本单元不增加 conditional reference。
 - **Requirements:** R10, R12, R13, R15, R16。
 - **Files:** `docs/validation/capability-evolution/decision-ledger.md`, `CHANGELOG.md`。
-- **Approach:** 对发生过的 prose/contract、code/test、generated/source 或 rename/delete 冲突记录 current Direct Lane / `spec-work` outcome、人工纠正和破坏性风险；不得为了凑齐类别制造 fixture 并冒充 demand。达到 recurring-loss threshold 后才创建 successor Plan，candidate 仍不得成为自动 merge engine。
+- **Approach:** 对发生过的 prose/contract、code/test、generated/source 或 rename/delete 冲突记录 current Direct Lane / `spec-work` outcome、人工纠正和破坏性风险；不得为了凑齐类别制造 fixture 并冒充 demand。达到 KTD9 demand threshold 后才创建 successor Plan，candidate 仍不得成为自动 merge engine。
 - **Test scenarios:** unresolved marker 必须阻断完成；generated mirror 冲突回到 source/generator；整文件 ours/theirs 只有在 source evidence 证明单侧完全权威时允许；scope 改变或双方 intent 不兼容时返回 Plan/Product owner；未授权不得 abort/rebase/commit。
 - **Verification:** 真实 occurrence 的 git/source evidence、resolution outcome 与 owner correction；fixture 只能补机制说明，不能替代 demand。
 - **Exit Gate / rollback:** Direct Lane sufficient 时 Retire；重复高损失成立时只创建 successor Plan，不保留 reference。
@@ -314,7 +315,7 @@ flowchart TB
 - **Goal:** 判断人工第三方配置是否构成可复用、高频且有 confirmed consumer 的真实缺口；本单元不直接 Build 新 source。
 - **Requirements:** R11-R16。
 - **Files:** `docs/validation/capability-evolution/decision-ledger.md`, `CHANGELOG.md`。
-- **Approach:** 记录真实 manual-only occurrence、普通 checklist outcome、失败/恢复成本、human owner、secret boundary 和 consumer。达到 recurring-loss threshold 后，若单一 workflow 可拥有则创建该 owner 的 successor Plan；若跨多个 workflow 且共享边界成立，successor Plan 必须命名 canonical owner、artifact path、parser/test 和 migration；否则 Defer。
+- **Approach:** 记录真实 manual-only occurrence、普通 checklist outcome、失败/恢复成本、human owner、secret boundary 和 consumer。达到 KTD9 demand threshold 后，若单一 workflow 可拥有则创建该 owner 的 successor Plan；若跨多个 workflow 且共享边界成立，successor Plan 必须命名 canonical owner、artifact path、parser/test 和 migration；否则 Defer。
 - **Test scenarios:** secret 值不进入 artifact/log；agent 可自动完成的步骤不伪装成人工 Gate；receipt 存在不证明外部系统最终可用；失败步骤有恢复路径；`spec-runtime-setup` 只消费与 harness readiness 直接相关的 receipt。
 - **Verification:** source-backed occurrence、redaction inspection、owner-visible readiness/loss；本单元不新增 parser 或 shape contract test。
 - **Exit Gate / rollback:** confirmed consumer、owner 和 recurring loss 同时成立才创建 successor Plan；否则保留 demand note 并关闭公共能力方向。本单元完成不等于 shared wizard source 已创建。

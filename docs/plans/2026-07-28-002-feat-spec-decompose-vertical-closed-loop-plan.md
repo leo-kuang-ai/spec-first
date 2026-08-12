@@ -89,7 +89,7 @@ execution: code
 - F4. **Promotion or retirement**
   - **Trigger:** field experiment 完成。
   - **Actors:** A1, A4。
-  - **Flow:** 逐项检查 R10 Build Gate；优先选择 Extend `spec-brainstorm`，只有 existing owner 无法保持内聚时才允许创建 successor Plan。
+  - **Flow:** 逐项检查 R10 Build Gate；优先选择 Extend `spec-brainstorm`，只有 existing owner 无法保持内聚时才形成 case-local `Build-successor` recommendation，交由 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 决定是否创建 successor Plan。
   - **Outcome:** 形成 `extend-existing-owner`、`defer` 或 `retire-new-skill` 裁决；本计划不直接晋升新 Skill。
 
 ### Acceptance Examples
@@ -167,7 +167,7 @@ execution: code
 
 ### Key Technical Decisions
 
-- KTD1. 当前不新增 `spec-decompose`，因为 current source 已拥有大部分分解层，而剩余 program-frontier 缺口尚无 field evidence；若 U2/U5 的 Build Gate 后续全部成立，只创建 current-source successor Plan，不在本计划中自动反转裁决。
+- KTD1. 当前不新增 `spec-decompose`，因为 current source 已拥有大部分分解层，而剩余 program-frontier 缺口尚无 field evidence；若 U2/U5 的 Build Gate 后续全部成立，只形成 case-local `Build-successor` recommendation 交由 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 裁决是否创建 current-source successor Plan，本计划不直接创建 successor，也不自动反转裁决。
 - KTD2. 超大需求按 altitude 分层：program fog 归 WHAT discovery，capability slicing 归 PRD/Product Contract，U-ID 归 Plan，dependency waves 归 derived Task Pack，execution state 归 work run 或宿主。
 - KTD3. Program frontier 先以 experiment-only representation 运行，不预先冻结 schema、目录或 tracker projection；artifact shape 只保留目标、source refs、confirmed decisions、fog、active decisions、candidate slices 和 limitations。
 - KTD4. Scripts 只验证路径、hash、ID、依赖存在性、wave membership 与文件重叠；LLM/owner 判断 fog 是否可立项、slice 是否闭环、依赖是否语义充分、Build Gate 是否成立。
@@ -203,7 +203,7 @@ flowchart LR
   E -- Fail --> G[Revert / Retire]
   F --> H{3 repeated failures + durable consumer + host gap?}
   H -- 否 --> I[No new Skill]
-  H -- 是 --> J[Create successor Plan; do not auto-build]
+  H -- 是 --> J[Case-local Build-successor recommendation -> 2026-08-11-001 U7 decides]
 ```
 
 ### Interface Contracts
@@ -227,7 +227,7 @@ flowchart LR
 2. U2 运行 existing-owner baseline 与 experiment candidate，field evidence 不足即停止。
 3. U3 仅在 U2 non-compensatory Gate 通过后最小扩展 `spec-brainstorm`。
 4. U4 验证既有 Plan -> Task Pack -> Work 组合，不新增 tracker/worktree caller。
-5. U5 汇总 field outcome 并裁决 Extend、Defer 或 Retire；只有 Build Gate 全部成立才另建 successor Plan。
+5. U5 汇总 field outcome 并给出 Extend、Defer、Retire 或 case-local `Build-successor` recommendation；只有 Build Gate 全部成立才把 recommendation 交由 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 裁决是否另建 successor Plan，本计划不直接创建。
 
 ---
 
@@ -301,7 +301,7 @@ flowchart LR
 
 ### U5. 收口 promotion 裁决与生命周期
 
-- **Goal:** 基于 U1-U4 证据给出 Extend、Defer、Retire 或 Build-successor verdict，并同步 Plan lifecycle。
+- **Goal:** 基于 U1-U4 证据给出 Extend、Defer、Retire 或 Build-successor 的 **case-local recommendation**，并同步本 Plan 自身 lifecycle。program-level 的是否创建 successor Plan 由 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 基于全局证据唯一裁决；本 Plan 不直接创建 successor。
 - **Requirements:** R8, R10；覆盖 F4、AE5。
 - **Dependencies:** U2 已完成或诚实 `not-run`；U3/U4 按 Gate 执行或明确 skipped。
 - **Files:** `docs/validation/spec-decompose/summary.md`, `docs/plans/2026-07-28-002-feat-spec-decompose-vertical-closed-loop-plan.md`, `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md`, `CHANGELOG.md`。
@@ -310,7 +310,7 @@ flowchart LR
   - U2 `not-run` 时不得输出 Build verdict。
   - Baseline 足够时选择 Retire，并将本 Plan 关闭为 `completed` 或 `superseded`，不声称 feature shipped。
   - U3 成功扩展 existing owner 时选择 Extend，仍不得创建 `spec-decompose`。
-  - 只有六项 Gate 全满足时才创建新的 current-source successor Plan，原 Plan 标记 `superseded`。
+  - 只有六项 Gate 全满足时才形成 case-local `Build-successor` recommendation，交由 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 决定是否创建 current-source successor Plan；本 Plan 不直接创建 successor Skill/Plan。
 - **Verification:** Plan audit、Changelog format 和 lifecycle tests 证明状态一致；verdict 引用直接 field evidence 而不是 transcript 或 provider summary。
 - **Stop condition:** Evidence 互相矛盾或 owner 未裁决时保持 `active` 并记录 blocker，不伪造终态。
 - **Rollback:** 恢复错误 lifecycle 变更；不删除已产生的可复验 field evidence。
@@ -395,4 +395,4 @@ flowchart LR
 - U2. 三个可裁决 case report + summary 完成，或以 `not-run` 阻断 U3。
 - U3. Gate 通过时最小扩展 `spec-brainstorm` 且 route/fresh-source eval 通过；Gate 未通过时明确 skipped。
 - U4. 原 tracker/worktree orchestration 分支被显式退役，Plan -> Task Pack -> Work 与 handoff 组合经聚焦验证，不需要新 orchestrator。
-- U5. 唯一 verdict、Plan lifecycle、umbrella Plan 与 Changelog 一致；Build 只产生 successor Plan，不直接产生 Skill。
+- U5. 唯一 verdict、Plan lifecycle、umbrella Plan 与 Changelog 一致；`Build-successor` 只作为 case-local recommendation 交由 `docs/plans/2026-08-11-001-refactor-optimization-execution-sequence-plan.md` U7 裁决，本计划不直接创建 successor Plan 或 Skill。
