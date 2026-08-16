@@ -1,5 +1,7 @@
 # Changelog
 
+- v1.15.1 2026-08-16 23:02:08 leokuang: chore(release): 发布 spec-first@1.15.1。该 patch 版本的唯一对外行为变化是修复 `spec-first init` 的目标解析：当前目录没有 `.git` marker 但能发现 child repos 时，按父 workspace 边界处理，不再被提升到无关的祖先 Git 仓库根；普通 Git 仓库子目录仍定位最近 Git 根。其余为文档收口（capability-evolution 决策台账与优化执行序列 Plan、外部 engineering skill 能力映射、CodeGraph 安装 analysis-only 诊断、v4.0 首场 PPT 讲稿 draft）与 `.claude/settings.json` hook 路径可移植性调整（不在 npm 包内）。同步 `package.json` 与 `package-lock.json` 版本字段。 (user-visible)
+
 - v1.15.0 2026-08-16 22:07:24 leokuang: docs(ppt): 新增 v4.0 首场 PPT 逐页演讲稿 draft（`docs/ppt-script-v4-p01-p05.md` 至 `docs/ppt-script-v4-p24-p26.md`，覆盖 P01-P26 的逐页讲稿与页面布局设计），source 为外部 vault 的 `12-首场PPT框架-v4.0-逻辑优化版`。五份文档 front matter 均为 `status: draft`，属于 harness 价值表达材料，不构成 runtime contract。本次仅新增 docs draft，未修改 skill/CLI/test source、generated runtime 或宿主配置。
 
 - v1.15.0 2026-08-16 22:06:53 leokuang: fix(init): 修复非 Git 父 workspace 位于祖先 Git 仓库内时被错误提升到祖先 Git 根的问题；补充目标解析文档，并新增嵌套 workspace 与普通 Git 子目录的对照回归测试。 (user-visible)
