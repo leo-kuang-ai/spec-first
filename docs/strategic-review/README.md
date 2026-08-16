@@ -103,6 +103,19 @@
 
 ---
 
+### 6. 外部 Engineering Skills 能力映射
+**文件**：[2026-08-11-external-engineering-skill-capability-mapping.md](./2026-08-11-external-engineering-skill-capability-mapping.md)
+
+**内容**：
+- 外部 `engineering` 与 spec-first 核心研发链路对应关系
+- user-invoked 与 model-invoked 辅助能力覆盖情况
+- `wayfinder`、需求级垂直拆分与任务级 tracer bullet 的边界
+- 候选 `spec-decompose` 的职责、Build Gate 与不应复制的执行机制
+
+**适合受众**：项目负责人、产品架构师、Skill/workflow 设计者
+
+---
+
 ## 核心发现
 
 ### 战略定位：精准且先进

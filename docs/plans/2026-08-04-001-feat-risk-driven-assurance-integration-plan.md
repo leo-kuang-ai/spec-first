@@ -1,7 +1,7 @@
 ---
 title: "Risk-Driven Assurance Integration - Plan"
 type: feat
-status: active
+status: completed
 date: 2026-08-04
 deepened: 2026-08-05
 artifact_contract: spec-unified-plan/v1

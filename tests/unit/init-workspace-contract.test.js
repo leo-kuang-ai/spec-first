@@ -56,6 +56,16 @@ function createWorkspace(options = {}) {
   return { workspaceRoot, childRoot };
 }
 
+function createNestedNonGitWorkspace() {
+  const ancestorRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-ancestor-'));
+  const workspaceRoot = path.join(ancestorRoot, 'vibops');
+  const childRoot = path.join(workspaceRoot, 'child-app');
+  fs.mkdirSync(path.join(ancestorRoot, '.git'), { recursive: true });
+  fs.mkdirSync(path.join(childRoot, '.git'), { recursive: true });
+  tempRoots.push(ancestorRoot);
+  return { ancestorRoot, workspaceRoot, childRoot };
+}
+
 function buildCodexWorkspacePlan(workspaceRoot, childRoot, options = {}) {
   return buildWorkspaceInitPlan({
     platform: 'codex',
@@ -151,6 +161,50 @@ afterAll(() => {
 });
 
 describe('init workspace contract', () => {
+  test('keeps a nested non-Git workspace boundary ahead of an ancestor Git root', () => {
+    const { ancestorRoot, workspaceRoot } = createNestedNonGitWorkspace();
+    const result = runInitCli(workspaceRoot, [
+      '--codex',
+      '-y',
+      '--dry-run',
+      '-u',
+      'Workspace Contract Test',
+      '--lang',
+      'en',
+    ]);
+
+    expect(result.status).toBe(0);
+    const targetDetails = result.stdout
+      .split('\n')
+      .filter((line) => line.includes('Target detail:'));
+    expect(targetDetails).toHaveLength(2);
+    expect(targetDetails.every((line) => (
+      line.includes(`root=${fs.realpathSync.native(workspaceRoot)}`)
+    ))).toBe(true);
+  });
+
+  test('keeps a regular Git subdirectory targeting its ancestor Git root', () => {
+    const ancestorRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-git-root-'));
+    const subdirectory = path.join(ancestorRoot, 'src');
+    fs.mkdirSync(path.join(ancestorRoot, '.git'), { recursive: true });
+    fs.mkdirSync(subdirectory, { recursive: true });
+    tempRoots.push(ancestorRoot);
+
+    const result = runInitCli(subdirectory, [
+      '--codex',
+      '-y',
+      '--dry-run',
+      '-u',
+      'Workspace Contract Test',
+      '--lang',
+      'en',
+    ]);
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain(`root=${fs.realpathSync.native(ancestorRoot)}`);
+    expect(result.stdout).not.toContain(`root=${fs.realpathSync.native(subdirectory)}`);
+  });
+
   test('characterizes full parent and child bootstrap operation paths without shrinking either target', () => {
     const { workspaceRoot, childRoot } = createWorkspace();
     const plan = buildCodexWorkspacePlan(workspaceRoot, childRoot);
