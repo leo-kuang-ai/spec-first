@@ -3,25 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Coding Harness 架构演化构想</title>
+  <title>spec-first 当前优化方向</title>
   <style>
     :root {
       color-scheme: light dark;
-      --bg: #f5f4ef;
+      --bg: #f4f3ee;
       --surface: #fffdf8;
-      --surface-2: #eceae2;
+      --surface-2: #ebe9e1;
       --text: #20231f;
       --muted: #5d625b;
-      --border: #d6d4ca;
+      --border: #d5d2c8;
       --accent: #0b6b62;
-      --accent-soft: #dceeea;
+      --accent-soft: #dceee9;
       --accent-text: #07534d;
-      --blue-soft: #e0eaf6;
+      --blue-soft: #e1eaf5;
       --blue-text: #244b73;
-      --warn-soft: #f4e8cc;
-      --warn-text: #6e4b0d;
-      --danger-soft: #f3dfdc;
-      --danger-text: #7a3028;
+      --warn-soft: #f4e7c9;
+      --warn-text: #6d4a0b;
+      --danger-soft: #f2deda;
+      --danger-text: #793028;
       --shadow: 0 10px 30px rgba(43, 46, 39, .07);
     }
     @media (prefers-color-scheme: dark) {
@@ -54,18 +54,18 @@
       font-size: 16px;
       line-height: 1.72;
     }
-    main { width: min(940px, calc(100% - 32px)); margin: 0 auto; padding: 56px 0 72px; }
-    header, section, footer { margin-block: 0 44px; }
+    main { width: min(960px, calc(100% - 32px)); margin: 0 auto; padding: 54px 0 72px; }
+    header, section, footer { margin-block: 0 46px; }
     h1, h2, h3 { line-height: 1.2; letter-spacing: -.02em; }
-    h1 { margin: 8px 0 16px; font-size: clamp(2rem, 5vw, 3.6rem); max-width: 16ch; }
-    h2 { margin: 0 0 18px; font-size: 1.65rem; }
+    h1 { margin: 8px 0 16px; font-size: clamp(2.15rem, 5vw, 3.65rem); max-width: 15ch; }
+    h2 { margin: 0 0 18px; font-size: 1.68rem; }
     h3 { margin: 0; font-size: 1.28rem; }
     p { max-width: 72ch; margin: .65rem 0; }
     strong { color: inherit; }
     a { color: var(--accent); text-underline-offset: 3px; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
-    .eyebrow { color: var(--accent); font-size: .76rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
-    .lede { font-size: 1.12rem; color: var(--muted); max-width: 68ch; }
+    .eyebrow { color: var(--accent); font-size: .76rem; font-weight: 760; letter-spacing: .13em; text-transform: uppercase; }
+    .lede { font-size: 1.12rem; color: var(--muted); max-width: 69ch; }
     .meta, .stats, .pills { display: flex; flex-wrap: wrap; gap: 10px; }
     .meta { margin-top: 22px; }
     .pill {
@@ -89,12 +89,13 @@
     .stat span { color: var(--muted); font-size: .82rem; }
     .callout { background: var(--accent-soft); color: var(--accent-text); border: 1px solid transparent; border-radius: 16px; padding: 20px 22px; margin: 24px 0; }
     .callout.warn { background: var(--warn-soft); color: var(--warn-text); }
+    .callout.danger { background: var(--danger-soft); color: var(--danger-text); }
     .callout p { margin: 0; max-width: none; }
     .axes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; list-style: none; padding: 0; }
     .axes li { padding: 15px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
     .axes b { display: block; color: var(--accent); font-size: .8rem; letter-spacing: .06em; }
     .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px; overflow-x: auto; box-shadow: var(--shadow); }
-    .diagram svg { display: block; width: 100%; min-width: 700px; height: auto; }
+    .diagram svg { display: block; width: 100%; min-width: 760px; height: auto; }
     .diagram-note { color: var(--muted); font-size: .82rem; margin-top: 10px; }
     .jump-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; list-style: none; padding: 0; margin: 0 0 22px; }
     .jump-list a { display: block; padding: 10px 12px; background: var(--surface-2); border-radius: 10px; text-decoration: none; font-weight: 650; }
@@ -109,92 +110,113 @@
     th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
     th { background: var(--surface-2); font-size: .8rem; letter-spacing: .04em; }
     tr:last-child td { border-bottom: 0; }
+    .table-wrap { overflow-x: auto; border-radius: 14px; }
     .composition-signal { color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); padding-top: 18px; }
     @media (max-width: 720px) {
-      main { width: min(100% - 22px, 940px); padding-top: 34px; }
+      main { width: min(100% - 22px, 960px); padding-top: 34px; }
       .stats, .axes, .jump-list { grid-template-columns: 1fr; }
       .idea { padding: 18px; }
       .idea dl { grid-template-columns: 1fr; gap: 3px; }
       .idea dd { margin-bottom: 10px; }
-      table { display: block; overflow-x: auto; white-space: normal; }
+      table { min-width: 680px; }
     }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <div class="eyebrow">Architecture Ideation · Repo-grounded</div>
-    <h1>AI Coding Harness 架构演化构想</h1>
-    <p class="lede">总架构师结论：spec-first 下一阶段的首要任务不是继续扩充 workflow，而是建立真实价值观测、证明跨宿主语义、削薄热路径；其余能力只保留窄实验资格。</p>
+    <div class="eyebrow">Architecture Ideation · Current-state refresh</div>
+    <h1>spec-first 当前优化方向</h1>
+    <p class="lede">结论：下一阶段最缺的不是更多 workflow、schema 或 gate，而是把已经建立的可信机制转成可观察的首次价值、真实任务结果与可撤销的产品证据；同时系统性削薄高成本热路径。</p>
     <div class="meta" aria-label="Document metadata">
-      <span class="pill">日期：<time datetime="2026-07-15">2026-07-15</time></span>
+      <span class="pill">日期：<time datetime="2026-08-11">2026-08-11</time></span>
       <span class="pill">主题：ai-coding-harness-architecture-evolution</span>
       <span class="pill">模式：repo-grounded</span>
-      <span class="pill accent">焦点：harness、loop、可信闭环与架构削薄</span>
+      <span class="pill accent">焦点：当前 spec-first 还有哪些需要优化</span>
     </div>
     <div class="stats" aria-label="Ideation counts">
-      <div class="stat"><b>36</b><span>原始候选</span></div>
-      <div class="stat"><b>7</b><span>跨框架合成</span></div>
-      <div class="stat"><b>6</b><span>最终方向</span></div>
-      <div class="stat"><b>0</b><span>达到 Build 门槛</span></div>
+      <div class="stat"><b>42</b><span>本轮原始候选</span></div>
+      <div class="stat"><b>7</b><span>最终方向</span></div>
+      <div class="stat"><b>6</b><span>既有方向已复核</span></div>
+      <div class="stat"><b>0</b><span>已获 field outcome 证明</span></div>
     </div>
   </header>
 
   <section id="grounding-context">
     <div class="eyebrow">Grounding Context</div>
     <h2>Codebase Context</h2>
-    <p>项目已经拥有较完整的 <code>Codebase → Spec → Plan → Tasks → Code → Review → Knowledge</code> artifact 链、确定性 contract、五宿主 source/runtime 投射与 evidence 基础。真正的结构性缺口不在“有没有机制”，而在四件事：真实采用和 field outcome 尚未测量；material claim 尚未稳定贯穿 evidence、verification 与 outcome；generated runtime 不等于真实 host invocation；知识失效边界仍主要依赖 prose 约定。</p>
-    <p>业界趋势进一步压缩了项目应拥有的边界：宿主正在吸收 agent loop、session、sandbox、parallelism、trace、resume 与异步任务。OpenAI 强调 repo 可读性、结构测试和运行反馈；Anthropic 强调可恢复 artifact、显式 done/verification、JIT context 与 session/harness/sandbox 解耦。由此推导，spec-first 的长期护城河不是通用 agent runtime，而是项目拥有的 intent、claim/evidence、跨宿主语义与可失效知识。</p>
+    <p>当前仓库已经是一个相当完整的工程 harness：Node.js CommonJS CLI、35 个 canonical skills、241 个 references、134 个 skill scripts、202 个测试文件；六宿主 runtime projection、verification summary、honest closeout、handoff 与 knowledge promotion 都已有明确 owner 和确定性地板。2026-08-02 的系统审计整改恢复了 deterministic baseline，但同一报告仍把 C2 真实宿主、C3 真实任务和 C4 增量价值列为未完成证据路线。</p>
+    <p>8 月新增的风险驱动 assurance 进一步强化了 Product Contract confirmation、evidence authority、source binding 与 required-proof reconciliation。然而其 RA-01、RA-02、RA-04、RA-07 baseline-vs-candidate Trial 因缺授权的独立 fresh reviewer 或人工 blind review，全部以 <code>not-run</code> 收口。因此“机制已经更强”是 confirmed source fact，“真实任务因此更好”仍不是。</p>
+    <p>复杂度也继续增长。当前最大的三个核心入口分别为 <code>spec-code-review/SKILL.md</code> 1035 行、<code>spec-plan/SKILL.md</code> 864 行、<code>spec-compound/SKILL.md</code> 768 行。<code>quickstart</code> 已将 doctor probes 与 init 串起来，但源码明确禁止它模拟宿主内 workflow；安装成功与首次可信结果之间仍有明显体验断点。仓库同时缺少 canonical <code>STRATEGY.md</code>，产品方向仍主要散落在 dated strategic-review 文档中。</p>
     <div class="callout">
-      <p><strong>第一性原理：</strong>如果一个机制不能缩短“正确意图形成可信结果”的时间，不能降低人工纠正/集成背压，也不能提高结果可证伪性，那么它即使增加了 agent、trace、artifact 或测试，也不构成架构进步。</p>
+      <p><strong>当前核心张力：</strong>deterministic floor 已经很强，field evidence 与 adoption 仍很弱。继续增加合同会扩大 carrying cost，却不能自动提高用户信任或研发产出。</p>
     </div>
-    <p>外部依据：<a href="https://openai.com/index/harness-engineering/">OpenAI Harness Engineering</a>、<a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic Context Engineering</a>、<a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Long-running Agent Harnesses</a>、<a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Agent Evals</a>、<a href="https://modelcontextprotocol.io/seps/2663-tasks-extension">MCP Tasks Extension</a> 与 <a href="https://github.com/a2aproject/A2A/blob/main/docs/specification.md">A2A 1.0</a>。</p>
+    <p>外部信号与这一判断一致。Anthropic 2026 的 agent eval 指南明确区分 transcript 与 outcome，并要求多 trial、capability/regression suites 和 human calibration；OpenAI Harness Engineering 强调 repo legibility、结构性测试与把真实 review/bug 反馈回灌为 tooling；SiriusDeliver 通过真实部署与 A/B 测量交付时间和工程师投入。与此同时，<a href="https://github.com/redhat-community-ai-tools/harness-eval">harness-eval</a>、<a href="https://github.com/scaleapi/vero">VeRO</a> 与 <a href="https://github.com/lemon07r/SanityHarness">SanityHarness</a> 表明通用 lint、eval runtime、sandbox 与 candidate optimization 正在外部商品化，spec-first 更应守住项目拥有的 intent、claim、evidence、handoff 与 knowledge 边界。</p>
+    <div class="callout warn">
+      <p><strong>验证限制：</strong>本轮因用户未授权 subagent/并行代理，采用 inline/serial 六视角与 basis self-check；结论有 current-source、测试报告和一手外部资料支撑，但不声称独立 agent 多样性或 fresh-context basis verification。</p>
+    </div>
   </section>
 
   <section id="topic-axes">
     <div class="eyebrow">Topic Axes</div>
     <h2>四个审查轴</h2>
     <ul class="axes">
-      <li><b>AXIS 1</b>Context 与 Harness 瘦身</li>
-      <li><b>AXIS 2</b>Evidence 与可信闭环</li>
-      <li><b>AXIS 3</b>Evaluation 与价值兑现</li>
-      <li><b>AXIS 4</b>Protocol、Knowledge 与跨宿主治理</li>
+      <li><b>AXIS 1</b>Adoption、Strategy 与首次价值</li>
+      <li><b>AXIS 2</b>Evaluation、Assurance 与 field outcome</li>
+      <li><b>AXIS 3</b>Context、Portfolio 与维护可持续性</li>
+      <li><b>AXIS 4</b>Host、Integrity 与跨宿主可信承诺</li>
     </ul>
-    <div class="diagram" role="img" aria-label="Recommended architecture posture: observe value, thin context, wrap host semantics, and experiment on evidence and knowledge gaps">
-      <svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg">
+    <div class="diagram" role="img" aria-label="Recommended evolution path from strategy and first value to field evidence, then thinning, host claims and retirement decisions">
+      <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#0b6b62"/></marker>
         </defs>
-        <rect x="24" y="78" width="170" height="102" rx="14" fill="var(--blue-soft)" stroke="var(--border)"/>
-        <text x="109" y="112" text-anchor="middle" font-size="16" font-weight="700" fill="var(--blue-text)">先观测价值</text>
-        <text x="109" y="139" text-anchor="middle" font-size="13" fill="var(--blue-text)">TTC · 人工纠正</text>
-        <text x="109" y="161" text-anchor="middle" font-size="13" fill="var(--blue-text)">reopen · field outcome</text>
-        <line x1="194" y1="129" x2="238" y2="129" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
-        <rect x="244" y="30" width="170" height="92" rx="14" fill="var(--accent-soft)" stroke="var(--border)"/>
-        <text x="329" y="65" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent-text)">直接 Thin</text>
-        <text x="329" y="91" text-anchor="middle" font-size="13" fill="var(--accent-text)">删重复 prose</text>
-        <text x="329" y="110" text-anchor="middle" font-size="13" fill="var(--accent-text)">做反事实 A/B</text>
-        <rect x="244" y="142" width="170" height="92" rx="14" fill="var(--accent-soft)" stroke="var(--border)"/>
-        <text x="329" y="177" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent-text)">最薄 Wrap</text>
-        <text x="329" y="203" text-anchor="middle" font-size="13" fill="var(--accent-text)">跨宿主语义 canary</text>
-        <text x="329" y="222" text-anchor="middle" font-size="13" fill="var(--accent-text)">显式 lossy/degraded</text>
-        <line x1="414" y1="76" x2="468" y2="76" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
-        <line x1="414" y1="188" x2="468" y2="188" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
-        <rect x="474" y="30" width="170" height="92" rx="14" fill="var(--warn-soft)" stroke="var(--border)"/>
-        <text x="559" y="65" text-anchor="middle" font-size="16" font-weight="700" fill="var(--warn-text)">窄 Experiment</text>
-        <text x="559" y="91" text-anchor="middle" font-size="13" fill="var(--warn-text)">claim join · real failures</text>
-        <text x="559" y="110" text-anchor="middle" font-size="13" fill="var(--warn-text)">knowledge predicate</text>
-        <rect x="474" y="142" width="170" height="92" rx="14" fill="var(--danger-soft)" stroke="var(--border)"/>
-        <text x="559" y="177" text-anchor="middle" font-size="16" font-weight="700" fill="var(--danger-text)">暂不 Build</text>
-        <text x="559" y="203" text-anchor="middle" font-size="13" fill="var(--danger-text)">不建状态机/遥测平台</text>
-        <text x="559" y="222" text-anchor="middle" font-size="13" fill="var(--danger-text)">不建通用 evidence graph</text>
-        <line x1="644" y1="129" x2="698" y2="129" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
-        <rect x="704" y="78" width="132" height="102" rx="14" fill="var(--surface-2)" stroke="var(--border)"/>
-        <text x="770" y="112" text-anchor="middle" font-size="16" font-weight="700" fill="var(--text)">决策闭环</text>
-        <text x="770" y="139" text-anchor="middle" font-size="13" fill="var(--text)">Adopt / Wrap</text>
-        <text x="770" y="161" text-anchor="middle" font-size="13" fill="var(--text)">Thin / Retire</text>
+        <rect x="18" y="72" width="156" height="104" rx="14" fill="var(--blue-soft)" stroke="var(--border)"/>
+        <text x="96" y="108" text-anchor="middle" font-size="15" font-weight="700" fill="var(--blue-text)">Strategy 真相源</text>
+        <text x="96" y="135" text-anchor="middle" font-size="12.5" fill="var(--blue-text)">谁 · 什么价值</text>
+        <text x="96" y="156" text-anchor="middle" font-size="12.5" fill="var(--blue-text)">如何被证伪</text>
+        <line x1="174" y1="124" x2="210" y2="124" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="218" y="72" width="156" height="104" rx="14" fill="var(--accent-soft)" stroke="var(--border)"/>
+        <text x="296" y="108" text-anchor="middle" font-size="15" font-weight="700" fill="var(--accent-text)">首次可信变更</text>
+        <text x="296" y="135" text-anchor="middle" font-size="12.5" fill="var(--accent-text)">brownfield journey</text>
+        <text x="296" y="156" text-anchor="middle" font-size="12.5" fill="var(--accent-text)">可复现实例</text>
+        <line x1="374" y1="124" x2="410" y2="124" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="418" y="72" width="156" height="104" rx="14" fill="var(--warn-soft)" stroke="var(--border)"/>
+        <text x="496" y="108" text-anchor="middle" font-size="15" font-weight="700" fill="var(--warn-text)">真实任务证据</text>
+        <text x="496" y="135" text-anchor="middle" font-size="12.5" fill="var(--warn-text)">纠正 · reopen</text>
+        <text x="496" y="156" text-anchor="middle" font-size="12.5" fill="var(--warn-text)">field outcome</text>
+        <line x1="574" y1="124" x2="610" y2="124" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="618" y="30" width="156" height="82" rx="14" fill="var(--accent-soft)" stroke="var(--border)"/>
+        <text x="696" y="66" text-anchor="middle" font-size="15" font-weight="700" fill="var(--accent-text)">Thin / Retire</text>
+        <text x="696" y="91" text-anchor="middle" font-size="12.5" fill="var(--accent-text)">删固定税与孤儿面</text>
+        <rect x="618" y="138" width="156" height="82" rx="14" fill="var(--blue-soft)" stroke="var(--border)"/>
+        <text x="696" y="174" text-anchor="middle" font-size="15" font-weight="700" fill="var(--blue-text)">Host Trust</text>
+        <text x="696" y="199" text-anchor="middle" font-size="12.5" fill="var(--blue-text)">canary · expiry</text>
+        <line x1="774" y1="124" x2="810" y2="124" stroke="#0b6b62" stroke-width="3" marker-end="url(#arrow)"/>
+        <rect x="818" y="72" width="66" height="104" rx="14" fill="var(--surface-2)" stroke="var(--border)"/>
+        <text x="851" y="112" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text)">Build</text>
+        <text x="851" y="138" text-anchor="middle" font-size="12" fill="var(--text)">最后</text>
+        <text x="851" y="157" text-anchor="middle" font-size="12" fill="var(--text)">选项</text>
       </svg>
-      <div class="diagram-note">方向性示意：先获得价值信号，再决定删除、包装或实验；Build 是最后选项。</div>
+      <div class="diagram-note">方向性示意：先建立 strategy 与真实价值证据，再决定削薄、宿主承诺或建设；图示不是实施规格。</div>
+    </div>
+  </section>
+
+  <section id="prior-snapshot">
+    <div class="eyebrow">Evolution Since Prior Snapshot</div>
+    <h2>7 月六个方向的当前状态</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>既有方向</th><th>2026-08-11 状态</th><th>本轮处置</th></tr></thead>
+        <tbody>
+          <tr><td>Trusted Change Observatory</td><td>真实 field runs 仍未开始</td><td>扩展为排名 1，把 onboarding、真实任务与案例证据合并。</td></tr>
+          <tr><td>Semantic Host Conformance Pack</td><td>worker-dispatch journey 已部分兑现；普遍 C2 未成立</td><td>收敛为排名 4 的 exact-version material canary。</td></tr>
+          <tr><td>Counterfactual Harness Thinning</td><td>方法论与 source 条件成熟，尚未对最大热路径执行</td><td>提升为排名 2。</td></tr>
+          <tr><td>Failure-to-Eval Flywheel</td><td>缺真实 failure supply 与 field consumer</td><td>并入排名 1 与 3。</td></tr>
+          <tr><td>Material Claim Join Pilot</td><td>assurance 已补 authority/source-binding；共享 join consumer 仍不足</td><td>继续 defer，禁止升级为统一 evidence graph。</td></tr>
+          <tr><td>Knowledge Invalidation Canary</td><td>仍缺复用量与 stale incident 证据</td><td>继续 defer，由 field observatory 先取证。</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
@@ -202,112 +224,160 @@
     <div class="eyebrow">Ranked Ideas</div>
     <h2>排序后的优化方向</h2>
     <ul class="jump-list" aria-label="Ranked idea navigation">
-      <li><a href="#idea-1">1. Trusted Change Observatory</a></li>
-      <li><a href="#idea-2">2. Semantic Host Conformance Pack</a></li>
-      <li><a href="#idea-3">3. Counterfactual Harness Thinning</a></li>
-      <li><a href="#idea-4">4. Failure-to-Eval Flywheel</a></li>
-      <li><a href="#idea-5">5. Material Claim Join Pilot</a></li>
-      <li><a href="#idea-6">6. Knowledge Invalidation Canary</a></li>
+      <li><a href="#idea-1">1. First Trusted Change Adoption Sprint</a></li>
+      <li><a href="#idea-2">2. Counterfactual Harness Thinning</a></li>
+      <li><a href="#idea-3">3. Assurance Graduation Trial</a></li>
+      <li><a href="#idea-4">4. Versioned Host Trust Matrix</a></li>
+      <li><a href="#idea-5">5. Canonical Strategy and Evidence Roadmap</a></li>
+      <li><a href="#idea-6">6. Workflow Portfolio Freeze and Retirement</a></li>
+      <li><a href="#idea-7">7. External Harness Integrity Provider Trial</a></li>
     </ul>
 
     <article class="idea" id="idea-1">
-      <div class="idea-head"><span class="rank">1</span><div><h3>1. Trusted Change Observatory</h3><div class="pills"><span class="pill accent">Experiment</span><span class="pill">置信度 88%</span><span class="pill">复杂度 Low</span></div></div></div>
-      <p><strong>Description：</strong>选择 5–10 个明确 opt-in 的真实任务，人工记录 intent accepted、claim-scoped verification、owner trusted、人工修正、等待、reopen/rollback 与观察窗后的 field outcome。它不是 telemetry 平台，也不从 trace 静默推导价值；目标是第一次让 TTC 与 quality-adjusted throughput 进入架构决策。</p>
+      <div class="idea-head"><span class="rank">1</span><div><h3>1. First Trusted Change Adoption Sprint</h3><div class="pills"><span class="pill accent">Experiment</span><span class="pill">置信度 92%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>用一个真实 brownfield golden journey、2–3 个可复现实例和 5–10 个明确 opt-in 的真实任务，闭合“安装 → 第一次可信变更 → 观察窗 outcome”。每次只记录与决策有关的 task class、首次可信结果时间、人工纠正、verification claim、reopen/rollback 与 owner verdict；新用户默认从已有失败测试、diff review 或小修复进入，而不是被迫走完整 workflow 链。</p>
       <dl>
-        <dt>Axis</dt><dd>Evaluation 与价值兑现</dd>
-        <dt>Basis</dt><dd><strong>direct:</strong> <code>README.md:196-206</code> 明确现有机制不是 measured adoption-outcome claims；评估 dossier 证实 TTC、人工负担、field outcome 没有持续观测。<strong>external:</strong> OpenAI/Anthropic 的 agent eval 实践要求 transcript 与 outcome 分离、多 trial、多 grader。</dd>
-        <dt>Rationale</dt><dd>没有真实价值基线，任何新增 contract 都无法证明比删除更好。这是后续 Adopt、Thin、Retire 的共同度量地板。</dd>
-        <dt>Downsides</dt><dd>需要 owner 授权、隐私/脱敏和人工裁决；小样本不能用于营销式普遍结论。若数据不改变任何决策，应停止收集。</dd>
-        <dt>Boundary</dt><dd>先用分析文档与现有 run artifact，不新增事件 schema；预先声明停止条件、数据保留期和不得作为 outcome 代理的字段。</dd>
+        <dt>Axis</dt><dd>Adoption、Strategy 与首次价值；Evaluation 与 field outcome</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> <code>src/cli/commands/quickstart.js:7-11,84-89</code> 明确 quickstart 只编排 probes/init，不能运行宿主内 workflow；<code>docs/validation/2026-08-01-full-system-audit-remediation.md:48-50</code> 将 C2–C4 保持为 <code>not-run</code>。<strong>external:</strong> SiriusDeliver 用真实部署和 A/B，而非功能数量，证明交付时间与工程师投入变化。</dd>
+        <dt>Rationale</dt><dd>这是当前最高杠杆动作：它同时验证 onboarding、可信机制、真实任务适配与对外价值表达。没有这层证据，新的 contract、metric 或 host 支持都无法证明值得长期维护。</dd>
+        <dt>Downsides</dt><dd>需要真实任务、owner 时间、隐私/脱敏与观察窗；5–10 个案例只支持任务类别内的初步判断，不能宣传普遍效率提升。</dd>
+        <dt>Boundary</dt><dd>不做静默 telemetry、用户等级、徽章或无基线的“效率提升 50%”；先使用人工研究记录，只有反复改变决策的字段才考虑 schema。</dd>
       </dl>
     </article>
 
     <article class="idea" id="idea-2">
-      <div class="idea-head"><span class="rank">2</span><div><h3>2. Semantic Host Conformance Pack</h3><div class="pills"><span class="pill blue">Wrap</span><span class="pill">置信度 84%</span><span class="pill">复杂度 Medium</span></div></div></div>
-      <p><strong>Description：</strong>选一个 material workflow 与两个可实际运行的宿主，用 3–5 个协议中立黑盒 canary 验证 entry discovery、invocation、source/runtime authority、mutation gate、handoff 与 degraded 表达。每次结果只声明特定 host/version/fixture 下的 supported、lossy、degraded 与 expiry，不把 generated files 当行为支持。</p>
+      <div class="idea-head"><span class="rank">2</span><div><h3>2. Counterfactual Harness Thinning</h3><div class="pills"><span class="pill accent">Thin</span><span class="pill">置信度 90%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>对 <code>spec-code-review</code>、<code>spec-plan</code>、<code>spec-compound</code> 三个最大核心入口做 current-vs-thinned fresh-source 对比。按钢筋结构先标记 hot path、triggered reference、deterministic fact、eval evidence，再移除重复治理 prose 或下沉冷路径；同时比较 route correctness、evidence coverage、false pass、context bytes 与 wall time。</p>
       <dl>
-        <dt>Axis</dt><dd>Protocol、Knowledge 与跨宿主治理</dd>
-        <dt>Basis</dt><dd><strong>direct:</strong> <code>getSupportedPlatforms()</code> 只证明 adapter 注册；<code>README.zh-CN.md:16-18,95-97</code> 明确 Cursor 尚未验证 discovery/invocation。<strong>external:</strong> MCP Tasks 仍实验，A2A 区分 task artifact 与 transport，支持 canonical semantics 与 adapter 解耦。</dd>
-        <dt>Rationale</dt><dd>它把“文件投射成功”与“宿主语义可依赖”分开，允许诚实地发布 lossy/degraded，同时避免追求 feature parity 或重建通用 orchestrator。</dd>
-        <dt>Downsides</dt><dd>全宿主 × 全版本矩阵会迅速变脆；canary 只能证明被测行为，不能推出宿主整体 fidelity。</dd>
-        <dt>Boundary</dt><dd>只维护会改变 mutation、verification、handoff 或 promotion claim 的 material canary；宿主提供等价 conformance fact 时删除 wrapper。</dd>
+        <dt>Axis</dt><dd>Context、Portfolio 与维护可持续性</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> 当前三个入口分别为 1035、864、768 行；仓库已有 <code>Front Controller + Triggered References + Deterministic Gates + Eval Regression</code>、钢筋结构与 with-skill/bare-baseline 方法论。</dd>
+        <dt>Rationale</dt><dd>这项优化不需要发明新 runtime，却可能同时降低固定 token 税、判断噪声、source drift 与六宿主投射维护成本；它也是检验“哪些规则真的承重”的唯一可靠方式。</dd>
+        <dt>Downsides</dt><dd>压缩可能误删低频但高风险边界；共享 reference 也可能损害 skill-local 可移植性。单一模型/fixture 的 A/B 不能外推所有任务。</dd>
+        <dt>Boundary</dt><dd>删除前必须有语义迁移映射与 rollback；行为质量下降立即恢复。目标是减少重复与固定上下文，不是追求任意行数阈值。</dd>
       </dl>
     </article>
 
     <article class="idea" id="idea-3">
-      <div class="idea-head"><span class="rank">3</span><div><h3>3. Counterfactual Harness Thinning</h3><div class="pills"><span class="pill accent">Thin</span><span class="pill">置信度 82%</span><span class="pill">复杂度 Low</span></div></div></div>
-      <p><strong>Description：</strong>把大型 <code>SKILL.md</code>、重复治理 prose 与 rendering contract 当成需要证明存在价值的成本。选择一个热路径，删除一段重复上下文或抽取共享 source，再用代表性 fresh-source A/B 对比 decision quality、evidence coverage 与上下文体积；结果允许恢复，不建 Context MEL、Lease registry 或新预算 schema。</p>
+      <div class="idea-head"><span class="rank">3</span><div><h3>3. Assurance Graduation Trial</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 88%</span><span class="pill">复杂度 Low–Medium</span></div></div></div>
+      <p><strong>Description：</strong>停止继续扩写 assurance prose、Agent 或 schema，先按现有计划补齐 RA-01、RA-02、RA-04、RA-07 的授权独立 fresh reviewer 或人工 blind review，并加入至少一个真实任务。裁决只允许 <code>retain-trial</code>、<code>revise</code>、<code>revert</code> 或 <code>not-run</code>。</p>
       <dl>
-        <dt>Axis</dt><dd>Context 与 Harness 瘦身</dd>
-        <dt>Basis</dt><dd><strong>direct:</strong> 当前 <code>spec-plan</code>、<code>spec-code-review</code> 入口超过 800 行，多套 HTML rendering contract 完整复制；仓库已有 Front Controller、Triggered References 与 fresh-source eval 方法。<strong>external:</strong> Anthropic context engineering 指向 JIT retrieval 与 compaction。</dd>
-        <dt>Rationale</dt><dd>这项收益最确定：减少固定 token 税、source drift 和多宿主投射成本，同时不创造新 runtime。真正的创新是让每段默认上下文接受可撤销的因果检验。</dd>
-        <dt>Downsides</dt><dd>当前尚未量化 token/wall-time 成本；一次 A/B 不能证明所有模型与任务分布。过度抽取共享 source 也可能损害 skill-local 可移植性。</dd>
-        <dt>Boundary</dt><dd>先删重复治理 prose 或一个 rendering copy；若 evidence/decision quality 下降立即恢复。它是一种持续删减方法，不是可发布的新产品能力。</dd>
+        <dt>Axis</dt><dd>Evaluation、Assurance 与 field outcome</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> <code>docs/validation/risk-driven-assurance/20260805T184057/trial-report.md:12-14,28-39</code> 显示四个 frozen case 全部因 <code>dispatch_authorization_missing</code> 而未比较；focused contract tests 明确不能替代 Trial。</dd>
+        <dt>Rationale</dt><dd>当前 assurance 最大缺口已经不是实现，而是增量证明。完成既定 Trial 能决定这些新增语义是降低 false green，还是只增加低风险任务的 ceremony。</dd>
+        <dt>Downsides</dt><dd>需要独立 reviewer 授权与稳定 baseline/candidate identity；少量案例可能有方差，真实 field outcome 仍需更长观察。</dd>
+        <dt>Boundary</dt><dd>不新增 assurance public workflow、专用 Agent、runner、manifest 或 artifact family；Trial 结果先止于 maintainer decision，不能自动升级为默认产品承诺。</dd>
       </dl>
     </article>
 
     <article class="idea" id="idea-4">
-      <div class="idea-head"><span class="rank">4</span><div><h3>4. Failure-to-Eval Flywheel</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 75%</span><span class="pill">复杂度 Medium</span></div></div></div>
-      <p><strong>Description：</strong>把 owner-confirmed 的 reopen、人工大改、review escape、rollback 或 abandon 转为 3 个脱敏 task archetype，复用现有 eval/scorecard 做 baseline/candidate 多 trial 与盲 outcome grading。只有真实失败被后续回归实际消费，才继续扩充样本。</p>
+      <div class="idea-head"><span class="rank">4</span><div><h3>4. Versioned Host Trust Matrix</h3><div class="pills"><span class="pill blue">Wrap</span><span class="pill">置信度 86%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>把当前零散的 host receipts 收敛为用户可读的 exact-version trust matrix。只维护会改变 mutation、verification、handoff 或 dispatch claim 的 material canary；每项显示 host/version、capture date、expiry、supported/lossy/degraded 与 limitation。先在一个主宿主完成深证，再复制已证明的 canary。</p>
       <dl>
-        <dt>Axis</dt><dd>Evaluation 与价值兑现</dd>
-        <dt>Basis</dt><dd><strong>direct:</strong> 项目已有 deterministic fixtures、局部 fresh-source A/B 和 structured closeout，却缺真实返工样本与 field outcome。<strong>external:</strong> OpenAI、METR、SWE-rebench 强调任务分布、freshness、harness/model/version 与多次运行。</dd>
-        <dt>Rationale</dt><dd>真实失败是最稀缺的 eval 数据。每个被转化的失败都能让未来 harness 变更围绕用户真正付过的成本回归，而非围绕易写断言优化。</dd>
-        <dt>Downsides</dt><dd>当前还没有 confirmed 样本供给证据；脱敏、授权、grader 漂移与任务陈旧成本不可忽略。</dd>
-        <dt>Boundary</dt><dd>从 3 个案例开始，不自动采集 transcript，不建 benchmark 平台；样本不再影响设计决策时退役或重采样。</dd>
+        <dt>Axis</dt><dd>Host、Integrity 与跨宿主可信承诺</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> 六宿主 projection 已达到 C1，但全系统审计明确不能据此外推 loader/invocation；Claude/Codex worker-dispatch 已有 versioned preflight/journey contract，可作为 receipt 形状参考。</dd>
+        <dt>Rationale</dt><dd>它让“支持宿主”从静态名单变为 claim-scoped、可过期、可降级的承诺，解决用户真正关心的“我的版本今天能依赖什么”。</dd>
+        <dt>Downsides</dt><dd>宿主版本更新快，实机验证需要环境、授权与清理成本；matrix 仍只能证明被测 canary，不能代表整个宿主。</dd>
+        <dt>Boundary</dt><dd>不做全宿主 × 全 workflow feature parity；无 fresh receipt 默认降级为 projection-only。宿主提供可信原生 capability facts 时删除 wrapper。</dd>
       </dl>
     </article>
 
     <article class="idea" id="idea-5">
-      <div class="idea-head"><span class="rank">5</span><div><h3>5. Material Claim Join Pilot</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 72%</span><span class="pill">复杂度 Medium</span></div></div></div>
-      <p><strong>Description：</strong>不要建设统一 Trust BOM 或 evidence graph。先在 5–10 个 completion/review 样本中，用临时 sidecar 手工关联一个 material claim、现有 evidence refs、support/refute、scope 与 freshness，验证跨 artifact join 是否真的减少重复回读或漏证。</p>
+      <div class="idea-head"><span class="rank">5</span><div><h3>5. Canonical Strategy and Evidence Roadmap</h3><div class="pills"><span class="pill accent">Clarify</span><span class="pill">置信度 85%</span><span class="pill">复杂度 Low</span></div></div></div>
+      <p><strong>Description：</strong>由 owner 创建 canonical <code>STRATEGY.md</code>，只保留 target problem、target persona、可证伪价值假设、可信指标来源、claim ceiling 与当前 P0/P1 tracks；8 月 dated roadmap 继续作为背景材料，实施 HOW 进入后续 plan。</p>
       <dl>
-        <dt>Axis</dt><dd>Evidence 与可信闭环</dd>
-        <dt>Basis</dt><dd><strong>direct:</strong> verification evidence 具有 <code>gate_ids</code>、status、artifact 与时间，却没有 material claim identity 或 support/refute 关系；<code>spec_id</code> 明确不是中央状态/进度键。<strong>reasoned:</strong> claim 是证据充分性判断的最小语义单位，但必须先证明共享 join key 有真实 consumer。</dd>
-        <dt>Rationale</dt><dd>它可能补上 evidence → verification → outcome 的关键连接，又通过 sidecar 实验避免一次性迁移所有 workflow schema。</dd>
-        <dt>Downsides</dt><dd>极易演化成第二套 evidence contract、状态图与字段治理；“引用存在”仍不能证明证据充分。</dd>
-        <dt>Boundary</dt><dd>只验证 join-key 需求；没有两个 workflow 反复消费同一关系，不进入 canonical schema。</dd>
+        <dt>Axis</dt><dd>Adoption、Strategy 与首次价值</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> 当前仓库没有 <code>STRATEGY.md</code>，但 <code>spec-strategy</code>、<code>spec-product-pulse</code> 与 ideation grounding 都把它视为产品方向 source；现有 roadmap 同时包含合理目标与未经验证的徽章、unlock state、行业平均值等实施假设。</dd>
+        <dt>Rationale</dt><dd>没有当前策略真相源，adoption、metrics、host breadth 与 capability investment 会继续由 dated docs 竞争。先明确谁的什么问题最值得解决，才能解释何时 Thin、Wrap 或 Build。</dd>
+        <dt>Downsides</dt><dd>需要 owner 做真实取舍；一份策略文档不会自动产生用户证据，也可能在无人维护时迅速陈旧。</dd>
+        <dt>Boundary</dt><dd>不虚构目标值，不把使用次数当 outcome，不把实现设计或 roadmap 全文复制进策略；每个关键指标必须有 source 或明确 <code>no data</code>。</dd>
       </dl>
     </article>
 
     <article class="idea" id="idea-6">
-      <div class="idea-head"><span class="rank">6</span><div><h3>6. Knowledge Invalidation Canary</h3><div class="pills"><span class="pill warn">Experiment</span><span class="pill">置信度 63%</span><span class="pill">复杂度 Low–Medium</span></div></div></div>
-      <p><strong>Description：</strong>从 3 条已经被真实 workflow 复用的高价值 learning 开始，为每条定义一个可机械观察的 file/version/contract predicate。命中时只输出 stale/advisory 诊断并要求回源，不自动删除、不扫描全库、不建设 mesh 或 memory 平台。</p>
+      <div class="idea-head"><span class="rank">6</span><div><h3>6. Workflow Portfolio Freeze and Retirement</h3><div class="pills"><span class="pill accent">Thin / Retire</span><span class="pill">置信度 80%</span><span class="pill">复杂度 Medium</span></div></div></div>
+      <p><strong>Description：</strong>设置一个版本周期的“零新增 public workflow”窗口，并对 35 个 skill package 做 consumer audit。没有真实入口、downstream consumer、近期验证或宿主原生能力已充分覆盖的 surface，进入 merge、thin、optional pack 或 retire；新需求必须说明替代了什么以及退役条件。</p>
       <dl>
-        <dt>Axis</dt><dd>Protocol、Knowledge 与跨宿主治理</dd>
-        <dt>Basis</dt><dd><strong>direct:</strong> Knowledge Harness 已要求 <code>source_refs</code> 与 <code>invalidation_condition</code>，同时诚实说明它们仍是 prose/LLM-enforced。<strong>reasoned:</strong> 只有被实际复用且具有可观察失效信号的 knowledge，才值得从 loud convention 提升为最小 canary。</dd>
-        <dt>Rationale</dt><dd>项目长期应拥有的是可失效知识，而不是宿主 session memory。局部 canary 可以验证主动降级是否真的避免错误复用。</dd>
-        <dt>Downsides</dt><dd>尚无 stale knowledge 事故率和 consumer 复用量；predicate 容易漂移、误报或无人处理。</dd>
-        <dt>Boundary</dt><dd>未证明“命中后避免了 material rework”前，不扩为 mesh；无 consumer 的 learning 不进入实验。</dd>
+        <dt>Axis</dt><dd>Context、Portfolio 与维护可持续性</dd>
+        <dt>Basis</dt><dd><strong>direct:</strong> 当前 35 skills、241 references、134 scripts，且每个 source surface 都承担六宿主投射、测试、README/docs 与升级责任；角色契约明确“兑现、验证和简化已有能力优先于继续增加能力”。</dd>
+        <dt>Rationale</dt><dd>这把 80/20 与 one-maintainer capacity 转化为可执行的 portfolio 约束，防止 capability 数量继续快于 adoption evidence 增长。</dd>
+        <dt>Downsides</dt><dd>消费信号目前不完整，容易误退低频高价值能力；退役还涉及 migration、runtime cleanup 与历史文档边界。</dd>
+        <dt>Boundary</dt><dd>不按行数或主观喜好删除；必须提供 consumer/eval/field evidence、migration、rollback 与下游检查。internal helper 不因隐藏而自动判死刑。</dd>
+      </dl>
+    </article>
+
+    <article class="idea" id="idea-7">
+      <div class="idea-head"><span class="rank">7</span><div><h3>7. External Harness Integrity Provider Trial</h3><div class="pills"><span class="pill blue">Adopt Trial</span><span class="pill">置信度 68%</span><span class="pill">复杂度 Low</span></div></div></div>
+      <p><strong>Description：</strong>以只读、opt-in 方式运行一次外部 <code>harness-eval</code> comparison，检查 skills、agents、hooks、MCP 与 host settings 的跨组件安全/冲突问题。只有当它发现现有检查遗漏的 material issue，才考虑把其 SARIF/facts 作为 optional Runtime Setup provider 输入。</p>
+      <dl>
+        <dt>Axis</dt><dd>Host、Integrity 与跨宿主可信承诺</dd>
+        <dt>Basis</dt><dd><strong>external:</strong> 2026 <code>harness-eval</code> 已公开 92 条离线规则，覆盖 credential exfiltration chains、confused deputy、hook/skill conflicts、orphan surfaces 与 token blowouts；这些属于外部工具正在商品化的能力。</dd>
+        <dt>Rationale</dt><dd>一次 comparison 可以低成本判断 spec-first 是否存在跨组件盲区；若有价值则 Adopt/Wrap，若没有则不增加任何 source surface。</dd>
+        <dt>Downsides</dt><dd>外部项目较新、规则可能误报或与 spec-first authority model 不一致；新增依赖会带来供应链、版本与支持成本。</dd>
+        <dt>Boundary</dt><dd>provider output 只能是 <code>provider_untrusted</code> advisory facts；不复制其 92 条规则、不设为默认硬依赖、不让 linter 做语义裁决。</dd>
       </dl>
     </article>
   </section>
 
   <section id="rejection-summary">
     <div class="eyebrow">Rejection Summary</div>
-    <h2>被合并或淘汰的方向</h2>
-    <div class="callout warn"><p><strong>对抗性结论：</strong>所有“统一图谱、全局状态、自动遥测、通用 conformance runtime、知识 mesh”都被降级或拒绝。当前没有一项达到 Build 门槛。</p></div>
-    <table>
-      <thead><tr><th>#</th><th>Idea</th><th>Reason Rejected</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Capability Survival Budget</td><td>与角色契约已有演化判断重复；独立 registry 会制造元治理。改为一次人工 portfolio review。</td></tr>
-        <tr><td>2</td><td>Consumer-issued readiness</td><td>可能形成第二套 readiness truth；并入 claim/handoff 局部实验。</td></tr>
-        <tr><td>3</td><td>Read-set receipt</td><td>只能证明读取发生，不能证明理解或 outcome；缺 confirmed failure 数据。</td></tr>
-        <tr><td>4</td><td>Claim LOPA</td><td>高风险验证方法有启发，但尚无稳定 common-cause 分类与 consumer；并入失败样本 eval。</td></tr>
-        <tr><td>5</td><td>Result escrow</td><td>边界正确，但单独状态会扩大 contract；由 Trusted Change Observatory 的 observation window 表达。</td></tr>
-        <tr><td>6</td><td>Execution-capability packet</td><td>ownership 张力真实，但应先删 host-specific prose；重复宿主缺口出现后再进入 conformance pack。</td></tr>
-        <tr><td>7</td><td>Default workflow zero</td><td>范围超过当前证据；可以局部 A/B Direct Lane-first，不能重构为 gate-card runtime。</td></tr>
-        <tr><td>8</td><td>Knowledge Mesh / Pharmacovigilance / Lease</td><td>命名与体系强于证据；收敛为 3 条已复用 knowledge 的 canary。</td></tr>
-        <tr><td>9</td><td>Run-scoped evidence snapshot</td><td>重复读取尚未量化，不能先建缓存与失效协议。</td></tr>
-        <tr><td>10</td><td>Unified Trust BOM</td><td>跨 artifact join gap 真实，但全量 schema 化会造成双重真相；降级为 sidecar pilot。</td></tr>
-        <tr><td>11</td><td>Full host capability lease</td><td>矩阵维护成本过高；只保留少数会改变 claim 的 material canary 与 expiry。</td></tr>
-        <tr><td>12</td><td>Automatic stale-knowledge deletion</td><td>脚本不能替代语义判断；命中只允许降级为 advisory 并要求回源。</td></tr>
-      </tbody>
-    </table>
-    <p>四个 topic axes 均有 survivor，没有刻意遗漏的覆盖轴。安全、授权、隐私、脱敏与保留期被视为所有真实任务实验的横切 gate，而不是新增第五套 workflow。</p>
+    <h2>被合并、暂缓或否决的方向</h2>
+    <div class="callout danger"><p><strong>对抗性结论：</strong>不建设自动遥测/徽章平台、用户解锁状态机、统一 evidence graph、新 assurance Agent、全宿主全 workflow 矩阵或自研通用 eval runtime。它们要么把代理指标冒充 outcome，要么重复宿主/外部工具，要么在 consumer 未成立前扩大 contract。</p></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Idea</th><th>Reason Rejected / Merged</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Golden Journey / Observatory / Case Study / No-Telemetry</td><td>各自独立会互相等待；合并为排名 1 的完整 adoption proof sprint。</td></tr>
+          <tr><td>2</td><td>Skill Cost Review / Rendering Collapse / SRE Ceremony Budget</td><td>都是削薄方法与约束，合并为排名 2，不新增治理产品。</td></tr>
+          <tr><td>3</td><td>Failure-to-Eval / Experiment Card / Field Failure Flywheel</td><td>需要先完成既定 assurance 比较与真实 failure supply，合并为排名 3 的后续 consumer。</td></tr>
+          <tr><td>4</td><td>Host Expiry / Type Rating / One-Host-Deep / Canary Reuse</td><td>共同核心是 exact-version/freshness，合并为排名 4。</td></tr>
+          <tr><td>5</td><td>Trust Kernel Reframing</td><td>不单独做品牌/架构项目，由排名 5 的 canonical strategy 承载。</td></tr>
+          <tr><td>6</td><td>Zero-New-Workflow / Consumer Retirement / Road Diet</td><td>合并为排名 6 的一项 portfolio 机制。</td></tr>
+          <tr><td>7</td><td>Ten-Times-Users Integrity</td><td>具体检验路径已由排名 7 的外部 provider comparison 覆盖。</td></tr>
+          <tr><td>8</td><td>Artifact Trust View</td><td>尚无 confirmed consumer，极易形成第二套 artifact truth；先用真实 onboarding/review 观察导航痛点。</td></tr>
+          <tr><td>9</td><td>Gamified Metrics Dashboard</td><td>徽章、pass rate、finding density 和无来源行业平均值会触发 Goodhart 与虚假价值声明。</td></tr>
+          <tr><td>10</td><td>Progressive Unlock State</td><td><code>.spec-first/user-state.json</code>、自动升级和 unlock 命令会创建新的可变状态机；用语义路由与文档分层即可。</td></tr>
+          <tr><td>11</td><td>Knowledge Promotion After Reuse</td><td>方向合理但当前缺 reuse/stale incident 数据；先由排名 1 取证，不先改 promotion contract。</td></tr>
+          <tr><td>12</td><td>Post-Market Surveillance</td><td>类比有帮助，但实质与排名 1/3 重复，不单立项目。</td></tr>
+          <tr><td>13</td><td>Material Claim Chain of Custody</td><td>assurance 已覆盖 authority/source-binding；旧 Material Claim Join 仍缺第二个稳定 consumer。</td></tr>
+          <tr><td>14</td><td>Compiler Backend IR</td><td>source/runtime adapter 已部分实现该原则；新建 canonical IR 会重复现有 contract 并泄漏实现。</td></tr>
+          <tr><td>15</td><td>One Artifact per Change</td><td>尚未证明 reviewer 需要新的聚合 artifact；可能把多 owner 证据压成新的单体 truth。</td></tr>
+          <tr><td>16</td><td>Zero-Subagent Baseline</td><td>已经是多个 workflow 的降级合同；继续增加 prose 的边际价值不足。</td></tr>
+          <tr><td>17</td><td>Capability Survival Budget</td><td>与角色契约已有 Adopt/Wrap/Thin/Retire 判断重复；独立 registry 会制造元治理。</td></tr>
+          <tr><td>18</td><td>Consumer-issued Readiness / Result Escrow</td><td>可能形成第二套 readiness/state truth；真实需求应先在 field study 中出现。</td></tr>
+          <tr><td>19</td><td>Read-set Receipt / Run-scoped Evidence Snapshot</td><td>只能证明读取或缓存发生，不能证明理解、充分性或 outcome；重复成本尚未量化。</td></tr>
+          <tr><td>20</td><td>Claim LOPA / Unified Trust BOM</td><td>全量 schema 化会制造 evidence graph 与双重真相；当前没有足够 consumer。</td></tr>
+          <tr><td>21</td><td>Execution-capability Packet / Full Host Lease</td><td>全矩阵维护成本过高；只保留排名 4 的 material canary。</td></tr>
+          <tr><td>22</td><td>Default Workflow Zero / Gate-card Runtime</td><td>可以局部测试 Direct Lane-first，但不能在缺 field evidence 时重构为新 runtime。</td></tr>
+          <tr><td>23</td><td>Knowledge Mesh / Automatic Stale Deletion</td><td>脚本不能替代语义判断；无 confirmed stale incident 时不建设 mesh 或自动删除。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>四个 topic axes 均有 survivor。安全、授权、隐私、脱敏、retention 与 source/runtime 继续作为所有实验的横切边界，而不是新增第五套 workflow。</p>
   </section>
 
-  <footer class="composition-signal">Composed 2026-07-15T12:59:13Z by spec-ideate from the user request and repository source at <code>/Users/kuang/xiaobu/spec-first</code>.</footer>
+  <section id="sources">
+    <div class="eyebrow">Evidence Index</div>
+    <h2>关键依据</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>来源</th><th>本轮使用方式</th></tr></thead>
+        <tbody>
+          <tr><td><code>docs/10-prompt/结构化项目角色契约.md</code></td><td>使命、权威、Adopt/Wrap/Thin/Retire 与 field evidence 边界。</td></tr>
+          <tr><td><code>docs/validation/2026-08-01-full-system-audit-remediation.md</code></td><td>deterministic baseline 已恢复；C2–C4 未外推。</td></tr>
+          <tr><td><code>docs/validation/risk-driven-assurance/20260805T184057/trial-report.md</code></td><td>assurance Trial 的四个 frozen case 与 <code>not-run</code> 限制。</td></tr>
+          <tr><td><code>src/cli/commands/quickstart.js</code></td><td>setup 与宿主内首次 workflow 的真实边界。</td></tr>
+          <tr><td><code>docs/solutions/architecture-patterns/front-controller-triggered-references-gates-eval-regression-2026-07-01.md</code></td><td>大 workflow 可验证削薄模式。</td></tr>
+          <tr><td><code>docs/solutions/architecture-patterns/rebar-structure-skill-simplification-pattern-2026-06-04.md</code></td><td>先迁移承重边界，再删重复 surface。</td></tr>
+          <tr><td><a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic · Demystifying evals for AI agents</a></td><td>transcript/outcome、多 trial、capability/regression 与 human calibration。</td></tr>
+          <tr><td><a href="https://openai.com/index/harness-engineering/">OpenAI · Harness Engineering</a></td><td>repo legibility、结构性约束与 feedback-to-tooling。</td></tr>
+          <tr><td><a href="https://arxiv.org/abs/2608.09185">SiriusDeliver</a></td><td>真实部署与 A/B field outcome 的一手案例。</td></tr>
+          <tr><td><a href="https://github.com/redhat-community-ai-tools/harness-eval">harness-eval</a> · <a href="https://github.com/scaleapi/vero">VeRO</a> · <a href="https://github.com/lemon07r/SanityHarness">SanityHarness</a></td><td>外部 eval/security/runtime 工具商品化信号。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="composition-signal">Composed 2026-08-11T10:48:33+08:00 by spec-ideate from the user request and repository source at <code>714e4cb3b598428996e5eea3e5b21df658563deb</code>; resumed from the 2026-07-15 artifact.</footer>
 </main>
 </body>
 </html>

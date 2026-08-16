@@ -226,6 +226,14 @@ function resolveUserLanguageSyncProjectRoot(input = {}) {
 
 function collectDefaultInitTarget(workspaceRoot) {
   const cwdGitRoot = findGitRoot(workspaceRoot);
+  const candidates = discoverChildGitRepos(workspaceRoot);
+
+  // 含 child repo 的非 Git 目录是显式 workspace 边界，即使它位于无关的祖先 Git 仓库内。
+  // 当前目录不是 workspace root 时，仍保留普通 Git 子目录定位到 Git 根的行为。
+  if (!hasGitMarker(workspaceRoot) && candidates.length > 0) {
+    return buildWorkspaceOnlyInitTarget(workspaceRoot, 'parent-workspace-default');
+  }
+
   if (cwdGitRoot) {
     return {
       mode: 'single-repo',
@@ -234,7 +242,6 @@ function collectDefaultInitTarget(workspaceRoot) {
     };
   }
 
-  const candidates = discoverChildGitRepos(workspaceRoot);
   if (candidates.length > 0) {
     return buildWorkspaceOnlyInitTarget(workspaceRoot, 'parent-workspace-default');
   }
@@ -289,7 +296,9 @@ function collectExplicitInitTarget(workspaceRoot, parsed) {
 
 async function collectInteractiveInitTarget(workspaceRoot, promptApi, messages = getInitMessages('zh')) {
   const cwdGitRoot = findGitRoot(workspaceRoot);
-  if (cwdGitRoot) {
+  const candidates = discoverChildGitRepos(workspaceRoot);
+
+  if (cwdGitRoot && (hasGitMarker(workspaceRoot) || candidates.length === 0)) {
     return {
       mode: 'single-repo',
       projectRoot: cwdGitRoot,
@@ -297,7 +306,6 @@ async function collectInteractiveInitTarget(workspaceRoot, promptApi, messages =
     };
   }
 
-  const candidates = discoverChildGitRepos(workspaceRoot);
   if (candidates.length === 0) {
     return {
       mode: 'single-repo',
@@ -343,6 +351,10 @@ function buildWorkspaceOnlyInitTarget(workspaceRoot, selectionSource) {
     gitRootTopology: 'multi-repo-workspace',
     selectionSource,
   };
+}
+
+function hasGitMarker(dirPath) {
+  return fs.existsSync(path.join(dirPath, '.git'));
 }
 
 function resolveDeveloperDefaults(projectRoot) {
