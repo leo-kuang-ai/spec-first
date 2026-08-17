@@ -27,6 +27,10 @@ const {
   commandSucceeded,
 } = require('./process-runner.cjs');
 const {
+  buildRuntimeInitRemediation,
+  clearRuntimeInitRemediation,
+} = require('./runtime-remediation.cjs');
+const {
   inspectProjectConfig,
 } = require('./project-config.cjs');
 const {
@@ -140,9 +144,13 @@ function runVerificationOrMutation(context, repoRoot) {
     generatedRuntimeManifest,
     directEvidence: {
       ripgrep: commandSucceeded(ripgrepProbe),
+      git_diff: context.target && context.target.repo_status === 'git-repo',
     },
     projectConfigStatus: projectStatus,
     target: context.target,
+    repoStatus: context.target && context.target.repo_status
+      ? context.target.repo_status
+      : 'not-git-repo',
     now: factsNow,
   };
   const preliminaryBundle = collectSetupFacts(baseFactInputs);
@@ -387,6 +395,14 @@ function firstSelectedProviderFailure(providerResults, selectedIds, options = {}
 
 function providerFailureReason(readiness, failedField = '') {
   if (readiness && readiness.reason_code) return readiness.reason_code;
+  const scopeProvenance = readiness
+    && readiness.first_generation
+    && readiness.first_generation.scope_provenance;
+  if (scopeProvenance
+    && ['mismatch', 'invalid'].includes(scopeProvenance.status)
+    && scopeProvenance.reason_code) {
+    return scopeProvenance.reason_code;
+  }
   const hook = readiness && readiness.steady_state ? readiness.steady_state : {};
   if (hook.hook_skipped_reason && ['failed', 'blocked'].includes(hook.hook_status)) {
     return hook.hook_skipped_reason;
@@ -794,6 +810,7 @@ function providerContext(context, repoRoot, id, extra = {}) {
     dependency: dependencyFor(context, dependencyRef),
     probeDependency: true,
     requirementWorkspace: context.actionPlan.args.requirementWorkspace || '',
+    targetKind: context.target && context.target.target_kind ? context.target.target_kind : '',
     ...extra,
   };
 }
@@ -806,16 +823,26 @@ function requireCapability(context, capability) {
 }
 
 function computeGeneratedRuntimeManifestHealth(context, repoRoot) {
-  const statePath = runtimeStatePath(context.host, repoRoot);
+  const executionRoot = path.resolve(repoRoot);
+  const target = context && context.target ? context.target : null;
+  const runtimeProjectionRoot = target
+    && target.mode !== 'workspace-all-repos'
+    && target.target_root
+    && path.resolve(target.target_root) === executionRoot
+    && target.runtime_projection_root
+    ? path.resolve(target.runtime_projection_root)
+    : executionRoot;
+  const statePath = runtimeStatePath(context.host, runtimeProjectionRoot);
   const result = {
     status: 'unknown',
     reason_code: 'unknown-runtime-manifest-health',
     host: context.host,
+    runtime_projection_root: runtimeProjectionRoot,
     state_path: statePath,
     recorded_manifest_version: null,
     bundled_manifest_version: context.bundledVersion || null,
     evidence_basis: '比较 state.manifestVersion 与 bundled manifest.version',
-    next_action: `spec-first init --${context.host} -y`,
+    ...buildRuntimeInitRemediation({ host: context.host, cwd: runtimeProjectionRoot }),
   };
   if (!context.host || !statePath) {
     result.reason_code = 'missing-host-or-target-root';
@@ -837,7 +864,7 @@ function computeGeneratedRuntimeManifestHealth(context, repoRoot) {
     } else if (result.recorded_manifest_version === result.bundled_manifest_version) {
       result.status = 'current';
       result.reason_code = null;
-      result.next_action = null;
+      clearRuntimeInitRemediation(result);
     } else {
       result.status = 'stale';
       result.reason_code = 'runtime-manifest-version-stale';

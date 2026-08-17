@@ -310,6 +310,8 @@ describe('spec-runtime-setup unified Node contract', () => {
       ['scenario-fingerprint.cjs', ['generateSetupScenarioFingerprint', 'scenarioFingerprintFailure']],
       ['human-output.cjs', ['advisoryHostCandidates', 'diagnosticNextActions', 'renderDiagnosticHuman']],
       ['workspace-executor.cjs', ['runWorkspaceBatch', 'buildWorkspaceSetupSummary', 'buildWorkspaceVerifySummary']],
+      ['workspace-runtime-preflight.cjs', ['buildProviderPlanSelections', 'resolveRuntimeProjectionTargets']],
+      ['runtime-remediation.cjs', ['buildRuntimeInitCommand', 'buildRuntimeInitRemediation']],
       ['installation-executor.cjs', ['installBaselineTools', 'installBaselineHelpers', 'probeRegistry']],
       ['runtime-executor.cjs', ['runVerificationOrMutation', 'computeGeneratedRuntimeManifestHealth', 'firstSelectedProviderFailure']],
     ];

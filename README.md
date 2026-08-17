@@ -182,6 +182,8 @@ Runtime delivery 和宿主实机证据是不同声明。能够生成投射，并
 
 当团队已经使用 AI coding 宿主，并希望在不同会话或宿主之间保留项目内意图、可检查交接、明确 review 边界、受证据约束的完成声明和可复用经验时，适合使用 `spec-first`。
 
+Runtime Setup 也支持用 `--folder <path>` 选择非 Git 单目录；CodeGraph、Graphify 与 setup facts 归该目录，Git hook 自动刷新降级为 `manual-only`。
+
 如果你只需要一次性 prompt、不允许在仓库中写入 workflow artifacts、想要独立 coding 应用，或期待中心化流程引擎替你决定产品优先级和架构，它通常没有必要。
 
 ## 相关文档

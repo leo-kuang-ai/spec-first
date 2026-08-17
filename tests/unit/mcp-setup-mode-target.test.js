@@ -303,7 +303,53 @@ describe('spec-runtime-setup project target resolution', () => {
       mode: 'non-git-folder',
       selection_source: 'explicit-folder',
       target_root: folder,
+      artifact_root: folder,
+      runtime_projection_root: folder,
+      enclosing_git_root: null,
       state_write_allowed: true,
+      git_health: {
+        status: 'not-git',
+        reason_code: 'not-git',
+      },
+    });
+  });
+
+  test('keeps an explicit nested folder exact while reusing its enclosing Git runtime projection', () => {
+    const { resolveProjectTarget } = require(projectTargetModule);
+    const workspace = createRepo(createWorkspace());
+    const nested = path.join(workspace, 'vibops');
+    fs.mkdirSync(nested, { recursive: true });
+
+    expect(resolveProjectTarget({ cwd: nested, folder: nested })).toMatchObject({
+      mode: 'non-git-folder',
+      repo_status: 'not-git-repo',
+      target_kind: 'non-git-folder',
+      selection_source: 'explicit-folder',
+      state_write_allowed: true,
+      selected_folder_root: nested,
+      target_root: nested,
+      artifact_root: nested,
+      runtime_projection_root: workspace,
+      enclosing_git_root: workspace,
+      git_health: {
+        status: 'not-git',
+        reason_code: 'not-git',
+      },
+    });
+  });
+
+  test('fails closed instead of promoting an explicit nested path to its ancestor Git root', () => {
+    const { resolveProjectTarget } = require(projectTargetModule);
+    const workspace = createRepo(createWorkspace());
+    const nested = path.join(workspace, 'vibops');
+    fs.mkdirSync(nested, { recursive: true });
+
+    expect(resolveProjectTarget({ cwd: nested, repo: nested })).toMatchObject({
+      mode: 'invalid-target',
+      reason_code: 'repo-target-not-git-root',
+      state_write_allowed: false,
+      requested_repo_root: nested,
+      resolved_git_root: workspace,
     });
   });
 
@@ -378,13 +424,29 @@ describe('spec-runtime-setup project target resolution', () => {
     });
   });
 
-  test('reports an empty parent workspace without granting writes', () => {
+  test('treats an empty non-Git cwd as a writable single-folder target by default', () => {
     const { resolveProjectTarget } = require(projectTargetModule);
     const workspace = createWorkspace();
 
     expect(resolveProjectTarget({ cwd: workspace })).toMatchObject({
+      mode: 'non-git-folder',
+      selection_source: 'cwd-non-git-folder',
+      reason_code: '',
+      state_write_allowed: true,
+      target_root: workspace,
+      artifact_root: workspace,
+      runtime_projection_root: workspace,
+      enclosing_git_root: null,
+    });
+  });
+
+  test('keeps explicit --all-repos fail-closed when no child Git repositories exist', () => {
+    const { resolveProjectTarget } = require(projectTargetModule);
+    const workspace = createWorkspace();
+
+    expect(resolveProjectTarget({ cwd: workspace, allRepos: true })).toMatchObject({
       mode: 'workspace-no-git-candidates',
-      selection_source: '',
+      selection_source: 'explicit-all-repos',
       reason_code: 'workspace-no-git-candidates',
       state_write_allowed: false,
       candidates: [],

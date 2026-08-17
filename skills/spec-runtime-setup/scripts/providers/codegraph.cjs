@@ -98,6 +98,7 @@ function plan(context = {}) {
     schema_version: 'provider-action-plan.v1',
     provider: 'codegraph',
     repo_root: repoRoot,
+    artifact_root_relative: '.codegraph',
     dependency_version: context.dependency && context.dependency.version ? context.dependency.version : null,
     dependency_ready: dependencyReady,
     mutation: true,
@@ -208,7 +209,12 @@ function apply(context = {}, actionPlan = plan(context)) {
   let statusText = text(statusResult);
   if (succeeded(statusResult) && statusNeedsSync(statusText)) {
     const syncResult = run(context, 'codegraph', ['sync'], { cwd: repoRoot, timeoutMs: 120000 });
-    if (!succeeded(syncResult)) return degraded(context, repoRoot, 'codegraph-sync-failed');
+    if (!succeeded(syncResult)) {
+      const reasonCode = /maximum call stack size exceeded/i.test(text(syncResult))
+        ? 'codegraph-sync-stack-overflow'
+        : 'codegraph-sync-failed';
+      return degraded(context, repoRoot, reasonCode);
+    }
     statusResult = run(context, 'codegraph', ['status'], { cwd: repoRoot });
     statusText = text(statusResult);
   }

@@ -91,7 +91,9 @@ function collectSetupFacts(options = {}) {
         ? options.directEvidence.ripgrep
         : commandReady(items, 'rg'),
       ast_grep: commandReady(items, 'ast-grep'),
-      git_diff: true,
+      git_diff: options.directEvidence && typeof options.directEvidence.git_diff === 'boolean'
+        ? options.directEvidence.git_diff
+        : options.repoStatus !== 'not-git-repo',
       tests_and_logs: true,
     },
     setup_summary: {

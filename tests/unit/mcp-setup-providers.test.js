@@ -199,6 +199,53 @@ describe('spec-runtime-setup provider registry', () => {
 });
 
 describe('CodeGraph provider', () => {
+  test('initializes and queries a standalone non-Git folder', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-codegraph-non-git-'));
+    const calls = [];
+    const runner = (command, args) => {
+      calls.push([command, ...args]);
+      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === 'init') {
+        fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+        fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+        return success();
+      }
+      if (args[0] === 'status') return success('index ready');
+      if (args[0] === 'query') return success('{}');
+      return failure(`unexpected ${command} ${args.join(' ')}`);
+    };
+    const context = {
+      selected: true,
+      probeDependency: true,
+      configured: true,
+      repoRoot: target,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+      runner,
+    };
+
+    const plan = provider.plan(context);
+    const result = provider.apply(context, plan);
+
+    expect(plan).toMatchObject({
+      blocked: false,
+      repo_root: target,
+      artifact_root_relative: '.codegraph',
+    });
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: {
+        initialized: true,
+        indexed: true,
+        artifact_exists: true,
+        query_verified: true,
+      },
+    });
+    expect(fs.existsSync(path.join(target, '.git'))).toBe(false);
+    expect(fs.existsSync(path.join(target, '.codegraph', 'codegraph.db'))).toBe(true);
+    expect(calls.some((call) => call.join(' ') === 'codegraph init')).toBe(true);
+  });
+
   test('resolves an absolute pinned launcher from the bounded PATH', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-launcher');
@@ -276,6 +323,36 @@ describe('CodeGraph provider', () => {
     expect(calls.filter((call) => call.join(' ') === 'codegraph sync')).toHaveLength(1);
     expect(calls.filter((call) => call.join(' ') === 'codegraph index -f')).toHaveLength(1);
     expect(calls.filter((call) => call.join(' ') === 'codegraph query __spec_first_readiness_probe__ --limit 1 --json')).toHaveLength(1);
+  });
+
+  test('classifies a stack overflow during bounded sync and does not escalate to full reindex', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
+    const target = tempRepo('codegraph-stack-overflow');
+    const calls = [];
+    const runner = (command, args) => {
+      calls.push([command, ...args]);
+      if (args[0] === '--version') return success('codegraph 1.5.0');
+      if (args[0] === 'init') {
+        fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
+        fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
+        return success();
+      }
+      if (args[0] === 'status') return success('pending changes; run codegraph sync');
+      if (args[0] === 'sync') return { ...failure(''), stdout: 'Maximum call stack size exceeded' };
+      return success();
+    };
+
+    const plan = provider.plan({
+      selected: true,
+      repoRoot: target,
+      dependency: { package: '@colbymchenry/codegraph', version: '1.5.0' },
+    });
+    const result = provider.apply({ repoRoot: target, runner, configured: true }, plan);
+
+    expect(result.readiness_status).toBe('degraded');
+    expect(result.limitations).toContain('failed: codegraph-sync-stack-overflow. CodeGraph setup 失败。');
+    expect(calls.filter((call) => call.join(' ') === 'codegraph sync')).toHaveLength(1);
+    expect(calls.filter((call) => call.join(' ') === 'codegraph index -f')).toHaveLength(0);
   });
 
   test.each([
@@ -459,6 +536,71 @@ describe('CodeGraph provider', () => {
 });
 
 describe('Graphify provider', () => {
+  test('generates a graph in a standalone non-Git folder and skips only Git hook automation', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('non-git-folder');
+    fs.rmSync(path.join(fixture.target, '.git'), { recursive: true, force: true });
+
+    const plan = provider.plan(fixture.context);
+    const result = provider.apply(fixture.context, plan);
+
+    expect(plan).toMatchObject({
+      blocked: false,
+      repo_root: fixture.target,
+      requirement_workspace: fixture.target,
+      artifact_root: path.join(fixture.target, 'graphify-out'),
+    });
+    expect(result).toMatchObject({
+      readiness_status: 'fresh',
+      lifecycle: {
+        initialized: true,
+        indexed: true,
+        artifact_exists: true,
+        query_verified: true,
+      },
+      steady_state: {
+        refresh_mode: 'manual-only',
+        hook_installed: false,
+        hook_verified: false,
+        hook_status: 'skipped',
+        hook_skipped_reason: 'not-a-git-repo',
+      },
+    });
+    expect(fs.existsSync(path.join(fixture.target, '.git'))).toBe(false);
+    expect(fs.existsSync(path.join(fixture.target, 'graphify-out', 'graph.json'))).toBe(true);
+    expect(fixture.hookCalls).toEqual([]);
+  });
+
+  test('does not certify an enclosing Git hook for a nested non-Git folder', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('nested-non-git-parent-hook');
+    const nested = path.join(fixture.target, 'vibops');
+    fs.mkdirSync(path.join(nested, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(
+      path.join(nested, 'graphify-out', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'nested' }], links: [] }),
+    );
+    fs.writeFileSync(
+      path.join(fixture.target, '.git', 'hooks', 'post-commit'),
+      '#!/bin/sh\n# Installed by: graphify hook install\ngraphify update .\n',
+    );
+
+    const result = provider.verify({
+      ...fixture.context,
+      repoRoot: nested,
+      targetKind: 'non-git-folder',
+    });
+
+    expect(result.steady_state).toMatchObject({
+      refresh_mode: 'manual-only',
+      hook_installed: false,
+      hook_verified: false,
+      hook_status: 'skipped',
+      hook_skipped_reason: 'graphify-hook-not-applicable-non-git-folder',
+    });
+    expect(result.steady_state.refresh_mode).not.toBe('commit-hook-external-verified');
+  });
+
   test('keeps an external effective hooks path read-only and preserves core readiness', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('external-hooks');
@@ -719,6 +861,111 @@ describe('Graphify provider', () => {
     });
   });
 
+  test('does not relabel a scope-A artifact as scope B during verify', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('nested-workspace-verify-scope');
+    const scopeA = path.join('packages', 'api');
+    const scopeB = path.join('packages', 'web');
+    fs.mkdirSync(path.join(fixture.target, scopeA), { recursive: true });
+    fs.mkdirSync(path.join(fixture.target, scopeB), { recursive: true });
+    const generated = provider.apply(
+      { ...fixture.context, requirementWorkspace: scopeA },
+      provider.plan({ ...fixture.context, requirementWorkspace: scopeA }),
+    );
+    expect(generated.first_generation).toMatchObject({
+      status: 'completed',
+      requirement_workspace_path: 'packages/api',
+      scope_provenance: {
+        status: 'verified',
+        requested_requirement_workspace_path: 'packages/api',
+        verified_requirement_workspace_path: 'packages/api',
+      },
+    });
+    expect(fs.existsSync(path.join(
+      fixture.target,
+      'graphify-out',
+      'spec-first-graph-scope.json',
+    ))).toBe(true);
+
+    const result = provider.verify({
+      ...fixture.context,
+      requirementWorkspace: scopeB,
+    });
+
+    expect(result).toMatchObject({
+      readiness_status: 'degraded',
+      first_generation: {
+        status: 'unknown',
+        scope: 'unknown',
+        requirement_workspace_path: 'packages/api',
+        scope_provenance: {
+          status: 'mismatch',
+          reason_code: 'graphify-scope-provenance-mismatch',
+          requested_requirement_workspace_path: 'packages/web',
+          verified_requirement_workspace_path: 'packages/api',
+          receipt_ref: 'graphify-out/spec-first-graph-scope.json',
+        },
+      },
+    });
+    expect(result.next_actions.join('\n')).toContain('requested Graphify scope');
+    expect(result.next_actions.join('\n')).not.toContain('graphify-extract-integrity-failed');
+    expect(validateAgainstSchema(providerSchema, result)).toEqual({ valid: true, errors: [] });
+  });
+
+  test('invalidates scope provenance when graph.json changes after the receipt was written', () => {
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('scope-receipt-artifact-binding');
+    provider.apply(fixture.context, provider.plan(fixture.context));
+    fs.writeFileSync(
+      path.join(fixture.target, 'graphify-out', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'replaced-after-receipt' }], links: [] }),
+    );
+
+    const result = provider.verify(fixture.context);
+
+    expect(result).toMatchObject({
+      readiness_status: 'degraded',
+      first_generation: {
+        status: 'unknown',
+        scope: 'unknown',
+        requirement_workspace_path: '.',
+        scope_provenance: {
+          status: 'invalid',
+          reason_code: 'graphify-scope-provenance-artifact-mismatch',
+          requested_requirement_workspace_path: '.',
+          verified_requirement_workspace_path: '.',
+        },
+      },
+    });
+  });
+
+  test('does not follow a symlinked Graphify scope receipt', () => {
+    if (process.platform === 'win32') return;
+    const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
+    const fixture = createGraphifyApplyFixture('scope-receipt-symlink');
+    fs.mkdirSync(path.join(fixture.target, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(
+      path.join(fixture.target, 'graphify-out', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'existing' }], links: [] }),
+    );
+    const outside = path.join(
+      fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-graphify-scope-outside-')),
+      'receipt.json',
+    );
+    fs.writeFileSync(outside, JSON.stringify({ requirement_workspace_path: 'forged' }));
+    fs.symlinkSync(outside, path.join(fixture.target, 'graphify-out', 'spec-first-graph-scope.json'));
+
+    const result = provider.verify(fixture.context);
+
+    expect(result).toMatchObject({
+      readiness_status: 'degraded',
+      lifecycle: { artifact_exists: false, query_verified: false },
+      first_generation: { status: 'failed' },
+      limitations: expect.arrayContaining([expect.stringMatching(/graphify-(?:artifact|scope-provenance)-symlink-escape/)]),
+    });
+    expect(fs.readFileSync(outside, 'utf8')).toBe(JSON.stringify({ requirement_workspace_path: 'forged' }));
+  });
+
   test('refreshes an existing Graphify graph in place without spec-first staging or backup artifacts', () => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/graphify.cjs');
     const fixture = createGraphifyApplyFixture('incremental-refresh');
@@ -938,6 +1185,11 @@ describe('Graphify provider', () => {
     expect(result).toMatchObject({
       readiness_status: 'fresh',
       lifecycle: { artifact_exists: true, query_verified: true },
+      first_generation: {
+        scope: 'user-specified',
+        requirement_workspace_path: 'packages/api',
+        artifact_root: 'graphify-out',
+      },
     });
   });
 

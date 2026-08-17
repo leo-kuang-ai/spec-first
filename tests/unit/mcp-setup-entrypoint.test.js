@@ -299,6 +299,38 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     }
   });
 
+  test('renders execution root, Graphify input scope, and artifact owner in the install plan', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('plan-target-facts');
+    const before = snapshot(target);
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const audit = createReadOnlyAuditRunner();
+
+    const result = runSetup({
+      argv: ['--plan', '--only', 'graphify', '--requirement-workspace', 'packages/api'],
+      cwd: target,
+      skillRoot,
+      runner: audit.runner,
+      env: {},
+      homeDir,
+    });
+
+    expect(result.exit_code).toBe(2);
+    expect(result.reason_code).toBe('requirement-workspace-missing');
+    expect(result.payload.provider_selection).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        provider: 'graphify',
+        selected: true,
+        execution_root: target,
+        runtime_projection_root: target,
+        graphify_input_scope: path.join(target, 'packages', 'api'),
+        artifact_root: path.join(target, 'graphify-out'),
+      }),
+    ]));
+    expect(audit.violations).toEqual([]);
+    expect(snapshot(target)).toEqual(before);
+  });
+
   test('previews an explicit Graphify refresh without mutating the project', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const target = tempRepo('readonly-graphify-refresh-plan');
@@ -912,7 +944,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
             status: 'missing',
             reason_code: 'runtime-state-missing',
           }),
-          next_action: expect.stringContaining('spec-first init --qoder --repo'),
+          next_action: expect.stringContaining('next_action_command'),
+          next_action_command: {
+            cwd: child,
+            command: 'spec-first',
+            args: ['init', '--qoder'],
+          },
         })],
       },
     });
@@ -979,6 +1016,339 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(fs.existsSync(path.join(missingChild, '.spec-first', 'config.local.example.yaml'))).toBe(true);
   });
 
+  test('fails closed for an explicit nested repo target before host, provider, or facts work in every mode', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = tempRepo('nested-repo-target-entrypoint');
+    const nested = path.join(workspace, 'vibops');
+    fs.mkdirSync(nested, { recursive: true });
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    const calls = [];
+    const runner = (command, args, options) => {
+      calls.push([command, ...args]);
+      return fakeRunner(command, args, options);
+    };
+
+    for (const argv of [
+      ['--plan', '--only', 'graphify', '--repo', nested],
+      ['--check', '--repo', nested],
+      ['--verify-only', '--repo', nested],
+    ]) {
+      const result = runSetup({
+        argv,
+        cwd: nested,
+        skillRoot,
+        runner,
+        env: { MCP_SETUP_HOST: 'qoder' },
+        homeDir,
+        bundledVersion: '1.13.2',
+      });
+
+      expect(result).toMatchObject({
+        exit_code: 2,
+        reason_code: 'repo-target-not-git-root',
+        target: {
+          mode: 'invalid-target',
+          requested_repo_root: nested,
+          resolved_git_root: workspace,
+        },
+      });
+    }
+
+    expect(calls).toEqual([]);
+    expect(fs.existsSync(path.join(workspace, '.spec-first', 'config', 'tool-facts.json'))).toBe(false);
+    expect(fs.existsSync(path.join(homeDir, '.qoder'))).toBe(false);
+  });
+
+  test('plans a nested folder at its exact artifact root while reusing the enclosing runtime projection', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = tempRepo('nested-folder-plan');
+    const nested = path.join(workspace, 'vibops');
+    const inputScope = path.join(nested, 'packages', 'api');
+    fs.mkdirSync(inputScope, { recursive: true });
+
+    const result = runSetup({
+      argv: [
+        '--plan',
+        '--only',
+        'codegraph,graphify',
+        '--folder',
+        nested,
+        '--requirement-workspace',
+        'packages/api',
+      ],
+      cwd: nested,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'codex' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result.exit_code).toBe(0);
+    expect(result.target).toMatchObject({
+      mode: 'non-git-folder',
+      target_root: nested,
+      artifact_root: nested,
+      runtime_projection_root: workspace,
+      enclosing_git_root: workspace,
+    });
+    expect(result.payload.provider_selection).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        provider: 'codegraph',
+        execution_root: nested,
+        runtime_projection_root: workspace,
+        artifact_root: path.join(nested, '.codegraph'),
+      }),
+      expect.objectContaining({
+        provider: 'graphify',
+        execution_root: nested,
+        runtime_projection_root: workspace,
+        graphify_input_scope: inputScope,
+        artifact_root: path.join(nested, 'graphify-out'),
+      }),
+    ]));
+  });
+
+  test('uses the enclosing runtime manifest but writes provider artifacts and setup facts inside a nested folder', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = tempRepo('nested-folder-apply');
+    const nested = path.join(workspace, 'vibops');
+    fs.mkdirSync(nested, { recursive: true });
+    const runner = (command, args, options) => {
+      if (command === 'codegraph' && args[0] === '--version') {
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+      }
+      if (command === 'codegraph' && args[0] === 'init') {
+        fs.mkdirSync(path.join(nested, '.codegraph'), { recursive: true });
+        fs.writeFileSync(path.join(nested, '.codegraph', 'codegraph.db'), 'db');
+      }
+      if (command === 'codegraph' && args[0] === 'status') {
+        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+      }
+      return fakeRunner(command, args, options);
+    };
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph', '--folder', nested],
+      cwd: nested,
+      skillRoot,
+      runner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result.reason_code).not.toBe('generated-runtime-projection-preflight-blocked');
+    expect(fs.existsSync(path.join(nested, '.codegraph', 'codegraph.db'))).toBe(true);
+    expect(fs.existsSync(path.join(nested, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
+    expect(fs.existsSync(path.join(nested, '.qoder', 'spec-first', 'state.json'))).toBe(false);
+    expect(result.payload.runtime_capabilities.setup_summary.generated_runtime_manifest).toMatchObject({
+      status: 'current',
+      state_path: path.join(workspace, '.qoder', 'spec-first', 'state.json'),
+    });
+  });
+
+  test('points a nested folder at a structured enclosing-runtime init action', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-nested-folder-preflight-'));
+    initializeGitRepo(workspace);
+    const folder = path.join(workspace, 'vibops');
+    fs.mkdirSync(folder, { recursive: true });
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph', '--folder', '.'],
+      cwd: folder,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        results: [expect.objectContaining({
+          execution_root: folder,
+          runtime_projection_root: workspace,
+          artifact_root: folder,
+          next_action: expect.stringContaining('next_action_command'),
+          next_action_command: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder'],
+          },
+          next_action_headless_command: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder', '-y', '-u', '<name>', '--lang', '<zh|en>'],
+          },
+        })],
+      },
+    });
+    expect(result.payload.results[0].next_action).not.toContain('&&');
+  });
+
+  test('keeps verify-only folder remediation bound to the runtime projection root', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-folder-verify-remediation-'));
+    initializeGitRepo(workspace);
+    const folder = path.join(workspace, 'vibops');
+    fs.mkdirSync(folder, { recursive: true });
+
+    const result = runSetup({
+      argv: ['--verify-only', '--folder', folder],
+      cwd: workspace,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result.payload.runtime_capabilities.setup_summary.generated_runtime_manifest).toMatchObject({
+      status: 'missing',
+      runtime_projection_root: workspace,
+      next_action: expect.stringContaining('next_action_command'),
+      next_action_command: {
+        cwd: workspace,
+        command: 'spec-first',
+        args: ['init', '--qoder'],
+      },
+      next_action_headless_command: {
+        cwd: workspace,
+        command: 'spec-first',
+        args: ['init', '--qoder', '-y', '-u', '<name>', '--lang', '<zh|en>'],
+      },
+    });
+  });
+
+  test('keeps special folder paths as structured cwd data instead of shell source', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const base = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-structured-action-'));
+    const folder = path.join(base, "space ' $(touch injected) `touch injected2`\nline");
+    fs.mkdirSync(folder, { recursive: true });
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph', '--folder', '.'],
+      cwd: folder,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+
+    const remediation = result.payload.results[0];
+    expect(remediation.next_action_command).toEqual({
+      cwd: folder,
+      command: 'spec-first',
+      args: ['init', '--qoder'],
+    });
+    expect(remediation.next_action_headless_command.args).toEqual([
+      'init', '--qoder', '-y', '-u', '<name>', '--lang', '<zh|en>',
+    ]);
+    expect(remediation.next_action).not.toContain('&&');
+    expect(remediation.next_action).not.toContain('$(');
+    expect(remediation.next_action).not.toContain('`');
+  });
+
+  test('repairs a fresh standalone non-Git folder through the published headless init action', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-standalone-folder-'));
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-standalone-home-'));
+    const calls = [];
+    const runner = (command, args, options) => {
+      calls.push([command, ...args]);
+      if (command === 'codegraph' && args[0] === '--version') {
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.5.0' };
+      }
+      if (command === 'codegraph' && args[0] === 'init') {
+        fs.mkdirSync(path.join(folder, '.codegraph'), { recursive: true });
+        fs.writeFileSync(path.join(folder, '.codegraph', 'codegraph.db'), 'db');
+      }
+      if (command === 'codegraph' && args[0] === 'status') {
+        return { ...fakeRunner(command, args, options), stdout: 'index ready' };
+      }
+      return fakeRunner(command, args, options);
+    };
+    const input = {
+      argv: ['--only', 'codegraph'],
+      cwd: folder,
+      skillRoot,
+      runner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir,
+      bundledVersion: require('../../package.json').version,
+    };
+
+    const blocked = runSetup(input);
+
+    expect(blocked).toMatchObject({
+      exit_code: 2,
+      reason_code: 'generated-runtime-projection-preflight-blocked',
+      payload: {
+        results: [expect.objectContaining({
+          execution_root: folder,
+          runtime_projection_root: folder,
+          artifact_root: folder,
+          next_action: expect.stringContaining('next_action_command'),
+          next_action_command: {
+            cwd: folder,
+            command: 'spec-first',
+            args: ['init', '--qoder'],
+          },
+          next_action_headless_command: {
+            cwd: folder,
+            command: 'spec-first',
+            args: ['init', '--qoder', '-y', '-u', '<name>', '--lang', '<zh|en>'],
+          },
+        })],
+      },
+    });
+    expect(calls.some(([command, action]) => command === 'codegraph' && action === 'init')).toBe(false);
+    expect(fs.existsSync(path.join(folder, '.git'))).toBe(false);
+
+    const headless = blocked.payload.results[0].next_action_headless_command;
+    const initArgs = headless.args.map((arg) => {
+      if (arg === '<name>') return 'FixtureUser';
+      if (arg === '<zh|en>') return 'zh';
+      return arg;
+    });
+    const initialized = spawnSync(
+      process.execPath,
+      [path.join(repoRoot, 'bin', 'spec-first.js'), ...initArgs],
+      {
+        cwd: headless.cwd,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          HOME: homeDir,
+          XDG_CONFIG_HOME: path.join(homeDir, '.config'),
+          GIT_CONFIG_NOSYSTEM: '1',
+        },
+      },
+    );
+    expect(initialized.status).toBe(0);
+    expect(fs.existsSync(path.join(folder, '.qoder', 'spec-first', 'state.json'))).toBe(true);
+    const result = runSetup(input);
+
+    expect(result.exit_code).toBe(0);
+    expect(result.target).toMatchObject({
+      mode: 'non-git-folder',
+      target_root: folder,
+      artifact_root: folder,
+      runtime_projection_root: folder,
+      enclosing_git_root: null,
+    });
+    expect(fs.existsSync(path.join(folder, '.git'))).toBe(false);
+    expect(fs.existsSync(path.join(folder, '.codegraph', 'codegraph.db'))).toBe(true);
+    expect(fs.existsSync(path.join(folder, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
+    expect(result.payload.tool_facts.source.repo_status).toBe('not-git-repo');
+    expect(result.payload.runtime_capabilities.direct_evidence.git_diff).toBe(false);
+  });
+
   test('blocks unreadable current-host projection before provider, host, or facts mutation', () => {
     const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-preflight-unreadable-'));
@@ -1010,7 +1380,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
             status: 'unknown',
             reason_code: 'runtime-state-unreadable',
           }),
-          next_action: expect.stringContaining('spec-first init --qoder --repo'),
+          next_action: expect.stringContaining('next_action_command'),
+          next_action_command: {
+            cwd: child,
+            command: 'spec-first',
+            args: ['init', '--qoder'],
+          },
         })],
       },
     });
@@ -1048,7 +1423,12 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
           expect.objectContaining({
             repo_root: missingChild,
             blocked: true,
-            next_action: expect.stringContaining('spec-first init --qoder --repo'),
+            next_action: expect.stringContaining('next_action_command'),
+            next_action_command: {
+              cwd: missingChild,
+              command: 'spec-first',
+              args: ['init', '--qoder'],
+            },
           }),
         ]),
       },
@@ -1288,6 +1668,97 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         configured_status: 'ready',
         result: 'ready',
       });
+  });
+
+  test('fails selected Graphify completion when the artifact receipt belongs to another requested scope', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const target = tempRepo('graphify-scope-mismatch');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-'));
+    fs.mkdirSync(path.join(target, 'packages', 'api'), { recursive: true });
+    fs.mkdirSync(path.join(target, 'packages', 'web'), { recursive: true });
+    const input = {
+      cwd: target,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir,
+      bundledVersion: '1.13.2',
+    };
+
+    const generated = runSetup({
+      ...input,
+      argv: ['--only', 'graphify', '--requirement-workspace', 'packages/api'],
+    });
+    expect(generated.exit_code).toBe(0);
+
+    const mismatched = runSetup({
+      ...input,
+      argv: ['--only', 'graphify', '--requirement-workspace', 'packages/web'],
+    });
+
+    expect(mismatched).toMatchObject({
+      exit_code: 1,
+      reason_code: 'graphify-scope-provenance-mismatch',
+      payload: {
+        execution_summary: {
+          overall_status: 'action-required',
+          reason_code: 'graphify-scope-provenance-mismatch',
+        },
+      },
+    });
+    expect(mismatched.payload.tool_facts.provider_readiness.find((entry) => entry.provider === 'graphify'))
+      .toMatchObject({
+        readiness_status: 'degraded',
+        first_generation: {
+          status: 'unknown',
+          requirement_workspace_path: 'packages/api',
+          scope_provenance: {
+            status: 'mismatch',
+            requested_requirement_workspace_path: 'packages/web',
+            verified_requirement_workspace_path: 'packages/api',
+          },
+        },
+      });
+  });
+
+  test('keeps an enclosing Git hook not applicable for a nested non-Git folder at the entrypoint', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const parent = tempRepo('nested-folder-parent-hook');
+    const folder = path.join(parent, 'vibops');
+    fs.mkdirSync(path.join(folder, 'graphify-out'), { recursive: true });
+    fs.writeFileSync(
+      path.join(folder, 'graphify-out', 'graph.json'),
+      JSON.stringify({ nodes: [{ id: 'nested' }], links: [] }),
+    );
+    fs.writeFileSync(
+      path.join(parent, '.git', 'hooks', 'post-commit'),
+      '#!/bin/sh\n# Installed by: graphify hook install\ngraphify update .\n',
+    );
+
+    const result = runSetup({
+      argv: ['--check', '--folder', folder],
+      cwd: parent,
+      skillRoot,
+      runner: fakeRunner,
+      env: { MCP_SETUP_HOST: 'qoder' },
+      homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
+      bundledVersion: '1.13.2',
+    });
+    const graphify = result.payload.provider_readiness
+      .find((entry) => entry.provider === 'graphify');
+
+    expect(result.target).toMatchObject({
+      target_kind: 'non-git-folder',
+      target_root: folder,
+      enclosing_git_root: parent,
+    });
+    expect(graphify.steady_state).toMatchObject({
+      refresh_mode: 'manual-only',
+      hook_installed: false,
+      hook_verified: false,
+      hook_status: 'skipped',
+      hook_skipped_reason: 'graphify-hook-not-applicable-non-git-folder',
+    });
   });
 
   test('writes OpenCode MCP entries through the native project config shape', () => {
@@ -2231,7 +2702,35 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         },
         overall_status: 'action-required',
         reason_code: 'generated-runtime-manifest-refresh-required',
-        next_action: '从 parent workspace 运行 spec-first init --qoder -y -u <name> 刷新 parent runtime，或对 stale child repo 运行 spec-first init --qoder --repo <child> -y -u <name>，然后重新 verify。',
+        next_action: '按 runtime_init_actions 中与目标 topology 对应的 cwd + argv 刷新 runtime，然后重新 verify。',
+        runtime_init_actions: {
+          parent: { cwd: workspace, command: 'spec-first', args: ['init', '--qoder'] },
+          parent_headless: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder', '-y', '-u', '<name>', '--lang', '<zh|en>'],
+          },
+          child_example: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder', '--repo', '<child>'],
+          },
+          child_headless_example: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder', '--repo', '<child>', '-y', '-u', '<name>', '--lang', '<zh|en>'],
+          },
+          all_repos: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder', '--all-repos'],
+          },
+          all_repos_headless: {
+            cwd: workspace,
+            command: 'spec-first',
+            args: ['init', '--qoder', '--all-repos', '-y', '-u', '<name>', '--lang', '<zh|en>'],
+          },
+        },
       },
     });
     expect(result.payload.results.find((entry) => entry.repo_label === 'packages/second')).toMatchObject({

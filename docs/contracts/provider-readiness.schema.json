@@ -101,7 +101,25 @@
           "type": "array",
           "items": { "type": "string", "minLength": 1 }
         },
-        "next_action": { "type": ["string", "null"] }
+        "next_action": { "type": ["string", "null"] },
+        "scope_provenance": {
+          "type": "object",
+          "required": [
+            "status",
+            "reason_code",
+            "requested_requirement_workspace_path",
+            "verified_requirement_workspace_path",
+            "receipt_ref"
+          ],
+          "properties": {
+            "status": { "enum": ["verified", "missing", "mismatch", "invalid", "unknown"] },
+            "reason_code": { "type": ["string", "null"] },
+            "requested_requirement_workspace_path": { "type": ["string", "null"] },
+            "verified_requirement_workspace_path": { "type": ["string", "null"] },
+            "receipt_ref": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },

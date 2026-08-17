@@ -51,6 +51,7 @@ const {
   runWorkspaceBatch,
 } = require('./lib/workspace-executor.cjs');
 const {
+  buildProviderPlanSelections,
   buildWorkspaceRuntimePreflight,
   requiresRuntimeProjectionPreflight,
   resolveRuntimeProjectionTargets,
@@ -138,7 +139,7 @@ function runSetup(input = {}) {
     folder: actionPlan.args.folder,
     allRepos: actionPlan.args.allRepos,
   });
-  if (!target.state_write_allowed && actionPlan.mutation) {
+  if (target.mode === 'invalid-target' || (!target.state_write_allowed && actionPlan.mutation)) {
     return {
       exit_code: 2,
       mode: actionPlan.mode,
@@ -580,6 +581,7 @@ function runPlan(context, repoRoot) {
     reason_code: blockedEntry ? blockedEntry.reason_code || blockedEntry.blocked_reason : 'setup-install-plan-ready',
     target: context.target,
     host: context.host,
+    provider_selection: buildProviderPlanSelections({ context, repoRoot, providerPlans }),
     actions: previewActions,
     safety: previewSafety(context),
     next_action: providerBlock
@@ -823,6 +825,8 @@ function helpResult() {
     '模式：--check | --verify-only | --refresh-facts | --plan | --project-config | --only <ids> | --repair-host-config',
     'Graphify 刷新：--only graphify --refresh',
     '目标：--repo <path> | --folder <path> | --all-repos',
+    '  --repo 仅接受精确 Git root；--folder 接受精确逻辑目录且不要求 Git。',
+    '  folder 内的 Provider artifact/facts 不会提升到父 Git root；仅 generated runtime 可复用父 root。',
     'Workspace 双层图构建：--only codegraph,graphify --workspace-graph [--repos <a,b>]',
     'Workspace 双层图状态：--workspace-graph-status [--repos <a,b>]',
     'Workspace 双层图清理：--workspace-graph-clean [--repos <a,b>]',

@@ -182,6 +182,8 @@ Run `spec-first doctor --verbose` for the current project's runtime facts. The g
 
 Use `spec-first` when your team already codes with an AI host and wants project-local intent, inspectable handoffs, explicit review boundaries, evidence-aware completion, and reusable learning across sessions or hosts.
 
+Runtime Setup also supports CodeGraph and Graphify in a non-Git folder selected with `--folder <path>`; artifacts stay in that folder, while Git-hook refresh becomes `manual-only`.
+
 It is probably unnecessary when you only need a one-off prompt, cannot write workflow artifacts into the repository, want a standalone coding application, or expect a central process engine to choose product priorities and architecture for you.
 
 ## Documentation

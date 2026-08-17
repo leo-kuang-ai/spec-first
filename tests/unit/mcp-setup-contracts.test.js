@@ -67,8 +67,13 @@ describe('spec-runtime-setup runner contracts', () => {
     expect(skill).toContain('## Default Full Setup Flow');
     expect(skill).toContain('--only codegraph,graphify');
     expect(skill).toContain('defaults-active');
-    expect(skill).toContain('default to all discovered supported child repos');
-    expect(skill).toContain('`--repo <child>` is the explicit narrowing control');
+    expect(skill).toContain('a pure non-Git directory with no child repos becomes the single folder target');
+    expect(skill).toContain('a non-Git parent with discovered child repos keeps the bounded all-repos behavior');
+    expect(skill).toContain('`--folder <path>` selects the exact logical project directory and does not require Git');
+    expect(skill).toContain('`--repo <path>` must resolve to the exact Git repository root');
+    expect(skill).toContain('the folder is never passed to Git-only `init --repo`');
+    expect(skill).toContain('`next_action_command={cwd,command,args}`');
+    expect(skill).toContain('`first_generation.scope_provenance`');
     expect(skill).toContain('默认 parent-workspace batch 则从 parent 运行');
     expect(registry.providers.filter((entry) => entry.setup_required).map((entry) => entry.id).sort())
       .toEqual(['codegraph', 'graphify']);

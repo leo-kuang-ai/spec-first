@@ -62,6 +62,13 @@ function resolveExplicitRepo(base, requested, cwdGitRoot) {
 
   const gitRoot = findGitRoot(target.real_path);
   if (!gitRoot) return invalidTarget(base, 'repo-target-not-git');
+  if (path.resolve(gitRoot) !== path.resolve(target.real_path)) {
+    return invalidTarget(base, 'repo-target-not-git-root', {
+      requested_repo_root: target.real_path,
+      resolved_git_root: gitRoot,
+      next_action: `--repo 必须指向 Git repository root；当前路径位于 ${gitRoot}。请选择父仓，或用 --folder ${target.real_path} 保持精确目录边界。`,
+    });
+  }
   if (!isPathWithin(gitRoot, base.workspace_root) || !isCanonicalPathWithin(gitRoot, base.workspace_root)) {
     return invalidTarget(base, 'repo-target-outside-workspace');
   }
@@ -81,25 +88,10 @@ function resolveExplicitRepo(base, requested, cwdGitRoot) {
 function resolveExplicitFolder(base, requested) {
   const target = inspectExplicitPath(base.workspace_root, base.invocation_cwd, requested, 'folder');
   if (!target.ok) return invalidTarget(base, target.reason_code);
-  if (findGitRoot(target.real_path)) {
+  if (hasGitMarker(target.real_path)) {
     return invalidTarget(base, 'folder-target-is-git-repo');
   }
-
-  const label = relativeLabel(target.real_path, base.workspace_root);
-  return {
-    ...base,
-    mode: 'non-git-folder',
-    repo_status: 'not-git-repo',
-    target_kind: 'non-git-folder',
-    selection_source: 'explicit-folder',
-    state_write_allowed: true,
-    selected_folder_root: target.real_path,
-    target_root: target.real_path,
-    repo_label: label,
-    folder_label: label,
-    reason_code: '',
-    next_action: '',
-  };
+  return nonGitFolderResult(base, target.real_path, 'explicit-folder');
 }
 
 function resolveAllRepos(base, scanDepth, explicit, cwdGitRoot) {
@@ -110,6 +102,9 @@ function resolveAllRepos(base, scanDepth, explicit, cwdGitRoot) {
 
   const candidates = discoverChildRepos(base.workspace_root, scanDepth);
   if (candidates.length === 0) {
+    if (!explicit) {
+      return nonGitFolderResult(base, base.invocation_cwd, 'cwd-non-git-folder');
+    }
     return {
       ...base,
       mode: 'workspace-no-git-candidates',
@@ -143,6 +138,30 @@ function currentRepoResult(base, gitRoot) {
     target_root: gitRoot,
     repo_label: path.basename(gitRoot),
   }, gitRoot);
+}
+
+function nonGitFolderResult(base, folderRoot, selectionSource) {
+  const enclosingGitRoot = findGitRoot(folderRoot);
+  const label = relativeLabel(folderRoot, base.workspace_root);
+  return {
+    ...base,
+    mode: 'non-git-folder',
+    repo_status: 'not-git-repo',
+    target_kind: 'non-git-folder',
+    selection_source: selectionSource,
+    state_write_allowed: true,
+    selected_repo_root: null,
+    selected_folder_root: folderRoot,
+    target_root: folderRoot,
+    artifact_root: folderRoot,
+    runtime_projection_root: enclosingGitRoot || folderRoot,
+    enclosing_git_root: enclosingGitRoot,
+    repo_label: label,
+    folder_label: label,
+    git_health: { status: 'not-git', reason_code: 'not-git', git_entry_type: 'missing' },
+    reason_code: '',
+    next_action: '',
+  };
 }
 
 function inspectExplicitPath(workspaceRoot, invocationCwd, requested, kind) {
@@ -320,6 +339,9 @@ function baseResult(invocationCwd, workspaceRoot = invocationCwd, cwdGitRoot = n
     selected_repo_root: null,
     selected_folder_root: null,
     target_root: null,
+    artifact_root: null,
+    runtime_projection_root: null,
+    enclosing_git_root: cwdGitRoot,
     repo_label: '',
     folder_label: '',
     candidates: [],
@@ -338,6 +360,9 @@ function gitRepoResult(base, gitRoot) {
     repo_status: 'git-repo',
     target_kind: 'git-repo',
     state_write_allowed: writable,
+    artifact_root: base.artifact_root || gitRoot,
+    runtime_projection_root: base.runtime_projection_root || gitRoot,
+    enclosing_git_root: gitRoot,
     git_health: gitHealth,
     reason_code: writable ? '' : gitHealth.reason_code,
     next_action: writable ? '' : gitHealthNextAction(gitHealth),
@@ -354,15 +379,16 @@ function gitHealthNextAction(gitHealth) {
   return '请在 setup mutation 前恢复有效的 Git repository。';
 }
 
-function invalidTarget(base, reasonCode) {
+function invalidTarget(base, reasonCode, details = {}) {
   return {
     ...base,
+    ...details,
     mode: 'invalid-target',
     target_kind: 'invalid',
     state_write_allowed: false,
     target_root: null,
     reason_code: reasonCode,
-    next_action: '请选择 invocation workspace 内的目标，然后重试。',
+    next_action: details.next_action || '请选择 invocation workspace 内的目标，然后重试。',
   };
 }
 

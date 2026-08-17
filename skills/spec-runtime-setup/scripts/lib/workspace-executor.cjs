@@ -22,6 +22,9 @@ const {
   renderJson,
 } = require('./renderer.cjs');
 const {
+  buildRuntimeInitRemediation,
+} = require('./runtime-remediation.cjs');
+const {
   buildHostConfigReceipt,
   computeGeneratedRuntimeManifestHealth,
   configureOrInspectHost,
@@ -448,10 +451,10 @@ function buildVerifyChildResult(child, candidate, context) {
     reason_code: 'not-reported',
   }) };
   const manifestRefreshRequired = ['stale', 'missing'].includes(manifest.status);
-  const childRuntimeAction = runtimeInitAction(context.host, {
-    repo: portableWorkspacePath(candidate.workspace_relative_path),
-  });
-  if (manifestRefreshRequired) manifest.next_action = childRuntimeAction;
+  const childRemediation = manifestRefreshRequired
+    ? buildRuntimeInitRemediation({ host: context.host, cwd: candidate.git_root })
+    : null;
+  if (childRemediation) Object.assign(manifest, childRemediation);
   const nextActions = [];
   for (const item of (payload.tool_facts && payload.tool_facts.items) || []) {
     if (item.next_action) nextActions.push(item.next_action);
@@ -459,7 +462,7 @@ function buildVerifyChildResult(child, candidate, context) {
   for (const readiness of (payload.tool_facts && payload.tool_facts.provider_readiness) || []) {
     nextActions.push(...(readiness.next_actions || []));
   }
-  if (manifestRefreshRequired) nextActions.push(childRuntimeAction);
+  if (childRemediation) nextActions.push(childRemediation.next_action);
   return {
     schema_version: 'mcp-verify-child-result.v1',
     baseline_ready: setupSummary.baseline_ready === true,
@@ -531,12 +534,12 @@ function buildWorkspaceVerifySummary(context, results, computeGeneratedRuntimeMa
     quarantineWriteStatus = 'degraded';
     quarantineWriteReasonCode = error.reason_code || 'workspace-quarantine-write-failed';
   }
-  const parentRuntimeAction = runtimeInitAction(context.host);
-  const childRuntimeAction = runtimeInitAction(context.host, { repo: '<child>' });
-  const allReposRuntimeAction = runtimeInitAction(context.host, { allRepos: true });
+  const parentRemediation = buildRuntimeInitRemediation({ host: context.host, cwd: workspaceRoot });
+  const childRemediation = buildRuntimeInitRemediation({ host: context.host, cwd: workspaceRoot, repo: '<child>' });
+  const allReposRemediation = buildRuntimeInitRemediation({ host: context.host, cwd: workspaceRoot, allRepos: true });
   const parentManifest = computeGeneratedRuntimeManifestHealth(context, workspaceRoot);
   const parentManifestRefreshRequired = ['stale', 'missing'].includes(parentManifest.status);
-  if (parentManifestRefreshRequired) parentManifest.next_action = parentRuntimeAction;
+  if (parentManifestRefreshRequired) Object.assign(parentManifest, parentRemediation);
   const counts = countWorkspaceResults(results, { includeManifests: true });
   const manifestCounts = counts.generated_runtime_manifest;
   const childManifestRefreshRequired = manifestCounts.stale + manifestCounts.missing > 0;
@@ -552,7 +555,7 @@ function buildWorkspaceVerifySummary(context, results, computeGeneratedRuntimeMa
     runtimeHints.push(`- 检测到 workspace 污染：已写入 .spec-first/workspace/parent-artifact-quarantine.json（quarantine ${pollutionCount} 条路径）。运行 \`spec-first clean --workspace-orphans\` 进行只读检查。`);
   }
   if (manifestRefreshRequired) {
-    runtimeHints.push(`- Parent workspace 或一个以上 child repo 的 generated runtime manifest 已 stale 或缺失。对 parent workspace runtime 运行 \`${parentRuntimeAction}\`；对 stale child repo 使用 \`${childRuntimeAction}\`，或显式运行 \`${allReposRuntimeAction}\` 批量刷新 child root。`);
+    runtimeHints.push('- Parent workspace 或一个以上 child repo 的 generated runtime manifest 已 stale 或缺失；按 runtime_init_actions 中与目标 topology 对应的 cwd + argv 修复。');
   }
   return {
     schema_version: 'workspace-mcp-verify-summary.v1',
@@ -592,8 +595,16 @@ function buildWorkspaceVerifySummary(context, results, computeGeneratedRuntimeMa
     quarantine_write_status: quarantineWriteStatus,
     quarantine_write_reason_code: quarantineWriteReasonCode,
     runtime_hints: runtimeHints,
+    runtime_init_actions: manifestRefreshRequired ? {
+      parent: parentRemediation.next_action_command,
+      parent_headless: parentRemediation.next_action_headless_command,
+      child_example: childRemediation.next_action_command,
+      child_headless_example: childRemediation.next_action_headless_command,
+      all_repos: allReposRemediation.next_action_command,
+      all_repos_headless: allReposRemediation.next_action_headless_command,
+    } : null,
     next_action: manifestRefreshRequired
-      ? `从 parent workspace 运行 ${parentRuntimeAction} 刷新 parent runtime，或对 stale child repo 运行 ${childRuntimeAction}，然后重新 verify。`
+      ? '按 runtime_init_actions 中与目标 topology 对应的 cwd + argv 刷新 runtime，然后重新 verify。'
       : (overallStatus === 'ready'
         ? '所有 child repo 均已验证必需 MCP/helper dependency readiness。父目录双层图请用 --workspace-graph --repos <清单> 构建/复核（勿用 --workspace-graph --all-repos）。'
         : '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup/verify。'),
@@ -631,21 +642,6 @@ function countWorkspaceResults(results, { includePartial = false, includeManifes
   }
   if (manifests) counts.generated_runtime_manifest = manifests;
   return counts;
-}
-
-function runtimeInitAction(host, { repo = '', allRepos = false } = {}) {
-  const hostFlag = host ? `--${host} ` : '';
-  if (allRepos) return `spec-first init ${hostFlag}--all-repos -y -u <name>`;
-  if (repo) {
-    const repoArg = repo === '<child>' ? repo : quoteRuntimeExampleArg(repo);
-    return `spec-first init ${hostFlag}--repo ${repoArg} -y -u <name>`;
-  }
-  return `spec-first init ${hostFlag}-y -u <name>`;
-}
-
-function quoteRuntimeExampleArg(value) {
-  const normalized = String(value || '');
-  return /^[A-Za-z0-9_./:\\-]+$/.test(normalized) ? normalized : JSON.stringify(normalized);
 }
 
 function portableWorkspacePath(value) {
