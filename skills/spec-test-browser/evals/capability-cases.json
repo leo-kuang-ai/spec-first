@@ -3,6 +3,7 @@
   "skill": "spec-test-browser",
   "source_refs": [
     "skills/spec-test-browser/scripts/agent-browser-run-context.cjs",
+    "skills/spec-test-browser/scripts/agent-browser-exact-origin-conformance.cjs",
     "skills/spec-test-browser/SKILL.md",
     "skills/spec-test-browser/references/pipeline-orchestration.md"
   ],
@@ -33,8 +34,15 @@
       "id": "provider-self-report-does-not-confirm-exact-origin",
       "kind": "negative-owner",
       "input": "agent-browser help advertises --exact-origin, or a caller/provider JSON claims request-time enforcement, but no Spec-First controlled conformance has passed for the same binary.",
-      "expected": "Return exact-origin-conformance-required with conformance_status not_run, keep execution_readiness blocked, and launch zero navigation/interaction subprocess calls.",
+      "expected": "Run controlled conformance for the resolved binary identity; unless every positive and negative case passes, return a structured exact-origin-conformance failure, keep execution_readiness blocked, and launch zero test-plan navigation/interaction subprocess calls.",
       "forbidden": ["invoke a speculative capabilities command", "promote provider self-report to confirmed evidence", "accept a caller capability override"]
+    },
+    {
+      "id": "controlled-conformance-binds-current-binary",
+      "kind": "positive",
+      "input": "The resolved agent-browser executable advertises --exact-origin and the independent producer passes all positive and cross-origin negative cases for its realpath, SHA-256, and size.",
+      "expected": "Return conformance_status passed, execution_readiness ready, exact_origin_confirmed true, and rerun the producer when binary identity changes.",
+      "forbidden": ["trust an external receipt", "skip positive controls", "accept blocked-origin requests"]
     },
     {
       "id": "profile-state-and-caller-literals-are-rejected",

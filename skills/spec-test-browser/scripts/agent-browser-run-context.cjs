@@ -8,6 +8,18 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const MANIFEST_VERSION = 'spec-test-browser-run-context/v1';
+const CONFORMANCE_SCHEMA_VERSION = 'agent-browser-exact-origin-conformance/v1';
+const CONFORMANCE_CASES = [
+  'initial-open-and-frame',
+  'same-origin-redirect',
+  'cross-origin-redirect',
+  'same-origin-link',
+  'cross-origin-link',
+  'cross-origin-form',
+  'cross-origin-script',
+  'cross-origin-popup',
+  'cross-origin-direct-open',
+];
 const AGENT_BROWSER_COMMAND = 'agent-browser';
 const REQUIRED_HELP_MARKERS = [
   'open <url>',
@@ -162,7 +174,7 @@ function buildCapabilities(options = {}) {
   return {
     required_flags: options.requiredFlags === true,
     exact_origin_advertised: options.exactOriginAdvertised === true,
-    exact_origin_confirmed: false,
+    exact_origin_confirmed: options.exactOriginConfirmed === true,
     exact_origin_evidence: options.exactOriginEvidence || 'none',
     profile_state_with_allowlist: false,
   };
@@ -173,13 +185,136 @@ function buildBlockedProbe(options = {}) {
     status: options.status || 'not_supported',
     execution_readiness: 'blocked',
     reason_code: options.reasonCode || 'agent-browser-unavailable',
-    conformance_status: 'not_run',
+    conformance_status: options.conformanceStatus || 'not_run',
     repair_scope: options.repairScope || 'dependency',
     next_action: options.nextAction || '',
     version: options.version || null,
     capabilities: options.capabilities || buildCapabilities(),
+    ...(options.binaryIdentity ? { binary_identity: options.binaryIdentity } : {}),
     missing: options.missing || [],
   };
+}
+
+function buildReadyProbe(options) {
+  return {
+    status: 'available',
+    execution_readiness: 'ready',
+    reason_code: null,
+    conformance_status: 'passed',
+    repair_scope: 'none',
+    next_action: '',
+    version: options.version,
+    binary_identity: options.binaryIdentity,
+    capabilities: buildCapabilities({
+      requiredFlags: true,
+      exactOriginAdvertised: true,
+      exactOriginConfirmed: true,
+      exactOriginEvidence: 'spec-first-conformance',
+    }),
+    missing: [],
+  };
+}
+
+function resolveBinaryIdentity(command, options = {}) {
+  const invocation = resolveRunnerInvocation(command, [], options);
+  if (!invocation.ok) return null;
+  const resolved = resolveExecutablePath(invocation.command, options.env || process.env, options.platform || process.platform);
+  if (!resolved) return null;
+  try {
+    const stat = fs.statSync(resolved);
+    if (!stat.isFile()) return null;
+    return {
+      path: fs.realpathSync.native(resolved),
+      sha256: sha256(fs.readFileSync(resolved)),
+      size: stat.size,
+    };
+  } catch (_error) {
+    return null;
+  }
+}
+
+function resolveExecutablePath(command, env, platform) {
+  if (typeof command !== 'string' || command.length === 0) return null;
+  const candidates = [];
+  if (path.isAbsolute(command) || command.includes('/') || command.includes('\\')) {
+    candidates.push(command);
+  } else {
+    const pathValue = env.PATH || env.Path || env.path || '';
+    const extensions = platform === 'win32'
+      ? (env.PATHEXT || '.EXE;.CMD;.BAT;.COM').split(';')
+      : [''];
+    for (const directory of pathValue.split(path.delimiter).filter(Boolean)) {
+      for (const extension of extensions) candidates.push(path.join(directory, `${command}${extension}`));
+    }
+  }
+  for (const candidate of candidates) {
+    try {
+      if (fs.statSync(candidate).isFile()) return candidate;
+    } catch (_error) {
+      // 继续检查下一个 PATH 候选。
+    }
+  }
+  return null;
+}
+
+function defaultConformanceRunner(options) {
+  const producer = path.join(__dirname, 'agent-browser-exact-origin-conformance.cjs');
+  return spawnSync(process.execPath, [
+    producer,
+    '--binary', options.binaryIdentity.path,
+    '--expected-sha256', options.binaryIdentity.sha256,
+  ], {
+    cwd: options.cwd,
+    env: options.env,
+    encoding: 'utf8',
+    shell: false,
+    timeout: options.timeout || 180000,
+    windowsHide: true,
+  });
+}
+
+function evaluateConformance(result, binaryIdentity) {
+  if (result && result.error && result.error.code === 'ETIMEDOUT') {
+    return { ok: false, reason_code: 'exact-origin-conformance-timeout' };
+  }
+  let payload;
+  try {
+    payload = JSON.parse(String(result && result.stdout || ''));
+  } catch (_error) {
+    return { ok: false, reason_code: 'exact-origin-conformance-invalid' };
+  }
+  if (!processSucceeded(result)) {
+    return {
+      ok: false,
+      reason_code: payload && payload.status === 'failed'
+        ? 'exact-origin-conformance-failed'
+        : 'exact-origin-conformance-invalid',
+    };
+  }
+  if (!isPlainObject(payload)
+    || payload.schema_version !== CONFORMANCE_SCHEMA_VERSION
+    || payload.status !== 'passed'
+    || !sameBinaryIdentity(payload.binary_identity, binaryIdentity)
+    || !isPlainObject(payload.positive_control)
+    || payload.positive_control.status !== 'passed'
+    || payload.blocked_origin_total_hits !== 0
+    || !Array.isArray(payload.cases)
+    || payload.cases.length !== CONFORMANCE_CASES.length) {
+    return { ok: false, reason_code: 'exact-origin-conformance-invalid' };
+  }
+  const cases = new Map(payload.cases.map((item) => [item && item.name, item]));
+  if (cases.size !== CONFORMANCE_CASES.length
+    || CONFORMANCE_CASES.some((name) => !cases.has(name) || cases.get(name).status !== 'passed')) {
+    return { ok: false, reason_code: 'exact-origin-conformance-invalid' };
+  }
+  return { ok: true };
+}
+
+function sameBinaryIdentity(actual, expected) {
+  return isPlainObject(actual)
+    && actual.path === expected.path
+    && actual.sha256 === expected.sha256
+    && actual.size === expected.size;
 }
 
 function probeAgentBrowser(options = {}) {
@@ -242,19 +377,74 @@ function probeAgentBrowser(options = {}) {
     });
   }
 
-  return buildBlockedProbe({
-    status: 'available',
-    reasonCode: 'exact-origin-conformance-required',
-    repairScope: 'spec-first',
-    nextAction: '实现并通过 Spec-First controlled exact-origin conformance 后才能放行；当前保持 browser execution blocked。',
-    version,
-    capabilities: buildCapabilities({
-      requiredFlags: true,
-      exactOriginAdvertised: true,
-      exactOriginEvidence: 'help-marker',
-    }),
-    missing: ['spec-first controlled exact-origin conformance'],
+  const identityResolver = options.binaryIdentityResolver || resolveBinaryIdentity;
+  const binaryIdentity = identityResolver(command, {
+    env: buildCleanEnv(options.env || process.env),
+    platform: options.platform || process.platform,
+    arch: options.arch || process.arch,
   });
+  if (!binaryIdentity) {
+    return buildBlockedProbe({
+      status: 'available',
+      reasonCode: 'agent-browser-binary-identity-unavailable',
+      repairScope: 'spec-first',
+      nextAction: '无法绑定当前 agent-browser executable identity；修复 PATH/native binary 解析后重新运行 controlled conformance。',
+      version,
+      capabilities: buildCapabilities({
+        requiredFlags: true,
+        exactOriginAdvertised: true,
+        exactOriginEvidence: 'help-marker',
+      }),
+      missing: ['agent-browser binary identity'],
+    });
+  }
+
+  const conformanceRunner = options.conformanceRunner || defaultConformanceRunner;
+  let conformanceResult;
+  try {
+    conformanceResult = conformanceRunner({
+      command,
+      binaryIdentity,
+      cwd: options.cwd || process.cwd(),
+      env: buildCleanEnv(options.env || process.env),
+      timeout: options.conformanceTimeout || 180000,
+    });
+  } catch (_error) {
+    return buildBlockedProbe({
+      status: 'available',
+      reasonCode: 'exact-origin-conformance-error',
+      conformanceStatus: 'failed',
+      repairScope: 'spec-first',
+      nextAction: 'Spec-First controlled exact-origin conformance 无法执行；修复 producer 后重试。',
+      version,
+      binaryIdentity,
+      capabilities: buildCapabilities({
+        requiredFlags: true,
+        exactOriginAdvertised: true,
+        exactOriginEvidence: 'help-marker',
+      }),
+      missing: ['spec-first controlled exact-origin conformance'],
+    });
+  }
+  const conformance = evaluateConformance(conformanceResult, binaryIdentity);
+  if (!conformance.ok) {
+    return buildBlockedProbe({
+      status: 'available',
+      reasonCode: conformance.reason_code,
+      conformanceStatus: 'failed',
+      repairScope: 'spec-first',
+      nextAction: '当前 binary 未通过 Spec-First controlled exact-origin conformance；保持 browser execution blocked 并检查 producer evidence。',
+      version,
+      binaryIdentity,
+      capabilities: buildCapabilities({
+        requiredFlags: true,
+        exactOriginAdvertised: true,
+        exactOriginEvidence: 'help-marker',
+      }),
+      missing: ['spec-first controlled exact-origin conformance'],
+    });
+  }
+  return buildReadyProbe({ version, binaryIdentity });
 }
 
 function parseVersion(output) {
@@ -471,8 +661,10 @@ function prepareRunContext(options = {}) {
   }
 
   const token = crypto.randomBytes(8).toString('hex');
-  const session = `spec-test-browser-${token}`;
-  const namespace = `spec-test-browser-${token}`;
+  // Keep the provider socket path below macOS's 103-byte limit even when the
+  // caller stores the private run under a deeply nested project directory.
+  const session = `sfb-${token}`;
+  const namespace = `sfb-${token}`;
   const syntheticSeed = token;
   const testPlanPath = path.join(runDir, 'test-plan.json');
   const configPath = path.join(runDir, 'agent-browser-config.json');
@@ -485,6 +677,8 @@ function prepareRunContext(options = {}) {
     writePrivateJson(actionPolicyPath, {
       default: 'deny',
       allow: [
+        'launch',
+        'navigate',
         'open',
         'snapshot',
         'get',
@@ -583,7 +777,15 @@ function runPreparedContext(options = {}) {
   const cwd = options.cwd || process.cwd();
   const env = options.env || process.env;
   const probeRunner = typeof options.probe === 'function' ? options.probe : probeAgentBrowser;
-  const probe = probeRunner({ runner, command, cwd, env });
+  const probe = probeRunner({
+    runner,
+    command,
+    cwd,
+    env,
+    binaryIdentityResolver: options.binaryIdentityResolver,
+    conformanceRunner: options.conformanceRunner,
+    conformanceTimeout: options.conformanceTimeout,
+  });
   if (probe.execution_readiness !== 'ready' || probe.capabilities.exact_origin_confirmed !== true) {
     return {
       status: 'not_supported',
@@ -594,6 +796,24 @@ function runPreparedContext(options = {}) {
         .map((step) => step.action),
     };
   }
+
+  const identityResolver = options.binaryIdentityResolver || resolveBinaryIdentity;
+  const currentIdentity = identityResolver(probe.binary_identity && probe.binary_identity.path, {
+    env: buildCleanEnv(env),
+    platform: options.platform || process.platform,
+    arch: options.arch || process.arch,
+  });
+  if (!probe.binary_identity || !currentIdentity || !sameBinaryIdentity(currentIdentity, probe.binary_identity)) {
+    return {
+      status: 'not_supported',
+      reason_code: 'agent-browser-binary-identity-changed',
+      action_process_calls: 0,
+      blocked_actions: initialPlan.plan.steps
+        .filter((step) => NAVIGATION_OR_INTERACTION_ACTIONS.has(step.action))
+        .map((step) => step.action),
+    };
+  }
+  const actionCommand = currentIdentity.path;
 
   const cleanEnv = buildCleanEnv(env);
   const steps = [];
@@ -637,7 +857,7 @@ function runPreparedContext(options = {}) {
     const args = [...buildGlobalArgs(manifest), ...actionArgs.args];
     let result;
     try {
-      result = runner(command, args, {
+      result = runner(actionCommand, args, {
         cwd,
         env: cleanEnv,
         timeout: options.timeout || 30000,
@@ -1118,6 +1338,7 @@ module.exports = {
   main,
   prepareRunContext,
   probeAgentBrowser,
+  resolveBinaryIdentity,
   resolveRunnerInvocation,
   resolveWindowsAgentBrowserExecutable,
   runPreparedContext,

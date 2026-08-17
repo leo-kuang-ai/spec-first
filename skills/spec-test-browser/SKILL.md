@@ -37,9 +37,9 @@ node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe
 ```
 
 - `agent-browser-unavailable` 或 `required-agent-browser-capability-missing` → `not_supported`，停止。
-- `exact-origin-capability-unavailable` 或 `exact-origin-conformance-required` → `not_supported`，停止；navigation/interaction subprocess 必须为 0。
+- `exact-origin-capability-unavailable`、`agent-browser-binary-identity-unavailable` 或任一 `exact-origin-conformance-*` failure → `not_supported`，停止；navigation/interaction subprocess 必须为 0。
 - 只有 wrapper 返回 `execution_readiness: ready`，且 `capabilities.required_flags: true` 与 `capabilities.exact_origin_confirmed: true`，才可继续准备 browser run。
-- help 中出现 `--exact-origin`、provider 自报 JSON、版本 allowlist 或外部文档都只是 advertised/advisory evidence，不能单独放行。只有同一 binary identity 通过 Spec-First controlled conformance，覆盖 initial open、redirect、link/form/script navigation、popup 与 frame navigation 的负向跨 origin 场景，才能把 `conformance_status` 提升为 `passed`。当前 wrapper 还没有 conformance producer，因此即使 help 宣称该 flag 也保持 `exact-origin-conformance-required` / blocked。
+- help 中出现 `--exact-origin`、provider 自报 JSON、版本 allowlist 或外部文档都只是 advertised/advisory evidence，不能单独放行。Wrapper 对当前 executable 的 realpath、SHA-256 与 size 建立 run-local identity，并通过独立 Node producer 现场执行 Spec-First controlled conformance；不读取或信任外部 receipt。Conformance 覆盖 initial open、同源 redirect/link 正向控制，以及 redirect、link、form、script、popup、frame、direct open 的负向跨 origin 场景；正向控制、命令语义、identity 绑定、case 完整性或禁止 origin 零请求任一不满足都 fail closed。只有完整通过才返回 `conformance_status: passed` / `execution_readiness: ready`；binary identity 变化会重新执行验证。
 - 不要直接运行 browser CLI 做二次确认，也不以 host 名称、版本号、allowed domains 或 action policy 猜测 exact-origin 已支持。调用方传入的 capability 声明不能代替该 probe 或省略 request-time origin constraint。
 
 ## 3. Authorize Browser Effects Before Writing The Plan

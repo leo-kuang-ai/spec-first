@@ -6,7 +6,7 @@
 
 - Browser applicable 时必须提供一个 explicit exact loopback `target-origin:<origin>`。缺失时返回 `not_run` / `target-origin-missing`；非法值返回 `not_run` / `target-origin-invalid`。
 - 不读 runtime profile，不解析 package script、cwd 或 env，不做 reachability preflight、free-port scan、origin 改写或 server 启动。caller-owned server 在运行前后都保持 caller-owned，不被 wrapper 信号、关闭或清理。
-- 先调用 `node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe`。只有 probe 返回 `execution_readiness: ready`、`conformance_status: passed` 且 `capabilities.exact_origin_confirmed: true` 才能执行；缺少参数、只有 help marker、provider/caller 自报或尚无 Spec-First controlled conformance 都返回 `not_supported`，navigation/interaction subprocess 为 0。static/provider evidence 不等于 conformance，capability probe 也不等于本次 browser field outcome。
+- 先调用 `node "$SKILL_DIR/scripts/agent-browser-run-context.cjs" probe`。Probe 为当前 binary identity 现场运行独立的 controlled conformance producer，不读取外部 receipt；只有返回 `execution_readiness: ready`、`conformance_status: passed` 且 `capabilities.exact_origin_confirmed: true` 才能执行。缺少参数、只有 help marker、provider/caller 自报、identity 无法绑定、producer 异常/超时/畸形输出、正向控制失败或任一负向场景失败都返回 `not_supported`，navigation/interaction subprocess 为 0。static/provider evidence 不等于 conformance，capability probe 也不等于本次 browser field outcome。
 
 ## Effect Gate And Browser Execution
 

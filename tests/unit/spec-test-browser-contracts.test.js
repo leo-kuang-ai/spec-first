@@ -21,6 +21,7 @@ const testSuiteSource = fs.readFileSync(
   path.resolve(__dirname, '../../scripts/run-test-suite.cjs'),
   'utf8',
 );
+const CONFIRMED_BINARY_IDENTITY = wrapper.resolveBinaryIdentity(process.execPath);
 
 const tempRoots = [];
 
@@ -146,6 +147,7 @@ function confirmedConformanceProbe() {
     conformance_status: 'passed',
     repair_scope: 'none',
     next_action: '',
+    binary_identity: CONFIRMED_BINARY_IDENTITY,
     capabilities: {
       required_flags: true,
       exact_origin_advertised: true,
@@ -154,6 +156,49 @@ function confirmedConformanceProbe() {
       profile_state_with_allowlist: false,
     },
     missing: [],
+  };
+}
+
+function binaryIdentity(sha = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa') {
+  return {
+    path: '/opt/spec-first/agent-browser',
+    sha256: sha,
+    size: 1024,
+  };
+}
+
+function passedConformance(identity = binaryIdentity()) {
+  return {
+    status: 0,
+    stdout: JSON.stringify({
+      schema_version: 'agent-browser-exact-origin-conformance/v1',
+      status: 'passed',
+      binary_identity: identity,
+      positive_control: { status: 'passed' },
+      blocked_origin_total_hits: 0,
+      cases: [
+        'initial-open-and-frame',
+        'same-origin-redirect',
+        'cross-origin-redirect',
+        'same-origin-link',
+        'cross-origin-link',
+        'cross-origin-form',
+        'cross-origin-script',
+        'cross-origin-popup',
+        'cross-origin-direct-open',
+      ].map((name) => ({ name, status: 'passed' })),
+    }),
+    stderr: '',
+    error: null,
+  };
+}
+
+function failedConformance() {
+  return {
+    status: 1,
+    stdout: JSON.stringify({ status: 'failed' }),
+    stderr: '',
+    error: null,
   };
 }
 
@@ -190,13 +235,20 @@ test('probe does not treat a help marker as proof of request-time enforcement', 
   const calls = [];
   const result = wrapper.probeAgentBrowser({
     runner: probeRunner({ exactOrigin: true, calls }),
+    binaryIdentityResolver: () => binaryIdentity(),
+    conformanceRunner: () => ({
+      status: 1,
+      stdout: JSON.stringify({ status: 'failed' }),
+      stderr: '',
+      error: null,
+    }),
   });
 
   expect(result).toMatchObject({
     status: 'available',
     execution_readiness: 'blocked',
-    reason_code: 'exact-origin-conformance-required',
-    conformance_status: 'not_run',
+    reason_code: 'exact-origin-conformance-failed',
+    conformance_status: 'failed',
     repair_scope: 'spec-first',
   });
   expect(result.capabilities).toMatchObject({
@@ -207,6 +259,92 @@ test('probe does not treat a help marker as proof of request-time enforcement', 
   expect(calls).toEqual([['--version'], ['--help']]);
 });
 
+test('probe becomes ready only after controlled conformance passes for the resolved binary identity', () => {
+  const identity = binaryIdentity();
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }),
+    binaryIdentityResolver: () => identity,
+    conformanceRunner: () => passedConformance(identity),
+  });
+
+  expect(result).toMatchObject({
+    status: 'available',
+    execution_readiness: 'ready',
+    reason_code: null,
+    conformance_status: 'passed',
+    repair_scope: 'none',
+    binary_identity: identity,
+    capabilities: {
+      exact_origin_advertised: true,
+      exact_origin_confirmed: true,
+      exact_origin_evidence: 'spec-first-conformance',
+    },
+  });
+});
+
+test('probe rejects false-green conformance when the positive control did not pass', () => {
+  const identity = binaryIdentity();
+  const conformance = passedConformance(identity);
+  const payload = JSON.parse(conformance.stdout);
+  payload.positive_control.status = 'failed';
+  conformance.stdout = JSON.stringify(payload);
+
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }),
+    binaryIdentityResolver: () => identity,
+    conformanceRunner: () => conformance,
+  });
+
+  expect(result).toMatchObject({
+    execution_readiness: 'blocked',
+    reason_code: 'exact-origin-conformance-invalid',
+    conformance_status: 'failed',
+  });
+  expect(result.capabilities.exact_origin_confirmed).toBe(false);
+});
+
+test.each([
+  ['throws', () => { throw new Error('spawn failed'); }, 'exact-origin-conformance-error'],
+  ['times out', () => ({ status: null, stdout: '', stderr: '', error: Object.assign(new Error('timeout'), { code: 'ETIMEDOUT' }) }), 'exact-origin-conformance-timeout'],
+  ['returns malformed JSON', () => ({ status: 0, stdout: '{', stderr: '', error: null }), 'exact-origin-conformance-invalid'],
+])('probe fails closed when controlled conformance %s', (_label, conformanceRunner, reasonCode) => {
+  const result = wrapper.probeAgentBrowser({
+    runner: probeRunner({ exactOrigin: true }),
+    binaryIdentityResolver: () => binaryIdentity(),
+    conformanceRunner,
+  });
+
+  expect(result).toMatchObject({
+    execution_readiness: 'blocked',
+    reason_code: reasonCode,
+    conformance_status: 'failed',
+  });
+  expect(result.capabilities.exact_origin_confirmed).toBe(false);
+});
+
+test('probe reruns conformance when the resolved binary identity changes', () => {
+  const identities = [
+    binaryIdentity('sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
+    binaryIdentity('sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'),
+  ];
+  const observed = [];
+  let identityIndex = 0;
+
+  const options = {
+    runner: probeRunner({ exactOrigin: true }),
+    binaryIdentityResolver: () => identities[identityIndex],
+    conformanceRunner: ({ binaryIdentity: identity }) => {
+      observed.push(identity.sha256);
+      return passedConformance(identity);
+    },
+  };
+
+  expect(wrapper.probeAgentBrowser(options).execution_readiness).toBe('ready');
+  identityIndex = 1;
+  expect(wrapper.probeAgentBrowser(options).execution_readiness).toBe('ready');
+  expect(observed).toEqual([identities[0].sha256, identities[1].sha256]);
+});
+
 test.each([
   '--exact-origin <URL>',
   '--exact-origin=<origin>',
@@ -214,12 +352,14 @@ test.each([
 ])('probe recognizes the exact-origin flag token independent of help metavar shape: %s', (marker) => {
   const result = wrapper.probeAgentBrowser({
     runner: probeRunner({ exactOrigin: true, exactOriginMarker: marker }),
+    binaryIdentityResolver: () => binaryIdentity(),
+    conformanceRunner: failedConformance,
   });
 
   expect(result).toMatchObject({
     execution_readiness: 'blocked',
-    reason_code: 'exact-origin-conformance-required',
-    conformance_status: 'not_run',
+    reason_code: 'exact-origin-conformance-failed',
+    conformance_status: 'failed',
     repair_scope: 'spec-first',
   });
   expect(result.capabilities.exact_origin_advertised).toBe(true);
@@ -235,13 +375,15 @@ test('probe ignores provider or caller capability claims and never invokes a cap
       capabilities: { exact_origin: { status: 'enforced' } },
     },
     exactOriginConfirmed: true,
+    binaryIdentityResolver: () => binaryIdentity(),
+    conformanceRunner: failedConformance,
   });
 
   expect(result).toMatchObject({
     status: 'available',
     execution_readiness: 'blocked',
-    reason_code: 'exact-origin-conformance-required',
-    conformance_status: 'not_run',
+    reason_code: 'exact-origin-conformance-failed',
+    conformance_status: 'failed',
   });
   expect(result.capabilities).toMatchObject({
     exact_origin_advertised: true,
@@ -384,7 +526,10 @@ test('prepare writes only owner-private run files and pins the internal test-pla
   expect(fs.existsSync(prepared.config_path)).toBe(true);
   const actionPolicy = JSON.parse(fs.readFileSync(prepared.action_policy_path, 'utf8'));
   expect(actionPolicy.default).toBe('deny');
+  expect(actionPolicy.allow).toEqual(expect.arrayContaining(['launch', 'navigate']));
   expect(actionPolicy.allow).toContain('find');
+  expect(prepared.session).toMatch(/^sfb-[a-f0-9]{16}$/);
+  expect(prepared.namespace).toMatch(/^sfb-[a-f0-9]{16}$/);
   if (process.platform !== 'win32') {
     expect(fs.statSync(prepared.run_dir).mode & 0o777).toBe(0o700);
     for (const filePath of [
@@ -567,11 +712,31 @@ test('launches zero browser actions when exact-origin is advertised but its enfo
   const result = wrapper.runPreparedContext({
     manifestPath: prepared.manifest_path,
     runner: browserRunner(calls, { exactOrigin: true }),
+    binaryIdentityResolver: () => binaryIdentity(),
+    conformanceRunner: failedConformance,
   });
 
   expect(result).toMatchObject({
     status: 'not_supported',
-    reason_code: 'exact-origin-conformance-required',
+    reason_code: 'exact-origin-conformance-failed',
+    action_process_calls: 0,
+  });
+  expect(actionCalls(calls)).toEqual([]);
+});
+
+test('launches zero browser actions when the conformed binary identity changes before execution', () => {
+  const prepared = prepare(testPlan([{ action: 'open', route: '/settings' }]));
+  const calls = [];
+  const result = wrapper.runPreparedContext({
+    manifestPath: prepared.manifest_path,
+    runner: browserRunner(calls),
+    probe: confirmedConformanceProbe,
+    binaryIdentityResolver: () => binaryIdentity(),
+  });
+
+  expect(result).toMatchObject({
+    status: 'not_supported',
+    reason_code: 'agent-browser-binary-identity-changed',
     action_process_calls: 0,
   });
   expect(actionCalls(calls)).toEqual([]);
@@ -699,7 +864,7 @@ test('builds allowlisted argv, synthetic values, sanitized env, and private raw-
   expect(JSON.stringify(result)).not.toContain('RAW SECRET-LIKE PAGE DATA');
   const executedCalls = actionCalls(calls);
   for (const call of executedCalls) {
-    expect(call.command).toBe('agent-browser');
+    expect(call.command).toBe(CONFIRMED_BINARY_IDENTITY.path);
     expect(call.args).toEqual(expect.arrayContaining([
       '--session',
       '--namespace',
@@ -888,10 +1053,11 @@ test('source-only capability cases cover browser policy and caller-owned server 
     'utf8',
   )).cases;
 
-  expect(cases.filter((entry) => entry.kind === 'positive')).toHaveLength(2);
+  expect(cases.filter((entry) => entry.kind === 'positive')).toHaveLength(3);
   expect(cases.filter((entry) => entry.kind === 'negative-owner')).toHaveLength(5);
   expect(cases.map((entry) => entry.id)).toEqual(expect.arrayContaining([
     'provider-self-report-does-not-confirm-exact-origin',
+    'controlled-conformance-binds-current-binary',
     'caller-owned-origin-never-starts-a-project-command',
     'destructive-browser-effect-requires-current-authorization',
   ]));

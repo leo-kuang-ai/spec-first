@@ -302,6 +302,51 @@ describe('spec-runtime-setup unified Node contract', () => {
     ]);
   });
 
+  test('reports agent-browser ready only when the canonical controlled conformance probe is ready', () => {
+    const { probeHelper } = require('../../skills/spec-runtime-setup/scripts/lib/installation-executor.cjs');
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-ready-home-'));
+    fs.mkdirSync(path.join(homeDir, '.agent-browser'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agent-browser', 'spec-first-install.json'), '{}\n');
+    fs.mkdirSync(path.join(homeDir, '.agents', 'skills', 'agent-browser'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agents', 'skills', 'agent-browser', 'SKILL.md'), '# agent-browser\n');
+
+    const result = probeHelper({
+      homeDir,
+      env: {},
+      agentBrowserProbe: () => ({
+        status: 'available',
+        execution_readiness: 'ready',
+        reason_code: null,
+        conformance_status: 'passed',
+        repair_scope: 'none',
+        next_action: '',
+        version: '0.34.0',
+        capabilities: {
+          required_flags: true,
+          exact_origin_advertised: true,
+          exact_origin_confirmed: true,
+          exact_origin_evidence: 'spec-first-conformance',
+          profile_state_with_allowlist: false,
+        },
+        missing: [],
+      }),
+    }, process.cwd(), {
+      id: 'agent-browser',
+      kind: 'browser-helper',
+      detection: { kind: 'agent-browser', command: 'agent-browser', skill_name: 'agent-browser' },
+      installation: { next_action: '安装 agent-browser' },
+    });
+
+    expect(result).toMatchObject({
+      status: 'ready',
+      reason_code: 'ready',
+      dependency_status: 'ready',
+      execution_readiness: 'ready',
+      conformance_status: 'passed',
+      capabilities: { exact_origin_confirmed: true },
+    });
+  });
+
   test('keeps the entrypoint thin and exposes explicit runtime owner modules', () => {
     const setupPath = path.join(skillRoot, 'scripts', 'setup.cjs');
     const owners = [
