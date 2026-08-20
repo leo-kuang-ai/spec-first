@@ -838,24 +838,28 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
   "inventory 已刷新"的声明）。原始报告：`verify-phase-1a-YYYYMMDD-HHMMSS.txt`（每次重跑生成，
   不纳入版本控制，属临时验证产物）
 
-### Phase 1B（架构说明删除）
-- [ ] Candidate patch：spec-work 删除纯说明段落（只有匹配行为证据通过且另有变更授权时）
-- [ ] 标注文档：每段的行为影响分析
-- [ ] 验证报告：门测结果（正确率、成本、人工修正）
+### Phase 1B（架构说明删除，未执行——无匹配行为证据授权删除，保持 deferred）
+- [ ] Candidate patch：spec-work 删除纯说明段落（只有匹配行为证据通过且另有变更授权时）——
+  本轮未产出：`spec-work` 未被任何现有 fixture 覆盖到"删除说明段落是否改变行为"这个具体问题，
+  Phase 1B 原计划的手动 3 任务对照也未执行（超出零成本人工审查范围，需要新的门测预算决策）
+- [ ] 标注文档：每段的行为影响分析——未做，前置条件（候选段落清单）未产出
+- [ ] 验证报告：门测结果（正确率、成本、人工修正）——未做，同上
 
-### Step 2-4（checklist 建立）
-- [ ] `docs/solutions/skill-simplification-patterns.md`
-  - 通过的 patterns（≥5 项）
-  - 失败的 anti-patterns（含 evidence）
-  - 每个 pattern 的 applicability、ceiling、trigger、owner
-- [ ] 门测报告（每个 checklist 项）
-  - baseline vs candidate 对照
-  - 正确率、成本、token、人工修正
-  - 代表性任务样本
-- [ ] 推广决策文档
-  - 哪些项可推广为 durable guidance
-  - 哪些项保持 advisory
-  - 哪些项需要重新评估
+### Step 2-4（checklist 建立，✅ 2026-08-21 部分完成——见下方明细）
+- [x] **`docs/solutions/skill-simplification-patterns.md`**（已创建，2026-08-21）——诚实记录：
+  本批次**零个 pattern 通过**（不是"未达到 ≥5 项"，是"5 个已完成门测的候选全部是 anti-pattern
+  或证据不足"）。4 个 anti-pattern（AP-1 shared-caller 检查、AP-2 复用检查、AP-3 安全默认检查、
+  AP-4 表述方式对照——均已用真实门测证实无收益，含完整 evidence/invalidation condition/owner）、
+  1 个 pending（PD-1 spec-debug 误用防护，证据强度不足，未归档为 pattern 也未归档为 anti-pattern）。
+  **不为凑够数量编造正面结果**——§8 的晋级规则本身是非补偿式的，本文档如实反映"当前批次没有
+  找到值得推广的正面 pattern"这个事实，比虚构 5 项通过更符合方案的证据纪律。
+- [x] **门测报告（每个 checklist 项）**——已随本轮门测运行本身产出（`runs/20260820-*` 系列，
+  详见方案文档 Step 1/Step 2 表格中的完整 baseline vs candidate 数据、成本、token、Fisher exact
+  检验结果），未额外整理独立报告文件——数据已完整记录在方案文档正文与 `skill-simplification-
+  patterns.md` 中，重复整理一份不增加信息量
+- [ ] **推广决策文档**——未产出独立文档：本批次没有 pattern 通过 §8 的推广条件（≥5 项通过且
+  correction burden 未上升），因此"哪些项可推广"这一问题当前答案是"零项"，不需要单独的推广
+  决策文档来说明一个空集合；若未来有候选真正通过门测，再补这份文档
 
 ---
 
