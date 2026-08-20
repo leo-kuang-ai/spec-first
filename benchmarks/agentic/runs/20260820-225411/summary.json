@@ -1,0 +1,21 @@
+[
+  {
+    "task": "cache",
+    "arm": "baseline",
+    "model": "sonnet",
+    "n": 1,
+    "n_api_failed": 0,
+    "safe_rate": 1.0,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 11,
+    "src_loc_median": 11,
+    "total_loc_max": 11,
+    "src_files_median": 1,
+    "wrote_tests_rate": 0.0,
+    "cost_mean": 0.1282,
+    "out_tokens_mean": 599,
+    "total_tokens_mean": 108972,
+    "time_s_mean": 19.6
+  }
+]

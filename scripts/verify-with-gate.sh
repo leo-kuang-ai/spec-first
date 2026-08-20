@@ -17,9 +17,10 @@
 # 前置条件：
 # - benchmarks/agentic/run.py 存在（--selftest 必须先通过，否则拒绝花钱调 API）
 # - Python 3 已配置
-# - ANTHROPIC_API_KEY 已设置，且模型名在该 key 的 allowlist 内
-#   （run.py 的 MODELS 字典把 "sonnet"/"opus" 映射到具体模型 id；映射错了会
-#   24 个 cell 全 403，但 tok=0/cost=$0，评分器不会自动识别——本脚本会检测这个信号）
+# - ANTHROPIC_API_KEY 或 ANTHROPIC_AUTH_TOKEN(+ANTHROPIC_BASE_URL) 已设置，
+#   且模型别名在该认证下的 allowlist 内。映射错了会 24 个 cell 全 403，
+#   但 tok=0/cost=$0，评分器不会自动识别——本脚本会先跑 1-cell smoke test 探路，
+#   再决定是否继续跑 n 次完整门测。
 #
 # 输出：
 # - 原始结果在 benchmarks/agentic/runs/<stamp>/{results.json,summary.json}
@@ -106,12 +107,66 @@ check_prerequisites() {
     exit 1
   fi
 
-  if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
-    log_error "环境变量 ANTHROPIC_API_KEY 未设置"
+  # run.py 内部调 `claude -p ...` CLI，认证既可能是官方 ANTHROPIC_API_KEY，
+  # 也可能是网关代理的 ANTHROPIC_AUTH_TOKEN + ANTHROPIC_BASE_URL；两种都接受，
+  # 但网关/自定义 base_url 下模型别名是否在 allowlist 内是未知的——
+  # run.py 的注释本身就警告过：模型不在 allowlist 会 24 个 cell 全 403 却报满分。
+  if [[ -z "${ANTHROPIC_API_KEY:-}" && -z "${ANTHROPIC_AUTH_TOKEN:-}" ]]; then
+    log_error "既未设置 ANTHROPIC_API_KEY 也未设置 ANTHROPIC_AUTH_TOKEN"
     exit 1
+  fi
+  if [[ -n "${ANTHROPIC_AUTH_TOKEN:-}" ]]; then
+    log_warn "检测到 ANTHROPIC_AUTH_TOKEN${ANTHROPIC_BASE_URL:+ + ANTHROPIC_BASE_URL=$ANTHROPIC_BASE_URL}（网关代理）"
+    log_warn "模型别名（$MODEL → run.py 的 MODELS 字典）是否在该网关的 allowlist 内未知"
+    log_warn "强烈建议先跑 1-cell smoke test 再上 n=$N，否则可能重演 403-全失败-却报满分 的假绿事故"
   fi
 
   log_info "✅ 前置条件满足"
+}
+
+# 1-cell smoke test：花最小成本确认认证/模型别名真的能跑通，
+# 避免在网关代理场景下直接烧 n=6 全失败又被误判成满分（参见 verify-benchmark-ran-before-trusting）
+run_smoke_test() {
+  log_section "1-cell smoke test（确认认证与模型别名可用）"
+
+  local first_arm
+  first_arm=$(cut -d',' -f1 <<< "$ARMS")
+
+  local before_dirs after_dirs new_dirs new_count smoke_run
+  before_dirs=$(ls benchmarks/agentic/runs 2>/dev/null || true)
+  ( cd benchmarks/agentic && \
+    python3 run.py --task "$TASK" --arms "$first_arm" --model "$MODEL" --runs 1 --workers 1 )
+  after_dirs=$(ls benchmarks/agentic/runs 2>/dev/null || true)
+  new_dirs=$(comm -13 <(echo "$before_dirs" | sort) <(echo "$after_dirs" | sort))
+  new_count=$(grep -c . <<< "$new_dirs" || true)
+  if [[ "$new_count" != "1" ]]; then
+    log_error "smoke test 需要且只能产生一个新 runs 目录，实际发现 $new_count 个"
+    log_error "可能存在并发 benchmark；拒绝用 latest 目录猜测本次结果"
+    exit 1
+  fi
+  smoke_run=$(head -1 <<< "$new_dirs")
+  local smoke_summary="benchmarks/agentic/runs/$smoke_run/summary.json"
+
+  if [[ ! -f "$smoke_summary" ]]; then
+    log_error "smoke test 未生成 summary.json，无法确认认证是否成功"
+    exit 1
+  fi
+
+  local smoke_tok smoke_cost smoke_correct smoke_fail
+  smoke_tok=$(node -e "const r=require(require('path').resolve('$smoke_summary'))[0]; console.log(r.total_tokens_mean)")
+  smoke_cost=$(node -e "const r=require(require('path').resolve('$smoke_summary'))[0]; console.log(r.cost_mean)")
+  smoke_correct=$(node -e "const r=require(require('path').resolve('$smoke_summary'))[0]; console.log(r.correct_rate)")
+  smoke_fail=$(node -e "const r=require(require('path').resolve('$smoke_summary'))[0]; console.log(r.n_api_failed||0)")
+
+  log_info "smoke test 结果: tokens=$smoke_tok cost=\$$smoke_cost correct_rate=$smoke_correct api_failed=$smoke_fail"
+
+  if [[ "$smoke_fail" != "0" ]] || [[ "$smoke_tok" == "0" || "$smoke_tok" == "null" ]]; then
+    log_error "🔴 smoke test 失败或零 token——认证/模型别名在当前网关下不可用"
+    log_error "   不要继续跑 n=$N，先排查 ANTHROPIC_AUTH_TOKEN/ANTHROPIC_BASE_URL/模型别名映射"
+    exit 1
+  fi
+
+  log_info "✅ smoke test 通过，认证与模型别名可用，可以继续跑 n=$N 的完整门测"
 }
 
 run_selftest() {
@@ -124,19 +179,25 @@ run_gate() {
   log_section "运行行为门：task=$TASK arms=$ARMS n=$N model=$MODEL"
   log_info "这会花真实的 API 费用，且可能需要几分钟到几十分钟，请等待..."
 
-  local before_dirs after_dirs new_dir
+  local before_dirs after_dirs new_dirs new_count new_dir
   before_dirs=$(ls benchmarks/agentic/runs 2>/dev/null || true)
 
+  # cells are fully isolated (own workdir + own claude context) per run.py's own comments,
+  # so parallelizing is safe; run.py's own default is 4 — match it instead of serializing
+  # real-money cells for no safety benefit.
   ( cd benchmarks/agentic && \
-    python3 run.py --task "$TASK" --arms "$ARMS" --model "$MODEL" --runs "$N" --workers 1 )
+    python3 run.py --task "$TASK" --arms "$ARMS" --model "$MODEL" --runs "$N" --workers 4 )
 
   after_dirs=$(ls benchmarks/agentic/runs 2>/dev/null || true)
-  new_dir=$(comm -13 <(echo "$before_dirs" | sort) <(echo "$after_dirs" | sort) | tail -1)
+  new_dirs=$(comm -13 <(echo "$before_dirs" | sort) <(echo "$after_dirs" | sort))
+  new_count=$(grep -c . <<< "$new_dirs" || true)
 
-  if [[ -z "$new_dir" ]]; then
-    log_error "未能定位本次运行生成的 runs/<stamp>/ 目录"
+  if [[ "$new_count" != "1" ]]; then
+    log_error "行为门需要且只能产生一个新 runs 目录，实际发现 $new_count 个"
+    log_error "可能存在并发 benchmark；拒绝用最后一个目录猜测本次结果"
     exit 1
   fi
+  new_dir=$(head -1 <<< "$new_dirs")
 
   RUN_DIR="benchmarks/agentic/runs/$new_dir"
   log_info "结果目录: $RUN_DIR"
@@ -162,10 +223,12 @@ parse_and_check_authenticity() {
   echo "$SUMMARY_JSON" | column -t -s'|' -N "task,arm,model,n,api_fail,correct_rate,cost_mean,tok_mean" 2>/dev/null || echo "$SUMMARY_JSON"
 
   local any_suspect=false
+  local any_partial=false
   while IFS='|' read -r task arm model n api_fail correct_rate cost_mean tok_mean; do
     [[ -z "$task" ]] && continue
     if [[ "$api_fail" != "0" ]]; then
-      log_warn "⚠️  $arm 有 $api_fail 个 cell API 失败，已被 aggregate 排除出比率，但样本量减少"
+      log_error "🔴 $arm 有 $api_fail 个 cell 失败；该臂只有 n=$n 个有效测量，不能与完整臂作确认性比较"
+      any_partial=true
     fi
     # fail-loud 检测：零 token 又报出正确率，是 403 假绿的典型破绽
     if [[ "$tok_mean" == "0" || "$tok_mean" == "null" ]] && [[ "$correct_rate" != "null" ]]; then
@@ -178,6 +241,11 @@ parse_and_check_authenticity() {
 
   if $any_suspect; then
     log_error "检测到疑似假绿数据，拒绝继续判断——先核实 $RUN_DIR/results.json 再重跑"
+    return 1
+  fi
+
+  if $any_partial; then
+    log_error "检测到部分运行失败，拒绝把不等样本量结果判为 PASSED/FAILED；请补跑完整对照"
     return 1
   fi
 
@@ -328,6 +396,9 @@ main() {
   validate_params
   check_prerequisites
   run_selftest
+  if [[ -n "${ANTHROPIC_AUTH_TOKEN:-}" ]]; then
+    run_smoke_test
+  fi
   run_gate
 
   if ! parse_and_check_authenticity; then

@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 const {
   runProcess,
@@ -21,6 +22,9 @@ const {
   inspectHostConfig,
   resolveHostConfigTarget,
 } = require('../../skills/spec-runtime-setup/scripts/lib/host-config.cjs');
+const {
+  resolveHostAuthority,
+} = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
 
 function tempDir(label) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `spec-mcp-u4-${label}-`));
@@ -594,6 +598,112 @@ describe('host config resolution, inspection, and transaction', () => {
       homeDir,
       userScope: false,
     })).toMatchObject({ ok: false, reason_code: 'host-user-scope-not-authorized' });
+  });
+
+  test.each([
+    ['claude', '.claude/skills'],
+    ['codex', '.agents/skills'],
+    ['cursor', '.cursor/skills'],
+    ['kiro', '.kiro/skills'],
+    ['qoder', '.qoder/skills'],
+    ['opencode', '.opencode/skills'],
+  ])('accepts confirmed loaded-root-bound authority for %s', (host, surfaceId) => {
+    const repoRoot = tempDir(`${host}-surface-bound-repo`);
+    const homeDir = tempDir(`${host}-surface-bound-home`);
+    const skillRoot = path.join(repoRoot, surfaceId, 'spec-runtime-setup');
+    fs.mkdirSync(skillRoot, { recursive: true });
+    const authority = resolveHostAuthority({
+      env: { MCP_SETUP_HOST: host },
+      mutationRequested: true,
+      candidates: [host],
+      skillRoot,
+      targetIdentity: repoRoot,
+      enforceSurfaceBinding: true,
+    });
+
+    expect(resolveHostConfigTarget({
+      entry: jsonEntry(),
+      host,
+      authority,
+      repoRoot,
+      homeDir,
+    })).toMatchObject({
+      ok: true,
+      reason_code: 'host-config-target-resolved',
+    });
+  });
+
+  test('accepts confirmed loaded-root-bound authority without weakening the host gate', () => {
+    const repoRoot = tempDir('surface-bound-repo');
+    const homeDir = tempDir('surface-bound-home');
+    const skillRoot = path.join(repoRoot, '.agents', 'skills', 'spec-runtime-setup');
+    fs.mkdirSync(skillRoot, { recursive: true });
+    const authority = resolveHostAuthority({
+      env: { MCP_SETUP_HOST: 'codex' },
+      mutationRequested: true,
+      candidates: ['codex'],
+      skillRoot,
+      targetIdentity: repoRoot,
+      enforceSurfaceBinding: true,
+    });
+
+    expect(authority).toMatchObject({
+      status: 'ready',
+      host: 'codex',
+      authority_source: 'MCP_SETUP_HOST+loaded-skill-root',
+      mutation_authorized: true,
+      invocation_receipt: {
+        verification_status: 'confirmed',
+        host: 'codex',
+        loaded_host: 'codex',
+        enforcement_status: 'loaded-root-checked',
+      },
+    });
+    expect(resolveHostConfigTarget({
+      entry: codexEntry(),
+      host: 'codex',
+      authority,
+      repoRoot,
+      homeDir,
+    })).toMatchObject({
+      ok: true,
+      scope: 'user',
+      config_path: path.join(homeDir, '.codex', 'config.toml'),
+    });
+
+    expect(resolveHostConfigTarget({
+      entry: codexEntry(),
+      host: 'codex',
+      authority: {
+        ...authority,
+        invocation_receipt: {
+          ...authority.invocation_receipt,
+          verification_status: 'unverified',
+        },
+      },
+      repoRoot,
+      homeDir,
+    })).toMatchObject({ ok: false, reason_code: 'host-authority-not-explicit' });
+
+    const forgedReceipt = {
+      ...authority.invocation_receipt,
+      target_identity: `${repoRoot}-tampered`,
+    };
+    forgedReceipt.receipt_sha256 = crypto.createHash('sha256')
+      .update(JSON.stringify(Object.fromEntries(
+        Object.entries(forgedReceipt).filter(([key]) => key !== 'receipt_sha256'),
+      )))
+      .digest('hex');
+    expect(resolveHostConfigTarget({
+      entry: codexEntry(),
+      host: 'codex',
+      authority: {
+        ...authority,
+        invocation_receipt: forgedReceipt,
+      },
+      repoRoot,
+      homeDir,
+    })).toMatchObject({ ok: false, reason_code: 'host-authority-not-explicit' });
   });
 
   test('skips an unavailable preferred target and selects the next writable fallback', () => {

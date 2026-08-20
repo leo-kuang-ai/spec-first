@@ -3,14 +3,14 @@
   "artifact_kind": "source-bound-semantic-review-delta",
   "review_run_id": "ce-localization-review-delta-2026-08-20-current-source-final-v2",
   "producer": "inline same-context semantic review owner",
-  "reviewed_at": "2026-08-20T14:08:00.000Z",
+  "reviewed_at": "2026-08-20T18:11:49.000Z",
   "source_binding": {
-    "head": "741175a23615e37382ce65ec1e0448abfa214e95",
-    "dirty_path_manifest_sha256": "d6f3c6b1ae0e309ffb32d97268bfc761454488874921918d84fca1114023312c",
-    "source_tree_hash": "ca7387b743df81ef1a45aa253d61dd3ecaedddce03b16241f1e93099c8a8e0fb",
-    "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
-    "inventory_artifact_sha256": "e1356937cb02d7faa01861cd5050bbc802ffe6c80e30d97b01192d4d31a53c16",
-    "review_input_hash": "15a861484caa3c3acd66db5f8eed40517aa048e3db6294812f4196fe2cf73414"
+    "head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
+    "dirty_path_manifest_sha256": "846ffcb265bc133d50b794aa6db7de6f74c9d897c735ef7947629bc64ffe1965",
+    "source_tree_hash": "caac71f54d2204b1e42854191e4af2008b6a7f9ca27875990955f92ac149c5d3",
+    "inventory_hash": "10b01c2ee73b1eb4b16eada1cc8bab2b9e419a85e0f6825b1305915015ee4ede",
+    "inventory_artifact_sha256": "6ef23009e534fdf660a23385e15edd91f6b4f865f93fe8b2222fd8dd1ab3aa18",
+    "review_input_hash": "05b5c38f2b96b818990fedb1d26a737b0d9e96c7c2737bbfc61c66171c614201"
   },
   "execution_context": {
     "review_method": "inline-same-context",
@@ -24,13 +24,13 @@
       "skill_ids": [
         "spec-compound"
       ],
-      "sha256": "91b40253e413dbf531777a7ae154d3674d3ffe4191e2c0d16a821188f8ec1933",
-      "bytes": 14710,
-      "line_count": 356,
+      "sha256": "36bff143ff183507a78fac0ff1d4ba320a6f7993e70fd9ec97ea9a574d279c19",
+      "bytes": 15672,
+      "line_count": 377,
       "covered_line_ranges": [
         [
           1,
-          356
+          377
         ]
       ],
       "lens_verdicts": [
@@ -39,7 +39,7 @@
           "review_status": "complete",
           "verdict": "no-new-actionable-finding",
           "notes": [
-            "Current source was read and checked against the owning workflow contract."
+            "Full current closeout contract test source was read; the pruning case creates and removes its own hash-valid stale delta fixture, independent of ambient lineage count."
           ],
           "limitations": [
             "Inline same-context verdict is not independent provider evidence."
@@ -50,7 +50,7 @@
           "review_status": "complete",
           "verdict": "no-new-actionable-finding",
           "notes": [
-            "Current source was read for safety, progressive disclosure, and failure-boundary regressions."
+            "The fixture remains under the governed delta directory, changes only source binding, and is removed in finally while production pruning stays fail closed on hash or non-freshness errors."
           ],
           "limitations": [
             "Inline same-context verdict is not independent provider evidence."
@@ -62,8 +62,8 @@
   "retired_relations": [],
   "findings": [],
   "limitations": [
-    "This delta covers the closeout regression test relation only; it is not a full Skill re-review.",
-    "Provider-authenticated receipt, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run."
+    "This delta covers the current spec-compound closeout lineage regression relation only; it is not a full Skill re-review.",
+    "Provider-authenticated independent review, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run."
   ],
-  "claim_ceiling": "Source-bound incremental review of the closeout regressions only."
+  "claim_ceiling": "Source-bound incremental review of the current closeout lineage regression relation only."
 }

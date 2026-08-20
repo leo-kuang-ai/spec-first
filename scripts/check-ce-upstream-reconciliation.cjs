@@ -729,6 +729,12 @@ function canonicalSourceTreeHash(repoRoot = REPO_ROOT) {
   return sha256(manifest);
 }
 
+function isCanonicalSourcePath(relativePath) {
+  return CANONICAL_SOURCE_ROOTS.some((sourceRoot) => (
+    relativePath === sourceRoot || relativePath.startsWith(`${sourceRoot}/`)
+  ));
+}
+
 function buildTargetSourceSnapshot(repoRoot = REPO_ROOT, inventory = null) {
   const root = path.resolve(repoRoot);
   const sourceInventory = inventory || buildCurrentInventory();
@@ -737,6 +743,7 @@ function buildTargetSourceSnapshot(repoRoot = REPO_ROOT, inventory = null) {
     .split('\n')
     .filter(Boolean)
     .map((line) => line.slice(3).replace(/^"|"$/g, '').split(' -> ').pop())
+    .filter((relativePath) => isCanonicalSourcePath(relativePath))
     .filter((relativePath) => !isRunOutput(relativePath))
     .sort();
   const dirtyPathManifest = dirtyPaths.length ? `${dirtyPaths.join('\n')}\n` : '';
@@ -1572,6 +1579,7 @@ module.exports = {
   summarize,
   assertSummary,
   buildCurrentInventory,
+  isCanonicalSourcePath,
   isRunOutput,
   buildTargetSourceSnapshot,
   groupFor,

@@ -19,6 +19,9 @@ tags: [spec-prd, checker, findings, schema-freeze, deferred-decision]
 **日期:** 2026-06-28
 **状态:** deferred — 当前消费者不依赖细节字段，等下游有需求再做
 
+**⚠️ 2026-08-21 复核（`spec-first代码审查方案.md` P3 Shortcut 治理，纯发现，未实施）：本决策的前提已不成立，需要 owner 重新评估。**
+`finalize-prd-artifact.js:254-260` 现在读取并按 `expected_shape`/`remediation_hint` 过滤 finding（`.filter((finding) => finding.expected_shape || finding.remediation_hint)`），这两个字段是 2026-07-01（commit `464786ab`）引入的，比本文档晚 3 天，触发了下方"When to Apply"第 1 条（"某个消费者需要渲染 finding 细节"）。`check-prd-artifact.js` 当前有 41 处 `findings.push(...)`，字段形状已比下表列出的 6 种更多样，此表已过期。**本次审查不实施 schema freeze**——是否冻结、冻结哪些字段属于需要另行授权的实现决策，超出人工审查范围；这里只标记触发条件已满足，交由 owner 决定。
+
 ## Context
 
 `check-prd-artifact.js` 的 `findings` 数组中，每条 finding 的字段形状不一致：

@@ -203,19 +203,45 @@ Refs: docs/10-prompt/spec-first代码审查方案.md Phase 1B
 | `score_reuse_slug` | reuse-slug | 是否复用既有 `slugify()` | baseline, spec-work, spec-debug | 2 | ⚠️ 快速扫描，未 n=6 确认 |
 | `score_reuse_money` | reuse-money | 是否复用既有 money 格式化 | — | 0 | ❌ fixture 存在但未运行 |
 | `score_safe_path` | safe-path | 是否用 `abspath`+`startswith` 防路径遍历 | baseline, spec-work, spec-debug | 2 | ⚠️ 快速扫描，未 n=6 确认 |
-| `score_cache` | cache | 是否拒绝无 consumer 的缓存（YAGNI） | baseline, spec-work, spec-debug | 6 | ✅ 确认——**唯一发现的真实回归**：spec-debug 用在实现任务上掉到 4/5（80%） |
+| `score_cache` | cache | 是否拒绝无 consumer 的缓存（YAGNI） | baseline, spec-work, spec-debug | 6 | ⚠️ **仲裁后信号弱于原始报告**，见下方更正 |
 
-**结论调整（基于实测，覆盖比 Step 1 原假设更广）**：
+**⚠️ 2026-08-20 22:30 更正（仲裁复现，不要沿用上面"唯一真实回归"的原始措辞）**：
 
-- ✅ **根因修复维度已饱和且已确认**（[[spec-debug-root-cause-saturated]]）——不要再对 §3.1/§3.4 建新门或改文本，直接归档为 anti-pattern。
-- ⚠️ **复用维度（§3.3）和安全默认维度只有 n=2 快速扫描**，方向与根因维度一致（baseline 100%、加 skill 无收益但成本涨 1.8×-4.1×），但样本太小不能直接归档，需要 n=6 confirmatory run 才能定论。
-- 🔴 **新发现、原候选池未覆盖的风险**：`spec-debug`（诊断 bug 的 skill）被误用在实现任务（cache）上时，正确率从 100% 掉到 80%——这是 45 次运行里唯一出现的**真实负回归**，而不只是成本开销。这说明"skill 路由/触发条件是否精确"比候选池里任何一条 Ponytail 原则的验证优先级更高，必须补进 Step 2/3。
+原始报告 `REPORT-20260820-sonnet5-saturation.md` 里的 "spec-debug 4/5=80%" 是 `runs/20260820-190610/`（n=5，认证环境未记录）单次小样本结果，被当成"45 次运行里唯一的真实负回归"写进本文档并驱动了整个 Step 2 的优先级重排。执行模板 B 落地前按方案纪律先复现，结果如下（当前网关环境 `ANTHROPIC_AUTH_TOKEN`+`ANTHROPIC_BASE_URL`，`claude-sonnet-5`，全部零 API 失败）：
+
+| 来源 | n | correct（spec-debug） | 备注 |
+|---|---|---|---|
+| `190610`（历史，报告引用） | 5 | 4/5 = 80% | 认证环境未知 |
+| `225532`（本次复现） | 6 | 6/6 = 100% | 网关环境，方向反转 |
+| `230644`（本次仲裁） | 12 | 9/12 = 75% | 网关环境 |
+| **本次合并（225532+230644）** | **18** | **15/18 = 83.3%** | **零 API 失败** |
+
+同一 18 个 cell 里 baseline 16/18=88.9%、spec-work 17/18=94.4%。2026-08-21 复算双侧 Fisher exact：baseline vs spec-debug **p=1.000**，spec-work vs spec-debug **p≈0.603**；两组对比均无统计证据支持真实差异。此前写入的 `p=0.063/0.0055` 是错误计算，已废止。
+
+**修正结论**：
+- spec-debug 在这 18 次 cache 测量中的观察正确率略低于 baseline 和 spec-work，但双侧 Fisher exact 不支持真实差异；当前结果只能归类为**未证实假设**，不能称为“边缘信号”或“真实回归”。
+- 原始的单次 n=5/n=6 样本方差大到足以让结论在重跑时反转（0/2→4/5→6/6→9/12），**任何基于 n≤6 单臂结果的"唯一真实回归"表述都应该先标注置信区间宽度，不能直接当作行动依据**。
+- 本次仲裁额外花费约 $20.73（18+18 个 cell 的真实 API 调用），已计入门测预算。
+- 相应地，下面 Step 2 表格中“spec-debug 误用防护”不再是当前修改候选；只有出现更能区分诊断与实现路由的 fixture，且先定义实际效应阈值和统计方法时，才重新开放验证。
+
+**其余结论调整（未受本次仲裁影响，仍按原假设）**：
+
+- ✅ **根因修复维度已饱和且已确认**（[[spec-debug-root-cause-saturated]]，n=6/臂，无 API 失败，未被本次仲裁触及）——不要再对 §3.1/§3.4 建新门或改文本，直接归档为 anti-pattern。
+- ⚠️ **复用维度（§3.3）和安全默认维度完成了 n=12 confirmatory run**（2026-08-20 23:22，`runs/20260820-232245`，108 个计划 cell、107 个有效测量、1 个 300 秒超时，花费 $44.54）：
+
+  | 任务 | baseline | spec-work | spec-debug |
+  |---|---|---|---|
+  | reuse-slug | 12/12=100% | 11/11=100%（1 API 失败已排除） | 12/12=100% |
+  | reuse-money | 12/12=100% | 12/12=100% | 12/12=100% |
+  | safe-path | 12/12=100% | 12/12=100% | 12/12=100% |
+
+  107 个有效测量全部正确，与原 n=2 快速扫描方向一致；但 `reuse-slug/spec-work` 只有 11/12 个有效测量，因此不能写“三臂完整零失败”。证据仍足以说明这些简单 fixture 已接近天花板、当前无法证明 Skill 相对收益；结论降为**fixture 饱和候选**，不据此修改 Skill，也不把部分失败运行提升为完整 confirmatory pass。
+
 - ❌ **仍未被任何门覆盖**：`spec-plan`、`spec-code-review`、`spec-doc-review`（报告附录明确列出，需要新 fixture：两阶段工作流或"带 bug/问题的种子文档"）、其余 34 个未测 skill。
 
 **决策**：
-- 已确认饱和的维度（根因）→ 不再投入门测资源，直接进入 §3.8 意义上的 anti-pattern 归档
-- 只有 n=2 的维度（复用、安全默认）→ 先补 n=6 confirmatory run，再决定是否归档
-- skill 误用风险 → 新增为 Step 2 的最高优先级候选项（见下表），因为它是唯一有实测负收益证据的方向
+- 已确认饱和的维度（根因、复用、安全默认）→ 不再投入门测资源，直接进入 §3.8 意义上的 anti-pattern 归档
+- spec-debug 误用风险 → 当前假设未证实并退出修改候选；不机械扩到 n≥24，只有新 fixture 能形成更强区分且预先定义效应阈值时才重开
 - 完全未覆盖的 skill（spec-plan/spec-code-review/spec-doc-review）→ 需要新 fixture，不能复用现有 `benchmarks/agentic/`，成本按"新建门"而非"复用门"估算
 
 #### Step 2：第一个 checklist 项闭环（Day 4-8）
@@ -226,17 +252,38 @@ Refs: docs/10-prompt/spec-first代码审查方案.md Phase 1B
 2. 可快速验证（有现成门或可机械检查）
 3. 失败成本低（只在一个 skill 试点）
 
-**候选项优先级**（基于 `REPORT-20260820-sonnet5-saturation.md` 重排）：
+**候选项优先级**（⚠️ 2026-08-21 再复核：`spec-debug` 误用防护的双侧 Fisher exact 为 `p=1.000`，不支持真实差异；退出当前修改候选）：
 
 | 优先级 | Checklist 项 | 可用验证 | 预期周期 | 状态 |
 |---|---|---|---|---|
-| P0 | `spec-debug` 触发条件收紧：诊断类 skill 不应加载到实现类任务（cache 任务上 spec-debug 4/5=80%，是 45 次运行里唯一的真实负回归） | 现有 `score_cache` 门，n=6 confirmatory（当前 6/6 baseline+work vs 4/5 spec-debug 已是 n=6，可直接用） | 1-2 天 | 🆕 新增，最高优先级 |
-| P1 | 复用维度（§3.3）confirmatory run：`score_reuse_slug`/`score_reuse_money` 补到 n=6，确认 baseline 是否真的饱和 | 现有门，仅需追加 runs | 半天 | 🆕 补测，当前只有 n=2 |
-| P1 | 安全默认维度 confirmatory run：`score_safe_path` 补到 n=6 | 现有门，仅需追加 runs | 半天 | 🆕 补测，当前只有 n=2 |
-| P2 | 每个 reference 必须有明确 consumer 或 projection owner | sync map + source refs + 人工语义审查 | 1 天 | 沿用原方案 |
+| 已退出 | `spec-debug` 触发条件收紧：n=18 时 spec-debug 15/18、baseline 16/18，双侧 Fisher exact p=1.000 | 现有 `score_cache` fixture 区分力不足；只有新 fixture + 预注册效应阈值才重开 | 已花 ~$20.73，不继续机械扩样本 | ❌ 未证实，不授权改 `SKILL.md` |
+| P2 | 每个 reference 必须有明确 consumer 或 projection owner | sync map + source refs + 人工语义审查 | ✅ 已完成，见下方更新 | 完成 |
 | P3 | 新增 fixture 覆盖 `spec-plan`/`spec-code-review`（报告附录标出的未测 skill） | 需要新 fixture（两阶段工作流或带 bug 种子文档），成本远高于复用现有门 | 3-5 天/skill | 沿用原方案，明确降级为 P3（成本被低估过） |
 
-~~原 P2「删除单实现抽象」、原 P3「复用现有 helper 优先于新实现」~~：已被上面的 P1 confirmatory run 部分覆盖（复用维度），且 §3.5「删除优先」类判断在饱和报告里没有对应 fixture，暂无法门测，移出本轮候选池，记录到 Step 3 候选池等待新 fixture。
+~~原 P1「复用维度 confirmatory run」、原 P1「安全默认维度 confirmatory run」~~：**已于 2026-08-20 23:22 执行**（n=12，`runs/20260820-232245`，108 个计划 cell、107 个有效测量、1 个超时，花费 $44.54）。有效测量全部正确，说明 fixture 对当前模型已饱和；由于存在部分失败，本轮不称“完整 confirmatory pass”，但仍不支持修改 Skill，移出当前候选池。
+
+**本轮教训（写入 §3.8 意义上的方法学记录）**：单臂 n≤6 的"发现回归"结论在重跑中不稳定（cache/spec-debug 四次独立测量：0/2、4/5、6/6、9/12），任何要驱动"改 SKILL.md 正文"这类高成本动作的负回归证据，门测前应先用同一环境跑至少 n=12 做一次内部复现，而不是直接采信报告里的单次小样本数字。这条同样适用于未来任何"唯一真实回归"类表述。**但方差大小本身也是维度特异的**——cache（过度设计判断）在 n=5→n=18 之间剧烈波动，而 reuse-slug/reuse-money/safe-path（复用、安全默认）三个任务在 n=2→n=12 之间完全稳定（都是 100%）。这提示"要不要补大样本"应该按维度性质判断，不是一刀切：涉及模型主观判断阈值的维度（YAGNI/过度设计）方差更大，涉及明确对错的维度（是否调用了正确函数、是否有安全漏洞）方差更小。
+
+~~原 P2「删除单实现抽象」、原 P3「复用现有 helper 优先于新实现」~~：已被上面的 confirmatory run 部分覆盖（复用维度已确认饱和），且 §3.5「删除优先」类判断在饱和报告里没有对应 fixture，暂无法门测，移出本轮候选池，记录到 Step 3 候选池等待新 fixture。
+
+**P2「reference consumer/projection owner」实际执行结果（2026-08-20 23:40，人工审查，不占门测预算）**：
+
+`skills/_shared/README.md` 原有措辞把 8 组文件标记为"known drift, requires manual merge decision"。逐组重新 diff 后发现这个措辞本身是错的：
+
+| 组 | 标题（第 1 行） | 判断 |
+|---|---|---|
+| `cross-model-review.md` | "Cross-Model Adversarial Pass" vs "Cross-Model Whole-Document Pass" | 真分叉：不同脚本（`cross-model-adversarial-review.sh` vs `cross-model-doc-review.sh`）、不同 persona、不同 gate 结构 |
+| `intake.md` | "Intake" vs "Establish the Frame Before Grounding" | 真分叉，独立撰写 |
+| `interview.md`（3 份） | 三份标题各不相同 | 真分叉，各自 skill 专属访谈脚本 |
+| `pipeline-return.md` | 第 3 行起内容即分道 | 真分叉，不同 caller 语境 |
+| `review-output-template.md` | "Code Review" vs "Document Review" | 真分叉，不同评审对象 |
+| `synthesis-summary.md` | "Scoping Synthesis" vs "Synthesis Summary"，行数差 152 行 | 真分叉，内容量级都不同 |
+| `subagent-template.md`（3 份） | 三份标题各不相同 | 真分叉，不同 subagent 角色 |
+| **`model-tiers.md`** | 两份都是 "Model Tiers" | **唯一真正的模板复制候选**：四段结构逐句对应（extraction/generation/ceiling tier + degradation rule），只替换了角色名词（"media-analyzer workers" vs "claim verifier"）。`git log --follow` 确认两份同一个 commit（`e9fe0769`）引入。 |
+
+**结论**：8 组里 7 组是独立撰写内容偶然同名，不是漂移，不需要合并决策——**已修正 `skills/_shared/README.md` 里"8 file groups... require manual merge decision"这条错误陈述**。`model-tiers.md` 是唯一真实候选，但未纳入 `SYNC_MAP`：skill 特定名词是正文的一部分而非偶然差异，同步会强制锁死两个 skill 各自的措辞演化自由度；要正确同步需要先把文件改造成参数化模板（名词作变量），这是比现有 sync 脚本能力更大的变更，记录为 architecture-mismatch，留给未来有真实需求时再决策，不强行推进。
+
+**沉淀（写入 §3.8 意义上的记录，不写入 `docs/solutions/`，因为这不是一个可复用的"简化模式"，而是一次性的文档纠错）**：文件名相同不等于内容重复；判断"是否该同步"要看首行标题和结构是否同构，而不是文件名列表。`skills/_shared/README.md` 的"8 组已知漂移"清单在写入时可能就没有真的逐组 diff 过，这提示以后写"已知 XX 项待办"这类清单前，先验证清单本身的准确性。
 
 **执行模板 A**（已跑完的反例，示范"提出→试用→门测→归档为 anti-pattern"全流程；该项已从候选池移除，不要重跑）：
 
@@ -323,20 +370,27 @@ python3 run.py --task trace-transfer,trace-amount \
 - `docs/10-prompt/Ponytail思想指导spec-first-Skill优化.md` §4.4、§8
 ```
 
-**执行模板 B**（当前最高优先级候选项，尚未执行——按此模板做本轮第一个真正的闭环）：
+**执行模板 B**（⚠️ 已降级为 P1——步骤 1-3 已实际执行完毕并得到仲裁结果，见下方"实测更新"；步骤 4-5 因证据强度不足暂缓，不建议现在改 `SKILL.md` 正文）：
 
 ```markdown
 ## Checklist Item: spec-debug 误用防护（诊断类 skill 不应加载到实现类任务）
 
-### 1. 提出假设
+### 1. 提出假设（原始假设，已被下方仲裁结果部分推翻）
 
 **假设**：`spec-debug` 是诊断 bug 的 skill，若被加载到纯实现任务（如"给已有函数加缓存"）
 上，会把模型导向"找 bug"式思维，反而干扰正常的 YAGNI 判断，产生比 baseline 更差的结果。
 
-**理论依据**：`REPORT-20260820-sonnet5-saturation.md` 过度设计判断维度（cache 任务，n=6）：
+**理论依据（原始，单次 n=5/n=6 小样本，已证明不稳定）**：`REPORT-20260820-sonnet5-saturation.md`
+过度设计判断维度（cache 任务，n=6）：
 - baseline: 5/5（100%，1 cell API 失败已排除）
 - spec-work: 6/6（100%）
-- **spec-debug: 4/5（80%，1 cell API 失败已排除）** ← 45 次运行里唯一的真实负回归
+- spec-debug: 4/5（80%，1 cell API 失败已排除）← 原报告称为"45 次运行里唯一的真实负回归"
+
+**⚠️ 2026-08-20 22:30 仲裁更新（步骤 3 已实际执行，见下）**：在当前网关环境（`ANTHROPIC_AUTH_TOKEN`+
+`ANTHROPIC_BASE_URL`，`claude-sonnet-5`）用同一 cache 任务、三臂对照，先复现 n=6、再仲裁 n=12，
+合并 n=18（零 API 失败）：baseline 16/18=88.9%、spec-work 17/18=94.4%、**spec-debug 15/18=83.3%**。
+2026-08-21 复算双侧 Fisher exact：baseline vs spec-debug **p=1.000**，spec-work vs spec-debug **p≈0.603**。
+四次独立测量（0/2→4/5→6/6→9/12）方向也不稳定。**当前 fixture 未证实该假设，不应继续用“边缘信号”描述。**
 
 ### 2. 在一个 skill 上试用
 
@@ -357,36 +411,46 @@ for feature additions, performance optimization, or refactoring requests that ha
 no bug report — route those to spec-work or spec-simplify-code instead.
 ```
 
-### 3. 用门测试
+### 3. 用门测试（⚠️ 已实际执行——但只跑了"修改前"的复现/仲裁，未执行"修改 SKILL.md 后"的对照）
 
 ```bash
 cd benchmarks/agentic
 python3 run.py --selftest
 python3 run.py --task cache \
-  --arms baseline,spec-work,spec-debug --model sonnet --runs 6 --workers 1
+  --arms baseline,spec-work,spec-debug --model sonnet --runs 6 --workers 4   # 复现，225532
+python3 run.py --task cache \
+  --arms baseline,spec-work,spec-debug --model sonnet --runs 12 --workers 6  # 仲裁，230644
 ```
 
-**判断标准**：
-- 修改后 spec-debug 在 cache 任务上的正确率应回到与 baseline/spec-work 相当（6/6 或至少不低于当前 4/5）
-- 如果路由层修改后 spec-debug 根本不会被触发（因为任务不匹配 bug 报告特征）→ 说明问题应该在
-  路由/调度层解决，不是 SKILL.md 正文；记录为 architecture-mismatch，退回 spec-plan 决策
+**已执行，未改 `SKILL.md` 正文**：先复现"修改前"现状是否稳定，再决定是否值得改。
+Step 2 的原判断标准（"改后应回到 6/6 或不低于 4/5"）已经不适用——因为"修改前"的基线本身
+在 n=18 后变成 15/18=83.3%（不是 4/5=80%），且 baseline vs spec-debug 的双侧 Fisher exact 为 p=1.000，
+没有证据支持当前 fixture 上存在真实负回归。**此时改 `SKILL.md` 并重跑容易把噪音当成“修复生效”；
+不机械扩样本，只有换成能明确区分诊断与实现路由的新场景，并预先定义实际效应阈值时才重开。**
 
-### 4. 记录结果
+### 4. 记录结果（已执行，见下方"仲裁结果"）
 
-（执行后填写：baseline/spec-work/spec-debug 三臂正确率、成本、结论）
+**仲裁结果（2026-08-20 22:xx，当前网关环境，n=6+n=12 合并，零 API 失败）**：
 
-### 5. 沉淀
+| 臂 | correct (n=18) | 相对成本 |
+|---|---|---|
+| baseline | 16/18 = 88.9% | 基准 |
+| spec-work | 17/18 = 94.4% | ~1.32x |
+| spec-debug | 15/18 = 83.3% | ~1.39x |
 
-**如果通过**（触发条件修复后 spec-debug 不再误用于实现任务）→ 写入
-`docs/solutions/skill-simplification-patterns.md` 的 Patterns 部分，标注：
-- Applicability：所有诊断类 skill 与实现类 skill 并存的路由场景
-- Ceiling：仅覆盖"任务描述明显是实现/优化而非 bug"的情况，不覆盖歧义任务
-- Trigger：新增诊断类 skill 时，必须先测试它是否会被误路由到实现任务
-- Owner：spec-debug 的 scope 边界，以及项目的 skill 路由/调度机制
+双侧 Fisher exact：baseline vs spec-debug p=1.000；spec-work vs spec-debug p≈0.603。均无统计证据支持真实差异。花费约 $20.73。
 
-**如果失败**（触发条件难以精确区分，或路由层不支持这种限定）→ 记录为
-architecture-mismatch，说明当前路由机制无法承载这类判断，需要在 `spec-plan` 层
-重新设计路由决策，而不是在单个 SKILL.md 里打补丁。
+### 5. 沉淀（本轮判定：暂缓，不进入 Patterns 也不进入 Anti-patterns）
+
+**当前假设未证实**。按 §3.8 的证据纪律，`behavior_quality` 轴没有统计证据支持差异，
+不满足写入 Patterns 或驱动 Skill 修改的门槛。记录为**未证实并退出当前候选池**：
+
+- Applicability：spec-debug 是否误用于纯实现任务这一假设方向仍然合理，但强度未坐实
+- Ceiling：当前证据只覆盖 cache 这一个任务、claude-sonnet-5 一个模型、网关代理一种认证环境
+- Trigger：只有出现信号更强、能直接区分诊断与实现路由的新场景，并预注册实际效应阈值、
+  样本量和统计方法时才重开；不在当前弱 fixture 上机械追加预算
+- Owner：本条目的下一步决策者是继续投入门测预算的人，不是直接改 `SKILL.md` 的人——
+  按方案"门在前"纪律，没有坐实的证据不授权修改 `skills/spec-debug/SKILL.md` 正文
 ```
 
 **重复此流程**，每完成一个 checklist 项：
@@ -402,9 +466,9 @@ architecture-mismatch，说明当前路由机制无法承载这类判断，需�
 
 | 来源 | Checklist 项 | 验证方式 | 状态 |
 |---|---|---|---|
-| 实测新发现 | spec-debug 误用防护（诊断 vs 实现路由） | 现有 `score_cache` 门 | 🆕 P0，见执行模板 B |
-| §3.3 复用优先 | reuse-slug/reuse-money confirmatory run（n=2→n=6） | 现有门，仅需追加 runs | 🆕 P1，补测中 |
-| 报告安全默认维度 | safe-path confirmatory run（n=2→n=6） | 现有门，仅需追加 runs | 🆕 P1，补测中 |
+| 实测新发现 | spec-debug 误用防护（诊断 vs 实现路由） | 现有 `score_cache` 门；n=18 双侧 Fisher exact p=1.000，未证实差异 | ❌ 退出当前修改候选；仅在高区分度新 fixture 下重开 |
+| §3.3 复用优先 | reuse-slug/reuse-money | 现有门，n=12 已跑（`runs/20260820-232245`） | ✅ **已确认饱和**（3 臂全 100%），归档为 anti-pattern，不再候选 |
+| 报告安全默认维度 | safe-path | 现有门，n=12 已跑，同上 | ✅ **已确认饱和**，同上 |
 | §3.2 必要性优先于可实现性 | 新增 durable surface 必须有真实 consumer | `grep -r` 或人工 | 沿用，P2 |
 | §3.7 有意简化必须有 ceiling | shortcut 记录适用范围和 invalidation condition | 人工审查 | 沿用，P2 |
 | §3.8 用证据判断收益 | 区分 structure/behavior/runtime/field 四类证据 | meta 检查（非门测，审查方案本身已示范） | 沿用，P2 |
@@ -464,22 +528,70 @@ architecture-mismatch，说明当前路由机制无法承载这类判断，需�
 
 ### 高优先级（必查）
 
-#### 1. 重复消除（Phase 1A）
+#### 1. 重复消除（Phase 1A，✅ 2026-08-21 完成扫描——零门测花费，发现但未实施任何删除/合并）
+
 - [x] 已纳入同步治理的字节级相同 reference（SHA-256 parity）
-- [ ] 高度相似但有微小差异的文件（需人工 diff）
-- [ ] 重复的代码逻辑片段（非文件级）
+- [x] **高度相似但有微小差异的文件**——用 Jaccard 行相似度扫描全部 `skills/*/references/**/*.md`
+  的同名文件组（排除已在 `SYNC_MAP` 里管理的 6 组和 P2 已审查过的 8 组同名-但-真分叉组）。
+  发现 **11 个 agent/persona 模板家族、25 个文件、约 3536 行**，最低两两相似度 82%-99%：
+  `slack-researcher.md`（3 份）、`learnings-researcher.md`（4 份）、`repo-research-analyst.md`（2 份）、
+  `best-practices-researcher.md`、`data-integrity-guardian.md`、`framework-docs-researcher.md`、
+  `pattern-recognition-specialist.md`、`performance-oracle.md`、`security-sentinel.md`、
+  `web-researcher.md`、`deployment-verification-agent.md`（各 2 份），分布在
+  `spec-compound`/`spec-plan`/`spec-ideate`/`spec-optimize`/`spec-code-review`/`spec-brainstorm` 之间。
+  抽查全部 11 组的完整 diff，模式高度一致：差异几乎总是精确落在第 7 行左右的一段
+  "For X invocations, convert ... into Y" 段落（invocation-specific 语境，如"For planning
+  invocations..."vs"For durable-learning invocations..."vs"For optimization invocations..."），
+  偶尔多一处次要差异（如 `pattern-recognition-specialist.md` 额外多一段 reuse/extend/compose/new
+  posture 指导，`deployment-verification-agent.md` 额外多一段调用门禁条件）。
+  **这与 P2 已发现的 `model-tiers.md` 是同一类模式（共享模板 + 调用方专属段落），但规模是它的
+  10 倍以上**——如果去重到 1 份 canonical + 各自的 invocation 段落，粗估可省约 2073 行。
+  **未实施任何合并**：按 `model-tiers.md` 先例的同一判断标准，这类文件的调用方专属段落是正文
+  内容而非偶然差异，纳入 `SYNC_MAP` 需要先设计参数化模板（把"invocation 段落"和"次要差异段落"
+  都做成可替换的槎口），这是比现有 sync 脚本能力更大的变更，且涉及 25 个文件、6 个 skill，
+  风险和工作量远超本轮"人工审查、零成本"的授权范围。标记为 architecture-mismatch，留给 owner
+  决定是否值得投入设计一个 agent-template 参数化机制。**完整发现已沉淀为独立知识文档**：
+  `docs/solutions/architecture-patterns/agent-persona-reference-template-duplication-2026-08-21.md`
+  （含每组文件清单、diff 模式、判断逻辑、可复跑的检测脚本、何时值得处理的三条件），
+  不只留在本方案文档里，方便未来复用检测方法或决定是否投入参数化机制时直接引用。
+- [x] **重复的代码逻辑片段（非文件级）**——用滑动窗口 md5 哈希扫描 `scripts/*.js`/`*.cjs`（17 个文件）
+  的跨文件重复 8 行代码块，发现 `countBy(items, selector)` 函数体在 `check-ce-localization-review.cjs`
+  与 `check-ce-upstream-reconciliation.cjs` 中逐字节相同，`generate-runtime-capability-catalog.js`
+  中有一个参数形式略有差异的等价版本（3 处共同实现同一个"按 key 分组计数"逻辑）。规模很小
+  （3 处、每处 6 行），`scripts/lib/` 目录已存在（当前只有 `npm-cli.cjs`），是合适的抽取目标，
+  但**未实施抽取**——这类零风险重构本应属于"machinery cleanup"而非本审查方案授权范围内的动作。
+  `if (require.main === module) { ... }` 样板在 14 个脚本中重复，但这是 Node.js 惯用写法而非
+  有意义的业务逻辑重复，**不计入本项发现**。
 
-#### 2. 死代码识别（Phase 1B + Step 2）
-- [ ] 无 consumer 的 reference 文档
-- [ ] 未被任何 skill 调用的 helper 函数
-- [ ] 无效的配置选项（schema 定义但无实现）
-- [ ] 永远不会触发的分支（如 `if (false)`）
+#### 2. 死代码识别（Phase 1B + Step 2，✅ 2026-08-21 完成——全部机械检测，零门测花费）
 
-#### 3. Skill 路由/误用防护（Step 2 P0，🆕 最高优先级，唯一有实测负回归证据的方向）
-- [ ] 诊断类 skill（spec-debug）的触发条件是否排除纯实现/优化请求
-- [ ] 每个 skill 的 SKILL.md 是否有显式"何时不使用本 skill"边界
-- [ ] 用 `score_cache` 门验证修复后 spec-debug 在实现任务上的正确率是否回到 baseline 水平
-- [ ] 如果路由层无法承载这类判断 → 记录 architecture-mismatch，退回 `spec-plan`
+- [x] **无 consumer 的 reference 文档**——用"skill 目录内文件名互相引用 + repo-wide 文件名 grep"扫描全部
+  `skills/*/references/*.md`，命中 4 个候选（`spec-doc-review/references/cross-model-eval.md`、
+  `spec-prototype/references/{preview,write-back}.md`、`spec-runtime-setup/references/supported-mcp-tools.md`）。
+  逐一深查后**全部是假阳性**：前三个是被 `tests/unit/spec-prototype-contracts.test.js`、
+  `tests/unit/mcp-setup-contracts.test.js` 直接读取校验内容的契约测试 consumer；`cross-model-eval.md`
+  是 maintainer 向的 eval spec（类比 `spec-write-skill/references/evaluation-design.md`、
+  `spec-resolve-pr-feedback/references/evaluation-rubric.md`、`spec-code-review/evals/eval.yaml`
+  这一类文件——本来就不该被运行时加载的 SKILL.md 引用，consumer 是"未来编辑该 skill 时跑
+  skill-creator eval workflow 的维护者"），且被 CE localization inventory 正式追踪。**无需任何修改。**
+- [x] **未被任何 skill 调用的 helper 函数**——扫描 `scripts/*.js`/`*.cjs`（17 个文件）的顶层 `module.exports`，
+  逐个在全仓库（排除自身文件）搜索使用点。**零孤儿，无需修改。**
+- [x] **无效的配置选项（schema 定义但无实现）**——用 Node 脚本遍历 `docs/contracts/**/*.schema.json`
+  （36 个文件，445 个顶层 property），对每个属性名做全仓库文本命中检查（排除 schema 自身），
+  并用一个刻意不存在的哨兵属性名验证检测器本身有效（sanity check 通过）。**零孤儿属性，无需修改。**
+- [x] **永远不会触发的分支**——`grep` 字面 `if(false)`/`if (0)` 零命中；对 `scripts/*.js`/`*.cjs`
+  全部文件跑"裸 `return` 后紧跟非空非 `}` 非注释行"的 unreachable-after-return 启发式扫描，零命中
+  （仓库无 eslint 配置，机械启发式是当前可用的最佳替代）。**无需修改。**
+
+**结论**：本项全部四个子检查均为机械可验证、零门测花费。当前 spec-first 源码（`scripts/`、
+`docs/contracts/`、`skills/*/references/`）没有发现死代码或孤儿配置。发现的 4 个"疑似孤儿 reference"
+全部核实为合法但间接的 consumer 关系（测试契约或 maintainer 向文档），提示"SKILL.md 未提及文件名"
+不能单独作为孤儿判据，必须交叉核对 `tests/` 和同类文件的既有模式。
+
+#### 3. Skill 路由/误用防护（Step 2，❌ 当前假设未证实并退出候选）
+- [x] 已用 `score_cache` 门跑 n=6+n=12 仲裁：baseline 16/18=88.9% vs spec-debug 15/18=83.3%；双侧 Fisher exact p=1.000
+- [x] 不修改 `skills/spec-debug/SKILL.md`：当前 fixture 没有证明负回归
+- [x] 不在同一弱 fixture 上机械扩大样本；只有新场景 + 预注册效应阈值与统计方法才重开
 
 #### 4. 可执行性检查（已证伪，仅作反面参考，不再列入本轮审查重点）
 - [x] ~~价值观表述 vs 可执行指令~~ —— trace-transfer/trace-amount 实测证明当前模型对
@@ -487,29 +599,63 @@ architecture-mismatch，说明当前路由机制无法承载这类判断，需�
   anti-pattern，不再对新文本重复验证，除非模型演化或 §8 触发重新评估
 - [ ] 例外：若发现新的具体场景（非根因修复类）显示表述方式确实影响行为，才重新开门测
 
-#### 5. 复用与安全默认 confirmatory run（Step 2 P1，补测中）
-- [ ] `score_reuse_slug`/`score_reuse_money` 从 n=2 补到 n=6
-- [ ] `score_safe_path` 从 n=2 补到 n=6
-- [ ] 确认方向是否与快速扫描一致（baseline 饱和、加 skill 无收益但成本涨 1.8×-4.1×）
-- [ ] 如果 confirmatory run 结果与快速扫描一致 → 归档为 anti-pattern（类比根因维度）
-- [ ] 如果出现差异 → 保留为候选，需要更大样本或更难 fixture
+#### 5. 复用与安全默认 confirmatory run（Step 2，⚠️ 已执行——2026-08-20 23:22，`runs/20260820-232245`，108 个计划 cell、107 个有效测量、1 个超时，$44.54）
+- [x] `score_reuse_slug`/`score_reuse_money` 补到 n=12：有效测量全部 100%；`reuse-slug/spec-work` 为 11/12，1 个 300 秒超时已排除
+- [x] `score_safe_path` 补到 n=12：三臂全部 100%
+- [x] 方向与快速扫描一致（baseline 饱和、加 skill 无收益但成本涨 1.1×-1.5×）
+- [x] 结果与快速扫描一致，但部分失败使 claim ceiling 降为 fixture 饱和候选；不支持修改 Skill，不再列入当前候选池
 
-#### 6. 必要性验证（Step 2 P2）
-- [ ] 每个新增 durable surface 有真实 consumer
-- [ ] 每个抽象有 ≥2 个实现或明确的扩展计划
-- [ ] 每个 wrapper 增加了 translation、sequencing、safety 或 evidence（不只是转发）
+#### 6. 必要性验证（Step 2 P2，✅ 2026-08-21 完成）
+- [x] `ce-localization-review-delta.schema.json`：由 deterministic validator、closeout generator 和 focused tests 共同消费，承担 source binding / lineage / claim-ceiling 边界，保留
+- [x] `listSkillDirectoryNames()` 的 `SKILL.md` entrypoint 过滤：由 bundled Skill/runtime catalog 消费，并有 `_shared` 负例测试，属于已有 owner 的 focused extension，保留
+- [x] `spec-compound` candidate→promotion：由用户 workflow 消费，复用既有 knowledge owner；contract tests 与 examples-as-context 覆盖拒绝边界，保留，但 fresh-source/field outcome 仍未运行
+- [x] `skills/spec-compound/evals/examples.json`：是 contract test 和 maintainer fresh-source eval 的输入，不是已执行效果证据；按 evidence-only surface 保留
+- [x] `verify-phase-1a.sh` / `verify-with-gate.sh`：是本审查方案的 operator 工具，不注册为新的 CLI/Skill 入口；前者编排现有 checks，后者增加认证 smoke、run identity、partial-failure 和比较门禁，非纯转发
+- [x] review delta 中间快照：7 个 artifact 仅 1 个被当前 Round-3 lineage 引用；删除其余 6 个无 consumer 的会话中间产物，避免把 stale snapshot 当 durable surface
+
+**结论**：没有发现需要新增“第二实现”来证明合理性的通用抽象；新增边界均是现有 owner 的 focused extension 或 evidence artifact。唯一无 consumer 的表面是中间 review deltas，已直接清理。
 
 ### 中优先级（条件查）
 
-#### 7. Owner 正确性（Step 2 P2）
-- [ ] 每个能力有唯一 source-of-truth
-- [ ] 没有混淆职责的 nearby capability 复用
-- [ ] 跨层调用的 boundary 清晰
+#### 7. Owner 正确性（Step 2 P2，✅ 全部完成——2026-08-20 23:40 / 23:55）
+- [x] 每个能力有唯一 source-of-truth——重新审查 `skills/_shared/README.md` 的"8 组已知漂移"清单，
+  发现其中 7 组是同名但独立撰写的内容（标题从第 1 行就不同），不存在 source-of-truth 混淆；
+  已修正 README 里错误的"需要人工合并决策"陈述
+- [x] 没有混淆职责的 nearby capability 复用——`model-tiers.md`（spec-sweep/spec-brainstorm）是唯一
+  真实的模板复制候选，判定为 architecture-mismatch（skill 特定名词是正文，非同步脚本能力范围），
+  不强行合并，留待未来有真实需求时再评估
+- [x] 跨层调用的 boundary 清晰——抽取全部 37 个 `skills/*/SKILL.md` 对其他 skill 名字的引用，逐条
+  分类为 consumer 声明（数据消费关系，如"消费者：spec-work、spec-code-review"）、路由建议（用户可选
+  切换，如 spec-plan 检测到 bug 报告时呈现"switch to spec-debug"选项）、代码层越界（直接读写另一个
+  skill 的私有目录或脚本）。图中看起来像环的边（`spec-plan↔spec-debug`、`spec-compound↔spec-work`
+  等）逐一核查后全部是前两类，不构成自动调用循环；搜索直接越界读写（`.internal/`/`_private/`/跨
+  skill import 脚本）**未发现任何实例**。唯一一处疑似自环（`spec-app-consistency-audit`）核查后是
+  脚本误报——skill 引用自己目录下的 `prompts/`/`scripts/`/`rule-packs/` 子资源，属正常内部结构。
+  **结论：当前跨层调用边界干净，无需修复动作。**
 
-#### 8. Shortcut 治理（Step 3）
-- [ ] 有意简化必须记录 ceiling 和 trigger
-- [ ] "以后再做"必须有可观测的触发条件
-- [ ] 退役条件明确
+#### 8. Shortcut 治理（Step 3，✅ 2026-08-21 完成——人工审查，零门测花费）
+
+抽样审查了仓库里两类真实的"有意简化/deferred"记录，判断依据是文档自身是否给出可观测的 trigger 和退役条件：
+
+- [x] **`docs/plans/2026-05-08-001-source-code-deferred-tracker.md`**（`status: closed`，2026-05-27 关闭）——正例。
+  正文明确写"如其中某条历史 finding 未来再次触发，应基于当前源码与当时需求另开新 plan，而不是恢复本 tracker"，
+  即退役条件写得很清楚：这是死的历史快照，表格里的 `open` 只是关闭时刻的状态截图，不代表当前活跃。
+  抽查 `doc2-P1-4`（package.json/package-lock.json 版本漂移）：当前两者版本已一致（`1.15.1`），
+  与 tracker 已关闭三个多月的事实吻合。**不需要任何修改**，是 §3.7 的良好范例。
+- [x] **`docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md`**——发现真实过期，已标注。
+  文档本身结构完整（ceiling："当前消费者只读 reason_code"；trigger：三条 When to Apply 条件；退役步骤：届时如何实施），
+  是 §3.7 要求格式的正例。但**内容已经过期**：`finalize-prd-artifact.js:254-260` 现在读取并按
+  `expected_shape`/`remediation_hint` 过滤 finding，这两个字段是 2026-07-01（commit `464786ab`）引入的，
+  比本文档晚 3 天，直接触发了文档自己写的 trigger 第 1 条（"某个消费者需要渲染 finding 细节"）。
+  `check-prd-artifact.js` 当前有 41 处 `findings.push(...)`，字段形状已比文档表格列出的 6 种更多样，该表已过期。
+  **已在原文档加注复核发现**，未实施 schema freeze——是否冻结属于需要另行授权的实现决策，超出人工审查范围。
+- [x] `model-tiers.md`（见 P2「Owner 正确性」）已用同一套判断标准处理：标记为 architecture-mismatch 而不是
+  强行合并，留待未来有真实需求时再评估——这也是"退役条件明确"的一种应用（trigger 是"未来需要同步措辞时"）。
+
+**沉淀**：deferred 记录本身的质量（是否有 ceiling/trigger/退役条件）和它内容是否仍然准确，是两件独立的事——
+`source-code-deferred-tracker.md` 两者都好；`finding-schema-freeze-deferred` 记录格式虽好但内容已被后续代码变更
+悄悄推过了自己设定的门槛，而没有人回头检查。**这提示：任何写了 trigger 条件的 deferred 决策，都应该在后续
+touch 相关代码时被动检查一次，而不能只靠人记得回头看。**
 
 #### 9. 未覆盖 skill 的新 fixture（Step 3 P3，成本高于其他项）
 - [ ] `spec-plan`：需要两阶段工作流 fixture（plan → implement）
@@ -662,10 +808,35 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
 
 ## 输出交付物
 
-### Phase 1A（机械清理）
-- [ ] Review handoff：source/projection/consumer 映射（删除需另行授权）
-- [ ] 清单：shared source、regular-file projections、consumer 与 test owner
-- [ ] 验证报告：`check:shared-references`、entry lint、focused tests、inventory 结果
+### Phase 1A（机械清理，✅ 2026-08-21 装配完成——见下方 Review handoff）
+
+- [x] **Review handoff：source/projection/consumer 映射**（删除仍需另行授权，本次只装配映射本身）：
+
+  | Shared source | Regular-file projections | Test owner |
+  |---|---|---|
+  | `skills/_shared/references/html-rendering.md` | `spec-plan`, `spec-ideate`, `spec-brainstorm` | `npm run check:shared-references`（SHA-256 parity） |
+  | `skills/_shared/references/markdown-rendering.md` | `spec-plan`, `spec-ideate`, `spec-brainstorm` | 同上 |
+  | `skills/_shared/references/concepts-vocabulary.md` | `spec-compound`, `spec-compound-refresh` | 同上 |
+  | `skills/_shared/references/settled-decisions.md` | `spec-plan`, `spec-brainstorm` | 同上 |
+  | `skills/_shared/references/tracker-defer.md` | `spec-work`, `spec-lfg` | 同上 + `tests/unit/spec-work-consumer-chain-contracts.test.js`（五宿主 projection parity，见文件自身 canonical owner 声明） |
+  | `skills/_shared/references/yaml-schema.md` | `spec-compound`, `spec-compound-refresh` | `npm run check:shared-references` |
+
+  加上本轮新发现、**未纳入** `SYNC_MAP`（均标记 architecture-mismatch，不在本次授权范围内合并）：
+
+  | 候选家族 | 副本数 | 状态 |
+  |---|---|---|
+  | `model-tiers.md` | 2（spec-sweep, spec-brainstorm） | P2 已发现，architecture-mismatch |
+  | 11 个 agent/persona 模板家族 | 25 个文件 | 本轮新发现，详见 `docs/solutions/architecture-patterns/agent-persona-reference-template-duplication-2026-08-21.md` |
+
+- [x] **清单：shared source、regular-file projections、consumer 与 test owner**——见上表；另有 8 组
+  同名-但-真分叉文件（P2 已审查，非本清单范围，见 `skills/_shared/README.md` 已修正的段落）
+- [x] **验证报告**：`npm run check:shared-references`（PASSED）、`npm run lint:skill-entrypoints`
+  （PASSED，327 文件扫描）、`npm run test:eval-fixtures`（PASSED，80 测试）、focused unit tests
+  （PASSED，22 测试）、`check-ce-localization-review.cjs --verify-only`（**FAILED**——
+  `docs/validation/ce-localization/skill-inventory.json` stale，这是仓库既有未提交漂移，
+  与本次 Phase 1A 审查/发现的任何改动无关，此前已确认过；不阻塞本次 handoff，但阻塞任何
+  "inventory 已刷新"的声明）。原始报告：`verify-phase-1a-YYYYMMDD-HHMMSS.txt`（每次重跑生成，
+  不纳入版本控制，属临时验证产物）
 
 ### Phase 1B（架构说明删除）
 - [ ] Candidate patch：spec-work 删除纯说明段落（只有匹配行为证据通过且另有变更授权时）
@@ -725,27 +896,28 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
 
 ## 时间线与里程碑
 
-### Week 1（Day 1-5，已按 `REPORT-20260820-sonnet5-saturation.md` 重排）
+### Week 1（Day 1-5，⚠️ 已按 22:30 仲裁结果二次重排，见执行模板 B）
 - **Day 1**: Phase 1A 执行（source/projection 盘点、同步、验证）
 - **Day 2**: Phase 1B 仅建立 spec-work 的 task/eval 设计；没有匹配门时不改 source
 - **Day 3**: Step 1（盘点门覆盖，已完成——见上文按 scorer 的覆盖表）
-- **Day 4-5**: Step 2 第一个 checklist 项 —— **P0：spec-debug 误用防护**（执行模板 B，用现有 `score_cache` 门，唯一有实测负回归证据的方向）
+- **Day 4**: 已实际执行——spec-debug 误用防护假设的复现（n=6）+ 仲裁（n=12）；2026-08-21 复算双侧 Fisher exact p=1.000，假设未证实，**不改 `SKILL.md`**
+- **Day 5**: ✅ 已完成——复用/安全默认维度 confirmatory run（n=12，见下方 Week 2 记录），比原计划提前完成
 
-**Milestone 1**: 
+**Milestone 1**（已按实际执行结果调整）:
 - ✅ 完成 source/projection/consumer ledger；不以净删行数作为里程碑
-- ✅ 完成 spec-debug 误用防护这一项的完整闭环（提出→路由层修改→`score_cache` 门测→沉淀 pattern 或 architecture-mismatch）
-- ⚠️ 原计划"P0 可执行性"项已在建立门当天证伪并归档，不再占用 Day 4-5 资源
+- ✅ 完成 spec-debug 误用防护的复现与仲裁（不是"修复闭环"，是"证据强度判定"）——结论是证据不足，不授权改 `SKILL.md` 正文，本条目状态为 pending 而非 passed/failed
+- ✅ 完成复用维度 + 安全默认维度的 confirmatory run（n=12，均确认饱和），比原计划提前一周完成
+- ⚠️ 原计划"P0 可执行性"项已在建立门当天证伪并归档，不再占用资源
+- 💰 本轮门测已花费约 $65.27（cache 仲裁 $20.73 + 复用/安全默认 confirmatory $44.54），计入门测预算
 
-### Week 2（Day 6-12，重排后）
-- **Day 6**: P1 confirmatory run —— `score_reuse_slug`/`score_reuse_money` 从 n=2 补到 n=6
-- **Day 7**: P1 confirmatory run —— `score_safe_path` 从 n=2 补到 n=6
-- **Day 8-9**: 根据 confirmatory run 结果决定：若与快速扫描方向一致 → 归档为 anti-pattern；若有差异 → 设计下一轮验证
+### Week 2（Day 6-12，⚠️ Day 6-9 已提前在 Week 1 完成，此处调整为跳过重复工作）
+- **Day 6-9**: ~~原计划的 confirmatory run~~ 已在 Week 1 Day 5 完成，结果：复用/安全默认维度均确认饱和（n=12，三臂全 100%），已归档为 anti-pattern
 - **Day 10-11**: Step 2 P2 项（consumer 验证 / owner 正确性 / shortcut 治理，人工审查为主，不占门测资源）
-- **Day 12**: Step 3 回顾与优先级调整
+- **Day 12**: Step 3 回顾与优先级调整；停止在现有 cache fixture 上追加预算，转向 P2 必要性审查和高区分度新 fixture
 
-**Milestone 2**:
-- ✅ 完成 spec-debug 误用防护 + 2 个 confirmatory run（复用、安全默认）的闭环，累计 3 个
-- ✅ 初步判断是否继续（基于通过率和成本，重点看 confirmatory run 是否推翻快速扫描的饱和结论）
+**Milestone 2**（已提前达成部分）:
+- ✅ 完成 spec-debug 误用假设复核（未证实）+ 2 个 fixture 饱和检查；三个候选项都有明确退出结论
+- ✅ **没有一个方向支撑“改 SKILL.md”**；Step 3 转向 P2 人工审查或重新设计高区分度 fixture，不继续在现有 4 个维度里找信号
 
 ### Week 3+（视 Milestone 2 决定）
 - **If continue**: Step 2-3 继续（目标 5+ 项）
@@ -788,11 +960,22 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
 
 ---
 
-**最后更新**: 2026-08-20（已按 `REPORT-20260820-sonnet5-saturation.md` 重排 Step 2/3 候选池优先级）  
-**状态**: Active；Phase 1A source/projection audit 已有 owner，Phase 1B/后续行为优化仍 deferred  
+**最后更新**: 2026-08-21（第六次更新——P2 全部三项完成：必要性验证 + reference consumer/owner + 跨层调用 boundary；同时复核并修正了 2026-08-20 的两处统计/证据错误）
+**状态**: Active；Phase 1A source/projection audit 已有 owner；spec-debug 误用防护假设未证实并退出当前候选（Fisher exact 复算为 p=1.000，此前 p=0.063 的计算是错的）；复用/安全默认 fixture 显示饱和但含 1 个超时（此前"零 API 失败"的记录不准确，已修正为 107/108 有效测量）；**P2 全部三项、P3「Shortcut 治理」已完成**；剩余仅 Phase 1B 与 P3「未覆盖 skill 新 fixture」
 **Owner**: @kuang  
-**Next Action**（按当前优先级，先做 1 再做 2）：
-1. `npm run check:shared-references && npm run lint:skill-entrypoints && npm run test:eval-fixtures`（Phase 1A 验证，无需门）
-2. 执行模板 B：`spec-debug` 误用防护——先读 `skills/spec-debug/SKILL.md` 现有触发条件描述，再跑
-   `cd benchmarks/agentic && python3 run.py --selftest && python3 run.py --task cache --arms baseline,spec-work,spec-debug --model sonnet --runs 6 --workers 1`
-   确认当前 4/5 的负回归可复现，再决定路由层修改方案（这是本轮唯一有实测负回归证据支撑的候选项，见 §Step 2）
+**已完成（本次及此前会话）**：
+- Phase 1A 验证脚本（`scripts/verify-phase-1a.sh`）已实跑：前 4 项通过，inventory stale（既有未提交漂移，未处理）
+- spec-debug 误用防护假设复现+仲裁：n=18 合并，双侧 Fisher exact **p=1.000**（此前误算的 p=0.063 已废止），假设未证实，**未修改 `skills/spec-debug/SKILL.md`**
+- 复用/安全默认维度 n=12 运行：108 个计划 cell、**107 个有效测量、1 个 300 秒超时**（此前"零 API 失败"的记录已修正）；有效测量全部正确，结论为 fixture 饱和候选，不称完整 confirmatory pass，不支持修改 Skill
+- P2「reference consumer/owner」：修正 `skills/_shared/README.md` 错误的"8 组需人工合并"清单，7 组是同名独立内容，1 组（`model-tiers.md`）标记 architecture-mismatch
+- P2「跨层调用 boundary」：审查 37 个 skill 间引用关系，未发现自动调用循环或代码越界，无需修复
+- P2「必要性验证」（2026-08-21 完成）：审查 6 个候选 durable surface（`ce-localization-review-delta.schema.json`、`listSkillDirectoryNames()` entrypoint 过滤、`spec-compound` candidate→promotion、`examples.json`、两个 verify 脚本），均有明确 owner/consumer，保留；发现并清理了 6 个无 consumer 的中间 review delta 快照（只保留 Round-3 lineage 引用的 1 个）
+- **P3「Shortcut 治理」（2026-08-21 完成，人工审查，零门测花费）**：抽查两份 deferred 记录。`docs/plans/2026-05-08-001-source-code-deferred-tracker.md`（已正式关闭）是 §3.7 正例，退役条件写得清楚，抽查 `doc2-P1-4` 确认已解决，不需修改。`docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 格式正确但**内容已过期**：`finalize-prd-artifact.js` 现在消费该文档声明"当前不被消费"的 `expected_shape`/`remediation_hint` 字段（2026-07-01 引入，晚于文档 3 天），已触发文档自己写的 trigger 条件。**已在原文档标注复核发现，未实施 schema freeze**（是否冻结属于需另行授权的实现决策，超出人工审查范围）。沉淀教训：deferred 记录的格式质量与内容时效性是两件独立的事，需要在后续 touch 相关代码时被动检查
+- `verify-with-gate.sh` 已加固：smoke/gate 只接受唯一新 run 目录（拒绝并发目录猜测），部分失败时 fail closed，不再用不等样本量做确认性比较
+- 本轮门测累计花费约 $65.27；本次 P2 全部三项 + P3 Shortcut 治理审查零门测花费
+
+**Next Action**（按当前优先级）：
+1. 决定 `spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 的 schema freeze 是否需要实施——这是本次审查发现但未授权处理的实际待办，需要 owner 判断
+2. P3「未覆盖 skill 的新 fixture」：`spec-plan`/`spec-code-review`/`spec-doc-review` 需要新 fixture（两阶段工作流或带 bug/问题的种子文档），成本高于本轮其他项，暂缓
+3. 若要重新验证 Skill 路由价值假设，先设计高区分度 fixture 并预注册效应阈值、样本量和统计方法；不在当前 cache fixture 上机械扩样本
+4. 在源码稳定后刷新 CE localization inventory，完成 snapshot 的 adjudication、delta 与 closeout（这条来自并行的 CE localization 工作流，非本审查方案范围）

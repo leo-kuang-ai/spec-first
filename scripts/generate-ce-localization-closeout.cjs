@@ -21,7 +21,10 @@ const write = (file, value) => {
 };
 
 function replaceStaleSnapshotWarning(report, currentBindingNote) {
-  return report.replace(/^> \*\*当前快照失效[\s\S]*?\n\n/m, currentBindingNote);
+  return report.replace(
+    /^> (?:\*\*当前快照失效[\s\S]*?|本报告绑定当前 target source snapshot：[^\n]*)\n\n/m,
+    currentBindingNote,
+  );
 }
 
 function refreshReport(deterministic) {

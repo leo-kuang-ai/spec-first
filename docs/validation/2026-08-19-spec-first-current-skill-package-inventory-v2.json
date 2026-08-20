@@ -1,9 +1,9 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "741175a23615e37382ce65ec1e0448abfa214e95",
-  "skills_tree_oid": "a0de26d11fe14bb79b3f84f747ea1977d149dd08",
+  "source_head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
+  "skills_tree_oid": "421f5f6ee388da5b9f091c5cf9c703f1b797dc5e",
   "source_mode": "working-tree",
-  "manifest_sha256": "e8b7deb851a351d44c078d665b5a6373cb903a5170ac635c9a6aa775f382dc4e",
+  "manifest_sha256": "627e96a3a7bfe71d2154c23e3d9b99474c006852f91cdd204aea2f0b88173103",
   "skill_count": 36,
   "file_count": 578,
   "per_skill_counts": {
@@ -49,8 +49,8 @@
       "path": "skills/_shared/README.md",
       "skill": "_shared",
       "owner_role": "reference-contract",
-      "bytes": 2852,
-      "sha256": "781b08a2d26196dd3b0295e83fef8886acd13ef9d4f2f5a33a9688052d604172"
+      "bytes": 4024,
+      "sha256": "27186a5e3e980b83bee267989318a2f44c4832f761c2ba066d9a14f3c7c35b48"
     },
     {
       "path": "skills/_shared/references/concepts-vocabulary.md",
@@ -3185,8 +3185,8 @@
       "path": "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 51876,
-      "sha256": "245e7329877698802163be0726346d3985a723d8b5afc604f3c092e0d329a214"
+      "bytes": 53210,
+      "sha256": "2f7095e650ec09eba73b2b648c0a98b981de88cdf7f7fc00da9a87214f2904d6"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/lib/human-output.cjs",

@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 
 const checker = require('../../scripts/check-ce-upstream-reconciliation.cjs');
 const crypto = require('node:crypto');
@@ -30,6 +31,30 @@ describe('CE reconciliation v2 contracts', () => {
 
   test('target source snapshot covers script and test producers', () => {
     expect(checker.CANONICAL_SOURCE_ROOTS).toEqual(expect.arrayContaining(['scripts', 'tests']));
+  });
+
+  test('target source dirty manifest excludes evidence outside canonical source roots', () => {
+    const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-source-snapshot-'));
+    try {
+      fs.mkdirSync(path.join(repo, 'docs'), { recursive: true });
+      fs.mkdirSync(path.join(repo, 'benchmarks/agentic/runs/example'), { recursive: true });
+      fs.writeFileSync(path.join(repo, 'docs/source.md'), 'before\n');
+      fs.writeFileSync(path.join(repo, 'benchmarks/agentic/runs/example/results.json'), '{}\n');
+      execFileSync('git', ['init', '-q'], { cwd: repo });
+      execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repo });
+      execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repo });
+      execFileSync('git', ['add', 'docs/source.md', 'benchmarks/agentic/runs/example/results.json'], { cwd: repo });
+      execFileSync('git', ['commit', '-qm', 'fixture'], { cwd: repo });
+
+      fs.writeFileSync(path.join(repo, 'docs/source.md'), 'after\n');
+      fs.writeFileSync(path.join(repo, 'benchmarks/agentic/runs/example/results.json'), '{"done":true}\n');
+      const snapshot = checker.buildTargetSourceSnapshot(repo, { files: [] });
+
+      expect(snapshot.dirty_paths).toEqual(['docs/source.md']);
+      expect(snapshot.dirty).toBe(true);
+    } finally {
+      fs.rmSync(repo, { recursive: true, force: true });
+    }
   });
 
   test('parses a dynamic audit count and requires an explicit target action', () => {

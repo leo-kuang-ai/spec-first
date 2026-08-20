@@ -1,5 +1,8 @@
 'use strict';
 
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+
 const producer = require('../../scripts/check-ce-localization-review.cjs');
 const closeoutWriter = require('../../scripts/generate-ce-localization-closeout.cjs');
 
@@ -254,13 +257,31 @@ describe('CE localization closeout artifacts', () => {
     const deterministic = producer.buildArtifacts();
     const closeout = producer.loadCloseoutArtifacts();
     const review = JSON.parse(JSON.stringify(closeout.reviews.round3Openai));
+    const sourceDelta = JSON.parse(fs.readFileSync(
+      'docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json',
+      'utf8',
+    ));
+    sourceDelta.source_binding.source_tree_hash = '0'.repeat(64);
+    const artifactRef = `docs/validation/ce-localization/review/deltas/.test-stale-${process.pid}.json`;
+    const artifactBytes = Buffer.from(`${JSON.stringify(sourceDelta, null, 2)}\n`);
+    fs.writeFileSync(artifactRef, artifactBytes);
+    review.review_status = 'complete-with-incremental-review';
+    review.coverage_status = 'complete-current-source-with-incremental-review';
+    review.review_deltas = [{
+      review_run_id: 'ce-localization-review-delta-2026-08-20-current-source-final-v2',
+      artifact_ref: artifactRef,
+      artifact_sha256: crypto.createHash('sha256').update(artifactBytes).digest('hex'),
+    }];
 
-    closeoutWriter.pruneReviewDeltaLineage(review, deterministic);
+    try {
+      closeoutWriter.pruneReviewDeltaLineage(review, deterministic);
 
-    expect(review.review_deltas).toHaveLength(1);
-    expect(review.review_deltas[0].review_run_id)
-      .not.toBe('ce-localization-review-delta-2026-08-20-current-source-inline-review');
-    expect(review.review_status).toBe('complete-with-incremental-review');
+      expect(review).not.toHaveProperty('review_deltas');
+      expect(review.review_status).toBe('complete-current-source');
+      expect(review.coverage_status).toBe('complete-current-source');
+    } finally {
+      fs.rmSync(artifactRef, { force: true });
+    }
   });
 
   test('rejects a reviewed Skill/path relation that is not in current coverage', () => {

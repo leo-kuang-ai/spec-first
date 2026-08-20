@@ -53,16 +53,44 @@ function isObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
-function isExplicitAuthority(authority) {
+function hasConfirmedLoadedRootReceipt(authority, targetIdentity) {
+  const receipt = authority.invocation_receipt;
+  if (!isObject(receipt)
+    || typeof receipt.receipt_sha256 !== 'string'
+    || typeof targetIdentity !== 'string'
+    || typeof receipt.target_identity !== 'string') return false;
+  if (receipt.schema_version !== 'host-invocation-receipt/v1'
+    || receipt.producer !== 'skills/spec-runtime-setup/scripts/setup.cjs'
+    || receipt.verification_status !== 'confirmed'
+    || receipt.reason_code !== 'host-authority-loaded-root-bound'
+    || receipt.host !== authority.host
+    || receipt.loaded_host !== authority.host
+    || receipt.canonical_entry_name !== 'spec-runtime-setup'
+    || path.resolve(receipt.target_identity) !== path.resolve(targetIdentity)
+    || receipt.enforcement_status !== 'loaded-root-checked') {
+    return false;
+  }
+  const { receipt_sha256: observedHash, ...unsignedReceipt } = receipt;
+  const expectedHash = crypto.createHash('sha256')
+    .update(JSON.stringify(unsignedReceipt))
+    .digest('hex');
+  return observedHash === expectedHash;
+}
+
+function isExplicitAuthority(authority, targetIdentity) {
   if (!isObject(authority)) return false;
   if (authority.explicit === true) return true;
   if (authority.status === 'ready' && authority.authority_source === 'MCP_SETUP_HOST') return true;
+  if (authority.status === 'ready'
+    && authority.authority_source === 'MCP_SETUP_HOST+loaded-skill-root') {
+    return hasConfirmedLoadedRootReceipt(authority, targetIdentity);
+  }
   return authority.authority_level === 'confirmed'
     && /^(?:runtime-pin|explicit-runtime|host-runtime-pin)$/.test(String(authority.source || ''));
 }
 
-function validateAuthority(authority, host) {
-  if (!isExplicitAuthority(authority)) {
+function validateAuthority(authority, host, targetIdentity) {
+  if (!isExplicitAuthority(authority, targetIdentity)) {
     return { ok: false, reason_code: 'host-authority-not-explicit' };
   }
   if (authority.host !== host) {
@@ -280,7 +308,8 @@ function resolveTargetRecord(scope, target, context) {
 function resolveHostConfigTarget(options = {}) {
   const entry = options.entry;
   const host = options.host;
-  const authorityResult = validateAuthority(options.authority, host);
+  const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const authorityResult = validateAuthority(options.authority, host, repoRoot);
   if (!authorityResult.ok) return authorityResult;
   const hostConfig = hostConfigForEntry(entry);
   const server = buildServerConfig(entry);
@@ -288,7 +317,6 @@ function resolveHostConfigTarget(options = {}) {
   if (!hostConfig || !server || !key || !isObject(hostConfig.targets)) {
     return { ok: false, reason_code: 'host-config-entry-invalid' };
   }
-  const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const homeDir = path.resolve(options.homeDir || os.homedir());
   const context = {
     repoRoot,
