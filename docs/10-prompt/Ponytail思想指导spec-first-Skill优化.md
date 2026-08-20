@@ -218,7 +218,9 @@ promotion 使用非补偿式门禁：成本或 footprint 变好，不能抵消�
 - 修复前完整 ponytail（懒惰框架齐备）→ Opus 0/3
 - `grep every caller of the function you touch` → Opus **6/6**
 
-**实测结论（2026-08-20）:** `benchmarks/agentic/` 门在 trace-transfer 与 trace-amount 两个根因 fixture 上（各 n=6, Sonnet 4.6）测得 **baseline 6/6 vs spec-debug 6/6**——baseline 零指导情况下也全部找到共享函数并在正确位置修复，与 spec-debug（393 行）结果完全一致。**当前模型在根因修复维度上已饱和，这一维度不是 spec-debug 的瓶颈。** 优化 § 4.4 措辞的行为收益是 6/6 → 6/6 = 0，不应列入 P1 优先级。
+**实测结论（2026-08-20, 真实运行）:** `benchmarks/agentic/` 门在两个根因任务上（各 n=6, Sonnet 5）测得 **trace-transfer: baseline 5/5（1 cell API 失败已排除）vs spec-debug 6/6；trace-amount: baseline 6/6 vs spec-debug 6/6**——11 次真实运行两臂全对，正确率无差异。trace-transfer 上 spec-debug 每 cell 成本 $0.67 vs baseline $0.33、token 多 36%（纯开销）；trace-amount 上成本相当（$0.34 vs $0.37）。**shared-caller 指令在根因维度无正确率收益，不应列入 P1 优先级。**
+
+> **方法学警告:** 同日早先两次 run 报出 "baseline 6/6 vs spec-debug 6/6"，是假绿——`MODELS["sonnet"]` 指向本 key 无权访问的模型，24 个 cell 全部 403，agent 一次未运行，评分器把 seed 文件当成 agent 的 diff。破绽是 `tok=0 cost=$0 time=0.3s`。已修 `score_workspace`（API 失败返回 `correct=None`）与 `aggregate`（排除并单独报 fail 列）。**读本门任何结果前，先确认 token/cost/time 非零。**
 
 若未来观察到 spec-debug 在根因修复上的实际失效案例，或换用更难的 fixture / 更弱的模型后出现 delta，可重新评估以下可执行动作序列的价值：
 
@@ -310,7 +312,7 @@ spec-first 的治理强度应由风险、歧义、不可逆性、影响面和 ha
 **理由:** §8 降级规则要求”只证明文件更短、没有行为证据 → 必须降级”。若先改文本再建门，按 §8 就该降级。ponytail 的 `benchmarks/results/2026-06-16-robustness-audit.md` 八处 SKILL.md 编辑（含 n=100 的 A/B，96% → 95%）全部 ≤ 现状、若干更差、全让输出膨胀，最终零 ship——这些编辑读起来都更严谨，唯一没被误判的原因是当时门已存在。顺序必须门在前。
 
 1. **从 ponytail 的 `benchmarks/agentic/` 复制 harness，只做 `spec-debug` 根因门。** fixture 现成且可移植：`score_trace_transfer`（`benchmarks/agentic/tasks.py:699`）带自验证 seed（`:725`）与 lazy-wrong 参照（`:747`），`run.py` 已支持 Sonnet/Opus 及每臂隔离（`--setting-sources project,local` + 单一 `--plugin-dir`，这是修掉 baseline 偷跑污染 bug 后的写法）。先跑 selftest 通过，再 n=6 对照 baseline vs spec-debug。
-2. **已完成（2026-08-20）:** `benchmarks/agentic/` 门在 trace-transfer 与 trace-amount 两个根因 fixture 上（各 n=6, Sonnet 4.6）测得 **baseline 6/6 vs spec-debug 6/6**——baseline 零指导也全部修对。**结论：当前模型在根因修复维度上已饱和，§ 4.4 的 shared-caller 检查不应列入 P1 优先级**（行为收益为零）。P1-P3 应转向其他维度（读代码纪律、臆测修复控制、必要边界保留）或直接做消重（下一步）。
+2. **已完成（2026-08-20）:** 门跑通并产出第一批真实数据。trace-transfer（n=6, Sonnet 5）**baseline 5/5 vs spec-debug 6/6**（spec-debug 成本翻倍 $0.67 vs $0.33/cell）、trace-amount **baseline 6/6 vs spec-debug 6/6**（成本相当）——11 次真实运行两臂全对，正确率无差异。**结论：§ 4.4 的 shared-caller 检查不应列入 P1**（正确率收益零、成本负）。P1-P3 应转向其他维度（读代码纪律、臆测修复控制、必要边界保留）。建门过程本身暴露两个 harness 缺陷并已修复：模型名不在 API key allowlist 时 24 个 cell 全 403 却报满分（seed 被当成 agent 产出），以及 `aggregate` 遇到失败 cell 崩溃。**这正是"先建门"的价值：如果先改文本，会拿这批假绿当证据 ship。**
 
 **关于 spec-optimize:** 当前 `spec-optimize` 是 785 行的 LLM skill，不是 harness。`grep -rlE “claude -p|anthropic|openai|promptfoo” scripts/` 只命中两个本地化脚本，179 个单测、73 个 contract、14 个 skill 带 evals，没有一个跑模型。用 skill 编排的 pilot 是 n=1、不可复现、由模型自述结果——恰是 §3.8 警告的”用叙事判断收益”。所以 P0 用 ponytail 的 harness，不等 spec-optimize 演化成可复现基础设施。
 

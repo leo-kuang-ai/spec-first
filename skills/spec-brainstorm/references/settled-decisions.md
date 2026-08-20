@@ -43,4 +43,3 @@ A settled decision is recorded on its Key Technical Decision entry (plan) or Key
 ## Brief entries (pipeline input)
 
 A calling skill (e.g. `spec-lfg`) may pass a distilled brief as invocation input — from the user or a calling skill. Each settled-decision entry requires: the decision, its class, the rejected alternative, and a one-line reason. An entry that cannot state its rejected alternative fails the settlement test — demote it to a directive (one challenge) or an open area. The required fields are a compliance aid; the settlement classification itself remains this skill's judgment. The brief is transient: once the artifact is written with labeled entries, the artifact is canonical and the brief carries no further authority.
-

@@ -39,8 +39,12 @@ ARMS = {
     "yagni":          lambda: "Follow YAGNI principles.",
     "yagni-oneliner": lambda: "Follow YAGNI principles, and prefer one-liner solutions.",
     "spec-debug":     lambda: _skill("skills/spec-debug/SKILL.md"),
+    "spec-work":      lambda: _skill("skills/spec-work/SKILL.md"),
 }
-MODELS = {"haiku": "claude-haiku-4-5-20251001", "sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}
+# Model ids must be in this API key's allowlist, or every cell fails 403 with
+# tok=0/cost=$0 and the scorer silently reads the seed as if an agent wrote it.
+# Verify with a 1-cell run before trusting any n>1 result.
+MODELS = {"haiku": "claude-haiku-4-5-20251001", "sonnet": "claude-sonnet-5", "opus": "claude-opus-5"}
 
 # Skills are plugins activated by a SessionStart hook. To test exactly one at a time we exclude the
 # user's globally-enabled plugins (--setting-sources project,local) and load one plugin from its
@@ -256,7 +260,7 @@ def chat_code_loc(text):
     return total, code
 
 def score_workspace(task_id, arm, model, workdir: Path):
-    meta, result_text = {}, ""
+    meta, result_text, api_error = {}, "", None
     cj = workdir / "_claude.json"
     if cj.exists():
         try:
@@ -267,7 +271,17 @@ def score_workspace(task_id, arm, model, workdir: Path):
                     "out_tokens": u.get("output_tokens"), "in_tokens": u.get("input_tokens"),
                     "cache_tokens": (u.get("cache_read_input_tokens") or 0) + (u.get("cache_creation_input_tokens") or 0)}
             result_text = j.get("result", "")
-        except Exception: pass
+            # A 403/429/5xx means the agent never ran. Without this the seed itself shows up as the
+            # agent's diff (total_loc>0 -> correct=1), so a fully failed run reports a perfect score.
+            if j.get("is_error") or j.get("api_error_status") or j.get("terminal_reason") == "api_error":
+                api_error = f"{j.get('api_error_status') or j.get('terminal_reason') or 'error'}: {str(result_text)[:200]}"
+        except Exception as e: api_error = f"unparseable _claude.json: {e}"
+    else:
+        api_error = "no _claude.json (CLI never produced output)"
+    if api_error:
+        return {"task": task_id, "arm": arm, "model": model, "correct": None, "safe": None,
+                "reason": f"API FAILURE -- not a measurement: {api_error}", "api_error": api_error,
+                "total_loc": None, "src_loc": None, "src_files": None, **meta}
     surgical = not TASKS[task_id].get("open") and not TASKS[task_id].get("fixture")
     stats = git_diff_stats(workdir) if TASKS[task_id].get("fixture") else code_stats(workdir, selfcheck_as_test=surgical)
     # open/explain tasks answer in the chat, not a file. If no source file was written, count the
@@ -344,11 +358,22 @@ def aggregate(results):
     for r in results: groups[(r["task"], r["arm"], r["model"])].append(r)
     rows = []
     for (t, a, m), cells in sorted(groups.items()):
-        n = len(cells)
+        # API-failed cells (403/timeout/no output) are NOT measurements: scoring them as 0 would
+        # understate an arm, scoring them as 1 would invent a pass. Exclude from rates, report the
+        # count so a run that half-failed can never read as a clean result.
+        all_cells, cells = cells, [c for c in cells if c.get("correct") is not None]
+        n_failed, n = len(all_cells) - len(cells), len(cells)
+        if n == 0:
+            rows.append({"task": t, "arm": a, "model": m, "n": 0, "n_api_failed": n_failed,
+                         "safe_rate": None, "correct_rate": None, "wrote_file_rate": None,
+                         "total_loc_median": 0, "src_loc_median": 0, "total_loc_max": 0,
+                         "src_files_median": 0, "wrote_tests_rate": None, "cost_mean": None,
+                         "tokens_mean": None, "duration_mean_s": None, "denials_mean": None})
+            continue
         costs = [c["cost"] for c in cells if c.get("cost") is not None]
-        loc_cells = [c for c in cells if c.get("total_loc", 0) > 0]   # LOC only where code was delivered
+        loc_cells = [c for c in cells if (c.get("total_loc") or 0) > 0]   # LOC only where code was delivered
         nl = len(loc_cells)
-        rows.append({"task": t, "arm": a, "model": m, "n": n,
+        rows.append({"task": t, "arm": a, "model": m, "n": n, "n_api_failed": n_failed,
                      "safe_rate": round(sum(c["safe"] for c in cells) / n, 3),
                      "correct_rate": round(sum(c["correct"] for c in cells) / n, 3),
                      "wrote_file_rate": round(nl / n, 3),
@@ -371,14 +396,18 @@ def print_table(rows):
     by = defaultdict(list)
     for r in rows: by[(r["task"], r["model"])].append(r)
     for (task, model), rs in sorted(by.items()):
-        print(f"\n=== {task}  ({model}, n={rs[0]['n']}) ===")
-        print(f"  {'arm':16} {'wrote%':>7} {'correct':>8} {'LOC':>7} {'tot_tok':>9} {'$/run':>8} {'time_s':>7}")
+        print(f"\n=== {task}  ({model}) ===")
+        print(f"  {'arm':16} {'n':>3} {'fail':>5} {'wrote%':>7} {'correct':>8} {'LOC':>7} {'tot_tok':>9} {'$/run':>8} {'time_s':>7}")
         for r in sorted(rs, key=lambda x: x["arm"]):
             c = ("$" + format(r["cost_mean"], ".4f")) if r["cost_mean"] is not None else "-"
             tt = r.get("total_tokens_mean"); t = r.get("time_s_mean")
-            print(f"  {r['arm']:16} {r.get('wrote_file_rate', 1.0):>7} {r['correct_rate']:>8} "
-                  f"{r['total_loc_median']:>7} {(tt if tt is not None else '-'):>9} {c:>8} "
-                  f"{(t if t is not None else '-'):>7}")
+            fmt = lambda v: "-" if v is None else v
+            print(f"  {r['arm']:16} {r['n']:>3} {r.get('n_api_failed', 0):>5} "
+                  f"{fmt(r.get('wrote_file_rate')):>7} {fmt(r['correct_rate']):>8} "
+                  f"{r['total_loc_median']:>7} {fmt(tt):>9} {c:>8} {fmt(t):>7}")
+        # An arm whose cells partly failed is not comparable to a full arm; say so next to the numbers.
+        if any(r.get("n_api_failed") for r in rs):
+            print("  NOTE: 'fail' cells are API failures excluded from rates -- rates rest on fewer runs.")
 
 def rescore(run_dir):
     run_dir = Path(run_dir)
