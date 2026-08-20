@@ -1,0 +1,21 @@
+[
+  {
+    "task": "reuse-slug",
+    "arm": "spec-work",
+    "model": "sonnet",
+    "n": 1,
+    "n_api_failed": 0,
+    "safe_rate": 1.0,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 21,
+    "src_loc_median": 21,
+    "total_loc_max": 21,
+    "src_files_median": 2,
+    "wrote_tests_rate": 0.0,
+    "cost_mean": 1.1432,
+    "out_tokens_mean": 762,
+    "total_tokens_mean": 481830,
+    "time_s_mean": 206.6
+  }
+]

@@ -77,13 +77,13 @@ describe('compound knowledge-promotion contract', () => {
     const compound = read('skills/spec-compound/SKILL.md');
     const refresh = read('skills/spec-compound-refresh/references/per-action-flows.md');
 
-    const compoundFull = markdownSection(compound, '### Phase 2: Assembly & Write', '### Phase 2.4:');
+    const compoundFull = markdownSection(compound, '### Phase 2: Assembly & Candidate Validation', '### Phase 2.4:');
     const compoundLightweight = markdownSection(compound, '### Lightweight Mode', '## What It Captures');
     const refreshConsolidate = markdownSection(refresh, '## Consolidate Flow', '## Replace Flow');
     const refreshReplace = markdownSection(refresh, '## Replace Flow', '## Delete Flow');
 
     for (const section of [compoundFull, compoundLightweight]) {
-      expect(section).toContain('validate-frontmatter.py" --promotion <output-path>');
+      expect(section).toContain('validate-frontmatter.py" --promotion <candidate-path>');
       expect(section).toContain('source_refs');
       expect(section).toContain('invalidation_condition');
     }
@@ -100,11 +100,84 @@ describe('compound knowledge-promotion contract', () => {
   test('knowledge harness describes the deterministic floor without claiming semantic automation', () => {
     const harness = read('docs/contracts/knowledge/knowledge-harness.md');
 
-    expect(harness).toContain('validate-frontmatter.py --promotion');
+    expect(harness).toContain('validate-frontmatter.py --promotion <candidate-path>');
+    expect(harness).not.toContain('validate-frontmatter.py --promotion <doc-path>');
     expect(harness).toContain('只机械检查字段存在、顶层类型形态、非空与重复键');
     expect(harness).toContain('引用是否可信、是否足以回源，以及失效条件是否语义充分，仍由 LLM / human 判断');
     expect(harness).not.toContain('prose / LLM-enforced，非 machine-validated');
     expect(harness).not.toContain('最小回填 `domain`、`pattern`');
+  });
+
+  test('compound keeps high-risk learnings out of context-pressure Lightweight mode', () => {
+    const compound = read('skills/spec-compound/SKILL.md');
+    const modeSelection = markdownSection(
+      compound,
+      '**Mode selection (Full vs Lightweight) — decide it, don\'t ask it.**',
+      '**In headless mode**',
+    );
+    const lightweight = markdownSection(compound, '### Lightweight Mode', '## What It Captures');
+
+    expect(modeSelection).toContain('low-risk, bounded, source-grounded, and already backed by verification evidence');
+    expect(modeSelection).toContain('Context pressure alone never waives promotion obligations');
+    expect(modeSelection).toContain('High-risk learnings use Full mode');
+    expect(lightweight).toContain('never enter Lightweight merely because context is tight');
+    expect(lightweight).toContain('emits `Documentation skipped`');
+  });
+
+  test('compound validates scratch candidates before per-target atomic durable publication', () => {
+    const compound = read('skills/spec-compound/SKILL.md');
+    const full = markdownSection(
+      compound,
+      '### Phase 2: Assembly & Candidate Validation',
+      '### Phase 2.5: Selective Refresh Check',
+    );
+    const lightweight = markdownSection(compound, '### Lightweight Mode', '## What It Captures');
+
+    for (const section of [full, lightweight]) {
+      expect(section).toContain('<private-scratch-dir>/learning-candidate.md');
+      expect(section).toContain('existence/SHA-256');
+      expect(section).toContain('atomic');
+      expect(section).toContain('Documentation skipped');
+    }
+    expect(full.indexOf('validate-frontmatter.py" --promotion <candidate-path>'))
+      .toBeLessThan(full.indexOf('### Phase 2.47: Promotion Decision & Per-Target Atomic Publication'));
+    expect(full).toContain('validate-doc-claims.py" <candidate-path>');
+    expect(full).toContain('Do not run `git fetch` unless');
+    expect(full.indexOf('### Phase 2.46: Optional Candidate Enhancement'))
+      .toBeLessThan(full.indexOf('### Phase 2.47: Promotion Decision & Per-Target Atomic Publication'));
+    expect(full).toContain('The final `docs/solutions/**` path remains untouched until this phase');
+    expect(full).toContain('scripts do not make it');
+    expect(full).toContain('a multi-target run is not an all-or-nothing filesystem transaction');
+    expect(full).toContain('report the exact partial publication');
+    expect(lightweight.indexOf('validate-frontmatter.py" --promotion <candidate-path>'))
+      .toBeLessThan(lightweight.indexOf('Semantic promotion decision and publication'));
+    expect(compound).not.toContain('Writes the final learning directly into `docs/solutions/`.');
+    expect(compound).toContain(
+      'Publishes the approved learning into `docs/solutions/` only after candidate validation and the semantic promotion decision succeed.',
+    );
+  });
+
+  test('compound behavior evals cover semantic promotion refusal boundaries', () => {
+    const evals = JSON.parse(read('skills/spec-compound/evals/examples.json'));
+    const cases = new Map(evals.cases.map((entry) => [entry.id, entry]));
+
+    expect(new Set(cases.keys())).toEqual(new Set([
+      'irrelevant-existing-source-ref',
+      'transcript-only-completion-claim',
+      'high-risk-context-pressure',
+      'current-source-contradicts-draft',
+      'vague-invalidation-condition',
+      'candidate-validation-failure-keeps-final-untouched',
+      'specialized-review-before-promotion',
+      'multi-target-partial-publication',
+    ]));
+    expect(cases.get('high-risk-context-pressure').expected).toContain('选择 Full mode；若上下文不足则 handoff 或 Documentation skipped');
+    expect(cases.get('candidate-validation-failure-keeps-final-untouched').forbidden)
+      .toContain('在校验失败后创建或修改 docs/solutions/** 最终路径');
+    expect(cases.get('specialized-review-before-promotion').forbidden)
+      .toContain('让可选 reviewer 在 publication 后直接修改 durable target');
+    expect(cases.get('multi-target-partial-publication').forbidden)
+      .toContain('声称跨文件整体原子');
   });
 
   test.each(SHARED_PROMOTION_FILES)('compound and refresh %s stay byte-identical', (relativePath) => {

@@ -57,9 +57,13 @@ Context budget accounting 复用 `context-bundle.v1`：included 语义映射到 
 
 新的或 materially rewritten `docs/solutions/**` learning 必须走 `skills/spec-compound/references/schema.yaml` 的 `promotion_required_fields`：`source_refs` 是 recall 回源抓手，`invalidation_condition` 是失效边界。`spec-compound` Full、Lightweight 与 `spec-compound-refresh` Replace / Consolidate material rewrite 均消费同一合同。
 
-Promotion gate 的最小机制是 candidate -> review -> promote。只有 verified learning 进入 durable store；未验证的 session notes、raw tool output、raw diff hunks 或未确认 recall 不写入 `docs/solutions/**`。
+Promotion gate 的最小机制是 candidate -> review -> promote。Candidate 必须先留在 owner-private scratch，最终 `docs/solutions/**` 路径在机械校验、可选候选稿复核和语义 promotion decision 完成前保持不变；批准后才通过同目录临时文件与原子 rename 逐目标发布。更新既有 learning 时还必须绑定原文件的 existence/SHA-256，发布前发生漂移就重新生成和审查，不能覆盖并发新事实。每个目标替换可原子化，但同时更新 learning 与 `CONCEPTS.md` 不是跨文件事务：必须先准备全部临时文件，先发布可选 vocabulary、最后发布主 learning；中途失败要报告精确 partial publication，保持 run incomplete，不得声称整体原子或 `Documentation complete`。只有 verified learning 进入 durable store；未验证的 session notes、raw tool output、raw diff hunks 或未确认 recall 不写入 `docs/solutions/**`。
 
-此 gate 分成确定性地板与语义判断两层：producer 必须运行 `validate-frontmatter.py --promotion <doc-path>`；脚本除 parser safety 外，只机械检查字段存在、顶层类型形态、非空与重复键，缺任一字段时拒绝 promotion。引用是否可信、是否足以回源，以及失效条件是否语义充分，仍由 LLM / human 判断。默认 validator 模式继续只做 parser safety，避免 untouched legacy learning 被迫批量迁移。
+此 gate 分成确定性地板与语义判断两层：producer 必须先对 owner-private candidate 运行 `validate-frontmatter.py --promotion <candidate-path>`；脚本除 parser safety 外，只机械检查字段存在、顶层类型形态、非空与重复键，缺任一字段时拒绝 promotion。引用是否可信、是否足以回源，以及失效条件是否语义充分，仍由 LLM / human 判断。默认 validator 模式继续只做 parser safety，避免 untouched legacy learning 被迫批量迁移。
+
+Full、Headless 和 Lightweight 都遵循上述 publication boundary；它们的差别是研究和语义复核强度，不是 promotion gate 强度。Lightweight 仅适用于 low-risk、bounded、source-grounded 且已有验证证据的 learning；上下文压力本身不能覆盖这四项。错误结论可能实质削弱 security/authorization、data integrity、migration/release safety、privacy/compliance 或 irreversible mutation 边界时，必须进入 Full；剩余上下文不足则 handoff 或 `Documentation skipped`，不得降级写入 durable knowledge。
+
+独立 semantic reviewer 不是所有普通 learning 的普遍硬要求：有明确 dispatch authorization/capability 时可作为高风险复核增强；否则 Full/Headless 使用同一 validator prompt inline 并标记非独立，Lightweight 由 orchestrator 作显式语义 promotion decision。无论哪种路径，脚本都不判断问题是否真的解决、引用是否相关或 learning 是否值得复用；只有语义判断通过后才能发布。
 
 ## Open Questions / Resolved
 

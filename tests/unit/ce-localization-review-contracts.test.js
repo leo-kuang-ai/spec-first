@@ -17,7 +17,7 @@ describe('CE localization deterministic review producer', () => {
     ].join('/');
 
     expect(inventory.skill_count).toBe(36);
-    expect(inventory.package_path_count).toBe(570);
+    expect(inventory.package_path_count).toBe(571);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -31,8 +31,8 @@ describe('CE localization deterministic review producer', () => {
       terminal_disposition: 'excluded-host-owned-local-source',
     }));
     expect(coverage.coverage_summary.missing_path_count).toBe(0);
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(184);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(390);
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(186);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(392);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

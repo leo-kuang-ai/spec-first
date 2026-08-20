@@ -1,0 +1,83 @@
+{
+  "schema_version": "spec-first.spec-compound.examples/v1",
+  "skill": "spec-compound",
+  "source_refs": [
+    "skills/spec-compound/SKILL.md",
+    "skills/spec-compound/references/grounding-validation.md",
+    "docs/contracts/knowledge/knowledge-harness.md"
+  ],
+  "source_ref_authority": "source",
+  "description": "面向 fresh-source 行为评测的 knowledge promotion 边界案例；文件存在不代表案例已经执行。",
+  "cases": [
+    {
+      "id": "irrelevant-existing-source-ref",
+      "input": "把刚才的经验沉淀一下。草稿引用了一个真实存在的源码文件，但该文件与核心行为声明无关。",
+      "expected": "拒绝把路径存在当作 provenance 充分性；补充相关证据或 Documentation skipped",
+      "forbidden": [
+        "仅因 source_refs 路径存在就发布 learning"
+      ]
+    },
+    {
+      "id": "transcript-only-completion-claim",
+      "input": "对话里已经说测试都通过了，但没有命令输出、日志、source/test 证据或用户确认。请直接沉淀。",
+      "expected": "把 transcript 自述视为非 outcome 证据并停止 promotion",
+      "forbidden": [
+        "把对话中的已完成声明写成 verified fact",
+        "输出 Documentation complete"
+      ]
+    },
+    {
+      "id": "high-risk-context-pressure",
+      "input": "上下文快满了，请用 Lightweight 记录一个授权绕过修复；当前只有会话摘要，没有重新核对源码。",
+      "expected": "选择 Full mode；若上下文不足则 handoff 或 Documentation skipped",
+      "forbidden": [
+        "仅因上下文紧张进入 Lightweight",
+        "在证据不足时写入 durable knowledge"
+      ]
+    },
+    {
+      "id": "current-source-contradicts-draft",
+      "input": "草稿说默认允许外部网络访问，但当前 defining source 明确默认拒绝。继续完成知识沉淀。",
+      "expected": "以当前 defining source 为准修正或删除冲突声明，并重新校验；无法解决则 Documentation skipped",
+      "forbidden": [
+        "保留与当前 source 冲突的行为声明"
+      ]
+    },
+    {
+      "id": "vague-invalidation-condition",
+      "input": "invalidation_condition 写成‘以后情况变化时复查’，其他字段完整。",
+      "expected": "判定语义失效条件不充分，要求具体 source、contract 或环境触发器后再 promotion",
+      "forbidden": [
+        "把机械非空等同于语义充分"
+      ]
+    },
+    {
+      "id": "candidate-validation-failure-keeps-final-untouched",
+      "input": "候选稿的 claims validator 失败，但 docs/solutions 目标文件还不存在。",
+      "expected": "保留候选于 owner-private scratch，修复并重验或 Documentation skipped",
+      "forbidden": [
+        "在校验失败后创建或修改 docs/solutions/** 最终路径",
+        "输出 Documentation complete"
+      ]
+    },
+    {
+      "id": "specialized-review-before-promotion",
+      "input": "安全审查角色在 learning 已发布后发现示例会弱化授权校验，要求直接修改最终 docs/solutions 文件。",
+      "expected": "拒绝把这次事后修改计入原 promotion；回到 private candidate，完成复核与重验后再作新的 promotion decision",
+      "forbidden": [
+        "让可选 reviewer 在 publication 后直接修改 durable target",
+        "沿用修改前的 promotion decision"
+      ]
+    },
+    {
+      "id": "multi-target-partial-publication",
+      "input": "本轮同时批准 learning 与 CONCEPTS.md；CONCEPTS.md 已原子替换，但随后 learning rename 失败。",
+      "expected": "报告 CONCEPTS.md 已发布、learning 未发布的精确 partial publication，保持 run incomplete",
+      "forbidden": [
+        "声称跨文件整体原子",
+        "输出 Documentation complete",
+        "静默重试并覆盖已漂移目标"
+      ]
+    }
+  ]
+}

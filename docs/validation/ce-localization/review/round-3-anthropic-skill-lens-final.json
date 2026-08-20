@@ -8,281 +8,253 @@
   "provider_receipt_ref": null,
   "worker_context_isolation": "degraded_inherited",
   "field_outcome": "not-run",
-  "review_status": "complete-with-terminal-deferred-measurement",
-  "coverage_status": "full",
+  "review_status": "complete-with-incremental-review",
+  "coverage_status": "complete-current-source-with-incremental-review",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "69621aac0bbf34b13b96f57ebe0114a251698e68",
+    "head": "741175a23615e37382ce65ec1e0448abfa214e95",
     "dirty": true,
     "dirty_paths": [
-      ".spec-first/config.local.example.yaml",
       "CHANGELOG.md",
-      "benchmarks/agentic/README.md",
-      "benchmarks/agentic/complete.py",
-      "benchmarks/agentic/judge.py",
-      "benchmarks/agentic/run.py",
-      "benchmarks/agentic/runs/20260820-162800/results.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/results.json",
-      "benchmarks/agentic/runs/20260820-163052/summary.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-163304/results.json",
-      "benchmarks/agentic/runs/20260820-163304/summary.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/billing.py",
-      "benchmarks/agentic/tasks.py",
-      "docs/10-prompt/AI-Coding-Harness\\346\\274\\224\\345\\214\\226\\346\\226\\271\\346\\263\\225\\350\\256\\272.md",
-      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md",
-      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md.backup-20260820-161301",
-      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md.bak2",
-      "docs/10-prompt/README.md",
-      "docs/10-prompt/\\347\\273\\223\\346\\236\\204\\345\\214\\226\\351\\241\\271\\347\\233\\256\\350\\247\\222\\350\\211\\262\\345\\245\\221\\347\\272\\246.md",
-      "docs/catalog/runtime-capabilities.md",
-      "docs/contracts/verification/baseline.schema.json",
+      "benchmarks/agentic/runs/20260820-173640/results.json",
+      "benchmarks/agentic/runs/20260820-173640/summary.json",
+      "benchmarks/agentic/runs/20260820-173640/trace-transfer__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-173640/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173640/trace-transfer__baseline__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/results.json",
+      "benchmarks/agentic/runs/20260820-173746/summary.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-174459/results.json",
+      "benchmarks/agentic/runs/20260820-174459/summary.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__0/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__1/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/test_billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__3/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__4/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__5/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/test_billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__1/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/test_billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__3/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__4/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__5/billing.py",
+      "benchmarks/agentic/runs/20260820-184301/results.json",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-184301/summary.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/results.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__0/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/test_uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/test_uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__1/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/test_uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__1/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/summary.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__2/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__4/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__2/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__3/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__4/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__5/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__2/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__3/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__5/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/results.json",
+      "benchmarks/agentic/runs/20260820-190610/summary.json",
+      "docs/10-prompt/spec-first\\344\\273\\243\\347\\240\\201\\345\\256\\241\\346\\237\\245\\346\\226\\271\\346\\241\\210.md",
+      "docs/contracts/knowledge/knowledge-harness.md",
+      "docs/contracts/verification/ce-localization-review-delta.schema.json",
       "docs/contracts/verification/ce-localization-round-3-review.schema.json",
-      "docs/contracts/verification/ce-setup-dependency-matrix.schema.json",
-      "docs/contracts/verification/ce-setup-prerequisite-preflight.schema.json",
-      "docs/contracts/verification/ce-setup-side-effect.schema.json",
-      "docs/contracts/verification/ce-setup-snapshot.schema.json",
-      "docs/contracts/verification/ce-upstream-adjudication-input.schema.json",
-      "docs/contracts/verification/ce-upstream-adjudication.schema.json",
-      "docs/contracts/verification/ce-upstream-ledger-patch.schema.json",
-      "docs/contracts/verification/field-validation-protocol.schema.json",
-      "docs/contracts/verification/field-validation-results.schema.json",
-      "docs/contracts/verification/host-invocation-receipt.schema.json",
-      "docs/contracts/verification/knowledge-promotion.schema.json",
-      "docs/contracts/verification/localization-ledger.schema.json",
-      "docs/contracts/verification/provider-serving-receipt.md",
-      "docs/contracts/verification/provider-serving-receipt.schema.json",
-      "docs/contracts/verification/review-findings.schema.json",
-      "docs/contracts/verification/runtime-status-projection.schema.json",
-      "docs/contracts/verification/skill-inventory.schema.json",
-      "docs/contracts/verification/skill-scenarios.schema.json",
-      "docs/plans/2026-08-18-001-refactor-sync-ce-post-3-20-head-calibration-plan.md",
-      "docs/plans/2026-08-19-002-refactor-ce-post-3-20-skill-sync-scope-clarification.md",
-      "docs/plans/2026-08-19-003-refactor-ce-post-3-20-full-window-sync-plan.md",
-      "docs/plans/2026-08-20-001-fix-ce-full-window-review-findings.md",
-      "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md",
-      "docs/validation/2026-08-18-ce-post-3-20-name-status.md",
-      "docs/validation/2026-08-19-ce-post-3-20-filelist-source-comparison.md",
-      "docs/validation/2026-08-19-ce-post-3-20-reconciliation.json",
-      "docs/validation/2026-08-19-ce-post-3-20-reconciliation.md",
-      "docs/validation/2026-08-19-current-skill-package-inventory.json",
-      "jest.config.js",
-      "package-lock.json",
-      "package.json",
       "scripts/check-ce-localization-review.cjs",
-      "scripts/check-ce-upstream-reconciliation.cjs",
       "scripts/generate-ce-localization-closeout.cjs",
-      "scripts/rebind-ce-ledger-patches.cjs",
-      "scripts/sync-shared-references.js",
-      "skills/_shared/README.md",
-      "skills/_shared/references/concepts-vocabulary.md",
-      "skills/_shared/references/html-rendering.md",
-      "skills/_shared/references/markdown-rendering.md",
-      "skills/_shared/references/settled-decisions.md",
-      "skills/_shared/references/tracker-defer.md",
-      "skills/_shared/references/yaml-schema.md",
-      "skills/spec-brainstorm/references/handoff.md",
-      "skills/spec-brainstorm/references/html-rendering.md",
-      "skills/spec-code-review/references/cross-model-review.md",
-      "skills/spec-code-review/scripts/cross-model-adversarial-review.sh",
-      "skills/spec-code-review/scripts/peer-job-runner.py",
-      "skills/spec-commit-push-pr/SKILL.md",
-      "skills/spec-commit-push-pr/references/pr-description-writing.md",
-      "skills/spec-commit/SKILL.md",
-      "skills/spec-compound-refresh/SKILL.md",
+      "scripts/verify-phase-1a.sh",
+      "scripts/verify-with-gate.sh",
       "skills/spec-compound/SKILL.md",
-      "skills/spec-debug/SKILL.md",
-      "skills/spec-debug/references/investigation-techniques.md",
-      "skills/spec-doc-review/references/cross-model-review.md",
-      "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
-      "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "skills/spec-dogfood/SKILL.md",
-      "skills/spec-ideate/SKILL.md",
-      "skills/spec-ideate/references/html-rendering.md",
-      "skills/spec-ideate/references/universal-ideation.md",
-      "skills/spec-lfg/SKILL.md",
-      "skills/spec-lfg/references/tracker-defer.md",
-      "skills/spec-optimize/SKILL.md",
-      "skills/spec-plan/references/plan-handoff.md",
-      "skills/spec-polish/SKILL.md",
-      "skills/spec-pov/references/cross-model-panel.md",
-      "skills/spec-pov/scripts/cross-model-pov.sh",
-      "skills/spec-pov/scripts/peer-job-runner.py",
-      "skills/spec-product-pulse/SKILL.md",
-      "skills/spec-product-pulse/references/interview.md",
-      "skills/spec-product-pulse/references/report-template.md",
-      "skills/spec-promote/SKILL.md",
-      "skills/spec-promote/references/spiral-cli.md",
-      "skills/spec-promote/scripts/check-spiral-auth.cjs",
-      "skills/spec-prototype/SKILL.md",
-      "skills/spec-prototype/references/craft-floor.md",
-      "skills/spec-prototype/references/preview.md",
-      "skills/spec-prototype/references/write-back.md",
-      "skills/spec-prototype/scripts/light-webserver.js",
-      "skills/spec-riffrec-feedback-analysis/SKILL.md",
-      "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md",
-      "skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md",
-      "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/references/config-template.yaml",
-      "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
-      "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
-      "skills/spec-runtime-setup/scripts/setup.cjs",
-      "skills/spec-runtime-setup/scripts/vendor/README.md",
-      "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
-      "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
-      "skills/spec-sweep/SKILL.md",
-      "skills/spec-sweep/references/agents/media-analyzer.md",
-      "skills/spec-sweep/references/interview.md",
-      "skills/spec-sweep/references/state-schema.md",
-      "skills/spec-sweep/scripts/analyze_riffrec_zip.py",
-      "skills/spec-test-xcode/SKILL.md",
-      "skills/spec-work/SKILL.md",
-      "skills/spec-work/references/agents/figma-design-sync.md",
-      "skills/spec-work/references/execution-strategy.md",
-      "skills/spec-work/references/tracker-defer.md",
-      "skills/spec-work/references/work-intake-and-task-pack.md",
-      "skills/spec-worktree/SKILL.md",
-      "skills/spec-worktree/scripts/worktree-manager.sh",
-      "skills/spec-write-tasks/SKILL.md",
-      "skills/using-spec-first/references/public-route-map.md",
-      "src/cli/commands/doctor.js",
-      "src/cli/commands/tasks.js",
-      "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "src/cli/task-pack.js",
-      "templates/claude/commands/spec/write-tasks.md",
-      "tests/integration/init-six-host-lifecycle.integration.test.js",
-      "tests/integration/spec-prototype-human-journey.integration.test.js",
+      "skills/spec-compound/evals/examples.json",
+      "src/cli/plugin-manifest.js",
       "tests/unit/ce-localization-closeout-contracts.test.js",
       "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
-      "tests/unit/ce-post-3-20-calibration-contracts.test.js",
-      "tests/unit/ce-setup-localization-contracts.test.js",
-      "tests/unit/ce-upstream-3-20-reconciliation.test.js",
-      "tests/unit/ce-upstream-reconciliation-v2.test.js",
       "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "tests/unit/doctor-output.test.js",
-      "tests/unit/doctor-runtime-assets.test.js",
-      "tests/unit/low-findings-cleanup-contracts.test.js",
-      "tests/unit/mcp-setup-config-consumers.test.js",
-      "tests/unit/mcp-setup-entrypoint.test.js",
-      "tests/unit/mcp-setup-mode-target.test.js",
-      "tests/unit/mcp-setup-project-config.test.js",
-      "tests/unit/mutation-authority-contracts.test.js",
-      "tests/unit/pipeline-mode-contracts.test.js",
-      "tests/unit/project-role-contract.test.js",
-      "tests/unit/skill-flow-p2-closure-contracts.test.js",
-      "tests/unit/spec-code-review-peer-runner.test.js",
-      "tests/unit/spec-debug-contracts.test.js",
-      "tests/unit/spec-product-pulse-contracts.test.js",
-      "tests/unit/spec-promote-auth-probe.test.js",
-      "tests/unit/spec-prototype-contracts.test.js",
-      "tests/unit/spec-riffrec-analyzer-safety.test.js",
-      "tests/unit/spec-riffrec-feedback-analysis-contracts.test.js",
-      "tests/unit/spec-work-contracts.test.js",
-      "tests/unit/spec-work-execution-strategy-contracts.test.js",
-      "tests/unit/spec-worktree-contracts.test.js",
-      "tests/unit/spec-write-tasks-contracts.test.js",
-      "tests/unit/task-pack-command.test.js",
-      "tests/unit/test-inventory-contracts.test.js"
+      "tests/unit/compound-promotion-contracts.test.js",
+      "tests/unit/plugin-modules.test.js"
     ],
-    "dirty_path_manifest_sha256": "01d8c3bd383359c55450823d72022ed61c6a4da33f263a80eeaafaec65ae88c1",
-    "source_tree_hash": "959ce732ecff948bdfc634f199bf72832361b04374a0553024abc737ba2f5b64",
-    "inventory_hash": "2e6379a59b991c3ebfe3aeabc0162fa67369691b85b9494020f54f95a56dc81a",
+    "dirty_path_manifest_sha256": "d6f3c6b1ae0e309ffb32d97268bfc761454488874921918d84fca1114023312c",
+    "source_tree_hash": "20cd90fe19cce704960e3ee3df95022aa0cb9e6690500a2980e611212867712e",
+    "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -364,21 +336,21 @@
       "sha256": "0a18d51978a03a3c2d330950be7d81f0e20415993b6dcdf0fc30a4a9ecbff8a2"
     }
   ],
-  "inventory_hash": "2e6379a59b991c3ebfe3aeabc0162fa67369691b85b9494020f54f95a56dc81a",
-  "inventory_artifact_sha256": "b48f7832d840ae99215053fed1a5f4cd8506ccd74875e2993500b560d4413325",
+  "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
+  "inventory_artifact_sha256": "877383049ff0490034e84876d7c8360a76a7268572479d29c150b8c1875621c6",
   "package_manifest_sha256": "1cd48b6b37b7012ff54a2afa1d7dc33603aa00423fe57cc2d51435af76a97f3c",
   "direct_support_manifest_sha256": "81d8304096d57a53e0cb6c10ef4663e8fff35752adbc3fbf28b4c86e8ec0d958",
   "relation_manifest_sha256": "0b0b4dac3ab03d5f6e07b42b5940ae260810fd77cc8745cf554b3700100d0165",
   "review_input_hash_algorithm": "sha256(stable-json(coverage.review_input))",
-  "review_input_hash": "5469509aafbae72762f789d278407975ada7c4d01e1cadabde646f0ba9d35a74",
+  "review_input_hash": "62045625d4cddf67c7c76458160284a4e3a57e0a7522d333f7ce89bada218dcb",
   "expected_skill_count": 36,
   "reviewed_skill_count": 36,
-  "expected_package_path_count": 570,
-  "reviewed_package_path_count": 570,
-  "expected_direct_support_path_count": 184,
-  "reviewed_direct_support_path_count": 184,
-  "expected_direct_support_relation_count": 390,
-  "reviewed_direct_support_relation_count": 390,
+  "expected_package_path_count": 571,
+  "reviewed_package_path_count": 571,
+  "expected_direct_support_path_count": 186,
+  "reviewed_direct_support_path_count": 186,
+  "expected_direct_support_relation_count": 392,
+  "reviewed_direct_support_relation_count": 392,
   "reviewed_unique_source_path_count": 751,
   "expected_receipt_count": 956,
   "reviewed_receipt_count": 956,
@@ -390,24 +362,18 @@
     "receipt_binding": "chunk ids are listed by source_read_receipts",
     "limitation": "packet identity/range only; not equal semantic attention"
   },
-  "chunk_manifest_hash": "5b96f743b22b1128a5489899bee1c0166340a94e89c4b9aa26484abb0230a233",
+  "chunk_manifest_hash": "a4f88b71d11c287ba3752aa418ac0ae4240709505ad264f992e7f73f7e7f2841",
   "finding_summary": {
     "review_area_count": 13,
-    "open_count": 2,
-    "closed_source_contract_count": 11,
+    "open_count": 0,
+    "closed_source_contract_count": 13,
     "deferred_count": 0,
-    "open_p1": 1,
-    "open_p2": 1,
-    "open_finding_ids": [
-      "ANTH-R3-001",
-      "ANTH-R3-013"
-    ],
-    "open_skill_ids": [
-      "spec-ideate",
-      "spec-sweep"
-    ],
-    "no_open_finding_skill_count": 34,
-    "closure_status": "2-open-11-closed-source-contract-0-deferred"
+    "open_p1": 0,
+    "open_p2": 0,
+    "open_finding_ids": [],
+    "open_skill_ids": [],
+    "no_open_finding_skill_count": 36,
+    "closure_status": "0-open-13-closed-source-contract-0-deferred"
   },
   "browser_ownership_review": {
     "status": "closed-source-contract",
@@ -483,7 +449,14 @@
     "provider_identity=unverified、provider_receipt_ref=null、worker_context_isolation=degraded_inherited；不得表述为外部 Anthropic 审查或跨模型独立覆盖。",
     "36/36 Skill、567/567 package paths、184/184 unique support paths、389/389 relations、956/956 per-Skill receipts 已绑定 current SHA/bytes/line_count；范围 receipt 不证明语义结论正确。",
     "未执行 package scripts/evals、generated runtime、browser/Xcode、外部 API/DB、Git/CI/release 或 field task；field_outcome=not-run。",
-    "11 项 closure 仅为 closed-source-contract；2 项 open 仍需 owner patch、focused verification 与新 snapshot disposition。"
+    "11 项 closure 仅为 closed-source-contract；2 项 open 仍需 owner patch、focused verification 与新 snapshot disposition。",
+    "This delta refreshes source-bound receipts for current changed relations and preserves prior semantic lane judgments; it is not independent provider review.",
+    "Provider-authenticated receipt, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run.",
+    "This delta refreshes source-bound receipts and preserves prior semantic lane judgments; it is not independent provider review.",
+    "The added review-scheme document is documentation evidence, not a new Skill/path relation; no semantic lane relation was created or retired.",
+    "This delta covers the new summary-drift regression relation only; it is not a full Skill re-review.",
+    "This delta covers the added lineage-pruning regression relation only; it is not a full Skill re-review.",
+    "This delta covers the closeout regression test relation only; it is not a full Skill re-review."
   ],
   "claim_ceiling": "只支持冻结 working-tree canonical package/direct-support source 的 role-simulated Anthropic skill-craft/safety 静态合同结论；不证明 Anthropic/provider 身份、reviewer independence、等强度逐行注意、runtime/browser/provider/Git/CI 或 field outcome。",
   "skill_reviews": [
@@ -2259,7 +2232,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-app-consistency-audit",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -2275,21 +2248,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-app-consistency-audit-73c2f33d6b84",
-            "anthropic-r3-final-spec-app-consistency-audit-b6d1a8260ddd",
-            "anthropic-r3-final-spec-app-consistency-audit-f408286693ed"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/skill-flow-p2-closure-contracts.test.js",
@@ -2591,19 +2563,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-brainstorm",
           "shared_consumers": [],
-          "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971",
-          "line_count": 46,
+          "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0",
+          "line_count": 45,
           "covered_line_ranges": [
             [
               1,
-              46
+              45
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-brainstorm-ad84aa5cf278"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-a9e4f0e64dba"
           ],
           "read_status": "full",
-          "bytes": 4951
+          "bytes": 4950,
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-brainstorm/references/synthesis-summary.md",
@@ -2809,7 +2782,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-brainstorm",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -2824,19 +2797,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-brainstorm-f9885be70ae7"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -2935,7 +2909,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-brainstorm",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -2951,21 +2925,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-brainstorm-223de12e08b9",
-            "anthropic-r3-final-spec-brainstorm-70df5d4926f5",
-            "anthropic-r3-final-spec-brainstorm-03298d9a1763"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -4484,7 +4457,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-code-review",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -4499,19 +4472,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-code-review-0cd7e45c3b47"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -5016,7 +4990,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-commit",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -5031,19 +5005,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-commit-a425920ef2a7"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/specialized-skill-calibration-contracts.test.js",
@@ -5279,7 +5254,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-commit-push-pr",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -5294,19 +5269,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-commit-push-pr-d9dc0841361d"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/pipeline-mode-contracts.test.js",
@@ -5537,6 +5513,26 @@
       ],
       "source_read_receipts": [
         {
+          "path": "docs/contracts/knowledge/knowledge-harness.md",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "ef5b37d45376380ae9591edad9bde383799c1d33b8a5b969ab9a871874c9f55d",
+          "bytes": 9979,
+          "line_count": 77,
+          "covered_line_ranges": [
+            [
+              1,
+              77
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ef5b37d45376"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-compound/assets/resolution-template.md",
           "path_role": "skill-package",
           "owning_skill": "spec-compound",
@@ -5554,6 +5550,26 @@
           ],
           "read_status": "full",
           "bytes": 2910
+        },
+        {
+          "path": "skills/spec-compound/evals/examples.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "ad0bdb37c2ba3faee15fc5aa38a507b8fa762e7bf6d9b75ec217aba9784d1a4b",
+          "bytes": 3915,
+          "line_count": 83,
+          "covered_line_ranges": [
+            [
+              1,
+              83
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ad0bdb37c2ba"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-compound/references/agents/best-practices-researcher.md",
@@ -5904,20 +5920,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "ac22a08a60a90248a35b10fc231cdd6fa0a048b516bd884711da015dc442e6ca",
-          "line_count": 770,
+          "sha256": "9b6e776fef91bca892b0420cc4b9aa1feeb8d5e55f3abe5fd80e3ad41bc6dc09",
+          "line_count": 773,
           "covered_line_ranges": [
             [
               1,
-              770
+              773
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-compound-b256d9c92299",
-            "anthropic-r3-final-spec-compound-270e83e59dff"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-9b6e776fef91"
           ],
           "read_status": "full",
-          "bytes": 69728
+          "bytes": 74193,
+          "source_kind": "skill-package"
         },
         {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -5996,6 +6012,26 @@
           "bytes": 407
         },
         {
+          "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "91b40253e413dbf531777a7ae154d3674d3ffe4191e2c0d16a821188f8ec1933",
+          "bytes": 14710,
+          "line_count": 356,
+          "covered_line_ranges": [
+            [
+              1,
+              356
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-review-delta-2026-08-20-current-source-final-v2-anthropic-skill-craft-safety-91b40253e413"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
           "path_role": "shared-support",
           "owning_skill": null,
@@ -6027,7 +6063,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-compound",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -6042,41 +6078,43 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-compound-062b190043bb"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/compound-promotion-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-compound",
           "shared_consumers": [
             "spec-compound",
             "spec-compound-refresh"
           ],
-          "sha256": "0277379b6ec451cd5008a606d628b85a44e7cef3a9ae417153a87b9a02eb26d5",
-          "line_count": 220,
+          "sha256": "dab772b0a1fe9a687676bad9b30b3feaa8051c78f2afc02395f3a8444cf56dd2",
+          "line_count": 293,
           "covered_line_ranges": [
             [
               1,
-              220
+              293
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-compound-be261f6166cf"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-dab772b0a1fe"
           ],
           "read_status": "full",
-          "bytes": 11063
+          "bytes": 15317,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -6668,24 +6706,25 @@
         {
           "path": "tests/unit/compound-promotion-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-compound-refresh",
           "shared_consumers": [
             "spec-compound",
             "spec-compound-refresh"
           ],
-          "sha256": "0277379b6ec451cd5008a606d628b85a44e7cef3a9ae417153a87b9a02eb26d5",
-          "line_count": 220,
+          "sha256": "dab772b0a1fe9a687676bad9b30b3feaa8051c78f2afc02395f3a8444cf56dd2",
+          "line_count": 293,
           "covered_line_ranges": [
             [
               1,
-              220
+              293
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-compound-refresh-81ccae3a1950"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-dab772b0a1fe"
           ],
           "read_status": "full",
-          "bytes": 11063
+          "bytes": 15317,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -8247,7 +8286,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-doc-review",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -8262,19 +8301,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-doc-review-f553a1153aea"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/command-resource-path-rewrite.test.js",
@@ -8741,7 +8781,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-dogfood",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -8757,21 +8797,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-dogfood-58281a46dc57",
-            "anthropic-r3-final-spec-dogfood-d31571b6b3de",
-            "anthropic-r3-final-spec-dogfood-7876900d22a9"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/spec-worktree-contracts.test.js",
@@ -9101,7 +9140,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-explain",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -9117,21 +9156,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-explain-429884827bbd",
-            "anthropic-r3-final-spec-explain-e3fdd42fe600",
-            "anthropic-r3-final-spec-explain-e60099a7f2cb"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -9836,7 +9874,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-ideate",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -9851,19 +9889,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-ideate-ef739f09d00d"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -9962,7 +10001,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-ideate",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -9978,21 +10017,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-ideate-6adca3c40c6d",
-            "anthropic-r3-final-spec-ideate-0482155cb0db",
-            "anthropic-r3-final-spec-ideate-95cf93dd0131"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -10562,7 +10600,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-lfg",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -10578,21 +10616,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-lfg-e350d0a291a5",
-            "anthropic-r3-final-spec-lfg-0cad557db2d5",
-            "anthropic-r3-final-spec-lfg-6f5ccacbdaf1"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/spec-brainstorm-clarification-contracts.test.js",
@@ -12787,19 +12824,20 @@
           "path_role": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971",
-          "line_count": 46,
+          "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0",
+          "line_count": 45,
           "covered_line_ranges": [
             [
               1,
-              46
+              45
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-plan-aa16410f88c6"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-a9e4f0e64dba"
           ],
           "read_status": "full",
-          "bytes": 4951
+          "bytes": 4950,
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-plan/references/synthesis-summary.md",
@@ -12993,7 +13031,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-plan",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -13008,19 +13046,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-plan-2dfd687bfd82"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -13138,7 +13177,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-plan",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -13154,21 +13193,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-plan-7c5584b53c47",
-            "anthropic-r3-final-spec-plan-8fa9c829050f",
-            "anthropic-r3-final-spec-plan-8fcfcacff07d"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -14423,7 +14461,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-pov",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -14439,21 +14477,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-pov-f660cd01568a",
-            "anthropic-r3-final-spec-pov-f50bac830557",
-            "anthropic-r3-final-spec-pov-2bf4eb23b379"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/private-scratch-migration-contracts.test.js",
@@ -15634,7 +15671,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-prd",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -15650,21 +15687,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-prd-c45f2408bc9f",
-            "anthropic-r3-final-spec-prd-e4f781b84b8a",
-            "anthropic-r3-final-spec-prd-b8c60eadc16f"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/requirements-language-promotion-contracts.test.js",
@@ -16106,7 +16142,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-product-pulse",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -16121,19 +16157,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-product-pulse-b9df0068713a"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/mcp-setup-config-consumers.test.js",
@@ -17181,7 +17218,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -17197,21 +17234,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-resolve-pr-feedback-555e841d0322",
-            "anthropic-r3-final-spec-resolve-pr-feedback-3dfbd769306f",
-            "anthropic-r3-final-spec-resolve-pr-feedback-c0ca477c074c"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/skill-flow-p2-closure-contracts.test.js",
@@ -19385,6 +19421,66 @@
           "bytes": 33783
         },
         {
+          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
+          "path_role": "deterministic-helper",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "5a6faa5b5ca6c944b6449f5476c0bfc4511cd5749cd2bf99e9c910fc60c58d5c",
+          "bytes": 42410,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "anthropic-skill-craft-safety-final-lane-supplemental-112"
+          ]
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
+          "path_role": "deterministic-helper",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550",
+          "bytes": 1084,
+          "line_count": 21,
+          "covered_line_ranges": [
+            [
+              1,
+              21
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "anthropic-skill-craft-safety-final-lane-supplemental-112"
+          ]
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/vendor/README.md",
+          "path_role": "deterministic-helper",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "8f6c08f333684ccde83a33a6179d9f738574e0776e55b5c956f2b84869d490a0",
+          "bytes": 392,
+          "line_count": 9,
+          "covered_line_ranges": [
+            [
+              1,
+              9
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "anthropic-skill-craft-safety-final-lane-supplemental-112"
+          ]
+        },
+        {
           "path": "skills/spec-runtime-setup/setup-registry.json",
           "path_role": "skill-package",
           "owning_skill": "spec-runtime-setup",
@@ -19731,7 +19827,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-runtime-setup",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -19746,19 +19842,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-55a58bfeccb6"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/graphify-defensive-probes.test.js",
@@ -20389,7 +20486,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-runtime-setup",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -20405,21 +20502,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-runtime-setup-4ea0bc342293",
-            "anthropic-r3-final-spec-runtime-setup-f450403c82d7",
-            "anthropic-r3-final-spec-runtime-setup-ecac49621df6"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/sync-instruction-files.test.js",
@@ -20439,66 +20535,6 @@
           ],
           "read_status": "full",
           "bytes": 2295
-        },
-        {
-          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
-          "path_role": "deterministic-helper",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "5a6faa5b5ca6c944b6449f5476c0bfc4511cd5749cd2bf99e9c910fc60c58d5c",
-          "bytes": 42410,
-          "line_count": 1,
-          "covered_line_ranges": [
-            [
-              1,
-              1
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "anthropic-skill-craft-safety-final-lane-supplemental-112"
-          ]
-        },
-        {
-          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
-          "path_role": "deterministic-helper",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550",
-          "bytes": 1084,
-          "line_count": 21,
-          "covered_line_ranges": [
-            [
-              1,
-              21
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "anthropic-skill-craft-safety-final-lane-supplemental-112"
-          ]
-        },
-        {
-          "path": "skills/spec-runtime-setup/scripts/vendor/README.md",
-          "path_role": "deterministic-helper",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "8f6c08f333684ccde83a33a6179d9f738574e0776e55b5c956f2b84869d490a0",
-          "bytes": 392,
-          "line_count": 9,
-          "covered_line_ranges": [
-            [
-              1,
-              9
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "anthropic-skill-craft-safety-final-lane-supplemental-112"
-          ]
         }
       ],
       "supporting_case": {
@@ -21338,9 +21374,29 @@
           "bytes": 13821
         },
         {
+          "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
+          "path_role": "evaluation",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-sweep",
+          "shared_consumers": [],
+          "sha256": "de0c05fed6050fb0bcbfc09ffd241401f5381389abdfa65d3aeb64d166b4e64c",
+          "bytes": 7442,
+          "line_count": 149,
+          "covered_line_ranges": [
+            [
+              1,
+              149
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "anthropic-skill-craft-safety-final-lane-supplemental-25"
+          ]
+        },
+        {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-sweep",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -21355,19 +21411,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-sweep-b368c31f818f"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -21613,26 +21670,6 @@
           ],
           "read_status": "full",
           "bytes": 4234
-        },
-        {
-          "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
-          "path_role": "evaluation",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-sweep",
-          "shared_consumers": [],
-          "sha256": "de0c05fed6050fb0bcbfc09ffd241401f5381389abdfa65d3aeb64d166b4e64c",
-          "bytes": 7442,
-          "line_count": 149,
-          "covered_line_ranges": [
-            [
-              1,
-              149
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "anthropic-skill-craft-safety-final-lane-supplemental-25"
-          ]
         }
       ],
       "supporting_case": {
@@ -22910,7 +22947,7 @@
         {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-work",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -22925,19 +22962,20 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-work-890a50026178"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-ae5486e6f0e3"
           ],
           "read_status": "full",
-          "bytes": 6417
+          "bytes": 6908,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -23045,7 +23083,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-work",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -23061,21 +23099,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-work-cfbdba40fae8",
-            "anthropic-r3-final-spec-work-e2c5fa6f4cb6",
-            "anthropic-r3-final-spec-work-58bd7fd4c4d1"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/scenario-capability-matrix-contracts.test.js",
@@ -24541,7 +24578,7 @@
         {
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
-          "owning_skill": null,
+          "owning_skill": "spec-write-skill",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -24557,21 +24594,20 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-write-skill-5087cc948ad4",
-            "anthropic-r3-final-spec-write-skill-f84edbe22621",
-            "anthropic-r3-final-spec-write-skill-1ed39abc42f9"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-anthropic-skill-craft-safety-958351d78ae7"
           ],
           "read_status": "full",
-          "bytes": 37231
+          "bytes": 37698,
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/spec-write-skill-authoring-preview.test.js",
@@ -25809,5 +25845,20 @@
         "未执行 package scripts/evals、generated runtime、browser/Xcode、外部 API/DB、Git/CI 或 field task。"
       ]
     }
-  ]
+  ],
+  "generated_at": "2026-08-20T13:59:05.111Z",
+  "review_deltas": [
+    {
+      "review_run_id": "ce-localization-review-delta-2026-08-20-current-source-final-v2",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json",
+      "artifact_sha256": "a89473307d23931fdbda374b607185aa5081c2ad34051648080538a28dd208ea",
+      "reviewed_at": "2026-08-20T13:59:05.111Z",
+      "review_method": "inline-same-context",
+      "independent": false,
+      "provider_identity": "not-used",
+      "worker_context_isolation": "degraded_inherited",
+      "claim_ceiling": "Source-bound incremental review of the closeout regressions only."
+    }
+  ],
+  "review_delta_findings": []
 }

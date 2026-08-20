@@ -1,18 +1,18 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "69621aac0bbf34b13b96f57ebe0114a251698e68",
-  "skills_tree_oid": "17df58486a3845a0eb2b6ae64cf7f18ce21fc8ff",
+  "source_head": "741175a23615e37382ce65ec1e0448abfa214e95",
+  "skills_tree_oid": "a0de26d11fe14bb79b3f84f747ea1977d149dd08",
   "source_mode": "working-tree",
-  "manifest_sha256": "48bd205b5ed99244e15c7ba4c5956fd85bbb502fc5807560f12ac95a152ccdc8",
+  "manifest_sha256": "e8b7deb851a351d44c078d665b5a6373cb903a5170ac635c9a6aa775f382dc4e",
   "skill_count": 36,
-  "file_count": 570,
+  "file_count": 578,
   "per_skill_counts": {
     "spec-app-consistency-audit": 80,
     "spec-brainstorm": 13,
     "spec-code-review": 53,
     "spec-commit": 1,
     "spec-commit-push-pr": 3,
-    "spec-compound": 20,
+    "spec-compound": 21,
     "spec-compound-refresh": 9,
     "spec-debug": 6,
     "spec-doc-review": 34,
@@ -45,6 +45,55 @@
     "using-spec-first": 3
   },
   "files": [
+    {
+      "path": "skills/_shared/README.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 2852,
+      "sha256": "781b08a2d26196dd3b0295e83fef8886acd13ef9d4f2f5a33a9688052d604172"
+    },
+    {
+      "path": "skills/_shared/references/concepts-vocabulary.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 6336,
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71"
+    },
+    {
+      "path": "skills/_shared/references/html-rendering.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 34875,
+      "sha256": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383"
+    },
+    {
+      "path": "skills/_shared/references/markdown-rendering.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 10321,
+      "sha256": "1cc87b51fa1aa815249a82fe663eb23087453b77ba50070dff30f5c42c737c60"
+    },
+    {
+      "path": "skills/_shared/references/settled-decisions.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 4950,
+      "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0"
+    },
+    {
+      "path": "skills/_shared/references/tracker-defer.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 15989,
+      "sha256": "6ecbada70184eed585496da1c917dbe42dcc95cfd854981485f99e56f6755746"
+    },
+    {
+      "path": "skills/_shared/references/yaml-schema.md",
+      "skill": "_shared",
+      "owner_role": "reference-contract",
+      "bytes": 7755,
+      "sha256": "5b05f640df1c53608073cceaa64be706fea96b4f3febb6802f6dec73537e971a"
+    },
     {
       "path": "skills/spec-app-consistency-audit/evals/evaluation-governance.md",
       "skill": "spec-app-consistency-audit",
@@ -637,8 +686,8 @@
       "path": "skills/spec-brainstorm/references/html-rendering.md",
       "skill": "spec-brainstorm",
       "owner_role": "reference-contract",
-      "bytes": 34523,
-      "sha256": "62685237eeab7a1d213c631f607f8f79104971c686baa99eaf5767d57f5b8b9b"
+      "bytes": 34875,
+      "sha256": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383"
     },
     {
       "path": "skills/spec-brainstorm/references/markdown-rendering.md",
@@ -665,8 +714,8 @@
       "path": "skills/spec-brainstorm/references/settled-decisions.md",
       "skill": "spec-brainstorm",
       "owner_role": "reference-contract",
-      "bytes": 4951,
-      "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971"
+      "bytes": 4950,
+      "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0"
     },
     {
       "path": "skills/spec-brainstorm/references/synthesis-summary.md",
@@ -1166,6 +1215,13 @@
       "sha256": "5497072f9386e7d96cd84e6b07363a0ba75078a074e2f529292e02da427dbac5"
     },
     {
+      "path": "skills/spec-compound/evals/examples.json",
+      "skill": "spec-compound",
+      "owner_role": "evaluation",
+      "bytes": 3915,
+      "sha256": "ad0bdb37c2ba3faee15fc5aa38a507b8fa762e7bf6d9b75ec217aba9784d1a4b"
+    },
+    {
       "path": "skills/spec-compound/references/agents/best-practices-researcher.md",
       "skill": "spec-compound",
       "owner_role": "reference-contract",
@@ -1295,8 +1351,8 @@
       "path": "skills/spec-compound/SKILL.md",
       "skill": "spec-compound",
       "owner_role": "entry-contract",
-      "bytes": 69728,
-      "sha256": "ac22a08a60a90248a35b10fc231cdd6fa0a048b516bd884711da015dc442e6ca"
+      "bytes": 74193,
+      "sha256": "9b6e776fef91bca892b0420cc4b9aa1feeb8d5e55f3abe5fd80e3ad41bc6dc09"
     },
     {
       "path": "skills/spec-debug/evals/examples.json",
@@ -1715,8 +1771,8 @@
       "path": "skills/spec-ideate/references/html-rendering.md",
       "skill": "spec-ideate",
       "owner_role": "reference-contract",
-      "bytes": 34523,
-      "sha256": "62685237eeab7a1d213c631f607f8f79104971c686baa99eaf5767d57f5b8b9b"
+      "bytes": 34875,
+      "sha256": "3a73c760bf2daea7428671862b05af8ba8a5971ed21fec2d911c484e8da44383"
     },
     {
       "path": "skills/spec-ideate/references/ideation-sections.md",
@@ -2338,8 +2394,8 @@
       "path": "skills/spec-plan/references/settled-decisions.md",
       "skill": "spec-plan",
       "owner_role": "reference-contract",
-      "bytes": 4951,
-      "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971"
+      "bytes": 4950,
+      "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0"
     },
     {
       "path": "skills/spec-plan/references/synthesis-summary.md",
@@ -2856,8 +2912,8 @@
       "path": "skills/spec-prototype/references/craft-floor.md",
       "skill": "spec-prototype",
       "owner_role": "reference-contract",
-      "bytes": 512,
-      "sha256": "9f9bb6525ab12f57cacb0390f1a3adf6aeca7ee39029df2fc3bdf00ddf5fcb4b"
+      "bytes": 511,
+      "sha256": "a56686475765a31f3b319f4f1ffe674f6e51d4098d23917c7e948eaf5330560b"
     },
     {
       "path": "skills/spec-prototype/references/preview.md",
@@ -2870,8 +2926,8 @@
       "path": "skills/spec-prototype/references/write-back.md",
       "skill": "spec-prototype",
       "owner_role": "reference-contract",
-      "bytes": 387,
-      "sha256": "bf67244a1b31b5024e0bc3a92705b9fad33214901f84eb738c3b8ef9a4ff5934"
+      "bytes": 386,
+      "sha256": "105fd654c4da196df5dd4a6f692903d866d2f0f141d2713ee263b20fb2465629"
     },
     {
       "path": "skills/spec-prototype/scripts/light-webserver.js",
@@ -3451,8 +3507,8 @@
       "path": "skills/spec-runtime-setup/scripts/setup.cjs",
       "skill": "spec-runtime-setup",
       "owner_role": "deterministic-helper",
-      "bytes": 33025,
-      "sha256": "6435404410a4bb4564be0ebbcf8b7a227eb42127ea55b413d056079cc33ad85c"
+      "bytes": 33783,
+      "sha256": "5ed8fcbb044655f1e5ec29e85f2c788b4c17247abf654f247046260e7d64e8d6"
     },
     {
       "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",

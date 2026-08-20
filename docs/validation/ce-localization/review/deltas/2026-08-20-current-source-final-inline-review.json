@@ -1,0 +1,69 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-review-delta-2026-08-20-current-source-final",
+  "producer": "inline same-context semantic review owner",
+  "reviewed_at": "2026-08-20T13:55:37.992Z",
+  "source_binding": {
+    "head": "741175a23615e37382ce65ec1e0448abfa214e95",
+    "dirty_path_manifest_sha256": "d6f3c6b1ae0e309ffb32d97268bfc761454488874921918d84fca1114023312c",
+    "source_tree_hash": "25be285ad8599cf0205f5c6f151ec40540f10b6c21132794e3a5c36cb0bde2e4",
+    "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
+    "inventory_artifact_sha256": "debff1fd04bb48801f474d5fa97ac42d755a467938bfbee96a1a64cda88a219c",
+    "review_input_hash": "2847280f80318e9124138457c9de8b1e3b682a7cca4259b96dade8fbac815460"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+      "skill_ids": [
+        "spec-compound"
+      ],
+      "sha256": "1efe905000f1f4a1d5d193c2df081978ebfb1859ab0440407f63a53c12639c5f",
+      "bytes": 14216,
+      "line_count": 346,
+      "covered_line_ranges": [
+        [
+          1,
+          346
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Current source was read and checked against the owning workflow contract."
+          ],
+          "limitations": [
+            "Inline same-context verdict is not independent provider evidence."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Current source was read for safety, progressive disclosure, and failure-boundary regressions."
+          ],
+          "limitations": [
+            "Inline same-context verdict is not independent provider evidence."
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "This delta covers the closeout regression test relation only; it is not a full Skill re-review.",
+    "Provider-authenticated receipt, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run."
+  ],
+  "claim_ceiling": "Source-bound incremental review of the closeout regressions only."
+}

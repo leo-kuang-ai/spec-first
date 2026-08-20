@@ -1,8 +1,10 @@
 # CE 本地化与全量 Skill 第三轮审查报告
 
+> 本报告绑定当前 target source snapshot：`source_tree_hash=20cd90fe19cce704960e3ee3df95022aa0cb9e6690500a2980e611212867712e`、`dirty_path_manifest_sha256=d6f3c6b1ae0e309ffb32d97268bfc761454488874921918d84fca1114023312c`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。
+
 ## 结论
 
-当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：36 个 canonical Skill、570 个 package path、5,839,248 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 390 条 direct-support relations、184 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
+当前不能进入“全部 Skill 已改善”或“CE 集成已完成”的声明。第三轮已完成当前工作树的全量 source packet coverage：36 个 canonical Skill、571 个 package path、5,848,328 bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 392 条 direct-support relations、186 个 unique direct-support paths。两个角色 lane 均为内部模拟视角，`role-simulated/provider_unverified/degraded_inherited`，不是 OpenAI 或 Anthropic 公司审查，也没有真实跨模型独立性证明。
 
 语义审查产物显示：当前聚合包含 13 个已完成 source-contract closure 的 P1/P2 历史 finding，以及 2 个 OpenAI lane 的 P3 `defer-pending-measurement`。`spec-ideate` 与 `spec-sweep` 的本轮 source 修复已由 Anthropic lane 回源确认并关闭；P3 只在取得 paired token/latency/quality 数据后重评。Round 3 的最高 claim 是“当前源码合同与审查范围可追溯”，不是现场价值或真实 provider 结果。
 
@@ -10,16 +12,16 @@
 
 | 维度 | 结果 |
 |---|---|
-| target HEAD | `69621aac0bbf34b13b96f57ebe0114a251698e68` |
+| target HEAD | `741175a23615e37382ce65ec1e0448abfa214e95` |
 | canonical Skill | 36/36 |
-| package path | 570/570 |
-| package bytes | 5,839,248 |
+| package path | 571/571 |
+| package bytes | 5,848,328 |
 | package missing/hash mismatch | 0/0 |
-| direct-support relations | 390 |
-| unique direct-support paths | 184 |
-| source-tree hash | `1ab7b8fc69bcd90f3114a5424f3306c756772431bcd3e6347a604921f4df99fe`，见 inventory/coverage artifact |
-| inventory hash | `10c347581a3a611f46d5e48bedefc8f940612dd36ac4f386c6111c5460094554`，见 inventory snapshot |
-| dirty manifest | `75059300...`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
+| direct-support relations | 392 |
+| unique direct-support paths | 186 |
+| source-tree hash | `20cd90fe19cce704960e3ee3df95022aa0cb9e6690500a2980e611212867712e`，见 inventory/coverage artifact |
+| inventory hash | `9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de`，见 inventory snapshot |
+| dirty manifest | `d6f3c6b1ae0e309ffb32d97268bfc761454488874921918d84fca1114023312c`，计算时排除 `docs/validation/ce-localization/**` derived artifacts |
 | excluded | `skills/autoresearch` tracked symlink，host-owned/local-only，不计入 36 |
 
 确定性产物：[round-3-source-coverage.json](/Users/kuang/xiaobu/spec-first/docs/validation/ce-localization/review/round-3-source-coverage.json)。该产物明确禁止 blanket 纳入整个 `src/**` 或 `tests/**`；当前 `unresolved_non_semantic_boundary` 为 `null`，`spec-write-tasks` 的 Claude command template 已纳入当前 source inventory。
@@ -28,8 +30,8 @@
 
 | Lane | 覆盖 | 结果 | 可信边界 |
 |---|---:|---|---|
-| OpenAI skill-engineering lens | 36 Skill / 570 package / 184 direct-support / 390 relations | 2 个 P3 deferred；无 P1/P2 source defect | 无 provider receipt，context isolation degraded/inherited |
-| Anthropic skill-craft/safety lens | 36 Skill / 570 package / 184 direct-support / 390 relations | 历史 P1/P2 均已 source-contract closure | 完整静态 source coverage，不等于 fixture/runtime execution；无 provider receipt |
+| OpenAI skill-engineering lens | 36 Skill / 571 package / 186 direct-support / 392 relations | 2 个 P3 deferred；无 P1/P2 source defect | 无 provider receipt，context isolation degraded/inherited |
+| Anthropic skill-craft/safety lens | 36 Skill / 571 package / 186 direct-support / 392 relations | 历史 P1/P2 均已 source-contract closure | 完整静态 source coverage，不等于 fixture/runtime execution；无 provider receipt |
 
 两个 lane 都重新读取当前 source；其中 OpenAI artifact 的 receipt 是结构化 packet coverage，Anthropic artifact 的 package status 是 `complete-static`。两者均没有把 hash receipt 当作“每行得到等强度语义注意”的证明。
 
@@ -71,17 +73,19 @@
 | 验证 | 结果 | Claim ceiling |
 |---|---|---|
 | CE v2 full-window report-only freshness | 通过，517 records / 33 packages / 9 serialized patches | 只证明当前 target snapshot 下的上游路径账本新鲜 |
-| CE/localization focused Jest | 5/5 suites，45/45 tests 通过 | 只证明本地化、setup 与 reconciliation 聚焦合同 |
-| `npm run typecheck` | 217 files 通过 | 语法检查 |
-| `npm run lint:skill-entrypoints` | 320 files 通过 | Skill 入口结构治理 |
-| `npm run test:unit` | 179/179 suites，2073/2073 tests 通过 | 当前 unit aggregate |
+| CE/localization focused Jest | 5/5 suites，82/82 tests 通过 | 只证明本地化、setup、reconciliation 与本轮 closeout 合同 |
+| `npm run typecheck` | 218 files 通过 | 语法检查 |
+| `npm run lint:skill-entrypoints` | 327 files 通过 | Skill 入口结构治理 |
+| `npm run test:unit` | 177/179 suites，2081/2083 tests 通过；2 个失败均为并发 dirty overlap（`CHANGELOG.md` 格式、`AGENTS.md` 生成同步） | 本轮 CE 相关 unit 均通过；仓库 unit aggregate 未完全通过 |
 | `npm run test:smoke` | 1/1 suite，5/5 tests 通过 | CLI/打包初始化 smoke |
-| `npm run test:mcp-setup` | 33/33 suites，657/657 tests 通过 | Runtime Setup/MCP 聚合合同；不证明真实 provider serving |
-| `npm run build` | `npm pack --dry-run` 通过，776 files | 发布包内容可生成 |
-| `npm run test:integration` | 通过；13 suites、60/60 tests 通过，1 suite/2 tests 按既有条件跳过；其中 six-host lifecycle、workspace graph projection/refresh 均通过 | 只证明当前 integration fixtures；不证明真实 provider serving 或 field outcome |
+| `npm run test:mcp-setup` | 33/33 suites，658/658 tests 通过 | Runtime Setup/MCP 聚合合同；不证明真实 provider serving |
+| `npm run build` | `npm pack --dry-run` 通过，785 files | 发布包内容可生成 |
+| `npm run test:integration` | 13 suites、60/62 tests 通过，1 suite/2 tests 按既有条件跳过；其中 six-host lifecycle、workspace graph projection/refresh 均通过 | 只证明当前 integration fixtures；不证明真实 provider serving 或 field outcome |
 | `git diff --check` | 通过 | 只证明 diff whitespace 合同 |
 
-### 隔离 pack/init/doctor 验证
+### 隔离 pack/init/doctor 验证（此前快照证据）
+
+以下记录来自此前 source snapshot 的隔离验证；本轮没有把它们重新执行后的结果冒充当前 source 的新鲜现场证据。当前轮只新增 `npm run test:smoke` 中的 packed-tarball smoke，并继续把真实宿主现场与 runtime adoption 置为未验证。
 
 在临时 consumer 与临时 `HOME` 中使用当前源码生成 tarball，并通过 tarball 安装后执行六宿主初始化：
 
@@ -96,7 +100,7 @@
 
 宿主 claim ceiling：Claude/Codex 为 runtime projection confirmed，但 fresh session invocation 未运行；Cursor/OpenCode 为 `generated-runtime-preview`；Qoder 的 hook activation/authenticated event execution 未验证。临时 sandbox 路径与一次性安装结果不构成真实企业宿主现场或 runtime adoption 证据。
 
-本轮新增验证记录：`npm run lint:skill-entrypoints` 扫描 320 files 通过；`npm run test:mcp-setup` 33/33 suites、657/657 tests 通过；`npm run test:integration` 13 suites、60/60 tests 通过（1 suite/2 tests 按既有条件跳过）；`npm run test:smoke` 5/5 tests 通过；`npm run typecheck` 217 files 通过；CE closeout `--verify-closeout` 返回 `valid`。这些结果证明 source/contract/build/integration fixture 层行为，没有把 provider serving、runtime adoption 或 field outcome 当作已完成。
+本轮新增验证记录：`npm run lint:skill-entrypoints` 扫描 327 files 通过；`npm run test:mcp-setup` 33/33 suites、658/658 tests 通过；`npm run test:integration` 13 suites、60/62 tests 通过（1 suite/2 tests 按既有条件跳过）；`npm run test:smoke` 5/5 tests 通过（包含 packed tarball 六宿主 smoke）；`npm run typecheck` 218 files 通过；CE closeout `--verify-closeout` 返回 `valid`；`npm run check:shared-references` 无漂移。`npm run test:unit` 的两个失败属于并发 dirty overlap，未归因于本轮 CE 改动。这些结果证明 source/contract/build/integration fixture 层行为，没有把 provider serving、runtime adoption 或 field outcome 当作已完成。
 
 ### 独立对抗式验证
 
@@ -106,7 +110,7 @@
 | 普通 public setup 使用与 loaded Skill root 不一致的 host pin | fail-closed，3 个 host-authority tests 通过 | surface binding 未被内部 refresh 例外放宽 |
 | lifecycle lease + async refresh 底层单测 | 2 suites、63 tests 通过 | token/PID/start-marker、抢占、释放与 pending 合并合同 |
 | workspace graph focused integration | 4/4 tests 通过 | 连续 commit、provider partial、explicit build/clean 并发边界 |
-| CE localization closeout contract tests | 3 suites、11/11 tests 通过；源码快照漂移时先 fail-closed，重新生成后恢复 `valid` | closeout freshness、schema、join key、promotion gate 的确定性边界 |
+| CE localization closeout contract tests | 5 suites、82/82 tests 通过；源码快照漂移时先 fail-closed，显式更新 adjudication/review delta 后恢复 `valid` | closeout freshness、schema、join key、promotion gate 的确定性边界 |
 
 上述对抗式验证仍属于 deterministic/fixture evidence；没有 provider-authenticated receipt、真实宿主现场或代表性研发任务 cohort，因此不提升 `runtime_cost` 或 `field_outcome` claim。
 
@@ -119,4 +123,4 @@
 3. 关闭 `ce-setup` S4 的 degraded 边界，并确认 S9 `evidence-only` 的 terminal disposition；在此之前不升级 setup-related downstream claim。
 4. 继续补齐 provider serving、field validation、generated runtime adoption 与 knowledge promotion 的真实证据；workspace graph integration 修复已完成并通过 focused/full integration 回归。
 
-验证边界：本轮已完成 JSON 自洽、source hash/line anchor、inventory coverage、聚焦/仓库级测试、workspace graph integration 回归、隔离 tarball 六宿主 pack/init/doctor 和 `git diff --check`；当前仓库未执行 generated runtime refresh，仍未执行 field validation、provider serving、fresh host session invocation、commit/push/PR。
+验证边界：本轮已完成 JSON 自洽、source hash/line anchor、inventory coverage、聚焦测试、workspace graph integration 回归、packed-tarball smoke、`npm run check:shared-references` 和 `git diff --check`；完整 unit aggregate 受两处并发 dirty overlap 影响未全绿。此前隔离 tarball 六宿主 pack/init/doctor 记录保留为历史证据；当前仓库未执行 generated runtime refresh，仍未执行 field validation、provider serving、fresh host session invocation、commit/push/PR。

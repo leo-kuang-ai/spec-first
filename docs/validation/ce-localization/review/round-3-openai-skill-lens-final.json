@@ -8,281 +8,253 @@
   "provider_identity": "unverified",
   "provider_receipt_ref": null,
   "worker_context_isolation": "degraded_inherited",
-  "generated_at": "2026-08-20T04:20:43.052Z",
+  "generated_at": "2026-08-20T13:59:05.111Z",
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "69621aac0bbf34b13b96f57ebe0114a251698e68",
+    "head": "741175a23615e37382ce65ec1e0448abfa214e95",
     "dirty": true,
     "dirty_paths": [
-      ".spec-first/config.local.example.yaml",
       "CHANGELOG.md",
-      "benchmarks/agentic/README.md",
-      "benchmarks/agentic/complete.py",
-      "benchmarks/agentic/judge.py",
-      "benchmarks/agentic/run.py",
-      "benchmarks/agentic/runs/20260820-162800/results.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/results.json",
-      "benchmarks/agentic/runs/20260820-163052/summary.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/bank.py",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/bank.py",
-      "benchmarks/agentic/runs/20260820-163304/results.json",
-      "benchmarks/agentic/runs/20260820-163304/summary.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/billing.py",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/_claude.json",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/_claude.stderr.txt",
-      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/billing.py",
-      "benchmarks/agentic/tasks.py",
-      "docs/10-prompt/AI-Coding-Harness\\346\\274\\224\\345\\214\\226\\346\\226\\271\\346\\263\\225\\350\\256\\272.md",
-      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md",
-      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md.backup-20260820-161301",
-      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md.bak2",
-      "docs/10-prompt/README.md",
-      "docs/10-prompt/\\347\\273\\223\\346\\236\\204\\345\\214\\226\\351\\241\\271\\347\\233\\256\\350\\247\\222\\350\\211\\262\\345\\245\\221\\347\\272\\246.md",
-      "docs/catalog/runtime-capabilities.md",
-      "docs/contracts/verification/baseline.schema.json",
+      "benchmarks/agentic/runs/20260820-173640/results.json",
+      "benchmarks/agentic/runs/20260820-173640/summary.json",
+      "benchmarks/agentic/runs/20260820-173640/trace-transfer__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-173640/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173640/trace-transfer__baseline__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/results.json",
+      "benchmarks/agentic/runs/20260820-173746/summary.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__1/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__baseline__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__1/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__3/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__4/test_bank.py",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-173746/trace-transfer__spec-debug__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-174459/results.json",
+      "benchmarks/agentic/runs/20260820-174459/summary.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__0/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__1/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__2/test_billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__3/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__4/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__baseline__sonnet__5/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__0/test_billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__1/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__2/test_billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__3/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__4/billing.py",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-174459/trace-amount__spec-debug__sonnet__5/billing.py",
+      "benchmarks/agentic/runs/20260820-184301/results.json",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-184301/reuse-slug__spec-work__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-184301/summary.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__baseline__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-debug__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/cache__spec-work__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-185556/results.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__baseline__sonnet__1/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-debug__sonnet__1/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__0/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/articles.py",
+      "benchmarks/agentic/runs/20260820-185556/reuse-slug__spec-work__sonnet__1/textutils.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__0/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/test_uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__baseline__sonnet__1/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/test_uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__0/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-debug__sonnet__1/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/test_uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__0/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-185556/safe-path__spec-work__sonnet__1/uploads.py",
+      "benchmarks/agentic/runs/20260820-185556/summary.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__1/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__2/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__3/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__4/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__baseline__sonnet__5/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__2/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__3/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__4/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-debug__sonnet__5/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__0/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__1/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__2/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__3/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__4/test_compute.py",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-190610/cache__spec-work__sonnet__5/compute.py",
+      "benchmarks/agentic/runs/20260820-190610/results.json",
+      "benchmarks/agentic/runs/20260820-190610/summary.json",
+      "docs/10-prompt/spec-first\\344\\273\\243\\347\\240\\201\\345\\256\\241\\346\\237\\245\\346\\226\\271\\346\\241\\210.md",
+      "docs/contracts/knowledge/knowledge-harness.md",
+      "docs/contracts/verification/ce-localization-review-delta.schema.json",
       "docs/contracts/verification/ce-localization-round-3-review.schema.json",
-      "docs/contracts/verification/ce-setup-dependency-matrix.schema.json",
-      "docs/contracts/verification/ce-setup-prerequisite-preflight.schema.json",
-      "docs/contracts/verification/ce-setup-side-effect.schema.json",
-      "docs/contracts/verification/ce-setup-snapshot.schema.json",
-      "docs/contracts/verification/ce-upstream-adjudication-input.schema.json",
-      "docs/contracts/verification/ce-upstream-adjudication.schema.json",
-      "docs/contracts/verification/ce-upstream-ledger-patch.schema.json",
-      "docs/contracts/verification/field-validation-protocol.schema.json",
-      "docs/contracts/verification/field-validation-results.schema.json",
-      "docs/contracts/verification/host-invocation-receipt.schema.json",
-      "docs/contracts/verification/knowledge-promotion.schema.json",
-      "docs/contracts/verification/localization-ledger.schema.json",
-      "docs/contracts/verification/provider-serving-receipt.md",
-      "docs/contracts/verification/provider-serving-receipt.schema.json",
-      "docs/contracts/verification/review-findings.schema.json",
-      "docs/contracts/verification/runtime-status-projection.schema.json",
-      "docs/contracts/verification/skill-inventory.schema.json",
-      "docs/contracts/verification/skill-scenarios.schema.json",
-      "docs/plans/2026-08-18-001-refactor-sync-ce-post-3-20-head-calibration-plan.md",
-      "docs/plans/2026-08-19-002-refactor-ce-post-3-20-skill-sync-scope-clarification.md",
-      "docs/plans/2026-08-19-003-refactor-ce-post-3-20-full-window-sync-plan.md",
-      "docs/plans/2026-08-20-001-fix-ce-full-window-review-findings.md",
-      "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md",
-      "docs/validation/2026-08-18-ce-post-3-20-name-status.md",
-      "docs/validation/2026-08-19-ce-post-3-20-filelist-source-comparison.md",
-      "docs/validation/2026-08-19-ce-post-3-20-reconciliation.json",
-      "docs/validation/2026-08-19-ce-post-3-20-reconciliation.md",
-      "docs/validation/2026-08-19-current-skill-package-inventory.json",
-      "jest.config.js",
-      "package-lock.json",
-      "package.json",
       "scripts/check-ce-localization-review.cjs",
-      "scripts/check-ce-upstream-reconciliation.cjs",
       "scripts/generate-ce-localization-closeout.cjs",
-      "scripts/rebind-ce-ledger-patches.cjs",
-      "scripts/sync-shared-references.js",
-      "skills/_shared/README.md",
-      "skills/_shared/references/concepts-vocabulary.md",
-      "skills/_shared/references/html-rendering.md",
-      "skills/_shared/references/markdown-rendering.md",
-      "skills/_shared/references/settled-decisions.md",
-      "skills/_shared/references/tracker-defer.md",
-      "skills/_shared/references/yaml-schema.md",
-      "skills/spec-brainstorm/references/handoff.md",
-      "skills/spec-brainstorm/references/html-rendering.md",
-      "skills/spec-code-review/references/cross-model-review.md",
-      "skills/spec-code-review/scripts/cross-model-adversarial-review.sh",
-      "skills/spec-code-review/scripts/peer-job-runner.py",
-      "skills/spec-commit-push-pr/SKILL.md",
-      "skills/spec-commit-push-pr/references/pr-description-writing.md",
-      "skills/spec-commit/SKILL.md",
-      "skills/spec-compound-refresh/SKILL.md",
+      "scripts/verify-phase-1a.sh",
+      "scripts/verify-with-gate.sh",
       "skills/spec-compound/SKILL.md",
-      "skills/spec-debug/SKILL.md",
-      "skills/spec-debug/references/investigation-techniques.md",
-      "skills/spec-doc-review/references/cross-model-review.md",
-      "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
-      "skills/spec-doc-review/scripts/peer-job-runner.py",
-      "skills/spec-dogfood/SKILL.md",
-      "skills/spec-ideate/SKILL.md",
-      "skills/spec-ideate/references/html-rendering.md",
-      "skills/spec-ideate/references/universal-ideation.md",
-      "skills/spec-lfg/SKILL.md",
-      "skills/spec-lfg/references/tracker-defer.md",
-      "skills/spec-optimize/SKILL.md",
-      "skills/spec-plan/references/plan-handoff.md",
-      "skills/spec-polish/SKILL.md",
-      "skills/spec-pov/references/cross-model-panel.md",
-      "skills/spec-pov/scripts/cross-model-pov.sh",
-      "skills/spec-pov/scripts/peer-job-runner.py",
-      "skills/spec-product-pulse/SKILL.md",
-      "skills/spec-product-pulse/references/interview.md",
-      "skills/spec-product-pulse/references/report-template.md",
-      "skills/spec-promote/SKILL.md",
-      "skills/spec-promote/references/spiral-cli.md",
-      "skills/spec-promote/scripts/check-spiral-auth.cjs",
-      "skills/spec-prototype/SKILL.md",
-      "skills/spec-prototype/references/craft-floor.md",
-      "skills/spec-prototype/references/preview.md",
-      "skills/spec-prototype/references/write-back.md",
-      "skills/spec-prototype/scripts/light-webserver.js",
-      "skills/spec-riffrec-feedback-analysis/SKILL.md",
-      "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md",
-      "skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md",
-      "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
-      "skills/spec-runtime-setup/SKILL.md",
-      "skills/spec-runtime-setup/references/config-template.yaml",
-      "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
-      "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
-      "skills/spec-runtime-setup/scripts/setup.cjs",
-      "skills/spec-runtime-setup/scripts/vendor/README.md",
-      "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
-      "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
-      "skills/spec-sweep/SKILL.md",
-      "skills/spec-sweep/references/agents/media-analyzer.md",
-      "skills/spec-sweep/references/interview.md",
-      "skills/spec-sweep/references/state-schema.md",
-      "skills/spec-sweep/scripts/analyze_riffrec_zip.py",
-      "skills/spec-test-xcode/SKILL.md",
-      "skills/spec-work/SKILL.md",
-      "skills/spec-work/references/agents/figma-design-sync.md",
-      "skills/spec-work/references/execution-strategy.md",
-      "skills/spec-work/references/tracker-defer.md",
-      "skills/spec-work/references/work-intake-and-task-pack.md",
-      "skills/spec-worktree/SKILL.md",
-      "skills/spec-worktree/scripts/worktree-manager.sh",
-      "skills/spec-write-tasks/SKILL.md",
-      "skills/using-spec-first/references/public-route-map.md",
-      "src/cli/commands/doctor.js",
-      "src/cli/commands/tasks.js",
-      "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "src/cli/task-pack.js",
-      "templates/claude/commands/spec/write-tasks.md",
-      "tests/integration/init-six-host-lifecycle.integration.test.js",
-      "tests/integration/spec-prototype-human-journey.integration.test.js",
+      "skills/spec-compound/evals/examples.json",
+      "src/cli/plugin-manifest.js",
       "tests/unit/ce-localization-closeout-contracts.test.js",
       "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
-      "tests/unit/ce-post-3-20-calibration-contracts.test.js",
-      "tests/unit/ce-setup-localization-contracts.test.js",
-      "tests/unit/ce-upstream-3-20-reconciliation.test.js",
-      "tests/unit/ce-upstream-reconciliation-v2.test.js",
       "tests/unit/ce-upstream-skill-sync-contracts.test.js",
-      "tests/unit/doctor-output.test.js",
-      "tests/unit/doctor-runtime-assets.test.js",
-      "tests/unit/low-findings-cleanup-contracts.test.js",
-      "tests/unit/mcp-setup-config-consumers.test.js",
-      "tests/unit/mcp-setup-entrypoint.test.js",
-      "tests/unit/mcp-setup-mode-target.test.js",
-      "tests/unit/mcp-setup-project-config.test.js",
-      "tests/unit/mutation-authority-contracts.test.js",
-      "tests/unit/pipeline-mode-contracts.test.js",
-      "tests/unit/project-role-contract.test.js",
-      "tests/unit/skill-flow-p2-closure-contracts.test.js",
-      "tests/unit/spec-code-review-peer-runner.test.js",
-      "tests/unit/spec-debug-contracts.test.js",
-      "tests/unit/spec-product-pulse-contracts.test.js",
-      "tests/unit/spec-promote-auth-probe.test.js",
-      "tests/unit/spec-prototype-contracts.test.js",
-      "tests/unit/spec-riffrec-analyzer-safety.test.js",
-      "tests/unit/spec-riffrec-feedback-analysis-contracts.test.js",
-      "tests/unit/spec-work-contracts.test.js",
-      "tests/unit/spec-work-execution-strategy-contracts.test.js",
-      "tests/unit/spec-worktree-contracts.test.js",
-      "tests/unit/spec-write-tasks-contracts.test.js",
-      "tests/unit/task-pack-command.test.js",
-      "tests/unit/test-inventory-contracts.test.js"
+      "tests/unit/compound-promotion-contracts.test.js",
+      "tests/unit/plugin-modules.test.js"
     ],
-    "dirty_path_manifest_sha256": "01d8c3bd383359c55450823d72022ed61c6a4da33f263a80eeaafaec65ae88c1",
-    "source_tree_hash": "959ce732ecff948bdfc634f199bf72832361b04374a0553024abc737ba2f5b64",
-    "inventory_hash": "2e6379a59b991c3ebfe3aeabc0162fa67369691b85b9494020f54f95a56dc81a",
+    "dirty_path_manifest_sha256": "d6f3c6b1ae0e309ffb32d97268bfc761454488874921918d84fca1114023312c",
+    "source_tree_hash": "20cd90fe19cce704960e3ee3df95022aa0cb9e6690500a2980e611212867712e",
+    "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -316,8 +288,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "2e6379a59b991c3ebfe3aeabc0162fa67369691b85b9494020f54f95a56dc81a",
-  "inventory_artifact_sha256": "b48f7832d840ae99215053fed1a5f4cd8506ccd74875e2993500b560d4413325",
+  "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
+  "inventory_artifact_sha256": "877383049ff0490034e84876d7c8360a76a7268572479d29c150b8c1875621c6",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -344,9 +316,9 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "5469509aafbae72762f789d278407975ada7c4d01e1cadabde646f0ba9d35a74",
+  "review_input_hash": "62045625d4cddf67c7c76458160284a4e3a57e0a7522d333f7ce89bada218dcb",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
-  "chunk_manifest_hash": "3123adf8e44731206a9be5f0eac847b70daa80a57fd0d0582ec062f3ef027818",
+  "chunk_manifest_hash": "a4f88b71d11c287ba3752aa418ac0ae4240709505ad264f992e7f73f7e7f2841",
   "chunk_manifest": [
     {
       "chunk_id": "oai-r3-final-001",
@@ -567,16 +539,16 @@
   ],
   "expected_skill_count": 36,
   "reviewed_skill_count": 36,
-  "expected_package_path_count": 570,
-  "expected_direct_support_path_count": 184,
-  "expected_direct_support_relation_count": 390,
-  "reviewed_package_path_count": 570,
-  "reviewed_direct_support_path_count": 184,
-  "reviewed_direct_support_relation_count": 390,
+  "expected_package_path_count": 571,
+  "expected_direct_support_path_count": 186,
+  "expected_direct_support_relation_count": 392,
+  "reviewed_package_path_count": 571,
+  "reviewed_direct_support_path_count": 186,
+  "reviewed_direct_support_relation_count": 392,
   "reviewed_expected_path_relation_count": 956,
   "reviewed_unique_source_path_count": 751,
-  "coverage_status": "full-current-source-packet",
-  "review_status": "complete-with-deferred-measurement",
+  "coverage_status": "complete-current-source-with-incremental-review",
+  "review_status": "complete-with-incremental-review",
   "trust_status": "source-bound-role-simulated-provider-unverified",
   "findings_summary": {
     "current_total": 2,
@@ -716,66 +688,6 @@
           ]
         },
         {
-          "path": "skills/spec-app-consistency-audit/README.md",
-          "path_role": "skill-package",
-          "source_kind": "reference-contract",
-          "owning_skill": "spec-app-consistency-audit",
-          "shared_consumers": [],
-          "sha256": "6748ef59c2e235c3894f8f7f68cfdf645b903badb88f0c084212f5315dce7b15",
-          "bytes": 3724,
-          "line_count": 71,
-          "covered_line_ranges": [
-            [
-              1,
-              71
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-001"
-          ]
-        },
-        {
-          "path": "skills/spec-app-consistency-audit/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-app-consistency-audit",
-          "shared_consumers": [],
-          "sha256": "15e75ce0985990f04ed92d2f2231a5f0e939614d883b7e05ac85688eb3cc3a05",
-          "bytes": 17676,
-          "line_count": 297,
-          "covered_line_ranges": [
-            [
-              1,
-              297
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-001"
-          ]
-        },
-        {
-          "path": "skills/spec-app-consistency-audit/evals/README.md",
-          "path_role": "skill-package",
-          "source_kind": "evaluation",
-          "owning_skill": "spec-app-consistency-audit",
-          "shared_consumers": [],
-          "sha256": "dc00f022c4e1bc51d1840ca0fc0bb389578b1b8de36d7b85c3bdc819cf85c07a",
-          "bytes": 537,
-          "line_count": 7,
-          "covered_line_ranges": [
-            [
-              1,
-              7
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-001"
-          ]
-        },
-        {
           "path": "skills/spec-app-consistency-audit/evals/evaluation-governance.md",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -808,6 +720,26 @@
             [
               1,
               120
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-001"
+          ]
+        },
+        {
+          "path": "skills/spec-app-consistency-audit/evals/README.md",
+          "path_role": "skill-package",
+          "source_kind": "evaluation",
+          "owning_skill": "spec-app-consistency-audit",
+          "shared_consumers": [],
+          "sha256": "dc00f022c4e1bc51d1840ca0fc0bb389578b1b8de36d7b85c3bdc819cf85c07a",
+          "bytes": 537,
+          "line_count": 7,
+          "covered_line_ranges": [
+            [
+              1,
+              7
             ]
           ],
           "read_status": "full",
@@ -1148,6 +1080,26 @@
             [
               1,
               57
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-001"
+          ]
+        },
+        {
+          "path": "skills/spec-app-consistency-audit/README.md",
+          "path_role": "skill-package",
+          "source_kind": "reference-contract",
+          "owning_skill": "spec-app-consistency-audit",
+          "shared_consumers": [],
+          "sha256": "6748ef59c2e235c3894f8f7f68cfdf645b903badb88f0c084212f5315dce7b15",
+          "bytes": 3724,
+          "line_count": 71,
+          "covered_line_ranges": [
+            [
+              1,
+              71
             ]
           ],
           "read_status": "full",
@@ -2316,6 +2268,26 @@
           ]
         },
         {
+          "path": "skills/spec-app-consistency-audit/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-app-consistency-audit",
+          "shared_consumers": [],
+          "sha256": "15e75ce0985990f04ed92d2f2231a5f0e939614d883b7e05ac85688eb3cc3a05",
+          "bytes": 17676,
+          "line_count": 297,
+          "covered_line_ranges": [
+            [
+              1,
+              297
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-001"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -2440,7 +2412,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-app-consistency-audit",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -2456,18 +2428,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-001"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -2584,26 +2556,6 @@
         "tests/unit/spec-ideate-clarification-handoff-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-brainstorm/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-brainstorm",
-          "shared_consumers": [],
-          "sha256": "7d38006a3eb1362d43cb6ec52dabcef8fcd5c959c992a1e3b46ae2b36bb89fca",
-          "bytes": 44658,
-          "line_count": 307,
-          "covered_line_ranges": [
-            [
-              1,
-              307
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-002"
-          ]
-        },
         {
           "path": "skills/spec-brainstorm/references/agents/slack-researcher.md",
           "path_role": "skill-package",
@@ -2767,21 +2719,21 @@
         {
           "path": "skills/spec-brainstorm/references/settled-decisions.md",
           "path_role": "skill-package",
-          "source_kind": "reference-contract",
+          "source_kind": "skill-package",
           "owning_skill": "spec-brainstorm",
           "shared_consumers": [],
-          "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971",
-          "bytes": 4951,
-          "line_count": 46,
+          "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0",
+          "bytes": 4950,
+          "line_count": 45,
           "covered_line_ranges": [
             [
               1,
-              46
+              45
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-002"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-a9e4f0e64dba"
           ]
         },
         {
@@ -2837,6 +2789,26 @@
             [
               1,
               26
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-002"
+          ]
+        },
+        {
+          "path": "skills/spec-brainstorm/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-brainstorm",
+          "shared_consumers": [],
+          "sha256": "7d38006a3eb1362d43cb6ec52dabcef8fcd5c959c992a1e3b46ae2b36bb89fca",
+          "bytes": 44658,
+          "line_count": 307,
+          "covered_line_ranges": [
+            [
+              1,
+              307
             ]
           ],
           "read_status": "full",
@@ -2979,7 +2951,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-brainstorm",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -2994,18 +2966,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-002"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -3107,7 +3079,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-brainstorm",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -3123,18 +3095,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-002"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -3500,26 +3472,6 @@
             [
               1,
               88
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-003"
-          ]
-        },
-        {
-          "path": "skills/spec-code-review/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-code-review",
-          "shared_consumers": [],
-          "sha256": "e6d1b0c08bb22f105e4c00a162144c61a1c8a4de1ec385319e50b6e954811ba6",
-          "bytes": 123834,
-          "line_count": 1035,
-          "covered_line_ranges": [
-            [
-              1,
-              1035
             ]
           ],
           "read_status": "full",
@@ -4568,6 +4520,26 @@
           ]
         },
         {
+          "path": "skills/spec-code-review/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-code-review",
+          "shared_consumers": [],
+          "sha256": "e6d1b0c08bb22f105e4c00a162144c61a1c8a4de1ec385319e50b6e954811ba6",
+          "bytes": 123834,
+          "line_count": 1035,
+          "covered_line_ranges": [
+            [
+              1,
+              1035
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-003"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -4704,7 +4676,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-code-review",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -4719,18 +4691,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-003"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -5272,7 +5244,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-commit",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -5287,18 +5259,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-004"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -5391,26 +5363,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-commit-push-pr/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-commit-push-pr",
-          "shared_consumers": [],
-          "sha256": "ccd2277dfd43dddfaa1b0836296adbaaec4c79cd89fd8a9332eb8117ac21dd7c",
-          "bytes": 22401,
-          "line_count": 278,
-          "covered_line_ranges": [
-            [
-              1,
-              278
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-005"
-          ]
-        },
-        {
           "path": "skills/spec-commit-push-pr/references/branch-creation.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -5443,6 +5395,26 @@
             [
               1,
               352
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-005"
+          ]
+        },
+        {
+          "path": "skills/spec-commit-push-pr/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-commit-push-pr",
+          "shared_consumers": [],
+          "sha256": "ccd2277dfd43dddfaa1b0836296adbaaec4c79cd89fd8a9332eb8117ac21dd7c",
+          "bytes": 22401,
+          "line_count": 278,
+          "covered_line_ranges": [
+            [
+              1,
+              278
             ]
           ],
           "read_status": "full",
@@ -5511,7 +5483,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-commit-push-pr",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -5526,18 +5498,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-005"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -5653,24 +5625,24 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-compound/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
+          "path": "docs/contracts/knowledge/knowledge-harness.md",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
           "owning_skill": "spec-compound",
           "shared_consumers": [],
-          "sha256": "ac22a08a60a90248a35b10fc231cdd6fa0a048b516bd884711da015dc442e6ca",
-          "bytes": 69728,
-          "line_count": 770,
+          "sha256": "ef5b37d45376380ae9591edad9bde383799c1d33b8a5b969ab9a871874c9f55d",
+          "bytes": 9979,
+          "line_count": 77,
           "covered_line_ranges": [
             [
               1,
-              770
+              77
             ]
           ],
-          "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-006"
-          ]
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ef5b37d45376"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-compound/assets/resolution-template.md",
@@ -5691,6 +5663,26 @@
           "review_chunk_ids": [
             "oai-r3-final-006"
           ]
+        },
+        {
+          "path": "skills/spec-compound/evals/examples.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "ad0bdb37c2ba3faee15fc5aa38a507b8fa762e7bf6d9b75ec217aba9784d1a4b",
+          "bytes": 3915,
+          "line_count": 83,
+          "covered_line_ranges": [
+            [
+              1,
+              83
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ad0bdb37c2ba"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-compound/references/agents/best-practices-researcher.md",
@@ -6053,6 +6045,26 @@
           ]
         },
         {
+          "path": "skills/spec-compound/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "9b6e776fef91bca892b0420cc4b9aa1feeb8d5e55f3abe5fd80e3ad41bc6dc09",
+          "bytes": 74193,
+          "line_count": 773,
+          "covered_line_ranges": [
+            [
+              1,
+              773
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-9b6e776fef91"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -6132,6 +6144,26 @@
           ]
         },
         {
+          "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+          "path_role": "direct-support",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-compound",
+          "shared_consumers": [],
+          "sha256": "91b40253e413dbf531777a7ae154d3674d3ffe4191e2c0d16a821188f8ec1933",
+          "bytes": 14710,
+          "line_count": 356,
+          "covered_line_ranges": [
+            [
+              1,
+              356
+            ]
+          ],
+          "review_chunk_ids": [
+            "ce-localization-review-delta-2026-08-20-current-source-final-v2-openai-skill-engineering-91b40253e413"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -6165,7 +6197,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-compound",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -6180,41 +6212,41 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-006"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
           "path": "tests/unit/compound-promotion-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-compound",
           "shared_consumers": [
             "spec-compound",
             "spec-compound-refresh"
           ],
-          "sha256": "0277379b6ec451cd5008a606d628b85a44e7cef3a9ae417153a87b9a02eb26d5",
-          "bytes": 11063,
-          "line_count": 220,
+          "sha256": "dab772b0a1fe9a687676bad9b30b3feaa8051c78f2afc02395f3a8444cf56dd2",
+          "bytes": 15317,
+          "line_count": 293,
           "covered_line_ranges": [
             [
               1,
-              220
+              293
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-006"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-dab772b0a1fe"
           ]
         },
         {
@@ -6521,26 +6553,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-compound-refresh/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-compound-refresh",
-          "shared_consumers": [],
-          "sha256": "4e0278242a849af3aea4b412ea0b18009b7e2b3f1a919bc3598c2a36b4daa0c4",
-          "bytes": 58862,
-          "line_count": 708,
-          "covered_line_ranges": [
-            [
-              1,
-              708
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-007"
-          ]
-        },
-        {
           "path": "skills/spec-compound-refresh/assets/resolution-template.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -6701,6 +6713,26 @@
           ]
         },
         {
+          "path": "skills/spec-compound-refresh/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-compound-refresh",
+          "shared_consumers": [],
+          "sha256": "4e0278242a849af3aea4b412ea0b18009b7e2b3f1a919bc3598c2a36b4daa0c4",
+          "bytes": 58862,
+          "line_count": 708,
+          "covered_line_ranges": [
+            [
+              1,
+              708
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-007"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -6813,23 +6845,23 @@
           "path": "tests/unit/compound-promotion-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-compound-refresh",
           "shared_consumers": [
             "spec-compound",
             "spec-compound-refresh"
           ],
-          "sha256": "0277379b6ec451cd5008a606d628b85a44e7cef3a9ae417153a87b9a02eb26d5",
-          "bytes": 11063,
-          "line_count": 220,
+          "sha256": "dab772b0a1fe9a687676bad9b30b3feaa8051c78f2afc02395f3a8444cf56dd2",
+          "bytes": 15317,
+          "line_count": 293,
           "covered_line_ranges": [
             [
               1,
-              220
+              293
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-007"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-dab772b0a1fe"
           ]
         },
         {
@@ -7148,26 +7180,6 @@
           ]
         },
         {
-          "path": "skills/spec-debug/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-debug",
-          "shared_consumers": [],
-          "sha256": "e8efb3c661be94ee7a2062c737413f5f6d9b3fc1ddf5251e4550f7c467cb0b09",
-          "bytes": 39482,
-          "line_count": 393,
-          "covered_line_ranges": [
-            [
-              1,
-              393
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-008"
-          ]
-        },
-        {
           "path": "skills/spec-debug/evals/examples.json",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -7260,6 +7272,26 @@
             [
               1,
               54
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-008"
+          ]
+        },
+        {
+          "path": "skills/spec-debug/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-debug",
+          "shared_consumers": [],
+          "sha256": "e8efb3c661be94ee7a2062c737413f5f6d9b3fc1ddf5251e4550f7c467cb0b09",
+          "bytes": 39482,
+          "line_count": 393,
+          "covered_line_ranges": [
+            [
+              1,
+              393
             ]
           ],
           "read_status": "full",
@@ -7609,26 +7641,6 @@
         "tests/unit/spec-doc-review-task-pack-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-doc-review/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-doc-review",
-          "shared_consumers": [],
-          "sha256": "cd7bbcb4838b3cd6b779140da986b18e1ac25b707676936253225a6c0784e5ca",
-          "bytes": 26942,
-          "line_count": 195,
-          "covered_line_ranges": [
-            [
-              1,
-              195
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-009"
-          ]
-        },
         {
           "path": "skills/spec-doc-review/evals/report-only-cases.json",
           "path_role": "skill-package",
@@ -8290,6 +8302,26 @@
           ]
         },
         {
+          "path": "skills/spec-doc-review/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-doc-review",
+          "shared_consumers": [],
+          "sha256": "cd7bbcb4838b3cd6b779140da986b18e1ac25b707676936253225a6c0784e5ca",
+          "bytes": 26942,
+          "line_count": 195,
+          "covered_line_ranges": [
+            [
+              1,
+              195
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-009"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -8372,7 +8404,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-doc-review",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -8387,18 +8419,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-009"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -8624,26 +8656,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-dogfood/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-dogfood",
-          "shared_consumers": [],
-          "sha256": "1147524fd8a66ca602e478eb50771ca79a2a924df84a048d833bdb9ce2002af9",
-          "bytes": 24362,
-          "line_count": 223,
-          "covered_line_ranges": [
-            [
-              1,
-              223
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-010"
-          ]
-        },
-        {
           "path": "skills/spec-dogfood/references/dogfood-report-template.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -8676,6 +8688,26 @@
             [
               1,
               62
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-010"
+          ]
+        },
+        {
+          "path": "skills/spec-dogfood/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-dogfood",
+          "shared_consumers": [],
+          "sha256": "1147524fd8a66ca602e478eb50771ca79a2a924df84a048d833bdb9ce2002af9",
+          "bytes": 24362,
+          "line_count": 223,
+          "covered_line_ranges": [
+            [
+              1,
+              223
             ]
           ],
           "read_status": "full",
@@ -8866,7 +8898,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-dogfood",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -8882,18 +8914,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-010"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -8960,26 +8992,6 @@
         "tests/unit/specialized-skill-calibration-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-explain/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-explain",
-          "shared_consumers": [],
-          "sha256": "42f65e927ac125e1c5ff1d54cae2fe6faaa15963d6579cebc124692d217d001c",
-          "bytes": 13625,
-          "line_count": 127,
-          "covered_line_ranges": [
-            [
-              1,
-              127
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-011"
-          ]
-        },
         {
           "path": "skills/spec-explain/references/agents/work-recap-scout.md",
           "path_role": "skill-package",
@@ -9101,6 +9113,26 @@
           ]
         },
         {
+          "path": "skills/spec-explain/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-explain",
+          "shared_consumers": [],
+          "sha256": "42f65e927ac125e1c5ff1d54cae2fe6faaa15963d6579cebc124692d217d001c",
+          "bytes": 13625,
+          "line_count": 127,
+          "covered_line_ranges": [
+            [
+              1,
+              127
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-011"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -9203,7 +9235,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-explain",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -9219,18 +9251,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-011"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -9327,26 +9359,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-handoff/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-handoff",
-          "shared_consumers": [],
-          "sha256": "845e122ffb4da32e0e482b535f1a594ab97e907bb66e1079466aaf71ee5ab8af",
-          "bytes": 7133,
-          "line_count": 90,
-          "covered_line_ranges": [
-            [
-              1,
-              90
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-012"
-          ]
-        },
-        {
           "path": "skills/spec-handoff/evals/examples.json",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -9399,6 +9411,26 @@
             [
               1,
               323
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-012"
+          ]
+        },
+        {
+          "path": "skills/spec-handoff/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-handoff",
+          "shared_consumers": [],
+          "sha256": "845e122ffb4da32e0e482b535f1a594ab97e907bb66e1079466aaf71ee5ab8af",
+          "bytes": 7133,
+          "line_count": 90,
+          "covered_line_ranges": [
+            [
+              1,
+              90
             ]
           ],
           "read_status": "full",
@@ -9540,26 +9572,6 @@
         "tests/unit/spec-ideate-clarification-handoff-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-ideate/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-ideate",
-          "shared_consumers": [],
-          "sha256": "dc2ce7de7ce42a8ebf27a47e4322315947024384d2914663392c0e25fdc58b29",
-          "bytes": 56351,
-          "line_count": 440,
-          "covered_line_ranges": [
-            [
-              1,
-              440
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-013"
-          ]
-        },
         {
           "path": "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
           "path_role": "skill-package",
@@ -9781,6 +9793,26 @@
           ]
         },
         {
+          "path": "skills/spec-ideate/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "dc2ce7de7ce42a8ebf27a47e4322315947024384d2914663392c0e25fdc58b29",
+          "bytes": 56351,
+          "line_count": 440,
+          "covered_line_ranges": [
+            [
+              1,
+              440
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-013"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -9925,7 +9957,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-ideate",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -9940,18 +9972,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-013"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -10053,7 +10085,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-ideate",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -10069,18 +10101,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-013"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -10231,26 +10263,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-lfg/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-lfg",
-          "shared_consumers": [],
-          "sha256": "6dcb35b044f79c8d6d1a6cbdaabacff85d90e17608faba398fc7f203f8550aa0",
-          "bytes": 24050,
-          "line_count": 233,
-          "covered_line_ranges": [
-            [
-              1,
-              233
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-014"
-          ]
-        },
-        {
           "path": "skills/spec-lfg/references/next-work-handoff.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -10363,6 +10375,26 @@
             [
               1,
               122
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-014"
+          ]
+        },
+        {
+          "path": "skills/spec-lfg/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-lfg",
+          "shared_consumers": [],
+          "sha256": "6dcb35b044f79c8d6d1a6cbdaabacff85d90e17608faba398fc7f203f8550aa0",
+          "bytes": 24050,
+          "line_count": 233,
+          "covered_line_ranges": [
+            [
+              1,
+              233
             ]
           ],
           "read_status": "full",
@@ -10551,7 +10583,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-lfg",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -10567,18 +10599,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-014"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -10835,38 +10867,18 @@
           ]
         },
         {
-          "path": "skills/spec-optimize/README.md",
+          "path": "skills/spec-optimize/evals/examples.json",
           "path_role": "skill-package",
-          "source_kind": "reference-contract",
+          "source_kind": "evaluation",
           "owning_skill": "spec-optimize",
           "shared_consumers": [],
-          "sha256": "395d55fd1fd6c15382814305ba347d3250537a9d8a0c7559f54c2b932e6746d5",
-          "bytes": 1924,
-          "line_count": 39,
+          "sha256": "cd2f6d1efa75849d334e2fd7c5c557748bb4282589c31c4bdc20cdf3a9b85390",
+          "bytes": 1897,
+          "line_count": 37,
           "covered_line_ranges": [
             [
               1,
-              39
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-015"
-          ]
-        },
-        {
-          "path": "skills/spec-optimize/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-optimize",
-          "shared_consumers": [],
-          "sha256": "12feec6ffbb4f78cede96194a8f9ea6bcbc095391ea1d08ddfecaafa40fd085e",
-          "bytes": 51070,
-          "line_count": 785,
-          "covered_line_ranges": [
-            [
-              1,
-              785
+              37
             ]
           ],
           "read_status": "full",
@@ -10895,18 +10907,18 @@
           ]
         },
         {
-          "path": "skills/spec-optimize/evals/examples.json",
+          "path": "skills/spec-optimize/README.md",
           "path_role": "skill-package",
-          "source_kind": "evaluation",
+          "source_kind": "reference-contract",
           "owning_skill": "spec-optimize",
           "shared_consumers": [],
-          "sha256": "cd2f6d1efa75849d334e2fd7c5c557748bb4282589c31c4bdc20cdf3a9b85390",
-          "bytes": 1897,
-          "line_count": 37,
+          "sha256": "395d55fd1fd6c15382814305ba347d3250537a9d8a0c7559f54c2b932e6746d5",
+          "bytes": 1924,
+          "line_count": 39,
           "covered_line_ranges": [
             [
               1,
-              37
+              39
             ]
           ],
           "read_status": "full",
@@ -11187,6 +11199,26 @@
             [
               1,
               142
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-015"
+          ]
+        },
+        {
+          "path": "skills/spec-optimize/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-optimize",
+          "shared_consumers": [],
+          "sha256": "12feec6ffbb4f78cede96194a8f9ea6bcbc095391ea1d08ddfecaafa40fd085e",
+          "bytes": 51070,
+          "line_count": 785,
+          "covered_line_ranges": [
+            [
+              1,
+              785
             ]
           ],
           "read_status": "full",
@@ -11647,46 +11679,6 @@
             [
               1,
               97
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-016"
-          ]
-        },
-        {
-          "path": "skills/spec-plan/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-plan",
-          "shared_consumers": [],
-          "sha256": "86c71fa9c2ee28fec4c4e45ff03b2511bdbe93f0e15528d2f54d59ec1a990689",
-          "bytes": 115997,
-          "line_count": 864,
-          "covered_line_ranges": [
-            [
-              1,
-              864
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-016"
-          ]
-        },
-        {
-          "path": "skills/spec-plan/evals/README.md",
-          "path_role": "skill-package",
-          "source_kind": "evaluation",
-          "owning_skill": "spec-plan",
-          "shared_consumers": [],
-          "sha256": "5cadccb623b8cb564ff924a308a9b82fb2c005e917a663d4b1bfd00ab79a785c",
-          "bytes": 1472,
-          "line_count": 12,
-          "covered_line_ranges": [
-            [
-              1,
-              12
             ]
           ],
           "read_status": "full",
@@ -12295,6 +12287,26 @@
           ]
         },
         {
+          "path": "skills/spec-plan/evals/README.md",
+          "path_role": "skill-package",
+          "source_kind": "evaluation",
+          "owning_skill": "spec-plan",
+          "shared_consumers": [],
+          "sha256": "5cadccb623b8cb564ff924a308a9b82fb2c005e917a663d4b1bfd00ab79a785c",
+          "bytes": 1472,
+          "line_count": 12,
+          "covered_line_ranges": [
+            [
+              1,
+              12
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-016"
+          ]
+        },
+        {
           "path": "skills/spec-plan/references/agents/agent-native-planning-strategist.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -12817,21 +12829,21 @@
         {
           "path": "skills/spec-plan/references/settled-decisions.md",
           "path_role": "skill-package",
-          "source_kind": "reference-contract",
+          "source_kind": "skill-package",
           "owning_skill": "spec-plan",
           "shared_consumers": [],
-          "sha256": "be563f436acfab9564bc39f0a8c15635f4a2dbbd901e2e7daa3f2c0766079971",
-          "bytes": 4951,
-          "line_count": 46,
+          "sha256": "a9e4f0e64dba0ec0526756bd8e8aa0a27a57ba8ee6ac35b5abc99488264e4ab0",
+          "bytes": 4950,
+          "line_count": 45,
           "covered_line_ranges": [
             [
               1,
-              46
+              45
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-016"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-a9e4f0e64dba"
           ]
         },
         {
@@ -12867,6 +12879,26 @@
             [
               1,
               164
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-016"
+          ]
+        },
+        {
+          "path": "skills/spec-plan/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-plan",
+          "shared_consumers": [],
+          "sha256": "86c71fa9c2ee28fec4c4e45ff03b2511bdbe93f0e15528d2f54d59ec1a990689",
+          "bytes": 115997,
+          "line_count": 864,
+          "covered_line_ranges": [
+            [
+              1,
+              864
             ]
           ],
           "read_status": "full",
@@ -13010,7 +13042,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-plan",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -13025,18 +13057,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-016"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -13160,7 +13192,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-plan",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -13176,18 +13208,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-016"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -13510,26 +13542,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-polish/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-polish",
-          "shared_consumers": [],
-          "sha256": "02ab00d2abad8dbb2072b82c1682ddc33d65abb2d19e4ceb3e42f028f76b8066",
-          "bytes": 9193,
-          "line_count": 156,
-          "covered_line_ranges": [
-            [
-              1,
-              156
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-017"
-          ]
-        },
-        {
           "path": "skills/spec-polish/references/dev-server-astro.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -13830,6 +13842,26 @@
           ]
         },
         {
+          "path": "skills/spec-polish/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-polish",
+          "shared_consumers": [],
+          "sha256": "02ab00d2abad8dbb2072b82c1682ddc33d65abb2d19e4ceb3e42f028f76b8066",
+          "bytes": 9193,
+          "line_count": 156,
+          "covered_line_ranges": [
+            [
+              1,
+              156
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-017"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -14035,26 +14067,6 @@
         "tests/unit/review-peer-expansion-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-pov/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-pov",
-          "shared_consumers": [],
-          "sha256": "d1efe4d5a01e9c2ae608c22cd5d94bd6f10b8a1bd56b906e96a708bf6b97f4f3",
-          "bytes": 18000,
-          "line_count": 137,
-          "covered_line_ranges": [
-            [
-              1,
-              137
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-018"
-          ]
-        },
         {
           "path": "skills/spec-pov/references/agents/external-evidence-researcher.md",
           "path_role": "skill-package",
@@ -14316,6 +14328,26 @@
           ]
         },
         {
+          "path": "skills/spec-pov/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-pov",
+          "shared_consumers": [],
+          "sha256": "d1efe4d5a01e9c2ae608c22cd5d94bd6f10b8a1bd56b906e96a708bf6b97f4f3",
+          "bytes": 18000,
+          "line_count": 137,
+          "covered_line_ranges": [
+            [
+              1,
+              137
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-018"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -14442,7 +14474,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-pov",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -14458,18 +14490,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-018"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -14690,26 +14722,6 @@
           ]
         },
         {
-          "path": "skills/spec-prd/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-prd",
-          "shared_consumers": [],
-          "sha256": "26199b91a9d78b1c612a89cf022773653f31eedfa495957ef3dd79f6ad9c46eb",
-          "bytes": 65669,
-          "line_count": 340,
-          "covered_line_ranges": [
-            [
-              1,
-              340
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-019"
-          ]
-        },
-        {
           "path": "skills/spec-prd/assets/overlays/securities.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -14890,26 +14902,6 @@
           ]
         },
         {
-          "path": "skills/spec-prd/evals/README.md",
-          "path_role": "skill-package",
-          "source_kind": "evaluation",
-          "owning_skill": "spec-prd",
-          "shared_consumers": [],
-          "sha256": "b4f0384424269500702ec39ef0d96f21b099074d9fd0b7e4773c530b2de88fe7",
-          "bytes": 2746,
-          "line_count": 31,
-          "covered_line_ranges": [
-            [
-              1,
-              31
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-019"
-          ]
-        },
-        {
           "path": "skills/spec-prd/evals/contract-reset-candidate.patch",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -15062,6 +15054,26 @@
             [
               1,
               914
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-019"
+          ]
+        },
+        {
+          "path": "skills/spec-prd/evals/README.md",
+          "path_role": "skill-package",
+          "source_kind": "evaluation",
+          "owning_skill": "spec-prd",
+          "shared_consumers": [],
+          "sha256": "b4f0384424269500702ec39ef0d96f21b099074d9fd0b7e4773c530b2de88fe7",
+          "bytes": 2746,
+          "line_count": 31,
+          "covered_line_ranges": [
+            [
+              1,
+              31
             ]
           ],
           "read_status": "full",
@@ -15362,6 +15374,26 @@
             [
               1,
               106
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-019"
+          ]
+        },
+        {
+          "path": "skills/spec-prd/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-prd",
+          "shared_consumers": [],
+          "sha256": "26199b91a9d78b1c612a89cf022773653f31eedfa495957ef3dd79f6ad9c46eb",
+          "bytes": 65669,
+          "line_count": 340,
+          "covered_line_ranges": [
+            [
+              1,
+              340
             ]
           ],
           "read_status": "full",
@@ -15676,7 +15708,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-prd",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -15692,18 +15724,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-019"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -16012,26 +16044,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-product-pulse/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-product-pulse",
-          "shared_consumers": [],
-          "sha256": "002de8c569986d36d40020ffbbda43fdb3115c8cdb219aa628d88b882990dda3",
-          "bytes": 15652,
-          "line_count": 199,
-          "covered_line_ranges": [
-            [
-              1,
-              199
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-020"
-          ]
-        },
-        {
           "path": "skills/spec-product-pulse/references/interview.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -16064,6 +16076,26 @@
             [
               1,
               90
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-020"
+          ]
+        },
+        {
+          "path": "skills/spec-product-pulse/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-product-pulse",
+          "shared_consumers": [],
+          "sha256": "002de8c569986d36d40020ffbbda43fdb3115c8cdb219aa628d88b882990dda3",
+          "bytes": 15652,
+          "line_count": 199,
+          "covered_line_ranges": [
+            [
+              1,
+              199
             ]
           ],
           "read_status": "full",
@@ -16164,7 +16196,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-product-pulse",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -16179,18 +16211,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-020"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -16307,26 +16339,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-promote/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-promote",
-          "shared_consumers": [],
-          "sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb",
-          "bytes": 11245,
-          "line_count": 140,
-          "covered_line_ranges": [
-            [
-              1,
-              140
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-021"
-          ]
-        },
-        {
           "path": "skills/spec-promote/references/spiral-cli.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -16359,6 +16371,26 @@
             [
               1,
               73
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-021"
+          ]
+        },
+        {
+          "path": "skills/spec-promote/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-promote",
+          "shared_consumers": [],
+          "sha256": "e9f2145d1f6aacc60ed1a753bdd11789350ffbf919704e540bd29a04872a26eb",
+          "bytes": 11245,
+          "line_count": 140,
+          "covered_line_ranges": [
+            [
+              1,
+              140
             ]
           ],
           "read_status": "full",
@@ -16515,26 +16547,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-prototype/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-prototype",
-          "shared_consumers": [],
-          "sha256": "40c5883f66db50e9d77b71905c704af6fe92bf7721eb13b591f75838866f5fab",
-          "bytes": 3774,
-          "line_count": 41,
-          "covered_line_ranges": [
-            [
-              1,
-              41
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-022"
-          ]
-        },
-        {
           "path": "skills/spec-prototype/references/craft-floor.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -16607,6 +16619,26 @@
             [
               1,
               285
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-022"
+          ]
+        },
+        {
+          "path": "skills/spec-prototype/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-prototype",
+          "shared_consumers": [],
+          "sha256": "40c5883f66db50e9d77b71905c704af6fe92bf7721eb13b591f75838866f5fab",
+          "bytes": 3774,
+          "line_count": 41,
+          "covered_line_ranges": [
+            [
+              1,
+              41
             ]
           ],
           "read_status": "full",
@@ -16759,26 +16791,6 @@
         "tests/unit/spec-resolve-pr-feedback-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-resolve-pr-feedback/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-resolve-pr-feedback",
-          "shared_consumers": [],
-          "sha256": "5a3896a9c1c5b9ca65a98f17224af03bdd63913c750ff55dd1d7cf583ed789ed",
-          "bytes": 8261,
-          "line_count": 116,
-          "covered_line_ranges": [
-            [
-              1,
-              116
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-023"
-          ]
-        },
         {
           "path": "skills/spec-resolve-pr-feedback/references/agents/pr-comment-resolver.md",
           "path_role": "skill-package",
@@ -16960,6 +16972,26 @@
           ]
         },
         {
+          "path": "skills/spec-resolve-pr-feedback/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-resolve-pr-feedback",
+          "shared_consumers": [],
+          "sha256": "5a3896a9c1c5b9ca65a98f17224af03bdd63913c750ff55dd1d7cf583ed789ed",
+          "bytes": 8261,
+          "line_count": 116,
+          "covered_line_ranges": [
+            [
+              1,
+              116
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-023"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -17062,7 +17094,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-resolve-pr-feedback",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -17078,18 +17110,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-023"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -17190,26 +17222,6 @@
         "tests/unit/specialized-skill-calibration-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-riffrec-feedback-analysis",
-          "shared_consumers": [],
-          "sha256": "18d2cba65c8fd94a4a5afcd1d84fa5b84fe85bc4bd17e76ebb601eeadd269a44",
-          "bytes": 6128,
-          "line_count": 54,
-          "covered_line_ranges": [
-            [
-              1,
-              54
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-024"
-          ]
-        },
         {
           "path": "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md",
           "path_role": "skill-package",
@@ -17323,6 +17335,26 @@
             [
               1,
               27
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-024"
+          ]
+        },
+        {
+          "path": "skills/spec-riffrec-feedback-analysis/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-riffrec-feedback-analysis",
+          "shared_consumers": [],
+          "sha256": "18d2cba65c8fd94a4a5afcd1d84fa5b84fe85bc4bd17e76ebb601eeadd269a44",
+          "bytes": 6128,
+          "line_count": 54,
+          "covered_line_ranges": [
+            [
+              1,
+              54
             ]
           ],
           "read_status": "full",
@@ -17649,26 +17681,6 @@
           ]
         },
         {
-          "path": "skills/spec-rule-miner/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-rule-miner",
-          "shared_consumers": [],
-          "sha256": "01b5af41925dac85c5446fadebf80efd528cc1d00ec8b2d3bfcf1cadd056764c",
-          "bytes": 8138,
-          "line_count": 73,
-          "covered_line_ranges": [
-            [
-              1,
-              73
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-025"
-          ]
-        },
-        {
           "path": "skills/spec-rule-miner/evals/trigger-cases.json",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -17721,6 +17733,26 @@
             [
               1,
               56
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-025"
+          ]
+        },
+        {
+          "path": "skills/spec-rule-miner/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-rule-miner",
+          "shared_consumers": [],
+          "sha256": "01b5af41925dac85c5446fadebf80efd528cc1d00ec8b2d3bfcf1cadd056764c",
+          "bytes": 8138,
+          "line_count": 73,
+          "covered_line_ranges": [
+            [
+              1,
+              73
             ]
           ],
           "read_status": "full",
@@ -17980,18 +18012,18 @@
           ]
         },
         {
-          "path": "skills/spec-runtime-setup/SKILL.md",
+          "path": "skills/spec-runtime-setup/evals/examples.json",
           "path_role": "skill-package",
-          "source_kind": "entry-contract",
+          "source_kind": "evaluation",
           "owning_skill": "spec-runtime-setup",
           "shared_consumers": [],
-          "sha256": "42757be1d4adb3796447cec0daf7e7184ce70f35920a4ca6378ae2bc2699a3d7",
-          "bytes": 54290,
-          "line_count": 355,
+          "sha256": "9bc00802d05bc78efa712bfd45f68c2a7773b46a245a6f40b3e7169d4fd9bcfe",
+          "bytes": 3295,
+          "line_count": 51,
           "covered_line_ranges": [
             [
               1,
-              355
+              51
             ]
           ],
           "read_status": "full",
@@ -18012,26 +18044,6 @@
             [
               1,
               6
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-026"
-          ]
-        },
-        {
-          "path": "skills/spec-runtime-setup/evals/examples.json",
-          "path_role": "skill-package",
-          "source_kind": "evaluation",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "9bc00802d05bc78efa712bfd45f68c2a7773b46a245a6f40b3e7169d4fd9bcfe",
-          "bytes": 3295,
-          "line_count": 51,
-          "covered_line_ranges": [
-            [
-              1,
-              51
             ]
           ],
           "read_status": "full",
@@ -19200,6 +19212,66 @@
           ]
         },
         {
+          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
+          "path_role": "deterministic-helper",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "5a6faa5b5ca6c944b6449f5476c0bfc4511cd5749cd2bf99e9c910fc60c58d5c",
+          "bytes": 42410,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "round-3-openai-skill-lens-final-supplemental-112"
+          ]
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
+          "path_role": "deterministic-helper",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550",
+          "bytes": 1084,
+          "line_count": 21,
+          "covered_line_ranges": [
+            [
+              1,
+              21
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "round-3-openai-skill-lens-final-supplemental-112"
+          ]
+        },
+        {
+          "path": "skills/spec-runtime-setup/scripts/vendor/README.md",
+          "path_role": "deterministic-helper",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "8f6c08f333684ccde83a33a6179d9f738574e0776e55b5c956f2b84869d490a0",
+          "bytes": 392,
+          "line_count": 9,
+          "covered_line_ranges": [
+            [
+              1,
+              9
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "round-3-openai-skill-lens-final-supplemental-112"
+          ]
+        },
+        {
           "path": "skills/spec-runtime-setup/setup-registry.json",
           "path_role": "skill-package",
           "source_kind": "support-asset",
@@ -19232,6 +19304,26 @@
             [
               1,
               673
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-026"
+          ]
+        },
+        {
+          "path": "skills/spec-runtime-setup/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-runtime-setup",
+          "shared_consumers": [],
+          "sha256": "42757be1d4adb3796447cec0daf7e7184ce70f35920a4ca6378ae2bc2699a3d7",
+          "bytes": 54290,
+          "line_count": 355,
+          "covered_line_ranges": [
+            [
+              1,
+              355
             ]
           ],
           "read_status": "full",
@@ -19552,7 +19644,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-runtime-setup",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -19567,18 +19659,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-026"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -20271,7 +20363,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-runtime-setup",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -20287,18 +20379,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-026"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -20321,66 +20413,6 @@
           "read_status": "full",
           "review_chunk_ids": [
             "oai-r3-final-026"
-          ]
-        },
-        {
-          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
-          "path_role": "deterministic-helper",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "5a6faa5b5ca6c944b6449f5476c0bfc4511cd5749cd2bf99e9c910fc60c58d5c",
-          "bytes": 42410,
-          "line_count": 1,
-          "covered_line_ranges": [
-            [
-              1,
-              1
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "round-3-openai-skill-lens-final-supplemental-112"
-          ]
-        },
-        {
-          "path": "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
-          "path_role": "deterministic-helper",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550",
-          "bytes": 1084,
-          "line_count": 21,
-          "covered_line_ranges": [
-            [
-              1,
-              21
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "round-3-openai-skill-lens-final-supplemental-112"
-          ]
-        },
-        {
-          "path": "skills/spec-runtime-setup/scripts/vendor/README.md",
-          "path_role": "deterministic-helper",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-runtime-setup",
-          "shared_consumers": [],
-          "sha256": "8f6c08f333684ccde83a33a6179d9f738574e0776e55b5c956f2b84869d490a0",
-          "bytes": 392,
-          "line_count": 9,
-          "covered_line_ranges": [
-            [
-              1,
-              9
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "round-3-openai-skill-lens-final-supplemental-112"
           ]
         }
       ],
@@ -20420,26 +20452,6 @@
         "tests/unit/specialized-skill-calibration-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-simplify-code/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-simplify-code",
-          "shared_consumers": [],
-          "sha256": "f3930a20910262b36a759a582c15293f401d036c3f3b1027481caf532e55bd51",
-          "bytes": 9411,
-          "line_count": 88,
-          "covered_line_ranges": [
-            [
-              1,
-              88
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-027"
-          ]
-        },
         {
           "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
           "path_role": "skill-package",
@@ -20493,6 +20505,26 @@
             [
               1,
               11
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-027"
+          ]
+        },
+        {
+          "path": "skills/spec-simplify-code/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-simplify-code",
+          "shared_consumers": [],
+          "sha256": "f3930a20910262b36a759a582c15293f401d036c3f3b1027481caf532e55bd51",
+          "bytes": 9411,
+          "line_count": 88,
+          "covered_line_ranges": [
+            [
+              1,
+              88
             ]
           ],
           "read_status": "full",
@@ -20687,26 +20719,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-strategy/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-strategy",
-          "shared_consumers": [],
-          "sha256": "3a3bc443564235455de872444be815e935924cbf041fad0d2e216feb6c03cdbd",
-          "bytes": 6174,
-          "line_count": 95,
-          "covered_line_ranges": [
-            [
-              1,
-              95
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-028"
-          ]
-        },
-        {
           "path": "skills/spec-strategy/references/interview.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -20739,6 +20751,26 @@
             [
               1,
               89
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-028"
+          ]
+        },
+        {
+          "path": "skills/spec-strategy/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-strategy",
+          "shared_consumers": [],
+          "sha256": "3a3bc443564235455de872444be815e935924cbf041fad0d2e216feb6c03cdbd",
+          "bytes": 6174,
+          "line_count": 95,
+          "covered_line_ranges": [
+            [
+              1,
+              95
             ]
           ],
           "read_status": "full",
@@ -20856,26 +20888,6 @@
         "tests/unit/sweep-state-legacy-import.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-sweep/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-sweep",
-          "shared_consumers": [],
-          "sha256": "6af3ddddeb578f7802e476d2c659c36dde2bea729254b511d0d0df192eacd27d",
-          "bytes": 19715,
-          "line_count": 189,
-          "covered_line_ranges": [
-            [
-              1,
-              189
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-029"
-          ]
-        },
         {
           "path": "skills/spec-sweep/references/agents/media-analyzer.md",
           "path_role": "skill-package",
@@ -21117,6 +21129,26 @@
           ]
         },
         {
+          "path": "skills/spec-sweep/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-sweep",
+          "shared_consumers": [],
+          "sha256": "6af3ddddeb578f7802e476d2c659c36dde2bea729254b511d0d0df192eacd27d",
+          "bytes": 19715,
+          "line_count": 189,
+          "covered_line_ranges": [
+            [
+              1,
+              189
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-029"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -21174,10 +21206,30 @@
           ]
         },
         {
+          "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
+          "path_role": "evaluation",
+          "source_kind": "direct-support",
+          "owning_skill": "spec-sweep",
+          "shared_consumers": [],
+          "sha256": "de0c05fed6050fb0bcbfc09ffd241401f5381389abdfa65d3aeb64d166b4e64c",
+          "bytes": 7442,
+          "line_count": 149,
+          "covered_line_ranges": [
+            [
+              1,
+              149
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "round-3-openai-skill-lens-final-supplemental-25"
+          ]
+        },
+        {
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-sweep",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -21192,18 +21244,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-029"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -21460,26 +21512,6 @@
           "review_chunk_ids": [
             "oai-r3-final-029"
           ]
-        },
-        {
-          "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
-          "path_role": "evaluation",
-          "source_kind": "direct-support",
-          "owning_skill": "spec-sweep",
-          "shared_consumers": [],
-          "sha256": "de0c05fed6050fb0bcbfc09ffd241401f5381389abdfa65d3aeb64d166b4e64c",
-          "bytes": 7442,
-          "line_count": 149,
-          "covered_line_ranges": [
-            [
-              1,
-              149
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "round-3-openai-skill-lens-final-supplemental-25"
-          ]
         }
       ],
       "supporting_case": "state engine 提供 lease、原子写、cursor/read-back 与 sensitive redaction，source acknowledgment 还要求配置中的 standing approval。",
@@ -21519,26 +21551,6 @@
         "tests/unit/spec-test-browser-contracts.test.js"
       ],
       "source_read_receipts": [
-        {
-          "path": "skills/spec-test-browser/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-test-browser",
-          "shared_consumers": [],
-          "sha256": "4964b59acb0ead8aba479ff1d89344f16ac3b2e7927a7cb3bf836700fe9ade7b",
-          "bytes": 9036,
-          "line_count": 86,
-          "covered_line_ranges": [
-            [
-              1,
-              86
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-030"
-          ]
-        },
         {
           "path": "skills/spec-test-browser/evals/capability-cases.json",
           "path_role": "skill-package",
@@ -21612,6 +21624,26 @@
             [
               1,
               1346
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-030"
+          ]
+        },
+        {
+          "path": "skills/spec-test-browser/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-test-browser",
+          "shared_consumers": [],
+          "sha256": "4964b59acb0ead8aba479ff1d89344f16ac3b2e7927a7cb3bf836700fe9ade7b",
+          "bytes": 9036,
+          "line_count": 86,
+          "covered_line_ranges": [
+            [
+              1,
+              86
             ]
           ],
           "read_status": "full",
@@ -22052,26 +22084,6 @@
           ]
         },
         {
-          "path": "skills/spec-work/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-work",
-          "shared_consumers": [],
-          "sha256": "33ad7ab53c3d7ea6b3cace4d6040767a4ece3023ccd311a7e37c544196a89e4c",
-          "bytes": 36944,
-          "line_count": 293,
-          "covered_line_ranges": [
-            [
-              1,
-              293
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-032"
-          ]
-        },
-        {
           "path": "skills/spec-work/evals/examples.json",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -22332,6 +22344,26 @@
           ]
         },
         {
+          "path": "skills/spec-work/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-work",
+          "shared_consumers": [],
+          "sha256": "33ad7ab53c3d7ea6b3cace4d6040767a4ece3023ccd311a7e37c544196a89e4c",
+          "bytes": 36944,
+          "line_count": 293,
+          "covered_line_ranges": [
+            [
+              1,
+              293
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-032"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -22567,7 +22599,7 @@
           "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-work",
           "shared_consumers": [
             "spec-brainstorm",
             "spec-code-review",
@@ -22582,18 +22614,18 @@
             "spec-sweep",
             "spec-work"
           ],
-          "sha256": "f45c071a4d2352f15d5a9f8e8508c8f4f7ed8b07d9ff2570b44ee89de984458f",
-          "bytes": 6417,
-          "line_count": 123,
+          "sha256": "ae5486e6f0e306ac2b2c5622e5a451b2c849ef4e0a7510aed0aeaeefa0a1bd14",
+          "bytes": 6908,
+          "line_count": 129,
           "covered_line_ranges": [
             [
               1,
-              123
+              129
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-032"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-ae5486e6f0e3"
           ]
         },
         {
@@ -22709,7 +22741,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-work",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -22725,18 +22757,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-032"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -23199,26 +23231,6 @@
       ],
       "source_read_receipts": [
         {
-          "path": "skills/spec-worktree/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-worktree",
-          "shared_consumers": [],
-          "sha256": "ed13432eec8bb6d5c4d73431ff8db16f918b07b70c01d886be09f0d6443a37e2",
-          "bytes": 12851,
-          "line_count": 152,
-          "covered_line_ranges": [
-            [
-              1,
-              152
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-033"
-          ]
-        },
-        {
           "path": "skills/spec-worktree/scripts/worktree-manager.sh",
           "path_role": "skill-package",
           "source_kind": "deterministic-helper",
@@ -23231,6 +23243,26 @@
             [
               1,
               710
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-033"
+          ]
+        },
+        {
+          "path": "skills/spec-worktree/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-worktree",
+          "shared_consumers": [],
+          "sha256": "ed13432eec8bb6d5c4d73431ff8db16f918b07b70c01d886be09f0d6443a37e2",
+          "bytes": 12851,
+          "line_count": 152,
+          "covered_line_ranges": [
+            [
+              1,
+              152
             ]
           ],
           "read_status": "full",
@@ -23498,26 +23530,6 @@
           ]
         },
         {
-          "path": "skills/spec-write-skill/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-write-skill",
-          "shared_consumers": [],
-          "sha256": "0c47a193000a8f70f75c7b018c3dac86c5d4078bd9d0a4869301ace91a0ae48a",
-          "bytes": 8492,
-          "line_count": 58,
-          "covered_line_ranges": [
-            [
-              1,
-              58
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-034"
-          ]
-        },
-        {
           "path": "skills/spec-write-skill/agents/openai.yaml",
           "path_role": "skill-package",
           "source_kind": "support-asset",
@@ -23538,26 +23550,6 @@
           ]
         },
         {
-          "path": "skills/spec-write-skill/evals/README.md",
-          "path_role": "skill-package",
-          "source_kind": "evaluation",
-          "owning_skill": "spec-write-skill",
-          "shared_consumers": [],
-          "sha256": "98f773d0df9aa624cd5228f70813a1aeb39850c6a17c3f3f8b5d656d218cba37",
-          "bytes": 4988,
-          "line_count": 44,
-          "covered_line_ranges": [
-            [
-              1,
-              44
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-034"
-          ]
-        },
-        {
           "path": "skills/spec-write-skill/evals/export-trigger-evals.cjs",
           "path_role": "skill-package",
           "source_kind": "evaluation",
@@ -23570,6 +23562,26 @@
             [
               1,
               64
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-034"
+          ]
+        },
+        {
+          "path": "skills/spec-write-skill/evals/README.md",
+          "path_role": "skill-package",
+          "source_kind": "evaluation",
+          "owning_skill": "spec-write-skill",
+          "shared_consumers": [],
+          "sha256": "98f773d0df9aa624cd5228f70813a1aeb39850c6a17c3f3f8b5d656d218cba37",
+          "bytes": 4988,
+          "line_count": 44,
+          "covered_line_ranges": [
+            [
+              1,
+              44
             ]
           ],
           "read_status": "full",
@@ -23858,6 +23870,26 @@
           ]
         },
         {
+          "path": "skills/spec-write-skill/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-write-skill",
+          "shared_consumers": [],
+          "sha256": "0c47a193000a8f70f75c7b018c3dac86c5d4078bd9d0a4869301ace91a0ae48a",
+          "bytes": 8492,
+          "line_count": 58,
+          "covered_line_ranges": [
+            [
+              1,
+              58
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-034"
+          ]
+        },
+        {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "path_role": "shared-support",
           "source_kind": "direct-support",
@@ -24063,7 +24095,7 @@
           "path": "tests/unit/plugin-modules.test.js",
           "path_role": "shared-support",
           "source_kind": "direct-support",
-          "owning_skill": null,
+          "owning_skill": "spec-write-skill",
           "shared_consumers": [
             "spec-app-consistency-audit",
             "spec-brainstorm",
@@ -24079,18 +24111,18 @@
             "spec-work",
             "spec-write-skill"
           ],
-          "sha256": "71f3ed50395b55f8465e422a95bce679567620919de045892e9c5e8d4ad051fc",
-          "bytes": 37231,
-          "line_count": 877,
+          "sha256": "958351d78ae7f68836e1a61065b38644a4b4c2074fc68cf8e58025963c217200",
+          "bytes": 37698,
+          "line_count": 888,
           "covered_line_ranges": [
             [
               1,
-              877
+              888
             ]
           ],
           "read_status": "full",
           "review_chunk_ids": [
-            "oai-r3-final-034"
+            "ce-localization-review-delta-2026-08-20-current-source-inline-review-openai-skill-engineering-958351d78ae7"
           ]
         },
         {
@@ -24334,26 +24366,6 @@
           ]
         },
         {
-          "path": "skills/spec-write-tasks/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "dddabe599934d90204a4967fd1a33924393838767d887be74433d7765cbafb3d",
-          "bytes": 10297,
-          "line_count": 139,
-          "covered_line_ranges": [
-            [
-              1,
-              139
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-035"
-          ]
-        },
-        {
           "path": "skills/spec-write-tasks/agents/openai.yaml",
           "path_role": "skill-package",
           "source_kind": "support-asset",
@@ -24366,26 +24378,6 @@
             [
               1,
               7
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-035"
-          ]
-        },
-        {
-          "path": "skills/spec-write-tasks/evals/README.md",
-          "path_role": "skill-package",
-          "source_kind": "evaluation",
-          "owning_skill": "spec-write-tasks",
-          "shared_consumers": [],
-          "sha256": "e6456a3506ca9dff2b246c2133e2c0fc75be7e132b4da5a0245573155cc61435",
-          "bytes": 2697,
-          "line_count": 20,
-          "covered_line_ranges": [
-            [
-              1,
-              20
             ]
           ],
           "read_status": "full",
@@ -24486,6 +24478,26 @@
             [
               1,
               2
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-035"
+          ]
+        },
+        {
+          "path": "skills/spec-write-tasks/evals/README.md",
+          "path_role": "skill-package",
+          "source_kind": "evaluation",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "e6456a3506ca9dff2b246c2133e2c0fc75be7e132b4da5a0245573155cc61435",
+          "bytes": 2697,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
             ]
           ],
           "read_status": "full",
@@ -24606,6 +24618,26 @@
             [
               1,
               323
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-035"
+          ]
+        },
+        {
+          "path": "skills/spec-write-tasks/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "spec-write-tasks",
+          "shared_consumers": [],
+          "sha256": "dddabe599934d90204a4967fd1a33924393838767d887be74433d7765cbafb3d",
+          "bytes": 10297,
+          "line_count": 139,
+          "covered_line_ranges": [
+            [
+              1,
+              139
             ]
           ],
           "read_status": "full",
@@ -25018,26 +25050,6 @@
           ]
         },
         {
-          "path": "skills/using-spec-first/SKILL.md",
-          "path_role": "skill-package",
-          "source_kind": "entry-contract",
-          "owning_skill": "using-spec-first",
-          "shared_consumers": [],
-          "sha256": "0f65e00250fb8a63a57a6b99bfdc0b26c74f9d132fe2bc2e9395ff41b60e69d3",
-          "bytes": 4149,
-          "line_count": 42,
-          "covered_line_ranges": [
-            [
-              1,
-              42
-            ]
-          ],
-          "read_status": "full",
-          "review_chunk_ids": [
-            "oai-r3-final-036"
-          ]
-        },
-        {
           "path": "skills/using-spec-first/references/conditional-routing-boundaries.md",
           "path_role": "skill-package",
           "source_kind": "reference-contract",
@@ -25070,6 +25082,26 @@
             [
               1,
               48
+            ]
+          ],
+          "read_status": "full",
+          "review_chunk_ids": [
+            "oai-r3-final-036"
+          ]
+        },
+        {
+          "path": "skills/using-spec-first/SKILL.md",
+          "path_role": "skill-package",
+          "source_kind": "entry-contract",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "0f65e00250fb8a63a57a6b99bfdc0b26c74f9d132fe2bc2e9395ff41b60e69d3",
+          "bytes": 4149,
+          "line_count": 42,
+          "covered_line_ranges": [
+            [
+              1,
+              42
             ]
           ],
           "read_status": "full",
@@ -25393,7 +25425,14 @@
     "旧 review artifact 仅作 locator；binding receipts、finding quotes 与 dispositions 以 current coverage/source 为准。",
     "full receipt 证明输入身份和完整行区间，不证明每行等强度注意或语义判断正确。",
     "未调用外部 provider，未运行真实 browser/Xcode/feedback/Spiral journey。",
-    "field_outcome、adoption、time-to-trusted-change、review burden、billed token/latency/correction burden 均为 not-run。"
+    "field_outcome、adoption、time-to-trusted-change、review burden、billed token/latency/correction burden 均为 not-run。",
+    "This delta refreshes source-bound receipts for current changed relations and preserves prior semantic lane judgments; it is not independent provider review.",
+    "Provider-authenticated receipt, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run.",
+    "This delta refreshes source-bound receipts and preserves prior semantic lane judgments; it is not independent provider review.",
+    "The added review-scheme document is documentation evidence, not a new Skill/path relation; no semantic lane relation was created or retired.",
+    "This delta covers the new summary-drift regression relation only; it is not a full Skill re-review.",
+    "This delta covers the added lineage-pruning regression relation only; it is not a full Skill re-review.",
+    "This delta covers the closeout regression test relation only; it is not a full Skill re-review."
   ],
   "consumers": [
     "docs/validation/ce-localization/review/round-3-findings.json aggregate owner",
@@ -26724,5 +26763,19 @@
       "latency",
       "correction burden"
     ]
-  }
+  },
+  "review_deltas": [
+    {
+      "review_run_id": "ce-localization-review-delta-2026-08-20-current-source-final-v2",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-08-20-current-source-final-v2-inline-review.json",
+      "artifact_sha256": "a89473307d23931fdbda374b607185aa5081c2ad34051648080538a28dd208ea",
+      "reviewed_at": "2026-08-20T13:59:05.111Z",
+      "review_method": "inline-same-context",
+      "independent": false,
+      "provider_identity": "not-used",
+      "worker_context_isolation": "degraded_inherited",
+      "claim_ceiling": "Source-bound incremental review of the closeout regressions only."
+    }
+  ],
+  "review_delta_findings": []
 }

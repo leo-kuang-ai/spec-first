@@ -473,6 +473,17 @@ function listSkillDirectoryNames(sourceDir) {
   return fs
     .readdirSync(sourceDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
+    .filter((entry) => {
+      const entrypointPath = path.join(sourceDir, entry.name, 'SKILL.md');
+      try {
+        return fs.lstatSync(entrypointPath).isFile();
+      } catch (error) {
+        if (error && (error.code === 'ENOENT' || error.code === 'ENOTDIR')) {
+          return false;
+        }
+        throw error;
+      }
+    })
     .map((entry) => entry.name)
     .sort((a, b) => a.localeCompare(b));
 }

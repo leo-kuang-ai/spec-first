@@ -10,12 +10,46 @@ const producer = require('./check-ce-localization-review.cjs');
 
 const repoRoot = path.resolve(__dirname, '..');
 const root = path.join(repoRoot, 'docs/validation/ce-localization');
+const upstreamInputPath = path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json');
+const upstreamAdjudicationPath = path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json');
 const iso = '2026-08-20T00:00:00.000Z';
 const sha = (value) => crypto.createHash('sha256').update(JSON.stringify(value, null, 2) + '\n').digest('hex');
+const shaBytes = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const write = (file, value) => {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 };
+
+function replaceStaleSnapshotWarning(report, currentBindingNote) {
+  return report.replace(/^> \*\*当前快照失效[\s\S]*?\n\n/m, currentBindingNote);
+}
+
+function refreshReport(deterministic) {
+  const reportPath = path.join(root, 'reports/2026-08-20-ce-localization-full-skill-review.md');
+  if (!fs.existsSync(reportPath)) return;
+  const { inventory, coverage } = deterministic;
+  const snapshot = inventory.source_snapshot;
+  const summary = coverage.coverage_summary;
+  let report = fs.readFileSync(reportPath, 'utf8');
+  const currentBindingNote = `> 本报告绑定当前 target source snapshot：\`source_tree_hash=${snapshot.source_tree_hash}\`、\`dirty_path_manifest_sha256=${snapshot.dirty_path_manifest_sha256}\`。当前 closeout 以 deterministic validator 为准；provider、runtime adoption 和 field outcome 仍受本报告 Claim Ceiling 限制。\n\n`;
+  report = replaceStaleSnapshotWarning(report, currentBindingNote);
+  report = report
+    .replace(/：\d+ 个 canonical Skill、\d+ 个 package path、[\d,]+ bytes，文件缺失 0、inventory hash\/byte mismatch 0；另有 \d+ 条 direct-support relations、\d+ 个 unique direct-support paths。/, `：${inventory.skill_count} 个 canonical Skill、${inventory.package_path_count} 个 package path、${inventory.package_bytes.toLocaleString('en-US')} bytes，文件缺失 0、inventory hash/byte mismatch 0；另有 ${summary.direct_support_relation_count} 条 direct-support relations、${summary.direct_support_unique_path_count} 个 unique direct-support paths。`)
+    .replace(/\| target HEAD \| `[^`]+`/, `| target HEAD | \`${snapshot.head}\``)
+    .replace(/\| canonical Skill \| \d+\/\d+ \|/, `| canonical Skill | ${inventory.skill_count}/${inventory.skill_count} |`)
+    .replace(/\| package path \| \d+\/\d+ \|/, `| package path | ${inventory.package_path_count}/${inventory.package_path_count} |`)
+    .replace(/\| package bytes \| [\d,]+ \|/, `| package bytes | ${inventory.package_bytes.toLocaleString('en-US')} |`)
+    .replace(/\| direct-support relations \| \d+ \|/, `| direct-support relations | ${summary.direct_support_relation_count} |`)
+    .replace(/\| unique direct-support paths \| \d+ \|/, `| unique direct-support paths | ${summary.direct_support_unique_path_count} |`)
+    .replace(/\| source-tree hash \| `[^`]+`/, `| source-tree hash | \`${snapshot.source_tree_hash}\``)
+    .replace(/\| inventory hash \| `[^`]+`/, `| inventory hash | \`${snapshot.inventory_hash}\``)
+    .replace(/\| dirty manifest \| `[^`]+`/, `| dirty manifest | \`${snapshot.dirty_path_manifest_sha256}\``)
+    .replace(/\d+ Skill \/ \d+ package \/ \d+ direct-support \/ \d+ relations/g, `${inventory.skill_count} Skill / ${inventory.package_path_count} package / ${summary.direct_support_unique_path_count} direct-support / ${summary.direct_support_relation_count} relations`);
+  if (!report.includes(`package path | ${inventory.package_path_count}/${inventory.package_path_count}`)) {
+    throw new Error('closeout report template does not contain a replaceable package-path row');
+  }
+  fs.writeFileSync(reportPath, report);
+}
 const strings = (value) => Array.isArray(value) ? value : [value];
 const LOCAL_ONLY_SKILL_IDS = [
   'spec-app-consistency-audit', 'spec-polish', 'spec-prd',
@@ -148,8 +182,8 @@ function scenarioFor([skillId, task, actor, outcome, gain], deterministic) {
   };
 }
 
-function buildCloseout() {
-  const deterministic = producer.buildArtifacts();
+function buildCloseout(upstreamOverride = null, deterministicOverride = null) {
+  const deterministic = deterministicOverride || producer.buildArtifacts();
   const snap = snapshot(deterministic);
   const scenarioRows = skills.map((item) => scenarioFor(item, deterministic));
   scenarioRows.push({
@@ -177,7 +211,9 @@ function buildCloseout() {
   };
   const baselines = skills.map((item) => baselineFor(item[0], deterministic));
   const baselineBySkill = new Map(baselines.map((b) => [b.skill_id, b]));
-  const upstream = producer.readJson ? producer.readJson(path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json')) : JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json')));
+  const upstream = upstreamOverride || (producer.readJson
+    ? producer.readJson(path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json'))
+    : JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json'))));
   const ownerToSkill = new Map(skills.map((item) => [item[0], item[0]]));
   const packageOwner = new Map();
   for (const record of upstream.records) {
@@ -203,135 +239,272 @@ function buildCloseout() {
   return { deterministic, scenariosArtifact, baselines, ledger: { schema_version: 'ce-localization-ledger/v1', artifact_kind: 'source-bound-semantic-adjudication-ledger', producer: 'spec-work-semantic-adjudication-owner', single_writer: 'ce-localization-ledger-writer', source_snapshot: snap, inventory_ref: 'docs/validation/ce-localization/skill-inventory.json', inventory_sha256: sha(deterministic.inventory), scenarios_ref: 'docs/validation/ce-localization/skill-scenarios.json', scenarios_sha256: sha(scenariosArtifact), upstream_adjudication_ref: 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json', upstream_adjudication_sha256: sha(upstream), entries: ledgerEntries, consumers: ['spec-work', 'spec-code-review', 'spec-compound'], claim_ceiling: 'Semantic adjudication is source-bound but not field evidence; local owner decisions are explicit and reversible.' }, fieldProtocol, fieldTaskPairs, fieldResults, knowledgePromotion };
 }
 
-function refreshReviewArtifacts(deterministic) {
-  const reviewRoot = path.join(root, 'review');
-  const snapshot = deterministic.inventory.source_snapshot;
-  const inventory = deterministic.inventory;
-  const coverage = deterministic.coverage.coverage_summary;
-  const inventorySha = sha(inventory);
-  const packageFacts = new Map(deterministic.coverage.package_files.map((item) => [item.path, item]));
-  const directFacts = new Map();
-  for (const item of deterministic.coverage.direct_support) {
-    if (!directFacts.has(item.path)) directFacts.set(item.path, item);
-  }
-  const packageFactsBySkill = new Map();
-  for (const item of deterministic.coverage.package_files) {
-    if (!packageFactsBySkill.has(item.skill_id)) packageFactsBySkill.set(item.skill_id, []);
-    packageFactsBySkill.get(item.skill_id).push(item);
-  }
-  const supportFactsBySkill = new Map();
-  for (const item of deterministic.coverage.direct_support) {
-    if (!supportFactsBySkill.has(item.skill_id)) supportFactsBySkill.set(item.skill_id, []);
-    supportFactsBySkill.get(item.skill_id).push(item);
-  }
-  const refreshReceipt = (receipt) => {
-    const fact = packageFacts.get(receipt.path) || directFacts.get(receipt.path);
-    if (!fact) throw new Error(`review receipt path missing from current coverage: ${receipt.path}`);
-    return {
-      ...receipt,
-      sha256: fact.sha256,
-      bytes: fact.bytes,
-      line_count: fact.line_count,
-      covered_line_ranges: [[1, fact.line_count]],
-      read_status: 'full',
-    };
+function reviewFactsBySkill(deterministic) {
+  const bySkill = new Map();
+  const add = (fact, sourceKind) => {
+    if (!bySkill.has(fact.skill_id)) bySkill.set(fact.skill_id, new Map());
+    bySkill.get(fact.skill_id).set(fact.path, { ...fact, source_kind: sourceKind });
   };
-  const update = (file, fn) => {
-    const filePath = path.join(reviewRoot, file);
-    const value = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    fn(value);
-    write(filePath, value);
-  };
-  update('round-1-findings.json', (value) => {
-    value.source_snapshot = snapshot;
-    value.claim_ceiling = Array.isArray(value.claim_ceiling) ? value.claim_ceiling.join('; ') : String(value.claim_ceiling || 'Source-bound findings only.');
-    if (value.coverage_summary) {
-      value.coverage_summary.expected_package_path_count = inventory.package_path_count;
-      value.coverage_summary.reviewed_package_path_count = inventory.package_path_count;
+  for (const fact of deterministic.coverage.package_files) add(fact, 'skill-package');
+  for (const fact of deterministic.coverage.direct_support) add(fact, 'direct-support');
+  return bySkill;
+}
+
+function collectReviewGaps(review, deterministic) {
+  const factsBySkill = reviewFactsBySkill(deterministic);
+  const currentSkillIds = deterministic.inventory.skills.map((entry) => entry.skill_id).sort();
+  const reviewsBySkill = new Map((review.skill_reviews || []).map((entry) => [entry.skill_id, entry]));
+  const actualSkillIds = [...reviewsBySkill.keys()].sort();
+  if (JSON.stringify(actualSkillIds) !== JSON.stringify(currentSkillIds)) {
+    throw new Error(`${review.review_lane_id}: semantic review delta cannot create or retire an entire Skill review; run a full current-source lane review`);
+  }
+
+  const gaps = [];
+  for (const skillId of currentSkillIds) {
+    const expected = factsBySkill.get(skillId) || new Map();
+    const skillReview = reviewsBySkill.get(skillId);
+    const receipts = skillReview.source_read_receipts || [];
+    const actual = new Map();
+    for (const receipt of receipts) {
+      if (actual.has(receipt.path)) {
+        gaps.push({ issue: 'duplicate', skill_id: skillId, path: receipt.path, receipt });
+      }
+      actual.set(receipt.path, receipt);
     }
-  });
-  update('round-2-findings.json', (value) => {
-    value.source_snapshot = snapshot;
-    value.claim_ceiling = Array.isArray(value.claim_ceiling) ? value.claim_ceiling.join('; ') : String(value.claim_ceiling || 'Source-bound findings only.');
-    if (value.coverage_summary) {
-      value.coverage_summary.expected_package_path_count = inventory.package_path_count;
-      value.coverage_summary.reviewed_package_path_count = inventory.package_path_count;
+    for (const [sourcePath, fact] of expected) {
+      const receipt = actual.get(sourcePath);
+      if (!receipt) {
+        gaps.push({ issue: 'missing', skill_id: skillId, path: sourcePath, fact });
+      } else if (receipt.sha256 !== fact.sha256
+        || receipt.bytes !== fact.bytes
+        || receipt.line_count !== fact.line_count
+        || JSON.stringify(receipt.covered_line_ranges) !== JSON.stringify([[1, fact.line_count]])
+        || receipt.read_status !== 'full') {
+        gaps.push({ issue: 'stale', skill_id: skillId, path: sourcePath, fact, receipt });
+      }
     }
-  });
-  for (const file of ['round-3-openai-skill-lens-final.json', 'round-3-anthropic-skill-lens-final.json']) {
-    update(file, (value) => {
-      value.source_snapshot = snapshot;
-      value.inventory_hash = snapshot.inventory_hash;
-      value.inventory_artifact_sha256 = inventorySha;
-      value.expected_package_path_count = inventory.package_path_count;
-      value.reviewed_package_path_count = inventory.package_path_count;
-      value.expected_direct_support_path_count = coverage.direct_support_unique_path_count;
-      value.reviewed_direct_support_path_count = coverage.direct_support_unique_path_count;
-      value.expected_direct_support_relation_count = coverage.direct_support_relation_count;
-      value.reviewed_direct_support_relation_count = coverage.direct_support_relation_count;
-      for (const skillReview of value.skill_reviews || []) {
-        const refreshed = (skillReview.source_read_receipts || []).map(refreshReceipt);
-        const seen = new Set(refreshed.map((receipt) => receipt.path));
-        const missingFacts = [
-          ...(packageFactsBySkill.get(skillReview.skill_id) || []),
-          ...(supportFactsBySkill.get(skillReview.skill_id) || []),
-        ].filter((fact) => !seen.has(fact.path));
-        skillReview.source_read_receipts = refreshed.concat(missingFacts.map((fact) => ({
+    for (const receipt of receipts) {
+      if (!expected.has(receipt.path)) {
+        gaps.push({ issue: 'retired', skill_id: skillId, path: receipt.path, receipt });
+      }
+    }
+  }
+  return gaps;
+}
+
+function assertReviewDeltaPath(deltaPath) {
+  const resolved = path.resolve(deltaPath);
+  const relative = path.relative(repoRoot, resolved).split(path.sep).join('/');
+  if (relative.startsWith('../')
+    || path.isAbsolute(relative)
+    || !relative.startsWith('docs/validation/ce-localization/review/deltas/')) {
+    throw new Error('review delta must be a repo-contained artifact under docs/validation/ce-localization/review/deltas/');
+  }
+  const stat = fs.lstatSync(resolved);
+  if (!stat.isFile()) throw new Error('review delta must be a regular non-symlink file');
+  return { resolved, relative };
+}
+
+function reviewRelationKey(skillId, sourcePath) {
+  return `${skillId}\0${sourcePath}`;
+}
+
+function exactRelationSet(entries) {
+  return [...new Set(entries.map((entry) => reviewRelationKey(entry.skill_id, entry.path)))].sort();
+}
+
+function displayRelations(relations) {
+  return relations.map((entry) => entry.replace('\0', ':')).join(', ') || '(none)';
+}
+
+function assertDeltaCoversGaps(delta, laneGaps) {
+  const currentGapRelations = exactRelationSet(laneGaps.filter((gap) => gap.issue !== 'retired'));
+  const retiredGapRelations = exactRelationSet(laneGaps.filter((gap) => gap.issue === 'retired'));
+  const reviewedRelations = [...new Set(delta.reviewed_paths.flatMap((entry) => entry.skill_ids
+    .map((skillId) => reviewRelationKey(skillId, entry.path))))].sort();
+  const retiredRelations = exactRelationSet(delta.retired_relations);
+  if (JSON.stringify(currentGapRelations) !== JSON.stringify(reviewedRelations)) {
+    throw new Error(`review delta current relations do not match receipt gaps: expected ${displayRelations(currentGapRelations)}`);
+  }
+  if (JSON.stringify(retiredGapRelations) !== JSON.stringify(retiredRelations)) {
+    throw new Error(`review delta retired relations do not match receipt gaps: expected ${displayRelations(retiredGapRelations)}`);
+  }
+}
+
+function pruneReviewDeltaLineage(review, deterministic) {
+  const refs = Array.isArray(review.review_deltas) ? review.review_deltas : [];
+  if (refs.length === 0) return review;
+
+  const retained = [];
+  for (const deltaRef of refs) {
+    const location = assertReviewDeltaPath(deltaRef.artifact_ref);
+    const deltaBytes = fs.readFileSync(location.resolved);
+    if (shaBytes(deltaBytes) !== deltaRef.artifact_sha256) {
+      throw new Error(`${review.review_lane_id}: review delta artifact hash mismatch for ${deltaRef.artifact_ref}`);
+    }
+    let delta;
+    try {
+      delta = JSON.parse(deltaBytes.toString('utf8'));
+    } catch (error) {
+      throw new Error(`${review.review_lane_id}: review delta artifact is not valid JSON: ${deltaRef.artifact_ref}`);
+    }
+    const validation = producer.validateReviewDeltaArtifact(delta, deterministic);
+    if (validation.valid) {
+      retained.push(deltaRef);
+      continue;
+    }
+    const onlySourceFreshnessDrift = validation.errors.length > 0
+      && validation.errors.every((error) => (
+        error === 'reviewDelta: source_binding does not match the current deterministic review input'
+        || /^reviewDelta: current source facts are stale for .+$/.test(error)
+        || /^reviewDelta: .+ does not cover \[1,line_count\]$/.test(error)
+      ));
+    if (!onlySourceFreshnessDrift) {
+      throw new Error(`${review.review_lane_id}: review delta validation failed for ${deltaRef.artifact_ref}:\n${validation.errors.join('\n')}`);
+    }
+  }
+
+  if (retained.length === refs.length) return review;
+  if (retained.length === 0) {
+    delete review.review_deltas;
+    delete review.review_delta_findings;
+    if (String(review.review_status).includes('incremental')) {
+      review.review_status = 'complete-current-source';
+      review.coverage_status = 'complete-current-source';
+    }
+    return review;
+  }
+  review.review_deltas = retained;
+  return review;
+}
+
+function mergeReviewDelta(review, deterministic, delta = null, deltaRef = null) {
+  if (delta) {
+    const validation = producer.validateReviewDeltaArtifact(delta, deterministic);
+    if (!validation.valid) {
+      throw new Error(`review delta validation failed:\n${validation.errors.join('\n')}`);
+    }
+  }
+  const merged = JSON.parse(JSON.stringify(review));
+  const factsBySkill = reviewFactsBySkill(deterministic);
+  const deltaPaths = new Map((delta ? delta.reviewed_paths : []).map((entry) => [entry.path, entry]));
+  const retiredRelations = new Map((delta ? delta.retired_relations : [])
+    .map((entry) => [reviewRelationKey(entry.skill_id, entry.path), entry]));
+  const lens = merged.review_lens;
+
+  for (const skillReview of merged.skill_reviews || []) {
+    const expected = factsBySkill.get(skillReview.skill_id) || new Map();
+    const existing = new Map((skillReview.source_read_receipts || []).map((receipt) => [receipt.path, receipt]));
+    for (const [sourcePath, receipt] of existing) {
+      if (expected.has(sourcePath)) continue;
+      const retirement = retiredRelations.get(reviewRelationKey(skillReview.skill_id, sourcePath));
+      if (!retirement || retirement.prior_sha256 !== receipt.sha256
+        || !retirement.lens_verdicts.some((verdict) => verdict.review_lens === lens)) {
+        throw new Error(`${merged.review_lane_id}: retired receipt lacks a matching semantic delta for ${skillReview.skill_id}:${sourcePath}`);
+      }
+    }
+
+    skillReview.source_read_receipts = [...expected.values()]
+      .sort((left, right) => left.path.localeCompare(right.path))
+      .map((fact) => {
+        const receipt = existing.get(fact.path);
+        const current = receipt
+          && receipt.sha256 === fact.sha256
+          && receipt.bytes === fact.bytes
+          && receipt.line_count === fact.line_count
+          && JSON.stringify(receipt.covered_line_ranges) === JSON.stringify([[1, fact.line_count]])
+          && receipt.read_status === 'full';
+        if (current) return receipt;
+        const reviewed = deltaPaths.get(fact.path);
+        if (!reviewed
+          || !reviewed.skill_ids.includes(skillReview.skill_id)
+          || !reviewed.lens_verdicts.some((verdict) => verdict.review_lens === lens)) {
+          throw new Error(`${merged.review_lane_id}: current receipt lacks a matching semantic delta for ${skillReview.skill_id}:${fact.path}`);
+        }
+        return {
+          ...(receipt || {}),
           path: fact.path,
-          path_role: fact.path_role,
-          source_kind: fact.path_role === 'skill-package' ? 'skill-package' : 'direct-support',
+          path_role: receipt && receipt.path_role
+            ? receipt.path_role
+            : (fact.source_kind === 'skill-package' ? 'skill-package' : 'direct-support'),
+          source_kind: fact.source_kind,
           owning_skill: fact.owning_skill || skillReview.skill_id,
-          shared_consumers: fact.shared_consumers || [],
+          shared_consumers: receipt && Array.isArray(receipt.shared_consumers) ? receipt.shared_consumers : [],
           sha256: fact.sha256,
           bytes: fact.bytes,
           line_count: fact.line_count,
           covered_line_ranges: [[1, fact.line_count]],
+          review_chunk_ids: [`${delta.review_run_id}-${lens}-${fact.sha256.slice(0, 12)}`],
           read_status: 'full',
-          review_chunk_ids: [`${value.review_lane_id}-supplemental-${seen.size + 1}`],
-        })));
-      }
-      value.review_input_hash = sha(deterministic.coverage.review_input);
-      value.chunk_manifest_hash = sha((value.skill_reviews || []).map((skillReview) => ({
-        skill_id: skillReview.skill_id,
-        receipts: (skillReview.source_read_receipts || []).map((receipt) => ({
-          path: receipt.path,
-          sha256: receipt.sha256,
-          covered_line_ranges: receipt.covered_line_ranges,
-        })),
-      })));
-    });
+        };
+      });
   }
-  const openai = JSON.parse(fs.readFileSync(path.join(reviewRoot, 'round-3-openai-skill-lens-final.json'), 'utf8'));
-  const anthropic = JSON.parse(fs.readFileSync(path.join(reviewRoot, 'round-3-anthropic-skill-lens-final.json'), 'utf8'));
+
+  const snapshot = deterministic.inventory.source_snapshot;
+  const coverage = deterministic.coverage.coverage_summary;
+  merged.source_snapshot = snapshot;
+  merged.inventory_hash = snapshot.inventory_hash;
+  merged.inventory_artifact_sha256 = sha(deterministic.inventory);
+  merged.expected_skill_count = deterministic.inventory.skill_count;
+  merged.reviewed_skill_count = deterministic.inventory.skill_count;
+  merged.expected_package_path_count = deterministic.inventory.package_path_count;
+  merged.reviewed_package_path_count = deterministic.inventory.package_path_count;
+  merged.expected_direct_support_path_count = coverage.direct_support_unique_path_count;
+  merged.reviewed_direct_support_path_count = coverage.direct_support_unique_path_count;
+  merged.expected_direct_support_relation_count = coverage.direct_support_relation_count;
+  merged.reviewed_direct_support_relation_count = coverage.direct_support_relation_count;
+  merged.review_input_hash = sha(deterministic.coverage.review_input);
+  merged.chunk_manifest_hash = sha(producer.reviewChunkManifest(merged));
+  if (merged.finding_summary) {
+    merged.finding_summary = producer.reviewFindingSummary(merged, deterministic.inventory.skill_count);
+  }
+
+  if (delta && deltaRef) {
+    merged.generated_at = delta.reviewed_at;
+    merged.review_status = 'complete-with-incremental-review';
+    merged.coverage_status = 'complete-current-source-with-incremental-review';
+    merged.review_deltas = [
+      ...(merged.review_deltas || []).filter((entry) => entry.review_run_id !== delta.review_run_id),
+      deltaRef,
+    ];
+    merged.review_delta_findings = delta.findings.filter((finding) => finding.review_lens === lens);
+    merged.limitations = [...new Set([...(merged.limitations || []), ...delta.limitations])];
+  }
+  return merged;
+}
+
+function buildRound3Aggregate(deterministic, openai, anthropic, delta = null) {
+  const snapshot = deterministic.inventory.source_snapshot;
+  const inventory = deterministic.inventory;
+  const inventorySha = sha(inventory);
   const laneFindings = [
     ...(openai.current_findings || []),
     ...(anthropic.skill_reviews || []).flatMap((skillReview) => skillReview.findings || []),
+    ...((delta && delta.findings) || []).map((finding) => ({
+      ...finding,
+      owner: `skills/${finding.skill_id}`,
+      source_ref: finding.source_refs[0],
+      resolution_evidence_refs: finding.source_refs,
+      decision: finding.status,
+      claim_ceiling: delta.claim_ceiling,
+      limitations: delta.limitations,
+    })),
   ];
-  const aggregate = {
+  return {
     schema_version: 'ce-localization-round-3-findings/v1',
     artifact_kind: 'cross-lens-calibration',
     producer: 'serialized round-3 aggregation owner',
     source_snapshot: snapshot,
     inventory_manifest_sha256: inventorySha,
     dirty_manifest_sha256: snapshot.dirty_path_manifest_sha256,
-    review_lanes: [
-      {
-        review_lane_id: openai.review_lane_id,
-        review_lens: openai.review_lens,
-        role_representation: openai.role_representation,
-        provider_identity: openai.provider_identity,
-        worker_context_isolation: openai.worker_context_isolation,
-        coverage_status: openai.coverage_status,
-      },
-      {
-        review_lane_id: anthropic.review_lane_id,
-        review_lens: anthropic.review_lens,
-        role_representation: anthropic.role_representation,
-        provider_identity: anthropic.provider_identity,
-        worker_context_isolation: anthropic.worker_context_isolation,
-        coverage_status: anthropic.coverage_status,
-      },
-    ],
+    review_lanes: [openai, anthropic].map((lane) => ({
+      review_lane_id: lane.review_lane_id,
+      review_lens: lane.review_lens,
+      role_representation: lane.role_representation,
+      provider_identity: lane.provider_identity,
+      worker_context_isolation: lane.worker_context_isolation,
+      coverage_status: lane.coverage_status,
+    })),
     findings: laneFindings.map((finding) => ({
       finding_id: finding.finding_id,
       skill_id: finding.skill_id,
@@ -357,29 +530,89 @@ function refreshReviewArtifacts(deterministic) {
     ],
     claim_ceiling: 'Current source-bound role-simulated review aggregation only; no external provider identity, runtime isolation, generated runtime, or field outcome claim.',
   };
-  write(path.join(reviewRoot, 'round-3-findings.json'), aggregate);
-  const reportPath = path.join(root, 'reports/2026-08-20-ce-localization-full-skill-review.md');
-  if (fs.existsSync(reportPath)) {
-    let report = fs.readFileSync(reportPath, 'utf8');
-    report = report.replaceAll('566', String(inventory.package_path_count));
-    report = report.replaceAll('5,756,855', inventory.package_bytes.toLocaleString('en-US'));
-    fs.writeFileSync(reportPath, report);
+}
+
+function prepareReviewArtifacts(deterministic, reviewDeltaPath = null) {
+  const reviewRoot = path.join(root, 'review');
+  const openaiSource = JSON.parse(fs.readFileSync(path.join(reviewRoot, 'round-3-openai-skill-lens-final.json'), 'utf8'));
+  const anthropicSource = JSON.parse(fs.readFileSync(path.join(reviewRoot, 'round-3-anthropic-skill-lens-final.json'), 'utf8'));
+  const laneGaps = [
+    ...collectReviewGaps(openaiSource, deterministic),
+    ...collectReviewGaps(anthropicSource, deterministic),
+  ];
+  const semanticGapRelations = exactRelationSet(laneGaps);
+  let delta = null;
+  let deltaRef = null;
+  if (semanticGapRelations.length > 0 && !reviewDeltaPath) {
+    throw new Error(`current review receipts require an explicit semantic delta for: ${displayRelations(semanticGapRelations)}`);
   }
+  if (reviewDeltaPath) {
+    const deltaLocation = assertReviewDeltaPath(reviewDeltaPath);
+    const deltaBytes = fs.readFileSync(deltaLocation.resolved);
+    delta = JSON.parse(deltaBytes.toString('utf8'));
+    const validation = producer.validateReviewDeltaArtifact(delta, deterministic);
+    if (!validation.valid) {
+      throw new Error(`review delta validation failed:\n${validation.errors.join('\n')}`);
+    }
+    assertDeltaCoversGaps(delta, laneGaps);
+    deltaRef = {
+      review_run_id: delta.review_run_id,
+      artifact_ref: deltaLocation.relative,
+      artifact_sha256: shaBytes(deltaBytes),
+      reviewed_at: delta.reviewed_at,
+      ...delta.execution_context,
+      claim_ceiling: delta.claim_ceiling,
+    };
+  }
+
+  const openai = mergeReviewDelta(openaiSource, deterministic, delta, deltaRef);
+  const anthropic = mergeReviewDelta(anthropicSource, deterministic, delta, deltaRef);
+  pruneReviewDeltaLineage(openai, deterministic);
+  pruneReviewDeltaLineage(anthropic, deterministic);
+  return {
+    openai,
+    anthropic,
+    aggregate: buildRound3Aggregate(deterministic, openai, anthropic, delta),
+  };
 }
 
-function rebindUpstreamAdjudication() {
-  const inputPath = path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json');
-  const adjudicationPath = path.join(repoRoot, 'docs/validation/2026-08-19-ce-post-3-20-adjudication.json');
-  const input = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
-  const adjudication = JSON.parse(fs.readFileSync(adjudicationPath, 'utf8'));
-  adjudication.target_source_snapshot = input.target_source_snapshot;
-  adjudication.input_artifact_sha256 = sha(input);
-  write(adjudicationPath, adjudication);
+function assertCurrentUpstreamBinding(input, adjudication, deterministic) {
+  const currentSnapshot = deterministic.inventory.source_snapshot;
+  if (JSON.stringify(input.target_source_snapshot) !== JSON.stringify(currentSnapshot)) {
+    throw new Error('upstream adjudication input is stale; refresh deterministic input and complete an LLM adjudication before closeout');
+  }
+  if (JSON.stringify(adjudication.target_source_snapshot) !== JSON.stringify(currentSnapshot)
+    || adjudication.input_artifact_sha256 !== sha(input)) {
+    throw new Error('upstream adjudication is stale; scripts cannot rebind an LLM adjudication to the current source snapshot');
+  }
+  return adjudication;
 }
 
-function main() {
-  rebindUpstreamAdjudication();
-  const closeout = buildCloseout();
+function loadCurrentUpstreamAdjudication(deterministic) {
+  const input = JSON.parse(fs.readFileSync(upstreamInputPath, 'utf8'));
+  const adjudication = JSON.parse(fs.readFileSync(upstreamAdjudicationPath, 'utf8'));
+  return assertCurrentUpstreamBinding(input, adjudication, deterministic);
+}
+
+function parseArgs(argv) {
+  const args = { reviewDeltaPath: null };
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (token !== '--review-delta') throw new Error(`Unknown argument: ${token}`);
+    const value = argv[index + 1];
+    if (!value) throw new Error('--review-delta requires a path');
+    args.reviewDeltaPath = path.resolve(value);
+    index += 1;
+  }
+  return args;
+}
+
+function main(argv = process.argv.slice(2)) {
+  const args = parseArgs(argv);
+  const deterministic = producer.buildArtifacts();
+  const upstream = loadCurrentUpstreamAdjudication(deterministic);
+  const closeout = buildCloseout(upstream, deterministic);
+  const reviews = prepareReviewArtifacts(closeout.deterministic, args.reviewDeltaPath);
   write(path.join(root, 'skill-scenarios.json'), closeout.scenariosArtifact);
   for (const baseline of closeout.baselines) write(path.join(root, 'baseline', `${baseline.skill_id}.json`), baseline);
   write(path.join(root, 'localization-ledger.json'), closeout.ledger);
@@ -387,8 +620,29 @@ function main() {
   write(path.join(root, 'field-validation/task-pairs.json'), closeout.fieldTaskPairs);
   write(path.join(root, 'field-validation/results.json'), closeout.fieldResults);
   write(path.join(root, 'knowledge-promotion/promotion-ledger.json'), closeout.knowledgePromotion);
-  refreshReviewArtifacts(closeout.deterministic);
-  process.stdout.write(JSON.stringify({ ok: true, scenarios: closeout.scenariosArtifact.scenarios.length, path_coverage: closeout.scenariosArtifact.path_coverage.length, baselines: closeout.baselines.length, ledger: closeout.ledger.entries.length, field: 'not-run', knowledge: 'not-run' }) + '\n');
+  write(path.join(root, 'review/round-3-openai-skill-lens-final.json'), reviews.openai);
+  write(path.join(root, 'review/round-3-anthropic-skill-lens-final.json'), reviews.anthropic);
+  write(path.join(root, 'review/round-3-findings.json'), reviews.aggregate);
+  refreshReport(closeout.deterministic);
+  process.stdout.write(JSON.stringify({
+    ok: true,
+    scenarios: closeout.scenariosArtifact.scenarios.length,
+    path_coverage: closeout.scenariosArtifact.path_coverage.length,
+    baselines: closeout.baselines.length,
+    ledger: closeout.ledger.entries.length,
+    review_delta: args.reviewDeltaPath ? path.relative(repoRoot, args.reviewDeltaPath) : null,
+    field: 'not-run',
+    knowledge: 'not-run',
+  }) + '\n');
 }
 if (require.main === module) main();
-module.exports = { buildCloseout };
+module.exports = {
+  assertCurrentUpstreamBinding,
+  buildCloseout,
+  collectReviewGaps,
+  main,
+  mergeReviewDelta,
+  pruneReviewDeltaLineage,
+  prepareReviewArtifacts,
+  replaceStaleSnapshotWarning,
+};

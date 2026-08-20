@@ -1,0 +1,30 @@
+{
+  "date": "20260820-173640",
+  "models": {
+    "sonnet": "claude-sonnet-5"
+  },
+  "claude": "2.1.234 (Claude Code)",
+  "results": [
+    {
+      "task": "trace-transfer",
+      "arm": "baseline",
+      "model": "sonnet",
+      "correct": 1,
+      "safe": 1,
+      "reason": "fixed shared _debit (withdraw guarded too)",
+      "files": 1,
+      "src_files": 1,
+      "total_loc": 18,
+      "src_loc": 18,
+      "test_files": 0,
+      "test_loc": 0,
+      "cost": 0.27363105,
+      "duration_ms": 40653,
+      "turns": 3,
+      "denials": 0,
+      "out_tokens": 612,
+      "in_tokens": 11618,
+      "cache_tokens": 232121
+    }
+  ]
+}

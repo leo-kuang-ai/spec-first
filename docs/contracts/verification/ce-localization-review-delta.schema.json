@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-review-delta/v1",
+  "title": "Source-bound semantic delta for CE localization review receipts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_kind",
+    "review_run_id",
+    "producer",
+    "reviewed_at",
+    "source_binding",
+    "execution_context",
+    "reviewed_paths",
+    "retired_relations",
+    "findings",
+    "limitations",
+    "claim_ceiling"
+  ],
+  "properties": {
+    "schema_version": { "const": "ce-localization-review-delta/v1" },
+    "artifact_kind": { "const": "source-bound-semantic-review-delta" },
+    "review_run_id": { "type": "string", "minLength": 1 },
+    "producer": { "type": "string", "minLength": 1 },
+    "reviewed_at": { "type": "string", "format": "date-time" },
+    "source_binding": { "$ref": "#/$defs/sourceBinding" },
+    "execution_context": { "$ref": "#/$defs/executionContext" },
+    "reviewed_paths": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reviewedPath" }
+    },
+    "retired_relations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/retiredRelation" }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "gitOid": { "type": "string", "pattern": "^[a-f0-9]{40,64}$" },
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "sourceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "head",
+        "dirty_path_manifest_sha256",
+        "source_tree_hash",
+        "inventory_hash",
+        "inventory_artifact_sha256",
+        "review_input_hash"
+      ],
+      "properties": {
+        "head": { "$ref": "#/$defs/gitOid" },
+        "dirty_path_manifest_sha256": { "$ref": "#/$defs/sha256" },
+        "source_tree_hash": { "$ref": "#/$defs/sha256" },
+        "inventory_hash": { "$ref": "#/$defs/sha256" },
+        "inventory_artifact_sha256": { "$ref": "#/$defs/sha256" },
+        "review_input_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "executionContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_method",
+        "independent",
+        "provider_identity",
+        "worker_context_isolation"
+      ],
+      "properties": {
+        "review_method": { "const": "inline-same-context" },
+        "independent": { "const": false },
+        "provider_identity": { "enum": ["unverified", "not-used"] },
+        "worker_context_isolation": { "enum": ["degraded_inherited", "unknown"] }
+      }
+    },
+    "lensVerdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["review_lens", "review_status", "verdict", "notes", "limitations"],
+      "properties": {
+        "review_lens": { "enum": ["openai-skill-engineering", "anthropic-skill-craft-safety"] },
+        "review_status": { "const": "complete" },
+        "verdict": { "enum": ["no-new-actionable-finding", "actionable-finding-recorded"] },
+        "notes": { "$ref": "#/$defs/nonEmptyStrings" },
+        "limitations": { "$ref": "#/$defs/nonEmptyStrings" }
+      }
+    },
+    "reviewedPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "skill_ids",
+        "sha256",
+        "bytes",
+        "line_count",
+        "covered_line_ranges",
+        "lens_verdicts"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "skill_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "line_count": { "type": "integer", "minimum": 0 },
+        "covered_line_ranges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "integer", "minimum": 1 },
+              { "type": "integer", "minimum": 0 }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "lens_verdicts": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/lensVerdict" }
+        }
+      }
+    },
+    "retiredRelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_id", "path", "prior_sha256", "lens_verdicts"],
+      "properties": {
+        "skill_id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "prior_sha256": { "$ref": "#/$defs/sha256" },
+        "lens_verdicts": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/lensVerdict" }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "review_lens", "skill_id", "severity", "title", "status", "source_refs"],
+      "properties": {
+        "finding_id": { "type": "string", "minLength": 1 },
+        "review_lens": { "enum": ["openai-skill-engineering", "anthropic-skill-craft-safety"] },
+        "skill_id": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["P0", "P1", "P2", "P3"] },
+        "title": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["open", "resolved", "accepted-residual", "not-applicable"] },
+        "source_refs": { "$ref": "#/$defs/nonEmptyStrings" }
+      }
+    }
+  }
+}

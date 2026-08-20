@@ -1,0 +1,40 @@
+[
+  {
+    "task": "trace-transfer",
+    "arm": "baseline",
+    "model": "sonnet",
+    "n": 5,
+    "n_api_failed": 1,
+    "safe_rate": 0.6,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 17,
+    "src_loc_median": 17,
+    "total_loc_max": 23,
+    "src_files_median": 1,
+    "wrote_tests_rate": 0.2,
+    "cost_mean": 0.3309,
+    "out_tokens_mean": 768,
+    "total_tokens_mean": 215424,
+    "time_s_mean": 91.3
+  },
+  {
+    "task": "trace-transfer",
+    "arm": "spec-debug",
+    "model": "sonnet",
+    "n": 6,
+    "n_api_failed": 0,
+    "safe_rate": 0.5,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 16.5,
+    "src_loc_median": 16.5,
+    "total_loc_max": 23,
+    "src_files_median": 1.0,
+    "wrote_tests_rate": 0.5,
+    "cost_mean": 0.6684,
+    "out_tokens_mean": 949,
+    "total_tokens_mean": 293670,
+    "time_s_mean": 67.3
+  }
+]

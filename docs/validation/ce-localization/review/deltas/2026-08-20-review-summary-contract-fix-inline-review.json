@@ -1,0 +1,54 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-review-delta-2026-08-20-review-summary-contract-fix",
+  "producer": "current-session inline source review",
+  "reviewed_at": "2026-08-20T21:00:00.000Z",
+  "source_binding": {
+    "head": "741175a23615e37382ce65ec1e0448abfa214e95",
+    "dirty_path_manifest_sha256": "7b3689b9c4f84455e290d329eb9a67e87c5104eebf0d040ad1c6ca8205129483",
+    "source_tree_hash": "78ea2140f8674bf405b746c7dc1cc20b2700c47d99441e75bd91dfb07832b8fa",
+    "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
+    "inventory_artifact_sha256": "08b10fe6182e4c32ad67867886095c853eba7a44b0b84c096ecc501266b5034a",
+    "review_input_hash": "5003e985315947f7bd328148c205ceb4c2731e644a15f8196b4114c6fb4c9da5"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+      "skill_ids": ["spec-compound"],
+      "sha256": "0362aaf1a0cf1bf7504ebd821efa3434fdaeab8849e8b37be959a7411a38e17f",
+      "bytes": 13073,
+      "line_count": 320,
+      "covered_line_ranges": [[1, 320]],
+      "lens_verdicts": [
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": ["The added regression asserts stale finding summaries fail closed and does not widen mutation or provider authority."],
+          "limitations": ["Inline same-context review is not independent provider evidence."]
+        },
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": ["The focused test covers the new producer invariant without changing the existing closeout behavior contract."],
+          "limitations": ["Inline same-context review is not independent provider evidence."]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "This delta covers the new summary-drift regression relation only; it is not a full Skill re-review.",
+    "Provider-authenticated receipt, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run."
+  ],
+  "claim_ceiling": "Source-bound incremental review of the closeout summary-drift regression only."
+}

@@ -116,6 +116,17 @@ describe('plugin module facade and governance', () => {
     expect(() => plugin.buildFilteredAssetSet('unknown')).toThrow('Unknown platform');
   });
 
+  test('enumerates only real bundled Skill packages', () => {
+    const skillsRoot = path.join(__dirname, '../../skills');
+    const bundledSkills = plugin.listBundledSkills();
+
+    expect(bundledSkills).not.toContain('_shared');
+    expect(fs.existsSync(path.join(skillsRoot, '_shared', 'README.md'))).toBe(true);
+    for (const skillName of bundledSkills) {
+      expect(fs.lstatSync(path.join(skillsRoot, skillName, 'SKILL.md')).isFile()).toBe(true);
+    }
+  });
+
   test('derives internal delivery only from skills governance', () => {
     const governance = plugin.loadSkillsGovernance();
     const source = fs.readFileSync(

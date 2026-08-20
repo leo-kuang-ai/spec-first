@@ -1,0 +1,40 @@
+[
+  {
+    "task": "trace-amount",
+    "arm": "baseline",
+    "model": "sonnet",
+    "n": 6,
+    "n_api_failed": 0,
+    "safe_rate": 1.0,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 10.0,
+    "src_loc_median": 10.0,
+    "total_loc_max": 10,
+    "src_files_median": 1.0,
+    "wrote_tests_rate": 0.167,
+    "cost_mean": 0.3745,
+    "out_tokens_mean": 508,
+    "total_tokens_mean": 243322,
+    "time_s_mean": 36.1
+  },
+  {
+    "task": "trace-amount",
+    "arm": "spec-debug",
+    "model": "sonnet",
+    "n": 6,
+    "n_api_failed": 0,
+    "safe_rate": 0.5,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 10.0,
+    "src_loc_median": 10.0,
+    "total_loc_max": 10,
+    "src_files_median": 1.0,
+    "wrote_tests_rate": 0.333,
+    "cost_mean": 0.3421,
+    "out_tokens_mean": 906,
+    "total_tokens_mean": 231367,
+    "time_s_mean": 39.4
+  }
+]

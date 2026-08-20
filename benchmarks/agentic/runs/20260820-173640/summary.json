@@ -1,0 +1,20 @@
+[
+  {
+    "task": "trace-transfer",
+    "arm": "baseline",
+    "model": "sonnet",
+    "n": 1,
+    "safe_rate": 1.0,
+    "correct_rate": 1.0,
+    "wrote_file_rate": 1.0,
+    "total_loc_median": 18,
+    "src_loc_median": 18,
+    "total_loc_max": 18,
+    "src_files_median": 1,
+    "wrote_tests_rate": 0.0,
+    "cost_mean": 0.2736,
+    "out_tokens_mean": 612,
+    "total_tokens_mean": 244351,
+    "time_s_mean": 40.7
+  }
+]

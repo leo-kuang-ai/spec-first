@@ -43,8 +43,8 @@ Check the invocation arguments supplied by the current host for the exact `mode:
 
 | Mode | When | Behavior |
 |------|------|----------|
-| **Interactive** (default) | No mode token present | Auto-pick Full vs Lightweight and report the choice; run session history as an automatic probe (Full only); prompt for Discoverability Check consent; end with a plain summary (no "What's next?" menu) |
-| **Headless** | `mode:headless` in arguments | No blocking questions. Run **Full mode without session history**. Report discoverability gaps without editing instruction files. Skip Phase 3 specialized reviews. End with a structured terminal report — no "What's next?" menu. |
+| **Interactive** (default) | No mode token present | Auto-pick Full vs Lightweight and report the choice; run the Full-mode session-history probe only with explicit restricted-read authorization; prompt for Discoverability Check consent; end with a plain summary (no "What's next?" menu) |
+| **Headless** | `mode:headless` in arguments | No blocking questions. Run **Full mode without session history**. Report discoverability gaps without editing instruction files. Skip Phase 2.46 optional candidate enhancement. End with a structured terminal report — no "What's next?" menu. |
 
 Headless mode is intended for automations and skill-to-skill invocation where no human is present to answer questions. The doc itself is identical to what an interactive Full run would produce — classification work (track, category, overlap) follows the same rules and writes nothing extra into the artifact. Once detected, headless mode applies for the entire run.
 
@@ -65,11 +65,11 @@ These files are the durable contract for the workflow. Read them on-demand at th
 - `references/schema.yaml` — canonical frontmatter fields and enum values (read when validating YAML)
 - `references/yaml-schema.md` — category mapping from problem_type to directory (read when classifying)
 - `references/concepts-vocabulary.md` — CONCEPTS.md format and inclusion rules (read in Phase 2.4 when domain terms surface)
-- `references/agents/session-historian.md` — skill-local synthesis prompt for optional session-history compounding context (read only when the user opts into session history)
+- `references/agents/session-historian.md` — skill-local synthesis prompt for optional session-history compounding context (read only when explicit restricted-read authorization exists and the relevance gate escalates)
 - `references/grounding-validation.md` — grounding-validation protocol: flag adjudication rules and the semantic validator prompt (read in Phase 2.45)
 - `assets/resolution-template.md` — section structure for new docs (read when assembling)
 - `scripts/session-history/` — session discovery and extraction scripts copied into this skill so session-history support does not depend on the bundled session-history support
-- `scripts/validate-frontmatter.py` — frontmatter parser-safety validator plus the opt-in `--promotion` exit gate for provenance/invalidation (run in Phase 2 step 8 through the existence guard documented there; resolves via the loaded skill directory anchor `SKILL_DIR`, with a manual-checklist fallback elsewhere)
+- `scripts/validate-frontmatter.py` — frontmatter parser-safety validator plus the opt-in `--promotion` exit gate for provenance/invalidation (run against the private candidate in Phase 2 step 6 through the existence guard documented there; resolves via the loaded skill directory anchor `SKILL_DIR`, with a manual-checklist fallback elsewhere)
 - `scripts/validate-doc-claims.py` — mechanical claims validator: cited paths, commit SHAs, relative links, dangling drafting scaffold (run in Phase 2.45 via the `SKILL_DIR` anchor)
 
 When spawning subagents, pass the relevant file contents into the task prompt so they have the contract without needing cross-skill paths.
@@ -91,17 +91,17 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 ## Execution Strategy
 
-`spec-compound` does not ask the user which mode to run or whether to search session history. Both are decisions the agent is better positioned to make: mode depends on context budget the agent can observe, and session-history value is unknowable a priori to *either* party (the payoff is an unrelated earlier session the current agent was never in), so it is resolved by a cheap probe rather than a question. The only interactive prompt in the whole workflow is the Discoverability Check consent, because that one edits a tracked instruction file.
+`spec-compound` does not ask the user which mode to run. Mode depends on context budget the agent can observe. Cross-session history is different: reading private session stores is a restricted-read boundary, so the workflow probes it only when the current user or visible upstream handoff explicitly authorizes that read; it never infers authorization from a compound request, Full mode, local file access, or tool availability. Missing authorization skips the probe with `restricted_read_authorization_missing` rather than opening another question. The only interactive prompt in the normal workflow is the Discoverability Check consent, because that one edits a tracked instruction file.
 
 **Mode selection (Full vs Lightweight) — decide it, don't ask it.**
 
 - Default to **Full**: the complete workflow (research, cross-referencing, overlap detection, grounding validation). This is the right choice for essentially every documented learning — its token cost is small next to the engineering work that produced the learning and is dwarfed by the value of a doc that compounds.
-- Choose **Lightweight** (single-pass, no subagents — see Lightweight Mode) ONLY under real context pressure: the session is near its context limit, or the fix is trivial enough that cross-referencing would add nothing. These are conditions the agent can observe and the user cannot, which is exactly why this is not a question.
+- Choose **Lightweight** (single-pass, no subagents — see Lightweight Mode) only when the learning is **low-risk, bounded, source-grounded, and already backed by verification evidence**, and either the session is near its context limit or the fix is trivial enough that cross-referencing would add nothing. Context pressure alone never waives promotion obligations. A learning is high-risk when a wrong or stale claim could materially weaken security/authorization, data integrity, migration/release safety, privacy, compliance, or irreversible mutation boundaries. High-risk learnings use Full mode; if the remaining context cannot support Full mode, leave a handoff or emit `Documentation skipped` instead of writing durable knowledge.
 - State the chosen mode and a one-line reason as the first line of the completion output (e.g., "Ran Full mode." / "Ran Lightweight mode — session context was tight."). If Lightweight was the wrong call for the user's taste, re-running is a rare, cheap correction — cheaper than taxing every run with a prompt.
 
 **In headless mode**, skip mode selection entirely and run **Full Mode** with session history disabled (Phase 1 step 4 omitted). Headless does not elevate dispatch authority; when the package-local boundary is not satisfied, proceed through the serial inline Full fallback.
 
-**Session history — an automatic probe in Full mode, never a question.** The point of searching prior sessions is that an *unrelated* earlier session may hold related problem-solving; neither the agent nor the user can know that a priori, so asking is pointless. Instead, Full mode always runs the cheap discovery+metadata probe (Phase 1 step 4) — it runs in parallel with the research subagents, so it is near-free on wall-clock — and escalates to the expensive extraction+synthesis only when the probe surfaces genuinely relevant candidate sessions. Lightweight and headless modes skip session history entirely. There is no standalone `session-history` product surface; this support exists only inside the compounding workflow.
+**Session history — an authorization-gated probe in Full mode.** When explicit restricted-read authorization exists, Full mode runs the cheap discovery+metadata probe (Phase 1 step 4) and escalates to extraction+synthesis only when the probe surfaces genuinely relevant candidate sessions. Without that authorization, record `restricted_read_authorization_missing` and continue without session context; do not inspect session roots or tool schemas. Lightweight and headless modes skip session history entirely. There is no standalone `session-history` product surface; this support exists only inside the compounding workflow.
 
 ---
 
@@ -111,7 +111,7 @@ worker_bounded_parallelism: supported | unsupported | unknown
 **The primary deliverable is ONE file - the final documentation.**
 
 When dispatch is authorized, Phase 1 subagents write their full structured output to the caller-provided owner-only `<private-scratch-dir>` and return only a compact confirmation containing the artifact path. In inline fallback, the orchestrator runs the same roles serially and writes the same scratch artifacts itself. Phase 2 reads those artifacts in either path. Scratch is ephemeral and never the only durable deliverable or handoff evidence. **Only the orchestrator writes product files** — the final solution doc and the maintenance side effects below. Subagents must not touch `docs/`, project instruction files, or any tracked path. Beyond the Phase 2 solution doc, the orchestrator's other writes are maintenance side effects — not additional deliverables, and creating one when absent is expected, not a violation of this rule:
-- **`CONCEPTS.md`** — create or update in Phase 2.4 (Vocabulary Capture) when a qualifying domain term surfaces.
+- **`CONCEPTS.md`** — prepare a private candidate in Phase 2.4 (Vocabulary Capture) when a qualifying domain term surfaces; publish it only through the shared promotion boundary in Phase 2.47.
 - **A project instruction file** (AGENTS.md or CLAUDE.md) — a small edit when the Discoverability Check finds a gap.
 
 Both ensure future agents can discover and ground in the knowledge store; neither makes the documentation any less the single deliverable.
@@ -172,7 +172,7 @@ Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 suba
 
 **Execution order:**
 - With authorized dispatch, launch `Context Analyzer`, `Solution Extractor`, and `Related Docs Finder` in bounded parallel. Without it, run the same roles serially inline and preserve their separate artifacts/results without presenting them as independent agents.
-- **Then** run the internal session-history discovery/extraction/synthesis flow (see step 4 below) in Full mode — skipped in lightweight and headless. Its cheap discovery+metadata probe always runs and escalates only on a relevance hit. With authorized background dispatch it overlaps the research roles; in inline fallback it runs after the three serial research roles so one orchestrator does not interleave several context-heavy jobs.
+- **Then**, only when explicit restricted-read authorization exists, run the internal session-history discovery/extraction/synthesis flow (see step 4 below) in Full mode — skipped in lightweight and headless. Its cheap discovery+metadata probe runs after authorization and escalates only on a relevance hit. With separately authorized background dispatch it overlaps the research roles; in inline fallback it runs after the three serial research roles so one orchestrator does not interleave several context-heavy jobs. Without restricted-read authorization, record `restricted_read_authorization_missing` and do not inspect session roots or related tool schemas.
 
 ### Research roles
 
@@ -244,8 +244,8 @@ Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 suba
 
    Prefer the `gh` CLI for searching related issues: `gh issue list --search "<keywords>" --state all --limit 5`. If `gh` is not installed, fall back to the GitHub MCP tools (e.g., `unblocked` data_retrieval) if available. If neither is available, skip GitHub issue search and note it was skipped in the output.
 
-#### 4. **Session History** (internal flow after launching the parallel block — automatic in Full mode)
-   - **Skip entirely** in lightweight mode or headless mode. In Full mode it always runs as a two-stage probe: the cheap discovery+metadata pass (below) always executes, and the expensive extraction+synthesis executes only when the probe clears the relevance gate (see **Escalation gate** below).
+#### 4. **Session History** (authorization-gated internal flow after the research block)
+   - **Run only** in Full mode with explicit restricted-read authorization. Without it, record `restricted_read_authorization_missing`, do not inspect session roots or related tool schemas, and continue to Phase 2 without session context. Skip entirely in lightweight mode or headless mode. After authorization, run a two-stage probe: the cheap discovery+metadata pass executes first, and the expensive extraction+synthesis executes only when the probe clears the relevance gate (see **Escalation gate** below).
    - Run session discovery, branch/keyword filtering, scan-window selection, deep-dive selection, and per-session extraction directly inside this skill using `scripts/session-history/`.
    - Read the skill-local synthesis prompt at `references/agents/session-historian.md`, then dispatch a generic subagent using that prompt content. Do not dispatch a standalone agent by type/name.
 
@@ -287,7 +287,7 @@ Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 suba
 
    Pi sessions are included when present under `~/.pi/agent/sessions/`; they carry `cwd` like Codex but no git branch. If `_meta.files_processed` is `0`, return `no relevant prior sessions`. If the first pass finds no relevant branch matches, or if processing Codex or Pi sessions, derive 2-4 keywords from the topic and re-run metadata extraction with `--keyword K1,K2,...`. Keep at most 5 sessions across Claude Code, Codex, Cursor, and Pi, ranked by branch match, keyword match count, file size over 30KB, and recency. Exclude the current session.
 
-   **Escalation gate.** The discovery+metadata pass above is the cheap probe and always runs in Full mode. Escalate to the extraction and synthesis stages below **only** when at least one retained candidate clears the relevance bar: a current-branch match, or ≥2 topic-keyword matches. If no candidate clears the bar (including the `_meta.files_processed` is `0` case), stop here, record `no relevant prior sessions` as the session-history input, and skip extraction and synthesis. This gate is what keeps the always-on probe cheap — the expensive synthesis is paid for only when a prior session is genuinely relevant.
+   **Escalation gate.** After restricted-read authorization, the discovery+metadata pass above is the cheap probe. Escalate to the extraction and synthesis stages below **only** when at least one retained candidate clears the relevance bar: a current-branch match, or ≥2 topic-keyword matches. If no candidate clears the bar (including the `_meta.files_processed` is `0` case), stop here, record `no relevant prior sessions` as the session-history input, and skip extraction and synthesis. This gate keeps the authorized probe cheap — the expensive synthesis is paid for only when a prior session is genuinely relevant.
 
    **Extraction pipeline.** Create `SCRATCH=$(mktemp -d -t spec-compound-sessions-XXXXXX)`. For each selected session, write extracted content to scratch files:
 
@@ -313,11 +313,11 @@ Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 suba
 
    The subagent reads only the scratch paths, **writes its prose findings to `<private-scratch-dir>/session-history.md`, and returns only that artifact path once the atomic write is confirmed**. If `{run_id}` or the private scratch directory did not resolve, ownership/symlink recheck failed, or the artifact write failed, it returns the prose inline instead. If synthesis fails, note the failure and continue without session context.
 
-### Phase 2: Assembly & Write
+### Phase 2: Assembly & Candidate Validation
 
 <sequential_tasks>
 
-**WAIT for all Phase 1 inputs to complete before proceeding** — the three research roles (parallel only under authorized dispatch) and, in Full mode, the internal session-history flow, which may stop at `no relevant prior sessions`. Session history is a Phase 1 input even though it runs in the orchestrator rather than as a public skill.
+**WAIT for all Phase 1 inputs to complete before proceeding** — the three research roles (parallel only under authorized dispatch) and, when separately authorized in Full mode, the internal session-history flow, which may stop at `no relevant prior sessions`. An authorization skip is a terminal Phase 1 fact, not an empty permission to inspect private session roots.
 
 The orchestrating agent (main conversation) performs these steps:
 
@@ -339,15 +339,13 @@ The orchestrating agent (main conversation) performs these steps:
    - Use cross-session patterns to enrich the **Prevention** or **Why This Matters** sections
    - Tag session-sourced content with "(session history)" so its origin is clear to future readers
    - If findings are thin or "no relevant prior sessions," proceed without session context
-4. Assemble complete markdown file from the collected pieces, reading `assets/resolution-template.md` for the section structure of new docs
-5. Validate YAML frontmatter against `references/schema.yaml`, including non-empty `source_refs` and `invalidation_condition` promotion exit fields and the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules). The references must be grounded and the invalidation condition must be semantically specific; the script in step 8 checks only their mechanical shape.
-6. Create directory if needed: `mkdir -p docs/solutions/[category]/`
-7. Write the file: either the updated existing doc or the new `docs/solutions/[category]/[filename].md`
-8. **Validate parser-safety and the knowledge-promotion exit contract** after every new or materially rewritten learning. Promotion mode catches malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), unquoted `: ` in scalar values (silent mapping confusion), and mechanically requires a non-empty top-level `source_refs` array plus a non-empty top-level `invalidation_condition`. The bundled validator ships **inside the skill bundle**; `SKILL_DIR` resolves to the skill directory, but the runtime Bash tool's CWD is the user's project, so a project-relative path (without the `$SKILL_DIR` prefix) would miss. Run it through an existence guard so platforms that cannot locate the script (harnesses where `$SKILL_DIR` is unset) fall back to the same manual gate instead of silently skipping the protection:
+4. Assemble the complete markdown into `<private-scratch-dir>/learning-candidate.md`, reading `assets/resolution-template.md` for the section structure of new docs. Do not create or modify the final `docs/solutions/**` path yet. For an existing target, record its current existence and SHA-256 before assembly so publication can detect concurrent drift.
+5. Validate the candidate frontmatter against `references/schema.yaml`, including non-empty `source_refs` and `invalidation_condition` promotion exit fields and the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules). The references must be grounded and the invalidation condition must be semantically specific; the script in step 6 checks only their mechanical shape.
+6. **Validate parser-safety and the knowledge-promotion exit contract on the candidate** after every new or materially rewritten learning. Promotion mode catches malformed `---` delimiter lines, unquoted ` #` in scalar values (silent comment truncation), unquoted `: ` in scalar values (silent mapping confusion), and mechanically requires a non-empty top-level `source_refs` array plus a non-empty top-level `invalidation_condition`. The bundled validator ships **inside the skill bundle**; `SKILL_DIR` resolves to the skill directory, but the runtime Bash tool's CWD is the user's project, so a project-relative path (without the `$SKILL_DIR` prefix) would miss. Run it through an existence guard so platforms that cannot locate the script (harnesses where `$SKILL_DIR` is unset) fall back to the same manual gate instead of silently skipping the protection:
 
    ```bash
    if [ -n "${SKILL_DIR:-}" ] && [ -f "$SKILL_DIR/scripts/validate-frontmatter.py" ]; then
-     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
+     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <candidate-path>
    else
      echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
    fi
@@ -363,7 +361,7 @@ The orchestrating agent (main conversation) performs these steps:
 
    Default validator mode remains parser-safety-only for legacy compatibility. `--promotion` adds only the two promotion exit shapes; it does not judge reference credibility, invalidation adequacy, other schema fields, or enum values. It also does not flag YAML reserved-indicator characters (those produce loud parser errors downstream rather than silent corruption — out of scope). Uses Python 3 stdlib only (no PyYAML or other deps).
 
-When creating a new doc, preserve the section order from `assets/resolution-template.md` unless the user explicitly asks for a different structure.
+When creating a new doc, preserve the section order from `assets/resolution-template.md` unless the user explicitly asks for a different structure. A candidate passing this mechanical check is not promoted yet.
 
 </sequential_tasks>
 
@@ -371,7 +369,7 @@ When creating a new doc, preserve the section order from `assets/resolution-temp
 
 **First, read `references/concepts-vocabulary.md`.** This is unconditional. Do not pre-judge from memory that nothing qualifies — the reference's criteria are non-obvious and qualifying terms often live in the surrounding conversation rather than the new doc itself. Reading the reference is what makes the rest of the phase possible.
 
-Then, applying those criteria, scan the new doc **and** the surrounding conversation for qualifying domain terms. If `CONCEPTS.md` exists at repo root, add missing qualifying terms and refine existing entries when new precision surfaced. If it does not exist and at least one qualifying term surfaced, create it.
+Then, applying those criteria, scan the learning candidate **and** the surrounding conversation for qualifying domain terms. Prepare any resulting `CONCEPTS.md` change as `<private-scratch-dir>/concepts-candidate.md`; do not modify the durable file before Phase 2.47. If `CONCEPTS.md` exists at repo root, base the candidate on its current contents and record its SHA-256; if it does not exist and at least one qualifying term surfaced, prepare a new candidate.
 
 **Verify behavior assertions against source before writing them.** When an entry asserts how code behaves (states, transitions, limits, semantics), Read the defining source at the current tree first — an entry drafted from a session-level summary is exactly how wrong semantics enter the glossary. Phase 2.45 re-checks these entries, but the cheap fix is to not write the error.
 
@@ -387,26 +385,46 @@ Then, applying those criteria, scan the new doc **and** the surrounding conversa
 
 If no terms qualified after applying the reference's criteria, record that outcome explicitly in the success output (e.g., "Vocabulary capture: scanned, no qualifying terms"). Do not silently skip — the visible scan-and-no-result record is the audit signal that the reference was consulted.
 
-**Apply edits silently in every mode — no user prompt in interactive, lightweight, or headless.** Vocabulary capture is a side effect of compounding, not a decision the user makes per run. Lightweight mode reaches this through its own single-pass step (see Lightweight Mode), and runs an **update-only** version — it refines an existing `CONCEPTS.md` but defers creation/seeding to a Full run.
+**Prepare the vocabulary candidate silently in every mode — no user prompt in interactive, lightweight, or headless.** Vocabulary capture is a declared side effect of compounding, not a separate decision per run; the durable write still waits for the shared promotion decision and target-hash recheck. Lightweight mode reaches this through its own single-pass step (see Lightweight Mode), and runs an **update-only** version — it refines an existing `CONCEPTS.md` but defers creation/seeding to a Full run.
 
 ### Phase 2.45: Grounding Validation
 
-The doc (and any `CONCEPTS.md` entries from Phase 2.4) is about to become permanent, trusted knowledge. Validate its claims against the tree before it compounds. **Read `references/grounding-validation.md` now** — it holds the adjudication rules and the validator prompt; the steps below are only the trigger.
+The candidate (and any `CONCEPTS.md` candidate entries from Phase 2.4) may become permanent, trusted knowledge. Validate its claims against the tree before it compounds. **Read `references/grounding-validation.md` now** — it holds the adjudication rules and the validator prompt; the steps below are only the trigger.
 
-1. **Mechanical claims check (every mode, including headless).** Optionally run `git fetch --quiet` first (best-effort — skip silently offline; the network is never a correctness dependency). Then run the bundled validator against the written doc:
+1. **Mechanical claims check (every mode, including headless).** Do not run `git fetch` unless the current user or visible upstream handoff separately authorized network access and remote-ref mutation; otherwise use existing local refs and mark remote merge-state claims degraded when they cannot be confirmed. Then run the bundled validator against the candidate:
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
-   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-doc-claims.py" <doc-path>
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-doc-claims.py" <candidate-path>
    ```
 
    Exit 0 means nothing flagged. Exit 1 means flags to **adjudicate, not auto-fix** — each flagged path, SHA, link, or scaffold pattern is fixed, annotated as historical, or confirmed intentional per the reference's adjudication table. A doc may legitimately cite a path deleted by the very fix it documents; a flag is a question, not a failure. If the script cannot be resolved on this platform, apply the reference's manual checklist and say so in the output — never silently skip.
 
-2. **Semantic grounding validator (Full and headless; lightweight skips it).** When the Dispatch Authorization Boundary is satisfied, dispatch one read-only generic subagent built from the prompt template in the reference, covering the written doc plus any `CONCEPTS.md` entries added or edited this run. Otherwise apply that validator prompt inline, record the matching fallback reason, and do not claim independent semantic validation. In either path, verify code-behavior claims by quoting the defining source line, merge-state claims against remote truth (`gh` primary, git reachability fallback), and internal completeness of countable assertions. Apply verdicts per the reference, then re-run the mechanical check if the body changed.
+2. **Semantic grounding validator (Full and headless; lightweight skips this separate pass).** When the Dispatch Authorization Boundary is satisfied, dispatch one read-only generic subagent built from the prompt template in the reference, covering the learning candidate plus any `CONCEPTS.md` candidate entries added or edited this run. Otherwise apply that validator prompt inline, record the matching fallback reason, and do not claim independent semantic validation. In either path, verify code-behavior claims by quoting the defining source line, merge-state claims against remote truth (`gh` primary, git reachability fallback), and internal completeness of countable assertions. Apply verdicts per the reference, then re-run the mechanical check if the body changed.
+
+### Phase 2.46: Optional Candidate Enhancement
+
+Full interactive runs may apply the problem-specific review prompts below to the private candidate before promotion. Headless and Lightweight skip this phase to keep their cost bounded. Dispatch generic read-only reviewers only when the Dispatch Authorization Boundary is satisfied; otherwise run the selected review inline or serially and label it non-independent.
+
+- **performance_issue** → `references/agents/performance-oracle.md`
+- **security_issue** → `references/agents/security-sentinel.md`
+- **database_issue** → `references/agents/data-integrity-guardian.md`
+- Any code-heavy issue → inspect the candidate's code examples and explanatory claims for speculative abstractions, redundant wrappers, dead branches, and just-in-case parameters. This is a read-only documentation review; do not invoke `spec-simplify-code` or mutate product code from this workflow.
+
+Apply accepted suggestions only to `<private-scratch-dir>/learning-candidate.md` or `<private-scratch-dir>/concepts-candidate.md`. If either candidate changes, rerun the applicable frontmatter and claims checks plus semantic grounding for affected claims. No optional reviewer may edit a durable target or run after publication and still count toward the promotion decision.
+
+### Phase 2.47: Promotion Decision & Per-Target Atomic Publication
+
+The orchestrator now makes the semantic promotion decision; scripts do not make it. Choose `promote` only when the problem is demonstrably resolved, the cited evidence is relevant to the claims, contradictions with current source are resolved in favor of source, and the invalidation condition describes a concrete re-check trigger. A transcript assertion such as “fixed” or “tests passed” is not outcome evidence. A separate reviewer is useful for high-risk material when dispatch is authorized, but is not a universal prerequisite for ordinary low-risk promotion; record whether semantic validation was independent or inline.
+
+- On `skip`, leave every final durable path unchanged, best-effort remove the private candidates, and emit `Documentation skipped` with the failed semantic or evidence condition.
+- On `promote`, first recompute the recorded existence/SHA-256 of every final target. If any target drifted, stop and rebuild/review the affected candidates against the new source; do not overwrite it. Prepare and validate every same-directory temporary file before the first rename. Publish an approved `CONCEPTS.md` candidate first and the primary learning last; each target replacement is atomic, but a multi-target run is not an all-or-nothing filesystem transaction. If a later rename fails after an earlier target was published, report the exact partial publication, keep the run incomplete, and do not emit `Documentation complete` or attempt an unverified overwrite.
+
+The final `docs/solutions/**` path remains untouched until this phase. This is the durable `candidate -> review -> promote` boundary; scratch artifacts are not durable knowledge and are never returned as a successful deliverable.
 
 ### Phase 2.5: Selective Refresh Check
 
-After writing the new learning, decide whether this new solution is evidence that older docs should be refreshed.
+After publishing the new learning, decide whether this new solution is evidence that older docs should be refreshed.
 
 `spec-compound-refresh` is **not** a default follow-up. Use it selectively when the new learning suggests an older learning or pattern doc may now be inaccurate.
 
@@ -495,24 +513,6 @@ After the learning is written and the refresh decision is made, check whether th
 
    **Skip this step entirely if `CONCEPTS.md` does not exist** — never nag for an artifact the project has not adopted. When skipped, this step produces no output and no edit.
 
-### Phase 3: Optional Enhancement
-
-**WAIT for Phase 2 to complete before proceeding.**
-
-**Skip Phase 3 entirely in headless mode** to bound token usage — the caller does not have a human-in-the-loop to act on reviewer findings, and downstream automations can run specialized reviewers themselves if they want that pass.
-
-#### Optional review roles
-
-Based on problem type, optionally apply local prompt assets from `references/agents/` to review the documentation. Dispatch generic subagents only when the package-local boundary permits it; otherwise run the selected reviews inline or serially and label them accordingly. Do not dispatch standalone agents by type/name.
-
-- **performance_issue** → `references/agents/performance-oracle.md`
-- **security_issue** → `references/agents/security-sentinel.md`
-- **database_issue** → `references/agents/data-integrity-guardian.md`
-- Any code-heavy issue → preserve code simplification as a **read-only documentation review**. Inspect the solution draft's code examples and explanatory claims inline, or dispatch a generic subagent seeded with a local prompt only to return suggestions. Do **not** invoke `spec-simplify-code` from this phase and do not mutate product code unless the user explicitly asks for a separate code-simplification pass. Do not use the deleted `code-simplicity-reviewer`.
-  Example: review the solution draft's examples for speculative abstractions, redundant wrappers, dead branches, and just-in-case parameters. Apply edits only to the documentation/examples being written by `spec-compound`; leave any branch code changes untouched.
-
----
-
 ### Lightweight Mode
 
 <critical_requirement>
@@ -521,27 +521,30 @@ Based on problem type, optionally apply local prompt assets from `references/age
 This mode skips parallel subagents entirely. The orchestrator performs all work in a single pass, producing the same solution document without cross-referencing or duplicate detection.
 
 Headless mode forces Full and does not enter Lightweight — automations get the cross-reference and overlap detection benefits without the interactive overhead.
+
+Lightweight is valid only when the mode-selection eligibility above is satisfied. Security/authorization, data-integrity, migration/release, privacy/compliance, or irreversible-mutation learnings never enter Lightweight merely because context is tight.
 </critical_requirement>
 
 The orchestrator (main conversation) performs ALL of the following in one sequential pass:
 
 1. **Extract from conversation**: Identify the problem and solution from conversation history. Also scan the "user's auto-memory" block injected into your system prompt, if present (Claude Code only) -- use any relevant notes as supplementary context alongside conversation history. Tag any memory-sourced content incorporated into the final doc with "(auto memory [claude])". Before asserting how code behaves (enum values, status semantics, limits, defaults), Read the defining line at the current tree — soften or attribute any claim you cannot verify. Cite PR numbers over bare commit SHAs, and phrase unmerged fixes as pending
 2. **Classify**: Read `references/schema.yaml` and `references/yaml-schema.md`, then determine track (bug vs knowledge), category, and filename
-3. **Write minimal doc**: Create `docs/solutions/[category]/[filename].md` using the appropriate track template from `assets/resolution-template.md`, with:
+3. **Prepare minimal candidate**: create and verify an owner-private scratch directory using the Full-mode scratch rules, then assemble `<private-scratch-dir>/learning-candidate.md` using the appropriate track template from `assets/resolution-template.md`. Record the intended final path and its current existence/SHA-256, but do not create or modify that path yet. Include:
    - YAML frontmatter with track-appropriate fields, a grounded non-empty `source_refs` array, and a concrete non-empty `invalidation_condition`, applying the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules)
    - Bug track: Problem, root cause, solution with key code snippets, one prevention tip
    - Knowledge track: Context, guidance with key examples, one applicability note
-4. **Vocabulary capture (update-only)**: if `CONCEPTS.md` exists at repo root, read `references/concepts-vocabulary.md`, then scan the new doc and the conversation for qualifying terms and add/refine entries silently (same criteria as Phase 2.4). Do **not** bootstrap or seed in lightweight mode — if `CONCEPTS.md` does not exist, defer creation to a Full run, which owns seeding. Record the outcome in the output (e.g., "Vocabulary: 1 entry refined" or "scanned, no qualifying terms"). If you refined `CONCEPTS.md` and a quick read of `AGENTS.md`/`CLAUDE.md` shows it isn't surfaced there, add the discoverability tip to the output below — lightweight **tips**, it does not edit instruction files (a Full run owns that edit).
-5. **Promotion gate**: run the same mechanical promotion validation as Phase 2 step 8. If the script is unavailable, apply that step's four-item manual checklist; do not silently skip or declare completion with either field absent:
+4. **Vocabulary candidate (update-only)**: if `CONCEPTS.md` exists at repo root, read `references/concepts-vocabulary.md`, then scan the learning candidate and the conversation for qualifying terms and prepare any refinement as `<private-scratch-dir>/concepts-candidate.md` (same criteria as Phase 2.4). Record the original SHA-256 and leave the final file untouched. Do **not** bootstrap or seed in lightweight mode — if `CONCEPTS.md` does not exist, defer creation to a Full run, which owns seeding. Record the outcome in the output (e.g., "Vocabulary: 1 entry refined" or "scanned, no qualifying terms"). If you prepared a refinement and a quick read of `AGENTS.md`/`CLAUDE.md` shows `CONCEPTS.md` is not surfaced there, add the discoverability tip to the output below — lightweight **tips**, it does not edit instruction files (a Full run owns that edit).
+5. **Mechanical promotion gate**: run the same mechanical promotion validation as Phase 2 step 6 against the learning candidate. If the script is unavailable, apply that step's four-item manual checklist; do not silently skip or declare completion with either field absent:
    ```bash
    if [ -n "${SKILL_DIR:-}" ] && [ -f "$SKILL_DIR/scripts/validate-frontmatter.py" ]; then
-     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <output-path>
+     bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/validate-frontmatter.py" --promotion <candidate-path>
    else
      echo "Bundled validate-frontmatter.py not resolvable on this platform; applying the parser-safety and promotion checklist manually."
    fi
    ```
-6. **Mechanical claims check**: run `scripts/validate-doc-claims.py` against the written doc exactly as in Phase 2.45 step 1 (same `SKILL_DIR` anchor, same adjudicate-not-auto-fix rule — read `references/grounding-validation.md` for the adjudication table when it flags anything). Lightweight skips only the semantic validator subagent, not this deterministic check.
-7. **Skip specialized agent reviews** (Phase 3) and the semantic grounding validator (Phase 2.45 step 2) to conserve context
+6. **Mechanical claims check**: run `scripts/validate-doc-claims.py` against the candidate exactly as in Phase 2.45 step 1 (same `SKILL_DIR` anchor, same adjudicate-not-auto-fix rule — read `references/grounding-validation.md` for the adjudication table when it flags anything).
+7. **Semantic promotion decision and publication**: apply Phase 2.47 inline. Reconfirm that the learning remains low-risk, resolved, source-grounded, and backed by verification evidence; judge source relevance and invalidation adequacy rather than treating mechanical validation as semantic approval. Only a `promote` decision may publish the candidate through the per-target atomic boundary. Any failed check, target drift, or unresolved contradiction leaves final paths unchanged and emits `Documentation skipped`.
+8. **Skip optional candidate enhancement** (Phase 2.46) and the separate semantic grounding validator (Phase 2.45 step 2) to conserve context. This does not skip the orchestrator's semantic promotion decision.
 
 **Lightweight output:**
 ```
@@ -741,7 +744,7 @@ Build → Test → Find Issue → Research → Improve → Document → Validate
 
 ## Output
 
-Writes the final learning directly into `docs/solutions/`.
+Publishes the approved learning into `docs/solutions/` only after candidate validation and the semantic promotion decision succeed. A skipped or failed promotion leaves every durable target unchanged.
 
 ## Applicable Specialized Local Prompts
 
@@ -761,7 +764,7 @@ Based on problem type, these local prompt assets can enhance documentation:
 - **references/agents/framework-docs-researcher.md**: Links to framework/library documentation references
 
 ### When to Invoke
-- **Auto-triggered** (optional): Generic subagents seeded with local prompts can run post-documentation for enhancement
+- **Auto-triggered** (optional): Generic subagents seeded with local prompts can review the private candidate before promotion
 - **Manual trigger**: User can run surviving skills such as `spec-simplify-code` after `spec-compound` completes for deeper code review and mutation
 
 ## Related Commands

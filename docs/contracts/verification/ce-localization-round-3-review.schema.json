@@ -56,6 +56,10 @@
     "expected_direct_support_relation_count": { "type": "integer", "minimum": 0 },
     "reviewed_direct_support_relation_count": { "type": "integer", "minimum": 0 },
     "skill_reviews": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/skillReview" } },
+    "review_deltas": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reviewDeltaRef" }
+    },
     "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
     "claim_ceiling": { "type": "string", "minLength": 1 }
   },
@@ -67,6 +71,32 @@
       "required": ["skill_id"],
       "properties": {
         "skill_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "reviewDeltaRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_run_id",
+        "artifact_ref",
+        "artifact_sha256",
+        "reviewed_at",
+        "review_method",
+        "independent",
+        "provider_identity",
+        "worker_context_isolation",
+        "claim_ceiling"
+      ],
+      "properties": {
+        "review_run_id": { "type": "string", "minLength": 1 },
+        "artifact_ref": { "type": "string", "minLength": 1 },
+        "artifact_sha256": { "$ref": "#/$defs/sha256" },
+        "reviewed_at": { "type": "string", "format": "date-time" },
+        "review_method": { "const": "inline-same-context" },
+        "independent": { "const": false },
+        "provider_identity": { "enum": ["unverified", "not-used"] },
+        "worker_context_isolation": { "enum": ["degraded_inherited", "unknown"] },
+        "claim_ceiling": { "type": "string", "minLength": 1 }
       }
     }
   }

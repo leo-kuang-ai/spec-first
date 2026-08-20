@@ -1,0 +1,69 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "ce-localization-review-delta-2026-08-20-lineage-prune-regression",
+  "producer": "current-session inline source review",
+  "reviewed_at": "2026-08-20T22:00:00.000Z",
+  "source_binding": {
+    "head": "741175a23615e37382ce65ec1e0448abfa214e95",
+    "dirty_path_manifest_sha256": "7b3689b9c4f84455e290d329eb9a67e87c5104eebf0d040ad1c6ca8205129483",
+    "source_tree_hash": "5afad2bf0042294786124fba63a6ef61c3ed5c692619313b06d62ab6f40834db",
+    "inventory_hash": "9d4241fec4cdf655e0912a3b55905520c04fc6000be5f8c2c7aec5e9eab432de",
+    "inventory_artifact_sha256": "d6798733a5e4ca9d3ab5de4e0e0fff6f80a531e001de8e719f3b9fc6926cf3e0",
+    "review_input_hash": "90cb7ceb1163d85a4a53645d5ddb74942ff5ecbfeb0c2d91bf326e1e97e24944"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/ce-localization-closeout-contracts.test.js",
+      "skill_ids": [
+        "spec-compound"
+      ],
+      "sha256": "19fbce6d7be33cd15dc6646857c243690e6d027b8f1db326b8b8625c1b8e0360",
+      "bytes": 13689,
+      "line_count": 335,
+      "covered_line_ranges": [
+        [
+          1,
+          335
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "The added regression only covers stale delta lineage pruning and preserves the source-bound closeout contract."
+          ],
+          "limitations": [
+            "Inline same-context review is not independent provider evidence."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "The added regression does not widen mutation authority or provider claims."
+          ],
+          "limitations": [
+            "Inline same-context review is not independent provider evidence."
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "This delta covers the added lineage-pruning regression relation only; it is not a full Skill re-review.",
+    "Provider-authenticated receipt, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run."
+  ],
+  "claim_ceiling": "Source-bound incremental review of the review-delta lineage-pruning regression only."
+}
