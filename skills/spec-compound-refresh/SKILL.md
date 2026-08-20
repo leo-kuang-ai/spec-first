@@ -14,6 +14,7 @@ Maintain the quality of `docs/solutions/` over time. This workflow reviews exist
 - **输出：** Keep/Update/Consolidate/Replace/Delete/Stale 分类、已应用的知识维护变更和完整 Applied/Recommended 报告。
 - **硬出口：** source truth、目标 repo、写入范围或语义分类无法确认时不得把猜测写成 current knowledge；headless 只能把歧义标 stale。
 - **权威：** 当前代码与验证证据优先于旧 learning；本地 mutation、commit 和 landing 分别需要独立授权，`mode:headless` 只改变交互方式。
+- Refresh is current-source anchored: re-read the defining source refs before updating a learning, retain observed revision/freshness and limitations, and mark the item stale when the source cannot be confirmed. Historical cache, session transcript, or provider output is advisory and never a substitute for the current source.
 - **消费者：** 项目维护者，以及读取 `docs/solutions/`/`CONCEPTS.md` 的规划、实现、调试和审查 workflow。
 
 ## Mode Detection

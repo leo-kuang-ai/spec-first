@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-upstream-ledger-patch/v1",
+  "title": "CE upstream ledger owner patch",
+  "type": "object",
+  "required": ["schema_version", "unit_id", "base_ledger_sha256", "base_target_source_snapshot", "result_target_source_snapshot", "affected_paths"],
+  "properties": {
+    "schema_version": { "const": "ce-upstream-ledger-patch/v1" },
+    "unit_id": { "type": "string", "pattern": "^U[0-9]+[a-z]?$" },
+    "base_ledger_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "base_target_source_snapshot": { "$ref": "ce-upstream-adjudication-input.schema.json#/$defs/targetSourceSnapshot" },
+    "result_target_source_snapshot": { "$ref": "ce-upstream-adjudication-input.schema.json#/$defs/targetSourceSnapshot" },
+    "affected_paths": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["path", "unit_id", "changes"],
+        "properties": {
+          "path": { "type": "string" }, "unit_id": { "type": "string", "pattern": "^U[0-9]+[a-z]?$" },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "evidence_status": { "enum": ["planned", "confirmed", "not-applicable"] },
+              "degraded": { "type": "boolean" }, "source_refs": { "type": "array", "items": { "type": "string" } },
+              "test_owner": { "type": "string" }, "test_refs": { "type": "array", "items": { "type": "string" } }, "limitations": { "type": "array", "items": { "type": "string" } }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {}
+}

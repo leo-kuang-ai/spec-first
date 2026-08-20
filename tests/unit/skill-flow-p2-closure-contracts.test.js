@@ -69,6 +69,9 @@ describe('Skill-flow 剩余 P2 关闭合同', () => {
     expect(prompt).toContain('不得修改 lifecycle status');
     expect(prompt).toContain('不得把 generated runtime mirror 当作 source 编辑');
     expect(prompt).toContain('只有修复已应用并完成验证后才能确认完成');
+    expect(prompt).toContain('caller-provided run-local private screenshot/evidence ref');
+    expect(prompt).toContain('implementation-browser-evidence-missing');
+    expect(prompt).not.toContain('agent-browser open');
   });
 
   test('SF-20 code review 从真实 reviewed tree 当轮派生且不跨 source identity 复用', () => {

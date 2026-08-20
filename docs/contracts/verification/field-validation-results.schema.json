@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-field-validation-evidence/v1",
+  "title": "CE localization field validation task pairs or results",
+  "oneOf": [
+    { "$ref": "#/$defs/taskPairs" },
+    { "$ref": "#/$defs/results" }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "strings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "commonProperties": {
+      "type": "object",
+      "required": ["producer", "single_writer", "source_snapshot", "inventory_sha256", "protocol_ref", "protocol_sha256", "overall_status", "reason_codes", "limitations", "claim_ceiling"],
+      "properties": {
+        "producer": { "const": "ce-localization-field-validation-owner" },
+        "single_writer": { "const": "ce-localization-field-evidence-writer" },
+        "source_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+        "inventory_sha256": { "$ref": "#/$defs/sha256" },
+        "protocol_ref": { "type": "string", "minLength": 1 },
+        "protocol_sha256": { "$ref": "#/$defs/sha256" },
+        "overall_status": { "enum": ["not-run", "exploratory", "candidate-confirmed", "confirmed-improved", "degraded"] },
+        "reason_codes": { "$ref": "#/$defs/nonEmptyStrings" },
+        "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
+        "claim_ceiling": { "type": "string", "minLength": 1 }
+      }
+    },
+    "taskPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pair_id", "skill_ids", "task_category", "complexity", "intervention_unit", "attribution_mode", "candidate_feature_set", "order_control", "evaluator_blinding", "event_schema_ref", "missing_data_policy", "status", "evidence_refs"],
+      "properties": {
+        "pair_id": { "type": "string", "minLength": 1 },
+        "skill_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "task_category": { "type": "string", "minLength": 1 },
+        "complexity": { "type": "string", "minLength": 1 },
+        "intervention_unit": { "type": "string", "minLength": 1 },
+        "attribution_mode": { "enum": ["single-skill", "chain", "ablation", "factorial"] },
+        "candidate_feature_set": { "$ref": "#/$defs/nonEmptyStrings" },
+        "order_control": { "type": "string", "minLength": 1 },
+        "evaluator_blinding": { "type": "string", "minLength": 1 },
+        "event_schema_ref": { "type": "string", "minLength": 1 },
+        "missing_data_policy": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["not-run", "complete", "excluded", "degraded"] },
+        "evidence_refs": { "$ref": "#/$defs/strings" }
+      }
+    },
+    "taskPairs": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/commonProperties" },
+        {
+          "type": "object",
+          "required": ["schema_version", "artifact_kind", "task_pairs"],
+          "properties": {
+            "schema_version": { "const": "ce-localization-field-validation-task-pairs/v1" },
+            "artifact_kind": { "const": "paired-field-task-evidence" },
+            "task_pairs": { "type": "array", "items": { "$ref": "#/$defs/taskPair" } }
+          }
+        }
+      ]
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result_id", "pair_id", "skill_ids", "attribution_mode", "metric_results", "status", "evidence_refs", "limitations"],
+      "properties": {
+        "result_id": { "type": "string", "minLength": 1 },
+        "pair_id": { "type": "string", "minLength": 1 },
+        "skill_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "attribution_mode": { "enum": ["single-skill", "chain", "ablation", "factorial"] },
+        "metric_results": { "$ref": "#/$defs/nonEmptyStrings" },
+        "status": { "enum": ["exploratory", "candidate-confirmed", "confirmed-improved", "degraded"] },
+        "evidence_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "limitations": { "$ref": "#/$defs/strings" }
+      }
+    },
+    "results": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/commonProperties" },
+        {
+          "type": "object",
+          "required": ["schema_version", "artifact_kind", "results", "reproduction_status"],
+          "properties": {
+            "schema_version": { "const": "ce-localization-field-validation-results/v1" },
+            "artifact_kind": { "const": "field-validation-results" },
+            "results": { "type": "array", "items": { "$ref": "#/$defs/result" } },
+            "reproduction_status": { "enum": ["not-run", "single-cohort", "replicated", "degraded"] }
+          }
+        }
+      ]
+    }
+  }
+}

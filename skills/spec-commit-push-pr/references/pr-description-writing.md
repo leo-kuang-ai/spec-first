@@ -130,7 +130,7 @@ Classify files by runtime purpose, not extension. Markdown or YAML may be inert 
 1. **Existing PR body contains a `## Demo` or `## Screenshots` section with image embeds:** preserve it verbatim unless the user's focus asks to refresh or remove it. Include the preserved block in the body.
 2. **No existing evidence block:** omit the evidence section entirely unless the caller already captured evidence and passed it in.
 
-Do not label test output as "Demo" or "Screenshots". Place any preserved evidence block before the Spec-First badge.
+Do not label test output as "Demo" or "Screenshots". Place any preserved evidence block before the Spec-First footer.
 
 ---
 
@@ -315,25 +315,17 @@ Assemble the body in this order:
 3. **Test plan** -- only when non-obvious per the writing principles. Omit otherwise.
 4. **New concepts section** -- only when Step B2 produced one or preserved one from the existing PR body.
 5. **Evidence block** -- only the preserved or freshly captured block from Step B, if one exists. Do not fabricate or placeholder.
-6. **Spec-First badge** -- append a badge footer separated by a `---` rule. Skip if regenerating an existing body that already contains the badge.
+6. **Spec-First footer** -- append the plain-text footer separated by a `---` rule. Skip if regenerating an existing body that already contains the footer.
 
-**Badge:**
+**Footer:**
 
 ```markdown
 ---
 
-[![Spec-First](https://img.shields.io/badge/Built_with-Spec_First-6366f1)](https://github.com/sunrain520/spec-first)
-![HARNESS](https://img.shields.io/badge/MODEL_SLUG-COLOR?logo=LOGO&logoColor=white)
+Built with [Spec-First](https://github.com/sunrain520/spec-first)
 ```
 
-**Harness lookup:**
-
-| Harness | `LOGO` | `COLOR` |
-|---------|--------|---------|
-| Claude Code | `claude` | `D97757` |
-| Codex | (omit logo param) | `000000` |
-
-**Model slug:** Replace spaces with underscores. Append context window and thinking level with URL-encoded literal parentheses if known. Examples: `Opus_4.6_%281M,_Extended_Thinking%29`, `Sonnet_4.6_%28200K%29`, `GPT-5.3`.
+The footer contains no externally loaded image and does not publish the harness or model slug. The repository link is navigated only when a reader chooses it; rendering the PR body makes no third-party image request.
 
 ---
 
@@ -353,7 +345,7 @@ Then apply these cuts:
 - If a "Review" or process-oriented section lists how to review, remove it. Move any truly non-obvious review hints inline with the relevant change.
 - If the body has 5+ H3 subsections that each describe one mechanism, consolidate them into a single table row per mechanism under one header. Reserve prose H3 callouts for 2-3 genuine design decisions.
 - If the body exceeds the sizing-table target by more than 30%, compress the longest non-Summary section by half.
-- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove required badge/footer content or a required `## New concepts` section solely to shorten the narrative.
+- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove required footer content or a required `## New concepts` section solely to shorten the narrative.
 
 **Value-lead check.** Re-read the first sentence of the Summary. If it describes what was moved around, renamed, or added ("This PR introduces three-tier autofix..."), rewrite to lead with what's now possible or what was broken and is now fixed ("Document reviews previously produced 14+ findings requiring user judgment; this PR cuts that to 4-6.").
 

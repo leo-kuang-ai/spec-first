@@ -98,7 +98,9 @@ Call `get_sim_logs` with the simulator UUID. Look for:
 - Failed network requests
 
 **Known automation limitation — SwiftUI Text links:**
-Simulated taps (via XcodeBuildMCP or any simulator automation tool) do not trigger gesture recognizers on SwiftUI `Text` views with inline `AttributedString` links. Taps report success but have no effect. This is a platform limitation — inline links are not exposed as separate elements in the accessibility tree. When a tap on a Text link has no visible effect, prompt the user to tap manually in the simulator. If the target URL is known, `xcrun simctl openurl <device> <URL>` can open it directly as a fallback.
+Simulated taps (via XcodeBuildMCP or any simulator automation tool) do not trigger gesture recognizers on SwiftUI `Text` views with inline `AttributedString` links. Taps report success but have no effect. This is a platform limitation — inline links are not exposed as separate elements in the accessibility tree. When a tap on a Text link has no visible effect, prompt the user to tap manually in the simulator.
+
+`xcrun simctl openurl <device> <URL>` is an effect-bearing fallback, not an automatic tap substitute. Parse the exact target before execution: reject `file:`, `data:`, and `javascript:` URLs; allow credential-free loopback HTTP(S) only after displaying the resolved URL; and require the run-local fact `url_open_authorization: authorized | missing` for external HTTP(S) or custom app schemes. Show the exact target, scheme, expected network/app-state effect, and device before asking. Missing authority returns `url_open_authorization_missing` with zero `simctl openurl` calls. Permission to build/test, simulator selection, a visible link, or a known URL does not imply this authority.
 
 ### 6. Human Verification (When Required)
 

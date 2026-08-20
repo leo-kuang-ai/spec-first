@@ -16,6 +16,7 @@ const {
 
 const CANONICALIZATION_VERSION = 'source-plan-body-v1';
 const TASK_PACK_SCHEMA_VERSION = 'task-pack/v1';
+const NON_ACTIVE_PLAN_STATUSES = new Set(['completed', 'partially-shipped', 'superseded']);
 
 // Frozen because these sets are exported; consumers read them (e.g. the parity
 // contract test) and must not mutate the module-level singleton.
@@ -117,6 +118,45 @@ function computeSourcePlanHash(planPath) {
     canonicalization_version: CANONICALIZATION_VERSION,
     removed_frontmatter: split.removedFrontmatter,
     canonical_body_bytes: Buffer.byteLength(split.body, 'utf8'),
+  };
+}
+
+function inspectSourcePlanExecutionEligibility(markdown) {
+  const split = splitMarkdownFrontmatter(markdown);
+  if (split.error) {
+    return {
+      eligible: false,
+      status: null,
+      reason_code: 'source-plan-frontmatter-invalid',
+      message: split.error.message,
+    };
+  }
+  const metadata = parseFrontmatterScalars(split.frontmatter);
+  const status = metadata.status || null;
+  if (status === null) {
+    return {
+      eligible: true,
+      status: null,
+      reason_code: 'source-plan-lifecycle-unmanaged',
+      limitation: 'Legacy source plan has no lifecycle status; downstream execution must keep the limitation visible.',
+    };
+  }
+  if (status === 'active') {
+    return { eligible: true, status, reason_code: 'source-plan-active' };
+  }
+  if (NON_ACTIVE_PLAN_STATUSES.has(status)) {
+    return {
+      eligible: false,
+      status,
+      reason_code: 'source-plan-non-active',
+      message: `Source plan status '${status}' is not eligible for task compilation or execution.`,
+    };
+  }
+  return {
+    eligible: false,
+    status,
+    reason_code: 'source-plan-status-invalid',
+    message: `Source plan status is not canonical: ${status}.`,
   };
 }
 
@@ -330,6 +370,7 @@ function deriveReasonCode(validity, errors) {
   if (validity === 'unverifiable') return 'unverifiable_hash';
   // invalid: inspect first deterministic error code for a more specific reason
   const first = errors[0] && errors[0].code;
+  if (first === 'task-pack-source-plan-non-active') return 'source_plan_non_active';
   if (first === 'task-pack-source-plan-file-missing' || first === 'task-pack-source-plan-missing') return 'source_plan_missing';
   if (first && first.includes('contract')) return 'invalid_contract';
   return 'invalid_contract';
@@ -348,6 +389,7 @@ function validateTaskPack(taskPackPath, options = {}) {
     source_plan_hash: 'not_checked',
     hash_tool: 'available',
     source_plan_path: 'not_checked',
+    source_plan_lifecycle: 'not_checked',
     task_pack_contract: 'not_checked',
   };
 
@@ -470,6 +512,17 @@ function validateTaskPack(taskPackPath, options = {}) {
         addFinding(errors, 'source-plan-frontmatter-invalid', sourcePlanSplit.error.message);
       } else {
         const sourcePlanMetadata = parseFrontmatterScalars(sourcePlanSplit.frontmatter);
+        const lifecycle = inspectSourcePlanExecutionEligibility(sourcePlanRead.text);
+        validation.source_plan_lifecycle = lifecycle.eligible
+          ? (lifecycle.status === 'active' ? 'active' : 'unmanaged')
+          : 'non-active';
+        if (!lifecycle.eligible) {
+          addFinding(errors, 'task-pack-source-plan-non-active', lifecycle.message, {
+            source_plan_status: lifecycle.status,
+          });
+        } else if (lifecycle.status === null) {
+          addFinding(limitations, 'task-pack-source-plan-lifecycle-unmanaged', lifecycle.limitation);
+        }
         if (metadata.spec_id && sourcePlanMetadata.spec_id && metadata.spec_id !== sourcePlanMetadata.spec_id) {
           validation.spec_id = 'mismatch';
           addFinding(errors, 'task-pack-wrong-chain', 'Task pack spec_id does not match source plan spec_id.');
@@ -904,6 +957,7 @@ module.exports = {
   REQUIRED_TASK_FIELDS,
   ALLOWED_TASK_FIELDS,
   computeSourcePlanHash,
+  inspectSourcePlanExecutionEligibility,
   parseFrontmatterScalars,
   splitMarkdownFrontmatter,
   validateTaskPack,

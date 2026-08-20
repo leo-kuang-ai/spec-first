@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-review-findings/v1",
+  "title": "CE localization review findings artifact family",
+  "type": "object",
+  "required": ["schema_version", "source_snapshot", "findings", "claim_ceiling"],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "ce-localization-round-1-review/v1",
+        "ce-localization-round-2-review/v1",
+        "ce-localization-round-3-findings/v1"
+      ]
+    },
+    "source_snapshot": { "type": "object" },
+    "findings": { "type": "array", "items": { "type": "object" } },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  }
+}

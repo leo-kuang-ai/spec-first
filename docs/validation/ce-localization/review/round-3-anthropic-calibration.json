@@ -1,0 +1,20 @@
+{
+  "schema_version": "ce-localization-round-3-calibration/v1",
+  "review_lens": "anthropic-skill-craft-safety",
+  "source_artifact": "docs/validation/ce-localization/review/round-3-anthropic-skill-lens.json",
+  "counter_artifact": "docs/validation/ce-localization/review/round-3-openai-skill-lens.json",
+  "role_representation": "role-simulated",
+  "provider_identity": "unverified",
+  "worker_context_isolation": "degraded_inherited",
+  "calibration": [
+    {"finding_id":"ANTH-R3-001","decision":"retain-owner-recheck","reason":"OpenAI lane no-finding does not disprove implicit branch mutation authority; exact caller handoff must be checked."},
+    {"finding_id":"ANTH-R3-002","decision":"retain-owner-recheck","reason":"OpenAI lane no-finding does not prove ordinary browser actions are non-durable; spec-test-browser effect contract is a relevant counter-source."},
+    {"finding_id":"ANTH-R3-003","decision":"retain-owner-recheck","reason":"OpenAI lane no-finding does not resolve opt-in versus always-on web research contradiction."},
+    {"finding_id":"ANTH-R3-004","decision":"retain-owner-recheck","reason":"OpenAI lane no-finding does not authorize tracker mutation; caller/reference trigger conflict remains source-bound."},
+    {"finding_id":"ANTH-R3-005","decision":"retain-convergent-owner-recheck","reason":"OpenAI lane independently identifies optimize lifecycle ambiguity; approval-before-command execution is higher-severity source evidence."},
+    {"finding_id":"ANTH-R3-006","decision":"retain-owner-recheck","reason":"OpenAI lane no-finding does not distinguish zero from unavailable provider; report claim ceiling remains incomplete."},
+    {"finding_id":"ANTH-R3-007","decision":"retain-convergent-owner-recheck","reason":"OpenAI lane identifies analyzer egress risk; automatic brainstorm handoff is a separate agency/mutation risk."},
+    {"finding_id":"ANTH-R3-008","decision":"retain-owner-recheck","reason":"OpenAI lane no-finding does not establish safe URL/scheme effect boundary for simctl openurl."}
+  ],
+  "limitations":["No authenticated provider receipt.","Context isolation degraded/inherited.","No source mutation or focused re-review performed.","Static package scan did not execute all fixtures or runtime flows."]
+}

@@ -8,7 +8,11 @@ CRITICAL: You MUST execute every step below IN ORDER. Do NOT skip any required s
 
 进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断“适合 shipping”都不构成授权。
 
-上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`worker_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
+上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`worker_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。外部 tracker filing 是独立副作用：只有当前请求或可见 upstream handoff 明确要求提交 residual tickets 时，才记录 `tracker_deferral_authorization: authorized`；否则固定为 `tracker_deferral_authorization: missing`。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
+
+```yaml
+tracker_deferral_authorization: authorized | missing
+```
 
 When invoking any skill referenced below, resolve its name against the available-skills list the host platform provides and use that exact entry. Some platforms list skills under a plugin namespace (e.g., `spec-first:spec-plan`); others list the bare name. Invoking a short-form guess that isn't in the list will fail — always match a listed entry verbatim before calling the Skill/Task tool.
 
@@ -168,8 +172,8 @@ retry a push or hunt for a remote. Run steps 7–9 normally when a remote exists
 
    Do not prompt the user. This step embraces the autopilot contract: residuals must become durable before DONE, but the agent never stops to ask.
 
-   1. Load `references/tracker-defer.md` in **non-interactive mode**. Pass the residual actionable findings from step 4/5 (or the run artifact when the summary was truncated).
-   2. Collect the structured return: `{ filed: [...], failed: [...], no_sink: [...] }`.
+   1. If `tracker_deferral_authorization: authorized`, Load `references/tracker-defer.md` in **non-interactive mode** and pass the residual actionable findings from step 4/5 (or the run artifact when the summary was truncated). If `tracker_deferral_authorization: missing`, do not invoke an external tracker sink; record `tracker_deferral_authorization_missing` and put every residual directly in `no_sink` so the already-authorized PR-body or local durable fallback owns persistence.
+   2. Collect or construct the structured return: `{ filed: [...], failed: [...], no_sink: [...] }`.
    3. Compose a `## Residual Review Findings` markdown section from the structured return:
       - For each item in `filed`: a bullet with severity, file:line, title, and a link to the tracker ticket URL.
       - For each item in `failed`: a bullet with severity, file:line, title, and the failure reason (e.g., `Defer failed: gh returned 401 — tracker unavailable`).

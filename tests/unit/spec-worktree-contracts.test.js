@@ -44,6 +44,8 @@ describe('spec-worktree existing-ref isolation contracts', () => {
     expect(skill).toContain('Governed callers are spec-dogfood and spec-work');
     expect(skill).toContain('caller-owned isolation contract');
     expect(skill).toMatch(/never selects an execution engine, dispatches a worker/i);
+    expect(skill).toContain('worker_git_index_enforcement_unavailable');
+    expect(skill).toMatch(/linked worktree does not enforce Git-index isolation/i);
     expect(skill).not.toContain('`spec-code-review` offer this skill');
     expect(skill).not.toMatch(/description:.*spec-work.*spec-code-review/i);
     expect(dogfood).toContain('isolate pr:<number>');
@@ -118,5 +120,51 @@ describe('spec-worktree existing-ref isolation contracts', () => {
     expect(facts.state).toBe('ordinary-checkout');
     expect(facts.reason_code).toBe('same-git-dir');
     expect(facts.git_dir).toBe(facts.common_dir);
+  });
+
+  test('reports mise and direnv trust commands without executing them', () => {
+    const dir = initRepo();
+    const fakeBin = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-worktree-fake-tools-'));
+    const marker = path.join(fakeBin, 'called.log');
+    for (const tool of ['mise', 'direnv']) {
+      const executable = path.join(fakeBin, tool);
+      fs.writeFileSync(executable, `#!/bin/sh\nprintf '%s\\n' "${tool}" >> "$FAKE_TOOL_MARKER"\n`);
+      fs.chmodSync(executable, 0o755);
+    }
+    fs.writeFileSync(path.join(dir, '.mise.toml'), '[tools]\nnode = "22"\n');
+    fs.writeFileSync(path.join(dir, '.envrc'), 'export SAFE_FIXTURE=1\n');
+    run('git', ['add', '.mise.toml', '.envrc'], { cwd: dir });
+    run('git', ['commit', '-m', 'add dev tool config'], { cwd: dir });
+
+    const output = run('bash', [scriptPath, 'create', 'feature/no-auto-trust', 'main'], {
+      cwd: dir,
+      env: {
+        PATH: `${fakeBin}${path.delimiter}${process.env.PATH}`,
+        FAKE_TOOL_MARKER: marker,
+      },
+    });
+
+    expect(output).toContain('Manual review required for: mise trust .mise.toml direnv allow');
+    expect(fs.existsSync(marker)).toBe(false);
+  });
+
+  test('env copy audit log is owner-only and contains no paths or content hash', () => {
+    const dir = initRepo();
+    const secretPath = path.join(dir, '.env.local');
+    fs.writeFileSync(secretPath, 'SECRET_SENTINEL=value\n');
+
+    run('bash', [scriptPath, 'isolate', '--copy-env', 'feature/login'], { cwd: dir });
+    const worktreePath = path.join(dir, '.worktrees', 'feature-login');
+    const logPath = path.join(worktreePath, '.env-copy.log');
+    const log = fs.readFileSync(logPath, 'utf8');
+
+    expect(fs.statSync(logPath).mode & 0o777).toBe(0o600);
+    expect(log).toContain('file_name=.env.local');
+    expect(log).toContain('size_bytes=');
+    expect(log).not.toContain(canonicalShellPath(dir));
+    expect(log).not.toContain('source_path=');
+    expect(log).not.toContain('destination_path=');
+    expect(log).not.toContain('sha256');
+    expect(log).not.toContain('SECRET_SENTINEL');
   });
 });

@@ -156,10 +156,17 @@ function runSetup(input = {}) {
   const mutationNeedsHost = ['verify', 'only', 'graphify-refresh', 'host-config-repair', 'workspace-graph-build'].includes(actionPlan.mode);
   const runner = input.runner || runCommandSync;
   const candidates = advisoryHostCandidates({ env, runner });
+  const internalWorkspaceRefresh = isInternalWorkspaceGraphRefreshInvocation({ actionPlan, env });
   const authority = resolveHostAuthority({
     env,
     mutationRequested: mutationNeedsHost,
     candidates,
+    skillRoot,
+    targetIdentity: target.target_root || target.workspace_root || cwd,
+    // Detached workspace refresh is launched from canonical source, not a host
+    // Skill mirror. Its mutation authority is the validated lifecycle lease.
+    enforceSurfaceBinding: input.enforceSurfaceBinding === true && !internalWorkspaceRefresh,
+    now: input.now,
   });
   if (authority.status === 'blocked') {
     return {
@@ -237,6 +244,15 @@ function runSetup(input = {}) {
       target,
     });
   }
+}
+
+function isInternalWorkspaceGraphRefreshInvocation({ actionPlan, env = {} } = {}) {
+  if (!actionPlan || actionPlan.mode !== 'workspace-graph-build') return false;
+  const credential = workspaceGraphLifecycleCredentialFromEnv(env);
+  return env[INTERNAL_REFRESH_ONLY_ENV] === '1'
+    && isAbsolutePath(env[INTERNAL_CODEGRAPH_COMMAND_ENV])
+    && isAbsolutePath(env[INTERNAL_GRAPHIFY_COMMAND_ENV])
+    && Boolean(credential && credential.token && credential.owner_pid);
 }
 
 function buildRuntimeProjectionPreflight(context, selection = null) {
@@ -853,7 +869,10 @@ function failedResult(reasonCode, error, exitCode = 1, extra = {}) {
 
 function main(argv = process.argv.slice(2)) {
   const parsed = parseEntrypointOptions(argv);
-  const result = runSetup({ argv });
+  const result = runSetup({
+    argv,
+    enforceSurfaceBinding: true,
+  });
   const scenarioFingerprintSetup = result.payload
     && result.payload.runtime_capabilities
     && result.payload.runtime_capabilities.scenario_fingerprint_setup;

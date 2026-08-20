@@ -26,9 +26,12 @@ function writeJson(file, value) {
 
 function fixture(root, overrides = {}) {
   const sourceIdentity = 'worktree:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  const requestedProvider = overrides.requestedProvider || 'claude';
+  const requestedModel = overrides.requestedModel || 'opus';
   const payloadRef = path.join(root, 'peer-task.json');
   const requestRef = path.join(root, 'worker-request.json');
   const receiptRef = path.join(root, 'worker-journey.json');
+  const servingReceiptRef = path.join(root, 'provider-serving-receipt.json');
   const inputRefs = overrides.inputRefs || ['git:base..head', 'skills/spec-code-review/SKILL.md'];
   const authorizations = {
     restricted_read_authorization: 'authorized',
@@ -63,7 +66,38 @@ function fixture(root, overrides = {}) {
     semantic_request_sha256: requestSha,
     ...authorizations,
   });
-  return { sourceIdentity, payloadRef, payloadSha, receiptRef, receiptSha };
+  const capturedAt = new Date();
+  const servingReceiptSha = writeJson(servingReceiptRef, {
+    schema_version: 'provider-serving-receipt/v2',
+    artifact_type: 'degraded',
+    verification_status: 'unverified',
+    reason_code: 'authenticated-producer-unavailable',
+    producer: {
+      kind: 'host-runtime',
+      identity: 'test-host-runtime',
+      authority: 'self-asserted',
+    },
+    captured_at: capturedAt.toISOString(),
+    freshness_expires_at: new Date(capturedAt.getTime() + 60_000).toISOString(),
+    semantic_request_sha256: requestSha,
+    source_identity: sourceIdentity,
+    provider_trust_domain: 'external',
+    requested_provider: requestedProvider,
+    requested_model: requestedModel,
+    actual_provider: overrides.actualProvider || requestedProvider,
+    actual_model: overrides.actualModel || requestedModel,
+    credential_env_allowlist: overrides.credentialEnvAllowlist || [],
+    ...(overrides.servingReceipt || {}),
+  });
+  return {
+    sourceIdentity,
+    payloadRef,
+    payloadSha,
+    receiptRef,
+    receiptSha,
+    servingReceiptRef,
+    servingReceiptSha,
+  };
 }
 
 function startArgs(root, evidence, resultPath, worker, extra = []) {
@@ -74,6 +108,8 @@ function startArgs(root, evidence, resultPath, worker, extra = []) {
     '--run-id', 'run-1',
     '--authorization-receipt', evidence.receiptRef,
     '--authorization-receipt-sha256', evidence.receiptSha,
+    '--serving-receipt', evidence.servingReceiptRef,
+    '--serving-receipt-sha256', evidence.servingReceiptSha,
     '--payload-ref', evidence.payloadRef,
     '--payload-sha256', evidence.payloadSha,
     '--payload-redaction-status', 'passed',
@@ -115,7 +151,7 @@ describe('spec-code-review peer runner', () => {
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  test('starts only with matching canonical authority and publishes bounded results', () => {
+  test('starts no peer when the serving producer is not authenticated', () => {
     const evidence = fixture(root);
     const resultPath = path.join(root, 'result.json');
     const worker = [
@@ -125,38 +161,21 @@ describe('spec-code-review peer runner', () => {
       resultPath,
     ];
     const env = runnerEnv(root);
-    const jobId = execFileSync('python3', startArgs(root, evidence, resultPath, worker), {
+    const result = spawnSync('python3', startArgs(root, evidence, resultPath, worker), {
       cwd: REPO_ROOT,
       env,
       encoding: 'utf8',
-    }).trim();
-    const state = execFileSync('python3', [RUNNER, 'wait', '--skill', 'spec-code-review', '--max-secs', '5', jobId], {
-      cwd: REPO_ROOT,
-      env,
-      encoding: 'utf8',
-    }).trim();
-    expect(state).toBe('done');
-    expect(JSON.parse(execFileSync('python3', [RUNNER, 'result', '--skill', 'spec-code-review', jobId], {
-      cwd: REPO_ROOT,
-      env,
-      encoding: 'utf8',
-    }))).toEqual({ findings: [] });
-
-    const jobRoot = path.join(env.SPEC_FIRST_PEER_JOBS_ROOT, 'spec-code-review', 'run-1', 'jobs');
-    const meta = JSON.parse(fs.readFileSync(path.join(jobRoot, jobId, 'meta.json'), 'utf8'));
-    expect(meta.worker_argv).toBeUndefined();
-    expect(meta.canonical_authorization_receipt_sha256).toBe(evidence.receiptSha);
-    expect(meta.payload_redaction_status).toBe('passed');
-    expect(meta.requested_provider).toBe('claude');
-    expect(meta.actual_model).toBe('opus');
+    });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('provider_serving_receipt_unverified');
+    expect(fs.existsSync(resultPath)).toBe(false);
+    expect(fs.existsSync(env.SPEC_FIRST_PEER_JOBS_ROOT)).toBe(false);
   });
 
   test.each([
     ['missing data-egress authorization', { authorizations: { data_egress_authorization: 'missing' } }, [], 'data_egress_authorization=authorized'],
-    ['non-allowlisted input ref', { payloadInputRefs: ['unapproved:path'] }, [], 'input_refs do not match'],
-    ['secret-like prompt', { prompt: 'Use api_key=abcdefghijk12345 to review.' }, [], 'secret-like value'],
-    ['same provider', {}, ['--host-provider', 'claude'], 'matches the host provider'],
-    ['actual model mismatch', {}, ['--actual-model', 'sonnet'], 'actual model does not match'],
+    ['self-asserted serving producer', {}, [], 'provider_serving_receipt_unverified'],
+    ['forged confirmed status', { servingReceipt: { artifact_type: 'confirmed', verification_status: 'verified' } }, [], 'provider_serving_receipt_unverified'],
   ])('fails closed for %s', (_name, fixtureOverrides, extra, expected) => {
     const evidence = fixture(root, fixtureOverrides);
     const resultPath = path.join(root, 'result.json');
@@ -170,8 +189,8 @@ describe('spec-code-review peer runner', () => {
     expect(result.stderr).toContain(expected);
   });
 
-  test('does not execute command-shaped provider output and redacts secret-like logs', () => {
-    const evidence = fixture(root);
+  test('does not execute a worker or expose credentials when serving identity is unverified', () => {
+    const evidence = fixture(root, { credentialEnvAllowlist: ['PEER_TEST_TOKEN'] });
     const resultPath = path.join(root, 'result.json');
     const marker = path.join(root, 'must-not-exist');
     const worker = [
@@ -183,40 +202,54 @@ describe('spec-code-review peer runner', () => {
     ];
     const env = runnerEnv(root, { PEER_TEST_TOKEN: 'api_key=abcdefghijk12345' });
     const args = startArgs(root, evidence, resultPath, worker, ['--credential-env', 'PEER_TEST_TOKEN']);
-    const jobId = execFileSync('python3', args, {
+    const result = spawnSync('python3', args, {
       cwd: REPO_ROOT,
       env,
       encoding: 'utf8',
-    }).trim();
-    execFileSync('python3', [RUNNER, 'wait', '--skill', 'spec-code-review', '--max-secs', '5', jobId], {
-      cwd: REPO_ROOT,
-      env,
     });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('provider_serving_receipt_unverified');
     expect(fs.existsSync(marker)).toBe(false);
-    const log = fs.readFileSync(path.join(
-      env.SPEC_FIRST_PEER_JOBS_ROOT,
-      'spec-code-review',
-      'run-1',
-      'jobs',
-      jobId,
-      'out.log',
-    ), 'utf8');
-    expect(log).toContain('[REDACTED]');
-    expect(log).not.toContain('abcdefghijk12345');
+    expect(fs.existsSync(env.SPEC_FIRST_PEER_JOBS_ROOT)).toBe(false);
   });
 
-  test('adapter publishes the authorized packet and uses the runner lifecycle', () => {
-    const evidence = fixture(root);
+  test('adapter rejects an unverified serving receipt before publishing a packet', () => {
+    const evidence = fixture(root, { requestedProvider: 'codex', requestedModel: 'gpt-5' });
     const fakeBin = path.join(root, 'bin');
     fs.mkdirSync(fakeBin, { mode: 0o700 });
-    const fakeClaude = path.join(fakeBin, 'claude');
+    const fakeCodex = path.join(fakeBin, 'codex');
     fs.writeFileSync(
-      fakeClaude,
-      '#!/bin/sh\nprintf \'%s\\n\' \'{"structured_output":{"findings":[],"residual_risks":[],"testing_gaps":[]}}\'\n',
+      fakeCodex,
+      '#!/bin/sh\nwhile [ "$#" -gt 0 ]; do\n  if [ "$1" = "-o" ]; then\n    shift\n    printf \'%s\\n\' \'{"findings":[],"residual_risks":[],"testing_gaps":[]}\' >"$1"\n    exit 0\n  fi\n  shift\ndone\nexit 2\n',
       { mode: 0o700 },
     );
     const env = runnerEnv(root, { PATH: `${fakeBin}:${process.env.PATH}` });
-    const jobId = execFileSync('bash', [
+    const result = spawnSync('bash', [
+      ADAPTER,
+      'start',
+      'codex',
+      'gpt-5',
+      'HEAD',
+      root,
+      evidence.receiptRef,
+      evidence.receiptSha,
+      evidence.sourceIdentity,
+      'claude',
+      evidence.servingReceiptRef,
+      evidence.servingReceiptSha,
+    ], {
+      cwd: REPO_ROOT,
+      env,
+      encoding: 'utf8',
+    });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('provider_serving_receipt_unverified');
+    expect(fs.existsSync(path.join(root, 'peer-task-codex.json'))).toBe(false);
+  });
+
+  test('adapter starts no peer when a serving receipt is unavailable', () => {
+    const evidence = fixture(root);
+    const result = spawnSync('bash', [
       ADAPTER,
       'start',
       'claude',
@@ -229,51 +262,11 @@ describe('spec-code-review peer runner', () => {
       'codex',
     ], {
       cwd: REPO_ROOT,
-      env,
+      env: runnerEnv(root),
       encoding: 'utf8',
-    }).trim();
-    const state = execFileSync('python3', [
-      RUNNER,
-      'wait',
-      '--skill',
-      'spec-code-review',
-      '--max-secs',
-      '5',
-      jobId,
-    ], {
-      cwd: REPO_ROOT,
-      env,
-      encoding: 'utf8',
-    }).trim();
-    if (state !== 'done') {
-      const reason = fs.readFileSync(path.join(
-        env.SPEC_FIRST_PEER_JOBS_ROOT,
-        'spec-code-review',
-        path.basename(root),
-        'jobs',
-        jobId,
-        'reason',
-      ), 'utf8');
-      const log = fs.readFileSync(path.join(
-        env.SPEC_FIRST_PEER_JOBS_ROOT,
-        'spec-code-review',
-        path.basename(root),
-        'jobs',
-        jobId,
-        'out.log',
-      ), 'utf8');
-      throw new Error(`adapter job ended as ${state}: ${reason}\n${log}`);
-    }
-    expect(state).toBe('done');
-    expect(JSON.parse(fs.readFileSync(path.join(root, 'adversarial-claude.json'), 'utf8')))
-      .toEqual({
-        reviewer: 'adversarial-claude',
-        findings: [],
-        residual_risks: [],
-        testing_gaps: [],
-      });
-    const packet = JSON.parse(fs.readFileSync(path.join(root, 'peer-task-claude.json'), 'utf8'));
-    expect(packet.source_identity).toBe(evidence.sourceIdentity);
-    expect(packet.prompt).toContain('Return one JSON object and nothing else');
+    });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('provider_serving_receipt_unavailable');
+    expect(fs.existsSync(path.join(root, 'peer-task-claude.json'))).toBe(false);
   });
 });

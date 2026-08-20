@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const yaml = require('../vendor/js-yaml-3.15.1.min.js');
 const {
   assertContainedPath,
   ensureContainedDirectory,
@@ -14,6 +15,41 @@ const {
 } = require('./renderer.cjs');
 
 const LOCAL_CONFIG_RULE = '.spec-first/*.local.yaml';
+const LOCAL_CONFIG_CONSUMERS = Object.freeze({
+  verification_profile_path: consumer('deterministic-source-reader', 'src/verification/profile-loader.js'),
+  feedback_sources: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_state_path: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_ack_cap: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_lease_ttl_minutes: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_shared_branch: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_commit_approved: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_branch_mutation_approved: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  sweep_landing_approved: consumer('skill-prose/native-read', 'skills/spec-sweep'),
+  pulse_product_name: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_lookback_default: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_primary_event: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_value_event: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_completion_events: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_quality_scoring: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_quality_dimension: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_analytics_source: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_tracing_source: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_payments_source: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_db_enabled: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_metric_sources: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_pending_metrics: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_excluded_metrics: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  pulse_schedule: consumer('skill-prose/native-read', 'skills/spec-product-pulse'),
+  spec_promote_spiral_optout: consumer('skill-prose/native-read', 'skills/spec-promote'),
+  plan_output: consumer('skill-prose/native-read', 'skills/spec-plan'),
+  brainstorm_output: consumer('skill-prose/native-read', 'skills/spec-brainstorm'),
+  ideate_output: consumer('skill-prose/native-read', 'skills/spec-ideate'),
+  plan_skip_scoping_confirm: consumer('skill-prose/native-read', 'skills/spec-plan'),
+});
+
+function consumer(kind, owner) {
+  return Object.freeze({ kind, owner, value_validation: 'consumer-owned' });
+}
 
 function readIfExists(filePath) {
   return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : null;
@@ -56,6 +92,76 @@ function gitIgnores(root, filePath) {
   return !result.error && result.status === 0;
 }
 
+function inspectLocalConfigContent(raw, localPath = '.spec-first/config.local.yaml') {
+  const source = String(raw || '').replace(/\r\n/g, '\n');
+  let document;
+  try {
+    document = yaml.safeLoad(source, { json: false });
+  } catch (error) {
+    const duplicate = error && error.reason === 'duplicated mapping key';
+    const reasonCode = duplicate ? 'local-config-duplicate-key' : 'local-config-syntax-invalid';
+    return {
+      status: 'invalid',
+      reason_code: reasonCode,
+      path: localPath,
+      keys: [],
+      unowned_keys: [],
+      errors: [{
+        line: error && error.mark ? error.mark.line + 1 : null,
+        reason_code: reasonCode,
+        parser_reason: error && error.reason ? error.reason : 'yaml-parse-failed',
+      }],
+      validation_scope: 'syntax-structure-and-consumer-ownership',
+    };
+  }
+
+  if (document === undefined || document === null) document = {};
+  if (typeof document !== 'object' || Array.isArray(document)) {
+    return {
+      status: 'invalid',
+      reason_code: 'local-config-syntax-invalid',
+      path: localPath,
+      keys: [],
+      unowned_keys: [],
+      errors: [{ line: 1, reason_code: 'local-config-top-level-mapping-required' }],
+      validation_scope: 'syntax-structure-and-consumer-ownership',
+    };
+  }
+
+  const keys = [];
+  for (const key of Object.keys(document)) {
+    const registered = LOCAL_CONFIG_CONSUMERS[key];
+    keys.push({
+      key,
+      consumer_kind: registered ? registered.kind : 'unowned',
+      consumer: registered ? registered.owner : null,
+      value_validation: registered ? registered.value_validation : 'not-applicable',
+    });
+  }
+
+  const unownedKeys = keys.filter((entry) => entry.consumer_kind === 'unowned').map((entry) => entry.key);
+  if (unownedKeys.length > 0) {
+    return {
+      status: 'invalid',
+      reason_code: 'local-config-key-unowned',
+      path: localPath,
+      keys,
+      unowned_keys: unownedKeys,
+      errors: [],
+      validation_scope: 'syntax-structure-and-consumer-ownership',
+    };
+  }
+  return {
+    status: 'valid',
+    reason_code: 'local-config-structure-valid',
+    path: localPath,
+    keys,
+    unowned_keys: [],
+    errors: [],
+    validation_scope: 'syntax-structure-and-consumer-ownership',
+  };
+}
+
 function inspectProjectConfig({ repoRoot, templatePath }) {
   if (!repoRoot || !isDirectory(repoRoot)) {
     return {
@@ -79,6 +185,9 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
   const template = templatePath && isFile(templatePath) ? fs.readFileSync(templatePath, 'utf8') : null;
   const example = isFile(examplePath) ? fs.readFileSync(examplePath, 'utf8') : null;
   const localPresent = isFile(localPath);
+  const localValidation = localPresent
+    ? inspectLocalConfigContent(fs.readFileSync(localPath, 'utf8'), workspaceRelativePath(root, localPath))
+    : null;
   const gitignore = readIfExists(gitignorePath) || '';
   const legacyMarkdownPresent = isFile(legacyMarkdownPath);
   const exampleStatus = example === null
@@ -90,7 +199,9 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
   } else if (gitignore.split(/\r?\n/).includes(LOCAL_CONFIG_RULE)) {
     gitignoreStatus = 'ready-for-local-config';
   }
-  const status = exampleStatus === 'current'
+  const status = localValidation && localValidation.status === 'invalid'
+    ? 'action-required'
+    : exampleStatus === 'current'
       && ['ignored', 'ready-for-local-config', 'not-applicable'].includes(gitignoreStatus)
     ? 'ready'
     : (['missing', 'outdated'].includes(exampleStatus) || gitignoreStatus === 'missing'
@@ -100,6 +211,9 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
   return {
     schema_version: 'project-local-config-status.v1',
     status,
+    ...(localValidation && localValidation.status === 'invalid'
+      ? { reason_code: localValidation.reason_code }
+      : {}),
     repo_root: root,
     example_config: {
       path: examplePath,
@@ -110,8 +224,11 @@ function inspectProjectConfig({ repoRoot, templatePath }) {
     },
     local_config: {
       path: localPath,
-      status: localPresent ? 'present' : 'defaults-active',
-      next_action: null,
+      status: localPresent && localValidation.status === 'invalid' ? 'invalid' : (localPresent ? 'present' : 'defaults-active'),
+      next_action: localPresent && localValidation.status === 'invalid'
+        ? `Review ${workspaceRelativePath(root, localPath)} and fix ${localValidation.reason_code}.`
+        : null,
+      ...(localValidation ? { validation: localValidation } : {}),
     },
     local_config_gitignore: {
       path: gitignorePath,
@@ -323,8 +440,10 @@ function applyProjectConfigBatch({ workspaceRoot, selectionSource, plans, templa
 }
 
 module.exports = {
+  LOCAL_CONFIG_CONSUMERS,
   applyProjectConfig,
   applyProjectConfigBatch,
   inspectProjectConfig,
+  inspectLocalConfigContent,
   planProjectConfig,
 };

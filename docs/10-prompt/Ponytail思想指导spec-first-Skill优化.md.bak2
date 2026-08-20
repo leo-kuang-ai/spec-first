@@ -1,0 +1,381 @@
+---
+title: Ponytail 思想指导 spec-first Skill 优化
+date: 2026-08-20
+input_shape: concept
+subject: Ponytail 核心思想与 spec-first Skill 优化
+---
+
+# Ponytail 思想指导 spec-first Skill 优化
+
+> 用最小充分、可验证、可撤销的机制，让 AI 更快地产生可信变更。
+
+## 文档定位
+
+本文是 `docs/10-prompt/` 下的专项 companion，不是新的顶层契约、runtime contract、workflow、状态机或 Skill canonical source。
+
+权威关系如下：
+
+1. [`结构化项目角色契约.md`](./结构化项目角色契约.md) 规定第一性原理、使命、权威和不可越过的边界。
+2. [`AI-Coding-Harness演化方法论.md`](./AI-Coding-Harness演化方法论.md) 规定 Harness 能力演化的判断顺序。
+3. [`skill-prompt-设计与优化方法论-v2.md`](./skill-prompt-设计与优化方法论-v2.md) 规定 Skill Prompt 的设计与优化方法。
+4. 本文只回答：如何把 Ponytail 的复杂度控制思想，吸收到现有 spec-first Skill 中。
+5. 当前行为以 `skills/`、`docs/contracts/`、测试和真实运行证据为准；生成的宿主 runtime 不是 source of truth。
+
+本文不主张把 Ponytail 的命令、全局注入、`lite/full/ultra` 模式或 benchmark 数字原样搬进 spec-first。
+
+## 一句话指导思想
+
+> 先理解真实问题、影响面、调用流和根因；再在安全、授权、正确性、可维护性和验证义务不降低的前提下，选择能够完成目标的最小充分机制；对没有证据支撑的抽象、依赖、状态、配置和流程保持怀疑。
+
+这不是“少写代码”，而是“少制造未经证明的复杂度”。
+
+## 1. 第一性原理：AI 为什么会过度实现
+
+AI coding agent 的默认倾向往往不是故意浪费，而是同时受到几种压力影响：
+
+- 训练数据中常见的工程模板会诱导它先建接口、工厂、配置和扩展点；
+- “以后可能复用”容易被误当成当前需求；
+- 只看到报告中的表面路径时，容易在 caller 层重复打补丁；
+- 工具和依赖越多，模型越容易把“可用”误判成“必要”；
+- 缺少明确停止条件时，模型会继续补充边界、选项和说明；
+- 只看代码是否生成，不看行为、风险和现场结果时，复杂度没有反作用力。
+
+Ponytail 的价值，是把这些自由度收缩为一组有优先级的判断：
+
+```text
+理解问题
+  -> 判断是否必须存在
+  -> 复用现有能力
+  -> 使用标准库或平台原生能力
+  -> 使用已安装依赖
+  -> 只写最小新增机制
+  -> 留下与风险匹配的可运行验证
+```
+
+其因果机制是：
+
+```text
+更少未经证明的选择
+  -> 更少隐藏假设
+  -> 更小的变更面
+  -> 更少的回归与返工路径
+  -> 更低的审查、验证和维护成本
+```
+
+但这个因果链只有在“先理解、保留保护性机制、完成验证”的条件下成立。
+
+## 2. 质量定义：最小充分，而不是最短
+
+spec-first 应把 Ponytail 的“lazy”解释为“避免无价值工作”，而不是“压缩代码”。
+
+```text
+可信执行 = 正确理解 × 最小充分机制 × 有界自治 × 可核验证据
+```
+
+最小充分机制必须保留：
+
+- 信任边界上的输入校验；
+- 授权、隐私、安全和数据完整性保护；
+- 错误传播、回滚、降级和可恢复路径；
+- 可访问性和必要的用户状态；
+- 观测、审计、关联和证据收集；
+- 与 claim、风险和影响面匹配的验证；
+- 用户明确要求保留的能力。
+
+以下内容不能单独证明质量提升：
+
+- 删除了多少行；
+- 减少了多少 Token；
+- 新增了多少 Skill 或 agent；
+- prompt 变短了多少；
+- benchmark 中某个任务的局部速度提升。
+
+代码量、Token、agent 数、文件数和调用次数只能作为诊断指标。只有当任务结果、风险、验证和现场返工同时得到改善时，才可以称为系统性优化。
+
+## 3. 八条可迁移原则
+
+### 3.1 先理解，再简化
+
+任何删除、内联、合并或拒绝抽象，都必须发生在以下事实已经足够清楚之后：
+
+- 用户真正要改变的行为；
+- 相关文件、caller、consumer 和边界；
+- 数据或控制流如何产生当前结果；
+- 需要保留的安全、兼容、回滚和可观测性要求；
+- 验证该判断所需的最小证据。
+
+小 diff 不是理解的替代品。不了解调用流的“小修复”，只是更难被发现的错误。
+
+### 3.2 必要性优先于可实现性
+
+“能实现”不等于“应该实现”。每个新增 durable surface 都要回答：
+
+1. 这个能力是否直接服务于当前目标？
+2. 是否存在真实 consumer？
+3. 现有能力为什么不能承载？
+4. 不新增它会具体损失什么？
+5. 什么证据或触发条件会让未来需要它？
+
+没有真实 consumer、没有当前约束、只有想象中的未来需求时，默认 `Experiment / Defer`，而不是 `Build`。
+
+### 3.3 复用优先，但不把错误 owner 当成复用
+
+复用顺序应是：现有正确 owner 的能力、现有项目 pattern、标准库、平台原生能力、已安装依赖，最后才是新实现。
+
+但复用不是配额。若 nearby capability 是错误 owner，不能为了少建一个文件把业务规则塞进去。应使用 `reuse / extend / compose / new` 判断：
+
+- `reuse`：现有能力已经满足，不加 wrapper；
+- `extend`：现有 owner 可以吸收局部行为且不混责；
+- `compose`：多个权威能力保持独立，由窄 glue 连接；
+- `new`：前三者会混淆职责、制造第二真相源或扭曲 contract，且当前需求确实支持新边界。
+
+### 3.4 修共享根因，而不是修报告表面
+
+Bug 或行为异常应从触发条件追到状态第一次失效的位置。若多个 caller 经过同一共享入口，应优先在 owning boundary 修一次，而不是在每条路径上复制 guard。
+
+只有当调用路径确实独立、共享修复会混淆职责或会改变无关行为时，才在局部修复。
+
+### 3.5 删除优先，但删除必须能说明保留什么
+
+删除候选包括：
+
+- 死代码、无 consumer 的配置和分支；
+- 只转发、不增加 translation、sequencing、safety 或 evidence 的 wrapper；
+- 单实现且没有当前扩展需求的抽象；
+- 重复实现标准库、runtime 或平台能力的代码；
+- 与当前目标无关的 speculative scaffolding。
+
+任何删除都必须同时说明：行为为何保持、哪个保护性机制仍在、影响面如何验证。
+
+### 3.6 阶段边界做一次简化，而不是每行都抽象
+
+在一个 behavior cluster、dependency wave 或 final review 前，执行一次有界简化：
+
+- `remove-now`：当前 scope 内的死代码、重复 wrapper、未使用能力；
+- `minimality-debt`：真实但超出当前 scope 的复杂度，进入既有 residual/deferred sink；
+- `protected`：安全、数据完整性、隐私、可访问性、观测、回滚、兼容和验证机制；
+- `architecture-mismatch`：owner 或 source-of-truth 不正确，需要回到 plan 决策。
+
+不要把每段相似代码都抽成 helper。只有当 helper 有稳定 owner、稳定语义、清晰 contract，并且确实减少 coupling 或 duplication 时才提取。
+
+### 3.7 有意简化必须有 ceiling 和 trigger
+
+如果为了当前目标有意保留了全局锁、朴素算法、局部降级或有限兼容性，必须记录：
+
+- 当前简化是什么；
+- ceiling 或适用边界是什么；
+- 哪个可观测条件会触发重新评估；
+- 升级应回到哪个 owner 或 plan。
+
+“以后再做”没有触发条件，就不是治理，而是遗忘。
+
+### 3.8 用证据判断收益，不用叙事判断收益
+
+任何 Ponytail-inspired 优化都要区分四类证据：
+
+| 证据轴 | 能证明什么 | 不能证明什么 |
+| --- | --- | --- |
+| `structure_contract` | Skill 结构、触发、来源和边界存在 | 模型会稳定做出正确判断 |
+| `behavior_quality` | 代表性任务的正确性、安全性、语义充分性 | 已经产生真实组织收益 |
+| `runtime_cost` | token、延迟、调用、维护和治理成本变化 | 任务质量一定提高 |
+| `field_outcome` | 真实任务中的返工、采纳、交付和维护结果 | 其他项目、宿主或模型一定同样有效 |
+
+promotion 使用非补偿式门禁：成本或 footprint 变好，不能抵消任务失败、安全回归、授权越界、关键验证失败或现场返工增加。
+
+## 4. 对 spec-first Skill 的优化映射
+
+### 4.1 [`spec-simplify-code`](../../skills/spec-simplify-code/SKILL.md)：直接承接 Ponytail 的核心 lens
+
+现有 Skill 已经拥有 reuse、quality、efficiency 三个 review lens，并明确“fewer lines is not the goal”和“不得删除安全检查”。应继续强化：
+
+- 在 code-reuse lens 中显式检查项目现有 helper、标准库、runtime 和平台原生能力；
+- 在 code-quality lens 中加入单实现抽象、无 consumer 配置、薄 wrapper 和 speculative flexibility；
+- 使用 `delete / stdlib / native / yagni / shrink` 作为报告标签；
+- 保持行为保持验证、全局类型/lint 和按 blast radius 扩展测试；
+- 汇报 reuse、quality、efficiency 和 skipped finding，不把净删行数作为主要成果。
+
+不应把它改造成自动删代码工具；它仍然由当前 scope、行为保持和 protected surfaces 约束。
+
+### 4.2 [`spec-work`](../../skills/spec-work/SKILL.md)：把最小性放到实现边界
+
+在 durable surface 变更前使用现有的 capability inventory 和 `reuse / extend / compose / new` recheck。
+
+在 phase boundary 使用现有 `remove-now / minimality-debt / protected / architecture-mismatch` 分类。若发现当前 plan 没有授权的新 public contract、schema、runtime、provider 或 source-of-truth，不在实现阶段临场设计，返回 `spec-plan` 或 task-pack regeneration。
+
+### 4.3 [`spec-code-review`](../../skills/spec-code-review/SKILL.md)：增加复杂度视角，不增加第二个 review 系统
+
+复用现有 maintainability reviewer 和 report-only 机制，增加一个受控的 over-engineering 子视角：
+
+- 发现可删除、可复用、可替换为 stdlib/native 的代码；
+- 记录位置、证据、替代方案、风险和 owner；
+- 保留 removable surface 作为诊断信号，不作为自动修复或 merge verdict；
+- 与 correctness、security、testing、performance finding 分开，避免复杂度标签吞掉高风险问题。
+
+### 4.4 [`spec-debug`](../../skills/spec-debug/SKILL.md)：把”共享根因”写成可执行检查
+
+**现状问题:** `spec-debug/SKILL.md:9` 写的是 “tracing the full causal chain before proposing a fix”，这是判断意图而非可执行动作。ponytail 的根因对照实测（`benchmarks/results/2026-06-22-issue-245-217-comprehension.md`）证明：
+- `trace the flow end to end`（散文，正确但不可执行）→ Opus 0/3
+- 修复前完整 ponytail（懒惰框架齐备）→ Opus 0/3
+- `grep every caller of the function you touch` → Opus **6/6**
+
+在诊断阶段增加以下**可执行动作序列**（而不是判断意图）:
+
+1. **`grep -rn “被修改函数名” . --include=”*.{py,js,ts,java,...}”`** 找所有 caller；
+2. **读每个 caller 的调用上下文**，检查它们是否共享相同的状态转换或失效条件；
+3. **若多条路径共享同一入口，在共享函数加一次 guard**——这是更小的 diff，且覆盖所有路径；若路径独立或共享修复会混淆职责，才在 caller 层修；
+4. **修复后对未被 bug 报告提及的 sibling caller 执行相同输入**，验证它们也被保护。
+
+**措辞示例:**
+
+> Bug 报告只提了 `transfer()`，但 `transfer()` 和 `withdraw()` 都经过共享的 `_debit()`。grep 所有 caller：发现两条路径共享入口。在 `_debit()` 加一次余额检查（6 行 diff）比在 `transfer()` 和 `withdraw()` 各加一次（12 行 diff）更小。修完后用透支金额调 `withdraw()`（报告里没提它），验证它也被拦住了。
+
+这不是机械搜全仓库，而是让 caller 关系成为根因判断的一等证据，且每条都对应一个当下可执行、结果可自检的动作。
+
+### 4.5 [`spec-plan`](../../skills/spec-plan/SKILL.md)：把“为什么必须新增”前置
+
+在提出新 abstraction、adapter、wrapper、orchestrator 或 integration seam 时，计划必须给出：
+
+- 当前 source 能力与 owner inventory；
+- `reuse / extend / compose / new` 姿态；
+- 不新增的替代方案及其失败原因；
+- 当前新增边界的 consumer、source-of-truth 和退出条件；
+- 未来扩展的触发条件，而不是 speculative flexibility。
+
+计划只保留决策，不把 Ponytail 的实现步骤硬编码成第二套执行脚本。
+
+### 4.6 [`spec-optimize`](../../skills/spec-optimize/SKILL.md)：把 Ponytail 的 benchmark honesty 变成证据纪律
+
+优化 Skill 本身时，至少要求：
+
+- 冻结 baseline、任务样本、模型、宿主、授权和 rubric；
+- 先做 A/A 噪声，再做 baseline-vs-candidate A/B；
+- 使用 deterministic gates 拦截明显坏结果；
+- 对质量目标使用语义 judge 或人工校准，不用单一硬指标替代质量；
+- 记录 correction burden、回归、返工、token、延迟和成本；
+- 结构性变短只能作为诊断，不能直接声称 field outcome 改善。
+
+### 4.7 [`spec-compound`](../../skills/spec-compound/SKILL.md) / [`spec-compound-refresh`](../../skills/spec-compound-refresh/SKILL.md)：承接 shortcut 的生命周期
+
+不新增 `PONYTAIL-DEBT.md` 或第二套 debt schema。使用现有 durable knowledge 和 residual/deferred 机制：
+
+- shortcut 必须有适用范围、ceiling、owner 和 invalidation condition；
+- 已验证的简化模式才进入 `docs/solutions/`；
+- 过时、失效或无 consumer 的经验应被更新、合并或删除；
+- 没有真实验证的判断只能保持 advisory，不能提升为项目规则。
+
+## 5. Skill 优化单元的统一合同
+
+每次优化一个 Skill，都至少回答以下问题：
+
+| 合同项 | 必须回答什么 |
+| --- | --- |
+| Objective | 要改善哪个用户可见结果或瓶颈？ |
+| Scope | 只影响哪些任务、文件、阶段和宿主？ |
+| Source / Owner | 哪个 canonical source 负责事实、规则和投射？ |
+| Consumer | 谁真实使用这个 Skill 或输出？ |
+| Decision lens | 需要减少哪类臆测、复杂度或错误路径？ |
+| Protected surfaces | 哪些安全、授权、证据、回滚、兼容和 a11y 不能被简化？ |
+| Output | 产生什么 finding、artifact、handoff 或 claim？ |
+| Verification | 用什么 deterministic、semantic 或 field evidence 验证？ |
+| Degraded path | 能力、证据或授权缺失时如何收缩 claim？ |
+| Retirement | 什么条件会让该规则失效、退役或回到上游 owner？ |
+
+缺少真实 consumer、verification owner 或 retirement 条件时，不应直接 Build 新 Skill；优先 `Experiment / Defer` 或复用现有 Skill。
+
+## 6. 不应直接迁移的内容
+
+### 6.1 不迁移 Ponytail 的全局持久注入
+
+spec-first 已有自己的入口治理、风险分层、渐进披露和 workflow owner。全局持久注入容易让低风险解释、文档和治理任务也被编码复杂度规则覆盖。
+
+### 6.2 不建立第二套 `lite/full/ultra` 状态机
+
+spec-first 的治理强度应由风险、歧义、不可逆性、影响面和 handoff 距离决定，而不是由另一个全局模式决定。若确有强度差异，应在现有 Skill 的 route 或 reference 中表达，而不是新增中心状态。
+
+### 6.3 不以 LOC、Token 或 prompt footprint 作为主目标
+
+这些数据最多说明成本形状。质量、授权、安全和 field outcome 是不可被成本指标补偿的硬约束。
+
+### 6.4 不把“一个最小测试”变成所有任务的统一硬规则
+
+验证深度必须匹配 claim、风险、跨层边界和现场影响。小型纯逻辑可用最小检查，高风险或跨系统行为必须增加适配的独立证据。
+
+### 6.5 不把 over-engineering finding 自动变成修复
+
+删除抽象可能破坏 owner、权限、可观测性、回滚、兼容性或未来真实 consumer。复杂度 review 默认 report-only，由现有 mutation、review 和 owner 决策边界承接。
+
+## 7. 推荐的优化顺序
+
+### P0：先建质量门
+
+**理由:** §8 降级规则要求”只证明文件更短、没有行为证据 → 必须降级”。若先改文本再建门，按 §8 就该降级。ponytail 的 `benchmarks/results/2026-06-16-robustness-audit.md` 八处 SKILL.md 编辑（含 n=100 的 A/B，96% → 95%）全部 ≤ 现状、若干更差、全让输出膨胀，最终零 ship——这些编辑读起来都更严谨，唯一没被误判的原因是当时门已存在。顺序必须门在前。
+
+1. **从 ponytail 的 `benchmarks/agentic/` 复制 harness，只做 `spec-debug` 根因门。** fixture 现成且可移植：`score_trace_transfer`（`benchmarks/agentic/tasks.py:699`）带自验证 seed（`:725`）与 lazy-wrong 参照（`:747`），`run.py` 已支持 Sonnet/Opus 及每臂隔离（`--setting-sources project,local` + 单一 `--plugin-dir`，这是修掉 baseline 偷跑污染 bug 后的写法）。先跑 selftest 通过，再 n=6 对照 baseline vs spec-debug。
+2. **建门过程同时验证下面 P1 第 4 项的根因检查是否真正改变行为**——而不只是让文本更严谨。现成线索：`spec-debug/SKILL.md:9` 写的是 “tracing the full causal chain before proposing a fix”，恰属 ponytail 对照里 Opus 0/3 的不可执行表述。
+
+**关于 spec-optimize:** 当前 `spec-optimize` 是 785 行的 LLM skill，不是 harness。`grep -rlE “claude -p|anthropic|openai|promptfoo” scripts/` 只命中两个本地化脚本，179 个单测、73 个 contract、14 个 skill 带 evals，没有一个跑模型。用 skill 编排的 pilot 是 n=1、不可复现、由模型自述结果——恰是 §3.8 警告的”用叙事判断收益”。所以 P0 用 ponytail 的 harness，不等 spec-optimize 演化成可复现基础设施。
+
+### P1：在有门的情况下复用现有 owner
+
+3. 以 `spec-simplify-code` 为试点，加入 Ponytail ladder 和过度工程标签。**每次修改后用 P0 的门测一次。**
+4. 让 `spec-work` 的 implementation-quality 成为所有 durable surface 的最小性检查点。
+5. 把 `spec-code-review` 的 maintainability 输出扩展为复杂度 finding，而不是新增 reviewer 系统。
+
+### P2：补强根因和计划判断
+
+6. 在 `spec-debug` 增加 shared-caller / owning-boundary 检查（具体措辞见下面 §4.4 的修正）。
+7. 在 `spec-plan` 要求”为什么必须新增”的 evidence-backed decision。
+8. 在 `spec-doc-review` 仅对新抽象、跨层架构和范围膨胀触发轻量 scope lens。
+
+### P3：现场验证后才推广
+
+9. 使用 P0 建立的门做配对任务对照，记录 §8 要求的全部轴（正确率、安全/授权/隐私/a11y 回归、复杂度诊断、token/延迟/成本、correction burden、采纳与 field outcome）。
+10. 使用 `spec-compound` / `spec-compound-refresh` 管理已验证的简化模式及失效条件。
+11. 只有 field outcome 支持后，才考虑把局部规则提升为跨 Skill 的 durable guidance。
+
+## 8. 评估与晋级门禁
+
+每个 pilot 都应同时记录：
+
+- 任务正确率、测试与审查结果；
+- 安全、授权、隐私、数据完整性和 a11y 回归；
+- 新增文件、依赖、抽象、状态和配置等复杂度诊断；
+- Token、延迟、工具调用和治理成本；
+- correction burden、返工、回滚、scope-back 和人工修正；
+- 真实任务中的采纳和 field outcome。
+
+晋级规则：
+
+```text
+结构通过
+  且行为质量不下降
+  且保护性约束不回归
+  且相对收益有 matched evidence
+  且 correction burden 没有上升
+  -> 才能推广
+```
+
+以下情况必须降级、暂停或回退：
+
+- 只证明 Skill 文件更短，没有行为证据；
+- 只证明 benchmark 变好，没有代表性任务或现场证据；
+- 出现安全、授权、数据完整性、a11y、回滚或关键验证回归；
+- 复杂度下降但人工修正和返工增加；
+- 规则与现有 source owner、workflow 或 contract 冲突；
+- 没有真实 consumer，或规则已经被宿主/现有 Skill 覆盖。
+
+## 9. 最终判断
+
+Ponytail 最值得被 spec-first 吸收的不是“懒”，而是一个工程纪律：
+
+> 不为可能存在的未来制造今天必须维护的复杂度；在充分理解之后，优先使用已经正确、已经存在、已经被验证的能力；所有有意简化都必须有保护边界、验证证据和重新评估条件。
+
+这套思想应成为各 Skill 的局部判断透镜，服从 spec-first 的顶层原则：可信变更优先于代码变短，最小充分优先于最短，证据优先于自信，真实用户结果优先于架构炫技。
+
+## 10. 维护纪律
+
+- 本文是专项 companion；若与角色契约或 canonical Skill Prompt 方法论冲突，以其为准。
+- 修改本文前，先确认 Ponytail 原始 source、当前 spec-first Skill source、相关测试和已有评估是否仍然一致。
+- 新增原则必须说明 evidence origin、适用范围、consumer、验证方式和 invalidation condition。
+- 结构性变短、静态统计或 benchmark 结果不得直接升级为 field outcome。
+- 不修改生成 runtime 作为持久修复；需要改变行为时，修改 canonical `skills/` 或对应 checked-in source，再按授权执行投射和验证。

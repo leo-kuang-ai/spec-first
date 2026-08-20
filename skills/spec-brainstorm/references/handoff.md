@@ -1,5 +1,11 @@
 # Handoff
 
+## Owner-local context facts adapter
+
+`spec-brainstorm` owns only the requirements handoff it already writes. When a downstream workflow needs machine-readable context facts, adapt that artifact locally as `context_facts_adapter/v1` with `owner: spec-brainstorm`, `source_identity`, `source_refs`, `freshness`, `artifact_type`, and `limitations`. Git identity, hashes, paths, and timestamps are script-owned facts; requirement sufficiency and unresolved questions remain LLM judgment. Provider output stays advisory unless its cited source is rechecked. Do not import `spec-write-skill`'s package inspector or create a shared helper until at least two real owners have demonstrated the same input/output and failure contract.
+
+**Prototype a remaining behavior or feel question** — when a decision still needs a runnable artifact and a human can experience it, invoke `spec-prototype` with the current brainstorm as its seed. Do not offer this for a visual probe that already settled the question, and do not offer Proof or any external upload.
+
 This content is loaded when Phase 4 begins — after the requirements-only
 unified plan is written.
 

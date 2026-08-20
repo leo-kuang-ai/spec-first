@@ -18,6 +18,10 @@ const {
   loadRegistry,
 } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
 const providers = require('../../skills/spec-runtime-setup/scripts/providers/registry.cjs');
+const {
+  LOCAL_CONFIG_CONSUMERS,
+} = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
+const localizationProducer = require('../../scripts/check-ce-localization-review.cjs');
 
 const repoRoot = path.resolve(__dirname, '../..');
 
@@ -32,6 +36,27 @@ function tempRepo(label) {
 }
 
 describe('spec-runtime-setup active config consumers', () => {
+  test('binds every registered local key to an exact current source anchor without creating a global gate', () => {
+    const { preflight } = localizationProducer.buildArtifacts();
+    const inventory = preflight.consumer_inventory;
+
+    expect(inventory.status).toBe('confirmed');
+    expect(inventory.missing_keys).toEqual([]);
+    expect(inventory.rows.map((entry) => entry.key).sort()).toEqual(
+      Object.keys(LOCAL_CONFIG_CONSUMERS).sort(),
+    );
+    for (const row of inventory.rows) {
+      expect(row).toMatchObject({
+        source_ref: expect.any(String),
+        source_line: expect.any(Number),
+        source_excerpt: expect.stringContaining(row.key),
+        fallback_boundary: 'consumer-owned',
+        blocking_scope: 'consumer-local-only',
+      });
+      expect(row.source_line).toBeGreaterThan(0);
+    }
+  });
+
   test('documents every active Product Pulse scheduling key', () => {
     const template = read('skills/spec-runtime-setup/references/config-template.yaml');
     const pulse = read('skills/spec-product-pulse/SKILL.md');

@@ -31,7 +31,9 @@
     "test:jest": "jest",
     "test:release": "node scripts/run-test-suite.cjs release",
     "test:release:governance": "node scripts/run-test-suite.cjs release-governance",
-    "test:release:website": "node scripts/check-website-sync.cjs --required"
+    "test:release:website": "node scripts/check-website-sync.cjs --required",
+    "sync:shared-references": "node scripts/sync-shared-references.js",
+    "check:shared-references": "node scripts/sync-shared-references.js --check"
   },
   "files": [
     "bin/",
@@ -110,6 +112,8 @@
     "js-yaml": "3.15.1"
   },
   "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "jest": "^29.0.0"
   }
 }

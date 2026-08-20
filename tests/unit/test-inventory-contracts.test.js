@@ -81,4 +81,19 @@ describe('active test inventory', () => {
     expect(runner).not.toContain('skip missing legacy');
     expect(runner).toContain('声明的测试路径不存在');
   });
+
+  test('root Jest ignores nested eval repositories while their package-owned tests remain present', () => {
+    const jestConfig = require('../../jest.config');
+    expect(jestConfig.testPathIgnorePatterns).toContain(
+      '<rootDir>/skills/.*/evals/fixtures/repos/',
+    );
+
+    for (const fixtureTest of [
+      'skills/spec-plan/evals/fixtures/repos/order-import-enrichment/tests/order-importer.test.js',
+      'skills/spec-plan/evals/fixtures/repos/order-import-direct/tests/order-importer.test.js',
+      'skills/spec-code-review/evals/fixtures/repos/tenant-orders/test/orders.test.js',
+    ]) {
+      expect(fs.existsSync(path.join(repoRoot, fixtureTest))).toBe(true);
+    }
+  });
 });

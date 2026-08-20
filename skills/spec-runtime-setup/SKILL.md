@@ -112,7 +112,7 @@ Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture, with *
 1. **Explore** host, target repo, generated runtime manifest, existing setup facts, `.spec-first/config.local.yaml`, verification profile visibility, provider artifacts, and project instructions.
 2. **Present & Decide**:
    - **Bare invocation** (default `spec-runtime-setup`): After exploration, present a consolidated single summary of all pending operations (missing dependencies, config changes, provider installations) and request **one confirmation** before batch execution. The user approves the entire setup plan with a single response.
-   - **Explicit modes** (`--check`, `--plan`, `--verify-only`): Present detailed diagnostics without requesting confirmation; these modes do not mutate.
+   - **Explicit modes**: `--check` and `--plan` are read-only. `--verify-only` is a facts-only mutation mode: it may write setup-owned facts, scenario fingerprints, and ledgers only, without requesting confirmation for those bounded writes.
    - **Subset repairs** (`--only ...`, `--refresh`): Execute the narrowed scope immediately after exploration; subset authorization is implicit in the flag itself.
 3. **Decide** only where the runtime setup workflow has authority: install/verify helper tools, configure host MCP/runtime wiring, refresh setup-owned facts, or choose a documented degraded path. Team workflow conventions and semantic project decisions remain LLM/owner judgment in downstream workflows.
 4. **Write** only setup-owned facts, supported local config examples, host runtime config through documented targets, and generated runtime refreshes through `spec-first init`. Do not write team-shared tracker policy, label vocabulary, external PR request-surface policy, issue acceptance decisions, or durable rejected-scope decisions from setup.
@@ -123,11 +123,10 @@ Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture, with *
 - `feedback_sources` and `sweep_*`, read and written by `spec-sweep`;
 - `pulse_*`, read and written by `spec-product-pulse`;
 - `spec_promote_spiral_optout`, read and written by `spec-promote`;
-- `work_delegate_*`, exposed for downstream execution workflows that support delegated work;
 - `plan_skip_scoping_confirm`, exposed for downstream planning workflows that support persisted scoping-confirmation preference;
 - `plan_output`, `brainstorm_output` 和 `ideate_output`，分别由 `spec-plan`、`spec-brainstorm` 和 `spec-ideate` 读取。
 
-`plan_output`、`brainstorm_output` 和 `ideate_output` 都是 active local rendering preferences。对应 consumer 只读取未注释且有效的 `md` / `html` 值；缺失、无效或仍被注释的值分别回退到 `spec-plan=md`、`spec-brainstorm=md`、`spec-ideate=html`。Pipeline override 仍由各 consumer 自己决定。Runtime Setup 只暴露并保护这些 key，不调用对应 workflow，也不把本地 rendering preference 提升为 runtime authority。Setup must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
+`plan_output`、`brainstorm_output` 和 `ideate_output` 都是 active local rendering preferences。对应 consumer 只读取未注释且有效的 `md` / `html` 值；缺失、无效或仍被注释的值分别回退到 `spec-plan=md`、`spec-brainstorm=md`、`spec-ideate=html`。Pipeline override 仍由各 consumer 自己决定。Runtime Setup 只暴露并保护这些 key，不调用对应 workflow，也不把本地 rendering preference 提升为 runtime authority。没有真实 reader 的 CE/local delegation key 不进入本地 config surface。Setup must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
 
 If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a project guidance index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
 
@@ -142,7 +141,7 @@ If setup later reports project convention facts, they must be deterministic exis
 ## Workflow Modes
 
 - `--check`: inspect current dependency/runtime status only; do not write setup facts, host config, or install tools.
-- `--verify-only` / `--refresh-facts`: verify readiness and refresh setup-owned facts; do not install tools or edit host config.
+- `--verify-only` / `--refresh-facts`: verify readiness and refresh setup-owned facts. `--verify-only` is a facts-only mutation mode and may write setup-owned facts, scenario fingerprints, and ledgers only; it must not install providers, edit host config, bootstrap project config, or refresh generated runtime.
 - `--plan`: render install/config operations and safety results; do not write setup facts, host config, or install tools.
 - `--project-config`：仅执行 project-local config bootstrap。按请求刷新 example，仅在显式 action 后创建 local override，按请求确保 `.spec-first/*.local.yaml` ignore coverage，并报告 legacy project config signal 而不迁移它们。该 mode 不安装 MCP server、不配置 host runtime，也不执行 helper/Provider first generation。
 - Bare invocation (`spec-runtime-setup` in the current host): default full setup workflow. Resolve target，运行默认 required-provider plan；无 blocker 时执行等价的 `--only codegraph,graphify` apply、验证 baseline/Provider/runtime/project status，并写 setup facts。Bare workflow invocation 本身已授权自动修复 selected target 中 registry 管理的 `host-config-conflict`，不需要二次确认；它不授权绕过 higher-precedence、unsafe path、unreadable config、symlink/path escape 或 literal secret gate。

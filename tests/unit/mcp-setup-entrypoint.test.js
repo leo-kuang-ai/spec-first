@@ -1597,6 +1597,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       resolveWorkspaceCodegraphCommand: () => { throw new Error('internal refresh must not resolve from PATH'); },
       resolveWorkspaceGraphifyCommand: () => { throw new Error('internal refresh must not resolve from PATH'); },
       env: internalEnv,
+      enforceSurfaceBinding: true,
       homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-home-')),
       bundledVersion: '1.13.2',
     });
@@ -1616,6 +1617,32 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       operation: 'async-refresh',
     });
     lifecycle.release();
+  });
+
+  test('incomplete internal workspace refresh context cannot bypass public surface binding', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    const workspace = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-entry-workspace-refresh-invalid-')));
+    const child = childRepo(workspace, 'child');
+    writeRuntimeState(child, 'qoder', '1.13.2');
+
+    const result = runSetup({
+      argv: ['--only', 'codegraph,graphify', '--workspace-graph', '--repos', 'child'],
+      cwd: workspace,
+      skillRoot,
+      env: {
+        MCP_SETUP_HOST: 'qoder',
+        [INTERNAL_REFRESH_ONLY_ENV]: '1',
+        [INTERNAL_CODEGRAPH_COMMAND_ENV]: '/verified/bin/codegraph',
+        [INTERNAL_GRAPHIFY_COMMAND_ENV]: '/verified/bin/graphify',
+      },
+      enforceSurfaceBinding: true,
+      bundledVersion: '1.13.2',
+    });
+
+    expect(result).toMatchObject({
+      exit_code: 2,
+      reason_code: 'host-invocation-surface-unverified',
+    });
   });
 
   test('explicit graphify setup applies baseline host config, provider mutation, and post-probe facts', () => {

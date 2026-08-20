@@ -28,6 +28,37 @@ function runPython(source) {
   return JSON.parse(result.stdout);
 }
 
+test('media transcription is opt-in even when a credential is present', () => {
+  const payload = runPython(String.raw`
+import importlib.util
+import json
+import sys
+
+spec = importlib.util.spec_from_file_location("riffrec_analyzer", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+original_argv = list(sys.argv)
+try:
+    sys.argv = ["analyze_riffrec_zip.py", "capture.webm"]
+    default_args = module.parse_args()
+    sys.argv = ["analyze_riffrec_zip.py", "capture.webm", "--transcribe"]
+    explicit_args = module.parse_args()
+finally:
+    sys.argv = original_argv
+
+print(json.dumps({
+    "default_transcribe": getattr(default_args, "transcribe", None),
+    "explicit_transcribe": getattr(explicit_args, "transcribe", None),
+}))
+`);
+
+  expect(payload).toEqual({
+    default_transcribe: false,
+    explicit_transcribe: true,
+  });
+});
+
 test('transcription sends the API key through curl config stdin instead of argv', () => {
   const payload = runPython(String.raw`
 import importlib.util
@@ -59,15 +90,56 @@ os.environ["OPENAI_API_KEY"] = "sk-test-secret-sentinel"
 with tempfile.TemporaryDirectory() as root:
     media = pathlib.Path(root) / "voice.webm"
     media.write_bytes(b"media")
-    result = module.transcribe_media(media, "gpt-4o-mini-transcribe")
+    result = module.transcribe_media(media, "gpt-4o-mini-transcribe", "explicit-cli-flag")
 
 print(json.dumps({"result": result, **captured}))
 `);
 
   expect(payload.result.status).toBe('ok');
+  expect(payload.result.transcription_egress_authorization).toBe('explicit-cli-flag');
+  expect(payload.result.provider).toBe('openai-audio-transcriptions');
   expect(payload.command).toEqual(expect.arrayContaining(['curl', '--config', '-']));
   expect(JSON.stringify(payload.command)).not.toContain('sk-test-secret-sentinel');
   expect(payload.input).toContain('Authorization: Bearer sk-test-secret-sentinel');
+});
+
+test('transcription function makes zero provider calls without the explicit authorization receipt', () => {
+  const payload = runPython(String.raw`
+import importlib.util
+import json
+import os
+import pathlib
+import sys
+import tempfile
+
+spec = importlib.util.spec_from_file_location("riffrec_analyzer", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+calls = []
+def fake_run(command, **kwargs):
+    calls.append(command)
+    raise AssertionError("provider subprocess must not run")
+
+module.subprocess.run = fake_run
+module.shutil.which = lambda command: "/usr/bin/curl" if command == "curl" else None
+os.environ["OPENAI_API_KEY"] = "sk-test-secret-sentinel"
+
+with tempfile.TemporaryDirectory() as root:
+    media = pathlib.Path(root) / "voice.webm"
+    media.write_bytes(b"media")
+    result = module.transcribe_media(media, "gpt-4o-mini-transcribe")
+
+print(json.dumps({"result": result, "calls": calls}))
+`);
+
+  expect(payload.result).toMatchObject({
+    status: 'skipped',
+    transcription_egress_authorization: 'missing',
+    provider: 'openai-audio-transcriptions',
+    provider_request_sent: false,
+  });
+  expect(payload.calls).toEqual([]);
 });
 
 test('zip budget failures preserve the previous destination and clean staging files', () => {

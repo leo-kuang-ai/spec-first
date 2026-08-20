@@ -104,13 +104,18 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
     ...platforms.flatMap((platform) => (platformChecks[platform] || [])
       .filter(isDoctorAttentionCheck)
       .map((check) => ({ scope: platform.toUpperCase(), check }))),
-  ].map((item) => ({
-    ...item,
-    disposition: resolveDoctorDisposition(item.check, { selectionMode }),
-  }));
-  const requiredItems = attentionItems.filter((item) => item.disposition === 'action_required');
+  ].map((item) => {
+    const projection = buildRuntimeStatusProjection(item.check, {
+      scope: item.scope,
+      selectionMode,
+    });
+    return { ...item, disposition: projection.disposition, projection };
+  });
+  const requiredItems = attentionItems.filter((item) => item.disposition === 'action-required');
   const optionalItems = attentionItems.filter((item) => item.disposition === 'optional');
-  const limitationItems = attentionItems.filter((item) => item.disposition === 'known_limitation');
+  const limitationItems = attentionItems.filter((item) => item.disposition === 'known-limitation');
+  const degradedItems = attentionItems.filter((item) => item.disposition === 'degraded');
+  const notRunItems = attentionItems.filter((item) => item.disposition === 'not-run');
   const result = hasError
     ? '不可用'
     : requiredItems.length > 0
@@ -139,6 +144,8 @@ function formatDoctorHumanReport(report, { verbose = false } = {}) {
   appendDoctorAttentionSection(lines, '需要处理', requiredItems, 'required');
   appendDoctorAttentionSection(lines, '按需配置', optionalItems, 'optional');
   appendDoctorAttentionSection(lines, '已知限制', limitationItems, 'limitation');
+  appendDoctorAttentionSection(lines, '降级状态', degradedItems, 'degraded');
+  appendDoctorAttentionSection(lines, '未执行', notRunItems, 'not-run');
 
   if (!verbose) return lines;
 
@@ -177,6 +184,52 @@ function resolveDoctorDisposition(check, { selectionMode = 'auto' } = {}) {
   return 'action_required';
 }
 
+function buildRuntimeStatusProjection(check = {}, { scope = 'common', selectionMode = 'auto' } = {}) {
+  const declaredStatus = check.runtimeStatus || check.runtime_status;
+  const allowedStatuses = new Set([
+    'ready',
+    'no-change',
+    'would-change',
+    'apply-failed',
+    'action-required',
+    'optional',
+    'known-limitation',
+    'degraded',
+    'not-run',
+  ]);
+  let status = allowedStatuses.has(declaredStatus) ? declaredStatus : null;
+  if (!status) {
+    if (check.level === 'PASS') status = 'ready';
+    else if (check.level === 'ERROR') status = 'action-required';
+    else if (check.level === 'WARNING') {
+      const legacyDisposition = resolveDoctorDisposition(check, { selectionMode });
+      status = legacyDisposition === 'action_required'
+        ? 'action-required'
+        : legacyDisposition === 'known_limitation'
+          ? 'known-limitation'
+          : legacyDisposition || 'degraded';
+    } else {
+      status = 'not-run';
+    }
+  }
+  const disposition = ['ready', 'no-change'].includes(status)
+    ? 'ready'
+    : ['would-change', 'apply-failed', 'action-required'].includes(status)
+      ? 'action-required'
+      : status;
+  return {
+    schema_version: 'runtime-status-projection/v1',
+    status,
+    reason_code: check.reasonCode || check.reason_code || `doctor-${status}`,
+    disposition,
+    scope,
+    artifact_refs: Array.isArray(check.artifact_refs)
+      ? [...check.artifact_refs]
+      : (Array.isArray(check.artifactRefs) ? [...check.artifactRefs] : []),
+    next_action: check.fix || check.next_action || null,
+  };
+}
+
 function appendDoctorAttentionSection(lines, title, items, kind) {
   if (items.length === 0) {
     if (kind === 'required') lines.push('', `${title}：无`);
@@ -198,6 +251,11 @@ function appendDoctorAttentionSection(lines, title, items, kind) {
       }
       continue;
     }
+    if (kind === 'degraded' || kind === 'not-run') {
+      if (check.fix) lines.push(`    下一步：${check.fix}`);
+      else lines.push(`    说明：${kind === 'degraded' ? '能力已降级，当前结论受限。' : '本项尚未执行，不能作为完成证据。'}`);
+      continue;
+    }
     if (check.fix) {
       lines.push(`    修复：${check.fix}`);
     } else {
@@ -211,15 +269,20 @@ function describeDoctorPlatformStatus(checks, { selectionMode = 'auto', hostSupp
   if (checks.some((check) => check.level === 'ERROR')) return '有问题';
   const warningChecks = checks.filter((check) => check.level === 'WARNING');
   if (warningChecks.some((check) => (
-    resolveDoctorDisposition(check, { selectionMode }) === 'action_required'
+    buildRuntimeStatusProjection(check, { selectionMode }).disposition === 'action-required'
   ))) return '需处理';
   if (warningChecks.some((check) => (
     typeof check.reasonCode === 'string' && check.reasonCode.endsWith('_cli_not_found')
   ))) return '未安装';
   if (
     hostSupport.support_state === 'preview'
-    || warningChecks.some((check) => resolveDoctorDisposition(check, { selectionMode }) === 'known_limitation')
+    || warningChecks.some((check) => ['known-limitation', 'degraded'].includes(
+      buildRuntimeStatusProjection(check, { selectionMode }).disposition,
+    ))
   ) return hostSupport.support_state === 'preview' ? '预览/受限' : '受限';
+  if (warningChecks.some((check) => (
+    buildRuntimeStatusProjection(check, { selectionMode }).disposition === 'not-run'
+  ))) return '未执行';
   return '正常';
 }
 
@@ -229,14 +292,16 @@ function appendDoctorCheckDetails(lines, scope, checks, { selectionMode = 'auto'
     const label = String(check.level || 'UNKNOWN').toUpperCase().padEnd(7);
     lines.push(`    ${label} ${check.name}: ${check.message}`);
     if (check.fix) {
-      const disposition = resolveDoctorDisposition(check, { selectionMode });
+      const disposition = buildRuntimeStatusProjection(check, { scope, selectionMode }).disposition;
       const actionLabel = disposition === 'optional'
         ? '按需操作'
-        : disposition === 'known_limitation'
+        : disposition === 'known-limitation'
           ? '验证建议'
+          : ['degraded', 'not-run'].includes(disposition)
+            ? '下一步'
           : '修复';
       lines.push(`             ${actionLabel}：${check.fix}`);
-    } else if (resolveDoctorDisposition(check, { selectionMode }) === 'known_limitation') {
+    } else if (buildRuntimeStatusProjection(check, { scope, selectionMode }).disposition === 'known-limitation') {
       lines.push('             说明：当前为已知限制，无需手工修改用户配置。');
     }
   }
@@ -1192,6 +1257,15 @@ function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
     ...commonChecks,
     ...Object.values(platformChecksByPlatform).flat(),
   ];
+  const runtimeStatusProjections = [
+    ...commonChecks.map((check) => buildRuntimeStatusProjection(check, {
+      scope: 'common',
+      selectionMode,
+    })),
+    ...platforms.flatMap((platform) => (platformChecksByPlatform[platform] || []).map((check) => (
+      buildRuntimeStatusProjection(check, { scope: platform, selectionMode })
+    ))),
+  ];
 
   return {
     schema_version: 'v1',
@@ -1208,6 +1282,7 @@ function buildDoctorReport({ projectRoot, platforms, selectionMode = 'auto' }) {
     host_support: hostSupportByPlatform,
     common_checks: commonChecks,
     platform_checks: platformChecksByPlatform,
+    runtime_status_projections: runtimeStatusProjections,
     checks: allChecks,
     warnings: allChecks.filter((check) => check.level === 'WARNING'),
     has_error: allChecks.some((check) => check.level === 'ERROR'),
@@ -1238,6 +1313,7 @@ function printDoctorJson(report) {
     checks: report.checks,
     common_checks: report.common_checks,
     platform_checks: report.platform_checks,
+    runtime_status_projections: report.runtime_status_projections,
     warnings: report.warnings,
   }, null, 2));
 }
@@ -1908,6 +1984,7 @@ module.exports = {
   buildWorkspaceReadinessView,
   buildDoctorCommonChecks,
   buildDoctorReport,
+  buildRuntimeStatusProjection,
   buildHostSupportView,
   formatDoctorHumanReport,
   checkPlatformCli,

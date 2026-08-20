@@ -49,9 +49,43 @@ describe('low-severity skill cleanup contracts', () => {
       'sweep_ack_cap',
       'sweep_lease_ttl_minutes',
       'sweep_shared_branch',
+      'sweep_commit_approved',
+      'sweep_branch_mutation_approved',
+      'sweep_landing_approved',
     ]) {
       expect(list[0]).toContain(`\`${key}\``);
     }
+  });
+
+  test('spec-sweep separates commit, branch mutation, and landing authority', () => {
+    const skill = read('skills/spec-sweep/SKILL.md');
+    const interview = read('skills/spec-sweep/references/interview.md');
+
+    for (const fact of [
+      'commit_authorization: authorized | missing',
+      'branch_mutation_authorization: authorized | missing',
+      'landing_authorization: authorized | missing',
+    ]) {
+      expect(skill).toContain(fact);
+    }
+    expect(skill).toContain('stop before `lease-acquire`');
+    expect(skill).toContain('leave the eligible files unstaged');
+    expect(interview).toContain('repo-wide lease cannot be established');
+  });
+
+  test('spec-sweep keeps repo-local durable state outside every stage set', () => {
+    const skill = read('skills/spec-sweep/SKILL.md');
+    const interview = read('skills/spec-sweep/references/interview.md');
+    const schema = read('skills/spec-sweep/references/state-schema.md');
+
+    expect(skill).toContain('default `.spec-first/workflows/spec-sweep/<repo-slug>/state.yml`');
+    expect(skill).toContain('never enter the stage set');
+    expect(skill).toContain('later one-run commit authorization does not change its topology');
+    expect(interview).toContain('repo-local durable default; never staged');
+    expect(interview).toContain('it never adds either state path to the stage set');
+    expect(schema).toContain('| repo-local durable (default) |');
+    expect(schema).toContain('| committed-local |');
+    expect(schema).not.toContain('| local-commit mode (default) |');
   });
 
   test('Python cache artifacts remain excluded from source control', () => {

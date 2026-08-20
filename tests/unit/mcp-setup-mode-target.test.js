@@ -232,6 +232,100 @@ describe('spec-runtime-setup action policy', () => {
 });
 
 describe('spec-runtime-setup host authority', () => {
+  test.each(['production', 'test'])(
+    'public main rejects a host pin that disagrees with the loaded Skill root when NODE_ENV=%s',
+    (nodeEnv) => {
+      const workspace = fs.realpathSync(createRepo(createWorkspace()));
+      const loadedRoot = path.join(workspace, '.agents', 'skills', 'spec-runtime-setup');
+      fs.mkdirSync(path.dirname(loadedRoot), { recursive: true });
+      fs.cpSync(path.resolve(__dirname, '../../skills/spec-runtime-setup'), loadedRoot, { recursive: true });
+
+      const result = spawnSync(process.execPath, [
+        path.join(loadedRoot, 'scripts', 'setup.cjs'),
+        '--only', 'graphify',
+        '--repair-host-config',
+        '--repo', workspace,
+        '--json',
+      ], {
+        cwd: workspace,
+        env: {
+          ...process.env,
+          NODE_ENV: nodeEnv,
+          MCP_SETUP_HOST: 'claude',
+        },
+        encoding: 'utf8',
+      });
+
+      expect(result.status).toBe(2);
+      expect(JSON.parse(result.stdout)).toMatchObject({
+        status: 'blocked',
+        mutation_authorized: false,
+        reason_code: 'host-invocation-surface-mismatch',
+        invocation_receipt: {
+          schema_version: 'host-invocation-receipt/v1',
+          verification_status: 'rejected',
+          host: 'claude',
+          loaded_host: 'codex',
+          surface_id: '.agents/skills',
+          enforcement_status: 'loaded-root-checked',
+          receipt_sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+        },
+      });
+    },
+  );
+
+  test('binds mutation authority to the loaded host Skill root and emits a hashed receipt', () => {
+    const { resolveHostAuthority } = require(hostAuthorityModule);
+    const workspace = createWorkspace();
+    const codexRoot = path.join(workspace, '.agents', 'skills', 'spec-runtime-setup');
+    fs.mkdirSync(codexRoot, { recursive: true });
+    const now = new Date('2026-08-20T08:00:00.000Z');
+
+    expect(resolveHostAuthority({
+      env: { MCP_SETUP_HOST: 'codex' },
+      mutationRequested: true,
+      candidates: ['codex'],
+      skillRoot: codexRoot,
+      targetIdentity: workspace,
+      enforceSurfaceBinding: true,
+      now,
+    })).toMatchObject({
+      status: 'ready',
+      host: 'codex',
+      mutation_authorized: true,
+      reason_code: 'host-authority-loaded-root-bound',
+      invocation_receipt: {
+        schema_version: 'host-invocation-receipt/v1',
+        verification_status: 'confirmed',
+        host: 'codex',
+        surface_id: '.agents/skills',
+        skill_root: fs.realpathSync(codexRoot),
+        target_identity: workspace,
+        issued_at: '2026-08-20T08:00:00.000Z',
+        freshness_expires_at: '2026-08-20T08:05:00.000Z',
+        receipt_sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+      },
+    });
+
+    expect(resolveHostAuthority({
+      env: { MCP_SETUP_HOST: 'claude' },
+      mutationRequested: true,
+      candidates: ['claude'],
+      skillRoot: codexRoot,
+      targetIdentity: workspace,
+      enforceSurfaceBinding: true,
+      now,
+    })).toMatchObject({
+      status: 'blocked',
+      mutation_authorized: false,
+      reason_code: 'host-invocation-surface-mismatch',
+      invocation_receipt: {
+        verification_status: 'rejected',
+        loaded_host: 'codex',
+      },
+    });
+  });
+
   test('accepts only canonical MCP_SETUP_HOST pins for mutation', () => {
     const { resolveHostAuthority } = require(hostAuthorityModule);
 

@@ -159,6 +159,9 @@ CLAIM_ATTEMPTS = 16
 STATUS_READ_CAP = 256
 META_READ_CAP = 64 * 1024
 PAYLOAD_READ_CAP = 2 * 1024 * 1024
+SERVING_RECEIPT_READ_CAP = 32 * 1024
+SERVING_RECEIPT_MAX_TTL_SECS = 15 * 60
+SERVING_RECEIPT_CLOCK_SKEW_SECS = 30
 SECRET_VALUE_PATTERNS = (
     re.compile(r'\b(?:api[_-]?key|access[_-]?token|password|secret)\s*[:=]\s*["\']?[A-Za-z0-9_./+\-=]{8,}', re.I),
     re.compile(r'\bsk-[A-Za-z0-9]{8,}\b'),
@@ -331,6 +334,56 @@ def validate_start_authority(args, worker_argv):
             if receipt.get(field) != 'authorized':
                 raise RunnerError(f'external peer requires {field}=authorized')
 
+    _require_sha256(args.serving_receipt_sha256, '--serving-receipt-sha256')
+    serving_raw, serving = _load_owned_json(
+        args.serving_receipt, SERVING_RECEIPT_READ_CAP,
+        'provider serving receipt')
+    if sha256_bytes(serving_raw) != args.serving_receipt_sha256:
+        raise RunnerError('provider_serving_receipt_hash_mismatch')
+    if serving.get('schema_version') != 'provider-serving-receipt/v2':
+        raise RunnerError('provider_serving_receipt_invalid')
+    if (serving.get('artifact_type') != 'degraded'
+            or serving.get('verification_status') != 'unverified'
+            or serving.get('reason_code')
+            != 'authenticated-producer-unavailable'):
+        raise RunnerError('provider_serving_receipt_unverified')
+    raise RunnerError('provider_serving_receipt_unverified')
+    try:
+        captured_epoch = datetime.datetime.fromisoformat(
+            serving.get('captured_at', '').replace('Z', '+00:00')
+        ).timestamp()
+        serving_expires_epoch = datetime.datetime.fromisoformat(
+            serving.get('freshness_expires_at', '').replace('Z', '+00:00')
+        ).timestamp()
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        raise RunnerError('provider_serving_receipt_freshness_invalid')
+    now_epoch = time.time()
+    if serving_expires_epoch <= now_epoch:
+        raise RunnerError('provider_serving_receipt_stale')
+    if (captured_epoch > now_epoch + SERVING_RECEIPT_CLOCK_SKEW_SECS
+            or captured_epoch > serving_expires_epoch
+            or serving_expires_epoch - captured_epoch
+            > SERVING_RECEIPT_MAX_TTL_SECS):
+        raise RunnerError('provider_serving_receipt_freshness_invalid')
+    if serving.get('semantic_request_sha256') != semantic_sha:
+        raise RunnerError('provider_serving_receipt_source_mismatch')
+    if serving.get('source_identity') != args.source_identity:
+        raise RunnerError('provider_serving_receipt_source_mismatch')
+    if serving.get('provider_trust_domain') != args.provider_trust_domain:
+        raise RunnerError('provider_serving_receipt_trust_domain_mismatch')
+    if (serving.get('requested_provider') != args.requested_provider
+            or serving.get('requested_model') != args.requested_model):
+        raise RunnerError('provider_serving_receipt_requested_identity_mismatch')
+    if (serving.get('actual_provider') != args.actual_provider
+            or serving.get('actual_model') != args.actual_model):
+        raise RunnerError('provider_serving_receipt_actual_identity_mismatch')
+    credential_allowlist = serving.get('credential_env_allowlist')
+    if (not isinstance(credential_allowlist, list)
+            or credential_allowlist
+            != list(dict.fromkeys(args.credential_env))):
+        raise RunnerError(
+            'provider_serving_receipt_credential_allowlist_mismatch')
+
     payload_raw, payload = _load_owned_json(args.payload_ref, PAYLOAD_READ_CAP, 'peer task packet')
     _require_sha256(args.payload_sha256, '--payload-sha256')
     if sha256_bytes(payload_raw) != args.payload_sha256:
@@ -370,6 +423,9 @@ def validate_start_authority(args, worker_argv):
     return {
         'receipt_ref': os.path.abspath(args.authorization_receipt),
         'receipt_sha256': args.authorization_receipt_sha256,
+        'serving_receipt_ref': os.path.abspath(args.serving_receipt),
+        'serving_receipt_sha256': args.serving_receipt_sha256,
+        'serving_receipt_producer': producer,
         'payload_bytes': len(payload_raw),
         'payload_sha256': args.payload_sha256,
         'credential_env': list(dict.fromkeys(args.credential_env)),
@@ -1657,6 +1713,10 @@ def cmd_start(args, worker_argv) -> int:
         "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "canonical_authorization_receipt_ref": authority['receipt_ref'],
         "canonical_authorization_receipt_sha256": authority['receipt_sha256'],
+        "provider_serving_receipt_ref": authority['serving_receipt_ref'],
+        "provider_serving_receipt_sha256": authority['serving_receipt_sha256'],
+        "provider_serving_receipt_producer": authority['serving_receipt_producer'],
+        "serving_identity_status": "verified",
         "requested_provider": args.requested_provider,
         "actual_provider": args.actual_provider,
         "requested_model": args.requested_model,
@@ -1931,6 +1991,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_start.add_argument("--label", default=None)
     p_start.add_argument('--authorization-receipt', required=True)
     p_start.add_argument('--authorization-receipt-sha256', required=True)
+    p_start.add_argument('--serving-receipt', required=True)
+    p_start.add_argument('--serving-receipt-sha256', required=True)
     p_start.add_argument('--payload-ref', required=True)
     p_start.add_argument('--payload-sha256', required=True)
     p_start.add_argument('--payload-redaction-status', required=True, choices=('passed', 'failed'))

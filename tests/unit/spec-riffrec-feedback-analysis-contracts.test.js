@@ -33,14 +33,42 @@ describe('spec-riffrec-feedback-analysis artifact path contracts', () => {
     expect(analyzer).not.toMatch(/durable[^\n]*docs\/brainstorms\//i);
   });
 
-  test('preserves the current spec-brainstorm handoff identity', () => {
+  test('preserves the spec-brainstorm identity without auto-invoking a public workflow', () => {
     const extensive = read('skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md');
     const analyzer = read('skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py');
 
-    expect(extensive).toContain('load the `spec-brainstorm` skill');
+    expect(extensive).toContain('ready-to-brainstorm');
+    expect(extensive).toContain('Only invoke `spec-brainstorm`');
+    expect(extensive).toContain('explicitly requested brainstorm, requirements, or planning');
     expect(analyzer).toContain('Brainstorm handoff: spec-brainstorm');
+    expect(analyzer).toContain('Ready-to-brainstorm handoff only');
     expect(extensive).not.toContain('ce-brainstorm');
     expect(analyzer).not.toContain('ce-brainstorm');
+  });
+
+  test('keeps media local unless transcription egress is explicitly selected', () => {
+    const skill = read('skills/spec-riffrec-feedback-analysis/SKILL.md');
+    const quick = read('skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md');
+    const extensive = read('skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md');
+    const analyzer = read('skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py');
+
+    expect(skill).toContain('transcription_egress_authorization: authorized | missing');
+    expect(quick).toContain('--no-transcribe');
+    expect(extensive).toContain('--transcribe');
+    expect(analyzer).toContain('transcription_egress_authorization');
+    expect(analyzer).toContain('explicit-cli-flag');
+  });
+
+  test('triggers only for explicit Riffrec feedback and keeps quick-to-extensive escalation user-owned', () => {
+    const skill = read('skills/spec-riffrec-feedback-analysis/SKILL.md');
+    const quick = read('skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md');
+
+    expect(skill).toContain('Do not trigger for generic podcasts, meetings, audio/video transcription');
+    expect(skill).toContain('Discovering broader scope returns an escalation handoff');
+    expect(quick).toContain('extensive-analysis-available');
+    expect(quick).toContain('Continue only when the current user explicitly selects extensive analysis');
+    expect(quick).not.toContain('switching to the extensive path');
+    expect(quick).not.toContain('re-run the analyzer with a non-temp output directory');
   });
 
   test('keeps credentials out of argv and enforces zip resource budgets', () => {

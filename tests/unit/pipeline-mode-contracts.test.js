@@ -26,7 +26,9 @@ describe('pipeline mode contracts', () => {
     expect(skill).toContain('pr_teaching_section:');
     expect(skill).toContain('<repo-root>/.spec-first/config.local.yaml');
     expect(skill).toContain('pr_teaching_archive:');
-    expect(skill).toContain('A per-run `archive:on|off` token overrides the archive key');
+    expect(skill).toContain('archive_authorization: authorized');
+    expect(skill).toContain('config, teaching-section eligibility, commit authority, and landing authority do not');
+    expect(skill).toContain('show the exact repo-relative');
     expect(skill).toContain('docs/explainers/YYYY-MM-DD-<concept-slug>.md');
     expect(skill).toContain('New concepts: <name>[, <name>]');
     expect(skill).toContain('Run spec-explain <name> to go deeper.');
@@ -34,7 +36,9 @@ describe('pipeline mode contracts', () => {
     expect(writingReference).toContain('## New concepts');
     expect(writingReference).toContain('Check each candidate against the base ref, never the working tree');
     expect(writingReference).toContain('Description-only and description-update runs never write repo files.');
-    expect(writingReference).toMatch(/New concepts section[\s\S]*Evidence block[\s\S]*Spec-First badge/);
+    expect(writingReference).toMatch(/New concepts section[\s\S]*Evidence block[\s\S]*Spec-First footer/);
+    expect(writingReference).not.toContain('img.shields.io');
+    expect(writingReference).not.toContain('MODEL_SLUG');
     expect(skill).not.toContain('/ce-explain');
     expect(skill).not.toContain('.compound-engineering/config.local.yaml');
     expect(writingReference).not.toContain('Compound Engineering badge');

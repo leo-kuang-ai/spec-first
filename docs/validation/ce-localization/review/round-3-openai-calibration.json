@@ -1,0 +1,17 @@
+{
+  "schema_version": "ce-localization-round-3-calibration/v1",
+  "review_lens": "openai-skill-engineering",
+  "source_artifact": "docs/validation/ce-localization/review/round-3-openai-skill-lens.json",
+  "counter_artifact": "docs/validation/ce-localization/review/round-3-anthropic-skill-lens.json",
+  "role_representation": "role-simulated",
+  "provider_identity": "unverified",
+  "worker_context_isolation": "degraded_inherited",
+  "calibration": [
+    {"finding_id":"OAI-R3-APP-001","decision":"retain-owner-recheck","reason":"Anthropic lane accepts disclosed limitation but does not establish runner/route coherence; source mismatch remains."},
+    {"finding_id":"OAI-R3-OPT-001","decision":"retain-convergent-owner-recheck","reason":"Anthropic lane independently identifies optimize approval/execution risk; digest cleanup is a separate lifecycle contradiction."},
+    {"finding_id":"OAI-R3-RIFF-001","decision":"retain-convergent-owner-recheck","reason":"Anthropic lane identifies a distinct automatic downstream mutation risk in the same privacy/agency surface."},
+    {"finding_id":"OAI-R3-SWEEP-001","decision":"retain-owner-recheck","reason":"Anthropic no-finding is not evidence that ordinary-media egress is gated; source analyzer path still requires owner proof."},
+    {"finding_id":"OAI-R3-PROMOTE-001","decision":"retain-owner-recheck","reason":"Provider authentication may be user intent, but the source does not establish per-run external retention/egress consent."}
+  ],
+  "limitations":["No authenticated provider receipt.","Context isolation degraded/inherited.","No source mutation or focused re-review performed.","Anthropic artifact uses a different but source-bound schema; aggregator normalized findings without treating either lane as authority."]
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-skill-scenarios/v1",
+  "title": "CE localization Skill scenarios and path coverage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_kind", "producer", "single_writer", "source_snapshot", "inventory_ref", "inventory_sha256", "scenario_fingerprint_contract_ref", "scenarios", "path_coverage", "handoff_contracts", "consumers", "claim_ceiling"],
+  "properties": {
+    "schema_version": { "const": "ce-localization-skill-scenarios/v1" },
+    "artifact_kind": { "const": "source-bound-semantic-scenario-inventory" },
+    "producer": { "const": "spec-work-semantic-adjudication-owner" },
+    "single_writer": { "const": "ce-localization-scenario-writer" },
+    "source_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+    "inventory_ref": { "type": "string", "minLength": 1 },
+    "inventory_sha256": { "$ref": "#/$defs/sha256" },
+    "scenario_fingerprint_contract_ref": { "type": "string", "minLength": 1 },
+    "scenarios": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/scenario" } },
+    "path_coverage": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/pathCoverage" } },
+    "handoff_contracts": { "type": "array", "minItems": 5, "items": { "$ref": "#/$defs/handoffContract" } },
+    "consumers": { "$ref": "#/$defs/nonEmptyStrings" },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "strings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scenario_id", "skill_id", "scenario_kind", "visibility", "actor", "actor_outcome", "user_task", "inputs", "outputs", "failure_cost", "canonical_owner", "source_refs", "downstream_consumers", "requirement_refs", "acceptance_example_refs", "expected_rnd_gain", "scenario_fingerprint_ref", "limitations", "status"],
+      "properties": {
+        "scenario_id": { "type": "string", "pattern": "^SCN-[A-Z0-9-]+$" },
+        "skill_id": { "type": ["string", "null"] },
+        "scenario_kind": { "enum": ["user-facing", "workflow-orchestrator", "internal-helper", "side-effect", "router", "provider-adapter", "local-only"] },
+        "visibility": { "enum": ["public", "internal", "evidence-only"] },
+        "actor": { "type": "string", "minLength": 1 },
+        "actor_outcome": { "type": "string", "minLength": 1 },
+        "user_task": { "type": "string", "minLength": 1 },
+        "inputs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "outputs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "failure_cost": { "type": "string", "minLength": 1 },
+        "canonical_owner": { "type": "string", "minLength": 1 },
+        "source_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "downstream_consumers": { "$ref": "#/$defs/strings" },
+        "requirement_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "acceptance_example_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "expected_rnd_gain": { "type": "string", "minLength": 1 },
+        "scenario_fingerprint_ref": { "type": "string", "minLength": 1 },
+        "limitations": { "$ref": "#/$defs/strings" },
+        "status": { "enum": ["confirmed-source-contract", "evidence-only", "degraded", "not-run"] }
+      }
+    },
+    "pathCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "owning_skill", "path_role", "evidence_role", "terminal_disposition", "scenario_ids", "source_sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "owning_skill": { "type": "string", "minLength": 1 },
+        "path_role": { "type": "string", "minLength": 1 },
+        "evidence_role": { "enum": ["upstream-fact", "local-contract", "behavior-eval", "field-outcome"] },
+        "terminal_disposition": { "enum": ["scenario-bound", "evidence-only", "excluded"] },
+        "scenario_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "source_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "handoffContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handoff_id", "producer_skill", "consumer_skill", "artifact_ref", "artifact_sha256", "freshness", "required_preconditions", "consumer_receipt", "claim_ceiling", "reason_code", "next_action"],
+      "properties": {
+        "handoff_id": { "type": "string", "pattern": "^HANDOFF-[A-Z0-9-]+$" },
+        "producer_skill": { "type": "string", "minLength": 1 },
+        "consumer_skill": { "type": "string", "minLength": 1 },
+        "artifact_ref": { "type": "string", "minLength": 1 },
+        "artifact_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "freshness": { "enum": ["current", "stale", "not-run"] },
+        "required_preconditions": { "$ref": "#/$defs/nonEmptyStrings" },
+        "consumer_receipt": { "enum": ["observed", "declared", "rejected", "not-run"] },
+        "claim_ceiling": { "type": "string", "minLength": 1 },
+        "reason_code": { "type": "string", "minLength": 1 },
+        "next_action": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

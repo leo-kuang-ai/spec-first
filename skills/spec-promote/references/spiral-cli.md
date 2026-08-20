@@ -5,17 +5,15 @@ Spiral (`@every-env/spiral-cli`) drafts copy in a user's brand voice. `spec-prom
 ## Detection — three states
 
 ```bash
-which spiral
-spiral auth status --json 2>/dev/null
+SKILL_DIR="<absolute path of the directory containing the loaded spec-promote SKILL.md>"
+node "$SKILL_DIR/scripts/check-spiral-auth.cjs"
 ```
 
-- **Absent** — `which spiral` finds nothing. → Path 0 (offer to install + connect).
-- Otherwise parse `spiral auth status --json`:
-  - **Ready** — `"authenticated": true` (equivalently `"status": "authenticated"`, any `source`). Use Path A.
-  - **Unauthed** — `"authenticated": false`. → Path 0 (offer to sign in).
-  - **Older CLI** that ignores `--json` (output isn't JSON): fall back to the human-readable signal in that same output — ready iff it contains `spiral_sk_`, else unauthed.
+- **Unavailable** — `status: unavailable`. → Path 0 (offer to install + connect).
+- **Ready** — `status: ready` and `authenticated: true`. Use Path A.
+- **Not ready / unverified** — every other allowlisted status. → Path 0 when interactive, otherwise local Path B.
 
-Prefer the JSON `authenticated` flag over substring-matching `spiral_sk_` — the flag is the designed contract, and the substring is only the backward-compat fallback. Any error or timeout → treat as not-ready and continue; never block.
+The helper captures and discards raw provider stdout/stderr, parses only the JSON authentication contract, and emits allowlisted readiness fields. Do not bypass it for backward compatibility or diagnostics. Any non-JSON output, error, or timeout is unverified/not-ready; continue through the local drafting fallback rather than exposing or interpreting secret-like output.
 
 ## Path 0 — Offer setup (first run, declinable)
 
@@ -50,9 +48,9 @@ There is deliberately no separate "don't ask again" option: **dismissing is itse
 
 - **Sign in to Spiral** (installed, unauthed) — the agent runs `spiral login --json` itself. It's non-blocking, and the **API key never touches the agent** (the token is exchanged server->CLI via a device-code flow). Parse the JSON `status`:
   - `already_authenticated` — `{ "authenticated": true, "status": "already_authenticated", "prefix": "..." }`: a credential already exists; nothing to approve. Go to Path A. (To switch accounts the user runs `spiral logout` first.)
-  - `pending` — `{ "status": "pending", "auth_url": "...", "user_code": "ABCD-2345", "expires_in": 900 }`: surface the `auth_url` for the user to open and approve in their browser (the `user_code` is embedded in the URL — show it too so they can confirm it matches), then wait. Once the user says they've approved, confirm by running `spiral auth status --json`: it returns `"authenticated": true` when claimed, or `"status": "pending"` if not yet (re-check, don't busy-loop with sleeps — let the user's confirmation drive the re-check). If it stays unclaimed or the code expires (~`expires_in`s), offer to retry or fall to Path B. On success -> Path A.
+  - `pending` — `{ "status": "pending", "auth_url": "...", "user_code": "ABCD-2345", "expires_in": 900 }`: surface the `auth_url` for the user to open and approve in their browser (the `user_code` is embedded in the URL — show it too so they can confirm it matches), then wait. Once the user says they've approved, confirm with `scripts/check-spiral-auth.cjs`; do not busy-loop with sleeps. If it stays not-ready or the code expires (~`expires_in`s), offer to retry or fall to Path B. On success -> Path A.
   - **Never have the user paste an API key into chat** — with agent login the agent never handles the key at all.
-  - **Older CLI (< 1.8.0, no agent login):** if `spiral login --json` returns the legacy `API key required ... --token` text instead of JSON, suggest `npm i -g @every-env/spiral-cli@latest`, or have the user run `spiral login` themselves in their terminal (browser sign-in) and re-check `spiral auth status`. If they would rather not, go to Path B.
+  - **Older CLI (< 1.8.0, no agent login):** if `spiral login --json` returns the legacy `API key required ... --token` text instead of JSON, suggest `npm i -g @every-env/spiral-cli@latest`, or have the user run `spiral login` themselves in their terminal (browser sign-in) and re-check through `scripts/check-spiral-auth.cjs`. If they would rather not, go to Path B.
 - **Install Spiral** (absent) — the pairing-code command installs and connects in one step. Direct the user to Settings → Connect an Agent at https://app.writewithspiral.com to copy their command, which looks like:
   ```bash
   npx @every-env/spiral-cli@latest setup --pairing-code <code>
@@ -72,6 +70,8 @@ If the root can't be resolved or any write fails, proceed to Path B anyway; the 
 After recording, confirm it in one line so the write isn't silent and the user knows how to undo it — e.g. "Got it — I won't bring up Spiral here again (saved to `.spec-first/config.local.yaml`, kept out of git). Want it back later? Just ask, or remove the `spec_promote_spiral_optout` key." Keep it to a single line; don't belabor it.
 
 ## Generate
+
+Run `spiral write` only after the caller has established `provider_egress_authorization: authorized` for this run and disclosed that feature context is sent to Spiral and drafts persist in the user's account. Authentication is readiness, not content-egress intent. Missing authority returns `provider_egress_authorization_missing` and uses direct local drafting.
 
 ```bash
 spiral write "<prompt>" --instant --num-drafts <1-5> --json
@@ -139,9 +139,9 @@ This one-call cross-channel set is the ideal fit for `spec-promote` when the use
 
 ## Failure handling
 
-Detection that comes back not-ready routes through Path 0 above. Once on Path A, any of these → fall back to direct drafting (SKILL.md Path B), silently, for the affected channels:
+Detection that comes back not-ready routes through Path 0 above. Once on Path A, any of these → fall back to direct drafting (SKILL.md Path B) for the affected channels and emit the safe provider-attempt receipt:
 
 - `spiral write` exits non-zero, hangs, or emits non-JSON
 - `drafts` is empty or missing expected fields
 
-Never surface raw Spiral errors to the user as a blocker. The skill always produces drafts.
+Never surface raw Spiral errors, stdout/stderr, or secret-like fields. The receipt discloses that a provider attempt occurred, delivery/persistence may be unknown, and local fallback was used; it contains only an allowlisted reason code. The skill still produces drafts.

@@ -270,29 +270,15 @@ The defining rule: if the bug is sensitive to observation, the fix must survive 
 
 ## Browser Debugging
 
-When investigating UI bugs with `agent-browser` or equivalent tools:
+Browser subprocess ownership belongs to the internal `spec-test-browser` Skill. Provide the caller-owned exact loopback origin and the smallest repo-relative routes/actions that reproduce the issue; do not invoke `agent-browser`, MCP browser tools, or another browser CLI directly from `spec-debug`.
 
-```bash
-# Open the affected page
-agent-browser open http://localhost:${PORT:-3000}/affected/route
-
-# Capture current state
-agent-browser snapshot -i
-
-# Interact with the page
-agent-browser click @ref          # click an element
-agent-browser fill @ref "text"    # fill a form field
-agent-browser snapshot -i         # capture state after interaction
-
-# Save visual evidence
-agent-browser screenshot bug-evidence.png
-```
+Invoke `spec-test-browser current target-origin:<exact-loopback-origin>` and ask it to observe the affected route, capture a private snapshot, perform only allowlisted synthetic interaction with authorized effects, then collect private screenshot/console/network evidence. Consume the structured result and private evidence refs; never copy raw page output into commands or promote a screenshot path to durable evidence without separate authorization.
 
 **Port detection:** If your in-context project instructions explicitly state the dev-server port, use it (don't grep instruction prose for a port — it's false-positive-prone); otherwise check `package.json` dev scripts, then `.env` files, falling back to `3000`.
 
-**Console errors:** Check browser console output for JavaScript errors, failed network requests, and CORS issues. These often reveal the root cause of UI bugs before any code tracing is needed.
+**Console errors:** Use console facts returned by the browser owner to check JavaScript errors, failed network requests, and CORS issues. These often reveal the root cause of UI bugs before any code tracing is needed.
 
-**Network tab:** Check for failed API requests, unexpected response codes, or missing CORS headers. A 422 or 500 response from the backend narrows the investigation immediately.
+**Network tab:** Use the owner's bounded network facts to check failed API requests, unexpected response codes, or missing CORS headers. A 422 or 500 response from the backend narrows the investigation immediately.
 
 ---
 

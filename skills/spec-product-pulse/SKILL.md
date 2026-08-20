@@ -124,6 +124,20 @@ If Phase 1 ran (first run, or `setup`/`reconfigure` argument), re-read `.spec-fi
 
 #### 2.1 Dispatch Queries
 
+Every configured or expected source returns a per-source receipt before report synthesis:
+
+```yaml
+source: <configured source id>
+status: confirmed-value | confirmed-zero | not-configured | unavailable | permission-denied | partial | not-run
+reason_code: <stable source-specific reason>
+window: { start: <timestamp>, end: <timestamp> }
+freshness: <query completion timestamp or provider watermark>
+values: <confirmed values only>
+limitations: [<missing slice or claim boundary>]
+```
+
+Use `confirmed-zero` only when the source successfully measured the requested window and explicitly returned numeric zero. Missing/empty responses, tool absence, auth failures, timeouts, and truncated pagination are not zero: classify them as `unavailable`, `permission-denied`, or `partial` with a `reason_code`. Use `not-run` only when a pre-query gate deliberately prevented access, such as unavailable provider-side minimization. Preserve `not-configured` for an expected source that has no configured owner. Do not collapse these states to `no data`, omit the source row, or let one successful source hide another source's failure.
+
 Run these in **parallel** (different tools, no shared load):
 
 - Product analytics query (primary event count, value-realization count, completions, conversion ratios) over the window
@@ -138,13 +152,17 @@ Run these **serially**, after the parallel batch:
 
 If `pulse_quality_scoring` is `true` (AI products only), sample up to 10 sessions or conversations from the window and score each 1-5 on the dimension recorded in `pulse_quality_dimension`.
 
+Quality scoring is content processing, not an aggregate metrics query. Before setup records the opt-in, disclose that the projected conversation/session content needed for scoring will enter the current agent/model context even though it will not be copied into the saved report. At run time, request only a provider-side projection that removes direct identity fields and unrelated message/history fields before the result is returned to the agent. The minimal accepted row contains a provider-stable opaque sample id, the bounded content needed for the configured dimension, window membership, and projection provenance.
+
+If the source cannot project or de-identify before returning data, do not fetch raw sessions and do not attempt local redaction after the content has already entered context. Record the quality source as `not-run` with `reason_code: quality-source-minimization-unavailable`, omit the quality score, and preserve that limitation in the report. Provider-side projection reduces exposure but does not make the content anonymous; keep it out of durable artifacts and worker prompts.
+
 **Scoring discipline:** Default to 4 or 5 when the session looks normal. Reserve 1-3 for sessions with a clear failure mode (product gave wrong answer, user got stuck, error surfaced). If every session is scoring 3, the bar is too strict; if every session is scoring 5, the bar is too loose.
 
 **No PII in the score summary.** Capture a count distribution (e.g., "8x 5, 1x 4, 1x 2") and a short anonymized note on any session scored below 4. Do not include message content or user identifiers in the saved report.
 
 #### 2.3 Assemble the Report
 
-Read `references/report-template.md`. Fill in the template using the query results. Four sections, in order:
+Read `references/report-template.md`. Fill in the template using the query results and per-source receipts. Four sections, in order:
 
 1. **Headlines** - 2-3 lines summarizing the window
 2. **Usage** - primary engagement, value realization, completions, quality sample

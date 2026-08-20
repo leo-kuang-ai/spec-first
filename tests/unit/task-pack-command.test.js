@@ -125,6 +125,31 @@ describe('spec-first tasks command', () => {
     expect(JSON.parse(stale.stdout).reason_code).toBe('stale_hash');
   });
 
+  test('rejects superseded source plans for new hashes and existing task-pack execution', () => {
+    fs.writeFileSync(
+      planPath,
+      '---\nspec_id: example\nstatus: superseded\nartifact_readiness: implementation-ready\nexecution: code\n---\n# Source Plan\n',
+      'utf8',
+    );
+    const hash = computeSourcePlanHash(planPath).hash;
+    const taskPath = writeTaskPack(tempRoot, hash);
+
+    const hashResult = runCli(['tasks', 'hash', planPath, '--json'], tempRoot);
+    expect(hashResult.status).toBe(2);
+    expect(JSON.parse(hashResult.stdout).error.code).toBe('tasks-source-plan-non-active');
+
+    const validateResult = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(validateResult.status).toBe(1);
+    expect(JSON.parse(validateResult.stdout)).toEqual(expect.objectContaining({
+      deterministic_handoff: false,
+      reason_code: 'source_plan_non_active',
+      validation: expect.objectContaining({ source_plan_lifecycle: 'non-active' }),
+      errors: expect.arrayContaining([
+        expect.objectContaining({ code: 'task-pack-source-plan-non-active' }),
+      ]),
+    }));
+  });
+
   test('returns a machine-readable reason when the task pack cannot be read', () => {
     const result = runCli([
       'tasks', 'validate', 'docs/tasks/missing.md', '--repo', tempRoot, '--json',

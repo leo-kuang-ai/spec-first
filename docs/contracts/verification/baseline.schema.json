@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-skill-baseline/v1",
+  "title": "Per-Skill localization baseline and frozen improvement contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_kind", "producer", "single_writer", "source_snapshot", "inventory_ref", "inventory_sha256", "skill_id", "source_refs", "before_state", "target_state", "known_limitations", "invalidation_conditions", "candidate_snapshot", "candidate_diff_ref", "improvement_contract", "improvement_contract_sha256", "evidence_axes", "final_status", "consumers", "claim_ceiling"],
+  "properties": {
+    "schema_version": { "const": "ce-localization-skill-baseline/v1" },
+    "artifact_kind": { "const": "source-bound-skill-baseline" },
+    "producer": { "type": "string", "pattern": "^skill-owner:" },
+    "single_writer": { "const": "ce-localization-baseline-writer" },
+    "source_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+    "inventory_ref": { "type": "string", "minLength": 1 },
+    "inventory_sha256": { "$ref": "#/$defs/sha256" },
+    "skill_id": { "type": "string", "minLength": 1 },
+    "source_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+    "before_state": { "type": "string", "minLength": 1 },
+    "target_state": { "type": "string", "minLength": 1 },
+    "known_limitations": { "$ref": "#/$defs/strings" },
+    "invalidation_conditions": { "$ref": "#/$defs/nonEmptyStrings" },
+    "candidate_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+    "candidate_diff_ref": { "type": "string", "minLength": 1 },
+    "improvement_contract": { "$ref": "#/$defs/improvementContract" },
+    "improvement_contract_sha256": { "$ref": "#/$defs/sha256" },
+    "evidence_axes": { "$ref": "#/$defs/evidenceAxes" },
+    "final_status": { "enum": ["confirmed-improved", "maintained-confirmed", "mechanism-improved", "degraded-or-partial", "not-improved-or-rejected"] },
+    "consumers": { "$ref": "#/$defs/nonEmptyStrings" },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "strings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "improvementContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frozen_at", "metric_owner", "metric_contract_ref", "metric_contract_sha256", "noise_floor", "budget", "measurement_artifact_refs", "primary_metric", "secondary_metrics", "minimum_detectable_improvement", "acceptable_regression", "sample_requirement", "decision_rule"],
+      "properties": {
+        "frozen_at": { "type": "string", "format": "date-time" },
+        "metric_owner": { "type": "string", "minLength": 1 },
+        "metric_contract_ref": { "type": "string", "minLength": 1 },
+        "metric_contract_sha256": { "$ref": "#/$defs/sha256" },
+        "noise_floor": { "type": "string", "minLength": 1 },
+        "budget": { "type": "string", "minLength": 1 },
+        "measurement_artifact_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "primary_metric": { "$ref": "#/$defs/metric" },
+        "secondary_metrics": { "type": "array", "items": { "$ref": "#/$defs/metric" } },
+        "minimum_detectable_improvement": { "type": "string", "minLength": 1 },
+        "acceptable_regression": { "type": "string", "minLength": 1 },
+        "sample_requirement": { "type": "string", "minLength": 1 },
+        "decision_rule": { "type": "string", "minLength": 1 }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_id", "metric_type", "direction", "instrumentation_ref", "numerator", "denominator", "measurement_window", "missing_data_policy"],
+      "properties": {
+        "metric_id": { "type": "string", "minLength": 1 },
+        "metric_type": { "enum": ["rate", "count", "duration", "score", "binary-gate"] },
+        "direction": { "enum": ["increase", "decrease", "zero-regression", "pass"] },
+        "instrumentation_ref": { "type": "string", "minLength": 1 },
+        "numerator": { "type": "string", "minLength": 1 },
+        "denominator": { "type": "string", "minLength": 1 },
+        "measurement_window": { "type": "string", "minLength": 1 },
+        "missing_data_policy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence_refs", "limitations"],
+      "properties": {
+        "state": { "enum": ["confirmed", "partial", "degraded", "not-run", "exploratory"] },
+        "evidence_refs": { "$ref": "#/$defs/strings" },
+        "limitations": { "$ref": "#/$defs/strings" }
+      }
+    },
+    "evidenceAxes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["structure_contract", "behavior_quality", "runtime_cost", "field_outcome"],
+      "properties": {
+        "structure_contract": { "$ref": "#/$defs/dimension" },
+        "behavior_quality": { "$ref": "#/$defs/dimension" },
+        "runtime_cost": { "$ref": "#/$defs/dimension" },
+        "field_outcome": { "$ref": "#/$defs/dimension" }
+      }
+    }
+  }
+}

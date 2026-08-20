@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.local/contracts/provider-serving-receipt.schema.json",
+  "title": "Provider Serving Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "verification_status",
+    "reason_code",
+    "producer",
+    "captured_at",
+    "freshness_expires_at",
+    "semantic_request_sha256",
+    "source_identity",
+    "provider_trust_domain",
+    "requested_provider",
+    "requested_model",
+    "actual_provider",
+    "actual_model",
+    "credential_env_allowlist"
+  ],
+  "properties": {
+    "schema_version": { "const": "provider-serving-receipt/v2" },
+    "artifact_type": { "const": "degraded" },
+    "verification_status": { "const": "unverified" },
+    "reason_code": { "const": "authenticated-producer-unavailable" },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "identity", "authority"],
+      "properties": {
+        "kind": { "enum": ["host-runtime", "provider-response-metadata", "caller-supplied"] },
+        "identity": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "authority": { "const": "self-asserted" }
+      }
+    },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "freshness_expires_at": { "type": "string", "format": "date-time" },
+    "semantic_request_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "source_identity": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "provider_trust_domain": { "enum": ["host-native", "external", "unknown"] },
+    "requested_provider": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "requested_model": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "actual_provider": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "actual_model": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "credential_env_allowlist": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 20,
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,127}$" }
+    }
+  }
+}

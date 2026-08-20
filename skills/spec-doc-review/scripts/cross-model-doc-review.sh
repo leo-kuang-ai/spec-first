@@ -140,13 +140,26 @@ shift
 PEER="${1:-}"; MODEL="${2:-}"; DOCUMENT="${3:-}"; DOCUMENT_TYPE="${4:-}"
 ORIGIN="${5:-}"; RUN_DIR="${6:-}"; AUTH_RECEIPT="${7:-}"; AUTH_SHA="${8:-}"
 SOURCE_IDENTITY="${9:-}"; HOST_PROVIDER="${10:-}"
+SERVING_RECEIPT="${11:-}"; SERVING_SHA="${12:-}"
 case "$PEER" in codex|claude) ;; *) fail "peer must be codex or claude" ;; esac
 [ -n "$MODEL" ] && [ -n "$DOCUMENT" ] && [ -n "$DOCUMENT_TYPE" ] &&
   [ -n "$ORIGIN" ] && [ -n "$AUTH_RECEIPT" ] &&
-  [ -n "$AUTH_SHA" ] && [ -n "$SOURCE_IDENTITY" ] && [ -n "$HOST_PROVIDER" ] ||
-  fail "start requires peer, model, document, document type, origin, run dir, receipt, receipt hash, source identity, and host provider"
+  [ -n "$AUTH_SHA" ] && [ -n "$SOURCE_IDENTITY" ] && [ -n "$HOST_PROVIDER" ] &&
+  [ -n "$SERVING_RECEIPT" ] && [ -n "$SERVING_SHA" ] ||
+  fail "provider_serving_receipt_unavailable"
 resolve_python || fail "Python 3 is required"
 command -v jq >/dev/null 2>&1 || fail "jq is required"
+jq -e '
+  .schema_version == "provider-serving-receipt/v2" and
+  .artifact_type == "degraded" and
+  .verification_status == "unverified" and
+  .reason_code == "authenticated-producer-unavailable"
+' "$SERVING_RECEIPT" >/dev/null 2>&1 || fail "provider_serving_receipt_invalid"
+fail "provider_serving_receipt_unverified"
+ACTUAL_PROVIDER="$(jq -er '.actual_provider | select(type == "string" and length > 0)' "$SERVING_RECEIPT")" ||
+  fail "provider_serving_receipt_invalid"
+ACTUAL_MODEL="$(jq -er '.actual_model | select(type == "string" and length > 0)' "$SERVING_RECEIPT")" ||
+  fail "provider_serving_receipt_invalid"
 
 SKILL_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 RUNNER="$SKILL_ROOT/scripts/peer-job-runner.py"
@@ -196,6 +209,8 @@ exec "${PYTHON_CMD[@]}" "$RUNNER" start \
   --label "whole-doc-$PEER" \
   --authorization-receipt "$AUTH_RECEIPT" \
   --authorization-receipt-sha256 "$AUTH_SHA" \
+  --serving-receipt "$SERVING_RECEIPT" \
+  --serving-receipt-sha256 "$SERVING_SHA" \
   --payload-ref "$PACKET" \
   --payload-sha256 "$PAYLOAD_SHA" \
   --payload-redaction-status passed \
@@ -203,9 +218,9 @@ exec "${PYTHON_CMD[@]}" "$RUNNER" start \
   --provider-trust-domain external \
   --host-provider "$HOST_PROVIDER" \
   --requested-provider "$PEER" \
-  --actual-provider "$PEER" \
+  --actual-provider "$ACTUAL_PROVIDER" \
   --requested-model "$MODEL" \
-  --actual-model "$MODEL" \
+  --actual-model "$ACTUAL_MODEL" \
   --result-path "$OUT" \
   -- bash "$SKILL_ROOT/scripts/cross-model-doc-review.sh" \
   __worker "$PEER" "$MODEL" "$REPO_ROOT" "$PACKET" "$OUT"

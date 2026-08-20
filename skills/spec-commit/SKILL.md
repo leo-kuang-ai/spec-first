@@ -10,7 +10,14 @@ Create a single, well-crafted git commit from the current working tree changes.
 
 ## Invocation And Authorization Boundary
 
-This is an internal-only helper. A public workflow may delegate here only after the current user or a visible upstream handoff has established `commit_authorization: authorized` for the intended run-owned paths. `workflow invocation does not authorize commit`; tool permission, a dirty tree, a branch name, or successful verification are execution facts, not authority. When commit authorization is missing, stop before branch mutation, staging, or commit and return `commit_authorization_missing`.
+This is an internal-only helper. A public workflow may delegate here only after the current user or a visible upstream handoff has established `commit_authorization: authorized` for the intended run-owned paths. Record branch authority separately:
+
+```yaml
+commit_authorization: authorized | missing
+branch_mutation_authorization: authorized | missing
+```
+
+`workflow invocation does not authorize commit`; tool permission, a dirty tree, a branch name, or successful verification are execution facts, not authority. Explicit commit authorization does not imply branch mutation authorization. When commit authorization is missing, stop before branch mutation, staging, or commit and return `commit_authorization_missing`. When a checkout or new branch is needed but branch authority is missing, stop before that Git mutation and return `branch_mutation_authorization_missing` or obtain approval for the exact branch action.
 
 This helper owns commit composition and the authorized commit checkpoint only. It does not own push, PR creation/update, plan lifecycle, or unrelated dirty paths. If branch creation would be required, obtain explicit approval for that concrete branch mutation before creating it.
 
@@ -50,9 +57,9 @@ If both fail, fall back to `main`.
 
 If the git status from the context above shows a clean working tree (no staged, modified, or untracked files), report that there is nothing to commit and stop.
 
-If the current branch from the context above is empty, the repository is in detached HEAD state. Explain that a branch is required before committing if the user wants this work attached to a branch. Ask whether to create a feature branch now. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+If the current branch from the context above is empty, the repository is in detached HEAD state. Explain that a branch is required if the user wants this work attached to a branch. When `branch_mutation_authorization: missing`, ask whether to create the exact proposed feature branch now and do not run checkout first. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
-- If the user chooses to create a branch, derive the name from the change content, create it with `git checkout -b <branch-name>`, then run `git branch --show-current` again and use that result as the current branch name for the rest of the workflow.
+- If the user authorizes the displayed branch creation, set `branch_mutation_authorization: authorized`, derive the name from the change content, create it with `git checkout -b <branch-name>`, then run `git branch --show-current` again and use that result as the current branch name for the rest of the workflow.
 - If the user declines, continue with the detached HEAD commit.
 
 ### Step 2: Determine commit message convention
@@ -76,7 +83,7 @@ Keep this lightweight:
 
 ### Step 4: Stage and commit
 
-If the current branch from the context above is `main`, `master`, or the resolved default branch from Step 1, automatically create a feature branch before staging or committing. Committing directly on the default branch is not an option in this workflow.
+If the current branch from the context above is `main`, `master`, or the resolved default branch from Step 1, committing directly is not an option in this workflow. Display the proposed feature-branch name and require `branch_mutation_authorization: authorized` before creation; otherwise return `branch_mutation_authorization_missing` before staging or committing.
 
 Derive the branch name from the change content, validate it, and create it from the current HEAD so uncommitted work and any local-only commits stay attached to the new branch:
 

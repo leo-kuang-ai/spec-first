@@ -116,7 +116,7 @@ describe('CE upstream skill sync contracts', () => {
     expect(fs.existsSync('skills/spec-brainstorm/references/reasoning-elevation.md')).toBe(false);
     expect(plan).not.toContain('Fable');
     expect(brainstorm).not.toContain('Fable');
-    expect(setup).toContain('work_delegate: codex');
+    expect(setup).not.toContain('work_delegate: codex');
     expect(setup).not.toContain('plan_use_fable');
     expect(setup).not.toContain('brainstorm_use_fable');
   });

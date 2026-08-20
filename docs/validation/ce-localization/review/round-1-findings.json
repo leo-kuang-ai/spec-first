@@ -1,0 +1,1030 @@
+{
+  "schema_version": "ce-localization-round-1-review/v1",
+  "artifact_kind": "source-bound-multi-lens-review",
+  "generated_at": "2026-08-20T02:18:18Z",
+  "source_snapshot": {
+    "repository": "spec-first",
+    "head": "69621aac0bbf34b13b96f57ebe0114a251698e68",
+    "dirty": true,
+    "dirty_paths": [
+      ".spec-first/config.local.example.yaml",
+      "CHANGELOG.md",
+      "benchmarks/agentic/README.md",
+      "benchmarks/agentic/complete.py",
+      "benchmarks/agentic/judge.py",
+      "benchmarks/agentic/run.py",
+      "benchmarks/agentic/runs/20260820-162800/results.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__baseline__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-162800/trace-transfer__spec-debug__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/results.json",
+      "benchmarks/agentic/runs/20260820-163052/summary.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__baseline__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__0/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__1/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__2/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__3/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__4/bank.py",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163052/trace-transfer__spec-debug__sonnet__5/bank.py",
+      "benchmarks/agentic/runs/20260820-163304/results.json",
+      "benchmarks/agentic/runs/20260820-163304/summary.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__0/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__1/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__2/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__3/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__4/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__baseline__sonnet__5/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__0/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__1/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__2/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__3/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__4/billing.py",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/_claude.json",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/_claude.stderr.txt",
+      "benchmarks/agentic/runs/20260820-163304/trace-amount__spec-debug__sonnet__5/billing.py",
+      "benchmarks/agentic/tasks.py",
+      "docs/10-prompt/AI-Coding-Harness\\346\\274\\224\\345\\214\\226\\346\\226\\271\\346\\263\\225\\350\\256\\272.md",
+      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md",
+      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md.backup-20260820-161301",
+      "docs/10-prompt/Ponytail\\346\\200\\235\\346\\203\\263\\346\\214\\207\\345\\257\\274spec-first-Skill\\344\\274\\230\\345\\214\\226.md.bak2",
+      "docs/10-prompt/README.md",
+      "docs/10-prompt/\\347\\273\\223\\346\\236\\204\\345\\214\\226\\351\\241\\271\\347\\233\\256\\350\\247\\222\\350\\211\\262\\345\\245\\221\\347\\272\\246.md",
+      "docs/catalog/runtime-capabilities.md",
+      "docs/contracts/verification/baseline.schema.json",
+      "docs/contracts/verification/ce-localization-round-3-review.schema.json",
+      "docs/contracts/verification/ce-setup-dependency-matrix.schema.json",
+      "docs/contracts/verification/ce-setup-prerequisite-preflight.schema.json",
+      "docs/contracts/verification/ce-setup-side-effect.schema.json",
+      "docs/contracts/verification/ce-setup-snapshot.schema.json",
+      "docs/contracts/verification/ce-upstream-adjudication-input.schema.json",
+      "docs/contracts/verification/ce-upstream-adjudication.schema.json",
+      "docs/contracts/verification/ce-upstream-ledger-patch.schema.json",
+      "docs/contracts/verification/field-validation-protocol.schema.json",
+      "docs/contracts/verification/field-validation-results.schema.json",
+      "docs/contracts/verification/host-invocation-receipt.schema.json",
+      "docs/contracts/verification/knowledge-promotion.schema.json",
+      "docs/contracts/verification/localization-ledger.schema.json",
+      "docs/contracts/verification/provider-serving-receipt.md",
+      "docs/contracts/verification/provider-serving-receipt.schema.json",
+      "docs/contracts/verification/review-findings.schema.json",
+      "docs/contracts/verification/runtime-status-projection.schema.json",
+      "docs/contracts/verification/skill-inventory.schema.json",
+      "docs/contracts/verification/skill-scenarios.schema.json",
+      "docs/plans/2026-08-18-001-refactor-sync-ce-post-3-20-head-calibration-plan.md",
+      "docs/plans/2026-08-19-002-refactor-ce-post-3-20-skill-sync-scope-clarification.md",
+      "docs/plans/2026-08-19-003-refactor-ce-post-3-20-full-window-sync-plan.md",
+      "docs/plans/2026-08-20-001-fix-ce-full-window-review-findings.md",
+      "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md",
+      "docs/validation/2026-08-18-ce-post-3-20-name-status.md",
+      "docs/validation/2026-08-19-ce-post-3-20-filelist-source-comparison.md",
+      "docs/validation/2026-08-19-ce-post-3-20-reconciliation.json",
+      "docs/validation/2026-08-19-ce-post-3-20-reconciliation.md",
+      "docs/validation/2026-08-19-current-skill-package-inventory.json",
+      "jest.config.js",
+      "package-lock.json",
+      "package.json",
+      "scripts/check-ce-localization-review.cjs",
+      "scripts/check-ce-upstream-reconciliation.cjs",
+      "scripts/generate-ce-localization-closeout.cjs",
+      "scripts/rebind-ce-ledger-patches.cjs",
+      "scripts/sync-shared-references.js",
+      "skills/_shared/README.md",
+      "skills/_shared/references/concepts-vocabulary.md",
+      "skills/_shared/references/html-rendering.md",
+      "skills/_shared/references/markdown-rendering.md",
+      "skills/_shared/references/settled-decisions.md",
+      "skills/_shared/references/tracker-defer.md",
+      "skills/_shared/references/yaml-schema.md",
+      "skills/spec-brainstorm/references/handoff.md",
+      "skills/spec-brainstorm/references/html-rendering.md",
+      "skills/spec-code-review/references/cross-model-review.md",
+      "skills/spec-code-review/scripts/cross-model-adversarial-review.sh",
+      "skills/spec-code-review/scripts/peer-job-runner.py",
+      "skills/spec-commit-push-pr/SKILL.md",
+      "skills/spec-commit-push-pr/references/pr-description-writing.md",
+      "skills/spec-commit/SKILL.md",
+      "skills/spec-compound-refresh/SKILL.md",
+      "skills/spec-compound/SKILL.md",
+      "skills/spec-debug/SKILL.md",
+      "skills/spec-debug/references/investigation-techniques.md",
+      "skills/spec-doc-review/references/cross-model-review.md",
+      "skills/spec-doc-review/scripts/cross-model-doc-review.sh",
+      "skills/spec-doc-review/scripts/peer-job-runner.py",
+      "skills/spec-dogfood/SKILL.md",
+      "skills/spec-ideate/SKILL.md",
+      "skills/spec-ideate/references/html-rendering.md",
+      "skills/spec-ideate/references/universal-ideation.md",
+      "skills/spec-lfg/SKILL.md",
+      "skills/spec-lfg/references/tracker-defer.md",
+      "skills/spec-optimize/SKILL.md",
+      "skills/spec-plan/references/plan-handoff.md",
+      "skills/spec-polish/SKILL.md",
+      "skills/spec-pov/references/cross-model-panel.md",
+      "skills/spec-pov/scripts/cross-model-pov.sh",
+      "skills/spec-pov/scripts/peer-job-runner.py",
+      "skills/spec-product-pulse/SKILL.md",
+      "skills/spec-product-pulse/references/interview.md",
+      "skills/spec-product-pulse/references/report-template.md",
+      "skills/spec-promote/SKILL.md",
+      "skills/spec-promote/references/spiral-cli.md",
+      "skills/spec-promote/scripts/check-spiral-auth.cjs",
+      "skills/spec-prototype/SKILL.md",
+      "skills/spec-prototype/references/craft-floor.md",
+      "skills/spec-prototype/references/preview.md",
+      "skills/spec-prototype/references/write-back.md",
+      "skills/spec-prototype/scripts/light-webserver.js",
+      "skills/spec-riffrec-feedback-analysis/SKILL.md",
+      "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md",
+      "skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md",
+      "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py",
+      "skills/spec-runtime-setup/SKILL.md",
+      "skills/spec-runtime-setup/references/config-template.yaml",
+      "skills/spec-runtime-setup/scripts/lib/host-authority.cjs",
+      "skills/spec-runtime-setup/scripts/lib/project-config.cjs",
+      "skills/spec-runtime-setup/scripts/setup.cjs",
+      "skills/spec-runtime-setup/scripts/vendor/README.md",
+      "skills/spec-runtime-setup/scripts/vendor/js-yaml-3.15.1.min.js",
+      "skills/spec-runtime-setup/scripts/vendor/js-yaml-LICENSE",
+      "skills/spec-sweep/SKILL.md",
+      "skills/spec-sweep/references/agents/media-analyzer.md",
+      "skills/spec-sweep/references/interview.md",
+      "skills/spec-sweep/references/state-schema.md",
+      "skills/spec-sweep/scripts/analyze_riffrec_zip.py",
+      "skills/spec-test-xcode/SKILL.md",
+      "skills/spec-work/SKILL.md",
+      "skills/spec-work/references/agents/figma-design-sync.md",
+      "skills/spec-work/references/execution-strategy.md",
+      "skills/spec-work/references/tracker-defer.md",
+      "skills/spec-work/references/work-intake-and-task-pack.md",
+      "skills/spec-worktree/SKILL.md",
+      "skills/spec-worktree/scripts/worktree-manager.sh",
+      "skills/spec-write-tasks/SKILL.md",
+      "skills/using-spec-first/references/public-route-map.md",
+      "src/cli/commands/doctor.js",
+      "src/cli/commands/tasks.js",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "src/cli/task-pack.js",
+      "templates/claude/commands/spec/write-tasks.md",
+      "tests/integration/init-six-host-lifecycle.integration.test.js",
+      "tests/integration/spec-prototype-human-journey.integration.test.js",
+      "tests/unit/ce-localization-closeout-contracts.test.js",
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
+      "tests/unit/ce-post-3-20-calibration-contracts.test.js",
+      "tests/unit/ce-setup-localization-contracts.test.js",
+      "tests/unit/ce-upstream-3-20-reconciliation.test.js",
+      "tests/unit/ce-upstream-reconciliation-v2.test.js",
+      "tests/unit/ce-upstream-skill-sync-contracts.test.js",
+      "tests/unit/doctor-output.test.js",
+      "tests/unit/doctor-runtime-assets.test.js",
+      "tests/unit/low-findings-cleanup-contracts.test.js",
+      "tests/unit/mcp-setup-config-consumers.test.js",
+      "tests/unit/mcp-setup-entrypoint.test.js",
+      "tests/unit/mcp-setup-mode-target.test.js",
+      "tests/unit/mcp-setup-project-config.test.js",
+      "tests/unit/mutation-authority-contracts.test.js",
+      "tests/unit/pipeline-mode-contracts.test.js",
+      "tests/unit/project-role-contract.test.js",
+      "tests/unit/skill-flow-p2-closure-contracts.test.js",
+      "tests/unit/spec-code-review-peer-runner.test.js",
+      "tests/unit/spec-debug-contracts.test.js",
+      "tests/unit/spec-product-pulse-contracts.test.js",
+      "tests/unit/spec-promote-auth-probe.test.js",
+      "tests/unit/spec-prototype-contracts.test.js",
+      "tests/unit/spec-riffrec-analyzer-safety.test.js",
+      "tests/unit/spec-riffrec-feedback-analysis-contracts.test.js",
+      "tests/unit/spec-work-contracts.test.js",
+      "tests/unit/spec-work-execution-strategy-contracts.test.js",
+      "tests/unit/spec-worktree-contracts.test.js",
+      "tests/unit/spec-write-tasks-contracts.test.js",
+      "tests/unit/task-pack-command.test.js",
+      "tests/unit/test-inventory-contracts.test.js"
+    ],
+    "dirty_path_manifest_sha256": "01d8c3bd383359c55450823d72022ed61c6a4da33f263a80eeaafaec65ae88c1",
+    "source_tree_hash": "959ce732ecff948bdfc634f199bf72832361b04374a0553024abc737ba2f5b64",
+    "inventory_hash": "2e6379a59b991c3ebfe3aeabc0162fa67369691b85b9494020f54f95a56dc81a",
+    "scope_contract": {
+      "source_roots": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "skills",
+        "templates",
+        "src",
+        "scripts",
+        "tests",
+        "docs",
+        "README.md",
+        "README.en.md",
+        "README.zh-CN.md",
+        "CHANGELOG.md",
+        "package.json"
+      ],
+      "excluded_run_outputs": [
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-name-status.md",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication-input.json",
+        "docs/validation/2026-08-19-ce-post-3-20-adjudication.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-full-window-reconciliation-v2.md",
+        "docs/validation/2026-08-19-spec-first-current-skill-package-inventory-v2.json",
+        "docs/validation/2026-08-19-ce-post-3-20-evidence-exceptions.json",
+        "docs/validation/2026-08-19-ce-post-3-20-ledger-patches/**",
+        "docs/validation/ce-localization/**"
+      ]
+    },
+    "hash_algorithm": {
+      "name": "sha256",
+      "version": "canonical-source-manifest-v1"
+    }
+  },
+  "coverage_summary": {
+    "expected_skill_count": 36,
+    "reviewed_skill_count": 36,
+    "expected_package_path_count": 570,
+    "reviewed_package_path_count": 570,
+    "package_bytes": 5756855,
+    "direct_support_unique_path_count": 182,
+    "direct_support_relation_count": 368,
+    "missing_path_count": 0,
+    "hash_mismatch_count": 0,
+    "coverage_status": "partial",
+    "coverage_reason": "Architecture and value lanes covered 36/36 Skills. Runtime/security deep-reviewed 11/36 and retained bounded/partial coverage for 25/36; no row is promoted to full semantic coverage."
+  },
+  "review_lanes": [
+    {
+      "lane_id": "round-1-coherence-architecture",
+      "lens": "coherence/architecture",
+      "role_representation": "internal-role-simulated",
+      "coverage": "36/36-partial",
+      "provider_identity": "unverified",
+      "worker_context_isolation": "inherited",
+      "claim_ceiling": "current-source architecture and ownership findings only"
+    },
+    {
+      "lane_id": "round-1-runtime-security",
+      "lens": "runtime/security",
+      "role_representation": "internal-role-simulated",
+      "coverage": "11/36-deep;25/36-bounded-partial",
+      "provider_identity": "unverified",
+      "worker_context_isolation": "inherited",
+      "claim_ceiling": "source contract and deterministic implementation findings; provider and field behavior not run"
+    },
+    {
+      "lane_id": "round-1-value-product",
+      "lens": "value/product",
+      "role_representation": "internal-role-simulated",
+      "coverage": "36/36-partial",
+      "provider_identity": "unverified",
+      "worker_context_isolation": "inherited",
+      "claim_ceiling": "mechanism and value hypotheses only; field_outcome not run"
+    }
+  ],
+  "skill_coverage": [
+    {
+      "skill_id": "spec-app-consistency-audit",
+      "package_paths": 80,
+      "direct_support_relations": 7,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Static App consistency owner is bounded; report-only deterministic execution remains deferred.",
+      "finding_ids": [
+        "R1-015"
+      ]
+    },
+    {
+      "skill_id": "spec-brainstorm",
+      "package_paths": 13,
+      "direct_support_relations": 18,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns unresolved WHAT to requirements-only planning without implementation authority.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-code-review",
+      "package_paths": 53,
+      "direct_support_relations": 19,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Review and mutation authority are separated; one caller description is over-broad.",
+      "finding_ids": [
+        "R1-012"
+      ]
+    },
+    {
+      "skill_id": "spec-commit",
+      "package_paths": 1,
+      "direct_support_relations": 4,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Internal commit owner has a contradictory default-branch mutation path.",
+      "finding_ids": [
+        "R1-003"
+      ]
+    },
+    {
+      "skill_id": "spec-commit-push-pr",
+      "package_paths": 3,
+      "direct_support_relations": 4,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Internal landing owner preserves separate commit and landing authority.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-compound",
+      "package_paths": 20,
+      "direct_support_relations": 14,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns verified reusable knowledge promotion rather than implementation.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-compound-refresh",
+      "package_paths": 9,
+      "direct_support_relations": 10,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns current-source refresh of durable knowledge.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-debug",
+      "package_paths": 6,
+      "direct_support_relations": 9,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns diagnosis and bounded fixes for active failures.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-doc-review",
+      "package_paths": 34,
+      "direct_support_relations": 10,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns document findings; apply authority remains separate.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-dogfood",
+      "package_paths": 3,
+      "direct_support_relations": 6,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Diff-scoped browser QA lacks a general durable/external effect gate.",
+      "finding_ids": [
+        "R1-005"
+      ]
+    },
+    {
+      "skill_id": "spec-explain",
+      "package_paths": 7,
+      "direct_support_relations": 6,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns durable teaching artifacts, not ordinary Q&A or status.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-handoff",
+      "package_paths": 4,
+      "direct_support_relations": 2,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns explicit cross-session continuity artifacts.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-ideate",
+      "package_paths": 12,
+      "direct_support_relations": 12,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "External evidence policy conflicts with an always-on research path.",
+      "finding_ids": [
+        "R1-004"
+      ]
+    },
+    {
+      "skill_id": "spec-lfg",
+      "package_paths": 7,
+      "direct_support_relations": 11,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Full delivery admission does not currently grant tracker filing authority.",
+      "finding_ids": [
+        "R1-002"
+      ]
+    },
+    {
+      "skill_id": "spec-optimize",
+      "package_paths": 18,
+      "direct_support_relations": 9,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Measurement execution and derived-state lifecycle need explicit contracts.",
+      "finding_ids": [
+        "R1-006",
+        "R1-013"
+      ]
+    },
+    {
+      "skill_id": "spec-plan",
+      "package_paths": 61,
+      "direct_support_relations": 20,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns implementation-ready HOW planning and posture selection.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-polish",
+      "package_paths": 16,
+      "direct_support_relations": 5,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns collaborative UI polish, separate from browser verification.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-pov",
+      "package_paths": 14,
+      "direct_support_relations": 6,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns project-grounded adoption verdicts for external inputs.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-prd",
+      "package_paths": 34,
+      "direct_support_relations": 22,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns brownfield requirements and planning readiness.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-product-pulse",
+      "package_paths": 3,
+      "direct_support_relations": 5,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Signal source failures and real zero values are not distinguishable.",
+      "finding_ids": [
+        "R1-014"
+      ]
+    },
+    {
+      "skill_id": "spec-promote",
+      "package_paths": 2,
+      "direct_support_relations": 1,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Optional Spiral enhancement has provider, credential-output, and local preference mutation gaps.",
+      "finding_ids": [
+        "R1-010",
+        "R1-016",
+        "R1-017"
+      ]
+    },
+    {
+      "skill_id": "spec-prototype",
+      "package_paths": 5,
+      "direct_support_relations": 3,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Loopback, CSP, token/process-bound stop, and journey contracts are present; no current finding.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-resolve-pr-feedback",
+      "package_paths": 10,
+      "direct_support_relations": 5,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "PR feedback validity, fix, reply, and resolve effects remain separated.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-riffrec-feedback-analysis",
+      "package_paths": 7,
+      "direct_support_relations": 8,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Local-only defaults conflict with implicit transcription and automatic public-workflow handoff.",
+      "finding_ids": [
+        "R1-007",
+        "R1-009"
+      ]
+    },
+    {
+      "skill_id": "spec-rule-miner",
+      "package_paths": 4,
+      "direct_support_relations": 1,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns source-grounded repository conventions.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-runtime-setup",
+      "package_paths": 63,
+      "direct_support_relations": 60,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Runtime readiness owner has a verify-only side-effect description contradiction.",
+      "finding_ids": [
+        "R1-001"
+      ]
+    },
+    {
+      "skill_id": "spec-simplify-code",
+      "package_paths": 4,
+      "direct_support_relations": 4,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns behavior-preserving cleanup of recently changed code.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-strategy",
+      "package_paths": 3,
+      "direct_support_relations": 1,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns durable product direction and metrics.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-sweep",
+      "package_paths": 13,
+      "direct_support_relations": 11,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Feedback intake authorization does not independently authorize media egress.",
+      "finding_ids": [
+        "R1-008"
+      ]
+    },
+    {
+      "skill_id": "spec-test-browser",
+      "package_paths": 5,
+      "direct_support_relations": 4,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Exact-origin and durable-effect gates provide the browser safety reference contract.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-test-xcode",
+      "package_paths": 1,
+      "direct_support_relations": 3,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "simctl openurl fallback lacks target and effect admission.",
+      "finding_ids": [
+        "R1-011"
+      ]
+    },
+    {
+      "skill_id": "spec-work",
+      "package_paths": 14,
+      "direct_support_relations": 31,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Implementation owner is sound; caller prose overstates code-review's global mutation policy.",
+      "finding_ids": [
+        "R1-012"
+      ]
+    },
+    {
+      "skill_id": "spec-worktree",
+      "package_paths": 2,
+      "direct_support_relations": 5,
+      "coverage_status": "partial",
+      "runtime_security": "deep",
+      "rationale": "Internal caller-owned isolation boundary remains explicit.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-write-skill",
+      "package_paths": 18,
+      "direct_support_relations": 13,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns canonical Skill authoring and validation, not generated runtime patches.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "spec-write-tasks",
+      "package_paths": 14,
+      "direct_support_relations": 6,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Owns optional derived task packs; command metadata currently falls back to canonical SKILL.md.",
+      "finding_ids": []
+    },
+    {
+      "skill_id": "using-spec-first",
+      "package_paths": 3,
+      "direct_support_relations": 13,
+      "coverage_status": "partial",
+      "runtime_security": "bounded",
+      "rationale": "Entry governor selects one workflow and yields control without owning workflow effects.",
+      "finding_ids": []
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "R1-001",
+      "severity": "P1",
+      "skill_id": "spec-runtime-setup",
+      "status": "accepted-pending-fix",
+      "summary": "--verify-only is described as non-mutating while the deterministic policy intentionally writes setup-owned facts and ledger state.",
+      "source_refs": [
+        "skills/spec-runtime-setup/SKILL.md:115",
+        "skills/spec-runtime-setup/SKILL.md:145",
+        "skills/spec-runtime-setup/scripts/lib/mode-policy.cjs:12",
+        "skills/spec-runtime-setup/scripts/lib/runtime-executor.cjs:178"
+      ],
+      "counterargument": "The write surface is bounded and line 145 already names facts refresh; the defect is contract inconsistency, not an uncontrolled implementation write.",
+      "owner_decision": "accept",
+      "planned_fix": "Define check/plan as read-only, verify-only as setup-facts-only mutation, and apply modes as separately authorized runtime mutation.",
+      "focused_test": "Assert verify-only exposes only write-setup-facts and cannot write host config, provider install, project config, or runtime projection."
+    },
+    {
+      "finding_id": "R1-002",
+      "severity": "P1",
+      "skill_id": "spec-lfg",
+      "status": "accepted-pending-fix",
+      "summary": "LFG admission does not authorize tracker mutation, but residual handling invokes tracker-defer non-interactively.",
+      "source_refs": [
+        "skills/spec-lfg/SKILL.md:11",
+        "skills/spec-lfg/SKILL.md:167",
+        "skills/spec-lfg/references/tracker-defer.md:17"
+      ],
+      "counterargument": "A user requesting full autopilot may reasonably expect residual durability, but external tracker filing remains a distinct outward effect.",
+      "owner_decision": "accept",
+      "planned_fix": "Require tracker_deferral_authorization for external filing; otherwise preserve residuals in the PR body or local durable artifact.",
+      "focused_test": "Without tracker authority, assert zero external filing and a durable local or PR-body residual."
+    },
+    {
+      "finding_id": "R1-003",
+      "severity": "P1",
+      "skill_id": "spec-commit",
+      "status": "accepted-pending-fix",
+      "summary": "The default-branch path automatically creates a feature branch despite an earlier requirement for concrete branch-mutation approval.",
+      "source_refs": [
+        "skills/spec-commit/SKILL.md:13",
+        "skills/spec-commit/SKILL.md:15",
+        "skills/spec-commit/SKILL.md:79",
+        "skills/spec-commit/SKILL.md:86"
+      ],
+      "counterargument": "Branch creation is reversible and protects the default branch, but commit authorization still does not imply branch mutation authorization.",
+      "owner_decision": "accept",
+      "planned_fix": "Carry branch_mutation_authorization separately and stop or ask before checkout -b on default or detached HEAD.",
+      "focused_test": "Cover default, detached, and feature branches with and without branch authority."
+    },
+    {
+      "finding_id": "R1-004",
+      "severity": "P1",
+      "skill_id": "spec-ideate",
+      "status": "accepted-pending-fix",
+      "summary": "External research is called opt-in while the web research phase is also described as always-on.",
+      "source_refs": [
+        "skills/spec-ideate/SKILL.md:298",
+        "skills/spec-ideate/SKILL.md:333",
+        "skills/spec-ideate/SKILL.md:351"
+      ],
+      "counterargument": "External grounding often improves ideation, but value does not replace run-local authorization and provenance.",
+      "owner_decision": "accept",
+      "planned_fix": "Default to current-source research and enable external providers only with recorded authorization, provenance, freshness, and limitations.",
+      "focused_test": "Cover missing, granted, and explicitly denied external research authorization."
+    },
+    {
+      "finding_id": "R1-005",
+      "severity": "P1",
+      "skill_id": "spec-dogfood",
+      "status": "accepted-pending-fix",
+      "summary": "Browser click/fill/submit execution lacks a general durable or external effect classification and authorization gate.",
+      "source_refs": [
+        "skills/spec-dogfood/SKILL.md:185",
+        "skills/spec-dogfood/SKILL.md:197",
+        "skills/spec-dogfood/SKILL.md:214",
+        "skills/spec-test-browser/SKILL.md:45"
+      ],
+      "counterargument": "Dogfood usually targets loopback and test data, but localhost does not prove that an action has no durable or outward effect.",
+      "owner_decision": "accept",
+      "planned_fix": "Reuse the spec-test-browser effect contract and exact-origin execution owner; block unknown, durable, or external actions before browser subprocess execution.",
+      "focused_test": "Cover safe synthetic flows and delete, send, purchase, permission-change, and unknown effects."
+    },
+    {
+      "finding_id": "R1-006",
+      "severity": "P1",
+      "skill_id": "spec-optimize",
+      "status": "accepted-pending-fix",
+      "summary": "An arbitrary measurement.command can execute through bash -c before the baseline approval gate.",
+      "source_refs": [
+        "skills/spec-optimize/SKILL.md:372",
+        "skills/spec-optimize/SKILL.md:393",
+        "skills/spec-optimize/SKILL.md:449",
+        "skills/spec-optimize/scripts/measure.sh:38"
+      ],
+      "counterargument": "The user approved an optimization spec, but that does not prove awareness of the exact command, cwd, inherited environment, or side effects.",
+      "owner_decision": "accept",
+      "planned_fix": "Freeze and display command, resolved cwd, environment names, expected effects, and require measurement_execution_authorization before the first run.",
+      "focused_test": "A sentinel command must have zero executions before authorization and exact cwd/environment after authorization."
+    },
+    {
+      "finding_id": "R1-007",
+      "severity": "P1",
+      "skill_id": "spec-riffrec-feedback-analysis",
+      "status": "accepted-pending-fix",
+      "summary": "Local-only-by-default media handling can still upload media when OPENAI_API_KEY is present.",
+      "source_refs": [
+        "skills/spec-riffrec-feedback-analysis/SKILL.md:22",
+        "skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md:11",
+        "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py:375",
+        "skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py:1151"
+      ],
+      "counterargument": "A request to analyze or transcribe is processing intent, but a local recording plus ambient credential is not explicit third-party egress consent.",
+      "owner_decision": "accept",
+      "planned_fix": "Make transcription opt-in via an explicit flag and return an egress receipt; local analysis remains the default.",
+      "focused_test": "Cross product of credential present or absent and consent present or absent; unauthorized network call count must be zero."
+    },
+    {
+      "finding_id": "R1-008",
+      "severity": "P1",
+      "skill_id": "spec-sweep",
+      "status": "accepted-pending-fix",
+      "summary": "Sweep source and dispatch authorization do not independently authorize third-party media transcription.",
+      "source_refs": [
+        "skills/spec-sweep/SKILL.md:38",
+        "skills/spec-sweep/SKILL.md:139",
+        "skills/spec-sweep/references/agents/media-analyzer.md:22",
+        "skills/spec-sweep/scripts/analyze_riffrec_zip.py:375"
+      ],
+      "counterargument": "Sensitive media is already protected, but sensitivity classification cannot replace egress authorization for ordinary recordings.",
+      "owner_decision": "accept",
+      "planned_fix": "Separate source-write, worker-dispatch, and provider-egress facts; pass --transcribe only with explicit egress authorization.",
+      "focused_test": "Cover ordinary and sensitive media with provider egress authorized or missing."
+    },
+    {
+      "finding_id": "R1-009",
+      "severity": "P1",
+      "skill_id": "spec-riffrec-feedback-analysis",
+      "status": "accepted-pending-fix",
+      "summary": "Extensive analysis automatically invokes another public workflow that can write a durable plan without a new user choice.",
+      "source_refs": [
+        "skills/spec-riffrec-feedback-analysis/SKILL.md:16",
+        "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md:41",
+        "skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md:54",
+        "skills/using-spec-first/SKILL.md:26"
+      ],
+      "counterargument": "Brainstorm starts with requirement confirmation, but workflow selection and durable plan creation still belong to the user or explicit upstream handoff.",
+      "owner_decision": "accept",
+      "planned_fix": "Return a ready-to-brainstorm handoff and invoke spec-brainstorm only when the original request or a new confirmation authorizes it.",
+      "focused_test": "Cover analysis-only, explicit brainstorm handoff, and headless execution; no unapproved docs/plans write."
+    },
+    {
+      "finding_id": "R1-010",
+      "severity": "P2",
+      "skill_id": "spec-promote",
+      "status": "accepted-pending-fix",
+      "summary": "An authenticated Spiral installation automatically receives promotion content and persists drafts without per-run provider intent.",
+      "source_refs": [
+        "skills/spec-promote/SKILL.md:53",
+        "skills/spec-promote/SKILL.md:82",
+        "skills/spec-promote/references/spiral-cli.md:77",
+        "skills/spec-promote/references/spiral-cli.md:105"
+      ],
+      "counterargument": "Installed and authenticated tooling signals preference, but does not authorize every future content transfer.",
+      "owner_decision": "accept",
+      "planned_fix": "Require run-local provider_egress_authorization before Spiral write; otherwise use local direct drafting.",
+      "focused_test": "Cover authenticated with missing intent, explicit intent, and local opt-out."
+    },
+    {
+      "finding_id": "R1-011",
+      "severity": "P2",
+      "skill_id": "spec-test-xcode",
+      "status": "accepted-pending-fix",
+      "summary": "simctl openurl can open external URLs or custom schemes without target and effect admission.",
+      "source_refs": [
+        "skills/spec-test-xcode/SKILL.md:100",
+        "skills/spec-test-xcode/SKILL.md:101",
+        "skills/spec-test-xcode/SKILL.md:114"
+      ],
+      "counterargument": "The simulator lowers host risk, but custom schemes can still trigger durable app state and external URLs create network effects.",
+      "owner_decision": "accept",
+      "planned_fix": "Auto-open only loopback HTTP(S); display and require explicit authorization for all other schemes and reject file, data, and javascript targets.",
+      "focused_test": "Cover loopback, external HTTPS, app custom scheme, and prohibited schemes."
+    },
+    {
+      "finding_id": "R1-012",
+      "severity": "P3",
+      "skill_id": "spec-work",
+      "status": "accepted-pending-fix",
+      "summary": "spec-work prose globally says spec-code-review never edits, while spec-code-review allows explicit review-and-fix outside mode:agent.",
+      "source_refs": [
+        "skills/spec-work/SKILL.md:232",
+        "skills/spec-code-review/SKILL.md:3",
+        "skills/spec-code-review/SKILL.md:795",
+        "skills/spec-work/references/review-findings-followup.md:3"
+      ],
+      "counterargument": "spec-work always invokes mode:agent, so the current execution path is safe; only the cross-owner description is inaccurate.",
+      "owner_decision": "accept",
+      "planned_fix": "Limit the statement to spec-work's mode:agent invocation.",
+      "focused_test": "Assert the caller contract names mode:agent rather than a global never-mutate claim."
+    },
+    {
+      "finding_id": "R1-013",
+      "severity": "P2",
+      "skill_id": "spec-optimize",
+      "status": "accepted-pending-fix",
+      "summary": "The strategy digest is described as retained for resume and audit, then deleted during cleanup.",
+      "source_refs": [
+        "skills/spec-optimize/SKILL.md:156",
+        "skills/spec-optimize/SKILL.md:751",
+        "skills/spec-optimize/SKILL.md:769"
+      ],
+      "counterargument": "The experiment log is the source of truth and the digest is reconstructable derived state.",
+      "owner_decision": "accept",
+      "planned_fix": "Declare the digest derived and reconstructable, retain the experiment log, and persist required audit fields before deleting the digest.",
+      "focused_test": "Assert cleanup leaves the canonical experiment log and documents digest reconstruction."
+    },
+    {
+      "finding_id": "R1-014",
+      "severity": "P2",
+      "skill_id": "spec-product-pulse",
+      "status": "accepted-pending-fix",
+      "summary": "True zero, not configured, unavailable, permission denied, and partial provider results can collapse to no data or an omitted line.",
+      "source_refs": [
+        "skills/spec-product-pulse/SKILL.md:125",
+        "skills/spec-product-pulse/SKILL.md:135",
+        "skills/spec-product-pulse/references/report-template.md:15",
+        "skills/spec-product-pulse/references/report-template.md:19"
+      ],
+      "counterargument": "The pulse is intentionally concise, but concise output still needs truthful source-state distinctions.",
+      "owner_decision": "accept",
+      "planned_fix": "Record per-source status, reason_code, window, freshness, and distinguish confirmed zero from unavailable or partial.",
+      "focused_test": "Render ok-value, ok-zero, not-configured, unavailable, permission-denied, and partial fixtures."
+    },
+    {
+      "finding_id": "R1-015",
+      "severity": "P3",
+      "skill_id": "spec-app-consistency-audit",
+      "status": "deferred",
+      "summary": "report-only is a public semantic token while the deterministic runner supports headless only.",
+      "source_refs": [
+        "skills/spec-app-consistency-audit/SKILL.md:4",
+        "skills/spec-app-consistency-audit/SKILL.md:91",
+        "skills/spec-app-consistency-audit/scripts/run-audit.js:48"
+      ],
+      "counterargument": "The limitation is explicitly disclosed and the token is preserved for long-lived semantic compatibility.",
+      "owner_decision": "defer",
+      "planned_fix": "Do not claim deterministic report-only support; revisit only with a no-write runner and stable envelope.",
+      "focused_test": "Existing mode_unsupported contract remains the current truth."
+    },
+    {
+      "finding_id": "R1-016",
+      "severity": "P1",
+      "skill_id": "spec-promote",
+      "status": "accepted-pending-fix",
+      "summary": "Legacy Spiral readiness detection inspects a secret-like token prefix in non-JSON tool output that is already visible to the agent transcript.",
+      "source_refs": [
+        "skills/spec-promote/SKILL.md:66",
+        "skills/spec-promote/references/spiral-cli.md:16"
+      ],
+      "counterargument": "The fallback supports old CLI releases, but compatibility cannot justify secret-bearing output entering agent-visible state.",
+      "owner_decision": "accept",
+      "planned_fix": "Remove the token-prefix fallback; treat non-JSON output as unverified and require an upgraded CLI or user-owned terminal login.",
+      "focused_test": "A non-JSON fixture containing a fake token prefix must not be echoed or classified ready."
+    },
+    {
+      "finding_id": "R1-017",
+      "severity": "P2",
+      "skill_id": "spec-promote",
+      "status": "accepted-pending-fix",
+      "summary": "The drafts-only statement does not disclose the separately authorized durable local opt-out and Git exclude mutation.",
+      "source_refs": [
+        "skills/spec-promote/SKILL.md:16",
+        "skills/spec-promote/references/spiral-cli.md:63"
+      ],
+      "counterargument": "The setup prompt already discloses the opt-out write, so this is a summary-contract mismatch rather than a hidden implementation effect.",
+      "owner_decision": "accept",
+      "planned_fix": "Scope drafts-only to promotion output and explicitly carve out the disclosed local preference write.",
+      "focused_test": "Assert the summary names the opt-out exception and still forbids posting, publishing, commit, and PR effects."
+    },
+    {
+      "finding_id": "R1-018",
+      "severity": "P1",
+      "skill_id": "portfolio",
+      "status": "accepted-residual",
+      "summary": "Per-Skill baseline, improvement, and field artifacts do not yet exist, so CE localization cannot be claimed to improve enterprise engineering outcomes.",
+      "source_refs": [
+        "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md:41",
+        "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md:126",
+        "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md:386",
+        "docs/plans/2026-08-20-002-review-ce-localization-value-plan.md:504"
+      ],
+      "counterargument": "This does not block current Skill use or source-level contract repair; it blocks only improved, confirmed, and field-value claims.",
+      "owner_decision": "accept-as-claim-ceiling",
+      "planned_fix": "Keep field_outcome not-run and require future scenario, baseline, paired candidate, and adoption evidence before promotion.",
+      "focused_test": "Not applicable to local contract tests; requires field evidence."
+    }
+  ],
+  "unresolved_non_semantic_boundaries": [
+    {
+      "boundary_id": "R1-BND-001",
+      "status": "accepted-maintenance-fix",
+      "summary": "spec-write-tasks has a valid SKILL.md metadata fallback, but lacks the command metadata template used by peer workflow commands.",
+      "source_refs": [
+        "src/cli/contracts/dual-host-governance/skills-governance.json:486",
+        "src/cli/plugin-manifest.js:111"
+      ],
+      "claim_ceiling": "Not a missing public entry; fixing the template removes a governance coverage exception."
+    }
+  ],
+  "claim_ceiling": "[object Object]",
+  "limitations": [
+    "No generated runtime mirror was used as source or refreshed.",
+    "Runtime/security deep coverage is 11/36; remaining rows are bounded partial coverage and are not promoted to full.",
+    "Existing focused tests passed before mutation, but that baseline does not disprove the findings.",
+    "No provider, browser, Xcode, external network, adoption, or field task was executed.",
+    "Role labels do not establish external company identity or independent model-family review."
+  ]
+}

@@ -17,6 +17,9 @@ describe('spec-work current contracts', () => {
   test('gates execution on implementation-ready code plans', () => {
     expect(skill).toContain('artifact_readiness: implementation-ready');
     expect(skill).toContain('execution: code');
+    expect(skill).toContain('source-plan-non-active');
+    expect(skill).toMatch(/completed.*partially-shipped.*superseded/is);
+    expect(skill).toMatch(/only `status: active` is eligible/i);
   });
 
   test('accepts validated task packs while keeping the source plan authoritative', () => {
@@ -46,10 +49,11 @@ describe('spec-work current contracts', () => {
     expect(skill).toMatch(/progress.*git/i);
   });
 
-  test('keeps review report-only and caller-owned fixes explicit', () => {
+  test('keeps the orchestrated mode:agent review report-only and caller-owned fixes explicit', () => {
     expect(skill).toContain('spec-code-review');
     expect(skill).toContain('mode:agent');
-    expect(skill).toContain('`spec-code-review` is review-only');
+    expect(skill).toContain("spec-work's `mode:agent` invocation is report-only");
+    expect(skill).not.toContain('`spec-code-review` is review-only');
     expect(skill).toContain('**Apply fixes**');
     expect(skill).toMatch(/orchestrator integrates and tests/i);
     expect(skill).toContain('Commit only with `commit_authorization: authorized`');

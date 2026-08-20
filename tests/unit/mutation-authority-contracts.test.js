@@ -33,6 +33,8 @@ describe('mutation authority baseline contracts', () => {
     expect(skill).toMatch(/done.*completion signal.*not commit authorization/is);
     expect(skill).toContain('commit_status: not-created');
     expect(skill).toMatch(/without landing authorization.*do not push.*do not open a PR/is);
+    expect(skill).toContain('invoke the internal `spec-test-browser` owner');
+    expect(skill).not.toMatch(/^agent-browser\s/m);
   });
 
   test('spec-dogfood can fix without forcing checkout or commit', () => {

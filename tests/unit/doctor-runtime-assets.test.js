@@ -100,7 +100,7 @@ describe('doctor runtime asset inventory', () => {
       );
       const skillsRootCount = synced.skills.length + synced.internalSkills.length;
 
-      expect(skillsRootCount).toBe(18);
+      expect(skillsRootCount).toBe(19);
       expect(synced.workflowSkills).toHaveLength(17);
       expect(skillsCheck).toEqual({
         level: 'PASS',

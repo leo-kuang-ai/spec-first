@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {
   computeSourcePlanHash,
+  inspectSourcePlanExecutionEligibility,
   validateTaskPack,
 } = require('../task-pack');
 
@@ -84,6 +85,14 @@ function runHash(args) {
       console.error(`error: ${result.error.message}`);
     }
     return 1;
+  }
+  const lifecycle = inspectSourcePlanExecutionEligibility(fs.readFileSync(resolvedPlan.absolutePath, 'utf8'));
+  if (!lifecycle.eligible) {
+    return writeCliError({
+      json,
+      code: 'tasks-source-plan-non-active',
+      message: lifecycle.message,
+    });
   }
 
   const payload = {

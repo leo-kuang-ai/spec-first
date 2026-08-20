@@ -64,6 +64,7 @@ Overrides: none
 7. Scripts validate identity, freshness, structure, hashes, concrete paths, and same-wave overlap. LLM/reviewers judge semantic task quality.
 8. Do not hand-edit `.claude/`, `.codex/`, or `.agents/skills/` as source fixes.
 9. `--repo <artifact-root>` selects the artifact/source resolution root only. It does not authorize or select the downstream mutation `target_repo`.
+10. Compile executable tasks only from `status: active`. `completed`, `partially-shipped`, and `superseded` plans return `source_plan_non_active`; do not hash them into a new executable task pack or route them to `spec-work`. A legacy plan without managed status remains a visible `source-plan-lifecycle-unmanaged` limitation.
 
 ## Input Paths
 

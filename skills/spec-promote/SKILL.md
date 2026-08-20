@@ -13,7 +13,7 @@ Turn a feature that just shipped into copy-pasteable, user-facing announcement c
 
 After you ship, the messaging shouldn't wait for a separate marketing pass. `spec-promote` figures out what shipped, picks the right channels, and drafts the copy. It is **spiral-agnostic by default**: with nothing installed it draws on a lite layer of editorial and social-media expertise to produce strong channel-specific copy. When the Spiral CLI (see `references/spiral-cli.md`) is present and authed, it uses Spiral so the drafts are voice-matched to your brand — a subtle enhancement, never a requirement.
 
-**This skill drafts only. It never posts, publishes, commits, or opens PRs.** Posting is a human action. The output is always drafts for you to review, edit, and ship yourself.
+**The promotion output is draft-only. It never posts, publishes, commits, or opens PRs.** Posting is a human action. The only durable local preference exception is the separately disclosed and authorized Spiral opt-out write described in Path 0; it is not promotion output and must remain local-only.
 
 ## Usage
 
@@ -50,20 +50,18 @@ Scale to what the change warrants and to what the user asked for. If they named 
 
 ## Phase 3 — Draft the copy
 
-First, detect Spiral's state with two quick, non-blocking commands:
+First, detect Spiral's state with the Skill-owned bounded probe. Resolve `SKILL_DIR` from the `spec-promote/SKILL.md` you loaded; do not run `spiral auth status` directly because provider stdout/stderr may contain secret-like fields:
 
 ```bash
-which spiral
-spiral auth status --json 2>/dev/null
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+node "$SKILL_DIR/scripts/check-spiral-auth.cjs"
 ```
 
 Classify into one of three states:
 
-- **Absent** (no binary, `which spiral` finds nothing) → **Path 0** (install), then Path A if set up, else **Path B**.
-- Otherwise read `spiral auth status --json`:
-  - **Ready** — JSON with `"authenticated": true` (equivalently `"status": "authenticated"`) → **Path A** (voice-matched).
-  - **Unauthed** — JSON with `"authenticated": false` → **Path 0**, then Path A if the user signs in, else **Path B**.
-  - If the output isn't JSON (older CLI that ignores `--json` on `auth status`), fall back to the legacy signal in that same output: **ready** iff it contains `spiral_sk_`, else **unauthed**.
+- **Unavailable** — `status: unavailable` → **Path 0** (install), then Path A if set up, else **Path B**.
+- **Ready** — `status: ready` and `authenticated: true` → **Path A** (voice-matched).
+- **Not ready / unverified** — every other allowlisted status → **Path 0** when interactive, else **Path B**. Treat non-JSON, timeout, non-zero, and malformed provider output as unverified without inspecting or surfacing the raw bytes.
 
 Never let a Spiral failure, timeout, or odd output block or slow the skill — when in doubt, treat it as not-ready and continue.
 
@@ -73,7 +71,7 @@ When Spiral isn't ready, offer to set it up **once** — unless the user previou
 
 Read `references/spiral-cli.md` for the exact setup prompt (built with the platform's blocking-question tool), the connect/install steps, and how the opt-out is recorded so later runs skip this. In short:
 
-- **Unauthed** → the agent runs `spiral login --json` (CLI >= 1.8.0; non-blocking, the API key never passes through the agent). On `status: already_authenticated` → use Path A. On `status: pending` → surface the `auth_url`, the user approves in their browser, then poll `spiral auth status --json` until `authenticated: true` → Path A. Never have the user paste a key into chat. (Older CLI without agent login → suggest `npm i -g @every-env/spiral-cli@latest`, or have the user run `spiral login` themselves.) Escape hatch: "or the agent can just draft directly, without Spiral's personalization and humanization."
+- **Unauthed** → the agent runs `spiral login --json` (CLI >= 1.8.0; non-blocking, the API key never passes through the agent). On `status: already_authenticated` → use Path A. On `status: pending` → surface the `auth_url`, the user approves in their browser, then re-run the bounded auth probe after the user's confirmation; `status: ready` → Path A. Never have the user paste a key into chat. (Older CLI without agent login → suggest `npm i -g @every-env/spiral-cli@latest`, or have the user run `spiral login` themselves.) Escape hatch: "or the agent can just draft directly, without Spiral's personalization and humanization."
 - **Absent** → guide the user to install + connect in one step via the pairing-code command from Settings → Connect an Agent.
 - **Decline** → record the opt-out (best-effort) and go to Path B.
 
@@ -83,10 +81,12 @@ Skip Path 0 entirely — straight to Path B — when the opt-out is already reco
 
 Use the Spiral CLI so drafts match the user's brand voice. **Read `references/spiral-cli.md` before composing the prompt** — multi-channel vs. single-channel-variations is phrasing-driven (channel keywords / cue words vs. `--num-drafts`) and getting it wrong silently returns the wrong number or shape of drafts. The exact phrasing rules live there; don't restate them from memory. Essentials:
 
+Before sending feature context or promotion copy to Spiral, record `provider_egress_authorization: authorized | missing`. Authentication, installation, prior use, requested channels, and general drafting intent do not authorize a run-local content transfer. Display the provider, content categories being sent, persistence behavior, and local Path B alternative; proceed only when the current request or a new confirmation explicitly authorizes this transfer. Missing authority returns `provider_egress_authorization_missing` and uses Path B with zero `spiral write` calls.
+
 - Always pass `--instant` and `--json`. Parse `drafts[]` (each carries its own `channel`) plus `session_id`.
 - **Present every returned draft, grouped by `channel`.** Spiral decides how many drafts per channel — multi-channel runs often return several per channel — so never assume one-per-channel or drop extras.
 
-If the `spiral write` call errors or returns no usable drafts, silently fall back to Path B for the affected channels.
+If the authorized `spiral write` call errors or returns no usable drafts, fall back to Path B for the affected channels, but do not describe the run as local-only. Return a safe provider receipt with `provider_attempt: attempted`, `delivery_status: unknown`, an allowlisted `reason_code`, `persistence_status: possible-or-unknown`, and `fallback_used: true`. Never copy raw Spiral stdout/stderr, exception text, internal commentary, or secret-like fields into chat, logs, or durable artifacts.
 
 ### Path B — Direct drafting (lite editorial & social expertise)
 
@@ -127,6 +127,7 @@ Show every draft as a clean, copy-pasteable block, labeled by channel. For each:
 - If Spiral produced them, also surface the `session_id` and each draft's `url` so the user can open and tweak them in the Spiral web app.
 - Offer to revise (tone, length, angle, more variations, another channel).
 - **Do not post, publish, schedule, commit, or open a PR.** End by reminding the user the drafts are theirs to ship.
+- If Path 0 recorded the local preference exception, disclose that local-only write once and keep it separate from the draft-output claim.
 
 ## Examples
 

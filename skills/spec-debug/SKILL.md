@@ -104,7 +104,7 @@ Read the full conversation — the original description AND every comment, with 
 
 Confirm the bug exists and understand its behavior. Run the test, trigger the error, follow reported reproduction steps — whatever matches the input.
 
-- **Browser bugs:** Prefer `agent-browser` if installed. Otherwise use whatever works — MCP browser tools, direct URL testing, screenshot capture, etc.
+- **Browser bugs:** Delegate browser execution to the internal `spec-test-browser` owner with `current target-origin:<exact-loopback-origin>`. `spec-debug` owns reproduction intent, route selection, diagnosis, and result interpretation; it never constructs `agent-browser` argv or bypasses the owner's exact-origin/effect/private-evidence gates. Consume only the returned route/step facts and private evidence refs. Missing or invalid origin, unavailable owner capability, or a durable/external effect without authorization is a visible `not-run`/`not-supported` reproduction limitation, not permission to fall back to another direct browser runner.
 - **Manual setup required:** If reproduction needs specific conditions the agent cannot create alone (data states, user roles, external services, environment config), document the exact setup steps and guide the user through them. Clear step-by-step instructions save significant time even when the process is fully manual.
 - **Does not reproduce after 2-3 attempts:** Read `references/investigation-techniques.md` for intermittent-bug techniques.
 - **Cannot reproduce at all in this environment:** Document what was tried and what conditions appear to be missing.

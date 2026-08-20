@@ -1,6 +1,6 @@
 ---
 name: spec-dogfood
-description: "Hands-off, diff-scoped browser QA of the active branch or PR. Use when a branch needs autonomous user-flow dogfooding before review or shipping: map changed flows, drive agent-browser, fix small breakages with regression tests, record human-decision blockers, and write a durable report. Do not use for collaborative UI polish, ordinary browser smoke tests, code review, implementation planning, or broad whole-app exploration."
+description: "Hands-off, diff-scoped browser QA of the active branch or PR. Use when a branch needs autonomous user-flow dogfooding before review or shipping: map changed flows, delegate exact-origin browser execution to spec-test-browser, fix small breakages with regression tests, record human-decision blockers, and write a durable report. Do not use for collaborative UI polish, ordinary browser smoke tests, code review, implementation planning, or broad whole-app exploration."
 disable-model-invocation: true
 argument-hint: "[PR number, branch name, or blank for current branch] [--port PORT]"
 ---
@@ -29,28 +29,22 @@ Incrementally updated dogfood report under `docs/dogfood-reports/`, flowcharts, 
 `docs/dogfood-reports/<YYYY-MM-DD>-<branch-slug>-dogfood.md`, authorized source/test changes, commits only when separately requested, transient screenshots in OS temp, and optional reusable learnings handed to `spec-compound`.
 
 ### Failure Modes
-Trunk target with no diff, unsafe checkout or dirty working tree, missing `agent-browser`, missing or failing dev server, external-interaction flows needing human verification, ambiguous fixes requiring human product/architecture decisions, or failing automated suite after browser matrix completion.
+Trunk target with no diff, unsafe checkout or dirty working tree, missing `spec-test-browser` execution owner/capability, missing or failing dev server, external-interaction flows needing human verification, ambiguous fixes requiring human product/architecture decisions, or failing automated suite after browser matrix completion.
 
 ### Workflow
-Resolve the target branch/PR, optionally isolate with `spec-worktree`, analyze the diff, map changed user flows, build a matrix, start the app, execute each scenario with `agent-browser`, fix only small unambiguous issues, update the report throughout, then run the automated suite and finalize the verdict.
+Resolve the target branch/PR, optionally isolate with `spec-worktree`, analyze the diff, map changed user flows, build a matrix, start the app, execute each scenario through `spec-test-browser`, fix only small unambiguous issues, update the report throughout, then run the automated suite and finalize the verdict.
 
 ### Downstream Consumers
 Human reviewers, `spec-code-review`, `spec-work` for larger follow-up fixes, `spec-compound` for reusable learnings, and PR/commit workflows that consume the readiness evidence.
 
-## Use `agent-browser` Only For Browser Automation
+## Use The Browser Execution Owner
 
-This workflow drives the browser exclusively through the `agent-browser` CLI. Do not use Chrome MCP tools (`mcp__claude-in-chrome__*`), any browser MCP integration, or other built-in browser-control tools. If the platform offers multiple ways to control a browser, always choose `agent-browser`. Use the direct binary, never `npx agent-browser` (the direct binary uses the fast Rust client).
+This workflow never executes a browser CLI directly. Invoke `spec-test-browser` with `mode:pipeline` and an explicit exact loopback `target-origin:<origin>` so its unique wrapper owns capability probing, request-time exact-origin enforcement, action validation, private evidence, and cleanup. Do not use Chrome MCP tools, other browser-control tools, or hand-built browser argv as a second execution path.
 
 ## Prerequisites
 
 - A local dev server you can start (`bin/dev`, `rails server`, `npm run dev`, etc.).
-- `agent-browser` installed. Check:
-
-  ```bash
-  command -v agent-browser >/dev/null 2>&1 && echo "Ready" || echo "NOT INSTALLED"
-  ```
-
-If not installed, stop with this message: "Browser automation helper unavailable. Run `spec-runtime-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-dogfood`. This does not block spec-first baseline." This workflow cannot function without `agent-browser`.
+- The internal `spec-test-browser` Skill is available to own browser execution. Do not probe or execute its private CLI directly; its `mode:pipeline` call returns the authoritative capability/exact-origin result. If the owner is unavailable, stop with: "Browser execution owner unavailable. Run `spec-runtime-setup` to inspect browser readiness, then rerun `spec-dogfood`. This does not block spec-first baseline."
 
 ## Reusing Spec-First Skills
 
@@ -65,16 +59,18 @@ If not installed, stop with this message: "Browser automation helper unavailable
 
 ## Mutation Authority Boundary
 
-Before isolation/checkout or the first source fix, derive four independent run-local facts from the current user request and any visible upstream handoff:
+Before isolation/checkout, browser execution, or the first source fix, derive five independent run-local facts from the current user request and any visible upstream handoff:
 
 ```yaml
 branch_mutation_authorization: authorized | missing
+browser_effect_authorization: authorized | missing
 local_fix_authorization: authorized | missing
 commit_authorization: authorized | missing
 landing_authorization: authorized | missing
 ```
 
 - A PR/branch argument selects the dogfood target; `branch-selection-is-not-authorization`. Branch/worktree mutation requires the current user or upstream owner to explicitly request the exact checkout/isolation action, or the user to approve it after disclosure.
+- Classify every planned browser flow by expected effect as `read-only | ephemeral-local | durable-local | external | unknown`, regardless of whether the triggering action looks like navigation, click, form submit, or a key press. Read-only and ephemeral-local flows may enter the pipeline with synthetic data. Durable-local, external, and unknown flows require separate `browser_effect_authorization: authorized`; when it is missing, record `browser_effect_authorization_missing`, do not put the step in a browser test plan, and keep the scenario blocked. Even when such authority exists, use only behavior the `spec-test-browser` owner admits; its pipeline refusal remains authoritative.
 - A request to inspect, QA, or dogfood does not by itself authorize source fixes. Set `local_fix_authorization: authorized` only when the current user/upstream explicitly requests applying small fixes; otherwise keep source findings report-only and record `fix_authorization_missing`.
 - Set `commit_authorization: authorized` only when commit creation is separately explicit. A verified fix may remain uncommitted with `commit_authorization_missing`.
 - Set `landing_authorization: authorized` only for an explicit push/PR request. Without landing authorization, do not push and do not open a PR.
@@ -86,8 +82,8 @@ landing_authorization: authorized | missing
 0. Scope        Resolve the target; change checkout only with branch authorization
 1. Analyze      Diff branch vs trunk, understand every change
 2. Map+Matrix   Map user flows as Mermaid flowcharts, then derive the test matrix as a task list
-3. Serve        Detect port, start dev server, open agent-browser
-4. Execute      Work the matrix one item at a time with agent-browser
+3. Serve        Detect port and start the caller-owned dev server
+4. Execute      Work the matrix through spec-test-browser mode:pipeline
 5. Fix loop     On failure: authorized fix -> regression proof -> optional commit -> continue
 6. Report       Write durable doc to docs/dogfood-reports/ (flows, matrix, fixes, learnings, verdict)
 ```
@@ -182,30 +178,14 @@ Map changed files to concrete routes (views -> their pages, components -> pages 
 
 ### Phase 3: Detect Port and Start the Dev Server
 
-Determine the port (priority: explicit `--port` > a port explicitly stated in your in-context project instructions > `package.json` dev script > `.env*` `PORT=` > default `3000`). If a server is already listening on it, reuse it. Otherwise start the project's dev command (`bin/dev`, `rails server`, `npm run dev`, etc.) in the background and poll the port until it accepts connections before opening the browser. This skill is hands-off, so start the server automatically without asking — do not block on a confirmation.
-
-```bash
-agent-browser open "http://localhost:${PORT}"
-agent-browser snapshot -i
-```
+Determine the port (priority: explicit `--port` > a port explicitly stated in your in-context project instructions > `package.json` dev script > `.env*` `PORT=` > default `3000`). If a server is already listening on it, reuse it. Otherwise start the project's dev command (`bin/dev`, `rails server`, `npm run dev`, etc.) in the background and poll the port until it accepts connections. This skill is hands-off, so start the server automatically without asking. Freeze a credential-free exact loopback origin such as `http://127.0.0.1:${PORT}` for the owner call; do not open the browser here, accept redirects as a replacement origin, or infer browser readiness from the listener alone.
 
 ### Phase 4: Execute the Matrix
 
 Work the task list **one item at a time**. For each scenario, mark the task `in_progress`, then:
 
-1. **Document** what you're testing (the journey and the expected outcome).
-2. **Drive it** with agent-browser — navigate, snapshot for interactive refs, click, fill, submit, follow the journey to its real end state:
-
-   ```bash
-   agent-browser open "http://localhost:${PORT}/<route>"
-   agent-browser snapshot -i
-   agent-browser click @e1
-   agent-browser fill @e2 "value"
-   agent-browser screenshot "$(mktemp -d)/<scenario>.png"   # scratch dir, not the repo root
-   agent-browser errors      # check console/page errors
-   ```
-
-   Write transient screenshots to OS temp (e.g. `mktemp -d`), never the repo root. Only copy a screenshot into the report's location if you intend to embed it in the final report.
+1. **Document** what you're testing (the journey, expected outcome, exact target origin, and expected-effect classification).
+2. **Execute through the owner** by invoking `spec-test-browser` with `mode:pipeline`, the current branch/PR selector, and `target-origin:<exact-loopback-origin>`. Supply only routes and expected-safe synthetic interactions derived from the flow. If the owner returns `target-origin-*`, exact-origin/conformance failure, `browser-mutation-authorization-required`, cleanup failure, or another `not_run` / `not_supported` result, preserve that reason and do not fall back to a direct browser command. Keep transient screenshots in owner-private temp evidence; copy one into the report only when intentionally embedding it.
 
 3. **Judge** both correctness and experience: right data, right destination, sensible content, no console errors, and does it feel aligned with the product?
 4. **Walk it as each persona.** Re-run the journey in your head from each primary persona's perspective (from Phase 1) and ask where they'd feel a **paper cut** — a small friction that wouldn't fail a functional test but degrades the experience: a confusing label, an extra click, an unexpected jump, a slow-feeling step, missing feedback, copy that doesn't match how that persona thinks. A scenario can be functionally `Pass` yet still carry paper cuts. Note each paper cut, which persona feels it, and its severity.

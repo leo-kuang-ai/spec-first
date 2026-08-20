@@ -76,7 +76,20 @@ def parse_args() -> argparse.Namespace:
         default=os.environ.get("RIFFREC_TRANSCRIBE_MODEL", "gpt-4o-mini-transcribe"),
         help="OpenAI transcription model to use when OPENAI_API_KEY is set",
     )
-    parser.add_argument("--no-transcribe", action="store_true", help="Skip media transcription")
+    transcription = parser.add_mutually_exclusive_group()
+    transcription.add_argument(
+        "--transcribe",
+        dest="transcribe",
+        action="store_true",
+        help="Explicitly authorize sending media to the OpenAI audio transcription provider",
+    )
+    transcription.add_argument(
+        "--no-transcribe",
+        dest="transcribe",
+        action="store_false",
+        help="Keep media local and skip third-party transcription (default)",
+    )
+    parser.set_defaults(transcribe=False)
     parser.add_argument("--max-moments", type=int, default=12, help="Maximum screenshots to extract")
     return parser.parse_args()
 
@@ -372,20 +385,37 @@ def transcript_has_complaint(transcript: str) -> bool:
     return any(cue in lowered for cue in COMPLAINT_CUES)
 
 
-def transcribe_media(media_path: Path | None, model: str) -> dict[str, Any]:
+def transcribe_media(
+    media_path: Path | None,
+    model: str,
+    egress_authorization: str = "missing",
+) -> dict[str, Any]:
+    receipt = {
+        "transcription_egress_authorization": egress_authorization,
+        "provider": "openai-audio-transcriptions",
+        "provider_request_sent": False,
+    }
+    if egress_authorization != "explicit-cli-flag":
+        return {
+            **receipt,
+            "status": "skipped",
+            "text": "",
+            "reason": "Transcription egress was not explicitly authorized. Re-run with --transcribe.",
+        }
     if not media_path or not media_path.exists():
-        return {"status": "missing", "text": ""}
+        return {**receipt, "status": "missing", "text": ""}
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         return {
+            **receipt,
             "status": "skipped",
             "text": "",
             "reason": "OPENAI_API_KEY is not set. Re-run with the key available to transcribe the media file.",
         }
     if not shutil.which("curl"):
-        return {"status": "skipped", "text": "", "reason": "curl is not installed"}
+        return {**receipt, "status": "skipped", "text": "", "reason": "curl is not installed"}
     if "\r" in api_key or "\n" in api_key:
-        return {"status": "failed", "text": "", "reason": "OPENAI_API_KEY contains invalid line breaks"}
+        return {**receipt, "status": "failed", "text": "", "reason": "OPENAI_API_KEY contains invalid line breaks"}
 
     escaped_api_key = api_key.replace("\\", "\\\\").replace('"', '\\"')
     curl_config = f'header = "Authorization: Bearer {escaped_api_key}"\n'
@@ -406,10 +436,13 @@ def transcribe_media(media_path: Path | None, model: str) -> dict[str, Any]:
     try:
         result = subprocess.run(command, input=curl_config, capture_output=True, text=True, timeout=180)
     except subprocess.TimeoutExpired:
-        return {"status": "failed", "text": "", "reason": "transcription request timed out"}
+        return {**receipt, "provider_request_sent": True, "status": "failed", "text": "", "reason": "transcription request timed out"}
+
+    receipt["provider_request_sent"] = True
 
     if result.returncode != 0:
         return {
+            **receipt,
             "status": "failed",
             "text": "",
             "reason": compact_text(result.stderr or result.stdout, 500),
@@ -418,16 +451,16 @@ def transcribe_media(media_path: Path | None, model: str) -> dict[str, Any]:
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError:
-        return {"status": "failed", "text": "", "reason": compact_text(result.stdout, 500)}
+        return {**receipt, "status": "failed", "text": "", "reason": compact_text(result.stdout, 500)}
 
     if not isinstance(payload, dict):
-        return {"status": "failed", "text": "", "reason": "transcription response must be a JSON object"}
+        return {**receipt, "status": "failed", "text": "", "reason": "transcription response must be a JSON object"}
 
     if "error" in payload:
-        return {"status": "failed", "text": "", "reason": compact_text(json.dumps(payload["error"]), 500)}
+        return {**receipt, "status": "failed", "text": "", "reason": compact_text(json.dumps(payload["error"]), 500)}
 
     text = payload.get("text", "")
-    return {"status": "ok", "text": text, "raw": payload}
+    return {**receipt, "status": "ok", "text": text, "raw": payload}
 
 
 def should_retry_transcription_in_chunks(transcript: dict[str, Any]) -> bool:
@@ -442,18 +475,35 @@ def transcribe_media_chunks(
     model: str,
     chunks_dir: Path,
     duration: float,
+    egress_authorization: str = "missing",
     chunk_seconds: int = 420,
 ) -> dict[str, Any]:
     if not media_path or not media_path.exists():
-        return {"status": "missing", "text": ""}
+        return {
+            "status": "missing",
+            "text": "",
+            "transcription_egress_authorization": egress_authorization,
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": False,
+        }
     if not shutil.which("ffmpeg"):
-        return {"status": "failed", "text": "", "reason": "ffmpeg is not installed; cannot chunk media"}
+        return {
+            "status": "failed",
+            "text": "",
+            "reason": "ffmpeg is not installed; cannot chunk media",
+            "transcription_egress_authorization": egress_authorization,
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": False,
+        }
     if not duration or duration <= 0:
         return {
             "status": "failed",
             "text": "",
             "reason": "media duration is unavailable; refusing partial chunk transcription",
             "degraded": True,
+            "transcription_egress_authorization": egress_authorization,
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": False,
         }
 
     chunks_dir.mkdir(parents=True, exist_ok=True)
@@ -505,7 +555,7 @@ def transcribe_media_chunks(
             )
             continue
 
-        chunk_transcript = transcribe_media(chunk_path, model)
+        chunk_transcript = transcribe_media(chunk_path, model, egress_authorization)
         chunk_results.append(
             {
                 "chunk": index + 1,
@@ -513,6 +563,7 @@ def transcribe_media_chunks(
                 "path": str(chunk_path),
                 "status": chunk_transcript.get("status"),
                 "reason": chunk_transcript.get("reason"),
+                "provider_request_sent": chunk_transcript.get("provider_request_sent", False),
             }
         )
         if chunk_transcript.get("text"):
@@ -522,6 +573,9 @@ def transcribe_media_chunks(
         return {
             "status": "ok",
             "text": "\n\n".join(transcripts),
+            "transcription_egress_authorization": egress_authorization,
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": any(chunk.get("provider_request_sent") is True for chunk in chunk_results),
             "source": "chunked_media",
             "chunk_seconds": chunk_seconds,
             "chunks": chunk_results,
@@ -530,6 +584,9 @@ def transcribe_media_chunks(
     return {
         "status": "failed",
         "text": "",
+        "transcription_egress_authorization": egress_authorization,
+        "provider": "openai-audio-transcriptions",
+        "provider_request_sent": any(chunk.get("provider_request_sent") is True for chunk in chunk_results),
         "reason": "No chunks transcribed successfully",
         "chunks": chunk_results,
     }
@@ -1149,17 +1206,30 @@ def main() -> int:
     duration = source["duration"]
 
     if source["notes_transcript"]:
-        transcript = source["notes_transcript"]
-    elif args.no_transcribe:
-        transcript = {"status": "skipped", "text": "", "reason": "--no-transcribe was passed"}
+        transcript = {
+            **source["notes_transcript"],
+            "transcription_egress_authorization": "not-applicable-local-notes",
+            "provider": None,
+            "provider_request_sent": False,
+        }
+    elif not args.transcribe:
+        transcript = {
+            "status": "skipped",
+            "text": "",
+            "reason": "Transcription egress was not authorized; use --transcribe to opt in.",
+            "transcription_egress_authorization": "missing",
+            "provider": "openai-audio-transcriptions",
+            "provider_request_sent": False,
+        }
     else:
-        transcript = transcribe_media(source["transcription_path"], args.model)
+        transcript = transcribe_media(source["transcription_path"], args.model, "explicit-cli-flag")
         if should_retry_transcription_in_chunks(transcript):
             transcript = transcribe_media_chunks(
                 source["transcription_path"],
                 args.model,
                 raw_dir / "transcription_chunks",
                 duration,
+                "explicit-cli-flag",
             )
 
     moments = select_moments(events, transcript.get("text", ""), duration, args.max_moments)
@@ -1192,6 +1262,11 @@ def main() -> int:
         "session": session,
         "event_counts": event_counts(events),
         "transcript": transcript,
+        "transcription_egress_receipt": {
+            "transcription_egress_authorization": transcript.get("transcription_egress_authorization"),
+            "provider": transcript.get("provider"),
+            "provider_request_sent": transcript.get("provider_request_sent", False),
+        },
         "moments": moments,
         "candidate_findings": findings,
         "artifacts": {
@@ -1213,7 +1288,7 @@ def main() -> int:
     print(f"Requirements kickoff written to: {kickoff_md}")
     print(f"Frames written to: {frames_dir}")
     print("")
-    print("Analysis complete. Ready to brainstorm the findings.")
+    print("Analysis complete. Ready-to-brainstorm handoff only.")
     print(f"Source materials: {display_path(source_materials_md, repo_root)}")
     print(f"Problem statements: {display_path(problem_analysis_md, repo_root)}")
     print(f"Brainstorm handoff: spec-brainstorm {display_path(kickoff_md, repo_root)}")

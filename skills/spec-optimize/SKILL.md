@@ -173,7 +173,7 @@ This skill runs for hours. Context windows compact, sessions crash, and agents r
 
 5. **Per-experiment result markers for crash recovery** — each experiment writes a `result.yaml` marker in its worktree immediately after measurement. On resume, scan for these markers to recover experiments that were measured but not yet logged.
 
-6. **Strategy digest is written after every batch, before generating new hypotheses** — the agent reads the digest (not its memory) when deciding what to try next.
+6. **Strategy digest is written after every batch, before generating new hypotheses** — the agent reads the digest (not its memory) when deciding what to try next. The strategy digest is derived, reconstructable state; the experiment log remains the canonical resume and audit source. Persist every hypothesis decision, kept/reverted result, metric, and audit field needed to reconstruct the digest in the experiment log before replacing or deleting the digest.
 
 7. **Never present results to the user without writing them to disk first** — the pattern is: measure -> write to disk -> verify -> THEN show the user. Not the reverse.
 
@@ -368,6 +368,18 @@ Filter the output against the scope paths. If any in-scope files have uncommitte
 ### 1.2 Build or Validate Measurement Harness
 
 Resolve `scripts/measure.sh`, `scripts/parallel-probe.sh`, and `scripts/experiment-worktree.sh` relative to this skill's loaded directory. The measurement working directory remains the project directory named by the optimization spec.
+
+Before the first measurement command, freeze and display this run-local execution envelope:
+
+```yaml
+measurement_execution_authorization: authorized | missing
+measurement_command: <exact command string from the approved spec>
+measurement_working_directory: <resolved absolute cwd>
+measurement_environment_names: [<inherited or overlaid variable names; never secret values>]
+measurement_expected_effects: [read-only | writes-project-files | writes-local-state | network | other]
+```
+
+An approved optimization spec, clean tree, executable harness, baseline approval, or shell permission does not set this fact. Require the current user or visible upstream handoff to authorize the displayed command, resolved cwd, environment names, and expected effects before any invocation of `measure.sh`, direct measurement command, or parallel probe that executes it. When missing, return `measurement_execution_authorization_missing` with zero measurement command executions. If any frozen field changes later, invalidate the authorization and present the new envelope before continuing. This is a workflow-level effect gate; `measure.sh` remains a bounded executor and does not infer semantic authorization from the command text.
 
 **If user provides a measurement harness** (the `measurement.command` already exists):
 1. Run it once via the measurement script:
@@ -748,7 +760,7 @@ Key improvements:
 ### 4.3 Preserve and Offer Next Steps
 
 The optimization branch (`optimize/<spec-name>`) is preserved with all commits from kept experiments.
-The experiment log and strategy digest remain in local `.spec-first/workflows/spec-optimize/<spec-name>/` scratch space for resume and audit on this machine only; they do not travel with the branch because that run-state path is gitignored.
+The experiment log remains in local `.spec-first/workflows/spec-optimize/<spec-name>/` scratch space for resume and audit on this machine only; it does not travel with the branch because that run-state path is gitignored. The strategy digest is derived, reconstructable state and may be regenerated from the canonical experiment log.
 
 Present post-completion options via the platform question tool:
 
@@ -765,7 +777,7 @@ Present post-completion options via the platform question tool:
 Clean up scratch space:
 ```bash
 # Keep the experiment log for local resume/audit on this machine
-# Remove temporary batch artifacts
+# Remove the derived strategy digest only after its required audit fields are in the log
 rm -f .spec-first/workflows/spec-optimize/<spec-name>/strategy-digest.md
 ```
 

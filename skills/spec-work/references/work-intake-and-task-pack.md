@@ -108,6 +108,7 @@ Recompute and compare the pinned facts before every task start and before every 
 - current task-pack byte digest vs `task_pack_digest`;
 - current canonical plan hash vs `source_plan_hash`;
 - current source-plan metadata/content-shape vs the implementation-ready code intake;
+- current source-plan lifecycle status; `completed`, `partially-shipped`, and `superseded` are `source-plan-non-active` and invalidate the task pack even when body hash and readiness still match;
 - selected artifact root and task/source paths vs the pinned receipt.
 
 On mismatch, stop the current task and all dependent work:

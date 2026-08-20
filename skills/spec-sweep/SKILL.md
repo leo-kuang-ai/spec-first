@@ -52,6 +52,22 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 对 `sensitive: true` source，普通派发授权仍不足以转交原始 body、quote、media 或完整 config；可见授权必须明确覆盖 delegated handling of sensitive content。否则在 orchestrator 内 inline 处理。即使允许派发，也只传完成 bounded unit 所需的最小、脱敏字段，绝不传 credential、token、cookie 或无关历史内容。Headless/scheduled 模式不得自行提升这项授权。Inline fallback 不得声称 independent extractor/analyzer coverage。
 
+Third-party media transcription has an independent run-local fact: `transcription_egress_authorization: authorized | missing`. Configured source reads, standing source-write approval, scheduled/headless mode, worker dispatch authority, downloaded media, and ambient credentials do not grant provider egress. Only explicit current-user/upstream wording that covers transcription of this run's ordinary media sets it to authorized. `sensitive: true` media never leaves through this workflow even when ordinary-media authority exists; record `sensitive_transcription_unsupported` and keep analysis local.
+
+## Git Side-Effect Authorization
+
+Before Phase 2 writes state or plan files, freeze three independent facts:
+
+```yaml
+commit_authorization: authorized | missing
+branch_mutation_authorization: authorized | missing
+landing_authorization: authorized | missing
+```
+
+Each fact needs current explicit user/upstream wording or the matching standing approval captured by the setup interview. Workflow invocation, `mode:headless`, committed state, shared-branch topology, scheduled execution, a writable checkout, and source acknowledgment approval grant none of them. `commit_authorization` covers exact staging/commit of the plan and repo-internal state only; `branch_mutation_authorization` separately covers fetch/rebase or other branch updates; `landing_authorization` separately covers push. Revoked or changed config/branch facts invalidate the prior receipt.
+
+In local committed-state mode, missing commit authority leaves the exact plan/state paths unstaged and reports `commit_authorization_missing`; it does not turn a successful file write into commit authority. In shared-branch mode, the lease protocol depends on commit, branch mutation, and push. If any required fact is missing, stop before `lease-acquire`, state/plan writes, acknowledgments, close-outs, or any other source-side write with the corresponding reason code. Never degrade a push-gated lease into an unpushed local lease.
+
 ## Execution Flow
 
 ### Phase 0: Route by Config State
@@ -68,10 +84,13 @@ If the line above is an absolute path, use it as `<repo-root>`. If it is empty, 
 
 **Config keys read here:**
 - `feedback_sources` — list of source entries; each carries a `type` (`slack`, `github-issues`, `email`), its target, the standing-approved ack action, an optional close-out action, and an optional `sensitive: true`. Presence of this key means the skill is configured.
-- `sweep_state_path` — path to the state file, established at setup; fallback `docs/feedback-sweep/state.yml`. A repo-internal path means committed mode (the state file is committed each run and must not be gitignored); a path outside the repo (e.g. under `/tmp`) means machine-local mode (the state file is never committed — only the plan is).
+- `sweep_state_path` — path to the state file, established at setup; default `.spec-first/workflows/spec-sweep/<repo-slug>/state.yml`. A path under that owner root is repo-local durable state and is never staged or committed. Another repo-internal path is committed state only when setup explicitly selected committed topology. A durable path outside the repo is machine-local state and is never committed. Path location selects the state owner; later one-run commit authorization does not change its topology.
 - `sweep_lease_ttl_minutes` — single-writer lease staleness threshold; default `60`. Passed to `lease-acquire` in 2a.
 - `sweep_shared_branch` — `true` when the state file lives on a shared branch multiple checkouts push to (see 2a topology); default `false`.
 - `sweep_ack_cap` — integer circuit-breaker threshold; default `25`.
+- `sweep_commit_approved` — standing approval for exact sweep plan/state commits; default `false`.
+- `sweep_branch_mutation_approved` — standing approval for the shared-branch fetch/rebase protocol; default `false`.
+- `sweep_landing_approved` — standing approval for shared-branch lease/final pushes; default `false`.
 
 ### Phase 1: First-Run Setup
 
@@ -100,7 +119,7 @@ Run the phases in order.
 - `STALE-RECLAIMED` — an expired lease was taken over; proceed, and note the takeover in the final summary.
 - `OK` — proceed.
 
-**Shared-branch topology** (`sweep_shared_branch: true`): before any source-side write, `git add` the state file, commit, and push it. A rejected push means another writer won the branch — fetch and rebase, re-run `lease-acquire`, and if the lease is still not yours, back off (record `aborted-locked` and stop). Only once your lease is pushed and confirmed do you touch a source.
+**Shared-branch topology** (`sweep_shared_branch: true`): first require `commit_authorization`, `branch_mutation_authorization`, and `landing_authorization` to all be `authorized`; otherwise stop before the lease or any write. With all three facts, before any source-side write, `git add` only the state file, commit, and push it. A rejected push means another writer won the branch — fetch and non-rewriting rebase only within the branch-mutation scope, re-run `lease-acquire`, and if the lease is still not yours, back off (record `aborted-locked` and stop). Only once your lease is pushed and confirmed do you touch a source.
 
 Then `validate --state <state>` (a lease-agnostic repair): note in the summary any ids it downgrades from `closed` to `fix_pending`.
 
@@ -136,7 +155,7 @@ A failed ack write -> upsert the item as `ack_deferred` and hold the cursor (do 
 
 For each new item carrying `media`:
 - Download attachments into owner-only run-local scratch created with `umask 077` and `mktemp -d "${TMPDIR:-/tmp}/spec-first-sweep.XXXXXX"`; reject symlink/non-directory results and recheck before atomic publication. Raw media is ephemeral and never committed. A download failure -> set the item `needs_download` and continue.
-- When the package-local boundary permits the recording's sensitivity class, dispatch one generic subagent per recording, in bounded parallel, at the **generation tier**, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Otherwise analyze recordings inline or serially and record the matching fallback reason. Fill the template's `{skill_dir}` slot with the same absolute spec-sweep skill directory you resolve for your own `SKILL_DIR` Bash calls (a fresh subagent does not inherit your shell state, so it cannot run the bundled analyzer without being told the path). Pass only the required absolute media PATHS, a scratch artifact path, and the item's `sensitive` flag; collect the compact 1-2 line summary each returns. A dispatched subagent failure -> set the item `needs_analysis`, retain the media, and continue.
+- When the package-local boundary permits the recording's sensitivity class, dispatch one generic subagent per recording, in bounded parallel, at the **generation tier**, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Otherwise analyze recordings inline or serially and record the matching fallback reason. Fill the template's `{skill_dir}` slot with the same absolute spec-sweep skill directory you resolve for your own `SKILL_DIR` Bash calls (a fresh subagent does not inherit your shell state, so it cannot run the bundled analyzer without being told the path). Pass only the required absolute media PATHS, a scratch artifact path, the item's `sensitive` flag, and the explicit transcription-egress fact. The analyzer command uses `--transcribe` only for non-sensitive media with `transcription_egress_authorization: authorized`; every other path uses `--no-transcribe` and records `transcription_egress_authorization_missing` or `sensitive_transcription_unsupported`. Collect the compact 1-2 line summary and provider receipt each returns. A dispatched subagent failure -> set the item `needs_analysis`, retain the media, and continue.
 - Track attempts on the item (a `media_attempts` count upserted on each try). After 3 failed attempts across runs (`needs_download`/`needs_analysis`), set the item `manual_stuck` and list it separately — out of the routine nag.
 
 #### 2f. Fix verification
@@ -162,7 +181,7 @@ Interactive only. For items needing a product call, ask the user — grouped by 
 
 #### 2i. Wrap-up
 
-- **Commit.** `git add` ONLY `docs/plans/feedback-sweep-plan.md` plus `<state>` when it is repo-internal (never `-A`; machine-local state under `/tmp` is never committed), then commit `docs(sweep): feedback sweep <date>`. A commit failure is reported, not fatal. In local-commit mode, never push. In shared-branch mode (`sweep_shared_branch: true`), fetch, rebase, and push the final commit.
+- **Commit.** With `commit_authorization: authorized`, preview and `git add` ONLY `docs/plans/feedback-sweep-plan.md` plus `<state>` when setup selected committed topology (never `-A`). Repo-local durable state under `.spec-first/workflows/spec-sweep/` and machine-local state outside the repo never enter the stage set, even when the plan commit is authorized. Without commit authority, leave the eligible files unstaged and report `commit_authorization_missing`. A commit failure is reported, not fatal. In committed-local mode, never push. In shared-branch mode, fetch/rebase only with `branch_mutation_authorization: authorized` and push only with `landing_authorization: authorized`; the earlier shared-mode gate means a missing fact already stopped the run before writes.
 - **Record the run.** `run-record --state <state> --writer <writer> --outcome <completed|partial|failed> --counts '<per-source JSON>' --timestamp <ISO now>`.
 - **Release.** `lease-release --state <state> --writer <writer>`.
 - **Summary** (always emit): new items by source; recordings analyzed, each with its one-line finding; closed items with their fix evidence; the `ack_deferred` / `manual_stuck` / needs-attention list; any circuit-breaker or stale-reclaim note; and always the plan path with the handoff line:

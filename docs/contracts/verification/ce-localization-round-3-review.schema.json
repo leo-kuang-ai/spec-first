@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-round-3-review/v1",
+  "title": "Source-bound role-simulated full Skill review lane",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "review_run_id",
+    "review_lane_id",
+    "review_lens",
+    "role_representation",
+    "provider_identity",
+    "provider_receipt_ref",
+    "worker_context_isolation",
+    "review_status",
+    "coverage_status",
+    "source_snapshot",
+    "inventory_hash",
+    "inventory_artifact_sha256",
+    "review_input_hash",
+    "chunk_manifest_hash",
+    "expected_skill_count",
+    "reviewed_skill_count",
+    "expected_package_path_count",
+    "reviewed_package_path_count",
+    "expected_direct_support_path_count",
+    "reviewed_direct_support_path_count",
+    "expected_direct_support_relation_count",
+    "reviewed_direct_support_relation_count",
+    "skill_reviews",
+    "limitations",
+    "claim_ceiling"
+  ],
+  "properties": {
+    "schema_version": { "const": "ce-localization-round-3-review/v1" },
+    "review_run_id": { "type": "string", "minLength": 1 },
+    "review_lane_id": { "type": "string", "minLength": 1 },
+    "review_lens": { "enum": ["openai-skill-engineering", "anthropic-skill-craft-safety"] },
+    "role_representation": { "enum": ["role-simulated", "external-provider"] },
+    "provider_identity": { "enum": ["verified", "unverified", "not-used"] },
+    "provider_receipt_ref": { "type": ["string", "null"] },
+    "worker_context_isolation": { "enum": ["isolated", "degraded_inherited", "unknown"] },
+    "review_status": { "type": "string", "minLength": 1 },
+    "coverage_status": { "type": "string", "minLength": 1 },
+    "source_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+    "inventory_hash": { "$ref": "#/$defs/sha256" },
+    "inventory_artifact_sha256": { "$ref": "#/$defs/sha256" },
+    "review_input_hash": { "$ref": "#/$defs/sha256" },
+    "chunk_manifest_hash": { "$ref": "#/$defs/sha256" },
+    "expected_skill_count": { "type": "integer", "minimum": 1 },
+    "reviewed_skill_count": { "type": "integer", "minimum": 0 },
+    "expected_package_path_count": { "type": "integer", "minimum": 1 },
+    "reviewed_package_path_count": { "type": "integer", "minimum": 0 },
+    "expected_direct_support_path_count": { "type": "integer", "minimum": 0 },
+    "reviewed_direct_support_path_count": { "type": "integer", "minimum": 0 },
+    "expected_direct_support_relation_count": { "type": "integer", "minimum": 0 },
+    "reviewed_direct_support_relation_count": { "type": "integer", "minimum": 0 },
+    "skill_reviews": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/skillReview" } },
+    "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "skillReview": {
+      "type": "object",
+      "required": ["skill_id"],
+      "properties": {
+        "skill_id": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

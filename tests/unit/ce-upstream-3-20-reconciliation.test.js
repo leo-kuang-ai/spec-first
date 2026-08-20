@@ -7,8 +7,8 @@ const path = require('node:path');
 const checker = require('../../scripts/check-ce-upstream-reconciliation.cjs');
 
 describe('CE 3.20 reconciliation deterministic floor', () => {
-  test('checked-in snapshots cover the fixed range and current Skill source', () => {
-    expect(checker.main([])).toBe(0);
+  test('legacy ledger verification does not rewrite or require a current inventory snapshot', () => {
+    expect(checker.main(['--verify-legacy'])).toBe(0);
   });
 
   test('fails closed when an upstream path is not independently audited', () => {

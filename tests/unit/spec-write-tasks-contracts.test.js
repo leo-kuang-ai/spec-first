@@ -33,6 +33,12 @@ describe('spec-write-tasks current contracts', () => {
     expect(skill).toContain('before reporting `deterministic_handoff`');
   });
 
+  test('does not compile non-active source plans', () => {
+    expect(skill).toContain('source_plan_non_active');
+    expect(skill).toMatch(/completed.*partially-shipped.*superseded/is);
+    expect(skill).toContain('status: active');
+  });
+
   test('uses portable source-plan identity and keeps spec_id as an optional compatibility trace', () => {
     for (const source of [skill, schema, handoff]) {
       expect(source).toContain('source-plan-path+body-hash');

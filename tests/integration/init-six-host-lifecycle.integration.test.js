@@ -681,7 +681,7 @@ describe('six-host init lifecycle', () => {
       if (platform === 'claude') {
         expect(report.checks.find((check) => check.name === '.claude/skills')).toMatchObject({
           level: 'PASS',
-          message: 'found 18 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
+          message: 'found 19 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
         });
       }
       if (platform === 'cursor') {

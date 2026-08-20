@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-skill-inventory/v1",
+  "title": "CE localization canonical Skill inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_kind", "producer", "source_snapshot", "included_roots", "excluded_paths", "skill_count", "package_path_count", "package_bytes", "package_manifest_sha256", "skills", "files", "claim_ceiling"],
+  "properties": {
+    "schema_version": { "const": "ce-localization-skill-inventory/v1" },
+    "artifact_kind": { "const": "deterministic-source-inventory" },
+    "producer": { "const": "scripts/check-ce-localization-review.cjs" },
+    "source_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+    "included_roots": { "$ref": "#/$defs/nonEmptyStrings" },
+    "excluded_paths": { "type": "array", "items": { "$ref": "#/$defs/excludedPath" } },
+    "skill_count": { "type": "integer", "minimum": 1 },
+    "package_path_count": { "type": "integer", "minimum": 1 },
+    "package_bytes": { "type": "integer", "minimum": 1 },
+    "package_manifest_sha256": { "$ref": "#/$defs/sha256" },
+    "skills": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/skill" } },
+    "files": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/file" } },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "excludedPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "skill_id", "path_role", "terminal_disposition", "exclusion_reason", "governance_owner"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "skill_id": { "type": "string", "minLength": 1 },
+        "path_role": { "type": "string", "minLength": 1 },
+        "terminal_disposition": { "const": "excluded-host-owned-local-source" },
+        "exclusion_reason": { "type": "string", "minLength": 1 },
+        "governance_owner": { "type": "string", "minLength": 1 }
+      }
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_id", "package_root", "entry_path", "package_path_count", "direct_support_path_count", "package_paths", "direct_support_paths"],
+      "properties": {
+        "skill_id": { "type": "string", "minLength": 1 },
+        "package_root": { "type": "string", "minLength": 1 },
+        "entry_path": { "type": "string", "minLength": 1 },
+        "package_path_count": { "type": "integer", "minimum": 1 },
+        "direct_support_path_count": { "type": "integer", "minimum": 0 },
+        "package_paths": { "$ref": "#/$defs/nonEmptyStrings" },
+        "direct_support_paths": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes", "line_count", "skill_id", "owning_skill", "path_role", "evidence_role", "terminal_disposition"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "line_count": { "type": "integer", "minimum": 0 },
+        "skill_id": { "type": "string", "minLength": 1 },
+        "owning_skill": { "type": "string", "minLength": 1 },
+        "path_role": { "type": "string", "minLength": 1 },
+        "evidence_role": { "enum": ["local-contract", "behavior-eval"] },
+        "terminal_disposition": { "const": "included-canonical-skill-source" }
+      }
+    }
+  }
+}

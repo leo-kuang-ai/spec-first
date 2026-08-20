@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/host-invocation-receipt/v1",
+  "title": "Runtime Setup loaded host invocation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "producer",
+    "verification_status",
+    "reason_code",
+    "host",
+    "loaded_host",
+    "surface_id",
+    "skill_root",
+    "canonical_entry_name",
+    "target_identity",
+    "issued_at",
+    "freshness_expires_at",
+    "enforcement_status",
+    "receipt_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "host-invocation-receipt/v1" },
+    "producer": { "const": "skills/spec-runtime-setup/scripts/setup.cjs" },
+    "verification_status": { "enum": ["confirmed", "unverified", "rejected"] },
+    "reason_code": { "type": "string", "minLength": 1 },
+    "host": { "enum": ["claude", "codex", "cursor", "kiro", "qoder", "opencode"] },
+    "loaded_host": { "type": ["string", "null"] },
+    "surface_id": { "type": ["string", "null"] },
+    "skill_root": { "type": "string", "minLength": 1 },
+    "canonical_entry_name": { "const": "spec-runtime-setup" },
+    "target_identity": { "type": "string", "minLength": 1 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "freshness_expires_at": { "type": "string", "format": "date-time" },
+    "enforcement_status": { "enum": ["loaded-root-checked", "loaded-root-unverified"] },
+    "receipt_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

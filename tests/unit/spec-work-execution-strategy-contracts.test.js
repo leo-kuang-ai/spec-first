@@ -62,6 +62,18 @@ describe('spec-work execution strategy contracts', () => {
     expect(strategy).not.toContain('edits its forked workspace');
   });
 
+  test('fails closed when the host cannot enforce Git index and credential isolation', () => {
+    expect(strategy).toContain('git rev-parse --git-common-dir');
+    expect(strategy).toContain('git rev-parse --git-path index');
+    expect(strategy).toContain('worker_git_index_enforcement: unavailable');
+    expect(strategy).toContain('worker_git_index_enforcement_unavailable');
+    expect(strategy).toContain('worker_git_index_mutation_detected');
+    expect(strategy).toContain('worker_cleanup_unconfirmed');
+    expect(strategy).toContain('credential allowlist');
+    expect(strategy).toMatch(/do not start the mutation-capable worker/i);
+    expect(strategy).toMatch(/cannot be used to claim an independently completed worker unit/i);
+  });
+
   test('engines preserve checkpoints without hard-coding host guarantees', () => {
     expect(engines).toContain('runtime capability facts');
     expect(engines).toContain('examples are advisory');

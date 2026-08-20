@@ -141,6 +141,102 @@ describe('spec-runtime-setup project config', () => {
     });
   });
 
+  test('reports malformed, duplicate, and unowned local config keys without taking over consumer value semantics', () => {
+    const { inspectProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
+    const target = tempRepo('project-config-validation');
+    const specDir = path.join(target, '.spec-first');
+    const localPath = path.join(specDir, 'config.local.yaml');
+    fs.mkdirSync(specDir, { recursive: true });
+    fs.copyFileSync(templatePath, path.join(specDir, 'config.local.example.yaml'));
+    fs.writeFileSync(path.join(target, '.gitignore'), '.spec-first/*.local.yaml\n');
+
+    fs.writeFileSync(localPath, 'plan_output: [html\n');
+    expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
+      status: 'action-required',
+      reason_code: 'local-config-syntax-invalid',
+      local_config: {
+        status: 'invalid',
+        validation: {
+          status: 'invalid',
+          reason_code: 'local-config-syntax-invalid',
+        },
+      },
+    });
+
+    fs.writeFileSync(localPath, 'plan_output: md\nplan_output: html\n');
+    expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
+      status: 'action-required',
+      reason_code: 'local-config-duplicate-key',
+      local_config: { status: 'invalid' },
+    });
+
+    fs.writeFileSync(localPath, 'ce_docs_root: docs\n');
+    expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
+      status: 'action-required',
+      reason_code: 'local-config-key-unowned',
+      local_config: {
+        status: 'invalid',
+        validation: {
+          unowned_keys: ['ce_docs_root'],
+        },
+      },
+    });
+
+    fs.writeFileSync(localPath, 'plan_output: pdf\n');
+    expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
+      status: 'ready',
+      local_config: {
+        status: 'present',
+        validation: {
+          status: 'valid',
+          reason_code: 'local-config-structure-valid',
+          keys: [expect.objectContaining({
+            key: 'plan_output',
+            consumer: 'skills/spec-plan',
+            value_validation: 'consumer-owned',
+          })],
+        },
+      },
+    });
+  });
+
+  test('accepts YAML sequences and block scalars owned by local consumers', () => {
+    const { inspectProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
+    const target = tempRepo('project-config-structured-yaml');
+    const specDir = path.join(target, '.spec-first');
+    const localPath = path.join(specDir, 'config.local.yaml');
+    fs.mkdirSync(specDir, { recursive: true });
+    fs.copyFileSync(templatePath, path.join(specDir, 'config.local.example.yaml'));
+    fs.writeFileSync(path.join(target, '.gitignore'), '.spec-first/*.local.yaml\n');
+    fs.writeFileSync(localPath, [
+      'feedback_sources:',
+      '  - type: slack',
+      '    id: engineering',
+      'pulse_completion_events:',
+      '  - deployed',
+      '  - adopted',
+      'plan_output: |',
+      '  html',
+      '',
+    ].join('\n'));
+
+    expect(inspectProjectConfig({ repoRoot: target, templatePath })).toMatchObject({
+      status: 'ready',
+      local_config: {
+        status: 'present',
+        validation: {
+          status: 'valid',
+          reason_code: 'local-config-structure-valid',
+          keys: expect.arrayContaining([
+            expect.objectContaining({ key: 'feedback_sources', consumer: 'skills/spec-sweep' }),
+            expect.objectContaining({ key: 'pulse_completion_events', consumer: 'skills/spec-product-pulse' }),
+            expect.objectContaining({ key: 'plan_output', consumer: 'skills/spec-plan' }),
+          ]),
+        },
+      },
+    });
+  });
+
   test('fails closed when a managed ancestor or leaf is a symlink', () => {
     const { planProjectConfig, applyProjectConfig } = require('../../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
     const target = tempRepo('project-config-symlink');

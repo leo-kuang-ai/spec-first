@@ -205,7 +205,7 @@ Do not prescribe correction phrases ("say X to switch"). State the inferred mode
 
 **Active confirmation on mode ambiguity.** Only fire when mode classification is genuinely ambiguous *after* 0.2 settled the subject — e.g., "our docs" could mean repo docs (repo-grounded) or public marketing docs (elsewhere-software). Most subjects settled in 0.2 classify cleanly here. When ambiguous, ask one confirmation question via the blocking tool with two self-contained labels naming the two candidate interpretations in plain language (e.g., "Treat as repo docs in this codebase" vs "Treat as public marketing docs") — never leak internal mode names. Otherwise the one-sentence inferred-mode statement is sufficient; do not ask.
 
-**Routing rule (non-software mode).** When Decision 2 = non-software, still run Phase 1 Elsewhere-mode grounding (user-context synthesis + web-research by default; skip phrases honored). Learnings-researcher is skipped by default in this mode — the CWD's `docs/solutions/` rarely transfers to naming, narrative, personal, or non-digital business topics; see Phase 1 for the full rationale. Then load `references/universal-ideation.md` and follow it in place of Phase 2's software frame dispatch and the Phase 5 menu narrative. This load is non-optional — the file contains the domain-agnostic generation frames, critique rubric, and wrap-up menu that replace Phase 2 and the post-ideation menu for this mode, and none of those details live in this main body. Improvising from memory produces the wrong facilitation for non-software topics. Do not run the repo-specific codebase scan at any point. The deliverable is auto-written here too (per `references/post-ideation-workflow.md` Phase 4); the auto-written local file remains the intact record regardless of what the user does with it afterward.
+**Routing rule (non-software mode).** When Decision 2 = non-software, still run Phase 1 Elsewhere-mode grounding with user-context synthesis. Add web research only when `external_research_authorization: authorized`; missing authority removes the web-research role regardless of mode or depth. Learnings-researcher is skipped by default in this mode — the CWD's `docs/solutions/` rarely transfers to naming, narrative, personal, or non-digital business topics; see Phase 1 for the full rationale. Then load `references/universal-ideation.md` and follow it in place of Phase 2's software frame dispatch and the Phase 5 menu narrative. This load is non-optional — the file contains the domain-agnostic generation frames, critique rubric, and wrap-up menu that replace Phase 2 and the post-ideation menu for this mode, and none of those details live in this main body. Improvising from memory produces the wrong facilitation for non-software topics. Do not run the repo-specific codebase scan at any point. The deliverable is auto-written here too (per `references/post-ideation-workflow.md` Phase 4); the auto-written local file remains the intact record regardless of what the user does with it afterward.
 
 #### 0.4 Context-Substance Gate (Elsewhere Modes Only)
 
@@ -251,15 +251,17 @@ Use reasonable interpretation rather than formal parsing.
 
 #### 0.6 Cost Transparency Notice
 
-Before Phase 1, surface the execution count and cost shape in one short line. When dispatch is authorized and capable, report the actual agent count using the calculation below. Otherwise report the number of role lenses that will run inline/serial and the applicable fallback reason; do not describe them as agents. Compute the count from the actual execution decision: 1 grounding-context role + 1 learnings role (skip in elsewhere-non-software) + 1 web researcher + evidence roles (repo mode only, one per Phase 1.5 axis, max 5) + user-research distillers + the ideation fleet (5 roles default; 6 in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier. Add issue intelligence and opt-in Slack roles when applicable; subtract web research when skipped/reused. Phase 2 may add up to 2 recovery roles when axis coverage requires it.
+Before Phase 1, derive and record `external_research_authorization: authorized | missing`. It is `authorized` only when the current user or visible upstream handoff explicitly requests web/external/provider research or issue-tracker evidence for this run. General ideation, `go deep`, surprise-me mode, tool availability, and a prior run do not grant it. Missing or explicitly denied authority records `external_research_authorization_missing` and removes web research and issue intelligence without weakening current-source grounding. Every authorized external result carries provenance, freshness, and limitations and remains advisory until its cited source is rechecked.
 
-Authorized-dispatch examples (defaults, no skips, no opt-ins):
+Then surface the execution count and cost shape in one short line. When dispatch is authorized and capable, report the actual agent count using the calculation below. Otherwise report the number of role lenses that will run inline/serial and the applicable fallback reason; do not describe them as agents. Compute the count from the actual execution decision: 1 grounding-context role + 1 learnings role (skip in elsewhere-non-software) + an authorized web researcher + evidence roles (repo mode only, one per Phase 1.5 axis, max 5) + user-research distillers + the ideation fleet (5 roles default; 6 in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier. Add issue intelligence only when issue-tracker intent and external research authority are both present; add opt-in Slack roles when applicable. Phase 2 may add up to 2 recovery roles when axis coverage requires it.
 
-- **Repo mode, specified subject:** "Will dispatch ~13 agents, most on cheap tiers: codebase scan + learnings + web research + up to 5 evidence scouts (cheap) + 5 ideation (3 mid-tier, 2 top-tier) + 1 basis verifier (mid-tier). Skip phrases: 'no external research', 'no slack'."
-- **Repo mode, surprise-me:** "Will dispatch ~10 agents (surprise-me mode: deeper exploration per agent): codebase scan + learnings + web research + 6 ideation (top-tier) + 1 basis verifier. Skip phrases: 'no external research', 'no slack'."
-- **Repo mode, issue-tracker intent:** "Will dispatch ~13 agents: codebase scan + learnings + web research + issue intelligence + up to 5 evidence scouts + 4 ideation + 1 basis verifier. Skip phrases: 'no external research', 'no slack'." Reflects the successful-theme path; if issue intelligence returns insufficient signal (see Phase 1), ideation falls back to the default 5-agent fleet.
-- **Elsewhere-software:** "Will dispatch ~9 agents: context synthesis + learnings + web research + 5 ideation + 1 basis verifier. Skip phrases: 'no external research'."
-- **Elsewhere-non-software:** "Will dispatch ~8 agents: context synthesis + web research + 5 ideation + 1 basis verifier. Skip phrases: 'no external research'."
+Authorized-dispatch examples below assume `external_research_authorization: authorized`, with no skips or additional opt-ins. When external research authority is missing, omit web research from the role set and subtract it from the displayed count; dispatch authority never substitutes for research authority.
+
+- **Repo mode, specified subject:** "Will dispatch ~12 agents by default, most on cheap tiers: codebase scan + learnings + up to 5 evidence scouts (cheap) + 5 ideation (3 mid-tier, 2 top-tier) + 1 basis verifier (mid-tier). With external research authorization, add the web researcher. Skip phrases: 'no external research', 'no slack'."
+- **Repo mode, surprise-me:** "Will dispatch ~9 agents by default (surprise-me mode: deeper exploration per agent): codebase scan + learnings + 6 ideation (top-tier) + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research', 'no slack'."
+- **Repo mode, issue-tracker intent:** "Will dispatch ~12 agents by default: codebase scan + learnings + issue intelligence only when separately authorized + up to 5 evidence scouts + 4 ideation + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research', 'no slack'." If issue intelligence returns insufficient signal (see Phase 1), ideation falls back to the default 5-agent fleet.
+- **Elsewhere-software:** "Will dispatch ~8 agents by default: context synthesis + learnings + 5 ideation + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research'."
+- **Elsewhere-non-software:** "Will dispatch ~7 agents by default: context synthesis + 5 ideation + 1 basis verifier. With external research authorization, add the web researcher. Skip phrases: 'no external research'."
 
 Inline fallback uses the same computed role count but says, for example: `Will run ~13 role lenses inline/serial (dispatch_authorization_missing); independent agent diversity and fresh-context verification are not available.`
 
@@ -267,7 +269,7 @@ The line is informational; users do not need to acknowledge it.
 
 ### Phase 1: Mode-Aware Grounding
 
-Before generating ideas, gather grounding. The dispatch set depends on the mode chosen in Phase 0.3. Web research runs in all modes (skip phrases honored). When the user supplied a research artifact, the user-supplied research handling below also runs in all modes. Learnings runs in repo mode and elsewhere-software, and is **skipped by default in elsewhere-non-software** — the CWD repo's `docs/solutions/` almost always contains engineering patterns that do not transfer to naming, narrative, personal, or non-digital business topics.
+Before generating ideas, gather grounding. The dispatch set depends on the mode chosen in Phase 0.3. Web research runs only with `external_research_authorization: authorized`. When the user supplied a research artifact, the user-supplied research handling below still runs in all modes because the user named that input directly. Learnings runs in repo mode and elsewhere-software, and is **skipped by default in elsewhere-non-software** — the CWD repo's `docs/solutions/` almost always contains engineering patterns that do not transfer to naming, narrative, personal, or non-digital business topics.
 
 **Surprise-me grounding depth.** When Phase 0.2 routed to surprise-me mode, Phase 1 must produce richer material than specified mode — Phase 2 sub-agents will discover their own subjects from what Phase 1 returns, so texture matters:
 
@@ -294,6 +296,10 @@ With authorized dispatch, run grounding agents in bounded parallel in the **fore
 **Repo mode dispatch:**
 
 **Resolve current project orientation first.** Derive the stack, top-level layout, conventions, and root instruction facts from the current target repo/worktree for this run. Record current git identity and dirty state when available, carry direct source refs, and never persist or reuse the orientation across runs, branches, or worktrees. If git or a source cannot be read, record the concrete degraded fact and continue with only the bounded readable evidence; do not claim complete or fresh repo grounding.
+
+External research, issue-tracker access, and provider calls are opt-in evidence sources, not the default ideation route. Start from the current source and the user's Product Contract; use an external source only after recording authorization, provenance, freshness, and limitation. Provider output is advisory until its cited source is rechecked.
+
+**Owner-local context facts adapter.** `spec-ideate` adapts only its current grounding dossier and final idea artifact as `context_facts_adapter/v1`: `owner: spec-ideate`, `source_identity`, `source_refs`, `freshness`, `artifact_type`, and `limitations`. Scripts may prepare hashes, paths, timestamps, and provider readiness; the LLM owns topic fit, grounding sufficiency, and idea judgment. Do not reuse the `spec-write-skill` package inspector or publish a shared workflow helper until another real owner demonstrates the same input/output and failure contract.
 
 1. **Quick context scan** — dispatch a generic worker and request the cheapest capable tier only when `worker_model_override: supported`; otherwise inherit. Before dispatching, apply the routing test from "User-Supplied Research Artifacts" below to any root-level `*.md` file the focus hint names: research artifacts (evidence) take that subsection's distillation path, so list them on the prompt's research-artifacts line to keep the scan from duplicating them into `User-named references`. Dispatch with this prompt:
 
@@ -326,9 +332,9 @@ With authorized dispatch, run grounding agents in bounded parallel in the **fore
 
 2. **Learnings search** — read `references/agents/learnings-researcher.md` and dispatch a generic subagent seeded with that local prompt plus a brief summary of the ideation focus.
 
-3. **Web research** (always-on; see "Web research" subsection below for skip-phrase and V15 cache handling).
+3. **Web research** (opt-in; run only with `external_research_authorization: authorized`, then apply the cache rules below).
 
-4. **Issue intelligence** (conditional) — if issue-tracker intent was detected in Phase 0.3, read `references/agents/issue-intelligence-analyst.md` and dispatch a generic subagent seeded with that local prompt plus the focus hint. Run in parallel with the other subagents.
+4. **Issue intelligence** (conditional) — if issue-tracker intent was detected in Phase 0.3 and `external_research_authorization: authorized`, read `references/agents/issue-intelligence-analyst.md` and dispatch a generic subagent seeded with that local prompt plus the focus hint. Run in parallel with the other subagents. Without authority, record `external_research_authorization_missing` and do not access the tracker.
 
    If the agent returns an error (gh not installed, no remote, auth failure), log a warning to the user ("Issue analysis unavailable: {reason}. Proceeding with standard ideation.") and continue with the remaining grounding.
 
@@ -346,7 +352,7 @@ Issue intelligence does not apply in elsewhere mode. Slack research is opt-in fo
 
 #### Web Research (V5, V15)
 
-Always-on for both modes. Skip when the user said "no external research", "skip web research", or equivalent in their prompt or earlier answers; in that case, omit the `web-researcher` local prompt from dispatch and note the skip in the consolidated grounding summary.
+Opt-in for both modes. Run only when `external_research_authorization: authorized`; otherwise omit the `web-researcher` local prompt and record `external_research_authorization_missing` in the consolidated grounding summary. Explicit skip phrases keep the fact missing and must never be overridden by mode, depth, cache availability, or provider readiness.
 
 Reuse prior web research within a session via a sidecar cache — see `references/web-research-cache.md` for the cache file shape, reuse check, append behavior, and platform-degradation rules. Read it the first time the `web-researcher` local prompt would be dispatched in this run (and on every subsequent dispatch where the cache might apply).
 
@@ -360,7 +366,7 @@ Applies in all modes whenever the prompt or intake names a file of *gathered evi
 
 **Repo-mode coordination.** Apply this routing test *before* dispatching the Phase 1 quick context scan: when a research artifact is a root-level `*.md` the focus hint names, list it on the scan prompt's research-artifacts line so the scan gists it under `Additional context` instead of fully reading it into `User-named references`. Each file takes exactly one path — distillation here, never both.
 
-**Enrichment, not substitution.** A supplied research artifact does not replace the web-research local prompt dispatch — these artifacts typically cover source classes (social platforms, niche communities, prediction markets, short-video) that web research does not reach, and vice versa. Dispatch web research as normal.
+**Enrichment, not substitution.** A supplied research artifact and authorized web research are distinct evidence sources. The artifact never grants provider access; dispatch web research only when the independent external research authorization is present.
 
 Handling:
 

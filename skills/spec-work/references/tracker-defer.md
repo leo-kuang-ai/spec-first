@@ -40,6 +40,8 @@ Used by `spec-work` Residual Work Gate and similar caller flows when the user ch
 
 Used by autonomous callers like `lfg` that must not prompt. All blocking questions are skipped; the fallback chain is executed silently in order. Behavior:
 
+Non-interactive mode still requires explicit tracker deferral authorization. The caller must supply `tracker_deferral_authorization: authorized`; headless/autonomous execution, delivery authorization, tracker availability, or a residual finding does not grant it. When the fact is missing, do not probe or invoke any external sink. Return every finding in `no_sink` with `tracker_deferral_authorization_missing` so the caller can preserve it in an already-authorized PR body or local artifact.
+
 - No confirmation on the first generic-label Defer; proceed directly.
 - On execution failure, automatically fall to the next tier without prompting. Record the failure.
 - On total chain exhaustion (every tier failed or no sink available), return findings in the `no_sink` bucket so the caller can route them to another surface (e.g., inline them in a PR description).

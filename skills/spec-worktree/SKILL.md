@@ -10,7 +10,7 @@ allowed-tools: Bash(bash *worktree-manager.sh*)
 Detect whether the current checkout is already isolated, then create or attach a worktree under `.worktrees/<slug>` only when isolation is still needed. The bundled script adds branch-specific setup that `git worktree add` alone does not handle:
 
 - Does not copy `.env*` files by default; `--copy-env` is an explicit opt-in for workflows that need local env files
-- Trusts `mise`/`direnv` configs, with branch-aware safety rules so review branches do not auto-grant trust to untrusted `.envrc` content
+- Detects `mise`/`direnv` configs and prints review commands without changing user trust state
 - Adds `.worktrees` to `.gitignore` if not already ignored
 - Does not modify the main repo checkout — `from-branch` and PR heads are fetched, not checked out
 
@@ -103,7 +103,7 @@ Behavior:
 
 ## Env File Opt-In
 
-Use `--copy-env` only when the workflow explicitly needs local environment files in the new worktree. The opt-in path works for both `create` and `isolate`: it copies `.env*` files except `.env.example`, `.env.template`, and `.env.sample`, prints only file names, backs up pre-existing destination files, and appends `.env-copy.log` with timestamp, source path, destination path, byte size, and an 8-character content fingerprint. The log does not include file contents and is added to the worktree git exclude file.
+Use `--copy-env` only when the workflow explicitly needs local environment files in the new worktree. The opt-in path works for both `create` and `isolate`: it copies `.env*` files except `.env.example`, `.env.template`, and `.env.sample`, prints only file names, backs up pre-existing destination files, and appends an owner-only `.env-copy.log` containing only timestamp, basename, and byte size. The log contains no absolute path, content-derived hash, or file contents and is added to the worktree git exclude file.
 
 Even when env files were copied intentionally, downstream staging must still treat them as denied by default. A batch may stage an env file only when the task/implementation unit declares the exact env path in `expected_side_effects` and explicitly states that changing that env file is intended.
 
@@ -122,12 +122,7 @@ Do not manually copy `.env*` files as a default setup step. If an existing workt
 
 ## Dev tool trust behavior
 
-When mise or direnv configs are present, the script attempts to trust them so hooks and scripts do not block on interactive prompts. Trust is baseline-checked against a reference branch:
-
-- **Trusted base branches** (`main`, `develop`, `dev`, `trunk`, `staging`, `release/*`): the new worktree's configs are compared against that branch; unchanged configs are auto-trusted. `direnv allow` is permitted.
-- **Other branches** (feature branches, PR review branches): configs are compared against the default branch; `direnv allow` is skipped regardless, because `.envrc` can source files that direnv does not validate.
-
-Modified configs are never auto-trusted. The script prints the manual trust command to run after review.
+Trust stores are user-owned state outside the worktree contract. When mise or direnv configs are present, the script only prints the exact `mise trust <file>` or `direnv allow` command and tells the user to review the worktree content first. It never executes either command, even when the config matches a trusted branch; worktree creation success does not imply trust approval.
 
 ## When to create a worktree
 
@@ -140,11 +135,11 @@ Do not create a new-work worktree for single-task work that can happen on a bran
 
 ## Integration
 
-This helper accepts only a caller-owned isolation contract: caller identity, target repo, target ref or new branch, reason isolation is needed, allowed setup side effects, environment-copy authorization, and the return path consumer. It detects or creates the worktree and returns facts. It never selects an execution engine, dispatches a worker, stages, commits, pushes, opens a PR, or decides cleanup.
+This helper accepts only a caller-owned isolation contract: caller identity, target repo, target ref or new branch, reason isolation is needed, allowed setup side effects, environment-copy authorization, and the return path consumer. It detects or creates the worktree and returns facts. It never selects an execution engine, dispatches a worker, stages, commits, pushes, opens a PR, or decides cleanup. A worker placed in a linked worktree is edit-and-test only: it must not run `git add`, `git commit`, or any command that writes the shared Git index. A worker sandbox `EPERM` is evidence about that worker only, not host capability evidence.
 
 `spec-dogfood` uses existing-ref mode for a PR or non-current branch: `isolate pr:<number>` or `isolate <branch>`. It consumes `Worktree ready: <path>` or `already_checked_out branch=<name> path=<path>` without switching the primary checkout.
 
-`spec-work` may use new-work or existing-ref mode only after `execution-strategy.md` has locked one target repo and recorded mutation authorization. It owns all implementation and recovery state outside this helper. The returned worktree root becomes the snapshot `worktree_identity.repo_root`; any later identity drift routes back to `spec-work` as `run-source-drifted` rather than causing this helper to recreate, reset, or rerun work.
+`spec-work` may use new-work or existing-ref mode only after `execution-strategy.md` has locked one target repo and recorded mutation authorization. It owns all implementation and recovery state outside this helper. A linked worktree does not enforce Git-index isolation: before a mutation-capable worker starts, the caller still needs a host receipt that denies writes to the exact Git common directory/index path and filters credential environment. Without it, use `worker_git_index_enforcement_unavailable`, do not dispatch that worker, and continue inline/serial. The returned worktree root becomes the snapshot `worktree_identity.repo_root`; any later identity drift routes back to `spec-work` as `run-source-drifted` rather than causing this helper to recreate, reset, or rerun work.
 
 未来 caller 必须先在其 public owner source 中增加 forward invocation 与 intake contract。本 helper 的 reverse claim 不能单独建立 integration edge。
 

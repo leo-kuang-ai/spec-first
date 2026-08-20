@@ -1,12 +1,11 @@
 #!/bin/bash
 #
 # Create a new git worktree or attach an existing ref with optional environment
-# files and dev-tool trust.
+# files and dev-tool trust guidance.
 #
 # The distinctive work this script does (vs. raw `git worktree add`):
 #   1. Optionally copies .env* files from the main repo with --copy-env
-#   2. Trusts mise/direnv configs with branch-aware safety rules,
-#      so hooks and scripts don't block on interactive trust prompts
+#   2. Reports mise/direnv review commands without changing trust state
 #   3. Ensures .worktrees is gitignored (via `git check-ignore`)
 #
 # List / remove / switch operations are NOT provided here. Use git directly:
@@ -343,21 +342,17 @@ validate_env_copy_log_path() {
 
 append_env_copy_log() {
   local worktree_path="$1" source="$2" dest="$3"
-  local size sha8 timestamp log_file
+  local size timestamp log_file file_name
   size=$(wc -c < "$source" | tr -d '[:space:]')
-  if command -v shasum >/dev/null 2>&1; then
-    sha8=$(shasum -a 256 "$source" | awk '{print substr($1, 1, 8)}')
-  elif command -v sha256sum >/dev/null 2>&1; then
-    sha8=$(sha256sum "$source" | awk '{print substr($1, 1, 8)}')
-  else
-    echo "Error: no SHA-256 tool found for env copy audit" >&2
-    return 1
-  fi
+  file_name=$(basename "$source")
   timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   log_file="$worktree_path/.env-copy.log"
   validate_env_copy_log_path "$worktree_path"
-  printf 'timestamp=%s source_path=%s destination_path=%s size_bytes=%s sha256_8=%s\n' \
-    "$timestamp" "$source" "$dest" "$size" "$sha8" >> "$log_file"
+  umask 077
+  touch "$log_file"
+  chmod 600 "$log_file"
+  printf 'timestamp=%s file_name=%s size_bytes=%s\n' \
+    "$timestamp" "$file_name" "$size" >> "$log_file"
 }
 
 is_env_example_file() {
@@ -447,65 +442,29 @@ get_default_branch() {
   fi
 }
 
-# Auto-trust is only safe when the worktree is based on a long-lived branch
-# the developer already controls. Review/PR branches fall back to the default
-# branch baseline and require manual direnv approval.
-is_trusted_base_branch() {
-  local branch="$1"
-  local default_branch="$2"
-  [[ "$branch" == "$default_branch" ]] && return 0
-  case "$branch" in
-    develop|dev|trunk|staging|release/*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
-# Return 0 if worktree's copy of $file has the same blob hash as $base_ref's.
-# Symlinks are rejected (can't verify content).
-config_unchanged() {
-  local file="$1" base_ref="$2" worktree_path="$3"
-  [[ -L "$worktree_path/$file" ]] && return 1
-  local base_hash worktree_hash
-  base_hash=$(git rev-parse "$base_ref:$file" 2>/dev/null) || return 1
-  worktree_hash=$(git hash-object "$worktree_path/$file") || return 1
-  [[ "$base_hash" == "$worktree_hash" ]]
-}
-
-# Trust dev tool configs (mise, direnv) so hooks/scripts don't block on
-# interactive trust prompts. Auto-trusts only when the config matches the
-# trusted baseline branch.
-trust_dev_tools() {
-  local worktree_path="$1" base_ref="$2" allow_direnv_auto="$3"
-  local trusted=0
+# Trust is user-owned state. Report commands only after creation so the user can
+# review the exact worktree contents before choosing whether to run them.
+report_dev_tool_trust() {
+  local worktree_path="$1"
   local manual=()
 
   if command -v mise &>/dev/null; then
     for f in .mise.toml mise.toml .tool-versions; do
       [[ -f "$worktree_path/$f" ]] || continue
-      if config_unchanged "$f" "$base_ref" "$worktree_path" \
-         && (cd "$worktree_path" && mise trust "$f" --quiet); then
-        trusted=$((trusted + 1))
-      else
-        manual+=("mise trust $f")
-      fi
+      manual+=("mise trust $f")
       break
     done
   fi
 
   if command -v direnv &>/dev/null && [[ -f "$worktree_path/.envrc" ]]; then
-    if [[ "$allow_direnv_auto" == "true" ]] \
-       && config_unchanged ".envrc" "$base_ref" "$worktree_path" \
-       && (cd "$worktree_path" && direnv allow); then
-      trusted=$((trusted + 1))
-    else
-      manual+=("direnv allow")
-    fi
+    manual+=("direnv allow")
   fi
 
-  [[ $trusted -gt 0 ]] && echo "  Trusted $trusted dev tool config(s)"
   if [[ ${#manual[@]} -gt 0 ]]; then
     echo "  Manual review required for: ${manual[*]}"
     echo "  Review the diff, then run from $worktree_path"
+  else
+    echo "  No installed dev-tool trust command applies."
   fi
 }
 
@@ -580,26 +539,7 @@ create_worktree() {
   fi
 
   echo "Dev tool trust:"
-  local trust_branch="$default_branch"
-  local allow_direnv_auto="false"
-  if is_trusted_base_branch "$from_branch" "$default_branch"; then
-    trust_branch="$from_branch"
-    allow_direnv_auto="true"
-  fi
-  # Refresh the trust baseline before the hash-baseline check. Without this,
-  # a stale origin/<default_branch> can cause auto-trust against an outdated
-  # baseline when from_branch is untrusted (feature/review branches).
-  if [[ "$trust_branch" != "$from_branch" ]]; then
-    if ! git fetch origin "$trust_branch" --quiet; then
-      echo "  Warning: could not fetch origin/$trust_branch; baseline may be stale" >&2
-    fi
-  fi
-  local trust_ref="origin/$trust_branch"
-  if git rev-parse --verify "$trust_ref" &>/dev/null; then
-    trust_dev_tools "$worktree_path" "$trust_ref" "$allow_direnv_auto"
-  else
-    echo "  Skipped: $trust_ref not available locally"
-  fi
+  report_dev_tool_trust "$worktree_path"
 
   echo ""
   echo "Worktree ready: $worktree_path"
@@ -744,14 +684,7 @@ isolate_existing_ref() {
   fi
 
   echo "Dev tool trust:"
-  local default_branch trust_ref
-  default_branch=$(get_default_branch)
-  trust_ref="origin/$default_branch"
-  if git rev-parse --verify "$trust_ref" &>/dev/null; then
-    trust_dev_tools "$worktree_path" "$trust_ref" "false"
-  else
-    echo "  Skipped: $trust_ref not available locally"
-  fi
+  report_dev_tool_trust "$worktree_path"
 
   echo ""
   echo "Worktree ready: $worktree_path"

@@ -86,8 +86,9 @@ For email sources there are no source-side actions, so approval is moot — reco
 
 Ask where the sweep's state file lives:
 
-- **Committed to the repo** (recommended when multiple agents or machines share branches — one source of truth everyone reads and writes). Sets `sweep_state_path` to the committed default `docs/feedback-sweep/state.yml`.
+- **Committed to the repo** (explicit opt-in when multiple agents or machines share branches). Sets `sweep_state_path` to the committed path `docs/feedback-sweep/state.yml`; this topology is never selected merely because the repo is writable or the run is scheduled.
 - **Repo-local durable state** (default): `.spec-first/workflows/spec-sweep/<repo-slug>/state.yml`, where `<repo-slug>` is derived from the resolved repo identity rather than basename alone. This path is recoverable across invocations and follows the state schema's single-writer/atomic-write rules. A non-repo run must receive an explicit durable path or remain one-shot; temporary scratch is not a state owner.
+- **Machine-local durable state:** a user-selected durable path outside the repo. It is visible only on this machine and is never staged or committed; a transient `/tmp` file is not a durable state owner.
 
 Let the user override the path if they want a different location. If they pick machine-local, note that a fresh checkout or a teammate's machine will not see this state — it is per-machine by design.
 
@@ -105,7 +106,7 @@ Let the user override the path if they want a different location. If they pick m
 
 ## 6. Shared branch (only if committed state)
 
-**Skip this section entirely if the user chose machine-local state in section 4** — the shared-branch topology only applies to committed state.
+**Skip this section entirely if the user chose repo-local durable or machine-local state in section 4** — the shared-branch topology applies only to explicitly committed state.
 
 **Ask:** "Is this a multi-agent setup where several checkouts push the sweep state to a shared docs branch? Answer yes only if more than one machine or agent commits and pushes to the same branch. Default is no — a single checkout committing locally."
 
@@ -113,6 +114,18 @@ Let the user override the path if they want a different location. If they pick m
 - **Yes** -> `sweep_shared_branch: true`. Explain: the lease becomes **push-gated** — before any source-side write, the sweep commits and pushes the lease acquisition on the shared branch and confirms its writer won, making the lease a repo-wide mutex across machines.
 
 **Capture:** `sweep_shared_branch` (`true` | `false`).
+
+---
+
+## 6a. Git side-effect authorization
+
+For committed state, disclose the exact tracked write set: `docs/plans/feedback-sweep-plan.md` plus the configured repo-internal state path. Ask whether every future sweep may stage and commit only those paths. Record the literal answer as `sweep_commit_approved: true | false`; a committed state location or scheduled run is not approval.
+
+When `sweep_shared_branch: true`, separately ask whether every future sweep may (1) fetch and non-rewriting rebase the configured shared branch and (2) push the lease/final commits to that branch. Record the literal answers as `sweep_branch_mutation_approved` and `sweep_landing_approved`. Explain that either `false` makes shared mode fail closed before any state, plan, acknowledgment, or close-out write because the repo-wide lease cannot be established. Do not combine these questions with source acknowledgment approval.
+
+For repo-local durable or machine-local state, record all three keys as `false`; there is no state commit or shared-branch protocol. A later one-run commit authorization may cover the generated plan, but it never adds either state path to the stage set. Changing that rule requires setup to switch explicitly to committed topology first.
+
+**Capture:** `sweep_commit_approved`, `sweep_branch_mutation_approved`, `sweep_landing_approved` (`true` | `false`, all default `false`).
 
 ---
 
@@ -149,6 +162,9 @@ Write these keys (see "Config File Shape" below for the exact form):
 - `sweep_ack_cap` — from section 5.
 - `sweep_lease_ttl_minutes` — write the default `60`; it is not asked interactively and remains user-tunable.
 - `sweep_shared_branch` — from section 6 (default `false`; only meaningful with committed state).
+- `sweep_commit_approved` — from section 6a (default `false`).
+- `sweep_branch_mutation_approved` — from section 6a (default `false`; shared branch only).
+- `sweep_landing_approved` — from section 6a (default `false`; shared branch only).
 
 Then surface the resulting Sweep section to the user in chat and offer **one round of edits**.
 
@@ -178,10 +194,13 @@ feedback_sources:
   - { type: slack, id: slack-alpha, target: C0XXXXXXX, ack_action: eyes, closeout_action: white_check_mark, sensitive: false, approved: true }
   - { type: github-issues, id: gh-issues, target: owner/repo, ack_action: "feedback:ack", closeout_action: "feedback:resolved", sensitive: false, approved: true }
 
-sweep_state_path: docs/feedback-sweep/state.yml   # committed (multi-agent) or /tmp path (solo)
+sweep_state_path: .spec-first/workflows/spec-sweep/<repo-slug>/state.yml  # repo-local durable default; never staged
 sweep_ack_cap: 25                                 # max acks per source per run before the circuit breaker
 sweep_lease_ttl_minutes: 60                       # single-writer lease staleness threshold; not asked interactively, tunable here
 sweep_shared_branch: false                        # true: push-gated lease for shared-docs-branch topology
+sweep_commit_approved: false                      # standing exact plan/state commit authority
+sweep_branch_mutation_approved: false             # standing shared-branch fetch/rebase authority
+sweep_landing_approved: false                     # standing shared-branch push authority
 ~~~
 
 Notes:

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-setup-side-effect/v1",
+  "title": "CE setup localization side-effect contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "modes"],
+  "properties": {
+    "schema_version": { "const": "ce-setup-side-effect-contract/v1" },
+    "modes": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/mode" }
+    }
+  },
+  "$defs": {
+    "mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "mutation_class",
+        "allowed_write_scopes",
+        "forbidden_write_scopes",
+        "claim_ceiling"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "check",
+            "plan",
+            "verify-only",
+            "refresh-facts",
+            "project-config",
+            "host-provider-apply"
+          ]
+        },
+        "mutation_class": {
+          "enum": ["read-only", "setup-owned-facts", "authorized-owner-mutation"]
+        },
+        "allowed_write_scopes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "forbidden_write_scopes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "claim_ceiling": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

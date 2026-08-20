@@ -1,8 +1,14 @@
 # Plan Handoff
 
+## Owner-local context facts adapter
+
+`spec-plan` adapts only the unified plan and review envelope it owns. A machine-readable handoff uses `context_facts_adapter/v1` with `owner: spec-plan`, `source_identity`, `source_refs`, `freshness`, `artifact_type`, and `limitations`; deterministic helpers may calculate hashes and metadata but never decide planning adequacy or implementation readiness. Provider output remains advisory until source-confirmed. Do not reuse the `spec-write-skill` package inspector as a workflow-wide context owner, and do not extract a shared helper until another owner demonstrates an isomorphic contract in current source.
+
 This file contains post-plan-writing instructions: document review, post-generation options, and issue creation. Load it only after the plan file has been written and the confidence check (5.3.1-5.3.7) is complete. Never preload it while composing the initial plan.
 
 ## 5.3.8 Document Review
+
+**Prototype a remaining behavior or feel question** — when the plan still contains a question that cannot be settled honestly from prose, invoke `spec-prototype` with this plan as its seed. The prototype requires a human experience, remains throwaway, and does not enter the production implementation path. Do not offer Proof or external upload.
 
 Run `spec-doc-review` headless for both output formats. Delivery is headless in either case; the plan producer supplies mutation authority explicitly:
 

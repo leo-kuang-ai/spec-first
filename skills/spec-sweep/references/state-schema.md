@@ -145,7 +145,8 @@ The lease's guarantee depends on where the state file lives:
 
 | topology | lease scope | protocol |
 | --- | --- | --- |
-| local-commit mode (default) | Single writer **per checkout**. | The lease serializes overlapping sweeps in the same working tree (e.g. a cron sweep and a manual one). The file is written in-tree (and may be committed locally). No cross-machine guarantee. |
+| repo-local durable (default) | Single writer **per checkout**. | State lives under `.spec-first/workflows/spec-sweep/<repo-slug>/`, is never staged or committed, and serializes overlapping sweeps in the same working tree. No cross-machine guarantee. |
+| committed-local | Single writer **per checkout**. | Setup explicitly selected a tracked repo path. The lease serializes overlapping sweeps in that working tree; exact plan/state commit still requires commit authorization. Never push in this topology. |
 | pushed-shared-branch | One writer **per repo**. | The state file lives on a shared branch multiple checkouts push to. `lease-acquire` must be committed, pushed, and confirmed (fetch back and verify our writer won) **before any source-side write**. This makes the lease a repo-wide mutex across machines. |
 
 TTL-based reclaim (`STALE-RECLAIMED`) is what lets a crashed or killed writer's

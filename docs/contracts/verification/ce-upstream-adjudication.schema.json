@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-upstream-adjudication/v1",
+  "title": "CE upstream semantic adjudication",
+  "type": "object",
+  "required": ["schema_version", "join_key", "producer", "upstream", "target_source_snapshot", "input_artifact_sha256", "records"],
+  "properties": {
+    "schema_version": { "const": "ce-upstream-adjudication/v1" },
+    "join_key": { "const": "path+upstream+target-source" },
+    "producer": { "type": "object", "required": ["kind", "model", "status"], "properties": { "kind": { "const": "llm-adjudication" }, "model": { "type": "string" }, "status": { "enum": ["confirmed", "degraded"] } }, "additionalProperties": false },
+    "upstream": { "$ref": "ce-upstream-adjudication-input.schema.json#/$defs/upstream" },
+    "target_source_snapshot": { "$ref": "ce-upstream-adjudication-input.schema.json#/$defs/targetSourceSnapshot" },
+    "input_artifact_sha256": { "$ref": "ce-upstream-adjudication-input.schema.json#/$defs/sha256" },
+    "records": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/record" } }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": ["audit_id", "path", "group_id", "package_id", "surface", "role", "canonical_owner", "implementation_unit", "implementation_targets", "target_action", "evidence_status", "degraded", "source_refs", "test_owner", "test_refs", "limitations", "closure_profile"],
+      "properties": {
+        "audit_id": { "type": "string" }, "path": { "type": "string" }, "old_path": { "type": "string" },
+        "group_id": { "enum": ["G01", "G02", "G03", "G04", "G05", "G06"] }, "package_id": { "type": ["string", "null"] }, "surface": { "type": "string" }, "role": { "type": "string" },
+        "canonical_owner": { "type": ["string", "null"] }, "implementation_unit": { "type": ["string", "null"] }, "implementation_targets": { "type": "array", "items": { "type": "string" } },
+        "target_action": { "enum": ["implement-in-current-owner", "compose", "evidence-only", "out-of-scope-by-product-decision"] },
+        "evidence_status": { "enum": ["planned", "confirmed", "not-applicable"] }, "degraded": { "type": "boolean" }, "source_refs": { "type": "array", "items": { "type": "string" } },
+        "test_owner": { "type": "string" }, "test_refs": { "type": "array", "items": { "type": "string" } }, "limitations": { "type": "array", "items": { "type": "string" } },
+        "closure_profile": { "enum": ["source-adjudication", "evidence-only", "product-excluded"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -91,7 +91,7 @@ Optional section. 0-3 events is typical.
 
 ## 5. Quality Scoring (optional, AI products)
 
-**Opening question:** "Is this an AI product where a conversation or session could be rated for quality? If yes, I'll sample up to 10 sessions per run and score each 1-5 on a dimension you define. Say no if this isn't applicable."
+**Opening question:** "Is this an AI product where a conversation or session could be rated for quality? If yes, I'll sample up to 10 provider-projected, de-identified sessions per run and score each 1-5 on a dimension you define. The bounded content needed for scoring enters the current agent/model context, although no message content or identity fields are saved in the report. If the provider cannot remove direct identity and unrelated fields before returning the sample, scoring will not run. Say no if this isn't applicable."
 
 If the user opts in, ask: "What dimension should sessions be scored on? (e.g., 'got to a useful answer', 'response was accurate', 'no hallucinations')."
 
@@ -101,7 +101,7 @@ If the user opts in, ask: "What dimension should sessions be scored on? (e.g., '
 - **Multiple dimensions** ("accurate AND actionable") -> "Start with one. You can add dimensions by editing the config later. Keeping it at one keeps the scores comparable across runs. Which matters more right now?"
 - **Reviewability test** - after the user names a dimension, apply this check silently: could two separate reviewers look at the same session and agree on the score? If no, push back once: "Let's tighten this - what would make a reviewer score this a 5 vs a 3? If you can name the distinction in one sentence, the dimension is tight enough." If the user can answer, capture it as a scoring note alongside the dimension. If they can't, flag the dimension `needs-review` and move on.
 
-**Capture:** opt-in (yes/no), dimension (if opted in), scoring note (1 sentence distinguishing 5 from 3), scoring discipline reminder ("default to 4-5; reserve 1-3 for clear failures").
+**Capture:** opt-in after the context-processing disclosure (yes/no), dimension (if opted in), scoring note (1 sentence distinguishing 5 from 3), scoring discipline reminder ("default to 4-5; reserve 1-3 for clear failures").
 
 ---
 

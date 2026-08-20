@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-setup-dependency-matrix/v1",
+  "title": "CE setup localization dependency matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_kind",
+    "producer",
+    "public_entrypoint_disposition",
+    "source_snapshot",
+    "inventory_ref",
+    "inventory_sha256",
+    "preflight_ref",
+    "preflight_sha256",
+    "ce_tool_dispositions",
+    "dependencies",
+    "status_counts",
+    "blocking_reason_codes",
+    "overall_status",
+    "claim_ceiling"
+  ],
+  "properties": {
+    "schema_version": { "const": "ce-setup-dependency-matrix/v1" },
+    "artifact_kind": { "const": "source-bound-prerequisite-matrix" },
+    "producer": { "const": "scripts/check-ce-localization-review.cjs" },
+    "public_entrypoint_disposition": { "const": "reuse-spec-runtime-setup-only" },
+    "source_snapshot": {
+      "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1"
+    },
+    "inventory_ref": { "type": "string", "minLength": 1 },
+    "inventory_sha256": { "$ref": "#/$defs/sha256" },
+    "preflight_ref": { "type": "string", "minLength": 1 },
+    "preflight_sha256": { "$ref": "#/$defs/sha256" },
+    "ce_tool_dispositions": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/toolDisposition" }
+    },
+    "dependencies": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "items": { "$ref": "#/$defs/dependency" }
+    },
+    "status_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "blocking_reason_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "overall_status": { "enum": ["confirmed", "degraded", "blocked"] },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "stringArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "toolDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_id",
+        "disposition",
+        "reason_code",
+        "local_registry_kind",
+        "local_required",
+        "baseline_blocking",
+        "source_ref",
+        "status_authority"
+      ],
+      "properties": {
+        "tool_id": { "type": "string", "minLength": 1 },
+        "disposition": { "enum": ["reuse", "extend", "compose", "evidence-only", "reject", "defer"] },
+        "reason_code": { "type": "string", "minLength": 1 },
+        "local_registry_kind": { "enum": ["helper", "tool", "provider", "not-registered"] },
+        "local_required": { "type": "boolean" },
+        "baseline_blocking": { "type": "boolean" },
+        "source_ref": { "type": "string", "minLength": 1 },
+        "status_authority": { "const": "plan-settled-and-source-checked" }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dependency_id",
+        "status",
+        "reason_codes",
+        "owner",
+        "source_refs",
+        "test_refs",
+        "evidence_refs",
+        "downstream_impact",
+        "next_action",
+        "terminal_disposition",
+        "status_authority"
+      ],
+      "properties": {
+        "dependency_id": { "type": "string", "pattern": "^S(?:[1-9]|1[01])$" },
+        "status": {
+          "enum": ["confirmed", "partial", "degraded", "blocked", "not-applicable", "evidence-only", "defer", "reject"]
+        },
+        "reason_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "owner": { "type": "string", "minLength": 1 },
+        "source_refs": { "$ref": "#/$defs/stringArray" },
+        "test_refs": { "$ref": "#/$defs/stringArray" },
+        "evidence_refs": { "$ref": "#/$defs/stringArray" },
+        "downstream_impact": { "type": "string", "minLength": 1 },
+        "next_action": { "type": "string", "minLength": 1 },
+        "terminal_disposition": { "type": ["string", "null"] },
+        "status_authority": {
+          "enum": ["deterministic-source-check", "plan-settled", "plan-settled-and-source-checked"]
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: spec-riffrec-feedback-analysis
-description: Analyze Riffrec feedback captures from bundles or standalone recordings. Always load for `riffrec-*.zip`, `session.json` + `events.json` + `recording.webm` + `voice.webm` bundles, `.mp4`/`.mov`/`.webm` videos, `.m4a`/`.mp3`/`.wav` audio, or capture/share requests.
+description: Analyze explicit Riffrec product-feedback captures, including `riffrec-*.zip`, the Riffrec `session.json` + `events.json` + `recording.webm` + `voice.webm` bundle, or media/notes the user identifies as a Riffrec feedback capture. Also use for Riffrec setup and capture guidance. Do not trigger for generic podcasts, meetings, audio/video transcription, or unrelated capture/share requests.
 ---
 
 # Riffrec Feedback Analysis
@@ -12,8 +12,8 @@ Turn raw product feedback into structured evidence for downstream agents. This s
 Route to the matching reference based on the input. Read only that reference; do not load the others.
 
 - **Setup** — user has no recording yet and asks how to install Riffrec, capture a session, or share feedback. Read `references/install-riffrec.md`.
-- **Quick bug report** — input is a short recording (under ~60 seconds), the user describes a single specific issue, or asks for "quick", "small", or "just transcribe". Read `references/quick-bug-report.md`. Emit one concise bug report; skip the full artifact set and brainstorm handoff.
-- **Extensive analysis** — input is a longer recording, contains multiple issues / requirements / workflow walkthroughs, or the user wants requirements or brainstorm material. Read `references/extensive-analysis.md`. Always continue into the `spec-brainstorm` skill.
+- **Quick bug report** — input is a short recording (under ~60 seconds), the user describes a single specific issue, or asks for "quick", "small", or "just transcribe". Read `references/quick-bug-report.md`. Emit one concise bug report; skip the full artifact set and brainstorm handoff. Discovering broader scope returns an escalation handoff and never authorizes a durable extensive rerun.
+- **Extensive analysis** — input is a longer recording, contains multiple issues / requirements / workflow walkthroughs, or the user wants requirements or brainstorm material. Read `references/extensive-analysis.md`. Produce a ready-to-brainstorm handoff; invoke `spec-brainstorm` only when the original request or a new confirmation authorizes that public workflow.
 
 When the input is ambiguous (e.g., a zip arrived without context), inspect the recording length and event count before choosing. If still unclear, ask the user which path applies before running anything heavy.
 
@@ -22,6 +22,8 @@ When the input is ambiguous (e.g., a zip arrived without context), inspect the r
 - Keep raw recordings, audio chunks, zip contents, session dumps, and extracted screenshots local-only by default. Do not commit `raw/` or `frames/` directories unless the user explicitly asks and privacy is acceptable.
 - Text/metadata artifacts (requirements kickoff material, analysis summaries, problem analyses, source manifests) may be committed when they are needed for traceability and contain no sensitive data.
 - Use repo-relative screenshot paths in any committed doc so later agents can open the evidence without absolute local paths.
+
+Media transcription is a separate third-party egress. Before analyzer execution, record `transcription_egress_authorization: authorized | missing`. It is authorized only when the current user or visible upstream handoff explicitly requests third-party transcription for this recording; analysis intent, a local file, an ambient `OPENAI_API_KEY`, or worker dispatch authority does not grant it. Pass `--transcribe` only when authorized. Otherwise pass `--no-transcribe`, preserve local frames/events/notes analysis, and report the missing transcript limitation. The analyzer returns the authorization source, provider identity, and whether a provider request was sent.
 
 ## Dispatch Authorization Boundary
 
@@ -44,7 +46,7 @@ All non-setup paths share the same analyzer, which ships in this skill's `script
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
-bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input
+bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input --no-transcribe
 ```
 
 Accepted inputs: a Riffrec `.zip`, an `.mp4` / `.mov` / `.webm` video, an `.m4a` / `.mp3` / `.wav` audio file, or a meeting-notes `.md`. Use `--output-dir <dir>` to control where artifacts land. In repos with `docs/brainstorms/`, the default remains `docs/brainstorms/riffrec-feedback/` as a documented evidence/kickoff-artifact exception; it is not the durable `spec-brainstorm` output convention. The quick path overrides the output dir to a temp location so nothing pollutes the repo.

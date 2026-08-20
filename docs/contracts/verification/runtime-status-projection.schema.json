@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/runtime-status-projection/v1",
+  "title": "Runtime setup and doctor status projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "reason_code",
+    "disposition",
+    "scope",
+    "artifact_refs",
+    "next_action"
+  ],
+  "properties": {
+    "schema_version": { "const": "runtime-status-projection/v1" },
+    "status": {
+      "enum": [
+        "ready",
+        "no-change",
+        "would-change",
+        "apply-failed",
+        "action-required",
+        "optional",
+        "known-limitation",
+        "degraded",
+        "not-run"
+      ]
+    },
+    "reason_code": { "type": "string", "minLength": 1 },
+    "disposition": {
+      "enum": ["ready", "action-required", "optional", "known-limitation", "degraded", "not-run"]
+    },
+    "scope": { "type": "string", "minLength": 1 },
+    "artifact_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "next_action": { "type": ["string", "null"] }
+  }
+}

@@ -65,19 +65,6 @@
 # brainstorm_output: html # active: md | html (spec-brainstorm 默认 md)
 # ideate_output: html     # active: md | html (spec-ideate 默认 html)
 
-# --- Work delegation ---
-# Integrated local config surface for downstream execution workflows that
-# choose to support delegated work. These keys are inert during setup: setup
-# exposes and protects them, but never auto-delegates or changes host runtime
-# behavior by itself.
-
-# work_delegate: codex
-# work_delegate_consent: true
-# work_delegate_sandbox: yolo
-# work_delegate_decision: auto
-# work_delegate_model: gpt-5.4
-# work_delegate_effort: high
-
 # --- Planning confirmation ---
 # Integrated local config surface for downstream planning workflows that choose
 # to support a persisted scoping-confirmation preference. Setup never uses this

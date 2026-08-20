@@ -1,6 +1,9 @@
 'use strict';
 
-const { formatDoctorHumanReport } = require('../../src/cli/commands/doctor');
+const {
+  buildRuntimeStatusProjection,
+  formatDoctorHumanReport,
+} = require('../../src/cli/commands/doctor');
 
 function createReport({
   platforms = ['claude', 'codex'],
@@ -31,6 +34,28 @@ function createReport({
 }
 
 describe('doctor human-readable output', () => {
+  test('projects machine statuses without collapsing optional, degraded, known limitation, or not-run', () => {
+    const cases = [
+      [{ level: 'PASS', reasonCode: 'ready' }, 'ready', 'ready'],
+      [{ level: 'WARNING', reasonCode: 'would-change', runtimeStatus: 'would-change' }, 'would-change', 'action-required'],
+      [{ level: 'ERROR', reasonCode: 'apply-failed', runtimeStatus: 'apply-failed' }, 'apply-failed', 'action-required'],
+      [{ level: 'WARNING', reasonCode: 'optional', disposition: 'optional' }, 'optional', 'optional'],
+      [{ level: 'WARNING', reasonCode: 'limited', disposition: 'known_limitation' }, 'known-limitation', 'known-limitation'],
+      [{ level: 'WARNING', reasonCode: 'degraded', runtimeStatus: 'degraded' }, 'degraded', 'degraded'],
+      [{ level: 'WARNING', reasonCode: 'not-run', runtimeStatus: 'not-run' }, 'not-run', 'not-run'],
+    ];
+
+    for (const [check, status, disposition] of cases) {
+      expect(buildRuntimeStatusProjection(check, { scope: 'codex' })).toMatchObject({
+        schema_version: 'runtime-status-projection/v1',
+        status,
+        disposition,
+        scope: 'codex',
+        reason_code: check.reasonCode,
+      });
+    }
+  });
+
   test('keeps an all-pass default report concise while naming every host', () => {
     const output = formatDoctorHumanReport(createReport({
       platformChecks: {

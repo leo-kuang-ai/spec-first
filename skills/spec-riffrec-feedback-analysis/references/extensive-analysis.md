@@ -8,10 +8,10 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the spec-riffrec-feedback-analysis SKILL.md>"
-   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input
+   bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/analyze_riffrec_zip.py" /path/to/input --no-transcribe
    ```
 
-   Use `--output-dir <dir>` when the artifact should live somewhere specific. In a repo with `docs/brainstorms/`, the default output goes under `docs/brainstorms/riffrec-feedback/` as an evidence/kickoff-artifact exception, not as the durable brainstorm output convention.
+   Use `--output-dir <dir>` when the artifact should live somewhere specific. Use `--transcribe` instead of `--no-transcribe` only when `transcription_egress_authorization: authorized` explicitly covers this recording and provider transfer; ambient credentials do not grant it. Preserve the analyzer's authorization/provider receipt. In a repo with `docs/brainstorms/`, the default output goes under `docs/brainstorms/riffrec-feedback/` as an evidence/kickoff-artifact exception, not as the durable brainstorm output convention.
 
 2. Read the generated `analysis.md`, `problem-analysis.md`, `review-prompt.md`, and `requirements-kickoff.md`.
 
@@ -38,22 +38,22 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
 8. Add source mapping to the brainstorm material as suspected implementation surfaces, not as proven root cause unless the code clearly proves it. Include confidence levels and short evidence notes explaining why each file or component is relevant.
 
-9. Always continue into brainstorm. Once `analysis.md`, `problem-analysis.md`, `source-materials.md`, and `requirements-kickoff.md` exist, say "Analysis complete. Ready to brainstorm the findings." Then immediately load the `spec-brainstorm` skill with the generated `requirements-kickoff.md`, unless the user explicitly asked only to extract or analyze artifacts.
+9. Return a `ready-to-brainstorm` handoff once `analysis.md`, `problem-analysis.md`, `source-materials.md`, and `requirements-kickoff.md` exist. Say "Analysis complete. Ready to brainstorm the findings" and provide the `spec-brainstorm <requirements-kickoff.md>` handoff without invoking it automatically.
 
 10. In brainstorm, first ask the user to confirm the captured requirements: "Did this capture the requirements correctly, and what is missing, wrong, or grouped badly?" Do not move to planning until brainstorm has confirmed or corrected the requirements.
 
-## Automatic handoff
+## Authorized handoff
 
-Do not end the workflow after extraction in normal use. The intended sequence is:
+Only invoke `spec-brainstorm` when the current user explicitly requested brainstorm, requirements, or planning in the original request, or confirms the ready handoff after analysis. Analysis-only and headless runs return the handoff without creating a durable plan. The intended authorized sequence is:
 
 1. Run the analyzer.
 2. Read `source-materials.md` so brainstorm has direct links to raw feedback, transcript, frames, and analysis artifacts.
 3. Inspect or refine `problem-analysis.md` when the evidence needs human-visible interpretation.
-4. Load the `spec-brainstorm` skill with `requirements-kickoff.md`.
+4. When public-workflow authorization is present, load the `spec-brainstorm` skill with `requirements-kickoff.md`.
 5. Ask the user to confirm, correct, or regroup the captured requirements.
 6. Let `spec-brainstorm` produce the durable requirements-only unified plan under `docs/plans/`.
 
-Only stop after step 1 or 2 when the user asks specifically for raw artifacts, transcript, screenshots, or analysis without brainstorming.
+Without that public-workflow authorization, stop after returning the evidence bundle and ready-to-brainstorm handoff. Do not turn analyzer output into permission to write under `docs/plans/`.
 
 ## Capture scale
 

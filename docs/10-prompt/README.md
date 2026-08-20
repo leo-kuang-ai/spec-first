@@ -11,6 +11,7 @@ docs/10-prompt/
   系统性项目审查方法.md        ★ 当前基线:系统性项目审查方法论
   skill-prompt-设计与优化方法论-v2.md ★ 当前基线(spec-first canonical):skill prompt 设计与优化方法论(含 spec-first 适配层:init 投射/source-runtime/spec-* 入口/task-pack handoff;版本演进见 CHANGELOG)
   spec-first-skill-prompt压缩优化组合方法论.md ◇ 专项 companion:期望成本×内容分级×多 agent 拓扑×伪优化识别×partial-landing×证据晋级
+  Ponytail思想指导spec-first-Skill优化.md ◇ 专项 companion:最小充分机制、复杂度控制、Skill 映射与非补偿式评估门禁
   GPT-5.6提示工程方法论.md        ◇ 外部 provider companion:面向 GPT-5.6 的结果契约、既有 Skill 分层适配、工具/授权边界与评测驱动迁移方法
   当前分支与远程master-Skill能力审计提示词.md ◇ report-only 操作提示词:冻结远程 master 基线并逐 Skill 审计能力、方法论、边界与证据，不自动修复
   skill-prompt-设计与优化方法论-通用版.md ☆ host/项目中立提取版:同一方法论的通用内核(剥离 spec-first 专属;供其他项目复用,适配层留空待填)
@@ -41,6 +42,7 @@ docs/10-prompt/
 3b. `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`：skill prompt 设计与优化方法论基线（唯一 canonical；版本演进见 CHANGELOG；与审查方法平级，冲突时让位于角色契约）。前身 v1 已合并进本文件并删除。
 3c. `docs/10-prompt/spec-first-skill-prompt压缩优化组合方法论.md`：skill prompt 压缩与 multi-agent token 拓扑专项方法；从属于 3b，不提升为第二 canonical。
 3d. `docs/10-prompt/GPT-5.6提示工程方法论.md`：基于当前 OpenAI 官方资料的 GPT-5.6 提示、既有 Skill 适配和迁移专项 companion；不提升为第二 canonical，外部事实以官方当前文档为准。
+3e. `docs/10-prompt/Ponytail思想指导spec-first-Skill优化.md`：最小充分机制、复杂度控制、Skill 映射与非补偿式评估专项 companion；从属于角色契约与 3b，不提升为第二 canonical。
 4. `skills/`：当前 skill 合同
 5. `agents/`：当前 agent 合同
 6. `templates/claude/commands/spec/`：Claude 命令模板

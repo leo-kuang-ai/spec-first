@@ -33,4 +33,16 @@ describe('spec-product-pulse system performance contract', () => {
     expect(interview).not.toContain('pulse_error_count');
     expect(interview).not.toContain('pulse_latency');
   });
+
+  test('minimizes quality-scoring content before it enters the agent context', () => {
+    const skill = read('skills/spec-product-pulse/SKILL.md');
+    const interview = read('skills/spec-product-pulse/references/interview.md');
+    const reportTemplate = read('skills/spec-product-pulse/references/report-template.md');
+
+    expect(interview).toContain('enters the current agent/model context');
+    expect(skill).toContain('provider-side projection');
+    expect(skill).toContain('quality-source-minimization-unavailable');
+    expect(skill).toContain('do not attempt local redaction after the content has already entered context');
+    expect(reportTemplate).toContain('Quality scoring blocked before access is `not-run`');
+  });
 });

@@ -30,6 +30,7 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are advisor
 
 - Measurable experiment -> `spec-optimize`; branch or PR browser QA -> `spec-dogfood`.
 - Running UI polish -> `spec-polish`; app PRD/Figma/source consistency -> `spec-app-consistency-audit`.
+- An unresolved product behavior or feel question that needs a human-experienced throwaway artifact -> `spec-prototype`.
 
 ## Standalone Skills
 

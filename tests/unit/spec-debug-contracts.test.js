@@ -43,4 +43,15 @@ describe('spec-debug current safety contracts', () => {
     expect(skill).toContain('diagnosis-only-no-post-fix-verification');
     expect(skill).toMatch(/do not fabricate.*validator verdict/is);
   });
+
+  test('delegates browser execution to the unique browser owner', () => {
+    const techniques = fs.readFileSync(
+      path.resolve(__dirname, '../../skills/spec-debug/references/investigation-techniques.md'),
+      'utf8',
+    );
+
+    expect(skill).toContain('Delegate browser execution to the internal `spec-test-browser` owner');
+    expect(techniques).toContain('spec-test-browser current target-origin:<exact-loopback-origin>');
+    expect(techniques).not.toMatch(/^agent-browser\s/m);
+  });
 });

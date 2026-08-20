@@ -157,6 +157,8 @@ echo "$SCRATCH_DIR"
 
 **Resolve current project orientation before dispatching subagents.** Record the current target repo/worktree identity and dirty state when available, then read root instruction files and `CONCEPTS.md` directly for the vocabulary and conventions needed by the Context Analyzer. Keep this as run-local input with direct source refs; never persist or reuse it across runs, branches, or worktrees. If a source cannot be read, record that degraded fact and let the Context Analyzer limit its claims rather than substituting stale orientation.
 
+Current source is the authority for code-behavior claims. Every promoted learning must retain direct source refs, observed revision/freshness, applicability scope, and an invalidation condition; session history, cached summaries, and external provider output are advisory leads only and cannot close grounding on their own.
+
 **CRITICAL — glob `docs/solutions/` fresh every run.** `spec-compound` writes new learnings there, so even a run-local orientation assembled earlier cannot stand in for the live enumeration in step 3.
 
 Pass `{run_id}` and the verified `<private-scratch-dir>` into every Phase 1 subagent prompt. Recheck that the directory remains owned and non-symlink before publishing each file with same-directory temp + atomic rename. Each subagent **writes its full structured output** to its own file there, **confirms the write succeeded** (the file exists and is non-empty), and then **returns only a one-line confirmation containing the artifact path** — not the prose body inline. Artifact filenames by subagent:

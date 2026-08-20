@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/ce-localization-knowledge-promotion/v1",
+  "title": "CE localization knowledge promotion decisions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_kind",
+    "producer",
+    "single_writer",
+    "source_snapshot",
+    "inventory_sha256",
+    "field_results_ref",
+    "field_results_sha256",
+    "entries",
+    "overall_status",
+    "reason_codes",
+    "consumers",
+    "limitations",
+    "claim_ceiling"
+  ],
+  "properties": {
+    "schema_version": { "const": "ce-localization-knowledge-promotion/v1" },
+    "artifact_kind": { "const": "knowledge-promotion-input-ledger" },
+    "producer": { "const": "ce-localization-knowledge-owner" },
+    "single_writer": { "const": "ce-localization-knowledge-promotion-writer" },
+    "source_snapshot": { "$ref": "https://spec-first.dev/contracts/ce-setup-snapshot/v1" },
+    "inventory_sha256": { "$ref": "#/$defs/sha256" },
+    "field_results_ref": { "type": "string", "minLength": 1 },
+    "field_results_sha256": { "$ref": "#/$defs/sha256" },
+    "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+    "overall_status": { "enum": ["not-run", "candidate-only", "promoted", "rejected", "degraded"] },
+    "reason_codes": { "$ref": "#/$defs/nonEmptyStrings" },
+    "consumers": { "$ref": "#/$defs/nonEmptyStrings" },
+    "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
+    "claim_ceiling": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "strings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "reuseEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumer_task_id", "consumer_task_sha256", "outcome", "metric_delta", "adoption", "invalidation_check"],
+      "properties": {
+        "consumer_task_id": { "type": "string", "minLength": 1 },
+        "consumer_task_sha256": { "$ref": "#/$defs/sha256" },
+        "outcome": { "type": "string", "minLength": 1 },
+        "metric_delta": { "type": "string", "minLength": 1 },
+        "adoption": { "enum": ["adopted", "overridden", "rejected"] },
+        "invalidation_check": { "type": "string", "minLength": 1 }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["knowledge_id", "skill_ids", "candidate_ref", "source_refs", "consumer_task_refs", "invalidation_conditions", "reuse_events", "decision", "status", "limitations"],
+      "properties": {
+        "knowledge_id": { "type": "string", "minLength": 1 },
+        "skill_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "candidate_ref": { "type": "string", "minLength": 1 },
+        "source_refs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "consumer_task_refs": { "$ref": "#/$defs/strings" },
+        "invalidation_conditions": { "$ref": "#/$defs/nonEmptyStrings" },
+        "reuse_events": { "type": "array", "items": { "$ref": "#/$defs/reuseEvent" } },
+        "decision": { "enum": ["candidate-only", "promote", "reject"] },
+        "status": { "enum": ["not-run", "candidate-only", "promoted", "rejected", "degraded"] },
+        "limitations": { "$ref": "#/$defs/strings" }
+      }
+    }
+  }
+}
