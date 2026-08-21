@@ -1078,7 +1078,7 @@ anti-pattern 判定标准（"成本增加且正确率无提升 → 拒绝"），
 **Owner**: @kuang  
 **已完成（本次及此前会话）**：
 - Phase 1A 验证脚本（`scripts/verify-phase-1a.sh`）已实跑：前 4 项通过，inventory stale（既有未提交漂移，未处理）
-- Phase 1A 检查清单第 1/2 项（重复消除、死代码识别）全部完成，发现两处规模不小的重复：agent/persona 模板 25 文件（未实施合并，沉淀为独立知识文档 `agent-persona-reference-template-duplication-2026-08-21.md`）；`countBy` 代码重复（**已实施抽取**，见下方 `scripts/lib/count-by.cjs`）
+- Phase 1A 检查清单第 1/2 项（重复消除、死代码识别）全部完成，发现两处规模不小的重复：agent/persona 模板 25 文件（**已实施漂移检测**，见下方）；`countBy` 代码重复（**已实施抽取**，见下方 `scripts/lib/count-by.cjs`）
 - Phase 2 退出条件灰色地带已用方案自身逻辑解决：4 个已完成候选项全部是负结果，20% 成本聚合门槛在"全员落选"场景下没有独立判断意义，不再是待决问题
 - Phase 1B 补做前置分析并否决候选段落删除：`spec-work/SKILL.md` 的 `Workflow Contract Summary` 段落已被
   `spec-work-front-controller-contracts.test.js` 测试锁定，不满足"可删"前提，零门测成本排除
@@ -1087,6 +1087,12 @@ anti-pattern 判定标准（"成本增加且正确率无提升 → 拒绝"），
 - `spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 的 schema freeze **已实施**（用户明确授权）：
   新增 `tests/unit/spec-prd-finding-schema-freeze.test.js`，冻结 9 个真实被消费的 reason_code 字段形状，
   用"故意改坏字段名"验证过测试确实生效，`check-prd-artifact.js` 本身零改动
+- 11 个 agent/persona 模板家族（25 文件）的漂移检测 **已实施**（用户明确授权）：精确测量后发现三档差异
+  （A 档 8 组仅单行变体、骨架完全一致；B 档 2 组多了局部语义增强；C 档 1 组是两种不同的调用契约）。
+  当前真实痛点是"无声漂移"，不是"行数多"（历史修改频率极低）。新增 `tests/unit/agent-persona-template-drift.test.js`：
+  A 档用骨架一致性检测（排除单行变体后比对 SHA-256），B/C 档用全文哈希冻结（已记录合法基线）。
+  用"故意加空行"验证过测试确实能捕获两种漂移。不做参数化的理由和未来升级路径记录在
+  `docs/solutions/architecture-patterns/agent-persona-template-drift-detection-2026-08-21.md`
 - Phase 1A 三项输出交付物（review handoff、清单、验证报告）已装配完成
 - spec-debug 误用防护假设复现+仲裁：n=18 合并，双侧 Fisher exact **p=1.000**（此前误算的 p=0.063 已废止），假设未证实，**未修改 `skills/spec-debug/SKILL.md`**
 - 复用/安全默认维度 n=12 运行：108 个计划 cell、**107 个有效测量、1 个 300 秒超时**（此前"零 API 失败"的记录已修正）；有效测量全部正确，结论为 fixture 饱和候选，不称完整 confirmatory pass，不支持修改 Skill
@@ -1105,12 +1111,11 @@ anti-pattern 判定标准（"成本增加且正确率无提升 → 拒绝"），
 - `verify-with-gate.sh` 已加固：smoke/gate 只接受唯一新 run 目录，部分失败时 fail closed
 - 本轮门测累计花费约 $65.27；本次全部审查性工作零门测花费（复用已有数据）
 
-**Next Action**（按当前优先级，前两项已解决，剩余为暂缓/待决）：
+**Next Action**（按当前优先级，前三项已解决，剩余为暂缓/待决）：
 1. ~~Phase 2 退出条件灰色地带~~ ✅ 已用方案自身逻辑解决，不再是待决问题
 2. ~~`spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 的 schema freeze~~ ✅ 已实施（用户明确授权）
-3. `spec-debug` 误用防护是否继续投预算：当前 Fisher exact p=1.000 不支持假设；继续验证需要先设计
+3. ~~11 个 agent/persona 模板家族的参数化去重~~ ✅ 已实施漂移检测（用户明确授权），不做参数化（理由记录在方案文档）
+4. `spec-debug` 误用防护是否继续投预算：当前 Fisher exact p=1.000 不支持假设；继续验证需要先设计
    区分力更强的新 fixture，成本和收益都不确定，评估后决定是否投入
-4. P3「未覆盖 skill 的新 fixture」：`spec-plan`/`spec-code-review`/`spec-doc-review` 需要新 fixture，成本高于本轮其他项，暂缓
-5. 11 个 agent/persona 模板家族（25 文件）的参数化去重机制是否值得设计——见
-   `agent-persona-reference-template-duplication-2026-08-21.md`，成本不小，需要 owner 评估
+5. P3「未覆盖 skill 的新 fixture」：`spec-plan`/`spec-code-review`/`spec-doc-review` 需要新 fixture，成本高于本轮其他项，暂缓
 6. 在源码稳定后刷新 CE localization inventory（并行 CE localization 工作流的事项，非本审查方案范围）
