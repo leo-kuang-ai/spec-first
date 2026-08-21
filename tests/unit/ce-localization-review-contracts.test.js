@@ -31,8 +31,11 @@ describe('CE localization deterministic review producer', () => {
       terminal_disposition: 'excluded-host-owned-local-source',
     }));
     expect(coverage.coverage_summary.missing_path_count).toBe(0);
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(186);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(392);
+    // 2026-08-21: 186 -> 187 / 392 -> 393 after adding
+    // tests/unit/spec-prd-finding-schema-freeze.test.js, which the coverage
+    // producer picks up as one additional spec-prd `focused-test-name` relation.
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(187);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(393);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

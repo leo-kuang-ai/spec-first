@@ -13,6 +13,7 @@ const {
 } = require('../src/cli/plugin');
 const { getAdapter, getSupportedPlatforms } = require('../src/cli/adapters');
 const { initPlatformLabel } = require('../src/cli/commands/init-args');
+const { countBy } = require('./lib/count-by.cjs');
 
 const REPO_ROOT = path.join(__dirname, '..');
 const DEFAULT_OUTPUT_PATH = path.join(REPO_ROOT, 'docs', 'catalog', 'runtime-capabilities.md');
@@ -62,14 +63,6 @@ function deliverySummary(assetSet) {
 
 function tableRow(values) {
   return `| ${values.map((value) => String(value || '').replace(/\n/g, '<br>')).join(' | ')} |`;
-}
-
-function countBy(records, key) {
-  return records.reduce((counts, record) => {
-    const value = record[key] || 'unknown';
-    counts[value] = (counts[value] || 0) + 1;
-    return counts;
-  }, {});
 }
 
 function formatCounts(counts) {
@@ -160,7 +153,7 @@ function buildRuntimeCapabilityCatalog() {
     `| Bundled source skills | ${bundledSkillCount} |`,
     `| Bundled source agents | ${bundledAgentCount} |`,
     `| Bundled agent support files | ${bundledSupportCount} |`,
-    `| Governance records by entry surface | ${formatCounts(countBy(records, 'entry_surface'))} |`,
+    `| Governance records by entry surface | ${formatCounts(countBy(records, (record) => record.entry_surface || 'unknown'))} |`,
     ...platformEntries.map(({ label, assets }) => (
       `| ${label} runtime delivery | ${deliverySummary(assets)} |`
     )),

@@ -1,12 +1,13 @@
 ---
 title: spec-prd finding 字段形状 freeze 延迟决策
 date: 2026-06-28
+last_updated: 2026-08-21
 category: docs/solutions/architecture-patterns
 module: spec-prd
 problem_type: architecture_pattern
 component: prd_checker_findings
 severity: low
-status: deferred
+status: resolved
 applies_when:
   - "checker findings 的 extra 字段形状不一致但下游只消费 reason_code"
   - "想增加 schema freeze 测试前需要判断是否存在真实消费者"
@@ -14,13 +15,15 @@ applies_when:
 tags: [spec-prd, checker, findings, schema-freeze, deferred-decision]
 ---
 
-# spec-prd finding 字段形状 freeze（已延迟）
+# spec-prd finding 字段形状 freeze（已解决）
 
-**日期:** 2026-06-28
-**状态:** deferred — 当前消费者不依赖细节字段，等下游有需求再做
+**日期:** 2026-06-28（deferred）→ 2026-08-21（resolved）
+**状态:** resolved — 触发条件已满足并已实施 freeze 测试，见下方 2026-08-21 记录
 
-**⚠️ 2026-08-21 复核（`spec-first代码审查方案.md` P3 Shortcut 治理，纯发现，未实施）：本决策的前提已不成立，需要 owner 重新评估。**
-`finalize-prd-artifact.js:254-260` 现在读取并按 `expected_shape`/`remediation_hint` 过滤 finding（`.filter((finding) => finding.expected_shape || finding.remediation_hint)`），这两个字段是 2026-07-01（commit `464786ab`）引入的，比本文档晚 3 天，触发了下方"When to Apply"第 1 条（"某个消费者需要渲染 finding 细节"）。`check-prd-artifact.js` 当前有 41 处 `findings.push(...)`，字段形状已比下表列出的 6 种更多样，此表已过期。**本次审查不实施 schema freeze**——是否冻结、冻结哪些字段属于需要另行授权的实现决策，超出人工审查范围；这里只标记触发条件已满足，交由 owner 决定。
+**⚠️ 2026-08-21 复核（`spec-first代码审查方案.md` P3 Shortcut 治理）：本决策的前提已不成立。**
+`finalize-prd-artifact.js:254-260` 现在读取并按 `expected_shape`/`remediation_hint` 过滤 finding（`.filter((finding) => finding.expected_shape || finding.remediation_hint)`），这两个字段是 2026-07-01（commit `464786ab`）引入的，比本文档晚 3 天，触发了下方"When to Apply"第 1 条（"某个消费者需要渲染 finding 细节"）。`check-prd-artifact.js` 当前有 41 处 `findings.push(...)`，字段形状已比下表列出的 6 种更多样，此表已过期。
+
+**✅ 2026-08-21 已实施 schema freeze（用户明确授权）：** 新增 `tests/unit/spec-prd-finding-schema-freeze.test.js`，冻结当前被 `REMEDIATION_BY_REASON_CODE` 增强的全部 9 个 reason_code（`decision_card_undeclared`、`decision_card_path_mismatch`、`open_oq_without_owner_closure`、`owner_decision_trace_required_but_absent`、`design_source_coverage_undeclared`、`design_sources_unread_undeclared`、`design_partial_coverage_unaccepted`、`ready_receipt_stale`、`input_refs_unavailable`）——即真实被 `finalize-prd-artifact.js` 消费的那批，而不是下表列出的、已经过期的 6 种粗粒度形状分类。每个 reason_code 都用直接执行 `buildReport()` 验证过的最小 fixture 触发，断言其精确字段集合（`Object.keys(finding).sort()`），并有一条反向测试确认"当前被增强的 reason_code 集合"与"测试声明覆盖的集合"完全一致，防止未来新增第 10 个增强字段却漏测。**范围明确限定在这 9 个已被消费的 reason_code**——其余约 30 个未被消费的 reason_code 仍不冻结，符合本文档"不要冻结未被消费的细节"的原有指导；不是把下表的 6 种分类原样冻结（那 6 种本身已经不准确，也不是真正驱动本次实施的触发条件）。已用"故意改坏一个字段名重跑测试"验证测试确实会失败（而不是形同摆设），随后还原确认改动干净。
 
 ## Context
 
@@ -65,6 +68,9 @@ tags: [spec-prd, checker, findings, schema-freeze, deferred-decision]
 
 ## 关联
 
-- `facts` key-set freeze: `tests/unit/spec-prd-finalize.test.js:430`
-- reason_code parity 闸: `tests/unit/spec-prd-reason-code-parity.test.js`
-- finding 字段形状分析: `skills/spec-prd/scripts/check-prd-artifact.js:875-1138`
+- **finding 字段形状 freeze（本次新增）: `tests/unit/spec-prd-finding-schema-freeze.test.js`**
+- reason_code parity 闸（`BLOCKING_REASON_CODES`）: `skills/spec-prd/scripts/lib/reason-codes.js`，消费方见 `tests/unit/spec-prd-decision-card-contracts.test.js`
+- `REMEDIATION_BY_REASON_CODE` 增强映射: `skills/spec-prd/scripts/check-prd-artifact.js:1417-1454`
+- finding 构建与 enrichFinding: `skills/spec-prd/scripts/check-prd-artifact.js:1456-1583`
+
+**⚠️ 2026-08-21 说明**：本节原有的 `tests/unit/spec-prd-finalize.test.js:430`（"facts key-set freeze"）与 `tests/unit/spec-prd-reason-code-parity.test.js` 两条链接指向的文件在本仓库当前状态下均不存在（很可能测试文件已被重命名，但本文档从 2026-06-28 起未同步更新）——这与本文档"当前不痛"字段清单过期是同一类问题：**文档写下具体路径引用后，如果不随代码演进主动复核，路径本身也会腐烂。** 已在本次复核中改为指向当前真实存在的等价文件；若未来这些路径再次改名，同样需要人工发现，本文档不具备自动检测过期链接的机制。

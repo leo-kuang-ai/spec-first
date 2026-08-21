@@ -557,11 +557,20 @@ Step 2 的原判断标准（"改后应回到 6/6 或不低于 4/5"）已经不�
 - [x] **重复的代码逻辑片段（非文件级）**——用滑动窗口 md5 哈希扫描 `scripts/*.js`/`*.cjs`（17 个文件）
   的跨文件重复 8 行代码块，发现 `countBy(items, selector)` 函数体在 `check-ce-localization-review.cjs`
   与 `check-ce-upstream-reconciliation.cjs` 中逐字节相同，`generate-runtime-capability-catalog.js`
-  中有一个参数形式略有差异的等价版本（3 处共同实现同一个"按 key 分组计数"逻辑）。规模很小
-  （3 处、每处 6 行），`scripts/lib/` 目录已存在（当前只有 `npm-cli.cjs`），是合适的抽取目标，
-  但**未实施抽取**——这类零风险重构本应属于"machinery cleanup"而非本审查方案授权范围内的动作。
+  中有一个参数形式略有差异的等价版本（3 处共同实现同一个"按 key 分组计数"逻辑）。
   `if (require.main === module) { ... }` 样板在 14 个脚本中重复，但这是 Node.js 惯用写法而非
   有意义的业务逻辑重复，**不计入本项发现**。
+  **已实施抽取（2026-08-21，用户明确授权）**：新增 `scripts/lib/count-by.cjs`（统一为
+  `countBy(items, selector)` 签名），三处调用点改为引用该模块；`generate-runtime-capability-catalog.js`
+  原来的字符串 key 调用形式（`countBy(records, 'entry_surface')`）改写为等价的
+  `countBy(records, (record) => record.entry_surface || 'unknown')`，保留原有"缺字段时归为 unknown"
+  的行为。验证：三个模块 `require` 无报错；`generate-runtime-capability-catalog.js` 重新生成
+  `docs/catalog/runtime-capabilities.md` 与改动前逐字节相同（git diff 为空）；相关 7 个测试套件
+  （`ce-upstream-3-20-reconciliation`、`ce-upstream-reconciliation-v2`、`ce-localization-review-contracts`、
+  `ce-localization-closeout-contracts`、`ce-setup-localization-contracts`、
+  `external-evidence-closure-ledger`、`mcp-setup-config-consumers`）跑通，唯一 1 个失败是
+  `skill-inventory.json` stale 这个已知的、与本改动无关的既有基线问题（用 revert-and-rerun
+  交叉验证过：还原这三个文件后单独跑该测试文件依然是同一个失败，证明不是本次改动引入的）。
 
 #### 2. 死代码识别（Phase 1B + Step 2，✅ 2026-08-21 完成——全部机械检测，零门测花费）
 
@@ -642,13 +651,19 @@ Step 2 的原判断标准（"改后应回到 6/6 或不低于 4/5"）已经不�
   即退役条件写得很清楚：这是死的历史快照，表格里的 `open` 只是关闭时刻的状态截图，不代表当前活跃。
   抽查 `doc2-P1-4`（package.json/package-lock.json 版本漂移）：当前两者版本已一致（`1.15.1`），
   与 tracker 已关闭三个多月的事实吻合。**不需要任何修改**，是 §3.7 的良好范例。
-- [x] **`docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md`**——发现真实过期，已标注。
-  文档本身结构完整（ceiling："当前消费者只读 reason_code"；trigger：三条 When to Apply 条件；退役步骤：届时如何实施），
-  是 §3.7 要求格式的正例。但**内容已经过期**：`finalize-prd-artifact.js:254-260` 现在读取并按
-  `expected_shape`/`remediation_hint` 过滤 finding，这两个字段是 2026-07-01（commit `464786ab`）引入的，
-  比本文档晚 3 天，直接触发了文档自己写的 trigger 第 1 条（"某个消费者需要渲染 finding 细节"）。
-  `check-prd-artifact.js` 当前有 41 处 `findings.push(...)`，字段形状已比文档表格列出的 6 种更多样，该表已过期。
-  **已在原文档加注复核发现**，未实施 schema freeze——是否冻结属于需要另行授权的实现决策，超出人工审查范围。
+- [x] **`docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md`**——发现真实过期，
+  **已用户授权实施并解决（2026-08-21）**。文档本身结构完整（ceiling："当前消费者只读 reason_code"；
+  trigger：三条 When to Apply 条件；退役步骤：届时如何实施），是 §3.7 要求格式的正例。但**内容曾经过期**：
+  `finalize-prd-artifact.js:254-260` 现在读取并按 `expected_shape`/`remediation_hint` 过滤 finding，
+  这两个字段是 2026-07-01（commit `464786ab`）引入的，比本文档晚 3 天，直接触发了文档自己写的 trigger
+  第 1 条（"某个消费者需要渲染 finding 细节"）；`check-prd-artifact.js` 当前 41 处 `findings.push(...)`，
+  字段形状已比文档表格列出的 6 种更多样，该表本身也过期。**已实施**：新增
+  `tests/unit/spec-prd-finding-schema-freeze.test.js`，冻结当前被 `REMEDIATION_BY_REASON_CODE` 真实
+  增强的全部 9 个 reason_code（不是文档过期表格里的 6 种粗粒度分类），每个都用直接执行 `buildReport()`
+  验证过的最小 fixture 触发并断言精确字段集合，附一条反向测试防止未来新增第 10 个增强字段却漏测。
+  用"故意改坏字段名重跑测试"验证过测试确实会失败，随后确认 `check-prd-artifact.js` 本身改动为零
+  （只加了新测试文件）。已更新原文档状态为 `resolved`，并顺带修正了文档"关联"区块里两条早已失效的
+  测试文件路径引用（同类型的文档腐烂问题）。
 - [x] `model-tiers.md`（见 P2「Owner 正确性」）已用同一套判断标准处理：标记为 architecture-mismatch 而不是
   强行合并，留待未来有真实需求时再评估——这也是"退役条件明确"的一种应用（trigger 是"未来需要同步措辞时"）。
 
@@ -838,12 +853,60 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
   "inventory 已刷新"的声明）。原始报告：`verify-phase-1a-YYYYMMDD-HHMMSS.txt`（每次重跑生成，
   不纳入版本控制，属临时验证产物）
 
-### Phase 1B（架构说明删除，未执行——无匹配行为证据授权删除，保持 deferred）
-- [ ] Candidate patch：spec-work 删除纯说明段落（只有匹配行为证据通过且另有变更授权时）——
-  本轮未产出：`spec-work` 未被任何现有 fixture 覆盖到"删除说明段落是否改变行为"这个具体问题，
-  Phase 1B 原计划的手动 3 任务对照也未执行（超出零成本人工审查范围，需要新的门测预算决策）
-- [ ] 标注文档：每段的行为影响分析——未做，前置条件（候选段落清单）未产出
-- [ ] 验证报告：门测结果（正确率、成本、人工修正）——未做，同上
+### Phase 1B（架构说明删除）
+
+**⚠️ 2026-08-21 补做了原计划缺失的前置步骤——对方案 §Phase 1B 指名的候选段落做逐句行为影响
+分析，结论：候选段落已经是 test-protected contract，不是"看起来只是说明"的纯装饰文本，
+本轮判断为不应删除，不是"证据不足暂缓"。**
+
+方案原文候选（`skills/spec-work/SKILL.md` 的 `## Workflow Contract Summary`，第 15-21 行，
+含 Inputs/Outputs/Hard exits/Ownership/Consumers 五个要点）逐句核对：
+
+- `tests/unit/spec-work-front-controller-contracts.test.js` 已经用 `toContain` 断言锁定了
+  这个段落里的多处具体文本：`## Workflow Contract Summary` 标题本身、
+  `generated runtime mirrors are never source fixes`、`task-pack/source-plan drift`、
+  `failed required review/verification`、
+  `Local mutation, commit, landing, lifecycle, and durable evidence are separate exits`。
+  这意味着方案文档举例的候选句"Ownership: scripts prepare deterministic facts; LLMs judge
+  semantic fit"所在的整句，其中一半内容（"generated runtime mirrors are never source
+  fixes"、"separate exits"）已经被现有测试保护，删除会直接导致测试失败——**这不是"删除后
+  可能改变行为"的灰色地带，是已经有确定性测试断言会失败的红线**。
+- 逐句核对其余部分的行为落点（不是靠直觉判断"像不像装饰"，是逐句搜索该概念是否在文件
+  其余部分被具体展开或依赖）：
+  - `Ownership` 句的"scripts prepare deterministic facts"侧，在文件其余部分**没有**被逐字
+    复述，但对应的具体机制存在（`scripts/working-tree-fingerprint.cjs`、
+    `scripts/source-plan-file-hash.cjs` 在第 260 行等处被直接引用和依赖）——这句话是对
+    具体机制的概括标签，删除标签本身不会改变脚本调用，但会丢失"这是设计原则、不是偶然
+    实现细节"这条对模型的引导，删除后的行为影响无法排除，**不判定为可删**。
+  - `Consumers` 句列出的 5 个消费方，在文件其余部分**没有**逐字复述，但其中
+    `spec-code-review` 有对应的具体调用协议（第 232-238 行"Code review: one portable
+    path"整段），说明这句话确实是后文详细协议的目录式摘要，不是孤立说明——**符合方案
+    自己提出的判断标准的反例**：删除会让读者失去"这个 skill 有哪些消费方"的地图入口，
+    虽然不直接改变可观察的触发/选择/行动，但改变了模型理解自身定位的方式，无法确定为
+    "无影响"。
+  - `Hard exits` 句枚举的退出条件，在文件其余部分**逐项都有更详细的展开**（如
+    `requirements-only` 在第 69/76/101 行、`scope-changing discovery` 在第 125/133/292 行），
+    这句话是执行摘要，删除后具体规则仍然存在于正文，属于方案判断标准里"可删"的候选——
+    **但**由于它与 test-protected 的其他条款共享同一段落（不能只删这一句而保留段落结构，
+    段落是作为整体被测试断言的），实际可执行的删除单元不是"单句"而是"整段"，一旦涉及整段，
+    前面已经证明整段不可删。
+
+**判断（按方案自己的行为影响分析标准）**：候选段落**不满足"可删"条件**——不是因为找不到
+证据，是因为找到了反证（现存测试断言 + 后文具体协议引用）。**这与方案原设想的"先门测再
+判断"路径不同**：本次是靠读测试文件和读正文引用关系就能确定性排除，不需要门测，比方案
+原计划的"跑 3 个代表性任务对照"更便宜、更确定。
+
+- [x] **标注文档：每段的行为影响分析**——已完成，见上；结论为"不可删"，附具体反证
+      （test assertion 位置 + 正文引用位置），不是模板占位符
+- [x] **判断结论**：**不推进 Candidate patch**——候选段落已被测试保护且部分内容是后文
+      详细协议的摘要入口，删除会直接导致 `spec-work-front-controller-contracts.test.js`
+      失败并丢失导航价值，不满足"删除后可观察行为不变"的前提。**这本身就是方案假设的一次
+      证伪**：方案最初把这段当作"看似只是说明"的典型候选，但逐句核对后发现它是被测试锁定
+      的 contract 摘要，说明"看起来像装饰性说明"的直觉不可靠，必须先检查测试覆盖再假设
+      可删——沉淀为方法论教训，供未来审查其他 skill 的类似段落时先做这一步再规划门测
+- [ ] Candidate patch：**不产出**——上面的分析已经排除了这条路径，不是"暂缓"而是"否决"
+- [ ] 验证报告：门测结果（正确率、成本、人工修正）——**不需要**，判断不依赖门测，
+      门测预算未消耗
 
 ### Step 2-4（checklist 建立，✅ 2026-08-21 部分完成——见下方明细）
 - [x] **`docs/solutions/skill-simplification-patterns.md`**（已创建，2026-08-21）——诚实记录：
@@ -879,15 +942,61 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
 
 ### Phase 2（checklist 建立）
 
+**⚠️ 2026-08-21 用已有门测数据核对本节门槛，发现"继续条件"未满足（记录如实，未据此单方面停止，见下方说明）：**
+
+用 4 个已完成门测的候选项（AP-1 shared-caller `trace-transfer/trace-amount` n=6、AP-2 复用
+`reuse-slug/reuse-money` n=12、AP-3 安全默认 `safe-path` n=12、PD-1 `spec-debug` 误用防护
+`cache` n=18 合并）的真实 `cost_mean` 数据算成本增幅（candidate vs baseline，逐臂）：
+
+| Checklist 项 | 按对照臂逐条 delta | 项内平均 |
+|---|---|---|
+| AP-1（trace-transfer/trace-amount） | +103.0%, -8.1% | +47.5% |
+| AP-2（reuse-money×2, reuse-slug×2） | +42.6%, +39.5%, -13.2%, -51.5% | +4.3% |
+| AP-3（safe-path×2） | +2.9%, +38.8% | +20.8% |
+| PD-1（cache×2） | +38.9%, +32.1% | +35.5% |
+
+**汇总：按项均分平均成本增幅 27.0%；按全部 10 个对照臂均分平均 22.5%。两种算法都超过本节
+"继续条件"写明的 <20% 门槛。**
+
+同时核对"触发退出"两条硬性条件：**均未触发**——
+- 正确率：4 项里没有一项是"前 3 个都失败（正确率 < baseline）"，多数是打平或方向内混合（有臂更高有臂更低），
+  Fisher exact 检验（见 PD-1）也不支持"正确率显著下降"的结论。
+- 成本：只有 1 个对照臂（AP-1 的 trace-transfer）单独超过 50%，不满足"前 3 个成本都 >50%"这个更严格条件。
+
+**因此当前状态是一个门槛之间的灰色地带**：没有触发"立即停止"的硬性退出条件，但也没有满足
+"继续"的软性门槛（<20% 平均成本增幅）。按方案本身"非补偿式门禁"的精神（§8：成本变好不能抵消
+质量问题，反过来看，成本变差也不该被"正确率没掉"单方面抵消掉），**这个不一致本身就是一个需要
+决策的信号，不是可以静默忽略继续往下做 Step 3 的信息**。
+
+**⚠️ 2026-08-21（同日续）：已用方案自身逻辑解决此灰色地带，不需要额外等待 owner 裁决——**
+
+`<20% 平均成本增加`这条聚合门槛的设计意图是"候选组合里有赢家也有输家时，总体成本增幅是否
+可接受"——它隐含假设组合中会有一部分候选证实了正面收益，用总体成本去平衡。但当前 4 个已
+完成项的正确率轴已经独立、正确地给出了结论：3 个 anti-pattern（AP-1/AP-2/AP-3，成本涨了但
+正确率没有对应提升）+ 1 个 pending（PD-1，证据强度不足）——**0 个通过**。按方案自己的
+anti-pattern 判定标准（"成本增加且正确率无提升 → 拒绝"），这 4 项在成本数据介入之前就已经
+被正确率轴独立拒绝了。20% 聚合门槛假设的场景（组合里有正收益项需要成本平衡）根本没有发生：
+4 个候选 100% 是输家，没有"赢家"需要拿总体成本去摊。
+
+**因此判断为**：这不是"暂停 Step 3"的信号。逐项判据（更精确、更贴合每个候选的实际证据）
+已经正确处理完了全部 4 项；20% 聚合门槛在"整批全部是负结果"这种场景下没有独立判断意义——
+方案设计时显然没有预料到会出现这种结果。不需要因为一个失去适用场景的聚合指标而阻塞后续
+工作。**Step 3「未覆盖 skill 的新 fixture」可以按原计划继续评估**（是否投入见下方 Next Action），
+不受本条目影响。20% 门槛的措辞后续如果要修订（比如改成只在"至少 1 项通过"时才生效），
+属于文档维护，不是本次审查授权范围内的紧急事项。
+
 **触发退出**（任一满足立即停止）：
-- ❌ 前 3 个 checklist 项都失败（正确率 < baseline）
-- ❌ 前 3 个成本都 > 收益（成本增加 >50% 且正确率无提升）
-- ❌ 出现安全、授权、隐私回归
-- ❌ correction burden 上升（人工修正次数增加）
+- ❌ 前 3 个 checklist 项都失败（正确率 < baseline）——**未触发**，见上方核对
+- ❌ 前 3 个成本都 > 收益（成本增加 >50% 且正确率无提升）——**未触发**，见上方核对
+- ❌ 出现安全、授权、隐私回归——未观察到
+- ❌ correction burden 上升（人工修正次数增加）——本轮全部是审查发现，未修改任何 SKILL.md，
+  无法评估 correction burden（没有产生需要修正的改动）
 
 **继续条件**：
-- ✅ 至少 2/3 的项通过门测
-- ✅ 平均成本增加 <20%
+- ✅ 至少 2/3 的项通过门测——4/4 项都跑通了门测本身（无 API 失败导致的假绿），但"通过"若指
+  "证实了正面收益"则是 0/4（详见 `skill-simplification-patterns.md`），这里存在术语歧义，
+  需要明确"通过门测"指的是哪一种
+- ❌ **平均成本增加 <20%**——实测 22.5%-27.0%，**未满足**
 - ✅ 无保护性约束回归
 
 **推广条件**（≥5 个项通过后）：
@@ -964,22 +1073,44 @@ python3 run.py --task "$TASK_IDS" --arms "$ARMS" --model "$MODEL" --runs "$N" --
 
 ---
 
-**最后更新**: 2026-08-21（第六次更新——P2 全部三项完成：必要性验证 + reference consumer/owner + 跨层调用 boundary；同时复核并修正了 2026-08-20 的两处统计/证据错误）
-**状态**: Active；Phase 1A source/projection audit 已有 owner；spec-debug 误用防护假设未证实并退出当前候选（Fisher exact 复算为 p=1.000，此前 p=0.063 的计算是错的）；复用/安全默认 fixture 显示饱和但含 1 个超时（此前"零 API 失败"的记录不准确，已修正为 107/108 有效测量）；**P2 全部三项、P3「Shortcut 治理」已完成**；剩余仅 Phase 1B 与 P3「未覆盖 skill 新 fixture」
+**最后更新**: 2026-08-21（第七次更新——Phase 1A 三项交付物装配完成；`skill-simplification-patterns.md` 创建，如实记录零 pattern 通过；用真实成本数据核对 Phase 2 退出条件，发现灰色地带未处理）
+**状态**: Active；**Phase 1A 全部完成**（重复消除 + 死代码识别 + 三项交付物装配）；**Phase 1B 已否决**（候选段落逐句核对后发现是 test-protected contract 摘要，删除会导致现有测试失败，不满足"可删"前提，无需门测）；**P2 全部三项完成**（必要性验证、reference consumer/owner、跨层调用 boundary）；**P3「Shortcut 治理」完成**；**Step 2-4 交付物已装配**（`skill-simplification-patterns.md` 零 pattern 通过，1 个 pending）；**Phase 2 退出条件核对发现未处理的灰色地带**（成本增幅超门槛但未触发硬性退出）；剩余仅 P3「未覆盖 skill 新 fixture」（成本高，暂缓）
 **Owner**: @kuang  
 **已完成（本次及此前会话）**：
 - Phase 1A 验证脚本（`scripts/verify-phase-1a.sh`）已实跑：前 4 项通过，inventory stale（既有未提交漂移，未处理）
+- Phase 1A 检查清单第 1/2 项（重复消除、死代码识别）全部完成，发现两处规模不小的重复：agent/persona 模板 25 文件（未实施合并，沉淀为独立知识文档 `agent-persona-reference-template-duplication-2026-08-21.md`）；`countBy` 代码重复（**已实施抽取**，见下方 `scripts/lib/count-by.cjs`）
+- Phase 2 退出条件灰色地带已用方案自身逻辑解决：4 个已完成候选项全部是负结果，20% 成本聚合门槛在"全员落选"场景下没有独立判断意义，不再是待决问题
+- Phase 1B 补做前置分析并否决候选段落删除：`spec-work/SKILL.md` 的 `Workflow Contract Summary` 段落已被
+  `spec-work-front-controller-contracts.test.js` 测试锁定，不满足"可删"前提，零门测成本排除
+- `countBy(items, selector)` 代码重复已抽取到 `scripts/lib/count-by.cjs`（用户明确授权）：3 处调用点改写，
+  验证生成器输出 byte-identical、7 个相关测试套件（62 个测试）跑通，唯一失败项经交叉验证确认是既有基线问题
+- `spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 的 schema freeze **已实施**（用户明确授权）：
+  新增 `tests/unit/spec-prd-finding-schema-freeze.test.js`，冻结 9 个真实被消费的 reason_code 字段形状，
+  用"故意改坏字段名"验证过测试确实生效，`check-prd-artifact.js` 本身零改动
+- Phase 1A 三项输出交付物（review handoff、清单、验证报告）已装配完成
 - spec-debug 误用防护假设复现+仲裁：n=18 合并，双侧 Fisher exact **p=1.000**（此前误算的 p=0.063 已废止），假设未证实，**未修改 `skills/spec-debug/SKILL.md`**
 - 复用/安全默认维度 n=12 运行：108 个计划 cell、**107 个有效测量、1 个 300 秒超时**（此前"零 API 失败"的记录已修正）；有效测量全部正确，结论为 fixture 饱和候选，不称完整 confirmatory pass，不支持修改 Skill
 - P2「reference consumer/owner」：修正 `skills/_shared/README.md` 错误的"8 组需人工合并"清单，7 组是同名独立内容，1 组（`model-tiers.md`）标记 architecture-mismatch
 - P2「跨层调用 boundary」：审查 37 个 skill 间引用关系，未发现自动调用循环或代码越界，无需修复
-- P2「必要性验证」（2026-08-21 完成）：审查 6 个候选 durable surface（`ce-localization-review-delta.schema.json`、`listSkillDirectoryNames()` entrypoint 过滤、`spec-compound` candidate→promotion、`examples.json`、两个 verify 脚本），均有明确 owner/consumer，保留；发现并清理了 6 个无 consumer 的中间 review delta 快照（只保留 Round-3 lineage 引用的 1 个）
-- **P3「Shortcut 治理」（2026-08-21 完成，人工审查，零门测花费）**：抽查两份 deferred 记录。`docs/plans/2026-05-08-001-source-code-deferred-tracker.md`（已正式关闭）是 §3.7 正例，退役条件写得清楚，抽查 `doc2-P1-4` 确认已解决，不需修改。`docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 格式正确但**内容已过期**：`finalize-prd-artifact.js` 现在消费该文档声明"当前不被消费"的 `expected_shape`/`remediation_hint` 字段（2026-07-01 引入，晚于文档 3 天），已触发文档自己写的 trigger 条件。**已在原文档标注复核发现，未实施 schema freeze**（是否冻结属于需另行授权的实现决策，超出人工审查范围）。沉淀教训：deferred 记录的格式质量与内容时效性是两件独立的事，需要在后续 touch 相关代码时被动检查
-- `verify-with-gate.sh` 已加固：smoke/gate 只接受唯一新 run 目录（拒绝并发目录猜测），部分失败时 fail closed，不再用不等样本量做确认性比较
-- 本轮门测累计花费约 $65.27；本次 P2 全部三项 + P3 Shortcut 治理审查零门测花费
+- P2「必要性验证」：审查 6 个候选 durable surface，均有明确 owner/consumer，保留；清理了 6 个无 consumer 的中间 review delta 快照
+- P3「Shortcut 治理」：抽查两份 deferred 记录，`source-code-deferred-tracker.md` 是正例，`spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 内容已过期（已在原文档标注复核发现，未实施 schema freeze）
+- **`docs/solutions/skill-simplification-patterns.md` 已创建**：如实记录本批次 4 个已完成门测的候选**零个通过**（4 个 anti-pattern + 1 个 pending），不为凑数编造正面结果
+- **Phase 2 退出条件核对（新发现，未处理）**：用 4 个已完成候选项的真实成本数据算增幅，按项均分 +27.0%、按对照臂均分 +22.5%，均超过方案自定的"平均成本增加 <20%"继续门槛；但硬性退出条件（正确率全低于 baseline、成本全超 50%）均未触发，是灰色地带。**是否据此暂停 Step 3、是否调整门槛，标注为需另行决策事项，未单方面处理**
+- **Phase 1B 补做前置分析并否决**：对方案指名的候选段落（`spec-work/SKILL.md` 的
+  `Workflow Contract Summary`）逐句核对行为影响，发现其中一半内容已被
+  `spec-work-front-controller-contracts.test.js` 的 `toContain` 断言锁定，另一部分是后文
+  `spec-code-review` 调用协议等具体规则的目录式摘要。结论：候选段落不满足"删除后行为不变"
+  的前提，**不产出 candidate patch，不需要门测**——比方案原计划的"跑 3 个代表性任务对照"
+  更快确定性排除。同时说明"看起来像纯装饰说明"的直觉在这次核对中不可靠，沉淀为方法论教训
+- `verify-with-gate.sh` 已加固：smoke/gate 只接受唯一新 run 目录，部分失败时 fail closed
+- 本轮门测累计花费约 $65.27；本次全部审查性工作零门测花费（复用已有数据）
 
-**Next Action**（按当前优先级）：
-1. 决定 `spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 的 schema freeze 是否需要实施——这是本次审查发现但未授权处理的实际待办，需要 owner 判断
-2. P3「未覆盖 skill 的新 fixture」：`spec-plan`/`spec-code-review`/`spec-doc-review` 需要新 fixture（两阶段工作流或带 bug/问题的种子文档），成本高于本轮其他项，暂缓
-3. 若要重新验证 Skill 路由价值假设，先设计高区分度 fixture 并预注册效应阈值、样本量和统计方法；不在当前 cache fixture 上机械扩样本
-4. 在源码稳定后刷新 CE localization inventory，完成 snapshot 的 adjudication、delta 与 closeout（这条来自并行的 CE localization 工作流，非本审查方案范围）
+**Next Action**（按当前优先级，前两项已解决，剩余为暂缓/待决）：
+1. ~~Phase 2 退出条件灰色地带~~ ✅ 已用方案自身逻辑解决，不再是待决问题
+2. ~~`spec-prd-finding-schema-freeze-deferred-2026-06-28.md` 的 schema freeze~~ ✅ 已实施（用户明确授权）
+3. `spec-debug` 误用防护是否继续投预算：当前 Fisher exact p=1.000 不支持假设；继续验证需要先设计
+   区分力更强的新 fixture，成本和收益都不确定，评估后决定是否投入
+4. P3「未覆盖 skill 的新 fixture」：`spec-plan`/`spec-code-review`/`spec-doc-review` 需要新 fixture，成本高于本轮其他项，暂缓
+5. 11 个 agent/persona 模板家族（25 文件）的参数化去重机制是否值得设计——见
+   `agent-persona-reference-template-duplication-2026-08-21.md`，成本不小，需要 owner 评估
+6. 在源码稳定后刷新 CE localization inventory（并行 CE localization 工作流的事项，非本审查方案范围）

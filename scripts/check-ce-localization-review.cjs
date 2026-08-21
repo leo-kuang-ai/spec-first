@@ -9,6 +9,7 @@ const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 
 const reconciliation = require('./check-ce-upstream-reconciliation.cjs');
+const { countBy } = require('./lib/count-by.cjs');
 const {
   LOCAL_CONFIG_CONSUMERS,
 } = require('../skills/spec-runtime-setup/scripts/lib/project-config.cjs');
@@ -310,14 +311,6 @@ function manifestHash(receipts) {
   return sha256(receipts.map((receipt) => (
     `${receipt.path}\0${receipt.sha256}\0${receipt.bytes}\0${receipt.line_count}`
   )).join('\n'));
-}
-
-function countBy(items, selector) {
-  return items.reduce((counts, item) => {
-    const key = selector(item);
-    counts[key] = (counts[key] || 0) + 1;
-    return counts;
-  }, {});
 }
 
 function setupContract({

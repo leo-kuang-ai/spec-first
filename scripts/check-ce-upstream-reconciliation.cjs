@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const { countBy } = require('./lib/count-by.cjs');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const LEGACY_BASE = '7f86be9d02679adeb93951587dee40de42c5bf82';
@@ -641,14 +642,6 @@ function v2RoleFor(filePath) {
   return filePath.startsWith('.compound-engineering/config')
     ? 'config-rename-evidence'
     : 'root-metadata-evidence';
-}
-
-function countBy(items, selector) {
-  return items.reduce((counts, item) => {
-    const key = selector(item);
-    counts[key] = (counts[key] || 0) + 1;
-    return counts;
-  }, {});
 }
 
 function assertExactCounts(actual, expected, label) {
