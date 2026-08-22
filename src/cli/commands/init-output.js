@@ -605,19 +605,13 @@ function printParentOnlyInitHandoff(plan, lang) {
 
 function printAllReposInitHandoff(plan, result, lang) {
   const summary = result.workspace_summary || {};
-  const counts = summary.counts || {};
   const children = Array.isArray(summary.results) ? summary.results : [];
-  const allChildrenReady = Number(counts.total) > 0
-    && Number(counts.ready) === Number(counts.total)
-    && summary.parent_host_runtime
-    && summary.parent_host_runtime.overall_status === 'ready'
-    && result.exit_code === 0;
 
-  if (allChildrenReady) {
+  if (isAllReposInitReady(result)) {
     if (lang === 'en') {
-      console.log(`Child repo projections are ready for ${initPlatformLabel(plan.platform)}. Next: run spec-runtime-setup.`);
+      console.log(`Child repo projections are ready for ${initPlatformLabel(plan.platform)}.`);
     } else {
-      console.log(`所有子仓 runtime projection 已为 ${initPlatformLabel(plan.platform)} 就绪。下一步：运行 spec-runtime-setup。`);
+      console.log(`所有子仓 runtime projection 已为 ${initPlatformLabel(plan.platform)} 就绪。`);
     }
     return;
   }
@@ -645,6 +639,16 @@ function printAllReposInitHandoff(plan, result, lang) {
     console.log('all-repos bootstrap 未完成。请先修复 workspace projection：');
     console.log(`  spec-first init ${hostFlags} --all-repos -y`);
   }
+}
+
+function isAllReposInitReady(result = {}) {
+  const summary = result.workspace_summary || {};
+  const counts = summary.counts || {};
+  return Number(counts.total) > 0
+    && Number(counts.ready) === Number(counts.total)
+    && summary.parent_host_runtime
+    && summary.parent_host_runtime.overall_status === 'ready'
+    && result.exit_code === 0;
 }
 
 function buildInitApplyHostDetails(plan, result, messages) {
@@ -957,12 +961,12 @@ function printHelp() {
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',
     '',
     '➡️ After successful init:',
-    '  Claude: restart Claude Code. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
-    '  Codex: restart Codex. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
-    '  Cursor: restart Cursor. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup. Cursor remains generated-runtime preview until local loader evidence is recorded.',
-    '  Kiro: restart Kiro. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
-    '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run spec-runtime-setup.',
-    '  OpenCode: restart OpenCode so it reloads generated commands and skills. Support remains generated-runtime preview until version-matched loader evidence is recorded.',
+    '  Claude: for first-time onboarding, restart Claude Code, then run spec-runtime-setup before the first task.',
+    '  Codex: for first-time onboarding, restart Codex, then run spec-runtime-setup before the first task.',
+    '  Cursor: for first-time onboarding, restart Cursor, then run spec-runtime-setup before the first task. Cursor remains generated-runtime preview until local loader evidence is recorded.',
+    '  Kiro: for first-time onboarding, restart Kiro, then run spec-runtime-setup before the first task.',
+    '  Qoder: for first-time onboarding, restart Qoder or run /commands reload, /skills reload, and /agents reload, then run spec-runtime-setup before the first task.',
+    '  OpenCode: for first-time onboarding, restart OpenCode so it reloads generated commands and skills, then run spec-runtime-setup before the first task. Support remains generated-runtime preview until version-matched loader evidence is recorded.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
@@ -1049,6 +1053,7 @@ module.exports = {
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
   hasAnyManagedState,
   hasInitDiagnostic,
+  isAllReposInitReady,
   printGlobalDeveloperWriteSummary,
   printHelp,
   printInitApplySummaries,

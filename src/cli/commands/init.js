@@ -49,6 +49,7 @@ const {
   printInitDiagnostics,
 } = require('./init-diagnostics');
 const {
+  isAllReposInitReady,
   printHelp,
   printInitApplySummaries,
   printInitApplySuccess,
@@ -222,10 +223,13 @@ async function runInit(argv, promptOverrides = {}) {
     const childProjectionPending = plans.some((plan) => (
       plan.mode !== 'all-repos' && plan.gitRootTopology === 'multi-repo-workspace'
     ));
+    const allReposProjectionReady = plans.every((plan, index) => (
+      plan.mode !== 'all-repos' || isAllReposInitReady(results[index])
+    ));
     if (
       exitCode === 0
       && !childProjectionPending
-      && (plans.length > 1 || plans[0].mode !== 'all-repos')
+      && allReposProjectionReady
     ) {
       console.log('');
       printInitNextStepsForPlatforms(interactiveInput.platforms, interactiveInput.lang);

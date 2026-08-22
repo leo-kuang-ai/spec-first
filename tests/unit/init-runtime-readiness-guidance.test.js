@@ -5,6 +5,8 @@ const os = require('node:os');
 const path = require('node:path');
 
 const {
+  isAllReposInitReady,
+  printHelp,
   printInitNextSteps,
   printInitNextStepsForPlatforms,
 } = require('../../src/cli/commands/init-output');
@@ -84,5 +86,43 @@ describe('init runtime readiness guidance', () => {
       expect(output).toHaveLength(4);
       expect(output[3]).toContain(`spec-first doctor --${platform}`);
     }
+  });
+
+  test('describes Runtime Setup as the default first-time onboarding path for every host', () => {
+    const output = captureOutput(() => printHelp()).join('\n');
+
+    for (const platform of ['Claude', 'Codex', 'Cursor', 'Kiro', 'Qoder', 'OpenCode']) {
+      const line = output.split('\n').find((candidate) => candidate.startsWith(`  ${platform}:`));
+      expect(line).toContain('for first-time onboarding');
+      expect(line).toContain('spec-runtime-setup before the first task');
+    }
+    expect(output).not.toContain('For lightweight work');
+    expect(output).not.toContain('enhanced readiness');
+  });
+
+  test('requires non-empty child and parent readiness before all-repos next steps', () => {
+    const readyResult = {
+      exit_code: 0,
+      workspace_summary: {
+        counts: { total: 1, ready: 1 },
+        parent_host_runtime: { overall_status: 'ready' },
+      },
+    };
+
+    expect(isAllReposInitReady(readyResult)).toBe(true);
+    expect(isAllReposInitReady({
+      ...readyResult,
+      workspace_summary: {
+        ...readyResult.workspace_summary,
+        counts: { total: 0, ready: 0 },
+      },
+    })).toBe(false);
+    expect(isAllReposInitReady({
+      ...readyResult,
+      workspace_summary: {
+        ...readyResult.workspace_summary,
+        parent_host_runtime: { overall_status: 'action-required' },
+      },
+    })).toBe(false);
   });
 });
