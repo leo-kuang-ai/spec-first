@@ -14,7 +14,6 @@ const {
 } = require('../brand');
 const {
   hostDisplayName,
-  hostEntrypointLabel,
   hostMcpSetupCommand,
   formatInitHostFlagsForExample,
   initPlatformLabel,
@@ -606,19 +605,13 @@ function printParentOnlyInitHandoff(plan, lang) {
 
 function printAllReposInitHandoff(plan, result, lang) {
   const summary = result.workspace_summary || {};
-  const counts = summary.counts || {};
   const children = Array.isArray(summary.results) ? summary.results : [];
-  const allChildrenReady = Number(counts.total) > 0
-    && Number(counts.ready) === Number(counts.total)
-    && summary.parent_host_runtime
-    && summary.parent_host_runtime.overall_status === 'ready'
-    && result.exit_code === 0;
 
-  if (allChildrenReady) {
+  if (isAllReposInitReady(result)) {
     if (lang === 'en') {
-      console.log(`Child repo projections are ready for ${initPlatformLabel(plan.platform)}. Next: run spec-runtime-setup.`);
+      console.log(`Child repo projections are ready for ${initPlatformLabel(plan.platform)}.`);
     } else {
-      console.log(`所有子仓 runtime projection 已为 ${initPlatformLabel(plan.platform)} 就绪。下一步：运行 spec-runtime-setup。`);
+      console.log(`所有子仓 runtime projection 已为 ${initPlatformLabel(plan.platform)} 就绪。`);
     }
     return;
   }
@@ -646,6 +639,16 @@ function printAllReposInitHandoff(plan, result, lang) {
     console.log('all-repos bootstrap 未完成。请先修复 workspace projection：');
     console.log(`  spec-first init ${hostFlags} --all-repos -y`);
   }
+}
+
+function isAllReposInitReady(result = {}) {
+  const summary = result.workspace_summary || {};
+  const counts = summary.counts || {};
+  return Number(counts.total) > 0
+    && Number(counts.ready) === Number(counts.total)
+    && summary.parent_host_runtime
+    && summary.parent_host_runtime.overall_status === 'ready'
+    && result.exit_code === 0;
 }
 
 function buildInitApplyHostDetails(plan, result, messages) {
@@ -870,105 +873,48 @@ function hasInitDiagnostic(plan, code) {
 }
 
 function printInitNextSteps(platform, lang = 'zh') {
-  const hostDisplay = hostDisplayName(platform);
-  const entryKind = hostEntrypointLabel(platform);
-  const mcpSetupCommand = hostMcpSetupCommand(platform);
+  printInitNextStepsForPlatforms([platform], lang);
+}
 
-  // 检测是否首次项目（.spec-first/workflows是否存在）
-  const fs = require('fs');
-  const path = require('path');
-  const workflowHistoryExists = fs.existsSync(path.join(process.cwd(), '.spec-first', 'workflows'));
-
-  if (lang === 'en') {
-    console.log('Setup complete. Next steps:');
-    console.log(`  1. Restart ${hostDisplay} or open a new session so it loads the generated ${entryKind}.`);
-
-    if (!workflowHistoryExists) {
-      // 首次项目：直接给出快速上手的workflow建议
-      console.log('  2. Quick start workflow guide:');
-      console.log('     • spec-first prd     → Define requirements and product decisions');
-      console.log('     • spec-first plan    → Generate implementation plan');
-      console.log('     • spec-first work    → Execute planned changes');
-      console.log(`  3. For stronger readiness, run ${mcpSetupCommand} to install and verify the required MCP/helper runtime.`);
-      console.log('  4. Then choose the workflow by user intent. Project guidance comes from AGENTS.md, CLAUDE.md, docs/contracts, direct source evidence, tests, and logs.');
-    } else {
-      // 有执行历史：维持原有的generic提示
-      console.log(`  2. Start with the matching ${entryKind} for lightweight docs, small fixes, first trials, plan, work, review, or debug.`);
-      console.log(`  3. For stronger readiness, run ${mcpSetupCommand} to install and verify the required MCP/helper runtime.`);
-      console.log('  4. Then choose the workflow by user intent. Project guidance comes from AGENTS.md, CLAUDE.md, docs/contracts, direct source evidence, tests, and logs.');
-    }
-    return;
+function formatInitList(values, lang) {
+  if (lang !== 'en' || values.length < 2) {
+    return values.join(lang === 'en' ? '' : '、');
   }
-
-  console.log('初始化完成。下一步:');
-  console.log(`  1. 重启 ${hostDisplay} 或新开会话，让宿主加载刚生成的 ${entryKind}。`);
-
-  if (!workflowHistoryExists) {
-    // 首次项目：直接给出快速上手的workflow建议
-    console.log('  2. 快速上手流程指南:');
-    console.log('     • spec-first prd     → 定义需求与产品决策');
-    console.log('     • spec-first plan    → 生成实施计划');
-    console.log('     • spec-first work    → 执行计划变更');
-    console.log(`  3. 需要更完整的 readiness 时，运行 ${mcpSetupCommand} 安装并验证必装 MCP/helper runtime。`);
-    console.log('  4. 然后按用户意图选择 workflow；项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts、直接源码证据、测试和日志。');
-  } else {
-    // 有执行历史：维持原有的generic提示
-    console.log(`  2. docs、小修复、首次试用、plan、work、review 或 debug，可直接启动匹配的 ${entryKind}。`);
-    console.log(`  3. 需要更完整的 readiness 时，运行 ${mcpSetupCommand} 安装并验证必装 MCP/helper runtime。`);
-    console.log('  4. 然后按用户意图选择 workflow；项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts、直接源码证据、测试和日志。');
+  if (values.length === 2) {
+    return values.join(' and ');
   }
+  return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`;
 }
 
 function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
   const uniquePlatforms = [...new Set(platforms)];
-  if (uniquePlatforms.length === 1) {
-    printInitNextSteps(uniquePlatforms[0], lang);
+  if (uniquePlatforms.length === 0) {
     return;
   }
-
-  // 检测是否首次项目（.spec-first/workflows是否存在）
-  const fs = require('fs');
-  const path = require('path');
-  const workflowHistoryExists = fs.existsSync(path.join(process.cwd(), '.spec-first', 'workflows'));
+  const hostDisplay = formatInitList(uniquePlatforms.map(hostDisplayName), lang);
+  const setupCommand = hostMcpSetupCommand(uniquePlatforms[0]);
+  const doctorCommands = formatInitList(
+    uniquePlatforms.map((platform) => `\`spec-first doctor --${platform}\``),
+    lang,
+  );
+  const multipleHosts = uniquePlatforms.length > 1;
 
   if (lang === 'en') {
-    console.log('Setup complete. Next steps:');
-    console.log(`  1. Restart ${uniquePlatforms.map(hostDisplayName).join(', ')} or open new sessions so each host loads the generated entrypoints.`);
-
-    if (!workflowHistoryExists) {
-      // 首次项目：直接给出快速上手的workflow建议
-      console.log('  2. Quick start workflow guide:');
-      console.log('     • spec-first prd     → Define requirements and product decisions');
-      console.log('     • spec-first plan    → Generate implementation plan');
-      console.log('     • spec-first work    → Execute planned changes');
-      console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
-      console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
-    } else {
-      // 有执行历史：维持原有的generic提示
-      console.log('  2. Use the matching spec-* workflow entrypoint for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
-      console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
-      console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
-    }
+    console.log('Initialization complete. Next steps:');
+    console.log(`  Status: The ${hostDisplay} runtime projection${multipleHosts ? 's were' : ' was'} written; host loading and runtime readiness are not verified yet.`);
+    console.log(multipleHosts
+      ? `  Required: Restart ${hostDisplay} or open new sessions, then run ${setupCommand} in each host you plan to use.`
+      : `  Required: Restart ${hostDisplay} or open a new session, then run ${setupCommand}.`);
+    console.log(`  Optional: To troubleshoot or audit projection health, run ${doctorCommands}.`);
     return;
   }
 
   console.log('初始化完成。下一步:');
-  console.log(`  1. 重启 ${uniquePlatforms.map(hostDisplayName).join('、')} 或分别新开会话，让宿主加载刚生成的入口。`);
-
-  if (!workflowHistoryExists) {
-    // 首次项目：直接给出快速上手的workflow建议
-    console.log('  2. 快速上手流程指南:');
-    console.log('     • spec-first prd     → 定义需求与产品决策');
-    console.log('     • spec-first plan    → 生成实施计划');
-    console.log('     • spec-first work    → 执行计划变更');
-    console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
-    console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
-  } else {
-    // 有执行历史：维持原有的generic提示
-    console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动同名 spec-* workflow 入口。');
-    console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
-    console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
-  }
+  console.log(`  状态：已写入 ${hostDisplay} runtime projection${multipleHosts ? 's；各宿主' : '；宿主'}加载与 runtime readiness 尚未验证。`);
+  console.log(multipleHosts
+    ? `  必做：重启 ${hostDisplay} 或分别新开会话，然后在每个计划使用的宿主中运行 ${setupCommand}。`
+    : `  必做：重启 ${hostDisplay} 或新开会话，然后运行 ${setupCommand}。`);
+  console.log(`  可选：如需排查或审计 projection health，${multipleHosts ? '分别' : ''}运行 ${doctorCommands}。`);
 }
 
 function printHelp() {
@@ -1015,12 +961,12 @@ function printHelp() {
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',
     '',
     '➡️ After successful init:',
-    '  Claude: restart Claude Code. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
-    '  Codex: restart Codex. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
-    '  Cursor: restart Cursor. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup. Cursor remains generated-runtime preview until local loader evidence is recorded.',
-    '  Kiro: restart Kiro. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
-    '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run spec-runtime-setup.',
-    '  OpenCode: restart OpenCode so it reloads generated commands and skills. Support remains generated-runtime preview until version-matched loader evidence is recorded.',
+    '  Claude: for first-time onboarding, restart Claude Code, then run spec-runtime-setup before the first task.',
+    '  Codex: for first-time onboarding, restart Codex, then run spec-runtime-setup before the first task.',
+    '  Cursor: for first-time onboarding, restart Cursor, then run spec-runtime-setup before the first task. Cursor remains generated-runtime preview until local loader evidence is recorded.',
+    '  Kiro: for first-time onboarding, restart Kiro, then run spec-runtime-setup before the first task.',
+    '  Qoder: for first-time onboarding, restart Qoder or run /commands reload, /skills reload, and /agents reload, then run spec-runtime-setup before the first task.',
+    '  OpenCode: for first-time onboarding, restart OpenCode so it reloads generated commands and skills, then run spec-runtime-setup before the first task. Support remains generated-runtime preview until version-matched loader evidence is recorded.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
@@ -1107,6 +1053,7 @@ module.exports = {
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
   hasAnyManagedState,
   hasInitDiagnostic,
+  isAllReposInitReady,
   printGlobalDeveloperWriteSummary,
   printHelp,
   printInitApplySummaries,

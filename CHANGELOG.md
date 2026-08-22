@@ -1,5 +1,9 @@
 # Changelog
 
+- v1.15.2 2026-08-22 13:51:32 Codex: fix(init): 逐项修复 runtime readiness 引导审查 finding：单宿主 `--all-repos` 在父 runtime 与全部子仓 projection 成功后接入共享 4 行 next-step renderer，拓扑 handoff 只报告 projection ready，避免重复或绕过首次 onboarding；parent-only 与 partial/failed all-repos 继续优先输出 projection 补齐/修复命令，不提前建议 Runtime Setup。`init --help` 的六宿主说明统一为首次使用默认先重启/重载宿主、再运行 `spec-runtime-setup`、然后开始首个任务，同时保留 Cursor/OpenCode preview 限制；新增真实 all-repos CLI 与 help 合同回归。未修改 generated runtime，未 commit/push/回复或 resolve PR thread。(user-visible)
+
+- v1.15.2 2026-08-22 12:12:39 leokuang: feat(init): 优化初始化完成后的 runtime readiness 引导：单/多宿主与中英文统一为 4 行状态/必做/可选输出，明确 projection 已写入不等于宿主已加载或 runtime ready，首次使用前需重开宿主并运行 `spec-runtime-setup`，`doctor` 仅用于可选排障/审计；Runtime Setup 仅在完整 ready 后提供可复制的首次任务模板，未就绪继续修复与重跑，保留 direct-source 降级边界。新增聚焦 contract 测试及六宿主临时投影验证；未手改当前 checkout 的 generated runtime，真实宿主重开与首次任务 field outcome 尚未验证。(user-visible)
+
 - v1.15.1 2026-08-16 23:02:08 leokuang: chore(release): 发布 spec-first@1.15.1。该 patch 版本的唯一对外行为变化是修复 `spec-first init` 的目标解析：当前目录没有 `.git` marker 但能发现 child repos 时，按父 workspace 边界处理，不再被提升到无关的祖先 Git 仓库根；普通 Git 仓库子目录仍定位最近 Git 根。其余为文档收口（capability-evolution 决策台账与优化执行序列 Plan、外部 engineering skill 能力映射、CodeGraph 安装 analysis-only 诊断、v4.0 首场 PPT 讲稿 draft）与 `.claude/settings.json` hook 路径可移植性调整（不在 npm 包内）。同步 `package.json` 与 `package-lock.json` 版本字段。 (user-visible)
 
 - v1.15.0 2026-08-16 22:07:24 leokuang: docs(ppt): 新增 v4.0 首场 PPT 逐页演讲稿 draft（`docs/ppt-script-v4-p01-p05.md` 至 `docs/ppt-script-v4-p24-p26.md`，覆盖 P01-P26 的逐页讲稿与页面布局设计），source 为外部 vault 的 `12-首场PPT框架-v4.0-逻辑优化版`。五份文档 front matter 均为 `status: draft`，属于 harness 价值表达材料，不构成 runtime contract。本次仅新增 docs draft，未修改 skill/CLI/test source、generated runtime 或宿主配置。
