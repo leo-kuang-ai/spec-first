@@ -271,6 +271,12 @@ The final setup output should contain:
 - `Verification profile`: current verification profile visibility placeholder; full profile execution is v1.13 scope.
 - `Next steps`: either fix action-required rows, narrow to an explicit child repo when a single-repo retry is needed, continue to the user-intent workflow, or suggest `spec-rule-miner` as a separate follow-up after CodeGraph/Graphify readiness is prepared. This suggestion is advisory; setup must not treat rule-miner output as setup readiness and must not call `spec-rule-miner` automatically.
 
+### Readiness Handoff
+
+- Render the first-task handoff only when the full setup outcome is ready and every required dependency plus generated runtime manifest is ready. 按用户语言输出最多 3 行非空输出，并提供可直接替换内容的任务模板：中文为 `请基于当前项目处理这个任务：<描述你的需求或问题>。`；英文为 `Please handle this task based on the current project: <describe your requirement or problem>.`。
+- 对 action-required、degraded、failed 或其他未就绪结果，不得展示上述首次任务模板；要求用户执行报告的 next action 后重新运行 `spec-runtime-setup`。不得把 `spec-first doctor` 或额外 `--verify-only` 作为正常 ready 路径的第二道验证。
+- 既有 direct source evidence fallback 仍可供下游 workflow 在证据足够时降级执行，但它不改变本次完整 setup 的状态，也不得把完整 setup 报告为 ready。
+
 `tool-facts.json` records setup-owned tool and helper readiness:
 
 ```json

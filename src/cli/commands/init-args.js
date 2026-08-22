@@ -229,10 +229,6 @@ function hostDisplayName(platform) {
   return platform;
 }
 
-function hostEntrypointLabel(platform) {
-  return 'spec-* workflow entrypoints';
-}
-
 function hostMcpSetupCommand(platform) {
   return '`spec-runtime-setup`';
 }
@@ -244,7 +240,6 @@ module.exports = {
   formatInitHostFlagsForExample,
   formatInitTargetFlagsForExample,
   hostDisplayName,
-  hostEntrypointLabel,
   hostMcpSetupCommand,
   initPlatformLabel,
   normalizeInitPlatform,
