@@ -206,110 +206,40 @@ Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启
 PR 应说明变更的 command、skill、agent 或文档面，列出实际执行过的验证命令，并说明是否影响 generated runtime assets。只有视觉文档或 UI 资产变更时才附截图。
 
 <!-- spec-first:lang:start -->
-## 语言与治理策略（由 spec-first 管理）
+## Language and Governance Policy
 
-**语言设置：** `Chinese / 中文`
+**Language setting:** `English / 英文`
 
-### 语言规则
-- 默认输出语言是 **中文（Chinese）**。除非用户明确要求翻译、双语或指定其他语言，所有新生成的自然语言内容必须使用中文
-- 严格适用范围包括：回复、状态更新、问题澄清、生成文档、需求/计划/任务、评审意见、总结、变更说明、commit/PR 文案等
-- 如果输入、工具输出或被引用材料是其他语言，除非需要保留原文引用，新生成的说明、归纳和结论仍必须使用中文
-- 允许混用英文技术术语，不要求强行翻译常见技术词
-- 代码标识符（变量、函数、类、模块、文件名中的技术标识）保持英文
-- 新增代码注释使用中文，简洁清晰，不写空洞注释
-- 代码、命令、路径、配置键、环境变量名、API 名称、协议名等技术标识不因语言偏好而被翻译
+- Generate responses, status updates, clarifications, documentation, requirements/plans/tasks, reviews, summaries, change notes, and commit/PR text in English unless the user explicitly asks for translation, bilingual output, or another language.
+- Input, tool output, and quoted material may keep their original language; new explanations and conclusions still follow the language setting.
+- Keep code identifiers, commands, paths, config keys, env vars, API/protocol names, and common technical terms unchanged.
+- New code comments use English and explain only non-obvious intent.
 
-### Changelog 治理规则
-**代码变动铁律（无例外）**
-- 任何对项目源码的新增、删除、修改，必须同步在项目根目录 `CHANGELOG.md` 中添加一条记录
-- 无此记录的代码变动，一律拒绝生成
-- 记录格式以仓库现行格式为准
-- `作者` 必须使用当前 host 的项目级 developer profile：Codex 读取 `.codex/spec-first/.developer`，Claude 读取 `.claude/spec-first/.developer`；如果缺失，先运行对应的 `spec-first init --codex|--claude -u <name> --lang <zh|en>`
-- **示例：** `- vX.Y.Z YYYY-MM-DD 作者: 一句话摘要`
-- 用户可见变更在末尾追加 `(user-visible)`
+### Changelog
+- Any project source addition, deletion, or modification must update the repo-root `CHANGELOG.md`; follow the repository's existing format.
+- `author` reads the global developer profile `~/.spec-first/.developer`; if it is unavailable, fall back to the git commit identity or leave it blank, and do not block the change.
+- Append `(user-visible)` for user-visible changes; if the changelog entry is missing, refuse to generate the source change.
 <!-- spec-first:lang:end -->
 
 <!-- spec-first:bootstrap:start -->
-## Workflow 入口治理（由 spec-first 管理）
+## Workflow Entry Governance
 
-- 本 block 是 spec-first workflow 入口提醒；`using-spec-first` 是 standalone meta skill，不是 workflow command
-- 修改文件、运行会改变状态的命令、或做架构/prompt/workflow 决策前，先判断是否应进入公开 spec-first workflow；轻量问答和窄事实查询可直接回答
-- 按当前用户意图选择一个最匹配入口；不要默认进入 `spec-brainstorm`，也不要自动串联多个 workflow
-- 如果用户询问下一步、该用哪个命令或不知道 workflow，按 `using-spec-first` 的 guide mode 推荐一个公开入口、一句理由和一个下一步动作
-- 如果已经在 spec-first workflow 中或作为 bounded subagent 执行，遵循当前 workflow/父任务范围，不重新入口分流
-- 父级多仓 workspace 的只读代码问题可使用 `workspace-graph-targets.v1` advisory facts 做候选 repo 发现并优先 GitNexus；写入、修复、测试、review autofix 或 commit 前仍必须有明确 `target_repo` / per-child scope
-- Codex workflow 入口使用 `$spec-*`
-- 不要把 `using-spec-first` 写成 `/spec:*` 或 command-backed workflow
-- 顶层 Codex orchestrator 在准备进入公开 `$spec-*` workflow 前，可 best-effort 运行 `spec-first startup-reminder --codex` 做只读版本提醒；缺失、失败或无输出都必须忽略，不阻塞路由
-- 该提醒只指向 `$spec-update` 由用户自主决策升级；bounded subagents、leaf reviewers、worker agents 不运行该检查，也不写 cooldown 状态
-- 常见入口锚点：环境/MCP→`$spec-mcp-setup`；graph readiness 编译→`$spec-graph-bootstrap`；项目规范/胶水基线→`$spec-standards`；更新/runtime 修复→`$spec-update`；bug/失败→`$spec-debug`；代码/文档评审→`$spec-code-review`/`$spec-doc-review`；需求/计划/任务编译/执行→`$spec-brainstorm`/`$spec-plan`/`spec-write-tasks`（standalone skill）/`$spec-work`；可度量优化→`$spec-optimize`
-- 完整选择策略、优先级和 red flags 由 spec-first 随包的 `using-spec-first` 维护；本 block 只保留启动提醒、host 入口边界和少量锚点
-- 不要直接暴露 internal-only skills：`spec-session-inventory`、`spec-session-extract`
+- This block is the using-spec-first minimal entry anchor (injected at session start, present from the start); the full route map, boundaries, and exceptions still live in `skills/using-spec-first/SKILL.md`
+- **When to enter a workflow**: before substantial work (editing code/docs/config/runtime assets; starting implementation/debug/review/plan/setup/update/optimization/knowledge capture; running state-changing commands; architecture/prompt/workflow/contract decisions; adding/removing durable knowledge), decide whether to enter a public spec-first workflow
+- **When to just answer**: lightweight factual Q&A, current-context explanations, narrow lookups (where is X used), and current conversation/user-provided single-document summaries may be answered directly or with bounded reads; workflow-first does NOT mean brainstorming-first
+- **When NOT to reroute**: if already inside a public workflow (follow its SKILL; reroute only when the user changes the goal, the workflow explicitly hands off, or the request is clearly out of scope) or dispatched as a bounded subagent/worker (complete the bounded task; do not restart routing)
+- **How to route**: immediate intent beats keywords and broad subject area; honor an explicitly invoked current-host public workflow; otherwise pick one entrypoint and state one reason; do not default to `spec-brainstorm` or chain workflows automatically
+- **Common entry anchors**: setup/runtime→`$spec-mcp-setup` or terminal `spec-first update`; failures→`$spec-debug`; review→`$spec-code-review`/`$spec-doc-review`; definition→`$spec-ideate`/`$spec-brainstorm`/`$spec-prd`; optimization→`$spec-optimize`; plan/execute→`$spec-plan`/`$spec-work`; knowledge→`$spec-compound`/`$spec-compound-refresh`; read the SKILL for the complete map
+- User-visible output language follows this file's `spec-first:lang` managed block; skill/agent/template source language and conversation inertia must not override it unless the user explicitly requests another language
+- Parent multi-repo workspace: writes, fixes, tests, review autofix, or commits require explicit `target_repo` / per-child scope; read-only orientation should use bounded direct reads and state target-repo assumptions
+- Runtime context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`) by default; only setup/update/runtime-drift/audit/governance-health tasks read them when explicitly needed
+- Before architecture/prompt/workflow/contract or source/runtime judgments, read `docs/10-prompt/结构化项目角色契约.md` as needed; scripts/tools produce deterministic facts, while the LLM owns semantic routing judgment
+- **Anti-rationalization red flags** (stop when these thoughts appear): "I'll just edit the file first" → first check whether this is work/debug/update/compound-refresh; "just a quick architecture/prompt change" → architecture/prompt/workflow/contract changes ARE substantial; "I need to inspect a bunch of files first" → do a minimal fact check only, route if already clear; "review needed but I'll answer informally" → use code-review/doc-review when the target is concrete; "a helper skill exists so I should expose it" → only public workflows are user entrypoints, internal helpers stay hidden
+- Codex workflow entrypoints use `$spec-*`
+- Do not write `using-spec-first` as `/spec:*` or as a command-backed workflow; do not expose internal-only skills directly, for example `git-worktree`
+- Codex: before entering public `$spec-*`, a top-level orchestrator may best-effort run `spec-first startup-reminder --codex`; failure/empty output must not block routing, only points to running `spec-first update` in the terminal, and bounded subagents, leaf reviewers, and worker agents do not run it
+- Codex: invoking public `$spec-*` authorizes the workflow itself, not `spawn_agent`; for example, `$spec-doc-review` without explicit subagents/personas/delegated/parallel wording uses the documented fallback with `dispatch_authorization_missing`; for multi-persona/subagent review, ask for `subagents` or `personas` in the request
 <!-- spec-first:bootstrap:end -->
-
-<!-- spec-first:coding-guidelines:start -->
-## 编码执行准则（由 spec-first 管理）
-
-### 1. 编码前思考
-
-**不要假设。不要隐藏困惑。呈现权衡。**
-
-LLM 经常默默选择一种解释然后执行。这个原则强制明确推理：
-
-- 明确说明假设：如果不确定，询问而不是猜测。
-- 呈现多种解释：当存在歧义时，不要默默选择。
-- 适时提出异议：如果存在更简单的方法，说出来。
-- 困惑时停下来：指出不清楚的地方并要求澄清。
-
-### 2. 简洁优先
-
-**用最少的代码解决问题。不要过度推测。**
-
-对抗过度工程的倾向：
-
-- 不要添加要求之外的功能。
-- 不要为一次性代码创建抽象。
-- 不要添加未要求的“灵活性”或“可配置性”。
-- 不要为不可能发生的场景做错误处理。
-- 如果 200 行代码可以写成 50 行，重写它。
-
-检验标准：资深工程师会觉得这过于复杂吗？如果是，简化。
-
-### 3. 精准修改
-
-**只碰必须碰的。只清理自己造成的混乱。**
-
-编辑已有代码时：
-- 不要“改进”相邻的代码、注释或格式。
-- 不要重构没坏的东西。
-- 匹配现有风格，即使你更倾向于不同的写法。
-- 如果注意到无关的死代码，提一下，不要删除它。
-
-当你的改动产生孤儿代码时：
-- 删除因你的改动而变得无用的导入 / 变量 / 函数。
-- 不要删除预先存在的死代码，除非被要求。
-
-检验标准：每一行修改都应该能直接追溯到用户的请求。
-
-### 4. 目标驱动执行
-
-**定义成功标准。循环直到验证通过。**
-
-将指令式任务转化为可验证的目标：
-
-- “添加验证” → “为无效输入编写测试，然后让它们通过”
-- “修复 bug” → “编写重现 bug 的测试，然后让它通过”
-- “重构 X” → “确保重构前后测试都能通过”
-
-对于多步骤任务，说明一个简短的计划：
-```
-1. [步骤] → 验证: [检查]
-2. [步骤] → 验证: [检查]
-3. [步骤] → 验证: [检查]
-```
-
-强有力的成功标准让 LLM 能够独立循环执行。弱标准（“让它工作”）需要不断澄清。
-<!-- spec-first:coding-guidelines:end -->
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence

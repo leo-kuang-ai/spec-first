@@ -1,6 +1,7 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.3 2026-08-28 00:52:00 leokuang: docs(init): AGENTS/CLAUDE managed blocks 刷新为英文新治理模板，lang 切换 English、bootstrap 更新为 Workflow Entry Governance 并移除 coding-guidelines block (user-visible)
 - v1.6.3 2026-08-28 00:48:00 leokuang: chore(runtime): 取消跟踪生成式 .claude/hooks/session-start，.gitignore 纳入 spec-first managed 忽略块并在 settings.json 注册 spec-plan-guard hook (user-visible)
 - v1.6.3 2026-05-05 04:17:11 leokuang: fix(dispatch): 收口 CE 血缘 skill dispatch 边界，修复 Codex runtime inline 降级并补跨 skill 回归测试 (user-visible)
 - v1.6.3 2026-05-05 03:46:35 leokuang: docs(plan): 将 CE dispatch control-plane 修复方案规范化为正式 plan，保留 plan-local spec_id 并移除临时 review 草稿 (user-visible)
