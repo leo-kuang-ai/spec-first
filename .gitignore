@@ -66,3 +66,34 @@ __pycache__/
 *.pyc
 *.pyo
 .gitnexus
+
+# spec-first:start
+# spec-first generated runtime assets
+.claude/commands/spec/
+.claude/skills/
+.claude/spec-first/
+.claude/agents/
+.claude/hooks/session-start
+.claude/hooks/spec-plan-guard
+.claude/tasks/
+.claude/worktrees/
+.codex/
+.agents/skills/
+.context/spec-first/
+
+# spec-first local setup and workflow runtime artifacts
+.spec-first/*.local.yaml
+.spec-first/config.local.yaml
+.spec-first/config/*.json
+.spec-first/audits/
+.spec-first/governance/
+.spec-first/app-audit/
+.spec-first/workflows/
+.spec-first/workspace/
+.spec-first/sessions/
+
+# optional provider local artifacts
+.codegraph/
+graphify-out/cost.json
+graphify-out/.graphify_python
+# spec-first:end

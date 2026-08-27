@@ -10,6 +10,17 @@
           }
         ]
       }
+    ],
+    "UserPromptExpansion": [
+      {
+        "matcher": "spec:plan",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/spec-plan-guard"
+          }
+        ]
+      }
     ]
   }
 }
