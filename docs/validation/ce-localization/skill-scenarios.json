@@ -5,24 +5,38 @@
   "single_writer": "ce-localization-scenario-writer",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
+    "head": "cda386695f40f0b8e56952eb064ed90c92857095",
     "dirty": true,
     "dirty_paths": [
+      "AGENTS.md",
       "CHANGELOG.md",
-      "docs/10-prompt/spec-first\\344\\273\\243\\347\\240\\201\\345\\256\\241\\346\\237\\245\\346\\226\\271\\346\\241\\210.md",
-      "docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/04-workflows-artifacts-map.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/10-\\344\\272\\247\\347\\211\\251\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
+      "docs/catalog/runtime-capabilities.md",
+      "docs/plans/2026-08-28-001-feat-ai-dev-knowledge-and-process-contract-plan.md",
+      "docs/plans/2026-08-28-002-refactor-knowledge-layer-slice1-and-b-line-architecture-plan.md",
+      "scripts/check-ce-localization-review.cjs",
       "scripts/generate-ce-localization-closeout.cjs",
-      "scripts/verify-with-gate.sh",
-      "skills/_shared/README.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-project-rules/SKILL.md",
+      "skills/spec-project-rules/evals/trigger-cases.json",
+      "skills/spec-project-rules/references/knowledge-format.md",
+      "skills/spec-project-rules/references/mining-method.md",
+      "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "skills/using-spec-first/references/public-route-map.md",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "tests/integration/init-six-host-lifecycle.integration.test.js",
       "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-upstream-reconciliation-v2.test.js",
-      "tests/unit/mcp-setup-host-config.test.js"
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/doctor-runtime-assets.test.js",
+      "tests/unit/spec-project-rules-contracts.test.js",
+      "tests/unit/spec-project-rules-scripts.test.js"
     ],
-    "dirty_path_manifest_sha256": "846ffcb265bc133d50b794aa6db7de6f74c9d897c735ef7947629bc64ffe1965",
-    "source_tree_hash": "d181026578b2fa15342ebae3e4e5f4b6743a319816e4671827e9012a51858ac0",
-    "inventory_hash": "10b01c2ee73b1eb4b16eada1cc8bab2b9e419a85e0f6825b1305915015ee4ede",
+    "dirty_path_manifest_sha256": "ceff7530a08d5ddf9659652456c833e22592eb50cf0318fd6edc6f1133e0b98c",
+    "source_tree_hash": "b2a360eda9ba1b10d35c0d4314292411330f58c43bce3e7645ba9508439da3b3",
+    "inventory_hash": "cbecc17ffa1b5601818a0c78c1fe14d6cb8c7cfb12c02aec82360759b5150614",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -57,7 +71,7 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e26f46a69e758f5fe46011fb6675ef33d0c69a5af6d4dbfb15f41ab79d0b53cd",
+  "inventory_sha256": "2a78f12ffb874f01ace1bcaaf9093c71f07b7f29d1fb6342ffbcae132c08d821",
   "scenario_fingerprint_contract_ref": "docs/contracts/workflows/scenario-capability-matrix.md",
   "scenarios": [
     {
@@ -974,6 +988,52 @@
         "AE5"
       ],
       "expected_rnd_gain": "support evidence-based prioritization",
+      "scenario_fingerprint_ref": "docs/contracts/workflows/scenario-capability-matrix.md",
+      "limitations": [
+        "Source and focused-contract evidence do not prove field adoption or outcome."
+      ],
+      "status": "confirmed-source-contract"
+    },
+    {
+      "scenario_id": "SCN-SPEC-PROJECT-RULES",
+      "skill_id": "spec-project-rules",
+      "scenario_kind": "user-facing",
+      "visibility": "public",
+      "actor": "A3",
+      "actor_outcome": "evidence-graded architecture knowledge base",
+      "user_task": "map and maintain monorepo architecture boundary knowledge",
+      "inputs": [
+        "user intent for map and maintain monorepo architecture boundary knowledge",
+        "current source and relevant evidence for spec-project-rules"
+      ],
+      "outputs": [
+        "evidence-graded architecture knowledge base",
+        "explicit limitations and next action"
+      ],
+      "failure_cost": "wrong owner, hidden side effect, stale evidence or rework in the affected delivery stage",
+      "canonical_owner": "skills/spec-project-rules",
+      "source_refs": [
+        "skills/spec-project-rules/SKILL.md"
+      ],
+      "downstream_consumers": [
+        "spec-work",
+        "spec-code-review",
+        "spec-compound"
+      ],
+      "requirement_refs": [
+        "R2",
+        "R3",
+        "R5",
+        "R6",
+        "R7",
+        "R19"
+      ],
+      "acceptance_example_refs": [
+        "AE1",
+        "AE3",
+        "AE5"
+      ],
+      "expected_rnd_gain": "align AI changes with project boundaries",
       "scenario_fingerprint_ref": "docs/contracts/workflows/scenario-capability-matrix.md",
       "limitations": [
         "Source and focused-contract evidence do not prove field adoption or outcome."
@@ -6145,6 +6205,72 @@
       "source_sha256": "002de8c569986d36d40020ffbbda43fdb3115c8cdb219aa628d88b882990dda3"
     },
     {
+      "path": "skills/spec-project-rules/evals/trigger-cases.json",
+      "owning_skill": "spec-project-rules",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "4b72e2aaaec68b5610634a1f7fc88cfe80e752ab0d4858c971b274ac7f16a1e3"
+    },
+    {
+      "path": "skills/spec-project-rules/references/knowledge-format.md",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "76dfcafc592b42f0ebd300f01de2063778c90e1f789ee150c3d0ec5f2dc99505"
+    },
+    {
+      "path": "skills/spec-project-rules/references/mining-method.md",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "ecd1dfa45bb7aa01f1d1866e13d1a019dfedc947fa9e75f2f278de20f614200c"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "owning_skill": "spec-project-rules",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "4d51ede233b3b015de91843da9b2f1ca90582cd1cb41f4fecd13af40a3bd4a8f"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "owning_skill": "spec-project-rules",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "196f08ccf9446a2a3547a530b58aa4ec85a697920018f8f20c53b62f1391c5bb"
+    },
+    {
+      "path": "skills/spec-project-rules/SKILL.md",
+      "owning_skill": "spec-project-rules",
+      "path_role": "entry-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "ea913747325d861b07b077637a61681e598cd13b1d45fad5292e1f5f04301285"
+    },
+    {
       "path": "skills/spec-promote/references/spiral-cli.md",
       "owning_skill": "spec-promote",
       "path_role": "reference-contract",
@@ -7187,7 +7313,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "42757be1d4adb3796447cec0daf7e7184ce70f35920a4ca6378ae2bc2699a3d7"
+      "source_sha256": "41c9d338217ad31ab904d38d882eca18af66c1089f29d28d19a55dd906164d70"
     },
     {
       "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
@@ -8023,7 +8149,7 @@
       "scenario_ids": [
         "SCN-USING-SPEC-FIRST"
       ],
-      "source_sha256": "79ba60523dcbc08b355f321297b9ef17b269a9d35a431cdffd1c19795f816f0a"
+      "source_sha256": "1c09aa00d5a2d667219448486d684354e3d221bc479178a919b6655603b8d24d"
     },
     {
       "path": "skills/using-spec-first/SKILL.md",
@@ -8056,7 +8182,7 @@
       "scenario_ids": [
         "SCN-SPEC-APP-CONSISTENCY-AUDIT"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/app-consistency-audit.md",
@@ -8122,7 +8248,7 @@
       "scenario_ids": [
         "SCN-SPEC-BRAINSTORM"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/brainstorm.md",
@@ -8134,6 +8260,17 @@
         "SCN-SPEC-BRAINSTORM"
       ],
       "source_sha256": "84a24437d15827d1d82e22652d103178d3bdb70556450006c68db783400d27bc"
+    },
+    {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "owning_skill": "spec-brainstorm",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-BRAINSTORM"
+      ],
+      "source_sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997"
     },
     {
       "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -8342,7 +8479,7 @@
       "scenario_ids": [
         "SCN-SPEC-CODE-REVIEW"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/code-review.md",
@@ -8354,6 +8491,17 @@
         "SCN-SPEC-CODE-REVIEW"
       ],
       "source_sha256": "c29769d30f27d752b173409de535f111cc6532dc25dd71e85798a1e1e9e993f5"
+    },
+    {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "owning_skill": "spec-code-review",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-CODE-REVIEW"
+      ],
+      "source_sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997"
     },
     {
       "path": "tests/unit/anti-rationalization-contracts.test.js",
@@ -8551,7 +8699,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMMIT-PUSH-PR"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -8595,7 +8743,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMMIT"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -8650,7 +8798,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND-REFRESH"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/compound-refresh.md",
@@ -8771,7 +8919,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/compound.md",
@@ -8785,6 +8933,17 @@
       "source_sha256": "6233908b4475eb5d3d4b3fea54cd24e99f21db9a90b2fa260fd4902bc04276f2"
     },
     {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "owning_skill": "spec-compound",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-COMPOUND"
+      ],
+      "source_sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997"
+    },
+    {
       "path": "tests/unit/ce-localization-closeout-contracts.test.js",
       "owning_skill": "spec-compound",
       "path_role": "evaluation",
@@ -8793,7 +8952,7 @@
       "scenario_ids": [
         "SCN-SPEC-COMPOUND"
       ],
-      "source_sha256": "36bff143ff183507a78fac0ff1d4ba320a6f7993e70fd9ec97ea9a574d279c19"
+      "source_sha256": "86e01aa9306ac56500b548b7b5bd1330a37025dc7d5fccfe6e32a2526b5268ae"
     },
     {
       "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -8980,7 +9139,7 @@
       "scenario_ids": [
         "SCN-SPEC-DEBUG"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/debug.md",
@@ -9079,7 +9238,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOC-REVIEW"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/doc-review.md",
@@ -9189,7 +9348,7 @@
       "scenario_ids": [
         "SCN-SPEC-DOGFOOD"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/dogfood.md",
@@ -9266,7 +9425,7 @@
       "scenario_ids": [
         "SCN-SPEC-EXPLAIN"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -9321,7 +9480,7 @@
       "scenario_ids": [
         "SCN-SPEC-HANDOFF"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/spec-handoff-contracts.test.js",
@@ -9343,7 +9502,7 @@
       "scenario_ids": [
         "SCN-SPEC-IDEATE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/ideate.md",
@@ -9355,6 +9514,17 @@
         "SCN-SPEC-IDEATE"
       ],
       "source_sha256": "8ecf7021faa885daa9dbcd7acc255a46baf5d051e663a04963fa014f142ccff5"
+    },
+    {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "owning_skill": "spec-ideate",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-IDEATE"
+      ],
+      "source_sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -9486,7 +9656,7 @@
       "scenario_ids": [
         "SCN-SPEC-LFG"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/integration/spec-lfg-fingerprint-projection.integration.test.js",
@@ -9640,7 +9810,7 @@
       "scenario_ids": [
         "SCN-SPEC-OPTIMIZE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "src/cli/helpers/secret-deny-patterns.js",
@@ -9663,6 +9833,17 @@
         "SCN-SPEC-OPTIMIZE"
       ],
       "source_sha256": "e0310db076a278aa01312286376041bc9eb870fbd4ff6f415c131784e1b269f3"
+    },
+    {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "owning_skill": "spec-optimize",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-OPTIMIZE"
+      ],
+      "source_sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -9772,7 +9953,7 @@
       "scenario_ids": [
         "SCN-SPEC-PLAN"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/plan.md",
@@ -9794,7 +9975,18 @@
       "scenario_ids": [
         "SCN-SPEC-PLAN"
       ],
-      "source_sha256": "200789a0deef116ac99b7c77395a629109c7f47c21dc197e2eb9d745f7c1a544"
+      "source_sha256": "d7ce399c00c9dcaeeab51600400a0a5dffd5f196d6c0cb1a6aa1faabe0ab98e2"
+    },
+    {
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "owning_skill": "spec-plan",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PLAN"
+      ],
+      "source_sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997"
     },
     {
       "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -9992,7 +10184,7 @@
       "scenario_ids": [
         "SCN-SPEC-POLISH"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/polish.md",
@@ -10047,7 +10239,7 @@
       "scenario_ids": [
         "SCN-SPEC-POV"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -10146,7 +10338,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRD"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/prd.md",
@@ -10347,6 +10539,17 @@
       "source_sha256": "31ca44e12da1ae73cae183be29a42e307b8626df7723e1f5b02f5a6d74f5a7a7"
     },
     {
+      "path": "tests/unit/spec-prd-finding-schema-freeze.test.js",
+      "owning_skill": "spec-prd",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PRD"
+      ],
+      "source_sha256": "1f0ff32ba60127bbb51a88992365b5c7a123aa934b0927850bfb51d4b281a1a6"
+    },
+    {
       "path": "tests/unit/spec-prd-hook-contracts.test.js",
       "owning_skill": "spec-prd",
       "path_role": "evaluation",
@@ -10410,7 +10613,7 @@
       "scenario_ids": [
         "SCN-SPEC-PRODUCT-PULSE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -10468,6 +10671,50 @@
       "source_sha256": "0adb2d8c67e66335cbc0fb11b95ec7639544aa79e6d234c2a3f17dc22382fa72"
     },
     {
+      "path": "docs/contracts/project-graph-consumption.md",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "1ac40abd06793720ca0ba9a9dad723f249548383160485cf4594fe793ef3427c"
+    },
+    {
+      "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "owning_skill": "spec-project-rules",
+      "path_role": "support-asset",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
+    },
+    {
+      "path": "tests/unit/spec-project-rules-contracts.test.js",
+      "owning_skill": "spec-project-rules",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "dc68a533a4702f120a73d9e1f8da96b52edb7eb8270148d3cb2bad9c67b92d86"
+    },
+    {
+      "path": "tests/unit/spec-project-rules-scripts.test.js",
+      "owning_skill": "spec-project-rules",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "scenario-bound",
+      "scenario_ids": [
+        "SCN-SPEC-PROJECT-RULES"
+      ],
+      "source_sha256": "c63ff9deb6ea376b0fdf1cac0ddfe88357b4a7856e28db1ffe83f6b5fe5b9078"
+    },
+    {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
       "owning_skill": "spec-promote",
       "path_role": "support-asset",
@@ -10476,7 +10723,7 @@
       "scenario_ids": [
         "SCN-SPEC-PROMOTE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -10509,7 +10756,7 @@
       "scenario_ids": [
         "SCN-SPEC-PROTOTYPE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/integration/spec-prototype-human-journey.integration.test.js",
@@ -10542,7 +10789,7 @@
       "scenario_ids": [
         "SCN-SPEC-RESOLVE-PR-FEEDBACK"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -10597,7 +10844,7 @@
       "scenario_ids": [
         "SCN-SPEC-RIFFREC-FEEDBACK-ANALYSIS"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -10696,7 +10943,7 @@
       "scenario_ids": [
         "SCN-SPEC-RULE-MINER"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "docs/contracts/project-graph-consumption.md",
@@ -10729,7 +10976,7 @@
       "scenario_ids": [
         "SCN-SPEC-RUNTIME-SETUP"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "src/verification/profile-loader.js",
@@ -11235,7 +11482,7 @@
       "scenario_ids": [
         "SCN-SPEC-SIMPLIFY-CODE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -11279,7 +11526,7 @@
       "scenario_ids": [
         "SCN-SPEC-STRATEGY"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -11290,7 +11537,7 @@
       "scenario_ids": [
         "SCN-SPEC-SWEEP"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -11422,7 +11669,7 @@
       "scenario_ids": [
         "SCN-SPEC-TEST-BROWSER"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/low-findings-cleanup-contracts.test.js",
@@ -11466,7 +11713,7 @@
       "scenario_ids": [
         "SCN-SPEC-TEST-XCODE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
@@ -11521,7 +11768,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORK"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "src/cli/task-pack.js",
@@ -11873,7 +12120,7 @@
       "scenario_ids": [
         "SCN-SPEC-WORKTREE"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/unit/ce-post-3-20-calibration-contracts.test.js",
@@ -11939,7 +12186,7 @@
       "scenario_ids": [
         "SCN-SPEC-WRITE-SKILL"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "templates/claude/commands/spec/write-skill.md",
@@ -12115,7 +12362,7 @@
       "scenario_ids": [
         "SCN-SPEC-WRITE-TASKS"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "src/cli/task-pack.js",
@@ -12258,7 +12505,7 @@
       "scenario_ids": [
         "SCN-USING-SPEC-FIRST"
       ],
-      "source_sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a"
+      "source_sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad"
     },
     {
       "path": "tests/integration/init-six-host-lifecycle.integration.test.js",
@@ -12269,7 +12516,7 @@
       "scenario_ids": [
         "SCN-USING-SPEC-FIRST"
       ],
-      "source_sha256": "200789a0deef116ac99b7c77395a629109c7f47c21dc197e2eb9d745f7c1a544"
+      "source_sha256": "d7ce399c00c9dcaeeab51600400a0a5dffd5f196d6c0cb1a6aa1faabe0ab98e2"
     },
     {
       "path": "tests/unit/instruction-bootstrap.test.js",

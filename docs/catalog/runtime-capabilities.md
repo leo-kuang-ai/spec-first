@@ -18,16 +18,16 @@
 
 | 范围 | 当前值 |
 |---|---|
-| Bundled source skills | 36 |
+| Bundled source skills | 37 |
 | Bundled source agents | 0 |
 | Bundled agent support files | 0 |
-| Governance records by entry surface | internal_only: 4, standalone_skill: 15, workflow_command: 17 |
-| Claude Code runtime delivery | 17 commands, 17 workflow skills, 15 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 17 workflow skills, 15 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 17 workflow skills, 15 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 17 workflow skills, 15 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| Qoder runtime delivery | 17 commands, 17 workflow skills, 15 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
-| OpenCode runtime delivery | 17 commands, 17 workflow skills, 15 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Governance records by entry surface | internal_only: 4, standalone_skill: 16, workflow_command: 17 |
+| Claude Code runtime delivery | 17 commands, 17 workflow skills, 16 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 17 workflow skills, 16 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 17 workflow skills, 16 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 17 workflow skills, 16 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 17 commands, 17 workflow skills, 16 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
+| OpenCode runtime delivery | 17 commands, 17 workflow skills, 16 standalone skills, 4 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | OpenCode support status | preview |
@@ -91,6 +91,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 | spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | Run the full hands-off engineering pipeline from planning through a green PR. Use only when the current user explicitly requests spec-lfg or selects an option that clearly states it will commit, push, open a PR, and watch CI. |
 | spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | Give a decisive, project-grounded verdict on an external input — judged against the current project, not in the abstract. Use to decide whether to adopt, switch to, or revisit a technology, library, pattern, platform, or architecture; to compare a candidate against what the project already uses; to judge whether an external change (a CVE, a deprecation, an ecosystem shift) actually affects this project; or for a mid-session second opinion. Always returns a project-specific verdict, so it is not for neutral explainers or generating options. |
 | spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | Generate time-windowed product pulse reports from configured signals. |
+| spec-project-rules | standalone skill: spec-project-rules | standalone skill: spec-project-rules | standalone skill: spec-project-rules | standalone skill: spec-project-rules | standalone skill: spec-project-rules | standalone skill: spec-project-rules | Use this standalone skill when the user asks to build or refresh a project architecture knowledge base before development in a multi-end monorepo (app/h5/admin/backend services in one workspace), capture which end owns what, dependency direction, and shared-layer reuse contracts into a fixed directory, or incrementally write newly confirmed conventions back into that knowledge base during development. Do not use for mining coding-style rules only, capturing a single solved problem as learning, code review/debug/refactor work, linter/formatter configuration, or generated runtime mirror edits. |
 | spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | Draft launch or promotion copy for a shipped feature. |
 | spec-prototype | standalone skill: spec-prototype | standalone skill: spec-prototype | standalone skill: spec-prototype | standalone skill: spec-prototype | standalone skill: spec-prototype | standalone skill: spec-prototype | Build a throwaway prototype to answer an unresolved product behavior or visual question before implementation. Use when the question needs a runnable artifact and a human must experience it; do not use for product discovery, routine polish, production implementation, or unattended runs. |
 | spec-resolve-pr-feedback | standalone skill: spec-resolve-pr-feedback | standalone skill: spec-resolve-pr-feedback | standalone skill: spec-resolve-pr-feedback | standalone skill: spec-resolve-pr-feedback | standalone skill: spec-resolve-pr-feedback | standalone skill: spec-resolve-pr-feedback | Resolve PR review feedback by evaluating validity and fixing issues with conflict-aware resolver dispatch. Use when addressing PR review comments, resolving review threads, or fixing code review feedback. |

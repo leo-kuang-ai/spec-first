@@ -35,6 +35,7 @@
 | `docs/solutions/**/*` | 知识沉淀 | `spec-compound` / `spec-compound-refresh` | 保存已解决问题的可复用工程经验；refresh 负责过时/重叠/漂移清理 | 通常提交 |
 | `docs/dogfood-reports/*-dogfood.md` | 分支/PR 浏览器 dogfood | `spec-dogfood` | 场景矩阵、修复记录、阻断项与 readiness 结论 | 通常提交；跨会话可 resume |
 | `docs/ai/project-rules.md` | 项目约定挖掘 | `spec-rule-miner` | 从代码证据沉淀 AI coding 规则；`AGENTS.md`/`CLAUDE.md` 常写 pointer | 通常提交 |
+| `docs/architecture/**` | 架构知识库挖掘/回写 | `spec-project-rules` | 从代码证据沉淀各端职责、依赖方向规则、shared 层复用契约与高价值隐式约定；`AGENTS.md`/`CLAUDE.md` 常写 pointer | 通常提交 |
 | `STRATEGY.md` | 产品方向 | `spec-strategy` | 产品策略与 persona / metrics 等方向文档 | 通常提交 |
 | `skills/**`（source） | Skill 包 create/revise | `spec-write-skill` | 项目拥有的 Agent Skill source；runtime 由 `spec-first init` 投影 | 提交 source；selected-host generated mirror 作为 checked-in delivery projection 默认也跟随目标项目提交，但不手改 mirror |
 

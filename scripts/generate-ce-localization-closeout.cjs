@@ -56,7 +56,7 @@ function refreshReport(deterministic) {
 const strings = (value) => Array.isArray(value) ? value : [value];
 const LOCAL_ONLY_SKILL_IDS = [
   'spec-app-consistency-audit', 'spec-polish', 'spec-prd',
-  'spec-rule-miner', 'spec-write-tasks', 'using-spec-first',
+  'spec-project-rules', 'spec-rule-miner', 'spec-write-tasks', 'using-spec-first',
 ];
 
 const skills = [
@@ -80,6 +80,7 @@ const skills = [
   ['spec-pov', 'decisive project-grounded external input verdict', 'A2', 'adopt/defer/reject verdict', 'avoid abstract technology decisions'],
   ['spec-prd', 'brownfield PRD planning readiness', 'A1', 'implementation-ready requirements', 'reduce ambiguity before planning'],
   ['spec-product-pulse', 'time-windowed product signal report', 'A2', 'status-aware pulse report', 'support evidence-based prioritization'],
+  ['spec-project-rules', 'map and maintain monorepo architecture boundary knowledge', 'A3', 'evidence-graded architecture knowledge base', 'align AI changes with project boundaries'],
   ['spec-promote', 'launch or promotion copy for shipped work', 'A1', 'authorized promotion draft', 'communicate shipped value safely'],
   ['spec-prototype', 'throwaway prototype for unresolved behavior', 'A1', 'human-decision prototype receipt', 'resolve behavior uncertainty before production work'],
   ['spec-resolve-pr-feedback', 'evaluate and resolve PR feedback', 'A1', 'conflict-aware landed fixes', 'reduce review turnaround and regressions'],

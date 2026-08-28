@@ -52,6 +52,7 @@ const LOCAL_ONLY_SKILL_IDS = Object.freeze([
   'spec-app-consistency-audit',
   'spec-polish',
   'spec-prd',
+  'spec-project-rules',
   'spec-rule-miner',
   'spec-write-tasks',
   'using-spec-first',

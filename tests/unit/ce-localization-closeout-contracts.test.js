@@ -85,13 +85,13 @@ describe('CE localization closeout artifacts', () => {
     const result = producer.validateCloseoutArtifacts(closeout, deterministic);
 
     expect(result).toEqual({ valid: true, errors: [] });
-    expect(closeout.scenarios.scenarios).toHaveLength(37);
+    expect(closeout.scenarios.scenarios).toHaveLength(38);
     expect(closeout.scenarios.path_coverage).toHaveLength(
       deterministic.inventory.package_path_count
         + deterministic.coverage.coverage_summary.direct_support_relation_count,
     );
     expect(closeout.baselines).toHaveLength(deterministic.inventory.skill_count);
-    expect(closeout.ledger.entries).toHaveLength(523);
+    expect(closeout.ledger.entries).toHaveLength(524);
     expect(closeout.fieldProtocol.overall_status).toBe('not-run');
     expect(closeout.fieldTaskPairs.overall_status).toBe('not-run');
     expect(closeout.fieldResults.overall_status).toBe('not-run');

@@ -4,24 +4,38 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
+    "head": "cda386695f40f0b8e56952eb064ed90c92857095",
     "dirty": true,
     "dirty_paths": [
+      "AGENTS.md",
       "CHANGELOG.md",
-      "docs/10-prompt/spec-first\\344\\273\\243\\347\\240\\201\\345\\256\\241\\346\\237\\245\\346\\226\\271\\346\\241\\210.md",
-      "docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/04-workflows-artifacts-map.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/10-\\344\\272\\247\\347\\211\\251\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
+      "docs/catalog/runtime-capabilities.md",
+      "docs/plans/2026-08-28-001-feat-ai-dev-knowledge-and-process-contract-plan.md",
+      "docs/plans/2026-08-28-002-refactor-knowledge-layer-slice1-and-b-line-architecture-plan.md",
+      "scripts/check-ce-localization-review.cjs",
       "scripts/generate-ce-localization-closeout.cjs",
-      "scripts/verify-with-gate.sh",
-      "skills/_shared/README.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-project-rules/SKILL.md",
+      "skills/spec-project-rules/evals/trigger-cases.json",
+      "skills/spec-project-rules/references/knowledge-format.md",
+      "skills/spec-project-rules/references/mining-method.md",
+      "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "skills/using-spec-first/references/public-route-map.md",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "tests/integration/init-six-host-lifecycle.integration.test.js",
       "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-upstream-reconciliation-v2.test.js",
-      "tests/unit/mcp-setup-host-config.test.js"
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/doctor-runtime-assets.test.js",
+      "tests/unit/spec-project-rules-contracts.test.js",
+      "tests/unit/spec-project-rules-scripts.test.js"
     ],
-    "dirty_path_manifest_sha256": "846ffcb265bc133d50b794aa6db7de6f74c9d897c735ef7947629bc64ffe1965",
-    "source_tree_hash": "d181026578b2fa15342ebae3e4e5f4b6743a319816e4671827e9012a51858ac0",
-    "inventory_hash": "10b01c2ee73b1eb4b16eada1cc8bab2b9e419a85e0f6825b1305915015ee4ede",
+    "dirty_path_manifest_sha256": "ceff7530a08d5ddf9659652456c833e22592eb50cf0318fd6edc6f1133e0b98c",
+    "source_tree_hash": "b2a360eda9ba1b10d35c0d4314292411330f58c43bce3e7645ba9508439da3b3",
+    "inventory_hash": "cbecc17ffa1b5601818a0c78c1fe14d6cb8c7cfb12c02aec82360759b5150614",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -56,19 +70,19 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "e26f46a69e758f5fe46011fb6675ef33d0c69a5af6d4dbfb15f41ab79d0b53cd",
+  "inventory_sha256": "2a78f12ffb874f01ace1bcaaf9093c71f07b7f29d1fb6342ffbcae132c08d821",
   "review_input": {
-    "inventory_sha256": "e26f46a69e758f5fe46011fb6675ef33d0c69a5af6d4dbfb15f41ab79d0b53cd",
-    "package_manifest_sha256": "70b8275534590a555c70da2e35b89de8b4acb7c5dbdfae00fa80948e26871be6",
-    "direct_support_manifest_sha256": "9454014f71866abe264cc4000942b4c316def7e24eff01187fee69f5d495a113",
-    "relation_manifest_sha256": "8d873a6ba3b5a0d535f1d0b4b61354d2412217c6238d2c2ce831e334939c35fd"
+    "inventory_sha256": "2a78f12ffb874f01ace1bcaaf9093c71f07b7f29d1fb6342ffbcae132c08d821",
+    "package_manifest_sha256": "2ba879fa45d297c3a47cfb315d22770d5677b3b53a1d9a8acba2fe30f651a760",
+    "direct_support_manifest_sha256": "8d10d5651ace605b55f48b208ed6ecce76581dc9a1b8c8b0228835a0a010b4e8",
+    "relation_manifest_sha256": "d254bfb25862101d28a2e957c2ee0f8a56bbf3fe69f3f792c4dd916a05c61e34"
   },
   "coverage_summary": {
-    "skill_count": 36,
-    "package_path_count": 571,
-    "package_bytes": 5849662,
-    "direct_support_unique_path_count": 186,
-    "direct_support_relation_count": 392,
+    "skill_count": 37,
+    "package_path_count": 577,
+    "package_bytes": 5913501,
+    "direct_support_unique_path_count": 190,
+    "direct_support_relation_count": 403,
     "excluded_path_count": 1,
     "missing_path_count": 0,
     "hash_mismatch_count": 0
@@ -187,7 +201,7 @@
       "package_root": "skills/spec-brainstorm",
       "entry_path": "skills/spec-brainstorm/SKILL.md",
       "package_path_count": 13,
-      "direct_support_path_count": 17,
+      "direct_support_path_count": 18,
       "package_paths": [
         "skills/spec-brainstorm/references/agents/slack-researcher.md",
         "skills/spec-brainstorm/references/blindspot-pass.md",
@@ -206,6 +220,7 @@
       "direct_support_paths": [
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/brainstorm.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-reconciliation-v2.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -228,7 +243,7 @@
       "package_root": "skills/spec-code-review",
       "entry_path": "skills/spec-code-review/SKILL.md",
       "package_path_count": 53,
-      "direct_support_path_count": 22,
+      "direct_support_path_count": 23,
       "package_paths": [
         "skills/spec-code-review/evals/api-contract-capability-cases.json",
         "skills/spec-code-review/evals/cases/agent-mode-remains-read-only.yaml",
@@ -290,6 +305,7 @@
         "docs/contracts/workflows/scenario-capability-matrix.md",
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/code-review.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/anti-rationalization-contracts.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -349,7 +365,7 @@
       "package_root": "skills/spec-compound",
       "entry_path": "skills/spec-compound/SKILL.md",
       "package_path_count": 21,
-      "direct_support_path_count": 16,
+      "direct_support_path_count": 17,
       "package_paths": [
         "skills/spec-compound/assets/resolution-template.md",
         "skills/spec-compound/evals/examples.json",
@@ -377,6 +393,7 @@
         "docs/contracts/knowledge/knowledge-harness.md",
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/compound.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-localization-closeout-contracts.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -573,7 +590,7 @@
       "package_root": "skills/spec-ideate",
       "entry_path": "skills/spec-ideate/SKILL.md",
       "package_path_count": 12,
-      "direct_support_path_count": 13,
+      "direct_support_path_count": 14,
       "package_paths": [
         "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
         "skills/spec-ideate/references/agents/learnings-researcher.md",
@@ -591,6 +608,7 @@
       "direct_support_paths": [
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/ideate.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -639,7 +657,7 @@
       "package_root": "skills/spec-optimize",
       "entry_path": "skills/spec-optimize/SKILL.md",
       "package_path_count": 18,
-      "direct_support_path_count": 13,
+      "direct_support_path_count": 14,
       "package_paths": [
         "skills/spec-optimize/evals/examples.json",
         "skills/spec-optimize/evals/README.md",
@@ -666,6 +684,7 @@
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "src/cli/helpers/secret-deny-patterns.js",
         "templates/claude/commands/spec/optimize.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
         "tests/unit/dispatch-authorization-matrix-contracts.test.js",
         "tests/unit/opencode-adapter.test.js",
@@ -681,7 +700,7 @@
       "package_root": "skills/spec-plan",
       "entry_path": "skills/spec-plan/SKILL.md",
       "package_path_count": 61,
-      "direct_support_path_count": 21,
+      "direct_support_path_count": 22,
       "package_paths": [
         "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
         "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
@@ -750,6 +769,7 @@
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/plan.md",
         "tests/integration/init-six-host-lifecycle.integration.test.js",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
         "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -837,7 +857,7 @@
       "package_root": "skills/spec-prd",
       "entry_path": "skills/spec-prd/SKILL.md",
       "package_path_count": 34,
-      "direct_support_path_count": 27,
+      "direct_support_path_count": 28,
       "package_paths": [
         "skills/spec-prd/assets/overlays/securities.md",
         "skills/spec-prd/assets/templates/00-generic.md",
@@ -897,6 +917,7 @@
         "tests/unit/spec-prd-decision-card-contracts.test.js",
         "tests/unit/spec-prd-exit-safety.test.js",
         "tests/unit/spec-prd-finalize-transition.test.js",
+        "tests/unit/spec-prd-finding-schema-freeze.test.js",
         "tests/unit/spec-prd-hook-contracts.test.js",
         "tests/unit/spec-prd-lite-profile-contracts.test.js",
         "tests/unit/spec-prd-plan-handoff-contracts.test.js",
@@ -922,6 +943,27 @@
         "tests/unit/mcp-setup-config-consumers.test.js",
         "tests/unit/spec-product-pulse-contracts.test.js",
         "tests/unit/specialized-skill-calibration-contracts.test.js"
+      ]
+    },
+    {
+      "skill_id": "spec-project-rules",
+      "package_root": "skills/spec-project-rules",
+      "entry_path": "skills/spec-project-rules/SKILL.md",
+      "package_path_count": 6,
+      "direct_support_path_count": 4,
+      "package_paths": [
+        "skills/spec-project-rules/evals/trigger-cases.json",
+        "skills/spec-project-rules/references/knowledge-format.md",
+        "skills/spec-project-rules/references/mining-method.md",
+        "skills/spec-project-rules/scripts/extract-deps.cjs",
+        "skills/spec-project-rules/scripts/verify-deps.cjs",
+        "skills/spec-project-rules/SKILL.md"
+      ],
+      "direct_support_paths": [
+        "docs/contracts/project-graph-consumption.md",
+        "src/cli/contracts/dual-host-governance/skills-governance.json",
+        "tests/unit/spec-project-rules-contracts.test.js",
+        "tests/unit/spec-project-rules-scripts.test.js"
       ]
     },
     {
@@ -5835,6 +5877,72 @@
       "terminal_disposition": "included-canonical-skill-source"
     },
     {
+      "path": "skills/spec-project-rules/evals/trigger-cases.json",
+      "sha256": "4b72e2aaaec68b5610634a1f7fc88cfe80e752ab0d4858c971b274ac7f16a1e3",
+      "bytes": 18225,
+      "line_count": 389,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/references/knowledge-format.md",
+      "sha256": "76dfcafc592b42f0ebd300f01de2063778c90e1f789ee150c3d0ec5f2dc99505",
+      "bytes": 8688,
+      "line_count": 112,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/references/mining-method.md",
+      "sha256": "ecd1dfa45bb7aa01f1d1866e13d1a019dfedc947fa9e75f2f278de20f614200c",
+      "bytes": 9283,
+      "line_count": 83,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "sha256": "4d51ede233b3b015de91843da9b2f1ca90582cd1cb41f4fecd13af40a3bd4a8f",
+      "bytes": 8125,
+      "line_count": 220,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "sha256": "196f08ccf9446a2a3547a530b58aa4ec85a697920018f8f20c53b62f1391c5bb",
+      "bytes": 5725,
+      "line_count": 154,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/SKILL.md",
+      "sha256": "ea913747325d861b07b077637a61681e598cd13b1d45fad5292e1f5f04301285",
+      "bytes": 12685,
+      "line_count": 88,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "entry-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
       "path": "skills/spec-promote/references/spiral-cli.md",
       "sha256": "7d2f974175b936bf129be6bd9cdccae53ac6d72bedf6546fbdb8ad4b211b75ae",
       "bytes": 12694,
@@ -6870,9 +6978,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
-      "sha256": "42757be1d4adb3796447cec0daf7e7184ce70f35920a4ca6378ae2bc2699a3d7",
-      "bytes": 54290,
-      "line_count": 355,
+      "sha256": "41c9d338217ad31ab904d38d882eca18af66c1089f29d28d19a55dd906164d70",
+      "bytes": 55233,
+      "line_count": 361,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "entry-contract",
@@ -7706,9 +7814,9 @@
     },
     {
       "path": "skills/using-spec-first/references/public-route-map.md",
-      "sha256": "79ba60523dcbc08b355f321297b9ef17b269a9d35a431cdffd1c19795f816f0a",
-      "bytes": 4443,
-      "line_count": 48,
+      "sha256": "1c09aa00d5a2d667219448486d684354e3d221bc479178a919b6655603b8d24d",
+      "bytes": 4608,
+      "line_count": 49,
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path_role": "reference-contract",
@@ -7753,9 +7861,9 @@
       "skill_id": "spec-app-consistency-audit",
       "owning_skill": "spec-app-consistency-audit",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -7885,9 +7993,9 @@
       "skill_id": "spec-brainstorm",
       "owning_skill": "spec-brainstorm",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -7920,6 +8028,27 @@
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "line": 96,
           "excerpt": "\"skill_name\": \"spec-brainstorm\","
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-brainstorm",
+      "owning_skill": "spec-brainstorm",
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997",
+      "bytes": 5651,
+      "line_count": 133,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/agent-persona-template-drift.test.js",
+          "line": 24,
+          "excerpt": "'skills/spec-brainstorm/references/agents',"
         }
       ]
     },
@@ -8305,9 +8434,9 @@
       "skill_id": "spec-code-review",
       "owning_skill": "spec-code-review",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -8340,6 +8469,27 @@
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "line": 111,
           "excerpt": "\"skill_name\": \"spec-code-review\","
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-code-review",
+      "owning_skill": "spec-code-review",
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997",
+      "bytes": 5651,
+      "line_count": 133,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/agent-persona-template-drift.test.js",
+          "line": 29,
+          "excerpt": "'skills/spec-code-review/references/personas',"
         }
       ]
     },
@@ -8704,9 +8854,9 @@
       "skill_id": "spec-commit-push-pr",
       "owning_skill": "spec-commit-push-pr",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -8788,9 +8938,9 @@
       "skill_id": "spec-commit",
       "owning_skill": "spec-commit",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -8893,9 +9043,9 @@
       "skill_id": "spec-compound-refresh",
       "owning_skill": "spec-compound-refresh",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -9124,9 +9274,9 @@
       "skill_id": "spec-compound",
       "owning_skill": "spec-compound",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -9165,8 +9315,29 @@
     {
       "skill_id": "spec-compound",
       "owning_skill": "spec-compound",
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997",
+      "bytes": 5651,
+      "line_count": 133,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/agent-persona-template-drift.test.js",
+          "line": 39,
+          "excerpt": "'skills/spec-compound/references/agents',"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-compound",
+      "owning_skill": "spec-compound",
       "path": "tests/unit/ce-localization-closeout-contracts.test.js",
-      "sha256": "36bff143ff183507a78fac0ff1d4ba320a6f7993e70fd9ec97ea9a574d279c19",
+      "sha256": "86e01aa9306ac56500b548b7b5bd1330a37025dc7d5fccfe6e32a2526b5268ae",
       "bytes": 15672,
       "line_count": 377,
       "path_role": "evaluation",
@@ -9523,9 +9694,9 @@
       "skill_id": "spec-debug",
       "owning_skill": "spec-debug",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -9712,9 +9883,9 @@
       "skill_id": "spec-doc-review",
       "owning_skill": "spec-doc-review",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -9922,9 +10093,9 @@
       "skill_id": "spec-dogfood",
       "owning_skill": "spec-dogfood",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -10069,9 +10240,9 @@
       "skill_id": "spec-explain",
       "owning_skill": "spec-explain",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -10174,9 +10345,9 @@
       "skill_id": "spec-handoff",
       "owning_skill": "spec-handoff",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -10216,9 +10387,9 @@
       "skill_id": "spec-ideate",
       "owning_skill": "spec-ideate",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -10251,6 +10422,27 @@
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "line": 246,
           "excerpt": "\"skill_name\": \"spec-ideate\","
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-ideate",
+      "owning_skill": "spec-ideate",
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997",
+      "bytes": 5651,
+      "line_count": 133,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/agent-persona-template-drift.test.js",
+          "line": 25,
+          "excerpt": "'skills/spec-ideate/references/agents',"
         }
       ]
     },
@@ -10489,9 +10681,9 @@
       "skill_id": "spec-lfg",
       "owning_skill": "spec-lfg",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -10789,9 +10981,9 @@
       "skill_id": "spec-optimize",
       "owning_skill": "spec-optimize",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -10845,6 +11037,27 @@
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "line": 276,
           "excerpt": "\"skill_name\": \"spec-optimize\","
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-optimize",
+      "owning_skill": "spec-optimize",
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997",
+      "bytes": 5651,
+      "line_count": 133,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/agent-persona-template-drift.test.js",
+          "line": 31,
+          "excerpt": "'skills/spec-optimize/references/agents',"
         }
       ]
     },
@@ -11041,9 +11254,9 @@
       "skill_id": "spec-plan",
       "owning_skill": "spec-plan",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -11083,9 +11296,9 @@
       "skill_id": "spec-plan",
       "owning_skill": "spec-plan",
       "path": "tests/integration/init-six-host-lifecycle.integration.test.js",
-      "sha256": "200789a0deef116ac99b7c77395a629109c7f47c21dc197e2eb9d745f7c1a544",
-      "bytes": 32836,
-      "line_count": 956,
+      "sha256": "d7ce399c00c9dcaeeab51600400a0a5dffd5f196d6c0cb1a6aa1faabe0ab98e2",
+      "bytes": 33352,
+      "line_count": 965,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",
@@ -11095,8 +11308,29 @@
       "evidence": [
         {
           "source_path": "tests/integration/init-six-host-lifecycle.integration.test.js",
-          "line": 791,
+          "line": 800,
           "excerpt": "'.agents/skills/spec-plan/SKILL.md',"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-plan",
+      "owning_skill": "spec-plan",
+      "path": "tests/unit/agent-persona-template-drift.test.js",
+      "sha256": "e1964915343ee62ee413653d8e871949bf574c3957ba454952b58e7e5f40f997",
+      "bytes": 5651,
+      "line_count": 133,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/agent-persona-template-drift.test.js",
+          "line": 26,
+          "excerpt": "'skills/spec-plan/references/agents',"
         }
       ]
     },
@@ -11461,9 +11695,9 @@
       "skill_id": "spec-polish",
       "owning_skill": "spec-polish",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -11566,9 +11800,9 @@
       "skill_id": "spec-pov",
       "owning_skill": "spec-pov",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -11780,9 +12014,9 @@
       "skill_id": "spec-prd",
       "owning_skill": "spec-prd",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12178,6 +12412,27 @@
     {
       "skill_id": "spec-prd",
       "owning_skill": "spec-prd",
+      "path": "tests/unit/spec-prd-finding-schema-freeze.test.js",
+      "sha256": "1f0ff32ba60127bbb51a88992365b5c7a123aa934b0927850bfb51d4b281a1a6",
+      "bytes": 9813,
+      "line_count": 277,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-name"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/spec-prd-finding-schema-freeze.test.js",
+          "line": 4,
+          "excerpt": "// docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md."
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-prd",
+      "owning_skill": "spec-prd",
       "path": "tests/unit/spec-prd-hook-contracts.test.js",
       "sha256": "07a975108a3357e7ae8ecef926c863b0da603d06dca4bd29fd8faabb9d37ce08",
       "bytes": 13148,
@@ -12284,9 +12539,9 @@
       "skill_id": "spec-product-pulse",
       "owning_skill": "spec-product-pulse",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12407,12 +12662,96 @@
       ]
     },
     {
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path": "docs/contracts/project-graph-consumption.md",
+      "sha256": "1ac40abd06793720ca0ba9a9dad723f249548383160485cf4594fe793ef3427c",
+      "bytes": 18796,
+      "line_count": 125,
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "explicit-source-ref"
+      ],
+      "evidence": [
+        {
+          "source_path": "skills/spec-project-rules/references/mining-method.md",
+          "line": 23,
+          "excerpt": "大仓库、monorepo 或依赖关系难以直接定位时，可以把 `code-graph` / `project-graph` capability-class 输出作为 `provider_untrusted` 候选导航，用来决定下一批 source refs。遵守当前仓库 `docs/contracts/project-graph-consumption.md` 的 candidate-only 口径；若该合同在运行目标不可见，按本小节最小边界执行。"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
+      "path_role": "support-asset",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "governance-manifest"
+      ],
+      "evidence": [
+        {
+          "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+          "line": 381,
+          "excerpt": "\"skill_name\": \"spec-project-rules\","
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path": "tests/unit/spec-project-rules-contracts.test.js",
+      "sha256": "dc68a533a4702f120a73d9e1f8da96b52edb7eb8270148d3cb2bad9c67b92d86",
+      "bytes": 3785,
+      "line_count": 84,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-name"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/spec-project-rules-contracts.test.js",
+          "line": 16,
+          "excerpt": "describe('spec-project-rules governance and source contracts', () => {"
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path": "tests/unit/spec-project-rules-scripts.test.js",
+      "sha256": "c63ff9deb6ea376b0fdf1cac0ddfe88357b4a7856e28db1ffe83f6b5fe5b9078",
+      "bytes": 6078,
+      "line_count": 137,
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "focused-test-name"
+      ],
+      "evidence": [
+        {
+          "source_path": "tests/unit/spec-project-rules-scripts.test.js",
+          "line": 9,
+          "excerpt": "const SCRIPTS = path.join(REPO_ROOT, 'skills', 'spec-project-rules', 'scripts');"
+        }
+      ]
+    },
+    {
       "skill_id": "spec-promote",
       "owning_skill": "spec-promote",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12473,9 +12812,9 @@
       "skill_id": "spec-prototype",
       "owning_skill": "spec-prototype",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12536,9 +12875,9 @@
       "skill_id": "spec-resolve-pr-feedback",
       "owning_skill": "spec-resolve-pr-feedback",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12641,9 +12980,9 @@
       "skill_id": "spec-riffrec-feedback-analysis",
       "owning_skill": "spec-riffrec-feedback-analysis",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12653,7 +12992,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 381,
+          "line": 396,
           "excerpt": "\"skill_name\": \"spec-riffrec-feedback-analysis\","
         }
       ]
@@ -12830,9 +13169,9 @@
       "skill_id": "spec-rule-miner",
       "owning_skill": "spec-rule-miner",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -12842,7 +13181,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 396,
+          "line": 411,
           "excerpt": "\"skill_name\": \"spec-rule-miner\","
         }
       ]
@@ -12893,9 +13232,9 @@
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -13864,9 +14203,9 @@
       "skill_id": "spec-simplify-code",
       "owning_skill": "spec-simplify-code",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -13876,7 +14215,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 411,
+          "line": 426,
           "excerpt": "\"skill_name\": \"spec-simplify-code\","
         }
       ]
@@ -13948,9 +14287,30 @@
       "skill_id": "spec-strategy",
       "owning_skill": "spec-strategy",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
+      "path_role": "support-asset",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-direct-support",
+      "relation_types": [
+        "governance-manifest"
+      ],
+      "evidence": [
+        {
+          "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+          "line": 456,
+          "excerpt": "\"skill_name\": \"spec-strategy\","
+        }
+      ]
+    },
+    {
+      "skill_id": "spec-sweep",
+      "owning_skill": "spec-sweep",
+      "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -13961,27 +14321,6 @@
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
           "line": 441,
-          "excerpt": "\"skill_name\": \"spec-strategy\","
-        }
-      ]
-    },
-    {
-      "skill_id": "spec-sweep",
-      "owning_skill": "spec-sweep",
-      "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
-      "path_role": "support-asset",
-      "evidence_role": "local-contract",
-      "terminal_disposition": "included-direct-support",
-      "relation_types": [
-        "governance-manifest"
-      ],
-      "evidence": [
-        {
-          "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 426,
           "excerpt": "\"skill_name\": \"spec-sweep\","
         }
       ]
@@ -14221,9 +14560,9 @@
       "skill_id": "spec-test-browser",
       "owning_skill": "spec-test-browser",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -14233,7 +14572,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 501,
+          "line": 516,
           "excerpt": "\"skill_name\": \"spec-test-browser\","
         }
       ]
@@ -14305,9 +14644,9 @@
       "skill_id": "spec-test-xcode",
       "owning_skill": "spec-test-xcode",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -14317,7 +14656,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 516,
+          "line": 531,
           "excerpt": "\"skill_name\": \"spec-test-xcode\","
         }
       ]
@@ -14415,9 +14754,9 @@
       "skill_id": "spec-work",
       "owning_skill": "spec-work",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -14427,7 +14766,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 456,
+          "line": 471,
           "excerpt": "\"skill_name\": \"spec-work\","
         }
       ]
@@ -14469,7 +14808,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 456,
+          "line": 471,
           "excerpt": "\"skill_name\": \"spec-work\","
         }
       ]
@@ -15093,9 +15432,9 @@
       "skill_id": "spec-worktree",
       "owning_skill": "spec-worktree",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -15219,9 +15558,9 @@
       "skill_id": "spec-write-skill",
       "owning_skill": "spec-write-skill",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -15237,7 +15576,7 @@
         },
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 471,
+          "line": 486,
           "excerpt": "\"skill_name\": \"spec-write-skill\","
         }
       ]
@@ -15258,7 +15597,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 471,
+          "line": 486,
           "excerpt": "\"skill_name\": \"spec-write-skill\","
         }
       ]
@@ -15578,9 +15917,9 @@
       "skill_id": "spec-write-tasks",
       "owning_skill": "spec-write-tasks",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -15590,7 +15929,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 486,
+          "line": 501,
           "excerpt": "\"skill_name\": \"spec-write-tasks\","
         }
       ]
@@ -15632,7 +15971,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 486,
+          "line": 501,
           "excerpt": "\"skill_name\": \"spec-write-tasks\","
         }
       ]
@@ -15851,9 +16190,9 @@
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "sha256": "5727763ed76d27899f1a6fbaedecb4010cba00a59f956913eab89fd13875301a",
-      "bytes": 13821,
-      "line_count": 546,
+      "sha256": "1e79212cc47592a3ed85076013dc756005036d08d0490e705c909a802e838bad",
+      "bytes": 14198,
+      "line_count": 561,
       "path_role": "support-asset",
       "evidence_role": "local-contract",
       "terminal_disposition": "included-direct-support",
@@ -15863,7 +16202,7 @@
       "evidence": [
         {
           "source_path": "src/cli/contracts/dual-host-governance/skills-governance.json",
-          "line": 531,
+          "line": 546,
           "excerpt": "\"skill_name\": \"using-spec-first\","
         }
       ]
@@ -15872,9 +16211,9 @@
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path": "tests/integration/init-six-host-lifecycle.integration.test.js",
-      "sha256": "200789a0deef116ac99b7c77395a629109c7f47c21dc197e2eb9d745f7c1a544",
-      "bytes": 32836,
-      "line_count": 956,
+      "sha256": "d7ce399c00c9dcaeeab51600400a0a5dffd5f196d6c0cb1a6aa1faabe0ab98e2",
+      "bytes": 33352,
+      "line_count": 965,
       "path_role": "evaluation",
       "evidence_role": "behavior-eval",
       "terminal_disposition": "included-direct-support",

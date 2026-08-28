@@ -378,6 +378,21 @@
       }
     },
     {
+      "skill_name": "spec-project-rules",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill",
+        "opencode": "skill"
+      }
+    },
+    {
       "skill_name": "spec-riffrec-feedback-analysis",
       "entry_surface": "standalone_skill",
       "command_name": null,

@@ -16,8 +16,8 @@ describe('CE localization deterministic review producer', () => {
       'check-spiral-auth.cjs',
     ].join('/');
 
-    expect(inventory.skill_count).toBe(36);
-    expect(inventory.package_path_count).toBe(571);
+    expect(inventory.skill_count).toBe(37);
+    expect(inventory.package_path_count).toBe(577);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -34,8 +34,11 @@ describe('CE localization deterministic review producer', () => {
     // 2026-08-21: 186 -> 187 / 392 -> 393 after adding
     // tests/unit/spec-prd-finding-schema-freeze.test.js, which the coverage
     // producer picks up as one additional spec-prd `focused-test-name` relation.
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(187);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(393);
+    // 2026-08-28: 187 -> 189 / 393 -> 402 after adding skills/spec-project-rules
+    // (new focused test + shared governance/project-graph relations);
+    // 189 -> 190 / 402 -> 403 after adding its deterministic scripts test.
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(190);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(403);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

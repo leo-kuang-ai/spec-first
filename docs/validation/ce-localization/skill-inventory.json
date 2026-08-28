@@ -4,24 +4,38 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
+    "head": "cda386695f40f0b8e56952eb064ed90c92857095",
     "dirty": true,
     "dirty_paths": [
+      "AGENTS.md",
       "CHANGELOG.md",
-      "docs/10-prompt/spec-first\\344\\273\\243\\347\\240\\201\\345\\256\\241\\346\\237\\245\\346\\226\\271\\346\\241\\210.md",
-      "docs/solutions/architecture-patterns/spec-prd-finding-schema-freeze-deferred-2026-06-28.md",
-      "scripts/check-ce-upstream-reconciliation.cjs",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/04-workflows-artifacts-map.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/10-\\344\\272\\247\\347\\211\\251\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
+      "docs/catalog/runtime-capabilities.md",
+      "docs/plans/2026-08-28-001-feat-ai-dev-knowledge-and-process-contract-plan.md",
+      "docs/plans/2026-08-28-002-refactor-knowledge-layer-slice1-and-b-line-architecture-plan.md",
+      "scripts/check-ce-localization-review.cjs",
       "scripts/generate-ce-localization-closeout.cjs",
-      "scripts/verify-with-gate.sh",
-      "skills/_shared/README.md",
-      "skills/spec-runtime-setup/scripts/lib/host-config.cjs",
+      "skills/spec-project-rules/SKILL.md",
+      "skills/spec-project-rules/evals/trigger-cases.json",
+      "skills/spec-project-rules/references/knowledge-format.md",
+      "skills/spec-project-rules/references/mining-method.md",
+      "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "skills/using-spec-first/references/public-route-map.md",
+      "src/cli/contracts/dual-host-governance/skills-governance.json",
+      "tests/integration/init-six-host-lifecycle.integration.test.js",
       "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-upstream-reconciliation-v2.test.js",
-      "tests/unit/mcp-setup-host-config.test.js"
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/doctor-runtime-assets.test.js",
+      "tests/unit/spec-project-rules-contracts.test.js",
+      "tests/unit/spec-project-rules-scripts.test.js"
     ],
-    "dirty_path_manifest_sha256": "846ffcb265bc133d50b794aa6db7de6f74c9d897c735ef7947629bc64ffe1965",
-    "source_tree_hash": "d181026578b2fa15342ebae3e4e5f4b6743a319816e4671827e9012a51858ac0",
-    "inventory_hash": "10b01c2ee73b1eb4b16eada1cc8bab2b9e419a85e0f6825b1305915015ee4ede",
+    "dirty_path_manifest_sha256": "ceff7530a08d5ddf9659652456c833e22592eb50cf0318fd6edc6f1133e0b98c",
+    "source_tree_hash": "b2a360eda9ba1b10d35c0d4314292411330f58c43bce3e7645ba9508439da3b3",
+    "inventory_hash": "cbecc17ffa1b5601818a0c78c1fe14d6cb8c7cfb12c02aec82360759b5150614",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -68,10 +82,10 @@
       "governance_owner": "src/cli/contracts/dual-host-governance/skills-governance.json"
     }
   ],
-  "skill_count": 36,
-  "package_path_count": 571,
-  "package_bytes": 5849662,
-  "package_manifest_sha256": "70b8275534590a555c70da2e35b89de8b4acb7c5dbdfae00fa80948e26871be6",
+  "skill_count": 37,
+  "package_path_count": 577,
+  "package_bytes": 5913501,
+  "package_manifest_sha256": "2ba879fa45d297c3a47cfb315d22770d5677b3b53a1d9a8acba2fe30f651a760",
   "skills": [
     {
       "skill_id": "spec-app-consistency-audit",
@@ -176,7 +190,7 @@
       "package_root": "skills/spec-brainstorm",
       "entry_path": "skills/spec-brainstorm/SKILL.md",
       "package_path_count": 13,
-      "direct_support_path_count": 17,
+      "direct_support_path_count": 18,
       "package_paths": [
         "skills/spec-brainstorm/references/agents/slack-researcher.md",
         "skills/spec-brainstorm/references/blindspot-pass.md",
@@ -195,6 +209,7 @@
       "direct_support_paths": [
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/brainstorm.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-reconciliation-v2.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -217,7 +232,7 @@
       "package_root": "skills/spec-code-review",
       "entry_path": "skills/spec-code-review/SKILL.md",
       "package_path_count": 53,
-      "direct_support_path_count": 22,
+      "direct_support_path_count": 23,
       "package_paths": [
         "skills/spec-code-review/evals/api-contract-capability-cases.json",
         "skills/spec-code-review/evals/cases/agent-mode-remains-read-only.yaml",
@@ -279,6 +294,7 @@
         "docs/contracts/workflows/scenario-capability-matrix.md",
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/code-review.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/anti-rationalization-contracts.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -338,7 +354,7 @@
       "package_root": "skills/spec-compound",
       "entry_path": "skills/spec-compound/SKILL.md",
       "package_path_count": 21,
-      "direct_support_path_count": 16,
+      "direct_support_path_count": 17,
       "package_paths": [
         "skills/spec-compound/assets/resolution-template.md",
         "skills/spec-compound/evals/examples.json",
@@ -366,6 +382,7 @@
         "docs/contracts/knowledge/knowledge-harness.md",
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/compound.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-localization-closeout-contracts.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -562,7 +579,7 @@
       "package_root": "skills/spec-ideate",
       "entry_path": "skills/spec-ideate/SKILL.md",
       "package_path_count": 12,
-      "direct_support_path_count": 13,
+      "direct_support_path_count": 14,
       "package_paths": [
         "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
         "skills/spec-ideate/references/agents/learnings-researcher.md",
@@ -580,6 +597,7 @@
       "direct_support_paths": [
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/ideate.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
@@ -628,7 +646,7 @@
       "package_root": "skills/spec-optimize",
       "entry_path": "skills/spec-optimize/SKILL.md",
       "package_path_count": 18,
-      "direct_support_path_count": 13,
+      "direct_support_path_count": 14,
       "package_paths": [
         "skills/spec-optimize/evals/examples.json",
         "skills/spec-optimize/evals/README.md",
@@ -655,6 +673,7 @@
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "src/cli/helpers/secret-deny-patterns.js",
         "templates/claude/commands/spec/optimize.md",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-localization-round-1-remediation-contracts.test.js",
         "tests/unit/dispatch-authorization-matrix-contracts.test.js",
         "tests/unit/opencode-adapter.test.js",
@@ -670,7 +689,7 @@
       "package_root": "skills/spec-plan",
       "entry_path": "skills/spec-plan/SKILL.md",
       "package_path_count": 61,
-      "direct_support_path_count": 21,
+      "direct_support_path_count": 22,
       "package_paths": [
         "skills/spec-plan/evals/cases/enriches-product-contract-in-place.yaml",
         "skills/spec-plan/evals/cases/planning-only-rejects-implementation.yaml",
@@ -739,6 +758,7 @@
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "templates/claude/commands/spec/plan.md",
         "tests/integration/init-six-host-lifecycle.integration.test.js",
+        "tests/unit/agent-persona-template-drift.test.js",
         "tests/unit/ce-post-3-20-calibration-contracts.test.js",
         "tests/unit/ce-upstream-skill-sync-contracts.test.js",
         "tests/unit/dispatch-authorization-matrix-contracts.test.js",
@@ -826,7 +846,7 @@
       "package_root": "skills/spec-prd",
       "entry_path": "skills/spec-prd/SKILL.md",
       "package_path_count": 34,
-      "direct_support_path_count": 27,
+      "direct_support_path_count": 28,
       "package_paths": [
         "skills/spec-prd/assets/overlays/securities.md",
         "skills/spec-prd/assets/templates/00-generic.md",
@@ -886,6 +906,7 @@
         "tests/unit/spec-prd-decision-card-contracts.test.js",
         "tests/unit/spec-prd-exit-safety.test.js",
         "tests/unit/spec-prd-finalize-transition.test.js",
+        "tests/unit/spec-prd-finding-schema-freeze.test.js",
         "tests/unit/spec-prd-hook-contracts.test.js",
         "tests/unit/spec-prd-lite-profile-contracts.test.js",
         "tests/unit/spec-prd-plan-handoff-contracts.test.js",
@@ -911,6 +932,27 @@
         "tests/unit/mcp-setup-config-consumers.test.js",
         "tests/unit/spec-product-pulse-contracts.test.js",
         "tests/unit/specialized-skill-calibration-contracts.test.js"
+      ]
+    },
+    {
+      "skill_id": "spec-project-rules",
+      "package_root": "skills/spec-project-rules",
+      "entry_path": "skills/spec-project-rules/SKILL.md",
+      "package_path_count": 6,
+      "direct_support_path_count": 4,
+      "package_paths": [
+        "skills/spec-project-rules/evals/trigger-cases.json",
+        "skills/spec-project-rules/references/knowledge-format.md",
+        "skills/spec-project-rules/references/mining-method.md",
+        "skills/spec-project-rules/scripts/extract-deps.cjs",
+        "skills/spec-project-rules/scripts/verify-deps.cjs",
+        "skills/spec-project-rules/SKILL.md"
+      ],
+      "direct_support_paths": [
+        "docs/contracts/project-graph-consumption.md",
+        "src/cli/contracts/dual-host-governance/skills-governance.json",
+        "tests/unit/spec-project-rules-contracts.test.js",
+        "tests/unit/spec-project-rules-scripts.test.js"
       ]
     },
     {
@@ -5824,6 +5866,72 @@
       "terminal_disposition": "included-canonical-skill-source"
     },
     {
+      "path": "skills/spec-project-rules/evals/trigger-cases.json",
+      "sha256": "4b72e2aaaec68b5610634a1f7fc88cfe80e752ab0d4858c971b274ac7f16a1e3",
+      "bytes": 18225,
+      "line_count": 389,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "evaluation",
+      "evidence_role": "behavior-eval",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/references/knowledge-format.md",
+      "sha256": "76dfcafc592b42f0ebd300f01de2063778c90e1f789ee150c3d0ec5f2dc99505",
+      "bytes": 8688,
+      "line_count": 112,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/references/mining-method.md",
+      "sha256": "ecd1dfa45bb7aa01f1d1866e13d1a019dfedc947fa9e75f2f278de20f614200c",
+      "bytes": 9283,
+      "line_count": 83,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "reference-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "sha256": "4d51ede233b3b015de91843da9b2f1ca90582cd1cb41f4fecd13af40a3bd4a8f",
+      "bytes": 8125,
+      "line_count": 220,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "sha256": "196f08ccf9446a2a3547a530b58aa4ec85a697920018f8f20c53b62f1391c5bb",
+      "bytes": 5725,
+      "line_count": 154,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "deterministic-helper",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
+      "path": "skills/spec-project-rules/SKILL.md",
+      "sha256": "ea913747325d861b07b077637a61681e598cd13b1d45fad5292e1f5f04301285",
+      "bytes": 12685,
+      "line_count": 88,
+      "skill_id": "spec-project-rules",
+      "owning_skill": "spec-project-rules",
+      "path_role": "entry-contract",
+      "evidence_role": "local-contract",
+      "terminal_disposition": "included-canonical-skill-source"
+    },
+    {
       "path": "skills/spec-promote/references/spiral-cli.md",
       "sha256": "7d2f974175b936bf129be6bd9cdccae53ac6d72bedf6546fbdb8ad4b211b75ae",
       "bytes": 12694,
@@ -6859,9 +6967,9 @@
     },
     {
       "path": "skills/spec-runtime-setup/SKILL.md",
-      "sha256": "42757be1d4adb3796447cec0daf7e7184ce70f35920a4ca6378ae2bc2699a3d7",
-      "bytes": 54290,
-      "line_count": 355,
+      "sha256": "41c9d338217ad31ab904d38d882eca18af66c1089f29d28d19a55dd906164d70",
+      "bytes": 55233,
+      "line_count": 361,
       "skill_id": "spec-runtime-setup",
       "owning_skill": "spec-runtime-setup",
       "path_role": "entry-contract",
@@ -7695,9 +7803,9 @@
     },
     {
       "path": "skills/using-spec-first/references/public-route-map.md",
-      "sha256": "79ba60523dcbc08b355f321297b9ef17b269a9d35a431cdffd1c19795f816f0a",
-      "bytes": 4443,
-      "line_count": 48,
+      "sha256": "1c09aa00d5a2d667219448486d684354e3d221bc479178a919b6655603b8d24d",
+      "bytes": 4608,
+      "line_count": 49,
       "skill_id": "using-spec-first",
       "owning_skill": "using-spec-first",
       "path_role": "reference-contract",

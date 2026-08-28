@@ -84,7 +84,7 @@ using-spec-first（入口路由，可选）
   -> compound / compound-refresh
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
 旁路（按意图直接进入，非主链路状态）：
-  write-skill | explain | pov | strategy | rule-miner | simplify-code
+  write-skill | explain | pov | strategy | rule-miner | project-rules | simplify-code
   | product-pulse | sweep | riffrec-feedback-analysis | promote | lfg（仅显式）
 ```
 
