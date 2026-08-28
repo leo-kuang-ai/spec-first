@@ -2,7 +2,7 @@
 artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan
-status: active
+status: completed
 execution: code
 ---
 
@@ -89,7 +89,7 @@ skill 包文件数不变（ce-localization 口径：governance 注册 37 skills 
 
 - 契约测试：资产断言增三问/C4/四族指针关键词；**新增** eval 数量断言（cases.length === 27，现状无此断言——审查修正）与 coverage_tags/case 标签一致性检查；落点 `tests/unit/spec-project-rules-contracts.test.js`。
 - 验证序列：`lint:skill-entrypoints` → `typecheck` → 脚本/契约套件 → ce-localization 再生链（refresh→surgery→generate→verify）→ 全量 unit → 六宿主 `spec-first init`。
-- hszq-app 侧验证：22 条规则三问回检报告；RULE-006 与四族指针写入后的 grep 验收（marker 成对、敏感信息零泄漏）。
+- hszq-app 侧验证：22 条规则三问回检报告；REUSE-006/RULE-006 与 index 指针写入后的 grep 验收四项（①marker 成对 ②敏感零泄漏 ③7 条 confirmed 均有 owner 字段 ④REUSE-006/RULE-006 存在，同 U5 定义）。
 - 回滚：单变更窗口，git revert 即回滚全部（skill 文本 + evals + 治理面）；hszq-app 侧 update 写入独立回滚。
 
 ## Part 2：B 线架构设计（设计级，切片 2–4 评审用）
@@ -136,16 +136,67 @@ preflight（四族就绪报告；主案=并入 spec-work intake，新 skill 仅�
 - receipts 格式复用 A6 冻结思路：先在 spec-first 仓内合同化，稳定后再考虑跨仓。
 - B 线不引入新规范挖掘类别；所有 schema 变更走 CHANGELOG + contract test。
 
+## Implementation Units（切片 1 剩余范围；A1/A2/A5 及 A3 的 SKILL.md 部分已于 b70aba8f 落地）
+
+### U1. knowledge-format 生命周期与模板（A3/A4/A6 文本）
+
+- **Goal:** 元数据四字段（含 `verified_against_model` 可选字段说明）、stale 双原因语法、index 四族指针骨架（只路径、治理/动态注释位）、能力指针模板（REUSE/RULE 双轨）、DEP 行 contract-candidate 标注（含冻结触发条件显式记录）。
+- **Files:** `skills/spec-project-rules/references/knowledge-format.md`、`skills/spec-project-rules/SKILL.md`（Outputs 补 index.md 四族指针区骨架一句）
+- **Approach:** 按 §1.4/§1.5/§1.6 修订版执行；锚点断言逐处替换。
+- **Test scenarios:** 契约测试关键词断言命中（owner/invalidation_condition/model-obsolescence/pre-development pointers/contract-candidate）；markdown 结构不破坏（标题层级、表格列数不变）。
+- **Verification:** 契约测试全绿；文本含全部新增关键词（含 verified_against_model 与冻结触发条件）。
+
+### U2. eval 扩充（23 → 27）
+
+- **Goal:** 新增 NEG-004（通识拒写 should-not-trigger）、TRIGGER-005（查重义务回写 should-trigger/update）、BOUNDARY-006（减法审查 should-trigger：重测三问、列 model-obsolescence 候选、不自动删）、UPDATE-003（index 指针登记 should-trigger/update）。
+- **Files:** `skills/spec-project-rules/evals/trigger-cases.json`
+- **Test scenarios:** JSON 可解析；case_id 全局唯一；每 case 的 coverage_tags ⊆ 顶层 coverage_tags；case_type 覆盖集不缩小。
+- **Verification:** `node -e` JSON 校验 + 契约测试数量断言。
+
+### U3. 契约测试断言扩充
+
+- **Goal:** 新增 cases.length===27 断言、SKILL/knowledge-format 关键词断言（准入三问/C4/四族指针/contract-candidate）、coverage_tags 一致性检查。
+- **Files:** `tests/unit/spec-project-rules-contracts.test.js`
+- **Test scenarios:** 断言在当前源上通过；人为删一个 case 的红测 mentally 验证（数量断言会失败）。
+- **Verification:** 该套件全绿。
+
+### U4. 治理面同步与全量验证
+
+- **Goal:** CHANGELOG 条目、ce-localization 再生链（refresh→surgery→generate→verify）、lint/typecheck、全量 unit、六宿主 init。
+- **Files:** `CHANGELOG.md`、ce-localization 再生产物（脚本生成）
+- **Test scenarios:** verify 模式 ok；全量 unit ≥2134 全绿；lint 330 文件通过；init 6/6 ready。
+- **Verification:** 验证矩阵 §1.7 全项执行。
+
+### U5. hszq-app 回检与回填（跨仓写入，不入本仓 PR 面）
+
+- **Goal:** 22 条规则三问回检（通过判据按 §1.2 修订版：全部条目至少一问肯定证据；RULE-004 拆分裁定并记录）；7 条 confirmed 回填 owner + last_verified_commit；REUSE-006（能力指针）与 RULE-006（查重义务）写入；index 增静态/操作指针；grep 验收四项全过（①marker 成对 ②敏感信息零泄漏 ③7 条 confirmed 均有 owner 字段 ④REUSE-006 与 RULE-006 存在）。
+- **Files:** 目标仓 `/Users/kuang/xiaobu/hszq-app/docs/architecture/*`（marker 内替换）
+- **Test scenarios:** grep 验收四项全过（①marker 成对 ②敏感零泄漏 ③owner 字段存在 ④REUSE-006/RULE-006 存在）；回检报告含 22 条逐条裁定。
+- **Verification:** 回检通过判据满足；写入仅限 marker 内。
+
+## Verification Contract（切片 1 整体）
+
+- 单元级：U1–U3 各自套件/校验全绿。
+- 集成级：U4 验证矩阵全项（lint/typecheck、ce-localization 再生链全绿 refresh→surgery→generate→verify、全量 unit、init 6/6）。
+- 跨仓级：U5 grep 验收四项（①marker 成对 ②敏感零泄漏 ③owner 字段存在 ④REUSE-006/RULE-006 存在）+ 回检通过判据。
+- 行为保护：本切片为 prose/eval/test 变更，无运行时行为变化（skill 文本消费方为 LLM 会话）；行为保护证据 = 既有契约/脚本测试不回退 + 新增断言生效。
+
+## Definition of Done
+
+1. U1–U5 全部完成且 Verification Contract 全项通过；
+2. 修订版 §验收 三条满足（文本落盘、hszq-app 回检通过 + 写入 + grep 验收、CHANGELOG/投影完成）；
+3. 回检报告交付（含 RULE-004 拆分裁定）；本计划 status 保持 active 至切片 1 验收通过后由 owner 关闭。
+
 ## Key Decisions
 
 - 2026-08-28：A 线六项全部文本级实施，不新增挖掘维度（与需求计划一致）。
 - 2026-08-28：receipts run-local 不入库、ledger/handoff 入库（动态族载体铁律）。
-- 2026-08-28：DEP 行格式冻结为执法导出合同 v1，字段变更需 schema 升版。
+- 2026-08-28：DEP 行格式标注 contract-candidate，冻结推迟至首个机器消费者出现（2026-08-28 审查修订，原冻结决定作废）。
 
 ## 验收（切片 1 完成定义）
 
 1. 全部 A1–A6 文本/eval/模板变更落盘且验证矩阵全绿；
-2. hszq-app 回检报告 + RULE-006 + 四族指针写入完成并 grep 验收通过；
+2. hszq-app 回检报告（通过判据满足）+ REUSE-006/RULE-006 + index 静态/操作指针写入（治理/动态留注释位）并 grep 验收四项通过；
 3. CHANGELOG 记录；六宿主投影刷新；本计划 status 保持 active 至切片 1 验证通过后由 owner 关闭。
 
 ## 审查修订记录（2026-08-28，三路对抗性审查后）
