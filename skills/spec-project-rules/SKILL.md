@@ -33,7 +33,7 @@ description: "Use this standalone skill when the user asks to build or refresh a
 
 ## Outputs
 
-- `knowledge_base`：写入 `docs/architecture/` 的五个文件——`index.md`、`workspace-map.md`、`dependency-rules.md`、`reuse-contracts.md`、`coding-rules.md`；managed block 使用 `spec-project-rules-start` / `spec-project-rules-end` markers。结构见 [Knowledge Format](references/knowledge-format.md)。
+- `knowledge_base`：写入 `docs/architecture/` 的五个文件（`index.md` 含 pre-development 指针区骨架：只放各族 owner 路径，治理/动态两族待后续版本加入）——`index.md`、`workspace-map.md`、`dependency-rules.md`、`reuse-contracts.md`、`coding-rules.md`；managed block 使用 `spec-project-rules-start` / `spec-project-rules-end` markers。结构见 [Knowledge Format](references/knowledge-format.md)。
 - `evidence_summary`：每个规则/边界的代表性 source refs 与证据等级（`confirmed` / `inferred`）；不写入知识库正文，除非用户明确要求。
 - `target_files`：知识库目录内文件（默认 `docs/architecture/`，用户显式指定目录时为该目录且五文件结构不变）与 AGENTS.md/CLAUDE.md pointer。
 - `module_files`：分层装载启用时，`docs/architecture/modules/<module>.md` 与对应模块目录的入口 pointer；未启用时无此项。
@@ -66,7 +66,7 @@ description: "Use this standalone skill when the user asks to build or refresh a
 5. 证据分级并合成知识库：每条边界/规则标注 `confirmed` / `inferred`、适用端范围与例外；`dependency-rules.md` 使用结构化规则行（规则 id、from、to、方向、等级、source refs）；区分跨端通用、单端专属、历史例外；除非证据压倒性一致，不使用全仓库绝对措辞。
 6. Preview：展示将写入的五个文件内容（或 update 模式下的 diff）、入口 pointer、证据等级分布、采样/证据限制、适用范围、历史例外，以及每条规则的代表性 source refs。
 7. 写入前读 [Knowledge Format](references/knowledge-format.md)，按 marker、frontmatter、pointer 规则执行；默认让 `AGENTS.md` 与 `CLAUDE.md` 指向 `docs/architecture/index.md`。
-8. update 模式：按用户声称变化的范围裁剪步骤 2-5 的取证（只取相关端/路径），不重跑全量盘点；分层启用时只更新声称涉及的模块文件。对每条声称回源验证——新约定须有存在性代码证据（至少 2 个文件），规则失效须有反证（最低检索深度见 [Mining Method](references/mining-method.md)），回写内容同样过敏感信息过滤；失效条目不删除，改标 `status: stale(reason: code-drift | model-obsolescence, evidence: 反证 refs 或三问重测记录)`；无实质变化时不重写文件，closeout 记录 `refresh_noop`。
+8. update 模式：按用户声称变化的范围裁剪步骤 2-5 的取证（只取相关端/路径），不重跑全量盘点；分层启用时只更新声称涉及的模块文件。对每条声称回源验证——新约定须有存在性代码证据（至少 2 个文件），规则失效须有反证（最低检索深度见 [Mining Method](references/mining-method.md)），回写内容同样过敏感信息过滤；失效条目不删除，改标 `status: stale(reason: code-drift / model-obsolescence, evidence: 反证 refs 或三问重测记录)`（条目值内禁用 `|` 字符）；无实质变化时不重写文件，closeout 记录 `refresh_noop`。
 9. 收尾输出：列出写入文件、confirmed/inferred 条数、是否采样、limitations、未写入的近邻目标；未写文件时说明 preview-only 状态；headless 默认写入必须说明证据来源。可选减法审查：当用户告知宿主模型已大版本更新时发起（本 skill 无法自判模型版本；可选元数据 `verified_against_model` 记录用户口供）——对知识库逐条重测准入三问，model-obsolescence 候选在 preview 中列出交 owner 裁决，不自动删除。
 
 ## Failure Modes

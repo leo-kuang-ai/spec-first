@@ -8,11 +8,19 @@
   ],
   "source_ref_authority": "source",
   "coverage_tags": [
+    "admission-test",
+    "bootstrap-mode",
     "boundary",
+    "c4-obligation",
     "coexistence",
+    "failure",
+    "headless",
     "layered-loading",
+    "model-obsolescence",
     "near-neighbor",
     "pointer-merge",
+    "pointer-section",
+    "refresh-mode",
     "trigger",
     "update-mode",
     "verify-mode",
@@ -384,6 +392,72 @@
       "expected_mode": "bootstrap-layered",
       "boundary_note": "Module-dir entry files follow the same merge rules: append own marker block only, existing user prose and other skills' marker blocks are external content.",
       "reason_code": "module-pointer-coexistence"
+    },
+    {
+      "id": "generic-conventions-rejected",
+      "case_id": "SPEC-PROJECT-RULES-NEG-004",
+      "case_type": "boundary",
+      "input": "把\"函数不要过长、写清晰注释、命名要规范\"这类通用编码规范也加进知识库。",
+      "prompt": "把\"函数不要过长、写清晰注释、命名要规范\"这类通用编码规范也加进知识库。",
+      "coverage_tags": [
+        "boundary",
+        "admission-test"
+      ],
+      "expected_outcome": "admission-refusal",
+      "expected_result": "admission-refusal",
+      "expected_mode": "update",
+      "boundary_note": "Write-back request enters update mode, then the admission three questions reject the purely generic content: no write, explain the refusal (trigger-then-refuse, not route-out).",
+      "reason_code": "generic-conventions-rejected"
+    },
+    {
+      "id": "c4-obligation-write-back",
+      "case_id": "SPEC-PROJECT-RULES-TRIGGER-005",
+      "case_type": "should-trigger",
+      "input": "把金额格式化先查现有实现的查重义务回写进知识库。",
+      "prompt": "把金额格式化先查现有实现的查重义务回写进知识库。",
+      "coverage_tags": [
+        "trigger",
+        "update-mode",
+        "c4-obligation"
+      ],
+      "expected_outcome": "should-trigger",
+      "expected_result": "should-trigger",
+      "expected_mode": "update",
+      "boundary_note": "Write-back of a C4 check-before-create obligation is a mining-context update; direct coding requests do not trigger this skill.",
+      "reason_code": "c4-obligation-write-back"
+    },
+    {
+      "id": "model-obsolescence-review",
+      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-006",
+      "case_type": "boundary",
+      "input": "新模型发布了，检查一下知识库哪些规则已经不需要了。",
+      "prompt": "新模型发布了，检查一下知识库哪些规则已经不需要了。",
+      "coverage_tags": [
+        "boundary",
+        "model-obsolescence"
+      ],
+      "expected_outcome": "model-obsolescence-review",
+      "expected_result": "model-obsolescence-review",
+      "expected_mode": "verify",
+      "boundary_note": "Verify-mode run performing the user-initiated subtraction review: re-run admission three questions per rule, list model-obsolescence candidates in preview, owner decides, never auto-delete.",
+      "reason_code": "model-obsolescence-review"
+    },
+    {
+      "id": "pointer-section-registration",
+      "case_id": "SPEC-PROJECT-RULES-UPDATE-003",
+      "case_type": "should-trigger",
+      "input": "在 index 里把构建命令文档也指进 pre-development 指针区。",
+      "prompt": "在 index 里把构建命令文档也指进 pre-development 指针区。",
+      "coverage_tags": [
+        "trigger",
+        "update-mode",
+        "pointer-section"
+      ],
+      "expected_outcome": "should-trigger",
+      "expected_result": "should-trigger",
+      "expected_mode": "update",
+      "boundary_note": "Registering an operational-family owner path in the index pointer section is an update-mode write (paths only, no status snapshots).",
+      "reason_code": "pointer-section-registration"
     }
   ]
 }

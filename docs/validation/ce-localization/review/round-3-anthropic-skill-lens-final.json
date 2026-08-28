@@ -12,38 +12,19 @@
   "coverage_status": "complete-current-source",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "cda386695f40f0b8e56952eb064ed90c92857095",
+    "head": "b70aba8f951548eee6888734615dee34324c15b4",
     "dirty": true,
     "dirty_paths": [
-      "AGENTS.md",
       "CHANGELOG.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/04-workflows-artifacts-map.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/10-\\344\\272\\247\\347\\211\\251\\347\\233\\256\\345\\275\\225.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/README.md",
-      "docs/catalog/runtime-capabilities.md",
-      "docs/plans/2026-08-28-001-feat-ai-dev-knowledge-and-process-contract-plan.md",
       "docs/plans/2026-08-28-002-refactor-knowledge-layer-slice1-and-b-line-architecture-plan.md",
-      "scripts/check-ce-localization-review.cjs",
-      "scripts/generate-ce-localization-closeout.cjs",
       "skills/spec-project-rules/SKILL.md",
       "skills/spec-project-rules/evals/trigger-cases.json",
       "skills/spec-project-rules/references/knowledge-format.md",
-      "skills/spec-project-rules/references/mining-method.md",
-      "skills/spec-project-rules/scripts/extract-deps.cjs",
-      "skills/spec-project-rules/scripts/verify-deps.cjs",
-      "skills/using-spec-first/references/public-route-map.md",
-      "src/cli/contracts/dual-host-governance/skills-governance.json",
-      "tests/integration/init-six-host-lifecycle.integration.test.js",
-      "tests/unit/ce-localization-closeout-contracts.test.js",
-      "tests/unit/ce-localization-review-contracts.test.js",
-      "tests/unit/doctor-runtime-assets.test.js",
-      "tests/unit/spec-project-rules-contracts.test.js",
-      "tests/unit/spec-project-rules-scripts.test.js"
+      "tests/unit/spec-project-rules-contracts.test.js"
     ],
-    "dirty_path_manifest_sha256": "ceff7530a08d5ddf9659652456c833e22592eb50cf0318fd6edc6f1133e0b98c",
-    "source_tree_hash": "b2a360eda9ba1b10d35c0d4314292411330f58c43bce3e7645ba9508439da3b3",
-    "inventory_hash": "cbecc17ffa1b5601818a0c78c1fe14d6cb8c7cfb12c02aec82360759b5150614",
+    "dirty_path_manifest_sha256": "f3b898da84b211761335a7e41fe2a5b17c3b7940d3cddddb4dd744d6f09f0ee6",
+    "source_tree_hash": "7d558a018f9853f2a0b4401c7d0ecd11d434b2948683b8dbfc3b71111a8445bc",
+    "inventory_hash": "14936245009ee8ff3d8f856e1c248bdf10afd08bd6eacc1827ca5ed010478cfa",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -81,7 +62,7 @@
     "inventory": {
       "artifact_role": "current-skill-inventory",
       "ref": "docs/validation/ce-localization/skill-inventory.json",
-      "sha256": "2a78f12ffb874f01ace1bcaaf9093c71f07b7f29d1fb6342ffbcae132c08d821"
+      "sha256": "e359b2c87a545652a267e9a6d1c432b70267b0120e1dda65ac24eb37e3ce1b61"
     },
     "coverage": {
       "artifact_role": "deterministic-source-coverage",
@@ -106,7 +87,7 @@
     {
       "artifact_role": "current-skill-inventory",
       "ref": "docs/validation/ce-localization/skill-inventory.json",
-      "sha256": "2a78f12ffb874f01ace1bcaaf9093c71f07b7f29d1fb6342ffbcae132c08d821"
+      "sha256": "e359b2c87a545652a267e9a6d1c432b70267b0120e1dda65ac24eb37e3ce1b61"
     },
     {
       "artifact_role": "deterministic-source-coverage",
@@ -125,13 +106,13 @@
       "sha256": "0a18d51978a03a3c2d330950be7d81f0e20415993b6dcdf0fc30a4a9ecbff8a2"
     }
   ],
-  "inventory_hash": "cbecc17ffa1b5601818a0c78c1fe14d6cb8c7cfb12c02aec82360759b5150614",
-  "inventory_artifact_sha256": "2a78f12ffb874f01ace1bcaaf9093c71f07b7f29d1fb6342ffbcae132c08d821",
-  "package_manifest_sha256": "224233071a6cb0c14ccd0cebaa1e1e93882fc7d761c653c0ffac87896567e1bf",
-  "direct_support_manifest_sha256": "27459383da9694ca0d77aa9607abe1e680a0b718bc317ae1eecda565cb36a8d4",
-  "relation_manifest_sha256": "2ee71071b426a108103f8e6bb75e03dc24badbd6b5eed2d11dd76e23caefa5b2",
+  "inventory_hash": "14936245009ee8ff3d8f856e1c248bdf10afd08bd6eacc1827ca5ed010478cfa",
+  "inventory_artifact_sha256": "e359b2c87a545652a267e9a6d1c432b70267b0120e1dda65ac24eb37e3ce1b61",
+  "package_manifest_sha256": "137cec551e994bb73d0934b5484ba67ecbf1d0d58b914c39075a9b6aaef5b3a5",
+  "direct_support_manifest_sha256": "d4bcecd8d4ad32ac8e3736c5da40bf397edbb6b22c8b51463d7795caa097913e",
+  "relation_manifest_sha256": "fab8b2266cdbca52ee8dff5fda392e4279a08f2a3b005bb09f653d1714c58e1c",
   "review_input_hash_algorithm": "sha256(stable-json(coverage.review_input))",
-  "review_input_hash": "0751ec2eada8673caa95ab654457528cae77e014e3d15fe52c754e4288e70832",
+  "review_input_hash": "8e4df851d6673159593fcb7a5d46f7df1ef5ca2f4ccbff3304a43c4d49efe199",
   "expected_skill_count": 37,
   "reviewed_skill_count": 37,
   "expected_package_path_count": 577,
@@ -151,7 +132,7 @@
     "receipt_binding": "chunk ids are listed by source_read_receipts",
     "limitation": "packet identity/range only; not equal semantic attention"
   },
-  "chunk_manifest_hash": "94058b274ce3c9cb55e85e59f893b9a65aab40bf718da9dc82abadb5cdac540c",
+  "chunk_manifest_hash": "d3128c3bd2af163a800f7380432574f4e67c50ac1fa95df67766e1fd25ba43e7",
   "finding_summary": {
     "review_area_count": 13,
     "open_count": 0,
@@ -14183,13 +14164,13 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "4b72e2aaaec68b5610634a1f7fc88cfe80e752ab0d4858c971b274ac7f16a1e3",
-          "bytes": 18225,
-          "line_count": 389,
+          "sha256": "6d730e6bd62c50c9206ff059c2f985bd2486fd0dfcb6b19b52dcc82d22a89c40",
+          "bytes": 21558,
+          "line_count": 463,
           "covered_line_ranges": [
             [
               1,
-              389
+              463
             ]
           ],
           "review_chunk_ids": [
@@ -14202,13 +14183,13 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "76dfcafc592b42f0ebd300f01de2063778c90e1f789ee150c3d0ec5f2dc99505",
-          "bytes": 8688,
-          "line_count": 112,
+          "sha256": "fdf2c842e162436caca009c2d66b379cbe19868a340c0bf327d561a920a00879",
+          "bytes": 11472,
+          "line_count": 131,
           "covered_line_ranges": [
             [
               1,
-              112
+              131
             ]
           ],
           "review_chunk_ids": [
@@ -14278,8 +14259,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "ea913747325d861b07b077637a61681e598cd13b1d45fad5292e1f5f04301285",
-          "bytes": 12685,
+          "sha256": "9695c5f07a1dc24a7782eb844a83a3765cea1cbcbeca70e0ee8319274f3cc5ad",
+          "bytes": 12843,
           "line_count": 88,
           "covered_line_ranges": [
             [
@@ -14316,13 +14297,13 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "dc68a533a4702f120a73d9e1f8da96b52edb7eb8270148d3cb2bad9c67b92d86",
-          "bytes": 3785,
-          "line_count": 84,
+          "sha256": "f93f7ac62bb797e763ea7e82cf0ac799c7195eed0dcc764362a790b8c606418b",
+          "bytes": 5108,
+          "line_count": 110,
           "covered_line_ranges": [
             [
               1,
-              84
+              110
             ]
           ],
           "review_chunk_ids": [
@@ -14358,7 +14339,7 @@
             "path": "skills/spec-project-rules/SKILL.md",
             "line": 3,
             "line_end": 3,
-            "sha256": "ea913747325d861b07b077637a61681e598cd13b1d45fad5292e1f5f04301285"
+            "sha256": "9695c5f07a1dc24a7782eb844a83a3765cea1cbcbeca70e0ee8319274f3cc5ad"
           }
         ]
       },

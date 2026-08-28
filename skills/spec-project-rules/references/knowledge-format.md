@@ -8,7 +8,7 @@
 
 | 文件 | 职责 |
 | --- | --- |
-| `index.md` | 最小骨架：freshness（`generated_at` 与 `source_commit`）、一行导读（workspace-map 各端职责 → dependency-rules 依赖方向 → reuse-contracts shared 复用 → coding-rules 高价值约定）、已知局限汇总 |
+| `index.md` | 最小骨架：freshness（`generated_at` 与 `source_commit`）、一行导读（workspace-map 各端职责 → dependency-rules 依赖方向 → reuse-contracts shared 复用 → coding-rules 高价值约定）、pre-development 指针区（只放各族 owner 路径，不放状态快照——各族就绪状态由宿主运行前检查判定，index 不做第二真相源；静态=本库五文件、操作=命令文档/setup 脚本；治理（如 CODEOWNERS/CI 入口）与动态（如任务账本/交接）两族待后续版本加入，现以 `<!-- reserved: governance/dynamic -->` 注释占位）、已知局限汇总 |
 | `workspace-map.md` | 一端一节：目录、技术栈、职责边界、"不该放什么"反例（带 source refs） |
 | `dependency-rules.md` | 依赖方向规则表：结构化行，未来导出确定性执法配置的扩展位 |
 | `reuse-contracts.md` | shared 层暴露面、预期消费端、复用边界、重复信号、非目标 |
@@ -54,7 +54,8 @@ source_commit: <目标仓库 git HEAD 短 hash>
 - 证据类型：存在性证据（支撑"必须/总是如此"类规则）至少 2 个文件支撑；缺失性证据（支撑"禁止/无此依赖"类规则）记录可复现的检索式与命中数，如 `rg "from 'apps/app'" apps/admin-console` 0 命中，不适用 2 文件门槛。
 - 适用范围：`scope: workspace | <端名> | <包名>`。
 - 例外：`exceptions:` 列表或行内说明；历史例外用收窄措辞。
-- 状态：默认 `status: active`；update 模式中失效的条目改标 `status: stale` 并附原因与反证 refs，不直接删除。
+- 状态：默认 `status: active`；update 模式中失效的条目改标 `status: stale(reason: code-drift / model-obsolescence, evidence: 反证 refs 或三问重测记录)`，不直接删除——code-drift 需反证 refs，model-obsolescence 需准入三问重测记录（减法审查产出）。注意：条目值内禁用 `|` 字符（会切断 markdown 表格与脚本解析），枚举分隔用 `/`。
+- 生命周期元数据（可选，`confirmed` 条目必填 owner）：`owner`（规则负责人）、`consumer`（预期消费端）、`invalidation_condition`（何时失效）、`last_verified_commit`（最近验证时的源 commit）、`verified_against_model`（可选，减法审查时的宿主模型版本口供）。小节模板条目写为字段行；DEP 表格条目在表格下方以"条目元数据"清单登记。
 
 写入前（bootstrap 与 update 相同）对将写入的正文做敏感信息检查：密钥、内部 URL、私有包名、账号、生产路径、安全实现细节只用于判断，不进入知识库。
 
@@ -69,7 +70,11 @@ source_commit: <目标仓库 git HEAD 短 hash>
 | DEP-002 | admin | app | 禁止引入 | inferred | `rg "from 'apps/app'" apps/admin-console` 0 命中 | 旧页面 `admin/legacy/**` 为历史例外 | active |
 ```
 
-`DEP-002` 的 source refs 是缺失性证据的标准写法：记录可复现检索式与命中数，不写"无证据"这类不可复现的表述；标 stale 时改 status 列并在例外列或行内附原因与反证 refs。
+条目元数据（confirmed 必填 owner）以表格下方清单登记，例如：`- 条目元数据：DEP-001 — owner: @x，consumer: app 端，last_verified_commit: <hash>`。
+
+`DEP-002` 的 source refs 是缺失性证据的标准写法：记录可复现检索式与命中数，不写"无证据"这类不可复现的表述；标 stale 时改 status 列为 `stale(reason: code-drift / model-obsolescence, evidence: ...)`——code-drift 附反证 refs，model-obsolescence 附三问重测记录（与证据标注节同一语法）。
+
+**执法导出合同状态：contract-candidate。** 上表 7 字段（规则 id/from/to/允许方向/grade/source refs/例外，含 status 列语义）为候选格式，**首个机器消费者（CI 导出/脚本解析）出现时冻结为 v1**；冻结触发条件即"任一非本 skill 自身的程序开始解析 DEP 行"。冻结前字段可随知识库演进自由调整；冻结后任何字段语义变更需升 `docs-architecture/v2` 并迁移既有产物。
 
 workspace-map / reuse-contracts / coding-rules 的条目使用统一小节模板：
 
@@ -79,10 +84,24 @@ workspace-map / reuse-contracts / coding-rules 的条目使用统一小节模板
 - scope: <端名/包名/workspace>
 - source_refs: `<path>`, `<path>`（缺失性证据写检索式与命中数）
 - exceptions: 无 | <说明>
-- status: active | stale（附原因与反证 refs）
+- status: active | stale(reason: code-drift / model-obsolescence, evidence: 反证 refs 或三问重测记录)
+- owner: <规则负责人；confirmed 条目必填>（consumer/invalidation_condition/last_verified_commit 按需追加）
 ```
 
-`REUSE-` 与 `RULE-` 条目沿用同一模板，仅替换标题前缀与结论内容。
+`REUSE-` 与 `RULE-` 条目沿用同一模板，仅替换标题前缀与结论内容；判别规则：能力住址类存在性知识（"有什么、在哪查"）用下方能力指针专属模板，约束/边界类条目沿用统一模板。
+
+能力指针条目（存在性知识，`REUSE-` 前缀落 reuse-contracts.md）使用专属模板；查重义务条目（行为约束，`RULE-` 前缀落 coding-rules.md）与之配对：
+
+```markdown
+### REUSE-00X <能力域>（如：金额/日期格式化）
+- grade: inferred（能力存在性通常无明文，如实标注）
+- scope: <适用端/包>
+- 住址: <package/模块与代表文件>
+- 查法: `rg "<检索模式>" <目录>`
+- source_refs: <代表文件路径>
+- 义务: 新建同类前必先按查法检索；发现即复用；新建后归位本域
+- status: active
+```
 
 规则 id 前缀按文件固定：`DEP-`（依赖方向）、`OWN-`（归属，写在 workspace-map.md）、`REUSE-`（复用，写在 reuse-contracts.md）、`RULE-`（编码约定，写在 coding-rules.md）。id 沿用既有编号不重排；新增条目取该文件当前最大编号递增；失效条目保留原 id 只改 status，不复用已占用编号。
 

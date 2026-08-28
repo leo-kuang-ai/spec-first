@@ -54,6 +54,14 @@ describe('spec-project-rules governance and source contracts', () => {
 
     const evals = JSON.parse(fs.readFileSync(path.join(skillDir, 'evals/trigger-cases.json'), 'utf8'));
     expect(evals.skill).toBe('spec-project-rules');
+    expect(evals.cases).toHaveLength(27);
+    const caseIds = evals.cases.map((item) => item.case_id);
+    expect(new Set(caseIds).size).toBe(caseIds.length);
+    for (const item of evals.cases) {
+      for (const tag of item.coverage_tags) {
+        expect(evals.coverage_tags).toContain(tag);
+      }
+    }
     const types = new Set(evals.cases.map((item) => item.case_type));
     for (const required of ['should-trigger', 'near-neighbor', 'should-not-trigger', 'boundary', 'failure']) {
       expect(types.has(required)).toBe(true);
@@ -69,12 +77,30 @@ describe('spec-project-rules governance and source contracts', () => {
     expect(nearNames).toContain('spec-rule-miner');
   });
 
+  test('knowledge-format carries lifecycle metadata, dual stale reasons, and candidate contract', () => {
+    const format = fs.readFileSync(path.join(skillDir, 'references/knowledge-format.md'), 'utf8');
+    expect(format).toContain('`owner`（规则负责人）');
+    expect(format).toContain('invalidation_condition');
+    expect(format).toContain('last_verified_commit');
+    expect(format).toContain('verified_against_model');
+    expect(format).toContain('code-drift / model-obsolescence');
+    expect(format).toContain('pre-development 指针区');
+    expect(format).toContain('contract-candidate');
+    expect(format).toContain('查法');
+  });
+
   test('knowledge base declares a marker-scoped, architecture-first write contract', () => {
     const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
     expect(skill).toContain('spec-project-rules-start');
     expect(skill).toContain('docs/architecture/');
     // Layered loading contract: module-level KB files + module-dir entry pointers.
     expect(skill).toContain('modules/');
+    // 切片 1 知识层合同：准入三问、stale 双原因、减法审查、指针区、词汇边界。
+    expect(skill).toContain('准入三问');
+    expect(skill).toContain('model-obsolescence');
+    expect(skill).toContain('verified_against_model');
+    expect(skill).toContain('词汇');
+    expect(skill).toContain('pre-development 指针区');
     // Architecture boundaries are the primary product; coding rules are a filtered secondary section.
     const purposeIndex = skill.indexOf('一级产物是架构边界知识');
     const codingIndex = skill.indexOf('编码约定是二级产物');
