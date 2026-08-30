@@ -1,0 +1,27 @@
+id: refresh-noop
+title: 无实质变化时 dry-run 产出 refresh_noop 且零写入
+description: |
+  验证保鲜路径的 no-op 保护：仓库与知识库自建立以来无变化，用户要求检查
+  是否还准——预期走 dry-run（只报告不写），refs 存活与依赖方向核对通过后
+  判定无实质变化，知识库与 AGENTS.md 保持逐字节不变，不重写文件、不更新
+  frontmatter 时间戳。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    fixture 基线 commit（仓库已含 docs/architecture.md 知识库与 AGENTS.md
+    内嵌块）。本用例完全自包含；不要读取本工作区之外的任何资料。使用
+    spec-project-rules skill 处理以下要求："知识库是上周建的，最近没改过
+    代码，帮我检查一下还准不准。"完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/multi-end-with-kb
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-refresh-noop.sh
+  timeout_seconds: 60

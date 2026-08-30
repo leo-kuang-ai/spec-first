@@ -1,0 +1,28 @@
+id: marker-coexist-embed
+title: module 更新合入知识库且 AGENTS.md 用户内容与他 skill marker 逐字节保留
+description: |
+  验证共享入口文件的写入边界：AGENTS.md 同时含团队手写说明、spec-rule-miner
+  marker 块与 spec-project-rules marker 块。用户要求补录 packages/ui 的归属——
+  预期知识库在 marker 内增量合入归属条目，既有条目不丢；归属细节不满足内嵌
+  筛选标准，AGENTS.md（含用户内容、他 skill marker、本 skill 内嵌块）保持
+  逐字节不变。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    fixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。
+    使用 spec-project-rules skill 处理以下要求："知识库补一下 packages/ui
+    模块：它是什么、谁在用，补进知识库。AGENTS.md 里我们自己的说明和别的
+    工具的块别动。"完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/multi-end-embedded
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-marker-coexist.sh
+  timeout_seconds: 60

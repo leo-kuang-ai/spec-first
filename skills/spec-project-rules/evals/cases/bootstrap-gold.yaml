@@ -1,0 +1,27 @@
+id: bootstrap-gold
+title: 多端 monorepo bootstrap 产出单文件知识库且遵守 headless 首嵌跳过与敏感信息过滤
+description: |
+  验证 spec-project-rules 在非交互评测环境下对小规模 npm workspaces 多端仓库执行
+  bootstrap：产出单文件 docs/architecture.md（marker/frontmatter/四小节）、README
+  明文边界吸收为 confirmed、敏感 URL 不泄漏、业务源码零改动；headless 环境首次
+  嵌入必须跳过（AGENTS.md 不被创建，closeout 记录 agents_embed_skipped）。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建 fixture
+    基线 commit；该命令只准备评测环境。本用例完全自包含；不要读取本工作区之外
+    的任何资料。使用 spec-project-rules skill，按其规程对本仓库执行全量 bootstrap
+    建立架构知识库（按 headless 规程处理确认环节并在 closeout 记录相应证据）。
+    完成后输出 closeout 报告并把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/multi-end-fresh
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-bootstrap.sh
+  timeout_seconds: 60

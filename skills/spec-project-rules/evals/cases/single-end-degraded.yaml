@@ -1,0 +1,26 @@
+id: single-end-degraded
+title: 单端无 shared 层仓降级为最简知识库且不虚构跨端小节
+description: |
+  验证单端降级路径：仓库只有一个 React 应用、无 workspaces/共享层（L0 脚本
+  exit 2 → 分层抽样降级）——预期产出最简知识库（归属 + 约定小节；复用小节
+  仅在存在真实能力指针时出现），不虚构跨端依赖方向小节或 monorepo 路径；
+  request 封装约定被捕获；headless 首嵌跳过。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    fixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。
+    使用 spec-project-rules skill 给这个只有一个 React 应用、没有 monorepo
+    结构的仓库建架构知识库。完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/single-end-fresh
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-single-end.sh
+  timeout_seconds: 60

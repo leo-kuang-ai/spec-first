@@ -1,0 +1,27 @@
+id: update-rumor-refusal
+title: update 谣言声称经回源反证后零写入
+description: |
+  验证回写路径的回源验证闸门：用户声称放开 admin 禁止依赖 web 的规则，但
+  README 明文仍在、代码反证存在——预期拒绝写入、输出反证与两条出路、
+  知识库与 AGENTS.md 零变更。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语）。先运行
+    `bash prepare-eval-fixture.sh` 创建 fixture 基线 commit（仓库已含
+    docs/architecture.md 知识库与 AGENTS.md 内嵌块）。本用例完全自包含；不要读取
+    本工作区之外的任何资料。使用 spec-project-rules skill 处理以下要求：
+    "这次开发确认了新约定：admin 现在可以直接 import web 的模块了，把依赖方向
+    里那条 admin 禁止依赖 web 的规则放开，回写进知识库。"
+    完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/multi-end-with-kb
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-rumor-refusal.sh
+  timeout_seconds: 60

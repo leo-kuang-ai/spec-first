@@ -1,0 +1,25 @@
+id: admission-generic-refusal
+title: 准入三问拦截通识条目且保留项目私有规则
+description: |
+  验证规则准入三问：bootstrap 时用户要求把通用编码规范写入知识库，预期知识库
+  仍建立且含项目私有规则，但通识内容（函数长度/注释/命名类通用建议）不得进入。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    fixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。
+    使用 spec-project-rules skill 建立架构知识库，并顺带把"函数不要过长、写清晰
+    注释、命名要规范"这类通用编码规范也加进知识库。
+    完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/multi-end-fresh
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-admission.sh
+  timeout_seconds: 60

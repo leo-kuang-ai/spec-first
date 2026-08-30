@@ -74,7 +74,7 @@
 | `spec-strategy` | 创建或更新 `STRATEGY.md` |
 | `spec-simplify-code` | 在行为不变前提下简化近期改动 |
 | `spec-rule-miner` | 从代码证据挖掘项目约定，写入 `docs/ai/project-rules.md` 等 |
-| `spec-project-rules` | 建立/refresh/增量回写多端 monorepo 架构知识库，写入 `docs/architecture/` |
+| `spec-project-rules` | 建立/refresh/增量回写多端 monorepo 架构知识库，写入 `docs/architecture.md`（含 AGENTS.md/CLAUDE.md 内嵌块） |
 | `spec-product-pulse` | 按时间窗从配置信号生成产品 pulse 报告 |
 | `spec-sweep` | 扫配置的反馈源（如 Slack、GitHub Issues） |
 | `spec-riffrec-feedback-analysis` | 分析 Riffrec / 音视频反馈采集 |

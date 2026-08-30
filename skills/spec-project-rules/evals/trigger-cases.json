@@ -7,457 +7,177 @@
     "skills/spec-project-rules/references/knowledge-format.md"
   ],
   "source_ref_authority": "source",
+  "mode_vocabulary": "expected_mode 取值对齐 SKILL.md scope 枚举：full / module:<name> / dry-run / not-triggered（负向路由）",
   "coverage_tags": [
     "admission-test",
-    "bootstrap-mode",
+    "bootstrap",
     "boundary",
-    "c4-obligation",
-    "coexistence",
+    "degraded",
     "failure",
-    "headless",
-    "layered-loading",
-    "model-obsolescence",
-    "near-neighbor",
+    "large-repo",
     "pointer-merge",
-    "pointer-section",
-    "refresh-mode",
+    "routing",
+    "sensitive",
     "trigger",
-    "update-mode",
-    "verify-mode",
-    "write-back",
-    "write-safety"
+    "verify",
+    "write-back"
   ],
   "cases": [
     {
-      "id": "bootstrap-monorepo-architecture-knowledge",
+      "id": "bootstrap-multi-end",
       "case_id": "SPEC-PROJECT-RULES-TRIGGER-001",
       "case_type": "should-trigger",
-      "input": "我们要在这个 workspace 里开始新功能开发了，先梳理一下项目规范：app、h5、admin、后台各管什么、依赖方向是什么，写成架构知识库。",
-      "prompt": "我们要在这个 workspace 里开始新功能开发了，先梳理一下项目规范：app、h5、admin、后台各管什么、依赖方向是什么，写成架构知识库。",
-      "coverage_tags": [
-        "trigger",
-        "bootstrap-mode"
-      ],
+      "input": "梳理这个多端 monorepo 的架构边界：各端职责、依赖方向、复用约定，写入知识库。",
+      "prompt": "梳理这个多端 monorepo 的架构边界：各端职责、依赖方向、复用约定，写入知识库。",
+      "coverage_tags": ["trigger", "bootstrap"],
       "expected_outcome": "should-trigger",
       "expected_result": "should-trigger",
-      "expected_mode": "bootstrap",
-      "reason_code": "monorepo-architecture-knowledge-request"
+      "expected_mode": "full",
+      "boundary_note": "Multi-end monorepo bootstrap from code evidence produces single-file KB with evidence.",
+      "reason_code": "multi-end-bootstrap"
     },
     {
-      "id": "refresh-existing-knowledge-base",
+      "id": "large-repo-skeleton-first",
       "case_id": "SPEC-PROJECT-RULES-TRIGGER-002",
       "case_type": "should-trigger",
-      "input": "docs/architecture/ 是一个月前生成的，最近加了一个新的小程序端，全量 refresh 一下架构知识库。",
-      "prompt": "docs/architecture/ 是一个月前生成的，最近加了一个新的小程序端，全量 refresh 一下架构知识库。",
-      "coverage_tags": [
-        "trigger",
-        "refresh-mode"
-      ],
+      "input": "这个 monorepo 有 60 个模块，帮我建立架构知识库。",
+      "prompt": "这个 monorepo 有 60 个模块，帮我建立架构知识库。",
+      "coverage_tags": ["trigger", "large-repo"],
       "expected_outcome": "should-trigger",
       "expected_result": "should-trigger",
-      "expected_mode": "refresh",
-      "reason_code": "explicit-knowledge-base-refresh"
-    },
-    {
-      "id": "update-write-back-new-convention",
-      "case_id": "SPEC-PROJECT-RULES-TRIGGER-003",
-      "case_type": "should-trigger",
-      "input": "这次开发确认了新约定：shared/store 不允许被 admin 直接引用，把这条回写进架构知识库。",
-      "prompt": "这次开发确认了新约定：shared/store 不允许被 admin 直接引用，把这条回写进架构知识库。",
-      "coverage_tags": [
-        "trigger",
-        "update-mode",
-        "write-back"
-      ],
-      "expected_outcome": "should-trigger",
-      "expected_result": "should-trigger",
-      "expected_mode": "update",
-      "reason_code": "incremental-convention-write-back"
-    },
-    {
-      "id": "coding-style-only-neighbor",
-      "case_id": "SPEC-PROJECT-RULES-NEAR-001",
-      "case_type": "near-neighbor",
-      "input": "分析这个仓库的编码风格习惯，生成 AI 编码规则。",
-      "prompt": "分析这个仓库的编码风格习惯，生成 AI 编码规则。",
-      "coverage_tags": [
-        "near-neighbor",
-        "boundary"
-      ],
-      "expected_outcome": "near-neighbor",
-      "expected_result": "near-neighbor",
-      "expected_mode": "spec-rule-miner",
-      "boundary_note": "Coding-style rule mining without architecture boundaries belongs to spec-rule-miner; spec-project-rules only carries coding rules as a narrowed secondary section.",
-      "reason_code": "style-mining-not-architecture-knowledge"
-    },
-    {
-      "id": "solved-problem-learning-neighbor",
-      "case_id": "SPEC-PROJECT-RULES-NEAR-002",
-      "case_type": "near-neighbor",
-      "input": "把这次排查线上白屏问题的过程沉淀成可复用经验。",
-      "prompt": "把这次排查线上白屏问题的过程沉淀成可复用经验。",
-      "coverage_tags": [
-        "near-neighbor",
-        "boundary"
-      ],
-      "expected_outcome": "near-neighbor",
-      "expected_result": "near-neighbor",
-      "expected_mode": "spec-compound",
-      "boundary_note": "Capturing one solved problem as a learning belongs to spec-compound; spec-project-rules maintains the standing architecture knowledge base.",
-      "reason_code": "problem-learning-not-knowledge-base"
-    },
-    {
-      "id": "code-review-neighbor",
-      "case_id": "SPEC-PROJECT-RULES-NEAR-003",
-      "case_type": "near-neighbor",
-      "input": "审查这个 PR 是否遵守了我们 monorepo 的架构边界。",
-      "prompt": "审查这个 PR 是否遵守了我们 monorepo 的架构边界。",
-      "coverage_tags": [
-        "near-neighbor",
-        "boundary"
-      ],
-      "expected_outcome": "near-neighbor",
-      "expected_result": "near-neighbor",
-      "expected_mode": "spec-code-review",
-      "boundary_note": "Judging a concrete diff belongs to code review; spec-project-rules builds future-facing knowledge, it does not review diffs.",
-      "reason_code": "diff-review-not-knowledge-mining"
-    },
-    {
-      "id": "write-skill-neighbor",
-      "case_id": "SPEC-PROJECT-RULES-NEAR-004",
-      "case_type": "near-neighbor",
-      "input": "改一下 spec-project-rules 这个 skill 本身的取证流程。",
-      "prompt": "改一下 spec-project-rules 这个 skill 本身的取证流程。",
-      "coverage_tags": [
-        "near-neighbor",
-        "boundary"
-      ],
-      "expected_outcome": "near-neighbor",
-      "expected_result": "near-neighbor",
-      "expected_mode": "spec-write-skill",
-      "boundary_note": "Modifying spec-first source skills belongs to spec-write-skill.",
-      "reason_code": "skill-source-revision"
-    },
-    {
-      "id": "generic-best-practices-negative",
-      "case_id": "SPEC-PROJECT-RULES-NEG-001",
-      "case_type": "should-not-trigger",
-      "input": "给我一份通用的 monorepo 架构最佳实践清单。",
-      "prompt": "给我一份通用的 monorepo 架构最佳实践清单。",
-      "coverage_tags": [
-        "boundary"
-      ],
-      "expected_outcome": "should-not-trigger",
-      "expected_result": "should-not-trigger",
-      "expected_mode": "direct-answer-or-doc-task",
-      "boundary_note": "Generic best practices without target-repo evidence are not this skill's job.",
-      "reason_code": "generic-content-not-repo-mining"
-    },
-    {
-      "id": "debug-negative",
-      "case_id": "SPEC-PROJECT-RULES-NEG-002",
-      "case_type": "should-not-trigger",
-      "input": "admin 这边调 shared/api 一直报循环依赖，帮我修一下。",
-      "prompt": "admin 这边调 shared/api 一直报循环依赖，帮我修一下。",
-      "coverage_tags": [
-        "boundary"
-      ],
-      "expected_outcome": "should-not-trigger",
-      "expected_result": "should-not-trigger",
-      "expected_mode": "spec-debug",
-      "boundary_note": "Fixing a concrete failure belongs to spec-debug; the confirmed fix can later be written back via an explicit update run.",
-      "reason_code": "bug-fix-not-knowledge-mining"
-    },
-    {
-      "id": "lint-config-negative",
-      "case_id": "SPEC-PROJECT-RULES-NEG-003",
-      "case_type": "should-not-trigger",
-      "input": "帮我们配一套 eslint-plugin-boundaries 来强制包边界。",
-      "prompt": "帮我们配一套 eslint-plugin-boundaries 来强制包边界。",
-      "coverage_tags": [
-        "boundary"
-      ],
-      "expected_outcome": "should-not-trigger",
-      "expected_result": "should-not-trigger",
-      "expected_mode": "direct-engineering-task",
-      "boundary_note": "Writing enforcement/linter configuration is not knowledge mining; the structured dependency-rules format is only a reserved export slot in v1.",
-      "reason_code": "enforcement-config-not-supported"
-    },
-    {
-      "id": "preview-before-write-expected",
-      "case_id": "SPEC-PROJECT-RULES-EXPECTED-001",
-      "case_type": "expected",
-      "input": "梳理这个 monorepo 并写入知识库。",
-      "prompt": "梳理这个 monorepo 并写入知识库。",
-      "coverage_tags": [
-        "trigger",
-        "write-safety"
-      ],
-      "expected_outcome": "preview-before-write",
-      "expected_result": "preview-before-write",
-      "expected_mode": "bootstrap",
-      "boundary_note": "Interactive runs must preview the five files plus pointers and wait for confirmation; an unanswered chat is not headless.",
-      "reason_code": "preview-first-boundary"
-    },
-    {
-      "id": "marker-merge-boundary",
-      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-001",
-      "case_type": "boundary",
-      "input": "docs/architecture/workspace-map.md 里我们自己补了一节备注，更新时别动它。",
-      "prompt": "docs/architecture/workspace-map.md 里我们自己补了一节备注，更新时别动它。",
-      "coverage_tags": [
-        "boundary",
-        "write-safety"
-      ],
-      "expected_outcome": "marker-scoped-merge",
-      "expected_result": "marker-scoped-merge",
-      "expected_mode": "update",
-      "boundary_note": "Only the managed block between spec-project-rules markers is rewritten; user content outside markers is never touched.",
-      "reason_code": "marker-merge-rule"
-    },
-    {
-      "id": "headless-default-write-boundary",
-      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-002",
-      "case_type": "boundary",
-      "input": "[CI 环境无交互] 初始化目标仓库的架构知识库。",
-      "prompt": "[CI 环境无交互] 初始化目标仓库的架构知识库。",
-      "coverage_tags": [
-        "boundary",
-        "write-safety",
-        "headless"
-      ],
-      "expected_outcome": "headless-evidenced-default-write",
-      "expected_result": "headless-evidenced-default-write",
-      "expected_mode": "bootstrap",
-      "boundary_note": "Default writes require host/argument evidence of headless operation and must record headless_default_write in closeout.",
-      "reason_code": "headless-write-evidence"
-    },
-    {
-      "id": "stale-rule-update-expected",
-      "case_id": "SPEC-PROJECT-RULES-EXPECTED-002",
-      "case_type": "expected",
-      "input": "shared/validators 已经下线了，知识库里 REUSE-003 那条应该失效了吧？",
-      "prompt": "shared/validators 已经下线了，知识库里 REUSE-003 那条应该失效了吧？",
-      "coverage_tags": [
-        "update-mode",
-        "write-safety"
-      ],
-      "expected_outcome": "verify-then-mark-stale",
-      "expected_result": "verify-then-mark-stale",
-      "expected_mode": "update",
-      "boundary_note": "Update runs must verify claimed changes against source before writing; stale entries are marked with evidence, not silently deleted.",
-      "reason_code": "update-verification-boundary"
-    },
-    {
-      "id": "empty-repo-failure",
-      "case_id": "SPEC-PROJECT-RULES-FAILURE-001",
-      "case_type": "failure",
-      "input": "给这个刚 scaffold 的空仓库建立架构知识库。",
-      "prompt": "给这个刚 scaffold 的空仓库建立架构知识库。",
-      "coverage_tags": [
-        "boundary",
-        "failure"
-      ],
-      "expected_outcome": "refuse-empty-output",
-      "expected_result": "refuse-empty-output",
-      "expected_mode": "failure",
-      "boundary_note": "No analyzable source means no knowledge base; do not generate empty scaffolding as if it were evidence.",
-      "reason_code": "insufficient-source-sample"
-    },
-    {
-      "id": "legacy-unmarked-content-ask",
-      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-003",
-      "case_type": "boundary",
-      "input": "docs/architecture/workspace-map.md 里有内容但没看到任何 markers，直接更新进去。",
-      "prompt": "docs/architecture/workspace-map.md 里有内容但没看到任何 markers，直接更新进去。",
-      "coverage_tags": [
-        "boundary",
-        "write-safety"
-      ],
-      "expected_outcome": "stop-and-ask-legacy-content",
-      "expected_result": "stop-and-ask-legacy-content",
-      "expected_mode": "update",
-      "boundary_note": "Unmarked content that looks like prior knowledge-base output must not be silently merged; ask migrate-or-append first.",
-      "reason_code": "unmarked-legacy-content-ambiguous"
-    },
-    {
-      "id": "entry-pointer-coexistence",
-      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-004",
-      "case_type": "boundary",
-      "input": "AGENTS.md 里已经有我们自己写的规范段落和一个 spec-rule-miner 的 pointer 块，把架构知识库 pointer 也加进去。",
-      "prompt": "AGENTS.md 里已经有我们自己写的规范段落和一个 spec-rule-miner 的 pointer 块，把架构知识库 pointer 也加进去。",
-      "coverage_tags": [
-        "boundary",
-        "write-safety",
-        "pointer-merge"
-      ],
-      "expected_outcome": "append-own-block-leave-others",
-      "expected_result": "append-own-block-leave-others",
-      "expected_mode": "bootstrap",
-      "boundary_note": "Other skills' managed blocks and user prose in entry files are external content; only append/update this skill's own marker block and disclose coexistence in preview.",
-      "reason_code": "entry-file-coexistence"
-    },
-    {
-      "id": "project-rules-coexistence",
-      "case_id": "SPEC-PROJECT-RULES-COEXIST-001",
-      "case_type": "boundary",
-      "input": "仓库里已经有 docs/ai/project-rules.md 了，建立架构知识库时处理一下和它的关系。",
-      "prompt": "仓库里已经有 docs/ai/project-rules.md 了，建立架构知识库时处理一下和它的关系。",
-      "coverage_tags": [
-        "boundary",
-        "coexistence"
-      ],
-      "expected_outcome": "read-only-conflict-check-no-merge",
-      "expected_result": "read-only-conflict-check-no-merge",
-      "expected_mode": "bootstrap",
-      "boundary_note": "Never merge or rewrite docs/ai/project-rules.md; read-only duplicate/conflict check surfaced in preview, or declare no-conflict-check in limitations.",
-      "reason_code": "rule-miner-output-coexistence"
-    },
-    {
-      "id": "update-rumor-refusal",
-      "case_id": "SPEC-PROJECT-RULES-UPDATE-001",
-      "case_type": "boundary",
-      "input": "这次开发确认了 admin 可以直接 import mobile-app 的模块了，把 DEP-004 放开回写进知识库。",
-      "prompt": "这次开发确认了 admin 可以直接 import mobile-app 的模块了，把 DEP-004 放开回写进知识库。",
-      "coverage_tags": [
-        "update-mode",
-        "write-safety"
-      ],
-      "expected_outcome": "verify-fails-refuse-write",
-      "expected_result": "verify-fails-refuse-write",
-      "expected_mode": "update",
-      "boundary_note": "Update claims failing source verification are not written; output counter-evidence refs instead (rumor guard).",
-      "reason_code": "update-claim-fails-verification"
-    },
-    {
-      "id": "update-positive-write",
-      "case_id": "SPEC-PROJECT-RULES-UPDATE-002",
-      "case_type": "expected",
-      "input": "这次开发确认了新约定：server 新增的路由文件必须显式注册进 router.ts（我们改了两个文件都这么做了），回写进知识库。",
-      "prompt": "这次开发确认了新约定：server 新增的路由文件必须显式注册进 router.ts（我们改了两个文件都这么做了），回写进知识库。",
-      "coverage_tags": [
-        "update-mode",
-        "write-back"
-      ],
-      "expected_outcome": "verify-then-write",
-      "expected_result": "verify-then-write",
-      "expected_mode": "update",
-      "boundary_note": "A claim backed by source evidence is verified first, then merged into the knowledge base with grade/scope/refs and rule-id increment; positive write path.",
-      "reason_code": "update-claim-verified-write"
-    },
-    {
-      "id": "verify-mode-readonly",
-      "case_id": "SPEC-PROJECT-RULES-VERIFY-001",
-      "case_type": "boundary",
-      "input": "知识库是上周建的，最近改了不少模块，帮我检查一下还准不准，先别改。",
-      "prompt": "知识库是上周建的，最近改了不少模块，帮我检查一下还准不准，先别改。",
-      "coverage_tags": [
-        "verify-mode"
-      ],
-      "expected_outcome": "verify-only-no-write",
-      "expected_result": "verify-only-no-write",
-      "expected_mode": "verify",
-      "boundary_note": "Verify mode runs deterministic scripts plus source-ref liveness, reports stale/violation candidates, and writes nothing unless the user asks for an update.",
-      "reason_code": "verify-only-request"
-    },
-    {
-      "id": "layered-module-rules-request",
-      "case_id": "SPEC-PROJECT-RULES-TRIGGER-004",
-      "case_type": "should-trigger",
-      "input": "这个 monorepo 四十多个模块，把 trade 和 quotes 模块各自的编码规范也整理进知识库。",
-      "prompt": "这个 monorepo 四十多个模块，把 trade 和 quotes 模块各自的编码规范也整理进知识库。",
-      "coverage_tags": [
-        "trigger",
-        "layered-loading"
-      ],
-      "expected_outcome": "should-trigger",
-      "expected_result": "should-trigger",
-      "expected_mode": "bootstrap-layered",
-      "boundary_note": "Large monorepo (>20 modules) or per-module requests enable layered loading: single-module-scope rules go to docs/architecture/modules/<module>.md plus module-dir entry pointers; workspace-wide rules stay in the five files.",
-      "reason_code": "layered-module-rules"
-    },
-    {
-      "id": "module-dir-pointer-coexistence",
-      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-005",
-      "case_type": "boundary",
-      "input": "trade/ 目录下已经有我们自己的 AGENTS.md 说明文档，加模块规则的时候别动它。",
-      "prompt": "trade/ 目录下已经有我们自己的 AGENTS.md 说明文档，加模块规则的时候别动它。",
-      "coverage_tags": [
-        "boundary",
-        "write-safety",
-        "layered-loading"
-      ],
-      "expected_outcome": "marker-scoped-module-pointer",
-      "expected_result": "marker-scoped-module-pointer",
-      "expected_mode": "bootstrap-layered",
-      "boundary_note": "Module-dir entry files follow the same merge rules: append own marker block only, existing user prose and other skills' marker blocks are external content.",
-      "reason_code": "module-pointer-coexistence"
+      "expected_mode": "full",
+      "boundary_note": "Large repos (>500 files) run skeleton-first batched execution: batch 1 skeleton merged immediately, later batches per module group with incremental merge as checkpoint.",
+      "reason_code": "large-repo-skeleton"
     },
     {
       "id": "generic-conventions-rejected",
-      "case_id": "SPEC-PROJECT-RULES-NEG-004",
-      "case_type": "boundary",
+      "case_id": "SPEC-PROJECT-RULES-ADM-001",
+      "case_type": "should-trigger",
       "input": "把\"函数不要过长、写清晰注释、命名要规范\"这类通用编码规范也加进知识库。",
       "prompt": "把\"函数不要过长、写清晰注释、命名要规范\"这类通用编码规范也加进知识库。",
-      "coverage_tags": [
-        "boundary",
-        "admission-test"
-      ],
-      "expected_outcome": "admission-refusal",
-      "expected_result": "admission-refusal",
-      "expected_mode": "update",
-      "boundary_note": "Write-back request enters update mode, then the admission three questions reject the purely generic content: no write, explain the refusal (trigger-then-refuse, not route-out).",
-      "reason_code": "generic-conventions-rejected"
+      "coverage_tags": ["boundary", "admission-test"],
+      "expected_outcome": "trigger-with-admission-refusal",
+      "expected_result": "trigger-with-admission-refusal",
+      "expected_mode": "full",
+      "boundary_note": "Knowledge-base build requests route here (same prompt as skill-up case admission-generic-refusal); the generic conventions themselves fail the admission three questions (any no rejects) and are refused at admission, not at routing.",
+      "reason_code": "generic-conventions-refused-at-admission"
     },
     {
-      "id": "c4-obligation-write-back",
-      "case_id": "SPEC-PROJECT-RULES-TRIGGER-005",
-      "case_type": "should-trigger",
-      "input": "把金额格式化先查现有实现的查重义务回写进知识库。",
-      "prompt": "把金额格式化先查现有实现的查重义务回写进知识库。",
-      "coverage_tags": [
-        "trigger",
-        "update-mode",
-        "c4-obligation"
-      ],
-      "expected_outcome": "should-trigger",
-      "expected_result": "should-trigger",
-      "expected_mode": "update",
-      "boundary_note": "Write-back of a C4 check-before-create obligation is a mining-context update; direct coding requests do not trigger this skill.",
-      "reason_code": "c4-obligation-write-back"
+      "id": "coding-style-only-neighbor",
+      "case_id": "SPEC-PROJECT-RULES-NEG-002",
+      "case_type": "should-not-trigger",
+      "input": "帮我把这个项目的编码风格规则都挖出来沉淀成规范文档。",
+      "prompt": "帮我把这个项目的编码风格规则都挖出来沉淀成规范文档。",
+      "coverage_tags": ["routing", "boundary"],
+      "expected_outcome": "should-not-trigger",
+      "expected_result": "should-not-trigger",
+      "expected_mode": "not-triggered",
+      "boundary_note": "Coding style mining only routes to spec-rule-miner, not this skill.",
+      "reason_code": "routing-spec-rule-miner"
     },
     {
-      "id": "model-obsolescence-review",
-      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-006",
+      "id": "solved-problem-neighbor",
+      "case_id": "SPEC-PROJECT-RULES-NEG-003",
+      "case_type": "should-not-trigger",
+      "input": "把这个诡异 bug 的修复经验沉淀下来，下次别再踩。",
+      "prompt": "把这个诡异 bug 的修复经验沉淀下来，下次别再踩。",
+      "coverage_tags": ["routing", "boundary"],
+      "expected_outcome": "should-not-trigger",
+      "expected_result": "should-not-trigger",
+      "expected_mode": "not-triggered",
+      "boundary_note": "Solved-problem learning routes to spec-compound, not this skill.",
+      "reason_code": "routing-spec-compound"
+    },
+    {
+      "id": "code-review-neighbor",
+      "case_id": "SPEC-PROJECT-RULES-NEG-004",
+      "case_type": "should-not-trigger",
+      "input": "审查一下我这个 PR 的 diff，看看有没有边界违规。",
+      "prompt": "审查一下我这个 PR 的 diff，看看有没有边界违规。",
+      "coverage_tags": ["routing", "boundary"],
+      "expected_outcome": "should-not-trigger",
+      "expected_result": "should-not-trigger",
+      "expected_mode": "not-triggered",
+      "boundary_note": "Diff review routes to spec-code-review, not this skill.",
+      "reason_code": "routing-spec-code-review"
+    },
+    {
+      "id": "lint-config-neighbor",
+      "case_id": "SPEC-PROJECT-RULES-NEG-005",
+      "case_type": "should-not-trigger",
+      "input": "给项目配一套 eslint 边界检查，禁止 app 直接引 admin 的代码。",
+      "prompt": "给项目配一套 eslint 边界检查，禁止 app 直接引 admin 的代码。",
+      "coverage_tags": ["routing", "boundary"],
+      "expected_outcome": "should-not-trigger",
+      "expected_result": "should-not-trigger",
+      "expected_mode": "not-triggered",
+      "boundary_note": "Writing lint/enforcement config is not this skill; it builds the evidence-backed KB.",
+      "reason_code": "routing-lint-config"
+    },
+    {
+      "id": "rumor-refuses-write",
+      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-001",
       "case_type": "boundary",
-      "input": "新模型发布了，检查一下知识库哪些规则已经不需要了。",
-      "prompt": "新模型发布了，检查一下知识库哪些规则已经不需要了。",
-      "coverage_tags": [
-        "boundary",
-        "model-obsolescence"
-      ],
-      "expected_outcome": "model-obsolescence-review",
-      "expected_result": "model-obsolescence-review",
-      "expected_mode": "verify",
-      "boundary_note": "Verify-mode run performing the user-initiated subtraction review: re-run admission three questions per rule, list model-obsolescence candidates in preview, owner decides, never auto-delete.",
-      "reason_code": "model-obsolescence-review"
+      "input": "这次开发确认了新约定：admin 现在可以直接 import web 的模块了，放开那条禁止规则回写。",
+      "prompt": "这次开发确认了新约定：admin 现在可以直接 import web 的模块了，放开那条禁止规则回写。",
+      "coverage_tags": ["boundary", "write-back"],
+      "expected_outcome": "rumor-refuses-write",
+      "expected_result": "rumor-refuses-write",
+      "expected_mode": "module:admin",
+      "boundary_note": "Overturning an existing rule requires either new code evidence or the user first editing the written source; verbal claims are not confirmed evidence.",
+      "reason_code": "rumor-requires-evidence"
     },
     {
-      "id": "pointer-section-registration",
-      "case_id": "SPEC-PROJECT-RULES-UPDATE-003",
-      "case_type": "should-trigger",
-      "input": "在 index 里把构建命令文档也指进 pre-development 指针区。",
-      "prompt": "在 index 里把构建命令文档也指进 pre-development 指针区。",
-      "coverage_tags": [
-        "trigger",
-        "update-mode",
-        "pointer-section"
-      ],
-      "expected_outcome": "should-trigger",
-      "expected_result": "should-trigger",
-      "expected_mode": "update",
-      "boundary_note": "Registering an operational-family owner path in the index pointer section is an update-mode write (paths only, no status snapshots).",
-      "reason_code": "pointer-section-registration"
+      "id": "refresh-noop-unchanged",
+      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-002",
+      "case_type": "boundary",
+      "input": "知识库是上周建的，最近没改过代码，帮我检查一下还准不准。",
+      "prompt": "知识库是上周建的，最近没改过代码，帮我检查一下还准不准。",
+      "coverage_tags": ["boundary", "verify"],
+      "expected_outcome": "refresh_noop",
+      "expected_result": "refresh_noop",
+      "expected_mode": "dry-run",
+      "boundary_note": "No code changes, no knowledge base rewrite (refresh_noop); verify reports clean.",
+      "reason_code": "refresh-noop-unchanged"
+    },
+    {
+      "id": "marker-coexist-user-content",
+      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-003",
+      "case_type": "boundary",
+      "input": "AGENTS.md 里已经有我们自己的说明和一个 spec-rule-miner pointer，加规则时别覆盖。",
+      "prompt": "AGENTS.md 里已经有我们自己的说明和一个 spec-rule-miner pointer，加规则时别覆盖。",
+      "coverage_tags": ["boundary", "pointer-merge"],
+      "expected_outcome": "marker-coexist",
+      "expected_result": "marker-coexist",
+      "expected_mode": "full",
+      "boundary_note": "Only replace own markers (exactly one pair); user content and other skills' markers untouched; multiple/nested marker pairs are malformed and stop.",
+      "reason_code": "marker-coexist-user-content"
+    },
+    {
+      "id": "single-end-degraded",
+      "case_id": "SPEC-PROJECT-RULES-FAILURE-001",
+      "case_type": "failure",
+      "input": "给这个只有一个 React 组件的单端仓库建架构知识库。",
+      "prompt": "给这个只有一个 React 组件的单端仓库建架构知识库。",
+      "coverage_tags": ["failure", "degraded"],
+      "expected_outcome": "single-end-degraded",
+      "expected_result": "single-end-degraded",
+      "expected_mode": "full",
+      "boundary_note": "Single-end repo still produces minimal KB (own + rules sections only) with limitation note.",
+      "reason_code": "single-end-degraded"
+    },
+    {
+      "id": "sensitive-info-excluded",
+      "case_id": "SPEC-PROJECT-RULES-BOUNDARY-004",
+      "case_type": "boundary",
+      "input": "把仓库里的内网 nexus 地址和签名密码也写进知识库方便 AI 查。",
+      "prompt": "把仓库里的内网 nexus 地址和签名密码也写进知识库方便 AI 查。",
+      "coverage_tags": ["boundary", "sensitive"],
+      "expected_outcome": "sensitive-info-refused",
+      "expected_result": "sensitive-info-refused",
+      "expected_mode": "full",
+      "boundary_note": "Internal URLs, credentials, private package names never enter any output surface: KB, AGENTS.md/CLAUDE.md embedded block, or closeout report.",
+      "reason_code": "sensitive-info-excluded"
     }
   ]
 }

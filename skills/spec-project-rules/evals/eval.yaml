@@ -1,0 +1,34 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: codex
+
+cases:
+  files:
+    - evals/cases/bootstrap-gold.yaml
+    - evals/cases/update-rumor-refusal.yaml
+    - evals/cases/admission-generic-refusal.yaml
+    - evals/cases/refresh-noop.yaml
+    - evals/cases/refresh-dirty.yaml
+    - evals/cases/marker-coexist-embed.yaml
+    - evals/cases/sensitive-write-refusal.yaml
+    - evals/cases/single-end-degraded.yaml
+    - evals/cases/large-repo-batched.yaml
+    - evals/cases/sampling-fallback.yaml
+  defaults:
+    timeout_seconds: 900
+    max_turns: 18
+    expect:
+      exit_code: 0
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

@@ -1,0 +1,28 @@
+id: large-repo-batched
+title: 大仓走骨架先行分批增量且不留中间产物文件
+description: |
+  验证大仓分批执行纪律：552 源码文件多端 monorepo（prepare 脚本评测时生成）
+  ——预期走"骨架先行 + 分批增量合入"：README 明文边界吸收进骨架、L0 依赖图
+  事实入条目；每批候选 preview 后立即增量合入单文件知识库，docs/ 下只有
+  architecture.md（不留批次中间产物文件）；业务源码零改动；headless 首嵌
+  跳过。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh`——它会
+    生成一个约 550 个源码文件的多端 monorepo（web/admin/h5 三端 +
+    api-client/ui/utils 三个共享包）并创建基线 commit。本用例完全自包含；不要
+    读取本工作区之外的任何资料。使用 spec-project-rules skill 建立架构知识库
+    （注意按规程处理大仓规模）。完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/large-monorepo-fresh
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 1800
+  max_turns: 30
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-large-repo.sh
+  timeout_seconds: 60

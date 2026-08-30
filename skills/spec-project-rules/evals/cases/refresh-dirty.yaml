@@ -1,0 +1,30 @@
+id: refresh-dirty
+title: refs 脏检测后聚焦重验仍准确则零写入且不回滚用户工作区改动
+description: |
+  验证保鲜路径的脏检测分支：知识库基线之后 apps/web/src/order.ts 有未提交
+  改动——预期 freshness 报 dirty（order.ts），只重验涉及条目；追加导出不改变
+  createClient 既有事实，结论仍为无实质变化零写入；同时不得"顺手修复"或
+  回滚用户的工作区改动（目标仓库只读边界的行为面）。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    fixture 基线 commit，然后依次执行以下 setup 命令模拟"知识库生成于当前
+    基线、之后代码有改动"：
+    1. `perl -pi -e "s/eval0001/$(git rev-parse --short HEAD)/" docs/architecture.md && git add docs/architecture.md && git commit -qm kb-baseline`
+    2. `printf 'export const TOUCHED = 1;\n' >> apps/web/src/order.ts`（不要 commit 这条改动）
+    本用例完全自包含；不要读取本工作区之外的任何资料。然后使用
+    spec-project-rules skill 处理以下要求："知识库是之前建的，帮我检查一下
+    还准不准。"完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/multi-end-with-kb
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-refresh-dirty.sh
+  timeout_seconds: 60

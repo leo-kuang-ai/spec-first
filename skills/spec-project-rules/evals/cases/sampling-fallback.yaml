@@ -1,0 +1,26 @@
+id: sampling-fallback
+title: 布局不受支持时消费脚本抽样清单产出知识库并披露抽样比例
+description: |
+  验证 exit-2 抽样降级路径：仓库无 workspaces/Gradle（多目录单包，21 源码文件）——
+  预期消费 extract-deps.cjs exit-2 输出的确定性抽样清单（sampling.modules[].sample_files）
+  取证而非自创抽样；产出知识库覆盖 lib/net 封装约定与目录归属；closeout 披露
+  抽样比例与无依赖图事实；不虚构 monorepo 路径；headless 首嵌跳过。
+input:
+  prompt: |
+    这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
+    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    fixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。
+    使用 spec-project-rules skill 给这个没有 monorepo 工具链（无 workspaces、
+    无 Gradle）的多目录仓库建架构知识库。完成后把控制权交还 caller。
+context:
+  repo_fixture: evals/fixtures/repos/plain-multidir-fresh
+  git:
+    init: true
+    checkout: main
+constraints:
+  timeout_seconds: 900
+  max_turns: 18
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-sampling-fallback.sh
+  timeout_seconds: 60

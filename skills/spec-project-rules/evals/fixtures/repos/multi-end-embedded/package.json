@@ -1,0 +1,1 @@
+{"name":"shop-monorepo","private":true,"workspaces":["apps/*","packages/*"]}
