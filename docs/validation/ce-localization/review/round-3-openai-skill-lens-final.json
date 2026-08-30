@@ -8,23 +8,70 @@
   "provider_identity": "unverified",
   "provider_receipt_ref": null,
   "worker_context_isolation": "degraded_inherited",
-  "generated_at": "2026-08-28",
+  "generated_at": "2026-08-29T00:00:00.000Z",
   "producer": "role-simulated OpenAI skill-engineering lens using current local source only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "b70aba8f951548eee6888734615dee34324c15b4",
+    "head": "f9b4633d1f4d97f48435d78fc9828aac977bd0a1",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/plans/2026-08-28-002-refactor-knowledge-layer-slice1-and-b-line-architecture-plan.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/04-workflows-artifacts-map.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/10-\\344\\272\\247\\347\\211\\251\\347\\233\\256\\345\\275\\225.md",
+      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
+      "docs/catalog/runtime-capabilities.md",
+      "docs/plans/2026-08-29-001-feat-spec-project-rules-v2-ultimate-design-plan.md",
+      "docs/validation/spec-project-rules/2026-08-29-hszq-app-skill-up-evaluation.md",
+      "docs/validation/spec-project-rules/2026-08-29-post-remediation-multi-round-evaluation.md",
       "skills/spec-project-rules/SKILL.md",
+      "skills/spec-project-rules/evals/README.md",
+      "skills/spec-project-rules/evals/cases/admission-generic-refusal.yaml",
+      "skills/spec-project-rules/evals/cases/bootstrap-gold.yaml",
+      "skills/spec-project-rules/evals/cases/update-rumor-refusal.yaml",
+      "skills/spec-project-rules/evals/eval.yaml",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/README.md",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/legacy/OldPanel.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/stats.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/cart.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/order.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/index.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/index.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/prepare-eval-fixture.sh",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/AGENTS.md",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/README.md",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/legacy/OldPanel.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/stats.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/cart.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/order.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture.md",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/index.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/index.ts",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/package.json",
+      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/prepare-eval-fixture.sh",
+      "skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
+      "skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+      "skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
       "skills/spec-project-rules/evals/trigger-cases.json",
       "skills/spec-project-rules/references/knowledge-format.md",
-      "tests/unit/spec-project-rules-contracts.test.js"
+      "skills/spec-project-rules/references/mining-method.md",
+      "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "tests/unit/ce-localization-review-contracts.test.js",
+      "tests/unit/spec-project-rules-contracts.test.js",
+      "tests/unit/spec-project-rules-scripts.test.js"
     ],
-    "dirty_path_manifest_sha256": "f3b898da84b211761335a7e41fe2a5b17c3b7940d3cddddb4dd744d6f09f0ee6",
-    "source_tree_hash": "7d558a018f9853f2a0b4401c7d0ecd11d434b2948683b8dbfc3b71111a8445bc",
-    "inventory_hash": "14936245009ee8ff3d8f856e1c248bdf10afd08bd6eacc1827ca5ed010478cfa",
+    "dirty_path_manifest_sha256": "5b49dd05f9636c62a1efa9e7a04ec6f83c2fe7c373e6bf901055f29eca7161e3",
+    "source_tree_hash": "5a71afe3466d3079624e3805910d9073650cd27eba63ad2ebda0378c9e3b5eaf",
+    "inventory_hash": "b651022f71ba3d8e3f9e0564efc93b9c7843375480098d79b36d8cd55a1fbf15",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -58,8 +105,8 @@
       "version": "canonical-source-manifest-v1"
     }
   },
-  "inventory_hash": "14936245009ee8ff3d8f856e1c248bdf10afd08bd6eacc1827ca5ed010478cfa",
-  "inventory_artifact_sha256": "e359b2c87a545652a267e9a6d1c432b70267b0120e1dda65ac24eb37e3ce1b61",
+  "inventory_hash": "b651022f71ba3d8e3f9e0564efc93b9c7843375480098d79b36d8cd55a1fbf15",
+  "inventory_artifact_sha256": "c0fa6e764b95a88458c5b073115a7ed73cef6e4171fb954ccdd55524ed2aed94",
   "input_artifacts": [
     {
       "path": "docs/validation/ce-localization/skill-inventory.json",
@@ -86,9 +133,9 @@
     "dirty_path_manifest_sha256": "4c0c78000acf7fae68fdff3eb8e523956af2a2fbb9bb6d48b6a9c4996283fee8",
     "inventory_hash": "7897d3b4a38f689cfa2e44bf66e511544710579472825938473b32495bbe1021"
   },
-  "review_input_hash": "8e4df851d6673159593fcb7a5d46f7df1ef5ca2f4ccbff3304a43c4d49efe199",
+  "review_input_hash": "dbd7d869b0f2cc1ad36c1c0912baa193993b2fc7ec95c30c66b24ed0ed0e6827",
   "review_input_hash_algorithm": "sha256(JSON.stringify(coverage.review_input, null, 2) + newline)",
-  "chunk_manifest_hash": "d3128c3bd2af163a800f7380432574f4e67c50ac1fa95df67766e1fd25ba43e7",
+  "chunk_manifest_hash": "93d27d70d7b213e1e5c5de28a3c847686e01e544aa7a9d764386d52faa927978",
   "chunk_manifest": [
     {
       "chunk_id": "oai-r3-final-001",
@@ -213,8 +260,8 @@
     {
       "chunk_id": "oai-r3-final-037",
       "skill_id": "spec-project-rules",
-      "receipt_count": 10,
-      "receipt_manifest_sha256": "6e0b2097fe702d93faaca1c57de492b00137548c8e0656571be0a02dd4150e0d"
+      "receipt_count": 49,
+      "receipt_manifest_sha256": "bd3bb8535a665a84d9a71b3e1e1383018a0447b70a477133529e8e5cb829649d"
     },
     {
       "chunk_id": "oai-r3-final-021",
@@ -315,16 +362,16 @@
   ],
   "expected_skill_count": 37,
   "reviewed_skill_count": 37,
-  "expected_package_path_count": 577,
+  "expected_package_path_count": 612,
   "expected_direct_support_path_count": 190,
   "expected_direct_support_relation_count": 403,
-  "reviewed_package_path_count": 577,
+  "reviewed_package_path_count": 612,
   "reviewed_direct_support_path_count": 190,
   "reviewed_direct_support_relation_count": 403,
-  "reviewed_expected_path_relation_count": 980,
-  "reviewed_unique_source_path_count": 767,
-  "coverage_status": "complete-current-source",
-  "review_status": "complete-current-source",
+  "reviewed_expected_path_relation_count": 1019,
+  "reviewed_unique_source_path_count": 806,
+  "coverage_status": "complete-current-source-with-incremental-review",
+  "review_status": "complete-with-incremental-review",
   "trust_status": "source-bound-role-simulated-provider-unverified",
   "findings_summary": {
     "current_total": 2,
@@ -14156,11 +14203,50 @@
       "expected_paths": [
         "docs/contracts/project-graph-consumption.md",
         "skills/spec-project-rules/SKILL.md",
+        "skills/spec-project-rules/evals/README.md",
+        "skills/spec-project-rules/evals/cases/admission-generic-refusal.yaml",
+        "skills/spec-project-rules/evals/cases/bootstrap-gold.yaml",
+        "skills/spec-project-rules/evals/cases/update-rumor-refusal.yaml",
+        "skills/spec-project-rules/evals/eval.yaml",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/README.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/legacy/OldPanel.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/stats.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/cart.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/order.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/index.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/index.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/prepare-eval-fixture.sh",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/AGENTS.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/README.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/legacy/OldPanel.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/stats.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/cart.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/order.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture/coding-rules.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture/dependency-rules.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture/index.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture/reuse-contracts.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture/workspace-map.md",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/index.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/index.ts",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/package.json",
+        "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/prepare-eval-fixture.sh",
+        "skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
+        "skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+        "skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
         "skills/spec-project-rules/evals/trigger-cases.json",
         "skills/spec-project-rules/references/knowledge-format.md",
         "skills/spec-project-rules/references/mining-method.md",
         "skills/spec-project-rules/scripts/extract-deps.cjs",
-        "skills/spec-project-rules/scripts/verify-deps.cjs",
         "src/cli/contracts/dual-host-governance/skills-governance.json",
         "tests/unit/spec-project-rules-contracts.test.js",
         "tests/unit/spec-project-rules-scripts.test.js"
@@ -14187,17 +14273,97 @@
           "source_kind": "reference-contract"
         },
         {
-          "path": "skills/spec-project-rules/evals/trigger-cases.json",
+          "path": "skills/spec-project-rules/evals/cases/admission-generic-refusal.yaml",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "6d730e6bd62c50c9206ff059c2f985bd2486fd0dfcb6b19b52dcc82d22a89c40",
-          "bytes": 21558,
-          "line_count": 463,
+          "sha256": "7f0f2b59f8c805ec27a78caaf920141aebc3d3624a355a001c9f93649324136e",
+          "bytes": 1136,
+          "line_count": 25,
           "covered_line_ranges": [
             [
               1,
-              463
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-7f0f2b59f8c8"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/bootstrap-gold.yaml",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "2377040ee1a02dbef48cc2896720753576e8afc825f965dca9baef3088893685",
+          "bytes": 1407,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-post-remediation-eval-openai-skill-engineering-2377040ee1a0"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/update-rumor-refusal.yaml",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "f06b01ced381a42555e2997a552d5a39d9a7b3017a7b48400871f531897e7ee5",
+          "bytes": 1231,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-f06b01ced381"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/eval.yaml",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "ee89609626353c05a2188ce7ff9858b0834aab01483ca8f16c3b5b59f68a2c4d",
+          "bytes": 429,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-ee8960962635"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "ef9424a8f34b68a24ae2f4aac388907e88fb2dc2887926713924f9d67661a957",
+          "bytes": 61,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
             ]
           ],
           "review_chunk_ids": [
@@ -14207,104 +14373,724 @@
           "source_kind": "evaluation"
         },
         {
-          "path": "skills/spec-project-rules/references/knowledge-format.md",
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/legacy/OldPanel.ts",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "fdf2c842e162436caca009c2d66b379cbe19868a340c0bf327d561a920a00879",
-          "bytes": 11472,
-          "line_count": 131,
+          "sha256": "dd6473c4a62fa9634ec5d639902a967e8f7b7b79e20b0813eb4bb26a855eb31a",
+          "bytes": 246,
+          "line_count": 4,
           "covered_line_ranges": [
             [
               1,
-              131
+              4
             ]
           ],
           "review_chunk_ids": [
             "oai-r3-final-037"
           ],
           "read_status": "full",
-          "source_kind": "reference-contract"
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/stats.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "44a4bd9ac63808abc03190b750fa5bb93cc46ab1106a70ed48ffb36d757bf848",
+          "bytes": 162,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "e1c7dda9c503d4f85bfcac3b285c5016453bc99235199763b15a3439dc290308",
+          "bytes": 78,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/cart.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "dda60413756934d1fc0cae039969660cc29a426f02e6301b9b3c910c2faca7b7",
+          "bytes": 224,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/order.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "b507b4e46606db1e18f0edb1afbc2526ab7f9e093b1667ceeba90dcd7d0733a4",
+          "bytes": 162,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "481d783ee2f0debf1d78fcc6890b0f7e132ca31ca1c361d59d890b1873113e21",
+          "bytes": 77,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/index.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "f2391b9e0d91ab20878c340fb9b0b072684b54091ad15c6223320adec9b72cdc",
+          "bytes": 365,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "81fdfc79fbf78bc2644a9c057fbfb3117e170b2bcf88caf610b30ed3cb2a1c45",
+          "bytes": 64,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/index.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "36823cc12ddd568ebf37c911dafaebdf588e454aef10e3b76a9df3c183c38651",
+          "bytes": 76,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "1176e1e0351539ed6bc527401b8447723e5abe50780808bc61a5b0b0a33110b1",
+          "bytes": 56,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/prepare-eval-fixture.sh",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e",
+          "bytes": 134,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/README.md",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "af1a0708505cc201f117be58ee20c4b634f6be6ec747ba55f22336f720afe7ea",
+          "bytes": 239,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/AGENTS.md",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "35a1bc055a998d23d1276c06e89c08ead96b32670c213fefba8474849a2e2b06",
+          "bytes": 640,
+          "line_count": 15,
+          "covered_line_ranges": [
+            [
+              1,
+              15
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-35a1bc055a99"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "ef9424a8f34b68a24ae2f4aac388907e88fb2dc2887926713924f9d67661a957",
+          "bytes": 61,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/legacy/OldPanel.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "dd6473c4a62fa9634ec5d639902a967e8f7b7b79e20b0813eb4bb26a855eb31a",
+          "bytes": 246,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/stats.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "44a4bd9ac63808abc03190b750fa5bb93cc46ab1106a70ed48ffb36d757bf848",
+          "bytes": 162,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "e1c7dda9c503d4f85bfcac3b285c5016453bc99235199763b15a3439dc290308",
+          "bytes": 78,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/cart.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "dda60413756934d1fc0cae039969660cc29a426f02e6301b9b3c910c2faca7b7",
+          "bytes": 224,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/order.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "b507b4e46606db1e18f0edb1afbc2526ab7f9e093b1667ceeba90dcd7d0733a4",
+          "bytes": 162,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "8827de6a110807051897b094e10157906eaa5f5dfb7818b4f73e28fe1b352267",
+          "bytes": 919,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-8827de6a1108"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "481d783ee2f0debf1d78fcc6890b0f7e132ca31ca1c361d59d890b1873113e21",
+          "bytes": 77,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/index.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "f2391b9e0d91ab20878c340fb9b0b072684b54091ad15c6223320adec9b72cdc",
+          "bytes": 365,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "81fdfc79fbf78bc2644a9c057fbfb3117e170b2bcf88caf610b30ed3cb2a1c45",
+          "bytes": 64,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/index.ts",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "36823cc12ddd568ebf37c911dafaebdf588e454aef10e3b76a9df3c183c38651",
+          "bytes": 76,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/package.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "1176e1e0351539ed6bc527401b8447723e5abe50780808bc61a5b0b0a33110b1",
+          "bytes": 56,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/prepare-eval-fixture.sh",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e",
+          "bytes": 134,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/README.md",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "af1a0708505cc201f117be58ee20c4b634f6be6ec747ba55f22336f720afe7ea",
+          "bytes": 239,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "oai-r3-final-037"
+          ],
+          "read_status": "full",
+          "source_kind": "evaluation"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "bf715fdaa139d12628cdd2a7d86254a4f04db05ba9b803ee5ac476f3655f7adf",
+          "bytes": 779,
+          "line_count": 13,
+          "covered_line_ranges": [
+            [
+              1,
+              13
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-bf715fdaa139"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "919195a25a44fcf1f7c071fe78dda64aa24b249fdcecaa66b8d3ee32ec145003",
+          "bytes": 1832,
+          "line_count": 24,
+          "covered_line_ranges": [
+            [
+              1,
+              24
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-post-remediation-eval-openai-skill-engineering-919195a25a44"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "44816bf4079e7fccc049b120030545bb943e84b06af51d41f4e0f15d204c7133",
+          "bytes": 511,
+          "line_count": 9,
+          "covered_line_ranges": [
+            [
+              1,
+              9
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-44816bf4079e"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/README.md",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "1b57ed2ccc3cae1165efb6558e4c36affb12e53f046c8a65dc2dc47ce36a12c8",
+          "bytes": 1891,
+          "line_count": 8,
+          "covered_line_ranges": [
+            [
+              1,
+              8
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-post-remediation-eval-openai-skill-engineering-1b57ed2ccc3c"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/trigger-cases.json",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "c8d39ea17dd1715651cdb9127b75a6d54dc036e9d50fb1864614c3c742886de3",
+          "bytes": 9139,
+          "line_count": 183,
+          "covered_line_ranges": [
+            [
+              1,
+              183
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-c8d39ea17dd1"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/references/knowledge-format.md",
+          "path_role": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "631718f9869bec9e8b954d6147f9037757483735778ee04f9f068456fdf65dab",
+          "bytes": 7426,
+          "line_count": 152,
+          "covered_line_ranges": [
+            [
+              1,
+              152
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-29-spec-project-rules-post-remediation-eval-openai-skill-engineering-631718f9869b"
+          ],
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-project-rules/references/mining-method.md",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "ecd1dfa45bb7aa01f1d1866e13d1a019dfedc947fa9e75f2f278de20f614200c",
-          "bytes": 9283,
-          "line_count": 83,
+          "sha256": "3c8091fdec5e48ed6dbf8310ceea9ee8cc89a865c67826d9001f56fb989d0b8f",
+          "bytes": 21833,
+          "line_count": 242,
           "covered_line_ranges": [
             [
               1,
-              83
+              242
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-037"
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-3c8091fdec5e"
           ],
           "read_status": "full",
-          "source_kind": "reference-contract"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "4d51ede233b3b015de91843da9b2f1ca90582cd1cb41f4fecd13af40a3bd4a8f",
-          "bytes": 8125,
-          "line_count": 220,
+          "sha256": "4e9a64e01f406409c7b1e4fe388275929160fd216a5e1c9b09f25c4711cee082",
+          "bytes": 16970,
+          "line_count": 436,
           "covered_line_ranges": [
             [
               1,
-              220
+              436
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-037"
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-4e9a64e01f40"
           ],
           "read_status": "full",
-          "source_kind": "deterministic-helper"
-        },
-        {
-          "path": "skills/spec-project-rules/scripts/verify-deps.cjs",
-          "path_role": "skill-package",
-          "owning_skill": "spec-project-rules",
-          "shared_consumers": [],
-          "sha256": "196f08ccf9446a2a3547a530b58aa4ec85a697920018f8f20c53b62f1391c5bb",
-          "bytes": 5725,
-          "line_count": 154,
-          "covered_line_ranges": [
-            [
-              1,
-              154
-            ]
-          ],
-          "review_chunk_ids": [
-            "oai-r3-final-037"
-          ],
-          "read_status": "full",
-          "source_kind": "deterministic-helper"
+          "source_kind": "skill-package"
         },
         {
           "path": "skills/spec-project-rules/SKILL.md",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "9695c5f07a1dc24a7782eb844a83a3765cea1cbcbeca70e0ee8319274f3cc5ad",
-          "bytes": 12843,
-          "line_count": 88,
+          "sha256": "8437f32ad4640ca4180ecafdf92d4d48680c0cb492dd9fd06d7f7d15b3510a74",
+          "bytes": 8074,
+          "line_count": 115,
           "covered_line_ranges": [
             [
               1,
-              88
+              115
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-037"
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-8437f32ad464"
           ],
           "read_status": "full",
-          "source_kind": "entry-contract"
+          "source_kind": "skill-package"
         },
         {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -14331,40 +15117,40 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "f93f7ac62bb797e763ea7e82cf0ac799c7195eed0dcc764362a790b8c606418b",
-          "bytes": 5108,
-          "line_count": 110,
+          "sha256": "2040e269d81475d7df91fd9fe297945b6dceae3b2d7139e0bb7d90743adb84ac",
+          "bytes": 8016,
+          "line_count": 167,
           "covered_line_ranges": [
             [
               1,
-              110
+              167
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-037"
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-2040e269d814"
           ],
           "read_status": "full",
-          "source_kind": "evaluation"
+          "source_kind": "direct-support"
         },
         {
           "path": "tests/unit/spec-project-rules-scripts.test.js",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "c63ff9deb6ea376b0fdf1cac0ddfe88357b4a7856e28db1ffe83f6b5fe5b9078",
-          "bytes": 6078,
-          "line_count": 137,
+          "sha256": "a31624f500b24dac6e284de64e0920f2c80c14d2d7ad7189845ba0b8c2ae629b",
+          "bytes": 9196,
+          "line_count": 229,
           "covered_line_ranges": [
             [
               1,
-              137
+              229
             ]
           ],
           "review_chunk_ids": [
-            "oai-r3-final-037"
+            "2026-08-29-spec-project-rules-review-hardening-openai-skill-engineering-a31624f500b2"
           ],
           "read_status": "full",
-          "source_kind": "evaluation"
+          "source_kind": "direct-support"
         }
       ],
       "coverage_status": "full",
@@ -22061,11 +22847,11 @@
   "verification": {
     "source_receipt_recalculation": {
       "status": "passed",
-      "package_paths": 577,
+      "package_paths": 616,
       "direct_support_unique_paths": 190,
       "direct_support_relations": 403,
-      "unique_utf8_paths": 767,
-      "relation_receipts": 980,
+      "unique_utf8_paths": 806,
+      "relation_receipts": 1019,
       "hash_mismatch_count": 0,
       "line_count_mismatch_count": 0,
       "invalid_utf8_count": 0,
@@ -22114,15 +22900,18 @@
     "This delta covers the closeout regression test relation only; it is not a full Skill re-review.",
     "This delta covers only the current CE reconciliation and Runtime Setup receipt gaps created by the reviewed source changes; it is not a full Skill re-review.",
     "Provider-authenticated independent review, isolated worker execution, real host behavior, runtime adoption, field outcome, and knowledge promotion remain unverified or not-run.",
-    "This delta covers the current spec-compound closeout lineage regression relation only; it is not a full Skill re-review."
+    "This delta covers the current spec-compound closeout lineage regression relation only; it is not a full Skill re-review.",
+    "inline-same-context review; no independent provider identity; worker context isolation degraded_inherited",
+    "judge scripts verified red/green on the with-kb fixture only; full skill-up rerun (engine=codex) still pending",
+    "F-02 (legacy v1 KB migration guidance) and F-04 (pointer-style sensitive registration) recorded as open owner decisions, not fixed in this window"
   ],
   "consumers": [
     "docs/validation/ce-localization/review/round-3-findings.json aggregate owner",
     "accepted finding canonical Skill owners",
     "U9a-D conflict adjudication and U10 closeout"
   ],
-  "expected_receipt_count": 980,
-  "reviewed_receipt_count": 980,
+  "expected_receipt_count": 1019,
+  "reviewed_receipt_count": 1019,
   "current_findings": [
     {
       "finding_id": "R3-OAI-003",
@@ -23457,5 +24246,19 @@
     "open_skill_ids": [],
     "no_open_finding_skill_count": 37,
     "closure_status": "0-open-0-closed-source-contract-2-deferred"
-  }
+  },
+  "review_deltas": [
+    {
+      "review_run_id": "2026-08-29-spec-project-rules-hszq-field-test-docs",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-08-29-spec-project-rules-hszq-field-test-docs-delta.json",
+      "artifact_sha256": "7f7d45932a2c7bc986bf7eab14f5349b1d09f2e1adff8ba84a674cc819228851",
+      "reviewed_at": "2026-08-29T00:00:00.000Z",
+      "review_method": "inline-same-context",
+      "independent": false,
+      "provider_identity": "not-used",
+      "worker_context_isolation": "degraded_inherited",
+      "claim_ceiling": "Source-bound incremental review of the field-test documentation change set only."
+    }
+  ],
+  "review_delta_findings": []
 }

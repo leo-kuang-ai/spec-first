@@ -17,7 +17,7 @@ describe('CE localization deterministic review producer', () => {
     ].join('/');
 
     expect(inventory.skill_count).toBe(37);
-    expect(inventory.package_path_count).toBe(577);
+    expect(inventory.package_path_count).toBe(650);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -37,6 +37,12 @@ describe('CE localization deterministic review producer', () => {
     // 2026-08-28: 187 -> 189 / 393 -> 402 after adding skills/spec-project-rules
     // (new focused test + shared governance/project-graph relations);
     // 189 -> 190 / 402 -> 403 after adding its deterministic scripts test.
+    // 2026-08-29: 575 -> 617 after adding skill-up eval assets; 617 -> 616 after v2 removed verify-deps.cjs
+    // (eval.yaml + 3 cases + 2 fixture repos + 3 judge scripts); 616 -> 612 after the review-hardening
+    // pass retired the five-file fixture KB into single-file docs/architecture.md (net -4);
+    // 612 -> 650 after the darwin/governance rounds expanded behavior evals to 9 cases
+    // (+6 case yamls, +6 judge scripts, single-end fixture, generated large-repo fixture,
+    // multi-end-embedded fixture, evals/README).
     expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(190);
     expect(coverage.coverage_summary.direct_support_relation_count).toBe(403);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({

@@ -1,0 +1,29 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-08-29-spec-project-rules-review-hardening",
+  "producer": "maintainer inline review (multi-role remediation window)",
+  "reviewed_at": "2026-08-29T00:00:00.000Z",
+  "source_binding": {
+    "head": "f9b4633d1f4d97f48435d78fc9828aac977bd0a1",
+    "dirty_path_manifest_sha256": "fa77c469d2fcbfd223e52bb61586fe9d5feb3762e34776ed8d2860c3b9c752b0",
+    "source_tree_hash": "78e69339712d01d7a4cb090729ba0d4e5f7faddf0067dcc3980a346d63af8fc0",
+    "inventory_hash": "f832ce8da51ad862897f9bb3e1a8605e16e222bf07661b411e650f7c347a4fd1",
+    "inventory_artifact_sha256": "8f53308279913b53229b2d435998a26678cd6dda820f5661b6c41d879ef5c5aa",
+    "review_input_hash": "b7ff0cb3e4938451eab96e5d7f6a1367b3f3ba2107867fa63ee98153a945bd6b"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "inline-same-context review; no independent provider identity; worker context isolation degraded_inherited",
+    "judge scripts verified red/green on the with-kb fixture only; full skill-up rerun (engine=codex) still pending"
+  ],
+  "claim_ceiling": "Source-bound incremental review of the spec-project-rules review-hardening change set only."
+}

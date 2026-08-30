@@ -1,0 +1,186 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-08-29-spec-project-rules-post-remediation-eval",
+  "producer": "maintainer inline review (post-remediation evaluation window)",
+  "reviewed_at": "2026-08-29T00:00:00.000Z",
+  "source_binding": {
+    "head": "f9b4633d1f4d97f48435d78fc9828aac977bd0a1",
+    "dirty_path_manifest_sha256": "5b49dd05f9636c62a1efa9e7a04ec6f83c2fe7c373e6bf901055f29eca7161e3",
+    "source_tree_hash": "90e631caf899768d7fb3d8d26cb9e0a88628d053fd84bb52a819be37fd37d722",
+    "inventory_hash": "b651022f71ba3d8e3f9e0564efc93b9c7843375480098d79b36d8cd55a1fbf15",
+    "inventory_artifact_sha256": "6b61a18123dfaff42e7d933cf90cd191b3779c657c1df5d5993161f48cd7bfa5",
+    "review_input_hash": "3f1bf22c3751624327d1e41fba2a3d75be11253d56cf8b1f4c7eaf9e09440026"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-project-rules/evals/README.md",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "1b57ed2ccc3cae1165efb6558e4c36affb12e53f046c8a65dc2dc47ce36a12c8",
+      "bytes": 1891,
+      "line_count": 8,
+      "covered_line_ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Engineering lens: measurement repair loop only; deterministic/semantic boundary unchanged; 12/12 behavioral scenarios passed."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Craft/safety lens: security clauses (environmental headless, exact-one-marker-pair, forged-marker suspicion, three-surface sensitive exclusion) behaviorally verified under adversarial scenarios."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/bootstrap-gold.yaml",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "2377040ee1a02dbef48cc2896720753576e8afc825f965dca9baef3088893685",
+      "bytes": 1407,
+      "line_count": 27,
+      "covered_line_ranges": [
+        [
+          1,
+          27
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Engineering lens: measurement repair loop only; deterministic/semantic boundary unchanged; 12/12 behavioral scenarios passed."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Craft/safety lens: security clauses (environmental headless, exact-one-marker-pair, forged-marker suspicion, three-surface sensitive exclusion) behaviorally verified under adversarial scenarios."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "919195a25a44fcf1f7c071fe78dda64aa24b249fdcecaa66b8d3ee32ec145003",
+      "bytes": 1832,
+      "line_count": 24,
+      "covered_line_ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Engineering lens: measurement repair loop only; deterministic/semantic boundary unchanged; 12/12 behavioral scenarios passed."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Craft/safety lens: security clauses (environmental headless, exact-one-marker-pair, forged-marker suspicion, three-surface sensitive exclusion) behaviorally verified under adversarial scenarios."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-project-rules/references/knowledge-format.md",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "631718f9869bec9e8b954d6147f9037757483735778ee04f9f068456fdf65dab",
+      "bytes": 7426,
+      "line_count": 152,
+      "covered_line_ranges": [
+        [
+          1,
+          152
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Engineering lens: measurement repair loop only; deterministic/semantic boundary unchanged; 12/12 behavioral scenarios passed."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Change is the 2026-08-29 post-remediation multi-round evaluation window: F-01 eval instrument fix (check-bootstrap judge aligned to headless first-embed-skip contract), F-03 skill template fix (frontmatter must be first in knowledge-format file-structure block; behaviorally confirmed 3/3 agents followed the flawed template), evaluation report and CHANGELOG added, judge scripts corrected during measurement. Craft/safety lens: security clauses (environmental headless, exact-one-marker-pair, forged-marker suspicion, three-surface sensitive exclusion) behaviorally verified under adversarial scenarios."
+          ],
+          "limitations": [
+            "inline-same-context review; provider identity not verified"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "inline-same-context review; no independent provider identity; worker context isolation degraded_inherited",
+    "F-02 (legacy v1 KB migration guidance) and F-04 (pointer-style sensitive registration) recorded as open owner decisions, not fixed in this window"
+  ],
+  "claim_ceiling": "Source-bound incremental review of the post-remediation evaluation change set only."
+}

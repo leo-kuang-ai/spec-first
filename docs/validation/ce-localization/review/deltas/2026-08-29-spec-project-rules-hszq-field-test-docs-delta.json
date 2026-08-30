@@ -1,0 +1,28 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-08-29-spec-project-rules-hszq-field-test-docs",
+  "producer": "maintainer inline review (hszq field-test documentation window)",
+  "reviewed_at": "2026-08-29T00:00:00.000Z",
+  "source_binding": {
+    "head": "f9b4633d1f4d97f48435d78fc9828aac977bd0a1",
+    "dirty_path_manifest_sha256": "5b49dd05f9636c62a1efa9e7a04ec6f83c2fe7c373e6bf901055f29eca7161e3",
+    "source_tree_hash": "5a71afe3466d3079624e3805910d9073650cd27eba63ad2ebda0378c9e3b5eaf",
+    "inventory_hash": "b651022f71ba3d8e3f9e0564efc93b9c7843375480098d79b36d8cd55a1fbf15",
+    "inventory_artifact_sha256": "c0fa6e764b95a88458c5b073115a7ed73cef6e4171fb954ccdd55524ed2aed94",
+    "review_input_hash": "dbd7d869b0f2cc1ad36c1c0912baa193993b2fc7ec95c30c66b24ed0ed0e6827"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "not-used",
+    "worker_context_isolation": "degraded_inherited"
+  },
+  "reviewed_paths": [],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "inline-same-context review; no independent provider identity; worker context isolation degraded_inherited"
+  ],
+  "claim_ceiling": "Source-bound incremental review of the field-test documentation change set only."
+}
