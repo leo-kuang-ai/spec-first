@@ -1,0 +1,23 @@
+id: direct-lane-simple-howto
+title: 轻量一次性问答应留在 Direct Lane 不进 workflow
+description: |
+  验证 Direct Lane 判据：当前上下文的轻量事实/一次性 how-to 解释不进入任何 spec-* workflow，
+  不产生 Entering 宣告，也不产生路由推荐（Recommended entrypoint / 推荐入口），
+  由入口治理器直接作答。
+
+input:
+  prompt: |
+    （当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。）
+    Markdown 的围栏代码块语法是什么？一句话告诉我。
+
+expect:
+  must_not_contain:
+    - "Entering spec"
+    - "Recommended entrypoint"
+    - "推荐入口"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["```"]

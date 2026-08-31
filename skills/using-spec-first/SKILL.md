@@ -23,7 +23,7 @@ description: Standalone entry governor for spec-first. Use before substantial wo
 
 ## Route Selection
 
-For every request outside the fast paths, and to validate an explicit public route or answer “what next?”, read [Public Route Map](references/public-route-map.md). Select exactly one entrypoint; do not automatically chain the flow. Prefer readiness, failure, or review routes when they match; otherwise use immediate intent and artifact type. At low confidence, ask at most one route-changing question.
+For every request outside the fast paths, and to validate an explicit public route or answer “what next?”, read [Public Route Map](references/public-route-map.md). Select exactly one entrypoint; do not automatically chain the flow. Prefer readiness, failure, or review routes when they match; otherwise use immediate intent and artifact type. **Checkpoint — ask:** at low confidence, ask at most one route-changing question, then stop and wait for the answer before routing further.
 
 For active work, announce one localized line equivalent to `Entering <entrypoint>: <one concrete reason>`, then follow the selected route. If a standalone skill is user-invoked only, recommend it and wait. For recommendation-only requests, return exactly one recommendation and wait:
 
@@ -33,7 +33,7 @@ Reason: <one concrete reason>
 Next action: <one action the user can take now>
 ```
 
-Use the repository's configured user language. Enter the recommendation only after the user asks to continue.
+Use the repository's configured user language. **Checkpoint — wait:** after any recommendation, stop and yield; enter the recommended entrypoint only after the user asks to continue.
 
 ## Exit Boundaries
 

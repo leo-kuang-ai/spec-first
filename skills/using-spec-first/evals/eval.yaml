@@ -1,0 +1,27 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/route-failure-to-spec-debug.yaml
+    - evals/cases/route-vague-idea-to-spec-brainstorm.yaml
+    - evals/cases/recommendation-only-format.yaml
+    - evals/cases/direct-lane-simple-howto.yaml
+    - evals/cases/failure-priority-single-entry.yaml
+  defaults:
+    timeout_seconds: 240
+    max_turns: 8
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

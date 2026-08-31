@@ -1,0 +1,28 @@
+id: route-failure-to-spec-debug
+title: 失败信号应路由到 spec-debug
+description: |
+  验证入口治理器对报错/堆栈/回归类请求选择恰好一个入口：应选择 spec-debug，
+  而不是 spec-plan / spec-work，也不是链式进入多个 workflow。
+  沙箱为空目录、workflow 未安装，skill 允许按 recommend-and-wait 降级输出推荐模板，
+  因此断言只锚定入口名与排除项，宣告格式（Entering / Recommended entrypoint / 中文变体）均算合法。
+
+input:
+  prompt: |
+    （当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。
+    这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，
+    按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）
+    跑 npm test 全挂了，报 TypeError: Cannot read properties of undefined (reading 'id')，
+    位置 src/sum.js:42，昨天还是绿的。帮我处理一下。
+
+expect:
+  must_contain:
+    - "spec-debug"
+  must_not_contain:
+    - "Entering spec-plan"
+    - "Entering spec-work"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

@@ -114,5 +114,5 @@ description: "Use this standalone skill to build or update a project architectur
 
 - `scripts/extract-deps.cjs <repoRoot> --verify` 核对依赖图与依赖方向小节（依赖方向条目用规范动词：禁止/不得/不允许）；发现违规边、失效 source refs 或别名扫描错误时 exit 1
 - source refs 存活扫描：每条规则引用的路径是否仍存在
-- `--freshness`（可与 `--verify` 同用，advisory 不影响退出码）：以知识库 frontmatter 的 `source_commit` 为 git 基线对 source refs 做脏检测——`clean` 且 verify clean → 确定性 refresh_noop，零重验；`dirty` → 只重验 `dirty_refs` 涉及的条目，不重挖全库（文件级保守判定，是否实质影响条目由重验裁决）；`unavailable`（无 git/浅克隆/基线不可解析）→ 退回全量重验并在 closeout 披露
+- `--freshness`（可与 `--verify` 同用，advisory 不影响退出码）：以知识库 frontmatter 的 `source_commit` 为 git 基线对 source refs 与复用条目住址做脏检测——`clean` 且 verify clean → 确定性 refresh_noop，零重验；`dirty` → 只重验 `dirty_refs` 涉及的条目，不重挖全库（文件级保守判定，是否实质影响条目由重验裁决；目录住址按其下任一文件变更计脏）；`unavailable`（无 git/浅克隆/基线不可解析）→ 退回全量重验并在 closeout 披露
 - 无实质变化 → refresh_noop（不重写文件）

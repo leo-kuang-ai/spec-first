@@ -12,66 +12,46 @@
   "coverage_status": "complete-current-source-with-incremental-review",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "f9b4633d1f4d97f48435d78fc9828aac977bd0a1",
+    "head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
     "dirty": true,
     "dirty_paths": [
       "CHANGELOG.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/04-workflows-artifacts-map.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/10-\\344\\272\\247\\347\\211\\251\\347\\233\\256\\345\\275\\225.md",
-      "docs/05-\\347\\224\\250\\346\\210\\267\\346\\211\\213\\345\\206\\214/24-\\345\\205\\254\\345\\274\\200\\345\\205\\245\\345\\217\\243\\344\\270\\216Skill\\347\\233\\256\\345\\275\\225.md",
-      "docs/catalog/runtime-capabilities.md",
-      "docs/plans/2026-08-29-001-feat-spec-project-rules-v2-ultimate-design-plan.md",
-      "docs/validation/spec-project-rules/2026-08-29-hszq-app-skill-up-evaluation.md",
-      "docs/validation/spec-project-rules/2026-08-29-post-remediation-multi-round-evaluation.md",
+      "docs/contracts/workflows/ce-localization-regeneration-sequence.md",
+      "docs/validation/skill-evals/2026-08-30-skill-inventory.md",
+      "docs/validation/skill-evals/README.md",
+      "docs/validation/skill-evals/_template.md",
+      "docs/validation/skill-evals/results.tsv",
+      "docs/validation/skill-evals/using-spec-first.md",
+      "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
+      "skills/spec-ideate/evals/cases/refine-own-idea-routes-to-brainstorm.yaml",
+      "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
+      "skills/spec-ideate/evals/cases/surprise-me-no-repo-needs-substance.yaml",
+      "skills/spec-ideate/evals/cases/vague-subject-gate-asks.yaml",
+      "skills/spec-ideate/evals/eval.yaml",
+      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md",
+      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/package.json",
+      "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js",
+      "skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
       "skills/spec-project-rules/SKILL.md",
       "skills/spec-project-rules/evals/README.md",
-      "skills/spec-project-rules/evals/cases/admission-generic-refusal.yaml",
-      "skills/spec-project-rules/evals/cases/bootstrap-gold.yaml",
-      "skills/spec-project-rules/evals/cases/update-rumor-refusal.yaml",
-      "skills/spec-project-rules/evals/eval.yaml",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/README.md",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/legacy/OldPanel.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/stats.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/cart.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/order.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/index.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/index.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/prepare-eval-fixture.sh",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/AGENTS.md",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/README.md",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/legacy/OldPanel.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/stats.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/cart.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/order.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture.md",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/index.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/index.ts",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/package.json",
-      "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/prepare-eval-fixture.sh",
-      "skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
-      "skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
-      "skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
-      "skills/spec-project-rules/evals/trigger-cases.json",
       "skills/spec-project-rules/references/knowledge-format.md",
       "skills/spec-project-rules/references/mining-method.md",
       "skills/spec-project-rules/scripts/extract-deps.cjs",
-      "skills/spec-project-rules/scripts/verify-deps.cjs",
+      "skills/using-spec-first/SKILL.md",
+      "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
+      "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
+      "skills/using-spec-first/evals/cases/recommendation-only-format.yaml",
+      "skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml",
+      "skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml",
+      "skills/using-spec-first/evals/eval.yaml",
       "tests/unit/ce-localization-review-contracts.test.js",
       "tests/unit/spec-project-rules-contracts.test.js",
-      "tests/unit/spec-project-rules-scripts.test.js"
+      "tests/unit/spec-project-rules-scripts.test.js",
+      "tests/unit/using-spec-first-contracts.test.js"
     ],
-    "dirty_path_manifest_sha256": "5b49dd05f9636c62a1efa9e7a04ec6f83c2fe7c373e6bf901055f29eca7161e3",
-    "source_tree_hash": "5a71afe3466d3079624e3805910d9073650cd27eba63ad2ebda0378c9e3b5eaf",
-    "inventory_hash": "b651022f71ba3d8e3f9e0564efc93b9c7843375480098d79b36d8cd55a1fbf15",
+    "dirty_path_manifest_sha256": "bbc7b9dcb60366a9d6a3178f2c227db2f0e4608ff453360c3b65c2d958059849",
+    "source_tree_hash": "be29eca636cd722fb90acecf19a63a74e320e0251b003b81e16ba167cea3e761",
+    "inventory_hash": "8048c355d99c8dc6af15e5da9caab06fa4a8e987a121147ac210f77a31607295",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -153,17 +133,17 @@
       "sha256": "0a18d51978a03a3c2d330950be7d81f0e20415993b6dcdf0fc30a4a9ecbff8a2"
     }
   ],
-  "inventory_hash": "b651022f71ba3d8e3f9e0564efc93b9c7843375480098d79b36d8cd55a1fbf15",
-  "inventory_artifact_sha256": "c0fa6e764b95a88458c5b073115a7ed73cef6e4171fb954ccdd55524ed2aed94",
+  "inventory_hash": "8048c355d99c8dc6af15e5da9caab06fa4a8e987a121147ac210f77a31607295",
+  "inventory_artifact_sha256": "f60f539a7c6f563b47eda88b0542f950dc484abcc69701a776e708f5c0572d94",
   "package_manifest_sha256": "7e91561f57bdee5fc0d014651a14cff141e9bdb4cc39b0b6a7bbc01b6726031e",
   "direct_support_manifest_sha256": "8b7e968aef897b43123d279a1080939fc96ecca3b593d54086fef95b7b523612",
   "relation_manifest_sha256": "807319b1e686537190a85b44149d4dd9b5faacc8fb412e210b5c6ecb6b6d59de",
   "review_input_hash_algorithm": "sha256(stable-json(coverage.review_input))",
-  "review_input_hash": "dbd7d869b0f2cc1ad36c1c0912baa193993b2fc7ec95c30c66b24ed0ed0e6827",
+  "review_input_hash": "bc469ef5befe912c11af7dd508af7eb5f555802ff177496ad70917c658caebed",
   "expected_skill_count": 37,
   "reviewed_skill_count": 37,
-  "expected_package_path_count": 612,
-  "reviewed_package_path_count": 612,
+  "expected_package_path_count": 692,
+  "reviewed_package_path_count": 692,
   "expected_direct_support_path_count": 190,
   "reviewed_direct_support_path_count": 190,
   "expected_direct_support_relation_count": 403,
@@ -179,7 +159,7 @@
     "receipt_binding": "chunk ids are listed by source_read_receipts",
     "limitation": "packet identity/range only; not equal semantic attention"
   },
-  "chunk_manifest_hash": "93d27d70d7b213e1e5c5de28a3c847686e01e544aa7a9d764386d52faa927978",
+  "chunk_manifest_hash": "537c95247f32ed36e167575996e60d65e1368850d0a15a408716130d9899bcc0",
   "finding_summary": {
     "review_area_count": 13,
     "open_count": 0,
@@ -279,7 +259,13 @@
     "This delta covers the current spec-compound closeout lineage regression relation only; it is not a full Skill re-review.",
     "inline-same-context review; no independent provider identity; worker context isolation degraded_inherited",
     "judge scripts verified red/green on the with-kb fixture only; full skill-up rerun (engine=codex) still pending",
-    "F-02 (legacy v1 KB migration guidance) and F-04 (pointer-style sensitive registration) recorded as open owner decisions, not fixed in this window"
+    "F-02 (legacy v1 KB migration guidance) and F-04 (pointer-style sensitive registration) recorded as open owner decisions, not fixed in this window",
+    "execution_context schema (v1) only models the inline-same-context path; this delta was actually reviewed by fresh-source dispatched paired judges (3/3 better per round, context-level independence only — same provider pool)",
+    "paired-judge verdicts are comparative (better/worse), not absolute quality scores; engine-level eval (skill-up/codex) covers all 10 cases green",
+    "upstream adjudication re-verified by fresh-source agent: 517/517 carry-over, 0 stale flips",
+    "execution_context schema (v1) only models the inline-same-context path; this delta was actually reviewed inline by the batch-commit session agent (full-text reads of all changed/new canonical skill-package files), not by independent fresh-source dispatched reviewers",
+    "eval behavior evidence lives in the per-skill eval transcripts and CHANGELOG entries (using-spec-first cross-engine 5/5, iteration-6); this delta adds the source-receipt binding for the new eval assets and scanner fixes",
+    "upstream adjudication re-stamped on identical upstream window (name_status_sha256 unchanged, shared record fields 0 mismatches, no local ref deletions): 517/517 carry-over"
   ],
   "claim_ceiling": "只支持冻结 working-tree canonical package/direct-support source 的 role-simulated Anthropic skill-craft/safety 静态合同结论；不证明 Anthropic/provider 身份、reviewer independence、等强度逐行注意、runtime/browser/provider/Git/CI 或 field outcome。",
   "skill_reviews": [
@@ -4429,8 +4415,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-commit",
           "shared_consumers": [],
-          "sha256": "e246c5389b17ea4d573ab6e3e4f7a36cd20d110a53896f5b43515a71b1f1e5a6",
-          "bytes": 8108,
+          "sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253",
+          "bytes": 8183,
           "line_count": 160,
           "covered_line_ranges": [
             [
@@ -4439,9 +4425,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-spec-commit-ab4dcf3c"
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-10f7549d3d67"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         }
       ],
       "supporting_case": {
@@ -8157,6 +8144,206 @@
         "tests/unit/spec-ideate-clarification-handoff-contracts.test.js"
       ],
       "source_read_receipts": [
+        {
+          "path": "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "41a1228c6e5caf8f3914b27b3b580b6b696699343127ec9ab6a347bd6c180bb6",
+          "bytes": 783,
+          "line_count": 23,
+          "covered_line_ranges": [
+            [
+              1,
+              23
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-41a1228c6e5c"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/cases/refine-own-idea-routes-to-brainstorm.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "c9a15dcd95a4143f9dbb2c4fa6166a40515bf9b2623aa8a1dde24412b98e31d7",
+          "bytes": 741,
+          "line_count": 22,
+          "covered_line_ranges": [
+            [
+              1,
+              22
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-c9a15dcd95a4"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "b449d880c69515d7b0e788bc1b9c05382af34caafa55d93b51737218d31a1e88",
+          "bytes": 1079,
+          "line_count": 34,
+          "covered_line_ranges": [
+            [
+              1,
+              34
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-b449d880c695"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/cases/surprise-me-no-repo-needs-substance.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "86204da0093bc65630566d3708fd386c1add28cc8581a7871ca6a669f3645ab4",
+          "bytes": 699,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-86204da0093b"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/cases/vague-subject-gate-asks.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "5d249670f612ecb3e8ac5b63aa88d085c59a3b477a9e1b3adb34515d0dc37338",
+          "bytes": 793,
+          "line_count": 21,
+          "covered_line_ranges": [
+            [
+              1,
+              21
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-5d249670f612"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/eval.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "979c31fd86663137f1a7eb9059cd80a8a3d9cab62ee727288d5daead712b1b84",
+          "bytes": 551,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-979c31fd8666"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/fixtures/repos/mini-ledger/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
+          "bytes": 96,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-03422077e4a5"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855",
+          "bytes": 365,
+          "line_count": 8,
+          "covered_line_ranges": [
+            [
+              1,
+              8
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-4aac9f151312"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34",
+          "bytes": 665,
+          "line_count": 25,
+          "covered_line_ranges": [
+            [
+              1,
+              25
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-ff9d96855c23"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-ideate",
+          "shared_consumers": [],
+          "sha256": "d0946c4c69850e60a31401e7f8ef67bf92796b2257d8546ce55c2b4791007353",
+          "bytes": 548,
+          "line_count": 19,
+          "covered_line_ranges": [
+            [
+              1,
+              19
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-d0946c4c6985"
+          ],
+          "read_status": "full"
+        },
         {
           "path": "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
           "path_role": "skill-package",
@@ -14289,6 +14476,146 @@
           "source_kind": "skill-package"
         },
         {
+          "path": "skills/spec-project-rules/evals/cases/large-repo-batched.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "9d05ab5482e789d172c801694b697e127989ef9fe2eff8c4f93ee7e56f857b94",
+          "bytes": 1375,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-9d05ab5482e7"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/marker-coexist-embed.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "d08e2abc6ec76b8856a77fdb71cdf244994036abf05d506a41b30f8d49d28cdd",
+          "bytes": 1398,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-d08e2abc6ec7"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/refresh-dirty.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "ff795c54f35db10738949c99433a16796f8cbfc33ec599b8ae4f1fb6f8c68b91",
+          "bytes": 1618,
+          "line_count": 30,
+          "covered_line_ranges": [
+            [
+              1,
+              30
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-ff795c54f35d"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/refresh-noop.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "caac9402bd22aacc396c089abd099cbddb91be1e2961c5595565c642535bd32d",
+          "bytes": 1279,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-caac9402bd22"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/sampling-fallback.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "0d070a0b84372ea6e59a3c64b874edcf1c2e32de8c9785b758d06aef76dd66e0",
+          "bytes": 1317,
+          "line_count": 26,
+          "covered_line_ranges": [
+            [
+              1,
+              26
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-0d070a0b8437"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/sensitive-write-refusal.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "58295023da70f0e66f6521f472fb9b6835a4ec00820db2f3035f4a168c301163",
+          "bytes": 1297,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-58295023da70"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/cases/single-end-degraded.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "0319ecaac50e86030d03021162545d64850b6b72fd793bdd1d9ac397f934b48c",
+          "bytes": 1236,
+          "line_count": 26,
+          "covered_line_ranges": [
+            [
+              1,
+              26
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-0319ecaac50e"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-project-rules/evals/cases/update-rumor-refusal.yaml",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
@@ -14313,20 +14640,380 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "ee89609626353c05a2188ce7ff9858b0834aab01483ca8f16c3b5b59f68a2c4d",
-          "bytes": 429,
-          "line_count": 27,
+          "sha256": "891797aa1e32d215ac63a0dc39e31ae7f4361267107e27801be5a113ffe63ad6",
+          "bytes": 719,
+          "line_count": 34,
           "covered_line_ranges": [
             [
               1,
-              27
+              34
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-ee8960962635"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-891797aa1e32"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/large-monorepo-fresh/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6c0c7e81f74211ccc6902e73342fa184d95d085bd6b0b1a1dea3b779c501150b",
+          "bytes": 74,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-6c0c7e81f742"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/large-monorepo-fresh/prepare-eval-fixture.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "de5791870c0392d2242ef144aefb26ea183a0dab37e005161204e46707f3f4d9",
+          "bytes": 2244,
+          "line_count": 52,
+          "covered_line_ranges": [
+            [
+              1,
+              52
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-de5791870c03"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/large-monorepo-fresh/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "52ba2ddc0f846b8fabfb64f281faba5a3b2412ffea9a1e7d2f57af1a392700fa",
+          "bytes": 320,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-52ba2ddc0f84"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/AGENTS.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "25bf0bb8c8d26870ce808cd84d469171e50058fdd31b882262861e893cd06cf0",
+          "bytes": 1043,
+          "line_count": 26,
+          "covered_line_ranges": [
+            [
+              1,
+              26
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-25bf0bb8c8d2"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "ef9424a8f34b68a24ae2f4aac388907e88fb2dc2887926713924f9d67661a957",
+          "bytes": 61,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-ef9424a8f34b"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/src/legacy/OldPanel.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "dd6473c4a62fa9634ec5d639902a967e8f7b7b79e20b0813eb4bb26a855eb31a",
+          "bytes": 246,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-dd6473c4a62f"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/src/stats.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "44a4bd9ac63808abc03190b750fa5bb93cc46ab1106a70ed48ffb36d757bf848",
+          "bytes": 162,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-44a4bd9ac638"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "e1c7dda9c503d4f85bfcac3b285c5016453bc99235199763b15a3439dc290308",
+          "bytes": 78,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-e1c7dda9c503"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/src/cart.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "dda60413756934d1fc0cae039969660cc29a426f02e6301b9b3c910c2faca7b7",
+          "bytes": 224,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-dda604137569"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/src/order.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "b507b4e46606db1e18f0edb1afbc2526ab7f9e093b1667ceeba90dcd7d0733a4",
+          "bytes": 162,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-b507b4e46606"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/docs/architecture.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "d326ddd55522a9c0ebb0c5813ede42edf13d73117f83b70db05e25350a319676",
+          "bytes": 919,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-d326ddd55522"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "481d783ee2f0debf1d78fcc6890b0f7e132ca31ca1c361d59d890b1873113e21",
+          "bytes": 77,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-481d783ee2f0"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/index.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "f2391b9e0d91ab20878c340fb9b0b072684b54091ad15c6223320adec9b72cdc",
+          "bytes": 365,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-f2391b9e0d91"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "81fdfc79fbf78bc2644a9c057fbfb3117e170b2bcf88caf610b30ed3cb2a1c45",
+          "bytes": 64,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-81fdfc79fbf7"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/index.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "36823cc12ddd568ebf37c911dafaebdf588e454aef10e3b76a9df3c183c38651",
+          "bytes": 76,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-36823cc12ddd"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "1176e1e0351539ed6bc527401b8447723e5abe50780808bc61a5b0b0a33110b1",
+          "bytes": 56,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-1176e1e03515"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/prepare-eval-fixture.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e",
+          "bytes": 134,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-6216cebd5015"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "af1a0708505cc201f117be58ee20c4b634f6be6ec747ba55f22336f720afe7ea",
+          "bytes": 239,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-af1a0708505c"
+          ],
+          "read_status": "full"
         },
         {
           "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json",
@@ -14715,7 +15402,7 @@
           "source_kind": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "8827de6a110807051897b094e10157906eaa5f5dfb7818b4f73e28fe1b352267",
+          "sha256": "d326ddd55522a9c0ebb0c5813ede42edf13d73117f83b70db05e25350a319676",
           "bytes": 919,
           "line_count": 20,
           "covered_line_ranges": [
@@ -14725,7 +15412,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-8827de6a1108"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-d326ddd55522"
           ],
           "read_status": "full"
         },
@@ -14863,6 +15550,646 @@
           "read_status": "full"
         },
         {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/main.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "e5f36ac6e2e5eca172b749d6984bb752388810b0c40133a365638db1cf69b18d",
+          "bytes": 257,
+          "line_count": 4,
+          "covered_line_ranges": [
+            [
+              1,
+              4
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-e5f36ac6e2e5"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/screen1.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "4837428e9cb229c41e4a91ba3e686fd6001fec0e2bc53057ff231799421bb3d8",
+          "bytes": 23,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-4837428e9cb2"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/screen2.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "7d92d5177f3319a4de8e5cd5a13dd259bf26a9382edd05e2d36421cffaca4a4f",
+          "bytes": 23,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-7d92d5177f33"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/screen3.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "3145f0553368a692be14936fdba31a07f22b8e3c54be278ced301a4621a6de64",
+          "bytes": 23,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-3145f0553368"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/audit.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "40814addee5642600828f2caac3d6c2086ca1bff5720beac647d0baa2decd620",
+          "bytes": 102,
+          "line_count": 2,
+          "covered_line_ranges": [
+            [
+              1,
+              2
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-40814addee56"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/domain.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "9c515a0961ac56cc903eb6ea488d38650998e52435464d46df741371078ed7f4",
+          "bytes": 54,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-9c515a0961ac"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra1.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "09e794e67261dff51621da988f011e5975abaaf7c8931e28fd3058f6ec477be8",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-09e794e67261"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra2.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "35566a151db8a3a479e748756c18c01772d1486aeb597e84005b2d9935138943",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-35566a151db8"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra3.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "868d63fba9cd35a346c1d8d4caf8a4f2c693e496419ea1cbdf320e48b8c2cb85",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-868d63fba9cd"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra4.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "b9259b3a41b541b82676f22a51cdfdf7af44ccb16fef122150e0bfb60473e7b5",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-b9259b3a41b5"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/service.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "45d129354a3381d8b51bf10bc3ed6bd2d50090d8ebb9d3943fd06d937010e491",
+          "bytes": 151,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-45d129354a33"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/extra1.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "cf11f00f98c6f73fcfc2243e06af4f76a5733de93647e9f9d2411361a8d54f95",
+          "bytes": 23,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-cf11f00f98c6"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/extra2.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "7db17dd3e6d0d28164d4b00962720621ec239efbf3c266f7f1c3560dc973b755",
+          "bytes": 23,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-7db17dd3e6d0"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/extra3.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "e99243ae0d8aa48968c40c94e08b518feb1d99b159adcd8143518536ca3772f5",
+          "bytes": 23,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-e99243ae0d8a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/gateway.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "e2ed578bfcec0ede26eae4bbb1dc7a9155b0511671bc9b971ec50ff895680735",
+          "bytes": 90,
+          "line_count": 2,
+          "covered_line_ranges": [
+            [
+              1,
+              2
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-e2ed578bfcec"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/index.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "fd94f6f7608a8492ab125511ee24a8ed49330d24102d0915e13f32857f8861c2",
+          "bytes": 102,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-fd94f6f7608a"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/dates.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "efe1aa2829a58f54a4e24778498d5c9e135afeb6ac6443e11521c6a0e24710f7",
+          "bytes": 66,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-efe1aa2829a5"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/extra1.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "1a38eaacd1898550e6fe31d87c271ed8844f41afac48938e5038f0c080a25d28",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-1a38eaacd189"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/extra2.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "07c9bb7bf0c1cd966e702fe13c4b3e40caa866d800ae88898685c458459eedee",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-07c9bb7bf0c1"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/extra3.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "3e77b361068efef703f7f862f0eb04e2169e0ffa4e3a92662184cc144ac46f7a",
+          "bytes": 24,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-3e77b361068e"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/format.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "0a3e5a7a5565f26032aa4a7c60aa8ed559eaef7d5b47694c88b633318346ce3a",
+          "bytes": 60,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-0a3e5a7a5565"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "102d010ac436d05bd2c9f22f353fffcd08f5d2c9acbc236353f71fcf6b1135dd",
+          "bytes": 36,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-102d010ac436"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/prepare-eval-fixture.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e",
+          "bytes": 134,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-6216cebd5015"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "67c83cf24433afd853558db5a48931bda6a59f5d6dcbb507a84065d0f72d1a24",
+          "bytes": 193,
+          "line_count": 6,
+          "covered_line_ranges": [
+            [
+              1,
+              6
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-67c83cf24433"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/package.json",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "4ec3280ff8ee484e5796170d83f6d5f978e2ccd795a319df297f74a5c20301fd",
+          "bytes": 37,
+          "line_count": 1,
+          "covered_line_ranges": [
+            [
+              1,
+              1
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-4ec3280ff8ee"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/prepare-eval-fixture.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e",
+          "bytes": 134,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-6216cebd5015"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/README.md",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "0d6d8bad888fc236ed18445eafb0d9ee716958b884f6fb27387730f21d4f46e0",
+          "bytes": 173,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-0d6d8bad888f"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/api.ts",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "2a7209002dc89735703fee68de78fe363769990abb96444972af15f167fb4e11",
+          "bytes": 183,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-2a7209002dc8"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/App.tsx",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "a7e178662f8e1815033a474c356fe69464c51ea109b4162ec93d7cb382fc3b95",
+          "bytes": 177,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-a7e178662f8e"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/components/OrderList.tsx",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "402e4046835d4a51487b5190d65bb0cf1900ed1dee88f58bce011573496c188e",
+          "bytes": 151,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-402e4046835d"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/components/UserList.tsx",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "9ffacdee475616deaaa9d26d41c588763b0c75a9fd182cbc52e560f989ee33fc",
+          "bytes": 147,
+          "line_count": 5,
+          "covered_line_ranges": [
+            [
+              1,
+              5
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-9ffacdee4756"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/main.tsx",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "ee863f5d392ed8c335f580825440516e37c3ad199e6af4c6d9c5979c3b2f1b1d",
+          "bytes": 115,
+          "line_count": 3,
+          "covered_line_ranges": [
+            [
+              1,
+              3
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-ee863f5d392e"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
@@ -14903,6 +16230,86 @@
           "source_kind": "skill-package"
         },
         {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-large-repo.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "6ae3256cec0764308f53bb98a7551b2d74420738e2987ee05f1c1893fc5d268f",
+          "bytes": 1475,
+          "line_count": 20,
+          "covered_line_ranges": [
+            [
+              1,
+              20
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-6ae3256cec07"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-marker-coexist.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "10b6707520bcce226e876f15b03ea24d719fbcd012fc922d273658d0cb41625d",
+          "bytes": 1026,
+          "line_count": 14,
+          "covered_line_ranges": [
+            [
+              1,
+              14
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-10b6707520bc"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-refresh-dirty.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "d99902e68b4720c7c87612fc5bac9614eb96d06ee3c8ec75179070e7f25a2441",
+          "bytes": 867,
+          "line_count": 12,
+          "covered_line_ranges": [
+            [
+              1,
+              12
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-d99902e68b47"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-refresh-noop.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "b8c27e3c9bb69f866c0dd1c5213c11bb528eb6a2a2b0382263419ca94fe0f37e",
+          "bytes": 836,
+          "line_count": 12,
+          "covered_line_ranges": [
+            [
+              1,
+              12
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-b8c27e3c9bb6"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
@@ -14923,21 +16330,81 @@
           "source_kind": "skill-package"
         },
         {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-sampling-fallback.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "8d06a6cf231388621dde5c0fb6d35d13af4dcf3477e489d8358ac100a8956410",
+          "bytes": 1142,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-8d06a6cf2313"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-sensitive-refusal.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "b629d9e490624d4cd0b18e23daf6821374fb6ef84d57ef595cd9058b6501a000",
+          "bytes": 876,
+          "line_count": 12,
+          "covered_line_ranges": [
+            [
+              1,
+              12
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-b629d9e49062"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/spec-project-rules/evals/fixtures/scripts/check-single-end.sh",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "spec-project-rules",
+          "shared_consumers": [],
+          "sha256": "c59d249ac92a9da01460a4b934bdb649671ea94f9330deebaf884e86a00d1295",
+          "bytes": 1097,
+          "line_count": 16,
+          "covered_line_ranges": [
+            [
+              1,
+              16
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-c59d249ac92a"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/spec-project-rules/evals/README.md",
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "1b57ed2ccc3cae1165efb6558e4c36affb12e53f046c8a65dc2dc47ce36a12c8",
-          "bytes": 1891,
-          "line_count": 8,
+          "sha256": "9dfc3341795c57b203d79871b894713c98ff8ef4551b341ce832aac930385dbd",
+          "bytes": 3977,
+          "line_count": 9,
           "covered_line_ranges": [
             [
               1,
-              8
+              9
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-post-remediation-eval-anthropic-skill-craft-safety-1b57ed2ccc3c"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-9dfc3341795c"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -14947,8 +16414,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "c8d39ea17dd1715651cdb9127b75a6d54dc036e9d50fb1864614c3c742886de3",
-          "bytes": 9139,
+          "sha256": "ab10ce16c8d8dd39b0ae2d9dfdf1b1aec61b34c68de6dbe9253e61099c026659",
+          "bytes": 9287,
           "line_count": 183,
           "covered_line_ranges": [
             [
@@ -14957,7 +16424,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-c8d39ea17dd1"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-ab10ce16c8d8"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -14967,17 +16434,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "631718f9869bec9e8b954d6147f9037757483735778ee04f9f068456fdf65dab",
-          "bytes": 7426,
-          "line_count": 152,
+          "sha256": "e3ec6d56a1b62fd97e29f852ceb26cc7304bc5d0d93bd7e6e07d6ee712ddec4c",
+          "bytes": 9043,
+          "line_count": 151,
           "covered_line_ranges": [
             [
               1,
-              152
+              151
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-post-remediation-eval-anthropic-skill-craft-safety-631718f9869b"
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-e3ec6d56a1b6"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -14987,8 +16454,8 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "3c8091fdec5e48ed6dbf8310ceea9ee8cc89a865c67826d9001f56fb989d0b8f",
-          "bytes": 21833,
+          "sha256": "846de9b819a6f0468f380a2447af42af6374dec2d27077016f2958f748cef47a",
+          "bytes": 21793,
           "line_count": 242,
           "covered_line_ranges": [
             [
@@ -14997,7 +16464,7 @@
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-3c8091fdec5e"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-846de9b819a6"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -15007,17 +16474,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "4e9a64e01f406409c7b1e4fe388275929160fd216a5e1c9b09f25c4711cee082",
-          "bytes": 16970,
-          "line_count": 436,
+          "sha256": "ac8eac7d3b9021533e266223a92642396f90fee147e51bea04c19b2ba292e3ba",
+          "bytes": 26186,
+          "line_count": 638,
           "covered_line_ranges": [
             [
               1,
-              436
+              638
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-4e9a64e01f40"
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-ac8eac7d3b90"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -15027,17 +16494,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "8437f32ad4640ca4180ecafdf92d4d48680c0cb492dd9fd06d7f7d15b3510a74",
-          "bytes": 8074,
-          "line_count": 115,
+          "sha256": "dac119ac9c53f96e139ccee6603dfc97eaf86bcd9f54f12fdbbdf961ade55088",
+          "bytes": 9708,
+          "line_count": 118,
           "covered_line_ranges": [
             [
               1,
-              115
+              118
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-8437f32ad464"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-dac119ac9c53"
           ],
           "read_status": "full",
           "source_kind": "skill-package"
@@ -15066,17 +16533,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "2040e269d81475d7df91fd9fe297945b6dceae3b2d7139e0bb7d90743adb84ac",
-          "bytes": 8016,
-          "line_count": 167,
+          "sha256": "52bd246d0ce5f0c7644f8e3018368eb784b5d9b23474f92b9e87060b0d242d21",
+          "bytes": 8571,
+          "line_count": 175,
           "covered_line_ranges": [
             [
               1,
-              167
+              175
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-2040e269d814"
+            "2026-08-30-spec-project-rules-darwin-governance-sampling-anthropic-skill-craft-safety-52bd246d0ce5"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -15086,17 +16553,17 @@
           "path_role": "skill-package",
           "owning_skill": "spec-project-rules",
           "shared_consumers": [],
-          "sha256": "a31624f500b24dac6e284de64e0920f2c80c14d2d7ad7189845ba0b8c2ae629b",
-          "bytes": 9196,
-          "line_count": 229,
+          "sha256": "655c13991b28e0e847d7ff294e3650b158975dcc13c651c7b7464c93fe48a292",
+          "bytes": 18719,
+          "line_count": 444,
           "covered_line_ranges": [
             [
               1,
-              229
+              444
             ]
           ],
           "review_chunk_ids": [
-            "2026-08-29-spec-project-rules-review-hardening-anthropic-skill-craft-safety-a31624f500b2"
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-655c13991b28"
           ],
           "read_status": "full",
           "source_kind": "direct-support"
@@ -23004,6 +24471,126 @@
           "read_status": "full"
         },
         {
+          "path": "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "5f34a655efdf589f4f34a2f8aaaf23d5f70a79942789d236ab8eb2a22e7809d9",
+          "bytes": 735,
+          "line_count": 23,
+          "covered_line_ranges": [
+            [
+              1,
+              23
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-5f34a655efdf"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "7d39fa4e9595342ca58a0d16f9a9bca61e7024ccd8c417f3dd356b95606b0bd2",
+          "bytes": 1212,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-7d39fa4e9595"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/using-spec-first/evals/cases/recommendation-only-format.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "92d75c148be7341a00abf97545d6dab8b21ec21c80f62eaff8ed9f25333b6493",
+          "bytes": 1106,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-92d75c148be7"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "e4a09c4648f4a9f5ec5d7e45bd556cf89fce0049f06c7a533d6720d37a5ced67",
+          "bytes": 1214,
+          "line_count": 28,
+          "covered_line_ranges": [
+            [
+              1,
+              28
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-e4a09c4648f4"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "be434779c72bb119681e819bee5e27c51532ccdcf7a6eec29015d2f8e36dbf9d",
+          "bytes": 1166,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-be434779c72b"
+          ],
+          "read_status": "full"
+        },
+        {
+          "path": "skills/using-spec-first/evals/eval.yaml",
+          "path_role": "skill-package",
+          "source_kind": "skill-package",
+          "owning_skill": "using-spec-first",
+          "shared_consumers": [],
+          "sha256": "bfebc9189313325299fb69b27954d20650e570f889b7a3b9d0bc1dad925c33dc",
+          "bytes": 533,
+          "line_count": 27,
+          "covered_line_ranges": [
+            [
+              1,
+              27
+            ]
+          ],
+          "review_chunk_ids": [
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-bfebc9189313"
+          ],
+          "read_status": "full"
+        },
+        {
           "path": "skills/using-spec-first/references/conditional-routing-boundaries.md",
           "path_role": "skill-package",
           "owning_skill": "using-spec-first",
@@ -23046,8 +24633,8 @@
           "path_role": "skill-package",
           "owning_skill": "using-spec-first",
           "shared_consumers": [],
-          "sha256": "0f65e00250fb8a63a57a6b99bfdc0b26c74f9d132fe2bc2e9395ff41b60e69d3",
-          "bytes": 4149,
+          "sha256": "29c8fe075e9d9956a52145f81ec334458a3ea22d9c432e640c372da2b0fea623",
+          "bytes": 4306,
           "line_count": 42,
           "covered_line_ranges": [
             [
@@ -23056,9 +24643,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-using-spec-first-39f6ed84"
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-29c8fe075e9d"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "skill-package"
         },
         {
           "path": "src/cli/contracts/dual-host-governance/skills-governance.json",
@@ -23217,8 +24805,8 @@
           "path_role": "skill-package",
           "owning_skill": "using-spec-first",
           "shared_consumers": [],
-          "sha256": "e246c5389b17ea4d573ab6e3e4f7a36cd20d110a53896f5b43515a71b1f1e5a6",
-          "bytes": 8108,
+          "sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253",
+          "bytes": 8183,
           "line_count": 160,
           "covered_line_ranges": [
             [
@@ -23227,9 +24815,10 @@
             ]
           ],
           "review_chunk_ids": [
-            "anthropic-r3-final-using-spec-first-ab4dcf3c"
+            "2026-08-31-evals-and-scanner-fix-delta-anthropic-skill-craft-safety-10f7549d3d67"
           ],
-          "read_status": "full"
+          "read_status": "full",
+          "source_kind": "direct-support"
         }
       ],
       "supporting_case": {
@@ -23269,19 +24858,19 @@
       ]
     }
   ],
-  "generated_at": "2026-08-29T00:00:00.000Z",
+  "generated_at": "2026-08-31T00:00:00.000Z",
   "reviewed_expected_path_relation_count": 1019,
   "review_deltas": [
     {
-      "review_run_id": "2026-08-29-spec-project-rules-hszq-field-test-docs",
-      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-08-29-spec-project-rules-hszq-field-test-docs-delta.json",
-      "artifact_sha256": "7f7d45932a2c7bc986bf7eab14f5349b1d09f2e1adff8ba84a674cc819228851",
-      "reviewed_at": "2026-08-29T00:00:00.000Z",
+      "review_run_id": "2026-08-31-evals-and-scanner-fix-delta",
+      "artifact_ref": "docs/validation/ce-localization/review/deltas/2026-08-31-evals-and-scanner-fix-delta.json",
+      "artifact_sha256": "313f08b030b4f07dfdf63aa802cf298a8f10503e88eb4067529dbf870349b1bb",
+      "reviewed_at": "2026-08-31T00:00:00.000Z",
       "review_method": "inline-same-context",
       "independent": false,
-      "provider_identity": "not-used",
-      "worker_context_isolation": "degraded_inherited",
-      "claim_ceiling": "Source-bound incremental review of the field-test documentation change set only."
+      "provider_identity": "unverified",
+      "worker_context_isolation": "unknown",
+      "claim_ceiling": "Source-bound incremental review of the using-spec-first/spec-ideate eval assets, using-spec-first checkpoint markers, and spec-project-rules freshness-scanner fix change set only."
     }
   ],
   "review_delta_findings": []

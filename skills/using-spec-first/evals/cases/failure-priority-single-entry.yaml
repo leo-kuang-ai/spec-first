@@ -1,0 +1,28 @@
+id: failure-priority-single-entry
+title: 复合意图按失败优先且只选一个入口
+description: |
+  验证路由优先级规则：请求同时包含失败信号（崩溃）与后续质量诉求（简化）时，
+  按 readiness/failure/review 优先选择 spec-debug，且不自动链式选择简化 workflow。
+  沙箱允许 recommend-and-wait 降级；断言锚定入口名与排除项，宣告格式中英变体均合法。
+
+input:
+  prompt: |
+    （当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。
+    这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，
+    按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）
+    这个崩溃先帮我解决：App 一启动就 NSInvalidArgumentException，
+    reason: 'unrecognized selector sent to instance 0x60000c0a8f00'。
+    解决完之后我还想把相关代码简化一下，会更清爽。
+
+expect:
+  must_contain:
+    - "spec-debug"
+  must_not_contain:
+    - "Entering spec-simplify-code"
+    - "Entering spec-simplify"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

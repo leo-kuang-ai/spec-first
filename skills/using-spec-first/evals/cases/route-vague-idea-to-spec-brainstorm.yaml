@@ -1,0 +1,27 @@
+id: route-vague-idea-to-spec-brainstorm
+title: 模糊想法应路由到 spec-brainstorm
+description: |
+  验证入口治理器对"问题框定/用户/成功标准都未定"的模糊想法选择 spec-brainstorm，
+  而不是 spec-plan（HOW 未定但 WHAT 已定才用）或 spec-ideate（需要 0-1 方向生成）。
+  沙箱允许 recommend-and-wait 降级；断言锚定入口名与排除项，宣告格式中英变体均合法。
+
+input:
+  prompt: |
+    （当前仓库是 spec-first，using-spec-first skill 已安装，请按它工作。
+    这是隔离评测沙箱：本目录为空、spec-* workflow 未安装属预期，请只做路由判定，
+    按你的宣告或推荐模板给出所选入口即可，无需实际安装或执行任何 workflow。）
+    我有个模糊的念头：想给团队做个自动汇总每日站会进展的小工具，
+    但不确定该做多大、给谁用、成功标准是什么。帮我理一理。
+
+expect:
+  must_contain:
+    - "spec-brainstorm"
+  must_not_contain:
+    - "Entering spec-plan"
+    - "Entering spec-ideate"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-brainstorm"]

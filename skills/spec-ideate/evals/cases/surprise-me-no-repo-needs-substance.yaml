@@ -1,0 +1,20 @@
+id: surprise-me-no-repo-needs-substance
+title: 无仓库时的 Surprise me 必须先索要材料并干净结束
+description: |
+  验证 surprise-me 的确定性路由：CWD 不在 git repo 内时路由到 elsewhere 模式，
+  且必须先收集至少一份材料（URL / 描述 / 粘贴）才能继续；
+  用户提供不了时应说明需要什么并干净结束，不得凭空生成或产出 artifact。
+
+input:
+  prompt: |
+    （spec-ideate skill 已安装，请按它工作。）
+    随便给我一些惊喜的方向吧，你看着办。
+
+expect:
+  must_not_contain:
+    - "docs/ideation"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

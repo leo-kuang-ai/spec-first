@@ -1,0 +1,71 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-08-31-evals-and-scanner-fix-delta",
+  "producer": "batch-commit session agent (inline full-text review of the using-spec-first eval, spec-ideate eval, and spec-project-rules scanner-fix change set)",
+  "reviewed_at": "2026-08-31T00:00:00.000Z",
+  "source_binding": {
+    "head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
+    "dirty_path_manifest_sha256": "bbc7b9dcb60366a9d6a3178f2c227db2f0e4608ff453360c3b65c2d958059849",
+    "source_tree_hash": "be29eca636cd722fb90acecf19a63a74e320e0251b003b81e16ba167cea3e761",
+    "inventory_hash": "8048c355d99c8dc6af15e5da9caab06fa4a8e987a121147ac210f77a31607295",
+    "inventory_artifact_sha256": "f60f539a7c6f563b47eda88b0542f950dc484abcc69701a776e708f5c0572d94",
+    "review_input_hash": "bc469ef5befe912c11af7dd508af7eb5f555802ff177496ad70917c658caebed"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "unknown"
+  },
+  "reviewed_paths": [
+    {
+      "path": "tests/unit/using-spec-first-contracts.test.js",
+      "skill_ids": [
+        "spec-commit",
+        "using-spec-first"
+      ],
+      "sha256": "10f7549d3d678850410fdd9aed8e34029320142de15760d1489964f5303bd253",
+      "bytes": 8183,
+      "line_count": 160,
+      "covered_line_ranges": [
+        [
+          1,
+          160
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "保鲜扫描器统一口径修复全文核验：collectSourceRefs 单一收集器同时服务 liveness 与 freshness（引号检索式/反斜杠转义/glob/含空格片段不再算 ref），住址正则收窄 CJK 括号截断，目录住址锚定脏检测；聚焦单测+契约 25/25 绿（本会话复跑）。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the batch-commit session agent, not independent fresh-source dispatched reviewers"
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "knowledge-format/mining-method 文案与脚本口径同步（排除项去重收敛到通用段）；无敏感信息写入路径变化。"
+          ],
+          "limitations": [
+            "verdicts are inline same-context full-text reads by the batch-commit session agent, not independent fresh-source dispatched reviewers"
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "execution_context schema (v1) only models the inline-same-context path; this delta was actually reviewed inline by the batch-commit session agent (full-text reads of all changed/new canonical skill-package files), not by independent fresh-source dispatched reviewers",
+    "eval behavior evidence lives in the per-skill eval transcripts and CHANGELOG entries (using-spec-first cross-engine 5/5, iteration-6); this delta adds the source-receipt binding for the new eval assets and scanner fixes",
+    "upstream adjudication re-stamped on identical upstream window (name_status_sha256 unchanged, shared record fields 0 mismatches, no local ref deletions): 517/517 carry-over"
+  ],
+  "claim_ceiling": "Source-bound incremental review of the using-spec-first/spec-ideate eval assets, using-spec-first checkpoint markers, and spec-project-rules freshness-scanner fix change set only."
+}

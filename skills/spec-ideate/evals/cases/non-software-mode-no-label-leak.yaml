@@ -1,0 +1,23 @@
+id: non-software-mode-no-label-leak
+title: 非软件主题的情境宣告不得泄漏内部模式标签
+description: |
+  验证模式分类的对外纪律：咖啡店命名属于无软件表面的主题，
+  情境宣告必须用用户认识的平实语言，禁止打印内部 taxonomy 标签
+  （repo-grounded / elsewhere-software / elsewhere-non-software）。
+  该主题缺少 context-substance，skill 也应先问材料而不是直接生成。
+
+input:
+  prompt: |
+    （spec-ideate skill 已安装，请按它工作。）
+    帮我的咖啡店想几个名字。
+
+expect:
+  must_not_contain:
+    - "repo-grounded"
+    - "elsewhere-software"
+    - "elsewhere-non-software"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

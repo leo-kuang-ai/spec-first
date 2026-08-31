@@ -1,11 +1,11 @@
 {
   "schema_version": "spec-first-current-skill-package-inventory/v2",
-  "source_head": "918b10bbccdf6bfb3407972ce3134a82a04bdcbd",
-  "skills_tree_oid": "421f5f6ee388da5b9f091c5cf9c703f1b797dc5e",
+  "source_head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
+  "skills_tree_oid": "ffec5a0dc38275ea90dba2ee236b8511d4081995",
   "source_mode": "working-tree",
-  "manifest_sha256": "627e96a3a7bfe71d2154c23e3d9b99474c006852f91cdd204aea2f0b88173103",
-  "skill_count": 36,
-  "file_count": 578,
+  "manifest_sha256": "f2ce902c106b7cddd4098521dd9689c3af3f63af3c8cc615b523b7e7de1dc771",
+  "skill_count": 37,
+  "file_count": 699,
   "per_skill_counts": {
     "spec-app-consistency-audit": 80,
     "spec-brainstorm": 13,
@@ -19,7 +19,7 @@
     "spec-dogfood": 3,
     "spec-explain": 7,
     "spec-handoff": 4,
-    "spec-ideate": 12,
+    "spec-ideate": 22,
     "spec-lfg": 7,
     "spec-optimize": 18,
     "spec-plan": 61,
@@ -27,6 +27,7 @@
     "spec-pov": 14,
     "spec-prd": 34,
     "spec-product-pulse": 3,
+    "spec-project-rules": 105,
     "spec-promote": 3,
     "spec-prototype": 5,
     "spec-resolve-pr-feedback": 10,
@@ -42,7 +43,7 @@
     "spec-worktree": 2,
     "spec-write-skill": 18,
     "spec-write-tasks": 14,
-    "using-spec-first": 3
+    "using-spec-first": 9
   },
   "files": [
     {
@@ -1733,6 +1734,76 @@
       "sha256": "845e122ffb4da32e0e482b535f1a594ab97e907bb66e1079466aaf71ee5ab8af"
     },
     {
+      "path": "skills/spec-ideate/evals/cases/non-software-mode-no-label-leak.yaml",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 783,
+      "sha256": "41a1228c6e5caf8f3914b27b3b580b6b696699343127ec9ab6a347bd6c180bb6"
+    },
+    {
+      "path": "skills/spec-ideate/evals/cases/refine-own-idea-routes-to-brainstorm.yaml",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 741,
+      "sha256": "c9a15dcd95a4143f9dbb2c4fa6166a40515bf9b2623aa8a1dde24412b98e31d7"
+    },
+    {
+      "path": "skills/spec-ideate/evals/cases/repo-grounded-e2e-writes-artifact.yaml",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 1079,
+      "sha256": "b449d880c69515d7b0e788bc1b9c05382af34caafa55d93b51737218d31a1e88"
+    },
+    {
+      "path": "skills/spec-ideate/evals/cases/surprise-me-no-repo-needs-substance.yaml",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 699,
+      "sha256": "86204da0093bc65630566d3708fd386c1add28cc8581a7871ca6a669f3645ab4"
+    },
+    {
+      "path": "skills/spec-ideate/evals/cases/vague-subject-gate-asks.yaml",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 793,
+      "sha256": "5d249670f612ecb3e8ac5b63aa88d085c59a3b477a9e1b3adb34515d0dc37338"
+    },
+    {
+      "path": "skills/spec-ideate/evals/eval.yaml",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 551,
+      "sha256": "979c31fd86663137f1a7eb9059cd80a8a3d9cab62ee727288d5daead712b1b84"
+    },
+    {
+      "path": "skills/spec-ideate/evals/fixtures/repos/mini-ledger/package.json",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 96,
+      "sha256": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b"
+    },
+    {
+      "path": "skills/spec-ideate/evals/fixtures/repos/mini-ledger/README.md",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 365,
+      "sha256": "4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855"
+    },
+    {
+      "path": "skills/spec-ideate/evals/fixtures/repos/mini-ledger/src/server.js",
+      "skill": "spec-ideate",
+      "owner_role": "evaluation",
+      "bytes": 665,
+      "sha256": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
+    },
+    {
+      "path": "skills/spec-ideate/evals/fixtures/scripts/asks-a-question.sh",
+      "skill": "spec-ideate",
+      "owner_role": "deterministic-helper",
+      "bytes": 548,
+      "sha256": "d0946c4c69850e60a31401e7f8ef67bf92796b2257d8546ce55c2b4791007353"
+    },
+    {
       "path": "skills/spec-ideate/references/agents/issue-intelligence-analyst.md",
       "skill": "spec-ideate",
       "owner_role": "reference-contract",
@@ -2888,6 +2959,741 @@
       "sha256": "002de8c569986d36d40020ffbbda43fdb3115c8cdb219aa628d88b882990dda3"
     },
     {
+      "path": "skills/spec-project-rules/evals/cases/admission-generic-refusal.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1136,
+      "sha256": "7f0f2b59f8c805ec27a78caaf920141aebc3d3624a355a001c9f93649324136e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/bootstrap-gold.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1407,
+      "sha256": "2377040ee1a02dbef48cc2896720753576e8afc825f965dca9baef3088893685"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/large-repo-batched.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1375,
+      "sha256": "9d05ab5482e789d172c801694b697e127989ef9fe2eff8c4f93ee7e56f857b94"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/marker-coexist-embed.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1398,
+      "sha256": "d08e2abc6ec76b8856a77fdb71cdf244994036abf05d506a41b30f8d49d28cdd"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/refresh-dirty.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1618,
+      "sha256": "ff795c54f35db10738949c99433a16796f8cbfc33ec599b8ae4f1fb6f8c68b91"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/refresh-noop.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1279,
+      "sha256": "caac9402bd22aacc396c089abd099cbddb91be1e2961c5595565c642535bd32d"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/sampling-fallback.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1317,
+      "sha256": "0d070a0b84372ea6e59a3c64b874edcf1c2e32de8c9785b758d06aef76dd66e0"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/sensitive-write-refusal.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1297,
+      "sha256": "58295023da70f0e66f6521f472fb9b6835a4ec00820db2f3035f4a168c301163"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/single-end-degraded.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1236,
+      "sha256": "0319ecaac50e86030d03021162545d64850b6b72fd793bdd1d9ac397f934b48c"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/cases/update-rumor-refusal.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1231,
+      "sha256": "f06b01ced381a42555e2997a552d5a39d9a7b3017a7b48400871f531897e7ee5"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/eval.yaml",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 719,
+      "sha256": "891797aa1e32d215ac63a0dc39e31ae7f4361267107e27801be5a113ffe63ad6"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/large-monorepo-fresh/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 74,
+      "sha256": "6c0c7e81f74211ccc6902e73342fa184d95d085bd6b0b1a1dea3b779c501150b"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/large-monorepo-fresh/prepare-eval-fixture.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 2244,
+      "sha256": "de5791870c0392d2242ef144aefb26ea183a0dab37e005161204e46707f3f4d9"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/large-monorepo-fresh/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 320,
+      "sha256": "52ba2ddc0f846b8fabfb64f281faba5a3b2412ffea9a1e7d2f57af1a392700fa"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/AGENTS.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 1043,
+      "sha256": "25bf0bb8c8d26870ce808cd84d469171e50058fdd31b882262861e893cd06cf0"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 61,
+      "sha256": "ef9424a8f34b68a24ae2f4aac388907e88fb2dc2887926713924f9d67661a957"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/src/legacy/OldPanel.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 246,
+      "sha256": "dd6473c4a62fa9634ec5d639902a967e8f7b7b79e20b0813eb4bb26a855eb31a"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/admin/src/stats.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 162,
+      "sha256": "44a4bd9ac63808abc03190b750fa5bb93cc46ab1106a70ed48ffb36d757bf848"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 78,
+      "sha256": "e1c7dda9c503d4f85bfcac3b285c5016453bc99235199763b15a3439dc290308"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/src/cart.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 224,
+      "sha256": "dda60413756934d1fc0cae039969660cc29a426f02e6301b9b3c910c2faca7b7"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/apps/web/src/order.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 162,
+      "sha256": "b507b4e46606db1e18f0edb1afbc2526ab7f9e093b1667ceeba90dcd7d0733a4"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/docs/architecture.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 919,
+      "sha256": "d326ddd55522a9c0ebb0c5813ede42edf13d73117f83b70db05e25350a319676"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 77,
+      "sha256": "481d783ee2f0debf1d78fcc6890b0f7e132ca31ca1c361d59d890b1873113e21"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 365,
+      "sha256": "f2391b9e0d91ab20878c340fb9b0b072684b54091ad15c6223320adec9b72cdc"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/api-client/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 64,
+      "sha256": "81fdfc79fbf78bc2644a9c057fbfb3117e170b2bcf88caf610b30ed3cb2a1c45"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 76,
+      "sha256": "36823cc12ddd568ebf37c911dafaebdf588e454aef10e3b76a9df3c183c38651"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/packages/ui/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 56,
+      "sha256": "1176e1e0351539ed6bc527401b8447723e5abe50780808bc61a5b0b0a33110b1"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/prepare-eval-fixture.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 134,
+      "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-embedded/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 239,
+      "sha256": "af1a0708505cc201f117be58ee20c4b634f6be6ec747ba55f22336f720afe7ea"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 61,
+      "sha256": "ef9424a8f34b68a24ae2f4aac388907e88fb2dc2887926713924f9d67661a957"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/legacy/OldPanel.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 246,
+      "sha256": "dd6473c4a62fa9634ec5d639902a967e8f7b7b79e20b0813eb4bb26a855eb31a"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/admin/src/stats.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 162,
+      "sha256": "44a4bd9ac63808abc03190b750fa5bb93cc46ab1106a70ed48ffb36d757bf848"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 78,
+      "sha256": "e1c7dda9c503d4f85bfcac3b285c5016453bc99235199763b15a3439dc290308"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/cart.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 224,
+      "sha256": "dda60413756934d1fc0cae039969660cc29a426f02e6301b9b3c910c2faca7b7"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/apps/web/src/order.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 162,
+      "sha256": "b507b4e46606db1e18f0edb1afbc2526ab7f9e093b1667ceeba90dcd7d0733a4"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 77,
+      "sha256": "481d783ee2f0debf1d78fcc6890b0f7e132ca31ca1c361d59d890b1873113e21"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 365,
+      "sha256": "f2391b9e0d91ab20878c340fb9b0b072684b54091ad15c6223320adec9b72cdc"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/api-client/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 64,
+      "sha256": "81fdfc79fbf78bc2644a9c057fbfb3117e170b2bcf88caf610b30ed3cb2a1c45"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 76,
+      "sha256": "36823cc12ddd568ebf37c911dafaebdf588e454aef10e3b76a9df3c183c38651"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/packages/ui/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 56,
+      "sha256": "1176e1e0351539ed6bc527401b8447723e5abe50780808bc61a5b0b0a33110b1"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/prepare-eval-fixture.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 134,
+      "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-fresh/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 239,
+      "sha256": "af1a0708505cc201f117be58ee20c4b634f6be6ec747ba55f22336f720afe7ea"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/AGENTS.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 640,
+      "sha256": "35a1bc055a998d23d1276c06e89c08ead96b32670c213fefba8474849a2e2b06"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 61,
+      "sha256": "ef9424a8f34b68a24ae2f4aac388907e88fb2dc2887926713924f9d67661a957"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/legacy/OldPanel.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 246,
+      "sha256": "dd6473c4a62fa9634ec5d639902a967e8f7b7b79e20b0813eb4bb26a855eb31a"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/admin/src/stats.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 162,
+      "sha256": "44a4bd9ac63808abc03190b750fa5bb93cc46ab1106a70ed48ffb36d757bf848"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 78,
+      "sha256": "e1c7dda9c503d4f85bfcac3b285c5016453bc99235199763b15a3439dc290308"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/cart.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 224,
+      "sha256": "dda60413756934d1fc0cae039969660cc29a426f02e6301b9b3c910c2faca7b7"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/apps/web/src/order.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 162,
+      "sha256": "b507b4e46606db1e18f0edb1afbc2526ab7f9e093b1667ceeba90dcd7d0733a4"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/docs/architecture.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 919,
+      "sha256": "d326ddd55522a9c0ebb0c5813ede42edf13d73117f83b70db05e25350a319676"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 77,
+      "sha256": "481d783ee2f0debf1d78fcc6890b0f7e132ca31ca1c361d59d890b1873113e21"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 365,
+      "sha256": "f2391b9e0d91ab20878c340fb9b0b072684b54091ad15c6223320adec9b72cdc"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/api-client/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 64,
+      "sha256": "81fdfc79fbf78bc2644a9c057fbfb3117e170b2bcf88caf610b30ed3cb2a1c45"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 76,
+      "sha256": "36823cc12ddd568ebf37c911dafaebdf588e454aef10e3b76a9df3c183c38651"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/packages/ui/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 56,
+      "sha256": "1176e1e0351539ed6bc527401b8447723e5abe50780808bc61a5b0b0a33110b1"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/prepare-eval-fixture.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 134,
+      "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/multi-end-with-kb/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 239,
+      "sha256": "af1a0708505cc201f117be58ee20c4b634f6be6ec747ba55f22336f720afe7ea"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/main.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 257,
+      "sha256": "e5f36ac6e2e5eca172b749d6984bb752388810b0c40133a365638db1cf69b18d"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/screen1.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 23,
+      "sha256": "4837428e9cb229c41e4a91ba3e686fd6001fec0e2bc53057ff231799421bb3d8"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/screen2.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 23,
+      "sha256": "7d92d5177f3319a4de8e5cd5a13dd259bf26a9382edd05e2d36421cffaca4a4f"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/app/screen3.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 23,
+      "sha256": "3145f0553368a692be14936fdba31a07f22b8e3c54be278ced301a4621a6de64"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/audit.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 102,
+      "sha256": "40814addee5642600828f2caac3d6c2086ca1bff5720beac647d0baa2decd620"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/domain.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 54,
+      "sha256": "9c515a0961ac56cc903eb6ea488d38650998e52435464d46df741371078ed7f4"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra1.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "09e794e67261dff51621da988f011e5975abaaf7c8931e28fd3058f6ec477be8"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra2.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "35566a151db8a3a479e748756c18c01772d1486aeb597e84005b2d9935138943"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra3.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "868d63fba9cd35a346c1d8d4caf8a4f2c693e496419ea1cbdf320e48b8c2cb85"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/extra4.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "b9259b3a41b541b82676f22a51cdfdf7af44ccb16fef122150e0bfb60473e7b5"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/core/service.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 151,
+      "sha256": "45d129354a3381d8b51bf10bc3ed6bd2d50090d8ebb9d3943fd06d937010e491"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/extra1.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 23,
+      "sha256": "cf11f00f98c6f73fcfc2243e06af4f76a5733de93647e9f9d2411361a8d54f95"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/extra2.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 23,
+      "sha256": "7db17dd3e6d0d28164d4b00962720621ec239efbf3c266f7f1c3560dc973b755"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/extra3.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 23,
+      "sha256": "e99243ae0d8aa48968c40c94e08b518feb1d99b159adcd8143518536ca3772f5"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/gateway.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 90,
+      "sha256": "e2ed578bfcec0ede26eae4bbb1dc7a9155b0511671bc9b971ec50ff895680735"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/net/index.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 102,
+      "sha256": "fd94f6f7608a8492ab125511ee24a8ed49330d24102d0915e13f32857f8861c2"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/dates.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 66,
+      "sha256": "efe1aa2829a58f54a4e24778498d5c9e135afeb6ac6443e11521c6a0e24710f7"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/extra1.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "1a38eaacd1898550e6fe31d87c271ed8844f41afac48938e5038f0c080a25d28"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/extra2.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "07c9bb7bf0c1cd966e702fe13c4b3e40caa866d800ae88898685c458459eedee"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/extra3.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 24,
+      "sha256": "3e77b361068efef703f7f862f0eb04e2169e0ffa4e3a92662184cc144ac46f7a"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/lib/util/format.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 60,
+      "sha256": "0a3e5a7a5565f26032aa4a7c60aa8ed559eaef7d5b47694c88b633318346ce3a"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 36,
+      "sha256": "102d010ac436d05bd2c9f22f353fffcd08f5d2c9acbc236353f71fcf6b1135dd"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/prepare-eval-fixture.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 134,
+      "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/plain-multidir-fresh/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 193,
+      "sha256": "67c83cf24433afd853558db5a48931bda6a59f5d6dcbb507a84065d0f72d1a24"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/package.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 37,
+      "sha256": "4ec3280ff8ee484e5796170d83f6d5f978e2ccd795a319df297f74a5c20301fd"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/prepare-eval-fixture.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 134,
+      "sha256": "6216cebd5015376bac576a4ec6e264f966c9b2fd5dced1ea834889258296ee6e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 173,
+      "sha256": "0d6d8bad888fc236ed18445eafb0d9ee716958b884f6fb27387730f21d4f46e0"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/api.ts",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 183,
+      "sha256": "2a7209002dc89735703fee68de78fe363769990abb96444972af15f167fb4e11"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/App.tsx",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 177,
+      "sha256": "a7e178662f8e1815033a474c356fe69464c51ea109b4162ec93d7cb382fc3b95"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/components/OrderList.tsx",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 151,
+      "sha256": "402e4046835d4a51487b5190d65bb0cf1900ed1dee88f58bce011573496c188e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/components/UserList.tsx",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 147,
+      "sha256": "9ffacdee475616deaaa9d26d41c588763b0c75a9fd182cbc52e560f989ee33fc"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/repos/single-end-fresh/src/main.tsx",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 115,
+      "sha256": "ee863f5d392ed8c335f580825440516e37c3ad199e6af4c6d9c5979c3b2f1b1d"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-admission.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 779,
+      "sha256": "bf715fdaa139d12628cdd2a7d86254a4f04db05ba9b803ee5ac476f3655f7adf"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-bootstrap.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 1832,
+      "sha256": "919195a25a44fcf1f7c071fe78dda64aa24b249fdcecaa66b8d3ee32ec145003"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-large-repo.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 1475,
+      "sha256": "6ae3256cec0764308f53bb98a7551b2d74420738e2987ee05f1c1893fc5d268f"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-marker-coexist.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 1026,
+      "sha256": "10b6707520bcce226e876f15b03ea24d719fbcd012fc922d273658d0cb41625d"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-refresh-dirty.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 867,
+      "sha256": "d99902e68b4720c7c87612fc5bac9614eb96d06ee3c8ec75179070e7f25a2441"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-refresh-noop.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 836,
+      "sha256": "b8c27e3c9bb69f866c0dd1c5213c11bb528eb6a2a2b0382263419ca94fe0f37e"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-rumor-refusal.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 511,
+      "sha256": "44816bf4079e7fccc049b120030545bb943e84b06af51d41f4e0f15d204c7133"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-sampling-fallback.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 1142,
+      "sha256": "8d06a6cf231388621dde5c0fb6d35d13af4dcf3477e489d8358ac100a8956410"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-sensitive-refusal.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 876,
+      "sha256": "b629d9e490624d4cd0b18e23daf6821374fb6ef84d57ef595cd9058b6501a000"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/fixtures/scripts/check-single-end.sh",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 1097,
+      "sha256": "c59d249ac92a9da01460a4b934bdb649671ea94f9330deebaf884e86a00d1295"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/README.md",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 3977,
+      "sha256": "9dfc3341795c57b203d79871b894713c98ff8ef4551b341ce832aac930385dbd"
+    },
+    {
+      "path": "skills/spec-project-rules/evals/trigger-cases.json",
+      "skill": "spec-project-rules",
+      "owner_role": "evaluation",
+      "bytes": 9287,
+      "sha256": "ab10ce16c8d8dd39b0ae2d9dfdf1b1aec61b34c68de6dbe9253e61099c026659"
+    },
+    {
+      "path": "skills/spec-project-rules/references/knowledge-format.md",
+      "skill": "spec-project-rules",
+      "owner_role": "reference-contract",
+      "bytes": 9043,
+      "sha256": "e3ec6d56a1b62fd97e29f852ceb26cc7304bc5d0d93bd7e6e07d6ee712ddec4c"
+    },
+    {
+      "path": "skills/spec-project-rules/references/mining-method.md",
+      "skill": "spec-project-rules",
+      "owner_role": "reference-contract",
+      "bytes": 21793,
+      "sha256": "846de9b819a6f0468f380a2447af42af6374dec2d27077016f2958f748cef47a"
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "skill": "spec-project-rules",
+      "owner_role": "deterministic-helper",
+      "bytes": 26186,
+      "sha256": "ac8eac7d3b9021533e266223a92642396f90fee147e51bea04c19b2ba292e3ba"
+    },
+    {
+      "path": "skills/spec-project-rules/SKILL.md",
+      "skill": "spec-project-rules",
+      "owner_role": "entry-contract",
+      "bytes": 9708,
+      "sha256": "dac119ac9c53f96e139ccee6603dfc97eaf86bcd9f54f12fdbbdf961ade55088"
+    },
+    {
       "path": "skills/spec-promote/references/spiral-cli.md",
       "skill": "spec-promote",
       "owner_role": "reference-contract",
@@ -3549,8 +4355,8 @@
       "path": "skills/spec-runtime-setup/SKILL.md",
       "skill": "spec-runtime-setup",
       "owner_role": "entry-contract",
-      "bytes": 54290,
-      "sha256": "42757be1d4adb3796447cec0daf7e7184ce70f35920a4ca6378ae2bc2699a3d7"
+      "bytes": 55233,
+      "sha256": "41c9d338217ad31ab904d38d882eca18af66c1089f29d28d19a55dd906164d70"
     },
     {
       "path": "skills/spec-simplify-code/references/personas/code-quality-reviewer.md",
@@ -4071,6 +4877,48 @@
       "sha256": "dddabe599934d90204a4967fd1a33924393838767d887be74433d7765cbafb3d"
     },
     {
+      "path": "skills/using-spec-first/evals/cases/direct-lane-simple-howto.yaml",
+      "skill": "using-spec-first",
+      "owner_role": "evaluation",
+      "bytes": 735,
+      "sha256": "5f34a655efdf589f4f34a2f8aaaf23d5f70a79942789d236ab8eb2a22e7809d9"
+    },
+    {
+      "path": "skills/using-spec-first/evals/cases/failure-priority-single-entry.yaml",
+      "skill": "using-spec-first",
+      "owner_role": "evaluation",
+      "bytes": 1212,
+      "sha256": "7d39fa4e9595342ca58a0d16f9a9bca61e7024ccd8c417f3dd356b95606b0bd2"
+    },
+    {
+      "path": "skills/using-spec-first/evals/cases/recommendation-only-format.yaml",
+      "skill": "using-spec-first",
+      "owner_role": "evaluation",
+      "bytes": 1106,
+      "sha256": "92d75c148be7341a00abf97545d6dab8b21ec21c80f62eaff8ed9f25333b6493"
+    },
+    {
+      "path": "skills/using-spec-first/evals/cases/route-failure-to-spec-debug.yaml",
+      "skill": "using-spec-first",
+      "owner_role": "evaluation",
+      "bytes": 1214,
+      "sha256": "e4a09c4648f4a9f5ec5d7e45bd556cf89fce0049f06c7a533d6720d37a5ced67"
+    },
+    {
+      "path": "skills/using-spec-first/evals/cases/route-vague-idea-to-spec-brainstorm.yaml",
+      "skill": "using-spec-first",
+      "owner_role": "evaluation",
+      "bytes": 1166,
+      "sha256": "be434779c72bb119681e819bee5e27c51532ccdcf7a6eec29015d2f8e36dbf9d"
+    },
+    {
+      "path": "skills/using-spec-first/evals/eval.yaml",
+      "skill": "using-spec-first",
+      "owner_role": "evaluation",
+      "bytes": 533,
+      "sha256": "bfebc9189313325299fb69b27954d20650e570f889b7a3b9d0bc1dad925c33dc"
+    },
+    {
       "path": "skills/using-spec-first/references/conditional-routing-boundaries.md",
       "skill": "using-spec-first",
       "owner_role": "reference-contract",
@@ -4081,15 +4929,15 @@
       "path": "skills/using-spec-first/references/public-route-map.md",
       "skill": "using-spec-first",
       "owner_role": "reference-contract",
-      "bytes": 4443,
-      "sha256": "79ba60523dcbc08b355f321297b9ef17b269a9d35a431cdffd1c19795f816f0a"
+      "bytes": 4608,
+      "sha256": "1c09aa00d5a2d667219448486d684354e3d221bc479178a919b6655603b8d24d"
     },
     {
       "path": "skills/using-spec-first/SKILL.md",
       "skill": "using-spec-first",
       "owner_role": "entry-contract",
-      "bytes": 4149,
-      "sha256": "0f65e00250fb8a63a57a6b99bfdc0b26c74f9d132fe2bc2e9395ff41b60e69d3"
+      "bytes": 4306,
+      "sha256": "29c8fe075e9d9956a52145f81ec334458a3ea22d9c432e640c372da2b0fea623"
     }
   ]
 }

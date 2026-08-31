@@ -17,7 +17,8 @@ describe('CE localization deterministic review producer', () => {
     ].join('/');
 
     expect(inventory.skill_count).toBe(37);
-    expect(inventory.package_path_count).toBe(650);
+    // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
+    expect(inventory.package_path_count).toBe(692);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -42,7 +43,9 @@ describe('CE localization deterministic review producer', () => {
     // pass retired the five-file fixture KB into single-file docs/architecture.md (net -4);
     // 612 -> 650 after the darwin/governance rounds expanded behavior evals to 9 cases
     // (+6 case yamls, +6 judge scripts, single-end fixture, generated large-repo fixture,
-    // multi-end-embedded fixture, evals/README).
+    // multi-end-embedded fixture, evals/README);
+    // 650 -> 676 after committing exposed previously-untracked sources to the
+    // inventory (2 plans, 3 review deltas, spec-project-rules validation reports).
     expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(190);
     expect(coverage.coverage_summary.direct_support_relation_count).toBe(403);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({

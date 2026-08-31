@@ -361,24 +361,15 @@ function runVerify(repoRoot, facts) {
       }
     }
   }
-  // source refs liveness (repo-relative backtick paths only)
+  // source refs liveness — same collector as freshness (source_refs field
+  // backticks plus reuse 住址 homes), so prose backticks in conclusion fields
+  // cannot surface as phantom refs. Escaping refs are flagged, not probed.
   const missingRefs = [];
-  for (const line of kbText.split('\n')) {
-    if (!line.startsWith('- ')) continue;
-    for (const m of line.matchAll(/`([^`]+)`/g)) {
-      const ref = m[1];
-      if (!/[/\\]/.test(ref) || ref.includes(' ') || ref.startsWith('@') || ref.startsWith('rg ')) continue;
-      // URLs are citations, not repo paths (sensitive values are banned from KBs upstream anyway).
-      if (/^https?:\/\//.test(ref)) continue;
-      // `path:line` citations are checked against the file, not the line-qualified literal.
-      const normalizedRef = ref.replace(/\\/g, '/').replace(/:\d+$/, '');
-      if (normalizedRef.startsWith('../') || normalizedRef.includes('/../') || path.isAbsolute(ref)) {
-        missingRefs.push({ ref, line: line.slice(0, 100), reason: 'ref escapes repo root' });
-        continue;
-      }
-      if (!fs.existsSync(path.join(repoRoot, normalizedRef))) {
-        missingRefs.push({ ref, line: line.slice(0, 100) });
-      }
+  for (const [normalized, meta] of collectSourceRefs(kbText)) {
+    if (normalized.startsWith('../') || normalized.includes('/../') || path.isAbsolute(normalized)) {
+      missingRefs.push({ ref: meta.raw, line: meta.line, reason: 'ref escapes repo root' });
+    } else if (!fs.existsSync(path.join(repoRoot, normalized))) {
+      missingRefs.push({ ref: meta.raw, line: meta.line });
     }
   }
   const scanErrors = facts.alias_scan_errors || [];
@@ -413,7 +404,11 @@ function runFreshness(repoRoot) {
     };
   }
   const refs = collectSourceRefs(kbText);
-  const dirtyRefs = [...refs.keys()].filter((ref) => changed.has(ref)).sort();
+  // Directory refs (e.g. a reuse 住址 pointing at a package dir) count as dirty
+  // when any file underneath them changed.
+  const dirtyRefs = [...refs.keys()]
+    .filter((ref) => [...changed].some((c) => c === ref || c.startsWith(`${ref}/`)))
+    .sort();
   return {
     status: dirtyRefs.length === 0 ? 'clean' : 'dirty',
     source_commit: sourceCommit,
@@ -424,23 +419,36 @@ function runFreshness(repoRoot) {
 }
 
 function collectSourceRefs(kbText) {
-  // Freshness tracks evidence refs only: backtick paths inside the third
-  // ` | `-separated field of an entry line. Bare words without a slash or a
-  // file extension are ignored (same conservative shape as the liveness scan).
+  // One collector serves both --verify liveness and --freshness dirty
+  // detection, so the scanners cannot disagree on what counts as a declared
+  // ref: backtick tokens in the source_refs field (third ` | ` field) plus
+  // the reuse 住址 home in the conclusion. Backtick prose elsewhere in the
+  // conclusion (e.g. `net/`) is not a declared ref. Quoted search patterns,
+  // regex escapes, glob characters, and multi-word command snippets are
+  // retrieval syntax, not paths — rejected on the raw token, because
+  // normalizing `\` first would fake a path separator out of an escape.
   const filePattern = /^[A-Za-z][A-Za-z0-9_.-]*\.[A-Za-z0-9]+$/;
   const refs = new Map();
+  const addRef = (raw, line) => {
+    const ref = String(raw).trim().replace(/[，,。;；）)]+$/, '').trim();
+    if (!ref || ref.startsWith('rg ') || ref.startsWith('@') || /^https?:\/\//.test(ref)) return;
+    if (/^["']/.test(ref) || /[\\*?]/.test(ref) || /\s/.test(ref)) return;
+    const normalized = ref.replace(/:\d+$/, '');
+    if (!normalized.includes('/') && !filePattern.test(normalized)) return;
+    const existing = refs.get(normalized);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      refs.set(normalized, { count: 1, raw: ref, line: line.slice(0, 100) });
+    }
+  };
   for (const line of kbText.split('\n')) {
     if (!line.startsWith('- ')) continue;
     const fields = line.slice(2).split(' | ');
     if (fields.length < 3) continue;
-    for (const m of fields[2].matchAll(/`([^`]+)`/g)) {
-      const ref = m[1].trim();
-      if (!ref || ref.startsWith('rg ') || ref.startsWith('@') || /^https?:\/\//.test(ref)) continue;
-      const normalized = ref.replace(/:\d+$/, '').replace(/\\/g, '/');
-      if (!normalized.includes('/') && !filePattern.test(normalized)) continue;
-      if (normalized.startsWith('../') || normalized.includes('/../') || path.isAbsolute(normalized)) continue;
-      refs.set(normalized, (refs.get(normalized) || 0) + 1);
-    }
+    for (const m of fields[2].matchAll(/`([^`]+)`/g)) addRef(m[1], line);
+    const home = fields[0].match(/住址\s+`?([^\s，,；;（）()]+)`?/);
+    if (home) addRef(home[1], line);
   }
   return refs;
 }
@@ -505,7 +513,10 @@ function fileChurnCounts(repoRoot, files) {
 }
 
 // Deterministic directory-ratio sampling for unsupported build layouts: the
-// LLM never picks which files to read — it consumes this list as-is.
+// LLM never picks which files to read — it consumes this list as-is. Modules
+// over their quota rotate picks across second-level sub-directories so larger
+// sub-domains cannot crowd out the rest (each sub-domain gets a seat while
+// quota lasts; when sub-domains outnumber the quota, the smallest lose out).
 function buildSourceSampling(repoRoot, perModuleCap = 8, totalBudget = 60) {
   const files = walkSourceFiles(repoRoot).sort();
   const byModule = new Map();
@@ -516,15 +527,41 @@ function buildSourceSampling(repoRoot, perModuleCap = 8, totalBudget = 60) {
   }
   const churn = fileChurnCounts(repoRoot, files);
   const hasChurn = [...churn.values()].some((c) => c > 0);
+  const entryFirst = (f) => (/^(\.\/)?(index|main|app)\.[a-z]+$/i.test(f.split('/').pop()) ? 0 : 1);
+  const withinSort = (list) => [...list].sort((a, b) => entryFirst(a) - entryFirst(b)
+    || churn.get(b) - churn.get(a)
+    || a.localeCompare(b));
+  const allocateAcrossSubdirs = (moduleFiles, quota) => {
+    const subdirs = new Map();
+    for (const f of moduleFiles) {
+      const segs = f.split('/');
+      const sub = segs.length > 2 ? segs[1] : '.';
+      if (!subdirs.has(sub)) subdirs.set(sub, []);
+      subdirs.get(sub).push(f);
+    }
+    const ordered = [...subdirs.entries()]
+      .map(([sub, list]) => ({ sub, files: withinSort(list), size: list.length, assigned: 0 }))
+      .sort((a, b) => b.size - a.size || a.sub.localeCompare(b.sub));
+    for (let i = 0; i < quota && i < ordered.length; i += 1) ordered[i].assigned = 1;
+    let left = quota - Math.min(quota, ordered.length);
+    while (left > 0) {
+      const next = ordered
+        .filter((g) => g.assigned < g.size)
+        .sort((a, b) => (b.size - b.assigned) - (a.size - a.assigned) || a.sub.localeCompare(b.sub))[0];
+      if (!next) break;
+      next.assigned += 1;
+      left -= 1;
+    }
+    return ordered.flatMap((g) => g.files.slice(0, g.assigned));
+  };
   const total = files.length;
   const modules = [...byModule.entries()]
     .map(([dir, moduleFiles]) => {
-      const entryFirst = (f) => (/^(\.\/)?(index|main|app)\.[a-z]+$/i.test(f.split('/').pop()) ? 0 : 1);
-      const sorted = [...moduleFiles].sort((a, b) => entryFirst(a) - entryFirst(b)
-        || churn.get(b) - churn.get(a)
-        || a.localeCompare(b));
       const quota = Math.min(perModuleCap, Math.max(2, Math.ceil((totalBudget * moduleFiles.length) / Math.max(total, 1))));
-      return { dir, file_count: moduleFiles.length, sample_files: sorted.slice(0, quota) };
+      const sample_files = moduleFiles.length > quota
+        ? allocateAcrossSubdirs(moduleFiles, quota)
+        : withinSort(moduleFiles);
+      return { dir, file_count: moduleFiles.length, sample_files: sample_files.sort() };
     })
     .sort((a, b) => b.file_count - a.file_count || a.dir.localeCompare(b.dir));
   return {

@@ -167,6 +167,8 @@ describe('spec-project-rules governance and source contracts', () => {
     // Unsupported layouts yield a deterministic script-owned sampling list (LLM never picks files).
     expect(skill).toContain('sampling.modules[].sample_files');
     expect(skill).toContain('不自创抽样');
+    // Freshness also covers reuse-entry capability homes (directory-aware).
+    expect(skill).toContain('复用条目住址');
     // Architecture boundaries are the primary product.
     expect(skill.indexOf('一级产物是架构边界知识')).toBeGreaterThan(-1);
   });

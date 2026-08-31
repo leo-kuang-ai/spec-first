@@ -39,7 +39,7 @@ source_commit: <git HEAD 短 hash>
 
 - **结论**：一句话，命令式（"必须走 X" / "禁止 Y" / "新代码放 Z"），不用描述式
 - **grade**：`confirmed`（README/ADR/明文规范支撑）/ `inferred`（代码反推 + refs）
-- **source_refs**：仓库相对路径，一律用反引号包裹（`` `README:5` ``、`` `apps/web/src/order.ts` ``），带目录的路径可加 `:行号` 精确引用（`` `apps/web/src/order.ts:12` ``），缺失性证据写检索式+命中数。`--verify` 的 refs 存活扫描只解析反引号内的路径：`path:line` 剥离行号后检查文件存在性，URL 不属于仓库路径不参与扫描——不加反引号的引用不参与扫描，等于放弃保鲜检测
+- **source_refs**：仓库相对路径，一律用反引号包裹（`` `README:5` ``、`` `apps/web/src/order.ts` ``），带目录的路径可加 `:行号` 精确引用（`` `apps/web/src/order.ts:12` ``），缺失性证据写检索式+命中数。`--verify` 存活扫描与 freshness 脏检测共用同一收集口径：只解析 source_refs 字段（第三个 ` | ` 字段）的反引号 token 与复用条目住址指针；`path:line` 剥离行号后检查文件存在性，URL 不属于仓库路径不参与扫描。token 需路径形态（含 `/` 或带扩展名的根文件名）才算 ref：引号包裹的检索式、含 `\` 转义、`*`/`?` glob、含空格的命令片段都不算，路径分隔符一律用 `/`——source_refs 不加反引号即放弃该项的存活检测与脏检测
 - **可选尾字段**：例外说明 / 查法（rg 命令）/ 出现次数
 
 **分隔符规则**：字段内不得出现 ` | ` 序列（空格-竖线-空格）。rg 检索式里的备选写紧凑转义形式（如 `rg "ApiHelper\|retrofit"`），`\|` 无前后空格，与分隔符天然不冲突；解析时按 ` | ` 切分。
@@ -137,7 +137,7 @@ pointer 一律使用 repo-root-relative 路径。
 
 - frontmatter 的 `generated_at` 和 `source_commit` 仅在有实质内容变化时更新
 - 无实质变化 → 不重写文件（refresh_noop）
-- freshness 脏检测以 `source_commit` 为 git 基线，只覆盖条目 source_refs 字段的反引号路径（含带扩展名的根文件引用，如 `README.md`；无扩展名的 `README:5` 形态不参与脏检测）；写入时 `source_commit` 必须是取证时的 git HEAD 短 hash，否则 freshness 降级 `unavailable`
+- freshness 脏检测以 `source_commit` 为 git 基线，覆盖条目 source_refs 字段的反引号路径（含带扩展名的根文件引用，如 `README.md`；无扩展名的 `README:5` 形态不参与）与复用条目的住址指针（目录住址下任一文件变更即计脏）；refs 收集与 `--verify` 存活扫描同口径（见条目格式节）。写入时 `source_commit` 必须是取证时的 git HEAD 短 hash，否则 freshness 降级 `unavailable`
 - 失效条目 → 删除或标注 `OUTDATED（原因）`，不做复杂分类
 
 ## 敏感信息（三路都不写）

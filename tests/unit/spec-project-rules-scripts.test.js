@@ -185,6 +185,10 @@ describe('spec-project-rules deterministic scripts', () => {
     expect(net.sample_files.length).toBeLessThanOrEqual(sampling.per_module_cap);
     expect(net.sample_files).toContain('lib/net/index.ts');
     expect(net.sample_files.every((f) => f.startsWith('lib/'))).toBe(true);
+    // Second-level rotation: over-quota modules keep every sub-domain represented.
+    for (const sub of ['core', 'net', 'util']) {
+      expect(net.sample_files.some((f) => f.startsWith(`lib/${sub}/`))).toBe(true);
+    }
     expect(sampling.sampled_file_count).toBe(sampling.modules.reduce((sum, m) => sum + m.sample_files.length, 0));
   });
 
@@ -367,5 +371,74 @@ describe('spec-project-rules deterministic scripts', () => {
     const noKb = makeRepo('npm');
     const missing = JSON.parse(runCli('extract-deps.cjs', [noKb.root, '--freshness']));
     expect(missing.freshness.status).toBe('no-kb');
+  });
+
+  test('extract-deps --freshness flags reuse-entry 住址 homes including directory anchors', () => {
+    const repo = makeRepo('npm');
+    git(repo.root, ['init', '-q', '-b', 'main']);
+    git(repo.root, ['add', '-A']);
+    git(repo.root, ['commit', '-qm', 'base']);
+    const head = git(repo.root, ['rev-parse', '--short', 'HEAD']).trim();
+    repo.w('docs/architecture.md', [
+      '---',
+      `source_commit: ${head}`,
+      '---',
+      '# Test Architecture',
+      '<!-- spec-project-rules-start -->',
+      '',
+      '## 复用（reuse）',
+      '- HTTP 客户端：住址 packages/shared，查法 `rg request packages` | inferred | `packages/shared/package.json`',
+      '- UI 组件：住址 `packages/shared/button.ts` | inferred | `packages/shared/package.json`',
+      '',
+      '<!-- spec-project-rules-end -->',
+    ].join('\n'));
+    const { root, w } = repo;
+    // Staged new file under the directory home: caught via the cached-diff channel.
+    w('packages/shared/helper.ts', 'export const helper = 1;\n');
+    git(root, ['add', 'packages/shared/helper.ts']);
+    const out = JSON.parse(runCli('extract-deps.cjs', [root, '--freshness']));
+    expect(out.freshness.status).toBe('dirty');
+    // 目录住址锚定：其下 staged 新文件使目录住址计脏
+    expect(out.freshness.dirty_refs).toEqual(['packages/shared']);
+    // 未变更的文件级住址与 source ref 不计脏
+    expect(out.freshness.dirty_refs).not.toContain('packages/shared/button.ts');
+    expect(out.freshness.dirty_refs).not.toContain('packages/shared/package.json');
+  });
+
+  test('extract-deps --verify scopes ref scanning to source_refs field and rejects retrieval syntax', () => {
+    const { root, w } = makeRepo('npm');
+    w('docs/architecture.md', [
+      '# Test Architecture',
+      '## 复用（reuse）',
+      // `net/` is conclusion prose, not a declared ref; the 住址 home stops at the CJK paren.
+      '- 网络请求：住址各模块 `net/` 静态门面 | inferred | `apps/web/package.json`',
+      '- 门面目录：住址 packages/shared（跨模块入口） | inferred | `apps/web/package.json`',
+      '',
+      '## 约定（rules）',
+      '- Toast 必须用 ToastUtils | inferred | `rg -l "ToastUtils"` / `"Toast\\.makeText"` 分项计数',
+      '- 目录别名与 glob | inferred | `packages` 与 `packages/**`',
+      '',
+      '<!-- spec-project-rules-end -->',
+    ].join('\n'));
+    const out = JSON.parse(runCli('extract-deps.cjs', [root, '--verify']));
+    expect(out.verify.verify_status).toBe('clean');
+    expect(out.verify.missing_refs).toEqual([]);
+  });
+
+  test('extract-deps --freshness counts only path-shaped refs (retrieval syntax excluded)', () => {
+    const { root } = makeGitRepoWithKb('npm', (head) => [
+      '---',
+      `source_commit: ${head}`,
+      '---',
+      '# Test Architecture',
+      '## 约定（rules）',
+      '- Toast 用 ToastUtils | inferred | `rg -l "ToastUtils"` / `"Toast\\.makeText"` / `apps/web/package.json` 计数',
+      '',
+      '<!-- spec-project-rules-end -->',
+    ]);
+    const out = JSON.parse(runCli('extract-deps.cjs', [root, '--freshness']));
+    expect(out.freshness.status).toBe('clean');
+    expect(out.freshness.ref_count).toBe(1);
+    expect(out.freshness.dirty_refs).toEqual([]);
   });
 });

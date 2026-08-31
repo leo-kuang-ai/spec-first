@@ -1,0 +1,34 @@
+id: repo-grounded-e2e-writes-artifact
+title: 仓库内主题应走完整流程并落盘 ideation artifact
+description: |
+  端到端验证 repo-grounded 模式：请求围绕当前仓库的主题（提升这个记账 demo 的留存），
+  skill 应先做代码库 grounding 再发散-批判-排序，最终把 ranked ideation artifact
+  自动写入 docs/ideation/（默认 HTML 格式，repo mode 下目录不存在则创建）。
+  断言锚定产出不变量：输出提及 docs/ideation 路径与 .html 产物；
+  想法质量、批判理由与排序语义由 transcript 人工核验。
+
+input:
+  prompt: |
+    （spec-ideate skill 已安装，请按它工作。）
+    这个记账 demo 留存很差，帮我围绕提升用户留存想一批改进方向。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 40
+
+expect:
+  must_contain:
+    - "docs/ideation"
+    - ".html"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["docs/ideation", ".html"]

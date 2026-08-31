@@ -1,0 +1,27 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/vague-subject-gate-asks.yaml
+    - evals/cases/refine-own-idea-routes-to-brainstorm.yaml
+    - evals/cases/non-software-mode-no-label-leak.yaml
+    - evals/cases/repo-grounded-e2e-writes-artifact.yaml
+    - evals/cases/surprise-me-no-repo-needs-substance.yaml
+  defaults:
+    timeout_seconds: 300
+    max_turns: 12
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

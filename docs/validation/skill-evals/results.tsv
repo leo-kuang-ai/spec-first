@@ -1,0 +1,5 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-08-30T19:40	wt@4f209572	using-spec-first	-	88.6	baseline	dim1-9	结构 66.7/77 + dim8 9.5(实测 5/5 语义正确,断言修正后自动判定见 iteration-3);红灯扫描通过;断言缺陷属 eval 不属 skill	darwin_rubric+skill-up
+2026-08-30T20:05	wt@4f209572	using-spec-first	88.6	-	keep	dim4	检查点显性化(**Checkpoint — ask/wait** 两处,最小 diff);paired 3-0 better(1 clear + 2 slight)	paired
+2026-08-30T20:10	wt@4f209572	using-spec-first	-	-	regression	dim8	改进后回归 5/5 保持(iteration-4);dim2 判定不修(与 semantic-map 哲学冲突),循环收束	full_test
+2026-08-31T20:25	wt@4f209572	using-spec-first	-	-	cross-engine	dim8	codex engine 配额恢复后全量补跑,5/5 PASS(iteration-6);与 claude_code 双引擎一致,证据闭环	full_test

@@ -1,0 +1,27 @@
+id: recommendation-only-format
+title: 推荐类请求应推荐 0-1 入口且不直接开始
+description: |
+  已初始化的 spec-first 仓库里，"第一个功能还没想好做什么"的推荐类请求应推荐
+  spec-ideate（需要 0-1 方向/选项）或 spec-brainstorm（想法已定但未决）之一；
+  recommendation-only 场景不得直接宣告进入任何 workflow（Entering）。
+  模板字段语言跟随用户语言，中文变体合法，断言不锚定英文模板词。
+
+input:
+  prompt: |
+    （当前仓库是 spec-first，已完成 spec-first init、全部 spec-* workflow 可用，
+    using-spec-first skill 已安装，请按它工作。这是隔离评测沙箱：请只做路由推荐，
+    不要实际开始执行任何 workflow。）
+    我们仓库刚初始化完，第一个功能做什么都还没想好。
+    接下来该跑哪个 spec workflow？只要一个推荐，先别开始做。
+
+expect:
+  must_contain:
+    - "spec-ideate"
+  must_not_contain:
+    - "Entering spec"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-ideate"]

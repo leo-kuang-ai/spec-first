@@ -1,0 +1,226 @@
+{
+  "schema_version": "ce-localization-review-delta/v1",
+  "artifact_kind": "source-bound-semantic-review-delta",
+  "review_run_id": "2026-08-30-spec-project-rules-darwin-governance-sampling",
+  "producer": "fresh-source dispatched reviewers (darwin optimization + governance + sampling rounds)",
+  "reviewed_at": "2026-08-30T00:00:00.000Z",
+  "source_binding": {
+    "head": "4f2095725c4b503b0ea62cc16a9ce4631c4ede76",
+    "dirty_path_manifest_sha256": "2d59066e5b2f7015526f1c6b1d2c2893b3e5e97f2789ab5974e02c5424d03077",
+    "source_tree_hash": "0e1d47b74119ccbb57912b59e95e21d865f3182596ebb3a967ed3a11048a63a4",
+    "inventory_hash": "87b5935265e785776efd3421723311387617df1d7b6bd0a04eb8d2726f5a1b8c",
+    "inventory_artifact_sha256": "bec0bcbb78a577e0e22fa11dbfed9585ad44bc127edf4cb3d5ced29ca5e5cc49",
+    "review_input_hash": "3592f6141a4c91323fc9a996106f73cb41c21e6b100f3426c01978bfeccdca5c"
+  },
+  "execution_context": {
+    "review_method": "inline-same-context",
+    "independent": false,
+    "provider_identity": "unverified",
+    "worker_context_isolation": "unknown"
+  },
+  "reviewed_paths": [
+    {
+      "path": "skills/spec-project-rules/references/knowledge-format.md",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "a3dee32cef791053ee6f61c93f2ab3664f357708e7e8bebed9745f76367cb318",
+      "bytes": 8714,
+      "line_count": 151,
+      "covered_line_ranges": [
+        [
+          1,
+          151
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Reviewed across darwin/governance rounds: paired fresh-source judges, contract/unit tests updated, codex engine eval green."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Write gates, sensitive-info handling, and degraded paths re-checked; judge-named nits fixed and re-verified."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-project-rules/scripts/extract-deps.cjs",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "52832b7508003c8ccda1a002e81cce25969ee5fda42f211a80388939561a8396",
+      "bytes": 26209,
+      "line_count": 638,
+      "covered_line_ranges": [
+        [
+          1,
+          638
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Reviewed across darwin/governance rounds: paired fresh-source judges, contract/unit tests updated, codex engine eval green."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Safety-relevant behavior verified by dedicated behavior eval cases."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/spec-project-rules/SKILL.md",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "dac119ac9c53f96e139ccee6603dfc97eaf86bcd9f54f12fdbbdf961ade55088",
+      "bytes": 9708,
+      "line_count": 118,
+      "covered_line_ranges": [
+        [
+          1,
+          118
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Reviewed across darwin/governance rounds: paired fresh-source judges, contract/unit tests updated, codex engine eval green."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Write gates, sensitive-info handling, and degraded paths re-checked; judge-named nits fixed and re-verified."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-project-rules-contracts.test.js",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "52bd246d0ce5f0c7644f8e3018368eb784b5d9b23474f92b9e87060b0d242d21",
+      "bytes": 8571,
+      "line_count": 175,
+      "covered_line_ranges": [
+        [
+          1,
+          175
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Reviewed across darwin/governance rounds: paired fresh-source judges, contract/unit tests updated, codex engine eval green."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Safety-relevant behavior verified by dedicated behavior eval cases."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/unit/spec-project-rules-scripts.test.js",
+      "skill_ids": [
+        "spec-project-rules"
+      ],
+      "sha256": "cda6c509b4af412d9713cfa31e3c73af25c901f888a773345e11673febd44799",
+      "bytes": 17013,
+      "line_count": 407,
+      "covered_line_ranges": [
+        [
+          1,
+          407
+        ]
+      ],
+      "lens_verdicts": [
+        {
+          "review_lens": "openai-skill-engineering",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Reviewed across darwin/governance rounds: paired fresh-source judges, contract/unit tests updated, codex engine eval green."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        },
+        {
+          "review_lens": "anthropic-skill-craft-safety",
+          "review_status": "complete",
+          "verdict": "no-new-actionable-finding",
+          "notes": [
+            "Safety-relevant behavior verified by dedicated behavior eval cases."
+          ],
+          "limitations": [
+            "Comparative paired-judge verdicts; independence is context-level (same provider pool)."
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_relations": [],
+  "findings": [],
+  "limitations": [
+    "execution_context schema (v1) only models the inline-same-context path; this delta was actually reviewed by fresh-source dispatched paired judges (3/3 better per round, context-level independence only — same provider pool)",
+    "paired-judge verdicts are comparative (better/worse), not absolute quality scores; engine-level eval (skill-up/codex) covers all 10 cases green",
+    "upstream adjudication re-verified by fresh-source agent: 517/517 carry-over, 0 stale flips"
+  ],
+  "claim_ceiling": "Source-bound incremental review of the spec-project-rules darwin-optimization, governance, and sampling change set only."
+}
