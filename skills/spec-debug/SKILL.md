@@ -94,7 +94,7 @@ Read the full conversation — the original description AND every comment, with 
 - Only ask when a genuine ambiguity blocks investigation and cannot be resolved by reading code or running tests
 - When asking, ask one specific question
 
-**Prior-attempt awareness:** If the user indicates prior failed attempts ("I've been trying", "keeps failing", "stuck"), ask what they have already tried before investigating. This avoids repeating failed approaches and is one of the few cases where asking first is the right call.
+**Prior-attempt awareness:** If the user signals they lack or have exhausted attempts — "I've been trying", "keeps failing", "stuck", "试了好几次" — ask what they have already tried **before any investigation step**. The attempts list prevents repeating known-failed paths; a later diagnostic question about environment or startup is not a substitute for it. This is one of the few cases where asking first is the right call.
 
 ---
 

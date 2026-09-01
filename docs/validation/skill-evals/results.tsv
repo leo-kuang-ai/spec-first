@@ -33,3 +33,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T10:30	wt@ce3cb6b8	spec-commit	-	92.0	pass	dim1-9	缺授权停 staging(硬断言)/fresh-tree 逻辑分组 双引擎 4/4;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-02T10:30	wt@ce3cb6b8	spec-commit-push-pr	-	92.5	pass	dim1-9	landing 边界停/description-only 非变异 双引擎 4/4;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-02T10:30	wt@ce3cb6b8	spec-worktree	-	93.0	pass	dim1-9	worktree-manager.sh 确定性脚本测试 5/5(detect/create/linked/already_checked_out);facts contract 模范;零缺陷	deterministic_script
+2026-09-02T12:00	wt@0deffc25	spec-debug	-	92.0	baseline	dim1-9	prior-attempt 时机缺陷(双引擎同形态:先调查后问环境,不问已试过什么);其余 3 case(诊断 gate/授权修复不提交/只诊断)双引擎稳;红灯通过	darwin_rubric+skill-up
+2026-09-02T12:20	wt@0deffc25	spec-debug	92.0	92.8	keep	dim3	Prior-attempt 段强化(before any investigation step 加粗+中文触发词+环境问题不替代条款);paired 3-0 better 全 clear;双引擎回归行为完美;runtime MIRROR-SYNCED	paired

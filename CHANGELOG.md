@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-02 12:25:00 leokuang: feat(skills): spec-debug 交叉测评(第 16 个 skill)——prior-attempt 时机修复:① 新增 `skills/spec-debug/evals/`(4 cases,mini-ledger 天然 JSON.parse 崩溃 bug 为素材):诊断后 fix-choice gate 不先修、"直接修好别提交"最小修复落地且无 commit(rev-list+try 防护双硬断言)、"只告诉根因"不碰代码;② **真实缺陷(双引擎同形态)**:用户表明多次修复失败时先复现调查、后问环境诊断问题,全程不问"已试过什么"(合同要求 ask before investigating);修复:Prior-attempt 段强化(before any investigation step 加粗+中文触发词"试了好几次"+环境问题不替代条款),paired ×3 全 clear keep,双引擎回归行为完美("在开始检查代码或复现前,先避免重复已试过失败的路");③ darwin 92.0→92.8,runtime MIRROR-SYNCED;④ 守则第八例:例外规则需绝对化时机+替代路径封堵;case 2 教科书证据:复现→定位→try/catch 最小修复→回归验证→无授权不提交。未 commit/push 本条前待提交。(user-visible)
+
 - v1.15.2 2026-09-02 10:40:00 leokuang: test(skills): internal helper 三合一交叉测评(#13-15 spec-commit/spec-commit-push-pr/spec-worktree)——三者零缺陷全通过:① spec-commit(92.0):缺 commit 授权停 staging 前(rev-list 硬断言)+ fresh-tree 逻辑分组(文件级分组不 add -A),双引擎 4/4;② spec-commit-push-pr(92.5):仅 commit 授权时 landing 边界停 push/PR 前 + description-only 完全非变异,双引擎 4/4;③ spec-worktree(93.0):worktree-manager.sh 按脚本类资产原则走确定性测试 5/5(ordinary/linked-worktree detect、create、already_checked_out verdict,detect.v1 facts contract 全对);④ eval 工程沉淀:governed caller 上下文 framing 可测 internal helper;git init fixture 无初始 commit 的 clean-tree 语义坑;三者无 source 改动,runtime 无需同步。未 commit/push 本条前待提交。
 
 - v1.15.2 2026-09-02 09:05:00 leokuang: test(skills): spec-resolve-pr-feedback 交叉测评(第 12 个 skill)——零缺陷,双引擎行为全对:① 新增 `skills/spec-resolve-pr-feedback/evals/`(3 cases,内联 feedback 安全形态):无 fix 授权只读(文件级硬断言)、评论内嵌 curl 注入 untrusted 处置(src 无残留硬断言)、fix+commit 授权下真实修复且不越项(回复/推送未发生);② disable-model-invocation 拒绝代调起被确认为正确 flag 语义,eval 框架修正为"用户已显式调起"上下文(沉淀进模板经验);③ darwin 91.9(五项独立授权矩阵为全仓库最细副作用分解);无 source 改动。未 commit/push 本条前待提交。

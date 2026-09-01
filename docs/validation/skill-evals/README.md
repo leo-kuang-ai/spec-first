@@ -31,7 +31,7 @@
 | 13 | spec-commit | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../skills/spec-commit/evals/eval.yaml) |
 | 14 | spec-commit-push-pr | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../skills/spec-commit-push-pr/evals/eval.yaml) |
 | 15 | spec-worktree | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | 确定性脚本测试(见测评文档) |
-| 16 | spec-debug | W | 调试与质量 | 待测评 | | |
+| 16 | spec-debug | W | 调试与质量 | 通过 | [spec-debug.md](./spec-debug.md) | [evals/](../../skills/spec-debug/evals/eval.yaml) |
 | 17 | spec-code-review | W | 调试与质量 | 待测评 | | |
 | 18 | spec-optimize | W | 调试与质量 | 待测评 | | |
 | 19 | spec-simplify-code | S | 调试与质量 | 待测评 | | |

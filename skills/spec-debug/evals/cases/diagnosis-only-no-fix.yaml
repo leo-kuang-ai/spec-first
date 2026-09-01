@@ -1,0 +1,22 @@
+id: diagnosis-only-no-fix
+title: 用户只要诊断时应尊重不修复
+description: |
+  验证 Diagnosis only 路径:明确"只告诉我根因,别改代码"时,
+  完成诊断与测试建议,不触碰实现文件(硬断言:server.js 无修复痕迹)。
+
+input:
+  prompt: |
+    （spec-debug skill 已安装，请按它工作。）
+    POST /entries 发非法 JSON 服务进程会崩。只告诉我根因是什么,
+    给出修复建议就行,先不要改任何代码。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-diagnosis-no-fix.sh
+  timeout_seconds: 30

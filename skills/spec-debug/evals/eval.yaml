@@ -1,0 +1,26 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/diagnose-then-choice-gate.yaml
+    - evals/cases/fix-authorized-fixes-no-commit.yaml
+    - evals/cases/prior-attempt-asks-first.yaml
+    - evals/cases/diagnosis-only-no-fix.yaml
+  defaults:
+    timeout_seconds: 600
+    max_turns: 24
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]
