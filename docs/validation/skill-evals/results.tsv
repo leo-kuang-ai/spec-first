@@ -58,3 +58,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-03T09:00	wt@a0b2d3a9	spec-riffrec-feedback-analysis	-	92.0	pass	dim1-9	通用音视频转写不触发 双引擎原生;54 行最紧凑;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-03T09:00	wt@a0b2d3a9	spec-polish	-	91.0	baseline	dim1-9	静态审查请求被双引擎收编(识别 Not To Use 却直接做审查),未点名 spec-code-review	darwin_rubric+skill-up
 2026-09-03T09:30	wt@a0b2d3a9	spec-polish	91.0	91.8	keep	dim3/9	Not To Use 补点名+反收编双要素;paired 3-0 全 clear;双引擎回归全过;MIRROR-SYNCED	paired
+2026-09-03T10:30	wt@e25401fd	spec-explain	-	91.5	pass	dim1-9	简单问答不产教学 artifact 双引擎(claude 原生;codex 断言补轻量语义词);零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-03T10:30	wt@e25401fd	spec-handoff	-	92.0	pass	dim1-9	普通续问不触发 handoff 双引擎;触发词最严格;零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-03T10:30	wt@e25401fd	spec-pov	-	91.0	baseline	dim1-9	用户自有设计问题被直接 verdict(替用户做产品决定,既有 selection hatch 不覆盖)	darwin_rubric+skill-up
+2026-09-03T11:00	wt@e25401fd	spec-pov	91.0	92.0	keep	dim3	escape hatch 补 design-question-not-verdict(路由 brainstorm/plan+禁 verdict);paired 3-0 全 clear;claude 回归 1/1;codex 半改良残留(拒 formal 但给建议)——通过(带条件);MIRROR-SYNCED	paired

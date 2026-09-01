@@ -1,0 +1,25 @@
+id: ordinary-continuation-not-triggered
+title: 当前会话普通续问不应触发 handoff
+description: |
+  验证 description 反例:ordinary continuation in the current conversation
+  不触发 handoff——应直接继续当前工作,不产交接文档。
+
+input:
+  prompt: |
+    （spec-handoff skill 已安装，请按它工作。）
+    我们继续刚才的活儿,接着做下一步。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "docs/handoffs"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-continues-inline.sh
+  timeout_seconds: 30

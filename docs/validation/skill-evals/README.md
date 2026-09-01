@@ -48,9 +48,9 @@
 | 30 | spec-sweep | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-sweep/evals/eval.yaml) |
 | 31 | spec-riffrec-feedback-analysis | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-riffrec-feedback-analysis/evals/eval.yaml) |
 | 32 | spec-polish | W | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-polish/evals/eval.yaml) |
-| 33 | spec-explain | S | 会话连续性与解释 | 待测评 | | |
-| 34 | spec-handoff | S | 会话连续性与解释 | 待测评 | | |
-| 35 | spec-pov | S | 会话连续性与解释 | 待测评 | | |
+| 33 | spec-explain | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-explain/evals/eval.yaml) |
+| 34 | spec-handoff | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-handoff/evals/eval.yaml) |
+| 35 | spec-pov | S | 会话连续性与解释 | 通过(带条件) | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-pov/evals/eval.yaml) |
 | 36 | spec-write-skill | W | 治理与元能力 | 待测评 | | |
 | 37 | spec-promote | S | 发布 | 待测评 | | |
 

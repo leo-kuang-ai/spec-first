@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-03 11:10:00 leokuang: feat(skills): 会话组三合一交叉测评(#33-35):① explain(91.5)/handoff(92.0)零缺陷——简单问答不产教学 artifact、普通续问不触发 handoff 双引擎稳固;② pov(91.0→92.0)真实缺陷:用户自有设计问题("表单列表同页还是分开")被直接 verdict 替用户做了产品决定(既有 selection hatch 不覆盖——该场有界判据可知);修复:escape hatch 补 "A product-design question the user owns is not a verdict"(路由 brainstorm=WHAT/plan=HOW+禁 verdict),paired ×3 全 clear,claude 回归 1/1;codex 半改良残留(拒 formal verdict 但仍给工程建议未指路)通过(带条件);③ pov MIRROR-SYNCED,其余无 source 改动。未 commit/push 本条前待提交。(user-visible)
+
 - v1.15.2 2026-09-03 09:40:00 leokuang: feat(skills): 产品信号组四合一交叉测评(#29-32):① product-pulse(91.0)/sweep(91.5)/riffrec(92.0)零缺陷——未配置引导 setup、headless 首跑 requires-interactive-setup 停止、通用音视频不触发三 gate 双引擎稳固;② polish(91.0→91.8)真实缺陷:静态审查请求被双引擎收编(识别 Not To Use 却直接做审查);修复:补点名 spec-code-review+反收编双要素("recognizing the mismatch and then doing the excluded work anyway is adopting the wrong workflow, not a helpful fallback"),paired ×3 全 clear,双引擎回归全过;③ 断言工程三处同日复现:祈使形态与中文关键词是 ask/gate 断言两大长尾;④ 四者 runtime 状态:polish MIRROR-SYNCED,其余无 source 改动。未 commit/push 本条前待提交。(user-visible)
 
 - v1.15.2 2026-09-03 00:10:00 leokuang: test(skills): spec-project-rules/spec-rule-miner 交叉测评(#27-28 规则对合并轮):① spec-project-rules(93.5)——复用 owner 既有 10-case suite 双引擎:**codex 10/10 + claude 10/10 = 20/20 全绿**,近期 darwin 优化循环成果(v2 治理/行为 eval 3→10)完整复现,零缺陷零修复;② spec-rule-miner(91.5→92.0)——preview-first 写入纪律双引擎稳;review 请求双引擎收编,修复:近邻路由补点名义务句,paired ×3 全 clear,codex 回归 1/1,claude 残留收编(输入同形诱惑强)通过(带条件);runtime MIRROR-SYNCED。未 commit/push 本条前待提交。(user-visible)

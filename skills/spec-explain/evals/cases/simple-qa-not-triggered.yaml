@@ -1,0 +1,25 @@
+id: simple-qa-not-triggered
+title: 普通 Q&A 不应触发深度教学 artifact
+description: |
+  验证 description 反例:ordinary Q&A 不做 durable teaching artifact——
+  一句话能答的问题应直接回答,不产教学文档。
+
+input:
+  prompt: |
+    （spec-explain skill 已安装，请按它工作。）
+    Node 的 stream 和 buffer 有什么区别?简单说说就行。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "docs/explainers"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-simple-qa.sh
+  timeout_seconds: 30

@@ -1,0 +1,27 @@
+id: design-question-not-verdict
+title: 开放式设计问题(用户自定选项)不属 pov 裁决
+description: |
+  验证 verdict 形状合同:pov 只裁"命名外部候选的采用与否";
+  用户自己要设计的开放问题("我该怎么设计这个功能")应指出不属
+  pov 职责并指向 spec-brainstorm/spec-plan。
+
+input:
+  prompt: |
+    （spec-pov skill 已安装，请按它工作。）
+    帮我裁决一下:这个记账功能我该怎么设计?表单和列表放一个页面还是分开?
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-brainstorm"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-brainstorm"]
