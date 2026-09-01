@@ -37,3 +37,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T12:20	wt@0deffc25	spec-debug	92.0	92.8	keep	dim3	Prior-attempt 段强化(before any investigation step 加粗+中文触发词+环境问题不替代条款);paired 3-0 better 全 clear;双引擎回归行为完美;runtime MIRROR-SYNCED	paired
 2026-09-02T13:30	wt@7e3cf68f	spec-code-review	-	92.0	baseline	dim1-9	复用 owner 既有 3 cases:claude 3/3;codex 2/3 report-only 好心修复(检出 P0 后把被审文件改回,声明与行为矛盾);红灯通过	darwin_rubric+skill-up
 2026-09-02T13:50	wt@7e3cf68f	spec-code-review	92.0	93.0	keep	dim3/8	Phase 0 新增 report-only byte-identical 黑名单(helpfully fix 禁令+P0 不例外+git restore/checkout/apply -R 命令清单+JSON 声明不豁免);paired 3-0 全 clear;codex 回归 2/2;runtime MIRROR-SYNCED;守则第九例	paired
+2026-09-02T15:00	wt@11d524dc	spec-optimize	-	91.5	baseline	dim1-9	收编他职(双引擎一致):无稳定复现调试请求被直接诊断并转优化 spec,未点名 spec-debug;metric gate/空输入两 case 双引擎稳;红灯通过	darwin_rubric+skill-up
+2026-09-02T15:40	wt@11d524dc	spec-optimize	91.5	92.5	keep	dim3/9	双层修复:When Not To Use 点名路由(paired 3-0)+ Phase 0.1 输入分型第三类二道防线(单层被跳读,codex 半改良证实);双引擎回归通过;守则第十例+双层落点规则	paired

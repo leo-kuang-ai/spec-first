@@ -1,0 +1,26 @@
+id: debug-request-routes-out
+title: 无反馈循环的调试请求应指出不适配并指向 spec-debug
+description: |
+  验证 Not To Use 合同:debugging without a feedback loop 不属本 skill,
+  应点名 spec-debug 路由。
+
+input:
+  prompt: |
+    （spec-optimize skill 已安装，请按它工作。）
+    服务偶尔崩溃也没法稳定复现,帮我优化修复一下。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-debug"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

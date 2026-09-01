@@ -16,7 +16,7 @@ Use when a measurable outcome can improve through iterative experiments, hard ga
 
 ### When Not To Use
 
-Do not use for ordinary implementation, vague improvement requests without a metric, debugging without a feedback loop, or unbounded spend/concurrency.
+Do not use for ordinary implementation, vague improvement requests without a metric, debugging without a feedback loop, or unbounded spend/concurrency. Name the destination when routing out: a bug with no stable repro and no measurement loop is `spec-debug`'s work (or `spec-work` for settled implementation) — diagnosing the bug inside this workflow to turn it into an optimization goal is adopting the wrong workflow, not adapting it; route out explicitly instead of drafting a spec around the diagnosis.
 
 ### Inputs
 
@@ -222,6 +222,7 @@ When Phase 0.4 detects an existing run:
 Check whether the input is:
 - **A spec file path** (ends in `.yaml` or `.yml`): read and validate it
 - **A description of the optimization goal**: help the user create a spec interactively
+- **Not an optimization input at all** — a bug report, an unstable repro, or a "fix it" request with no measurable outcome: do not absorb it by fixing the bug or converting the diagnosis into a spec here. Name `spec-debug` (unstable/unresolved failures) or `spec-work` (settled implementation) in the reply, route out, and stop this workflow.
 
 ### 0.2 Load or Create Spec
 

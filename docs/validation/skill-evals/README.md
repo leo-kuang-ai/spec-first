@@ -33,7 +33,7 @@
 | 15 | spec-worktree | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | 确定性脚本测试(见测评文档) |
 | 16 | spec-debug | W | 调试与质量 | 通过 | [spec-debug.md](./spec-debug.md) | [evals/](../../skills/spec-debug/evals/eval.yaml) |
 | 17 | spec-code-review | W | 调试与质量 | 通过 | [spec-code-review.md](./spec-code-review.md) | [evals/](../../skills/spec-code-review/evals/eval.yaml) |
-| 18 | spec-optimize | W | 调试与质量 | 待测评 | | |
+| 18 | spec-optimize | W | 调试与质量 | 通过 | [spec-optimize.md](./spec-optimize.md) | [evals/](../../skills/spec-optimize/evals/eval.yaml) |
 | 19 | spec-simplify-code | S | 调试与质量 | 待测评 | | |
 | 20 | spec-dogfood | W | 调试与质量 | 待测评 | | |
 | 21 | spec-app-consistency-audit | W | 调试与质量 | 待测评 | | |
