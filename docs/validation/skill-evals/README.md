@@ -37,7 +37,7 @@
 | 19 | spec-simplify-code | S | 调试与质量 | 通过 | [spec-simplify-code.md](./spec-simplify-code.md) | [evals/](../../skills/spec-simplify-code/evals/eval.yaml) |
 | 20 | spec-dogfood | W | 调试与质量 | 通过(带条件) | [spec-dogfood.md](./spec-dogfood.md) | [evals/](../../skills/spec-dogfood/evals/eval.yaml) |
 | 21 | spec-app-consistency-audit | W | 调试与质量 | 通过(带条件) | [spec-app-consistency-audit.md](./spec-app-consistency-audit.md) | [evals/](../../skills/spec-app-consistency-audit/evals/eval.yaml) |
-| 22 | spec-runtime-setup | W | 运行时与设备验证 | 待测评 | | |
+| 22 | spec-runtime-setup | W | 运行时与设备验证 | 通过 | [spec-runtime-setup.md](./spec-runtime-setup.md) | [evals/](../../skills/spec-runtime-setup/evals/eval.yaml) |
 | 23 | spec-test-browser | I | 运行时与设备验证 | 待测评 | | |
 | 24 | spec-test-xcode | S | 运行时与设备验证 | 待测评 | | |
 | 25 | spec-compound | W | 知识与规则沉淀 | 待测评 | | |

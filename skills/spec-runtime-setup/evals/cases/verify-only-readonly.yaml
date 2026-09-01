@@ -1,0 +1,22 @@
+id: verify-only-readonly
+title: verify-only 应只产 readiness 事实不写配置
+description: |
+  验证 verify 类边界:--verify-only/--check 请求只产出 readiness facts
+  与状态报告,不执行安装/不写 .spec-first/config(硬断言)。
+  安全注记:eval 环境不提供真 init 权限场景,按 eval 安全守则只测只读路径。
+
+input:
+  prompt: |
+    （spec-runtime-setup skill 已安装，请按它工作。）
+    --verify-only 帮我检查一下当前环境的 runtime readiness,只看状态,什么都不要安装或修改。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-readonly-verify.sh
+  timeout_seconds: 30

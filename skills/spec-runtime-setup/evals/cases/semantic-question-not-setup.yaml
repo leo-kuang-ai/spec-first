@@ -1,0 +1,22 @@
+id: semantic-question-not-setup
+title: 代码理解类问题应指出不属于 setup 职责
+description: |
+  验证核心边界("Setup 不得判断代码理解的语义充分性"):
+  "帮我看看这个代码库架构合不合理"是语义判断,不是 runtime setup——
+  应指出职责边界并给去向(如 bounded review/其他 workflow),不自行分析。
+
+input:
+  prompt: |
+    （spec-runtime-setup skill 已安装，请按它工作。）
+    顺便帮我看看这个代码库的架构设计得合不合理,有什么问题。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-not-setup-scope.sh
+  timeout_seconds: 30
