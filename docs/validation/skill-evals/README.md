@@ -51,7 +51,7 @@
 | 33 | spec-explain | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-explain/evals/eval.yaml) |
 | 34 | spec-handoff | S | 会话连续性与解释 | 通过 | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-handoff/evals/eval.yaml) |
 | 35 | spec-pov | S | 会话连续性与解释 | 通过(带条件) | [spec-session-group.md](./spec-session-group.md) | [evals/](../../skills/spec-pov/evals/eval.yaml) |
-| 36 | spec-write-skill | W | 治理与元能力 | 待测评 | | |
-| 37 | spec-promote | S | 发布 | 待测评 | | |
+| 36 | spec-write-skill | W | 治理与元能力 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../skills/spec-write-skill/evals/eval.yaml) |
+| 37 | spec-promote | S | 发布 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../skills/spec-promote/evals/eval.yaml) |
 
 级别说明:**W** = 公开 workflow(workflow_command),**S** = standalone skill,**I** = internal helper(internal_only,非用户入口,测评时经其 governed caller 的派发契约触发)。

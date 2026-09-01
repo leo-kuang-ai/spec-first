@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-03 12:30:00 leokuang: test(skills): 全量 37/37 skill 交叉测评完成——最后一轮(#36-37)+ 总结报告:① spec-write-skill(92.5)/spec-promote(91.0)零缺陷——mirror patch 拒绝+source 指引、只产草稿不发布双引擎稳固;② 新增总结文档 `docs/validation/skill-evals/2026-09-03-full-suite-summary.md`:darwin 均分 91.8(区间 88.6~95.1)、19 个零缺陷一次通过、14 个真实缺陷全部修复(13 轮 paired ×3 全 3-0 全 clear、无一 revert)、6 个带条件通过(残留集中于输入同形边界,建议 using-spec-first 上游路由消化)、九条设计守则(路由三要素/排除自带目的地/双层落点/反收编/用户施压非写权限/mismatch 非 authorization/绝对化时机/逐字合同最稳/声明行为解耦)与 eval 工程九条经验沉淀;③ 全程 ~150+ case 执行、29 套 skill-up 回归资产、每轮 commit/push。未 commit/push 本条前待提交。
+
 - v1.15.2 2026-09-03 11:10:00 leokuang: feat(skills): 会话组三合一交叉测评(#33-35):① explain(91.5)/handoff(92.0)零缺陷——简单问答不产教学 artifact、普通续问不触发 handoff 双引擎稳固;② pov(91.0→92.0)真实缺陷:用户自有设计问题("表单列表同页还是分开")被直接 verdict 替用户做了产品决定(既有 selection hatch 不覆盖——该场有界判据可知);修复:escape hatch 补 "A product-design question the user owns is not a verdict"(路由 brainstorm=WHAT/plan=HOW+禁 verdict),paired ×3 全 clear,claude 回归 1/1;codex 半改良残留(拒 formal verdict 但仍给工程建议未指路)通过(带条件);③ pov MIRROR-SYNCED,其余无 source 改动。未 commit/push 本条前待提交。(user-visible)
 
 - v1.15.2 2026-09-03 09:40:00 leokuang: feat(skills): 产品信号组四合一交叉测评(#29-32):① product-pulse(91.0)/sweep(91.5)/riffrec(92.0)零缺陷——未配置引导 setup、headless 首跑 requires-interactive-setup 停止、通用音视频不触发三 gate 双引擎稳固;② polish(91.0→91.8)真实缺陷:静态审查请求被双引擎收编(识别 Not To Use 却直接做审查);修复:补点名 spec-code-review+反收编双要素("recognizing the mismatch and then doing the excluded work anyway is adopting the wrong workflow, not a helpful fallback"),paired ×3 全 clear,双引擎回归全过;③ 断言工程三处同日复现:祈使形态与中文关键词是 ask/gate 断言两大长尾;④ 四者 runtime 状态:polish MIRROR-SYNCED,其余无 source 改动。未 commit/push 本条前待提交。(user-visible)

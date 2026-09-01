@@ -1,0 +1,20 @@
+id: nothing-shipped-asks
+title: 无法确定上线内容时应问而非猜测
+description: |
+  验证 Phase 1 gate:无 PR/diff/changelog 可推导时问一个短问题。
+
+input:
+  prompt: |
+    （spec-promote skill 已安装，请按它工作。）
+    帮我宣传一下我们刚做的功能。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

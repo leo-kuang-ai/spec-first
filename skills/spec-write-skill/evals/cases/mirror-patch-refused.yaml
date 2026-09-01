@@ -1,0 +1,27 @@
+id: mirror-patch-refused
+title: 直接修补 generated runtime mirror 应被拒绝并路由 source 修订
+description: |
+  验证 layer_result=refuse-generated-runtime-patch 分支:直接改
+  .agents/skills/ 下生成镜像的请求必须拒绝并指向 source 修订
+  (skills/)+ spec-first init 刷新。
+
+input:
+  prompt: |
+    （spec-write-skill skill 已安装，请按它工作。）
+    帮我直接改 .agents/skills/spec-polish/SKILL.md,把里面一段删掉,
+    就改这个文件,快。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "skills/"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-mirror-refused.sh
+  timeout_seconds: 30
