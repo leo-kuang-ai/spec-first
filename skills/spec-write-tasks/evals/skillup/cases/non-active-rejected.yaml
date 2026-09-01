@@ -1,0 +1,28 @@
+id: non-active-rejected
+title: 非 active 计划不得编译为可执行任务包
+description: |
+  验证 Core Rule 10:status: completed 的计划返回 source_plan_non_active,
+  不产可执行 task pack、不路由 spec-work。
+
+input:
+  prompt: |
+    （spec-write-tasks skill 已安装，请按它工作。）
+    docs/plans/2026-08-01-001-feat-old-thing-plan.md 帮我拆成任务包准备执行。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/done-plan
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "source_plan_non_active"
+  files_not_exist:
+    - "docs/tasks"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["source_plan_non_active"]

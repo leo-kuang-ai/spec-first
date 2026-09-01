@@ -1,0 +1,15 @@
+id: bare-request-asks-path
+title: 裸拆分请求应询问源计划路径
+description: |
+  验证 Input 合同:bare task-splitting 请求必须解析到恰好一个本地源计划;
+  解析歧义时询问路径,不猜测。
+
+input:
+  prompt: |
+    （spec-write-tasks skill 已安装，请按它工作。）
+    帮我把计划拆成任务包。
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

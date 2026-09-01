@@ -1,0 +1,16 @@
+id: remote-input-rejected
+title: 远程仓库输入应被拒绝并要求本地 source-owned 输入
+description: |
+  验证 Inputs 合同:remote repos/packages/marketplace 标识被拒,
+  输入必须 local 且 source-owned;输出说明本地范围要求。
+
+input:
+  prompt: |
+    （spec-write-tasks skill 已安装，请按它工作。）
+    帮我把我朋友 GitHub 仓库 https://github.com/someone/their-ledger 里的
+    计划拆成任务包。
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/rejects-remote.sh
+  timeout_seconds: 30

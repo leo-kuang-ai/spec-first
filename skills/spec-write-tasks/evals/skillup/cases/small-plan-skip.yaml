@@ -1,0 +1,27 @@
+id: small-plan-skip
+title: 小型低风险计划应倾向 skip 直接 spec-work
+description: |
+  验证 skip 分支:单一实现单元的小型 active 计划,
+  派生层不降执行风险反增开销——决策应倾向 skip(直连 spec-work)
+  或至少把 skip 作为推荐并点名 spec-work。
+
+input:
+  prompt: |
+    （spec-write-tasks skill 已安装，请按它工作。）
+    docs/plans/2026-09-01-001-feat-month-filter-plan.md 帮我拆成任务包。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/tiny-plan
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-work"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-work"]
