@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-02 21:45:00 leokuang: test(skills): spec-test-browser/spec-test-xcode 交叉测评(#23-24 小 skill 合一轮)——双引擎 6/6 全绿零缺陷:① test-browser(93.5):fail-closed origin 合同(pipeline 缺 origin→target-origin-missing、非法 origin→target-origin-invalid,不推断不规范化)双引擎 4/4 一次过——与 doc-review 同型再证"越逐字的合同失守越少";② test-xcode(90.0):MCP 不可用停止+安装指引双引擎 2/2,claim 纪律(MCP readiness≠build/render)模范;③ 两者均无 source 改动,runtime 无需同步。未 commit/push 本条前待提交。
+
 - v1.15.2 2026-09-02 21:05:00 leokuang: test(skills): spec-runtime-setup 交叉测评(第 22 个 skill)——零缺陷通过:① 新增 `skills/spec-runtime-setup/evals/`(2 cases,按 eval 安全守则只测只读/边界路径,不触发真实安装):--verify-only readiness 语义、"架构合理性"语义职责分离;② 双引擎行为全对(codex 2/2;claude 行为正确,断言修正——.spec-first/config 是合同 Outputs 明文的 setup 自有 facts 目录,verify 写入属边界灰区记为观察项);③ darwin 93.5(setup-registry 单源/facts-vs-语义核心边界/provider_readiness v2 lifecycle 分离模范);无 source 改动。未 commit/push 本条前待提交。
 
 - v1.15.2 2026-09-02 20:10:00 leokuang: feat(skills): spec-app-consistency-audit 交叉测评(第 21 个 skill)——通过(带条件),文本修复达瓶颈的首次如实记录:① 新增 `skills/spec-app-consistency-audit/evals/`(3 cases):三源皆缺输入 gate(双引擎 ✓)、test-only 边界(双引擎 ✓)、near-neighbor code-review 路由;② 缺陷:near-neighbor 排除识别正确但不宣告目的地;修复:补"name the destination skill explicitly in your reply"义务,paired ×3 全 clear;③ 行为回归诚实记录:双引擎在该 case 共 5 形态仅 2 正确(解释不点名/收编做高质量 code review/超时×2)——297 行审计主流程注意力淹没近邻路由,文本层修复达瓶颈;④ 处置:通过(带条件),建议近邻场景由 using-spec-first 入口路由层消化而非逐 skill 硬扛;⑤ darwin 91.7→92.0,runtime MIRROR-SYNCED。未 commit/push 本条前待提交。(user-visible)

@@ -46,3 +46,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T19:40	wt@0b0b3e4f	spec-app-consistency-audit	-	91.7	baseline	dim1-9	near-neighbor 排除识别正确但不宣告目的地(双引擎);输入 gate/test-only 双引擎稳;红灯通过	darwin_rubric+skill-up
 2026-09-02T20:00	wt@0b0b3e4f	spec-app-consistency-audit	91.7	92.0	keep	dim9	near-neighbor 补点名义务;paired 3-0 全 clear;行为回归双引擎 5 形态仅 2 正确(收编做审查/超时)——文本修复达瓶颈,通过(带条件),建议上游入口路由消化;MIRROR-SYNCED	paired
 2026-09-02T21:00	wt@f9d9c7e4	spec-runtime-setup	-	93.5	pass	dim1-9	只测只读/边界路径(eval 安全守则):verify-only 语义双引擎对、语义职责分离双引擎稳;零缺陷;verify 写自有 facts 目录灰区记为观察;红灯通过	darwin_rubric+skill-up
+2026-09-02T21:40	wt@a6a71301	spec-test-browser	-	93.5	pass	dim1-9	fail-closed origin 合同双引擎 4/4(target-origin-missing/invalid 一次过);零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-02T21:40	wt@a6a71301	spec-test-xcode	-	90.0	pass	dim1-9	MCP 不可用停止+安装指引双引擎 2/2;claim 纪律(MCP readiness≠build/render)模范;零缺陷	darwin_rubric+skill-up

@@ -1,0 +1,20 @@
+id: mcp-unavailable-stops
+title: XcodeBuildMCP 不可用应停止并给安装指引
+description: |
+  验证 Phase 0 前置:MCP server 不可用(当前沙箱无 XcodeBuildMCP)时
+  停止并输出安装指引,不继续 build/test。
+
+input:
+  prompt: |
+    （我已通过 /spec-test-xcode 显式调起该 skill——已加载,输入如下。）
+    current
+
+expect:
+  must_contain:
+    - "XcodeBuildMCP"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["XcodeBuildMCP"]

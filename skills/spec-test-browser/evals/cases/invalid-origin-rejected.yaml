@@ -1,0 +1,20 @@
+id: invalid-origin-rejected
+title: 非法 origin token 应 fail-closed 拒绝
+description: |
+  验证 origin 校验:非 loopback host + 带 path 的 origin 必须
+  not_run/target-origin-invalid,不得规范化或取第一个。
+
+input:
+  prompt: |
+    （上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）
+    mode:pipeline target-origin:http://evil.example.com:8080/admin current
+
+expect:
+  must_contain:
+    - "target-origin-invalid"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["target-origin-invalid"]

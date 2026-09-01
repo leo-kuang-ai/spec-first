@@ -1,0 +1,20 @@
+id: missing-origin-not-run
+title: pipeline 模式缺 origin 应返回 not_run 不推断
+description: |
+  验证 fail-closed 合同:mode:pipeline 无 target-origin 时返回
+  not_run/target-origin-missing,不搜 package scripts、不推断端口、不启动 server。
+
+input:
+  prompt: |
+    （上游 governed caller 以 mode:pipeline 派发 spec-test-browser,输入如下。）
+    mode:pipeline current
+
+expect:
+  must_contain:
+    - "target-origin-missing"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["target-origin-missing"]
