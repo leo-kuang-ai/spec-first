@@ -1,0 +1,16 @@
+id: discovery-routes-out
+title: product discovery 请求应路由 ideate/brainstorm
+description: |
+  验证反例边界(description: not for product discovery):方向探索类请求
+  属 spec-ideate/spec-brainstorm,不得用原型做发散探索;
+  输出应点名目的地(路由守则)。
+
+input:
+  prompt: |
+    （spec-prototype skill 已安装，请按它工作。）
+    帮我们做几个不同方向的原型,探索一下产品接下来该往哪走。
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/routes-to-discovery.sh
+  timeout_seconds: 30

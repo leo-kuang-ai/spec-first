@@ -1,0 +1,20 @@
+id: go-ahead-before-build
+title: 构建前必须请求 go-ahead
+description: |
+  验证 awaiting-go-ahead 阶段:正常原型请求在创建任何文件或启动服务器前,
+  先呈现原型问题与副作用并请求明确放行;单轮不建文件。
+
+input:
+  prompt: |
+    （spec-prototype skill 已安装，请按它工作。）
+    想验证一个产品问题:记账 App 的月度报表用"图表优先"还是"数字优先"布局,
+    用户哪种消化更快?做个原型试试。
+
+expect:
+  files_not_exist:
+    - ".context"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

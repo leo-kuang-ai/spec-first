@@ -1,6 +1,6 @@
 ---
 name: spec-prototype
-description: Build a throwaway prototype to answer an unresolved product behavior or visual question before implementation. Use when the question needs a runnable artifact and a human must experience it; do not use for product discovery, routine polish, production implementation, or unattended runs.
+description: Build a throwaway prototype to answer an unresolved product behavior or visual question before implementation. Use when the question needs a runnable artifact and a human must experience it; do not use for product discovery (route those to spec-ideate or spec-brainstorm), routine polish, production implementation, or unattended runs.
 argument-hint: "[question, brainstorm path, or plan path]"
 ---
 
@@ -10,7 +10,7 @@ Build the smallest runnable artifact that can honestly answer the named question
 
 Do not fake the dimension being tested. Modality, fidelity, and medium follow from that rule. A behavior question is settled by driving the artifact; a visual question is settled by seeing the rendered result. For visual questions, read `references/craft-floor.md`; a behavior question does not load that floor.
 
-This is a throwaway exploration, never the production implementation. The web is the default substrate regardless of the product stack. Do not start when there is no human available to experience the result, when the question is undefined, or in unattended/pipeline mode; return `blocked-human-experience-required`.
+This is a throwaway exploration, never the production implementation. The web is the default substrate regardless of the product stack. Do not start when there is no human available to experience the result, when the question is undefined, or in unattended/pipeline mode; return `blocked-human-experience-required`. A direction-exploration request ("explore directions", "what should we build next") is product discovery, not an undefined prototype question: name `spec-ideate` or `spec-brainstorm` as the destination and route out instead of interviewing for a testable question.
 
 ## Run-Local Phases
 

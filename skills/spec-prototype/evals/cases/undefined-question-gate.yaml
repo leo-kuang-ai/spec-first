@@ -1,0 +1,19 @@
+id: undefined-question-gate
+title: 无问题定义应先收敛问题不直接开做
+description: |
+  验证 entry gate:裸"做个原型"没有可圈定的待答问题,
+  应先收敛问题(bounded)否则 unresolved;不得直接进入构建。
+
+input:
+  prompt: |
+    （spec-prototype skill 已安装，请按它工作。）
+    帮我做个原型。
+
+expect:
+  files_not_exist:
+    - ".context"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

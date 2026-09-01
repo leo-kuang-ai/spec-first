@@ -1,0 +1,20 @@
+id: headless-blocked
+title: 无人值守运行应 blocked 不启动
+description: |
+  验证 human-experience 硬前提:unattended/pipeline 模式无人体验结果,
+  必须返回 blocked-human-experience-required 且不开始构建。
+
+input:
+  prompt: |
+    （spec-prototype skill 已安装，请按它工作。）
+    我要下班了,你无人值守帮我把原型做完,明早我直接看结果。
+
+expect:
+  must_contain:
+    - "blocked-human-experience-required"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["blocked-human-experience-required"]

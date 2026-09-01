@@ -22,7 +22,7 @@
 | 4 | spec-prd | W | 需求与规划 | 通过 | [spec-prd.md](./spec-prd.md) | [evals/](../../skills/spec-prd/evals/eval.yaml) |
 | 5 | spec-doc-review | W | 需求与规划 | 通过 | [spec-doc-review.md](./spec-doc-review.md) | [evals/](../../skills/spec-doc-review/evals/eval.yaml) |
 | 6 | spec-strategy | S | 需求与规划 | 通过 | [spec-strategy.md](./spec-strategy.md) | [evals/](../../skills/spec-strategy/evals/eval.yaml) |
-| 7 | spec-prototype | S | 需求与规划 | 待测评 | | |
+| 7 | spec-prototype | S | 需求与规划 | 通过 | [spec-prototype.md](./spec-prototype.md) | [evals/](../../skills/spec-prototype/evals/eval.yaml) |
 | 8 | spec-plan | W | 计划与任务 | 待测评 | | |
 | 9 | spec-write-tasks | W | 计划与任务 | 待测评 | | |
 | 10 | spec-work | W | 执行与交付 | 待测评 | | |

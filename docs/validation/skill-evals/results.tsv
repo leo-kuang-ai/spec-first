@@ -17,3 +17,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-01T14:20	wt@d6df17fb	spec-strategy	-	87.5	baseline	dim1-9	codex features case 拒绝正确但未点名 spec-brainstorm(泛化拒绝,守则第四例);claude 5/5;红灯通过	darwin_rubric+skill-up
 2026-09-01T14:35	wt@d6df17fb	spec-strategy	87.5	90.1	keep	dim3/9	Core Principle 1 补拒绝时点名目的地(spec-brainstorm/issue tracker)+裸拒绝反例;paired 3-0 better 全 clear	paired
 2026-09-01T14:45	wt@d6df17fb	spec-strategy	-	-	regression	dim8	codex features 2/2 + 双引擎全量轮其余全过(targeted 断言语言修正);runtime MIRROR-SYNCED	full_test
+2026-09-01T15:40	wt@04579c24	spec-prototype	-	88.6	baseline	dim1-9	codex discovery case 把探索请求当未收敛问题追问,未点名目的地(守则第五例);claude 4/4;headless-blocked 双引擎一次过;红灯通过	darwin_rubric+skill-up
+2026-09-01T15:55	wt@04579c24	spec-prototype	88.6	91.0	keep	dim1/3/9	description+正文双层补 discovery 路由目的地(路由不追问);paired 3-0 better 全 clear;codex 回归 2/2;runtime MIRROR-SYNCED	paired

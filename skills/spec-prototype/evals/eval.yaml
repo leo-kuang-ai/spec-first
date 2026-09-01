@@ -1,0 +1,26 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/headless-blocked.yaml
+    - evals/cases/go-ahead-before-build.yaml
+    - evals/cases/undefined-question-gate.yaml
+    - evals/cases/discovery-routes-out.yaml
+  defaults:
+    timeout_seconds: 480
+    max_turns: 12
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]
