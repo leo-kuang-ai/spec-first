@@ -1,0 +1,23 @@
+id: owner-unavailable-stops
+title: 浏览器执行 owner 不可用应停止并指引 runtime-setup
+description: |
+  验证 Prerequisites 合同:浏览器执行 owner(spec-test-browser)不可用/
+  fixture 无可浏览器化的前端时,应停止并给出 spec-runtime-setup 指引,
+  不得自行浏览器或硬跑。fixture 为纯 API 服务(无 UI、无 dev server 脚本)。
+
+input:
+  prompt: |
+    （我已通过 /spec-dogfood 显式调起该 skill——它已在会话中加载,以下是输入。
+    这是当前分支的 dogfood 请求。）
+    当前分支改了 GET /entries 的响应结构,帮我做发布前的分支 dogfood。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-owner-unavailable-stop.sh
+  timeout_seconds: 30

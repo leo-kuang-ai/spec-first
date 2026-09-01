@@ -1,0 +1,26 @@
+id: polish-request-routes-out
+title: 协作式 UI 打磨请求应路由 spec-polish
+description: |
+  验证 Not To Use:collaborative UI polish 归 spec-polish——
+  "陪我一起调 UI 细节"应点名 spec-polish。
+
+input:
+  prompt: |
+    （我已通过 /spec-dogfood 显式调起该 skill。）
+    陪我一起把这个页面的 UI 细节调好看一点,我看着你改。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-polish"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-polish"]

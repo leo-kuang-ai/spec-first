@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-02 18:30:00 leokuang: feat(skills): spec-dogfood 交叉测评(第 20 个 skill)——路由点名义务修复:① 新增 `skills/spec-dogfood/evals/`(3 cases,显式调起 framing):浏览器 owner 不可用停止+spec-runtime-setup 指引(双引擎 ✓)、trunk 目标拒绝(双引擎 ✓)、collaborative polish 路由;② 真实缺陷(双引擎):polish 请求被正确识别不匹配但未点名 spec-polish(合同括号有标注、输出未宣告);修复:Not To Use 补"路由排除时必须在回复中点名目的地 skill(不指路则 owner 无路可走)",paired ×3 全 clear keep,claude 回归 1/1;③ 诚实残留:codex polish case 形态发散三轮(识别不指路/收编建 UI/超时),文本修复已尽,通过(带条件);④ darwin 91.0→91.8,runtime MIRROR-SYNCED。未 commit/push 本条前待提交。(user-visible)
+
 - v1.15.2 2026-09-02 17:00:00 leokuang: feat(skills): spec-simplify-code 交叉测评(第 19 个 skill)——Step 1 路由门(守则十例再现,双层守则一次到位):① 新增 `skills/spec-simplify-code/evals/`(3 cases + mini-ledger-guarded fixture):safety-check 保持(try 防护硬断言)、纯文档 no-yield gate、bug 请求路由;② 真实缺陷(codex):"非法 JSON 会崩处理一下"被直接 try/catch 收编修复(spec-debug 0 次);修复:Step 1 开头 Not-a-simplification-input-first 路由门(禁修+点名+修复后回流清理路径),paired ×3 全 clear keep,codex 回归 1/1;③ darwin 90.5→91.5,runtime MIRROR-SYNCED;④ 守则复用价值实证:optimize 轮沉淀的"双层落点"规则在本轮直接一次修复到位。未 commit/push 本条前待提交。(user-visible)
 
 - v1.15.2 2026-09-02 15:45:00 leokuang: feat(skills): spec-optimize 交叉测评(第 18 个 skill)——收编他职双层修复(守则第十例+双层落点新规则):① 新增 `skills/spec-optimize/evals/`(3 cases):无指标 gate、空输入询问、调试请求路由;② **真实缺陷(双引擎一致)**:无稳定复现的调试请求被直接代码诊断并转优化 spec 起草,未点名 spec-debug;第一层修复(When Not To Use 点名路由+adopting-wrong-workflow 定性,paired ×3 全 clear)后 codex 半改良(拒绝进循环但仍"我转为先修"),证实单层合同摘要会被跳读;③ 修复 2:Phase 0.1 输入分型新增"Not an optimization input at all"二道防线(点名 spec-debug/spec-work 路由后停止),codex 回归 1/1;④ darwin 91.5→92.5;⑤ 守则新增:路由类修复需双层落点(合同摘要+执行 Phase 入口);runtime 改动已同步(129 行既有投影模板差异与本次无关,如实记录)。未 commit/push 本条前待提交。(user-visible)

@@ -1,0 +1,21 @@
+id: trunk-target-rejected
+title: 指定 trunk 为目标应被拒绝
+description: |
+  验证 Failure Modes(trunk target with no diff):目标解析为 trunk 本身时
+  无 diff 可 dogfood,应拒绝/要求 feature 分支,不得转为全应用探索。
+
+input:
+  prompt: |
+    （我已通过 /spec-dogfood 显式调起该 skill。）
+    main
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-trunk-reject.sh
+  timeout_seconds: 30

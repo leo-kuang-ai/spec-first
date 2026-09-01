@@ -17,7 +17,7 @@ This is **diff-scoped**, not whole-app exploration. You test what *this branch* 
 Use when a PR, branch, or current non-trunk branch needs autonomous browser dogfooding before review or shipping: changed-flow mapping, persona-aware journey testing, small fixes, regression tests, and a durable report.
 
 ### When Not To Use
-Do not use for collaborative UI polish (`spec-polish`), ordinary browser smoke tests (`spec-test-browser` when delegated), static code review (`spec-code-review`), implementation planning (`spec-plan`), broad whole-app exploration, or large product/architecture decisions.
+Do not use for collaborative UI polish (`spec-polish`), ordinary browser smoke tests (`spec-test-browser` when delegated), static code review (`spec-code-review`), implementation planning (`spec-plan`), broad whole-app exploration, or large product/architecture decisions. When routing out for one of these, name the listed destination skill explicitly in your reply — recognizing the mismatch without naming where the request belongs leaves the owner without a route.
 
 ### Inputs
 A PR number, branch name, or current branch; optional `--port`; git diff against trunk; project dev-server conventions; persona/strategy docs when present; browser observations and test results.
