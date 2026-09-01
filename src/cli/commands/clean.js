@@ -12,7 +12,42 @@ const {
   readStateFileRaw,
   summarizeOperationPlan,
 } = require('../state');
-const { getAdapter, getSupportedPlatforms } = require('../adapters');
+const { getAdapter, getPlatformDisplayName, getSupportedPlatforms } = require('../adapters');
+const { resolveUserLanguage } = require('../cli-lang');
+
+// 用户旅程文案双语；usage/help、legacy state 与 workspace-graph 等技术诊断输出保留英文。
+const CLEAN_MESSAGES = {
+  zh: {
+    noAssets: '未发现 spec-first 受管的项目 assets。',
+    dryRunLabel: '演练: spec-first clean',
+    applyLabel: '执行: spec-first clean',
+    wouldRemove: (count) => `将移除 ${count} 个受管 path。`,
+    removing: (count) => `正在移除 ${count} 个受管 path。`,
+    wouldUpdate: (count) => `将更新 ${count} 个受管文件。`,
+    updating: (count) => `正在更新 ${count} 个受管文件。`,
+    wouldRemoveEmptyRoots: (count) => `之后将移除 ${count} 个空的受管根目录。`,
+    removingEmptyRoots: '清理过程中会移除空的受管根目录。',
+    customAssetsWould: '受管集合之外的自定义 assets 将保持不变。',
+    customAssetsDid: '受管集合之外的自定义 assets 已保持不变。',
+    noChanges: '未修改任何文件。',
+    removed: (display) => `已从当前项目移除 spec-first 受管的 ${display} assets。`,
+  },
+  en: {
+    noAssets: 'No spec-first managed project assets found.',
+    dryRunLabel: 'Dry run: spec-first clean',
+    applyLabel: 'Apply: spec-first clean',
+    wouldRemove: (count) => `Would remove ${count} managed path(s).`,
+    removing: (count) => `Removing ${count} managed path(s).`,
+    wouldUpdate: (count) => `Would update ${count} managed file(s).`,
+    updating: (count) => `Updating ${count} managed file(s).`,
+    wouldRemoveEmptyRoots: (count) => `Would remove ${count} empty managed root(s) after cleanup.`,
+    removingEmptyRoots: 'Empty managed roots are removed during cleanup.',
+    customAssetsWould: 'Custom assets outside the spec-first managed set would remain untouched.',
+    customAssetsDid: 'Custom assets outside the spec-first managed set are left untouched.',
+    noChanges: 'No files were changed.',
+    removed: (display) => `Removed spec-first managed ${display} assets from the current project.`,
+  },
+};
 const { formatInitGuidance } = require('../init-guidance');
 const { removeManagedCodingGuidelinesBlock } = require('../coding-guidelines');
 const { removeManagedBootstrapBlock } = require('../instruction-bootstrap');
@@ -64,6 +99,9 @@ function runClean(argv, deps = {}) {
 
   const platform = selectedPlatforms[0];
   const adapter = getAdapter(platform);
+  const messages = CLEAN_MESSAGES[
+    (deps.resolveLang || resolveUserLanguage)() === 'en' ? 'en' : 'zh'
+  ];
   const projectRoot = process.cwd();
   let state;
   try {
@@ -91,7 +129,7 @@ function runClean(argv, deps = {}) {
   }
 
   if (!state) {
-    console.log('No spec-first managed project assets found.');
+    console.log(messages.noAssets);
     return 0;
   }
 
@@ -111,15 +149,15 @@ function runClean(argv, deps = {}) {
 
   const cleanPlan = buildCleanPlan(projectRoot, state, adapter);
   if (parsed.dryRun) {
-    printCleanSummary(platform, cleanPlan, { mode: 'dry-run' });
+    printCleanSummary(platform, cleanPlan, { mode: 'dry-run', messages });
     return 0;
   }
 
-  printCleanSummary(platform, cleanPlan, { mode: 'apply' });
+  printCleanSummary(platform, cleanPlan, { mode: 'apply', messages });
   applyOperationPlan(projectRoot, mergeOperationPlans(cleanPlan.managedPlan, cleanPlan.runtimeCleanup));
   applyOperationPlan(projectRoot, planEmptyManagedRootCleanup(projectRoot, adapter));
 
-  console.log(`Removed spec-first managed ${platformDisplayName(platform)} assets from the current project.`);
+  console.log(messages.removed(getPlatformDisplayName(platform)));
   console.log('Custom assets outside the spec-first managed set were left untouched.');
   return 0;
 }
@@ -132,15 +170,11 @@ function tryReadRawManagedState(projectRoot, adapter) {
   }
 }
 
+// 宿主 flag 集合从 registry 派生：新增宿主时 clean 的解析面随 getSupportedPlatforms() 自动扩展。
+const CLEAN_HOST_FLAGS = new Map(getSupportedPlatforms().map((platform) => [`--${platform}`, platform]));
+
 function parseCleanArgs(argv) {
   const parsed = {
-    help: false,
-    claude: false,
-    codex: false,
-    cursor: false,
-    kiro: false,
-    qoder: false,
-    opencode: false,
     dryRun: false,
     workspaceOrphans: false,
     workspaceGraph: false,
@@ -148,23 +182,16 @@ function parseCleanArgs(argv) {
     confirm: false,
     unknown: [],
   };
+  for (const platform of getSupportedPlatforms()) {
+    parsed[platform] = false;
+  }
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '-h' || arg === '--help') {
       parsed.help = true;
-    } else if (arg === '--claude') {
-      parsed.claude = true;
-    } else if (arg === '--codex') {
-      parsed.codex = true;
-    } else if (arg === '--cursor') {
-      parsed.cursor = true;
-    } else if (arg === '--kiro') {
-      parsed.kiro = true;
-    } else if (arg === '--qoder') {
-      parsed.qoder = true;
-    } else if (arg === '--opencode') {
-      parsed.opencode = true;
+    } else if (CLEAN_HOST_FLAGS.has(arg)) {
+      parsed[CLEAN_HOST_FLAGS.get(arg)] = true;
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
@@ -531,16 +558,6 @@ function printHelp() {
   ].join('\n'));
 }
 
-function platformDisplayName(platform) {
-  if (platform === 'claude') return 'Claude Code';
-  if (platform === 'codex') return 'Codex';
-  if (platform === 'cursor') return 'Cursor';
-  if (platform === 'kiro') return 'Kiro';
-  if (platform === 'qoder') return 'Qoder';
-  if (platform === 'opencode') return 'OpenCode';
-  return platform;
-}
-
 function selectedHostPlatforms(parsed) {
   return getSupportedPlatforms().filter((platform) => parsed[platform]);
 }
@@ -685,7 +702,7 @@ function removeManagedInstructionBlocks(existing) {
   );
 }
 
-function printCleanSummary(platform, cleanPlan, { mode }) {
+function printCleanSummary(platform, cleanPlan, { mode, messages = CLEAN_MESSAGES.en }) {
   const dryRun = mode === 'dry-run';
   const removeCount =
     (cleanPlan.managedPlan.summary.remove_file || 0) +
@@ -695,8 +712,8 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
   const updateCount = cleanPlan.runtimeCleanup.summary.update_file || 0;
   const emptyRootCount = cleanPlan.emptyRootPlan.summary.remove_empty_root || 0;
 
-  console.log(`${dryRun ? 'Dry run' : 'Apply'}: spec-first clean (${platform})`);
-  console.log(`${dryRun ? 'Would remove' : 'Removing'} ${removeCount} managed path(s).`);
+  console.log(`${dryRun ? messages.dryRunLabel : messages.applyLabel} (${platform})`);
+  console.log(dryRun ? messages.wouldRemove(removeCount) : messages.removing(removeCount));
   for (const operation of cleanPlan.managedPlan.operations) {
     console.log(`  - ${operation.path}`);
   }
@@ -705,7 +722,7 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
   )) {
     console.log(`  - ${operation.path}`);
   }
-  console.log(`${dryRun ? 'Would update' : 'Updating'} ${updateCount} managed file(s).`);
+  console.log(dryRun ? messages.wouldUpdate(updateCount) : messages.updating(updateCount));
   for (const operation of cleanPlan.runtimeCleanup.operations.filter((entry) => entry.kind === 'update_file')) {
     console.log(`  - ${operation.path}`);
   }
@@ -713,13 +730,13 @@ function printCleanSummary(platform, cleanPlan, { mode }) {
     console.log(`[${diagnostic.code}] ${diagnostic.message}`);
   }
   if (dryRun) {
-    console.log(`Would remove ${emptyRootCount} empty managed root(s) after cleanup.`);
+    console.log(messages.wouldRemoveEmptyRoots(emptyRootCount));
   } else {
-    console.log('Empty managed roots are removed during cleanup.');
+    console.log(messages.removingEmptyRoots);
   }
-  console.log(`Custom assets outside the spec-first managed set ${dryRun ? 'would remain' : 'are left'} untouched.`);
+  console.log(dryRun ? messages.customAssetsWould : messages.customAssetsDid);
   if (dryRun) {
-    console.log('No files were changed.');
+    console.log(messages.noChanges);
   }
 }
 

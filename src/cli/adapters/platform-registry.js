@@ -2,6 +2,7 @@
 
 const PLATFORM_REGISTRY = {
   claude: {
+    displayName: 'Claude Code',
     runtimeRoot: '.claude',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.claude/spec-first/', ownership: 'generated-runtime' },
@@ -29,6 +30,7 @@ const PLATFORM_REGISTRY = {
     },
   },
   codex: {
+    displayName: 'Codex',
     runtimeRoot: '.codex',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.codex/spec-first/', ownership: 'generated-runtime' },
@@ -51,6 +53,7 @@ const PLATFORM_REGISTRY = {
     },
   },
   cursor: {
+    displayName: 'Cursor',
     runtimeRoot: '.cursor',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.cursor/spec-first/', ownership: 'generated-runtime' },
@@ -75,6 +78,7 @@ const PLATFORM_REGISTRY = {
     },
   },
   kiro: {
+    displayName: 'Kiro',
     runtimeRoot: '.kiro',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.kiro/spec-first/', ownership: 'generated-runtime' },
@@ -102,6 +106,7 @@ const PLATFORM_REGISTRY = {
     },
   },
   qoder: {
+    displayName: 'Qoder',
     runtimeRoot: '.qoder',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.qoder/spec-first/', ownership: 'generated-runtime' },
@@ -141,6 +146,7 @@ const PLATFORM_REGISTRY = {
     },
   },
   opencode: {
+    displayName: 'OpenCode',
     runtimeRoot: '.opencode',
     surfaces: {
       managedRoot: { kind: 'dir', path: '.opencode/spec-first/', ownership: 'generated-runtime' },

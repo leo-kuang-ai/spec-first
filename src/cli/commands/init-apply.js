@@ -34,16 +34,35 @@ function applyProjectInitPlan(projectRoot, plan, context = {}) {
       applyOperationPlan(normalizedRoot, plan.writePlan);
       removeRuntimeRollbackBackup(destructiveBackup);
     } catch (error) {
-      restoreRuntimeRollbackBackup(normalizedRoot, destructiveBackup);
-      removeRuntimeRollbackBackup(destructiveBackup);
-      throw annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
+      const restoreOutcome = tryRestoreRuntimeRollbackBackup(normalizedRoot, destructiveBackup);
+      if (restoreOutcome.status !== 'restore-failed') {
+        removeRuntimeRollbackBackup(destructiveBackup);
+      }
+      annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
+      annotateRuntimeRollbackOutcome(error, restoreOutcome);
+      throw error;
     }
   } else {
+    // 常规刷新路径与破坏性重置共享同一备份/恢复基建：中途失败（EACCES、磁盘满、
+    // Windows 文件占用）不留半写状态。回滚保证来自 state.json 本身在 writePlan 的
+    // 备份集合内：恢复后旧 manifest 与磁盘内容一致，doctor 仍可独立检出残余漂移。
+    // 接受语义：ensure_dir 产生的空目录在回滚后可能残留，无数据损失。
+    const regularBackup = createRuntimeRollbackBackup({
+      projectRoot: normalizedRoot,
+      plans: [plan.preSyncPlan, plan.writePlan],
+    });
     try {
       applyOperationPlan(normalizedRoot, plan.preSyncPlan);
       applyOperationPlan(normalizedRoot, plan.writePlan);
+      removeRuntimeRollbackBackup(regularBackup);
     } catch (error) {
-      throw annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
+      const restoreOutcome = tryRestoreRuntimeRollbackBackup(normalizedRoot, regularBackup);
+      if (restoreOutcome.status !== 'restore-failed') {
+        removeRuntimeRollbackBackup(regularBackup);
+      }
+      annotateProjectMutationError(error, prerequisite.globalDeveloperWriteResult);
+      annotateRuntimeRollbackOutcome(error, restoreOutcome);
+      throw error;
     }
   }
 
@@ -51,6 +70,38 @@ function applyProjectInitPlan(projectRoot, plan, context = {}) {
     exit_code: 0,
     globalDeveloperWriteResult: prerequisite.globalDeveloperWriteResult,
   };
+}
+
+// 恢复失败不能掩盖触发它的原始写入错误：吞掉恢复异常，把备份位置记进
+// 结果，由 annotateRuntimeRollbackOutcome 引导用户手动恢复。
+function tryRestoreRuntimeRollbackBackup(projectRoot, backup) {
+  if (!backup) {
+    return { status: 'no-backup' };
+  }
+  try {
+    const restored = restoreRuntimeRollbackBackup(projectRoot, backup);
+    return { status: restored ? 'restored' : 'no-backup' };
+  } catch (error) {
+    return {
+      status: 'restore-failed',
+      error,
+      backupRoot: backup.backupRoot,
+    };
+  }
+}
+
+function annotateRuntimeRollbackOutcome(error, restoreOutcome) {
+  if (!error || typeof error !== 'object') {
+    return error;
+  }
+  if (restoreOutcome.status === 'restored') {
+    error.runtimeRollback = 'restored';
+    error.message = `${error.message}\nspec-first init 已把受管 runtime 回滚到本次写入前状态；问题排查后可安全重试。`;
+  } else if (restoreOutcome.status === 'restore-failed') {
+    error.runtimeRollback = 'restore-failed';
+    error.message = `${error.message}\n回滚未完全成功，备份保留在 ${restoreOutcome.backupRoot}；请运行 spec-first doctor 检查漂移，必要时从该目录手动恢复后重试 init。`;
+  }
+  return error;
 }
 
 function ensureGlobalDeveloperPrerequisite(plans, context = {}) {

@@ -53,5 +53,9 @@ describe('required CI producers', () => {
       expect(source).not.toMatch(/spawnSync\(['"]npm/);
     }
     expect(packageJson.files).toContain('scripts/lib/npm-cli.cjs');
+    // release-publish 的 git 门禁模块同样随包分发，缺失会让 tarball 内的
+    // release-publish.cjs 在 require 时崩溃。
+    expect(packageJson.files).toContain('scripts/lib/release-git.cjs');
+    expect(read('scripts/release-publish.cjs')).toContain("require('./lib/release-git.cjs')");
   });
 });

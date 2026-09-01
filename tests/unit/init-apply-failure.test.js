@@ -263,16 +263,138 @@ describe('init run-level global developer prerequisite', () => {
     expect(thrown).toBe(projectError);
     expect(thrown).toMatchObject({
       code: 'EIO',
-      message: 'project write failed',
       globalDeveloperWriteResult: {
         action: 'create',
         status: 'applied',
         applied: true,
         resolvedPath,
       },
+      // 常规路径失败后错误消息追加回滚指引，原始失败原因保持在首行。
+      runtimeRollback: 'restored',
     });
+    expect(thrown.message).toContain('project write failed');
+    expect(thrown.message).toContain('spec-first init 已把受管 runtime 回滚到本次写入前状态');
     expect(writer).toHaveBeenCalledTimes(1);
     expect(applyOperationPlan).toHaveBeenCalledTimes(2);
+  });
+
+  test('regular-path partial write failure rolls back pre-existing managed files', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-rollback-'));
+    const existingManaged = path.join(projectRoot, 'existing-managed.md');
+    const blockedTarget = path.join(projectRoot, 'blocked-target');
+    fs.writeFileSync(existingManaged, 'before\n', 'utf8');
+    fs.mkdirSync(blockedTarget);
+    const { applyProjectInitPlan } = loadInitApplyWithDeveloper({
+      writeGlobalDeveloperFile: jest.fn(),
+    });
+
+    let thrown;
+    try {
+      applyProjectInitPlan(projectRoot, makeProjectPlan(projectRoot, makeGlobalWrite(), {
+        writePlan: emptyOperationPlan([
+          { kind: 'write_file', path: 'existing-managed.md', contents: 'after\n' },
+          // 目录占位使第二个写入以 EISDIR 失败，模拟磁盘/权限类中途失败。
+          { kind: 'write_file', path: 'blocked-target', contents: 'never written\n' },
+        ]),
+      }));
+    } catch (caught) {
+      thrown = caught;
+    }
+
+    expect(thrown).toMatchObject({ code: 'EISDIR', runtimeRollback: 'restored' });
+    // 第一个写入已发生，回滚必须把它恢复到写入前内容。
+    expect(fs.readFileSync(existingManaged, 'utf8')).toBe('before\n');
+    expect(fs.statSync(blockedTarget).isDirectory()).toBe(true);
+    expect(thrown.message).toContain('spec-first init 已把受管 runtime 回滚到本次写入前状态');
+  });
+
+  test('write failure rolls back files removed by preSync and preserves the old state manifest', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-presync-'));
+    const obsoleteAsset = path.join(projectRoot, 'obsolete-asset.md');
+    const stateFile = path.join(projectRoot, 'state.json');
+    const blockedTarget = path.join(projectRoot, 'blocked-target');
+    fs.writeFileSync(obsoleteAsset, 'obsolete content\n', 'utf8');
+    fs.writeFileSync(stateFile, '{"platform":"codex","assets":["obsolete-asset.md"]}\n', 'utf8');
+    fs.mkdirSync(blockedTarget);
+    const { applyProjectInitPlan } = loadInitApplyWithDeveloper({
+      writeGlobalDeveloperFile: jest.fn(),
+    });
+
+    let thrown;
+    try {
+      applyProjectInitPlan(projectRoot, makeProjectPlan(projectRoot, makeGlobalWrite(), {
+        // preSync 删除旧受管资产——这是常规刷新路径中真实存在的删除来源
+        //（planObsoleteManagedAssetRemoval 等），回滚必须覆盖它。
+        preSyncPlan: emptyOperationPlan([
+          { kind: 'remove_file', path: 'obsolete-asset.md' },
+        ]),
+        writePlan: emptyOperationPlan([
+          { kind: 'write_file', path: 'state.json', contents: '{"platform":"codex","assets":[]}\n' },
+          { kind: 'write_file', path: 'blocked-target', contents: 'boom\n' },
+        ]),
+      }));
+    } catch (caught) {
+      thrown = caught;
+    }
+
+    expect(thrown).toMatchObject({ code: 'EISDIR', runtimeRollback: 'restored' });
+    // preSync 删除的资产被恢复。
+    expect(fs.readFileSync(obsoleteAsset, 'utf8')).toBe('obsolete content\n');
+    // 已写入的新 state 被回滚，旧 manifest 保留——doctor 的漂移检测依赖它。
+    expect(fs.readFileSync(stateFile, 'utf8'))
+      .toBe('{"platform":"codex","assets":["obsolete-asset.md"]}\n');
+  });
+
+  test('destructive reset failure restores files removed by the reset plan', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-destructive-'));
+    const legacyAsset = path.join(projectRoot, 'legacy-asset.md');
+    const blockedTarget = path.join(projectRoot, 'blocked-target');
+    fs.writeFileSync(legacyAsset, 'legacy content\n', 'utf8');
+    fs.mkdirSync(blockedTarget);
+    const { applyProjectInitPlan } = loadInitApplyWithDeveloper({
+      writeGlobalDeveloperFile: jest.fn(),
+    });
+
+    let thrown;
+    try {
+      applyProjectInitPlan(projectRoot, makeProjectPlan(projectRoot, makeGlobalWrite(), {
+        destructiveResetPlan: emptyOperationPlan([
+          { kind: 'remove_file', path: 'legacy-asset.md' },
+        ]),
+        writePlan: emptyOperationPlan([
+          { kind: 'write_file', path: 'blocked-target', contents: 'boom\n' },
+        ]),
+      }));
+    } catch (caught) {
+      thrown = caught;
+    }
+
+    expect(thrown).toMatchObject({ code: 'EISDIR', runtimeRollback: 'restored' });
+    // 破坏性重置删掉的资产在写入失败后同样恢复。
+    expect(fs.readFileSync(legacyAsset, 'utf8')).toBe('legacy content\n');
+  });
+
+  test('regular-path success removes the rollback backup from tmpdir', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-rollback-ok-'));
+    const { applyProjectInitPlan } = loadInitApplyWithDeveloper({
+      writeGlobalDeveloperFile: jest.fn(),
+    });
+    const mkdtempSpy = jest.spyOn(fs, 'mkdtempSync');
+
+    const result = applyProjectInitPlan(
+      projectRoot,
+      makeProjectPlan(projectRoot, makeGlobalWrite()),
+    );
+
+    expect(result.exit_code).toBe(0);
+    expect(fs.readFileSync(path.join(projectRoot, 'project-mutation.txt'), 'utf8'))
+      .toBe('project mutation\n');
+    const backupDirs = mkdtempSpy.mock.results
+      .map((call) => call.value)
+      .filter((dir) => path.basename(dir).startsWith('spec-first-init-backup-'));
+    // 备份建在 os.tmpdir() 而非 projectRoot；成功路径必须将其删除。
+    expect(backupDirs).toHaveLength(1);
+    expect(fs.existsSync(backupDirs[0])).toBe(false);
   });
 
   test.each([

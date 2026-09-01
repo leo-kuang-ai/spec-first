@@ -41,14 +41,8 @@ function runDoctor(argv) {
 
   const projectRoot = process.cwd();
 
-  // 确定要检查的平台
-  let platforms = [];
-  if (parsed.claude) platforms.push('claude');
-  if (parsed.codex) platforms.push('codex');
-  if (parsed.cursor) platforms.push('cursor');
-  if (parsed.kiro) platforms.push('kiro');
-  if (parsed.qoder) platforms.push('qoder');
-  if (parsed.opencode) platforms.push('opencode');
+  // 确定要检查的平台：解析层已按 registry 生成宿主 flag，这里直接收集命中项。
+  let platforms = getSupportedPlatforms().filter((platform) => parsed[platform]);
   const selectionMode = platforms.length > 0 ? 'explicit' : 'auto';
 
   // 无参数时自动检测
@@ -1928,35 +1922,26 @@ function isPlatformRuntimeDetected(projectRoot, adapter) {
   return runtimePaths.some((runtimePath) => fs.existsSync(path.join(projectRoot, runtimePath)));
 }
 
+// 宿主 flag 集合从 registry 派生：新增宿主时 doctor 的解析面随 getSupportedPlatforms() 自动扩展。
+const DOCTOR_HOST_FLAGS = new Map(
+  getSupportedPlatforms().map((platform) => [`--${platform}`, platform]),
+);
+
 function parseDoctorArgs(argv) {
   const parsed = {
-    help: false,
-    claude: false,
-    codex: false,
-    cursor: false,
-    kiro: false,
-    qoder: false,
-    opencode: false,
     json: false,
     verbose: false,
     unknown: [],
   };
+  for (const platform of getSupportedPlatforms()) {
+    parsed[platform] = false;
+  }
 
   for (const arg of argv) {
     if (arg === '-h' || arg === '--help') {
       parsed.help = true;
-    } else if (arg === '--claude') {
-      parsed.claude = true;
-    } else if (arg === '--codex') {
-      parsed.codex = true;
-    } else if (arg === '--cursor') {
-      parsed.cursor = true;
-    } else if (arg === '--kiro') {
-      parsed.kiro = true;
-    } else if (arg === '--qoder') {
-      parsed.qoder = true;
-    } else if (arg === '--opencode') {
-      parsed.opencode = true;
+    } else if (DOCTOR_HOST_FLAGS.has(arg)) {
+      parsed[DOCTOR_HOST_FLAGS.get(arg)] = true;
     } else if (arg === '--json') {
       parsed.json = true;
     } else if (arg === '--verbose') {
@@ -1990,5 +1975,6 @@ module.exports = {
   checkPlatformCli,
   checkNodeVersion,
   checkGit,
+  parseDoctorArgs,
   readWorkflowVerificationEvidence,
 };

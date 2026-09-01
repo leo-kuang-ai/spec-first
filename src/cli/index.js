@@ -17,6 +17,14 @@ const {
   maybeShowStartupVersionReminder,
   maybeShowVersionReminder,
 } = require('./version-reminder');
+const { getStartupReminderHosts } = require('./adapters');
+
+// startup-reminder 只服务声明了 session-start hook 的宿主；集合从 registry 派生，
+// 新宿主通过 registry 的 capabilities.hooks.sessionStart 声明即可进入此处。
+const STARTUP_REMINDER_HOSTS = new Set(getStartupReminderHosts());
+const STARTUP_REMINDER_HOST_FLAGS = getStartupReminderHosts()
+  .map((host) => `--${host}`)
+  .join(', ');
 
 async function runCli(argv) {
   const args = [...argv];
@@ -124,7 +132,7 @@ function parseStartupReminderArgs(args) {
   };
 
   const setHost = (host) => {
-    if (host !== 'claude' && host !== 'codex' && host !== 'qoder') {
+    if (!STARTUP_REMINDER_HOSTS.has(host)) {
       parsed.error = `invalid host "${host}"`;
       return;
     }
@@ -139,31 +147,23 @@ function parseStartupReminderArgs(args) {
     if (parsed.error) {
       break;
     }
-    if (arg === '--claude') {
-      setHost('claude');
-      continue;
-    }
-    if (arg === '--codex') {
-      setHost('codex');
-      continue;
-    }
-    if (arg === '--qoder') {
-      setHost('qoder');
+    if (arg.startsWith('--host=')) {
+      setHost(arg.slice('--host='.length));
       continue;
     }
     if (arg === '--reset') {
       parsed.reset = true;
       continue;
     }
-    if (arg.startsWith('--host=')) {
-      setHost(arg.slice('--host='.length));
+    if (arg.startsWith('--') && STARTUP_REMINDER_HOSTS.has(arg.slice(2))) {
+      setHost(arg.slice(2));
       continue;
     }
     parsed.error = `unknown option "${arg}"`;
   }
 
   if (!parsed.error && !parsed.host) {
-    parsed.error = 'missing host selector (--claude, --codex, or --qoder)';
+    parsed.error = `missing host selector (${STARTUP_REMINDER_HOST_FLAGS})`;
   }
 
   return parsed;
@@ -235,6 +235,7 @@ function printVersion() {
 }
 
 module.exports = {
+  parseStartupReminderArgs,
   printVersion,
   runCli,
 };

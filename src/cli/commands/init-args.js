@@ -1,49 +1,25 @@
 'use strict';
 
-const INIT_PLATFORM_CHOICES = [
-  {
-    id: 'claude',
-    flag: 'claude',
-    label: 'Claude Code',
-    defaultChecked: false,
-    defaultForYes: true,
-  },
-  {
-    id: 'codex',
-    flag: 'codex',
-    label: 'Codex',
-    defaultChecked: false,
-    defaultForYes: true,
-  },
-  {
-    id: 'cursor',
-    flag: 'cursor',
-    label: 'Cursor',
-    defaultChecked: false,
-    defaultForYes: false,
-  },
-  {
-    id: 'kiro',
-    flag: 'kiro',
-    label: 'Kiro',
-    defaultChecked: false,
-    defaultForYes: false,
-  },
-  {
-    id: 'qoder',
-    flag: 'qoder',
-    label: 'Qoder',
-    defaultChecked: false,
-    defaultForYes: false,
-  },
-  {
-    id: 'opencode',
-    flag: 'opencode',
-    label: 'OpenCode',
-    defaultChecked: false,
-    defaultForYes: false,
-  },
-];
+const { getPlatformDisplayName, getSupportedPlatforms } = require('../adapters');
+
+// init 特有的选择行为（默认勾选、-y 默认宿主）是本地配置；宿主 id 集合与
+// 显示名从 platform registry 派生，新增宿主自动进入 init 的选择面与解析面，
+// 未配置默认行为的宿主按 { defaultChecked: false, defaultForYes: false } 兜底。
+const INIT_PLATFORM_DEFAULTS = {
+  claude: { defaultChecked: false, defaultForYes: true },
+  codex: { defaultChecked: false, defaultForYes: true },
+  cursor: { defaultChecked: false, defaultForYes: false },
+  kiro: { defaultChecked: false, defaultForYes: false },
+  qoder: { defaultChecked: false, defaultForYes: false },
+  opencode: { defaultChecked: false, defaultForYes: false },
+};
+
+const INIT_PLATFORM_CHOICES = getSupportedPlatforms().map((id) => ({
+  id,
+  flag: id,
+  label: getPlatformDisplayName(id),
+  ...(INIT_PLATFORM_DEFAULTS[id] || { defaultChecked: false, defaultForYes: false }),
+}));
 
 const SUPPORTED_HOST_IDS = new Set(INIT_PLATFORM_CHOICES.map((choice) => choice.id));
 
@@ -220,13 +196,7 @@ function initPlatformLabel(platform) {
 }
 
 function hostDisplayName(platform) {
-  if (platform === 'claude') return 'Claude Code';
-  if (platform === 'codex') return 'Codex';
-  if (platform === 'cursor') return 'Cursor';
-  if (platform === 'kiro') return 'Kiro';
-  if (platform === 'qoder') return 'Qoder';
-  if (platform === 'opencode') return 'OpenCode';
-  return platform;
+  return getPlatformDisplayName(platform);
 }
 
 function hostMcpSetupCommand(platform) {

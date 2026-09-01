@@ -87,6 +87,8 @@ describe('spec-first update spawns without .cmd shims', () => {
         resolveRuntimeRefreshCommand: () => ({ args: ['init', '-y'], cwd: repoRoot, reason_code: 'test' }),
         resolveInstalledCliPath: () => ({ ok: false, reason_code: 'global-package-cli-unresolved' }),
         clearVersionReminderCooldown: () => {},
+        // 显式语言注入：断言锁英文消息，不依赖执行机器的全局 developer profile。
+        resolveLang: () => 'en',
       });
 
       expect(exitCode).toBe(1);

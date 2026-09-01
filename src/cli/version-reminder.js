@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { getAdapter } = require('./adapters');
+const { getAdapter, getPlatformDisplayName, getStartupReminderHosts } = require('./adapters');
 
 const VERSION_REMINDER_ATTEMPT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const STARTUP_REMINDER_COOLDOWN_MS = VERSION_REMINDER_ATTEMPT_COOLDOWN_MS;
@@ -11,11 +11,13 @@ const UNKNOWN_RUNTIME_VERSION = 'unknown-runtime-version';
 const DEFAULT_VERSION_REMINDER_TIMEOUT_MS = 2000;
 const REMINDER_ATTEMPT_LOCK_STALE_MS = 5 * 60 * 1000;
 const VERSION_REMINDER_OPT_OUT_ENV = 'SPEC_FIRST_NO_UPDATE_NOTIFIER';
-const STARTUP_HOST_LABELS = Object.freeze({
-  claude: 'Claude Code',
-  codex: 'Codex',
-  qoder: 'Qoder',
-});
+// startup 提醒只覆盖声明了 session-start hook 的宿主；集合与显示名都从
+// platform registry 派生，避免与 adapters 的宿主清单脱节。
+const STARTUP_HOST_LABELS = Object.freeze(
+  Object.fromEntries(
+    getStartupReminderHosts().map((host) => [host, getPlatformDisplayName(host)]),
+  ),
+);
 
 // 默认网络超时；可经 SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS 覆盖(慢网调大、CI 调小)。
 // 350ms 曾导致在常见网络下查询 registry.npmjs.org(实测约 630ms)每次静默超时,提醒形同虚设。

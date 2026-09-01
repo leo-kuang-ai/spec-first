@@ -12,9 +12,46 @@ const {
   clearCliVersionReminderCooldown,
 } = require('../version-reminder');
 const { runNpm } = require('../../../scripts/lib/npm-cli.cjs');
+const { resolveUserLanguage } = require('../cli-lang');
 
 const PACKAGE_NAME = pkg.name;
 const UPGRADE_COMMAND = `npm install -g ${PACKAGE_NAME}@latest`;
+// 用户旅程文案双语；reason_code、npm 退出码等技术事实保留原文。
+const UPDATE_MESSAGES = {
+  zh: {
+    upgrading: (command) => `正在通过以下命令升级 ${PACKAGE_NAME}: ${command}`,
+    npmMissing: '无法运行 npm：PATH 上未找到 `npm`。',
+    npmMissingFix: '请先安装 Node.js/npm（或用你自己的包管理器执行升级），然后重试。',
+    upgradeFailed: (status) => `升级失败（npm 退出码 ${status}）。`,
+    retryManually: (command) => `可手动重试: ${command}`,
+    upgraded: (name) => `✅ ${name} 升级完成。`,
+    refreshSkipped: 'Runtime 刷新：已跳过（无法安全确定刷新范围）。',
+    refreshing: (command) => `正在刷新 runtime assets: ${command}`,
+    refreshDegraded: (reason) => `Runtime 刷新：降级（${reason}）。`,
+    refreshDegradedMissingCli: 'Runtime 刷新：降级（升级后在 PATH 上找不到 `spec-first`）。',
+    refreshDegradedExit: (status) => `Runtime 刷新：降级（spec-first init 退出码 ${status}）。`,
+    refreshCompleted: 'Runtime 刷新完成。',
+    pluginNote1: '注意：如果你是以 Claude Code plugin（而非 npm -g）方式安装 spec-first，',
+    pluginNote2: '请改用 `claude plugin update` 升级——npm -g 管理的是另一份副本。',
+  },
+  en: {
+    upgrading: (command) => `Upgrading ${PACKAGE_NAME} via: ${command}`,
+    npmMissing: 'Could not run npm: `npm` was not found on your PATH.',
+    npmMissingFix: 'Install Node.js/npm (or run the upgrade with your own package manager), then retry.',
+    upgradeFailed: (status) => `Upgrade failed (npm exited with code ${status}).`,
+    retryManually: (command) => `You can retry manually with: ${command}`,
+    upgraded: (name) => `✅ ${name} upgraded.`,
+    refreshSkipped: 'Runtime refresh: skipped (scope could not be determined safely).',
+    refreshing: (command) => `Refreshing runtime assets via: ${command}`,
+    refreshDegraded: (reason) => `Runtime refresh: degraded (${reason}).`,
+    refreshDegradedMissingCli: 'Runtime refresh: degraded (`spec-first` was not found on PATH after upgrade).',
+    refreshDegradedExit: (status) => `Runtime refresh: degraded (spec-first init exited with code ${status}).`,
+    refreshCompleted: 'Runtime refresh completed.',
+    pluginNote1: 'Note: if you installed spec-first as a Claude Code plugin (not via npm -g),',
+    pluginNote2: '  upgrade it with `claude plugin update` instead — npm -g manages a separate copy.',
+  },
+};
+
 
 /**
  * `spec-first update` — 实际执行 CLI 包升级。
@@ -48,32 +85,35 @@ async function runUpdate(argv, deps = {}) {
   const resolveInstalledCli = deps.resolveInstalledCliPath || resolveInstalledCliPath;
   const clearVersionReminderCooldown = deps.clearVersionReminderCooldown || clearCliVersionReminderCooldown;
   const cwd = deps.cwd || process.cwd();
+  const messages = UPDATE_MESSAGES[
+    (deps.resolveLang || resolveUserLanguage)() === 'en' ? 'en' : 'zh'
+  ];
 
-  console.log(`Upgrading ${PACKAGE_NAME} via: ${UPGRADE_COMMAND}`);
+  console.log(messages.upgrading(UPGRADE_COMMAND));
   console.log('');
 
   const result = runInstall();
 
   if (result && result.errorCode === 'ENOENT') {
     console.error('');
-    console.error('Could not run npm: `npm` was not found on your PATH.');
-    console.error('Install Node.js/npm (or run the upgrade with your own package manager), then retry.');
+    console.error(messages.npmMissing);
+    console.error(messages.npmMissingFix);
     return 1;
   }
 
   if (!result || result.status !== 0) {
     const status = result && Number.isInteger(result.status) ? result.status : 1;
     console.error('');
-    console.error(`Upgrade failed (npm exited with code ${status}).`);
-    console.error(`You can retry manually with: ${UPGRADE_COMMAND}`);
+    console.error(messages.upgradeFailed(status));
+    console.error(messages.retryManually(UPGRADE_COMMAND));
     return status || 1;
   }
 
   console.log('');
-  console.log(`✅ ${PACKAGE_NAME} upgraded.`);
+  console.log(messages.upgraded(PACKAGE_NAME));
   const refresh = resolveRuntimeRefresh(cwd);
   if (!refresh || !Array.isArray(refresh.args)) {
-    console.log('Runtime refresh: skipped (scope could not be determined safely).');
+    console.log(messages.refreshSkipped);
     printRuntimeRefreshFallback(refresh);
   } else {
     const installedCli = resolveInstalledCli();
@@ -82,33 +122,33 @@ async function runUpdate(argv, deps = {}) {
         ? installedCli.reason_code
         : 'global-package-cli-unresolved';
       console.error('');
-      console.error(`Runtime refresh: degraded (${reasonCode}).`);
+      console.error(messages.refreshDegraded(reasonCode));
       printRuntimeRefreshFallback(refresh);
       return 1;
     }
-    console.log(`Refreshing runtime assets via: ${formatSpecFirstCommand(refresh.args)}`);
+    console.log(messages.refreshing(formatSpecFirstCommand(refresh.args)));
     const refreshResult = runRuntimeRefresh(refresh.args, {
       cwd: refresh.cwd || cwd,
       cliPath: installedCli.cliPath,
     });
     if (refreshResult && refreshResult.errorCode === 'ENOENT') {
       console.error('');
-      console.error('Runtime refresh: degraded (`spec-first` was not found on PATH after upgrade).');
+      console.error(messages.refreshDegradedMissingCli);
       printRuntimeRefreshFallback(refresh);
       return 1;
     }
     if (!refreshResult || refreshResult.status !== 0) {
       const status = refreshResult && Number.isInteger(refreshResult.status) ? refreshResult.status : 1;
       console.error('');
-      console.error(`Runtime refresh: degraded (spec-first init exited with code ${status}).`);
+      console.error(messages.refreshDegradedExit(status));
       printRuntimeRefreshFallback(refresh);
       return 1;
     }
-    console.log('Runtime refresh completed.');
+    console.log(messages.refreshCompleted);
   }
   console.log('');
-  console.log('Note: if you installed spec-first as a Claude Code plugin (not via npm -g),');
-  console.log('upgrade it with `claude plugin update` instead — npm -g manages a separate copy.');
+  console.log(messages.pluginNote1);
+  console.log(messages.pluginNote2);
   try {
     clearVersionReminderCooldown();
   } catch {
