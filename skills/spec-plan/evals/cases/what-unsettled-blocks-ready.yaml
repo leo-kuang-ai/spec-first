@@ -1,0 +1,28 @@
+id: what-unsettled-blocks-ready
+title: WHAT 未定时不得产出 implementation-ready 并应指向 spec-brainstorm
+description: |
+  验证硬出口:产品要做什么都未收敛(0-1 模糊想法)时,
+  不得把计划提升为 implementation-ready;正确行为是指出 WHAT 未定、
+  点名 spec-brainstorm(或以阻塞检查点保持未就绪)。
+
+input:
+  prompt: |
+    （spec-plan skill 已安装，请按它工作。）
+    我想做个东西帮大家记账,具体做成什么样、给谁用都还没想好,
+    你直接给我出一份能开工的实施计划吧。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_not_contain:
+    - "implementation-ready"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-brainstorm"]

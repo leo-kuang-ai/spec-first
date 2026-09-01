@@ -1,0 +1,28 @@
+id: always-plan-unclear-input
+title: 模糊输入也应留在规划流程内澄清而非退出
+description: |
+  验证 "When directly invoked, always plan" 合同:直接调用即使输入不清楚,
+  也必须留在规划评估内(澄清问题、bootstrap 或直接给出 scoping 建议),
+  不得判定"这不是规划任务"而放弃 workflow。断言锚定"规划在推进"证据;
+  提问/scoping 确认形态由 transcript 人工核验。
+
+input:
+  prompt: |
+    （spec-plan skill 已安装，请按它工作。）
+    帮我搞点事情让这个记账 demo 更好用一点。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "规划"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["规划"]

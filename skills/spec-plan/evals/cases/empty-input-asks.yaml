@@ -1,0 +1,14 @@
+id: empty-input-asks
+title: 空输入应先问要规划什么
+description: |
+  验证 Feature Description gate:无输入时询问"要规划什么",等待回应,
+  不得凭空推进。
+
+input:
+  prompt: |
+    （spec-plan skill 已安装，请按它工作。）
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

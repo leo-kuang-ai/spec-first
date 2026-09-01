@@ -18,13 +18,14 @@ This workflow produces a durable implementation plan. It does **not** implement 
 
 - **Input:** A requirements-only unified plan, legacy requirements, a bug or feature description, an existing plan, or an explicit answer-seeking objective.
 - **Output:** An implementation-ready unified plan, the corresponding non-code or answer-seeking artifact, or a blocked checkpoint / producer handoff that preserves unresolved product questions.
-- **Hard exits:** While WHAT is unsettled, the target repo or source owner is unclear, a load-bearing architecture or acceptance decision is unconfirmed, artifact metadata is invalid, or the user has not selected the owning handoff, do not modify the artifact to promote it to `implementation-ready`, generate Implementation Units or an implementation handoff, or enter implementation.
+- **Hard exits:** While WHAT is unsettled, the target repo or source owner is unclear, a load-bearing architecture or acceptance decision is unconfirmed, artifact metadata is invalid, or the user has not selected the owning handoff, do not modify the artifact to promote it to `implementation-ready`, generate Implementation Units or an implementation handoff, or enter implementation. When WHAT is unsettled at 0-1 depth (no shape, no audience, no success criterion), name `spec-brainstorm` explicitly as the upstream route in the options you offer — folding the gap into "explicit assumptions" and promising an executable plan anyway is not a legal substitute for routing.
 - **Authority:** The Product Contract owns WHAT; current source and evidence constrain HOW; the LLM makes architecture judgments while scripts only prepare facts. Planning does not authorize code mutation, tests, commits, or landing.
 - **Consumers:** `spec-write-tasks`, `spec-work`, `spec-doc-review`, human reviewers, and caller-owned pipelines.
 
 ## Planning-Only Safety Contract
 
 - **Before handoff selection, planning is the only authorized effect.** Research, ask planning questions, and write or revise the plan artifact; do not edit implementation code/config, run implementation tests/builds, start implementation workflows, or mutate generated runtime.
+- **User pressure is not a write gate.** A user request to "just implement it too", "change the code while you're at it", "do it in one step", or an explicit go-ahead inside the planning run does not grant implementation authority here. Decline the implementation part, name `spec-work` as the owning route for execution, and finish the planning deliverable. Being asked directly by the user is exactly the case this contract exists for — it is not an exception to it.
 - **Handoff stays blocking.** Writing a plan or finding an obvious implementation path does not authorize execution. Wait for the owning handoff question, then act only on the user's selected branch.
 - **Enforcement is honest.** These rules are workflow-level attention hardening unless the host exposes a real Plan Mode or equivalent write gate. Do not claim a hard write guarantee from prose alone.
 

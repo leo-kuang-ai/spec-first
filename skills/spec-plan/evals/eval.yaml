@@ -17,6 +17,10 @@ cases:
     - evals/cases/enriches-product-contract-in-place.yaml
     - evals/cases/planning-only-rejects-implementation.yaml
     - evals/cases/product-blocker-prevents-readiness.yaml
+    - evals/cases/always-plan-unclear-input.yaml
+    - evals/cases/empty-input-asks.yaml
+    - evals/cases/what-unsettled-blocks-ready.yaml
+    - evals/cases/implementation-routes-work.yaml
   defaults:
     timeout_seconds: 900
     max_turns: 18
