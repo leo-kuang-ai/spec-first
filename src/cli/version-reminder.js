@@ -10,6 +10,8 @@ const CLI_VERSION_REMINDER_SCOPE = 'cli.package';
 const UNKNOWN_RUNTIME_VERSION = 'unknown-runtime-version';
 const DEFAULT_VERSION_REMINDER_TIMEOUT_MS = 2000;
 const REMINDER_ATTEMPT_LOCK_STALE_MS = 5 * 60 * 1000;
+// 查询失败后的短重试窗口：弱网一次失败不应触发 24h 提醒盲区。
+const REMINDER_FAILURE_RETRY_MS = 60 * 60 * 1000;
 const VERSION_REMINDER_OPT_OUT_ENV = 'SPEC_FIRST_NO_UPDATE_NOTIFIER';
 // startup 提醒只覆盖声明了 session-start hook 的宿主；集合与显示名都从
 // platform registry 派生，避免与 adapters 的宿主清单脱节。
@@ -32,10 +34,31 @@ function shouldNotifyVersionReminder(currentVersion, latestVersion) {
   return comparison !== null && comparison < 0;
 }
 
-function formatVersionReminder({ packageName, currentVersion, latestVersion }) {
+function detectInstallChannels(options = {}) {
+  // options.selfPath 供测试注入；生产取当前 bin 真实入口。
+  // 统一按 POSIX 分隔符匹配（宿主在 Windows 上常以正斜杠字符串 spawn），
+  // win32 下再做大小写归一（大小写不敏感文件系统上的目录名变体）。
+  let selfPath = String(options.selfPath || process.argv[1] || '');
+  if (process.platform === 'win32') {
+    selfPath = selfPath.toLowerCase();
+  }
+  selfPath = selfPath.split(path.sep).join('/');
+  const claudePlugin = selfPath.includes('/.claude/plugins/');
+  return { npm: !claudePlugin, claudePlugin };
+}
+
+function formatUpgradeGuidance(channels) {
+  const optOut = `or set ${VERSION_REMINDER_OPT_OUT_ENV}=1 to disable update checks`;
+  if (channels && channels.claudePlugin) {
+    return `Run \`claude plugin update\` to upgrade (installed as a Claude Code plugin); \`spec-first update\` manages a separate npm copy, ${optOut}.`;
+  }
+  return `Run \`spec-first update\` to upgrade, ${optOut}.`;
+}
+
+function formatVersionReminder({ packageName, currentVersion, latestVersion, channels }) {
   return [
     `Update available for ${packageName}: ${currentVersion} -> ${latestVersion}`,
-    `Run \`spec-first update\` to upgrade, or set ${VERSION_REMINDER_OPT_OUT_ENV}=1 to disable update checks.`,
+    formatUpgradeGuidance(channels || detectInstallChannels()),
   ].join('\n');
 }
 
@@ -68,10 +91,12 @@ async function maybeShowVersionReminder(options = {}) {
   try {
     latestVersion = await lookupLatestVersion(packageName, { timeoutMs });
   } catch {
-    return false;
+    latestVersion = '';
   }
-
-  if (!latestVersion || !shouldNotifyVersionReminder(currentVersion, latestVersion)) {
+  // 仅语义合法的版本算查询成功；垃圾响应（注入/损坏）按失败走短重试窗口。
+  const validLatest = Boolean(latestVersion) && parseVersion(latestVersion) !== null;
+  markCliVersionReminderOutcome(validLatest, options);
+  if (!validLatest || !shouldNotifyVersionReminder(currentVersion, latestVersion)) {
     return false;
   }
 
@@ -79,6 +104,7 @@ async function maybeShowVersionReminder(options = {}) {
     packageName,
     currentVersion,
     latestVersion,
+    channels: detectInstallChannels(options),
   });
 
   try {
@@ -146,6 +172,13 @@ async function buildStartupVersionReminder(options = {}) {
   try {
     latestVersion = await lookupLatestVersion({ host, packageName, timeoutMs });
   } catch {
+    latestVersion = '';
+  }
+  // 与 CLI 路径同一有效性判据：垃圾响应按失败走短重试窗口。
+  const startupLookupValid = Boolean(latestVersion)
+    && parseVersion(normalizeOverride(latestVersion)) !== null;
+  markStartupReminderOutcome(host, startupLookupValid, options);
+  if (!latestVersion) {
     return null;
   }
 
@@ -193,16 +226,10 @@ function formatStartupVersionReminder({ host, currentVersion, latestVersion }) {
   ].join('\n');
 }
 
-async function defaultLookupStartupLatestVersion({ host, packageName, timeoutMs }) {
-  const override = normalizeOverride(process.env.SPEC_FIRST_VERSION_REMINDER_LATEST);
-  if (override) {
-    return override;
-  }
-
-  if (host === 'claude') {
-    return lookupLatestGitHubPackageVersion({ timeoutMs });
-  }
-
+async function defaultLookupStartupLatestVersion({ packageName, timeoutMs }) {
+  // 版本源统一为 npm registry：与安装源一致，避免 GitHub main 上的未发布
+  // 版本对普通用户产生"更新提示却装不到"的噪音。GitHub 源保留为
+  // lookupLatestGitHubPackageVersion，仅供显式调试调用。
   return defaultLookupLatestVersion(packageName, { timeoutMs });
 }
 
@@ -334,6 +361,54 @@ function claimCliVersionReminderAttempt({ nowMs, cooldownMs }, options = {}) {
   });
 }
 
+// 查询结果回写：成功消耗完整冷却窗口，失败只依赖短重试窗口。
+// 回写失败静默（下次按 attemptedAt 走保守路径），不影响主命令。
+function markCliVersionReminderOutcome(succeeded, options = {}) {
+  markReminderOutcome(
+    getCliVersionReminderStatePath(options),
+    CLI_VERSION_REMINDER_SCOPE,
+    succeeded,
+    options,
+  );
+}
+
+function markStartupReminderOutcome(host, succeeded, options = {}) {
+  try {
+    markReminderOutcome(
+      getStartupReminderStatePath(host, options),
+      buildStartupAttemptScope(host),
+      succeeded,
+      options,
+    );
+  } catch {
+    // startup 提醒的结果回写失败不应让 hook 非零退出。
+  }
+}
+
+function markReminderOutcome(statePath, scope, succeeded, options = {}) {
+  const lockPath = getReminderAttemptLockPath(statePath, scope);
+  const lockStatus = acquireReminderAttemptLock(lockPath);
+  if (lockStatus !== 'acquired') {
+    return;
+  }
+  const nowMs = Number.isFinite(options.nowMs) ? options.nowMs : Date.now();
+  try {
+    const state = readReminderStateFile(statePath);
+    const previous = state.attempts[scope] || {};
+    state.attempts[scope] = {
+      scope,
+      attemptedAt: previous.attemptedAt || new Date(nowMs).toISOString(),
+      lastOutcome: succeeded ? 'success' : 'failed',
+      lastOutcomeAt: new Date(nowMs).toISOString(),
+    };
+    writeReminderStateFile(statePath, state);
+  } catch {
+    // 结果回写失败不阻塞提醒输出。
+  } finally {
+    releaseReminderAttemptLock(lockPath);
+  }
+}
+
 function claimReminderAttempt({ statePath, scope, nowMs, cooldownMs }) {
   const lockPath = getReminderAttemptLockPath(statePath, scope);
   const lockStatus = acquireReminderAttemptLock(lockPath);
@@ -414,7 +489,23 @@ function isReminderAttemptCooldownActive({ state, scope, nowMs, cooldownMs }) {
     return false;
   }
 
-  return nowMs - attemptedAtMs < cooldownMs;
+  // 上一次查询成功（或旧格式无结果字段）→ 完整冷却窗口；
+  // 上一次查询失败 → 只锁短重试窗口，网络抖动不制造长时间盲区。
+  // 基准取 max(attemptedAt, lastOutcomeAt)：claim 时刻必须锚定冷却起点，
+  // 否则 A 进程 claim 后、outcome 回写前，B 进程会因旧成功窗口刚过期而
+  // 重复 claim（互斥回归）；max 同时把伪造的未来 lastOutcomeAt 楔死风险
+  // 与 attemptedAt 守卫对齐。
+  const outcomeCooldownMs = record.lastOutcome === 'failed'
+    ? REMINDER_FAILURE_RETRY_MS
+    : cooldownMs;
+  const outcomeAtMs = Date.parse(record.lastOutcomeAt);
+  const referenceMs = record.lastOutcome === 'failed'
+    ? attemptedAtMs
+    : Math.max(attemptedAtMs, Number.isFinite(outcomeAtMs) ? outcomeAtMs : 0);
+  if (referenceMs > nowMs) {
+    return false;
+  }
+  return nowMs - referenceMs < outcomeCooldownMs;
 }
 
 function recordStartupReminderCooldown(reminder, options = {}) {
@@ -433,9 +524,13 @@ function recordStartupReminderCooldown(reminder, options = {}) {
 }
 
 function recordReminderAttempt(state, { scope, nowMs }) {
+  const previous = state.attempts[scope];
   state.attempts[scope] = {
     scope,
     attemptedAt: new Date(nowMs).toISOString(),
+    // 保留上次结果：查询失败不应消耗 24h 成功冷却窗口。
+    lastOutcome: previous && previous.lastOutcome,
+    lastOutcomeAt: previous && previous.lastOutcomeAt,
   };
 }
 
@@ -444,6 +539,12 @@ function shouldSkipCliVersionReminder(options = {}) {
     return true;
   }
   if (isTruthyEnvValue(resolveEnvValue('CI', options))) {
+    return true;
+  }
+  const env = options.env || process.env;
+  // 测试与提权环境不查网络、不打提醒（对齐 update-notifier 基线）。
+  // SUDO_UID 按存在性判断：sudo 子进程内其值可为 '0'，存在即提权标记。
+  if (env && (env.NODE_ENV === 'test' || Object.prototype.hasOwnProperty.call(env, 'SUDO_UID'))) {
     return true;
   }
 
@@ -787,11 +888,14 @@ module.exports = {
   clearStartupVersionReminderCooldown,
   compareVersions,
   defaultLookupLatestVersion,
-  formatVersionReminder,
+  detectInstallChannels,
   formatStartupVersionReminder,
+  formatUpgradeGuidance,
+  formatVersionReminder,
   isVersionReminderOptedOut,
   maybeShowVersionReminder,
   maybeShowStartupVersionReminder,
+  parseVersion,
   resolveVersionReminderTimeoutMs,
   shouldSkipCliVersionReminder,
   shouldNotifyVersionReminder,
