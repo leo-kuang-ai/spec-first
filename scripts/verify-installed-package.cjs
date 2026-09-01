@@ -265,6 +265,91 @@ function verifyHeal(cli, tempRoot) {
   assert('H4-doctor-clean-after-heal', doctorHealed.status === 0 && healed, 'has_error!=true');
 }
 
+
+// 六宿主生命周期矩阵：每宿主 init → 宿主特有 surface 断言 → doctor → clean。
+// surface 锚点来自 platform-registry 声明与实测投射（claude 扁平 commands、
+// codex skill-only 等），多轮测评已校准。
+const HOST_SURFACES = {
+  claude: {
+    stateFile: path.join('.claude', 'spec-first', 'state.json'),
+    proof: path.join('.claude', 'commands', 'spec-plan.md'),
+  },
+  codex: {
+    stateFile: path.join('.codex', 'spec-first', 'state.json'),
+    proof: path.join('.agents', 'skills', 'spec-runtime-setup'),
+  },
+  cursor: {
+    stateFile: path.join('.cursor', 'spec-first', 'state.json'),
+    proof: path.join('.cursor', 'skills', 'spec-runtime-setup'),
+  },
+  kiro: {
+    stateFile: path.join('.kiro', 'spec-first', 'state.json'),
+    proof: path.join('.kiro', 'skills', 'spec-runtime-setup'),
+  },
+  qoder: {
+    stateFile: path.join('.qoder', 'spec-first', 'state.json'),
+    proof: path.join('.qoder', 'skills', 'spec-runtime-setup'),
+  },
+  opencode: {
+    stateFile: path.join('.opencode', 'spec-first', 'state.json'),
+    proof: path.join('.opencode', 'skills', 'spec-runtime-setup'),
+  },
+};
+
+function verifyMultiHost(cli, tempRoot) {
+  console.log('\n▸ Phase: multihost（六宿主逐一生命周期 + 全宿主组合）');
+  const allHosts = Object.keys(HOST_SURFACES);
+
+  // 逐宿主：独立 repo，init → doctor → clean 全闭环。
+  for (const host of allHosts) {
+    const repo = createGitRepo(path.join(tempRoot, `repo-${host}`));
+    const surface = HOST_SURFACES[host];
+    runOk(`MH1-init-${host}`, process.execPath, [cli, 'init', `--${host}`, '-y', '-u', 'tester', '--lang', 'zh'], { cwd: repo });
+    assert(`MH2-state-${host}`, fs.existsSync(path.join(repo, surface.stateFile)), surface.stateFile);
+    assert(`MH3-surface-${host}`, fs.existsSync(path.join(repo, surface.proof)), surface.proof);
+    const state = JSON.parse(fs.readFileSync(path.join(repo, surface.stateFile), 'utf8'));
+    assert(`MH4-platform-${host}`, state.platform === host, state.platform);
+    const doctor = run(process.execPath, [cli, 'doctor', `--${host}`, '--json'], { cwd: repo });
+    let ok = false;
+    try { ok = JSON.parse(String(doctor.stdout)).has_error !== true; } catch (_) { ok = false; }
+    assert(`MH5-doctor-${host}`, doctor.status === 0 && ok, 'has_error!=true');
+    const clean = run(process.execPath, [cli, 'clean', `--${host}`], { cwd: repo });
+    assert(
+      `MH6-clean-${host}`,
+      clean.status === 0 && !fs.existsSync(path.join(repo, surface.stateFile)),
+      'managed state removed',
+    );
+  }
+
+  // 全宿主组合：同一 repo 六宿主共存 → 共享 instruction 的消费者递减 → 最终清空。
+  const shared = createGitRepo(path.join(tempRoot, 'repo-all-hosts'));
+  const initAll = run(process.execPath, [cli, 'init', ...allHosts.map((host) => `--${host}`), '-y', '-u', 'tester', '--lang', 'zh'], { cwd: shared });
+  assert('MH7-init-all-hosts', initAll.status === 0, String(initAll.stdout).split('\n')[0]);
+  for (const host of allHosts) {
+    assert(`MH7a-coexist-${host}`, fs.existsSync(path.join(shared, HOST_SURFACES[host].stateFile)), HOST_SURFACES[host].stateFile);
+  }
+  // 共享 instruction：claude 拥有 CLAUDE.md，codex 拥有 AGENTS.md；六宿主共存时两者都在。
+  assert('MH7b-claude-md', fs.existsSync(path.join(shared, 'CLAUDE.md')), 'CLAUDE.md');
+  assert('MH7c-agents-md', fs.existsSync(path.join(shared, 'AGENTS.md')), 'AGENTS.md');
+
+  const doctorAll = run(process.execPath, [cli, 'doctor', '--json'], { cwd: shared });
+  let autoPlatforms = null;
+  try { autoPlatforms = JSON.parse(String(doctorAll.stdout)).platforms; } catch (_) { /* asserted below */ }
+  assert(
+    'MH8-doctor-auto-detects-all',
+    doctorAll.status === 0 && Array.isArray(autoPlatforms) && autoPlatforms.length === allHosts.length,
+    `platforms=${autoPlatforms && autoPlatforms.length}`,
+  );
+
+  // 逐宿主 clean：codex 被清掉之前，AGENTS.md 必须保留（claude 共享消费者语义见 clean.js）。
+  for (const host of allHosts) {
+    runOk(`MH9-clean-${host}`, process.execPath, [cli, 'clean', `--${host}`], { cwd: shared });
+  }
+  for (const host of allHosts) {
+    assert(`MH9a-removed-${host}`, !fs.existsSync(path.join(shared, HOST_SURFACES[host].stateFile)), host);
+  }
+}
+
 function writeSummary(tempRoot, phase, packageVersion) {
   const outputDir = process.env.SPEC_FIRST_SMOKE_ARTIFACT_DIR;
   if (!outputDir) return;
@@ -282,9 +367,9 @@ function writeSummary(tempRoot, phase, packageVersion) {
 
 function main() {
   const phase = (process.argv[2] || 'all').replace(/^--/, '');
-  const validPhases = new Set(['all', 'package', 'lifecycle', 'negative', 'heal']);
+  const validPhases = new Set(['all', 'package', 'lifecycle', 'negative', 'heal', 'multihost']);
   if (!validPhases.has(phase)) {
-    console.error(`用法：node scripts/verify-installed-package.cjs [--]all|package|lifecycle|negative|heal`);
+    console.error(`用法：node scripts/verify-installed-package.cjs [--]all|package|lifecycle|negative|heal|multihost`);
     process.exitCode = 2;
     return;
   }
@@ -303,7 +388,7 @@ function main() {
     if (phase === 'all' || phase === 'package') {
       cli = verifyPackageArtifacts(tempRoot).cli;
     }
-    if (phase === 'lifecycle' || phase === 'negative' || phase === 'heal') {
+    if (phase === 'lifecycle' || phase === 'negative' || phase === 'heal' || phase === 'multihost') {
       // 独立 phase 复用同一 tarball 安装：轻量重装而非重 pack。
       const quick = verifyPackageArtifacts(tempRoot);
       cli = quick.cli;
@@ -311,6 +396,7 @@ function main() {
     if (phase === 'all' || phase === 'lifecycle') verifyLifecycle(cli, tempRoot);
     if (phase === 'all' || phase === 'negative') verifyNegative(cli, tempRoot);
     if (phase === 'all' || phase === 'heal') verifyHeal(cli, tempRoot);
+    if (phase === 'all' || phase === 'multihost') verifyMultiHost(cli, tempRoot);
 
     console.log(`\n✓ 验证通过：${CHECKS.length} 项 (${CHECKS.join(', ')})`);
     writeSummary(tempRoot, phase, packageVersion);
