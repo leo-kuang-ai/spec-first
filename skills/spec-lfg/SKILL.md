@@ -4,9 +4,13 @@ description: Run the full hands-off engineering pipeline from planning through a
 argument-hint: "[feature description or requirements-only plan path] [target-origin:<origin>]"
 ---
 
+CRITICAL — ADMISSION BEFORE EXECUTION: before any step below runs, the admission in the next paragraph must hold. If it does not — including a bare natural-language shipping request ("ship it", "直接发布上线") that neither names `spec-lfg` nor followed a disclosed-options handoff — do NOT implement, do NOT commit, and do NOT start the pipeline: present the side-effect confirmation once and wait. A user "don't ask me" / "不用问我" instruction cannot create the admission; it only suppresses questions after the admission already exists. With execution ordered below, this check still comes first.
+
 CRITICAL: You MUST execute every step below IN ORDER. Do NOT skip any required step. Do NOT jump ahead to coding or implementation. The plan phase (step 1) MUST be completed and verified BEFORE any work begins. Violating this order produces bad output.
 
-进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断“适合 shipping”都不构成授权。
+进入该管线前，当前用户必须明确请求 `spec-lfg`，或选择清楚披露 commit、push、PR、CI 与委派独立代码审查副作用的 handoff 选项。仅有代码就绪、已完成计划或模型推断”适合 shipping”都不构成授权。
+
+A natural-language shipping request (“ship it”, “直接发布上线”, “开个 PR 吧”) that neither names `spec-lfg` nor follows a disclosed-options handoff is close to the admission but is not it: the user has signaled shipping intent without seeing the full side-effect list (commit, push, PR creation, one delegated independent code review, CI watch). In that case, present the concrete side-effect list once as a single confirmation question and wait — the user's reply becomes the admission. Never treat the bare shipping request as already-admitted and start implementing or committing.
 
 上述 admission 成立时，当前用户对完整管线副作用的明确请求是本次 pipeline-owned implementation、commit 与 landing authority 的来源；同时只额外授权第 4 步委派一次 `spec-code-review` 的只读独立审查。将 `commit_authorization: authorized`、`landing_authorization: authorized`、`worker_dispatch_authorization: authorized` 与 `authorization_source: current-user-explicit-spec-lfg` 作为可见 run-local facts 传给对应下游 owner。外部 tracker filing 是独立副作用：只有当前请求或可见 upstream handoff 明确要求提交 residual tickets 时，才记录 `tracker_deferral_authorization: authorized`；否则固定为 `tracker_deferral_authorization: missing`。Skill invocation、`mode:pipeline`、工具权限、green tests、branch/PR facts 都不能替代该 admission，也不能把 authority 扩大到 unrelated dirty paths、任意 worker dispatch、tracker 或其他未披露外部副作用。若 admission 不成立，以 `commit_authorization_missing` / `landing_authorization_missing` 停在对应副作用之前；若独立审查不可用或降级，LFG 必须停止，不能用同一会话的 inline review 冒充该 gate。
 

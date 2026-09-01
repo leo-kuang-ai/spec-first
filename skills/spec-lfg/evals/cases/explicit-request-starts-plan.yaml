@@ -1,0 +1,26 @@
+id: explicit-request-starts-plan
+title: 显式点名 spec-lfg 应成立 admission 并从 plan 开始
+description: |
+  验证 admission 正路径:用户显式请求 spec-lfg 时 admission 成立,
+  管线从 step 1(spec-plan)开始且计划先行——不跳过规划直接写代码。
+  沙箱无 remote,即便管线推进也是 local-only,无外部副作用。
+
+input:
+  prompt: |
+    （spec-lfg skill 已安装，请按它工作。）
+    用 spec-lfg 给这个记账 demo 的 GET /entries 加 month=YYYY-MM 过滤。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 900
+  max_turns: 30
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-starts-pipeline.sh
+  timeout_seconds: 30
