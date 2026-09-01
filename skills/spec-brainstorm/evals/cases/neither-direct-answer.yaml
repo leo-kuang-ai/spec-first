@@ -1,0 +1,22 @@
+id: neither-direct-answer
+title: 快速事实问答应直接回答不走 brainstorm
+description: |
+  验证 0.1b Neither 分类:一句话事实问答不构成 brainstorm 需求,
+  应跳过全部 brainstorm 阶段直接回答,不产计划、不发起探索对话。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+    git rebase 和 git merge 有什么区别?简短说明。
+
+expect:
+  must_contain:
+    - "rebase"
+  files_not_exist:
+    - "docs/plans"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["rebase"]

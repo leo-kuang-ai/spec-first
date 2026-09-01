@@ -17,10 +17,10 @@
 | # | Skill | 级别 | 分组 | 状态 | 测评文件 | evals 资产 |
 |---|---|---|---|---|---|---|
 | 1 | using-spec-first | S | 入口与路由 | 通过 | [using-spec-first.md](./using-spec-first.md) | [evals/](../../skills/using-spec-first/evals/eval.yaml) |
-| 2 | spec-ideate | W | 需求与规划 | 待测评 | | |
-| 3 | spec-brainstorm | W | 需求与规划 | 待测评 | | |
-| 4 | spec-prd | W | 需求与规划 | 待测评 | | |
-| 5 | spec-doc-review | W | 需求与规划 | 待测评 | | |
+| 2 | spec-ideate | W | 需求与规划 | 通过 | [spec-ideate.md](./spec-ideate.md) | [evals/](../../skills/spec-ideate/evals/eval.yaml) |
+| 3 | spec-brainstorm | W | 需求与规划 | 通过 | [spec-brainstorm.md](./spec-brainstorm.md) | [evals/](../../skills/spec-brainstorm/evals/eval.yaml) |
+| 4 | spec-prd | W | 需求与规划 | 通过 | [spec-prd.md](./spec-prd.md) | [evals/](../../skills/spec-prd/evals/eval.yaml) |
+| 5 | spec-doc-review | W | 需求与规划 | 通过 | [spec-doc-review.md](./spec-doc-review.md) | [evals/](../../skills/spec-doc-review/evals/eval.yaml) |
 | 6 | spec-strategy | S | 需求与规划 | 待测评 | | |
 | 7 | spec-prototype | S | 需求与规划 | 待测评 | | |
 | 8 | spec-plan | W | 计划与任务 | 待测评 | | |

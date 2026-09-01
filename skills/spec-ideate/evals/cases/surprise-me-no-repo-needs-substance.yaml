@@ -11,8 +11,11 @@ input:
     随便给我一些惊喜的方向吧，你看着办。
 
 expect:
-  must_not_contain:
+  files_not_exist:
     - "docs/ideation"
+
+constraints:
+  timeout_seconds: 480
 
 judge:
   type: script

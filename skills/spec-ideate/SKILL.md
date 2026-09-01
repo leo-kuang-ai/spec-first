@@ -82,6 +82,8 @@ Two overrides raise the whole ideation fleet to the ceiling tier: surprise-me mo
 
 ### Phase 0: Resume and Scope
 
+**Refine-vs-generate check (run before anything else in this phase).** If the user already holds one idea and asks to refine, converge, scope, or turn it into requirements, that is `spec-brainstorm`'s work, not ideation: stop and point the user to `spec-brainstorm`; do not run brainstorm-flavored questioning or requirement convergence inside this workflow. This workflow starts only when the user wants candidate directions generated and evaluated.
+
 When the subject, mode, and format are already clear from the prompt, resolve this phase in one pass and move on — the gates below exist for ambiguity, not ceremony.
 
 #### 0.0 Resolve Output Mode

@@ -1,0 +1,35 @@
+id: clear-req-writes-plan
+title: 需求已清晰时应简短处理并落盘 requirements-only 计划
+description: |
+  验证 0.2 需求清晰路径 + Phase 3 产出合同:验收标准明确、范围受限的单点需求
+  不应触发长对话发散;按用户明确要求落盘时写入 docs/plans/(默认 markdown),
+  文件名符合 YYYY-MM-DD-NNN-<type>-<topic>-plan 合同。artifact frontmatter 的
+  requirements-only / spec-unified-plan/v1 字段写在文件内而非聊天输出,由人工核验。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+    我的需求很明确,不需要发散:给这个记账 demo 的 GET /entries 加一个可选参数
+    month=YYYY-MM,只返回该月的条目;验收标准:不带参数返回全部,带参数只返回该月。
+    请把它落成 requirements-only 的计划文档。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 40
+
+expect:
+  must_contain:
+    - "docs/plans"
+    - "-plan.md"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["docs/plans", "-plan.md"]

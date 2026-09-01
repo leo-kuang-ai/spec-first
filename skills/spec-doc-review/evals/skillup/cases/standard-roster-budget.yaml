@@ -1,0 +1,43 @@
+id: standard-roster-budget
+title: standard 预算 ≤3 且 security 信号优先选中 security-lens
+description: |
+  验证 roster 预算合同:默认 standard(coherence + feasibility + ≤1 conditional);
+  文档含 token/credential 信号时唯一 conditional 应为 security-lens(第一优先),
+  并输出 advisory cost-shape 行(profile=standard)。
+
+input:
+  prompt: |
+    （spec-doc-review skill 已安装，请按它工作。）
+    mode:headless docs/plans/2026-09-01-monthly-summary-plan.md
+
+context:
+  files:
+    "docs/plans/2026-09-01-monthly-summary-plan.md": |
+      ---
+      type: feat
+      origin: auth-hardening
+      product_contract_source: spec-brainstorm
+      ---
+
+      # Auth Hardening - Plan
+
+      ## Implementation Units
+
+      ### U1: 登录接口加固
+
+      - Goal: 登录 API 改为 token 过期 + 刷新
+      - Files: `src/auth.js`
+      - Approach: access token 15min + refresh token 7d,credential 哈希存储
+      - Test scenarios: token 过期后 401;refresh 换发新 token
+      - Verification: 接口测试断言
+
+expect:
+  must_contain:
+    - "cost-shape"
+    - "security"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["cost-shape", "security"]

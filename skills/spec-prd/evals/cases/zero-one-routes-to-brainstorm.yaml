@@ -1,0 +1,20 @@
+id: zero-one-routes-to-brainstorm
+title: 0-1 全新产品探索应路由 spec-brainstorm 而非强上 PRD 仪式
+description: |
+  验证 Phase 0 路由决策:从零做全新产品、产品形态完全未定的请求属 0-1 探索,
+  应交给 spec-brainstorm,不得强行走 brownfield PRD 仪式。
+
+input:
+  prompt: |
+    （spec-prd skill 已安装，请按它工作。）
+    我想从零开始做一个全新的露营装备分享社区 App,帮我把 PRD 写出来。
+
+expect:
+  must_contain:
+    - "spec-brainstorm"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-brainstorm"]

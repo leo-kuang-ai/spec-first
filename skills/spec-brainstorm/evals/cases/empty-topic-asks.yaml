@@ -1,0 +1,18 @@
+id: empty-topic-asks
+title: 空 feature 描述应先提问不推进
+description: |
+  验证 Feature Description gate:无主题调用时按 SKILL.md 询问"想探索什么",
+  不得在拿到 feature 描述前推进任何阶段或产出计划。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+
+expect:
+  files_not_exist:
+    - "docs/plans"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

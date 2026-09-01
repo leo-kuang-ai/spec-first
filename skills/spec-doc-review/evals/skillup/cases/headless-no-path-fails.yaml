@@ -1,0 +1,20 @@
+id: headless-no-path-fails
+title: headless 模式缺文档路径应返回固定错误不派发
+description: |
+  验证 Phase 1 headless gate:无文档路径时输出固定错误消息(含重新调用指引),
+  不派发 personas、不猜测文档。
+
+input:
+  prompt: |
+    （spec-doc-review skill 已安装，请按它工作。）
+    mode:headless
+
+expect:
+  must_contain:
+    - "headless mode requires a document path"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["headless mode requires a document path"]

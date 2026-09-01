@@ -3,3 +3,14 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-08-30T20:05	wt@4f209572	using-spec-first	88.6	-	keep	dim4	检查点显性化(**Checkpoint — ask/wait** 两处,最小 diff);paired 3-0 better(1 clear + 2 slight)	paired
 2026-08-30T20:10	wt@4f209572	using-spec-first	-	-	regression	dim8	改进后回归 5/5 保持(iteration-4);dim2 判定不修(与 semantic-map 哲学冲突),循环收束	full_test
 2026-08-31T20:25	wt@4f209572	using-spec-first	-	-	cross-engine	dim8	codex engine 配额恢复后全量补跑,5/5 PASS(iteration-6);与 claude_code 双引擎一致,证据闭环	full_test
+2026-08-31T22:30	wt@4f209572	spec-ideate	-	89.3	baseline	dim1-9	结构 70.9/77 + dim8 8.5(case2 refine 请求三轮两对一错,输入侧拒绝分支缺失);红灯扫描通过;8 iteration 双引擎	darwin_rubric+skill-up
+2026-08-31T22:40	wt@4f209572	spec-ideate	89.3	91.0	keep	dim3	Phase 0 开头新增 Refine-vs-generate check(停止并指向 spec-brainstorm,禁止代行);paired 3-0 better 全 clear	paired
+2026-08-31T22:50	wt@4f209572	spec-ideate	-	-	regression	dim8	改进后 case2 七轮全过(claude_code iter4/5/7+stab×2+codex iter6/8);终验 claude_code 5/5、codex 4/5(唯一 FAIL 为断言词表长尾,人工核验正确);runtime MIRROR-SYNCED	full_test
+2026-09-01T09:20	wt@4f209572	spec-brainstorm	-	88.4	baseline	dim1-9	结构 70.6/77 + dim8 8(verdict case 0/1:识别越界后直接代行 spec-pov 裁决,写决策规则+追问裁决问题);红灯扫描通过;codex 全量 5/5(其余 4 case)	darwin_rubric+skill-up
+2026-09-01T09:40	wt@4f209572	spec-brainstorm	88.4	-	keep	dim3	0.1c 新增唯一出口禁令(offer 或 workflow,never the verdict itself;逐项禁止代行行为);paired 3-0 better 全 clear;效果 0/1→~50%	paired
+2026-09-01T09:55	wt@4f209572	spec-brainstorm	-	91.7	keep	dim1	description 排除句补 "; route those verdict questions to spec-pov"(失败轮原文引用过该句却无目的地);paired 3-0 better 全 clear;效果 →4/4(含 codex)	paired
+2026-09-01T10:05	wt@4f209572	spec-brainstorm	-	-	regression	dim8	终验 claude_code 全量 5/5(iteration-6)+ verdict stab ×3 + codex verdict ×1 全过;runtime MIRROR-SYNCED;修复链 0/1→50%→4/4	full_test
+2026-09-01T11:30	wt@4f209572	spec-prd	-	91.7	baseline	dim1-9	结构 72.15/77(四 skill 最高)+ dim8 8.5(codex zero-one 静默滑入:未宣告路由直接开始探索提问,brainstorm 出现 0 次);claude_code 首轮 5/5 含注入隔离与 report-only 教科书执行;红灯通过	darwin_rubric+skill-up
+2026-09-01T11:50	wt@4f209572	spec-prd	91.7	93.5	keep	dim3	Phase 0 route-out 补显式宣告(点名目的地+停止本 workflow+静默滑入反例);paired 3-0 better 全 clear	paired
+2026-09-01T12:00	wt@4f209572	spec-prd	-	-	regression	dim8	codex 缺陷 case 2/2 + claude_code 全量 5/5;runtime MIRROR-SYNCED;守则三度验证泛化:路由三要素=识别越界+目的地+宣告后停止	full_test
+2026-09-01T13:10	wt@4f209572	spec-doc-review	-	95.1	pass	dim1-9	结构 73.25/77(五 skill 最高)+ dim8 9.5;双引擎首轮 12/12 全绿(claude 6/6 + codex 6/6);flag fail-closed/三种强制 report-only(MARKER 未动)/cost-shape 逐字合同全部成立;零缺陷零修复;红灯通过	darwin_rubric+skill-up

@@ -1,0 +1,20 @@
+id: non-software-universal
+title: 非软件主题应走 universal 路线不产软件计划
+description: |
+  验证 0.1b 非软件分类:家庭庆典规划无任何软件信号,应路由 universal-brainstorming
+  (Core Principles 与 Interaction Rules 仍适用:一次一问),不产 spec-unified-plan
+  软件计划。断言锚定"提问开局 + 无计划产出";是否真正加载 universal reference 由 transcript 核验。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+    帮我想想怎么安排我爸妈的七十大寿庆典。
+
+expect:
+  files_not_exist:
+    - "docs/plans"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

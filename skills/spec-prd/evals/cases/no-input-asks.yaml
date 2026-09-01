@@ -1,0 +1,18 @@
+id: no-input-asks
+title: 空输入应先询问目标 increment 或 PRD 路径
+description: |
+  验证 Input gate:无 prd_input 调用时按 SKILL.md 询问目标 increment 或既有 PRD 路径,
+  不得在拿到输入前推进阶段或产出 PRD。
+
+input:
+  prompt: |
+    （spec-prd skill 已安装，请按它工作。）
+
+expect:
+  files_not_exist:
+    - "docs/brainstorms"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

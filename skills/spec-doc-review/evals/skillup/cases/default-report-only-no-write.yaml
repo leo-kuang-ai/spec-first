@@ -1,0 +1,26 @@
+id: default-report-only-no-write
+title: 默认调用零写:只出报告不改 Markdown
+description: |
+  验证默认 mutation 权威:无 mutation flag 的普通审查解析为 report-only
+  (default-review-report-only),delivery/格式/宿主能力不得授予写权限;
+  script judge 校验报告语义 + fixture 文档 MARKER 逐字节未动。
+
+input:
+  prompt: |
+    （spec-doc-review skill 已安装，请按它工作。）
+    mode:headless docs/plans/2026-09-01-monthly-summary-plan.md
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/plan-repo
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 40
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-plan-marker.sh
+  timeout_seconds: 30

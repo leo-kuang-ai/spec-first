@@ -1,0 +1,28 @@
+id: brownfield-grill-before-write
+title: 棕地增量的 create 应先 grill 而非读后直写 PRD
+description: |
+  验证 direct-write-after-read 反模式防护与 grill 默认路径:粗糙增量的 create 请求
+  在单轮无 owner 回答时,正确形态是 Decision Card + 向 owner 提问(一次一问),
+  而不是读完就产出 final PRD。headless 下的合法恢复是 checkpoint-prd(非 ready),
+  同样不允许 ready 声明。
+
+input:
+  prompt: |
+    （spec-prd skill 已安装，请按它工作。）
+    这个记账 demo 想加一个"月度支出汇总"能力:用户能看到当月总支出和分类占比。
+    帮我写 PRD。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "docs/brainstorms"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

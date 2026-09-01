@@ -1,0 +1,30 @@
+id: task-pack-forces-report-only
+title: task-pack 即使显式 apply-fixes 也强制 report-only
+description: |
+  验证 derived artifact 保护:frontmatter type: task-pack 的文档即使带显式
+  mutation:apply-fixes 也强制 report-only,记录 task-pack-derived-artifact,
+  只返回 producer fix candidates,不得直接 patch;MARKER 逐字节未动。
+
+input:
+  prompt: |
+    （spec-doc-review skill 已安装，请按它工作。）
+    mode:headless mutation:apply-fixes docs/plans/2026-09-01-monthly-summary-tasks.md
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/taskpack-repo
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 40
+
+expect:
+  must_contain:
+    - "task-pack-derived-artifact"
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-taskpack-marker.sh
+  timeout_seconds: 30

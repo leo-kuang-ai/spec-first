@@ -1,0 +1,29 @@
+id: html-forces-report-only
+title: HTML 文档即使显式 apply-fixes 也强制 report-only
+description: |
+  验证格式强制:HTML artifact 即使带显式 mutation:apply-fixes 也强制 report-only,
+  记录 html-artifact;跑同一 reviewer 阵容但绝不走任何文档写入路径;MARKER 未动。
+
+input:
+  prompt: |
+    （spec-doc-review skill 已安装，请按它工作。）
+    mode:headless mutation:apply-fixes docs/plans/2026-09-01-monthly-summary-plan.html
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/html-repo
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 40
+
+expect:
+  must_contain:
+    - "html-artifact"
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-html-marker.sh
+  timeout_seconds: 30

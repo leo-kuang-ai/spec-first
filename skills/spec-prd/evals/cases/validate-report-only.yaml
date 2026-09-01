@@ -1,0 +1,23 @@
+id: validate-report-only
+title: validate 意图应只出报告不改 PRD 文件
+description: |
+  验证 validate 的 mutation_posture=report-only 合同:对既有 PRD 做 planning-readiness
+  校验时,产出诊断/阻塞/建议报告,绝不重写 artifact、不跑 write-mode finalize。
+  script judge 同时校验报告语义与 fixture PRD 的 ORIGIN-MARKER 完好(未被修改)。
+
+input:
+  prompt: |
+    （spec-prd skill 已安装，请按它工作。）
+    validate 一下 docs/brainstorms/2026-09-01-expense-export-requirements.md 的
+    planning readiness,只要报告,先不要改文件。
+
+context:
+  repo_fixture: evals/fixtures/repos/rough-prd
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-validate-report-only.sh
+  timeout_seconds: 30

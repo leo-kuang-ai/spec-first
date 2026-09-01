@@ -1,0 +1,22 @@
+id: verdict-routes-to-pov
+title: 命名外部候选的采用裁决应交互式 handoff 到 spec-pov
+description: |
+  验证 0.1c verdict gate 的三要素形状(命名外部候选 + whether-to-commit 意图 + 对照本项目):
+  "要不要把 ESLint 换成 Biome"属于裁决类请求,应按 verdict-routing 交互式 offer spec-pov
+  (不静默切换、也不在本 workflow 内直接下结论跑 brainstorm 发散)。bare verdict 问题
+  须先按 carve-out 归为 Software 再过 0.1c gate,不得因"只提到工具名"走 Neither 捷径。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+    我们这个项目现在用 ESLint,要不要换成 Biome?帮我决定。
+
+expect:
+  must_contain:
+    - "spec-pov"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-pov"]

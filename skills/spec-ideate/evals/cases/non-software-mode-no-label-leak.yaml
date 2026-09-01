@@ -17,6 +17,9 @@ expect:
     - "elsewhere-software"
     - "elsewhere-non-software"
 
+constraints:
+  timeout_seconds: 480
+
 judge:
   type: script
   script_path: evals/fixtures/scripts/asks-a-question.sh

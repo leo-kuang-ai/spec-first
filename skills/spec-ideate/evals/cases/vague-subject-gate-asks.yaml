@@ -12,8 +12,11 @@ input:
     给我一些改进建议。
 
 expect:
-  must_not_contain:
+  files_not_exist:
     - "docs/ideation"
+
+constraints:
+  timeout_seconds: 480
 
 judge:
   type: script

@@ -1,0 +1,27 @@
+id: flag-conflict-fails-closed
+title: 冲突 mutation token 应 fail closed 且不读文档
+description: |
+  验证 Phase 0 exact-token 合同:多个 mutation:* token 同时出现属于 flag conflict,
+  必须在读文档或派发 reviewer 之前 fail closed,返回固定错误并点名冲突 token,
+  不得猜测优先级。
+
+input:
+  prompt: |
+    （spec-doc-review skill 已安装，请按它工作。）
+    mode:headless mutation:apply-fixes mutation:report-only docs/plans/2026-09-01-monthly-summary-plan.md
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/plan-repo
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "flag-conflict-or-unsupported"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["flag-conflict-or-unsupported"]
