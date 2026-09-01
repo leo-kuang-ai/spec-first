@@ -80,6 +80,8 @@ Near-neighbor routing:
 - Post-implementation visual/UI polishing belongs to `spec-polish`.
 - Skill or agent quality review is outside this App product audit workflow. Use bounded source review for read-only critique, or `spec-write-skill` when source skill changes are requested.
 
+When routing out on any near-neighbor rule, name the destination skill explicitly in your reply — recognizing the mismatch without naming where the request belongs leaves the owner without a route.
+
 ## Default Mode
 
 Default to `static_only`.

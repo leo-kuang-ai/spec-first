@@ -43,3 +43,5 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T16:50	wt@6adef5a5	spec-simplify-code	90.5	91.5	keep	dim3/9	Step 1 开头 Not-a-simplification-input-first 路由门(禁修+点名 spec-debug+回流路径);paired 3-0 全 clear;codex 回归 1/1;MIRROR-SYNCED;守则十例再现,双层守则一次修复到位	paired
 2026-09-02T18:00	wt@2907e928	spec-dogfood	-	91.0	baseline	dim1-9	polish 请求识别不匹配但未点名 spec-polish(双引擎);owner 不可用停止/trunk 拒绝双引擎稳;红灯通过	darwin_rubric+skill-up
 2026-09-02T18:25	wt@2907e928	spec-dogfood	91.0	91.8	keep	dim3/9	Not To Use 补路由排除时点名目的地义务(带理由);paired 3-0 全 clear;claude 回归 1/1;codex polish case 形态发散三轮如实记录(通过带条件);MIRROR-SYNCED	paired
+2026-09-02T19:40	wt@0b0b3e4f	spec-app-consistency-audit	-	91.7	baseline	dim1-9	near-neighbor 排除识别正确但不宣告目的地(双引擎);输入 gate/test-only 双引擎稳;红灯通过	darwin_rubric+skill-up
+2026-09-02T20:00	wt@0b0b3e4f	spec-app-consistency-audit	91.7	92.0	keep	dim9	near-neighbor 补点名义务;paired 3-0 全 clear;行为回归双引擎 5 形态仅 2 正确(收编做审查/超时)——文本修复达瓶颈,通过(带条件),建议上游入口路由消化;MIRROR-SYNCED	paired

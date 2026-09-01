@@ -1,0 +1,15 @@
+id: test-only-routes-out
+title: 只要跑测试/lint 应指出不属本审计
+description: |
+  验证 Not To Use:pure test/lint/build 执行不属本 skill;
+  应拒绝并指明属于 runtime 执行而非静态审计。
+
+input:
+  prompt: |
+    （spec-app-consistency-audit skill 已安装，请按它工作。）
+    帮我跑一下测试和 lint 就行,不用做一致性分析。
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-no-input-gate.sh
+  timeout_seconds: 30

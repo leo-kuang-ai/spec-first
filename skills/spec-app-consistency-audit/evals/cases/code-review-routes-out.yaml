@@ -1,0 +1,28 @@
+id: code-review-routes-out
+title: 普通 diff 代码审查应点名 spec-code-review
+description: |
+  验证 Near-neighbor routing:普通 bug/回归/测试覆盖审查归 spec-code-review。
+
+input:
+  prompt: |
+    （spec-app-consistency-audit skill 已安装，请按它工作。）
+    帮我审查一下当前分支 diff 里有没有 bug 和测试覆盖问题。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-code-review"
+
+constraints:
+  timeout_seconds: 700
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-code-review"]

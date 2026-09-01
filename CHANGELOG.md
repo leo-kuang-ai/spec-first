@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-02 20:10:00 leokuang: feat(skills): spec-app-consistency-audit 交叉测评(第 21 个 skill)——通过(带条件),文本修复达瓶颈的首次如实记录:① 新增 `skills/spec-app-consistency-audit/evals/`(3 cases):三源皆缺输入 gate(双引擎 ✓)、test-only 边界(双引擎 ✓)、near-neighbor code-review 路由;② 缺陷:near-neighbor 排除识别正确但不宣告目的地;修复:补"name the destination skill explicitly in your reply"义务,paired ×3 全 clear;③ 行为回归诚实记录:双引擎在该 case 共 5 形态仅 2 正确(解释不点名/收编做高质量 code review/超时×2)——297 行审计主流程注意力淹没近邻路由,文本层修复达瓶颈;④ 处置:通过(带条件),建议近邻场景由 using-spec-first 入口路由层消化而非逐 skill 硬扛;⑤ darwin 91.7→92.0,runtime MIRROR-SYNCED。未 commit/push 本条前待提交。(user-visible)
+
 - v1.15.2 2026-09-02 18:30:00 leokuang: feat(skills): spec-dogfood 交叉测评(第 20 个 skill)——路由点名义务修复:① 新增 `skills/spec-dogfood/evals/`(3 cases,显式调起 framing):浏览器 owner 不可用停止+spec-runtime-setup 指引(双引擎 ✓)、trunk 目标拒绝(双引擎 ✓)、collaborative polish 路由;② 真实缺陷(双引擎):polish 请求被正确识别不匹配但未点名 spec-polish(合同括号有标注、输出未宣告);修复:Not To Use 补"路由排除时必须在回复中点名目的地 skill(不指路则 owner 无路可走)",paired ×3 全 clear keep,claude 回归 1/1;③ 诚实残留:codex polish case 形态发散三轮(识别不指路/收编建 UI/超时),文本修复已尽,通过(带条件);④ darwin 91.0→91.8,runtime MIRROR-SYNCED。未 commit/push 本条前待提交。(user-visible)
 
 - v1.15.2 2026-09-02 17:00:00 leokuang: feat(skills): spec-simplify-code 交叉测评(第 19 个 skill)——Step 1 路由门(守则十例再现,双层守则一次到位):① 新增 `skills/spec-simplify-code/evals/`(3 cases + mini-ledger-guarded fixture):safety-check 保持(try 防护硬断言)、纯文档 no-yield gate、bug 请求路由;② 真实缺陷(codex):"非法 JSON 会崩处理一下"被直接 try/catch 收编修复(spec-debug 0 次);修复:Step 1 开头 Not-a-simplification-input-first 路由门(禁修+点名+修复后回流清理路径),paired ×3 全 clear keep,codex 回归 1/1;③ darwin 90.5→91.5,runtime MIRROR-SYNCED;④ 守则复用价值实证:optimize 轮沉淀的"双层落点"规则在本轮直接一次修复到位。未 commit/push 本条前待提交。(user-visible)

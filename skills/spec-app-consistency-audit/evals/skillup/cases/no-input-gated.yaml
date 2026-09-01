@@ -1,0 +1,14 @@
+id: no-input-gated
+title: 无 PRD/Figma/源码输入应被 gate
+description: |
+  验证 Not To Use(No input to inspect):三源皆缺时要求提供输入,不硬跑审计。
+
+input:
+  prompt: |
+    （spec-app-consistency-audit skill 已安装，请按它工作。）
+    帮我审一下我们的 App 一致性。
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-no-input-gate.sh
+  timeout_seconds: 30
