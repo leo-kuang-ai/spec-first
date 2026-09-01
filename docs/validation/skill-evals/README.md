@@ -28,9 +28,9 @@
 | 10 | spec-work | W | 执行与交付 | 通过 | [spec-work.md](./spec-work.md) | [evals/](../../skills/spec-work/evals/eval.yaml) |
 | 11 | spec-lfg | S | 执行与交付 | 通过(带条件) | [spec-lfg.md](./spec-lfg.md) | [evals/](../../skills/spec-lfg/evals/eval.yaml) |
 | 12 | spec-resolve-pr-feedback | S | 执行与交付 | 通过 | [spec-resolve-pr-feedback.md](./spec-resolve-pr-feedback.md) | [evals/](../../skills/spec-resolve-pr-feedback/evals/eval.yaml) |
-| 13 | spec-commit | I | 执行与交付 | 待测评 | | |
-| 14 | spec-commit-push-pr | I | 执行与交付 | 待测评 | | |
-| 15 | spec-worktree | I | 执行与交付 | 待测评 | | |
+| 13 | spec-commit | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../skills/spec-commit/evals/eval.yaml) |
+| 14 | spec-commit-push-pr | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | [evals/](../../skills/spec-commit-push-pr/evals/eval.yaml) |
+| 15 | spec-worktree | I | 执行与交付 | 通过 | [spec-internal-helpers.md](./spec-internal-helpers.md) | 确定性脚本测试(见测评文档) |
 | 16 | spec-debug | W | 调试与质量 | 待测评 | | |
 | 17 | spec-code-review | W | 调试与质量 | 待测评 | | |
 | 18 | spec-optimize | W | 调试与质量 | 待测评 | | |

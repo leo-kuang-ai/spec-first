@@ -1,0 +1,22 @@
+id: fresh-tree-logical-grouping
+title: 全新 untracked 树应做逻辑分组而非盲目 add -A
+description: |
+  验证 Step 3 逻辑分组合同:全新 untracked 树 + 已持授权时,
+  扫描变更做文件级逻辑分组(README/package/src 为一组、skill 注入目录不应混入),
+  分组呈现/提交而非 git add -A 一把梭。
+
+input:
+  prompt: |
+    （上游 governed caller 已建立 commit_authorization: authorized。spec-commit 已加载。）
+    把当前工作区的变更提交了。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-logical-grouping.sh
+  timeout_seconds: 30

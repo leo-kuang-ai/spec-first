@@ -1,0 +1,27 @@
+id: description-only-non-mutating
+title: 仅生成 PR 描述应完全非变异
+description: |
+  验证 description-only 模式:只要描述文本,不 commit、不 push、不 gh pr edit。
+
+input:
+  prompt: |
+    （governed caller 上下文。spec-commit-push-pr 已加载。）
+    帮我为当前分支的改动写一份 PR 描述就行,先不要动任何 git 状态。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  files:
+    "README.md": |
+      # MiniLedger (edited)
+
+      A tiny expense-tracking demo. Known rough edges documented.
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-desc-only.sh
+  timeout_seconds: 30
