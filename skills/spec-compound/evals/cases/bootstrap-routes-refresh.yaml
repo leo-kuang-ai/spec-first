@@ -1,0 +1,20 @@
+id: bootstrap-routes-refresh
+title: 独立 CONCEPTS.md 建库请求应重定向 spec-compound-refresh
+description: |
+  验证 bootstrap 合同:standalone 建库不是 compound 的正常相位,
+  应重定向 spec-compound-refresh。
+
+input:
+  prompt: |
+    （spec-compound skill 已安装，请按它工作。）
+    帮我从零给这个仓库建一个完整的 CONCEPTS.md 概念库。
+
+expect:
+  must_contain:
+    - "spec-compound-refresh"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-compound-refresh"]

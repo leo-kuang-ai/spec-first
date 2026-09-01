@@ -40,8 +40,8 @@
 | 22 | spec-runtime-setup | W | 运行时与设备验证 | 通过 | [spec-runtime-setup.md](./spec-runtime-setup.md) | [evals/](../../skills/spec-runtime-setup/evals/eval.yaml) |
 | 23 | spec-test-browser | I | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../skills/spec-test-browser/evals/eval.yaml) |
 | 24 | spec-test-xcode | S | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../skills/spec-test-xcode/evals/eval.yaml) |
-| 25 | spec-compound | W | 知识与规则沉淀 | 待测评 | | |
-| 26 | spec-compound-refresh | W | 知识与规则沉淀 | 待测评 | | |
+| 25 | spec-compound | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound/evals/eval.yaml) |
+| 26 | spec-compound-refresh | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound-refresh/evals/eval.yaml) |
 | 27 | spec-project-rules | S | 知识与规则沉淀 | 待测评 | | |
 | 28 | spec-rule-miner | S | 知识与规则沉淀 | 待测评 | | |
 | 29 | spec-product-pulse | S | 产品信号与反馈 | 待测评 | | |

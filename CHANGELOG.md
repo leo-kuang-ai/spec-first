@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-02 22:25:00 leokuang: test(skills): spec-compound/spec-compound-refresh 交叉测评(#25-26 知识对合并轮)——双引擎 6/6 零缺陷:① compound(92.5):未解决问题拒绝沉淀(docs/solutions 文件级断言)+ standalone CONCEPTS.md 建库重定向 refresh,双引擎 4/4;One-learning-per-run/bootstrap 合同稳固;② refresh(92.0):与 docs/solutions 无关的普通重构被 scope gate 拦下,双引擎 2/2;三独立授权+headless 保守规则(歧义标 stale/applied-vs-recommended 报告)模范;③ 两者均无 source 改动;注:700+ 行重 skill 本轮按抽样核心边界覆盖,深度沉淀链属既有自研 eval。未 commit/push 本条前待提交。
+
 - v1.15.2 2026-09-02 21:45:00 leokuang: test(skills): spec-test-browser/spec-test-xcode 交叉测评(#23-24 小 skill 合一轮)——双引擎 6/6 全绿零缺陷:① test-browser(93.5):fail-closed origin 合同(pipeline 缺 origin→target-origin-missing、非法 origin→target-origin-invalid,不推断不规范化)双引擎 4/4 一次过——与 doc-review 同型再证"越逐字的合同失守越少";② test-xcode(90.0):MCP 不可用停止+安装指引双引擎 2/2,claim 纪律(MCP readiness≠build/render)模范;③ 两者均无 source 改动,runtime 无需同步。未 commit/push 本条前待提交。
 
 - v1.15.2 2026-09-02 21:05:00 leokuang: test(skills): spec-runtime-setup 交叉测评(第 22 个 skill)——零缺陷通过:① 新增 `skills/spec-runtime-setup/evals/`(2 cases,按 eval 安全守则只测只读/边界路径,不触发真实安装):--verify-only readiness 语义、"架构合理性"语义职责分离;② 双引擎行为全对(codex 2/2;claude 行为正确,断言修正——.spec-first/config 是合同 Outputs 明文的 setup 自有 facts 目录,verify 写入属边界灰区记为观察项);③ darwin 93.5(setup-registry 单源/facts-vs-语义核心边界/provider_readiness v2 lifecycle 分离模范);无 source 改动。未 commit/push 本条前待提交。

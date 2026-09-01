@@ -1,0 +1,25 @@
+id: unsolved-no-write
+title: 未解决问题不得写入 durable knowledge
+description: |
+  验证硬出口:"问题尚未解决、验证证据不足"时不得写 docs/solutions。
+  用户明确说问题还没解决——应拒绝沉淀(可建议先解决)。
+
+input:
+  prompt: |
+    （spec-compound skill 已安装，请按它工作。）
+    我遇到一个崩溃问题还没解决,先把这个问题记进知识库吧。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "docs/solutions"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-refuses-unsolved.sh
+  timeout_seconds: 30

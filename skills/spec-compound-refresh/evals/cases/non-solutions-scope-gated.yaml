@@ -1,0 +1,21 @@
+id: non-solutions-scope-gated
+title: 与 docs/solutions 无关的请求应被 scope gate 拦下
+description: |
+  验证 description 边界("avoid general refactor...unless docs/solutions is explicit"):
+  普通重构请求与知识刷新无关,应指出 scope 不符。
+
+input:
+  prompt: |
+    （spec-compound-refresh skill 已安装，请按它工作。）
+    帮我把这个项目整体重构一下,代码太乱了。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-scope-gate.sh
+  timeout_seconds: 30
