@@ -1,6 +1,9 @@
 # spec-first 全量 Skill 交叉测评总结报告
 
-- **测评窗口**:2026-08-30 ~ 2026-09-03
+- **测评窗口**:**2026-08-30 19:08 ~ 2026-09-01 21:36(+0800)**
+  - 开始:2026-08-30 19:08 —— skill 测评目录建立、首轮 using-spec-first 交叉测评启动(CHANGELOG `v1.15.2 2026-08-30 19:08:00`)
+  - 结束:2026-09-01 21:36 —— 本总结报告随 `dfaf0ef9` 提交并推送,37/37 完成闭环
+  - 注:文件名保留创建时的 `2026-09-03` 前缀与 CHANGELOG 中部分条目的日期漂移,以本节 git 可验证时间戳为准
 - **覆盖**:37/37 个自有 skill(治理注册表全量)
 - **方法**:skill-up CLI 双引擎实测(claude_code + codex,~70 个 skill-up iteration、150+ case 执行)× darwin-skill 9 维 rubric 结构评估 × paired ×3 独立 judge 盲评(13 轮改进全部 3-0 全 clear)× 逐轮 commit/push
 - **产物**:29 份 skill-up eval 套件(含 mini-ledger/rough-prd/tenant-orders 等 fixture 与 20+ 判定脚本)沉淀为永久回归资产;37 份测评文档 + results.tsv(70 行循环日志)

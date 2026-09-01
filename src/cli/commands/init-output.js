@@ -91,6 +91,7 @@ function printInitPreviews(plans, options = {}) {
     groups.length,
     MAX_PREVIEW_DETAIL_LINES,
   ));
+  printChangeSummaryLine(groups, messages);
   printGlobalDeveloperWritePreview(effectiveGlobalDeveloperWrite, messages);
   printPreviewResetDisclosure(groups.map((group) => group.resetReason), messages);
 
@@ -105,6 +106,28 @@ function printInitPreviews(plans, options = {}) {
   console.log(messages.previewNoFilesChanged);
 }
 
+// 变更画像聚合渲染：只统计携带 changeSummary 的 group（workspace 子计划各带
+// 各的，plan 构建层按目标逐个准备事实）。全部缺失时不打印，保持旧输出形态。
+function printChangeSummaryLine(groups, messages) {
+  const totals = { unchanged: 0, updated: 0, added: 0, removed: 0 };
+  let present = false;
+  for (const group of groups) {
+    if (!group.changeSummary) continue;
+    present = true;
+    totals.unchanged += group.changeSummary.unchanged || 0;
+    totals.updated += group.changeSummary.updated || 0;
+    totals.added += group.changeSummary.added || 0;
+    totals.removed += group.changeSummary.removed || 0;
+  }
+  if (!present) return;
+  console.log(messages.previewChangeSummary(
+    totals.unchanged,
+    totals.updated,
+    totals.added,
+    totals.removed,
+  ));
+}
+
 function printInitSummaryPreview(groups, options = {}) {
   const {
     effectiveGlobalDeveloperWrite = null,
@@ -117,6 +140,7 @@ function printInitSummaryPreview(groups, options = {}) {
     summary.platforms.map((platform) => initPlatformLabel(platform)).join(', '),
   ));
   console.log(messages.previewSummaryCoverage(summary.targetCount, summary.platforms.length));
+  printChangeSummaryLine(groups, messages);
   printGlobalDeveloperWriteSummaryPreview(effectiveGlobalDeveloperWrite, messages);
   printPreviewResetDisclosure(summary.resetReasons, messages);
   if (summary.destructiveTotal > 0) {
@@ -320,6 +344,9 @@ function buildInitPreviewGroup({ platform, targetKind, targetLabel, targetRoot, 
     criticalWrites,
     generatedSamples,
     generatedTotal,
+    changeSummary: projectPlan && projectPlan.changeSummary
+      ? projectPlan.changeSummary
+      : null,
     resetReason: resolvePreviewResetReason(projectPlan),
   };
 }

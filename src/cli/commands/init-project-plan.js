@@ -56,6 +56,47 @@ const {
 } = require('./init-developer');
 const { canonicalizeExistingPath } = require('./init-paths');
 
+
+// 变更画像（相对当前磁盘状态）：scripts prepare facts——输出层只渲染。
+// write_file/update_file 与磁盘现状逐项比对；remove 来自 preSync 与破坏性
+// 重置计划。编码差异按"将更新"处理，不误报为不变。
+function summarizeWritePlanChanges(projectRoot, plan) {
+  const counts = { unchanged: 0, updated: 0, added: 0, removed: 0 };
+  const removalPlans = [plan.destructiveResetPlan, plan.preSyncPlan];
+  for (const removalPlan of removalPlans) {
+    for (const operation of (removalPlan && removalPlan.operations) || []) {
+      if (operation.kind === 'remove_file' || operation.kind === 'remove_dir') {
+        counts.removed += 1;
+      }
+    }
+  }
+  for (const operation of (plan.writePlan && plan.writePlan.operations) || []) {
+    if (operation.kind !== 'write_file' && operation.kind !== 'update_file') {
+      continue;
+    }
+    const targetPath = path.join(projectRoot, operation.path);
+    if (!fs.existsSync(targetPath)) {
+      counts.added += 1;
+      continue;
+    }
+    try {
+      // 部分 managed 资产以 Buffer 写入（encoding='buffer'）；字符串与 Buffer
+      // 混比会恒不等，必须分支比较，否则幂等刷新被误报为全部待更新。
+      const isBuffer = operation.encoding === 'buffer' || Buffer.isBuffer(operation.contents);
+      if (isBuffer) {
+        const current = fs.readFileSync(targetPath);
+        counts[current.equals(operation.contents) ? 'unchanged' : 'updated'] += 1;
+      } else {
+        const current = fs.readFileSync(targetPath, operation.encoding || 'utf8');
+        counts[current === operation.contents ? 'unchanged' : 'updated'] += 1;
+      }
+    } catch (_error) {
+      counts.updated += 1;
+    }
+  }
+  return counts;
+}
+
 function buildProjectInitPlan({
   projectRoot,
   platform,
@@ -300,6 +341,11 @@ function buildProjectInitPlan({
     legacyStateDetected,
     preSyncPlan,
     writePlan: initWritePlan,
+    changeSummary: summarizeWritePlanChanges(normalizedRoot, {
+      destructiveResetPlan,
+      preSyncPlan,
+      writePlan: initWritePlan,
+    }),
     operationPlan,
     syncedAssets: assetSync.syncedAssets,
     changelogCreated: !fs.existsSync(path.join(normalizedRoot, 'CHANGELOG.md')),
@@ -583,6 +629,7 @@ function buildPlanFileOperation(projectRoot, relativePath, contents, reason) {
 module.exports = {
   buildInitWritePlan,
   buildProjectInitPlan,
+  summarizeWritePlanChanges,
   findDuplicateClaudeAgentNames,
   inspectCurrentRuntimeDrift,
   mergeStringArrays,

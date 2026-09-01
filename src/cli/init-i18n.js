@@ -3,8 +3,8 @@ const MESSAGES = {
     selectHosts: '选择要初始化的宿主运行时:',
     checkboxHint: '↑/↓ 移动 · 空格 选择/取消 · Enter 确认 · Ctrl+C 取消',
     selectHint: '↑/↓ 移动 · Enter 确认 · Ctrl+C 取消',
-    developerName: '开发者名称:',
-    languageSelect: '默认回复语言:',
+    developerName: '开发者名称（用于 CHANGELOG author 与全局 developer profile）:',
+    languageSelect: '默认回复语言（AI 助手回复所用语言）:',
     workspaceTarget: '选择 workspace 初始化目标:',
     workspaceRootOnly: (count) => `仅父级 workspace（推荐，检测到 ${count} 个子仓库）`,
     workspaceAllRepos: (count) => `所有子仓库（高级批量维护，${count} 个）`,
@@ -27,6 +27,7 @@ const MESSAGES = {
       `预览覆盖: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
     ),
     previewSummaryCoverage: (targets, hosts) => `初始化预览: ${targets} 个目标 · ${hosts} 个宿主`,
+    previewChangeSummary: (unchanged, updated, added, removed) => `内容变更: 不变 ${unchanged} · 将更新 ${updated} · 新增 ${added} · 移除 ${removed}（相对当前磁盘状态）`,
     previewHostSummary: (label, destructive, critical, generated) => (
       `  ${label}: 风险操作 ${destructive} · 关键写入 ${critical} · 生成 ${generated}`
     ),
@@ -103,8 +104,8 @@ const MESSAGES = {
     selectHosts: 'Select host runtimes to initialize:',
     checkboxHint: '↑/↓ move · Space toggle · Enter confirm · Ctrl+C cancel',
     selectHint: '↑/↓ move · Enter confirm · Ctrl+C cancel',
-    developerName: 'Developer name:',
-    languageSelect: 'Default response language:',
+    developerName: 'Developer name (used for CHANGELOG authorship and the global developer profile):',
+    languageSelect: 'Default response language (the language AI assistants reply in):',
     workspaceTarget: 'Select workspace target:',
     workspaceRootOnly: (count) => `Parent workspace only (recommended, ${count} child repos detected)`,
     workspaceAllRepos: (count) => `All child repos (advanced batch maintenance, ${count})`,
@@ -127,6 +128,7 @@ const MESSAGES = {
       `Preview coverage: targets=${targets} hosts=${hosts} target_host_groups=${groups} detail_budget=${budget}`
     ),
     previewSummaryCoverage: (targets, hosts) => `Init preview: ${targets} target(s) · ${hosts} host(s)`,
+    previewChangeSummary: (unchanged, updated, added, removed) => `Content changes: ${unchanged} unchanged · ${updated} to update · ${added} added · ${removed} removed (vs current disk state)`,
     previewHostSummary: (label, destructive, critical, generated) => (
       `  ${label}: risk operations ${destructive} · critical writes ${critical} · generated ${generated}`
     ),

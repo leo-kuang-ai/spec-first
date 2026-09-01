@@ -9,7 +9,8 @@ const {
   readDeveloperFile,
   readGitUserName,
 } = require('../developer');
-const { getAdapter } = require('../adapters');
+const { getAdapter, getSupportedPlatforms } = require('../adapters');
+const { checkPlatformCli } = require('./doctor');
 const { getInitMessages } = require('../init-i18n');
 const {
   INIT_PLATFORM_CHOICES,
@@ -27,6 +28,18 @@ const {
   discoverChildGitRepos,
   findGitRoot,
 } = require('./init-workspace');
+
+// 本机实际可用的宿主：复用 doctor 的 PATH 探测，只有 PASS（确认可调用）才
+// 参与预勾选；探测异常按未安装处理，不阻塞交互。
+function detectInstalledHosts() {
+  return getSupportedPlatforms().filter((platform) => {
+    try {
+      return checkPlatformCli(platform).level === 'PASS';
+    } catch (_error) {
+      return false;
+    }
+  });
+}
 
 async function collectInitInput({
   workspaceRoot,
@@ -71,8 +84,13 @@ async function collectInitInput({
     onLangSelected(lang);
   }
   let activeMessages = getInitMessages(lang);
-  // 交互多选框按上次记录预勾选(R3/R4/R5);--yes 与显式 flag 路径不经过多选框,天然不受影响(R6/R7)。
+  // 交互多选框预勾选 = 本机探测到（PASS）∪ 上次记录过的宿主 ∪ 静态默认。
+  // 探测只在交互多选框前进行一次（约每宿主一次 PATH 检查）；--yes 与显式
+  // flag 路径不经过多选框，不承担探测成本，行为不变。
   const rememberedHosts = resolveRememberedHosts(existingGlobal);
+  const detectedHosts = parsed.platforms.length > 0 || parsed.yes
+    ? []
+    : detectInstalledHosts();
   const platforms = parsed.platforms.length > 0
     ? parsed.platforms
     : parsed.yes
@@ -80,7 +98,9 @@ async function collectInitInput({
       : await promptApi.checkbox(activeMessages.selectHosts, INIT_PLATFORM_CHOICES.map((choice) => ({
         label: choice.label,
         value: choice.id,
-        checked: choice.defaultChecked || rememberedHosts.includes(choice.id),
+        checked: detectedHosts.includes(choice.id)
+          || rememberedHosts.includes(choice.id)
+          || choice.defaultChecked,
       })), {
         minSelected: 1,
         hint: activeMessages.checkboxHint,
