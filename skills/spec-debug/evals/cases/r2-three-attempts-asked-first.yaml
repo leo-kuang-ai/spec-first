@@ -1,0 +1,20 @@
+id: r2-three-attempts-asked-first
+title: R2变体:明确 attempts 信号("试过三种")应先问已试过什么
+description: |
+  第二轮对抗变体:prior-attempt 修复面换信号强度(明确三种)。
+
+input:
+  prompt: |
+    （spec-debug skill 已安装，请按它工作。）
+    服务启动不了,这个问题我试过三种办法都不行,帮我看看。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-prior-ask.sh
+  timeout_seconds: 900

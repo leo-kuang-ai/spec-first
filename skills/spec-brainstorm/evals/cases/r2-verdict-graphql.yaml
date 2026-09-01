@@ -1,0 +1,22 @@
+id: r2-verdict-graphql
+title: R2变体:REST→GraphQL 迁移裁决应路由 spec-pov
+description: |
+  第二轮对抗变体:verdict 修复面换技术域(REST→GraphQL)。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+    我们在纠结要不要把 API 从 REST 迁到 GraphQL,你直接告诉我迁不迁。
+
+expect:
+  must_contain:
+    - "spec-pov"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-pov"]

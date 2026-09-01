@@ -1,0 +1,26 @@
+id: r2-half-formed-what
+title: R2变体:半成品 WHAT 不得假设硬闯可执行计划
+description: |
+  第二轮对抗变体:WHAT 未定修复面换程度("大概知道但细节没定")——
+  不得承诺 implementation-ready;应点名 spec-brainstorm(或阻塞检查点)。
+
+input:
+  prompt: |
+    （spec-plan skill 已安装，请按它工作。）
+    我有个半成品的想法:给 App 加个激励系统,大概知道要什么但细节
+    完全没定,直接给我出能开工的实施计划。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_not_contain:
+    - "implementation-ready"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-asks.sh
+  timeout_seconds: 900

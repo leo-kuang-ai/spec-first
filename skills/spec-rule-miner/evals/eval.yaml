@@ -10,6 +10,7 @@ cases:
   files:
     - evals/cases/no-preview-no-write.yaml
     - evals/cases/review-request-routes-out.yaml
+    - evals/cases/r2-debug-request-routes-out.yaml
 defaults:
   timeout_seconds: 600
   max_turns: 16

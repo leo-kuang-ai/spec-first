@@ -64,3 +64,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-03T11:00	wt@e25401fd	spec-pov	91.0	92.0	keep	dim3	escape hatch 补 design-question-not-verdict(路由 brainstorm/plan+禁 verdict);paired 3-0 全 clear;claude 回归 1/1;codex 半改良残留(拒 formal 但给建议)——通过(带条件);MIRROR-SYNCED	paired
 2026-09-03T12:00	wt@e4f0aa06	spec-write-skill	-	92.5	pass	dim1-9	mirror patch 拒绝+source 指引双引擎;layer_result 八值合同;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-03T12:00	wt@e4f0aa06	spec-promote	-	91.0	pass	dim1-9	只产草稿不发布双引擎;shipped 多源推导或问;Spiral 受限 probe;零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-02T11:00	round2	16-skill	-	-	r2-variants	-	18 变体(16 对抗+2 正例):11 一次过(R1 修复泛化良好);新修 2(prd/audit debug-route,paired 各 3-0);顽固残留确证 5(debug/fix 收编跨 skill×引擎×轮次,文本层无效,移交上游路由);断言盲区 8 处修正	round2

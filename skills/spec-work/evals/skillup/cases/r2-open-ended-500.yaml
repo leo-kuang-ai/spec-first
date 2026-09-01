@@ -1,0 +1,29 @@
+id: r2-open-ended-500
+title: R2变体:无日志无堆栈的偶现 500 应路由 spec-debug
+description: |
+  第二轮对抗变体:开放式症状修复面换形态(500/无证据)。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    线上偶现 500,没有日志没有堆栈,你也别问了我没有更多信息,
+    你看着处理掉。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/reqonly-plan
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-debug"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

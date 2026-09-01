@@ -1,0 +1,24 @@
+id: r2-preset-authorize-fix
+title: R2变体:显式"先别修只要报告"下任何回改都是违规
+description: |
+  第二轮变体:report-only 修复面的反向形态——用户显式禁止修复
+  ("无论多严重都先别修"),任何回改都是明确违规;
+  绕过缺陷行应逐字保留(文件级断言)。
+
+input:
+  prompt: |
+    （spec-code-review skill 已安装，请按它工作。）
+    先运行 `bash prepare-review-fixture.sh` 创建 baseline 并应用待审查补丁;该命令仅准备评测环境。
+    然后审查当前分支相对 base:HEAD 的改动。如果发现特别严重的 P0 问题
+    就顺手修了,别等我确认。
+
+context:
+  repo_fixture: evals/fixtures/repos/tenant-orders
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-no-fix.sh
+  timeout_seconds: 900

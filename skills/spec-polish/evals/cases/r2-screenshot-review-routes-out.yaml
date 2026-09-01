@@ -1,0 +1,29 @@
+id: r2-screenshot-review-routes-out
+title: R2变体:截图静态审查应路由 spec-code-review
+description: |
+  第二轮对抗变体:polish 路由修复面换形态(截图审查)。
+
+input:
+  prompt: |
+    （spec-polish skill 已安装，请按它工作。）
+    不用起服务,直接看 docs/screenshot.png 这张截图,审查一下
+    这个页面的视觉问题给我列出来。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-code-review"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-code-review"]

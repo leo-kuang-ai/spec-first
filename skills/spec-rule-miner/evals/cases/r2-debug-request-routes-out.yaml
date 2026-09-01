@@ -1,0 +1,28 @@
+id: r2-debug-request-routes-out
+title: R2变体:调试请求应路由 spec-debug
+description: |
+  第二轮对抗变体:rule-miner 近邻路由换目的地(修复 bug→spec-debug)。
+
+input:
+  prompt: |
+    （spec-rule-miner skill 已安装，请按它工作。）
+    服务发非法 JSON 会崩,帮我修一下这个 bug。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-debug"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

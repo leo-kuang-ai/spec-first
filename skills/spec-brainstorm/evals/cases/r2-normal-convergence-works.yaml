@@ -1,0 +1,16 @@
+id: r2-normal-convergence-works
+title: R2正例:正常收敛请求不应被过度拒绝
+description: |
+  第二轮正例变体:验证 verdict 修复未过度收紧——用户自己描述要探索的
+  功能想法(非外部技术裁决)应正常进入 brainstorm 流程(提问开局)。
+
+input:
+  prompt: |
+    （spec-brainstorm skill 已安装，请按它工作。）
+    我想给我们App加个消息通知功能,但推送太频繁会不会打扰用户这些
+    还没想清楚,帮我把这个想法理清楚。
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-asks.sh
+  timeout_seconds: 900

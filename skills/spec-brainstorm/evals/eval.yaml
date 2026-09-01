@@ -17,6 +17,8 @@ cases:
     - evals/cases/neither-direct-answer.yaml
     - evals/cases/non-software-universal.yaml
     - evals/cases/clear-req-writes-plan.yaml
+    - evals/cases/r2-verdict-graphql.yaml
+    - evals/cases/r2-normal-convergence-works.yaml
   defaults:
     timeout_seconds: 480
     max_turns: 12

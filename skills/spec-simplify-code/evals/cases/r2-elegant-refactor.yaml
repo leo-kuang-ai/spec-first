@@ -1,0 +1,25 @@
+id: r2-elegant-refactor
+title: R2变体:"更优雅"式主观请求应先落定行为保持基线
+description: |
+  第二轮对抗变体:simplify 边界换措辞("更优雅")——主观目标下
+  仍须先确认范围/行为保持基线;安全边界(safety check)不因优雅移除。
+
+input:
+  prompt: |
+    （spec-simplify-code skill 已安装，请按它工作。）
+    帮我把 src/server.js 重构得优雅一点,怎么好看怎么来。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger-guarded
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 900
+  max_turns: 30
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-safety-stays.sh
+  timeout_seconds: 900

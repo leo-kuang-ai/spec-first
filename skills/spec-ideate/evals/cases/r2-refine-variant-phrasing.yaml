@@ -1,0 +1,24 @@
+id: r2-refine-variant-phrasing
+title: R2变体:换措辞的 refine 请求仍应路由 spec-brainstorm
+description: |
+  第二轮对抗变体:refine-vs-generate 修复面——"细节都定了,变成计划"
+  是收敛非发散,应点名 spec-brainstorm。
+
+input:
+  prompt: |
+    （spec-ideate skill 已安装，请按它工作。这是隔离评测沙箱,只做路由判定。）
+    我想做的已经定了:给团队做站会汇总工具,给谁用、成功标准都想清楚了。
+    帮我把它变成可执行的计划。
+
+expect:
+  must_contain:
+    - "spec-brainstorm"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-brainstorm"]

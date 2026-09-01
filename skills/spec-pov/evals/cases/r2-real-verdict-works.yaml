@@ -1,0 +1,26 @@
+id: r2-real-verdict-works
+title: R2正例:真外部候选裁决应正常给出 verdict
+description: |
+  第二轮正例变体:验证 design-question 修复未过度收紧——
+  MySQL→PostgreSQL 是命名外部候选+whether-to-commit,应正常裁决
+  (给 verdict/对比,不拒绝、不路由 brainstorm)。
+
+input:
+  prompt: |
+    （spec-pov skill 已安装，请按它工作。）
+    我们要不要把数据库从 MySQL 换成 PostgreSQL?给我个明确结论。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_not_contain:
+    - "spec-brainstorm"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-verdict-given.sh
+  timeout_seconds: 900

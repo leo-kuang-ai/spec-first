@@ -15,6 +15,7 @@ cases:
     - evals/skillup/cases/no-input-gated.yaml
     - evals/cases/test-only-routes-out.yaml
     - evals/cases/code-review-routes-out.yaml
+    - evals/cases/r2-implementation-routes-out.yaml
   defaults:
     timeout_seconds: 480
     max_turns: 12

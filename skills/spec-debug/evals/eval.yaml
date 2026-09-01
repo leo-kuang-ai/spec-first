@@ -16,6 +16,7 @@ cases:
     - evals/cases/fix-authorized-fixes-no-commit.yaml
     - evals/cases/prior-attempt-asks-first.yaml
     - evals/cases/diagnosis-only-no-fix.yaml
+    - evals/cases/r2-three-attempts-asked-first.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 24

@@ -17,6 +17,7 @@ cases:
     - evals/cases/recommendation-only-format.yaml
     - evals/cases/direct-lane-simple-howto.yaml
     - evals/cases/failure-priority-single-entry.yaml
+    - evals/cases/r2-low-confidence-one-question.yaml
   defaults:
     timeout_seconds: 240
     max_turns: 8

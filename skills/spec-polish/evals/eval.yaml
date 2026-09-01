@@ -9,6 +9,7 @@ engine:
 cases:
   files:
     - evals/cases/review-request-routes-out.yaml
+    - evals/cases/r2-screenshot-review-routes-out.yaml
 defaults:
   timeout_seconds: 480
   max_turns: 12

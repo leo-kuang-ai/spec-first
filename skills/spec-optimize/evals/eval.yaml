@@ -15,6 +15,7 @@ cases:
     - evals/cases/no-metric-goal-gated.yaml
     - evals/cases/empty-input-asks.yaml
     - evals/cases/debug-request-routes-out.yaml
+    - evals/cases/r2-fastest-no-measure.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 14

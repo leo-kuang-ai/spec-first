@@ -17,6 +17,7 @@ cases:
     - evals/cases/non-software-mode-no-label-leak.yaml
     - evals/cases/repo-grounded-e2e-writes-artifact.yaml
     - evals/cases/surprise-me-no-repo-needs-substance.yaml
+    - evals/cases/r2-refine-variant-phrasing.yaml
   defaults:
     timeout_seconds: 300
     max_turns: 12

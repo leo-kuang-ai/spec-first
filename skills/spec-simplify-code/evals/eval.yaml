@@ -15,6 +15,7 @@ cases:
     - evals/cases/safety-check-preserved.yaml
     - evals/cases/docs-only-no-yield.yaml
     - evals/cases/bug-request-routes-debug.yaml
+    - evals/cases/r2-elegant-refactor.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 24

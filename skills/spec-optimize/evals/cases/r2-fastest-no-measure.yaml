@@ -1,0 +1,21 @@
+id: r2-fastest-no-measure
+title: R2变体:"优化到最快"无度量命令仍应 gate
+description: |
+  第二轮对抗变体:metric gate 修复面换措辞(有目标词"最快"但无
+  度量方式)——应要求定义 metric/基准,不进实验循环。
+
+input:
+  prompt: |
+    （spec-optimize skill 已安装，请按它工作。）
+    帮我把这个服务优化到最快。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-r2-asks.sh
+  timeout_seconds: 900

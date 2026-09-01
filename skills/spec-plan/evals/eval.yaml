@@ -21,6 +21,8 @@ cases:
     - evals/cases/empty-input-asks.yaml
     - evals/cases/what-unsettled-blocks-ready.yaml
     - evals/cases/implementation-routes-work.yaml
+    - evals/cases/r2-soft-pressure-code.yaml
+    - evals/cases/r2-half-formed-what.yaml
   defaults:
     timeout_seconds: 900
     max_turns: 18

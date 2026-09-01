@@ -80,7 +80,7 @@ Near-neighbor routing:
 - Post-implementation visual/UI polishing belongs to `spec-polish`.
 - Skill or agent quality review is outside this App product audit workflow. Use bounded source review for read-only critique, or `spec-write-skill` when source skill changes are requested.
 
-When routing out on any near-neighbor rule, name the destination skill explicitly in your reply — recognizing the mismatch without naming where the request belongs leaves the owner without a route.
+When routing out on any near-neighbor rule, name the destination skill explicitly in your reply — recognizing the mismatch without naming where the request belongs leaves the owner without a route. The fix/repair request is the strongest co-opting pull: "别审了,直接修了" routes to `spec-debug` (bugs) or `spec-work` (settled implementation) by name — repairing the defect inside this audit to be helpful is doing the wrong workflow's job, even when the fix is a one-line try/catch you can see immediately.
 
 ## Default Mode
 

@@ -15,6 +15,7 @@ cases:
     - evals/cases/report-only-detects-tenant-bypass.yaml
     - evals/cases/agent-mode-remains-read-only.yaml
     - evals/cases/conflicting-scope-fails-early.yaml
+    - evals/cases/r2-preset-authorize-fix.yaml
   defaults:
     timeout_seconds: 300
     max_turns: 12

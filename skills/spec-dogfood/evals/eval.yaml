@@ -15,6 +15,7 @@ cases:
     - evals/cases/owner-unavailable-stops.yaml
     - evals/cases/trunk-target-rejected.yaml
     - evals/cases/polish-request-routes-out.yaml
+    - evals/cases/r2-code-review-routes-out.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 16

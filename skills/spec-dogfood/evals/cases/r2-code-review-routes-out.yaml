@@ -1,0 +1,28 @@
+id: r2-code-review-routes-out
+title: R2变体:代码审查请求应点名 spec-code-review
+description: |
+  第二轮对抗变体:dogfood 路由修复面换邻居(code review)。
+
+input:
+  prompt: |
+    （我已通过 /spec-dogfood 显式调起该 skill。）
+    不用开浏览器,直接帮我静态审查当前分支的代码改动。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-code-review"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-code-review"]

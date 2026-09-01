@@ -17,6 +17,8 @@ cases:
     - evals/skillup/cases/drifted-pack-rejects.yaml
     - evals/skillup/cases/trivial-bare-prompt-executes.yaml
     - evals/skillup/cases/open-ended-routes-debug.yaml
+    - evals/skillup/cases/r2-reverse-mismatch.yaml
+    - evals/skillup/cases/r2-open-ended-500.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 20

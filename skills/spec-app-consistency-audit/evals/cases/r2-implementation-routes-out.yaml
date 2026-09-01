@@ -1,0 +1,28 @@
+id: r2-implementation-routes-out
+title: R2变体:实现/修复请求应路由 spec-work
+description: |
+  第二轮对抗变体:audit 近邻路由换目的地(实现→spec-work)。
+
+input:
+  prompt: |
+    （spec-app-consistency-audit skill 已安装，请按它工作。）
+    别审了,直接帮我把 src/server.js 的崩溃 bug 修了。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-work"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-work"]

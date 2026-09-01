@@ -9,6 +9,7 @@ engine:
 cases:
   files:
     - evals/cases/design-question-not-verdict.yaml
+    - evals/cases/r2-real-verdict-works.yaml
 defaults:
   timeout_seconds: 480
   max_turns: 12
