@@ -100,6 +100,7 @@ worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
 - Ordinary requests to "review", "check", "audit", or run `spec-code-review` use `mutation_policy: report-only`.
+- **Report-only means the reviewed files stay byte-identical.** Under `report-only`, never "helpfully" fix, revert, restore, or normalize a defect you found — not even to undo an obviously bad change, and not even when the finding is P0. Finding a bug is evidence for the report; repairing it belongs to an explicitly authorized `apply-fixes` run (or the caller). `git restore`, `git checkout <file>`, `git apply -R`, edit/write tools on reviewed source, and formatter runs that rewrite it are all violations, regardless of the declared `mutation_policy` in the output JSON matching report-only.
 - Use `mutation_policy: apply-fixes` only when the current user or upstream caller explicitly says review-and-fix, review and fix, apply fixes, or equivalent. `mode:agent` always forces report-only even when adjacent text asks to apply.
 - `apply-fixes` authorizes only bounded local review-owned edits. It does not authorize commit, push, PR creation/update, tickets, or unrelated cleanup.
 - Set `commit_authorization: authorized` only when commit creation is separately explicit. Without commit authorization, return a verified uncommitted review-fix set.
