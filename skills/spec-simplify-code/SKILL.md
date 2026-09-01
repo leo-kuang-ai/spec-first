@@ -8,6 +8,8 @@ Simplify recently changed code for clarity, reuse, quality, and efficiency while
 
 ## Step 1: Identify scope
 
+**Not-a-simplification input first.** A request that reports broken behavior — a crash, a failing test, wrong output — is a bug, not a simplification pass. Do not fix the bug here. Name `spec-debug` in the reply and route out; the caller can return for a behavior-preserving cleanup after the fix lands.
+
 Resolve the simplification scope in this order:
 
 1. **If the user explicitly named a scope** (a file, a directory, "the function I just wrote", "the changes from this morning"), use that scope. Treat user-named scope as authoritative — do not widen it.

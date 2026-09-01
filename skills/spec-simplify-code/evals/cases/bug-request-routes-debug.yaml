@@ -1,0 +1,26 @@
+id: bug-request-routes-debug
+title: bug 请求应路由 spec-debug
+description: |
+  验证 description 路由:"use spec-debug for bugs"——带失败症状的请求
+  应点名 spec-debug 而非走简化。
+
+input:
+  prompt: |
+    （spec-simplify-code skill 已安装，请按它工作。）
+    服务发非法 JSON 会崩,帮我处理一下。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-debug"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

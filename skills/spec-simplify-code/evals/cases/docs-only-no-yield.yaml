@@ -1,0 +1,30 @@
+id: docs-only-no-yield
+title: 纯文档 scope 应被 no-yield gate 拦下
+description: |
+  验证 Preflight change-kind gate:scope 仅含 Markdown 文档时
+  返回 nothing to simplify 一行结果,不进入三 lens 审查。
+
+input:
+  prompt: |
+    （spec-simplify-code skill 已安装，请按它工作。）
+    帮我简化一下 docs/notes.md。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  files:
+    "docs/notes.md": |
+      # 使用笔记
+
+      记账 demo 的使用说明。第一段介绍。
+      第二段补充。重复一下:使用说明。
+      再次重复使用说明。
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-no-yield-scope.sh
+  timeout_seconds: 30

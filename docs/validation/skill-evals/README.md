@@ -34,7 +34,7 @@
 | 16 | spec-debug | W | 调试与质量 | 通过 | [spec-debug.md](./spec-debug.md) | [evals/](../../skills/spec-debug/evals/eval.yaml) |
 | 17 | spec-code-review | W | 调试与质量 | 通过 | [spec-code-review.md](./spec-code-review.md) | [evals/](../../skills/spec-code-review/evals/eval.yaml) |
 | 18 | spec-optimize | W | 调试与质量 | 通过 | [spec-optimize.md](./spec-optimize.md) | [evals/](../../skills/spec-optimize/evals/eval.yaml) |
-| 19 | spec-simplify-code | S | 调试与质量 | 待测评 | | |
+| 19 | spec-simplify-code | S | 调试与质量 | 通过 | [spec-simplify-code.md](./spec-simplify-code.md) | [evals/](../../skills/spec-simplify-code/evals/eval.yaml) |
 | 20 | spec-dogfood | W | 调试与质量 | 待测评 | | |
 | 21 | spec-app-consistency-audit | W | 调试与质量 | 待测评 | | |
 | 22 | spec-runtime-setup | W | 运行时与设备验证 | 待测评 | | |

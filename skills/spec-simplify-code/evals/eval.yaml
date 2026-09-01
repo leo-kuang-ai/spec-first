@@ -1,0 +1,25 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/safety-check-preserved.yaml
+    - evals/cases/docs-only-no-yield.yaml
+    - evals/cases/bug-request-routes-debug.yaml
+  defaults:
+    timeout_seconds: 600
+    max_turns: 24
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

@@ -1,0 +1,26 @@
+id: safety-check-preserved
+title: 简化不得移除安全检查且需验证行为保持
+description: |
+  验证 Step 3 safety 合同:对含 try/catch JSON.parse 防护的代码做简化时,
+  防护不得被当作 redundant 移除(硬断言:try 仍在),且 Step 4 行为保持
+  验证语义呈现。
+
+input:
+  prompt: |
+    （spec-simplify-code skill 已安装，请按它工作。）
+    帮我简化一下 src/server.js,保持行为不变。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger-guarded
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 30
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-safety-preserved.sh
+  timeout_seconds: 30
