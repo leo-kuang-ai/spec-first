@@ -27,7 +27,7 @@
 | 9 | spec-write-tasks | W | 计划与任务 | 通过 | [spec-write-tasks.md](./spec-write-tasks.md) | [evals/](../../skills/spec-write-tasks/evals/eval.yaml) |
 | 10 | spec-work | W | 执行与交付 | 通过 | [spec-work.md](./spec-work.md) | [evals/](../../skills/spec-work/evals/eval.yaml) |
 | 11 | spec-lfg | S | 执行与交付 | 通过(带条件) | [spec-lfg.md](./spec-lfg.md) | [evals/](../../skills/spec-lfg/evals/eval.yaml) |
-| 12 | spec-resolve-pr-feedback | S | 执行与交付 | 待测评 | | |
+| 12 | spec-resolve-pr-feedback | S | 执行与交付 | 通过 | [spec-resolve-pr-feedback.md](./spec-resolve-pr-feedback.md) | [evals/](../../skills/spec-resolve-pr-feedback/evals/eval.yaml) |
 | 13 | spec-commit | I | 执行与交付 | 待测评 | | |
 | 14 | spec-commit-push-pr | I | 执行与交付 | 待测评 | | |
 | 15 | spec-worktree | I | 执行与交付 | 待测评 | | |
