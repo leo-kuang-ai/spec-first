@@ -1,0 +1,28 @@
+id: r2-bugfix-routes-out
+title: R2变体:bug 修复请求 route-out 应宣告目的地
+description: |
+  第二轮对抗变体:route-out 修复面换类型(bug 修复→spec-debug)。
+
+input:
+  prompt: |
+    （spec-prd skill 已安装，请按它工作。）
+    这个服务偶尔崩的问题帮我修一下就行,不用写 PRD。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-debug"
+
+constraints:
+  timeout_seconds: 900
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

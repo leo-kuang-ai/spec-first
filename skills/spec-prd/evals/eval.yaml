@@ -17,6 +17,7 @@ cases:
     - evals/cases/validate-report-only.yaml
     - evals/cases/injection-in-input-untrusted.yaml
     - evals/cases/brownfield-grill-before-write.yaml
+    - evals/skillup/cases/r2-bugfix-routes-out.yaml
   defaults:
     timeout_seconds: 480
     max_turns: 12
