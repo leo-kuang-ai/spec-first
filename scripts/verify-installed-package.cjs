@@ -144,6 +144,12 @@ function verifyLifecycle(cli, tempRoot) {
 
   const initCodex = run(process.execPath, [cli, 'init', '--codex', '-y', '-u', 'tester', '--lang', 'zh'], { cwd: repo });
   assert('V6-init-codex', initCodex.status === 0, String(initCodex.stdout).split('\n')[0]);
+  // 品牌契约：首次安装的非交互 init 也必须展示完整 logo。
+  assert(
+    'V6c-brand-logo',
+    String(initCodex.stdout).includes('██████') && String(initCodex.stdout).includes('Spec-First v'),
+    'full logo rendered',
+  );
   for (const required of [
     path.join('.codex', 'spec-first', 'state.json'),
     // codex 是 skill-only 发现（adapter hasCommands=false），投射面在 .agents/skills/。

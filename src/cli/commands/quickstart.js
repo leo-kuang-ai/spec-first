@@ -4,6 +4,8 @@ const { getSupportedPlatforms } = require('../adapters');
 const { checkGit, checkNodeVersion, checkPlatformCli } = require('./doctor');
 const { runInit } = require('./init');
 const { resolveUserLanguage } = require('../cli-lang');
+const { detectColorSupport, renderWordmark } = require('../brand');
+const pkg = require('../../../package.json');
 
 // 用户旅程文案双语；探测行中的 check.name/message 来自 doctor 探测结果
 //（技术事实，如 'Node.js'、'git version 2.40'），保留原文。
@@ -48,7 +50,9 @@ async function runQuickstart(argv, promptOverrides = {}, deps = {}) {
     (deps.resolveLang || resolveUserLanguage)() === 'en' ? 'en' : 'zh'
   ];
 
-  console.log('🚀 spec-first quickstart');
+  // 入口品牌行用 wordmark：主 logo 由转发目标的 init banner 承载
+  //（首次安装 fullArt），避免同旅程双份大图。
+  console.log(renderWordmark(pkg.version, { useColor: detectColorSupport() }));
   console.log('');
   console.log(messages.checking);
 

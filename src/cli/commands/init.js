@@ -116,13 +116,13 @@ async function runInit(argv, promptOverrides = {}) {
   let activeLang = defaultLang;
   const useColor = detectColorSupport();
 
-  if (!parsed.yes) {
-    printInitBrandBanner({
-      root: resolveInitBannerRoot(workspaceRoot),
-      version: pkg.version,
-      useColor,
-    });
-  }
+  // 品牌 banner 对所有 init 形态展示（交互、-y、dry-run）：首次安装显示完整
+  // logo，刷新场景显示紧凑 wordmark（形态语义见 printInitBrandBanner）。
+  printInitBrandBanner({
+    root: resolveInitBannerRoot(workspaceRoot),
+    version: pkg.version,
+    useColor,
+  });
 
   try {
     const interactiveInput = await collectInitInput({

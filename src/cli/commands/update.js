@@ -13,6 +13,7 @@ const {
 } = require('../version-reminder');
 const { runNpm } = require('../../../scripts/lib/npm-cli.cjs');
 const { resolveUserLanguage } = require('../cli-lang');
+const { detectColorSupport, renderFullArt } = require('../brand');
 
 const PACKAGE_NAME = pkg.name;
 const UPGRADE_COMMAND = `npm install -g ${PACKAGE_NAME}@latest`;
@@ -24,6 +25,7 @@ const UPDATE_MESSAGES = {
     npmMissingFix: '请先安装 Node.js/npm（或用你自己的包管理器执行升级），然后重试。',
     upgradeFailed: (status) => `升级失败（npm 退出码 ${status}）。`,
     retryManually: (command) => `可手动重试: ${command}`,
+    upgradedTo: (name, version) => `✅ ${name} 已升级到 v${version}。`,
     upgraded: (name) => `✅ ${name} 升级完成。`,
     refreshSkipped: 'Runtime 刷新：已跳过（无法安全确定刷新范围）。',
     refreshing: (command) => `正在刷新 runtime assets: ${command}`,
@@ -40,6 +42,7 @@ const UPDATE_MESSAGES = {
     npmMissingFix: 'Install Node.js/npm (or run the upgrade with your own package manager), then retry.',
     upgradeFailed: (status) => `Upgrade failed (npm exited with code ${status}).`,
     retryManually: (command) => `You can retry manually with: ${command}`,
+    upgradedTo: (name, version) => `✅ ${name} upgraded to v${version}.`,
     upgraded: (name) => `✅ ${name} upgraded.`,
     refreshSkipped: 'Runtime refresh: skipped (scope could not be determined safely).',
     refreshing: (command) => `Refreshing runtime assets via: ${command}`,
@@ -89,6 +92,8 @@ async function runUpdate(argv, deps = {}) {
     (deps.resolveLang || resolveUserLanguage)() === 'en' ? 'en' : 'zh'
   ];
 
+  // 更新入口展示完整 logo：版本升级是低频、值得仪式感的时刻。
+  console.log(renderFullArt(pkg.version, { useColor: detectColorSupport() }).trimEnd());
   console.log(messages.upgrading(UPGRADE_COMMAND));
   console.log('');
 
@@ -110,13 +115,18 @@ async function runUpdate(argv, deps = {}) {
   }
 
   console.log('');
-  console.log(messages.upgraded(PACKAGE_NAME));
+  // 升级后解析一次全局安装位置：既用于新版本展示，也供 runtime refresh
+  // 复用（避免重复执行 npm root -g）。
+  const installedCli = resolveInstalledCli();
+  const installedVersion = readInstalledVersion(installedCli && installedCli.cliPath);
+  console.log(installedVersion
+    ? messages.upgradedTo(PACKAGE_NAME, installedVersion)
+    : messages.upgraded(PACKAGE_NAME));
   const refresh = resolveRuntimeRefresh(cwd);
   if (!refresh || !Array.isArray(refresh.args)) {
     console.log(messages.refreshSkipped);
     printRuntimeRefreshFallback(refresh);
   } else {
-    const installedCli = resolveInstalledCli();
     if (!installedCli || !installedCli.ok || !installedCli.cliPath) {
       const reasonCode = installedCli && installedCli.reason_code
         ? installedCli.reason_code
@@ -155,6 +165,22 @@ async function runUpdate(argv, deps = {}) {
     // 缓存清理失败不能把成功升级变成失败命令。
   }
   return 0;
+}
+
+// 从已解析的全局 cli 路径（bin/spec-first.js）读安装清单中的新版本号；
+// 纯文件读取、可注入、不重复执行 npm root -g（全局根已由
+// resolveInstalledCliPath 解析一次）。读取失败静默回退旧措辞——
+// 版本展示是增强信息，不构成升级流程的一部分。
+function readInstalledVersion(cliPath, options = {}) {
+  try {
+    if (!cliPath) return '';
+    const readFileSync = options.readFileSync || fs.readFileSync;
+    const manifestPath = path.resolve(path.dirname(path.dirname(cliPath)), 'package.json');
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    return typeof manifest.version === 'string' ? manifest.version : '';
+  } catch (_error) {
+    return '';
+  }
 }
 
 // 默认 install 执行器:跨平台调用 npm,stdio 直通让 npm 进度直达用户。
@@ -416,6 +442,7 @@ module.exports = {
   buildRuntimeRefreshArgs,
   detectInstalledRuntimePlatforms,
   insertInitTargetArgs,
+  readInstalledVersion,
   resolveInstalledCliPath,
   resolvePackageCliFromGlobalRoot,
   resolveRuntimeRefreshCommand,
