@@ -2,6 +2,8 @@
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
 
+- v1.15.2 2026-09-02 02:56:00 leokuang: docs(validation): 输出两轮合并的详细最终测评报告 `docs/validation/skill-evals/2026-09-02-final-detailed-report.md`——九章结构:① 执行摘要(180+ case、15 轮改进全 3-0 零 revert、均分 91.8);② 方法论(三线交叉/改进循环纪律/断言三层/eval 安全);③ 37 skill 逐个明细表(分数/缺陷/终态);④ R1 14 缺陷族谱(收编 8/路由 3/授权 2/纪律 1);⑤ R2 变体验证明细(11/16 存活+新修 2+顽固模式);⑥ 设计守则最终版十条(R2 新增"文本层存在极限");⑦ 残留清单(5 项,含待 owner 删的泄漏仓库);⑧ 数字一览;⑨ 后续建议优先级序(首选上游 fix-intent 路由)。docs-only。
+
 - v1.15.2 2026-09-02 12:40:00 leokuang: chore: 收纳本地未提交变更——① R2 prd eval 资产补齐(eval.yaml 注册 r2 case + skillup fixtures/scripts);② ce-localization 两个 setup 矩阵更新(ce-setup-dependency-matrix.json / ce-setup-prerequisite-preflight.json,129+/75-,并行 ce 链产物);③ docs/solutions/logic-errors/windows-workspace-select-arrow-tokenizer-cancel-2026-07-07.md 落盘(CHANGELOG v1.13.1 2026-07-07 条目已述、文件此前未入库);④ .zcode/ 为宿主工具内部状态不入库。
 
 - v1.15.2 2026-09-02 12:00:00 leokuang: feat(skills): 第二轮交叉测评(16 修复面 skill 对抗变体轮)——18 变体(16 对抗+2 正例)双引擎:① 修复面稳定性 11/16 一次通过(R1 修复泛化良好:ideate 换措辞 refine 仍路由、plan 软性施压被显式拒绝、pov 真 verdict 不误拒、debug 先问 attempts、lfg 未点名即确认);② 新修 2:spec-prd route-out debug 分支专项(Phase 0 点名 spec-debug+一行 try/catch 豁免封堵+description 目的地,paired 3-0)、spec-app-consistency-audit fix/repair 专项("strongest co-opting pull"条款,paired 3-0);③ **核心发现:debug/fix 收编确证为跨 skill×跨引擎×跨轮次的顽固模式**——prd/audit 双引擎、rule-miner/polish codex、code-review claude 在"修一下"类请求上,模型读到条款、承认不适用、依然修复;文本层修复(双层+paired)无效,唯一可行解 = using-spec-first 上游 fix-intent 识别路由(建议列为下一优先级);④ 断言盲区 8 处修正(祈使/中文关键词/fixture prepare 非确定/变体授权措辞灰色);⑤ 总结 `docs/validation/skill-evals/2026-09-02-round2-summary.md`,runtime 镜像同步(prd SYNCED;audit 修复行同步,143/250 为投影路径改写)。未 commit/push 本条前待提交。(user-visible)
