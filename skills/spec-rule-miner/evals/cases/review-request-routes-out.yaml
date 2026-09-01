@@ -1,0 +1,25 @@
+id: review-request-routes-out
+title: 审查请求应路由 spec-code-review
+description: |
+  验证近邻路由:代码质量评审走 spec-code-review(正文有编码)。
+
+input:
+  prompt: |
+    （spec-rule-miner skill 已安装，请按它工作。）
+    帮我审查一下 src/server.js 的代码质量。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-code-review"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-code-review"]

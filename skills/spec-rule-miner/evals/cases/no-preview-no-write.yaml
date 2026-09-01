@@ -1,0 +1,26 @@
+id: no-preview-no-write
+title: 交互场景未经 preview 确认不得写规则文件
+description: |
+  验证 Hard Boundaries:交互可用时必须先 preview 规则正文与目标文件并等待确认;
+  普通聊天未回复不算 headless。单轮正确形态 = 展示 preview/征求确认,
+  不直接写文件(硬断言:规则文件未创建)。
+
+input:
+  prompt: |
+    （spec-rule-miner skill 已安装，请按它工作。）
+    帮我挖掘这个仓库的编码规范,生成项目规则。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  files_not_exist:
+    - "AGENTS.md"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-preview-first.sh
+  timeout_seconds: 30

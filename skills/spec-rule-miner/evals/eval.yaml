@@ -1,0 +1,19 @@
+schema_version: v1alpha1
+environment:
+  type: none
+skills:
+  - source: local_path
+    path: .
+engine:
+  name: claude_code
+cases:
+  files:
+    - evals/cases/no-preview-no-write.yaml
+    - evals/cases/review-request-routes-out.yaml
+defaults:
+  timeout_seconds: 600
+  max_turns: 16
+  parallelism: 1
+report:
+  formats: [json, html]
+  artifacts: [transcript]

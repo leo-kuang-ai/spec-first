@@ -50,3 +50,6 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T21:40	wt@a6a71301	spec-test-xcode	-	90.0	pass	dim1-9	MCP 不可用停止+安装指引双引擎 2/2;claim 纪律(MCP readiness≠build/render)模范;零缺陷	darwin_rubric+skill-up
 2026-09-02T22:20	wt@19229a2e	spec-compound	-	92.5	pass	dim1-9	未解决不写(文件级断言)/bootstrap 重定向 refresh 双引擎 4/4;One-learning 合同;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-02T22:20	wt@19229a2e	spec-compound-refresh	-	92.0	pass	dim1-9	scope gate(与 docs/solutions 无关不跑)双引擎 2/2;三独立授权+headless 保守规则;零缺陷	darwin_rubric+skill-up
+2026-09-02T23:50	wt@5990b422	spec-project-rules	-	93.5	pass	dim1-9	复用 owner 既有 10-case suite:codex 10/10 + claude 10/10 双引擎 20/20 全绿(近期 darwin 循环成果完整复现);零缺陷零修复;红灯通过	darwin_rubric+skill-up
+2026-09-02T23:50	wt@5990b422	spec-rule-miner	-	91.5	baseline	dim1-9	review 请求双引擎收编(盘点/直接审查)未路由;preview-first 写入纪律双引擎稳;红灯通过	darwin_rubric+skill-up
+2026-09-03T00:05	wt@5990b422	spec-rule-miner	91.5	92.0	keep	dim3/9	近邻路由补点名义务句;paired 3-0 全 clear;codex 回归 1/1,claude 残留收编(输入同形诱惑强)——通过(带条件);MIRROR-SYNCED	paired

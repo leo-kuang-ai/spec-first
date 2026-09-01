@@ -18,7 +18,7 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 ## When Not To Use
 
 - 不使用本 skill：用户要审查当前 diff、修复代码、重构、调试、写 lint/format 配置、生成通用语言规范，或治理 confirmed team policy。
-- 近邻路由：confirmed team policy governance 已退役，不再提供专用入口；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`；创建或修改 spec-first source skill 走 `spec-write-skill`。
+- 近邻路由：confirmed team policy governance 已退役，不再提供专用入口；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`；创建或修改 spec-first source skill 走 `spec-write-skill`。命中近邻路由时必须在回复中点名目的地 skill——只解释不匹配而不指路,owner 依然无路可走。
 
 ## Inputs
 

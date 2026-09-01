@@ -42,8 +42,8 @@
 | 24 | spec-test-xcode | S | 运行时与设备验证 | 通过 | [spec-test-browser-xcode.md](./spec-test-browser-xcode.md) | [evals/](../../skills/spec-test-xcode/evals/eval.yaml) |
 | 25 | spec-compound | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound/evals/eval.yaml) |
 | 26 | spec-compound-refresh | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound-refresh/evals/eval.yaml) |
-| 27 | spec-project-rules | S | 知识与规则沉淀 | 待测评 | | |
-| 28 | spec-rule-miner | S | 知识与规则沉淀 | 待测评 | | |
+| 27 | spec-project-rules | S | 知识与规则沉淀 | 通过 | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../skills/spec-project-rules/evals/eval.yaml) |
+| 28 | spec-rule-miner | S | 知识与规则沉淀 | 通过(带条件) | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../skills/spec-rule-miner/evals/eval.yaml) |
 | 29 | spec-product-pulse | S | 产品信号与反馈 | 待测评 | | |
 | 30 | spec-sweep | S | 产品信号与反馈 | 待测评 | | |
 | 31 | spec-riffrec-feedback-analysis | S | 产品信号与反馈 | 待测评 | | |
