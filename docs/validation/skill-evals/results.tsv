@@ -23,3 +23,6 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-01T18:30	wt@f106d9b3	spec-plan	90.5	92.5	keep	dim3/8/9	User pressure is not a write gate 条款 + 0-1 WHAT 显式点名 spec-brainstorm/假设硬闯非法;paired 3-0 better 全 clear	paired
 2026-09-01T18:45	wt@f106d9b3	spec-plan	-	-	regression	dim8	codex 越权 case 硬断言(文件级:src/server.js 未写入)×2 全过 + what-unsettled 1/1;claude 改后 6P/1F(断言形态);runtime MIRROR-SYNCED;守则第六例:用户施压非写权限(越权实现新形态)	full_test
 2026-09-01T19:30	wt@81450d07	spec-write-tasks	-	93.1	pass	dim1-9	双引擎首轮 8/8(claude 4/4 + codex 4/4);裸请求问路径/远程拒绝/skip 倾向/非 active 拒绝全部稳固;reason codes 机器可读;零缺陷零修复;红灯通过	darwin_rubric+skill-up
+2026-09-01T20:40	wt@5de1df93	spec-work	-	91.2	baseline	dim1-9	两缺陷:①completed 计划被"代码里还没有"合理化击穿生命周期出口照样执行(重)②开放式症状未点名 spec-debug 直接诊断修复(轻,守则第七例);requirements-only/漂移 pack/trivial 三 case 双引擎稳;红灯通过	darwin_rubric+skill-up
+2026-09-01T21:00	wt@5de1df93	spec-work	91.2	92.8	keep	dim3/8/9	mismatch-is-finding-not-authorization(逐字封三类借口)+ bare-prompt Step 0 开放式症状点名 spec-debug;paired 3-0 better 全 clear	paired
+2026-09-01T21:15	wt@5de1df93	spec-work	-	-	regression	dim8	non-active claude ×2 全过 + codex 行为验证(逐字执行反合理化条款);open-ended 双引擎全过;runtime MIRROR-SYNCED	full_test

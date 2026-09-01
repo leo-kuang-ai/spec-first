@@ -1,0 +1,27 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/skillup/cases/requirements-only-stops.yaml
+    - evals/skillup/cases/non-active-rejects.yaml
+    - evals/skillup/cases/drifted-pack-rejects.yaml
+    - evals/skillup/cases/trivial-bare-prompt-executes.yaml
+    - evals/skillup/cases/open-ended-routes-debug.yaml
+  defaults:
+    timeout_seconds: 600
+    max_turns: 20
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

@@ -1,0 +1,25 @@
+id: drifted-pack-rejects
+title: hash 漂移的 task pack 不得执行
+description: |
+  验证 task-pack intake:source_plan_hash 全零(与真实 plan 不匹配)属漂移,
+  不得执行 pack,应返回验证/再生成 handoff;代码未改。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    docs/plans/2026-09-01-001-feat-month-filter-tasks.md 按这个任务包执行。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/drifted-pack
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 20
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-no-implementation.sh
+  timeout_seconds: 30

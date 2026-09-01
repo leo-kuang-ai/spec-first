@@ -1,0 +1,27 @@
+id: non-active-rejects
+title: completed 计划不得进入实现
+description: |
+  验证生命周期出口:status: completed 的 implementation-ready 计划
+  返回 source-plan-non-active(语言变体均可),不生成执行任务、不改代码;断言锚定 completed 状态声明与 spec-plan 修复路径。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    docs/plans/2026-09-01-001-feat-month-filter-plan.md 继续执行完成它。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/done-plan
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "completed"
+    - "spec-plan"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["completed", "spec-plan"]

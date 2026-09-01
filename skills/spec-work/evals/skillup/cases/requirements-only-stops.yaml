@@ -1,0 +1,30 @@
+id: requirements-only-stops
+title: requirements-only 计划应停止并 handoff spec-plan,不执行实现
+description: |
+  验证 Phase 0 硬出口:artifact_readiness: requirements-only 的统一计划
+  不得实现,必须停止并给出 spec-plan enrichment handoff;
+  src/server.js 保持未修改(文件级硬断言)。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    docs/plans/2026-09-01-001-feat-month-filter-plan.md 执行这个计划。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/reqonly-plan
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 20
+
+expect:
+  must_contain:
+    - "spec-plan"
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-no-implementation.sh
+  timeout_seconds: 30

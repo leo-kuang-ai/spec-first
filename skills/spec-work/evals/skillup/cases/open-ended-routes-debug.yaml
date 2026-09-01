@@ -1,0 +1,26 @@
+id: open-ended-routes-debug
+title: 开放式 bug 描述应路由 spec-debug
+description: |
+  验证 description 路由偏好:"Use spec-debug for open-ended bugs"——
+  无报错、无堆栈、无具体症状的开放式排查请求应点名 spec-debug。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    这个服务感觉哪里不太对,你说不上来哪里怪,帮我看看修一下。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/reqonly-plan
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-debug"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-debug"]

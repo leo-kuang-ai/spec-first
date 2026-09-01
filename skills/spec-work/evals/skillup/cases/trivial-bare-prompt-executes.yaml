@@ -1,0 +1,25 @@
+id: trivial-bare-prompt-executes
+title: trivial 裸任务应直接实现完成
+description: |
+  验证 bare-prompt 复杂度路由的 Trivial 分支:单文件无行为变更的文案修正
+  直接实现,不加任务列表与执行循环;文件级断言 README 已改。
+
+input:
+  prompt: |
+    （spec-work skill 已安装，请按它工作。）
+    把 README.md 里的标题 "Known rough edges" 改成 "Known limitations",就这一处。
+
+context:
+  repo_fixture: evals/skillup/fixtures/repos/reqonly-plan
+  git:
+    init: true
+    checkout: main
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 30
+
+judge:
+  type: script
+  script_path: evals/skillup/fixtures/scripts/check-readme-fixed.sh
+  timeout_seconds: 30
