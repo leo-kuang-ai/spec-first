@@ -24,7 +24,7 @@ Interpret the user's current request as an optional focus: a section name to rev
 
 ## Core Principles
 
-1. **Anchor, not plan.** Strategy is what the product is and why. Features belong in `spec-brainstorm`; schedules belong in the issue tracker. Do not let either creep into the doc.
+1. **Anchor, not plan.** Strategy is what the product is and why. Features belong in `spec-brainstorm`; schedules belong in the issue tracker. Do not let either creep into the doc. When declining such creep, name the destination explicitly (`spec-brainstorm` for features, the issue tracker for schedules) — a bare refusal or a generic "put it elsewhere" leaves the owner without a route.
 2. **Rigor in the questions, not the headings.** The section headers are plain English. The interview questions enforce strategy discipline.
 3. **Short is a feature.** The template is constrained. Adding sections costs more than it looks like. Push back on expansion.
 4. **Durable across runs.** This skill is rerunnable. On a second run it updates in place, preserves what is working, and only challenges sections that look stale or weak.

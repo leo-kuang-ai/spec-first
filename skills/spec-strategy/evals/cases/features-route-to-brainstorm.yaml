@@ -1,0 +1,27 @@
+id: features-route-to-brainstorm
+title: 想把 feature 排期写进策略应被指出属于 spec-brainstorm
+description: |
+  验证 Core Principle 1(Anchor, not plan)的路由出口:feature 清单/排期
+  属于 spec-brainstorm 与 issue tracker,不得写进 STRATEGY.md;
+  输出应把该请求指向 spec-brainstorm。
+
+input:
+  prompt: |
+    （spec-strategy skill 已安装，请按它工作。）
+    帮我们把下季度要做的 8 个 feature 排期直接写进 STRATEGY.md,一行一个带时间。
+
+context:
+  repo_fixture: evals/fixtures/repos/existing-strategy
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-brainstorm"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-brainstorm"]

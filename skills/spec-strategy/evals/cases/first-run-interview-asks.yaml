@@ -1,0 +1,19 @@
+id: first-run-interview-asks
+title: 无 STRATEGY.md 应宣告首跑并以面试提问开局
+description: |
+  验证 Phase 0 文件路由:文件不存在时进入 First-Run Interview,
+  一次一问开局(先问 target problem),面试未完成不得先写 STRATEGY.md。
+
+input:
+  prompt: |
+    （spec-strategy skill 已安装，请按它工作。）
+    帮我们把这个新产品方向定成正式的产品策略。
+
+expect:
+  files_not_exist:
+    - "STRATEGY.md"
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

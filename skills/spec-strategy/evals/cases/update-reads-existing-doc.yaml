@@ -1,0 +1,28 @@
+id: update-reads-existing-doc
+title: 更新前应真读现有文档并给出现状摘要
+description: |
+  验证 Phase 2 读文件纪律:更新 run 先完整读 STRATEGY.md,
+  输出 3-5 行现状总结——断言必须引用 fixture 的独特内容(LedgerFlow、
+  对账时长),证明是真实读取而非模板复读。
+
+input:
+  prompt: |
+    （spec-strategy skill 已安装，请按它工作。）
+    策略文档过时了,过一遍。
+
+context:
+  repo_fixture: evals/fixtures/repos/existing-strategy
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "LedgerFlow"
+    - "对账"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["LedgerFlow", "对账"]

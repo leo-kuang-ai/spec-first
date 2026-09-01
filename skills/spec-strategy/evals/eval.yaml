@@ -1,0 +1,27 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/first-run-interview-asks.yaml
+    - evals/cases/existing-asks-which-section.yaml
+    - evals/cases/targeted-update-metrics.yaml
+    - evals/cases/features-route-to-brainstorm.yaml
+    - evals/cases/update-reads-existing-doc.yaml
+  defaults:
+    timeout_seconds: 480
+    max_turns: 12
+  parallelism: 1
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

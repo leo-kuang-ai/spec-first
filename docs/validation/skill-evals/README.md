@@ -21,7 +21,7 @@
 | 3 | spec-brainstorm | W | 需求与规划 | 通过 | [spec-brainstorm.md](./spec-brainstorm.md) | [evals/](../../skills/spec-brainstorm/evals/eval.yaml) |
 | 4 | spec-prd | W | 需求与规划 | 通过 | [spec-prd.md](./spec-prd.md) | [evals/](../../skills/spec-prd/evals/eval.yaml) |
 | 5 | spec-doc-review | W | 需求与规划 | 通过 | [spec-doc-review.md](./spec-doc-review.md) | [evals/](../../skills/spec-doc-review/evals/eval.yaml) |
-| 6 | spec-strategy | S | 需求与规划 | 待测评 | | |
+| 6 | spec-strategy | S | 需求与规划 | 通过 | [spec-strategy.md](./spec-strategy.md) | [evals/](../../skills/spec-strategy/evals/eval.yaml) |
 | 7 | spec-prototype | S | 需求与规划 | 待测评 | | |
 | 8 | spec-plan | W | 计划与任务 | 待测评 | | |
 | 9 | spec-write-tasks | W | 计划与任务 | 待测评 | | |

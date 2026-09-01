@@ -14,3 +14,6 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-01T11:50	wt@4f209572	spec-prd	91.7	93.5	keep	dim3	Phase 0 route-out 补显式宣告(点名目的地+停止本 workflow+静默滑入反例);paired 3-0 better 全 clear	paired
 2026-09-01T12:00	wt@4f209572	spec-prd	-	-	regression	dim8	codex 缺陷 case 2/2 + claude_code 全量 5/5;runtime MIRROR-SYNCED;守则三度验证泛化:路由三要素=识别越界+目的地+宣告后停止	full_test
 2026-09-01T13:10	wt@4f209572	spec-doc-review	-	95.1	pass	dim1-9	结构 73.25/77(五 skill 最高)+ dim8 9.5;双引擎首轮 12/12 全绿(claude 6/6 + codex 6/6);flag fail-closed/三种强制 report-only(MARKER 未动)/cost-shape 逐字合同全部成立;零缺陷零修复;红灯通过	darwin_rubric+skill-up
+2026-09-01T14:20	wt@d6df17fb	spec-strategy	-	87.5	baseline	dim1-9	codex features case 拒绝正确但未点名 spec-brainstorm(泛化拒绝,守则第四例);claude 5/5;红灯通过	darwin_rubric+skill-up
+2026-09-01T14:35	wt@d6df17fb	spec-strategy	87.5	90.1	keep	dim3/9	Core Principle 1 补拒绝时点名目的地(spec-brainstorm/issue tracker)+裸拒绝反例;paired 3-0 better 全 clear	paired
+2026-09-01T14:45	wt@d6df17fb	spec-strategy	-	-	regression	dim8	codex features 2/2 + 双引擎全量轮其余全过(targeted 断言语言修正);runtime MIRROR-SYNCED	full_test

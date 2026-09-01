@@ -1,0 +1,22 @@
+id: existing-asks-which-section
+title: 已有策略且无参数应询问要重访哪个 section
+description: |
+  验证 Phase 0 第三分支:STRATEGY.md 存在且未指定 section 时,
+  用 blocking question(或降级编号选项)问用户重访哪部分,不静默改写。
+  Phase 0 先问是合法路径,现状摘要可后置到 Phase 2(由 update case 单独覆盖)。
+
+input:
+  prompt: |
+    （spec-strategy skill 已安装，请按它工作。）
+    更新一下我们的产品策略。
+
+context:
+  repo_fixture: evals/fixtures/repos/existing-strategy
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30
