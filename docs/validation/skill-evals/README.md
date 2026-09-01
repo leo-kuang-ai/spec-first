@@ -44,10 +44,10 @@
 | 26 | spec-compound-refresh | W | 知识与规则沉淀 | 通过 | [spec-compound-pair.md](./spec-compound-pair.md) | [evals/](../../skills/spec-compound-refresh/evals/eval.yaml) |
 | 27 | spec-project-rules | S | 知识与规则沉淀 | 通过 | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../skills/spec-project-rules/evals/eval.yaml) |
 | 28 | spec-rule-miner | S | 知识与规则沉淀 | 通过(带条件) | [spec-project-rules-pair.md](./spec-project-rules-pair.md) | [evals/](../../skills/spec-rule-miner/evals/eval.yaml) |
-| 29 | spec-product-pulse | S | 产品信号与反馈 | 待测评 | | |
-| 30 | spec-sweep | S | 产品信号与反馈 | 待测评 | | |
-| 31 | spec-riffrec-feedback-analysis | S | 产品信号与反馈 | 待测评 | | |
-| 32 | spec-polish | W | 产品信号与反馈 | 待测评 | | |
+| 29 | spec-product-pulse | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-product-pulse/evals/eval.yaml) |
+| 30 | spec-sweep | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-sweep/evals/eval.yaml) |
+| 31 | spec-riffrec-feedback-analysis | S | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-riffrec-feedback-analysis/evals/eval.yaml) |
+| 32 | spec-polish | W | 产品信号与反馈 | 通过 | [spec-signal-group.md](./spec-signal-group.md) | [evals/](../../skills/spec-polish/evals/eval.yaml) |
 | 33 | spec-explain | S | 会话连续性与解释 | 待测评 | | |
 | 34 | spec-handoff | S | 会话连续性与解释 | 待测评 | | |
 | 35 | spec-pov | S | 会话连续性与解释 | 待测评 | | |

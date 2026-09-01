@@ -1,0 +1,26 @@
+id: headless-first-run-stops
+title: headless 首跑应报 requires interactive setup 并停止
+description: |
+  验证 Setup gate:首次运行(无配置状态)在 headless 模式必须
+  报 first run requires interactive setup 并停止,不猜测源配置。
+
+input:
+  prompt: |
+    （spec-sweep skill 已安装，请按它工作。定时调度器调用,无人在场。）
+    mode:headless
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "设置"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["设置"]

@@ -1,0 +1,21 @@
+id: unconfigured-guides-setup
+title: 未配置时应引导 setup 而非硬跑空报告
+description: |
+  验证配置 gate:pulse_product_name 未设时 skill 为 unconfigured,
+  应引导 setup/配置流程而非产出空报告。
+
+input:
+  prompt: |
+    （spec-product-pulse skill 已安装，请按它工作。）
+    给我出一份产品脉搏报告。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/asks-a-question.sh
+  timeout_seconds: 30

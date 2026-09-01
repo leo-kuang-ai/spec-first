@@ -1,0 +1,25 @@
+id: review-request-routes-out
+title: 静态代码审查请求应路由 spec-code-review
+description: |
+  验证 Not To Use:static code review 不属 polish——应点名 spec-code-review。
+
+input:
+  prompt: |
+    （spec-polish skill 已安装，请按它工作。）
+    帮我静态审查一下当前分支的代码改动质量,不用起服务。
+
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+
+expect:
+  must_contain:
+    - "spec-code-review"
+
+judge:
+  type: rule_based
+  success:
+    - output_contains:
+        all: ["spec-code-review"]

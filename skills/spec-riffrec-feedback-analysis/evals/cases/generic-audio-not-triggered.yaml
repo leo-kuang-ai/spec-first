@@ -1,0 +1,15 @@
+id: generic-audio-not-triggered
+title: 通用音频转写请求不应触发 Riffrec 分析
+description: |
+  验证 description 反例:generic podcasts/meetings/transcription 不触发本 skill,
+  应指出不匹配(建议通用转写途径),不硬套 Riffrec 流程。
+
+input:
+  prompt: |
+    （spec-riffrec-feedback-analysis skill 已安装，请按它工作。）
+    帮我把这个会议录音 meeting-final.mp3 转写成文字纪要。
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-generic-refused.sh
+  timeout_seconds: 30

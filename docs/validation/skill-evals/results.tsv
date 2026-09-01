@@ -53,3 +53,8 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-02T23:50	wt@5990b422	spec-project-rules	-	93.5	pass	dim1-9	复用 owner 既有 10-case suite:codex 10/10 + claude 10/10 双引擎 20/20 全绿(近期 darwin 循环成果完整复现);零缺陷零修复;红灯通过	darwin_rubric+skill-up
 2026-09-02T23:50	wt@5990b422	spec-rule-miner	-	91.5	baseline	dim1-9	review 请求双引擎收编(盘点/直接审查)未路由;preview-first 写入纪律双引擎稳;红灯通过	darwin_rubric+skill-up
 2026-09-03T00:05	wt@5990b422	spec-rule-miner	91.5	92.0	keep	dim3/9	近邻路由补点名义务句;paired 3-0 全 clear;codex 回归 1/1,claude 残留收编(输入同形诱惑强)——通过(带条件);MIRROR-SYNCED	paired
+2026-09-03T09:00	wt@a0b2d3a9	spec-product-pulse	-	91.0	pass	dim1-9	未配置引导 setup 双引擎(claude 原生+codex 断言补祈使词本地验证);零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-03T09:00	wt@a0b2d3a9	spec-sweep	-	91.5	pass	dim1-9	headless 首跑 requires-interactive-setup 停止 双引擎(claude 行为完美,断言补中文锚);零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-03T09:00	wt@a0b2d3a9	spec-riffrec-feedback-analysis	-	92.0	pass	dim1-9	通用音视频转写不触发 双引擎原生;54 行最紧凑;零缺陷;红灯通过	darwin_rubric+skill-up
+2026-09-03T09:00	wt@a0b2d3a9	spec-polish	-	91.0	baseline	dim1-9	静态审查请求被双引擎收编(识别 Not To Use 却直接做审查),未点名 spec-code-review	darwin_rubric+skill-up
+2026-09-03T09:30	wt@a0b2d3a9	spec-polish	91.0	91.8	keep	dim3/9	Not To Use 补点名+反收编双要素;paired 3-0 全 clear;双引擎回归全过;MIRROR-SYNCED	paired
