@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散新方向属于 definition 组的 spec-ideate 入口

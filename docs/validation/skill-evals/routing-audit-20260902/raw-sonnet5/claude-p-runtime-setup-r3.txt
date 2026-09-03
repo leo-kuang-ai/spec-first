@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 该请求是检查/修复新机器上 MCP 与宿主 runtime 配置就绪状态,属于 spec-runtime-setup 这一 standalone skill 的明确职责范围。

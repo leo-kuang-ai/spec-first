@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 清理最近改动中重复样板且保持行为不变,正是 spec-simplify-code 独立 skill 定义的 tidy/refactor 场景。

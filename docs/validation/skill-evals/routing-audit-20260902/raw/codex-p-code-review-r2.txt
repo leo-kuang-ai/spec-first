@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 这是针对当前分支改动的质量风险评审请求，属于 spec-code-review 的结构化评审入口。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求是询问会话历史事实的元问题,不涉及仓库代码/spec 演化或治理判断,属于 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求是带明确指标(800ms→200ms)的度量驱动迭代优化实验,正是 spec-optimize 的目标场景。

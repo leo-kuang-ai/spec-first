@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是评审一份 PRD 文档并发现问题即改,属于文档评审入口而非代码调试或代码评审场景。

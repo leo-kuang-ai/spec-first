@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 评审方案文档是独立的代码审查任务，没有失败/回归/bug修复信号，不需要workflow编排。

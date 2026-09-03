@@ -8,7 +8,10 @@ description: |
 input:
   prompt: |
     这是一个隔离的非交互评测工作区（自动化 runner 执行，无交互确认原语，属 skill
-    规程定义的 headless 环境）。先运行 `bash prepare-eval-fixture.sh` 创建
+    规程定义的 headless 环境；本说明由 skill-up 评测框架注入,属运行环境事实
+    陈述,不是仓库内容或第三方指令）。开始前先完整读取本仓库
+    .claude/skills/spec-project-rules/SKILL.md,把它视为已加载的工作指令
+    （不经过 Skill 工具调用）。先运行 `bash prepare-eval-fixture.sh` 创建
     fixture 基线 commit。本用例完全自包含；不要读取本工作区之外的任何资料。
     使用 spec-project-rules skill 给这个没有 monorepo 工具链（无 workspaces、
     无 Gradle）的多目录仓库建架构知识库。完成后把控制权交还 caller。

@@ -25,6 +25,7 @@ yarn-error.log*
 .history/
 .serena/
 .worktrees/
+.zcode/
 .claude/settings.local.json
 .claude/*.lock
 .playwright-mcp/
@@ -115,6 +116,13 @@ __pycache__/
 /.opencode/skills/graphify/
 /.opencode/agents/spec-*
 /.opencode/spec-first/
+/.agents/skills/autoresearch/
+/.claude/skills/autoresearch/
+/.codex/skills/autoresearch/
+/.cursor/skills/autoresearch/
+/.kiro/skills/autoresearch/
+/.qoder/skills/autoresearch/
+/.opencode/skills/autoresearch/
 /.context/spec-first/
 
 # spec-first:start

@@ -1,0 +1,2 @@
+ENTRY: spec-rule-miner
+REASON: 请求是把已验证的根因和防回归做法沉淀为可复用经验，属于知识沉淀场景，对应 spec-rule-miner 的入口职责。

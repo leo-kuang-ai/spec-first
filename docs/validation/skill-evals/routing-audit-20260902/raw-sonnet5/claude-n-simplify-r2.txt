@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 这是不改变行为的样板代码清理/简化任务,恰好匹配 spec-simplify-code standalone skill 的定位。

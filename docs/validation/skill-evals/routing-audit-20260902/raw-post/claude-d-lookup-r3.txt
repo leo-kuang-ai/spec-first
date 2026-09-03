@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是范围明确的只读符号引用查找,属于轻量事实性代码定位,不涉及演化判断或风险变更,走 Direct Lane 即可。

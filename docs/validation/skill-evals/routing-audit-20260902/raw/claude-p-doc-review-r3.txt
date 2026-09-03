@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户请求是对一份方案/计划文档做质量评审并给意见，属于只读文档评审，与公共 spec-doc-review 工作流精准匹配，无需 Direct Lane 或其他入口。

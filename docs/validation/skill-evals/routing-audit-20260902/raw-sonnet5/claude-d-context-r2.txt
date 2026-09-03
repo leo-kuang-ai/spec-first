@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求是询问会话历史本身（元问题），不涉及代码演化、架构判断或治理规则取舍，不属于任何 spec-* workflow 或 standalone skill 的适用范围。

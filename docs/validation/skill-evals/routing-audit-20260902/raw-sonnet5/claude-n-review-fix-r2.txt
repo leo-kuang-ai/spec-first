@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对既有 PRD 文档做发现问题并直接修改的评审闭环,属于 spec-doc-review 覆盖范围,而非需要跨阶段协调的复合 workflow 或轻量 Direct Lane 任务。

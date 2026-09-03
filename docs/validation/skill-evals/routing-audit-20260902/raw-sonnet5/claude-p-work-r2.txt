@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有落地计划文档需要执行成非平凡代码变更，属于 spec-work 覆盖的实现阶段入口，而非零散 Direct Lane 编辑。

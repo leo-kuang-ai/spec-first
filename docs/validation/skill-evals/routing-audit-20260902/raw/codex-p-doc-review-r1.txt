@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 该请求是对既有方案文档的规划质量评审，应使用 spec-doc-review 的角色化文档审查入口。

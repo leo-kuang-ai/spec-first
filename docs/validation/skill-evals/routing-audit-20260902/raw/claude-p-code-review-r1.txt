@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 评审当前分支 diff 的质量风险正是 spec-code-review workflow 的目标场景。

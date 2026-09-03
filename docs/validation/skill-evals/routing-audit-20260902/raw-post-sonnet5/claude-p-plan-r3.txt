@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已明确（导出功能加 CSV 格式），但实现方案和任务拆解未定，需要技术方案设计和执行计划，符合 spec-plan 的职责范围。

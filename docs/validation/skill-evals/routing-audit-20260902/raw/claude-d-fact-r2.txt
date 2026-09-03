@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一事实轻量查询(读 CHANGELOG 顶部版本号),属 using-spec-first 明确排除的 lightweight facts/narrow lookup,走 Direct Lane 直接回答。

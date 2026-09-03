@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是限定单一函数调用点的轻量事实查询，适合直接定位代码，无需启动公开 workflow。

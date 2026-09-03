@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 用户目标用户与成功标准均未定，需要发散澄清而非直接进入需求/计划产出，属于 spec-brainstorm 的入口范围。

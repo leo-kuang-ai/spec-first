@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单事实查询，读取单个已知文件 CHANGELOG.md，无需 workflow

@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 检查/修复 MCP 与宿主运行环境就绪状态属于 spec-runtime-setup 明确覆盖的场景。

@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 该请求是为跨机器/跨会话延续工作打包交接上下文，正好对应 spec-handoff 这一 standalone skill 的用途。

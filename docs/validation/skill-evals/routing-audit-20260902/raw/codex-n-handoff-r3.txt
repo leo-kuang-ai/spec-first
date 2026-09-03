@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 该请求明确要创建跨机器、跨会话继续工作的交接文档，属于 spec-handoff 的职责范围。

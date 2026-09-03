@@ -1,6 +1,6 @@
 ---
 name: spec-test-browser
-description: Run browser tests on pages affected by current PR or branch
+description: Run browser tests on pages affected by current PR or branch. Use after code changes when browser verification is requested before review or merge. Not for diagnosing failures those runs uncover — route defects to spec-debug.
 user-invocable: false
 argument-hint: "[PR number, branch name, 'current'] [mode:pipeline] [target-origin:<origin>]"
 ---

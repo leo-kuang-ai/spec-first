@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是明确的 pytest 失败诊断请求，应进入 spec-debug 的缺陷诊断闭环。

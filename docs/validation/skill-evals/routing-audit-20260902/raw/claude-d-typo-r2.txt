@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件、明确范围的错别字修正属于治理规则中"clearly scoped low-risk edit"的小任务，按任务分级直接执行，无需进入 spec-* workflow。

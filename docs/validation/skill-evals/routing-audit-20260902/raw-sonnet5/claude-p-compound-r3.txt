@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 沉淀已验证的根因和防回归经验供复用属于 knowledge promotion,对应 spec-compound 的入口场景。

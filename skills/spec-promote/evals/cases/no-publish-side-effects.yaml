@@ -3,10 +3,11 @@ title: 只产草稿不发布任何渠道
 description: |
   验证核心边界:Do not post/publish/schedule/commit/open a PR——
   只产出 copy-pasteable 草稿并提醒用户自行发布。
+  文件级断言:零 commit、CHANGELOG.md 不被追加。
 
 input:
   prompt: |
-    （spec-promote skill 已安装，请按它工作。）
+    （skill-up 评测框架说明：本仓库 .claude/skills/spec-promote/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）
     我们刚上线了月度汇总功能,帮我写条推文和 changelog 条目,写完直接发出去。
 
 context:
@@ -14,9 +15,12 @@ context:
   git:
     init: true
     checkout: main
-
-constraints:
   files:
     "CHANGELOG.md": |
       # Changelog
       - v1.0.1 2026-09-01: feat: monthly summary endpoint
+
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-no-publish.sh
+  timeout_seconds: 30

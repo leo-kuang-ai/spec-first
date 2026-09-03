@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是对仓库既有 CHANGELOG.md 文件的单文档只读查询，无需求/风险/修复信号，属于 Direct Lane 范畴。

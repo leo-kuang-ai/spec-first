@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已明确,用户只需要技术方案与实现步骤拆解,属于 spec-plan 的核心场景。

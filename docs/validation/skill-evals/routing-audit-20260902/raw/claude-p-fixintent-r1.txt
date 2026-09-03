@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户报告的缺陷只有症状与臆测根因(时区处理错误)，需要 root-cause 取证后再修，属于 spec-debug 的调试工作流，而非范围明确可直接执行的低风险小修。

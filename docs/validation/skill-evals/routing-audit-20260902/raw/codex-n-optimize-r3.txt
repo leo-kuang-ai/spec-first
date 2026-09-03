@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求需要设定量化性能目标并迭代测量、实验和取舍，属于 spec-optimize 的边界。

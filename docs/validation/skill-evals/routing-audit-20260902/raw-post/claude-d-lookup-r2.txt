@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单事实问答，查找函数调用位置，已限定范围，使用 rg 或 CodeGraph 直接回答即可。

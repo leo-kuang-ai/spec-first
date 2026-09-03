@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求从规划到绿 PR 全程自动完成且不再确认，符合 spec-lfg 的显式触发条件。

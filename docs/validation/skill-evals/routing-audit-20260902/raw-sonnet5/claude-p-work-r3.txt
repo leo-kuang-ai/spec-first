@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 执行一份已存在的落地计划属于对既有 plan 的实质性代码改动，应走 spec-work 而非 Direct Lane 或其他专用 skill。

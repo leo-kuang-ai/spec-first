@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 该请求明确是处理 PR review comments 并落地修改、提交、推送与回复，对应独立的 PR 反馈解决工作流。

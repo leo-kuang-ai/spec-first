@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 请求是对最近改动中的重复样板代码做清理且明确不改变行为，属于 tidy/refactor pass，与 spec-simplify-code 的用途精确匹配。

@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 明确的测试失败 + AttributeError 报错 + 修复意图，触发入口硬规则，必须进入 spec-debug。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一符号的轻量事实查询（调用点列举），无代码改动风险，属于 Direct Lane 的 narrow lookup 范畴，无需进入任何 spec-* workflow。

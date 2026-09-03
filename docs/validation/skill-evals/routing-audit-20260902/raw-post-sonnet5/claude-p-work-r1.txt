@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 用户已有明确计划文档要求执行落地，应进入 spec-plan workflow 验证计划充分性并生成任务清单后执行。

@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 明确要求清理重复样板代码且不改变行为，属于"最近改动"范围的整理性重构，匹配 spec-simplify-code 的用途。

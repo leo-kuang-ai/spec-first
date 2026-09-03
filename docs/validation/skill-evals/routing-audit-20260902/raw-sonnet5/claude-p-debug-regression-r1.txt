@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是一个回归类 bug 的根因排查请求（仅需查明原因,非直接修复或新需求),适配 spec-debug 的诊断定位场景。

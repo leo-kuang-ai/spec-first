@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 请求是新机器上 harness runtime readiness（MCP、宿主配置）检查与配置，属于 spec-runtime-setup 明确覆盖的场景。

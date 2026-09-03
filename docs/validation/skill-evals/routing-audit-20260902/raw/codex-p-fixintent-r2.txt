@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 已限定 utils/date.py 单个函数的局部修复，属于清晰、低风险的直接执行任务。

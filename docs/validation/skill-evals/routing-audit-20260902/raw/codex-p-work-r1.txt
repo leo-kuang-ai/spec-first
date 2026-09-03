@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 该请求已有明确计划并要求端到端执行落地，属于 spec-work 的已定计划实施场景。

@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 落地一份已存在的具体实施计划文档属于执行既有 plan 产出代码变更,对应 spec-work 的入口场景。

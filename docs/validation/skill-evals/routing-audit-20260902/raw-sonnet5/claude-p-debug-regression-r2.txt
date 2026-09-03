@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是一个具体的功能回归排查任务（导出按钮点击无反应且与上版本行为不同），属于需要根因定位的调试工作，应走 spec-debug 而非 Direct Lane。

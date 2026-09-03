@@ -1,0 +1,2 @@
+条目：spec-optimize
+原因：该请求是带明确量化目标（800ms→200ms）的可度量迭代优化实验，正好命中 spec-optimize 的 metric-driven 优化循环职责。

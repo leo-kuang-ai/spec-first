@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单事实查询，直接读取 CHANGELOG.md 文件即可获得版本号

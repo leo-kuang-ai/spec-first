@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 已有想法但目标用户或成功标准未定，需要收敛定义，符合 spec-brainstorm 判别条件

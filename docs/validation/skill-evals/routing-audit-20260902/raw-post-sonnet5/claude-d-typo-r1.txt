@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文档内的显然错别字修正,属于低风险局部编辑,不涉及失败/回归/架构判断,走 Direct Lane。

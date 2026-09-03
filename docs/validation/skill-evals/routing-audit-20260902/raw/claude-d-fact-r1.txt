@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的轻量事实查询(读取 CHANGELOG 中最新版本号)，无实质性改动，按治理规则走 Direct Lane 即可。

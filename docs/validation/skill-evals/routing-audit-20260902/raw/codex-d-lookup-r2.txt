@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是范围明确、低风险的简单代码事实查询，可直接使用 CodeGraph 或 `rg` 检索，无需完整 spec workflow。

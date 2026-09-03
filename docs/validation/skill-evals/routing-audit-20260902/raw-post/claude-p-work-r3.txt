@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 请求是执行一份已存在的落地计划文档,属于计划到代码的标准执行环节,对应 spec-work 入口。

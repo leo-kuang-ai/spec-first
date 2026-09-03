@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 单文件已知函数的行为缺陷修复,属于 bug-fix 场景,应走 spec-debug 而非直接改动。

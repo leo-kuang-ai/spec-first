@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是一次单文件 CHANGELOG.md 版本号查询,属于轻量事实性查询,不涉及演化判断或风险,走 Direct Lane。

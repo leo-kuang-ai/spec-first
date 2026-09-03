@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对既有 PRD/规划文档做评审并按发现的问题修改，属于文档评审与改进场景。

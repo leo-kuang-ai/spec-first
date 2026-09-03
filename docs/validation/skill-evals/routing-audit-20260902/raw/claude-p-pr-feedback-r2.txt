@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 该请求包含实质代码修改与 commit/push 副作用，属于典型执行工作流，应走公开 spec-work 而非 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文档内的单字错别字修正,风险极低且范围明确,属于 Direct Lane 而非需要 workflow 治理的实质性变更。

@@ -17,7 +17,7 @@ commit_authorization: authorized | missing
 branch_mutation_authorization: authorized | missing
 ```
 
-`workflow invocation does not authorize commit`; tool permission, a dirty tree, a branch name, or successful verification are execution facts, not authority. Explicit commit authorization does not imply branch mutation authorization. When commit authorization is missing, stop before branch mutation, staging, or commit and return `commit_authorization_missing`. When a checkout or new branch is needed but branch authority is missing, stop before that Git mutation and return `branch_mutation_authorization_missing` or obtain approval for the exact branch action.
+`workflow invocation does not authorize commit`; tool permission, a dirty tree, a branch name, or successful verification are execution facts, not authority. Explicit commit authorization does not imply branch mutation authorization. When any commit intent is expressed while commit authorization is missing, stop before branch mutation, staging, or commit and return `commit_authorization_missing`. When a checkout or new branch is needed but branch authority is missing, stop before that Git mutation and return `branch_mutation_authorization_missing` or obtain approval for the exact branch action. A pure status question about uncommitted changes (no commit intent expressed) does not trigger this gate: answer the query directly, mutate nothing, and do not stage or commit.
 
 This helper owns commit composition and the authorized commit checkpoint only. It does not own push, PR creation/update, plan lifecycle, or unrelated dirty paths. If branch creation would be required, obtain explicit approval for that concrete branch mutation before creating it.
 

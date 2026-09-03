@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是明确的功能回归调试请求，属于故障诊断与根因排查，应进入 spec-debug。

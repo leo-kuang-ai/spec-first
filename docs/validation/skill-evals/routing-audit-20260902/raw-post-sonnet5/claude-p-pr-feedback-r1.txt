@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 用户显式要求处理 GitHub PR review comments 并一条龙改完提交推送回复,命中入口硬规则中的强制路由项。

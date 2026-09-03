@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯对话历史查询,不涉及任何代码、文档、调试或workflow工作,无需进入任何spec-*入口

@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 有明确、可度量的性能目标（800ms→200ms）和优化实验设计诉求，属于 metric-driven 迭代优化场景，而非 bug 修复或常规实现任务。

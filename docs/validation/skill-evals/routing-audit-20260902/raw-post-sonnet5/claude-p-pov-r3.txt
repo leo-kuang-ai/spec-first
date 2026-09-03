@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 用户要求对外部技术采用（REST 迁到 GraphQL）做裁决，需结合系统现状判断，属于 technical point-of-view 决策场景

@@ -34,7 +34,7 @@ Check the skill arguments for flags and a document path. Tokens matching `mode:*
 
 If both `roster:` and `depth:` appear, **`roster:` wins**. If neither appears, profile = **`standard`**.
 
-`mutation:` and `output:` tokens are exact-token contracts. Accept only `mutation:report-only`, `mutation:apply-fixes`, and `output:json`. A duplicate token, multiple `mutation:*` tokens, multiple `output:*` tokens, or any unsupported `mutation:*` / `output:*` value fails closed before document read or reviewer dispatch. Return `Review failed: flag-conflict-or-unsupported` with the conflicting token names; do not guess precedence and do not treat those tokens as a path.
+`mutation:` and `output:` tokens are exact-token contracts. Fixed failure strings in this skill (flag-conflict, headless-missing-path, missing-document) are machine-facing exact contracts: emit them verbatim — never translated, localized, or rephrased. Accept only `mutation:report-only`, `mutation:apply-fixes`, and `output:json`. A duplicate token, multiple `mutation:*` tokens, multiple `output:*` tokens, or any unsupported `mutation:*` / `output:*` value fails closed before document read or reviewer dispatch. Return `Review failed: flag-conflict-or-unsupported` with the conflicting token names; do not guess precedence and do not treat those tokens as a path.
 
 Set run-local `requested_mutation` to `report-only` or `apply-fixes` only when the matching exact token is present; otherwise `default-report-only`. Set `output_mode` to `json` only when `output:json` is present; otherwise `text`. Output mode changes rendering only — it does not grant mutation, dispatch, producer, commit, or lifecycle authority.
 
@@ -42,7 +42,7 @@ Set run-local `delivery_mode` to `headless` when `mode:headless` is present, oth
 
 ## Phase 1: Get and Analyze Document
 
-**If a document path is provided:** Read it, then proceed; if the read fails, apply the missing-document gate below. **If no document is specified (interactive mode):** Ask which document to review, or find the most recent in `docs/brainstorms/` or `docs/plans/`. **If no document is specified (headless mode):** Output "Review failed: headless mode requires a document path. Re-invoke with: Skill(\"spec-doc-review\", \"mode:headless <path>\")" without dispatching agents.
+**If a document path is provided:** Read it, then proceed; if the read fails, apply the missing-document gate below. **If no document is specified (interactive mode):** Ask which document to review, or find the most recent in `docs/brainstorms/` or `docs/plans/`. **If no document is specified (headless mode):** Output this exact string, verbatim (machine-facing contract, do not localize): "Review failed: headless mode requires a document path. Re-invoke with: Skill(\"spec-doc-review\", \"mode:headless <path>\")" without dispatching agents.
 
 **Missing-document gate — verify before any dispatch.** Some persona reviewers lack shell access and cannot recover a path that only exists on an un-checked-out ref. Before Phase 2, confirm every resolved path is readable on disk (location doesn't matter — an absolute path outside the checkout or another worktree is valid). If any path is unreadable, do not dispatch personas: **interactive** — "Document(s) not found on disk: <paths>. If they only exist on another branch, check it out (or use a worktree) and re-invoke; otherwise correct the path(s)."; **headless** — "Review failed: document(s) not found on disk: <paths>. Check out the branch containing them (or pass paths to files on disk) and re-invoke."
 

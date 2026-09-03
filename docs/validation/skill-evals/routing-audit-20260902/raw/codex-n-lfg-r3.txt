@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求规划到绿 PR 的一条龙执行且过程不再询问，符合 spec-lfg 的显式触发条件。

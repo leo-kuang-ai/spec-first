@@ -65,3 +65,8 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-09-03T12:00	wt@e4f0aa06	spec-write-skill	-	92.5	pass	dim1-9	mirror patch 拒绝+source 指引双引擎;layer_result 八值合同;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-03T12:00	wt@e4f0aa06	spec-promote	-	91.0	pass	dim1-9	只产草稿不发布双引擎;shipped 多源推导或问;Spiral 受限 probe;零缺陷;红灯通过	darwin_rubric+skill-up
 2026-09-02T11:00	round2	16-skill	-	-	r2-variants	-	18 变体(16 对抗+2 正例):11 一次过(R1 修复泛化良好);新修 2(prd/audit debug-route,paired 各 3-0);顽固残留确证 5(debug/fix 收编跨 skill×引擎×轮次,文本层无效,移交上游路由);断言盲区 8 处修正	round2
+2026-09-02T17:00	wt@91b7b590	spec-debug	-	-	keep	dim2	description 补自包含 Not-for(settled plans/feature work→spec-work);依据=路由测评F1+静态体检排除条款11/37缺口;行为回归 prior-attempt-asks-first FAIL 但隔离A/B(还原改动重跑0/10同败)证伪改动因果,判环境性失效,挂起待复跑	routing_static+skillup_blocked_env
+2026-09-02T17:00	wt@91b7b590	spec-work	-	-	keep	dim2	description 补 Not-for(显式 PR-review-feedback→spec-resolve-pr-feedback);依据=路由测评 p-pr-feedback 0/3 误入work;行为回归 2/7 同上隔离证伪改动因果,环境性挂起	routing_static+skillup_blocked_env
+2026-09-02T17:00	wt@91b7b590	spec-simplify-code	-	-	keep	dim2	description 补 Not-for(new features/behavior changes);依据=静态体检;行为回归 2/4 隔离证伪改动因果,环境性挂起	routing_static+skillup_blocked_env
+2026-09-02T17:00	wt@91b7b590	spec-test-browser	-	-	keep	dim2	description 补触发句+Not-for(缺陷→spec-debug);依据=静态体检纯祈使句;行为回归 0/2 隔离证伪改动因果,环境性挂起	routing_static+skillup_blocked_env
+2026-09-02T17:00	wt@91b7b590	(governance)	-	-	keep	dim-routing	lang-policy.js 双语锚点硬规则(4缺失路由+Direct-Lane前置+ideate/brainstorm判别),AGENTS.md/CLAUDE.md 同源模块重生成;三引擎路由验收:glm 90.9→95.5%,sonnet-5 71.2→89.4%,定向误路由族(pr-feedback/brainstorm-ideate/fixintent/lfg/pov/failure-debug)全部清零;codex 补跑待网关恢复	routing_before_after_132

@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现路径与拆分未定，属于技术方案设计，符合 spec-plan 的入口场景。

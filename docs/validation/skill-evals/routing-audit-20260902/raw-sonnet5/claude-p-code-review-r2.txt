@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 用户明确要求评审当前分支的改动质量风险，属于 spec-code-review workflow 的核心场景（审查已完成代码变更的质量、安全、架构合规性）。

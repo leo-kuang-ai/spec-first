@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 请求过于抽象（未指明具体需求内容），无法路由到任何 spec-* workflow；需要先明确具体要做什么功能或修复

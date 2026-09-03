@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 目标用户与成功标准未定、需要上游产品想法梳理，属于 product discovery，正是 spec-ideate 的入口场景。

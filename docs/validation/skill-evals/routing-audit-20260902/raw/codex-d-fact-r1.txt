@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是当前仓库单文档的简单事实查询，属于无需 spec workflow 的有界读取任务。

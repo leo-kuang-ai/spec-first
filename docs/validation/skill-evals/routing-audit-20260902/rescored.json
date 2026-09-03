@@ -1,0 +1,25 @@
+{
+ "claude": {
+  "semantic": 0.9090909090909091,
+  "sem_correct": 60,
+  "n": 66,
+  "format_ok": 66,
+  "misroutes": [
+   "p-brainstorm:spec-brainstorm->spec-ideate",
+   "p-brainstorm:spec-brainstorm->spec-ideate",
+   "p-brainstorm:spec-brainstorm->spec-ideate",
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-work",
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-work",
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-work"
+  ]
+ },
+ "codex": {
+  "semantic": 0.9848484848484849,
+  "sem_correct": 65,
+  "n": 66,
+  "format_ok": 66,
+  "misroutes": [
+   "p-fixintent:spec-debug->direct"
+  ]
+ }
+}

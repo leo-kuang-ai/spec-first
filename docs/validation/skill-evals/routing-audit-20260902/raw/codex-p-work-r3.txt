@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 该请求是执行既定的 docs/plans 落地计划，属于已明确范围的实质性实施工作。

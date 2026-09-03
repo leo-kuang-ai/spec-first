@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 用户显式要求处理 GitHub PR review comments 并一条龙改完提交推送回复,治理规则规定此类信号必须进入对应入口,不得走 Direct Lane。

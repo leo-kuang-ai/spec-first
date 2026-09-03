@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现方案与拆步未定,正处于 Codebase→Plan→Tasks 链路中 Plan 节点,由 spec-plan 产出技术方案。

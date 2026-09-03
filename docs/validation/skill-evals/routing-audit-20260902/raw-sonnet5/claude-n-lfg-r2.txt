@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 请求要求端到端自主完成规划到绿 PR 且不再确认，对应 spec-work 的 autonomous end-to-end 落地入口，而非单点 skill 或需人工确认的 direct lane。

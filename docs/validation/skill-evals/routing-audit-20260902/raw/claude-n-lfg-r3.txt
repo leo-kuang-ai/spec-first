@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户以自己的话明确授权从规划一路自主执行到可合并的绿 PR 且中途不再询问,这正是 spec-lfg 专属的 hands-off 全管线授权,而非可由普通 workflow 推断的隐式许可。

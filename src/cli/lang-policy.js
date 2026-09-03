@@ -119,7 +119,9 @@ function buildZhProjectPolicy() {
 ${buildZhLanguageRules()}
 ### Workflow 入口治理
 ${WORKFLOW_ENTRY_ANCHOR}
-- 在执行实质性工作前，加载当前宿主已安装的 \`using-spec-first\` skill；完整入口路由与边界由该 skill 提供。`;
+- 在执行实质性工作前，加载当前宿主已安装的 \`using-spec-first\` skill；完整入口路由与边界由该 skill 提供。
+- 入口硬规则：存在失败、回归、flake、报错或明确修复意图（"修一下"、bug 引用）时必须进入 \`spec-debug\`，此类信号存在时不得走 Direct Lane；用户显式点名 workflow、要求处理 GitHub PR review 反馈、要求一条龙到绿 PR、要求外部技术采用裁决、要求跨会话交接时，必须进入对应入口（\`spec-resolve-pr-feedback\` / \`spec-lfg\` / \`spec-pov\` / \`spec-handoff\`），不得降级 Direct Lane。
+- definition 组判别：从零发散新方向用 \`spec-ideate\`；已有想法但目标用户或成功标准未定用 \`spec-brainstorm\`。`;
 }
 
 function buildEnProjectPolicy() {
@@ -128,7 +130,9 @@ function buildEnProjectPolicy() {
 ${buildEnLanguageRules()}
 ### Workflow Entry Governance
 ${WORKFLOW_ENTRY_ANCHOR}
-- Before substantial work, load the \`using-spec-first\` skill installed for the current host; that skill provides the full entry routing map and boundaries.`;
+- Before substantial work, load the \`using-spec-first\` skill installed for the current host; that skill provides the full entry routing map and boundaries.
+- Entry hard rules: failure, regression, flake, error output, or explicit fix intent ("fix this", a bug reference) must enter \`spec-debug\` — never Direct Lane while failure signals exist; when the user explicitly names a workflow, asks for GitHub PR-review-feedback handling, a hands-off run to a green PR, an adoption verdict on external tech, or a cross-session handoff, enter the matching entry (\`spec-resolve-pr-feedback\` / \`spec-lfg\` / \`spec-pov\` / \`spec-handoff\`) instead of Direct Lane.
+- Definition split: diverging brand-new directions uses \`spec-ideate\`; a known idea whose target users or success criteria are unsettled uses \`spec-brainstorm\`.`;
 }
 
 function buildZhUserLanguagePolicy() {

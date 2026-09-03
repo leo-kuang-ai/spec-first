@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单文案错别字修正，无需求理解、架构判断或验证流程，属于小任务 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求把当前工作进度打包成跨机器/跨会话交接文档以便明天无缝续作，正是 spec-handoff 的跨 session handoff 创建场景。

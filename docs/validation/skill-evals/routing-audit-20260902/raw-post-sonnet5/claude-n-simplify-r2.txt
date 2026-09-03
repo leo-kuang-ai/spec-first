@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 明确要求清理重复样板代码且不改变行为,属于纯 simplification 任务,匹配 spec-simplify-code 而非 debug/plan 等其他入口。

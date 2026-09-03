@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一符号的轻量事实查询(列出调用位置),不涉及实质性工作或修改,按入口治理规则走 Direct Lane。

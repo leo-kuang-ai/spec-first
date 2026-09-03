@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对既有 PRD 文档进行评审并直接修改，属于文档一致性/质量审查场景，对应 spec-doc-review 的入口范围。

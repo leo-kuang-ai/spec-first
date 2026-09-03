@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在明确的测试失败报错(pytest挂了+AttributeError),符合"存在失败、回归、flake、报错或明确修复意图时必须进入spec-debug"的硬规则,不得走Direct Lane。

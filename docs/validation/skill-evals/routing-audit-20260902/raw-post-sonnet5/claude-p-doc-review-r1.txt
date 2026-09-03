@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对已有方案文档（docs/plans/export-csv-plan.md）质量给评审意见，属于文档评审场景，对应 spec-doc-review。

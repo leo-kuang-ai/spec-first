@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求跨会话/跨机器交接工作进度,命中入口治理中"要求跨会话交接"的硬规则,必须进入 spec-handoff。

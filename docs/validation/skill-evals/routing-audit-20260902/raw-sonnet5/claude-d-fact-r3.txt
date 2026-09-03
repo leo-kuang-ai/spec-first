@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件 CHANGELOG.md 的只读事实查询,不涉及演化判断或副作用,属于 Direct Lane。

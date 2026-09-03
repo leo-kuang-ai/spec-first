@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现方式和拆解步骤未定，属于技术方案设计与任务拆分，对应 spec-plan 的规划职责。

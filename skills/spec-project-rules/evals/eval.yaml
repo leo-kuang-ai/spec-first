@@ -8,7 +8,7 @@ skills:
     path: .
 
 engine:
-  name: codex
+  name: claude_code
 
 cases:
   files:

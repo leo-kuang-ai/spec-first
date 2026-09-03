@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 明确的性能优化目标（800ms→200ms）加缓存,需要设计并跑可度量实验,属于 spec-optimize 覆盖场景而非模糊探索或调试修复。

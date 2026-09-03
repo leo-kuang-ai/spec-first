@@ -28,5 +28,8 @@
       "message": "Legacy slash command aliases are not valid user-visible entrypoints."
     }
   ],
-  "warnPatterns": []
+  "warnPatterns": [],
+  "ignoredPathFragments": [
+    "-workspace"
+  ]
 }

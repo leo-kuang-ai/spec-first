@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 运行环境配置与 MCP 检查属于系统设置任务，不涉及需求定义、代码实现或缺陷修复，应直接执行 `spec-first doctor` 和 `spec-first init` 等基础命令完成环境就绪检查。

@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 请求明确要求发散多个截然不同的方向、先发散不收敛，属于 spec-brainstorm 的典型场景，而非需要收敛结论的 spec-ideate。

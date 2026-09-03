@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 这是对已有 PRD 文档的评审并修改,属于文档评审类工作,应走 spec-doc-review 而非直接改动。

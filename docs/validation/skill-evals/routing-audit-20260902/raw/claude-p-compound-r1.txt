@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 已验证有效的根因与防回归经验属于知识沉淀/knowledge promotion,正是 spec-compound 知识捕获工作流的职责。

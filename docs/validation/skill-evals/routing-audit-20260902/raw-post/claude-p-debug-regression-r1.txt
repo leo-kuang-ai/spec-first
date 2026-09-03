@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户报告了一个明确的回归性 bug(上个版本导出功能正常、这版点击无反应),存在失败/报错信号,按治理规则的入口硬规则必须进入 spec-debug,不得走 Direct Lane。

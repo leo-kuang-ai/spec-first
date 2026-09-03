@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对既有方案文档质量的评审并给出意见,属于文档评审场景,非失败/修复/新架构判断,故路由到 spec-doc-review 而非 spec-debug 或其他 workflow。

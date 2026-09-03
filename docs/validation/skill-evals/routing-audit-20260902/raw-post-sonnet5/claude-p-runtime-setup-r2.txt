@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 该请求是环境/宿主/MCP 就绪检查与修复，属于 spec-runtime-setup 标准职责范围。

@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已确定,但实现方式和步骤拆分未定,属于技术方案与任务拆分诉求,应路由到 spec-plan。

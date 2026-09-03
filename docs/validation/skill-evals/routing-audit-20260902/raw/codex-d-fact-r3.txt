@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是简单事实查询，读取 CHANGELOG 即可，不涉及实质性 spec-first 演化或公共 workflow。

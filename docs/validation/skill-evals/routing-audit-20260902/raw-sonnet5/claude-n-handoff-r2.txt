@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 这是跨机器/跨会话的工作交接场景，需要生成带 summary、source refs、freshness 的 handoff artifact，属于 handoff gate 覆盖范围。

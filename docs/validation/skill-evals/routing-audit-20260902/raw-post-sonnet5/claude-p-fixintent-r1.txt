@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户明确表示"实现得不对"并要求"修一下"，属于修复意图，根据入口硬规则必须进入 spec-debug，不得走 Direct Lane。

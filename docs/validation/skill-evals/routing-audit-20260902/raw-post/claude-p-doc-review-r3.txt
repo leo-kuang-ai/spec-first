@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求评审单份已存在的方案文档质量并给意见,属于文档评审场景。

@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 该请求需要对 GraphQL 这一外部技术选型给出以当前系统现状为依据的明确项目性裁决。

@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 依据 review comments 进行本地修改属于实质性代码执行工作，且用户已显式授权 commit/push/回复评论，应走 spec-work 执行工作流（经其内部 landing helper 完成提交与 PR 回复），而非 Direct Lane 或独立 skill。

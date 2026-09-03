@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 对最近改动做保持行为不变的去重/简化整理，正是 spec-simplify-code 明确覆盖的 tidy/refactor 场景。

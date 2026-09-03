@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 该请求要求对「是否从 REST 迁移到 GraphQL」这一外部技术选型给出结合当前系统现状的明确裁决，正是 spec-pov 定义的 project-grounded verdict 场景。

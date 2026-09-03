@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户描述了功能回归(上个版本正常、这版按钮无响应)的明确修复意图,触发入口硬规则,必须进入 spec-debug 而非 Direct Lane。

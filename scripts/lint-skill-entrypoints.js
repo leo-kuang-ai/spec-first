@@ -18,6 +18,7 @@ function loadConfig() {
       ? raw.markdownExtensions
       : DEFAULT_MARKDOWN_EXTENSIONS,
     ignoredLineContains: Array.isArray(raw.ignoredLineContains) ? raw.ignoredLineContains : [],
+    ignoredPathFragments: Array.isArray(raw.ignoredPathFragments) ? raw.ignoredPathFragments : [],
     blockedPatterns: Array.isArray(raw.blockedPatterns) ? raw.blockedPatterns : [],
     warnPatterns: Array.isArray(raw.warnPatterns) ? raw.warnPatterns : [],
   };
@@ -134,6 +135,9 @@ function collectFiles(config = loadConfig()) {
     }
 
     walk(absoluteRoot, (filePath) => {
+      if (config.ignoredPathFragments.some((fragment) => filePath.includes(fragment))) {
+        return;
+      }
       if (config.markdownExtensions.includes(path.extname(filePath))) {
         files.push(filePath);
       }

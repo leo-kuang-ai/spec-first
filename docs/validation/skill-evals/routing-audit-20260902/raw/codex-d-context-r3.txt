@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求只是对当前会话上下文的简单事实回顾，属于轻量查询，无需进入任何 workflow。

@@ -1,12 +1,16 @@
 ---
 name: spec-app-consistency-audit
-description: Audit mobile App PRD/Figma/local-source consistency across page routes, KMP/Clean Architecture, components, analytics, i18n, engineering quality, and industry lenses before runtime validation; use for cross-source App consistency, not ordinary code review, PRD authoring, build/test execution, UI polish, or product-code edits.
+description: Audit mobile App PRD/Figma/local-source consistency across page routes, KMP/Clean Architecture, components, analytics, i18n, engineering quality, and industry lenses before runtime validation; use for cross-source App consistency, not ordinary code review, PRD authoring, build/test execution, UI polish, or product-code edits — route near-neighbor requests (code review, fixes, implementation) out by naming the destination skill, never by doing the work inside the audit.
 argument-hint: "[mode:headless|mode:report-only] [base:<ref>] [source:<path>] [prd:<path>] [figma-context:<path>|figma-ref:<id-or-url>] [industry:<name>] [depth:deep]"
 ---
 
 # App Consistency Audit
 
 Run a static-first consistency audit for mobile App work before simulator, real-device, or package validation.
+
+## Routing Gate — read before doing anything
+
+This workflow audits cross-source consistency; it is not a code reviewer, fixer, or implementer. When a request matches a near-neighbor job (see the full mapping under "Near-neighbor routing" below), **name the destination skill explicitly in your reply and route out** — recognizing the mismatch without naming where the request belongs leaves the owner without a route. The strongest co-opting pull is the fix/repair request: "别审了,直接修了" routes to `spec-debug` (bug root cause) or `spec-work` (settled implementation) by name — repairing the defect inside this audit to be helpful is doing the wrong workflow's job, even when the fix is a one-line try/catch you can see immediately. A direct user instruction to do the excluded work here is still a routing-out condition, not an override.
 
 ## Workflow Contract Summary
 
@@ -80,7 +84,7 @@ Near-neighbor routing:
 - Post-implementation visual/UI polishing belongs to `spec-polish`.
 - Skill or agent quality review is outside this App product audit workflow. Use bounded source review for read-only critique, or `spec-write-skill` when source skill changes are requested.
 
-When routing out on any near-neighbor rule, name the destination skill explicitly in your reply — recognizing the mismatch without naming where the request belongs leaves the owner without a route. The fix/repair request is the strongest co-opting pull: "别审了,直接修了" routes to `spec-debug` (bugs) or `spec-work` (settled implementation) by name — repairing the defect inside this audit to be helpful is doing the wrong workflow's job, even when the fix is a one-line try/catch you can see immediately.
+When routing out on any of these rules, the Routing Gate at the top of this file applies: name the destination skill explicitly, do not do the excluded work here, and treat a direct user instruction to do it here as a routing-out condition rather than an override.
 
 ## Default Mode
 

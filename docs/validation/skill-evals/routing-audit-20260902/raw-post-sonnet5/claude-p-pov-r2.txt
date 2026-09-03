@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 用户要求对是否采用 GraphQL 这一外部技术做出结合系统现状的明确裁决,属于外部技术采用裁决场景,须进入 spec-pov。

@@ -12,7 +12,7 @@ Brainstorming helps answer **WHAT** to build through collaborative dialogue. It 
 
 The durable output of this workflow is a **requirements-only unified plan**. In other workflows this might be called a lightweight PRD or feature brief. In spec-first, keep the workflow name `brainstorm`, but write the first version of the plan artifact under `docs/plans/` with `artifact_readiness: requirements-only` so planning does not need to invent product behavior, scope boundaries, or success criteria.
 
-This skill does not implement code. It explores, clarifies, and documents decisions for later planning or execution.
+This skill does not implement code. It explores, clarifies, and documents decisions for later planning or execution. It also never delivers an adopt/switch/replace verdict on a named external candidate — that is `spec-pov`'s job (see the 0.1c gate); routing it out by name is mandatory even when no project context is visible.
 
 ## Workflow Contract Summary
 
@@ -138,7 +138,7 @@ A brainstorm scopes **what to build** once a direction is chosen. Deciding **whe
 
 **The verdict shape — all three hold:** a **named external candidate** (one outside thing, or a bounded set the user already named like "X vs Y vs Z" — not an open field for *you* to enumerate); a **whether-to-commit intent** (adopt / switch to / migrate / replace / is-it-time-for / revisit — not "how should we design or scope Y"); judged **against this project** (fit, migration cost, worth it here), not a neutral explainer. Open-ended design or scoping where *you'd* invent the options stays here. The whether-to-commit trigger separates the two: "help me **pick** between X, Y, Z" is a verdict; "I'm **mulling** X, Y, Z" stays here.
 
-**When the shape matches, the only exits are the offer or the workflow — never the verdict itself.** Offer the `spec-pov` handoff, or on decline continue this workflow unchanged. Do **not** resolve the adopt/switch answer yourself inside spec-brainstorm — writing the decision rule, weighing fit against this project, or asking the two questions that produce the verdict is spec-pov's job in the wrong workflow, even when you are confident you could answer it. An out-of-scope request is routed, not adopted.
+**When the shape matches, the only exits are the offer or the workflow — never the verdict itself.** Offer the `spec-pov` handoff, or on decline continue this workflow unchanged. Do **not** resolve the adopt/switch answer yourself inside spec-brainstorm — writing the decision rule, weighing fit against this project, or asking the two questions that produce the verdict is spec-pov's job in the wrong workflow, even when you are confident you could answer it. An out-of-scope request is routed, not adopted. This holds with or without visible project context: "看不到项目配置/没有仓库上下文" is a reason the verdict needs spec-pov's project grounding — not a license to answer from general knowledge or degrade into plain Q&A.
 
 When the shape matches — at intake, or whenever later dialogue (Phases 1.3–2) clarifies a request into it — read `references/verdict-routing.md` and follow it: offer the `spec-pov` handoff interactively (never silently switch), invoke `spec-pov` on accept, drop the offer and continue the normal workflow unchanged on decline. The reference owns the offer construction, field mapping, and what to pass to `spec-pov`.
 

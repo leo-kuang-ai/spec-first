@@ -18,7 +18,7 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 ## When Not To Use
 
 - 不使用本 skill：用户要审查当前 diff、修复代码、重构、调试、写 lint/format 配置、生成通用语言规范，或治理 confirmed team policy。
-- 近邻路由：confirmed team policy governance 已退役，不再提供专用入口；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`；创建或修改 spec-first source skill 走 `spec-write-skill`。命中近邻路由时必须在回复中点名目的地 skill——只解释不匹配而不指路,owner 依然无路可走。
+- 近邻路由：confirmed team policy governance 已退役，不再提供专用入口；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`（bug 根因排查走 `spec-debug`）；创建或修改 spec-first source skill 走 `spec-write-skill`。命中近邻路由时必须在回复中点名目的地 skill（例如：「这是代码评审请求，属于 `spec-code-review`」）——只解释不匹配而不指路，owner 依然无路可走。点名之后不得在本会话内替目的地干活：直接修 bug、直接做代码评审、直接实现需求，都是把别的 workflow 的职责搬进 rule-miner 执行；用户的即时指令（「顺手修了」「直接审了」）不构成跨 workflow 代行授权——正确动作始终是点名目的地并交还路由。
 
 ## Inputs
 

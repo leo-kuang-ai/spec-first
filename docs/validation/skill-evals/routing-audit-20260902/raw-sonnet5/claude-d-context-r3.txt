@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 用户询问的是本会话历史事实(元问题),不涉及本仓库代码/spec/plan/skill 的实质性工作,不需要经过任何 spec-* workflow 或 standalone skill。

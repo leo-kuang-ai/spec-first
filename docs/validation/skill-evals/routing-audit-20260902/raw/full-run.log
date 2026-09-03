@@ -1,0 +1,191 @@
+[1/132] claude p-debug-stack -> spec-debug
+[2/132] claude p-debug-stack -> spec-debug
+[3/132] claude p-debug-stack -> spec-debug
+[4/132] claude p-debug-regression -> spec-debug
+[5/132] claude p-debug-regression -> spec-debug
+[6/132] claude p-code-review -> spec-code-review
+[7/132] claude p-code-review -> spec-code-review
+[8/132] claude p-debug-regression -> [unparsed]
+[9/132] claude p-code-review -> spec-code-review
+[10/132] claude p-doc-review -> spec-doc-review
+[11/132] claude p-doc-review -> spec-doc-review
+[12/132] claude p-doc-review -> spec-doc-review
+[13/132] claude p-plan -> spec-plan
+[14/132] claude p-plan -> [unparsed]
+[15/132] claude p-work -> spec-work
+[16/132] claude p-plan -> spec-plan
+[17/132] claude p-work -> spec-work
+[18/132] claude p-work -> spec-work
+[19/132] claude p-compound -> spec-compound
+[20/132] claude p-compound -> spec-compound
+[21/132] claude p-compound -> spec-compound
+[22/132] claude p-runtime-setup -> spec-runtime-setup
+[23/132] claude p-runtime-setup -> spec-runtime-setup
+[24/132] claude p-runtime-setup -> spec-runtime-setup
+[25/132] claude p-brainstorm -> spec-ideate
+[26/132] claude p-brainstorm -> spec-ideate
+[27/132] claude p-brainstorm -> spec-ideate
+[28/132] claude p-pr-feedback -> spec-work
+[29/132] claude p-pr-feedback -> spec-work
+[30/132] claude p-pr-feedback -> spec-work
+[31/132] claude p-pov -> spec-pov
+[32/132] claude p-pov -> spec-pov
+[33/132] claude p-pov -> spec-pov
+[34/132] claude p-fixintent -> spec-debug
+[35/132] claude p-fixintent -> spec-debug
+[36/132] claude p-fixintent -> spec-debug
+[37/132] claude n-review-fix -> [unparsed]
+[38/132] claude n-simplify -> spec-simplify-code
+[39/132] claude n-review-fix -> spec-doc-review
+[40/132] claude n-review-fix -> spec-doc-review
+[41/132] claude n-simplify -> spec-simplify-code
+[42/132] claude n-optimize -> spec-optimize
+[43/132] claude n-simplify -> spec-simplify-code
+[44/132] claude n-handoff -> spec-handoff
+[45/132] claude n-optimize -> spec-optimize
+[46/132] claude n-optimize -> [unparsed]
+[47/132] claude n-lfg -> spec-lfg
+[48/132] claude n-handoff -> spec-handoff
+[49/132] claude n-handoff -> spec-handoff
+[50/132] claude n-ideate -> spec-ideate
+[51/132] claude n-lfg -> spec-lfg
+[52/132] claude n-ideate -> [unparsed]
+[53/132] claude d-fact -> direct
+[54/132] claude d-fact -> direct
+[55/132] claude n-ideate -> [unparsed]
+[56/132] claude n-lfg -> spec-lfg
+[57/132] claude d-fact -> direct
+[58/132] claude d-lookup -> direct
+[59/132] claude d-lookup -> direct
+[60/132] claude d-lookup -> direct
+[61/132] claude d-context -> direct
+[62/132] claude d-context -> direct
+[63/132] claude d-context -> [unparsed]
+[64/132] claude d-typo -> direct
+[65/132] claude d-typo -> direct
+[66/132] claude d-typo -> direct
+[67/132] codex p-debug-stack -> spec-debug
+[68/132] codex p-debug-stack -> spec-debug
+[69/132] codex p-debug-stack -> spec-debug
+[70/132] codex p-debug-regression -> spec-debug
+[71/132] codex p-debug-regression -> spec-debug
+[72/132] codex p-debug-regression -> spec-debug
+[73/132] codex p-code-review -> spec-code-review
+[74/132] codex p-code-review -> spec-code-review
+[75/132] codex p-code-review -> spec-code-review
+[76/132] codex p-doc-review -> spec-doc-review
+[77/132] codex p-doc-review -> spec-doc-review
+[78/132] codex p-doc-review -> spec-doc-review
+[79/132] codex p-plan -> spec-plan
+[80/132] codex p-plan -> spec-plan
+[81/132] codex p-plan -> spec-plan
+[82/132] codex p-work -> spec-work
+[83/132] codex p-work -> spec-work
+[84/132] codex p-work -> spec-work
+[85/132] codex p-compound -> spec-compound
+[86/132] codex p-compound -> spec-compound
+[87/132] codex p-compound -> spec-compound
+[88/132] codex p-runtime-setup -> spec-runtime-setup
+[89/132] codex p-runtime-setup -> spec-runtime-setup
+[90/132] codex p-runtime-setup -> spec-runtime-setup
+[91/132] codex p-brainstorm -> spec-brainstorm
+[92/132] codex p-brainstorm -> spec-brainstorm
+[93/132] codex p-brainstorm -> spec-brainstorm
+[94/132] codex p-pr-feedback -> spec-resolve-pr-feedback
+[95/132] codex p-pr-feedback -> spec-resolve-pr-feedback
+[96/132] codex p-pr-feedback -> spec-resolve-pr-feedback
+[97/132] codex p-pov -> spec-pov
+[98/132] codex p-pov -> spec-pov
+[99/132] codex p-pov -> spec-pov
+[100/132] codex p-fixintent -> spec-debug
+[101/132] codex p-fixintent -> spec-debug
+[102/132] codex n-review-fix -> spec-doc-review
+[103/132] codex n-review-fix -> spec-doc-review
+[104/132] codex p-fixintent -> direct
+[105/132] codex n-simplify -> spec-simplify-code
+[106/132] codex n-simplify -> spec-simplify-code
+[107/132] codex n-optimize -> spec-optimize
+[108/132] codex n-simplify -> spec-simplify-code
+[109/132] codex n-review-fix -> spec-doc-review
+[110/132] codex n-optimize -> spec-optimize
+[111/132] codex n-optimize -> spec-optimize
+[112/132] codex n-handoff -> spec-handoff
+[113/132] codex n-handoff -> spec-handoff
+[114/132] codex n-handoff -> spec-handoff
+[115/132] codex n-lfg -> spec-lfg
+[116/132] codex n-lfg -> spec-lfg
+[117/132] codex n-lfg -> spec-lfg
+[118/132] codex n-ideate -> spec-ideate
+[119/132] codex n-ideate -> spec-ideate
+[120/132] codex n-ideate -> spec-ideate
+[121/132] codex d-fact -> direct
+[122/132] codex d-fact -> direct
+[123/132] codex d-fact -> direct
+[124/132] codex d-lookup -> direct
+[125/132] codex d-lookup -> direct
+[126/132] codex d-lookup -> direct
+[127/132] codex d-context -> direct
+[128/132] codex d-context -> direct
+[129/132] codex d-context -> direct
+[130/132] codex d-typo -> direct
+[131/132] codex d-typo -> direct
+[132/132] codex d-typo -> direct
+{
+ "claude": {
+  "overall_acc": 0.803,
+  "by_group": {
+   "P": {
+    "n": 36,
+    "correct": 28,
+    "acc": 0.778
+   },
+   "N": {
+    "n": 18,
+    "correct": 14,
+    "acc": 0.778
+   },
+   "D": {
+    "n": 12,
+    "correct": 11,
+    "acc": 0.917
+   }
+  },
+  "confusions": {
+   "p-debug-regression: spec-debug -> [unparsed]": 1,
+   "p-plan: spec-plan -> [unparsed]": 1,
+   "p-brainstorm: spec-brainstorm -> spec-ideate": 3,
+   "p-pr-feedback: spec-resolve-pr-feedback -> spec-work": 3,
+   "n-review-fix: spec-doc-review -> [unparsed]": 1,
+   "n-optimize: spec-optimize -> [unparsed]": 1,
+   "n-ideate: spec-ideate -> [unparsed]": 2,
+   "d-context: direct -> [unparsed]": 1
+  },
+  "unparsed": 7,
+  "avg_dur_s": 9.3
+ },
+ "codex": {
+  "overall_acc": 0.985,
+  "by_group": {
+   "P": {
+    "n": 36,
+    "correct": 35,
+    "acc": 0.972
+   },
+   "N": {
+    "n": 18,
+    "correct": 18,
+    "acc": 1.0
+   },
+   "D": {
+    "n": 12,
+    "correct": 12,
+    "acc": 1.0
+   }
+  },
+  "confusions": {
+   "p-fixintent: spec-debug -> direct": 1
+  },
+  "unparsed": 0,
+  "avg_dur_s": 8.3
+ }
+}

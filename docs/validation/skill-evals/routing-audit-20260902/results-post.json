@@ -1,0 +1,627 @@
+{
+ "records": [
+  {
+   "engine": "claude",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 9.3
+  },
+  {
+   "engine": "claude",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 9.5
+  },
+  {
+   "engine": "claude",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 10.1
+  },
+  {
+   "engine": "claude",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 8.6
+  },
+  {
+   "engine": "claude",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 10.3
+  },
+  {
+   "engine": "claude",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 9.8
+  },
+  {
+   "engine": "claude",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "dur_s": 9.7
+  },
+  {
+   "engine": "claude",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "dur_s": 9.7
+  },
+  {
+   "engine": "claude",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "direct",
+   "ok": false,
+   "dur_s": 10.1
+  },
+  {
+   "engine": "claude",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 10.6
+  },
+  {
+   "engine": "claude",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 10.9
+  },
+  {
+   "engine": "claude",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "dur_s": 8.2
+  },
+  {
+   "engine": "claude",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "dur_s": 7.9
+  },
+  {
+   "engine": "claude",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "dur_s": 7.9
+  },
+  {
+   "engine": "claude",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "spec-work",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "spec-work",
+   "ok": true,
+   "dur_s": 7.5
+  },
+  {
+   "engine": "claude",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "spec-work",
+   "ok": true,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-compound",
+   "ok": true,
+   "dur_s": 10.5
+  },
+  {
+   "engine": "claude",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-compound",
+   "ok": true,
+   "dur_s": 12.0
+  },
+  {
+   "engine": "claude",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "spec-runtime-setup",
+   "ok": true,
+   "dur_s": 9.6
+  },
+  {
+   "engine": "claude",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-compound",
+   "ok": true,
+   "dur_s": 21.3
+  },
+  {
+   "engine": "claude",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "direct",
+   "ok": false,
+   "dur_s": 11.1
+  },
+  {
+   "engine": "claude",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "spec-runtime-setup",
+   "ok": true,
+   "dur_s": 11.6
+  },
+  {
+   "engine": "claude",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "dur_s": 11.0
+  },
+  {
+   "engine": "claude",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "dur_s": 8.8
+  },
+  {
+   "engine": "claude",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "dur_s": 6.7
+  },
+  {
+   "engine": "claude",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "dur_s": 9.1
+  },
+  {
+   "engine": "claude",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "dur_s": 9.5
+  },
+  {
+   "engine": "claude",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "dur_s": 9.7
+  },
+  {
+   "engine": "claude",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "dur_s": 9.3
+  },
+  {
+   "engine": "claude",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "dur_s": 7.8
+  },
+  {
+   "engine": "claude",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "dur_s": 9.9
+  },
+  {
+   "engine": "claude",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 12.0
+  },
+  {
+   "engine": "claude",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 17.4
+  },
+  {
+   "engine": "claude",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 14.2
+  },
+  {
+   "engine": "claude",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 7.2
+  },
+  {
+   "engine": "claude",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 7.4
+  },
+  {
+   "engine": "claude",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "direct",
+   "ok": false,
+   "dur_s": 10.5
+  },
+  {
+   "engine": "claude",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "spec-simplify-code",
+   "ok": true,
+   "dur_s": 7.0
+  },
+  {
+   "engine": "claude",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "spec-simplify-code",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-optimize",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-optimize",
+   "ok": true,
+   "dur_s": 11.5
+  },
+  {
+   "engine": "claude",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-optimize",
+   "ok": true,
+   "dur_s": 8.0
+  },
+  {
+   "engine": "claude",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "dur_s": 10.8
+  },
+  {
+   "engine": "claude",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "dur_s": 10.1
+  },
+  {
+   "engine": "claude",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "dur_s": 9.7
+  },
+  {
+   "engine": "claude",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "dur_s": 7.8
+  },
+  {
+   "engine": "claude",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "dur_s": 10.5
+  },
+  {
+   "engine": "claude",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "dur_s": 11.5
+  },
+  {
+   "engine": "claude",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "dur_s": 10.4
+  },
+  {
+   "engine": "claude",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "dur_s": 8.8
+  },
+  {
+   "engine": "claude",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "dur_s": 13.0
+  },
+  {
+   "engine": "claude",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 10.9
+  },
+  {
+   "engine": "claude",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.9
+  },
+  {
+   "engine": "claude",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.9
+  },
+  {
+   "engine": "claude",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.3
+  },
+  {
+   "engine": "claude",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 9.4
+  },
+  {
+   "engine": "claude",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 9.6
+  },
+  {
+   "engine": "claude",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.4
+  },
+  {
+   "engine": "claude",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 9.9
+  },
+  {
+   "engine": "claude",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 49.5
+  }
+ ],
+ "summary": {
+  "claude": {
+   "overall_acc": 0.955,
+   "by_group": {
+    "P": {
+     "n": 36,
+     "correct": 34,
+     "acc": 0.944
+    },
+    "N": {
+     "n": 18,
+     "correct": 17,
+     "acc": 0.944
+    },
+    "D": {
+     "n": 12,
+     "correct": 12,
+     "acc": 1.0
+    }
+   },
+   "confusions": {
+    "p-doc-review: spec-doc-review -> direct": 1,
+    "p-runtime-setup: spec-runtime-setup -> direct": 1,
+    "n-simplify: spec-simplify-code -> direct": 1
+   },
+   "unparsed": 0,
+   "avg_dur_s": 10.3
+  }
+ }
+}

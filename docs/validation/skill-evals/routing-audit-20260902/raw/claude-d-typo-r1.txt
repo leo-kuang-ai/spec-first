@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件单处错别字修正属于明确限定范围的低风险小改动，按治理规则直接执行（Direct Lane），无需走 spec-* workflow，仅需遵守 CHANGELOG 与 source-of-truth 边界纪律。

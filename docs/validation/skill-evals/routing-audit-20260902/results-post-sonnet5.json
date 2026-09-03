@@ -1,0 +1,631 @@
+{
+ "records": [
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 8.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 10.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 11.5
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 10.0
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "dur_s": 7.8
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 20.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "dur_s": 8.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 25.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "dur_s": 9.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 8.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "dur_s": 7.5
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "dur_s": 8.5
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "spec-plan",
+   "ok": false,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "direct",
+   "ok": false,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "spec-work",
+   "ok": true,
+   "dur_s": 7.8
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-rule-miner",
+   "ok": false,
+   "dur_s": 8.0
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-promote",
+   "ok": false,
+   "dur_s": 8.5
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-compound",
+   "ok": true,
+   "dur_s": 10.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "spec-runtime-setup",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "spec-runtime-setup",
+   "ok": true,
+   "dur_s": 7.0
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "dur_s": 7.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "spec-runtime-setup",
+   "ok": true,
+   "dur_s": 10.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "dur_s": 8.9
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "dur_s": 8.5
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "dur_s": 8.8
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "dur_s": 8.9
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 7.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "dur_s": 8.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "dur_s": 13.8
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 7.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "dur_s": 7.8
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 10.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 8.2
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "dur_s": 9.5
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "direct",
+   "ok": false,
+   "dur_s": 9.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "spec-simplify-code",
+   "ok": true,
+   "dur_s": 7.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "spec-simplify-code",
+   "ok": true,
+   "dur_s": 7.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-optimize",
+   "ok": true,
+   "dur_s": 7.2
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-debug",
+   "ok": false,
+   "dur_s": 9.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-plan",
+   "ok": false,
+   "dur_s": 9.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "dur_s": 10.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "dur_s": 7.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "dur_s": 11.2
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "dur_s": 7.9
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "dur_s": 8.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "dur_s": 17.6
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "dur_s": 7.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 9.0
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.7
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.8
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 10.0
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.2
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.2
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 7.3
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 8.1
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 10.4
+  },
+  {
+   "engine": "claude:claude-sonnet-5",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "dur_s": 9.2
+  }
+ ],
+ "summary": {
+  "claude": {
+   "overall_acc": 0.894,
+   "by_group": {
+    "P": {
+     "n": 36,
+     "correct": 32,
+     "acc": 0.889
+    },
+    "N": {
+     "n": 18,
+     "correct": 15,
+     "acc": 0.833
+    },
+    "D": {
+     "n": 12,
+     "correct": 12,
+     "acc": 1.0
+    }
+   },
+   "confusions": {
+    "p-work: spec-work -> spec-plan": 1,
+    "p-work: spec-work -> direct": 1,
+    "p-compound: spec-compound -> spec-rule-miner": 1,
+    "p-compound: spec-compound -> spec-promote": 1,
+    "n-simplify: spec-simplify-code -> direct": 1,
+    "n-optimize: spec-optimize -> spec-debug": 1,
+    "n-optimize: spec-optimize -> spec-plan": 1
+   },
+   "unparsed": 0,
+   "avg_dur_s": 9.2
+  }
+ }
+}

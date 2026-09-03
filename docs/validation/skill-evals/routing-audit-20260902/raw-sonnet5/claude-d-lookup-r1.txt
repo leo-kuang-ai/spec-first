@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是一次只读的代码定位查询,属于 Direct Lane,无需经过 spec-* workflow。

@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 性能优化实验属于需要度量基线/改动/复测证据的可验证性能工作，匹配 spec-optimize 而非通用 direct 编码。

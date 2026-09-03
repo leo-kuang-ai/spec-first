@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求是关于接口性能优化和实验设计的通用技术咨询,不涉及 spec-first 仓库自身的代码变更、需求分析、架构设计或 workflow 执行,应由 general-purpose assistant 直接处理。

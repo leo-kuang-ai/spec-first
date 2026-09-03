@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定而实现方案与任务拆解未定,正是 Codebase->Spec->Plan 链路中 Plan 节点的输入,应走 spec-plan 规划工作流产出技术方案。

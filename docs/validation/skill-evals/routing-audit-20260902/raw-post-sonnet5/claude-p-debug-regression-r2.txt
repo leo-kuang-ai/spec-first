@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在明确的回归/报错信号(上版正常、这版按钮无反应),入口硬规则要求此类信号必须进入 spec-debug,不得走 Direct Lane。

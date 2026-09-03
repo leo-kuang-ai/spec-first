@@ -1,6 +1,6 @@
 ---
 name: spec-debug
-description: 'Diagnosis loop for bugs and failing behavior. Use for errors, stack traces, regressions, failed tests, issue-tracker bugs, stuck investigations after failed fixes, or asks to debug/fix a bug.'
+description: 'Diagnosis loop for bugs and failing behavior. Use for errors, stack traces, regressions, failed tests, issue-tracker bugs, stuck investigations after failed fixes, or asks to debug/fix a bug. Not for executing settled plans or feature work — route those to spec-work.'
 argument-hint: "[issue reference, error message, test path, or description of broken behavior]"
 ---
 

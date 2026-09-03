@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 请求是安装/检查/配置 spec-first 工作流所需的 harness runtime 就绪状态（MCP providers 与宿主配置），正是 spec-runtime-setup skill 的专属职责，无需走需求/计划类 workflow 或 Direct Lane。

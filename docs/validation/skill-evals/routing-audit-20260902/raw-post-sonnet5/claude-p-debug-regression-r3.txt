@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 明确的功能回归("上个版本还是好的,这版没反应")属于入口硬规则中的失败/回归信号,必须进入 spec-debug,不得走 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单个 README 文档中的明确错别字修正属于限定范围的低风险直接修改，无需进入 spec-* 工作流。

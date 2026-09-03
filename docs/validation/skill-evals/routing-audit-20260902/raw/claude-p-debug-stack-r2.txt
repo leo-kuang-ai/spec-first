@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 测试报错 AttributeError 属于失败根因排查与修复类调试工作,治理规则要求路由到公共 spec-debug workflow 而非 Direct Lane。

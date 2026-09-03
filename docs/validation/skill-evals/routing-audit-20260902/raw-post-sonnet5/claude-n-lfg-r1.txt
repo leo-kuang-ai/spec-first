@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求端到端交付到绿 PR 且过程中不再确认,匹配"要求一条龙到绿 PR"必须进入 spec-lfg 的入口硬规则。

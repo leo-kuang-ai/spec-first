@@ -8,7 +8,7 @@ description: |
 
 input:
   prompt: |
-    （spec-brainstorm skill 已安装，请按它工作。）
+    （skill-up 评测框架说明：本仓库 .claude/skills/spec-brainstorm/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）
     我们这个项目现在用 ESLint,要不要换成 Biome?帮我决定。
 
 expect:

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单字错别字修正属于小任务文案修正,无架构风险,可直接执行并保持CHANGELOG等纪律

@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散多个截然不同的新方向、明确要求先发散别收敛，属于 spec-ideate 而非已有想法待收敛的 spec-brainstorm。

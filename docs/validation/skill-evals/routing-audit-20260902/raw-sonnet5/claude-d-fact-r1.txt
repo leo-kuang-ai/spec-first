@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 查询 CHANGELOG.md 中已存在的最新版本号是简单事实读取,不涉及演化判断或治理决策,属于 Direct Lane。

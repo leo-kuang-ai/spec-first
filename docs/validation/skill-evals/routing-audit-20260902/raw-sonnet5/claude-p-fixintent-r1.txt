@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件已定位函数的具体 bug 修复,属于小范围直接修复,不涉及架构/契约/跨模块演化判断,走 Direct Lane 而非 spec-* workflow。

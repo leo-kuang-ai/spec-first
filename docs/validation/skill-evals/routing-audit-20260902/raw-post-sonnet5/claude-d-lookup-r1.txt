@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是纯只读的符号调用位置查询，无修复/回归/发散/裁决/交接信号，属于 Explore/Direct Lane 范畴，不涉及 spec-first 演化或架构判断。

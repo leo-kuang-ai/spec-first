@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 请求是按既有 plan 文档执行落地，属于 Codebase→Plan→Code 链路的执行节点，应路由到 spec-work 执行 workflow。

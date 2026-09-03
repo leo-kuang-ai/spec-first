@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单事实问答，查询函数调用位置，无需完整 workflow，直接使用 grep 或 Graphify 定向即可。

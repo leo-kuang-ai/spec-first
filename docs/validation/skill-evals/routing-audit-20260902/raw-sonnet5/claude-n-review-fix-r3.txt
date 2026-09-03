@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对一份 PRD/plan 文档做质量评审并修复问题,属于 spec-doc-review 的文档评审入口场景。

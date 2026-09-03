@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 用户明确要求处理 GitHub PR review 反馈并完成本地修改、提交、推送和回复的完整闭环，符合 `spec-resolve-pr-feedback` 的职责范围。

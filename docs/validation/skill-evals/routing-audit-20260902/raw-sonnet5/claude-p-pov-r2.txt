@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 这是需要结合当前系统现状做架构取舍判断（REST vs GraphQL）、非确定性可判定的开放性决策问题，属于探索性判断而非确定性执行，适合 spec-brainstorm 而非 direct 或其他执行类 workflow。

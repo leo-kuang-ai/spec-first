@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是已限定在 README.md 的单处低风险文案修正，属于 Direct Lane。

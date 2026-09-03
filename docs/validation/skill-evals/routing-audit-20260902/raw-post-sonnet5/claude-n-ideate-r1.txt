@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散多个新方向、要求"越意外越好""先发散别收敛",属于definition组判别中"从零发散新方向"场景，对应 spec-ideate。

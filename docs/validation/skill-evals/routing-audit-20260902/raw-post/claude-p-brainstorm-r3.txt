@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 已有产品想法但目标用户与成功标准未定,符合 spec-brainstorm 而非从零发散的 spec-ideate。

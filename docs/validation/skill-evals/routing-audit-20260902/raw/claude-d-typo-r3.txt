@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件单字错别字修正是典型小任务(clearly scoped low-risk edit),按任务分级与入口治理直接执行即可,无需 public spec-* workflow。

@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 用户明确请求对当前分支的 12 个文件改动进行质量风险评审，这是代码审查场景，应使用 spec-code-review workflow。

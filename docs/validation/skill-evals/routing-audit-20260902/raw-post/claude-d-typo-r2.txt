@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文档内的显性错别字纠正是最窄范围的低风险编辑，属于 Direct Lane。

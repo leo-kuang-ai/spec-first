@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求从规划到绿 PR 全程一条龙、不再中途确认，属于 spec-lfg 的显式点名场景，不得降级 Direct Lane。

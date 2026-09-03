@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 目标用户和成功标准尚未想清楚,属于发散澄清阶段,应先用 spec-brainstorm 捋清问题再进入 spec-prd/plan。

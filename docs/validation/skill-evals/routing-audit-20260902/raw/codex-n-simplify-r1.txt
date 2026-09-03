@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 这是针对最近变更的行为保持型样板代码简化，匹配 spec-simplify-code 的 tidy/refactor 范围。

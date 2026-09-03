@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求是当前会话上下文内的轻量事实问答,不涉及实质性工作或任何文件读写,按治理规则属于 Direct Lane。

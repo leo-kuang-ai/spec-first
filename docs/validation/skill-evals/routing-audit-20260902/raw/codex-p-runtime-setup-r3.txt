@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 该请求是运行环境、MCP 与宿主配置的准备和验证，直接属于 spec-runtime-setup 的职责范围。

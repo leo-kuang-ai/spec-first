@@ -1,0 +1,2 @@
+ENTRY: spec-sweep
+REASON: 用户要求从规划到绿 PR 一条龙完成需求，spec-sweep 正是为此设计的端到端 workflow，覆盖需求澄清、计划、实现、测试和 PR 创建全流程。

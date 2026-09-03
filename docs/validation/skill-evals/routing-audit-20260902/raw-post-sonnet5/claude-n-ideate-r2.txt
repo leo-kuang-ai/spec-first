@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散新功能方向属于 definition 组判别场景，用户未提供已有想法或明确目标，符合"从零发散新方向"使用 spec-ideate 的硬规则。

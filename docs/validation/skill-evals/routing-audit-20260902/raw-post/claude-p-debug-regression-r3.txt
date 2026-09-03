@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 明确存在回归("上个版本还是好的,这版点导出按钮没反应"),必须进入 spec-debug 入口

@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 对既有文档(PRD/plan)做评审并直接修订属于文档评审闭环，应走 spec-doc-review workflow 而非 Direct Lane。

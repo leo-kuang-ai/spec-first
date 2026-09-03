@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求明确但实现路径与任务拆分未定，适合用 spec-plan 制定有证据的技术方案和落地拆解。

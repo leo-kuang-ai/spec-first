@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户请求评审一份 PRD 文档并直接修改，属于文档评审入口的典型场景，不涉及代码 bug/回归/失败信号，不应走 spec-debug 或 Direct Lane。

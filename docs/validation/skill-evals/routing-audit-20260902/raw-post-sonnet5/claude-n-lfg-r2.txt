@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户显式要求规划到绿 PR 一条龙、过程中不再确认,匹配 spec-lfg 的端到端免打断入口场景。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是对会话历史的回溯性问答，不涉及失败、修复、workflow 点名、PR 处理或技术采用裁决，属于简单事实查询。

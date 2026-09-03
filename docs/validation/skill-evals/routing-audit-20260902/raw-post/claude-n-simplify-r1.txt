@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 代码清理属于局部重构任务，无失败信号、无跨会话交接需求、无外部裁决或PR反馈，符合 Direct Lane 条件。

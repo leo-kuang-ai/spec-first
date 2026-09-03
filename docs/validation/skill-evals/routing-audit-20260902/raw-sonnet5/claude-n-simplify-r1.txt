@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 请求是"清理刚改动中的重复样板代码、不改变行为"的重构类工作,spec-simplify-code 正是覆盖该场景的 standalone skill。

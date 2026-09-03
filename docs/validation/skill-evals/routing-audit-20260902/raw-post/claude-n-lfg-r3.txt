@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户显式要求"一条龙到绿 PR"且"别再来问我"，满足 spec-lfg（Let's Fucking Go）的明确触发条件——全流程自主推进到可合并状态。

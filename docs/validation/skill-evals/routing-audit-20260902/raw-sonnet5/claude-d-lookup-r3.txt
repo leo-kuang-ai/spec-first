@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是简单的只读代码定位查询,直属 Direct Lane,无需 spec-* workflow 或 standalone skill。

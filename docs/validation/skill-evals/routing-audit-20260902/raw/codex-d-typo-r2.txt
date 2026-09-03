@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是单文件低风险的文档错别字修正，属于已限定范围的轻量编辑，无需启动 spec-* workflow。

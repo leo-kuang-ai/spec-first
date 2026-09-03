@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一事实查询（读取 CHANGELOG.md 最新版本号），无需架构判断、演化决策或多步骤 workflow。

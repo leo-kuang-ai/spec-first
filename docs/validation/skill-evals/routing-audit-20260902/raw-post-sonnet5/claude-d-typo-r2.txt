@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文档内的错别字修正是纯局部文本修复,不涉及架构/契约/治理判断,属于小任务应走 Direct Lane。

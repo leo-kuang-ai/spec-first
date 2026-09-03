@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确授权免干预一条龙从规划干到可合并的绿 PR（含 commit/push/PR/CI），正是 spec-lfg 的免干预工程管线场景。

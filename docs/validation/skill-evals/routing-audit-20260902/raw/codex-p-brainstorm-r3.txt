@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 用户尚未定义目标用户与成功标准，属于产品范围澄清，应先用 spec-brainstorm 将模糊想法收敛为需求级方向。

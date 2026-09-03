@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户报告测试挂掉并给出具体报错,属于带失败症状的根因排查任务,应走 spec-debug 工作流而非直接通道。

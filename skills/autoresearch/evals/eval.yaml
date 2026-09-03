@@ -1,0 +1,24 @@
+schema_version: v1alpha1
+
+environment:
+  type: none
+
+skills:
+  - source: local_path
+    path: .
+
+engine:
+  name: claude_code
+
+cases:
+  files:
+    - evals/cases/dispatch-classic-mode.yaml
+    - evals/cases/ship-never-auto-approves.yaml
+    - evals/cases/screen-cmd-refuses-unsafe-predicate.yaml
+  defaults:
+    timeout_seconds: 300
+    max_turns: 10
+
+report:
+  formats: [json, html]
+  artifacts: [transcript]

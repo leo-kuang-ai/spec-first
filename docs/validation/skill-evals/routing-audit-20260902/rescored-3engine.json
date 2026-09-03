@@ -1,0 +1,47 @@
+{
+ "claude:glm-5.3(默认代理映射)": {
+  "acc": 0.9090909090909091,
+  "sem": 60,
+  "n": 66,
+  "fmt_ok": 66,
+  "strict_entry_label": 59,
+  "misroutes": {
+   "p-brainstorm:spec-brainstorm->spec-ideate": 3,
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-work": 3
+  }
+ },
+ "codex:gpt-5.6-sol": {
+  "acc": 0.9848484848484849,
+  "sem": 65,
+  "n": 66,
+  "fmt_ok": 66,
+  "strict_entry_label": 66,
+  "misroutes": {
+   "p-fixintent:spec-debug->direct": 1
+  }
+ },
+ "claude:claude-sonnet-5": {
+  "acc": 0.7121212121212122,
+  "sem": 47,
+  "n": 66,
+  "fmt_ok": 65,
+  "strict_entry_label": 65,
+  "misroutes": {
+   "n-ideate:spec-ideate->spec-brainstorm": 3,
+   "n-lfg:spec-lfg->spec-sweep": 1,
+   "n-lfg:spec-lfg->spec-work": 1,
+   "n-lfg:spec-lfg->direct": 1,
+   "n-optimize:spec-optimize->direct": 1,
+   "n-simplify:spec-simplify-code->direct": 1,
+   "p-compound:spec-compound->spec-rule-miner": 1,
+   "p-debug-regression:spec-debug->direct": 1,
+   "p-debug-stack:spec-debug->direct": 2,
+   "p-fixintent:spec-debug->direct": 1,
+   "p-pov:spec-pov->direct": 2,
+   "p-pov:spec-pov->spec-brainstorm": 1,
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-commit-push-pr": 1,
+   "p-pr-feedback:spec-resolve-pr-feedback->direct": 1,
+   "p-pr-feedback:spec-resolve-pr-feedback->[unparsed]": 1
+  }
+ }
+}

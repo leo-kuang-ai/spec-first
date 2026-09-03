@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 请求是检查/配置 MCP 与宿主运行环境就绪状态，属于 spec-runtime-setup 标准职责，不涉及 workflow 链路语义决策。

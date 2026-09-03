@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一符号的简单调用点查询，属于轻量事实检索，无需 workflow 或 skill 入口。

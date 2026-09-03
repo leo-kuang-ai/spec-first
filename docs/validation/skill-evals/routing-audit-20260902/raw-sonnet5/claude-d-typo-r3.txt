@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文档内的一处错别字修正,属于文案级 docs-only 小改动,不涉及架构判断或跨节点 workflow,走 Direct Lane 即可。

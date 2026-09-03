@@ -1,0 +1,2 @@
+条目：spec-ideate
+理由： 发散式产品功能方向构思属于 product discovery/ideation，正是 spec-ideate 工作流的职责范围（区别于已限定上下文的 spec-brainstorm 协作讨论）。

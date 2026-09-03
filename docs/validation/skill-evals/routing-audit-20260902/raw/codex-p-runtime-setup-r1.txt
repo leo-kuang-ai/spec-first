@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 该请求是检查和配置 spec-first 在新机器上的宿主与 MCP 运行环境，完全对应 spec-runtime-setup 的职责边界。

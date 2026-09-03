@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 处理 PR review comments、commit、push 和回复是标准 git 协作操作，无需 spec-first workflow 介入。

@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求是明确目标的可度量性能优化实验，应由 spec-optimize 执行度量与迭代优化循环。

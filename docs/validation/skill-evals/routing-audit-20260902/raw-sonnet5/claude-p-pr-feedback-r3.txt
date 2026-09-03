@@ -1,0 +1,2 @@
+TRY: direct
+REASON: 处理 PR review comments 的本地改动、commit、push 与回复是常规 GitHub 协作操作,无架构判断或 spec-first 演化需求,属于 Direct Lane。

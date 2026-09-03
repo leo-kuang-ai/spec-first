@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 这是已验证问题解决经验的沉淀任务，应使用 spec-compound 写入可复用知识。

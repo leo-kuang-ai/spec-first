@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 用户显式要求处理 GitHub PR review 反馈，属于入口硬规则中的"要求处理 GitHub PR review 反馈"场景，必须进入对应入口，不得降级 Direct Lane。

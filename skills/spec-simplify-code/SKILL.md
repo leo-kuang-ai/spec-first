@@ -1,6 +1,6 @@
 ---
 name: spec-simplify-code
-description: "Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving behavior. Use for tidy/refactor passes; use spec-debug for bugs."
+description: "Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving behavior. Use for tidy/refactor passes; use spec-debug for bugs. Not for new features or behavior changes."
 argument-hint: "[blank to simplify current branch changes, or describe what to simplify]"
 ---
 

@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有确认的计划文档要执行落地，属于计划→代码的执行阶段，正是 spec-work 工作流的职责。

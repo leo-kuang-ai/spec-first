@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一符号调用位置查询是范围明确的低风险只读检索，属于 using-spec-first 排除的"narrow lookups"，不构成实质性变更。

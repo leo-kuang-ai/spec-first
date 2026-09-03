@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 这是一个有明确量化目标(800ms→200ms)、需要设计并跑可度量实验的性能优化迭代任务,匹配 spec-optimize 的 metric-driven iterative optimization 定位,而非一次性代码修改或缺陷修复。

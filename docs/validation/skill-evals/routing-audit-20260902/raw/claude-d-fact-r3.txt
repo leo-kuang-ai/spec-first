@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件单事实的轻量查询(读 CHANGELOG.md 最新版本号),无实质性改动,属 Direct Lane 而非 spec-* workflow。

@@ -1,0 +1,2 @@
+条目：spec-doc-review
+理由：对仓库内 PRD 文档（docs/plans/export-csv-plan.md）进行评审并直接修复问题，属于文档评审工作流的职责范围，而非用户提供的单文档清理或低风险小改动，因此不应走直接通道（Direct Lane）。

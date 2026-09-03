@@ -6,7 +6,10 @@ description: |
 
 input:
   prompt: |
-    （spec-sweep skill 已安装，请按它工作。定时调度器调用,无人在场。）
+    （skill-up 评测框架说明：本仓库 .claude/skills/spec-sweep/SKILL.md 是被测
+    skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整
+    读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。输入形态:
+    定时调度器触发,无人在场。）
     mode:headless
 
 context:
@@ -17,10 +20,10 @@ context:
 
 expect:
   must_contain:
-    - "设置"
+    - "first run requires interactive setup"
 
 judge:
   type: rule_based
   success:
     - output_contains:
-        all: ["设置"]
+        all: ["first run requires interactive setup"]

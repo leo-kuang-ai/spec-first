@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 测试失败带 AttributeError 属于需要 root-cause 证据链的缺陷调查，正是 spec-debug workflow 的覆盖场景，而非 Direct Lane 的轻量问答。

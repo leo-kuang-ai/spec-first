@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 用户显式要求处理 GitHub PR review 反馈并完成本地改、commit、push、回复的完整闭环，必须进入 `spec-resolve-pr-feedback` workflow，不得降级 Direct Lane。

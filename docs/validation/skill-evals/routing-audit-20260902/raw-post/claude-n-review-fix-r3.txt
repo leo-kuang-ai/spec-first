@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求评审 PRD 文档并直接修复发现的问题,属于对既有文档的评审+改动闭环,匹配 spec-doc-review 而非零发散或代码实现类入口。

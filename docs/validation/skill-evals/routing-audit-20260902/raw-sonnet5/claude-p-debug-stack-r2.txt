@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是一个具体的测试失败与运行时报错定位任务,属于 spec-debug 覆盖的 root-cause 调试场景。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是对当前会话历史的简单事实回溯提问，不涉及代码演化或治理判断，属于轻量事实问答，走 Direct Lane。

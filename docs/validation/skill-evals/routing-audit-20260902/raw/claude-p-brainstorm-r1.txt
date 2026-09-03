@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 目标用户与成功标准均未明确、处于产品构思前期的发散梳理，属于典型 product discovery 场景，应由 ideation workflow 承接而非 PRD/plan 类入口。

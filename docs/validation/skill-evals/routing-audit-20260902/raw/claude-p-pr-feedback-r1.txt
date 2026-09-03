@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 这是带明确 commit/push/reply 授权的有范围代码修改执行任务,属于 spec-work 执行工作流的适用场景(PR 已存在,无需 spec-lfg 重新建 PR)。

@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有明确计划文档需要执行落地,属于执行既有 plan 的实质性工作,应走 spec-work 而非发散或 Direct Lane。

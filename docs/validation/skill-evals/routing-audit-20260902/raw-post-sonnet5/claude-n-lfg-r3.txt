@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求规划到绿 PR 一条龙且不再确认,匹配 spec-lfg 的端到端交付入口。

@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户明确请求评审方案文档质量和合理性，属于文档审查任务，应使用 spec-doc-review workflow。

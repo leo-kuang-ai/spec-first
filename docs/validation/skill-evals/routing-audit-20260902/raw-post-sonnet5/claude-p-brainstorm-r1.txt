@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 已有产品想法（周报工具）但目标用户与成功标准未定，属于 definition 组中"已有想法但目标未定"的场景，应走 spec-brainstorm 而非 spec-ideate。

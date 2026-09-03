@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 已有跨 12 个文件的实际改动且用户明确要求评审质量风险，属于 diff 审查场景，直接匹配 spec-code-review 的标准入口。

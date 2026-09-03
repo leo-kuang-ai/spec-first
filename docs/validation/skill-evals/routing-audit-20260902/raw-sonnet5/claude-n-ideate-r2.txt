@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 请求是发散式产品新功能构思、明确要求先发散别收敛，属于探索性 ideation 而非需求收敛，匹配 spec-brainstorm 而非 spec-ideate/spec-prd。

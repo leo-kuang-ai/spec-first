@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单事实查询，只需读取 CHANGELOG.md 文件即可回答，不涉及失败、修复、新方向发散或其他需要 workflow 的场景。

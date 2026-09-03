@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 用户要求外部技术采用裁决（REST vs GraphQL），需要结合当前系统现状做技术选型判断，必须进入 spec-pov 入口。

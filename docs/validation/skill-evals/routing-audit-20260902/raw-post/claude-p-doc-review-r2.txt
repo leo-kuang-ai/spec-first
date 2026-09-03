@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户明确要求评审方案文档质量并提供意见，属于 spec-doc-review 的核心场景（审查技术文档的完整性、清晰度和可维护性）

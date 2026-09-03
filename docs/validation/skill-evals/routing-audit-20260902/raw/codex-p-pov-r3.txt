@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 这是要求基于当前项目现状对 REST 迁移 GraphQL 做出明确技术采纳判断，属于 spec-pov 的项目限定裁决场景。

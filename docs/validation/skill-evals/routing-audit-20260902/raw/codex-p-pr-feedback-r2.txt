@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 该请求是处理既有 PR 的 review comments 并修复、提交、推送和回复，精确匹配 spec-resolve-pr-feedback 的作用范围。

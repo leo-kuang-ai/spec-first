@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 对指定文档(PRD)做评审并直接修订,正是 spec-doc-review 文档评审工作流的职责,不属于单文档轻量清理的 Direct Lane 豁免。

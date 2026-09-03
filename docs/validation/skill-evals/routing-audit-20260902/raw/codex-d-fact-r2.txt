@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是简单事实问答，只需读取 CHANGELOG 的单个限定信息，无需进入 spec-* workflow。

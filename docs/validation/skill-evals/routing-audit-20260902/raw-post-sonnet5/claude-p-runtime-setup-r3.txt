@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 用户明确请求检查和配置 MCP 及宿主运行环境,属于 runtime setup 职责范围

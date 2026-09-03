@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 这是产品层面的发散式创意探索（多方向、不收敛、无需实现），正是 spec-ideate 构思工作流的适用场景，而非 brainstorm/prototype/strategy。

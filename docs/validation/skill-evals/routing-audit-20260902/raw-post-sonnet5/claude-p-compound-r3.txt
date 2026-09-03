@@ -1,0 +1,2 @@
+ENTRY: spec-promote
+REASON: 用户明确要求将已验证有效的根因分析和防回归做法沉淀为可复用经验，这是典型的知识提升场景，应进入 spec-promote workflow 处理知识沉淀、文档化和索引建立。

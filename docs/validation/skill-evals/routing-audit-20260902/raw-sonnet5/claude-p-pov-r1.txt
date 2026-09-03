@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是需要开放式判断、结合上下文权衡利弊给出建议的架构咨询问题，不产生 workflow artifact 或代码变更，不匹配任何 spec-* workflow 或 standalone skill 的入口标准。

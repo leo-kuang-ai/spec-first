@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 跨机器/跨会话交接工作进度并要求次日无缝衔接，属于 handoff artifact 场景，应走 spec-handoff 而非临时性 direct 输出。

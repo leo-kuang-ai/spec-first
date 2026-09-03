@@ -8,9 +8,7 @@ skills:
     path: .
 
 engine:
-  name: codex
-  kwargs:
-    bypass_sandbox: "true"
+  name: claude_code
 
 cases:
   files:

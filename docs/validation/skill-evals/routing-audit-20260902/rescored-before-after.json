@@ -1,0 +1,53 @@
+{
+ "claude(glm-5.3) BEFORE": {
+  "acc": 0.9090909090909091,
+  "n": 66,
+  "misroutes": {
+   "p-brainstorm:spec-brainstorm->spec-ideate": 3,
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-work": 3
+  }
+ },
+ "claude(glm-5.3) AFTER": {
+  "acc": 0.9545454545454546,
+  "n": 66,
+  "misroutes": {
+   "n-simplify:spec-simplify-code->direct": 1,
+   "p-doc-review:spec-doc-review->direct": 1,
+   "p-runtime-setup:spec-runtime-setup->direct": 1
+  }
+ },
+ "sonnet-5 BEFORE": {
+  "acc": 0.7121212121212122,
+  "n": 66,
+  "misroutes": {
+   "n-ideate:spec-ideate->spec-brainstorm": 3,
+   "n-lfg:spec-lfg->spec-sweep": 1,
+   "n-lfg:spec-lfg->spec-work": 1,
+   "n-lfg:spec-lfg->direct": 1,
+   "n-optimize:spec-optimize->direct": 1,
+   "n-simplify:spec-simplify-code->direct": 1,
+   "p-compound:spec-compound->spec-rule-miner": 1,
+   "p-debug-regression:spec-debug->direct": 1,
+   "p-debug-stack:spec-debug->direct": 2,
+   "p-fixintent:spec-debug->direct": 1,
+   "p-pov:spec-pov->direct": 2,
+   "p-pov:spec-pov->spec-brainstorm": 1,
+   "p-pr-feedback:spec-resolve-pr-feedback->spec-commit-push-pr": 1,
+   "p-pr-feedback:spec-resolve-pr-feedback->direct": 1,
+   "p-pr-feedback:spec-resolve-pr-feedback->[unparsed]": 1
+  }
+ },
+ "sonnet-5 AFTER": {
+  "acc": 0.8939393939393939,
+  "n": 66,
+  "misroutes": {
+   "n-optimize:spec-optimize->spec-debug": 1,
+   "n-optimize:spec-optimize->spec-plan": 1,
+   "n-simplify:spec-simplify-code->direct": 1,
+   "p-compound:spec-compound->spec-rule-miner": 1,
+   "p-compound:spec-compound->spec-promote": 1,
+   "p-work:spec-work->spec-plan": 1,
+   "p-work:spec-work->direct": 1
+  }
+ }
+}

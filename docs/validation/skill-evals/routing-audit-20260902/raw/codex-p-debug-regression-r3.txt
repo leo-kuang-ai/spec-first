@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是明确的上一版回归和按钮失效 bug 诊断请求，应走 spec-debug。

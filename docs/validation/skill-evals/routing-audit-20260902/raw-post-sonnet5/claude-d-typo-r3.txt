@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文案修正,无失败/回归/bug信号,无需workflow

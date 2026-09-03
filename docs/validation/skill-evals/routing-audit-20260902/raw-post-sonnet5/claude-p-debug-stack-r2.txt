@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在失败信号（pytest 报错 AttributeError），符合入口硬规则必须进入 spec-debug 的条件。

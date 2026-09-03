@@ -1,0 +1,16 @@
+score	a	b	jaccard	seq_ratio
+0.635	spec-commit	spec-commit-push-pr	0.65	0.61
+0.221	spec-code-review	spec-debug	0.15	0.33
+0.209	spec-prototype	spec-strategy	0.08	0.40
+0.195	spec-debug	spec-simplify-code	0.09	0.35
+0.179	spec-ideate	spec-strategy	0.03	0.40
+0.175	spec-simplify-code	spec-test-xcode	0.06	0.34
+0.170	spec-polish	spec-test-browser	0.07	0.33
+0.169	spec-prd	spec-write-tasks	0.23	0.08
+0.169	spec-commit-push-pr	spec-worktree	0.06	0.33
+0.169	spec-commit	spec-worktree	0.06	0.34
+0.166	spec-app-consistency-audit	spec-runtime-setup	0.04	0.36
+0.164	spec-polish	spec-promote	0.08	0.29
+0.161	spec-lfg	spec-test-browser	0.10	0.25
+0.157	spec-prd	spec-strategy	0.07	0.29
+0.156	spec-compound	spec-simplify-code	0.04	0.34

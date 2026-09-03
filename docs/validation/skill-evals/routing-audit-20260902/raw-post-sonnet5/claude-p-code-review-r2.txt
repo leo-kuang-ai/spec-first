@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 请求是对当前分支多文件改动做质量/风险评审，属于既有 diff 的代码审查场景，直接匹配 spec-code-review 而非需求不明确的 definition 类入口。

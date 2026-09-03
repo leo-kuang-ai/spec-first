@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 明确的"清理重复样板代码、不改变行为"是纯质量重构诉求，匹配 spec-simplify-code 的既定用途，无失败/回归/bug信号，无需进入 spec-debug 或其他全链路 workflow。

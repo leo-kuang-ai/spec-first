@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 性能压测/度量式优化实验属于 spec-optimize 的专属入口，而非通用 spec-work 或 Direct Lane。

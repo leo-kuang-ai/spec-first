@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单代码查找问题，用户只要位置列表，不涉及失败、修复或跨会话交接，且 Graphify graph.json 存在可用于快速定向调用关系。

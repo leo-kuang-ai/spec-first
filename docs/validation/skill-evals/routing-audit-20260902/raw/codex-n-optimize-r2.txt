@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求目标明确且以可测量性能指标为核心，适合用 spec-optimize 建立度量、并行试验缓存方案并保留有效改进。

@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求对一份方案文档(docs/plans/export-csv-plan.md)做质量评审并给出意见,这正是 spec-doc-review 文档评审 workflow 的目标场景,而非代码评审或轻量问答。

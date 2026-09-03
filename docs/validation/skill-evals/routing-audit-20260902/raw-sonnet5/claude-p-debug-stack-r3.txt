@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一测试失败调试属于窄范围故障排查，不需要 workflow 协调或跨文件影响分析。

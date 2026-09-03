@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 请求是把已验证有效的根因与防回归经验沉淀为可复用知识，属于 knowledge promotion 场景，对应 spec-compound 入口。

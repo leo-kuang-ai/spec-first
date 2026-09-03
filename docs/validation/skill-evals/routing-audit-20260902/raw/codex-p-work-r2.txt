@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 这是执行已明确落盘计划的具体实施请求，应交给 spec-work 端到端执行。

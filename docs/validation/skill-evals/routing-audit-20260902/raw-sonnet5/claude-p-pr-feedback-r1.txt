@@ -1,0 +1,2 @@
+ENTRY: spec-commit-push-pr
+REASON: 涉及本地改动、commit、push 与在 GitHub PR 上回复评论,属于 commit/push/PR 收尾类标准化操作,匹配该 standalone skill 的既定入口而非需另起 spec-* workflow 或 direct lane。

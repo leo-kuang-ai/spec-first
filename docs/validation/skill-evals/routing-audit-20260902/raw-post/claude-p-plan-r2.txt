@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现路径与拆解未定，属于 codebase→spec→plan 链路中的技术方案与任务拆分判断，对应 spec-plan 入口。

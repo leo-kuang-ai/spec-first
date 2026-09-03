@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户报告版本间行为回归（导出按钮无响应）并要求定位根因，属于典型的缺陷根因调查任务，应走 spec-debug workflow 而非直接修改或规划入口。

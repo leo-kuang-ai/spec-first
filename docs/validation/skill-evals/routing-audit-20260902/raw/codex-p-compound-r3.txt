@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 请求是沉淀已验证的根因与防回归经验，属于可复用工程知识的专用入口。

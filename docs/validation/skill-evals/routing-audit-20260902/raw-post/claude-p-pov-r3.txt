@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 用户要求对外部技术选择(REST vs GraphQL)给出项目特定的裁决结论,属于技术采用判断,必须进入 spec-pov,不得降级 Direct Lane

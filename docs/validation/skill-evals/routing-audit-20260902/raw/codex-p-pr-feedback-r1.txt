@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 该请求是明确的 PR review 反馈处理闭环，且包含本地修改、提交、推送和回复评论。

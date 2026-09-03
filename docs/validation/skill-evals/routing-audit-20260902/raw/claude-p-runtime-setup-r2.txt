@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 检查并配置 spec-first 工作流所需 harness runtime 就绪状态（MCP/宿主配置）正是 spec-runtime-setup 的专属职责。

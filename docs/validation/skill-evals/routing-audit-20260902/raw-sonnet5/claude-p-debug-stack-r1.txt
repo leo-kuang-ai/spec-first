@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 测试失败诊断属于即时故障排查，不需要规范化 workflow 或 skill 介入，直接读取测试代码和相关实现定位 NoneType 根因即可。

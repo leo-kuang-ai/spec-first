@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在明确的测试失败和报错信息（AttributeError），必须进入 spec-debug 而非 Direct Lane

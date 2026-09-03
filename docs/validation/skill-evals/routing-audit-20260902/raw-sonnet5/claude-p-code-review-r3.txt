@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 请求是对当前分支多文件改动做质量风险评审,属于代码审查场景,应路由到 spec-code-review 而非临时性 Direct Lane。

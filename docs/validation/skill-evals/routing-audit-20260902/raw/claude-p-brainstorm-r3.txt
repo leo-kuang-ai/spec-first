@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 目标用户与成功标准均未想清的早期模糊想法，属于从零捋清问题的发散探索，正是 spec-ideate 的适用场景（spec-strategy 适用于已有方向变更、spec-brainstorm 适用于围绕已定主题发散方案）。

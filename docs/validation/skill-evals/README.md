@@ -55,3 +55,9 @@
 | 37 | spec-promote | S | 发布 | 通过 | [spec-final-pair.md](./spec-final-pair.md) | [evals/](../../skills/spec-promote/evals/eval.yaml) |
 
 级别说明:**W** = 公开 workflow(workflow_command),**S** = standalone skill,**I** = internal helper(internal_only,非用户入口,测评时经其 governed caller 的派发契约触发)。
+
+## 专项测评(跨 skill,不占用上表逐 skill 口径)
+
+| 日期 | 专项 | 报告 | 资产 |
+|---|---|---|---|
+| 2026-09-02 | 入口路由准确率(22 用例 ×3 ×双引擎)+ 37 skill 静态体检 + 碰撞/安全扫描 | [2026-09-02-entry-routing-and-static-audit.md](./2026-09-02-entry-routing-and-static-audit.md) | [routing-audit-20260902/](./routing-audit-20260902/) |

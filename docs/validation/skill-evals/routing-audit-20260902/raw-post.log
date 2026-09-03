@@ -1,0 +1,95 @@
+[1/66] claude p-debug-stack -> spec-debug
+[2/66] claude p-debug-stack -> spec-debug
+[3/66] claude p-debug-stack -> spec-debug
+[4/66] claude p-debug-regression -> spec-debug
+[5/66] claude p-debug-regression -> spec-debug
+[6/66] claude p-debug-regression -> spec-debug
+[7/66] claude p-code-review -> spec-code-review
+[8/66] claude p-code-review -> spec-code-review
+[9/66] claude p-code-review -> spec-code-review
+[10/66] claude p-doc-review -> direct
+[11/66] claude p-doc-review -> spec-doc-review
+[12/66] claude p-doc-review -> spec-doc-review
+[13/66] claude p-plan -> spec-plan
+[14/66] claude p-plan -> spec-plan
+[15/66] claude p-plan -> spec-plan
+[16/66] claude p-work -> spec-work
+[17/66] claude p-work -> spec-work
+[18/66] claude p-work -> spec-work
+[19/66] claude p-compound -> spec-compound
+[20/66] claude p-compound -> spec-compound
+[21/66] claude p-runtime-setup -> spec-runtime-setup
+[22/66] claude p-compound -> spec-compound
+[23/66] claude p-runtime-setup -> direct
+[24/66] claude p-runtime-setup -> spec-runtime-setup
+[25/66] claude p-brainstorm -> spec-brainstorm
+[26/66] claude p-brainstorm -> spec-brainstorm
+[27/66] claude p-brainstorm -> spec-brainstorm
+[28/66] claude p-pr-feedback -> spec-resolve-pr-feedback
+[29/66] claude p-pr-feedback -> spec-resolve-pr-feedback
+[30/66] claude p-pr-feedback -> spec-resolve-pr-feedback
+[31/66] claude p-pov -> spec-pov
+[32/66] claude p-pov -> spec-pov
+[33/66] claude p-pov -> spec-pov
+[34/66] claude p-fixintent -> spec-debug
+[35/66] claude p-fixintent -> spec-debug
+[36/66] claude p-fixintent -> spec-debug
+[37/66] claude n-review-fix -> spec-doc-review
+[38/66] claude n-review-fix -> spec-doc-review
+[39/66] claude n-review-fix -> spec-doc-review
+[40/66] claude n-simplify -> direct
+[41/66] claude n-simplify -> spec-simplify-code
+[42/66] claude n-simplify -> spec-simplify-code
+[43/66] claude n-optimize -> spec-optimize
+[44/66] claude n-optimize -> spec-optimize
+[45/66] claude n-optimize -> spec-optimize
+[46/66] claude n-handoff -> spec-handoff
+[47/66] claude n-handoff -> spec-handoff
+[48/66] claude n-handoff -> spec-handoff
+[49/66] claude n-lfg -> spec-lfg
+[50/66] claude n-lfg -> spec-lfg
+[51/66] claude n-lfg -> spec-lfg
+[52/66] claude n-ideate -> spec-ideate
+[53/66] claude n-ideate -> spec-ideate
+[54/66] claude n-ideate -> spec-ideate
+[55/66] claude d-fact -> direct
+[56/66] claude d-fact -> direct
+[57/66] claude d-fact -> direct
+[58/66] claude d-lookup -> direct
+[59/66] claude d-lookup -> direct
+[60/66] claude d-lookup -> direct
+[61/66] claude d-context -> direct
+[62/66] claude d-context -> direct
+[63/66] claude d-typo -> direct
+[64/66] claude d-typo -> direct
+[65/66] claude d-typo -> direct
+[66/66] claude d-context -> direct
+{
+ "claude": {
+  "overall_acc": 0.955,
+  "by_group": {
+   "P": {
+    "n": 36,
+    "correct": 34,
+    "acc": 0.944
+   },
+   "N": {
+    "n": 18,
+    "correct": 17,
+    "acc": 0.944
+   },
+   "D": {
+    "n": 12,
+    "correct": 12,
+    "acc": 1.0
+   }
+  },
+  "confusions": {
+   "p-doc-review: spec-doc-review -> direct": 1,
+   "p-runtime-setup: spec-runtime-setup -> direct": 1,
+   "n-simplify: spec-simplify-code -> direct": 1
+  },
+  "unparsed": 0,
+  "avg_dur_s": 10.3
+ }
+}

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求只是询问当前会话上下文的简单事实，属于轻量问答，无需路由到任何 spec-* workflow 或 standalone skill。

@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 该请求是明确的产品功能发散创意任务，需要生成意外且多样的新方向，符合 spec-ideate 的入口边界。

@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 这是针对最近变更的保持行为重构，应使用 spec-simplify-code 做定向简化。

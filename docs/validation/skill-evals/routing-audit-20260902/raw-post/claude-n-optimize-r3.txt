@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 明确带可度量目标（800ms→200ms）的性能优化实验设计与执行，属于 metric-driven iterative optimization 场景，而非一次性调试或普通实现任务。

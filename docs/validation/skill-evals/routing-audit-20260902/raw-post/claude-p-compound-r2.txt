@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 用户明确要求把已验证有效的根因与防回归经验沉淀为可复用知识，这正是知识捕获入口 spec-compound 的职责。

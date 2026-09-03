@@ -1,6 +1,6 @@
 ---
 name: spec-work
-description: Execute a settled plan, validated task pack, spec path, or concrete implementation request end-to-end. Use spec-debug for open-ended bugs; stop when target repo, scope, source ownership, or required authorization is unresolved.
+description: Execute a settled plan, validated task pack, spec path, or concrete implementation request end-to-end. Use spec-debug for open-ended bugs; stop when target repo, scope, source ownership, or required authorization is unresolved. Not for explicitly requested GitHub PR-review-feedback handling — route those to spec-resolve-pr-feedback.
 argument-hint: "[Plan doc path or description of work. Blank to auto use latest plan doc]"
 ---
 

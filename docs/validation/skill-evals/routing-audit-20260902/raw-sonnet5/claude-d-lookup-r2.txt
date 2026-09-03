@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单的代码位置查询，使用 CodeGraph 或 grep 直接定位调用点即可，无需完整 workflow。

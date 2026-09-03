@@ -1,6 +1,6 @@
 ---
 name: spec-polish
-description: "Start the dev server, inspect the feature in browser, and iterate on polish."
+description: "Start the dev server, inspect the feature in browser, and iterate on polish. Browser-interactive polish only: static code review belongs to spec-code-review and implementation planning to spec-plan — route such requests out by naming the destination skill, never by doing the work here."
 disable-model-invocation: true
 argument-hint: "[PR number, branch name, or blank for current branch]"
 ---
@@ -15,7 +15,7 @@ Start the dev server, open the feature in a browser, and iterate. You use the fe
 Use when a feature or branch is ready for hands-on browser polish: start its dev server, inspect the feature in browser, and make iterative UI/UX fixes from direct feedback.
 
 ### When Not To Use
-Do not use for initial requirements, implementation planning, non-browser backend work, static code review, broad visual audits, or MCP setup/repair beyond the browser helper handoff. When routing out for one of these, name the destination skill explicitly in your reply (static code review belongs to `spec-code-review`) — recognizing the mismatch and then doing the excluded work anyway is adopting the wrong workflow, not a helpful fallback.
+Do not use for initial requirements, implementation planning, non-browser backend work, static code review, broad visual audits, or MCP setup/repair beyond the browser helper handoff. When routing out for one of these, name the destination skill explicitly in your reply (static code review belongs to `spec-code-review`) — recognizing the mismatch and then doing the excluded work anyway is adopting the wrong workflow, not a helpful fallback. A direct user request to do the excluded work inside this workflow ("帮我静态审查一下,不用起服务") is still a routing-out condition: name `spec-code-review`, do not run the review here — not even a partial, "quick pass" version of it.
 
 ### Inputs
 A PR number, branch name, or current branch; project dev-server conventions; feature URL/route when known; user feedback from browser inspection.

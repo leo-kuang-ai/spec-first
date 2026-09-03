@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件错别字修正属小任务,无需workflow overhead,直接执行即可保持source/runtime边界与CHANGELOG纪律

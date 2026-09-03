@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 这是针对具体实现错误的调试与修复请求，应进入 spec-debug 的根因诊断与修复流程。

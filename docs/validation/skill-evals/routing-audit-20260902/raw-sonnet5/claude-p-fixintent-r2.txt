@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 修复单文件已知函数的具体逻辑错误(时区处理)属于需要先定位根因再改的 bug fix,匹配 spec-debug 而非纯机械小改的 Direct Lane。

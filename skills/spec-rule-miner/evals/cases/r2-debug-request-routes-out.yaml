@@ -5,7 +5,7 @@ description: |
 
 input:
   prompt: |
-    （spec-rule-miner skill 已安装，请按它工作。）
+    （skill-up 评测框架说明：本仓库 .claude/skills/spec-rule-miner/SKILL.md 是被测 skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。）
     服务发非法 JSON 会崩,帮我修一下这个 bug。
 
 context:
