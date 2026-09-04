@@ -1,5 +1,5 @@
 {
-  "schema_version": "setup-registry.v9",
+  "schema_version": "setup-registry.v10",
   "summary_columns": [
     "tool",
     "type",
@@ -282,6 +282,36 @@
             "uninstall_targets": [
               "local",
               "user"
+            ]
+          }
+        },
+        "helper": {},
+        "provider": {}
+      }
+    },
+    "zcode": {
+      "id": "zcode",
+      "defaults": {
+        "tool": {
+          "host_config": {
+            "scope": "workspace",
+            "json_container_path": [
+              "mcp",
+              "servers"
+            ],
+            "targets": {
+              "workspace": {
+                "config_path": ".zcode/config.json",
+                "config_format": "json",
+                "precedence": 50,
+                "writable_check": "parent-or-file"
+              }
+            },
+            "fallback_order": [
+              "workspace"
+            ],
+            "uninstall_targets": [
+              "workspace"
             ]
           }
         },

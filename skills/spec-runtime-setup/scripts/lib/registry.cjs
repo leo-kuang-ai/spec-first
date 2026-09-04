@@ -5,8 +5,8 @@ const path = require('node:path');
 
 const REGISTRY_FILE = 'setup-registry.json';
 const SCHEMA_FILE = 'setup-registry.schema.json';
-const REGISTRY_SCHEMA_VERSION = 'setup-registry.v9';
-const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
+const REGISTRY_SCHEMA_VERSION = 'setup-registry.v10';
+const HOST_IDS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
 const PLATFORM_IDS = Object.freeze(['macos', 'linux', 'wsl', 'windows']);
 const KIND_COLLECTIONS = Object.freeze({
   tool: 'tools',

@@ -10,6 +10,7 @@ const {
 const RUNTIME_MARKERS = Object.freeze([
   ['codex', ['CODEX_CI', 'CODEX_MANAGED_BY_NPM', 'CODEX_THREAD_ID', 'CODEX_SANDBOX']],
   ['claude', ['CLAUDE_CODE_SSE_PORT', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_PROJECT_DIR']],
+  ['zcode', ['ZCODE_PROJECT_DIR', 'ZCODE_SESSION_ID']],
 ]);
 
 const HOST_CLI_COMMANDS = Object.freeze({
@@ -19,6 +20,7 @@ const HOST_CLI_COMMANDS = Object.freeze({
   kiro: ['kiro'],
   opencode: ['opencode'],
   qoder: ['qodercli', 'qoder'],
+  zcode: ['zcode'],
 });
 
 function advisoryHostCandidates({ env = {}, runner } = {}) {

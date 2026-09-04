@@ -90,7 +90,7 @@ describe('spec-runtime-setup registry v9', () => {
   test('matches the captured legacy inventory while retiring the jq helper', () => {
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v9');
+    expect(registry.schema_version).toBe('setup-registry.v10');
     expect(registry.install_mirrors).toEqual({
       npm: {
         endpoint: 'https://registry.npmmirror.com',
@@ -160,7 +160,7 @@ describe('spec-runtime-setup registry v9', () => {
 
   test('keeps complete host and artifact contracts at the top level', () => {
     const registry = loadRegistry({ skillRoot });
-    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
+    expect(Object.keys(registry.hosts)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
     for (const host of Object.values(registry.hosts)) {
       expect(host.defaults.tool.host_config.targets).toBeDefined();
       expect(host.defaults.tool.host_config.fallback_order).toBeDefined();

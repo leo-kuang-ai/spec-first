@@ -14,7 +14,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -29,7 +30,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -44,7 +46,8 @@
         "cursor": "internal",
         "kiro": "internal",
         "qoder": "internal",
-        "opencode": "internal"
+        "opencode": "internal",
+        "zcode": "internal"
       }
     },
     {
@@ -59,7 +62,8 @@
         "cursor": "internal",
         "kiro": "internal",
         "qoder": "internal",
-        "opencode": "internal"
+        "opencode": "internal",
+        "zcode": "internal"
       }
     },
     {
@@ -74,7 +78,8 @@
         "cursor": "internal",
         "kiro": "internal",
         "qoder": "internal",
-        "opencode": "internal"
+        "opencode": "internal",
+        "zcode": "internal"
       }
     },
     {
@@ -89,7 +94,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -104,7 +110,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -119,7 +126,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -134,7 +142,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -149,7 +158,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -164,7 +174,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -179,7 +190,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -194,7 +206,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -209,7 +222,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -224,7 +238,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -239,7 +254,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -254,7 +270,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -269,7 +286,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -284,7 +302,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -299,7 +318,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -314,7 +334,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -329,7 +350,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -344,7 +366,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -359,7 +382,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -374,7 +398,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -389,7 +414,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -404,7 +430,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -419,7 +446,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -434,7 +462,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -449,7 +478,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -464,7 +494,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -479,7 +510,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -494,7 +526,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -509,7 +542,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -524,7 +558,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command",
-        "opencode": "command"
+        "opencode": "command",
+        "zcode": "skill"
       }
     },
     {
@@ -539,7 +574,8 @@
         "cursor": "internal",
         "kiro": "internal",
         "qoder": "internal",
-        "opencode": "internal"
+        "opencode": "internal",
+        "zcode": "internal"
       }
     },
     {
@@ -554,7 +590,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     },
     {
@@ -569,7 +606,8 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "skill",
-        "opencode": "skill"
+        "opencode": "skill",
+        "zcode": "skill"
       }
     }
   ]

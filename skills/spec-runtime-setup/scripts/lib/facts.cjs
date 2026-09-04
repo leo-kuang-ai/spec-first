@@ -19,7 +19,7 @@ const CONFIRMED_SOURCES = new Set([
   'read-only-probe',
   'confirmed-local-state',
 ]);
-const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
+const CANONICAL_HOSTS = new Set(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
 
 function collectSetupFacts(options = {}) {
   const registry = options.registry || {};

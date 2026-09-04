@@ -4,7 +4,7 @@
 
 **Turn AI coding sessions into trusted, repo-owned change.**
 
-`spec-first` is a repo-native AI coding harness for Claude Code, Codex, Kiro, Qoder, Cursor, and OpenCode. Your host still writes the code; `spec-first` preserves intent, scopes execution, ties completion claims to evidence, and turns verified work into reusable project knowledge.
+`spec-first` is a repo-native AI coding harness for Claude Code, Codex, Kiro, Qoder, Cursor, OpenCode, and ZCode. Your host still writes the code; `spec-first` preserves intent, scopes execution, ties completion claims to evidence, and turns verified work into reusable project knowledge.
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
@@ -175,6 +175,7 @@ Runtime delivery and real host evidence are different claims. Generating a proje
 | Qoder | opt-in preview | `--qoder` |
 | Cursor | opt-in `generated_runtime_preview`; local loader journey unverified | `--cursor` |
 | OpenCode | opt-in `generated_runtime_preview`; version-matched loader journey unverified | `--opencode` |
+| ZCode | opt-in preview; skill discovery live-verified, hooks/MCP activation pending live evidence | `--zcode` |
 
 Run `spec-first doctor --verbose` for the current project's runtime facts. The generated [runtime capability catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md) is the detailed support reference.
 

@@ -114,8 +114,9 @@ describe('D6 six-host workspace-graph projection', () => {
       'kiro',
       'qoder',
       'opencode',
+      'zcode',
     ]));
-    expect(platforms).toHaveLength(6);
+    expect(platforms).toHaveLength(7);
 
     const init = runSpecFirst([
       'init',

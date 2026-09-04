@@ -46,7 +46,7 @@ describe('host flag parsing stays registry-driven', () => {
 
     expect(getStartupReminderHosts()).toEqual(derived);
     // 锁定当前集合：新增 startup 宿主应通过 registry 声明，并有意更新此断言。
-    expect(getStartupReminderHosts()).toEqual(['claude', 'codex', 'qoder']);
+    expect(getStartupReminderHosts()).toEqual(['claude', 'codex', 'qoder', 'zcode']);
   });
 
   test('clean accepts a --flag for every supported platform without marking it unknown', () => {

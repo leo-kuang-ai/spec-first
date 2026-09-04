@@ -43,7 +43,7 @@ function writeState(projectRoot, relativePath, platform, skills = [], workflowSk
 }
 
 describe('OpenCode adapter', () => {
-  test('is the sixth canonical adapter with preview-only support metadata', () => {
+  test('is a canonical adapter with preview-only support metadata', () => {
     expect(getSupportedPlatforms()).toEqual([
       'claude',
       'codex',
@@ -51,6 +51,7 @@ describe('OpenCode adapter', () => {
       'kiro',
       'qoder',
       'opencode',
+      'zcode',
     ]);
 
     const adapter = getAdapter('opencode');

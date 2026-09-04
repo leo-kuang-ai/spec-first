@@ -35,7 +35,7 @@
     "consumers": { "type": "array", "minItems": 1 },
     "contract_status": { "const": "candidate" },
     "data_sensitivity": { "enum": ["public", "internal", "confidential", "restricted"] },
-    "host": { "enum": ["unknown", "claude", "codex", "cursor", "kiro", "qoder", "opencode"] },
+    "host": { "enum": ["unknown", "claude", "codex", "cursor", "kiro", "qoder", "opencode", "zcode"] },
     "mode": { "enum": ["default", "headless", "report-only"] },
     "status": { "enum": ["started", "complete", "degraded", "failed"] },
     "status_reason_codes": { "type": "array", "items": { "type": "string" } },

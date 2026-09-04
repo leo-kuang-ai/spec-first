@@ -1,0 +1,189 @@
+#!/usr/bin/env node
+'use strict';
+
+const FALLBACK_CONTEXT = [
+  '[spec-first] using-spec-first SessionStart injection',
+  'Managed language/governance workflow entry guidance could not be inspected from `AGENTS.md`.',
+  'Run `spec-first doctor --zcode` in this project to inspect the managed SessionStart hook.',
+].join('\n');
+
+main().catch(() => {
+  writeHookOutput(FALLBACK_CONTEXT);
+});
+
+async function main() {
+  // Dynamic import keeps this extensionless hook runnable in both CommonJS and
+  // `"type":"module"` projects.
+  const { spawnSync } = await import('node:child_process');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+
+  // ZCode writes the hook event payload to stdin like Claude/Codex; drain it so a
+  // broken pipe is not treated as hook failure.
+  try {
+    fs.readFileSync(0, 'utf8');
+  } catch {
+    // Best effort: malformed or unavailable stdin should not block SessionStart.
+  }
+
+  const projectDir = process.env.ZCODE_PROJECT_DIR
+    || process.env.CLAUDE_PROJECT_DIR
+    || process.cwd();
+  const instructionPath = path.join(projectDir, 'AGENTS.md');
+  const SPEC_FIRST_CLI_COMMAND = process.platform === 'win32' ? 'spec-first.cmd' : 'spec-first';
+  const STARTUP_REMINDER_LOOKUP_TIMEOUT_MS = 2000;
+  const STARTUP_REMINDER_PROCESS_TIMEOUT_MS = 2500;
+  const LANG_START = '<!-- spec-first:lang:start -->';
+  const LANG_END = '<!-- spec-first:lang:end -->';
+  const WORKFLOW_ENTRY_ANCHOR = '<!-- spec-first:workflow-entry:using-spec-first -->';
+  const LEGACY_BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
+  const LEGACY_BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
+  const missingMessage = [
+    '[spec-first] using-spec-first SessionStart injection',
+    'Managed language/governance block is missing from `AGENTS.md`.',
+    'Run `spec-first init` in this project and choose ZCode when prompted to restore the managed language/governance block.',
+  ].join('\n');
+
+  let additionalContext = missingMessage;
+  // Read via try/catch (not existsSync + read) so an unreadable file (EACCES/EISDIR)
+  // or a TOCTOU delete degrades to a pointer instead of throwing and aborting the hook.
+  const instructionBody = readInstructionBody(instructionPath);
+  if (instructionBody !== null) {
+    const status = inspectWorkflowEntryGuidance(instructionBody);
+
+    if (status.installed) {
+      // AGENTS.md already carries the managed language/governance block; inject a short pointer.
+      additionalContext = [
+        '[spec-first] using-spec-first SessionStart injection',
+        "Workflow entry governance is active in this repo's AGENTS.md (`spec-first:lang` managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+        'Full routing policy: .agents/skills/using-spec-first/SKILL.md.',
+      ].join('\n');
+    } else {
+      additionalContext = [
+        '[spec-first] using-spec-first SessionStart injection',
+        status.message,
+        'Run `spec-first init` in this project and choose ZCode when prompted to restore the managed language/governance block.',
+      ].join('\n');
+    }
+  }
+
+  const startupReminder = readStartupReminder(projectDir);
+  if (startupReminder) {
+    additionalContext = [
+      additionalContext,
+      '',
+      startupReminder,
+    ].join('\n');
+  }
+
+  writeHookOutput(additionalContext);
+
+  function readInstructionBody(filePath) {
+    try {
+      return fs.readFileSync(filePath, 'utf8');
+    } catch {
+      return null;
+    }
+  }
+
+  function inspectWorkflowEntryGuidance(body) {
+    const legacyMarkers = inspectMarkerStructure(body, LEGACY_BOOTSTRAP_START, LEGACY_BOOTSTRAP_END);
+    if (!legacyMarkers.absent) {
+      if (!legacyMarkers.valid) {
+        return {
+          installed: false,
+          message: 'Legacy standalone bootstrap markers must form exactly one balanced pair in `AGENTS.md`.',
+        };
+      }
+      return {
+        installed: false,
+        message: 'Legacy standalone using-spec-first bootstrap should be merged into the `spec-first:lang` block in `AGENTS.md`.',
+      };
+    }
+
+    const langMarkers = inspectMarkerStructure(body, LANG_START, LANG_END);
+    if (langMarkers.absent) {
+      return {
+        installed: false,
+        message: 'Managed language/governance block is missing from `AGENTS.md`.',
+      };
+    }
+    if (!langMarkers.valid) {
+      return {
+        installed: false,
+        message: 'Managed language/governance markers must form exactly one balanced pair in `AGENTS.md`.',
+      };
+    }
+
+    const managedBlock = body.slice(langMarkers.startIdx, langMarkers.endIdx + LANG_END.length);
+    if (countOccurrences(managedBlock, WORKFLOW_ENTRY_ANCHOR) === 1) {
+      return { installed: true };
+    }
+    return {
+      installed: false,
+      message: 'Workflow entry guidance is missing from the `spec-first:lang` block in `AGENTS.md`.',
+    };
+  }
+
+  function inspectMarkerStructure(contents, startMarker, endMarker) {
+    const startIndexes = findMarkerIndexes(contents, startMarker);
+    const endIndexes = findMarkerIndexes(contents, endMarker);
+    return {
+      absent: startIndexes.length === 0 && endIndexes.length === 0,
+      valid: startIndexes.length === 1 && endIndexes.length === 1 && startIndexes[0] < endIndexes[0],
+      startIdx: startIndexes.length === 1 ? startIndexes[0] : -1,
+      endIdx: endIndexes.length === 1 ? endIndexes[0] : -1,
+    };
+  }
+
+  function findMarkerIndexes(contents, marker) {
+    const indexes = [];
+    let searchFrom = 0;
+    while (searchFrom <= contents.length - marker.length) {
+      const index = contents.indexOf(marker, searchFrom);
+      if (index === -1) {
+        break;
+      }
+      indexes.push(index);
+      searchFrom = index + marker.length;
+    }
+    return indexes;
+  }
+
+  function countOccurrences(contents, value) {
+    return findMarkerIndexes(contents, value).length;
+  }
+
+  function readStartupReminder(cwd) {
+    try {
+      const result = spawnSync(SPEC_FIRST_CLI_COMMAND, ['startup-reminder', '--zcode'], {
+        cwd,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS: String(STARTUP_REMINDER_LOOKUP_TIMEOUT_MS),
+        },
+        shell: process.platform === 'win32',
+        // 子进程网络超时必须小于 hook 总预算，避免外层先终止而 attempt cooldown 已经落盘。
+        timeout: STARTUP_REMINDER_PROCESS_TIMEOUT_MS,
+      });
+
+      if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {
+        return '';
+      }
+
+      return result.stdout.trim();
+    } catch {
+      return '';
+    }
+  }
+}
+
+function writeHookOutput(additionalContext) {
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'SessionStart',
+      additionalContext,
+    },
+  }));
+}

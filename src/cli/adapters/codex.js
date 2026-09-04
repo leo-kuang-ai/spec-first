@@ -102,7 +102,7 @@ class CodexAdapter extends PlatformAdapter {
       transformed = rewriteSkillName(transformed, codexRuntimeSkillName(context));
     }
     if (isEntrypoint && isCodexRuntimeSetupSurface(context)) {
-      transformed = addCodexSetupHostPin(transformed);
+      transformed = addSharedSetupHostPin(transformed);
     }
     const runtimeSkillRoot = context.runtimeSkillRoot
       || (context.isWorkflowSkill ? `${this.workflowsRoot}/${context.skillName}` : '');
@@ -280,15 +280,15 @@ function isSkillEntrypointContext(context = {}) {
     || context.relativePath.replace(/\\/g, '/') === 'SKILL.md';
 }
 
-function addCodexSetupHostPin(content) {
-  if (content.includes('## Codex Host Pin')) {
+function addSharedSetupHostPin(content) {
+  if (content.includes('## Shared Setup Host Pin')) {
     return content;
   }
 
   return content.replace(/## Workflow Modes\n/, [
-    '## Codex Host Pin',
+    '## Shared Setup Host Pin',
     '',
-    'When this generated Codex Skill invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST=codex` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    'When this generated Skill invokes `skills/spec-runtime-setup/scripts/*`, set `MCP_SETUP_HOST` for the host session that runs it: `MCP_SETUP_HOST=codex` under Codex (user-level Codex config), or `MCP_SETUP_HOST=zcode` under ZCode (workspace `.zcode/config.json` under `mcp.servers`). Do not rely on automatic host detection from PATH, because multiple host CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',

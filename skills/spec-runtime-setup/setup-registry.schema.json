@@ -19,7 +19,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "setup-registry.v9"
+      "const": "setup-registry.v10"
     },
     "summary_columns": {
       "type": "array",
@@ -50,7 +50,8 @@
         "cursor",
         "kiro",
         "opencode",
-        "qoder"
+        "qoder",
+        "zcode"
       ],
       "properties": {
         "claude": {
@@ -69,6 +70,9 @@
           "$ref": "#/$defs/hostDefinition"
         },
         "qoder": {
+          "$ref": "#/$defs/hostDefinition"
+        },
+        "zcode": {
           "$ref": "#/$defs/hostDefinition"
         }
       }
@@ -220,10 +224,22 @@
             "windows"
           ],
           "properties": {
-            "macos": { "type": "string", "minLength": 1 },
-            "linux": { "type": "string", "minLength": 1 },
-            "wsl": { "type": "string", "minLength": 1 },
-            "windows": { "type": "string", "minLength": 1 }
+            "macos": {
+              "type": "string",
+              "minLength": 1
+            },
+            "linux": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wsl": {
+              "type": "string",
+              "minLength": 1
+            },
+            "windows": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         }
       ]
@@ -238,9 +254,15 @@
         "reason_code"
       ],
       "properties": {
-        "config_path": { "$ref": "#/$defs/configPath" },
-        "config_format": { "const": "jsonc" },
-        "precedence": { "type": "number" },
+        "config_path": {
+          "$ref": "#/$defs/configPath"
+        },
+        "config_format": {
+          "const": "jsonc"
+        },
+        "precedence": {
+          "type": "number"
+        },
         "reason_code": {
           "type": "string",
           "pattern": "^[a-z0-9][a-z0-9-]*$"
@@ -256,20 +278,39 @@
         "precedence"
       ],
       "properties": {
-        "config_path": { "$ref": "#/$defs/configPath" },
+        "config_path": {
+          "$ref": "#/$defs/configPath"
+        },
         "config_format": {
-          "enum": ["json", "toml"]
+          "enum": [
+            "json",
+            "toml"
+          ]
         },
-        "precedence": { "type": "number" },
+        "precedence": {
+          "type": "number"
+        },
         "writable_check": {
-          "enum": ["parent-or-file", "file-only"]
+          "enum": [
+            "parent-or-file",
+            "file-only"
+          ]
         },
-        "requires_user_scope": { "type": "boolean" },
-        "requires_user_scope_opt_in": { "type": "boolean" },
-        "containment_root": { "type": "string", "minLength": 1 },
+        "requires_user_scope": {
+          "type": "boolean"
+        },
+        "requires_user_scope_opt_in": {
+          "type": "boolean"
+        },
+        "containment_root": {
+          "type": "string",
+          "minLength": 1
+        },
         "precedence_guards": {
           "type": "array",
-          "items": { "$ref": "#/$defs/precedenceGuard" }
+          "items": {
+            "$ref": "#/$defs/precedenceGuard"
+          }
         }
       }
     },
@@ -277,7 +318,10 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "scope": { "type": "string", "minLength": 1 },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
         "json_container_path": {
           "type": "array",
           "minItems": 1,
@@ -287,7 +331,10 @@
           }
         },
         "server_representation": {
-          "enum": ["standard", "opencode-local"]
+          "enum": [
+            "standard",
+            "opencode-local"
+          ]
         },
         "permission_policy": {
           "$ref": "#/$defs/opencodePermissionPolicy"
@@ -295,22 +342,32 @@
         "targets": {
           "type": "object",
           "minProperties": 1,
-          "additionalProperties": { "$ref": "#/$defs/hostConfigTarget" }
+          "additionalProperties": {
+            "$ref": "#/$defs/hostConfigTarget"
+          }
         },
         "fallback_order": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "uninstall_targets": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "opencodePermissionPolicy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind"],
+      "required": [
+        "kind"
+      ],
       "properties": {
         "kind": {
           "const": "opencode-governed-assets-v1"
@@ -366,11 +423,22 @@
       "allOf": [
         {
           "if": {
-            "properties": { "ecosystem": { "const": "pypi" } },
-            "required": ["ecosystem"]
+            "properties": {
+              "ecosystem": {
+                "const": "pypi"
+              }
+            },
+            "required": [
+              "ecosystem"
+            ]
           },
           "then": {
-            "required": ["python", "installers", "distribution", "hook_normalization_contract"]
+            "required": [
+              "python",
+              "installers",
+              "distribution",
+              "hook_normalization_contract"
+            ]
           }
         }
       ]
@@ -407,7 +475,10 @@
         "python": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["requires", "allow_managed_download"],
+          "required": [
+            "requires",
+            "allow_managed_download"
+          ],
           "properties": {
             "requires": {
               "type": "string",
@@ -421,15 +492,22 @@
         "installers": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["preference", "plain_pip_allowed"],
+          "required": [
+            "preference",
+            "plain_pip_allowed"
+          ],
           "properties": {
             "preference": {
               "type": "array",
               "minItems": 2,
               "maxItems": 2,
               "prefixItems": [
-                { "const": "uv" },
-                { "const": "pipx" }
+                {
+                  "const": "uv"
+                },
+                {
+                  "const": "pipx"
+                }
               ],
               "items": false
             },
@@ -441,7 +519,11 @@
         "distribution": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["wheel_url", "sha256", "index_url"],
+          "required": [
+            "wheel_url",
+            "sha256",
+            "index_url"
+          ],
           "properties": {
             "wheel_url": {
               "type": "string",

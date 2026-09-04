@@ -31,7 +31,8 @@
         "cursor",
         "kiro",
         "qoder",
-        "opencode"
+        "opencode",
+        "zcode"
       ]
     },
     "entrySurface": {
@@ -96,7 +97,8 @@
             "kiro",
             "qoder",
             "opencode",
-            null
+            null,
+            "zcode"
           ]
         },
         "host_delivery": {
@@ -108,7 +110,8 @@
             "cursor",
             "kiro",
             "qoder",
-            "opencode"
+            "opencode",
+            "zcode"
           ],
           "properties": {
             "claude": {
@@ -127,6 +130,9 @@
               "$ref": "#/$defs/hostDelivery"
             },
             "opencode": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "zcode": {
               "$ref": "#/$defs/hostDelivery"
             }
           }

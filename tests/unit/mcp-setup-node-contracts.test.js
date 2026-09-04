@@ -374,7 +374,7 @@ describe('spec-runtime-setup unified Node contract', () => {
     const { loadRegistry } = require('../../skills/spec-runtime-setup/scripts/lib/registry.cjs');
     const registry = loadRegistry({ skillRoot });
 
-    expect(registry.schema_version).toBe('setup-registry.v9');
+    expect(registry.schema_version).toBe('setup-registry.v10');
     expect(registry.tools.map((entry) => entry.id)).toEqual(
       expect.arrayContaining(['sequential-thinking', 'context7', 'codegraph']),
     );

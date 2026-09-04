@@ -80,7 +80,7 @@ async function runInit(argv, promptOverrides = {}) {
 
   if (parsed.error) {
     console.error(parsed.error);
-    console.error('Usage: spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]');
+    console.error('Usage: spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]');
     return 2;
   }
 
@@ -88,7 +88,7 @@ async function runInit(argv, promptOverrides = {}) {
     const tty = promptApi.requireTty();
     if (!tty.ok) {
       console.error('spec-first init requires an interactive terminal unless `-y/--yes` is used with defaults or explicit host flags.');
-      console.error('spec-first init 需要交互式终端；如需跳过引导，请使用 `-y/--yes` 并按需指定 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder` / `--opencode`。');
+      console.error('spec-first init 需要交互式终端；如需跳过引导，请使用 `-y/--yes` 并按需指定 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder` / `--opencode` / `--zcode`。');
       return 2;
     }
   }

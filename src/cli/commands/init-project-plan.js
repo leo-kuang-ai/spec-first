@@ -43,6 +43,9 @@ const {
   QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
 } = require('../qoder-settings');
 const {
+  ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
+} = require('../zcode-settings');
+const {
   getClaudeSettingsPath,
   inspectManagedClaudeHooks,
   renderManagedClaudeHooksUpsert,
@@ -154,6 +157,13 @@ function buildProjectInitPlan({
       message: `Warning [${QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE}]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified. Hook scripts are generated while settings entries remain intentionally omitted, so SessionStart and PRD guard hooks stay inactive.`,
     });
   }
+  if (platform === 'zcode') {
+    diagnostics.push({
+      level: 'warn',
+      code: ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
+      message: `Warning [${ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE}]: the ZCode config hook contract (hooks.events + hooks.enabled) is documented by the official guide, but SessionStart activation on the ZCode client is not yet verified by a live session. The managed SessionStart entry is installed while its activation stays degraded until live evidence is recorded.`,
+    });
+  }
 
   const commandDir = adapter.hasCommands ? path.join(normalizedRoot, adapter.commandRoot) : '';
   let previousState = null;
@@ -220,6 +230,19 @@ function buildProjectInitPlan({
       message: 'This directory\'s .codex is the Codex global hook location (CODEX_HOME). '
         + 'Skipping SessionStart hook install here to avoid double-injecting into every project. '
         + 'skills/AGENTS.md were still installed. Run init inside an actual project to install the project hook.',
+    });
+  }
+  if (runtimeSyncPlan && runtimeSyncPlan.skippedConfigWrite) {
+    diagnostics.push({
+      level: 'warn',
+      code: 'zcode_config_write_skipped',
+      message: `Warning: the managed ZCode SessionStart entry was NOT written. ${runtimeSyncPlan.configWriteBlockReason || '.zcode/config.json could not be read.'} Fix or remove the file, then rerun init --zcode. skills/AGENTS.md were still installed.`,
+    });
+  } else if (runtimeSyncPlan && runtimeSyncPlan.hooksDisabledByUser) {
+    diagnostics.push({
+      level: 'warn',
+      code: 'zcode_hooks_disabled_by_user',
+      message: 'Warning: .zcode/config.json has hooks.enabled=false, so the managed ZCode SessionStart entry is installed but stays inactive. Remove the flag or set it to true to activate spec-first session injection.',
     });
   } else if (platform === 'codex') {
     // High-touch existing-pollution bridge (U2b): a normal project init is a frequent action,

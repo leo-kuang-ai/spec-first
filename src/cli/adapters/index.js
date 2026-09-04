@@ -4,6 +4,7 @@ const CursorAdapter = require('./cursor');
 const KiroAdapter = require('./kiro');
 const QoderAdapter = require('./qoder');
 const OpenCodeAdapter = require('./opencode');
+const ZcodeAdapter = require('./zcode');
 const { PLATFORM_REGISTRY } = require('./platform-registry');
 
 const adapters = {
@@ -13,6 +14,7 @@ const adapters = {
   kiro: new KiroAdapter(),
   qoder: new QoderAdapter(),
   opencode: new OpenCodeAdapter(),
+  zcode: new ZcodeAdapter(),
 };
 
 /**

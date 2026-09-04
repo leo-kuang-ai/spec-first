@@ -7,6 +7,7 @@ const {
   isLegacyManagedState,
   mergeOperationPlans,
   planEmptyManagedRootCleanup,
+  hasSharedSkillsRootConsumer,
   planManagedAssetRemoval,
   readState,
   readStateFileRaw,
@@ -87,7 +88,7 @@ function runClean(argv, deps = {}) {
   const selectedPlatforms = selectedHostPlatforms(parsed);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode) [--dry-run]');
     console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
@@ -546,7 +547,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
     '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
@@ -575,6 +576,13 @@ function buildRuntimeCleanupPreview(projectRoot, adapter) {
   const preservingConsumers = sharedConsumers.filter((consumer) => consumer.status !== 'confirmed_absent');
   const operations = [];
   const diagnostics = buildSharedInstructionDiagnostics(adapter, preservingConsumers);
+  if (hasSharedSkillsRootConsumer(projectRoot, adapter)) {
+    diagnostics.push({
+      level: 'info',
+      code: 'shared_skills_consumer_present',
+      message: `Preserved the shared ${adapter.skillsRoot}/ projection consumed by another installed host; only host-specific assets were removed.`,
+    });
+  }
 
   const instructionPath = path.join(projectRoot, adapter.instructionFile);
   if (preservingConsumers.length === 0) {

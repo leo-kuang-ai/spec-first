@@ -317,6 +317,11 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
     manifestVersion: state.manifestVersion || 'normalized',
   }, adapter);
   const operations = [];
+  // Shared skills roots (e.g. `.agents/skills/` consumed by both Codex and
+  // ZCode) must survive a per-host clean/hard-reset while another host's state
+  // still claims the same projection; AGENTS.md has the same guard via the
+  // instruction-file consumer classification in clean.js.
+  const preserveSharedSkills = hasSharedSkillsRootConsumer(projectRoot, adapter);
 
   for (const commandFile of state.commands) {
     operations.push(
@@ -329,26 +334,28 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
     );
   }
 
-  for (const skillName of state.skills) {
-    operations.push(
-      buildOperation(
-        'remove_dir',
-        path.join(projectRoot, adapter.skillsRoot, skillName),
-        projectRoot,
-        'managed_skill',
-      ),
-    );
-  }
+  if (!preserveSharedSkills) {
+    for (const skillName of state.skills) {
+      operations.push(
+        buildOperation(
+          'remove_dir',
+          path.join(projectRoot, adapter.skillsRoot, skillName),
+          projectRoot,
+          'managed_skill',
+        ),
+      );
+    }
 
-  for (const skillName of state.workflowSkills) {
-    operations.push(
-      buildOperation(
-        'remove_dir',
-        path.join(projectRoot, adapter.workflowsRoot, skillName),
-        projectRoot,
-        'managed_workflow_skill',
-      ),
-    );
+    for (const skillName of state.workflowSkills) {
+      operations.push(
+        buildOperation(
+          'remove_dir',
+          path.join(projectRoot, adapter.workflowsRoot, skillName),
+          projectRoot,
+          'managed_workflow_skill',
+        ),
+      );
+    }
   }
 
   for (const agentPath of state.agents) {
@@ -376,11 +383,39 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
   return {
     operations,
     summary: summarizeOperations(operations),
+    skippedSharedSkills: preserveSharedSkills,
   };
 }
 
 function removeManagedAssets(projectRoot, managedState, adapter) {
   applyOperationPlan(projectRoot, planManagedAssetRemoval(projectRoot, managedState, adapter));
+}
+
+// True when another supported host's managed state still claims the same
+// skillsRoot projection (e.g. Codex and ZCode both consume `.agents/skills/`).
+// Lazy require: adapters depend on this module, so a top-level import would cycle.
+function hasSharedSkillsRootConsumer(projectRoot, adapter) {
+  const { getSupportedPlatforms, getAdapter } = require('./adapters');
+  return getSupportedPlatforms().some((platform) => {
+    if (platform === adapter.id) {
+      return false;
+    }
+    let candidate;
+    try {
+      candidate = getAdapter(platform);
+    } catch (_error) {
+      return false;
+    }
+    if (candidate.skillsRoot !== adapter.skillsRoot) {
+      return false;
+    }
+    try {
+      const candidateState = readState(projectRoot, candidate);
+      return Boolean(candidateState && candidateState.platform === candidate.id);
+    } catch (_error) {
+      return false;
+    }
+  });
 }
 
 function planHardResetManagedAssets(projectRoot, managedState, adapter) {
@@ -544,9 +579,13 @@ function planEmptyManagedRootCleanup(projectRoot, adapter) {
   if (adapter.supportsAgents !== false) {
     relativePaths.push(adapter.agentsRoot);
   }
+  const preserveSharedSkillsRoot = hasSharedSkillsRootConsumer(projectRoot, adapter);
 
   const operations = [];
   for (const relativePath of relativePaths) {
+    if (relativePath === adapter.skillsRoot && preserveSharedSkillsRoot) {
+      continue;
+    }
     const absolutePath = path.join(projectRoot, relativePath);
     if (!fs.existsSync(absolutePath)) {
       continue;
@@ -727,6 +766,7 @@ module.exports = {
   mergeOperationPlans,
   normalizeOperationPath,
   planEmptyManagedRootCleanup,
+  hasSharedSkillsRootConsumer,
   planHardResetManagedAssets,
   planManagedAssetRemoval,
   planObsoleteManagedAssetRemoval,

@@ -14,6 +14,7 @@ const APP_AUDIT_METADATA_HOSTS = Object.freeze([
   'kiro',
   'qoder',
   'opencode',
+  'zcode',
 ]);
 const GENERATED_OR_CONTROL_ROOTS = Object.freeze([
   '.agents',

@@ -28,6 +28,7 @@ const HOST_ENTRY_FILE = Object.freeze({
   kiro: 'AGENTS.md',
   opencode: 'AGENTS.md',
   qoder: 'AGENTS.md',
+  zcode: 'AGENTS.md',
 });
 
 function entryFilesForHosts(hosts) {

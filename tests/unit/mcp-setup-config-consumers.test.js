@@ -103,7 +103,7 @@ describe('spec-runtime-setup active config consumers', () => {
 describe('spec-runtime-setup active Node consumers', () => {
   test('loads helper metadata from setup-registry v9 without jq', () => {
     const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
-    expect(registry.schema_version).toBe('setup-registry.v9');
+    expect(registry.schema_version).toBe('setup-registry.v10');
     expect(registry.helpers.map((entry) => entry.id)).not.toContain('jq');
 
     const helpers = new Map(registry.helpers.map((entry) => [entry.id, entry]));

@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder']);
+const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode']);
 const CANONICAL_HOST_SET = new Set(CANONICAL_HOSTS);
 const HOST_SKILL_SURFACES = Object.freeze({
   claude: '.claude/skills',
@@ -13,6 +13,10 @@ const HOST_SKILL_SURFACES = Object.freeze({
   kiro: '.kiro/skills',
   qoder: '.qoder/skills',
   opencode: '.opencode/skills',
+  // ZCode discovers skills from the same shared AGENTS.md-ecosystem root Codex
+  // projects to; resolveLoadedHostSurface returns every host bound to the
+  // matched surface so a zcode pin confirms against the shared root.
+  zcode: '.agents/skills',
 });
 
 function resolveHostAuthority({
@@ -41,12 +45,17 @@ function resolveHostAuthority({
   if (pin) {
     if (enforceSurfaceBinding) {
       const loadedSurface = resolveLoadedHostSurface(skillRoot);
+      // Shared surfaces (e.g. `.agents/skills/` bound to both codex and zcode)
+      // confirm the pin when the pinned host is among the surface's owners;
+      // the receipt keeps the first-match host for stable evidence display.
+      const pinBoundToSurface = Boolean(loadedSurface && Array.isArray(loadedSurface.hosts)
+        && loadedSurface.hosts.includes(pin));
       const verificationStatus = !loadedSurface
         ? 'unverified'
-        : (loadedSurface.host === pin ? 'confirmed' : 'rejected');
+        : (pinBoundToSurface ? 'confirmed' : 'rejected');
       const reasonCode = !loadedSurface
         ? 'host-invocation-surface-unverified'
-        : (loadedSurface.host === pin
+        : (pinBoundToSurface
           ? 'host-authority-loaded-root-bound'
           : 'host-invocation-surface-mismatch');
       const receipt = buildInvocationReceipt({
@@ -123,12 +132,23 @@ function resolveLoadedHostSurface(skillRoot) {
     return null;
   }
   const normalized = canonicalRoot.split(path.sep).join('/').replace(/\/$/, '');
+  const hosts = [];
+  let matchedSurfaceId = null;
   for (const [host, surfaceId] of Object.entries(HOST_SKILL_SURFACES)) {
-    if (normalized.endsWith(`/${surfaceId}/spec-runtime-setup`)) {
-      return { host, surface_id: surfaceId, skill_root: canonicalRoot };
+    if (!normalized.endsWith(`/${surfaceId}/spec-runtime-setup`)) {
+      continue;
+    }
+    if (matchedSurfaceId === null) {
+      matchedSurfaceId = surfaceId;
+    }
+    if (surfaceId === matchedSurfaceId) {
+      hosts.push(host);
     }
   }
-  return null;
+  if (hosts.length === 0) {
+    return null;
+  }
+  return { host: hosts[0], hosts, surface_id: matchedSurfaceId, skill_root: canonicalRoot };
 }
 
 function buildInvocationReceipt({

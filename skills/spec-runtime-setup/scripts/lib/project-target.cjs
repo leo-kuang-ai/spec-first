@@ -21,6 +21,7 @@ const IGNORED_DIRECTORY_NAMES = new Set([
   '.kiro',
   '.opencode',
   '.qoder',
+  '.zcode',
   '.agents',
   '.spec-first',
   'build',

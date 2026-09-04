@@ -766,7 +766,7 @@ describe('plugin module facade and governance', () => {
         );
         expect(setupSkill).toBeDefined();
         expect(setupSkill.contents).toContain(
-          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v9`。',
+          'Canonical package source-of-truth 是 `skills/spec-runtime-setup/setup-registry.json`，由共置的 `setup-registry.schema.json` 校验，schema version 为 `setup-registry.v10`。',
         );
         expect(setupSkill.contents).toContain(
           'Generated host runtime mirrors and host-local MCP config files are projections or outputs, not source.',

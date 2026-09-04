@@ -883,6 +883,7 @@ function runtimeStatePath(host, repoRoot) {
     kiro: '.kiro/spec-first/state.json',
     opencode: '.opencode/spec-first/state.json',
     qoder: '.qoder/spec-first/state.json',
+    zcode: '.zcode/spec-first/state.json',
   };
   return roots[host] ? path.join(repoRoot, roots[host]) : null;
 }

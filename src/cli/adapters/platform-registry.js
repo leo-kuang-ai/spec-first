@@ -164,6 +164,23 @@ const PLATFORM_REGISTRY = {
       },
     },
   },
+  zcode: {
+    displayName: 'ZCode',
+    runtimeRoot: '.zcode',
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.zcode/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+      workflowsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+    },
+    capabilities: {
+      hooks: {
+        shellCommand: { status: 'confirmed' },
+        sessionStart: { status: 'degraded', reasonCode: 'zcode_activation_unverified' },
+        preToolUse: { status: 'not-supported', reasonCode: 'spec-first-scope' },
+        stopBlocking: { status: 'not-supported', reasonCode: 'spec-first-scope' },
+      },
+    },
+  },
 };
 
 function widenDelta(platform, fixture, candidatePath, reasonCode, ownership = 'generated-runtime') {

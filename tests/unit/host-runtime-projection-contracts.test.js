@@ -163,7 +163,7 @@ describe('host runtime projection contracts', () => {
         ]),
       );
 
-      expect(registry.schema_version).toBe('setup-registry.v9');
+      expect(registry.schema_version).toBe('setup-registry.v10');
       expect(hostConfig.kiro.targets).toMatchObject({
         workspace: { config_path: '.kiro/settings/mcp.json' },
         user: { config_path: '$HOME/.kiro/settings/mcp.json' },

@@ -225,6 +225,7 @@ function visibleHostRunner(visibleHost) {
     kiro: ['kiro'],
     opencode: ['opencode'],
     qoder: ['qodercli', 'qoder'],
+    zcode: ['zcode'],
   };
   const hostCommands = new Set(Object.values(commands).flat());
   return (command, args, options = {}) => {
