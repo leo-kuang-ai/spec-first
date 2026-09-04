@@ -124,3 +124,9 @@ python3 $D/run_routing.py claude 3 --claude-model claude-sonnet-5 --tag -sonnet5
 ### 8.3 P1 行为回归的环境性受阻(诚实记录)
 
 4 个 description 编辑 skill 的 skill-up 行为回归首跑 8/18 FAIL(debug 4/5、simplify 2/4、work 2/7、test-browser 0/2)。**隔离 A/B:还原全部 4 处改动后重跑同批 10 个失败用例,0/10 同败**——失败与改动无因果,判定为当日网关/引擎降级所致(codex 通道全程超时限流同日旁证;routing 单轮问答不受影响,多轮 agentic 用例敏感)。按纪律不声称通过:4 处 description 以 keep 挂起(见 results.tsv,eval_mode=`skillup_blocked_env`),网关恢复后重跑 18 用例再转正。**该受阻同时影响并行测评线的同通道用例,建议 owner 关注网关状态。**
+
+### 8.4 收口状态(2026-09-03 上午更新,含第三轮回归)
+
+- **环境探测(09:34)**:codex 双通道不可用(智谱直连 responses 端点 404;HST-中转经隔离 CODEX_HOME 探测 7 分钟无响应),claude 双通道 prompt 丢弃(glm 默认 3/3、sonnet-5 2/2 返回问候语,即并行线记录的 `[env-noise]` 症状加重)。**两挂起项(codex 路由补跑、18 用例行为回归)当天不具备执行条件,继续挂起**;复跑命令见 §7 与 §8.3,环境恢复后即可一次收口。补充:codex-官方 档案依赖的 127.0.0.1:8080 本地代理未运行(端口被一个 `python3 -m http.server` 占用)。
+- **§8.1 延迟项闭环核对**:spec-ideate/brainstorm/polish 已由并行测评线(CHANGELOG 14:40 条目)补齐触发与路由点名句;spec-code-review 已有等效边界句("Report-only by default; apply fixes only when … explicitly requests")——P1#5 四件套全部闭环;spec-promote 与 spec-product-pulse 均带 `disable-model-invocation: true`,模型不可触发,description 不承担路由职能,P1#6 全部闭环。无需再改源。
+- **第三轮行为回归(09:5x,claude 引擎)**:预检(连续 2 次 PONG)通过后全量 18 用例得 **6/18**(debug 2/5、simplify 2/4、work 1/7、test-browser 1/2)。三点定性:①失败集逐轮漂移——diagnose-then-choice-gate(此前三轮全过)、r2-three-attempts-asked-first(昨日过)今日首挂,missing-origin-not-run(连挂两日)今日转过;②transcript 证实失败用例 skill 已进上下文(失败用例 SKILL.md 引用 5 次 vs 通过 4 次),排除"注入缺失"与"我的 description 改动"两假设;③门禁违反形态(修而不问、requirements-only 直接实现)与 R2 收编模式同族但呈非确定性。**结论:网关降级窗口内的行为波动,回归判定继续挂起至通道稳定;按纪律不改判 keep 状态。** 三个数据点:with-edit 8/18(09-02)、without-edit 0/10 子集(09-02 隔离)、with-edit 6/18(09-03)。

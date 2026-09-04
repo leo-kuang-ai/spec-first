@@ -4,15 +4,20 @@
   "producer": "scripts/check-ce-localization-review.cjs",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "ac8f35259efbee0e02d1654cbf3b5b3ce0ff133c",
+    "head": "a8482f46c7f13cecd6aa15a4ab8e63f66ef23fb0",
     "dirty": true,
     "dirty_paths": [
-      "src/cli/version-reminder.js",
-      "tests/unit/version-reminder-hardening.test.js"
+      "CHANGELOG.md",
+      "docs/marketing/2026-09-03-wechat-eval-article-design-specs.md",
+      "docs/marketing/2026-09-03-wechat-eval-article.md",
+      "docs/plans/2026-09-03-001-feat-skill-routing-optimization-requirements.md",
+      "docs/plans/2026-09-04-002-feat-pi-host-support-plan.md",
+      "docs/validation/skill-evals/2026-09-02-entry-routing-and-static-audit.md",
+      "docs/validation/skill-evals/results.tsv"
     ],
-    "dirty_path_manifest_sha256": "efd487deadfbd5a09cc00cd8519d76d723d7475ab834a39e734efd3b10f01de6",
-    "source_tree_hash": "5140e522c508e12d98d205b70b400acbc9d1eab227bfd3570a7355c2be539fbe",
-    "inventory_hash": "dff99dec4438c9996eff73bdeb1d56b600a00e2d8cdeab6d6be84dc1e325b2b5",
+    "dirty_path_manifest_sha256": "60c20b5627e182c5b085c242c421e4a6f402b6d1301123cc0e8b59b662fe6ec3",
+    "source_tree_hash": "8cc0ecfa5c653469e00c4761818782666296e3def523f4ab6d3e08b42123c257",
+    "inventory_hash": "f9aef0883d2a5547c46994de0bc4d674d5a939064446226493f26bab7cf32126",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
