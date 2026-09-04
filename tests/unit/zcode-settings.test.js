@@ -226,8 +226,9 @@ describe('zcode adapter runtime file planning (hooks)', () => {
 
       const present = zcode.inspectRuntimeFiles(projectRoot);
       expect(present[0].level).toBe('PASS');
-      expect(present[1].level).toBe('WARNING');
-      expect(present[1].reasonCode).toBe('zcode_activation_unverified');
+      expect(present[1].level).toBe('PASS');
+      expect(present[1].message).toContain('activation verified in a live ZCode session');
+      expect(present[1].fix).toBeUndefined();
     });
   });
 

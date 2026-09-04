@@ -43,9 +43,6 @@ const {
   QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
 } = require('../qoder-settings');
 const {
-  ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
-} = require('../zcode-settings');
-const {
   getClaudeSettingsPath,
   inspectManagedClaudeHooks,
   renderManagedClaudeHooksUpsert,
@@ -155,13 +152,6 @@ function buildProjectInitPlan({
       level: 'warn',
       code: QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
       message: `Warning [${QODER_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE}]: the qodercli 1.0.41 evidence baseline confirms the hook settings and command protocol, but authenticated event execution and shared IDE loader safety are not verified. Hook scripts are generated while settings entries remain intentionally omitted, so SessionStart and PRD guard hooks stay inactive.`,
-    });
-  }
-  if (platform === 'zcode') {
-    diagnostics.push({
-      level: 'warn',
-      code: ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE,
-      message: `Warning [${ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE}]: the ZCode config hook contract (hooks.events + hooks.enabled) is documented by the official guide, but SessionStart activation on the ZCode client is not yet verified by a live session. The managed SessionStart entry is installed while its activation stays degraded until live evidence is recorded.`,
     });
   }
 

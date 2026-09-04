@@ -60,7 +60,7 @@ class ZcodeAdapter extends CodexAdapter {
   }
 
   get evidenceClaim() {
-    return 'skills_discovery_live_verified';
+    return 'skills_discovery_and_session_start_live_verified';
   }
 
   planRuntimeFilesSync(projectRoot) {
@@ -132,13 +132,15 @@ class ZcodeAdapter extends CodexAdapter {
     return [
       this.inspectSessionStartHook(projectRoot),
       ...inspectManagedZcodeConfig(projectRoot).map((status) => ({
-        level: 'WARNING',
+        level: status.status === 'installed' ? 'PASS' : 'WARNING',
         drift: status.drift,
         degradedByDesign: status.degradedByDesign,
         reasonCode: status.reasonCode,
         name: ZCODE_CONFIG_RELATIVE_PATH,
         message: status.message,
-        fix: formatInitGuidance('zcode', 'in this project to restore the managed SessionStart hook config'),
+        ...(status.status === 'installed' ? {} : {
+          fix: formatInitGuidance('zcode', 'in this project to restore the managed SessionStart hook config'),
+        }),
       })),
     ];
   }

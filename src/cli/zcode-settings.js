@@ -107,9 +107,16 @@ function inspectManagedZcodeConfig(projectRoot) {
   if (hasManagedSessionStartEntry(settings)) {
     const enabled = settings.hooks && settings.hooks.enabled === true;
     if (enabled) {
-      return [degradedStatus(
-        'managed SessionStart entry is installed; activation on the ZCode client is not yet verified by a live session',
-      )];
+      // Activation verified live on 2026-09-05: the ZCode client executed the
+      // managed SessionStart hook at session start and injected its
+      // additionalContext (docs/validation/2026-09-05-zcode-sessionstart-activation-eval.md).
+      return [{
+        status: 'installed',
+        eventName: 'SessionStart',
+        drift: false,
+        degradedByDesign: false,
+        message: 'managed SessionStart entry is installed; session activation verified in a live ZCode session',
+      }];
     }
     return [degradedStatus(
       'managed SessionStart entry is installed but hooks are disabled (hooks.enabled is not true); enable hooks or rerun init',

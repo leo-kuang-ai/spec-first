@@ -175,7 +175,7 @@ const PLATFORM_REGISTRY = {
     capabilities: {
       hooks: {
         shellCommand: { status: 'confirmed' },
-        sessionStart: { status: 'degraded', reasonCode: 'zcode_activation_unverified' },
+        sessionStart: { status: 'confirmed' },
         preToolUse: { status: 'not-supported', reasonCode: 'spec-first-scope' },
         stopBlocking: { status: 'not-supported', reasonCode: 'spec-first-scope' },
       },
