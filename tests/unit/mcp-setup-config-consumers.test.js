@@ -156,14 +156,21 @@ describe('spec-runtime-setup active Node consumers', () => {
     });
   });
 
-  test('queries effective registry data for every supported host', () => {
+  test('queries effective registry data for every setup-registry host', () => {
     const registry = loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') });
-    for (const host of getSupportedPlatforms()) {
+    const registryHosts = Object.keys(registry.hosts);
+    expect(registryHosts.length).toBeGreaterThan(0);
+    for (const host of registryHosts) {
       const effective = getEffectiveRegistry(registry, { host, platform: 'linux' });
       expect(effective.host_definition.id).toBe(host);
       expect(effective.tools.find((entry) => entry.id === 'context7').host_config.targets)
         .toBeDefined();
     }
+    // setup-registry 覆盖面是受支持宿主的有意子集：pi 无原生 MCP 支持，
+    // MCP_SETUP_HOST=pi 保持不支持，registry 不得新增 pi 定义（计划 KTD5；
+    // 仅当 pi MCP 官方化时重评）。
+    expect(getSupportedPlatforms().filter((platform) => !registryHosts.includes(platform)))
+      .toEqual(['pi']);
   });
 
   test('routes Graphify project-skill installation through the trusted provider map', () => {
@@ -183,9 +190,10 @@ describe('spec-runtime-setup active Node consumers', () => {
       : (command === 'uv'
         ? { exit_code: 0, status: 0, stdout: 'uv 0.8.0', stderr: '', signal: null, error: null, timed_out: false }
         : { exit_code: 1, status: 1, stdout: '', stderr: 'missing', signal: null, error: null, timed_out: false });
-    for (const host of getSupportedPlatforms()) {
-      const repoRoot = tempRepo(host);
-      const plan = providers.graphify.plan({ selected: true, repoRoot, host, dependency, runner });
+    const registryHosts = Object.keys(loadRegistry({ skillRoot: path.join(repoRoot, 'skills', 'spec-runtime-setup') }).hosts);
+    for (const host of registryHosts) {
+      const planRepoRoot = tempRepo(host);
+      const plan = providers.graphify.plan({ selected: true, repoRoot: planRepoRoot, host, dependency, runner });
       if (host === 'qoder') {
         expect(plan.actions).toContainEqual(expect.objectContaining({ kind: 'install-qoder-adapter', command: null }));
         expect(plan.actions.some((entry) => entry.kind === 'install-project-skill')).toBe(false);

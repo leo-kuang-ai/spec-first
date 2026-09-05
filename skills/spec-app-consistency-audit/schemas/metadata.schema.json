@@ -29,20 +29,81 @@
     "started_at"
   ],
   "properties": {
-    "schema_version": { "const": "spec-app-consistency-audit-metadata.v1" },
-    "artifact_id": { "const": "metadata" },
-    "source_inputs": { "type": "array", "minItems": 1 },
-    "consumers": { "type": "array", "minItems": 1 },
-    "contract_status": { "const": "candidate" },
-    "data_sensitivity": { "enum": ["public", "internal", "confidential", "restricted"] },
-    "host": { "enum": ["unknown", "claude", "codex", "cursor", "kiro", "qoder", "opencode", "zcode"] },
-    "mode": { "enum": ["default", "headless", "report-only"] },
-    "status": { "enum": ["started", "complete", "degraded", "failed"] },
-    "status_reason_codes": { "type": "array", "items": { "type": "string" } },
-    "started_at": { "type": "string" },
-    "diff_scope_kind": { "enum": ["git_diff", "working_tree", "source_snapshot"] },
-    "coverage_capabilities": { "type": "object" },
-    "input_expectations": { "type": "object" }
+    "schema_version": {
+      "const": "spec-app-consistency-audit-metadata.v1"
+    },
+    "artifact_id": {
+      "const": "metadata"
+    },
+    "source_inputs": {
+      "type": "array",
+      "minItems": 1
+    },
+    "consumers": {
+      "type": "array",
+      "minItems": 1
+    },
+    "contract_status": {
+      "const": "candidate"
+    },
+    "data_sensitivity": {
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted"
+      ]
+    },
+    "host": {
+      "enum": [
+        "unknown",
+        "claude",
+        "codex",
+        "cursor",
+        "kiro",
+        "qoder",
+        "opencode",
+        "zcode",
+        "pi"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "default",
+        "headless",
+        "report-only"
+      ]
+    },
+    "status": {
+      "enum": [
+        "started",
+        "complete",
+        "degraded",
+        "failed"
+      ]
+    },
+    "status_reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "diff_scope_kind": {
+      "enum": [
+        "git_diff",
+        "working_tree",
+        "source_snapshot"
+      ]
+    },
+    "coverage_capabilities": {
+      "type": "object"
+    },
+    "input_expectations": {
+      "type": "object"
+    }
   },
   "additionalProperties": true
 }

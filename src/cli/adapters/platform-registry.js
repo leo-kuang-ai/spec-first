@@ -181,6 +181,28 @@ const PLATFORM_REGISTRY = {
       },
     },
   },
+  pi: {
+    displayName: 'Pi',
+    runtimeRoot: '.pi',
+    surfaces: {
+      managedRoot: { kind: 'dir', path: '.pi/spec-first/', ownership: 'generated-runtime' },
+      skillsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+      workflowsRoot: { kind: 'dir', path: '.agents/skills/', ownership: 'generated-runtime', crossRuntimeRoot: true },
+    },
+    capabilities: {
+      hooks: {
+        // Pi has no shell hooks. The equivalent mechanism exists — TypeScript
+        // extensions with session_start/before_tool_call/before_agent_stop
+        // events — but extensions run with full system permissions, a larger
+        // trust surface than an advisory startup reminder, so none is shipped;
+        // entry governance already lives in the shared AGENTS.md layer.
+        shellCommand: { status: 'not-supported', reasonCode: 'spec-first-scope' },
+        sessionStart: { status: 'not-supported', reasonCode: 'pi_extension_not_shipped' },
+        preToolUse: { status: 'not-supported', reasonCode: 'pi_extension_not_shipped' },
+        stopBlocking: { status: 'not-supported', reasonCode: 'pi_extension_not_shipped' },
+      },
+    },
+  },
 };
 
 function widenDelta(platform, fixture, candidatePath, reasonCode, ownership = 'generated-runtime') {

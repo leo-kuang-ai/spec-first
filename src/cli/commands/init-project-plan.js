@@ -147,6 +147,14 @@ function buildProjectInitPlan({
       message: 'Warning: OpenCode support is generated-runtime preview. Command and skill loader behavior has not been verified for the installed OpenCode version.',
     });
   }
+  if (platform === 'pi') {
+    diagnostics.push({
+      level: 'warn',
+      code: 'pi_generated_runtime_preview',
+      message: 'Warning: Pi support is preview (skills discovery from the shared .agents/skills projection and the trust gate are live-verified on pi 0.85.0; AGENTS.md injection and model-mediated /skill: invocation remain docs-verified only). '
+        + 'Activation gate: pi loads project-level .agents/skills only after the project is trusted — run `pi` in this project and confirm the trust prompt (or trust once with `pi -a`); without trust, project skills stay silent.',
+    });
+  }
   if (platform === 'qoder') {
     diagnostics.push({
       level: 'warn',

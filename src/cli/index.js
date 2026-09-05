@@ -171,7 +171,7 @@ function parseStartupReminderArgs(args) {
 
 function printHelp(withErrorPrefix = false) {
   const lines = [
-    '🚀 spec-first — Manage spec-first workflow assets for Claude Code, Codex, Kiro, Qoder, Cursor preview, and OpenCode preview',
+    '🚀 spec-first — Manage spec-first workflow assets for Claude Code, Codex, Kiro, Qoder, Cursor preview, OpenCode preview, ZCode, and Pi',
     '',
     '📘 Usage:',
     '  spec-first <command> [options]',
@@ -179,9 +179,9 @@ function printHelp(withErrorPrefix = false) {
     '🧩 Commands:',
     '  doctor                 Check environment, runtime asset manifest, and managed runtime assets',
     '  quickstart [-y|--yes]  Detect Node/Git/host CLIs, then hand off to `init` (auto-selects host when exactly one is detected)',
-    '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
+    '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [--pi] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
     '  update                 Upgrade the spec-first CLI package and refresh runtime assets with `spec-first init`',
-    '  clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',
+    '  clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',
     '  repair-worktree        Preview broken worktree pointer repair guidance',
     '  tasks <subcommand>      Hash and validate derived task packs',
     '  plans <subcommand>      Read-only plan lifecycle audit (`plans audit`)',

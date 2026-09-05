@@ -5,6 +5,7 @@ const KiroAdapter = require('./kiro');
 const QoderAdapter = require('./qoder');
 const OpenCodeAdapter = require('./opencode');
 const ZcodeAdapter = require('./zcode');
+const PiAdapter = require('./pi');
 const { PLATFORM_REGISTRY } = require('./platform-registry');
 
 const adapters = {
@@ -15,6 +16,7 @@ const adapters = {
   qoder: new QoderAdapter(),
   opencode: new OpenCodeAdapter(),
   zcode: new ZcodeAdapter(),
+  pi: new PiAdapter(),
 };
 
 /**

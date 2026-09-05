@@ -269,6 +269,11 @@ describe('six-host init lifecycle', () => {
         expect(firstInit.stderr).toContain('inactive');
       }
 
+      if (platform === 'pi') {
+        expect(firstInit.stderr).toContain('pi_generated_runtime_preview');
+        expect(firstInit.stderr).toContain('Activation gate');
+      }
+
       const doctor = runSpecFirst(['doctor', `--${platform}`, '--json'], sandbox);
       expect(doctor.status).toBe(0);
       const report = parseJsonOutput(doctor);
@@ -289,6 +294,22 @@ describe('six-host init lifecycle', () => {
             drift: false,
           }),
         ]));
+      }
+
+      if (platform === 'pi') {
+        // doctor --pi 必须把 trust 激活门槛作为 known-limitation 呈现（KTD7）。
+        const trustChecks = report.checks.filter((check) =>
+          check.reasonCode === 'pi_project_trust_gate'
+        );
+        expect(trustChecks).toHaveLength(1);
+        expect(trustChecks[0]).toMatchObject({
+          level: 'WARNING',
+          runtimeStatus: 'known-limitation',
+        });
+        const hostSupport = report.host_support.pi;
+        expect(hostSupport.support_state).toBe('preview');
+        expect(hostSupport.evidence_claim).toBe('skills_discovery_and_trust_live_verified');
+        expect(hostSupport.loader_evidence).toBe(true);
       }
 
       const secondInit = runSpecFirst([...initArgs, '--dry-run'], sandbox);

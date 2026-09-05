@@ -56,6 +56,9 @@ function knownDiagnosticMessage(code, messages) {
   if (code === 'opencode_generated_runtime_preview') {
     return messages.diagnosticOpenCodeGeneratedRuntimePreview;
   }
+  if (code === 'pi_generated_runtime_preview') {
+    return messages.diagnosticPiGeneratedRuntimePreview;
+  }
   return '';
 }
 

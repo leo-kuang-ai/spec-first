@@ -16,9 +16,10 @@ describe('CE localization deterministic review producer', () => {
       'check-spiral-auth.cjs',
     ].join('/');
 
-    expect(inventory.skill_count).toBe(37);
+    expect(inventory.skill_count).toBe(38);
     // 692 = 676 + spec-ideate/using-spec-first eval 资产与断言脚本进入 inventory 源集（2026-08-31 批次）
-    expect(inventory.package_path_count).toBe(692);
+    // 1029 = 692 + autoresearch 收编为 canonical skill 源（2026-09-04 批次，01fad369，+337 包路径）
+    expect(inventory.package_path_count).toBe(1029);
     expect(inventory.files).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',
@@ -27,9 +28,13 @@ describe('CE localization deterministic review producer', () => {
       evidence_role: 'local-contract',
       terminal_disposition: 'included-canonical-skill-source',
     }));
-    expect(inventory.excluded_paths).toContainEqual(expect.objectContaining({
-      path: 'skills/autoresearch',
-      terminal_disposition: 'excluded-host-owned-local-source',
+    // 2026-09-04（01fad369）：autoresearch 从 host-owned 排除清单收编进 canonical
+    // inventory（excluded_paths 归零，37→38），断言随之移位到 files 侧。
+    expect(inventory.files).toContainEqual(expect.objectContaining({
+      skill_id: 'autoresearch',
+      owning_skill: 'autoresearch',
+      path: 'skills/autoresearch/SKILL.md',
+      terminal_disposition: 'included-canonical-skill-source',
     }));
     expect(coverage.coverage_summary.missing_path_count).toBe(0);
     // 2026-08-21: 186 -> 187 / 392 -> 393 after adding
@@ -46,8 +51,19 @@ describe('CE localization deterministic review producer', () => {
     // multi-end-embedded fixture, evals/README);
     // 650 -> 676 after committing exposed previously-untracked sources to the
     // inventory (2 plans, 3 review deltas, spec-project-rules validation reports).
-    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(190);
-    expect(coverage.coverage_summary.direct_support_relation_count).toBe(403);
+    // 2026-09-04 (01fad369): 190 -> 191 / 403 -> 405 after adopting autoresearch
+    // into the canonical inventory (its package + eval relations);
+    // 191 -> 192 / 405 -> 406 after this fix batch added the explicit autoresearch
+    // source refs below (a new direct-support path: this very test file, carrying
+    // two focused-test-explicit-source-ref relations). Note: the extractor scans
+    // quoted skill paths anywhere in this file, comments included — do not cite
+    // skill paths in comments here or the frozen count drifts.
+    // 2026-09-05 (pi host): 192 -> 193 / 406 -> 407 — the new direct-support path
+    // is the pi adapter test file itself (its runtime-setup transform fixture's
+    // frontmatter names that skill, incidentally matching the focused-test
+    // relation); the adapter source file carries no relation of its own.
+    expect(coverage.coverage_summary.direct_support_unique_path_count).toBe(193);
+    expect(coverage.coverage_summary.direct_support_relation_count).toBe(407);
     expect(coverage.direct_support).toContainEqual(expect.objectContaining({
       skill_id: 'spec-promote',
       owning_skill: 'spec-promote',

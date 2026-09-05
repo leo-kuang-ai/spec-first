@@ -88,7 +88,7 @@ function runClean(argv, deps = {}) {
   const selectedPlatforms = selectedHostPlatforms(parsed);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) [--dry-run]');
     console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
@@ -547,7 +547,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
     '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',

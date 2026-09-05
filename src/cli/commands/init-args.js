@@ -12,6 +12,8 @@ const INIT_PLATFORM_DEFAULTS = {
   kiro: { defaultChecked: false, defaultForYes: false },
   qoder: { defaultChecked: false, defaultForYes: false },
   opencode: { defaultChecked: false, defaultForYes: false },
+  // 显式条目保持清单完整（未配置宿主有同值兜底，但列出可读性更好）。
+  pi: { defaultChecked: false, defaultForYes: false },
 };
 
 const INIT_PLATFORM_CHOICES = getSupportedPlatforms().map((id) => ({

@@ -32,7 +32,8 @@
         "kiro",
         "qoder",
         "opencode",
-        "zcode"
+        "zcode",
+        "pi"
       ]
     },
     "entrySurface": {
@@ -98,7 +99,8 @@
             "qoder",
             "opencode",
             null,
-            "zcode"
+            "zcode",
+            "pi"
           ]
         },
         "host_delivery": {
@@ -111,7 +113,8 @@
             "kiro",
             "qoder",
             "opencode",
-            "zcode"
+            "zcode",
+            "pi"
           ],
           "properties": {
             "claude": {
@@ -133,6 +136,9 @@
               "$ref": "#/$defs/hostDelivery"
             },
             "zcode": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "pi": {
               "$ref": "#/$defs/hostDelivery"
             }
           }

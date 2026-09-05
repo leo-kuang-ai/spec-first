@@ -4,7 +4,7 @@
 
 **把 AI coding 会话变成可信、由项目拥有的变更。**
 
-`spec-first` 是面向 Claude Code、Codex、Kiro、Qoder、Cursor、OpenCode 与 ZCode 的仓库原生 AI Coding Harness。宿主仍负责写代码；`spec-first` 负责保留意图、约束执行范围、让完成声明受证据约束，并把已验证工作沉淀为可复用的项目知识。
+`spec-first` 是面向 Claude Code、Codex、Kiro、Qoder、Cursor、OpenCode、ZCode 与 Pi 的仓库原生 AI Coding Harness。宿主仍负责写代码；`spec-first` 负责保留意图、约束执行范围、让完成声明受证据约束，并把已验证工作沉淀为可复用的项目知识。
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
@@ -176,6 +176,7 @@ Runtime delivery 和宿主实机证据是不同声明。能够生成投射，并
 | Cursor | opt-in `generated_runtime_preview`；本机 loader journey 尚未验证 | `--cursor` |
 | OpenCode | opt-in `generated_runtime_preview`；同版本 loader journey 尚未验证 | `--opencode` |
 | ZCode | opt-in preview；skills 发现已经 live 验证，hooks/MCP 激活待真机证据 | `--zcode` |
+| Pi | opt-in preview；skills 发现与 trust 门控已 live 验证（0.85.0），`/skill:` 调用与 AGENTS.md 注入待凭据环境验证；MCP 需自装官方 adapter | `--pi` |
 
 运行 `spec-first doctor --verbose` 查看当前项目的 runtime facts。自动生成的 [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)是详细支持状态的权威参考。
 

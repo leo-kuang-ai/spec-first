@@ -52,6 +52,7 @@ describe('OpenCode adapter', () => {
       'qoder',
       'opencode',
       'zcode',
+      'pi',
     ]);
 
     const adapter = getAdapter('opencode');

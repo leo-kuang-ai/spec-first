@@ -921,6 +921,9 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
     lang,
   );
   const multipleHosts = uniquePlatforms.length > 1;
+  // Pi 的激活门槛是项目信任而非仅重启：未信任时即使新开会话，pi 也静默
+  // 跳过项目级 .agents/skills。
+  const piSelected = uniquePlatforms.includes('pi');
 
   if (lang === 'en') {
     console.log('Initialization complete. Next steps:');
@@ -928,6 +931,9 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
     console.log(multipleHosts
       ? `  Required: Restart ${hostDisplay} or open new sessions, then run ${setupCommand} in each host you plan to use.`
       : `  Required: Restart ${hostDisplay} or open a new session, then run ${setupCommand}.`);
+    if (piSelected) {
+      console.log('  Pi activation: run `pi` in this project and complete the trust step (confirm the trust prompt, or trust once with `pi -a`) — without project trust, pi does not load project-level .agents/skills.');
+    }
     console.log(`  Optional: To troubleshoot or audit projection health, run ${doctorCommands}.`);
     return;
   }
@@ -937,6 +943,9 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
   console.log(multipleHosts
     ? `  必做：重启 ${hostDisplay} 或分别新开会话，然后在每个计划使用的宿主中运行 ${setupCommand}。`
     : `  必做：重启 ${hostDisplay} 或新开会话，然后运行 ${setupCommand}。`);
+  if (piSelected) {
+    console.log('  Pi 激活：在本项目运行 `pi` 并完成项目信任（确认信任提示，或用 `pi -a` 一次性信任）——项目未信任时 pi 不加载项目级 .agents/skills。');
+  }
   console.log(`  可选：如需排查或审计 projection health，${multipleHosts ? '分别' : ''}运行 ${doctorCommands}。`);
 }
 
@@ -945,7 +954,7 @@ function printHelp() {
     '🚀 spec-first init',
     '',
     '📘 Usage:',
-    '  spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
+    '  spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [--pi] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
     '',
     'Host selection:',
     '  spec-first init                         Select one or more host runtimes interactively',
@@ -954,14 +963,14 @@ function printHelp() {
     '  spec-first init --kiro                  Initialize only Kiro after the remaining prompts',
     '  spec-first init --qoder                 Initialize only Qoder after the remaining prompts',
     '  spec-first init --opencode               Initialize only OpenCode preview runtime after the remaining prompts',
-    '  spec-first init --claude --codex --cursor --kiro --qoder --opencode --zcode Initialize all supported hosts',
+    '  spec-first init --claude --codex --cursor --kiro --qoder --opencode --zcode --pi Initialize all supported hosts',
     '  spec-first init -y -u <name> --lang zh  Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder/OpenCode require explicit flags)',
     '  spec-first init --cursor -y -u <name> --lang zh',
     '  spec-first init --qoder -y -u <name> --lang zh',
     '  spec-first init --opencode -y -u <name> --lang zh',
     '',
     'Interactive steps:',
-    '  1. Select Claude Code, Codex, Cursor, Kiro, Qoder, OpenCode, and/or ZCode',
+    '  1. Select Claude Code, Codex, Cursor, Kiro, Qoder, OpenCode, ZCode, and/or Pi',
     '  2. Confirm developer name (reuse the existing global profile when present)',
     '  3. Choose response language',
     '  4. Choose workspace target when child Git repos are detected',
@@ -979,7 +988,7 @@ function printHelp() {
     'Non-interactive usage:',
     '  Use -y/--yes to skip prompts. Without -y, init requires an interactive terminal and exits 2 in CI/non-TTY environments.',
     '  Fresh machines without a global developer profile or git user.name must pass -u <name>.',
-    '  Explicit --claude/--codex/--cursor/--kiro/--qoder/--opencode/--zcode flags override the default host set.',
+    '  Explicit --claude/--codex/--cursor/--kiro/--qoder/--opencode/--zcode/--pi flags override the default host set.',
     '  Use --dry-run to preview writes without changing runtime assets.',
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',
     '',
@@ -990,7 +999,8 @@ function printHelp() {
     '  Kiro: restart Kiro. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-runtime-setup, then route by user intent.',
     '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run spec-runtime-setup.',
     '  OpenCode: restart OpenCode so it reloads generated commands and skills. Support remains generated-runtime preview until version-matched loader evidence is recorded.',
-  '  ZCode: restart ZCode so it re-discovers skills from the shared .agents/skills projection. Support remains preview (skills discovery live-verified) until hook/MCP activation evidence is recorded.',
+    '  ZCode: restart ZCode so it re-discovers skills from the shared .agents/skills projection. Support remains preview (skills discovery live-verified) until hook/MCP activation evidence is recorded.',
+    '  Pi: run `pi` in this project and complete the project trust step (confirm the trust prompt, or trust once with `pi -a`) — without trust, project-level .agents/skills stays silent. Skills then load from the shared projection via /skill:name. Support remains preview (skills discovery and the trust gate live-verified on 0.85.0; /skill: invocation pending live evidence).',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',

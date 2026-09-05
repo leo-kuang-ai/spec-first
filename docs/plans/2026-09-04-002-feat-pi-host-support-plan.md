@@ -6,7 +6,7 @@ artifact_contract: spec-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: spec-plan-bootstrap
 execution: code
-status: active
+status: completed
 ---
 
 # pi Host Support - Plan
