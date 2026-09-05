@@ -1,0 +1,251 @@
+{
+ "records": [
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-code-review",
+   "group": "P",
+   "expected": "spec-code-review",
+   "got": "spec-code-review",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 20.1
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-debug-regression",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 26.6
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-doc-review",
+   "group": "P",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 9.8
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-work",
+   "group": "P",
+   "expected": "spec-work",
+   "got": "spec-work",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 9.0
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-debug-stack",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 42.5
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-plan",
+   "group": "P",
+   "expected": "spec-plan",
+   "got": "spec-plan",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 16.2
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-compound",
+   "group": "P",
+   "expected": "spec-compound",
+   "got": "spec-compound",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 10.3
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-runtime-setup",
+   "group": "P",
+   "expected": "spec-runtime-setup",
+   "got": "spec-runtime-setup",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 8.9
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-brainstorm",
+   "group": "P",
+   "expected": "spec-brainstorm",
+   "got": "spec-brainstorm",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 13.9
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-pr-feedback",
+   "group": "P",
+   "expected": "spec-resolve-pr-feedback",
+   "got": "spec-resolve-pr-feedback",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 11.0
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-pov",
+   "group": "P",
+   "expected": "spec-pov",
+   "got": "spec-pov",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 9.0
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "p-fixintent",
+   "group": "P",
+   "expected": "spec-debug",
+   "got": "spec-debug",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 12.4
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "n-simplify",
+   "group": "N",
+   "expected": "spec-simplify-code",
+   "got": "spec-simplify-code",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 13.4
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "n-review-fix",
+   "group": "N",
+   "expected": "spec-doc-review",
+   "got": "spec-doc-review",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 16.5
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "n-optimize",
+   "group": "N",
+   "expected": "spec-optimize",
+   "got": "spec-optimize",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 16.2
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "n-handoff",
+   "group": "N",
+   "expected": "spec-handoff",
+   "got": "spec-handoff",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 15.1
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "n-lfg",
+   "group": "N",
+   "expected": "spec-lfg",
+   "got": "spec-lfg",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 12.6
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "n-ideate",
+   "group": "N",
+   "expected": "spec-ideate",
+   "got": "spec-ideate",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 9.5
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "d-lookup",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 8.7
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "d-context",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 8.3
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "d-fact",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 18.0
+  },
+  {
+   "engine": "nonexistent-engine",
+   "case": "d-typo",
+   "group": "D",
+   "expected": "direct",
+   "got": "direct",
+   "ok": true,
+   "env_error": false,
+   "dur_s": 10.2
+  }
+ ],
+ "summary": {
+  "nonexistent-engine": {
+   "overall_acc": 1.0,
+   "valid_n": 22,
+   "env_errors": 0,
+   "by_group": {
+    "P": {
+     "n": 12,
+     "correct": 12,
+     "acc": 1.0
+    },
+    "N": {
+     "n": 6,
+     "correct": 6,
+     "acc": 1.0
+    },
+    "D": {
+     "n": 4,
+     "correct": 4,
+     "acc": 1.0
+    }
+   },
+   "confusions": {},
+   "unparsed": 0,
+   "avg_dur_s": 14.5
+  }
+ }
+}

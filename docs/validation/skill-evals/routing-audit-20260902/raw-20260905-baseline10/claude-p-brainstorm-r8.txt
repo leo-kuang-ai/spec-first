@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 已有初步想法但目标用户与成功标准未定,按 definition 组判别规则应进 spec-brainstorm 而非 spec-ideate。

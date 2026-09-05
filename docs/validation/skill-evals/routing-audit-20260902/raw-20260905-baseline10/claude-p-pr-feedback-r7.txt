@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 治理硬规则规定“要求处理 GitHub PR review 反馈”必须进入对应入口 spec-resolve-pr-feedback，且该请求含 commit/push/回复评论等落地副作用，不得降级 Direct Lane。

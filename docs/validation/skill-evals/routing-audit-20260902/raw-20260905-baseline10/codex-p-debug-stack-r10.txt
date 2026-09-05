@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求包含 pytest 失败与明确报错，需要进入故障诊断流程定位根因。

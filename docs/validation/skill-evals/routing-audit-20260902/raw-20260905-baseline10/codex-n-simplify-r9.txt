@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 这是保持行为不变的代码简化与重构请求，直接进入专门的简化代码技能。

@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 入口硬规则规定「要求一条龙到绿 PR」必须进入 spec-lfg,不得降级 Direct Lane。

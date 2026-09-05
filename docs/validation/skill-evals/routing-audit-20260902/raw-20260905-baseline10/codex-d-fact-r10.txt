@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是对仓库 CHANGELOG 最新版本号的简单、限定范围事实查询，无需进入 spec-* 工作流。

@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 新机器上 harness runtime readiness（MCP、宿主配置）的安装、检查与刷新正是 spec-runtime-setup standalone skill 的专属职责，不属于任何 spec-* workflow 或 Direct Lane。

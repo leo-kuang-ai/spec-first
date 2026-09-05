@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件、明确范围的低风险文案修正，不涉及失败信号或 workflow 诉求，符合 Direct Lane 判定。

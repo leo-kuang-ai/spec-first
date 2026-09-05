@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求跨机器/跨会话交接工作进度并在新机器上恢复，正是 spec-handoff 的跨会话交接场景。

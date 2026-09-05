@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 这是基于当前项目现状对是否采用或迁移到 GraphQL 的明确技术选型裁决，应由 spec-pov 输出项目特定结论。

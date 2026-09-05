@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 目标用户和成功标准尚未明确，需先通过发散与收敛完成产品范围定义。

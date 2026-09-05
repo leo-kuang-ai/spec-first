@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有正式 plan 文档要落地执行，属于 Codebase 工作流链路中 Plan→Tasks→Code 的执行阶段，对应 spec-work 入口，且无失败/修复信号触发其他入口。

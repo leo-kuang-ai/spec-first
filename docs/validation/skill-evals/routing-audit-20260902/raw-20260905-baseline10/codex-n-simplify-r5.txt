@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 这是在保持行为不变前提下清理重复样板代码的重构任务，适用代码简化入口。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的单点事实查询(读 CHANGELOG 最新版本号)，无失败信号、无修改意图，属于 lightweight fact lookup，Direct Lane 即可。

@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 用户要求在新机器上安装、检查并配置 spec-first 运行环境(MCP 与宿主 readiness),这正是 `spec-runtime-setup` skill 的专属职责(Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows)。

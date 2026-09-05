@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 评审当前分支 12 个文件的改动是否存在质量风险，正是 spec-code-review workflow 的职责范围（review 判断而非修复意图，不触发 spec-debug）。

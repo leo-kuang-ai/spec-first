@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求只是询问当前会话上下文中的简单事实(第一件事是什么),属于 lightweight facts / current-context explanation,无需进入任何 spec-* workflow 或 standalone skill。

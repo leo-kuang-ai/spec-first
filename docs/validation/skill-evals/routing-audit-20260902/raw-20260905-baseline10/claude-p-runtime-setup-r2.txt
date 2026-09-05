@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 请求是安装/检查/配置 spec-first 所需的 harness runtime(MCP、宿主配置),正是 `spec-runtime-setup` skill 的职责范围。

@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在失败与报错信号(pytest 挂、AttributeError)及明确修复意图(“帮我看看怎么回事”)，入口硬规则要求进入 spec-debug，不得走 Direct Lane。

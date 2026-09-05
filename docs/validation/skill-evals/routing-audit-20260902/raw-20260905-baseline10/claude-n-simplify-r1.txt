@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 清理最近改动中的重复样板代码且保持行为不变，正是 behavior-preserving 重构/简化 pass，匹配 spec-simplify-code 的触发条件而非 spec-debug 或 Direct Lane。

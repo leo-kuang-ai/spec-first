@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 行为不变的近期改动清理/重构正中 spec-simplify-code 的触发条件（tidy/refactor passes），且无失败或修复信号故不进 spec-debug。

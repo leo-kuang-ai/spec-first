@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的单符号调用点查询，无失败信号、无修改意图，属于轻量事实查找，按治理规则可直接走 Direct Lane(codegraph/grep 即答)。

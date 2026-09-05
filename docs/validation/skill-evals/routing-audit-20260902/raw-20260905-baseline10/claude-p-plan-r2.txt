@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现方案与任务拆解未定，spec-plan 正是承接“从明确需求产出技术方案与任务规划”的入口。

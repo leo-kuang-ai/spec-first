@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求对既有方案文档做质量评审并给意见，属于文档评审工作，由公共文档评审工作流承接而非 Direct Lane。

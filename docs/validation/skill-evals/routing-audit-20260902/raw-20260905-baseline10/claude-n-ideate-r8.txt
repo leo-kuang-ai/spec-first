@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散新方向、明确“先发散别收敛”，命中治理规则中 definition 组的 spec-ideate 判别条件。

@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 这是针对最近改动进行保持行为不变的代码简化与样板清理，应使用专门的简化代码入口。

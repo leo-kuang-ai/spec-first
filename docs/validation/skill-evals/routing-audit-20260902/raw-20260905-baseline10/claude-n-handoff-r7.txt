@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户显式要求把当前工作进度打包成交接文档并在另一台机器的新会话中无缝续接，正是跨会话 handoff artifact 的创建场景。

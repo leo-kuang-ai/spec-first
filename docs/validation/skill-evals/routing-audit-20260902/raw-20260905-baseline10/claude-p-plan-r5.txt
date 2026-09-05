@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现方案与任务拆分未定，正是从既定需求产出技术方案的 planning workflow 入口。

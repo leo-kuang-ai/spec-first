@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 要求对外部技术（GraphQL 迁移）给出结合本项目现状的明确采用/不采用裁决，属治理规则指定的 spec-pov 专属入口。

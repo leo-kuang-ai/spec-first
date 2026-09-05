@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件局部错别字修正属于 CLAUDE.md 定义的小任务（docs/文案修正），无失败信号、无明确 workflow 点名，Direct Lane 直接执行即可。

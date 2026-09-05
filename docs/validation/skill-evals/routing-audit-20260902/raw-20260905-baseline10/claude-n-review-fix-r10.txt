@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户点名评审一份 PRD 文档并要求直接修复发现的问题，属于文档评审工作流的典型场景，不得降级 Direct Lane。

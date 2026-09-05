@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 已验证有效的根因与防回归经验属于已解决问题的知识沉淀（进 docs/solutions/ 供后续复用），正是 spec-compound 知识捕获 workflow 的入口职责。

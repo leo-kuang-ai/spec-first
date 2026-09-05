@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求从规划到提交、推送、开 PR 并持续推进到绿 PR 的一条龙流程，符合 spec-lfg 入口。

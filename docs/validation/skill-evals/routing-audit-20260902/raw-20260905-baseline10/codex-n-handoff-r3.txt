@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求跨设备交接并在新会话无缝续接，属于跨会话交接工作流。

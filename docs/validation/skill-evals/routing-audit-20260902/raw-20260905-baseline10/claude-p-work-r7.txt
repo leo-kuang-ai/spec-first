@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有既定 plan 文档要求执行落地，属于计划执行节点，按治理规则进入 spec-work 执行工作流。

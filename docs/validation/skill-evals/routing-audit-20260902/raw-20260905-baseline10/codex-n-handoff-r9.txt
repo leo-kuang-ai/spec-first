@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求创建跨会话交接文档并在另一台机器上恢复工作，应进入 spec-handoff。

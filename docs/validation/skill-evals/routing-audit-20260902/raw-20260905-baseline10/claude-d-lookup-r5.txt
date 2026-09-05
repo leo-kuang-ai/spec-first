@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯代码位置查询(lightweight fact lookup),不涉及失败/修复意图或显式 workflow 点名,属 Direct Lane 直接用 rg/codegraph 回答。

@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散新方向、明确“先发散别收敛”，符合 definition 组中 spec-ideate 的判别条件，而非已有想法待定目标的 spec-brainstorm。

@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 评审一份既有的方案文档质量属于文档评审，repo 有专门的 `spec-doc-review` workflow 承载该入口，不应走 Direct Lane。

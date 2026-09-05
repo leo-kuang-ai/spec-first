@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 这是已有想法但目标用户与成功标准尚未明确的产品范围梳理请求。

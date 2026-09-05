@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 该请求是对既有方案文档进行结构化审查与改进建议，属于规划文档评审场景。

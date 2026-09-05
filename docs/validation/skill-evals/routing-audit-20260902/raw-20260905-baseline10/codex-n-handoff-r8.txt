@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求创建跨会话交接文档，以便在另一台机器上无缝续接工作。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件单错别字的明确低风险 docs-only 小修，属于小任务 Direct Lane，无需进入 spec-* workflow（但仍需遵守 CHANGELOG 更新与最窄验证纪律）。

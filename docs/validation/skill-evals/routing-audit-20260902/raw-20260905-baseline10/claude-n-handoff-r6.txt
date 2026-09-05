@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求把当前进度打包成交接文档以在另一台机器/新会话继续工作,属于治理规则中必须进入 spec-handoff 的跨会话交接场景,不得降级 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 用户明确要求处理 GitHub PR #142 的 review comments，按治理规则必须进入 PR 反馈解决工作流。

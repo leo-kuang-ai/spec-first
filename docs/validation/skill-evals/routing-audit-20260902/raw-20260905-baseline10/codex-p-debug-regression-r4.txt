@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求明确涉及回归故障并要求调查原因，应进入 spec-debug 诊断流程。

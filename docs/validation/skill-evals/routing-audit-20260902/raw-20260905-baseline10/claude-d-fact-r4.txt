@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一事实轻量查询(读 CHANGELOG 顶部版本号),无失败信号、无 workflow 点名,属于 Direct Lane 的典型 lightweight lookup。

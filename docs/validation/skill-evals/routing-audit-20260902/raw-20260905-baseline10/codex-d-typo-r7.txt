@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是 README.md 中明确限定范围的单字错别字修正，属于低风险轻量编辑，可直接处理。

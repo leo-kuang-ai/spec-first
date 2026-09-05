@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 这是基于当前项目现状对是否从 REST 迁移到 GraphQL 的技术采用裁决，应使用项目特定的决策工作流。

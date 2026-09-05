@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 新机器上的 MCP/宿主运行环境检查与配置正是 spec-runtime-setup 的职责（安装、配置、验证并刷新 spec-first workflow 所需的 harness runtime readiness facts），无需进入 debug 或其他 workflow。

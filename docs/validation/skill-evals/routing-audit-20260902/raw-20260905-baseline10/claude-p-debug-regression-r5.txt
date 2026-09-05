@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户明确报告回归故障(上版正常、本版导出按钮失效)并要求查因，属于入口硬规则中“失败/回归/明确修复意图”信号，必须进入 spec-debug，不得走 Direct Lane。

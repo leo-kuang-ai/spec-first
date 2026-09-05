@@ -1,0 +1,2 @@
+入口：spec-optimize
+原因：该请求是以量化指标（800ms→200ms）为目标的可度量迭代优化实验，正好匹配 spec-optimize 的 metric-driven 迭代优化工作流。

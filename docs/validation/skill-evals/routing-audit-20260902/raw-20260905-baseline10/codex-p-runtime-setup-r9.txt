@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 该请求明确涉及 spec-first 运行时、MCP 与宿主配置的检查和就绪化，应进入运行时设置入口。

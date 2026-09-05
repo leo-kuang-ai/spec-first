@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 简单的只读代码定位查询(列调用位置)，无失败信号、无编辑意图，属于 lightweight facts / narrow lookup，走 Direct Lane。

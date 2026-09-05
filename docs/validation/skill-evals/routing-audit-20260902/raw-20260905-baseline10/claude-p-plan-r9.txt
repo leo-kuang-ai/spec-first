@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但技术方案与任务拆分未定,正是 spec-plan 的 Plan 阶段职责(且无失败信号需 spec-debug,非 Direct Lane 小改动)。

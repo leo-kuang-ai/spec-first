@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求目标已明确但实现方式与任务拆分尚未确定，应通过 spec-plan 制定证据化技术方案。

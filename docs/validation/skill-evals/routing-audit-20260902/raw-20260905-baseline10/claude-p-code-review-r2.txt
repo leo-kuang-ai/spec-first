@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 对当前分支 diff 做质量风险评审，正是 spec-code-review workflow 的定向场景（非 debug、非单文档、非低风险小编辑）。

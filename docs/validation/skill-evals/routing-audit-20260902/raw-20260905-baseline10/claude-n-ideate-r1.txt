@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散新方向、明确要求先发散不收敛，符合 definition 组判别中 spec-ideate 的触发条件。

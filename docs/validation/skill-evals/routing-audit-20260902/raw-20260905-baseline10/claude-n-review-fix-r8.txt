@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求评审既有 PRD 文档并将发现的问题直接改掉，属于文档评审闭环，命中 spec-doc-review 工作流而非 Direct Lane。

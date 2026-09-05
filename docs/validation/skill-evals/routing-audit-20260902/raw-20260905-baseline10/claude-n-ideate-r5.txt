@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 定义组判别规则明确「从零发散新方向用 spec-ideate」，本请求正是无既有想法的纯发散找方向，而非已有想法待定目标用户的 spec-brainstorm。

@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: definition 组判别规则明确「从零发散新方向用 spec-ideate」，该请求正是无既定想法、要求先发散不收敛的新方向探索。

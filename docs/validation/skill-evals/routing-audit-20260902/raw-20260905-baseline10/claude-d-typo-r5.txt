@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件单字错别字修正是明确限定的低风险小改动，按任务分级属于 Direct Lane，仅需遵守 CHANGELOG 与最窄验证纪律。

@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 新机器运行环境未就绪且涉及 MCP 与宿主配置检查，应进入专用 Runtime Setup 流程。

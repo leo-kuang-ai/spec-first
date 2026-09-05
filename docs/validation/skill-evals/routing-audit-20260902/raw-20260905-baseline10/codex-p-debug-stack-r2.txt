@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求涉及 pytest 失败与明确的报错诊断意图，按治理规则必须进入 spec-debug。

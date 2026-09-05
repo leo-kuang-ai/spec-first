@@ -81,9 +81,23 @@ REASON: <一句话理由>"""
 
 ENTRY_RE = re.compile(r"^ENTRY:\s*(.+)$", re.M)
 
+# Engine-failure markers: output that only echoes the prompt plus gateway errors
+# (e.g. codex "exceeded retry limit ... 429") is an environment failure, not an answer.
+ENV_ERROR_MARKERS = ("429 too many requests", "exceeded retry limit")
+
+
+def is_env_error_output(out):
+    low = (out or "").lower()
+    return any(marker in low for marker in ENV_ERROR_MARKERS)
+
 
 def norm_entry(s):
     s = (s or "").strip().strip("`*\"'。.").lower()
+    # The instruction template's own placeholder line ("ENTRY: <spec-<名称> 或 direct>")
+    # gets echoed back verbatim in engine-failure output; a leading '<' marks that echo,
+    # never a real answer.
+    if s.startswith("<"):
+        return "[unparsed]"
     s = re.sub(r"\s*\(.*?\)\s*$", "", s)
     if s.startswith("spec-"):
         return s.split()[0]
@@ -113,7 +127,7 @@ def run_one(engine, case, rep, claude_model=None, raw_dir="raw"):
     out, dur, rc = call_engine(engine, text, claude_model=claude_model)
     m = ENTRY_RE.search(out)
     got = norm_entry(m.group(1)) if m else "[unparsed]"
-    if got == "[unparsed]":  # one retry
+    if got == "[unparsed]" and not is_env_error_output(out):  # one retry, env errors excluded
         out2, dur2, rc2 = call_engine(engine, text, claude_model=claude_model)
         m2 = ENTRY_RE.search(out2)
         if m2:
@@ -122,9 +136,11 @@ def run_one(engine, case, rep, claude_model=None, raw_dir="raw"):
     raw_path = os.path.join(OUT, raw_dir, f"{engine}-{case['id']}-r{rep}.txt")
     with open(raw_path, "w") as f:
         f.write(out)
+    env_error = is_env_error_output(out)
     return {"engine": engine + (f":{claude_model}" if engine == "claude" and claude_model else ""),
             "case": case["id"], "group": case["group"],
-            "expected": case["expected"], "got": got, "ok": got == case["expected"],
+            "expected": case["expected"], "got": got,
+            "ok": got == case["expected"] and not env_error, "env_error": env_error,
             "dur_s": round(dur, 1)}
 
 
@@ -162,19 +178,22 @@ def main():
     for e in engines:
         ename = e + (f":{claude_model}" if e == "claude" and claude_model else "")
         recs = [r for r in records if r["engine"] == ename]
+        env_errors = [r for r in recs if r.get("env_error")]
+        valid = [r for r in recs if not r.get("env_error")]
         by_group = {}
         for g in ("P", "N", "D"):
-            sub = [r for r in recs if r["group"] == g]
+            sub = [r for r in valid if r["group"] == g]
             by_group[g] = {"n": len(sub), "correct": sum(r["ok"] for r in sub),
                            "acc": round(sum(r["ok"] for r in sub) / len(sub), 3) if sub else None}
         confusions = {}
-        for r in recs:
+        for r in valid:
             if not r["ok"]:
                 key = f"{r['case']}: {r['expected']} -> {r['got']}"
                 confusions[key] = confusions.get(key, 0) + 1
-        summary[e] = {"overall_acc": round(sum(r["ok"] for r in recs) / len(recs), 3),
+        summary[e] = {"overall_acc": round(sum(r["ok"] for r in valid) / len(valid), 3) if valid else None,
+                      "valid_n": len(valid), "env_errors": len(env_errors),
                       "by_group": by_group, "confusions": confusions,
-                      "unparsed": sum(1 for r in recs if r["got"] == "[unparsed]"),
+                      "unparsed": sum(1 for r in valid if r["got"] == "[unparsed]"),
                       "avg_dur_s": round(sum(r["dur_s"] for r in recs) / len(recs), 1)}
     with open(os.path.join(OUT, f"results{tag}.json"), "w") as f:
         json.dump({"records": records, "summary": summary}, f, ensure_ascii=False, indent=1)

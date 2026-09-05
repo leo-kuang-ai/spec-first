@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是基于当前会话上下文的轻量事实查询，无需进入 spec-* 工作流。

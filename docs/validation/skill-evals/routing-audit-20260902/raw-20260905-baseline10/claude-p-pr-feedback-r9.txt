@@ -1,0 +1,2 @@
+入口： spec-resolve-pr-feedback
+原因： 入口硬规则明确规定,用户显式要求处理 GitHub PR review 反馈(含本地修改、commit、push、回复评论)时必须进入 spec-resolve-pr-feedback,不得降级 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散新方向的定义组请求（要意外、先发散别收敛），按入口治理规则应走 spec-ideate 而非 spec-brainstorm。

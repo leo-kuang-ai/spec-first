@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一文件轻量事实查询，无需实质修改或 workflow，属 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 将已验证有效的根因与防回归经验沉淀为可复用知识，正是 spec-compound 知识捕获工作流的职责（spec-project-rules 明确排除 solved-problem learnings）。

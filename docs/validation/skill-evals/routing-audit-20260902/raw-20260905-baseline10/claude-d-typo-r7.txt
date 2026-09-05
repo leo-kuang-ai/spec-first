@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文案错别字修正属小任务，无失败/回归/明确工作流信号，按治理规则走 Direct Lane（仍需 CHANGELOG 与 README 硬约束检查）。

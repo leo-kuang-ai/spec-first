@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定而实现方案与任务拆分未定，属于从明确需求产出技术方案的规划阶段，按 definition 组判别应走 spec-plan 而非 spec-brainstorm/spec-ideate。

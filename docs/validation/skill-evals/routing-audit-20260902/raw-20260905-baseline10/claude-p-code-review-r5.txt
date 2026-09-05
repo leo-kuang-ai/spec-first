@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 用户要求对当前分支的多文件改动做质量风险评审，正是 spec-code-review 工作流的职责范围，且无失败/修复信号排除 Direct Lane 之外的其他入口。

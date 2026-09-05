@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求评审一份方案文档的质量并给出意见，属于文档评审工作流范畴，应进入 spec-doc-review 而非 Direct Lane。

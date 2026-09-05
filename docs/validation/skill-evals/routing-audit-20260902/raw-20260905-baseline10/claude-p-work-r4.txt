@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有成型 plan 需要执行落地,正是 spec-work 执行工作流的职责,且无失败/修复信号或显式点名的其他入口。

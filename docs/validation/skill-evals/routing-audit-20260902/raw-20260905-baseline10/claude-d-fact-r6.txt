@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是一个轻量级的事实查询(读 CHANGELOG 最新版本号),属于简单事实问答,不构成实质性工作,无需进入任何 spec-* workflow。

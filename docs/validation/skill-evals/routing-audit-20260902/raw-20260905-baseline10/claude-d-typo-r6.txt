@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件文案错别字修正是 CLAUDE.md 定义的小任务(docs-only 变更),无失败/回归/修复意图信号,属明确低风险编辑,走 Direct Lane 即可。

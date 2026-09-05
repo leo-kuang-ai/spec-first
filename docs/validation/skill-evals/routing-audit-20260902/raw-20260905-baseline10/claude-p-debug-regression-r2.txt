@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在回归信号(上一版本正常、本版本失效)且用户明确表达修复意图，入口硬规则要求进入 spec-debug 而非 Direct Lane。

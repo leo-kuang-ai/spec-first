@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 用户要求评审当前分支 12 个文件的改动是否有质量风险，这是典型的 diff 范围代码评审请求，对应 spec-code-review workflow 入口。

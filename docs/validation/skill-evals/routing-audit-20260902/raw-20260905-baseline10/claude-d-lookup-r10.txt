@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的调用点定位查询,无失败信号、无显式 workflow 点名、无代码变更,属于 Direct Lane 的 lightweight lookup。

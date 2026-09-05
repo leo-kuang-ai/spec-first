@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求只是询问当前会话上下文的简单事实（回顾对话历史），无失败信号、无 workflow 点名、无实质工程改动，属于轻量事实问答，走 Direct Lane。

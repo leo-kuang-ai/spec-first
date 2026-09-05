@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有明确 plan 产物要求执行落地，属于 Plan→Code 执行阶段的实质性变更，应进入 spec-work 执行 workflow 而非 Direct Lane。

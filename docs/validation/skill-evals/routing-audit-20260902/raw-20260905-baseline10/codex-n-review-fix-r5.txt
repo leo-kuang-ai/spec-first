@@ -1,0 +1,2 @@
+ENTRY: spec-prd
+REASON: 这是对既有 PRD/规划文档进行评审并直接修订需求内容，属于 brownfield PRD refinement。

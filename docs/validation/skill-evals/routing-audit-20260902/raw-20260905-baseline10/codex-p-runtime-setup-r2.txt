@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 请求涉及新机器上的 MCP 与多宿主运行环境检查、配置和就绪验证，应进入运行时设置流程。

@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 从零发散全新的产品功能方向且明确"先发散别收敛",符合 definition 组中"从零发散新方向用 spec-ideate"的判别规则。

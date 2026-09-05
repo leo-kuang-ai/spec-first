@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户请求评审一份方案文档的质量并给意见,属于文档评审语义判断,正是 spec-doc-review workflow 的承接范围,且无失败/修复信号不构成 Direct Lane。

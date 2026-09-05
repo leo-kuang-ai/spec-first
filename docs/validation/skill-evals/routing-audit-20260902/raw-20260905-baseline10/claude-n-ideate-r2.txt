@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 定义组判别规则明确「从零发散新方向用 spec-ideate」，该请求是纯发散、无既有想法与收敛要求，正是 ideation workflow 的入口场景。

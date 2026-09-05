@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 请求本质是新机器上安装、配置并验证 spec-first 工作流所需的 harness runtime/MCP 与宿主就绪状态，正是 spec-runtime-setup skill 的专属职责。

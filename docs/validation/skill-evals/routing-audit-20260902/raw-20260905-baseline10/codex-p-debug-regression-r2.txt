@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求明确涉及版本回归和功能失效诊断，应进入 spec-debug 排查原因。

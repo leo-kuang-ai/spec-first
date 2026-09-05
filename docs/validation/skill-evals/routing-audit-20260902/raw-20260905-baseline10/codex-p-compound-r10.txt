@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 用户明确要求将已验证的根因与防回归做法沉淀为可复用工程知识，适用 spec-compound。

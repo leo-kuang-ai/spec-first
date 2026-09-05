@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 对最近改动的重复样板做保持行为不变的重构清理，正是 spec-simplify-code 的触发场景（tidy/refactor pass），且无失败或修复信号，不进 spec-debug。

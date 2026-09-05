@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的轻量事实查询（读 CHANGELOG 顶部版本号），无失败信号、无修复意图、未点名 workflow，属于 Direct Lane。

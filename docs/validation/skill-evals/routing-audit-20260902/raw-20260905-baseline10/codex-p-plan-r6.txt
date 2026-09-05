@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求目标已明确但实现方式与拆分尚未确定，适合通过 spec-plan 产出证据驱动的技术方案。

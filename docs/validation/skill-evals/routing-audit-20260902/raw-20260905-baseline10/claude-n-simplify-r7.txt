@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 行为保持不变的最近改动样板清理正是 spec-simplify-code 的 tidy/refactor 场景，且不属于 bug（无需 spec-debug）。

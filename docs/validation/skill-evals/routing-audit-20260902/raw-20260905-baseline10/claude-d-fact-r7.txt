@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的轻量事实问答（查 CHANGELOG 版本号），无失败信号、无修改意图，按治理规则走 Direct Lane。

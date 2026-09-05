@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 这是要求对是否采纳/切换外部技术(GraphQL)给出结合本现状的明确裁决,按入口硬规则外部技术采用裁决必须进入 spec-pov,不得降级 Direct Lane。

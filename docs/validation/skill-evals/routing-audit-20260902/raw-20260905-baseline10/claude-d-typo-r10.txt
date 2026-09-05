@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件错别字修正属于典型小任务(clearly scoped low-risk edit),无失败信号、无 workflow 点名,Direct Lane 即可,仅同步 CHANGELOG。

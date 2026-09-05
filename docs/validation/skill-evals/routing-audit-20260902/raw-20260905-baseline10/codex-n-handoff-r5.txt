@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求创建跨机器、跨会话的工作交接文档以便后续无缝续作，属于 spec-handoff 入口。

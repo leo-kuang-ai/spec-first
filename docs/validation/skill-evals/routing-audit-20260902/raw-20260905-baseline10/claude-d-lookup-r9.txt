@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的代码位置查询(narrow lookup),无失败信号、无编辑、无 workflow 点名,按入口治理规则走 Direct Lane。

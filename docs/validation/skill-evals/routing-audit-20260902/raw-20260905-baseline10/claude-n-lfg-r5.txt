@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户显式要求从规划到绿 PR 一条龙免打扰干到可合并，命中入口硬规则，必须进入 `spec-lfg` 不得降级 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 用户明确指出 parseDate 实现错误并要求修复,属于入口硬规则中的明确修复意图信号,必须进入 spec-debug 而非 Direct Lane。

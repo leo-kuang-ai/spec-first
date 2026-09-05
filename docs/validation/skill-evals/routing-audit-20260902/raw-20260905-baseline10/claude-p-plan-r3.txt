@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现方案与任务拆解未定，正是 spec-plan 把已定需求转化为技术方案的职责，无需再走 ideate/brainstorm。

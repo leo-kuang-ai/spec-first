@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON：这是以量化指标(800ms→200ms)为目标的可度量优化实验，属于 metric-driven iterative optimization loop,正对 spec-optimize 的职责范围，而非 debug(无失败信号)或 plan。

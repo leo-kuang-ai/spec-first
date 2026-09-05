@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求从规划到绿 PR 一条龙完成，符合 spec-lfg 的全流程落地入口。

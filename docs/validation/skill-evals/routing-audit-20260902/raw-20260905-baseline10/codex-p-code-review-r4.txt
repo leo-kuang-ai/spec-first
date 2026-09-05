@@ -1,0 +1,11 @@
+
+[stderr]"
+
+请依据本仓库的治理规则,为该请求选择恰好一个入口(public spec-* workflow / standalone skill / Direct Lane)。
+严格按以下格式输出,共两行,不要输出其他任何内容:
+ENTRY: <spec-<名称> 或 direct>
+REASON: <一句话理由>
+hook: SessionStart
+hook: SessionStart Completed
+ERROR: exceeded retry limit, last status: 429 Too Many Requests, request id: a35fa9e84db1fafc-SJC
+ERROR: exceeded retry limit, last status: 429 Too Many Requests, request id: a35fa9e84db1fafc-SJC

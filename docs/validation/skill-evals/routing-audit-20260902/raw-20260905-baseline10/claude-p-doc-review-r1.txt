@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求评审一份既有方案文档的质量并给出意见，属于文档审查入口，无失败/修复信号，正好匹配 spec-doc-review workflow。

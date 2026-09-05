@@ -1,0 +1,2 @@
+ENTRY: spec-runtime-setup
+REASON: 检查并配置 spec-first 工作流运行环境(MCP、宿主 runtime readiness)正是 spec-runtime-setup standalone skill 的职责范围。

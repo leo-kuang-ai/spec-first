@@ -1,0 +1,2 @@
+ENTRY: spec-prd
+REASON: 这是对既有 PRD 的评审、问题修订与规划就绪性完善，属于 spec-prd 的 brownfield PRD refine 场景。

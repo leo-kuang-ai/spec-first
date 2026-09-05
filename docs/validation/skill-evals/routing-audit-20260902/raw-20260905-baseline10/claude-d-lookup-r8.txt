@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一符号的只读定位查询(列出 parseDate 调用位置),无失败信号、无显式点名 workflow、无实质变更,属于轻量事实问答,走 Direct Lane 即可。

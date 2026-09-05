@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的代码位置查询,无失败信号与修改意图,属于轻量事实查询,按治理规则走 Direct Lane。

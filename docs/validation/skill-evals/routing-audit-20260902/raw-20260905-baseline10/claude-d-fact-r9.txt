@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 轻量事实问答(读 CHANGELOG 查最新版本号),无失败/修复信号、非实质性工作,属于 using-spec-first 明确排除的 Direct Lane 场景。

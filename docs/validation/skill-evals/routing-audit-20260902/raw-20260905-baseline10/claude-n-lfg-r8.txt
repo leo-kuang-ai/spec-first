@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户显式要求从规划到绿 PR 一条龙 hands-off 干到能合并，属于 CLAUDE.md 入口硬规则中“要求一条龙到绿 PR”必须进入的 spec-lfg，不得降级 Direct Lane。

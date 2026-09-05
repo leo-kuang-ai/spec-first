@@ -1,0 +1,2 @@
+ENTRY: spec-ideate
+REASON: 定义组判别规则明确：从零发散新方向（要 3 个意外的新功能方向、先发散不收敛）属于 spec-ideate，而非已有想法待收敛的 spec-brainstorm。

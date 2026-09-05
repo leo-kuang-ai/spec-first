@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 该请求是对既有 PRD/规划文档进行角色化审查并直接修订，应走专门的文档评审入口。

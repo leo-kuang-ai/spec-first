@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 用户要求评审并直接修改一份 PRD 文档,属于文档评审闭环,对应 spec-doc-review 工作流,且无失败/修复信号或显式点名的其他入口。

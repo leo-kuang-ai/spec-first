@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 要求对外部技术（GraphQL）给出结合项目现状的明确采用/切换裁决，正是 spec-pov 的项目落地裁决入口。

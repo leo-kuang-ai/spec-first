@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单一事实的轻量只读查询(读取 CHANGELOG 顶部版本号)，无失败信号、无实质变更，按治理规则走 Direct Lane。

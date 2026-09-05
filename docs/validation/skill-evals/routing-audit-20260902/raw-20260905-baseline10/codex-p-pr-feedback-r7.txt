@@ -1,0 +1,2 @@
+ENTRY: spec-resolve-pr-feedback
+REASON: 请求明确要求处理 GitHub PR review comments，应进入专门的 PR 反馈解决流程，并涵盖修改、验证及后续回复。

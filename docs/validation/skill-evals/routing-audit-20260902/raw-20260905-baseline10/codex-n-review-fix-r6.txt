@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 该请求是对既有 PRD 进行角色化审查并直接修订，应进入文档评审工作流。

@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 已验证有效的根因排查与防回归经验属于 solved-problem knowledge capture，正是 spec-compound 解决问题后沉淀可复用 solution 文档的职责。

@@ -1,0 +1,2 @@
+ENTRY: spec-lfg
+REASON: 用户明确要求从规划一条龙干到可合并的绿 PR 且全程免交互，命中 CLAUDE.md 入口硬规则中「要求一条龙到绿 PR」必须进入 spec-lfg、不得降级 Direct Lane 的强制路由。

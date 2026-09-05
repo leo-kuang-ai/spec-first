@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件轻量事实查询(读 CHANGELOG 最新版本号),无失败信号、无 workflow 点名,属 Direct Lane 免路由范围。

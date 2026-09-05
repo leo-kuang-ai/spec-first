@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有正式 plan 文档并要求执行落地，属于进入执行 workflow 的标准场景，而非 Direct Lane 或规划/调试入口。

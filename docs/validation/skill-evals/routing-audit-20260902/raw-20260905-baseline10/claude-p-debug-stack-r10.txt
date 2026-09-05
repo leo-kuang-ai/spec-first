@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在失败测试与报错信号(挂了、AttributeError、修复意图“帮我看看怎么回事”),按入口硬规则必须进入 spec-debug,不得走 Direct Lane。

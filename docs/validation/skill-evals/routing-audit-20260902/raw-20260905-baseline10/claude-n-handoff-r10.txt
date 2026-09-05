@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户显式要求跨会话/跨机器交接工作进度并明天无缝续作，命中入口硬规则中必须进入 `spec-handoff` 的情形，不得降级 Direct Lane。

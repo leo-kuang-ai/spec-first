@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 请求是对当前分支 diff 的质量评审,无失败/修复信号,按入口路由应走 `spec-code-review` 而非 Direct Lane。

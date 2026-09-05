@@ -1,0 +1,325 @@
+---
+title: spec-first 下一阶段开发顺序与批次执行指南
+date: 2026-09-05
+type: development-sequence
+status: active
+artifact_type: advisory
+execution: knowledge-work
+---
+
+# spec-first 下一阶段开发顺序与批次执行指南
+
+> 开发主线：最小测量与证据基线 -> Astra 核心指令修订 -> 真实任务对照 -> 按瓶颈优化上下文与接续 -> 知识复用、消融与成本收敛。
+
+本文是后续开发的顺序入口，负责批次、依赖、范围与进入条件。后续收到“按本文开发”的任务时，从 S0 核对当前事实并收敛当批实施输入，再由对应 owner 执行；不重新研究全部战略，也不把所有候选一次展开。
+
+本文不是整包 `implementation-ready` 代码计划。`execution: knowledge-work` 表示本文是协调与规划文档，不能直接作为 `spec-work` 的整包代码输入；`status: active` 表示仍在使用，不表示产品开发已开始。具体批次形成范围有限的代码计划或明确修复输入后，才进入实施。当前用户只要求输出本文，本轮不执行任何产品改动。
+
+## 1. 文档分工与范围
+
+| 文档 | 在开发中的职责 | 使用方式 |
+| --- | --- | --- |
+| [能力战略](../strategic-review/2026-09-05-next-phase-capability-strategy.md) | 决定目标用户、价值方向与衡量方法 | 解释为什么投入；不单独启动一轮开发 |
+| [来源账本](../strategic-review/2026-09-05-harness-research-sources.md) | 提供来源、版本和结论边界 | 核对依据；不把外部实验结果当本项目收益 |
+| [完整优化总方案](./2026-09-05-001-next-phase-optimization-program-plan.md) | 拥有 OPT-01 至 OPT-12 的候选目标、架构和验证边界 | 作为总体范围与验收依据 |
+| [Astra 指令优化方案](../strategic-review/2026-09-05-gpt6-astra-instruction-optimization-plan.md) | 提供 F01 至 F33、批次 A/B/C 和行为场景 E01 至 E33 | 作为指令改造候选与行为验证输入 |
+| 本文 | 合并开发顺序、前置条件和各项去向 | 后续先读本文，再读当批相关来源 |
+| 当批代码计划或修复输入 | 拥有本批实际目标、source 修改范围、接口决定、验证与完成条件 | 唯一代码实施输入；执行证据留在原 workflow/run |
+
+本轮新增的是顺序关系，没有把上游建议改写成已批准产品契约。发生源合同与候选行为冲突时，在对应批次明确修订决定、影响和验证，再改 owning source；本文不静默覆盖角色契约或生成规则。
+
+- 主开发仓库：`spec-first`，以下代码路径均相对该仓库根目录。
+- 首条内部任务推荐采用本仓库路由评测 runner 的结果与重试记录补强，有现成输入和可确定验收；这是维护者自用任务，不能代表外部业务 feature 的收益。
+- 目标模型为 GPT-6 Astra；实际模型标识、宿主与工具版本在运行时核实。首批优先可用的 Codex 环境；不能用显示名称或其他模型历史结果代替目标模型证据。
+- 不新增统一评测平台、中央授权状态库、通用监督 runner 或第二套指纹实现；现有 owner 能承载时复用或局部扩展。
+- 个人 Skill、插件安装层和外部用户仓库属于独立边界，见 X1；主仓实施不自动覆盖它们。
+
+## 2. 总顺序与批次状态
+
+| 批次 | 工作 | 前置条件 | 交付后可以声称什么 | 本文编写时状态 |
+| --- | --- | --- | --- | --- |
+| S0 | 锁定首批范围与执行条件 | 后续已有开发任务授权 | 知道从哪里开始、写哪里、如何验证 | 未执行 |
+| S1 | 校准测量与补齐结果记录 | S0 本地范围明确 | 测量器能正确记录失败、重试和覆盖 | 未执行 |
+| S2 | 冻结现行行为与最小交付证据基线 | S1 对应测量器校准通过 | 修改前发生了什么，可按同条件比较 | 未执行 |
+| S3 | 修订 Astra 核心指令 | S2 已覆盖本批行为与受保护边界 | 核心场景中的连续执行、权限和完成状态得到验证 | 未执行 |
+| S4 | 真实任务对照与主宿主旅程 | 本批候选通过 source 行为验证 | 内部真实任务是否受益，哪些仍未知 | 未执行 |
+| S5 | 按瓶颈修订剩余指令、上下文和接续 | S4 摩擦证据，或更早已确认的直接缺陷 | 选定场景的进一步改进 | 条件启动 |
+| S6 | 模型消融、知识复用与文档收敛 | 已有候选结果和后续消费者 | 机制应默认、按需、继续试验或退役 | 条件启动 |
+| X1 | 个人 Skill 与安装层 | 对应源仓库、owner 和授权明确 | 独立范围内的指令或加载结果 | 独立支线 |
+
+默认依赖链为 S0 -> S1 -> S2 -> S3 -> S4 -> S5 -> S6。S0 同时准备任务与模型预算；S1 期间可准备 S2 的场景和验收，不提前改待比较的 Skill。
+
+这是研发排序，不是新增 runtime 状态机。某条直接缺陷已有充分复现和局部验证时，可以提前修复并记录理由；缺少某个外部 cohort 或昂贵实验不阻止独立的本地确定性工作，但不得据此宣称整个批次验证完成或候选已有相对收益。
+
+同时最多推进两个实质工作项。共享 `skills/spec-plan/`、`skills/spec-work/`、根指令、renderer、公共 tests、CHANGELOG 或同一评测环境时串行集成。任务并行不等于获得子代理权限，是否委派仍按当前宿主与用户授权执行。
+
+## 3. S0：锁定首批开发输入
+
+目标是让下一会话可以直接准备首批实施，不再把“选什么任务”留成无期限研究。
+
+1. 重新读取 Git HEAD、staged/unstaged/untracked 状态和命中的 source。记录已有修改与本批交集，保留当前用户与其他会话改动。HEAD 相同不表示工作树相同。
+2. 默认从 `docs/validation/skill-evals/routing-audit-20260902/run_routing.py` 入手，复核当前是否仍存在逐次重试记录、环境分类和汇总覆盖缺口。已经修好的部分只保留回归，不重新实现。
+3. 明确首批是“评测可靠性 + 核心指令行为”，不同时新增业务 feature、宿主或公共 schema。后续真实业务仓库在 S4 扩大试点时再选；不阻塞公开或合成样本准备。
+4. 选定现有 runner 与测试 owner。模型场景必须支持所需的多轮答复、工具事件和最终状态检查；调用 Skill 名称正确不能代替能力核实。
+5. 确定模型任务数、重复次数、并发、timeout、费用上限与停止预算。未有付费授权时，只做本地无模型回放、场景准备与 source 核查，不启动收费调用。
+6. 从本节及 S1/S2 收敛首批代码计划或具体修复输入。已知故障由 `spec-debug` 承接；已收敛的实施由 `spec-work` 承接。Skill 改造沿用项目 source owner，通用作者工具与评测工具不重新开启需求访谈。
+
+当批输入至少包含：目标及非目标、目标仓库、当前 source 身份和已有修改、具体修改路径、需求到验收场景、必要验证、预算、回退、产物消费者。跨模块或合同变更形成有限实施计划；原子修复可用具体修复输入，不为每个小项生成重复文档。
+
+**出口条件：** S1 的本地执行范围、复现和验证入口明确。模型身份、费用或外部数据权限的缺口单独记录，只阻断依赖它们的动作。不能为完成 S0 伪造预算、授权或已存在的试点参与者。
+
+## 4. S1：测量校准与结果记录补强
+
+对应 OPT-01/02。采用 `extend`，先保证测量器能分清结果，再用它评价指令。
+
+### 4.1 修改范围
+
+- 路由 runner：`docs/validation/skill-evals/routing-audit-20260902/run_routing.py`。
+- 代码生产 benchmark：`benchmarks/agentic/run.py`、`benchmarks/agentic/tasks.py`，仅处理本次复现的测量缺口。
+- 测量准入复用：`skills/spec-optimize/scripts/measurement-admission.cjs` 及 `skills/spec-optimize/references/measurement-only-calibration.md`。它们不负责选择或推广候选。
+- 测试沿用 `tests/unit/` 和现有 fixtures；若当前没有路由 runner 回放测试 owner，可在当批计划中新增一个窄 Jest 测试调用 Python 逻辑，不引入第二套评测框架。
+- 报告说明沿用 `docs/validation/skill-evals/README.md` 和本轮结果报告；不覆盖旧 raw 或重判结果。
+
+### 4.2 必须完成的行为
+
+1. 每次 attempt 保留退出状态、环境/任务/解析分类、耗时、可获得的成本及原始证据引用。未知成本保持未知；重试成功不抹去第一次失败；第二次仍不可解析也不能漏记耗时。
+2. 将超时、非零退出、API 错误、未执行、空输出与任务正常结束后的错误答案分别表达。不能只靠两个错误字符串识别全部环境失败，也不能从错误日志的示例标签得到成功答案。
+3. 只解析明确的最终结果区域。输出格式与语义正确性分开；异常记录缺字段时汇总仍能保留缺失事实，不中断整批报告。
+4. 汇总计划任务数、实际尝试数、有效样本、环境失败、解析不可判定、未执行、逐类别覆盖。任务成功率与有效样本准确率分开，不把被过滤样本从用户成功率分母删除。
+5. 核查已有 JSON consumers 后决定局部兼容方式。优先兼容旧报告；重判输出绑定原记录与判定版本。确需改变结果合同，先在当批计划列 writer、reader、旧记录行为和版本，不能借此新增跨 workflow 公共 schema。
+
+### 4.3 校准与验收
+
+至少回放：正常正确结果、正常错误结果、429 携带 ENTRY 模板、非 429 引擎失败、超时、空输出、重试后成功、两次均不可判定、某类别全缺、异常记录字段不全。正确参考结果应通过，错误参考结果应失败，未执行不得继承 fixture 的成功值。
+
+`benchmarks/agentic/run.py` 当前的 NO_RUN 与 Bash 限制使其适合代码生产观察，不能直接承担完整验证交付或多轮 goal 场景。优先另用已有能执行这些任务的 harness；只有确认能力缺口才局部扩展 owner，并保留原测量模式。
+
+**出口条件：** 本地正反回放通过，失败路径和分母可复核，没有模型调用也能校准确定性判定。修好的测量器作为所有比较组共同条件，记录其新版本；不与旧判定口径直接拼接收益。
+
+## 5. S2：修改前基线与最小证据链
+
+对应 OPT-03/04 的最小使用、OPT-10 的前置保护及 OPT-01 的模型校准。首先复用，暂不建设新 receipt。
+
+### 5.1 固定比较对象
+
+不同来源文档的 A/B 标签含义不同，运行记录使用描述性组名，并保留原文映射：
+
+| 组名 | 含义 | 能力战略/总方案 | Astra 方案 |
+| --- | --- | --- | --- |
+| `native_project` | 宿主原生 + 必要项目事实与安全约束，无本次定义的 spec-first 增强 | A | 不直接对应 |
+| `current_full` | 冻结的当前有效全局、项目、Skill 与引用 | B | A |
+| `minimal_guidance` | 保留共同条件，仅移除被评估的重复流程教学 | 不自动等于 A | B |
+| `candidate` | 明确记录改动机制的候选 | C | C |
+
+主仓首次指令实验按 Astra 三组执行，整体 harness 增量另按战略三组执行。不把两种实验混成一次四组测评，也不把最小指导误称为完全原生。不同对照采用独立实验身份，冻结主指标、接受阈值、缺失处理和执行顺序后再观察候选。
+
+记录三类源码身份：冻结 harness/Skill 与引用的版本、任务初始源码及允许范围、任务最终源码与验证引用。正常获准实现属于结果；非预定的 harness 变化或初始快照污染才使对应比较失效。
+
+全局指导、替代 Skill 摘要、hooks、MCP 与插件实际加载需核实；不可观测项记未知。保留现行全局协作规则作为共同条件，不能用已退役的旧全局配置夸大候选效果。
+
+### 5.2 最小交付链
+
+- 用 S1 的真实维护任务连接“预期行为 -> 变更 source -> 检查结果 -> review 与限制”。它用于证明证据链能使用，不作为未见过的 holdout 任务。
+- 复用 `src/cli/helpers/verification-run-summary.js`、`src/cli/helpers/honest-closeout.js` 和 `skills/spec-work/scripts/working-tree-fingerprint.cjs`。
+- 单项 `consistent` 只表示引用关系一致；`overall: verified` 不提升为独立业务接受。保留现有 failed/not-run/degraded 聚合，不重复实现已有防子集通过逻辑。
+- 使用原 workflow 的日志路径与 run summary；仅 work 在原条件下写 `src/cli/helpers/spec-work-run-artifact.js` 所有的产物，debug/review 不写 work-owned 状态。
+- 检查正常收尾、验证后 tail edit、并发变更和环境变化。whole-tree 指纹只证明实际覆盖的 Git 状态与字节，依赖安装、数据库、远端状态需另留相关环境事实。证据文件的写入时序不得制造未解释的漂移。
+
+### 5.3 先冻结受保护行为
+
+首轮沿用 Astra 的 E01/E03/E04/E05/E09/E12/E26/E33，每组 3 次，完整三组共 72 个目标 cell；这不包含 A/A、校准或重试，预算须另外覆盖并设置上限。先做小规模 A/A，确认可观测输入和环境噪声满足预先约定条件。
+
+运行分两段：S2 冻结共同场景并取得 `current_full` 与 `minimal_guidance` 基线；最小指导组在隔离输入中移除已声明的流程教学，原 source 保持冻结。S3 改写候选，冻结该候选身份后再跑 `candidate`。不能要求 S2 先取得尚未产生的候选结果；S3 的反复调优另外计成本，holdout 不参与调优，完整三组比较只使用共同冻结条件下的有效记录。
+
+改到某项额外边界时，先补其正反场景再改候选。例如授权共同条款应覆盖 E02 的只诊断不写，恢复涉及 E10/E11，用户 dirty 重叠涉及 E24。不能因未在首轮 8 项内而漏掉本批实际改变的保护行为。
+
+**出口条件：** 测量器可用，当前版本行为、案例/rubric、模型环境和预算已冻结；本批变更都有受保护场景。旧版本出现预期要修的失败，是有效基线，不要求旧版本先全绿。只要证据来源可靠，失败基线可以进入 S3；评测器失真、输入隔离未知或必需的多轮能力缺失则不能声称行为基线完成。
+
+## 6. S3：Astra 核心指令修订
+
+首期仅处理直接影响连续交付、写权限和完成责任的条款。每个子批次保持 before/after source 与同一组场景，增量集成；整组结果只能支持整组改造，单条收益需要后续消融。
+
+| 顺序 | 来源 | 修改 owner | 必须保留与验证 |
+| --- | --- | --- | --- |
+| S3.1 共同授权与完成语义 | A1；F01 | `docs/10-prompt/结构化项目角色契约.md`、`CLAUDE.md` 和命中的共享引用 | 任务内必要本地步骤可以连续推进；只读不写；新的重要副作用单独判断；不建立授权数据库 |
+| S3.2 debug/work 连续执行与风险保护 | A2/A6；F02/F03/F09 | `skills/spec-debug/SKILL.md`、`skills/spec-work/SKILL.md`、work 的 `references/shipping-workflow.md` 及实际 caller | 已要求修复不再 fix-choice；答案直接生效；headless 不自动接受严重残余或本次验收失败 |
+| S3.3 plan 的执行交接与完成 owner | A3；F04/F05/F26/F33 | `skills/spec-plan/SKILL.md`、plan 的 `references/plan-handoff.md` 及命中 consumers | 只要计划则交付结束；已要求随后实施则交给 owner 继续；普通复审传 report-only；真实 goal 完成由顶层 owner 更新 |
+
+共同语义先完成，随后串行合并 debug/work 与 plan 子批次。若 F14 的路由或 renderer 条款实际阻断上述链路，把必要的 consumer 修订纳入同批并留证；其余广泛入口优化仍归 S5，不借一个冲突全面重写路由。
+
+角色契约若涉及 durable boundary 或权威解释变化，沿用现行修订纪律：明确修订范围、来源、独立 fresh-source 视角、失效条件和 consumers。用户后续对具体实施范围的授权持续有效；缺真正必需的独立证据时记录相应限制，不用同一会话自评冒充，也不因文档措辞修改假定拥有宿主不提供的能力。
+
+**验收重点：** 固定场景中无无效二次批准、无只交中间结果就停机、无审阅转写入、无 headless 风险放行；必需澄清仍发生，用户已有修改得到保留。goal 场景检查真实工具调用与最终状态，平台不支持时保留未验证，不能只检查文本含 `update_goal`。
+
+**出口条件：** 本批 contract 与 fresh-source 行为检查完成，没有新引入的权限、真实性或关键验收回归。保留失败候选及原因；仅字数下降不作为推广依据。随后按第 10 节投射和新会话核验，进入 S4 的受限内部使用，不宣称普遍提效。
+
+## 7. S4：真实任务对照与主宿主验证
+
+对应 OPT-05、OPT-09，并兑现 OPT-03/04。先作者/维护者自用，再考虑外部参与者。
+
+1. 选择未参与候选调优的匹配任务，覆盖跨模块修复、业务交付或接续中的实际目标场景。不得把 S1 中已熟悉的同题重做当成工具提效；采用交叉顺序或匹配任务并记录熟悉程度。
+2. 比较相同模型、工具、权限和可接受范围下的结果，记录主动人工投入、墙钟与等待、review 修改轮次、返工、缺陷、实际运行费用、未完成任务与退出。
+3. 先验证实际可用主宿主的首次发现/调用、失败不能报通过、恢复/显式交接旅程。声明 Claude 与 Codex 均支持某一能力前，需要对应版本旅程；其他宿主按本批影响做生成、清理及 ownership 回归，不冒称八宿主现场全测。
+4. 涉及真实私有数据时，先落实总方案 OPT-05 的采集、访问、保留和撤回约定。原始输出留仓外私有目录；获准脱敏派生日志才进入原 workflow 的仓内 logs，继续使用现有校验。原始、派生数据和元数据均覆盖清理，删除后收缩相关 claim。
+5. 外部参与者、其他仓库访问、收费资源或报告外发缺授权时，停止对应动作并继续公开/合成或已授权内部范围。作者自用与外部采用分开。
+
+**出口条件：** 至少一类真实任务有可比较的完整结果，能够指出下一瓶颈；得到无收益结论也可结束候选，不为满足进度推广。20% 周期、25% 人工投入降幅仍只是候选讨论目标，未获预先冻结与实测支持前不变成验收承诺。
+
+## 8. S5：依据瓶颈扩展
+
+以下不是同时开发清单。默认先处理高频、已复现且影响本次交付的条款，再做需要收益证据的上下文与产物简化；每个选定小批次沿用 S2 的先保护、再改写和 S4 的新任务观察。
+
+| 子批次 | 适用触发 | 来源与 source owner | 关键结果 |
+| --- | --- | --- | --- |
+| S5.1 澄清、调试和批量工作收束 | 摘要修订、PRD、诊断或文档维护反复暂停 | Astra A4/A5/A7/A8；plan/brainstorm 的 synthesis references、`skills/spec-prd/`、`skills/spec-debug/`、`skills/spec-compound-refresh/`、`skills/spec-strategy/` | 明确决定直接生效；范围外不无限追问；失败按证据修正具体假设；批次进度不成为重复许可 |
+| S5.2 恢复与历史计划补完 | 接续丢目标、重复实施，或元数据截断补完任务 | Astra B1/B4；OPT-08；`skills/spec-handoff/`、work intake、计划 owner 与 task-pack consumers | 只读恢复仍只读；当前用户明确要求继续才核验后执行；旧计划经 owner 修订后接续，不静默重开或篡改 pins |
+| S5.3 Git、优化和委派边界 | 具体授权反复索取，或隔离/独立证据判断失真 | Astra B2/B3；commit helpers、`skills/spec-optimize/`、`docs/contracts/workflows/worker-dispatch-capability.md`、work 的 execution reference | 授权内连续执行；缺独立证据早披露；正确区分 worktree common dir 与独立 index，不推断凭据隔离 |
+| S5.4 入口、首次使用和产物规模 | 重复路由、工具形态误判、简单任务被机械扩大 | Astra B5/B6；OPT-07/09；`skills/using-spec-first/`、`skills/spec-sweep/`、work/dogfood/optimize、`src/cli/lang-policy.js`、`src/cli/instruction-bootstrap.js`、`src/cli/commands/quickstart.js` | 缺阻塞 API 不等于无用户；可行通道可用；init 不冒充首次任务完成；产物按风险与消费者需要生成 |
+| S5.5 最小充分上下文 | 漏约束、重复读取、人工补充或无关输入造成实质成本 | OPT-06；`src/cli/helpers/context-bundle.js`、project-rules、plan/debug 对应 references | 正确展开关键事实，空图无负向权威，预算不足说明缺口；更少 token 不牺牲质量 |
+
+S5.2 的行为修订需要显式处理总方案 OPT-08 与 Astra F08 的差异：总方案记录现行“显式交接读取后停止”；候选仅在当前用户已明确要求“继续完成指定任务”时，经核验后交给执行 owner。读取文件本身仍不产生授权。先在当批计划写清 before/after、生产与消费路径和正反验收，同步相关合同与来源状态说明，再实施。
+
+S5.5 涉及 `spec-code-review` 或 `spec-plan` 上下文拆分时，继续遵守 [8 月上下文 pilot](./2026-08-27-001-perf-skill-runtime-context-pilot-plan.md) 的投资门、受保护行为和 holdout 要求。未通过不换名重做，也不以本顺序文档绕过旧范围。
+
+## 9. S6 与 X1：收敛和独立支线
+
+### S6. 消融、知识复用和文档收敛
+
+- OPT-10：在已冻结的同环境下逐项消融；模型升级先跑“新模型 + 旧 Skill”，再比较新候选。以 observed 结果和成本决定默认、定向使用、继续实验或退役。
+- OPT-11：从已有 verified 经验选择真实消费者，在另一个任务验证回源、复用及条件变化后的拒绝/纠正。沿用 `skills/spec-compound/`、`skills/spec-compound-refresh/`、`docs/solutions/` 与现有知识合同；命中和模型自评不能替代收益。
+- OPT-12：只处理本次实际涉及的重复指向、旧状态和介绍；先核对引用与消费者，再决定归档。README、用户手册、案例及 CHANGELOG 的 claim 与真实结果一致。外发另按实际授权处理。
+
+维护文档和清理本批临时产物贯穿所有阶段；S6 负责集中处置，不是让前面批次积累文档债。没有新消费者的知识机制可以暂缓，不通过批量补写制造“完成”。
+
+### X1. 个人 Skill 与安装层
+
+沿用 Astra 批次 C，独立登记 owner 仓库、实际源路径与授权后执行。本文不提供可直接写入个人安装镜像或 managed cache 的文件清单。
+
+| 范围 | 处置顺序与验证 |
+| --- | --- |
+| C1/C3/C4 中已解决入口 | F18/F20/F21 不重写，只验证加载或 runner/judge 是否实际采纳；F22 的作者 owner 差异仍需处理 |
+| C2 PPT 意图与确认 | F19/F25；修原始维护源及状态 consumer，委托决定不能伪造人工 accepted |
+| C5 安装来源 | F23；先核对 discovery、版本和引用闭包，再由安装器 owner 处理；目录重复不等于重复加载 |
+| C6 HyperFrames 升级 | F24；已工作的 pin 不因提示有新版本而升级，修 owner 后验证渲染行为 |
+| C7 评测 literal | F31；报告可翻译，fixture 和精确断言保真；若实际阻塞 S1/S2，提前解决或采用不改 literal 的可靠路径 |
+
+X1 不要求等待主仓全部完成，也不成为主仓的统一前置条件。仓外环境、权限或 owner 不明时仅暂停该项。
+
+## 10. 每批共同验证、投射与回退
+
+### 10.1 验证按影响面选择
+
+以下是后续开发命令与入口，本次编写文档没有执行产品测试或模型评测。
+
+| 变更面 | 已有验证入口 | 能证明的范围 |
+| --- | --- | --- |
+| 测量 | `python3 benchmarks/agentic/run.py --selftest`；路由 runner 固定输出回放；`tests/unit/spec-optimize-measurement-only-contracts.test.js` | grader 区分力、错误分类和准入；不证明真实任务提效 |
+| 核心指令 | `tests/unit/spec-debug-contracts.test.js`、`tests/unit/spec-work-contracts.test.js`、`tests/unit/spec-work-shipping-contracts.test.js`、`tests/unit/spec-plan-contracts.test.js`、`tests/unit/spec-prd-plan-handoff-contracts.test.js` | source 合同与消费者行为；另需目标 Skill fresh-source 行为场景 |
+| 证据链 | `tests/unit/verification-run-summary.test.js`、`tests/unit/honest-closeout.test.js`、`tests/unit/spec-work-working-tree-fingerprint.test.js`、`tests/integration/spec-work-closeout-producer.test.js` | 引用、路径、聚合与漂移场景；不自动证明业务接受 |
+| 接续与宿主 | `tests/unit/spec-handoff-contracts.test.js`、`tests/unit/worker-dispatch-host-preflight-contracts.test.js`、`tests/unit/host-runtime-projection-contracts.test.js`、目标宿主新会话 | 结构、ownership、调用与恢复各自实测范围 |
+| 上手与知识 | `tests/unit/quickstart-command.test.js`、`tests/unit/quickstart-language.test.js`、`tests/unit/compound-promotion-contracts.test.js` | 局部合同，真实使用及跨任务收益另验 |
+
+Jest 使用本地已有执行器，例如 `npx --no-install jest <本批测试路径> --runInBand`。CLI/脚本变更补 `npm run typecheck`；Skill 入口或治理变化补 `npm run lint:skill-entrypoints`。共享生成行为变化按影响扩大到 unit/integration/smoke/build，不为 docs-only 批次运行整套产品回归。
+
+Skill 行为验证使用新上下文和当前 source，参考 `docs/contracts/workflows/fresh-source-eval-checklist.md`。用 skill-up 时先 `validate`、`list-cases` 核对实际 runner 能力，再 focused run；根据当批新增影响扩展回归。全文 33 场景包含 X1 仓外范围，主仓只能报告主仓覆盖子集；X1 未运行项保持未验证，不能宣称 33 项全套通过。
+
+删除有问题的流程文案时，同步迁移绑定旧文字的断言；保留真正保护只读、授权、证据和兼容的行为测试。已有失败、环境失败、本批引入失败分开报告；必要检查失败仍阻断对应完成声明。
+
+### 10.2 Source 先验证，再投射
+
+1. 修改 canonical source 与对应引用、tests、contracts、CHANGELOG 和必要用户说明。
+2. 根治理区按 `CLAUDE.md` owning source 修改，再使用 `npm run sync:instructions -- --write` 生成受管部分；`src/cli/lang-policy.js` 与 `src/cli/instruction-bootstrap.js` 的实际生成内容一起核对。
+3. 先完成 source 合同和行为验证，不用当前会话缓存的 Skill 调用证明新定义有效。
+4. 需要且已获授权更新宿主入口时，运行 `spec-first init` 的对应宿主投射；不手改 `.agents/skills/`、`.codex/`、`.claude/` 等镜像。
+5. 对影响的全部受支持宿主做结构和 ownership 检查，平台集合从当前 `getSupportedPlatforms()` 获取；仅对实际测试的模型/宿主版本宣称发现、调用与任务结果。
+6. 在新会话核对有效入口、命中 references 与关键行为。source 一致、生成成功、loader 发现和现场结果分别记录。
+
+### 10.3 运行产物与完成边界
+
+每批保留当批输入、source/环境身份、实际 changed paths、验证命令与退出、必要日志引用、未完成项、风险和下一个满足条件的批次。复用原 workflow/run 与 task tracker；本文不新增公共进度 schema，也不从 Markdown 勾选判断实现已完成。
+
+一批完成意味着本批目标已实现、必要检查已运行、严重问题已处理或明确阻断、证据可回源、文档与实际状态一致。候选保留、试验或退役结论另说明依据；不要求没有宣称的现场收益也必须先证明。
+
+付费超预算、授权越界、错误覆盖用户修改、假完成或测量污染时停止相关动作。回退只撤销本批拥有的候选修改，保留失败证据，保护其他会话改动；source 回退后按授权恢复对应投射。不得用全树 reset 或放宽验证器让结果变绿。
+
+## 11. 全部优化项去向
+
+### 11.1 总方案 OPT 映射
+
+| 优化项 | 开发阶段 | 说明 |
+| --- | --- | --- |
+| OPT-01 | S1/S2 | 校准与实验身份先完成 |
+| OPT-02 | S1 | 完整结果、分母、重试与覆盖 |
+| OPT-03 | S2/S4 | 内部证据链先使用，真实验收再验证 |
+| OPT-04 | S2/S4 | 复用现有保护，有实际缺口再扩展 |
+| OPT-05 | S4，S0/S2 做准备 | 内部先行，外部范围另落实 |
+| OPT-06 | S5.5 | 按上下文瓶颈启动 |
+| OPT-07 | S3 的核心摩擦修订、S5.4 | 不等待所有体验优化才修直接阻断 |
+| OPT-08 | S5.2，依赖 S2 证据能力 | 处理接续与新旧授权边界 |
+| OPT-09 | 各批投射检查、S4/S5.4 | 宿主验证贯穿，现场 claim 按版本 |
+| OPT-10 | S2 前置保护、各批回归、S6 消融 | 不能推迟到最后才建立行为基线 |
+| OPT-11 | S6 | 有后续任务才验证有效复用 |
+| OPT-12 | 各批维护、S6 集中收敛 | 不批量清理无关历史资产 |
+
+### 11.2 Astra 发现映射
+
+每个 F-ID 在下表出现一次。状态沿用 Astra revision 2 的记录，实际实施前需重新核实 source；映射完整不表示每项都必须产生代码修改。
+
+| 发现 | 处理批次 | 处置 |
+| --- | --- | --- |
+| F01 | S3.1 | 授权继承与必要本地步骤 |
+| F02 | S3.2 | 明确修复不再 fix-choice |
+| F03 | S3.2 | 答案不二次批准 |
+| F04 | S3.3 | 计划后实施按已有指令交接 |
+| F05 | S3.3 | 计划交付不绑定下一步菜单 |
+| F06 | S5.1 | 摘要与层级不机械再确认 |
+| F07 | S5.1 | PRD 当前范围收束 |
+| F08 | S5.2 | 区分只读恢复与明确继续 |
+| F09 | S3.2 | headless 不改变风险接受权限 |
+| F10 | S5.3 | Git 差量授权 |
+| F11 | S5.3 | 优化实验授权与预算保持 |
+| F12 | S5.3 | 委派和必需独立覆盖边界 |
+| F13 | S5.2 | 非活跃计划经 owner 补完 |
+| F14 | S5.4，必要 consumer 部分随 S3 | 统一入口与连续执行，避免重复改造 |
+| F15 | S5.4 | 流程随风险而非行数 |
+| F16 | S5.4 | 结构化产物按消费者与风险适用 |
+| F17 | S5.4 | 可用工具通道与 fallback |
+| F18 | X1/C1 | 入口已解决，验证加载，不重写 |
+| F19 | X1/C2 | PPT 确认及状态 consumer 尚待统一 |
+| F20 | X1/C3 | 入口已解决，验证 runner/judge |
+| F21 | X1/C4 | 入口已解决，保留行为回归 |
+| F22 | X1/C4 | 项目与通用作者 owner 对齐 |
+| F23 | X1/C5 | 安装来源与 discovery 验证 |
+| F24 | X1/C6 | 非必要升级边界 |
+| F25 | X1/C2 | 复合咨询与制作意图 |
+| F26 | S3.3 | 普通审阅保持 report-only |
+| F27 | S5.1 | 失败按证据更新具体假设 |
+| F28 | S5.3 | worktree index 事实与实际隔离 |
+| F29 | S5.1 | 已授权批量维护持续完成 |
+| F30 | S5.4 | 缺阻塞 API 不误判 headless |
+| F31 | X1/C7，实际阻塞评测时前置 | 评测 literal 保真 |
+| F32 | S5.1 | 充分输入不强制战略访谈 |
+| F33 | S3.3 | 顶层 goal 完成责任 |
+
+## 12. 接手、证据与当前限制
+
+接手时先读第 2 节确定批次，再读对应批次及来源；核对已存在的实施计划、当前源码与实际结果。已有验证闭环的批次不重做，缺证据或 source 变化时只重验受影响范围。用户只指定某一批时尊重该范围，不顺带实施 X1 或后续候选。
+
+需要推进到下一批时，复用已形成的目标、决定和授权。只有新的重要产品取舍、权限或预算缺口才请求补充；不因完成一个批次而重复要求批准同一目标。尚未验证的优化只标为候选，不伪造已批准、已实现或已采纳状态。
+
+编写时 HEAD 为 `bb17c7e10f3423e278c2da322cedf9a536e11464`，工作树已有路由 runner、入口引用、两项测试、CHANGELOG 和研究文档等未提交修改。本轮回读了关键 owner 和合同；这些文件的既有修改不归因于本文。
+
+来源快照 SHA-256：
+
+| 来源 | SHA-256 |
+| --- | --- |
+| 完整优化总方案 | `635a0b731e798717127602b4ee112362ae24262fac0f9fb8b7f9d02bec70cbff` |
+| 能力战略 | `5b80d0059567e930789b8f984e6e9562354a44cd79c7d9fd31e506252f68a106` |
+| 来源账本 | `acca905fc2d53516b420a110ca5094ce5d3b3f0fdcd69b82d7bd9f3c461e1cd0` |
+| Astra 指令优化 revision 2 | `1a040086b997cc7ce9afb2483e3be73494cda7a6a00710becfc0773171fa90ff` |
+
+来源后续变化时，核对受影响的排序与验收，不把 hash 变化直接当作语义失效。当前没有为本方案启动付费实验、产品测试、试点、runtime 刷新或发布，也没有批准 90 天资源承诺。文档顺序由本轮规划判断整理，后续事实可触发有依据的局部调整。
+
+本次文档由当前 Agent 编写并进行有界一致性、范围、路径和编号检查；已核对 12 个 OPT 和 33 个 F 的唯一映射、5 个本地链接、49 个明确源码/测试路径及四份来源快照。`git diff --check` 通过；现有 `changelog-format` 与 `plan-status-taxonomy` 两个文档相关 suite 共 7 项测试通过，只证明相应格式与元数据约束。
+
+未派发独立评审，独立评审为 `not_run`；本轮未获独立评审委派授权，采用当前 Agent 的有界文档自检。没有执行产品行为或独立 fresh-source 验证，不把文档检查代替这些证据。

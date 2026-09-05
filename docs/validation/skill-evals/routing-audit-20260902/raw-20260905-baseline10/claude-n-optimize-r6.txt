@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 以 800ms→200ms 为可度量指标设计并运行优化实验,正是 metric-driven iterative optimization loop 的 spec-optimize 入口场景,且无失败/修复信号,不适用 spec-debug。

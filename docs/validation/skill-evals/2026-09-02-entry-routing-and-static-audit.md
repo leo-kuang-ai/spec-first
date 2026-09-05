@@ -130,3 +130,22 @@ python3 $D/run_routing.py claude 3 --claude-model claude-sonnet-5 --tag -sonnet5
 - **环境探测(09:34)**:codex 双通道不可用(智谱直连 responses 端点 404;HST-中转经隔离 CODEX_HOME 探测 7 分钟无响应),claude 双通道 prompt 丢弃(glm 默认 3/3、sonnet-5 2/2 返回问候语,即并行线记录的 `[env-noise]` 症状加重)。**两挂起项(codex 路由补跑、18 用例行为回归)当天不具备执行条件,继续挂起**;复跑命令见 §7 与 §8.3,环境恢复后即可一次收口。补充:codex-官方 档案依赖的 127.0.0.1:8080 本地代理未运行(端口被一个 `python3 -m http.server` 占用)。
 - **§8.1 延迟项闭环核对**:spec-ideate/brainstorm/polish 已由并行测评线(CHANGELOG 14:40 条目)补齐触发与路由点名句;spec-code-review 已有等效边界句("Report-only by default; apply fixes only when … explicitly requests")——P1#5 四件套全部闭环;spec-promote 与 spec-product-pulse 均带 `disable-model-invocation: true`,模型不可触发,description 不承担路由职能,P1#6 全部闭环。无需再改源。
 - **第三轮行为回归(09:5x,claude 引擎)**:预检(连续 2 次 PONG)通过后全量 18 用例得 **6/18**(debug 2/5、simplify 2/4、work 1/7、test-browser 1/2)。三点定性:①失败集逐轮漂移——diagnose-then-choice-gate(此前三轮全过)、r2-three-attempts-asked-first(昨日过)今日首挂,missing-origin-not-run(连挂两日)今日转过;②transcript 证实失败用例 skill 已进上下文(失败用例 SKILL.md 引用 5 次 vs 通过 4 次),排除"注入缺失"与"我的 description 改动"两假设;③门禁违反形态(修而不问、requirements-only 直接实现)与 R2 收编模式同族但呈非确定性。**结论:网关降级窗口内的行为波动,回归判定继续挂起至通道稳定;按纪律不改判 keep 状态。** 三个数据点:with-edit 8/18(09-02)、without-edit 0/10 子集(09-02 隔离)、with-edit 6/18(09-03)。
+
+### 8.5 十轮基线复跑(2026-09-05,双引擎 × 22 用例 × 10 重复 = 440 调用)
+
+**目的**:基线修复(route-map 增 autoresearch 条目等)后的路由健康复测 + 10 重复稳定性数据(R3 CI 化前置)+ 顺带清 §8.4 挂起的「codex 路由补跑」债。**命令**:`python3 run_routing.py claude,codex 10 --tag 20260905-baseline10`;**资产**:`results20260905-baseline10.json`、`raw-20260905-baseline10/`(440 份逐份可复核)、`rescored-20260905-baseline10.json`(修正判分重判)、`run-20260905-baseline10.log`。
+
+**初判分数与两个测量缺陷**:初判 claude 97.7% / codex 85.0%(P 组大面积 `→direct` 绕过形态)。复核原始输出定位**全部为测量缺陷而非模型行为**:① codex 网关 `429 Too Many Requests` 失败输出回显了 prompt 模板,示例行 `ENTRY: <spec-<名称> 或 direct>` 被正则误匹配、又因含 "direct" 判为 Direct Lane——把 34/220 次网关限流伪造成「绕过」(p-code-review 10/10 全为 429);② claude 5 个「unparsed」实为中文格式正确答案(`入口：spec-optimize` 等,语义全对、格式漂移)。**runner 已修复**:`norm_entry` 拒绝 `<` 开头占位回显、新增 env-error 标记(429/retry-limit)并在汇总中排除与单列(`valid_n`/`env_errors`)、env-error 不触发重试。
+
+**重判后真实结论**:
+
+| 引擎 | 有效样本 | 严格解析 | 语义(含双语人工复核) | env-error | 混淆 | 逐例稳定度 |
+|---|---|---|---|---|---|---|
+| claude(glm-5.3) | 220/220 | 97.7% | **100%** | 0 | 无 | 22 例全 1.0 |
+| codex | 186/220 | **98.9%** | 98.9% | 34(429) | 仅 `n-review-fix→spec-prd` ×2(语义邻界,"评审 PRD 并直接改"被 2/10 判给 spec-prd) | 0.8-1.0 |
+
+- **D 组 40/40 双引擎全对**,入口硬规则(Direct Lane 纪律)稳固。
+- **autoresearch 抢路由 = 0**(440 次调用无一误入)——route-map 新条目路由安全,昨日基线修复的行为面验证通过。
+- **与历史对比**:claude 95.5%(09-02 修复后)→ 97.7%/100%;codex 98.5% → 98.9%。两引擎稳定或改善,无回归。
+- **挂起债状态**:「codex 路由补跑」(§8.4)本轮已清(通道健康窗口内 220 次调用完成);18 用例行为回归属多轮 agentic 负载类,**仍挂起**待专门复跑。
+- **方法论教训入册**:引擎失败输出可回显指令模板造成假解析——路由 CI 化(R3)落地前必须带 env-error 过滤,本轮 runner 修复即为此铺路。

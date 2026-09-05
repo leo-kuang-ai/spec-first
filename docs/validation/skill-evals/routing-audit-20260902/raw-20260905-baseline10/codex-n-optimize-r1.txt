@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求需要围绕明确性能指标设计并运行迭代优化实验，符合 metric-driven optimization workflow。

@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 评审并直接修订一份 PRD 文档属于文档审查闭环，正是 spec-doc-review workflow 的职责范围。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是 README.md 的单文件错别字修正，范围明确、低风险，无需进入 spec-* workflow。

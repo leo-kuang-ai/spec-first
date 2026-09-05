@@ -1,0 +1,503 @@
+[1/440] claude p-debug-stack -> spec-debug
+[2/440] claude p-debug-stack -> spec-debug
+[3/440] claude p-debug-stack -> spec-debug
+[4/440] claude p-debug-stack -> spec-debug
+[5/440] claude p-debug-stack -> spec-debug
+[6/440] claude p-debug-stack -> spec-debug
+[7/440] claude p-debug-stack -> spec-debug
+[8/440] claude p-debug-stack -> spec-debug
+[9/440] claude p-debug-stack -> spec-debug
+[10/440] claude p-debug-regression -> spec-debug
+[11/440] claude p-debug-stack -> spec-debug
+[12/440] claude p-debug-regression -> spec-debug
+[13/440] claude p-debug-regression -> spec-debug
+[14/440] claude p-debug-regression -> [unparsed]
+[15/440] claude p-debug-regression -> spec-debug
+[16/440] claude p-debug-regression -> spec-debug
+[17/440] claude p-debug-regression -> spec-debug
+[18/440] claude p-debug-regression -> spec-debug
+[19/440] claude p-debug-regression -> spec-debug
+[20/440] claude p-debug-regression -> spec-debug
+[21/440] claude p-code-review -> spec-code-review
+[22/440] claude p-code-review -> spec-code-review
+[23/440] claude p-code-review -> spec-code-review
+[24/440] claude p-code-review -> spec-code-review
+[25/440] claude p-code-review -> spec-code-review
+[26/440] claude p-code-review -> spec-code-review
+[27/440] claude p-code-review -> spec-code-review
+[28/440] claude p-code-review -> spec-code-review
+[29/440] claude p-code-review -> spec-code-review
+[30/440] claude p-code-review -> spec-code-review
+[31/440] claude p-doc-review -> spec-doc-review
+[32/440] claude p-doc-review -> spec-doc-review
+[33/440] claude p-doc-review -> spec-doc-review
+[34/440] claude p-doc-review -> spec-doc-review
+[35/440] claude p-doc-review -> spec-doc-review
+[36/440] claude p-doc-review -> spec-doc-review
+[37/440] claude p-doc-review -> spec-doc-review
+[38/440] claude p-doc-review -> spec-doc-review
+[39/440] claude p-doc-review -> spec-doc-review
+[40/440] claude p-doc-review -> spec-doc-review
+[41/440] claude p-plan -> spec-plan
+[42/440] claude p-plan -> spec-plan
+[43/440] claude p-plan -> spec-plan
+[44/440] claude p-plan -> spec-plan
+[45/440] claude p-plan -> spec-plan
+[46/440] claude p-plan -> spec-plan
+[47/440] claude p-plan -> spec-plan
+[48/440] claude p-plan -> spec-plan
+[49/440] claude p-plan -> spec-plan
+[50/440] claude p-plan -> spec-plan
+[51/440] claude p-work -> [unparsed]
+[52/440] claude p-work -> spec-work
+[53/440] claude p-work -> spec-work
+[54/440] claude p-work -> spec-work
+[55/440] claude p-work -> spec-work
+[56/440] claude p-work -> spec-work
+[57/440] claude p-work -> spec-work
+[58/440] claude p-work -> spec-work
+[59/440] claude p-work -> spec-work
+[60/440] claude p-work -> spec-work
+[61/440] claude p-compound -> spec-compound
+[62/440] claude p-compound -> spec-compound
+[63/440] claude p-compound -> spec-compound
+[64/440] claude p-compound -> spec-compound
+[65/440] claude p-compound -> spec-compound
+[66/440] claude p-compound -> spec-compound
+[67/440] claude p-compound -> spec-compound
+[68/440] claude p-compound -> spec-compound
+[69/440] claude p-compound -> spec-compound
+[70/440] claude p-compound -> spec-compound
+[71/440] claude p-runtime-setup -> spec-runtime-setup
+[72/440] claude p-runtime-setup -> spec-runtime-setup
+[73/440] claude p-runtime-setup -> spec-runtime-setup
+[74/440] claude p-runtime-setup -> spec-runtime-setup
+[75/440] claude p-runtime-setup -> spec-runtime-setup
+[76/440] claude p-runtime-setup -> spec-runtime-setup
+[77/440] claude p-runtime-setup -> spec-runtime-setup
+[78/440] claude p-runtime-setup -> spec-runtime-setup
+[79/440] claude p-runtime-setup -> spec-runtime-setup
+[80/440] claude p-runtime-setup -> spec-runtime-setup
+[81/440] claude p-brainstorm -> spec-brainstorm
+[82/440] claude p-brainstorm -> spec-brainstorm
+[83/440] claude p-brainstorm -> spec-brainstorm
+[84/440] claude p-brainstorm -> spec-brainstorm
+[85/440] claude p-brainstorm -> spec-brainstorm
+[86/440] claude p-brainstorm -> spec-brainstorm
+[87/440] claude p-brainstorm -> spec-brainstorm
+[88/440] claude p-brainstorm -> spec-brainstorm
+[89/440] claude p-brainstorm -> spec-brainstorm
+[90/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[91/440] claude p-brainstorm -> spec-brainstorm
+[92/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[93/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[94/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[95/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[96/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[97/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[98/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[99/440] claude p-pr-feedback -> spec-resolve-pr-feedback
+[100/440] claude p-pov -> spec-pov
+[101/440] claude p-pr-feedback -> [unparsed]
+[102/440] claude p-pov -> spec-pov
+[103/440] claude p-pov -> spec-pov
+[104/440] claude p-pov -> spec-pov
+[105/440] claude p-pov -> spec-pov
+[106/440] claude p-pov -> spec-pov
+[107/440] claude p-pov -> [unparsed]
+[108/440] claude p-pov -> spec-pov
+[109/440] claude p-pov -> spec-pov
+[110/440] claude p-pov -> spec-pov
+[111/440] claude p-fixintent -> spec-debug
+[112/440] claude p-fixintent -> spec-debug
+[113/440] claude p-fixintent -> spec-debug
+[114/440] claude p-fixintent -> spec-debug
+[115/440] claude p-fixintent -> spec-debug
+[116/440] claude p-fixintent -> spec-debug
+[117/440] claude p-fixintent -> spec-debug
+[118/440] claude p-fixintent -> spec-debug
+[119/440] claude p-fixintent -> spec-debug
+[120/440] claude p-fixintent -> spec-debug
+[121/440] claude n-review-fix -> spec-doc-review
+[122/440] claude n-review-fix -> spec-doc-review
+[123/440] claude n-review-fix -> spec-doc-review
+[124/440] claude n-review-fix -> spec-doc-review
+[125/440] claude n-review-fix -> spec-doc-review
+[126/440] claude n-review-fix -> spec-doc-review
+[127/440] claude n-review-fix -> spec-doc-review
+[128/440] claude n-review-fix -> spec-doc-review
+[129/440] claude n-review-fix -> spec-doc-review
+[130/440] claude n-simplify -> spec-simplify-code
+[131/440] claude n-review-fix -> spec-doc-review
+[132/440] claude n-simplify -> spec-simplify-code
+[133/440] claude n-simplify -> spec-simplify-code
+[134/440] claude n-simplify -> spec-simplify-code
+[135/440] claude n-simplify -> spec-simplify-code
+[136/440] claude n-simplify -> spec-simplify-code
+[137/440] claude n-simplify -> spec-simplify-code
+[138/440] claude n-simplify -> spec-simplify-code
+[139/440] claude n-simplify -> spec-simplify-code
+[140/440] claude n-simplify -> spec-simplify-code
+[141/440] claude n-optimize -> spec-optimize
+[142/440] claude n-optimize -> spec-optimize
+[143/440] claude n-optimize -> spec-optimize
+[144/440] claude n-optimize -> spec-optimize
+[145/440] claude n-optimize -> spec-optimize
+[146/440] claude n-optimize -> spec-optimize
+[147/440] claude n-optimize -> spec-optimize
+[148/440] claude n-optimize -> spec-optimize
+[149/440] claude n-handoff -> spec-handoff
+[150/440] claude n-optimize -> [unparsed]
+[151/440] claude n-optimize -> spec-optimize
+[152/440] claude n-handoff -> spec-handoff
+[153/440] claude n-handoff -> spec-handoff
+[154/440] claude n-handoff -> spec-handoff
+[155/440] claude n-handoff -> spec-handoff
+[156/440] claude n-handoff -> spec-handoff
+[157/440] claude n-handoff -> spec-handoff
+[158/440] claude n-handoff -> spec-handoff
+[159/440] claude n-handoff -> spec-handoff
+[160/440] claude n-handoff -> spec-handoff
+[161/440] claude n-lfg -> spec-lfg
+[162/440] claude n-lfg -> spec-lfg
+[163/440] claude n-lfg -> spec-lfg
+[164/440] claude n-lfg -> spec-lfg
+[165/440] claude n-lfg -> spec-lfg
+[166/440] claude n-lfg -> spec-lfg
+[167/440] claude n-lfg -> spec-lfg
+[168/440] claude n-lfg -> spec-lfg
+[169/440] claude n-lfg -> spec-lfg
+[170/440] claude n-lfg -> spec-lfg
+[171/440] claude n-ideate -> spec-ideate
+[172/440] claude n-ideate -> spec-ideate
+[173/440] claude n-ideate -> spec-ideate
+[174/440] claude n-ideate -> spec-ideate
+[175/440] claude n-ideate -> spec-ideate
+[176/440] claude n-ideate -> spec-ideate
+[177/440] claude n-ideate -> spec-ideate
+[178/440] claude n-ideate -> spec-ideate
+[179/440] claude n-ideate -> spec-ideate
+[180/440] claude n-ideate -> spec-ideate
+[181/440] claude d-fact -> direct
+[182/440] claude d-fact -> direct
+[183/440] claude d-fact -> direct
+[184/440] claude d-fact -> direct
+[185/440] claude d-fact -> direct
+[186/440] claude d-fact -> direct
+[187/440] claude d-fact -> direct
+[188/440] claude d-fact -> direct
+[189/440] claude d-lookup -> direct
+[190/440] claude d-fact -> direct
+[191/440] claude d-fact -> direct
+[192/440] claude d-lookup -> direct
+[193/440] claude d-lookup -> direct
+[194/440] claude d-lookup -> direct
+[195/440] claude d-lookup -> direct
+[196/440] claude d-lookup -> direct
+[197/440] claude d-lookup -> direct
+[198/440] claude d-lookup -> direct
+[199/440] claude d-lookup -> direct
+[200/440] claude d-lookup -> direct
+[201/440] claude d-context -> direct
+[202/440] claude d-context -> direct
+[203/440] claude d-context -> direct
+[204/440] claude d-context -> direct
+[205/440] claude d-context -> direct
+[206/440] claude d-context -> direct
+[207/440] claude d-context -> direct
+[208/440] claude d-context -> direct
+[209/440] claude d-context -> direct
+[210/440] claude d-context -> direct
+[211/440] claude d-typo -> direct
+[212/440] claude d-typo -> direct
+[213/440] claude d-typo -> direct
+[214/440] claude d-typo -> direct
+[215/440] claude d-typo -> direct
+[216/440] claude d-typo -> direct
+[217/440] claude d-typo -> direct
+[218/440] claude d-typo -> direct
+[219/440] claude d-typo -> direct
+[220/440] claude d-typo -> direct
+[221/440] codex p-debug-stack -> spec-debug
+[222/440] codex p-debug-stack -> spec-debug
+[223/440] codex p-debug-stack -> spec-debug
+[224/440] codex p-debug-stack -> spec-debug
+[225/440] codex p-debug-stack -> spec-debug
+[226/440] codex p-debug-stack -> spec-debug
+[227/440] codex p-debug-stack -> spec-debug
+[228/440] codex p-debug-stack -> spec-debug
+[229/440] codex p-debug-stack -> spec-debug
+[230/440] codex p-debug-stack -> spec-debug
+[231/440] codex p-debug-regression -> spec-debug
+[232/440] codex p-debug-regression -> spec-debug
+[233/440] codex p-debug-regression -> spec-debug
+[234/440] codex p-debug-regression -> spec-debug
+[235/440] codex p-debug-regression -> spec-debug
+[236/440] codex p-debug-regression -> direct
+[237/440] codex p-debug-regression -> spec-debug
+[238/440] codex p-debug-regression -> spec-debug
+[239/440] codex p-debug-regression -> direct
+[240/440] codex p-debug-regression -> direct
+[241/440] codex p-code-review -> direct
+[242/440] codex p-code-review -> direct
+[243/440] codex p-code-review -> direct
+[244/440] codex p-code-review -> direct
+[245/440] codex p-code-review -> direct
+[246/440] codex p-code-review -> direct
+[247/440] codex p-code-review -> direct
+[248/440] codex p-code-review -> direct
+[249/440] codex p-code-review -> direct
+[250/440] codex p-code-review -> direct
+[251/440] codex p-doc-review -> direct
+[252/440] codex p-doc-review -> direct
+[253/440] codex p-doc-review -> direct
+[254/440] codex p-doc-review -> direct
+[255/440] codex p-doc-review -> direct
+[256/440] codex p-doc-review -> direct
+[257/440] codex p-doc-review -> spec-doc-review
+[258/440] codex p-doc-review -> spec-doc-review
+[259/440] codex p-doc-review -> spec-doc-review
+[260/440] codex p-plan -> spec-plan
+[261/440] codex p-plan -> spec-plan
+[262/440] codex p-doc-review -> spec-doc-review
+[263/440] codex p-plan -> spec-plan
+[264/440] codex p-plan -> spec-plan
+[265/440] codex p-plan -> direct
+[266/440] codex p-plan -> spec-plan
+[267/440] codex p-plan -> spec-plan
+[268/440] codex p-plan -> spec-plan
+[269/440] codex p-plan -> spec-plan
+[270/440] codex p-plan -> spec-plan
+[271/440] codex p-work -> spec-work
+[272/440] codex p-work -> spec-work
+[273/440] codex p-work -> spec-work
+[274/440] codex p-work -> spec-work
+[275/440] codex p-work -> spec-work
+[276/440] codex p-work -> spec-work
+[277/440] codex p-work -> spec-work
+[278/440] codex p-work -> spec-work
+[279/440] codex p-work -> direct
+[280/440] codex p-work -> direct
+[281/440] codex p-compound -> direct
+[282/440] codex p-compound -> direct
+[283/440] codex p-compound -> direct
+[284/440] codex p-compound -> direct
+[285/440] codex p-compound -> direct
+[286/440] codex p-compound -> direct
+[287/440] codex p-compound -> direct
+[288/440] codex p-compound -> direct
+[289/440] codex p-compound -> spec-compound
+[290/440] codex p-compound -> spec-compound
+[291/440] codex p-runtime-setup -> spec-runtime-setup
+[292/440] codex p-runtime-setup -> spec-runtime-setup
+[293/440] codex p-runtime-setup -> spec-runtime-setup
+[294/440] codex p-runtime-setup -> spec-runtime-setup
+[295/440] codex p-runtime-setup -> spec-runtime-setup
+[296/440] codex p-runtime-setup -> spec-runtime-setup
+[297/440] codex p-runtime-setup -> spec-runtime-setup
+[298/440] codex p-runtime-setup -> spec-runtime-setup
+[299/440] codex p-runtime-setup -> spec-runtime-setup
+[300/440] codex p-runtime-setup -> spec-runtime-setup
+[301/440] codex p-brainstorm -> spec-brainstorm
+[302/440] codex p-brainstorm -> spec-brainstorm
+[303/440] codex p-brainstorm -> spec-brainstorm
+[304/440] codex p-brainstorm -> spec-brainstorm
+[305/440] codex p-brainstorm -> spec-brainstorm
+[306/440] codex p-brainstorm -> spec-brainstorm
+[307/440] codex p-brainstorm -> spec-brainstorm
+[308/440] codex p-brainstorm -> direct
+[309/440] codex p-brainstorm -> spec-brainstorm
+[310/440] codex p-brainstorm -> spec-brainstorm
+[311/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[312/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[313/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[314/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[315/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[316/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[317/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[318/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[319/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[320/440] codex p-pr-feedback -> spec-resolve-pr-feedback
+[321/440] codex p-pov -> spec-pov
+[322/440] codex p-pov -> spec-pov
+[323/440] codex p-pov -> spec-pov
+[324/440] codex p-pov -> spec-pov
+[325/440] codex p-pov -> spec-pov
+[326/440] codex p-pov -> spec-pov
+[327/440] codex p-pov -> spec-pov
+[328/440] codex p-pov -> spec-pov
+[329/440] codex p-fixintent -> spec-debug
+[330/440] codex p-pov -> spec-pov
+[331/440] codex p-pov -> spec-pov
+[332/440] codex p-fixintent -> spec-debug
+[333/440] codex p-fixintent -> spec-debug
+[334/440] codex p-fixintent -> spec-debug
+[335/440] codex p-fixintent -> spec-debug
+[336/440] codex p-fixintent -> spec-debug
+[337/440] codex p-fixintent -> spec-debug
+[338/440] codex p-fixintent -> spec-debug
+[339/440] codex p-fixintent -> spec-debug
+[340/440] codex p-fixintent -> spec-debug
+[341/440] codex n-review-fix -> spec-doc-review
+[342/440] codex n-review-fix -> spec-doc-review
+[343/440] codex n-review-fix -> spec-prd
+[344/440] codex n-review-fix -> spec-doc-review
+[345/440] codex n-review-fix -> spec-prd
+[346/440] codex n-review-fix -> spec-doc-review
+[347/440] codex n-review-fix -> spec-doc-review
+[348/440] codex n-review-fix -> spec-doc-review
+[349/440] codex n-simplify -> spec-simplify-code
+[350/440] codex n-review-fix -> spec-doc-review
+[351/440] codex n-review-fix -> spec-doc-review
+[352/440] codex n-simplify -> spec-simplify-code
+[353/440] codex n-simplify -> spec-simplify-code
+[354/440] codex n-simplify -> spec-simplify-code
+[355/440] codex n-simplify -> spec-simplify-code
+[356/440] codex n-simplify -> spec-simplify-code
+[357/440] codex n-simplify -> spec-simplify-code
+[358/440] codex n-simplify -> spec-simplify-code
+[359/440] codex n-simplify -> spec-simplify-code
+[360/440] codex n-optimize -> spec-optimize
+[361/440] codex n-simplify -> spec-simplify-code
+[362/440] codex n-optimize -> spec-optimize
+[363/440] codex n-optimize -> spec-optimize
+[364/440] codex n-optimize -> spec-optimize
+[365/440] codex n-optimize -> spec-optimize
+[366/440] codex n-optimize -> spec-optimize
+[367/440] codex n-optimize -> spec-optimize
+[368/440] codex n-optimize -> spec-optimize
+[369/440] codex n-optimize -> spec-optimize
+[370/440] codex n-optimize -> spec-optimize
+[371/440] codex n-handoff -> spec-handoff
+[372/440] codex n-handoff -> spec-handoff
+[373/440] codex n-handoff -> spec-handoff
+[374/440] codex n-handoff -> spec-handoff
+[375/440] codex n-handoff -> spec-handoff
+[376/440] codex n-handoff -> spec-handoff
+[377/440] codex n-handoff -> spec-handoff
+[378/440] codex n-handoff -> spec-handoff
+[379/440] codex n-handoff -> spec-handoff
+[380/440] codex n-lfg -> spec-lfg
+[381/440] codex n-handoff -> spec-handoff
+[382/440] codex n-lfg -> spec-lfg
+[383/440] codex n-lfg -> spec-lfg
+[384/440] codex n-lfg -> spec-lfg
+[385/440] codex n-lfg -> spec-lfg
+[386/440] codex n-lfg -> spec-lfg
+[387/440] codex n-lfg -> spec-lfg
+[388/440] codex n-lfg -> spec-lfg
+[389/440] codex n-lfg -> spec-lfg
+[390/440] codex n-ideate -> spec-ideate
+[391/440] codex n-lfg -> spec-lfg
+[392/440] codex n-ideate -> spec-ideate
+[393/440] codex n-ideate -> spec-ideate
+[394/440] codex n-ideate -> spec-ideate
+[395/440] codex n-ideate -> spec-ideate
+[396/440] codex n-ideate -> spec-ideate
+[397/440] codex n-ideate -> spec-ideate
+[398/440] codex n-ideate -> spec-ideate
+[399/440] codex n-ideate -> spec-ideate
+[400/440] codex n-ideate -> spec-ideate
+[401/440] codex d-fact -> direct
+[402/440] codex d-fact -> direct
+[403/440] codex d-fact -> direct
+[404/440] codex d-fact -> direct
+[405/440] codex d-fact -> direct
+[406/440] codex d-fact -> direct
+[407/440] codex d-fact -> direct
+[408/440] codex d-fact -> direct
+[409/440] codex d-fact -> direct
+[410/440] codex d-lookup -> direct
+[411/440] codex d-fact -> direct
+[412/440] codex d-lookup -> direct
+[413/440] codex d-lookup -> direct
+[414/440] codex d-lookup -> direct
+[415/440] codex d-lookup -> direct
+[416/440] codex d-lookup -> direct
+[417/440] codex d-lookup -> direct
+[418/440] codex d-lookup -> direct
+[419/440] codex d-lookup -> direct
+[420/440] codex d-lookup -> direct
+[421/440] codex d-context -> direct
+[422/440] codex d-context -> direct
+[423/440] codex d-context -> direct
+[424/440] codex d-context -> direct
+[425/440] codex d-context -> direct
+[426/440] codex d-context -> direct
+[427/440] codex d-context -> direct
+[428/440] codex d-context -> direct
+[429/440] codex d-context -> direct
+[430/440] codex d-typo -> direct
+[431/440] codex d-typo -> direct
+[432/440] codex d-context -> direct
+[433/440] codex d-typo -> direct
+[434/440] codex d-typo -> direct
+[435/440] codex d-typo -> direct
+[436/440] codex d-typo -> direct
+[437/440] codex d-typo -> direct
+[438/440] codex d-typo -> direct
+[439/440] codex d-typo -> direct
+[440/440] codex d-typo -> direct
+{
+ "claude": {
+  "overall_acc": 0.977,
+  "by_group": {
+   "P": {
+    "n": 120,
+    "correct": 116,
+    "acc": 0.967
+   },
+   "N": {
+    "n": 60,
+    "correct": 59,
+    "acc": 0.983
+   },
+   "D": {
+    "n": 40,
+    "correct": 40,
+    "acc": 1.0
+   }
+  },
+  "confusions": {
+   "p-debug-regression: spec-debug -> [unparsed]": 1,
+   "p-work: spec-work -> [unparsed]": 1,
+   "p-pr-feedback: spec-resolve-pr-feedback -> [unparsed]": 1,
+   "p-pov: spec-pov -> [unparsed]": 1,
+   "n-optimize: spec-optimize -> [unparsed]": 1
+  },
+  "unparsed": 5,
+  "avg_dur_s": 9.3
+ },
+ "codex": {
+  "overall_acc": 0.85,
+  "by_group": {
+   "P": {
+    "n": 120,
+    "correct": 89,
+    "acc": 0.742
+   },
+   "N": {
+    "n": 60,
+    "correct": 58,
+    "acc": 0.967
+   },
+   "D": {
+    "n": 40,
+    "correct": 40,
+    "acc": 1.0
+   }
+  },
+  "confusions": {
+   "p-debug-regression: spec-debug -> direct": 3,
+   "p-code-review: spec-code-review -> direct": 10,
+   "p-doc-review: spec-doc-review -> direct": 6,
+   "p-plan: spec-plan -> direct": 1,
+   "p-work: spec-work -> direct": 2,
+   "p-compound: spec-compound -> direct": 8,
+   "p-brainstorm: spec-brainstorm -> direct": 1,
+   "n-review-fix: spec-doc-review -> spec-prd": 2
+  },
+  "unparsed": 0,
+  "avg_dur_s": 10.5
+ }
+}

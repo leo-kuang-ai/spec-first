@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 这是对既有方案文档的结构化审查请求，应使用角色化 lens 评审其完整性、可执行性与风险边界。

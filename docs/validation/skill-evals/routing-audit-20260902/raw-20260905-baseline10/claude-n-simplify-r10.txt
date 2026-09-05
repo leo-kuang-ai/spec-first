@@ -1,0 +1,2 @@
+ENTRY: spec-simplify-code
+REASON: 清理最近改动中的重复样板代码且保持行为不变，属于 scoped tidy/refactor pass，正是 spec-simplify-code 的用途(非 bug,不走 spec-debug)。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 纯只读的单点事实查询(某函数的调用位置列举),无失败/修复信号、无改动意图,属于 using-spec-first 明确排除的轻量事实查找,走 Direct Lane 即可。

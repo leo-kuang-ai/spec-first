@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求跨机器/跨会话交接工作进度（打包交接文档、明天在另一台机器接着干），命中 `spec-handoff` 的显式触发条件（显式要求跨会话交接），不得降级 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求包含 pytest 失败与明确的 AttributeError 诊断信号，按治理规则必须进入 spec-debug。

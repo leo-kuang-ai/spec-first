@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 该请求包含明确修复意图（“实现得不对”、“帮我修一下”的 bug 引用），命中入口硬规则，必须进入 spec-debug，不得走 Direct Lane。

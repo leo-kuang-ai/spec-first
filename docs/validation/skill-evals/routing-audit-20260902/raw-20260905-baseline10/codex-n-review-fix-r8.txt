@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 这是对既有 PRD/规划文档进行角色化评审并按明确授权直接修订，匹配 spec-doc-review 入口。

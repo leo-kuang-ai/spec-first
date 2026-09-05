@@ -1,0 +1,2 @@
+ENTRY: spec-compound
+REASON: 已验证有效的根因与防回归经验要沉淀为可复用知识，正是 spec-compound（knowledge capture）workflow 的职责，而非 Direct Lane 或其他入口。

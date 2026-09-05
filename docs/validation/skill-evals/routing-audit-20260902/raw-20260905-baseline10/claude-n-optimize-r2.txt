@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求是以可度量指标(800ms→200ms)为目标的迭代优化实验设计加执行，正是 spec-optimize 的 metric-driven 优化循环职责。

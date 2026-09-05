@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: README 单文件明确范围的低风险文案错别字修正,无失败/回归信号,不构成 spec-debug 的 bug 修复意图,按治理规则走 Direct Lane(小任务直接执行,仅保留 CHANGELOG 与边界纪律)。

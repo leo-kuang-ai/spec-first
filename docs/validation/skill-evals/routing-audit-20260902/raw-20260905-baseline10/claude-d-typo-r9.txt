@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 单文件单错字修正属小任务(docs-only 文案修正)，无失败信号与显式 workflow 点名，按任务分级直接执行即可(仍需补 CHANGELOG 条目)。

@@ -1,0 +1,2 @@
+ENTRY: spec-pov
+REASON: 这是结合当前项目现状对是否采用 GraphQL 的外部技术选型裁决，应进入项目化判断工作流。

@@ -1,0 +1,2 @@
+ENTRY: spec-code-review
+REASON: 用户要求对当前分支 12 个文件的改动做质量风险评审，属于对现有 diff 的代码审查，无失败/修复信号，命中 spec-code-review 的 diff 评审场景。

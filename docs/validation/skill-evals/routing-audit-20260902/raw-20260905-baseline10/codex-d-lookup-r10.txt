@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是已限定符号的只读定位请求，直接检索即可，无需进入 spec-* workflow。

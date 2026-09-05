@@ -1,0 +1,2 @@
+ENTRY: spec-handoff
+REASON: 用户明确要求跨机器/跨会话交接（打包工作进度交接文档供明天新机器续作），入口硬规则指定必须进入 spec-handoff，不得降级 Direct Lane。

@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求包含明确测试失败与 AttributeError，需要进入诊断工作流定位根因。

@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求只是询问当前会话的上下文内容,属于轻量事实问答,无失败信号、无修复意图、未点名任何 workflow,按入口治理规则走 Direct Lane。

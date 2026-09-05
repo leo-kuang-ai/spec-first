@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 该请求只是询问当前会话上下文中的轻量事实，无失败信号、无实质改动，属于 Direct Lane 的 current-context explanation 范畴。

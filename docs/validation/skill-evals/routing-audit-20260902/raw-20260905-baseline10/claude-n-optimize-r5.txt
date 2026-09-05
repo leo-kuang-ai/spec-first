@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 目标是把列表接口从 800ms 压到 200ms 的可度量性能指标优化实验，属于 metric-driven iterative optimization loop，正是 spec-optimize 的定义场景。

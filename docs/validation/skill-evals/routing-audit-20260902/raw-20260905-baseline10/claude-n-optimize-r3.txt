@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 请求是带明确量化指标(800ms→200ms)的可度量优化迭代实验，正是 spec-optimize(metric-driven iterative optimization loops)的定义场景。

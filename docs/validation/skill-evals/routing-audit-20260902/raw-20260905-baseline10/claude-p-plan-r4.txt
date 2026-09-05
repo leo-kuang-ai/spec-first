@@ -1,0 +1,2 @@
+ENTRY: spec-plan
+REASON: 需求已定但实现方案与任务拆分未定,属于规划阶段诉求,应进入 spec-plan 工作流而非 Direct Lane 或发散类入口。

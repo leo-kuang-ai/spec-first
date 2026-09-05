@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 对指定 PRD 文档做评审并直接修复问题，正是 spec-doc-review 文档评审工作流的职责范围（非 bug 修复、非单文档轻量清理，属实质性文档审查工作）。

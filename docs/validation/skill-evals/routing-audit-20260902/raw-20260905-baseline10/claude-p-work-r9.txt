@@ -1,0 +1,2 @@
+ENTRY: spec-work
+REASON: 已有明确 plan 产物待执行落地，无失败/修复信号，按入口治理应走执行 workflow 而非 Direct Lane。

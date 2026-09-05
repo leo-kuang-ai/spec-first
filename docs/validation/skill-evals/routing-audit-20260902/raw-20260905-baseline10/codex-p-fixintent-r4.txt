@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 请求明确指出函数实现错误并要求修复，属于必须进入 spec-debug 的 bug/失败行为处理。

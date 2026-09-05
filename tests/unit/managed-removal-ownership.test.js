@@ -424,9 +424,14 @@ describe('codex legacy runtime root removal ownership', () => {
     writeFile(path.join(projectRoot, '.codex', 'skills', 'spec-work', 'SKILL.md'), 'generated\n');
 
     const targets = removeDirTargets(projectRoot);
+    // Managed legacy-cleanup names mirror codex.js legacyCodexSpecFirstSkillNames():
+    // every bundled skill except graphify — prefixed or not (autoresearch is unprefixed).
+    const managedNames = new Set(
+      require('../../src/cli/plugin').listBundledSkills().filter((name) => name !== 'graphify'),
+    );
     const unprefixed = targets.filter(
       (target) => target.startsWith('.codex/skills/')
-        && !/^\.codex\/skills\/(spec-|using-spec-first)/.test(target),
+        && !managedNames.has(target.slice('.codex/skills/'.length)),
     );
     expect(unprefixed).toEqual([]);
     expect(targets).toContain('.codex/skills/spec-work');

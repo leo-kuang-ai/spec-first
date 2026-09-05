@@ -1,0 +1,2 @@
+ENTRY: direct
+REASON: 这是一个明确范围内的只读代码位置查询，属于轻量事实查找，无需进入 spec-* workflow。

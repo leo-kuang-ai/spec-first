@@ -1,0 +1,2 @@
+ENTRY: spec-optimize
+REASON: 该请求明确要求围绕可度量指标设计、执行并比较缓存优化实验，适合使用 metric-driven iterative optimization workflow。

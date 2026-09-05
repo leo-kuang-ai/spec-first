@@ -1,0 +1,2 @@
+ENTRY: spec-debug
+REASON: 存在明确 bug 与修复意图（"实现得不对……帮我修一下"），入口硬规则强制进入 spec-debug，不得走 Direct Lane。

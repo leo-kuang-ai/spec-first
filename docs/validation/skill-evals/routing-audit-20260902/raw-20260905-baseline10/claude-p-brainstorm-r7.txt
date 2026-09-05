@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 已有明确想法但目标用户与成功标准未定，按 definition 组判别规则属于 spec-brainstorm（若是从零发散新方向才走 spec-ideate）。

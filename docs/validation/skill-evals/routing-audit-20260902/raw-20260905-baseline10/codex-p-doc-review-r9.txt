@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 这是对既有方案文档的角色化审查请求，应使用 spec-doc-review。

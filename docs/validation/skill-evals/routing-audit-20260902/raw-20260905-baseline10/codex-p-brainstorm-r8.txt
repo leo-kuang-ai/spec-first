@@ -1,0 +1,2 @@
+ENTRY: spec-brainstorm
+REASON: 目标用户与成功标准尚未明确，需先通过结构化头脑风暴澄清产品方向与范围。

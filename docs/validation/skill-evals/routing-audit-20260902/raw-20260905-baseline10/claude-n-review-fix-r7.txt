@@ -1,0 +1,2 @@
+ENTRY: spec-doc-review
+REASON: 请求是对一份 PRD 文档做评审并直接修改发现的问题，属于文档评审工作流（spec-doc-review）的范围，而非 Direct Lane 的轻量单文档清理或代码类入口。
