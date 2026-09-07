@@ -116,6 +116,7 @@ __pycache__/
 /.opencode/skills/graphify/
 /.opencode/agents/spec-*
 /.opencode/spec-first/
+/.pi/spec-first/
 /.agents/skills/autoresearch/
 /.claude/skills/autoresearch/
 /.codex/skills/autoresearch/
