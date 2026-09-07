@@ -11,6 +11,7 @@
 [![CI](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
 [![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/package.json)
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
+[![Website](https://img.shields.io/badge/website-spec--first.cn-blue)](http://spec-first.cn/)
 
 [English](README.en.md) | [简体中文](README.md) | [用户手册](docs/05-用户手册/README.md) | [官方网站](http://spec-first.cn/)
 
