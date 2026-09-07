@@ -12,7 +12,7 @@ Extract from $ARGUMENTS:
 - `Target:` or `--target` — what to ship (path, PR, artifact, deployment)
 - `--type <type>` — override auto-detection: code-pr, code-release, deployment, content, docs, package, config
 - `--dry-run` — validate everything but don't ship
-- `--auto` — auto-approve if no errors found
+- `--auto` — legacy alias; never bypasses the explicit-approval gate below
 - `--force` — skip non-critical items (blockers still enforced)
 - `--rollback` — undo last ship action
 - `--monitor N` — post-ship monitoring for N minutes
@@ -83,7 +83,7 @@ If `--dry-run` or always before actual ship:
 
 ## Phase 6: Ship
 
-**REQUIRES EXPLICIT USER APPROVAL** (unless --auto with zero errors).
+**REQUIRES EXPLICIT USER APPROVAL** — unconditionally; `--auto` and a zero-error run never waive this gate.
 
 Execute the ship action:
 - Code PR: create/update PR, request reviewers

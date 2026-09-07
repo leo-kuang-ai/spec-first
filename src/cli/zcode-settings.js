@@ -7,10 +7,9 @@ const ZCODE_CONFIG_RELATIVE_PATH = '.zcode/config.json';
 const ZCODE_SESSION_START_RELATIVE_PATH = '.zcode/hooks/session-start';
 const ZCODE_HOOK_ACTIVATION_UNVERIFIED_REASON_CODE = 'zcode_activation_unverified';
 
-// The ZCode config hook contract is `hooks: { enabled?, events: { <Event>: [{ matcher?, hooks: [...] }] } }`
-// (Claude-compatible event names; configuration-file hooks additionally require
-// `hooks.enabled: true`). spec-first injects exactly one managed SessionStart
-// command hook and treats every other key/entry as user-owned.
+// ZCode config hook 契约为 `hooks: { enabled?, events: { <Event>: [{ matcher?, hooks: [...] }] } }`
+// （Claude 兼容的事件名；config-file hooks 还要求 `hooks.enabled: true`）。
+// spec-first 只注入一个受管 SessionStart command hook，其余键/条目一律视为用户所有。
 const MANAGED_SESSION_START_COMMAND = `node ${ZCODE_SESSION_START_RELATIVE_PATH}`;
 const MANAGED_SESSION_START_ENTRY = {
   hooks: [
@@ -25,9 +24,9 @@ function getZcodeConfigPath(projectRoot) {
   return path.join(projectRoot, ZCODE_CONFIG_RELATIVE_PATH);
 }
 
-// Returns { filePath, existsAfter, contents } for the merged config, or
-// { blocked: 'zcode_config_unreadable', filePath, message } when the existing
-// config cannot be parsed — a corrupt user file is never overwritten.
+// 返回合并后 config 的 { filePath, existsAfter, contents }；既有 config 无法解析时
+// 返回 { blocked: 'zcode_config_unreadable', filePath, message }——损坏的用户文件
+// 永不被覆盖。
 function renderManagedZcodeConfig(projectRoot) {
   const filePath = getZcodeConfigPath(projectRoot);
   let existing = null;
@@ -94,10 +93,9 @@ function inspectManagedZcodeConfig(projectRoot) {
     return [{
       status: 'drifted',
       eventName: 'SessionStart',
-      // A corrupt user-owned config is not spec-first runtime drift: a managed
-      // hard reset cannot repair it, so flagging it as drift would loop init
-      // through destructive resets that never converge. Doctor still surfaces
-      // the WARNING; init emits its own zcode_config_write_skipped diagnostic.
+      // 用户自有的损坏 config 不属于 spec-first runtime drift：受管 hard reset
+      // 修不了它，标为 drift 会让 init 在永不收敛的破坏性 reset 里循环。doctor
+      // 仍呈现 WARNING；init 自带 zcode_config_write_skipped 诊断。
       drift: false,
       degradedByDesign: false,
       reasonCode: 'zcode_config_unreadable',
@@ -107,9 +105,9 @@ function inspectManagedZcodeConfig(projectRoot) {
   if (hasManagedSessionStartEntry(settings)) {
     const enabled = settings.hooks && settings.hooks.enabled === true;
     if (enabled) {
-      // Activation verified live on 2026-09-05: the ZCode client executed the
-      // managed SessionStart hook at session start and injected its
-      // additionalContext (docs/validation/2026-09-05-zcode-sessionstart-activation-eval.md).
+      // 2026-09-05 真机激活验证：ZCode 客户端在会话启动时执行了受管
+      // SessionStart hook 并注入其 additionalContext
+      // （docs/validation/2026-09-05-zcode-sessionstart-activation-eval.md）。
       return [{
         status: 'installed',
         eventName: 'SessionStart',
@@ -136,8 +134,8 @@ function mergeManagedSlice(existing) {
     next.hooks = {};
   }
 
-  // Ownership rule: an explicit user `enabled: false` wins and is surfaced as a
-  // degraded warning by the caller; only an absent flag is set to true.
+  // 所有权规则：用户显式 `enabled: false` 优先并由调用方以降级 WARNING 呈现；
+  // 只有缺失的 flag 才会被置 true。
   if (next.hooks.enabled === undefined) {
     next.hooks.enabled = true;
   }
@@ -181,9 +179,8 @@ function removeManagedSlice(settings) {
   if (Object.keys(hooks.events).length === 0) {
     delete hooks.events;
   }
-  // Ownership: a leftover `hooks.enabled` cannot be attributed (a user-written
-  // false is indistinguishable from the spec-first-written true), so it is
-  // always preserved rather than deleted with the managed entry.
+  // 所有权：残留的 `hooks.enabled` 无法归因（用户写的 false 与 spec-first 写的
+  // true 不可区分），因此总是保留、不随受管条目一起删除。
   if (isPlainObject(next.hooks) && Object.keys(next.hooks).length === 0) {
     delete next.hooks;
   }
@@ -219,9 +216,8 @@ function degradedStatus(detail, reasonCode = ZCODE_HOOK_ACTIVATION_UNVERIFIED_RE
   return {
     status: 'degraded-by-design',
     eventName: 'SessionStart',
-    // `drift: false` keeps the persistent degraded-by-design state out of
-    // init's runtime-drift detection (same contract as the qoder degraded
-    // statuses), so an unchanged install does not trigger a hard reset.
+    // `drift: false` 使常驻的 degraded-by-design 状态不进入 init 的 runtime-drift
+    // 检测（与 qoder 降级状态同契约），未变更的安装不会触发 hard reset。
     drift: false,
     degradedByDesign: true,
     reasonCode,

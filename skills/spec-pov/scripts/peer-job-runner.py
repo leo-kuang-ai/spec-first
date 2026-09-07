@@ -160,6 +160,9 @@ STATUS_READ_CAP = 256
 META_READ_CAP = 64 * 1024
 PAYLOAD_READ_CAP = 2 * 1024 * 1024
 SERVING_RECEIPT_READ_CAP = 32 * 1024
+# 跨模型 serving receipt 的认证 producer 通道尚未建成；关闭期间 start 对任何
+# receipt 形状一律 fail-closed（含 degraded 形状），禁止把自述 receipt 当信任根。
+SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED = False
 SERVING_RECEIPT_MAX_TTL_SECS = 15 * 60
 SERVING_RECEIPT_CLOCK_SKEW_SECS = 30
 SECRET_VALUE_PATTERNS = (
@@ -347,42 +350,14 @@ def validate_start_authority(args, worker_argv):
             or serving.get('reason_code')
             != 'authenticated-producer-unavailable'):
         raise RunnerError('provider_serving_receipt_unverified')
-    raise RunnerError('provider_serving_receipt_unverified')
-    try:
-        captured_epoch = datetime.datetime.fromisoformat(
-            serving.get('captured_at', '').replace('Z', '+00:00')
-        ).timestamp()
-        serving_expires_epoch = datetime.datetime.fromisoformat(
-            serving.get('freshness_expires_at', '').replace('Z', '+00:00')
-        ).timestamp()
-    except (AttributeError, TypeError, ValueError, OverflowError):
-        raise RunnerError('provider_serving_receipt_freshness_invalid')
-    now_epoch = time.time()
-    if serving_expires_epoch <= now_epoch:
-        raise RunnerError('provider_serving_receipt_stale')
-    if (captured_epoch > now_epoch + SERVING_RECEIPT_CLOCK_SKEW_SECS
-            or captured_epoch > serving_expires_epoch
-            or serving_expires_epoch - captured_epoch
-            > SERVING_RECEIPT_MAX_TTL_SECS):
-        raise RunnerError('provider_serving_receipt_freshness_invalid')
-    if serving.get('semantic_request_sha256') != semantic_sha:
-        raise RunnerError('provider_serving_receipt_source_mismatch')
-    if serving.get('source_identity') != args.source_identity:
-        raise RunnerError('provider_serving_receipt_source_mismatch')
-    if serving.get('provider_trust_domain') != args.provider_trust_domain:
-        raise RunnerError('provider_serving_receipt_trust_domain_mismatch')
-    if (serving.get('requested_provider') != args.requested_provider
-            or serving.get('requested_model') != args.requested_model):
-        raise RunnerError('provider_serving_receipt_requested_identity_mismatch')
-    if (serving.get('actual_provider') != args.actual_provider
-            or serving.get('actual_model') != args.actual_model):
-        raise RunnerError('provider_serving_receipt_actual_identity_mismatch')
-    credential_allowlist = serving.get('credential_env_allowlist')
-    if (not isinstance(credential_allowlist, list)
-            or credential_allowlist
-            != list(dict.fromkeys(args.credential_env))):
+    if not SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED:
+        # 通道关闭是设计状态：file-based receipt 可自伪造，不能作为信任根。
+        # 解除条件：存在经认证的 host producer channel 并为 receipt 增加防伪
+        # 签名后，重写 freshness/identity/allowlist 校验并补正向测试。
         raise RunnerError(
-            'provider_serving_receipt_credential_allowlist_mismatch')
+            'provider_serving_receipt_unverified'
+            ' (authenticated producer channel disabled)')
+    raise RunnerError('provider_serving_receipt_unverified')
 
     payload_raw, payload = _load_owned_json(args.payload_ref, PAYLOAD_READ_CAP, 'peer task packet')
     _require_sha256(args.payload_sha256, '--payload-sha256')
@@ -425,7 +400,7 @@ def validate_start_authority(args, worker_argv):
         'receipt_sha256': args.authorization_receipt_sha256,
         'serving_receipt_ref': os.path.abspath(args.serving_receipt),
         'serving_receipt_sha256': args.serving_receipt_sha256,
-        'serving_receipt_producer': producer,
+        'serving_receipt_producer': f"degraded:{serving.get('reason_code', 'unknown')}",
         'payload_bytes': len(payload_raw),
         'payload_sha256': args.payload_sha256,
         'credential_env': list(dict.fromkeys(args.credential_env)),
@@ -1716,7 +1691,7 @@ def cmd_start(args, worker_argv) -> int:
         "provider_serving_receipt_ref": authority['serving_receipt_ref'],
         "provider_serving_receipt_sha256": authority['serving_receipt_sha256'],
         "provider_serving_receipt_producer": authority['serving_receipt_producer'],
-        "serving_identity_status": "verified",
+        "serving_identity_status": "channel-disabled-unverified",
         "requested_provider": args.requested_provider,
         "actual_provider": args.actual_provider,
         "requested_model": args.requested_model,

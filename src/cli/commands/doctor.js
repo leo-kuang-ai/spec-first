@@ -4,7 +4,9 @@ const { inspectInstalledAssets, listBundledCommands, loadPluginManifest } = requ
 const { readDeveloperFile, getGlobalDeveloperPath } = require('../developer');
 const { isCommandTimeout, spawnSyncWithTimeout } = require('../external-command');
 const { isLegacyManagedState, readState, readStateFileRaw } = require('../state');
-const { getAdapter, getSupportedPlatforms } = require('../adapters');
+const { getAdapter, getPlatformDisplayName, getSupportedPlatforms } = require('../adapters');
+const { PLATFORM_REGISTRY } = require('../adapters/platform-registry');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { inspectInstructionBootstrap } = require('../instruction-bootstrap');
 const { formatInitGuidance } = require('../init-guidance');
 const { inspectManagedClaudeHooks } = require('../claude-settings');
@@ -35,7 +37,7 @@ function runDoctor(argv) {
   }
 
   if (parsed.unknown.length > 0) {
-    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi] [--json] [--verbose]');
+    console.error(`Usage: spec-first doctor ${formatSupportedHostFlags('pipe')} [--json] [--verbose]`);
     return 2;
   }
 
@@ -343,20 +345,20 @@ function checkGit() {
   };
 }
 
-// doctor 探测的宿主 CLI 命令与显示名；未列出的宿主回退 claude/Claude Code。
-const PLATFORM_CLI_PROBES = {
-  opencode: { command: 'opencode', displayName: 'OpenCode' },
-  codex: { command: 'codex', displayName: 'Codex' },
-  cursor: { command: 'agent', displayName: 'Cursor CLI' },
-  kiro: { command: 'kiro', displayName: 'Kiro' },
-  qoder: { command: 'qodercli', displayName: 'Qoder' },
-  zcode: { command: 'zcode', displayName: 'ZCode' },
-  pi: { command: 'pi', displayName: 'Pi' },
+// doctor 探测的宿主 CLI 命令名（探测命令与宿主 id 不同名时才登记）；
+// 显示名一律从 registry 派生，避免第二份硬编码名单漂移。
+const PLATFORM_CLI_PROBE_COMMANDS = {
+  cursor: 'agent',
+  qoder: 'qodercli',
+};
+const PLATFORM_CLI_DISPLAY_NAME_OVERRIDES = {
+  cursor: 'Cursor CLI',
 };
 
 function checkPlatformCli(platform, options = {}) {
-  const { command, displayName } = PLATFORM_CLI_PROBES[platform]
-    || { command: 'claude', displayName: 'Claude Code' };
+  const command = PLATFORM_CLI_PROBE_COMMANDS[platform] || platform;
+  const displayName = PLATFORM_CLI_DISPLAY_NAME_OVERRIDES[platform]
+    || getPlatformDisplayName(platform);
   // Note: Codex CLI may not be available yet - this is expected during MVP phase
   const runner = options.runner || spawnSyncWithTimeout;
   const isWindows = options.platform === 'win32' || (options.platform === undefined && process.platform === 'win32');
@@ -1875,7 +1877,7 @@ function printHelp() {
     '🩺 spec-first doctor',
     '',
 	    '📘 Usage:',
-	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi] [--json] [--verbose]',
+	    `  spec-first doctor ${formatSupportedHostFlags('pipe')} [--json] [--verbose]`,
 	    '  --verbose  在简明总览后显示所有检查明细。',
 	    '',
 	    '📊 JSON status fields:',
@@ -1913,25 +1915,27 @@ function detectPlatforms(projectRoot) {
   });
 }
 
+// 安装态判定按 registry 的 detection 描述符分派（唯一事实源）：
+// state-file 宿主的裸 runtime 目录可能是宿主客户端自建内容（settings、prompts、
+// extensions），只有受管 state file 能证明 spec-first 已安装——此前两份平行手写
+// 宿主清单漏改任一份即产生误判。
 function isPlatformRuntimeDetected(projectRoot, adapter) {
-  // ZCode/Pi 按受管 state file 判定而非裸 runtime 目录：宿主客户端可能自建
-  // 项目级 `.zcode/`/`.pi/` 内容（settings、prompts、extensions）而 spec-first
-  // 并未安装。
-  if (!['kiro', 'qoder', 'cursor', 'opencode', 'zcode', 'pi'].includes(adapter.id)) {
-    return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
-  }
+  const entry = PLATFORM_REGISTRY[adapter.id];
+  const detection = entry && entry.detection;
 
-  if (adapter.id === 'qoder' || adapter.id === 'cursor' || adapter.id === 'opencode' || adapter.id === 'zcode' || adapter.id === 'pi') {
+  if (detection === 'state-file') {
     return fs.existsSync(path.join(projectRoot, adapter.stateFile));
   }
 
-  const runtimePaths = [
-    adapter.stateFile,
-    adapter.skillsRoot,
-    adapter.agentsRoot,
-  ];
+  if (detection === 'runtime-paths') {
+    return [
+      adapter.stateFile,
+      adapter.skillsRoot,
+      adapter.agentsRoot,
+    ].some((runtimePath) => fs.existsSync(path.join(projectRoot, runtimePath)));
+  }
 
-  return runtimePaths.some((runtimePath) => fs.existsSync(path.join(projectRoot, runtimePath)));
+  return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
 }
 
 // 宿主 flag 集合从 registry 派生：新增宿主时 doctor 的解析面随 getSupportedPlatforms() 自动扩展。

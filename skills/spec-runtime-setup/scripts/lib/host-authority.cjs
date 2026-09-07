@@ -177,6 +177,11 @@ function buildInvocationReceipt({
     reason_code: reasonCode,
     host,
     loaded_host: loadedSurface ? loadedSurface.host : null,
+    // 共享面（如 .agents/skills 同时绑定 codex/zcode）时 receipt 必须证明 pin
+    // 宿主确实绑定到该面，否则消费方只能看到 first-match 宿主而误拒 pin。
+    surface_hosts: loadedSurface && Array.isArray(loadedSurface.hosts)
+      ? [...loadedSurface.hosts]
+      : [],
     surface_id: loadedSurface ? loadedSurface.surface_id : null,
     skill_root: loadedSurface ? loadedSurface.skill_root : path.resolve(String(skillRoot || '.')),
     canonical_entry_name: 'spec-runtime-setup',

@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const pkg = require('../../package.json');
 const { detectColorSupport, renderFullArt } = require('./brand');
+const { formatSupportedHostFlags } = require('./helpers/supported-host-flags');
 const { runClean } = require('./commands/clean');
 const { runDoctor } = require('./commands/doctor');
 const { runInit } = require('./commands/init');
@@ -179,9 +180,9 @@ function printHelp(withErrorPrefix = false) {
     '🧩 Commands:',
     '  doctor                 Check environment, runtime asset manifest, and managed runtime assets',
     '  quickstart [-y|--yes]  Detect Node/Git/host CLIs, then hand off to `init` (auto-selects host when exactly one is detected)',
-    '  init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [--pi] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
+    `  init ${formatSupportedHostFlags('each')} [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile`,
     '  update                 Upgrade the spec-first CLI package and refresh runtime assets with `spec-first init`',
-    '  clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets',
+    `  clean ${formatSupportedHostFlags('paren')} Remove host runtime managed assets; or clean --workspace-graph for per-requirement graph assets`,
     '  repair-worktree        Preview broken worktree pointer repair guidance',
     '  tasks <subcommand>      Hash and validate derived task packs',
     '  plans <subcommand>      Read-only plan lifecycle audit (`plans audit`)',

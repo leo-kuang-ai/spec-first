@@ -19,6 +19,9 @@ const HOST_COMPARATIVE_CONFIG_PATHS = [
   '$HOME/.cursor/mcp.json',
   '~/.cursor/mcp.json',
   '.cursor/mcp.json',
+  '$HOME/.zcode/config.json',
+  '~/.zcode/config.json',
+  '.zcode/config.json',
 ].sort((left, right) => right.length - left.length);
 
 const HOST_COMPARATIVE_CONFIG_REPLACEMENTS = HOST_COMPARATIVE_CONFIG_PATHS.map(

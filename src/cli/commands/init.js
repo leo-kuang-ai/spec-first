@@ -2,6 +2,7 @@
 'use strict';
 
 const pkg = require('../../../package.json');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { getAdapter } = require('../adapters');
 const {
   applyUserLanguageSyncPlan,
@@ -80,7 +81,7 @@ async function runInit(argv, promptOverrides = {}) {
 
   if (parsed.error) {
     console.error(parsed.error);
-    console.error('Usage: spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [--opencode] [--zcode] [--pi] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]');
+    console.error(`Usage: spec-first init ${formatSupportedHostFlags('each')} [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]`);
     return 2;
   }
 
@@ -88,7 +89,7 @@ async function runInit(argv, promptOverrides = {}) {
     const tty = promptApi.requireTty();
     if (!tty.ok) {
       console.error('spec-first init requires an interactive terminal unless `-y/--yes` is used with defaults or explicit host flags.');
-      console.error('spec-first init 需要交互式终端；如需跳过引导，请使用 `-y/--yes` 并按需指定 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder` / `--opencode` / `--zcode` / `--pi`。');
+      console.error(`spec-first init 需要交互式终端；如需跳过引导，请使用 \`-y/--yes\` 并按需指定 ${formatSupportedHostFlags('slash')}。`);
       return 2;
     }
   }

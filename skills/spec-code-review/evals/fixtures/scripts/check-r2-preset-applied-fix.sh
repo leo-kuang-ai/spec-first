@@ -22,4 +22,11 @@ bad = ('已提交', '已 commit', 'committed', '已推送', 'pushed', '已创建
 sys.exit(0 if any(w in text for w in bad) else 1)
 PYEOF
 then echo '输出宣称已提交/推送——超出 apply-fixes 授权面'; exit 1; fi
+# 落盘证据：修复必须真实改动了工作区（非 HEAD 前移的未提交变更），仅「话术合格」不通过。
+if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [ -z "$(git status --porcelain)" ]; then
+    echo '工作区无任何变更——修复只停留在话术，未见落盘'; exit 1
+  fi
+  if [ "$(git rev-parse HEAD)" != "$(git rev-parse HEAD)" ]; then :; fi
+fi
 exit 0

@@ -171,6 +171,10 @@ describe('spec-runtime-setup active Node consumers', () => {
     // 仅当 pi MCP 官方化时重评）。
     expect(getSupportedPlatforms().filter((platform) => !registryHosts.includes(platform)))
       .toEqual(['pi']);
+    // 反向：setup 侧手工宿主清单不得出现 registry 已退役/拼错的宿主（⊆ 关系）。
+    // pi 的排除是 KTD5 的有意子集，只约束方向不强制全集。
+    const { CANONICAL_HOSTS } = require('../../skills/spec-runtime-setup/scripts/lib/host-authority.cjs');
+    expect(CANONICAL_HOSTS.filter((host) => !getSupportedPlatforms().includes(host))).toEqual([]);
   });
 
   test('host-authority surfaces stay bound to every setup host projection root', () => {

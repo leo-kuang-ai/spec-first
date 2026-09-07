@@ -14,6 +14,7 @@ const {
   summarizeOperationPlan,
 } = require('../state');
 const { getAdapter, getPlatformDisplayName, getSupportedPlatforms } = require('../adapters');
+const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { resolveUserLanguage } = require('../cli-lang');
 
 // 用户旅程文案双语；usage/help、legacy state 与 workspace-graph 等技术诊断输出保留英文。
@@ -88,7 +89,7 @@ function runClean(argv, deps = {}) {
   const selectedPlatforms = selectedHostPlatforms(parsed);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) [--dry-run]');
+    console.error(`Usage: spec-first clean ${formatSupportedHostFlags('paren')} [--dry-run]`);
     console.error('   or: spec-first clean --workspace-graph [--repos a,b] [--dry-run]');
     return 2;
   }
@@ -547,7 +548,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder|--opencode|--zcode|--pi) [--dry-run]',
+    `  spec-first clean ${formatSupportedHostFlags('paren')} [--dry-run]`,
     '  spec-first clean --workspace-orphans [--confirm]',
     '  spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
     '',
