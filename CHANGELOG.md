@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- chore(gitignore): 补齐 Pi 宿主 runtime mirror 忽略规则 `/.pi/spec-first/`——该路径是 `platform-registry.js` 登记的 generated-runtime managed root（Pi 专属 runtime 面仅 `.pi/spec-first/` 下 state file），此前缺失导致 runtime 状态文件存在被 `git add -A` 误入库的风险。仅改 `.gitignore` 与本条记录。
+
 - docs(plan): 终审修正开发顺序方案边界与验收合同。
 
 - docs(plan): 新增 SDLC 视角多专家提升方案 `docs/plans/2026-09-07-001-sdlc-lens-multi-expert-improvement-plan.md`（advisory）——基于 SDLC 全网调研结论，5 视角专家只读分析 + 红队逐项裁决 19 项提案：3 项确定性收口立即执行（AGENTS.md vendor/ 失效引用修正、漂移检查接入 CI、Linux 全量测试 job）、14 项折入 S0-S6 现有批次（B1 供应链免审盲区列为 S3.2 首项）、2 项挂起待触发；关键行级证据经红队与主席两级 grep 复验。仅新增方案文档与本条变更记录，未执行产品改动、模型评测或 runtime 投射。
