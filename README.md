@@ -8,9 +8,9 @@
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
-[![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
-[![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/master/package.json)
-[![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/master/LICENSE)
+[![CI](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
+[![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/package.json)
+[![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
 
 [English](README.en.md) | [简体中文](README.md) | [用户手册](docs/05-用户手册/README.md) | [官方网站](http://spec-first.cn/)
 
@@ -264,17 +264,17 @@ npm run test:release
 npm run build
 ```
 
-源码变更应发生在 canonical source surfaces。只有 runtime source 变化时，才通过 `spec-first init` 重新生成 runtime copies。更多信息见[贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)、[版本记录](CHANGELOG.md)和 [GitHub Issues](https://github.com/sunrain520/spec-first/issues)。
+源码变更应发生在 canonical source surfaces。只有 runtime source 变化时，才通过 `spec-first init` 重新生成 runtime copies。更多信息见[贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)、[版本记录](CHANGELOG.md)和 [GitHub Issues](https://github.com/leo-kuang-ai/spec-first/issues)。
 
 项目使用 MIT License。
 
 ## 相关文档
 
-- [用户手册](https://github.com/sunrain520/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
-- [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
-- [项目角色契约](https://github.com/sunrain520/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
+- [用户手册](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md)
+- [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
+- [项目角色契约](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/10-prompt/%E7%BB%93%E6%9E%84%E5%8C%96%E9%A1%B9%E7%9B%AE%E8%A7%92%E8%89%B2%E5%A5%91%E7%BA%A6.md)
 
 ## 加入社区
 
-- [GitHub Issues](https://github.com/sunrain520/spec-first/issues)
+- [GitHub Issues](https://github.com/leo-kuang-ai/spec-first/issues)
 - [官方网站](http://spec-first.cn/)

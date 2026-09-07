@@ -7,9 +7,9 @@
 `spec-first` is a repository-native AI Coding Harness for Claude Code, Codex, Kiro, Qoder, Cursor, OpenCode, ZCode, and Pi. It connects intent, requirements, plans, code, review, evidence, and reusable knowledge in one inspectable engineering loop.
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
-[![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
-[![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/master/package.json)
-[![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/master/LICENSE)
+[![CI](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/leo-kuang-ai/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
+[![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/package.json)
+[![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/leo-kuang-ai/spec-first/blob/master/LICENSE)
 
 [简体中文](README.md) | [English](README.en.md) | [User Manual](docs/05-用户手册/README.md) | [Website](http://spec-first.cn/)
 
@@ -260,9 +260,9 @@ MIT licensed.
 ## Documentation
 
 - [User Manual](docs/05-用户手册/README.md)
-- [Runtime Capability Catalog](https://github.com/sunrain520/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
+- [Runtime Capability Catalog](https://github.com/leo-kuang-ai/spec-first/blob/master/docs/catalog/runtime-capabilities.md)
 
 ## Community
 
-- [GitHub Issues](https://github.com/sunrain520/spec-first/issues)
+- [GitHub Issues](https://github.com/leo-kuang-ai/spec-first/issues)
 - [Website](http://spec-first.cn/)
