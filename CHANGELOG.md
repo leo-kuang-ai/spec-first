@@ -1,6 +1,16 @@
+## [Unreleased]
+
+- docs(plan): 终审修正开发顺序方案边界与验收合同。
+
+- docs(plan): 新增 SDLC 视角多专家提升方案 `docs/plans/2026-09-07-001-sdlc-lens-multi-expert-improvement-plan.md`（advisory）——基于 SDLC 全网调研结论，5 视角专家只读分析 + 红队逐项裁决 19 项提案：3 项确定性收口立即执行（AGENTS.md vendor/ 失效引用修正、漂移检查接入 CI、Linux 全量测试 job）、14 项折入 S0-S6 现有批次（B1 供应链免审盲区列为 S3.2 首项）、2 项挂起待触发；关键行级证据经红队与主席两级 grep 复验。仅新增方案文档与本条变更记录，未执行产品改动、模型评测或 runtime 投射。
+
 # Changelog
 
+- v1.15.2 2026-09-07 12:12:10 tester: docs(plan): 逐项落实开发顺序终审意见——将跨批次验收表收敛为正文索引，统一替代模型内部试验与 Astra 验收边界，明确多 agent、私有数据和现场试点的适用条件；对齐既有测量准入器的逐比较对身份、A/A 与重新采样预算；保留映射检查但移除首批强制建设长期 lint 的要求。仅修改方案与变更记录，未执行模型实验、产品改动或 runtime 投射。
+
 - v1.15.2 2026-09-07 01:52:00 leokuang: fix(update,init): 修复两处安装/更新链路缺陷——`spec-first update` 在零已安装宿主时不再回落无 host flag 的 `init -y`（该命令会安装 `-y` 默认宿主 claude+codex），父 workspace 自身无 host state 时也不再代表 child 发出 `--all-repos`（会把某个 child 的宿主装进从未安装过的兄弟仓库）；改为按成因分别报告 `installed-runtime-absent` / `installed-runtime-stateless` / `child-repo-runtime-only`，给出显式选宿主的安装指引或逐子仓库刷新命令，升级本身成功仍以 0 退出。`init` 的全局 developer profile 判定不再从已解析的 name/lang 反推显式性（两者带 global profile、git user.name、'zh' 回落，永不为空，导致 `preserve` 分支不可达、每次 init 都报 overwrite 并重写 `~/.spec-first/.developer`）；显式信号改由 `parseInitArgs` 的 `explicitName`/`explicitLang` 与交互确认结果提供，并补上 `init-workspace.js` 一直缺失的 `globalProfileConfirmed` 转发（否则修复后 `--all-repos` 交互改名会被静默丢弃）。验证：`npm run typecheck`（256 files），`npx jest tests/unit/update-command-spawn.test.js tests/unit/init-global-developer-explicit-signal.test.js`（25 passed），`npm run test:smoke`（5 passed），`npx jest tests/integration/init-six-host-lifecycle.integration.test.js`（35 passed）；实机复验原始症状：虚拟仓库与父 workspace 执行 update 不再生成 runtime 目录、隔离 HOME 下 `init -y` 不再改写 profile 文件。 (user-visible)
+
+- v1.15.2 2026-09-07 12:00:00 leokuang: docs(plan): 终审修订下一阶段开发顺序——把编号错位的“12.1 审查问题逐项修复合同”移为 10.4，并将其 18 条按归属批次并入 S0/S1/S2/S3/S4/S5.5 出口条件，消除“批次出口条件可独立关闭批次”的双合同缺口；明确 5.3 每组 3 次仅服务受保护行为存在性与判定稳定性、效应量一律走 S4 分层样本；去重 S4 比较矩阵并固定为三对；消解替代模型受限内部使用与 Astra 目标模型 hard gate 的字面冲突；标注编写时 HEAD 快照已被取代。仅修改方案与变更记录，未改产品 source、未执行实验或行为验证。
 
 - v1.15.2 2026-09-07 00:00:00 leokuang: fix(runtime-setup): 修复 Claude 宿主 spec-runtime-setup mutation 全部被 `host-invocation-surface-unverified` 阻断的回归——`HOST_SKILL_SURFACES` 未登记 claude 的 workflow 投射根 `.claude/spec-first/workflows`（surface 改为按宿主多根登记，与 adapter 投射根对齐）；receipt schema host enum 补齐 zcode；新增 drift-guard 单测强制 surface 登记面与 adapter workflowsRoot、schema enum 与 CANONICAL_HOSTS 同步。 (user-visible)
 
