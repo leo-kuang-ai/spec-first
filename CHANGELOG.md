@@ -1,5 +1,7 @@
 # Changelog
 
+- v1.15.3 2026-09-07 16:00:00 leokuang: docs(readme): 三个 README 变体中的仓库链接统一由旧地址 `github.com/sunrain520/spec-first` 改为现址 `github.com/leo-kuang-ai/spec-first`（CI/node/license 徽章、Issues、用户手册与文档深链，共 21 处）；CI 徽章引用的 `npm-install-matrix.yml` 在现仓库存在，链接继续有效。同时设置 GitHub 仓库 homepage 为 spec-first.cn 并更新 description。仅文档与仓库元数据变更。
+
 - v1.15.3 2026-09-07 15:44:00 leokuang: chore(release): 发布 npm `spec-first@1.15.3`（shasum 43e9a9e6cb15b6596c8f1b6b32a3e41e0288194d）；website source-capabilities 与 facts 同步至 1.15.3（spec-first-official-website 43f07854）。本版相对已发布 1.15.2 的实质变更即下列两条 user-visible 修复与依赖安全升级。
 
 - v1.15.3 2026-09-07 15:40:00 leokuang: chore(deps): 经 dependabot #47/#48 升级 lockfile 中的 fast-uri 3.1.5→3.1.7、browserslist 4.28.4→4.28.9，关闭 5 个 high 级依赖安全告警；两者均为 dev 依赖链传递依赖，无运行时 API 变化。
