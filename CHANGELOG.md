@@ -1,5 +1,7 @@
 # Changelog
 
+- v1.15.3 2026-09-07 15:44:00 leokuang: chore(release): 发布 npm `spec-first@1.15.3`（shasum 43e9a9e6cb15b6596c8f1b6b32a3e41e0288194d）；website source-capabilities 与 facts 同步至 1.15.3（spec-first-official-website 43f07854）。本版相对已发布 1.15.2 的实质变更即下列两条 user-visible 修复与依赖安全升级。
+
 - v1.15.3 2026-09-07 15:40:00 leokuang: chore(deps): 经 dependabot #47/#48 升级 lockfile 中的 fast-uri 3.1.5→3.1.7、browserslist 4.28.4→4.28.9，关闭 5 个 high 级依赖安全告警；两者均为 dev 依赖链传递依赖，无运行时 API 变化。
 
 - v1.15.3 2026-09-07 15:00:00 leokuang: chore(gitignore): 补齐 Pi 宿主 runtime mirror 忽略规则 `/.pi/spec-first/`——该路径是 `platform-registry.js` 登记的 generated-runtime managed root（Pi 专属 runtime 面仅 `.pi/spec-first/` 下 state file），此前缺失导致 runtime 状态文件存在被 `git add -A` 误入库的风险。仅改 `.gitignore` 与本条记录。
