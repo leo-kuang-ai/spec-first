@@ -5,22 +5,12 @@
   "public_entrypoint_disposition": "reuse-spec-runtime-setup-only",
   "source_snapshot": {
     "repository": "spec-first",
-    "head": "cb4c4b1590a39ef2cc5506215bb084e4a8941354",
-    "dirty": true,
-    "dirty_paths": [
-      "CHANGELOG.md",
-      "docs/plans/2026-09-05-002-next-phase-development-sequence.md",
-      "src/cli/commands/init-args.js",
-      "src/cli/commands/init-input.js",
-      "src/cli/commands/init-project-plan.js",
-      "src/cli/commands/init-workspace.js",
-      "src/cli/commands/update.js",
-      "tests/unit/init-global-developer-explicit-signal.test.js",
-      "tests/unit/update-command-spawn.test.js"
-    ],
-    "dirty_path_manifest_sha256": "b13b00cc9e2e16d2425dedd76e7818d04f70162c871826f579caf50d589c324e",
-    "source_tree_hash": "4c47895c1a18b6d1458cc23abf8d864897d5626bd21c9c3ba5c3b7813a0170d6",
-    "inventory_hash": "b468bba1a6e91bbd5f7d800241d02194a8630258b4e2da2a7df42b58be250b2c",
+    "head": "e4e667176516ad08e6ca36439f2e02f8db31b2a8",
+    "dirty": false,
+    "dirty_paths": [],
+    "dirty_path_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_tree_hash": "d3ac3c993f255d3149854f40664468ef4e27a6a3b3f7fcea127b4c1367bf6f03",
+    "inventory_hash": "fbd548868fd472bc8748c727dcc79f1785995844f9fb451db7839b4c41dbf29d",
     "scope_contract": {
       "source_roots": [
         "CLAUDE.md",
@@ -55,9 +45,9 @@
     }
   },
   "inventory_ref": "docs/validation/ce-localization/skill-inventory.json",
-  "inventory_sha256": "31845a6db954490bb8645efc648185d33287cb282adad486861f3fa250dbd5f1",
+  "inventory_sha256": "ac55468a93c9614c8afcf2ad3ba69a9375cdc18c67665a42b40b176c1d72227b",
   "preflight_ref": "docs/validation/ce-localization/ce-setup-prerequisite-preflight.json",
-  "preflight_sha256": "07b7a1f09458f0e73fcc1e915337c111554c8075b5c3ea33e509f312835bfd59",
+  "preflight_sha256": "e39835e9ecf8e25dd6d4c27b16d844346fabc0a944e93fcebee173f3f095703c",
   "ce_tool_dispositions": [
     {
       "tool_id": "agent-browser",
